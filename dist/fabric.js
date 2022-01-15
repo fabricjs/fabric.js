@@ -14438,7 +14438,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       var pointer = this.getPointer(e);
       if (target.group) {
-        //  transform pointer to target's coordinate plane
+        //  transform pointer to target's containing coordinate plane
         pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(target.group.calcTransformMatrix()));
       }
       var corner = target.__corner,
@@ -14448,7 +14448,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           action = this._getActionFromCorner(alreadySelected, corner, e, target),
           origin = this._getOriginFromCorner(target, corner),
           altKey = e[this.centeredKey],
-          /**relative to target's coordinate plane */
+          /**
+           * relative to target's containing coordinate plane
+           * both agree on every point
+           **/
           transform = {
             target: target,
             action: action,
@@ -16072,7 +16075,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           transform = this._currentTransform,
           target = transform.target;
       if (target.group) {
-        //  transform pointer to target's coordinate plane
+        //  transform pointer to target's containing coordinate plane
+        //  both agree on every point
         pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(target.group.calcTransformMatrix()));
       }
       transform.reset = false;
@@ -17802,11 +17806,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @returns {number}
      */
     getTotalAngle: function () {
-      var angle = this.angle;
-      if (this.group) {
-        angle += this.group.getTotalAngle();
-      }
-      return angle;
+      return fabric.util.qrDecompose(this.calcTransformMatrix()).angle;
     },
 
     /**
@@ -20276,11 +20276,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
     _findTargetCorner: function(pointer, forTouch) {
-      // objects in group, anykind, are not self modificable,
-      // must not return an hovered corner.
       if (!this.hasControls || (!this.canvas || this.canvas._activeObject !== this)) {
         return false;
       }
+      //  transform pointer to target's containing coordinate plane
+      //  both agree on every point
       var p = this.group ?
         fabric.util.transformPoint(pointer, fabric.util.invertTransform(this.group.calcTransformMatrix())) :
         pointer;
@@ -22682,9 +22682,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @private
      */
     _updateObjectsACoords: function() {
-      var skipControls = false;
       for (var i = this._objects.length; i--; ){
-        this._objects[i].setCoords(skipControls);
+        this._objects[i].setCoords();
       }
     },
 
@@ -22705,16 +22704,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {fabric.Point} center, current center of group.
      */
     _updateObjectCoords: function(object, center) {
-      var objectLeft = object.left,
-          objectTop = object.top,
-          skipControls = false;
-
+      var objectLeft = object.left, objectTop = object.top;
       object.set({
         left: objectLeft - center.x,
         top: objectTop - center.y
       });
       object.group = this;
-      object.setCoords(skipControls);
+      object.setCoords();
     },
 
     /**
