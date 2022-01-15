@@ -106,9 +106,8 @@
      * @private
      */
     _updateObjectsACoords: function() {
-      var skipControls = false;
       for (var i = this._objects.length; i--; ){
-        this._objects[i].setCoords(skipControls);
+        this._objects[i].setCoords();
       }
     },
 
@@ -129,16 +128,13 @@
      * @param {fabric.Point} center, current center of group.
      */
     _updateObjectCoords: function(object, center) {
-      var objectLeft = object.left,
-          objectTop = object.top,
-          skipControls = false;
-
+      var objectLeft = object.left, objectTop = object.top;
       object.set({
         left: objectLeft - center.x,
         top: objectTop - center.y
       });
       object.group = this;
-      object.setCoords(skipControls);
+      object.setCoords();
     },
 
     /**
