@@ -984,11 +984,7 @@
      * @returns {number}
      */
     getTotalAngle: function () {
-      var angle = this.angle;
-      if (this.group) {
-        angle += this.group.getTotalAngle();
-      }
-      return angle;
+      return fabric.util.qrDecompose(this.calcTransformMatrix()).angle;
     },
 
     /**
