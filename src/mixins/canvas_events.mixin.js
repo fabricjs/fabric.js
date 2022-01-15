@@ -473,10 +473,17 @@
             fabric.util.isTouchEvent(e)
           );
           var control = target.controls[corner],
-              mouseUpHandler = control && control.getMouseUpHandler(e, target, control);
+              originalControl = transform.target.controls[transform.corner],
+              mouseUpHandler = control && control.getMouseUpHandler(e, target, control),
+              pointer;
           if (mouseUpHandler) {
-            var pointer = this.getPointer(e);
+            pointer = this.getPointer(e);
             mouseUpHandler(e, transform, pointer.x, pointer.y);
+          }
+          if (originalControl && originalControl !== control) {
+            var originalMouseUpHandler = originalControl && originalControl.getMouseUpHandler(e, target, control);
+            pointer = this.getPointer(e);
+            originalMouseUpHandler(e, transform, pointer.x, pointer.y);
           }
         }
         target.isMoving = false;
