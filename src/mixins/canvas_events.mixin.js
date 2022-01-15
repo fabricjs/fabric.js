@@ -462,31 +462,32 @@
           );
         }
       }
+      var corner, pointer;
       if (target) {
+        corner = target._findTargetCorner(
+          this.getPointer(e, true),
+          fabric.util.isTouchEvent(e)
+        );
         if (target.selectable && target !== this._activeObject && target.activeOn === 'up') {
           this.setActiveObject(target, e);
           shouldRender = true;
         }
         else {
-          var corner = target._findTargetCorner(
-            this.getPointer(e, true),
-            fabric.util.isTouchEvent(e)
-          );
           var control = target.controls[corner],
-              originalControl = transform.target.controls[transform.corner],
-              mouseUpHandler = control && control.getMouseUpHandler(e, target, control),
-              pointer;
+              mouseUpHandler = control && control.getMouseUpHandler(e, target, control);
           if (mouseUpHandler) {
             pointer = this.getPointer(e);
             mouseUpHandler(e, transform, pointer.x, pointer.y);
           }
-          if (originalControl && originalControl !== control) {
-            var originalMouseUpHandler = originalControl && originalControl.getMouseUpHandler(e, target, control);
-            pointer = this.getPointer(e);
-            originalMouseUpHandler(e, transform, pointer.x, pointer.y);
-          }
         }
         target.isMoving = false;
+      }
+      // if we are ending up a transform
+      if (transform && (transform.target !== target || transform.corner !== corner)) {
+        var originalControl = transform.target && transform.target.controls[transform.corner],
+            originalMouseUpHandler = originalControl && originalControl.getMouseUpHandler(e, target, control);
+        pointer = pointer || this.getPointer(e);
+        originalMouseUpHandler && originalMouseUpHandler(e, transform, pointer.x, pointer.y);
       }
       this._setCursorFromEvent(e, target);
       this._handleEvent(e, 'up', LEFT_CLICK, isClick);
