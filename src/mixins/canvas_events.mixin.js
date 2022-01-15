@@ -942,7 +942,8 @@
           transform = this._currentTransform,
           target = transform.target;
       if (target.group) {
-        //  transform pointer to target's coordinate plane
+        //  transform pointer to target's containing coordinate plane
+        //  both agree on every point
         pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(target.group.calcTransformMatrix()));
       }
       transform.reset = false;

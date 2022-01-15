@@ -10,11 +10,11 @@
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
     _findTargetCorner: function(pointer, forTouch) {
-      // objects in group, anykind, are not self modificable,
-      // must not return an hovered corner.
       if (!this.hasControls || (!this.canvas || this.canvas._activeObject !== this)) {
         return false;
       }
+      //  transform pointer to target's containing coordinate plane
+      //  both agree on every point
       var p = this.group ?
         fabric.util.transformPoint(pointer, fabric.util.invertTransform(this.group.calcTransformMatrix())) :
         pointer;
