@@ -291,6 +291,35 @@
     },
 
     /**
+     * Sends a point from the source coordinate plane to the destination
+     * @param {fabric.Object} object 
+     * @param {'sibling'|'child'} relationToObject 
+     * @returns {number[]} plane matrix
+     */
+    getPlaneMatrixByObject: function (object, relationToObject) {
+      return relationToObject === 'child' ?
+        object.calcTransformMatrix() :
+        object.group ?
+          object.group.calcTransformMatrix() :
+          fabric.iMatrix.concat()
+    },
+
+    /**
+     * Sends a point from the source coordinate plane to the destination
+     * @param {fabric.Point} point
+     * @param {fabric.Object} sourceObject 
+     * @param {fabric.Object} destinationObject 
+     * @param {'sibling'|'child'} relationToSource 
+     * @param {'sibling'|'child'} relationToDestination 
+     */
+    transformPointBetweenObjectPlanes: function (point, sourceObject, destinationObject, relationToSource, relationToDestination) {
+      var from = fabric.util.getPlaneMatrixByObject(sourceObject, relationToSource),
+        to = fabric.util.getPlaneMatrixByObject(destinationObject, relationToDestination),
+        t = fabric.util.multiplyTransformMatrices(fabric.util.invertTransform(from), to);
+      return fabric.util.transformPoint(point, t);
+    },
+
+    /**
      * Returns coordinates of points's bounding rectangle (left, top, width, height)
      * @param {Array} points 4 points array
      * @param {Array} [transform] an array of 6 numbers representing a 2x3 transform matrix
