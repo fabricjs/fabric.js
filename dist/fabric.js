@@ -13274,7 +13274,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      */
     _reset: function() {
       this._points = [];
-      this._setBrushStyles();
+      this._setBrushStyles(this.canvas.contextTop);
       this._setShadow();
       this._hasStraightLine = false;
     },
