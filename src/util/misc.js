@@ -378,7 +378,8 @@
     ) {
       var t = fabric.util.calcTransformationBetweenObjectPlanes(
         sourceObject, destinationObject,
-        relationToSource, relationToDestination);
+        relationToSource, relationToDestination
+      );
       return fabric.util.transformPoint(point, t);
     },
 
@@ -1283,7 +1284,7 @@
     /**
      * A util that abstracts applying transform to objects.\
      * Sends `object` to the destination coordinate plane by applying the relevant transformations.\
-     * This is equivalent to changing the space/plane where `object` is drawn.
+     * Changes the space/plane where `object` is drawn while **preserving** it's appearance and position from the canvas/viewer's perspective.
      *
      * `child` relation means `object` should exist in the coordinate plane created by `destinationObject`.
      * In other words, `object` will be drawn by `destinationObject` onto the plane it creates.\
@@ -1296,10 +1297,18 @@
      * @returns {number[]} the transform matrix that was applied to `object`
      */
     sendObjectToPlane: function (object, destinationObject, relationToDestination) {
+      //  we are looking for the transformation between the destination plane to the source plane
+      //  because the object will exist on the destination plane and we want it to seem unchanged by it
+      //  so we reverse the destination matrix and add it to object
+      //  this is de facto a linear mapping (which can help explain why the order is reversed if the explanation didn't)
       var t = fabric.util.calcTransformationBetweenObjectPlanes(
-        object, destinationObject,
-        'sibling', relationToDestination);
-      fabric.util.applyTransformToObject(object, t);
+        destinationObject, object, 
+        relationToDestination, 'sibling'
+      );
+      fabric.util.applyTransformToObject(
+        object,
+        fabric.util.multiplyTransformMatrices(t, object.calcOwnMatrix())
+      );
       return t;
     },
 
