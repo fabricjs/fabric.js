@@ -1257,7 +1257,7 @@
      * @param {fabric.Object} object 
      * @param {fabric.Object} destinationObject 
      * @param {'sibling'|'child'} relationToDestination
-     * @returns 
+     * @returns {number[]} the transform matrix that was applied to `object`
      */
     sendObjectToPlane: function (object, destinationObject, relationToDestination) {
       var from = fabric.util.getTransformMatrixByObject(object, 'sibling'),
