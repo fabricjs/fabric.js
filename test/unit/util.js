@@ -954,18 +954,6 @@
 
     applyTransformToObject(obj1, m1);
     applyTransformToObject(obj2, m2);
-    p = transformPointBetweenObjectPlanes(point, obj1, obj2, 'child', 'child');
-    t = multiply(invert(obj1.calcTransformMatrix()), obj2.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    p = transformPointBetweenObjectPlanes(point, obj1, obj2, 'sibling', 'child');
-    t = obj2.calcTransformMatrix();
-    assert.deepEqual(p, transformPoint(point, t));
-    p = transformPointBetweenObjectPlanes(point, obj1, obj2, 'child', 'sibling');
-    t = invert(obj1.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    p = transformPointBetweenObjectPlanes(point, obj1, obj2, 'sibling', 'sibling');
-    assert.deepEqual(p, point);
-    //  with groups
     obj1.group = new fabric.Object();
     obj2.group = new fabric.Object();
     applyTransformToObject(obj1.group, m1);
@@ -981,28 +969,6 @@
     assert.deepEqual(p, transformPoint(point, t));
     p = transformPointBetweenObjectPlanes(point, obj1, obj2, 'sibling', 'sibling');
     t = multiply(invert(obj1.group.calcTransformMatrix()), obj2.group.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    //  nested
-    obj2.group.group = obj1;
-    p = transformPointBetweenObjectPlanes(point, obj1, obj2, 'child', 'child');
-    t = multiply(invert(obj1.calcTransformMatrix()), obj2.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    t = multiply(obj2.group.calcOwnMatrix(), obj2.calcOwnMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    p = transformPointBetweenObjectPlanes(point, obj1, obj2, 'sibling', 'child');
-    t = multiply(invert(obj1.group.calcTransformMatrix()), obj2.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    t = multiply(multiply(obj1.calcOwnMatrix(), obj2.group.calcOwnMatrix()), obj2.calcOwnMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    p = transformPointBetweenObjectPlanes(point, obj1, obj2, 'child', 'sibling');
-    t = multiply(invert(obj1.calcTransformMatrix()), obj2.group.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    t = obj2.group.calcOwnMatrix();
-    assert.deepEqual(p, transformPoint(point, t));
-    p = transformPointBetweenObjectPlanes(point, obj1, obj2, 'sibling', 'sibling');
-    t = multiply(invert(obj1.group.calcTransformMatrix()), obj2.group.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    t = multiply(obj1.calcOwnMatrix(), obj2.group.calcOwnMatrix());
     assert.deepEqual(p, transformPoint(point, t));
   });
 
