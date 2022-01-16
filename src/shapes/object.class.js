@@ -1232,8 +1232,8 @@
 
     /**
      * Prepare clipPath state and cache and draw it on instance's cache
-     * @param {CanvasRenderingContext2D} ctx 
-     * @param {fabric.Object} clipPath 
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {fabric.Object} clipPath
      */
     _drawClipPath: function (ctx, clipPath) {
       if (!clipPath) { return; }
@@ -1388,6 +1388,7 @@
 
     /**
      * Renders controls and borders for the object
+     * the context here is not transformed
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Object} [styleOverride] properties to override the object style
      */
@@ -1409,7 +1410,7 @@
       if (this.flipX) {
         options.angle -= 180;
       }
-      ctx.rotate(degreesToRadians(options.angle));
+      ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
       if (styleOverride.forActiveSelection || this.group) {
         drawBorders && this.drawBordersInGroup(ctx, options, styleOverride);
       }
@@ -1967,7 +1968,7 @@
    * @static
    * @memberOf fabric.Object
    * @constant
-   * @type string[] 
+   * @type string[]
    */
   fabric.Object.ENLIVEN_PROPS = ['clipPath'];
 

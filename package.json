@@ -44,6 +44,7 @@
   },
   "license": "MIT",
   "scripts": {
+    "changelog": "auto-changelog -o change-output.md --unreleased-only",
     "build": "node build.js modules=ALL requirejs exclude=gestures,accessors,erasing",
     "build:fast": "node build.js modules=ALL requirejs fast exclude=gestures,accessors,erasing",
     "build:watch": "onchange 'src/**/**' 'HEADER.js' 'lib/**/**' -- npm run build_export",
@@ -69,20 +70,21 @@
   },
   "optionalDependencies": {
     "canvas": "^2.8.0",
-    "jsdom": "^15.2.1"
+    "jsdom": "^19.0.0"
   },
   "devDependencies": {
+    "auto-changelog": "^2.3.0",
     "chalk": "^2.4.1",
     "eslint": "4.18.x",
     "nyc": "^15.1.0",
-    "onchange": "^3.x.x",
+    "onchange": "^7.1.0",
     "pixelmatch": "^4.0.2",
     "qunit": "^2.13.0",
     "testem": "^3.2.0",
     "uglify-js": "3.3.x"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=14.0.0"
   },
   "main": "./dist/fabric.js",
   "dependencies": {}
