@@ -342,7 +342,7 @@
      * @param {'sibling'|'child'} relationToDestination
      * @returns {fabric.Point} transformed point
      */
-    calcTransformationBetweenPlanes: function (
+    calcTransformationBetweenObjectPlanes: function (
       sourceObject, destinationObject,
       relationToSource, relationToDestination
     ) {
@@ -376,7 +376,7 @@
       sourceObject, destinationObject,
       relationToSource, relationToDestination
     ) {
-      var t = fabric.util.calcTransformationBetweenPlanes(
+      var t = fabric.util.calcTransformationBetweenObjectPlanes(
         sourceObject, destinationObject,
         relationToSource, relationToDestination);
       return fabric.util.transformPoint(point, t);
@@ -1296,7 +1296,7 @@
      * @returns {number[]} the transform matrix that was applied to `object`
      */
     sendObjectToPlane: function (object, destinationObject, relationToDestination) {
-      var t = fabric.util.calcTransformationBetweenPlanes(
+      var t = fabric.util.calcTransformationBetweenObjectPlanes(
         object, destinationObject,
         'sibling', relationToDestination);
       fabric.util.applyTransformToObject(object, t);
