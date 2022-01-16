@@ -293,6 +293,7 @@
     /**
      * Sends a point from the source coordinate plane to the destination coordinate plane
      * @see {fabric.util.transformPointBetweenObjectPlanes}
+     * @see {fabric.util.transformPointRelativeToCanvas} for transforming relative to canvas
      * @static
      * @memberOf fabric.util
      * @param {fabric.Object} object 
@@ -319,6 +320,7 @@
      * in other words they both relate to the same (0,0) and agree on every point
      * @static
      * @memberOf fabric.util
+     * @see {fabric.util.transformPointRelativeToCanvas} for transforming relative to canvas
      * @param {fabric.Point} point
      * @param {fabric.Object} sourceObject object that point currently relates to
      * @param {fabric.Object} destinationObject object that returned point should relate to
