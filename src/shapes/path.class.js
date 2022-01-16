@@ -6,6 +6,7 @@
       min = fabric.util.array.min,
       max = fabric.util.array.max,
       extend = fabric.util.object.extend,
+      clone = fabric.util.object.clone,
       _toString = Object.prototype.toString,
       toFixed = fabric.util.toFixed;
 
@@ -47,26 +48,26 @@
      * @param {Object} [options] Options object
      * @return {fabric.Path} thisArg
      */
-    initialize: function(path, options) {
-      options = options || { };
+    initialize: function (path, options) {
+      options = clone(options || {});
+      delete options.path;
       this.callSuper('initialize', options);
-      if (!path) {
-        path = [];
-      }
+      this._setPath(path || [], options);
+    },
 
+    /**
+    * @private
+    * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
+    * @param {Object} [options] Options object
+    */
+    _setPath: function (path, options) {
       var fromArray = _toString.call(path) === '[object Array]';
 
-      this.path = fromArray
-        ? fabric.util.makePathSimpler(path)
+      this.path = fabric.util.makePathSimpler(
+        fromArray ? path : fabric.util.parsePath(path)
+      );
 
-        : fabric.util.makePathSimpler(
-          fabric.util.parsePath(path)
-        );
-
-      if (!this.path) {
-        return;
-      }
-      fabric.Polyline.prototype._setPositionDimensions.call(this, options);
+      fabric.Polyline.prototype._setPositionDimensions.call(this, options || {});
     },
 
     /**
@@ -193,9 +194,7 @@
      * of the instance
      */
     _toSVG: function() {
-      var path = this.path.map(function(path) {
-        return path.join(' ');
-      }).join(' ');
+      var path = fabric.util.joinPath(this.path);
       return [
         '<path ', 'COMMON_PARTS',
         'd="', path,
