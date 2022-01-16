@@ -47,9 +47,10 @@
      * @override 
      * @private
      * @param {CanvasRenderingContext2D} ctx 
+     * @param {fabric.Object} clipPath
      */
-    _drawClipPath: function (ctx) {
-      __drawClipPath.call(this, ctx);
+    _drawClipPath: function (ctx, clipPath) {
+      __drawClipPath.call(this, ctx, clipPath);
       if (this.eraser) {
         //  update eraser size to match instance
         var size = this._getNonTransformedDimensions();
