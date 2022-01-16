@@ -394,6 +394,84 @@
     assert.equal(rect.scaleY, 3, 'rect scaled Y');
   });
 
+  QUnit.test('A transform will call mouseup and mousedown on the control', function(assert) {
+    var e = { clientX: 3, clientY: 3, which: 1 };
+    var e1 = { clientX: 6, clientY: 6, which: 1 };
+    var e2 = { clientX: 9, clientY: 9, which: 1 };
+    var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
+    var mouseUpCalled = false;
+    var mouseDownCalled = false;
+    rect.controls = {
+      br: fabric.Object.prototype.controls.br,
+    };
+    rect.controls.br.mouseUpHandler = function() {
+      mouseUpCalled = true;
+    };
+    rect.controls.br.mouseDownHandler = function() {
+      mouseDownCalled = true;
+    };
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e1);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    assert.equal(mouseUpCalled, true, 'mouse up handler for control has been called');
+    assert.equal(mouseDownCalled, true, 'mouse down handler for control has been called');
+  });
+
+  QUnit.test('A transform than ends outside the object will call mouseup handler', function(assert) {
+    var e = { clientX: 3, clientY: 3, which: 1 };
+    var e1 = { clientX: 6, clientY: 6, which: 1 };
+    var e2 = { clientX: 9, clientY: 9, which: 1 };
+    var e3 = { clientX: 100, clientY: 100, which: 1 };
+    var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
+    var mouseUpCalled = false;
+    rect.controls = {
+      br: fabric.Object.prototype.controls.br,
+    };
+    rect.controls.br.mouseUpHandler = function() {
+      mouseUpCalled = true;
+    };
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e1);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e3);
+    assert.equal(mouseUpCalled, true, 'mouse up handler for control has been called anyway');
+  });
+
+  QUnit.test('A transform than ends on a new control, calls both mouseup handler', function(assert) {
+    var e = { clientX: 3, clientY: 3, which: 1 };
+    var e1 = { clientX: 6, clientY: 6, which: 1 };
+    var e2 = { clientX: 9, clientY: 9, which: 1 };
+    var e3 = { clientX: 9, clientY: 3, which: 1 };
+    var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
+    var mouseUpCalled1 = false;
+    var mouseUpCalled2 = false;
+
+    rect.controls = {
+      br: fabric.Object.prototype.controls.br,
+      tr: fabric.Object.prototype.controls.tr,
+    };
+    rect.controls.br.mouseUpHandler = function() {
+      mouseUpCalled1 = true;
+    };
+    rect.controls.tr.mouseUpHandler = function() {
+      mouseUpCalled2 = true;
+    };
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e1);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e3);
+    assert.equal(mouseUpCalled1, true, 'mouse up handler for rect has been called anyway');
+    assert.equal(mouseUpCalled2, true, 'mouse up handler for rect2 has been called');
+  });
+
+
   QUnit.test('avoid multiple bindings', function(assert) {
     var c = new fabric.Canvas();
     var eventsArray = [
@@ -459,7 +537,7 @@
     });
   });
 
-  ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
+  ['DragEnter', 'DragLeave', 'DragOver'].forEach(function(eventType) {
     QUnit.test('Fabric event fired - ' + eventType, function(assert) {
       var eventName = eventType.toLowerCase();
       var counter = 0;
@@ -474,8 +552,23 @@
     });
   });
 
+  QUnit.test('Fabric event fired - Drop', function (assert) {
+    var eventNames = ['drop:before', 'drop'];
+    var c = new fabric.Canvas();
+    var fired = [];
+    eventNames.forEach(function (eventName) {
+      c.on(eventName, function () {
+        fired.push(eventName);
+      });
+    });
+    var event = fabric.document.createEvent('HTMLEvents');
+    event.initEvent('drop', true, true);
+    c.upperCanvasEl.dispatchEvent(event);
+    assert.deepEqual(fired, eventNames, 'bad drop event fired');
+  });
+
   ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
-    QUnit.test('_simpleEventHandler fires on object and canvas' + eventType, function(assert) {
+    QUnit.test('_simpleEventHandler fires on object and canvas - ' + eventType, function(assert) {
       var eventName = eventType.toLowerCase();
       var counter = 0;
       var target;

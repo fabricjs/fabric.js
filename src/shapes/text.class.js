@@ -1044,16 +1044,17 @@
           path = this.path,
           shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex) && !path,
           isLtr = this.direction === 'ltr', sign = this.direction === 'ltr' ? 1 : -1,
-          drawingLeft;
-
+          drawingLeft, currentDirection = ctx.canvas.getAttribute('dir');
       ctx.save();
+      if (currentDirection !== this.direction) {
+        ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
+        ctx.direction = isLtr ? 'ltr' : 'rtl';
+        ctx.textAlign = isLtr ? 'left' : 'right';
+      }
       top -= lineHeight * this._fontSizeFraction / this.lineHeight;
       if (shortCut) {
         // render all the line in one pass without checking
         // drawingLeft = isLtr ? left : left - this.getLineWidth(lineIndex);
-        ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
-        ctx.direction = isLtr ? 'ltr' : 'rtl';
-        ctx.textAlign = isLtr ? 'left' : 'right';
         this._renderChar(method, ctx, lineIndex, 0, line.join(''), left, top, lineHeight);
         ctx.restore();
         return;
@@ -1090,9 +1091,6 @@
           }
           else {
             drawingLeft = left;
-            ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
-            ctx.direction = isLtr ? 'ltr' : 'rtl';
-            ctx.textAlign = isLtr ? 'left' : 'right';
             this._renderChar(method, ctx, lineIndex, i, charsToRender, drawingLeft, top, lineHeight);
           }
           charsToRender = '';

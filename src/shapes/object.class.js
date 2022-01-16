@@ -1388,6 +1388,7 @@
 
     /**
      * Renders controls and borders for the object
+     * the context here is not transformed
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Object} [styleOverride] properties to override the object style
      */
@@ -1409,7 +1410,7 @@
       if (this.flipX) {
         options.angle -= 180;
       }
-      ctx.rotate(degreesToRadians(options.angle));
+      ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
       if (styleOverride.forActiveSelection || this.group) {
         drawBorders && this.drawBordersInGroup(ctx, options, styleOverride);
       }
