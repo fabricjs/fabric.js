@@ -291,9 +291,15 @@
     },
 
     /**
-     * Sends a point from the source coordinate plane to the destination coordinate plane
-     * @see {fabric.util.transformPointBetweenObjectPlanes}
-     * @see {fabric.util.transformPointRelativeToCanvas} for transforming relative to canvas
+     * Returns the transform matrix according to `relationToObject`.\
+     * The matrix is relative to the object plane.
+     * 
+     * `child` relation means `point` exists in the coordinate plane created by the object.
+     * In other words, point is measured acoording to objects' center point
+     * meaning that if `point` is equal to (0,0) it is positioned at object's center.\
+     * `sibling` relation means `point` exists in the same coordinate plane as object.
+     * In other words they both relate to the same (0,0) and agree on every point.
+     * 
      * @static
      * @memberOf fabric.util
      * @param {fabric.Object} object
@@ -313,11 +319,13 @@
 
     /**
      * Sends a point from the source coordinate plane to the destination coordinate plane
-     * `child` relation means `point` exists in the coordinate plane created by the object,
-     * in other words point is measured acoording to objects' center point
-     * meaning that if `point` is equal to (0,0) it is positioned at object's center\
-     * `sibling` relation means `point` exists in the same coordinate plane as object,
-     * in other words they both relate to the same (0,0) and agree on every point
+     * 
+     * `child` relation means `point` exists in the coordinate plane created by the object.
+     * In other words, point is measured acoording to objects' center point
+     * meaning that if `point` is equal to (0,0) it is positioned at object's center.\
+     * `sibling` relation means `point` exists in the same coordinate plane as object.
+     * In other words they both relate to the same (0,0) and agree on every point.
+     * 
      * @static
      * @memberOf fabric.util
      * @see {fabric.util.transformPointRelativeToCanvas} for transforming relative to canvas
@@ -340,12 +348,14 @@
     },
 
     /**
-     * Transform point relative to canvas\
-     * `child` relation means `point` exists in the coordinate plane created by `canvas`,
-     * in other words point is measured acoording to canvas' top left corner
-     * meaning that if `point` is equal to (0,0) it is positioned at canvas' top left corener\
-     * `sibling` relation means `point` exists in the same coordinate plane as canvas,
-     * in other words they both relate to the same (0,0) and agree on every point
+     * Transform point relative to canvas
+     * 
+     * `child` relation means `point` exists in the coordinate plane created by `canvas`.
+     * In other words point is measured acoording to canvas' top left corner
+     * meaning that if `point` is equal to (0,0) it is positioned at canvas' top left corner.\
+     * `sibling` relation means `point` exists in the same coordinate plane as canvas.
+     * In other words they both relate to the same (0,0) and agree on every point.
+     * 
      * @static
      * @memberOf fabric.util
      * @param {fabric.Point} point
