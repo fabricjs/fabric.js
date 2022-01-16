@@ -68,10 +68,9 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   /**
    * Sets brush styles
    * @private
-   * @param {CanvasRenderingContext2D} [ctx]
+   * @param {CanvasRenderingContext2D} ctx
    */
   _setBrushStyles: function (ctx) {
-    ctx = ctx || this.canvas.contextTop;
     ctx.strokeStyle = this.color;
     ctx.lineWidth = this.width;
     ctx.lineCap = this.strokeLineCap;

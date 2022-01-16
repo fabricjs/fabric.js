@@ -461,10 +461,9 @@
       /**
        * Sets brush styles
        * @private
-       * @param {CanvasRenderingContext2D} [ctx]
+       * @param {CanvasRenderingContext2D} ctx
        */
       _setBrushStyles: function (ctx) {
-        ctx = ctx || this.canvas.contextTop;
         this.callSuper('_setBrushStyles', ctx);
         ctx.strokeStyle = 'black';
       },
