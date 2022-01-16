@@ -1245,6 +1245,29 @@
     },
 
     /**
+     * A util that abstracts applying transform to objects.\ 
+     * Sends `object` to the destination coordinate plane by applying the relevant transformations.\
+     * This is equivalent to changing the space/plane where `object` is drawn.
+     * 
+     * `child` relation means `object` should exist in the coordinate plane created by `destinationObject`.
+     * In other words, `object` will be drawn by `destinationObject` onto the plane it creates.\
+     * `sibling` relation means `object` should exist in the same plane as `destinationObject`.
+     * In other words, they are both drawn together in the same transformed plane.
+     * 
+     * @param {fabric.Object} object 
+     * @param {fabric.Object} destinationObject 
+     * @param {'sibling'|'child'} relationToDestination
+     * @returns 
+     */
+    sendObjectToPlane: function (object, destinationObject, relationToDestination) {
+      var from = fabric.util.getTransformMatrixByObject(object, 'sibling'),
+        to = fabric.util.getTransformMatrixByObject(destinationObject, relationToDestination),
+        t = fabric.util.multiplyTransformMatrices(fabric.util.invertTransform(from), to);
+      fabric.util.applyTransformToObject(object, t);
+      return t;
+    },
+
+    /**
      * given a width and height, return the size of the bounding box
      * that can contains the box with width/height with applied transform
      * described in options.
