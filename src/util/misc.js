@@ -1291,6 +1291,8 @@
      * `sibling` relation means `object` should exist in the same plane as `destinationObject`.
      * In other words, they are both drawn together in the same transformed plane.
      *
+     * @static
+     * @memberof fabric.util
      * @param {fabric.Object} object
      * @param {fabric.Object} destinationObject
      * @param {'sibling'|'child'} relationToDestination
@@ -1302,7 +1304,7 @@
       //  so we reverse the destination matrix and add it to object
       //  this is de facto a linear mapping (which can help explain why the order is reversed if the explanation didn't)
       var t = fabric.util.calcTransformationBetweenObjectPlanes(
-        destinationObject, object, 
+        destinationObject, object,
         relationToDestination, 'sibling'
       );
       fabric.util.applyTransformToObject(
