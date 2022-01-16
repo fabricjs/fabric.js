@@ -846,6 +846,31 @@
     assert.equal(Math.round(tp.y), 8);
   });
 
+  QUnit.test('getTransformMatrixByObject', function(assert) {
+    assert.ok(typeof fabric.util.getTransformMatrixByObject === 'function');
+    var matrix = [3, 0, 0, 2, 10, 4],
+      m1 = [1, 2, 3, 4, 5, 6],
+      t,
+      obj = new fabric.Object();
+    fabric.util.applyTransformToObject(obj, matrix);
+    t = fabric.util.getTransformMatrixByObject(obj, 'child');
+    assert.deepEqual(t, matrix);
+    t = fabric.util.getTransformMatrixByObject(obj, 'sibling');
+    assert.deepEqual(t, fabric.iMatrix);
+    obj.group = new fabric.Object();
+    fabric.util.applyTransformToObject(obj.group, m1);
+    t = fabric.util.getTransformMatrixByObject(obj, 'child');
+    assert.deepEqual(t, fabric.util.multiplyTransformMatrices(m1, matrix));
+    t = fabric.util.getTransformMatrixByObject(obj, 'sibling');
+    assert.deepEqual(t, m1);
+    assert.throws(function () {
+      fabric.util.getTransformMatrixByObject(obj);
+    });
+    assert.throws(function () {
+      fabric.util.getTransformMatrixByObject(obj, true);
+    });
+  });
+
   QUnit.test('makeBoundingBoxFromPoints', function(assert) {
     assert.ok(typeof fabric.util.makeBoundingBoxFromPoints === 'function');
   });
