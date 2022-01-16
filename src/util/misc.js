@@ -297,7 +297,7 @@
      * @memberOf fabric.util
      * @param {fabric.Object} object 
      * @param {'sibling'|'child'} relationToObject 
-     * @returns {number[]} plane matrix
+     * @returns {number[]} plane matrix relative to the coordinate plane created by canvas
      */
     getTransformMatrixByObject: function (object, relationToObject) {
       if (relationToObject !== 'child' && relationToObject !== 'sibling') {
@@ -320,10 +320,11 @@
      * @static
      * @memberOf fabric.util
      * @param {fabric.Point} point
-     * @param {fabric.Object} sourceObject 
-     * @param {fabric.Object} destinationObject 
+     * @param {fabric.Object} sourceObject object that point currently relates to
+     * @param {fabric.Object} destinationObject object that returned point should relate to
      * @param {'sibling'|'child'} relationToSource 
      * @param {'sibling'|'child'} relationToDestination 
+     * @returns {fabric.Point} transformed point
      */
     transformPointBetweenObjectPlanes: function (point, sourceObject, destinationObject, relationToSource, relationToDestination) {
       var from = fabric.util.getTransformMatrixByObject(sourceObject, relationToSource),
@@ -345,6 +346,7 @@
      * @param {fabric.StaticCanvas} canvas 
      * @param {'sibling'|'child'} relationBefore current relation of point to canvas
      * @param {'sibling'|'child'} relationAfter desired relation of point to canvas
+     * @returns {fabric.Point} transformed point
      */
     transformPointRelativeToCanvas: function (point, canvas, relationBefore, relationAfter) {
       if (relationBefore !== 'child' && relationBefore !== 'sibling') {
