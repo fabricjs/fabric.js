@@ -852,6 +852,7 @@
       m1 = [1, 2, 3, 4, 5, 6],
       t,
       obj = new fabric.Object();
+    
     fabric.util.applyTransformToObject(obj, matrix);
     t = fabric.util.getTransformMatrixByObject(obj, 'child');
     assert.deepEqual(t, matrix);
@@ -884,6 +885,7 @@
       invert = fabric.util.invertTransform,
       multiply = fabric.util.multiplyTransformMatrices,
       transformPoint = fabric.util.transformPoint;
+    
     applyTransformToObject(obj1, m1);
     applyTransformToObject(obj2, m2);
     p = transformPointBetweenObjectPlanes(point, obj1, obj2, 'child', 'child');
@@ -965,6 +967,58 @@
     assert.throws(function () {
       transformPointRelativeToCanvas(point, canvas, 'sibling', 'chil');
     });
+  });
+
+
+  QUnit.test('sendObjectToPlane', function (assert) {
+    assert.ok(typeof fabric.util.sendObjectToPlane === 'function');
+    var m0 = [6, 5, 4, 3, 2, 1],
+      m2 = [3, 0, 0, 2, 10, 4],
+      m2 = [1, 2, 3, 4, 5, 6],
+      tOut, t,
+      obj = new fabric.Object(),
+      obj1 = new fabric.Object(),
+      obj2 = new fabric.Object(),
+      point = new fabric.Point(2, 2),
+      sendObjectToPlane = fabric.util.sendObjectToPlane,
+      applyTransformToObject = fabric.util.applyTransformToObject,
+      invert = fabric.util.invertTransform,
+      multiply = fabric.util.multiplyTransformMatrices,
+      transformPoint = fabric.util.transformPoint;
+    applyTransformToObject(obj, m0);
+    applyTransformToObject(obj1, m1);
+    applyTransformToObject(obj2, m2);
+
+    tOut = sendObjectToPlane(obj0, obj1, obj2, 'child', 'child');
+
+
+    t = multiply(invert(obj1.calcTransformMatrix()), obj2.calcTransformMatrix());
+    assert.deepEqual(tOut, transformPoint(point, t));
+    tOut = fabric.util.transformPointBetweenObjectPlanes(point, obj1, obj2, 'sibling', 'child');
+    t = obj2.calcTransformMatrix();
+    assert.deepEqual(tOut, transformPoint(point, t));
+    tOut = fabric.util.transformPointBetweenObjectPlanes(point, obj1, obj2, 'child', 'sibling');
+    t = invert(obj1.calcTransformMatrix());
+    assert.deepEqual(tOut, transformPoint(point, t));
+    tOut = fabric.util.transformPointBetweenObjectPlanes(point, obj1, obj2, 'sibling', 'sibling');
+    assert.deepEqual(tOut, point);
+    //  with groups
+    obj1.group = new fabric.Object();
+    obj2.group = new fabric.Object();
+    applyTransformToObject(obj1.group, m1);
+    applyTransformToObject(obj2.group, m2);
+    tOut = fabric.util.transformPointBetweenObjectPlanes(point, obj1, obj2, 'child', 'child');
+    t = multiply(invert(obj1.calcTransformMatrix()), obj2.calcTransformMatrix());
+    assert.deepEqual(tOut, transformPoint(point, t));
+    tOut = fabric.util.transformPointBetweenObjectPlanes(point, obj1, obj2, 'sibling', 'child');
+    t = multiply(invert(obj1.group.calcTransformMatrix()), obj2.calcTransformMatrix());
+    assert.deepEqual(tOut, transformPoint(point, t));
+    tOut = fabric.util.transformPointBetweenObjectPlanes(point, obj1, obj2, 'child', 'sibling');
+    t = multiply(invert(obj1.calcTransformMatrix()), obj2.group.calcTransformMatrix());
+    assert.deepEqual(tOut, transformPoint(point, t));
+    tOut = fabric.util.transformPointBetweenObjectPlanes(point, obj1, obj2, 'sibling', 'sibling');
+    t = multiply(invert(obj1.group.calcTransformMatrix()), obj2.group.calcTransformMatrix());
+    assert.deepEqual(tOut, transformPoint(point, t));
   });
 
   QUnit.test('makeBoundingBoxFromPoints', function(assert) {
