@@ -291,12 +291,18 @@
     },
 
     /**
-     * Sends a point from the source coordinate plane to the destination
+     * Sends a point from the source coordinate plane to the destination coordinate plane
+     * @see {fabric.util.transformPointBetweenObjectPlanes}
+     * @static
+     * @memberOf fabric.util
      * @param {fabric.Object} object 
      * @param {'sibling'|'child'} relationToObject 
      * @returns {number[]} plane matrix
      */
     getPlaneMatrixByObject: function (object, relationToObject) {
+      if (relationToObject !== 'child' && relationToObject !== 'sibling') {
+        throw new Error('fabric.js: recieved bad argument ' + relationToObject);
+      }
       return relationToObject === 'child' ?
         object.calcTransformMatrix() :
         object.group ?
@@ -305,7 +311,14 @@
     },
 
     /**
-     * Sends a point from the source coordinate plane to the destination
+     * Sends a point from the source coordinate plane to the destination coordinate plane
+     * `child` relation means `point` exists in the coordinate plane created by the object, 
+     * in other words point is measured acoording to objects' center point 
+     * meaning that if `point` is equal to (0,0) it is positioned at object's center\
+     * `sibling` relation means `point` exists in the same coordinate plane as object, 
+     * in other words they both relate to the same (0,0) and agree on every point
+     * @static
+     * @memberOf fabric.util
      * @param {fabric.Point} point
      * @param {fabric.Object} sourceObject 
      * @param {fabric.Object} destinationObject 
@@ -320,7 +333,37 @@
     },
 
     /**
+     * Transform point relative to canvas\
+     * `child` relation means `point` exists in the coordinate plane created by `canvas`, 
+     * in other words point is measured acoording to canvas' top left corner 
+     * meaning that if `point` is equal to (0,0) it is positioned at canvas' top left corener\
+     * `sibling` relation means `point` exists in the same coordinate plane as canvas, 
+     * in other words they both relate to the same (0,0) and agree on every point
+     * @static
+     * @memberOf fabric.util
+     * @param {fabric.Point} point 
+     * @param {fabric.StaticCanvas} canvas 
+     * @param {'sibling'|'child'} relationBefore current relation of point to canvas
+     * @param {'sibling'|'child'} relationAfter desired relation of point to canvas
+     */
+    transformPointRelativeToCanvas: function (point, canvas, relationBefore, relationAfter) {
+      if (relationBefore !== 'child' && relationBefore !== 'sibling') {
+        throw new Error('fabric.js: recieved bad argument ' + relationBefore);
+      }
+      if (relationAfter !== 'child' && relationAfter !== 'sibling') {
+        throw new Error('fabric.js: recieved bad argument ' + relationAfter);
+      }
+      if (relationBefore === relationAfter) {
+        return point;
+      }
+      var t = canvas.viewportTransform;
+      return fabric.util.transformPoint(point, relationAfter === 'child' ? t : fabric.util.invertTransform(t));
+    },
+
+    /**
      * Returns coordinates of points's bounding rectangle (left, top, width, height)
+     * @static
+     * @memberOf fabric.util
      * @param {Array} points 4 points array
      * @param {Array} [transform] an array of 6 numbers representing a 2x3 transform matrix
      * @return {Object} Object with left, top, width, height properties
