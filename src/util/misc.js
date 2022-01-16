@@ -299,7 +299,7 @@
      * @param {'sibling'|'child'} relationToObject 
      * @returns {number[]} plane matrix
      */
-    getPlaneMatrixByObject: function (object, relationToObject) {
+    getTransformMatrixByObject: function (object, relationToObject) {
       if (relationToObject !== 'child' && relationToObject !== 'sibling') {
         throw new Error('fabric.js: recieved bad argument ' + relationToObject);
       }
@@ -326,8 +326,8 @@
      * @param {'sibling'|'child'} relationToDestination 
      */
     transformPointBetweenObjectPlanes: function (point, sourceObject, destinationObject, relationToSource, relationToDestination) {
-      var from = fabric.util.getPlaneMatrixByObject(sourceObject, relationToSource),
-        to = fabric.util.getPlaneMatrixByObject(destinationObject, relationToDestination),
+      var from = fabric.util.getTransformMatrixByObject(sourceObject, relationToSource),
+        to = fabric.util.getTransformMatrixByObject(destinationObject, relationToDestination),
         t = fabric.util.multiplyTransformMatrices(fabric.util.invertTransform(from), to);
       return fabric.util.transformPoint(point, t);
     },
