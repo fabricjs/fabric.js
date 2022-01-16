@@ -296,8 +296,8 @@
      * @see {fabric.util.transformPointRelativeToCanvas} for transforming relative to canvas
      * @static
      * @memberOf fabric.util
-     * @param {fabric.Object} object 
-     * @param {'sibling'|'child'} relationToObject 
+     * @param {fabric.Object} object
+     * @param {'sibling'|'child'} relationToObject
      * @returns {number[]} plane matrix relative to the coordinate plane created by canvas
      */
     getTransformMatrixByObject: function (object, relationToObject) {
@@ -308,15 +308,15 @@
         object.calcTransformMatrix() :
         object.group ?
           object.group.calcTransformMatrix() :
-          fabric.iMatrix.concat()
+          fabric.iMatrix.concat();
     },
 
     /**
      * Sends a point from the source coordinate plane to the destination coordinate plane
-     * `child` relation means `point` exists in the coordinate plane created by the object, 
-     * in other words point is measured acoording to objects' center point 
+     * `child` relation means `point` exists in the coordinate plane created by the object,
+     * in other words point is measured acoording to objects' center point
      * meaning that if `point` is equal to (0,0) it is positioned at object's center\
-     * `sibling` relation means `point` exists in the same coordinate plane as object, 
+     * `sibling` relation means `point` exists in the same coordinate plane as object,
      * in other words they both relate to the same (0,0) and agree on every point
      * @static
      * @memberOf fabric.util
@@ -324,28 +324,32 @@
      * @param {fabric.Point} point
      * @param {fabric.Object} sourceObject object that point currently relates to
      * @param {fabric.Object} destinationObject object that returned point should relate to
-     * @param {'sibling'|'child'} relationToSource 
-     * @param {'sibling'|'child'} relationToDestination 
+     * @param {'sibling'|'child'} relationToSource
+     * @param {'sibling'|'child'} relationToDestination
      * @returns {fabric.Point} transformed point
      */
-    transformPointBetweenObjectPlanes: function (point, sourceObject, destinationObject, relationToSource, relationToDestination) {
+    transformPointBetweenObjectPlanes: function (
+      point,
+      sourceObject, destinationObject,
+      relationToSource, relationToDestination
+    ) {
       var from = fabric.util.getTransformMatrixByObject(sourceObject, relationToSource),
-        to = fabric.util.getTransformMatrixByObject(destinationObject, relationToDestination),
-        t = fabric.util.multiplyTransformMatrices(fabric.util.invertTransform(from), to);
+          to = fabric.util.getTransformMatrixByObject(destinationObject, relationToDestination),
+          t = fabric.util.multiplyTransformMatrices(fabric.util.invertTransform(from), to);
       return fabric.util.transformPoint(point, t);
     },
 
     /**
      * Transform point relative to canvas\
-     * `child` relation means `point` exists in the coordinate plane created by `canvas`, 
-     * in other words point is measured acoording to canvas' top left corner 
+     * `child` relation means `point` exists in the coordinate plane created by `canvas`,
+     * in other words point is measured acoording to canvas' top left corner
      * meaning that if `point` is equal to (0,0) it is positioned at canvas' top left corener\
-     * `sibling` relation means `point` exists in the same coordinate plane as canvas, 
+     * `sibling` relation means `point` exists in the same coordinate plane as canvas,
      * in other words they both relate to the same (0,0) and agree on every point
      * @static
      * @memberOf fabric.util
-     * @param {fabric.Point} point 
-     * @param {fabric.StaticCanvas} canvas 
+     * @param {fabric.Point} point
+     * @param {fabric.StaticCanvas} canvas
      * @param {'sibling'|'child'} relationBefore current relation of point to canvas
      * @param {'sibling'|'child'} relationAfter desired relation of point to canvas
      * @returns {fabric.Point} transformed point
