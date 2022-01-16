@@ -46,7 +46,7 @@
      * draw eraser above clip path
      * @override
      * @private
-     * @param {CanvasRenderingContext2D} ctx 
+     * @param {CanvasRenderingContext2D} ctx
      * @param {fabric.Object} clipPath
      */
     _drawClipPath: function (ctx, clipPath) {

@@ -1232,8 +1232,8 @@
 
     /**
      * Prepare clipPath state and cache and draw it on instance's cache
-     * @param {CanvasRenderingContext2D} ctx 
-     * @param {fabric.Object} clipPath 
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {fabric.Object} clipPath
      */
     _drawClipPath: function (ctx, clipPath) {
       if (!clipPath) { return; }
