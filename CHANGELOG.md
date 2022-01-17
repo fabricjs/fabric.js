@@ -1,5 +1,18 @@
 # Changelog
 
+
+## [5.0.0]
+
+- feat(fabric.EraserBrush): added `eraser` property to Object instead of attaching to `clipPath`, remove hacky `getClipPath`/`setClipPath` [#7470](https://github.com/fabricjs/fabric.js/pull/7470), see **BREAKING** comments.
+- feat(fabric.EraserBrush): support `inverted` option to undo erasing [#7470](https://github.com/fabricjs/fabric.js/pull/7470)
+- fix(fabric.EraserBrush): fix doubling opaic objects while erasing [#7445](https://github.com/fabricjs/fabric.js/issues/7445) [#7470](https://github.com/fabricjs/fabric.js/pull/7470)
+
+**BREAKING**:
+
+- fabric.EraserBrush: The Eraser object is now a subclass of Group. This means that loading from JSON will break between versions.
+Use this [code](https://gist.github.com/ShaMan123/6c5c4ca2cc720a2700848a2deb6addcd) to transform your json payload to the new version.
+
+
 ## [next]
 - feat(fabric.Canvas): fire an extra mouse up for the original control of the initial target [`#7612`](https://github.com/fabricjs/fabric.js/pull/7612)
 - fix(fabric.Object) bounding box display with skewY when outside group [`#7611`](https://github.com/fabricjs/fabric.js/pull/7611)
@@ -35,6 +48,7 @@
 - feat(fabric.EraserBrush): added `clipPath` property [#7175](https://github.com/fabricjs/fabric.js/pull/7175).
 - Breaking: renamed `fabric.SprayBrush` `render` method to `renderChunk`.
 - Breaking: renamed `fabric.EraserBrush` `render` method to `renderAll`.
+
 
 ## [4.6.0]
 
