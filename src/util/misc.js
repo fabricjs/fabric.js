@@ -421,7 +421,7 @@
         return point;
       }
       var t = canvas.viewportTransform;
-      return fabric.util.transformPoint(point, relationAfter === 'child' ? t : fabric.util.invertTransform(t));
+      return fabric.util.transformPoint(point, relationAfter === 'child' ? fabric.util.invertTransform(t) : t);
     },
 
     /**

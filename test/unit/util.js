@@ -981,9 +981,9 @@
     var invertTransform = fabric.util.invertTransform;
     var transformPointRelativeToCanvas = fabric.util.transformPointRelativeToCanvas;
     var p = transformPointRelativeToCanvas(point, canvas, 'sibling', 'child');
-    assert.deepEqual(p, transformPoint(point, matrix));
-    p = transformPointRelativeToCanvas(point, canvas, 'child', 'sibling');
     assert.deepEqual(p, transformPoint(point, invertTransform(matrix)));
+    p = transformPointRelativeToCanvas(point, canvas, 'child', 'sibling');
+    assert.deepEqual(p, transformPoint(point, matrix));
     p = transformPointRelativeToCanvas(point, canvas, 'child', 'child');
     assert.deepEqual(p, point);
     p = transformPointRelativeToCanvas(point, canvas, 'sibling', 'sibling');
