@@ -176,7 +176,6 @@
           p1 = this._points[0],
           p2 = this._points[1];
       ctx = ctx || this.canvas.contextTop;
-      this._saveAndTransform(ctx);
       ctx.beginPath();
       //if we only have 2 points in the path and they are the same
       //it means that the user only clicked the canvas without moving the mouse
