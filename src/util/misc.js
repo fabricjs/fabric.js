@@ -339,9 +339,9 @@
      * @static
      * @memberOf fabric.util
      * @see {fabric.util.transformPointRelativeToCanvas} for transforming relative to canvas
-     * @param {fabric.Object} sourceObject object that point currently relates to
+     * @param {fabric.Object} [sourceObject] object that point currently relates to
      * @param {fabric.Object} destinationObject object that returned point should relate to
-     * @param {'sibling'|'child'} relationToSource
+     * @param {'sibling'|'child'} [relationToSource] optional if `sourceObject` is `null`
      * @param {'sibling'|'child'} relationToDestination
      * @returns {fabric.Point} transformed point
      */
@@ -349,7 +349,7 @@
       sourceObject, destinationObject,
       relationToSource, relationToDestination
     ) {
-      var from = fabric.util.getTransformMatrixByObject(sourceObject, relationToSource),
+      var from = sourceObject ? fabric.util.getTransformMatrixByObject(sourceObject, relationToSource) : fabric.iMatrix.concat(),
         to = fabric.util.getTransformMatrixByObject(destinationObject, relationToDestination);
       //  actually we are looking for the transformation between the destination plane to the source plane
       //  because the object will exist on the destination plane and we want it to seem unchanged by it we reverse the destination matrix
