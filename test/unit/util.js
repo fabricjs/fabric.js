@@ -872,23 +872,22 @@
     });
   });
 
-  function isCorrectTransformation(assert, obj1, obj2, relation1, relation2, message) {
-    var getTransform = fabric.util.getTransformMatrixByObject,
-      calcOPTransform = fabric.util.calcTransformationBetweenObjectPlanes,
-      invert = fabric.util.invertTransform,
-      multiply = fabric.util.multiplyTransformMatrices;
-    
-    var m1 = getTransform(obj1, relation1);
-    var m2 = getTransform(obj2, relation2);
-    var actual = calcOPTransform(obj1, obj2, relation1, relation2);
-    var expected = multiply(invert(m2), m1);
-    assert.deepEqual(actual, expected, message);
-    assert.deepEqual(multiply(m2, expected), m1, message);
-    return actual;
-  };
-
   QUnit.test('calcTransformationBetweenObjectPlanes', function (assert) {
     assert.ok(typeof fabric.util.calcTransformationBetweenObjectPlanes === 'function');
+    function isCorrectTransformation(obj1, obj2, relation1, relation2, message) {
+      var getTransform = fabric.util.getTransformMatrixByObject,
+        calcOPTransform = fabric.util.calcTransformationBetweenObjectPlanes,
+        invert = fabric.util.invertTransform,
+        multiply = fabric.util.multiplyTransformMatrices;
+
+      var m1 = getTransform(obj1, relation1);
+      var m2 = getTransform(obj2, relation2);
+      var actual = calcOPTransform(obj1, obj2, relation1, relation2);
+      var expected = multiply(invert(m2), m1);
+      assert.deepEqual(actual, expected, message);
+      assert.deepEqual(multiply(m2, expected), m1, message);
+      return actual;
+    };
     var m1 = [3, 0, 0, 2, 10, 4],
       m2 = [1, 2, 3, 4, 5, 6],
       actual, expected,
@@ -907,34 +906,32 @@
     assert.deepEqual(actual, expected);
     assert.deepEqual(multiply(getTransform(obj2, 'child'), expected), getTransform(obj1, 'child'));
 
-    var assertT = isCorrectTransformation.bind(this, assert);
-
-    assertT(obj1, obj2, 'child', 'child');
-    assertT(obj1, obj2, 'sibling', 'child');
-    assertT(obj1, obj2, 'child', 'sibling');
-    actual = assertT(obj1, obj2, 'sibling', 'sibling');
+    isCorrectTransformation(obj1, obj2, 'child', 'child');
+    isCorrectTransformation(obj1, obj2, 'sibling', 'child');
+    isCorrectTransformation(obj1, obj2, 'child', 'sibling');
+    actual = isCorrectTransformation(obj1, obj2, 'sibling', 'sibling');
     assert.deepEqual(actual, fabric.iMatrix);
     //  with groups
     obj1.group = new fabric.Object();
     obj2.group = new fabric.Object();
     applyTransformToObject(obj1.group, m1);
     applyTransformToObject(obj2.group, m2);
-    assertT(obj1, obj2, 'child', 'child');
-    assertT(obj1, obj2, 'sibling', 'child');
-    assertT(obj1, obj2, 'child', 'sibling');
-    assertT(obj1, obj2, 'sibling', 'sibling');
+    isCorrectTransformation(obj1, obj2, 'child', 'child');
+    isCorrectTransformation(obj1, obj2, 'sibling', 'child');
+    isCorrectTransformation(obj1, obj2, 'child', 'sibling');
+    isCorrectTransformation(obj1, obj2, 'sibling', 'sibling');
     //  nested
     obj2.group.group = obj1;
-    actual = assertT(obj1, obj2, 'child', 'child');
+    actual = isCorrectTransformation(obj1, obj2, 'child', 'child');
     expected = invert(multiply(obj2.group.calcOwnMatrix(), obj2.calcOwnMatrix()));
     assert.deepEqual(actual, expected);
-    actual = assertT(obj1, obj2, 'sibling', 'child');
+    actual = isCorrectTransformation(obj1, obj2, 'sibling', 'child');
     expected = invert(multiply(multiply(obj1.calcOwnMatrix(), obj2.group.calcOwnMatrix()), obj2.calcOwnMatrix()));
     assert.deepEqual(actual, expected);
-    actual = assertT(obj1, obj2, 'child', 'sibling');
+    actual = isCorrectTransformation(obj1, obj2, 'child', 'sibling');
     expected = invert(obj2.group.calcOwnMatrix());
     assert.deepEqual(actual, expected);
-    actual = assertT(obj1, obj2, 'sibling', 'sibling');
+    actual = isCorrectTransformation(obj1, obj2, 'sibling', 'sibling');
     expected = invert((multiply(obj1.calcOwnMatrix(), obj2.group.calcOwnMatrix())));
     assert.deepEqual(actual, expected);
   });
@@ -960,16 +957,16 @@
     applyTransformToObject(obj1.group, m1);
     applyTransformToObject(obj2.group, m2);
     p = sendPointToPlane(point, obj1, obj2, 'child', 'child');
-    t = multiply(invert(obj1.calcTransformMatrix()), obj2.calcTransformMatrix());
+    t = multiply(invert(obj2.calcTransformMatrix()), obj1.calcTransformMatrix());
     assert.deepEqual(p, transformPoint(point, t));
     p = sendPointToPlane(point, obj1, obj2, 'sibling', 'child');
-    t = multiply(invert(obj1.group.calcTransformMatrix()), obj2.calcTransformMatrix());
+    t = multiply(invert(obj2.calcTransformMatrix()), obj1.group.calcTransformMatrix());
     assert.deepEqual(p, transformPoint(point, t));
     p = sendPointToPlane(point, obj1, obj2, 'child', 'sibling');
-    t = multiply(invert(obj1.calcTransformMatrix()), obj2.group.calcTransformMatrix());
+    t = multiply(invert(obj2.group.calcTransformMatrix()), obj1.calcTransformMatrix());
     assert.deepEqual(p, transformPoint(point, t));
     p = sendPointToPlane(point, obj1, obj2, 'sibling', 'sibling');
-    t = multiply(invert(obj1.group.calcTransformMatrix()), obj2.group.calcTransformMatrix());
+    t = multiply(invert(obj2.group.calcTransformMatrix()), obj1.group.calcTransformMatrix());
     assert.deepEqual(p, transformPoint(point, t));
   });
 
