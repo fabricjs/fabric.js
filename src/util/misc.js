@@ -395,7 +395,8 @@
     },
 
     /**
-     * Transform point relative to canvas
+     * Transform point relative to canvas.
+     * From the viewport/viewer's perspective the point remains unchanged.
      *
      * `child` relation means `point` exists in the coordinate plane created by `canvas`.
      * In other words point is measured acoording to canvas' top left corner
