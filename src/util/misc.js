@@ -349,8 +349,10 @@
       sourceObject, destinationObject,
       relationToSource, relationToDestination
     ) {
-      var from = sourceObject ? fabric.util.getTransformMatrixByObject(sourceObject, relationToSource) : fabric.iMatrix.concat(),
-        to = fabric.util.getTransformMatrixByObject(destinationObject, relationToDestination);
+      var from = sourceObject ?
+            fabric.util.getTransformMatrixByObject(sourceObject, relationToSource) :
+            fabric.iMatrix.concat(),
+          to = fabric.util.getTransformMatrixByObject(destinationObject, relationToDestination);
       //  actually we are looking for the transformation between the destination plane to the source plane
       //  because the object will exist on the destination plane and we want it to seem unchanged by it we reverse the destination matrix
       //  this is de facto a linear mapping (which can help explain why the order is reversed if the explanation didn't)
@@ -1309,7 +1311,7 @@
      */
     sendObjectToPlane: function (object, destinationObject, relationToDestination) {
       var t = fabric.util.calcTransformationBetweenObjectPlanes(
-        object, destinationObject, 
+        object, destinationObject,
         'sibling', relationToDestination
       );
       fabric.util.applyTransformToObject(
