@@ -403,7 +403,7 @@
      * meaning that if `point` is equal to (0,0) it is positioned at canvas' top left corner.
      *
      * `sibling` relation means `point` exists in the same coordinate plane as canvas.
-     * In other words they both relate to the same (0,0) and agree on every point.
+     * In other words they both relate to the same (0,0) and agree on every point, which is how an event relates to canvas.
      *
      * @static
      * @memberOf fabric.util
