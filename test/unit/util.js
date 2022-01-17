@@ -968,6 +968,9 @@
     p = sendPointToPlane(point, obj1, obj2, 'sibling', 'sibling');
     t = multiply(invert(obj2.group.calcTransformMatrix()), obj1.group.calcTransformMatrix());
     assert.deepEqual(p, transformPoint(point, t));
+    p = sendPointToPlane(point, null, obj2, null, 'sibling');
+    t = invert(obj2.group.calcTransformMatrix());
+    assert.deepEqual(p, transformPoint(point, t));
   });
 
   QUnit.test('transformPointRelativeToCanvas', function(assert) {
