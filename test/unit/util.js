@@ -1104,6 +1104,19 @@
     assert.deepEqual(matrix, fabric.iMatrix, 'default is identity matrix');
   });
 
+  QUnit.test('composeMatrix with options', function (assert) {
+    assert.ok(typeof fabric.util.composeMatrix === 'function');
+    var m = [6, 5, 4, 3, 2, 1],
+      m1 = [3, 0, 0, 2, 10, 4],
+      m2 = [1, 2, 3, 4, 5, 6];
+    var matrix = fabric.util.composeMatrix(fabric.util.qrDecompose(m));
+    assert.deepEqual(matrix, m, 'matrices should be equal');
+    matrix = fabric.util.composeMatrix(fabric.util.qrDecompose(m1));
+    assert.deepEqual(matrix, m1, 'matrices should be equal');
+    matrix = fabric.util.composeMatrix(fabric.util.qrDecompose(m2));
+    assert.deepEqual(matrix, m2, 'matrices should be equal');
+  });
+
   QUnit.test('drawArc', function(assert) {
     assert.ok(typeof fabric.util.drawArc === 'function');
     var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
