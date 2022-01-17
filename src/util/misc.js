@@ -320,8 +320,11 @@
 
 
     /**
-     * Calculate the transform matrix needed to send target (object/point/whatever)
-     * from the source coordinate plane to the destination coordinate plane.
+     * Calculate the transform matrix needed to apply to target (object/point/whatever)
+     * in order for it to be sent to the destination coordinate plane **without** being changed from the canvas/viewer's perspective.
+     * In other words, target exists on the source plane and we need it to be moved to the destination plane
+     * but we want it to remain unchanged from our perspective.
+     * This method will return the transformation that needs to be added to target (pre-transform).
      *
      * `child` relation means target exists in the coordinate plane created by the object we relate to.
      * In other words:
@@ -377,7 +380,7 @@
      * @param {'sibling'|'child'} relationToDestination
      * @returns {fabric.Point} transformed point
      */
-    transformPointBetweenObjectPlanes: function (
+    sendPointToPlane: function (
       point,
       sourceObject, destinationObject,
       relationToSource, relationToDestination
