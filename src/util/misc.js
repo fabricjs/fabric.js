@@ -347,12 +347,18 @@
       relationToSource, relationToDestination
     ) {
       var from = fabric.util.getTransformMatrixByObject(sourceObject, relationToSource),
-          to = fabric.util.getTransformMatrixByObject(destinationObject, relationToDestination);
-      return fabric.util.multiplyTransformMatrices(fabric.util.invertTransform(from), to);
+        to = fabric.util.getTransformMatrixByObject(destinationObject, relationToDestination);
+      //  actually we are looking for the transformation between the destination plane to the source plane
+      //  because the object will exist on the destination plane and we want it to seem unchanged by it we reverse the destination matrix
+      //  this is de facto a linear mapping (which can help explain why the order is reversed if the explanation didn't)
+      //  think of how the target will be transformed once it's on the destination plane
+      //  first it reverses the effect of the plane and then it transforms itself with the source transformation, achieving what we wanted
+      return fabric.util.multiplyTransformMatrices(fabric.util.invertTransform(to), from);
     },
 
     /**
-     * Sends a point from the source coordinate plane to the destination coordinate plane
+     * Sends a point from the source coordinate plane to the destination coordinate plane.\
+     * From the canvas/viewer's perspective the point remains unchanged.
      *
      * `child` relation means `point` exists in the coordinate plane created by the object we relate to.
      * In other words, point is measured acoording to object's center point
@@ -1299,13 +1305,9 @@
      * @returns {number[]} the transform matrix that was applied to `object`
      */
     sendObjectToPlane: function (object, destinationObject, relationToDestination) {
-      //  we are looking for the transformation between the destination plane to the source plane
-      //  because the object will exist on the destination plane and we want it to seem unchanged by it
-      //  so we reverse the destination matrix and add it to object
-      //  this is de facto a linear mapping (which can help explain why the order is reversed if the explanation didn't)
       var t = fabric.util.calcTransformationBetweenObjectPlanes(
-        destinationObject, object,
-        relationToDestination, 'sibling'
+        object, destinationObject, 
+        'sibling', relationToDestination
       );
       fabric.util.applyTransformToObject(
         object,
