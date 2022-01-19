@@ -111,13 +111,13 @@
         context,
         removeFromRegistry = function () {
           var index = fabric.runningAnimations.indexOf(context);
-          index > -1 && fabric.runningAnimations.splice(index, 1);
+          return index > -1 && fabric.runningAnimations.splice(index, 1)[0];
         };
 
     context = extend(clone(options), {
       cancel: function () {
         cancel = true;
-        removeFromRegistry();
+        return removeFromRegistry();
       },
       currentValue: 'startValue' in options ? options.startValue : 0,
       completionRate: 0,

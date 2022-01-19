@@ -131,8 +131,9 @@
     assert.equal(fabric.runningAnimations.length, 1, 'should have registered animation');
     assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
     assert.equal(fabric.runningAnimations.findAnimation(abort).cancel, abort, 'animation should exist in registry');
-    abort();
+    var context = abort();
     assert.equal(fabric.runningAnimations.length, 0, 'should have unregistered animation');
+    assert.equal(context.foo, 'bar', 'should return animation context');
   });
 
   QUnit.test('fabric.runningAnimations cancelAll', function (assert) {
