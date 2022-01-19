@@ -935,7 +935,7 @@
           scaleX = sqrt(denom),
           scaleY = (a[0] * a[3] - a[2] * a[1]) / scaleX,
           skewX = atan2(a[0] * a[2] + a[1] * a [3], denom);
-      var options = {
+      return {
         angle: angle / PiBy180,
         scaleX: scaleX,
         scaleY: scaleY,
@@ -944,13 +944,6 @@
         translateX: a[4],
         translateY: a[5]
       };
-      Object.defineProperty(options, 'matrix', {
-        value: a,
-        configurable: false,
-        enumerable: false,
-        writable: false
-      });
-      return options;
     },
 
     /**
@@ -1035,10 +1028,7 @@
      * @param  {Number} [options.translateY]
      * @return {Number[]} transform matrix
      */
-    composeMatrix: function (options) {
-      if (options.matrix) {
-        return options.matrix;
-      }
+    composeMatrix: function(options) {
       var matrix = [1, 0, 0, 1, options.translateX || 0, options.translateY || 0],
           multiply = fabric.util.multiplyTransformMatrices;
       if (options.angle) {
