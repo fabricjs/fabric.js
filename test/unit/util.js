@@ -872,6 +872,23 @@
     });
   });
 
+  /**
+   * 
+   * @param {*} actual 
+   * @param {*} expected 
+   * @param {*} [message] 
+   * @param {number} [error] floating point percision, defaults to 14
+   */
+  QUnit.assert.matrixIsEquallEnough = function (actual, expected, message, error) {
+    var error = Math.pow(10, error ? -error : -14);
+    this.pushResult({
+      result: actual.every((x, i) => Math.abs(x - expected[i]) < error),
+      actual: actual,
+      expected: expected,
+      message: message
+    })
+  }
+
   QUnit.test('calcTransformationBetweenObjectPlanes', function (assert) {
     assert.ok(typeof fabric.util.calcTransformationBetweenObjectPlanes === 'function');
     function isCorrectTransformation(obj1, obj2, relation1, relation2, message) {
@@ -903,14 +920,13 @@
     applyTransformToObject(obj2, m2);
     actual = calcOPTransform(obj1, obj2, 'child', 'child');
     expected = multiply(invert(obj2.calcTransformMatrix()), obj1.calcTransformMatrix());
-    assert.deepEqual(actual, expected);
-    assert.deepEqual(multiply(getTransform(obj2, 'child'), expected), getTransform(obj1, 'child'));
-
+    assert.matrixIsEquallEnough(actual, expected);
+    assert.matrixIsEquallEnough(multiply(getTransform(obj2, 'child'), expected), getTransform(obj1, 'child'));
     isCorrectTransformation(obj1, obj2, 'child', 'child');
     isCorrectTransformation(obj1, obj2, 'sibling', 'child');
     isCorrectTransformation(obj1, obj2, 'child', 'sibling');
     actual = isCorrectTransformation(obj1, obj2, 'sibling', 'sibling');
-    assert.deepEqual(actual, fabric.iMatrix);
+    assert.matrixIsEquallEnough(actual, fabric.iMatrix);
     //  with groups
     obj1.group = new fabric.Object();
     obj2.group = new fabric.Object();
@@ -924,16 +940,16 @@
     obj2.group.group = obj1;
     actual = isCorrectTransformation(obj1, obj2, 'child', 'child');
     expected = invert(multiply(obj2.group.calcOwnMatrix(), obj2.calcOwnMatrix()));
-    assert.deepEqual(actual, expected);
+    assert.matrixIsEquallEnough(actual, expected);
     actual = isCorrectTransformation(obj1, obj2, 'sibling', 'child');
     expected = invert(multiply(multiply(obj1.calcOwnMatrix(), obj2.group.calcOwnMatrix()), obj2.calcOwnMatrix()));
-    assert.deepEqual(actual, expected);
+    assert.matrixIsEquallEnough(actual, expected);
     actual = isCorrectTransformation(obj1, obj2, 'child', 'sibling');
     expected = invert(obj2.group.calcOwnMatrix());
-    assert.deepEqual(actual, expected);
+    assert.matrixIsEquallEnough(actual, expected);
     actual = isCorrectTransformation(obj1, obj2, 'sibling', 'sibling');
     expected = invert((multiply(obj1.calcOwnMatrix(), obj2.group.calcOwnMatrix())));
-    assert.deepEqual(actual, expected);
+    assert.matrixIsEquallEnough(actual, expected);
   });
 
   QUnit.test('sendPointToPlane', function (assert) {
@@ -1024,10 +1040,10 @@
     obj.group = obj1;
     actual = sendObjectToPlane(obj, obj2, 'child');
     expected = multiply(invert(obj2.calcTransformMatrix()), obj1.calcTransformMatrix());
-    assert.deepEqual(actual, expected);
-    assert.deepEqual(obj.calcOwnMatrix(), multiply(actual, m));
+    assert.matrixIsEquallEnough(actual, expected);
+    assert.matrixIsEquallEnough(obj.calcOwnMatrix(), multiply(actual, m));
     obj.group = obj2;
-    assert.deepEqual(obj.calcTransformMatrix(), multiply(multiply(obj2.calcTransformMatrix(), actual), m));
+    assert.matrixIsEquallEnough(obj.calcTransformMatrix(), multiply(multiply(obj2.calcTransformMatrix(), actual), m));
   });
 
   QUnit.test('makeBoundingBoxFromPoints', function(assert) {
@@ -1111,11 +1127,11 @@
       m1 = [3, 0, 0, 2, 10, 4],
       m2 = [1, 2, 3, 4, 5, 6];
     var matrix = fabric.util.composeMatrix(fabric.util.qrDecompose(m));
-    assert.deepEqual(matrix, m, 'matrices should be equal');
+    assert.matrixIsEquallEnough(matrix, m, 'matrices should be equal');
     matrix = fabric.util.composeMatrix(fabric.util.qrDecompose(m1));
-    assert.deepEqual(matrix, m1, 'matrices should be equal');
+    assert.matrixIsEquallEnough(matrix, m1, 'matrices should be equal');
     matrix = fabric.util.composeMatrix(fabric.util.qrDecompose(m2));
-    assert.deepEqual(matrix, m2, 'matrices should be equal');
+    assert.matrixIsEquallEnough(matrix, m2, 'matrices should be equal');
   });
 
   QUnit.test('drawArc', function(assert) {
