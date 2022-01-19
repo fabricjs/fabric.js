@@ -1749,6 +1749,15 @@
       return this.renderOnAddRemove && this.requestRenderAll();
     },
 
+    setObjectsAtTime: function(objects, time) {
+      var i, len;
+      for (i = 0, len = objects.length; i < len; ++i) {
+        if (objects[i]) {
+          fabric.util.applyAnimationState(objects[i], time);
+        }
+      }
+    },
+
     /**
      * Clears a canvas element and dispose objects
      * @return {fabric.Canvas} thisArg
