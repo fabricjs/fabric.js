@@ -1941,6 +1941,13 @@
       if (this.globalCompositeOperation) {
         ctx.globalCompositeOperation = this.globalCompositeOperation;
       }
+    },
+
+    /**
+     * cancel instance's running animations
+     */
+    dispose: function () {
+      fabric.runningAnimations.cancelByTarget(this);
     }
   });
 
