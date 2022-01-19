@@ -2057,8 +2057,11 @@
     assert.notEqual(parentEl.firstChild, canvas.getElement(), 'canvas should not be parent div firstChild');
     assert.ok(typeof canvas.dispose === 'function');
     canvas.add(makeRect(), makeRect(), makeRect());
+    canvas.item(0).animate('scaleX', 10);
+    assert.equal(fabric.runningAnimations.length, 1, 'should have a running animation');
     canvas.dispose();
     canvas.cancelRequestedRender();
+    assert.equal(fabric.runningAnimations.length, 0, 'dispose should clear running animations');
     assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
     assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
     if (!fabric.isLikelyNode) {
