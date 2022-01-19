@@ -34,6 +34,7 @@
     options = options || {};
 
     return fabric.util.animate(fabric.util.object.extend(options, {
+      target: this,
       duration: duration || 500,
       startValue: startColor,
       endValue: endColor,

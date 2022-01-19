@@ -39,6 +39,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         _this = this;
 
     fabric.util.animate({
+      target: this,
       startValue: this.get('angle'),
       endValue: this._getAngleValueForStraighten(),
       duration: this.FX_DURATION,
