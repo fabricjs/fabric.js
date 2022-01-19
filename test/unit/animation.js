@@ -1,6 +1,7 @@
 (function() {
   QUnit.module('fabric.util.animate', {
-    afterEach: function () {
+    afterEach: function (assert) {
+      assert.equal(fabric.runningAnimations.length, 0, 'runningAnimations should be empty at the end of a test');
       fabric.runningAnimations.cancelAll();
     }
   });
@@ -47,20 +48,28 @@
   // });
 
   QUnit.test('animation context', function (assert) {
+    var done = assert.async();
     var options = { foo: 'bar' };
     fabric.util.animate(options);
     assert.propEqual(options, { foo: 'bar' }, 'options were mutated');
+    setTimeout(() => {
+      assert.equal(fabric.runningAnimations.length, 0, 'animation should exist in registry');
+      done();
+    }, 1000);
   });
 
   QUnit.test('fabric.runningAnimations', function (assert) {
     var done = assert.async();
     assert.ok(fabric.runningAnimations instanceof Array);
     assert.ok(typeof fabric.runningAnimations.cancelAll === 'function');
+    assert.ok(typeof fabric.runningAnimations.cancelByTarget === 'function');
     assert.ok(typeof fabric.runningAnimations.findAnimationIndex === 'function');
     assert.ok(typeof fabric.runningAnimations.findAnimation === 'function');
+    assert.ok(typeof fabric.runningAnimations.findAnimationsByTarget === 'function');
     assert.equal(fabric.runningAnimations.length, 0, 'should have registered animation');
-    var abort;
+    var abort, target = { foo: 'bar' };
     var options = {
+      target,
       onChange(currentValue, completionRate, durationRate) {
         var context = fabric.runningAnimations.findAnimation(abort);
         assert.equal(context.currentValue, currentValue, 'context.currentValue is wrong');
@@ -83,6 +92,11 @@
     assert.equal(context.currentValue, 0, 'context.currentValue is wrong');
     assert.equal(context.completionRate, 0, 'context.completionRate is wrong');
     assert.equal(context.durationRate, 0, 'context.durationRate is wrong');
+    var byTarget = fabric.runningAnimations.findAnimationsByTarget(target);
+    assert.equal(byTarget.length, 1, 'should have found registered animation by target');
+    assert.deepEqual(byTarget[0], context, 'should have found registered animation by target');
+    delete byTarget[0].target;
+    assert.equal(fabric.runningAnimations.findAnimationsByTarget(target), 0, 'should not have found registered animation by target');
   });
 
   QUnit.test('fabric.runningAnimations with abort', function (assert) {
@@ -138,6 +152,26 @@
     assert.ok(typeof fabric.runningAnimations.findAnimation === 'function');
   });
 
+  QUnit.test('fabric.runningAnimations cancelByTarget', function (assert) {
+    var done = assert.async();
+    var options = { foo: 'bar', target: 'pip' }, opt2 = { bar: 'baz' };
+    fabric.util.animate(options);
+    fabric.util.animate(options);
+    fabric.util.animate(options);
+    fabric.util.animate(opt2);
+    assert.equal(fabric.runningAnimations.length, 4, 'should have registered animations');
+    var cancelledAnimations = fabric.runningAnimations.cancelByTarget();
+    assert.equal(cancelledAnimations.length, 0, 'should return empty array');
+    assert.equal(fabric.runningAnimations.length, 4, 'should have registered animations');
+    cancelledAnimations = fabric.runningAnimations.cancelByTarget('pip');
+    assert.equal(cancelledAnimations.length, 3, 'should return cancelled animations');
+    assert.equal(fabric.runningAnimations.length, 1, 'should have left 1 registered animation');
+    assert.equal(fabric.runningAnimations[0].bar, opt2.bar, 'should have left 1 registered animation');
+    setTimeout(() => {
+      done();
+    }, 1000);
+  });
+
   QUnit.test('animate', function(assert) {
     var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
@@ -146,6 +180,8 @@
 
     object.animate('left', 40);
     assert.ok(true, 'animate without options does not crash');
+    assert.equal(fabric.runningAnimations.length, 1, 'should have 1 registered animation');
+    assert.equal(fabric.runningAnimations[0].target, object, 'animation.target should be set');
 
     setTimeout(function() {
 
@@ -190,14 +226,17 @@
       object.set(prop, 'red');
       object.animate(prop, 'blue');
       assert.ok(true, 'animate without options does not crash');
+      assert.equal(fabric.runningAnimations.length, index + 1, 'should have 1 registered animation');
+      assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, index + 1, 'animation.target should be set');
 
       setTimeout(function () {
         assert.equal(object[prop], new fabric.Color('blue').toRgba(), 'property [' + prop + '] has been animated');
-        if (index === properties.length - 1) {
-          done();
-        }
       }, 1000);
     });
+
+    setTimeout(function () {
+      done();
+    }, 1000);
   });
 
   QUnit.test('animate with decrement', function(assert) {
@@ -222,6 +261,8 @@
 
     object.animate({ left: 40});
     assert.ok(true, 'animate without options does not crash');
+    assert.equal(fabric.runningAnimations.length, 1, 'should have 1 registered animation');
+    assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, 1, 'animation.target should be set');
 
     setTimeout(function() {
       assert.equal(40, Math.round(object.left));
