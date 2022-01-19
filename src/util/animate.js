@@ -44,6 +44,19 @@
     },
 
     /**
+     * cancel all running animations for target
+     * @param {*} target 
+     * @returns 
+     */
+    cancelByTarget: function (target) {
+      var cancelled = this.findAnimationsByTarget(target);
+      cancelled.forEach(function (animation) {
+        animation.cancel();
+      });
+      return cancelled;
+    },
+
+    /**
      *
      * @param {CancelFunction} cancelFunc the function returned by animate
      * @returns {number}
@@ -60,6 +73,20 @@
     findAnimation: function (cancelFunc) {
       return this.find(function (animation) {
         return animation.cancel === cancelFunc;
+      });
+    },
+
+    /**
+     *
+     * @param {*} target the object that is assigned to the target property of the animation context
+     * @returns {AnimationContext[]} array of animation options object associated with target
+     */
+    findAnimationsByTarget: function (target) {
+      if (!target) {
+        return [];
+      }
+      return this.filter(function (animation) {
+        return animation.target === target;
       });
     }
   });
