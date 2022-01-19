@@ -1205,4 +1205,12 @@
     object.fill = 'transparent';
     assert.equal(object.hasFill(), false, 'with a color that is transparent, hasFill is true');
   });
+  QUnit.test('dispose', function (assert) {
+    var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });
+    assert.ok(typeof object.dispose === 'function');
+    object.animate('fill', 'red');
+    assert.equal(fabric.runningAnimations.length, 1, 'runningAnimations should be include he animation');
+    object.dispose();
+    assert.equal(fabric.runningAnimations.length, 0, 'runningAnimations should be empty after dispose');
+  });
 })();
