@@ -763,6 +763,135 @@ fabric.CommonMethods = {
     },
 
     /**
+     * Creates a vetor from points represented as a point
+     * @static
+     * @memberOf fabric.util
+     *
+     * @typedef {Object} Point
+     * @property {number} x
+     * @property {number} y
+     *
+     * @param {Point} from
+     * @param {Point} to
+     * @returns {Point} vector
+     */
+    createVector: function (from, to) {
+      return new fabric.Point(to.x - from.x, to.y - from.y);
+    },
+
+    /**
+     * Calculates angle between 2 vectors using dot product
+     * @static
+     * @memberOf fabric.util
+     * @param {Point} a
+     * @param {Point} b
+     * @returns the angle in radian between the vectors
+     */
+    calcAngleBetweenVectors: function (a, b) {
+      return Math.acos((a.x * b.x + a.y * b.y) / (Math.hypot(a.x, a.y) * Math.hypot(b.x, b.y)));
+    },
+
+    /**
+     * @static
+     * @memberOf fabric.util
+     * @param {Point} v
+     * @returns {Point} vector representing the unit vector of pointing to the direction of `v`
+     */
+    getHatVector: function (v) {
+      return new fabric.Point(v.x, v.y).multiply(1 / Math.hypot(v.x, v.y));
+    },
+
+    /**
+     * @static
+     * @memberOf fabric.util
+     * @param {Point} A
+     * @param {Point} B
+     * @param {Point} C
+     * @returns {{ vector: Point, angle: number }} vector representing the bisector of A and A's angle
+     */
+    getBisector: function (A, B, C) {
+      var AB = fabric.util.createVector(A, B), AC = fabric.util.createVector(A, C);
+      var alpha = fabric.util.calcAngleBetweenVectors(AB, AC);
+      //  check if alpha is relative to AB->BC
+      var ro = fabric.util.calcAngleBetweenVectors(fabric.util.rotateVector(AB, alpha), AC);
+      var phi = alpha * (ro === 0 ? 1 : -1) / 2;
+      return {
+        vector: fabric.util.getHatVector(fabric.util.rotateVector(AB, phi)),
+        angle: alpha
+      };
+    },
+
+    /**
+     * Project stroke width on points returning 2 projections for each point as follows:
+     * - `miter`: 2 points corresponding to the outer boundary and the inner boundary of stroke.
+     * - `bevel`: 2 points corresponding to the bevel boundaries, tangent to the bisector.
+     * - `round`: same as `bevel`
+     * Used to calculate object's bounding box
+     * @static
+     * @memberOf fabric.util
+     * @param {Point[]} points
+     * @param {Object} options
+     * @param {number} options.strokeWidth
+     * @param {'miter'|'bevel'|'round'} options.strokeLineJoin
+     * @param {number} options.strokeMiterLimit https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
+     * @param {boolean} options.strokeUniform
+     * @param {number} options.scaleX
+     * @param {number} options.scaleY
+     * @param {boolean} [openPath] whether the shape is open or not, affects the calculations of the first and last points
+     * @returns {fabric.Point[]} array of size 2n/4n of all suspected points
+     */
+    projectStrokeOnPoints: function (points, options, openPath) {
+      var coords = [], s = options.strokeWidth / 2,
+          strokeUniformScalar = options.strokeUniform ?
+            new fabric.Point(1 / options.scaleX, 1 / options.scaleY) : new fabric.Point(1, 1),
+          getStrokeHatVector = function (v) {
+            var scalar = s / (Math.hypot(v.x, v.y));
+            return new fabric.Point(v.x * scalar * strokeUniformScalar.x, v.y * scalar * strokeUniformScalar.y);
+          };
+      if (points.length <= 1) {return coords;}
+      points.forEach(function (p, index) {
+        var A = new fabric.Point(p.x, p.y), B, C;
+        if (index === 0) {
+          C = points[index + 1];
+          B = openPath ? getStrokeHatVector(fabric.util.createVector(C, A)).addEquals(A) : points[points.length - 1];
+        }
+        else if (index === points.length - 1) {
+          B = points[index - 1];
+          C = openPath ? getStrokeHatVector(fabric.util.createVector(B, A)).addEquals(A) : points[0];
+        }
+        else {
+          B = points[index - 1];
+          C = points[index + 1];
+        }
+        var bisector = fabric.util.getBisector(A, B, C),
+            bisectorVector = bisector.vector,
+            alpha = bisector.angle,
+            scalar,
+            miterVector;
+        if (options.strokeLineJoin === 'miter') {
+          scalar = -s / Math.sin(alpha / 2);
+          miterVector = new fabric.Point(
+            bisectorVector.x * scalar * strokeUniformScalar.x,
+            bisectorVector.y * scalar * strokeUniformScalar.y
+          );
+          if (Math.hypot(miterVector.x, miterVector.y) / s <= options.strokeMiterLimit) {
+            coords.push(A.add(miterVector));
+            coords.push(A.subtract(miterVector));
+            return;
+          }
+        }
+        scalar = -s * Math.SQRT2;
+        miterVector = new fabric.Point(
+          bisectorVector.x * scalar * strokeUniformScalar.x,
+          bisectorVector.y * scalar * strokeUniformScalar.y
+        );
+        coords.push(A.add(miterVector));
+        coords.push(A.subtract(miterVector));
+      });
+      return coords;
+    },
+
+    /**
      * Apply transform t to point p
      * @static
      * @memberOf fabric.util
@@ -785,7 +914,146 @@ fabric.CommonMethods = {
     },
 
     /**
+     * Returns the transform matrix according to `relationToObject`.\
+     * The returned matrix is relative to the entire object plane spread by a canvas,
+     * meaning it doesn't account for canvas viewport transform.
+     *
+     * `child` relation means `point` exists in the coordinate plane created by the object.
+     * In other words, point is measured acoording to object's center point
+     * meaning that if `point` is equal to (0,0) it is positioned at object's center.\
+     * `sibling` relation means `point` exists in the same coordinate plane as object.
+     * In other words they both relate to the same (0,0) and agree on every point.
+     *
+     * @static
+     * @memberOf fabric.util
+     * @param {fabric.Object} object
+     * @param {'sibling'|'child'} relationToObject
+     * @returns {number[]} plane matrix relative to the coordinate plane created by a canvas
+     */
+    getTransformMatrixByObject: function (object, relationToObject) {
+      if (relationToObject !== 'child' && relationToObject !== 'sibling') {
+        throw new Error('fabric.js: recieved bad argument ' + relationToObject);
+      }
+      return relationToObject === 'child' ?
+        object.calcTransformMatrix() :
+        object.group ?
+          object.group.calcTransformMatrix() :
+          fabric.iMatrix.concat();
+    },
+
+
+    /**
+     * Calculate the transform matrix needed to apply to target (object/point/whatever)
+     * in order for it to be sent to the destination coordinate plane **without** being changed from the canvas/viewer's perspective.
+     * In other words, target exists on the source plane and we need it to be moved to the destination plane
+     * but we want it to remain unchanged from our perspective.
+     * This method will return the transformation that needs to be added to target (pre-transform).
+     *
+     * `child` relation means target exists in the coordinate plane created by the object we relate to.
+     * In other words:
+     * - target is measured acoording to object's center point
+     * - target is drawn by object in the plane object creates
+     * - target is transformed by object but is unaware of it.
+     * - if target is positioned at (0,0) it is positioned at object's center.
+     *
+     * `sibling` relation means target exists in the same coordinate plane as the object we relate to.
+     * In other words they both relate to the same (0,0), agree on every point and are drawn in the same transformed plane.
+     *
+     * @static
+     * @memberOf fabric.util
+     * @see {fabric.util.transformPointRelativeToCanvas} for transforming relative to canvas
+     * @param {fabric.Object} [sourceObject] object that point currently relates to
+     * @param {fabric.Object} destinationObject object that returned point should relate to
+     * @param {'sibling'|'child'} [relationToSource] optional if `sourceObject` is `null`
+     * @param {'sibling'|'child'} relationToDestination
+     * @returns {fabric.Point} transformed point
+     */
+    calcTransformationBetweenObjectPlanes: function (
+      sourceObject, destinationObject,
+      relationToSource, relationToDestination
+    ) {
+      var from = sourceObject ?
+            fabric.util.getTransformMatrixByObject(sourceObject, relationToSource) :
+            fabric.iMatrix.concat(),
+          to = fabric.util.getTransformMatrixByObject(destinationObject, relationToDestination);
+      //  actually we are looking for the transformation between the destination plane to the source plane
+      //  because the object will exist on the destination plane and we want it to seem unchanged by it we reverse the destination matrix
+      //  this is de facto a linear mapping (which can help explain why the order is reversed if the explanation didn't)
+      //  think of how the target will be transformed once it's on the destination plane
+      //  first it reverses the effect of the plane and then it transforms itself with the source transformation, achieving what we wanted
+      return fabric.util.multiplyTransformMatrices(fabric.util.invertTransform(to), from);
+    },
+
+    /**
+     * Sends a point from the source coordinate plane to the destination coordinate plane.\
+     * From the canvas/viewer's perspective the point remains unchanged.
+     *
+     * `child` relation means `point` exists in the coordinate plane created by the object we relate to.
+     * In other words, point is measured acoording to object's center point
+     * meaning that if `point` is equal to (0,0) it is positioned at object's center.
+     *
+     * `sibling` relation means `point` exists in the same coordinate plane as the object we relate to.
+     * In other words they both relate to the same (0,0) and agree on every point.
+     *
+     * @static
+     * @memberOf fabric.util
+     * @see {fabric.util.transformPointRelativeToCanvas} for transforming relative to canvas
+     * @param {fabric.Point} point
+     * @param {fabric.Object} sourceObject object that point currently relates to
+     * @param {fabric.Object} destinationObject object that returned point should relate to
+     * @param {'sibling'|'child'} relationToSource
+     * @param {'sibling'|'child'} relationToDestination
+     * @returns {fabric.Point} transformed point
+     */
+    sendPointToPlane: function (
+      point,
+      sourceObject, destinationObject,
+      relationToSource, relationToDestination
+    ) {
+      var t = fabric.util.calcTransformationBetweenObjectPlanes(
+        sourceObject, destinationObject,
+        relationToSource, relationToDestination
+      );
+      return fabric.util.transformPoint(point, t);
+    },
+
+    /**
+     * Transform point relative to canvas.
+     * From the viewport/viewer's perspective the point remains unchanged.
+     *
+     * `child` relation means `point` exists in the coordinate plane created by `canvas`.
+     * In other words point is measured acoording to canvas' top left corner
+     * meaning that if `point` is equal to (0,0) it is positioned at canvas' top left corner.
+     *
+     * `sibling` relation means `point` exists in the same coordinate plane as canvas.
+     * In other words they both relate to the same (0,0) and agree on every point, which is how an event relates to canvas.
+     *
+     * @static
+     * @memberOf fabric.util
+     * @param {fabric.Point} point
+     * @param {fabric.StaticCanvas} canvas
+     * @param {'sibling'|'child'} relationBefore current relation of point to canvas
+     * @param {'sibling'|'child'} relationAfter desired relation of point to canvas
+     * @returns {fabric.Point} transformed point
+     */
+    transformPointRelativeToCanvas: function (point, canvas, relationBefore, relationAfter) {
+      if (relationBefore !== 'child' && relationBefore !== 'sibling') {
+        throw new Error('fabric.js: recieved bad argument ' + relationBefore);
+      }
+      if (relationAfter !== 'child' && relationAfter !== 'sibling') {
+        throw new Error('fabric.js: recieved bad argument ' + relationAfter);
+      }
+      if (relationBefore === relationAfter) {
+        return point;
+      }
+      var t = canvas.viewportTransform;
+      return fabric.util.transformPoint(point, relationAfter === 'child' ? fabric.util.invertTransform(t) : t);
+    },
+
+    /**
      * Returns coordinates of points's bounding rectangle (left, top, width, height)
+     * @static
+     * @memberOf fabric.util
      * @param {Array} points 4 points array
      * @param {Array} [transform] an array of 6 numbers representing a 2x3 transform matrix
      * @return {Object} Object with left, top, width, height properties
@@ -1290,7 +1558,7 @@ fabric.CommonMethods = {
           scaleX = sqrt(denom),
           scaleY = (a[0] * a[3] - a[2] * a[1]) / scaleX,
           skewX = atan2(a[0] * a[2] + a[1] * a [3], denom);
-      return {
+      var options = {
         angle: angle / PiBy180,
         scaleX: scaleX,
         scaleY: scaleY,
@@ -1299,6 +1567,13 @@ fabric.CommonMethods = {
         translateX: a[4],
         translateY: a[5]
       };
+      Object.defineProperty(options, 'matrix', {
+        value: a,
+        configurable: false,
+        enumerable: false,
+        writable: false
+      });
+      return options;
     },
 
     /**
@@ -1383,7 +1658,10 @@ fabric.CommonMethods = {
      * @param  {Number} [options.translateY]
      * @return {Number[]} transform matrix
      */
-    composeMatrix: function(options) {
+    composeMatrix: function (options) {
+      if (options.matrix) {
+        return options.matrix;
+      }
       var matrix = [1, 0, 0, 1, options.translateX || 0, options.translateY || 0],
           multiply = fabric.util.multiplyTransformMatrices;
       if (options.angle) {
@@ -1646,6 +1924,35 @@ fabric.CommonMethods = {
       object.skewY = options.skewY;
       object.angle = options.angle;
       object.setPositionByOrigin(center, 'center', 'center');
+    },
+
+    /**
+     * A util that abstracts applying transform to objects.\
+     * Sends `object` to the destination coordinate plane by applying the relevant transformations.\
+     * Changes the space/plane where `object` is drawn while **preserving** it's appearance and position from the canvas/viewer's perspective.
+     *
+     * `child` relation means `object` should exist in the coordinate plane created by `destinationObject`.
+     * In other words, `object` will be drawn by `destinationObject` onto the plane it creates.\
+     * `sibling` relation means `object` should exist in the same plane as `destinationObject`.
+     * In other words, they are both drawn together in the same transformed plane.
+     *
+     * @static
+     * @memberof fabric.util
+     * @param {fabric.Object} object
+     * @param {fabric.Object} destinationObject
+     * @param {'sibling'|'child'} relationToDestination
+     * @returns {number[]} the transform matrix that was applied to `object`
+     */
+    sendObjectToPlane: function (object, destinationObject, relationToDestination) {
+      var t = fabric.util.calcTransformationBetweenObjectPlanes(
+        object, destinationObject,
+        'sibling', relationToDestination
+      );
+      fabric.util.applyTransformToObject(
+        object,
+        fabric.util.multiplyTransformMatrices(t, object.calcOwnMatrix())
+      );
+      return t;
     },
 
     /**
@@ -2203,15 +2510,15 @@ fabric.CommonMethods = {
         p, nextLen, nextStep = 0.01, angleFinder = segInfo.angleFinder, lastPerc;
     // nextStep > 0.0001 covers 0.00015625 that 1/64th of 1/100
     // the path
-    while (tmpLen < distance && perc <= 1 && nextStep > 0.0001) {
+    while (tmpLen < distance && nextStep > 0.0001) {
       p = iterator(perc);
       lastPerc = perc;
       nextLen = calcLineLength(tempP.x, tempP.y, p.x, p.y);
       // compare tmpLen each cycle with distance, decide next perc to test.
       if ((nextLen + tmpLen) > distance) {
         // we discard this step and we make smaller steps.
-        nextStep /= 2;
         perc -= nextStep;
+        nextStep /= 2;
       }
       else {
         tempP = p;
@@ -5062,22 +5369,26 @@ fabric.warn = console.warn;
         if (styleContents.trim() === '') {
           continue;
         }
-        rules = styleContents.match(/[^{]*\{[\s\S]*?\}/g);
-        rules = rules.map(function(rule) { return rule.trim(); });
+        // recovers all the rule in this form `body { style code... }`
+        // rules = styleContents.match(/[^{]*\{[\s\S]*?\}/g);
+        rules = styleContents.split('}');
+        // remove empty rules.
+        rules = rules.filter(function(rule) { return rule.trim(); });
+        // at this point we have hopefully an array of rules `body { style code... `
         // eslint-disable-next-line no-loop-func
         rules.forEach(function(rule) {
 
-          var match = rule.match(/([\s\S]*?)\s*\{([^}]*)\}/),
-              ruleObj = { }, declaration = match[2].trim(),
-              propertyValuePairs = declaration.replace(/;$/, '').split(/\s*;\s*/);
+          var match = rule.split('{'),
+              ruleObj = { }, declaration = match[1].trim(),
+              propertyValuePairs = declaration.split(';').filter(function(pair) { return pair.trim(); });
 
           for (i = 0, len = propertyValuePairs.length; i < len; i++) {
-            var pair = propertyValuePairs[i].split(/\s*:\s*/),
-                property = pair[0],
-                value = pair[1];
+            var pair = propertyValuePairs[i].split(':'),
+                property = pair[0].trim(),
+                value = pair[1].trim();
             ruleObj[property] = value;
           }
-          rule = match[1];
+          rule = match[0].trim();
           rule.split(',').forEach(function(_rule) {
             _rule = _rule.replace(/^svg/i, '').trim();
             if (_rule === '') {
@@ -8652,8 +8963,12 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     imageSmoothingEnabled: true,
 
     /**
-     * The transformation (in the format of Canvas transform) which focuses the viewport
+     * The transformation (a Canvas 2D API transform matrix) which focuses the viewport
      * @type Array
+     * @example <caption>Default transform</caption>
+     * canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+     * @example <caption>Scale by 70% and translate toward bottom-right by 50, without skewing</caption>
+     * canvas.viewportTransform = [0.7, 0, 0, 0.7, 50, 50];
      * @default
      */
     viewportTransform: fabric.iMatrix.concat(),
@@ -8747,7 +9062,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @private
      */
     _isRetinaScaling: function() {
-      return (fabric.devicePixelRatio !== 1 && this.enableRetinaScaling);
+      return (fabric.devicePixelRatio > 1 && this.enableRetinaScaling);
     },
 
     /**
@@ -8755,7 +9070,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @return {Number} retinaScaling if applied, otherwise 1;
      */
     getRetinaScaling: function() {
-      return this._isRetinaScaling() ? fabric.devicePixelRatio : 1;
+      return this._isRetinaScaling() ? Math.max(1, fabric.devicePixelRatio) : 1;
     },
 
     /**
@@ -9189,8 +9504,8 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     },
 
     /**
-     * Sets viewport transform of this canvas instance
-     * @param {Array} vpt the transform in the form of context.transform
+     * Sets viewport transformation of this canvas instance
+     * @param {Array} vpt a Canvas 2D API transform matrix
      * @return {fabric.Canvas} instance
      * @chainable true
      */
@@ -10291,7 +10606,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       this.contextContainer = null;
       // restore canvas style
       this.lowerCanvasEl.classList.remove('lower-canvas');
-      this.lowerCanvasEl.style = this._originalCanvasStyle;
+      fabric.util.setStyle(this.lowerCanvasEl, this._originalCanvasStyle);
       delete this._originalCanvasStyle;
       // restore canvas size to original size in case retina scaling was applied
       this.lowerCanvasEl.setAttribute('width', this.width);
@@ -10547,6 +10862,22 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     decimate: 0.4,
 
     /**
+     * Draws a straight line between last recorded point to current pointer
+     * Used for `shift` functionality
+     *
+     * @type boolean
+     * @default false
+     */
+    drawStraightLine: false,
+
+    /**
+     * The event modifier key that makes the brush draw a straight line.
+     * If `null` or 'none' or any other string that is not a modifier key the feature is disabled.
+     * @type {'altKey' | 'shiftKey' | 'ctrlKey' | 'none' | undefined | null}
+     */
+    straightLineKey: 'shiftKey',
+
+    /**
      * Constructor
      * @param {fabric.Canvas} canvas
      * @return {fabric.PencilBrush} Instance of a pencil brush
@@ -10554,6 +10885,10 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     initialize: function(canvas) {
       this.canvas = canvas;
       this._points = [];
+    },
+
+    needsFullRender: function () {
+      return this.callSuper('needsFullRender') || this._hasStraightLine;
     },
 
     /**
@@ -10574,6 +10909,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       if (!this.canvas._isMainEvent(options.e)) {
         return;
       }
+      this.drawStraightLine = options.e[this.straightLineKey];
       this._prepareForDrawing(pointer);
       // capture coordinates immediately
       // this allows to draw dots (when movement never occurs)
@@ -10589,6 +10925,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       if (!this.canvas._isMainEvent(options.e)) {
         return;
       }
+      this.drawStraightLine = options.e[this.straightLineKey];
       if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
         return;
       }
@@ -10621,6 +10958,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       if (!this.canvas._isMainEvent(options.e)) {
         return true;
       }
+      this.drawStraightLine = false;
       this.oldEnd = undefined;
       this._finalizeAndAddPath();
       return false;
@@ -10647,6 +10985,10 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       if (this._points.length > 1 && point.eq(this._points[this._points.length - 1])) {
         return false;
       }
+      if (this.drawStraightLine && this._points.length > 1) {
+        this._hasStraightLine = true;
+        this._points.pop();
+      }
       this._points.push(point);
       return true;
     },
@@ -10659,6 +11001,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       this._points = [];
       this._setBrushStyles();
       this._setShadow();
+      this._hasStraightLine = false;
     },
 
     /**
@@ -11585,6 +11928,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @type fabric.Object[]
      */
     targets: [],
+
+    /**
+     * When the option is enabled, PointerEvent is used instead of MouseEvent.
+     * @type Boolean
+     * @default
+     */
+    enablePointerEvents: false,
 
     /**
      * Keep track of the hovered target
@@ -12664,7 +13014,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._onDragOver = this._onDragOver.bind(this);
       this._onDragEnter = this._simpleEventHandler.bind(this, 'dragenter');
       this._onDragLeave = this._simpleEventHandler.bind(this, 'dragleave');
-      this._onDrop = this._simpleEventHandler.bind(this, 'drop');
+      this._onDrop = this._onDrop.bind(this);
       this.eventsBound = true;
     },
 
@@ -12774,6 +13124,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       e.preventDefault();
       var target = this._simpleEventHandler('dragover', e);
       this._fireEnterLeaveEvents(target, e);
+    },
+
+    /**
+     * `drop:before` is a an event that allow you to schedule logic
+     * before the `drop` event. Prefer `drop` event always, but if you need
+     * to run some drop-disabling logic on an event, since there is no way
+     * to handle event handlers ordering, use `drop:before`
+     * @param {Event} e
+     */
+    _onDrop: function (e) {
+      this._simpleEventHandler('drop:before', e);
+      return this._simpleEventHandler('drop', e);
     },
 
     /**
@@ -14615,6 +14977,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     /**
      * When `false`, the stoke width will scale with the object.
      * When `true`, the stroke will always match the exact pixel size entered for stroke width.
+     * this Property does not work on Text classes or drawing call that uses strokeText,fillText methods
      * default to false
      * @since 2.6.0
      * @type Boolean
@@ -15479,6 +15842,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       ctx.lineWidth = 1 * this.borderScaleFactor;
       if (!this.group) {
         ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+      }
+      if (this.flipX) {
+        options.angle -= 180;
       }
       ctx.rotate(degreesToRadians(options.angle));
       if (styleOverride.forActiveSelection || this.group) {
@@ -16838,7 +17204,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * oCoords are used to find the corners
      * aCoords are used to quickly find an object on the canvas
      * lineCoords are used to quickly find object during pointer events.
-     * See {@link https://github.com/kangax/fabric.js/wiki/When-to-call-setCoords|When-to-call-setCoords}
+     * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
+     * 
      * @param {Boolean} [skipCorners] skip calculation of oCoords.
      * @return {fabric.Object} thisArg
      * @chainable
@@ -19049,7 +19416,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
-      toFixed = fabric.util.toFixed;
+      toFixed = fabric.util.toFixed,
+      projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
 
   if (fabric.Polyline) {
     fabric.warn('fabric.Polyline is already defined');
@@ -19077,6 +19445,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @default
      */
     points: null,
+
+    /**
+     * WARNING: Feature in progress
+     * Calculate the exact bounding box taking in account strokeWidth on acute angles
+     * this will be turned to true by default on fabric 5.0
+     * maybe will be left in as an optimization since calculations may be slow
+     * @deprecated
+     * @type Boolean
+     * @default false
+     */
+    exactBoundingBox: false,
 
     cacheProperties: fabric.Object.prototype.cacheProperties.concat('points'),
 
@@ -19106,13 +19485,25 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this._setPositionDimensions(options);
     },
 
+    /**
+     * @private
+     */
+    _projectStrokeOnPoints: function () {
+      return projectStrokeOnPoints(this.points, this, true);
+    },
+
     _setPositionDimensions: function(options) {
-      var calcDim = this._calcDimensions(options), correctLeftTop;
-      this.width = calcDim.width;
-      this.height = calcDim.height;
+      var calcDim = this._calcDimensions(options), correctLeftTop,
+          correctSize = this.exactBoundingBox ? this.strokeWidth : 0;
+      this.width = calcDim.width - correctSize;
+      this.height = calcDim.height - correctSize;
       if (!options.fromSVG) {
         correctLeftTop = this.translateToGivenOrigin(
-          { x: calcDim.left - this.strokeWidth / 2, y: calcDim.top - this.strokeWidth / 2 },
+          {
+            // this looks bad, but is one way to keep it optional for now.
+            x: calcDim.left - this.strokeWidth / 2 + correctSize / 2,
+            y: calcDim.top - this.strokeWidth / 2 + correctSize / 2
+          },
           'left',
           'top',
           this.originX,
@@ -19126,8 +19517,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
       }
       this.pathOffset = {
-        x: calcDim.left + this.width / 2,
-        y: calcDim.top + this.height / 2
+        x: calcDim.left + this.width / 2 + correctSize / 2,
+        y: calcDim.top + this.height / 2 + correctSize / 2
       };
     },
 
@@ -19143,7 +19534,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      */
     _calcDimensions: function() {
 
-      var points = this.points,
+      var points = this.exactBoundingBox ? this._projectStrokeOnPoints() : this.points,
           minX = min(points, 'x') || 0,
           minY = min(points, 'y') || 0,
           maxX = max(points, 'x') || 0,
@@ -19155,7 +19546,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         left: minX,
         top: minY,
         width: width,
-        height: height
+        height: height,
       };
     },
 
@@ -19291,7 +19682,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = {}),
+      projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
 
   if (fabric.Polygon) {
     fabric.warn('fabric.Polygon is already defined');
@@ -19312,6 +19704,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @default
      */
     type: 'polygon',
+
+    /**
+     * @private
+     */
+    _projectStrokeOnPoints: function () {
+      return projectStrokeOnPoints(this.points, this);
+    },
 
     /**
      * @private
@@ -19370,6 +19769,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       min = fabric.util.array.min,
       max = fabric.util.array.max,
       extend = fabric.util.object.extend,
+      clone = fabric.util.object.clone,
       _toString = Object.prototype.toString,
       toFixed = fabric.util.toFixed;
 
@@ -19411,23 +19811,26 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {Object} [options] Options object
      * @return {fabric.Path} thisArg
      */
-    initialize: function(path, options) {
-      options = options || { };
+    initialize: function (path, options) {
+      options = clone(options || {});
+      delete options.path;
       this.callSuper('initialize', options);
-      if (!path) {
-        path = [];
-      }
+      this._setPath(path || [], options);
+    },
 
+    /**
+    * @private
+    * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
+    * @param {Object} [options] Options object
+    */
+    _setPath: function (path, options) {
       var fromArray = _toString.call(path) === '[object Array]';
 
       this.path = fabric.util.makePathSimpler(
         fromArray ? path : fabric.util.parsePath(path)
       );
 
-      if (!this.path) {
-        return;
-      }
-      fabric.Polyline.prototype._setPositionDimensions.call(this, options);
+      fabric.Polyline.prototype._setPositionDimensions.call(this, options || {});
     },
 
     /**
@@ -20140,12 +20543,15 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * this method will be reduced to using the utility.
      * @private
      * @deprecated
-     * @param {fabric.Object} object
-     * @param {Array} parentMatrix parent transformation
+     * @param {fabric.Object} object that is inside the group
+     * @param {Array} parentMatrix parent transformation of the object.
      * @return {fabric.Object} transformedObject
      */
     realizeTransform: function(object, parentMatrix) {
-      fabric.util.addTransformToObject(object, parentMatrix);
+      fabric.util.addTransformToObject(
+        object,
+        parentMatrix || this.calcTransformMatrix()
+      );
       return object;
     },
 
@@ -25511,7 +25917,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
   var additionalProps =
     ('fontFamily fontWeight fontSize text underline overline linethrough' +
     ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles' +
-    ' direction path pathStartOffset pathSide').split(' ');
+    ' direction path pathStartOffset pathSide pathAlign').split(' ');
 
   /**
    * Text class
@@ -25540,7 +25946,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       'styles',
       'path',
       'pathStartOffset',
-      'pathSide'
+      'pathSide',
+      'pathAlign'
     ],
 
     /**
@@ -25738,6 +26145,16 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     pathSide:               'left',
 
     /**
+     * How text is aligned to the path. This property determines
+     * the perpendicular position of each character relative to the path.
+     * (one of "baseline", "center", "ascender", "descender")
+     * This feature is in BETA, and its behavior may change
+     * @type String
+     * @default
+     */
+    pathAlign:               'baseline',
+
+    /**
      * @private
      */
     _fontSizeFraction: 0.222,
@@ -25880,6 +26297,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     /**
      * Return a context for measurement of text string.
      * if created it gets stored for reuse
+     * this is for internal use, please do not use it
+     * @private
      * @param {String} text Text string
      * @param {Object} [options] Options object
      * @return {fabric.Text} thisArg
@@ -26051,7 +26470,20 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @param {String} [charStyle.fontStyle] Font style (italic|normal)
      */
     _setTextStyles: function(ctx, charStyle, forMeasuring) {
-      ctx.textBaseline = 'alphabetic';
+      ctx.textBaseline = 'alphabetical';
+      if (this.path) {
+        switch (this.pathAlign) {
+          case 'center':
+            ctx.textBaseline = 'middle';
+            break;
+          case 'ascender':
+            ctx.textBaseline = 'top';
+            break;
+          case 'descender':
+            ctx.textBaseline = 'bottom';
+            break;
+        }
+      }
       ctx.font = this._getFontDeclaration(charStyle, forMeasuring);
     },
 
@@ -26815,19 +27247,12 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @return {Number} Line width
      */
     getLineWidth: function(lineIndex) {
-      if (this.__lineWidths[lineIndex]) {
+      if (this.__lineWidths[lineIndex] !== undefined) {
         return this.__lineWidths[lineIndex];
       }
 
-      var width, line = this._textLines[lineIndex], lineInfo;
-
-      if (line === '') {
-        width = 0;
-      }
-      else {
-        lineInfo = this.measureLine(lineIndex);
-        width = lineInfo.width;
-      }
+      var lineInfo = this.measureLine(lineIndex);
+      var width = lineInfo.width;
       this.__lineWidths[lineIndex] = width;
       return width;
     },
@@ -28924,7 +29349,13 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           this.insertCharStyleObject(cursorLoc.lineIndex + i, 0, addedLines[i], copiedStyle);
         }
         else if (copiedStyle) {
-          this.styles[cursorLoc.lineIndex + i][0] = copiedStyle[0];
+          // this test is required in order to close #6841
+          // when a pasted buffer begins with a newline then
+          // this.styles[cursorLoc.lineIndex + i] and copiedStyle[0]
+          // may be undefined for some reason
+          if (this.styles[cursorLoc.lineIndex + i] && copiedStyle[0]) {
+            this.styles[cursorLoc.lineIndex + i][0] = copiedStyle[0];
+          }
         }
         copiedStyle = copiedStyle && copiedStyle.slice(addedLines[i] + 1);
       }
