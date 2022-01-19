@@ -877,10 +877,10 @@
    * @param {*} actual 
    * @param {*} expected 
    * @param {*} [message] 
-   * @param {number} [error] floating point percision, defaults to 14
+   * @param {number} [error] floating point percision, defaults to 10
    */
   QUnit.assert.matrixIsEquallEnough = function (actual, expected, message, error) {
-    var error = Math.pow(10, error ? -error : -14);
+    var error = Math.pow(10, error ? -error : -10);
     this.pushResult({
       result: actual.every((x, i) => Math.abs(x - expected[i]) < error),
       actual: actual,
@@ -901,8 +901,8 @@
       var m2 = getTransform(obj2, relation2);
       var actual = calcOPTransform(obj1, obj2, relation1, relation2);
       var expected = multiply(invert(m2), m1);
-      assert.deepEqual(actual, expected, message);
-      assert.deepEqual(multiply(m2, expected), m1, message);
+      assert.matrixIsEquallEnough(actual, expected, message);
+      assert.matrixIsEquallEnough(multiply(m2, expected), m1, message);
       return actual;
     };
     var m1 = [3, 0, 0, 2, 10, 4],
