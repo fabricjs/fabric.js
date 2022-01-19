@@ -1209,8 +1209,8 @@
     var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });
     assert.ok(typeof object.dispose === 'function');
     object.animate('fill', 'red');
-    assert.equal(fabric.runningAnimations.length, 1, 'runningAnimations should be include he animation');
+    assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, 1, 'runningAnimations should include the animation');
     object.dispose();
-    assert.equal(fabric.runningAnimations.length, 0, 'runningAnimations should be empty after dispose');
+    assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, 0, 'runningAnimations should be empty after dispose');
   });
 })();
