@@ -1200,6 +1200,7 @@
      */
     dispose: function () {
       var wrapper = this.wrapperEl;
+      fabric.runningAnimations.cancelAll();
       this.removeListeners();
       wrapper.removeChild(this.upperCanvasEl);
       wrapper.removeChild(this.lowerCanvasEl);
