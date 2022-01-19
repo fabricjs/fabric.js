@@ -569,13 +569,13 @@
 
     var callbacks = { onComplete: onComplete, onChange: onChange };
     assert.ok(typeof object.fxStraighten === 'function');
-    assert.equal(object.fxStraighten(callbacks), object, 'should be chainable');
+    assert.ok(typeof object.fxStraighten(callbacks) === 'function', 'should return animation abort function');
     assert.equal(fabric.util.toFixed(object.get('angle'), 0), 43);
     setTimeout(function(){
       assert.ok(onCompleteFired);
       assert.ok(onChangeFired);
       assert.equal(object.get('angle'), 0, 'angle should be set to 0 by the end of animation');
-      assert.equal(object.fxStraighten(), object, 'should work without callbacks');
+      assert.ok(typeof object.fxStraighten() === 'function', 'should work without callbacks');
       done();
     }, 1000);
   });
