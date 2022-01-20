@@ -1,7 +1,7 @@
 import { Object } from './object.class';
 
 export class Rect extends Object {
-    static type = 'rect';
+    readonly type = 'rect';
     rx: number = 0;
     ry: number = 0;
 
