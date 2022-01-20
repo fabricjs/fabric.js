@@ -11,9 +11,9 @@ export class Rect extends Object {
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: Object.stateProperties.concat('rx', 'ry');
+    stateProperties = Object.stateProperties.concat('rx', 'ry');
 
-    cacheProperties: Object.cacheProperties.concat('rx', 'ry');
+    cacheProperties = Object.cacheProperties.concat('rx', 'ry');
 
     constructor(options) {
         super(options);
@@ -37,7 +37,7 @@ export class Rect extends Object {
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    protected _render(ctx) {
+    protected _render(ctx: CanvasRenderingContext2D) {
 
         // 1x1 case (used in spray brush) optimization was removed because
         // with caching and higher zoom level this makes more damage than help
@@ -70,7 +70,7 @@ export class Rect extends Object {
         ctx.closePath();
 
         this._renderPaintInOrder(ctx);
-    },
+    }
 
     /**
      * Returns object representation of an instance
