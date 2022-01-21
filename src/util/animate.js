@@ -12,6 +12,7 @@
    * @property {Number} [options.byValue=100] Value to modify the property by
    * @property {Function} [options.easing] Easing function
    * @property {Number} [options.duration=500] Duration of change (in ms)
+   * @property {Number} [options.delay] Delay of animation start (in ms)
    * @property {Function} [options.abort] Additional function with logic. If returns true, animation aborts.
    *
    * @typedef {() => void} CancelFunction
@@ -45,8 +46,8 @@
 
     /**
      * cancel all running animations for target
-     * @param {*} target 
-     * @returns 
+     * @param {*} target
+     * @returns
      */
     cancelByTarget: function (target) {
       var cancelled = this.findAnimationsByTarget(target);
@@ -125,7 +126,7 @@
     });
     fabric.runningAnimations.push(context);
 
-    requestAnimFrame(function(timestamp) {
+    var runner = function (timestamp) {
       var start = timestamp || +new Date(),
           duration = options.duration || 500,
           finish = start + duration, time,
@@ -172,7 +173,16 @@
           requestAnimFrame(tick);
         }
       })(start);
-    });
+    };
+
+    if (options.delay) {
+      setTimeout(function () {
+        requestAnimFrame(runner);
+      }, options.delay);
+    }
+    else {
+      requestAnimFrame(runner);
+    }
 
     return context.cancel;
   }
