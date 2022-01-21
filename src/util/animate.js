@@ -140,8 +140,6 @@
       options.onStart && options.onStart();
 
       (function tick(ticktime) {
-        // TODO: move abort call after calculation
-        // and pass (current,valuePerc, timePerc) as arguments
         time = ticktime || +new Date();
         var currentTime = time > finish ? duration : (time - start),
             timePerc = currentTime / duration,
@@ -163,6 +161,7 @@
           context.currentValue = endValue;
           context.completionRate = 1;
           context.durationRate = 1;
+          //  execute callbacks
           onChange(endValue, 1, 1);
           onComplete(endValue, 1, 1);
           removeFromRegistry();
