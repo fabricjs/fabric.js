@@ -1954,7 +1954,6 @@
     dispose: function () {
       if (fabric.runningAnimations) {
         fabric.runningAnimations.cancelByTarget(this);
-        this.clipPath && fabric.runningAnimations.cancelByTarget(this.clipPath);
       }
     }
   });
