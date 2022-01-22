@@ -125,8 +125,7 @@
         0,
         this.radius,
         degreesToRadians(this.startAngle),
-        // degreesToRadians does do mod for full circle
-        this.endAngle === 360 ? Math.PI * 2 : degreesToRadians(this.endAngle),
+        degreesToRadians(this.endAngle),
         false
       );
       this._renderPaintInOrder(ctx);
