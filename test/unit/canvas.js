@@ -1275,7 +1275,7 @@
     assert.ok(typeof canvas.centerObjectH === 'function');
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
-    assert.equal(canvas.centerObjectH(rect), canvas, 'should be chainable');
+    canvas.centerObjectH(rect);
     assert.equal(rect.getCenterPoint().x, upperCanvasEl.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
   });
 
@@ -1283,7 +1283,7 @@
     assert.ok(typeof canvas.centerObjectV === 'function');
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
-    assert.equal(canvas.centerObjectV(rect), canvas, 'should be chainable');
+    canvas.centerObjectV(rect);
     assert.equal(rect.getCenterPoint().y, upperCanvasEl.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
   });
 
@@ -1291,7 +1291,7 @@
     assert.ok(typeof canvas.centerObject === 'function');
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
-    assert.equal(canvas.centerObject(rect), canvas, 'should be chainable');
+    canvas.centerObject(rect);
 
     assert.equal(rect.getCenterPoint().y, upperCanvasEl.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
     assert.equal(rect.getCenterPoint().x, upperCanvasEl.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
@@ -1301,7 +1301,7 @@
     assert.ok(typeof canvas.straightenObject === 'function');
     var rect = makeRect({ angle: 10 });
     canvas.add(rect);
-    assert.equal(canvas.straightenObject(rect), canvas, 'should be chainable');
+    canvas.straightenObject(rect);
     assert.equal(rect.get('angle'), 0, 'angle should be coerced to 0 (from 10)');
 
     rect.rotate('60');
@@ -2057,8 +2057,11 @@
     assert.notEqual(parentEl.firstChild, canvas.getElement(), 'canvas should not be parent div firstChild');
     assert.ok(typeof canvas.dispose === 'function');
     canvas.add(makeRect(), makeRect(), makeRect());
+    canvas.item(0).animate('scaleX', 10);
+    assert.equal(fabric.runningAnimations.length, 1, 'should have a running animation');
     canvas.dispose();
     canvas.cancelRequestedRender();
+    assert.equal(fabric.runningAnimations.length, 0, 'dispose should clear running animations');
     assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
     assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
     if (!fabric.isLikelyNode) {
@@ -2340,7 +2343,7 @@
     }
 
     assert.equal(canvas.item(0), rect);
-    assert.equal(canvas.fxRemove(rect, { onComplete: onComplete }), canvas, 'should be chainable');
+    assert.ok(typeof canvas.fxRemove(rect, { onComplete: onComplete }) === 'function', 'should return animation abort function');
 
     setTimeout(function() {
       assert.equal(canvas.item(0), undefined);
