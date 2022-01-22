@@ -425,6 +425,14 @@
       return this._restoreObjectsState();
     },
 
+    dispose: function () {
+      this.callSuper('dispose');
+      this.forEachObject(function (object) {
+        object.dispose && object.dispose();
+      });
+      this._objects = [];
+    },
+
     /**
      * make a group an active selection, remove the group from canvas
      * the group has to be on canvas for this to work.
