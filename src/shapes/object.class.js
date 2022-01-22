@@ -1952,7 +1952,9 @@
      * cancel instance's running animations
      */
     dispose: function () {
-      fabric.runningAnimations.cancelByTarget(this);
+      if (fabric.runningAnimations) {
+        fabric.runningAnimations.cancelByTarget(this);
+      }
     }
   });
 

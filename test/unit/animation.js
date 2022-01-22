@@ -153,6 +153,26 @@
     assert.ok(typeof fabric.runningAnimations.findAnimation === 'function');
   });
 
+  QUnit.test('fabric.runningAnimations cancelByCanvas', function (assert) {
+    var done = assert.async();
+    var canvas = { pip: 'py' };
+    fabric.util.animate({ foo: 'bar', target: 'pip' });
+    fabric.util.animate({ foo: 'bar', target: { canvas: 'pip' } });
+    fabric.util.animate({ foo: 'bar' });
+    fabric.util.animate({ target: { canvas } });
+    assert.equal(fabric.runningAnimations.length, 4, 'should have registered animations');
+    var cancelledAnimations = fabric.runningAnimations.cancelByCanvas();
+    assert.equal(cancelledAnimations.length, 0, 'should return empty array');
+    assert.equal(fabric.runningAnimations.length, 4, 'should have registered animations');
+    cancelledAnimations = fabric.runningAnimations.cancelByCanvas(canvas);
+    assert.equal(cancelledAnimations.length, 1, 'should return cancelled animations');
+    assert.equal(cancelledAnimations[0].target.canvas, canvas, 'should return cancelled animations by canvas');
+    assert.equal(fabric.runningAnimations.length, 3, 'should have left registered animation');
+    setTimeout(() => {
+      done();
+    }, 1000);
+  });
+
   QUnit.test('fabric.runningAnimations cancelByTarget', function (assert) {
     var done = assert.async();
     var options = { foo: 'bar', target: 'pip' }, opt2 = { bar: 'baz' };

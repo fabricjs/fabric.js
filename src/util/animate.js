@@ -34,7 +34,8 @@
   fabric.util.object.extend(RUNNING_ANIMATIONS, {
 
     /**
-     * cancel all running animations
+     * cancel all running animations at the next requestAnimFrame
+     * @returns {AnimationContext[]}
      */
     cancelAll: function () {
       var animations = this.splice(0);
@@ -45,9 +46,27 @@
     },
 
     /**
-     * cancel all running animations for target
+     * cancel all running animations attached to canvas at the next requestAnimFrame
+     * @param {fabric.Canvas} canvas
+     * @returns {AnimationContext[]}
+     */
+    cancelByCanvas: function (canvas) {
+      if (!canvas) {
+        return [];
+      }
+      var cancelled = this.filter(function (animation) {
+        return typeof animation.target === 'object' && animation.target.canvas === canvas;
+      });
+      cancelled.forEach(function (animation) {
+        animation.cancel();
+      });
+      return cancelled;
+    },
+
+    /**
+     * cancel all running animations for target at the next requestAnimFrame
      * @param {*} target
-     * @returns
+     * @returns {AnimationContext[]}
      */
     cancelByTarget: function (target) {
       var cancelled = this.findAnimationsByTarget(target);
