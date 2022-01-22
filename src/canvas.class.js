@@ -232,13 +232,6 @@
     freeDrawingCursor:      'crosshair',
 
     /**
-     * Cursor value used for rotation point
-     * @type String
-     * @default
-     */
-    rotationCursor:         'crosshair',
-
-    /**
      * Cursor value used for disabled elements ( corners with disabled action )
      * @type String
      * @since 2.0.0

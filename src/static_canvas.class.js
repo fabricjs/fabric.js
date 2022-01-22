@@ -1762,6 +1762,10 @@
       }
       this.forEachObject(function(object) {
         object.dispose && object.dispose();
+        // animation module is still optional
+        if (fabric.runningAnimations) {
+          fabric.runningAnimations.cancelByTarget(object);
+        }
       });
       this._objects = [];
       if (this.backgroundImage && this.backgroundImage.dispose) {

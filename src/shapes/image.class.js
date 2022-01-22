@@ -202,7 +202,8 @@
     /**
      * Delete textures, reference to elements and eventually JSDOM cleanup
      */
-    dispose: function() {
+    dispose: function () {
+      this.callSuper('dispose');
       this.removeTexture(this.cacheKey);
       this.removeTexture(this.cacheKey + '_filtered');
       this._cacheContext = undefined;
