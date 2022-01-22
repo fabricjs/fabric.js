@@ -51,7 +51,7 @@ Fabric.js allows you to easily create simple shapes like rectangles, circles, tr
 - Opera 9.64+
 - Chrome (all versions)
 - Edge (chromium based, all versions)
-- IE11 and Edge legacy, supported but deprecated.
+- IE11 and Edge legacy, not supported. Fabric up to 5.0 is written with ES5 in mind, but no specific tests are run for those browsers.
 
 You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the browser.
 
