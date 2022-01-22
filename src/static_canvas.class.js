@@ -1038,6 +1038,7 @@
     /**
      * Centers object horizontally in the canvas
      * @param {fabric.Object} object Object to center horizontally
+     * @return {fabric.Canvas} thisArg
      */
     centerObjectH: function (object) {
       return this._centerObject(object, new fabric.Point(this.getCenter().left, object.getCenterPoint().y));
@@ -1046,6 +1047,8 @@
     /**
      * Centers object vertically in the canvas
      * @param {fabric.Object} object Object to center vertically
+     * @return {fabric.Canvas} thisArg
+     * @chainable
      */
     centerObjectV: function (object) {
       return this._centerObject(object, new fabric.Point(object.getCenterPoint().x, this.getCenter().top));
@@ -1054,6 +1057,8 @@
     /**
      * Centers object vertically and horizontally in the canvas
      * @param {fabric.Object} object Object to center vertically and horizontally
+     * @return {fabric.Canvas} thisArg
+     * @chainable
      */
     centerObject: function(object) {
       var center = this.getCenter();
@@ -1064,6 +1069,8 @@
     /**
      * Centers object vertically and horizontally in the viewport
      * @param {fabric.Object} object Object to center vertically and horizontally
+     * @return {fabric.Canvas} thisArg
+     * @chainable
      */
     viewportCenterObject: function(object) {
       var vpCenter = this.getVpCenter();
@@ -1074,15 +1081,20 @@
     /**
      * Centers object horizontally in the viewport, object.top is unchanged
      * @param {fabric.Object} object Object to center vertically and horizontally
+     * @return {fabric.Canvas} thisArg
+     * @chainable
      */
     viewportCenterObjectH: function(object) {
       var vpCenter = this.getVpCenter();
-      return this._centerObject(object, new fabric.Point(vpCenter.x, object.getCenterPoint().y));
+      this._centerObject(object, new fabric.Point(vpCenter.x, object.getCenterPoint().y));
+      return this;
     },
 
     /**
      * Centers object Vertically in the viewport, object.top is unchanged
      * @param {fabric.Object} object Object to center vertically and horizontally
+     * @return {fabric.Canvas} thisArg
+     * @chainable
      */
     viewportCenterObjectV: function(object) {
       var vpCenter = this.getVpCenter();
@@ -1093,6 +1105,7 @@
     /**
      * Calculate the point in canvas that correspond to the center of actual viewport.
      * @return {fabric.Point} vpCenter, viewport center
+     * @chainable
      */
     getVpCenter: function() {
       var center = this.getCenter(),
@@ -1104,11 +1117,14 @@
      * @private
      * @param {fabric.Object} object Object to center
      * @param {fabric.Point} center Center point
+     * @return {fabric.Canvas} thisArg
+     * @chainable
      */
     _centerObject: function(object, center) {
       object.setPositionByOrigin(center, 'center', 'center');
       object.setCoords();
       this.renderOnAddRemove && this.requestRenderAll();
+      return this;
     },
 
     /**
@@ -1746,6 +1762,10 @@
       }
       this.forEachObject(function(object) {
         object.dispose && object.dispose();
+        // animation module is still optional
+        if (fabric.runningAnimations) {
+          fabric.runningAnimations.cancelByTarget(object);
+        }
       });
       this._objects = [];
       if (this.backgroundImage && this.backgroundImage.dispose) {
