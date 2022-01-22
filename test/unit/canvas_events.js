@@ -1097,21 +1097,4 @@
     assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'lockSkewingX br action is not disabled');
     assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'lockSkewingX mtr action is not disabled');
   });
-  QUnit.test('_addEventOptions return the correct event name', function(assert) {
-    var opt = {};
-    assert.equal(canvas._addEventOptions(opt, { action: 'scaleX' }), 'scaled', 'scaleX => scaled');
-    assert.equal(opt.by, 'x', 'by => x');
-    assert.equal(canvas._addEventOptions(opt, { action: 'scaleY' }), 'scaled', 'scaleY => scaled');
-    assert.equal(opt.by, 'y', 'by => y');
-    assert.equal(canvas._addEventOptions(opt, { action: 'scale' }), 'scaled', 'scale => scaled');
-    assert.equal(opt.by, 'equally', 'by => equally');
-    assert.equal(canvas._addEventOptions(opt, { action: 'skewX' }), 'skewed', 'skewX => skewed');
-    assert.equal(opt.by, 'x', 'by => x');
-    assert.equal(canvas._addEventOptions(opt, { action: 'skewY' }), 'skewed', 'skewY => skewed');
-    assert.equal(opt.by, 'y', 'by => y');
-    assert.equal(canvas._addEventOptions(opt, { action: 'rotate' }), 'rotated', 'rotate => rotated');
-    assert.equal(opt.by, undefined, 'by => undefined');
-    assert.equal(canvas._addEventOptions(opt, { action: 'drag' }), 'moved', 'drag => moved');
-    assert.equal(opt.by, undefined, 'by => undefined');
-  });
 })();
