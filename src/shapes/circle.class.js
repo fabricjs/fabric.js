@@ -103,7 +103,7 @@
             startY = fabric.util.sin(start) * radius,
             endX = fabric.util.cos(end) * radius,
             endY = fabric.util.sin(end) * radius,
-            largeFlag = angle > pi ? '1' : '0';
+            largeFlag = angle > 180 ? '1' : '0';
         svgString = [
           '<path d="M ' + startX + ' ' + startY,
           ' A ' + radius + ' ' + radius,
