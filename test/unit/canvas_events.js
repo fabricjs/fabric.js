@@ -347,10 +347,6 @@
       count++;
       opt = _opt;
     });
-    canvas.on('object:moved', function(_opt) {
-      count2++;
-      opt = _opt;
-    });
     canvas.__onMouseDown(e);
     canvas.__onMouseMove(e2);
     canvas.__onMouseUp(e2);
@@ -358,7 +354,6 @@
     assert.equal(opt.e, e2, 'options match model - event');
     assert.equal(opt.target, rect, 'options match model - target');
     assert.equal(opt.transform.action, 'drag', 'options match model - target');
-    assert.equal(count2, 1, 'object:moved fired');
   });
 
   QUnit.test('drag small object when mousemove + drag, not active', function(assert) {
