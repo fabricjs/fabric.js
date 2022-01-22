@@ -1950,6 +1950,7 @@
 
     /**
      * cancel instance's running animations
+     * override if necessary to dispose artifacts such as `clipPath`
      */
     dispose: function () {
       if (fabric.runningAnimations) {
