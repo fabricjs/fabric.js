@@ -33,7 +33,7 @@
   fabric.util.object.extend(RUNNING_ANIMATIONS, {
 
     /**
-     * cancel all running animations
+     * cancel all running animations at the next requestAnimFrame
      * @returns {AnimationContext[]}
      */
     cancelAll: function () {
@@ -45,8 +45,8 @@
     },
 
     /**
-     * cancel all running animations attached to canvas
-     * @param {fabric.Canvas} canvas 
+     * cancel all running animations attached to canvas at the next requestAnimFrame
+     * @param {fabric.Canvas} canvas
      * @returns {AnimationContext[]}
      */
     cancelByCanvas: function (canvas) {
@@ -63,7 +63,7 @@
     },
 
     /**
-     * cancel all running animations for target
+     * cancel all running animations for target at the next requestAnimFrame
      * @param {*} target
      * @returns {AnimationContext[]}
      */
