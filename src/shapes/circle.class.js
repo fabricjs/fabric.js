@@ -3,7 +3,6 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
-      pi = Math.PI,
       degreesToRadians = fabric.util.degreesToRadians;
 
   if (fabric.Circle) {
