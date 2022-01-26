@@ -170,7 +170,6 @@
             }) : easing(currentTime, startValue, byValue, duration),
             valuePerc = isMany ? Math.abs((current[0] - startValue[0]) / byValue[0])
               : Math.abs((current - startValue) / byValue);
-        console.log('current', current);
         //  update context
         context.currentValue = current;
         context.completionRate = valuePerc;
