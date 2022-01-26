@@ -26,8 +26,8 @@
 
   var path = require('path');
 
-  var IMG_SRC = (fabric.isLikelyNode ? ('file://' + path.join(__dirname + '/../fixtures/test_image.gif')) : getAbsolutePath('../fixtures/test_image.gif')).replace(/\\/g, '/'),
-    IMG_SRC_REL = (fabric.isLikelyNode ? ('file://' + path.join(__dirname + '/../fixtures/test_image.gif')) : '../fixtures/test_image.gif').replace(/\\/g, '/'),
+  var IMG_SRC = fabric.isLikelyNode ? ('file://' + path.join(__dirname + '/../fixtures/test_image.gif')) : getAbsolutePath('../fixtures/test_image.gif'),
+    IMG_SRC_REL = fabric.isLikelyNode ? ('file://' + path.join(__dirname + '/../fixtures/test_image.gif')) : '../fixtures/test_image.gif',
       IMG_WIDTH   = 276,
       IMG_HEIGHT  = 110;
 
