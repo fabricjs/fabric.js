@@ -711,10 +711,30 @@
      */
     qrDecompose: function(a) {
       var angle = atan2(a[1], a[0]),
-          denom = pow(a[0], 2) + pow(a[1], 2),
-          scaleX = sqrt(denom),
-          scaleY = (a[0] * a[3] - a[2] * a[1]) / scaleX,
-          skewX = atan2(a[0] * a[2] + a[1] * a [3], denom);
+        scaleX, scaleY, skewX;
+      //  find the eigenvalues of the matrix `a` by calculating the characteristic polynomial of `a` (if possible)
+      //  x ^ 2 - trace * x + det = 0
+      var det = a[0] * a[3] - a[2] * a[1],
+        trace = a[0] + a[3],
+        charPolynomDiscriminant = pow(trace, 2) - 4 * det;
+
+      if (charPolynomDiscriminant > 0) {
+        //  found eigenvalues
+        var descRoot = sqrt(charPolynomDiscriminant),
+          r1 = (trace + descRoot) / 2,
+          r2 = (trace - descRoot) / 2;
+        scaleX = r1;
+        scaleY = r2;
+        skewX = 0;
+      }
+      else {
+        //  revert to qr decomposition (in case of a rotation matrix for example - doesn't have eigenvalues)
+        var denom = pow(a[0], 2) + pow(a[1], 2);
+        scaleX = sqrt(denom);
+        scaleY = det / scaleX;
+        skewX = atan2(a[0] * a[2] + a[1] * a[3], denom);
+      }
+
       return {
         angle: angle / PiBy180,
         scaleX: scaleX,
