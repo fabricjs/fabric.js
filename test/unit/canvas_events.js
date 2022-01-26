@@ -347,10 +347,6 @@
       count++;
       opt = _opt;
     });
-    canvas.on('object:moved', function(_opt) {
-      count2++;
-      opt = _opt;
-    });
     canvas.__onMouseDown(e);
     canvas.__onMouseMove(e2);
     canvas.__onMouseUp(e2);
@@ -358,7 +354,6 @@
     assert.equal(opt.e, e2, 'options match model - event');
     assert.equal(opt.target, rect, 'options match model - target');
     assert.equal(opt.transform.action, 'drag', 'options match model - target');
-    assert.equal(count2, 1, 'object:moved fired');
   });
 
   QUnit.test('drag small object when mousemove + drag, not active', function(assert) {
@@ -1096,22 +1091,5 @@
     assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'lockSkewingX bl action is not disabled');
     assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'lockSkewingX br action is not disabled');
     assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'lockSkewingX mtr action is not disabled');
-  });
-  QUnit.test('_addEventOptions return the correct event name', function(assert) {
-    var opt = {};
-    assert.equal(canvas._addEventOptions(opt, { action: 'scaleX' }), 'scaled', 'scaleX => scaled');
-    assert.equal(opt.by, 'x', 'by => x');
-    assert.equal(canvas._addEventOptions(opt, { action: 'scaleY' }), 'scaled', 'scaleY => scaled');
-    assert.equal(opt.by, 'y', 'by => y');
-    assert.equal(canvas._addEventOptions(opt, { action: 'scale' }), 'scaled', 'scale => scaled');
-    assert.equal(opt.by, 'equally', 'by => equally');
-    assert.equal(canvas._addEventOptions(opt, { action: 'skewX' }), 'skewed', 'skewX => skewed');
-    assert.equal(opt.by, 'x', 'by => x');
-    assert.equal(canvas._addEventOptions(opt, { action: 'skewY' }), 'skewed', 'skewY => skewed');
-    assert.equal(opt.by, 'y', 'by => y');
-    assert.equal(canvas._addEventOptions(opt, { action: 'rotate' }), 'rotated', 'rotate => rotated');
-    assert.equal(opt.by, undefined, 'by => undefined');
-    assert.equal(canvas._addEventOptions(opt, { action: 'drag' }), 'moved', 'drag => moved');
-    assert.equal(opt.by, undefined, 'by => undefined');
   });
 })();
