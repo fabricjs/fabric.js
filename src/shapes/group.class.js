@@ -390,28 +390,6 @@
     },
 
     /**
-     * Realises the transform from this group onto the supplied object
-     * i.e. it tells you what would happen if the supplied object was in
-     * the group, and then the group was destroyed. It mutates the supplied
-     * object.
-     * Warning: this method is not useful anymore, it has been kept to no break the api.
-     * is not used in the fabricJS codebase
-     * this method will be reduced to using the utility.
-     * @private
-     * @deprecated
-     * @param {fabric.Object} object that is inside the group
-     * @param {Array} parentMatrix parent transformation of the object.
-     * @return {fabric.Object} transformedObject
-     */
-    realizeTransform: function(object, parentMatrix) {
-      fabric.util.addTransformToObject(
-        object,
-        parentMatrix || this.calcTransformMatrix()
-      );
-      return object;
-    },
-
-    /**
      * Destroys a group (restoring state of its objects)
      * @return {fabric.Group} thisArg
      * @chainable

@@ -45,7 +45,7 @@
     /**
      * Describe object's corner position in canvas element coordinates.
      * includes padding. Used of object detection.
-     * set and refreshed with setCoords and calcCoords.
+     * set and refreshed with setCoords.
      * @memberOf fabric.Object.prototype
      */
     lineCoords: null,
@@ -429,21 +429,6 @@
       return this.scale(value / this.height / boundingRectFactor);
     },
 
-    /**
-     * Calculates and returns the .coords of an object.
-     * unused by the library, only for the end dev.
-     * @return {Object} Object with tl, tr, br, bl ....
-     * @chainable
-     * @deprecated
-     */
-    calcCoords: function(absolute) {
-      // this is a compatibility function to avoid removing calcCoords now.
-      if (absolute) {
-        return this.calcACoords();
-      }
-      return this.calcOCoords();
-    },
-
     calcLineCoords: function() {
       var vpt = this.getViewportTransform(),
           padding = this.padding, angle = degreesToRadians(this.angle),
@@ -519,7 +504,7 @@
      * aCoords are used to quickly find an object on the canvas
      * lineCoords are used to quickly find object during pointer events.
      * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
-     * 
+     *
      * @param {Boolean} [skipCorners] skip calculation of oCoords.
      * @return {fabric.Object} thisArg
      * @chainable
@@ -614,23 +599,6 @@
       cache.key = key;
       cache.value = util.composeMatrix(options);
       return cache.value;
-    },
-
-    /*
-     * Calculate object dimensions from its properties
-     * @private
-     * @deprecated since 3.4.0, please use fabric.util._calcDimensionsTransformMatrix
-     * not including or including flipX, flipY to emulate the flipping boolean
-     * @return {Object} .x width dimension
-     * @return {Object} .y height dimension
-     */
-    _calcDimensionsTransformMatrix: function(skewX, skewY, flipping) {
-      return util.calcDimensionsMatrix({
-        skewX: skewX,
-        skewY: skewY,
-        scaleX: this.scaleX * (flipping && this.flipX ? -1 : 1),
-        scaleY: this.scaleY * (flipping && this.flipY ? -1 : 1)
-      });
     },
 
     /*

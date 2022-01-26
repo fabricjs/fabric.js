@@ -881,22 +881,6 @@
     assert.equal(rect5.scaleY, 1, 'scaleY is back to original');
   });
 
-  QUnit.test('realizeTransform', function(assert) {
-    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' }),
-        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 6, angle: 90, strokeWidth: 0, fill: 'red' }),
-        group0 = new fabric.Group([rect1, rect2]),
-        rect3 = new fabric.Rect({ top: 2, left: 9, width: 3, height: 2, strokeWidth: 0, fill: 'red' }),
-        rect4 = new fabric.Rect({ top: 3, left: 5, width: 2, height: 6, angle: 90, strokeWidth: 0, fill: 'red' }),
-        group1 = new fabric.Group([rect3, rect4], { scaleX: 3, scaleY: 4 }),
-        group = new fabric.Group([group0, group1], { angle: 90, scaleX: 2, scaleY: 0.5 }),
-        rect5 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' });
-
-    assert.equal(rect1.scaleX, 1, 'object starts with scale 1');
-    assert.equal(rect1.angle, 0, 'object starts with angle 0');
-    group0.realizeTransform(rect1);
-    assert.equal(rect1.scaleX, 2, 'object ends with scale 2');
-    assert.equal(rect1.angle, 90, 'object ends with angle 90');
-  });
   // QUnit.test('cloning group with image', function(assert) {
   //   var done = assert.async();
   //   var rect = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),

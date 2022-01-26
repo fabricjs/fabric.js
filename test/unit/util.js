@@ -610,17 +610,6 @@
     assert.ok(true, 'test did not throw on null element removeListener');
   });
 
-  QUnit.test('fabric.util.drawDashedLine', function(assert) {
-    assert.ok(typeof fabric.util.drawDashedLine === 'function');
-
-    var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
-
-
-    var ctx = canvas.getContext('2d');
-
-    fabric.util.drawDashedLine(ctx, 0, 0, 100, 100, [5, 5]);
-  });
-
   QUnit.test('fabric.util.array.invoke', function(assert) {
     assert.ok(typeof fabric.util.array.invoke === 'function');
 
@@ -921,42 +910,6 @@
     assert.deepEqual(matrix, fabric.iMatrix, 'default is identity matrix');
   });
 
-  QUnit.test('drawArc', function(assert) {
-    assert.ok(typeof fabric.util.drawArc === 'function');
-    var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
-    var ctx = canvas.contextContainer;
-    fabric.util.drawArc(ctx, 0, 0, [
-      50,
-      30,
-      0,
-      1,
-      1,
-      100,
-      100,
-    ]);
-    fabric.util.drawArc(ctx, 0, 0, [
-      50,
-      30,
-      0,
-      1,
-      1,
-      100,
-      100,
-    ]);
-  });
-
-  QUnit.test('get bounds of arc', function(assert) {
-    assert.ok(typeof fabric.util.getBoundsOfArc === 'function');
-    var bounds = fabric.util.getBoundsOfArc(0, 0, 50, 30, 0, 1, 1, 100, 100);
-    var expectedBounds = [
-      { x: 0, y: -8.318331151877368 },
-      { x: 133.33333333333331, y: 19.99999999999999 },
-      { x: 100.00000000000003, y: 19.99999999999999 },
-      { x: 147.19721858646224, y: 100 },
-    ];
-    assert.deepEqual(bounds, expectedBounds, 'bounds are as expected');
-  });
-
   QUnit.test('fabric.util.limitDimsByArea', function(assert) {
     assert.ok(typeof fabric.util.limitDimsByArea === 'function');
     var dims = fabric.util.limitDimsByArea(1, 10000);
@@ -1105,5 +1058,41 @@
     var newPath = fabric.util.transformPath(path.path, [1, 2, 3, 4, 5, 6], path.pathOffset);
     assert.equal(fabric.util.joinPath(oldPath), 'M 100 100 L 200 100 L 170 200 z');
     assert.equal(fabric.util.joinPath(newPath), 'M -195 -294 L -95 -94 L 175 246 z');
+  });
+
+  QUnit.test('fabric.util.calcDimensionsMatrix', function(assert) {
+    assert.ok(typeof fabric.util.calcDimensionsMatrix === 'function', 'fabric.util.calcDimensionsMatrix should exist');
+    var matrix = fabric.util.calcDimensionsMatrix({
+      scaleX: 2,
+      scaleY: 3,
+      skewY: 10,
+      skewX: 5,
+    });
+    var expected = [
+      2.03085322377149,
+      0.5289809421253949,
+      0.17497732705184801,
+      3,
+      0,
+      0
+    ];
+    assert.deepEqual(matrix, expected, 'dimensions matrix is equal');
+    matrix = fabric.util.calcDimensionsMatrix({
+      scaleX: 2,
+      scaleY: 3,
+      skewY: 10,
+      skewX: 5,
+      flipX: true,
+      flipY: true,
+    });
+    expected = [
+      -2.03085322377149,
+      -0.5289809421253949,
+      -0.17497732705184801,
+      -3,
+      0,
+      0
+    ];
+    assert.deepEqual(matrix, expected, 'dimensions matrix flipped is equal');
   });
 })();
