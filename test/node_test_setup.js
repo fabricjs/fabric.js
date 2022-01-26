@@ -1,5 +1,6 @@
 // set the fabric framework as a global for tests
 var chalk = require('chalk');
+var path = require('path');
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
 global.fs = require('fs');
@@ -32,6 +33,25 @@ global.imageDataToChalk = function(imageData) {
 QUnit.config.testTimeout = 15000;
 QUnit.config.noglobals = true;
 QUnit.config.hidePassed = true;
+
+/**
+ * 
+ * @param {*} actual 
+ * @param {*} [expected]
+ */
+QUnit.assert.sameImageObject = function (actual, expected) {
+  var a = {}, b = {};
+  expected = expected || REFERENCE_IMG_OBJECT;
+  Object.assign(a, actual, { src: path.basename(actual.src) });
+  Object.assign(b, expected, { src: path.basename(expected.src) });
+  QUnit.equiv(a, b, 'image object not equal');
+  this.pushResult({
+    result: QUnit.equiv(a, b),
+    actual: actual,
+    expected: expected,
+    message: 'image object equal to ref'
+  })
+}
 
 var jsdom = require('jsdom');
 
