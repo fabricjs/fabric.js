@@ -974,7 +974,7 @@
       var json = canvas.toJSON();
 
       fixImageDimension(json.backgroundImage);
-      assert.deepEqual(json.backgroundImage, REFERENCE_IMG_OBJECT);
+      assert.sameImageObject(json.backgroundImage, REFERENCE_IMG_OBJECT);
 
       canvas.backgroundImage = null;
 
@@ -1003,7 +1003,7 @@
       var json = canvas.toJSON();
 
       fixImageDimension(json.overlayImage);
-      assert.deepEqual(json.overlayImage, REFERENCE_IMG_OBJECT);
+      assert.sameImageObject(json.overlayImage, REFERENCE_IMG_OBJECT);
 
       canvas.overlayImage = null;
 
