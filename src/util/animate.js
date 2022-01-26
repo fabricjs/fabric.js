@@ -154,7 +154,10 @@
           easing = options.easing || defaultEasing,
           startValue = 'startValue' in options ? options.startValue : 0,
           endValue = 'endValue' in options ? options.endValue : 100,
-          byValue = options.byValue || endValue - startValue;
+          isMany = 'startValue' in options ? startValue.length > 0 : false,
+          byValue = options.byValue || (isMany ? startValue.map(function(value, i) {
+            return endValue[i] - startValue[i];
+          }) : endValue - startValue);
 
       options.onStart && options.onStart();
 
@@ -162,8 +165,12 @@
         time = ticktime || +new Date();
         var currentTime = time > finish ? duration : (time - start),
             timePerc = currentTime / duration,
-            current = easing(currentTime, startValue, byValue, duration),
-            valuePerc = Math.abs((current - startValue) / byValue);
+            current = isMany ? startValue.map(function(_value, i) {
+              return easing(currentTime, startValue[i], byValue[i], duration);
+            }) : easing(currentTime, startValue, byValue, duration),
+            valuePerc = isMany ? Math.abs((current[0] - startValue[0]) / byValue[0])
+              : Math.abs((current - startValue) / byValue);
+        console.log('current', current);
         //  update context
         context.currentValue = current;
         context.completionRate = valuePerc;
