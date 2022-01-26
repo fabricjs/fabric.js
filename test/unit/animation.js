@@ -332,6 +332,24 @@
     }, 1000);
   });
 
+  QUnit.test('animate with list of values', function(assert) {
+    var done = assert.async();
+
+    fabric.util.animate({
+      startValue: [1, 2, 3],
+      endValue: [2, 4, 6],
+      onValue: [1, 1, 1],
+      duration: 96,
+      onChange: function(currentValue) {
+        assert.equal(currentValue.length, 3)
+      },
+      onComplete: function(endValue) {
+        assert.equal(endValue.length, 3)
+        done()
+      }
+    })
+  });
+
   QUnit.test('animate with abort', function(assert) {
     var done = assert.async();
     var object = new fabric.Object({ left: 123, top: 124 });
