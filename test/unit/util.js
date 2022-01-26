@@ -22,6 +22,8 @@
 
   var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
 
+  var path = require('path');
+
   QUnit.test('fabric.util.toFixed', function(assert) {
     assert.ok(typeof fabric.util.toFixed === 'function');
 
@@ -475,7 +477,7 @@
     }
     try {
       fabric.util.loadImage(IMG_URL, function(img, isError) {
-        assert.equal(img.src, IMG_URL, 'src is set');
+        assert.equal(path.basename(img.src), path.basename(IMG_URL), 'src is set');
         assert.equal(img.crossOrigin, 'anonymous', 'crossOrigin is set');
         assert.ok(!isError);
         done();
