@@ -334,6 +334,7 @@
 
   QUnit.test('animate with list of values', function(assert) {
     var done = assert.async();
+    assert.expect(38)
 
     fabric.util.animate({
       startValue: [1, 2, 3],
@@ -341,10 +342,15 @@
       onValue: [1, 1, 1],
       duration: 96,
       onChange: function(currentValue) {
+        assert.equal(fabric.runningAnimations.length, 1, 'runningAnimations should not be empty');
         assert.equal(currentValue.length, 3)
+        currentValue.forEach(function(v) {
+          assert.ok(v > 0, 'confirm values are not invalid numbers')
+        })
       },
       onComplete: function(endValue) {
         assert.equal(endValue.length, 3)
+        assert.deepEqual(endValue, [2, 4, 6])
         done()
       }
     })
