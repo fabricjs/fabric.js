@@ -721,8 +721,8 @@
       if (charPolynomDiscriminant > 0) {
         //  found eigenvalues
         var descRoot = sqrt(charPolynomDiscriminant),
-          r1 = (trace + descRoot) / 2,
-          r2 = (trace - descRoot) / 2;
+          r1 = (trace - descRoot) / 2,
+          r2 = (trace + descRoot) / 2;
         scaleX = r1;
         scaleY = r2;
         skewX = 0;
