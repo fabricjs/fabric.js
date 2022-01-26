@@ -78,11 +78,7 @@
     return src;
   }
 
-  var path = require('path');
-
-  var IMG_SRC = fabric.isLikelyNode ?
-    ('file://' + path.normalize(path.join(__dirname + '/../fixtures/test_image.gif'))) :
-    path.normalize(getAbsolutePath('../fixtures/test_image.gif'));
+  var IMG_SRC = fabric.isLikelyNode ? ('file://' + __dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif');
   
   var canvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, width: 600, height: 600});
   var upperCanvasEl = canvas.upperCanvasEl;
