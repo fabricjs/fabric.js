@@ -35,26 +35,6 @@ QUnit.config.testTimeout = 15000;
 QUnit.config.noglobals = true;
 QUnit.config.hidePassed = true;
 
-/**
- * 
- * @param {*} actual 
- * @param {*} [expected]
- */
-QUnit.assert.sameImageObject = function (actual, expected) {
-  var a = {}, b = {};
-  expected = expected || REFERENCE_IMG_OBJECT;
-  Object.assign(a, actual, { src: path.basename(actual.src) });
-  Object.assign(b, expected, { src: path.basename(expected.src) });
-  this.pushResult({
-    result: QUnit.equiv(a, b),
-    actual: actual,
-    expected: expected,
-    message: 'image object equal to ref'
-  })
-}
-
-QUnit.addAssertions();
-
 var jsdom = require('jsdom');
 
 // make a jsdom version for tests that does not spam too much.
