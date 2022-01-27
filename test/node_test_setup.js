@@ -45,7 +45,6 @@ QUnit.assert.sameImageObject = function (actual, expected) {
   expected = expected || REFERENCE_IMG_OBJECT;
   Object.assign(a, actual, { src: path.basename(actual.src) });
   Object.assign(b, expected, { src: path.basename(expected.src) });
-  QUnit.equiv(a, b, 'image object not equal');
   this.pushResult({
     result: QUnit.equiv(a, b),
     actual: actual,
