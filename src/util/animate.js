@@ -153,8 +153,8 @@
           onComplete = options.onComplete || noop,
           easing = options.easing || defaultEasing,
           isMany = 'startValue' in options ? options.startValue.length > 0 : false,
-          startValue = 'startValue' in options ? (isMany ? options.startValue : options.startValue) : 0,
-          endValue = 'endValue' in options ? (isMany ? options.endValue.slice() : options.endValue) : 100,
+          startValue = 'startValue' in options ? options.startValue : 0,
+          endValue = 'endValue' in options ? options.endValue : 100,
           byValue = options.byValue || (isMany ? startValue.map(function(value, i) {
             return endValue[i] - startValue[i];
           }) : endValue - startValue);
@@ -188,7 +188,7 @@
           context.durationRate = 1;
           //  execute callbacks
           onChange(isMany ? endValue.slice() : endValue, 1, 1);
-          onComplete(isMany ? endValue.slice() : endValue, 1, 1);
+          onComplete(endValue, 1, 1);
           removeFromRegistry();
           return;
         }
