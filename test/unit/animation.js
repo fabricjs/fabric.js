@@ -334,7 +334,7 @@
 
   QUnit.test('animate with list of values', function(assert) {
     var done = assert.async();
-    assert.expect(38)
+    assert.expect(52)
 
     fabric.util.animate({
       startValue: [1, 2, 3],
@@ -343,15 +343,19 @@
       duration: 96,
       onChange: function(currentValue) {
         assert.equal(fabric.runningAnimations.length, 1, 'runningAnimations should not be empty');
-        assert.equal(currentValue.length, 3)
+        assert.deepEqual(fabric.runningAnimations[0]['currentValue'], currentValue)
+        assert.equal(currentValue.length, 3);
         currentValue.forEach(function(v) {
-          assert.ok(v > 0, 'confirm values are not invalid numbers')
+          assert.ok(v > 0, 'confirm values are not invalid numbers');
         })
+        // Make sure mutations are not kept
+        assert.ok(currentValue[0] <= 2, `mutating callback values must not persist ${currentValue[0]}`);
+        currentValue[0] = 200;
       },
       onComplete: function(endValue) {
-        assert.equal(endValue.length, 3)
-        assert.deepEqual(endValue, [2, 4, 6])
-        done()
+        assert.equal(endValue.length, 3);
+        assert.deepEqual(endValue, [2, 4, 6]);
+        done();
       }
     })
   });

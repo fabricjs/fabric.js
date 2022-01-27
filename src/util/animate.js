@@ -152,9 +152,9 @@
           abort = options.abort || noop,
           onComplete = options.onComplete || noop,
           easing = options.easing || defaultEasing,
-          startValue = 'startValue' in options ? options.startValue : 0,
-          endValue = 'endValue' in options ? options.endValue : 100,
-          isMany = 'startValue' in options ? startValue.length > 0 : false,
+          isMany = 'startValue' in options ? options.startValue.length > 0 : false,
+          startValue = 'startValue' in options ? (isMany ? options.startValue : options.startValue) : 0,
+          endValue = 'endValue' in options ? (isMany ? options.endValue.slice() : options.endValue) : 100,
           byValue = options.byValue || (isMany ? startValue.map(function(value, i) {
             return endValue[i] - startValue[i];
           }) : endValue - startValue);
@@ -171,29 +171,29 @@
             valuePerc = isMany ? Math.abs((current[0] - startValue[0]) / byValue[0])
               : Math.abs((current - startValue) / byValue);
         //  update context
-        context.currentValue = current;
+        context.currentValue = isMany ? current.slice() : current;
         context.completionRate = valuePerc;
         context.durationRate = timePerc;
         if (cancel) {
           return;
         }
-        if (abort(current, valuePerc, timePerc)) {
+        if (abort(isMany ? current.slice() : current, valuePerc, timePerc)) {
           removeFromRegistry();
           return;
         }
         if (time > finish) {
           //  update context
-          context.currentValue = endValue;
+          context.currentValue = isMany ? endValue.slice() : endValue;
           context.completionRate = 1;
           context.durationRate = 1;
           //  execute callbacks
-          onChange(endValue, 1, 1);
-          onComplete(endValue, 1, 1);
+          onChange(isMany ? endValue.slice() : endValue, 1, 1);
+          onComplete(isMany ? endValue.slice() : endValue, 1, 1);
           removeFromRegistry();
           return;
         }
         else {
-          onChange(current, valuePerc, timePerc);
+          onChange(isMany ? current.slice() : current, valuePerc, timePerc);
           requestAnimFrame(tick);
         }
       })(start);
