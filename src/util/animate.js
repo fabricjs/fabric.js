@@ -187,9 +187,8 @@
           context.completionRate = 1;
           context.durationRate = 1;
           //  execute callbacks
-          var end = isMany ? endValue.slice() : endValue;
-          onChange(end, 1, 1);
-          onComplete(end, 1, 1);
+          onChange(isMany ? endValue.slice() : endValue, 1, 1);
+          onComplete(isMany ? endValue.slice() : endValue, 1, 1);
           removeFromRegistry();
           return;
         }
