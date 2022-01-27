@@ -104,10 +104,14 @@
     img.src = src;
   }
 
+  function basename(path) {
+    return path.slice(Math.max(path.lastIndexOf('\\'), path.lastIndexOf('/')) + 1);
+  }
+
   QUnit.assert.equalImageSVG = function (actual, expected) {
     function extractBasename(s) {
       var p = 'xlink:href', pos = s.indexOf(p) + p.length;
-      return path.basename(s.slice(pos, s.indexOf(' ', pos)));
+      return basename(s.slice(pos, s.indexOf(' ', pos)));
     }
     this.pushResult({
       result: extractBasename(actual) === extractBasename(expected),
@@ -125,8 +129,8 @@
   QUnit.assert.sameImageObject = function (actual, expected) {
     var a = {}, b = {};
     expected = expected || REFERENCE_IMG_OBJECT;
-    Object.assign(a, actual, { src: path.basename(actual.src) });
-    Object.assign(b, expected, { src: path.basename(expected.src) });
+    Object.assign(a, actual, { src: basename(actual.src) });
+    Object.assign(b, expected, { src: basename(expected.src) });
     this.pushResult({
       result: QUnit.equiv(a, b),
       actual: actual,
@@ -368,7 +372,7 @@
     var done = assert.async();
     createImageObject(function(image) {
       assert.ok(typeof image.getSrc === 'function');
-      assert.equal(path.basename(image.getSrc()), path.basename(IMG_SRC));
+      assert.equal(basename(image.getSrc()), basename(IMG_SRC));
       done();
     });
   });

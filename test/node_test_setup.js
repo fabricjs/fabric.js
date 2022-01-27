@@ -4,7 +4,6 @@ var path = require('path');
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
 global.fs = require('fs');
-global.path = path;
 global.visualCallback = {
   addArguments: function() {},
 };
