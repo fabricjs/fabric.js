@@ -22,8 +22,6 @@
 
   var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
 
-  var path = require('path');
-
   QUnit.test('fabric.util.toFixed', function(assert) {
     assert.ok(typeof fabric.util.toFixed === 'function');
 
