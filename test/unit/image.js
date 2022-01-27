@@ -117,7 +117,24 @@
     });
   }
 
-  QUnit.addAssertions();
+  /**
+   * 
+   * @param {*} actual 
+   * @param {*} [expected]
+   */
+  QUnit.assert.sameImageObject = function (actual, expected) {
+    var a = {}, b = {};
+    expected = expected || REFERENCE_IMG_OBJECT;
+    Object.assign(a, actual, { src: path.basename(actual.src) });
+    Object.assign(b, expected, { src: path.basename(expected.src) });
+    QUnit.equiv(a, b, 'image object not equal');
+    this.pushResult({
+      result: QUnit.equiv(a, b),
+      actual: actual,
+      expected: expected,
+      message: 'image object equal to ref'
+    })
+  }
 
   QUnit.module('fabric.Image');
 
