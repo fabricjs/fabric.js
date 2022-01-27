@@ -158,7 +158,7 @@
   /**
    * 
    * @param {*} actual 
-   * @param {*} [expected]
+   * @param {*} [expected] 
    */
   QUnit.assert.sameImageObject = function (actual, expected) {
     var a = {}, b = {};
