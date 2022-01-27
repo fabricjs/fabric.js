@@ -7,9 +7,9 @@
    * @typedef {Object} AnimationOptions
    * @property {Function} [options.onChange] Callback; invoked on every value change
    * @property {Function} [options.onComplete] Callback; invoked when value change is completed
-   * @property {Number} [options.startValue=0] Starting value
-   * @property {Number} [options.endValue=100] Ending value
-   * @property {Number} [options.byValue=100] Value to modify the property by
+   * @property {number | number[]} [options.startValue=0] Starting value
+   * @property {number | number[]} [options.endValue=100] Ending value
+   * @property {number | number[]} [options.byValue=100] Value to modify the property by
    * @property {Function} [options.easing] Easing function
    * @property {Number} [options.duration=500] Duration of change (in ms)
    * @property {Function} [options.abort] Additional function with logic. If returns true, animation aborts.
@@ -17,7 +17,7 @@
    * @typedef {() => void} CancelFunction
    *
    * @typedef {Object} AnimationCurrentState
-   * @property {number} currentValue value in range [`startValue`, `endValue`]
+   * @property {number | number[]} currentValue value in range [`startValue`, `endValue`]
    * @property {number} completionRate value in range [0, 1]
    * @property {number} durationRate value in range [0, 1]
    *
@@ -177,7 +177,7 @@
         if (cancel) {
           return;
         }
-        if (abort(isMany ? current.slice() : current, valuePerc, timePerc)) {
+        if (abort(current, valuePerc, timePerc)) {
           removeFromRegistry();
           return;
         }
@@ -187,13 +187,14 @@
           context.completionRate = 1;
           context.durationRate = 1;
           //  execute callbacks
-          onChange(isMany ? endValue.slice() : endValue, 1, 1);
-          onComplete(isMany ? endValue.slice() : endValue, 1, 1);
+          var end = isMany ? endValue.slice() : endValue;
+          onChange(end, 1, 1);
+          onComplete(end, 1, 1);
           removeFromRegistry();
           return;
         }
         else {
-          onChange(isMany ? current.slice() : current, valuePerc, timePerc);
+          onChange(current, valuePerc, timePerc);
           requestAnimFrame(tick);
         }
       })(start);
