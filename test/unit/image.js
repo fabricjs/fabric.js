@@ -31,19 +31,6 @@
 
   var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
 
-  QUnit.assert.equalImageSVG = function (actual, expected) {
-    function extractBasename(s) {
-      var p = 'xlink:href', pos = s.indexOf(p) + p.length;
-      return path.basename(s.slice(pos, s.indexOf(' ', pos)));
-    }
-    this.pushResult({
-      result: extractBasename(actual) === extractBasename(expected),
-      actual: actual,
-      expected: expected,
-      message: 'svg is not equal to ref'
-    });
-  }
-
   var REFERENCE_IMG_OBJECT = {
     version:                  fabric.version,
     type:                     'image',
@@ -116,6 +103,21 @@
     };
     img.src = src;
   }
+
+  QUnit.assert.equalImageSVG = function (actual, expected) {
+    function extractBasename(s) {
+      var p = 'xlink:href', pos = s.indexOf(p) + p.length;
+      return path.basename(s.slice(pos, s.indexOf(' ', pos)));
+    }
+    this.pushResult({
+      result: extractBasename(actual) === extractBasename(expected),
+      actual: actual,
+      expected: expected,
+      message: 'svg is not equal to ref'
+    });
+  }
+
+  QUnit.addAssertions();
 
   QUnit.module('fabric.Image');
 

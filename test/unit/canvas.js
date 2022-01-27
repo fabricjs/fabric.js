@@ -94,6 +94,8 @@
     return new fabric.Triangle(fabric.util.object.extend(defaultOptions, options || { }));
   }
 
+  QUnit.addAssertions();
+
   QUnit.module('fabric.Canvas', {
     beforeEach: function() {
       upperCanvasEl.style.display = '';

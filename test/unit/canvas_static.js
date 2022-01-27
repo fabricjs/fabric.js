@@ -155,6 +155,8 @@
     return new fabric.Rect(fabric.util.object.extend(defaultOptions, options || { }));
   }
 
+  QUnit.addAssertions();
+
   QUnit.module('fabric.StaticCanvas', {
     beforeEach: function() {
       fabric.Object.__uid = 0;
