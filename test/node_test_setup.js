@@ -1,6 +1,5 @@
 // set the fabric framework as a global for tests
 var chalk = require('chalk');
-var path = require('path');
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
 global.fs = require('fs');
