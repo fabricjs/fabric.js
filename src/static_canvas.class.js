@@ -1327,7 +1327,7 @@
     _setSVGHeader: function(markup, options) {
       var width = options.width || this.width,
           height = options.height || this.height,
-          vpt, viewBox = 'viewBox="0 0 ' + this.width + ' ' + this.height + '" ',
+          vpt, viewBox = 'viewBox="0 0 ' + width + ' ' + height + '" ',
           NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
       if (options.viewBox) {
@@ -1343,8 +1343,8 @@
           viewBox = 'viewBox="' +
                   toFixed(-vpt[4] / vpt[0], NUM_FRACTION_DIGITS) + ' ' +
                   toFixed(-vpt[5] / vpt[3], NUM_FRACTION_DIGITS) + ' ' +
-                  toFixed(this.width / vpt[0], NUM_FRACTION_DIGITS) + ' ' +
-                  toFixed(this.height / vpt[3], NUM_FRACTION_DIGITS) + '" ';
+                  toFixed(width / vpt[0], NUM_FRACTION_DIGITS) + ' ' +
+                  toFixed(height / vpt[3], NUM_FRACTION_DIGITS) + '" ';
         }
       }
 
