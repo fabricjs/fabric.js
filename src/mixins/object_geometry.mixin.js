@@ -609,8 +609,9 @@
      */
     _getNonTransformedDimensions: function() {
       var strokeWidth = this.strokeWidth,
-          w = this.width + strokeWidth,
-          h = this.height + strokeWidth;
+        strokeUniform = this.strokeUniform,
+        w = this.width + strokeUniform ? (strokeWidth / this.scaleX) : strokeWidth,
+        h = this.height + strokeUniform ? (strokeWidth / this.scaleY) : strokeWidth;
       return { x: w, y: h };
     },
 
