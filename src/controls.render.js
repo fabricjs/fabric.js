@@ -55,14 +55,16 @@
         transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
           styleOverride.transparentCorners : fabricObject.transparentCorners,
         methodName = transparentCorners ? 'stroke' : 'fill',
+        resizingStroke = styleOverride.resizingStrokeColor || fabricObject.resizingStrokeColor,
         stroke = !transparentCorners && (
           styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor
         ), sizeBy2 = size / 2;
     ctx.save();
+
     ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
     ctx.strokeStyle = styleOverride.strokeCornerColor || fabricObject.strokeCornerColor;
     // this is still wrong
-    ctx.lineWidth = 1;
+    ctx.lineWidth = fabricObject.navigationState === 'resizing' ? 2 : 1;
     ctx.translate(left, top);
     ctx.rotate(degreesToRadians(fabricObject.angle));
     // this does not work, and fixed with ( && ) does not make sense.
@@ -72,6 +74,14 @@
     if (stroke) {
       ctx.strokeRect(-sizeBy2, -sizeBy2, size, size);
     }
+
+    // AB: this one will add a focus border for control when the fabric object is in some specific state
+    // right now there is only one state where control can have that border, the resizing one
+    if (fabricObject.navigationState === 'resizing') {
+      ctx.strokeStyle = resizingStroke;
+      ctx.strokeRect(-sizeBy2 - 2, -sizeBy2 - 2, size + 4, size + 4);
+    }
+
     ctx.restore();
   }
 
