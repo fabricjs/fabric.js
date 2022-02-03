@@ -3,6 +3,11 @@
 
 ## [5.0.0]
 
+- **BREAKING**: remove 4.x deprecated code [`#7630`](https://github.com/fabricjs/fabric.js/pull/7630)
+- feat(fabric.StaticCanvas, fabric.Canvas): limit breaking changes [`#7627`](https://github.com/fabricjs/fabric.js/pull/7627)
+- feat(animation): animations registry [`#7528`](https://github.com/fabricjs/fabric.js/pull/7528)
+- docs(): Remove not working badges [`#7623`](https://github.com/fabricjs/fabric.js/pull/7623)
+- ci(): add auto-changelog package to quickly draft a changelog [`#7615`](https://github.com/fabricjs/fabric.js/pull/7615)
 - feat(fabric.EraserBrush): added `eraser` property to Object instead of attaching to `clipPath`, remove hacky `getClipPath`/`setClipPath` [#7470](https://github.com/fabricjs/fabric.js/pull/7470), see **BREAKING** comments.
 - feat(fabric.EraserBrush): support `inverted` option to undo erasing [#7470](https://github.com/fabricjs/fabric.js/pull/7470)
 - fix(fabric.EraserBrush): fix doubling opaic objects while erasing [#7445](https://github.com/fabricjs/fabric.js/issues/7445) [#7470](https://github.com/fabricjs/fabric.js/pull/7470)
