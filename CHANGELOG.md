@@ -3,17 +3,17 @@
 
 ## [5.0.0]
 
+- fix(fabric.Canvas): unflag contextLost after a full re-render [`#7646`](https://github.com/fabricjs/fabric.js/pull/7646)
+- **BREAKING**: remove 4.x deprecated code [`#7630`](https://github.com/fabricjs/fabric.js/pull/7630)
+- feat(fabric.StaticCanvas, fabric.Canvas): limit breaking changes [`#7627`](https://github.com/fabricjs/fabric.js/pull/7627)
+- feat(animation): animations registry [`#7528`](https://github.com/fabricjs/fabric.js/pull/7528)
+- docs(): Remove not working badges [`#7623`](https://github.com/fabricjs/fabric.js/pull/7623)
+- ci(): add auto-changelog package to quickly draft a changelog [`#7615`](https://github.com/fabricjs/fabric.js/pull/7615)
 - feat(fabric.EraserBrush): added `eraser` property to Object instead of attaching to `clipPath`, remove hacky `getClipPath`/`setClipPath` [#7470](https://github.com/fabricjs/fabric.js/pull/7470), see **BREAKING** comments.
 - feat(fabric.EraserBrush): support `inverted` option to undo erasing [#7470](https://github.com/fabricjs/fabric.js/pull/7470)
 - fix(fabric.EraserBrush): fix doubling opaic objects while erasing [#7445](https://github.com/fabricjs/fabric.js/issues/7445) [#7470](https://github.com/fabricjs/fabric.js/pull/7470)
-
-**BREAKING**:
-
-- fabric.EraserBrush: The Eraser object is now a subclass of Group. This means that loading from JSON will break between versions.
+- **BREAKING**: fabric.EraserBrush: The Eraser object is now a subclass of Group. This means that loading from JSON will break between versions.
 Use this [code](https://gist.github.com/ShaMan123/6c5c4ca2cc720a2700848a2deb6addcd) to transform your json payload to the new version.
-
-
-## [next]
 - feat(fabric.Canvas): fire an extra mouse up for the original control of the initial target [`#7612`](https://github.com/fabricjs/fabric.js/pull/7612)
 - fix(fabric.Object) bounding box display with skewY when outside group [`#7611`](https://github.com/fabricjs/fabric.js/pull/7611)
 - fix(fabric.text) fix rtl/ltr performance issues [`#7610`](https://github.com/fabricjs/fabric.js/pull/7610)
@@ -21,9 +21,9 @@ Use this [code](https://gist.github.com/ShaMan123/6c5c4ca2cc720a2700848a2deb6add
 - feat(): `drop:before` event [`#7442`](https://github.com/fabricjs/fabric.js/pull/7442)
 - ci(): Add codeql analysis step [`#7588`](https://github.com/fabricjs/fabric.js/pull/7588)
 - security(): update onchange to solve security issue [`#7591`](https://github.com/fabricjs/fabric.js/pull/7591)
-- fix(): MAJOR prevent render canvas with quality less than 100% [`#7537`](https://github.com/fabricjs/fabric.js/pull/7537)
+- **BREAKING**: fix(): MAJOR prevent render canvas with quality less than 100% [`#7537`](https://github.com/fabricjs/fabric.js/pull/7537)
 - docs(): fix broken link [`#7579`](https://github.com/fabricjs/fabric.js/pull/7579)
-- Deps(): MAJOR update to jsdom 19 node 14 [`#7587`](https://github.com/fabricjs/fabric.js/pull/7587)
+- **BREAKING**: Deps(): MAJOR update to jsdom 19 node 14 [`#7587`](https://github.com/fabricjs/fabric.js/pull/7587)
 - Fix(): JSDOM transative vulnerability [`#7510`](https://github.com/fabricjs/fabric.js/pull/7510)
 - fix(fabric.parser): attempt to resolve some issues with regexp [`#7520`](https://github.com/fabricjs/fabric.js/pull/7520)
 - fix(fabric.IText)  fix for possible error on copy paste [`#7526`](https://github.com/fabricjs/fabric.js/pull/7526)
