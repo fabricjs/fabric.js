@@ -3,6 +3,7 @@
 
 ## [5.0.0]
 
+- fix(fabric.Canvas): unflag contextLost after a full re-render [`#7646`](https://github.com/fabricjs/fabric.js/pull/7646)
 - **BREAKING**: remove 4.x deprecated code [`#7630`](https://github.com/fabricjs/fabric.js/pull/7630)
 - feat(fabric.StaticCanvas, fabric.Canvas): limit breaking changes [`#7627`](https://github.com/fabricjs/fabric.js/pull/7627)
 - feat(animation): animations registry [`#7528`](https://github.com/fabricjs/fabric.js/pull/7528)
