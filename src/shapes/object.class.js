@@ -1976,7 +1976,7 @@
    */
   fabric.Object.ENLIVEN_PROPS = ['clipPath', 'path'];
 
-  fabric.Object._fromObject = function(className, object, callback, extraParam) {
+  fabric.Object._fromObject = function(className, object, extraParam) {
     var klass = fabric[className], serializedObject = clone(object, true),
         fill = serializedObject.fill, stroke = serializedObject.stroke;
     var promises = [
@@ -1989,6 +1989,10 @@
       serializedObject.stroke = allTheThings[1];
       return extraParam ? new klass(object[extraParam], serializedObject) : new klass(object);
     });
+  };
+
+  fabric.Object.fromObject = function(object) {
+    return fabric.Object._fromObject('Object', object);
   };
 
   /**
