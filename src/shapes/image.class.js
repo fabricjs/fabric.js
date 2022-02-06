@@ -712,13 +712,11 @@
           fabric.Image.prototype._initFilters.call(object, [object.resizeFilter], function(resizeFilters) {
             object.resizeFilter = resizeFilters[0];
             fabric.util.enlivenObjectEnlivables(object, object, function () {
-              var image = new fabric.Image(img, object);
-              callback(image, false);
+              return new fabric.Image(img, object);
             });
           });
         });
-      })
-    });
+      });
   };
 
   /**

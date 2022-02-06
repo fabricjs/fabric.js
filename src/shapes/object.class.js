@@ -1658,17 +1658,12 @@
 
     /**
      * Clones an instance, using a callback method will work for every object.
-     * @param {Function} callback Callback is invoked with a clone as a first argument
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @returns {Promise<fabric.Object>}
      */
-    clone: function(callback, propertiesToInclude) {
+    clone: function(propertiesToInclude) {
       var objectForm = this.toObject(propertiesToInclude);
-      if (this.constructor.fromObject) {
-        this.constructor.fromObject(objectForm, callback);
-      }
-      else {
-        fabric.Object._fromObject('Object', objectForm, callback);
-      }
+      return this.constructor.fromObject(objectForm);
     },
 
     /**
