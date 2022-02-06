@@ -339,7 +339,7 @@
     fabric.util.animate({
       startValue: [1, 2, 3],
       endValue: [2, 4, 6],
-      onValue: [1, 1, 1],
+      byValue: [1, 2, 3],
       duration: 96,
       onChange: function(currentValue) {
         assert.equal(fabric.runningAnimations.length, 1, 'runningAnimations should not be empty');
@@ -349,7 +349,7 @@
           assert.ok(v > 0, 'confirm values are not invalid numbers');
         })
         // Make sure mutations are not kept
-        assert.ok(currentValue[0] <= 2, `mutating callback values must not persist ${currentValue[0]}`);
+        assert.ok(currentValue[0] <= 2, 'mutating callback values must not persist');
         currentValue[0] = 200;
       },
       onComplete: function(endValue) {

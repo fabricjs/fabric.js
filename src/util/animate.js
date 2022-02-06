@@ -5,14 +5,20 @@
 
   /**
    * @typedef {Object} AnimationOptions
-   * @property {Function} [options.onChange] Callback; invoked on every value change
-   * @property {Function} [options.onComplete] Callback; invoked when value change is completed
-   * @property {number | number[]} [options.startValue=0] Starting value
-   * @property {number | number[]} [options.endValue=100] Ending value
-   * @property {number | number[]} [options.byValue=100] Value to modify the property by
-   * @property {Function} [options.easing] Easing function
-   * @property {Number} [options.duration=500] Duration of change (in ms)
-   * @property {Function} [options.abort] Additional function with logic. If returns true, animation aborts.
+   * Animation of a value or list of values.
+   * @example
+   * @property {Function} [onChange] Callback; invoked on every value change
+   * @property {Function} [onComplete] Callback; invoked when value change is completed
+   * @example
+   * // Note: startValue, endValue, and byValue must match the type
+   * var animationOptions = { startValue: 0, endValue: 1, byValue: 0.25 }
+   * var animationOptions = { startValue: [0, 1], endValue: [1, 2], byValue: [0.25, 0.25] }
+   * @property {number | number[]} [startValue=0] Starting value
+   * @property {number | number[]} [endValue=100] Ending value
+   * @property {number | number[]} [byValue=100] Value to modify the property by
+   * @property {Function} [easing] Easing function
+   * @property {Number} [duration=500] Duration of change (in ms)
+   * @property {Function} [abort] Additional function with logic. If returns true, animation aborts.
    *
    * @typedef {() => void} CancelFunction
    *
@@ -122,6 +128,10 @@
    * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
    * @memberOf fabric.util
    * @param {AnimationOptions} [options] Animation options
+   * @example
+   * // Note: startValue, endValue, and byValue must match the type
+   * fabric.util.animate({ startValue: 0, endValue: 1, byValue: 0.25 })
+   * fabric.util.animate({ startValue: [0, 1], endValue: [1, 2], byValue: [0.25, 0.25] })
    * @returns {CancelFunction} cancel function
    */
   function animate(options) {
