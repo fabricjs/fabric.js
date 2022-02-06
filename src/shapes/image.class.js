@@ -700,26 +700,25 @@
    * Creates an instance of fabric.Image from its object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @param {Function} callback Callback to invoke when an image instance is created
+   * @returns {Promise<fabric.Image>}
    */
-  fabric.Image.fromObject = function(_object, callback) {
+  fabric.Image.fromObject = function(_object) {
     var object = fabric.util.object.clone(_object);
-    fabric.util.loadImage(object.src, function(img, isError) {
-      if (isError) {
-        callback && callback(null, true);
-        return;
-      }
-      fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
-        object.filters = filters || [];
-        fabric.Image.prototype._initFilters.call(object, [object.resizeFilter], function(resizeFilters) {
-          object.resizeFilter = resizeFilters[0];
-          fabric.util.enlivenObjectEnlivables(object, object, function () {
-            var image = new fabric.Image(img, object);
-            callback(image, false);
+    return fabric.util.loadImage(object.src, { crossOrigin: _object.crossOrigin })
+      .then(function(img) {
+        // this is obviously broken for now. need to refactor a bit
+        fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
+          object.filters = filters || [];
+          fabric.Image.prototype._initFilters.call(object, [object.resizeFilter], function(resizeFilters) {
+            object.resizeFilter = resizeFilters[0];
+            fabric.util.enlivenObjectEnlivables(object, object, function () {
+              var image = new fabric.Image(img, object);
+              callback(image, false);
+            });
           });
         });
-      });
-    }, null, object.crossOrigin);
+      })
+    });
   };
 
   /**

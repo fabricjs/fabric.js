@@ -1979,22 +1979,20 @@
    * @constant
    * @type string[]
    */
-  fabric.Object.ENLIVEN_PROPS = ['clipPath'];
+  fabric.Object.ENLIVEN_PROPS = ['clipPath', 'path'];
 
   fabric.Object._fromObject = function(className, object, callback, extraParam) {
-    var klass = fabric[className];
-    object = clone(object, true);
-    fabric.util.enlivenPatterns([object.fill, object.stroke], function(patterns) {
-      if (typeof patterns[0] !== 'undefined') {
-        object.fill = patterns[0];
-      }
-      if (typeof patterns[1] !== 'undefined') {
-        object.stroke = patterns[1];
-      }
-      fabric.util.enlivenObjectEnlivables(object, object, function () {
-        var instance = extraParam ? new klass(object[extraParam], object) : new klass(object);
-        callback && callback(instance);
-      });
+    var klass = fabric[className], serializedObject = clone(object, true),
+        fill = serializedObject.fill, stroke = serializedObject.stroke;
+    var promises = [
+      fill && fill.source ? fabric.Pattern.fromObject(fill) : fill,
+      stroke && stroke.source ? fabric.Pattern.fromObject(stroke) : stroke,
+      fabric.util.enlivenObjectEnlivables(serializedObject, serializedObject),
+    ];
+    return Promise.all(promises).then(function(allTheThings) {
+      serializedObject.fill = allTheThings[0];
+      serializedObject.stroke = allTheThings[1];
+      return extraParam ? new klass(object[extraParam], serializedObject) : new klass(object);
     });
   };
 

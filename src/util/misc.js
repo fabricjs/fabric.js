@@ -457,55 +457,32 @@
     },
 
     /**
-     * Loads image element from given url and passes it to a callback
+     * Loads image element from given url and resolve it, or catch.
      * @memberOf fabric.util
      * @param {String} url URL representing an image
-     * @param {Function} callback Callback; invoked with loaded image
-     * @param {*} [context] Context to invoke callback in
-     * @param {Object} [crossOrigin] crossOrigin value to set image element to
+     * @param {Object} [options] image loading options
+     * @param {string} [options.crossOrigin] cors value for the image loading, default to anonymous
+     * @param {Promise<fabric.Image>} img the loaded image.
      */
-    loadImage: function(url, callback, context, crossOrigin) {
-      if (!url) {
-        callback && callback.call(context, url);
-        return;
-      }
-
-      var img = fabric.util.createImage();
-
-      /** @ignore */
-      var onLoadCallback = function () {
-        callback && callback.call(context, img, false);
-        img = img.onload = img.onerror = null;
-      };
-
-      img.onload = onLoadCallback;
-      /** @ignore */
-      img.onerror = function() {
-        fabric.log('Error loading ' + img.src);
-        callback && callback.call(context, null, true);
-        img = img.onload = img.onerror = null;
-      };
-
-      // data-urls appear to be buggy with crossOrigin
-      // https://github.com/kangax/fabric.js/commit/d0abb90f1cd5c5ef9d2a94d3fb21a22330da3e0a#commitcomment-4513767
-      // see https://code.google.com/p/chromium/issues/detail?id=315152
-      //     https://bugzilla.mozilla.org/show_bug.cgi?id=935069
-      // crossOrigin null is the same as not set.
-      if (url.indexOf('data') !== 0 &&
-        crossOrigin !== undefined &&
-        crossOrigin !== null) {
-        img.crossOrigin = crossOrigin;
-      }
-
-      // IE10 / IE11-Fix: SVG contents from data: URI
-      // will only be available if the IMG is present
-      // in the DOM (and visible)
-      if (url.substring(0,14) === 'data:image/svg') {
-        img.onload = null;
-        fabric.util.loadImageInDom(img, onLoadCallback);
-      }
-
-      img.src = url;
+    loadImage: function(url, options) {
+      return new Promise(function(resolve, reject) {
+        var img = fabric.util.createImage();
+        var done = function() {
+          img.onload = img.onerror = null;
+          resolve(img);
+        };
+        if (!url) {
+          done();
+        }
+        else {
+          img.onload = done;
+          img.onerror = function () {
+            reject(new Error('Error loading ' + img.src));
+          };
+          img.crossOrigin = options.crossOrigin;
+          img.src = url;
+        }
+      });
     },
 
     /**
@@ -538,46 +515,19 @@
      * Creates corresponding fabric instances from their object representations
      * @static
      * @memberOf fabric.util
-     * @param {Array} objects Objects to enliven
-     * @param {Function} callback Callback to invoke when all objects are created
+     * @param {Object[]} objects Objects to enliven
      * @param {String} namespace Namespace to get klass "Class" object from
      * @param {Function} reviver Method for further parsing of object elements,
      * called after each fabric object created.
      */
-    enlivenObjects: function(objects, callback, namespace, reviver) {
-      objects = objects || [];
-
-      var enlivenedObjects = [],
-          numLoadedObjects = 0,
-          numTotalObjects = objects.length;
-
-      function onLoaded() {
-        if (++numLoadedObjects === numTotalObjects) {
-          callback && callback(enlivenedObjects.filter(function(obj) {
-            // filter out undefined objects (objects that gave error)
-            return obj;
-          }));
-        }
-      }
-
-      if (!numTotalObjects) {
-        callback && callback(enlivenedObjects);
-        return;
-      }
-
-      objects.forEach(function (o, index) {
-        // if sparse array
-        if (!o || !o.type) {
-          onLoaded();
-          return;
-        }
-        var klass = fabric.util.getKlass(o.type, namespace);
-        klass.fromObject(o, function (obj, error) {
-          error || (enlivenedObjects[index] = obj);
-          reviver && reviver(o, obj, error);
-          onLoaded();
+    enlivenObjects: function(objects, namespace, reviver) {
+      return Promise.all(objects.map(function(obj) {
+        var klass = fabric.util.getKlass(obj.type, namespace);
+        return klass.fromObject(obj).then(function(fabricInstance) {
+          reviver && reviver(obj, fabricInstance);
+          return fabricInstance;
         });
-      });
+      }));
     },
 
     /**
@@ -585,58 +535,18 @@
      * @see {@link fabric.Object.ENLIVEN_PROPS}
      * @param {Object} object
      * @param {Object} [context] assign enlived props to this object (pass null to skip this)
-     * @param {(objects:fabric.Object[]) => void} callback
+     * @returns {Promise<fabric.Path>}
      */
-    enlivenObjectEnlivables: function (object, context, callback) {
+    enlivenObjectEnlivables: function (object, context) {
       var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key]; });
-      fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key]; }), function (enlivedProps) {
-        var objects = {};
-        enlivenProps.forEach(function (key, index) {
-          objects[key] = enlivedProps[index];
-          context && (context[key] = enlivedProps[index]);
-        });
-        callback && callback(objects);
-      });
-    },
-
-    /**
-     * Create and wait for loading of patterns
-     * @static
-     * @memberOf fabric.util
-     * @param {Array} patterns Objects to enliven
-     * @param {Function} callback Callback to invoke when all objects are created
-     * called after each fabric object created.
-     */
-    enlivenPatterns: function(patterns, callback) {
-      patterns = patterns || [];
-
-      function onLoaded() {
-        if (++numLoadedPatterns === numPatterns) {
-          callback && callback(enlivenedPatterns);
-        }
-      }
-
-      var enlivenedPatterns = [],
-          numLoadedPatterns = 0,
-          numPatterns = patterns.length;
-
-      if (!numPatterns) {
-        callback && callback(enlivenedPatterns);
-        return;
-      }
-
-      patterns.forEach(function (p, index) {
-        if (p && p.source) {
-          new fabric.Pattern(p, function(pattern) {
-            enlivenedPatterns[index] = pattern;
-            onLoaded();
+      return fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key]; })).then(
+        function(enlivedProps) {
+          context && enlivenProps.forEach(function (key, index) {
+            context[key] = enlivedProps[index];
           });
+          return enlivedProps;
         }
-        else {
-          enlivenedPatterns[index] = p;
-          onLoaded();
-        }
-      });
+      );
     },
 
     /**

@@ -451,8 +451,9 @@
    * @memberOf fabric.Textbox
    * @param {Object} object Object to create an instance from
    * @param {Function} [callback] Callback to invoke when an fabric.Textbox instance is created
+   * @returns {Promise<fabric.Textbox>}
    */
-  fabric.Textbox.fromObject = function(object, callback) {
-    return fabric.Object._fromObject('Textbox', object, callback, 'text');
+  fabric.Textbox.fromObject = function(object) {
+    return fabric.Object._fromObject('Textbox', object, 'text');
   };
 })(typeof exports !== 'undefined' ? exports : this);
