@@ -16,6 +16,10 @@
     return src;
   }
 
+  function basename(path) {
+    return path.slice(Math.max(path.lastIndexOf('\\'), path.lastIndexOf('/')) + 1);
+  }
+
   var IMG_URL = fabric.isLikelyNode
     ? 'file://' + require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
     : getAbsolutePath('../fixtures/very_large_image.jpg');
@@ -475,7 +479,7 @@
     }
     try {
       fabric.util.loadImage(IMG_URL, function(img, isError) {
-        assert.equal(img.src, IMG_URL, 'src is set');
+        assert.equal(basename(img.src), basename(IMG_URL), 'src is set');
         assert.equal(img.crossOrigin, 'anonymous', 'crossOrigin is set');
         assert.ok(!isError);
         done();
