@@ -29,17 +29,19 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
   /**
    * Creates "pattern" instance property
+   * @param {CanvasRenderingContext2D} ctx
    */
-  getPattern: function() {
-    return this.canvas.contextTop.createPattern(this.source || this.getPatternSrc(), 'repeat');
+  getPattern: function(ctx) {
+    return ctx.createPattern(this.source || this.getPatternSrc(), 'repeat');
   },
 
   /**
    * Sets brush styles
+   * @param {CanvasRenderingContext2D} ctx
    */
-  _setBrushStyles: function() {
-    this.callSuper('_setBrushStyles');
-    this.canvas.contextTop.strokeStyle = this.getPattern();
+  _setBrushStyles: function(ctx) {
+    this.callSuper('_setBrushStyles', ctx);
+    ctx.strokeStyle = this.getPattern(ctx);
   },
 
   /**

@@ -37,6 +37,7 @@
    * @fires dragover
    * @fires dragenter
    * @fires dragleave
+   * @fires drop:before before drop event. same native event. This is added to handle edge cases
    * @fires drop
    * @fires after:render at the end of the render process, receives the context in the callback
    * @fires before:render at start the render process, receives the context in the callback
