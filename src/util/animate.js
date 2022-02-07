@@ -6,6 +6,15 @@
   /**
    * @typedef {Object} AnimationOptions
    * Animation of a value or list of values.
+   * When using lists, think of something like this:
+   * fabric.util.animate({
+   *   startValue: [1, 2, 3],
+   *   endValue: [2, 4, 6],
+   *   onChange: function([a, b, c]) {
+   *     canvas.zoomToPoint({x: b, y: c}, a)
+   *     canvas.renderAll()
+   *   }
+   * });
    * @example
    * @property {Function} [onChange] Callback; invoked on every value change
    * @property {Function} [onComplete] Callback; invoked when value change is completed
