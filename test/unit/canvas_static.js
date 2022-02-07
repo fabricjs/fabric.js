@@ -155,6 +155,28 @@
     return new fabric.Rect(fabric.util.object.extend(defaultOptions, options || { }));
   }
 
+  function basename(path) {
+    return path.slice(Math.max(path.lastIndexOf('\\'), path.lastIndexOf('/')) + 1);
+  }
+
+  /**
+   * 
+   * @param {*} actual 
+   * @param {*} [expected] 
+   */
+  QUnit.assert.sameImageObject = function (actual, expected) {
+    var a = {}, b = {};
+    expected = expected || REFERENCE_IMG_OBJECT;
+    Object.assign(a, actual, { src: basename(actual.src) });
+    Object.assign(b, expected, { src: basename(expected.src) });
+    this.pushResult({
+      result: QUnit.equiv(a, b),
+      actual: actual,
+      expected: expected,
+      message: 'image object equal to ref'
+    })
+  }
+
   QUnit.module('fabric.StaticCanvas', {
     beforeEach: function() {
       fabric.Object.__uid = 0;
@@ -657,7 +679,7 @@
     assert.ok(typeof canvas.centerObjectH === 'function');
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
-    assert.equal(canvas.centerObjectH(rect), canvas, 'should be chainable');
+    canvas.centerObjectH(rect);
     assert.equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "center.y" property should correspond to canvas element\'s center');
     canvas.setZoom(4);
     assert.equal(rect.getCenterPoint().x, canvas.height / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is transformed');
@@ -668,7 +690,7 @@
     assert.ok(typeof canvas.centerObjectV === 'function');
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
-    assert.equal(canvas.centerObjectV(rect), canvas, 'should be chainable');
+    canvas.centerObjectV(rect);
     assert.equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center');
     canvas.setZoom(2);
     assert.equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center when canvas is transformed');
@@ -679,7 +701,7 @@
     assert.ok(typeof canvas.centerObject === 'function');
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
-    assert.equal(canvas.centerObject(rect), canvas, 'should be chainable');
+    canvas.centerObject(rect);
 
     assert.equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center');
     assert.equal(rect.getCenterPoint().x, canvas.height / 2, 'object\'s "center.x" property should correspond to canvas element\'s center');
@@ -695,7 +717,7 @@
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     canvas.add(rect);
     var oldY = rect.top;
-    assert.equal(canvas.viewportCenterObjectH(rect), canvas, 'should be chainable');
+    canvas.viewportCenterObjectH(rect);
     assert.equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is not transformed');
     assert.equal(rect.top, oldY, 'object\'s "top" should not change');
     canvas.setZoom(2);
@@ -714,7 +736,7 @@
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     canvas.add(rect);
     var oldX = rect.left;
-    assert.equal(canvas.viewportCenterObjectV(rect), canvas, 'should be chainable');
+    canvas.viewportCenterObjectV(rect);
     assert.equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center when canvas is not transformed');
     assert.equal(rect.left, oldX, 'x position did not change');
     canvas.setZoom(2);
@@ -732,7 +754,7 @@
     var rect = makeRect({ left: 102, top: 202 }), pan = 10;
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     canvas.add(rect);
-    assert.equal(canvas.viewportCenterObject(rect), canvas, 'should be chainable');
+    canvas.viewportCenterObject(rect);
     assert.equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center when canvas is not transformed');
     assert.equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is not transformed');
 
@@ -752,7 +774,7 @@
     assert.ok(typeof canvas.straightenObject === 'function');
     var rect = makeRect({ angle: 10 });
     canvas.add(rect);
-    assert.equal(canvas.straightenObject(rect), canvas, 'should be chainable');
+    canvas.straightenObject(rect);
     assert.equal(rect.get('angle'), 0, 'angle should be coerced to 0 (from 10)');
 
     rect.rotate('60');
@@ -974,7 +996,7 @@
       var json = canvas.toJSON();
 
       fixImageDimension(json.backgroundImage);
-      assert.deepEqual(json.backgroundImage, REFERENCE_IMG_OBJECT);
+      assert.sameImageObject(json.backgroundImage, REFERENCE_IMG_OBJECT);
 
       canvas.backgroundImage = null;
 
@@ -1003,7 +1025,7 @@
       var json = canvas.toJSON();
 
       fixImageDimension(json.overlayImage);
-      assert.deepEqual(json.overlayImage, REFERENCE_IMG_OBJECT);
+      assert.sameImageObject(json.overlayImage, REFERENCE_IMG_OBJECT);
 
       canvas.overlayImage = null;
 
@@ -1247,7 +1269,7 @@
     var done = assert.async();
     var serialized = JSON.parse(PATH_JSON);
     serialized.background = 'green';
-    serialized.backgroundImage = JSON.parse('{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":""}');
+    serialized.backgroundImage = { "type": "image", "originX": "left", "originY": "top", "left": 13.6, "top": -1.4, "width": 3000, "height": 3351, "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 0, "strokeDashArray": null, "strokeLineCap": "butt", "strokeDashOffset": 0, "strokeLineJoin": "miter", "strokeMiterLimit": 4, "scaleX": 0.05, "scaleY": 0.05, "angle": 0, "flipX": false, "flipY": false, "opacity": 1, "shadow": null, "visible": true, "backgroundColor": "", "fillRule": "nonzero", "globalCompositeOperation": "source-over", "skewX": 0, "skewY": 0, "src": IMG_SRC, "filters": [], "crossOrigin": "" };
     canvas.loadFromJSON(serialized, function() {
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
       assert.equal(canvas.backgroundColor, 'green');
@@ -1627,7 +1649,7 @@
     }
 
     assert.ok(canvas.item(0) === rect);
-    assert.equal(canvas.fxRemove(rect, { onComplete: onComplete }), canvas, 'should be chainable');
+    assert.ok(typeof canvas.fxRemove(rect, { onComplete: onComplete }) === 'function', 'should return animation abort function');
   });
 
   QUnit.test('options in setBackgroundImage from URL', function(assert) {
