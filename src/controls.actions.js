@@ -24,7 +24,9 @@
    * @return {Number} 0 - 7 a quadrant number
    */
   function findCornerQuadrant(fabricObject, control) {
-    var cornerAngle = fabricObject.angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
+    //  angle is relative to canvas plane
+    var angle = fabricObject.getTotalAngle();
+    var cornerAngle = angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
     return Math.round((cornerAngle % 360) / 45);
   }
 
@@ -231,7 +233,7 @@
         control = target.controls[transform.corner],
         zoom = target.canvas.getZoom(),
         padding = target.padding / zoom,
-        localPoint = target.toLocalPoint(new fabric.Point(x, y), originX, originY);
+        localPoint = target.normalizePoint(new fabric.Point(x, y), originX, originY);
     if (localPoint.x >= padding) {
       localPoint.x -= padding;
     }

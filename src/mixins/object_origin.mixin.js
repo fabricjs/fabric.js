@@ -129,16 +129,14 @@
     },
 
     /**
-     * Returns the point in local coordinates
-     * @param {fabric.Point} point The point relative to the global coordinate system
+     * Returns the normalized point (rotated relative to center) in local coordinates
+     * @param {fabric.Point} point The point relative to instance coordinate system
      * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
      * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
-    toLocalPoint: function(point, originX, originY) {
-      var center = this.getCenterPoint(),
-          p, p2;
-
+    normalizePoint: function(point, originX, originY) {
+      var center = this.getCenterPoint(), p, p2;
       if (typeof originX !== 'undefined' && typeof originY !== 'undefined' ) {
         p = this.translateToGivenOrigin(center, 'center', 'center', originX, originY);
       }
