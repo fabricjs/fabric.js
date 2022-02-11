@@ -562,11 +562,11 @@
    * @returns {Promise<fabric.Group>}
    */
   fabric.Group.fromObject = function(object) {
-    var objects = object.objects,
+    var objects = object.objects || [],
         options = fabric.util.object.clone(object, true);
     delete options.objects;
     return fabric.util.enlivenObjects(objects).then(function (enlivenedObjects) {
-      return fabric.Group(enlivenedObjects, options, true);
+      return new fabric.Group(enlivenedObjects, options, true);
     });
   };
 

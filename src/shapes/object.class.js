@@ -1974,7 +1974,7 @@
    * @constant
    * @type string[]
    */
-  fabric.Object.ENLIVEN_PROPS = ['clipPath', 'path'];
+  fabric.Object.ENLIVEN_PROPS = ['clipPath'];
 
   fabric.Object._fromObject = function(className, object, extraParam) {
     var klass = fabric[className], serializedObject = clone(object, true),
