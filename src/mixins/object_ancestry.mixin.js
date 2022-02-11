@@ -70,7 +70,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {fabric.Object} other 
      * @returns {boolean}
      */
-    hasCommonAncestor: function (other) {
+    hasCommonAncestors: function (other) {
         return !!this.findCommonAncestors(other);
     }
 
