@@ -152,7 +152,7 @@
     },
 
     /**
-     * Returns coordinates of a pointer relative to object's top left corner
+     * Returns coordinates of a pointer relative to object's top left corner in object's plane
      * @param {Event} e Event to operate upon
      * @param {Object} [pointer] Pointer to operate upon (instead of event)
      * @return {Object} Coordinates of a pointer (x, y)
