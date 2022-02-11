@@ -768,7 +768,6 @@
         }
       }
       var target = this._searchPossibleTargets(this._objects, pointer);
-      target = this.targets[0] || target;
       if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
         target = activeTarget;
         this.targets = activeTargetSubs;
@@ -808,7 +807,7 @@
      * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
      * @param {Array} [objects] objects array to look into
      * @param {Object} [pointer] x,y object of point coordinates we want to check.
-     * @return {fabric.Object} object that contains pointer
+     * @return {fabric.Object} top most object on screen that contains pointer
      * @private
      */
     _searchPossibleTargets: function(objects, pointer) {
@@ -829,7 +828,7 @@
           break;
         }
       }
-      return target;
+      return subTarget || target;
     },
 
     /**
