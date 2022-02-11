@@ -152,6 +152,20 @@
     },
 
     /**
+     * Returns coordinates of a pointer relative to object's top left corner
+     * @param {Event} e Event to operate upon
+     * @param {Object} [pointer] Pointer to operate upon (instead of event)
+     * @return {Object} Coordinates of a pointer (x, y)
+     */
+    getLocalPointer: function (e, pointer) {
+      pointer = pointer || this.canvas.getPointer(e);
+      return fabric.util.transformPoint(
+        new fabric.Point(pointer.x, pointer.y),
+        fabric.util.invertTransform(this.calcTransformMatrix())
+      ).addEquals(new fabric.Point(this.width / 2, this.height / 2));
+    },
+
+    /**
      * Returns the point in global coordinates
      * @param {fabric.Point} The point relative to the local coordinate system
      * @return {fabric.Point}

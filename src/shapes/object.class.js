@@ -1926,30 +1926,6 @@
     },
 
     /**
-     * Returns coordinates of a pointer relative to an object
-     * @param {Event} e Event to operate upon
-     * @param {Object} [pointer] Pointer to operate upon (instead of event)
-     * @return {Object} Coordinates of a pointer (x, y)
-     */
-    getLocalPointer: function (e, pointer) {
-      pointer = pointer || this.canvas.getPointer(e);
-      var pClicked = new fabric.Point(pointer.x, pointer.y),
-          objectLeftTop = this._getLeftTopCoords(),
-          angle = this.getTotalAngle();
-      if (this.group) {
-        objectLeftTop = fabric.util.transformPoint(objectLeftTop, this.group.calcTransformMatrix());
-      }
-      if (this.angle) {
-        pClicked = fabric.util.rotatePoint(
-          pClicked, objectLeftTop, degreesToRadians(-angle));
-      }
-      return {
-        x: pClicked.x - objectLeftTop.x,
-        y: pClicked.y - objectLeftTop.y
-      };
-    },
-
-    /**
      * Sets canvas globalCompositeOperation for specific object
      * custom composition operation for the particular object can be specified using globalCompositeOperation property
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
