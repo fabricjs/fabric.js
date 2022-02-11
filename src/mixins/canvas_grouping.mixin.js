@@ -9,49 +9,41 @@
      * @private
      * @param {Event} e Event object
      * @param {fabric.Object} target
-     * @return {Boolean}
-     */
-    _shouldGroup: function(e, target) {
-      var activeObject = this._activeObject;
-      return activeObject && this._isSelectionKeyPressed(e) && target && target.selectable && this.selection &&
-            (activeObject !== target || activeObject.type === 'activeSelection') && !target.onSelect({ e: e });
-    },
-
-    /**
-     * @private
-     * @param {Event} e Event object
-     * @param {fabric.Object} target
+     * @returns {boolean} true if grouping occured
      */
     _handleGrouping: function (e, target) {
       var activeObject = this._activeObject;
+      if (!(activeObject && this._isSelectionKeyPressed(e) && this.selection && target && target.selectable && !target.onSelect({ e: e }))) {
+        return false;
+      }
       // avoid multi select when shift click on a corner
       if (activeObject.__corner) {
-        return;
+        return false;
       }
       if (target === activeObject) {
-        // if it's a group, find target again, using activeGroup objects
-        target = this.findTarget(e, true);
-        // if even object is not found or we are on activeObjectCorner, bail out
+        target = this.targets.pop();
         if (!target || !target.selectable) {
-          return;
+          return false;
         }
       }
-      if (activeObject && activeObject.type === 'activeSelection') {
-        this._updateActiveSelection(target, e);
-      }
-      else {
+      return activeObject && activeObject.type === 'activeSelection' ?
+        this._updateActiveSelection(target, e) :
         this._createActiveSelection(target, e);
-      }
     },
 
     /**
      * @private
+     * @returns {boolean} true if target was added to active selection
      */
     _updateActiveSelection: function(target, e) {
       var activeSelection = this._activeObject,
-          currentActiveObjects = activeSelection._objects.slice(0);
-      if (activeSelection.contains(target)) {
+        currentActiveObjects = activeSelection._objects.slice(0),
+        modified = false;
+       // an object is about to be removed from active selection
+       // we make sure it is a direct child of active selection
+      if (target.group === activeSelection) {
         activeSelection.removeWithUpdate(target);
+        modified = true;
         this._hoveredTarget = target;
         this._hoveredTargets = this.targets.concat();
         if (activeSelection.size() === 1) {
@@ -59,18 +51,29 @@
           this._setActiveObject(activeSelection.item(0), e);
         }
       }
-      else {
+      //  an object is about to be added to active selection
+      //  we make sure it is not a already a descendant of active selection
+      else if (!target.isDescendantOf(activeSelection)) {
         activeSelection.addWithUpdate(target);
+        modified = true;
         this._hoveredTarget = activeSelection;
         this._hoveredTargets = this.targets.concat();
       }
-      this._fireSelectionEvents(currentActiveObjects, e);
+      modified && this._fireSelectionEvents(currentActiveObjects, e);
+      return modified;
     },
 
     /**
      * @private
+     * @returns {boolean} true if active selection was created
      */
-    _createActiveSelection: function(target, e) {
+    _createActiveSelection: function (target, e) {
+      var activeObject = this._activeObject;
+      //  target is about be join active selection
+      //  we make sure objects aren't ancestors of each other in order to avoid recursive selection
+      if (target === activeObject || target.isDescendantOf(activeObject) || activeObject.isDescendantOf(target)) {
+        return false;
+      }
       var currentActives = this.getActiveObjects(), group = this._createGroup(target);
       this._hoveredTarget = group;
       // ISSUE 4115: should we consider subTargets here?
@@ -78,43 +81,23 @@
       // this._hoveredTargets = this.targets.concat();
       this._setActiveObject(group, e);
       this._fireSelectionEvents(currentActives, e);
+      return true;
     },
 
     /**
      * @private
      * @param {Object} target
      */
-    _createGroup: function(target) {
-      var objects = this._objects,
-          isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target),
-          groupObjects = isActiveLower
-            ? [this._activeObject, target]
-            : [target, this._activeObject];
-      this._activeObject.isEditing && this._activeObject.exitEditing();
+    _createGroup: function (target) {
+      var activeObject = this._activeObject;
+      var groupObjects = activeObject.isInFrontOf(target) ?
+        [activeObject, target] :
+        [target, activeObject];
+      activeObject.isEditing && activeObject.exitEditing();
+      //  handle case: target is nested
       return new fabric.ActiveSelection(groupObjects, {
         canvas: this
       });
-    },
-
-    /**
-     * @private
-     * @param {Event} e mouse event
-     */
-    _groupSelectedObjects: function (e) {
-
-      var group = this._collectObjects(e),
-          aGroup;
-
-      // do not create group for 1 element only
-      if (group.length === 1) {
-        this.setActiveObject(group[0], e);
-      }
-      else if (group.length > 1) {
-        aGroup = new fabric.ActiveSelection(group.reverse(), {
-          canvas: this
-        });
-        this.setActiveObject(aGroup, e);
-      }
     },
 
     /**
@@ -159,6 +142,27 @@
       }
 
       return group;
+    },
+
+    /**
+     * @private
+     * @param {Event} e mouse event
+     */
+    _groupSelectedObjects: function (e) {
+
+      var objects = this._collectObjects(e),
+        aGroup;
+
+      // do not create group for 1 element only
+      if (objects.length === 1) {
+        this.setActiveObject(objects[0], e);
+      }
+      else if (objects.length > 1) {
+        aGroup = new fabric.ActiveSelection(objects.reverse(), {
+          canvas: this
+        });
+        this.setActiveObject(aGroup, e);
+      }
     },
 
     /**

@@ -25,11 +25,6 @@
     type: 'activeSelection',
 
     /**
-     * disabled for proper functionality
-     */
-    subTargetCheck: false,
-
-    /**
      * Constructor
      * @param {Object} objects ActiveSelection objects
      * @param {Object} [options] Options object
@@ -51,6 +46,7 @@
       this._calcBounds();
       this._updateObjectsCoords();
       fabric.Object.prototype.initialize.call(this, options);
+      this._updateObjectsCoords();
       this.setCoords();
     },
 

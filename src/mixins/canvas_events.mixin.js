@@ -671,13 +671,13 @@
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
       var shouldRender = this._shouldRender(target),
-          shouldGroup = this._shouldGroup(e, target);
+          didGroup = false;
       if (this._shouldClearSelection(e, target)) {
         this.discardActiveObject(e);
       }
-      else if (shouldGroup) {
-        this._handleGrouping(e, target);
+      else if (this._handleGrouping(e, target)) {
         target = this._activeObject;
+        didGroup = true;
       }
 
       if (this.selection && (!target ||
@@ -700,7 +700,7 @@
           fabric.util.isTouchEvent(e)
         );
         target.__corner = corner;
-        if (target === this._activeObject && (corner || !shouldGroup)) {
+        if (target === this._activeObject && (corner || !didGroup)) {
           this._setupCurrentTransform(e, target, alreadySelected);
           var control = target.controls[corner],
               pointer = this.getPointer(e),
@@ -712,7 +712,7 @@
       }
       this._handleEvent(e, 'down');
       // we must renderAll so that we update the visuals
-      (shouldRender || shouldGroup) && this.requestRenderAll();
+      (shouldRender || didGroup) && this.requestRenderAll();
     },
 
     /**
