@@ -768,6 +768,7 @@
         }
       }
       var target = this._searchPossibleTargets(this._objects, pointer);
+      target = this.targets[0] || target;
       if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
         target = activeTarget;
         this.targets = activeTargetSubs;
