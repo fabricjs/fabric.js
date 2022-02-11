@@ -149,7 +149,7 @@
     var objects = object.objects,
         options = fabric.util.object.clone(object, true);
     delete options.objects;
-    return fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
+    return fabric.util.enlivenObjects(objects).then(function(enlivenedObjects) {
       return new fabric.ActiveSelection(enlivenedObjects, object, true);
     });
   };
