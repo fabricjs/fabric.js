@@ -70,8 +70,8 @@
      */
     _createActiveSelection: function (target, e) {
       var activeObject = this._activeObject;
-      //  target is about be join active selection
-      //  we make sure objects aren't ancestors of each other in order to avoid recursive selection
+      //  target is about be added to a new active selection
+      //  we make sure `activeObject` and `target` aren't ancestors of each other in order to avoid recursive selection
       if (target === activeObject || target.isDescendantOf(activeObject) || activeObject.isDescendantOf(target)) {
         return false;
       }
