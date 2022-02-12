@@ -197,7 +197,7 @@
 
       /**
        * backward compatibility
-       * @deprecated 
+       * @deprecated
        */
       addWithUpdate: function () {
         this.add.apply(this, arguments);
@@ -270,7 +270,7 @@
 
       /**
        * @private
-       * @param {fabric.Object} object 
+       * @param {fabric.Object} object
        * @param {boolean} [relativeToGroup] true if object is in group's coordinate plane
        */
       enterGroup: function (object, relativeToGroup) {
@@ -294,7 +294,7 @@
 
       /**
        * @private
-       * @param {fabric.Object} object 
+       * @param {fabric.Object} object
        * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
        */
       exitGroup: function (object, removeParentTransform) {
@@ -386,7 +386,7 @@
       },
 
       /**
-       * 
+       *
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
@@ -413,12 +413,13 @@
 
       /**
        * @public
-       * @param {string} [layoutDirective] 
+       * @param {string} [layoutDirective]
        */
       triggerLayout: function (layoutDirective) {
         if (layoutDirective) {
           this.set('layout', layoutDirective);
-        } else {
+        }
+        else {
           this._applyLayoutStrategy({ type: 'imperative' });
         }
       },
@@ -481,10 +482,11 @@
       getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
         var bbox = this.getObjectsBoundingBox(objects);
         if (layoutDirective === 'fit-content') {
-            return bbox;
+          return bbox;
         }
         else if (layoutDirective === 'fixed' && context.type === 'initializion') {
-          if (context.options && (typeof context.options.left !== 'undefined' || typeof context.options.top !== 'undefined')) {
+          if (context.options
+            && (typeof context.options.left !== 'undefined' || typeof context.options.top !== 'undefined')) {
             var center = this.translateToCenterPoint(
               new fabric.Point(this.left || 0, this.top || 0),
               typeof context.options.originX !== 'undefined' ? context.options.originX : this.originX,
@@ -537,12 +539,12 @@
         }, { min: coords[0], max: coords[0] });
 
         var width = bounds.max.x - bounds.min.x,
-          height = bounds.max.y - bounds.min.y,
-          center = new fabric.Point(bounds.min.x, bounds.min.y).midPointFrom(bounds.max),
-          rad = fabric.util.degreesToRadians(this.angle || 0),
-          cos = Math.abs(Math.cos(rad)),
-          sin = Math.abs(Math.sin(rad));
-        
+            height = bounds.max.y - bounds.min.y,
+            center = new fabric.Point(bounds.min.x, bounds.min.y).midPointFrom(bounds.max),
+            rad = fabric.util.degreesToRadians(this.angle || 0),
+            cos = Math.abs(Math.cos(rad)),
+            sin = Math.abs(Math.sin(rad));
+
         return {
           left: bounds.min.x,
           top: bounds.min.y,
@@ -613,7 +615,7 @@
        * @chainable
        */
       toActiveSelection: function () {
-        throw new Error('not implemented')
+        throw new Error('not implemented');
         /*
         if (!this.canvas) {
           return;
