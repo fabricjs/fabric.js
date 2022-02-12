@@ -497,7 +497,7 @@
        * @param {object} context object with data regarding what triggered the call
        * @param {'initialization'|'object_modified'|'added'|'removed'|'layout_change'|'imperative'} context.type
        * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
-       * @returns {Object} options object
+       * @returns {{ centerX: number, centerY: number, width: number, height: number }} positioning data
        */
       getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
         var bbox = this.getObjectsBoundingBox(objects);
