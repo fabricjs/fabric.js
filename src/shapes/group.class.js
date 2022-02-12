@@ -121,7 +121,7 @@
           });
         }
         if (key === 'layout' && prev !== this[key]) {
-          this._applyLayoutStrategy({ type: 'layout_change', value: value, prevValue: prev });
+          this._applyLayoutStrategy({ type: 'layout_change', layout: value, prevLayout: prev });
         }
         if (key === 'subTargetCheck') {
           this.forEachObject(this._watchObject.bind(this, value));
@@ -373,15 +373,20 @@
 
       /**
        * @public
-       * @param {string} [layoutDirective]
+       * @typedef LayoutContext
+       * @property {string} [layout] layout directive
+       * @property {number} [centerX] new centerX in canvas coordinate plane
+       * @property {number} [centerY] new centerY in canvas coordinate plane
+       * @property {number} [width]
+       * @property {number} [height]
+       * @param {LayoutContext} [context] pass values to use for layout calculations
        */
-      triggerLayout: function (layoutDirective) {
-        if (layoutDirective) {
-          this.set('layout', layoutDirective);
+      triggerLayout: function (context) {
+        if (context.layout) {
+          context.prevLayout = this.layout;
+          this.layout = context.layout;
         }
-        else {
-          this._applyLayoutStrategy({ type: 'imperative' });
-        }
+        this._applyLayoutStrategy({ type: 'imperative', context: context });
       },
 
       /**
@@ -453,6 +458,9 @@
        */
       getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
         var bbox = this.getObjectsBoundingBox(objects);
+        if (context.type === 'imperative' && context.context) {
+          Object.assign(bbox, context.context);
+        }
         if (layoutDirective === 'fit-content') {
           return bbox;
         }
@@ -503,7 +511,7 @@
        * @param {*} context layout context
        * @param {Object} result layout result
        */
-      onLayout: function () {
+      onLayout: function (/* context, result */) {
         //  override by subclass
       },
 
