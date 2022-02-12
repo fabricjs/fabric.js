@@ -223,6 +223,7 @@
         var directive = watch ? 'on' : 'off';
         //  make sure we listen only once
         watch && this._watchObject(false, object);
+        object[directive]('changed', this.__objectMonitor);
         object[directive]('modified', this.__objectMonitor);
         object[directive]('selected', this.__objectSelectionTracker);
         object[directive]('deselected', this.__objectSelectionDisposer);
