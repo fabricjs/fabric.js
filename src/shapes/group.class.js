@@ -37,6 +37,7 @@
       /**
        * Specifies the **layout strategy** for instance
        * Used by `getLayoutStrategyResult` to calculate layout
+       * `fit-content`, `fixed` are supported out of the box
        * @type string
        * @default
        */
@@ -444,7 +445,7 @@
           true
         );
         //  adjust objects to account for new center
-        context.type !== 'initialization' && this.forEachObject(function (object) {
+        this.forEachObject(function (object) {
           object.set({
             left: object.left + diff.x,
             top: object.top + diff.y,
