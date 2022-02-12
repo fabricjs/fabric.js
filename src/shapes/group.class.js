@@ -614,13 +614,10 @@
        */
       _toSVG: function (reviver) {
         var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-        //  in case there's an unapplied matrix diff (`subTargetCheck = false`) we need to use `ownMatrixCache.initialValue`
-        var t = invertTransform(this.ownMatrixCache.initialValue || this.calcTransformMatrix());
-        svgString.push('<g ', 'transform="', fabric.util.matrixToSVG(t), '">\n');
         for (var i = 0, len = this._objects.length; i < len; i++) {
           svgString.push('\t\t', this._objects[i].toSVG(reviver));
         }
-        svgString.push('</g>\n', '</g>\n');
+        svgString.push('</g>\n');
         return svgString;
       },
 
