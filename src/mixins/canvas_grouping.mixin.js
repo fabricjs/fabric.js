@@ -91,7 +91,7 @@
      */
     _createGroup: function (target) {
       var activeObject = this._activeObject;
-      var groupObjects = activeObject.isInFrontOf(target) ?
+      var groupObjects = target.isInFrontOf(activeObject) ?
         [activeObject, target] :
         [target, activeObject];
       activeObject.isEditing && activeObject.exitEditing();
