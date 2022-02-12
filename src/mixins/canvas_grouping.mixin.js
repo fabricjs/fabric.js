@@ -53,7 +53,7 @@
         }
       }
       //  target is about to be added to active selection
-      //  we make sure it is not a already a descendant of active selection
+      //  we make sure it is not already a descendant of active selection
       else if (!target.isDescendantOf(activeSelection)) {
         activeSelection.addWithUpdate(target);
         modified = true;
