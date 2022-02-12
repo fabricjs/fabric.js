@@ -711,7 +711,7 @@
    */
   fabric.Group.fromObject = function (object, callback) {
     callback && fabric.Group._fromObject(object, function (objects, options) {
-      callback(new fabric.Group(objects, options));
+      callback(new fabric.Group(objects, options, true));
     });
   };
 
