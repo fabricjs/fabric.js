@@ -25,31 +25,6 @@
     type: 'activeSelection',
 
     /**
-     * Constructor
-     * @param {Object} objects ActiveSelection objects
-     * @param {Object} [options] Options object
-     * @return {Object} thisArg
-     */
-    initialize: function(objects, options) {
-      options = options || {};
-      this._objects = objects || [];
-      for (var i = this._objects.length; i--; ) {
-        this._objects[i].group = this;
-      }
-
-      if (options.originX) {
-        this.originX = options.originX;
-      }
-      if (options.originY) {
-        this.originY = options.originY;
-      }
-      this._calcBounds();
-      this._updateObjectsCoords();
-      fabric.Object.prototype.initialize.call(this, options);
-      this.setCoords();
-    },
-
-    /**
      * Change te activeSelection to a normal group,
      * High level function that automatically adds it to canvas as
      * active object. no events fired.
@@ -84,7 +59,10 @@
      * @return {Boolean} [cancel]
      */
     onDeselect: function() {
-      this.destroy();
+      var objects = this.removeAll(), canvas = this.canvas;
+      objects.forEach(function (object) {
+        object._set('canvas', canvas);
+      });
       return false;
     },
 
