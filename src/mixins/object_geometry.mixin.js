@@ -65,7 +65,7 @@
      * controls are added by default_controls.js
      */
     controls: { },
-    
+
     /**
      * @returns {number} x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
      */

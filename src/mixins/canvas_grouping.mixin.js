@@ -13,7 +13,8 @@
      */
     _handleGrouping: function (e, target) {
       var activeObject = this._activeObject;
-      if (!(activeObject && this._isSelectionKeyPressed(e) && this.selection && target && target.selectable && !target.onSelect({ e: e }))) {
+      if (!(activeObject && this._isSelectionKeyPressed(e)
+        && this.selection && target && target.selectable && !target.onSelect({ e: e }))) {
         return false;
       }
       // avoid multi select when shift click on a corner
@@ -37,10 +38,10 @@
      */
     _updateActiveSelection: function(target, e) {
       var activeSelection = this._activeObject,
-        currentActiveObjects = activeSelection._objects.slice(0),
-        modified = false;
-       // an object is about to be removed from active selection
-       // we make sure it is a direct child of active selection
+          currentActiveObjects = activeSelection._objects.slice(0),
+          modified = false;
+      // an object is about to be removed from active selection
+      // we make sure it is a direct child of active selection
       if (target.group === activeSelection) {
         activeSelection.removeWithUpdate(target);
         modified = true;
@@ -151,7 +152,7 @@
     _groupSelectedObjects: function (e) {
 
       var objects = this._collectObjects(e),
-        aGroup;
+          aGroup;
 
       // do not create group for 1 element only
       if (objects.length === 1) {

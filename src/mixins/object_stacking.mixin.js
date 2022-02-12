@@ -79,7 +79,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   },
 
   /**
-   * 
+   *
    * @param {fabric.Object} other object to compare against
    * @returns {boolean | undefined} if objects do not share a common ancestor or they are strictly equal it is impossible to determine which is in front of the other; in such cases the function returns `undefined`
    */
@@ -107,8 +107,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     }
     //  compare trees from the common ancestor down
     var tree = ancestors.slice(i),
-      otherTree = otherAncestors.slice(j),
-      a, b, parent;
+        otherTree = otherAncestors.slice(j),
+        a, b, parent;
     for (i = 1; i < Math.min(tree.length, otherTree.length); i++) {
       a = tree[i];
       b = otherTree[i];
