@@ -81,7 +81,6 @@
 
       /**
        * Constructor
-       * Guard objects' transformations from excessive mutations during initialization.
        *
        * @param {fabric.Object[]} [objects] instance objects
        * @param {Object} [options] Options object
