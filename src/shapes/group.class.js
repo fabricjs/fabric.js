@@ -80,7 +80,7 @@
 
       /**
        * Constructor
-       * Guard objects' transformations from excessive mutations during initializion.
+       * Guard objects' transformations from excessive mutations during initialization.
        *
        * @param {fabric.Object[]} [objects] instance objects
        * @param {Object} [options] Options object
@@ -97,7 +97,7 @@
         this.forEachObject(function (object) {
           this.enterGroup(object, objectsRelativeToGroup);
         }, this);
-        this._applyLayoutStrategy({ type: 'initializion', options: options });
+        this._applyLayoutStrategy({ type: 'initialization', options: options });
       },
 
       /**
@@ -475,7 +475,7 @@
        * @param {string} layoutDirective
        * @param {fabric.Object[]} objects
        * @param {object} context object with data regarding what triggered the call
-       * @param {'initializion'|'object_modified'|'added'|'removed'|'layout_change'|'imperative'} context.type
+       * @param {'initialization'|'object_modified'|'added'|'removed'|'layout_change'|'imperative'} context.type
        * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
        * @returns {Object} options object
        */
@@ -484,7 +484,7 @@
         if (layoutDirective === 'fit-content') {
           return bbox;
         }
-        else if (layoutDirective === 'fixed' && context.type === 'initializion') {
+        else if (layoutDirective === 'fixed' && context.type === 'initialization') {
           if (context.options
             && (typeof context.options.left !== 'undefined' || typeof context.options.top !== 'undefined')) {
             var center = this.translateToCenterPoint(
