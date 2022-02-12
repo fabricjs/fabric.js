@@ -445,7 +445,10 @@
           true
         );
         //  adjust objects to account for new center
-        this.forEachObject(function (object) {
+        var objects = this._objects.slice();
+        context.type !== 'initialization' && this.clipPath && !this.clipPath.absolutePositioned
+          && objects.push(this.clipPath);
+        objects.forEach(function (object) {
           object.set({
             left: object.left + diff.x,
             top: object.top + diff.y,
