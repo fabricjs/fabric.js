@@ -495,7 +495,8 @@ fabric.Collection = {
   },
 
   /**
-   * Returns true if collection contains an object
+   * Returns true if collection contains an object.\
+   * **Prefer using {@link `fabric.Object#isDescendantOf`} for performance reasons**
    * @param {Object} object Object to check against
    * @param {Boolean} [deep=false] `true` to check all descendants, `false` to check only `_objects`
    * @return {Boolean} `true` if collection contains an object
@@ -3577,19 +3578,34 @@ fabric.warn = console.warn;
 
   /**
    * @typedef {Object} AnimationOptions
-   * @property {Function} [options.onChange] Callback; invoked on every value change
-   * @property {Function} [options.onComplete] Callback; invoked when value change is completed
-   * @property {Number} [options.startValue=0] Starting value
-   * @property {Number} [options.endValue=100] Ending value
-   * @property {Number} [options.byValue=100] Value to modify the property by
-   * @property {Function} [options.easing] Easing function
-   * @property {Number} [options.duration=500] Duration of change (in ms)
-   * @property {Function} [options.abort] Additional function with logic. If returns true, animation aborts.
+   * Animation of a value or list of values.
+   * When using lists, think of something like this:
+   * fabric.util.animate({
+   *   startValue: [1, 2, 3],
+   *   endValue: [2, 4, 6],
+   *   onChange: function([a, b, c]) {
+   *     canvas.zoomToPoint({x: b, y: c}, a)
+   *     canvas.renderAll()
+   *   }
+   * });
+   * @example
+   * @property {Function} [onChange] Callback; invoked on every value change
+   * @property {Function} [onComplete] Callback; invoked when value change is completed
+   * @example
+   * // Note: startValue, endValue, and byValue must match the type
+   * var animationOptions = { startValue: 0, endValue: 1, byValue: 0.25 }
+   * var animationOptions = { startValue: [0, 1], endValue: [1, 2], byValue: [0.25, 0.25] }
+   * @property {number | number[]} [startValue=0] Starting value
+   * @property {number | number[]} [endValue=100] Ending value
+   * @property {number | number[]} [byValue=100] Value to modify the property by
+   * @property {Function} [easing] Easing function
+   * @property {Number} [duration=500] Duration of change (in ms)
+   * @property {Function} [abort] Additional function with logic. If returns true, animation aborts.
    *
    * @typedef {() => void} CancelFunction
    *
    * @typedef {Object} AnimationCurrentState
-   * @property {number} currentValue value in range [`startValue`, `endValue`]
+   * @property {number | number[]} currentValue value in range [`startValue`, `endValue`]
    * @property {number} completionRate value in range [0, 1]
    * @property {number} durationRate value in range [0, 1]
    *
@@ -3694,6 +3710,10 @@ fabric.warn = console.warn;
    * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
    * @memberOf fabric.util
    * @param {AnimationOptions} [options] Animation options
+   * @example
+   * // Note: startValue, endValue, and byValue must match the type
+   * fabric.util.animate({ startValue: 0, endValue: 1, byValue: 0.25 })
+   * fabric.util.animate({ startValue: [0, 1], endValue: [1, 2], byValue: [0.25, 0.25] })
    * @returns {CancelFunction} cancel function
    */
   function animate(options) {
@@ -3724,9 +3744,12 @@ fabric.warn = console.warn;
           abort = options.abort || noop,
           onComplete = options.onComplete || noop,
           easing = options.easing || defaultEasing,
+          isMany = 'startValue' in options ? options.startValue.length > 0 : false,
           startValue = 'startValue' in options ? options.startValue : 0,
           endValue = 'endValue' in options ? options.endValue : 100,
-          byValue = options.byValue || endValue - startValue;
+          byValue = options.byValue || (isMany ? startValue.map(function(value, i) {
+            return endValue[i] - startValue[i];
+          }) : endValue - startValue);
 
       options.onStart && options.onStart();
 
@@ -3734,10 +3757,13 @@ fabric.warn = console.warn;
         time = ticktime || +new Date();
         var currentTime = time > finish ? duration : (time - start),
             timePerc = currentTime / duration,
-            current = easing(currentTime, startValue, byValue, duration),
-            valuePerc = Math.abs((current - startValue) / byValue);
+            current = isMany ? startValue.map(function(_value, i) {
+              return easing(currentTime, startValue[i], byValue[i], duration);
+            }) : easing(currentTime, startValue, byValue, duration),
+            valuePerc = isMany ? Math.abs((current[0] - startValue[0]) / byValue[0])
+              : Math.abs((current - startValue) / byValue);
         //  update context
-        context.currentValue = current;
+        context.currentValue = isMany ? current.slice() : current;
         context.completionRate = valuePerc;
         context.durationRate = timePerc;
         if (cancel) {
@@ -3749,11 +3775,11 @@ fabric.warn = console.warn;
         }
         if (time > finish) {
           //  update context
-          context.currentValue = endValue;
+          context.currentValue = isMany ? endValue.slice() : endValue;
           context.completionRate = 1;
           context.durationRate = 1;
           //  execute callbacks
-          onChange(endValue, 1, 1);
+          onChange(isMany ? endValue.slice() : endValue, 1, 1);
           onComplete(endValue, 1, 1);
           removeFromRegistry();
           return;
@@ -6701,7 +6727,9 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
    * @return {Number} 0 - 7 a quadrant number
    */
   function findCornerQuadrant(fabricObject, control) {
-    var cornerAngle = fabricObject.angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
+    //  angle is relative to canvas plane
+    var angle = fabricObject.getTotalAngle();
+    var cornerAngle = angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
     return Math.round((cornerAngle % 360) / 45);
   }
 
@@ -6908,7 +6936,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
         control = target.controls[transform.corner],
         zoom = target.canvas.getZoom(),
         padding = target.padding / zoom,
-        localPoint = target.toLocalPoint(new fabric.Point(x, y), originX, originY);
+        localPoint = target.normalizePoint(new fabric.Point(x, y), originX, originY);
     if (localPoint.x >= padding) {
       localPoint.x -= padding;
     }
@@ -7501,7 +7529,9 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     // this is still wrong
     ctx.lineWidth = 1;
     ctx.translate(left, top);
-    ctx.rotate(degreesToRadians(fabricObject.angle));
+    //  angle is relative to canvas plane
+    var angle = fabricObject.getTotalAngle();
+    ctx.rotate(degreesToRadians(angle));
     // this does not work, and fixed with ( && ) does not make sense.
     // to have real transparent corners we need the controls on upperCanvas
     // transparentCorners || ctx.clearRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
@@ -10503,10 +10533,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       }
       this.forEachObject(function(object) {
         object.dispose && object.dispose();
-        // animation module is still optional
-        if (fabric.runningAnimations) {
-          fabric.runningAnimations.cancelByTarget(object);
-        }
       });
       this._objects = [];
       if (this.backgroundImage && this.backgroundImage.dispose) {
@@ -12127,14 +12153,22 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (!target) {
         return;
       }
-
-      var pointer = this.getPointer(e), corner = target.__corner,
+      var pointer = this.getPointer(e);
+      if (target.group) {
+        //  transform pointer to target's containing coordinate plane
+        pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(target.group.calcTransformMatrix()));
+      }
+      var corner = target.__corner,
           control = target.controls[corner],
           actionHandler = (alreadySelected && corner) ?
             control.getActionHandler(e, target, control) : fabric.controlsUtils.dragHandler,
           action = this._getActionFromCorner(alreadySelected, corner, e, target),
           origin = this._getOriginFromCorner(target, corner),
           altKey = e[this.centeredKey],
+          /**
+           * relative to target's containing coordinate plane
+           * both agree on every point
+           **/
           transform = {
             target: target,
             action: action,
@@ -12144,7 +12178,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             scaleY: target.scaleY,
             skewX: target.skewX,
             skewY: target.skewY,
-            // used by transation
             offsetX: pointer.x - target.left,
             offsetY: pointer.y - target.top,
             originX: origin.x,
@@ -12153,11 +12186,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             ey: pointer.y,
             lastX: pointer.x,
             lastY: pointer.y,
-            // unsure they are useful anymore.
-            // left: target.left,
-            // top: target.top,
             theta: degreesToRadians(target.angle),
-            // end of unsure
             width: target.width * target.scaleX,
             shiftKey: e.shiftKey,
             altKey: altKey,
@@ -12250,11 +12279,12 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       if (shouldLookForActive && activeObject._findTargetCorner(pointer, isTouch)) {
         return activeObject;
       }
-      if (aObjects.length > 1 && !skipGroup && activeObject === this._searchPossibleTargets([activeObject], pointer)) {
+      if (aObjects.length > 1 && activeObject.type === 'activeSelection'
+        && !skipGroup && this.searchPossibleTargets([activeObject], pointer)) {
         return activeObject;
       }
       if (aObjects.length === 1 &&
-        activeObject === this._searchPossibleTargets([activeObject], pointer)) {
+        activeObject === this.searchPossibleTargets([activeObject], pointer)) {
         if (!this.preserveObjectStacking) {
           return activeObject;
         }
@@ -12264,7 +12294,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           this.targets = [];
         }
       }
-      var target = this._searchPossibleTargets(this._objects, pointer);
+      var target = this.searchPossibleTargets(this._objects, pointer);
       if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
         target = activeTarget;
         this.targets = activeTargetSubs;
@@ -12301,10 +12331,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     },
 
     /**
-     * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
+     * Internal Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
      * @param {Array} [objects] objects array to look into
      * @param {Object} [pointer] x,y object of point coordinates we want to check.
-     * @return {fabric.Object} object that contains pointer
+     * @return {fabric.Object} **top most object from given `objects`** that contains pointer
      * @private
      */
     _searchPossibleTargets: function(objects, pointer) {
@@ -12326,6 +12356,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
         }
       }
       return target;
+    },
+
+    /**
+     * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
+     * @see {@link fabric.Canvas#_searchPossibleTargets}
+     * @param {Array} [objects] objects array to look into
+     * @param {Object} [pointer] x,y object of point coordinates we want to check.
+     * @return {fabric.Object} **top most object on screen** that contains pointer
+     */
+    searchPossibleTargets: function (objects, pointer) {
+      var target = this._searchPossibleTargets(objects, pointer);
+      return this.targets[0] || target;
     },
 
     /**
@@ -13482,13 +13524,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
       var shouldRender = this._shouldRender(target),
-          shouldGroup = this._shouldGroup(e, target);
+          didGroup = false;
       if (this._shouldClearSelection(e, target)) {
         this.discardActiveObject(e);
       }
-      else if (shouldGroup) {
-        this._handleGrouping(e, target);
+      else if (this._handleGrouping(e, target)) {
         target = this._activeObject;
+        didGroup = true;
       }
 
       if (this.selection && (!target ||
@@ -13511,7 +13553,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           fabric.util.isTouchEvent(e)
         );
         target.__corner = corner;
-        if (target === this._activeObject && (corner || !shouldGroup)) {
+        if (target === this._activeObject && (corner || !didGroup)) {
           this._setupCurrentTransform(e, target, alreadySelected);
           var control = target.controls[corner],
               pointer = this.getPointer(e),
@@ -13523,7 +13565,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
       this._handleEvent(e, 'down');
       // we must renderAll so that we update the visuals
-      (shouldRender || shouldGroup) && this.requestRenderAll();
+      (shouldRender || didGroup) && this.requestRenderAll();
     },
 
     /**
@@ -13709,8 +13751,13 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      */
     _transformObject: function(e) {
       var pointer = this.getPointer(e),
-          transform = this._currentTransform;
-
+          transform = this._currentTransform,
+          target = transform.target;
+      if (target.group) {
+        //  transform pointer to target's containing coordinate plane
+        //  both agree on every point
+        pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(target.group.calcTransformMatrix()));
+      }
       transform.reset = false;
       transform.shiftKey = e.shiftKey;
       transform.altKey = e[this.centeredKey];
@@ -13804,49 +13851,42 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @private
      * @param {Event} e Event object
      * @param {fabric.Object} target
-     * @return {Boolean}
-     */
-    _shouldGroup: function(e, target) {
-      var activeObject = this._activeObject;
-      return activeObject && this._isSelectionKeyPressed(e) && target && target.selectable && this.selection &&
-            (activeObject !== target || activeObject.type === 'activeSelection') && !target.onSelect({ e: e });
-    },
-
-    /**
-     * @private
-     * @param {Event} e Event object
-     * @param {fabric.Object} target
+     * @returns {boolean} true if grouping occured
      */
     _handleGrouping: function (e, target) {
       var activeObject = this._activeObject;
+      if (!(activeObject && this._isSelectionKeyPressed(e)
+        && this.selection && target && target.selectable && !target.onSelect({ e: e }))) {
+        return false;
+      }
       // avoid multi select when shift click on a corner
       if (activeObject.__corner) {
-        return;
+        return false;
       }
       if (target === activeObject) {
-        // if it's a group, find target again, using activeGroup objects
-        target = this.findTarget(e, true);
-        // if even object is not found or we are on activeObjectCorner, bail out
+        target = this.targets.pop();
         if (!target || !target.selectable) {
-          return;
+          return false;
         }
       }
-      if (activeObject && activeObject.type === 'activeSelection') {
-        this._updateActiveSelection(target, e);
-      }
-      else {
+      return activeObject && activeObject.type === 'activeSelection' ?
+        this._updateActiveSelection(target, e) :
         this._createActiveSelection(target, e);
-      }
     },
 
     /**
      * @private
+     * @returns {boolean} true if target was added to active selection
      */
     _updateActiveSelection: function(target, e) {
       var activeSelection = this._activeObject,
-          currentActiveObjects = activeSelection._objects.slice(0);
-      if (activeSelection.contains(target)) {
+          currentActiveObjects = activeSelection._objects.slice(0),
+          modified = false;
+      // target is about to be removed from active selection
+      // we make sure it is a direct child of active selection
+      if (target.group === activeSelection) {
         activeSelection.removeWithUpdate(target);
+        modified = true;
         this._hoveredTarget = target;
         this._hoveredTargets = this.targets.concat();
         if (activeSelection.size() === 1) {
@@ -13854,18 +13894,29 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
           this._setActiveObject(activeSelection.item(0), e);
         }
       }
-      else {
+      //  target is about to be added to active selection
+      //  we make sure it is not already a descendant of active selection
+      else if (!target.isDescendantOf(activeSelection)) {
         activeSelection.addWithUpdate(target);
+        modified = true;
         this._hoveredTarget = activeSelection;
         this._hoveredTargets = this.targets.concat();
       }
-      this._fireSelectionEvents(currentActiveObjects, e);
+      modified && this._fireSelectionEvents(currentActiveObjects, e);
+      return modified;
     },
 
     /**
      * @private
+     * @returns {boolean} true if active selection was created
      */
-    _createActiveSelection: function(target, e) {
+    _createActiveSelection: function (target, e) {
+      var activeObject = this._activeObject;
+      //  target is about be added to a new active selection
+      //  we make sure `activeObject` and `target` aren't ancestors of each other in order to avoid recursive selection
+      if (target === activeObject || target.isDescendantOf(activeObject) || activeObject.isDescendantOf(target)) {
+        return false;
+      }
       var currentActives = this.getActiveObjects(), group = this._createGroup(target);
       this._hoveredTarget = group;
       // ISSUE 4115: should we consider subTargets here?
@@ -13873,43 +13924,23 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       // this._hoveredTargets = this.targets.concat();
       this._setActiveObject(group, e);
       this._fireSelectionEvents(currentActives, e);
+      return true;
     },
 
     /**
      * @private
      * @param {Object} target
      */
-    _createGroup: function(target) {
-      var objects = this._objects,
-          isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target),
-          groupObjects = isActiveLower
-            ? [this._activeObject, target]
-            : [target, this._activeObject];
-      this._activeObject.isEditing && this._activeObject.exitEditing();
+    _createGroup: function (target) {
+      var activeObject = this._activeObject;
+      var groupObjects = target.isInFrontOf(activeObject) ?
+        [activeObject, target] :
+        [target, activeObject];
+      activeObject.isEditing && activeObject.exitEditing();
+      //  handle case: target is nested
       return new fabric.ActiveSelection(groupObjects, {
         canvas: this
       });
-    },
-
-    /**
-     * @private
-     * @param {Event} e mouse event
-     */
-    _groupSelectedObjects: function (e) {
-
-      var group = this._collectObjects(e),
-          aGroup;
-
-      // do not create group for 1 element only
-      if (group.length === 1) {
-        this.setActiveObject(group[0], e);
-      }
-      else if (group.length > 1) {
-        aGroup = new fabric.ActiveSelection(group.reverse(), {
-          canvas: this
-        });
-        this.setActiveObject(aGroup, e);
-      }
     },
 
     /**
@@ -13954,6 +13985,27 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       }
 
       return group;
+    },
+
+    /**
+     * @private
+     * @param {Event} e mouse event
+     */
+    _groupSelectedObjects: function (e) {
+
+      var objects = this._collectObjects(e),
+          aGroup;
+
+      // do not create group for 1 element only
+      if (objects.length === 1) {
+        this.setActiveObject(objects[0], e);
+      }
+      else if (objects.length > 1) {
+        aGroup = new fabric.ActiveSelection(objects.reverse(), {
+          canvas: this
+        });
+        this.setActiveObject(aGroup, e);
+      }
     },
 
     /**
@@ -15283,6 +15335,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
+     * Returns the object angle relative to canvas counting also the group property
+     * @returns {number}
+     */
+    getTotalAngle: function () {
+      return fabric.util.qrDecompose(this.calcTransformMatrix()).angle;
+    },
+
+    /**
      * @private
      * @param {String} key
      * @param {*} value
@@ -16221,26 +16281,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
-     * Returns coordinates of a pointer relative to an object
-     * @param {Event} e Event to operate upon
-     * @param {Object} [pointer] Pointer to operate upon (instead of event)
-     * @return {Object} Coordinates of a pointer (x, y)
-     */
-    getLocalPointer: function(e, pointer) {
-      pointer = pointer || this.canvas.getPointer(e);
-      var pClicked = new fabric.Point(pointer.x, pointer.y),
-          objectLeftTop = this._getLeftTopCoords();
-      if (this.angle) {
-        pClicked = fabric.util.rotatePoint(
-          pClicked, objectLeftTop, degreesToRadians(-this.angle));
-      }
-      return {
-        x: pClicked.x - objectLeftTop.x,
-        y: pClicked.y - objectLeftTop.y
-      };
-    },
-
-    /**
      * Sets canvas globalCompositeOperation for specific object
      * custom composition operation for the particular object can be specified using globalCompositeOperation property
      * @param {CanvasRenderingContext2D} ctx Rendering canvas context
@@ -16253,6 +16293,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * cancel instance's running animations
+     * override if necessary to dispose artifacts such as `clipPath`
      */
     dispose: function () {
       if (fabric.runningAnimations) {
@@ -16442,16 +16483,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     /**
-     * Returns the point in local coordinates
-     * @param {fabric.Point} point The point relative to the global coordinate system
+     * Returns the normalized point (rotated relative to center) in local coordinates
+     * @param {fabric.Point} point The point relative to instance coordinate system
      * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
      * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
-    toLocalPoint: function(point, originX, originY) {
-      var center = this.getCenterPoint(),
-          p, p2;
-
+    normalizePoint: function(point, originX, originY) {
+      var center = this.getCenterPoint(), p, p2;
       if (typeof originX !== 'undefined' && typeof originY !== 'undefined' ) {
         p = this.translateToGivenOrigin(center, 'center', 'center', originX, originY);
       }
@@ -16464,6 +16503,20 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         p2 = fabric.util.rotatePoint(p2, center, -degreesToRadians(this.angle));
       }
       return p2.subtractEquals(p);
+    },
+
+    /**
+     * Returns coordinates of a pointer relative to object's top left corner in object's plane
+     * @param {Event} e Event to operate upon
+     * @param {Object} [pointer] Pointer to operate upon (instead of event)
+     * @return {Object} Coordinates of a pointer (x, y)
+     */
+    getLocalPointer: function (e, pointer) {
+      pointer = pointer || this.canvas.getPointer(e);
+      return fabric.util.transformPoint(
+        new fabric.Point(pointer.x, pointer.y),
+        fabric.util.invertTransform(this.calcTransformMatrix())
+      ).addEquals(new fabric.Point(this.width / 2, this.height / 2));
     },
 
     /**
@@ -16637,6 +16690,107 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     controls: { },
 
     /**
+     * @returns {number} x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
+     */
+    getX: function () {
+      return this.getXY().x;
+    },
+
+    /**
+     * @param {number} value x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
+     */
+    setX: function (value) {
+      this.setXY(this.getXY().setX(value));
+    },
+
+    /**
+     * @returns {number} x position according to object's {@link fabric.Object#originX} property in parent's coordinate plane\
+     * if parent is canvas then this property is identical to {@link fabric.Object#getX}
+     */
+    getRelativeX: function () {
+      return this.left;
+    },
+
+    /**
+     * @param {number} value x position according to object's {@link fabric.Object#originX} property in parent's coordinate plane\
+     * if parent is canvas then this method is identical to {@link fabric.Object#setX}
+     */
+    setRelativeX: function (value) {
+      this.left = value;
+    },
+
+    /**
+     * @returns {number} y position according to object's {@link fabric.Object#originY} property in canvas coordinate plane
+     */
+    getY: function () {
+      return this.getXY().y;
+    },
+
+    /**
+     * @param {number} value y position according to object's {@link fabric.Object#originY} property in canvas coordinate plane
+     */
+    setY: function (value) {
+      this.setXY(this.getXY().setY(value));
+    },
+
+    /**
+     * @returns {number} y position according to object's {@link fabric.Object#originY} property in parent's coordinate plane\
+     * if parent is canvas then this property is identical to {@link fabric.Object#getY}
+     */
+    getRelativeY: function () {
+      return this.top;
+    },
+
+    /**
+     * @param {number} value y position according to object's {@link fabric.Object#originY} property in parent's coordinate plane\
+     * if parent is canvas then this property is identical to {@link fabric.Object#setY}
+     */
+    setRelativeY: function (value) {
+      this.top = value;
+    },
+
+    /**
+     * @returns {number} x position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in canvas coordinate plane
+     */
+    getXY: function () {
+      var relativePosition = this.getRelativeXY();
+      return this.group ?
+        fabric.util.transformPoint(relativePosition, this.group.calcTransformMatrix()) :
+        relativePosition;
+    },
+
+    /**
+     * @param {fabric.Point} point position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in canvas coordinate plane
+     * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
+     * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
+     */
+    setXY: function (point, originX, originY) {
+      if (this.group) {
+        point = fabric.util.transformPoint(
+          point,
+          fabric.util.invertTransform(this.group.calcTransformMatrix())
+        );
+      }
+      this.setRelativeXY(point, originX, originY);
+    },
+
+    /**
+     * @returns {number} x position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
+     */
+    getRelativeXY: function () {
+      return new fabric.Point(this.left, this.top);
+    },
+
+    /**
+     * @param {fabric.Point} point position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
+     * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
+     * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
+     */
+    setRelativeXY: function (point, originX, originY) {
+      this.setPositionByOrigin(point, originX || this.originX, originY || this.originY);
+    },
+
+    /**
      * return correct set of coordinates for intersection
      * this will return either aCoords or lineCoords.
      * @param {Boolean} absolute will return aCoords if true or lineCoords
@@ -16658,8 +16812,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * The coords are returned in an array.
      * @return {Array} [tl, tr, br, bl] of points
      */
-    getCoords: function(absolute, calculate) {
-      return arrayFromCoords(this._getCoords(absolute, calculate));
+    getCoords: function (absolute, calculate) {
+      var coords = arrayFromCoords(this._getCoords(absolute, calculate));
+      if (this.group) {
+        var t = this.group.calcTransformMatrix();
+        return coords.map(function (p) {
+          return util.transformPoint(p, t);
+        });
+      }
+      return coords;
     },
 
     /**
@@ -17256,6 +17417,85 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
   /**
+     * Checks if object is decendant of target
+     * Should be used instead of @link {fabric.Collection.contains} for performance reasons
+     * @param {fabric.Object|fabric.StaticCanvas} target
+     * @returns {boolean}
+     */
+  isDescendantOf: function (target) {
+    var parent = this.group || this.canvas;
+    while (parent) {
+      if (target === parent) {
+        return true;
+      }
+      else if (parent instanceof fabric.StaticCanvas) {
+        //  happens after all parents were traversed through without a match
+        return false;
+      }
+      parent = parent.group || parent.canvas;
+    }
+    return false;
+  },
+
+  /**
+     *
+     * @returns {(fabric.Object | fabric.StaticCanvas)[]} ancestors from bottom to top
+     */
+  getAncestors: function () {
+    var ancestors = [];
+    var parent = this.group || this.canvas;
+    while (parent) {
+      ancestors.push(parent);
+      parent = parent.group || parent.canvas;
+    }
+    return ancestors;
+  },
+
+  /**
+     *
+     * @param {fabric.Object} other
+     * @returns {{ index: number, otherIndex: number, ancestors: fabric.Object[] }} ancestors may include the passed objects if one is an ancestor of the other resulting in index of -1
+     */
+  findCommonAncestors: function (other) {
+    if (this === other) {
+      return true;
+    }
+    else if (!other) {
+      return false;
+    }
+    var ancestors = this.getAncestors();
+    ancestors.unshift(this);
+    var otherAncestors = other.getAncestors();
+    otherAncestors.unshift(other);
+    for (var i = 0, ancestor; i < ancestors.length; i++) {
+      ancestor = ancestors[i];
+      for (var j = 0; j < otherAncestors.length; j++) {
+        if (ancestor === otherAncestors[j] && !(ancestor instanceof fabric.StaticCanvas)) {
+          return {
+            index: i - 1,
+            otherIndex: j - 1,
+            ancestors: ancestors.slice(i)
+          };
+        }
+      }
+    }
+  },
+
+  /**
+     *
+     * @param {fabric.Object} other
+     * @returns {boolean}
+     */
+  hasCommonAncestors: function (other) {
+    return !!this.findCommonAncestors(other);
+  }
+
+});
+
+
+fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
+
+  /**
    * Moves an object to the bottom of the stack of drawn objects
    * @return {fabric.Object} thisArg
    * @chainable
@@ -17331,6 +17571,49 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this.canvas.moveTo(this, index);
     }
     return this;
+  },
+
+  /**
+   *
+   * @param {fabric.Object} other object to compare against
+   * @returns {boolean | undefined} if objects do not share a common ancestor or they are strictly equal it is impossible to determine which is in front of the other; in such cases the function returns `undefined`
+   */
+  isInFrontOf: function (other) {
+    if (this === other) {
+      return undefined;
+    }
+    var ancestors = this.getAncestors().reverse().concat(this);
+    var otherAncestors = other.getAncestors().reverse().concat(other);
+    var i, j, found = false;
+    //  find the common ancestor
+    for (i = 0; i < ancestors.length; i++) {
+      for (j = 0; j < otherAncestors.length; j++) {
+        if (ancestors[i] === otherAncestors[j]) {
+          found = true;
+          break;
+        }
+      }
+      if (found) {
+        break;
+      }
+    }
+    if (!found) {
+      return undefined;
+    }
+    //  compare trees from the common ancestor down
+    var tree = ancestors.slice(i),
+        otherTree = otherAncestors.slice(j),
+        a, b, parent;
+    for (i = 1; i < Math.min(tree.length, otherTree.length); i++) {
+      a = tree[i];
+      b = otherTree[i];
+      if (a !== b) {
+        parent = tree[i - 1];
+        return parent._objects.indexOf(a) > parent._objects.indexOf(b);
+      }
+    }
+    //  happens if a is ancestor of b or vice versa
+    return tree.length > otherTree.length;
   }
 });
 
@@ -17716,14 +17999,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
     _findTargetCorner: function(pointer, forTouch) {
-      // objects in group, anykind, are not self modificable,
-      // must not return an hovered corner.
-      if (!this.hasControls || this.group || (!this.canvas || this.canvas._activeObject !== this)) {
+      if (!this.hasControls || (!this.canvas || this.canvas._activeObject !== this)) {
         return false;
       }
-
-      var ex = pointer.x,
-          ey = pointer.y,
+      //  transform pointer to target's containing coordinate plane
+      //  both agree on every point
+      var p = this.group ?
+        fabric.util.transformPoint(pointer, fabric.util.invertTransform(this.group.calcTransformMatrix())) :
+        pointer;
+      var ex = p.x,
+          ey = p.y,
           xPoints,
           lines, keys = Object.keys(this.oCoords),
           j = keys.length - 1, i;
@@ -17834,8 +18119,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           width = wh.x + strokeWidth,
           height = wh.y + strokeWidth,
           hasControls = typeof styleOverride.hasControls !== 'undefined' ?
-            styleOverride.hasControls : this.hasControls,
-          shouldStroke = false;
+            styleOverride.hasControls : this.hasControls;
 
       ctx.save();
       ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
@@ -17847,26 +18131,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         width,
         height
       );
+      hasControls && this.drawControlsConnectingLines(ctx);
 
-      if (hasControls) {
-        ctx.beginPath();
-        this.forEachControl(function(control, key, fabricObject) {
-          // in this moment, the ctx is centered on the object.
-          // width and height of the above function are the size of the bbox.
-          if (control.withConnection && control.getVisibility(fabricObject, key)) {
-            // reset movement for each control
-            shouldStroke = true;
-            ctx.moveTo(control.x * width, control.y * height);
-            ctx.lineTo(
-              control.x * width + control.offsetX,
-              control.y * height + control.offsetY
-            );
-          }
-        });
-        if (shouldStroke) {
-          ctx.stroke();
-        }
-      }
       ctx.restore();
       return this;
     },
@@ -17890,7 +18156,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
           width =
             bbox.x + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleX) + borderScaleFactor,
           height =
-            bbox.y + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor;
+            bbox.y + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor,
+          hasControls = typeof styleOverride.hasControls !== 'undefined' ?
+            styleOverride.hasControls : this.hasControls;
       ctx.save();
       this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray);
       ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
@@ -17900,8 +18168,43 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         width,
         height
       );
+      hasControls && this.drawControlsConnectingLines(ctx);
 
       ctx.restore();
+      return this;
+    },
+
+    /**
+     * Draws lines from a borders of an object's bounding box to controls that have `withConnection` property set.
+     * Requires public properties: width, height
+     * Requires public options: padding, borderColor
+     * @param {CanvasRenderingContext2D} ctx Context to draw on
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    drawControlsConnectingLines: function (ctx) {
+      var wh = this._calculateCurrentDimensions(),
+          strokeWidth = this.borderScaleFactor,
+          width = wh.x + strokeWidth,
+          height = wh.y + strokeWidth,
+          shouldStroke = false;
+
+      ctx.beginPath();
+      this.forEachControl(function (control, key, fabricObject) {
+        // in this moment, the ctx is centered on the object.
+        // width and height of the above function are the size of the bbox.
+        if (control.withConnection && control.getVisibility(fabricObject, key)) {
+          // reset movement for each control
+          shouldStroke = true;
+          ctx.moveTo(control.x * width, control.y * height);
+          ctx.lineTo(
+            control.x * width + control.offsetX,
+            control.y * height + control.offsetY
+          );
+        }
+      });
+      shouldStroke && ctx.stroke();
+
       return this;
     },
 
@@ -20033,7 +20336,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @type Boolean
      * @default
      */
-    subTargetCheck: false,
+    subTargetCheck: true,
 
     /**
      * Groups are container, do not render anything on theyr own, ence no cache properties
@@ -20100,9 +20403,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @private
      */
     _updateObjectsACoords: function() {
-      var skipControls = true;
       for (var i = this._objects.length; i--; ){
-        this._objects[i].setCoords(skipControls);
+        this._objects[i].setCoords();
       }
     },
 
@@ -20123,16 +20425,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {fabric.Point} center, current center of group.
      */
     _updateObjectCoords: function(object, center) {
-      var objectLeft = object.left,
-          objectTop = object.top,
-          skipControls = true;
-
+      var objectLeft = object.left, objectTop = object.top;
       object.set({
         left: objectLeft - center.x,
         top: objectTop - center.y
       });
       object.group = this;
-      object.setCoords(skipControls);
+      object.setCoords();
     },
 
     /**
@@ -29402,7 +29701,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   mouseUpHandler: function(options) {
     this.__isMousedown = false;
-    if (!this.editable || this.group ||
+    if (!this.editable ||
       (options.transform && options.transform.actionPerformed) ||
       (options.e.button && options.e.button !== 1)) {
       return;
