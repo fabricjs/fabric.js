@@ -130,54 +130,6 @@
         return this;
       },
 
-      /**
-       * Applies the matrix diff on all objects.
-       * @private
-       * @param {number[]} from The matrix objects are curretly relating to
-       * @param {number[]} to The matrix objects should relate to
-       */
-      _applyMatrixDiffToObjects: function (from, to) {
-        var invTransform = invertTransform(from);
-        this.forEachObject(function (object) {
-          var objectTransform = multiplyTransformMatrices(invTransform, object.calcTransformMatrix());
-          applyTransformToObject(object, multiplyTransformMatrices(to, objectTransform));
-          object.setCoords();
-        });
-      },
-
-      /**
-       * Use the matrix diff to keep clip path in place after resizing instance by applying the inverted diff to it
-       * @private
-       */
-      _applyMatrixDiffToClipPath: function () {
-        var clipPath = this.clipPath;
-        if (clipPath && !clipPath.absolutePositioned
-          && this.prevMatrixCache && this.ownMatrixCache.key !== this.prevMatrixCache.key) {
-          var from = this.prevMatrixCache.cache, to = this.calcOwnMatrix();
-          var transformDiff = multiplyTransformMatrices(invertTransform(to), from);
-          applyTransformToObject(clipPath, multiplyTransformMatrices(transformDiff, clipPath.calcTransformMatrix()));
-        }
-      },
-
-      /**
-       * Compares changes made to the transform matrix and applies them to instance's objects.
-       * In other words, call this method to make the current transform the starting point of a transform diff for objects.
-       * @param {boolean} [disablePropagation] disable propagation of current transform diff to objects, preventing the existing transform diff from being applied to them unnecessarily.
-       */
-      _applyMatrixDiff: function (disablePropagation) {
-        var key = this.ownMatrixCache && this.ownMatrixCache.key;
-        if ((!this.prevMatrixCache || this.prevMatrixCache.key !== key) && this.subTargetCheck) {
-          var transform = this.calcOwnMatrix();
-          if (this.prevMatrixCache && !disablePropagation) {
-            this._applyMatrixDiffToObjects(this.prevMatrixCache.cache, transform);
-          }
-          this.prevMatrixCache = {
-            key: this.ownMatrixCache.key,
-            cache: transform
-          };
-        }
-      },
-
       add: function () {
         this.onBeforeObjectsChange();
         fabric.Collection.add.apply(this, arguments);
