@@ -815,10 +815,6 @@
      */
     setOptions: function(options) {
       this._setOptions(options);
-      this._initGradient(options.fill, 'fill');
-      this._initGradient(options.stroke, 'stroke');
-      this._initPattern(options.fill, 'fill');
-      this._initPattern(options.stroke, 'stroke');
     },
 
     /**
@@ -1977,17 +1973,10 @@
   fabric.Object.ENLIVEN_PROPS = ['clipPath'];
 
   fabric.Object._fromObject = function(className, object, extraParam) {
-    var klass = fabric[className], serializedObject = clone(object, true),
-        fill = serializedObject.fill, stroke = serializedObject.stroke;
-    var promises = [
-      fill && fill.source ? fabric.Pattern.fromObject(fill) : fill,
-      stroke && stroke.source ? fabric.Pattern.fromObject(stroke) : stroke,
-      fabric.util.enlivenObjectEnlivables(serializedObject, serializedObject),
-    ];
-    return Promise.all(promises).then(function(allTheThings) {
-      serializedObject.fill = allTheThings[0];
-      serializedObject.stroke = allTheThings[1];
-      return extraParam ? new klass(object[extraParam], serializedObject) : new klass(object);
+    var klass = fabric[className], serializedObject = clone(object, true);
+    return fabric.util.enlivenObjectEnlivables(serializedObject).then(function(enlivedMap) {
+      var newObject = Object.assign(object, enlivedMap);
+      return extraParam ? new klass(object[extraParam], newObject) : new klass(newObject);
     });
   };
 

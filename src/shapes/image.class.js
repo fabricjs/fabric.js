@@ -589,22 +589,6 @@
 
     /**
      * @private
-     * @param {Array} filters to be initialized
-     * @param {Function} callback Callback to invoke when all fabric.Image.filters instances are created
-     */
-    _initFilters: function(filters, callback) {
-      if (filters && filters.length) {
-        fabric.util.enlivenObjects(filters, function(enlivenedObjects) {
-          callback && callback(enlivenedObjects);
-        }, 'fabric.Image.filters');
-      }
-      else {
-        callback && callback();
-      }
-    },
-
-    /**
-     * @private
      * Set the width and the height of the image object, using the element or the
      * options.
      * @param {Object} [options] Object with width/height properties
@@ -704,18 +688,16 @@
    */
   fabric.Image.fromObject = function(_object) {
     var object = fabric.util.object.clone(_object);
-    return fabric.util.loadImage(object.src, { crossOrigin: _object.crossOrigin })
-      .then(function(img) {
-        // this is obviously broken for now. need to refactor a bit
-        fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
-          object.filters = filters || [];
-          fabric.Image.prototype._initFilters.call(object, [object.resizeFilter], function(resizeFilters) {
-            object.resizeFilter = resizeFilters[0];
-            fabric.util.enlivenObjectEnlivables(object, object, function () {
-              return new fabric.Image(img, object);
-            });
-          });
-        });
+    return Promise.all([
+      fabric.util.loadImage(object.src, { crossOrigin: _object.crossOrigin }),
+      object.filters && fabric.util.enlivenObjects(object.filters,  'fabric.Image.filters'),
+      object.resizeFilter && fabric.util.enlivenObjects([object.resizeFilter],  'fabric.Image.filters'),
+    ])
+      .then(function(imgAndFilters) {
+        object.filters = imgAndFilters[1] || [];
+        object.resizeFilter = imgAndFilters[2] && imgAndFilters[2][0];
+        object._originalElement = imgAndFilters[0];
+        return fabric.Object._fromObject('Image', object, '_originalElement');
       });
   };
 

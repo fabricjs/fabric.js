@@ -532,21 +532,40 @@
 
     /**
      * Creates corresponding fabric instances residing in an object, e.g. `clipPath`
-     * @see {@link fabric.Object.ENLIVEN_PROPS}
-     * @param {Object} object
-     * @param {Object} [context] assign enlived props to this object (pass null to skip this)
-     * @returns {Promise<fabric.Path>}
+     * @param {Object} object with properties to enlive ( fill, stroke, clipPath, path )
+     * @returns {Promise<object>} the input object with enlived values
      */
-    enlivenObjectEnlivables: function (object, context) {
-      var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key]; });
-      return fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key]; })).then(
-        function(enlivedProps) {
-          context && enlivenProps.forEach(function (key, index) {
-            context[key] = enlivedProps[index];
-          });
-          return enlivedProps;
+
+    enlivenObjectEnlivables: function (serializedObject) {
+      // enlive gradients or patterns
+      var enliven = {};
+      ['fill', 'stroke', 'backgroundColor', 'overlayColor', 'path', 'clipPath', 'backgroundImage', 'overlayImage'].forEach(function(prop) {
+        var value = serializedObject[prop];
+        if (!value) {
+          return;
         }
-      );
+        if (value.colorStops) {
+          enliven[prop] = new fabric.Gradient(value);
+          return;
+        }
+        if (value.type) {
+          enliven[prop] = fabric.util.enlivenObjects([value]);
+          return
+        }
+        if (value.source) {
+          enliven[prop] = fabric.Pattern.fromObject(value);
+          return;
+        }
+        enliven[prop] = value;
+      });
+      var promises = Object.values(enliven);
+      var keys = Object.keys(enliven);
+      return Promise.all(promises).then(function(enlived) {
+        return keys.reduce(function(acc, element, index) {
+          acc[keys[index]] = enlived[index];
+          return acc;
+        }, {});
+      });
     },
 
     /**

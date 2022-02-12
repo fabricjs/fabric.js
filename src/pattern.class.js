@@ -51,6 +51,8 @@
      */
     patternTransform: null,
 
+    type: 'pattern',
+
     /**
      * Constructor
      * @param {Object} [options] Options object

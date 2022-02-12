@@ -30,29 +30,27 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       : fabric.util.object.clone(json);
 
     var _this = this,
-        clipPath = serialized.clipPath,
-        backgroundImage = serialized.backgroundImage,
-        overlayImage = serialized.overlayImage,
         renderOnAddRemove = this.renderOnAddRemove;
 
     this.renderOnAddRemove = false;
 
     delete serialized.clipPath;
-    return Promise.all([
-      fabric.util.enlivenObjects(serialized.objects || [], '', reviver),
-      backgroundImage && fabric.util.enlivenObjects([backgroundImage], '', reviver),
-      overlayImage && fabric.util.enlivenObjects([overlayImage], '', reviver),
-      clipPath && fabric.util.enlivenObjects([clipPath], '', reviver),
-    ]).then(function(enlived) {
-      _this.clear();
-      _this.clipPath = enlived[3];
-      _this.backgroundImage = enlived[1];
-      _this.overlayImage = enlived[2];
-      _this.__setBgOverlay('backgroundColor', serialized.background);
-      _this.__setBgOverlay('overlayColor', serialized.overlay);
-      _this.__setupCanvas(serialized, enlived[0], renderOnAddRemove);
-      return _this;
-    });
+    return fabric.util.enlivenObjects(serialized.objects || [], '', reviver)
+      .then(function(enlived) {
+        _this.clear();
+        return fabric.util.enlivenObjectEnlivables({
+          backgroundImage: serialized.backgroundImage,
+          backgroundColor: serialized.background,
+          overlayImage: serialized.overlayImage,
+          overlayColor: serialized.overlay,
+          clipPath: serialized.clipPath,
+        })
+          .then(function(enlivedMap) {
+            _this.set(enlivedMap);
+            _this.__setupCanvas(serialized, enlived, renderOnAddRemove);
+            return _this;
+          });
+      });
   },
 
   /**
