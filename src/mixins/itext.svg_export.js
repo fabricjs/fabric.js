@@ -53,6 +53,7 @@
         (this.fontStyle ? 'font-style="' + this.fontStyle + '" ' : ''),
         (this.fontWeight ? 'font-weight="' + this.fontWeight + '" ' : ''),
         (textDecoration ? 'text-decoration="' + textDecoration + '" ' : ''),
+        (this.direction === 'rtl' ? 'direction="' + this.direction + '" ' : ''),
         'style="', this.getSvgStyles(noShadow), '"', this.addPaintOrder(), ' >',
         textAndBg.textSpans.join(''),
         '</text>\n'
@@ -75,6 +76,9 @@
       // text and text-background
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         lineOffset = this._getLineLeftOffset(i);
+        if (this.direction === 'rtl') {
+          lineOffset += this.width;
+        }
         if (this.textBackgroundColor || this.styleHas('textBackgroundColor', i)) {
           this._setSVGTextLineBg(textBgRects, i, textLeftOffset + lineOffset, height);
         }
