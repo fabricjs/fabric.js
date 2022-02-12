@@ -37,7 +37,7 @@
       /**
        * Specifies the **layout strategy** for instance
        * Used by `getLayoutStrategyResult` to calculate layout
-       * `fit-content`, `fixed` are supported out of the box
+       * `fit-content`, `fixed`, `clip-path` are supported out of the box
        * @type string
        * @default
        */
@@ -98,7 +98,14 @@
         this.forEachObject(function (object) {
           this.enterGroup(object, objectsRelativeToGroup);
         }, this);
-        this._applyLayoutStrategy({ type: 'initialization', options: options });
+        var center = options && (typeof options.left !== 'undefined' || typeof options.top !== 'undefined') ?
+          this.translateToCenterPoint(
+            new fabric.Point(this.left || 0, this.top || 0),
+            typeof options.originX !== 'undefined' ? options.originX : this.originX,
+            typeof options.originY !== 'undefined' ? options.originY : this.originY
+          ) :
+          undefined;
+        this._applyLayoutStrategy({ type: 'initialization', options: options, center: center });
       },
 
       /**
@@ -498,17 +505,41 @@
           return bbox;
         }
         else if (layoutDirective === 'fixed' && context.type === 'initialization') {
-          if (context.options
-            && (typeof context.options.left !== 'undefined' || typeof context.options.top !== 'undefined')) {
-            var center = this.translateToCenterPoint(
-              new fabric.Point(this.left || 0, this.top || 0),
-              typeof context.options.originX !== 'undefined' ? context.options.originX : this.originX,
-              typeof context.options.originY !== 'undefined' ? context.options.originY : this.originY
-            );
-            bbox.centerX = center.x;
-            bbox.centerY = center.y;
+          if (context.center) {
+            bbox.centerX = context.center.x;
+            bbox.centerY = context.center.y;
           }
           return bbox;
+        }
+        else if (layoutDirective === 'clip-path' && this.clipPath) {
+          var clipPath = this.clipPath;
+          var clipPathCenter = clipPath.getCenterPoint();
+          if (clipPath.absolutePositioned && context.type === 'initialization') {
+            return {
+              centerX: clipPathCenter.x,
+              centerY: clipPathCenter.y,
+              width: clipPath.width,
+              height: clipPath.height,
+            };
+          }
+          else if (!clipPath.absolutePositioned && context.type === 'initialization') {
+            if (context.center) {
+              bbox.centerX = context.center.x;
+              bbox.centerY = context.center.y;
+            }
+            bbox.width = clipPath.width;
+            bbox.height = clipPath.height;
+            return bbox;
+          }
+          else if (!clipPath.absolutePositioned) {
+            var center = this.getCenterPoint();
+            return {
+              centerX: center.x + clipPathCenter.x,
+              centerY: center.y + clipPathCenter.y,
+              width: clipPath.width,
+              height: clipPath.height,
+            };
+          }
         }
       },
 
