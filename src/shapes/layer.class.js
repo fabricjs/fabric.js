@@ -139,7 +139,7 @@
      * @returns {Object} options object
      */
     getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
-      if ((context.type === 'canvas' || context.type === 'canvas_resize') && this.canvas) {
+      if ((context.type === 'canvas' || context.type === 'canvas_resize') && this.canvas && !this.group) {
         return {
           centerX: this.canvas.width / 2,
           centerY: this.canvas.height / 2,
@@ -152,6 +152,11 @@
     toString: function () {
       return '#<fabric.Layer: (' + this.complexity() + ')>';
     },
+
+    dispose: function () {
+      this.canvas && this.canvas.off('resize', this.__canvasMonitor);
+      this.callSuper('dispose');
+    }
 
   });
 
