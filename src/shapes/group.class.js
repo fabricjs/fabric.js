@@ -173,26 +173,25 @@
         this.onBeforeObjectsChange();
         fabric.Collection.add.apply(this, arguments);
         this._onAfterObjectsChange('added', arguments);
-        return this;
       },
 
       insertAt: function () {
         this.onBeforeObjectsChange();
         fabric.Collection.insertAt.apply(this, arguments);
         this._onAfterObjectsChange('added', arguments);
-        return this;
       },
 
       remove: function () {
         this.onBeforeObjectsChange();
         fabric.Collection.remove.apply(this, arguments);
         this._onAfterObjectsChange('removed', arguments);
-        return this;
       },
 
       removeAll: function () {
         this._activeObjects = [];
-        return this.remove.apply(this, this._objects);
+        var remove = this._objects.slice();
+        this.remove.apply(this, this._objects);
+        return remove;
       },
 
       /**
@@ -298,6 +297,8 @@
        * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
        */
       exitGroup: function (object, removeParentTransform) {
+        delete object.canvas;
+        delete object.group;
         if (!removeParentTransform) {
           applyTransformToObject(
             object,
@@ -308,8 +309,6 @@
           );
           object.setCoords();
         }
-        delete object.canvas;
-        delete object.group;
         this._watchObject(false, object);
         var index = this._activeObjects.length > 0 ? this._activeObjects.indexOf(object) : -1;
         if (index > -1) {
@@ -443,7 +442,7 @@
           fabric.util.invertTransform(transform),
           true
         );
-        //  adjust objects to new center
+        //  adjust objects to account for new center
         context.type !== 'initialization' && this.forEachObject(function (object) {
           object.set({
             left: object.left + diff.x,
@@ -588,57 +587,13 @@
        * @return {Object} object representation of an instance
        */
       toObject: function (propertiesToInclude) {
-        var obj = fabric.Object.prototype.toObject.call(this, ['layout'].concat(propertiesToInclude));
+        var obj = this.callSuper('toObject', ['layout'].concat(propertiesToInclude));
         obj.objects = this.__serializeObjects('toObject', propertiesToInclude);
-        return obj;
-      },
-
-      /**
-       * Returns object representation of an instance, in dataless mode.
-       * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
-       * @return {Object} object representation of an instance
-       */
-      toDatalessObject: function (propertiesToInclude) {
-        var obj = fabric.Object.prototype.toDatalessObject.call(this, ['layout'].propertiesToInclude);
-        obj.objects = this.sourcePath || this.__serializeObjects('toDatalessObject', propertiesToInclude);
         return obj;
       },
 
       toString: function () {
         return '#<fabric.Group: (' + this.complexity() + ')>';
-      },
-
-      /**
-       * make a group an active selection, remove the group from canvas
-       * the group has to be on canvas for this to work.
-       * @return {fabric.ActiveSelection} thisArg
-       * @chainable
-       */
-      toActiveSelection: function () {
-        throw new Error('not implemented');
-        /*
-        if (!this.canvas) {
-          return;
-        }
-        var objects = this._objects, canvas = this.canvas;
-        this._objects = [];
-        var options = this.toObject();
-        delete options.objects;
-        var activeSelection = new fabric.ActiveSelection([]);
-        activeSelection.set(options);
-        activeSelection.type = 'activeSelection';
-        canvas.remove(this);
-        objects.forEach(function (object) {
-          object.group = activeSelection;
-          object.dirty = true;
-          canvas.add(object);
-        });
-        activeSelection.canvas = canvas;
-        activeSelection._objects = objects;
-        canvas._activeObject = activeSelection;
-        activeSelection.setCoords();
-        return activeSelection;
-        */
       },
 
       dispose: function () {
