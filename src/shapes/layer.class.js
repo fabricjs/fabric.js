@@ -67,6 +67,14 @@
     lockMovementY: true,
 
     /**
+     * we don't want to int with the layer, only with it's objects
+     * this makes group selection possible over a layer
+     * @override
+     * @default
+     */
+    selectable: false,
+
+    /**
      * Constructor
      *
      * @param {fabric.Object[]} [objects] instance objects
