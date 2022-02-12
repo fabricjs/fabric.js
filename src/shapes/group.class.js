@@ -84,9 +84,10 @@
        *
        * @param {fabric.Object[]} [objects] instance objects
        * @param {Object} [options] Options object
+       * @param {boolean} [objectsRelativeToGroup] true if objects exist in group coordinate plane
        * @return {fabric.Group} thisArg
        */
-      initialize: function (objects, options) {
+      initialize: function (objects, options, objectsRelativeToGroup) {
         this._objects = objects || [];
         this._activeObjects = [];
         this.__objectMonitor = this.__objectMonitor.bind(this);
@@ -94,7 +95,7 @@
         this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
         this.callSuper('initialize', options);
         this.forEachObject(function (object) {
-          this.enterGroup(object);
+          this.enterGroup(object, objectsRelativeToGroup);
         }, this);
         this._applyLayoutStrategy({ type: 'initializion', options: options });
       },
