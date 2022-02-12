@@ -25,6 +25,29 @@
     type: 'activeSelection',
 
     /**
+     * @override
+     */
+    layout: 'fit-content',
+
+    /**
+     * @override
+     */
+    subTargetCheck: true,
+
+    /**
+     * Constructor
+     *
+     * @param {fabric.Object[]} [objects] instance objects
+     * @param {Object} [options] Options object
+     * @param {boolean} [objectsRelativeToGroup] true if objects exist in group coordinate plane
+     * @return {fabric.ActiveSelection} thisArg
+     */
+    initialize: function (objects, options, objectsRelativeToGroup) {
+      this.callSuper('initialize', objects, options, objectsRelativeToGroup);
+      this.setCoords();
+    },
+
+    /**
      * Change te activeSelection to a normal group,
      * High level function that automatically adds it to canvas as
      * active object. no events fired.
