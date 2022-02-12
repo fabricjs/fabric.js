@@ -46,7 +46,6 @@
       this._calcBounds();
       this._updateObjectsCoords();
       fabric.Object.prototype.initialize.call(this, options);
-      this._updateObjectsCoords();
       this.setCoords();
     },
 
