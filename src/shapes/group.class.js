@@ -427,6 +427,19 @@
 
       /**
        * @private
+       * @param {fabric.Object} object 
+       * @param {fabric.Point} diff 
+       */
+      _adjustObjectPosition: function (object, diff) {
+        object.set({
+          left: object.left + diff.x,
+          top: object.top + diff.y,
+        });
+        object.setCoords();
+      },
+
+      /**
+       * @private
        * @param {object} context see `getLayoutStrategyResult`
        */
       _applyLayoutStrategy: function (context) {
@@ -445,16 +458,12 @@
           true
         );
         //  adjust objects to account for new center
-        var objects = this._objects.slice();
+        this.forEachObject(function (object) {
+          this._adjustObjectPosition(object, diff);
+        }, this);
+        //  clip path as well
         context.type !== 'initialization' && this.clipPath && !this.clipPath.absolutePositioned
-          && objects.push(this.clipPath);
-        objects.forEach(function (object) {
-          object.set({
-            left: object.left + diff.x,
-            top: object.top + diff.y,
-          });
-          object.setCoords();
-        });
+          && this._adjustObjectPosition(this.clipPath, diff);
         //  set position
         this.setPositionByOrigin(newCenter, 'center', 'center');
         context.type !== 'initialization' && this.callSuper('setCoords');
