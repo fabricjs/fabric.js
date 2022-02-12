@@ -40,7 +40,7 @@
       var activeSelection = this._activeObject,
           currentActiveObjects = activeSelection._objects.slice(0),
           modified = false;
-      // an object is about to be removed from active selection
+      // target is about to be removed from active selection
       // we make sure it is a direct child of active selection
       if (target.group === activeSelection) {
         activeSelection.removeWithUpdate(target);
@@ -52,7 +52,7 @@
           this._setActiveObject(activeSelection.item(0), e);
         }
       }
-      //  an object is about to be added to active selection
+      //  target is about to be added to active selection
       //  we make sure it is not a already a descendant of active selection
       else if (!target.isDescendantOf(activeSelection)) {
         activeSelection.addWithUpdate(target);
