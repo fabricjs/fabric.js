@@ -566,7 +566,9 @@
         options = fabric.util.object.clone(object, true);
     delete options.objects;
     return fabric.util.enlivenObjects(objects).then(function (enlivenedObjects) {
-      return new fabric.Group(enlivenedObjects, options, true);
+      return fabric.util.enlivenObjectEnlivables(options).then(function(enlivedProps) {
+        return new fabric.Group(enlivenedObjects, Object.assign(options, enlivedProps), true);
+      })
     });
   };
 
