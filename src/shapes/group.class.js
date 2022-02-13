@@ -37,7 +37,7 @@
       /**
        * Specifies the **layout strategy** for instance
        * Used by `getLayoutStrategyResult` to calculate layout
-       * `fit-content`, `fixed`, `clip-path` are supported out of the box
+       * `fit-content`, `fit-content-lazy`, `fixed`, `clip-path` are supported out of the box
        * @type string
        * @default
        */
@@ -97,14 +97,11 @@
         this.forEachObject(function (object) {
           this.enterGroup(object, objectsRelativeToGroup);
         }, this);
-        var center = options && (typeof options.left !== 'undefined' || typeof options.top !== 'undefined') ?
-          this.translateToCenterPoint(
-            new fabric.Point(this.left || 0, this.top || 0),
-            typeof options.originX !== 'undefined' ? options.originX : this.originX,
-            typeof options.originY !== 'undefined' ? options.originY : this.originY
-          ) :
-          undefined;
-        this._applyLayoutStrategy({ type: 'initialization', options: options, center: center });
+        this._applyLayoutStrategy({
+          type: 'initialization',
+          options: options,
+          objectsRelativeToGroup: objectsRelativeToGroup
+        });
       },
 
       /**
@@ -130,21 +127,18 @@
       },
 
       add: function () {
-        this.onBeforeObjectsChange();
         fabric.Collection.add.apply(this, arguments);
-        this._onAfterObjectsChange('added', arguments);
+        this._onAfterObjectsChange('added', Array.from(arguments));
       },
 
       insertAt: function () {
-        this.onBeforeObjectsChange();
         fabric.Collection.insertAt.apply(this, arguments);
-        this._onAfterObjectsChange('added', arguments);
+        this._onAfterObjectsChange('added', Array.from(arguments));
       },
 
       remove: function () {
-        this.onBeforeObjectsChange();
         fabric.Collection.remove.apply(this, arguments);
-        this._onAfterObjectsChange('removed', arguments);
+        this._onAfterObjectsChange('removed', Array.from(arguments));
       },
 
       removeAll: function () {
@@ -168,19 +162,6 @@
        */
       removeWithUpdate: function () {
         this.remove.apply(this, arguments);
-      },
-
-      /**
-       * @private
-       * @param {'added'|'removed'} type
-       * @param {fabric.Object[]} targets
-       */
-      _onAfterObjectsChange: function (type, targets) {
-        this._applyLayoutStrategy({
-          type: type,
-          targets: targets
-        });
-        this._set('dirty', true);
       },
 
       /**
@@ -279,10 +260,16 @@
       },
 
       /**
-       * override this method if necessary
+       * @private
+       * @param {'added'|'removed'} type
+       * @param {fabric.Object[]} targets
        */
-      onBeforeObjectsChange: function () {
-
+      _onAfterObjectsChange: function (type, targets) {
+        this._applyLayoutStrategy({
+          type: type,
+          targets: targets
+        });
+        this._set('dirty', true);
       },
 
       /**
@@ -410,7 +397,7 @@
       _applyLayoutStrategy: function (context) {
         var transform = this.calcTransformMatrix();
         var center = this.getCenterPoint();
-        var result = this.getLayoutStrategyResult(this.layout, this._objects, context);
+        var result = this.getLayoutStrategyResult(this.layout, this._objects.concat(), context);
         if (!result) {
           return;
         }
@@ -461,22 +448,20 @@
        * @param {object} context object with data regarding what triggered the call
        * @param {'initialization'|'object_modified'|'added'|'removed'|'layout_change'|'imperative'} context.type
        * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
-       * @returns {{ centerX: number, centerY: number, width: number, height: number }} positioning data
+       * @returns {{ centerX: number, centerY: number, width: number, height: number } | undefined} positioning data
        */
       getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
-        var bbox = this.getObjectsBoundingBox(objects);
-        if (context.type === 'imperative' && context.context) {
-          Object.assign(bbox, context.context);
+        //  performance enhancement
+        //  skip if instance had no objects before the `added` event because it may have kept layout after removing all previous objects
+        if (layoutDirective === 'fit-content-lazy'
+          && context.type === 'added' && objects.length > context.targets.length) {
+          //  calculate added objects' bbox with existing bbox
+          var objects = context.targets.concat(this);
+          return this.getObjectsBoundingBox(objects);
         }
-        if (layoutDirective === 'fit-content') {
-          return bbox;
-        }
-        else if (layoutDirective === 'fixed' && context.type === 'initialization') {
-          if (context.center) {
-            bbox.centerX = context.center.x;
-            bbox.centerY = context.center.y;
-          }
-          return bbox;
+        else if (layoutDirective === 'fit-content' || layoutDirective === 'fit-content-lazy'
+          || (layoutDirective === 'fixed' && context.type === 'initialization')) {
+          return this.prepareBoundingBox(layoutDirective, objects, context);
         }
         else if (layoutDirective === 'clip-path' && this.clipPath) {
           var clipPath = this.clipPath;
@@ -490,10 +475,10 @@
             };
           }
           else if (!clipPath.absolutePositioned && context.type === 'initialization') {
-            if (context.center) {
-              bbox.centerX = context.center.x;
-              bbox.centerY = context.center.y;
-            }
+            var bbox = this.prepareBoundingBox(layoutDirective, objects, context) || {
+              centerX: clipPathCenter.x,
+              centerY: clipPathCenter.y, 
+            };
             bbox.width = clipPath.width;
             bbox.height = clipPath.height;
             return bbox;
@@ -511,25 +496,80 @@
       },
 
       /**
-       * Hook that is called once layout has completed.
-       * Provided for layout customization, override if necessary.
-       * Complements `getLayoutStrategyResult`, which is called at the beginning of layout.
+       * Override this method to customize layout.
+       * A wrapper around {@link fabric.Group#getObjectsBoundingBox}
        * @public
-       * @param {*} context layout context
-       * @param {Object} result layout result
+       * @param {string} layoutDirective
+       * @param {fabric.Object[]} objects
+       * @param {object} context object with data regarding what triggered the call
+       * @param {'initialization'|'object_modified'|'added'|'removed'|'layout_change'|'imperative'} context.type
+       * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
+       * @returns {{ centerX: number, centerY: number, width: number, height: number } | null} positioning data
        */
-      onLayout: function (/* context, result */) {
-        //  override by subclass
+      prepareBoundingBox: function (layoutDirective, objects, context) {
+        var bbox;
+        if (context.type === 'initialization') {
+          var options = context.options || {};
+          var hasX = typeof options.left === 'number',
+            hasY = typeof options.top === 'number',
+            hasWidth = typeof options.width === 'number',
+            hasHeight = typeof options.height === 'number';
+          var center = hasX || hasY ?
+            this.translateToCenterPoint(
+              new fabric.Point(this.left, this.top),
+              this.originX,
+              this.originY
+            ) :
+            undefined;
+          //  performance enhancement
+          //  skip layout calculation if bbox is defined
+          if (center && hasWidth && hasHeight) {
+            bbox = {
+              centerX: center.x,
+              centerY: center.y,
+              width: this.width,
+              height: this.height
+            };
+          }
+          else if (center || hasWidth || hasHeight || objects.length > 0) {
+            bbox = this.getObjectsBoundingBox(objects) || {
+              centerX: 0,
+              centerY: 0,
+              width: 0,
+              height: 0
+            };
+            if (center) {
+              bbox.centerX = center.x;
+              bbox.centerY = center.y;
+            }
+            if (hasWidth) {
+              bbox.width = this.width;
+            }
+            if (hasHeight) {
+              bbox.height = this.height;
+            }
+          }
+        }
+        else {
+          bbox = this.getObjectsBoundingBox(objects);
+          //  override values
+          if (context.type === 'imperative' && context.context) {
+            bbox = bbox || {};
+            Object.assign(bbox, context.context);
+          }
+        }
+        return bbox;
       },
 
       /**
+       * uses absolute object coords (in canvas coordinate plane)
        * @public
        * @param {fabric.Object[]} objects
        * @returns
        */
       getObjectsBoundingBox: function (objects) {
         if (objects.length === 0) {
-          return {};
+          return null;
         }
         var coords = [];
         for (var i = 0, o; i < objects.length; ++i) {
@@ -568,6 +608,18 @@
           width: width * cos + height * sin,
           height: width * sin + height * cos,
         };
+      },
+
+      /**
+       * Hook that is called once layout has completed.
+       * Provided for layout customization, override if necessary.
+       * Complements `getLayoutStrategyResult`, which is called at the beginning of layout.
+       * @public
+       * @param {*} context layout context
+       * @param {Object} result layout result
+       */
+      onLayout: function (/* context, result */) {
+        //  override by subclass
       },
 
       /**
