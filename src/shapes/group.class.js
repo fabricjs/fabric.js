@@ -111,12 +111,12 @@
       _set: function (key, value) {
         var prev = this[key];
         this.callSuper('_set', key, value);
-        if (key === 'canvas') {
+        if (key === 'canvas' && prev !== value) {
           this.forEachObject(function (object) {
             object._set(key, value);
           });
         }
-        if (key === 'layout' && prev !== this[key]) {
+        if (key === 'layout' && prev !== value) {
           this._applyLayoutStrategy({ type: 'layout_change', layout: value, prevLayout: prev });
         }
         if (key === 'subTargetCheck') {
