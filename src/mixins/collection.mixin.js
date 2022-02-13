@@ -3,16 +3,15 @@
  */
 fabric.Collection = {
 
+  /**
+   * @type {fabric.Object[]}
+   */
   _objects: [],
 
   /**
    * Adds objects to collection, Canvas or Group, then renders canvas
    * (if `renderOnAddRemove` is not `false`).
-   * in case of Group no changes to bounding box are made.
    * Objects should be instances of (or inherit from) fabric.Object
-   * Use of this function is highly discouraged for groups.
-   * you can add a bunch of objects with the add method but then you NEED
-   * to run a addWithUpdate call for the Group class or position/bbox will be wrong.
    * @param {...fabric.Object} object Zero or more fabric instances
    * @return {Self} thisArg
    * @chainable
@@ -24,16 +23,13 @@ fabric.Collection = {
         this._onObjectAdded(arguments[i]);
       }
     }
-    this.renderOnAddRemove && this.requestRenderAll();
+    this.renderOnAddRemove && this.requestRenderAll && this.requestRenderAll();
     return this;
   },
 
   /**
    * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
    * An object should be an instance of (or inherit from) fabric.Object
-   * Use of this function is highly discouraged for groups.
-   * you can add a bunch of objects with the insertAt method but then you NEED
-   * to run a addWithUpdate call for the Group class or position/bbox will be wrong.
    * @param {Object} object Object to insert
    * @param {Number} index Index to insert object at
    * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
@@ -49,7 +45,7 @@ fabric.Collection = {
       objects.splice(index, 0, object);
     }
     this._onObjectAdded && this._onObjectAdded(object);
-    this.renderOnAddRemove && this.requestRenderAll();
+    this.renderOnAddRemove && this.requestRenderAll && this.requestRenderAll();
     return this;
   },
 
@@ -74,7 +70,7 @@ fabric.Collection = {
       }
     }
 
-    this.renderOnAddRemove && somethingRemoved && this.requestRenderAll();
+    this.renderOnAddRemove && somethingRemoved && this.requestRenderAll && this.requestRenderAll();
     return this;
   },
 
@@ -102,16 +98,23 @@ fabric.Collection = {
    * Returns an array of children objects of this instance
    * Type parameter introduced in 1.3.10
    * since 2.3.5 this method return always a COPY of the array;
-   * @param {String} [type] When specified, only objects of this type are returned
+   * @param {String|String[]} [type] When specified, only objects of this type are returned
    * @return {Array}
    */
   getObjects: function(type) {
     if (typeof type === 'undefined') {
       return this._objects.concat();
     }
-    return this._objects.filter(function(o) {
-      return o.type === type;
-    });
+    else if (Array.isArray(type)) {
+      return this._objects.filter(function (o) {
+        return type.indexOf(o.type) > -1;
+      });
+    }
+    else {
+      return this._objects.filter(function (o) {
+        return o.type === type;
+      });
+    }
   },
 
   /**
