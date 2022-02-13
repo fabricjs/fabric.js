@@ -1,3 +1,5 @@
+const { done } = require("qunit");
+
 (function() {
 
   var canvas = fabric.document.createElement('canvas'),
@@ -82,11 +84,14 @@
   });
 
   QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.Brightness();
 
     var object = filter.toObject();
-
-    assert.deepEqual(fabric.Image.filters.Brightness.fromObject(object), filter);
+    fabric.Image.filters.Brightness.fromObject(object).then((newFilter) => {
+      assert.deepEqual(newFilter, filter, 'enlived filter match');
+      done();
+    });
   });
 
   QUnit.test('isNeutralState', function(assert) {
@@ -150,24 +155,30 @@
   });
 
   QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.Composed();
 
     var object = filter.toObject();
-
-    assert.deepEqual(fabric.Image.filters.Composed.fromObject(object), filter);
+    fabric.Image.filters.Composed.fromObject(object).then(function(restoredFilters) {
+      assert.deepEqual(restoredFilters, filter);
+      done();
+    });
   });
 
   QUnit.test('fromObject with subfilters', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.Composed();
     var brightness = new fabric.Image.filters.Brightness();
     var contrast = new fabric.Image.filters.Contrast();
     filter.subFilters.push(brightness);
     filter.subFilters.push(contrast);
     var toObject = filter.toObject();
-    var newFilter = fabric.Image.filters.Composed.fromObject(toObject);
-    assert.ok(newFilter instanceof fabric.Image.filters.Composed, 'should inherit from fabric.Image.filters.Composed');
-    assert.ok(newFilter.subFilters[0] instanceof fabric.Image.filters.Brightness, 'should inherit from fabric.Image.filters.Brightness');
-    assert.ok(newFilter.subFilters[1] instanceof fabric.Image.filters.Contrast, 'should inherit from fabric.Image.filters.Contrast');
+    fabric.Image.filters.Composed.fromObject(toObject).then(function(newFilter){
+      assert.ok(newFilter instanceof fabric.Image.filters.Composed, 'should inherit from fabric.Image.filters.Composed');
+      assert.ok(newFilter.subFilters[0] instanceof fabric.Image.filters.Brightness, 'should inherit from fabric.Image.filters.Brightness');
+      assert.ok(newFilter.subFilters[1] instanceof fabric.Image.filters.Contrast, 'should inherit from fabric.Image.filters.Contrast');
+      done();
+    });
   });
 
   QUnit.test('isNeutralState', function(assert) {
@@ -275,11 +286,14 @@
   });
 
   QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.ColorMatrix();
 
     var object = filter.toObject();
-
-    assert.deepEqual(fabric.Image.filters.ColorMatrix.fromObject(object), filter);
+    fabric.Image.filters.ColorMatrix.fromObject(object).then(function(restoredFilter){
+      assert.deepEqual(restoredFilter, filter);
+      done();
+    });
   });
 
   QUnit.test('isNeutralState', function(assert) {
@@ -359,11 +373,14 @@
   });
 
   QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.HueRotation();
 
     var object = filter.toObject();
-
-    assert.deepEqual(fabric.Image.filters.HueRotation.fromObject(object), filter);
+    fabric.Image.filters.HueRotation.fromObject(object).then(function(restoredFilter){
+      assert.deepEqual(restoredFilter, filter);
+      done();
+    });
   });
 
   QUnit.test('isNeutralState', function(assert) {
@@ -436,11 +453,14 @@
   });
 
   QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.Contrast();
 
     var object = filter.toObject();
-
-    assert.deepEqual(fabric.Image.filters.Contrast.fromObject(object), filter);
+    fabric.Image.filters.Contrast.fromObject(object).then(function(restoredFilter){
+      assert.deepEqual(restoredFilter, filter);
+      done();
+    });
   });
 
   QUnit.test('isNeutralState', function(assert) {
@@ -513,11 +533,14 @@
   });
 
   QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.Saturation();
 
     var object = filter.toObject();
-
-    assert.deepEqual(fabric.Image.filters.Saturation.fromObject(object), filter);
+    fabric.Image.filters.Saturation.fromObject(object).then(function(restoredFilter){
+      assert.deepEqual(restoredFilter, filter);
+      done();
+    });
   });
 
   QUnit.test('isNeutralState', function(assert) {
@@ -590,11 +613,14 @@
   });
 
   QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.Gamma();
 
     var object = filter.toObject();
-
-    assert.deepEqual(fabric.Image.filters.Gamma.fromObject(object), filter);
+    fabric.Image.filters.Gamma.fromObject(object).then(function(restoredFilter){
+      assert.deepEqual(restoredFilter, filter);
+      done();
+    });
   });
 
   QUnit.test('isNeutralState', function(assert) {
@@ -648,11 +674,14 @@
   });
 
   QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.Convolute();
 
     var object = filter.toObject();
-
-    assert.deepEqual(fabric.Image.filters.Convolute.fromObject(object), filter);
+    fabric.Image.filters.Convolute.fromObject(object).then(function(restoredFilter){
+      assert.deepEqual(restoredFilter, filter);
+      done();
+    });
   });
 
   QUnit.test('isNeutralState', function(assert) {
@@ -729,11 +758,14 @@
   });
 
   QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.Grayscale();
 
     var object = filter.toObject();
-
-    assert.deepEqual(fabric.Image.filters.Grayscale.fromObject(object), filter);
+    fabric.Image.filters.Grayscale.fromObject(object).then(function(restoredFilter){
+      assert.deepEqual(restoredFilter, filter);
+      done();
+    });
   });
 
   QUnit.test('isNeutralState', function(assert) {
@@ -789,11 +821,14 @@
   });
 
   QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.Invert();
 
     var object = filter.toObject();
-
-    assert.deepEqual(fabric.Image.filters.Invert.fromObject(object), filter);
+    fabric.Image.filters.Invert.fromObject(object).then(function(restoredFilter){
+      assert.deepEqual(restoredFilter, filter);
+      done();
+    });
   });
 
   QUnit.test('isNeutralState', function(assert) {
@@ -854,11 +889,14 @@
   });
 
   QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.Noise();
 
     var object = filter.toObject();
-
-    assert.deepEqual(fabric.Image.filters.Noise.fromObject(object), filter);
+    fabric.Image.filters.Noise.fromObject(object).then(function(restoredFilter){
+      assert.deepEqual(restoredFilter, filter);
+      done();
+    });
   });
 
   QUnit.test('isNeutralState', function(assert) {
@@ -920,11 +958,14 @@
   });
 
   QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.Pixelate();
 
     var object = filter.toObject();
-
-    assert.deepEqual(fabric.Image.filters.Pixelate.fromObject(object), filter);
+    fabric.Image.filters.Pixelate.fromObject(object).then(function(restoredFilter){
+      assert.deepEqual(restoredFilter, filter);
+      done();
+    });
   });
 
   QUnit.test('isNeutralState', function(assert) {
@@ -990,11 +1031,14 @@
   });
 
   QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.RemoveColor();
 
     var object = filter.toObject();
-
-    assert.deepEqual(fabric.Image.filters.RemoveColor.fromObject(object), filter);
+    fabric.Image.filters.RemoveColor.fromObject(object).then(function(restoredFilter){
+      assert.deepEqual(restoredFilter, filter);
+      done();
+    });
   });
 
   QUnit.test('isNeutralState', function(assert) {
@@ -1039,11 +1083,14 @@
   });
 
   QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.Sepia();
 
     var object = filter.toObject();
-
-    assert.deepEqual(fabric.Image.filters.Sepia.fromObject(object), filter);
+    fabric.Image.filters.Sepia.fromObject(object).then(function(restoredFilter){
+      assert.deepEqual(restoredFilter, filter);
+      done();
+    });
   });
 
   QUnit.test('isNeutralState', function(assert) {
@@ -1095,16 +1142,21 @@
   });
 
   QUnit.test('fromObject', function(assert) {
+    var done = assert.async();
     var filter = new fabric.Image.filters.Resize();
 
     var object = filter.toObject();
-    var fromObject = fabric.Image.filters.Resize.fromObject(object);
-    assert.deepEqual(fromObject, filter);
-    assert.ok(fromObject instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
-    filter.resizeType = 'bilinear';
-    filter.scaleX = 0.8;
-    filter.scaleY = 0.8;
-    assert.deepEqual(fabric.Image.filters.Resize.fromObject(filter.toObject()), filter);
+    fabric.Image.filters.Resize.fromObject(object).then(function(restoredFilter) {
+      assert.ok(restoredFilter instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+      assert.deepEqual(restoredFilter, filter);
+      filter.resizeType = 'bilinear';
+      filter.scaleX = 0.8;
+      filter.scaleY = 0.8;
+      return fabric.Image.filters.Resize.fromObject(filter.toObject()).then(function(restoredFilter2) {
+        assert.deepEqual(restoredFilter2, filter);
+        done();
+      });
+    });
   });
 
   QUnit.test('isNeutralState', function(assert) {
