@@ -125,25 +125,54 @@
         return this;
       },
 
+      /**
+       * Add objects
+       * @param {...fabric.Object} objects
+       */
       add: function () {
         fabric.Collection.add.apply(this, arguments);
         this._onAfterObjectsChange('added', Array.from(arguments));
       },
 
+      /**
+       * Add objects that exist in instance's coordinate plane
+       * @param {...fabric.Object} objects
+       */
+      addRelativeToGroup: function () {
+        this._objects.push.apply(this._objects, arguments);
+        for (var i = 0, length = arguments.length; i < length; i++) {
+          this._onObjectAdded(arguments[i], true);
+        }
+      },
+
+      /**
+       * Inserts an object into collection at specified index
+       * @param {fabric.Object} object Object to insert
+       * @param {Number} index Index to insert object at
+       * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
+       */
       insertAt: function () {
         fabric.Collection.insertAt.apply(this, arguments);
         this._onAfterObjectsChange('added', Array.from(arguments));
       },
 
+      /**
+       * Remove objects
+       * @param {...fabric.Object} objects
+       */
       remove: function () {
         fabric.Collection.remove.apply(this, arguments);
         this._onAfterObjectsChange('removed', Array.from(arguments));
       },
 
+      /**
+       * Remove all objects
+       * @returns {fabric.Object[]} removed objects
+       */
       removeAll: function () {
         this._activeObjects = [];
         var remove = this._objects.slice();
-        this.remove.apply(this, this._objects);
+        this.remove.apply(this, remove);
         return remove;
       },
 
@@ -274,18 +303,20 @@
       /**
        * @private
        * @param {fabric.Object} object
+       * @param {boolean} [relativeToGroup] true if object is in group's coordinate plane
        */
-      _onObjectAdded: function (object) {
-        this.enterGroup(object);
+      _onObjectAdded: function (object, relativeToGroup) {
+        this.enterGroup(object, relativeToGroup);
         object.fire('added', { target: this });
       },
 
       /**
        * @private
        * @param {fabric.Object} object
+       * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
        */
-      _onObjectRemoved: function (object) {
-        this.exitGroup(object);
+      _onObjectRemoved: function (object, removeParentTransform) {
+        this.exitGroup(object, removeParentTransform);
         object.fire('removed', { target: this });
       },
 
