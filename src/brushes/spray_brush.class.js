@@ -188,7 +188,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    */
   addSprayChunk: function(pointer) {
     var sprayChunkPoints = [];
-    var i, x, y, key, width, radius = this.width / 2;
+    var i, x, y, key, width, radius = this.width / 2, r;
 
     for (i = 0; i < this.density; i++) {
 
@@ -224,11 +224,12 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       }
 
       sprayChunkPoints.push(point);
+      r = point.width / 2;
       var rect = new fabric.Rect({
         width: point.width,
         height: point.width,
-        left: point.x + point.width / 2,
-        top: point.y + point.width / 2,
+        left: point.x + r,
+        top: point.y + r,
         originX: 'center',
         originY: 'center',
         fill: this.color,
