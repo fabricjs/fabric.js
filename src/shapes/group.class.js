@@ -431,8 +431,14 @@
         //  set position
         this.setPositionByOrigin(newCenter, 'center', 'center');
         context.type !== 'initialization' && this.callSuper('setCoords');
-        //  fire layout hook
+        //  fire layout hook and event
         this.onLayout(context, result);
+        this.fire('layout', {
+          context: context,
+          result: result,
+          transform: transform,
+          diff: diff
+        });
         //  recursive up
         if (this.group && this.group._applyLayoutStrategy) {
           //  append the path recursion to context
