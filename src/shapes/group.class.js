@@ -400,7 +400,7 @@
        * @param {LayoutContext} [context] pass values to use for layout calculations
        */
       triggerLayout: function (context) {
-        if (context.layout) {
+        if (context && context.layout) {
           context.prevLayout = this.layout;
           this.layout = context.layout;
         }
