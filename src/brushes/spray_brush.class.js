@@ -227,8 +227,8 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       var rect = new fabric.Rect({
         width: point.width,
         height: point.width,
-        left: point.x + 1,
-        top: point.y + 1,
+        left: point.x + point.width / 2,
+        top: point.y + point.width / 2,
         originX: 'center',
         originY: 'center',
         fill: this.color,
