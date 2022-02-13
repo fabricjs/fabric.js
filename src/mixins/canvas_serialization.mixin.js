@@ -34,7 +34,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     this.renderOnAddRemove = false;
 
-    delete serialized.clipPath;
     return fabric.util.enlivenObjects(serialized.objects || [], '', reviver)
       .then(function(enlived) {
         _this.clear();
@@ -46,8 +45,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           clipPath: serialized.clipPath,
         })
           .then(function(enlivedMap) {
-            _this.set(enlivedMap);
             _this.__setupCanvas(serialized, enlived, renderOnAddRemove);
+            _this.set(enlivedMap);
             return _this;
           });
       });

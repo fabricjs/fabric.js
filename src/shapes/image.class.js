@@ -708,10 +708,10 @@
    * @param {Function} [callback] Callback to invoke when image is created (newly created image is passed as a first argument). Second argument is a boolean indicating if an error occurred or not.
    * @param {Object} [imgOptions] Options object
    */
-  fabric.Image.fromURL = function(url, callback, imgOptions) {
-    fabric.util.loadImage(url, function(img, isError) {
-      callback && callback(new fabric.Image(img, imgOptions), isError);
-    }, null, imgOptions && imgOptions.crossOrigin);
+  fabric.Image.fromURL = function(url, imgOptions) {
+    return fabric.util.loadImage(url, imgOptions || {}).then(function(img) {
+      return new fabric.Image(img, imgOptions);
+    });
   };
 
   /* _FROM_SVG_START_ */

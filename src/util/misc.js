@@ -549,7 +549,9 @@
           return;
         }
         if (value.type) {
-          enliven[prop] = fabric.util.enlivenObjects([value]);
+          enliven[prop] = fabric.util.enlivenObjects([value]).then(function (enlived) {
+            return enlived[0];
+          });
           return
         }
         if (value.source) {
