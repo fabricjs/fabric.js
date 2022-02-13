@@ -51,7 +51,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    * Threshold of dots before creating a new buffering group
    * @type number
    */
-  bufferThreshold: 75,
+  bufferThreshold: 500,
 
   /**
    * Constructor
@@ -64,6 +64,8 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   },
 
   /**
+   * create a group to contain some of the spray chunks, acting as a buffer
+   * position group center at canvas 0,0 so we can add objects relative to group, reducing calculations to a minimum
    * @private
    * @returns {fabric.Group}
    */
@@ -81,6 +83,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   },
 
   /**
+   * layout once and disable future layouting by setting to `fixed`
    * @private
    * @param {fabric.Group} group 
    */
@@ -96,7 +99,6 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   onMouseDown: function(pointer) {
     this.sprayChunks = [];
     this._buffer = this._createBufferingGroup();
-    this._buffer.set({ layout: 'fit-content-lazy' });
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
 
@@ -125,8 +127,9 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     var group = this._buffer;
     if (this._tempBuffer) {
       this._layoutBufferingGroup(this._tempBuffer);
-      group.add(this._tempBuffer);
+      group.addRelativeToGroup(this._tempBuffer);
     }
+    this._layoutBufferingGroup(group);
     this._buffer = undefined;
     this._tempBuffer = undefined;
     this.shadow && group.set('shadow', new fabric.Shadow(this.shadow));
@@ -223,11 +226,12 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
         originX: 'center',
         originY: 'center',
         fill: this.color,
-        objectCaching: false
+        objectCaching: false,
+        canvas: this.canvas
       });
       if (this._tempBuffer && this._tempBuffer.size() > this.bufferThreshold) {
         this._layoutBufferingGroup(this._tempBuffer);
-        this._buffer.add(this._tempBuffer);
+        this._buffer.addRelativeToGroup(this._tempBuffer);
         this._tempBuffer.renderCache();
         this._tempBuffer = undefined;
       }
