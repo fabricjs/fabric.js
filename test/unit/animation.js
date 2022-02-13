@@ -52,7 +52,7 @@
     var options = { foo: 'bar' };
     fabric.util.animate(options);
     assert.propEqual(options, { foo: 'bar' }, 'options were mutated');
-    setTimeout(() => {
+    setTimeout(function() {
       assert.equal(fabric.runningAnimations.length, 0, 'animation should exist in registry');
       done();
     }, 1000);
