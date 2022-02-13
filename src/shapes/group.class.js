@@ -235,6 +235,7 @@
        */
       enterGroup: function (object, relativeToGroup) {
         object.group && object.group.remove(object);
+        if (object.type === 'layer') throw new Error('fabric.js: Nesting layers under groups hasn\'t been implemented yet');
         !relativeToGroup && applyTransformToObject(
           object,
           multiplyTransformMatrices(
