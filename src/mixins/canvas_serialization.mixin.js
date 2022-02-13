@@ -85,8 +85,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {(Object|String)} value Value to set
    */
   __setBgOverlay: function(property, value) {
-    var _this = this;
-
     if (!value) {
       return;
     }

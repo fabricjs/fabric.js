@@ -539,27 +539,28 @@
     enlivenObjectEnlivables: function (serializedObject) {
       // enlive gradients or patterns
       var enliven = {};
-      ['fill', 'stroke', 'backgroundColor', 'overlayColor', 'path', 'clipPath', 'backgroundImage', 'overlayImage'].forEach(function(prop) {
-        var value = serializedObject[prop];
-        if (!value) {
-          return;
-        }
-        if (value.colorStops) {
-          enliven[prop] = new fabric.Gradient(value);
-          return;
-        }
-        if (value.type) {
-          enliven[prop] = fabric.util.enlivenObjects([value]).then(function (enlived) {
-            return enlived[0];
-          });
-          return
-        }
-        if (value.source) {
-          enliven[prop] = fabric.Pattern.fromObject(value);
-          return;
-        }
-        enliven[prop] = value;
-      });
+      ['fill', 'stroke', 'backgroundColor', 'overlayColor', 'path', 'clipPath', 'backgroundImage', 'overlayImage']
+        .forEach(function(prop) {
+          var value = serializedObject[prop];
+          if (!value) {
+            return;
+          }
+          if (value.colorStops) {
+            enliven[prop] = new fabric.Gradient(value);
+            return;
+          }
+          if (value.type) {
+            enliven[prop] = fabric.util.enlivenObjects([value]).then(function (enlived) {
+              return enlived[0];
+            });
+            return;
+          }
+          if (value.source) {
+            enliven[prop] = fabric.Pattern.fromObject(value);
+            return;
+          }
+          enliven[prop] = value;
+        });
       var promises = Object.values(enliven);
       var keys = Object.keys(enliven);
       return Promise.all(promises).then(function(enlived) {

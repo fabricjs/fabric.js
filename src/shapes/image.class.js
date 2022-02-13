@@ -378,7 +378,7 @@
      */
     setSrc: function(src, options) {
       var _this = this;
-      return fabric.util.loadImage(src, options).then(function(img, isError) {
+      return fabric.util.loadImage(src, options).then(function(img) {
         _this.setElement(img, options);
         _this._setWidthHeight();
         return _this;

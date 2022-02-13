@@ -568,7 +568,7 @@
     return fabric.util.enlivenObjects(objects).then(function (enlivenedObjects) {
       return fabric.util.enlivenObjectEnlivables(options).then(function(enlivedProps) {
         return new fabric.Group(enlivenedObjects, Object.assign(options, enlivedProps), true);
-      })
+      });
     });
   };
 
