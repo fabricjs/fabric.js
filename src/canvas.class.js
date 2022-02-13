@@ -397,10 +397,12 @@
       }
       //  in case a single object is selected render it's entire above the other objects
       else if (!this.preserveObjectStacking && activeObjects.length === 1) {
-        activeGroupObjects = activeObjects[0].getAncestors(true).reverse().concat(activeObjects[0]);
+        var target = activeObjects[0], ancestors = target.getAncestors(true);
+        var topAncestor = ancestors.length === 0 ? target : ancestors.pop();
         objsToRender = this._objects.slice();
-        objsToRender.splice(objsToRender.indexOf(activeGroupObjects[0]), 1);
-        objsToRender.push(activeGroupObjects[0]);
+        var index = objsToRender.indexOf(topAncestor);
+        index > -1 && objsToRender.splice(objsToRender.indexOf(topAncestor), 1);
+        objsToRender.push(topAncestor);
       }
       else {
         objsToRender = this._objects;
