@@ -245,7 +245,9 @@
        */
       enterGroup: function (object, relativeToGroup) {
         object.group && object.group.remove(object);
-        if (object.type === 'layer') throw new Error('fabric.js: Nesting layers under groups hasn\'t been implemented yet');
+        if (object.type === 'layer') {
+          throw new Error('fabric.js: Nesting layers under groups hasn\'t been implemented yet');
+        }
         !relativeToGroup && applyTransformToObject(
           object,
           multiplyTransformMatrices(
@@ -393,8 +395,8 @@
 
       /**
        * @private
-       * @param {fabric.Object} object 
-       * @param {fabric.Point} diff 
+       * @param {fabric.Object} object
+       * @param {fabric.Point} diff
        */
       _adjustObjectPosition: function (object, diff) {
         object.set({
@@ -491,7 +493,7 @@
           else if (!clipPath.absolutePositioned && context.type === 'initialization') {
             var bbox = this.prepareBoundingBox(layoutDirective, objects, context) || {
               centerX: clipPathCenter.x,
-              centerY: clipPathCenter.y, 
+              centerY: clipPathCenter.y,
             };
             bbox.width = clipPath.width;
             bbox.height = clipPath.height;
@@ -525,9 +527,9 @@
         if (context.type === 'initialization') {
           var options = context.options || {};
           var hasX = typeof options.left === 'number',
-            hasY = typeof options.top === 'number',
-            hasWidth = typeof options.width === 'number',
-            hasHeight = typeof options.height === 'number';
+              hasY = typeof options.top === 'number',
+              hasWidth = typeof options.width === 'number',
+              hasHeight = typeof options.height === 'number';
           var center = hasX || hasY ?
             this.translateToCenterPoint(
               new fabric.Point(this.left, this.top),
