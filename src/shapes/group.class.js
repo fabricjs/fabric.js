@@ -19,8 +19,7 @@
    * @class fabric.Group
    * @extends fabric.Object
    * @mixes fabric.Collection
-   * @fires added on added object before layout
-   * @fires removed on removed object before layout
+   * @fires layout once layout completes
    * @see {@link fabric.Group#initialize} for constructor definition
    */
   fabric.Group = fabric.util.createClass(fabric.Object, fabric.Collection,
@@ -451,7 +450,7 @@
        * @returns {{ centerX: number, centerY: number, width: number, height: number } | undefined} positioning data
        */
       getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
-        //  performance enhancement
+        //  `fit-content-lazy` performance enhancement
         //  skip if instance had no objects before the `added` event because it may have kept layout after removing all previous objects
         if (layoutDirective === 'fit-content-lazy'
           && context.type === 'added' && objects.length > context.targets.length) {
@@ -565,7 +564,7 @@
        * uses absolute object coords (in canvas coordinate plane)
        * @public
        * @param {fabric.Object[]} objects
-       * @returns
+       * @returns {Object | null} bounding box
        */
       getObjectsBoundingBox: function (objects) {
         if (objects.length === 0) {
