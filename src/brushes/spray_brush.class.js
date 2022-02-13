@@ -133,18 +133,20 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       group.addRelativeToGroup(this._tempBuffer);
     }
     this._layoutBufferingGroup(group);
-    this._buffer = undefined;
-    this._tempBuffer = undefined;
-    this.memo = {};
     this.shadow && group.set('shadow', new fabric.Shadow(this.shadow));
+    // fire events and add
     this.canvas.fire('before:path:created', { path: group });
     this.canvas.add(group);
     this.canvas.fire('path:created', { path: group });
-
+    //  render
     this.canvas.clearContext(this.canvas.contextTop);
     this._resetShadow();
     this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
     this.canvas.requestRenderAll();
+    //  deallocate
+    this._buffer = undefined;
+    this._tempBuffer = undefined;
+    this.memo = {};
   },
 
   /**
