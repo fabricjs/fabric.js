@@ -23,15 +23,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   /**
      *
-     * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
      * @returns {(fabric.Object | fabric.StaticCanvas)[]} ancestors from bottom to top
      */
-  getAncestors: function (strict) {
+  getAncestors: function () {
     var ancestors = [];
-    var parent = this.group || (!strict && this.canvas);
+    var parent = this.group || this.canvas;
     while (parent) {
       ancestors.push(parent);
-      parent = parent.group || (!strict && this.canvas);
+      parent = parent.group || parent.canvas;
     }
     return ancestors;
   },
