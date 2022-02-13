@@ -209,7 +209,7 @@
   QUnit.test('path array not shared when cloned', function(assert) {
     var done = assert.async();
     makePathObject(function(originalPath) {
-      originalPath.clone(function(clonedPath) {
+      originalPath.clone().then(function(clonedPath) {
         clonedPath.path[0][1] = 200;
         assert.equal(originalPath.path[0][1], 100);
         done();
