@@ -201,8 +201,8 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       }
 
       if (this.optimizeOverlapping) {
-        key = x + ',' + y;
         // avoid creating duplicate rects at the same coordinates
+        key = x + ',' + y;
         if (hits[key]) {
           continue;
         }
