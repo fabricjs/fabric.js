@@ -61,6 +61,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   initialize: function(canvas) {
     this.canvas = canvas;
     this.sprayChunks = [];
+    this.memo = {};
   },
 
   /**
@@ -98,6 +99,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    */
   onMouseDown: function(pointer) {
     this.sprayChunks = [];
+    this.memo = {};
     this._buffer = this._createBufferingGroup();
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
@@ -133,6 +135,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     this._layoutBufferingGroup(group);
     this._buffer = undefined;
     this._tempBuffer = undefined;
+    this.memo = {};
     this.shadow && group.set('shadow', new fabric.Shadow(this.shadow));
     this.canvas.fire('before:path:created', { path: group });
     this.canvas.add(group);
@@ -183,7 +186,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    */
   addSprayChunk: function(pointer) {
     var sprayChunkPoints = [];
-    var i, x, y, key, width, radius = this.width / 2, hits = {};
+    var i, x, y, key, width, radius = this.width / 2;
 
     for (i = 0; i < this.density; i++) {
 
@@ -203,11 +206,11 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       if (this.optimizeOverlapping) {
         // avoid creating duplicate rects at the same coordinates
         key = x + ',' + y;
-        if (hits[key]) {
+        if (this.memo[key]) {
           continue;
         }
         else {
-          hits[key] = true;
+          this.memo[key] = true;
         }
       }
 
