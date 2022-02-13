@@ -368,9 +368,11 @@
        */
       _renderObjects: function (ctx) {
         var localActiveObjects = this._activeObjects,
-          activeObjectsSize = this.canvas.getActiveObjects ? this.canvas.getActiveObjects().length : 0;
+          activeObjectsSize = this.canvas.getActiveObjects ? this.canvas.getActiveObjects().length : 0,
+          preserveObjectStacking = this.canvas.preserveObjectStacking;
         this.forEachObject(function (object) {
-          if (activeObjectsSize <= 1 || localActiveObjects.length === 0 || localActiveObjects.indexOf(object) === -1) {
+          if (preserveObjectStacking || activeObjectsSize <= 1
+            || localActiveObjects.length === 0 || localActiveObjects.indexOf(object) === -1) {
             object.render(ctx);
           }
         }, this);
