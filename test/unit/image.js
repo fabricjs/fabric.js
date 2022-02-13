@@ -467,7 +467,7 @@
       assert.ok(typeof image.clone === 'function');
       image.clone().then(function(clone) {
         assert.ok(clone instanceof fabric.Image);
-        assert.deepEqual(clone.toObject(), image.toObject());
+        assert.deepEqual(clone.toObject(), image.toObject(), 'clone and original image are equal');
         done();
       });
     });
@@ -560,9 +560,10 @@
   QUnit.test('fromURL error', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Image.fromURL === 'function');
-    fabric.Image.fromURL(IMG_URL_NON_EXISTING, function(instance, isError) {
+    fabric.Image.fromURL(IMG_URL_NON_EXISTING, function(instance) {
       assert.ok(instance instanceof fabric.Image);
-      assert.equal(isError, true);
+    }).catch(function(e) {
+      assert.ok(e instanceof Error);
       done();
     });
   });
