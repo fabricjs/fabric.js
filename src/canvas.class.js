@@ -378,7 +378,7 @@
       var activeObjects = this.getActiveObjects(),
           object, objsToRender, activeGroupObjects;
 
-      if (activeObjects.length > 0 && !this.preserveObjectStacking) {
+      if (!this.preserveObjectStacking && activeObjects.length > 1) {
         objsToRender = [];
         activeGroupObjects = [];
         for (var i = 0, length = this._objects.length; i < length; i++) {
@@ -394,6 +394,13 @@
           this._activeObject._objects = activeGroupObjects;
         }
         objsToRender.push.apply(objsToRender, activeGroupObjects);
+      }
+      //  in case a single object is selected render it's entire above the other objects
+      else if (!this.preserveObjectStacking && activeObjects.length === 1) {
+        activeGroupObjects = activeObjects[0].getAncestors(true).reverse().concat(activeObjects[0]);
+        objsToRender = this._objects.slice();
+        objsToRender.splice(objsToRender.indexOf(activeGroupObjects[0]), 1);
+        objsToRender.push(activeGroupObjects[0]);
       }
       else {
         objsToRender = this._objects;

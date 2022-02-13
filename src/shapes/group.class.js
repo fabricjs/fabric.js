@@ -355,21 +355,22 @@
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
       _render: function (ctx) {
-        this.forEachObject(function (object) {
-          object.render(ctx);
-        });
+        this._renderObjects(ctx);
       },
 
       /**
-       * render only non-selected objects,
-       * canvas is in charge of rendering the selected objects
+       * Render objects:\
+       * Canvas is in charge of rendering the selected objects in case of multiselection.\
+       * In case a single object is selected it's entire tree will be rendered by canvas above the other objects (`preserveObjectStacking = false`)
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
        * @deprecated
        */
       _renderObjects: function (ctx) {
+        var localActiveObjects = this._activeObjects,
+          activeObjectsSize = this.canvas.getActiveObjects ? this.canvas.getActiveObjects().length : 0;
         this.forEachObject(function (object) {
-          if (this._activeObjects.length === 0 || this._activeObjects.indexOf(object) === -1) {
+          if (activeObjectsSize <= 1 || localActiveObjects.length === 0 || localActiveObjects.indexOf(object) === -1) {
             object.render(ctx);
           }
         }, this);
