@@ -1,5 +1,3 @@
-const { done } = require("qunit");
-
 (function() {
 
   var canvas = fabric.document.createElement('canvas'),
