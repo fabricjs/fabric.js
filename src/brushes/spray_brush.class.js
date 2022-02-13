@@ -102,8 +102,8 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
 
-    this.addSprayChunk(pointer);
-    this.renderChunk(this.sprayChunkPoints);
+    var chunk = this.addSprayChunk(pointer);
+    this.renderChunk(chunk);
   },
 
   /**
@@ -114,8 +114,8 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
       return;
     }
-    this.addSprayChunk(pointer);
-    this.renderChunk(this.sprayChunkPoints);
+    var chunk = this.addSprayChunk(pointer);
+    this.renderChunk(chunk);
   },
 
   /**
@@ -182,7 +182,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    * @param {Object} pointer
    */
   addSprayChunk: function(pointer) {
-    this.sprayChunkPoints = [];
+    var sprayChunkPoints = [];
     var i, x, y, key, width, radius = this.width / 2, hits = {};
 
     for (i = 0; i < this.density; i++) {
@@ -218,7 +218,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
         point.opacity = fabric.util.getRandomInt(0, 100) / 100;
       }
 
-      this.sprayChunkPoints.push(point);
+      sprayChunkPoints.push(point);
       var rect = new fabric.Rect({
         width: point.width,
         height: point.width,
@@ -242,6 +242,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       this._tempBuffer.addRelativeToGroup(rect);
     }
 
-    this.sprayChunks.push(this.sprayChunkPoints);
+    this.sprayChunks.push(sprayChunkPoints);
+    return sprayChunkPoints;
   }
 });
