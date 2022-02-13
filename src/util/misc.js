@@ -479,7 +479,7 @@
           img.onerror = function () {
             reject(new Error('Error loading ' + img.src));
           };
-          img.crossOrigin = options.crossOrigin;
+          img.crossOrigin = options ? options.crossOrigin : 'anonymous';
           img.src = url;
         }
       });

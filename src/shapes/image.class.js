@@ -374,16 +374,15 @@
      * @param {Object} [options] Options object
      * @param {String} [options.crossOrigin] crossOrigin value (one of "", "anonymous", "use-credentials")
      * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
-     * @return {fabric.Image} thisArg
-     * @chainable
+     * @return {Promise<fabric.Image>} thisArg
      */
-    setSrc: function(src, callback, options) {
-      fabric.util.loadImage(src, function(img, isError) {
-        this.setElement(img, options);
-        this._setWidthHeight();
-        callback && callback(this, isError);
-      }, this, options && options.crossOrigin);
-      return this;
+    setSrc: function(src, options) {
+      var _this = this;
+      return fabric.util.loadImage(src, options).then(function(img, isError) {
+        _this.setElement(img, options);
+        _this._setWidthHeight();
+        return _this;
+      });
     },
 
     /**
@@ -687,17 +686,19 @@
    * @returns {Promise<fabric.Image>}
    */
   fabric.Image.fromObject = function(_object) {
-    var object = fabric.util.object.clone(_object);
+    var object = fabric.util.object.clone(_object),
+        filters = object.filters,
+        resizeFilter = object.resizeFilter;
     return Promise.all([
       fabric.util.loadImage(object.src, { crossOrigin: _object.crossOrigin }),
-      object.filters && fabric.util.enlivenObjects(object.filters,  'fabric.Image.filters'),
-      object.resizeFilter && fabric.util.enlivenObjects([object.resizeFilter],  'fabric.Image.filters'),
+      filters && fabric.util.enlivenObjects(filters,  'fabric.Image.filters'),
+      resizeFilter && fabric.util.enlivenObjects([resizeFilter],  'fabric.Image.filters'),
+      fabric.util.enlivenObjectEnlivables(object),
     ])
       .then(function(imgAndFilters) {
         object.filters = imgAndFilters[1] || [];
         object.resizeFilter = imgAndFilters[2] && imgAndFilters[2][0];
-        object._originalElement = imgAndFilters[0];
-        return fabric.Object._fromObject('Image', object, '_originalElement');
+        return new fabric.Image(imgAndFilters[0], Object.assign(object, imgAndFilters[3]));
       });
   };
 
