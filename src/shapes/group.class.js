@@ -328,23 +328,6 @@
         return this.ownCaching || (!!this.group && this.group.isOnACache());
       },
 
-      /**
-       * @override
-       * @param {boolean} [skipCanvas]
-       * @returns {boolean}
-       */
-      isCacheDirty: function (skipCanvas) {
-        if (this.callSuper('isCacheDirty', skipCanvas)) {
-          return true;
-        }
-        if (!this.statefullCache) {
-          return false;
-        }
-        return this._objects.some(function (object) {
-          return object.isCacheDirty(true);
-        });
-      },
-
       setCoords: function () {
         this.callSuper('setCoords');
         this.subTargetCheck && this.forEachObject(function (object) {
