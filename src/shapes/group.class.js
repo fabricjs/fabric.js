@@ -143,6 +143,7 @@
         for (var i = 0, length = arguments.length; i < length; i++) {
           this._onObjectAdded(arguments[i], true);
         }
+        this._onAfterObjectsChange('added', Array.from(arguments));
       },
 
       /**
