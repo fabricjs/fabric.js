@@ -103,7 +103,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     this._setShadow();
 
     this.addSprayChunk(pointer);
-    this.renderChunck(this.sprayChunkPoints);
+    this.renderChunk(this.sprayChunkPoints);
   },
 
   /**
@@ -115,7 +115,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       return;
     }
     this.addSprayChunk(pointer);
-    this.renderChunck(this.sprayChunkPoints);
+    this.renderChunk(this.sprayChunkPoints);
   },
 
   /**
@@ -126,6 +126,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     this.canvas.renderOnAddRemove = false;
     var group = this._buffer;
     if (this._tempBuffer) {
+      //  add last buffer to main buffer
       this._layoutBufferingGroup(this._tempBuffer);
       group.addRelativeToGroup(this._tempBuffer);
     }
@@ -146,7 +147,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   /**
    * Render new chunk of spray brush
    */
-  renderChunck: function(sprayChunk) {
+  renderChunk: function(sprayChunk) {
     var ctx = this.canvas.contextTop, i, len;
     ctx.fillStyle = this.color;
 
@@ -172,7 +173,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     this._saveAndTransform(ctx);
 
     for (i = 0, ilen = this.sprayChunks.length; i < ilen; i++) {
-      this.renderChunck(this.sprayChunks[i]);
+      this.renderChunk(this.sprayChunks[i]);
     }
     ctx.restore();
   },
