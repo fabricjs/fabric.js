@@ -334,7 +334,6 @@
 
   QUnit.test('animate with list of values', function(assert) {
     var done = assert.async();
-    assert.expect(52)
 
     fabric.util.animate({
       startValue: [1, 2, 3],
