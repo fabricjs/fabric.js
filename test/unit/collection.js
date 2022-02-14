@@ -45,37 +45,63 @@
     assert.equal(collection.rendered, 2, 'this.renderAll has been called just once more');
   });
 
-  QUnit.test('insertAt', function(assert) {
-    var obj = { prop: 4 }, fired = 0, index = 1, nonSplicing = false;
-    collection._objects = [{ prop: 0 }, {prop: 1}];
-    assert.ok(typeof collection.insertAt === 'function', 'has insertAdd method');
-    var previousObject = collection._objects[index];
-    var previousLength = collection._objects.length;
-    collection.insertAt(obj, index, nonSplicing);
-    assert.equal(collection._objects[index], obj, 'add object in the array at specified index');
-    assert.equal(collection._objects[index + 1], previousObject, 'add old object in the array at next index');
-    assert.equal(collection._objects.length, previousLength + 1, 'length is incremented');
+  QUnit.test('insertAt', function (assert) {
+    var rect1 = new fabric.Rect({ id: 1 }),
+      rect2 = new fabric.Rect({ id: 2 }),
+      rect3 = new fabric.Rect({ id: 3 }),
+      rect4 = new fabric.Rect({ id: 4 }),
+      rect5 = new fabric.Rect({ id: 5 }),
+      rect6 = new fabric.Rect({ id: 6 }),
+      rect7 = new fabric.Rect({ id: 7 }),
+      rect8 = new fabric.Rect({ id: 8 }),
+      control = [],
+      fired = [],
+      firingControl = [];
 
-    nonSplicing = true;
-    previousLength = collection._objects.length;
-    var newObject = { prop: 5 };
-    previousObject = collection._objects[index];
-    var returned = collection.insertAt(newObject, index, nonSplicing);
-    assert.equal(returned, collection, 'is chainable');
-    assert.equal(collection._objects[index], newObject, 'add newobject in the array at specified index');
-    assert.notEqual(collection._objects[index + 1], previousObject, 'old object is not in the array at next index');
-    assert.equal(collection._objects.indexOf(previousObject), -1, 'old object is no more in array');
-    assert.equal(collection._objects.length, previousLength, 'length is not incremented');
+    collection.add(rect1, rect2);
+    control.push(rect1, rect2);
+
+    assert.ok(typeof collection.insertAt === 'function', 'should respond to `insertAt` method');
+
+    const equalsControl = () => {
+      assert.deepEqual(collection.getObjects().map(o => o.id), control.map(o => o.id), 'should equal control array');
+      assert.deepEqual(collection.getObjects(), control, 'should equal control array');
+      assert.deepEqual(fired.map(o => o.id), firingControl.map(o => o.id), 'fired events should equal control array');
+      assert.deepEqual(fired, firingControl, 'fired events should equal control array');
+    }
+
     assert.ok(typeof collection._onObjectAdded === 'undefined', 'do not have a standard _onObjectAdded method');
-    assert.equal(fired, 0, 'fired is 0');
-    collection._onObjectAdded = function() {
-      fired++;
+    collection._onObjectAdded = function (object) {
+      fired.push(object);
     };
-    collection.insertAt(obj, 1);
-    assert.equal(fired, 1, 'fired is incremented if there is a _onObjectAdded');
+
+    collection.insertAt(rect3, 1, false);
+    control.splice(1, 0, rect3);
+    firingControl.push(rect3);
+    equalsControl();
+    collection.insertAt(rect4, 0, true);
+    control.splice(0, 1, rect4);
+    firingControl.push(rect4);
+    equalsControl();
+    collection.insertAt(rect5, 2, false);
+    control.splice(2, 0, rect5);
+    firingControl.push(rect5);
+    equalsControl();
+    collection.insertAt([rect6], 2, false);
+    control.splice(2, 0, rect6);
+    firingControl.push(rect6);
+    equalsControl();
     collection.renderOnAddRemove = true;
-    collection.insertAt(obj, 1);
+    collection.insertAt([rect7, rect8], 3, true);
+    control.splice(3, 2, rect7, rect8);
+    firingControl.push(rect7, rect8);
+    equalsControl();
     assert.equal(collection.rendered, 1, 'this.renderAll has been called');
+    //  insert duplicates
+    collection.insertAt([rect1, rect2], 2);
+    control.splice(2, 0, rect1, rect2);
+    firingControl.push(rect1, rect2);
+    equalsControl();
   });
 
   QUnit.test('remove', function(assert) {

@@ -30,21 +30,24 @@ fabric.Collection = {
   /**
    * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
    * An object should be an instance of (or inherit from) fabric.Object
-   * @param {Object} object Object to insert
+   * @param {fabric.Object|fabric.Object[]} objects Object(s) to insert
    * @param {Number} index Index to insert object at
    * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
    * @return {Self} thisArg
    * @chainable
    */
-  insertAt: function (object, index, nonSplicing) {
-    var objects = this._objects;
-    if (nonSplicing) {
-      objects[index] = object;
+  insertAt: function (objects, index, nonSplicing) {
+    var deleteCount = nonSplicing ?
+      Array.isArray(objects) ? objects.length : 1 :
+      0;
+    //  objects might be an array so we use concat
+    var args = [index, deleteCount].concat(objects);
+    Array.prototype.splice.apply(this._objects, args);
+    if (this._onObjectAdded) {
+      for (var i = 2, length = args.length; i < length; i++) {
+        this._onObjectAdded(args[i]);
+      }
     }
-    else {
-      objects.splice(index, 0, object);
-    }
-    this._onObjectAdded && this._onObjectAdded(object);
     this.renderOnAddRemove && this.requestRenderAll && this.requestRenderAll();
     return this;
   },
