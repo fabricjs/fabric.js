@@ -659,7 +659,7 @@
             obj.includeDefaultValues = _includeDefaultValues;
             var data = obj[method || 'toObject'](propertiesToInclude);
             obj.includeDefaultValues = originalDefaults;
-            delete data.version;
+            //delete data.version;
             return data;
           });
       },
