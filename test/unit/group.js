@@ -614,7 +614,6 @@
   });
 
   QUnit.test('dirty flag propagation from children up with', function (assert) {
-    console.log(assert.deepEqual,fabric.assert)
     var g1 = makeGroupWith4Objects();
     var obj = g1.item(0);
     g1.dirty = false;
@@ -626,7 +625,6 @@
     obj.set('angle', 5);
     assert.equal(obj.dirty, false, 'Obj has dirty flag still false');
     assert.equal(g1.dirty, true, 'Group has dirty flag set');
-    assert.deepEqual(g1,obj)
   });
 
   QUnit.test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas are influenced by group', function(assert) {
@@ -679,7 +677,7 @@
     assert.notEqual(coords, newCoords, 'object coords have been recalculated - remove');
   });
 
-  QUnit.test.skip('group willDrawShadow', function(assert) {
+  QUnit.skip('group willDrawShadow', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect3 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
@@ -701,7 +699,7 @@
     assert.equal(group2.willDrawShadow(), false, 'group will not cast shadow because no child has shadow');
   });
 
-  QUnit.test.skip('group willDrawShadow with no offsets', function(assert) {
+  QUnit.skip('group willDrawShadow with no offsets', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect3 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
@@ -727,7 +725,7 @@
 
   });
 
-  QUnit.test.skip('group shouldCache', function(assert) {
+  QUnit.skip('group shouldCache', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
         rect3 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
