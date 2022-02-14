@@ -48,35 +48,6 @@
     },
 
     /**
-     * Change te activeSelection to a normal group,
-     * High level function that automatically adds it to canvas as
-     * active object. no events fired.
-     * @since 2.0.0
-     * @return {fabric.Group}
-     */
-    toGroup: function() {
-      var objects = this._objects.concat();
-      this._objects = [];
-      var options = fabric.Object.prototype.toObject.call(this);
-      var newGroup = new fabric.Group([]);
-      delete options.type;
-      newGroup.set(options);
-      objects.forEach(function(object) {
-        object.canvas.remove(object);
-        object.group = newGroup;
-      });
-      newGroup._objects = objects;
-      if (!this.canvas) {
-        return newGroup;
-      }
-      var canvas = this.canvas;
-      canvas.add(newGroup);
-      canvas._activeObject = newGroup;
-      newGroup.setCoords();
-      return newGroup;
-    },
-
-    /**
      * we want objects to retain their canvas ref when exiting instance
      * @private
      * @param {fabric.Object} object
