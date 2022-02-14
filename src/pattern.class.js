@@ -57,7 +57,6 @@
      * Constructor
      * @param {Object} [options] Options object
      * @param {option.source} [source] the pattern source, eventually empty or a drawable
-     * @param {Function} [callback] function to invoke after callback init.
      * @return {fabric.Pattern} thisArg
      */
     initialize: function(options) {

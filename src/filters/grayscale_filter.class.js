@@ -143,11 +143,10 @@
   });
 
   /**
-   * Returns filter instance from an object representation
+   * Returns filter instance from an object representations
    * @static
    * @param {Object} object Object to create an instance from
-   * @param {function} [callback] to be invoked after filter creation
-   * @return {fabric.Image.filters.Grayscale} Instance of fabric.Image.filters.Grayscale
+   * @returns {Promise<fabric.Image.filters.Grayscale>}
    */
   fabric.Image.filters.Grayscale.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 

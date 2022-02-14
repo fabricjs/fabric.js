@@ -123,11 +123,10 @@
   });
 
   /**
-   * Returns filter instance from an object representation
+   * Returns filter instance from an object representations
    * @static
    * @param {Object} object Object to create an instance from
-   * @param {Function} [callback] to be invoked after filter creation
-   * @return {fabric.Image.filters.Noise} Instance of fabric.Image.filters.Noise
+   * @returns {Promise<fabric.Image.filters.Noise>}
    */
   fabric.Image.filters.Noise.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 
