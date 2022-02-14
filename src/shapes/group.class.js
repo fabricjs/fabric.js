@@ -148,13 +148,13 @@
 
       /**
        * Inserts an object into collection at specified index
-       * @param {fabric.Object} object Object to insert
+       * @param {fabric.Object} objects Object to insert
        * @param {Number} index Index to insert object at
        * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
        */
-      insertAt: function (object, index, nonSplicing) {
-        fabric.Collection.insertAt.call(this, object, index, nonSplicing);
-        this._onAfterObjectsChange('added', [object]);
+      insertAt: function (objects, index, nonSplicing) {
+        fabric.Collection.insertAt.call(this, objects, index, nonSplicing);
+        this._onAfterObjectsChange('added', Array.isArray(objects) ? objects : [objects]);
       },
 
       /**
@@ -244,9 +244,14 @@
        * @param {boolean} [relativeToGroup] true if object is in group's coordinate plane
        */
       enterGroup: function (object, relativeToGroup) {
-        object.group && object.group.remove(object);
+        if (object.group) {
+          if (object.group === this) {
+            throw new Error('fabric.Group: duplicate objects are not supported inside group');
+          }
+          object.group.remove(object);
+        }
         if (object.type === 'layer') {
-          throw new Error('fabric.js: Nesting layers under groups hasn\'t been implemented yet');
+          throw new Error('fabric.Group: nesting layers is not supported inside group');
         }
         !relativeToGroup && applyTransformToObject(
           object,
