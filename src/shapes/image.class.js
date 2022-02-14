@@ -689,6 +689,9 @@
     var object = fabric.util.object.clone(_object),
         filters = object.filters,
         resizeFilter = object.resizeFilter;
+    // the generic enliving will fail on filters for now
+    delete object.resizeFilter;
+    delete object.filters;
     return Promise.all([
       fabric.util.loadImage(object.src, { crossOrigin: _object.crossOrigin }),
       filters && fabric.util.enlivenObjects(filters,  'fabric.Image.filters'),

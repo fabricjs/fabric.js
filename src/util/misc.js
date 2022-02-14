@@ -537,35 +537,28 @@
      */
 
     enlivenObjectEnlivables: function (serializedObject) {
-      // enlive gradients or patterns
-      var enliven = {};
-      ['fill', 'stroke', 'backgroundColor', 'overlayColor', 'path', 'clipPath', 'backgroundImage', 'overlayImage']
-        .forEach(function(prop) {
-          var value = serializedObject[prop];
-          if (!value) {
-            return;
-          }
-          if (value.colorStops) {
-            enliven[prop] = new fabric.Gradient(value);
-            return;
-          }
-          if (value.type) {
-            enliven[prop] = fabric.util.enlivenObjects([value]).then(function (enlived) {
-              return enlived[0];
-            });
-            return;
-          }
-          if (value.source) {
-            enliven[prop] = fabric.Pattern.fromObject(value);
-            return;
-          }
-          enliven[prop] = value;
-        });
-      var promises = Object.values(enliven);
-      var keys = Object.keys(enliven);
+      // enlive every possible property
+      var promises = Object.values(serializedObject).map(function(value) {
+        if (!value) {
+          return value;
+        }
+        if (value.colorStops) {
+          return new fabric.Gradient(value);
+        }
+        if (value.type) {
+          return fabric.util.enlivenObjects([value]).then(function (enlived) {
+            return enlived[0];
+          });
+        }
+        if (value.source) {
+          return fabric.Pattern.fromObject(value);
+        }
+        return value;
+      });
+      var keys = Object.keys(serializedObject);
       return Promise.all(promises).then(function(enlived) {
-        return keys.reduce(function(acc, element, index) {
-          acc[keys[index]] = enlived[index];
+        return enlived.reduce(function(acc, instance, index) {
+          acc[keys[index]] = instance;
           return acc;
         }, {});
       });
