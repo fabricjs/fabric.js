@@ -168,6 +168,7 @@
       width:                    80,
       height:                   60,
       fill:                     'rgb(0,0,0)',
+      layout:                   'fit-content',
       stroke:                   null,
       strokeWidth:              0,
       strokeDashArray:          null,
