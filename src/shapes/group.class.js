@@ -152,9 +152,9 @@
        * @param {Number} index Index to insert object at
        * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
        */
-      insertAt: function () {
-        fabric.Collection.insertAt.apply(this, arguments);
-        this._onAfterObjectsChange('added', Array.from(arguments));
+      insertAt: function (object, index, nonSplicing) {
+        fabric.Collection.insertAt.call(this, object, index, nonSplicing);
+        this._onAfterObjectsChange('added', [object]);
       },
 
       /**
