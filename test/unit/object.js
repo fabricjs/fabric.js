@@ -357,6 +357,7 @@
   });
 
   QUnit.test('clone', function(assert) {
+    var done = assert.async();
     var cObj = new fabric.Object({ left: 123, top: 456, opacity: 0.66 });
     assert.ok(typeof cObj.clone === 'function');
     cObj.clone().then(function(clone) {
@@ -370,6 +371,7 @@
       assert.equal(cObj.get('left'), 123);
       assert.equal(cObj.get('scaleX'), 1);
       assert.equal(cObj.get('angle'), 0);
+      done();
     });
   });
 

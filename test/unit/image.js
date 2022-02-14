@@ -453,8 +453,7 @@
         done();
         return;
       }
-      console.log(objRepr);
-      fabric.Image.fromObject(objRepr, function(img) {
+      fabric.Image.fromObject(objRepr).then(function(img) {
         assert.equal(img.getCrossOrigin(), null, 'image without src return no element');
         done();
       });
