@@ -711,6 +711,7 @@
           }
         }
       }
+      this._objectsToRender = this._chooseObjectsToRender();
       this._handleEvent(e, 'down');
       // we must renderAll so that we update the visuals
       (shouldRender || didGroup) && this.requestRenderAll();

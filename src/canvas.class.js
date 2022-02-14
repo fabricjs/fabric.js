@@ -353,6 +353,13 @@
     _hoveredTargets: [],
 
     /**
+     * hold the list of objects to render
+     * @type fabric.Object[]
+     * @private
+     */
+    _objectsToRender: undefined,
+
+    /**
      * @private
      */
     _initInteractive: function() {
@@ -369,6 +376,23 @@
       this.calcOffset();
     },
 
+    /**
+     * @private
+     * @param {fabric.Object} obj Object that was added
+     */
+    _onObjectAdded: function (obj) {
+      this._objectsToRender = undefined;
+      this.callSuper('_onObjectAdded', obj);
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} obj Object that was removed
+     */
+    _onObjectRemoved: function (obj) {
+      this._objectsToRender = undefined;
+      this.callSuper('_onObjectRemoved', obj);
+    },
     /**
      * Divides objects in two groups, one to render immediately
      * and one to render as activeGroup.
@@ -425,7 +449,8 @@
         this.hasLostContext = false;
       }
       var canvasToDrawOn = this.contextContainer;
-      this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
+      !this._objectsToRender && (this._objectsToRender = this._chooseObjectsToRender());
+      this.renderCanvas(canvasToDrawOn, this._objectsToRender);
       return this;
     },
 
@@ -1082,7 +1107,7 @@
      */
     _fireSelectionEvents: function(oldObjects, e) {
       var somethingChanged = false, objects = this.getActiveObjects(),
-          added = [], removed = [];
+          added = [], removed = [], invalidate = false;
       oldObjects.forEach(function(oldObject) {
         if (objects.indexOf(oldObject) === -1) {
           somethingChanged = true;
@@ -1104,6 +1129,7 @@
         }
       });
       if (oldObjects.length > 0 && objects.length > 0) {
+        invalidate = true;
         somethingChanged && this.fire('selection:updated', {
           e: e,
           selected: added,
@@ -1111,17 +1137,20 @@
         });
       }
       else if (objects.length > 0) {
+        invalidate = true;
         this.fire('selection:created', {
           e: e,
           selected: added,
         });
       }
       else if (oldObjects.length > 0) {
+        invalidate = true;
         this.fire('selection:cleared', {
           e: e,
           deselected: removed,
         });
       }
+      invalidate && (this._objectsToRender = undefined);
     },
 
     /**
