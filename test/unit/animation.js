@@ -334,7 +334,7 @@
 
   QUnit.test('animate with list of values', function(assert) {
     var done = assert.async();
-    assert.expect(52)
+    var run = false;
 
     fabric.util.animate({
       startValue: [1, 2, 3],
@@ -351,10 +351,12 @@
         // Make sure mutations are not kept
         assert.ok(currentValue[0] <= 2, 'mutating callback values must not persist');
         currentValue[0] = 200;
+        run = true;
       },
       onComplete: function(endValue) {
         assert.equal(endValue.length, 3);
         assert.deepEqual(endValue, [2, 4, 6]);
+        assert.equal(run, true, 'something run');
         done();
       }
     })
