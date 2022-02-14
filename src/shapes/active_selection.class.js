@@ -77,15 +77,22 @@
     },
 
     /**
+     * we want objects to retain their canvas ref when exiting instance
+     * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
+     */
+    exitGroup: function (object, removeParentTransform) {
+      this._exitGroup(object, removeParentTransform);
+    },
+
+    /**
      * If returns true, deselection is cancelled.
      * @since 2.0.0
      * @return {Boolean} [cancel]
      */
     onDeselect: function() {
-      var objects = this.removeAll(), canvas = this.canvas;
-      objects.forEach(function (object) {
-        object._set('canvas', canvas);
-      });
+      this.removeAll();
       return false;
     },
 

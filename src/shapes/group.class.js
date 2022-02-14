@@ -276,8 +276,17 @@
        * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
        */
       exitGroup: function (object, removeParentTransform) {
-        delete object.canvas;
-        delete object.group;
+        this._exitGroup(object, removeParentTransform);
+        object._set('canvas', undefined);
+      },
+
+      /**
+       * @private
+       * @param {fabric.Object} object
+       * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
+       */
+      _exitGroup: function (object, removeParentTransform) {
+        object._set('group', undefined);
         if (!removeParentTransform) {
           applyTransformToObject(
             object,
