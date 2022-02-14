@@ -54,7 +54,7 @@
        * @default
        * @override
        */
-      fill: '',
+      fill: 'rgb(0,0,0)',
 
       /**
        * @default
