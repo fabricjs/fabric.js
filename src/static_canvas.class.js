@@ -49,7 +49,6 @@
 
     /**
      * Background color of canvas instance.
-     * Should be set via {@link fabric.StaticCanvas#setBackgroundColor}.
      * @type {(String|fabric.Pattern)}
      * @default
      */
@@ -67,7 +66,6 @@
 
     /**
      * Overlay color of canvas instance.
-     * Should be set via {@link fabric.StaticCanvas#setOverlayColor}
      * @since 1.3.9
      * @type {(String|fabric.Pattern)}
      * @default
