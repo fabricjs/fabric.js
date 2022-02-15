@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors,erasing requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '5.0.0' };
+var fabric = fabric || { version: '5.1.0' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -3577,19 +3577,34 @@ fabric.warn = console.warn;
 
   /**
    * @typedef {Object} AnimationOptions
-   * @property {Function} [options.onChange] Callback; invoked on every value change
-   * @property {Function} [options.onComplete] Callback; invoked when value change is completed
-   * @property {Number} [options.startValue=0] Starting value
-   * @property {Number} [options.endValue=100] Ending value
-   * @property {Number} [options.byValue=100] Value to modify the property by
-   * @property {Function} [options.easing] Easing function
-   * @property {Number} [options.duration=500] Duration of change (in ms)
-   * @property {Function} [options.abort] Additional function with logic. If returns true, animation aborts.
+   * Animation of a value or list of values.
+   * When using lists, think of something like this:
+   * fabric.util.animate({
+   *   startValue: [1, 2, 3],
+   *   endValue: [2, 4, 6],
+   *   onChange: function([a, b, c]) {
+   *     canvas.zoomToPoint({x: b, y: c}, a)
+   *     canvas.renderAll()
+   *   }
+   * });
+   * @example
+   * @property {Function} [onChange] Callback; invoked on every value change
+   * @property {Function} [onComplete] Callback; invoked when value change is completed
+   * @example
+   * // Note: startValue, endValue, and byValue must match the type
+   * var animationOptions = { startValue: 0, endValue: 1, byValue: 0.25 }
+   * var animationOptions = { startValue: [0, 1], endValue: [1, 2], byValue: [0.25, 0.25] }
+   * @property {number | number[]} [startValue=0] Starting value
+   * @property {number | number[]} [endValue=100] Ending value
+   * @property {number | number[]} [byValue=100] Value to modify the property by
+   * @property {Function} [easing] Easing function
+   * @property {Number} [duration=500] Duration of change (in ms)
+   * @property {Function} [abort] Additional function with logic. If returns true, animation aborts.
    *
    * @typedef {() => void} CancelFunction
    *
    * @typedef {Object} AnimationCurrentState
-   * @property {number} currentValue value in range [`startValue`, `endValue`]
+   * @property {number | number[]} currentValue value in range [`startValue`, `endValue`]
    * @property {number} completionRate value in range [0, 1]
    * @property {number} durationRate value in range [0, 1]
    *
@@ -3694,6 +3709,10 @@ fabric.warn = console.warn;
    * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
    * @memberOf fabric.util
    * @param {AnimationOptions} [options] Animation options
+   * @example
+   * // Note: startValue, endValue, and byValue must match the type
+   * fabric.util.animate({ startValue: 0, endValue: 1, byValue: 0.25 })
+   * fabric.util.animate({ startValue: [0, 1], endValue: [1, 2], byValue: [0.25, 0.25] })
    * @returns {CancelFunction} cancel function
    */
   function animate(options) {
@@ -3724,9 +3743,12 @@ fabric.warn = console.warn;
           abort = options.abort || noop,
           onComplete = options.onComplete || noop,
           easing = options.easing || defaultEasing,
+          isMany = 'startValue' in options ? options.startValue.length > 0 : false,
           startValue = 'startValue' in options ? options.startValue : 0,
           endValue = 'endValue' in options ? options.endValue : 100,
-          byValue = options.byValue || endValue - startValue;
+          byValue = options.byValue || (isMany ? startValue.map(function(value, i) {
+            return endValue[i] - startValue[i];
+          }) : endValue - startValue);
 
       options.onStart && options.onStart();
 
@@ -3734,10 +3756,13 @@ fabric.warn = console.warn;
         time = ticktime || +new Date();
         var currentTime = time > finish ? duration : (time - start),
             timePerc = currentTime / duration,
-            current = easing(currentTime, startValue, byValue, duration),
-            valuePerc = Math.abs((current - startValue) / byValue);
+            current = isMany ? startValue.map(function(_value, i) {
+              return easing(currentTime, startValue[i], byValue[i], duration);
+            }) : easing(currentTime, startValue, byValue, duration),
+            valuePerc = isMany ? Math.abs((current[0] - startValue[0]) / byValue[0])
+              : Math.abs((current - startValue) / byValue);
         //  update context
-        context.currentValue = current;
+        context.currentValue = isMany ? current.slice() : current;
         context.completionRate = valuePerc;
         context.durationRate = timePerc;
         if (cancel) {
@@ -3749,11 +3774,11 @@ fabric.warn = console.warn;
         }
         if (time > finish) {
           //  update context
-          context.currentValue = endValue;
+          context.currentValue = isMany ? endValue.slice() : endValue;
           context.completionRate = 1;
           context.durationRate = 1;
           //  execute callbacks
-          onChange(endValue, 1, 1);
+          onChange(isMany ? endValue.slice() : endValue, 1, 1);
           onComplete(endValue, 1, 1);
           removeFromRegistry();
           return;
@@ -10503,10 +10528,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       }
       this.forEachObject(function(object) {
         object.dispose && object.dispose();
-        // animation module is still optional
-        if (fabric.runningAnimations) {
-          fabric.runningAnimations.cancelByTarget(object);
-        }
       });
       this._objects = [];
       if (this.backgroundImage && this.backgroundImage.dispose) {
@@ -16253,6 +16274,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     /**
      * cancel instance's running animations
+     * override if necessary to dispose artifacts such as `clipPath`
      */
     dispose: function () {
       if (fabric.runningAnimations) {
@@ -22481,8 +22503,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     mainParameter: 'matrix',
 
     /**
-     * Lock the colormatrix on the color part, skipping alpha, manly for non webgl scenario
+     * Lock the colormatrix on the color part, skipping alpha, mainly for non webgl scenario
      * to save some calculation
+     * @type Boolean
+     * @default true
      */
     colorsOnly: true,
 
@@ -23881,17 +23905,23 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     /**
      * Color to make the blend operation with. default to a reddish color since black or white
      * gives always strong result.
+     * @type String
+     * @default
      **/
     color: '#F95C63',
 
     /**
      * Blend mode for the filter: one of multiply, add, diff, screen, subtract,
      * darken, lighten, overlay, exclusion, tint.
+     * @type String
+     * @default
      **/
     mode: 'multiply',
 
     /**
      * alpha value. represent the strength of the blend color operation.
+     * @type Number
+     * @default
      **/
     alpha: 1,
 
@@ -24132,8 +24162,9 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     image: null,
 
     /**
-     * Blend mode for the filter: one of multiply, add, diff, screen, subtract,
-     * darken, lighten, overlay, exclusion, tint.
+     * Blend mode for the filter (one of "multiply", "mask")
+     * @type String
+     * @default
      **/
     mode: 'multiply',
 
@@ -25269,6 +25300,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * blur value, in percentage of image dimensions.
      * specific to keep the image blur constant at different resolutions
      * range between 0 and 1.
+     * @type Number
+     * @default
      */
     blur: 0,
 
