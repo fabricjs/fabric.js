@@ -1669,8 +1669,7 @@
      * and format option. toCanvasElement is faster and produce no loss of quality.
      * If you need to get a real Jpeg or Png from an object, using toDataURL is the right way to do it.
      * toCanvasElement and then toBlob from the obtained canvas is also a good option.
-     * This method is sync now, but still support the callback because we did not want to break.
-     * When fabricJS 5.0 will be planned, this will probably be changed to not have a callback.     * @param {Object} [options] for clone as image, passed to toDataURL
+     * @param {Object} [options] for clone as image, passed to toDataURL
      * @param {Number} [options.multiplier=1] Multiplier to scale by
      * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
      * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
