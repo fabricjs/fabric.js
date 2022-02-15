@@ -420,25 +420,38 @@
           left: object.left + diff.x,
           top: object.top + diff.y,
         });
-        object.setCoords();
       },
 
       /**
+       * initial layout logic:
+       * calculate bbox of objects (if necessary) and translate it according to options recieved from the constructor (left, top, width, height)
+       * so it is placed in the center of the bbox received from the constructor
+       * 
        * @private
        * @param {object} context see `getLayoutStrategyResult`
        */
       _applyLayoutStrategy: function (context) {
         var transform = this.calcTransformMatrix();
+        var isFirstLayout = context.type === 'initialization';
         var center = this.getCenterPoint();
         var result = this.getLayoutStrategyResult(this.layout, this._objects.concat(), context);
         if (!result) {
+          //  fire hook on first layout  (firing layout event won't have any effect because at this point no events have been registered)
+          isFirstLayout && this.onLayout(context, {
+            centerX: center.x,
+            centerY: center.y,
+            width: this.width,
+            height: this.height,
+          });
           return;
         }
         this.set({ width: result.width, height: result.height });
         //  handle positioning
         var newCenter = new fabric.Point(result.centerX, result.centerY);
         var diff = fabric.util.transformPoint(
-          center.subtract(newCenter),
+          isFirstLayout ?
+            center.subtract(new fabric.Point(result.centerMassX, result.centerMassY)):
+            center.subtract(newCenter),
           fabric.util.invertTransform(transform),
           true
         );
@@ -447,11 +460,13 @@
           this._adjustObjectPosition(object, diff);
         }, this);
         //  clip path as well
-        context.type !== 'initialization' && this.clipPath && !this.clipPath.absolutePositioned
+        !isFirstLayout && this.clipPath && !this.clipPath.absolutePositioned
           && this._adjustObjectPosition(this.clipPath, diff);
-        //  set position
-        this.setPositionByOrigin(newCenter, 'center', 'center');
-        context.type !== 'initialization' && this.callSuper('setCoords');
+        if (!newCenter.eq(center)) {
+          //  set position
+          this.setPositionByOrigin(newCenter, 'center', 'center');
+          this.setCoords();
+        }
         //  fire layout hook and event
         this.onLayout(context, result);
         this.fire('layout', {
@@ -537,61 +552,42 @@
        * @param {object} context object with data regarding what triggered the call
        * @param {'initialization'|'object_modified'|'added'|'removed'|'layout_change'|'imperative'} context.type
        * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
-       * @returns {{ centerX: number, centerY: number, width: number, height: number } | null} positioning data
+       * @returns {{ centerX: number, centerY: number, width: number, height: number } | undefined} positioning data in canvas coordinate plane
        */
       prepareBoundingBox: function (layoutDirective, objects, context) {
-        var bbox;
         if (context.type === 'initialization') {
           var options = context.options || {};
           var hasX = typeof options.left === 'number',
               hasY = typeof options.top === 'number',
               hasWidth = typeof options.width === 'number',
               hasHeight = typeof options.height === 'number';
-          var center = hasX || hasY ?
-            this.translateToCenterPoint(
-              new fabric.Point(this.left, this.top),
-              this.originX,
-              this.originY
-            ) :
-            undefined;
           //  performance enhancement
           //  skip layout calculation if bbox is defined
-          if (center && hasWidth && hasHeight) {
-            bbox = {
-              centerX: center.x,
-              centerY: center.y,
-              width: this.width,
-              height: this.height
+          if ((hasX && hasY && hasWidth && hasHeight && context.objectsRelativeToGroup) || objects.length === 0) {
+            return;
+          }
+          else {
+            var bbox = this.getObjectsBoundingBox(objects);
+            var center = this.getCenterPoint();
+            return {
+              centerX: hasX || hasY ? center.x : bbox.centerX,
+              centerY: hasX || hasY ? center.y : bbox.centerY,
+              centerMassX: bbox.centerX,
+              centerMassY: bbox.centerY,
+              width: hasWidth ? this.width : bbox.width,
+              height: hasHeight ? this.height : bbox.height,
             };
           }
-          else if (center || hasWidth || hasHeight || objects.length > 0) {
-            bbox = this.getObjectsBoundingBox(objects) || {
-              centerX: 0,
-              centerY: 0,
-              width: 0,
-              height: 0
-            };
-            if (center) {
-              bbox.centerX = center.x;
-              bbox.centerY = center.y;
-            }
-            if (hasWidth) {
-              bbox.width = this.width;
-            }
-            if (hasHeight) {
-              bbox.height = this.height;
-            }
-          }
+        }
+        else if (context.type === 'imperative' && context.context) {
+          return Object.assign(
+            this.getObjectsBoundingBox(objects) || {},
+            context.context
+          );
         }
         else {
-          bbox = this.getObjectsBoundingBox(objects);
-          //  override values
-          if (context.type === 'imperative' && context.context) {
-            bbox = bbox || {};
-            Object.assign(bbox, context.context);
-          }
+          return this.getObjectsBoundingBox(objects);
         }
-        return bbox;
       },
 
       /**
@@ -625,7 +621,7 @@
         var width = bounds.max.x - bounds.min.x,
             height = bounds.max.y - bounds.min.y,
             center = new fabric.Point(bounds.min.x, bounds.min.y).midPointFrom(bounds.max),
-            rad = fabric.util.degreesToRadians(this.angle || 0),
+            rad = fabric.util.degreesToRadians(this.getTotalAngle() || 0),
             cos = Math.abs(Math.cos(rad)),
             sin = Math.abs(Math.sin(rad));
 
