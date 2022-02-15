@@ -87,9 +87,9 @@
     },
 
     /**
-     * 
-     * @param {string} key 
-     * @param {*} value 
+     *
+     * @param {string} key
+     * @param {*} value
      */
     _set: function (key, value) {
       var settingCanvas = key === 'canvas';

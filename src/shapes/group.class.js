@@ -382,8 +382,8 @@
        */
       _renderObjects: function (ctx) {
         var localActiveObjects = this._activeObjects,
-          activeObjectsSize = this.canvas.getActiveObjects ? this.canvas.getActiveObjects().length : 0,
-          preserveObjectStacking = this.canvas.preserveObjectStacking;
+            activeObjectsSize = this.canvas.getActiveObjects ? this.canvas.getActiveObjects().length : 0,
+            preserveObjectStacking = this.canvas.preserveObjectStacking;
         this.forEachObject(function (object) {
           if (preserveObjectStacking || activeObjectsSize <= 1
             || localActiveObjects.length === 0 || localActiveObjects.indexOf(object) === -1) {
@@ -426,7 +426,7 @@
        * initial layout logic:
        * calculate bbox of objects (if necessary) and translate it according to options recieved from the constructor (left, top, width, height)
        * so it is placed in the center of the bbox received from the constructor
-       * 
+       *
        * @private
        * @param {object} context see `getLayoutStrategyResult`
        */
@@ -450,7 +450,7 @@
         var newCenter = new fabric.Point(result.centerX, result.centerY);
         var diff = fabric.util.transformPoint(
           isFirstLayout ?
-            center.subtract(new fabric.Point(result.centerMassX, result.centerMassY)):
+            center.subtract(new fabric.Point(result.centerMassX, result.centerMassY)) :
             center.subtract(newCenter),
           fabric.util.invertTransform(transform),
           true
