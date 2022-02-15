@@ -141,11 +141,13 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     el.height = this.height;
     // this seems wrong. either Canvas or StaticCanvas
     var clone = new fabric.Canvas(el);
+    var data = {};
     if (this.backgroundImage) {
-      // TODO verify this
-      clone.setBackgroundImage(this.backgroundImage.src);
-      return Promise.resolve(clone);
+      data.backgroundImage = this.backgroundImage.toObject();
     }
-    return Promise.resolve(clone);
+    if (this.backgroundColor) {
+      data.background = this.backgroundColor.toObject ? this.backgroundColor.toObject() : this.backgroundColor;
+    }
+    return clone.loadFromJSON(data);
   }
 });
