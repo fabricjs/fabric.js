@@ -80,41 +80,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   },
 
   /**
-   * @private
-   * @param {String} property Property to set (backgroundColor, overlayColor)
-   * @param {(Object|String)} value Value to set
-   */
-  __setBgOverlay: function(property, value) {
-    if (!value) {
-      return;
-    }
-    this['set' + fabric.util.string.capitalize(property, true)](value);
-  },
-
-  /**
-   * @private
-   * @param {String} format
-   * @param {Function} callback
-   */
-  _toDataURL: function (format, callback) {
-    this.clone(function (clone) {
-      callback(clone.toDataURL(format));
-    });
-  },
-
-  /**
-   * @private
-   * @param {String} format
-   * @param {Number} multiplier
-   * @param {Function} callback
-   */
-  _toDataURLWithMultiplier: function (format, multiplier, callback) {
-    this.clone(function (clone) {
-      callback(clone.toDataURLWithMultiplier(format, multiplier));
-    });
-  },
-
-  /**
    * Clones canvas instance
    * @param {Array} [properties] Array of properties to include in the cloned canvas and children
    * @returns {Promise<fabric.Canvas>}
