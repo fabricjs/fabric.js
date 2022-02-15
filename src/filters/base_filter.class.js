@@ -356,7 +356,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 });
 
 /**
- * Returns filter instance from an object representations
+ * Create filter instance from an object representation
  * @static
  * @param {Object} object Object to create an instance from
  * @returns {Promise<fabric.Image.filters.BaseFilter>}
