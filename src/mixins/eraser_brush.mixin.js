@@ -269,7 +269,7 @@
    */
   fabric.Eraser.fromObject = function (object) {
     var objects = object.objects || [],
-      options = fabric.util.object.clone(object, true);
+        options = fabric.util.object.clone(object, true);
     delete options.objects;
     return Promise.all([
       fabric.util.enlivenObjects(objects),
@@ -670,7 +670,7 @@
             });
             if (context) {
               (obj.group ? context.subTargets : context.targets).push(obj);
-              context.paths.set(obj, path);
+              //context.paths.set(obj, path);
             }
             return path;
           });
@@ -696,7 +696,7 @@
               .then(function (path) {
                 if (context) {
                   context.drawables[prop] = drawable;
-                  context.paths.set(drawable, path);
+                  //context.paths.set(drawable, path);
                 }
                 return path;
               });
@@ -743,7 +743,7 @@
         var context = {
           targets: [],
           subTargets: [],
-          paths: new Map(),
+          //paths: new Map(),
           drawables: {}
         };
         var tasks = canvas._objects.map(function (obj) {
@@ -757,7 +757,7 @@
             canvas.fire('erasing:end', Object.assign(context, {
               path: path
             }));
-            
+
             canvas.requestRenderAll();
             _this._resetShadow();
 
