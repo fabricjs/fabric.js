@@ -233,7 +233,6 @@
    * Returns filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @param {function} callback to be invoked after filter creation
    * @return {fabric.Image.filters.BlendImage} Instance of fabric.Image.filters.BlendImage
    */
   fabric.Image.filters.BlendImage.fromObject = function(object) {

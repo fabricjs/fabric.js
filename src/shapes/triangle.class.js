@@ -87,7 +87,7 @@
    * @returns {Promise<fabric.Triangle>}
    */
   fabric.Triangle.fromObject = function(object) {
-    return fabric.Object._fromObject('Triangle', object);
+    return fabric.Object._fromObject(fabric.Triangle, object);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

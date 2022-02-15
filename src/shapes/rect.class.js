@@ -181,7 +181,7 @@
    * @returns {Promise<fabric.Rect>}
    */
   fabric.Rect.fromObject = function(object) {
-    return fabric.Object._fromObject('Rect', object);
+    return fabric.Object._fromObject(fabric.Rect, object);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

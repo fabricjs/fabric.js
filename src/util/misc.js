@@ -486,32 +486,6 @@
     },
 
     /**
-     * Attaches SVG image with data: URL to the dom
-     * @memberOf fabric.util
-     * @param {Object} img Image object with data:image/svg src
-     * @param {Function} callback Callback; invoked with loaded image
-     * @return {Object} DOM element (div containing the SVG image)
-     */
-    loadImageInDom: function(img, onLoadCallback) {
-      var div = fabric.document.createElement('div');
-      div.style.width = div.style.height = '1px';
-      div.style.left = div.style.top = '-100%';
-      div.style.position = 'absolute';
-      div.appendChild(img);
-      fabric.document.querySelector('body').appendChild(div);
-      /**
-       * Wrap in function to:
-       *   1. Call existing callback
-       *   2. Cleanup DOM
-       */
-      img.onload = function () {
-        onLoadCallback();
-        div.parentNode.removeChild(div);
-        div = null;
-      };
-    },
-
-    /**
      * Creates corresponding fabric instances from their object representations
      * @static
      * @memberOf fabric.util

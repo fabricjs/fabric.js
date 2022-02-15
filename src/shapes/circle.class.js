@@ -204,7 +204,7 @@
    * @returns {Promise<fabric.Circle>}
    */
   fabric.Circle.fromObject = function(object) {
-    return fabric.Object._fromObject('Circle', object);
+    return fabric.Object._fromObject(fabric.Circle, object);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

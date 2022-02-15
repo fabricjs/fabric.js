@@ -376,28 +376,22 @@
   });
 
   QUnit.test('cloneAsImage', function(assert) {
-    var done = assert.async();
     var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
     assert.ok(typeof cObj.cloneAsImage === 'function');
-    cObj.cloneAsImage(function(image) {
-      assert.ok(image);
-      assert.ok(image instanceof fabric.Image);
-      assert.equal(image.width, 100, 'the image has same dimension of object');
-      done();
-    });
+    var image = cObj.cloneAsImage();
+    assert.ok(image);
+    assert.ok(image instanceof fabric.Image);
+    assert.equal(image.width, 100, 'the image has same dimension of object');
   });
 
   QUnit.test('cloneAsImage with retina scaling enabled', function(assert) {
-    var done = assert.async();
     var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
     fabric.devicePixelRatio = 2;
-    cObj.cloneAsImage(function(image) {
-      assert.ok(image);
-      assert.ok(image instanceof fabric.Image);
-      assert.equal(image.width, 200, 'the image has been scaled by retina');
-      fabric.devicePixelRatio = 1;
-      done();
-    }, { enableRetinaScaling: true });
+    var image = cObj.cloneAsImage({ enableRetinaScaling: true });
+    assert.ok(image);
+    assert.ok(image instanceof fabric.Image);
+    assert.equal(image.width, 200, 'the image has been scaled by retina');
+    fabric.devicePixelRatio = 1;
   });
 
   QUnit.test('toCanvasElement', function(assert) {

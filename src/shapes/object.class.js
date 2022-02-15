@@ -1653,7 +1653,7 @@
     },
 
     /**
-     * Clones an instance, using a callback method will work for every object.
+     * Clones an instance.
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @returns {Promise<fabric.Object>}
      */
@@ -1670,9 +1670,7 @@
      * If you need to get a real Jpeg or Png from an object, using toDataURL is the right way to do it.
      * toCanvasElement and then toBlob from the obtained canvas is also a good option.
      * This method is sync now, but still support the callback because we did not want to break.
-     * When fabricJS 5.0 will be planned, this will probably be changed to not have a callback.
-     * @param {Function} callback callback, invoked with an instance as a first argument
-     * @param {Object} [options] for clone as image, passed to toDataURL
+     * When fabricJS 5.0 will be planned, this will probably be changed to not have a callback.     * @param {Object} [options] for clone as image, passed to toDataURL
      * @param {Number} [options.multiplier=1] Multiplier to scale by
      * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
      * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
@@ -1681,14 +1679,11 @@
      * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
      * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
      * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
-     * @return {fabric.Object} thisArg
+     * @return {fabric.Image} Object cloned as image.
      */
-    cloneAsImage: function(callback, options) {
+    cloneAsImage: function(options) {
       var canvasEl = this.toCanvasElement(options);
-      if (callback) {
-        callback(new fabric.Image(canvasEl));
-      }
-      return this;
+      return new fabric.Image(canvasEl);
     },
 
     /**
@@ -1972,8 +1967,8 @@
    * @type string[]
    */
 
-  fabric.Object._fromObject = function(className, object, extraParam) {
-    var klass = fabric[className], serializedObject = clone(object, true);
+  fabric.Object._fromObject = function(klass, object, extraParam) {
+    var serializedObject = clone(object, true);
     return fabric.util.enlivenObjectEnlivables(serializedObject).then(function(enlivedMap) {
       var newObject = Object.assign(object, enlivedMap);
       return extraParam ? new klass(object[extraParam], newObject) : new klass(newObject);
@@ -1981,7 +1976,7 @@
   };
 
   fabric.Object.fromObject = function(object) {
-    return fabric.Object._fromObject('Object', object);
+    return fabric.Object._fromObject(fabric.Object, object);
   };
 
   /**

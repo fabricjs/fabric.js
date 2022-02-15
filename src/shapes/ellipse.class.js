@@ -174,7 +174,7 @@
    * @returns {Promise<fabric.Ellipse>}
    */
   fabric.Ellipse.fromObject = function(object) {
-    return fabric.Object._fromObject('Ellipse', object);
+    return fabric.Object._fromObject(fabric.Ellipse, object);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

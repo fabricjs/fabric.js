@@ -284,13 +284,12 @@
    * @static
    * @memberOf fabric.Line
    * @param {Object} object Object to create an instance from
-   * @param {function} [callback] invoked with new instance as first argument
    * @returns {Promise<fabric.Line>}
    */
   fabric.Line.fromObject = function(object) {
     var options = clone(object, true);
     options.points = [object.x1, object.y1, object.x2, object.y2];
-    return fabric.Object._fromObject('Line', options, 'points').then(function(fabricLine) {
+    return fabric.Object._fromObject(fabric.Line, options, 'points').then(function(fabricLine) {
       delete fabricLine.points;
       return fabricLine;
     });

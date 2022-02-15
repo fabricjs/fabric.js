@@ -74,7 +74,7 @@
    * @returns {Promise<fabric.Polygon>}
    */
   fabric.Polygon.fromObject = function(object) {
-    return fabric.Object._fromObject('Polygon', object, 'points');
+    return fabric.Object._fromObject(fabric.Polygon, object, 'points');
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
