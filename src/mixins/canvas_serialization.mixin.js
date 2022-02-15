@@ -116,7 +116,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * Clones canvas instance
-   * @param {Object} [callback] Receives cloned instance as a first argument
    * @param {Array} [properties] Array of properties to include in the cloned canvas and children
    * @returns {Promise<fabric.Canvas>}
    */
@@ -131,7 +130,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * Clones canvas instance without cloning existing data.
    * This essentially copies canvas dimensions, clipping properties, etc.
    * but leaves data empty (so that you can populate it with your own)
-   * @param {Object} [callback] Receives cloned instance as a first argument
    * @returns {Promise<fabric.Canvas>}
    */
   cloneWithoutData: function() {

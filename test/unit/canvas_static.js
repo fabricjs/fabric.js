@@ -1562,8 +1562,36 @@
   });
 
   QUnit.test('clone', function(assert) {
+    var done = assert.async();
+    var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false, width: 10, height: 10 });
     assert.ok(typeof canvas.clone === 'function');
-    // TODO (kangax): test clone
+    var rect = new fabric.Rect();
+    canvas2.add(rect);
+    canvas2.clone().then(function(cloned) {
+      assert.ok(cloned instanceof fabric.Canvas, 'is cloned in a Canvas, sad but true');
+      var clonedRect = cloned.getObjects()[0];
+      assert.equal(clonedRect.type, 'rect', 'the rect has been cloned too');
+      assert.equal(clonedRect.width, rect.width, 'the rect has been cloned too with properties');
+      assert.equal(cloned.width, canvas2.width, 'the canvas has been cloned with properties');
+      done();
+    });
+  });
+
+  QUnit.test('cloneWithoutData', function(assert) {
+    var done = assert.async();
+    var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false, width: 10, height: 10 });
+    assert.ok(typeof canvas.clone === 'function');
+    var rect = new fabric.Rect();
+    canvas2.add(rect);
+    canvas2.backgroundColor = 'red';
+    canvas2.cloneWithoutData().then(function(cloned) {
+      assert.ok(cloned instanceof fabric.Canvas, 'is cloned in a Canvas, sad but true');
+      var clonedObjects = cloned.getObjects();
+      assert.equal(clonedObjects.length, 0, 'no cloend objects');
+      assert.equal(cloned.width, canvas2.width, 'the canvas has been cloned with properties');
+      assert.equal(cloned.backgroundColor, 'red', 'background color has been cloned');
+      done();
+    });
   });
 
   QUnit.test('getSetWidth', function(assert) {
