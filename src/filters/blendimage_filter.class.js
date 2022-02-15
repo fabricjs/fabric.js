@@ -230,10 +230,10 @@
   });
 
   /**
-   * Returns filter instance from an object representation
+   * Create filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @return {fabric.Image.filters.BlendImage} Instance of fabric.Image.filters.BlendImage
+   * @returns {Promise<fabric.Image.filters.BlendImage>}
    */
   fabric.Image.filters.BlendImage.fromObject = function(object) {
     return fabric.Image.fromObject(object.image).then(function(image) {
