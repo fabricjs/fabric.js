@@ -126,7 +126,6 @@
     /* _TO_SVG_END_ */
   });
 
-  var __restoreObjectsState = fabric.Group.prototype._restoreObjectsState;
   fabric.util.object.extend(fabric.Group.prototype, {
     /**
      * @private
@@ -178,15 +177,6 @@
             });
         });
       }
-    },
-
-    /**
-     * Propagate the group's eraser to its objects, crucial for proper functionality of the eraser within the group and nested objects.
-     * @private
-     */
-    _restoreObjectsState: function () {
-      this.erasable === true && this.applyEraserToObjects();
-      return __restoreObjectsState.call(this);
     }
   });
 
@@ -214,14 +204,6 @@
      */
     originY: 'center',
 
-    drawObject: function (ctx) {
-      ctx.save();
-      ctx.fillStyle = 'black';
-      ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
-      ctx.restore();
-      this.callSuper('drawObject', ctx);
-    },
-
     /**
      * eraser should retain size
      * dimensions should not change when paths are added or removed
@@ -229,8 +211,14 @@
      * @override
      * @private
      */
-    _getBounds: function () {
-      //  noop
+    layout: 'fixed',
+
+    drawObject: function (ctx) {
+      ctx.save();
+      ctx.fillStyle = 'black';
+      ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+      ctx.restore();
+      this.callSuper('drawObject', ctx);
     },
 
     /* _TO_SVG_START_ */
