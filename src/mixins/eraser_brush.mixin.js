@@ -126,67 +126,61 @@
     /* _TO_SVG_END_ */
   });
 
-  var __restoreObjectsState = fabric.Group.prototype._restoreObjectsState;
   fabric.util.object.extend(fabric.Group.prototype, {
     /**
      * @private
      * @param {fabric.Path} path
+     * @returns {Promise<fabric.Path[]>}
      */
     _addEraserPathToObjects: function (path) {
-      this._objects.forEach(function (object) {
-        fabric.EraserBrush.prototype._addPathToObjectEraser.call(
+      return Promise.all(this._objects.map(function (object) {
+        return fabric.EraserBrush.prototype._addPathToObjectEraser.call(
           fabric.EraserBrush.prototype,
           object,
           path
         );
-      });
+      }));
     },
 
     /**
      * Applies the group's eraser to its objects
      * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
+     * @returns {Promise<fabric.Path[]|fabric.Path[][]|void>}
      */
     applyEraserToObjects: function () {
       var _this = this, eraser = this.eraser;
-      if (eraser) {
-        delete this.eraser;
-        var transform = _this.calcTransformMatrix();
-        eraser.clone(function (eraser) {
-          var clipPath = _this.clipPath;
-          eraser.getObjects('path')
-            .forEach(function (path) {
-              //  first we transform the path from the group's coordinate system to the canvas'
-              var originalTransform = fabric.util.multiplyTransformMatrices(
-                transform,
-                path.calcTransformMatrix()
-              );
-              fabric.util.applyTransformToObject(path, originalTransform);
-              if (clipPath) {
-                clipPath.clone(function (_clipPath) {
-                  var eraserPath = fabric.EraserBrush.prototype.applyClipPathToPath.call(
-                    fabric.EraserBrush.prototype,
-                    path,
-                    _clipPath,
-                    transform
-                  );
-                  _this._addEraserPathToObjects(eraserPath);
-                }, ['absolutePositioned', 'inverted']);
-              }
-              else {
-                _this._addEraserPathToObjects(path);
-              }
-            });
+      return Promise.resolve()
+        .then(function () {
+          if (eraser) {
+            delete _this.eraser;
+            var transform = _this.calcTransformMatrix();
+            return eraser.clone()
+              .then(function (eraser) {
+                var clipPath = _this.clipPath;
+                return Promise.all(eraser.getObjects('path')
+                  .map(function (path) {
+                    //  first we transform the path from the group's coordinate system to the canvas'
+                    var originalTransform = fabric.util.multiplyTransformMatrices(
+                      transform,
+                      path.calcTransformMatrix()
+                    );
+                    fabric.util.applyTransformToObject(path, originalTransform);
+                    return clipPath ?
+                      clipPath.clone()
+                        .then(function (_clipPath) {
+                          var eraserPath = fabric.EraserBrush.prototype.applyClipPathToPath.call(
+                            fabric.EraserBrush.prototype,
+                            path,
+                            _clipPath,
+                            transform
+                          );
+                          return _this._addEraserPathToObjects(eraserPath);
+                        }, ['absolutePositioned', 'inverted']) :
+                      _this._addEraserPathToObjects(path);
+                  }));
+              });
+          }
         });
-      }
-    },
-
-    /**
-     * Propagate the group's eraser to its objects, crucial for proper functionality of the eraser within the group and nested objects.
-     * @private
-     */
-    _restoreObjectsState: function () {
-      this.erasable === true && this.applyEraserToObjects();
-      return __restoreObjectsState.call(this);
     }
   });
 
@@ -214,23 +208,20 @@
      */
     originY: 'center',
 
+    /**
+     * eraser should retain size
+     * dimensions should not change when paths are added or removed
+     * handled by {@link fabric.Object#_drawClipPath}
+     * @private
+     */
+    layout: 'fixed',
+
     drawObject: function (ctx) {
       ctx.save();
       ctx.fillStyle = 'black';
       ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
       ctx.restore();
       this.callSuper('drawObject', ctx);
-    },
-
-    /**
-     * eraser should retain size
-     * dimensions should not change when paths are added or removed
-     * handled by {@link fabric.Object#_drawClipPath}
-     * @override
-     * @private
-     */
-    _getBounds: function () {
-      //  noop
     },
 
     /* _TO_SVG_START_ */
@@ -262,20 +253,21 @@
   });
 
   /**
-   * Returns {@link fabric.Eraser} instance from an object representation
+   * Returns instance from an object representation
    * @static
    * @memberOf fabric.Eraser
    * @param {Object} object Object to create an Eraser from
-   * @param {Function} [callback] Callback to invoke when an eraser instance is created
+   * @returns {Promise<fabric.Eraser>}
    */
-  fabric.Eraser.fromObject = function (object, callback) {
-    var objects = object.objects;
-    fabric.util.enlivenObjects(objects, function (enlivenedObjects) {
-      var options = fabric.util.object.clone(object, true);
-      delete options.objects;
-      fabric.util.enlivenObjectEnlivables(object, options, function () {
-        callback && callback(new fabric.Eraser(enlivenedObjects, options, true));
-      });
+  fabric.Eraser.fromObject = function (object) {
+    var objects = object.objects || [],
+      options = fabric.util.object.clone(object, true);
+    delete options.objects;
+    return Promise.all([
+      fabric.util.enlivenObjects(objects),
+      fabric.util.enlivenObjectEnlivables(options)
+    ]).then(function (enlivedProps) {
+      return new fabric.Eraser(enlivedProps[0], Object.assign(options, enlivedProps[1]), true);
     });
   };
 
@@ -600,27 +592,31 @@
        * Called when a group has a clip path that should be applied to the path before applying erasing on the group's objects.
        * @param {fabric.Path} path The eraser path
        * @param {fabric.Object} object The clipPath to apply to path belongs to object
-       * @param {Function} callback Callback to be invoked with the cloned path after applying the clip path
+       * @returns {Promise<fabric.Path>}
        */
-      clonePathWithClipPath: function (path, object, callback) {
+      clonePathWithClipPath: function (path, object) {
         var objTransform = object.calcTransformMatrix();
         var clipPath = object.clipPath;
         var _this = this;
-        path.clone(function (_path) {
-          clipPath.clone(function (_clipPath) {
-            callback(_this.applyClipPathToPath(_path, _clipPath, objTransform));
-          }, ['absolutePositioned', 'inverted']);
+        return Promise.all([
+          path.clone(),
+          clipPath.clone(['absolutePositioned', 'inverted'])
+        ]).then(function (clones) {
+          return _this.applyClipPathToPath(clones[0], clones[1], objTransform);
         });
       },
 
       /**
        * Adds path to object's eraser, walks down object's descendants if necessary
        *
+       * @public
        * @fires erasing:end on object
        * @param {fabric.Object} obj
        * @param {fabric.Path} path
+       * @param {Object} [context] context to assign erased objects to
+       * @returns {Promise<fabric.Path | fabric.Path[]>}
        */
-      _addPathToObjectEraser: function (obj, path) {
+      _addPathToObjectEraser: function (obj, path, context) {
         var _this = this;
         //  object is collection, i.e group
         if (obj.forEachObject && obj.erasable === 'deep') {
@@ -628,16 +624,17 @@
             return _obj.erasable;
           });
           if (targets.length > 0 && obj.clipPath) {
-            this.clonePathWithClipPath(path, obj, function (_path) {
-              targets.forEach(function (_obj) {
-                _this._addPathToObjectEraser(_obj, _path);
+            return this.clonePathWithClipPath(path, obj)
+              .then(function (_path) {
+                return Promise.all(targets.map(function (_obj) {
+                  return _this._addPathToObjectEraser(_obj, _path, context);
+                }));
               });
-            });
           }
           else if (targets.length > 0) {
-            targets.forEach(function (_obj) {
-              _this._addPathToObjectEraser(_obj, path);
-            });
+            return Promise.all(targets.map(function (_obj) {
+              return _this._addPathToObjectEraser(_obj, path, context);
+            }));
           }
           return;
         }
@@ -648,24 +645,27 @@
           obj.eraser = eraser;
         }
         //  clone and add path
-        path.clone(function (path) {
-          // http://fabricjs.com/using-transformations
-          var desiredTransform = fabric.util.multiplyTransformMatrices(
-            fabric.util.invertTransform(
-              obj.calcTransformMatrix()
-            ),
-            path.calcTransformMatrix()
-          );
-          fabric.util.applyTransformToObject(path, desiredTransform);
-          eraser.addWithUpdate(path);
-          obj.set('dirty', true);
-          obj.fire('erasing:end', {
-            path: path
+        return path.clone()
+          .then(function (path) {
+            // http://fabricjs.com/using-transformations
+            var desiredTransform = fabric.util.multiplyTransformMatrices(
+              fabric.util.invertTransform(
+                obj.calcTransformMatrix()
+              ),
+              path.calcTransformMatrix()
+            );
+            fabric.util.applyTransformToObject(path, desiredTransform);
+            eraser.add(path);
+            obj.set('dirty', true);
+            obj.fire('erasing:end', {
+              path: path
+            });
+            if (context) {
+              (obj.group ? context.subTargets : context.targets).push(obj);
+              context.paths.set(obj, path);
+            }
+            return path;
           });
-          if (obj.group && Array.isArray(_this.__subTargets)) {
-            _this.__subTargets.push(obj);
-          }
-        });
       },
 
       /**
@@ -673,22 +673,26 @@
        *
        * @param {fabric.Canvas} source
        * @param {fabric.Canvas} path
-       * @returns {Object} canvas drawables that were erased by the path
+       * @param {Object} [context] context to assign erased objects to
+       * @returns {Promise<fabric.Path[]|void>} eraser paths
        */
-      applyEraserToCanvas: function (path) {
+      applyEraserToCanvas: function (path, context) {
         var canvas = this.canvas;
-        var drawables = {};
-        [
+        return Promise.all([
           'backgroundImage',
           'overlayImage',
-        ].forEach(function (prop) {
+        ].map(function (prop) {
           var drawable = canvas[prop];
-          if (drawable && drawable.erasable) {
-            this._addPathToObjectEraser(drawable, path);
-            drawables[prop] = drawable;
-          }
-        }, this);
-        return drawables;
+          return drawable && drawable.erasable &&
+            this._addPathToObjectEraser(drawable, path)
+              .then(function (path) {
+                if (context) {
+                  context.drawables[prop] = drawable;
+                  context.paths.set(drawable, path);
+                }
+                return path;
+              });
+        }, this));
       },
 
       /**
@@ -727,30 +731,31 @@
         canvas.fire('before:path:created', { path: path });
 
         // finalize erasing
-        var drawables = this.applyEraserToCanvas(path);
         var _this = this;
-        this.__subTargets = [];
-        var targets = [];
-        canvas.forEachObject(function (obj) {
-          if (obj.erasable && obj.intersectsWithObject(path, true, true)) {
-            _this._addPathToObjectEraser(obj, path);
-            targets.push(obj);
-          }
+        var context = {
+          targets: [],
+          subTargets: [],
+          paths: new Map(),
+          drawables: {}
+        };
+        var tasks = canvas._objects.map(function (obj) {
+          return obj.erasable && obj.intersectsWithObject(path, true, true) &&
+            _this._addPathToObjectEraser(obj, path, context);
         });
-        //  fire erasing:end
-        canvas.fire('erasing:end', {
-          path: path,
-          targets: targets,
-          subTargets: this.__subTargets,
-          drawables: drawables
-        });
-        delete this.__subTargets;
+        tasks.push(this.applyEraserToCanvas(path, context));
+        return Promise.all(tasks)
+          .then(function () {
+            //  fire erasing:end
+            canvas.fire('erasing:end', Object.assign(context, {
+              path: path
+            }));
+            
+            canvas.requestRenderAll();
+            this._resetShadow();
 
-        canvas.requestRenderAll();
-        this._resetShadow();
-
-        // fire event 'path' created
-        canvas.fire('path:created', { path: path });
+            // fire event 'path' created
+            canvas.fire('path:created', { path: path });
+          });
       }
     }
   );
