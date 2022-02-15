@@ -708,6 +708,7 @@
    * @static
    * @param {String} url URL to create an image from
    * @param {Object} [imgOptions] Options object
+   * @returns {Promise<fabric.Image>}
    */
   fabric.Image.fromURL = function(url, imgOptions) {
     return fabric.util.loadImage(url, imgOptions || {}).then(function(img) {
