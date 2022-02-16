@@ -421,12 +421,12 @@
         else if (this.inverted) {
           var eraser = backgroundImage && backgroundImage.eraser;
           if (eraser) {
-            eraser.inverted = true;
+            backgroundImage.eraser = undefined;
             backgroundImage.dirty = true;
           }
           this.canvas._renderBackground(patternCtx);
           if (eraser) {
-            eraser.inverted = false;
+            backgroundImage.eraser = eraser;
             backgroundImage.dirty = true;
           }
         }
@@ -451,12 +451,12 @@
         else if (this.inverted) {
           var eraser = overlayImage && overlayImage.eraser;
           if (eraser) {
-            eraser.inverted = true;
+            overlayImage.eraser = undefined;
             overlayImage.dirty = true;
           }
           __renderOverlay.call(this.canvas, patternCtx);
           if (eraser) {
-            eraser.inverted = false;
+            overlayImage.eraser = eraser;
             overlayImage.dirty = true;
           }
         }
