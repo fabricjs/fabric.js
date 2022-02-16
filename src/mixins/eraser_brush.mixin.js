@@ -305,9 +305,7 @@
      */
     _renderOverlay: function (ctx) {
       __renderOverlay.call(this, ctx);
-      if (this.isErasing() && !this.freeDrawingBrush.inverted) {
-        this.freeDrawingBrush._render();
-      }
+      this.isErasing() && this.freeDrawingBrush._render();
     }
   });
 
@@ -359,10 +357,10 @@
        * @private
        * This is designed to support erasing a collection with both erasable and non-erasable objects.
        * Iterates over collections to allow nested selective erasing.
-       * Prepares the pattern brush that will draw on the top context to achieve the desired visual effect.
+       * Prepares the pattern brush that will draw on the top context after cliiping main context to achieve the desired visual effect.
        * If brush is **NOT** inverted render all non-erasable objects.
-       * If brush is inverted render all erasable objects that have been erased with their clip path inverted.
-       * This will render the erased parts as if they were not erased.
+       * If brush is inverted render all objects, erasable objects that have been erased with their clip path inverted.
+       * This will render the erased parts as if they were not erased while maintaining object stacking.
        *
        * @param {fabric.Collection} collection
        * @param {CanvasRenderingContext2D} ctx
@@ -381,21 +379,14 @@
             restorationContext.visibility.push(obj);
             restorationContext.collection.push(collection);
           }
-          else if (this.inverted && obj.visible) {
-            //  render only erasable objects that were erased
-            if (obj.erasable && obj.eraser) {
-              obj.eraser.inverted = true;
-              obj.dirty = true;
-              collection.dirty = true;
-              restorationContext.eraser.push(obj);
-              restorationContext.collection.push(collection);
-            }
-            else {
-              obj.visible = false;
-              collection.dirty = true;
-              restorationContext.visibility.push(obj);
-              restorationContext.collection.push(collection);
-            }
+          else if (this.inverted && obj.erasable && obj.eraser && obj.visible) {
+            //  invert eraser
+            var eraser = obj.eraser;
+            obj.eraser = undefined;
+            obj.dirty = true;
+            collection.dirty = true;
+            restorationContext.eraser.push([obj, eraser]);
+            restorationContext.collection.push(collection);
           }
         }, this);
       },
@@ -427,11 +418,17 @@
           this.canvas._renderBackground(patternCtx);
           if (bgErasable) { this.canvas.backgroundImage = backgroundImage; }
         }
-        else if (this.inverted && (backgroundImage && bgErasable)) {
-          var color = this.canvas.backgroundColor;
-          this.canvas.backgroundColor = undefined;
+        else if (this.inverted) {
+          var eraser = backgroundImage && backgroundImage.eraser;
+          if (eraser) {
+            eraser.inverted = true;
+            backgroundImage.dirty = true;
+          }
           this.canvas._renderBackground(patternCtx);
-          this.canvas.backgroundColor = color;
+          if (eraser) {
+            eraser.inverted = false;
+            backgroundImage.dirty = true;
+          }
         }
         patternCtx.save();
         patternCtx.transform.apply(patternCtx, this.canvas.viewportTransform);
@@ -439,8 +436,9 @@
         this._prepareCollectionTraversal(this.canvas, patternCtx, restorationContext);
         this.canvas._renderObjects(patternCtx, this.canvas._objects);
         restorationContext.visibility.forEach(function (obj) { obj.visible = true; });
-        restorationContext.eraser.forEach(function (obj) {
-          obj.eraser.inverted = false;
+        restorationContext.eraser.forEach(function (entry) {
+          var obj = entry[0], eraser = entry[1];
+          obj.eraser = eraser;
           obj.dirty = true;
         });
         restorationContext.collection.forEach(function (obj) { obj.dirty = true; });
@@ -450,11 +448,17 @@
           __renderOverlay.call(this.canvas, patternCtx);
           if (overlayErasable) { this.canvas.overlayImage = overlayImage; }
         }
-        else if (this.inverted && (overlayImage && overlayErasable)) {
-          var color = this.canvas.overlayColor;
-          this.canvas.overlayColor = undefined;
+        else if (this.inverted) {
+          var eraser = overlayImage && overlayImage.eraser;
+          if (eraser) {
+            eraser.inverted = true;
+            overlayImage.dirty = true;
+          }
           __renderOverlay.call(this.canvas, patternCtx);
-          this.canvas.overlayColor = color;
+          if (eraser) {
+            eraser.inverted = false;
+            overlayImage.dirty = true;
+          }
         }
       },
 
@@ -526,11 +530,9 @@
        */
       _render: function () {
         var ctx;
-        if (!this.inverted) {
-          //  clip canvas
-          ctx = this.canvas.getContext();
-          this.callSuper('_render', ctx);
-        }
+        //  clip canvas
+        ctx = this.canvas.getContext();
+        this.callSuper('_render', ctx);
         //  render brush and mask it with image of non erasables
         ctx = this.canvas.contextTop;
         this.canvas.clearContext(ctx);
