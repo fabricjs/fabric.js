@@ -355,12 +355,12 @@
 
       /**
        * @private
-       * This is designed to support erasing a collection with both erasable and non-erasable objects.
-       * Iterates over collections to allow nested selective erasing.
-       * Prepares the pattern brush that will draw on the top context after cliiping main context to achieve the desired visual effect.
-       * If brush is **NOT** inverted render all non-erasable objects.
+       * This is designed to support erasing a collection with both erasable and non-erasable objects while maintaining object stacking.\
+       * Iterates over collections to allow nested selective erasing.\
+       * Prepares the pattern brush that will draw on the top context after cliiping main context to achieve the desired visual effect.\
+       * If brush is **NOT** inverted render all non-erasable objects.\
        * If brush is inverted render all objects, erasable objects that have been erased with their clip path inverted.
-       * This will render the erased parts as if they were not erased while maintaining object stacking.
+       * This will render the erased parts as if they were not erased.
        *
        * @param {fabric.Collection} collection
        * @param {CanvasRenderingContext2D} ctx
