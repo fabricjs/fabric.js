@@ -16,7 +16,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    *   // `object` = fabric.Object instance
    *   // ... do some stuff ...
    * }).then((canvas) => {
-   *   ... your canvas callback
+   *   ... canvas is restored, add your code.
    * });
    */
   loadFromJSON: function (json, reviver) {
