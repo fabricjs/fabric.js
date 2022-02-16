@@ -357,10 +357,10 @@
        * @private
        * This is designed to support erasing a collection with both erasable and non-erasable objects while maintaining object stacking.\
        * Iterates over collections to allow nested selective erasing.\
-       * Prepares the pattern brush that will draw on the top context after clipping main context to achieve the desired visual effect.\
+       * Prepares objects before rendering the pattern brush.\
        * If brush is **NOT** inverted render all non-erasable objects.\
        * If brush is inverted render all objects, erasable objects without their eraser.
-       * This will render the erased parts as if they were not erased.
+       * This will render the erased parts as if they were not erased in the first place, achieving an undo effect.
        *
        * @param {fabric.Collection} collection
        * @param {CanvasRenderingContext2D} ctx
@@ -393,8 +393,8 @@
 
       /**
        * Prepare the pattern for the erasing brush
-       * This pattern will be drawn on the top context, achieving a visual effect of erasing only erasable objects
-       * @todo decide how overlay color should behave when `inverted === true`, currently draws over it which is undesirable
+       * This pattern will be drawn on the top context after clipping the main context, 
+       * achieving a visual effect of erasing only erasable objects
        * @private
        */
       preparePattern: function () {
