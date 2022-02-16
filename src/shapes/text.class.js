@@ -1306,13 +1306,13 @@
         leftOffset = lineDiff;
       }
       if (direction === 'rtl') {
-        if (textAlign === 'right' || textAlign === 'justify'){
+        if (textAlign === 'right' || textAlign === 'justify' || textAlign === 'justify-right') {
           leftOffset = 0;
         }
-        else if (textAlign === 'left') {
+        else if (textAlign === 'left' || textAlign === 'justify-left') {
           leftOffset = -lineDiff;
         }
-        else if (textAlign === 'center') {
+        else if (textAlign === 'center' || textAlign === 'justify-center') {
           leftOffset = -lineDiff / 2;
         }
       }
