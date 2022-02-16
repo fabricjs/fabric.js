@@ -153,7 +153,12 @@
           textSpans.push(this._createTextCharSpan(charsToRender, style, textLeftOffset, textTopOffset));
           charsToRender = '';
           actualStyle = nextStyle;
-          textLeftOffset += boxWidth;
+          if (this.direction === 'rtl') {
+            textLeftOffset -= boxWidth;
+          }
+          else {
+            textLeftOffset += boxWidth;
+          }
           boxWidth = 0;
         }
       }
