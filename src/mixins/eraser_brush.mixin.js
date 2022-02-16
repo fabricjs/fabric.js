@@ -357,9 +357,9 @@
        * @private
        * This is designed to support erasing a collection with both erasable and non-erasable objects while maintaining object stacking.\
        * Iterates over collections to allow nested selective erasing.\
-       * Prepares the pattern brush that will draw on the top context after cliiping main context to achieve the desired visual effect.\
+       * Prepares the pattern brush that will draw on the top context after clipping main context to achieve the desired visual effect.\
        * If brush is **NOT** inverted render all non-erasable objects.\
-       * If brush is inverted render all objects, erasable objects that have been erased with their clip path inverted.
+       * If brush is inverted render all objects, erasable objects without their eraser.
        * This will render the erased parts as if they were not erased.
        *
        * @param {fabric.Collection} collection
@@ -380,7 +380,7 @@
             restorationContext.collection.push(collection);
           }
           else if (this.inverted && obj.erasable && obj.eraser && obj.visible) {
-            //  invert eraser
+            //  render all objects without eraser
             var eraser = obj.eraser;
             obj.eraser = undefined;
             obj.dirty = true;
