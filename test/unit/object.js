@@ -357,9 +357,10 @@
   });
 
   QUnit.test('clone', function(assert) {
+    var done = assert.async();
     var cObj = new fabric.Object({ left: 123, top: 456, opacity: 0.66 });
     assert.ok(typeof cObj.clone === 'function');
-    cObj.clone(function(clone) {
+    cObj.clone().then(function(clone) {
       assert.equal(clone.get('left'), 123);
       assert.equal(clone.get('top'), 456);
       assert.equal(clone.get('opacity'), 0.66);
@@ -370,32 +371,27 @@
       assert.equal(cObj.get('left'), 123);
       assert.equal(cObj.get('scaleX'), 1);
       assert.equal(cObj.get('angle'), 0);
+      done();
     });
   });
 
   QUnit.test('cloneAsImage', function(assert) {
-    var done = assert.async();
     var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
     assert.ok(typeof cObj.cloneAsImage === 'function');
-    cObj.cloneAsImage(function(image) {
-      assert.ok(image);
-      assert.ok(image instanceof fabric.Image);
-      assert.equal(image.width, 100, 'the image has same dimension of object');
-      done();
-    });
+    var image = cObj.cloneAsImage();
+    assert.ok(image);
+    assert.ok(image instanceof fabric.Image);
+    assert.equal(image.width, 100, 'the image has same dimension of object');
   });
 
   QUnit.test('cloneAsImage with retina scaling enabled', function(assert) {
-    var done = assert.async();
     var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
     fabric.devicePixelRatio = 2;
-    cObj.cloneAsImage(function(image) {
-      assert.ok(image);
-      assert.ok(image instanceof fabric.Image);
-      assert.equal(image.width, 200, 'the image has been scaled by retina');
-      fabric.devicePixelRatio = 1;
-      done();
-    }, { enableRetinaScaling: true });
+    var image = cObj.cloneAsImage({ enableRetinaScaling: true });
+    assert.ok(image);
+    assert.ok(image instanceof fabric.Image);
+    assert.equal(image.width, 200, 'the image has been scaled by retina');
+    fabric.devicePixelRatio = 1;
   });
 
   QUnit.test('toCanvasElement', function(assert) {

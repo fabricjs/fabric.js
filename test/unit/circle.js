@@ -231,7 +231,7 @@
 
     fabric.Circle.fromObject({
       left: left, top: top, radius: radius, fill: fill
-    }, function(circle) {
+    }).then(function(circle) {
       assert.ok(circle instanceof fabric.Circle);
 
       assert.equal(circle.get('left'), left);
@@ -240,7 +240,7 @@
       assert.equal(circle.get('fill'), fill);
 
       var expected = circle.toObject();
-      fabric.Circle.fromObject(expected, function(actual) {
+      fabric.Circle.fromObject(expected).then(function(actual) {
         assert.deepEqual(actual.toObject(), expected);
         done();
       });
@@ -248,15 +248,17 @@
   });
 
   QUnit.test('cloning and radius, width, height', function(assert) {
+    var done = assert.async();
     var circle = new fabric.Circle({ radius: 10, strokeWidth: 0});
     circle.scale(2);
 
-    circle.clone(function(clone) {
+    circle.clone().then(function(clone) {
       assert.equal(clone.width, 20);
       assert.equal(clone.getScaledWidth(), 40);
       assert.equal(clone.height, 20);
       assert.equal(clone.getScaledHeight(), 40);
       assert.equal(clone.radius, 10);
+      done();
     });
   });
 })();

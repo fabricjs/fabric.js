@@ -103,7 +103,7 @@
     QUnit.test('fromObject', function(assert) {
       var done = assert.async();
       assert.ok(typeof fabric.IText.fromObject === 'function');
-      fabric.IText.fromObject(ITEXT_OBJECT, function(iText) {
+      fabric.IText.fromObject(ITEXT_OBJECT).then(function(iText) {
         assert.ok(iText instanceof fabric.IText);
         assert.deepEqual(ITEXT_OBJECT, iText.toObject());
         done();

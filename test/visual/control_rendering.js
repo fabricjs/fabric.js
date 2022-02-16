@@ -285,8 +285,8 @@
   });
 
   function controlBoxes(canvas, callback) {
-    canvas.loadFromJSON('{"version":"4.6.0","objects":[{"type":"rect","version":"4.6.0","left":38,"top":201,"width":150,"height":150,"fill":"red","skewX":0.15,"skewY":36},{"type":"rect","version":"4.6.0","left":20,"top":2,"width":150,"height":150,"fill":"#020aed","scaleX":1.24,"scaleY":0.81,"angle":35.95,"skewX":25.46},{"type":"group","version":"4.6.0","left":60.65,"top":28,"width":320.4,"height":335.5,"objects":[{"type":"rect","version":"4.6.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"green","angle":30,"skewX":14.71,"skewY":36},{"type":"rect","version":"4.6.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"yellow","angle":45,"skewX":14.71}]}]}',
-      function() {
+    canvas.loadFromJSON('{"version":"4.6.0","objects":[{"type":"rect","version":"4.6.0","left":38,"top":201,"width":150,"height":150,"fill":"red","skewX":0.15,"skewY":36},{"type":"rect","version":"4.6.0","left":20,"top":2,"width":150,"height":150,"fill":"#020aed","scaleX":1.24,"scaleY":0.81,"angle":35.95,"skewX":25.46},{"type":"group","version":"4.6.0","left":60.65,"top":28,"width":320.4,"height":335.5,"objects":[{"type":"rect","version":"4.6.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"green","angle":30,"skewX":14.71,"skewY":36},{"type":"rect","version":"4.6.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"yellow","angle":45,"skewX":14.71}]}]}')
+      .then(function() {
         canvas.renderAll();
         canvas.getObjects().forEach(function(object) {
           object.borderScaleFactor = 3;

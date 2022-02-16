@@ -89,7 +89,7 @@
   QUnit.test('fromObject', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Polyline.fromObject === 'function');
-    fabric.Polyline.fromObject(REFERENCE_OBJECT, function(polyline) {
+    fabric.Polyline.fromObject(REFERENCE_OBJECT).then(function(polyline) {
       assert.ok(polyline instanceof fabric.Polyline);
       assert.deepEqual(polyline.toObject(), REFERENCE_OBJECT);
       done();

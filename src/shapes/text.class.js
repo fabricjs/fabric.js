@@ -1699,22 +1699,10 @@
    * @static
    * @memberOf fabric.Text
    * @param {Object} object plain js Object to create an instance from
-   * @param {Function} [callback] Callback to invoke when an fabric.Text instance is created
+   * @returns {Promise<fabric.Text>}
    */
-  fabric.Text.fromObject = function(object, callback) {
-    var objectCopy = clone(object), path = object.path;
-    delete objectCopy.path;
-    return fabric.Object._fromObject('Text', objectCopy, function(textInstance) {
-      if (path) {
-        fabric.Object._fromObject('Path', path, function(pathInstance) {
-          textInstance.set('path', pathInstance);
-          callback(textInstance);
-        }, 'path');
-      }
-      else {
-        callback(textInstance);
-      }
-    }, 'text');
+  fabric.Text.fromObject = function(object) {
+    return fabric.Object._fromObject(fabric.Text, object, 'text');
   };
 
   fabric.Text.genericFonts = ['sans-serif', 'serif', 'cursive', 'fantasy', 'monospace'];
