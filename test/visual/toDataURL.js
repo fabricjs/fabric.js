@@ -113,7 +113,7 @@
   });
   //
   function toDataURL4(fabricCanvas, callback) {
-    fabricCanvas.loadFromJSON(canvasWithObjects, function() {
+    fabricCanvas.loadFromJSON(canvasWithObjects).then(function() {
       var dataUrl = fabricCanvas.toDataURL();
       callback(dataUrl);
     });
@@ -129,7 +129,7 @@
   });
 
   function toDataURL5(fabricCanvas, callback) {
-    fabricCanvas.loadFromJSON(canvasWithObjects, function() {
+    fabricCanvas.loadFromJSON(canvasWithObjects).then(function() {
       var dataurl = fabricCanvas.toDataURL({ multiplier: 0.3 });
       callback(dataurl);
     });
@@ -147,7 +147,7 @@
   function toDataURL6(fabricCanvas, callback) {
     // make so everything is smaller
     fabricCanvas.setZoom(0.1);
-    fabricCanvas.loadFromJSON(canvasWithObjects, function() {
+    fabricCanvas.loadFromJSON(canvasWithObjects).then(function() {
       var dataUrl = fabricCanvas.toDataURL({ multiplier: 4 });
       callback(dataUrl);
     });
@@ -165,7 +165,7 @@
   function toDataURL7(fabricCanvas, callback) {
     // make so everything is smaller
     fabricCanvas.setZoom(0.1);
-    fabricCanvas.loadFromJSON(canvasWithObjects, function() {
+    fabricCanvas.loadFromJSON(canvasWithObjects).then(function() {
       var dataUrl = fabricCanvas.toDataURL({ multiplier: 12, left: 20, top: 20, width: 20, height: 20 });
       callback(dataUrl);
     });
@@ -182,7 +182,7 @@
 
   function toDataURL8(fabricCanvas, callback) {
     // make so everything is smaller
-    fabricCanvas.loadFromJSON(canvasWithObjects, function() {
+    fabricCanvas.loadFromJSON(canvasWithObjects).then(function() {
       var dataUrl = fabricCanvas.toDataURL({ multiplier: 1.2, left: 200, top: 200, width: 200, height: 200 });
       callback(dataUrl);
     });
@@ -201,7 +201,7 @@
   function toDataURL9(fabricCanvas, callback) {
     // make so everything is smaller
     fabricCanvas.setZoom(3);
-    fabricCanvas.loadFromJSON(canvasWithObjects, function() {
+    fabricCanvas.loadFromJSON(canvasWithObjects).then(function() {
       var dataUrl = fabricCanvas.toDataURL({ multiplier: 0.4, left: 600, top: 600, width: 600, height: 600 });
       callback(dataUrl);
     });

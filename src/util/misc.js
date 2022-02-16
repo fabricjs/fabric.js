@@ -457,185 +457,84 @@
     },
 
     /**
-     * Loads image element from given url and passes it to a callback
+     * Loads image element from given url and resolve it, or catch.
      * @memberOf fabric.util
      * @param {String} url URL representing an image
-     * @param {Function} callback Callback; invoked with loaded image
-     * @param {*} [context] Context to invoke callback in
-     * @param {Object} [crossOrigin] crossOrigin value to set image element to
+     * @param {Object} [options] image loading options
+     * @param {string} [options.crossOrigin] cors value for the image loading, default to anonymous
+     * @param {Promise<fabric.Image>} img the loaded image.
      */
-    loadImage: function(url, callback, context, crossOrigin) {
-      if (!url) {
-        callback && callback.call(context, url);
-        return;
-      }
-
-      var img = fabric.util.createImage();
-
-      /** @ignore */
-      var onLoadCallback = function () {
-        callback && callback.call(context, img, false);
-        img = img.onload = img.onerror = null;
-      };
-
-      img.onload = onLoadCallback;
-      /** @ignore */
-      img.onerror = function() {
-        fabric.log('Error loading ' + img.src);
-        callback && callback.call(context, null, true);
-        img = img.onload = img.onerror = null;
-      };
-
-      // data-urls appear to be buggy with crossOrigin
-      // https://github.com/kangax/fabric.js/commit/d0abb90f1cd5c5ef9d2a94d3fb21a22330da3e0a#commitcomment-4513767
-      // see https://code.google.com/p/chromium/issues/detail?id=315152
-      //     https://bugzilla.mozilla.org/show_bug.cgi?id=935069
-      // crossOrigin null is the same as not set.
-      if (url.indexOf('data') !== 0 &&
-        crossOrigin !== undefined &&
-        crossOrigin !== null) {
-        img.crossOrigin = crossOrigin;
-      }
-
-      // IE10 / IE11-Fix: SVG contents from data: URI
-      // will only be available if the IMG is present
-      // in the DOM (and visible)
-      if (url.substring(0,14) === 'data:image/svg') {
-        img.onload = null;
-        fabric.util.loadImageInDom(img, onLoadCallback);
-      }
-
-      img.src = url;
-    },
-
-    /**
-     * Attaches SVG image with data: URL to the dom
-     * @memberOf fabric.util
-     * @param {Object} img Image object with data:image/svg src
-     * @param {Function} callback Callback; invoked with loaded image
-     * @return {Object} DOM element (div containing the SVG image)
-     */
-    loadImageInDom: function(img, onLoadCallback) {
-      var div = fabric.document.createElement('div');
-      div.style.width = div.style.height = '1px';
-      div.style.left = div.style.top = '-100%';
-      div.style.position = 'absolute';
-      div.appendChild(img);
-      fabric.document.querySelector('body').appendChild(div);
-      /**
-       * Wrap in function to:
-       *   1. Call existing callback
-       *   2. Cleanup DOM
-       */
-      img.onload = function () {
-        onLoadCallback();
-        div.parentNode.removeChild(div);
-        div = null;
-      };
+    loadImage: function(url, options) {
+      return new Promise(function(resolve, reject) {
+        var img = fabric.util.createImage();
+        var done = function() {
+          img.onload = img.onerror = null;
+          resolve(img);
+        };
+        if (!url) {
+          done();
+        }
+        else {
+          img.onload = done;
+          img.onerror = function () {
+            reject(new Error('Error loading ' + img.src));
+          };
+          options && options.crossOrigin && (img.crossOrigin = options.crossOrigin);
+          img.src = url;
+        }
+      });
     },
 
     /**
      * Creates corresponding fabric instances from their object representations
      * @static
      * @memberOf fabric.util
-     * @param {Array} objects Objects to enliven
-     * @param {Function} callback Callback to invoke when all objects are created
+     * @param {Object[]} objects Objects to enliven
      * @param {String} namespace Namespace to get klass "Class" object from
      * @param {Function} reviver Method for further parsing of object elements,
      * called after each fabric object created.
      */
-    enlivenObjects: function(objects, callback, namespace, reviver) {
-      objects = objects || [];
-
-      var enlivenedObjects = [],
-          numLoadedObjects = 0,
-          numTotalObjects = objects.length;
-
-      function onLoaded() {
-        if (++numLoadedObjects === numTotalObjects) {
-          callback && callback(enlivenedObjects.filter(function(obj) {
-            // filter out undefined objects (objects that gave error)
-            return obj;
-          }));
-        }
-      }
-
-      if (!numTotalObjects) {
-        callback && callback(enlivenedObjects);
-        return;
-      }
-
-      objects.forEach(function (o, index) {
-        // if sparse array
-        if (!o || !o.type) {
-          onLoaded();
-          return;
-        }
-        var klass = fabric.util.getKlass(o.type, namespace);
-        klass.fromObject(o, function (obj, error) {
-          error || (enlivenedObjects[index] = obj);
-          reviver && reviver(o, obj, error);
-          onLoaded();
+    enlivenObjects: function(objects, namespace, reviver) {
+      return Promise.all(objects.map(function(obj) {
+        var klass = fabric.util.getKlass(obj.type, namespace);
+        return klass.fromObject(obj).then(function(fabricInstance) {
+          reviver && reviver(obj, fabricInstance);
+          return fabricInstance;
         });
-      });
+      }));
     },
 
     /**
      * Creates corresponding fabric instances residing in an object, e.g. `clipPath`
-     * @see {@link fabric.Object.ENLIVEN_PROPS}
-     * @param {Object} object
-     * @param {Object} [context] assign enlived props to this object (pass null to skip this)
-     * @param {(objects:fabric.Object[]) => void} callback
+     * @param {Object} object with properties to enlive ( fill, stroke, clipPath, path )
+     * @returns {Promise<object>} the input object with enlived values
      */
-    enlivenObjectEnlivables: function (object, context, callback) {
-      var enlivenProps = fabric.Object.ENLIVEN_PROPS.filter(function (key) { return !!object[key]; });
-      fabric.util.enlivenObjects(enlivenProps.map(function (key) { return object[key]; }), function (enlivedProps) {
-        var objects = {};
-        enlivenProps.forEach(function (key, index) {
-          objects[key] = enlivedProps[index];
-          context && (context[key] = enlivedProps[index]);
-        });
-        callback && callback(objects);
-      });
-    },
 
-    /**
-     * Create and wait for loading of patterns
-     * @static
-     * @memberOf fabric.util
-     * @param {Array} patterns Objects to enliven
-     * @param {Function} callback Callback to invoke when all objects are created
-     * called after each fabric object created.
-     */
-    enlivenPatterns: function(patterns, callback) {
-      patterns = patterns || [];
-
-      function onLoaded() {
-        if (++numLoadedPatterns === numPatterns) {
-          callback && callback(enlivenedPatterns);
+    enlivenObjectEnlivables: function (serializedObject) {
+      // enlive every possible property
+      var promises = Object.values(serializedObject).map(function(value) {
+        if (!value) {
+          return value;
         }
-      }
-
-      var enlivenedPatterns = [],
-          numLoadedPatterns = 0,
-          numPatterns = patterns.length;
-
-      if (!numPatterns) {
-        callback && callback(enlivenedPatterns);
-        return;
-      }
-
-      patterns.forEach(function (p, index) {
-        if (p && p.source) {
-          new fabric.Pattern(p, function(pattern) {
-            enlivenedPatterns[index] = pattern;
-            onLoaded();
+        if (value.colorStops) {
+          return new fabric.Gradient(value);
+        }
+        if (value.type) {
+          return fabric.util.enlivenObjects([value]).then(function (enlived) {
+            return enlived[0];
           });
         }
-        else {
-          enlivenedPatterns[index] = p;
-          onLoaded();
+        if (value.source) {
+          return fabric.Pattern.fromObject(value);
         }
+        return value;
+      });
+      var keys = Object.keys(serializedObject);
+      return Promise.all(promises).then(function(enlived) {
+        return enlived.reduce(function(acc, instance, index) {
+          acc[keys[index]] = instance;
+          return acc;
+        }, {});
       });
     },
 

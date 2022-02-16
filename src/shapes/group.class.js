@@ -733,20 +733,18 @@
    * @private
    * @static
    * @memberOf fabric.Group
-   * @param {Object} object Object to create an instance from
-   * @param {(objects: fabric.Object[], options?: Object) => any} [callback]
+   * @param {Object} object Object to create a group from
+   * @returns {Promise<fabric.Group>}
    */
-  fabric.Group._fromObject = function (object, callback) {
-    var objects = object.objects,
-        options = clone(object, true);
+  fabric.Group.fromObject = function(object) {
+    var objects = object.objects || [],
+        options = fabric.util.object.clone(object, true);
     delete options.objects;
-    fabric.util.enlivenObjects(objects, function (enlivenedObjects) {
-      fabric.util.enlivenObjects([object.clipPath], function (enlivedClipPath) {
-        var options = clone(object, true);
-        options.clipPath = enlivedClipPath[0];
-        delete options.objects;
-        callback && callback(enlivenedObjects, options);
-      });
+    return Promise.all([
+      fabric.util.enlivenObjects(objects),
+      fabric.util.enlivenObjectEnlivables(options)
+    ]).then(function (enlivened) {
+      return new fabric.Group(enlivened[0], Object.assign(options, enlivened[1]), true);
     });
   };
 

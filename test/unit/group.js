@@ -367,7 +367,7 @@
     assert.ok(typeof fabric.Group.fromObject === 'function');
     var groupObject = group.toObject();
 
-    fabric.Group.fromObject(groupObject, function(newGroupFromObject) {
+    fabric.Group.fromObject(groupObject).then(function(newGroupFromObject) {
 
       var objectFromOldGroup = group.toObject();
       var objectFromNewGroup = newGroupFromObject.toObject();
@@ -407,7 +407,7 @@
 
     var groupToObject = groupObject.toObject();
 
-    fabric.Group.fromObject(groupToObject, function(newGroupFromObject) {
+    fabric.Group.fromObject(groupToObject).then(function(newGroupFromObject) {
 
       var objectFromNewGroup = newGroupFromObject.toObject();
 
@@ -425,10 +425,9 @@
 
     var groupObject = group.toObject();
 
-    fabric.Group.fromObject(groupObject, function(newGroupFromObject) {
+    fabric.Group.fromObject(groupObject).then(function(newGroupFromObject) {
       assert.ok(newGroupFromObject._objects[0].lineCoords.tl, 'acoords 0 are restored');
       assert.ok(newGroupFromObject._objects[1].lineCoords.tl, 'acoords 1 are restored');
-
       done();
     });
   });
@@ -438,7 +437,7 @@
     var group = makeGroupWith2ObjectsWithOpacity();
     var groupObject = group.toObject();
 
-    fabric.Group.fromObject(groupObject, function(newGroupFromObject) {
+    fabric.Group.fromObject(groupObject).then(function(newGroupFromObject) {
       assert.equal(newGroupFromObject.objects, undefined, 'the objects array has not been pulled in');
       assert.notEqual(groupObject.objects, undefined, 'the objects array has not been deleted from object source');
       done();
@@ -477,11 +476,9 @@
   QUnit.test('cloning group with 2 objects', function(assert) {
     var done = assert.async();
     var group = makeGroupWith2Objects();
-    group.clone(function(clone) {
-
+    group.clone().then(function(clone) {
       assert.ok(clone !== group);
       assert.deepEqual(clone.toObject(), group.toObject());
-
       done();
     });
   });

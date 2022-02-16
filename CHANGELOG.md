@@ -1,5 +1,17 @@
 # Changelog
 
+## [5.1.0]
+
+- build(deps): bump node-fetch from 2.6.6 to 2.6.7 [`#7684`](https://github.com/fabricjs/fabric.js/pull/7684)
+- build(deps): bump follow-redirects from 1.14.6 to 1.14.8 [`#7683`](https://github.com/fabricjs/fabric.js/pull/7683)
+- build(deps): bump simple-get from 3.1.0 to 3.1.1 [`#7682`](https://github.com/fabricjs/fabric.js/pull/7682)
+- build(deps): bump engine.io from 6.1.0 to 6.1.2 [`#7681`](https://github.com/fabricjs/fabric.js/pull/7681)
+- fix(test): Remove expect assertion [`#7678`](https://github.com/fabricjs/fabric.js/pull/7678)
+- docs(blendimage_filter.class.js) corrected mode options [`#7672`](https://github.com/fabricjs/fabric.js/pull/7672)
+- chore(): Update bug_report.md [`#7659`](https://github.com/fabricjs/fabric.js/pull/7659)
+- fix(util.animation): remove extra animation cancel [`#7631`](https://github.com/fabricjs/fabric.js/pull/7631)
+- feat(animation): Support a list of animation values for animating matrices changes [`#7633`](https://github.com/fabricjs/fabric.js/pull/7633)
+- ci(tests): windows and linux paths resolutions [`#7635`](https://github.com/fabricjs/fabric.js/pull/7635)
 
 ## [5.0.0]
 

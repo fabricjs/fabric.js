@@ -122,8 +122,8 @@
   }
 
   /**
-   * 
-   * @param {*} actual 
+   *
+   * @param {*} actual
    * @param {*} [expected]
    */
   QUnit.assert.sameImageObject = function (actual, expected) {
@@ -180,7 +180,7 @@
       assert.ok(typeof image.setSrc === 'function');
       assert.equal(image.width, 100);
       assert.equal(image.height, 100);
-      image.setSrc(IMG_SRC, function() {
+      image.setSrc(IMG_SRC).then(function() {
         assert.equal(image.width, IMG_WIDTH);
         assert.equal(image.height, IMG_HEIGHT);
         done();
@@ -196,13 +196,11 @@
       assert.ok(typeof image.setSrc === 'function');
       assert.equal(image.width, 100);
       assert.equal(image.height, 100);
-      image.setSrc(IMG_SRC, function() {
+      image.setSrc(IMG_SRC, { crossOrigin: 'anonymous' }).then(function() {
         assert.equal(image.width, IMG_WIDTH);
         assert.equal(image.height, IMG_HEIGHT);
         assert.equal(image.getCrossOrigin(), 'anonymous', 'setSrc will respect crossOrigin');
         done();
-      }, {
-        crossOrigin: 'anonymous'
       });
     });
   });
@@ -233,7 +231,7 @@
       assert.ok(image.resizeFilter instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
       var toObject = image.toObject();
       assert.deepEqual(toObject.resizeFilter, filter.toObject(), 'the filter is in object form now');
-      fabric.Image.fromObject(toObject, function(imageFromObject) {
+      fabric.Image.fromObject(toObject).then(function(imageFromObject) {
         var filterFromObj = imageFromObject.resizeFilter;
         assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
         assert.deepEqual(filterFromObj, filter,  'the filter has been restored');
@@ -257,7 +255,7 @@
       var toObject = image.toObject();
       assert.deepEqual(toObject.resizeFilter, filter.toObject(), 'the filter is in object form now');
       assert.deepEqual(toObject.filters[0], filterBg.toObject(), 'the filter is in object form now brightness');
-      fabric.Image.fromObject(toObject, function(imageFromObject) {
+      fabric.Image.fromObject(toObject).then(function(imageFromObject) {
         var filterFromObj = imageFromObject.resizeFilter;
         var brightnessFromObj = imageFromObject.filters[0];
         assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
@@ -284,7 +282,7 @@
       assert.deepEqual(toObject.filters[0], filter.toObject());
       assert.equal(toObject.width, width, 'width is stored as before filters');
       assert.equal(toObject.height, height, 'height is stored as before filters');
-      fabric.Image.fromObject(toObject, function(_imageFromObject) {
+      fabric.Image.fromObject(toObject).then(function(_imageFromObject) {
         var filterFromObj = _imageFromObject.filters[0];
         assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
         assert.equal(filterFromObj.scaleY, 0.2);
@@ -455,8 +453,7 @@
         done();
         return;
       }
-      console.log(objRepr);
-      fabric.Image.fromObject(objRepr, function(img) {
+      fabric.Image.fromObject(objRepr).then(function(img) {
         assert.equal(img.getCrossOrigin(), null, 'image without src return no element');
         done();
       });
@@ -467,9 +464,9 @@
     var done = assert.async();
     createImageObject(function(image) {
       assert.ok(typeof image.clone === 'function');
-      image.clone(function(clone) {
+      image.clone().then(function(clone) {
         assert.ok(clone instanceof fabric.Image);
-        assert.deepEqual(clone.toObject(), image.toObject());
+        assert.deepEqual(clone.toObject(), image.toObject(), 'clone and original image are equal');
         done();
       });
     });
@@ -478,7 +475,7 @@
   QUnit.test('cloneWidthHeight', function(assert) {
     var done = assert.async();
     createSmallImageObject(function(image) {
-      image.clone(function(clone) {
+      image.clone().then(function(clone) {
         assert.equal(clone.width, IMG_WIDTH / 2,
           'clone\'s element should have width identical to that of original image');
         assert.equal(clone.height, IMG_HEIGHT / 2,
@@ -496,7 +493,7 @@
     var obj = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_IMG_OBJECT), {
       src: IMG_SRC
     });
-    fabric.Image.fromObject(obj, function(instance){
+    fabric.Image.fromObject(obj).then(function(instance){
       assert.ok(instance instanceof fabric.Image);
       done();
     });
@@ -509,7 +506,7 @@
       src: IMG_SRC,
       clipPath: (new fabric.Rect({ width: 100, height: 100 })).toObject(),
     });
-    fabric.Image.fromObject(obj, function(instance){
+    fabric.Image.fromObject(obj).then(function(instance){
       assert.ok(instance instanceof fabric.Image);
       assert.ok(instance.clipPath instanceof fabric.Rect);
       done();
@@ -537,7 +534,7 @@
     var copyOfBrighteness = brightness;
     var copyOfContrast = contrast;
     var copyOfObject = obj;
-    fabric.Image.fromObject(obj, function(){
+    fabric.Image.fromObject(obj).then(function(){
       assert.ok(copyOfFilters === obj.filters, 'filters array did not mutate');
       assert.ok(copyOfBrighteness === copyOfFilters[0], 'filter is same object');
       assert.deepEqual(copyOfBrighteness, obj.filters[0], 'did not mutate filter');
@@ -552,7 +549,7 @@
   QUnit.test('fromURL', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Image.fromURL === 'function');
-    fabric.Image.fromURL(IMG_SRC, function(instance) {
+    fabric.Image.fromURL(IMG_SRC).then(function(instance) {
       assert.ok(instance instanceof fabric.Image);
       assert.sameImageObject(REFERENCE_IMG_OBJECT, instance.toObject());
       done();
@@ -562,9 +559,10 @@
   QUnit.test('fromURL error', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Image.fromURL === 'function');
-    fabric.Image.fromURL(IMG_URL_NON_EXISTING, function(instance, isError) {
+    fabric.Image.fromURL(IMG_URL_NON_EXISTING, function(instance) {
       assert.ok(instance instanceof fabric.Image);
-      assert.equal(isError, true);
+    }).catch(function(e) {
+      assert.ok(e instanceof Error);
       done();
     });
   });
