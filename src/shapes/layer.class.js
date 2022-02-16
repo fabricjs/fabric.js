@@ -165,11 +165,17 @@
    * @static
    * @memberOf fabric.Layer
    * @param {Object} object Object to create an instance from
-   * @param {function} [callback] invoked with new instance as first argument
+   * @returns {Promise<fabric.Layer>}
    */
-  fabric.Layer.fromObject = function (object, callback) {
-    callback && fabric.Group._fromObject(object, function (objects, options) {
-      callback(new fabric.Layer(objects, options));
+  fabric.Layer.fromObject = function (object) {
+    var objects = object.objects || [],
+      options = fabric.util.object.clone(object, true);
+    delete options.objects;
+    return Promise.all([
+      fabric.util.enlivenObjects(objects),
+      fabric.util.enlivenObjectEnlivables(options)
+    ]).then(function (enlivened) {
+      return new fabric.Layer(enlivened[0], Object.assign(options, enlivened[1]), true);
     });
   };
 

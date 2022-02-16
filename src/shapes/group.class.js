@@ -748,17 +748,4 @@
     });
   };
 
-  /**
-   * Returns fabric.Group instance from an object representation
-   * @static
-   * @memberOf fabric.Group
-   * @param {Object} object Object to create an instance from
-   * @param {function} [callback] invoked with new instance as first argument
-   */
-  fabric.Group.fromObject = function (object, callback) {
-    callback && fabric.Group._fromObject(object, function (objects, options) {
-      callback(new fabric.Group(objects, options, true));
-    });
-  };
-
 })(typeof exports !== 'undefined' ? exports : this);
