@@ -162,11 +162,10 @@
   });
 
   /**
-   * Returns filter instance from an object representation
+   * Create filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @param {Function} [callback] to be invoked after filter creation
-   * @return {fabric.Image.filters.RemoveColor} Instance of fabric.Image.filters.RemoveWhite
+   * @returns {Promise<fabric.Image.filters.RemoveColor>}
    */
   fabric.Image.filters.RemoveColor.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 

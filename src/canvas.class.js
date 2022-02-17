@@ -42,11 +42,6 @@
    * @fires after:render at the end of the render process, receives the context in the callback
    * @fires before:render at start the render process, receives the context in the callback
    *
-   * the following events are deprecated:
-   * @fires object:rotated at the end of a rotation transform
-   * @fires object:scaled at the end of a scale transform
-   * @fires object:moved at the end of translation transform
-   * @fires object:skewed at the end of a skew transform
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
 
@@ -418,6 +413,7 @@
       }
       if (this.hasLostContext) {
         this.renderTopLayer(this.contextTop);
+        this.hasLostContext = false;
       }
       var canvasToDrawOn = this.contextContainer;
       this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
@@ -1087,17 +1083,12 @@
           e: e,
           selected: added,
           deselected: removed,
-          // added for backward compatibility
-          // deprecated
-          updated: added[0] || removed[0],
-          target: this._activeObject,
         });
       }
       else if (objects.length > 0) {
         this.fire('selection:created', {
           e: e,
           selected: added,
-          target: this._activeObject,
         });
       }
       else if (oldObjects.length > 0) {

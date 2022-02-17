@@ -3,7 +3,7 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
-      pi = Math.PI;
+      degreesToRadians = fabric.util.degreesToRadians;
 
   if (fabric.Circle) {
     fabric.warn('fabric.Circle is already defined.');
@@ -33,22 +33,20 @@
     radius: 0,
 
     /**
-     * Start angle of the circle, moving clockwise
-     * deprecated type, this should be in degree, this was an oversight.
+     * degrees of start of the circle.
      * probably will change to degrees in next major version
-     * @type Number
+     * @type Number 0 - 359
      * @default 0
      */
     startAngle: 0,
 
     /**
      * End angle of the circle
-     * deprecated type, this should be in degree, this was an oversight.
      * probably will change to degrees in next major version
-     * @type Number
-     * @default 2Pi
+     * @type Number 1 - 360
+     * @default 360
      */
-    endAngle: pi * 2,
+    endAngle: 360,
 
     cacheProperties: fabric.Object.prototype.cacheProperties.concat('radius', 'startAngle', 'endAngle'),
 
@@ -86,7 +84,7 @@
      */
     _toSVG: function() {
       var svgString, x = 0, y = 0,
-          angle = (this.endAngle - this.startAngle) % ( 2 * pi);
+          angle = (this.endAngle - this.startAngle) % 360;
 
       if (angle === 0) {
         svgString = [
@@ -97,14 +95,17 @@
         ];
       }
       else {
-        var startX = fabric.util.cos(this.startAngle) * this.radius,
-            startY = fabric.util.sin(this.startAngle) * this.radius,
-            endX = fabric.util.cos(this.endAngle) * this.radius,
-            endY = fabric.util.sin(this.endAngle) * this.radius,
-            largeFlag = angle > pi ? '1' : '0';
+        var start = degreesToRadians(this.startAngle),
+            end = degreesToRadians(this.endAngle),
+            radius = this.radius,
+            startX = fabric.util.cos(start) * radius,
+            startY = fabric.util.sin(start) * radius,
+            endX = fabric.util.cos(end) * radius,
+            endY = fabric.util.sin(end) * radius,
+            largeFlag = angle > 180 ? '1' : '0';
         svgString = [
           '<path d="M ' + startX + ' ' + startY,
-          ' A ' + this.radius + ' ' + this.radius,
+          ' A ' + radius + ' ' + radius,
           ' 0 ', +largeFlag + ' 1', ' ' + endX + ' ' + endY,
           '" ', 'COMMON_PARTS', ' />\n'
         ];
@@ -123,8 +124,10 @@
         0,
         0,
         this.radius,
-        this.startAngle,
-        this.endAngle, false);
+        degreesToRadians(this.startAngle),
+        degreesToRadians(this.endAngle),
+        false
+      );
       this._renderPaintInOrder(ctx);
     },
 
@@ -197,11 +200,10 @@
    * @static
    * @memberOf fabric.Circle
    * @param {Object} object Object to create an instance from
-   * @param {function} [callback] invoked with new instance as first argument
-   * @return {void}
+   * @returns {Promise<fabric.Circle>}
    */
-  fabric.Circle.fromObject = function(object, callback) {
-    fabric.Object._fromObject('Circle', object, callback);
+  fabric.Circle.fromObject = function(object) {
+    return fabric.Object._fromObject(fabric.Circle, object);
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

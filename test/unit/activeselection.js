@@ -138,7 +138,7 @@
     assert.ok(typeof fabric.ActiveSelection.fromObject === 'function');
     var groupObject = group.toObject();
 
-    fabric.ActiveSelection.fromObject(groupObject, function(newGroupFromObject) {
+    fabric.ActiveSelection.fromObject(groupObject).then(function(newGroupFromObject) {
 
       var objectFromOldGroup = group.toObject();
       var objectFromNewGroup = newGroupFromObject.toObject();

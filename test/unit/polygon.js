@@ -111,7 +111,7 @@
   QUnit.test('fromObject', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Polygon.fromObject === 'function');
-    fabric.Polygon.fromObject(REFERENCE_OBJECT, function(polygon) {
+    fabric.Polygon.fromObject(REFERENCE_OBJECT).then(function(polygon) {
       assert.ok(polygon instanceof fabric.Polygon);
       assert.deepEqual(polygon.toObject(), REFERENCE_OBJECT);
       done();

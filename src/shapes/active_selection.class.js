@@ -143,12 +143,14 @@
    * @static
    * @memberOf fabric.ActiveSelection
    * @param {Object} object Object to create a group from
-   * @param {Function} [callback] Callback to invoke when an ActiveSelection instance is created
+   * @returns {Promise<fabric.ActiveSelection>}
    */
-  fabric.ActiveSelection.fromObject = function(object, callback) {
-    fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
-      delete object.objects;
-      callback && callback(new fabric.ActiveSelection(enlivenedObjects, object, true));
+  fabric.ActiveSelection.fromObject = function(object) {
+    var objects = object.objects,
+        options = fabric.util.object.clone(object, true);
+    delete options.objects;
+    return fabric.util.enlivenObjects(objects).then(function(enlivenedObjects) {
+      return new fabric.ActiveSelection(enlivenedObjects, object, true);
     });
   };
 

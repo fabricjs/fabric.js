@@ -93,7 +93,7 @@
 
   QUnit.test('fromObject', function(assert) {
     var done = assert.async();
-    fabric.Textbox.fromObject(TEXTBOX_OBJECT, function(textbox) {
+    fabric.Textbox.fromObject(TEXTBOX_OBJECT).then(function(textbox) {
       assert.equal(textbox.text, 'x', 'properties are respected');
       assert.ok(textbox instanceof fabric.Textbox, 'the generated object is a textbox');
       done();

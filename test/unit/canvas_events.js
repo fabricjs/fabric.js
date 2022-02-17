@@ -347,10 +347,6 @@
       count++;
       opt = _opt;
     });
-    canvas.on('object:moved', function(_opt) {
-      count2++;
-      opt = _opt;
-    });
     canvas.__onMouseDown(e);
     canvas.__onMouseMove(e2);
     canvas.__onMouseUp(e2);
@@ -358,7 +354,6 @@
     assert.equal(opt.e, e2, 'options match model - event');
     assert.equal(opt.target, rect, 'options match model - target');
     assert.equal(opt.transform.action, 'drag', 'options match model - target');
-    assert.equal(count2, 1, 'object:moved fired');
   });
 
   QUnit.test('drag small object when mousemove + drag, not active', function(assert) {
@@ -702,6 +697,7 @@
   });
 
   QUnit.test('Fabric mouseover, mouseout events fire for subTargets when subTargetCheck is enabled', function(assert){
+    var done = assert.async();
     var counterOver = 0, counterOut = 0, canvas = new fabric.Canvas();
     function setSubTargetCheckRecursive(obj) {
       if (obj._objects) {
@@ -715,7 +711,7 @@
         counterOut++;
       });
     }
-    canvas.loadFromJSON(SUB_TARGETS_JSON, function() {
+    canvas.loadFromJSON(SUB_TARGETS_JSON).then(function() {
       var activeSelection = new fabric.ActiveSelection(canvas.getObjects(), {
         canvas: canvas
       });
@@ -742,6 +738,7 @@
       assert.equal(counterOut, 4, 'mouseout fabric event fired 4 times for primary hoveredTarget & subTargets');
       assert.equal(canvas._hoveredTarget, null, '_hoveredTarget has been set to null');
       assert.equal(canvas._hoveredTargets.length, 0, '_hoveredTargets array is empty');
+      done();
     });
   });
 
@@ -1096,22 +1093,5 @@
     assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'lockSkewingX bl action is not disabled');
     assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'lockSkewingX br action is not disabled');
     assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'lockSkewingX mtr action is not disabled');
-  });
-  QUnit.test('_addEventOptions return the correct event name', function(assert) {
-    var opt = {};
-    assert.equal(canvas._addEventOptions(opt, { action: 'scaleX' }), 'scaled', 'scaleX => scaled');
-    assert.equal(opt.by, 'x', 'by => x');
-    assert.equal(canvas._addEventOptions(opt, { action: 'scaleY' }), 'scaled', 'scaleY => scaled');
-    assert.equal(opt.by, 'y', 'by => y');
-    assert.equal(canvas._addEventOptions(opt, { action: 'scale' }), 'scaled', 'scale => scaled');
-    assert.equal(opt.by, 'equally', 'by => equally');
-    assert.equal(canvas._addEventOptions(opt, { action: 'skewX' }), 'skewed', 'skewX => skewed');
-    assert.equal(opt.by, 'x', 'by => x');
-    assert.equal(canvas._addEventOptions(opt, { action: 'skewY' }), 'skewed', 'skewY => skewed');
-    assert.equal(opt.by, 'y', 'by => y');
-    assert.equal(canvas._addEventOptions(opt, { action: 'rotate' }), 'rotated', 'rotate => rotated');
-    assert.equal(opt.by, undefined, 'by => undefined');
-    assert.equal(canvas._addEventOptions(opt, { action: 'drag' }), 'moved', 'drag => moved');
-    assert.equal(opt.by, undefined, 'by => undefined');
   });
 })();

@@ -448,46 +448,6 @@
       43.50067533516962], 'translate matrix scale skewX skewY angle flipX flipY');
   });
 
-  QUnit.test('_calcDimensionsTransformMatrix', function(assert) {
-    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0, scaleX: 2, scaleY: 3, skewY: 10 });
-    assert.ok(typeof cObj._calcDimensionsTransformMatrix === 'function', '_calcDimensionsTransformMatrix should exist');
-    var matrix = cObj._calcDimensionsTransformMatrix();
-    var expected = [
-      2,
-      0,
-      0,
-      3,
-      0,
-      0
-    ];
-    assert.deepEqual(matrix, expected, 'dimensions matrix is equal');
-  });
-
-  QUnit.test('_calcDimensionsTransformMatrix with flipping', function(assert) {
-    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0, scaleX: 2, scaleY: 3, skewY: 10, flipX: true });
-    assert.ok(typeof cObj._calcDimensionsTransformMatrix === 'function', '_calcDimensionsTransformMatrix should exist');
-    var matrix = cObj._calcDimensionsTransformMatrix(0, 0, false);
-    var expected = [
-      2,
-      0,
-      0,
-      3,
-      0,
-      0
-    ];
-    assert.deepEqual(matrix, expected, 'dimensions matrix with flipping = false is equal');
-    var matrix2 = cObj._calcDimensionsTransformMatrix(0, 0, true);
-    var expected = [
-      -2,
-      0,
-      0,
-      3,
-      0,
-      0
-    ];
-    assert.deepEqual(matrix2, expected, 'dimensions matrix with flipping = true is equal');
-  });
-
   QUnit.test('_calcRotateMatrix', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0, angle: 90 });
     assert.ok(typeof cObj._calcRotateMatrix === 'function', '_calcRotateMatrix should exist');

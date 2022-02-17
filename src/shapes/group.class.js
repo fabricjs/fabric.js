@@ -390,28 +390,6 @@
     },
 
     /**
-     * Realises the transform from this group onto the supplied object
-     * i.e. it tells you what would happen if the supplied object was in
-     * the group, and then the group was destroyed. It mutates the supplied
-     * object.
-     * Warning: this method is not useful anymore, it has been kept to no break the api.
-     * is not used in the fabricJS codebase
-     * this method will be reduced to using the utility.
-     * @private
-     * @deprecated
-     * @param {fabric.Object} object that is inside the group
-     * @param {Array} parentMatrix parent transformation of the object.
-     * @return {fabric.Object} transformedObject
-     */
-    realizeTransform: function(object, parentMatrix) {
-      fabric.util.addTransformToObject(
-        object,
-        parentMatrix || this.calcTransformMatrix()
-      );
-      return object;
-    },
-
-    /**
      * Destroys a group (restoring state of its objects)
      * @return {fabric.Group} thisArg
      * @chainable
@@ -423,6 +401,14 @@
         object.set('dirty', true);
       });
       return this._restoreObjectsState();
+    },
+
+    dispose: function () {
+      this.callSuper('dispose');
+      this.forEachObject(function (object) {
+        object.dispose && object.dispose();
+      });
+      this._objects = [];
     },
 
     /**
@@ -573,26 +559,15 @@
    * @static
    * @memberOf fabric.Group
    * @param {Object} object Object to create a group from
-   * @param {Function} [callback] Callback to invoke when an group instance is created
+   * @returns {Promise<fabric.Group>}
    */
-  fabric.Group.fromObject = function(object, callback) {
-    var objects = object.objects,
+  fabric.Group.fromObject = function(object) {
+    var objects = object.objects || [],
         options = fabric.util.object.clone(object, true);
     delete options.objects;
-    if (typeof objects === 'string') {
-      // it has to be an url or something went wrong.
-      fabric.loadSVGFromURL(objects, function (elements) {
-        var group = fabric.util.groupSVGElements(elements, object, objects);
-        group.set(options);
-        callback && callback(group);
-      });
-      return;
-    }
-    fabric.util.enlivenObjects(objects, function (enlivenedObjects) {
-      var options = fabric.util.object.clone(object, true);
-      delete options.objects;
-      fabric.util.enlivenObjectEnlivables(object, options, function () {
-        callback && callback(new fabric.Group(enlivenedObjects, options, true));
+    return fabric.util.enlivenObjects(objects).then(function (enlivenedObjects) {
+      return fabric.util.enlivenObjectEnlivables(options).then(function(enlivedProps) {
+        return new fabric.Group(enlivenedObjects, Object.assign(options, enlivedProps), true);
       });
     });
   };
