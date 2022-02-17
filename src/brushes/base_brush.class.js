@@ -150,7 +150,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     var v = fabric.util.invertTransform(this.canvas.viewportTransform);
     ctx.save();
     ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-    fabric.Object.prototype._drawClipPath.call(this, ctx);
+    fabric.Object.prototype._drawClipPath.call(this, ctx, this.clipPath);
     ctx.restore();
   },
 
