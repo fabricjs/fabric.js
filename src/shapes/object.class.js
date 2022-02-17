@@ -361,6 +361,12 @@
      * @default
      */
     shadow:                   null,
+    /**
+     * Shadow object representing shadow of this shape
+     * @type fabric.Shadow array
+     * @default
+     */
+    shadows:                   null,
 
     /**
      * Opacity of object's controlling borders when object is active and moving
@@ -999,6 +1005,9 @@
       else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
         value = new fabric.Shadow(value);
       }
+      else if (key === 'shadows' && value && value.length > 0) {
+        this._set('shadow',value[0]);
+      }
       else if (key === 'dirty' && this.group) {
         this.group.set('dirty', value);
       }
@@ -1083,6 +1092,27 @@
           this.saveState({ propertySet: 'cacheProperties' });
         }
       }
+
+      if (this.shadows && this.shadows.length > 1){
+        for (var i = 1 ;i < this.shadows.length ; i++){
+          this.shadow = this.shadows[i];
+          this._setShadow(ctx, this);
+          if (this.shouldCache()) {
+            this.renderCache();
+            this.drawCacheOnCanvas(ctx);
+          }
+          else {
+            this._removeCacheCanvas();
+            this.dirty = false;
+            this.drawObject(ctx);
+            if (this.objectCaching && this.statefullCache) {
+              this.saveState({ propertySet: 'cacheProperties' });
+            }
+          }
+        }
+        this.shadow = this.shadows[0];
+      }
+
       ctx.restore();
     },
 

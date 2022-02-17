@@ -46,6 +46,7 @@
   "scripts": {
     "changelog": "auto-changelog -o change-output.md --unreleased-only",
     "build": "node build.js modules=ALL requirejs exclude=gestures,accessors,erasing",
+    "build:my": "node build.js modules=ALL requirejs exclude=gestures,accessors,erasing,image_filters,parser,serialization,freedrawing",
     "build:fast": "node build.js modules=ALL requirejs fast exclude=gestures,accessors,erasing",
     "build:watch": "onchange 'src/**/**' 'HEADER.js' 'lib/**/**' -- npm run build_export",
     "link:watch": "onchange 'src/**/**' 'HEADER.js' 'lib/**/**' -- npm link",
