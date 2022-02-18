@@ -221,8 +221,8 @@
       }
       var shadowOffset = this.calcShadowOffset();
       // we calculate canvas vptCoords relative to shadow instead of calculating shadow coords (by offsetting object's coordinates)
-      var tl = this.canvas.vptCoords.tl.subtract(shadowOffset),
-          br = this.canvas.vptCoords.br.subtract(shadowOffset);
+      var tl = this.canvas.vptCoords.tl.subtract(shadowOffset).scalarSubtractEquals(this.shadow.blur),
+          br = this.canvas.vptCoords.br.subtract(shadowOffset).scalarAddEquals(this.shadow.blur);
       return this._isOnScreen(tl, br, calculate);
     },
 
@@ -271,8 +271,8 @@
       }
       var shadowOffset = this.calcShadowOffset();
       // we calculate canvas vptCoords relative to shadow instead of calculating shadow coords (by offsetting object's coordinates)
-      var tl = this.canvas.vptCoords.tl.subtract(shadowOffset),
-          br = this.canvas.vptCoords.br.subtract(shadowOffset);
+      var tl = this.canvas.vptCoords.tl.subtract(shadowOffset).scalarSubtractEquals(this.shadow.blur),
+          br = this.canvas.vptCoords.br.subtract(shadowOffset).scalarAddEquals(this.shadow.blur);
       return this._isPartiallyOnScreen(tl, br, calculate);
     },
 
