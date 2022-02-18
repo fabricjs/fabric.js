@@ -192,38 +192,46 @@
       if (!this.canvas) {
         return false;
       }
-      var pointTL = this.canvas.vptCoords.tl, pointBR = this.canvas.vptCoords.br;
-      var points = this.getCoords(true, calculate);
-      // if some point is on screen, the object is on screen.
-      if (points.some(function(point) {
-        return point.x <= pointBR.x && point.x >= pointTL.x &&
-        point.y <= pointBR.y && point.y >= pointTL.y;
-      })) {
-        return true;
-      }
-      // no points on screen, check intersection with absolute coordinates
-      if (this.intersectsWithRect(pointTL, pointBR, true, calculate)) {
-        return true;
-      }
-      return this._containsCenterOfCanvas(pointTL, pointBR, calculate);
+      var tl = this.canvas.vptCoords.tl, br = this.canvas.vptCoords.br;
+      return this._isOnScreen(tl, br, calculate);
     },
 
     /**
-     * Checks if the object contains the midpoint between canvas extremities
-     * Does not make sense outside the context of isOnScreen and isPartiallyOnScreen
-     * @private
-     * @param {Fabric.Point} pointTL Top Left point
-     * @param {Fabric.Point} pointBR Top Right point
-     * @param {Boolean} calculate use coordinates of current position instead of .oCoords
-     * @return {Boolean} true if the object contains the point
+     * Checks if object's shadow is contained within the canvas with current viewportTransform
+     * the check is done stopping at first point that appears on screen
+     * @param {Boolean} [calculate] use coordinates of current position instead of .aCoords
+     * @return {Boolean} true if object is fully or partially contained within canvas
      */
-    _containsCenterOfCanvas: function(pointTL, pointBR, calculate) {
-      // worst case scenario the object is so big that contains the screen
-      var centerPoint = { x: (pointTL.x + pointBR.x) / 2, y: (pointTL.y + pointBR.y) / 2 };
-      if (this.containsPoint(centerPoint, null, true, calculate)) {
-        return true;
+    isShadowOnScreen: function (calculate) {
+      if (!this.canvas || !this.shadow) {
+        return false;
       }
-      return false;
+      var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY);
+      // we calculate canvas vptCoords relative to shadow instead of calculating shadow coords (by offsetting object's coordinates)
+      var tl = this.canvas.vptCoords.tl.subtract(shadowOffset),
+        br = this.canvas.vptCoords.br.subtract(shadowOffset);
+      return this._isOnScreen(tl, br, calculate);
+    },
+
+    /**
+     * @private
+     * @param {fabric.Point} tl 
+     * @param {fabric.Point} br 
+     * @param {boolean} [calculate]
+     * @returns {boolean}
+     */
+    _isOnScreen: function (tl, br, calculate) {
+      var points = this.getCoords(true, calculate);
+      // if some point is on screen, the object is on screen.
+      return points.some(function (point) {
+        return point.x <= br.x && point.x >= tl.x &&
+          point.y <= br.y && point.y >= tl.y;
+      }) ||
+        // no points are on screen
+        // check intersection with absolute coordinates 
+        this.intersectsWithRect(tl, br, true, calculate) ||
+        // check if object contains canvas center (in case it is painted all over canvas)
+        this.containsPoint(tl.midPointFrom(br), null, true, calculate);
     },
 
     /**
@@ -235,15 +243,42 @@
       if (!this.canvas) {
         return false;
       }
-      var pointTL = this.canvas.vptCoords.tl, pointBR = this.canvas.vptCoords.br;
-      if (this.intersectsWithRect(pointTL, pointBR, true, calculate)) {
+      var tl = this.canvas.vptCoords.tl, br = this.canvas.vptCoords.br;
+      return this._isPartiallyOnScreen(tl, br, calculate);
+    },
+
+    /**
+     * Checks if object's shadow is partially contained within the canvas with current viewportTransform
+     * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
+     * @return {Boolean} true if object is partially contained within canvas
+     */
+    isShadowPartiallyOnScreen: function (calculate) {
+      if (!this.canvas || !this.shadow) {
+        return false;
+      }
+      var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY);
+      // we calculate canvas vptCoords relative to shadow instead of calculating shadow coords (by offsetting object's coordinates)
+      var tl = this.canvas.vptCoords.tl.subtract(shadowOffset),
+        br = this.canvas.vptCoords.br.subtract(shadowOffset);
+      return this._isPartiallyOnScreen(tl, br, calculate);
+    },
+
+    /**
+     * @private
+     * @param {fabric.Point} tl 
+     * @param {fabric.Point} br 
+     * @param {boolean} [calculate]
+     * @returns {boolean}
+     */
+    _isPartiallyOnScreen: function (tl, br, calculate) {
+      if (this.intersectsWithRect(tl, br, true, calculate)) {
         return true;
       }
-      var allPointsAreOutside = this.getCoords(true, calculate).every(function(point) {
-        return (point.x >= pointBR.x || point.x <= pointTL.x) &&
-        (point.y >= pointBR.y || point.y <= pointTL.y);
+      var allPointsAreOutside = this.getCoords(true, calculate).every(function (point) {
+        return (point.x >= br.x || point.x <= tl.x) &&
+          (point.y >= br.y || point.y <= tl.y);
       });
-      return allPointsAreOutside && this._containsCenterOfCanvas(pointTL, pointBR, calculate);
+      return allPointsAreOutside && this.containsPoint(tl.midPointFrom(br), null, true, calculate);
     },
 
     /**
