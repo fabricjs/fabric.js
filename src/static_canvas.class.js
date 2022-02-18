@@ -829,7 +829,7 @@
      * @return {fabric.Point} 
      */
     getCenterPoint: function () {
-      return new fabric.Point(this.height / 2, this.width / 2);
+      return new fabric.Point(this.width / 2, this.height / 2);
     },
 
     /**
