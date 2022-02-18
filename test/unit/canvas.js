@@ -2527,6 +2527,11 @@
 
     assert.ok(typeof InheritedCanvasClass === 'function');
   });
+  
+  QUnit.test('canvas getTopContext', function(assert) {
+    assert.ok(typeof canvas.getTopContext === 'function');
+    assert.equal(canvas.getTopContext(), canvas.contextTop, 'it jsut returns contextTop');
+  });
 
   QUnit.test('_shouldCenterTransform', function(assert) {
     assert.equal(
