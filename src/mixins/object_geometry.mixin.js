@@ -194,10 +194,10 @@
       }
       var pointTL = this.canvas.vptCoords.tl, pointBR = this.canvas.vptCoords.br;
       var points = this.getCoords(true, calculate);
-      var shadowOffset = this.shadow ? new fabric.Point(this.shadow.offsetX, this.shadow.offsetY) : null;
       if (this.shadow) {
-        var offsetAdd = shadowOffset.scalarAdd(this.shadow.blur);
-        var offsetSub = shadowOffset.scalarSubtract(this.shadow.blur);
+        var offset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY);
+        var offsetAdd = offset.scalarAdd(this.shadow.blur);
+        var offsetSub = offset.scalarSubtract(this.shadow.blur);
         var shadowCoords = [];
         points.forEach(function (point) {
           //  instead of figuring out to which coordinate we need to add blur and from which to subtract we apply blur to all points
@@ -214,21 +214,11 @@
       })) {
         return true;
       }
-      // no points on screen
-      if (shadowOffset) {
-        var pointTLRelativeToShadow = pointTL.subtract(shadowOffset);
-        var pointBRRelativeToShadow = pointBR.subtract(shadowOffset);
-        // check intersection with shadow absolute coordinates 
-        if (this.intersectsWithRect(pointTLRelativeToShadow, pointBRRelativeToShadow, true, calculate) ||
-          // check if object shadow contains canvas center in case it is painted all over canvas
-          this._containsCenterOfCanvas(pointTLRelativeToShadow, pointBRRelativeToShadow, calculate)) {
-          return true;
-        }
+      // no points on screen, check intersection with absolute coordinates
+      if (this.intersectsWithRect(pointTL, pointBR, true, calculate)) {
+        return true;
       }
-      // check intersection with absolute coordinates 
-      return this.intersectsWithRect(pointTL, pointBR, true, calculate) ||
-        // check if object contains canvas center in case it is painted all over canvas
-        this._containsCenterOfCanvas(pointTL, pointBR, calculate);
+      return this._containsCenterOfCanvas(pointTL, pointBR, calculate);
     },
 
     /**
