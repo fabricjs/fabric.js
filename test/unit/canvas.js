@@ -1286,6 +1286,13 @@
   //     }, 100);
   // });
 
+  QUnit.test('getCenter', function(assert) {
+    assert.ok(typeof canvas.getCenter === 'function');
+    var center = canvas.getCenter();
+    assert.equal(center.left, upperCanvasEl.width / 2);
+    assert.equal(center.top, upperCanvasEl.height / 2);
+  });
+  
   QUnit.test('getCenterPoint', function(assert) {
     assert.ok(typeof canvas.getCenterPoint === 'function');
     var center = canvas.getCenterPoint();
