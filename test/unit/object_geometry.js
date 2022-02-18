@@ -400,7 +400,7 @@
 
   QUnit.test('isShadowOnScreen with scaling', function (assert) {
     var shadow = new fabric.Shadow({ offsetX: 25, offsetY: 12.5, nonScaling: false });
-    var cObj = new fabric.Rect({ left: -100, top: -100, width: 25, height: 12.5, shadow, scaleX: 2, scaleY: 4 });
+    var cObj = new fabric.Rect({ left: -100, top: -100, width: 25, height: 12.5, shadow, scaleX: 2, scaleY: 4, strokeWidth: 1 });
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     cObj.canvas = canvas;
     cObj.setCoords();
