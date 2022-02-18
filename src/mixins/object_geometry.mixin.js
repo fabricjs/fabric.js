@@ -184,15 +184,17 @@
 
     /**
      *
-     * @returns {fabric.Point}
+     * @returns {[fabric.Point, fabric.Point]} [offset, blur]
      */
-    calcShadowOffset: function () {
-      var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY);
+    calcShadowOffsets: function () {
+      var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY),
+          shadowBlur = new fabric.Point(this.shadow.blur, this.shadow.blur);
       if (!this.shadow.nonScaling) {
-        var t = this.calcTransformMatrix();
-        shadowOffset.setXY(shadowOffset.x * t[0], shadowOffset.y * t[3]);
+        var t = this.calcTransformMatrix(), sx = t[0], sy = t[3];
+        shadowOffset.setXY(shadowOffset.x * sx, shadowOffset.y * sy);
+        shadowBlur.setXY(shadowBlur.x * sx, shadowBlur.y * sy);
       }
-      return shadowOffset;
+      return [shadowOffset, shadowBlur];
     },
 
     /**
@@ -219,10 +221,11 @@
       if (!this.canvas || !this.shadow) {
         return false;
       }
-      var shadowOffset = this.calcShadowOffset();
+      var shadowOffsets = this.calcShadowOffsets(),
+          offset = shadowOffsets[0], blur = shadowOffsets[1];
       // we calculate canvas vptCoords relative to shadow instead of calculating shadow coords (by offsetting object's coordinates)
-      var tl = this.canvas.vptCoords.tl.subtract(shadowOffset).scalarSubtractEquals(this.shadow.blur),
-          br = this.canvas.vptCoords.br.subtract(shadowOffset).scalarAddEquals(this.shadow.blur);
+      var tl = this.canvas.vptCoords.tl.subtract(offset).subtractEquals(blur),
+          br = this.canvas.vptCoords.br.subtract(offset).addEquals(blur);
       return this._isOnScreen(tl, br, calculate);
     },
 
@@ -269,10 +272,11 @@
       if (!this.canvas || !this.shadow) {
         return false;
       }
-      var shadowOffset = this.calcShadowOffset();
+      var shadowOffsets = this.calcShadowOffsets(),
+          offset = shadowOffsets[0], blur = shadowOffsets[1];
       // we calculate canvas vptCoords relative to shadow instead of calculating shadow coords (by offsetting object's coordinates)
-      var tl = this.canvas.vptCoords.tl.subtract(shadowOffset).scalarSubtractEquals(this.shadow.blur),
-          br = this.canvas.vptCoords.br.subtract(shadowOffset).scalarAddEquals(this.shadow.blur);
+      var tl = this.canvas.vptCoords.tl.subtract(offset).subtractEquals(blur),
+          br = this.canvas.vptCoords.br.subtract(offset).addEquals(blur);
       return this._isPartiallyOnScreen(tl, br, calculate);
     },
 
