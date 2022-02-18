@@ -1503,7 +1503,7 @@
       if (!this.visible) {
         return;
       }
-      if (this.canvas && this.canvas.skipOffscreen && !this.group && !this.isOnScreen()) {
+      if (this.canvas && this.canvas.skipOffscreen && !this.group && !this.isOnScreen() && !this.isShadowOnScreen()) {
         return;
       }
       if (this._shouldClearDimensionCache()) {
