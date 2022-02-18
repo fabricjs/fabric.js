@@ -183,7 +183,7 @@
     },
 
     /**
-     * 
+     *
      * @returns {fabric.Point}
      */
     calcShadowOffset: function () {
@@ -222,14 +222,14 @@
       var shadowOffset = this.calcShadowOffset();
       // we calculate canvas vptCoords relative to shadow instead of calculating shadow coords (by offsetting object's coordinates)
       var tl = this.canvas.vptCoords.tl.subtract(shadowOffset),
-        br = this.canvas.vptCoords.br.subtract(shadowOffset);
+          br = this.canvas.vptCoords.br.subtract(shadowOffset);
       return this._isOnScreen(tl, br, calculate);
     },
 
     /**
      * @private
-     * @param {fabric.Point} tl 
-     * @param {fabric.Point} br 
+     * @param {fabric.Point} tl
+     * @param {fabric.Point} br
      * @param {boolean} [calculate]
      * @returns {boolean}
      */
@@ -241,7 +241,7 @@
           point.y <= br.y && point.y >= tl.y;
       }) ||
         // no points are on screen
-        // check intersection with absolute coordinates 
+        // check intersection with absolute coordinates
         this.intersectsWithRect(tl, br, true, calculate) ||
         // check if object contains canvas center (in case it is painted all over canvas)
         this.containsPoint(tl.midPointFrom(br), null, true, calculate);
@@ -272,14 +272,14 @@
       var shadowOffset = this.calcShadowOffset();
       // we calculate canvas vptCoords relative to shadow instead of calculating shadow coords (by offsetting object's coordinates)
       var tl = this.canvas.vptCoords.tl.subtract(shadowOffset),
-        br = this.canvas.vptCoords.br.subtract(shadowOffset);
+          br = this.canvas.vptCoords.br.subtract(shadowOffset);
       return this._isPartiallyOnScreen(tl, br, calculate);
     },
 
     /**
      * @private
-     * @param {fabric.Point} tl 
-     * @param {fabric.Point} br 
+     * @param {fabric.Point} tl
+     * @param {fabric.Point} br
      * @param {boolean} [calculate]
      * @returns {boolean}
      */
