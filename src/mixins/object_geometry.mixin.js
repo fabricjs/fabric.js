@@ -183,6 +183,19 @@
     },
 
     /**
+     * 
+     * @returns {fabric.Point}
+     */
+    calcShadowOffset: function () {
+      var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY);
+      if (!this.shadow.nonScaling) {
+        var t = this.calcTransformMatrix();
+        shadowOffset.setXY(shadowOffset.x * t[0], shadowOffset.y * t[3]);
+      }
+      return shadowOffset;
+    },
+
+    /**
      * Checks if object is contained within the canvas with current viewportTransform
      * the check is done stopping at first point that appears on screen
      * @param {Boolean} [calculate] use coordinates of current position instead of .aCoords
@@ -206,7 +219,7 @@
       if (!this.canvas || !this.shadow) {
         return false;
       }
-      var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY);
+      var shadowOffset = this.calcShadowOffset();
       // we calculate canvas vptCoords relative to shadow instead of calculating shadow coords (by offsetting object's coordinates)
       var tl = this.canvas.vptCoords.tl.subtract(shadowOffset),
         br = this.canvas.vptCoords.br.subtract(shadowOffset);
@@ -256,7 +269,7 @@
       if (!this.canvas || !this.shadow) {
         return false;
       }
-      var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY);
+      var shadowOffset = this.calcShadowOffset();
       // we calculate canvas vptCoords relative to shadow instead of calculating shadow coords (by offsetting object's coordinates)
       var tl = this.canvas.vptCoords.tl.subtract(shadowOffset),
         br = this.canvas.vptCoords.br.subtract(shadowOffset);
