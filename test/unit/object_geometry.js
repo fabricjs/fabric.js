@@ -374,16 +374,17 @@
 
   QUnit.test('isShadowOnScreen', function (assert) {
     var shadow = new fabric.Shadow({ offsetX: 50, offsetY: 50 });
-    var cObj = new fabric.Rect({ left: -100, top: -100, width: 50, height: 50, shadow, strokeWidth: 1 });
+    var cObj = new fabric.Rect({ left: -100, top: -100, width: 50, height: 50, strokeWidth: 1 });
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     cObj.canvas = canvas;
-    cObj.setCoords();
-    assert.ok(cObj.isShadowOnScreen(), 'object shadow is onScreen because it intersect a canvas line');
+    assert.ok(!cObj.isShadowOnScreen(true), 'object has no shadow');
+    cObj.shadow = shadow;
+    assert.ok(cObj.isShadowOnScreen(true), 'object shadow is onScreen because it intersect a canvas line');
     shadow.offsetX--;
     assert.ok(cObj.isShadowOnScreen(), 'object shadow is intersecting the screen with the y axis');
     cObj.strokeWidth = 0;
-    cObj.setCoords();
-    assert.ok(!cObj.isShadowOnScreen(), 'object shadow is not intersecting the screen with the y axis');
+    assert.ok(cObj.isShadowOnScreen(), 'using cached coords');
+    assert.ok(!cObj.isShadowOnScreen(true), 'object shadow is not intersecting the screen with the y axis');
   });
 
   QUnit.test('isShadowOnScreen nonScaling', function (assert) {
@@ -403,13 +404,12 @@
     var cObj = new fabric.Rect({ left: -100, top: -100, width: 25, height: 12.5, shadow, scaleX: 2, scaleY: 4, strokeWidth: 1 });
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     cObj.canvas = canvas;
-    cObj.setCoords();
-    assert.ok(cObj.isShadowOnScreen(), 'object shadow is onScreen because it intersect a canvas line');
+    assert.ok(cObj.isShadowOnScreen(true), 'object shadow is onScreen because it intersect a canvas line');
     shadow.offsetX--;
     assert.ok(cObj.isShadowOnScreen(), 'object shadow is intersecting the screen with the y axis');
     cObj.strokeWidth = 0;
-    cObj.setCoords();
-    assert.ok(!cObj.isShadowOnScreen(), 'object shadow is not intersecting the screen with the y axis');
+    assert.ok(cObj.isShadowOnScreen(), 'using cached coords');
+    assert.ok(!cObj.isShadowOnScreen(true), 'object shadow is not intersecting the screen with the y axis');
   });
 
   QUnit.test('transformMatrixKey depends from properties', function(assert) {
@@ -908,4 +908,57 @@
     cObj.setCoords();
     assert.equal(cObj.isPartiallyOnScreen(true), true, 'object has all corners outside screen but contains canvas');
   });
+
+  QUnit.test('isShadowPartiallyOnScreen', function (assert) {
+    var shadow = new fabric.Shadow({ offsetX: 100, offsetY: 100 });
+    var cObj = new fabric.Object({ left: -200, top: -200, width: 100, height: 100, strokeWidth: 0 });
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    cObj.canvas = canvas;
+    assert.ok(!cObj.isShadowPartiallyOnScreen(true), 'object has no shadow');
+    cObj.shadow = shadow;
+    assert.ok(cObj.isShadowPartiallyOnScreen(true), 'object\'s shadow is intersection canvas (0,0)');
+    shadow.offsetX--;
+    assert.ok(!cObj.isShadowPartiallyOnScreen(true), 'object\'s shadow is off screen');
+    shadow.offsetX = shadow.offsetY = 1;
+    assert.ok(!cObj.isShadowPartiallyOnScreen(), 'object is completely offScreen and not partial');
+    shadow.offsetX = shadow.offsetY = 150;
+    canvas.setZoom(2);
+    assert.ok(cObj.isShadowPartiallyOnScreen(true), 'after zooming object is partially onScreen and offScreen');
+  });
+
+  QUnit.test('isShadowPartiallyOnScreen nonScaling', function (assert) {
+    var shadow = new fabric.Shadow({ offsetX: 100, offsetY: 100, nonScaling: true });
+    var cObj = new fabric.Object({ left: -200, top: -200, width: 50, height: 25, strokeWidth: 0, scaleX: 2, scaleY: 4 });
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    cObj.canvas = canvas;
+    assert.ok(!cObj.isShadowPartiallyOnScreen(true), 'object has no shadow');
+    cObj.shadow = shadow;
+    assert.ok(cObj.isShadowPartiallyOnScreen(true), 'object\'s shadow is intersection canvas (0,0)');
+    shadow.offsetX--;
+    assert.ok(!cObj.isShadowPartiallyOnScreen(true), 'object\'s shadow is off screen');
+    shadow.offsetX = shadow.offsetY = 1;
+    assert.ok(!cObj.isShadowPartiallyOnScreen(), 'object is completely offScreen and not partial');
+    shadow.offsetX = shadow.offsetY = 150;
+    canvas.setZoom(2);
+    assert.ok(cObj.isShadowPartiallyOnScreen(true), 'after zooming object is partially onScreen and offScreen');
+  });
+
+  QUnit.test('isShadowPartiallyOnScreen with scaling', function (assert) {
+    var shadow = new fabric.Shadow({ offsetX: 50, offsetY: 25, nonScaling: false });
+    var cObj = new fabric.Object({ left: -200, top: -200, width: 50, height: 25, strokeWidth: 0, scaleX: 2, scaleY: 4 });
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    cObj.canvas = canvas;
+    assert.ok(!cObj.isShadowPartiallyOnScreen(true), 'object has no shadow');
+    cObj.shadow = shadow;
+    assert.ok(cObj.isShadowPartiallyOnScreen(true), 'object\'s shadow is intersection canvas (0,0)');
+    shadow.offsetX--;
+    assert.ok(!cObj.isShadowPartiallyOnScreen(true), 'object\'s shadow is off screen');
+    shadow.offsetX = shadow.offsetY = 1;
+    assert.ok(!cObj.isShadowPartiallyOnScreen(), 'object is completely offScreen and not partial');
+    shadow.offsetX = 75;
+    shadow.offsetY = 150 / 4;
+    canvas.setZoom(2);
+    assert.ok(cObj.isShadowPartiallyOnScreen(true), 'after zooming object is partially onScreen and offScreen');
+  });
+
 })();
