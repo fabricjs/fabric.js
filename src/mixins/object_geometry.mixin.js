@@ -183,7 +183,7 @@
     },
 
     /**
-     * Checks if object (and artifacts, e.g. shadow) is contained within the canvas with current viewportTransform
+     * Checks if object is contained within the canvas with current viewportTransform
      * the check is done stopping at first point that appears on screen
      * @param {Boolean} [calculate] use coordinates of current position instead of .aCoords
      * @return {Boolean} true if object is fully or partially contained within canvas
@@ -194,19 +194,6 @@
       }
       var pointTL = this.canvas.vptCoords.tl, pointBR = this.canvas.vptCoords.br;
       var points = this.getCoords(true, calculate);
-      if (this.shadow) {
-        var offset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY);
-        var offsetAdd = offset.scalarAdd(this.shadow.blur);
-        var offsetSub = offset.scalarSubtract(this.shadow.blur);
-        var shadowCoords = [];
-        points.forEach(function (point) {
-          //  instead of figuring out to which coordinate we need to add blur and from which to subtract we apply blur to all points
-          //  this way the points will be on the border of the blur or inside it
-          shadowCoords.push(point.add(offsetAdd));
-          shadowCoords.push(point.add(offsetSub));
-        });
-        points = points.concat(shadowCoords);
-      }
       // if some point is on screen, the object is on screen.
       if (points.some(function(point) {
         return point.x <= pointBR.x && point.x >= pointTL.x &&
