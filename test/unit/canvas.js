@@ -1292,6 +1292,13 @@
     assert.equal(center.left, upperCanvasEl.width / 2);
     assert.equal(center.top, upperCanvasEl.height / 2);
   });
+  
+  QUnit.test('getCenterPoint', function(assert) {
+    assert.ok(typeof canvas.getCenterPoint === 'function');
+    var center = canvas.getCenterPoint();
+    assert.equal(center.x, upperCanvasEl.width / 2);
+    assert.equal(center.y, upperCanvasEl.height / 2);
+  });
 
   QUnit.test('centerObjectH', function(assert) {
     assert.ok(typeof canvas.centerObjectH === 'function');
