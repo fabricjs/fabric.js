@@ -149,7 +149,7 @@
     assert.equal(point.y, y1 - scalar, 'y coords should be added');
   });
 
-  QUnit.test.only('multiply', function (assert) {
+  QUnit.test('multiply', function (assert) {
     var a = new fabric.Point(2, 3), b = new fabric.Point(4, 5);
 
     assert.ok(typeof a.multiply === 'function');
