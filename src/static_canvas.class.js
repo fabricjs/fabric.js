@@ -470,9 +470,21 @@
      * @chainable true
      */
     setViewportTransform: function (vpt) {
+      this._setViewportTransform(vpt);
+      this.renderOnAddRemove && this.requestRenderAll();
+      return this;
+    },
+
+    /**
+     * Sets viewport transformation of this canvas instance
+     * @private
+     * @param {Array} vpt a Canvas 2D API transform matrix
+     * @return {fabric.Canvas} instance
+     */
+    _setViewportTransform: function (vpt) {
       var backgroundObject = this.backgroundImage,
           overlayObject = this.overlayImage,
-          object, i, len, dirty = false;
+          object, i, len;
       this.viewportTransform = vpt;
       for (i = 0, len = this._objects.length; i < len; i++) {
         object = this._objects[i];
@@ -485,8 +497,6 @@
         overlayObject.setCoords(true);
       }
       this.calcViewportBoundaries();
-      (this.renderOnAddRemove || dirty) && this.requestRenderAll();
-      return this;
     },
 
     /**

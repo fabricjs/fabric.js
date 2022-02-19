@@ -1350,7 +1350,7 @@
     },
 
     setViewportTransform: function (vpt) {
-      var activeObject = this._activeObject
+      var activeObject = this._activeObject, dirty = false, discard = this.false;
       if (this.renderOnAddRemove && activeObject && activeObject.isEditing) {
         this._activeObject.clearContextTop();
       }
@@ -1365,9 +1365,13 @@
           this._needsCurrentTransformSetup = true;
           dirty = true;
         }
+        else {
+          discard = true;
+        }
         activeObject.setCoords();
       }
-      fabric.StaticCanvas.prototype.setViewportTransform.call(this, vpt);
+      fabric.StaticCanvas.prototype._setViewportTransform.call(this, vpt);
+      (dirty || this.renderOnAddRemove) && this.requestRenderAll();
     }
   });
 
