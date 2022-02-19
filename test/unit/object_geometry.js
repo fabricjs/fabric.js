@@ -407,8 +407,8 @@
   });
 
   QUnit.test('isShadowOnScreen nonScaling', function (assert) {
-    var shadow = new fabric.Shadow({ offsetX: 25, offsetY: 11.5, nonScaling: true });
-    var cObj = new fabric.Rect({ left: -100, top: -100, width: 25, height: 11.5, shadow, scaleX: 2, scaleY: 4 });
+    var shadow = new fabric.Shadow({ offsetX: 25, offsetY: 12.5, nonScaling: true });
+    var cObj = new fabric.Rect({ left: -100, top: -100, width: 25, height: 12.5, shadow, scaleX: 2, scaleY: 4 });
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     cObj.canvas = canvas;
     cObj.setCoords();
@@ -426,8 +426,8 @@
   });
 
   QUnit.test('isShadowOnScreen with scaling', function (assert) {
-    var shadow = new fabric.Shadow({ offsetX: 25, offsetY: 11.5, nonScaling: false });
-    var cObj = new fabric.Rect({ left: -100, top: -100, width: 25, height: 11.5, shadow, scaleX: 2, scaleY: 4, strokeWidth: 1 });
+    var shadow = new fabric.Shadow({ offsetX: 25, offsetY: 12.5, nonScaling: false });
+    var cObj = new fabric.Rect({ left: -100, top: -100, width: 25, height: 12.5, shadow, scaleX: 2, scaleY: 4, strokeWidth: 1 });
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     cObj.canvas = canvas;
     assert.ok(cObj.isShadowOnScreen(true), 'object shadow is onScreen because it intersect a canvas line');
@@ -948,6 +948,7 @@
     offsetX = offsetX || 0;
     offsetY = offsetY || 0;
     blur = blur || 0;
+    var quarter = Math.PI / 2;
     var shadow = new fabric.Shadow({ offsetX, offsetY, blur });
     object.shadow = shadow;
     if (vpt) {
@@ -955,51 +956,38 @@
         viewportTransform: vpt
       };
     }
-    var control = object.getCoords().map((point, i) =>
-      new fabric.Point(
-        point.x + offsetX - blur * Math.sign(Math.cos(i * Math.PI / 2 + 1)),
-        point.y + offsetY - blur * Math.sign(Math.sin(i * Math.PI / 2 + 1))
-      ));
-    var coords = object.calcShadowCoords();
+    var control = object.getCoords(false, true).map((point, i) => {
+      var rad = fabric.util.degreesToRadians(fabric.util.qrDecompose(object.calcTransformMatrix()).angle);
+      var r = i * quarter + rad + 1;
+      return new fabric.Point(
+        point.x + offsetX - blur * Math.sign(Math.cos(r)),
+        point.y + offsetY - blur * Math.sign(Math.sin(r))
+      );
+    });
+    var coords = object.calcShadowCoords(false, true);
     this.deepEqual(coords[0], control[0], 'tl');
     this.deepEqual(coords[1], control[1], 'tr');
     this.deepEqual(coords[2], control[2], 'br');
     this.deepEqual(coords[3], control[3], 'bl');
+    //  abs
+    control = object.getCoords(true, true).map((point, i) => {
+      var rad = fabric.util.degreesToRadians(fabric.util.qrDecompose(object.calcTransformMatrix()).angle);
+      var r = i * quarter + rad + 1;
+      return new fabric.Point(
+        point.x + offsetX - blur * Math.sign(Math.cos(r)),
+        point.y + offsetY - blur * Math.sign(Math.sin(r))
+      );
+    });
+    coords = object.calcShadowCoords(true, true);
+    this.deepEqual(coords[0], control[0], 'abs tl');
+    this.deepEqual(coords[1], control[1], 'abs tr');
+    this.deepEqual(coords[2], control[2], 'abs br');
+    this.deepEqual(coords[3], control[3], 'abs bl');
   }
 
-  QUnit.test('calcShadowCoords return coordinate of object in zoomed canvas coordinate.', function (assert) {
-    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0, left: 40, top: 30 });
+  QUnit.test('calcShadowCoords in zoomed canvas coordinate.', function (assert) {
+    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, left: 40, top: 30 });
     assert.correctShadowCoords(cObj, 5, 5, 1, [2, 0, 0, 2, 35, 35]);
-  });
-
-  QUnit.test('calcShadowCoords return coordinate of object in absolute coordinates and ignore canvas zoom', function (assert) {
-    var shadow = new fabric.Shadow({ offsetX: 40, offsetY: 30, blur: 0 });
-    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, shadow });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 35]
-    };
-    var coords = cObj.calcShadowCoords(true);
-    assert.deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner cached oCoords');
-    assert.deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner cached oCoords');
-    assert.deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner cached oCoords');
-    assert.deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner cached oCoords');
-  });
-
-  QUnit.test('calcShadowCoords absolute with angle', function (assert) {
-    var shadow = new fabric.Shadow({ offsetX: 40, offsetY: 30, blur: 0 });
-    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, shadow, angle: 20 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
-    var coords = cObj.calcShadowCoords(true);
-    assert.deepEqual(coords[0].x, 40, 'return top left absolute with angle X');
-    assert.deepEqual(coords[1].x, 51.27631144943091, 'return top right absolute with angle X');
-    assert.deepEqual(coords[2].x, 45.461969012894535, 'return bottom right absolute with angle X');
-    assert.deepEqual(coords[3].x, 34.18565756346363, 'return bottom left absolute with angle X');
-    assert.deepEqual(coords[0].y, 30, 'return top left absolute with angle Y');
-    assert.deepEqual(coords[1].y, 34.104241719908025, 'return top right absolute with angle Y');
-    assert.deepEqual(coords[2].y, 50.079016273268465, 'return bottom right absolute with angle Y');
-    assert.deepEqual(coords[3].y, 45.97477455336045, 'return bottom left absolute with angle Y');
   });
 
   QUnit.test('calcShadowCoords with angle', function (assert) {
@@ -1007,9 +995,9 @@
     assert.correctShadowCoords(cObj, 40, 30, 1, [2, 0, 0, 2, 35, 35]);
   });
 
-  QUnit.test('calcShadowCoords absolute with skewX', function (assert) {
-    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewX: 45 });
-    assert.correctShadowCoords(cObj, 40, 30, 0, [2, 0, 0, 2, 35, 35]);
+  QUnit.test('calcShadowCoords with accute angle', function (assert) {
+    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, left: 40, top: 30, angle: 120 });
+    assert.correctShadowCoords(cObj, 40, 30, 1, [2, 0, 0, 2, 35, 35]);
   });
 
   QUnit.test('calcShadowCoords with skewX', function (assert) {
@@ -1017,18 +1005,8 @@
     assert.correctShadowCoords(cObj, 40, 30, 1, [2, 0, 0, 2, 35, 35]);
   });
 
-  QUnit.test('calcShadowCoords absolute with skewY', function(assert) {
-    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewY: 45 });
-    assert.correctShadowCoords(cObj, 40, 30, 1, [2, 0, 0, 2, 35, 35]);
-  });
-
   QUnit.test('calcShadowCoords with skewY', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewY: 45 });
-    assert.correctShadowCoords(cObj, 40, 30, 1, [2, 0, 0, 2, 35, 35]);
-  });
-
-  QUnit.test('calcShadowCoords absolute with skewY skewX angle', function(assert) {
-    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewY: 45, skewX: 30, angle: 90 });
     assert.correctShadowCoords(cObj, 40, 30, 1, [2, 0, 0, 2, 35, 35]);
   });
 
