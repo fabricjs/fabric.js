@@ -470,27 +470,13 @@
      * @chainable true
      */
     setViewportTransform: function (vpt) {
-      var activeObject = this._activeObject,
-          backgroundObject = this.backgroundImage,
+      var backgroundObject = this.backgroundImage,
           overlayObject = this.overlayImage,
           object, i, len, dirty = false;
       this.viewportTransform = vpt;
       for (i = 0, len = this._objects.length; i < len; i++) {
         object = this._objects[i];
         object.group || object.setCoords(true);
-      }
-      if (activeObject) {
-        //  interacting object should not be changed by vpt
-        if (this._currentTransform) {
-          var vpTransform = vpt.slice();
-          vpTransform[4] = vpTransform[5] = 0;
-          var currentTransform = activeObject.calcTransformMatrix(),
-            t = multiplyTransformMatrices(invertTransform(vpTransform), currentTransform);
-          applyTransformToObject(activeObject, t);
-          this._needsCurrentTransformSetup = true;
-          dirty = true;
-        }
-        activeObject.setCoords();
       }
       if (backgroundObject) {
         backgroundObject.setCoords(true);

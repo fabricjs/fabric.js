@@ -1350,8 +1350,22 @@
     },
 
     setViewportTransform: function (vpt) {
-      if (this.renderOnAddRemove && this._activeObject && this._activeObject.isEditing) {
+      var activeObject = this._activeObject
+      if (this.renderOnAddRemove && activeObject && activeObject.isEditing) {
         this._activeObject.clearContextTop();
+      }
+      if (activeObject) {
+        //  interacting object should not be changed by vpt
+        if (this._currentTransform) {
+          var vpTransform = vpt.slice();
+          vpTransform[4] = vpTransform[5] = 0;
+          var currentTransform = activeObject.calcTransformMatrix(),
+            t = multiplyTransformMatrices(invertTransform(vpTransform), currentTransform);
+          applyTransformToObject(activeObject, t);
+          this._needsCurrentTransformSetup = true;
+          dirty = true;
+        }
+        activeObject.setCoords();
       }
       fabric.StaticCanvas.prototype.setViewportTransform.call(this, vpt);
     }
