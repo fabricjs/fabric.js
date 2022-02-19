@@ -14,8 +14,6 @@
       toFixed = fabric.util.toFixed,
       transformPoint = fabric.util.transformPoint,
       invertTransform = fabric.util.invertTransform,
-      applyTransformToObject = fabric.util.applyTransformToObject,
-      multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
       getNodeCanvas = fabric.util.getNodeCanvas,
       createCanvasElement = fabric.util.createCanvasElement,
 

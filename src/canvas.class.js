@@ -2,7 +2,10 @@
 
   var getPointer = fabric.util.getPointer,
       degreesToRadians = fabric.util.degreesToRadians,
-      isTouchEvent = fabric.util.isTouchEvent;
+      isTouchEvent = fabric.util.isTouchEvent,
+      invertTransform = fabric.util.invertTransform,
+      applyTransformToObject = fabric.util.applyTransformToObject,
+      multiplyTransformMatrices = fabric.util.multiplyTransformMatrices;
 
   /**
    * Canvas class
@@ -1360,7 +1363,7 @@
           var vpTransform = vpt.slice();
           vpTransform[4] = vpTransform[5] = 0;
           var currentTransform = activeObject.calcTransformMatrix(),
-            t = multiplyTransformMatrices(invertTransform(vpTransform), currentTransform);
+              t = multiplyTransformMatrices(invertTransform(vpTransform), currentTransform);
           applyTransformToObject(activeObject, t);
           this._needsCurrentTransformSetup = true;
           dirty = true;
