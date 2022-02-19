@@ -188,10 +188,10 @@
      */
     calcShadowOffsets: function () {
       var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY),
-        shadowBlur = new fabric.Point(this.shadow.blur, this.shadow.blur);
+          shadowBlur = new fabric.Point(this.shadow.blur, this.shadow.blur);
       if (!this.shadow.nonScaling) {
         var scaling = this.getObjectScaling(),
-          sx = scaling.scaleX, sy = scaling.scaleY;
+            sx = scaling.scaleX, sy = scaling.scaleY;
         shadowOffset.setXY(shadowOffset.x * sx, shadowOffset.y * sy);
         shadowBlur.setXY(shadowBlur.x * sx, shadowBlur.y * sy);
       }
@@ -199,17 +199,17 @@
     },
 
     /**
-     * calcualtes shadow coordinates by offsetting object coordinates
+     * Calcualtes shadow coordinates by offsetting object coordinates
      * @param {Boolean} [absolute] use coordinates without viewportTransform
      * @param {Boolean} [calculate] use coordinates of current position instead of .aCoords
      * @returns {fabric.Point[]}
      */
     calcShadowCoords: function (absolute, calculate) {
       var shadowOffsets = this.calcShadowOffsets(),
-        shadowOffset = shadowOffsets[0],
-        shadowBlur = shadowOffsets[1],
-        shadowOffsetMin = shadowOffset.subtract(shadowBlur),
-        shadowOffsetMax = shadowOffset.add(shadowBlur);
+          shadowOffset = shadowOffsets[0],
+          shadowBlur = shadowOffsets[1],
+          shadowOffsetMin = shadowOffset.subtract(shadowBlur),
+          shadowOffsetMax = shadowOffset.add(shadowBlur);
       var coords = this._getCoords(absolute, calculate);
       var center = new fabric.Point(coords.tl.x, coords.tl.y).midPointFrom(coords.br);
       var shadowCenter = center.add(shadowOffset);
@@ -233,11 +233,11 @@
      */
     shadowIntersectsWithRect: function (pointTL, pointBR, absolute, calculate) {
       var coords = this.calcShadowCoords(absolute, calculate),
-        intersection = fabric.Intersection.intersectPolygonRectangle(
-          coords,
-          pointTL,
-          pointBR
-        );
+          intersection = fabric.Intersection.intersectPolygonRectangle(
+            coords,
+            pointTL,
+            pointBR
+          );
       return intersection.status === 'Intersection';
     },
 
