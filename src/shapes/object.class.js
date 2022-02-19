@@ -930,7 +930,7 @@
 
     /**
      * Return the object scale factor counting also the group scaling
-     * @return {Object} object with scaleX and scaleY properties
+     * @return {fabric.Point} 
      */
     getObjectScaling: function() {
       // if the object is a top level one, on the canvas, we go for simple aritmetic
@@ -938,14 +938,11 @@
       // and will likely kill the cache when not needed
       // https://github.com/fabricjs/fabric.js/issues/7157
       if (!this.group) {
-        return {
-          scaleX: this.scaleX,
-          scaleY: this.scaleY,
-        };
+        return new fabric.Point(Math.abs(this.scaleX), Math.abs(this.scaleY));
       }
       // if we are inside a group total zoom calculation is complex, we defer to generic matrices
       var options = fabric.util.qrDecompose(this.calcTransformMatrix());
-      return { scaleX: Math.abs(options.scaleX), scaleY: Math.abs(options.scaleY) };
+      return new fabric.Point(Math.abs(options.scaleX), Math.abs(options.scaleY));
     },
 
     /**
