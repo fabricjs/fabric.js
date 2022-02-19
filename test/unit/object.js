@@ -806,7 +806,7 @@
     canvas.setZoom(3);
     canvas.add(object);
     var objectScale = object.getTotalObjectScaling();
-    assert.ok(object instanceof fabric.Point);
+    assert.ok(objectScale instanceof fabric.Point);
     assert.deepEqual(objectScale, new fabric.Point(object.scaleX * 3, object.scaleY * 3));
   });
 
@@ -816,7 +816,7 @@
     fabric.devicePixelRatio = 4;
     canvas.add(object);
     var objectScale = object.getTotalObjectScaling();
-    assert.ok(object instanceof fabric.Point);
+    assert.ok(objectScale instanceof fabric.Point);
     assert.deepEqual(objectScale, new fabric.Point(object.scaleX * 4, object.scaleY * 4));
   });
 
@@ -824,7 +824,7 @@
     var object = new fabric.Object({ scaleX: 3, scaleY: 2});
     var objectScale = object.getObjectScaling();
     assert.ok(objectScale instanceof fabric.Point);
-    assert.deepEqual(objectScale, new fabric.Point(object.scaleX, object.scaleY));
+    assert.ok(objectScale.eq(new fabric.Point(object.scaleX, object.scaleY)));
   });
 
   QUnit.test('getObjectScaling in group', function(assert) {
