@@ -96,15 +96,14 @@
      * @returns {{ offset: fabric.Point, blur: fabric.Point }}
      */
     getShadowOffsets: function () {
-      var blur = this.shadow.blur;
-      var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY),
-          blurOffset = new fabric.Point(blur, blur);
+      var blur = this.shadow.blur, sx = 1, sy = 1;
       if (!this.shadow.nonScaling) {
-        var scaling = this.getObjectScaling(),
-            sx = scaling.scaleX, sy = scaling.scaleY;
-        shadowOffset.setXY(shadowOffset.x * sx, shadowOffset.y * sy);
-        blurOffset.setXY(blurOffset.x * sx, blurOffset.y * sy);
+        var scaling = this.getObjectScaling();
+        sx = scaling.scaleX;
+        sy = scaling.scaleY;
       }
+      var shadowOffset = new fabric.Point(this.shadow.offsetX * sx, this.shadow.offsetY * sy),
+        blurOffset = new fabric.Point(blur * sx, blur * sy);
       return {
         offset: shadowOffset,
         blur: blurOffset
