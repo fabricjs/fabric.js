@@ -313,6 +313,7 @@
       if (!this.canvas || !this.shadow) {
         return false;
       }
+      var tl = this.canvas.vptCoords.tl, br = this.canvas.vptCoords.br;
       return this.shadowIntersectsWithRect(tl, br, true, calculate)
         || this._isPartiallyOnScreen(this.calcShadowCoords(true, calculate), calculate);
     },
