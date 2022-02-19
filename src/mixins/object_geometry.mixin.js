@@ -200,27 +200,27 @@
 
     /**
      * calcualtes shadow coordinates by offsetting object coordinates
-     * @private
      * @param {Boolean} [absolute] use coordinates without viewportTransform
      * @param {Boolean} [calculate] use coordinates of current position instead of .aCoords
-     * @returns {fabric.Point[]} 8 points, 4 points are the actual bounds, 4 are redundant points inside the shadow
+     * @returns {fabric.Point[]}
      */
-    _calcShadowCoords: function (absolute, calculate) {
+    calcShadowCoords: function (absolute, calculate) {
       var shadowOffsets = this.calcShadowOffsets(),
-        shadowOffsetMin = shadowOffsets[0].subtract(shadowOffsets[1]),
-        shadowOffsetMax = shadowOffsets[0].add(shadowOffsets[1]);
-      var points = this.getCoords(absolute, calculate);
-      var shadowPoints = [];
-      //  because of rotation we don't know to which point we should add the blur and from which point to subtract it so we do both
-      //  this way we get a set of points that are the bounds and a set of redundant points that are inside the shadow
-      //  that's good enough for checking if shadow is on screen, is simple and seems better for performance
-      points.forEach(function (point) {
-        shadowPoints.push(
-          point.add(shadowOffsetMin),
-          point.add(shadowOffsetMax),
-        )
+        shadowOffset = shadowOffsets[0],
+        shadowBlur = shadowOffsets[1],
+        shadowOffsetMin = shadowOffset.subtract(shadowBlur),
+        shadowOffsetMax = shadowOffset.add(shadowBlur);
+      var coords = this._getCoords(absolute, calculate);
+      var center = new fabric.Point(coords.tl.x, coords.tl.y).midPointFrom(coords.br);
+      var shadowCenter = center.add(shadowOffset);
+      var a, b, scalarCheck;
+      return arrayFromCoords(coords).map(function (point) {
+        a = point.add(shadowOffsetMin);
+        b = point.add(shadowOffsetMax);
+        //  we check which vector is larger than the other to decide which point is farthest from the center, meaning it's on the border
+        scalarCheck = a.subtract(shadowCenter).x > b.subtract(shadowCenter).x;
+        return scalarCheck ? a : b;
       });
-      return shadowPoints;
     },
 
     /**
@@ -232,7 +232,7 @@
      * @return {Boolean} true if object intersects with an area formed by 2 points
      */
     shadowIntersectsWithRect: function (pointTL, pointBR, absolute, calculate) {
-      var coords = this._calcShadowCoords(absolute, calculate),
+      var coords = this.calcShadowCoords(absolute, calculate),
         intersection = fabric.Intersection.intersectPolygonRectangle(
           coords,
           pointTL,
@@ -265,7 +265,7 @@
       if (!this.canvas || !this.shadow) {
         return false;
       }
-      var points = this._calcShadowCoords(calculate);
+      var points = this.calcShadowCoords(true, calculate);
       return this._isOnScreen(points, calculate);
     },
 
@@ -313,8 +313,8 @@
       if (!this.canvas || !this.shadow) {
         return false;
       }
-      return this.intersectsWithRect(tl, br, true, calculate)
-        || this._isPartiallyOnScreen(this._calcShadowCoords(calculate), calculate);
+      return this.shadowIntersectsWithRect(tl, br, true, calculate)
+        || this._isPartiallyOnScreen(this.calcShadowCoords(true, calculate), calculate);
     },
 
     /**
