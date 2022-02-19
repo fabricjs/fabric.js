@@ -331,6 +331,38 @@
     assert.equal(cObj.aCoords.br.y, 250, 'aCoords do not interfere with viewportTransform');
   });
 
+  QUnit.test('isOnBoundingBox', function (assert) {
+    var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100, strokeWidth: 0 });
+    var tl = new fabric.Point(0, 0), br = new fabric.Point(0, 0);
+    assert.ok(!cObj.isOnBoundingBox(tl, br, true, true), 'object is not on bbox');
+    tl.setXY(10, 10);
+    br.setXY(49, 49);
+    assert.ok(!cObj.isOnBoundingBox(tl, br, true, true), 'object is a pixel from intersecting bbox');
+    br.setXY(50, 50);
+    assert.ok(cObj.isOnBoundingBox(tl, br, true, true), 'object is intersecting bbox');
+    br.setXY(60, 60);
+    assert.ok(cObj.isOnBoundingBox(tl, br, true, true), 'object is in bbox');
+    tl.setXY(51, 51);
+    assert.ok(cObj.isOnBoundingBox(tl, br, true, true), 'object is entirely in bbox');
+    tl.setXY(49, 49);
+    br.setXY(101, 101);
+    assert.ok(cObj.isOnBoundingBox(tl, br, true, true), 'object covers bbox');
+  });
+
+  QUnit.test('isPartiallyOnBoundingBox', function (assert) {
+    var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100, strokeWidth: 0 });
+    var tl = new fabric.Point(0, 0), br = new fabric.Point(0, 0);
+    assert.ok(!cObj.isPartiallyOnBoundingBox(tl, br, true, true), 'object is not on bbox');
+    tl.setXY(10, 10);
+    br.setXY(50, 50);
+    assert.ok(cObj.isPartiallyOnBoundingBox(tl, br, true, true), 'object is intersecting bbox');
+    br.setXY(60, 60);
+    assert.ok(cObj.isPartiallyOnBoundingBox(tl, br, true, true), 'object is in bbox');
+    tl.setXY(49, 49);
+    br.setXY(101, 101);
+    assert.ok(cObj.isPartiallyOnBoundingBox(tl, br, true, true), 'object covers bbox');
+  });
+
   QUnit.test('isOnScreen', function(assert) {
     var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100, strokeWidth: 0});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
