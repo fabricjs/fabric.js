@@ -183,43 +183,29 @@
     },
 
     /**
-     *
-     * @returns {fabric.Point}
-     */
-    calcShadowOffsets: function () {
-      var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY),
-          shadowBlur = new fabric.Point(this.shadow.blur, this.shadow.blur);
-      if (!this.shadow.nonScaling) {
-        var scaling = this.getObjectScaling(),
-            sx = scaling.scaleX, sy = scaling.scaleY;
-        shadowOffset.setXY(shadowOffset.x * sx, shadowOffset.y * sy);
-        shadowBlur.setXY(shadowBlur.x * sx, shadowBlur.y * sy);
-      }
-      return [shadowOffset, shadowBlur];
-    },
-
-    /**
      * Calcualtes shadow coordinates by offsetting object coordinates
      * @param {Boolean} [absolute] use coordinates without viewportTransform
      * @param {Boolean} [calculate] use coordinates of current position instead of .aCoords
      * @returns {fabric.Point[]}
      */
     calcShadowCoords: function (absolute, calculate) {
-      var shadowOffsets = this.calcShadowOffsets(),
-          shadowOffset = shadowOffsets[0],
-          shadowBlur = shadowOffsets[1],
-          shadowOffsetMin = shadowOffset.subtract(shadowBlur),
-          shadowOffsetMax = shadowOffset.add(shadowBlur);
+      var blur = this.shadow.blur;
+      var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY);
+      var sx = 1, sy = 1;
+      if (!this.shadow.nonScaling) {
+        var scaling = this.getObjectScaling();
+        sx = scaling.scaleX;
+        sy = scaling.scaleY;
+        shadowOffset.setXY(shadowOffset.x * sx, shadowOffset.y * sy);
+      }
       var coords = this._getCoords(absolute, calculate);
       var center = new fabric.Point(coords.tl.x, coords.tl.y).midPointFrom(coords.br);
       var shadowCenter = center.add(shadowOffset);
-      var a, b, scalarCheck;
+      var vector, projection;
       return arrayFromCoords(coords).map(function (point) {
-        a = point.add(shadowOffsetMin);
-        b = point.add(shadowOffsetMax);
-        //  we check which vector is larger than the other to decide which point is farthest from the center, meaning it's on the border
-        scalarCheck = a.subtract(shadowCenter).x > b.subtract(shadowCenter).x;
-        return scalarCheck ? a : b;
+        projection = point.add(shadowOffset);
+        vector = fabric.util.getHatVector(fabric.util.createVector(shadowCenter, projection));
+        return projection.add(new fabric.Point(vector.x * blur * sx, vector.y * blur * sy));
       });
     },
 
