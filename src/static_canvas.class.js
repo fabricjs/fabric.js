@@ -14,6 +14,8 @@
       toFixed = fabric.util.toFixed,
       transformPoint = fabric.util.transformPoint,
       invertTransform = fabric.util.invertTransform,
+      applyTransformToObject = fabric.util.applyTransformToObject,
+      multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
       getNodeCanvas = fabric.util.getNodeCanvas,
       createCanvasElement = fabric.util.createCanvasElement,
 
@@ -480,7 +482,12 @@
       if (activeObject) {
         //  interacting object should not be changed by vpt
         if (this._currentTransform) {
-          fabric.util.removeTransformFromObject(activeObject, vpt);
+          var vpTransform = vpt.slice();
+          vpTransform[4] = vpTransform[5] = 0;
+          var currentTransform = activeObject.calcTransformMatrix(),
+            t = multiplyTransformMatrices(invertTransform(vpTransform), currentTransform);
+          applyTransformToObject(activeObject, t);
+          this._needsCurrentTransformSetup = true;
           dirty = true;
         }
         activeObject.setCoords();

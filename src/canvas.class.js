@@ -653,6 +653,7 @@
      * @param {fabric.Object} target
      */
     _setupCurrentTransform: function (e, target, alreadySelected) {
+      this._needsCurrentTransformSetup = false;
       if (!target) {
         return;
       }

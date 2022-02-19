@@ -896,7 +896,9 @@
      * @private
      * @param {Event} e Event fired on mousemove
      */
-    _transformObject: function(e) {
+    _transformObject: function (e) {
+      this._needsCurrentTransformSetup && this._setupCurrentTransform(e, this._currentTransform.target, true);
+
       var pointer = this.getPointer(e),
           transform = this._currentTransform;
 
