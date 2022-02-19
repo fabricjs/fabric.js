@@ -848,7 +848,7 @@
     group.scaleY = 3;
     object.group = group;
     var objectScale = object.getObjectScaling();
-    assert.deepEqual(new fabric.Point(objectScale.x.toFixed(3), objectScale.y.toFixed(3)), new fabric.Point(7.649, 4.707));
+    assert.ok(new fabric.Point(objectScale.x.toFixed(3), objectScale.y.toFixed(3)).eq(new fabric.Point(7.649, 4.707)));
   });
 
   QUnit.test('dirty flag on set property', function(assert) {
