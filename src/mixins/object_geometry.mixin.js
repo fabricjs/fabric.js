@@ -202,7 +202,7 @@
     },
 
     /**
-     * Checks if object is contained within the within the bbox created by `tl` and `br`
+     * Checks if object is displayed within the bbox created by `tl` and `br`
      * @param {fabric.Point} tl
      * @param {fabric.Point} br
      * @param {Boolean} [absolute] use coordinates without viewportTransform
