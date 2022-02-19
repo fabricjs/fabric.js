@@ -184,17 +184,61 @@
 
     /**
      *
-     * @returns {[fabric.Point, fabric.Point]} [offset, blur]
+     * @returns {fabric.Point}
      */
     calcShadowOffsets: function () {
       var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY),
-          shadowBlur = new fabric.Point(this.shadow.blur, this.shadow.blur);
+        shadowBlur = new fabric.Point(this.shadow.blur, this.shadow.blur);
       if (!this.shadow.nonScaling) {
-        var t = this.calcTransformMatrix(), sx = t[0], sy = t[3];
+        var scaling = this.getObjectScaling(),
+          sx = scaling.scaleX, sy = scaling.scaleY;
         shadowOffset.setXY(shadowOffset.x * sx, shadowOffset.y * sy);
         shadowBlur.setXY(shadowBlur.x * sx, shadowBlur.y * sy);
       }
       return [shadowOffset, shadowBlur];
+    },
+
+    /**
+     * calcualtes shadow coordinates by offsetting object coordinates
+     * @private
+     * @param {Boolean} [absolute] use coordinates without viewportTransform
+     * @param {Boolean} [calculate] use coordinates of current position instead of .aCoords
+     * @returns {fabric.Point[]} 8 points, 4 points are the actual bounds, 4 are redundant points inside the shadow
+     */
+    _calcShadowCoords: function (absolute, calculate) {
+      var shadowOffsets = this.calcShadowOffsets(),
+        shadowOffsetMin = shadowOffsets[0].subtract(shadowOffsets[1]),
+        shadowOffsetMax = shadowOffsets[0].add(shadowOffsets[1]);
+      var points = this.getCoords(absolute, calculate);
+      var shadowPoints = [];
+      //  because of rotation we don't know to which point we should add the blur and from which point to subtract it so we do both
+      //  this way we get a set of points that are the bounds and a set of redundant points that are inside the shadow
+      //  that's good enough for checking if shadow is on screen, is simple and seems better for performance
+      points.forEach(function (point) {
+        shadowPoints.push(
+          point.add(shadowOffsetMin),
+          point.add(shadowOffsetMax),
+        )
+      });
+      return shadowPoints;
+    },
+
+    /**
+     * Checks if object intersects with an area formed by 2 points
+     * @param {Object} pointTL top-left point of area
+     * @param {Object} pointBR bottom-right point of area
+     * @param {Boolean} [absolute] use coordinates without viewportTransform
+     * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
+     * @return {Boolean} true if object intersects with an area formed by 2 points
+     */
+    shadowIntersectsWithRect: function (pointTL, pointBR, absolute, calculate) {
+      var coords = this._calcShadowCoords(absolute, calculate),
+        intersection = fabric.Intersection.intersectPolygonRectangle(
+          coords,
+          pointTL,
+          pointBR
+        );
+      return intersection.status === 'Intersection';
     },
 
     /**
@@ -207,8 +251,8 @@
       if (!this.canvas) {
         return false;
       }
-      var tl = this.canvas.vptCoords.tl, br = this.canvas.vptCoords.br;
-      return this._isOnScreen(tl, br, calculate);
+      var points = this.getCoords(true, calculate);
+      return this._isOnScreen(points, calculate);
     },
 
     /**
@@ -221,12 +265,8 @@
       if (!this.canvas || !this.shadow) {
         return false;
       }
-      var shadowOffsets = this.calcShadowOffsets(),
-          offset = shadowOffsets[0], blur = shadowOffsets[1];
-      // we calculate canvas vptCoords relative to shadow instead of calculating shadow coords (by offsetting object's coordinates)
-      var tl = this.canvas.vptCoords.tl.subtract(offset).subtractEquals(blur),
-          br = this.canvas.vptCoords.br.subtract(offset).addEquals(blur);
-      return this._isOnScreen(tl, br, calculate);
+      var points = this._calcShadowCoords(calculate);
+      return this._isOnScreen(points, calculate);
     },
 
     /**
@@ -236,8 +276,8 @@
      * @param {boolean} [calculate]
      * @returns {boolean}
      */
-    _isOnScreen: function (tl, br, calculate) {
-      var points = this.getCoords(true, calculate);
+    _isOnScreen: function (points, calculate) {
+      var tl = this.canvas.vptCoords.tl, br = this.canvas.vptCoords.br;
       // if some point is on screen, the object is on screen.
       return points.some(function (point) {
         return point.x <= br.x && point.x >= tl.x &&
@@ -260,7 +300,8 @@
         return false;
       }
       var tl = this.canvas.vptCoords.tl, br = this.canvas.vptCoords.br;
-      return this._isPartiallyOnScreen(tl, br, calculate);
+      return this.intersectsWithRect(tl, br, true, calculate)
+        || this._isPartiallyOnScreen(this.getCoords(true, calculate), calculate);
     },
 
     /**
@@ -272,26 +313,19 @@
       if (!this.canvas || !this.shadow) {
         return false;
       }
-      var shadowOffsets = this.calcShadowOffsets(),
-          offset = shadowOffsets[0], blur = shadowOffsets[1];
-      // we calculate canvas vptCoords relative to shadow instead of calculating shadow coords (by offsetting object's coordinates)
-      var tl = this.canvas.vptCoords.tl.subtract(offset).subtractEquals(blur),
-          br = this.canvas.vptCoords.br.subtract(offset).addEquals(blur);
-      return this._isPartiallyOnScreen(tl, br, calculate);
+      return this.intersectsWithRect(tl, br, true, calculate)
+        || this._isPartiallyOnScreen(this._calcShadowCoords(calculate), calculate);
     },
 
     /**
      * @private
-     * @param {fabric.Point} tl
-     * @param {fabric.Point} br
+     * @param {fabric.Point[]} points
      * @param {boolean} [calculate]
      * @returns {boolean}
      */
-    _isPartiallyOnScreen: function (tl, br, calculate) {
-      if (this.intersectsWithRect(tl, br, true, calculate)) {
-        return true;
-      }
-      var allPointsAreOutside = this.getCoords(true, calculate).every(function (point) {
+    _isPartiallyOnScreen: function (points, calculate) {
+      var tl = this.canvas.vptCoords.tl, br = this.canvas.vptCoords.br;
+      var allPointsAreOutside = points.every(function (point) {
         return (point.x >= br.x || point.x <= tl.x) &&
           (point.y >= br.y || point.y <= tl.y);
       });
