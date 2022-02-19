@@ -238,7 +238,14 @@
         return false;
       }
       var points = this.getCoords(true, calculate);
-      return this._isOnScreen(points, calculate);
+      var tl = this.canvas.vptCoords.tl, br = this.canvas.vptCoords.br;
+      // if some point is on screen, the object is on screen.
+      return this._isPointOnScreen(points)
+        // no points are on screen
+        // check intersection with absolute coordinates
+        || this.intersectsWithRect(tl, br, true, calculate)
+        // check if object contains canvas center (in case it is painted all over canvas)
+        || this.containsPoint(tl.midPointFrom(br), null, true, calculate);
     },
 
     /**
@@ -252,7 +259,15 @@
         return false;
       }
       var points = this.calcShadowCoords(true, calculate);
-      return this._isOnScreen(points, calculate);
+      var tl = this.canvas.vptCoords.tl, br = this.canvas.vptCoords.br;
+      var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY);
+      // if some point is on screen, the object is on screen.
+      return this._isPointOnScreen(points)
+        // no points are on screen
+        // check intersection with absolute coordinates
+        || this.shadowIntersectsWithRect(tl, br, true, calculate)
+        // check if shadow contains canvas center (in case it is painted all over canvas)
+        || this.containsPoint(tl.midPointFrom(br).subtract(shadowOffset), null, true, calculate);
     },
 
     /**
@@ -262,18 +277,13 @@
      * @param {boolean} [calculate]
      * @returns {boolean}
      */
-    _isOnScreen: function (points, calculate) {
+    _isPointOnScreen: function (points) {
       var tl = this.canvas.vptCoords.tl, br = this.canvas.vptCoords.br;
       // if some point is on screen, the object is on screen.
       return points.some(function (point) {
         return point.x <= br.x && point.x >= tl.x &&
           point.y <= br.y && point.y >= tl.y;
-      }) ||
-        // no points are on screen
-        // check intersection with absolute coordinates
-        this.intersectsWithRect(tl, br, true, calculate) ||
-        // check if object contains canvas center (in case it is painted all over canvas)
-        this.containsPoint(tl.midPointFrom(br), null, true, calculate);
+      });
     },
 
     /**
