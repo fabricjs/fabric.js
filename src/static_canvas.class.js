@@ -235,16 +235,18 @@
         return;
       }
       var scaleRatio = fabric.devicePixelRatio;
-      this.__initRetinaScaling(scaleRatio, this.lowerCanvasEl, this.contextContainer);
+      this.__initRetinaScaling(scaleRatio, this.lowerCanvasEl, this.lowerCanvasEl.getContext('2d'));
       if (this.upperCanvasEl) {
-        this.__initRetinaScaling(scaleRatio, this.upperCanvasEl, this.contextTop);
+        this.__initRetinaScaling(scaleRatio, this.upperCanvasEl, this.upperCanvasEl.getContext('2d'));
       }
     },
 
     __initRetinaScaling: function(scaleRatio, canvas, context) {
       canvas.setAttribute('width', this.width * scaleRatio);
       canvas.setAttribute('height', this.height * scaleRatio);
-      context.scale(scaleRatio, scaleRatio);
+      if (context) {
+        context.scale(scaleRatio, scaleRatio);
+      }
     },
 
 
@@ -826,7 +828,7 @@
 
     /**
      * Returns coordinates of a center of canvas.
-     * @return {fabric.Point} 
+     * @return {fabric.Point}
      */
     getCenterPoint: function () {
       return new fabric.Point(this.width / 2, this.height / 2);
