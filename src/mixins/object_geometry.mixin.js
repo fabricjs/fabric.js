@@ -64,7 +64,7 @@
      * custom controls interface
      * controls are added by default_controls.js
      */
-    controls: { },
+    controls: {},
 
     /**
      * return correct set of coordinates for intersection
@@ -72,7 +72,7 @@
      * @param {Boolean} absolute will return aCoords if true or lineCoords
      * @return {Object} {tl, tr, br, bl} points
      */
-    _getCoords: function(absolute, calculate) {
+    _getCoords: function (absolute, calculate) {
       if (calculate) {
         return (absolute ? this.calcACoords() : this.calcLineCoords());
       }
@@ -88,8 +88,27 @@
      * The coords are returned in an array.
      * @return {Array} [tl, tr, br, bl] of points
      */
-    getCoords: function(absolute, calculate) {
+    getCoords: function (absolute, calculate) {
       return arrayFromCoords(this._getCoords(absolute, calculate));
+    },
+
+    /**
+     * @returns {{ offset: fabric.Point, blur: fabric.Point }}
+     */
+    getShadowOffsets: function () {
+      var blur = this.shadow.blur;
+      var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY),
+        blurOffset = new fabric.Point(blur, blur);
+      if (!this.shadow.nonScaling) {
+        var scaling = this.getObjectScaling(),
+          sx = scaling.scaleX, sy = scaling.scaleY;
+        shadowOffset.setXY(shadowOffset.x * sx, shadowOffset.y * sy);
+        blurOffset.setXY(blurOffset.x * sx, blurOffset.y * sy);
+      }
+      return {
+        offset: shadowOffset,
+        blur: blurOffset
+      }
     },
 
     /**
@@ -100,13 +119,13 @@
      * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
      * @return {Boolean} true if object intersects with an area formed by 2 points
      */
-    intersectsWithRect: function(pointTL, pointBR, absolute, calculate) {
+    intersectsWithRect: function (pointTL, pointBR, absolute, calculate) {
       var coords = this.getCoords(absolute, calculate),
-          intersection = fabric.Intersection.intersectPolygonRectangle(
-            coords,
-            pointTL,
-            pointBR
-          );
+        intersection = fabric.Intersection.intersectPolygonRectangle(
+          coords,
+          pointTL,
+          pointBR
+        );
       return intersection.status === 'Intersection';
     },
 
@@ -117,7 +136,7 @@
      * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
      * @return {Boolean} true if object intersects with another object
      */
-    intersectsWithObject: function(other, absolute, calculate) {
+    intersectsWithObject: function (other, absolute, calculate) {
       var intersection = fabric.Intersection.intersectPolygonPolygon(
         this.getCoords(absolute, calculate),
         other.getCoords(absolute, calculate)
@@ -135,10 +154,10 @@
      * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
      * @return {Boolean} true if object is fully contained within area of another object
      */
-    isContainedWithinObject: function(other, absolute, calculate) {
+    isContainedWithinObject: function (other, absolute, calculate) {
       var points = this.getCoords(absolute, calculate),
-          otherCoords = absolute ? other.aCoords : other.lineCoords,
-          i = 0, lines = other._getImageLines(otherCoords);
+        otherCoords = absolute ? other.aCoords : other.lineCoords,
+        i = 0, lines = other._getImageLines(otherCoords);
       for (; i < 4; i++) {
         if (!other.containsPoint(points[i], lines)) {
           return false;
@@ -155,7 +174,7 @@
      * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
      * @return {Boolean} true if object is fully contained within area formed by 2 points
      */
-    isContainedWithinRect: function(pointTL, pointBR, absolute, calculate) {
+    isContainedWithinRect: function (pointTL, pointBR, absolute, calculate) {
       var boundingRect = this.getBoundingRect(absolute, calculate);
 
       return (
@@ -174,10 +193,10 @@
      * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
      * @return {Boolean} true if point is inside the object
      */
-    containsPoint: function(point, lines, absolute, calculate) {
+    containsPoint: function (point, lines, absolute, calculate) {
       var coords = this._getCoords(absolute, calculate),
-          lines = lines || this._getImageLines(coords),
-          xPoints = this._findCrossPoints(point, lines);
+        lines = lines || this._getImageLines(coords),
+        xPoints = this._findCrossPoints(point, lines);
       // if xPoints is odd then point is inside the object
       return (xPoints !== 0 && xPoints % 2 === 1);
     },
@@ -206,63 +225,37 @@
       if (!this.canvas || !this.shadow) {
         return false;
       }
-      var blur = this.shadow.blur;
-      var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY),
-        blurOffset = new fabric.Point(blur, blur);
-      var sx = 1, sy = 1;
-      if (!this.shadow.nonScaling) {
-        var scaling = this.getObjectScaling();
-        sx = scaling.scaleX;
-        sy = scaling.scaleY;
-        shadowOffset.setXY(shadowOffset.x * sx, shadowOffset.y * sy);
-        blurOffset.setXY(blurOffset.x * sx, blurOffset.y * sy);
-      }
+      var shadowOffsets = this.getShadowOffsets(),
+        shadowOffset = shadowOffsets.offset, blurOffset = shadowOffsets.blur;
       var tl = this.canvas.vptCoords.tl.subtract(shadowOffset).subtract(blurOffset),
         br = this.canvas.vptCoords.br.subtract(shadowOffset).add(blurOffset);
       return this._isOnScreen(tl, br, calculate);
     },
 
     /**
-     * Checks if object is contained within the canvas with current viewportTransform
-     * the check is done stopping at first point that appears on screen
+     * Checks if object is contained within the within the bbox created by `tl` and `br`
+     * @private
+     * @param {fabric.Point} tl
+     * @param {fabric.Point} br
      * @param {Boolean} [calculate] use coordinates of current position instead of .aCoords
      * @return {Boolean} true if object is fully or partially contained within canvas
      */
     _isOnScreen: function (tl, br, calculate) {
       var points = this.getCoords(true, calculate);
       // if some point is on screen, the object is on screen.
-      console.log(tl.midPointFrom(br))
-      if (points.some(function(point) {
+      if (points.some(function (point) {
         return point.x <= br.x && point.x >= tl.x &&
-        point.y <= br.y && point.y >= tl.y;
+          point.y <= br.y && point.y >= tl.y;
       })) {
         return true;
       }
-      console.log('b')
       // no points on screen, check intersection with absolute coordinates
       if (this.intersectsWithRect(tl, br, true, calculate)) {
         return true;
       }
-      console.log(tl.midPointFrom(br))
+      // no points on screen and no intersection with canvas borders
+      // check if object covers canvas
       return this.containsPoint(tl.midPointFrom(br), null, true, calculate);
-    },
-
-    /**
-     * Checks if the object contains the midpoint between canvas extremities
-     * Does not make sense outside the context of isOnScreen and isPartiallyOnScreen
-     * @private
-     * @param {Fabric.Point} pointTL Top Left point
-     * @param {Fabric.Point} pointBR Top Right point
-     * @param {Boolean} calculate use coordinates of current position instead of .oCoords
-     * @return {Boolean} true if the object contains the point
-     */
-    _containsCenterOfCanvas: function(pointTL, pointBR, calculate) {
-      // worst case scenario the object is so big that contains the screen
-      var centerPoint = { x: (pointTL.x + pointBR.x) / 2, y: (pointTL.y + pointBR.y) / 2 };
-      if (this.containsPoint(centerPoint, null, true, calculate)) {
-        return true;
-      }
-      return false;
     },
 
     /**
@@ -270,19 +263,47 @@
      * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
      * @return {Boolean} true if object is partially contained within canvas
      */
-    isPartiallyOnScreen: function(calculate) {
+    isPartiallyOnScreen: function (calculate) {
       if (!this.canvas) {
         return false;
       }
-      var pointTL = this.canvas.vptCoords.tl, pointBR = this.canvas.vptCoords.br;
-      if (this.intersectsWithRect(pointTL, pointBR, true, calculate)) {
+      var tl = this.canvas.vptCoords.tl, br = this.canvas.vptCoords.br;
+      return this._isPartiallyOnScreen(tl, br, calculate);
+    },
+
+    /**
+     * Checks if object's shadow is partially contained within the canvas with current viewportTransform
+     * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
+     * @return {Boolean} true if object is partially contained within canvas
+     */
+    isShadowPartiallyOnScreen: function (calculate) {
+      if (!this.canvas || !this.shadow) {
+        return false;
+      }
+      var shadowOffsets = this.getShadowOffsets(),
+        shadowOffset = shadowOffsets.offset, blurOffset = shadowOffsets.blur;
+      var tl = this.canvas.vptCoords.tl.subtract(shadowOffset).subtract(blurOffset),
+        br = this.canvas.vptCoords.br.subtract(shadowOffset).add(blurOffset);
+      return this._isPartiallyOnScreen(tl, br, calculate);
+    },
+
+    /**
+     * Checks if object is partially contained within the bbox created by `tl` and `br`
+     * @private
+     * @param {fabric.Point} tl
+     * @param {fabric.Point} br
+     * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
+     * @return {Boolean} true if object is partially contained within canvas
+     */
+    _isPartiallyOnScreen: function (tl, br, calculate) {
+      if (this.intersectsWithRect(tl, br, true, calculate)) {
         return true;
       }
       var allPointsAreOutside = this.getCoords(true, calculate).every(function(point) {
-        return (point.x >= pointBR.x || point.x <= pointTL.x) &&
-        (point.y >= pointBR.y || point.y <= pointTL.y);
+        return (point.x >= br.x || point.x <= tl.x) &&
+        (point.y >= br.y || point.y <= tl.y);
       });
-      return allPointsAreOutside && this._containsCenterOfCanvas(pointTL, pointBR, calculate);
+      return allPointsAreOutside && this.containsPoint(tl.midPointFrom(br), null, true, calculate);
     },
 
     /**
