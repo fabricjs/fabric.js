@@ -471,13 +471,18 @@
       var activeObject = this._activeObject,
           backgroundObject = this.backgroundImage,
           overlayObject = this.overlayImage,
-          object, i, len;
+          object, i, len, dirty = false;
       this.viewportTransform = vpt;
       for (i = 0, len = this._objects.length; i < len; i++) {
         object = this._objects[i];
         object.group || object.setCoords(true);
       }
       if (activeObject) {
+        //  interacting object should not be changed by vpt
+        if (this._currentTransform) {
+          fabric.util.removeTransformFromObject(activeObject, vpt);
+          dirty = true;
+        }
         activeObject.setCoords();
       }
       if (backgroundObject) {
@@ -487,7 +492,7 @@
         overlayObject.setCoords(true);
       }
       this.calcViewportBoundaries();
-      this.renderOnAddRemove && this.requestRenderAll();
+      (this.renderOnAddRemove || dirty) && this.requestRenderAll();
       return this;
     },
 
