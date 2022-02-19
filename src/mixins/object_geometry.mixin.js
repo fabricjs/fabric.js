@@ -204,8 +204,8 @@
       var vector, projection;
       return arrayFromCoords(coords).map(function (point) {
         projection = point.add(shadowOffset);
-        vector = fabric.util.getHatVector(fabric.util.createVector(shadowCenter, projection));
-        return projection.add(new fabric.Point(vector.x * blur * sx, vector.y * blur * sy));
+        vector = fabric.util.createVector(shadowCenter, projection);
+        return projection.add(new fabric.Point(blur * sx * Math.sign(vector.x), blur * sy * Math.sign(vector.y)));
       });
     },
 
