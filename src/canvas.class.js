@@ -1371,6 +1371,10 @@
         activeObject.setCoords();
       }
       fabric.StaticCanvas.prototype._setViewportTransform.call(this, vpt);
+      if (discard && !activeObject.isOnScreen() && !activeObject.isShadowOnScreen()) {
+        this.discardActiveObject();
+        dirty = true;
+      }
       (dirty || this.renderOnAddRemove) && this.requestRenderAll();
     }
   });
