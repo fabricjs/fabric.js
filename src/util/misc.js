@@ -172,7 +172,7 @@
      * @returns {Point} vector representing the unit vector of pointing to the direction of `v`
      */
     getHatVector: function (v) {
-      return new fabric.Point(v.x, v.y).multiply(1 / Math.hypot(v.x, v.y));
+      return new fabric.Point(v.x, v.y).scalarMultiply(1 / Math.hypot(v.x, v.y));
     },
 
     /**
