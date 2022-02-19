@@ -98,17 +98,17 @@
     getShadowOffsets: function () {
       var blur = this.shadow.blur;
       var shadowOffset = new fabric.Point(this.shadow.offsetX, this.shadow.offsetY),
-        blurOffset = new fabric.Point(blur, blur);
+          blurOffset = new fabric.Point(blur, blur);
       if (!this.shadow.nonScaling) {
         var scaling = this.getObjectScaling(),
-          sx = scaling.scaleX, sy = scaling.scaleY;
+            sx = scaling.scaleX, sy = scaling.scaleY;
         shadowOffset.setXY(shadowOffset.x * sx, shadowOffset.y * sy);
         blurOffset.setXY(blurOffset.x * sx, blurOffset.y * sy);
       }
       return {
         offset: shadowOffset,
         blur: blurOffset
-      }
+      };
     },
 
     /**
@@ -121,11 +121,11 @@
      */
     intersectsWithRect: function (pointTL, pointBR, absolute, calculate) {
       var coords = this.getCoords(absolute, calculate),
-        intersection = fabric.Intersection.intersectPolygonRectangle(
-          coords,
-          pointTL,
-          pointBR
-        );
+          intersection = fabric.Intersection.intersectPolygonRectangle(
+            coords,
+            pointTL,
+            pointBR
+          );
       return intersection.status === 'Intersection';
     },
 
@@ -156,8 +156,8 @@
      */
     isContainedWithinObject: function (other, absolute, calculate) {
       var points = this.getCoords(absolute, calculate),
-        otherCoords = absolute ? other.aCoords : other.lineCoords,
-        i = 0, lines = other._getImageLines(otherCoords);
+          otherCoords = absolute ? other.aCoords : other.lineCoords,
+          i = 0, lines = other._getImageLines(otherCoords);
       for (; i < 4; i++) {
         if (!other.containsPoint(points[i], lines)) {
           return false;
@@ -195,8 +195,8 @@
      */
     containsPoint: function (point, lines, absolute, calculate) {
       var coords = this._getCoords(absolute, calculate),
-        lines = lines || this._getImageLines(coords),
-        xPoints = this._findCrossPoints(point, lines);
+          lines = lines || this._getImageLines(coords),
+          xPoints = this._findCrossPoints(point, lines);
       // if xPoints is odd then point is inside the object
       return (xPoints !== 0 && xPoints % 2 === 1);
     },
@@ -284,11 +284,11 @@
         return false;
       }
       var shadowOffsets = this.getShadowOffsets(),
-        shadowOffset = shadowOffsets.offset, blurOffset = shadowOffsets.blur;
-      //  instead of offsetting object coordinates to calculate shadows coordinates, 
+          shadowOffset = shadowOffsets.offset, blurOffset = shadowOffsets.blur;
+      //  instead of offsetting object coordinates to calculate shadows coordinates,
       //  we translate canvas' corners to the shadow's coordinate system
       var tl = this.canvas.vptCoords.tl.subtract(shadowOffset).subtract(blurOffset),
-        br = this.canvas.vptCoords.br.subtract(shadowOffset).add(blurOffset);
+          br = this.canvas.vptCoords.br.subtract(shadowOffset).add(blurOffset);
       return this.isOnBoundingBox(tl, br, true, calculate);
     },
 
@@ -302,11 +302,11 @@
         return false;
       }
       var shadowOffsets = this.getShadowOffsets(),
-        shadowOffset = shadowOffsets.offset, blurOffset = shadowOffsets.blur;
+          shadowOffset = shadowOffsets.offset, blurOffset = shadowOffsets.blur;
       //  instead of offsetting object coordinates to calculate shadows coordinates,
       //  we translate canvas' corners to the shadow's coordinate system
       var tl = this.canvas.vptCoords.tl.subtract(shadowOffset).subtract(blurOffset),
-        br = this.canvas.vptCoords.br.subtract(shadowOffset).add(blurOffset);
+          br = this.canvas.vptCoords.br.subtract(shadowOffset).add(blurOffset);
       return this.isPartiallyOnBoundingBox(tl, br, true, calculate);
     },
 
