@@ -1237,13 +1237,13 @@
     /**
      * @private
      */
-    _toObject: function(instance, methodName, propertiesToInclude) {
+    _toObject: function(instance, methodName, propertiesToInclude, includeDefaultValues) {
       //If the object is part of the current selection group, it should
       //be transformed appropriately
       //i.e. it should be serialised as it would appear if the selection group
       //were to be destroyed.
       var originalProperties = this._realizeGroupTransformOnObject(instance),
-          object = this.callSuper('_toObject', instance, methodName, propertiesToInclude);
+          object = this.callSuper('_toObject', instance, methodName, propertiesToInclude, includeDefaultValues);
       //Undo the damage we did by changing all of its properties
       this._unwindGroupTransformOnObject(instance, originalProperties);
       return object;

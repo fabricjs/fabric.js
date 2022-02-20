@@ -1533,15 +1533,16 @@
     /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {Object} Object representation of an instance
      */
-    toObject: function(propertiesToInclude) {
+    toObject: function (propertiesToInclude, includeDefaultValues) {
       var allProperties = additionalProps.concat(propertiesToInclude);
-      var obj = this.callSuper('toObject', allProperties);
+      var obj = this.callSuper('toObject', allProperties, includeDefaultValues);
       // styles will be overridden with a properly cloned structure
       obj.styles = clone(this.styles, true);
       if (obj.path) {
-        obj.path = this.path.toObject();
+        obj.path = this.path.toObject(includeDefaultValues);
       }
       return obj;
     },

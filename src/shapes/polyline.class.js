@@ -143,10 +143,11 @@
     /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {Object} Object representation of an instance
      */
-    toObject: function(propertiesToInclude) {
-      return extend(this.callSuper('toObject', propertiesToInclude), {
+    toObject: function (propertiesToInclude, includeDefaultValues) {
+      return extend(this.callSuper('toObject', propertiesToInclude, includeDefaultValues), {
         points: this.points.concat()
       });
     },

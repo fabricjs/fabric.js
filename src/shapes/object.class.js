@@ -430,13 +430,6 @@
     perPixelTargetFind:       false,
 
     /**
-     * When `false`, default object's values are not included in its serialization
-     * @type Boolean
-     * @default
-     */
-    includeDefaultValues:     true,
-
-    /**
      * When `true`, object horizontal movement is locked
      * @type Boolean
      * @default
@@ -831,9 +824,10 @@
     /**
      * Returns an object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {Object} Object representation of an instance
      */
-    toObject: function(propertiesToInclude) {
+    toObject: function (propertiesToInclude, includeDefaultValues) {
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
 
           object = {
@@ -845,8 +839,8 @@
             top:                      toFixed(this.top, NUM_FRACTION_DIGITS),
             width:                    toFixed(this.width, NUM_FRACTION_DIGITS),
             height:                   toFixed(this.height, NUM_FRACTION_DIGITS),
-            fill:                     (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
-            stroke:                   (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
+            fill:                     (this.fill && this.fill.toObject) ? this.fill.toObject(includeDefaultValues) : this.fill,
+            stroke:                   (this.stroke && this.stroke.toObject) ? this.stroke.toObject(includeDefaultValues) : this.stroke,
             strokeWidth:              toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
             strokeDashArray:          this.strokeDashArray ? this.strokeDashArray.concat() : this.strokeDashArray,
             strokeLineCap:            this.strokeLineCap,
@@ -860,7 +854,7 @@
             flipX:                    this.flipX,
             flipY:                    this.flipY,
             opacity:                  toFixed(this.opacity, NUM_FRACTION_DIGITS),
-            shadow:                   (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
+            shadow:                   (this.shadow && this.shadow.toObject) ? this.shadow.toObject(includeDefaultValues) : this.shadow,
             visible:                  this.visible,
             backgroundColor:          this.backgroundColor,
             fillRule:                 this.fillRule,
@@ -871,27 +865,38 @@
           };
 
       if (this.clipPath && !this.clipPath.excludeFromExport) {
-        object.clipPath = this.clipPath.toObject(propertiesToInclude);
+        object.clipPath = this.clipPath.toObject(propertiesToInclude, includeDefaultValues);
         object.clipPath.inverted = this.clipPath.inverted;
         object.clipPath.absolutePositioned = this.clipPath.absolutePositioned;
       }
 
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
-      if (!this.includeDefaultValues) {
-        object = this._removeDefaultValues(object);
-      }
 
-      return object;
+      return includeDefaultValues ?
+        this._removeDefaultValues(object) :
+        object;
     },
 
     /**
      * Returns (dataless) object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {Object} Object representation of an instance
      */
-    toDatalessObject: function(propertiesToInclude) {
+    toDatalessObject: function (propertiesToInclude, includeDefaultValues) {
       // will be overwritten by subclasses
-      return this.toObject(propertiesToInclude);
+      return this.toObject(propertiesToInclude, includeDefaultValues);
+    },
+
+    /**
+     * Returns a JSON representation of an instance
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
+     * @return {Object} JSON
+     */
+    toJSON: function (propertiesToInclude, includeDefaultValues) {
+      // delegate, not alias
+      return this.toObject(propertiesToInclude, includeDefaultValues);
     },
 
     /**
@@ -1659,7 +1664,7 @@
      * @returns {Promise<fabric.Object>}
      */
     clone: function(propertiesToInclude) {
-      var objectForm = this.toObject(propertiesToInclude);
+      var objectForm = this.toObject(propertiesToInclude, false);
       return this.constructor.fromObject(objectForm);
     },
 
@@ -1803,16 +1808,6 @@
      */
     complexity: function() {
       return 1;
-    },
-
-    /**
-     * Returns a JSON representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} JSON
-     */
-    toJSON: function(propertiesToInclude) {
-      // delegate, not alias
-      return this.toObject(propertiesToInclude);
     },
 
     /**

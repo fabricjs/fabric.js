@@ -69,10 +69,11 @@
     /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {Object} object representation of an instance
      */
-    toObject: function(propertiesToInclude) {
-      return this.callSuper('toObject', ['radius', 'startAngle', 'endAngle'].concat(propertiesToInclude));
+    toObject: function (propertiesToInclude, includeDefaultValues) {
+      return this.callSuper('toObject', ['radius', 'startAngle', 'endAngle'].concat(propertiesToInclude), includeDefaultValues);
     },
 
     /* _TO_SVG_START_ */

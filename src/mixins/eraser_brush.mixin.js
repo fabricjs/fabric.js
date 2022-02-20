@@ -60,12 +60,13 @@
     /**
      * Returns an object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {Object} Object representation of an instance
      */
-    toObject: function (propertiesToInclude) {
-      var object = _toObject.call(this, ['erasable'].concat(propertiesToInclude));
+    toObject: function (propertiesToInclude, includeDefaultValues) {
+      var object = _toObject.call(this, ['erasable'].concat(propertiesToInclude), includeDefaultValues);
       if (this.eraser && !this.eraser.excludeFromExport) {
-        object.eraser = this.eraser.toObject(propertiesToInclude);
+        object.eraser = this.eraser.toObject(propertiesToInclude, includeDefaultValues);
       }
       return object;
     },

@@ -83,14 +83,6 @@
     overlayImage: null,
 
     /**
-     * Indicates whether toObject/toDatalessObject should include default values
-     * if set to false, takes precedence over the object value.
-     * @type Boolean
-     * @default
-     */
-    includeDefaultValues: true,
-
-    /**
      * Indicates whether objects' state should be saved
      * @type Boolean
      * @default
@@ -925,43 +917,46 @@
     /**
      * Returns dataless JSON representation of canvas
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {String} json string
      */
-    toDatalessJSON: function (propertiesToInclude) {
-      return this.toDatalessObject(propertiesToInclude);
+    toDatalessJSON: function (propertiesToInclude, includeDefaultValues) {
+      return this.toDatalessObject(propertiesToInclude, includeDefaultValues);
     },
 
     /**
      * Returns object representation of canvas
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {Object} object representation of an instance
      */
-    toObject: function (propertiesToInclude) {
-      return this._toObjectMethod('toObject', propertiesToInclude);
+    toObject: function (propertiesToInclude, includeDefaultValues) {
+      return this._toObjectMethod('toObject', propertiesToInclude, includeDefaultValues);
     },
 
     /**
      * Returns dataless object representation of canvas
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {Object} object representation of an instance
      */
-    toDatalessObject: function (propertiesToInclude) {
-      return this._toObjectMethod('toDatalessObject', propertiesToInclude);
+    toDatalessObject: function (propertiesToInclude, includeDefaultValues) {
+      return this._toObjectMethod('toDatalessObject', propertiesToInclude, includeDefaultValues);
     },
 
     /**
      * @private
      */
-    _toObjectMethod: function (methodName, propertiesToInclude) {
+    _toObjectMethod: function (methodName, propertiesToInclude, includeDefaultValues) {
 
       var clipPath = this.clipPath, data = {
         version: fabric.version,
-        objects: this._toObjects(methodName, propertiesToInclude),
+        objects: this._toObjects(methodName, propertiesToInclude, includeDefaultValues),
       };
       if (clipPath && !clipPath.excludeFromExport) {
-        data.clipPath = this._toObject(this.clipPath, methodName, propertiesToInclude);
+        data.clipPath = this._toObject(this.clipPath, methodName, propertiesToInclude, includeDefaultValues);
       }
-      extend(data, this.__serializeBgOverlay(methodName, propertiesToInclude));
+      extend(data, this.__serializeBgOverlay(methodName, propertiesToInclude, includeDefaultValues));
 
       fabric.util.populateWithProperties(this, data, propertiesToInclude);
 
@@ -971,42 +966,31 @@
     /**
      * @private
      */
-    _toObjects: function(methodName, propertiesToInclude) {
+    _toObjects: function (methodName, propertiesToInclude, includeDefaultValues) {
       return this._objects.filter(function(object) {
         return !object.excludeFromExport;
       }).map(function(instance) {
-        return this._toObject(instance, methodName, propertiesToInclude);
+        return this._toObject(instance, methodName, propertiesToInclude, includeDefaultValues);
       }, this);
     },
 
     /**
      * @private
      */
-    _toObject: function(instance, methodName, propertiesToInclude) {
-      var originalValue;
-
-      if (!this.includeDefaultValues) {
-        originalValue = instance.includeDefaultValues;
-        instance.includeDefaultValues = false;
-      }
-
-      var object = instance[methodName](propertiesToInclude);
-      if (!this.includeDefaultValues) {
-        instance.includeDefaultValues = originalValue;
-      }
-      return object;
+    _toObject: function (instance, methodName, propertiesToInclude, includeDefaultValues) {
+      return instance[methodName](propertiesToInclude, includeDefaultValues);
     },
 
     /**
      * @private
      */
-    __serializeBgOverlay: function(methodName, propertiesToInclude) {
+    __serializeBgOverlay: function (methodName, propertiesToInclude, includeDefaultValues) {
       var data = {}, bgImage = this.backgroundImage, overlayImage = this.overlayImage,
           bgColor = this.backgroundColor, overlayColor = this.overlayColor;
 
       if (bgColor && bgColor.toObject) {
         if (!bgColor.excludeFromExport) {
-          data.background = bgColor.toObject(propertiesToInclude);
+          data.background = bgColor.toObject(propertiesToInclude, includeDefaultValues);
         }
       }
       else if (bgColor) {
@@ -1015,7 +999,7 @@
 
       if (overlayColor && overlayColor.toObject) {
         if (!overlayColor.excludeFromExport) {
-          data.overlay = overlayColor.toObject(propertiesToInclude);
+          data.overlay = overlayColor.toObject(propertiesToInclude, includeDefaultValues);
         }
       }
       else if (overlayColor) {
@@ -1023,10 +1007,10 @@
       }
 
       if (bgImage && !bgImage.excludeFromExport) {
-        data.backgroundImage = this._toObject(bgImage, methodName, propertiesToInclude);
+        data.backgroundImage = this._toObject(bgImage, methodName, propertiesToInclude, includeDefaultValues);
       }
       if (overlayImage && !overlayImage.excludeFromExport) {
-        data.overlayImage = this._toObject(overlayImage, methodName, propertiesToInclude);
+        data.overlayImage = this._toObject(overlayImage, methodName, propertiesToInclude, includeDefaultValues);
       }
 
       return data;
@@ -1650,9 +1634,8 @@
    * var json = canvas.toJSON();
    * @example <caption>JSON with additional properties included</caption>
    * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY']);
-   * @example <caption>JSON without default values</caption>
-   * canvas.includeDefaultValues = false;
-   * var json = canvas.toJSON();
+   * @example <caption>JSON with default values</caption>
+   * var json = canvas.toJSON(true);
    */
   fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
 

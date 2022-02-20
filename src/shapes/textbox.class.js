@@ -438,10 +438,11 @@
      * Returns object representation of an instance
      * @method toObject
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {Object} object representation of an instance
      */
-    toObject: function(propertiesToInclude) {
-      return this.callSuper('toObject', ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude));
+    toObject: function (propertiesToInclude, includeDefaultValues) {
+      return this.callSuper('toObject', ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude), includeDefaultValues);
     }
   });
 

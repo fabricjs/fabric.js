@@ -166,10 +166,11 @@
     /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {Object} object representation of an instance
      */
-    toObject: function(propertiesToInclude) {
-      return extend(this.callSuper('toObject', propertiesToInclude), {
+    toObject: function (propertiesToInclude, includeDefaultValues) {
+      return extend(this.callSuper('toObject', propertiesToInclude, includeDefaultValues), {
         path: this.path.map(function(item) { return item.slice(); }),
       });
     },
@@ -177,10 +178,11 @@
     /**
      * Returns dataless object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {Object} object representation of an instance
      */
-    toDatalessObject: function(propertiesToInclude) {
-      var o = this.toObject(['sourcePath'].concat(propertiesToInclude));
+    toDatalessObject: function (propertiesToInclude, includeDefaultValues) {
+      var o = this.toObject(['sourcePath'].concat(propertiesToInclude), includeDefaultValues);
       if (o.sourcePath) {
         delete o.path;
       }

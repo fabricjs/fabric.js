@@ -252,9 +252,10 @@
     /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {Object} Object representation of an instance
      */
-    toObject: function(propertiesToInclude) {
+    toObject: function (propertiesToInclude, includeDefaultValues) {
       var filters = [];
 
       this.filters.forEach(function(filterObj) {
@@ -265,7 +266,8 @@
       var object = extend(
         this.callSuper(
           'toObject',
-          ['cropX', 'cropY'].concat(propertiesToInclude)
+          ['cropX', 'cropY'].concat(propertiesToInclude),
+          includeDefaultValues
         ), {
           src: this.getSrc(),
           crossOrigin: this.getCrossOrigin(),

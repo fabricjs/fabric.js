@@ -236,22 +236,18 @@
     /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {Object} object representation of an instance
      */
-    toObject: function(propertiesToInclude) {
-      var _includeDefaultValues = this.includeDefaultValues;
+    toObject: function (propertiesToInclude, includeDefaultValues) {
       var objsToObject = this._objects
         .filter(function (obj) {
           return !obj.excludeFromExport;
         })
         .map(function (obj) {
-          var originalDefaults = obj.includeDefaultValues;
-          obj.includeDefaultValues = _includeDefaultValues;
-          var _obj = obj.toObject(propertiesToInclude);
-          obj.includeDefaultValues = originalDefaults;
-          return _obj;
+          return obj.toObject(propertiesToInclude, includeDefaultValues);
         });
-      var obj = fabric.Object.prototype.toObject.call(this, propertiesToInclude);
+      var obj = fabric.Object.prototype.toObject.call(this, propertiesToInclude, includeDefaultValues);
       obj.objects = objsToObject;
       return obj;
     },
@@ -259,24 +255,24 @@
     /**
      * Returns object representation of an instance, in dataless mode.
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {Object} object representation of an instance
      */
-    toDatalessObject: function(propertiesToInclude) {
+    toDatalessObject: function (propertiesToInclude, includeDefaultValues) {
       var objsToObject, sourcePath = this.sourcePath;
       if (sourcePath) {
         objsToObject = sourcePath;
       }
       else {
-        var _includeDefaultValues = this.includeDefaultValues;
-        objsToObject = this._objects.map(function(obj) {
-          var originalDefaults = obj.includeDefaultValues;
-          obj.includeDefaultValues = _includeDefaultValues;
-          var _obj = obj.toDatalessObject(propertiesToInclude);
-          obj.includeDefaultValues = originalDefaults;
-          return _obj;
-        });
+        objsToObject = this._objects
+          .filter(function (obj) {
+            return !obj.excludeFromExport;
+          })
+          .map(function (obj) {
+            return obj.toDatalessObject(propertiesToInclude, includeDefaultValues);
+          });
       }
-      var obj = fabric.Object.prototype.toDatalessObject.call(this, propertiesToInclude);
+      var obj = fabric.Object.prototype.toDatalessObject.call(this, propertiesToInclude, includeDefaultValues);
       obj.objects = objsToObject;
       return obj;
     },

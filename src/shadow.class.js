@@ -53,13 +53,6 @@
     affectStroke: false,
 
     /**
-     * Indicates whether toObject should include default values
-     * @type Boolean
-     * @default
-     */
-    includeDefaultValues: true,
-
-    /**
      * When `false`, the shadow will scale with the object.
      * When `true`, the shadow's offsetX, offsetY, and blur will not be affected by the object's scale.
      * default to false
@@ -158,10 +151,11 @@
 
     /**
      * Returns object representation of a shadow
+     * @param {boolean} [includeDefaultValues] default values are not included in serialization
      * @return {Object} Object representation of a shadow instance
      */
-    toObject: function() {
-      if (this.includeDefaultValues) {
+    toObject: function (includeDefaultValues) {
+      if (includeDefaultValues) {
         return {
           color: this.color,
           blur: this.blur,
