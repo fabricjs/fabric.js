@@ -202,6 +202,7 @@
 
     /**
      * Checks if object is displayed within the bbox created by `tl` and `br`
+     * @private
      * @param {fabric.Point} tl
      * @param {fabric.Point} br
      * @param {Boolean} [absolute] use coordinates without viewportTransform
@@ -228,6 +229,7 @@
 
     /**
      * Checks if object is partially contained within the bbox created by `tl` and `br`
+     * @private
      * @param {fabric.Point} tl
      * @param {fabric.Point} br
      * @param {Boolean} [absolute] use coordinates without viewportTransform
