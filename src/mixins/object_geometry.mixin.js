@@ -98,7 +98,7 @@
     getShadowOffsets: function () {
       var blur = this.shadow.blur, sx = 1, sy = 1;
       if (!this.shadow.nonScaling) {
-        var scaling = this.getObjectScaling();
+        var scaling = this.getTotalObjectScaling();
         sx = scaling.scaleX;
         sy = scaling.scaleY;
       }
