@@ -117,7 +117,7 @@
     rotatePoint: function(point, origin, radians) {
       var newPoint = new fabric.Point(point.x - origin.x, point.y - origin.y),
           v = fabric.util.rotateVector(newPoint, radians);
-      return new fabric.Point(v.x, v.y).addEquals(origin);
+      return v.addEquals(origin);
     },
 
     /**
@@ -126,17 +126,14 @@
      * @memberOf fabric.util
      * @param {Object} vector The vector to rotate (x and y)
      * @param {Number} radians The radians of the angle for the rotation
-     * @return {Object} The new rotated point
+     * @return {fabric.Point} The new rotated point
      */
     rotateVector: function(vector, radians) {
       var sin = fabric.util.sin(radians),
           cos = fabric.util.cos(radians),
           rx = vector.x * cos - vector.y * sin,
           ry = vector.x * sin + vector.y * cos;
-      return {
-        x: rx,
-        y: ry
-      };
+      return new fabric.Point(rx, ry);
     },
 
     /**
@@ -175,7 +172,7 @@
      * @returns {Point} vector representing the unit vector of pointing to the direction of `v`
      */
     getHatVector: function (v) {
-      return new fabric.Point(v.x, v.y).multiply(1 / Math.hypot(v.x, v.y));
+      return new fabric.Point(v.x, v.y).scalarMultiply(1 / Math.hypot(v.x, v.y));
     },
 
     /**
