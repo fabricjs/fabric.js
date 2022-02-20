@@ -148,23 +148,30 @@
     },
 
     /**
-     * Divides this point by a value and returns a new one
-     * TODO: rename in scalarDivide in 2.0
+     * Divides this point by a another and returns a new one
      * @param {Number} scalar
      * @return {fabric.Point}
      */
-    divide: function (scalar) {
+    divide: function (that) {
+      return new Point(this.x / that.x, this.y / that.y);
+    },
+
+    /**
+     * Divides this point by a value and returns a new one
+     * @param {Number} scalar
+     * @return {fabric.Point}
+     */
+    scalarDivide: function (scalar) {
       return new Point(this.x / scalar, this.y / scalar);
     },
 
     /**
      * Divides this point by a value
-     * TODO: rename in scalarDivideEquals in 2.0
      * @param {Number} scalar
      * @return {fabric.Point} thisArg
      * @chainable
      */
-    divideEquals: function (scalar) {
+    scalarDivideEquals: function (scalar) {
       this.x /= scalar;
       this.y /= scalar;
       return this;
