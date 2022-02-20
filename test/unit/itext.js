@@ -1,7 +1,7 @@
 (function() {
   var canvas = this.canvas = new fabric.Canvas();
 
-  var ITEXT_OBJECT = {
+  var ITEXT_OBJECT = fabric.util.removeDefaultValues({
     version:                  fabric.version,
     type:                     'text',
     originX:                  'left',
@@ -51,7 +51,7 @@
     pathStartOffset:          0,
     pathSide:                 'left',
     pathAlign:                'baseline'
-  };
+  });
 
 
   QUnit.module('fabric.IText', function(hooks) {

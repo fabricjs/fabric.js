@@ -6,7 +6,7 @@
     }
   });
 
-  var TEXTBOX_OBJECT = {
+  var TEXTBOX_OBJECT = fabric.util.removeDefaultValues({
     version: fabric.version,
     type: 'textbox',
     originX: 'left',
@@ -58,7 +58,7 @@
     pathStartOffset: 0,
     pathSide: 'left',
     pathAlign: 'baseline'
-  };
+  });
 
   QUnit.test('constructor', function(assert) {
     var textbox = new fabric.Textbox('test');

@@ -158,7 +158,7 @@
 
     var clone = group.toObject();
 
-    var expectedObject = {
+    var expectedObject = fabric.util.removeDefaultValues({
       version: fabric.version,
       type:                     'group',
       originX:                  'left',
@@ -191,7 +191,7 @@
       skewY:                    0,
       objects:                  clone.objects,
       strokeUniform:            false
-    };
+    });
 
     assert.deepEqual(clone, expectedObject);
 

@@ -50,9 +50,9 @@
 
     assert.ok(typeof group.toObject === 'function');
 
-    var clone = group.toObject();
+    var clone = group.toObject(true);
 
-    var expectedObject = {
+    var expectedObject = fabric.util.removeDefaultValues({
       version:                  fabric.version,
       type:                     'activeSelection',
       originX:                  'left',
@@ -85,7 +85,7 @@
       skewY:                    0,
       strokeUniform:            false,
       objects:                  clone.objects
-    };
+    });
 
     assert.deepEqual(clone, expectedObject);
 
@@ -96,7 +96,6 @@
 
   QUnit.test('toObject without default values', function(assert) {
     var group = makeAsWith2Objects();
-    group.includeDefaultValues = false;
     var clone = group.toObject();
     var objects = [{
       version:                  fabric.version,

@@ -25,7 +25,7 @@
 
   QUnit.test('toObject', function(assert) {
     var ellipse = new fabric.Ellipse();
-    var defaultProperties = {
+    var defaultProperties = fabric.util.removeDefaultValues({
       version:                  fabric.version,
       type:                     'ellipse',
       originX:                  'left',
@@ -59,7 +59,7 @@
       paintFirst:               'fill',
       globalCompositeOperation: 'source-over',
       strokeUniform:            false,
-    };
+    });
     assert.ok(typeof ellipse.toObject === 'function');
     assert.deepEqual(ellipse.toObject(), defaultProperties);
 

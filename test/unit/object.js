@@ -26,7 +26,6 @@
     assert.ok(cObj.constructor === fabric.Object);
 
     assert.equal(cObj.type, 'object');
-    assert.equal(cObj.includeDefaultValues, true);
     assert.equal(cObj.selectable, true);
   });
 
@@ -130,11 +129,11 @@
       .set('strokeLineJoin', 'bevel')
       .set('strokeMiterLimit', 5);
 
-    assert.equal(JSON.stringify(cObj.toJSON()), augmentedJSON);
+    assert.equal(JSON.stringify(cObj.toJSON(undefined, true)), augmentedJSON);
   });
 
   QUnit.test('toObject', function(assert) {
-    var emptyObjectRepr = {
+    var emptyObjectRepr = fabric.util.removeDefaultValues({
       version:                  fabric.version,
       type:                     'object',
       originX:                  'left',
@@ -166,9 +165,9 @@
       skewX:                      0,
       skewY:                      0,
       strokeUniform:              false
-    };
+    });
 
-    var augmentedObjectRepr = {
+    var augmentedObjectRepr = fabric.util.removeDefaultValues({
       version:                  fabric.version,
       type:                     'object',
       originX:                  'left',
@@ -200,7 +199,7 @@
       skewX:                      0,
       skewY:                      0,
       strokeUniform:              false
-    };
+    });
 
     var cObj = new fabric.Object();
     assert.deepEqual(emptyObjectRepr, cObj.toObject());
@@ -274,8 +273,6 @@
       .set('strokeLineJoin', 'bevel')
       .set('strokeMiterLimit', 5);
     toObjectObj = cObj.toObject(undefined, false);
-    cObj.includeDefaultValues = false;
-    assert.deepEqual(cObj.toObject(), toObjectObj, 'instance `includeDefaultValues` prop should remove defaults');
     assert.deepEqual(augmentedObjectRepr, toObjectObj);
     assert.notEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
     assert.deepEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);

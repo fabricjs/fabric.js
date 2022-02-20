@@ -71,7 +71,7 @@
       IMG_WIDTH   = 276,
       IMG_HEIGHT  = 110;
 
-  var REFERENCE_IMG_OBJECT = {
+  var REFERENCE_IMG_OBJECT = fabric.util.removeDefaultValues({
     version: fabric.version,
     type: 'image',
     originX: 'left',
@@ -108,7 +108,7 @@
     cropX: 0,
     cropY: 0,
     strokeUniform: false
-  };
+  });
 
   function _createImageElement() {
     return fabric.document.createElement('img');
@@ -203,7 +203,6 @@
     assert.ok('overlayColor' in canvas);
     assert.ok('backgroundImage' in canvas);
     assert.ok('overlayImage' in canvas);
-    assert.ok('includeDefaultValues' in canvas);
     assert.ok('stateful' in canvas);
     assert.ok('renderOnAddRemove' in canvas);
     assert.ok('controlsAboveOverlay' in canvas);
@@ -212,7 +211,6 @@
     assert.ok('backgroundVpt' in canvas);
     assert.ok('overlayVpt' in canvas);
 
-    assert.equal(canvas.includeDefaultValues, true);
     assert.equal(canvas.stateful, false);
     assert.equal(canvas.renderOnAddRemove, true);
     assert.equal(canvas.controlsAboveOverlay, false);
@@ -964,9 +962,9 @@
     assert.equal(JSON.stringify(canvas.toJSON()), '{"version":"' + fabric.version + '","objects":[]}');
     canvas.backgroundColor = '#ff5555';
     canvas.overlayColor = 'rgba(0,0,0,0.2)';
-    assert.equal(JSON.stringify(canvas.toJSON()), '{"version":"' + fabric.version + '","objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlay` value should be reflected in json');
+    assert.equal(JSON.stringify(canvas.toJSON(undefined, true)), '{"version":"' + fabric.version + '","objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlay` value should be reflected in json');
     canvas.add(makeRect());
-    assert.deepEqual(JSON.stringify(canvas.toJSON()), RECT_JSON);
+    assert.deepEqual(JSON.stringify(canvas.toJSON(undefined, true)), RECT_JSON);
   });
 
   QUnit.test('toJSON custom properties non-existence check', function(assert) {
@@ -1071,9 +1069,6 @@
     var rect = makeRect();
     canvas.add(rect);
     var cObject = canvas.toObject(undefined, false);
-    canvas.includeDefaultValues = false;
-    assert.deepEqual(canvas.toObject(), cObject, 'instance `includeDefaultValues` prop should remove defaults');
-    canvas.includeDefaultValues = true;
     var expectedRect = { version: fabric.version, type: 'rect', width: 10, height: 10, top: 0, left: 0 };
     assert.deepEqual(cObject.objects[0], expectedRect, 'Rect should be exported withoud defaults');
   });
@@ -1287,8 +1282,8 @@
 
     canvas.add(rect);
 
-    var jsonWithoutFoo = JSON.stringify(canvas.toJSON(['padding']));
-    var jsonWithFoo = JSON.stringify(canvas.toJSON(['padding', 'foo']));
+    var jsonWithoutFoo = JSON.stringify(canvas.toJSON(['padding'], true));
+    var jsonWithFoo = JSON.stringify(canvas.toJSON(['padding', 'foo'], true));
 
     assert.equal(jsonWithFoo, RECT_JSON_WITH_PADDING);
     assert.ok(jsonWithoutFoo !== RECT_JSON_WITH_PADDING);

@@ -15,7 +15,7 @@
   });
 
   QUnit.test('toObject with clipPath', function(assert) {
-    var emptyObjectRepr = {
+    var emptyObjectRepr = fabric.util.removeDefaultValues({
       version:                  fabric.version,
       type:                     'object',
       originX:                  'left',
@@ -47,7 +47,7 @@
       skewX:                     0,
       skewY:                     0,
       strokeUniform:             false
-    };
+    });
 
     var cObj = new fabric.Object();
     assert.deepEqual(emptyObjectRepr, cObj.toObject());

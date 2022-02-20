@@ -85,7 +85,7 @@
 
   QUnit.test('toObject', function(assert) {
     var circle = new fabric.Circle();
-    var defaultProperties = {
+    var defaultProperties = fabric.util.removeDefaultValues({
       version:                  fabric.version,
       type:                     'circle',
       originX:                  'left',
@@ -120,7 +120,7 @@
       skewX:                    0,
       skewY:                    0,
       strokeUniform:            false
-    };
+    });
     assert.ok(typeof circle.toObject === 'function');
     assert.deepEqual(circle.toObject(), defaultProperties);
 

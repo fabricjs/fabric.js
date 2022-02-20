@@ -138,7 +138,6 @@
 
   QUnit.test('initialProperties', function(assert) {
     assert.ok('backgroundColor' in canvas);
-    assert.equal(canvas.includeDefaultValues, true);
   });
 
   QUnit.test('getObjects', function(assert) {
@@ -1390,7 +1389,7 @@
   QUnit.test('toObject with clipPath', function(assert) {
     var clipPath = makeRect();
     var canvasWithClipPath = new fabric.Canvas(null, { clipPath: clipPath });
-    var expectedObject = {
+    var expectedObject = fabric.util.removeDefaultValues({
       version: fabric.version,
       objects: canvasWithClipPath.getObjects(),
       clipPath: {
@@ -1428,7 +1427,7 @@
         ry: 0,
         strokeUniform: false
       }
-    };
+    });
 
     assert.ok(typeof canvasWithClipPath.toObject === 'function');
     assert.deepEqual(expectedObject, canvasWithClipPath.toObject());

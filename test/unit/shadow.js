@@ -160,7 +160,8 @@
     assert.ok(typeof shadow.toObject === 'function');
 
     var object = shadow.toObject();
-    assert.equal(JSON.stringify(object), '{"color":"rgb(0,0,0)","blur":0,"offsetX":0,"offsetY":0,"affectStroke":false,"nonScaling":false}');
+    assert.equal(JSON.stringify(object), '{}');
+    assert.equal(object.toJSON(true), '{"color":"rgb(0,0,0)","blur":0,"offsetX":0,"offsetY":0,"affectStroke":false,"nonScaling":false}');
   });
 
   QUnit.test('clone with affectStroke', function(assert) {
@@ -176,13 +177,12 @@
   QUnit.test('toObject without default value', function(assert) {
     var shadow = new fabric.Shadow();
 
-    assert.equal(JSON.stringify(shadow.toObject(false)), '{}');
+    assert.equal(JSON.stringify(shadow.toObject()), '{}');
 
     shadow.color = 'red';
-    assert.equal(JSON.stringify(shadow.toObject(false)), '{"color":"red"}');
+    assert.equal(JSON.stringify(shadow.toObject()), '{"color":"red"}');
 
     shadow.offsetX = 15;
-    shadow.includeDefaultValues = false;
     assert.equal(JSON.stringify(shadow.toObject()), '{"color":"red","offsetX":15}');
   });
 

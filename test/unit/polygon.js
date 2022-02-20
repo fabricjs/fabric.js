@@ -7,7 +7,7 @@
     ];
   }
 
-  var REFERENCE_OBJECT = {
+  var REFERENCE_OBJECT = fabric.util.removeDefaultValues({
     version:                  fabric.version,
     type:                     'polygon',
     originX:                  'left',
@@ -40,7 +40,7 @@
     skewX:                    0,
     skewY:                    0,
     strokeUniform:              false
-  };
+  });
 
   var REFERENCE_EMPTY_OBJECT = {
     points: [],

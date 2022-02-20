@@ -1,6 +1,6 @@
 (function() {
 
-  var REFERENCE_PATH_OBJECT = {
+  var REFERENCE_PATH_OBJECT = fabric.util.removeDefaultValues({
     version:                  fabric.version,
     type:                     'path',
     originX:                  'left',
@@ -33,7 +33,7 @@
     skewX:                    0,
     skewY:                    0,
     strokeUniform:            false
-  };
+  });
 
   function getPathElement(path) {
     var namespace = 'http://www.w3.org/2000/svg';

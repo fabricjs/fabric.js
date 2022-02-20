@@ -7,7 +7,7 @@
     ];
   }
 
-  var REFERENCE_OBJECT = {
+  var REFERENCE_OBJECT = fabric.util.removeDefaultValues({
     version:                  fabric.version,
     type:                     'polyline',
     originX:                  'left',
@@ -40,15 +40,15 @@
     skewX:                    0,
     skewY:                    0,
     strokeUniform:              false
-  };
+  });
 
-  var REFERENCE_EMPTY_OBJECT = {
+  var REFERENCE_EMPTY_OBJECT = fabric.util.removeDefaultValues({
     points: [],
     width: 0,
     height: 0,
     top: 0,
     left: 0
-  };
+  });
 
   QUnit.module('fabric.Polyline');
 

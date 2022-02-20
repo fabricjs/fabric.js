@@ -1,6 +1,6 @@
 (function(){
 
-  var LINE_OBJECT = {
+  var LINE_OBJECT = fabric.util.removeDefaultValues({
     version:                  fabric.version,
     type:                     'line',
     originX:                  'left',
@@ -36,7 +36,7 @@
     skewX:                    0,
     skewY:                    0,
     strokeUniform:            false
-  };
+  });
 
   QUnit.module('fabric.Line');
 

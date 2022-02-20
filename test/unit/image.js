@@ -31,7 +31,7 @@
 
   var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
 
-  var REFERENCE_IMG_OBJECT = {
+  var REFERENCE_IMG_OBJECT = fabric.util.removeDefaultValues({
     version:                  fabric.version,
     type:                     'image',
     originX:                  'left',
@@ -68,7 +68,7 @@
     cropX:                    0,
     cropY:                    0,
     strokeUniform:            false
-  };
+  });
 
   function _createImageElement() {
     return fabric.document.createElement('img');

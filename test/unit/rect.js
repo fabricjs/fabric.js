@@ -1,6 +1,6 @@
 (function() {
 
-  var REFERENCE_RECT = {
+  var REFERENCE_RECT = fabric.util.removeDefaultValues({
     version:                  fabric.version,
     type:                     'rect',
     originX:                  'left',
@@ -34,7 +34,7 @@
     skewX:                    0,
     skewY:                    0,
     strokeUniform:            false
-  };
+  });
 
   QUnit.module('fabric.Rect');
 

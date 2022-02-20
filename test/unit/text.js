@@ -8,7 +8,7 @@
 
   var CHAR_WIDTH = 20;
 
-  var REFERENCE_TEXT_OBJECT = {
+  var REFERENCE_TEXT_OBJECT = fabric.util.removeDefaultValues({
     version:                   fabric.version,
     type:                      'text',
     originX:                   'left',
@@ -58,7 +58,7 @@
     pathStartOffset:            0,
     pathSide:                   'left',
     pathAlign:                  'baseline'
-  };
+  });
 
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.Text);
@@ -201,14 +201,14 @@
 
     fabric.Text.fromElement(elText, function(text) {
       assert.ok(text instanceof fabric.Text);
-      var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
+      var expectedObject = fabric.util.removeDefaultValues(fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
         left: 0,
         top: -14.05,
         width: 8,
         height: 18.08,
         fontSize: 16,
         originX: 'left'
-      });
+      }));
       assert.deepEqual(text.toObject(), expectedObject, 'parsed object is what expected');
     });
   });
@@ -242,7 +242,7 @@
 
       assert.ok(textWithAttrs instanceof fabric.Text);
 
-      var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
+      var expectedObject = fabric.util.removeDefaultValues(fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
         /* left varies slightly due to node-canvas rendering */
         left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
         top:              -88.03,
@@ -263,7 +263,7 @@
         fontWeight:       'bold',
         fontSize:         123,
         underline:        true,
-      });
+      }));
 
       assert.deepEqual(textWithAttrs.toObject(), expectedObject);
     });
