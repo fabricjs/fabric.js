@@ -806,7 +806,8 @@
     canvas.setZoom(3);
     canvas.add(object);
     var objectScale = object.getTotalObjectScaling();
-    assert.deepEqual(objectScale, { scaleX: object.scaleX * 3, scaleY: object.scaleY * 3 });
+    assert.ok(objectScale instanceof fabric.Point);
+    assert.deepEqual(objectScale, new fabric.Point(object.scaleX * 3, object.scaleY * 3));
   });
 
   QUnit.test('getTotalObjectScaling with retina', function(assert) {
@@ -815,13 +816,15 @@
     fabric.devicePixelRatio = 4;
     canvas.add(object);
     var objectScale = object.getTotalObjectScaling();
-    assert.deepEqual(objectScale, { scaleX: object.scaleX * 4, scaleY: object.scaleY * 4 });
+    assert.ok(objectScale instanceof fabric.Point);
+    assert.deepEqual(objectScale, new fabric.Point(object.scaleX * 4, object.scaleY * 4));
   });
 
   QUnit.test('getObjectScaling', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2});
     var objectScale = object.getObjectScaling();
-    assert.deepEqual(objectScale, {scaleX: object.scaleX, scaleY: object.scaleY});
+    assert.ok(objectScale instanceof fabric.Point);
+    assert.deepEqual(objectScale, new fabric.Point(object.scaleX, object.scaleY));
   });
 
   QUnit.test('getObjectScaling in group', function(assert) {
@@ -831,10 +834,11 @@
     group.scaleY = 2;
     object.group = group;
     var objectScale = object.getObjectScaling();
-    assert.deepEqual(objectScale, {
-      scaleX: object.scaleX * group.scaleX,
-      scaleY: object.scaleY * group.scaleY
-    });
+    assert.ok(objectScale instanceof fabric.Point);
+    assert.deepEqual(objectScale, new fabric.Point(
+      object.scaleX * group.scaleX,
+      object.scaleY * group.scaleY
+    ));
   });
 
   QUnit.test('getObjectScaling in group with object rotated', function(assert) {
@@ -844,12 +848,10 @@
     group.scaleY = 3;
     object.group = group;
     var objectScale = object.getObjectScaling();
-    objectScale.scaleX = objectScale.scaleX.toFixed(3);
-    objectScale.scaleY = objectScale.scaleY.toFixed(3);
-    assert.deepEqual(objectScale, {
-      scaleX: '7.649',
-      scaleY: '4.707',
-    });
+    assert.deepEqual(
+      new fabric.Point(Math.round(objectScale.x * 1000) / 1000, Math.round(objectScale.y * 1000) / 1000),
+      new fabric.Point(7.649, 4.707)
+    );
   });
 
   QUnit.test('dirty flag on set property', function(assert) {
