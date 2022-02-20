@@ -83,6 +83,14 @@
     overlayImage: null,
 
     /**
+     * Indicates whether toObject/toDatalessObject should include default values
+     * if set to false, takes precedence over the object value.
+     * @type Boolean
+     * @default
+     */
+    includeDefaultValues: true,
+
+    /**
      * Indicates whether objects' state should be saved
      * @type Boolean
      * @default
@@ -917,7 +925,7 @@
     /**
      * Returns dataless JSON representation of canvas
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] default values are not included in serialization
+     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
      * @return {String} json string
      */
     toDatalessJSON: function (propertiesToInclude, includeDefaultValues) {
@@ -927,7 +935,7 @@
     /**
      * Returns object representation of canvas
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] default values are not included in serialization
+     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
      * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude, includeDefaultValues) {
@@ -937,7 +945,7 @@
     /**
      * Returns dataless object representation of canvas
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] default values are not included in serialization
+     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude, includeDefaultValues) {
@@ -948,7 +956,7 @@
      * @private
      */
     _toObjectMethod: function (methodName, propertiesToInclude, includeDefaultValues) {
-
+      includeDefaultValues = typeof includeDefaultValues === 'boolean' ? includeDefaultValues : this.includeDefaultValues;
       var clipPath = this.clipPath, data = {
         version: fabric.version,
         objects: this._toObjects(methodName, propertiesToInclude, includeDefaultValues),

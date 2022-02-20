@@ -428,6 +428,13 @@
      * @default
      */
     perPixelTargetFind:       false,
+    
+    /**
+     * When `false`, default object's values are not included in its serialization
+     * @type Boolean
+     * @default
+     */
+    includeDefaultValues:     true,
 
     /**
      * When `true`, object horizontal movement is locked
@@ -824,10 +831,11 @@
     /**
      * Returns an object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] default values are not included in serialization
+     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
      * @return {Object} Object representation of an instance
      */
     toObject: function (propertiesToInclude, includeDefaultValues) {
+      includeDefaultValues = typeof includeDefaultValues === 'boolean' ? includeDefaultValues : this.includeDefaultValues;
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
 
           object = {
@@ -880,7 +888,7 @@
     /**
      * Returns (dataless) object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] default values are not included in serialization
+     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
      * @return {Object} Object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude, includeDefaultValues) {
@@ -891,7 +899,7 @@
     /**
      * Returns a JSON representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] default values are not included in serialization
+     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
      * @return {Object} JSON
      */
     toJSON: function (propertiesToInclude, includeDefaultValues) {

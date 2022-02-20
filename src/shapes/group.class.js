@@ -236,10 +236,11 @@
     /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] default values are not included in serialization
+     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
      * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude, includeDefaultValues) {
+      includeDefaultValues = typeof includeDefaultValues === 'boolean' ? includeDefaultValues : this.includeDefaultValues;
       var objsToObject = this._objects
         .filter(function (obj) {
           return !obj.excludeFromExport;
@@ -255,10 +256,11 @@
     /**
      * Returns object representation of an instance, in dataless mode.
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] default values are not included in serialization
+     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude, includeDefaultValues) {
+      includeDefaultValues = typeof includeDefaultValues === 'boolean' ? includeDefaultValues : this.includeDefaultValues;
       var objsToObject, sourcePath = this.sourcePath;
       if (sourcePath) {
         objsToObject = sourcePath;
