@@ -3,7 +3,8 @@
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { }),
-      toFixed = fabric.util.toFixed;
+      toFixed = fabric.util.toFixed,
+      removeDefaultValues = fabric.util.removeDefaultValues;
 
   if (fabric.Shadow) {
     fabric.warn('fabric.Shadow is already defined.');
@@ -155,25 +156,15 @@
      * @return {Object} Object representation of a shadow instance
      */
     toObject: function (includeDefaultValues) {
-      if (includeDefaultValues) {
-        return {
-          color: this.color,
-          blur: this.blur,
-          offsetX: this.offsetX,
-          offsetY: this.offsetY,
-          affectStroke: this.affectStroke,
-          nonScaling: this.nonScaling
-        };
-      }
-      var obj = { }, proto = fabric.Shadow.prototype;
-
-      ['color', 'blur', 'offsetX', 'offsetY', 'affectStroke', 'nonScaling'].forEach(function(prop) {
-        if (this[prop] !== proto[prop]) {
-          obj[prop] = this[prop];
-        }
-      }, this);
-
-      return obj;
+      var data = {
+        color: this.color,
+        blur: this.blur,
+        offsetX: this.offsetX,
+        offsetY: this.offsetY,
+        affectStroke: this.affectStroke,
+        nonScaling: this.nonScaling
+      };
+      return includeDefaultValues ? data : removeDefaultValues(data);
     }
   });
 
