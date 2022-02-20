@@ -923,16 +923,6 @@
     },
 
     /**
-     * Returns dataless JSON representation of canvas
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
-     * @return {String} json string
-     */
-    toDatalessJSON: function (propertiesToInclude, includeDefaultValues) {
-      return this.toDatalessObject(propertiesToInclude, includeDefaultValues);
-    },
-
-    /**
      * Returns object representation of canvas
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
@@ -951,6 +941,38 @@
     toDatalessObject: function (propertiesToInclude, includeDefaultValues) {
       return this._toObjectMethod('toDatalessObject', propertiesToInclude, includeDefaultValues);
     },
+
+    /**
+     * Returns Object representation of canvas
+     * this alias is provided because if you call JSON.stringify on an instance,
+     * the toJSON object will be invoked if it exists.
+     * Having a toJSON method means you can do JSON.stringify(myCanvas)
+     * @function
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} JSON compatible object
+     * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization}
+     * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
+     * @example <caption>JSON without additional properties</caption>
+     * var json = canvas.toJSON();
+     * @example <caption>JSON with additional properties included</caption>
+     * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY']);
+     * @example <caption>JSON with default values</caption>
+     * var json = canvas.toJSON(true);
+     */
+    toJSON: function (propertiesToInclude, includeDefaultValues) {
+      return this.toObject(propertiesToInclude, includeDefaultValues);
+    },
+
+    /**
+     * Returns dataless JSON representation of canvas
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
+     * @return {String} json string
+     */
+    toDatalessJSON: function (propertiesToInclude, includeDefaultValues) {
+      return this.toDatalessObject(propertiesToInclude, includeDefaultValues);
+    },
+
 
     /**
      * @private
@@ -1629,25 +1651,6 @@
       }
     }
   });
-
-  /**
-   * Returns Object representation of canvas
-   * this alias is provided because if you call JSON.stringify on an instance,
-   * the toJSON object will be invoked if it exists.
-   * Having a toJSON method means you can do JSON.stringify(myCanvas)
-   * @function
-   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {Object} JSON compatible object
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization}
-   * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
-   * @example <caption>JSON without additional properties</caption>
-   * var json = canvas.toJSON();
-   * @example <caption>JSON with additional properties included</caption>
-   * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY']);
-   * @example <caption>JSON with default values</caption>
-   * var json = canvas.toJSON(true);
-   */
-  fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
 
   if (fabric.isLikelyNode) {
     fabric.StaticCanvas.prototype.createPNGStream = function() {
