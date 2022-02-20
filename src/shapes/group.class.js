@@ -680,7 +680,7 @@
        * @return {Object} object representation of an instance
        */
       toObject: function (propertiesToInclude) {
-        var obj = this.callSuper('toObject', ['layout'].concat(propertiesToInclude));
+        var obj = this.callSuper('toObject', ['layout', 'subTargetCheck'].concat(propertiesToInclude));
         obj.objects = this.__serializeObjects('toObject', propertiesToInclude);
         return obj;
       },
