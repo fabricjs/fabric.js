@@ -554,10 +554,10 @@
       }
       if (options) {
         if (options.width && options.height) {
-          options.left = 0;
-          options.top = 0;
-          options.originX = 'left';
-          options.originY = 'top';
+          options.left = options.width / 2;
+          options.top = options.height / 2;
+          options.originX = 'center';
+          options.originY = 'center';
         }
         else {
           delete options.width;
