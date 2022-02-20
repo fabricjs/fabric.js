@@ -148,7 +148,7 @@
     },
 
     /**
-     * Divides this point by a another and returns a new one
+     * Divides this point by another and returns a new one
      * @param {fabric.Point} that
      * @return {fabric.Point}
      */
