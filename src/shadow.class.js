@@ -20,6 +20,13 @@
   fabric.Shadow = fabric.util.createClass(/** @lends fabric.Shadow.prototype */ {
 
     /**
+     * @readonly
+     * @default
+     * @type string
+     */
+    type: 'shadow',
+
+    /**
      * Shadow color
      * @type String
      * @default
@@ -61,6 +68,8 @@
      * @default
      */
     nonScaling: false,
+
+    stateProperties: ['color', 'blur', 'offsetX', 'offsetY', 'affectStroke', 'nonScaling'],
 
     /**
      * Constructor
@@ -157,6 +166,7 @@
      */
     toObject: function (includeDefaultValues) {
       var data = {
+        type: this.type,
         color: this.color,
         blur: this.blur,
         offsetX: this.offsetX,
@@ -164,7 +174,7 @@
         affectStroke: this.affectStroke,
         nonScaling: this.nonScaling
       };
-      return includeDefaultValues ? data : removeDefaultValues(data);
+      return includeDefaultValues ? data : removeDefaultValues(data, Object.getPrototypeOf(this));
     }
   });
 
