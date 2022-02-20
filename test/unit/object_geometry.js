@@ -986,9 +986,11 @@
     assert.ok(cObj.isShadowPartiallyOnScreen(true), 'shadow blur is on screen');
     shadow.offsetX = shadow.offsetY = 1;
     assert.ok(!cObj.isShadowPartiallyOnScreen(), 'object is completely offScreen and not partial');
-    shadow.offsetX = shadow.offsetY = 150;
+    shadow.offsetX = shadow.offsetY = 49;
     canvas.setZoom(2);
-    assert.ok(cObj.isShadowPartiallyOnScreen(true), 'after zooming object is partially onScreen and offScreen');
+    assert.ok(cObj.isShadowPartiallyOnScreen(true), 'after zooming blur is on screen');
+    shadow.blur = 0;
+    assert.ok(!cObj.isShadowPartiallyOnScreen(true), 'without blur shadow is off screen');
   });
 
   QUnit.test('isShadowPartiallyOnScreen nonScaling', function (assert) {
@@ -1026,10 +1028,10 @@
     assert.ok(cObj.isShadowPartiallyOnScreen(true), 'shadow blur is intersecting the screen with the y axis');
     shadow.offsetX = shadow.offsetY = 1;
     assert.ok(!cObj.isShadowPartiallyOnScreen(), 'object is completely offScreen and not partial');
-    shadow.offsetX = 75;
-    shadow.offsetY = 150 / 4;
+    shadow.offsetX = 50;
+    shadow.offsetY = 25;
     canvas.setZoom(2);
-    assert.ok(cObj.isShadowPartiallyOnScreen(true), 'after zooming object is partially onScreen and offScreen');
+    assert.ok(cObj.isShadowPartiallyOnScreen(true), 'object is completely on screen');
   });
 
 })();
