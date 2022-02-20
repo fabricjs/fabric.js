@@ -498,6 +498,8 @@
     cObj = new fabric.Rect();
     assert.ok(cObj.isType('rect'));
     assert.ok(!cObj.isType('object'));
+    assert.ok(cObj.isType('object', 'rect'));
+    assert.ok(!cObj.isType('object', 'circle'));
   });
 
   QUnit.test('toggle', function(assert) {
