@@ -7,7 +7,6 @@
       max = fabric.util.array.max,
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
-      _toString = Object.prototype.toString,
       toFixed = fabric.util.toFixed;
 
   if (fabric.Path) {
