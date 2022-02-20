@@ -587,6 +587,31 @@
     },
 
     /**
+     * Removes default values from an object by comparing it to it's prototype
+     * @private
+     * @param {Object} object
+     */
+    removeDefaultValues: function (object) {
+      var prototype = fabric.util.getKlass(object.type).prototype,
+        stateProperties = prototype.stateProperties;
+      stateProperties.forEach(function (prop) {
+        if (prop === 'left' || prop === 'top') {
+          return;
+        }
+        if (object[prop] === prototype[prop]) {
+          delete object[prop];
+        }
+        // basically a check for [] === []
+        if (Array.isArray(object[prop]) && Array.isArray(prototype[prop])
+          && object[prop].length === 0 && prototype[prop].length === 0) {
+          delete object[prop];
+        }
+      });
+
+      return object;
+    },
+
+    /**
      * Creates canvas element
      * @static
      * @memberOf fabric.util

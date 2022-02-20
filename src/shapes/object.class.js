@@ -8,6 +8,7 @@
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
       degreesToRadians = fabric.util.degreesToRadians,
+      removeDefaultValues = fabric.util.removeDefaultValues,
       objectCaching = !fabric.isLikelyNode,
       ALIASING_LIMIT = 2;
 
@@ -875,9 +876,7 @@
 
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
 
-      return includeDefaultValues ?
-        object :
-        this._removeDefaultValues(object);
+      return includeDefaultValues ? object : removeDefaultValues(object);
     },
 
     /**
@@ -900,30 +899,6 @@
     toJSON: function (propertiesToInclude, includeDefaultValues) {
       // delegate, not alias
       return this.toObject(propertiesToInclude, includeDefaultValues);
-    },
-
-    /**
-     * @private
-     * @param {Object} object
-     */
-    _removeDefaultValues: function(object) {
-      var prototype = fabric.util.getKlass(object.type).prototype,
-          stateProperties = prototype.stateProperties;
-      stateProperties.forEach(function(prop) {
-        if (prop === 'left' || prop === 'top') {
-          return;
-        }
-        if (object[prop] === prototype[prop]) {
-          delete object[prop];
-        }
-        // basically a check for [] === []
-        if (Array.isArray(object[prop]) && Array.isArray(prototype[prop])
-          && object[prop].length === 0 && prototype[prop].length === 0) {
-          delete object[prop];
-        }
-      });
-
-      return object;
     },
 
     /**
