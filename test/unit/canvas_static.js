@@ -1070,7 +1070,7 @@
   QUnit.test('toObject non includeDefaultValues', function(assert) {
     var rect = makeRect();
     canvas.add(rect);
-    var cObject = canvas.toObject(false);
+    var cObject = canvas.toObject(undefined, false);
     canvas.includeDefaultValues = false;
     assert.deepEqual(canvas.toObject(), cObject, 'instance `includeDefaultValues` prop should remove defaults');
     canvas.includeDefaultValues = true;
