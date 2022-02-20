@@ -1545,7 +1545,7 @@
       // styles will be overridden with a properly cloned structure
       obj.styles = clone(this.styles, true);
       if (obj.path) {
-        obj.path = this.path.toObject(includeDefaultValues);
+        obj.path = this.path.toObject(propertiesToInclude, includeDefaultValues);
       }
       return obj;
     },
