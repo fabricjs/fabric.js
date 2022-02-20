@@ -149,7 +149,7 @@
 
     /**
      * Divides this point by a another and returns a new one
-     * @param {Number} scalar
+     * @param {fabric.Point} that
      * @return {fabric.Point}
      */
     divide: function (that) {
