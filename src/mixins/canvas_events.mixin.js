@@ -239,6 +239,7 @@
         e.stopPropagation();
         e.preventDefault();
       }
+      this._simpleEventHandler('contextmenu', e);
       return false;
     },
 
