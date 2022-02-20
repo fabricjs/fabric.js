@@ -1353,7 +1353,7 @@
     },
 
     setViewportTransform: function (vpt) {
-      var activeObject = this._activeObject, dirty = false, discard = this.false;
+      var activeObject = this._activeObject, dirty = false;
       if (this.renderOnAddRemove && activeObject && activeObject.isEditing) {
         this._activeObject.clearContextTop();
       }
@@ -1367,9 +1367,6 @@
           applyTransformToObject(activeObject, t);
           this._needsCurrentTransformSetup = true;
           dirty = true;
-        }
-        else {
-          discard = true;
         }
         activeObject.setCoords();
       }
