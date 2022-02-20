@@ -1630,8 +1630,9 @@
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @returns {Promise<fabric.Object>}
      */
-    clone: function(propertiesToInclude) {
-      var objectForm = this.toObject(propertiesToInclude);
+    clone: function (propertiesToInclude) {
+      //  for performance we set `includeDefaultValues` to true to reduce computation
+      var objectForm = this.toObject(propertiesToInclude, true);
       return this.constructor.fromObject(objectForm);
     },
 
