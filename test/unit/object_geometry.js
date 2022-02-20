@@ -1031,7 +1031,7 @@
     shadow.offsetX = 50;
     shadow.offsetY = 25;
     canvas.setZoom(2);
-    assert.ok(cObj.isShadowPartiallyOnScreen(true), 'object is parially on screen');
+    assert.ok(cObj.isShadowPartiallyOnScreen(true), 'object is partially on screen');
   });
 
 })();
