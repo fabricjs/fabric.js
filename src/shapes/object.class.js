@@ -911,7 +911,7 @@
 
     /**
      * Return the object scale factor counting also the group scaling
-     * @return {fabric.Point} 
+     * @return {fabric.Point}
      */
     getObjectScaling: function() {
       // if the object is a top level one, on the canvas, we go for simple aritmetic

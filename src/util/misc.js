@@ -593,7 +593,7 @@
      */
     removeDefaultValues: function (object) {
       var prototype = fabric.util.getKlass(object.type).prototype,
-        stateProperties = prototype.stateProperties;
+          stateProperties = prototype.stateProperties;
       stateProperties.forEach(function (prop) {
         if (prop === 'left' || prop === 'top') {
           return;
