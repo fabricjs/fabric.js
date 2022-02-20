@@ -437,8 +437,7 @@
     /**
      * Returns object representation of an instance
      * @method toObject
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
+     * @param {fabric.util.SerializationOptions} [options] serialization options
      * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude, includeDefaultValues) {

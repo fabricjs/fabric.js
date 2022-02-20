@@ -193,10 +193,10 @@
 
     /**
      * Returns object representation of a gradient
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {fabric.util.SerializationOptions} [options] serialization options
      * @return {Object}
      */
-    toObject: function(propertiesToInclude) {
+    toObject: function(options) {
       var object = {
         type: this.type,
         coords: this.coords,
@@ -206,7 +206,7 @@
         gradientUnits: this.gradientUnits,
         gradientTransform: this.gradientTransform ? this.gradientTransform.concat() : this.gradientTransform
       };
-      fabric.util.populateWithProperties(this, object, propertiesToInclude);
+      fabric.util.populateWithProperties(this, object, options);
 
       return object;
     },

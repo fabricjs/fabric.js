@@ -95,12 +95,12 @@
 
     /**
      * Returns object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
+     * @param {fabric.util.SerializationOptions} [options] serialization options
      * @return {Object} object representation of an instance
      */
-    toObject: function (propertiesToInclude, includeDefaultValues) {
-      return this.callSuper('toObject', ['rx', 'ry'].concat(propertiesToInclude), includeDefaultValues);
+    toObject: function (options) {
+      var opt = fabric.util.extendSerializationOptions(options, ['rx', 'ry']);
+      return this.callSuper('toObject', opt);
     },
 
     /* _TO_SVG_START_ */

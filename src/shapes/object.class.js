@@ -830,8 +830,7 @@
 
     /**
      * Returns an object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
+     * @param {fabric.util.SerializationOptions} [options] serialization options
      * @return {Object} Object representation of an instance
      */
     toObject: function (propertiesToInclude, includeDefaultValues) {
@@ -892,8 +891,7 @@
 
     /**
      * Returns (dataless) object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
+     * @param {fabric.util.SerializationOptions} [options] serialization options
      * @return {Object} Object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude, includeDefaultValues) {
@@ -903,8 +901,7 @@
 
     /**
      * Returns a JSON representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
+     * @param {fabric.util.SerializationOptions} [options] serialization options
      * @return {Object} JSON
      */
     toJSON: function (propertiesToInclude, includeDefaultValues) {
@@ -1673,7 +1670,6 @@
 
     /**
      * Clones an instance.
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @returns {Promise<fabric.Object>}
      */
     clone: function(propertiesToInclude) {
