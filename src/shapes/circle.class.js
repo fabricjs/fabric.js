@@ -68,12 +68,16 @@
 
     /**
      * Returns object representation of an instance
-     * @param {fabric.util.SerializationOptions} [options] serialization options
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
      * @return {Object} object representation of an instance
      */
-    toObject: function (options) {
-      var opt = fabric.util.extendSerializationOptions(options, ['radius', 'startAngle', 'endAngle']);
-      return this.callSuper('toObject', opt);
+    toObject: function (propertiesToInclude, includeDefaultValues) {
+      return this.callSuper(
+        'toObject',
+        ['radius', 'startAngle', 'endAngle'].concat(propertiesToInclude),
+        includeDefaultValues
+      );
     },
 
     /* _TO_SVG_START_ */

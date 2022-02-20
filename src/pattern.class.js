@@ -67,10 +67,10 @@
 
     /**
      * Returns object representation of a pattern
-     * @param {fabric.util.SerializationOptions} [options] serialization options
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} Object representation of a pattern instance
      */
-    toObject: function(options) {
+    toObject: function(propertiesToInclude) {
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
           source, object;
 
@@ -92,7 +92,7 @@
         offsetY: toFixed(this.offsetY, NUM_FRACTION_DIGITS),
         patternTransform: this.patternTransform ? this.patternTransform.concat() : null
       };
-      fabric.util.populateWithProperties(this, object, options);
+      fabric.util.populateWithProperties(this, object, propertiesToInclude);
 
       return object;
     },

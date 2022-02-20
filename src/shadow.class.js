@@ -158,13 +158,11 @@
 
     /**
      * Returns object representation of a shadow
-     * @param {Object} [options] serialization options
-     * @param {boolean} [options.includeDefaultValues] include/exclude default values
+     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
      * @return {Object} Object representation of a shadow instance
      */
-    toObject: function (options) {
-      var opt = fabric.util.extendSerializationOptions(options);
-      var includeDefaultValues = opt && typeof opt.includeDefaultValues === 'boolean' ?
+    toObject: function (includeDefaultValues) {
+      includeDefaultValues = typeof includeDefaultValues === 'boolean' ?
         includeDefaultValues :
         this.includeDefaultValues;
       if (includeDefaultValues) {

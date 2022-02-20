@@ -162,7 +162,8 @@
 
     /**
      * Returns object representation of an instance
-     * @param {fabric.util.SerializationOptions} [options] serialization options
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
      * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude, includeDefaultValues) {
@@ -173,7 +174,8 @@
 
     /**
      * Returns dataless object representation of an instance
-     * @param {fabric.util.SerializationOptions} [options] serialization options
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude, includeDefaultValues) {

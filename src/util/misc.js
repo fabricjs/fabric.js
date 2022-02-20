@@ -587,22 +587,6 @@
     },
 
     /**
-     * @typedef {Object} SerializationOptions
-     * @property {string[]} [options.propertiesToInclude] extend the list of properties to export
-     * @property {boolean} [options.includeDefaultValues] include/exclude default values
-     * 
-     * @private
-     * @param {SerializationOptions} options 
-     * @param {string[]} [propertiesToInclude]
-     * @returns 
-     */
-    extendSerializationOptions: function (options, propertiesToInclude) {
-      var opts = options || {};
-      propertiesToInclude && (opts.propertiesToInclude = propertiesToInclude.concat(opts.propertiesToInclude));
-      return opts;
-    },
-
-    /**
      * Creates canvas element
      * @static
      * @memberOf fabric.util
