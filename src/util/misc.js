@@ -547,17 +547,17 @@
      * @param {String} path Value to set sourcePath to
      * @return {fabric.Object|fabric.Group}
      */
-    groupSVGElements: function(elements, options, path) {
+    groupSVGElements: function (elements, options, path) {
       var object;
       if (elements && elements.length === 1) {
         return elements[0];
       }
       if (options) {
         if (options.width && options.height) {
-          options.centerPoint = {
-            x: options.width / 2,
-            y: options.height / 2
-          };
+          options.left = 0;
+          options.top = 0;
+          options.originX = 'left';
+          options.originY = 'top';
         }
         else {
           delete options.width;
