@@ -162,7 +162,9 @@
      * @return {Object} Object representation of a shadow instance
      */
     toObject: function (includeDefaultValues) {
-      includeDefaultValues = typeof includeDefaultValues === 'boolean' ? includeDefaultValues : this.includeDefaultValues;
+      includeDefaultValues = typeof includeDefaultValues === 'boolean' ?
+        includeDefaultValues :
+        this.includeDefaultValues;
       if (includeDefaultValues) {
         return {
           color: this.color,

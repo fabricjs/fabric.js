@@ -956,7 +956,9 @@
      * @private
      */
     _toObjectMethod: function (methodName, propertiesToInclude, includeDefaultValues) {
-      includeDefaultValues = typeof includeDefaultValues === 'boolean' ? includeDefaultValues : this.includeDefaultValues;
+      includeDefaultValues = typeof includeDefaultValues === 'boolean' ?
+        includeDefaultValues :
+        this.includeDefaultValues;
       var clipPath = this.clipPath, data = {
         version: fabric.version,
         objects: this._toObjects(methodName, propertiesToInclude, includeDefaultValues),

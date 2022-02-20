@@ -240,7 +240,9 @@
      * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude, includeDefaultValues) {
-      includeDefaultValues = typeof includeDefaultValues === 'boolean' ? includeDefaultValues : this.includeDefaultValues;
+      includeDefaultValues = typeof includeDefaultValues === 'boolean' ?
+        includeDefaultValues :
+        this.includeDefaultValues;
       var objsToObject = this._objects
         .filter(function (obj) {
           return !obj.excludeFromExport;
@@ -260,7 +262,9 @@
      * @return {Object} object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude, includeDefaultValues) {
-      includeDefaultValues = typeof includeDefaultValues === 'boolean' ? includeDefaultValues : this.includeDefaultValues;
+      includeDefaultValues = typeof includeDefaultValues === 'boolean' ?
+        includeDefaultValues :
+        this.includeDefaultValues;
       var objsToObject, sourcePath = this.sourcePath;
       if (sourcePath) {
         objsToObject = sourcePath;

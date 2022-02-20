@@ -442,7 +442,11 @@
      * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude, includeDefaultValues) {
-      return this.callSuper('toObject', ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude), includeDefaultValues);
+      return this.callSuper(
+        'toObject',
+        ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude),
+        includeDefaultValues
+      );
     }
   });
 

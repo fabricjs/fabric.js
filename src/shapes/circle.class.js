@@ -73,7 +73,11 @@
      * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude, includeDefaultValues) {
-      return this.callSuper('toObject', ['radius', 'startAngle', 'endAngle'].concat(propertiesToInclude), includeDefaultValues);
+      return this.callSuper(
+        'toObject',
+        ['radius', 'startAngle', 'endAngle'].concat(propertiesToInclude),
+        includeDefaultValues
+      );
     },
 
     /* _TO_SVG_START_ */

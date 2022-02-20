@@ -1537,7 +1537,9 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function (propertiesToInclude, includeDefaultValues) {
-      includeDefaultValues = typeof includeDefaultValues === 'boolean' ? includeDefaultValues : this.includeDefaultValues;
+      includeDefaultValues = typeof includeDefaultValues === 'boolean' ?
+        includeDefaultValues :
+        this.includeDefaultValues;
       var allProperties = additionalProps.concat(propertiesToInclude);
       var obj = this.callSuper('toObject', allProperties, includeDefaultValues);
       // styles will be overridden with a properly cloned structure

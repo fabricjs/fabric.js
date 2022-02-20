@@ -835,7 +835,9 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function (propertiesToInclude, includeDefaultValues) {
-      includeDefaultValues = typeof includeDefaultValues === 'boolean' ? includeDefaultValues : this.includeDefaultValues;
+      includeDefaultValues = typeof includeDefaultValues === 'boolean' ?
+        includeDefaultValues :
+        this.includeDefaultValues;
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
 
           object = {
@@ -847,8 +849,10 @@
             top:                      toFixed(this.top, NUM_FRACTION_DIGITS),
             width:                    toFixed(this.width, NUM_FRACTION_DIGITS),
             height:                   toFixed(this.height, NUM_FRACTION_DIGITS),
-            fill:                     (this.fill && this.fill.toObject) ? this.fill.toObject(includeDefaultValues) : this.fill,
-            stroke:                   (this.stroke && this.stroke.toObject) ? this.stroke.toObject(includeDefaultValues) : this.stroke,
+            fill:                     (this.fill && this.fill.toObject) ?
+              this.fill.toObject(includeDefaultValues) : this.fill,
+            stroke:                   (this.stroke && this.stroke.toObject) ?
+              this.stroke.toObject(includeDefaultValues) : this.stroke,
             strokeWidth:              toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
             strokeDashArray:          this.strokeDashArray ? this.strokeDashArray.concat() : this.strokeDashArray,
             strokeLineCap:            this.strokeLineCap,
@@ -862,7 +866,8 @@
             flipX:                    this.flipX,
             flipY:                    this.flipY,
             opacity:                  toFixed(this.opacity, NUM_FRACTION_DIGITS),
-            shadow:                   (this.shadow && this.shadow.toObject) ? this.shadow.toObject(includeDefaultValues) : this.shadow,
+            shadow:                   (this.shadow && this.shadow.toObject) ?
+              this.shadow.toObject(includeDefaultValues) : this.shadow,
             visible:                  this.visible,
             backgroundColor:          this.backgroundColor,
             fillRule:                 this.fillRule,
