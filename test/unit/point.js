@@ -157,7 +157,6 @@
     assert.ok(returned instanceof fabric.Point, 'returns a point class');
     assert.equal(returned.x, a.x * b.x, 'should be the product of the x coords');
     assert.equal(returned.y, a.y * b.y, 'should be the product of the y coords');
-    assert.throws(() => a.multiply(5), 'should throw a deprecation warning');
   });
 
   QUnit.test('scalarMultiply', function(assert) {

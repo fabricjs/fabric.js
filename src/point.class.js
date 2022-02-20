@@ -123,9 +123,6 @@
      * @return {fabric.Point}
      */
     multiply: function (that) {
-      if (!(that instanceof fabric.Point)) {
-        throw new Error('deprecated, migrate to fabric.Point#scalarMultiply');
-      }
       return new Point(this.x * that.x, this.y * that.y);
     },
 
