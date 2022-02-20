@@ -202,8 +202,7 @@
 
   QUnit.test('toObject without default values', function(assert) {
     var group = makeGroupWith2Objects();
-    group.includeDefaultValues = false;
-    var clone = group.toObject();
+    var clone = group.toObject(false);
     var objects = [{
       version: fabric.version,
       type: 'rect',

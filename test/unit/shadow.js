@@ -175,14 +175,14 @@
 
   QUnit.test('toObject without default value', function(assert) {
     var shadow = new fabric.Shadow();
-    shadow.includeDefaultValues = false;
 
-    assert.equal(JSON.stringify(shadow.toObject()), '{}');
+    assert.equal(JSON.stringify(shadow.toObject(false)), '{}');
 
     shadow.color = 'red';
-    assert.equal(JSON.stringify(shadow.toObject()), '{"color":"red"}');
+    assert.equal(JSON.stringify(shadow.toObject(false)), '{"color":"red"}');
 
     shadow.offsetX = 15;
+    shadow.includeDefaultValues = false;
     assert.equal(JSON.stringify(shadow.toObject()), '{"color":"red","offsetX":15}');
   });
 

@@ -261,8 +261,7 @@
 
     var cObj = new fabric.Object(),
         toObjectObj;
-    cObj.includeDefaultValues = false;
-    assert.deepEqual(emptyObjectRepr, cObj.toObject(), 'top and left are always maintained');
+    assert.deepEqual(emptyObjectRepr, cObj.toObject(false), 'top and left are always maintained');
 
     cObj.set('left', 10)
       .set('top', 20)
@@ -274,7 +273,9 @@
       .set('strokeLineCap', 'round')
       .set('strokeLineJoin', 'bevel')
       .set('strokeMiterLimit', 5);
-    toObjectObj = cObj.toObject();
+    toObjectObj = cObj.toObject(false);
+    cObj.includeDefaultValues = false;
+    assert.deepEqual(cObj.toObject(), toObjectObj, 'instance `includeDefaultValues` prop should remove defaults');
     assert.deepEqual(augmentedObjectRepr, toObjectObj);
     assert.notEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
     assert.deepEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
