@@ -10,7 +10,7 @@
 
   fabric.Object.prototype.cacheProperties.push('eraser');
   fabric.Object.prototype.stateProperties.push('eraser');
-    
+
   /**
    * @fires erasing:end
    */
