@@ -886,8 +886,8 @@
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
 
       return includeDefaultValues ?
-        this._removeDefaultValues(object) :
-        object;
+        object :
+        this._removeDefaultValues(object);
     },
 
     /**
