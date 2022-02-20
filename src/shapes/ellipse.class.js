@@ -96,7 +96,7 @@
     /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
+     * @param {boolean} [includeDefaultValues] include/exclude default values
      * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude, includeDefaultValues) {

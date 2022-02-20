@@ -430,13 +430,6 @@
     perPixelTargetFind:       false,
 
     /**
-     * When `false`, default object's values are not included in its serialization
-     * @type Boolean
-     * @default
-     */
-    includeDefaultValues:     true,
-
-    /**
      * When `true`, object horizontal movement is locked
      * @type Boolean
      * @default
@@ -831,13 +824,10 @@
     /**
      * Returns an object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
+     * @param {boolean} [includeDefaultValues] include/exclude default values
      * @return {Object} Object representation of an instance
      */
     toObject: function (propertiesToInclude, includeDefaultValues) {
-      includeDefaultValues = typeof includeDefaultValues === 'boolean' ?
-        includeDefaultValues :
-        this.includeDefaultValues;
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
 
           object = {
@@ -850,9 +840,9 @@
             width:                    toFixed(this.width, NUM_FRACTION_DIGITS),
             height:                   toFixed(this.height, NUM_FRACTION_DIGITS),
             fill:                     (this.fill && this.fill.toObject) ?
-              this.fill.toObject(includeDefaultValues) : this.fill,
+              this.fill.toObject(propertiesToInclude, includeDefaultValues) : this.fill,
             stroke:                   (this.stroke && this.stroke.toObject) ?
-              this.stroke.toObject(includeDefaultValues) : this.stroke,
+              this.stroke.toObject(propertiesToInclude, includeDefaultValues) : this.stroke,
             strokeWidth:              toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
             strokeDashArray:          this.strokeDashArray ? this.strokeDashArray.concat() : this.strokeDashArray,
             strokeLineCap:            this.strokeLineCap,
@@ -893,7 +883,7 @@
     /**
      * Returns (dataless) object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
+     * @param {boolean} [includeDefaultValues] include/exclude default values
      * @return {Object} Object representation of an instance
      */
     toDatalessObject: function (propertiesToInclude, includeDefaultValues) {
@@ -904,7 +894,7 @@
     /**
      * Returns a JSON representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @param {boolean} [includeDefaultValues] override instance config to include/exclude default values
+     * @param {boolean} [includeDefaultValues] include/exclude default values
      * @return {Object} JSON
      */
     toJSON: function (propertiesToInclude, includeDefaultValues) {
