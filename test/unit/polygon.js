@@ -122,7 +122,7 @@
     assert.ok(typeof fabric.Polygon.fromElement === 'function');
 
     var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
-    empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
+    empty_object = fabric.util.removeDefaultValues(fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT));
 
     var elPolygonWithoutPoints = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 
@@ -136,7 +136,7 @@
     var elPolygonWithEmptyPoints = fabric.document.createElementNS(namespace, 'polygon');
     elPolygonWithEmptyPoints.setAttributeNS(namespace, 'points', '');
     var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
-    empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
+    empty_object = fabric.util.removeDefaultValues(fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT));
     fabric.Polygon.fromElement(elPolygonWithEmptyPoints, function(polygon) {
       assert.deepEqual(polygon.toObject(), empty_object);
     });

@@ -159,9 +159,9 @@
     var shadow = new fabric.Shadow();
     assert.ok(typeof shadow.toObject === 'function');
 
-    var object = shadow.toObject();
+    var object = shadow.toObject(true);
     assert.equal(JSON.stringify(object), '{}');
-    assert.equal(object.toJSON(true), '{"color":"rgb(0,0,0)","blur":0,"offsetX":0,"offsetY":0,"affectStroke":false,"nonScaling":false}');
+    assert.equal(JSON.stringify(object), '{"color":"rgb(0,0,0)","blur":0,"offsetX":0,"offsetY":0,"affectStroke":false,"nonScaling":false}');
   });
 
   QUnit.test('clone with affectStroke', function(assert) {

@@ -1346,9 +1346,9 @@
     assert.equal(JSON.stringify(canvas.toJSON()), EMPTY_JSON);
     canvas.backgroundColor = '#ff5555';
     canvas.overlayColor = 'rgba(0,0,0,0.2)';
-    assert.equal(JSON.stringify(canvas.toJSON()), '{"version":"' + fabric.version + '","objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlayColor` value should be reflected in json');
+    assert.equal(JSON.stringify(canvas.toJSON(undefined, true)), '{"version":"' + fabric.version + '","objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlayColor` value should be reflected in json');
     canvas.add(makeRect());
-    assert.deepEqual(JSON.stringify(canvas.toJSON()), RECT_JSON);
+    assert.deepEqual(JSON.stringify(canvas.toJSON(undefined, true)), RECT_JSON);
   });
 
   QUnit.test('toJSON with active group', function(assert) {
@@ -1368,7 +1368,7 @@
       sourcePath: 'http://example.com/'
     });
     canvas.add(path);
-    assert.equal(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
+    assert.equal(JSON.stringify(canvas.toDatalessJSON(undefined, true)), PATH_DATALESS_JSON);
   });
 
   QUnit.test('toObject', function(assert) {
@@ -1389,45 +1389,46 @@
   QUnit.test('toObject with clipPath', function(assert) {
     var clipPath = makeRect();
     var canvasWithClipPath = new fabric.Canvas(null, { clipPath: clipPath });
-    var expectedObject = fabric.util.removeDefaultValues({
+    var CLIP_PATH_REF = fabric.util.removeDefaultValues({
+      type: 'rect',
+      version: fabric.version,
+      originX: 'left',
+      originY: 'top',
+      left: 0,
+      top: 0,
+      width: 10,
+      height: 10,
+      fill: 'rgb(0,0,0)',
+      stroke: null,
+      strokeWidth: 1,
+      strokeDashArray: null,
+      strokeLineCap: 'butt',
+      strokeDashOffset: 0,
+      strokeLineJoin: 'miter',
+      strokeMiterLimit: 4,
+      scaleX: 1,
+      scaleY: 1,
+      angle: 0,
+      flipX: false,
+      flipY: false,
+      opacity: 1,
+      shadow: null,
+      visible: true,
+      backgroundColor: '',
+      fillRule: 'nonzero',
+      paintFirst: 'fill',
+      globalCompositeOperation: 'source-over',
+      skewX: 0,
+      skewY: 0,
+      rx: 0,
+      ry: 0,
+      strokeUniform: false
+    });
+    var expectedObject = {
       version: fabric.version,
       objects: canvasWithClipPath.getObjects(),
-      clipPath: {
-        type: 'rect',
-        version: fabric.version,
-        originX: 'left',
-        originY: 'top',
-        left: 0,
-        top: 0,
-        width: 10,
-        height: 10,
-        fill: 'rgb(0,0,0)',
-        stroke: null,
-        strokeWidth: 1,
-        strokeDashArray: null,
-        strokeLineCap: 'butt',
-        strokeDashOffset: 0,
-        strokeLineJoin: 'miter',
-        strokeMiterLimit: 4,
-        scaleX: 1,
-        scaleY: 1,
-        angle: 0,
-        flipX: false,
-        flipY: false,
-        opacity: 1,
-        shadow: null,
-        visible: true,
-        backgroundColor: '',
-        fillRule: 'nonzero',
-        paintFirst: 'fill',
-        globalCompositeOperation: 'source-over',
-        skewX: 0,
-        skewY: 0,
-        rx: 0,
-        ry: 0,
-        strokeUniform: false
-      }
-    });
+      clipPath: CLIP_PATH_REF
+    };
 
     assert.ok(typeof canvasWithClipPath.toObject === 'function');
     assert.deepEqual(expectedObject, canvasWithClipPath.toObject());

@@ -42,13 +42,13 @@
     strokeUniform:              false
   });
 
-  var REFERENCE_EMPTY_OBJECT = fabric.util.removeDefaultValues({
+  var REFERENCE_EMPTY_OBJECT = {
     points: [],
     width: 0,
     height: 0,
     top: 0,
     left: 0
-  });
+  };
 
   QUnit.module('fabric.Polyline');
 
@@ -100,7 +100,7 @@
     assert.ok(typeof fabric.Polyline.fromElement === 'function');
     var elPolylineWithoutPoints = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
     var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
-    empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
+    empty_object = fabric.util.removeDefaultValues(fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT));
     fabric.Polyline.fromElement(elPolylineWithoutPoints, function(polyline) {
       assert.deepEqual(polyline.toObject(), empty_object);
     });
@@ -112,7 +112,7 @@
     elPolylineWithEmptyPoints.setAttributeNS(namespace, 'points', '');
     fabric.Polyline.fromElement(elPolylineWithEmptyPoints, function(polyline) {
       var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
-      empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
+      empty_object = fabric.util.removeDefaultValues(fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT));
       assert.deepEqual(polyline.toObject(), empty_object);
     });
   });

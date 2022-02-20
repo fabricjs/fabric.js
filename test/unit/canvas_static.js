@@ -1048,7 +1048,7 @@
       sourcePath: 'http://example.com/'
     });
     canvas.add(path);
-    assert.equal(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
+    assert.equal(JSON.stringify(canvas.toDatalessJSON(undefined, true)), PATH_DATALESS_JSON);
   });
 
   QUnit.test('toObject', function(assert) {
