@@ -1794,7 +1794,7 @@
      * @return {Boolean}
      */
     isType: function(type) {
-      return arguments.length > 1 ? Array.from(arguments).includes(type) : this.type === type;
+      return arguments.length > 1 ? Array.from(arguments).includes(this.type) : this.type === type;
     },
 
     /**
