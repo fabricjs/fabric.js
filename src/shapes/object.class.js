@@ -1677,7 +1677,7 @@
      * @returns {Promise<fabric.Object>}
      */
     clone: function(propertiesToInclude) {
-      var objectForm = this.toObject(propertiesToInclude, false);
+      var objectForm = this.toObject(propertiesToInclude);
       return this.constructor.fromObject(objectForm);
     },
 
