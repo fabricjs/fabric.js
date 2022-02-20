@@ -533,7 +533,7 @@
         //  clip canvas
         ctx = this.canvas.getContext();
         this.callSuper('_render', ctx);
-        //  render brush and mask it with image of non erasables
+        //  render brush and mask it with pattern
         ctx = this.canvas.contextTop;
         this.canvas.clearContext(ctx);
         this.callSuper('_render', ctx);
