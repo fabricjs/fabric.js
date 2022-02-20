@@ -103,7 +103,7 @@
         sy = scaling.scaleY;
       }
       var shadowOffset = new fabric.Point(this.shadow.offsetX * sx, this.shadow.offsetY * sy),
-        blurOffset = new fabric.Point(blur * sx, blur * sy);
+          blurOffset = new fabric.Point(blur * sx, blur * sy);
       return {
         offset: shadowOffset,
         blur: blurOffset
