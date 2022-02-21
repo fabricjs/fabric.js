@@ -536,7 +536,7 @@
      * @return {Array} rotation matrix for the object
      */
     _calcTranslateMatrix: function() {
-      var center = this.getCenterPoint();
+      var center = this.getRelativeCenterPoint();
       return [1, 0, 0, 1, center.x, center.y];
     },
 

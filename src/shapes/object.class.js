@@ -928,7 +928,7 @@
 
     /**
      * Return the object scale factor counting also the group scaling
-     * @return {fabric.Point} 
+     * @return {fabric.Point}
      */
     getObjectScaling: function() {
       // if the object is a top level one, on the canvas, we go for simple aritmetic
@@ -967,6 +967,16 @@
         opacity *= this.group.getObjectOpacity();
       }
       return opacity;
+    },
+
+    /**
+     * Returns the object angle relative to canvas counting also the group property
+     * @returns {number}
+     */
+    getTotalAngle: function () {
+      return this.group ?
+        fabric.util.qrDecompose(this.calcTransformMatrix()).angle :
+        this.angle;
     },
 
     /**
@@ -1010,16 +1020,6 @@
         }
       }
       return this;
-    },
-
-    /**
-     * This callback function is called by the parent group of an object every
-     * time a non-delegated property changes on the group. It is passed the key
-     * and value as parameters. Not adding in this function's signature to avoid
-     * Travis build error about unused variables.
-     */
-    setOnGroup: function() {
-      // implemented by sub-classes, as needed.
     },
 
     /**
@@ -1170,6 +1170,7 @@
      * Check if this object or a child object will cast a shadow
      * used by Group.shouldCache to know if child has a shadow recursively
      * @return {Boolean}
+     * @deprecated
      */
     willDrawShadow: function() {
       return !!this.shadow && (this.shadow.offsetX !== 0 || this.shadow.offsetY !== 0);
@@ -1887,23 +1888,13 @@
     },
 
     /**
-     * Returns coordinates of a pointer relative to an object
-     * @param {Event} e Event to operate upon
-     * @param {Object} [pointer] Pointer to operate upon (instead of event)
-     * @return {Object} Coordinates of a pointer (x, y)
+     * This callback function is called by the parent group of an object every
+     * time a non-delegated property changes on the group. It is passed the key
+     * and value as parameters. Not adding in this function's signature to avoid
+     * Travis build error about unused variables.
      */
-    getLocalPointer: function(e, pointer) {
-      pointer = pointer || this.canvas.getPointer(e);
-      var pClicked = new fabric.Point(pointer.x, pointer.y),
-          objectLeftTop = this._getLeftTopCoords();
-      if (this.angle) {
-        pClicked = fabric.util.rotatePoint(
-          pClicked, objectLeftTop, degreesToRadians(-this.angle));
-      }
-      return {
-        x: pClicked.x - objectLeftTop.x,
-        y: pClicked.y - objectLeftTop.y
-      };
+    setOnGroup: function() {
+      // implemented by sub-classes, as needed.
     },
 
     /**
