@@ -178,6 +178,7 @@ var filesToInclude = [
   'src/shapes/object.class.js',
   'src/mixins/object_origin.mixin.js',
   'src/mixins/object_geometry.mixin.js',
+  'src/mixins/object_ancestry.mixin.js',
   'src/mixins/object_stacking.mixin.js',
   'src/mixins/object.svg_export.js',
   'src/mixins/stateful.mixin.js',
