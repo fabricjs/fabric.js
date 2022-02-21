@@ -928,7 +928,7 @@
 
     /**
      * Return the object scale factor counting also the group scaling
-     * @return {fabric.Point} 
+     * @return {fabric.Point}
      */
     getObjectScaling: function() {
       // if the object is a top level one, on the canvas, we go for simple aritmetic
@@ -1883,6 +1883,16 @@
     viewportCenter: function () {
       this.canvas && this.canvas.viewportCenterObject(this);
       return this;
+    },
+
+    /**
+     * This callback function is called by the parent group of an object every
+     * time a non-delegated property changes on the group. It is passed the key
+     * and value as parameters. Not adding in this function's signature to avoid
+     * Travis build error about unused variables.
+     */
+    setOnGroup: function() {
+      // implemented by sub-classes, as needed.
     },
 
     /**

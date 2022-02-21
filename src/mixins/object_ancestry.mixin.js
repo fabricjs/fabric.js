@@ -1,11 +1,11 @@
 fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
   /**
-     * Checks if object is decendant of target
-     * Should be used instead of @link {fabric.Collection.contains} for performance reasons
-     * @param {fabric.Object|fabric.StaticCanvas} target
-     * @returns {boolean}
-     */
+   * Checks if object is decendant of target
+   * Should be used instead of @link {fabric.Collection.contains} for performance reasons
+   * @param {fabric.Object|fabric.StaticCanvas} target
+   * @returns {boolean}
+   */
   isDescendantOf: function (target) {
     var parent = this.group || this.canvas;
     while (parent) {
@@ -22,10 +22,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   },
 
   /**
-     *
-     * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
-     * @returns {(fabric.Object | fabric.StaticCanvas)[]} ancestors from bottom to top
-     */
+   *
+   * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
+   * @returns {(fabric.Object | fabric.StaticCanvas)[]} ancestors from bottom to top
+   */
   getAncestors: function (strict) {
     var ancestors = [];
     var parent = this.group || (!strict ? this.canvas : undefined);
@@ -37,10 +37,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   },
 
   /**
-     *
-     * @param {fabric.Object} other
-     * @returns {{ index: number, otherIndex: number, ancestors: fabric.Object[] }} ancestors may include the passed objects if one is an ancestor of the other resulting in index of -1
-     */
+   *
+   * @param {fabric.Object} other
+   * @returns {{ index: number, otherIndex: number, ancestors: fabric.Object[] }} ancestors may include the passed objects if one is an ancestor of the other resulting in index of -1
+   */
   findCommonAncestors: function (other) {
     if (this === other) {
       return true;
@@ -67,12 +67,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   },
 
   /**
-     *
-     * @param {fabric.Object} other
-     * @returns {boolean}
-     */
+   *
+   * @param {fabric.Object} other
+   * @returns {boolean}
+   */
   hasCommonAncestors: function (other) {
     return !!this.findCommonAncestors(other);
   }
-
 });
