@@ -149,56 +149,76 @@
     assert.equal(point.y, y1 - scalar, 'y coords should be added');
   });
 
-  QUnit.test('multiply', function(assert) {
+  QUnit.test('multiply', function (assert) {
+    var a = new fabric.Point(2, 3), b = new fabric.Point(4, 5);
+
+    assert.ok(typeof a.multiply === 'function');
+    var returned = a.multiply(b);
+    assert.ok(returned instanceof fabric.Point, 'returns a point class');
+    assert.equal(returned.x, a.x * b.x, 'should be the product of the x coords');
+    assert.equal(returned.y, a.y * b.y, 'should be the product of the y coords');
+  });
+
+  QUnit.test('scalarMultiply', function(assert) {
     var x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
-    assert.ok(typeof point.multiply === 'function');
+    assert.ok(typeof point.scalarMultiply === 'function');
     assert.equal(point.x, x1, 'constructor pass x value');
     assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.multiply(scalar);
+    var returned = point.scalarMultiply(scalar);
     assert.ok(returned instanceof fabric.Point, 'returns a point class');
     assert.notEqual(returned, point, 'is not chainable');
     assert.equal(returned.x, x1 * scalar, 'x coords should be added');
     assert.equal(returned.y, y1 * scalar, 'y coords should be added');
   });
 
-  QUnit.test('multiplyEquals', function(assert) {
+  QUnit.test('scalarMultiplyEquals', function(assert) {
     var x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
-    assert.ok(typeof point.multiplyEquals === 'function');
+    assert.ok(typeof point.scalarMultiplyEquals === 'function');
     assert.equal(point.x, x1, 'constructor pass x value');
     assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.multiplyEquals(scalar);
+    var returned = point.scalarMultiplyEquals(scalar);
     assert.ok(returned instanceof fabric.Point, 'returns a point class');
     assert.equal(returned, point, 'is chainable');
     assert.equal(point.x, x1 * scalar, 'x coords should be added');
     assert.equal(point.y, y1 * scalar, 'y coords should be added');
   });
 
-  QUnit.test('divide', function(assert) {
+  QUnit.test('divide', function (assert) {
+    var a = new fabric.Point(2, 3), b = new fabric.Point(4, 5);
+
+    assert.ok(typeof a.divide === 'function');
+    var returned = a.divide(b);
+    assert.ok(returned instanceof fabric.Point, 'returns a point class');
+    assert.equal(returned.x, a.x / b.x, 'should be the quotient of the x coords');
+    assert.equal(returned.y, a.y / b.y, 'should be the quotient of the y coords');
+  });
+
+  QUnit.test('scalarDivide', function(assert) {
     var x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
-    assert.ok(typeof point.divide === 'function');
+    assert.ok(typeof point.scalarDivide === 'function');
     assert.equal(point.x, x1, 'constructor pass x value');
     assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.divide(scalar);
+    var returned = point.scalarDivide(scalar);
     assert.ok(returned instanceof fabric.Point, 'returns a point class');
     assert.notEqual(returned, point, 'is not chainable');
     assert.equal(returned.x, x1 / scalar, 'x coords should be added');
     assert.equal(returned.y, y1 / scalar, 'y coords should be added');
   });
 
-  QUnit.test('divideEquals', function(assert) {
+  QUnit.test('scalarDivideEquals', function(assert) {
     var x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
-    assert.ok(typeof point.divideEquals === 'function');
+    assert.ok(typeof point.scalarDivideEquals === 'function');
     assert.equal(point.x, x1, 'constructor pass x value');
     assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.divideEquals(scalar);
+    var returned = point.scalarDivideEquals(scalar);
     assert.ok(returned instanceof fabric.Point, 'returns a point class');
     assert.equal(returned, point, 'is chainable');
     assert.equal(point.x, x1 / scalar, 'x coords should be added');
