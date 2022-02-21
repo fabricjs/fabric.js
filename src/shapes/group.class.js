@@ -521,8 +521,8 @@
         if (layoutDirective === 'fit-content-lazy'
           && context.type === 'added' && objects.length > context.targets.length) {
           //  calculate added objects' bbox with existing bbox
-          var objects = context.targets.concat(this);
-          return this.getObjectsBoundingBox(objects);
+          var addedObjects = context.targets.concat(this);
+          return this.prepareBoundingBox(layoutDirective, addedObjects, context);
         }
         else if (layoutDirective === 'fit-content' || layoutDirective === 'fit-content-lazy'
           || (layoutDirective === 'fixed' && context.type === 'initialization')) {
@@ -530,8 +530,9 @@
         }
         else if (layoutDirective === 'clip-path' && this.clipPath) {
           var clipPath = this.clipPath;
-          var clipPathCenter = clipPath.getRelativeCenterPoint();
           if (clipPath.absolutePositioned && context.type === 'initialization') {
+            var inv = fabric.util.invertTransform(this.calcTransformMatrix());
+            var clipPathCenter = fabric.util.transformPoint(clipPath.getCenterPoint(), inv);
             return {
               centerX: clipPathCenter.x,
               centerY: clipPathCenter.y,
@@ -539,17 +540,17 @@
               height: clipPath.height,
             };
           }
-          else if (!clipPath.absolutePositioned && context.type === 'initialization') {
-            var bbox = this.prepareBoundingBox(layoutDirective, objects, context) || {};
-            return {
-              centerX: (bbox.centerX || 0) + clipPathCenter.x,
-              centerY: (bbox.centerY || 0) + clipPathCenter.y,
-              width: clipPath.width,
-              height: clipPath.height,
-            };
-          }
           else if (!clipPath.absolutePositioned) {
-            var center = this.getRelativeCenterPoint();
+            var center;
+            var clipPathRelativeCenter = clipPath.getRelativeCenterPoint(),
+              clipPathCenter = fabric.util.transformPoint(clipPathRelativeCenter, this.calcOwnMatrix(), true);
+            if (context.type === 'initialization') {
+              var bbox = this.prepareBoundingBox(layoutDirective, objects, context) || {};
+              center = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0);
+            }
+            else {
+              center = this.getRelativeCenterPoint();
+            }
             return {
               centerX: center.x + clipPathCenter.x,
               centerY: center.y + clipPathCenter.y,
@@ -606,7 +607,7 @@
       },
 
       /**
-       * Calculate the bbox of objects relative to instance
+       * Calculate the bbox of objects relative to instance's containing plane
        * @public
        * @param {fabric.Object[]} objects
        * @returns {Object | null} bounding box
@@ -632,9 +633,9 @@
 
         var width = max.x - min.x,
           height = max.y - min.y,
-          relativeCenter = fabric.util.transformPoint(new fabric.Point(min.x, min.y).midPointFrom(max), this.calcOwnMatrix(), true),
-         // nCenter=fabric.util.transformPoint(relativeCenter,this.calcOwnMatrix(),true),
-          center = this.getRelativeCenterPoint().add(relativeCenter);
+          relativeCenter = min.midPointFrom(max),
+          centerMass = fabric.util.transformPoint(relativeCenter, this.calcOwnMatrix(), true),
+          center = this.getRelativeCenterPoint().add(centerMass);
 
         return {
           left: min.x,
