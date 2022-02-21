@@ -601,26 +601,21 @@
       return cache.value;
     },
 
-    /*
+    /** 
      * Calculate object dimensions from its properties
      * @private
-     * @return {Object} .x width dimension
-     * @return {Object} .y height dimension
+     * @returns {fabric.Point} dimensions
      */
     _getNonTransformedDimensions: function() {
-      var strokeWidth = this.strokeWidth,
-          w = this.width + strokeWidth,
-          h = this.height + strokeWidth;
-      return { x: w, y: h };
+      return new fabric.Point(this.width, this.height).scalarAddEquals(this.strokeWidth);
     },
 
-    /*
+    /**
      * Calculate object bounding box dimensions from its properties scale, skew.
      * @param {Number} skewX, a value to override current skewX
      * @param {Number} skewY, a value to override current skewY
      * @private
-     * @return {Object} .x width dimension
-     * @return {Object} .y height dimension
+     * @returns {fabric.Point} dimensions
      */
     _getTransformedDimensions: function(skewX, skewY) {
       if (typeof skewX === 'undefined') {
@@ -658,10 +653,11 @@
       return finalDimensions.scalarAddEquals(this.strokeUniform ? this.strokeWidth : 0);
     },
 
-    /*
+    /**
      * Calculate object dimensions for controls box, including padding and canvas zoom.
      * and active selection
-     * private
+     * @private
+     * @returns {fabric.Point} dimensions
      */
     _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
