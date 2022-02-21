@@ -12,6 +12,10 @@
   var _getSvgCommons = fabric.Object.prototype.getSvgCommons;
   var __createBaseClipPathSVGMarkup = fabric.Object.prototype._createBaseClipPathSVGMarkup;
   var __createBaseSVGMarkup = fabric.Object.prototype._createBaseSVGMarkup;
+
+  fabric.Object.prototype.cacheProperties.push('eraser');
+  fabric.Object.prototype.stateProperties.push('eraser');
+
   /**
    * @fires erasing:end
    */
