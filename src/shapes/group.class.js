@@ -471,9 +471,8 @@
         this.set({ width: result.width, height: result.height });
         //  handle positioning
         var newCenter = new fabric.Point(result.centerX, result.centerY);
-        var diff = isFirstLayout ?
-          center.subtract(newCenter) :
-          center.subtract(newCenter);
+        var vector = center.subtract(newCenter);
+        var diff = fabric.util.transformPoint(vector, fabric.util.invertTransform(this.calcOwnMatrix()), true);
         //  adjust objects to account for new center
         this.forEachObject(function (object) {
           this._adjustObjectPosition(object, diff);
@@ -541,13 +540,13 @@
             };
           }
           else if (!clipPath.absolutePositioned && context.type === 'initialization') {
-            var bbox = this.prepareBoundingBox(layoutDirective, objects, context) || {
-              centerX: clipPathCenter.x,
-              centerY: clipPathCenter.y,
+            var bbox = this.prepareBoundingBox(layoutDirective, objects, context) || {};
+            return {
+              centerX: (bbox.centerX || 0) + clipPathCenter.x,
+              centerY: (bbox.centerY || 0) + clipPathCenter.y,
+              width: clipPath.width,
+              height: clipPath.height,
             };
-            bbox.width = clipPath.width;
-            bbox.height = clipPath.height;
-            return bbox;
           }
           else if (!clipPath.absolutePositioned) {
             var center = this.getRelativeCenterPoint();
@@ -617,7 +616,7 @@
           return null;
         }
         
-        var objCenter, size, min,max;
+        var objCenter, size, min, max;
         objects.forEach(function (object, i) {
           objCenter = object.getRelativeCenterPoint();
           size = object._getTransformedDimensions();
@@ -633,8 +632,8 @@
 
         var width = max.x - min.x,
           height = max.y - min.y,
-          relativeCenter = new fabric.Point(min.x, min.y).midPointFrom(max),
-          nCenter=fabric.util.transformPoint(relativeCenter,this.calcOwnMatrix()),
+          relativeCenter = fabric.util.transformPoint(new fabric.Point(min.x, min.y).midPointFrom(max), this.calcOwnMatrix(), true),
+         // nCenter=fabric.util.transformPoint(relativeCenter,this.calcOwnMatrix(),true),
           center = this.getRelativeCenterPoint().add(relativeCenter);
 
         return {
