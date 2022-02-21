@@ -513,7 +513,7 @@
        * @param {object} context object with data regarding what triggered the call
        * @param {'initialization'|'object_modified'|'added'|'removed'|'layout_change'|'imperative'} context.type
        * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
-       * @returns {{ centerX: number, centerY: number, width: number, height: number } | undefined} positioning data
+       * @returns {{ centerX: number, centerY: number, width: number, height: number } | undefined} positioning and layout data **relative** to instance's parent
        */
       getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
         //  `fit-content-lazy` performance enhancement
@@ -634,6 +634,7 @@
         var width = max.x - min.x,
           height = max.y - min.y,
           relativeCenter = min.midPointFrom(max),
+          //  we send `relativeCenter` up to group's containing plane
           centerMass = fabric.util.transformPoint(relativeCenter, this.calcOwnMatrix(), true),
           center = this.getRelativeCenterPoint().add(centerMass);
 
