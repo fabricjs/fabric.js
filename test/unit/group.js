@@ -59,7 +59,7 @@
     var group = new fabric.Group([rect1, rect2]);
 
     assert.ok(typeof group.getObjects === 'function');
-    assert.ok(Object.prototype.toString.call(group.getObjects()) == '[object Array]', 'should be an array');
+    assert.ok(Array.isArray(group.getObjects()), 'should be an array');
     assert.equal(group.getObjects().length, 2, 'should have 2 items');
     assert.deepEqual(group.getObjects(), [rect1, rect2], 'should return deepEqual objects as those passed to constructor');
   });

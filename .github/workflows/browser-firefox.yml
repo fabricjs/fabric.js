@@ -4,9 +4,9 @@ name: Unit tests on Firefox
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, 5.x ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, 5.x ]
 
 jobs:
   firefox-tests:
