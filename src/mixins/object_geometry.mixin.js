@@ -627,9 +627,20 @@
         skewX: this.skewX,
         skewY: this.skewY,
       }, options || {});
-      var dimX = this.width, dimY = this.height, finalDimensions,
+      //  stroke is applied before/after transformations are applied according to `strokeUniform`
+      var preStroke, postStroke, strokeWidth = this.strokeWidth;
+      if (this.strokeUniform) {
+        preStroke = 0;
+        postStroke = strokeWidth;
+      }
+      else {
+        preStroke = strokeWidth;
+        postStroke = 0;
+      }
+      var dimX = this.width + preStroke,
+          dimY = this.height + preStroke,
+          finalDimensions,
           noSkew = options.skewX === 0 && options.skewY === 0;
-
       if (noSkew) {
         finalDimensions = new fabric.Point(dimX * options.scaleX, dimY * options.scaleY);
       }
@@ -638,7 +649,7 @@
         finalDimensions = new fabric.Point(bbox.x, bbox.y);
       }
 
-      return finalDimensions.scalarAddEquals(this.strokeUniform ? this.strokeWidth : 0);
+      return finalDimensions.scalarAddEquals(postStroke);
     },
 
     /**
