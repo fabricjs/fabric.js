@@ -54,7 +54,7 @@
        * @default
        * @override
        */
-      fill: 'rgb(0,0,0)',
+      fill: '',
 
       /**
        * @default
@@ -393,6 +393,8 @@
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
       _render: function (ctx) {
+        //  render fill/stroke courtesy of rect
+        fabric.Rect.prototype._render.call(this, ctx);
         this._renderObjects(ctx);
       },
 
