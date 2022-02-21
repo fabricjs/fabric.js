@@ -641,7 +641,7 @@
         dimX = dimensions.x;
         dimY = dimensions.y;
       }
-      
+
       if (noSkew) {
         finalDimensions = new fabric.Point(dimX * this.scaleX, dimY * this.scaleY);
       }
@@ -654,7 +654,7 @@
         });
         finalDimensions = new fabric.Point(bbox.x, bbox.y);
       }
-     
+
       return finalDimensions.scalarAddEquals(this.strokeUniform ? this.strokeWidth : 0);
     },
 
