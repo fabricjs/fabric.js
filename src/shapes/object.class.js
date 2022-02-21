@@ -974,7 +974,9 @@
      * @returns {number}
      */
     getTotalAngle: function () {
-      return fabric.util.qrDecompose(this.calcTransformMatrix()).angle;
+      return this.group ?
+        fabric.util.qrDecompose(this.calcTransformMatrix()).angle :
+        this.angle;
     },
 
     /**
