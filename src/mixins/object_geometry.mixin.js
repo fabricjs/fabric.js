@@ -612,41 +612,29 @@
 
     /**
      * Calculate object bounding box dimensions from its properties scale, skew.
-     * @param {Number} skewX, a value to override current skewX
-     * @param {Number} skewY, a value to override current skewY
+     * @param {Object} [options]
+     * @param {Number} options.scaleX a value to override current skewX
+     * @param {Number} options.scaleY a value to override current skewX
+     * @param {Number} options.skewX a value to override current skewX
+     * @param {Number} options.skewY a value to override current skewY
      * @private
      * @returns {fabric.Point} dimensions
      */
-    _getTransformedDimensions: function(skewX, skewY) {
-      if (typeof skewX === 'undefined') {
-        skewX = this.skewX;
-      }
-      if (typeof skewY === 'undefined') {
-        skewY = this.skewY;
-      }
-      var dimensions, dimX, dimY, finalDimensions,
-          noSkew = skewX === 0 && skewY === 0;
-
-      if (this.strokeUniform) {
-        dimX = this.width;
-        dimY = this.height;
-      }
-      else {
-        dimensions = this._getNonTransformedDimensions();
-        dimX = dimensions.x;
-        dimY = dimensions.y;
-      }
+    _getTransformedDimensions: function (options) {
+      options = Object.assign({
+        scaleX: this.scaleX,
+        scaleY: this.scaleY,
+        skewX: this.skewX,
+        skewY: this.skewY,
+      }, options || {});
+      var dimX = this.width, dimY = this.height, finalDimensions,
+        noSkew = options.skewX === 0 && options.skewY === 0;
 
       if (noSkew) {
-        finalDimensions = new fabric.Point(dimX * this.scaleX, dimY * this.scaleY);
+        finalDimensions = new fabric.Point(dimX * options.scaleX, dimY * options.scaleY);
       }
       else {
-        var bbox = util.sizeAfterTransform(dimX, dimY, {
-          scaleX: this.scaleX,
-          scaleY: this.scaleY,
-          skewX: skewX,
-          skewY: skewY,
-        });
+        var bbox = util.sizeAfterTransform(dimX, dimY, options);
         finalDimensions = new fabric.Point(bbox.x, bbox.y);
       }
 
