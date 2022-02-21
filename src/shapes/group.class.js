@@ -531,8 +531,13 @@
         else if (layoutDirective === 'clip-path' && this.clipPath) {
           var clipPath = this.clipPath;
           if (clipPath.absolutePositioned && context.type === 'initialization') {
-            var inv = fabric.util.invertTransform(this.calcTransformMatrix());
-            var clipPathCenter = fabric.util.transformPoint(clipPath.getCenterPoint(), inv);
+            //  we want the center point to exist in group's containing plane
+            var clipPathCenter = clipPath.getCenterPoint();
+            if (this.group) {
+              //  send point from canvas plane to group's containing plane
+              var inv = fabric.util.invertTransform(this.group.calcTransformMatrix());
+              clipPathCenter = fabric.util.transformPoint(clipPathCenter, inv);
+            }
             return {
               centerX: clipPathCenter.x,
               centerY: clipPathCenter.y,
@@ -543,6 +548,7 @@
           else if (!clipPath.absolutePositioned) {
             var center;
             var clipPathRelativeCenter = clipPath.getRelativeCenterPoint(),
+              //  we want the center point to exist in group's containing plane, so we send it upwards
               clipPathCenter = fabric.util.transformPoint(clipPathRelativeCenter, this.calcOwnMatrix(), true);
             if (context.type === 'initialization') {
               var bbox = this.prepareBoundingBox(layoutDirective, objects, context) || {};
