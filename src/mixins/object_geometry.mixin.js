@@ -629,7 +629,7 @@
       if (typeof skewY === 'undefined') {
         skewY = this.skewY;
       }
-      var dimensions, dimX, dimY,
+      var dimensions, dimX, dimY, finalDimensions,
           noSkew = skewX === 0 && skewY === 0;
 
       if (this.strokeUniform) {
@@ -641,31 +641,21 @@
         dimX = dimensions.x;
         dimY = dimensions.y;
       }
+      
       if (noSkew) {
-        return this._finalizeDimensions(dimX * this.scaleX, dimY * this.scaleY);
+        finalDimensions = new fabric.Point(dimX * this.scaleX, dimY * this.scaleY);
       }
-      var bbox = util.sizeAfterTransform(dimX, dimY, {
-        scaleX: this.scaleX,
-        scaleY: this.scaleY,
-        skewX: skewX,
-        skewY: skewY,
-      });
-      return this._finalizeDimensions(bbox.x, bbox.y);
-    },
-
-    /*
-     * Calculate object bounding box dimensions from its properties scale, skew.
-     * @param Number width width of the bbox
-     * @param Number height height of the bbox
-     * @private
-     * @return {Object} .x finalized width dimension
-     * @return {Object} .y finalized height dimension
-     */
-    _finalizeDimensions: function(width, height) {
-      return this.strokeUniform ?
-        { x: width + this.strokeWidth, y: height + this.strokeWidth }
-        :
-        { x: width, y: height };
+      else {
+        var bbox = util.sizeAfterTransform(dimX, dimY, {
+          scaleX: this.scaleX,
+          scaleY: this.scaleY,
+          skewX: skewX,
+          skewY: skewY,
+        });
+        finalDimensions = new fabric.Point(bbox.x, bbox.y);
+      }
+     
+      return finalDimensions.scalarAddEquals(this.strokeUniform ? this.strokeWidth : 0);
     },
 
     /*
