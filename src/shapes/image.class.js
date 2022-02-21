@@ -100,6 +100,12 @@
     stateProperties: fabric.Object.prototype.stateProperties.concat('cropX', 'cropY'),
 
     /**
+     * Color used for focusing the resizing stroke.
+     * @type string
+     */
+    resizingStrokeColor: '#9c0d63',
+
+    /**
      * key used to retrieve the texture representing this image
      * @since 2.0.0
      * @type String

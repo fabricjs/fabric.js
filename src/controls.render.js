@@ -64,7 +64,7 @@
     ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
     ctx.strokeStyle = styleOverride.strokeCornerColor || fabricObject.strokeCornerColor;
     // this is still wrong
-    ctx.lineWidth = fabricObject.navigationState === 'resizing' ? 2 : 1;
+    ctx.lineWidth = this.focused ? 2 : 1;
     ctx.translate(left, top);
     ctx.rotate(degreesToRadians(fabricObject.angle));
     // this does not work, and fixed with ( && ) does not make sense.
@@ -77,7 +77,7 @@
 
     // AB: this one will add a focus border for control when the fabric object is in some specific state
     // right now there is only one state where control can have that border, the resizing one
-    if (fabricObject.navigationState === 'resizing') {
+    if (this.focused) {
       ctx.strokeStyle = resizingStroke;
       ctx.strokeRect(-sizeBy2 - 2, -sizeBy2 - 2, size + 4, size + 4);
     }

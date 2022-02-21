@@ -6886,6 +6886,12 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     return moveX || moveY;
   }
 
+  function clearControlsFocus() {
+    Object.values(fabric.Object.prototype.controls).forEach(function (control) {
+      control.removeFocus();
+    });
+  }
+
   controls.scaleCursorStyleHandler = scaleCursorStyleHandler;
   controls.skewCursorStyleHandler = skewCursorStyleHandler;
   controls.scaleSkewCursorStyleHandler = scaleSkewCursorStyleHandler;
@@ -6904,6 +6910,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
   controls.fireEvent = fireEvent;
   controls.wrapWithFixedAnchor = wrapWithFixedAnchor;
   controls.getLocalPoint = getLocalPoint;
+  controls.clearControlsFocus = clearControlsFocus;
   fabric.controlsUtils = controls;
 
 })(typeof exports !== 'undefined' ? exports : this);
@@ -6975,7 +6982,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
     ctx.strokeStyle = styleOverride.strokeCornerColor || fabricObject.strokeCornerColor;
     // this is still wrong
-    ctx.lineWidth = fabricObject.navigationState === 'resizing' ? 2 : 1;
+    ctx.lineWidth = this.focused ? 2 : 1;
     ctx.translate(left, top);
     ctx.rotate(degreesToRadians(fabricObject.angle));
     // this does not work, and fixed with ( && ) does not make sense.
@@ -6988,7 +6995,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
 
     // AB: this one will add a focus border for control when the fabric object is in some specific state
     // right now there is only one state where control can have that border, the resizing one
-    if (fabricObject.navigationState === 'resizing') {
+    if (this.focused) {
       ctx.strokeStyle = resizingStroke;
       ctx.strokeRect(-sizeBy2 - 2, -sizeBy2 - 2, size + 4, size + 4);
     }
@@ -7027,6 +7034,16 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @default true
      */
     visible: true,
+
+    /**
+     * keep track of control visibility.
+     * mainly for backward compatibility.
+     * if you do not want to see a control, you can remove it
+     * from the controlset.
+     * @type {Boolean}
+     * @default true
+     */
+    focused: false,
 
     /**
      * Name of the action that the controll will likely execute.
@@ -7221,6 +7238,23 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       this.visible = visibility;
     },
 
+
+    /**
+     * Clears focus on all controls, and sets control focus
+     * @return {Void}
+     */
+    setFocus: function() {
+      fabric.controlsUtils.clearControlsFocus();
+      this.focused = true;
+    },
+
+    /**
+     * Removes controls focus
+     * @return {Void}
+     */
+    removeFocus: function() {
+      this.focused = false;
+    },
 
     positionHandler: function(dim, finalMatrix /*, fabricObject, currentControl */) {
       var point = fabric.util.transformPoint({
@@ -10333,7 +10367,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
         multSignY = points[2].y < p2.y ? -1 : points[2].y === p2.y ? 0 : 1;
       }
       path.push('M ', fabric.util.toFixed(p1.x - multSignX * width, fabric.Path.NUM_PATH_DIGITS)
-                    , ' ' 
+                    , ' '
                     , fabric.util.toFixed(p1.y - multSignY * width,fabric.Path.NUM_PATH_DIGITS)
                     , ' ');
       for (i = 1; i < len; i++) {
@@ -10349,9 +10383,9 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
         multSignX = p1.x > points[i - 2].x ? 1 : p1.x === points[i - 2].x ? 0 : -1;
         multSignY = p1.y > points[i - 2].y ? 1 : p1.y === points[i - 2].y ? 0 : -1;
       }
-      path.push('L ', 
-        fabric.util.toFixed(p1.x + multSignX * width, fabric.Path.NUM_PATH_DIGITS), 
-        ' ', 
+      path.push('L ',
+        fabric.util.toFixed(p1.x + multSignX * width, fabric.Path.NUM_PATH_DIGITS),
+        ' ',
         fabric.util.toFixed(p1.y + multSignY * width, fabric.Path.NUM_PATH_DIGITS));
       return path;
     },
@@ -10407,13 +10441,13 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
      */
     simplifyPath: function(fullPath) {
       // we start with [0], the M of the path
-      var newPath = [fullPath[0]] 
+      var newPath = [fullPath[0]]
       // the first point will also always get pushed
-      var baseIndex = 1 
+      var baseIndex = 1
       // checkIndex is set in the loop
       var checkIndex
       // use these to avoid removing extents if the line changes direction 180deg
-      var xInc, xDec, yInc, yDec 
+      var xInc, xDec, yInc, yDec
       do {
         var baseElement = fullPath[baseIndex]
         newPath.push(baseElement)
@@ -10453,7 +10487,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
               baseIndex = checkIndex
               break
             }
-          } 
+          }
           else {
             if(xInc || xDec || yInc || yDec){
               var prevElement = fullPath[checkIndex - 1]
@@ -10480,7 +10514,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
         }
       }
       // we have detected only a single point. Add a tiny change to it so it will be rendered.
-      // Safari specs: https://html.spec.whatwg.org/multipage/canvas.html#trace-a-path 
+      // Safari specs: https://html.spec.whatwg.org/multipage/canvas.html#trace-a-path
       // Specifically: 'Prune all zero-length line segments from path.'
       var lastPoint = ['L', path[lastIndex][1], (path[lastIndex][2] + 1)];
       path.push(lastPoint);
@@ -20764,6 +20798,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @type Array
      */
     stateProperties: fabric.Object.prototype.stateProperties.concat('cropX', 'cropY'),
+
+    /**
+     * Color used for focusing the resizing stroke.
+     * @type string
+     */
+    resizingStrokeColor: '#9c0d63',
 
     /**
      * key used to retrieve the texture representing this image

@@ -717,6 +717,12 @@
     return moveX || moveY;
   }
 
+  function clearControlsFocus() {
+    Object.values(fabric.Object.prototype.controls).forEach(function (control) {
+      control.removeFocus();
+    });
+  }
+
   controls.scaleCursorStyleHandler = scaleCursorStyleHandler;
   controls.skewCursorStyleHandler = skewCursorStyleHandler;
   controls.scaleSkewCursorStyleHandler = scaleSkewCursorStyleHandler;
@@ -735,6 +741,7 @@
   controls.fireEvent = fireEvent;
   controls.wrapWithFixedAnchor = wrapWithFixedAnchor;
   controls.getLocalPoint = getLocalPoint;
+  controls.clearControlsFocus = clearControlsFocus;
   fabric.controlsUtils = controls;
 
 })(typeof exports !== 'undefined' ? exports : this);

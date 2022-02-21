@@ -25,6 +25,14 @@
     visible: true,
 
     /**
+     * keep track of focus.
+     * from the controlset.
+     * @type {Boolean}
+     * @default false
+     */
+    focused: false,
+
+    /**
      * Name of the action that the controll will likely execute.
      * This is optional. FabricJS uses to identify what the user is doing for some
      * extra optimizations. If you are writing a custom control and you want to know
@@ -217,6 +225,23 @@
       this.visible = visibility;
     },
 
+
+    /**
+     * Clears focus on all controls, and sets control focus
+     * @return {Void}
+     */
+    setFocus: function() {
+      fabric.controlsUtils.clearControlsFocus();
+      this.focused = true;
+    },
+
+    /**
+     * Removes controls focus
+     * @return {Void}
+     */
+    removeFocus: function() {
+      this.focused = false;
+    },
 
     positionHandler: function(dim, finalMatrix /*, fabricObject, currentControl */) {
       var point = fabric.util.transformPoint({
