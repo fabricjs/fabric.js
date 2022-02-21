@@ -613,10 +613,10 @@
     /**
      * Calculate object bounding box dimensions from its properties scale, skew.
      * @param {Object} [options]
-     * @param {Number} options.scaleX a value to override current skewX
-     * @param {Number} options.scaleY a value to override current skewX
-     * @param {Number} options.skewX a value to override current skewX
-     * @param {Number} options.skewY a value to override current skewY
+     * @param {Number} [options.scaleX]
+     * @param {Number} [options.scaleY]
+     * @param {Number} [options.skewX]
+     * @param {Number} [options.skewY]
      * @private
      * @returns {fabric.Point} dimensions
      */
