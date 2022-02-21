@@ -120,7 +120,7 @@
 
     /**
      * Returns the center coordinates of the object relative to it's parent
-     * @return {fabric.Point} 
+     * @return {fabric.Point}
      */
     getRelativeCenterPoint: function () {
       return this.translateToCenterPoint(new fabric.Point(this.left, this.top), this.originX, this.originY);

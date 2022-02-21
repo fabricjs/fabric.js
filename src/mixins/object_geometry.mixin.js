@@ -601,7 +601,7 @@
       return cache.value;
     },
 
-    /** 
+    /**
      * Calculate object dimensions from its properties
      * @private
      * @returns {fabric.Point} dimensions
@@ -628,7 +628,7 @@
         skewY: this.skewY,
       }, options || {});
       var dimX = this.width, dimY = this.height, finalDimensions,
-        noSkew = options.skewX === 0 && options.skewY === 0;
+          noSkew = options.skewX === 0 && options.skewY === 0;
 
       if (noSkew) {
         finalDimensions = new fabric.Point(dimX * options.scaleX, dimY * options.scaleY);
