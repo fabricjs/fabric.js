@@ -42,7 +42,7 @@ fabric.Collection = {
       0;
     //  objects might be an array so we use concat
     var args = [index, deleteCount].concat(objects);
-    Array.prototype.splice.apply(this._objects, args);
+    this._objects.splice.apply(this._objects, args);
     if (callback) {
       for (var i = 2, length = args.length; i < length; i++) {
         callback.call(this, args[i]);
@@ -55,6 +55,7 @@ fabric.Collection = {
    * @private
    * @param {fabric.Object[]} objectsToRemove objects to remove
    * @param {(object:fabric.Object) => any} [callback]
+   * @returns {boolean} true if objects were removed
    */
   _remove: function(objectsToRemove, callback) {
     var objects = this._objects,
@@ -62,7 +63,6 @@ fabric.Collection = {
 
     for (var i = 0, length = objectsToRemove.length; i < length; i++) {
       index = objects.indexOf(objectsToRemove[i]);
-
       // only call onObjectRemoved if an object was actually removed
       if (index !== -1) {
         somethingRemoved = true;
@@ -70,6 +70,7 @@ fabric.Collection = {
         callback && callback.call(this, objectsToRemove[i]);
       }
     }
+    return somethingRemoved;
   },
 
   /**

@@ -590,8 +590,8 @@
      * @chainable
      */
     remove: function () {
-      fabric.Collection._remove.call(this, arguments, this._onObjectRemoved);
-      this.renderOnAddRemove && this.requestRenderAll();
+      var didRemove = fabric.Collection._remove.call(this, arguments, this._onObjectRemoved);
+      didRemove && this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
