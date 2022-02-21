@@ -431,7 +431,7 @@
 
     calcLineCoords: function() {
       var vpt = this.getViewportTransform(),
-          padding = this.padding, angle = degreesToRadians(this.angle),
+          padding = this.padding, angle = degreesToRadians(this.getTotalAngle()),
           cos = util.cos(angle), sin = util.sin(angle),
           cosP = cos * padding, sinP = sin * padding, cosPSinP = cosP + sinP,
           cosPMinusSinP = cosP - sinP, aCoords = this.calcACoords();
@@ -461,7 +461,8 @@
       var rotateMatrix = this._calcRotateMatrix(),
           translateMatrix = this._calcTranslateMatrix(),
           vpt = this.getViewportTransform(),
-          startMatrix = multiplyMatrices(vpt, translateMatrix),
+          startMatrix = this.group ? multiplyMatrices(vpt, this.group.calcTransformMatrix()) : vpt,
+          startMatrix = multiplyMatrices(startMatrix, translateMatrix),
           finalMatrix = multiplyMatrices(startMatrix, rotateMatrix),
           finalMatrix = multiplyMatrices(finalMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
           dim = this._calculateCurrentDimensions(),
@@ -471,15 +472,18 @@
       });
 
       // debug code
-      // var canvas = this.canvas;
-      // setTimeout(function() {
-      //   canvas.contextTop.clearRect(0, 0, 700, 700);
-      //   canvas.contextTop.fillStyle = 'green';
-      //   Object.keys(coords).forEach(function(key) {
-      //     var control = coords[key];
-      //     canvas.contextTop.fillRect(control.x, control.y, 3, 3);
-      //   });
-      // }, 50);
+      /*
+       var canvas = this.canvas;
+      setTimeout(function () {
+        if (!canvas) return;
+         canvas.contextTop.clearRect(0, 0, 700, 700);
+         canvas.contextTop.fillStyle = 'green';
+         Object.keys(coords).forEach(function(key) {
+           var control = coords[key];
+           canvas.contextTop.fillRect(control.x, control.y, 3, 3);
+         });
+       }, 50);
+       */
       return coords;
     },
 
