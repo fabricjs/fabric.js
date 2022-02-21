@@ -93,9 +93,24 @@
         this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(this, true);
         this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
         this.callSuper('initialize', options);
-        this.forEachObject(function (object) {
-          this.enterGroup(object, false);
-        }, this);
+        if (objectsRelativeToGroup) {
+          this.forEachObject(function (object) {
+            this.enterGroup(object, false);
+          }, this);
+        }
+        else {
+          //  we need to preserve object's center point in relation to canvas and apply group's transform to it
+          var inv = invertTransform(this.calcTransformMatrix());
+          this.forEachObject(function (object) {
+            var t = multiplyTransformMatrices(
+              inv,
+              object.calcTransformMatrix()
+            )
+            var center = fabric.util.transformPoint(this.getCenterPoint(), t);
+            this.enterGroup(object, false);
+            object.setPositionByOrigin(center, 'center', 'center');
+          }, this);
+        }
         this._applyLayoutStrategy({
           type: 'initialization',
           options: options,
@@ -252,13 +267,15 @@
         if (object.type === 'layer') {
           throw new Error('fabric.Group: nesting layers is not supported inside group');
         }
-        removeParentTransform && applyTransformToObject(
-          object,
-          multiplyTransformMatrices(
-            invertTransform(this.calcTransformMatrix()),
-            object.calcTransformMatrix()
-          )
-        );
+        if (removeParentTransform) {
+          applyTransformToObject(
+            object,
+            multiplyTransformMatrices(
+              invertTransform(this.calcTransformMatrix()),
+              object.calcTransformMatrix()
+            )
+          );
+        }
         object.setCoords();
         object._set('group', this);
         object._set('canvas', this.canvas);
@@ -438,9 +455,8 @@
        * @param {object} context see `getLayoutStrategyResult`
        */
       _applyLayoutStrategy: function (context) {
-        var transform = this.calcTransformMatrix();
         var isFirstLayout = context.type === 'initialization';
-        var center = this.getCenterPoint();
+        var center = this.getRelativeCenterPoint();
         var result = this.getLayoutStrategyResult(this.layout, this._objects.concat(), context);
         if (!result) {
           //  fire hook on first layout  (firing layout event won't have any effect because at this point no events have been registered)
@@ -455,13 +471,9 @@
         this.set({ width: result.width, height: result.height });
         //  handle positioning
         var newCenter = new fabric.Point(result.centerX, result.centerY);
-        var diff = fabric.util.transformPoint(
-          isFirstLayout ?
-            center.subtract(new fabric.Point(result.centerMassX, result.centerMassY)) :
-            center.subtract(newCenter),
-          fabric.util.invertTransform(transform),
-          true
-        );
+        var diff = isFirstLayout ?
+          center.subtract(newCenter) :
+          center.subtract(newCenter);
         //  adjust objects to account for new center
         this.forEachObject(function (object) {
           this._adjustObjectPosition(object, diff);
@@ -479,7 +491,6 @@
         this.fire('layout', {
           context: context,
           result: result,
-          transform: transform,
           diff: diff
         });
         //  recursive up
@@ -520,7 +531,7 @@
         }
         else if (layoutDirective === 'clip-path' && this.clipPath) {
           var clipPath = this.clipPath;
-          var clipPathCenter = clipPath.getCenterPoint();
+          var clipPathCenter = clipPath.getRelativeCenterPoint();
           if (clipPath.absolutePositioned && context.type === 'initialization') {
             return {
               centerX: clipPathCenter.x,
@@ -539,7 +550,7 @@
             return bbox;
           }
           else if (!clipPath.absolutePositioned) {
-            var center = this.getCenterPoint();
+            var center = this.getRelativeCenterPoint();
             return {
               centerX: center.x + clipPathCenter.x,
               centerY: center.y + clipPathCenter.y,
@@ -574,16 +585,14 @@
             return;
           }
           else {
-            var bbox = this.getObjectsBoundingBox(objects);
-            var center = this.getCenterPoint();
-            return {
-              centerX: hasX || hasY ? center.x : bbox.centerX,
-              centerY: hasX || hasY ? center.y : bbox.centerY,
-              centerMassX: bbox.centerX,
-              centerMassY: bbox.centerY,
-              width: hasWidth ? this.width : bbox.width,
-              height: hasHeight ? this.height : bbox.height,
-            };
+            var bbox = this.getObjectsBoundingBox(objects) || {};
+            return Object.assign(
+              bbox,
+              {
+                width: hasWidth ? this.width : (bbox.width || 0),
+                height: hasHeight ? this.height : (bbox.height || 0),
+              }
+            );
           }
         }
         else if (context.type === 'imperative' && context.context) {
@@ -598,7 +607,7 @@
       },
 
       /**
-       * uses absolute object coords (in canvas coordinate plane)
+       * Calculate the bbox of objects relative to instance
        * @public
        * @param {fabric.Object[]} objects
        * @returns {Object | null} bounding box
@@ -607,38 +616,34 @@
         if (objects.length === 0) {
           return null;
         }
-        var coords = [];
-        for (var i = 0, o; i < objects.length; ++i) {
-          o = objects[i];
-          coords.push.apply(coords, o.getCoords(true, true));
-        }
-        var bounds = coords.reduce(function (acc, point) {
-          return {
-            min: {
-              x: Math.min(acc.min.x, point.x),
-              y: Math.min(acc.min.y, point.y)
-            },
-            max: {
-              x: Math.max(acc.max.x, point.x),
-              y: Math.max(acc.max.y, point.y)
-            }
-          };
-        }, { min: coords[0], max: coords[0] });
+        
+        var objCenter, size, min,max;
+        objects.forEach(function (object, i) {
+          objCenter = object.getRelativeCenterPoint();
+          size = object._getTransformedDimensions();
+          if (i === 0) {
+            min = new fabric.Point(objCenter.x - size.x / 2, objCenter.y - size.y / 2);
+            max = new fabric.Point(objCenter.x + size.x / 2, objCenter.y + size.y / 2);
+          }
+          else {
+            min.setXY(Math.min(min.x, objCenter.x - size.x / 2), Math.min(min.y, objCenter.y - size.y / 2));
+            max.setXY(Math.max(max.x, objCenter.x + size.x / 2), Math.max(max.y, objCenter.y + size.y / 2));
+          }
+        });
 
-        var width = bounds.max.x - bounds.min.x,
-          height = bounds.max.y - bounds.min.y,
-          center = new fabric.Point(bounds.min.x, bounds.min.y).midPointFrom(bounds.max),
-          rad = fabric.util.degreesToRadians(this.getTotalAngle() || 0),
-          cos = Math.abs(Math.cos(rad)),
-          sin = Math.abs(Math.sin(rad));
+        var width = max.x - min.x,
+          height = max.y - min.y,
+          relativeCenter = new fabric.Point(min.x, min.y).midPointFrom(max),
+          nCenter=fabric.util.transformPoint(relativeCenter,this.calcOwnMatrix()),
+          center = this.getRelativeCenterPoint().add(relativeCenter);
 
         return {
-          left: bounds.min.x,
-          top: bounds.min.y,
-          right: bounds.max.x,
-          bottom: bounds.max.y,
-          x: bounds.min.x,
-          y: bounds.min.y,
+          left: min.x,
+          top: min.y,
+          right: max.x,
+          bottom: max.y,
+          x: min.x,
+          y: min.y,
           centerX: center.x,
           centerY: center.y,
           width: width,
