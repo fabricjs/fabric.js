@@ -145,7 +145,7 @@
        * @param {...fabric.Object} objects
        */
       add: function () {
-        fabric.Collection._add.call(this, arguments, this._onObjectAdded);
+        fabric.Collection.add.call(this, arguments, this._onObjectAdded);
         this._onAfterObjectsChange('added', Array.from(arguments));
       },
 
@@ -154,7 +154,7 @@
        * @param {...fabric.Object} objects
        */
       addRelativeToGroup: function () {
-        fabric.Collection._add.call(this, arguments, this._onRelativeObjectAdded);
+        fabric.Collection.add.call(this, arguments, this._onRelativeObjectAdded);
         this._onAfterObjectsChange('added', Array.from(arguments));
       },
 
@@ -166,7 +166,7 @@
        * @param {boolean} [relativeToGroup] true if object is in group's coordinate plane
        */
       insertAt: function (objects, index, nonSplicing, relativeToGroup) {
-        fabric.Collection._insertAt.call(this, objects, index, nonSplicing,
+        fabric.Collection.insertAt.call(this, objects, index, nonSplicing,
           relativeToGroup ? this._onRelativeObjectAdded : this._onObjectAdded);
         this._onAfterObjectsChange('added', Array.isArray(objects) ? objects : [objects]);
       },
@@ -176,7 +176,7 @@
        * @param {...fabric.Object} objects
        */
       remove: function () {
-        fabric.Collection._remove.call(this, arguments, this._onObjectRemoved);
+        fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
         this._onAfterObjectsChange('removed', Array.from(arguments));
       },
 

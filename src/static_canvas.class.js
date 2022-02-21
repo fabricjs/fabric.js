@@ -32,7 +32,7 @@
    * @fires object:added
    * @fires object:removed
    */
-  fabric.StaticCanvas = fabric.util.createClass(fabric.CommonMethods, /** @lends fabric.StaticCanvas.prototype */ {
+  fabric.StaticCanvas = fabric.util.createClass(fabric.CommonMethods, fabric.Collection, /** @lends fabric.StaticCanvas.prototype */ {
 
     /**
      * Constructor
@@ -564,8 +564,8 @@
      * @chainable
      */
     add: function () {
-      fabric.Collection._add.call(this, arguments, this._onObjectAdded);
-      this.renderOnAddRemove && this.requestRenderAll();
+      fabric.Collection.add.call(this, arguments, this._onObjectAdded);
+      arguments.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -579,7 +579,7 @@
      * @chainable
      */
     insertAt: function (objects, index, nonSplicing) {
-      fabric.Collection._insertAt.call(this, objects, index, nonSplicing, this._onObjectAdded);
+      fabric.Collection.insertAt.call(this, objects, index, nonSplicing, this._onObjectAdded);
       this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
@@ -590,7 +590,7 @@
      * @chainable
      */
     remove: function () {
-      var didRemove = fabric.Collection._remove.call(this, arguments, this._onObjectRemoved);
+      var didRemove = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
       didRemove && this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
@@ -1629,7 +1629,6 @@
   });
 
   extend(fabric.StaticCanvas.prototype, fabric.Observable);
-  extend(fabric.StaticCanvas.prototype, fabric.Collection);
   extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
 
   extend(fabric.StaticCanvas, /** @lends fabric.StaticCanvas */ {

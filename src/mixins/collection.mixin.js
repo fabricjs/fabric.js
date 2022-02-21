@@ -17,7 +17,7 @@ fabric.Collection = {
    * @param {(object:fabric.Object) => any} [callback]
    * @returns {number} new array length
    */
-  _add: function (objects, callback) {
+  add: function (objects, callback) {
     var size = this._objects.push.apply(this._objects, objects);
     if (callback) {
       for (var i = 0, length = objects.length; i < length; i++) {
@@ -36,7 +36,7 @@ fabric.Collection = {
    * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
    * @param {(object:fabric.Object) => any} [callback]
    */
-  _insertAt: function (objects, index, nonSplicing, callback) {
+  insertAt: function (objects, index, nonSplicing, callback) {
     var deleteCount = nonSplicing ?
       Array.isArray(objects) ? objects.length : 1 :
       0;
@@ -57,7 +57,7 @@ fabric.Collection = {
    * @param {(object:fabric.Object) => any} [callback]
    * @returns {boolean} true if objects were removed
    */
-  _remove: function(objectsToRemove, callback) {
+  remove: function(objectsToRemove, callback) {
     var objects = this._objects,
         index, somethingRemoved = false;
 
@@ -95,23 +95,23 @@ fabric.Collection = {
 
   /**
    * Returns an array of children objects of this instance
-   * Type parameter introduced in 1.3.10
-   * since 2.3.5 this method return always a COPY of the array;
-   * @param {String|String[]} [type] When specified, only objects of this type are returned
+   * @param {...String} [types] When specified, only objects of these types are returned
    * @return {Array}
    */
-  getObjects: function(type) {
-    if (typeof type === 'undefined') {
+  getObjects: function() {
+    if (arguments.length === 0) {
       return this._objects.concat();
     }
-    else if (Array.isArray(type)) {
+    else if (arguments.length === 1) {
+      var type = arguments[0];
       return this._objects.filter(function (o) {
-        return type.indexOf(o.type) > -1;
+        return o.type === type;
       });
     }
     else {
+      var types = Array.from(arguments);
       return this._objects.filter(function (o) {
-        return o.type === type;
+        return types.indexOf(o.type) > -1;
       });
     }
   },
