@@ -20,7 +20,6 @@ fabric.Collection = {
   _add: function (objects, callback) {
     var size = this._objects.push.apply(this._objects, objects);
     if (callback) {
-      console.log(callback)
       for (var i = 0, length = objects.length; i < length; i++) {
         callback.call(this, objects[i]);
       }
