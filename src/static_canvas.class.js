@@ -916,7 +916,7 @@
      * @chainable
      */
     _centerObject: function(object, center) {
-      object.setPositionByOrigin(center, 'center', 'center');
+      object.setXY(center, 'center', 'center');
       object.setCoords();
       this.renderOnAddRemove && this.requestRenderAll();
       return this;
