@@ -13,14 +13,7 @@
       if (!this.hasControls || (!this.canvas || this.canvas._activeObject !== this)) {
         return false;
       }
-      //  transform pointer to target's containing coordinate plane
-      //  both agree on every point
-      var p = this.group ?
-        fabric.util.transformPoint(pointer, fabric.util.invertTransform(this.group.calcTransformMatrix())) :
-        pointer;
-      var ex = p.x,
-          ey = p.y,
-          xPoints,
+      var xPoints,
           lines, keys = Object.keys(this.oCoords),
           j = keys.length - 1, i;
       this.__corner = 0;
@@ -47,7 +40,7 @@
         // this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
         // this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
 
-        xPoints = this._findCrossPoints({ x: ex, y: ey }, lines);
+        xPoints = this._findCrossPoints(pointer, lines);
         if (xPoints !== 0 && xPoints % 2 === 1) {
           this.__corner = i;
           return i;
@@ -231,7 +224,7 @@
     drawControls: function(ctx, styleOverride) {
       styleOverride = styleOverride || {};
       ctx.save();
-      var retinaScaling = this.canvas.getRetinaScaling(), matrix, p;
+      var retinaScaling = this.canvas.getRetinaScaling(), p;
       ctx.setTransform(retinaScaling, 0, 0, retinaScaling, 0, 0);
       ctx.strokeStyle = ctx.fillStyle = styleOverride.cornerColor || this.cornerColor;
       if (!this.transparentCorners) {
@@ -239,20 +232,9 @@
       }
       this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray);
       this.setCoords();
-      if (this.group) {
-        // fabricJS does not really support drawing controls inside groups,
-        // this piece of code here helps having at least the control in places.
-        // If an application needs to show some objects as selected because of some UI state
-        // can still call Object._renderControls() on any object they desire, independently of groups.
-        // using no padding, circular controls and hiding the rotating cursor is higly suggested,
-        matrix = this.group.calcTransformMatrix();
-      }
       this.forEachControl(function(control, key, fabricObject) {
-        p = fabricObject.oCoords[key];
         if (control.getVisibility(fabricObject, key)) {
-          if (matrix) {
-            p = fabric.util.transformPoint(p, matrix);
-          }
+          p = fabricObject.oCoords[key];
           control.render(ctx, p.x, p.y, styleOverride, fabricObject);
         }
       });
