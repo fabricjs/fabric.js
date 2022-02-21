@@ -61,7 +61,7 @@
       top:                      100,
       width:                    80,
       height:                   60,
-      fill:                     'rgb(0,0,0)',
+      fill:                     '',
       layout:                   'fit-content',
       stroke:                   null,
       strokeWidth:              0,
@@ -73,6 +73,7 @@
       scaleX:                   1,
       scaleY:                   1,
       shadow:                   null,
+      subTargetCheck:           true,
       visible:                  true,
       backgroundColor:          '',
       angle:                    0,
@@ -123,7 +124,8 @@
       top:                100,
       width:              80,
       height:             60,
-      objects:            objects
+      objects:            objects,
+      subTargetCheck:     true
     };
     assert.deepEqual(clone, expectedObject);
   });

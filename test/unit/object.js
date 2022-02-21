@@ -880,6 +880,15 @@
       initialize: function () {
         this._objects = [];
       },
+      add: function () {
+        fabric.Collection.add.call(this, arguments, this._onObjectAdded);
+      },
+      insertAt: function (objects, index, nonSplicing) {
+        fabric.Collection.insertAt.call(this, objects, index, nonSplicing, this._onObjectAdded);
+      },
+      remove: function () {
+        fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
+      },
       _onObjectAdded: function (object) {
         object.group = this;
       },
