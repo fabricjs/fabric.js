@@ -94,7 +94,7 @@
         this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
         this.callSuper('initialize', options);
         this.forEachObject(function (object) {
-          this.enterGroup(object, objectsRelativeToGroup);
+          this.enterGroup(object, false);
         }, this);
         this._applyLayoutStrategy({
           type: 'initialization',
@@ -130,7 +130,7 @@
        * @param {...fabric.Object} objects
        */
       add: function () {
-        fabric.Collection.add.apply(this, arguments);
+        fabric.Collection._add.call(this, arguments, this._onObjectAdded);
         this._onAfterObjectsChange('added', Array.from(arguments));
       },
 
@@ -139,10 +139,7 @@
        * @param {...fabric.Object} objects
        */
       addRelativeToGroup: function () {
-        this._objects.push.apply(this._objects, arguments);
-        for (var i = 0, length = arguments.length; i < length; i++) {
-          this._onObjectAdded(arguments[i], true);
-        }
+        fabric.Collection._add.call(this, arguments, this._onRelativeObjectAdded);
         this._onAfterObjectsChange('added', Array.from(arguments));
       },
 
@@ -151,9 +148,11 @@
        * @param {fabric.Object} objects Object to insert
        * @param {Number} index Index to insert object at
        * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
+       * @param {boolean} [relativeToGroup] true if object is in group's coordinate plane
        */
-      insertAt: function (objects, index, nonSplicing) {
-        fabric.Collection.insertAt.call(this, objects, index, nonSplicing);
+      insertAt: function (objects, index, nonSplicing, relativeToGroup) {
+        fabric.Collection._insertAt.call(this, objects, index, nonSplicing,
+          relativeToGroup ? this._onRelativeObjectAdded : this._onObjectAdded);
         this._onAfterObjectsChange('added', Array.isArray(objects) ? objects : [objects]);
       },
 
@@ -162,7 +161,7 @@
        * @param {...fabric.Object} objects
        */
       remove: function () {
-        fabric.Collection.remove.apply(this, arguments);
+        fabric.Collection._remove.call(this, arguments, this._onObjectRemoved);
         this._onAfterObjectsChange('removed', Array.from(arguments));
       },
 
@@ -241,9 +240,9 @@
       /**
        * @private
        * @param {fabric.Object} object
-       * @param {boolean} [relativeToGroup] true if object is in group's coordinate plane
+       * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
        */
-      enterGroup: function (object, relativeToGroup) {
+      enterGroup: function (object, removeParentTransform) {
         if (object.group) {
           if (object.group === this) {
             throw new Error('fabric.Group: duplicate objects are not supported inside group');
@@ -253,7 +252,7 @@
         if (object.type === 'layer') {
           throw new Error('fabric.Group: nesting layers is not supported inside group');
         }
-        !relativeToGroup && applyTransformToObject(
+        removeParentTransform && applyTransformToObject(
           object,
           multiplyTransformMatrices(
             invertTransform(this.calcTransformMatrix()),
@@ -320,10 +319,18 @@
       /**
        * @private
        * @param {fabric.Object} object
-       * @param {boolean} [relativeToGroup] true if object is in group's coordinate plane
        */
-      _onObjectAdded: function (object, relativeToGroup) {
-        this.enterGroup(object, relativeToGroup);
+      _onObjectAdded: function (object) {
+        this.enterGroup(object, true);
+        object.fire('added', { target: this });
+      },
+
+      /**
+       * @private
+       * @param {fabric.Object} object
+       */
+      _onRelativeObjectAdded: function (object) {
+        this.enterGroup(object, false);
         object.fire('added', { target: this });
       },
 
@@ -619,11 +626,11 @@
         }, { min: coords[0], max: coords[0] });
 
         var width = bounds.max.x - bounds.min.x,
-            height = bounds.max.y - bounds.min.y,
-            center = new fabric.Point(bounds.min.x, bounds.min.y).midPointFrom(bounds.max),
-            rad = fabric.util.degreesToRadians(this.getTotalAngle() || 0),
-            cos = Math.abs(Math.cos(rad)),
-            sin = Math.abs(Math.sin(rad));
+          height = bounds.max.y - bounds.min.y,
+          center = new fabric.Point(bounds.min.x, bounds.min.y).midPointFrom(bounds.max),
+          rad = fabric.util.degreesToRadians(this.getTotalAngle() || 0),
+          cos = Math.abs(Math.cos(rad)),
+          sin = Math.abs(Math.sin(rad));
 
         return {
           left: bounds.min.x,
@@ -634,8 +641,8 @@
           y: bounds.min.y,
           centerX: center.x,
           centerY: center.y,
-          width: width * cos + height * sin,
-          height: width * sin + height * cos,
+          width: width,
+          height: height,
         };
       },
 

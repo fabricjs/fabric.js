@@ -559,6 +559,43 @@
     },
 
     /**
+     * @param {...fabric.Object} objects to add
+     * @return {Self} thisArg
+     * @chainable
+     */
+    add: function () {
+      fabric.Collection._add.call(this, arguments, this._onObjectAdded);
+      this.renderOnAddRemove && this.requestRenderAll();
+      return this;
+    },
+
+    /**
+     * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
+     * An object should be an instance of (or inherit from) fabric.Object
+     * @param {fabric.Object|fabric.Object[]} objects Object(s) to insert
+     * @param {Number} index Index to insert object at
+     * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
+     * @return {Self} thisArg
+     * @chainable
+     */
+    insertAt: function (objects, index, nonSplicing) {
+      fabric.Collection._insertAt.call(this, objects, index, nonSplicing, this._onObjectAdded);
+      this.renderOnAddRemove && this.requestRenderAll();
+      return this;
+    },
+
+    /**
+     * @param {...fabric.Object} objects to remove
+     * @return {Self} thisArg
+     * @chainable
+     */
+    remove: function () {
+      fabric.Collection._remove.call(this, arguments, this._onObjectRemoved);
+      this.renderOnAddRemove && this.requestRenderAll();
+      return this;
+    },
+
+    /**
      * @private
      * @param {fabric.Object} obj Object that was added
      */

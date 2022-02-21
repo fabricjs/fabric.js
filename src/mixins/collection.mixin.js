@@ -12,69 +12,65 @@ fabric.Collection = {
    * Adds objects to collection, Canvas or Group, then renders canvas
    * (if `renderOnAddRemove` is not `false`).
    * Objects should be instances of (or inherit from) fabric.Object
-   * @param {...fabric.Object} object Zero or more fabric instances
-   * @return {Self} thisArg
-   * @chainable
+   * @private
+   * @param {fabric.Object[]} objects to add
+   * @param {(object:fabric.Object) => any} [callback]
+   * @returns {number} new array length
    */
-  add: function () {
-    this._objects.push.apply(this._objects, arguments);
-    if (this._onObjectAdded) {
-      for (var i = 0, length = arguments.length; i < length; i++) {
-        this._onObjectAdded(arguments[i]);
+  _add: function (objects, callback) {
+    var size = this._objects.push.apply(this._objects, objects);
+    if (callback) {
+      console.log(callback)
+      for (var i = 0, length = objects.length; i < length; i++) {
+        callback.call(this, objects[i]);
       }
     }
-    this.renderOnAddRemove && this.requestRenderAll && this.requestRenderAll();
-    return this;
+    return size;
   },
 
   /**
    * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
    * An object should be an instance of (or inherit from) fabric.Object
+   * @private
    * @param {fabric.Object|fabric.Object[]} objects Object(s) to insert
    * @param {Number} index Index to insert object at
    * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
-   * @return {Self} thisArg
-   * @chainable
+   * @param {(object:fabric.Object) => any} [callback]
    */
-  insertAt: function (objects, index, nonSplicing) {
+  _insertAt: function (objects, index, nonSplicing, callback) {
     var deleteCount = nonSplicing ?
       Array.isArray(objects) ? objects.length : 1 :
       0;
     //  objects might be an array so we use concat
     var args = [index, deleteCount].concat(objects);
     Array.prototype.splice.apply(this._objects, args);
-    if (this._onObjectAdded) {
+    if (callback) {
       for (var i = 2, length = args.length; i < length; i++) {
-        this._onObjectAdded(args[i]);
+        callback.call(this, args[i]);
       }
     }
-    this.renderOnAddRemove && this.requestRenderAll && this.requestRenderAll();
-    return this;
   },
 
   /**
    * Removes objects from a collection, then renders canvas (if `renderOnAddRemove` is not `false`)
-   * @param {...fabric.Object} object Zero or more fabric instances
-   * @return {Self} thisArg
-   * @chainable
+   * @private
+   * @param {fabric.Object[]} objectsToRemove objects to remove
+   * @param {(object:fabric.Object) => any} [callback]
    */
-  remove: function() {
+  _remove: function(objectsToRemove, callback) {
     var objects = this._objects,
         index, somethingRemoved = false;
 
-    for (var i = 0, length = arguments.length; i < length; i++) {
-      index = objects.indexOf(arguments[i]);
+    for (var i = 0, length = objectsToRemove.length; i < length; i++) {
+      index = objects.indexOf(objectsToRemove[i]);
 
       // only call onObjectRemoved if an object was actually removed
       if (index !== -1) {
         somethingRemoved = true;
         objects.splice(index, 1);
-        this._onObjectRemoved && this._onObjectRemoved(arguments[i]);
+        callback && callback.call(this, objectsToRemove[i]);
       }
     }
-
-    this.renderOnAddRemove && somethingRemoved && this.requestRenderAll && this.requestRenderAll();
-    return this;
   },
 
   /**
