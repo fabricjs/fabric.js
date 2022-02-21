@@ -100,12 +100,30 @@
     },
 
     /**
-     * Returns the real center coordinates of the object
+     * Returns the center coordinates of the object relative to canvas
      * @return {fabric.Point}
      */
     getCenterPoint: function() {
-      var leftTop = new fabric.Point(this.left, this.top);
-      return this.translateToCenterPoint(leftTop, this.originX, this.originY);
+      var relCenter = this.getRelativeCenterPoint();
+      return this.group ?
+        fabric.util.transformPoint(relCenter, this.group.calcTransformMatrix()) :
+        relCenter;
+    },
+
+    /**
+     * Returns the center coordinates of the object relative to it's containing group or null
+     * @return {fabric.Point|null} point or null of object has no parent group
+     */
+    getCenterPointRelativeToParent: function () {
+      return this.group ? this.getRelativeCenterPoint() : null;
+    },
+
+    /**
+     * Returns the center coordinates of the object relative to it's parent
+     * @return {fabric.Point} 
+     */
+    getRelativeCenterPoint: function () {
+      return this.translateToCenterPoint(new fabric.Point(this.left, this.top), this.originX, this.originY);
     },
 
     /**
@@ -124,7 +142,7 @@
      * @return {fabric.Point}
      */
     getPointByOrigin: function(originX, originY) {
-      var center = this.getCenterPoint();
+      var center = this.getRelativeCenterPoint();
       return this.translateToOriginPoint(center, originX, originY);
     },
 
@@ -136,7 +154,7 @@
      * @return {fabric.Point}
      */
     normalizePoint: function(point, originX, originY) {
-      var center = this.getCenterPoint(), p, p2;
+      var center = this.getRelativeCenterPoint(), p, p2;
       if (typeof originX !== 'undefined' && typeof originY !== 'undefined' ) {
         p = this.translateToGivenOrigin(center, 'center', 'center', originX, originY);
       }
@@ -226,7 +244,7 @@
       this._originalOriginX = this.originX;
       this._originalOriginY = this.originY;
 
-      var center = this.getCenterPoint();
+      var center = this.getRelativeCenterPoint();
 
       this.originX = 'center';
       this.originY = 'center';
@@ -242,7 +260,7 @@
      */
     _resetOrigin: function() {
       var originPoint = this.translateToOriginPoint(
-        this.getCenterPoint(),
+        this.getRelativeCenterPoint(),
         this._originalOriginX,
         this._originalOriginY);
 
@@ -260,7 +278,7 @@
      * @private
      */
     _getLeftTopCoords: function() {
-      return this.translateToOriginPoint(this.getCenterPoint(), 'left', 'top');
+      return this.translateToOriginPoint(this.getRelativeCenterPoint(), 'left', 'top');
     },
   });
 
