@@ -103,7 +103,7 @@
     test: 'Rect with strokeUniform: true and negative scaling',
     code: renderStrokeWithNegativeScale,
     golden: 'strokeNegativeScale.png',
-    percentage: 0.01,
+    percentage: 0.011,
     disabled: fabric.isLikelyNode,
     width: 100,
     height: 100,
