@@ -721,12 +721,26 @@
       /* _TO_SVG_START_ */
 
       /**
+       * @private
+       */
+      _createFillStrokeSVGRect: function (reviver) {
+        if (!this.fill && (!this.stroke || !this.strokeWidth)) {
+          return '';
+        }
+        var fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
+        var commons = fillStroke.indexOf('COMMON_PARTS');
+        fillStroke[commons] = 'for="group" ';
+        return fillStroke.join('');
+      },
+
+      /**
        * Returns svg representation of an instance
        * @param {Function} [reviver] Method for further parsing of svg representation.
        * @return {String} svg representation of an instance
        */
       _toSVG: function (reviver) {
         var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
+        svgString.push('\t\t', this._createFillStrokeSVGRect(reviver));
         for (var i = 0, len = this._objects.length; i < len; i++) {
           svgString.push('\t\t', this._objects[i].toSVG(reviver));
         }
@@ -741,6 +755,7 @@
        */
       toClipPathSVG: function (reviver) {
         var svgString = [];
+        svgString.push('\t\t', this._createFillStrokeSVGRect(reviver));
         for (var i = 0, len = this._objects.length; i < len; i++) {
           svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
         }
