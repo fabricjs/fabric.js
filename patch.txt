@@ -1,0 +1,845 @@
+diff --git a/build.js b/build.js
+index 38f3b45a..91fe3924 100644
+--- a/build.js
++++ b/build.js
+@@ -178,6 +178,7 @@ var filesToInclude = [
+   'src/shapes/object.class.js',
+   'src/mixins/object_origin.mixin.js',
+   'src/mixins/object_geometry.mixin.js',
++  'src/mixins/object_ancestry.mixin.js',
+   'src/mixins/object_stacking.mixin.js',
+   'src/mixins/object.svg_export.js',
+   'src/mixins/stateful.mixin.js',
+diff --git a/src/canvas.class.js b/src/canvas.class.js
+index 893d7acf..a06234de 100644
+--- a/src/canvas.class.js
++++ b/src/canvas.class.js
+@@ -352,6 +352,13 @@
+      */
+     _hoveredTargets: [],
+ 
++    /**
++     * hold the list of objects to render
++     * @type fabric.Object[]
++     * @private
++     */
++    _objectsToRender: undefined,
++
+     /**
+      * @private
+      */
+@@ -369,6 +376,23 @@
+       this.calcOffset();
+     },
+ 
++    /**
++     * @private
++     * @param {fabric.Object} obj Object that was added
++     */
++    _onObjectAdded: function (obj) {
++      this._objectsToRender = undefined;
++      this.callSuper('_onObjectAdded', obj);
++    },
++
++    /**
++     * @private
++     * @param {fabric.Object} obj Object that was removed
++     */
++    _onObjectRemoved: function (obj) {
++      this._objectsToRender = undefined;
++      this.callSuper('_onObjectRemoved', obj);
++    },
+     /**
+      * Divides objects in two groups, one to render immediately
+      * and one to render as activeGroup.
+@@ -378,7 +402,7 @@
+       var activeObjects = this.getActiveObjects(),
+           object, objsToRender, activeGroupObjects;
+ 
+-      if (activeObjects.length > 0 && !this.preserveObjectStacking) {
++      if (!this.preserveObjectStacking && activeObjects.length > 1) {
+         objsToRender = [];
+         activeGroupObjects = [];
+         for (var i = 0, length = this._objects.length; i < length; i++) {
+@@ -395,6 +419,15 @@
+         }
+         objsToRender.push.apply(objsToRender, activeGroupObjects);
+       }
++      //  in case a single object is selected render it's entire above the other objects
++      else if (!this.preserveObjectStacking && activeObjects.length === 1) {
++        var target = activeObjects[0], ancestors = target.getAncestors(true);
++        var topAncestor = ancestors.length === 0 ? target : ancestors.pop();
++        objsToRender = this._objects.slice();
++        var index = objsToRender.indexOf(topAncestor);
++        index > -1 && objsToRender.splice(objsToRender.indexOf(topAncestor), 1);
++        objsToRender.push(topAncestor);
++      }
+       else {
+         objsToRender = this._objects;
+       }
+@@ -416,7 +449,8 @@
+         this.hasLostContext = false;
+       }
+       var canvasToDrawOn = this.contextContainer;
+-      this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
++      !this._objectsToRender && (this._objectsToRender = this._chooseObjectsToRender());
++      this.renderCanvas(canvasToDrawOn, this._objectsToRender);
+       return this;
+     },
+ 
+@@ -622,14 +656,22 @@
+       if (!target) {
+         return;
+       }
+-
+-      var pointer = this.getPointer(e), corner = target.__corner,
++      var pointer = this.getPointer(e);
++      if (target.group) {
++        //  transform pointer to target's containing coordinate plane
++        pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(target.group.calcTransformMatrix()));
++      }
++      var corner = target.__corner,
+           control = target.controls[corner],
+           actionHandler = (alreadySelected && corner) ?
+             control.getActionHandler(e, target, control) : fabric.controlsUtils.dragHandler,
+           action = this._getActionFromCorner(alreadySelected, corner, e, target),
+           origin = this._getOriginFromCorner(target, corner),
+           altKey = e[this.centeredKey],
++          /**
++           * relative to target's containing coordinate plane
++           * both agree on every point
++           **/
+           transform = {
+             target: target,
+             action: action,
+@@ -639,7 +681,6 @@
+             scaleY: target.scaleY,
+             skewX: target.skewX,
+             skewY: target.skewY,
+-            // used by transation
+             offsetX: pointer.x - target.left,
+             offsetY: pointer.y - target.top,
+             originX: origin.x,
+@@ -648,11 +689,7 @@
+             ey: pointer.y,
+             lastX: pointer.x,
+             lastY: pointer.y,
+-            // unsure they are useful anymore.
+-            // left: target.left,
+-            // top: target.top,
+             theta: degreesToRadians(target.angle),
+-            // end of unsure
+             width: target.width * target.scaleX,
+             shiftKey: e.shiftKey,
+             altKey: altKey,
+@@ -745,11 +782,12 @@
+       if (shouldLookForActive && activeObject._findTargetCorner(pointer, isTouch)) {
+         return activeObject;
+       }
+-      if (aObjects.length > 1 && !skipGroup && activeObject === this._searchPossibleTargets([activeObject], pointer)) {
++      if (aObjects.length > 1 && activeObject.type === 'activeSelection'
++        && !skipGroup && this.searchPossibleTargets([activeObject], pointer)) {
+         return activeObject;
+       }
+       if (aObjects.length === 1 &&
+-        activeObject === this._searchPossibleTargets([activeObject], pointer)) {
++        activeObject === this.searchPossibleTargets([activeObject], pointer)) {
+         if (!this.preserveObjectStacking) {
+           return activeObject;
+         }
+@@ -759,7 +797,7 @@
+           this.targets = [];
+         }
+       }
+-      var target = this._searchPossibleTargets(this._objects, pointer);
++      var target = this.searchPossibleTargets(this._objects, pointer);
+       if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
+         target = activeTarget;
+         this.targets = activeTargetSubs;
+@@ -796,10 +834,10 @@
+     },
+ 
+     /**
+-     * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
++     * Internal Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
+      * @param {Array} [objects] objects array to look into
+      * @param {Object} [pointer] x,y object of point coordinates we want to check.
+-     * @return {fabric.Object} object that contains pointer
++     * @return {fabric.Object} **top most object from given `objects`** that contains pointer
+      * @private
+      */
+     _searchPossibleTargets: function(objects, pointer) {
+@@ -823,6 +861,18 @@
+       return target;
+     },
+ 
++    /**
++     * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
++     * @see {@link fabric.Canvas#_searchPossibleTargets}
++     * @param {Array} [objects] objects array to look into
++     * @param {Object} [pointer] x,y object of point coordinates we want to check.
++     * @return {fabric.Object} **top most object on screen** that contains pointer
++     */
++    searchPossibleTargets: function (objects, pointer) {
++      var target = this._searchPossibleTargets(objects, pointer);
++      return target;
++    },
++
+     /**
+      * Returns pointer coordinates without the effect of the viewport
+      * @param {Object} pointer with "x" and "y" number values
+@@ -1065,7 +1115,7 @@
+      */
+     _fireSelectionEvents: function(oldObjects, e) {
+       var somethingChanged = false, objects = this.getActiveObjects(),
+-          added = [], removed = [];
++          added = [], removed = [], invalidate = false;
+       oldObjects.forEach(function(oldObject) {
+         if (objects.indexOf(oldObject) === -1) {
+           somethingChanged = true;
+@@ -1087,6 +1137,7 @@
+         }
+       });
+       if (oldObjects.length > 0 && objects.length > 0) {
++        invalidate = true;
+         somethingChanged && this.fire('selection:updated', {
+           e: e,
+           selected: added,
+@@ -1094,17 +1145,20 @@
+         });
+       }
+       else if (objects.length > 0) {
++        invalidate = true;
+         this.fire('selection:created', {
+           e: e,
+           selected: added,
+         });
+       }
+       else if (oldObjects.length > 0) {
++        invalidate = true;
+         this.fire('selection:cleared', {
+           e: e,
+           deselected: removed,
+         });
+       }
++      invalidate && (this._objectsToRender = undefined);
+     },
+ 
+     /**
+diff --git a/src/controls.actions.js b/src/controls.actions.js
+index f51b7814..bbeaf53b 100644
+--- a/src/controls.actions.js
++++ b/src/controls.actions.js
+@@ -24,7 +24,9 @@
+    * @return {Number} 0 - 7 a quadrant number
+    */
+   function findCornerQuadrant(fabricObject, control) {
+-    var cornerAngle = fabricObject.angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
++    //  angle is relative to canvas plane
++    var angle = fabricObject.getTotalAngle();
++    var cornerAngle = angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
+     return Math.round((cornerAngle % 360) / 45);
+   }
+ 
+@@ -193,7 +195,7 @@
+    */
+   function wrapWithFixedAnchor(actionHandler) {
+     return function(eventData, transform, x, y) {
+-      var target = transform.target, centerPoint = target.getCenterPoint(),
++      var target = transform.target, centerPoint = target.getRelativeCenterPoint(),
+           constraint = target.translateToOriginPoint(centerPoint, transform.originX, transform.originY),
+           actionPerformed = actionHandler(eventData, transform, x, y);
+       target.setPositionByOrigin(constraint, transform.originX, transform.originY);
+@@ -231,7 +233,7 @@
+         control = target.controls[transform.corner],
+         zoom = target.canvas.getZoom(),
+         padding = target.padding / zoom,
+-        localPoint = target.toLocalPoint(new fabric.Point(x, y), originX, originY);
++        localPoint = target.normalizePoint(new fabric.Point(x, y), originX, originY);
+     if (localPoint.x >= padding) {
+       localPoint.x -= padding;
+     }
+@@ -469,7 +471,7 @@
+   function rotationWithSnapping(eventData, transform, x, y) {
+     var t = transform,
+         target = t.target,
+-        pivotPoint = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY);
++        pivotPoint = target.translateToOriginPoint(target.getRelativeCenterPoint(), t.originX, t.originY);
+ 
+     if (target.lockRotation) {
+       return false;
+diff --git a/src/controls.render.js b/src/controls.render.js
+index 1c3d339e..4c1ca95f 100644
+--- a/src/controls.render.js
++++ b/src/controls.render.js
+@@ -82,7 +82,9 @@
+     // this is still wrong
+     ctx.lineWidth = 1;
+     ctx.translate(left, top);
+-    ctx.rotate(degreesToRadians(fabricObject.angle));
++    //  angle is relative to canvas plane
++    var angle = fabricObject.getTotalAngle();
++    ctx.rotate(degreesToRadians(angle));
+     // this does not work, and fixed with ( && ) does not make sense.
+     // to have real transparent corners we need the controls on upperCanvas
+     // transparentCorners || ctx.clearRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
+diff --git a/src/mixins/object_ancestry.mixin.js b/src/mixins/object_ancestry.mixin.js
+new file mode 100644
+index 00000000..594da24a
+--- /dev/null
++++ b/src/mixins/object_ancestry.mixin.js
+@@ -0,0 +1,17 @@
++fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
++
++  /**
++     *
++     * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
++     * @returns {(fabric.Object | fabric.StaticCanvas)[]} ancestors from bottom to top
++     */
++  getAncestors: function (strict) {
++    var ancestors = [];
++    var parent = this.group || (!strict ? this.canvas : undefined);
++    while (parent) {
++      ancestors.push(parent);
++      parent = parent.group || (!strict ? parent.canvas : undefined);
++    }
++    return ancestors;
++  }
++});
+diff --git a/src/mixins/object_geometry.mixin.js b/src/mixins/object_geometry.mixin.js
+index 38f2cf2e..286df951 100644
+--- a/src/mixins/object_geometry.mixin.js
++++ b/src/mixins/object_geometry.mixin.js
+@@ -536,7 +536,7 @@
+      * @return {Array} rotation matrix for the object
+      */
+     _calcTranslateMatrix: function() {
+-      var center = this.getCenterPoint();
++      var center = this.getRelativeCenterPoint();
+       return [1, 0, 0, 1, center.x, center.y];
+     },
+ 
+diff --git a/src/mixins/object_interactivity.mixin.js b/src/mixins/object_interactivity.mixin.js
+index 4aea3954..6b280c9c 100644
+--- a/src/mixins/object_interactivity.mixin.js
++++ b/src/mixins/object_interactivity.mixin.js
+@@ -10,14 +10,16 @@
+      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
+      */
+     _findTargetCorner: function(pointer, forTouch) {
+-      // objects in group, anykind, are not self modificable,
+-      // must not return an hovered corner.
+-      if (!this.hasControls || this.group || (!this.canvas || this.canvas._activeObject !== this)) {
++      if (!this.hasControls || (!this.canvas || this.canvas._activeObject !== this)) {
+         return false;
+       }
+-
+-      var ex = pointer.x,
+-          ey = pointer.y,
++      //  transform pointer to target's containing coordinate plane
++      //  both agree on every point
++      var p = this.group ?
++        fabric.util.transformPoint(pointer, fabric.util.invertTransform(this.group.calcTransformMatrix())) :
++        pointer;
++      var ex = p.x,
++          ey = p.y,
+           xPoints,
+           lines, keys = Object.keys(this.oCoords),
+           j = keys.length - 1, i;
+@@ -101,7 +103,7 @@
+         return this;
+       }
+       ctx.save();
+-      var center = this.getCenterPoint(), wh = this._calculateCurrentDimensions(),
++      var center = this.getRelativeCenterPoint(), wh = this._calculateCurrentDimensions(),
+           vpt = this.canvas.viewportTransform;
+       ctx.translate(center.x, center.y);
+       ctx.scale(1 / vpt[0], 1 / vpt[3]);
+@@ -128,8 +130,7 @@
+           width = wh.x + strokeWidth,
+           height = wh.y + strokeWidth,
+           hasControls = typeof styleOverride.hasControls !== 'undefined' ?
+-            styleOverride.hasControls : this.hasControls,
+-          shouldStroke = false;
++            styleOverride.hasControls : this.hasControls;
+ 
+       ctx.save();
+       ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
+@@ -141,26 +142,8 @@
+         width,
+         height
+       );
++      hasControls && this.drawControlsConnectingLines(ctx);
+ 
+-      if (hasControls) {
+-        ctx.beginPath();
+-        this.forEachControl(function(control, key, fabricObject) {
+-          // in this moment, the ctx is centered on the object.
+-          // width and height of the above function are the size of the bbox.
+-          if (control.withConnection && control.getVisibility(fabricObject, key)) {
+-            // reset movement for each control
+-            shouldStroke = true;
+-            ctx.moveTo(control.x * width, control.y * height);
+-            ctx.lineTo(
+-              control.x * width + control.offsetX,
+-              control.y * height + control.offsetY
+-            );
+-          }
+-        });
+-        if (shouldStroke) {
+-          ctx.stroke();
+-        }
+-      }
+       ctx.restore();
+       return this;
+     },
+@@ -184,7 +167,9 @@
+           width =
+             bbox.x + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleX) + borderScaleFactor,
+           height =
+-            bbox.y + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor;
++            bbox.y + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor,
++          hasControls = typeof styleOverride.hasControls !== 'undefined' ?
++            styleOverride.hasControls : this.hasControls;
+       ctx.save();
+       this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray);
+       ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
+@@ -194,11 +179,46 @@
+         width,
+         height
+       );
++      hasControls && this.drawControlsConnectingLines(ctx);
+ 
+       ctx.restore();
+       return this;
+     },
+ 
++    /**
++     * Draws lines from a borders of an object's bounding box to controls that have `withConnection` property set.
++     * Requires public properties: width, height
++     * Requires public options: padding, borderColor
++     * @param {CanvasRenderingContext2D} ctx Context to draw on
++     * @return {fabric.Object} thisArg
++     * @chainable
++     */
++    drawControlsConnectingLines: function (ctx) {
++      var wh = this._calculateCurrentDimensions(),
++          strokeWidth = this.borderScaleFactor,
++          width = wh.x + strokeWidth,
++          height = wh.y + strokeWidth,
++          shouldStroke = false;
++
++      ctx.beginPath();
++      this.forEachControl(function (control, key, fabricObject) {
++        // in this moment, the ctx is centered on the object.
++        // width and height of the above function are the size of the bbox.
++        if (control.withConnection && control.getVisibility(fabricObject, key)) {
++          // reset movement for each control
++          shouldStroke = true;
++          ctx.moveTo(control.x * width, control.y * height);
++          ctx.lineTo(
++            control.x * width + control.offsetX,
++            control.y * height + control.offsetY
++          );
++        }
++      });
++      shouldStroke && ctx.stroke();
++
++      return this;
++    },
++
+     /**
+      * Draws corners of an object's bounding box.
+      * Requires public properties: width, height
+diff --git a/src/mixins/object_origin.mixin.js b/src/mixins/object_origin.mixin.js
+index 7cd8f10d..aa9b1298 100644
+--- a/src/mixins/object_origin.mixin.js
++++ b/src/mixins/object_origin.mixin.js
+@@ -100,12 +100,30 @@
+     },
+ 
+     /**
+-     * Returns the real center coordinates of the object
++     * Returns the center coordinates of the object relative to canvas
+      * @return {fabric.Point}
+      */
+     getCenterPoint: function() {
+-      var leftTop = new fabric.Point(this.left, this.top);
+-      return this.translateToCenterPoint(leftTop, this.originX, this.originY);
++      var relCenter = this.getRelativeCenterPoint();
++      return this.group ?
++        fabric.util.transformPoint(relCenter, this.group.calcTransformMatrix()) :
++        relCenter;
++    },
++
++    /**
++     * Returns the center coordinates of the object relative to it's containing group or null
++     * @return {fabric.Point|null} point or null of object has no parent group
++     */
++    getCenterPointRelativeToParent: function () {
++      return this.group ? this.getRelativeCenterPoint() : null;
++    },
++
++    /**
++     * Returns the center coordinates of the object relative to it's parent
++     * @return {fabric.Point} 
++     */
++    getRelativeCenterPoint: function () {
++      return this.translateToCenterPoint(new fabric.Point(this.left, this.top), this.originX, this.originY);
+     },
+ 
+     /**
+@@ -124,21 +142,19 @@
+      * @return {fabric.Point}
+      */
+     getPointByOrigin: function(originX, originY) {
+-      var center = this.getCenterPoint();
++      var center = this.getRelativeCenterPoint();
+       return this.translateToOriginPoint(center, originX, originY);
+     },
+ 
+     /**
+-     * Returns the point in local coordinates
+-     * @param {fabric.Point} point The point relative to the global coordinate system
++     * Returns the normalized point (rotated relative to center) in local coordinates
++     * @param {fabric.Point} point The point relative to instance coordinate system
+      * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
+      * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
+      * @return {fabric.Point}
+      */
+-    toLocalPoint: function(point, originX, originY) {
+-      var center = this.getCenterPoint(),
+-          p, p2;
+-
++    normalizePoint: function(point, originX, originY) {
++      var center = this.getRelativeCenterPoint(), p, p2;
+       if (typeof originX !== 'undefined' && typeof originY !== 'undefined' ) {
+         p = this.translateToGivenOrigin(center, 'center', 'center', originX, originY);
+       }
+@@ -153,6 +169,20 @@
+       return p2.subtractEquals(p);
+     },
+ 
++    /**
++     * Returns coordinates of a pointer relative to object's top left corner in object's plane
++     * @param {Event} e Event to operate upon
++     * @param {Object} [pointer] Pointer to operate upon (instead of event)
++     * @return {Object} Coordinates of a pointer (x, y)
++     */
++    getLocalPointer: function (e, pointer) {
++      pointer = pointer || this.canvas.getPointer(e);
++      return fabric.util.transformPoint(
++        new fabric.Point(pointer.x, pointer.y),
++        fabric.util.invertTransform(this.calcTransformMatrix())
++      ).addEquals(new fabric.Point(this.width / 2, this.height / 2));
++    },
++
+     /**
+      * Returns the point in global coordinates
+      * @param {fabric.Point} The point relative to the local coordinate system
+@@ -214,7 +244,7 @@
+       this._originalOriginX = this.originX;
+       this._originalOriginY = this.originY;
+ 
+-      var center = this.getCenterPoint();
++      var center = this.getRelativeCenterPoint();
+ 
+       this.originX = 'center';
+       this.originY = 'center';
+@@ -230,7 +260,7 @@
+      */
+     _resetOrigin: function() {
+       var originPoint = this.translateToOriginPoint(
+-        this.getCenterPoint(),
++        this.getRelativeCenterPoint(),
+         this._originalOriginX,
+         this._originalOriginY);
+ 
+@@ -248,7 +278,7 @@
+      * @private
+      */
+     _getLeftTopCoords: function() {
+-      return this.translateToOriginPoint(this.getCenterPoint(), 'left', 'top');
++      return this.translateToOriginPoint(this.getRelativeCenterPoint(), 'left', 'top');
+     },
+   });
+ 
+diff --git a/src/shapes/object.class.js b/src/shapes/object.class.js
+index 50bbf3f7..f8a378c0 100644
+--- a/src/shapes/object.class.js
++++ b/src/shapes/object.class.js
+@@ -928,7 +928,7 @@
+ 
+     /**
+      * Return the object scale factor counting also the group scaling
+-     * @return {fabric.Point} 
++     * @return {fabric.Point}
+      */
+     getObjectScaling: function() {
+       // if the object is a top level one, on the canvas, we go for simple aritmetic
+@@ -969,6 +969,14 @@
+       return opacity;
+     },
+ 
++    /**
++     * Returns the object angle relative to canvas counting also the group property
++     * @returns {number}
++     */
++    getTotalAngle: function () {
++      return fabric.util.qrDecompose(this.calcTransformMatrix()).angle;
++    },
++
+     /**
+      * @private
+      * @param {String} key
+@@ -1012,16 +1020,6 @@
+       return this;
+     },
+ 
+-    /**
+-     * This callback function is called by the parent group of an object every
+-     * time a non-delegated property changes on the group. It is passed the key
+-     * and value as parameters. Not adding in this function's signature to avoid
+-     * Travis build error about unused variables.
+-     */
+-    setOnGroup: function() {
+-      // implemented by sub-classes, as needed.
+-    },
+-
+     /**
+      * Retrieves viewportTransform from Object's canvas if possible
+      * @method getViewportTransform
+@@ -1170,6 +1168,7 @@
+      * Check if this object or a child object will cast a shadow
+      * used by Group.shouldCache to know if child has a shadow recursively
+      * @return {Boolean}
++     * @deprecated
+      */
+     willDrawShadow: function() {
+       return !!this.shadow && (this.shadow.offsetX !== 0 || this.shadow.offsetY !== 0);
+@@ -1887,23 +1886,13 @@
+     },
+ 
+     /**
+-     * Returns coordinates of a pointer relative to an object
+-     * @param {Event} e Event to operate upon
+-     * @param {Object} [pointer] Pointer to operate upon (instead of event)
+-     * @return {Object} Coordinates of a pointer (x, y)
++     * This callback function is called by the parent group of an object every
++     * time a non-delegated property changes on the group. It is passed the key
++     * and value as parameters. Not adding in this function's signature to avoid
++     * Travis build error about unused variables.
+      */
+-    getLocalPointer: function(e, pointer) {
+-      pointer = pointer || this.canvas.getPointer(e);
+-      var pClicked = new fabric.Point(pointer.x, pointer.y),
+-          objectLeftTop = this._getLeftTopCoords();
+-      if (this.angle) {
+-        pClicked = fabric.util.rotatePoint(
+-          pClicked, objectLeftTop, degreesToRadians(-this.angle));
+-      }
+-      return {
+-        x: pClicked.x - objectLeftTop.x,
+-        y: pClicked.y - objectLeftTop.y
+-      };
++    setOnGroup: function() {
++      // implemented by sub-classes, as needed.
+     },
+ 
+     /**
+diff --git a/test/unit/object_origin.js b/test/unit/object_origin.js
+index 97d32bbf..8c5eac31 100644
+--- a/test/unit/object_origin.js
++++ b/test/unit/object_origin.js
+@@ -161,39 +161,39 @@
+   });
+ 
+ 
+-  QUnit.test('toLocalPoint', function(assert) {
++  QUnit.test('normalizePoint', function(assert) {
+     var rect = new fabric.Rect(rectOptions),
+         p,
+         point = new fabric.Point(15, 20);
+ 
+-    p = rect.toLocalPoint(point, 'center', 'center');
++    p = rect.normalizePoint(point, 'center', 'center');
+     assert.deepEqual(p, new fabric.Point(-42, -67));
+ 
+-    p = rect.toLocalPoint(point, 'center', 'top');
++    p = rect.normalizePoint(point, 'center', 'top');
+     assert.deepEqual(p, new fabric.Point(-42, -25));
+ 
+-    p = rect.toLocalPoint(point, 'center', 'bottom');
++    p = rect.normalizePoint(point, 'center', 'bottom');
+     assert.deepEqual(p, new fabric.Point(-42, -109));
+ 
+-    p = rect.toLocalPoint(point, 'left', 'center');
++    p = rect.normalizePoint(point, 'left', 'center');
+     assert.deepEqual(p, new fabric.Point(-20, -67));
+ 
+-    p = rect.toLocalPoint(point, 'left', 'top');
++    p = rect.normalizePoint(point, 'left', 'top');
+     assert.deepEqual(p, new fabric.Point(-20, -25));
+ 
+-    p = rect.toLocalPoint(point, 'left', 'bottom');
++    p = rect.normalizePoint(point, 'left', 'bottom');
+     assert.deepEqual(p, new fabric.Point(-20, -109));
+ 
+-    p = rect.toLocalPoint(point, 'right', 'center');
++    p = rect.normalizePoint(point, 'right', 'center');
+     assert.deepEqual(p, new fabric.Point(-64, -67));
+ 
+-    p = rect.toLocalPoint(point, 'right', 'top');
++    p = rect.normalizePoint(point, 'right', 'top');
+     assert.deepEqual(p, new fabric.Point(-64, -25));
+ 
+-    p = rect.toLocalPoint(point, 'right', 'bottom');
++    p = rect.normalizePoint(point, 'right', 'bottom');
+     assert.deepEqual(p, new fabric.Point(-64, -109));
+ 
+-    p = rect.toLocalPoint(point);
++    p = rect.normalizePoint(point);
+     assert.deepEqual(p, new fabric.Point(-20, -25));
+   });
+ 
+@@ -203,34 +203,34 @@
+         point = new fabric.Point(15, 20);
+     rect.angle = 35;
+ 
+-    p = rect.toLocalPoint(point, 'center', 'center');
++    p = rect.normalizePoint(point, 'center', 'center');
+     assert.deepEqual(p, new fabric.Point(-52.72245179455599, -51.00727238020387));
+ 
+-    p = rect.toLocalPoint(point, 'center', 'top');
++    p = rect.normalizePoint(point, 'center', 'top');
+     assert.deepEqual(p, new fabric.Point(-52.72245179455599, -9.007272380203872));
+ 
+-    p = rect.toLocalPoint(point, 'center', 'bottom');
++    p = rect.normalizePoint(point, 'center', 'bottom');
+     assert.deepEqual(p, new fabric.Point(-52.72245179455599, -93.00727238020387));
+ 
+-    p = rect.toLocalPoint(point, 'left', 'center');
++    p = rect.normalizePoint(point, 'left', 'center');
+     assert.deepEqual(p, new fabric.Point(-30.722451794555987, -51.00727238020387));
+ 
+-    p = rect.toLocalPoint(point, 'left', 'top');
++    p = rect.normalizePoint(point, 'left', 'top');
+     assert.deepEqual(p, new fabric.Point(-30.722451794555987, -9.007272380203872));
+ 
+-    p = rect.toLocalPoint(point, 'left', 'bottom');
++    p = rect.normalizePoint(point, 'left', 'bottom');
+     assert.deepEqual(p, new fabric.Point(-30.722451794555987, -93.00727238020387));
+ 
+-    p = rect.toLocalPoint(point, 'right', 'center');
++    p = rect.normalizePoint(point, 'right', 'center');
+     assert.deepEqual(p, new fabric.Point(-74.722451794556, -51.00727238020387));
+ 
+-    p = rect.toLocalPoint(point, 'right', 'top');
++    p = rect.normalizePoint(point, 'right', 'top');
+     assert.deepEqual(p, new fabric.Point(-74.722451794556, -9.007272380203872));
+ 
+-    p = rect.toLocalPoint(point, 'right', 'bottom');
++    p = rect.normalizePoint(point, 'right', 'bottom');
+     assert.deepEqual(p, new fabric.Point(-74.722451794556, -93.00727238020387));
+ 
+-    p = rect.toLocalPoint(point);
++    p = rect.normalizePoint(point);
+     assert.deepEqual(p, new fabric.Point(-58.791317146942106, -3.9842049203432026));
+   });
+ 
+@@ -487,39 +487,39 @@
+   });
+ 
+ 
+-  QUnit.test('toLocalPoint with numeric origins', function(assert) {
++  QUnit.test('normalizePoint with numeric origins', function(assert) {
+     var rect = new fabric.Rect(rectOptions),
+         p,
+         point = new fabric.Point(15, 20);
+ 
+-    p = rect.toLocalPoint(point, 0.5, 0.5);
++    p = rect.normalizePoint(point, 0.5, 0.5);
+     assert.deepEqual(p, new fabric.Point(-42, -67));
+ 
+-    p = rect.toLocalPoint(point, 0.5, 0);
++    p = rect.normalizePoint(point, 0.5, 0);
+     assert.deepEqual(p, new fabric.Point(-42, -25));
+ 
+-    p = rect.toLocalPoint(point, 0.5, 1);
++    p = rect.normalizePoint(point, 0.5, 1);
+     assert.deepEqual(p, new fabric.Point(-42, -109));
+ 
+-    p = rect.toLocalPoint(point, 0, 0.5);
++    p = rect.normalizePoint(point, 0, 0.5);
+     assert.deepEqual(p, new fabric.Point(-20, -67));
+ 
+-    p = rect.toLocalPoint(point, 0, 0);
++    p = rect.normalizePoint(point, 0, 0);
+     assert.deepEqual(p, new fabric.Point(-20, -25));
+ 
+-    p = rect.toLocalPoint(point, 0, 1);
++    p = rect.normalizePoint(point, 0, 1);
+     assert.deepEqual(p, new fabric.Point(-20, -109));
+ 
+-    p = rect.toLocalPoint(point, 1, 0.5);
++    p = rect.normalizePoint(point, 1, 0.5);
+     assert.deepEqual(p, new fabric.Point(-64, -67));
+ 
+-    p = rect.toLocalPoint(point, 1, 0);
++    p = rect.normalizePoint(point, 1, 0);
+     assert.deepEqual(p, new fabric.Point(-64, -25));
+ 
+-    p = rect.toLocalPoint(point, 1, 1);
++    p = rect.normalizePoint(point, 1, 1);
+     assert.deepEqual(p, new fabric.Point(-64, -109));
+ 
+-    p = rect.toLocalPoint(point);
++    p = rect.normalizePoint(point);
+     assert.deepEqual(p, new fabric.Point(-20, -25));
+   });
+ 
+@@ -529,34 +529,34 @@
+         point = new fabric.Point(15, 20);
+     rect.angle = 35;
+ 
+-    p = rect.toLocalPoint(point, 0.5, 0.5);
++    p = rect.normalizePoint(point, 0.5, 0.5);
+     assert.deepEqual(p, new fabric.Point(-52.72245179455599, -51.00727238020387));
+ 
+-    p = rect.toLocalPoint(point, 0.5, 0);
++    p = rect.normalizePoint(point, 0.5, 0);
+     assert.deepEqual(p, new fabric.Point(-52.72245179455599, -9.007272380203872));
+ 
+-    p = rect.toLocalPoint(point, 0.5, 1);
++    p = rect.normalizePoint(point, 0.5, 1);
+     assert.deepEqual(p, new fabric.Point(-52.72245179455599, -93.00727238020387));
+ 
+-    p = rect.toLocalPoint(point, 0, 0.5);
++    p = rect.normalizePoint(point, 0, 0.5);
+     assert.deepEqual(p, new fabric.Point(-30.722451794555987, -51.00727238020387));
+ 
+-    p = rect.toLocalPoint(point, 0, 0);
++    p = rect.normalizePoint(point, 0, 0);
+     assert.deepEqual(p, new fabric.Point(-30.722451794555987, -9.007272380203872));
+ 
+-    p = rect.toLocalPoint(point, 0, 1);
++    p = rect.normalizePoint(point, 0, 1);
+     assert.deepEqual(p, new fabric.Point(-30.722451794555987, -93.00727238020387));
+ 
+-    p = rect.toLocalPoint(point, 1, 0.5);
++    p = rect.normalizePoint(point, 1, 0.5);
+     assert.deepEqual(p, new fabric.Point(-74.722451794556, -51.00727238020387));
+ 
+-    p = rect.toLocalPoint(point, 1, 0);
++    p = rect.normalizePoint(point, 1, 0);
+     assert.deepEqual(p, new fabric.Point(-74.722451794556, -9.007272380203872));
+ 
+-    p = rect.toLocalPoint(point, 1, 1);
++    p = rect.normalizePoint(point, 1, 1);
+     assert.deepEqual(p, new fabric.Point(-74.722451794556, -93.00727238020387));
+ 
+-    p = rect.toLocalPoint(point);
++    p = rect.normalizePoint(point);
+     assert.deepEqual(p, new fabric.Point(-58.791317146942106, -3.9842049203432026));
+   });
+ 
