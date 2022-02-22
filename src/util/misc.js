@@ -339,7 +339,7 @@
      * @static
      * @memberOf fabric.util
      * @see {fabric.util.transformPointRelativeToCanvas} for transforming relative to canvas
-     * @param {fabric.Object} [sourceObject] object that point currently relates to
+     * @param {fabric.Object} [sourceObject] object that point currently relates to, `null` means point is currently relating to canvas (0,0)
      * @param {fabric.Object} destinationObject object that returned point should relate to
      * @param {'sibling'|'child'} [relationToSource] optional if `sourceObject` is `null`
      * @param {'sibling'|'child'} relationToDestination
@@ -376,7 +376,7 @@
      * @memberOf fabric.util
      * @see {fabric.util.transformPointRelativeToCanvas} for transforming relative to canvas
      * @param {fabric.Point} point
-     * @param {fabric.Object} sourceObject object that point currently relates to
+     * @param {fabric.Object} [sourceObject] object that point currently relates to, `null` means you are currently relating to canvas (0,0)
      * @param {fabric.Object} destinationObject object that returned point should relate to
      * @param {'sibling'|'child'} relationToSource
      * @param {'sibling'|'child'} relationToDestination
