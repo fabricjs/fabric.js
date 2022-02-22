@@ -632,17 +632,17 @@
         skewY: this.skewY,
       }, options || {});
       //  stroke is applied before/after transformations are applied according to `strokeUniform`
-      var preStroke, postStroke, strokeWidth = this.strokeWidth;
+      var preScalingStrokeValue, postScalingStrokeValue, strokeWidth = this.strokeWidth;
       if (this.strokeUniform) {
-        preStroke = 0;
-        postStroke = strokeWidth;
+        preScalingStrokeValue = 0;
+        postScalingStrokeValue = strokeWidth;
       }
       else {
-        preStroke = strokeWidth;
-        postStroke = 0;
+        preScalingStrokeValue = strokeWidth;
+        postScalingStrokeValue = 0;
       }
-      var dimX = this.width + preStroke,
-          dimY = this.height + preStroke,
+      var dimX = this.width + preScalingStrokeValue,
+          dimY = this.height + preScalingStrokeValue,
           finalDimensions,
           noSkew = options.skewX === 0 && options.skewY === 0;
       if (noSkew) {
@@ -653,7 +653,7 @@
         finalDimensions = new fabric.Point(bbox.x, bbox.y);
       }
 
-      return finalDimensions.scalarAddEquals(postStroke);
+      return finalDimensions.scalarAddEquals(postScalingStrokeValue);
     },
 
     /**
