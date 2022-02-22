@@ -726,7 +726,8 @@
        * @private
        */
       _createFillStrokeSVGRect: function (reviver) {
-        if (!this.fill && (!this.stroke || !this.strokeWidth)) {
+        if (!this.fill && 
+          (!this.stroke || this.stroke === 'none' || this.stroke === 'transparent' || !this.strokeWidth)) {
           return '';
         }
         var fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
