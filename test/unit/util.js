@@ -927,6 +927,8 @@
     isCorrectTransformation(obj1, obj2, 'child', 'sibling');
     actual = isCorrectTransformation(obj1, obj2, 'sibling', 'sibling');
     assert.matrixIsEquallEnough(actual, fabric.iMatrix);
+    actual = calcOPTransform(null, obj2, null, 'child');
+    assert.matrixIsEquallEnough(actual, invert(getTransform(obj2, 'child')));
     //  with groups
     obj1.group = new fabric.Object();
     obj2.group = new fabric.Object();
