@@ -73,6 +73,7 @@
       stroke: 'blue',
       strokeWidth: 15,
       strokeUniform: true,
+      strokeDashArray: [2, 2],
       top: 65,
       left: 30,
     });
@@ -88,6 +89,7 @@
       strokeWidth: 15,
       scaleX: -2,
       scaleY: -4,
+      strokeDashArray: [2, 2],
       strokeUniform: true,
       top: 10,
       left: 55,
