@@ -484,7 +484,9 @@
           && this._adjustObjectPosition(this.clipPath, diff);
         if (!newCenter.eq(center)) {
           //  set position
-          this.setPositionByOrigin(newCenter, 'center', 'center');
+          isFirstLayout ?
+            this.setPositionByOrigin(newCenter, this.originX, this.originY) :
+            this.setPositionByOrigin(newCenter, 'center', 'center');
           this.setCoords();
         }
         //  fire layout hook and event
