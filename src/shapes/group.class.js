@@ -743,7 +743,8 @@
        */
       _toSVG: function (reviver) {
         var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-        svgString.push('\t\t', this._createFillStrokeSVGRect(reviver));
+        var fillStroke = this._createFillStrokeSVGRect(reviver);
+        fillStroke && svgString.push('\t\t', fillStroke);
         for (var i = 0, len = this._objects.length; i < len; i++) {
           svgString.push('\t\t', this._objects[i].toSVG(reviver));
         }
@@ -758,7 +759,8 @@
        */
       toClipPathSVG: function (reviver) {
         var svgString = [];
-        svgString.push('\t\t', this._createFillStrokeSVGRect(reviver));
+        var fillStroke = this._createFillStrokeSVGRect(reviver);
+        fillStroke && svgString.push('\t\t', fillStroke);
         for (var i = 0, len = this._objects.length; i < len; i++) {
           svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
         }
