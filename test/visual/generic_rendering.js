@@ -104,6 +104,7 @@
     code: renderStrokeWithNegativeScale,
     golden: 'strokeNegativeScale.png',
     percentage: 0.01,
+    disabled: fabric.isLikelyNode,
     width: 100,
     height: 100,
   });
