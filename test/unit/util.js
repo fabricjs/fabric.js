@@ -868,7 +868,7 @@
    * @param {*} [message] 
    * @param {number} [error] floating point percision, defaults to 10
    */
-  QUnit.assert.matrixIsEquallEnough = function (actual, expected, message, error) {
+  QUnit.assert.matrixIsEqualEnough = function (actual, expected, message, error) {
     var error = Math.pow(10, error ? -error : -10);
     this.pushResult({
       result: actual.every((x, i) => Math.abs(x - expected[i]) < error),
@@ -890,8 +890,8 @@
       var m2 = getTransform(obj2, relation2);
       var actual = calcOPTransform(obj1, obj2, relation1, relation2);
       var expected = multiply(invert(m2), m1);
-      assert.matrixIsEquallEnough(actual, expected, message);
-      assert.matrixIsEquallEnough(multiply(m2, expected), m1, message);
+      assert.matrixIsEqualEnough(actual, expected, message);
+      assert.matrixIsEqualEnough(multiply(m2, expected), m1, message);
       return actual;
     };
     var m1 = [3, 0, 0, 2, 10, 4],
@@ -909,15 +909,15 @@
     applyTransformToObject(obj2, m2);
     actual = calcOPTransform(obj1, obj2, 'child', 'child');
     expected = multiply(invert(obj2.calcTransformMatrix()), obj1.calcTransformMatrix());
-    assert.matrixIsEquallEnough(actual, expected);
-    assert.matrixIsEquallEnough(multiply(getTransform(obj2, 'child'), expected), getTransform(obj1, 'child'));
+    assert.matrixIsEqualEnough(actual, expected);
+    assert.matrixIsEqualEnough(multiply(getTransform(obj2, 'child'), expected), getTransform(obj1, 'child'));
     isCorrectTransformation(obj1, obj2, 'child', 'child');
     isCorrectTransformation(obj1, obj2, 'sibling', 'child');
     isCorrectTransformation(obj1, obj2, 'child', 'sibling');
     actual = isCorrectTransformation(obj1, obj2, 'sibling', 'sibling');
-    assert.matrixIsEquallEnough(actual, fabric.iMatrix);
+    assert.matrixIsEqualEnough(actual, fabric.iMatrix);
     actual = calcOPTransform(null, obj2, null, 'child');
-    assert.matrixIsEquallEnough(actual, invert(getTransform(obj2, 'child')));
+    assert.matrixIsEqualEnough(actual, invert(getTransform(obj2, 'child')));
     //  with groups
     obj1.group = new fabric.Object();
     obj2.group = new fabric.Object();
@@ -931,16 +931,16 @@
     obj2.group.group = obj1;
     actual = isCorrectTransformation(obj1, obj2, 'child', 'child');
     expected = invert(multiply(obj2.group.calcOwnMatrix(), obj2.calcOwnMatrix()));
-    assert.matrixIsEquallEnough(actual, expected);
+    assert.matrixIsEqualEnough(actual, expected);
     actual = isCorrectTransformation(obj1, obj2, 'sibling', 'child');
     expected = invert(multiply(multiply(obj1.calcOwnMatrix(), obj2.group.calcOwnMatrix()), obj2.calcOwnMatrix()));
-    assert.matrixIsEquallEnough(actual, expected);
+    assert.matrixIsEqualEnough(actual, expected);
     actual = isCorrectTransformation(obj1, obj2, 'child', 'sibling');
     expected = invert(obj2.group.calcOwnMatrix());
-    assert.matrixIsEquallEnough(actual, expected);
+    assert.matrixIsEqualEnough(actual, expected);
     actual = isCorrectTransformation(obj1, obj2, 'sibling', 'sibling');
     expected = invert((multiply(obj1.calcOwnMatrix(), obj2.group.calcOwnMatrix())));
-    assert.matrixIsEquallEnough(actual, expected);
+    assert.matrixIsEqualEnough(actual, expected);
   });
 
   QUnit.test('sendPointToPlane', function (assert) {
@@ -1043,10 +1043,10 @@
     obj.group = obj1;
     actual = sendObjectToPlane(obj, obj2, 'child');
     expected = multiply(invert(obj2.calcTransformMatrix()), obj1.calcTransformMatrix());
-    assert.matrixIsEquallEnough(actual, expected);
-    assert.matrixIsEquallEnough(obj.calcOwnMatrix(), multiply(actual, m));
+    assert.matrixIsEqualEnough(actual, expected);
+    assert.matrixIsEqualEnough(obj.calcOwnMatrix(), multiply(actual, m));
     obj.group = obj2;
-    assert.matrixIsEquallEnough(obj.calcTransformMatrix(), multiply(multiply(obj2.calcTransformMatrix(), actual), m));
+    assert.matrixIsEqualEnough(obj.calcTransformMatrix(), multiply(multiply(obj2.calcTransformMatrix(), actual), m));
   });
 
   QUnit.test.only('sendChildToPlane', function (assert) {
@@ -1072,15 +1072,15 @@
     obj.group = obj1;
     actual = sendChildToPlane(obj, obj1, obj2, 'child');
     expected = multiply(invert(obj2.calcTransformMatrix()), obj1.calcTransformMatrix());
-    assert.matrixIsEquallEnough(actual, expected);
+    assert.matrixIsEqualEnough(actual, expected);
     //  reapply and check against `sendObjectToPlane`
     applyTransformToObject(obj, m);
     applyTransformToObject(obj1, m1);
     applyTransformToObject(obj2, m2);
-    assert.matrixIsEquallEnough(actual, sendObjectToPlane(obj, obj2, 'child'));
-    assert.matrixIsEquallEnough(obj.calcOwnMatrix(), multiply(actual, m));
+    assert.matrixIsEqualEnough(actual, sendObjectToPlane(obj, obj2, 'child'));
+    assert.matrixIsEqualEnough(obj.calcOwnMatrix(), multiply(actual, m));
     obj.group = obj2;
-    assert.matrixIsEquallEnough(obj.calcTransformMatrix(), multiply(multiply(obj2.calcTransformMatrix(), actual), m));
+    assert.matrixIsEqualEnough(obj.calcTransformMatrix(), multiply(multiply(obj2.calcTransformMatrix(), actual), m));
   });
 
   QUnit.test('makeBoundingBoxFromPoints', function(assert) {
