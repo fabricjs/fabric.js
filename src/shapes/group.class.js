@@ -654,12 +654,6 @@
             center = this.getRelativeCenterPoint().add(centerMass);
 
         return {
-          left: min.x,
-          top: min.y,
-          right: max.x,
-          bottom: max.y,
-          x: min.x,
-          y: min.y,
           centerX: center.x,
           centerY: center.y,
           width: width,
