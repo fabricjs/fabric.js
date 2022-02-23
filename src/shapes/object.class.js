@@ -1537,12 +1537,9 @@
       }
 
       ctx.save();
-      if (this.strokeUniform && this.group) {
+      if (this.strokeUniform) {
         var scaling = this.getObjectScaling();
         ctx.scale(1 / scaling.x, 1 / scaling.y);
-      }
-      else if (this.strokeUniform) {
-        ctx.scale(1 / this.scaleX, 1 / this.scaleY);
       }
       this._setLineDash(ctx, this.strokeDashArray);
       this._setStrokeStyles(ctx, this);
