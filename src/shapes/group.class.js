@@ -105,7 +105,7 @@
             var t = multiplyTransformMatrices(
               inv,
               object.calcTransformMatrix()
-            )
+            );
             var center = fabric.util.transformPoint(this.getCenterPoint(), t);
             this.enterGroup(object, false);
             object.setPositionByOrigin(center, 'center', 'center');
@@ -470,11 +470,12 @@
           });
           return;
         }
-        this.set({ width: result.width, height: result.height });
         //  handle positioning
         var newCenter = new fabric.Point(result.centerX, result.centerY);
-        var vector = center.subtract(newCenter);
+        var vector = center.subtract(newCenter).add(new fabric.Point(result.correctionX || 0, result.correctionY || 0));
         var diff = fabric.util.transformPoint(vector, fabric.util.invertTransform(this.calcOwnMatrix()), true);
+        //  set dimensions
+        this.set({ width: result.width, height: result.height });
         //  adjust objects to account for new center
         this.forEachObject(function (object) {
           this._adjustObjectPosition(object, diff);
@@ -552,8 +553,8 @@
           else if (!clipPath.absolutePositioned) {
             var center;
             var clipPathRelativeCenter = clipPath.getRelativeCenterPoint(),
-              //  we want the center point to exist in group's containing plane, so we send it upwards
-              clipPathCenter = fabric.util.transformPoint(clipPathRelativeCenter, this.calcOwnMatrix(), true);
+                //  we want the center point to exist in group's containing plane, so we send it upwards
+                clipPathCenter = fabric.util.transformPoint(clipPathRelativeCenter, this.calcOwnMatrix(), true);
             if (context.type === 'initialization') {
               var bbox = this.prepareBoundingBox(layoutDirective, objects, context) || {};
               center = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0);
@@ -596,13 +597,17 @@
           }
           else {
             var bbox = this.getObjectsBoundingBox(objects) || {};
-            return Object.assign(
-              bbox,
-              {
-                width: hasWidth ? this.width : (bbox.width || 0),
-                height: hasHeight ? this.height : (bbox.height || 0),
-              }
-            );
+            var calculatedCenter = new fabric.Point(bbox.centerX, bbox.centerY);
+            var center = this.translateToOriginPoint(calculatedCenter, this.originX, this.originY);
+            var originX = this.resolveOriginX(this.originX), originY = this.resolveOriginY(this.originY);
+            return {
+              centerX: center.x,
+              centerY: center.y,
+              correctionX: hasWidth ? -bbox.width * originX + this.width * originX * 2 : 0,
+              correctionY: hasHeight ? -bbox.height * originY + this.height * originY * 2  : 0,
+              width: hasWidth ? this.width : (bbox.width || 0),
+              height: hasHeight ? this.height : (bbox.height || 0),
+            };
           }
         }
         else if (context.type === 'imperative' && context.context) {
@@ -626,7 +631,7 @@
         if (objects.length === 0) {
           return null;
         }
-        
+
         var objCenter, size, min, max;
         objects.forEach(function (object, i) {
           objCenter = object.getRelativeCenterPoint();
@@ -642,11 +647,11 @@
         });
 
         var width = max.x - min.x,
-          height = max.y - min.y,
-          relativeCenter = min.midPointFrom(max),
-          //  we send `relativeCenter` up to group's containing plane
-          centerMass = fabric.util.transformPoint(relativeCenter, this.calcOwnMatrix(), true),
-          center = this.getRelativeCenterPoint().add(centerMass);
+            height = max.y - min.y,
+            relativeCenter = min.midPointFrom(max),
+            //  we send `relativeCenter` up to group's containing plane
+            centerMass = fabric.util.transformPoint(relativeCenter, this.calcOwnMatrix(), true),
+            center = this.getRelativeCenterPoint().add(centerMass);
 
         return {
           left: min.x,
@@ -726,7 +731,7 @@
        * @private
        */
       _createFillStrokeSVGRect: function (reviver) {
-        if (!this.fill && 
+        if (!this.fill &&
           (!this.stroke || this.stroke === 'none' || this.stroke === 'transparent' || !this.strokeWidth)) {
           return '';
         }
