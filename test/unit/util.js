@@ -989,6 +989,18 @@
     p = sendPointToPlane(point, null, obj2, null, 'sibling');
     t = invert(obj2.group.calcTransformMatrix());
     assert.deepEqual(p, transformPoint(point, t));
+
+    var obj = new fabric.Rect({ left: 20, top: 20, width: 60, height: 60, strokeWidth: 0 });
+    var group = new fabric.Group([obj], { strokeWidth: 0 });
+    var sentPoint = sendPointToPlane(new fabric.Point(50, 50), null, obj, null, 'sibling');
+    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
+    sentPoint = sendPointToPlane(new fabric.Point(50, 50), null, group, null, 'child');
+    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
+    group.scaleX = 2;
+    sentPoint = sendPointToPlane(new fabric.Point(80, 50), null, obj, null, 'sibling');
+    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
+    sentPoint = sendPointToPlane(new fabric.Point(80, 50), null, group, null, 'child');
+    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
   });
 
   QUnit.test('transformPointRelativeToCanvas', function(assert) {
@@ -1043,6 +1055,40 @@
     actual = sendObjectToPlane(obj, obj2, 'child');
     expected = multiply(invert(obj2.calcTransformMatrix()), obj1.calcTransformMatrix());
     assert.matrixIsEquallEnough(actual, expected);
+    assert.matrixIsEquallEnough(obj.calcOwnMatrix(), multiply(actual, m));
+    obj.group = obj2;
+    assert.matrixIsEquallEnough(obj.calcTransformMatrix(), multiply(multiply(obj2.calcTransformMatrix(), actual), m));
+  });
+
+  QUnit.test.only('sendChildToPlane', function (assert) {
+    assert.ok(typeof fabric.util.sendChildToPlane === 'function');
+    var m = [6, 5, 4, 3, 2, 1],
+      m1 = [3, 0, 0, 2, 10, 4],
+      m2 = [1, 2, 3, 4, 5, 6],
+      actual, expected,
+      obj1 = new fabric.Object(),
+      obj2 = new fabric.Object(),
+      obj = new fabric.Object(),
+      sendChildToPlane = fabric.util.sendChildToPlane,
+      sendObjectToPlane = fabric.util.sendObjectToPlane,
+      applyTransformToObject = fabric.util.applyTransformToObject,
+      invert = fabric.util.invertTransform,
+      multiply = fabric.util.multiplyTransformMatrices;
+    //  silence group check
+    obj1.isOnACache = () => false;
+
+    applyTransformToObject(obj, m);
+    applyTransformToObject(obj1, m1);
+    applyTransformToObject(obj2, m2);
+    obj.group = obj1;
+    actual = sendChildToPlane(obj, obj1, obj2, 'child');
+    expected = multiply(invert(obj2.calcTransformMatrix()), obj1.calcTransformMatrix());
+    assert.matrixIsEquallEnough(actual, expected);
+    //  reapply and check against `sendObjectToPlane`
+    applyTransformToObject(obj, m);
+    applyTransformToObject(obj1, m1);
+    applyTransformToObject(obj2, m2);
+    assert.matrixIsEquallEnough(actual, sendObjectToPlane(obj, obj2, 'child'));
     assert.matrixIsEquallEnough(obj.calcOwnMatrix(), multiply(actual, m));
     obj.group = obj2;
     assert.matrixIsEquallEnough(obj.calcTransformMatrix(), multiply(multiply(obj2.calcTransformMatrix(), actual), m));
