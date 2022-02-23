@@ -5,6 +5,10 @@
       pow = Math.pow,
       PiBy180 = Math.PI / 180,
       PiBy2 = Math.PI / 2;
+      
+  /**
+   * @typedef {[number,number,number,number,number,number]} Matrix
+   */
 
   /**
    * @namespace fabric.util
@@ -288,92 +292,14 @@
     },
 
     /**
-     * Returns the transform matrix according to `relationToObject`.\
-     * The returned matrix is relative to the entire object plane spread by a canvas,
-     * meaning it doesn't account for canvas viewport transform.
-     *
-     * `child` relation means `point` exists in the coordinate plane created by the object.
-     * In other words, point is measured acoording to object's center point
-     * meaning that if `point` is equal to (0,0) it is positioned at object's center.\
-     * `sibling` relation means `point` exists in the same coordinate plane as object.
-     * In other words they both relate to the same (0,0) and agree on every point.
-     *
-     * @static
-     * @memberOf fabric.util
-     * @param {fabric.Object} object
-     * @param {'sibling'|'child'} relationToObject
-     * @returns {number[]} plane matrix relative to the coordinate plane created by a canvas
-     */
-    getTransformMatrixByObject: function (object, relationToObject) {
-      if (relationToObject !== 'child' && relationToObject !== 'sibling') {
-        throw new Error('fabric.js: recieved bad argument ' + relationToObject);
-      }
-      return relationToObject === 'child' ?
-        object.calcTransformMatrix() :
-        object.group ?
-          object.group.calcTransformMatrix() :
-          fabric.iMatrix.concat();
-    },
-
-
-    /**
-     * Calculate the transform matrix needed to apply to target (object/point/whatever)
-     * in order for it to be sent to the destination coordinate plane **without** being changed from the canvas/viewer's perspective.
-     * In other words, target exists on the source plane and we need it to be moved to the destination plane
-     * but we want it to remain unchanged from our perspective.
-     * This method will return the transformation that needs to be added to target (pre-transform).
-     *
-     * `child` relation means target exists in the coordinate plane created by the object we relate to.
-     * In other words:
-     * - target is measured acoording to object's center point
-     * - target is drawn by object in the plane object creates
-     * - target is transformed by object but is unaware of it.
-     * - if target is positioned at (0,0) it is positioned at object's center.
-     *
-     * `sibling` relation means target exists in the same coordinate plane as the object we relate to.
-     * In other words they both relate to the same (0,0), agree on every point and are drawn in the same transformed plane.
-     *
-     * @static
-     * @memberOf fabric.util
-     * @see {fabric.util.transformPointRelativeToCanvas} for transforming relative to canvas
-     * @param {fabric.Object} [sourceObject] object that point currently relates to, `null` means point is currently relating to canvas (0,0)
-     * @param {fabric.Object} destinationObject object that returned point should relate to
-     * @param {'sibling'|'child'} [relationToSource] optional if `sourceObject` is `null`
-     * @param {'sibling'|'child'} relationToDestination
-     * @returns {fabric.Point} transformed point
-     */
-    calcTransformationBetweenObjectPlanes: function (
-      sourceObject, destinationObject,
-      relationToSource, relationToDestination
-    ) {
-      var from = sourceObject ?
-            fabric.util.getTransformMatrixByObject(sourceObject, relationToSource) :
-            fabric.iMatrix.concat(),
-          to = fabric.util.getTransformMatrixByObject(destinationObject, relationToDestination);
-      //  actually we are looking for the transformation between the destination plane to the source plane
-      //  because the object will exist on the destination plane and we want it to seem unchanged by it, we reverse the destination matrix
-      //  this is de facto a linear mapping (which can help explain why the order is reversed if the explanation didn't)
-      //  think of how the target will be transformed once it's on the destination plane
-      //  first it reverses the effect of the plane and then it transforms itself with the source transformation, achieving what we wanted
-      return fabric.util.multiplyTransformMatrices(fabric.util.invertTransform(to), from);
-    },
-
-    /**
      * Sends a point from the source coordinate plane to the destination coordinate plane.\
      * From the canvas/viewer's perspective the point remains unchanged.
-     *
-     * `child` relation means `point` exists in the coordinate plane created by the object we relate to.
-     * In other words, point is measured acoording to object's center point
-     * meaning that if `point` is equal to (0,0) it is positioned at object's center.
-     *
-     * `sibling` relation means `point` exists in the same coordinate plane as the object we relate to.
-     * In other words they both relate to the same (0,0) and agree on every point.
      * 
      * @example <caption>Send point from canvas plane to group plane</caption>
      * var obj = new fabric.Rect({ left: 20, top: 20, width: 60, height: 60, strokeWidth: 0 });
-     * var group = new fabric.Group([obj]);
-     * var sentPoint1 = fabric.util.sendPointToPlane(new fabric.Point(50, 50), null, obj, null, 'sibling');
-     * var sentPoint2 = fabric.util.sendPointToPlane(new fabric.Point(50, 50), null, group, null, 'child');
+     * var group = new fabric.Group([obj], { strokeWidth: 0 });
+     * var sentPoint1 = fabric.util.sendPointToPlane(new fabric.Point(50, 50), null, obj.calcPlaneMatrix());
+     * var sentPoint2 = fabric.util.sendPointToPlane(new fabric.Point(50, 50), fabric.iMatrix, group.calcTransformMatrix());
      * console.log(sentPoint1) //  prints (0,0)
      * console.log(sentPoint2) //  prints (0,0)
      *
@@ -381,21 +307,15 @@
      * @memberOf fabric.util
      * @see {fabric.util.transformPointRelativeToCanvas} for transforming relative to canvas
      * @param {fabric.Point} point
-     * @param {fabric.Object} [sourceObject] object that point currently relates to, `null` means you are currently relating to canvas (0,0)
-     * @param {fabric.Object} destinationObject object that returned point should relate to
-     * @param {'sibling'|'child'} relationToSource
-     * @param {'sibling'|'child'} relationToDestination
+     * @param {Matrix} [from] plane matrix containing object. Passing `null` is equivalent to passing the identity matrix, which means `point` exists in the canvas coordinate plane.
+     * @param {Matrix} [to] destination plane matrix to contain object. Passing `null` means `point` should be sent to the canvas coordinate plane.
      * @returns {fabric.Point} transformed point
      */
-    sendPointToPlane: function (
-      point,
-      sourceObject, destinationObject,
-      relationToSource, relationToDestination
-    ) {
-      var t = fabric.util.calcTransformationBetweenObjectPlanes(
-        sourceObject, destinationObject,
-        relationToSource, relationToDestination
-      );
+    sendPointToPlane: function (point, from, to) {
+      //  we are actually looking for the transformation from the destination plane to the source plane (which is a linear mapping)
+      //  the object will exist on the destination plane and we want it to seem unchanged by it so we reverse the destination matrix (to) and then apply the source matrix (from)
+      var inv = fabric.util.invertTransform(to || fabric.iMatrix);
+      var t = fabric.util.multiplyTransformMatrices(inv, from || fabric.iMatrix);
       return fabric.util.transformPoint(point, t);
     },
 
@@ -1174,63 +1094,40 @@
     },
 
     /**
+     * 
      * A util that abstracts applying transform to objects.\
      * Sends `object` to the destination coordinate plane by applying the relevant transformations.\
-     * Changes the space/plane where `object` is drawn while **preserving** it's appearance and position from the canvas/viewer's perspective.
-     *
-     * `child` relation means `object` should exist in the coordinate plane created by `destinationObject`.
-     * In other words, `object` will be drawn by `destinationObject` onto the plane it creates.\
-     * `sibling` relation means `object` should exist in the same plane as `destinationObject`.
-     * In other words, they are both drawn together in the same transformed plane.
-     * 
-     * **CAUTION**
-     * Unfortunately a `clipPath` cannot be used with this method because it is unaware of it's parent, so we can't get it's transform matrix.
-     * Use {@link fabric.util.sendChildToPlane} instead.
-     * @todo support clipPath
-     *
-     * @static
-     * @memberof fabric.util
-     * @param {fabric.Object} object
-     * @param {fabric.Object} destinationObject
-     * @param {'sibling'|'child'} relationToDestination
-     * @returns {number[]} the transform matrix that was applied to `object`
-     */
-    sendObjectToPlane: function (object, destinationObject, relationToDestination) {
-      var t = fabric.util.calcTransformationBetweenObjectPlanes(
-        object, destinationObject,
-        'sibling', relationToDestination
-      );
-      fabric.util.applyTransformToObject(
-        object,
-        fabric.util.multiplyTransformMatrices(t, object.calcOwnMatrix())
-      );
-      return t;
-    },
-
-    /**
-     * 
-     * Same as {@link fabric.util.sendObjectToPlane}, safe to use with any fabric.Object (including `clipPath`)
+     * Changes the space/plane where `object` is drawn.\
+     * From the canvas/viewer's perspective `object` remains unchanged.
      * 
      * @example <caption>Move clip path from one object to another while preserving it's appearance as viewed by canvas/viewer</caption>
      * var clipPath = new fabric.Circle({ radius: 50 });
      * obj.clipPath = clipPath;
-     * fabric.util.sendChildToPlane(clipPath, obj, obj2, 'child');
+     * // render
+     * fabric.util.sendObjectToPlane(clipPath, obj.calcTransformMatrix(), obj2.calcTransformMatrix());
      * obj.clipPath = undefined;
      * obj2.clipPath = clipPath;
+     * // render, clipPath seems unchanged from the eyes of the viewer
+     * 
+     * @example <caption>Clip an object's clip path with an existing object</caption>
+     * // obj, existingObj;
+     * var clipPath = new fabric.Circle({ radius: 50 });
+     * obj.clipPath = clipPath;
+     * fabric.util.sendObjectToPlane(existingObj, existingObj.calcPlaneMatrix(), clipPath.calcTransformMatrix());
+     * clipPath.clipPath = existingObj;
      * 
      * @static
      * @memberof fabric.util
      * @param {fabric.Object} object
-     * @param {fabric.Object} [parent] pass `null` in case object is a child of canvas
-     * @param {fabric.Object} destinationObject
-     * @param {'sibling'|'child'} relationToDestination
-     * @returns {number[]} the transform matrix that was applied to `object`
+     * @param {Matrix} [from] plane matrix containing object. Passing `null` is equivalent to passing the identity matrix, which means `object` is a direct child of canvas.
+     * @param {Matrix} [to] destination plane matrix to contain object. Passing `null` means `object` should be sent to the canvas coordinate plane.
+     * @returns {Matrix} the transform matrix that was applied to `object`
      */
-    sendChildToPlane: function (object, parent, destinationObject, relationToDestination) {
-      var t = fabric.util.calcTransformationBetweenObjectPlanes(
-        parent, destinationObject,
-        'child', relationToDestination
-      );
+    sendObjectToPlane: function (object, from, to) {
+      //  we are actually looking for the transformation from the destination plane to the source plane (which is a linear mapping)
+      //  the object will exist on the destination plane and we want it to seem unchanged by it so we reverse the destination matrix (to) and then apply the source matrix (from)
+      var inv = fabric.util.invertTransform(to || fabric.iMatrix);
+      var t = fabric.util.multiplyTransformMatrices(inv, from || fabric.iMatrix);
       fabric.util.applyTransformToObject(
         object,
         fabric.util.multiplyTransformMatrices(t, object.calcOwnMatrix())

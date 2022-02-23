@@ -600,6 +600,16 @@
       cache.value = util.composeMatrix(options);
       return cache.value;
     },
+    
+    /**
+     * Returns the transform matrix of the coordinate plane that contains object.
+     * @returns {Array} plane matrix relative to the coordinate plane created by a canvas
+     */
+    calcPlaneMatrix: function () {
+      return this.group ?
+        this.group.calcTransformMatrix() :
+        fabric.iMatrix.concat();
+    },
 
     /*
      * Calculate object dimensions from its properties
