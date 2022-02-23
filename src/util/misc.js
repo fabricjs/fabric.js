@@ -1113,7 +1113,7 @@
      * let obj, existingObj;
      * let clipPath = new fabric.Circle({ radius: 50 });
      * obj.clipPath = clipPath;
-     * let transformTo = fabric.util.multiplyTransformMatrices(obj.calcTransformmatrix(), clipPath.calcTransformMatrix());
+     * let transformTo = fabric.util.multiplyTransformMatrices(obj.calcTransformMatrix(), clipPath.calcTransformMatrix());
      * fabric.util.sendObjectToPlane(existingObj, existingObj.group?.calcTransformMatrix(), transformTo);
      * clipPath.clipPath = existingObj;
      *
