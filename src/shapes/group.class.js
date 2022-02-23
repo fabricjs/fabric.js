@@ -600,11 +600,16 @@
             var calculatedCenter = new fabric.Point(bbox.centerX, bbox.centerY);
             var center = this.translateToOriginPoint(calculatedCenter, this.originX, this.originY);
             var originX = this.resolveOriginX(this.originX), originY = this.resolveOriginY(this.originY);
+            var offset = new fabric.Point(hasX ? -center.x + this.left : 0, hasY ? -center.y + this.top : 0);
+            var correction = fabric.util.transformPoint(new fabric.Point(
+              hasWidth ? -bbox.width * originX + this.width * originX * 2 : 0,
+              hasHeight ? -bbox.height * originY + this.height * originY * 2 : 0
+            ), this.calcOwnMatrix(), true).add(offset);
             return {
               centerX: hasX ? this.left : center.x,
               centerY: hasY ? this.top : center.y,
-              correctionX: (hasWidth ? -bbox.width * originX + this.width * originX * 2 : 0) + (hasX ? -center.x + this.left : 0),
-              correctionY: (hasHeight ? -bbox.height * originY + this.height * originY * 2 : 0) + (hasY ? -center.y + this.top : 0),
+              correctionX: correction.x,
+              correctionY: correction.y,
               width: hasWidth ? this.width : (bbox.width || 0),
               height: hasHeight ? this.height : (bbox.height || 0),
             };
