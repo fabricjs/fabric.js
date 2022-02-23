@@ -597,7 +597,7 @@
           }
           else {
             var bbox = this.getObjectsBoundingBox(objects) || {};
-            var calculatedCenter = new fabric.Point(bbox.centerX, bbox.centerY);
+            var calculatedCenter = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0);
             var center = this.translateToOriginPoint(calculatedCenter, this.originX, this.originY);
             var originX = this.resolveOriginX(this.originX), originY = this.resolveOriginY(this.originY);
             var offset = new fabric.Point(hasX ? -center.x + this.left : 0, hasY ? -center.y + this.top : 0);
