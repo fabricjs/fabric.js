@@ -601,10 +601,10 @@
             var center = this.translateToOriginPoint(calculatedCenter, this.originX, this.originY);
             var originX = this.resolveOriginX(this.originX), originY = this.resolveOriginY(this.originY);
             return {
-              centerX: center.x,
-              centerY: center.y,
-              correctionX: hasWidth ? -bbox.width * originX + this.width * originX * 2 : 0,
-              correctionY: hasHeight ? -bbox.height * originY + this.height * originY * 2  : 0,
+              centerX: hasX ? this.left : center.x,
+              centerY: hasY ? this.top : center.y,
+              correctionX: (hasWidth ? -bbox.width * originX + this.width * originX * 2 : 0) + (hasX ? -center.x + this.left : 0),
+              correctionY: (hasHeight ? -bbox.height * originY + this.height * originY * 2 : 0) + (hasY ? -center.y + this.top : 0),
               width: hasWidth ? this.width : (bbox.width || 0),
               height: hasHeight ? this.height : (bbox.height || 0),
             };
