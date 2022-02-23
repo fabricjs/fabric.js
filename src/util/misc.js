@@ -300,8 +300,7 @@
      * var group = new fabric.Group([obj], { strokeWidth: 0 });
      * var sentPoint1 = fabric.util.sendPointToPlane(new fabric.Point(50, 50), null, obj.calcPlaneMatrix());
      * var sentPoint2 = fabric.util.sendPointToPlane(new fabric.Point(50, 50), fabric.iMatrix, group.calcTransformMatrix());
-     * console.log(sentPoint1) //  prints (0,0)
-     * console.log(sentPoint2) //  prints (0,0)
+     * console.log(sentPoint1, sentPoint2) //  both points print (0,0) which is the center of group
      *
      * @static
      * @memberOf fabric.util
