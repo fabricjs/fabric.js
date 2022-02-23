@@ -603,6 +603,12 @@
     
     /**
      * Returns the transform matrix of the coordinate plane that contains object.
+     * 
+     * **WARNING**\
+     * Do **NOT** use with clip paths. 
+     * A clip path object isn't aware of it's containing plane (parent).
+     * This means this method will return the identity matrix, which is **WRONG**
+     * 
      * @returns {Array} plane matrix relative to the coordinate plane created by a canvas
      */
     calcPlaneMatrix: function () {
