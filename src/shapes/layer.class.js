@@ -169,7 +169,7 @@
    */
   fabric.Layer.fromObject = function (object) {
     var objects = object.objects || [],
-      options = fabric.util.object.clone(object, true);
+        options = fabric.util.object.clone(object, true);
     delete options.objects;
     return Promise.all([
       fabric.util.enlivenObjects(objects),
