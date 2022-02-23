@@ -1107,7 +1107,7 @@
      * fabric.util.sendObjectToPlane(clipPath, obj.calcTransformMatrix(), obj2.calcTransformMatrix());
      * obj.clipPath = undefined;
      * obj2.clipPath = clipPath;
-     * // render, clipPath seems unchanged from the eyes of the viewer
+     * // render, clipPath seems unchanged from the eyes of the viewer but now clip obj2
      *
      * @example <caption>Clip an object's clip path with an existing object</caption>
      * let obj, existingObj;
