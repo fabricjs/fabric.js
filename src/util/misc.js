@@ -371,6 +371,14 @@
      *
      * `sibling` relation means `point` exists in the same coordinate plane as the object we relate to.
      * In other words they both relate to the same (0,0) and agree on every point.
+     * 
+     * @example <caption>Send point from canvas plane to group plane</caption>
+     * var obj = new fabric.Rect({ left: 20, top: 20, width: 60, height: 60, strokeWidth: 0 });
+     * var group = new fabric.Group([obj]);
+     * var sentPoint1 = fabric.util.sendPointToPlane(new fabric.Point(50, 50), null, obj, null, 'sibling');
+     * var sentPoint2 = fabric.util.sendPointToPlane(new fabric.Point(50, 50), null, group, null, 'child');
+     * console.log(sentPoint1) //  prints (0,0)
+     * console.log(sentPoint2) //  prints (0,0)
      *
      * @static
      * @memberOf fabric.util
@@ -1302,6 +1310,11 @@
      * In other words, `object` will be drawn by `destinationObject` onto the plane it creates.\
      * `sibling` relation means `object` should exist in the same plane as `destinationObject`.
      * In other words, they are both drawn together in the same transformed plane.
+     * 
+     * **CAUTION**
+     * Unfortunately a `clipPath` cannot be used with this method because it is unaware of it's parent, so we can't get it's transform matrix.
+     * Use {@link fabric.util.sendChildToPlane} instead.
+     * @todo support clipPath
      *
      * @static
      * @memberof fabric.util
@@ -1314,6 +1327,37 @@
       var t = fabric.util.calcTransformationBetweenObjectPlanes(
         object, destinationObject,
         'sibling', relationToDestination
+      );
+      fabric.util.applyTransformToObject(
+        object,
+        fabric.util.multiplyTransformMatrices(t, object.calcOwnMatrix())
+      );
+      return t;
+    },
+
+    /**
+     * 
+     * Same as {@link fabric.util.sendObjectToPlane}, safe to use with any fabric.Object (including `clipPath`)
+     * 
+     * @example <caption>Move clip path from one object to another while preserving it's appearance as viewed by canvas/viewer</caption>
+     * var clipPath = new fabric.Circle({ radius: 50 });
+     * obj.clipPath = clipPath;
+     * fabric.util.sendChildToPlane(clipPath, obj, obj2, 'child');
+     * obj.clipPath = undefined;
+     * obj2.clipPath = clipPath;
+     * 
+     * @static
+     * @memberof fabric.util
+     * @param {fabric.Object} object
+     * @param {fabric.Object} parent
+     * @param {fabric.Object} destinationObject
+     * @param {'sibling'|'child'} relationToDestination
+     * @returns {number[]} the transform matrix that was applied to `object`
+     */
+    sendChildToPlane: function (object, parent, destinationObject, relationToDestination) {
+      var t = fabric.util.calcTransformationBetweenObjectPlanes(
+        parent, destinationObject,
+        'child', relationToDestination
       );
       fabric.util.applyTransformToObject(
         object,
