@@ -142,7 +142,6 @@
      * Please check video element events for seeking.
      * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | String} element Image element
      * @param {Object} [options] Options object
-     * @param {function} [callback] callback function to call after eventual filters applied.
      * @return {fabric.Image} thisArg
      */
     initialize: function(element, options) {
@@ -202,7 +201,8 @@
     /**
      * Delete textures, reference to elements and eventually JSDOM cleanup
      */
-    dispose: function() {
+    dispose: function () {
+      this.callSuper('dispose');
       this.removeTexture(this.cacheKey);
       this.removeTexture(this.cacheKey + '_filtered');
       this._cacheContext = undefined;
@@ -369,20 +369,18 @@
     /**
      * Sets source of an image
      * @param {String} src Source string (URL)
-     * @param {Function} [callback] Callback is invoked when image has been loaded (and all filters have been applied)
      * @param {Object} [options] Options object
      * @param {String} [options.crossOrigin] crossOrigin value (one of "", "anonymous", "use-credentials")
      * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
-     * @return {fabric.Image} thisArg
-     * @chainable
+     * @return {Promise<fabric.Image>} thisArg
      */
-    setSrc: function(src, callback, options) {
-      fabric.util.loadImage(src, function(img, isError) {
-        this.setElement(img, options);
-        this._setWidthHeight();
-        callback && callback(this, isError);
-      }, this, options && options.crossOrigin);
-      return this;
+    setSrc: function(src, options) {
+      var _this = this;
+      return fabric.util.loadImage(src, options).then(function(img) {
+        _this.setElement(img, options);
+        _this._setWidthHeight();
+        return _this;
+      });
     },
 
     /**
@@ -397,8 +395,8 @@
       var filter = this.resizeFilter,
           minimumScale = this.minimumScaleTrigger,
           objectScale = this.getTotalObjectScaling(),
-          scaleX = objectScale.scaleX,
-          scaleY = objectScale.scaleY,
+          scaleX = objectScale.x,
+          scaleY = objectScale.y,
           elementToFilter = this._filteredEl || this._originalElement;
       if (this.group) {
         this.set('dirty', true);
@@ -554,7 +552,7 @@
      */
     _needsResize: function() {
       var scale = this.getTotalObjectScaling();
-      return (scale.scaleX !== this._lastScaleX || scale.scaleY !== this._lastScaleY);
+      return (scale.x !== this._lastScaleX || scale.y !== this._lastScaleY);
     },
 
     /**
@@ -584,22 +582,6 @@
       options || (options = { });
       this.setOptions(options);
       this._setWidthHeight(options);
-    },
-
-    /**
-     * @private
-     * @param {Array} filters to be initialized
-     * @param {Function} callback Callback to invoke when all fabric.Image.filters instances are created
-     */
-    _initFilters: function(filters, callback) {
-      if (filters && filters.length) {
-        fabric.util.enlivenObjects(filters, function(enlivenedObjects) {
-          callback && callback(enlivenedObjects);
-        }, 'fabric.Image.filters');
-      }
-      else {
-        callback && callback();
-      }
     },
 
     /**
@@ -699,40 +681,39 @@
    * Creates an instance of fabric.Image from its object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @param {Function} callback Callback to invoke when an image instance is created
+   * @returns {Promise<fabric.Image>}
    */
-  fabric.Image.fromObject = function(_object, callback) {
-    var object = fabric.util.object.clone(_object);
-    fabric.util.loadImage(object.src, function(img, isError) {
-      if (isError) {
-        callback && callback(null, true);
-        return;
-      }
-      fabric.Image.prototype._initFilters.call(object, object.filters, function(filters) {
-        object.filters = filters || [];
-        fabric.Image.prototype._initFilters.call(object, [object.resizeFilter], function(resizeFilters) {
-          object.resizeFilter = resizeFilters[0];
-          fabric.util.enlivenObjects([object.clipPath], function(enlivedProps) {
-            object.clipPath = enlivedProps[0];
-            var image = new fabric.Image(img, object);
-            callback(image, false);
-          });
-        });
+  fabric.Image.fromObject = function(_object) {
+    var object = fabric.util.object.clone(_object),
+        filters = object.filters,
+        resizeFilter = object.resizeFilter;
+    // the generic enliving will fail on filters for now
+    delete object.resizeFilter;
+    delete object.filters;
+    return Promise.all([
+      fabric.util.loadImage(object.src, { crossOrigin: _object.crossOrigin }),
+      filters && fabric.util.enlivenObjects(filters,  'fabric.Image.filters'),
+      resizeFilter && fabric.util.enlivenObjects([resizeFilter],  'fabric.Image.filters'),
+      fabric.util.enlivenObjectEnlivables(object),
+    ])
+      .then(function(imgAndFilters) {
+        object.filters = imgAndFilters[1] || [];
+        object.resizeFilter = imgAndFilters[2] && imgAndFilters[2][0];
+        return new fabric.Image(imgAndFilters[0], Object.assign(object, imgAndFilters[3]));
       });
-    }, null, object.crossOrigin);
   };
 
   /**
    * Creates an instance of fabric.Image from an URL string
    * @static
    * @param {String} url URL to create an image from
-   * @param {Function} [callback] Callback to invoke when image is created (newly created image is passed as a first argument). Second argument is a boolean indicating if an error occurred or not.
    * @param {Object} [imgOptions] Options object
+   * @returns {Promise<fabric.Image>}
    */
-  fabric.Image.fromURL = function(url, callback, imgOptions) {
-    fabric.util.loadImage(url, function(img, isError) {
-      callback && callback(new fabric.Image(img, imgOptions), isError);
-    }, null, imgOptions && imgOptions.crossOrigin);
+  fabric.Image.fromURL = function(url, imgOptions) {
+    return fabric.util.loadImage(url, imgOptions || {}).then(function(img) {
+      return new fabric.Image(img, imgOptions);
+    });
   };
 
   /* _FROM_SVG_START_ */
@@ -756,8 +737,10 @@
    */
   fabric.Image.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
-    fabric.Image.fromURL(parsedAttributes['xlink:href'], callback,
-      extend((options ? fabric.util.object.clone(options) : { }), parsedAttributes));
+    fabric.Image.fromURL(parsedAttributes['xlink:href'], Object.assign({ }, options || { }, parsedAttributes))
+      .then(function(fabricImage) {
+        callback(fabricImage);
+      });
   };
   /* _FROM_SVG_END_ */
 

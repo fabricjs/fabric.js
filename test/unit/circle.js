@@ -116,7 +116,7 @@
       globalCompositeOperation: 'source-over',
       radius:                   0,
       startAngle:               0,
-      endAngle:                 2 * Math.PI,
+      endAngle:                 360,
       skewX:                    0,
       skewY:                    0,
       strokeUniform:            false
@@ -146,7 +146,7 @@
   });
 
   QUnit.test('toSVG with half circle', function(assert) {
-    var circle = new fabric.Circle({ width: 100, height: 100, radius: 10, endAngle: Math.PI });
+    var circle = new fabric.Circle({ width: 100, height: 100, radius: 10, endAngle: fabric.util.radiansToDegrees(Math.PI) });
     var svg = circle.toSVG();
     var svgClipPath = circle.toClipPathSVG();
     assert.equal(svg, '<g transform=\"matrix(1 0 0 1 10.5 10.5)\"  >\n<path d=\"M 10 0 A 10 10 0 0 1 -10 0\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"   />\n</g>\n');
@@ -231,7 +231,7 @@
 
     fabric.Circle.fromObject({
       left: left, top: top, radius: radius, fill: fill
-    }, function(circle) {
+    }).then(function(circle) {
       assert.ok(circle instanceof fabric.Circle);
 
       assert.equal(circle.get('left'), left);
@@ -240,7 +240,7 @@
       assert.equal(circle.get('fill'), fill);
 
       var expected = circle.toObject();
-      fabric.Circle.fromObject(expected, function(actual) {
+      fabric.Circle.fromObject(expected).then(function(actual) {
         assert.deepEqual(actual.toObject(), expected);
         done();
       });
@@ -248,15 +248,17 @@
   });
 
   QUnit.test('cloning and radius, width, height', function(assert) {
+    var done = assert.async();
     var circle = new fabric.Circle({ radius: 10, strokeWidth: 0});
     circle.scale(2);
 
-    circle.clone(function(clone) {
+    circle.clone().then(function(clone) {
       assert.equal(clone.width, 20);
       assert.equal(clone.getScaledWidth(), 40);
       assert.equal(clone.height, 20);
       assert.equal(clone.getScaledHeight(), 40);
       assert.equal(clone.radius, 10);
+      done();
     });
   });
 })();
