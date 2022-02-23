@@ -495,8 +495,8 @@
     /**
      * Returns true if object is transparent at a certain location
      * @param {fabric.Object} target Object to check
-     * @param {Number} x Left coordinate as measure from window (0,0)
-     * @param {Number} y Top coordinate as measure from window (0,0)
+     * @param {Number} x Left coordinate
+     * @param {Number} y Top coordinate
      * @return {Boolean}
      */
     isTargetTransparent: function (target, x, y) {
