@@ -1221,7 +1221,7 @@
      * @static
      * @memberof fabric.util
      * @param {fabric.Object} object
-     * @param {fabric.Object} parent
+     * @param {fabric.Object} [parent] pass `null` in case object is a child of canvas
      * @param {fabric.Object} destinationObject
      * @param {'sibling'|'child'} relationToDestination
      * @returns {number[]} the transform matrix that was applied to `object`

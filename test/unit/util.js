@@ -1049,7 +1049,7 @@
     assert.matrixIsEqualEnough(obj.calcTransformMatrix(), multiply(multiply(obj2.calcTransformMatrix(), actual), m));
   });
 
-  QUnit.test.only('sendChildToPlane', function (assert) {
+  QUnit.test('sendChildToPlane', function (assert) {
     assert.ok(typeof fabric.util.sendChildToPlane === 'function');
     var m = [6, 5, 4, 3, 2, 1],
       m1 = [3, 0, 0, 2, 10, 4],
@@ -1057,6 +1057,7 @@
       actual, expected,
       obj1 = new fabric.Object(),
       obj2 = new fabric.Object(),
+      obj3 = new fabric.Object(),
       obj = new fabric.Object(),
       sendChildToPlane = fabric.util.sendChildToPlane,
       sendObjectToPlane = fabric.util.sendObjectToPlane,
@@ -1081,6 +1082,8 @@
     assert.matrixIsEqualEnough(obj.calcOwnMatrix(), multiply(actual, m));
     obj.group = obj2;
     assert.matrixIsEqualEnough(obj.calcTransformMatrix(), multiply(multiply(obj2.calcTransformMatrix(), actual), m));
+    actual = sendChildToPlane(obj2, null, obj3, 'sibling');
+    assert.deepEqual(actual, fabric.iMatrix);
   });
 
   QUnit.test('makeBoundingBoxFromPoints', function(assert) {
