@@ -5,7 +5,7 @@
       pow = Math.pow,
       PiBy180 = Math.PI / 180,
       PiBy2 = Math.PI / 2;
-      
+
   /**
    * @typedef {[number,number,number,number,number,number]} Matrix
    */
@@ -294,7 +294,7 @@
     /**
      * Sends a point from the source coordinate plane to the destination coordinate plane.\
      * From the canvas/viewer's perspective the point remains unchanged.
-     * 
+     *
      * @example <caption>Send point from canvas plane to group plane</caption>
      * var obj = new fabric.Rect({ left: 20, top: 20, width: 60, height: 60, strokeWidth: 0 });
      * var group = new fabric.Group([obj], { strokeWidth: 0 });
@@ -1093,12 +1093,12 @@
     },
 
     /**
-     * 
+     *
      * A util that abstracts applying transform to objects.\
      * Sends `object` to the destination coordinate plane by applying the relevant transformations.\
      * Changes the space/plane where `object` is drawn.\
      * From the canvas/viewer's perspective `object` remains unchanged.
-     * 
+     *
      * @example <caption>Move clip path from one object to another while preserving it's appearance as viewed by canvas/viewer</caption>
      * var clipPath = new fabric.Circle({ radius: 50 });
      * obj.clipPath = clipPath;
@@ -1107,14 +1107,14 @@
      * obj.clipPath = undefined;
      * obj2.clipPath = clipPath;
      * // render, clipPath seems unchanged from the eyes of the viewer
-     * 
+     *
      * @example <caption>Clip an object's clip path with an existing object</caption>
      * // obj, existingObj;
      * var clipPath = new fabric.Circle({ radius: 50 });
      * obj.clipPath = clipPath;
      * fabric.util.sendObjectToPlane(existingObj, existingObj.calcPlaneMatrix(), clipPath.calcTransformMatrix());
      * clipPath.clipPath = existingObj;
-     * 
+     *
      * @static
      * @memberof fabric.util
      * @param {fabric.Object} object
