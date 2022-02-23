@@ -402,29 +402,6 @@
     assert.ok(!cObj.isOnScreen(), 'object is completely out of viewport');
   });
 
-  QUnit.test('calcPlaneMatrix', function (assert) {
-    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 });
-    var group = new fabric.Object({ width: 10, height: 15, strokeWidth: 0, scaleX: 4, scaleY: 2 });
-    assert.ok(typeof cObj.calcPlaneMatrix === 'function', 'calcPlaneMatrix should exist');
-    cObj.group = group;
-    cObj.top = 0;
-    cObj.left = 0;
-    cObj.scaleX = 2;
-    cObj.scaleY = 3;
-    group.scaleX = 3;
-    assert.deepEqual(cObj.calcPlaneMatrix(), [3, 0, 0, 2, 15, 15], 'should return group matrix');
-  });
-
-  QUnit.test('calcPlaneMatrix with no group', function (assert) {
-    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 });
-    assert.ok(typeof cObj.calcPlaneMatrix === 'function', 'calcPlaneMatrix should exist');
-    cObj.top = 0;
-    cObj.left = 0;
-    cObj.scaleX = 2;
-    cObj.scaleY = 3;
-    assert.deepEqual(cObj.calcPlaneMatrix(), fabric.iMatrix, 'without group matrix is the identity');
-  });
-
   QUnit.test('calcTransformMatrix with no group', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 });
     assert.ok(typeof cObj.calcTransformMatrix === 'function', 'calcTransformMatrix should exist');

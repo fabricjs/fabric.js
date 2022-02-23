@@ -869,10 +869,10 @@
       return fabric.util.sendPointToPlane(
         point,
         from ?
-          relationFrom === 'child' ? from.calcTransformMatrix() : from.calcPlaneMatrix() :
+          relationFrom === 'child' ? from.calcTransformMatrix() : from.group?.calcTransformMatrix() :
           null,
         to ?
-          relationTo === 'child' ? to.calcTransformMatrix() : to.calcPlaneMatrix() :
+          relationTo === 'child' ? to.calcTransformMatrix() : to.group?.calcTransformMatrix() :
           null
       );
     }
