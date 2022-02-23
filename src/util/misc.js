@@ -351,7 +351,7 @@
             fabric.iMatrix.concat(),
           to = fabric.util.getTransformMatrixByObject(destinationObject, relationToDestination);
       //  actually we are looking for the transformation between the destination plane to the source plane
-      //  because the object will exist on the destination plane and we want it to seem unchanged by it we reverse the destination matrix
+      //  because the object will exist on the destination plane and we want it to seem unchanged by it, we reverse the destination matrix
       //  this is de facto a linear mapping (which can help explain why the order is reversed if the explanation didn't)
       //  think of how the target will be transformed once it's on the destination plane
       //  first it reverses the effect of the plane and then it transforms itself with the source transformation, achieving what we wanted
