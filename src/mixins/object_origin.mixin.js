@@ -12,53 +12,52 @@
         bottom: 0.5
       };
 
+  /**
+   * @typedef {number | 'left' | 'center' | 'right'} OriginX
+   * @typedef {number | 'top' | 'center' | 'bottom'} OriginY
+   */
+
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
+
+    /**
+     * Resolves origin value relative to center
+     * @private
+     * @param {OriginX} originX
+     * @returns number
+     */
+    resolveOriginX: function (originX) {
+      return typeof originX === 'string' ?
+        originXOffset[originX] :
+        originX - 0.5;
+    },
+
+    /**
+     * Resolves origin value relative to center
+     * @private
+     * @param {OriginY} originY
+     * @returns number
+     */
+    resolveOriginY: function (originY) {
+      return typeof originY === 'string' ?
+        originYOffset[originY] :
+        originY - 0.5;
+    },
 
     /**
      * Translates the coordinates from a set of origin to another (based on the object's dimensions)
      * @param {fabric.Point} point The point which corresponds to the originX and originY params
-     * @param {String} fromOriginX Horizontal origin: 'left', 'center' or 'right'
-     * @param {String} fromOriginY Vertical origin: 'top', 'center' or 'bottom'
-     * @param {String} toOriginX Horizontal origin: 'left', 'center' or 'right'
-     * @param {String} toOriginY Vertical origin: 'top', 'center' or 'bottom'
+     * @param {OriginX} fromOriginX Horizontal origin: 'left', 'center' or 'right'
+     * @param {OriginY} fromOriginY Vertical origin: 'top', 'center' or 'bottom'
+     * @param {OriginX} toOriginX Horizontal origin: 'left', 'center' or 'right'
+     * @param {OriginY} toOriginY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
     translateToGivenOrigin: function(point, fromOriginX, fromOriginY, toOriginX, toOriginY) {
       var x = point.x,
           y = point.y,
-          offsetX, offsetY, dim;
-
-      if (typeof fromOriginX === 'string') {
-        fromOriginX = originXOffset[fromOriginX];
-      }
-      else {
-        fromOriginX -= 0.5;
-      }
-
-      if (typeof toOriginX === 'string') {
-        toOriginX = originXOffset[toOriginX];
-      }
-      else {
-        toOriginX -= 0.5;
-      }
-
-      offsetX = toOriginX - fromOriginX;
-
-      if (typeof fromOriginY === 'string') {
-        fromOriginY = originYOffset[fromOriginY];
-      }
-      else {
-        fromOriginY -= 0.5;
-      }
-
-      if (typeof toOriginY === 'string') {
-        toOriginY = originYOffset[toOriginY];
-      }
-      else {
-        toOriginY -= 0.5;
-      }
-
-      offsetY = toOriginY - fromOriginY;
+          dim,
+          offsetX = this.resolveOriginX(toOriginX) - this.resolveOriginX(fromOriginX),
+          offsetY = this.resolveOriginY(toOriginY) - this.resolveOriginY(fromOriginY);
 
       if (offsetX || offsetY) {
         dim = this._getTransformedDimensions();
@@ -72,8 +71,8 @@
     /**
      * Translates the coordinates from origin to center coordinates (based on the object's dimensions)
      * @param {fabric.Point} point The point which corresponds to the originX and originY params
-     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
-     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
+     * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
     translateToCenterPoint: function(point, originX, originY) {
@@ -87,8 +86,8 @@
     /**
      * Translates the coordinates from center to origin coordinates (based on the object's dimensions)
      * @param {fabric.Point} center The point which corresponds to center of the object
-     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
-     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
+     * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
     translateToOriginPoint: function(center, originX, originY) {
@@ -120,7 +119,7 @@
 
     /**
      * Returns the center coordinates of the object relative to it's parent
-     * @return {fabric.Point} 
+     * @return {fabric.Point}
      */
     getRelativeCenterPoint: function () {
       return this.translateToCenterPoint(new fabric.Point(this.left, this.top), this.originX, this.originY);
@@ -137,8 +136,8 @@
 
     /**
      * Returns the coordinates of the object as if it has a different origin
-     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
-     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
+     * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
     getPointByOrigin: function(originX, originY) {
@@ -149,8 +148,8 @@
     /**
      * Returns the normalized point (rotated relative to center) in local coordinates
      * @param {fabric.Point} point The point relative to instance coordinate system
-     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
-     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
+     * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {fabric.Point}
      */
     normalizePoint: function(point, originX, originY) {
@@ -195,8 +194,8 @@
     /**
      * Sets the position of the object taking into consideration the object's origin
      * @param {fabric.Point} pos The new position of the object
-     * @param {String} originX Horizontal origin: 'left', 'center' or 'right'
-     * @param {String} originY Vertical origin: 'top', 'center' or 'bottom'
+     * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
+     * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {void}
      */
     setPositionByOrigin: function(pos, originX, originY) {
