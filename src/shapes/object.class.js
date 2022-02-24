@@ -727,7 +727,7 @@
     _getCacheCanvasDimensions: function() {
       var objectScale = this.getTotalObjectScaling(),
           // caculate dimensions without skewing
-          dim = this._getTransformedDimensions(0, 0),
+          dim = this._getTransformedDimensions({ skewX: 0, skewY: 0 }),
           neededX = dim.x * objectScale.x / this.scaleX,
           neededY = dim.y * objectScale.y / this.scaleY;
       return {
