@@ -888,27 +888,27 @@
     /**
      * Returns pointer coordinates relative to canvas.
      * Can return coordinates with or without viewportTransform.
-     * ignoreZoom false gives back coordinates that represent
+     * ignoreVpt false gives back coordinates that represent
      * the point clicked on canvas element.
-     * ignoreZoom true gives back coordinates after being processed
+     * ignoreVpt true gives back coordinates after being processed
      * by the viewportTransform ( sort of coordinates of what is displayed
      * on the canvas where you are clicking.
-     * ignoreZoom true = HTMLElement coordinates relative to top,left
-     * ignoreZoom false, default = fabric space coordinates, the same used for shape position
-     * To interact with your shapes top and left you want to use ignoreZoom true
-     * most of the time, while ignoreZoom false will give you coordinates
+     * ignoreVpt true = HTMLElement coordinates relative to top,left
+     * ignoreVpt false, default = fabric space coordinates, the same used for shape position
+     * To interact with your shapes top and left you want to use ignoreVpt true
+     * most of the time, while ignoreVpt false will give you coordinates
      * compatible with the object.oCoords system.
      * of the time.
      * @param {Event} e
-     * @param {Boolean} ignoreZoom
+     * @param {Boolean} ignoreVpt
      * @return {Object} object with "x" and "y" number values
      */
-    getPointer: function (e, ignoreZoom) {
+    getPointer: function (e, ignoreVpt) {
       // return cached values if we are in the event processing chain
-      if (this._absolutePointer && !ignoreZoom) {
+      if (this._absolutePointer && !ignoreVpt) {
         return this._absolutePointer;
       }
-      if (this._pointer && ignoreZoom) {
+      if (this._pointer && ignoreVpt) {
         return this._pointer;
       }
 
@@ -931,7 +931,7 @@
       this.calcOffset();
       pointer.x = pointer.x - this._offset.left;
       pointer.y = pointer.y - this._offset.top;
-      if (!ignoreZoom) {
+      if (!ignoreVpt) {
         pointer = this.restorePointerVpt(pointer);
       }
 
