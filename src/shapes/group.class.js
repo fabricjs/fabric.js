@@ -422,8 +422,8 @@
        * @public
        * @typedef LayoutContext
        * @property {string} [layout] layout directive
-       * @property {number} [centerX] new centerX in canvas coordinate plane
-       * @property {number} [centerY] new centerY in canvas coordinate plane
+       * @property {number} [centerX] new centerX as measured by the containing plane (same as `left` with `originX` set to `center`)
+       * @property {number} [centerY] new centerY as measured by the containing plane (same as `top` with `originY` set to `center`)
        * @property {number} [width]
        * @property {number} [height]
        * @param {LayoutContext} [context] pass values to use for layout calculations
