@@ -797,6 +797,7 @@
     });
     assert.equal(target, group, 'Should return the group');
     group.subTargetCheck = true;
+    group.setCoords();
     target = canvas.findTarget({
       clientX: 5, clientY: 5
     });
