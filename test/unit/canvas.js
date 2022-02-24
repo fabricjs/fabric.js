@@ -833,7 +833,7 @@
       [rect3, rect4],
       { scaleX: 0.5, scaleY: 0.5, top: 100, left: 0 });
     group3.subTargetCheck = true;
-
+    group3.setCoords();
     var rect1 = new fabric.Rect({
       width: 100,
       height: 100,
@@ -848,6 +848,7 @@
     });
     var g = new fabric.Group([rect1, rect2, group3], { top: -150, left: -50 });
     g.subTargetCheck = true;
+    g.setCoords();
     canvas.viewportTransform = [0.1, 0, 0, 0.1, 100, 200];
     canvas.add(g);
 
@@ -903,6 +904,7 @@
     canvas.add(group);
     canvas.setActiveObject(group);
     group.subTargetCheck = true;
+    group.setCoords();
     target = canvas.findTarget({
       clientX: 9, clientY: 9
     });
@@ -934,6 +936,7 @@
     canvas.add(group);
     canvas.setActiveObject(group);
     group.subTargetCheck = true;
+    group.setCoords();
     target = canvas.findTarget({
       clientX: 9, clientY: 9
     });
