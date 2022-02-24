@@ -279,7 +279,7 @@
   function skewObjectX(eventData, transform, x, y) {
     var target = transform.target,
         // find how big the object would be, if there was no skewX. takes in account scaling
-        dimNoSkew = target._getTransformedDimensions(0, target.skewY),
+        dimNoSkew = target._getTransformedDimensions({ skewX: 0, skewY: target.skewY }),
         localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         // the mouse is in the center of the object, and we want it to stay there.
         // so the object will grow twice as much as the mouse.
@@ -322,7 +322,7 @@
   function skewObjectY(eventData, transform, x, y) {
     var target = transform.target,
         // find how big the object would be, if there was no skewX. takes in account scaling
-        dimNoSkew = target._getTransformedDimensions(target.skewX, 0),
+        dimNoSkew = target._getTransformedDimensions({ skewX: target.skewX, skewY: 0 }),
         localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         // the mouse is in the center of the object, and we want it to stay there.
         // so the object will grow twice as much as the mouse.
