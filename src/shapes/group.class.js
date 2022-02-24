@@ -598,11 +598,11 @@
             //  we need to calculate center taking into account originX, originY while not being sure that width/height are initialized
             var bbox = this.getObjectsBoundingBox(objects) || {};
             var width = hasWidth ? this.width : (bbox.width || 0),
-              height = hasHeight ? this.height : (bbox.height || 0),
-              calculatedCenter = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0),
-              originX = this.resolveOriginX(this.originX),
-              originY = this.resolveOriginY(this.originY),
-              originCorrection = new fabric.Point(width * (originX + 0.5), height * (originY + 0.5));
+                height = hasHeight ? this.height : (bbox.height || 0),
+                calculatedCenter = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0),
+                originX = this.resolveOriginX(this.originX),
+                originY = this.resolveOriginY(this.originY),
+                originCorrection = new fabric.Point(width * (originX + 0.5), height * (originY + 0.5));
             var center = calculatedCenter.subtract(originCorrection);
             var offsetCorrection = new fabric.Point(
               hasX ? this.left - (calculatedCenter.x + width * originX) : -originCorrection.x,
