@@ -485,9 +485,7 @@
           && this._adjustObjectPosition(this.clipPath, diff);
         if (!newCenter.eq(center)) {
           //  set position
-          isFirstLayout ?
-            this.setPositionByOrigin(newCenter, this.originX, this.originY) :
-            this.setPositionByOrigin(newCenter, 'center', 'center');
+          this.setPositionByOrigin(newCenter, 'center', 'center');
           this.setCoords();
         }
         //  fire layout hook and event
@@ -593,21 +591,30 @@
           //  performance enhancement
           //  skip layout calculation if bbox is defined
           if ((hasX && hasY && hasWidth && hasHeight && context.objectsRelativeToGroup) || objects.length === 0) {
+            //  return nothing to skip layout
             return;
           }
           else {
+            //  we need to calculate center taking into account originX, originY while not being sure that width/height are initialized
             var bbox = this.getObjectsBoundingBox(objects) || {};
-            var calculatedCenter = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0);
-            var center = this.translateToOriginPoint(calculatedCenter, this.originX, this.originY);
-            var originX = this.resolveOriginX(this.originX), originY = this.resolveOriginY(this.originY);
-            var offset = new fabric.Point(hasX ? -center.x + this.left : 0, hasY ? -center.y + this.top : 0);
+            var width = hasWidth ? this.width : (bbox.width || 0),
+              height = hasHeight ? this.height : (bbox.height || 0),
+              calculatedCenter = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0),
+              originX = this.resolveOriginX(this.originX),
+              originY = this.resolveOriginY(this.originY),
+              originCorrection = new fabric.Point(width * (originX + 0.5), height * (originY + 0.5));
+            var center = calculatedCenter.subtract(originCorrection);
+            var offsetCorrection = new fabric.Point(
+              hasX ? this.left - (calculatedCenter.x + width * originX) : -originCorrection.x,
+              hasY ? this.top - (calculatedCenter.y + height * originY) : -originCorrection.y
+            );
             var correction = fabric.util.transformPoint(new fabric.Point(
               hasWidth ? -bbox.width * originX + this.width * originX * 2 : 0,
               hasHeight ? -bbox.height * originY + this.height * originY * 2 : 0
-            ), this.calcOwnMatrix(), true).add(offset);
+            ), this.calcOwnMatrix(), true).add(offsetCorrection);
             return {
-              centerX: hasX ? this.left : center.x,
-              centerY: hasY ? this.top : center.y,
+              centerX: hasX ? this.left - width * originX : center.x,
+              centerY: hasY ? this.top - height * originY : center.y,
               correctionX: correction.x,
               correctionY: correction.y,
               width: hasWidth ? this.width : (bbox.width || 0),
