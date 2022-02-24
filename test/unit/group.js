@@ -5,7 +5,7 @@
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
         rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40, strokeWidth: 0 });
 
-    return new fabric.Group([rect1, rect2], { strokeWidth: 0, originX: 'center', originY: 'center' });
+    return new fabric.Group([rect1, rect2], { strokeWidth: 0 });
   }
 
   function makeGroupWith2ObjectsWithOpacity() {
@@ -815,7 +815,7 @@
     assert.equal(group._objects[1].canvas, canvas, 'canvas has been set on object 0');
   });
 
-  QUnit.skip('add and coordinates', function(assert) {
+  QUnit.test.skip('add and coordinates', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' }),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 6, angle: 90, strokeWidth: 0, fill: 'red' }),
         group = new fabric.Group([]);
@@ -836,7 +836,7 @@
     assert.equal(rect2.scaleY, 3, 'scaleY has been scaled inverted because of angle 90');
   });
 
-  QUnit.skip('addRelativeToGroup and coordinates with nested groups', function(assert) {
+  QUnit.test.skip('addRelativeToGroup and coordinates with nested groups', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' }),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 6, angle: 90, strokeWidth: 0, fill: 'red' }),
         group0 = new fabric.Group([rect1, rect2]),
