@@ -1044,7 +1044,9 @@
           path = this.path,
           shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex) && !path,
           isLtr = this.direction === 'ltr', sign = this.direction === 'ltr' ? 1 : -1,
-          drawingLeft, currentDirection = ctx.canvas.getAttribute('dir');
+          // this was changed in the PR #7674
+          // currentDirection = ctx.canvas.getAttribute('dir');
+          drawingLeft, currentDirection = ctx.direction;
       ctx.save();
       if (currentDirection !== this.direction) {
         ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
