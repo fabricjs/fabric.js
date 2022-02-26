@@ -643,27 +643,36 @@
         if (objects.length === 0) {
           return null;
         }
-
-        var objCenter, size, min, max;
+        
+        var objCenter, sizeVector, min, max, a, b;
         objects.forEach(function (object, i) {
           objCenter = object.getRelativeCenterPoint();
-          size = object._getTransformedDimensions();
+          sizeVector = object._getTransformedDimensions().scalarDivideEquals(2);
+          if (object.angle) {
+            var rad = degreesToRadians(object.angle),
+              sin = Math.abs(fabric.util.sin(rad)),
+              cos = Math.abs(fabric.util.cos(rad)),
+              rx = sizeVector.x * cos + sizeVector.y * sin,
+              ry = sizeVector.x * sin + sizeVector.y * cos;
+            sizeVector = new fabric.Point(rx, ry);
+          }
+          a = objCenter.subtract(sizeVector);
+          b = objCenter.add(sizeVector);
           if (i === 0) {
-            min = new fabric.Point(objCenter.x - size.x / 2, objCenter.y - size.y / 2);
-            max = new fabric.Point(objCenter.x + size.x / 2, objCenter.y + size.y / 2);
+            min = new fabric.Point(Math.min(a.x, b.x), Math.min(a.y, b.y));
+            max = new fabric.Point(Math.max(a.x, b.x), Math.max(a.y, b.y));
           }
           else {
-            min.setXY(Math.min(min.x, objCenter.x - size.x / 2), Math.min(min.y, objCenter.y - size.y / 2));
-            max.setXY(Math.max(max.x, objCenter.x + size.x / 2), Math.max(max.y, objCenter.y + size.y / 2));
+            min.setXY(Math.min(min.x, a.x, b.x), Math.min(min.y, a.y, b.y));
+            max.setXY(Math.max(max.x, a.x, b.x), Math.max(max.y, a.y, b.y));
           }
         });
 
         var width = max.x - min.x,
-            height = max.y - min.y,
-            relativeCenter = min.midPointFrom(max),
-            //  we send `relativeCenter` up to group's containing plane
-            centerMass = fabric.util.transformPoint(relativeCenter, this.calcOwnMatrix(), true),
-            center = this.getRelativeCenterPoint().add(centerMass);
+          height = max.y - min.y,
+          relativeCenter = min.midPointFrom(max),
+          //  we send `relativeCenter` up to group's containing plane
+          center = transformPoint(relativeCenter, this.calcOwnMatrix());
 
         return {
           centerX: center.x,
