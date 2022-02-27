@@ -396,7 +396,7 @@
        */
       _render: function (ctx) {
         //  render fill/stroke courtesy of rect
-        fabric.Rect.prototype._render.call(this, ctx);
+        //fabric.Rect.prototype._render.call(this, ctx);
         this._renderObjects(ctx);
       },
 
@@ -817,6 +817,7 @@
        * @private
        */
       _createFillStrokeSVGRect: function (reviver) {
+        return ''
         if (!this.fill &&
           (!this.stroke || this.stroke === 'none' || this.stroke === 'transparent' || !this.strokeWidth)) {
           return '';
