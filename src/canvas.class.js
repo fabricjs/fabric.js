@@ -870,7 +870,7 @@
      */
     searchPossibleTargets: function (objects, pointer) {
       var target = this._searchPossibleTargets(objects, pointer);
-      return this.targets[0] || target;
+      return /*this.targets[0] ||*/ target;
     },
 
     /**
