@@ -396,8 +396,13 @@
        */
       _render: function (ctx) {
         //  render fill/stroke courtesy of rect
-        //fabric.Rect.prototype._render.call(this, ctx);
+        this._hasFillStroke() && fabric.Rect.prototype._render.call(this, ctx);
         this._renderObjects(ctx);
+      },
+
+      _hasFillStroke: function () {
+        return (this.fill && this.fill !== 'none' && this.fill !== 'transparent') ||
+          (this.stroke && this.stroke !== 'none' && this.stroke !== 'transparent' && this.strokeWidth);
       },
 
       /**
@@ -817,9 +822,7 @@
        * @private
        */
       _createFillStrokeSVGRect: function (reviver) {
-        return ''
-        if (!this.fill &&
-          (!this.stroke || this.stroke === 'none' || this.stroke === 'transparent' || !this.strokeWidth)) {
+        if (!this._hasFillStroke()) {
           return '';
         }
         var fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
