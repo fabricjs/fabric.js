@@ -5,7 +5,9 @@
   var fabric = global.fabric || (global.fabric = {}),
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
       invertTransform = fabric.util.invertTransform,
+      transformPoint = fabric.util.transformPoint,
       applyTransformToObject = fabric.util.applyTransformToObject,
+      degreesToRadians = fabric.util.degreesToRadians,
       clone = fabric.util.object.clone,
       extend = fabric.util.object.extend;
 
@@ -106,7 +108,7 @@
               inv,
               object.calcTransformMatrix()
             );
-            var center = fabric.util.transformPoint(this.getCenterPoint(), t);
+            var center = transformPoint(this.getCenterPoint(), t);
             this.enterGroup(object, false);
             object.setPositionByOrigin(center, 'center', 'center');
           }, this);
@@ -246,7 +248,7 @@
         var directive = watch ? 'on' : 'off';
         //  make sure we listen only once
         watch && this._watchObject(false, object);
-        // TODO check what changed is
+        // TODO check what changed ischeck
         object[directive]('changed', this.__objectMonitor);
         object[directive]('modified', this.__objectMonitor);
         object[directive]('selected', this.__objectSelectionTracker);
@@ -433,15 +435,8 @@
 
       /**
        * @public
-       * @typedef LayoutContext
-       * @property {string} [layout] layout directive
-       * @property {number} [centerX] new centerX as measured by the containing plane (same as `left` with `originX` set to `center`)
-       * @property {number} [centerY] new centerY as measured by the containing plane (same as `top` with `originY` set to `center`)
-       * @property {number} [width]
-       * @property {number} [height]
-       * @param {LayoutContext} [context] pass values to use for layout calculations
+       * @param {Partial<LayoutResult> & { layout?: string }} [context] pass values to use for layout calculations
        */
-      // ANDREA: USED WHERE?
       triggerLayout: function (context) {
         if (context && context.layout) {
           context.prevLayout = this.layout;
@@ -468,7 +463,7 @@
        * so it is placed in the center of the bbox received from the constructor
        *
        * @private
-       * @param {object} context see `getLayoutStrategyResult`
+       * @param {LayoutContext} context
        */
       _applyLayoutStrategy: function (context) {
         var isFirstLayout = context.type === 'initialization';
@@ -487,7 +482,7 @@
         //  handle positioning
         var newCenter = new fabric.Point(result.centerX, result.centerY);
         var vector = center.subtract(newCenter).add(new fabric.Point(result.correctionX || 0, result.correctionY || 0));
-        var diff = fabric.util.transformPoint(vector, fabric.util.invertTransform(this.calcOwnMatrix()), true);
+        var diff = transformPoint(vector, invertTransform(this.calcOwnMatrix()), true);
         //  set dimensions
         this.set({ width: result.width, height: result.height });
         //  adjust objects to account for new center
@@ -495,7 +490,7 @@
           this._adjustObjectPosition(object, diff);
         }, this);
         //  clip path as well
-        !isFirstLayout && this.clipPath && !this.clipPath.absolutePositioned
+        !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
           && this._adjustObjectPosition(this.clipPath, diff);
         if (!newCenter.eq(center)) {
           //  set position
@@ -524,17 +519,26 @@
       /**
        * Override this method to customize layout.
        * If you need to run logic once layout completes use `onLayout`
-       * this function will return how big the group is and where its center is located
-       * in group parent/ancestor.
-       * This means that the coordinates are in canvas space for normal groups and in their container
-       * for nested groups
        * @public
+       *
+       * @typedef {'initialization'|'object_modified'|'added'|'removed'|'layout_change'|'imperative'} LayoutContextType
+       *
+       * @typedef LayoutContext context object with data regarding what triggered the call
+       * @property {LayoutContextType} type
+       * @property {fabric.Object[]} [path] array of objects starting from the object that triggered the call to the current one
+       *
+       * @typedef LayoutResult positioning and layout data **relative** to instance's parent
+       * @property {number} centerX new centerX as measured by the containing plane (same as `left` with `originX` set to `center`)
+       * @property {number} centerY new centerY as measured by the containing plane (same as `top` with `originY` set to `center`)
+       * @property {number} [correctionX] correctionX to translate objects by, measured as `centerX`
+       * @property {number} [correctionY] correctionY to translate objects by, measured as `centerY`
+       * @property {number} width
+       * @property {number} height
+       *
        * @param {string} layoutDirective
        * @param {fabric.Object[]} objects
-       * @param {object} context object with data regarding what triggered the call
-       * @param {'initialization'|'object_modified'|'added'|'removed'|'layout_change'|'imperative'} context.type
-       * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
-       * @returns {{ centerX: number, centerY: number, width: number, height: number } | undefined} positioning and layout data **relative** to instance's parent
+       * @param {LayoutContext} context
+       * @returns {LayoutResult | undefined}
        */
       getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
         //  `fit-content-lazy` performance enhancement
@@ -551,41 +555,48 @@
         }
         else if (layoutDirective === 'clip-path' && this.clipPath) {
           var clipPath = this.clipPath;
-          // would be happy to trash absolutePositioned or constrain what it can do on layouts.
-          // like nothing.
-          if (clipPath.absolutePositioned && context.type === 'initialization') {
+          var clipPathSizeAfter = clipPath._getTransformedDimensions();
+          if (clipPath.absolutePositioned && (context.type === 'initialization' || context.type === 'layout_change')) {
             //  we want the center point to exist in group's containing plane
             var clipPathCenter = clipPath.getCenterPoint();
             if (this.group) {
               //  send point from canvas plane to group's containing plane
-              var inv = fabric.util.invertTransform(this.group.calcTransformMatrix());
-              clipPathCenter = fabric.util.transformPoint(clipPathCenter, inv);
+              var inv = invertTransform(this.group.calcTransformMatrix());
+              clipPathCenter = transformPoint(clipPathCenter, inv);
             }
             return {
               centerX: clipPathCenter.x,
               centerY: clipPathCenter.y,
-              width: clipPath.width,
-              height: clipPath.height,
+              width: clipPathSizeAfter.x,
+              height: clipPathSizeAfter.y,
             };
           }
           else if (!clipPath.absolutePositioned) {
             var center;
             var clipPathRelativeCenter = clipPath.getRelativeCenterPoint(),
                 //  we want the center point to exist in group's containing plane, so we send it upwards
-                clipPathCenter = fabric.util.transformPoint(clipPathRelativeCenter, this.calcOwnMatrix(), true);
-            if (context.type === 'initialization') {
+                clipPathCenter = transformPoint(clipPathRelativeCenter, this.calcOwnMatrix(), true);
+            if (context.type === 'initialization' || context.type === 'layout_change') {
               var bbox = this.prepareBoundingBox(layoutDirective, objects, context) || {};
               center = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0);
+              return {
+                centerX: center.x + clipPathCenter.x,
+                centerY: center.y + clipPathCenter.y,
+                correctionX: bbox.correctionX - clipPathCenter.x,
+                correctionY: bbox.correctionY - clipPathCenter.y,
+                width: clipPath.width,
+                height: clipPath.height,
+              };
             }
             else {
               center = this.getRelativeCenterPoint();
+              return {
+                centerX: center.x + clipPathCenter.x,
+                centerY: center.y + clipPathCenter.y,
+                width: clipPathSizeAfter.x,
+                height: clipPathSizeAfter.y,
+              };
             }
-            return {
-              centerX: center.x + clipPathCenter.x,
-              centerY: center.y + clipPathCenter.y,
-              width: clipPath.width,
-              height: clipPath.height,
-            };
           }
         }
       },
@@ -596,51 +607,12 @@
        * @public
        * @param {string} layoutDirective
        * @param {fabric.Object[]} objects
-       * @param {object} context object with data regarding what triggered the call
-       * @param {'initialization'|'object_modified'|'added'|'removed'|'layout_change'|'imperative'} context.type
-       * @param {fabric.Object[]} context.path array of objects starting from the object that triggered the call to the current one
-       * @returns {{ centerX: number, centerY: number, width: number, height: number } | undefined} positioning data in canvas coordinate plane
+       * @param {LayoutContext} context
+       * @returns {LayoutResult | undefined}
        */
       prepareBoundingBox: function (layoutDirective, objects, context) {
         if (context.type === 'initialization') {
-          var options = context.options || {};
-          var hasX = typeof options.left === 'number',
-              hasY = typeof options.top === 'number',
-              hasWidth = typeof options.width === 'number',
-              hasHeight = typeof options.height === 'number';
-          //  performance enhancement
-          //  skip layout calculation if bbox is defined
-          if ((hasX && hasY && hasWidth && hasHeight && context.objectsRelativeToGroup) || objects.length === 0) {
-            //  return nothing to skip layout
-            return;
-          }
-          else {
-            //  we need to calculate center taking into account originX, originY while not being sure that width/height are initialized
-            var bbox = this.getObjectsBoundingBox(objects) || {};
-            var width = hasWidth ? this.width : (bbox.width || 0),
-                height = hasHeight ? this.height : (bbox.height || 0),
-                calculatedCenter = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0),
-                originX = this.resolveOriginX(this.originX),
-                originY = this.resolveOriginY(this.originY),
-                originCorrection = new fabric.Point(width * (originX + 0.5), height * (originY + 0.5));
-            var center = calculatedCenter.subtract(originCorrection);
-            var offsetCorrection = new fabric.Point(
-              hasX ? this.left - (calculatedCenter.x + width * originX) : -originCorrection.x,
-              hasY ? this.top - (calculatedCenter.y + height * originY) : -originCorrection.y
-            );
-            var correction = fabric.util.transformPoint(new fabric.Point(
-              hasWidth ? -bbox.width * originX + this.width * originX * 2 : 0,
-              hasHeight ? -bbox.height * originY + this.height * originY * 2 : 0
-            ), this.calcOwnMatrix(), true).add(offsetCorrection);
-            return {
-              centerX: hasX ? this.left - width * originX : center.x,
-              centerY: hasY ? this.top - height * originY : center.y,
-              correctionX: correction.x,
-              correctionY: correction.y,
-              width: hasWidth ? this.width : (bbox.width || 0),
-              height: hasHeight ? this.height : (bbox.height || 0),
-            };
-          }
+          return this.prepareInitialBoundingBox(layoutDirective, objects, context);
         }
         else if (context.type === 'imperative' && context.context) {
           return Object.assign(
@@ -654,27 +626,129 @@
       },
 
       /**
+       * Calculates center taking into account originX, originY while not being sure that width/height are initialized
+       * @public
+       * @param {string} layoutDirective
+       * @param {fabric.Object[]} objects
+       * @param {LayoutContext} context
+       * @returns {LayoutResult | undefined}
+       */
+      prepareInitialBoundingBox: function (layoutDirective, objects, context) {
+        var options = context.options || {},
+            hasX = typeof options.left === 'number',
+            hasY = typeof options.top === 'number',
+            hasWidth = typeof options.width === 'number',
+            hasHeight = typeof options.height === 'number';
+
+        //  performance enhancement
+        //  skip layout calculation if bbox is defined
+        if ((hasX && hasY && hasWidth && hasHeight && context.objectsRelativeToGroup) || objects.length === 0) {
+          //  return nothing to skip layout
+          return;
+        }
+
+        var bbox = this.getObjectsBoundingBox(objects) || {};
+        var width = hasWidth ? this.width : (bbox.width || 0),
+            height = hasHeight ? this.height : (bbox.height || 0),
+            calculatedCenter = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0),
+            origin = new fabric.Point(this.resolveOriginX(this.originX), this.resolveOriginY(this.originY)),
+            size = new fabric.Point(width, height),
+            strokeWidthVector = this._getTransformedDimensions({ width: 0, height: 0 }),
+            sizeAfter = this._getTransformedDimensions({
+              width: width,
+              height: height,
+              strokeWidth: 0
+            }),
+            bboxSizeAfter = this._getTransformedDimensions({
+              width: bbox.width,
+              height: bbox.height,
+              strokeWidth: 0
+            }),
+            rotationCorrection = new fabric.Point(0, 0);
+
+        if (this.angle) {
+          var rad = degreesToRadians(this.angle),
+              sin = Math.abs(fabric.util.sin(rad)),
+              cos = Math.abs(fabric.util.cos(rad));
+          sizeAfter.setXY(
+            sizeAfter.x * cos + sizeAfter.y * sin,
+            sizeAfter.x * sin + sizeAfter.y * cos
+          );
+          bboxSizeAfter.setXY(
+            bboxSizeAfter.x * cos + bboxSizeAfter.y * sin,
+            bboxSizeAfter.x * sin + bboxSizeAfter.y * cos
+          );
+          strokeWidthVector = fabric.util.rotateVector(strokeWidthVector, rad);
+          //  correct center after rotating
+          var strokeCorrection = strokeWidthVector.multiply(origin.scalarAdd(-0.5).scalarDivide(-2));
+          rotationCorrection = sizeAfter.subtract(size).scalarDivide(2).add(strokeCorrection);
+          calculatedCenter.addEquals(rotationCorrection);
+        }
+        //  calculate center and correction
+        var originT = origin.scalarAdd(0.5);
+        var originCorrection = sizeAfter.multiply(originT);
+        var centerCorrection = new fabric.Point(
+          hasWidth ? bboxSizeAfter.x / 2 : originCorrection.x,
+          hasHeight ? bboxSizeAfter.y / 2 : originCorrection.y
+        );
+        var center = new fabric.Point(
+          hasX ? this.left - (sizeAfter.x + strokeWidthVector.x) * origin.x : calculatedCenter.x - centerCorrection.x,
+          hasY ? this.top - (sizeAfter.y + strokeWidthVector.y) * origin.y : calculatedCenter.y - centerCorrection.y
+        );
+        var offsetCorrection = new fabric.Point(
+          hasX ?
+            center.x - calculatedCenter.x + bboxSizeAfter.x * (hasWidth ? 0.5 : 0) :
+            -(hasWidth ? (sizeAfter.x - strokeWidthVector.x) * 0.5 : sizeAfter.x * originT.x),
+          hasY ?
+            center.y - calculatedCenter.y + bboxSizeAfter.y * (hasHeight ? 0.5 : 0) :
+            -(hasHeight ? (sizeAfter.y - strokeWidthVector.y) * 0.5 : sizeAfter.y * originT.y)
+        ).add(rotationCorrection);
+        var correction = new fabric.Point(
+          hasWidth ? -sizeAfter.x / 2 : 0,
+          hasHeight ? -sizeAfter.y / 2 : 0
+        ).add(offsetCorrection);
+
+        return {
+          centerX: center.x,
+          centerY: center.y,
+          correctionX: correction.x,
+          correctionY: correction.y,
+          width: size.x,
+          height: size.y,
+        };
+      },
+
+      /**
        * Calculate the bbox of objects relative to instance's containing plane
        * @public
        * @param {fabric.Object[]} objects
-       * @returns {Object | null} bounding box
+       * @returns {LayoutResult | null} bounding box
        */
       getObjectsBoundingBox: function (objects) {
         if (objects.length === 0) {
           return null;
         }
-
-        var objCenter, size, min, max;
+        var objCenter, sizeVector, min, max, a, b;
         objects.forEach(function (object, i) {
           objCenter = object.getRelativeCenterPoint();
-          size = object._getTransformedDimensions();
+          sizeVector = object._getTransformedDimensions().scalarDivideEquals(2);
+          if (object.angle) {
+            var rad = degreesToRadians(object.angle),
+                sin = Math.abs(fabric.util.sin(rad)),
+                cos = Math.abs(fabric.util.cos(rad)),
+                rx = sizeVector.x * cos + sizeVector.y * sin,
+                ry = sizeVector.x * sin + sizeVector.y * cos;
+            sizeVector = new fabric.Point(rx, ry);
+          }
+          a = objCenter.subtract(sizeVector);
+          b = objCenter.add(sizeVector);
           if (i === 0) {
-            min = new fabric.Point(objCenter.x - size.x / 2, objCenter.y - size.y / 2);
-            max = new fabric.Point(objCenter.x + size.x / 2, objCenter.y + size.y / 2);
+            min = new fabric.Point(Math.min(a.x, b.x), Math.min(a.y, b.y));
+            max = new fabric.Point(Math.max(a.x, b.x), Math.max(a.y, b.y));
           }
           else {
-            min.setXY(Math.min(min.x, objCenter.x - size.x / 2), Math.min(min.y, objCenter.y - size.y / 2));
-            max.setXY(Math.max(max.x, objCenter.x + size.x / 2), Math.max(max.y, objCenter.y + size.y / 2));
+            min.setXY(Math.min(min.x, a.x, b.x), Math.min(min.y, a.y, b.y));
+            max.setXY(Math.max(max.x, a.x, b.x), Math.max(max.y, a.y, b.y));
           }
         });
 
@@ -682,8 +756,7 @@
             height = max.y - min.y,
             relativeCenter = min.midPointFrom(max),
             //  we send `relativeCenter` up to group's containing plane
-            centerMass = fabric.util.transformPoint(relativeCenter, this.calcOwnMatrix(), true),
-            center = this.getRelativeCenterPoint().add(centerMass);
+            center = transformPoint(relativeCenter, this.calcOwnMatrix());
 
         return {
           centerX: center.x,
@@ -810,7 +883,7 @@
    */
   fabric.Group.fromObject = function(object) {
     var objects = object.objects || [],
-        options = fabric.util.object.clone(object, true);
+        options = clone(object, true);
     delete options.objects;
     return Promise.all([
       fabric.util.enlivenObjects(objects),
