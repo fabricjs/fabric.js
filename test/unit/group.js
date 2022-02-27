@@ -90,9 +90,6 @@
     group.add(rect2, rect3);
     assert.strictEqual(group.item(group.size() - 1), rect3, 'last object should be last added one');
     assert.equal(group.size(), 5, 'there should be 5 objects');
-
-    //  add duplicates
-    assert.throws(() => group.add(rect2));
   });
 
   QUnit.test('remove', function(assert) {
@@ -195,7 +192,8 @@
       skewY:                    0,
       objects:                  clone.objects,
       strokeUniform:            false,
-      subTargetCheck:           true
+      subTargetCheck:           false,
+      interactive:              false,
     };
 
     assert.deepEqual(clone, expectedObject);
@@ -234,7 +232,6 @@
       width: 80,
       height: 60,
       objects: objects,
-      subTargetCheck: true
     };
     assert.deepEqual(clone, expectedObject);
   });
@@ -566,11 +563,11 @@
 
     assert.ok(typeof group.insertAt === 'function', 'should respond to `insertAt` method');
 
-    const equalsControl = () => {
-      assert.deepEqual(group.getObjects().map(o => o.id), control.map(o => o.id), 'should equal control array');
-      assert.deepEqual(group.getObjects(), control, 'should equal control array');
-      assert.deepEqual(fired.map(o => o.id), firingControl.map(o => o.id), 'fired events should equal control array');
-      assert.deepEqual(fired, firingControl, 'fired events should equal control array');
+    const equalsControl = (description) => {
+      assert.deepEqual(group.getObjects().map(o => o.id), control.map(o => o.id), 'should equal control array ' + description);
+      assert.deepEqual(group.getObjects(), control, 'should equal control array ' + description);
+      assert.deepEqual(fired.map(o => o.id), firingControl.map(o => o.id), 'fired events should equal control array ' + description);
+      assert.deepEqual(fired, firingControl, 'fired events should equal control array ' + description);
     }
 
     assert.ok(typeof group._onObjectAdded === 'function', 'has a standard _onObjectAdded method');
@@ -581,28 +578,26 @@
       });
     });
 
-    group.insertAt(rect3, 1, false);
+    group.insertAt(rect3, 1);
     control.splice(1, 0, rect3);
     firingControl.push(rect3);
-    equalsControl();
-    group.insertAt(rect4, 0, true);
-    control.splice(0, 1, rect4);
+    equalsControl('rect3');
+    group.insertAt(rect4, 0);
+    control.splice(0, 0, rect4);
     firingControl.push(rect4);
-    equalsControl();
-    group.insertAt(rect5, 2, false);
+    equalsControl('rect4');
+    group.insertAt(rect5, 2);
     control.splice(2, 0, rect5);
     firingControl.push(rect5);
-    equalsControl();
-    group.insertAt([rect6], 2, false);
+    equalsControl('rect5');
+    group.insertAt([rect6], 2);
     control.splice(2, 0, rect6);
     firingControl.push(rect6);
-    equalsControl();
-    group.insertAt([rect7, rect8], 3, true);
-    control.splice(3, 2, rect7, rect8);
+    equalsControl('rect6');
+    group.insertAt([rect7, rect8], 3);
+    control.splice(3, 0, rect7, rect8);
     firingControl.push(rect7, rect8);
-    equalsControl();
-    //  insert duplicates
-    assert.throws(() => collection.insertAt([rect1], 2));
+    equalsControl('rect7');
   });
 
   QUnit.test('dirty flag propagation from children up', function(assert) {
