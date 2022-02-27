@@ -33,15 +33,10 @@ fabric.Collection = {
    * @private
    * @param {fabric.Object|fabric.Object[]} objects Object(s) to insert
    * @param {Number} index Index to insert object at
-   * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
    * @param {(object:fabric.Object) => any} [callback]
    */
-  insertAt: function (objects, index, nonSplicing, callback) {
-    var deleteCount = nonSplicing ?
-      Array.isArray(objects) ? objects.length : 1 :
-      0;
-    //  objects might be an array so we use concat
-    var args = [index, deleteCount].concat(objects);
+  insertAt: function (objects, index, callback) {
+    var args = [index, 0].concat(objects);
     this._objects.splice.apply(this._objects, args);
     if (callback) {
       for (var i = 2, length = args.length; i < length; i++) {
@@ -54,7 +49,7 @@ fabric.Collection = {
    * Removes objects from a collection, then renders canvas (if `renderOnAddRemove` is not `false`)
    * @private
    * @param {fabric.Object[]} objectsToRemove objects to remove
-   * @param {(object:fabric.Object) => any} [callback]
+   * @param {(object:fabric.Object) => any} [callback] function to call for each object removed
    * @returns {boolean} true if objects were removed
    */
   remove: function(objectsToRemove, callback) {

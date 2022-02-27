@@ -133,9 +133,9 @@
             object._set(key, value);
           });
         }
-        // if (key === 'layout' && prev !== value) {
-        //   this._applyLayoutStrategy({ type: 'layout_change', layout: value, prevLayout: prev });
-        // }
+        if (key === 'layout' && prev !== value) {
+          this._applyLayoutStrategy({ type: 'layout_change', layout: value, prevLayout: prev });
+        }
         if (key === 'subTargetCheck') {
           this.forEachObject(this._watchObject.bind(this, value));
         }
@@ -152,24 +152,12 @@
       },
 
       /**
-       * Add objects that exist in instance's coordinate plane
-       * @param {...fabric.Object} objects
-       */
-      addRelativeToGroup: function () {
-        fabric.Collection.add.call(this, arguments, this._onRelativeObjectAdded);
-        this._onAfterObjectsChange('added', Array.from(arguments));
-      },
-
-      /**
        * Inserts an object into collection at specified index
        * @param {fabric.Object} objects Object to insert
        * @param {Number} index Index to insert object at
-       * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
-       * @param {boolean} [relativeToGroup] true if object is in group's coordinate plane
        */
-      insertAt: function (objects, index, nonSplicing, relativeToGroup) {
-        fabric.Collection.insertAt.call(this, objects, index, nonSplicing,
-          relativeToGroup ? this._onRelativeObjectAdded : this._onObjectAdded);
+      insertAt: function (objects, index) {
+        fabric.Collection.insertAt.call(this, objects, index,  this._onObjectAdded);
         this._onAfterObjectsChange('added', Array.isArray(objects) ? objects : [objects]);
       },
 
@@ -403,17 +391,12 @@
        *
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
+       * @param {boolean} [forClipping]
        */
-      // TODO decide here. Could it be an override and that's it?
-      _render: function (ctx) {
+      _render: function (ctx, forClipping) {
         //  render fill/stroke courtesy of rect
-        this._hasFillStroke() && fabric.Rect.prototype._render.call(this, ctx);
-        this._renderObjects(ctx);
-      },
-
-      _hasFillStroke: function () {
-        return (this.fill && this.fill !== 'none' && this.fill !== 'transparent') ||
-          (this.stroke && this.stroke !== 'none' && this.stroke !== 'transparent' && this.strokeWidth);
+        !forClipping && (this.hasFill() || this.hasStroke()) && fabric.Rect.prototype._render.call(this, ctx);
+        this._renderObjects(ctx, forClipping);
       },
 
       /**
@@ -422,32 +405,19 @@
        * In case a single object is selected it's entire tree will be rendered by canvas above the other objects (`preserveObjectStacking = false`)
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
-       * @deprecated
+       * @param {boolean} [renderAllObjects] override default behavior to render all objects, included selected objects
+       * @todo support perPixelTargetFind
        */
-      // ANDREA Do not mix canvas and group rendering.
-      // is OK to break object stacking
-      _renderObjects: function (ctx) {
+      _renderObjects: function (ctx, renderAllObjects) {
         var localActiveObjects = this._activeObjects,
             activeObjectsSize = this.canvas.getActiveObjects ? this.canvas.getActiveObjects().length : 0,
             preserveObjectStacking = this.canvas.preserveObjectStacking;
         this.forEachObject(function (object) {
-          if (preserveObjectStacking || activeObjectsSize <= 1
+          if (renderAllObjects || preserveObjectStacking || activeObjectsSize <= 1
             || localActiveObjects.length === 0 || localActiveObjects.indexOf(object) === -1) {
             object.render(ctx);
           }
         }, this);
-      },
-
-      /**
-       * @public
-       * @param {Partial<LayoutResult> & { layout?: string }} [context] pass values to use for layout calculations
-       */
-      triggerLayout: function (context) {
-        if (context && context.layout) {
-          context.prevLayout = this.layout;
-          this.layout = context.layout;
-        }
-        this._applyLayoutStrategy({ type: 'imperative', context: context });
       },
 
       /**
@@ -491,7 +461,7 @@
         //  set dimensions
         this.set({ width: result.width, height: result.height });
         //  adjust objects to account for new center
-        this.forEachObject(function (object) {
+        !context.objectsRelativeToGroup && this.forEachObject(function (object) {
           this._adjustObjectPosition(object, diff);
         }, this);
         //  clip path as well
@@ -603,6 +573,13 @@
               };
             }
           }
+        }
+        else if (layoutDirective === 'svg' && context.type === 'initialization') {
+          var bbox = this.getObjectsBoundingBox(objects, true) || {};
+          return Object.assign(bbox, {
+            correctionX: -bbox.offsetX || 0,
+            correctionY: -bbox.offsetY || 0,
+          });
         }
       },
 
@@ -729,7 +706,7 @@
        * @param {fabric.Object[]} objects
        * @returns {LayoutResult | null} bounding box
        */
-      getObjectsBoundingBox: function (objects) {
+      getObjectsBoundingBox: function (objects, ignoreOffset) {
         if (objects.length === 0) {
           return null;
         }
@@ -757,17 +734,19 @@
           }
         });
 
-        var width = max.x - min.x,
-            height = max.y - min.y,
-            relativeCenter = min.midPointFrom(max),
+        var size = max.subtract(min),
+            relativeCenter = ignoreOffset ? size.scalarDivide(2) : min.midPointFrom(max),
             //  we send `relativeCenter` up to group's containing plane
+            offset = transformPoint(min, this.calcOwnMatrix()),
             center = transformPoint(relativeCenter, this.calcOwnMatrix());
 
         return {
+          offsetX: offset.x,
+          offsetY: offset.y,
           centerX: center.x,
           centerY: center.y,
-          width: width,
-          height: height,
+          width: size.x,
+          height: size.y,
         };
       },
 
@@ -835,7 +814,7 @@
        * @private
        */
       _createFillStrokeSVGRect: function (reviver) {
-        if (!this._hasFillStroke()) {
+        if (!this.hasFill() && !this.hasStroke()) {
           return '';
         }
         var fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
