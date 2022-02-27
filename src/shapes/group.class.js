@@ -66,11 +66,20 @@
 
       /**
        * Used to optimize performance
-       * set to `false` if you don't need objects to be interactive
+       * set to `false` if you don't need caontained objects to be target of events
        * @default
        * @type boolean
        */
       subTargetCheck: false,
+
+      /**
+       * Used to allow targeting of object inside groups.
+       * set to true if you want to select an object inside a group.
+       * REQUIRES subTargetCheck set to true
+       * @default
+       * @type boolean
+       */
+      interactive: false,
 
       /**
        * Used internally to optimize performance
@@ -136,7 +145,7 @@
         if (key === 'layout' && prev !== value) {
           this._applyLayoutStrategy({ type: 'layout_change', layout: value, prevLayout: prev });
         }
-        if (key === 'subTargetCheck') {
+        if (key === 'interactive') {
           this.forEachObject(this._watchObject.bind(this, value));
         }
         return this;
@@ -274,7 +283,7 @@
         object.setCoords();
         object._set('group', this);
         object._set('canvas', this.canvas);
-        this.subTargetCheck && this._watchObject(true, object);
+        this._watchObject(true, object);
         var activeObject = this.canvas && this.canvas.getActiveObject && this.canvas.getActiveObject();
         // if we are adding the activeObject in a group
         if (activeObject && (activeObject === object || object.isDescendantOf(activeObject))) {
@@ -791,7 +800,7 @@
        * @return {Object} object representation of an instance
        */
       toObject: function (propertiesToInclude) {
-        var obj = this.callSuper('toObject', ['layout', 'subTargetCheck'].concat(propertiesToInclude));
+        var obj = this.callSuper('toObject', ['layout', 'subTargetCheck', 'interactive'].concat(propertiesToInclude));
         obj.objects = this.__serializeObjects('toObject', propertiesToInclude);
         return obj;
       },
