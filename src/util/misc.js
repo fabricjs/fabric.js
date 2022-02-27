@@ -616,16 +616,8 @@
         return elements[0];
       }
       if (options) {
-        if (options.width && options.height) {
-          options.left = options.width / 2;
-          options.top = options.height / 2;
-          options.originX = 'center';
-          options.originY = 'center';
-        }
-        else {
-          delete options.width;
-          delete options.height;
-        }
+        delete options.width;
+        delete options.height;
       }
       object = new fabric.Group(elements, options);
       if (typeof path !== 'undefined') {
