@@ -738,9 +738,12 @@
         scaleY: this.scaleY,
         skewX: this.skewX,
         skewY: this.skewY,
+        width: this.width,
+        height: this.height,
+        strokeWidth: this.strokeWidth
       }, options || {});
       //  stroke is applied before/after transformations are applied according to `strokeUniform`
-      var preScalingStrokeValue, postScalingStrokeValue, strokeWidth = this.strokeWidth;
+      var preScalingStrokeValue, postScalingStrokeValue, strokeWidth = options.strokeWidth;
       if (this.strokeUniform) {
         preScalingStrokeValue = 0;
         postScalingStrokeValue = strokeWidth;
@@ -749,8 +752,8 @@
         preScalingStrokeValue = strokeWidth;
         postScalingStrokeValue = 0;
       }
-      var dimX = this.width + preScalingStrokeValue,
-          dimY = this.height + preScalingStrokeValue,
+      var dimX = options.width + preScalingStrokeValue,
+          dimY = options.height + preScalingStrokeValue,
           finalDimensions,
           noSkew = options.skewX === 0 && options.skewY === 0;
       if (noSkew) {
