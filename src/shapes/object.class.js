@@ -1113,7 +1113,7 @@
      * @returns Boolean
      */
     hasStroke: function() {
-      return this.stroke && this.stroke !== 'transparent' && this.stroke !== 'none' && this.strokeWidth !== 0;
+      return this.stroke && this.stroke !== 'transparent' && this.strokeWidth !== 0;
     },
 
     /**
@@ -1127,7 +1127,7 @@
      * @returns Boolean
      */
     hasFill: function() {
-      return this.fill && this.fill !== 'transparent' && this.fill !== 'none';
+      return this.fill && this.fill !== 'transparent';
     },
 
     /**
