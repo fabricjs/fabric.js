@@ -561,8 +561,8 @@
           else if (!clipPath.absolutePositioned) {
             var center;
             var clipPathRelativeCenter = clipPath.getRelativeCenterPoint(),
-              //  we want the center point to exist in group's containing plane, so we send it upwards
-              clipPathCenter = transformPoint(clipPathRelativeCenter, this.calcOwnMatrix(), true);
+                //  we want the center point to exist in group's containing plane, so we send it upwards
+                clipPathCenter = transformPoint(clipPathRelativeCenter, this.calcOwnMatrix(), true);
             if (context.type === 'initialization' || context.type === 'layout_change') {
               var bbox = this.prepareBoundingBox(layoutDirective, objects, context) || {};
               center = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0);
