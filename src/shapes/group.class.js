@@ -43,6 +43,12 @@
     layout: 'fit-content',
 
     /**
+     * Width of stroke
+     * @type Number
+     */
+    strokeWidth: 0,
+
+    /**
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
@@ -331,6 +337,42 @@
     _onObjectRemoved: function (object, removeParentTransform) {
       this.exitGroup(object, removeParentTransform);
       object.fire('removed', { target: this });
+    },
+
+    /**
+     * Decide if the object should cache or not. Create its own cache level
+     * needsItsOwnCache should be used when the object drawing method requires
+     * a cache step. None of the fabric classes requires it.
+     * Generally you do not cache objects in groups because the group is already cached.
+     * @return {Boolean}
+     */
+    shouldCache: function() {
+      var ownCache = fabric.Object.prototype.shouldCache.call(this);
+      if (ownCache) {
+        for (var i = 0, len = this._objects.length; i < len; i++) {
+          if (this._objects[i].willDrawShadow()) {
+            this.ownCaching = false;
+            return false;
+          }
+        }
+      }
+      return ownCache;
+    },
+
+    /**
+     * Check if this object or a child object will cast a shadow
+     * @return {Boolean}
+     */
+    willDrawShadow: function() {
+      if (fabric.Object.prototype.willDrawShadow.call(this)) {
+        return true;
+      }
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        if (this._objects[i].willDrawShadow()) {
+          return true;
+        }
+      }
+      return false;
     },
 
     /**
@@ -788,32 +830,32 @@
     /* _TO_SVG_START_ */
 
     /**
-     * @private
-     */
-    _createFillStrokeSVGRect: function (reviver) {
-      if (!this.hasFill() && !this.hasStroke()) {
-        return '';
-      }
-      var fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
-      var commons = fillStroke.indexOf('COMMON_PARTS');
-      fillStroke[commons] = 'for="group" ';
-      return fillStroke.join('');
-    },
-
-    /**
      * Returns svg representation of an instance
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
     _toSVG: function (reviver) {
       var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-      var fillStroke = this._createFillStrokeSVGRect(reviver);
-      fillStroke && svgString.push('\t\t', fillStroke);
       for (var i = 0, len = this._objects.length; i < len; i++) {
         svgString.push('\t\t', this._objects[i].toSVG(reviver));
       }
       svgString.push('</g>\n');
       return svgString;
+    },
+
+    /**
+     * Returns styles-string for svg-export, specific version for group
+     * @return {String}
+     */
+    getSvgStyles: function() {
+      var opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ?
+            'opacity: ' + this.opacity + ';' : '',
+          visibility = this.visible ? '' : ' visibility: hidden;';
+      return [
+        opacity,
+        this.getSvgFilter(),
+        visibility
+      ].join('');
     },
 
     /**
@@ -823,8 +865,6 @@
      */
     toClipPathSVG: function (reviver) {
       var svgString = [];
-      var fillStroke = this._createFillStrokeSVGRect(reviver);
-      fillStroke && svgString.push('\t\t', fillStroke);
       for (var i = 0, len = this._objects.length; i < len; i++) {
         svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
       }

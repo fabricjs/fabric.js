@@ -61,28 +61,28 @@
       fired.push(object);
     };
 
-    collection.insertAt(rect3, 1, false, cb);
+    collection.insertAt(rect3, 1, cb);
     control.splice(1, 0, rect3);
     firingControl.push(rect3);
     equalsControl();
-    collection.insertAt(rect4, 0, true, cb);
-    control.splice(0, 1, rect4);
+    collection.insertAt(rect4, 0, cb);
+    control.splice(0, 0, rect4);
     firingControl.push(rect4);
     equalsControl();
-    collection.insertAt(rect5, 2, false, cb);
+    collection.insertAt(rect5, 2, cb);
     control.splice(2, 0, rect5);
     firingControl.push(rect5);
     equalsControl();
-    collection.insertAt([rect6], 2, false, cb);
+    collection.insertAt([rect6], 2, cb);
     control.splice(2, 0, rect6);
     firingControl.push(rect6);
     equalsControl();
-    collection.insertAt([rect7, rect8], 3, true, cb);
-    control.splice(3, 2, rect7, rect8);
+    collection.insertAt([rect7, rect8], 3, cb);
+    control.splice(3, 0, rect7, rect8);
     firingControl.push(rect7, rect8);
     equalsControl();
     //  insert duplicates
-    collection.insertAt([rect1, rect2], 2, false, cb);
+    collection.insertAt([rect1, rect2], 2, cb);
     control.splice(2, 0, rect1, rect2);
     firingControl.push(rect1, rect2);
     equalsControl();
