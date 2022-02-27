@@ -1216,7 +1216,7 @@
       else {
         this._renderBackground(ctx);
       }
-      this._render(ctx);
+      this._render(ctx, forClipping);
       this._drawClipPath(ctx, this.clipPath);
       this.fill = originalFill;
       this.stroke = originalStroke;

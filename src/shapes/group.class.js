@@ -393,16 +393,12 @@
        *
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
+       * @param {boolean} [forClipping]
        */
-      _render: function (ctx) {
+      _render: function (ctx, forClipping) {
         //  render fill/stroke courtesy of rect
-        this._hasFillStroke() && fabric.Rect.prototype._render.call(this, ctx);
-        this._renderObjects(ctx);
-      },
-
-      _hasFillStroke: function () {
-        return (this.fill && this.fill !== 'none' && this.fill !== 'transparent') ||
-          (this.stroke && this.stroke !== 'none' && this.stroke !== 'transparent' && this.strokeWidth);
+        !forClipping && (this.hasFill() || this.hasStroke()) && fabric.Rect.prototype._render.call(this, ctx);
+        this._renderObjects(ctx, forClipping);
       },
 
       /**
@@ -411,14 +407,15 @@
        * In case a single object is selected it's entire tree will be rendered by canvas above the other objects (`preserveObjectStacking = false`)
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
-       * @deprecated
+       * @param {boolean} [renderAllObjects] override default behavior to render all objects, included selected objects
+       * @todo support perPixelTargetFind
        */
-      _renderObjects: function (ctx) {
+      _renderObjects: function (ctx, renderAllObjects) {
         var localActiveObjects = this._activeObjects,
             activeObjectsSize = this.canvas.getActiveObjects ? this.canvas.getActiveObjects().length : 0,
             preserveObjectStacking = this.canvas.preserveObjectStacking;
         this.forEachObject(function (object) {
-          if (preserveObjectStacking || activeObjectsSize <= 1
+          if (renderAllObjects || preserveObjectStacking || activeObjectsSize <= 1
             || localActiveObjects.length === 0 || localActiveObjects.indexOf(object) === -1) {
             object.render(ctx);
           }
@@ -822,7 +819,7 @@
        * @private
        */
       _createFillStrokeSVGRect: function (reviver) {
-        if (!this._hasFillStroke()) {
+        if (!this.hasFill() && !this.hasStroke()) {
           return '';
         }
         var fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
