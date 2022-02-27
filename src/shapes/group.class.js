@@ -475,7 +475,7 @@
         //  set dimensions
         this.set({ width: result.width, height: result.height });
         //  adjust objects to account for new center
-        this.forEachObject(function (object) {
+        !context.objectsRelativeToGroup && this.forEachObject(function (object) {
           this._adjustObjectPosition(object, diff);
         }, this);
         //  clip path as well
@@ -587,6 +587,13 @@
               };
             }
           }
+        }
+        else if (layoutDirective === 'svg' && context.type === 'initialization') {
+          var bbox = this.getObjectsBoundingBox(objects, true) || {};
+          return Object.assign(bbox, {
+            correctionX: -bbox.offsetX || 0,
+            correctionY: -bbox.offsetY || 0,
+          });
         }
       },
 
@@ -713,7 +720,7 @@
        * @param {fabric.Object[]} objects
        * @returns {LayoutResult | null} bounding box
        */
-      getObjectsBoundingBox: function (objects) {
+      getObjectsBoundingBox: function (objects, ignoreOffset) {
         if (objects.length === 0) {
           return null;
         }
@@ -741,17 +748,19 @@
           }
         });
 
-        var width = max.x - min.x,
-            height = max.y - min.y,
-            relativeCenter = min.midPointFrom(max),
+        var size = max.subtract(min),
+            relativeCenter = ignoreOffset ? size.scalarDivide(2) : min.midPointFrom(max),
             //  we send `relativeCenter` up to group's containing plane
+            offset = transformPoint(min, this.calcOwnMatrix()),
             center = transformPoint(relativeCenter, this.calcOwnMatrix());
 
         return {
+          offsetX: offset.x,
+          offsetY: offset.y,
           centerX: center.x,
           centerY: center.y,
-          width: width,
-          height: height,
+          width: size.x,
+          height: size.y,
         };
       },
 

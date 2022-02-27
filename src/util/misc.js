@@ -611,7 +611,6 @@
      * @return {fabric.Object|fabric.Group}
      */
     groupSVGElements: function (elements, options, path) {
-      var object;
       if (elements && elements.length === 1) {
         return elements[0];
       }
@@ -619,11 +618,12 @@
         delete options.width;
         delete options.height;
       }
-      object = new fabric.Group(elements, options);
+      options.layout = 'svg';
+      var group = new fabric.Group(elements, options);
       if (typeof path !== 'undefined') {
-        object.sourcePath = path;
+        group.sourcePath = path;
       }
-      return object;
+      return group;
     },
 
     /**
