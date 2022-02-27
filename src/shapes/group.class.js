@@ -450,7 +450,7 @@
        * so it is placed in the center of the bbox received from the constructor
        *
        * @private
-       * @param {LayoutContext}
+       * @param {LayoutContext} context
        */
       _applyLayoutStrategy: function (context) {
         var isFirstLayout = context.type === 'initialization';
@@ -477,7 +477,7 @@
           this._adjustObjectPosition(object, diff);
         }, this);
         //  clip path as well
-        !isFirstLayout && this.clipPath && !this.clipPath.absolutePositioned
+        !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
           && this._adjustObjectPosition(this.clipPath, diff);
         if (!newCenter.eq(center)) {
           //  set position
@@ -542,6 +542,7 @@
         }
         else if (layoutDirective === 'clip-path' && this.clipPath) {
           var clipPath = this.clipPath;
+          var clipPathSizeAfter = clipPath._getTransformedDimensions();
           if (clipPath.absolutePositioned && (context.type === 'initialization' || context.type === 'layout_change')) {
             //  we want the center point to exist in group's containing plane
             var clipPathCenter = clipPath.getCenterPoint();
@@ -553,8 +554,8 @@
             return {
               centerX: clipPathCenter.x,
               centerY: clipPathCenter.y,
-              width: clipPath.width,
-              height: clipPath.height,
+              width: clipPathSizeAfter.x,
+              height: clipPathSizeAfter.y,
             };
           }
           else if (!clipPath.absolutePositioned) {
@@ -579,8 +580,8 @@
               return {
                 centerX: center.x + clipPathCenter.x,
                 centerY: center.y + clipPathCenter.y,
-                width: clipPath.width,
-                height: clipPath.height,
+                width: clipPathSizeAfter.x,
+                height: clipPathSizeAfter.y,
               };
             }
           }
