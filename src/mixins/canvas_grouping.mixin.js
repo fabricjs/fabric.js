@@ -97,9 +97,7 @@
       activeObject.isEditing && activeObject.exitEditing();
       //  handle case: target is nested
       return new fabric.ActiveSelection(groupObjects, {
-        canvas: this,
-        originX: 'center',
-        originY: 'center',
+        canvas: this
       });
     },
 
@@ -162,9 +160,7 @@
       }
       else if (objects.length > 1) {
         aGroup = new fabric.ActiveSelection(objects.reverse(), {
-          canvas: this,
-          originX: 'center',
-          originY: 'center',
+          canvas: this
         });
         this.setActiveObject(aGroup, e);
       }
