@@ -542,7 +542,7 @@
         }
         else if (layoutDirective === 'clip-path' && this.clipPath) {
           var clipPath = this.clipPath;
-          if (clipPath.absolutePositioned && context.type === 'initialization') {
+          if (clipPath.absolutePositioned && (context.type === 'initialization' || context.type === 'layout_change')) {
             //  we want the center point to exist in group's containing plane
             var clipPathCenter = clipPath.getCenterPoint();
             if (this.group) {
@@ -560,21 +560,29 @@
           else if (!clipPath.absolutePositioned) {
             var center;
             var clipPathRelativeCenter = clipPath.getRelativeCenterPoint(),
-                //  we want the center point to exist in group's containing plane, so we send it upwards
-                clipPathCenter = transformPoint(clipPathRelativeCenter, this.calcOwnMatrix(), true);
-            if (context.type === 'initialization') {
+              //  we want the center point to exist in group's containing plane, so we send it upwards
+              clipPathCenter = transformPoint(clipPathRelativeCenter, this.calcOwnMatrix(), true);
+            if (context.type === 'initialization' || context.type === 'layout_change') {
               var bbox = this.prepareBoundingBox(layoutDirective, objects, context) || {};
               center = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0);
+              return {
+                centerX: center.x + clipPathCenter.x,
+                centerY: center.y + clipPathCenter.y,
+                correctionX: bbox.correctionX - clipPathCenter.x,
+                correctionY: bbox.correctionY - clipPathCenter.y,
+                width: clipPath.width,
+                height: clipPath.height,
+              };
             }
             else {
               center = this.getRelativeCenterPoint();
+              return {
+                centerX: center.x + clipPathCenter.x,
+                centerY: center.y + clipPathCenter.y,
+                width: clipPath.width,
+                height: clipPath.height,
+              };
             }
-            return {
-              centerX: center.x + clipPathCenter.x,
-              centerY: center.y + clipPathCenter.y,
-              width: clipPath.width,
-              height: clipPath.height,
-            };
           }
         }
       },
