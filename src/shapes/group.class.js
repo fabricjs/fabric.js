@@ -342,6 +342,40 @@
     },
 
     /**
+     * Execute the drawing operation for an object on a specified context
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    drawObject: function(ctx) {
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        this._objects[i].render(ctx);
+      }
+      this._drawClipPath(ctx, this.clipPath);
+    },
+
+    /**
+     * Check if cache is dirty
+     */
+    isCacheDirty: function(skipCanvas) {
+      if (this.callSuper('isCacheDirty', skipCanvas)) {
+        return true;
+      }
+      if (!this.statefullCache) {
+        return false;
+      }
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        if (this._objects[i].isCacheDirty(true)) {
+          if (this._cacheCanvas) {
+            // if this group has not a cache canvas there is nothing to clean
+            var x = this.cacheWidth / this.zoomX, y = this.cacheHeight / this.zoomY;
+            this._cacheContext.clearRect(-x / 2, -y / 2, x, y);
+          }
+          return true;
+        }
+      }
+      return false;
+    },
+
+    /**
      * @override
      * @return {Boolean}
      */
@@ -361,39 +395,6 @@
       this._transformDone = true;
       this.callSuper('render', ctx);
       this._transformDone = false;
-    },
-
-    /**
-     *
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {boolean} [forClipping]
-     */
-    _render: function (ctx, forClipping) {
-      //  render fill/stroke courtesy of rect
-      !forClipping && (this.hasFill() || this.hasStroke()) && fabric.Rect.prototype._render.call(this, ctx);
-      this._renderObjects(ctx, forClipping);
-    },
-
-    /**
-     * Render objects:\
-     * Canvas is in charge of rendering the selected objects in case of multiselection.\
-     * In case a single object is selected it's entire tree will be rendered by canvas above the other objects (`preserveObjectStacking = false`)
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {boolean} [renderAllObjects] override default behavior to render all objects, included selected objects
-     * @todo support perPixelTargetFind
-     */
-    _renderObjects: function (ctx, renderAllObjects) {
-      var localActiveObjects = this._activeObjects,
-          activeObjectsSize = this.canvas.getActiveObjects ? this.canvas.getActiveObjects().length : 0,
-          preserveObjectStacking = this.canvas.preserveObjectStacking;
-      this.forEachObject(function (object) {
-        if (renderAllObjects || preserveObjectStacking || activeObjectsSize <= 1
-            || localActiveObjects.length === 0 || localActiveObjects.indexOf(object) === -1) {
-          object.render(ctx);
-        }
-      }, this);
     },
 
     /**
