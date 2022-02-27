@@ -20686,57 +20686,41 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     type: 'activeSelection',
 
     /**
-     * Constructor
-     * @param {Object} objects ActiveSelection objects
-     * @param {Object} [options] Options object
-     * @return {Object} thisArg
+     * @override
      */
-    initialize: function(objects, options) {
-      options = options || {};
-      this._objects = objects || [];
-      for (var i = this._objects.length; i--; ) {
-        this._objects[i].group = this;
-      }
+    layout: 'fit-content',
 
-      if (options.originX) {
-        this.originX = options.originX;
-      }
-      if (options.originY) {
-        this.originY = options.originY;
-      }
-      this._calcBounds();
-      this._updateObjectsCoords();
-      fabric.Object.prototype.initialize.call(this, options);
+    /**
+     * @override
+     */
+    subTargetCheck: false,
+
+    /**
+     * @override
+     */
+    interactive: false,
+
+    /**
+     * Constructor
+     *
+     * @param {fabric.Object[]} [objects] instance objects
+     * @param {Object} [options] Options object
+     * @param {boolean} [objectsRelativeToGroup] true if objects exist in group coordinate plane
+     * @return {fabric.ActiveSelection} thisArg
+     */
+    initialize: function (objects, options, objectsRelativeToGroup) {
+      this.callSuper('initialize', objects, options, objectsRelativeToGroup);
       this.setCoords();
     },
 
     /**
-     * Change te activeSelection to a normal group,
-     * High level function that automatically adds it to canvas as
-     * active object. no events fired.
-     * @since 2.0.0
-     * @return {fabric.Group}
+     * we want objects to retain their canvas ref when exiting instance
+     * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
      */
-    toGroup: function() {
-      var objects = this._objects.concat();
-      this._objects = [];
-      var options = fabric.Object.prototype.toObject.call(this);
-      var newGroup = new fabric.Group([]);
-      delete options.type;
-      newGroup.set(options);
-      objects.forEach(function(object) {
-        object.canvas.remove(object);
-        object.group = newGroup;
-      });
-      newGroup._objects = objects;
-      if (!this.canvas) {
-        return newGroup;
-      }
-      var canvas = this.canvas;
-      canvas.add(newGroup);
-      canvas._activeObject = newGroup;
-      newGroup.setCoords();
-      return newGroup;
+    exitGroup: function (object, removeParentTransform) {
+      this._exitGroup(object, removeParentTransform);
     },
 
     /**
@@ -20745,7 +20729,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {Boolean} [cancel]
      */
     onDeselect: function() {
-      this.destroy();
+      this.removeAll();
       return false;
     },
 
