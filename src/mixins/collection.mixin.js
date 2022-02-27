@@ -3,79 +3,74 @@
  */
 fabric.Collection = {
 
+  /**
+   * @type {fabric.Object[]}
+   */
   _objects: [],
 
   /**
    * Adds objects to collection, Canvas or Group, then renders canvas
    * (if `renderOnAddRemove` is not `false`).
-   * in case of Group no changes to bounding box are made.
    * Objects should be instances of (or inherit from) fabric.Object
-   * Use of this function is highly discouraged for groups.
-   * you can add a bunch of objects with the add method but then you NEED
-   * to run a addWithUpdate call for the Group class or position/bbox will be wrong.
-   * @param {...fabric.Object} object Zero or more fabric instances
-   * @return {Self} thisArg
-   * @chainable
+   * @private
+   * @param {fabric.Object[]} objects to add
+   * @param {(object:fabric.Object) => any} [callback]
+   * @returns {number} new array length
    */
-  add: function () {
-    this._objects.push.apply(this._objects, arguments);
-    if (this._onObjectAdded) {
-      for (var i = 0, length = arguments.length; i < length; i++) {
-        this._onObjectAdded(arguments[i]);
+  add: function (objects, callback) {
+    var size = this._objects.push.apply(this._objects, objects);
+    if (callback) {
+      for (var i = 0, length = objects.length; i < length; i++) {
+        callback.call(this, objects[i]);
       }
     }
-    this.renderOnAddRemove && this.requestRenderAll();
-    return this;
+    return size;
   },
 
   /**
    * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
    * An object should be an instance of (or inherit from) fabric.Object
-   * Use of this function is highly discouraged for groups.
-   * you can add a bunch of objects with the insertAt method but then you NEED
-   * to run a addWithUpdate call for the Group class or position/bbox will be wrong.
-   * @param {Object} object Object to insert
+   * @private
+   * @param {fabric.Object|fabric.Object[]} objects Object(s) to insert
    * @param {Number} index Index to insert object at
    * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
-   * @return {Self} thisArg
-   * @chainable
+   * @param {(object:fabric.Object) => any} [callback]
    */
-  insertAt: function (object, index, nonSplicing) {
-    var objects = this._objects;
-    if (nonSplicing) {
-      objects[index] = object;
+  insertAt: function (objects, index, nonSplicing, callback) {
+    var deleteCount = nonSplicing ?
+      Array.isArray(objects) ? objects.length : 1 :
+      0;
+    //  objects might be an array so we use concat
+    var args = [index, deleteCount].concat(objects);
+    this._objects.splice.apply(this._objects, args);
+    if (callback) {
+      for (var i = 2, length = args.length; i < length; i++) {
+        callback.call(this, args[i]);
+      }
     }
-    else {
-      objects.splice(index, 0, object);
-    }
-    this._onObjectAdded && this._onObjectAdded(object);
-    this.renderOnAddRemove && this.requestRenderAll();
-    return this;
   },
 
   /**
    * Removes objects from a collection, then renders canvas (if `renderOnAddRemove` is not `false`)
-   * @param {...fabric.Object} object Zero or more fabric instances
-   * @return {Self} thisArg
-   * @chainable
+   * @private
+   * @param {fabric.Object[]} objectsToRemove objects to remove
+   * @param {(object:fabric.Object) => any} [callback]
+   * @returns {boolean} true if objects were removed
    */
-  remove: function() {
+  remove: function(objectsToRemove, callback) {
     var objects = this._objects,
         index, somethingRemoved = false;
 
-    for (var i = 0, length = arguments.length; i < length; i++) {
-      index = objects.indexOf(arguments[i]);
-
+    for (var i = 0, length = objectsToRemove.length; i < length; i++) {
+      index = objects.indexOf(objectsToRemove[i]);
       // only call onObjectRemoved if an object was actually removed
       if (index !== -1) {
         somethingRemoved = true;
         objects.splice(index, 1);
-        this._onObjectRemoved && this._onObjectRemoved(arguments[i]);
+        callback && callback.call(this, objectsToRemove[i]);
       }
     }
-
-    this.renderOnAddRemove && somethingRemoved && this.requestRenderAll();
-    return this;
+    return somethingRemoved;
   },
 
   /**
@@ -100,18 +95,25 @@ fabric.Collection = {
 
   /**
    * Returns an array of children objects of this instance
-   * Type parameter introduced in 1.3.10
-   * since 2.3.5 this method return always a COPY of the array;
-   * @param {String} [type] When specified, only objects of this type are returned
+   * @param {...String} [types] When specified, only objects of these types are returned
    * @return {Array}
    */
-  getObjects: function(type) {
-    if (typeof type === 'undefined') {
+  getObjects: function() {
+    if (arguments.length === 0) {
       return this._objects.concat();
     }
-    return this._objects.filter(function(o) {
-      return o.type === type;
-    });
+    else if (arguments.length === 1) {
+      var type = arguments[0];
+      return this._objects.filter(function (o) {
+        return o.type === type;
+      });
+    }
+    else {
+      var types = Array.from(arguments);
+      return this._objects.filter(function (o) {
+        return types.indexOf(o.type) > -1;
+      });
+    }
   },
 
   /**
@@ -140,7 +142,8 @@ fabric.Collection = {
   },
 
   /**
-   * Returns true if collection contains an object
+   * Returns true if collection contains an object.\
+   * **Prefer using {@link `fabric.Object#isDescendantOf`} for performance reasons**
    * @param {Object} object Object to check against
    * @param {Boolean} [deep=false] `true` to check all descendants, `false` to check only `_objects`
    * @return {Boolean} `true` if collection contains an object
