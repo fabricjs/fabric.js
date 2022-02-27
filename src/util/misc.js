@@ -618,8 +618,7 @@
         delete options.width;
         delete options.height;
       }
-      options.layout = 'svg';
-      var group = new fabric.Group(elements, options);
+      var group = new fabric.Group(elements, Object.assign(options || {}, { layout: 'svg' }));
       if (typeof path !== 'undefined') {
         group.sourcePath = path;
       }
