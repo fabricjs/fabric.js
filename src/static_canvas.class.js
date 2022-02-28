@@ -579,8 +579,8 @@
      * @return {Self} thisArg
      * @chainable
      */
-    insertAt: function (objects, index, nonSplicing) {
-      fabric.Collection.insertAt.call(this, objects, index, nonSplicing, this._onObjectAdded);
+    insertAt: function (objects, index) {
+      fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
       this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
