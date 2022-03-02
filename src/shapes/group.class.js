@@ -117,7 +117,7 @@
      * @param {Boolean} [skipCoordsChange] if true, coordinates of objects enclosed in a group do not change
      */
     _updateObjectsCoords: function(center) {
-      var center = center || this.getRelativeCenterPoint();
+      var center = center || this.getCenterPoint();
       for (var i = this._objects.length; i--; ){
         this._updateObjectCoords(this._objects[i], center);
       }

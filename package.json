@@ -55,7 +55,7 @@
     "test:coverage": "nyc --silent qunit test/node_test_setup.js test/lib test/unit",
     "test:visual:coverage": "nyc --silent --no-clean qunit test/node_test_setup.js test/lib test/visual",
     "coverage:report": "nyc report --reporter=lcov --reporter=text",
-    "test": "qunit --require ./test/node_test_setup.js test/lib test/unit",
+    "test": "qunit test/node_test_setup.js test/lib test/unit",
     "test:visual": "qunit test/node_test_setup.js test/lib test/visual",
     "test:visual:single": "qunit test/node_test_setup.js test/lib",
     "test:all": "npm run test && npm run test:visual",
@@ -80,7 +80,7 @@
     "nyc": "^15.1.0",
     "onchange": "^7.1.0",
     "pixelmatch": "^4.0.2",
-    "qunit": "^2.17.2",
+    "qunit": "^2.13.0",
     "testem": "^3.2.0",
     "uglify-js": "3.3.x"
   },

@@ -727,17 +727,17 @@
     _getCacheCanvasDimensions: function() {
       var objectScale = this.getTotalObjectScaling(),
           // caculate dimensions without skewing
-          dim = this._getTransformedDimensions({ skewX: 0, skewY: 0 }),
-          neededX = dim.x * objectScale.x / this.scaleX,
-          neededY = dim.y * objectScale.y / this.scaleY;
+          dim = this._getTransformedDimensions(0, 0),
+          neededX = dim.x * objectScale.scaleX / this.scaleX,
+          neededY = dim.y * objectScale.scaleY / this.scaleY;
       return {
         // for sure this ALIASING_LIMIT is slightly creating problem
         // in situation in which the cache canvas gets an upper limit
         // also objectScale contains already scaleX and scaleY
         width: neededX + ALIASING_LIMIT,
         height: neededY + ALIASING_LIMIT,
-        zoomX: objectScale.x,
-        zoomY: objectScale.y,
+        zoomX: objectScale.scaleX,
+        zoomY: objectScale.scaleY,
         x: neededX,
         y: neededY
       };
@@ -908,9 +908,11 @@
         if (object[prop] === prototype[prop]) {
           delete object[prop];
         }
+        var isArray = Object.prototype.toString.call(object[prop]) === '[object Array]' &&
+                      Object.prototype.toString.call(prototype[prop]) === '[object Array]';
+
         // basically a check for [] === []
-        if (Array.isArray(object[prop]) && Array.isArray(prototype[prop])
-          && object[prop].length === 0 && prototype[prop].length === 0) {
+        if (isArray && object[prop].length === 0 && prototype[prop].length === 0) {
           delete object[prop];
         }
       });
@@ -928,7 +930,7 @@
 
     /**
      * Return the object scale factor counting also the group scaling
-     * @return {fabric.Point}
+     * @return {Object} object with scaleX and scaleY properties
      */
     getObjectScaling: function() {
       // if the object is a top level one, on the canvas, we go for simple aritmetic
@@ -936,11 +938,14 @@
       // and will likely kill the cache when not needed
       // https://github.com/fabricjs/fabric.js/issues/7157
       if (!this.group) {
-        return new fabric.Point(Math.abs(this.scaleX), Math.abs(this.scaleY));
+        return {
+          scaleX: this.scaleX,
+          scaleY: this.scaleY,
+        };
       }
       // if we are inside a group total zoom calculation is complex, we defer to generic matrices
       var options = fabric.util.qrDecompose(this.calcTransformMatrix());
-      return new fabric.Point(Math.abs(options.scaleX), Math.abs(options.scaleY));
+      return { scaleX: Math.abs(options.scaleX), scaleY: Math.abs(options.scaleY) };
     },
 
     /**
@@ -948,13 +953,14 @@
      * @return {Object} object with scaleX and scaleY properties
      */
     getTotalObjectScaling: function() {
-      var scale = this.getObjectScaling();
+      var scale = this.getObjectScaling(), scaleX = scale.scaleX, scaleY = scale.scaleY;
       if (this.canvas) {
         var zoom = this.canvas.getZoom();
         var retina = this.canvas.getRetinaScaling();
-        scale.scalarMultiplyEquals(zoom * retina);
+        scaleX *= zoom * retina;
+        scaleY *= zoom * retina;
       }
-      return scale;
+      return { scaleX: scaleX, scaleY: scaleY };
     },
 
     /**
@@ -967,16 +973,6 @@
         opacity *= this.group.getObjectOpacity();
       }
       return opacity;
-    },
-
-    /**
-     * Returns the object angle relative to canvas counting also the group property
-     * @returns {number}
-     */
-    getTotalAngle: function () {
-      return this.group ?
-        fabric.util.qrDecompose(this.calcTransformMatrix()).angle :
-        this.angle;
     },
 
     /**
@@ -1020,6 +1016,16 @@
         }
       }
       return this;
+    },
+
+    /**
+     * This callback function is called by the parent group of an object every
+     * time a non-delegated property changes on the group. It is passed the key
+     * and value as parameters. Not adding in this function's signature to avoid
+     * Travis build error about unused variables.
+     */
+    setOnGroup: function() {
+      // implemented by sub-classes, as needed.
     },
 
     /**
@@ -1170,7 +1176,6 @@
      * Check if this object or a child object will cast a shadow
      * used by Group.shouldCache to know if child has a shadow recursively
      * @return {Boolean}
-     * @deprecated
      */
     willDrawShadow: function() {
       return !!this.shadow && (this.shadow.offsetX !== 0 || this.shadow.offsetY !== 0);
@@ -1422,19 +1427,24 @@
         return;
       }
 
-      var shadow = this.shadow, canvas = this.canvas,
+      var shadow = this.shadow, canvas = this.canvas, scaling,
           multX = (canvas && canvas.viewportTransform[0]) || 1,
-          multY = (canvas && canvas.viewportTransform[3]) || 1,
-          scaling = shadow.nonScaling ? new fabric.Point(1, 1) : this.getObjectScaling();
+          multY = (canvas && canvas.viewportTransform[3]) || 1;
+      if (shadow.nonScaling) {
+        scaling = { scaleX: 1, scaleY: 1 };
+      }
+      else {
+        scaling = this.getObjectScaling();
+      }
       if (canvas && canvas._isRetinaScaling()) {
         multX *= fabric.devicePixelRatio;
         multY *= fabric.devicePixelRatio;
       }
       ctx.shadowColor = shadow.color;
       ctx.shadowBlur = shadow.blur * fabric.browserShadowBlurConstant *
-        (multX + multY) * (scaling.x + scaling.y) / 4;
-      ctx.shadowOffsetX = shadow.offsetX * multX * scaling.x;
-      ctx.shadowOffsetY = shadow.offsetY * multY * scaling.y;
+        (multX + multY) * (scaling.scaleX + scaling.scaleY) / 4;
+      ctx.shadowOffsetX = shadow.offsetX * multX * scaling.scaleX;
+      ctx.shadowOffsetY = shadow.offsetY * multY * scaling.scaleY;
     },
 
     /**
@@ -1537,9 +1547,12 @@
       }
 
       ctx.save();
-      if (this.strokeUniform) {
+      if (this.strokeUniform && this.group) {
         var scaling = this.getObjectScaling();
-        ctx.scale(1 / scaling.x, 1 / scaling.y);
+        ctx.scale(1 / scaling.scaleX, 1 / scaling.scaleY);
+      }
+      else if (this.strokeUniform) {
+        ctx.scale(1 / this.scaleX, 1 / this.scaleY);
       }
       this._setLineDash(ctx, this.strokeDashArray);
       this._setStrokeStyles(ctx, this);
@@ -1704,15 +1717,21 @@
       var el = fabric.util.createCanvasElement(),
           // skip canvas zoom and calculate with setCoords now.
           boundingRect = this.getBoundingRect(true, true),
-          shadow = this.shadow, shadowOffset = { x: 0, y: 0 },
+          shadow = this.shadow, scaling,
+          shadowOffset = { x: 0, y: 0 }, shadowBlur,
           width, height;
 
       if (shadow) {
-        var shadowBlur = shadow.blur;
-        var scaling = shadow.nonScaling ? new fabric.Point(1, 1) : this.getObjectScaling();
+        shadowBlur = shadow.blur;
+        if (shadow.nonScaling) {
+          scaling = { scaleX: 1, scaleY: 1 };
+        }
+        else {
+          scaling = this.getObjectScaling();
+        }
         // consider non scaling shadow.
-        shadowOffset.x = 2 * Math.round(abs(shadow.offsetX) + shadowBlur) * (abs(scaling.x));
-        shadowOffset.y = 2 * Math.round(abs(shadow.offsetY) + shadowBlur) * (abs(scaling.y));
+        shadowOffset.x = 2 * Math.round(abs(shadow.offsetX) + shadowBlur) * (abs(scaling.scaleX));
+        shadowOffset.y = 2 * Math.round(abs(shadow.offsetY) + shadowBlur) * (abs(scaling.scaleY));
       }
       width = boundingRect.width + shadowOffset.x;
       height = boundingRect.height + shadowOffset.y;
@@ -1775,7 +1794,7 @@
      * @return {Boolean}
      */
     isType: function(type) {
-      return arguments.length > 1 ? Array.from(arguments).includes(this.type) : this.type === type;
+      return this.type === type;
     },
 
     /**
@@ -1885,13 +1904,23 @@
     },
 
     /**
-     * This callback function is called by the parent group of an object every
-     * time a non-delegated property changes on the group. It is passed the key
-     * and value as parameters. Not adding in this function's signature to avoid
-     * Travis build error about unused variables.
+     * Returns coordinates of a pointer relative to an object
+     * @param {Event} e Event to operate upon
+     * @param {Object} [pointer] Pointer to operate upon (instead of event)
+     * @return {Object} Coordinates of a pointer (x, y)
      */
-    setOnGroup: function() {
-      // implemented by sub-classes, as needed.
+    getLocalPointer: function(e, pointer) {
+      pointer = pointer || this.canvas.getPointer(e);
+      var pClicked = new fabric.Point(pointer.x, pointer.y),
+          objectLeftTop = this._getLeftTopCoords();
+      if (this.angle) {
+        pClicked = fabric.util.rotatePoint(
+          pClicked, objectLeftTop, degreesToRadians(-this.angle));
+      }
+      return {
+        x: pClicked.x - objectLeftTop.x,
+        y: pClicked.y - objectLeftTop.y
+      };
     },
 
     /**

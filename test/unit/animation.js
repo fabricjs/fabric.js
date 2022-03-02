@@ -324,7 +324,7 @@
       assert.equal(Math.round(object.get('left')), 1);
       assert.equal(Math.round(object.get('top')), 1);
 
-      assert.ok(changedInvocations > 0);
+      assert.equal(changedInvocations, 2);
       assert.equal(completeInvocations, 1);
 
       done();

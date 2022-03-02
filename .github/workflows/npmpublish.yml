@@ -4,7 +4,7 @@ on:
   release:
     branches:
       - master
-      - 5.x
+      - v3.x
     types: [published]
 
 jobs:

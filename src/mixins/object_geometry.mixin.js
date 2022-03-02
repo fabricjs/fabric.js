@@ -431,7 +431,7 @@
 
     calcLineCoords: function() {
       var vpt = this.getViewportTransform(),
-          padding = this.padding, angle = degreesToRadians(this.getTotalAngle()),
+          padding = this.padding, angle = degreesToRadians(this.angle),
           cos = util.cos(angle), sin = util.sin(angle),
           cosP = cos * padding, sinP = sin * padding, cosPSinP = cosP + sinP,
           cosPMinusSinP = cosP - sinP, aCoords = this.calcACoords();
@@ -461,8 +461,7 @@
       var rotateMatrix = this._calcRotateMatrix(),
           translateMatrix = this._calcTranslateMatrix(),
           vpt = this.getViewportTransform(),
-          startMatrix = this.group ? multiplyMatrices(vpt, this.group.calcTransformMatrix()) : vpt,
-          startMatrix = multiplyMatrices(startMatrix, translateMatrix),
+          startMatrix = multiplyMatrices(vpt, translateMatrix),
           finalMatrix = multiplyMatrices(startMatrix, rotateMatrix),
           finalMatrix = multiplyMatrices(finalMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
           dim = this._calculateCurrentDimensions(),
@@ -472,18 +471,15 @@
       });
 
       // debug code
-      /*
-       var canvas = this.canvas;
-      setTimeout(function () {
-        if (!canvas) return;
-         canvas.contextTop.clearRect(0, 0, 700, 700);
-         canvas.contextTop.fillStyle = 'green';
-         Object.keys(coords).forEach(function(key) {
-           var control = coords[key];
-           canvas.contextTop.fillRect(control.x, control.y, 3, 3);
-         });
-       }, 50);
-       */
+      // var canvas = this.canvas;
+      // setTimeout(function() {
+      //   canvas.contextTop.clearRect(0, 0, 700, 700);
+      //   canvas.contextTop.fillStyle = 'green';
+      //   Object.keys(coords).forEach(function(key) {
+      //     var control = coords[key];
+      //     canvas.contextTop.fillRect(control.x, control.y, 3, 3);
+      //   });
+      // }, 50);
       return coords;
     },
 
@@ -540,7 +536,7 @@
      * @return {Array} rotation matrix for the object
      */
     _calcTranslateMatrix: function() {
-      var center = this.getRelativeCenterPoint();
+      var center = this.getCenterPoint();
       return [1, 0, 0, 1, center.x, center.y];
     },
 
@@ -605,62 +601,77 @@
       return cache.value;
     },
 
-    /**
+    /*
      * Calculate object dimensions from its properties
      * @private
-     * @returns {fabric.Point} dimensions
+     * @return {Object} .x width dimension
+     * @return {Object} .y height dimension
      */
     _getNonTransformedDimensions: function() {
-      return new fabric.Point(this.width, this.height).scalarAddEquals(this.strokeWidth);
+      var strokeWidth = this.strokeWidth,
+          w = this.width + strokeWidth,
+          h = this.height + strokeWidth;
+      return { x: w, y: h };
     },
 
-    /**
+    /*
      * Calculate object bounding box dimensions from its properties scale, skew.
-     * @param {Object} [options]
-     * @param {Number} [options.scaleX]
-     * @param {Number} [options.scaleY]
-     * @param {Number} [options.skewX]
-     * @param {Number} [options.skewY]
+     * @param {Number} skewX, a value to override current skewX
+     * @param {Number} skewY, a value to override current skewY
      * @private
-     * @returns {fabric.Point} dimensions
+     * @return {Object} .x width dimension
+     * @return {Object} .y height dimension
      */
-    _getTransformedDimensions: function (options) {
-      options = Object.assign({
+    _getTransformedDimensions: function(skewX, skewY) {
+      if (typeof skewX === 'undefined') {
+        skewX = this.skewX;
+      }
+      if (typeof skewY === 'undefined') {
+        skewY = this.skewY;
+      }
+      var dimensions, dimX, dimY,
+          noSkew = skewX === 0 && skewY === 0;
+
+      if (this.strokeUniform) {
+        dimX = this.width;
+        dimY = this.height;
+      }
+      else {
+        dimensions = this._getNonTransformedDimensions();
+        dimX = dimensions.x;
+        dimY = dimensions.y;
+      }
+      if (noSkew) {
+        return this._finalizeDimensions(dimX * this.scaleX, dimY * this.scaleY);
+      }
+      var bbox = util.sizeAfterTransform(dimX, dimY, {
         scaleX: this.scaleX,
         scaleY: this.scaleY,
-        skewX: this.skewX,
-        skewY: this.skewY,
-      }, options || {});
-      //  stroke is applied before/after transformations are applied according to `strokeUniform`
-      var preScalingStrokeValue, postScalingStrokeValue, strokeWidth = this.strokeWidth;
-      if (this.strokeUniform) {
-        preScalingStrokeValue = 0;
-        postScalingStrokeValue = strokeWidth;
-      }
-      else {
-        preScalingStrokeValue = strokeWidth;
-        postScalingStrokeValue = 0;
-      }
-      var dimX = this.width + preScalingStrokeValue,
-          dimY = this.height + preScalingStrokeValue,
-          finalDimensions,
-          noSkew = options.skewX === 0 && options.skewY === 0;
-      if (noSkew) {
-        finalDimensions = new fabric.Point(dimX * options.scaleX, dimY * options.scaleY);
-      }
-      else {
-        var bbox = util.sizeAfterTransform(dimX, dimY, options);
-        finalDimensions = new fabric.Point(bbox.x, bbox.y);
-      }
-
-      return finalDimensions.scalarAddEquals(postScalingStrokeValue);
+        skewX: skewX,
+        skewY: skewY,
+      });
+      return this._finalizeDimensions(bbox.x, bbox.y);
     },
 
-    /**
+    /*
+     * Calculate object bounding box dimensions from its properties scale, skew.
+     * @param Number width width of the bbox
+     * @param Number height height of the bbox
+     * @private
+     * @return {Object} .x finalized width dimension
+     * @return {Object} .y finalized height dimension
+     */
+    _finalizeDimensions: function(width, height) {
+      return this.strokeUniform ?
+        { x: width + this.strokeWidth, y: height + this.strokeWidth }
+        :
+        { x: width, y: height };
+    },
+
+    /*
      * Calculate object dimensions for controls box, including padding and canvas zoom.
      * and active selection
-     * @private
-     * @returns {fabric.Point} dimensions
+     * private
      */
     _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),

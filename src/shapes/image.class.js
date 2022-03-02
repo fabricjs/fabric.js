@@ -395,8 +395,8 @@
       var filter = this.resizeFilter,
           minimumScale = this.minimumScaleTrigger,
           objectScale = this.getTotalObjectScaling(),
-          scaleX = objectScale.x,
-          scaleY = objectScale.y,
+          scaleX = objectScale.scaleX,
+          scaleY = objectScale.scaleY,
           elementToFilter = this._filteredEl || this._originalElement;
       if (this.group) {
         this.set('dirty', true);
@@ -552,7 +552,7 @@
      */
     _needsResize: function() {
       var scale = this.getTotalObjectScaling();
-      return (scale.x !== this._lastScaleX || scale.y !== this._lastScaleY);
+      return (scale.scaleX !== this._lastScaleX || scale.scaleY !== this._lastScaleY);
     },
 
     /**
