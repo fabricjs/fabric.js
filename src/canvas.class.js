@@ -1355,7 +1355,7 @@
     setViewportTransform: function (vpt) {
       var activeObject = this._activeObject, dirty = false;
       if (this.renderOnAddRemove && activeObject && activeObject.isEditing) {
-        this._activeObject.clearContextTop();
+        activeObject.clearContextTop();
       }
       if (activeObject) {
         //  interacting object should not be changed by vpt
