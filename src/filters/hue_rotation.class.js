@@ -96,11 +96,10 @@
   });
 
   /**
-   * Returns filter instance from an object representation
+   * Create filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @param {function} [callback] to be invoked after filter creation
-   * @return {fabric.Image.filters.HueRotation} Instance of fabric.Image.filters.HueRotation
+   * @returns {Promise<fabric.Image.filters.HueRotation>}
    */
   fabric.Image.filters.HueRotation.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 

@@ -16,6 +16,10 @@
     return src;
   }
 
+  function basename(path) {
+    return path.slice(Math.max(path.lastIndexOf('\\'), path.lastIndexOf('/')) + 1);
+  }
+
   var IMG_URL = fabric.isLikelyNode
     ? 'file://' + require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
     : getAbsolutePath('../fixtures/very_large_image.jpg');
@@ -440,11 +444,10 @@
       return;
     }
 
-    fabric.util.loadImage(IMG_URL, function(obj, isError) {
+    fabric.util.loadImage(IMG_URL).then(function(obj) {
       if (obj) {
         var oImg = new fabric.Image(obj);
         assert.ok(/fixtures\/very_large_image\.jpg$/.test(oImg.getSrc()), 'image should have correct src');
-        assert.ok(!isError);
       }
       done();
     });
@@ -459,7 +462,7 @@
       return;
     }
 
-    fabric.util.loadImage('', function() {
+    fabric.util.loadImage('').then(function() {
       assert.ok(1, 'callback should be invoked');
       done();
     });
@@ -474,12 +477,12 @@
       return;
     }
     try {
-      fabric.util.loadImage(IMG_URL, function(img, isError) {
-        assert.equal(img.src, IMG_URL, 'src is set');
+      fabric.util.loadImage(IMG_URL, { crossOrigin: 'anonymous' }).then(function(img, isError) {
+        assert.equal(basename(img.src), basename(IMG_URL), 'src is set');
         assert.equal(img.crossOrigin, 'anonymous', 'crossOrigin is set');
         assert.ok(!isError);
         done();
-      }, null, 'anonymous');
+      });
     }
     catch (e) {
       console.log(e);
@@ -489,13 +492,10 @@
 
   QUnit.test('fabric.util.loadImage with url for a non exsiting image', function(assert) {
     var done = assert.async();
-    try {
-      fabric.util.loadImage(IMG_URL_NON_EXISTING, function(img, error) {
-        assert.equal(error, true, 'callback should be invoked with error set to true');
-        done();
-      }, this);
-    }
-    catch (e) { }
+    fabric.util.loadImage(IMG_URL_NON_EXISTING).catch(function(err) {
+      assert.ok(err instanceof Error, 'callback should be invoked with error set to true');
+      done();
+    });
   });
 
   var SVG_WITH_1_ELEMENT = '<?xml version="1.0"?>\
@@ -608,17 +608,6 @@
     assert.ok(typeof fabric.util.removeListener === 'function', 'fabric.util.removeListener is a function');
     fabric.util.removeListener(null, 'mouseup');
     assert.ok(true, 'test did not throw on null element removeListener');
-  });
-
-  QUnit.test('fabric.util.drawDashedLine', function(assert) {
-    assert.ok(typeof fabric.util.drawDashedLine === 'function');
-
-    var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
-
-
-    var ctx = canvas.getContext('2d');
-
-    fabric.util.drawDashedLine(ctx, 0, 0, 100, 100, [5, 5]);
   });
 
   QUnit.test('fabric.util.array.invoke', function(assert) {
@@ -846,6 +835,143 @@
     assert.equal(Math.round(tp.y), 8);
   });
 
+  /**
+   * 
+   * @param {*} actual 
+   * @param {*} expected 
+   * @param {*} [message] 
+   * @param {number} [error] floating point percision, defaults to 10
+   */
+  QUnit.assert.matrixIsEqualEnough = function (actual, expected, message, error) {
+    var error = Math.pow(10, error ? -error : -10);
+    this.pushResult({
+      result: actual.every((x, i) => Math.abs(x - expected[i]) < error),
+      actual: actual,
+      expected: expected,
+      message: message
+    })
+  }
+
+  QUnit.test('sendPointToPlane', function (assert) {
+    assert.ok(typeof fabric.util.sendPointToPlane === 'function');
+    var m1 = [3, 0, 0, 2, 10, 4],
+      m2 = [1, 2, 3, 4, 5, 6],
+      p, t,
+      obj1 = new fabric.Object(),
+      obj2 = new fabric.Object(),
+      point = new fabric.Point(2, 2),
+      applyTransformToObject = fabric.util.applyTransformToObject,
+      invert = fabric.util.invertTransform,
+      multiply = fabric.util.multiplyTransformMatrices,
+      transformPoint = fabric.util.transformPoint;
+    
+    function sendPointToPlane(point, from, to, relationFrom, relationTo) {
+      return fabric.util.sendPointToPlane(
+        point,
+        from ?
+          relationFrom === 'child' ? from.calcTransformMatrix() : from.group?.calcTransformMatrix() :
+          null,
+        to ?
+          relationTo === 'child' ? to.calcTransformMatrix() : to.group?.calcTransformMatrix() :
+          null
+      );
+    }
+
+    applyTransformToObject(obj1, m1);
+    applyTransformToObject(obj2, m2);
+    obj1.group = new fabric.Object();
+    obj2.group = new fabric.Object();
+    applyTransformToObject(obj1.group, m1);
+    applyTransformToObject(obj2.group, m2);
+    p = sendPointToPlane(point, obj1, obj2, 'child', 'child');
+    t = multiply(invert(obj2.calcTransformMatrix()), obj1.calcTransformMatrix());
+    assert.deepEqual(p, transformPoint(point, t));
+    p = sendPointToPlane(point, obj1, obj2, 'sibling', 'child');
+    t = multiply(invert(obj2.calcTransformMatrix()), obj1.group.calcTransformMatrix());
+    assert.deepEqual(p, transformPoint(point, t));
+    p = sendPointToPlane(point, obj1, obj2, 'child', 'sibling');
+    t = multiply(invert(obj2.group.calcTransformMatrix()), obj1.calcTransformMatrix());
+    assert.deepEqual(p, transformPoint(point, t));
+    p = sendPointToPlane(point, obj1, obj2, 'sibling', 'sibling');
+    t = multiply(invert(obj2.group.calcTransformMatrix()), obj1.group.calcTransformMatrix());
+    assert.deepEqual(p, transformPoint(point, t));
+    p = sendPointToPlane(point, null, obj2, null, 'sibling');
+    t = invert(obj2.group.calcTransformMatrix());
+    assert.deepEqual(p, transformPoint(point, t));
+
+    var obj = new fabric.Rect({ left: 20, top: 20, width: 60, height: 60, strokeWidth: 0 });
+    var group = new fabric.Group([obj], { strokeWidth: 0 });
+    var sentPoint = sendPointToPlane(new fabric.Point(50, 50), null, obj, null, 'sibling');
+    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
+    sentPoint = sendPointToPlane(new fabric.Point(50, 50), null, group, null, 'child');
+    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
+    group.scaleX = 2;
+    sentPoint = sendPointToPlane(new fabric.Point(80, 50), null, obj, null, 'sibling');
+    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
+    sentPoint = sendPointToPlane(new fabric.Point(80, 50), null, group, null, 'child');
+    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
+    assert.deepEqual(sendPointToPlane(point), point, 'sending to nowhere, point remains unchanged');
+  });
+
+  QUnit.test('transformPointRelativeToCanvas', function(assert) {
+    assert.ok(typeof fabric.util.transformPointRelativeToCanvas === 'function');
+    var point = new fabric.Point(2, 2);
+    var matrix = [3, 0, 0, 2, 10, 4];
+    var canvas = {
+      viewportTransform: matrix
+    }
+    var transformPoint = fabric.util.transformPoint;
+    var invertTransform = fabric.util.invertTransform;
+    var transformPointRelativeToCanvas = fabric.util.transformPointRelativeToCanvas;
+    var p = transformPointRelativeToCanvas(point, canvas, 'sibling', 'child');
+    assert.deepEqual(p, transformPoint(point, invertTransform(matrix)));
+    p = transformPointRelativeToCanvas(point, canvas, 'child', 'sibling');
+    assert.deepEqual(p, transformPoint(point, matrix));
+    p = transformPointRelativeToCanvas(point, canvas, 'child', 'child');
+    assert.deepEqual(p, point);
+    p = transformPointRelativeToCanvas(point, canvas, 'sibling', 'sibling');
+    assert.deepEqual(p, point);
+    assert.throws(function () {
+      transformPointRelativeToCanvas(point, canvas, 'sibling');
+    });
+    assert.throws(function () {
+      transformPointRelativeToCanvas(point, canvas, 'sibling', true);
+    });
+    assert.throws(function () {
+      transformPointRelativeToCanvas(point, canvas, 'sibling', 'chil');
+    });
+  });
+
+  QUnit.test('sendObjectToPlane', function (assert) {
+    assert.ok(typeof fabric.util.sendObjectToPlane === 'function');
+    var m = [6, Math.SQRT1_2, 0, 3, 2, 1],
+      m1 = [3, 0, 0, 2, 10, 4],
+      m2 = [1, Math.SQRT1_2, Math.SQRT1_2, 4, 5, 6],
+      actual, expected,
+      obj1 = new fabric.Object(),
+      obj2 = new fabric.Object(),
+      obj = new fabric.Object(),
+      sendObjectToPlane = fabric.util.sendObjectToPlane,
+      applyTransformToObject = fabric.util.applyTransformToObject,
+      invert = fabric.util.invertTransform,
+      multiply = fabric.util.multiplyTransformMatrices;
+    //  silence group check
+    obj1.isOnACache = () => false;
+
+    applyTransformToObject(obj, m);
+    applyTransformToObject(obj1, m1);
+    applyTransformToObject(obj2, m2);
+    obj.group = obj1;
+    actual = sendObjectToPlane(obj, obj1.calcTransformMatrix(), obj2.calcTransformMatrix());
+    expected = multiply(invert(obj2.calcTransformMatrix()), obj1.calcTransformMatrix());
+    assert.matrixIsEqualEnough(actual, expected);
+    assert.matrixIsEqualEnough(obj.calcOwnMatrix(), multiply(actual, m));
+    obj.group = obj2;
+    assert.matrixIsEqualEnough(obj.calcTransformMatrix(), multiply(multiply(obj2.calcTransformMatrix(), actual), m));
+    assert.deepEqual(sendObjectToPlane(obj2), fabric.iMatrix, 'sending to nowhere, no transform was applied');
+    assert.matrixIsEqualEnough(obj2.calcOwnMatrix(), m2, 'sending to nowhere, no transform was applied');
+  });
+
   QUnit.test('makeBoundingBoxFromPoints', function(assert) {
     assert.ok(typeof fabric.util.makeBoundingBoxFromPoints === 'function');
   });
@@ -921,42 +1047,6 @@
     assert.deepEqual(matrix, fabric.iMatrix, 'default is identity matrix');
   });
 
-  QUnit.test('drawArc', function(assert) {
-    assert.ok(typeof fabric.util.drawArc === 'function');
-    var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
-    var ctx = canvas.contextContainer;
-    fabric.util.drawArc(ctx, 0, 0, [
-      50,
-      30,
-      0,
-      1,
-      1,
-      100,
-      100,
-    ]);
-    fabric.util.drawArc(ctx, 0, 0, [
-      50,
-      30,
-      0,
-      1,
-      1,
-      100,
-      100,
-    ]);
-  });
-
-  QUnit.test('get bounds of arc', function(assert) {
-    assert.ok(typeof fabric.util.getBoundsOfArc === 'function');
-    var bounds = fabric.util.getBoundsOfArc(0, 0, 50, 30, 0, 1, 1, 100, 100);
-    var expectedBounds = [
-      { x: 0, y: -8.318331151877368 },
-      { x: 133.33333333333331, y: 19.99999999999999 },
-      { x: 100.00000000000003, y: 19.99999999999999 },
-      { x: 147.19721858646224, y: 100 },
-    ];
-    assert.deepEqual(bounds, expectedBounds, 'bounds are as expected');
-  });
-
   QUnit.test('fabric.util.limitDimsByArea', function(assert) {
     assert.ok(typeof fabric.util.limitDimsByArea === 'function');
     var dims = fabric.util.limitDimsByArea(1, 10000);
@@ -1015,13 +1105,6 @@
     assert.deepEqual(fabric.util.getSvgAttributes('stop'),
       ['instantiated_by_use', 'style', 'id', 'class', 'offset', 'stop-color', 'stop-opacity'],
       'stop attribs');
-  });
-
-  QUnit.test('fabric.util.enlivenPatterns', function(assert) {
-    assert.ok(typeof fabric.util.enlivenPatterns === 'function');
-    fabric.util.enlivenPatterns([], function() {
-      assert.ok(true, 'callBack is called when no patterns are available');
-    });
   });
 
   QUnit.test('fabric.util.copyCanvasElement', function(assert) {
@@ -1105,5 +1188,41 @@
     var newPath = fabric.util.transformPath(path.path, [1, 2, 3, 4, 5, 6], path.pathOffset);
     assert.equal(fabric.util.joinPath(oldPath), 'M 100 100 L 200 100 L 170 200 z');
     assert.equal(fabric.util.joinPath(newPath), 'M -195 -294 L -95 -94 L 175 246 z');
+  });
+
+  QUnit.test('fabric.util.calcDimensionsMatrix', function(assert) {
+    assert.ok(typeof fabric.util.calcDimensionsMatrix === 'function', 'fabric.util.calcDimensionsMatrix should exist');
+    var matrix = fabric.util.calcDimensionsMatrix({
+      scaleX: 2,
+      scaleY: 3,
+      skewY: 10,
+      skewX: 5,
+    });
+    var expected = [
+      2.03085322377149,
+      0.5289809421253949,
+      0.17497732705184801,
+      3,
+      0,
+      0
+    ];
+    assert.deepEqual(matrix, expected, 'dimensions matrix is equal');
+    matrix = fabric.util.calcDimensionsMatrix({
+      scaleX: 2,
+      scaleY: 3,
+      skewY: 10,
+      skewX: 5,
+      flipX: true,
+      flipY: true,
+    });
+    expected = [
+      -2.03085322377149,
+      -0.5289809421253949,
+      -0.17497732705184801,
+      -3,
+      0,
+      0
+    ];
+    assert.deepEqual(matrix, expected, 'dimensions matrix flipped is equal');
   });
 })();

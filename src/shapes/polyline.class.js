@@ -39,7 +39,7 @@
     /**
      * WARNING: Feature in progress
      * Calculate the exact bounding box taking in account strokeWidth on acute angles
-     * this will be turned to true by default on fabric 5.0
+     * this will be turned to true by default on fabric 6.0
      * maybe will be left in as an optimization since calculations may be slow
      * @deprecated
      * @type Boolean
@@ -259,10 +259,10 @@
    * @static
    * @memberOf fabric.Polyline
    * @param {Object} object Object to create an instance from
-   * @param {Function} [callback] Callback to invoke when an fabric.Path instance is created
+   * @returns {Promise<fabric.Polyline>}
    */
-  fabric.Polyline.fromObject = function(object, callback) {
-    return fabric.Object._fromObject('Polyline', object, callback, 'points');
+  fabric.Polyline.fromObject = function(object) {
+    return fabric.Object._fromObject(fabric.Polyline, object, 'points');
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

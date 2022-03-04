@@ -48,7 +48,7 @@
      * Vibrance value, from -1 to 1.
      * Increases/decreases the saturation of more muted colors with less effect on saturated colors.
      * A value of 0 has no effect.
-     * 
+     *
      * @param {Number} vibrance
      * @default
      */
@@ -111,11 +111,10 @@
   });
 
   /**
-   * Returns filter instance from an object representation
+   * Create filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @param {Function} [callback] to be invoked after filter creation
-   * @return {fabric.Image.filters.Vibrance} Instance of fabric.Image.filters.Vibrance
+   * @returns {Promise<fabric.Image.filters.Vibrance>}
    */
   fabric.Image.filters.Vibrance.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 

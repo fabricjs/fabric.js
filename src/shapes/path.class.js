@@ -7,7 +7,6 @@
       max = fabric.util.array.max,
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
-      _toString = Object.prototype.toString,
       toFixed = fabric.util.toFixed;
 
   if (fabric.Path) {
@@ -61,10 +60,8 @@
     * @param {Object} [options] Options object
     */
     _setPath: function (path, options) {
-      var fromArray = _toString.call(path) === '[object Array]';
-
       this.path = fabric.util.makePathSimpler(
-        fromArray ? path : fabric.util.parsePath(path)
+        Array.isArray(path) ? path : fabric.util.parsePath(path)
       );
 
       fabric.Polyline.prototype._setPositionDimensions.call(this, options || {});
@@ -335,20 +332,10 @@
    * @static
    * @memberOf fabric.Path
    * @param {Object} object
-   * @param {Function} [callback] Callback to invoke when an fabric.Path instance is created
+   * @returns {Promise<fabric.Path>}
    */
-  fabric.Path.fromObject = function(object, callback) {
-    if (typeof object.sourcePath === 'string') {
-      var pathUrl = object.sourcePath;
-      fabric.loadSVGFromURL(pathUrl, function (elements) {
-        var path = elements[0];
-        path.setOptions(object);
-        callback && callback(path);
-      });
-    }
-    else {
-      fabric.Object._fromObject('Path', object, callback, 'path');
-    }
+  fabric.Path.fromObject = function(object) {
+    return fabric.Object._fromObject(fabric.Path, object, 'path');
   };
 
   /* _FROM_SVG_START_ */

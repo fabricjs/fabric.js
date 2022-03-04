@@ -31,7 +31,7 @@
 	    assert.equal(newPoints[1], points[points.length-1], 'last point is always present');
 	    assert.equal(newPoints.length, 2, 'All points removed except first and last');
 	  });
-    
+
     [true, false].forEach(function(val) {
       QUnit.module('fabric.BaseBrush with canvas.enableRetinaScaling = ' + val, function(hooks) {
         hooks.beforeEach(function() {

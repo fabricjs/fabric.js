@@ -106,7 +106,7 @@
       this._onDragOver = this._onDragOver.bind(this);
       this._onDragEnter = this._simpleEventHandler.bind(this, 'dragenter');
       this._onDragLeave = this._simpleEventHandler.bind(this, 'dragleave');
-      this._onDrop = this._simpleEventHandler.bind(this, 'drop');
+      this._onDrop = this._onDrop.bind(this);
       this.eventsBound = true;
     },
 
@@ -216,6 +216,18 @@
       e.preventDefault();
       var target = this._simpleEventHandler('dragover', e);
       this._fireEnterLeaveEvents(target, e);
+    },
+
+    /**
+     * `drop:before` is a an event that allow you to schedule logic
+     * before the `drop` event. Prefer `drop` event always, but if you need
+     * to run some drop-disabling logic on an event, since there is no way
+     * to handle event handlers ordering, use `drop:before`
+     * @param {Event} e
+     */
+    _onDrop: function (e) {
+      this._simpleEventHandler('drop:before', e);
+      return this._simpleEventHandler('drop', e);
     },
 
     /**
@@ -450,24 +462,33 @@
           );
         }
       }
+      var corner, pointer;
       if (target) {
+        corner = target._findTargetCorner(
+          this.getPointer(e, true),
+          fabric.util.isTouchEvent(e)
+        );
         if (target.selectable && target !== this._activeObject && target.activeOn === 'up') {
           this.setActiveObject(target, e);
           shouldRender = true;
         }
         else {
-          var corner = target._findTargetCorner(
-            this.getPointer(e, true),
-            fabric.util.isTouchEvent(e)
-          );
           var control = target.controls[corner],
               mouseUpHandler = control && control.getMouseUpHandler(e, target, control);
           if (mouseUpHandler) {
-            var pointer = this.getPointer(e);
+            pointer = this.getPointer(e);
             mouseUpHandler(e, transform, pointer.x, pointer.y);
           }
         }
         target.isMoving = false;
+      }
+      // if we are ending up a transform on a different control or a new object
+      // fire the original mouse up from the corner that started the transform
+      if (transform && (transform.target !== target || transform.corner !== corner)) {
+        var originalControl = transform.target && transform.target.controls[transform.corner],
+            originalMouseUpHandler = originalControl && originalControl.getMouseUpHandler(e, target, control);
+        pointer = pointer || this.getPointer(e);
+        originalMouseUpHandler && originalMouseUpHandler(e, transform, pointer.x, pointer.y);
       }
       this._setCursorFromEvent(e, target);
       this._handleEvent(e, 'up', LEFT_CLICK, isClick);
@@ -550,7 +571,6 @@
 
       var transform = this._currentTransform,
           target = transform.target,
-          eventName,
           options = {
             e: e,
             target: target,
@@ -565,57 +585,8 @@
       target.setCoords();
 
       if (transform.actionPerformed || (this.stateful && target.hasStateChanged())) {
-        if (transform.actionPerformed) {
-          // this is not friendly to the new control api.
-          // is deprecated.
-          eventName = this._addEventOptions(options, transform);
-          this._fire(eventName, options);
-        }
         this._fire('modified', options);
       }
-    },
-
-    /**
-     * Mutate option object in order to add by property and give back the event name.
-     * @private
-     * @deprecated since 4.2.0
-     * @param {Object} options to mutate
-     * @param {Object} transform to inspect action from
-     */
-    _addEventOptions: function(options, transform) {
-      // we can probably add more details at low cost
-      // scale change, rotation changes, translation changes
-      var eventName, by;
-      switch (transform.action) {
-        case 'scaleX':
-          eventName = 'scaled';
-          by = 'x';
-          break;
-        case 'scaleY':
-          eventName = 'scaled';
-          by = 'y';
-          break;
-        case 'skewX':
-          eventName = 'skewed';
-          by = 'x';
-          break;
-        case 'skewY':
-          eventName = 'skewed';
-          by = 'y';
-          break;
-        case 'scale':
-          eventName = 'scaled';
-          by = 'equally';
-          break;
-        case 'rotate':
-          eventName = 'rotated';
-          break;
-        case 'drag':
-          eventName = 'moved';
-          break;
-      }
-      options.by = by;
-      return eventName;
     },
 
     /**

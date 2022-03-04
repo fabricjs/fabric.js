@@ -103,7 +103,7 @@
     QUnit.test('fromObject', function(assert) {
       var done = assert.async();
       assert.ok(typeof fabric.IText.fromObject === 'function');
-      fabric.IText.fromObject(ITEXT_OBJECT, function(iText) {
+      fabric.IText.fromObject(ITEXT_OBJECT).then(function(iText) {
         assert.ok(iText instanceof fabric.IText);
         assert.deepEqual(ITEXT_OBJECT, iText.toObject());
         done();
@@ -679,15 +679,8 @@
       };
       canvas.add(iText);
       assert.equal(typeof iText.toSVG, 'function');
-      var parser;
-      if (fabric.isLikelyNode) {
-        var XmlDomParser = require('xmldom').DOMParser;
-        parser = new XmlDomParser();
-      }
-      else {
-        parser = new DOMParser();
-      }
-      var svgString = canvas.toSVG(),
+      var parser = new DOMParser(),
+          svgString = canvas.toSVG(),
           doc = parser.parseFromString(svgString, 'image/svg+xml'),
           style = doc.getElementsByTagName('style')[0].firstChild.data;
       assert.equal(style, '\n\t\t@font-face {\n\t\t\tfont-family: \'Plaster\';\n\t\t\tsrc: url(\'path-to-plaster-font-file\');\n\t\t}\n\t\t@font-face {\n\t\t\tfont-family: \'Engagement\';\n\t\t\tsrc: url(\'path-to-engagement-font-file\');\n\t\t}\n');
