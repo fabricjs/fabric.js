@@ -1387,7 +1387,7 @@
     _renderControls: function(ctx, styleOverride) {
       var vpt = this.getViewportTransform(),
           matrix = this.calcTransformMatrix(),
-          options, drawBorders, drawControls, angle;
+          options, drawBorders, drawControls;
       styleOverride = styleOverride || { };
       drawBorders = typeof styleOverride.hasBorders !== 'undefined' ? styleOverride.hasBorders : this.hasBorders;
       drawControls = typeof styleOverride.hasControls !== 'undefined' ? styleOverride.hasControls : this.hasControls;
@@ -1399,11 +1399,10 @@
       if (!this.group) {
         ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       }
-      angle = this.group ? options.angle : this.angle;
       if (this.flipX) {
-        angle -= 180;
+        options.angle -= 180;
       }
-      ctx.rotate(degreesToRadians(angle));
+      ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
       if (drawBorders && (styleOverride.forActiveSelection || this.group)) {
         this.drawBordersInGroup(ctx, options, styleOverride);
       }
