@@ -568,7 +568,7 @@
     calcOCoords: function() {
       var vpt = this.getViewportTransform(),
           tMatrix = this._calcTranslateMatrix(true),
-          rMatrix = this._calcRotateMatrix(true, !!this.group),
+          rMatrix = this._calcRotateMatrix(true, true),
           positionMatrix = multiplyMatrices(tMatrix, rMatrix),
           startMatrix = multiplyMatrices(vpt, positionMatrix),
           finalMatrix = multiplyMatrices(startMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
