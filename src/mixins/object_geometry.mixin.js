@@ -570,7 +570,7 @@
           positionMatrix = multiplyMatrices(this._calcTranslateMatrix(true), this._calcRotateMatrix(true)),
           startMatrix = multiplyMatrices(vpt, positionMatrix),
           finalMatrix = multiplyMatrices(startMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
-          dim = this._calculateCurrentDimensions(fabric.util.qrDecompose(this.calcTransformMatrix())),
+          dim = this._calculateCurrentDimensions(this.group ? fabric.util.qrDecompose(this.calcTransformMatrix()) : undefined),
           coords = {};
       this.forEachControl(function(control, key, fabricObject) {
         coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
