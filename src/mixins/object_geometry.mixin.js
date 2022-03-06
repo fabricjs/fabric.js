@@ -567,10 +567,13 @@
 
     calcOCoords: function() {
       var vpt = this.getViewportTransform(),
-          positionMatrix = multiplyMatrices(this._calcTranslateMatrix(true), this._calcRotateMatrix(true, !!this.group)),
+          tMatrix = this._calcTranslateMatrix(true),
+          rMatrix = this._calcRotateMatrix(true, !!this.group),
+          positionMatrix = multiplyMatrices(tMatrix, rMatrix),
           startMatrix = multiplyMatrices(vpt, positionMatrix),
           finalMatrix = multiplyMatrices(startMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
-          dim = this._calculateCurrentDimensions(this.group ? fabric.util.qrDecompose(this.calcTransformMatrix()) : undefined),
+          transformOptions = this.group ? fabric.util.qrDecompose(this.calcTransformMatrix()) : undefined,
+          dim = this._calculateCurrentDimensions(transformOptions),
           coords = {};
       this.forEachControl(function(control, key, fabricObject) {
         coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
@@ -588,7 +591,7 @@
            canvas.contextTop.fillRect(control.x, control.y, 3, 3);
          });
        }, 50);
-      */ 
+      */
       return coords;
     },
 
