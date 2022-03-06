@@ -781,8 +781,8 @@
        * Provided for layout customization, override if necessary.
        * Complements `getLayoutStrategyResult`, which is called at the beginning of layout.
        * @public
-       * @param {*} context layout context
-       * @param {Object|undefined} result layout result
+       * @param {LayoutContext} context layout context
+       * @param {LayoutResult} result layout result
        */
       onLayout: function (/* context, result */) {
         //  override by subclass
@@ -793,7 +793,7 @@
        * @private
        * @param {'toObject'|'toDatalessObject'} [method]
        * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
-       * @returns {Object[]} serialized objects
+       * @returns {fabric.Object[]} serialized objects
        */
       __serializeObjects: function (method, propertiesToInclude) {
         var _includeDefaultValues = this.includeDefaultValues;
