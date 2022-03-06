@@ -309,7 +309,7 @@
   }
 
   tests.push({
-    test: 'controlboxes with skewY, green is wrong and needs fix',
+    test: 'controlboxes with skewY',
     code: controlBoxes,
     golden: 'controls12.png',
     percentage: 0.002,
@@ -343,7 +343,7 @@
   }
 
   tests.push({
-    test: 'controlboxes with skewY, green is wrong and needs fix',
+    test: 'controlboxes with skewY and flipX',
     code: controlBoxes2,
     golden: 'controls13.png',
     percentage: 0.002,
