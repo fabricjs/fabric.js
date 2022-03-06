@@ -280,7 +280,7 @@
     golden: 'controls11.png',
     percentage: 0.004,
     width: 150,
-    height: 200,
+    height: 170,
     fabricClass: 'Canvas',
   });
 
