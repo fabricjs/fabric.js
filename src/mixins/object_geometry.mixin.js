@@ -567,7 +567,7 @@
 
     calcOCoords: function() {
       var vpt = this.getViewportTransform(),
-          positionMatrix = multiplyMatrices(this._calcTranslateMatrix(true), this._calcRotateMatrix(true)),
+          positionMatrix = multiplyMatrices(this._calcTranslateMatrix(true), this._calcRotateMatrix(true, !!this.group)),
           startMatrix = multiplyMatrices(vpt, positionMatrix),
           finalMatrix = multiplyMatrices(startMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
           dim = this._calculateCurrentDimensions(this.group ? fabric.util.qrDecompose(this.calcTransformMatrix()) : undefined),
@@ -637,8 +637,10 @@
      * @param {boolean} [absolute] true means angle is measured relative to canvas, false means angle is measured realtive to parent
      * @return {Array} rotation matrix for the object
      */
-    _calcRotateMatrix: function(absolute) {
-      return util.calcRotateMatrix({ angle: absolute ? this.getTotalAngle() : this.angle });
+    _calcRotateMatrix: function (absolute, accountForFlipping) {
+      var angle = absolute ? this.getTotalAngle() : this.angle;
+      accountForFlipping && this.flipX && (angle -= 180);
+      return util.calcRotateMatrix({ angle: angle });
     },
 
     /**
