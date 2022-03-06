@@ -94,6 +94,7 @@
         this.__objectMonitor = this.__objectMonitor.bind(this);
         this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(this, true);
         this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
+        this._firstLayoutDone = false;
         this.callSuper('initialize', options);
         if (objectsRelativeToGroup) {
           this.forEachObject(function (object) {
@@ -456,10 +457,15 @@
        */
       _applyLayoutStrategy: function (context) {
         var isFirstLayout = context.type === 'initialization';
+        if (!isFirstLayout && !this._firstLayoutDone) {
+          //  reject layout requests before initialization layout
+          return;
+        }
         var center = this.getRelativeCenterPoint();
         var result = this.getLayoutStrategyResult(this.layout, this._objects.concat(), context);
         if (!result) {
           //  fire hook on first layout  (firing layout event won't have any effect because at this point no events have been registered)
+          this._firstLayoutDone = true;
           isFirstLayout && this.onLayout(context, {
             centerX: center.x,
             centerY: center.y,
@@ -486,6 +492,7 @@
           this.setPositionByOrigin(newCenter, 'center', 'center');
           this.setCoords();
         }
+        this._firstLayoutDone = true;
         //  fire layout hook and event
         this.onLayout(context, result);
         this.fire('layout', {
