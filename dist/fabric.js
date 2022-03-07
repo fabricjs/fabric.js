@@ -8918,7 +8918,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     backgroundVpt: true,
 
     /**
-     * if set to false overlya image is not affected by viewport transform
+     * if set to false overlay image is not affected by viewport transform
      * @since 1.6.3
      * @type Boolean
      * @default
