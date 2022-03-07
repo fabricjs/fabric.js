@@ -69,7 +69,7 @@
     tests.push({
         test: 'fit-content layout',
         code: fitContentLayout,
-        golden: 'group-fit-content-layout.png',
+        golden: 'group-layout/fit-content.png',
         newModule: 'Group Layout',
         percentage: 0.06,
         width: 400,
@@ -92,7 +92,7 @@
     tests.push({
         test: 'fit-content layout after change',
         code: fitContentLayoutChange,
-        golden: 'group-fit-content-layout2.png',
+        golden: 'group-layout/fit-content2.png',
         percentage: 0.06,
         width: 400,
         height: 300
@@ -120,7 +120,7 @@
     tests.push({
         test: 'fit-content layout add object',
         code: fitContentLayoutAdd,
-        golden: 'group-fit-content-layout3.png',
+        golden: 'group-layout/fit-content3.png',
         newModule: 'Group Layout',
         percentage: 0.06,
         width: 400,
@@ -145,7 +145,7 @@
     tests.push({
         test: 'clip-path layout',
         code: clipPathLayout,
-        golden: 'group-clip-path-layout.png',
+        golden: 'group-layout/clip-path.png',
         percentage: 0.06,
         width: 300,
         height: 300
@@ -170,7 +170,7 @@
     tests.push({
         test: 'clip-path layout scaleX value',
         code: clipPathLayoutWithScale,
-        golden: 'group-clip-path-layout1.png',
+        golden: 'group-layout/clip-path1.png',
         percentage: 0.06,
         width: 300,
         height: 300
@@ -195,7 +195,7 @@
     tests.push({
         test: 'clip-path layout left, top, originX, originY, scaleX values - WRONG',
         code: clipPathLayout2,
-        golden: 'group-clip-path-layout2.png',
+        golden: 'group-layout/clip-path2.png',
         percentage: 0.06,
         width: 330,
         height: 330
@@ -223,7 +223,7 @@
     tests.push({
         test: 'absolute clip-path layout',
         code: absClipPathLayout,
-        golden: 'group-clip-path-layout3.png',
+        golden: 'group-layout/clip-path3.png',
         percentage: 0.06,
         width: 250,
         height: 250
@@ -243,22 +243,24 @@
     var originX = ['left', 'center', 'right'];
     var originY = ['top', 'center', 'bottom'];
 
-    originX.forEach(ox => {
-        originY.forEach(oy => {
-            tests.push({
-                test: 'absolute clip-path layout',
-                code: function (canvas, callback) {
-                    canvas.add(...createObjectsForOriginTests(ox, oy));
-                    canvas.renderAll();
-                    callback(canvas.lowerCanvasEl);
-                },
-                golden: `group-origin-layout-${ox}-${oy}.png`,
-                percentage: 0.06,
-                width: 300,
-                height: 300
+    for (let angle = 0; angle < 360; angle += 30) {
+        originX.forEach(ox => {
+            originY.forEach(oy => {
+                tests.push({
+                    test: 'layout with originX, originY and angle values - angle is WRONG',
+                    code: function (canvas, callback) {
+                        canvas.add(...createObjectsForOriginTests(ox, oy, { angle }));
+                        canvas.renderAll();
+                        callback(canvas.lowerCanvasEl);
+                    },
+                    golden: `group-layout/origin-${ox}-${oy}-${angle}deg.png`,
+                    percentage: 0.06,
+                    width: 300,
+                    height: 300
+                });
             });
-        })
-    })
+        });
+    }
 
     tests.forEach(visualTestLoop(QUnit));
 })();
