@@ -247,7 +247,7 @@
         originX.forEach(ox => {
             originY.forEach(oy => {
                 tests.push({
-                    test: 'layout with originX, originY and angle values - angle is WRONG',
+                    test: `layout with originX=${ox}, originY=${oy} and angle=${angle} values - angle is WRONG`,
                     code: function (canvas, callback) {
                         canvas.add(...createObjectsForOriginTests(ox, oy, { angle }));
                         canvas.renderAll();
