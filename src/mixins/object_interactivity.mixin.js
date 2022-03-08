@@ -156,7 +156,7 @@
       var bbox = fabric.util.sizeAfterTransform(this.width, this.height, options),
           strokeWidth = this.strokeWidth,
           strokeUniform = this.strokeUniform,
-          borderScaleFactor = this.borderScaleFactor,
+          borderScaleFactor = this.borderScaleFactor + this.padding * 2,
           width =
             bbox.x + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleX) + borderScaleFactor,
           height =
