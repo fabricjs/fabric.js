@@ -313,7 +313,9 @@
       else {
         this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
       }
-
+      if (this.lowerCanvasEl.classList.contains('lower-canvas')) {
+        throw new Error('fabric.js: trying to initialize a canvas that has already been initialized');
+      }
       fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
       this._originalCanvasStyle = this.lowerCanvasEl.style;
       if (this.interactive) {
