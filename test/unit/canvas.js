@@ -136,12 +136,6 @@
     }
   });
 
-  QUnit.test('prevent multiple canvas initialization', function (assert) {
-    var canvas = new fabric.Canvas();
-    assert.ok(canvas.lowerCanvasEl);
-    assert.throws(() => new fabric.Canvas(canvas.lowerCanvasEl));
-  });
-
   QUnit.test('initialProperties', function(assert) {
     assert.ok('backgroundColor' in canvas);
     assert.equal(canvas.includeDefaultValues, true);
