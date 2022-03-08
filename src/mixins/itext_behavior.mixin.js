@@ -141,9 +141,14 @@
 
       this.abortCursorAnimation();
       this._currentCursorOpacity = 1;
-      this._cursorTimeout2 = setTimeout(function() {
-        _this._tick();
-      }, delay);
+      if (delay) {
+        this._cursorTimeout2 = setTimeout(function () {
+          _this._tick();
+        }, delay);
+      }
+      else {
+        this._tick();
+      }
     },
 
     /**
