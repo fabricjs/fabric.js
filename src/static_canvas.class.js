@@ -315,8 +315,8 @@
       }
 
       fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
-      this._originalCanvasStyle = this.lowerCanvasEl.style;
       if (this.interactive) {
+        this._originalCanvasStyle = this.lowerCanvasEl.style;
         this._applyCanvasStyle(this.lowerCanvasEl);
       }
 
@@ -1571,8 +1571,10 @@
       this.contextContainer = null;
       // restore canvas style
       this.lowerCanvasEl.classList.remove('lower-canvas');
-      fabric.util.setStyle(this.lowerCanvasEl, this._originalCanvasStyle);
-      delete this._originalCanvasStyle;
+      if (this._originalCanvasStyle) {
+        fabric.util.setStyle(this.lowerCanvasEl, this._originalCanvasStyle);
+        delete this._originalCanvasStyle;
+      }
       // restore canvas size to original size in case retina scaling was applied
       this.lowerCanvasEl.setAttribute('width', this.width);
       this.lowerCanvasEl.setAttribute('height', this.height);
