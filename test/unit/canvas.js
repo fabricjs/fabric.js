@@ -2112,7 +2112,7 @@
     assert.equal(canvas.contextTop, null, 'contextTop should be deleted');
     assert.equal(canvas.contextCache, null, 'contextCache should be deleted');
     assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
-    assert.equal(el.style.cssText, elStyle, 'saved original canvas style for disposal');
+    assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
     assert.equal(el.width, 200, 'restored width');
     assert.equal(el.height, 200, 'restored height');
 
