@@ -25,6 +25,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       fabric.document.body.appendChild(this.hiddenTextarea);
     }
 
+    fabric.util.addListener(this.hiddenTextarea, 'blur', this.blur.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keyup', this.onKeyUp.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
@@ -96,6 +97,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   onClick: function() {
     // No need to trigger click event here, focus is enough to have the keyboard appear on Android
     this.hiddenTextarea && this.hiddenTextarea.focus();
+  },
+
+  blur: function () {
+    this.abortCursorAnimation();
   },
 
   /**
