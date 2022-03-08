@@ -197,7 +197,7 @@
     }
   });
 
-  QUnit.test.only('prevent multiple canvas initialization', function (assert) {
+  QUnit.test('prevent multiple canvas initialization', function (assert) {
     var canvas = new fabric.StaticCanvas();
     assert.ok(canvas.lowerCanvasEl);
     assert.throws(() => new fabric.StaticCanvas(canvas.lowerCanvasEl));
