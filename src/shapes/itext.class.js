@@ -366,14 +366,30 @@
         left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
       };
       if (this.direction === 'rtl') {
-        if (this.textAlign === 'right' || this.textAlign === 'justify' || this.textAlign === 'justify-right') {
-          boundaries.left *= -1;
-        }
-        else if (this.textAlign === 'left' || this.textAlign === 'justify-left') {
-          boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
-        }
-        else if (this.textAlign === 'center' || this.textAlign === 'justify-center') {
-          boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+        switch (this.textAlign) {
+          case 'start':
+          case 'justify':
+          case 'justify-start':
+            boundaries.left *= -1;
+            break;
+          case 'end':
+          case 'justify-end':
+            boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+            break;
+          case 'left':
+          case 'justify-left':
+            boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+            break;
+          case 'center':
+          case 'justify-center':
+            boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+            break;
+          case 'right':
+          case 'justify-right':
+            boundaries.left *= -1;
+            break;
+          default:
+            break;
         }
       }
       this.cursorOffsetCache = boundaries;
@@ -463,14 +479,30 @@
           ctx.fillStyle = this.selectionColor;
         }
         if (this.direction === 'rtl') {
-          if (this.textAlign === 'right' || this.textAlign === 'justify' || this.textAlign === 'justify-right') {
-            drawStart = this.width - drawStart - drawWidth;
-          }
-          else if (this.textAlign === 'left' || this.textAlign === 'justify-left') {
-            drawStart = boundaries.left + lineOffset - boxEnd;
-          }
-          else if (this.textAlign === 'center' || this.textAlign === 'justify-center') {
-            drawStart = boundaries.left + lineOffset - boxEnd;
+          switch (this.textAlign) {
+            case 'start':
+            case 'justify':
+            case 'justify-start':
+              drawStart = this.width - drawStart - drawWidth;
+              break;
+            case 'end':
+            case 'justify-end':
+              drawStart = boundaries.left + lineOffset - boxEnd;
+              break;
+            case 'left':
+            case 'justify-left':
+              drawStart = boundaries.left + lineOffset - boxEnd;
+              break;
+            case 'center':
+            case 'justify-center':
+              drawStart = boundaries.left + lineOffset - boxEnd;
+              break;
+            case 'right':
+            case 'justify-right':
+              drawStart = this.width - drawStart - drawWidth;
+              break;
+            default:
+              break;
           }
         }
         ctx.fillRect(
