@@ -356,7 +356,31 @@
         left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
       };
       if (this.direction === 'rtl') {
-        boundaries.left *= -1;
+        switch (this.textAlign) {
+          case 'start':
+          case 'justify':
+          case 'justify-start':
+            boundaries.left *= -1;
+            break;
+          case 'end':
+          case 'justify-end':
+            boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+            break;
+          case 'left':
+          case 'justify-left':
+            boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+            break;
+          case 'center':
+          case 'justify-center':
+            boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+            break;
+          case 'right':
+          case 'justify-right':
+            boundaries.left *= -1;
+            break;
+          default:
+            break;
+        }
       }
       this.cursorOffsetCache = boundaries;
       return this.cursorOffsetCache;
@@ -445,7 +469,31 @@
           ctx.fillStyle = this.selectionColor;
         }
         if (this.direction === 'rtl') {
-          drawStart = this.width - drawStart - drawWidth;
+          switch (this.textAlign) {
+            case 'start':
+            case 'justify':
+            case 'justify-start':
+              drawStart = this.width - drawStart - drawWidth;
+              break;
+            case 'end':
+            case 'justify-end':
+              drawStart = boundaries.left + lineOffset - boxEnd;
+              break;
+            case 'left':
+            case 'justify-left':
+              drawStart = boundaries.left + lineOffset - boxEnd;
+              break;
+            case 'center':
+            case 'justify-center':
+              drawStart = boundaries.left + lineOffset - boxEnd;
+              break;
+            case 'right':
+            case 'justify-right':
+              drawStart = this.width - drawStart - drawWidth;
+              break;
+            default:
+              break;
+          }
         }
         ctx.fillRect(
           drawStart,
