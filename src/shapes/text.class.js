@@ -73,6 +73,13 @@
     _reWords: /\S+/g,
 
     /**
+     * https://stackoverflow.com/questions/12006095/javascript-how-to-check-if-character-is-rtl/14824756#14824756
+     */
+    _reExplicitRTL: /^[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]+$/,
+
+    _reExplicitLTR: /^[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF]+$/,
+
+    /**
      * Type of an object
      * @type String
      * @default
@@ -821,7 +828,8 @@
         left: graphemeInfo ? graphemeInfo.left + graphemeInfo.width : 0,
         width: 0,
         kernedWidth: 0,
-        height: this.fontSize
+        height: this.fontSize,
+        dir: graphemeInfo.dir
       };
       if (path) {
         totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
@@ -879,6 +887,27 @@
       graphemeInfo.angle = info.angle + (this.pathSide ===  'right' ? Math.PI : 0);
     },
 
+    _getGraphemeDirection: function (grapheme, lineIndex, charIndex) {
+      if (this._reExplicitRTL.test(grapheme)) {
+        return 'rtl';
+      }
+      else if (this._reExplicitLTR.test(grapheme)) {
+        return 'ltr';
+      }
+      else if (lineIndex === 0 && charIndex === 0) {
+        return this.direction === 'auto' ?
+          fabric.util.getElementStyle(fabric.document.body, 'dir') || 'ltr' :
+          this.direction;
+      }
+      else if (charIndex === 0) {
+        var prevLine = this.__charBounds[lineIndex - 1];
+        return prevLine[prevLine.length - 1].dir;
+      }
+      else {
+        return this.__charBounds[lineIndex][charIndex - 1].dir;
+      }
+    },
+
     /**
      * Measure and return the info of a single grapheme.
      * needs the the info of previous graphemes already filled
@@ -900,13 +929,14 @@
         width += charSpacing;
         kernedWidth += charSpacing;
       }
-
+      
       var box = {
         width: width,
         left: 0,
         height: style.fontSize,
         kernedWidth: kernedWidth,
         deltaY: style.deltaY,
+        dir: this._getGraphemeDirection(grapheme, lineIndex, charIndex)
       };
       if (charIndex > 0 && !skipLeft) {
         var previousBox = this.__charBounds[lineIndex][charIndex - 1];
