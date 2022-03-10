@@ -501,7 +501,72 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionStart === 0 && this.selectionEnd === 0) {
       return;
     }
-    this._moveCursorLeftOrRight('Left', e);
+    var changed = true;
+    if (e.shiftKey) {
+      if (this._selectionDirection === 'right' && this.selectionStart !== this.selectionEnd) {
+        changed = this._moveLeft(e, 'selectionEnd');
+      }
+      else if (this.selectionStart !== 0) {
+        this._selectionDirection = 'left';
+        changed = this._moveLeft(e, 'selectionStart');
+      }
+    }
+    else {
+      this._selectionDirection = 'left';
+
+      // only move cursor when there is no selection,
+      // otherwise we discard it, and leave cursor on same place
+      if (this.selectionEnd === this.selectionStart && this.selectionStart !== 0) {
+        changed = this._moveLeft(e, 'selectionStart');
+      }
+      this.selectionEnd = this.selectionStart;
+    }
+    this._invalidateCursor(changed);
+  },
+
+  /**
+   * Moves cursor right
+   * @param {Event} e Event object
+   */
+  moveCursorRight: function (e) {
+    if (this.selectionStart >= this._text.length && this.selectionEnd >= this._text.length) {
+      return;
+    }
+    var changed = true;
+    if (e.shiftKey) {
+      if (this._selectionDirection === 'left' && this.selectionStart !== this.selectionEnd) {
+        changed = this._moveRight(e, 'selectionStart');
+      }
+      else if (this.selectionEnd !== this._text.length) {
+        this._selectionDirection = 'right';
+        changed = this._moveRight(e, 'selectionEnd');
+      }
+    }
+    else {
+      this._selectionDirection = 'right';
+      if (this.selectionStart === this.selectionEnd) {
+        changed = this._moveRight(e, 'selectionStart');
+        this.selectionEnd = this.selectionStart;
+      }
+      else {
+        this.selectionStart = this.selectionEnd;
+      }
+    }
+    this._invalidateCursor(changed);
+  },
+
+  /**
+   * @private
+   * @param {boolean} dirty 
+   */
+  _invalidateCursor: function (dirty) {
+    this._currentCursorOpacity = 1;
+    if (dirty) {
+      this.abortCursorAnimation();
+      this.initDelayedCursor();
+      this._fireSelectionChanged();
+      this._updateTextarea();
+    }
   },
 
   /**
@@ -511,13 +576,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   _move: function(e, prop, direction) {
     var newValue;
     if (e.altKey) {
-      newValue = this['findWordBoundary' + direction](this[prop]);
+      newValue = this.findWordBoundary(direction, this[prop]);
     }
     else if (e.metaKey || e.keyCode === 35 ||  e.keyCode === 36 ) {
-      newValue = this['findLineBoundary' + direction](this[prop]);
+      newValue = this.findLineBoundary(direction, this[prop]);
     }
     else {
-      this[prop] += direction === 'Left' ? -1 : 1;
+      this[prop] += direction === 'left' ? -1 : 1;
       return true;
     }
     if (typeof newValue !== undefined && this[prop] !== newValue) {
@@ -530,112 +595,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @private
    */
   _moveLeft: function(e, prop) {
-    return this._move(e, prop, 'Left');
+    return this._move(e, prop, 'left');
   },
 
   /**
    * @private
    */
   _moveRight: function(e, prop) {
-    return this._move(e, prop, 'Right');
-  },
-
-  /**
-   * Moves cursor left without keeping selection
-   * @param {Event} e
-   */
-  moveCursorLeftWithoutShift: function(e) {
-    var change = true;
-    this._selectionDirection = 'left';
-
-    // only move cursor when there is no selection,
-    // otherwise we discard it, and leave cursor on same place
-    if (this.selectionEnd === this.selectionStart && this.selectionStart !== 0) {
-      change = this._moveLeft(e, 'selectionStart');
-
-    }
-    this.selectionEnd = this.selectionStart;
-    return change;
-  },
-
-  /**
-   * Moves cursor left while keeping selection
-   * @param {Event} e
-   */
-  moveCursorLeftWithShift: function(e) {
-    if (this._selectionDirection === 'right' && this.selectionStart !== this.selectionEnd) {
-      return this._moveLeft(e, 'selectionEnd');
-    }
-    else if (this.selectionStart !== 0){
-      this._selectionDirection = 'left';
-      return this._moveLeft(e, 'selectionStart');
-    }
-  },
-
-  /**
-   * Moves cursor right
-   * @param {Event} e Event object
-   */
-  moveCursorRight: function(e) {
-    if (this.selectionStart >= this._text.length && this.selectionEnd >= this._text.length) {
-      return;
-    }
-    this._moveCursorLeftOrRight('Right', e);
-  },
-
-  /**
-   * Moves cursor right or Left, fires event
-   * @param {String} direction 'Left', 'Right'
-   * @param {Event} e Event object
-   */
-  _moveCursorLeftOrRight: function(direction, e) {
-    var actionName = 'moveCursor' + direction + 'With';
-    this._currentCursorOpacity = 1;
-
-    if (e.shiftKey) {
-      actionName += 'Shift';
-    }
-    else {
-      actionName += 'outShift';
-    }
-    if (this[actionName](e)) {
-      this.abortCursorAnimation();
-      this.initDelayedCursor();
-      this._fireSelectionChanged();
-      this._updateTextarea();
-    }
-  },
-
-  /**
-   * Moves cursor right while keeping selection
-   * @param {Event} e
-   */
-  moveCursorRightWithShift: function(e) {
-    if (this._selectionDirection === 'left' && this.selectionStart !== this.selectionEnd) {
-      return this._moveRight(e, 'selectionStart');
-    }
-    else if (this.selectionEnd !== this._text.length) {
-      this._selectionDirection = 'right';
-      return this._moveRight(e, 'selectionEnd');
-    }
-  },
-
-  /**
-   * Moves cursor right without keeping selection
-   * @param {Event} e Event object
-   */
-  moveCursorRightWithoutShift: function(e) {
-    var changed = true;
-    this._selectionDirection = 'right';
-
-    if (this.selectionStart === this.selectionEnd) {
-      changed = this._moveRight(e, 'selectionStart');
-      this.selectionEnd = this.selectionStart;
-    }
-    else {
-      this.selectionStart = this.selectionEnd;
-    }
-    return changed;
+    return this._move(e, prop, 'right');
   },
 
   /**
