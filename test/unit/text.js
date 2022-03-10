@@ -43,7 +43,7 @@
     underline:                 false,
     overline:                  false,
     linethrough:               false,
-    textAlign:                 'left',
+    textAlign:                 'start',
     textBackgroundColor:       '',
     fillRule:                  'nonzero',
     paintFirst:                'fill',
@@ -56,7 +56,7 @@
     strokeUniform:              false,
     direction:                  'ltr',
     pathStartOffset:            0,
-    pathSide:                   'left',
+    pathSide:                   'start',
     pathAlign:                  'baseline'
   };
 
