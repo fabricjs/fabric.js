@@ -122,8 +122,7 @@
     linethrough:       false,
 
     /**
-     * Text alignment. Possible values: "left", "center", "right", "justify",
-     * "justify-left", "justify-center" or "justify-right".
+     * Text alignment.
      * @typedef {'start' | 'center' | 'end' | 'left' | 'right' | 'justify' | 'justify-start' | 'justify-center' | 'justify-end' | 'justify-left' | 'justify-right'} TextAlign
      * @type {TextAlign}
      * @default
@@ -236,10 +235,10 @@
     /**
      * Which side of the path the text should be drawn on.
      * Only used when text has a path
-     * @type {String} 'left|right'
+     * @type {'left'|'right'|'start'|'end'}
      * @default
      */
-    pathSide:               'left',
+    pathSide:               'start',
 
     /**
      * How text is aligned to the path. This property determines
@@ -381,19 +380,31 @@
 
     /**
      *
+     * @param {TextAlign} directive
      * @param {boolean} rtl
-     * @param {TextAlign} [textAlign]
      * @returns {TextAlign}
      */
-    resolveTextAlign: function (rtl, textAlign) {
-      switch (textAlign) {
+    resolveDirectionDirective: function (directive, rtl) {
+      switch (directive) {
+        case 'start':
+          return rtl ? 'right' : 'left';
+        case 'end':
+          return rtl ? 'left' : 'right';
         case 'justify-start':
           return rtl ? 'justify-right' : 'justify-left';
         case 'justify-end':
           return rtl ? 'justify-left' : 'justify-right';
         default:
-          return textAlign;
+          return directive;
       }
+    },
+
+    /**
+     * @private
+     * @returns {boolean}
+     */
+    _isPathReversed: function () {
+      return this.resolveDirectionDirective(this.pathSide, this.direction === 'rtl') === 'right';
     },
 
     /**
@@ -823,7 +834,8 @@
       var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
           graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length),
           positionInPath = 0, startingPoint, totalPathLength, path = this.path,
-          reverse = this.pathSide === 'right', textAlign = this.textAlign;
+          reverse = this._isPathReversed(),
+          textAlign = this.textAlign;
 
       this.__charBounds[lineIndex] = lineBounds;
       for (i = 0; i < line.length; i++) {
@@ -908,7 +920,7 @@
       var info = fabric.util.getPointOnPath(path.path, centerPosition, path.segmentsInfo);
       graphemeInfo.renderLeft = info.x - startingPoint.x;
       graphemeInfo.renderTop = info.y - startingPoint.y;
-      graphemeInfo.angle = info.angle + (this.pathSide ===  'right' ? Math.PI : 0);
+      graphemeInfo.angle = info.angle + (this._isPathReversed() ? Math.PI : 0);
     },
 
     /**
