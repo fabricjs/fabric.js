@@ -501,7 +501,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionStart === 0 && this.selectionEnd === 0) {
       return;
     }
-    var changed = true;
+    var changed = false;
     if (e.shiftKey) {
       if (this._selectionDirection === 'right' && this.selectionStart !== this.selectionEnd) {
         changed = this._moveLeft(e, 'selectionEnd');
@@ -512,8 +512,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
     }
     else {
+      changed = true;
       this._selectionDirection = 'left';
-
       // only move cursor when there is no selection,
       // otherwise we discard it, and leave cursor on same place
       if (this.selectionEnd === this.selectionStart && this.selectionStart !== 0) {
@@ -532,7 +532,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.selectionStart >= this._text.length && this.selectionEnd >= this._text.length) {
       return;
     }
-    var changed = true;
+    var changed = false;
     if (e.shiftKey) {
       if (this._selectionDirection === 'left' && this.selectionStart !== this.selectionEnd) {
         changed = this._moveRight(e, 'selectionStart');
@@ -543,6 +543,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
     }
     else {
+      changed = true;
       this._selectionDirection = 'right';
       if (this.selectionStart === this.selectionEnd) {
         changed = this._moveRight(e, 'selectionStart');

@@ -40,16 +40,16 @@
 
     iText.selectionStart = 2;
     iText.selectionEnd = 2;
-    iText.moveCursorLeft({ shiftKey: false});
-    assert.equal(selection, 1, 'should fire once on moveCursorLeft');
+    iText.moveCursorStartDir({ shiftKey: false});
+    assert.equal(selection, 1, 'should fire once on moveCursorStartDir');
     assert.equal(iText.selectionStart, 1, 'should be 1 less than 2');
     assert.equal(iText.selectionEnd, 1, 'should be 1 less than 2');
     selection = 0;
 
     iText.selectionStart = 2;
     iText.selectionEnd = 2;
-    iText.moveCursorRight({ shiftKey: false});
-    assert.equal(selection, 1, 'should fire once on moveCursorRight');
+    iText.moveCursorEndDir({ shiftKey: false});
+    assert.equal(selection, 1, 'should fire once on moveCursorEndDir');
     assert.equal(iText.selectionStart, 3, 'should be 1 more than 2');
     assert.equal(iText.selectionEnd, 3, 'should be 1 more than 2');
     selection = 0;
@@ -80,7 +80,7 @@
 
     iText.selectionStart = 0;
     iText.selectionEnd = 0;
-    iText.moveCursorLeft({ shiftKey: false});
+    iText.moveCursorStartDir({ shiftKey: false});
     assert.equal(selection, 0, 'should not fire with no change');
     assert.equal(iText.selectionStart, 0, 'should not move');
     assert.equal(iText.selectionEnd, 0, 'should not move');
@@ -92,7 +92,7 @@
 
     iText.selectionStart = 31;
     iText.selectionEnd = 31;
-    iText.moveCursorRight({ shiftKey: false});
+    iText.moveCursorEndDir({ shiftKey: false});
     assert.equal(selection, 0, 'should not fire with no change');
     assert.equal(iText.selectionStart, 31, 'should not move');
     assert.equal(iText.selectionEnd, 31, 'should not move');
@@ -120,7 +120,7 @@
 
     iText.selectionStart = 28;
     iText.selectionEnd = 31;
-    iText.moveCursorLeft({ shiftKey: false });
+    iText.moveCursorStartDir({ shiftKey: false });
     assert.equal(selection, 1, 'should fire');
     assert.equal(iText.selectionStart, 28, 'should move to selection Start');
     assert.equal(iText.selectionEnd, 28, 'should move to selection Start');
@@ -174,16 +174,16 @@
 
     iText.selectionStart = 2;
     iText.selectionEnd = 2;
-    iText.moveCursorLeft({ shiftKey: false});
-    assert.equal(selection, 1, 'should fire once on moveCursorLeft');
+    iText.moveCursorStartDir({ shiftKey: false});
+    assert.equal(selection, 1, 'should fire once on moveCursorStartDir');
     assert.equal(iText.selectionStart, 1, 'should be 1 less than 2');
     assert.equal(iText.selectionEnd, 1, 'should be 1 less than 2');
     selection = 0;
 
     iText.selectionStart = 2;
     iText.selectionEnd = 2;
-    iText.moveCursorRight({ shiftKey: false});
-    assert.equal(selection, 1, 'should fire once on moveCursorRight');
+    iText.moveCursorEndDir({ shiftKey: false});
+    assert.equal(selection, 1, 'should fire once on moveCursorEndDir');
     assert.equal(iText.selectionStart, 3, 'should be 1 more than 2');
     assert.equal(iText.selectionEnd, 3, 'should be 1 more than 2');
     selection = 0;
@@ -215,7 +215,7 @@
     iText.selectionStart = 0;
     iText.selectionEnd = 1;
     iText._selectionDirection = 'left';
-    iText.moveCursorLeft({ shiftKey: true});
+    iText.moveCursorStartDir({ shiftKey: true});
     assert.equal(selection, 0, 'should not fire with no change');
     assert.equal(iText.selectionStart, 0, 'should not move');
     assert.equal(iText.selectionEnd, 1, 'should not move');
@@ -229,7 +229,7 @@
     iText.selectionStart = 30;
     iText.selectionEnd = 31;
     iText._selectionDirection = 'right';
-    iText.moveCursorRight({ shiftKey: true});
+    iText.moveCursorEndDir({ shiftKey: true});
     assert.equal(selection, 0, 'should not fire with no change');
     assert.equal(iText.selectionStart, 30, 'should not move');
     assert.equal(iText.selectionEnd, 31, 'should not move');

@@ -40,7 +40,7 @@
     underline: false,
     overline: false,
     linethrough: false,
-    textAlign: 'left',
+    textAlign: 'start',
     backgroundColor: '',
     textBackgroundColor: '',
     fillRule: 'nonzero',
@@ -56,7 +56,7 @@
     path: null,
     direction: 'ltr',
     pathStartOffset: 0,
-    pathSide: 'left',
+    pathSide: 'start',
     pathAlign: 'baseline'
   };
 
