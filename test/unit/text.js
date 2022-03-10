@@ -875,13 +875,23 @@
 
   QUnit.test('_getLineLeftOffset', function(assert) {
     var text = new fabric.Text('long line of text\nshort');
-    assert.equal(text._getLineLeftOffset(1), 0, 'with align left is 0');
+    assert.equal(text._getLineLeftOffset(1), 0, 'with align start is 0');
+    text.textAlign = 'left';
+    assert.equal(text._getLineLeftOffset(1), 0, 'like align start');
     text.textAlign = 'right';
     assert.equal(Math.round(text._getLineLeftOffset(1)), 174, 'with align right is diff between width and lineWidth');
+    text.textAlign = 'end';
+    assert.equal(Math.round(text._getLineLeftOffset(1)), 174, 'like align right');
     text.textAlign = 'center';
     assert.equal(Math.round(text._getLineLeftOffset(1)), 87, 'with align center is split in 2');
     text.textAlign = 'justify';
     assert.equal(text._getLineLeftOffset(1), 0);
+    text.textAlign = 'justify-start';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last center');
+    assert.equal(text._getLineLeftOffset(1), 0);
+    text.textAlign = 'justify-end';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last right');
+    assert.equal(Math.round(text._getLineLeftOffset(1)), 174, 'like align right');
     text.textAlign = 'justify-center';
     assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last center');
     assert.equal(Math.round(text._getLineLeftOffset(1)), 87, 'like align center');
@@ -896,13 +906,23 @@
   QUnit.test('_getLineLeftOffset with direction rtl', function(assert) {
     var text = new fabric.Text('long line of text\nshort');
     text.direction = 'rtl';
-    assert.equal(Math.round(text._getLineLeftOffset(1)), -174, 'with align left is diff between width and lineWidth, negative');
+    assert.equal(text._getLineLeftOffset(1), 0, 'with align start is 0');
     text.textAlign = 'right';
-    assert.equal(text._getLineLeftOffset(1), 0, 'with align right is 0');
+    assert.equal(text._getLineLeftOffset(1), 0, 'like align start');
+    text.textAlign = 'left';
+    assert.equal(Math.round(text._getLineLeftOffset(1)), -174, 'with align left is diff between width and lineWidth, negative');
+    text.textAlign = 'end';
+    assert.equal(Math.round(text._getLineLeftOffset(1)), -174, 'like align left');
     text.textAlign = 'center';
     assert.equal(Math.round(text._getLineLeftOffset(1)), -87, 'with align center is split in 2');
     text.textAlign = 'justify';
     assert.equal(text._getLineLeftOffset(1), 0);
+    text.textAlign = 'justify-start';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last right');
+    assert.equal(text._getLineLeftOffset(1), 0, 'like align right with rtl');
+    text.textAlign = 'justify-end';
+    assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last left');
+    assert.equal(Math.round(text._getLineLeftOffset(1)), -174, 'like align left with rtl');
     text.textAlign = 'justify-center';
     assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last center');
     assert.equal(Math.round(text._getLineLeftOffset(1)), -87, 'like align center');
