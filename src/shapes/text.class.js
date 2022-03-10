@@ -829,7 +829,7 @@
         width: 0,
         kernedWidth: 0,
         height: this.fontSize,
-        dir: graphemeInfo.dir
+        dir: graphemeInfo ? graphemeInfo.dir : this._getGraphemeFallbackDirection(lineIndex, i)
       };
       if (path) {
         totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
@@ -894,7 +894,13 @@
       else if (this._reExplicitLTR.test(grapheme)) {
         return 'ltr';
       }
-      else if (lineIndex === 0 && charIndex === 0) {
+      else {
+        return this._getGraphemeFallbackDirection(lineIndex, charIndex);
+      }
+    },
+
+    _getGraphemeFallbackDirection: function (lineIndex, charIndex) {
+      if (lineIndex === 0 && charIndex === 0) {
         return this.direction === 'auto' ?
           fabric.util.getElementStyle(fabric.document.body, 'dir') || 'ltr' :
           this.direction;
@@ -906,7 +912,7 @@
       else {
         return this.__charBounds[lineIndex][charIndex - 1].dir;
       }
-    },
+    }
 
     /**
      * Measure and return the info of a single grapheme.
