@@ -902,7 +902,7 @@
     _getGraphemeFallbackDirection: function (lineIndex, charIndex) {
       if (lineIndex === 0 && charIndex === 0) {
         return this.direction === 'auto' ?
-          fabric.util.getElementStyle(this.canvas, 'dir') || 'ltr' :
+          fabric.util.getElementStyle(fabric.document.body, 'dir') || 'ltr' :
           this.direction;
       }
       else if (charIndex === 0) {
