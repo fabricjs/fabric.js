@@ -189,6 +189,18 @@
     },
 
     /**
+     * 
+     * @param {'left'|'right'} from 
+     * @param {number} startFrom 
+     * @return {number} New selection index
+     */
+    findWordBoundary: function (from, startFrom) {
+      return from === 'right' ?
+        this.findWordBoundaryRight(startFrom) :
+        this.findWordBoundaryLeft(startFrom)
+    },
+
+    /**
      * Find new selection index representing start of current word according to current selection index
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
@@ -232,6 +244,18 @@
       }
 
       return startFrom + offset;
+    },
+
+    /**
+     * 
+     * @param {'left'|'right'} from 
+     * @param {number} startFrom 
+     * @return {number} New selection index
+     */
+    findLineBoundary: function (from, startFrom) {
+      return from === 'right' ?
+        this.findLineBoundaryRight(startFrom) :
+        this.findLineBoundaryLeft(startFrom)
     },
 
     /**
