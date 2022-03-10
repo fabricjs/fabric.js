@@ -912,7 +912,7 @@
       else {
         return this.__charBounds[lineIndex][charIndex - 1].dir;
       }
-    }
+    },
 
     /**
      * Measure and return the info of a single grapheme.
