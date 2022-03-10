@@ -929,7 +929,7 @@
         width += charSpacing;
         kernedWidth += charSpacing;
       }
-      
+
       var box = {
         width: width,
         left: 0,
