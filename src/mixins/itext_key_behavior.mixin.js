@@ -57,11 +57,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     27: 'exitEditing',
     33: 'moveCursorUp',
     34: 'moveCursorDown',
-    35: 'moveCursorRight',
-    36: 'moveCursorLeft',
-    37: 'moveCursorLeft',
+    35: 'moveCursorEndDir',
+    36: 'moveCursorStartDir',
+    37: 'moveCursorStartDir',
     38: 'moveCursorUp',
-    39: 'moveCursorRight',
+    39: 'moveCursorEndDir',
     40: 'moveCursorDown',
   },
 
@@ -70,11 +70,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     27: 'exitEditing',
     33: 'moveCursorUp',
     34: 'moveCursorDown',
-    35: 'moveCursorLeft',
-    36: 'moveCursorRight',
-    37: 'moveCursorRight',
+    35: 'moveCursorStartDir',
+    36: 'moveCursorEndDir',
+    37: 'moveCursorEndDir',
     38: 'moveCursorUp',
-    39: 'moveCursorLeft',
+    39: 'moveCursorStartDir',
     40: 'moveCursorDown',
   },
 
@@ -497,7 +497,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Moves cursor left
    * @param {Event} e Event object
    */
-  moveCursorLeft: function(e) {
+  moveCursorStartDir: function (e) {
     if (this.selectionStart === 0 && this.selectionEnd === 0) {
       return;
     }
@@ -528,7 +528,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Moves cursor right
    * @param {Event} e Event object
    */
-  moveCursorRight: function (e) {
+  moveCursorEndDir: function (e) {
     if (this.selectionStart >= this._text.length && this.selectionEnd >= this._text.length) {
       return;
     }
@@ -557,7 +557,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * @private
-   * @param {boolean} dirty 
+   * @param {boolean} dirty
    */
   _invalidateCursor: function (dirty) {
     this._currentCursorOpacity = 1;

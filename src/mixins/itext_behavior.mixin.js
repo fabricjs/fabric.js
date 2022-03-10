@@ -189,15 +189,15 @@
     },
 
     /**
-     * 
-     * @param {'left'|'right'} from 
-     * @param {number} startFrom 
+     *
+     * @param {'left'|'right'} from
+     * @param {number} startFrom
      * @return {number} New selection index
      */
     findWordBoundary: function (from, startFrom) {
       return from === 'right' ?
         this.findWordBoundaryRight(startFrom) :
-        this.findWordBoundaryLeft(startFrom)
+        this.findWordBoundaryLeft(startFrom);
     },
 
     /**
@@ -247,15 +247,15 @@
     },
 
     /**
-     * 
-     * @param {'left'|'right'} from 
-     * @param {number} startFrom 
+     *
+     * @param {'left'|'right'} from
+     * @param {number} startFrom
      * @return {number} New selection index
      */
     findLineBoundary: function (from, startFrom) {
       return from === 'right' ?
         this.findLineBoundaryRight(startFrom) :
-        this.findLineBoundaryLeft(startFrom)
+        this.findLineBoundaryLeft(startFrom);
     },
 
     /**

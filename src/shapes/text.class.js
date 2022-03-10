@@ -380,8 +380,8 @@
     },
 
     /**
-     * 
-     * @param {boolean} rtl 
+     *
+     * @param {boolean} rtl
      * @param {TextAlign} [textAlign]
      * @returns {TextAlign}
      */
