@@ -29456,19 +29456,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     27: 'exitEditing',
     33: 'moveCursorUp',
     34: 'moveCursorDown',
-<<<<<<< HEAD
     35: 'moveCursorForward',
     36: 'moveCursorBackward',
     37: 'moveCursorBackward',
     38: 'moveCursorUp',
     39: 'moveCursorForward',
-=======
-    35: 'moveCursorEndDir',
-    36: 'moveCursorStartDir',
-    37: 'moveCursorStartDir',
-    38: 'moveCursorUp',
-    39: 'moveCursorEndDir',
->>>>>>> ff0f8654 (lint + rename)
     40: 'moveCursorDown',
   },
 
@@ -29477,19 +29469,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     27: 'exitEditing',
     33: 'moveCursorUp',
     34: 'moveCursorDown',
-<<<<<<< HEAD
     35: 'moveCursorBackward',
     36: 'moveCursorForward',
     37: 'moveCursorForward',
     38: 'moveCursorUp',
     39: 'moveCursorBackward',
-=======
-    35: 'moveCursorStartDir',
-    36: 'moveCursorEndDir',
-    37: 'moveCursorEndDir',
-    38: 'moveCursorUp',
-    39: 'moveCursorStartDir',
->>>>>>> ff0f8654 (lint + rename)
     40: 'moveCursorDown',
   },
 
@@ -29912,11 +29896,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Moves cursor back
    * @param {Event} e Event object
    */
-<<<<<<< HEAD
   moveCursorBackward: function (e) {
-=======
-  moveCursorStartDir: function (e) {
->>>>>>> ff0f8654 (lint + rename)
     if (this.selectionStart === 0 && this.selectionEnd === 0) {
       return;
     }
@@ -29933,7 +29913,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
     else {
       changed = true;
+<<<<<<< HEAD
       //this._selectionDirection = 'left';
+=======
+      this._selectionDirection = 'left';
+>>>>>>> 89582310 (fix(tests))
       // only move cursor when there is no selection,
       // otherwise we discard it, and leave cursor on same place
       if (this.selectionEnd === this.selectionStart) {
@@ -29954,11 +29938,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Moves cursor forward
    * @param {Event} e Event object
    */
-<<<<<<< HEAD
   moveCursorForward: function (e) {
-=======
-  moveCursorEndDir: function (e) {
->>>>>>> ff0f8654 (lint + rename)
     if (this.selectionStart >= this._text.length && this.selectionEnd >= this._text.length) {
       return;
     }
@@ -29975,7 +29955,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
     else {
       changed = true;
+<<<<<<< HEAD
       //this._selectionDirection = 'right';
+=======
+      this._selectionDirection = 'right';
+>>>>>>> 89582310 (fix(tests))
       if (this.selectionStart === this.selectionEnd) {
         changed = this._move(e, 'selectionStart', 1);
         this.selectionEnd = this.selectionStart;
