@@ -220,6 +220,17 @@
      * @param {SelectionDirection} [selectionDirection]
      */
     setSelectionRange: function (selectionStart, selectionEnd, selectionDirection) {
+      this._setSelectionRange(selectionStart, selectionEnd, selectionDirection || 'none');
+    },
+
+    /**
+     * {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/setSelectionRange}
+     * @private
+     * @param {number} selectionStart 
+     * @param {number} selectionEnd 
+     * @param {SelectionDirection|false} [selectionDirection] pass `false` to preserve current `selectionDirection` value
+     */
+    _setSelectionRange: function (selectionStart, selectionEnd, selectionDirection) {
       selectionStart = Math.max(selectionStart, 0);
       selectionEnd = Math.min(selectionEnd, this.text.length);
       if (selectionStart > selectionEnd) {
@@ -229,12 +240,14 @@
       var changed = selectionStart !== this.selectionStart || selectionEnd !== this.selectionEnd;
       this.selectionStart = selectionStart;
       this.selectionEnd = selectionEnd;
-      //  mimic HTMLTextareaElement behavior
-      this.selectionDirection = selectionDirection === 'backward' ? 'backward' : 'forward';
-      //  needed for future calcualtions of `selectionDirection`
-      this.__selectionStartOnMouseDown = this.selectionDirection === 'forward' ?
-        this.selectionStart :
-        this.selectionEnd;
+      if (selectionDirection !== false) {
+        //  mimic HTMLTextareaElement behavior
+        this.selectionDirection = selectionDirection === 'backward' ? 'backward' : 'forward';
+        //  needed for future calcualtions of `selectionDirection`
+        this.__selectionStartOnMouseDown = this.selectionDirection === 'forward' ?
+          this.selectionStart :
+          this.selectionEnd;
+      }
       changed && this._fireSelectionChanged();
       this._updateTextarea();
     },
