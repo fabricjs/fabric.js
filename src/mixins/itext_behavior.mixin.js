@@ -390,19 +390,19 @@
           currentStart = this.selectionStart,
           currentEnd = this.selectionEnd;
       if (
-        (newSelectionStart !== this.__selectionStartOnMouseDown || currentStart === currentEnd)
+        (newSelectionStart !== this.__selectionStartOrigin || currentStart === currentEnd)
         &&
         (currentStart === newSelectionStart || currentEnd === newSelectionStart)
       ) {
         return;
       }
-      if (newSelectionStart > this.__selectionStartOnMouseDown) {
-        this.selectionStart = this.__selectionStartOnMouseDown;
+      if (newSelectionStart > this.__selectionStartOrigin) {
+        this.selectionStart = this.__selectionStartOrigin;
         this.selectionEnd = newSelectionStart;
       }
       else {
         this.selectionStart = newSelectionStart;
-        this.selectionEnd = this.__selectionStartOnMouseDown;
+        this.selectionEnd = this.__selectionStartOrigin;
       }
       if (this.selectionStart !== currentStart || this.selectionEnd !== currentEnd) {
         this.restartCursorIfNeeded();
@@ -455,7 +455,7 @@
       return {
         selectionStart: graphemeStart,
         selectionEnd: graphemeStart + graphemeEnd,
-        selectionDirection: graphemeStart < this.__selectionStartOnMouseDown ? 'backward' : 'forward'
+        selectionDirection: graphemeStart < this.__selectionStartOrigin ? 'backward' : 'forward'
       };
     },
 

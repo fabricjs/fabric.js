@@ -244,7 +244,7 @@
         //  mimic HTMLTextareaElement behavior
         this.selectionDirection = selectionDirection === 'backward' ? 'backward' : 'forward';
         //  needed for future calcualtions of `selectionDirection`
-        this.__selectionStartOnMouseDown = this.selectionDirection === 'forward' ?
+        this.__selectionStartOrigin = this.selectionDirection === 'forward' ?
           this.selectionStart :
           this.selectionEnd;
       }
