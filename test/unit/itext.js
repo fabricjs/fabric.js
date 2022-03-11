@@ -444,44 +444,44 @@
       assert.equal(iText.selectLine(0), iText, 'should be chainable');
     });
 
-    QUnit.test('findWordBoundaryLeft', function(assert) {
+    QUnit.test('findWordBoundaryStart', function(assert) {
       var iText = new fabric.IText('test foo bar-baz\nqux');
 
-      assert.equal(typeof iText.findWordBoundaryLeft, 'function');
+      assert.equal(typeof iText.findWordBoundaryStart, 'function');
 
-      assert.equal(iText.findWordBoundaryLeft(3), 0); // 'tes|t'
-      assert.equal(iText.findWordBoundaryLeft(20), 17); // 'qux|'
-      assert.equal(iText.findWordBoundaryLeft(6), 5); // 'f|oo'
-      assert.equal(iText.findWordBoundaryLeft(11), 9); // 'ba|r-baz'
+      assert.equal(iText.findWordBoundaryStart(3), 0); // 'tes|t'
+      assert.equal(iText.findWordBoundaryStart(20), 17); // 'qux|'
+      assert.equal(iText.findWordBoundaryStart(6), 5); // 'f|oo'
+      assert.equal(iText.findWordBoundaryStart(11), 9); // 'ba|r-baz'
     });
 
-    QUnit.test('findWordBoundaryRight', function(assert) {
+    QUnit.test('findWordBoundaryEnd', function(assert) {
       var iText = new fabric.IText('test foo bar-baz\nqux');
 
-      assert.equal(typeof iText.findWordBoundaryRight, 'function');
+      assert.equal(typeof iText.findWordBoundaryEnd, 'function');
 
-      assert.equal(iText.findWordBoundaryRight(3), 4); // 'tes|t'
-      assert.equal(iText.findWordBoundaryRight(17), 20); // '|qux'
-      assert.equal(iText.findWordBoundaryRight(6), 8); // 'f|oo'
-      assert.equal(iText.findWordBoundaryRight(11), 16); // 'ba|r-baz'
+      assert.equal(iText.findWordBoundaryEnd(3), 4); // 'tes|t'
+      assert.equal(iText.findWordBoundaryEnd(17), 20); // '|qux'
+      assert.equal(iText.findWordBoundaryEnd(6), 8); // 'f|oo'
+      assert.equal(iText.findWordBoundaryEnd(11), 16); // 'ba|r-baz'
     });
 
-    QUnit.test('findLineBoundaryLeft', function(assert) {
+    QUnit.test('findLineBoundaryStart', function(assert) {
       var iText = new fabric.IText('test foo bar-baz\nqux');
 
-      assert.equal(typeof iText.findLineBoundaryLeft, 'function');
+      assert.equal(typeof iText.findLineBoundaryStart, 'function');
 
-      assert.equal(iText.findLineBoundaryLeft(3), 0); // 'tes|t'
-      assert.equal(iText.findLineBoundaryLeft(20), 17); // 'qux|'
+      assert.equal(iText.findLineBoundaryStart(3), 0); // 'tes|t'
+      assert.equal(iText.findLineBoundaryStart(20), 17); // 'qux|'
     });
 
-    QUnit.test('findLineBoundaryRight', function(assert) {
+    QUnit.test('findLineBoundaryEnd', function(assert) {
       var iText = new fabric.IText('test foo bar-baz\nqux');
 
-      assert.equal(typeof iText.findLineBoundaryRight, 'function');
+      assert.equal(typeof iText.findLineBoundaryEnd, 'function');
 
-      assert.equal(iText.findLineBoundaryRight(3), 16); // 'tes|t'
-      assert.equal(iText.findLineBoundaryRight(17), 20); // '|qux'
+      assert.equal(iText.findLineBoundaryEnd(3), 16); // 'tes|t'
+      assert.equal(iText.findLineBoundaryEnd(17), 20); // '|qux'
     });
 
     QUnit.test('getSelectionStyles with no arguments', function(assert) {
