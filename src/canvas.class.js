@@ -980,6 +980,7 @@
 
       this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
       this._applyCanvasStyle(upperCanvasEl);
+      upperCanvasEl.setAttribute('draggable', 'true');
       this.contextTop = upperCanvasEl.getContext('2d');
     },
 

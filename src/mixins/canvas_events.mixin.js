@@ -50,6 +50,7 @@
       functor(canvasElement, 'wheel', this._onMouseWheel);
       functor(canvasElement, 'contextmenu', this._onContextMenu);
       functor(canvasElement, 'dblclick', this._onDoubleClick);
+      functor(canvasElement, 'dragstart', this._onDragStart);
       functor(canvasElement, 'dragover', this._onDragOver);
       functor(canvasElement, 'dragenter', this._onDragEnter);
       functor(canvasElement, 'dragleave', this._onDragLeave);
@@ -103,6 +104,7 @@
       this._onMouseEnter = this._onMouseEnter.bind(this);
       this._onContextMenu = this._onContextMenu.bind(this);
       this._onDoubleClick = this._onDoubleClick.bind(this);
+      this._onDragStart = this._onDragStart.bind(this);
       this._onDragOver = this._onDragOver.bind(this);
       this._onDragEnter = this._simpleEventHandler.bind(this, 'dragenter');
       this._onDragLeave = this._simpleEventHandler.bind(this, 'dragleave');
@@ -205,6 +207,20 @@
      */
     _onLongPress: function(e, self) {
       this.__onLongPress && this.__onLongPress(e, self);
+    },
+
+    /**
+     * supports native like text dragging
+     * @private
+     * @param {DragEvent} e 
+     */
+    _onDragStart: function (e) {
+      var activeObject = this.getActiveObject();
+      if (activeObject && typeof activeObject.onDragStart === 'function' && activeObject.onDragStart(e)) {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
     },
 
     /**
@@ -374,7 +390,9 @@
      * @param {Event} e Event object fired on mousemove
      */
     _onMouseMove: function (e) {
-      !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
+      var activeObject = this.getActiveObject();
+      !this.allowTouchScrolling && (!activeObject || !activeObject.__isDragging)
+        && e.preventDefault && e.preventDefault();
       this.__onMouseMove(e);
     },
 

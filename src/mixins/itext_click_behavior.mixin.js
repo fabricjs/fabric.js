@@ -97,7 +97,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * current compositionMode. It will be set to false.
    */
   _mouseDownHandler: function(options) {
-    if (!this.canvas || !this.editable || (options.e.button && options.e.button !== 1)) {
+    if (!this.canvas || !this.editable || this.__isDragging || (options.e.button && options.e.button !== 1)) {
       return;
     }
 
@@ -129,6 +129,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     // we want to avoid that an object that was selected and then becomes unselectable,
     // may trigger editing mode in some way.
     this.selected = this === this.canvas._activeObject;
+    // text dragging logic
+    var newSelection = this.getSelectionStartFromPointer(options.e);
+    this.__isDragging = newSelection > this.selectionStart && newSelection < this.selectionEnd;
   },
 
   /**
@@ -147,11 +150,36 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
+   * support native like text dragging
+   * @private
+   * @param {DragEvent} e 
+   * @returns {boolean} should handle event
+   */
+  onDragStart: function (e) {
+    this.__dragStartFired = true;
+    if (this.__isDragging && e.dataTransfer) {
+      e.dataTransfer.setData('text/plain', this.text.slice(this.selectionStart, this.selectionEnd));
+      //e.dataTransfer.setDragImage(this._cacheCanvas, 0,0);
+    }
+    return this.__isDragging;
+  },
+
+  /**
    * standard handler for mouse up, overridable
    * @private
    */
-  mouseUpHandler: function(options) {
+  mouseUpHandler: function (options) {
+    // restore selection state after dragging
+    if (this.__isDragging && !this.__dragStartFired) {
+      // drag didn't occur, so we revert to click behavior
+      this.__isDragging = false;
+      this.selected = true;
+      this._mouseDownHandler(options);
+    }
+    this.__isDragging = this.__dragStartFired = false;
+    
     this.__isMousedown = false;
+
     if (!this.editable || this.group ||
       (options.transform && options.transform.actionPerformed) ||
       (options.e.button && options.e.button !== 1)) {
