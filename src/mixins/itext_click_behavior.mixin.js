@@ -109,7 +109,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
 
     if (this.isEditing) {
-      this.__selectionStartOnMouseDown = this.selectionStart;
+      this.__selectionStartOrigin = this.selectionStart;
       if (this.selectionStart === this.selectionEnd) {
         this.abortCursorAnimation();
       }
