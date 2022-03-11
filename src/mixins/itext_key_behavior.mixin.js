@@ -57,11 +57,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     27: 'exitEditing',
     33: 'moveCursorUp',
     34: 'moveCursorDown',
-    35: 'moveCursorEndDir',
-    36: 'moveCursorStartDir',
-    37: 'moveCursorStartDir',
+    35: 'moveCursorForward',
+    36: 'moveCursorBackward',
+    37: 'moveCursorBackward',
     38: 'moveCursorUp',
-    39: 'moveCursorEndDir',
+    39: 'moveCursorForward',
     40: 'moveCursorDown',
   },
 
@@ -70,11 +70,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     27: 'exitEditing',
     33: 'moveCursorUp',
     34: 'moveCursorDown',
-    35: 'moveCursorStartDir',
-    36: 'moveCursorEndDir',
-    37: 'moveCursorEndDir',
+    35: 'moveCursorBackward',
+    36: 'moveCursorForward',
+    37: 'moveCursorForward',
     38: 'moveCursorUp',
-    39: 'moveCursorStartDir',
+    39: 'moveCursorBackward',
     40: 'moveCursorDown',
   },
 
@@ -470,7 +470,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Number} offset
    */
   moveCursorWithShift: function(offset) {
-    var newSelection = this._selectionDirection === 'left'
+    var newSelection = this.selectionDirection === 'backward'
       ? this.selectionStart + offset
       : this.selectionEnd + offset;
     this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, newSelection);
@@ -494,26 +494,26 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Moves cursor left
+   * Moves cursor back
    * @param {Event} e Event object
    */
-  moveCursorStartDir: function (e) {
+  moveCursorBackward: function (e) {
     if (this.selectionStart === 0 && this.selectionEnd === 0) {
       return;
     }
     var changed = false;
     if (e.shiftKey) {
-      if (this._selectionDirection === 'right' && this.selectionStart !== this.selectionEnd) {
+      if (this.selectionDirection === 'forward' && this.selectionStart !== this.selectionEnd) {
         changed = this._move(e, 'selectionEnd', -1);
       }
       else if (this.selectionStart !== 0) {
-        this._selectionDirection = 'left';
+        //this._selectionDirection = 'left';
         changed = this._move(e, 'selectionStart', -1);
       }
     }
     else {
       changed = true;
-      this._selectionDirection = 'left';
+      //this._selectionDirection = 'left';
       // only move cursor when there is no selection,
       // otherwise we discard it, and leave cursor on same place
       if (this.selectionEnd === this.selectionStart && this.selectionStart !== 0) {
@@ -525,26 +525,26 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Moves cursor right
+   * Moves cursor forward
    * @param {Event} e Event object
    */
-  moveCursorEndDir: function (e) {
+  moveCursorForward: function (e) {
     if (this.selectionStart >= this._text.length && this.selectionEnd >= this._text.length) {
       return;
     }
     var changed = false;
     if (e.shiftKey) {
-      if (this._selectionDirection === 'left' && this.selectionStart !== this.selectionEnd) {
+      if (this.selectionDirection === 'backward' && this.selectionStart !== this.selectionEnd) {
         changed = this._move(e, 'selectionStart', 1);
       }
       else if (this.selectionEnd !== this._text.length) {
-        this._selectionDirection = 'right';
+        //this._selectionDirection = 'right';
         changed = this._move(e, 'selectionEnd', 1);
       }
     }
     else {
       changed = true;
-      this._selectionDirection = 'right';
+      //this._selectionDirection = 'right';
       if (this.selectionStart === this.selectionEnd) {
         changed = this._move(e, 'selectionStart', 1);
         this.selectionEnd = this.selectionStart;

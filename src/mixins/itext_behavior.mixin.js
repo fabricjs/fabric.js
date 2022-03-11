@@ -900,14 +900,14 @@
         if (end === start) {
           this._selectionDirection = 'left';
         }
-        else if (this._selectionDirection === 'right') {
+        else if (this.selectionDirection === 'forward') {
           this._selectionDirection = 'left';
           this.selectionEnd = start;
         }
         this.selectionStart = newSelection;
       }
       else if (newSelection > start && newSelection < end) {
-        if (this._selectionDirection === 'right') {
+        if (this.selectionDirection === 'forward') {
           this.selectionEnd = newSelection;
         }
         else {
@@ -919,7 +919,7 @@
         if (end === start) {
           this._selectionDirection = 'right';
         }
-        else if (this._selectionDirection === 'left') {
+        else if (this.selectionDirection === 'backward') {
           this._selectionDirection = 'right';
           this.selectionStart = end;
         }
