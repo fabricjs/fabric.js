@@ -212,7 +212,7 @@
     /**
      * supports native like text dragging
      * @private
-     * @param {DragEvent} e 
+     * @param {DragEvent} e
      */
     _onDragStart: function (e) {
       var activeObject = this.getActiveObject();

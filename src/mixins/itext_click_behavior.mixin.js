@@ -152,7 +152,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * support native like text dragging
    * @private
-   * @param {DragEvent} e 
+   * @param {DragEvent} e
    * @returns {boolean} should handle event
    */
   onDragStart: function (e) {
@@ -178,7 +178,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this._mouseDownHandler(options);
     }
     this.__isDragging = this.__dragStartFired = false;
-    
+
     this.__isMousedown = false;
 
     if (!this.editable || this.group ||
