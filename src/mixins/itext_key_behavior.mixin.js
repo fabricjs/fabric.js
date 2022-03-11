@@ -504,11 +504,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var changed = false;
     if (e.shiftKey) {
       if (this._selectionDirection === 'right' && this.selectionStart !== this.selectionEnd) {
-        changed = this._moveLeft(e, 'selectionEnd');
+        changed = this._move(e, 'selectionEnd', -1);
       }
       else if (this.selectionStart !== 0) {
         this._selectionDirection = 'left';
-        changed = this._moveLeft(e, 'selectionStart');
+        changed = this._move(e, 'selectionStart', -1);
       }
     }
     else {
@@ -517,7 +517,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       // only move cursor when there is no selection,
       // otherwise we discard it, and leave cursor on same place
       if (this.selectionEnd === this.selectionStart && this.selectionStart !== 0) {
-        changed = this._moveLeft(e, 'selectionStart');
+        changed = this._move(e, 'selectionStart', -1);
       }
       this.selectionEnd = this.selectionStart;
     }
@@ -535,18 +535,18 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var changed = false;
     if (e.shiftKey) {
       if (this._selectionDirection === 'left' && this.selectionStart !== this.selectionEnd) {
-        changed = this._moveRight(e, 'selectionStart');
+        changed = this._move(e, 'selectionStart', 1);
       }
       else if (this.selectionEnd !== this._text.length) {
         this._selectionDirection = 'right';
-        changed = this._moveRight(e, 'selectionEnd');
+        changed = this._move(e, 'selectionEnd', 1);
       }
     }
     else {
       changed = true;
       this._selectionDirection = 'right';
       if (this.selectionStart === this.selectionEnd) {
-        changed = this._moveRight(e, 'selectionStart');
+        changed = this._move(e, 'selectionStart', 1);
         this.selectionEnd = this.selectionStart;
       }
       else {
@@ -572,38 +572,35 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * @private
-   * @return {Boolean} true if a change happened
+   * @param {Event} e 
+   * @param {'selectionStart'|'selectionEnd'} prop 
+   * @param {number} direction 
+   * @returns {boolean} true if a change happened
    */
   _move: function(e, prop, direction) {
     var newValue;
+    direction = Math.sign(direction);
+    if (direction === 0) {
+      return false;
+    }
     if (e.altKey) {
-      newValue = this.findWordBoundary(direction, this[prop]);
+      newValue = direction > 0 ?
+        this.findWordBoundaryEnd(this[prop]) :
+        this.findWordBoundaryStart(this[prop]);
     }
     else if (e.metaKey || e.keyCode === 35 ||  e.keyCode === 36 ) {
-      newValue = this.findLineBoundary(direction, this[prop]);
+      newValue = direction > 0 ?
+        this.findLineBoundaryEnd(this[prop]) :
+        this.findLineBoundaryStart(this[prop]);
     }
     else {
-      this[prop] += direction === 'left' ? -1 : 1;
+      this[prop] = Math.min(Math.max(this[prop] + direction, 0), this.text.length);
       return true;
     }
     if (typeof newValue !== undefined && this[prop] !== newValue) {
       this[prop] = newValue;
       return true;
     }
-  },
-
-  /**
-   * @private
-   */
-  _moveLeft: function(e, prop) {
-    return this._move(e, prop, 'left');
-  },
-
-  /**
-   * @private
-   */
-  _moveRight: function(e, prop) {
-    return this._move(e, prop, 'right');
   },
 
   /**

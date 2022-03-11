@@ -189,23 +189,11 @@
     },
 
     /**
-     *
-     * @param {'left'|'right'} from
-     * @param {number} startFrom
-     * @return {number} New selection index
-     */
-    findWordBoundary: function (from, startFrom) {
-      return from === 'right' ?
-        this.findWordBoundaryRight(startFrom) :
-        this.findWordBoundaryLeft(startFrom);
-    },
-
-    /**
      * Find new selection index representing start of current word according to current selection index
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findWordBoundaryLeft: function(startFrom) {
+    findWordBoundaryStart: function(startFrom) {
       var offset = 0, index = startFrom - 1;
 
       // remove space before cursor first
@@ -220,7 +208,7 @@
         index--;
       }
 
-      return startFrom - offset;
+      return Math.max(startFrom - offset, 0);
     },
 
     /**
@@ -228,7 +216,7 @@
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findWordBoundaryRight: function(startFrom) {
+    findWordBoundaryEnd: function(startFrom) {
       var offset = 0, index = startFrom;
 
       // remove space after cursor first
@@ -247,23 +235,11 @@
     },
 
     /**
-     *
-     * @param {'left'|'right'} from
-     * @param {number} startFrom
-     * @return {number} New selection index
-     */
-    findLineBoundary: function (from, startFrom) {
-      return from === 'right' ?
-        this.findLineBoundaryRight(startFrom) :
-        this.findLineBoundaryLeft(startFrom);
-    },
-
-    /**
      * Find new selection index representing start of current line according to current selection index
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findLineBoundaryLeft: function(startFrom) {
+    findLineBoundaryStart: function(startFrom) {
       var offset = 0, index = startFrom - 1;
 
       while (!/\n/.test(this._text[index]) && index > -1) {
@@ -271,7 +247,7 @@
         index--;
       }
 
-      return startFrom - offset;
+      return Math.max(startFrom - offset, 0);
     },
 
     /**
@@ -279,7 +255,7 @@
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findLineBoundaryRight: function(startFrom) {
+    findLineBoundaryEnd: function(startFrom) {
       var offset = 0, index = startFrom;
 
       while (!/\n/.test(this._text[index]) && index < this._text.length) {
@@ -337,8 +313,8 @@
      */
     selectLine: function(selectionStart) {
       selectionStart = selectionStart || this.selectionStart;
-      var newSelectionStart = this.findLineBoundaryLeft(selectionStart),
-          newSelectionEnd = this.findLineBoundaryRight(selectionStart);
+      var newSelectionStart = this.findLineBoundaryStart(selectionStart),
+          newSelectionEnd = this.findLineBoundaryEnd(selectionStart);
 
       this.selectionStart = newSelectionStart;
       this.selectionEnd = newSelectionEnd;
