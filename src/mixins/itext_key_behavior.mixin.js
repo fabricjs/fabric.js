@@ -508,6 +508,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
       else if (this.selectionStart !== 0) {
         //this._selectionDirection = 'left';
+        this.__selectionStartOrigin = this.selectionEnd;
         changed = this._move(e, 'selectionStart', -1);
       }
     }
@@ -516,10 +517,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       //this._selectionDirection = 'left';
       // only move cursor when there is no selection,
       // otherwise we discard it, and leave cursor on same place
-      if (this.selectionEnd === this.selectionStart && this.selectionStart !== 0) {
-        changed = this._move(e, 'selectionStart', -1);
+      if (this.selectionEnd === this.selectionStart) {
+        changed = this.selectionStart !== 0 && this._move(e, 'selectionStart', -1);
+        this.selectionEnd = this.selectionStart;
       }
-      this.selectionEnd = this.selectionStart;
+      else if (this.selectionDirection === 'forward') {
+        this.selectionStart = this.selectionEnd;
+      }
+      else {
+        this.selectionEnd = this.selectionStart;
+      }
     }
     this._invalidateCursor(changed);
   },
@@ -539,6 +546,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
       else if (this.selectionEnd !== this._text.length) {
         //this._selectionDirection = 'right';
+        this.__selectionStartOrigin = this.selectionStart;
         changed = this._move(e, 'selectionEnd', 1);
       }
     }
@@ -549,8 +557,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         changed = this._move(e, 'selectionStart', 1);
         this.selectionEnd = this.selectionStart;
       }
-      else {
+      else if (this.selectionDirection === 'forward') {
         this.selectionStart = this.selectionEnd;
+      }
+      else {
+        this.selectionEnd = this.selectionStart;
       }
     }
     this._invalidateCursor(changed);
