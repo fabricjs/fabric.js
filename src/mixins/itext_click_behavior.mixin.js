@@ -157,9 +157,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   onDragStart: function (e) {
     this.__dragStartFired = true;
-    if (this.__isDragging && e.dataTransfer) {
-      e.dataTransfer.setData('text/plain', this.text.slice(this.selectionStart, this.selectionEnd));
+    if (this.__isDragging) {
+      var selectedText = this.text.slice(this.selectionStart, this.selectionEnd);
+      e.dataTransfer.setData('text/plain', selectedText);
       //e.dataTransfer.setDragImage(this._cacheCanvas, 0,0);
+      this.fire('dragstart', { e: e, selectedText: selectedText });
     }
     return this.__isDragging;
   },
