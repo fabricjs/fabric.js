@@ -175,7 +175,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.__isDragging && !this.__dragStartFired) {
       // drag didn't occur, so we revert to click behavior
       this.__isDragging = false;
-      this.selected = true;
       this._mouseDownHandler(options);
     }
     this.__isDragging = this.__dragStartFired = false;
