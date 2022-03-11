@@ -472,11 +472,15 @@
       var smallerTextStart = _text.slice(0, start),
           graphemeStart = smallerTextStart.join('').length;
       if (start === end) {
-        return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
+        return { selectionStart: graphemeStart, selectionEnd: graphemeStart, selectionDirection: 'forward' };
       }
       var smallerTextEnd = _text.slice(start, end),
           graphemeEnd = smallerTextEnd.join('').length;
-      return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
+      return {
+        selectionStart: graphemeStart,
+        selectionEnd: graphemeStart + graphemeEnd,
+        selectionDirection: graphemeStart < this.__selectionStartOnMouseDown ? 'backward' : 'forward'
+      };
     },
 
     /**
@@ -489,8 +493,12 @@
       }
       if (!this.inCompositionMode) {
         var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd, this._text);
-        this.hiddenTextarea.selectionStart = newSelection.selectionStart;
-        this.hiddenTextarea.selectionEnd = newSelection.selectionEnd;
+        this.hiddenTextarea.setSelectionRange(
+          newSelection.selectionStart,
+          newSelection.selectionEnd,
+          newSelection.selectionDirection
+        );
+        this.selectionDirection = newSelection.selectionDirection;
       }
       this.updateTextareaPosition();
     },
@@ -514,6 +522,7 @@
       if (!this.inCompositionMode) {
         this.selectionStart = newSelection.selectionStart;
       }
+      this.selectionDirection = newSelection.selectionDirection;
       this.updateTextareaPosition();
     },
 
