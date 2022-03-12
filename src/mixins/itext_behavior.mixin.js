@@ -14,8 +14,10 @@
       this.initDoubleClickSimulation();
       this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
       this.dragOverHandler = this.dragOverHandler.bind(this);
+      this.dragLeaveHandler = this.dragLeaveHandler.bind(this);
       this.dropHandler = this.dropHandler.bind(this);
       this.on('dragover', this.dragOverHandler);
+      this.on('dragleave', this.dragLeaveHandler);
       this.on('drop', this.dropHandler);
     },
 
@@ -429,6 +431,10 @@
         e.dataTransfer.effectAllowed = 'copyMove';
         e.dataTransfer.dropEffect = 'move';
         //e.dataTransfer.setDragImage(this._cacheCanvas, 0,0);
+        this.__dragStartSelection = {
+          selectionStart: this.selectionStart,
+          selectionEnd: this.selectionEnd,
+        };
         this.fire('dragstart', { e: e });
       }
       return this.__isDragging;
@@ -439,7 +445,10 @@
      * @private
      */
     dragOverHandler: function (options) {
-      this.__isDraggingOver = true;
+      if (!this.__isDraggingOver) {
+        this.__isDraggingOver = true;
+        this.enterEditing(options.e);
+      }
       this.setCursorByClick(options.e);
       this._updateTextarea();
       this.restartCursorIfNeeded();
@@ -449,11 +458,26 @@
     /**
      * support native like text dragging
      * @private
+     */
+    dragLeaveHandler: function () {
+      if (this.__isDraggingOver) {
+        this.__isDraggingOver = false;
+        this.exitEditing();
+      }
+    },
+
+    /**
+     * support native like text dragging
+     * @private
      * @param {DragEvent} e
      * @returns {boolean} should handle event
      */
     onDragEnd: function (e) {
-      this.__isDraggingOver = false;
+      delete this.__dragStartSelection;
+      if (this.__isDraggingOver) {
+        this.__isDraggingOver = false;
+        this.exitEditing();
+      }
       if (this.__isDragging && this.__dragStartFired) {
         if (e.dataTransfer.dropEffect === 'move') {
           this.insertChars('', null, this.selectionStart, this.selectionEnd + 1);
@@ -472,8 +496,16 @@
      * @private
      */
     dropHandler: function (options) {
-      var insert = options.e.dataTransfer.getData('text/plain');
+      var e = options.e;
+      var insert = e.dataTransfer.getData('text/plain');
       if (insert) {
+        this.canvas.discardActiveObject();
+        this.canvas.setActiveObject(this);
+        this.enterEditing(e);
+        if (this.__dragStartSelection) {
+          this.insertChars('', null, this.__dragStartSelection.selectionStart, this.__dragStartSelection.selectionEnd + 1);
+          this._updateTextarea();
+        }
         this.insertChars(insert, null, this.selectionStart);
         this.selectionEnd = this.selectionStart + insert.length;
         this._updateTextarea();
