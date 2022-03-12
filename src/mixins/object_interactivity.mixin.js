@@ -311,6 +311,16 @@
      */
     onSelect: function() {
       // implemented by sub-classes, as needed.
-    }
+    },
+
+    /**
+     * 
+     * @param {DragEvent} e 
+     * @returns {boolean}
+     */
+    canDrop: function (e) {
+      return false;
+    },
+
   });
 })();

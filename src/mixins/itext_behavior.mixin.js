@@ -441,18 +441,29 @@
     },
 
     /**
+     * 
+     * @param {DragEvent} e 
+     * @returns {boolean}
+     */
+    canDrop: function (e) {
+      return this.editable;
+    },
+
+    /**
      * support native like text dragging
      * @private
      */
     dragOverHandler: function (options) {
-      if (!this.__isDraggingOver) {
+      if (!this.__isDraggingOver && this.editable) {
         this.__isDraggingOver = true;
         this.enterEditing(options.e);
       }
-      this.setCursorByClick(options.e);
-      this._updateTextarea();
-      this.restartCursorIfNeeded();
-      this.renderCursorOrSelection();
+      if (this.editable) {
+        this.setCursorByClick(options.e);
+        this._updateTextarea();
+        this.restartCursorIfNeeded();
+        this.renderCursorOrSelection();
+      }
     },
 
     /**

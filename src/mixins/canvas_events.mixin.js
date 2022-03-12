@@ -241,12 +241,13 @@
 
     /**
      * prevent default to allow drop event to be fired
+     * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#specifying_drop_targets
      * @private
      * @param {Event} [e] Event object fired on Event.js shake
      */
     _onDragOver: function(e) {
-      e.preventDefault();
       var target = this._simpleEventHandler('dragover', e);
+      target && (!target.canDrop || target.canDrop(e)) && e.preventDefault();
       this._fireEnterLeaveEvents(target, e);
     },
 
