@@ -441,11 +441,11 @@
     },
 
     /**
-     * 
-     * @param {DragEvent} e 
+     *
+     * @param {DragEvent} e
      * @returns {boolean}
      */
-    canDrop: function (e) {
+    canDrop: function (e) { // eslint-disable-line no-unused-vars
       return this.editable;
     },
 
@@ -518,7 +518,8 @@
         this.enterEditing(e);
         var insertAt = this.selectionStart;
         if (this.__dragStartSelection) {
-          if (insertAt > this.__dragStartSelection.selectionStart && insertAt <= this.__dragStartSelection.selectionEnd) {
+          if (insertAt > this.__dragStartSelection.selectionStart
+            && insertAt <= this.__dragStartSelection.selectionEnd) {
             insertAt = this.__dragStartSelection.selectionStart;
           }
           else if (insertAt > this.__dragStartSelection.selectionEnd) {
