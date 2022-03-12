@@ -468,19 +468,16 @@
 
     /**
      * support native like text dragging
+     * fired only on the drag source
+     * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#finishing_a_drag
      * @private
      * @param {DragEvent} e
      * @returns {boolean} should handle event
      */
     onDragEnd: function (e) {
-      delete this.__dragStartSelection;
-      if (this.__isDraggingOver) {
-        this.__isDraggingOver = false;
-        this.exitEditing();
-      }
       if (this.__isDragging && this.__dragStartFired) {
-        if (e.dataTransfer.dropEffect === 'move') {
-          this.insertChars('', null, this.selectionStart, this.selectionEnd);
+        if (e.dataTransfer.dropEffect === 'move' && this.__dragStartSelection) {
+          this.insertChars('', null, this.__dragStartSelection.selectionStart, this.__dragStartSelection.selectionEnd);
           this.selectionEnd = this.selectionStart;
           this._updateTextarea();
           this.fire('changed');
@@ -489,14 +486,20 @@
         this.abortCursorAnimation();
         this.fire('dragend', { e: e });
       }
+
+      delete this.__dragStartSelection;
+      this.__isDraggingOver = false;
     },
 
     /**
      * support native like text dragging
+     * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#performing_a_drop
      * @private
      */
     dropHandler: function (options) {
       var e = options.e;
+      // inform browser that the drop has been accepted
+      e.preventDefault();
       var insert = e.dataTransfer.getData('text/plain');
       if (insert) {
         this.canvas.discardActiveObject();
@@ -504,6 +507,8 @@
         this.enterEditing(e);
         if (this.__dragStartSelection) {
           this.insertChars('', null, this.__dragStartSelection.selectionStart, this.__dragStartSelection.selectionEnd);
+          // delete so dragend event will not try to handle event in case of dragging in same instance
+          delete this.__dragStartSelection;
           this._updateTextarea();
         }
         this.insertChars(insert, null, this.selectionStart);

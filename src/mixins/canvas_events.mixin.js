@@ -219,6 +219,7 @@
     _onDragStart: function (e) {
       var activeObject = this.getActiveObject();
       if (activeObject && typeof activeObject.onDragStart === 'function' && activeObject.onDragStart(e)) {
+        this._dragSource = activeObject;
         return;
       }
       e.preventDefault();
@@ -227,16 +228,15 @@
 
     /**
      * supports native like text dragging
+     * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#finishing_a_drag
      * @private
      * @param {DragEvent} e
      */
     _onDragEnd: function (e) {
-      var activeObject = this.getActiveObject();
-      if (activeObject && typeof activeObject.onDragEnd === 'function' && activeObject.onDragEnd(e)) {
-        return;
-      }
-      e.preventDefault();
-      e.stopPropagation();
+      this._dragSource && typeof this._dragSource.onDragEnd === 'function' && this._dragSource.onDragEnd(e);
+      delete this._dragSource;
+      // we need to call mouse up synthetically because the browser won't
+      this._onMouseUp(e);
     },
 
     /**
