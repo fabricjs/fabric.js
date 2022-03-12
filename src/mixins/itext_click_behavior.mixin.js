@@ -131,7 +131,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.selected = this === this.canvas._activeObject;
     // text dragging logic
     var newSelection = this.getSelectionStartFromPointer(options.e);
-    this.__isDragging = newSelection >= this.selectionStart && newSelection <= this.selectionEnd
+    this.__isDragging = this.isEditing && newSelection >= this.selectionStart && newSelection <= this.selectionEnd
       && this.selectionStart < this.selectionEnd;
   },
 

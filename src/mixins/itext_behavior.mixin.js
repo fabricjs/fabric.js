@@ -490,12 +490,13 @@
         if (e.dataTransfer.dropEffect === 'move' && this.__dragStartSelection) {
           this.insertChars('', null, this.__dragStartSelection.selectionStart, this.__dragStartSelection.selectionEnd);
           this.selectionEnd = this.selectionStart;
-          this._updateTextarea();
-          this.mouseUpHandler({ e: e });
           this.fire('changed');
           this.canvas.requestRenderAll();
         }
-        this.abortCursorAnimation();
+        else if (this.__dragStartSelection) {
+          this.selectionStart = this.__dragStartSelection.selectionStart;
+          this.selectionEnd = this.__dragStartSelection.selectionEnd;
+        }
         this.fire('dragend', { e: e });
       }
 
@@ -510,6 +511,7 @@
      */
     dropHandler: function (options) {
       var e = options.e;
+      this.__isDraggingOver = false;
       // inform browser that the drop has been accepted
       e.preventDefault();
       var insert = e.dataTransfer.getData('text/plain');
