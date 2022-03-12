@@ -491,6 +491,7 @@
           this.insertChars('', null, this.__dragStartSelection.selectionStart, this.__dragStartSelection.selectionEnd);
           this.selectionEnd = this.selectionStart;
           this._updateTextarea();
+          this.mouseUpHandler({ e: e });
           this.fire('changed');
           this.canvas.requestRenderAll();
         }
