@@ -158,12 +158,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   onDragStart: function (e) {
     this.__dragStartFired = true;
     if (this.__isDragging) {
-      var selectedText = this.text.slice(this.selectionStart, this.selectionEnd);
-      e.dataTransfer.setData('text/plain', selectedText);
+      e.dataTransfer.setData('text/plain', this.getSelectedText());
       e.dataTransfer.effectAllowed = 'copyMove';
       e.dataTransfer.dropEffect = 'move';
       //e.dataTransfer.setDragImage(this._cacheCanvas, 0,0);
-      this.fire('dragstart', { e: e, selectedText: selectedText });
+      this.fire('dragstart', { e: e });
     }
     return this.__isDragging;
   },
