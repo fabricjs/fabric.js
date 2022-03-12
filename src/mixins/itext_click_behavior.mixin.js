@@ -160,10 +160,31 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (this.__isDragging) {
       var selectedText = this.text.slice(this.selectionStart, this.selectionEnd);
       e.dataTransfer.setData('text/plain', selectedText);
+      e.dataTransfer.effectAllowed = 'copyMove';
+      e.dataTransfer.dropEffect = 'move';
       //e.dataTransfer.setDragImage(this._cacheCanvas, 0,0);
       this.fire('dragstart', { e: e, selectedText: selectedText });
     }
     return this.__isDragging;
+  },
+
+  /**
+   * support native like text dragging
+   * @private
+   * @param {DragEvent} e
+   * @returns {boolean} should handle event
+   */
+  onDragEnd: function (e) {
+    if (this.__isDragging && this.__dragStartFired) {
+      if (e.dataTransfer.dropEffect === 'move') {
+        this.set('text', this.text.slice(0, this.selectionStart) + this.text.slice(this.selectionEnd + 1));
+        this.selectionEnd = this.selectionStart;
+        this._updateTextarea();
+        this.fire('changed');
+        this.canvas.requestRenderAll();
+      }
+      this.fire('dragend', { e: e });
+    }
   },
 
   /**

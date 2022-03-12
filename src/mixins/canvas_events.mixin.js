@@ -51,6 +51,7 @@
       functor(canvasElement, 'contextmenu', this._onContextMenu);
       functor(canvasElement, 'dblclick', this._onDoubleClick);
       functor(canvasElement, 'dragstart', this._onDragStart);
+      functor(canvasElement, 'dragend', this._onDragEnd);
       functor(canvasElement, 'dragover', this._onDragOver);
       functor(canvasElement, 'dragenter', this._onDragEnter);
       functor(canvasElement, 'dragleave', this._onDragLeave);
@@ -105,6 +106,7 @@
       this._onContextMenu = this._onContextMenu.bind(this);
       this._onDoubleClick = this._onDoubleClick.bind(this);
       this._onDragStart = this._onDragStart.bind(this);
+      this._onDragEnd = this._onDragEnd.bind(this);
       this._onDragOver = this._onDragOver.bind(this);
       this._onDragEnter = this._simpleEventHandler.bind(this, 'dragenter');
       this._onDragLeave = this._simpleEventHandler.bind(this, 'dragleave');
@@ -217,6 +219,20 @@
     _onDragStart: function (e) {
       var activeObject = this.getActiveObject();
       if (activeObject && typeof activeObject.onDragStart === 'function' && activeObject.onDragStart(e)) {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+    },
+
+    /**
+     * supports native like text dragging
+     * @private
+     * @param {DragEvent} e
+     */
+    _onDragEnd: function (e) {
+      var activeObject = this.getActiveObject();
+      if (activeObject && typeof activeObject.onDragEnd === 'function' && activeObject.onDragEnd(e)) {
         return;
       }
       e.preventDefault();

@@ -11,6 +11,7 @@
    * @fires editing:entered
    * @fires editing:exited
    * @fires dragstart
+   * @fires dragend
    *
    * @return {fabric.IText} thisArg
    * @see {@link fabric.IText#initialize} for constructor definition
