@@ -516,13 +516,20 @@
         this.canvas.discardActiveObject();
         this.canvas.setActiveObject(this);
         this.enterEditing(e);
+        var insertAt = this.selectionStart;
         if (this.__dragStartSelection) {
+          if (insertAt > this.__dragStartSelection.selectionStart && insertAt <= this.__dragStartSelection.selectionEnd) {
+            insertAt = this.__dragStartSelection.selectionStart;
+          }
+          else if (insertAt > this.__dragStartSelection.selectionEnd) {
+            insertAt -= this.__dragStartSelection.selectionEnd - this.__dragStartSelection.selectionStart;
+          }
           this.insertChars('', null, this.__dragStartSelection.selectionStart, this.__dragStartSelection.selectionEnd);
           // prevent `dragend` from handling event in case of drag and drop in same instance
           delete this.__dragStartSelection;
-          this._updateTextarea();
         }
-        this.insertChars(insert, null, this.selectionStart);
+        this.insertChars(insert, null, insertAt);
+        this.selectionStart = insertAt;
         this.selectionEnd = this.selectionStart + insert.length;
         this._updateTextarea();
         this.fire('changed');
