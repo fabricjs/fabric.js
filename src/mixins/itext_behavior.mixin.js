@@ -507,7 +507,7 @@
         this.enterEditing(e);
         if (this.__dragStartSelection) {
           this.insertChars('', null, this.__dragStartSelection.selectionStart, this.__dragStartSelection.selectionEnd);
-          // delete so dragend event will not try to handle event in case of dragging in same instance
+          // prevent `dragend` from handling event in case of drag and drop in same instance
           delete this.__dragStartSelection;
           this._updateTextarea();
         }
