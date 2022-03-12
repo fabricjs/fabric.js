@@ -480,7 +480,7 @@
       }
       if (this.__isDragging && this.__dragStartFired) {
         if (e.dataTransfer.dropEffect === 'move') {
-          this.insertChars('', null, this.selectionStart, this.selectionEnd + 1);
+          this.insertChars('', null, this.selectionStart, this.selectionEnd);
           this.selectionEnd = this.selectionStart;
           this._updateTextarea();
           this.fire('changed');
@@ -503,7 +503,7 @@
         this.canvas.setActiveObject(this);
         this.enterEditing(e);
         if (this.__dragStartSelection) {
-          this.insertChars('', null, this.__dragStartSelection.selectionStart, this.__dragStartSelection.selectionEnd + 1);
+          this.insertChars('', null, this.__dragStartSelection.selectionStart, this.__dragStartSelection.selectionEnd);
           this._updateTextarea();
         }
         this.insertChars(insert, null, this.selectionStart);
