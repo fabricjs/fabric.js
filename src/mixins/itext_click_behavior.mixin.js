@@ -183,6 +183,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         this.fire('changed');
         this.canvas.requestRenderAll();
       }
+      this.abortCursorAnimation();
       this.fire('dragend', { e: e });
     }
   },
