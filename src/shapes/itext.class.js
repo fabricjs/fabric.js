@@ -281,7 +281,7 @@
      * it does on the contextTop. If contextTop is not available, do nothing.
      */
     renderCursorOrSelection: function() {
-      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
+      if ((!this.isEditing && !this.__isDraggingOver) || !this.canvas || !this.canvas.contextTop) {
         return;
       }
       var boundaries = this._getCursorBoundaries(),

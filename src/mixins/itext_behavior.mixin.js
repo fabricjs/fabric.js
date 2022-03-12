@@ -13,6 +13,10 @@
       this.initCursorSelectionHandlers();
       this.initDoubleClickSimulation();
       this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
+      this.dragOverHandler = this.dragOverHandler.bind(this);
+      this.dropHandler = this.dropHandler.bind(this);
+      this.on('dragover', this.dragOverHandler);
+      this.on('drop', this.dropHandler);
     },
 
     onDeselect: function() {
@@ -409,6 +413,72 @@
         this._fireSelectionChanged();
         this._updateTextarea();
         this.renderCursorOrSelection();
+      }
+    },
+
+    /**
+     * support native like text dragging
+     * @private
+     * @param {DragEvent} e
+     * @returns {boolean} should handle event
+     */
+    onDragStart: function (e) {
+      this.__dragStartFired = true;
+      if (this.__isDragging) {
+        e.dataTransfer.setData('text/plain', this.getSelectedText());
+        e.dataTransfer.effectAllowed = 'copyMove';
+        e.dataTransfer.dropEffect = 'move';
+        //e.dataTransfer.setDragImage(this._cacheCanvas, 0,0);
+        this.fire('dragstart', { e: e });
+      }
+      return this.__isDragging;
+    },
+
+    /**
+     * support native like text dragging
+     * @private
+     */
+    dragOverHandler: function (options) {
+      this.__isDraggingOver = true;
+      this.setCursorByClick(options.e);
+      this._updateTextarea();
+      this.restartCursorIfNeeded();
+      this.renderCursorOrSelection();
+    },
+
+    /**
+     * support native like text dragging
+     * @private
+     * @param {DragEvent} e
+     * @returns {boolean} should handle event
+     */
+    onDragEnd: function (e) {
+      this.__isDraggingOver = false;
+      if (this.__isDragging && this.__dragStartFired) {
+        if (e.dataTransfer.dropEffect === 'move') {
+          this.insertChars('', null, this.selectionStart, this.selectionEnd + 1);
+          this.selectionEnd = this.selectionStart;
+          this._updateTextarea();
+          this.fire('changed');
+          this.canvas.requestRenderAll();
+        }
+        this.abortCursorAnimation();
+        this.fire('dragend', { e: e });
+      }
+    },
+
+    /**
+     * support native like text dragging
+     * @private
+     */
+    dropHandler: function (options) {
+      var insert = options.e.dataTransfer.getData('text/plain');
+      if (insert) {
+        this.insertChars(insert, null, this.selectionStart);
+        this.selectionEnd = this.selectionStart + insert.length;
+        this._updateTextarea();
+        this.fire('changed');
+        this.canvas.requestRenderAll();
       }
     },
 

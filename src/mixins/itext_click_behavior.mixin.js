@@ -150,44 +150,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * support native like text dragging
-   * @private
-   * @param {DragEvent} e
-   * @returns {boolean} should handle event
-   */
-  onDragStart: function (e) {
-    this.__dragStartFired = true;
-    if (this.__isDragging) {
-      e.dataTransfer.setData('text/plain', this.getSelectedText());
-      e.dataTransfer.effectAllowed = 'copyMove';
-      e.dataTransfer.dropEffect = 'move';
-      //e.dataTransfer.setDragImage(this._cacheCanvas, 0,0);
-      this.fire('dragstart', { e: e });
-    }
-    return this.__isDragging;
-  },
-
-  /**
-   * support native like text dragging
-   * @private
-   * @param {DragEvent} e
-   * @returns {boolean} should handle event
-   */
-  onDragEnd: function (e) {
-    if (this.__isDragging && this.__dragStartFired) {
-      if (e.dataTransfer.dropEffect === 'move') {
-        this.set('text', this.text.slice(0, this.selectionStart) + this.text.slice(this.selectionEnd + 1));
-        this.selectionEnd = this.selectionStart;
-        this._updateTextarea();
-        this.fire('changed');
-        this.canvas.requestRenderAll();
-      }
-      this.abortCursorAnimation();
-      this.fire('dragend', { e: e });
-    }
-  },
-
-  /**
    * standard handler for mouse up, overridable
    * @private
    */
