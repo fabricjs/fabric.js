@@ -461,7 +461,7 @@
      * @returns {boolean}
      */
     canDrop: function (e) { // eslint-disable-line no-unused-vars
-      return this.editable;
+      return this.editable && !this.__corner;
     },
 
     /**
@@ -469,11 +469,11 @@
      * @private
      */
     dragOverHandler: function (options) {
-      if (!this.__isDraggingOver && this.editable) {
+      if (!this.__isDraggingOver && this.canDrop(options.e)) {
         this.__isDraggingOver = true;
         this.enterEditing(options.e);
       }
-      if (this.editable) {
+      if (this.__isDraggingOver) {
         this.setCursorByClick(options.e);
         this._updateTextarea();
         this.restartCursorIfNeeded();
