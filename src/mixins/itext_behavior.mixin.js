@@ -430,7 +430,22 @@
         e.dataTransfer.setData('text/plain', this.getSelectedText());
         e.dataTransfer.effectAllowed = 'copyMove';
         e.dataTransfer.dropEffect = 'move';
-        //e.dataTransfer.setDragImage(this._cacheCanvas, 0,0);
+        //  position drag image offsecreen
+        //  https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setDragImage
+        var dragImage = this.toCanvasElement();
+        this.__dragImageDisposer = function () {
+          dragImage.remove();
+        }
+        fabric.util.setStyle(dragImage, {
+          position: 'absolute',
+          left: -dragImage.width + 'px'
+        });
+        fabric.document.body.appendChild(dragImage);
+        var pointer = this.canvas.getPointer(e);
+        var offsetFromCenter = pointer.subtract(this.getCenterPoint());
+        var originOffset = new fabric.Point(dragImage.width, dragImage.height).scalarDivideEquals(2);
+        var offset = originOffset.add(offsetFromCenter);
+        e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
         this.__dragStartSelection = {
           selectionStart: this.selectionStart,
           selectionEnd: this.selectionEnd,
@@ -500,6 +515,8 @@
         this.fire('dragend', { e: e });
       }
 
+      this.__dragImageDisposer && this.__dragImageDisposer();
+      delete this.__dragImageDisposer;
       delete this.__dragStartSelection;
       this.__isDraggingOver = false;
     },
