@@ -943,19 +943,16 @@
 
       if (boundsWidth === 0 || boundsHeight === 0) {
         // If bounds are not available (i.e. not visible), do not apply scale.
-        cssScale = { width: 1, height: 1 };
+        cssScale = { x: 1, y: 1 };
       }
       else {
         cssScale = {
-          width: upperCanvasEl.width / boundsWidth,
-          height: upperCanvasEl.height / boundsHeight
+          x: upperCanvasEl.width / boundsWidth,
+          y: upperCanvasEl.height / boundsHeight
         };
       }
 
-      return {
-        x: pointer.x * cssScale.width,
-        y: pointer.y * cssScale.height
-      };
+      return pointer.multiply(cssScale);
     },
 
     /**
