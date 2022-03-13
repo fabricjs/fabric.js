@@ -456,7 +456,8 @@
     },
 
     /**
-     *
+     * Override to customize drag and drop behavior
+     * @public
      * @param {DragEvent} e
      * @returns {boolean}
      */
