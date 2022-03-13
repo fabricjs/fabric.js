@@ -427,29 +427,48 @@
     onDragStart: function (e) {
       this.__dragStartFired = true;
       if (this.__isDragging) {
-        e.dataTransfer.setData('text/plain', this.getSelectedText());
+        var selection = {
+          selectionStart: this.selectionStart,
+          selectionEnd: this.selectionEnd,
+        };
+        var selectedText = this.getSelectedText();
+        var boundaries = this._getCursorBoundaries();
+        var pos = fabric.util.transformPoint(new fabric.Point(
+          boundaries.left + boundaries.leftOffset,
+          boundaries.top + boundaries.topOffset
+        ).multiply(new fabric.Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1)), this.calcTransformMatrix());
+        e.dataTransfer.setData('text/plain', selectedText);
         e.dataTransfer.effectAllowed = 'copyMove';
         e.dataTransfer.dropEffect = 'move';
         //  position drag image offsecreen
         //  https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setDragImage
-        var dragImage = this.toCanvasElement();
-        this.__dragImageDisposer = function () {
-          dragImage.remove();
-        };
-        fabric.util.setStyle(dragImage, {
-          position: 'absolute',
-          left: -dragImage.width + 'px'
-        });
-        fabric.document.body.appendChild(dragImage);
-        var pointer = this.canvas.getPointer(e);
-        var offsetFromCenter = pointer.subtract(this.getCenterPoint());
-        var originOffset = new fabric.Point(dragImage.width, dragImage.height).scalarDivideEquals(2);
-        var offset = originOffset.add(offsetFromCenter);
-        e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
-        this.__dragStartSelection = {
-          selectionStart: this.selectionStart,
-          selectionEnd: this.selectionEnd,
-        };
+        this.clone().then(function (clone) {
+          
+          clone.set({
+            editable: false,
+            text: selectedText,
+            left: pos.x,
+            top: pos.y,
+            canvas: this.canvas
+          });
+          var pos2 = fabric.util.transformPoint(clone.getLocalPointer(e), clone.calcTransformMatrix(), true);
+          var bbox = clone.getBoundingRect(true);
+          console.log(bbox)
+          var dragImage = clone.toCanvasElement();
+          clone.dispose();
+          this.__dragImageDisposer && this.__dragImageDisposer();
+          this.__dragImageDisposer = function () {
+            dragImage.remove();
+          };
+          fabric.util.setStyle(dragImage, {
+            position: 'absolute',
+            left: -dragImage.width + 'px'
+          });
+          fabric.document.body.appendChild(dragImage);
+          var offset = pos.subtract(new fabric.Point(bbox.left, bbox.top)).add(pos2);
+          e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
+        }.bind(this));
+        this.__dragStartSelection = selection;
         this.fire('dragstart', { e: e });
       }
       return this.__isDragging;
