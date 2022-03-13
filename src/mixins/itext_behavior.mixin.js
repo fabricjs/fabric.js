@@ -435,7 +435,7 @@
         var dragImage = this.toCanvasElement();
         this.__dragImageDisposer = function () {
           dragImage.remove();
-        }
+        };
         fabric.util.setStyle(dragImage, {
           position: 'absolute',
           left: -dragImage.width + 'px'
