@@ -91,7 +91,7 @@
     assert.equal(canvas._target, null);
     canvas.viewportTransform = [2, 0, 0, 2, 0, 0];
     canvas._cacheTransformEventData(e);
-    assert.deepEqual(canvas._pointer, { x: 30, y: 30 }, 'pointer has been cached');
+    assert.deepEqual(canvas._pointer, new fabric.Point(30, 30), 'pointer has been cached');
     assert.deepEqual(canvas._absolutePointer, new fabric.Point(15, 15), 'absolute pointer has been cached');
     assert.ok(canvas._target === rect);
     canvas._resetTransformEventData();
