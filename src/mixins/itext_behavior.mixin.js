@@ -424,7 +424,6 @@
      * @param {DragEvent} e 
      */
     setDragImage: function (e) {
-      var selectedText = this.getSelectedText();
       var t = this.calcTransformMatrix();
       var flipFactor = new fabric.Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
       var boundaries = this._getCursorBoundaries();
@@ -437,43 +436,40 @@
       var diff = pointer.subtract(pos);
       var enableRetinaScaling = this.canvas._isRetinaScaling();
       var retinaScaling = this.canvas.getRetinaScaling();
-
-      this.clone().then(function (clone) {
-        fabric.util.applyTransformToObject(clone, t);
-        clone.set({
-          text: selectedText,
-          left: pos.x,
-          top: pos.y,
-          canvas: this.canvas
-        });
-        var bbox = clone.getBoundingRect(true, true);
-        var correction = pos.subtract(new fabric.Point(bbox.left, bbox.top));
-        var dragImage = clone.toCanvasElement({ enableRetinaScaling: enableRetinaScaling });
-        if (enableRetinaScaling && retinaScaling > 1) {
-          var c = fabric.util.createCanvasElement();
-          c.width = dragImage.width / retinaScaling;
-          c.height = dragImage.height / retinaScaling;
-          var ctx = c.getContext('2d');
-          ctx.scale(1 / retinaScaling, 1 / retinaScaling);
-          ctx.drawImage(dragImage, 0, 0);
-          dragImage = c;
-        }
-        clone.dispose();
-        this.__dragImageDisposer && this.__dragImageDisposer();
-        this.__dragImageDisposer = function () {
-          dragImage.remove();
-        };
-        //  position drag image offsecreen
-        fabric.util.setStyle(dragImage, {
-          position: 'absolute',
-          left: -dragImage.width + 'px'
-        });
-        fabric.document.body.appendChild(dragImage);
-        var rtlCorrection = new fabric.Point(this.direction === 'rtl' ? dragImage.width : 0, 0);
-        var offset = correction.add(diff).add(rtlCorrection).scalarMultiply(retinaScaling);
-        var offset = correction.add(diff).scalarMultiply(retinaScaling);
-        e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
-      }.bind(this));
+      var bbox = this.getBoundingRect(true);
+      var correction = pos.subtract(new fabric.Point(bbox.left, bbox.top));
+      var rtlCorrection = new fabric.Point(this.direction === 'rtl' ? Math.ceil(bbox.width) : 0, 0);
+      var offset = correction.add(diff).add(rtlCorrection).scalarMultiply(retinaScaling);
+      //  prepare instance for drag image snapshot by making all non selected text invisible
+      var styles = fabric.util.object.clone(this.styles);
+      var fill = this.fill;
+      //this.fill = this.stroke = 'transparent';
+      this.setSelectionStyles({ fill: 'transparent' }, 0, this.selectionStart);
+      this.setSelectionStyles({ fill: 'transparent' }, this.selectionEnd, this.text.length);
+      var dragImage = this.toCanvasElement({ enableRetinaScaling: enableRetinaScaling });
+      this.fill = fill;
+      this.styles = styles;
+      //  handle retina scaling
+      if (enableRetinaScaling && retinaScaling > 1) {
+        var c = fabric.util.createCanvasElement();
+        c.width = dragImage.width / retinaScaling;
+        c.height = dragImage.height / retinaScaling;
+        var ctx = c.getContext('2d');
+        ctx.scale(1 / retinaScaling, 1 / retinaScaling);
+        ctx.drawImage(dragImage, 0, 0);
+        dragImage = c;
+      }
+      this.__dragImageDisposer && this.__dragImageDisposer();
+      this.__dragImageDisposer = function () {
+        dragImage.remove();
+      };
+      //  position drag image offsecreen
+      fabric.util.setStyle(dragImage, {
+        position: 'absolute',
+        left: -dragImage.width + 'px'
+      });
+      fabric.document.body.appendChild(dragImage);
+      e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
     },
 
     /**
