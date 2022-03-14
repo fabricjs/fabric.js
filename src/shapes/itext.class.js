@@ -308,7 +308,7 @@
      * @returns {fabric.Point} point relative to instance
      */
     getRelativeCursorPosition: function (index) {
-      var boundaries = this._getCursorBoundaries(index, true);
+      var boundaries = this._getCursorBoundaries(index);
       return new fabric.Point(
         boundaries.left + boundaries.leftOffset,
         boundaries.top + boundaries.topOffset
@@ -336,16 +336,26 @@
     },
 
     /**
+     * Caches and returns cursor left/top offset relative to instance's center point
      * @private
      * @param {number} [index] index from start
      * @param {boolean} [calculate] force recalculation
      */
     _getCursorBoundariesOffsets: function (index, calculate) {
-      if (typeof index === 'undefined') {
-        index = this.selectionStart;
-      }
       if (!calculate && this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
         return this.cursorOffsetCache;
+      }
+      return this.cursorOffsetCache = this.__getCursorBoundariesOffsets(index);
+    },
+
+    /**
+     * Calcualtes cursor left/top offset relative to instance's center point
+     * @private
+     * @param {number} [index] index from start
+     */
+    __getCursorBoundariesOffsets: function (index) {
+      if (typeof index === 'undefined') {
+        index = this.selectionStart;
       }
       var lineLeftOffset,
           lineIndex,
@@ -372,8 +382,7 @@
       if (this.direction === 'rtl') {
         boundaries.left *= -1;
       }
-      this.cursorOffsetCache = boundaries;
-      return this.cursorOffsetCache;
+      return boundaries;
     },
 
     /**
