@@ -303,23 +303,29 @@
     },
 
     /**
-     * Returns cursor boundaries (left, top, leftOffset, topOffset)
-     * @private
-     * @param {Array} chars Array of characters
-     * @param {String} typeOfBoundaries
+     * 
+     * @param {number} [index] index for start
+     * @returns {fabric.Point} point relative to instance
      */
-    _getCursorBoundaries: function(position) {
+    getRelativeCursorPosition: function (index) {
+      var boundaries = this._getCursorBoundaries(index);
+      return new fabric.Point(
+        boundaries.left + boundaries.leftOffset,
+        boundaries.top + boundaries.topOffset
+      );
+    },
 
-      // left/top are left/top of entire text box
-      // leftOffset/topOffset are offset from that left/top point of a text box
-
-      if (typeof position === 'undefined') {
-        position = this.selectionStart;
-      }
-
+    /**
+     * Returns cursor boundaries (left, top, leftOffset, topOffset)
+     * left/top are left/top of entire text box
+     * leftOffset/topOffset are offset from that left/top point of a text box
+     * @private
+     * @param {number} [index] index from start
+     */
+    _getCursorBoundaries: function(index) {
       var left = this._getLeftOffset(),
           top = this._getTopOffset(),
-          offsets = this._getCursorBoundariesOffsets(position);
+          offsets = this._getCursorBoundariesOffsets(index);
       return {
         left: left,
         top: top,
@@ -331,8 +337,11 @@
     /**
      * @private
      */
-    _getCursorBoundariesOffsets: function(position) {
-      if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
+    _getCursorBoundariesOffsets: function (index) {
+      if (typeof index === 'undefined') {
+        index = this.selectionStart;
+      }
+      if (index === this.selectionStart && this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
         return this.cursorOffsetCache;
       }
       var lineLeftOffset,
@@ -341,7 +350,7 @@
           topOffset = 0,
           leftOffset = 0,
           boundaries,
-          cursorPosition = this.get2DCursorLocation(position);
+          cursorPosition = this.get2DCursorLocation(index);
       charIndex = cursorPosition.charIndex;
       lineIndex = cursorPosition.lineIndex;
       for (var i = 0; i < lineIndex; i++) {
