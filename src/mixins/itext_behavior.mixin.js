@@ -438,8 +438,7 @@
       var retinaScaling = this.canvas.getRetinaScaling();
       var bbox = this.getBoundingRect(true);
       var correction = pos.subtract(new fabric.Point(bbox.left, bbox.top));
-      var rtlCorrection = new fabric.Point(this.direction === 'rtl' ? Math.ceil(bbox.width) : 0, 0);
-      var offset = correction.add(diff).add(rtlCorrection).scalarMultiply(retinaScaling);
+      var offset = correction.add(diff).scalarMultiply(retinaScaling);
       //  prepare instance for drag image snapshot by making all non selected text invisible
       var styles = fabric.util.object.clone(this.styles);
       var fill = this.fill;
