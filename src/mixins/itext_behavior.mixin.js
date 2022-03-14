@@ -422,11 +422,17 @@
      * Override to customize the drag image
      * https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setDragImage
      * @param {DragEvent} e 
+     * @param {object} data
+     * @param {number} data.selectionStart
+     * @param {number} data.selectionEnd
+     * @param {boolean} data.trailingSpace
+     * @param {string} data.text
+     * @param {string} data.value selected text
      */
-    setDragImage: function (e) {
+    setDragImage: function (e, data) {
       var t = this.calcTransformMatrix();
       var flipFactor = new fabric.Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
-      var boundaries = this._getCursorBoundaries();
+      var boundaries = this._getCursorBoundaries(data.selectionStart);
       var selectionPosition = new fabric.Point(
         boundaries.left + boundaries.leftOffset,
         boundaries.top + boundaries.topOffset
@@ -447,8 +453,8 @@
         fill: 'transparent',
         textBackgroundColor: 'transparent'
       };
-      this.setSelectionStyles(styleOverride, 0, this.selectionStart);
-      this.setSelectionStyles(styleOverride, this.selectionEnd, this.text.length);
+      this.setSelectionStyles(styleOverride, 0, data.selectionStart);
+      this.setSelectionStyles(styleOverride, data.selectionEnd, data.text.length);
       var dragImage = this.toCanvasElement({ enableRetinaScaling: enableRetinaScaling });
       this.backgroundColor = bgc;
       this.styles = styles;
@@ -484,20 +490,27 @@
     onDragStart: function (e) {
       this.__dragStartFired = true;
       if (this.__isDragging) {
-        this.__dragStartSelection = {
+        var trailing = this._text[this.selectionEnd];
+        var trailingSpace = this._reNewline.test(trailing) ?
+          this.findLineBoundaryLeft(this.selectionStart) === this.selectionStart
+          && this.findLineBoundaryRight(this.selectionEnd) === this.selectionEnd :
+          this.findWordBoundaryRight(this.selectionEnd - 1) === this.selectionEnd;
+        var selection = this.__dragStartSelection = {
           selectionStart: this.selectionStart,
-          selectionEnd: this.selectionEnd,
+          selectionEnd: this.selectionEnd + trailingSpace,
+          trailingSpace: trailingSpace
         };
-        var value = this.getSelectedText();
+        var value = this._text.slice(selection.selectionStart, selection.selectionEnd).join('');
+        var data = Object.assign({ text: this.text, value: value }, selection);
         e.dataTransfer.setData('text/plain', value);
         e.dataTransfer.setData('application/fabric', JSON.stringify({
           value: value,
-          styles: this.getSelectionStyles(this.selectionStart, this.selectionEnd, true)
+          styles: this.getSelectionStyles(selection.selectionStart, selection.selectionEnd, true)
         }));
         e.dataTransfer.effectAllowed = 'copyMove';
         e.dataTransfer.dropEffect = 'move';
-        this.setDragImage(e);
-        this.fire('dragstart', { e: e });
+        this.setDragImage(e, data);
+        this.fire('dragstart', { e: e, data: data });
       }
       return this.__isDragging;
     },
@@ -552,7 +565,7 @@
       if (this.__isDragging && this.__dragStartFired) {
         if (e.dataTransfer.dropEffect === 'move' && this.__dragStartSelection) {
           this.insertChars('', null, this.__dragStartSelection.selectionStart, this.__dragStartSelection.selectionEnd);
-          this.selectionEnd = this.selectionStart;
+          this.selectionStart = this.selectionEnd = this.__dragStartSelection.selectionStart;
           this.fire('changed');
           this.canvas.requestRenderAll();
         }
@@ -560,6 +573,8 @@
           this.selectionStart = this.__dragStartSelection.selectionStart;
           this.selectionEnd = this.__dragStartSelection.selectionEnd;
         }
+        this.exitEditing();
+        this.__lastSelected = false;
         this.fire('dragend', { e: e });
       }
 
