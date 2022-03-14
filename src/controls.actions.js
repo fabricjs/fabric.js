@@ -690,9 +690,9 @@
         strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
         multiplier = isTransformCentered(transform) ? 2 : 1,
         oldWidth = target.width,
-        newWidth = Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding;
+        newWidth = Math.ceil(Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding);
     target.set('width', Math.max(newWidth, 0));
-    return oldWidth !== newWidth;
+    return oldWidth !== target.width;
   }
 
   /**
