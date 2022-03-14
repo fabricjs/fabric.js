@@ -505,7 +505,8 @@
         e.dataTransfer.setData('text/plain', value);
         e.dataTransfer.setData('application/fabric', JSON.stringify({
           value: value,
-          styles: this.getSelectionStyles(selection.selectionStart, selection.selectionEnd, true)
+          styles: this.getSelectionStyles(selection.selectionStart, selection.selectionEnd, true),
+          trailingSpace: trailingSpace
         }));
         e.dataTransfer.effectAllowed = 'copyMove';
         e.dataTransfer.dropEffect = 'move';
@@ -597,25 +598,48 @@
       e.preventDefault();
       var insert = e.dataTransfer.getData('text/plain');
       if (insert) {
-        var styles = e.dataTransfer.types.includes('application/fabric') ?
-          JSON.parse(e.dataTransfer.getData('application/fabric')).styles :
-          null;
+        var insertAt = this.selectionStart;
+        var data = e.dataTransfer.types.includes('application/fabric') ?
+          JSON.parse(e.dataTransfer.getData('application/fabric')) :
+          {};
+        var styles = data.styles;
+        var trailingSpace = data.trailingSpace, trailing = insert[Math.max(0, insert.length - 1)];
         this.canvas.discardActiveObject();
         this.canvas.setActiveObject(this);
         this.enterEditing(e);
-        var insertAt = this.selectionStart;
+        var isSpace = /\s/;
+        var insertingOnSpace = isSpace.test(this._text[insertAt]);
+        var insertingAfterSpace = isSpace.test(this._text[insertAt - 1]);
+        //  drag and drop in same instance
         if (this.__dragStartSelection) {
-          if (insertAt > this.__dragStartSelection.selectionStart
-            && insertAt <= this.__dragStartSelection.selectionEnd) {
-            insertAt = this.__dragStartSelection.selectionStart;
+          var selectionStart = this.__dragStartSelection.selectionStart;
+          var selectionEnd = this.__dragStartSelection.selectionEnd;
+          if (insertAt > selectionStart && insertAt <= selectionEnd) {
+            insertAt = selectionStart;
+            trailingSpace = false;
           }
-          else if (insertAt > this.__dragStartSelection.selectionEnd) {
-            insertAt -= this.__dragStartSelection.selectionEnd - this.__dragStartSelection.selectionStart;
+          else if (insertAt > selectionEnd) {
+            insertAt -= selectionEnd - selectionStart;
           }
-          this.insertChars('', null, this.__dragStartSelection.selectionStart, this.__dragStartSelection.selectionEnd);
-          // prevent `dragend` from handling event in case of drag and drop in same instance
+          this.insertChars('', null, selectionStart, selectionEnd);
+          // prevent `dragend` from handling event
           delete this.__dragStartSelection;
         }
+        //  handle spacing
+        if (trailingSpace && this.findLineBoundaryLeft(insertAt) < insertAt && !insertingAfterSpace
+          && (insertAt === this._text.length || !insertingOnSpace)) {
+          insert = ' ' + insert;
+          styles.unshift({});
+        }
+        else if (trailingSpace && insertingOnSpace && !insertingAfterSpace) {
+          insertAt++;
+        }
+        //  remove redundant line break
+        if (this._reNewline.test(trailing)
+          && (this._reNewline.test(this._text[insertAt]) || insertAt === this._text.length)) {
+          insert = insert.trimEnd();
+        }
+        //  finalize
         this.insertChars(insert, styles, insertAt);
         this.selectionStart = insertAt;
         this.selectionEnd = this.selectionStart + insert.length;
