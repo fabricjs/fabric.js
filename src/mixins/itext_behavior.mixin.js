@@ -564,18 +564,26 @@
      */
     onDragEnd: function (e) {
       if (this.__isDragging && this.__dragStartFired) {
-        if (e.dataTransfer.dropEffect === 'move' && this.__dragStartSelection) {
-          this.insertChars('', null, this.__dragStartSelection.selectionStart, this.__dragStartSelection.selectionEnd);
-          this.selectionStart = this.selectionEnd = this.__dragStartSelection.selectionStart;
-          this.fire('changed');
-          this.canvas.requestRenderAll();
+        if (this.__dragStartSelection) {
+          var selectionStart = this.__dragStartSelection.selectionStart;
+          var selectionEnd = this.__dragStartSelection.selectionEnd;
+          var trailingSpace = this.__dragStartSelection.trailingSpace;
+          if (e.dataTransfer.dropEffect === 'move') {
+            this.insertChars('', null, selectionStart, selectionEnd);
+            this.selectionStart = this.selectionEnd = selectionStart;
+            this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
+            this._updateTextarea();
+            this.fire('changed', { index: selectionStart, action: 'dragend' });
+            this.canvas.requestRenderAll();
+          }
+          else {
+            this.selectionStart = selectionStart;
+            this.selectionEnd = selectionEnd - trailingSpace;
+          }
+          this.exitEditing();
+          this.__lastSelected = false;
         }
-        else if (this.__dragStartSelection) {
-          this.selectionStart = this.__dragStartSelection.selectionStart;
-          this.selectionEnd = this.__dragStartSelection.selectionEnd;
-        }
-        this.exitEditing();
-        this.__lastSelected = false;
+        
         this.fire('dragend', { e: e });
       }
 
@@ -610,6 +618,7 @@
         var isSpace = /\s/;
         var insertingOnSpace = isSpace.test(this._text[insertAt]);
         var insertingAfterSpace = isSpace.test(this._text[insertAt - 1]);
+        var seletionStartOffset = 0;
         //  drag and drop in same instance
         if (this.__dragStartSelection) {
           var selectionStart = this.__dragStartSelection.selectionStart;
@@ -630,6 +639,7 @@
           && (insertAt === this._text.length || !insertingOnSpace)) {
           insert = ' ' + insert;
           styles.unshift({});
+          seletionStartOffset = 1;
         }
         else if (trailingSpace && insertingOnSpace && !insertingAfterSpace) {
           insertAt++;
@@ -641,8 +651,9 @@
         }
         //  finalize
         this.insertChars(insert, styles, insertAt);
-        this.selectionStart = insertAt;
-        this.selectionEnd = this.selectionStart + insert.length;
+        this.selectionStart = Math.min(insertAt + seletionStartOffset, this._text.length);
+        this.selectionEnd = Math.min(this.selectionStart + insert.length, this._text.length);
+        this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
         this._updateTextarea();
         this.fire('changed', { index: insertAt, action: 'drop' });
         this.canvas.requestRenderAll();
