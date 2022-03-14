@@ -436,7 +436,7 @@
       var pointer = this.canvas.getPointer(e);
       var diff = pointer.subtract(pos);
       var enableRetinaScaling = this.canvas._isRetinaScaling();
-      var retinaScalingInv = 1 / this.canvas.getRetinaScaling();
+      var retinaScaling = this.canvas.getRetinaScaling();
 
       this.clone().then(function (clone) {
         fabric.util.applyTransformToObject(clone, t);
@@ -449,12 +449,12 @@
         var bbox = clone.getBoundingRect(true, true);
         var correction = pos.subtract(new fabric.Point(bbox.left, bbox.top));
         var dragImage = clone.toCanvasElement({ enableRetinaScaling: enableRetinaScaling });
-        if (enableRetinaScaling && retinaScalingInv !== 1) {
+        if (enableRetinaScaling && retinaScaling > 1) {
           var c = fabric.util.createCanvasElement();
-          c.width = dragImage.width * retinaScalingInv;
-          c.height = dragImage.height * retinaScalingInv;
+          c.width = dragImage.width / retinaScaling;
+          c.height = dragImage.height / retinaScaling;
           var ctx = c.getContext('2d');
-          ctx.scale(retinaScalingInv, retinaScalingInv);
+          ctx.scale(1 / retinaScaling, 1 / retinaScaling);
           ctx.drawImage(dragImage, 0, 0);
           dragImage = c;
         }
@@ -469,7 +469,7 @@
           left: -dragImage.width + 'px'
         });
         fabric.document.body.appendChild(dragImage);
-        var offset = correction.add(diff);
+        var offset = correction.add(diff).scalarMultiply(retinaScaling);
         e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
       }.bind(this));
     },
