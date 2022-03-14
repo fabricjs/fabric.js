@@ -243,7 +243,8 @@
   });
 
   QUnit.test('copy', function (assert) {
-    if (!ClipboardEvent) {
+    if (fabric.isLikelyNode) {
+      assert.expect(0);
       return;
     }
     var event = new ClipboardEvent('copy', { clipboardData: new DataTransfer() });
@@ -261,7 +262,8 @@
   });
 
   QUnit.test('copy paste', function (assert) {
-    if (!ClipboardEvent) {
+    if (fabric.isLikelyNode) {
+      assert.expect(0);
       return;
     }
     var event = new ClipboardEvent('copy', { clipboardData: new DataTransfer() });
