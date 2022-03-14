@@ -469,6 +469,8 @@
           left: -dragImage.width + 'px'
         });
         fabric.document.body.appendChild(dragImage);
+        var rtlCorrection = new fabric.Point(this.direction === 'rtl' ? dragImage.width : 0, 0);
+        var offset = correction.add(diff).add(rtlCorrection).scalarMultiply(retinaScaling);
         var offset = correction.add(diff).scalarMultiply(retinaScaling);
         e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
       }.bind(this));
