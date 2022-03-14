@@ -421,7 +421,7 @@
     /**
      * Override to customize the drag image
      * https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setDragImage
-     * @param {DragEvent} e 
+     * @param {DragEvent} e
      * @param {object} data
      * @param {number} data.selectionStart
      * @param {number} data.selectionEnd
@@ -584,7 +584,7 @@
           this.exitEditing();
           this.__lastSelected = false;
         }
-        
+
         this.fire('dragend', { e: e });
       }
 
@@ -596,8 +596,8 @@
 
     /**
      * support native like text dragging
-     * 
-     * Override the `text/plain | application/fabric` types of {@link DragEvent#dataTransfer} 
+     *
+     * Override the `text/plain | application/fabric` types of {@link DragEvent#dataTransfer}
      * in order to change the drop value or to customize styling respectively, by listening to the `drop:before` event
      * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#performing_a_drop
      * @private

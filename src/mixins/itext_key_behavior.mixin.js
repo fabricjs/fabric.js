@@ -302,7 +302,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * Pastes text
-   * Override the `text/plain | application/fabric` types of {@link ClipboardEvent#clipboardData} 
+   * Override the `text/plain | application/fabric` types of {@link ClipboardEvent#clipboardData}
    * in order to change the pasted value or to customize styling respectively, by listening to the `paste` event
    * @param {ClipboardEvent} e Event object
    */
@@ -316,7 +316,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var data = clipboardData.types.includes('application/fabric') ?
       JSON.parse(clipboardData.getData('application/fabric')) :
       {};
-    
+
     if (value) {
       this.insertChars(value, data.styles, this.selectionStart, this.selectionEnd);
       this.selectionEnd = this.selectionStart + value.length;
