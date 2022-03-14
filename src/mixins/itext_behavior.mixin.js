@@ -440,13 +440,17 @@
       var correction = pos.subtract(new fabric.Point(bbox.left, bbox.top));
       var offset = correction.add(diff).scalarMultiply(retinaScaling);
       //  prepare instance for drag image snapshot by making all non selected text invisible
-      var styles = fabric.util.object.clone(this.styles);
-      var fill = this.fill;
-      //this.fill = this.stroke = 'transparent';
-      this.setSelectionStyles({ fill: 'transparent' }, 0, this.selectionStart);
-      this.setSelectionStyles({ fill: 'transparent' }, this.selectionEnd, this.text.length);
+      var bgc = this.backgroundColor;
+      var styles = fabric.util.object.clone(this.styles, true);
+      delete this.backgroundColor;
+      var styleOverride = {
+        fill: 'transparent',
+        textBackgroundColor: 'transparent'
+      };
+      this.setSelectionStyles(styleOverride, 0, this.selectionStart);
+      this.setSelectionStyles(styleOverride, this.selectionEnd, this.text.length);
       var dragImage = this.toCanvasElement({ enableRetinaScaling: enableRetinaScaling });
-      this.fill = fill;
+      this.backgroundColor = bgc;
       this.styles = styles;
       //  handle retina scaling
       if (enableRetinaScaling && retinaScaling > 1) {
@@ -484,7 +488,12 @@
           selectionStart: this.selectionStart,
           selectionEnd: this.selectionEnd,
         };
-        e.dataTransfer.setData('text/plain', this.getSelectedText());
+        var value = this.getSelectedText();
+        e.dataTransfer.setData('text/plain', value);
+        e.dataTransfer.setData('application/fabric', JSON.stringify({
+          value: value,
+          styles: this.getSelectionStyles(this.selectionStart, this.selectionEnd, true)
+        }));
         e.dataTransfer.effectAllowed = 'copyMove';
         e.dataTransfer.dropEffect = 'move';
         this.setDragImage(e);
@@ -573,6 +582,9 @@
       e.preventDefault();
       var insert = e.dataTransfer.getData('text/plain');
       if (insert) {
+        var styles = e.dataTransfer.types.includes('application/fabric') ?
+          JSON.parse(e.dataTransfer.getData('application/fabric')).styles :
+          null;
         this.canvas.discardActiveObject();
         this.canvas.setActiveObject(this);
         this.enterEditing(e);
@@ -589,7 +601,7 @@
           // prevent `dragend` from handling event in case of drag and drop in same instance
           delete this.__dragStartSelection;
         }
-        this.insertChars(insert, null, insertAt);
+        this.insertChars(insert, styles, insertAt);
         this.selectionStart = insertAt;
         this.selectionEnd = this.selectionStart + insert.length;
         this._updateTextarea();
