@@ -656,7 +656,7 @@
         this.selectionEnd = Math.min(this.selectionStart + insert.length, this._text.length);
         this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
         this._updateTextarea();
-        this.fire('changed', { index: insertAt, action: 'drop' });
+        this.fire('changed', { index: insertAt + seletionStartOffset, action: 'drop' });
         this.canvas.requestRenderAll();
       }
     },
