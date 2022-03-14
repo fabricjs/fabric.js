@@ -342,6 +342,9 @@
      * @param {boolean} [calculate] force recalculation
      */
     _getCursorBoundariesOffsets: function (index, calculate) {
+      if (typeof index === 'undefined') {
+        index = this.selectionStart;
+      }
       if (!calculate && this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
         return this.cursorOffsetCache;
       }
@@ -351,12 +354,9 @@
     /**
      * Calcualtes cursor left/top offset relative to instance's center point
      * @private
-     * @param {number} [index] index from start
+     * @param {number} index index from start
      */
     __getCursorBoundariesOffsets: function (index) {
-      if (typeof index === 'undefined') {
-        index = this.selectionStart;
-      }
       var lineLeftOffset,
           lineIndex,
           charIndex,
