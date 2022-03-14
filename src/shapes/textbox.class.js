@@ -271,7 +271,7 @@
       var wrapped = [], i;
       this.isWrapping = true;
       for (i = 0; i < lines.length; i++) {
-        wrapped = wrapped.concat(this._wrapLine(lines[i], i, desiredWidth));
+        wrapped.push.apply(wrapped, this._wrapLine(lines[i], i, desiredWidth));
       }
       this.isWrapping = false;
       return wrapped;
@@ -344,7 +344,7 @@
         offset += word.length;
 
         lineWidth += infixWidth + wordWidth - additionalSpace;
-        if (lineWidth > desiredWidth && !lineJustStarted) {
+        if (lineWidth > Math.max(desiredWidth, largestWordWidth) && !lineJustStarted) {
           graphemeLines.push(line);
           line = [];
           lineWidth = wordWidth;
