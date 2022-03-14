@@ -62,13 +62,13 @@
       transform.target.strokeUniform = true;
       transform.target.scaleX = 3;
       fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
-      assert.equal(Math.floor(transform.target.width), 61);
+      assert.equal(Math.ceil(transform.target.width), 62);
     });
     QUnit.test('changeWidth changes the width with big strokeWidth + scaling', function(assert) {
       transform.target.strokeWidth = 15;
       transform.target.scaleX = 3;
       fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
-      assert.equal(Math.floor(transform.target.width), 51);
+      assert.equal(Math.ceil(transform.target.width), 52);
     });
     QUnit.test('changeWidth will fire events on canvas and target resizing', function(assert) {
       var done = assert.async();
