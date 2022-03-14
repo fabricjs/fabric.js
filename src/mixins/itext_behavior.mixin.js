@@ -574,6 +574,7 @@
             this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
             this._updateTextarea();
             this.fire('changed', { index: selectionStart, action: 'dragend' });
+            this.canvas.fire('text:changed', { target: this });
             this.canvas.requestRenderAll();
           }
           else {
@@ -657,6 +658,7 @@
         this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
         this._updateTextarea();
         this.fire('changed', { index: insertAt + seletionStartOffset, action: 'drop' });
+        this.canvas.fire('text:changed', { target: this });
         this.canvas.requestRenderAll();
       }
     },
