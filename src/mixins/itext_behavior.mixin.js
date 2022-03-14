@@ -596,8 +596,9 @@
 
     /**
      * support native like text dragging
-     * override by removing `text/plain` from {@link DragEvent#dataTransfer} in a `drop:before` event handler
-     * override the `application/fabric` type (e.g. change styles) of {@link DragEvent#dataTransfer.setData} in a `drop:before` event handler
+     * 
+     * Override the `text/plain | application/fabric` types of {@link DragEvent#dataTransfer} 
+     * in order to change the drop value or to customize styling respectively, by listening to the `drop:before` event
      * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#performing_a_drop
      * @private
      */
