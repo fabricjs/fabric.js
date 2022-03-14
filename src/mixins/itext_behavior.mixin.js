@@ -432,20 +432,18 @@
           selectionEnd: this.selectionEnd,
         };
         var selectedText = this.getSelectedText();
-        var boundaries = this._getCursorBoundaries();
-        var pos = fabric.util.transformPoint(new fabric.Point(
-          boundaries.left + boundaries.leftOffset,
-          boundaries.top + boundaries.topOffset
-        ).multiply(new fabric.Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1)), this.calcTransformMatrix());
+        var t = this.calcTransformMatrix();
+        var flipFactor = new fabric.Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
+        var selectionPosition = this.getRelativeCursorPosition().multiply(flipFactor);
+        var pos = fabric.util.transformPoint(selectionPosition, t);
         e.dataTransfer.setData('text/plain', selectedText);
         e.dataTransfer.effectAllowed = 'copyMove';
         e.dataTransfer.dropEffect = 'move';
         //  position drag image offsecreen
         //  https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setDragImage
         this.clone().then(function (clone) {
-          
+          fabric.util.applyTransformToObject(clone, t);
           clone.set({
-            editable: false,
             text: selectedText,
             left: pos.x,
             top: pos.y,
@@ -453,7 +451,7 @@
           });
           var pos2 = fabric.util.transformPoint(clone.getLocalPointer(e), clone.calcTransformMatrix(), true);
           var bbox = clone.getBoundingRect(true);
-          console.log(bbox)
+          var correction = pos.subtract(new fabric.Point(bbox.left, bbox.top));
           var dragImage = clone.toCanvasElement();
           clone.dispose();
           this.__dragImageDisposer && this.__dragImageDisposer();
@@ -465,7 +463,7 @@
             left: -dragImage.width + 'px'
           });
           fabric.document.body.appendChild(dragImage);
-          var offset = pos.subtract(new fabric.Point(bbox.left, bbox.top)).add(pos2);
+          var offset = correction.add(pos2);
           e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
         }.bind(this));
         this.__dragStartSelection = selection;
