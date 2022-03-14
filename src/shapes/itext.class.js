@@ -12,6 +12,9 @@
    * @fires editing:exited
    * @fires dragstart
    * @fires dragend
+   * @fires copy
+   * @fires cut
+   * @fires paste
    *
    * @return {fabric.IText} thisArg
    * @see {@link fabric.IText#initialize} for constructor definition

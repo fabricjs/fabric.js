@@ -257,7 +257,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {ClipboardEvent} e Event object
    * @returns {boolean} handle event
    */
-  copy: function (e) {
+  setClipboardData: function (e) {
     e.preventDefault();
     if (this.selectionStart === this.selectionEnd) {
       e.clipboardData.effectAllowed = 'none';
@@ -275,7 +275,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Copies selected text
+    * Copies selected text
+    * @param {ClipboardEvent} e Event object
+    */
+  copy: function (e) {
+    this.setClipboardData(e) && this.fire('copy', { e: e });
+  },
+
+  /**
+   * Cuts selected text
    * @param {ClipboardEvent} e Event object
    */
   cut: function (e) {
@@ -285,6 +293,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.selectionEnd = this.selectionStart;
       this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
       this._updateTextarea();
+      this.fire('cut', { e: e });
       this.fire('changed', { index: this.selectionStart, action: 'cut' });
       this.canvas.fire('text:changed', { target: this });
       this.canvas.requestRenderAll();
@@ -293,11 +302,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * Pastes text
-   * Override the `application/fabric` type of {@link ClipboardEvent#clipboardData.setData} to customize styling
+   * Override the `text/plain | application/fabric` types of {@link ClipboardEvent#clipboardData} 
+   * in order to change the pasted value or to customize styling respectively, by listening to the `paste` event
    * @param {ClipboardEvent} e Event object
    */
   paste: function (e) {
     e.preventDefault();
+    //  fire event before logic to allow overriding clipboard data
+    this.fire('paste', { e: e });
+
     var clipboardData = e.clipboardData;
     var value = clipboardData.getData('text/plain');
     var data = clipboardData.types.includes('application/fabric') ?
