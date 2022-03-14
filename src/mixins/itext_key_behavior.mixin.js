@@ -317,7 +317,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
     if (value) {
       this.insertChars(value, data.styles, this.selectionStart, this.selectionEnd);
-      this.selectionEnd = this.selectionStart + value.length;
+      this.selectionStart = this.selectionEnd = this.selectionStart + value.length;
       this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
       this._updateTextarea();
       this.fire('changed', { index: this.selectionStart, action: 'paste' });
