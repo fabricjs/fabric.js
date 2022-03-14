@@ -129,8 +129,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * Handles keyup event
-   * We handle KeyUp because ie11 and edge have difficulties copy/pasting
-   * if a copy/cut event fired, keyup is dismissed
    * @param {Event} e Event object
    */
   onKeyUp: function(e) {
@@ -287,7 +285,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {ClipboardEvent} e Event object
    */
   cut: function (e) {
-    if (this.copy(e)) {
+    if (this.setClipboardData(e)) {
       //  remove selection
       this.insertChars('', null, this.selectionStart, this.selectionEnd);
       this.selectionEnd = this.selectionStart;
