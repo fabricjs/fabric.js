@@ -1513,8 +1513,8 @@
     },
 
     /**
-     * 
-     * @param {string} value 
+     *
+     * @param {string} value
      * @returns {string[]} array of graphemes
      */
     graphemeSplit: function (value) {
