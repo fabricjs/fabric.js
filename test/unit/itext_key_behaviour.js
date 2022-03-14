@@ -118,6 +118,17 @@
     assert.equal(iText.selectionEnd, 21, 'should move to down line');
     selection = 0;
 
+    // test if the cursor moves to the correct position when an emoji appears in the text
+    iText.insertChars('🦆', null, 31);
+    iText.selectionStart = 20;
+    iText.selectionEnd = 26;
+    iText.moveCursorDown({ shiftKey: false });
+    assert.equal(selection, 1, 'should fire');
+    assert.equal(iText.selectionStart, 32, 'should be at end of text');
+    assert.equal(iText.selectionEnd, 32, 'should be at end of text');
+    selection = 0;
+    iText.removeChars(31)
+
     iText.selectionStart = 28;
     iText.selectionEnd = 31;
     iText.moveCursorLeft({ shiftKey: false });
