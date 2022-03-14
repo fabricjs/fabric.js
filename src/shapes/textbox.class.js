@@ -299,8 +299,8 @@
     },
 
     /**
-     * 
-     * @param {string} value 
+     *
+     * @param {string} value
      * @returns {string[]} array of words
      */
     wordSplit: function (value) {
@@ -338,11 +338,11 @@
       }
       desiredWidth -= reservedSpace;
       var data = words.map(function (word) {
-         // if using splitByGrapheme words are already in graphemes.
+        // if using splitByGrapheme words are already in graphemes.
         word = splitByGrapheme ? word : this.graphemeSplit(word);
         var width = this._measureWord(word, lineIndex);
         largestWordWidth = Math.max(width, largestWordWidth);
-        return { word, width };
+        return { word: word, width: width };
       }.bind(this));
       var maxWidth = Math.max(desiredWidth, largestWordWidth, this.dynamicMinWidth);
       for (var i = 0; i < words.length; i++) {
