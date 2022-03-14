@@ -432,12 +432,12 @@
      */
     fromStringToGraphemeSelection: function(start, end, text) {
       var smallerTextStart = text.slice(0, start),
-          graphemeStart = fabric.util.string.graphemeSplit(smallerTextStart).length;
+          graphemeStart = this.graphemeSplit(smallerTextStart).length;
       if (start === end) {
         return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
       }
       var smallerTextEnd = text.slice(start, end),
-          graphemeEnd = fabric.util.string.graphemeSplit(smallerTextEnd).length;
+          graphemeEnd = this.graphemeSplit(smallerTextEnd).length;
       return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
     },
 

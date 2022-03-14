@@ -1513,6 +1513,15 @@
     },
 
     /**
+     * 
+     * @param {string} value 
+     * @returns {string[]} array of graphemes
+     */
+    graphemeSplit: function (value) {
+      return fabric.util.string.graphemeSplit(value);
+    },
+
+    /**
      * Returns the text as an array of lines.
      * @param {String} text text to split
      * @returns {Array} Lines in the text
@@ -1523,7 +1532,7 @@
           newLine = ['\n'],
           newText = [];
       for (var i = 0; i < lines.length; i++) {
-        newLines[i] = fabric.util.string.graphemeSplit(lines[i]);
+        newLines[i] = this.graphemeSplit(lines[i]);
         newText = newText.concat(newLines[i], newLine);
       }
       newText.pop();

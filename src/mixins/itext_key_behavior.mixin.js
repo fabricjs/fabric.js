@@ -679,7 +679,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (end > start) {
       this.removeStyleFromTo(start, end);
     }
-    var graphemes = fabric.util.string.graphemeSplit(text);
+    var graphemes = this.graphemeSplit(text);
     this.insertNewStyleBlock(graphemes, start, style);
     this._text = [].concat(this._text.slice(0, start), graphemes, this._text.slice(end));
     this.text = this._text.join('');

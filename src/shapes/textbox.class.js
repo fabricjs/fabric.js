@@ -299,6 +299,15 @@
     },
 
     /**
+     * 
+     * @param {string} value 
+     * @returns {string[]} array of words
+     */
+    wordSplit: function (value) {
+      return value.split(this._wordJoiners);
+    },
+
+    /**
      * Wraps a line of text using the width of the Textbox and a context.
      * @param {Array} line The grapheme array that represent the line
      * @param {Number} lineIndex
@@ -313,7 +322,7 @@
           graphemeLines = [],
           line = [],
           // spaces in different languages?
-          words = splitByGrapheme ? fabric.util.string.graphemeSplit(_line) : _line.split(this._wordJoiners),
+          words = splitByGrapheme ? this.graphemeSplit(_line) : this.wordSplit(_line),
           word = '',
           offset = 0,
           infix = splitByGrapheme ? '' : ' ',
@@ -330,7 +339,7 @@
       desiredWidth -= reservedSpace;
       for (var i = 0; i < words.length; i++) {
         // if using splitByGrapheme words are already in graphemes.
-        word = splitByGrapheme ? words[i] : fabric.util.string.graphemeSplit(words[i]);
+        word = splitByGrapheme ? words[i] : this.graphemeSplit(words[i]);
         wordWidth = this._measureWord(word, lineIndex, offset);
         offset += word.length;
 
