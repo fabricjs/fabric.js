@@ -554,6 +554,7 @@
 
     /**
      * support native like text dragging
+     * override by removing `text/plain` from {@link DragEvent#dataTransfer} in a `drop:before` event handler
      * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#performing_a_drop
      * @private
      */
@@ -584,7 +585,7 @@
         this.selectionStart = insertAt;
         this.selectionEnd = this.selectionStart + insert.length;
         this._updateTextarea();
-        this.fire('changed');
+        this.fire('changed', { index: insertAt, action: 'drop' });
         this.canvas.requestRenderAll();
       }
     },
