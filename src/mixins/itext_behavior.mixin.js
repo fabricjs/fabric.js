@@ -435,6 +435,8 @@
       var pos = fabric.util.transformPoint(selectionPosition, t);
       var pointer = this.canvas.getPointer(e);
       var diff = pointer.subtract(pos);
+      var enableRetinaScaling = this.canvas._isRetinaScaling();
+      var retinaScalingInv = 1 / this.canvas.getRetinaScaling();
 
       this.clone().then(function (clone) {
         fabric.util.applyTransformToObject(clone, t);
@@ -446,7 +448,16 @@
         });
         var bbox = clone.getBoundingRect(true, true);
         var correction = pos.subtract(new fabric.Point(bbox.left, bbox.top));
-        var dragImage = clone.toCanvasElement();
+        var dragImage = clone.toCanvasElement({ enableRetinaScaling: enableRetinaScaling });
+        if (enableRetinaScaling && retinaScalingInv !== 1) {
+          var c = fabric.util.createCanvasElement();
+          c.width = dragImage.width * retinaScalingInv;
+          c.height = dragImage.height * retinaScalingInv;
+          var ctx = c.getContext('2d');
+          ctx.scale(retinaScalingInv, retinaScalingInv);
+          ctx.drawImage(dragImage, 0, 0);
+          dragImage = c;
+        }
         clone.dispose();
         this.__dragImageDisposer && this.__dragImageDisposer();
         this.__dragImageDisposer = function () {
