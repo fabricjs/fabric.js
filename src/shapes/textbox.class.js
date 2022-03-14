@@ -337,14 +337,21 @@
         words.push([]);
       }
       desiredWidth -= reservedSpace;
+      var data = words.map(function (word) {
+         // if using splitByGrapheme words are already in graphemes.
+        word = splitByGrapheme ? word : this.graphemeSplit(word);
+        var width = this._measureWord(word, lineIndex);
+        largestWordWidth = Math.max(width, largestWordWidth);
+        return { word, width };
+      }.bind(this));
+      var maxWidth = Math.max(desiredWidth, largestWordWidth, this.dynamicMinWidth);
       for (var i = 0; i < words.length; i++) {
-        // if using splitByGrapheme words are already in graphemes.
-        word = splitByGrapheme ? words[i] : this.graphemeSplit(words[i]);
+        word = data[i].word;
         wordWidth = this._measureWord(word, lineIndex, offset);
         offset += word.length;
 
         lineWidth += infixWidth + wordWidth - additionalSpace;
-        if (lineWidth > Math.max(desiredWidth, largestWordWidth) && !lineJustStarted) {
+        if (lineWidth > maxWidth && !lineJustStarted) {
           graphemeLines.push(line);
           line = [];
           lineWidth = wordWidth;
