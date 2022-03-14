@@ -427,7 +427,11 @@
       var selectedText = this.getSelectedText();
       var t = this.calcTransformMatrix();
       var flipFactor = new fabric.Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
-      var selectionPosition = this.getRelativeCursorPosition().multiply(flipFactor);
+      var boundaries = this._getCursorBoundaries();
+      var selectionPosition = new fabric.Point(
+        boundaries.left + boundaries.leftOffset,
+        boundaries.top + boundaries.topOffset
+      ).multiply(flipFactor);
       var pos = fabric.util.transformPoint(selectionPosition, t);
       var pointer = this.canvas.getPointer(e);
       var diff = pointer.subtract(pos);

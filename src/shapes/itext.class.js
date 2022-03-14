@@ -303,30 +303,16 @@
     },
 
     /**
-     * 
-     * @param {number} [index] index for start
-     * @returns {fabric.Point} point relative to instance
-     */
-    getRelativeCursorPosition: function (index) {
-      var boundaries = this._getCursorBoundaries(index);
-      return new fabric.Point(
-        boundaries.left + boundaries.leftOffset,
-        boundaries.top + boundaries.topOffset
-      );
-    },
-
-    /**
      * Returns cursor boundaries (left, top, leftOffset, topOffset)
      * left/top are left/top of entire text box
      * leftOffset/topOffset are offset from that left/top point of a text box
      * @private
      * @param {number} [index] index from start
-     * @param {boolean} [calculate] force recalculation
      */
-    _getCursorBoundaries: function (index, calculate) {
+    _getCursorBoundaries: function (index) {
       var left = this._getLeftOffset(),
           top = this._getTopOffset(),
-          offsets = this._getCursorBoundariesOffsets(index, calculate);
+          offsets = this._getCursorBoundariesOffsets(index);
       return {
         left: left,
         top: top,
@@ -339,13 +325,12 @@
      * Caches and returns cursor left/top offset relative to instance's center point
      * @private
      * @param {number} [index] index from start
-     * @param {boolean} [calculate] force recalculation
      */
-    _getCursorBoundariesOffsets: function (index, calculate) {
+    _getCursorBoundariesOffsets: function (index) {
       if (typeof index === 'undefined') {
         index = this.selectionStart;
       }
-      if (!calculate && this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
+      if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
         return this.cursorOffsetCache;
       }
       return this.cursorOffsetCache = this.__getCursorBoundariesOffsets(index);
