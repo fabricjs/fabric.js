@@ -851,7 +851,7 @@
           this._normalizePointer(objToCheck.group, pointer) : pointer;
         if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
           target = objects[i];
-          if (target.subTargetCheck && target instanceof fabric.Group) {
+          if (target.subTargetCheck && Array.isArray(target._objects)) {
             subTarget = this._searchPossibleTargets(target._objects, pointer);
             subTarget && this.targets.push(subTarget);
           }
