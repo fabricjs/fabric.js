@@ -919,7 +919,7 @@
     },
 
     setSelectionInBoundaries: function() {
-      var length = this.text.length;
+      var length = this._text.length;
       if (this.selectionStart > length) {
         this.selectionStart = length;
       }
