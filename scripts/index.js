@@ -15,6 +15,7 @@ class ICheckbox extends Checkbox {
     }
     getCurrentValue() {
         const current = super.getCurrentValue();
+        //fs.writeFileSync(path.resolve(__dirname,'oo.json'),JSON.stringify(current,null,'\t'))
         return current.concat(this.firstSourceLoading ? this.default : []);
     }
 }
@@ -116,10 +117,21 @@ function readCLIFile() {
     return fs.existsSync(path.resolve(__dirname, 'cli_history.json')) ? require('./cli_history.json') : [];
 }
 
+function createChoiceData(type, file) {
+    return {
+        name: `${type}/${file}`,
+        short: `${type}/${file}`,
+        value: {
+            type,
+            file
+        }
+    }
+}
+
 async function selectTestFile() {
     const selected = readCLIFile();
-    const unitTests = listTestFiles('unit').map(p => ({ type: 'unit', path: `unit/${p}` }));
-    const visualTests = listTestFiles('visual').map(p => ({ type: 'visual', path: `visual/${p}` }));
+    const unitTests = listTestFiles('unit').map(file => createChoiceData('unit', file));
+    const visualTests = listTestFiles('visual').map(file => createChoiceData('visual', file));
     const tests = unitTests.concat(visualTests);
     const { tests: filteredTests } = await inquirer.prompt([
         {
@@ -133,12 +145,14 @@ async function selectTestFile() {
             source(answersSoFar, input = '') {
                 return new Promise(resolve => {
                     const res = fuzzy.filter(input, tests, {
-                        extract: (item) => item.path
-                    }).map((element) => element.original.path);
-                    const value = this.getCurrentValue();
-                    value.unshift(new inquirer.Separator());
-                    value.push(new inquirer.Separator());
-                    resolve(_.uniq(value.concat(res)));
+                        extract: (item) => item.name
+                    }).map((element) => element.original);
+                    const value = _.map(this.getCurrentValue(), value => createChoiceData(value.type, value.file));
+                    if (value.length > 0) {
+                        value.unshift(new inquirer.Separator());
+                        value.push(new inquirer.Separator());
+                    }
+                    resolve(value.concat(_.differenceBy(res, value, 'name')));
                 });
             }
         }
@@ -148,8 +162,11 @@ async function selectTestFile() {
 }
 
 async function run() {
-    const tests = (await selectTestFile()).map(p => `test/${p}`);
-    test(tests);
+    const tests = _.reduce(await selectTestFile(), (acc, curr) => {
+        acc[curr.type].push(`test/${curr.type}/${curr.file}`);
+        return acc;
+    }, { unit: [], visual: [] });
+    _.map(tests, test);
 }
 
 run()
