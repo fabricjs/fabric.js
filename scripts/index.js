@@ -15,11 +15,24 @@ class ICheckbox extends Checkbox {
     }
     getCurrentValue() {
         const current = super.getCurrentValue();
-        //fs.writeFileSync(path.resolve(__dirname,'oo.json'),JSON.stringify(current,null,'\t'))
         return current.concat(this.firstSourceLoading ? this.default : []);
     }
+    onSpaceKey() {
+        const choice = this.choices.getChoice(this.pointer);
+        if (!choice) {
+            return;
+        }
+
+        this.toggleChoice(choice);
+        if (choice.value && !choice.value.file) {
+            delete this.lastQuery;
+            this.executeSource();
+        }
+
+        this.render();
+    }
 }
-inquirer.registerPrompt('checkbox-plus', ICheckbox);
+inquirer.registerPrompt('test-selection', ICheckbox);
 
 function build(exclude = ['gestures', 'accessors']) {
     cp.execSync(`node build.js modules=ALL requirejs fast exclude=${exclude.join(',')}`, { stdio: 'inherit' });
@@ -80,21 +93,15 @@ function exportTestsToWebsite() {
 
 function test(tests) {
     const args = ['npx', 'qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests);
-    /*{ visual, unit }
-    if (typeof visual === 'string') {
-        args.push(path.resolve('./test/visual', visual));
-    }
-    else if (visual === true) {
-        args.push('./test/visual');
-    }
-    if (typeof unit === 'string') {
-        args.push(path.resolve('./test/unit', unit));
-    }
-    else if (unit === true) {
-        args.push('./test/unit');
-    }
-    */
     cp.execSync(args.join(' '), { stdio: 'inherit' });
+}
+
+/**
+ * 
+ * @param {'unit'|'visual'} type correspondes to the test directories
+ */
+function testModule(type) {
+    test(`test/${type}`);
 }
 
 /**
@@ -132,10 +139,9 @@ async function selectTestFile() {
     const selected = readCLIFile();
     const unitTests = listTestFiles('unit').map(file => createChoiceData('unit', file));
     const visualTests = listTestFiles('visual').map(file => createChoiceData('visual', file));
-    const tests = unitTests.concat(visualTests);
     const { tests: filteredTests } = await inquirer.prompt([
         {
-            type: 'checkbox-plus',
+            type: 'test-selection',
             name: 'tests',
             message: 'Select test files',
             highlight: true,
@@ -144,14 +150,29 @@ async function selectTestFile() {
             pageSize: Math.max(10, selected.length),
             source(answersSoFar, input = '') {
                 return new Promise(resolve => {
-                    const res = fuzzy.filter(input, tests, {
-                        extract: (item) => item.name
-                    }).map((element) => element.original);
+                    const tests = _.concat(unitTests, visualTests);
                     const value = _.map(this.getCurrentValue(), value => createChoiceData(value.type, value.file));
                     if (value.length > 0) {
                         value.unshift(new inquirer.Separator());
                         value.push(new inquirer.Separator());
+                        if (value.find(v => v.value && v.value.type === 'unit' && !v.value.file)) {
+                            _.pullAll(tests, unitTests);
+                        }
+                        if (value.find(v => v.value && v.value.type === 'visual' && !v.value.file)) {
+                            _.pullAll(tests, visualTests);
+                        }
                     }
+                    else if (!input) {
+                        value.push(
+                            new inquirer.Separator(),
+                            createChoiceData('unit', ''),
+                            createChoiceData('visual', ''),
+                            new inquirer.Separator()
+                        );
+                    }
+                    const res = fuzzy.filter(input, tests, {
+                        extract: (item) => item.name
+                    }).map((element) => element.original);
                     resolve(value.concat(_.differenceBy(res, value, 'name')));
                 });
             }
@@ -169,4 +190,4 @@ async function run() {
     _.map(tests, test);
 }
 
-run()
+run();
