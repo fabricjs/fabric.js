@@ -7,6 +7,8 @@ const inquirer = require('inquirer');
 const fuzzy = require('fuzzy');
 const chalk = require('chalk');
 const Checkbox = require('inquirer-checkbox-plus-prompt');
+const commander = require('commander');
+const program = new commander.Command();
 
 class ICheckbox extends Checkbox {
     constructor(questions, rl, answers) {
@@ -44,8 +46,9 @@ class ICheckbox extends Checkbox {
 }
 inquirer.registerPrompt('test-selection', ICheckbox);
 
-function build(exclude = ['gestures', 'accessors']) {
-    cp.execSync(`node build.js modules=ALL requirejs fast exclude=${exclude.join(',')}`, { stdio: 'inherit' });
+function build(options = {}) {
+    _.defaultsDeep(options, { exclude: ['gestures', 'accessors'] });
+    cp.execSync(`node build.js modules=${options.modules ?? 'ALL'} requirejs ${options.fast ? 'fast' : ''} exclude=${options.exclude.join(',')}`, { stdio: 'inherit', cwd:process.cwd() });
 }
 
 function startWebsite() {
@@ -104,14 +107,6 @@ function exportTestsToWebsite() {
 function test(tests) {
     const args = ['npx', 'qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests);
     cp.execSync(args.join(' '), { stdio: 'inherit' });
-}
-
-/**
- * 
- * @param {'unit'|'visual'} type correspondes to the test directories
- */
-function testModule(type) {
-    test(`test/${type}`);
 }
 
 /**
@@ -190,12 +185,42 @@ async function selectTestFile() {
     return filteredTests;
 }
 
-async function run() {
+async function runIntreactiveTestSuite() {
     const tests = _.reduce(await selectTestFile(), (acc, curr) => {
         acc[curr.type].push(`test/${curr.type}/${curr.file}`);
         return acc;
     }, { unit: [], visual: [] });
-    _.map(tests, test);
+    _.forEach(tests, files => files.length > 0 && test(files));
 }
 
-run();
+program
+    .name('fabric.js')
+    .description('fabric.js DEV CLI tools');
+
+program
+    .command('build')
+    .option('-f, --fast')
+    .option('-x, --exclude [exclude...]')
+    .option('-m, --modules [modules...]')
+    .action((options) => {
+        build(options);
+    });
+
+program
+    .command('test')
+    .addOption(new commander.Option('-s, --suite [suite...]', 'test suite to run').choices(['unit', 'visual']))
+    .option('-a, --all', 'run all tests', false)
+    .option('-d, --debug', 'display some debugging', false)
+    .action((options) => {
+        if (options.all) {
+            options.suite = ['unit', 'visual'];
+        }
+        if (options.suite) {
+            options.suite.forEach(suite => test(`test/${suite}`));
+        }
+        else {
+            runIntreactiveTestSuite();
+        }
+    });
+
+program.parse(process.argv);
