@@ -26,6 +26,16 @@ class ICheckbox extends Checkbox {
         this.toggleChoice(choice);
         if (choice.value && !choice.value.file) {
             delete this.lastQuery;
+            // Remove the choices from the checked values with the same type
+            _.remove(this.value, v => v.type === choice.value.type && v.file);
+            _.remove(this.checkedChoices, checkedChoice => {
+                if (!checkedChoice.value.file) {
+                    return false;
+                }
+                checkedChoice.checked = false;
+                return checkedChoice.value.type === choice.value.type;
+            });
+
             this.executeSource();
         }
 
@@ -153,8 +163,6 @@ async function selectTestFile() {
                     const tests = _.concat(unitTests, visualTests);
                     const value = _.map(this.getCurrentValue(), value => createChoiceData(value.type, value.file));
                     if (value.length > 0) {
-                        value.unshift(new inquirer.Separator());
-                        value.push(new inquirer.Separator());
                         if (value.find(v => v.value && v.value.type === 'unit' && !v.value.file)) {
                             _.pullAll(tests, unitTests);
                         }
@@ -162,13 +170,13 @@ async function selectTestFile() {
                             _.pullAll(tests, visualTests);
                         }
                     }
-                    else if (!input) {
-                        value.push(
-                            new inquirer.Separator(),
-                            createChoiceData('unit', ''),
-                            createChoiceData('visual', ''),
-                            new inquirer.Separator()
-                        );
+                    const unitChoice = createChoiceData('unit', '');
+                    const visualChoice = createChoiceData('visual', '');
+                    !value.find(v => _.isEqual(v, unitChoice)) && value.push(unitChoice);
+                    !value.find(v => _.isEqual(v, visualChoice)) && value.push(visualChoice);
+                    if (value.length > 0) {
+                        value.unshift(new inquirer.Separator());
+                        value.push(new inquirer.Separator());
                     }
                     const res = fuzzy.filter(input, tests, {
                         extract: (item) => item.name
