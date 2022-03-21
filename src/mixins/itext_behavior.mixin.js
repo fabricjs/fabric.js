@@ -475,7 +475,8 @@
       //  position drag image offsecreen
       fabric.util.setStyle(dragImage, {
         position: 'absolute',
-        left: -dragImage.width + 'px'
+        left: -dragImage.width + 'px',
+        border: 'none'
       });
       fabric.document.body.appendChild(dragImage);
       e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
