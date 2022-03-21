@@ -1513,7 +1513,7 @@
     },
 
     /**
-     *
+     * Override this method to customize grapheme splitting
      * @param {string} value
      * @returns {string[]} array of graphemes
      */

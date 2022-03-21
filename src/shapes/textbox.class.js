@@ -299,7 +299,7 @@
     },
 
     /**
-     *
+     * Override this method to customize word splitting
      * @param {string} value
      * @returns {string[]} array of words
      */
