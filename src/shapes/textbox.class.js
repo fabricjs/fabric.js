@@ -279,15 +279,16 @@
 
     /**
      * Helper function to measure a string of text, given its lineIndex and charIndex offset
-     * it gets called when charBounds are not available yet.
+     * It gets called when charBounds are not available yet.
+     * Override if necessary
+     * 
      * @param {CanvasRenderingContext2D} ctx
      * @param {String} text
      * @param {number} lineIndex
      * @param {number} charOffset
      * @returns {number}
-     * @private
      */
-    _measureWord: function(word, lineIndex, charOffset) {
+    measureWord: function(word, lineIndex, charOffset) {
       var width = 0, prevGrapheme, skipLeft = true;
       charOffset = charOffset || 0;
       for (var i = 0, len = word.length; i < len; i++) {
@@ -340,7 +341,7 @@
       var data = words.map(function (word) {
         // if using splitByGrapheme words are already in graphemes.
         word = splitByGrapheme ? word : this.graphemeSplit(word);
-        var width = this._measureWord(word, lineIndex, offset);
+        var width = this.measureWord(word, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
         offset += word.length + 1;
         return { word: word, width: width };
@@ -368,7 +369,7 @@
         }
         line = line.concat(word);
 
-        infixWidth = splitByGrapheme ? 0 : this._measureWord([infix], lineIndex, offset);
+        infixWidth = splitByGrapheme ? 0 : this.measureWord([infix], lineIndex, offset);
         offset++;
         lineJustStarted = false;
       }
