@@ -340,14 +340,16 @@
       var data = words.map(function (word) {
         // if using splitByGrapheme words are already in graphemes.
         word = splitByGrapheme ? word : this.graphemeSplit(word);
-        var width = this._measureWord(word, lineIndex);
+        var width = this._measureWord(word, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
+        offset += word.length + 1;
         return { word: word, width: width };
       }.bind(this));
       var maxWidth = Math.max(desiredWidth, largestWordWidth, this.dynamicMinWidth);
+      offset = 0;
       for (var i = 0; i < words.length; i++) {
         word = data[i].word;
-        wordWidth = this._measureWord(word, lineIndex, offset);
+        wordWidth = data[i].width;
         offset += word.length;
 
         lineWidth += infixWidth + wordWidth - additionalSpace;
@@ -369,10 +371,6 @@
         infixWidth = splitByGrapheme ? 0 : this._measureWord([infix], lineIndex, offset);
         offset++;
         lineJustStarted = false;
-        // keep track of largest word
-        if (wordWidth > largestWordWidth) {
-          largestWordWidth = wordWidth;
-        }
       }
 
       i && graphemeLines.push(line);
