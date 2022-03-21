@@ -340,6 +340,7 @@
         words.push([]);
       }
       desiredWidth -= reservedSpace;
+      // measure words
       var data = words.map(function (word) {
         // if using splitByGrapheme words are already in graphemes.
         word = splitByGrapheme ? word : this.graphemeSplit(word);
@@ -349,6 +350,7 @@
         return { word: word, width: width };
       }.bind(this));
       var maxWidth = Math.max(desiredWidth, largestWordWidth, this.dynamicMinWidth);
+      // layout words 
       offset = 0;
       for (var i = 0; i < words.length; i++) {
         word = data[i].word;
