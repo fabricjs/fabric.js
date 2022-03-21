@@ -10,6 +10,10 @@ const Checkbox = require('inquirer-checkbox-plus-prompt');
 const commander = require('commander');
 const program = new commander.Command();
 
+const CLI_CACHE = path.resolve(__dirname, 'cli_cache.json');
+const wd = path.resolve(__dirname, '..');
+const websiteDir = path.resolve(wd, '../fabricjs.com');
+
 class ICheckbox extends Checkbox {
     constructor(questions, rl, answers) {
         super(questions, rl, answers);
@@ -47,19 +51,17 @@ class ICheckbox extends Checkbox {
 inquirer.registerPrompt('test-selection', ICheckbox);
 
 function build(options = {}) {
-    _.defaultsDeep(options, { exclude: ['gestures', 'accessors'] });
-    cp.execSync(`node build.js modules=${options.modules ?? 'ALL'} requirejs ${options.fast ? 'fast' : ''} exclude=${options.exclude.join(',')}`, { stdio: 'inherit', cwd:process.cwd() });
+    _.defaultsDeep(options, { exclude: ['gestures', 'accessors', 'erasing'] });
+    cp.spawnSync(`node build.js modules=${options.modules ?? 'ALL'} requirejs ${options.fast ? 'fast' : ''} exclude=${options.exclude.join(',')}`, { stdio: 'inherit' });
 }
 
 function startWebsite() {
-    build();
-    const expectedPath = path.resolve('../fabricjs.com');
-    if (require(path.resolve(expectedPath, 'package.json')).name !== 'fabricjs.com') {
+    if (require(path.resolve(websiteDir, 'package.json')).name !== 'fabricjs.com') {
         console.log(chalk.red('Could not locate fabricjs.com directory'));
     }
-    cp.spawn('npm', ['start'], {
+    cp.spawn('npm', ['run', 'start:dev'], {
         stdio: 'inherit',
-        cwd: expectedPath,
+        cwd: websiteDir,
         shell: true,
     });
 }
@@ -77,19 +79,25 @@ function watch(path, callback, debounce = 500) {
 function copy(from ,to) {
     try {
         fs.copySync(from, to);
-        console.log(`copied ${from} to ${to}`);
+        const containingFolder = path.resolve(wd, '..');
+        console.log(`copied ${path.relative(containingFolder, from)} to ${path.relative(containingFolder, to)}`);
     } catch (error) {
         console.error(error);
     }
 }
 
-function exportBuildToWebsite() {
+const BUILD_SOURCE = ['src', 'lib', 'HEADER.js'];
+
+function exportBuildToWebsite(options = {}) {
+    _.defaultsDeep(options, { gestures: true });
+    if (options.gestures) {
+        build({ exclude: ['accessors'] });
+        copy(path.resolve(wd, './dist/fabric.js'), path.resolve(websiteDir, './lib/fabric_with_gestures.js'));
+    }
     build();
-    copy(path.resolve('./dist/fabric.js'), path.resolve('../fabricjs.com', './lib/fabric.js'));
-    copy(path.resolve('./package.json'), path.resolve('../fabricjs.com', './lib/package.json'));
-    copy(path.resolve('./src'), path.resolve('../fabricjs.com', './build/files/src'));
-    copy(path.resolve('./lib'), path.resolve('../fabricjs.com', './build/files/lib'));
-    copy(path.resolve('./HEADER.js'), path.resolve('../fabricjs.com', './build/files/HEADER.js'));
+    copy(path.resolve(wd, './dist/fabric.js'), path.resolve(websiteDir, './lib/fabric.js'));
+    copy(path.resolve(wd, './package.json'), path.resolve(websiteDir, './lib/package.json'));
+    BUILD_SOURCE.forEach(p => copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p)));
     console.log('exported build to fabricjs.com');
 }
 
@@ -100,13 +108,31 @@ function exportTestsToWebsite() {
         './test/fixtures',
         './test/lib',
     ]
-    paths.forEach(location => copy(path.resolve(location), path.resolve('../fabricjs.com', location)));
-    console.log('exported tests to fabricjs.com');
+    paths.forEach(location => copy(path.resolve(wd, location), path.resolve(websiteDir, location)));
+    console.log(chalk.bold('exported tests to fabricjs.com'));
+}
+
+function exportToWebsite(options) {
+    if (!options.what || options.what.length === 0) {
+        options.what = ['build', 'tests'];
+    }
+    options.what.forEach(x => {
+        if (x === 'build') {
+            exportBuildToWebsite();
+            options.watch && BUILD_SOURCE.forEach(p => {
+                watch(path.resolve(wd, p), exportBuildToWebsite);
+            });
+        }
+        else if (x === 'tests') {
+            exportTestsToWebsite();
+            options.watch && watch(path.resolve(wd, './test'), exportTestsToWebsite);
+        }
+    })
 }
 
 function test(tests) {
-    const args = ['npx', 'qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests);
-    cp.execSync(args.join(' '), { stdio: 'inherit' });
+    const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests);
+    cp.spawnSync(args.join(' '), { stdio: 'inherit' });
 }
 
 /**
@@ -115,18 +141,19 @@ function test(tests) {
  * @returns 
  */
 function listTestFiles(type) {
-    return fs.readdirSync(path.resolve('./test', type)).filter(p => {
+    return fs.readdirSync(path.resolve(wd, './test', type)).filter(p => {
         const ext = path.parse(p).ext.slice(1);
         return ext === 'js' || ext === 'ts';
     });
 }
 
 function writeCLIFile(tests) {
-    fs.writeFileSync(path.resolve(__dirname, 'cli_history.json'), JSON.stringify(tests, null, '\t'));
+    fs.removeSync
+    fs.writeFileSync(CLI_CACHE, JSON.stringify(tests, null, '\t'));
 }
 
 function readCLIFile() {
-    return fs.existsSync(path.resolve(__dirname, 'cli_history.json')) ? require('./cli_history.json') : [];
+    return fs.existsSync(CLI_CACHE) ? require(CLI_CACHE) : [];
 }
 
 function createChoiceData(type, file) {
@@ -186,6 +213,8 @@ async function selectTestFile() {
 }
 
 async function runIntreactiveTestSuite() {
+    //  some tests fail because of some pollution when run from the same context
+    // test(_.map(await selectTestFile(), curr => `test/${curr.type}/${curr.file}`))
     const tests = _.reduce(await selectTestFile(), (acc, curr) => {
         acc[curr.type].push(`test/${curr.type}/${curr.file}`);
         return acc;
@@ -196,6 +225,15 @@ async function runIntreactiveTestSuite() {
 program
     .name('fabric.js')
     .description('fabric.js DEV CLI tools');
+
+program
+    .command('start')
+    .action((options) => {
+        exportToWebsite({
+            watch: true
+        });
+        startWebsite();
+    });
 
 program
     .command('build')
@@ -211,7 +249,11 @@ program
     .addOption(new commander.Option('-s, --suite [suite...]', 'test suite to run').choices(['unit', 'visual']))
     .option('-a, --all', 'run all tests', false)
     .option('-d, --debug', 'display some debugging', false)
+    .option('-cc, --clear-cache', 'clear CLI test cache', false)
     .action((options) => {
+        if (options.clearCache) {
+            fs.removeSync(CLI_CACHE);
+        }
         if (options.all) {
             options.suite = ['unit', 'visual'];
         }
@@ -222,5 +264,18 @@ program
             runIntreactiveTestSuite();
         }
     });
+
+const website = program.command('website');
+
+website
+    .command('start')
+    .allowExcessArguments()
+    .allowUnknownOption()
+    .action(startWebsite);
+
+website
+    .command('export [what...]')
+    .option('-w, --watch')
+    .action(exportToWebsite);
 
 program.parse(process.argv);
