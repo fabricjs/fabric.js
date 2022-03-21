@@ -281,6 +281,7 @@
      * Helper function to measure a string of text, given its lineIndex and charIndex offset
      * It gets called when charBounds are not available yet.
      * Override if necessary
+     * Use with {@link fabric.Textbox#wordSplit}
      * 
      * @param {CanvasRenderingContext2D} ctx
      * @param {String} text
@@ -301,6 +302,7 @@
 
     /**
      * Override this method to customize word splitting
+     * Use with {@link fabric.Textbox#measureWord}
      * @param {string} value
      * @returns {string[]} array of words
      */
