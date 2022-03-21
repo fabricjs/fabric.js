@@ -52,7 +52,7 @@ inquirer.registerPrompt('test-selection', ICheckbox);
 
 function build(options = {}) {
     _.defaultsDeep(options, { exclude: ['gestures', 'accessors', 'erasing'] });
-    cp.spawnSync(`node build.js modules=${options.modules ?? 'ALL'} requirejs ${options.fast ? 'fast' : ''} exclude=${options.exclude.join(',')}`, { stdio: 'inherit' });
+    cp.spawnSync(`node build.js modules=${options.modules ?? 'ALL'} requirejs ${options.fast ? 'fast' : ''} exclude=${options.exclude.join(',')}`, { stdio: 'inherit', cwd: wd });
 }
 
 function startWebsite() {
@@ -132,7 +132,7 @@ function exportToWebsite(options) {
 
 function test(tests) {
     const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests);
-    cp.spawnSync(args.join(' '), { stdio: 'inherit' });
+    cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd });
 }
 
 /**
