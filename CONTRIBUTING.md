@@ -53,7 +53,7 @@ After setting up `fabricjs.com` on your machine run `npm start` from the `fabric
 This will start the dev server and watch for changes in both repositories.
 While working, you might need to refresh the page for changes to take place.
 See [Working on fabricjs.com](#working-on-fabricjscom).
-To customize the dev server take a look at [./scripts](./scripts).
+To customize the dev server take a look at [`./scripts`](./scripts).
 
 #### symlinking
 You can symlink `fabric.js` and test your changes in a separate project.
@@ -61,7 +61,7 @@ You can symlink `fabric.js` and test your changes in a separate project.
 1. From your project's folder run `npm link fabric`.
 See [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link).
 
-### Working on fabricjs.com
+### Working on `fabricjs.com`
 
 To develop fabric's site you need to clone [`fabricjs.com`](https://github.com/fabricjs/fabricjs.com) in the same parent folder of [`fabric.js`](https://github.com/fabricjs/fabric.js), so that `fabric.js` and `fabricjs.com` are siblings.
 To start the dev server run `npm start:dev` inside the `fabricjs.com` directory (after installing dependecies).
