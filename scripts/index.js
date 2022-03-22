@@ -259,6 +259,7 @@ program
     .command('test')
     .description('run test suite')
     .addOption(new commander.Option('-s, --suite [suite...]', 'test suite to run').choices(['unit', 'visual']))
+    .option('-f, --file [file]', 'run a specific test file')
     .option('-a, --all', 'run all tests', false)
     .option('-d, --debug', 'display some debugging', false)
     .option('-cc, --clear-cache', 'clear CLI test cache', false)
@@ -271,6 +272,9 @@ program
         }
         if (options.suite) {
             options.suite.forEach(suite => test(`test/${suite}`, options.debug));
+        }
+        else if (options.file) {
+            test(`test/${options.file}`);
         }
         else {
             runIntreactiveTestSuite(options.debug);
