@@ -232,7 +232,8 @@ async function runIntreactiveTestSuite() {
 
 program
     .name('fabric.js')
-    .description('fabric.js DEV CLI tools');
+    .description('fabric.js DEV CLI tools')
+    .showSuggestionAfterError();
 
 program
     .command('start')
