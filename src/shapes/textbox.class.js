@@ -289,7 +289,7 @@
      * @param {number} charOffset
      * @returns {number}
      */
-    measureWord: function(word, lineIndex, charOffset) {
+    _measureWord: function(word, lineIndex, charOffset) {
       var width = 0, prevGrapheme, skipLeft = true;
       charOffset = charOffset || 0;
       for (var i = 0, len = word.length; i < len; i++) {
@@ -302,7 +302,7 @@
 
     /**
      * Override this method to customize word splitting
-     * Use with {@link fabric.Textbox#measureWord}
+     * Use with {@link fabric.Textbox#_measureWord}
      * @param {string} value
      * @returns {string[]} array of words
      */
@@ -344,7 +344,7 @@
       var data = words.map(function (word) {
         // if using splitByGrapheme words are already in graphemes.
         word = splitByGrapheme ? word : this.graphemeSplit(word);
-        var width = this.measureWord(word, lineIndex, offset);
+        var width = this._measureWord(word, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
         offset += word.length + 1;
         return { word: word, width: width };
@@ -373,7 +373,7 @@
         }
         line = line.concat(word);
 
-        infixWidth = splitByGrapheme ? 0 : this.measureWord([infix], lineIndex, offset);
+        infixWidth = splitByGrapheme ? 0 : this._measureWord([infix], lineIndex, offset);
         offset++;
         lineJustStarted = false;
       }
