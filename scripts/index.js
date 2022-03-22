@@ -52,7 +52,7 @@ inquirer.registerPrompt('test-selection', ICheckbox);
 
 function build(options = {}) {
     _.defaultsDeep(options, { exclude: ['gestures', 'accessors', 'erasing'] });
-    cp.spawnSync(`node build.js modules=${options.modules ?? 'ALL'} requirejs ${options.fast ? 'fast' : ''} exclude=${options.exclude.join(',')}`, { stdio: 'inherit', cwd: wd });
+    cp.execSync(`node build.js modules=${options.modules ? options.modules.join(',') : 'ALL'} requirejs ${options.fast ? 'fast' : ''} exclude=${options.exclude.join(',')}`, { stdio: 'inherit', cwd: wd });
 }
 
 function startWebsite() {
@@ -98,7 +98,7 @@ function exportBuildToWebsite(options = {}) {
     copy(path.resolve(wd, './dist/fabric.js'), path.resolve(websiteDir, './lib/fabric.js'));
     copy(path.resolve(wd, './package.json'), path.resolve(websiteDir, './lib/package.json'));
     BUILD_SOURCE.forEach(p => copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p)));
-    console.log('exported build to fabricjs.com');
+    console.log(chalk.bold('exported build to fabricjs.com'));
 }
 
 function exportTestsToWebsite() {
@@ -113,10 +113,10 @@ function exportTestsToWebsite() {
 }
 
 function exportToWebsite(options) {
-    if (!options.what || options.what.length === 0) {
-        options.what = ['build', 'tests'];
+    if (!options.include  || options.include .length === 0) {
+        options.include  = ['build', 'tests'];
     }
-    options.what.forEach(x => {
+    options.include .forEach(x => {
         if (x === 'build') {
             exportBuildToWebsite();
             options.watch && BUILD_SOURCE.forEach(p => {
@@ -228,6 +228,7 @@ program
 
 program
     .command('start')
+    .description('start fabricjs.com dev server and watch for changes')
     .action((options) => {
         exportToWebsite({
             watch: true
@@ -237,6 +238,7 @@ program
 
 program
     .command('build')
+    .description('build dist')
     .option('-f, --fast')
     .option('-x, --exclude [exclude...]')
     .option('-m, --modules [modules...]')
@@ -246,6 +248,7 @@ program
 
 program
     .command('test')
+    .description('run test suite')
     .addOption(new commander.Option('-s, --suite [suite...]', 'test suite to run').choices(['unit', 'visual']))
     .option('-a, --all', 'run all tests', false)
     .option('-d, --debug', 'display some debugging', false)
@@ -265,16 +268,21 @@ program
         }
     });
 
-const website = program.command('website');
+const website = program
+    .command('website')
+    .description('fabricjs.com commands');
 
 website
     .command('start')
+    .description('start fabricjs.com dev server')
     .allowExcessArguments()
     .allowUnknownOption()
     .action(startWebsite);
 
 website
-    .command('export [what...]')
+    .command('export')
+    .description('export files to fabricjs.com directory')
+    .addOption(new commander.Option('-i, --include [what...]').choices(['build', 'tests']).default(['build', 'tests'], 'export all'))
     .option('-w, --watch')
     .action(exportToWebsite);
 
