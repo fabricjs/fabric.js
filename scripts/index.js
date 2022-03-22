@@ -138,8 +138,8 @@ function exportToWebsite(options) {
     })
 }
 
-function test(tests) {
-    const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests);
+function test(tests, debug) {
+    const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests).concat(debug ? '--debug' : '');
     cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd });
 }
 
@@ -220,14 +220,14 @@ async function selectTestFile() {
     return filteredTests;
 }
 
-async function runIntreactiveTestSuite() {
+async function runIntreactiveTestSuite(debug) {
     //  some tests fail because of some pollution when run from the same context
     // test(_.map(await selectTestFile(), curr => `test/${curr.type}/${curr.file}`))
     const tests = _.reduce(await selectTestFile(), (acc, curr) => {
         acc[curr.type].push(`test/${curr.type}/${curr.file}`);
         return acc;
     }, { unit: [], visual: [] });
-    _.forEach(tests, files => files.length > 0 && test(files));
+    _.forEach(tests, files => files.length > 0 && test(files, debug));
 }
 
 program
@@ -270,10 +270,10 @@ program
             options.suite = ['unit', 'visual'];
         }
         if (options.suite) {
-            options.suite.forEach(suite => test(`test/${suite}`));
+            options.suite.forEach(suite => test(`test/${suite}`, options.debug));
         }
         else {
-            runIntreactiveTestSuite();
+            runIntreactiveTestSuite(options.debug);
         }
     });
 

@@ -64,10 +64,7 @@
   function getImage(filename, original, callback) {
     if (fabric.isLikelyNode && original) {
       var plainFileName = filename.replace('file://', '');
-      try {
-        fs.statSync(plainFileName);
-      }
-      catch (err) {
+      if (!fs.existsSync(plainFileName) || QUnit.debug) {
         var dataUrl = original.toDataURL().split(',')[1];
         console.log('creating original for ', filename);
         fs.writeFileSync(plainFileName, dataUrl, { encoding: 'base64' });
@@ -118,6 +115,7 @@
       var percentage = testObj.percentage;
       var golden = testObj.golden;
       var newModule = testObj.newModule;
+      var debug = testObj.debug;
       if (newModule) {
         QUnit.module(newModule, {
           beforeEach: testObj.beforeEachHandler,
