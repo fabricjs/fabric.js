@@ -115,7 +115,6 @@
       var percentage = testObj.percentage;
       var golden = testObj.golden;
       var newModule = testObj.newModule;
-      var debug = testObj.debug;
       if (newModule) {
         QUnit.module(newModule, {
           beforeEach: testObj.beforeEachHandler,
