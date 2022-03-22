@@ -100,4 +100,4 @@ Here are a few notes you should take into account:
 [fabricjs.com]: http://fabricjs.com/demos
 [fabricjs.com/docs]: http://fabricjs.com/docs
 [JSDoc 3]: http://usejsdoc.org/
-[issue]: https://github.com/kangax/fabric.js/issues
+[issue]: https://github.com/fabric/fabric.js/issues
