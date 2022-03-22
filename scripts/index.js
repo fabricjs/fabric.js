@@ -52,7 +52,15 @@ inquirer.registerPrompt('test-selection', ICheckbox);
 
 function build(options = {}) {
     _.defaultsDeep(options, { exclude: ['gestures', 'accessors', 'erasing'] });
-    cp.execSync(`node build.js modules=${options.modules ? options.modules.join(',') : 'ALL'} requirejs ${options.fast ? 'fast' : ''} exclude=${options.exclude.join(',')}`, { stdio: 'inherit', cwd: wd });
+    const args = [
+        `node`,
+        `build.js`,
+        `modules=${options.modules && options.modules.length > 0 ? options.modules.join(',') : 'ALL'}`,
+        `requirejs`,
+        `${options.fast ? 'fast' : ''}`,
+        `exclude=${options.exclude.join(',')}`
+    ]
+    cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd });
 }
 
 function startWebsite() {
