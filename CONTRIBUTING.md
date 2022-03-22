@@ -1,11 +1,5 @@
 # Contributing to Fabric
 
-1. [Questions?!?](#questions)
-2. [Issue tracker](#issue-tracker)
-3. [Issue tracker guidelines](#issue-tracker-guidelines)
-4. [Pull requests](#pull-request)
-5. [Pull request guidelines](#pull-request-guidelines)
-
 ## Questions?!?
 
 To get your questions answered, please ask/search on [Fabric's google group], [StackOverflow] or on Fabric's IRC channel (irc://irc.freenode.net/#fabric.js).
@@ -58,7 +52,7 @@ You can start the dev server that runs fabric's website and test live changes.
 After setting up `fabricjs.com` on your machine run `npm start` from the `fabric.js` folder.
 This will start the dev server and watch for changes in both repositories.
 While working, you might need to refresh the page for changes to take place.
-See [Working on fabricjs.com](#Working_on_fabricjs.com).
+See [Working on fabricjs.com](#working-on-fabricjscom).
 To customize the dev server take a look at [./scripts](./scripts).
 
 #### symlinking
