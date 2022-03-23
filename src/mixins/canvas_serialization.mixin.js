@@ -45,7 +45,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         })
           .then(function(enlivedMap) {
             _this.clear();
-            _this.__setupCanvas(serialized, enlived, renderOnAddRemove);
+            _this.__setupCanvas(serialized, enlived);
+            _this.renderOnAddRemove = renderOnAddRemove;
             _this.set(enlivedMap);
             return _this;
           });
@@ -56,16 +57,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @private
    * @param {Object} serialized Object with background and overlay information
    * @param {Array} enlivenedObjects canvas objects
-   * @param {boolean} renderOnAddRemove renderOnAddRemove setting for the canvas
    */
-  __setupCanvas: function(serialized, enlivenedObjects, renderOnAddRemove) {
+  __setupCanvas: function(serialized, enlivenedObjects) {
     var _this = this;
     enlivenedObjects.forEach(function(obj, index) {
       // we splice the array just in case some custom classes restored from JSON
       // will add more object to canvas at canvas init.
       _this.insertAt(obj, index);
     });
-    this.renderOnAddRemove = renderOnAddRemove;
     // remove parts i cannot set as options
     delete serialized.objects;
     delete serialized.backgroundImage;
