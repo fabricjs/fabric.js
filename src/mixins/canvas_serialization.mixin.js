@@ -36,7 +36,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     return fabric.util.enlivenObjects(serialized.objects || [], '', reviver)
       .then(function(enlived) {
-        _this.clear();
+       
         return fabric.util.enlivenObjectEnlivables({
           backgroundImage: serialized.backgroundImage,
           backgroundColor: serialized.background,
@@ -45,6 +45,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           clipPath: serialized.clipPath,
         })
           .then(function(enlivedMap) {
+            _this.clear();
             _this.__setupCanvas(serialized, enlived, renderOnAddRemove);
             _this.set(enlivedMap);
             return _this;
