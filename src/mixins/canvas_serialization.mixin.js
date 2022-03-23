@@ -36,7 +36,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     return fabric.util.enlivenObjects(serialized.objects || [], '', reviver)
       .then(function(enlived) {
-       
         return fabric.util.enlivenObjectEnlivables({
           backgroundImage: serialized.backgroundImage,
           backgroundColor: serialized.background,
