@@ -533,7 +533,7 @@
       var abort;
       return new Promise(function (resolve, reject) {
         if (signal && signal.aborted) {
-          return reject(new DOMException('`signal` is in `aborted` state', 'ABORT_ERR'));
+          return reject(new DOMException('`options.signal` is in `aborted` state', 'ABORT_ERR'));
         }
         else if (signal) {
           abort = function () {
