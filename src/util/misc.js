@@ -525,13 +525,26 @@
      * @param {String} url URL representing an image
      * @param {Object} [options] image loading options
      * @param {string} [options.crossOrigin] cors value for the image loading, default to anonymous
+     * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
      * @param {Promise<fabric.Image>} img the loaded image.
      */
-    loadImage: function(url, options) {
-      return new Promise(function(resolve, reject) {
+    loadImage: function (url, options) {
+      var signal = options && options.signal;
+      var abort;
+      return new Promise(function (resolve, reject) {
+        if (signal && signal.aborted) {
+          return reject(new DOMException('`signal` is in `aborted` state', 'ABORT_ERR'));
+        }
+        else if (signal) {
+          abort = function () {
+            reject(new DOMException('aborted by user', 'ABORT_ERR'));
+          }
+          signal.addEventListener('abort', abort);
+        }
         var img = fabric.util.createImage();
         var done = function() {
           img.onload = img.onerror = null;
+          signal && abort && signal.removeEventListener('abort', abort);
           resolve(img);
         };
         if (!url) {
