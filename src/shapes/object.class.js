@@ -1932,9 +1932,9 @@
   fabric.Object.NUM_FRACTION_DIGITS = 2;
 
   /**
-   * 
-   * @param {Function} klass 
-   * @param {object} object 
+   *
+   * @param {Function} klass
+   * @param {object} object
    * @param {object} [options]
    * @param {string} [options.extraParam] property to pass as first argument to the constructor
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
