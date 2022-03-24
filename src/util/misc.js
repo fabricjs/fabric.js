@@ -517,7 +517,7 @@
             img.src = '';
             reject(new DOMException('aborted by user', 'ABORT_ERR'));
           }
-          signal.addEventListener('abort', abort);
+          signal.addEventListener('abort', abort, { once: true });
         }
         var img = fabric.util.createImage();
         var done = function() {
@@ -572,8 +572,6 @@
      * @returns {Promise<{[key:string]:fabric.Object|fabric.Pattern|fabric.Gradient|null}>} the input object with enlived values
      */
     enlivenObjectEnlivables: function (serializedObject, options) {
-      // make sure we don't pass other properties
-      var opts = { signal: options.signal };
       // enlive every possible property
       var promises = Object.values(serializedObject).map(function(value) {
         if (!value) {
@@ -583,12 +581,12 @@
           return new fabric.Gradient(value);
         }
         if (value.type) {
-          return fabric.util.enlivenObjects([value], opts).then(function (enlived) {
+          return fabric.util.enlivenObjects([value], options).then(function (enlived) {
             return enlived[0];
           });
         }
         if (value.source) {
-          return fabric.Pattern.fromObject(value, opts);
+          return fabric.Pattern.fromObject(value, options);
         }
         return value;
       });

@@ -35,7 +35,7 @@
       throw new DOMException('`options.signal` is in `aborted` state', 'ABORT_ERR');
     }
     else if (signal) {
-      signal.addEventListener('abort', abort);
+      signal.addEventListener('abort', abort, { once: true });
     }
     
     /** @ignore */
