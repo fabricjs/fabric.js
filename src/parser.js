@@ -1058,7 +1058,7 @@
       new fabric.util.request(url, {
         method: 'get',
         onComplete: onComplete,
-        signal: options.signal
+        signal: options && options.signal
       });
 
       function onComplete(r) {
