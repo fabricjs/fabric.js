@@ -367,6 +367,16 @@
     },
 
     /**
+     * Aborts pending image loading task
+     */
+    abortLoadingTask: function () {
+      if (this.__abortController) {
+        this.__abortController.abort();
+        delete this.__abortController;
+      }
+    },
+
+    /**
      * Sets source of an image
      * @param {String} src Source string (URL)
      * @param {Object} [options] Options object
@@ -376,9 +386,13 @@
      */
     setSrc: function(src, options) {
       var _this = this;
-      return fabric.util.loadImage(src, options).then(function(img) {
+      this.abortLoadingTask();
+      this.__abortController = new AbortController();
+      var opts = Object.assign({}, options, { signal: this.__abortController.signal });
+      return fabric.util.loadImage(src, opts).then(function(img) {
         _this.setElement(img, options);
         _this._setWidthHeight();
+        delete this.__abortController;
         return _this;
       });
     },
