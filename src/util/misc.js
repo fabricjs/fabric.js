@@ -576,7 +576,7 @@
           .finally(function () {
             signal && signal.removeEventListener('abort', reject);
           });
-      });      
+      });
     },
 
     /**
