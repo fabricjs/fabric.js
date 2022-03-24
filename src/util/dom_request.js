@@ -44,7 +44,7 @@
 
     /** @ignore */
     xhr.onreadystatechange = function() {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
+      if (xhr.readyState === 4) {
         removeListener();
         onComplete(xhr);
         xhr.onreadystatechange = emptyFn;
