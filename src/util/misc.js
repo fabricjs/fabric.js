@@ -507,8 +507,7 @@
      * @param {Promise<fabric.Image>} img the loaded image.
      */
     loadImage: function (url, options) {
-      var signal = options && options.signal;
-      var abort;
+      var abort, signal = options && options.signal;
       return new Promise(function (resolve, reject) {
         if (signal && signal.aborted) {
           return reject(new DOMException('`options.signal` is in `aborted` state', 'ABORT_ERR'));
@@ -550,6 +549,7 @@
      * @param {(serializedObj: object, instance: fabric.Object) => any} [options.reviver] Method for further parsing of object elements,
      * called after each fabric object created.
      * @param {AbortSignal} [options.signal]
+     * @returns {Promise<fabric.Object[]>}
      */
     enlivenObjects: function(objects, options) {
       options = options || {};
@@ -564,11 +564,16 @@
 
     /**
      * Creates corresponding fabric instances residing in an object, e.g. `clipPath`
+     * @static
+     * @memberOf fabric.util
      * @param {Object} object with properties to enlive ( fill, stroke, clipPath, path )
-     * @returns {Promise<object>} the input object with enlived values
+     * @param {object} [options] 
+     * @param {AbortSignal} [options.signal]
+     * @returns {Promise<{[key:string]:fabric.Object|fabric.Pattern|fabric.Gradient|null}>} the input object with enlived values
      */
-
     enlivenObjectEnlivables: function (serializedObject, options) {
+      // make sure we don't pass other properties
+      var opts = { signal: options.signal };
       // enlive every possible property
       var promises = Object.values(serializedObject).map(function(value) {
         if (!value) {
@@ -578,12 +583,12 @@
           return new fabric.Gradient(value);
         }
         if (value.type) {
-          return fabric.util.enlivenObjects([value]).then(function (enlived) {
+          return fabric.util.enlivenObjects([value], opts).then(function (enlived) {
             return enlived[0];
           });
         }
         if (value.source) {
-          return fabric.Pattern.fromObject(value);
+          return fabric.Pattern.fromObject(value, opts);
         }
         return value;
       });
