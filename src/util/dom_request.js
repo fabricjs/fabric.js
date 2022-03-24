@@ -29,6 +29,10 @@
         signal = options.signal,
         abort = abort = function () {
           xhr.abort();
+        },
+        removeListener = function () {
+          signal && signal.removeEventListener('abort', abort);
+          xhr.onerror = xhr.ontimeout = emptyFn;
         };
 
     if (signal && signal.aborted) {
@@ -40,12 +44,14 @@
 
     /** @ignore */
     xhr.onreadystatechange = function() {
-      if (xhr.readyState === 4) {
-        signal && signal.removeEventListener('abort', abort);
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        removeListener();
         onComplete(xhr);
         xhr.onreadystatechange = emptyFn;
       }
     };
+
+    xhr.onerror = xhr.ontimeout = removeListener;
 
     if (method === 'GET') {
       body = null;
