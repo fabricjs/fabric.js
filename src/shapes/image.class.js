@@ -392,7 +392,7 @@
       return fabric.util.loadImage(src, opts).then(function(img) {
         _this.setElement(img, options);
         _this._setWidthHeight();
-        delete this.__abortController;
+        delete _this.__abortController;
         return _this;
       });
     },
