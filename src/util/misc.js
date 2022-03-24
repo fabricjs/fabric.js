@@ -515,7 +515,7 @@
         else if (signal) {
           abort = function () {
             img.src = '';
-            reject(new Error('aborted by user'));
+            reject(new Error('aborted'));
           };
           signal.addEventListener('abort', abort, { once: true });
         }
