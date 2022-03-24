@@ -15,7 +15,7 @@
    * @param {String} [options.method="GET"]
    * @param {String} [options.parameters] parameters to append to url in GET or in body
    * @param {String} [options.body] body to send with POST or PUT request
-   * @param {AbortSignal} [options.signal] 
+   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @param {Function} options.onComplete Callback to invoke when request is completed
    * @return {XMLHttpRequest} request
    */
@@ -37,7 +37,7 @@
     else if (signal) {
       signal.addEventListener('abort', abort, { once: true });
     }
-    
+
     /** @ignore */
     xhr.onreadystatechange = function() {
       if (xhr.readyState === 4) {

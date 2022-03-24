@@ -1,4 +1,4 @@
-(function(global) {
+(function() {
 
   var sqrt = Math.sqrt,
       atan2 = Math.atan2,
@@ -503,7 +503,7 @@
      * @param {String} url URL representing an image
      * @param {Object} [options] image loading options
      * @param {string} [options.crossOrigin] cors value for the image loading, default to anonymous
-     * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+     * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
      * @param {Promise<fabric.Image>} img the loaded image.
      */
     loadImage: function (url, options) {
@@ -516,7 +516,7 @@
           abort = function () {
             img.src = '';
             reject(new DOMException('aborted by user', 'ABORT_ERR'));
-          }
+          };
           signal.addEventListener('abort', abort, { once: true });
         }
         var img = fabric.util.createImage();
@@ -544,11 +544,11 @@
      * @static
      * @memberOf fabric.util
      * @param {Object[]} objects Objects to enliven
-     * @param {object} [options] 
+     * @param {object} [options]
      * @param {object} [options.namespace] Namespace to get klass "Class" object from
      * @param {(serializedObj: object, instance: fabric.Object) => any} [options.reviver] Method for further parsing of object elements,
      * called after each fabric object created.
-     * @param {AbortSignal} [options.signal]
+     * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
      * @returns {Promise<fabric.Object[]>}
      */
     enlivenObjects: function(objects, options) {
@@ -567,8 +567,8 @@
      * @static
      * @memberOf fabric.util
      * @param {Object} object with properties to enlive ( fill, stroke, clipPath, path )
-     * @param {object} [options] 
-     * @param {AbortSignal} [options.signal]
+     * @param {object} [options]
+     * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
      * @returns {Promise<{[key:string]:fabric.Object|fabric.Pattern|fabric.Gradient|null}>} the input object with enlived values
      */
     enlivenObjectEnlivables: function (serializedObject, options) {

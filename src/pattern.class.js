@@ -176,15 +176,15 @@
   });
 
   /**
-   * 
-   * @param {object} object 
-   * @param {object} options 
-   * @param {AbortSignal} options.signal 
-   * @returns 
+   *
+   * @param {object} object
+   * @param {object} [options]
+   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @returns
    */
   fabric.Pattern.fromObject = function(object, options) {
     var patternOptions = Object.assign({}, object),
-      imageOptions = Object.assign({ crossOrigin: object.crossOrigin }, options);
+        imageOptions = Object.assign({ crossOrigin: object.crossOrigin }, options);
     return fabric.util.loadImage(object.source, imageOptions)
       .then(function(img) {
         patternOptions.source = img;
