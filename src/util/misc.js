@@ -554,13 +554,29 @@
      */
     enlivenObjects: function(objects, options) {
       options = options || {};
-      return Promise.all(objects.map(function(obj) {
-        var klass = fabric.util.getKlass(obj.type, options.namespace || fabric);
-        return klass.fromObject(obj, options).then(function(fabricInstance) {
-          options.reviver && options.reviver(obj, fabricInstance);
-          return fabricInstance;
-        });
-      }));
+      var instances = [], signal = options && options.signal;
+      return new Promise(function (resolve, reject) {
+        signal && signal.addEventListener('abort', reject, { once: true });
+        Promise.all(objects.map(function (obj) {
+          var klass = fabric.util.getKlass(obj.type, options.namespace || fabric);
+          return klass.fromObject(obj, options).then(function (fabricInstance) {
+            options.reviver && options.reviver(obj, fabricInstance);
+            instances.push(fabricInstance);
+            return fabricInstance;
+          });
+        }))
+          .then(resolve)
+          .catch(function (error) {
+            // cleanup
+            instances.forEach(function (instance) {
+              instance.dispose && instance.dispose();
+            });
+            reject(error);
+          })
+          .finally(function () {
+            signal && signal.removeEventListener('abort', reject);
+          });
+      });      
     },
 
     /**
@@ -573,30 +589,50 @@
      * @returns {Promise<{[key:string]:fabric.Object|fabric.Pattern|fabric.Gradient|null}>} the input object with enlived values
      */
     enlivenObjectEnlivables: function (serializedObject, options) {
-      // enlive every possible property
-      var promises = Object.values(serializedObject).map(function(value) {
-        if (!value) {
+      var instances = [], signal = options && options.signal;
+      return new Promise(function (resolve, reject) {
+        signal && signal.addEventListener('abort', reject, { once: true });
+        // enlive every possible property
+        var promises = Object.values(serializedObject).map(function (value) {
+          if (!value) {
+            return value;
+          }
+          if (value.colorStops) {
+            return new fabric.Gradient(value);
+          }
+          if (value.type) {
+            return fabric.util.enlivenObjects([value], options).then(function (enlived) {
+              var instance = enlived[0];
+              instances.push(instance);
+              return instance;
+            });
+          }
+          if (value.source) {
+            return fabric.Pattern.fromObject(value, options).then(function (pattern) {
+              instances.push(pattern);
+              return pattern;
+            });
+          }
           return value;
-        }
-        if (value.colorStops) {
-          return new fabric.Gradient(value);
-        }
-        if (value.type) {
-          return fabric.util.enlivenObjects([value], options).then(function (enlived) {
-            return enlived[0];
+        });
+        var keys = Object.keys(serializedObject);
+        Promise.all(promises).then(function (enlived) {
+          return enlived.reduce(function (acc, instance, index) {
+            acc[keys[index]] = instance;
+            return acc;
+          }, {});
+        })
+          .then(resolve)
+          .catch(function (error) {
+            // cleanup
+            instances.forEach(function (instance) {
+              instance.dispose && instance.dispose();
+            });
+            reject(error);
+          })
+          .finally(function () {
+            signal && signal.removeEventListener('abort', reject);
           });
-        }
-        if (value.source) {
-          return fabric.Pattern.fromObject(value, options);
-        }
-        return value;
-      });
-      var keys = Object.keys(serializedObject);
-      return Promise.all(promises).then(function(enlived) {
-        return enlived.reduce(function(acc, instance, index) {
-          acc[keys[index]] = instance;
-          return acc;
-        }, {});
       });
     },
 
