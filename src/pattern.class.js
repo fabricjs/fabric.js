@@ -175,9 +175,17 @@
     }
   });
 
-  fabric.Pattern.fromObject = function(object) {
-    var patternOptions = Object.assign({}, object);
-    return fabric.util.loadImage(object.source, { crossOrigin: object.crossOrigin })
+  /**
+   * 
+   * @param {object} object 
+   * @param {object} options 
+   * @param {AbortSignal} options.signal 
+   * @returns 
+   */
+  fabric.Pattern.fromObject = function(object, options) {
+    var patternOptions = Object.assign({}, object),
+      imageOptions = Object.assign({ crossOrigin: object.crossOrigin }, options);
+    return fabric.util.loadImage(object.source, imageOptions)
       .then(function(img) {
         patternOptions.source = img;
         return new fabric.Pattern(patternOptions);
