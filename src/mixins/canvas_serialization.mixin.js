@@ -32,7 +32,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   loadFromJSON: function (json, reviver) {
     this.abortLoadingTask();
     if (!json) {
-      return;
+      return Promise.reject(new Error('fabric.js: `json` is undefined'));
     }
 
     // serialize if it wasn't already
@@ -64,6 +64,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this.renderOnAddRemove = renderOnAddRemove;
         delete _this.__abortController;
         _this.set(enlivedMap);
+        return _this;
       });
   },
 
