@@ -368,12 +368,15 @@
 
     /**
      * Aborts pending image loading task
+     * @returns {boolean} true if aborted
      */
     abortLoadingTask: function () {
       if (this.__abortController) {
         this.__abortController.abort();
         delete this.__abortController;
+        return true;
       }
+      return false;
     },
 
     /**
@@ -386,14 +389,20 @@
      */
     setSrc: function(src, options) {
       var _this = this;
-      this.abortLoadingTask();
-      this.__abortController = new AbortController();
-      var opts = Object.assign({}, options, { signal: this.__abortController.signal });
+      if (this.abortLoadingTask()) {
+        this.fire('loading:aborted');
+      }
+      var abortController = new AbortController();
+      this.__abortController = abortController;
+      var opts = Object.assign({}, options, { signal: abortController.signal });
       return fabric.util.loadImage(src, opts).then(function(img) {
         _this.setElement(img, options);
         _this._setWidthHeight();
-        delete _this.__abortController;
         return _this;
+      }).finally(function () {
+        if (abortController === _this.__abortController) {
+          delete _this.__abortController;
+        }
       });
     },
 

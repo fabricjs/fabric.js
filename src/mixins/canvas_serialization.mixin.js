@@ -67,9 +67,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this.clear();
         _this.__setupCanvas(serialized, enlived);
         _this.renderOnAddRemove = renderOnAddRemove;
-        delete _this.__abortController;
         _this.set(enlivedMap);
         return _this;
+      }).finally(function () {
+        if (abortController === _this.__abortController) {
+          delete _this.__abortController;
+        }
       });
   },
 
