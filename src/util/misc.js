@@ -510,12 +510,12 @@
       var abort, signal = options && options.signal;
       return new Promise(function (resolve, reject) {
         if (signal && signal.aborted) {
-          return reject(new DOMException('`options.signal` is in `aborted` state', 'ABORT_ERR'));
+          return reject(new Error('`options.signal` is in `aborted` state'));
         }
         else if (signal) {
           abort = function () {
             img.src = '';
-            reject(new DOMException('aborted by user', 'ABORT_ERR'));
+            reject(new Error('aborted by user'));
           };
           signal.addEventListener('abort', abort, { once: true });
         }

@@ -695,7 +695,7 @@
       return;
     }
     if (parsingOptions && parsingOptions.signal && parsingOptions.signal.aborted) {
-      throw new DOMException('`options.signal` is in `aborted` state', 'ABORT_ERR');
+      throw new Error('`options.signal` is in `aborted` state');
     }
     parseUseDirectives(doc);
 

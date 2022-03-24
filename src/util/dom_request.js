@@ -32,7 +32,7 @@
         };
 
     if (signal && signal.aborted) {
-      throw new DOMException('`options.signal` is in `aborted` state', 'ABORT_ERR');
+      throw new Error('`options.signal` is in `aborted` state');
     }
     else if (signal) {
       signal.addEventListener('abort', abort, { once: true });
