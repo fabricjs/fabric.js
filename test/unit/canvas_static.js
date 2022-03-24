@@ -1288,7 +1288,7 @@
       assert.equal(opt.from, 'json');
     });
     canvas.loadFromJSON(serialized).catch(function (err) {
-      assert.equal(err.type, 'abort');
+      assert.equal(err.type, 'abort', 'should be an error object');
     });
     canvas.loadFromJSON(serialized).then(function () {
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
@@ -1296,6 +1296,21 @@
       assert.ok(canvas.backgroundImage instanceof fabric.Image);
       done();
     });
+  });
+
+
+  QUnit.test('imperative abort loadFromJSON', function (assert) {
+    var done = assert.async();
+    assert.expect(3);
+    var serialized = JSON.parse(PATH_JSON);
+    serialized.background = 'green';
+    serialized.backgroundImage = { "type": "image", "originX": "left", "originY": "top", "left": 13.6, "top": -1.4, "width": 3000, "height": 3351, "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 0, "strokeDashArray": null, "strokeLineCap": "butt", "strokeDashOffset": 0, "strokeLineJoin": "miter", "strokeMiterLimit": 4, "scaleX": 0.05, "scaleY": 0.05, "angle": 0, "flipX": false, "flipY": false, "opacity": 1, "shadow": null, "visible": true, "backgroundColor": "", "fillRule": "nonzero", "globalCompositeOperation": "source-over", "skewX": 0, "skewY": 0, "src": IMG_SRC, "filters": [], "crossOrigin": "" };
+    canvas.loadFromJSON(serialized).catch(function (err) {
+      assert.equal(err.type, 'abort');
+    });
+    assert.ok(canvas.abortLoadingTask(), 'should return true because loading was aborted');
+    assert.ok(canvas.isEmpty(), 'canvas is empty');
+    done();
   });
 
   QUnit.test('loadFromJSON custom properties', function(assert) {
