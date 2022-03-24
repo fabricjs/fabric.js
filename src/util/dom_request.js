@@ -15,6 +15,7 @@
    * @param {String} [options.method="GET"]
    * @param {String} [options.parameters] parameters to append to url in GET or in body
    * @param {String} [options.body] body to send with POST or PUT request
+   * @param {AbortSignal} [options.signal] 
    * @param {Function} options.onComplete Callback to invoke when request is completed
    * @return {XMLHttpRequest} request
    */
@@ -22,13 +23,25 @@
     options || (options = { });
 
     var method = options.method ? options.method.toUpperCase() : 'GET',
-        onComplete = options.onComplete || function() { },
+        onComplete = options.onComplete || function () { },
         xhr = new fabric.window.XMLHttpRequest(),
-        body = options.body || options.parameters;
+        body = options.body || options.parameters,
+        signal = options.signal,
+        abort = abort = function () {
+          xhr.abort();
+        };
 
+    if (signal && signal.aborted) {
+      throw new DOMException('`options.signal` is in `aborted` state', 'ABORT_ERR');
+    }
+    else if (signal) {
+      signal.addEventListener('abort', abort);
+    }
+    
     /** @ignore */
     xhr.onreadystatechange = function() {
       if (xhr.readyState === 4) {
+        signal && signal.removeEventListener('abort', abort);
         onComplete(xhr);
         xhr.onreadystatechange = emptyFn;
       }

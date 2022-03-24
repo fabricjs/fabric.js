@@ -681,6 +681,8 @@
    * Creates an instance of fabric.Image from its object representation
    * @static
    * @param {Object} object Object to create an instance from
+   * @param {object} [options] Options object
+   * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Image>}
    */
   fabric.Image.fromObject = function(_object, options) {
@@ -709,7 +711,9 @@
    * Creates an instance of fabric.Image from an URL string
    * @static
    * @param {String} url URL to create an image from
-   * @param {Object} [imgOptions] Options object
+   * @param {object} [imgOptions] Options object
+   * @param {string} [options.crossOrigin] cors value for the image loading, default to anonymous
+   * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Image>}
    */
   fabric.Image.fromURL = function(url, imgOptions) {
@@ -734,6 +738,7 @@
    * @static
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
+   * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @param {Function} callback Callback to execute when fabric.Image object is created
    * @return {fabric.Image} Instance of fabric.Image
    */
