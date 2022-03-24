@@ -500,6 +500,6 @@
    * @returns {Promise<fabric.IText>}
    */
   fabric.IText.fromObject = function(object) {
-    return fabric.Object._fromObject(fabric.IText, object, 'text');
+    return fabric.Object._fromObject(fabric.IText, object, { extraParam: 'text' });
   };
 })();
