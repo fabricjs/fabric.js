@@ -1939,16 +1939,23 @@
    * @type string[]
    */
 
-  fabric.Object._fromObject = function(klass, object, extraParam) {
+  fabric.Object._fromObject = function(klass, object, extraParam, options) {
     var serializedObject = clone(object, true);
-    return fabric.util.enlivenObjectEnlivables(serializedObject).then(function(enlivedMap) {
+    return fabric.util.enlivenObjectEnlivables(serializedObject, options).then(function(enlivedMap) {
       var newObject = Object.assign(object, enlivedMap);
       return extraParam ? new klass(object[extraParam], newObject) : new klass(newObject);
     });
   };
 
-  fabric.Object.fromObject = function(object) {
-    return fabric.Object._fromObject(fabric.Object, object);
+  /**
+   * 
+   * @param {object} object 
+   * @param {object} options 
+   * @param {AbortSignal} options.signal 
+   * @returns 
+   */
+  fabric.Object.fromObject = function(object, options) {
+    return fabric.Object._fromObject(fabric.Object, object, null, options);
   };
 
   /**
