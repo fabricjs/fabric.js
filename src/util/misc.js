@@ -461,13 +461,13 @@
      * Returns klass "Class" object of given namespace
      * @memberOf fabric.util
      * @param {String} type Type of object (eg. 'circle')
-     * @param {String} namespace Namespace to get klass "Class" object from
+     * @param {object} namespace Namespace to get klass "Class" object from
      * @return {Object} klass "Class"
      */
     getKlass: function(type, namespace) {
       // capitalize first letter only
       type = fabric.util.string.camelize(type.charAt(0).toUpperCase() + type.slice(1));
-      return fabric.util.resolveNamespace(namespace)[type];
+      return (namespace || fabric)[type];
     },
 
     /**
@@ -498,28 +498,6 @@
     },
 
     /**
-     * Returns object of given namespace
-     * @memberOf fabric.util
-     * @param {String} namespace Namespace string e.g. 'fabric.Image.filter' or 'fabric'
-     * @return {Object} Object for given namespace (default fabric)
-     */
-    resolveNamespace: function(namespace) {
-      if (!namespace) {
-        return fabric;
-      }
-
-      var parts = namespace.split('.'),
-          len = parts.length, i,
-          obj = global || fabric.window;
-
-      for (i = 0; i < len; ++i) {
-        obj = obj[parts[i]];
-      }
-
-      return obj;
-    },
-
-    /**
      * Loads image element from given url and resolve it, or catch.
      * @memberOf fabric.util
      * @param {String} url URL representing an image
@@ -537,6 +515,7 @@
         }
         else if (signal) {
           abort = function () {
+            img.src = '';
             reject(new DOMException('aborted by user', 'ABORT_ERR'));
           }
           signal.addEventListener('abort', abort);
@@ -566,15 +545,18 @@
      * @static
      * @memberOf fabric.util
      * @param {Object[]} objects Objects to enliven
-     * @param {String} namespace Namespace to get klass "Class" object from
-     * @param {Function} reviver Method for further parsing of object elements,
+     * @param {object} [options] 
+     * @param {object} [options.namespace] Namespace to get klass "Class" object from
+     * @param {(serializedObj: object, instance: fabric.Object) => any} [options.reviver] Method for further parsing of object elements,
      * called after each fabric object created.
+     * @param {AbortSignal} [options.signal]
      */
-    enlivenObjects: function(objects, namespace, reviver) {
+    enlivenObjects: function(objects, options) {
+      options = options || {};
       return Promise.all(objects.map(function(obj) {
-        var klass = fabric.util.getKlass(obj.type, namespace);
-        return klass.fromObject(obj).then(function(fabricInstance) {
-          reviver && reviver(obj, fabricInstance);
+        var klass = fabric.util.getKlass(obj.type, options.namespace || fabric);
+        return klass.fromObject(obj, options).then(function(fabricInstance) {
+          options.reviver && options.reviver(obj, fabricInstance);
           return fabricInstance;
         });
       }));
@@ -586,7 +568,7 @@
      * @returns {Promise<object>} the input object with enlived values
      */
 
-    enlivenObjectEnlivables: function (serializedObject) {
+    enlivenObjectEnlivables: function (serializedObject, options) {
       // enlive every possible property
       var promises = Object.values(serializedObject).map(function(value) {
         if (!value) {

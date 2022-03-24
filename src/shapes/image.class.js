@@ -683,17 +683,18 @@
    * @param {Object} object Object to create an instance from
    * @returns {Promise<fabric.Image>}
    */
-  fabric.Image.fromObject = function(_object) {
+  fabric.Image.fromObject = function(_object, options) {
     var object = fabric.util.object.clone(_object),
         filters = object.filters,
         resizeFilter = object.resizeFilter;
     // the generic enliving will fail on filters for now
     delete object.resizeFilter;
     delete object.filters;
+    var imageOptions = Object.assign({ crossOrigin: _object.crossOrigin }, options);
     return Promise.all([
-      fabric.util.loadImage(object.src, { crossOrigin: _object.crossOrigin }),
-      filters && fabric.util.enlivenObjects(filters,  'fabric.Image.filters'),
-      resizeFilter && fabric.util.enlivenObjects([resizeFilter],  'fabric.Image.filters'),
+      fabric.util.loadImage(object.src, imageOptions),
+      filters && fabric.util.enlivenObjects(filters, fabric.Image.filters),
+      resizeFilter && fabric.util.enlivenObjects([resizeFilter], fabric.Image.filters),
       fabric.util.enlivenObjectEnlivables(object),
     ])
       .then(function(imgAndFilters) {
