@@ -184,7 +184,7 @@
    */
   fabric.Pattern.fromObject = function(object, options) {
     var patternOptions = Object.assign({}, object),
-        imageOptions = Object.assign({ crossOrigin: object.crossOrigin }, options);
+        imageOptions = Object.assign({}, options, { crossOrigin: object.crossOrigin });
     return fabric.util.loadImage(object.source, imageOptions)
       .then(function(img) {
         patternOptions.source = img;
