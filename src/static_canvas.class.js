@@ -31,6 +31,7 @@
    * @fires canvas:cleared
    * @fires object:added
    * @fires object:removed
+   * @fires loading:aborted
    */
   fabric.StaticCanvas = fabric.util.createClass(fabric.CommonMethods, /** @lends fabric.StaticCanvas.prototype */ {
 

@@ -2,12 +2,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
   /**
    * Aborts instance's loading task ({@link fabric.Canvas#loadFromJSON} etc.) if exists
+   * @returns {boolean} true if aborted
    */
   abortLoadingTask: function () {
     if (this.__abortController) {
       this.__abortController.abort();
       delete this.__abortController;
+      return true;
     }
+    return false;
   },
 
   /**
@@ -30,7 +33,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * });
    */
   loadFromJSON: function (json, reviver) {
-    this.abortLoadingTask();
+    if (this.abortLoadingTask()) {
+      this.fire('loading:aborted', { from: 'json' });
+    }
     if (!json) {
       return Promise.reject(new Error('fabric.js: `json` is undefined'));
     }
