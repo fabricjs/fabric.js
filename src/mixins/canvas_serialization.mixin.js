@@ -5,7 +5,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {String|Object} json JSON string or object
    * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @return {Promise<fabric.Canvas>} instance
-   * @chainable
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#deserialization}
    * @see {@link http://jsfiddle.net/fabricjs/fmgXt/|jsFiddle demo}
    * @example <caption>loadFromJSON</caption>
@@ -30,26 +29,27 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       : fabric.util.object.clone(json);
 
     var _this = this,
-        renderOnAddRemove = this.renderOnAddRemove;
+        renderOnAddRemove = this.renderOnAddRemove,
+        abortController = new AbortController();
 
     this.renderOnAddRemove = false;
 
-    return fabric.util.enlivenObjects(serialized.objects || [], '', reviver)
-      .then(function(enlived) {
-        return fabric.util.enlivenObjectEnlivables({
-          backgroundImage: serialized.backgroundImage,
-          backgroundColor: serialized.background,
-          overlayImage: serialized.overlayImage,
-          overlayColor: serialized.overlay,
-          clipPath: serialized.clipPath,
-        })
-          .then(function(enlivedMap) {
-            _this.clear();
-            _this.__setupCanvas(serialized, enlived);
-            _this.renderOnAddRemove = renderOnAddRemove;
-            _this.set(enlivedMap);
-            return _this;
-          });
+    return Promise.all([
+      fabric.util.enlivenObjects(serialized.objects || [], { reviver: reviver, signal: abortController.signal }),
+      fabric.util.enlivenObjectEnlivables({
+        backgroundImage: serialized.backgroundImage,
+        backgroundColor: serialized.background,
+        overlayImage: serialized.overlayImage,
+        overlayColor: serialized.overlay,
+        clipPath: serialized.clipPath,
+      })
+    ])
+      .then(function (res) {
+        var enlived = res[0], enlivedMap = res[1];
+        _this.clear();
+        _this.__setupCanvas(serialized, enlived);
+        _this.renderOnAddRemove = renderOnAddRemove;
+        _this.set(enlivedMap);
       });
   },
 
