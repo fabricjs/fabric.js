@@ -690,12 +690,13 @@
     // the generic enliving will fail on filters for now
     delete object.resizeFilter;
     delete object.filters;
-    var imageOptions = Object.assign({ crossOrigin: _object.crossOrigin }, options);
+    var imageOptions = Object.assign({}, options, { crossOrigin: _object.crossOrigin }),
+      filterOptions = Object.assign({}, options, { namespace: fabric.Image.filters });
     return Promise.all([
       fabric.util.loadImage(object.src, imageOptions),
-      filters && fabric.util.enlivenObjects(filters, fabric.Image.filters),
-      resizeFilter && fabric.util.enlivenObjects([resizeFilter], fabric.Image.filters),
-      fabric.util.enlivenObjectEnlivables(object),
+      filters && fabric.util.enlivenObjects(filters, filterOptions),
+      resizeFilter && fabric.util.enlivenObjects([resizeFilter], filterOptions),
+      fabric.util.enlivenObjectEnlivables(object, options),
     ])
       .then(function(imgAndFilters) {
         object.filters = imgAndFilters[1] || [];
