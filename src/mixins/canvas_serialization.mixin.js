@@ -1,4 +1,15 @@
 fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
+
+  /**
+   * Aborts instance's loading task ({@link fabric.Canvas#loadFromJSON} etc.) if exists
+   */
+  abortLoadingTask: function () {
+    if (this.__abortController) {
+      this.__abortController.abort();
+      delete this.__abortController;
+    }
+  },
+
   /**
    * Populates canvas with data from the specified JSON.
    * JSON format must conform to the one of {@link fabric.Canvas#toJSON}
@@ -19,6 +30,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * });
    */
   loadFromJSON: function (json, reviver) {
+    this.abortLoadingTask();
     if (!json) {
       return;
     }
@@ -32,6 +44,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         renderOnAddRemove = this.renderOnAddRemove,
         abortController = new AbortController();
 
+    this.__abortController = abortController;
     this.renderOnAddRemove = false;
 
     return Promise.all([
@@ -42,13 +55,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         overlayImage: serialized.overlayImage,
         overlayColor: serialized.overlay,
         clipPath: serialized.clipPath,
-      })
+      }, { signal: abortController.signal })
     ])
       .then(function (res) {
         var enlived = res[0], enlivedMap = res[1];
         _this.clear();
         _this.__setupCanvas(serialized, enlived);
         _this.renderOnAddRemove = renderOnAddRemove;
+        delete _this.__abortController;
         _this.set(enlivedMap);
       });
   },
