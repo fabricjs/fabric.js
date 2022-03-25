@@ -17,6 +17,7 @@
    * Image class
    * @class fabric.Image
    * @extends fabric.Object
+   * @fires loading:aborted
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
    * @see {@link fabric.Image#initialize} for constructor definition
    */
