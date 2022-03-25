@@ -26,8 +26,9 @@
    * @property {number | number[]} [endValue=100] Ending value
    * @property {number | number[]} [byValue=100] Value to modify the property by
    * @property {Function} [easing] Easing function
-   * @property {Number} [duration=500] Duration of change (in ms)
+   * @property {number} [duration=500] Duration of change (in ms)
    * @property {Function} [abort] Additional function with logic. If returns true, animation aborts.
+   * @property {number} [delay] Delay of animation start (in ms)
    *
    * @typedef {() => void} CancelFunction
    *
@@ -163,7 +164,7 @@
     });
     fabric.runningAnimations.push(context);
 
-    requestAnimFrame(function(timestamp) {
+    var runner = function (timestamp) {
       var start = timestamp || +new Date(),
           duration = options.duration || 500,
           finish = start + duration, time,
@@ -216,7 +217,16 @@
           requestAnimFrame(tick);
         }
       })(start);
-    });
+    };
+
+    if (options.delay) {
+      setTimeout(function () {
+        requestAnimFrame(runner);
+      }, options.delay);
+    }
+    else {
+      requestAnimFrame(runner);
+    }
 
     return context.cancel;
   }
