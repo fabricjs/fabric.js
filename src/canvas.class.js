@@ -1352,6 +1352,12 @@
       this._unwindGroupTransformOnObject(instance, originalProperties);
     },
 
+    /**
+     * Sets viewport transformation of this canvas instance
+     * @param {Array} vpt a Canvas 2D API transform matrix
+     * @chainable
+     * @return {fabric.Canvas} instance
+     */
     setViewportTransform: function (vpt) {
       var activeObject = this._activeObject, dirty = false;
       if (this.renderOnAddRemove && activeObject && activeObject.isEditing) {
@@ -1372,6 +1378,7 @@
       }
       fabric.StaticCanvas.prototype._setViewportTransform.call(this, vpt);
       (dirty || this.renderOnAddRemove) && this.requestRenderAll();
+      return this;
     }
   });
 

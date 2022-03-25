@@ -464,7 +464,7 @@
     /**
      * Sets viewport transformation of this canvas instance
      * @param {Array} vpt a Canvas 2D API transform matrix
-     * @return {fabric.Canvas} instance
+     * @return {fabric.StaticCanvas} instance
      * @chainable true
      */
     setViewportTransform: function (vpt) {
@@ -477,7 +477,6 @@
      * Sets viewport transformation of this canvas instance
      * @private
      * @param {Array} vpt a Canvas 2D API transform matrix
-     * @return {fabric.Canvas} instance
      */
     _setViewportTransform: function (vpt) {
       var backgroundObject = this.backgroundImage,
