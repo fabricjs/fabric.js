@@ -85,7 +85,7 @@
     "uglify-js": "3.3.x"
   },
   "engines": {
-    "node": ">=15.4.0"
+    "node": ">=16.0.0"
   },
   "main": "./dist/fabric.js",
   "dependencies": {}
