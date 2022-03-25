@@ -206,9 +206,12 @@
   });
 
   QUnit.test('abort setSrc', function (assert) {
-    var done = assert.async();
-    assert.expect(9);
+    var done = assert.async(), called = 0;
+    assert.expect(10);
     createImageObject(function (image) {
+      image.on('loading:aborted', function () {
+        called++;
+      });
       image.setSrc(IMG_SRC, { crossOrigin: 'anonymous' }).catch(function (err) {
         assert.ok(err instanceof Error);
         assert.equal(basename(image.getSrc()), basename(IMG_SRC), 'should preserve prev src');
@@ -221,6 +224,7 @@
         assert.equal(image.getCrossOrigin(), 'anonymous', 'setSrc will respect crossOrigin');
         assert.ok(basename(image.getSrc()), basename(IMG_SRC));
         assert.equal(image.__abortController, undefined, 'abort controller reference should be cleared');
+        assert.equal(called, 1, 'should have fired `loading:aborted` event once');
         done();
       });
     });
