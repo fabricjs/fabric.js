@@ -1118,7 +1118,7 @@ const { groupCollapsed } = require("console");
     canvas.add(rect1);
     canvas.add(rect2);
     canvas.add(rect3);
-    var group = new fabric.ActiveSelection([rect1, rect2]);
+    var group = new fabric.ActiveSelection([rect1, rect2], { subTargetCheck: true });
     canvas.setActiveObject(group);
     target = canvas.findTarget({
       clientX: 5, clientY: 5
