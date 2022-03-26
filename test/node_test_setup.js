@@ -1,6 +1,12 @@
 // set the fabric framework as a global for tests
 var chalk = require('chalk');
 var diff = require('deep-object-diff').diff;
+var commander = require('commander');
+
+commander.program.option('-d, --debug', 'write golden file in case of difference in visual test').action(options => {
+  QUnit.debug = options.debug;
+}).parse(process.argv);
+
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
 global.fs = require('fs');
