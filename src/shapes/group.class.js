@@ -105,20 +105,16 @@
         //  we need to preserve object's center point in relation to canvas and apply group's transform to it
         var inv = invertTransform(this.calcTransformMatrix());
         this.forEachObject(function (object) {
-          var t = multiplyTransformMatrices(
-            inv,
-            object.calcTransformMatrix()
-          );
-          var center = transformPoint(this.getCenterPoint(), t);
+          var center = transformPoint(object.getCenterPoint(), inv);
           this.enterGroup(object, false);
           object.setPositionByOrigin(center, 'center', 'center');
         }, this);
+        this._applyLayoutStrategy({
+          type: 'initialization',
+          options: options,
+          objectsRelativeToGroup: objectsRelativeToGroup
+        });
       }
-      this._applyLayoutStrategy({
-        type: 'initialization',
-        options: options,
-        objectsRelativeToGroup: objectsRelativeToGroup
-      });
     },
 
     /**
@@ -643,7 +639,7 @@
 
       //  performance enhancement
       //  skip layout calculation if bbox is defined
-      if ((hasX && hasY && hasWidth && hasHeight && context.objectsRelativeToGroup) || objects.length === 0) {
+      if ((hasWidth && hasHeight) || context.objectsRelativeToGroup || objects.length === 0) {
         //  return nothing to skip layout
         return;
       }

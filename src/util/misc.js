@@ -607,20 +607,17 @@
      * @memberOf fabric.util
      * @param {Array} elements SVG elements to group
      * @param {Object} [options] Options object
-     * @param {String} path Value to set sourcePath to
      * @return {fabric.Object|fabric.Group}
      */
-    groupSVGElements: function(elements, options, path) {
+    groupSVGElements: function(elements, options) {
       var object;
       if (elements && elements.length === 1) {
         return elements[0];
       }
+      var center;
       if (options) {
         if (options.width && options.height) {
-          options.centerPoint = {
-            x: options.width / 2,
-            y: options.height / 2
-          };
+          center = new fabric.Point(options.width / 2, options.height / 2);
         }
         else {
           delete options.width;
@@ -628,9 +625,6 @@
         }
       }
       object = new fabric.Group(elements, options);
-      if (typeof path !== 'undefined') {
-        object.sourcePath = path;
-      }
       return object;
     },
 
