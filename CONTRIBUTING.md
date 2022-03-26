@@ -18,21 +18,28 @@ If you are sure that it's a bug in Fabric.js or a suggestion, open a new [issue]
 
 ### Issue tracker guidelines
 
-- **Search:** Before opening a new issue please [search](https://github.com/fabricjs/fabric.js/search?q=&ref=cmdform&type=Issues) Fabric's existing issues.
+If you think you found a bug in Fabric file an [issue](https://github.com/fabricjs/fabric.js/issues).
+
+- **Gotchas**: Make sure you didn't fall into a known [fabric-gotcha](http://fabricjs.com/fabric-gotchas)
+
+- **Search:** Before opening a new issue please take the time to [search](https://github.com/fabricjs/fabric.js/search?q=&ref=cmdform&type=Issues) Fabric's existing issues. This is vital to prevent spamming and to keep the community in a good state.
 
 - **Title:** Choose an informative title.
 
 - **Description:** Use the questions above to describe the issue. Add logs, screenshots or videos if that makes sense.
 
-- **Test case:** Please post code to replicate the bug - best on [jsfiddle](http://jsfiddle.net). Ideally a failing test would be
-perfect, but even a simple script demonstrating the error would suffice. You could use [this jsfiddle template](http://jsfiddle.net/fabricjs/Da7SP/) as a
-starting point.
+- **Test case:** Make sure you create a minimal and immediate test case, demonstrating the bug, with relevant explanations. It should be extremely **easy** and **fast** for someone to understand your bug and reproduce it. Bug templates can be found within a [bug report](https://github.com/fabricjs/fabric.js/issues/new?assignees=&labels=&template=bug_report.md)
 
-- **Fabric.js version:** Make sure to specify which version of Fabric.js you are using. The version can be found in [fabric.js file](https://github.com/fabricjs/fabric.js/blob/master/dist/fabric.js#L5) or just by executing `fabric.version` in the browser console.
+- **Fabric.js version:** Make sure to specify which version of Fabric.js you are using. The version can be found in [fabric.js file](https://github.com/fabricjs/fabric.js/blob/master/dist/fabric.js#L5) or just by executing `fabric.version` in the browser console. It is advised you upgrade to the latest version before proceeding.
+
+**Without these requirements issues shall be closed.**
+
+If you're unsure about something that is not a bug, it's best to start a [discussion](https://github.com/fabricjs/fabric.js/discussions) or create a post on [Fabric's google group](groups.google.com/forum/?fromgroups#!forum/fabricjs) where someone might clarify some of the things.
 
 ## Pull requests
 
 We are very grateful for your pull requests! This is your chance to improve Fabric for everyone else.
+Before you begin read this through and take a look at [fabric-gotchas](http://fabricjs.com/fabric-gotchas)
 
 ### Online one-click setup for making PRs
 
