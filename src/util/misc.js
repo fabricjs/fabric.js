@@ -610,22 +610,16 @@
      * @return {fabric.Object|fabric.Group}
      */
     groupSVGElements: function(elements, options) {
-      var object;
       if (elements && elements.length === 1) {
         return elements[0];
       }
-      var center;
       if (options) {
-        if (options.width && options.height) {
-          center = new fabric.Point(options.width / 2, options.height / 2);
-        }
-        else {
+        if (!options.width || !options.height) {
           delete options.width;
           delete options.height;
         }
       }
-      object = new fabric.Group(elements, options);
-      return object;
+      return new fabric.Group(elements, options);
     },
 
     /**
