@@ -229,7 +229,11 @@ async function runIntreactiveTestSuite(debug) {
         acc[curr.type].push(`test/${curr.type}/${curr.file}`);
         return acc;
     }, { unit: [], visual: [] });
-    _.forEach(tests, files => files.length > 0 && test(files, debug));
+    _.forEach(tests, files => {
+        if (files.length > 0) {
+            test(files, debug);
+        }
+    });
 }
 
 program
