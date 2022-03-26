@@ -77,7 +77,7 @@ Fabric has 2 test suites:
 - `visual` testing visual outcome against image refs
 
 #### Running Tests
-- **Node.js**: run `npm test -- -a -d` to run all tests in debug mode (pass `--help` to see more options).
+- **Node.js**: run `npm test -- -a -d` to run **a**ll tests in **d**ebug mode (pass `--help` to see more options).
 - **Browser**: start `fabricjs.com` (`npm start`) and navigate to the `tests` tab where you will find the test interface.
 
 ### Pull request guidelines
