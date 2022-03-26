@@ -14,7 +14,8 @@ about: Create a report with a reproducible test case in a JSFIDDLE, For anything
 <!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
 <!-- A good reproduction helps us understand better your issue, find the bug and fix it quickly so take the time to make it accurate and minimal -->
 ## Test Case
-http://jsfiddle.net/fabricjs/Da7SP/
+- [ ] [Browser Issue Template](https://jsfiddle.net/Lcp2h3nv/)
+- [ ] [Node Issue Template](https://codesandbox.io/s/exciting-browser-ytb701)
 
 ## Information about environment
 Nodejs or browser?
