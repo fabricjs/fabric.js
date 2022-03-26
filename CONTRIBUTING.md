@@ -71,6 +71,15 @@ If you are working on windows, check out [`jekyll` docs](https://jekyllrb.com/do
 Take a look at an existing [demo file](https://github.com/fabricjs/fabricjs.com/blob/gh-pages/posts/demos/_posts/2020-2-15-custom-control-render.md).
 Create a new file in the same directory (`posts/demos/_posts`) and you're good to go.
 
+### Tests
+Fabric has 2 test suites: 
+- `unit` testing logic and state
+- `visual` testing visual outcome against image refs
+
+#### Running Tests
+- **Node.js**: run `npm test -- -a -d` to run all tests in debug mode (pass `--help` to see more options).
+- **Browser**: start `fabricjs.com` (`npm start`) and navigate to the `tests` tab where you will find the test interface.
+
 ### Pull request guidelines
 
 Here are a few notes you should take into account:
@@ -79,7 +88,7 @@ Here are a few notes you should take into account:
 
 - **Distribution files:** Do your changes only in the [source files](https://github.com/fabricjs/fabric.js/tree/master/src). Don't include the [distribution files](https://github.com/fabricjs/fabric.js/tree/master/dist) in your commit.
 
-- **Add tests**: Tests are always a great addition - invest a little time and expand the [unit tests suite](https://github.com/fabricjs/fabric.js/tree/master/test/unit). More informations about [QUnit](http://qunitjs.com/) tests can be found in the [wiki](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric#testing-fabric).
+- **Add tests**: Tests are vital - invest a little time and expand the [unit tests suite](https://github.com/fabricjs/fabric.js/tree/master/test/unit). More information about [QUnit](http://qunitjs.com/) tests can be found in the [wiki](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric#testing-fabric).
 
 - **Add documentation:** Fabric uses [JSDoc 3] for documentation. The generated documentation can be found at [fabricjs.com](http://fabricjs.com/docs).
 
