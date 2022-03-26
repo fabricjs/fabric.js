@@ -139,9 +139,16 @@ function exportToWebsite(options) {
     })
 }
 
-function test(tests, debug) {
+/**
+ * 
+ * @param {string[]} tests file paths
+ * @param {{debug:boolean,recreate:boolean}} [options] 
+ */
+function test(tests, options) {
+    options = options || {};
     const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests);
-    process.env.QUNIT_DEBUG_VISUAL_TESTS = debug;
+    process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
+    process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
     cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd, env: process.env });
 }
 
@@ -222,7 +229,7 @@ async function selectTestFile() {
     return filteredTests;
 }
 
-async function runIntreactiveTestSuite(debug) {
+async function runIntreactiveTestSuite(options) {
     //  some tests fail because of some pollution when run from the same context
     // test(_.map(await selectTestFile(), curr => `test/${curr.type}/${curr.file}`))
     const tests = _.reduce(await selectTestFile(), (acc, curr) => {
@@ -231,7 +238,7 @@ async function runIntreactiveTestSuite(debug) {
     }, { unit: [], visual: [] });
     _.forEach(tests, files => {
         if (files.length > 0) {
-            test(files, debug);
+            test(files, options);
         }
     });
 }
@@ -267,7 +274,8 @@ program
     .addOption(new commander.Option('-s, --suite [suite...]', 'test suite to run').choices(['unit', 'visual']))
     .option('-f, --file [file]', 'run a specific test file')
     .option('-a, --all', 'run all tests', false)
-    .option('-d, --debug', 'debug visual tests by overriding golden images', false)
+    .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
+    .option('-r, --recreate', 'recreate visual refs (golden images)', false)
     .option('-cc, --clear-cache', 'clear CLI test cache', false)
     .action((options) => {
         if (options.clearCache) {
@@ -277,13 +285,13 @@ program
             options.suite = ['unit', 'visual'];
         }
         if (options.suite) {
-            options.suite.forEach(suite => test(`test/${suite}`, options.debug));
+            options.suite.forEach(suite => test(`test/${suite}`, options));
         }
         else if (options.file) {
-            test(`test/${options.file}`);
+            test(`test/${options.file}`, options);
         }
         else {
-            runIntreactiveTestSuite(options.debug);
+            runIntreactiveTestSuite(options);
         }
     });
 

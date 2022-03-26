@@ -160,7 +160,9 @@
             if (!isOK) {
               var stringa = imageDataToChalk(output);
               console.log(stringa);
-              QUnit.debugVisual && generateGolden(getGoldeName(golden), renderedCanvas);
+            }
+            if ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs) {
+              generateGolden(getGoldeName(golden), renderedCanvas);
             }
             fabricCanvas.dispose();
             done();
