@@ -891,7 +891,6 @@
      * @property {number} left
      * @property {number} deltaY
      * 
-     * @private
      * @param {String} grapheme to be measured
      * @param {Number} lineIndex index of the line where the char is
      * @param {Number} charIndex position in the line
