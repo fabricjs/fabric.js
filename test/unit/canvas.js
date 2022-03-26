@@ -739,8 +739,8 @@
       rect3Selected = true;
     });
     var currentObjects = canvas.getActiveObjects();
-    activeSelection.removeWithUpdate(rect1);
-    activeSelection.addWithUpdate(rect3);
+    activeSelection.remove(rect1);
+    activeSelection.add(rect3);
     canvas._fireSelectionEvents(currentObjects, {});
     assert.ok(rect3Selected, 'rect 3 selected');
     assert.ok(rect1Deselected, 'rect 1 deselected');
@@ -1292,7 +1292,7 @@
     assert.equal(center.left, upperCanvasEl.width / 2);
     assert.equal(center.top, upperCanvasEl.height / 2);
   });
-  
+
   QUnit.test('getCenterPoint', function(assert) {
     assert.ok(typeof canvas.getCenterPoint === 'function');
     var center = canvas.getCenterPoint();
@@ -2527,7 +2527,7 @@
 
     assert.ok(typeof InheritedCanvasClass === 'function');
   });
-  
+
   QUnit.test('canvas getTopContext', function(assert) {
     assert.ok(typeof canvas.getTopContext === 'function');
     assert.equal(canvas.getTopContext(), canvas.contextTop, 'it jsut returns contextTop');

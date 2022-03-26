@@ -259,7 +259,7 @@
       this._watchObject(true, object);
       var activeObject = this.canvas && this.canvas.getActiveObject && this.canvas.getActiveObject();
       // if we are adding the activeObject in a group
-      if (activeObject && (activeObject === object || object.isDescendantOf(activeObject))) {
+      if (activeObject && (activeObject === object || (object.contains && object.contains(activeObject)))) {
         this._activeObjects.push(object);
       }
     },

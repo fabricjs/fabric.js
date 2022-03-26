@@ -51,7 +51,7 @@
       var activeSelection = this._activeObject,
           currentActiveObjects = activeSelection._objects.slice(0);
       if (activeSelection.contains(target)) {
-        activeSelection.removeWithUpdate(target);
+        activeSelection.remove(target);
         this._hoveredTarget = target;
         this._hoveredTargets = this.targets.concat();
         if (activeSelection.size() === 1) {
@@ -60,7 +60,7 @@
         }
       }
       else {
-        activeSelection.addWithUpdate(target);
+        activeSelection.add(target);
         this._hoveredTarget = activeSelection;
         this._hoveredTargets = this.targets.concat();
       }
