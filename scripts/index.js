@@ -140,8 +140,9 @@ function exportToWebsite(options) {
 }
 
 function test(tests, debug) {
-    const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests).concat(debug ? '--debug' : '');
-    cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd });
+    const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests);
+    process.env.QUNIT_DEBUG_VISUAL_TESTS = debug;
+    cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd, env: process.env });
 }
 
 /**
@@ -262,7 +263,7 @@ program
     .addOption(new commander.Option('-s, --suite [suite...]', 'test suite to run').choices(['unit', 'visual']))
     .option('-f, --file [file]', 'run a specific test file')
     .option('-a, --all', 'run all tests', false)
-    .option('-d, --debug', 'display some debugging', false)
+    .option('-d, --debug', 'debug visual tests by overriding golden images', false)
     .option('-cc, --clear-cache', 'clear CLI test cache', false)
     .action((options) => {
         if (options.clearCache) {

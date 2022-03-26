@@ -4,8 +4,12 @@ var diff = require('deep-object-diff').diff;
 var commander = require('commander');
 
 commander.program.option('-d, --debug', 'write golden file in case of difference in visual test').action(options => {
-  QUnit.debug = options.debug;
+  QUnit.debug = QUnit.debugVisual = options.debug;
 }).parse(process.argv);
+//  for now accept an env variable because qunit doesn't allow passing unknown options
+if (process.env.QUNIT_DEBUG_VISUAL_TESTS === 'true') {
+  QUnit.debugVisual = true;
+}
 
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
