@@ -1,3 +1,5 @@
+const { groupCollapsed } = require("console");
+
 (function() {
 
 
@@ -829,26 +831,31 @@
         group = new fabric.Group([rect, rect2]);
 
     canvas.add(group);
+
     target = canvas.findTarget({
       clientX: 5, clientY: 5
     }, true);
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], undefined, 'no subtarget should return');
+
     target = canvas.findTarget({
       clientX: 30, clientY: 30
     });
     assert.equal(target, group, 'Should return the group');
     group.subTargetCheck = true;
+    group.setCoords();
     target = canvas.findTarget({
       clientX: 5, clientY: 5
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], rect, 'should return the rect');
+
     target = canvas.findTarget({
       clientX: 15, clientY: 15
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], undefined, 'no subtarget should return');
+
     target = canvas.findTarget({
       clientX: 32, clientY: 32
     });
@@ -874,7 +881,7 @@
       [rect3, rect4],
       { scaleX: 0.5, scaleY: 0.5, top: 100, left: 0 });
     group3.subTargetCheck = true;
-
+    group3.setCoords();
     var rect1 = new fabric.Rect({
       width: 100,
       height: 100,
@@ -941,9 +948,10 @@
         rect2 = makeRect({ left: 30, top:  30}), target,
         group = new fabric.Group([rect, rect2]);
 
+
+    group.subTargetCheck = true;
     canvas.add(group);
     canvas.setActiveObject(group);
-    group.subTargetCheck = true;
     target = canvas.findTarget({
       clientX: 9, clientY: 9
     });
@@ -972,9 +980,9 @@
         rect2 = makeRect({ left: 30, top:  30}), target,
         group = new fabric.Group([rect, rect2]);
     canvas.preserveObjectStacking = true;
+    group.subTargetCheck = true;
     canvas.add(group);
     canvas.setActiveObject(group);
-    group.subTargetCheck = true;
     target = canvas.findTarget({
       clientX: 9, clientY: 9
     });
