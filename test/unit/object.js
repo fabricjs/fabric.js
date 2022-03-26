@@ -425,7 +425,7 @@
 
     assert.equal(cObj.canvas, canvas, 'canvas is the main one step 2');
 
-    activeSel.destroy();
+    activeSel.removeAll();
 
     assert.equal(cObj.canvas, canvas, 'canvas is the main one step 3');
 
