@@ -97,13 +97,7 @@ fabric.Collection = {
     if (arguments.length === 0) {
       return this._objects.concat();
     }
-    var types;
-    if (arguments.length === 1) {
-      types = [arguments[0]];
-    }
-    else {
-      types = Array.from(arguments);
-    }
+    var types = Array.from(arguments);
     return this._objects.filter(function (o) {
       return types.indexOf(o.type) > -1;
     });
