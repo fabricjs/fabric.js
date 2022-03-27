@@ -97,6 +97,53 @@
         height: 300
     });
 
+    function nestedLayout(canvas, callback) {
+        var rect3 = new fabric.Rect({
+            width: 100,
+            height: 100,
+            fill: 'yellow'
+        });
+        var rect4 = new fabric.Rect({
+            width: 100,
+            height: 100,
+            left: 100,
+            top: 100,
+            fill: 'purple'
+        });
+        var group3 = new fabric.Group(
+            [rect3, rect4],
+            { scaleX: 0.5, scaleY: 0.5, top: 100, left: 0 });
+        group3.subTargetCheck = true;
+        group3.setCoords();
+        var rect1 = new fabric.Rect({
+            width: 100,
+            height: 100,
+            fill: 'red'
+        });
+        var rect2 = new fabric.Rect({
+            width: 100,
+            height: 100,
+            left: 100,
+            top: 100,
+            fill: 'blue'
+        });
+        var g = new fabric.Group([rect1, rect2, group3], { top: -150, left: -50 });
+        g.subTargetCheck = true;
+        canvas.viewportTransform = [0.1, 0, 0, 0.1, 100, 200];
+        canvas.add(g);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+
+    tests.push({
+        test: 'unit test scene',
+        code: nestedLayout,
+        golden: 'group-layout/unit-test-scene.png',
+        percentage: 0.06,
+        width: 400,
+        height: 300
+    });
+
     function fitContentLayoutChange(canvas, callback) {
         var g = createGroupForLayoutTests('fit-content layout', {
             backgroundColor: 'blue'
