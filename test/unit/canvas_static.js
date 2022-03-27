@@ -244,7 +244,7 @@
 
     assert.deepEqual(canvas.getObjects('rect'), [rect], 'should return rect only');
     assert.deepEqual(canvas.getObjects('circle'), [circle], 'should return circle only');
-    assert.deepEqual(canvas.getObjects('circle', 'rect'), [circle, rect], 'should return circle only');
+    assert.deepEqual(canvas.getObjects('circle', 'rect'), [rect, circle], 'should return rect and circle');
   });
 
   QUnit.test('getElement', function(assert) {
