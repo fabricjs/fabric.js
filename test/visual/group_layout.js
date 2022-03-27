@@ -310,7 +310,7 @@
 
     var originX = ['left', 'center', 'right'];
     var originY = ['top', 'center', 'bottom'];
-
+/*
     for (let angle = 0; angle < 360; angle += 30) {
         originX.forEach(ox => {
             originY.forEach(oy => {
@@ -329,6 +329,6 @@
             });
         });
     }
-
+*/
     tests.forEach(visualTestLoop(QUnit));
 })();
