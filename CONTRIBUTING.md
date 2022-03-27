@@ -66,7 +66,8 @@ To customize the dev server take a look at [`./scripts`](./scripts).
 You can symlink `fabric.js` and test your changes in a separate project.
 1. From `fabric.js` folder run `npm link` **OR** `yarn link`.
 1. From your project's folder run `npm link fabric` **OR** `yarn link fabric`.
-See [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link) **OR** [yarn link](https://yarnpkg.com/cli/link).
+
+See [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link) **OR** [yarn link](https://yarnpkg.com/cli/link).\
 Don't forget to unlink the package once you're done.
 
 ### Working on `fabricjs.com`
