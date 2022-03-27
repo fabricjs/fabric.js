@@ -122,7 +122,7 @@ function exportTestsToWebsite() {
 }
 
 function exportToWebsite(options) {
-    if (!options.include  || options.include .length === 0) {
+    if (!options.include  || options.include.length === 0) {
         options.include  = ['build', 'tests'];
     }
     options.include .forEach(x => {
@@ -165,7 +165,6 @@ function listTestFiles(type) {
 }
 
 function writeCLIFile(tests) {
-    fs.removeSync
     fs.writeFileSync(CLI_CACHE, JSON.stringify(tests, null, '\t'));
 }
 
@@ -262,10 +261,13 @@ program
     .command('build')
     .description('build dist')
     .option('-f, --fast')
+    .option('-w, --watch')
     .option('-x, --exclude [exclude...]')
     .option('-m, --modules [modules...]')
     .action((options) => {
-        build(options);
+        const { watch: w, ...rest } = options || {};
+        build(rest);
+        w && watch(path.resolve(wd, 'src'), () => build(rest));
     });
 
 program
