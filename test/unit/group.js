@@ -74,7 +74,7 @@
 
     assert.deepEqual(group.getObjects('rect'), [rect], 'should return rect only');
     assert.deepEqual(group.getObjects('circle'), [circle], 'should return circle only');
-    assert.deepEqual(group.getObjects('circle', 'rect'), [rect, circle], 'should return circle and rect, in the same order they are stored');
+    assert.deepEqual(group.getObjects('circle', 'rect'), [rect, circle], 'should return circle and rect, in the same order they are');
   });
 
   QUnit.test('add', function(assert) {
@@ -211,17 +211,17 @@
     var objects = [{
       version: fabric.version,
       type: 'rect',
-      left: 10,
-      top: -30,
-      width: 30,
-      height: 10,
-    }, {
-      version: fabric.version,
-      type: 'rect',
       left: -40,
       top: -10,
       width: 10,
       height: 40,
+    }, {
+      version: fabric.version,
+      type: 'rect',
+      left: 10,
+      top: -30,
+      width: 30,
+      height: 10,
     }];
     var expectedObject = {
       version: fabric.version,
