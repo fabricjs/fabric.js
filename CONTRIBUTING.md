@@ -64,9 +64,10 @@ To customize the dev server take a look at [`./scripts`](./scripts).
 
 #### symlinking
 You can symlink `fabric.js` and test your changes in a separate project.
-1. From `fabric.js` folder run `npm link`.
-1. From your project's folder run `npm link fabric`.
-See [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link).
+1. From `fabric.js` folder run `npm link` **OR** `yarn link`.
+1. From your project's folder run `npm link fabric` **OR** `yarn link fabric`.
+See [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link) **OR** [yarn link](https://yarnpkg.com/cli/link).
+Don't forget to unlink the package once you're done.
 
 ### Working on `fabricjs.com`
 
@@ -95,7 +96,7 @@ Here are a few notes you should take into account:
 
 - **Distribution files:** Do your changes only in the [source files](https://github.com/fabricjs/fabric.js/tree/master/src). Don't include the [distribution files](https://github.com/fabricjs/fabric.js/tree/master/dist) in your commit.
 
-- **Add tests**: Tests are vital - invest a little time and expand the [unit tests suite](https://github.com/fabricjs/fabric.js/tree/master/test/unit). More information about [QUnit](http://qunitjs.com/) tests can be found in the [wiki](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric#testing-fabric).
+- **Add tests**: Tests are vital - invest time to extend the [tests suites](https://github.com/fabricjs/fabric.js/tree/master/test). More information about [QUnit](http://qunitjs.com/) tests can be found in the [wiki](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric#testing-fabric).
 
 - **Add documentation:** Fabric uses [JSDoc 3] for documentation. The generated documentation can be found at [fabricjs.com](http://fabricjs.com/docs).
 
