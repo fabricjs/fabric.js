@@ -148,7 +148,11 @@
         var g = createGroupForLayoutTests('fit-content layout', {
             backgroundColor: 'blue'
         });
-        g.item(0).setX(50);
+        var point = fabric.util.transformPoint(
+            new fabric.Point(50, 0),
+            fabric.util.invertTransform(g.calcTransformMatrix())
+        );
+        g.item(0).set({ left: point.x });
         g.item(1).set({ skewX: -45 });
         g.item(2).rotate(45);
         g.triggerLayout();

@@ -436,6 +436,18 @@
     },
 
     /**
+     * @public
+     * @param {Partial<LayoutResult> & { layout?: string }} [context] pass values to use for layout calculations
+     */
+    triggerLayout: function (context) {
+      if (context && context.layout) {
+        context.prevLayout = this.layout;
+        this.layout = context.layout;
+      }
+      this._applyLayoutStrategy({ type: 'imperative', context: context });
+    },
+
+    /**
      * @private
      * @param {fabric.Object} object
      * @param {fabric.Point} diff
