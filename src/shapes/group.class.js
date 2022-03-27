@@ -639,7 +639,7 @@
 
       //  performance enhancement
       //  skip layout calculation if bbox is defined
-      if ((hasWidth && hasHeight) || context.objectsRelativeToGroup || objects.length === 0) {
+      if ((hasX && hasY && hasWidth && hasHeight && context.objectsRelativeToGroup) || objects.length === 0) {
         //  return nothing to skip layout
         return;
       }
