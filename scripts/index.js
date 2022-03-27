@@ -149,7 +149,11 @@ function test(tests, options) {
     const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests);
     process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
     process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
-    cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd, env: process.env });
+    try {
+        cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd, env: process.env });
+    } catch (error) {
+
+    }
 }
 
 /**
