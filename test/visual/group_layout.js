@@ -139,9 +139,9 @@
         test: 'unit test scene',
         code: nestedLayout,
         golden: 'group-layout/unit-test-scene.png',
-        percentage: 0.06,
-        width: 400,
-        height: 300
+        percentage: 0.01,
+        width: 120,
+        height: 210
     });
 
     function fitContentLayoutChange(canvas, callback) {
