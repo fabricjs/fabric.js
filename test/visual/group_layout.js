@@ -76,6 +76,27 @@
         height: 300
     });
 
+    function fitContentReLayout(canvas, callback) {
+        var g = createGroupForLayoutTests('fit-content layout', {
+            backgroundColor: 'blue'
+        });
+        var objects = g.removeAll();
+        //  layout
+        objects.forEach(o => g.add(o));
+        canvas.add(g);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+
+    tests.push({
+        test: 'fit-content relayout',
+        code: fitContentReLayout,
+        golden: 'group-layout/fit-content.png',
+        percentage: 0.06,
+        width: 400,
+        height: 300
+    });
+
     function fitContentLayoutChange(canvas, callback) {
         var g = createGroupForLayoutTests('fit-content layout', {
             backgroundColor: 'blue'
