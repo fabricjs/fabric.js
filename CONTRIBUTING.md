@@ -1,11 +1,5 @@
 # Contributing to Fabric
 
-1. [Questions?!?](#questions)
-2. [Issue tracker](#issue-tracker)
-3. [Issue tracker guidelines](#issue-tracker-guidelines)
-4. [Pull requests](#pull-request)
-5. [Pull request guidelines](#pull-request-guidelines)
-
 ## Questions?!?
 
 To get your questions answered, please ask/search on [Fabric's google group], [StackOverflow] or on Fabric's IRC channel (irc://irc.freenode.net/#fabric.js).
@@ -48,12 +42,29 @@ Contribute to fabricjs using a fully featured online development environment tha
 
 ### Setting up a local environment
 
-Coming Soon!
+1. Clone your fork of `fabric.js` to your machine
+1. Install dependencies: `npm i`
 
-### Working on fabricjs.com
+You can decide how you prefer to work:
+
+#### `fabricjs.com`
+You can start the dev server that runs fabric's website and test live changes.
+After setting up `fabricjs.com` on your machine run `npm start` from the `fabric.js` folder.
+This will start the dev server and watch for changes in both repositories.
+While working, you might need to refresh the page for changes to take place.
+See [Working on fabricjs.com](#working-on-fabricjscom).
+To customize the dev server take a look at [`./scripts`](./scripts).
+
+#### symlinking
+You can symlink `fabric.js` and test your changes in a separate project.
+1. From `fabric.js` folder run `npm link`.
+1. From your project's folder run `npm link fabric`.
+See [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link).
+
+### Working on `fabricjs.com`
 
 To develop fabric's site you need to clone [`fabricjs.com`](https://github.com/fabricjs/fabricjs.com) in the same parent folder of [`fabric.js`](https://github.com/fabricjs/fabric.js), so that `fabric.js` and `fabricjs.com` are siblings.
-To start the dev server run `npm start` inside the `fabricjs.com` directory (after installing dependecies).
+To start the dev server run `npm start:dev` inside the `fabricjs.com` directory (after installing dependecies).
 If you are working on windows, check out [`jekyll` docs](https://jekyllrb.com/docs/installation/) for futher instructions.
 
 **Adding a DEMO**:
@@ -89,4 +100,4 @@ Here are a few notes you should take into account:
 [fabricjs.com]: http://fabricjs.com/demos
 [fabricjs.com/docs]: http://fabricjs.com/docs
 [JSDoc 3]: http://usejsdoc.org/
-[issue]: https://github.com/kangax/fabric.js/issues
+[issue]: https://github.com/fabric/fabric.js/issues
