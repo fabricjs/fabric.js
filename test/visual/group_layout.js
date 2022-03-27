@@ -305,7 +305,7 @@
         var rect1 = new fabric.Rect({ top: 100, left: 150, width: 30, height: 10, strokeWidth: 0 }),
             rect2 = new fabric.Rect({ top: 120, left: 200, width: 10, height: 40, strokeWidth: 0 }),
             controlPoint = new fabric.Circle({ radius: 5, fill: 'blue', left: 150, top: 100, originX: 'center', originY: 'center' });
-        
+
         var g = new fabric.Group([rect1, rect2], Object.assign({}, options, {
             originX, originY, strokeWidth: 1, stroke: 'blue'
         }));
@@ -334,5 +334,5 @@
         });
     }
 */
-    tests.forEach(visualTestLoop(QUnit));
+    // tests.forEach(visualTestLoop(QUnit));
 })();
