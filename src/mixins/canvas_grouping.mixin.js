@@ -31,6 +31,7 @@
       if (target === activeObject) {
         // if it's a group, find target again, using activeGroup objects
         target = this.findTarget(e, true);
+        console.log(target)
         // if even object is not found or we are on activeObjectCorner, bail out
         if (!target || !target.selectable) {
           return;

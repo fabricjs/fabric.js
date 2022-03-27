@@ -32,7 +32,7 @@
     /**
      * @override
      */
-    subTargetCheck: false,
+    subTargetCheck: true,
 
     /**
      * @override
