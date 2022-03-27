@@ -938,7 +938,6 @@
     assert.equal(target, g, 'Should return the group 106');
     assert.equal(canvas.targets[0], rect2, 'should find the target rect2 106');
     canvas.targets = [];
-
   });
 
   QUnit.test('findTarget with subTargetCheck on activeObject', function(assert) {

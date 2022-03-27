@@ -606,20 +606,13 @@
      * @static
      * @memberOf fabric.util
      * @param {Array} elements SVG elements to group
-     * @param {Object} [options] Options object
      * @return {fabric.Object|fabric.Group}
      */
-    groupSVGElements: function(elements, options) {
+    groupSVGElements: function(elements) {
       if (elements && elements.length === 1) {
         return elements[0];
       }
-      if (options) {
-        if (!options.width || !options.height) {
-          delete options.width;
-          delete options.height;
-        }
-      }
-      return new fabric.Group(elements, options);
+      return new fabric.Group(elements);
     },
 
     /**

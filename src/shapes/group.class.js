@@ -105,7 +105,11 @@
         //  we need to preserve object's center point in relation to canvas and apply group's transform to it
         var inv = invertTransform(this.calcTransformMatrix());
         this.forEachObject(function (object) {
-          var center = transformPoint(object.getCenterPoint(), inv);
+          var t = multiplyTransformMatrices(
+            inv,
+            object.calcTransformMatrix()
+          );
+          var center = transformPoint(this.getCenterPoint(), t);
           this.enterGroup(object, false);
           object.setPositionByOrigin(center, 'center', 'center');
         }, this);
