@@ -491,7 +491,7 @@
           centerY: center.y,
           width: this.width,
           height: this.height,
-        }
+        };
       }
       else {
         //  no `result` so we return
