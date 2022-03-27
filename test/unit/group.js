@@ -208,21 +208,26 @@
     var group = makeGroupWith2Objects();
     group.includeDefaultValues = false;
     var clone = group.toObject();
-    var objects = [{
-      version: fabric.version,
-      type: 'rect',
-      left: -40,
-      top: -10,
-      width: 10,
-      height: 40,
-    }, {
-      version: fabric.version,
-      type: 'rect',
-      left: 10,
-      top: -30,
-      width: 30,
-      height: 10,
-    }];
+    var objects = [
+      {
+        version: fabric.version,
+        type: 'rect',
+        left: 10,
+        top: -30,
+        width: 30,
+        height: 10,
+        strokeWidth: 0
+      },
+      {
+        version: fabric.version,
+        type: 'rect',
+        left: -40,
+        top: -10,
+        width: 10,
+        height: 40,
+        strokeWidth: 0
+      }
+    ];
     var expectedObject = {
       version: fabric.version,
       type: 'group',
@@ -830,7 +835,7 @@
     assert.equal(rect2.scaleY, 3, 'scaleY has been scaled inverted because of angle 90');
   });
 
-  QUnit.test.skip('addRelativeToGroup and coordinates with nested groups', function(assert) {
+  QUnit.skip('addRelativeToGroup and coordinates with nested groups', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' }),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 6, angle: 90, strokeWidth: 0, fill: 'red' }),
         group0 = new fabric.Group([rect1, rect2]),
