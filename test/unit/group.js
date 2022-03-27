@@ -74,6 +74,7 @@
 
     assert.deepEqual(group.getObjects('rect'), [rect], 'should return rect only');
     assert.deepEqual(group.getObjects('circle'), [circle], 'should return circle only');
+    assert.deepEqual(group.getObjects('circle', 'rect'), [rect, circle], 'should return circle and rect, in the same order they are stored');
   });
 
   QUnit.test('add', function(assert) {
