@@ -914,34 +914,78 @@
     assert.equal(text._getLineLeftOffset(1), 0, 'like align right with rtl');
   });
 
-  QUnit.test.only('bidi', function (assert) {
-    var text = new fabric.Text('   long line of text\nshort');
-    for (let i = 0; i < text.__charBounds.length; i++) {
-      for (let j = 0; j < text.__charBounds[i].length; j++) {
-        assert.equal(text.__charBounds[i][j].dir, 'ltr');
+  /**
+   * 
+   * @param {QUnit.assert} assert 
+   * @param {string} text 
+   * @param {'ltr'|'rtl'} dir 
+   * @param {'ltr'|'rtl'|Array<'ltr'|'rtl'>} expected 
+   */
+  function assertBidi(assert, text, dir, expected) {
+    var textObj = new fabric.Text(text, { direction: dir });
+    var c = 0;
+    for (let i = 0; i < textObj.__charBounds.length; i++) {
+      for (let j = 0, len = textObj.__charBounds[i].length; j < len; j++) {
+        assert.equal(
+          textObj.__charBounds[i][j].dir,
+          Array.isArray(expected) ? expected[c] : expected,
+          `grapheme(${c},${i},${j}) = ${JSON.stringify(text[c])} dir should be equal, baseDir = ${dir}`
+        );
+        c++;
       }
     }
-    text = new fabric.Text('   long line of text\nshort', { direction: 'rtl' });
-    for (let i = 0; i < text.__charBounds.length; i++) {
-      for (let j = 0; j < text.__charBounds[i].length; j++) {
-        assert.equal(text.__charBounds[i][j].dir, 'ltr');
-      }
+    if (Array.isArray(expected)) {
+      assert.equal(expected.length, c, 'expected length mismatch');
     }
+  }
+
+  QUnit.test('bidi ltr', function (assert) {
+    var t = '   absdefg\n  hijklmnop  012 ';
+    assertBidi(assert, t, 'ltr', 'ltr');
+    assertBidi(assert, t, 'rtl', 'ltr');
   });
 
-  QUnit.test.only('bidi spaces', function (assert) {
-    var text = new fabric.Text('   \n  ');
-    for (let i = 0; i < text.__charBounds.length; i++) {
-      for (let j = 0; j < text.__charBounds[i].length; j++) {
-        assert.equal(text.__charBounds[i][j].dir, 'ltr');
-      }
-    }
-    text = new fabric.Text('   \n  ', { direction: 'rtl' });
-    for (let i = 0; i < text.__charBounds.length; i++) {
-      for (let j = 0; j < text.__charBounds[i].length; j++) {
-        assert.equal(text.__charBounds[i][j].dir, 'rtl');
-      }
-    }
+  QUnit.test('bidi rtl', function (assert) {
+    var t = '   אבגדהוזחטי\n   כלמנסע   ';
+    assertBidi(assert, t, 'ltr', 'rtl');
+    assertBidi(assert, t, 'rtl', 'rtl');
+  });
+
+  QUnit.test('bidi weak chars', function (assert) {
+    var t = '   \n ,; ';
+    assertBidi(assert, t, 'ltr', 'ltr');
+    assertBidi(assert, t, 'rtl', 'rtl');
+  });
+
+  QUnit.test('bidi', function (assert) {
+    var t = ' abc אבג ';
+    assertBidi(assert, t, 'ltr', ['ltr', 'ltr', 'ltr', 'ltr', 'ltr', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl']);
+    assertBidi(assert, t, 'rtl', ['ltr', 'ltr', 'ltr', 'ltr', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl']);
+  });
+
+  QUnit.test('bidi between', function (assert) {
+    var t = ' abc אבג אבג ';
+    assertBidi(assert, t, 'ltr', ['ltr', 'ltr', 'ltr', 'ltr', 'ltr', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl']);
+    assertBidi(assert, t, 'rtl', ['ltr', 'ltr', 'ltr', 'ltr', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl']);
+    var t = ' אבג abc abc ';
+    assertBidi(assert, t, 'ltr', ['rtl', 'rtl', 'rtl', 'rtl', 'ltr', 'ltr', 'ltr', 'ltr', 'ltr', 'ltr', 'ltr', 'ltr', 'ltr', 'ltr']);
+    assertBidi(assert, t, 'ltr', ['rtl', 'rtl', 'rtl', 'rtl', 'ltr', 'ltr', 'ltr', 'ltr', 'ltr', 'ltr', 'ltr', 'ltr', 'ltr', 'ltr']);
+  });
+
+  QUnit.test('bidi multiline', function (assert) {
+    var t = ' abc אבג \n abc אבג \n אבג abc \n   ';
+    assertBidi(assert, t, 'ltr', [
+      'ltr', 'ltr', 'ltr', 'ltr', 'ltr', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl',
+      'ltr', 'ltr', 'ltr', 'ltr', 'ltr', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl',
+      'rtl', 'rtl', 'rtl', 'rtl', 'ltr', 'ltr', 'ltr', 'ltr', 'ltr', 'ltr',
+      'ltr', 'ltr', 'ltr', 'ltr',
+    ]);
+    assertBidi(assert, t, 'rtl', [
+      'ltr', 'ltr', 'ltr', 'ltr', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl',
+      'ltr', 'ltr', 'ltr', 'ltr', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl', 'rtl',
+      'rtl', 'rtl', 'rtl', 'rtl', 'rtl', 'ltr', 'ltr', 'ltr', 'ltr', 'ltr',
+      'rtl', 'rtl', 'rtl', 'rtl',
+    ]);
   });
 
 })();
