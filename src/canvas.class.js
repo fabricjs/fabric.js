@@ -1049,7 +1049,16 @@
     },
 
     /**
+     * Returns context of top canvas where interactions are drawn
+     * @returns {CanvasRenderingContext2D}
+     */
+    getTopContext: function () {
+      return this.contextTop;
+    },
+
+    /**
      * Returns context of canvas where object selection is drawn
+     * @alias
      * @return {CanvasRenderingContext2D}
      */
     getSelectionContext: function() {

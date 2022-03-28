@@ -996,12 +996,21 @@
     /**
      * Measure and return the info of a single grapheme.
      * needs the the info of previous graphemes already filled
-     * @private
+     * Override to customize measuring
+     * 
+     * @typedef {object} GraphemeBBox
+     * @property {number} width
+     * @property {number} height
+     * @property {number} kernedWidth
+     * @property {number} left
+     * @property {number} deltaY
+     * 
      * @param {String} grapheme to be measured
      * @param {Number} position position from start
      * @param {Number} lineIndex index of the line where the char is
      * @param {Number} charIndex position in the line
      * @param {String} [prevGrapheme] character preceding the one to be measured
+     * @returns {GraphemeBBox} grapheme bbox
      */
     _getGraphemeBox: function(grapheme, position, lineIndex, charIndex, prevGrapheme, skipLeft) {
       var style = this.getCompleteStyleDeclaration(lineIndex, charIndex),
