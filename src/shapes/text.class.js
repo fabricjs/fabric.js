@@ -871,16 +871,13 @@
       }
       // this latest bound box represent the last character of the line
       // to simplify cursor handling in interactive mode.
-      var dir = graphemeInfo && graphemeInfo.dir !== 'undetermined' ? graphemeInfo.dir : this.direction;
       lineBounds[i] = {
         left: graphemeInfo ? graphemeInfo.left + graphemeInfo.width : 0,
         width: 0,
         kernedWidth: 0,
         height: this.fontSize,
-        dir: dir
+        dir: this._resolveLineDirection(lineIndex, i)
       };
-      this._resolveLineDirection(dir, lineIndex, i);
-
       if (path) {
         totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
         startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
@@ -978,7 +975,7 @@
         }
       }
       else {
-        this._resolveLineDirection(dir, lineIndex, charIndex);
+        this._resolveLineDirectionBackwards(dir, lineIndex, charIndex);
         return dir;
       }
     },
@@ -991,7 +988,7 @@
      * @param {number} charIndex position in the line
      * @returns {boolean} true if overriden any undetermined values
      */
-    _resolveLineDirection: function (dir, lineIndex, charIndex) {
+    _resolveLineDirectionBackwards: function (dir, lineIndex, charIndex) {
       var overriden = false;
       while (charIndex > 0) {
         var data = this.__charBounds[lineIndex][--charIndex];
@@ -1005,6 +1002,30 @@
         }
       }
       return overriden;
+    },
+
+    /**
+     * used at the end of a line
+     * resolves undetermined direction values for the given line
+     * @private
+     * @param {number} lineIndex index of the line where the char is
+     * @param {number} charIndex position in the line
+     * @returns {'ltr'|'rtl'} resolved direction
+     */
+    _resolveLineDirection: function (lineIndex, charIndex) {
+      var dir = 'undetermined', c = charIndex;
+      while (c > 0) {
+        var data = this.__charBounds[lineIndex][--c];
+        if (data.dir !== 'undetermined') {
+          dir = data.dir;
+          break;
+        }
+      }
+      if (dir === 'undetermined') {
+        dir = this.direction;
+      }
+      this._resolveLineDirectionBackwards(dir, lineIndex, charIndex);
+      return dir;
     },
 
     /**
