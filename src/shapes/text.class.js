@@ -956,12 +956,19 @@
           after = bidiResolver.resolve(this._text[p++]);
         }
         if (before === after) {
+          //  ewak char between 2 words with the same direction
           return before;
         }
         else if (this._reWords.test(grapheme)) {
+          //  weak char that is not a space, e.g. punctuation
           return before;
         }
+        else if (before === 'undetermined') {
+          //  space at the beiginning of text
+          return 'undetermined';
+        }
         else {
+          //  space between 2 words with different direction
           return this.direction;
         }
       }
@@ -976,6 +983,7 @@
           var data = this.__charBounds[lineIndex][charIndex];
           if (data.dir === 'undetermined') {
             data.dir = dir;
+            p--;
           }
           else {
             break;
