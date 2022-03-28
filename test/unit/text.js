@@ -914,4 +914,34 @@
     assert.equal(text._getLineLeftOffset(1), 0, 'like align right with rtl');
   });
 
+  QUnit.test.only('bidi', function (assert) {
+    var text = new fabric.Text('   long line of text\nshort');
+    for (let i = 0; i < text.__charBounds.length; i++) {
+      for (let j = 0; j < text.__charBounds[i].length; j++) {
+        assert.equal(text.__charBounds[i][j].dir, 'ltr');
+      }
+    }
+    text = new fabric.Text('   long line of text\nshort', { direction: 'rtl' });
+    for (let i = 0; i < text.__charBounds.length; i++) {
+      for (let j = 0; j < text.__charBounds[i].length; j++) {
+        assert.equal(text.__charBounds[i][j].dir, 'ltr');
+      }
+    }
+  });
+
+  QUnit.test.only('bidi spaces', function (assert) {
+    var text = new fabric.Text('   \n  ');
+    for (let i = 0; i < text.__charBounds.length; i++) {
+      for (let j = 0; j < text.__charBounds[i].length; j++) {
+        assert.equal(text.__charBounds[i][j].dir, 'ltr');
+      }
+    }
+    text = new fabric.Text('   \n  ', { direction: 'rtl' });
+    for (let i = 0; i < text.__charBounds.length; i++) {
+      for (let j = 0; j < text.__charBounds[i].length; j++) {
+        assert.equal(text.__charBounds[i][j].dir, 'rtl');
+      }
+    }
+  });
+
 })();
