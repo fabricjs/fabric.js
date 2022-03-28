@@ -837,25 +837,24 @@
      * @return {Number} Line width
      */
     measureLine: function(lineIndex) {
-      var lineInfo = this._measureLine(lineIndex);
+      var width = this._measureLine(lineIndex);
       if (this.charSpacing !== 0) {
-        lineInfo.width -= this._getWidthOfCharSpacing();
+        width -= this._getWidthOfCharSpacing();
       }
-      if (lineInfo.width < 0) {
-        lineInfo.width = 0;
+      if (width < 0) {
+        width = 0;
       }
-      return lineInfo;
+      return width;
     },
 
     /**
      * measure every grapheme of a line, populating __charBounds
      * @param {Number} lineIndex
-     * @return {Object} object.width total width of characters
-     * @return {Object} object.widthOfSpaces length of chars that match this._reSpacesAndTabs
+     * @return {Number} total width of characters
      */
     _measureLine: function(lineIndex) {
       var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
-          graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length),
+          graphemeInfo, lineBounds = new Array(line.length),
           positionInPath = 0, startingPoint, totalPathLength, path = this.path,
           reverse = this.pathSide === 'right',
           position = this._textLines.slice(0, lineIndex).reduce(function (total, line) {
@@ -881,7 +880,7 @@
         dir: dir
       };
       this._resolveLineDirection(dir, lineIndex, i);
-      
+
       if (path) {
         totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
         startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
@@ -916,7 +915,7 @@
           positionInPath += graphemeInfo.kernedWidth;
         }
       }
-      return { width: width, numOfSpaces: numOfSpaces };
+      return width;
     },
 
     /**
@@ -1484,11 +1483,7 @@
       if (this.__lineWidths[lineIndex] !== undefined) {
         return this.__lineWidths[lineIndex];
       }
-
-      var lineInfo = this.measureLine(lineIndex);
-      var width = lineInfo.width;
-      this.__lineWidths[lineIndex] = width;
-      return width;
+      return this.__lineWidths[lineIndex] = this.measureLine(lineIndex);
     },
 
     _getWidthOfCharSpacing: function() {
