@@ -15,6 +15,58 @@
     ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles' +
     ' direction path pathStartOffset pathSide pathAlign').split(' ');
 
+  var BidiResolver = fabric.util.createClass({
+
+    /**
+     * https://stackoverflow.com/questions/12006095/javascript-how-to-check-if-character-is-rtl/14824756#14824756
+     */
+    _reExplicitRTL: /^[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]+$/,
+
+    _reExplicitLTR: /^[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF]+$/,
+
+    cache: {},
+
+    /**
+     * 
+     * @param {string} grapheme 
+     * @param {boolean} [calculate] 
+     * @returns {-1|0|1} 0 for 'ltr', 1 for 'rtl, -1 for undetermined
+     */
+    test: function (grapheme, calculate) {
+      if (!calculate && this.cache[grapheme]) {
+        return this.cache[grapheme];
+      }
+      var value;
+      if (this._reExplicitRTL.test(grapheme)) {
+        value = 1;
+      }
+      else if (this._reExplicitLTR.test(grapheme)) {
+        value = 0;
+      }
+      else {
+        value = -1;
+      }
+      return this.cache[grapheme] = value;
+    },
+
+    /**
+     * 
+     * @param {string} grapheme 
+     * @returns {'ltr'|'rtl'|'undetermined'} direction
+     */
+    resolve: function (grapheme) {
+      switch (this.test(grapheme)) {
+        case 0: return 'ltr';
+        case 1: return 'rtl';
+        default: return 'undetermined';
+      }
+    }
+    
+  });
+
+  var bidiResolver = new BidiResolver();
+  
+  
   /**
    * Text class
    * @class fabric.Text
@@ -71,13 +123,6 @@
      * @private
      */
     _reWords: /\S+/g,
-
-    /**
-     * https://stackoverflow.com/questions/12006095/javascript-how-to-check-if-character-is-rtl/14824756#14824756
-     */
-    _reExplicitRTL: /^[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]+$/,
-
-    _reExplicitLTR: /^[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF]+$/,
 
     /**
      * Type of an object
@@ -319,7 +364,7 @@
      * some interesting link for the future
      * https://www.w3.org/International/questions/qa-bidi-unicode-controls
      * @since 4.5.0
-     * @type {String} 'ltr|rtl'
+     * @type {'ltr'|'rtl'}
      * @default
      */
     direction: 'ltr',
@@ -812,12 +857,15 @@
       var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
           graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length),
           positionInPath = 0, startingPoint, totalPathLength, path = this.path,
-          reverse = this.pathSide === 'right';
+          reverse = this.pathSide === 'right',
+          position = this._textLines.slice(0, lineIndex).reduce(function (total, line) {
+            return total + line.length;
+          }, 0);
 
       this.__charBounds[lineIndex] = lineBounds;
       for (i = 0; i < line.length; i++) {
         grapheme = line[i];
-        graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
+        graphemeInfo = this._getGraphemeBox(grapheme, position + i, lineIndex, i, prevGrapheme);
         lineBounds[i] = graphemeInfo;
         width += graphemeInfo.kernedWidth;
         prevGrapheme = grapheme;
@@ -829,7 +877,7 @@
         width: 0,
         kernedWidth: 0,
         height: this.fontSize,
-        dir: graphemeInfo ? graphemeInfo.dir : this._getGraphemeFallbackDirection(lineIndex, i)
+        dir: graphemeInfo && graphemeInfo.dir !== 'undetermined' ? graphemeInfo.dir : this.direction
       };
       if (path) {
         totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
@@ -887,30 +935,53 @@
       graphemeInfo.angle = info.angle + (this.pathSide ===  'right' ? Math.PI : 0);
     },
 
-    _getGraphemeDirection: function (grapheme, lineIndex, charIndex) {
-      if (this._reExplicitRTL.test(grapheme)) {
-        return 'rtl';
-      }
-      else if (this._reExplicitLTR.test(grapheme)) {
-        return 'ltr';
+    /**
+     * 
+     * @param {string} grapheme 
+     * @param {number} position index from start
+     * @param {number} lineIndex index of the line where the char is
+     * @param {number} charIndex position in the line
+     * @returns 
+     */
+    _getGraphemeDirection: function (grapheme, position, lineIndex, charIndex) {
+      var dir = bidiResolver.resolve(grapheme), p;
+      if (dir === 'undetermined') {
+        var before = 'undetermined', after = 'undetermined';
+        p = position - 1;
+        while (before === 'undetermined' && p >= 0) {
+          before = bidiResolver.resolve(this._text[p--]);
+        }
+        p = position + 1;
+        while (after === 'undetermined' && p < this._text.length) {
+          after = bidiResolver.resolve(this._text[p++]);
+        }
+        if (before === after) {
+          return before;
+        }
+        else if (this._reWords.test(grapheme)) {
+          return before;
+        }
+        else {
+          return this.direction;
+        }
       }
       else {
-        return this._getGraphemeFallbackDirection(lineIndex, charIndex);
-      }
-    },
-
-    _getGraphemeFallbackDirection: function (lineIndex, charIndex) {
-      if (lineIndex === 0 && charIndex === 0) {
-        return this.direction === 'auto' ?
-          fabric.util.getElementStyle(fabric.document.body, 'dir') || 'ltr' :
-          this.direction;
-      }
-      else if (charIndex === 0) {
-        var prevLine = this.__charBounds[lineIndex - 1];
-        return prevLine[prevLine.length - 1].dir;
-      }
-      else {
-        return this.__charBounds[lineIndex][charIndex - 1].dir;
+        p = position;
+        //  override previous undetermined values
+        while (p > 0) {
+          //  decrement charIndex/lineIndex
+          if (--charIndex < 0) {
+            charIndex = Math.max(this._textLines[--lineIndex].length - 1, 0);
+          }
+          var data = this.__charBounds[lineIndex][charIndex];
+          if (data.dir === 'undetermined') {
+            data.dir = dir;
+          }
+          else {
+            break;
+          }
+        }
+        return dir;
       }
     },
 
@@ -919,11 +990,12 @@
      * needs the the info of previous graphemes already filled
      * @private
      * @param {String} grapheme to be measured
+     * @param {Number} position position from start
      * @param {Number} lineIndex index of the line where the char is
      * @param {Number} charIndex position in the line
      * @param {String} [prevGrapheme] character preceding the one to be measured
      */
-    _getGraphemeBox: function(grapheme, lineIndex, charIndex, prevGrapheme, skipLeft) {
+    _getGraphemeBox: function(grapheme, position, lineIndex, charIndex, prevGrapheme, skipLeft) {
       var style = this.getCompleteStyleDeclaration(lineIndex, charIndex),
           prevStyle = prevGrapheme ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : { },
           info = this._measureChar(grapheme, style, prevGrapheme, prevStyle),
@@ -942,7 +1014,7 @@
         height: style.fontSize,
         kernedWidth: kernedWidth,
         deltaY: style.deltaY,
-        dir: this._getGraphemeDirection(grapheme, lineIndex, charIndex)
+        dir: this._getGraphemeDirection(grapheme, position, lineIndex, charIndex)
       };
       if (charIndex > 0 && !skipLeft) {
         var previousBox = this.__charBounds[lineIndex][charIndex - 1];
