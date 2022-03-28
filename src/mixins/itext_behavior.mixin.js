@@ -141,7 +141,6 @@
 
       this.abortCursorAnimation();
       this._currentCursorOpacity = 1;
-      clearTimeout(this._cursorTimeout2);
       if (delay) {
         this._cursorTimeout2 = setTimeout(function () {
           _this._tick();
