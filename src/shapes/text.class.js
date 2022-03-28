@@ -944,7 +944,10 @@
      */
     _getGraphemeDirection: function (grapheme, position, lineIndex, charIndex) {
       var dir = bidiResolver.resolve(grapheme);
-      if (dir === 'undetermined') {
+      if (dir === 'undetermined' && charIndex === this._textLines[lineIndex].length - 1) {
+        return this._resolveLineDirection(lineIndex, charIndex);
+      }
+      else if (dir === 'undetermined') {
         var before = 'undetermined', after = 'undetermined',
           start = position - charIndex,
           end = start + this._textLines[lineIndex].length;
