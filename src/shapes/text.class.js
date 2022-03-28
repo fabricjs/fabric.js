@@ -22,7 +22,7 @@
      */
     _reExplicitRTL: /^[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]+$/,
 
-    _reExplicitLTR: /^[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF]+$/,
+    _reExplicitLTR: /^[A-Za-z0-9\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF]+$/,
 
     cache: {},
 
@@ -872,13 +872,16 @@
       }
       // this latest bound box represent the last character of the line
       // to simplify cursor handling in interactive mode.
+      var dir = graphemeInfo && graphemeInfo.dir !== 'undetermined' ? graphemeInfo.dir : this.direction;
       lineBounds[i] = {
         left: graphemeInfo ? graphemeInfo.left + graphemeInfo.width : 0,
         width: 0,
         kernedWidth: 0,
         height: this.fontSize,
-        dir: graphemeInfo && graphemeInfo.dir !== 'undetermined' ? graphemeInfo.dir : this.direction
+        dir: dir
       };
+      this._resolveLineDirection(dir, lineIndex, i);
+      
       if (path) {
         totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
         startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
@@ -941,31 +944,34 @@
      * @param {number} position index from start
      * @param {number} lineIndex index of the line where the char is
      * @param {number} charIndex position in the line
-     * @returns 
+     * @returns {'ltr'|'rtl'|'undetermined'} direction
      */
     _getGraphemeDirection: function (grapheme, position, lineIndex, charIndex) {
-      var dir = bidiResolver.resolve(grapheme), p;
+      var dir = bidiResolver.resolve(grapheme);
       if (dir === 'undetermined') {
-        var before = 'undetermined', after = 'undetermined';
-        p = position - 1;
-        while (before === 'undetermined' && p >= 0) {
+        var before = 'undetermined', after = 'undetermined',
+          start = position - charIndex,
+          end = start + this._textLines[lineIndex].length;
+        //  check graphemes up to start of line
+        var p = position - 1;
+        while (before === 'undetermined' && p >= start) {
           before = bidiResolver.resolve(this._text[p--]);
         }
+        //  check graphemes up to end of line
         p = position + 1;
-        while (after === 'undetermined' && p < this._text.length) {
+        while (after === 'undetermined' && p < end) {
           after = bidiResolver.resolve(this._text[p++]);
         }
+        //  in case a char returns an `undetermined` dir it will be overriden by the next strong char
         if (before === after) {
-          //  ewak char between 2 words with the same direction
+          //  weak char between 2 words with the same direction
           return before;
         }
-        else if (this._reWords.test(grapheme)) {
-          //  weak char that is not a space, e.g. punctuation
+        else if (this._reWords.test(grapheme) || before === 'undetermined' || after === 'undetermined') {
+          //  1. weak char that is not a space, e.g. punctuation
+          //  2. space at the beiginning of text
+          //  3. line ending with weak chars
           return before;
-        }
-        else if (before === 'undetermined') {
-          //  space at the beiginning of text
-          return 'undetermined';
         }
         else {
           //  space between 2 words with different direction
@@ -973,24 +979,33 @@
         }
       }
       else {
-        p = position;
-        //  override previous undetermined values
-        while (p > 0) {
-          //  decrement charIndex/lineIndex
-          if (--charIndex < 0) {
-            charIndex = Math.max(this._textLines[--lineIndex].length - 1, 0);
-          }
-          var data = this.__charBounds[lineIndex][charIndex];
-          if (data.dir === 'undetermined') {
-            data.dir = dir;
-            p--;
-          }
-          else {
-            break;
-          }
-        }
+        this._resolveLineDirection(dir, lineIndex, charIndex);
         return dir;
       }
+    },
+
+    /**
+     * override previous undetermined direction values for the given line
+     * @private
+     * @param {'ltr'|'rtl'|'undetermined'} dir
+     * @param {number} lineIndex index of the line where the char is
+     * @param {number} charIndex position in the line
+     * @returns {boolean} true if overriden any undetermined values
+     */
+    _resolveLineDirection: function (dir, lineIndex, charIndex) {
+      var overriden = false;
+      while (charIndex > 0) {
+        var data = this.__charBounds[lineIndex][--charIndex];
+        if (data.dir === 'undetermined' || (data.inheritedDir && data.dir !== dir)) {
+          data.dir = dir;
+          data.inheritedDir = true;
+          overriden = true;
+        }
+        else {
+          break;
+        }
+      }
+      return overriden;
     },
 
     /**
