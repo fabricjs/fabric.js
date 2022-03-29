@@ -404,6 +404,23 @@
     }, 100);
   });
 
+  QUnit.test('animate with delay', function (assert) {
+    var done = assert.async();
+    var object = new fabric.Object({ left: 123, top: 124 });
+    var started = false;
+    var t = new Date();
+    var abort = object._animate('left', 223, {
+      onStart: function () {
+        started = true;
+        assert.gte(new Date() - t, 500, 'animation delay');
+        return false;
+      },
+      onComplete: done,
+      delay: 500
+    });
+    assert.ok(started === false);
+  });
+
   QUnit.test('animate easing easeInQuad', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.util.ease.easeInQuad === 'function');
