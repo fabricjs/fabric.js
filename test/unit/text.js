@@ -187,7 +187,7 @@
   QUnit.test('fabric.Text.fromObject', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Text.fromObject === 'function');
-    fabric.Text.fromObject(REFERENCE_TEXT_OBJECT, function(text) {
+    fabric.Text.fromObject(REFERENCE_TEXT_OBJECT).then(function(text) {
       assert.deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
       done();
     });
@@ -860,7 +860,7 @@
       path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
     });
     var toObject = text.toObject();
-    fabric.Text.fromObject(toObject, function(text) {
+    fabric.Text.fromObject(toObject).then(function(text) {
       assert.equal(text.path.type, 'path', 'the path is restored');
       assert.ok(text.path instanceof fabric.Path, 'the path is a path');
       assert.ok(toObject.path, 'the input has still a path property');

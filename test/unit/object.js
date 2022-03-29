@@ -357,9 +357,10 @@
   });
 
   QUnit.test('clone', function(assert) {
+    var done = assert.async();
     var cObj = new fabric.Object({ left: 123, top: 456, opacity: 0.66 });
     assert.ok(typeof cObj.clone === 'function');
-    cObj.clone(function(clone) {
+    cObj.clone().then(function(clone) {
       assert.equal(clone.get('left'), 123);
       assert.equal(clone.get('top'), 456);
       assert.equal(clone.get('opacity'), 0.66);
@@ -370,32 +371,27 @@
       assert.equal(cObj.get('left'), 123);
       assert.equal(cObj.get('scaleX'), 1);
       assert.equal(cObj.get('angle'), 0);
+      done();
     });
   });
 
   QUnit.test('cloneAsImage', function(assert) {
-    var done = assert.async();
     var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
     assert.ok(typeof cObj.cloneAsImage === 'function');
-    cObj.cloneAsImage(function(image) {
-      assert.ok(image);
-      assert.ok(image instanceof fabric.Image);
-      assert.equal(image.width, 100, 'the image has same dimension of object');
-      done();
-    });
+    var image = cObj.cloneAsImage();
+    assert.ok(image);
+    assert.ok(image instanceof fabric.Image);
+    assert.equal(image.width, 100, 'the image has same dimension of object');
   });
 
   QUnit.test('cloneAsImage with retina scaling enabled', function(assert) {
-    var done = assert.async();
     var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
     fabric.devicePixelRatio = 2;
-    cObj.cloneAsImage(function(image) {
-      assert.ok(image);
-      assert.ok(image instanceof fabric.Image);
-      assert.equal(image.width, 200, 'the image has been scaled by retina');
-      fabric.devicePixelRatio = 1;
-      done();
-    }, { enableRetinaScaling: true });
+    var image = cObj.cloneAsImage({ enableRetinaScaling: true });
+    assert.ok(image);
+    assert.ok(image instanceof fabric.Image);
+    assert.equal(image.width, 200, 'the image has been scaled by retina');
+    fabric.devicePixelRatio = 1;
   });
 
   QUnit.test('toCanvasElement', function(assert) {
@@ -498,6 +494,8 @@
     cObj = new fabric.Rect();
     assert.ok(cObj.isType('rect'));
     assert.ok(!cObj.isType('object'));
+    assert.ok(cObj.isType('object', 'rect'));
+    assert.ok(!cObj.isType('object', 'circle'));
   });
 
   QUnit.test('toggle', function(assert) {
@@ -569,13 +567,13 @@
 
     var callbacks = { onComplete: onComplete, onChange: onChange };
     assert.ok(typeof object.fxStraighten === 'function');
-    assert.equal(object.fxStraighten(callbacks), object, 'should be chainable');
+    assert.ok(typeof object.fxStraighten(callbacks) === 'function', 'should return animation abort function');
     assert.equal(fabric.util.toFixed(object.get('angle'), 0), 43);
     setTimeout(function(){
       assert.ok(onCompleteFired);
       assert.ok(onChangeFired);
       assert.equal(object.get('angle'), 0, 'angle should be set to 0 by the end of animation');
-      assert.equal(object.fxStraighten(), object, 'should work without callbacks');
+      assert.ok(typeof object.fxStraighten() === 'function', 'should work without callbacks');
       done();
     }, 1000);
   });
@@ -810,7 +808,8 @@
     canvas.setZoom(3);
     canvas.add(object);
     var objectScale = object.getTotalObjectScaling();
-    assert.deepEqual(objectScale, { scaleX: object.scaleX * 3, scaleY: object.scaleY * 3 });
+    assert.ok(objectScale instanceof fabric.Point);
+    assert.deepEqual(objectScale, new fabric.Point(object.scaleX * 3, object.scaleY * 3));
   });
 
   QUnit.test('getTotalObjectScaling with retina', function(assert) {
@@ -819,13 +818,15 @@
     fabric.devicePixelRatio = 4;
     canvas.add(object);
     var objectScale = object.getTotalObjectScaling();
-    assert.deepEqual(objectScale, { scaleX: object.scaleX * 4, scaleY: object.scaleY * 4 });
+    assert.ok(objectScale instanceof fabric.Point);
+    assert.deepEqual(objectScale, new fabric.Point(object.scaleX * 4, object.scaleY * 4));
   });
 
   QUnit.test('getObjectScaling', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2});
     var objectScale = object.getObjectScaling();
-    assert.deepEqual(objectScale, {scaleX: object.scaleX, scaleY: object.scaleY});
+    assert.ok(objectScale instanceof fabric.Point);
+    assert.deepEqual(objectScale, new fabric.Point(object.scaleX, object.scaleY));
   });
 
   QUnit.test('getObjectScaling in group', function(assert) {
@@ -835,10 +836,11 @@
     group.scaleY = 2;
     object.group = group;
     var objectScale = object.getObjectScaling();
-    assert.deepEqual(objectScale, {
-      scaleX: object.scaleX * group.scaleX,
-      scaleY: object.scaleY * group.scaleY
-    });
+    assert.ok(objectScale instanceof fabric.Point);
+    assert.deepEqual(objectScale, new fabric.Point(
+      object.scaleX * group.scaleX,
+      object.scaleY * group.scaleY
+    ));
   });
 
   QUnit.test('getObjectScaling in group with object rotated', function(assert) {
@@ -848,12 +850,10 @@
     group.scaleY = 3;
     object.group = group;
     var objectScale = object.getObjectScaling();
-    objectScale.scaleX = objectScale.scaleX.toFixed(3);
-    objectScale.scaleY = objectScale.scaleY.toFixed(3);
-    assert.deepEqual(objectScale, {
-      scaleX: '7.649',
-      scaleY: '4.707',
-    });
+    assert.deepEqual(
+      new fabric.Point(Math.round(objectScale.x * 1000) / 1000, Math.round(objectScale.y * 1000) / 1000),
+      new fabric.Point(7.649, 4.707)
+    );
   });
 
   QUnit.test('dirty flag on set property', function(assert) {
@@ -1204,5 +1204,13 @@
     assert.equal(object.hasFill(), false, 'without a color, hasFill is false');
     object.fill = 'transparent';
     assert.equal(object.hasFill(), false, 'with a color that is transparent, hasFill is true');
+  });
+  QUnit.test('dispose', function (assert) {
+    var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });
+    assert.ok(typeof object.dispose === 'function');
+    object.animate('fill', 'red');
+    assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, 1, 'runningAnimations should include the animation');
+    object.dispose();
+    assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, 0, 'runningAnimations should be empty after dispose');
   });
 })();

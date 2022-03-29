@@ -23,17 +23,6 @@
     assert.ok(pattern instanceof fabric.Pattern, 'should inherit from fabric.Pattern');
   });
 
-  QUnit.test('constructor with source string and with callback', function(assert) {
-    var done = assert.async();
-    function callback(pattern) {
-      assert.equal(pattern.source.complete, true, 'pattern source has been loaded');
-      done();
-    }
-    new fabric.Pattern({
-      source: IMG_SRC
-    }, callback);
-  });
-
   QUnit.test('properties', function(assert) {
     var pattern = createPattern();
     assert.equal(pattern.source, img);
@@ -85,14 +74,18 @@
   });
 
   QUnit.test('fromObject with crossOrigin', function(assert) {
-    var pattern = new fabric.Pattern({
+    var done = assert.async();
+    fabric.Pattern.fromObject({
       source: IMG_SRC,
-      crossOrigin: 'anonymous'
+      crossOrigin: 'anonymous',
+      type: 'pattern',
+    }).then(function(patternEnlived) {
+      var object = patternEnlived.toObject();
+      fabric.Pattern.fromObject(object).then(function(patternAgain) {
+        assert.equal(patternAgain.crossOrigin, 'anonymous');
+        done();
+      });
     });
-
-    var object = pattern.toObject();
-    var pattern2 = new fabric.Pattern(object);
-    assert.equal(pattern2.crossOrigin, 'anonymous');
   });
 
   QUnit.test('toLive', function(assert) {
@@ -100,19 +93,21 @@
     var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
     var patternHTML = canvas.contextContainer.createPattern(img, 'repeat');
     assert.ok(typeof pattern.toLive === 'function');
-
     var created = pattern.toLive(canvas.contextContainer);
     assert.equal(created.toString(), patternHTML.toString(), 'is a pattern');
   });
 
   QUnit.test('pattern serialization / deserialization (image source)', function(assert) {
+    var done = assert.async();
     var pattern = createPattern();
     var obj = pattern.toObject();
 
     // node-canvas doesn't give <img> "src"
-    var patternDeserialized = new fabric.Pattern(obj);
-    assert.equal(typeof patternDeserialized.source, 'object');
-    assert.equal(patternDeserialized.repeat, 'repeat');
+    fabric.Pattern.fromObject(obj).then(function(patternDeserialized) {
+      assert.equal(typeof patternDeserialized.source, 'object');
+      assert.equal(patternDeserialized.repeat, 'repeat');
+      done();
+    });
   });
 
   QUnit.test('toSVG', function(assert) {
@@ -167,12 +162,17 @@
   });
 
   QUnit.test('initPattern from object', function(assert) {
-    var fillObj = {
-      type: 'pattern',
-      source: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=='
-    };
-    var obj = new fabric.Object({ fill: fillObj });
-    assert.ok(obj.fill instanceof fabric.Pattern, 'the pattern is enlived');
+    var done = assert.async();
+    var rectObj = {
+      fill: {
+        type: 'pattern',
+        source: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=='
+      }
+    }
+    var obj = fabric.Rect.fromObject(rectObj).then(function(obj){
+      assert.ok(obj.fill instanceof fabric.Pattern, 'the pattern is enlived');
+      done();
+    });
   });
 
 })();

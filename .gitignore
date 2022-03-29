@@ -1,5 +1,6 @@
 .DS_Store
 *.iml
+change-output.md
 /.nyc_output/
 /.vscode/
 /node_modules/
@@ -9,3 +10,4 @@ before_commit
 .idea/
 /dist/fabric.require.js
 /dist/fabric.min.js.gz
+/scripts/cli_cache.json

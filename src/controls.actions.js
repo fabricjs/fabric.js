@@ -24,7 +24,9 @@
    * @return {Number} 0 - 7 a quadrant number
    */
   function findCornerQuadrant(fabricObject, control) {
-    var cornerAngle = fabricObject.angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
+    //  angle is relative to canvas plane
+    var angle = fabricObject.getTotalAngle();
+    var cornerAngle = angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
     return Math.round((cornerAngle % 360) / 45);
   }
 
@@ -193,7 +195,7 @@
    */
   function wrapWithFixedAnchor(actionHandler) {
     return function(eventData, transform, x, y) {
-      var target = transform.target, centerPoint = target.getCenterPoint(),
+      var target = transform.target, centerPoint = target.getRelativeCenterPoint(),
           constraint = target.translateToOriginPoint(centerPoint, transform.originX, transform.originY),
           actionPerformed = actionHandler(eventData, transform, x, y);
       target.setPositionByOrigin(constraint, transform.originX, transform.originY);
@@ -231,7 +233,7 @@
         control = target.controls[transform.corner],
         zoom = target.canvas.getZoom(),
         padding = target.padding / zoom,
-        localPoint = target.toLocalPoint(new fabric.Point(x, y), originX, originY);
+        localPoint = target.normalizePoint(new fabric.Point(x, y), originX, originY);
     if (localPoint.x >= padding) {
       localPoint.x -= padding;
     }
@@ -277,7 +279,7 @@
   function skewObjectX(eventData, transform, x, y) {
     var target = transform.target,
         // find how big the object would be, if there was no skewX. takes in account scaling
-        dimNoSkew = target._getTransformedDimensions(0, target.skewY),
+        dimNoSkew = target._getTransformedDimensions({ skewX: 0, skewY: target.skewY }),
         localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         // the mouse is in the center of the object, and we want it to stay there.
         // so the object will grow twice as much as the mouse.
@@ -320,7 +322,7 @@
   function skewObjectY(eventData, transform, x, y) {
     var target = transform.target,
         // find how big the object would be, if there was no skewX. takes in account scaling
-        dimNoSkew = target._getTransformedDimensions(target.skewX, 0),
+        dimNoSkew = target._getTransformedDimensions({ skewX: target.skewX, skewY: 0 }),
         localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
         // the mouse is in the center of the object, and we want it to stay there.
         // so the object will grow twice as much as the mouse.
@@ -469,7 +471,7 @@
   function rotationWithSnapping(eventData, transform, x, y) {
     var t = transform,
         target = t.target,
-        pivotPoint = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY);
+        pivotPoint = target.translateToOriginPoint(target.getRelativeCenterPoint(), t.originX, t.originY);
 
     if (target.lockRotation) {
       return false;
@@ -688,9 +690,10 @@
         strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
         multiplier = isTransformCentered(transform) ? 2 : 1,
         oldWidth = target.width,
-        newWidth = Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding;
+        newWidth = Math.ceil(Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding);
     target.set('width', Math.max(newWidth, 0));
-    return oldWidth !== newWidth;
+    //  check against actual target width in case `newWidth` was rejected
+    return oldWidth !== target.width;
   }
 
   /**

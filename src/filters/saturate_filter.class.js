@@ -47,7 +47,7 @@
      * Saturation value, from -1 to 1.
      * Increases/decreases the color saturation.
      * A value of 0 has no effect.
-     * 
+     *
      * @param {Number} saturation
      * @default
      */
@@ -108,11 +108,10 @@
   });
 
   /**
-   * Returns filter instance from an object representation
+   * Create filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @param {Function} [callback] to be invoked after filter creation
-   * @return {fabric.Image.filters.Saturation} Instance of fabric.Image.filters.Saturate
+   * @returns {Promise<fabric.Image.filters.Saturation>}
    */
   fabric.Image.filters.Saturation.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 

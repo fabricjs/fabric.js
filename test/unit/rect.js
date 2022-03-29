@@ -74,14 +74,14 @@
     var done = assert.async();
     assert.ok(typeof fabric.Rect.fromObject === 'function');
 
-    fabric.Rect.fromObject(REFERENCE_RECT, function(rect) {
+    return fabric.Rect.fromObject(REFERENCE_RECT).then(function(rect) {
       assert.ok(rect instanceof fabric.Rect);
       assert.deepEqual(rect.toObject(), REFERENCE_RECT);
 
       var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
       expectedObject.fill = {type: 'linear',coords: {x1: 0,y1: 0,x2: 200,y2: 0},colorStops: [{offset: '0',color: 'rgb(255,0,0)',opacity: 1},{offset: '1',color: 'rgb(0,0,255)',opacity: 1}],offsetX: 0,offsetY: 0};
       expectedObject.stroke = {type: 'linear',coords: {x1: 0,y1: 0,x2: 200,y2: 0},colorStops: [{offset: '0',color: 'rgb(255,0,0)',opacity: 1},{offset: '1',color: 'rgb(0,0,255)',opacity: 1}],offsetX: 0,offsetY: 0};
-      fabric.Rect.fromObject(expectedObject, function(rect2) {
+      return fabric.Rect.fromObject(expectedObject).then(function(rect2) {
         assert.ok(rect2.fill instanceof fabric.Gradient);
         assert.ok(rect2.stroke instanceof fabric.Gradient);
         done();
@@ -95,7 +95,7 @@
       type: 'pattern',
       source: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=='
     };
-    fabric.Rect.fromObject({ fill: fillObj }, function(rect) {
+    fabric.Rect.fromObject({ fill: fillObj }).then(function(rect) {
       assert.ok(rect.fill instanceof fabric.Pattern);
       done();
     });
@@ -164,10 +164,12 @@
   });
 
   QUnit.test('clone with rounded corners', function(assert) {
+    var done = assert.async();
     var rect = new fabric.Rect({ width: 100, height: 100, rx: 20, ry: 30 });
-    rect.clone(function(clone) {
+    rect.clone().then(function(clone) {
       assert.equal(clone.get('rx'), rect.get('rx'));
       assert.equal(clone.get('ry'), rect.get('ry'));
+      done();
     });
   });
 

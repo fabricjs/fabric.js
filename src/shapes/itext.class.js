@@ -1,14 +1,4 @@
 (function() {
-
-  function parseDecoration(object) {
-    if (object.textDecoration) {
-      object.textDecoration.indexOf('underline') > -1 && (object.underline = true);
-      object.textDecoration.indexOf('line-through') > -1 && (object.linethrough = true);
-      object.textDecoration.indexOf('overline') > -1 && (object.overline = true);
-      delete object.textDecoration;
-    }
-  }
-
   /**
    * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
    * prefix when observing canvas.
@@ -507,17 +497,9 @@
    * @static
    * @memberOf fabric.IText
    * @param {Object} object Object to create an instance from
-   * @param {function} [callback] invoked with new instance as argument
+   * @returns {Promise<fabric.IText>}
    */
-  fabric.IText.fromObject = function(object, callback) {
-    parseDecoration(object);
-    if (object.styles) {
-      for (var i in object.styles) {
-        for (var j in object.styles[i]) {
-          parseDecoration(object.styles[i][j]);
-        }
-      }
-    }
-    fabric.Object._fromObject('IText', object, callback, 'text');
+  fabric.IText.fromObject = function(object) {
+    return fabric.Object._fromObject(fabric.IText, object, 'text');
   };
 })();

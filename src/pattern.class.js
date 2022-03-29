@@ -51,30 +51,18 @@
      */
     patternTransform: null,
 
+    type: 'pattern',
+
     /**
      * Constructor
      * @param {Object} [options] Options object
-     * @param {Function} [callback] function to invoke after callback init.
+     * @param {option.source} [source] the pattern source, eventually empty or a drawable
      * @return {fabric.Pattern} thisArg
      */
-    initialize: function(options, callback) {
+    initialize: function(options) {
       options || (options = { });
-
       this.id = fabric.Object.__uid++;
       this.setOptions(options);
-      if (!options.source || (options.source && typeof options.source !== 'string')) {
-        callback && callback(this);
-        return;
-      }
-      else {
-        // img src string
-        var _this = this;
-        this.source = fabric.util.createImage();
-        fabric.util.loadImage(options.source, function(img, isError) {
-          _this.source = img;
-          callback && callback(_this, isError);
-        }, null, this.crossOrigin);
-      }
     },
 
     /**
@@ -186,4 +174,13 @@
       return ctx.createPattern(source, this.repeat);
     }
   });
+
+  fabric.Pattern.fromObject = function(object) {
+    var patternOptions = Object.assign({}, object);
+    return fabric.util.loadImage(object.source, { crossOrigin: object.crossOrigin })
+      .then(function(img) {
+        patternOptions.source = img;
+        return new fabric.Pattern(patternOptions);
+      });
+  };
 })();

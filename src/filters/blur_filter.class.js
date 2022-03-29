@@ -73,6 +73,8 @@
      * blur value, in percentage of image dimensions.
      * specific to keep the image blur constant at different resolutions
      * range between 0 and 1.
+     * @type Number
+     * @default
      */
     blur: 0,
 
@@ -208,7 +210,10 @@
   });
 
   /**
-   * Deserialize a JSON definition of a BlurFilter into a concrete instance.
+   * Create filter instance from an object representation
+   * @static
+   * @param {Object} object Object to create an instance from
+   * @returns {Promise<fabric.Image.filters.Blur>}
    */
   filters.Blur.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 

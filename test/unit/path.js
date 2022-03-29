@@ -209,7 +209,7 @@
   QUnit.test('path array not shared when cloned', function(assert) {
     var done = assert.async();
     makePathObject(function(originalPath) {
-      originalPath.clone(function(clonedPath) {
+      originalPath.clone().then(function(clonedPath) {
         clonedPath.path[0][1] = 200;
         assert.equal(originalPath.path[0][1], 100);
         done();
@@ -250,7 +250,7 @@
   QUnit.test('fromObject', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Path.fromObject === 'function');
-    fabric.Path.fromObject(REFERENCE_PATH_OBJECT, function(path) {
+    fabric.Path.fromObject(REFERENCE_PATH_OBJECT).then(function(path) {
       assert.ok(path instanceof fabric.Path);
       assert.deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
       done();
@@ -260,7 +260,7 @@
   QUnit.test('fromObject with sourcePath', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Path.fromObject === 'function');
-    fabric.Path.fromObject(REFERENCE_PATH_OBJECT, function(path) {
+    fabric.Path.fromObject(REFERENCE_PATH_OBJECT).then(function(path) {
       assert.ok(path instanceof fabric.Path);
       assert.deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
       done();

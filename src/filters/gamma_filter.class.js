@@ -125,11 +125,10 @@
   });
 
   /**
-   * Returns filter instance from an object representation
+   * Create filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @param {function} [callback] to be invoked after filter creation
-   * @return {fabric.Image.filters.Gamma} Instance of fabric.Image.filters.Gamma
+   * @returns {Promise<fabric.Image.filters.Gamma>}
    */
   fabric.Image.filters.Gamma.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 
