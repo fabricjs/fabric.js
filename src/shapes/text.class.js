@@ -22,14 +22,15 @@
      */
     _reExplicitRTL: /^[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]+$/,
 
+    // eslint-disable-next-line max-len
     _reExplicitLTR: /^[A-Za-z0-9\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF]+$/,
 
     cache: {},
 
     /**
-     * 
-     * @param {string} grapheme 
-     * @param {boolean} [calculate] 
+     *
+     * @param {string} grapheme
+     * @param {boolean} [calculate]
      * @returns {-1|0|1} 0 for 'ltr', 1 for 'rtl, -1 for undetermined
      */
     test: function (grapheme, calculate) {
@@ -50,8 +51,8 @@
     },
 
     /**
-     * 
-     * @param {string} grapheme 
+     *
+     * @param {string} grapheme
      * @returns {'ltr'|'rtl'|'undetermined'} direction
      */
     resolve: function (grapheme) {
@@ -61,12 +62,12 @@
         default: return 'undetermined';
       }
     }
-    
+
   });
 
   var bidiResolver = new BidiResolver();
-  
-  
+
+
   /**
    * Text class
    * @class fabric.Text
@@ -932,8 +933,8 @@
     },
 
     /**
-     * 
-     * @param {string} grapheme 
+     *
+     * @param {string} grapheme
      * @param {number} lineIndex index of the line where the char is
      * @param {number} charIndex position in the line
      * @returns {'ltr'|'rtl'|'undetermined'} direction
@@ -1029,14 +1030,14 @@
      * Measure and return the info of a single grapheme.
      * needs the the info of previous graphemes already filled
      * Override to customize measuring
-     * 
+     *
      * @typedef {object} GraphemeBBox
      * @property {number} width
      * @property {number} height
      * @property {number} kernedWidth
      * @property {number} left
      * @property {number} deltaY
-     * 
+     *
      * @param {String} grapheme to be measured
      * @param {Number} lineIndex index of the line where the char is
      * @param {Number} charIndex position in the line

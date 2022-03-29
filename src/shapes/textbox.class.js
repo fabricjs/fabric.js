@@ -282,7 +282,7 @@
      * It gets called when charBounds are not available yet.
      * Override if necessary
      * Use with {@link fabric.Textbox#wordSplit}
-     * 
+     *
      * @param {CanvasRenderingContext2D} ctx
      * @param {String} text
      * @param {number} lineIndex
@@ -350,7 +350,7 @@
         return { word: word, width: width };
       }.bind(this));
       var maxWidth = Math.max(desiredWidth, largestWordWidth, this.dynamicMinWidth);
-      // layout words 
+      // layout words
       offset = 0;
       for (var i = 0; i < words.length; i++) {
         word = data[i].word;
