@@ -856,15 +856,12 @@
       var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
           graphemeInfo, lineBounds = new Array(line.length),
           positionInPath = 0, startingPoint, totalPathLength, path = this.path,
-          reverse = this.pathSide === 'right',
-          position = this._textLines.slice(0, lineIndex).reduce(function (total, line) {
-            return total + line.length;
-          }, 0);
+          reverse = this.pathSide === 'right';
 
       this.__charBounds[lineIndex] = lineBounds;
       for (i = 0; i < line.length; i++) {
         grapheme = line[i];
-        graphemeInfo = this._getGraphemeBox(grapheme, line, position + i, lineIndex, i, prevGrapheme);
+        graphemeInfo = this._getGraphemeBox(grapheme, line, lineIndex, i, prevGrapheme);
         lineBounds[i] = graphemeInfo;
         width += graphemeInfo.kernedWidth;
         prevGrapheme = grapheme;
@@ -937,12 +934,11 @@
     /**
      * 
      * @param {string} grapheme 
-     * @param {number} position index from start
      * @param {number} lineIndex index of the line where the char is
      * @param {number} charIndex position in the line
      * @returns {'ltr'|'rtl'|'undetermined'} direction
      */
-    _getGraphemeDirection: function (grapheme, line, position, lineIndex, charIndex) {
+    _getGraphemeDirection: function (grapheme, line, lineIndex, charIndex) {
       var dir = bidiResolver.resolve(grapheme);
       if (dir === 'undetermined' && charIndex === line.length - 1) {
         return this._resolveLineDirection(lineIndex, charIndex);
@@ -1042,13 +1038,12 @@
      * @property {number} deltaY
      * 
      * @param {String} grapheme to be measured
-     * @param {Number} position position from start
      * @param {Number} lineIndex index of the line where the char is
      * @param {Number} charIndex position in the line
      * @param {String} [prevGrapheme] character preceding the one to be measured
      * @returns {GraphemeBBox} grapheme bbox
      */
-    _getGraphemeBox: function(grapheme, line, position, lineIndex, charIndex, prevGrapheme, skipLeft) {
+    _getGraphemeBox: function(grapheme, line, lineIndex, charIndex, prevGrapheme, skipLeft) {
       var style = this.getCompleteStyleDeclaration(lineIndex, charIndex),
           prevStyle = prevGrapheme ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : { },
           info = this._measureChar(grapheme, style, prevGrapheme, prevStyle),
@@ -1067,7 +1062,7 @@
         height: style.fontSize,
         kernedWidth: kernedWidth,
         deltaY: style.deltaY,
-        dir: this._getGraphemeDirection(grapheme, line, position, lineIndex, charIndex)
+        dir: this._getGraphemeDirection(grapheme, line, lineIndex, charIndex)
       };
       if (charIndex > 0 && !skipLeft) {
         var previousBox = this.__charBounds[lineIndex][charIndex - 1];

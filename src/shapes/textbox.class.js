@@ -268,11 +268,10 @@
      * @returns {Array} Array of lines
      */
     _wrapText: function(lines, desiredWidth) {
-      var wrapped = [], i, position = 0;
+      var wrapped = [], i;
       this.isWrapping = true;
       for (i = 0; i < lines.length; i++) {
-        wrapped.push.apply(wrapped, this._wrapLine(lines[i], position, i, desiredWidth));
-        position += lines[i].length;
+        wrapped.push.apply(wrapped, this._wrapLine(lines[i], i, desiredWidth));
       }
       this.isWrapping = false;
       return wrapped;
@@ -286,16 +285,15 @@
      * 
      * @param {CanvasRenderingContext2D} ctx
      * @param {String} text
-     * @param {number} position index from start
      * @param {number} lineIndex
      * @param {number} charOffset
      * @returns {number}
      */
-    _measureWord: function (word, line, position, lineIndex, charOffset) {
+    _measureWord: function (word, line, lineIndex, charOffset) {
       var width = 0, prevGrapheme, skipLeft = true;
       charOffset = charOffset || 0;
       for (var i = 0, len = word.length; i < len; i++) {
-        var box = this._getGraphemeBox(word[i], line, position + i, lineIndex, charOffset + i, prevGrapheme, skipLeft);
+        var box = this._getGraphemeBox(word[i], line, lineIndex, charOffset + i, prevGrapheme, skipLeft);
         width += box.kernedWidth;
         prevGrapheme = word[i];
       }
@@ -315,14 +313,13 @@
     /**
      * Wraps a line of text using the width of the Textbox and a context.
      * @param {Array} line The grapheme array that represent the line
-     * @param {Number} position char index from start
      * @param {Number} lineIndex
      * @param {Number} desiredWidth width you want to wrap the line to
      * @param {Number} reservedSpace space to remove from wrapping for custom functionalities
      * @returns {Array} Array of line(s) into which the given text is wrapped
      * to.
      */
-    _wrapLine: function (_line, position, lineIndex, desiredWidth, reservedSpace) {
+    _wrapLine: function (_line, lineIndex, desiredWidth, reservedSpace) {
       var lineWidth = 0,
           splitByGrapheme = this.splitByGrapheme,
           graphemeLines = [],
@@ -347,7 +344,7 @@
       var data = words.map(function (word) {
         // if using splitByGrapheme words are already in graphemes.
         word = splitByGrapheme ? word : this.graphemeSplit(word);
-        var width = this._measureWord(word, _line, position + offset, lineIndex, offset);
+        var width = this._measureWord(word, _line, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
         offset += word.length + 1;
         return { word: word, width: width };
@@ -376,7 +373,7 @@
         }
         line = line.concat(word);
 
-        infixWidth = splitByGrapheme ? 0 : this._measureWord([infix], infix, position + offset, lineIndex, 0);
+        infixWidth = splitByGrapheme ? 0 : this._measureWord([infix], infix, lineIndex, 0);
         offset++;
         lineJustStarted = false;
       }
