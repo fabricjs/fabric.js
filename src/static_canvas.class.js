@@ -314,7 +314,9 @@
         this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
       }
       if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
+        /* _DEV_MODE_START_ */
         throw new Error('fabric.js: trying to initialize a canvas that has already been initialized');
+        /* _DEV_MODE_END_ */
       }
       fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
       this.lowerCanvasEl.setAttribute('data-fabric', 'main');
