@@ -309,9 +309,7 @@
      */
     _renderOverlay: function (ctx) {
       __renderOverlay.call(this, ctx);
-      if (this.isErasing() && !this.freeDrawingBrush.inverted) {
-        this.freeDrawingBrush._render();
-      }
+      this.isErasing() && this.freeDrawingBrush._render();
     }
   });
 
@@ -361,12 +359,12 @@
 
       /**
        * @private
-       * This is designed to support erasing a collection with both erasable and non-erasable objects.
-       * Iterates over collections to allow nested selective erasing.
-       * Prepares the pattern brush that will draw on the top context to achieve the desired visual effect.
-       * If brush is **NOT** inverted render all non-erasable objects.
-       * If brush is inverted render all erasable objects that have been erased with their clip path inverted.
-       * This will render the erased parts as if they were not erased.
+       * This is designed to support erasing a collection with both erasable and non-erasable objects while maintaining object stacking.\
+       * Iterates over collections to allow nested selective erasing.\
+       * Prepares objects before rendering the pattern brush.\
+       * If brush is **NOT** inverted render all non-erasable objects.\
+       * If brush is inverted render all objects, erasable objects without their eraser.
+       * This will render the erased parts as if they were not erased in the first place, achieving an undo effect.
        *
        * @param {fabric.Collection} collection
        * @param {CanvasRenderingContext2D} ctx
@@ -385,29 +383,22 @@
             restorationContext.visibility.push(obj);
             restorationContext.collection.push(collection);
           }
-          else if (this.inverted && obj.visible) {
-            //  render only erasable objects that were erased
-            if (obj.erasable && obj.eraser) {
-              obj.eraser.inverted = true;
-              obj.dirty = true;
-              collection.dirty = true;
-              restorationContext.eraser.push(obj);
-              restorationContext.collection.push(collection);
-            }
-            else {
-              obj.visible = false;
-              collection.dirty = true;
-              restorationContext.visibility.push(obj);
-              restorationContext.collection.push(collection);
-            }
+          else if (this.inverted && obj.erasable && obj.eraser && obj.visible) {
+            //  render all objects without eraser
+            var eraser = obj.eraser;
+            obj.eraser = undefined;
+            obj.dirty = true;
+            collection.dirty = true;
+            restorationContext.eraser.push([obj, eraser]);
+            restorationContext.collection.push(collection);
           }
         }, this);
       },
 
       /**
        * Prepare the pattern for the erasing brush
-       * This pattern will be drawn on the top context, achieving a visual effect of erasing only erasable objects
-       * @todo decide how overlay color should behave when `inverted === true`, currently draws over it which is undesirable
+       * This pattern will be drawn on the top context after clipping the main context, 
+       * achieving a visual effect of erasing only erasable objects
        * @private
        */
       preparePattern: function () {
@@ -431,11 +422,17 @@
           this.canvas._renderBackground(patternCtx);
           if (bgErasable) { this.canvas.backgroundImage = backgroundImage; }
         }
-        else if (this.inverted && (backgroundImage && bgErasable)) {
-          var color = this.canvas.backgroundColor;
-          this.canvas.backgroundColor = undefined;
+        else if (this.inverted) {
+          var eraser = backgroundImage && backgroundImage.eraser;
+          if (eraser) {
+            backgroundImage.eraser = undefined;
+            backgroundImage.dirty = true;
+          }
           this.canvas._renderBackground(patternCtx);
-          this.canvas.backgroundColor = color;
+          if (eraser) {
+            backgroundImage.eraser = eraser;
+            backgroundImage.dirty = true;
+          }
         }
         patternCtx.save();
         patternCtx.transform.apply(patternCtx, this.canvas.viewportTransform);
@@ -443,8 +440,9 @@
         this._prepareCollectionTraversal(this.canvas, patternCtx, restorationContext);
         this.canvas._renderObjects(patternCtx, this.canvas._objects);
         restorationContext.visibility.forEach(function (obj) { obj.visible = true; });
-        restorationContext.eraser.forEach(function (obj) {
-          obj.eraser.inverted = false;
+        restorationContext.eraser.forEach(function (entry) {
+          var obj = entry[0], eraser = entry[1];
+          obj.eraser = eraser;
           obj.dirty = true;
         });
         restorationContext.collection.forEach(function (obj) { obj.dirty = true; });
@@ -454,11 +452,17 @@
           __renderOverlay.call(this.canvas, patternCtx);
           if (overlayErasable) { this.canvas.overlayImage = overlayImage; }
         }
-        else if (this.inverted && (overlayImage && overlayErasable)) {
-          var color = this.canvas.overlayColor;
-          this.canvas.overlayColor = undefined;
+        else if (this.inverted) {
+          var eraser = overlayImage && overlayImage.eraser;
+          if (eraser) {
+            overlayImage.eraser = undefined;
+            overlayImage.dirty = true;
+          }
           __renderOverlay.call(this.canvas, patternCtx);
-          this.canvas.overlayColor = color;
+          if (eraser) {
+            overlayImage.eraser = eraser;
+            overlayImage.dirty = true;
+          }
         }
       },
 
@@ -530,12 +534,10 @@
        */
       _render: function () {
         var ctx;
-        if (!this.inverted) {
-          //  clip canvas
-          ctx = this.canvas.getContext();
-          this.callSuper('_render', ctx);
-        }
-        //  render brush and mask it with image of non erasables
+        //  clip canvas
+        ctx = this.canvas.getContext();
+        this.callSuper('_render', ctx);
+        //  render brush and mask it with pattern
         ctx = this.canvas.contextTop;
         this.canvas.clearContext(ctx);
         this.callSuper('_render', ctx);
