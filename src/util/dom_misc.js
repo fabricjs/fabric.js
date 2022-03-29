@@ -296,6 +296,5 @@
   fabric.util.getElementOffset = getElementOffset;
   fabric.util.getNodeCanvas = getNodeCanvas;
   fabric.util.cleanUpJsdomNode = cleanUpJsdomNode;
-  fabric.util.getElementStyle = getElementStyle;
 
 })();
