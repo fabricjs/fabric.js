@@ -3,7 +3,7 @@
  * Easing functions
  * See <a href="http://gizma.com/easing/">Easing Equations by Robert Penner</a>
  */
-export class AnimationEase {
+class AnimationEase {
 
   /**
    * Quadratic easing in
