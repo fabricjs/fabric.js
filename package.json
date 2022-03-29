@@ -84,11 +84,10 @@
     "qunit": "^2.17.2",
     "testem": "^3.2.0",
     "typescript": "^4.5.4",
-    "uglify-js": "^3.3.28"
+    "uglify-js": "^3.15.3"
   },
   "engines": {
     "node": ">=14.0.0"
   },
-  "main": "./dist/fabric.js",
-  "dependencies": {}
+  "main": "./dist/fabric.js"
 }
