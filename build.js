@@ -1,4 +1,4 @@
-var fs = require('fs'),
+var fs = require('fs-extra'),
     exec = require('child_process').exec,
     execSync = require('child_process').execSync;
 
@@ -14,6 +14,7 @@ buildArgs.forEach(function(arg) {
 });
 
 try {
+  fs.removeSync('./dist');
   execSync('npm run tsc', { stdio: 'inherit' });
 } catch (error) {
   
