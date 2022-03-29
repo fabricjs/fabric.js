@@ -1561,9 +1561,12 @@
     var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
     assert.ok(typeof canvas2.dispose === 'function');
     canvas2.add(makeRect(), makeRect(), makeRect());
+    var lowerCanvas = canvas2.lowerCanvasEl;
+    assert.equal(lowerCanvas.getAttribute('data-fabric'), 'main', 'lowerCanvasEl should be marked by fabric');
     canvas2.dispose();
     assert.equal(canvas2.getObjects().length, 0, 'dispose should clear canvas');
     assert.equal(canvas2.lowerCanvasEl, null, 'dispose should clear lowerCanvasEl');
+    assert.equal(lowerCanvas.hasAttribute('data-fabric'), false, 'dispose should clear lowerCanvasEl data-fabric attr');
     assert.equal(canvas2.contextContainer, null, 'dispose should clear contextContainer');
   });
 
