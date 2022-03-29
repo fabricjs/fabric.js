@@ -864,7 +864,7 @@
       this.__charBounds[lineIndex] = lineBounds;
       for (i = 0; i < line.length; i++) {
         grapheme = line[i];
-        graphemeInfo = this._getGraphemeBox(grapheme, position + i, lineIndex, i, prevGrapheme);
+        graphemeInfo = this._getGraphemeBox(grapheme, line, position + i, lineIndex, i, prevGrapheme);
         lineBounds[i] = graphemeInfo;
         width += graphemeInfo.kernedWidth;
         prevGrapheme = grapheme;
@@ -942,24 +942,22 @@
      * @param {number} charIndex position in the line
      * @returns {'ltr'|'rtl'|'undetermined'} direction
      */
-    _getGraphemeDirection: function (grapheme, position, lineIndex, charIndex) {
+    _getGraphemeDirection: function (grapheme, line, position, lineIndex, charIndex) {
       var dir = bidiResolver.resolve(grapheme);
-      if (dir === 'undetermined' && charIndex === this._textLines[lineIndex].length - 1) {
+      if (dir === 'undetermined' && charIndex === line.length - 1) {
         return this._resolveLineDirection(lineIndex, charIndex);
       }
       else if (dir === 'undetermined') {
-        var before = 'undetermined', after = 'undetermined',
-          start = position - charIndex,
-          end = start + this._textLines[lineIndex].length;
+        var before = 'undetermined', after = 'undetermined';
         //  check graphemes up to start of line
-        var p = position - 1;
-        while (before === 'undetermined' && p >= start) {
-          before = bidiResolver.resolve(this._text[p--]);
+        var p = charIndex - 1;
+        while (before === 'undetermined' && p >= 0) {
+          before = bidiResolver.resolve(line[p--]);
         }
         //  check graphemes up to end of line
-        p = position + 1;
-        while (after === 'undetermined' && p < end) {
-          after = bidiResolver.resolve(this._text[p++]);
+        p = charIndex + 1;
+        while (after === 'undetermined' && p < line.length) {
+          after = bidiResolver.resolve(line[p++]);
         }
         //  in case a char returns an `undetermined` dir it will be overriden by the next strong char
         if (before === after) {
@@ -993,7 +991,7 @@
      */
     _resolveLineDirectionBackwards: function (dir, lineIndex, charIndex) {
       var overriden = false;
-      while (charIndex > 0) {
+      while (lineIndex >= 0 && this.__charBounds[lineIndex] && charIndex > 0) {
         var data = this.__charBounds[lineIndex][--charIndex];
         if (data.dir === 'undetermined' || (data.inheritedDir && data.dir !== dir)) {
           data.dir = dir;
@@ -1050,7 +1048,7 @@
      * @param {String} [prevGrapheme] character preceding the one to be measured
      * @returns {GraphemeBBox} grapheme bbox
      */
-    _getGraphemeBox: function(grapheme, position, lineIndex, charIndex, prevGrapheme, skipLeft) {
+    _getGraphemeBox: function(grapheme, line, position, lineIndex, charIndex, prevGrapheme, skipLeft) {
       var style = this.getCompleteStyleDeclaration(lineIndex, charIndex),
           prevStyle = prevGrapheme ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : { },
           info = this._measureChar(grapheme, style, prevGrapheme, prevStyle),
@@ -1069,7 +1067,7 @@
         height: style.fontSize,
         kernedWidth: kernedWidth,
         deltaY: style.deltaY,
-        dir: this._getGraphemeDirection(grapheme, position, lineIndex, charIndex)
+        dir: this._getGraphemeDirection(grapheme, line, position, lineIndex, charIndex)
       };
       if (charIndex > 0 && !skipLeft) {
         var previousBox = this.__charBounds[lineIndex][charIndex - 1];

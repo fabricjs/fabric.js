@@ -291,11 +291,11 @@
      * @param {number} charOffset
      * @returns {number}
      */
-    _measureWord: function (word, position, lineIndex, charOffset) {
+    _measureWord: function (word, line, position, lineIndex, charOffset) {
       var width = 0, prevGrapheme, skipLeft = true;
       charOffset = charOffset || 0;
       for (var i = 0, len = word.length; i < len; i++) {
-        var box = this._getGraphemeBox(word[i], position + i, lineIndex, i + charOffset, prevGrapheme, skipLeft);
+        var box = this._getGraphemeBox(word[i], line, position + i, lineIndex, charOffset + i, prevGrapheme, skipLeft);
         width += box.kernedWidth;
         prevGrapheme = word[i];
       }
@@ -347,7 +347,7 @@
       var data = words.map(function (word) {
         // if using splitByGrapheme words are already in graphemes.
         word = splitByGrapheme ? word : this.graphemeSplit(word);
-        var width = this._measureWord(word, position + offset, lineIndex, offset);
+        var width = this._measureWord(word, _line, position + offset, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
         offset += word.length + 1;
         return { word: word, width: width };
@@ -376,7 +376,7 @@
         }
         line = line.concat(word);
 
-        infixWidth = splitByGrapheme ? 0 : this._measureWord([infix], position + offset, lineIndex, 0);
+        infixWidth = splitByGrapheme ? 0 : this._measureWord([infix], infix, position + offset, lineIndex, 0);
         offset++;
         lineJustStarted = false;
       }
