@@ -10,7 +10,7 @@ export class AnimationEase {
    * Quadratic easing in
    * @memberOf fabric.util.ease
    */
-  easeInQuad(t, b, c, d) {
+  easeInQuad(t: number, b: number, c: number, d: number) {
     return c * (t /= d) * t + b;
   }
 
@@ -18,7 +18,7 @@ export class AnimationEase {
    * Quadratic easing out
    * @memberOf fabric.util.ease
    */
-  easeOutQuad(t, b, c, d) {
+  easeOutQuad(t: number, b: number, c: number, d: number) {
     return -c * (t /= d) * (t - 2) + b;
   }
 
@@ -26,7 +26,7 @@ export class AnimationEase {
    * Quadratic easing in and out
    * @memberOf fabric.util.ease
    */
-  easeInOutQuad(t, b, c, d) {
+  easeInOutQuad(t: number, b: number, c: number, d: number) {
     t /= (d / 2);
     if (t < 1) {
       return c / 2 * t * t + b;
@@ -38,11 +38,11 @@ export class AnimationEase {
    * Cubic easing in
    * @memberOf fabric.util.ease
    */
-  easeInCubic(t, b, c, d) {
+  easeInCubic(t: number, b: number, c: number, d: number) {
     return c * (t /= d) * t * t + b;
   }
 
-  normalize(a, c, p, s) {
+  normalize(a: number, c: number, p: number, s: number) {
     if (a < Math.abs(c)) {
       a = c;
       s = p / 4;
@@ -59,7 +59,7 @@ export class AnimationEase {
     return { a: a, c: c, p: p, s: s };
   }
 
-  elastic(opts, t, d) {
+  elastic(opts: { a: number, c: number, p: number, s: number }, t: number, d: number) {
     return opts.a *
       Math.pow(2, 10 * (t -= 1)) *
       Math.sin((t * d - opts.s) * (2 * Math.PI) / opts.p);
@@ -69,7 +69,7 @@ export class AnimationEase {
    * Cubic easing out
    * @memberOf fabric.util.ease
    */
-  easeOutCubic(t, b, c, d) {
+  easeOutCubic(t: number, b: number, c: number, d: number) {
     return c * ((t = t / d - 1) * t * t + 1) + b;
   }
 
@@ -77,7 +77,7 @@ export class AnimationEase {
    * Cubic easing in and out
    * @memberOf fabric.util.ease
    */
-  easeInOutCubic(t, b, c, d) {
+  easeInOutCubic(t: number, b: number, c: number, d: number) {
     t /= d / 2;
     if (t < 1) {
       return c / 2 * t * t * t + b;
@@ -89,7 +89,7 @@ export class AnimationEase {
    * Quartic easing in
    * @memberOf fabric.util.ease
    */
-  easeInQuart(t, b, c, d) {
+  easeInQuart(t: number, b: number, c: number, d: number) {
     return c * (t /= d) * t * t * t + b;
   }
 
@@ -97,7 +97,7 @@ export class AnimationEase {
    * Quartic easing out
    * @memberOf fabric.util.ease
    */
-  easeOutQuart(t, b, c, d) {
+  easeOutQuart(t: number, b: number, c: number, d: number) {
     return -c * ((t = t / d - 1) * t * t * t - 1) + b;
   }
 
@@ -105,7 +105,7 @@ export class AnimationEase {
    * Quartic easing in and out
    * @memberOf fabric.util.ease
    */
-  easeInOutQuart(t, b, c, d) {
+  easeInOutQuart(t: number, b: number, c: number, d: number) {
     t /= d / 2;
     if (t < 1) {
       return c / 2 * t * t * t * t + b;
@@ -117,7 +117,7 @@ export class AnimationEase {
    * Quintic easing in
    * @memberOf fabric.util.ease
    */
-  easeInQuint(t, b, c, d) {
+  easeInQuint(t: number, b: number, c: number, d: number) {
     return c * (t /= d) * t * t * t * t + b;
   }
 
@@ -125,7 +125,7 @@ export class AnimationEase {
    * Quintic easing out
    * @memberOf fabric.util.ease
    */
-  easeOutQuint(t, b, c, d) {
+  easeOutQuint(t: number, b: number, c: number, d: number) {
     return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
   }
 
@@ -133,7 +133,7 @@ export class AnimationEase {
    * Quintic easing in and out
    * @memberOf fabric.util.ease
    */
-  easeInOutQuint(t, b, c, d) {
+  easeInOutQuint(t: number, b: number, c: number, d: number) {
     t /= d / 2;
     if (t < 1) {
       return c / 2 * t * t * t * t * t + b;
@@ -145,7 +145,7 @@ export class AnimationEase {
    * Sinusoidal easing in
    * @memberOf fabric.util.ease
    */
-  easeInSine(t, b, c, d) {
+  easeInSine(t: number, b: number, c: number, d: number) {
     return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
   }
 
@@ -153,7 +153,7 @@ export class AnimationEase {
    * Sinusoidal easing out
    * @memberOf fabric.util.ease
    */
-  easeOutSine(t, b, c, d) {
+  easeOutSine(t: number, b: number, c: number, d: number) {
     return c * Math.sin(t / d * (Math.PI / 2)) + b;
   }
 
@@ -161,7 +161,7 @@ export class AnimationEase {
    * Sinusoidal easing in and out
    * @memberOf fabric.util.ease
    */
-  easeInOutSine(t, b, c, d) {
+  easeInOutSine(t: number, b: number, c: number, d: number) {
     return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
   }
 
@@ -169,7 +169,7 @@ export class AnimationEase {
    * Exponential easing in
    * @memberOf fabric.util.ease
    */
-  easeInExpo(t, b, c, d) {
+  easeInExpo(t: number, b: number, c: number, d: number) {
     return (t === 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
   }
 
@@ -177,7 +177,7 @@ export class AnimationEase {
    * Exponential easing out
    * @memberOf fabric.util.ease
    */
-  easeOutExpo(t, b, c, d) {
+  easeOutExpo(t: number, b: number, c: number, d: number) {
     return (t === d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
   }
 
@@ -185,7 +185,7 @@ export class AnimationEase {
    * Exponential easing in and out
    * @memberOf fabric.util.ease
    */
-  easeInOutExpo(t, b, c, d) {
+  easeInOutExpo(t: number, b: number, c: number, d: number) {
     if (t === 0) {
       return b;
     }
@@ -203,7 +203,7 @@ export class AnimationEase {
    * Circular easing in
    * @memberOf fabric.util.ease
    */
-  easeInCirc(t, b, c, d) {
+  easeInCirc(t: number, b: number, c: number, d: number) {
     return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
   }
 
@@ -211,7 +211,7 @@ export class AnimationEase {
    * Circular easing out
    * @memberOf fabric.util.ease
    */
-  easeOutCirc(t, b, c, d) {
+  easeOutCirc(t: number, b: number, c: number, d: number) {
     return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
   }
 
@@ -219,7 +219,7 @@ export class AnimationEase {
    * Circular easing in and out
    * @memberOf fabric.util.ease
    */
-  easeInOutCirc(t, b, c, d) {
+  easeInOutCirc(t: number, b: number, c: number, d: number) {
     t /= d / 2;
     if (t < 1) {
       return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
@@ -231,7 +231,7 @@ export class AnimationEase {
    * Elastic easing in
    * @memberOf fabric.util.ease
    */
-  easeInElastic(t, b, c, d) {
+  easeInElastic(t: number, b: number, c: number, d: number) {
     var s = 1.70158, p = 0, a = c;
     if (t === 0) {
       return b;
@@ -251,7 +251,7 @@ export class AnimationEase {
    * Elastic easing out
    * @memberOf fabric.util.ease
    */
-  easeOutElastic(t, b, c, d) {
+  easeOutElastic(t: number, b: number, c: number, d: number) {
     var s = 1.70158, p = 0, a = c;
     if (t === 0) {
       return b;
@@ -271,7 +271,7 @@ export class AnimationEase {
    * Elastic easing in and out
    * @memberOf fabric.util.ease
    */
-  easeInOutElastic(t, b, c, d) {
+  easeInOutElastic(t: number, b: number, c: number, d: number) {
     var s = 1.70158, p = 0, a = c;
     if (t === 0) {
       return b;
@@ -283,9 +283,9 @@ export class AnimationEase {
     if (!p) {
       p = d * (0.3 * 1.5);
     }
-    var opts = normalize(a, c, p, s);
+    var opts = this.normalize(a, c, p, s);
     if (t < 1) {
-      return -0.5 * elastic(opts, t, d) + b;
+      return -0.5 * this.elastic(opts, t, d) + b;
     }
     return opts.a * Math.pow(2, -10 * (t -= 1)) *
       Math.sin((t * d - opts.s) * (2 * Math.PI) / opts.p) * 0.5 + opts.c + b;
@@ -295,7 +295,7 @@ export class AnimationEase {
    * Backwards easing in
    * @memberOf fabric.util.ease
    */
-  easeInBack(t, b, c, d, s) {
+  easeInBack(t: number, b: number, c: number, d: number, s: number) {
     if (s === undefined) {
       s = 1.70158;
     }
@@ -306,7 +306,7 @@ export class AnimationEase {
    * Backwards easing out
    * @memberOf fabric.util.ease
    */
-  easeOutBack(t, b, c, d, s) {
+  easeOutBack(t: number, b: number, c: number, d: number, s: number) {
     if (s === undefined) {
       s = 1.70158;
     }
@@ -317,7 +317,7 @@ export class AnimationEase {
    * Backwards easing in and out
    * @memberOf fabric.util.ease
    */
-  easeInOutBack(t, b, c, d, s) {
+  easeInOutBack(t: number, b: number, c: number, d: number, s: number) {
     if (s === undefined) {
       s = 1.70158;
     }
@@ -332,7 +332,7 @@ export class AnimationEase {
    * Bouncing easing in
    * @memberOf fabric.util.ease
    */
-  easeInBounce(t, b, c, d) {
+  easeInBounce(t: number, b: number, c: number, d: number) {
     return c - this.easeOutBounce(d - t, 0, c, d) + b;
   }
 
@@ -340,7 +340,7 @@ export class AnimationEase {
    * Bouncing easing out
    * @memberOf fabric.util.ease
    */
-  easeOutBounce(t, b, c, d) {
+  easeOutBounce(t: number, b: number, c: number, d: number) {
     if ((t /= d) < (1 / 2.75)) {
       return c * (7.5625 * t * t) + b;
     }
@@ -359,7 +359,7 @@ export class AnimationEase {
    * Bouncing easing in and out
    * @memberOf fabric.util.ease
    */
-  easeInOutBounce(t, b, c, d) {
+  easeInOutBounce(t: number, b: number, c: number, d: number) {
     if (t < d / 2) {
       return this.easeInBounce(t * 2, 0, c, d) * 0.5 + b;
     }
