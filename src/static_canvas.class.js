@@ -313,10 +313,11 @@
       else {
         this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
       }
-      if (this.lowerCanvasEl.classList.contains('lower-canvas')) {
+      if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
         throw new Error('fabric.js: trying to initialize a canvas that has already been initialized');
       }
       fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
+      this.lowerCanvasEl.setAttribute('data-fabric', 'main');
       this._originalCanvasStyle = this.lowerCanvasEl.style;
       if (this.interactive) {
         this._applyCanvasStyle(this.lowerCanvasEl);
@@ -1573,6 +1574,7 @@
       this.contextContainer = null;
       // restore canvas style
       this.lowerCanvasEl.classList.remove('lower-canvas');
+      this.lowerCanvasEl.removeAttribute('data-fabric');
       fabric.util.setStyle(this.lowerCanvasEl, this._originalCanvasStyle);
       delete this._originalCanvasStyle;
       // restore canvas size to original size in case retina scaling was applied

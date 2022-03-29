@@ -975,7 +975,7 @@
         this.upperCanvasEl = upperCanvasEl;
       }
       fabric.util.addClass(upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
-
+      this.wrapperEl.setAttribute('data-fabric', 'top');
       this.wrapperEl.appendChild(upperCanvasEl);
 
       this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
@@ -1011,6 +1011,7 @@
       this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, 'div', {
         'class': this.containerClass
       });
+      this.wrapperEl.setAttribute('data-fabric', 'wrapper');
       fabric.util.setStyle(this.wrapperEl, {
         width: this.width + 'px',
         height: this.height + 'px',
