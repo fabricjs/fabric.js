@@ -231,7 +231,7 @@ export class AnimationEase {
    * @memberOf fabric.util.ease
    */
   easeInElastic(t: number, b: number, c: number, d: number) {
-    var s = 1.70158, p = 0, a = c;
+    let s = 1.70158, p = 0, a = c;
     if (t === 0) {
       return b;
     }
@@ -242,7 +242,7 @@ export class AnimationEase {
     if (!p) {
       p = d * 0.3;
     }
-    var opts = this.normalize(a, c, p, s);
+    let opts = this.normalize(a, c, p, s);
     return -this.elastic(opts, t, d) + b;
   }
 
@@ -251,7 +251,7 @@ export class AnimationEase {
    * @memberOf fabric.util.ease
    */
   easeOutElastic(t: number, b: number, c: number, d: number) {
-    var s = 1.70158, p = 0, a = c;
+    let s = 1.70158, p = 0, a = c;
     if (t === 0) {
       return b;
     }
@@ -262,7 +262,7 @@ export class AnimationEase {
     if (!p) {
       p = d * 0.3;
     }
-    var opts = this.normalize(a, c, p, s);
+    let opts = this.normalize(a, c, p, s);
     return opts.a * Math.pow(2, -10 * t) * Math.sin((t * d - opts.s) * (2 * Math.PI) / opts.p) + opts.c + b;
   }
 
@@ -271,7 +271,7 @@ export class AnimationEase {
    * @memberOf fabric.util.ease
    */
   easeInOutElastic(t: number, b: number, c: number, d: number) {
-    var s = 1.70158, p = 0, a = c;
+    let s = 1.70158, p = 0, a = c;
     if (t === 0) {
       return b;
     }
@@ -282,7 +282,7 @@ export class AnimationEase {
     if (!p) {
       p = d * (0.3 * 1.5);
     }
-    var opts = this.normalize(a, c, p, s);
+    let opts = this.normalize(a, c, p, s);
     if (t < 1) {
       return -0.5 * this.elastic(opts, t, d) + b;
     }
