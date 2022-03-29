@@ -2,7 +2,6 @@
 /**
  * Easing functions
  * See <a href="http://gizma.com/easing/">Easing Equations by Robert Penner</a>
- * @namespace fabric.util.ease
  */
 export class AnimationEase {
 
@@ -367,4 +366,7 @@ export class AnimationEase {
   }
 }
 
+/**
+ * @namespace fabric.util.ease
+ */
 fabric.util.ease = new AnimationEase();
