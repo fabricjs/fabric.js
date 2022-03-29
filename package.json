@@ -58,7 +58,8 @@
     "lint_tests": "eslint test/unit --config .eslintrc_tests && eslint test/visual --config .eslintrc_tests",
     "all": "npm run build && npm run test -- --all && npm run lint && npm run lint_tests && npm run export",
     "testem": "testem .",
-    "testem:ci": "testem ci"
+    "testem:ci": "testem ci",
+    "tsc": "tsc"
   },
   "optionalDependencies": {
     "canvas": "^2.8.0",
@@ -82,6 +83,7 @@
     "pixelmatch": "^4.0.2",
     "qunit": "^2.17.2",
     "testem": "^3.2.0",
+    "typescript": "^4.5.4",
     "uglify-js": "^3.3.28"
   },
   "engines": {
