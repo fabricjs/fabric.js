@@ -929,7 +929,7 @@
         assert.equal(
           textObj.__charBounds[i][j].dir,
           Array.isArray(expected) ? expected[c] : expected,
-          `grapheme(${c},${i},${j}) = ${JSON.stringify(text[c])} dir should be equal, baseDir = ${dir}`
+          `charBounds(${c},${i},${j}).dir of grapheme(${c - i},${i},${j}) should be equal, baseDir = ${dir}`
         );
         c++;
       }
