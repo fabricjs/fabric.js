@@ -208,26 +208,23 @@
     var group = makeGroupWith2Objects();
     group.includeDefaultValues = false;
     var clone = group.toObject();
-    var objects = [
-      {
-        version: fabric.version,
-        type: 'rect',
-        left: 10,
-        top: -30,
-        width: 30,
-        height: 10,
-        strokeWidth: 0
-      },
-      {
-        version: fabric.version,
-        type: 'rect',
-        left: -40,
-        top: -10,
-        width: 10,
-        height: 40,
-        strokeWidth: 0
-      }
-    ];
+    var objects = [{
+      version: fabric.version,
+      type: 'rect',
+      left: 10,
+      top: -30,
+      width: 30,
+      height: 10,
+      strokeWidth: 0,
+    }, {
+      version: fabric.version,
+      type: 'rect',
+      left: -40,
+      top: -10,
+      width: 10,
+      height: 40,
+      strokeWidth: 0,
+    }];
     var expectedObject = {
       version: fabric.version,
       type: 'group',
