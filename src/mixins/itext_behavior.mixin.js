@@ -592,6 +592,8 @@
         this.canvas.defaultCursor = this._savedProps.defaultCursor;
         this.canvas.moveCursor = this._savedProps.moveCursor;
       }
+
+      delete this._savedProps;
     },
 
     /**
