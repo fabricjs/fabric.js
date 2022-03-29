@@ -5,6 +5,15 @@
  */
 class AnimationEase {
 
+  constructor() {
+    this.easeInElastic = this.easeInElastic.bind(this);
+    this.easeOutElastic = this.easeOutElastic.bind(this);
+    this.easeInOutElastic = this.easeInOutElastic.bind(this);
+    this.easeInBounce = this.easeInBounce.bind(this);
+    this.easeOutBounce = this.easeOutBounce.bind(this);
+    this.easeInOutBounce = this.easeInOutBounce.bind(this);
+  }
+
   /**
    * Quadratic easing in
    * @memberOf fabric.util.ease
