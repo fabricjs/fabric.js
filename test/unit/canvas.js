@@ -2108,6 +2108,7 @@
     }
     assert.equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');
     assert.equal(canvas.upperCanvasEl, null, 'upperCanvas should be deleted');
+    assert.equal(canvas.lowerCanvasEl, null, 'lowerCanvasEl should be deleted');
     assert.equal(canvas.cacheCanvasEl, null, 'cacheCanvasEl should be deleted');
     assert.equal(canvas.contextTop, null, 'contextTop should be deleted');
     assert.equal(canvas.contextCache, null, 'contextCache should be deleted');
@@ -2117,6 +2118,47 @@
     assert.equal(el.height, 200, 'restored height');
 
     fabric.devicePixelRatio = originalDevicePixelRatio;
+  });
+
+  QUnit.test('dispose + set dimensions', function (assert) {
+    var done = assert.async();
+    //made local vars to do not dispose the external canvas
+    var el = fabric.document.createElement('canvas'),
+      parentEl = fabric.document.createElement('div');
+    el.width = 200; el.height = 200;
+    parentEl.className = 'rootNode';
+    parentEl.appendChild(el);
+
+    var originalDevicePixelRatio = fabric.devicePixelRatio;
+    fabric.devicePixelRatio = 1.25;
+
+    assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
+    assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
+
+    el.style.position = 'relative';
+    var elStyle = el.style.cssText;
+    assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
+
+    var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
+
+    //  prevent a race condition
+    //  setDimensions requests rendering while disposing which throws an error
+    canvas.on('after:render', () => {
+      assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+      assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
+
+      canvas.dispose();
+      assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
+      assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
+      assert.equal(el.width, 500, 'restored width');
+      assert.equal(el.height, 500, 'restored height');
+
+      fabric.devicePixelRatio = originalDevicePixelRatio;
+      done();
+    });
+
+    canvas.setDimensions({ width: 500, height: 500 });
+    
   });
 
   // QUnit.test('dispose', function(assert) {
