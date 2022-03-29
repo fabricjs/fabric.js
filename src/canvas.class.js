@@ -1269,7 +1269,7 @@
         wrapper.parentNode.replaceChild(this.lowerCanvasEl, this.wrapperEl);
       }
       delete this.wrapperEl;
-      fabric.StaticCanvas.prototype.dispose.call(this);
+      this.callSuper('dispose');
       return this;
     },
 
