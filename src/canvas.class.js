@@ -975,20 +975,12 @@
         this.upperCanvasEl = upperCanvasEl;
       }
       fabric.util.addClass(upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
-
+      this.upperCanvasEl.setAttribute('data-fabric', 'top');
       this.wrapperEl.appendChild(upperCanvasEl);
 
       this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
       this._applyCanvasStyle(upperCanvasEl);
       this.contextTop = upperCanvasEl.getContext('2d');
-    },
-
-    /**
-     * Returns context of top canvas where interactions are drawn
-     * @returns {CanvasRenderingContext2D}
-     */
-    getTopContext: function () {
-      return this.contextTop;
     },
 
     /**
@@ -1005,9 +997,13 @@
      * @private
      */
     _initWrapperElement: function () {
+      if (this.wrapperEl) {
+        return;
+      }
       this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, 'div', {
         'class': this.containerClass
       });
+      this.wrapperEl.setAttribute('data-fabric', 'wrapper');
       fabric.util.setStyle(this.wrapperEl, {
         width: this.width + 'px',
         height: this.height + 'px',
