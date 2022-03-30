@@ -22,18 +22,10 @@
     /**
      * Resolves origin value relative to center
      * @private
-     * @param {OriginX|'start'|'end'} originX
+     * @param {OriginX} originX
      * @returns number
      */
     resolveOriginX: function (originX) {
-      switch (originX) {
-        case 'start':
-          originX = this.direction === 'rtl' ? 'right' : 'left';
-          break;
-        case 'end':
-          originX = this.direction === 'rtl' ? 'left' : 'right';
-          break;
-      }
       return typeof originX === 'string' ?
         originXOffset[originX] :
         originX - 0.5;
