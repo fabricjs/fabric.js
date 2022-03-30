@@ -150,7 +150,9 @@ function test(tests, options) {
     const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests);
     process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
     process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
-    process.env.QUNIT_FILTER = options.filter;
+    if (options.filter) {
+        process.env.QUNIT_FILTER = options.filter;
+    }
     return new Promise((resolve, reject) => {
         try {
             var p = cp.spawn(args.join(' '), { cwd: wd, env: process.env, shell: true, stdio: 'pipe' });
@@ -273,8 +275,9 @@ async function runIntreactiveTestSuite(options) {
         acc[curr.type].push(`test/${curr.type}/${curr.file}`);
         return acc;
     }, { unit: [], visual: [] });
-    _.reduce(tests, async (queue, files) => {
+    _.reduce(tests, async (queue, files, suite) => {
         await queue;
+        console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
         if (files.length > 0) {
             return test(files, options);
         }
@@ -330,6 +333,7 @@ program
         if (options.suite) {
             _.reduce(options.suite, async (queue, suite) => {
                 await queue;
+                console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
                 return test(`test/${suite}`, options);
             }, Promise.resolve());
         }
