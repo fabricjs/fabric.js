@@ -110,21 +110,27 @@
     assert.equal(iText.selectionEnd, 9, 'should move to upper line end');
     selection = 0;
 
-    iText.selectionStart = 1;
-    iText.selectionEnd = 4;
+    iText.setSelectionRange(1, 4, 'forward');
     iText.moveCursorDown({ shiftKey: false });
     assert.equal(selection, 1, 'should fire');
     assert.equal(iText.selectionStart, 24, 'should move to down line');
     assert.equal(iText.selectionEnd, 24, 'should move to down line');
     selection = 0;
 
-    iText.selectionStart = 28;
-    iText.selectionEnd = 31;
+    iText.setSelectionRange(28, 31, 'backward');
     iText.moveCursorBackward({ shiftKey: false });
     assert.equal(selection, 1, 'should fire');
     assert.equal(iText.selectionStart, 28, 'should move to selection Start');
     assert.equal(iText.selectionEnd, 28, 'should move to selection Start');
     selection = 0;
+
+    iText.setSelectionRange(28, 31, 'forward');
+    iText.moveCursorBackward({ shiftKey: false });
+    assert.equal(selection, 1, 'should fire');
+    assert.equal(iText.selectionStart, 31, 'should move to selection Start');
+    assert.equal(iText.selectionEnd, 31, 'should move to selection Start');
+    selection = 0;
+
     // needed or test hangs
     iText.abortCursorAnimation();
     // TODO verify and dp
