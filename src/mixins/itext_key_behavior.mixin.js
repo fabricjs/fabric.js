@@ -99,6 +99,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea && this.hiddenTextarea.focus();
   },
 
+  /**
+   * Override this method to customize cursor behavior on textbox blur
+   */
   blur: function () {
     this.abortCursorAnimation();
   },
