@@ -337,7 +337,7 @@
         //if obj has a style for this line
         if (styles[i]) {
           //loop through each character of the current line
-          for (var c=0; c < textLines[i].length; c++) {
+          for (var c = 0; c < textLines[i].length; c++) {
             charIndex++;
             var thisStyle = styles[i] || {};
             //check if style exists for this character
@@ -385,7 +385,7 @@
       //loop through each textLine
       for (var i = 0; i < textLines.length; i++) {
         //loop through each character of the current line
-        for (var c=0; c < textLines[i].length; c++) {
+        for (var c = 0; c < textLines[i].length; c++) {
           charIndex++;
           //check if there's a style collection for the current character
           if (this.styles[styleIndex]
