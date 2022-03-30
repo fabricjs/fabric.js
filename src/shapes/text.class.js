@@ -1012,7 +1012,7 @@
      */
     _resolveLineDirection: function (lineIndex, charIndex) {
       var dir = 'undetermined', c = charIndex;
-      while (c > 0) {
+      while (c > 0 && this.__charBounds[lineIndex]) {
         var data = this.__charBounds[lineIndex][--c];
         if (data.dir !== 'undetermined') {
           dir = data.dir;
