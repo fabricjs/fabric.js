@@ -153,7 +153,7 @@ function test(tests, options) {
     try {
         var p = cp.exec(args.join(' '), { cwd: wd, env: process.env });
         let clearLines = 0;
-        //process.stdout.write(ansiEscapes.cursorHide);
+        process.stdout.write(ansiEscapes.cursorHide);
         p.stdout.on('data', function (data) {
             data = _.compact(data.trim().split(/\n/));
             data.forEach(line => {
