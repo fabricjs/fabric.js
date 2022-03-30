@@ -874,8 +874,10 @@
         width: 0,
         kernedWidth: 0,
         height: this.fontSize,
-        dir: this._resolveLineDirection(lineIndex, i)
       };
+      //  resolve direction, including for the last one
+      var dir = this._resolveLineDirection(lineIndex, i);
+      lineBounds[i].dir = dir;
       if (path) {
         totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
         startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
@@ -1011,9 +1013,9 @@
      * @returns {'ltr'|'rtl'} resolved direction
      */
     _resolveLineDirection: function (lineIndex, charIndex) {
-      var dir = 'undetermined', c = charIndex;
-      while (c > 0 && this.__charBounds[lineIndex]) {
-        var data = this.__charBounds[lineIndex][--c];
+      var dir = 'undetermined', c = charIndex, lineBounds = this.__charBounds[lineIndex];
+      while (c > 0 && lineBounds) {
+        var data = lineBounds[--c];
         if (data.dir !== 'undetermined') {
           dir = data.dir;
           break;
@@ -1023,6 +1025,34 @@
         dir = this.direction;
       }
       this._resolveLineDirectionBackwards(dir, lineIndex, charIndex);
+      //  at this point the the direction of line's graphemes is resolved (='ltr'|'rtl')
+      //  now we need to reorder char bounds of words that are opposite to the base direction
+      c = 0;
+      var baseDir = this.direction, width = 0, offset = 0, prev, oppositeBounds = [];
+      while (lineBounds && c < lineBounds.length) {
+        var data = lineBounds[c];
+        if (data && data.dir !== baseDir) {
+          oppositeBounds.push(data);
+          if (width === 0) {
+            prev = c > 0 ? lineBounds[c - 1] : undefined;
+            offset = prev ? prev.left + prev.width : 0;
+          }
+          width += data.width;
+        }
+        if (data && (data.dir === baseDir || c === lineBounds.length - 1) && oppositeBounds.length > 0) {
+          data = oppositeBounds[0];
+          data.left = width + offset - data.kernedWidth;
+          for (var i = 1; i < oppositeBounds.length; i++) {
+            data = oppositeBounds[i];
+            prev = oppositeBounds[i - 1];
+            data.left = prev.left - prev.width - data.kernedWidth + data.width;
+          }
+          width = offset = 0;
+          oppositeBounds = [];
+          prev = undefined;
+        }
+        c++;
+      }
       return dir;
     },
 
