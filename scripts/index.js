@@ -143,11 +143,11 @@ function exportToWebsite(options) {
 /**
  * 
  * @param {string[]} tests file paths
- * @param {{debug:boolean,recreate:boolean}} [options] 
+ * @param {{debug?:boolean,recreate?:boolean,hidePassed?:boolean,filter?:boolean}} [options] 
  */
 function test(tests, options) {
     options = options || {};
-    const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests);
+    const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests).concat(options.filter ? '--filter' : '');
     process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
     process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
     try {
@@ -155,10 +155,11 @@ function test(tests, options) {
         let clearLines = 0;
         process.stdout.write(ansiEscapes.cursorHide);
         p.stdout.on('data', function (data) {
-            data = _.compact(data.replaceAll('ok ', '\nok ').replaceAll('not ok ', '\nnot ok ').split(/\n/));
+            data = _.compact(data.replaceAll('ok ', '\nok ').replaceAll('not ok ', '\nnot ok ').trim().split(/\n/));
             data.forEach(line => {
-                if (clearLines > 0) {
-                    process.stdout.write(ansiEscapes.eraseLines(2));
+                if (clearLines > 0 && options.hidePassed) {
+                    process.stdout.write(ansiEscapes.cursorUp(3));
+                    process.stdout.write(ansiEscapes.eraseDown);
                 }
                 if (line.startsWith('ok')) {
                     clearLines = 1;
@@ -169,6 +170,7 @@ function test(tests, options) {
                     console.log(line);
                 }
             });
+            console.log('\n');
         });
         p.stdout.once('end', () => {
             process.stdout.write(ansiEscapes.cursorDown());
@@ -303,9 +305,11 @@ program
     .description('run test suite')
     .addOption(new commander.Option('-s, --suite [suite...]', 'test suite to run').choices(['unit', 'visual']))
     .option('-f, --file [file]', 'run a specific test file')
+    .option('--filter [filter]', 'filter tests by name')
     .option('-a, --all', 'run all tests', false)
     .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
     .option('-r, --recreate', 'recreate visual refs (golden images)', false)
+    .option('-r, --hide-passed', 'hide passed tests to reduce visual overload', true)
     .option('-cc, --clear-cache', 'clear CLI test cache', false)
     .action((options) => {
         if (options.clearCache) {
