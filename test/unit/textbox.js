@@ -9,7 +9,7 @@
   var TEXTBOX_OBJECT = {
     version: fabric.version,
     type: 'textbox',
-    originX: 'left',
+    originX: 'start',
     originY: 'top',
     left: 0,
     top: 0,
@@ -268,7 +268,7 @@
     var line2 = textbox._wrapLine('', 0, 100, 0);
     assert.deepEqual(line2, [[]], 'wrapping with splitByGrapheme');
   });
-  QUnit.test('texbox will change width from the mr corner', function(assert) {
+  QUnit.test('textbox will change width from the mr corner', function(assert) {
     var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0 });
     canvas.add(text);
     canvas.setActiveObject(text);
@@ -293,7 +293,7 @@
     });
     assert.equal(text.width, originalWidth + 20, 'width increased');
   });
-  QUnit.test('texbox will change width from the ml corner', function(assert) {
+  QUnit.test('textbox will change width from the ml corner', function(assert) {
     var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0, left: 40 });
     canvas.add(text);
     canvas.setActiveObject(text);
@@ -440,58 +440,31 @@
     assert.deepEqual(textbox.styles[0], {}, 'style is an empty object');
   });
 
-  QUnit.test('_deleteStyleDeclaration', function(assert) {
-    var textbox = new fabric.Textbox('aaa aaq ggg gg oee eee', {
-      styles: {
-        0: {
-          0: { fontSize: 4 },
-          1: { fontSize: 4 },
-          2: { fontSize: 4 },
-          3: { fontSize: 4 },
-          4: { fontSize: 4 },
-          5: { fontSize: 4 },
-          6: { fontSize: 4 },
-          7: { fontSize: 4 },
-          8: { fontSize: 4 },
-          9: { fontSize: 4 },
-          10: { fontSize: 4 },
-          11: { fontSize: 4 },
-          12: { fontSize: 4 },
-          13: { fontSize: 4 },
-          14: { fontSize: 4 },
-          15: { fontSize: 4 },
-          16: { fontSize: 4 },
-        },
-      },
+  QUnit.test('_deleteStyleDeclaration', function (assert) {
+    var text = 'aaa aaq ggg gg oee eee';
+    var styles = {};
+    for (var index = 0; index < text.length; index++) {
+      styles[index] = { fontSize: 4 };
+      
+    }
+    var textbox = new fabric.Textbox(text, {
+      styles: { 0: styles },
       width: 5,
     });
+    assert.equal(typeof textbox._deleteStyleDeclaration, 'function', 'function exists');
     textbox._deleteStyleDeclaration(2, 2);
     assert.equal(textbox.styles[0][10], undefined, 'style has been removed');
   });
 
   QUnit.test('_setStyleDeclaration', function(assert) {
-    var textbox = new fabric.Textbox('aaa aaq ggg gg oee eee', {
-      styles: {
-        0: {
-          0: { fontSize: 4 },
-          1: { fontSize: 4 },
-          2: { fontSize: 4 },
-          3: { fontSize: 4 },
-          4: { fontSize: 4 },
-          5: { fontSize: 4 },
-          6: { fontSize: 4 },
-          7: { fontSize: 4 },
-          8: { fontSize: 4 },
-          9: { fontSize: 4 },
-          10: { fontSize: 4 },
-          11: { fontSize: 4 },
-          12: { fontSize: 4 },
-          13: { fontSize: 4 },
-          14: { fontSize: 4 },
-          15: { fontSize: 4 },
-          16: { fontSize: 4 },
-        },
-      },
+    var text = 'aaa aaq ggg gg oee eee';
+    var styles = {};
+    for (var index = 0; index < text.length; index++) {
+      styles[index] = { fontSize: 4 };
+
+    }
+    var textbox = new fabric.Textbox(text, {
+      styles: { 0: styles },
       width: 5,
     });
     assert.equal(typeof textbox._setStyleDeclaration, 'function', 'function exists');
