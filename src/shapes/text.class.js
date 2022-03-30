@@ -966,7 +966,7 @@
      * @param {string} grapheme
      * @param {number} lineIndex index of the line where the char is
      * @param {number} charIndex position in the line
-     * @returns {'ltr'|'rtl'|'undetermined'} direction
+     * @returns {Direction} direction
      */
     _getGraphemeDirection: function (grapheme, line, lineIndex, charIndex) {
       var dir = bidiResolver.resolve(grapheme);
@@ -1010,9 +1010,9 @@
     },
 
     /**
-     * override previous undetermined direction values for the given line
+     * resolve all previous `undetermined` direction values for the given line to strong values (`ltr`|`rtl`)
      * @private
-     * @param {'ltr'|'rtl'|'undetermined'} dir
+     * @param {Direction} dir
      * @param {number} lineIndex index of the line where the char is
      * @param {number} charIndex position in the line
      * @returns {boolean} true if overriden any undetermined values
@@ -1038,7 +1038,6 @@
      * resolves undetermined direction values for the given line
      * @private
      * @param {number} lineIndex index of the line where the char is
-     * @param {number} charIndex position in the line
      * @returns {number} width of line in px
      */
     _resolveLineDirection: function (lineIndex) {
