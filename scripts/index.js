@@ -4,6 +4,7 @@ const _ = require('lodash');
 const path = require('path');
 const cp = require('child_process');
 const inquirer = require('inquirer');
+const ansiEscapes = require('ansi-escapes');
 const fuzzy = require('fuzzy');
 const chalk = require('chalk');
 const moment = require('moment');
@@ -150,9 +151,32 @@ function test(tests, options) {
     process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
     process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
     try {
-        cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd, env: process.env });
+        var p = cp.exec(args.join(' '), { cwd: wd, env: process.env });
+        let clearLines = 0;
+        process.stdout.write(ansiEscapes.cursorHide);
+        p.stdout.on('data', function (data) {
+            data = _.compact(data.replaceAll('ok ', '\nok ').replaceAll('not ok ', '\nnot ok ').split(/\n/));
+            data.forEach(line => {
+                if (clearLines > 0) {
+                    process.stdout.write(ansiEscapes.eraseLines(2));
+                }
+                if (line.startsWith('ok')) {
+                    clearLines = 1;
+                    console.log(chalk.green(line));
+                }
+                else {
+                    clearLines = 0;
+                    console.log(line);
+                }
+            });
+        });
+        p.stdout.once('end', () => {
+            process.stdout.write(ansiEscapes.cursorDown());
+            process.stdout.write(ansiEscapes.cursorShow);
+        });
     } catch (error) {
-
+        process.stdout.write(ansiEscapes.cursorDown());
+        process.stdout.write(ansiEscapes.cursorShow);
     }
 }
 
