@@ -64,7 +64,7 @@
         Array.isArray(path) ? path : fabric.util.parsePath(path)
       );
 
-      fabric.Polyline.prototype._setPositionDimensions.call(this, options || {});
+      this._setPositionDimensions(options || {});
     },
 
     /**
@@ -324,7 +324,43 @@
         width: deltaX,
         height: deltaY
       };
-    }
+    },
+
+    /**
+     * @private
+     * @param {object} options 
+     * @param {boolean} options.fromSVG
+     */
+    _setPositionDimensions: function (options) {
+      var calcDim = this._calcDimensions(options), correctLeftTop,
+        correctSize = this.exactBoundingBox ? this.strokeWidth : 0;
+      this.width = calcDim.width - correctSize;
+      this.height = calcDim.height - correctSize;
+      if (!options.fromSVG) {
+        correctLeftTop = this.translateToGivenOrigin(
+          {
+            // this looks bad, but is one way to keep it optional for now.
+            x: calcDim.left - this.strokeWidth / 2 + correctSize / 2,
+            y: calcDim.top - this.strokeWidth / 2 + correctSize / 2
+          },
+          'left',
+          'top',
+          this.originX,
+          this.originY
+        );
+      }
+      if (typeof options.left === 'undefined') {
+        this.left = options.fromSVG ? calcDim.left : correctLeftTop.x;
+      }
+      if (typeof options.top === 'undefined') {
+        this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
+      }
+      this.pathOffset = {
+        x: calcDim.left + this.width / 2 + correctSize / 2,
+        y: calcDim.top + this.height / 2 + correctSize / 2
+      };
+    },
+
   });
 
   /**
