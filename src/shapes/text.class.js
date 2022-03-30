@@ -23,7 +23,11 @@
     _reExplicitRTL: /^[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]+$/,
 
     // eslint-disable-next-line max-len
-    _reExplicitLTR: /^[A-Za-z0-9\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF]+$/,
+    _reExplicitLTR: /^[A-Za-z0-9%\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF]+$/,
+
+    _reBaseDirection: /^[,:;]+$/,
+
+    _reContext: /^[.!?]+$/,
 
     cache: {},
 
@@ -53,7 +57,9 @@
     /**
      *
      * @param {string} grapheme
-     * @returns {'ltr'|'rtl'|'undetermined'} direction
+     * @typedef {'ltr'|'rtl'} ExplicitDirection
+     * @typedef {ExplicitDirection|'undetermined'} Direction
+     * @returns {Direction} direction
      */
     resolve: function (grapheme) {
       switch (this.test(grapheme)) {
@@ -61,7 +67,29 @@
         case 1: return 'rtl';
         default: return 'undetermined';
       }
-    }
+    },
+
+    /**
+     * 
+     * @param {string} grapheme 
+     * @param {Direction} before 
+     * @param {Direction} after 
+     * @param {ExplicitDirection} base 
+     * @returns {Direction}
+     */
+    resolveUndetermined: function (grapheme, before, after, base) {
+      if (this._reBaseDirection.test(grapheme)) {
+        return base;
+      }
+      else if (this._reContext.test(grapheme)) {
+        return before === after && before !== 'undetermined' ?
+          before :
+          base;
+      }
+      else {
+        return 'undetermined';
+      }
+    },
 
   });
 
@@ -958,6 +986,8 @@
         while (after === 'undetermined' && p < line.length) {
           after = bidiResolver.resolve(line[p++]);
         }
+        //  resolve special cases
+        dir = bidiResolver.resolveUndetermined(grapheme, before, after, this.direction);
         //  in case a char returns an `undetermined` dir it will be overriden by the next strong char
         if (before === after) {
           //  weak char between 2 words with the same direction
