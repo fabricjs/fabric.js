@@ -147,9 +147,10 @@ function exportToWebsite(options) {
  */
 function test(tests, options) {
     options = options || {};
-    const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests, options.filter ? ['--filter', options.filter] : '');
+    const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests);
     process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
     process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
+    process.env.QUNIT_FILTER = options.filter;
     return new Promise((resolve, reject) => {
         try {
             var p = cp.spawn(args.join(' '), { cwd: wd, env: process.env, shell: true, stdio: 'pipe' });
