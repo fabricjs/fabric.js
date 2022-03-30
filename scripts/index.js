@@ -167,6 +167,10 @@ function test(tests, options) {
                         clearLines = 1;
                         console.log(chalk.green(line));
                     }
+                    else if (line.startsWith('not ok')) {
+                        clearLines = 0;
+                        console.log(chalk.bold(chalk.red('not ok') + line.slice(6)));
+                    }
                     else {
                         clearLines = 0;
                         console.log(line);
