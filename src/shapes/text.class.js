@@ -875,9 +875,9 @@
         kernedWidth: 0,
         height: this.fontSize,
       };
-      //  resolve direction, including for the last one
-      var dir = this._resolveLineDirection(lineIndex, i);
-      lineBounds[i].dir = dir;
+      //  resolve direction
+      //  we need the last bbox populated before we call the method
+      lineBounds[i].dir = this._resolveLineDirection(lineIndex, i);
       if (path) {
         totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
         startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
