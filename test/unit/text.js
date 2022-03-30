@@ -11,7 +11,7 @@
   var REFERENCE_TEXT_OBJECT = {
     version:                   fabric.version,
     type:                      'text',
-    originX:                   'left',
+    originX:                   'start',
     originY:                   'top',
     left:                      0,
     top:                       0,
