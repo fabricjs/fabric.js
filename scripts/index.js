@@ -153,12 +153,12 @@ function test(tests, options) {
     try {
         var p = cp.exec(args.join(' '), { cwd: wd, env: process.env });
         let clearLines = 0;
-        process.stdout.write(ansiEscapes.cursorHide);
+        //process.stdout.write(ansiEscapes.cursorHide);
         p.stdout.on('data', function (data) {
-            data = _.compact(data.replaceAll('ok ', '\nok ').replaceAll('not ok ', '\nnot ok ').trim().split(/\n/));
+            data = _.compact(data.trim().split(/\n/));
             data.forEach(line => {
                 if (clearLines > 0 && options.hidePassed) {
-                    process.stdout.write(ansiEscapes.cursorUp(3));
+                    process.stdout.write(ansiEscapes.cursorUp(1));
                     process.stdout.write(ansiEscapes.eraseDown);
                 }
                 if (line.startsWith('ok')) {
@@ -170,7 +170,6 @@ function test(tests, options) {
                     console.log(line);
                 }
             });
-            console.log('\n');
         });
         p.stdout.once('end', () => {
             process.stdout.write(ansiEscapes.cursorDown());
