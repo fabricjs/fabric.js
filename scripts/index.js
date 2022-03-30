@@ -150,35 +150,39 @@ function test(tests, options) {
     const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests, options.filter ? ['--filter', options.filter] : '');
     process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
     process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
-    try {
-        var p = cp.exec(args.join(' '), { cwd: wd, env: process.env });
-        let clearLines = 0;
-        process.stdout.write(ansiEscapes.cursorHide);
-        p.stdout.on('data', function (data) {
-            data = _.compact(data.trim().split(/\n/));
-            data.forEach(line => {
-                if (clearLines > 0 && options.hidePassed) {
-                    process.stdout.write(ansiEscapes.cursorUp(1));
-                    process.stdout.write(ansiEscapes.eraseDown);
-                }
-                if (line.startsWith('ok')) {
-                    clearLines = 1;
-                    console.log(chalk.green(line));
-                }
-                else {
-                    clearLines = 0;
-                    console.log(line);
-                }
+    return new Promise((resolve, reject) => {
+        try {
+            var p = cp.spawn(args.join(' '), { cwd: wd, env: process.env, shell: true, stdio: 'pipe' });
+            let clearLines = 0;
+            process.stdout.write(ansiEscapes.cursorHide);
+            p.stdout.on('data', function (data) {
+                data = _.compact(data.toString().trim().split(/\n/));
+                data.forEach(line => {
+                    if (clearLines > 0 && options.hidePassed) {
+                        process.stdout.write(ansiEscapes.cursorUp(1));
+                        process.stdout.write(ansiEscapes.eraseDown);
+                    }
+                    if (line.startsWith('ok')) {
+                        clearLines = 1;
+                        console.log(chalk.green(line));
+                    }
+                    else {
+                        clearLines = 0;
+                        console.log(line);
+                    }
+                });
             });
-        });
-        p.stdout.once('end', () => {
+            p.stdout.once('end', () => {
+                process.stdout.write(ansiEscapes.cursorDown());
+                process.stdout.write(ansiEscapes.cursorShow);
+                resolve();
+            });
+        } catch (error) {
             process.stdout.write(ansiEscapes.cursorDown());
             process.stdout.write(ansiEscapes.cursorShow);
-        });
-    } catch (error) {
-        process.stdout.write(ansiEscapes.cursorDown());
-        process.stdout.write(ansiEscapes.cursorShow);
-    }
+            reject(error);
+        }
+    });
 }
 
 /**
@@ -264,11 +268,12 @@ async function runIntreactiveTestSuite(options) {
         acc[curr.type].push(`test/${curr.type}/${curr.file}`);
         return acc;
     }, { unit: [], visual: [] });
-    _.forEach(tests, files => {
+    _.reduce(tests, async (queue, files) => {
+        await queue;
         if (files.length > 0) {
-            test(files, options);
+            return test(files, options);
         }
-    });
+    }, Promise.resolve());
 }
 
 program
@@ -318,7 +323,10 @@ program
             options.suite = ['unit', 'visual'];
         }
         if (options.suite) {
-            options.suite.forEach(suite => test(`test/${suite}`, options));
+            _.reduce(options.suite, async (queue, suite) => {
+                await queue;
+                return test(`test/${suite}`, options);
+            }, Promise.resolve());
         }
         else if (options.file) {
             test(`test/${options.file}`, options);
