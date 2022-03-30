@@ -900,7 +900,7 @@
       // this latest bound box represent the last character of the line
       // to simplify cursor handling in interactive mode.
       lineBounds[i] = {
-        left: left,
+        left: this._resolveLineDirection(lineIndex),
         width: 0,
         kernedWidth: 0,
         height: this.fontSize,
@@ -1043,22 +1043,10 @@
      * @param {number} charIndex position in the line
      * @returns {number} width of line in px
      */
-    _resolveLineDirection: function (lineIndex, charIndex) {
-      var dir = 'undetermined', c = charIndex, lineBounds = this.__charBounds[lineIndex];
-      while (c > 0 && lineBounds) {
-        var data = lineBounds[--c];
-        if (data.dir !== 'undetermined') {
-          dir = data.dir;
-          break;
-        }
-      }
-      if (dir === 'undetermined') {
-        dir = this.direction;
-      }
-      this._resolveLineDirectionBackwards(dir, lineIndex, charIndex);
+    _resolveLineDirection: function (lineIndex) {
+      var c = 0, lineBounds = this.__charBounds[lineIndex];
       //  at this point the the direction of line's graphemes is resolved (='ltr'|'rtl')
       //  now we need to reorder char bounds of words that are opposite to the base direction
-      c = 0;
       var baseDir = this.direction, width = 0, offset = 0, prev, oppositeBounds = [], eol;
       while (lineBounds && c < lineBounds.length) {
         var data = lineBounds[c];
@@ -1075,7 +1063,7 @@
         }
         if (data && (data.dir === baseDir || c === lineBounds.length - 1) && oppositeBounds.length > 0) {
           data = oppositeBounds[0];
-          eol = data.left = width + offset - data.kernedWidth;
+          eol = data.left = width + offset;
           for (var i = 1; i < oppositeBounds.length; i++) {
             data = oppositeBounds[i];
             prev = oppositeBounds[i - 1];
