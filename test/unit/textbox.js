@@ -268,7 +268,7 @@
     var line2 = textbox._wrapLine('', 0, 100, 0);
     assert.deepEqual(line2, [[]], 'wrapping with splitByGrapheme');
   });
-  QUnit.test('texbox will change width from the mr corner', function(assert) {
+  QUnit.test('textbox will change width from the mr corner', function(assert) {
     var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0 });
     canvas.add(text);
     canvas.setActiveObject(text);
@@ -293,7 +293,7 @@
     });
     assert.equal(text.width, originalWidth + 20, 'width increased');
   });
-  QUnit.test('texbox will change width from the ml corner', function(assert) {
+  QUnit.test('textbox will change width from the ml corner', function(assert) {
     var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0, left: 40 });
     canvas.add(text);
     canvas.setActiveObject(text);
