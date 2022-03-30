@@ -1574,7 +1574,7 @@
       this.overlayImage = null;
       this._iTextInstances = null;
       this.contextContainer = null;
-      // restore canvas style
+      // restore canvas style and attributes
       this.lowerCanvasEl.classList.remove('lower-canvas');
       this.lowerCanvasEl.removeAttribute('data-fabric');
       if (this.interactive) {
