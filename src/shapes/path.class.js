@@ -328,12 +328,12 @@
 
     /**
      * @private
-     * @param {object} options 
+     * @param {object} options
      * @param {boolean} options.fromSVG
      */
     _setPositionDimensions: function (options) {
       var calcDim = this._calcDimensions(options), correctLeftTop,
-        correctSize = this.exactBoundingBox ? this.strokeWidth : 0;
+          correctSize = this.exactBoundingBox ? this.strokeWidth : 0;
       this.width = calcDim.width - correctSize;
       this.height = calcDim.height - correctSize;
       if (!options.fromSVG) {
