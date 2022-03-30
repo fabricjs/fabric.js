@@ -373,6 +373,7 @@
         this.setPathInfo();
       }
       this.__skipDimension = false;
+      this.styles = this._getExpandedStyles();
       this.initDimensions();
       this.setCoords();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
@@ -1538,8 +1539,7 @@
     toObject: function(propertiesToInclude) {
       var allProperties = additionalProps.concat(propertiesToInclude);
       var obj = this.callSuper('toObject', allProperties);
-      // styles will be overridden with a properly cloned structure
-      obj.styles = clone(this.styles, true);
+      obj.styles = this._getCondensedStyles();
       if (obj.path) {
         obj.path = this.path.toObject();
       }
