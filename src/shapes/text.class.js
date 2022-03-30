@@ -895,6 +895,8 @@
         width += graphemeInfo.kernedWidth;
         prevGrapheme = grapheme;
       }
+      //  resolve direction
+      this._resolveLineDirection(lineIndex, i - 1);
       // this latest bound box represent the last character of the line
       // to simplify cursor handling in interactive mode.
       lineBounds[i] = {
@@ -902,10 +904,9 @@
         width: 0,
         kernedWidth: 0,
         height: this.fontSize,
+        dir: this.direction
       };
-      //  resolve direction
-      //  we need the last bbox populated before we call the method
-      lineBounds[i].dir = this._resolveLineDirection(lineIndex, i);
+      
       if (path) {
         totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
         startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
@@ -1075,7 +1076,7 @@
           for (var i = 1; i < oppositeBounds.length; i++) {
             data = oppositeBounds[i];
             prev = oppositeBounds[i - 1];
-            data.left = prev.left - prev.width - data.kernedWidth + data.width;
+            data.left = prev.left - prev.width + data.kernedWidth - data.width;
           }
           width = offset = 0;
           oppositeBounds = [];
