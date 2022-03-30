@@ -147,7 +147,7 @@ function exportToWebsite(options) {
  */
 function test(tests, options) {
     options = options || {};
-    const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests).concat(options.filter ? '--filter' : '');
+    const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests, options.filter ? ['--filter', options.filter] : '');
     process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
     process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
     try {
