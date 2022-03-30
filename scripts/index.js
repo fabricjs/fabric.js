@@ -143,7 +143,7 @@ function exportToWebsite(options) {
 /**
  * 
  * @param {string[]} tests file paths
- * @param {{debug?:boolean,recreate?:boolean,hidePassed?:boolean,filter?:boolean}} [options] 
+ * @param {{debug?:boolean,recreate?:boolean,show?:boolean,filter?:boolean}} [options] 
  */
 function test(tests, options) {
     options = options || {};
@@ -159,7 +159,7 @@ function test(tests, options) {
             p.stdout.on('data', function (data) {
                 data = _.compact(data.toString().trim().split(/\n/));
                 data.forEach(line => {
-                    if (clearLines > 0 && options.hidePassed) {
+                    if (clearLines > 0 && !options.show) {
                         process.stdout.write(ansiEscapes.cursorUp(1));
                         process.stdout.write(ansiEscapes.eraseDown);
                     }
@@ -318,7 +318,7 @@ program
     .option('-a, --all', 'run all tests', false)
     .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
     .option('-r, --recreate', 'recreate visual refs (golden images)', false)
-    .option('-r, --hide-passed', 'hide passed tests to reduce visual overload', true)
+    .option('--show', 'show passing tests', false)
     .option('-cc, --clear-cache', 'clear CLI test cache', false)
     .action((options) => {
         if (options.clearCache) {
