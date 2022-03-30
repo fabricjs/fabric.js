@@ -333,38 +333,38 @@
           textLines = this.text.split('\n'),
           charIndex = -1, prevStyle = {}, newStyles = [];
       //loop through each textLine
-      for (var i=0; i < textLines.length; i++) {
-          //if obj has a style for this line
-          if (styles[i]) {
-              //loop through each character of the current line
-              for (var c=0; c < textLines[i].length; c++) {
-                  charIndex++;
-                  var thisStyle = styles[i] || {};
-                  //check if style exists for this character
-                  if (thisStyle && thisStyle[c]) {
-                      thisStyle = thisStyle[c];
-                      var styleChanged = this._hasStyleChanged(prevStyle, thisStyle);
-                      //check if no style exists for previous character, or if style has changed
-                      if (!prevStyle || styleChanged) {
-                        newStyles.push({
-                              start: charIndex,
-                              end: charIndex + 1,
-                              style: thisStyle
-                          });
-                      }
-                      else {
-                          if (!styleChanged) {
-                              //if style is the same as previous character, increase end index
-                              newStyles[newStyles.length - 1].end++;
-                          }
-                      }
-                  }
-                  prevStyle = thisStyle;
+      for (var i = 0; i < textLines.length; i++) {
+        //if obj has a style for this line
+        if (styles[i]) {
+          //loop through each character of the current line
+          for (var c=0; c < textLines[i].length; c++) {
+            charIndex++;
+            var thisStyle = styles[i] || {};
+            //check if style exists for this character
+            if (thisStyle && thisStyle[c]) {
+              thisStyle = thisStyle[c];
+              var styleChanged = this._hasStyleChanged(prevStyle, thisStyle);
+              //check if no style exists for previous character, or if style has changed
+              if (!prevStyle || styleChanged) {
+                newStyles.push({
+                  start: charIndex,
+                  end: charIndex + 1,
+                  style: thisStyle
+                });
               }
+              else {
+                if (!styleChanged) {
+                  //if style is the same as previous character, increase end index
+                  newStyles[newStyles.length - 1].end++;
+                }
+              }
+            }
+            prevStyle = thisStyle;
           }
-          else {
-              charIndex += textLines[i].length;
-          }
+        }
+        else {
+          charIndex += textLines[i].length;
+        }
       }
       return newStyles;
     },
@@ -377,28 +377,32 @@
      */
     _getExpandedStyles: function() {
       //styles doesn't need expanding if it's already an array
-      if (!Array.isArray(this.styles)) return this.styles;
+      if (!Array.isArray(this.styles)) {
+        return this.styles;
+      }
       var textLines = this.text.split('\n'),
           charIndex = -1, styleIndex = 0, newStyles = {};
       //loop through each textLine
-      for (var i=0; i < textLines.length; i++) {
-          //loop through each character of the current line
-          for (var c=0; c < textLines[i].length; c++) {
-              charIndex++;
-              //check if there's a style collection for the current character
-              if (this.styles[styleIndex] 
-                  && this.styles[styleIndex].start <= charIndex 
-                  && charIndex < this.styles[styleIndex].end) {
-                  //create object for line index if it doesn't exist
-                  if (!newStyles[i]) newStyles[i] = {};
-                  //add a style entry for this character's index
-                  newStyles[i][c] = this.styles[styleIndex].style;
-                  //if character is at the end of the current style collection, move to the next
-                  if (charIndex === this.styles[styleIndex].end - 1) {
-                      styleIndex++;
-                  }
-              }
+      for (var i = 0; i < textLines.length; i++) {
+        //loop through each character of the current line
+        for (var c=0; c < textLines[i].length; c++) {
+          charIndex++;
+          //check if there's a style collection for the current character
+          if (this.styles[styleIndex]
+            && this.styles[styleIndex].start <= charIndex
+            && charIndex < this.styles[styleIndex].end) {
+            //create object for line index if it doesn't exist
+            if (!newStyles[i]) {
+              newStyles[i] = {};
+            }
+            //add a style entry for this character's index
+            newStyles[i][c] = this.styles[styleIndex].style;
+            //if character is at the end of the current style collection, move to the next
+            if (charIndex === this.styles[styleIndex].end - 1) {
+              styleIndex++;
+            }
           }
+        }
       }
       return newStyles;
     }
