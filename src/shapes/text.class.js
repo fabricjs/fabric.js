@@ -895,8 +895,6 @@
         width += graphemeInfo.kernedWidth;
         prevGrapheme = grapheme;
       }
-      //  resolve direction
-      var left = this._resolveLineDirection(lineIndex, i - 1);
       // this latest bound box represent the last character of the line
       // to simplify cursor handling in interactive mode.
       lineBounds[i] = {
