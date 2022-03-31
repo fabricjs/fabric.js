@@ -927,7 +927,6 @@
   function assertBidi(assert, text, baseDirection, expected) {
     var textObj = new fabric.Text(text, { direction: baseDirection === 'R' ? 'rtl' : 'ltr' });
     assert.ok(textObj.bidiResolver, 'should have a bidiResolver attached to instance');
-    console.log(textObj.__charBounds)
     var c = 0;
     for (let i = 0, dir, data; i < textObj.__charBounds.length; i++) {
       for (let j = 0, len = textObj.__charBounds[i].length; j < len; j++) {
