@@ -1041,17 +1041,30 @@
         //  resolve all preceding `W` character direction values for the given line to strong values (`L`|`R`)
         //  https://unicode.org/reports/tr9/#Explicit_Directional_Isolates
         //  we use `FSI` to mark a weak grapheme overriden by a FS (first strong) grapheme, differently from the spec
-        var lineBounds = this.__charBounds[lineIndex];
+        var lineBounds = this.__charBounds[lineIndex], weaklings = [], isBaseDir = cdir === cBaseDirection, wdir = cdir;
         c = charIndex - 1;
         while (lineBounds && c >= 0) {
           var data = lineBounds[c--];
           if (data.dir === 'W' || (data.type === 'FSI' && data.dir !== cdir)) {
-            data.dir = cdir;
             data.type = 'FSI';
+            if (isBaseDir) {
+              data.dir = cdir;
+            }
+            else {
+              //  we are not sure what is the preceding strong character so we store for later
+              weaklings.push(data);
+            }
           }
           else {
+            if (data.dir === cBaseDirection) {
+              //  the preceding strong character should take over
+              wdir = cBaseDirection;
+            }
             break;
           }
+        }
+        for (var i = 0; i < weaklings.length; i++) {
+          weaklings[i].dir = wdir;
         }
         return cdir;
       }
