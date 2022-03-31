@@ -1195,8 +1195,10 @@
               left: data.left,
               dir: data.dir,
               type: isStarter ?
-                typeStart :
-                data.dir === 'R' ? 'RLI' : 'LRI'
+                  typeStart :
+                  data.dir === 'R' ?
+                    'RLI' :
+                    'LRI'
             });
             c += 2;
             for (var i = 1; i < oppositeBounds.length; i++) {
@@ -1204,6 +1206,10 @@
               prev = oppositeBounds[i - 1];
               data.left = prev.left - prev.width + data.kernedWidth - data.width;
             }
+          }
+          else if (isStarter) {
+            lineBounds.splice(start, 1);
+            lineBounds[start].dir = data.dir;
           }
           width = offset = 0;
           oppositeBounds = [];
@@ -1247,6 +1253,7 @@
         kernedWidth += charSpacing;
       }
 
+      var type = this.bidiResolver.resolveDirectionals(grapheme);
       var box = {
         width: width,
         left: 0,
@@ -1254,8 +1261,10 @@
         kernedWidth: kernedWidth,
         deltaY: style.deltaY,
         dir: this._getGraphemeDirection(grapheme, line, lineIndex, charIndex, this.direction),
-        type: this.bidiResolver.resolveDirectionals(grapheme)
       };
+      if (type) {
+        box.type = type;
+      }
       if (charIndex > 0 && !skipLeft) {
         var previousBox = this.__charBounds[lineIndex][charIndex - 1];
         box.left = previousBox.left + previousBox.width + info.kernedWidth - info.width;
