@@ -898,7 +898,7 @@
       // this latest bound box represent the last character of the line
       // to simplify cursor handling in interactive mode.
       lineBounds[i] = {
-        left: this._resolveLineDirection(lineIndex),
+        left: this._resolveLineDirection(lineIndex, this.direction),
         width: 0,
         kernedWidth: 0,
         height: this.fontSize,
@@ -966,14 +966,16 @@
      * @param {string} grapheme
      * @param {number} lineIndex index of the line where the char is
      * @param {number} charIndex position in the line
+     * @param {ExplicitDirection} baseDirection
      * @returns {Direction} direction
      */
-    _getGraphemeDirection: function (grapheme, line, lineIndex, charIndex) {
+    _getGraphemeDirection: function (grapheme, line, lineIndex, charIndex, baseDirection) {
       var dir = bidiResolver.resolve(grapheme);
       if (dir === 'undetermined' && charIndex === line.length - 1) {
-        return this._resolveLineDirection(lineIndex, charIndex);
+        //  the direction of the last grapheme should set by `baseDirection`
+        dir = baseDirection;
       }
-      else if (dir === 'undetermined') {
+      if (dir === 'undetermined') {
         var before = 'undetermined', after = 'undetermined';
         //  check graphemes up to start of line
         var p = charIndex - 1;
@@ -986,7 +988,7 @@
           after = bidiResolver.resolve(line[p++]);
         }
         //  resolve special cases
-        dir = bidiResolver.resolveUndetermined(grapheme, before, after, this.direction);
+        dir = bidiResolver.resolveUndetermined(grapheme, before, after, baseDirection);
         //  in case a char returns an `undetermined` dir it will be overriden by the next strong char
         if (before === after) {
           //  weak char between 2 words with the same direction
@@ -995,12 +997,11 @@
         else if (this._reWords.test(grapheme) || before === 'undetermined' || after === 'undetermined') {
           //  1. weak char that is not a space, e.g. punctuation
           //  2. space at the beiginning of text
-          //  3. line ending with weak chars
           return before;
         }
         else {
           //  space between 2 words with different direction
-          return this.direction;
+          return baseDirection;
         }
       }
       else {
@@ -1038,19 +1039,20 @@
      * resolves undetermined direction values for the given line
      * @private
      * @param {number} lineIndex index of the line where the char is
+     * @param {ExplicitDirection} baseDirection
      * @returns {number} width of line in px
      */
-    _resolveLineDirection: function (lineIndex) {
+    _resolveLineDirection: function (lineIndex, baseDirection) {
       var c = 0, lineBounds = this.__charBounds[lineIndex];
       //  at this point the the direction of line's graphemes is resolved (='ltr'|'rtl')
       //  now we need to reorder char bounds of words that are opposite to the base direction
-      var baseDir = this.direction, width = 0, offset = 0, prev, oppositeBounds = [], eol;
+      var width = 0, offset = 0, prev, oppositeBounds = [], eol;
       while (lineBounds && c < lineBounds.length) {
         var data = lineBounds[c];
         if (data) {
           eol = data.left + data.width;
         }
-        if (data && data.dir !== baseDir) {
+        if (data && data.dir !== baseDirection) {
           oppositeBounds.push(data);
           if (width === 0) {
             prev = c > 0 ? lineBounds[c - 1] : undefined;
@@ -1058,7 +1060,7 @@
           }
           width += data.width;
         }
-        if (data && (data.dir === baseDir || c === lineBounds.length - 1) && oppositeBounds.length > 0) {
+        if (data && (data.dir === baseDirection || c === lineBounds.length - 1) && oppositeBounds.length > 0) {
           data = oppositeBounds[0];
           eol = data.left = width + offset;
           for (var i = 1; i < oppositeBounds.length; i++) {
@@ -1112,7 +1114,7 @@
         height: style.fontSize,
         kernedWidth: kernedWidth,
         deltaY: style.deltaY,
-        dir: this._getGraphemeDirection(grapheme, line, lineIndex, charIndex)
+        dir: this._getGraphemeDirection(grapheme, line, lineIndex, charIndex, this.direction)
       };
       if (charIndex > 0 && !skipLeft) {
         var previousBox = this.__charBounds[lineIndex][charIndex - 1];
