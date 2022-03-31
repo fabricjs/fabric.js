@@ -1062,7 +1062,12 @@
         }
         if (data && (data.dir === baseDirection || c === lineBounds.length - 1) && oppositeBounds.length > 0) {
           data = oppositeBounds[0];
-          eol = data.left = width + offset;
+          eol = width + offset;
+          if (oppositeBounds.length > 1) {
+            //  insert bdo bbox for cursor handling
+            lineBounds.splice(c++, 0, Object.assign({}, data, { left: data.left, type: 'bdo' }));
+            lineBounds.splice(c++ + oppositeBounds.length, 0, Object.assign({}, data, { left: eol, type: 'bdo' }));
+          }
           for (var i = 1; i < oppositeBounds.length; i++) {
             data = oppositeBounds[i];
             prev = oppositeBounds[i - 1];
