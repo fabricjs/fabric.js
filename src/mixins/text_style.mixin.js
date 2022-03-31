@@ -331,7 +331,7 @@
       // clone style structure to prevent mutation
       var styles = fabric.util.object.clone(this.styles, true),
           textLines = this.text.split('\n'),
-          charIndex = -1, prevStyle = {}, newStyles = [];
+          charIndex = -1, prevStyle = {}, stylesArray = [];
       //loop through each textLine
       for (var i = 0; i < textLines.length; i++) {
         //if obj has a style for this line
@@ -345,7 +345,7 @@
               var styleChanged = this._hasStyleChangedForSvg(prevStyle, thisStyle);
               //check if no style exists for previous character, or if style has changed
               if (styleChanged) {
-                newStyles.push({
+                stylesArray.push({
                   start: charIndex,
                   end: charIndex + 1,
                   style: thisStyle
@@ -353,7 +353,7 @@
               }
               else {
                 //if style is the same as previous character, increase end index
-                newStyles[newStyles.length - 1].end++;
+                stylesArray[stylesArray.length - 1].end++;
               }
             }
             prevStyle = thisStyle || {};
@@ -364,7 +364,7 @@
           charIndex += textLines[i].length;
         }
       }
-      return newStyles;
+      return stylesArray;
     },
 
     /**
@@ -378,7 +378,7 @@
         return this.styles;
       }
       var textLines = this.text.split('\n'),
-          charIndex = -1, styleIndex = 0, newStyles = {};
+          charIndex = -1, styleIndex = 0, stylesObject = {};
       //loop through each textLine
       for (var i = 0; i < textLines.length; i++) {
         //loop through each character of the current line
@@ -389,9 +389,9 @@
             && this.styles[styleIndex].start <= charIndex
             && charIndex < this.styles[styleIndex].end) {
             //create object for line index if it doesn't exist
-            newStyles[i] = newStyles[i] || {};
+            stylesObject[i] = stylesObject[i] || {};
             //add a style entry for this character's index
-            newStyles[i][c] = this.styles[styleIndex].style;
+            stylesObject[i][c] = this.styles[styleIndex].style;
             //if character is at the end of the current style collection, move to the next
             if (charIndex === this.styles[styleIndex].end - 1) {
               styleIndex++;
@@ -399,7 +399,7 @@
           }
         }
       }
-      return newStyles;
+      return stylesObject;
     }
   });
 })();
