@@ -92,7 +92,7 @@
      * @returns {boolean}
      */
     isDirectionalStart: function (resolvedDirectional) {
-      return resolvedDirectional
+      return !!resolvedDirectional
         && !this.isDirectionalTerminate(resolvedDirectional)
         && resolvedDirectional !== 'FSI';
     },
@@ -1056,12 +1056,37 @@
      * @param {number} lineIndex index of the line where the char is
      * @param {number} charIndex position in the line
      * @param {ExplicitDirection} baseDirection
-     * @returns {CharacterDirection} direction
+     * @returns {{direction:CharacterDirection, type?: string}} direction data
      */
     _getGraphemeDirection: function (grapheme, line, lineIndex, charIndex, baseDirection) {
       var cdir = this.bidiResolver.resolve(grapheme), c,
-          cBaseDirection = this.bidiResolver.resolveDirection(baseDirection);
-      if (cdir === 'W' && charIndex === line.length - 1) {
+        cBaseDirection = this.bidiResolver.resolveDirection(baseDirection),
+        type = this.bidiResolver.resolveDirectionals(grapheme),
+        isTerminate = this.bidiResolver.isDirectionalTerminate(type),
+        lineBounds = this.__charBounds[lineIndex];
+      
+      if (isTerminate) {
+        c = charIndex - 1;
+        cdir = 'W';
+        var overrides = [];
+        while (c >= 0) {
+          var data = lineBounds[c--];
+          if (this.bidiResolver.isDirectionalStart(data.type)) {
+            cdir = data.dir;
+            break;
+          }
+          overrides.push(data);
+        }
+        if (cdir !== 'W') {
+          for (var i = 0; i < overrides.length; i++) {
+            data = overrides[i];
+            data.originalDir = data.dir;
+            data.dir = cdir;
+          }
+        }
+        return { direction: cdir, type: type };
+      }
+      else if (cdir === 'W' && charIndex === line.length - 1) {
         //  the direction of the last grapheme should set by `baseDirection`
         cdir = cBaseDirection;
       }
@@ -1084,30 +1109,28 @@
       if (cdir === 'W') {
         if (before === 'W' || after === 'W') {
           //  weak line start/end
-          return 'W';
         }
         else if (before === after) {
           //  weak char between 2 strong chars with the same direction
-          return before;
+          cdir = before;
         }
         else {
           //  weak char between 2 strong chars with different direction
-          return cBaseDirection;
+          cdir = cBaseDirection;
         }
+        return { direction: cdir, type: 'FSI' };
       }
       else {
         //  strong character
         //  resolve all preceding `W` character direction values for the given line to strong values (`L`|`R`)
         //  https://unicode.org/reports/tr9/#Explicit_Directional_Isolates
         //  we use `FSI` to mark a weak grapheme overriden by a FS (first strong) grapheme, differently from the spec
-        var lineBounds = this.__charBounds[lineIndex], weaklings = [],
-            isBaseDir = cdir === cBaseDirection, wdir = cdir;
+        var weaklings = [], isBaseDir = cdir === cBaseDirection, wdir = cdir;
         c = charIndex - 1;
         while (lineBounds && c >= 0) {
           var data = lineBounds[c--];
           if ((data.dir === 'W' || (data.type === 'FSI' && data.dir !== cdir))
             && !this.bidiResolver.isDirectionalTerminate(data.type)) {
-            data.type = 'FSI';
             if (isBaseDir) {
               data.dir = cdir;
             }
@@ -1127,7 +1150,7 @@
         for (var i = 0; i < weaklings.length; i++) {
           weaklings[i].dir = wdir;
         }
-        return cdir;
+        return { direction: cdir, type: type };
       }
     },
 
@@ -1146,6 +1169,7 @@
       var width = 0, offset = 0, prev, start = -1, oppositeBounds = [], eol,
           cBaseDirection = this.bidiResolver.resolveDirection(baseDirection),
           isBaseDir, isTerminate, isStarter = false, type, typeStart;
+          
       while (lineBounds && c < lineBounds.length) {
         var data = lineBounds[c];
         if (!data) {
@@ -1158,7 +1182,7 @@
         isTerminate = this.bidiResolver.isDirectionalTerminate(type);
         if (!isBaseDir && !isTerminate) {
           oppositeBounds.push(data);
-          if (width === 0) {
+          if (!isStarter && width === 0) {
             start = c;
             typeStart = type;
             isStarter = this.bidiResolver.isDirectionalStart(type);
@@ -1195,7 +1219,7 @@
                   'RLI' :
                   'LRI'
             });
-            c += 2;
+            c += (!isStarter + !isTerminate);
             for (var i = 1; i < oppositeBounds.length; i++) {
               data = oppositeBounds[i];
               prev = oppositeBounds[i - 1];
@@ -1204,7 +1228,12 @@
           }
           else if (isStarter) {
             lineBounds.splice(start, 1);
+            c--;
             lineBounds[start].dir = data.dir;
+          }
+          else if (isTerminate) {
+            lineBounds.splice(c, 1);
+            c--;
           }
           width = offset = 0;
           oppositeBounds = [];
@@ -1248,17 +1277,17 @@
         kernedWidth += charSpacing;
       }
 
-      var type = this.bidiResolver.resolveDirectionals(grapheme);
+      var dir = this._getGraphemeDirection(grapheme, line, lineIndex, charIndex, this.direction);
       var box = {
         width: width,
         left: 0,
         height: style.fontSize,
         kernedWidth: kernedWidth,
         deltaY: style.deltaY,
-        dir: this._getGraphemeDirection(grapheme, line, lineIndex, charIndex, this.direction),
+        dir: dir.direction,
       };
-      if (type) {
-        box.type = type;
+      if (dir.type) {
+        box.type = dir.type;
       }
       if (charIndex > 0 && !skipLeft) {
         var previousBox = this.__charBounds[lineIndex][charIndex - 1];
