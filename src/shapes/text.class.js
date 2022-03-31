@@ -928,7 +928,7 @@
         kernedWidth: 0,
         height: this.fontSize,
         dir: this.direction,
-        type: 'eol'
+        type: 'EOL'
       });
       
       if (path) {
