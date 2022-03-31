@@ -1098,7 +1098,7 @@
               height: data.height,
               left: data.left,
               dir: data.dir,
-              type: data.dir === 'rtl' ? 'RLI' : 'LRI'
+              type: data.dir === 'R' ? 'RLI' : 'LRI'
             });
             c += 2;
           }
