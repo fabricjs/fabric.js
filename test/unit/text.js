@@ -927,6 +927,7 @@
   function assertBidi(assert, text, baseDirection, expected) {
     var textObj = new fabric.Text(text, { direction: baseDirection === 'R' ? 'rtl' : 'ltr' });
     assert.ok(textObj.bidiResolver, 'should have a bidiResolver attached to instance');
+    console.log(textObj.__charBounds)
     var c = 0;
     for (let i = 0, dir, data; i < textObj.__charBounds.length; i++) {
       for (let j = 0, len = textObj.__charBounds[i].length; j < len; j++) {
@@ -935,10 +936,10 @@
         assert.equal(
           dir,
           Array.isArray(expected) ? typeof expected[c] === 'string' ? expected[c] : expected[c].dir : expected,
-          `charBounds(${c},${i},${j}).dir should be equal, baseDir = ${baseDirection}\n${JSON.stringify(data, null, '\t') }`
+          `charBounds(${c},${i},${j}) dir should be equal, baseDir = ${baseDirection}\n${JSON.stringify(data, null, '\t') }`
         );
         if (Array.isArray(expected) && typeof expected[c] === 'object') {
-          assert.equal(data.type, expected[c].type, `type should be equal\n${JSON.stringify(data, null, '\t')}`);
+          assert.equal(data.type, expected[c].type, `charBounds(${c},${i},${j}) type should be equal\n${JSON.stringify(data, null, '\t')}`);
         }
         c++;
       }
@@ -966,40 +967,72 @@
     assertBidi(assert, t, 'R', 'R');
   });
 
-  QUnit.test.only('bidi weak chars', function (assert) {
+  QUnit.test('bidi weak chars', function (assert) {
     var t = '   \n ,; ';
     assertBidi(assert, t, 'L', 'L');
     assertBidi(assert, t, 'R', 'R');
   });
 
+  QUnit.test('bidi single char', function (assert) {
+    var t = 'a b א ב c ג';
+    assertBidi(assert, t, 'L', [
+      'L', 'L', 'L', 'L', { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', 'L', 'L', 'R', { dir: 'L', type: 'EOL' }
+    ]);
+    assertBidi(assert, t, 'R', [
+      { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', 'R', 'R', 'R', 'L', 'R', 'R', { dir: 'R', type: 'EOL' }
+    ]);
+  });
+
+  QUnit.todo('bidi special chars', function (assert) {
+    var t = 'a, b, '+'א, ב, ' + 'c, ג!' //+ '\n' + 'right? נכון?';
+    assertBidi(assert, t, 'L', [
+      'L', 'L', 'L', 'L', 'L', 'L', { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', 'R', { dir: 'R', type: 'PDI' },'L','L','L','L','R','L', { dir: 'L', type: 'EOL' },
+      //'L', 'L', 'L', 'L', 'L', 'L', 'L', { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', { dir: 'L', type: 'EOL' }
+    ]);
+    //assertBidi(assert, t, 'R', 'R');
+  });
+
   QUnit.test('bidi', function (assert) {
     var t = ' abc אבג ';
-    assertBidi(assert, t, 'L', ['L', 'L', 'L', 'L', 'L', 'R', 'R', 'R', 'R', 'L']);
-    assertBidi(assert, t, 'R', ['L', 'L', 'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R']);
+    assertBidi(assert, t, 'L', [
+      'L', 'L', 'L', 'L', 'L', { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', { dir: 'L', type: 'EOL' }
+    ]);
+    assertBidi(assert, t, 'R', [
+      { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', 'R', 'R', 'R', { dir: 'R', type: 'EOL' }
+    ]);
   });
 
   QUnit.test('bidi between', function (assert) {
     var t = ' abc אבג אבג ';
-    assertBidi(assert, t, 'L', ['L', 'L', 'L', 'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'L', 'L']);
-    assertBidi(assert, t, 'R', ['L', 'L', 'L', 'L', 'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R']);
+    assertBidi(assert, t, 'L', [
+      'L', 'L', 'L', 'L', 'L', { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', 'R', 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', { dir: 'L', type: 'EOL' }
+    ]);
+    assertBidi(assert, t, 'R', [
+      { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', { dir: 'R', type: 'EOL' }
+    ]);
+    
     var t = ' אבג abc abc ';
-    assertBidi(assert, t, 'L', ['R', 'R', 'R', 'R', 'R', 'R', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L']);
-    assertBidi(assert, t, 'L', ['R', 'R', 'R', 'R', 'R', 'R', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L']);
+    assertBidi(assert, t, 'L', [
+      { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', { dir: 'L', type: 'EOL' }
+    ]);
+    assertBidi(assert, t, 'R', [
+      'R', 'R', 'R', 'R', 'R', { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', { dir: 'R', type: 'EOL' }
+    ]);
   });
 
   QUnit.test('bidi multiline', function (assert) {
     var t = ' abc אבג \n abc אבג \n אבג abc \n   ';
     assertBidi(assert, t, 'L', [
-      'L', 'L', 'L', 'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R', 'L',
-      'L', 'L', 'L', 'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R', 'L',
-      'R', 'R', 'R', 'R', 'R', 'R', 'L', 'L', 'L', 'L', 'L', 'L',
-      'L', 'L', 'L', 'L',
+      'L', 'L', 'L', 'L', 'L', { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', { dir: 'L', type: 'EOL' },
+      'L', 'L', 'L', 'L', 'L', { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', { dir: 'L', type: 'EOL' },
+      { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', 'L', 'L', 'L', 'L', { dir: 'L', type: 'EOL' },
+      'L', 'L', 'L', { dir: 'L', type: 'EOL' },
     ]);
     assertBidi(assert, t, 'R', [
-      'L', 'L', 'L', 'L', 'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R',
-      'L', 'L', 'L', 'L', 'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R',
-      'R', 'R', 'R', 'R', 'R', 'L', 'L', 'L', 'L', 'L', 'L', 'R',
-      'R', 'R', 'R', 'R',
+      { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', 'R', 'R', 'R', { dir: 'R', type: 'EOL' },
+      { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', 'R', 'R', 'R', { dir: 'R', type: 'EOL' },
+      'R', 'R', 'R', 'R', 'R', { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', { dir: 'R', type: 'EOL' },
+      'R', 'R', 'R', { dir: 'R', type: 'EOL' },
     ]);
   });
 
