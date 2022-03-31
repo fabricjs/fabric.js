@@ -2,7 +2,7 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { }),
+  var fabric = global.fabric || (global.fabric = {}),
       clone = fabric.util.object.clone,
       _reWords = /\S+/g;
 
@@ -22,12 +22,17 @@
   var BidiResolver = fabric.util.createClass({
 
     /**
-     * https://stackoverflow.com/questions/12006095/javascript-how-to-check-if-character-is-rtl/14824756#14824756
+     * @see https://stackoverflow.com/questions/12006095/javascript-how-to-check-if-character-is-rtl/14824756#14824756
+     * RLE @see http://www.unicode.org/reports/tr9/#Explicit_Directional_Embeddings
      */
-    _reExplicitRTL: /^[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]+$/,
+    _reExplicitRTL: /^[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC\u202B\u202E\u2067\u200F\u061C]+$/,
 
+    /**
+     * @see https://stackoverflow.com/questions/12006095/javascript-how-to-check-if-character-is-rtl/14824756#14824756
+     * LRE @see http://www.unicode.org/reports/tr9/#Explicit_Directional_Embeddings
+     */
     // eslint-disable-next-line max-len
-    _reExplicitLTR: /^[A-Za-z0-9%\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF]+$/,
+    _reExplicitLTR: /^[A-Za-z0-9%\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF\u202A\u202D\u2066\u200E]+$/,
 
     _reBaseDirection: /^[,:;]+$/,
 
@@ -80,6 +85,66 @@
           return 'L';
         default:
           return 'W';
+      }
+    },
+
+    /**
+     * 
+     * @param {string} char 
+     * @returns {boolean}
+     */
+    isDirectionalStart: function (resolvedDirectional) {
+      return resolvedDirectional
+        && !this.isDirectionalTerminate(resolvedDirectional)
+        && resolvedDirectional !== 'FSI';
+    },
+
+    /**
+     * 
+     * @param {string} char 
+     * @returns {boolean}
+     */
+    isDirectionalTerminate: function (resolvedDirectional) {
+      return resolvedDirectional === 'PDF' || resolvedDirectional === 'PDI';
+    },
+
+    /**
+     * 
+     * @param {string} char 
+     * @returns {string}
+     */
+    resolveDirectionals: function (char) {
+      switch (char) {
+
+        case '\u202A':
+          return 'LRE';
+        case '\u202B':
+          return 'RLE';
+        case '\u202C':
+          return 'PDF';
+        case '\u202D':
+          return 'LRO';
+        case '\u202E':
+          return 'RLO';
+        
+        case '\u2066':
+          return 'LRI';
+        case '\u2067':
+          return 'RLI';
+        case '\u2068':
+          return 'FSI';
+        case '\u2069':
+          return 'PDI';
+        
+        case '\u200E':
+          return 'LRM';
+        case '\u200F':
+          return 'RLM';
+        case '\u061C':
+          return 'ALM';
+        
+        default:
+          return;
       }
     },
 
@@ -1046,7 +1111,8 @@
         c = charIndex - 1;
         while (lineBounds && c >= 0) {
           var data = lineBounds[c--];
-          if (data.dir === 'W' || (data.type === 'FSI' && data.dir !== cdir)) {
+          if ((data.dir === 'W' || (data.type === 'FSI' && data.dir !== cdir))
+            && !this.bidiResolver.isDirectionalTerminate(data.type)) {
             data.type = 'FSI';
             if (isBaseDir) {
               data.dir = cdir;
@@ -1084,7 +1150,8 @@
       //  at this point the the direction of line's graphemes are resolved (='L'|'R')
       //  now we need to reorder char bounds of words that are opposite to the base direction
       var width = 0, offset = 0, prev, start = -1, oppositeBounds = [], eol,
-        cBaseDirection = this.bidiResolver.resolveDirection(baseDirection), isBaseDir;
+        cBaseDirection = this.bidiResolver.resolveDirection(baseDirection),
+        isBaseDir, isTerminate, isStarter = false, type, typeStart;
       while (lineBounds && c < lineBounds.length) {
         var data = lineBounds[c];
         if (!data) {
@@ -1093,37 +1160,44 @@
         }
         eol = data.left + data.width;
         isBaseDir = data.dir === cBaseDirection;
-        if (!isBaseDir) {
+        type = data.type;
+        isTerminate = this.bidiResolver.isDirectionalTerminate(type);
+        if (!isBaseDir && !isTerminate) {
           oppositeBounds.push(data);
           if (width === 0) {
             start = c;
+            typeStart = type;
+            isStarter = this.bidiResolver.isDirectionalStart(type);
             prev = c > 0 ? lineBounds[c - 1] : undefined;
             offset = prev ? prev.left + prev.width : 0;
           }
           width += data.width;
         }
-        if ((isBaseDir || c === lineBounds.length - 1) && oppositeBounds.length > 0) {
+        if ((isBaseDir || c === lineBounds.length - 1 || isTerminate)
+          && oppositeBounds.length > 0) {
           data = oppositeBounds[0];
           eol = width + offset;
           if (oppositeBounds.length > 1) {
             //  insert bdo bbox for cursor handling
             //  in order to insert the closing bdo tag in the correct place we insert it before inserting the opening bdo tag
             //  https://unicode.org/reports/tr9/#Explicit_Directional_Isolates
-            lineBounds.splice(start + oppositeBounds.length, 0, {
+            lineBounds.splice(start + oppositeBounds.length, isTerminate, {
               width: 0,
               kernedWidth: 0,
               height: data.height,
               left: eol,
               dir: data.dir,
-              type: 'PDI'
+              type: isTerminate ? type : 'PDI'
             });
-            lineBounds.splice(start, 0, {
+            lineBounds.splice(start, isStarter, {
               width: 0,
               kernedWidth: 0,
               height: data.height,
               left: data.left,
               dir: data.dir,
-              type: data.dir === 'R' ? 'RLI' : 'LRI'
+              type: isStarter ?
+                typeStart :
+                data.dir === 'R' ? 'RLI' : 'LRI'
             });
             c += 2;
             for (var i = 1; i < oppositeBounds.length; i++) {
@@ -1135,6 +1209,7 @@
           width = offset = 0;
           oppositeBounds = [];
           start = -1;
+          isStarter = false;
           prev = undefined;
         }
         c++;
@@ -1179,7 +1254,8 @@
         height: style.fontSize,
         kernedWidth: kernedWidth,
         deltaY: style.deltaY,
-        dir: this._getGraphemeDirection(grapheme, line, lineIndex, charIndex, this.direction)
+        dir: this._getGraphemeDirection(grapheme, line, lineIndex, charIndex, this.direction),
+        type: this.bidiResolver.resolveDirectionals(grapheme)
       };
       if (charIndex > 0 && !skipLeft) {
         var previousBox = this.__charBounds[lineIndex][charIndex - 1];
