@@ -327,7 +327,7 @@
      * so it is used in serialization (not during runtime).
      * @return {Array}
      */
-     _stylesToArray: function() {
+    _stylesToArray: function() {
       // clone style structure to prevent mutation
       var styles = fabric.util.object.clone(this.styles, true),
           textLines = this.text.split('\n'),
