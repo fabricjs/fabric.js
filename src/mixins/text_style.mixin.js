@@ -322,12 +322,12 @@
     },
 
     /**
-     * Returns the condensed form of an object's styles property by grouping styles in ranges
+     * Returns the array form of an object's styles property where styles are grouped in ranges
      * rather than per character. This format is less verbose, and is better suited for storage
-     * so it is used in serialization.
+     * so it is used in serialization (not during runtime).
      * @return {Array}
      */
-    _getCondensedStyles: function() {
+     _stylesToArray: function() {
       // clone style structure to prevent mutation
       var styles = fabric.util.object.clone(this.styles, true),
           textLines = this.text.split('\n'),
@@ -368,13 +368,12 @@
     },
 
     /**
-     * Returns the expanded form of an object's styles property where styles are assigned
-     * per character rather than grouped by range. This format is more verbose, and is
-     * only used for initialized objects (not for serialization)
+     * Returns the object form of the styles property where styles are assigned per
+     * character rather than grouped by range. This format is more verbose, and is
+     * only used during runtime (not for serialization/storage)
      * @return {Object}
      */
-    _getExpandedStyles: function() {
-      //styles doesn't need expanding if it's already an array
+    _stylesFromArray: function() {
       if (!Array.isArray(this.styles)) {
         return this.styles;
       }

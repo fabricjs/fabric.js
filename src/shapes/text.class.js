@@ -373,7 +373,7 @@
         this.setPathInfo();
       }
       this.__skipDimension = false;
-      this.styles = this._getExpandedStyles();
+      this.styles = this._stylesFromArray();
       this.initDimensions();
       this.setCoords();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
@@ -1539,7 +1539,7 @@
     toObject: function(propertiesToInclude) {
       var allProperties = additionalProps.concat(propertiesToInclude);
       var obj = this.callSuper('toObject', allProperties);
-      obj.styles = this._getCondensedStyles();
+      obj.styles = this._stylesToArray();
       if (obj.path) {
         obj.path = this.path.toObject();
       }
