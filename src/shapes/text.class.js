@@ -895,15 +895,18 @@
         width += graphemeInfo.kernedWidth;
         prevGrapheme = grapheme;
       }
+      //  mutates `lineBounds`
+      var eol = this._resolveLineDirection(lineIndex, this.direction);
       // this latest bound box represent the last character of the line
       // to simplify cursor handling in interactive mode.
-      lineBounds[i] = {
-        left: this._resolveLineDirection(lineIndex, this.direction),
+      lineBounds.push({
+        left: eol,
         width: 0,
         kernedWidth: 0,
         height: this.fontSize,
-        dir: this.direction
-      };
+        dir: this.direction,
+        type: 'eol'
+      });
       
       if (path) {
         totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
@@ -1022,9 +1025,9 @@
       var overriden = false;
       while (lineIndex >= 0 && this.__charBounds[lineIndex] && charIndex > 0) {
         var data = this.__charBounds[lineIndex][--charIndex];
-        if (data.dir === 'undetermined' || (data.inheritedDir && data.dir !== dir)) {
+        if (data.dir === 'undetermined' || (data.type === 'FSI' && data.dir !== dir)) {
           data.dir = dir;
-          data.inheritedDir = true;
+          data.type = 'FSI';
           overriden = true;
         }
         else {
@@ -1046,7 +1049,7 @@
       var c = 0, lineBounds = this.__charBounds[lineIndex];
       //  at this point the the direction of line's graphemes is resolved (='ltr'|'rtl')
       //  now we need to reorder char bounds of words that are opposite to the base direction
-      var width = 0, offset = 0, prev, oppositeBounds = [], eol;
+      var width = 0, offset = 0, prev, start = -1, oppositeBounds = [], eol, type;
       while (lineBounds && c < lineBounds.length) {
         var data = lineBounds[c];
         if (data) {
@@ -1055,6 +1058,7 @@
         if (data && data.dir !== baseDirection) {
           oppositeBounds.push(data);
           if (width === 0) {
+            start = Math.max(c - 1, 0);
             prev = c > 0 ? lineBounds[c - 1] : undefined;
             offset = prev ? prev.left + prev.width : 0;
           }
@@ -1065,8 +1069,24 @@
           eol = width + offset;
           if (oppositeBounds.length > 1) {
             //  insert bdo bbox for cursor handling
-            lineBounds.splice(c++, 0, Object.assign({}, data, { left: data.left, type: 'bdo' }));
-            lineBounds.splice(c++ + oppositeBounds.length, 0, Object.assign({}, data, { left: eol, type: 'bdo' }));
+            //  in order to insert the last bdo in the correct place we insert it first
+            lineBounds.splice(start + oppositeBounds.length, 0, {
+              width: 0,
+              kernedWidth: 0,
+              height: data.height,
+              left: eol,
+              dir: data.dir,
+              type: data.dir === 'rtl' ? 'RLI' : 'LRI'
+            });
+            lineBounds.splice(start, 0, {
+              width: 0,
+              kernedWidth: 0,
+              height: data.height,
+              left: data.left,
+              dir: data.dir,
+              type: 'PDI'
+            });
+            c += 2;
           }
           for (var i = 1; i < oppositeBounds.length; i++) {
             data = oppositeBounds[i];
