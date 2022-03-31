@@ -1090,7 +1090,7 @@
               height: data.height,
               left: eol,
               dir: data.dir,
-              type: data.dir === 'rtl' ? 'RLI' : 'LRI'
+              type: 'PDI'
             });
             lineBounds.splice(start, 0, {
               width: 0,
@@ -1098,7 +1098,7 @@
               height: data.height,
               left: data.left,
               dir: data.dir,
-              type: 'PDI'
+              type: data.dir === 'rtl' ? 'RLI' : 'LRI'
             });
             c += 2;
           }
