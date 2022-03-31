@@ -982,13 +982,25 @@
     ]);
   });
 
-  QUnit.todo('bidi special chars', function (assert) {
-    var t = 'a, b, '+'א, ב, ' + 'c, ג!' //+ '\n' + 'right? נכון?';
+  QUnit.test('bidi special chars', function (assert) {
+    var t = 'a, b, ' + 'א' + '\u202A, ' + 'ב, ' + 'c, ג!' + '\n' + 'right? נכון?';
+    var control = 'a, b, ' + 'א' + ', ' + 'ב, ' + 'c, ג!' + '\n' + 'right? נכון?';
     assertBidi(assert, t, 'L', [
-      'L', 'L', 'L', 'L', 'L', 'L', { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', 'R', { dir: 'R', type: 'PDI' },'L','L','L','L','R','L', { dir: 'L', type: 'EOL' },
-      //'L', 'L', 'L', 'L', 'L', 'L', 'L', { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', { dir: 'L', type: 'EOL' }
+      'L', 'L', 'L', 'L', 'L', 'L', 'R', { dir: 'L', type: 'LRE' }, 'L', 'L', 'R', 'L', 'L', 'L', 'L','L', 'R', 'L', { dir: 'L', type: 'EOL' },
+      'L', 'L', 'L', 'L', 'L', 'L', 'L', { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', { dir: 'L', type: 'EOL' }
     ]);
-    //assertBidi(assert, t, 'R', 'R');
+    assertBidi(assert, control, 'L', [
+      'L', 'L', 'L', 'L', 'L', 'L', { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', 'L', 'L', 'L', 'L', 'R', 'L', { dir: 'L', type: 'EOL' },
+      'L', 'L', 'L', 'L', 'L', 'L', 'L', { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', { dir: 'L', type: 'EOL' }
+    ]);
+    assertBidi(assert, t, 'R', [
+      { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', 'R', 'L', 'R', 'R', 'R', 'R', 'L', 'R', 'R', 'R', 'R', { dir: 'R', type: 'EOL' },
+      { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', 'R', 'R', 'R', 'R','R', { dir: 'R', type: 'EOL' }
+    ]);
+    assertBidi(assert, control, 'R', [
+      { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'L', 'R', 'R', 'R', 'R', { dir: 'R', type: 'EOL' },
+      { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', 'R', 'R', 'R', 'R', 'R', { dir: 'R', type: 'EOL' }
+    ]);
   });
 
   QUnit.test('bidi', function (assert) {
