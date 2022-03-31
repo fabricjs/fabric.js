@@ -1015,7 +1015,7 @@
           after = this.bidiResolver.resolve(line[p++]);
         }
         //  resolve special cases
-        //  in case a char returns a `W` dir it will be overriden by the next strong char by `_resolveLineDirection`
+        //  in case a char returns a `W` dir it will be overriden by the next strong char or by the last char
         cdir = this.bidiResolver.resolveUndetermined(grapheme, before, after, cBaseDirection);
         if (before === after) {
           //  weak char between 2 words with the same direction
