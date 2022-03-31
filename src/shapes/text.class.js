@@ -92,11 +92,14 @@
      * @returns {CharacterDirection} direction
      */
     resolveUndetermined: function (grapheme, before, after, base) {
-      if (this._reBaseDirection.test(grapheme)) {
+      if (before === 'W') {
+        return 'W';
+      }
+      else if (this._reBaseDirection.test(grapheme)) {
         return base;
       }
       else if (this._reContext.test(grapheme)) {
-        return before === after && before !== 'W' ?
+        return before === after ?
           before :
           base;
       }
