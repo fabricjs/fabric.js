@@ -927,7 +927,7 @@
   function assertBidi(assert, text, baseDirection, expected) {
     var textObj = new fabric.Text(text, { direction: baseDirection === 'R' ? 'rtl' : 'ltr' });
     assert.ok(textObj.bidiResolver, 'should have a bidiResolver attached to instance');
-  //  console.log(textObj.__charBounds);
+    //console.log(textObj.__charBounds);
     var c = 0;
     for (let i = 0, dir, data; i < textObj.__charBounds.length; i++) {
       for (let j = 0, len = textObj.__charBounds[i].length; j < len; j++) {
@@ -949,7 +949,7 @@
     }
   }
 
-  QUnit.test.only('bidi ltr', function (assert) {
+  QUnit.test('bidi ltr', function (assert) {
     var t = '   abcdefg\n  hijklmnop  012 ';
     assertBidi(assert, t, 'L', 'L');
     assertBidi(assert, t, 'R', [
@@ -1004,31 +1004,21 @@
     ]);
   });
 
-  QUnit.test.skip('bidi special chars + LRE + PDF terminate', function (assert) {
-    var t = 'a, b, ' + 'א' + '\u202A, \u202C' + 'ב, ' + 'c, ג!' //+ '\n' + 'right? נכון?';
+  QUnit.test('bidi special chars + LRE + PDF terminate', function (assert) {
+    var t = 'a, b, ' + 'א' + '\u202A, \u202C' + 'ב, ' + 'c, ג!' + '\n' + 'right? נכון?';
     var control = 'a, b, ' + 'א' + ', ' + 'ב, ' + 'c, ג!' + '\n' + 'right? נכון?';
-    /*
     assertBidi(assert, t, 'L', [
-      'L', 'L', 'L', 'L', 'L', 'L', 'R', { dir: 'L', type: 'LRE' }, 'L', 'L', 'R', 'L', 'L', 'L', 'L', 'L', 'R', 'L', { dir: 'L', type: 'EOL' },
+      'L', 'L', 'L', 'L', 'L', 'L', 'R', { dir: 'L', type: 'LRE' }, 'L', 'L', { dir: 'L', type: 'PDF' }, 'R', 'L', 'L', 'L', 'L', 'L', 'R', 'L', { dir: 'L', type: 'EOL' },
       'L', 'L', 'L', 'L', 'L', 'L', 'L', { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', { dir: 'L', type: 'EOL' }
     ]);
     assertBidi(assert, control, 'L', [
       'L', 'L', 'L', 'L', 'L', 'L', { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', 'L', 'L', 'L', 'L', 'R', 'L', { dir: 'L', type: 'EOL' },
       'L', 'L', 'L', 'L', 'L', 'L', 'L', { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', { dir: 'L', type: 'EOL' }
     ]);
-    */
     assertBidi(assert, t, 'R', [
       { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', 'R', { dir: 'L', type: 'LRE' }, 'L', 'L', { dir: 'L', type: 'PDF' }, 'R', 'R', 'R', 'L', 'R', 'R', 'R', 'R', { dir: 'R', type: 'EOL' },
-      // { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', 'R', 'R', 'R', 'R', 'R', { dir: 'R', type: 'EOL' }
+      { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', 'R', 'R', 'R', 'R', 'R', { dir: 'R', type: 'EOL' }
     ]);
-
-
-    return
-    assertBidi(assert, t, 'R', [
-      { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', { dir: 'L', type: 'LRE' },'L','L', { dir: 'L', type: 'PDF' }, 'R', 'R', 'R', 'L', 'R', 'R', 'R', 'R', { dir: 'R', type: 'EOL' },
-     // { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', 'R', 'R', 'R', 'R', 'R', { dir: 'R', type: 'EOL' }
-    ]);
-    return
     assertBidi(assert, control, 'R', [
       { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'L', 'R', 'R', 'R', 'R', { dir: 'R', type: 'EOL' },
       { dir: 'L', type: 'LRI' }, 'L', 'L', 'L', 'L', 'L', { dir: 'L', type: 'PDI' }, 'R', 'R', 'R', 'R', 'R', 'R', 'R', { dir: 'R', type: 'EOL' }
