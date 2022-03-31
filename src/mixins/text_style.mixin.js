@@ -345,7 +345,7 @@
               thisStyle = thisStyle[c];
               var styleChanged = this._hasStyleChanged(prevStyle, thisStyle);
               //check if no style exists for previous character, or if style has changed
-              if (!prevStyle || styleChanged) {
+              if (styleChanged) {
                 newStyles.push({
                   start: charIndex,
                   end: charIndex + 1,
@@ -353,10 +353,8 @@
                 });
               }
               else {
-                if (!styleChanged) {
-                  //if style is the same as previous character, increase end index
-                  newStyles[newStyles.length - 1].end++;
-                }
+                //if style is the same as previous character, increase end index
+                newStyles[newStyles.length - 1].end++;
               }
             }
             prevStyle = thisStyle;
@@ -392,9 +390,7 @@
             && this.styles[styleIndex].start <= charIndex
             && charIndex < this.styles[styleIndex].end) {
             //create object for line index if it doesn't exist
-            if (!newStyles[i]) {
-              newStyles[i] = {};
-            }
+            newStyles[i] = newStyles[i] || {};
             //add a style entry for this character's index
             newStyles[i][c] = this.styles[styleIndex].style;
             //if character is at the end of the current style collection, move to the next
