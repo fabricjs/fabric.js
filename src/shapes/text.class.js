@@ -34,8 +34,6 @@
     // eslint-disable-next-line max-len
     _reExplicitLTR: /^[A-Za-z0-9%\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF\u202A\u202D\u2066\u200E]+$/,
 
-    _reBaseDirection: /^[]+$/,
-
     _reContext: /^[.!?,:;]+$/,
 
     /**
@@ -159,9 +157,6 @@
     resolveUndetermined: function (grapheme, before, after, base) {
       if (before === 'W') {
         return 'W';
-      }
-      else if (this._reBaseDirection.test(grapheme)) {
-        return base;
       }
       else if (this._reContext.test(grapheme)) {
         return before === after ?
