@@ -935,10 +935,10 @@
         assert.equal(
           dir,
           Array.isArray(expected) ? typeof expected[c] === 'string' ? expected[c] : expected[c].dir : expected,
-          `charBounds(${c},${i},${j}).dir should be equal, baseDir = ${baseDirection}`
+          `charBounds(${c},${i},${j}).dir should be equal, baseDir = ${baseDirection}\n${JSON.stringify(data, null, '\t') }`
         );
         if (Array.isArray(expected) && typeof expected[c] === 'object') {
-          assert.equal(data.type, expected[c].type, 'type should be equal');
+          assert.equal(data.type, expected[c].type, `type should be equal\n${JSON.stringify(data, null, '\t')}`);
         }
         c++;
       }
@@ -948,9 +948,9 @@
     }
   }
 
-  QUnit.test.only('bidi ltr', function (assert) {
+  QUnit.test('bidi ltr', function (assert) {
     var t = '   abcdefg\n  hijklmnop  012 ';
-    //assertBidi(assert, t, 'L', 'L');
+    assertBidi(assert, t, 'L', 'L');
     assertBidi(assert, t, 'R', [
       /*bdo*/ { dir: 'L', type: 'LRI' }, /* */ 'L', /* */ 'L', /* */ 'L', /*a*/ 'L', /*b*/ 'L', /*c*/ 'L', /*d*/ 'L', /*e*/ 'L', /*f*/ 'L', /*g*/ 'L',/*bdo*/ { dir: 'L', type: 'PDI' },/*eol*/ { dir: 'R', type: 'EOL' },
       /*bdo*/ { dir: 'L', type: 'LRI' }, 'L', 'L', /*h*/ 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L',/*p*/ 'L', 'L', 'L',/*0*/ 'L', 'L', 'L', /*bdo*/ { dir: 'L', type: 'PDI' }, 'R', /*eol*/ { dir: 'R', type: 'EOL' }
@@ -958,12 +958,15 @@
   });
 
   QUnit.test('bidi rtl', function (assert) {
-    var t = '   אבגדהוזחטי\n   כלמנסע   ';
-    assertBidi(assert, t, 'L', new Array(t.length).fill('R').concat(['L', 'L']));
+    var t = ' אבגדה וזחטי  ' + '\n' + ' כלמנסע  ';
+    assertBidi(assert, t, 'L', [
+      { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', 'L', { dir: 'L', type: 'EOL' },
+      { dir: 'R', type: 'RLI' }, 'R', 'R', 'R', 'R', 'R', 'R', 'R', { dir: 'R', type: 'PDI' }, 'L', 'L', { dir: 'L', type: 'EOL' },
+    ]);
     assertBidi(assert, t, 'R', 'R');
   });
 
-  QUnit.test('bidi weak chars', function (assert) {
+  QUnit.test.only('bidi weak chars', function (assert) {
     var t = '   \n ,; ';
     assertBidi(assert, t, 'L', 'L');
     assertBidi(assert, t, 'R', 'R');
