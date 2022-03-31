@@ -1060,11 +1060,11 @@
      */
     _getGraphemeDirection: function (grapheme, line, lineIndex, charIndex, baseDirection) {
       var cdir = this.bidiResolver.resolve(grapheme), c,
-        cBaseDirection = this.bidiResolver.resolveDirection(baseDirection),
-        type = this.bidiResolver.resolveDirectionals(grapheme),
-        isTerminate = this.bidiResolver.isDirectionalTerminate(type),
-        lineBounds = this.__charBounds[lineIndex];
-      
+          cBaseDirection = this.bidiResolver.resolveDirection(baseDirection),
+          type = this.bidiResolver.resolveDirectionals(grapheme),
+          isTerminate = this.bidiResolver.isDirectionalTerminate(type),
+          lineBounds = this.__charBounds[lineIndex];
+
       if (isTerminate) {
         c = charIndex - 1;
         cdir = 'W';
@@ -1169,7 +1169,7 @@
       var width = 0, offset = 0, prev, start = -1, oppositeBounds = [], eol,
           cBaseDirection = this.bidiResolver.resolveDirection(baseDirection),
           isBaseDir, isTerminate, isStarter = false, type, typeStart;
-          
+
       while (lineBounds && c < lineBounds.length) {
         var data = lineBounds[c];
         if (!data) {
