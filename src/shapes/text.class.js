@@ -1041,7 +1041,8 @@
         //  resolve all preceding `W` character direction values for the given line to strong values (`L`|`R`)
         //  https://unicode.org/reports/tr9/#Explicit_Directional_Isolates
         //  we use `FSI` to mark a weak grapheme overriden by a FS (first strong) grapheme, differently from the spec
-        var lineBounds = this.__charBounds[lineIndex], weaklings = [], isBaseDir = cdir === cBaseDirection, wdir = cdir;
+        var lineBounds = this.__charBounds[lineIndex], weaklings = [],
+          isBaseDir = cdir === cBaseDirection, wdir = cdir;
         c = charIndex - 1;
         while (lineBounds && c >= 0) {
           var data = lineBounds[c--];
@@ -1083,22 +1084,25 @@
       //  at this point the the direction of line's graphemes are resolved (='L'|'R')
       //  now we need to reorder char bounds of words that are opposite to the base direction
       var width = 0, offset = 0, prev, start = -1, oppositeBounds = [], eol,
-        cBaseDirection = this.bidiResolver.resolveDirection(baseDirection);
+        cBaseDirection = this.bidiResolver.resolveDirection(baseDirection), isBaseDir;
       while (lineBounds && c < lineBounds.length) {
         var data = lineBounds[c];
-        if (data) {
-          eol = data.left + data.width;
+        if (!data) {
+          c++;
+          continue;
         }
-        if (data && data.dir !== cBaseDirection) {
+        eol = data.left + data.width;
+        isBaseDir = data.dir === cBaseDirection;
+        if (!isBaseDir) {
           oppositeBounds.push(data);
           if (width === 0) {
-            start = Math.max(c - 1, 0);
+            start = c;
             prev = c > 0 ? lineBounds[c - 1] : undefined;
             offset = prev ? prev.left + prev.width : 0;
           }
           width += data.width;
         }
-        if (data && (data.dir === cBaseDirection || c === lineBounds.length - 1) && oppositeBounds.length > 0) {
+        if ((isBaseDir || c === lineBounds.length - 1) && oppositeBounds.length > 0) {
           data = oppositeBounds[0];
           eol = width + offset;
           if (oppositeBounds.length > 1) {
@@ -1122,14 +1126,15 @@
               type: data.dir === 'R' ? 'RLI' : 'LRI'
             });
             c += 2;
-          }
-          for (var i = 1; i < oppositeBounds.length; i++) {
-            data = oppositeBounds[i];
-            prev = oppositeBounds[i - 1];
-            data.left = prev.left - prev.width + data.kernedWidth - data.width;
+            for (var i = 1; i < oppositeBounds.length; i++) {
+              data = oppositeBounds[i];
+              prev = oppositeBounds[i - 1];
+              data.left = prev.left - prev.width + data.kernedWidth - data.width;
+            }
           }
           width = offset = 0;
           oppositeBounds = [];
+          start = -1;
           prev = undefined;
         }
         c++;
