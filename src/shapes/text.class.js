@@ -50,7 +50,7 @@
      * @typedef {StrongCharacterDirection|'W'} CharacterDirection
      * @typedef {'ltr'|'rtl'} ExplicitDirection
      * @typedef {ExplicitDirection|'auto'} Direction
-     * 
+     *
      * @param {string} grapheme
      * @param {boolean} [calculate]
      * @returns {CharacterDirection} direction
@@ -73,8 +73,8 @@
     },
 
     /**
-     * 
-     * @param {Direction} direction 
+     *
+     * @param {Direction} direction
      * @returns {CharacterDirection}
      */
     resolveDirection: function (direction) {
@@ -89,8 +89,8 @@
     },
 
     /**
-     * 
-     * @param {string} char 
+     *
+     * @param {string} char
      * @returns {boolean}
      */
     isDirectionalStart: function (resolvedDirectional) {
@@ -100,8 +100,8 @@
     },
 
     /**
-     * 
-     * @param {string} char 
+     *
+     * @param {string} char
      * @returns {boolean}
      */
     isDirectionalTerminate: function (resolvedDirectional) {
@@ -109,8 +109,8 @@
     },
 
     /**
-     * 
-     * @param {string} char 
+     *
+     * @param {string} char
      * @returns {string}
      */
     resolveDirectionals: function (char) {
@@ -126,7 +126,7 @@
           return 'LRO';
         case '\u202E':
           return 'RLO';
-        
+
         case '\u2066':
           return 'LRI';
         case '\u2067':
@@ -135,25 +135,25 @@
           return 'FSI';
         case '\u2069':
           return 'PDI';
-        
+
         case '\u200E':
           return 'LRM';
         case '\u200F':
           return 'RLM';
         case '\u061C':
           return 'ALM';
-        
+
         default:
           return;
       }
     },
 
     /**
-     * 
-     * @param {string} grapheme 
-     * @param {CharacterDirection} before 
-     * @param {CharacterDirection} after 
-     * @param {StrongCharacterDirection} base 
+     *
+     * @param {string} grapheme
+     * @param {CharacterDirection} before
+     * @param {CharacterDirection} after
+     * @param {StrongCharacterDirection} base
      * @returns {CharacterDirection} direction
      */
     resolveUndetermined: function (grapheme, before, after, base) {
@@ -998,7 +998,7 @@
         dir: this.bidiResolver.resolveDirection(this.direction),
         type: 'EOL'
       });
-      
+
       if (path) {
         totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
         startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
@@ -1065,7 +1065,7 @@
      */
     _getGraphemeDirection: function (grapheme, line, lineIndex, charIndex, baseDirection) {
       var cdir = this.bidiResolver.resolve(grapheme), c,
-        cBaseDirection = this.bidiResolver.resolveDirection(baseDirection);
+          cBaseDirection = this.bidiResolver.resolveDirection(baseDirection);
       if (cdir === 'W' && charIndex === line.length - 1) {
         //  the direction of the last grapheme should set by `baseDirection`
         cdir = cBaseDirection;
@@ -1106,7 +1106,7 @@
         //  https://unicode.org/reports/tr9/#Explicit_Directional_Isolates
         //  we use `FSI` to mark a weak grapheme overriden by a FS (first strong) grapheme, differently from the spec
         var lineBounds = this.__charBounds[lineIndex], weaklings = [],
-          isBaseDir = cdir === cBaseDirection, wdir = cdir;
+            isBaseDir = cdir === cBaseDirection, wdir = cdir;
         c = charIndex - 1;
         while (lineBounds && c >= 0) {
           var data = lineBounds[c--];
@@ -1149,8 +1149,8 @@
       //  at this point the the direction of line's graphemes are resolved (='L'|'R')
       //  now we need to reorder char bounds of words that are opposite to the base direction
       var width = 0, offset = 0, prev, start = -1, oppositeBounds = [], eol,
-        cBaseDirection = this.bidiResolver.resolveDirection(baseDirection),
-        isBaseDir, isTerminate, isStarter = false, type, typeStart;
+          cBaseDirection = this.bidiResolver.resolveDirection(baseDirection),
+          isBaseDir, isTerminate, isStarter = false, type, typeStart;
       while (lineBounds && c < lineBounds.length) {
         var data = lineBounds[c];
         if (!data) {
@@ -1195,10 +1195,10 @@
               left: data.left,
               dir: data.dir,
               type: isStarter ?
-                  typeStart :
-                  data.dir === 'R' ?
-                    'RLI' :
-                    'LRI'
+                typeStart :
+                data.dir === 'R' ?
+                  'RLI' :
+                  'LRI'
             });
             c += 2;
             for (var i = 1; i < oppositeBounds.length; i++) {
