@@ -34,9 +34,9 @@
     // eslint-disable-next-line max-len
     _reExplicitLTR: /^[A-Za-z0-9%\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF\u202A\u202D\u2066\u200E]+$/,
 
-    _reBaseDirection: /^[,:;]+$/,
+    _reBaseDirection: /^[]+$/,
 
-    _reContext: /^[.!?]+$/,
+    _reContext: /^[.!?,:;]+$/,
 
     /**
      * @private
@@ -1085,9 +1085,8 @@
         //  resolve special cases
         //  in case a char returns a `W` dir it will be overriden by the next strong char or by the last char
         cdir = this.bidiResolver.resolveUndetermined(grapheme, before, after, cBaseDirection);
-        if (cdir !== 'W') {
-          return cdir;
-        }
+      }
+      if (cdir === 'W') {
         if (before === 'W' || after === 'W') {
           //  weak line start/end
           return 'W';
