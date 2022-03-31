@@ -342,7 +342,7 @@
             var thisStyle = styles[i][c];
             //check if style exists for this character
             if (thisStyle) {
-              var styleChanged = this._hasStyleChanged(prevStyle, thisStyle);
+              var styleChanged = this._hasStyleChangedForSvg(prevStyle, thisStyle);
               //check if no style exists for previous character, or if style has changed
               if (styleChanged) {
                 newStyles.push({
@@ -355,8 +355,8 @@
                 //if style is the same as previous character, increase end index
                 newStyles[newStyles.length - 1].end++;
               }
-              prevStyle = thisStyle;
             }
+            prevStyle = thisStyle || {};
           }
         }
         else {
