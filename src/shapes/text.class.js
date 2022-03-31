@@ -1195,7 +1195,7 @@
         if ((isBaseDir || c === lineBounds.length - 1 || isTerminate)
           && oppositeBounds.length > 0) {
           data = oppositeBounds[0];
-          eol = width + offset;
+          eol = data.left = width + offset;
           if (oppositeBounds.length > 1) {
             //  insert bdo bbox for cursor handling
             //  in order to insert the closing bdo tag in the correct place we insert it before inserting the opening bdo tag
