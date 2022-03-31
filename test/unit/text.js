@@ -927,7 +927,6 @@
   function assertBidi(assert, text, baseDirection, expected) {
     var textObj = new fabric.Text(text, { direction: baseDirection === 'R' ? 'rtl' : 'ltr' });
     assert.ok(textObj.bidiResolver, 'should have a bidiResolver attached to instance');
-    console.log(textObj.__charBounds)
     var c = 0;
     for (let i = 0, dir, data; i < textObj.__charBounds.length; i++) {
       for (let j = 0, len = textObj.__charBounds[i].length; j < len; j++) {
@@ -950,12 +949,11 @@
   }
 
   QUnit.test.only('bidi ltr', function (assert) {
-    var t = '   abcdefg\n ';
+    var t = '   abcdefg\n  hijklmnop  012 ';
     //assertBidi(assert, t, 'L', 'L');
     assertBidi(assert, t, 'R', [
       /*bdo*/ { dir: 'L', type: 'LRI' }, /* */ 'L', /* */ 'L', /* */ 'L', /*a*/ 'L', /*b*/ 'L', /*c*/ 'L', /*d*/ 'L', /*e*/ 'L', /*f*/ 'L', /*g*/ 'L',/*bdo*/ { dir: 'L', type: 'PDI' },/*eol*/ { dir: 'R', type: 'EOL' },
-     // /*bdo*/ { dir: 'L', type: 'LRI' }, 'L', 'L', /*h*/ 'L', 'L', 'L', 'L', 'L', 'L', 'L',/*p*/ 'L', 'L', 'L',/*0*/ 'L', 'L', 'L', /*bdo*/ { dir: 'L', type: 'PDI' }, 'R',
-     'R', /*eol*/ { dir: 'R', type: 'EOL' }
+      /*bdo*/ { dir: 'L', type: 'LRI' }, 'L', 'L', /*h*/ 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L',/*p*/ 'L', 'L', 'L',/*0*/ 'L', 'L', 'L', /*bdo*/ { dir: 'L', type: 'PDI' }, 'R', /*eol*/ { dir: 'R', type: 'EOL' }
     ]);
   });
 
