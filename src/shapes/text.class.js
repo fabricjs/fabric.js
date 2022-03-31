@@ -1020,7 +1020,6 @@
         //  resolve special cases
         //  in case a char returns a `W` dir it will be overriden by the next strong char or by the last char
         cdir = this.bidiResolver.resolveUndetermined(grapheme, before, after, cBaseDirection);
-        console.log(cdir)
         if (cdir !== 'W') {
           return cdir;
         }
