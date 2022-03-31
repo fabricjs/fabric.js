@@ -1155,7 +1155,8 @@
     },
 
     /**
-     * used at the end of a line to resolve line direction by mutating relevant grapheme bboxes
+     * Used at the end of a line to resolve line direction by mutating relevant grapheme bboxes
+     * Wraps the words that are opposite to the base direction in LRI/RLI...PDI (not if it's a single grapheme) and appends directional graphemes (if exisitng)
      * @see https://unicode.org/reports/tr9
      * @private
      * @param {number} lineIndex index of the line where the char is
@@ -1164,7 +1165,7 @@
      */
     _resolveLineDirection: function (lineIndex, baseDirection) {
       var c = 0, lineBounds = this.__charBounds[lineIndex];
-      //  at this point the the direction of line's graphemes are resolved (='L'|'R')
+      //  at this point the the direction of line's graphemes are resolved (='L'|'R') except for some redundant direction terminates (='PDF'|'PDI')
       //  now we need to reorder char bounds of words that are opposite to the base direction
       var width = 0, offset = 0, prev, start = -1, oppositeBounds = [], eol,
           cBaseDirection = this.bidiResolver.resolveDirection(baseDirection),
