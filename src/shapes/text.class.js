@@ -996,7 +996,7 @@
      * @returns {CharacterDirection} direction
      */
     _getGraphemeDirection: function (grapheme, line, lineIndex, charIndex, baseDirection) {
-      var cdir = this.bidiResolver.resolve(grapheme),
+      var cdir = this.bidiResolver.resolve(grapheme), c,
         cBaseDirection = this.bidiResolver.resolveDirection(baseDirection);
       if (cdir === 'W' && charIndex === line.length - 1) {
         //  the direction of the last grapheme should set by `baseDirection`
@@ -1005,25 +1005,29 @@
       if (cdir === 'W') {
         var before = 'W', after = 'W';
         //  check graphemes up to start of line
-        var p = charIndex - 1;
-        while (before === 'W' && p >= 0) {
-          before = this.bidiResolver.resolve(line[p--]);
+        c = charIndex - 1;
+        while (before === 'W' && c >= 0) {
+          before = this.bidiResolver.resolve(line[c--]);
         }
         //  check graphemes up to end of line
-        p = charIndex + 1;
-        while (after === 'W' && p < line.length) {
-          after = this.bidiResolver.resolve(line[p++]);
+        c = charIndex + 1;
+        while (after === 'W' && c < line.length) {
+          after = this.bidiResolver.resolve(line[c++]);
         }
         //  resolve special cases
         //  in case a char returns a `W` dir it will be overriden by the next strong char or by the last char
         cdir = this.bidiResolver.resolveUndetermined(grapheme, before, after, cBaseDirection);
-        if (before === after) {
-          //  weak char between 2 words with the same direction
-          return before;
+        console.log(cdir)
+        if (cdir !== 'W') {
+          return cdir;
         }
-        else if (before === 'W' || after === 'W') {
+        if (before === 'W' || after === 'W') {
           //  weak line start/end
           return 'W';
+        }
+        else if (before === after) {
+          //  weak char between 2 strong chars with the same direction
+          return before;
         }
         else {
           //  weak char between 2 strong chars with different direction
@@ -1035,8 +1039,10 @@
         //  resolve all preceding `W` character direction values for the given line to strong values (`L`|`R`)
         //  https://unicode.org/reports/tr9/#Explicit_Directional_Isolates
         //  we use `FSI` to mark a weak grapheme overriden by a FS (first strong) grapheme, differently from the spec
-        while (lineIndex >= 0 && this.__charBounds[lineIndex] && charIndex > 0) {
-          var data = this.__charBounds[lineIndex][--charIndex];
+        var lineBounds = this.__charBounds[lineIndex];
+        c = charIndex - 1;
+        while (lineBounds && c >= 0) {
+          var data = lineBounds[c--];
           if (data.dir === 'W' || (data.type === 'FSI' && data.dir !== cdir)) {
             data.dir = cdir;
             data.type = 'FSI';
