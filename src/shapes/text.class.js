@@ -927,7 +927,7 @@
         width: 0,
         kernedWidth: 0,
         height: this.fontSize,
-        dir: this.direction,
+        dir: this.bidiResolver.resolveDirection(this.direction),
         type: 'EOL'
       });
       
