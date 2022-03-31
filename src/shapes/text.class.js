@@ -1034,7 +1034,7 @@
         //  strong character
         //  resolve all preceding `W` character direction values for the given line to strong values (`L`|`R`)
         //  https://unicode.org/reports/tr9/#Explicit_Directional_Isolates
-        //  we use `FSI` to mark a weak grapheme that was override by a FS (first strong) grapheme, differently from the spec
+        //  we use `FSI` to mark a weak grapheme overriden by a FS (first strong) grapheme, differently from the spec
         while (lineIndex >= 0 && this.__charBounds[lineIndex] && charIndex > 0) {
           var data = this.__charBounds[lineIndex][--charIndex];
           if (data.dir === 'W' || (data.type === 'FSI' && data.dir !== cdir)) {
