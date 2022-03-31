@@ -1182,7 +1182,7 @@
         isTerminate = this.bidiResolver.isDirectionalTerminate(type);
         if (!isBaseDir && !isTerminate) {
           oppositeBounds.push(data);
-          if (!isStarter && width === 0) {
+          if (start === -1) {
             start = c;
             typeStart = type;
             isStarter = this.bidiResolver.isDirectionalStart(type);
