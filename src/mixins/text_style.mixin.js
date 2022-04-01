@@ -334,35 +334,33 @@
           charIndex = -1, prevStyle = {}, stylesArray = [];
       //loop through each textLine
       for (var i = 0; i < textLines.length; i++) {
-        //if a style exists for this text line
-        if (styles[i]) {
-          //loop through each character of the current line
-          for (var c = 0; c < textLines[i].length; c++) {
-            charIndex++;
-            var thisStyle = styles[i][c];
-            //check if style exists for this character
-            if (thisStyle) {
-              //need to call _hasStyleChangedForSvg, not _hasStyleChanged so that overline,
-              //underline, and line-through are also checked
-              var styleChanged = this._hasStyleChangedForSvg(prevStyle, thisStyle);
-              if (styleChanged) {
-                stylesArray.push({
-                  start: charIndex,
-                  end: charIndex + 1,
-                  style: thisStyle
-                });
-              }
-              else {
-                //if style is the same as previous character, increase end index
-                stylesArray[stylesArray.length - 1].end++;
-              }
-            }
-            prevStyle = thisStyle || {};
-          }
-        }
-        else {
+        if (!styles[i]) {
           //no styles exist for this line, so add the line's length to the charIndex total
           charIndex += textLines[i].length;
+          continue;
+        }
+        //loop through each character of the current line
+        for (var c = 0; c < textLines[i].length; c++) {
+          charIndex++;
+          var thisStyle = styles[i][c];
+          //check if style exists for this character
+          if (thisStyle) {
+            //need to call _hasStyleChangedForSvg, not _hasStyleChanged so that overline,
+            //underline, and line-through are also checked
+            var styleChanged = this._hasStyleChangedForSvg(prevStyle, thisStyle);
+            if (styleChanged) {
+              stylesArray.push({
+                start: charIndex,
+                end: charIndex + 1,
+                style: thisStyle
+              });
+            }
+            else {
+              //if style is the same as previous character, increase end index
+              stylesArray[stylesArray.length - 1].end++;
+            }
+          }
+          prevStyle = thisStyle || {};
         }
       }
       return stylesArray;
