@@ -49,7 +49,7 @@
     skewX: 0,
     skewY: 0,
     charSpacing: 0,
-    styles: { },
+    styles: [],
     minWidth: 20,
     splitByGrapheme: false,
     strokeUniform: false,
