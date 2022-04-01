@@ -187,6 +187,21 @@
     },
 
     /**
+     * While editing handle differently
+     * @private
+     * @param {string} key 
+     * @param {*} value 
+     */
+    _set: function (key, value) {
+      if (this.isEditing && this._savedProps && key in this._savedProps) {
+        this._savedProps[key] = value;
+      }
+      else {
+        this.callSuper('_set', key, value);
+      }
+    },
+
+    /**
      * Sets selection start (left boundary of a selection)
      * @param {Number} index Index to set selection start to
      */
