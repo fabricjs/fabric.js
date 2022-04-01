@@ -115,8 +115,7 @@
         "1":{
           "3":{underline:true},
           "4":{underline:true},
-          "5":{underline:true},
-          "6":{underline:true}
+          "5":{underline:true}
         },
         "2":{
           "0":{underline:true},
@@ -138,6 +137,46 @@
     fabric.Textbox.fromObject(TEXTBOX_OBJECT, function(textbox) {
       assert.equal(textbox.text, 'The quick \nbrown \nfox', 'properties are respected');
       assert.ok(textbox instanceof fabric.Textbox, 'the generated object is a textbox');
+      done();
+    });
+  });
+
+  QUnit.test('fromObjectWithStyles', function(assert) {
+    var done = assert.async();
+    var textbox = new fabric.Textbox('The quick \nbrown \nfox', {
+      width: 120,
+      styles: {
+        "0":{
+          "5":{fill:"red"},
+          "6":{fill:"red"},
+          "7":{fill:"red"},
+          "8":{fill:"red"}
+        },
+        "1":{
+          "3":{underline:true},
+          "4":{underline:true},
+          "5":{underline:true}
+        },
+        "2":{
+          "0":{underline:true},
+          "1":{underline:true}
+        }
+      }
+    });
+    fabric.Textbox.fromObject(TEXTBOX_OBJECT, function(obj) {
+      assert.deepEqual(obj.styles, textbox.styles, 'stylesFromArray output matches');
+      assert.deepEqual(obj.styles[0], textbox.styles[0], 'styles match at line 0');
+      assert.deepEqual(obj.styles[0][5], textbox.styles[0][5], 'styles match at index 5');
+      assert.deepEqual(obj.styles[0][6], textbox.styles[0][6], 'styles match at index 6');
+      assert.deepEqual(obj.styles[0][7], textbox.styles[0][7], 'styles match at index 7');
+      assert.deepEqual(obj.styles[0][8], textbox.styles[0][8], 'styles match at index 8');
+      assert.deepEqual(obj.styles[1], textbox.styles[1], 'styles match at line 1');
+      assert.deepEqual(obj.styles[1][3], textbox.styles[1][3], 'styles match at index 3');
+      assert.deepEqual(obj.styles[1][4], textbox.styles[1][4], 'styles match at index 4');
+      assert.deepEqual(obj.styles[1][5], textbox.styles[1][5], 'styles match at index 5');
+      assert.deepEqual(obj.styles[2], textbox.styles[2], 'styles match at line 2');
+      assert.deepEqual(obj.styles[2][0], textbox.styles[2][0], 'styles match at index 0');
+      assert.deepEqual(obj.styles[2][1], textbox.styles[2][1], 'styles match at index 1');
       done();
     });
   });
