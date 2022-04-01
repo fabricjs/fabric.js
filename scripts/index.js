@@ -4,6 +4,7 @@ const _ = require('lodash');
 const path = require('path');
 const cp = require('child_process');
 const inquirer = require('inquirer');
+const ansiEscapes = require('ansi-escapes');
 const fuzzy = require('fuzzy');
 const chalk = require('chalk');
 const moment = require('moment');
@@ -142,18 +143,53 @@ function exportToWebsite(options) {
 /**
  * 
  * @param {string[]} tests file paths
- * @param {{debug:boolean,recreate:boolean}} [options] 
+ * @param {{debug?:boolean,recreate?:boolean,show?:boolean,filter?:boolean}} [options] 
  */
 function test(tests, options) {
     options = options || {};
     const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests);
     process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
     process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
-    try {
-        cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd, env: process.env });
-    } catch (error) {
-
+    if (options.filter) {
+        process.env.QUNIT_FILTER = options.filter;
     }
+    return new Promise((resolve, reject) => {
+        try {
+            var p = cp.spawn(args.join(' '), { cwd: wd, env: process.env, shell: true, stdio: 'pipe' });
+            let clearLines = 0;
+            process.stdout.write(ansiEscapes.cursorHide);
+            p.stdout.on('data', function (data) {
+                data = _.compact(data.toString().trim().split(/\n/));
+                data.forEach(line => {
+                    if (clearLines > 0 && !options.show) {
+                        process.stdout.write(ansiEscapes.cursorUp(1));
+                        process.stdout.write(ansiEscapes.eraseDown);
+                    }
+                    if (line.startsWith('ok')) {
+                        clearLines = 1;
+                        console.log(chalk.green(line));
+                    }
+                    else if (line.startsWith('not ok')) {
+                        clearLines = 0;
+                        console.log(chalk.bold(chalk.red('not ok') + line.slice(6)));
+                    }
+                    else {
+                        clearLines = 0;
+                        console.log(line);
+                    }
+                });
+            });
+            p.stdout.once('end', () => {
+                process.stdout.write(ansiEscapes.cursorDown());
+                process.stdout.write(ansiEscapes.cursorShow);
+                resolve();
+            });
+        } catch (error) {
+            process.stdout.write(ansiEscapes.cursorDown());
+            process.stdout.write(ansiEscapes.cursorShow);
+            reject(error);
+        }
+    });
 }
 
 /**
@@ -239,11 +275,13 @@ async function runIntreactiveTestSuite(options) {
         acc[curr.type].push(`test/${curr.type}/${curr.file}`);
         return acc;
     }, { unit: [], visual: [] });
-    _.forEach(tests, files => {
+    _.reduce(tests, async (queue, files, suite) => {
+        await queue;
+        console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
         if (files.length > 0) {
-            test(files, options);
+            return test(files, options);
         }
-    });
+    }, Promise.resolve());
 }
 
 program
@@ -279,9 +317,11 @@ program
     .description('run test suite')
     .addOption(new commander.Option('-s, --suite [suite...]', 'test suite to run').choices(['unit', 'visual']))
     .option('-f, --file [file]', 'run a specific test file')
+    .option('--filter [filter]', 'filter tests by name')
     .option('-a, --all', 'run all tests', false)
     .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
     .option('-r, --recreate', 'recreate visual refs (golden images)', false)
+    .option('--show', 'show passing tests', false)
     .option('-cc, --clear-cache', 'clear CLI test cache', false)
     .action((options) => {
         if (options.clearCache) {
@@ -291,7 +331,11 @@ program
             options.suite = ['unit', 'visual'];
         }
         if (options.suite) {
-            options.suite.forEach(suite => test(`test/${suite}`, options));
+            _.reduce(options.suite, async (queue, suite) => {
+                await queue;
+                console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
+                return test(`test/${suite}`, options);
+            }, Promise.resolve());
         }
         else if (options.file) {
             test(`test/${options.file}`, options);
