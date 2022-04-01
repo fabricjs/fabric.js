@@ -334,7 +334,7 @@
           charIndex = -1, prevStyle = {}, stylesArray = [];
       //loop through each textLine
       for (var i = 0; i < textLines.length; i++) {
-        //if obj has a style for this line
+        //if a style exists for this text line
         if (styles[i]) {
           //loop through each character of the current line
           for (var c = 0; c < textLines[i].length; c++) {
@@ -343,7 +343,6 @@
             //check if style exists for this character
             if (thisStyle) {
               var styleChanged = this._hasStyleChangedForSvg(prevStyle, thisStyle);
-              //check if no style exists for previous character, or if style has changed
               if (styleChanged) {
                 stylesArray.push({
                   start: charIndex,
@@ -384,7 +383,7 @@
         //loop through each character of the current line
         for (var c = 0; c < textLines[i].length; c++) {
           charIndex++;
-          //check if there's a style collection for the current character
+          //check if there's a style collection that includes the current character
           if (this.styles[styleIndex]
             && this.styles[styleIndex].start <= charIndex
             && charIndex < this.styles[styleIndex].end) {
