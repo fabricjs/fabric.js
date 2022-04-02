@@ -141,9 +141,14 @@
 
       this.abortCursorAnimation();
       this._currentCursorOpacity = 1;
-      this._cursorTimeout2 = setTimeout(function() {
-        _this._tick();
-      }, delay);
+      if (delay) {
+        this._cursorTimeout2 = setTimeout(function () {
+          _this._tick();
+        }, delay);
+      }
+      else {
+        this._tick();
+      }
     },
 
     /**
@@ -432,12 +437,12 @@
      */
     fromStringToGraphemeSelection: function(start, end, text) {
       var smallerTextStart = text.slice(0, start),
-          graphemeStart = fabric.util.string.graphemeSplit(smallerTextStart).length;
+          graphemeStart = this.graphemeSplit(smallerTextStart).length;
       if (start === end) {
         return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
       }
       var smallerTextEnd = text.slice(start, end),
-          graphemeEnd = fabric.util.string.graphemeSplit(smallerTextEnd).length;
+          graphemeEnd = this.graphemeSplit(smallerTextEnd).length;
       return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
     },
 
@@ -592,6 +597,8 @@
         this.canvas.defaultCursor = this._savedProps.defaultCursor;
         this.canvas.moveCursor = this._savedProps.moveCursor;
       }
+
+      delete this._savedProps;
     },
 
     /**
