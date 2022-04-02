@@ -1400,9 +1400,9 @@
           this._needsCurrentTransformSetup = true;
           dirty = true;
         }
-        activeObject.setCoords();
       }
       this._setViewportTransform(vpt);
+      activeObject && activeObject.setCoords();
       (dirty || this.renderOnAddRemove) && this.requestRenderAll();
       return this;
     }
