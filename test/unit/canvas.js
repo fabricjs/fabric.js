@@ -1983,6 +1983,7 @@
 
     canvas.add(makeRect());
     canvas.setActiveObject(canvas.item(0));
+    //  stub current transform data
     canvas._currentTransform = { foo: 'bar' };
     canvas._discardActiveObject();
     assert.ok(!canvas.item(0).active);
