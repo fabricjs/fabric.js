@@ -1387,12 +1387,13 @@
      */
     setViewportTransform: function (vpt) {
       var activeObject = this._activeObject, dirty = false;
-      if (this.renderOnAddRemove && activeObject && activeObject.isEditing) {
-        activeObject.clearContextTop();
-      }
       if (activeObject) {
+        //  text editing
+        if (this.renderOnAddRemove && activeObject.isEditing) {
+          activeObject.clearContextTop();
+        }
         //  interacting object should not be changed by vpt
-        if (this._currentTransform) {
+        if (this._currentTransform || activeObject.isEditing) {
           var currentTransform = activeObject.calcTransformMatrix(),
               t = multiplyTransformMatrices(invertTransform(vpt), currentTransform);
           applyTransformToObject(activeObject, t);
