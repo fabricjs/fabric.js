@@ -528,8 +528,16 @@
      * @param {DragEvent} e
      * @returns {boolean}
      */
-    canDrop: function (e) { // eslint-disable-line no-unused-vars
-      return this.editable && !this.__corner;
+    canDrop: function (e) {
+      if (this.editable && !this.__corner) {
+        if (this.__isDragging && this.__dragStartSelection) {
+          var index = this.getSelectionStartFromPointer(e);
+          var dragStartSelection = this.__dragStartSelection;
+          return index < dragStartSelection.selectionStart || index > dragStartSelection.selectionEnd;
+        }
+        return true;
+      }
+      return false;
     },
 
     /**
