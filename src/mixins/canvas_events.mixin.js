@@ -109,7 +109,7 @@
       this._onDragEnd = this._onDragEnd.bind(this);
       this._onDragOver = this._onDragOver.bind(this);
       this._onDragEnter = this._simpleEventHandler.bind(this, 'dragenter');
-      this._onDragLeave = this._simpleEventHandler.bind(this, 'dragleave');
+      this._onDragLeave = this._onDragLeave.bind(this);
       this._onDrop = this._onDrop.bind(this);
       this.eventsBound = true;
     },
@@ -246,11 +246,41 @@
      * @param {Event} [e] Event object fired on Event.js shake
      */
     _onDragOver: function (e) {
-      this._dragSource && this._dragSource.renderDragStartSelection
-        && this._dragSource.renderDragStartSelection();
-      var target = this._simpleEventHandler('dragover', e);
-      target && (!target.canDrop || target.canDrop(e)) && e.preventDefault();
+      var eventType = 'dragover',
+        target = this.findTarget(e),
+        targets = this.targets,
+        options = {
+          e: e,
+          target: target,
+          subTargets: targets,
+          dragSource: this._dragSource
+        };
+      this.fire(eventType, options);
+      if (target && (!target.canDrop || target.canDrop(e))) {
+        e.preventDefault();
+        this._dragSource && this._dragSource.renderDragStartSelection
+          && this._dragSource.renderDragStartSelection();
+        target && target.fire(eventType, options);
+      }
+      else {
+        this._dragSource && this._dragSource.renderDragStartSelection
+          && this._dragSource.renderDragStartSelection();
+      }
       this._fireEnterLeaveEvents(target, e);
+      for (var i = 0; i < targets.length; i++) {
+        targets[i].fire(eventType, options);
+      }
+    },
+
+    /**
+     * fire `dragleave` on `dragover` targets
+     * @private
+     * @param {Event} [e] Event object fired on Event.js shake
+     */
+    _onDragLeave: function (e) {
+      this._fireEnterLeaveEvents(null, e);   
+      this.targets = [];
+      this._hoveredTargets = [];
     },
 
     /**

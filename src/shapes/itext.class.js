@@ -456,12 +456,11 @@
      * Renders drag start text selection
      */
     renderDragStartSelection: function () {
-      if (this.__isDragging) {
-        var ctx = this.clearContextTop(true);
-        if (ctx) {
-          this._renderDragStartSelection(ctx);
-          ctx.restore();
-        }
+      var ctx = this.prepareContextTop();
+      if (this.__isDragging && ctx) {
+        this._clearTextArea(ctx);
+        this._renderDragStartSelection(ctx);
+        ctx.restore();
       }
     },
 
