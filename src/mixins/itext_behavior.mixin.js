@@ -158,7 +158,7 @@
     },
 
     /**
-     * Aborts cursor animation and clears all timeouts
+     * Aborts cursor animation, clears all timeouts and clear textarea context if necessary
      */
     abortCursorAnimation: function() {
       var shouldClear = this._currentTickState || this._currentTickCompleteState;
@@ -170,7 +170,11 @@
 
       this._currentCursorOpacity = 0;
       
-      shouldClear && this.clearContextTop();
+      //  make sure we clear context even if instance is not editing
+      if (shouldClear) {
+        var ctx = this._clearContextTop();
+        ctx && ctx.restore();
+      }
     },
 
     /**

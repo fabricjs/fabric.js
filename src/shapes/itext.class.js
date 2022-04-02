@@ -296,16 +296,25 @@
     },
 
     /**
-     * Prepare and clean the contextTop
+     * Prepare and clear top context
      * @returns {CanvasRenderingContext2D|undefined} ctx
      */
-    clearContextTop: function(skipRestore) {
-      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
+    _clearContextTop: function () {
+      var ctx = this.prepareContextTop();
+      ctx && this._clearTextArea(ctx);
+      return ctx;
+    },
+
+    /**
+     * clear top context
+     * @returns {CanvasRenderingContext2D|undefined} ctx
+     */
+    clearContextTop: function() {
+      if (!this.isEditing) {
         return;
       }
-      var ctx = this.prepareContextTop();
-      this._clearTextArea(ctx);
-      skipRestore || ctx.restore();
+      var ctx = this._clearContextTop();
+      ctx && ctx.restore();
       return ctx;
     },
     /**
@@ -316,7 +325,7 @@
       if (!this.isEditing && !this.__isDraggingOver) {
         return;
       }
-      var ctx = this.clearContextTop(true);
+      var ctx = this._clearContextTop();
       if (!ctx) {
         return;
       }
@@ -456,11 +465,12 @@
      * Renders drag start text selection
      */
     renderDragStartSelection: function () {
-      var ctx = this.prepareContextTop();
-      if (this.__isDragging && ctx) {
-        this._clearTextArea(ctx);
-        this._renderDragStartSelection(ctx);
-        ctx.restore();
+      if (this.__isDragging) {
+        var ctx = this._clearContextTop();
+        if (ctx) {
+          this._renderDragStartSelection(ctx);
+          ctx.restore();
+        }
       }
     },
 
