@@ -425,7 +425,6 @@
      * @param {object} data
      * @param {number} data.selectionStart
      * @param {number} data.selectionEnd
-     * @param {boolean} data.trailingSpace
      * @param {string} data.text
      * @param {string} data.value selected text
      */
@@ -491,23 +490,16 @@
     onDragStart: function (e) {
       this.__dragStartFired = true;
       if (this.__isDragging) {
-        var trailing = this._text[this.selectionEnd];
-        var trailingSpace = this._reNewline.test(trailing) ?
-          this.findLineBoundaryLeft(this.selectionStart) === this.selectionStart
-          && this.findLineBoundaryRight(this.selectionEnd) === this.selectionEnd :
-          this.findWordBoundaryRight(this.selectionEnd - 1) === this.selectionEnd;
         var selection = this.__dragStartSelection = {
           selectionStart: this.selectionStart,
-          selectionEnd: this.selectionEnd + trailingSpace,
-          trailingSpace: trailingSpace
+          selectionEnd: this.selectionEnd,
         };
         var value = this._text.slice(selection.selectionStart, selection.selectionEnd).join('');
         var data = Object.assign({ text: this.text, value: value }, selection);
         e.dataTransfer.setData('text/plain', value);
         e.dataTransfer.setData('application/fabric', JSON.stringify({
           value: value,
-          styles: this.getSelectionStyles(selection.selectionStart, selection.selectionEnd, true),
-          trailingSpace: trailingSpace
+          styles: this.getSelectionStyles(selection.selectionStart, selection.selectionEnd, true)
         }));
         e.dataTransfer.effectAllowed = 'copyMove';
         e.dataTransfer.dropEffect = 'move';
@@ -585,7 +577,6 @@
         if (this.__dragStartSelection) {
           var selectionStart = this.__dragStartSelection.selectionStart;
           var selectionEnd = this.__dragStartSelection.selectionEnd;
-          var trailingSpace = this.__dragStartSelection.trailingSpace;
           if (e.dataTransfer.dropEffect === 'move') {
             this.insertChars('', null, selectionStart, selectionEnd);
             this.selectionStart = this.selectionEnd = selectionStart;
@@ -597,7 +588,7 @@
           }
           else {
             this.selectionStart = selectionStart;
-            this.selectionEnd = selectionEnd - trailingSpace;
+            this.selectionEnd = selectionEnd;
           }
           this.exitEditing();
           this.__lastSelected = false;
@@ -632,13 +623,10 @@
           JSON.parse(e.dataTransfer.getData('application/fabric')) :
           {};
         var styles = data.styles;
-        var trailingSpace = data.trailingSpace, trailing = insert[Math.max(0, insert.length - 1)];
+        var trailing = insert[Math.max(0, insert.length - 1)];
         this.canvas.discardActiveObject();
         this.canvas.setActiveObject(this);
         this.enterEditing(e);
-        var isSpace = /\s/;
-        var insertingOnSpace = isSpace.test(this._text[insertAt]);
-        var insertingAfterSpace = isSpace.test(this._text[insertAt - 1]);
         var selectionStartOffset = 0;
         //  drag and drop in same instance
         if (this.__dragStartSelection) {
@@ -646,7 +634,6 @@
           var selectionEnd = this.__dragStartSelection.selectionEnd;
           if (insertAt > selectionStart && insertAt <= selectionEnd) {
             insertAt = selectionStart;
-            trailingSpace = false;
           }
           else if (insertAt > selectionEnd) {
             insertAt -= selectionEnd - selectionStart;
@@ -654,16 +641,6 @@
           this.insertChars('', null, selectionStart, selectionEnd);
           // prevent `dragend` from handling event
           delete this.__dragStartSelection;
-        }
-        //  handle spacing
-        if (trailingSpace && this.findLineBoundaryLeft(insertAt) < insertAt && !insertingAfterSpace
-          && (insertAt === this._text.length || !insertingOnSpace)) {
-          insert = ' ' + insert;
-          styles.unshift({});
-          selectionStartOffset = 1;
-        }
-        else if (trailingSpace && insertingOnSpace && !insertingAfterSpace) {
-          insertAt++;
         }
         //  remove redundant line break
         if (this._reNewline.test(trailing)
