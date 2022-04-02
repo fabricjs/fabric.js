@@ -764,11 +764,23 @@
     assert.equal(canvas.clearContext(canvas.getContext()), canvas, 'should be chainable');
   });
 
-  QUnit.test('clear', function(assert) {
+  QUnit.test('clear', function (assert) {
+    var rect = makeRect({ left: 0, top: 0 });
+    canvas.add(rect);
+    assert.deepEqual(canvas.getObjects(), [rect]);
+    //  select rect
+    canvas._onMouseDown({
+      clientX: 1,
+      clientY: 1
+    });
+    assert.equal(canvas.getActiveObject(), rect, 'rect should be selected');
+    assert.ok(canvas._currentTransform, 'should have set current transform');
     assert.ok(typeof canvas.clear === 'function');
 
     assert.equal(canvas.clear(), canvas, 'should be chainable');
     assert.equal(canvas.getObjects().length, 0);
+    assert.equal(canvas.getActiveObject(), null, 'should clear active object');
+    assert.equal(canvas._currentTransform, null, 'should clear current transform');
   });
 
   QUnit.test('renderAll', function(assert) {
@@ -1964,6 +1976,7 @@
     canvas.setActiveObject(group);
     assert.equal(canvas.discardActiveObject(), canvas, 'should be chainable');
     assert.equal(canvas.getActiveObject(), null, 'removing active group sets it to null');
+    assert.equal(canvas._currentTransform, null, 'should clear current transform');
   });
 
   QUnit.test('_discardActiveObject', function(assert) {
@@ -2001,6 +2014,7 @@
     assert.ok(!canvas.item(0).active);
     assert.equal(canvas.getActiveObject(), null);
     assert.equal(canvas.getActiveObject(), null);
+    assert.equal(canvas._currentTransform, null, 'should clear current transform');
 
     for (var prop in eventsFired) {
       assert.ok(eventsFired[prop]);

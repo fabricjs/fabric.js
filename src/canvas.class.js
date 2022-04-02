@@ -1248,6 +1248,7 @@
           return false;
         }
         this._activeObject = null;
+        this._currentTransform = null;
       }
       return true;
     },
@@ -1301,7 +1302,6 @@
      * @chainable
      */
     clear: function () {
-      // this.discardActiveGroup();
       this.discardActiveObject();
       this.clearContext(this.contextTop);
       return this.callSuper('clear');
