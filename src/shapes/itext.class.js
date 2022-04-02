@@ -264,14 +264,12 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     render: function (ctx) {
-      this.__isRendering = true;
       this.clearContextTop();
       this.callSuper('render', ctx);
       // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
       // the correct position but not at every cursor animation.
       this.cursorOffsetCache = { };
       this.renderCursorOrSelection();
-      this.__isRendering = false;
     },
 
     /**
@@ -322,7 +320,6 @@
       if (!ctx) {
         return;
       }
-      this.__isRendering = true;
       var boundaries = this._getCursorBoundaries();
       if (this.selectionStart === this.selectionEnd) {
         this.__isDragging && this._renderDragStartSelection(ctx);
@@ -331,7 +328,6 @@
       else {
         this.renderSelection(boundaries, ctx);
       }
-      this.__isRendering = false;
       ctx.restore();
     },
 
