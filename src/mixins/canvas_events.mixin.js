@@ -241,16 +241,18 @@
      * @param {DragEvent} e
      */
     _onDragEnd: function (e) {
-      var didDrop = e.dataTransfer.dropEffect !== 'none';
+      var didDrop = e.dataTransfer.dropEffect !== 'none',
+        dropTarget = didDrop ? this._activeObject : undefined;
       this.fire('dragend', {
         e: e,
         target: this._dragSource,
         subTargets: this.targets,
         dragSource: this._dragSource,
         didDrop: didDrop,
-        dropTarget: didDrop ? this._activeObject : undefined
+        dropTarget: dropTarget
       });
-      this._dragSource && typeof this._dragSource.onDragEnd === 'function' && this._dragSource.onDragEnd(e);
+      this._dragSource && typeof this._dragSource.onDragEnd === 'function'
+        && this._dragSource.onDragEnd(e, dropTarget);
       delete this._dragSource;
      
       // we need to call mouse up synthetically because the browser won't
