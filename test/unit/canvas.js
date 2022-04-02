@@ -2392,6 +2392,27 @@
     // canvas._currentTransform = false;
   });
 
+  QUnit.test.only('setViewportTransform with actively transforming object', function (assert) {
+    var vpt = [2, 0, 0, 2, -50, -50];
+    assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var rect = new fabric.Rect({ width: 10, heigth: 10 });
+    canvas.add(rect);
+    //  control
+    canvas.setViewportTransform(vpt);
+    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(-50, -50), 'rect should be on screen -50,-50');
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+    assert.ok(rect.isOnScreen(), 'rect should be on screen 0,0');
+    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(0, 0), 'rect should be on screen 0,0');
+    canvas._onMouseDown({
+      clientX: 1,
+      clientY: 1
+    });
+    assert.equal(canvas.getActiveObject(), rect, 'rect should be selected');
+    canvas.setViewportTransform(vpt);
+    assert.ok(rect.isOnScreen(), 'rect should be unchanged from the viewer perspective');
+    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(25, 25), 'rect should be on screen 25,25');
+  });
+
   // QUnit.test('_rotateObject', function(assert) {
   //   assert.ok(typeof canvas._rotateObject === 'function');
   //   var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
