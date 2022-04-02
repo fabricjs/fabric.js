@@ -580,7 +580,8 @@
         if (this.__dragStartSelection) {
           var selectionStart = this.__dragStartSelection.selectionStart;
           var selectionEnd = this.__dragStartSelection.selectionEnd;
-          if (e.dataTransfer.dropEffect === 'move') {
+          var dropEffect = e.dataTransfer.dropEffect;
+          if (dropEffect === 'move') {
             this.insertChars('', null, selectionStart, selectionEnd);
             this.selectionStart = this.selectionEnd = selectionStart;
             this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
@@ -592,7 +593,7 @@
           else {
             this.selectionStart = selectionStart;
             this.selectionEnd = selectionEnd;
-            if (e.dataTransfer.dropEffect === 'none') {
+            if (dropEffect === 'none') {
               this._updateTextarea();
             }
             else {
