@@ -41,7 +41,7 @@
    * @fires drop
    * @fires after:render at the end of the render process, receives the context in the callback
    * @fires before:render at start the render process, receives the context in the callback
-   * 
+   *
    * @fires contextmenu:before
    * @fires contextmenu
    * @example
@@ -1326,7 +1326,7 @@
       var originalProperties = this._realizeGroupTransformOnObject(instance),
           object = this.callSuper('_toObject', instance, methodName, propertiesToInclude);
       //Undo the damage we did by changing all of its properties
-      originalProperties && instance.set(originalValues);
+      originalProperties && instance.set(originalProperties);
       return object;
     },
 
@@ -1360,7 +1360,7 @@
       //object when the group is deselected
       var originalProperties = this._realizeGroupTransformOnObject(instance);
       this.callSuper('_setSVGObject', markup, instance, reviver);
-      originalProperties && instance.set(originalValues);
+      originalProperties && instance.set(originalProperties);
     },
 
     setViewportTransform: function (vpt) {
