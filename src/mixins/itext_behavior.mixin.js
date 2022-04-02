@@ -506,7 +506,6 @@
           styles: this.getSelectionStyles(selection.selectionStart, selection.selectionEnd, true)
         }));
         e.dataTransfer.effectAllowed = 'copyMove';
-        e.dataTransfer.dropEffect = 'move';
         this.setDragImage(e, data);
         this.fire('dragstart', { e: e, data: data });
       }
