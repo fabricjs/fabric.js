@@ -307,6 +307,14 @@
       this.clearContextTop(true);
       if (this.selectionStart === this.selectionEnd) {
         this.renderCursor(boundaries, ctx);
+        //  render drag start selection
+        if (this.__isDragging && this.__dragStartSelection) {
+          this._renderSelection(
+            this.__dragStartSelection,
+            this._getCursorBoundaries(this.__dragStartSelection.selectionStart, true),
+            ctx
+          );
+        }
       }
       else {
         this.renderSelection(boundaries, ctx);
@@ -326,11 +334,15 @@
      * leftOffset/topOffset are offset from that left/top point of a text box
      * @private
      * @param {number} [index] index from start
+     * @param {boolean} [skipCaching]
      */
-    _getCursorBoundaries: function (index) {
+    _getCursorBoundaries: function (index, skipCaching) {
+      if (typeof index === 'undefined') {
+        index = this.selectionStart;
+      }
       var left = this._getLeftOffset(),
           top = this._getTopOffset(),
-          offsets = this._getCursorBoundariesOffsets(index);
+          offsets = this._getCursorBoundariesOffsets(index, skipCaching);
       return {
         left: left,
         top: top,
@@ -342,11 +354,12 @@
     /**
      * Caches and returns cursor left/top offset relative to instance's center point
      * @private
-     * @param {number} [index] index from start
+     * @param {number} index index from start
+     * @param {boolean} [skipCaching]
      */
-    _getCursorBoundariesOffsets: function (index) {
-      if (typeof index === 'undefined') {
-        index = this.selectionStart;
+    _getCursorBoundariesOffsets: function (index, skipCaching) {
+      if (skipCaching) {
+        return this.__getCursorBoundariesOffsets(index);
       }
       if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
         return this.cursorOffsetCache;
@@ -422,10 +435,24 @@
      * @param {Object} boundaries Object with left/top/leftOffset/topOffset
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
-    renderSelection: function(boundaries, ctx) {
+    renderSelection: function (boundaries, ctx) {
+      var selection = {
+        selectionStart: this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
+        selectionEnd: this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd
+      };
+      this._renderSelection(selection, boundaries, ctx)
+    },
 
-      var selectionStart = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
-          selectionEnd = this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd,
+    /**
+     * Renders text selection
+     * @private
+     * @param {{ selectionStart: number, selectionEnd: number }} selection
+     * @param {Object} boundaries Object with left/top/leftOffset/topOffset
+     * @param {CanvasRenderingContext2D} ctx transformed context to draw on
+     */
+    _renderSelection: function (selection, boundaries, ctx) {
+      var selectionStart = selection.selectionStart,
+          selectionEnd = selection.selectionEnd,
           isJustify = this.textAlign.indexOf('justify') !== -1,
           start = this.get2DCursorLocation(selectionStart),
           end = this.get2DCursorLocation(selectionEnd),
