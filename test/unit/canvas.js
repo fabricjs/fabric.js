@@ -2392,7 +2392,7 @@
     // canvas._currentTransform = false;
   });
 
-  QUnit.test.only('setViewportTransform with actively transforming object', function (assert) {
+  QUnit.test('setViewportTransform with actively transforming object', function (assert) {
     var vpt = [2, 0, 0, 2, -50, -50];
     assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
     var rect = new fabric.Rect({ width: 10, heigth: 10 });
