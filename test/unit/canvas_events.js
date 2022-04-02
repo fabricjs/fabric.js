@@ -548,16 +548,19 @@
   });
 
   QUnit.test('drag event cycle', function (assert) {
-    function testDragCycle(cycle) {
+    function testDragCycle(cycle, canDrop) {
       var c = new fabric.Canvas();
       var rect = new fabric.Rect({ width: 10, height: 10 });
+      rect.canDrop = function () {
+        return canDrop;
+      }
       c.add(rect);
       var registery = [], canvasRegistry = [];
       cycle.forEach(eventName => {
-        rect.on(eventName, function () {
+        rect.once(eventName, function () {
           registery.push(eventName);
         });
-        c.on(eventName, function (opt) {
+        c.once(eventName, function (opt) {
           assert.equal(opt.target, rect, eventName + ' on canvas has rect as a target');
           canvasRegistry.push(eventName);
         });
@@ -567,15 +570,26 @@
         event.clientY = 5;
         c.upperCanvasEl.dispatchEvent(event);
       });
-      assert.deepEqual(registery, cycle, 'should fire all events');
-      assert.deepEqual(canvasRegistry, cycle, 'should fire all events');
       c.dispose();
-      return cycle.length + 2;
+      assert.equal(canvasRegistry.length, cycle.length, 'should fire cycle on canvas');
+      assert.deepEqual(canvasRegistry, cycle, 'should fire all events on canvas');
+      return registery
     }
-    var expect = 0;
-    expect += testDragCycle(['dragenter', 'dragover', 'drop']);
-    expect += testDragCycle(['dragenter', 'dragover', 'dragleave']);
-    assert.expect(expect);
+    var cycle, res, expected;
+    cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'drop'];
+    res = testDragCycle(cycle, true);
+    assert.deepEqual(res, cycle, 'should fire all events on rect');
+    cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'dragleave'];
+    res = testDragCycle(cycle, true);
+    assert.deepEqual(res, cycle, 'should fire all events on rect');
+    expected = ['dragenter', 'drop'];
+    cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'drop'];
+    res = testDragCycle(cycle);
+    assert.deepEqual(res, expected, 'should fire all events on rect');
+    expected = ['dragenter', 'dragleave'];
+    cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'dragleave'];
+    res = testDragCycle(cycle);
+    assert.deepEqual(res, expected, 'should fire all events on rect');
   });
 
   ['mousedown', 'mousemove', 'wheel', 'dblclick'].forEach(function(eventType) {
