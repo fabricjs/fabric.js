@@ -584,10 +584,10 @@
     assert.deepEqual(res, cycle, 'should fire all events on rect');
     cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'drop'];
     res = testDragCycle(cycle);
-    assert.deepEqual(res, ['dragenter', 'drop'], 'should fire all events on rect');
+    assert.deepEqual(res, cycle, 'should fire all events on rect');
     cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'dragleave'];
     res = testDragCycle(cycle);
-    assert.deepEqual(res, ['dragenter', 'dragleave'], 'should fire all events on rect');
+    assert.deepEqual(res, cycle, 'should fire all events on rect');
   });
 
   ['mousedown', 'mousemove', 'wheel', 'dblclick'].forEach(function(eventType) {

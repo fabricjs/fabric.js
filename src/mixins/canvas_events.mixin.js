@@ -263,6 +263,7 @@
         target && target.fire(eventType, options);
       }
       else {
+        target && target.fire(eventType, options);
         this._dragSource && this._dragSource.renderDragStartSelection
           && this._dragSource.renderDragStartSelection();
       }
