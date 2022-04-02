@@ -307,14 +307,7 @@
       this.clearContextTop(true);
       if (this.selectionStart === this.selectionEnd) {
         this.renderCursor(boundaries, ctx);
-        //  render drag start selection
-        if (this.__isDragging && this.__dragStartSelection) {
-          this._renderSelection(
-            this.__dragStartSelection,
-            this._getCursorBoundaries(this.__dragStartSelection.selectionStart, true),
-            ctx
-          );
-        }
+        this.renderDragStartSelection(ctx, true);
       }
       else {
         this.renderSelection(boundaries, ctx);
@@ -441,6 +434,25 @@
         selectionEnd: this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd
       };
       this._renderSelection(selection, boundaries, ctx)
+    },
+
+    /**
+     * Renders drag start text selection
+     * @param {CanvasRenderingContext2D} ctx 
+     * @param {boolean} [skipContextPrep]
+     */
+    renderDragStartSelection: function (ctx, skipContextPrep) {
+      if (this.__isDragging && this.__dragStartSelection) {
+        if (!skipContextPrep) {
+          ctx.save();
+        }
+        this._renderSelection(
+          this.__dragStartSelection,
+          this._getCursorBoundaries(this.__dragStartSelection.selectionStart, true),
+          ctx
+        );
+        !skipContextPrep && ctx.restore();
+      }
     },
 
     /**

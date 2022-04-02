@@ -545,9 +545,16 @@
      * @private
      */
     dragOverHandler: function (options) {
-      if (!this.__isDraggingOver && this.canDrop(options.e)) {
+      var canDrop = this.canDrop(options.e);
+      if (!this.__isDraggingOver && canDrop) {
         this.__isDraggingOver = true;
         this.enterEditing(options.e);
+        this.__isDragging && this.abortCursorAnimation();
+      }
+      else if (this.__isDraggingOver && !canDrop) {
+        //  drop state has changed
+        this.__isDraggingOver = false;
+        this.exitEditing();
       }
       if (this.__isDraggingOver) {
         this.setCursorByClick(options.e);
