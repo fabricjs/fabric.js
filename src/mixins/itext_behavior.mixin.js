@@ -570,36 +570,39 @@
     /**
      * support native like text dragging
      * fired only on the drag source
+     * handle changes to the drag source in case of a drop on another object or a cancellation
      * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#finishing_a_drag
      * @private
      * @param {DragEvent} e
      */
     onDragEnd: function (e) {
       if (this.__isDragging && this.__dragStartFired) {
+        //  once the drop event finishes we check if we need to change the drag source
+        //  if the drag source received the drop we bail out
         if (this.__dragStartSelection) {
           var selectionStart = this.__dragStartSelection.selectionStart;
           var selectionEnd = this.__dragStartSelection.selectionEnd;
           var dropEffect = e.dataTransfer.dropEffect;
-          if (dropEffect === 'move') {
-            this.insertChars('', null, selectionStart, selectionEnd);
-            this.selectionStart = this.selectionEnd = selectionStart;
-            this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
-            this._updateTextarea();
-            this.fire('changed', { index: selectionStart, action: 'dragend' });
-            this.canvas.fire('text:changed', { target: this });
-            this.canvas.requestRenderAll();
-          }
-          else {
+          if (dropEffect === 'none') {
             this.selectionStart = selectionStart;
             this.selectionEnd = selectionEnd;
-            if (dropEffect === 'none') {
+            this._updateTextarea();
+          }
+          else {
+            var ctx = this._clearContextTop();
+            ctx && ctx.restore();
+            if (dropEffect === 'move') {
+              this.insertChars('', null, selectionStart, selectionEnd);
+              this.selectionStart = this.selectionEnd = selectionStart;
+              this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
               this._updateTextarea();
+              this.fire('changed', { index: selectionStart, action: 'dragend' });
+              this.canvas.fire('text:changed', { target: this });
+              this.canvas.requestRenderAll();
             }
-            else {
-              this.exitEditing();
-              //  disable mouse up logic
-              this.__lastSelected = false;
-            }
+            this.exitEditing();
+            //  disable mouse up logic
+            this.__lastSelected = false;
           }
         }
 
