@@ -593,9 +593,8 @@
           else {
             this.selectionStart = selectionStart;
             this.selectionEnd = selectionEnd;
+            this._updateTextarea();
           }
-          this.exitEditing();
-          this.__lastSelected = false;
         }
 
         this.fire('dragend', { e: e });
