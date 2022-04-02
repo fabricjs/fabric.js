@@ -549,6 +549,7 @@
       else if (this.__isDraggingOver && !canDrop) {
         //  drop state has changed
         this.__isDraggingOver = false;
+        !this.__isDragging && this.clearContextTop();
         this.exitEditing();
       }
       if (this.__isDraggingOver) {
@@ -566,6 +567,7 @@
     dragLeaveHandler: function () {
       if (this.__isDraggingOver) {
         this.__isDraggingOver = false;
+        !this.__isDragging && this.clearContextTop();
         this.exitEditing();
       }
     },
