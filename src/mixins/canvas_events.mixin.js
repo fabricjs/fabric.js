@@ -242,7 +242,7 @@
      */
     _onDragEnd: function (e) {
       var didDrop = e.dataTransfer.dropEffect !== 'none',
-        dropTarget = didDrop ? this._activeObject : undefined;
+          dropTarget = didDrop ? this._activeObject : undefined;
       this.fire('dragend', {
         e: e,
         target: this._dragSource,
@@ -254,7 +254,7 @@
       this._dragSource && typeof this._dragSource.onDragEnd === 'function'
         && this._dragSource.onDragEnd(e, dropTarget);
       delete this._dragSource;
-     
+
       // we need to call mouse up synthetically because the browser won't
       this._onMouseUp(e);
     },
@@ -280,7 +280,7 @@
       if (target && target.canDrop(e)) {
         canDrop = true;
       }
-      else if(target) {
+      else if (target) {
         target.fire(eventType, options);
       }
       this._fireEnterLeaveEvents(target, e);
@@ -309,18 +309,18 @@
      */
     _onDragEnter: function (e) {
       var eventType = 'dragenter',
-        target = this.findTarget(e),
-        targets = this.targets,
-        options = {
-          e: e,
-          target: target,
-          subTargets: targets,
-          dragSource: this._dragSource
-        };
+          target = this.findTarget(e),
+          targets = this.targets,
+          options = {
+            e: e,
+            target: target,
+            subTargets: targets,
+            dragSource: this._dragSource
+          };
       this.fire(eventType, options);
       this._fireEnterLeaveEvents(target, e);
     },
-    
+
     /**
      * fire `dragleave` on `dragover` targets
      * @private
