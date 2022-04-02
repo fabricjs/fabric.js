@@ -2427,7 +2427,7 @@
     assert.equal(canvas.getActiveObject(), rect, 'rect should be selected');
     //  apply vpt
     canvas.setViewportTransform(vpt);
-    assert.ok(rect.isOnScreen(), 'rect should be unchanged from the viewer perspective');
+    assert.ok(rect.isOnScreen(), 'rect should be unchanged from the viewer\'s perspective');
     assert.deepEqual(rect.lineCoords.tl, new fabric.Point(0, 0), 'rect should be on screen 0,0');
   });
 
@@ -2447,8 +2447,7 @@
     itext.enterEditing();
     //  apply vpt
     canvas.setViewportTransform(vpt);
-    assert.deepEqual(itext.lineCoords.tl, new fabric.Point(0, 0), 'itext should be on screen 0,0');
-    assert.ok(itext.isOnScreen(), 'itext should be unchanged from the viewer perspective');
+    assert.ok(itext.isOnScreen(), 'itext should be unchanged from the viewer\'s perspective');
     assert.deepEqual(itext.lineCoords.tl, new fabric.Point(0, 0), 'itext should be on screen 0,0');
   });
 
