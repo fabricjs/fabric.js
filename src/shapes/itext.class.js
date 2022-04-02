@@ -305,9 +305,7 @@
       if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
         return;
       }
-      var ctx = this.canvas.contextTop;
-      //  avoid race conditions
-      !this.__isRendering && this.prepareContextTop();
+      var ctx = this.prepareContextTop();
       this._clearTextArea(ctx);
       skipRestore || ctx.restore();
       return ctx;
