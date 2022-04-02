@@ -227,6 +227,14 @@
     },
 
     /**
+     * @private
+     */
+    _renderDragStartSelection: function () {
+      this._dragSource && this._dragSource.renderDragStartSelection
+        && this._dragSource.renderDragStartSelection();
+    },
+
+    /**
      * supports native like text dragging
      * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#finishing_a_drag
      * @private
@@ -234,7 +242,14 @@
      */
     _onDragEnd: function (e) {
       this._dragSource && typeof this._dragSource.onDragEnd === 'function' && this._dragSource.onDragEnd(e);
+      this.fire('dragend', {
+        e: e,
+        target: this._dragSource,
+        subTargets: this.targets,
+        dragSource: this._dragSource
+      });
       delete this._dragSource;
+     
       // we need to call mouse up synthetically because the browser won't
       this._onMouseUp(e);
     },
@@ -249,6 +264,7 @@
       var eventType = 'dragover',
           target = this.findTarget(e),
           targets = this.targets,
+          canDrop = false,
           options = {
             e: e,
             target: target,
@@ -256,20 +272,28 @@
             dragSource: this._dragSource
           };
       this.fire(eventType, options);
-      if (target && (!target.canDrop || target.canDrop(e))) {
-        e.preventDefault();
-        this._dragSource && this._dragSource.renderDragStartSelection
-          && this._dragSource.renderDragStartSelection();
-        target && target.fire(eventType, options);
+      if (target && target.canDrop(e)) {
+        canDrop = true;
       }
-      else {
-        target && target.fire(eventType, options);
-        this._dragSource && this._dragSource.renderDragStartSelection
-          && this._dragSource.renderDragStartSelection();
+      else if(target) {
+        target.fire(eventType, options);
       }
       this._fireEnterLeaveEvents(target, e);
-      for (var i = 0; i < targets.length; i++) {
-        targets[i].fire(eventType, options);
+      //  bubble the event to subtargets
+      if (!canDrop) {
+        for (var i = 0; i < targets.length; i++) {
+          target = targets[i];
+          if (target.canDrop(e)) {
+            canDrop = true;
+            break;
+          }
+        }
+      }
+      //  handle the event
+      this._renderDragStartSelection();
+      if (canDrop) {
+        e.preventDefault();
+        target.fire(eventType, options);
       }
     },
 
