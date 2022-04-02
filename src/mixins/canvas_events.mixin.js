@@ -108,7 +108,7 @@
       this._onDragStart = this._onDragStart.bind(this);
       this._onDragEnd = this._onDragEnd.bind(this);
       this._onDragOver = this._onDragOver.bind(this);
-      this._onDragEnter = this._simpleEventHandler.bind(this, 'dragenter');
+      this._onDragEnter = this._onDragEnter.bind(this);
       this._onDragLeave = this._onDragLeave.bind(this);
       this._onDrop = this._onDrop.bind(this);
       this.eventsBound = true;
@@ -272,6 +272,25 @@
       }
     },
 
+    /**
+     * fire `dragleave` on `dragover` targets
+     * @private
+     * @param {Event} [e] Event object fired on Event.js shake
+     */
+    _onDragEnter: function (e) {
+      var eventType = 'dragenter',
+        target = this.findTarget(e),
+        targets = this.targets,
+        options = {
+          e: e,
+          target: target,
+          subTargets: targets,
+          dragSource: this._dragSource
+        };
+      this.fire(eventType, options);
+      this._fireEnterLeaveEvents(target, e);
+    },
+    
     /**
      * fire `dragleave` on `dragover` targets
      * @private
