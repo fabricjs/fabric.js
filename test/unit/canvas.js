@@ -1983,10 +1983,11 @@
 
     canvas.add(makeRect());
     canvas.setActiveObject(canvas.item(0));
-
+    canvas._currentTransform = { foo: 'bar' };
     canvas._discardActiveObject();
     assert.ok(!canvas.item(0).active);
     assert.equal(canvas.getActiveObject(), null);
+    assert.equal(canvas._currentTransform, null, 'should clear current transform');
   });
 
   QUnit.test('discardActiveObject', function(assert) {
