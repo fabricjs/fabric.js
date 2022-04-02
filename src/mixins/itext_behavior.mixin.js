@@ -575,20 +575,17 @@
      * @private
      * @param {DragEvent} e
      */
-    onDragEnd: function (e) {
+    onDragEnd: function (e, dropTarget) {
       if (this.__isDragging && this.__dragStartFired) {
         if (this.__dragStartSelection) {
           var selectionStart = this.__dragStartSelection.selectionStart;
           var selectionEnd = this.__dragStartSelection.selectionEnd;
           var dropEffect = e.dataTransfer.dropEffect;
-          if (dropEffect === 'move') {
+          if (dropEffect === 'move' && dropTarget === this) {
             this.insertChars('', null, selectionStart, selectionEnd);
             this.selectionStart = this.selectionEnd = selectionStart;
             this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
             this._updateTextarea();
-            this.fire('changed', { index: selectionStart, action: 'dragend' });
-            this.canvas.fire('text:changed', { target: this });
-            this.canvas.requestRenderAll();
           }
           else {
             this.selectionStart = selectionStart;
