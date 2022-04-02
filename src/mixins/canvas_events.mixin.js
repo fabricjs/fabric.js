@@ -252,7 +252,7 @@
         dropTarget: dropTarget
       });
       this._dragSource && typeof this._dragSource.onDragEnd === 'function'
-        && this._dragSource.onDragEnd(e, dropTarget);
+        && this._dragSource.onDragEnd(e);
       delete this._dragSource;
 
       // we need to call mouse up synthetically because the browser won't
