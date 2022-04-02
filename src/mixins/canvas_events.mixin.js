@@ -278,6 +278,12 @@
      * @param {Event} [e] Event object fired on Event.js shake
      */
     _onDragLeave: function (e) {
+      this.fire('dragleave', {
+        e: e,
+        target: this._draggedoverTarget,
+        subTargets: this.targets,
+        dragSource: this._dragSource
+      });
       this._fireEnterLeaveEvents(null, e);
       this.targets = [];
       this._hoveredTargets = [];
