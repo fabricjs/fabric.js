@@ -574,7 +574,6 @@
      * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#finishing_a_drag
      * @private
      * @param {DragEvent} e
-     * @returns {boolean} should handle event
      */
     onDragEnd: function (e) {
       if (this.__isDragging && this.__dragStartFired) {

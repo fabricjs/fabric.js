@@ -241,13 +241,16 @@
      * @param {DragEvent} e
      */
     _onDragEnd: function (e) {
-      this._dragSource && typeof this._dragSource.onDragEnd === 'function' && this._dragSource.onDragEnd(e);
+      var didDrop = e.dataTransfer.dropEffect !== 'none';
       this.fire('dragend', {
         e: e,
         target: this._dragSource,
         subTargets: this.targets,
-        dragSource: this._dragSource
+        dragSource: this._dragSource,
+        didDrop: didDrop,
+        dropTarget: didDrop ? this._activeObject : undefined
       });
+      this._dragSource && typeof this._dragSource.onDragEnd === 'function' && this._dragSource.onDragEnd(e);
       delete this._dragSource;
      
       // we need to call mouse up synthetically because the browser won't
@@ -279,7 +282,7 @@
         target.fire(eventType, options);
       }
       this._fireEnterLeaveEvents(target, e);
-      //  bubble the event to subtargets
+      //  propagate the event to subtargets
       if (!canDrop) {
         for (var i = 0; i < targets.length; i++) {
           target = targets[i];
