@@ -593,6 +593,9 @@
             this.selectionStart = selectionStart;
             this.selectionEnd = selectionEnd;
             this._updateTextarea();
+            if (e.dataTransfer.dropEffect !== 'none') {
+              this.__lastSelected = false;
+            }
           }
         }
 
