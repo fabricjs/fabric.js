@@ -2392,7 +2392,7 @@
     // canvas._currentTransform = false;
   });
 
-  QUnit.test('setViewportTransform with actively transforming object', function (assert) {
+  QUnit.test.only('setViewportTransform while actively transforming object', function (assert) {
     var vpt = [2, 0, 0, 2, -50, -50];
     assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
     var rect = new fabric.Rect({ width: 10, heigth: 10 });
@@ -2412,7 +2412,28 @@
     //  apply vpt
     canvas.setViewportTransform(vpt);
     assert.ok(rect.isOnScreen(), 'rect should be unchanged from the viewer perspective');
-    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(25, 25), 'rect should be on screen 25,25');
+    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(0, 0), 'rect should be on screen 0,0');
+  });
+
+  QUnit.test.only('setViewportTransform while editing text', function (assert) {
+    var vpt = [2, 0, 0, 2, -50, -50];
+    assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var itext = new fabric.IText('a');
+    canvas.add(itext);
+    //  control
+    canvas.setViewportTransform(vpt);
+    assert.deepEqual(itext.lineCoords.tl, new fabric.Point(-50, -50), 'itext should be on screen -50,-50');
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+    assert.ok(itext.isOnScreen(), 'itext should be on screen 0,0');
+    assert.deepEqual(itext.lineCoords.tl, new fabric.Point(0, 0), 'itext should be on screen 0,0');
+    //  select itext
+    canvas.setActiveObject(itext);
+    itext.enterEditing();
+    //  apply vpt
+    canvas.setViewportTransform(vpt);
+    assert.deepEqual(itext.lineCoords.tl, new fabric.Point(0, 0), 'itext should be on screen 0,0');
+    assert.ok(itext.isOnScreen(), 'itext should be unchanged from the viewer perspective');
+    assert.deepEqual(itext.lineCoords.tl, new fabric.Point(0, 0), 'itext should be on screen 0,0');
   });
 
   // QUnit.test('_rotateObject', function(assert) {
