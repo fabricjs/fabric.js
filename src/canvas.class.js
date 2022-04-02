@@ -1403,7 +1403,7 @@
         }
         activeObject.setCoords();
       }
-      fabric.StaticCanvas.prototype._setViewportTransform.call(this, vpt);
+      this._setViewportTransform(vpt);
       (dirty || this.renderOnAddRemove) && this.requestRenderAll();
       return this;
     }
