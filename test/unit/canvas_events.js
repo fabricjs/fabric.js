@@ -575,21 +575,19 @@
       assert.deepEqual(canvasRegistry, cycle, 'should fire all events on canvas');
       return registery
     }
-    var cycle, res, expected;
+    var cycle, res;
     cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'drop'];
     res = testDragCycle(cycle, true);
     assert.deepEqual(res, cycle, 'should fire all events on rect');
     cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'dragleave'];
     res = testDragCycle(cycle, true);
     assert.deepEqual(res, cycle, 'should fire all events on rect');
-    expected = ['dragenter', 'drop'];
     cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'drop'];
     res = testDragCycle(cycle);
-    assert.deepEqual(res, expected, 'should fire all events on rect');
-    expected = ['dragenter', 'dragleave'];
+    assert.deepEqual(res, ['dragenter', 'drop'], 'should fire all events on rect');
     cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'dragleave'];
     res = testDragCycle(cycle);
-    assert.deepEqual(res, expected, 'should fire all events on rect');
+    assert.deepEqual(res, ['dragenter', 'dragleave'], 'should fire all events on rect');
   });
 
   ['mousedown', 'mousemove', 'wheel', 'dblclick'].forEach(function(eventType) {
