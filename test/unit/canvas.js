@@ -2403,11 +2403,13 @@
     canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
     assert.ok(rect.isOnScreen(), 'rect should be on screen 0,0');
     assert.deepEqual(rect.lineCoords.tl, new fabric.Point(0, 0), 'rect should be on screen 0,0');
+    //  select rect
     canvas._onMouseDown({
       clientX: 1,
       clientY: 1
     });
     assert.equal(canvas.getActiveObject(), rect, 'rect should be selected');
+    //  apply vpt
     canvas.setViewportTransform(vpt);
     assert.ok(rect.isOnScreen(), 'rect should be unchanged from the viewer perspective');
     assert.deepEqual(rect.lineCoords.tl, new fabric.Point(25, 25), 'rect should be on screen 25,25');
