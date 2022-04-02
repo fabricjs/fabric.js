@@ -194,8 +194,8 @@
     /**
      * While editing handle differently
      * @private
-     * @param {string} key 
-     * @param {*} value 
+     * @param {string} key
+     * @param {*} value
      */
     _set: function (key, value) {
       if (this.isEditing && this._savedProps && key in this._savedProps) {
@@ -458,7 +458,7 @@
         selectionStart: this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
         selectionEnd: this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd
       };
-      this._renderSelection(selection, boundaries, ctx)
+      this._renderSelection(selection, boundaries, ctx);
     },
 
     /**

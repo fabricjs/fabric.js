@@ -169,7 +169,7 @@
       clearTimeout(this._cursorTimeout2);
 
       this._currentCursorOpacity = 0;
-      
+
       //  make sure we clear context even if instance is not editing
       if (shouldClear) {
         var ctx = this._clearContextTop();

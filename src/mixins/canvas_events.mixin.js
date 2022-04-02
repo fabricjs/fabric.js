@@ -247,14 +247,14 @@
      */
     _onDragOver: function (e) {
       var eventType = 'dragover',
-        target = this.findTarget(e),
-        targets = this.targets,
-        options = {
-          e: e,
-          target: target,
-          subTargets: targets,
-          dragSource: this._dragSource
-        };
+          target = this.findTarget(e),
+          targets = this.targets,
+          options = {
+            e: e,
+            target: target,
+            subTargets: targets,
+            dragSource: this._dragSource
+          };
       this.fire(eventType, options);
       if (target && (!target.canDrop || target.canDrop(e))) {
         e.preventDefault();
@@ -278,7 +278,7 @@
      * @param {Event} [e] Event object fired on Event.js shake
      */
     _onDragLeave: function (e) {
-      this._fireEnterLeaveEvents(null, e);   
+      this._fireEnterLeaveEvents(null, e);
       this.targets = [];
       this._hoveredTargets = [];
     },
