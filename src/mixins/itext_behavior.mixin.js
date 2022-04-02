@@ -592,8 +592,12 @@
           else {
             this.selectionStart = selectionStart;
             this.selectionEnd = selectionEnd;
-            this._updateTextarea();
-            if (e.dataTransfer.dropEffect !== 'none') {
+            if (e.dataTransfer.dropEffect === 'none') {
+              this._updateTextarea();
+            }
+            else {
+              this.exitEditing();
+              //  disable mouse up logic
               this.__lastSelected = false;
             }
           }
