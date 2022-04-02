@@ -263,13 +263,15 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    render: function(ctx) {
+    render: function (ctx) {
+      this.__isRendering = true;
       this.clearContextTop();
       this.callSuper('render', ctx);
       // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
       // the correct position but not at every cursor animation.
       this.cursorOffsetCache = { };
       this.renderCursorOrSelection();
+      this.__isRendering = false;
     },
 
     /**
@@ -281,37 +283,57 @@
     },
 
     /**
-     * Prepare and clean the contextTop
+     * Prepare top context
+     * @returns {CanvasRenderingContext2D|undefined} ctx
      */
-    clearContextTop: function(skipRestore) {
-      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
+    prepareContextTop: function () {
+      if (!this.canvas || !this.canvas.contextTop) {
         return;
       }
       var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
       ctx.save();
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       this.transform(ctx);
+      return ctx;
+    },
+
+    /**
+     * Prepare and clean the contextTop
+     * @returns {CanvasRenderingContext2D|undefined} ctx
+     */
+    clearContextTop: function(skipRestore) {
+      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
+        return;
+      }
+      var ctx = this.canvas.contextTop;
+      //  avoid race conditions
+      !this.__isRendering && this.prepareContextTop();
       this._clearTextArea(ctx);
       skipRestore || ctx.restore();
+      return ctx;
     },
     /**
      * Renders cursor or selection (depending on what exists)
      * it does on the contextTop. If contextTop is not available, do nothing.
      */
     renderCursorOrSelection: function() {
-      if ((!this.isEditing && !this.__isDraggingOver) || !this.canvas || !this.canvas.contextTop) {
+      if (!this.isEditing && !this.__isDraggingOver) {
         return;
       }
-      var boundaries = this._getCursorBoundaries(),
-          ctx = this.canvas.contextTop;
-      this.clearContextTop(true);
+      var ctx = this.clearContextTop(true);
+      if (!ctx) {
+        return;
+      }
+      this.__isRendering = true;
+      var boundaries = this._getCursorBoundaries();
       if (this.selectionStart === this.selectionEnd) {
+        this.__isDragging && this._renderDragStartSelection(ctx);
         this.renderCursor(boundaries, ctx);
-        this.renderDragStartSelection(ctx, true);
       }
       else {
         this.renderSelection(boundaries, ctx);
       }
+      this.__isRendering = false;
       ctx.restore();
     },
 
@@ -438,20 +460,28 @@
 
     /**
      * Renders drag start text selection
-     * @param {CanvasRenderingContext2D} ctx 
-     * @param {boolean} [skipContextPrep]
      */
-    renderDragStartSelection: function (ctx, skipContextPrep) {
-      if (this.__isDragging && this.__dragStartSelection) {
-        if (!skipContextPrep) {
-          ctx.save();
+    renderDragStartSelection: function () {
+      if (this.__isDragging) {
+        var ctx = this.clearContextTop(true);
+        if (ctx) {
+          this._renderDragStartSelection(ctx);
+          ctx.restore();
         }
+      }
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx
+     */
+    _renderDragStartSelection: function (ctx) {
+      if (this.__dragStartSelection) {
         this._renderSelection(
           this.__dragStartSelection,
           this._getCursorBoundaries(this.__dragStartSelection.selectionStart, true),
           ctx
         );
-        !skipContextPrep && ctx.restore();
       }
     },
 
