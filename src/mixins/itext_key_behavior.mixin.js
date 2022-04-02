@@ -100,7 +100,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * Override this method to customize cursor behavior on textbox blur
    */
   blur: function () {
-    this.abortCursorAnimation();
+    !this.__isDragging && this.abortCursorAnimation();
   },
 
   /**
