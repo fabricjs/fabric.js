@@ -561,7 +561,7 @@
      * @private
      */
     dragLeaveHandler: function () {
-      if (this.__isDraggingOver) {
+      if (this.__isDraggingOver || this.__isDragging) {
         this.__isDraggingOver = false;
         !this.__isDragging && this.clearContextTop();
         this.exitEditing();
