@@ -2392,7 +2392,7 @@
     // canvas._currentTransform = false;
   });
 
-  QUnit.test.only('setViewportTransform while actively transforming object', function (assert) {
+  QUnit.test('setViewportTransform while actively transforming object', function (assert) {
     var vpt = [2, 0, 0, 2, -50, -50];
     assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
     var rect = new fabric.Rect({ width: 10, heigth: 10 });
@@ -2415,7 +2415,7 @@
     assert.deepEqual(rect.lineCoords.tl, new fabric.Point(0, 0), 'rect should be on screen 0,0');
   });
 
-  QUnit.test.only('setViewportTransform while editing text', function (assert) {
+  QUnit.test('setViewportTransform while editing text', function (assert) {
     var vpt = [2, 0, 0, 2, -50, -50];
     assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
     var itext = new fabric.IText('a');
