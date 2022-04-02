@@ -1326,7 +1326,7 @@
       var originalProperties = this._realizeGroupTransformOnObject(instance),
           object = this.callSuper('_toObject', instance, methodName, propertiesToInclude);
       //Undo the damage we did by changing all of its properties
-      this._unwindGroupTransformOnObject(instance, originalProperties);
+      originalProperties && instance.set(originalValues);
       return object;
     },
 
@@ -1353,18 +1353,6 @@
     },
 
     /**
-     * Restores the changed properties of instance
-     * @private
-     * @param {fabric.Object} [instance] the object to un-transform (gets mutated)
-     * @param {Object} [originalValues] the original values of instance, as returned by _realizeGroupTransformOnObject
-     */
-    _unwindGroupTransformOnObject: function(instance, originalValues) {
-      if (originalValues) {
-        instance.set(originalValues);
-      }
-    },
-
-    /**
      * @private
      */
     _setSVGObject: function(markup, instance, reviver) {
@@ -1372,7 +1360,7 @@
       //object when the group is deselected
       var originalProperties = this._realizeGroupTransformOnObject(instance);
       this.callSuper('_setSVGObject', markup, instance, reviver);
-      this._unwindGroupTransformOnObject(instance, originalProperties);
+      originalProperties && instance.set(originalValues);
     },
 
     setViewportTransform: function (vpt) {
