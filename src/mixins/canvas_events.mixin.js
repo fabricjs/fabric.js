@@ -341,7 +341,7 @@
      * @param {Event} e
      */
     _onDrop: function (e) {
-      var options = this._simpleEventHandler('drop:before', e);
+      var options = this._simpleEventHandler('drop:before', e, { dragSource: this._dragSource });
       //  will be set by the drop target
       options.didDrop = false;
       //  will be set by the drop target, used in case options.target refuses the drop
@@ -637,15 +637,16 @@
      * Handle event firing for target and subtargets
      * @param {Event} e event from mouse
      * @param {String} eventType event to fire (up, down or move)
+     * @param {object} [data] event data overrides
      * @return {object} options
      */
-    _simpleEventHandler: function(eventType, e) {
+    _simpleEventHandler: function(eventType, e, data) {
       var target = this.findTarget(e), subTargets = this.targets || [];
-      return this._basicEventHandler(eventType, {
+      return this._basicEventHandler(eventType, Object.assign({}, {
         e: e,
         target: target,
         subTargets: subTargets,
-      });
+      }, data));
     },
 
     _basicEventHandler: function (eventType, options) {
