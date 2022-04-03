@@ -420,7 +420,7 @@
      */
     setCoords: function () {
       this.callSuper('setCoords');
-      this.subTargetCheck && this.forEachObject(function (object) {
+      (this.subTargetCheck || this.type === 'activeSelection') && this.forEachObject(function (object) {
         object.setCoords();
       });
     },

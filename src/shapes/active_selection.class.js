@@ -101,17 +101,6 @@
     },
 
     /**
-     * @override
-     * @return {Boolean}
-     */
-    setCoords: function () {
-      this.callSuper('setCoords');
-      this.forEachObject(function (object) {
-        object.setCoords();
-      });
-    },
-
-    /**
      * Renders controls and borders for the object
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {Object} [styleOverride] properties to override the object style
