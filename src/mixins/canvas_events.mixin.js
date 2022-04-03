@@ -255,7 +255,7 @@
           };
       removeListener(this.upperCanvasEl, 'drag', this._onDragProgress);
       this.fire('dragend', options);
-      this._dragSource && this._dragSource.fire('dragend', options)
+      this._dragSource && this._dragSource.fire('dragend', options);
       delete this._dragSource;
       // we need to call mouse up synthetically because the browser won't
       this._onMouseUp(e);
@@ -264,7 +264,7 @@
     /**
      * fire `drag` event on canvas and drag source
      * @private
-     * @param {DragEvent} e 
+     * @param {DragEvent} e
      */
     _onDragProgress: function (e) {
       var options = {
@@ -342,7 +342,7 @@
         subTargets: this.targets,
         dragSource: this._dragSource
       });
-      //  fire dragleave on targets 
+      //  fire dragleave on targets
       this._fireEnterLeaveEvents(null, e);
       //  clear targets
       this.targets = [];
