@@ -218,7 +218,6 @@
       var directive = watch ? 'on' : 'off';
       //  make sure we listen only once
       watch && this._watchObject(false, object);
-      // TODO check what changed ischeck
       object[directive]('changed', this.__objectMonitor);
       object[directive]('modified', this.__objectMonitor);
       object[directive]('selected', this.__objectSelectionTracker);
@@ -253,9 +252,10 @@
       object.setCoords();
       object._set('group', this);
       object._set('canvas', this.canvas);
-      this._watchObject(true, object);
+      this.interactive && this._watchObject(true, object);
       var activeObject = this.canvas && this.canvas.getActiveObject && this.canvas.getActiveObject();
       // if we are adding the activeObject in a group
+      // TODO migrate back to isDescendantOf
       if (activeObject && (activeObject === object || (object.contains && object.contains(activeObject)))) {
         this._activeObjects.push(object);
       }
