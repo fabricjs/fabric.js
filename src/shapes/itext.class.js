@@ -11,6 +11,7 @@
    * @fires editing:entered
    * @fires editing:exited
    * @fires dragstart
+   * @fires drag drag event firing on the drag source
    * @fires dragend
    * @fires copy
    * @fires cut

@@ -230,7 +230,7 @@
      * @private
      */
     _renderDragStartSelection: function () {
-      this._dragSource && this._dragSource.renderDragStartSelection
+      this._dragSource && typeof this._dragSource.renderDragStartSelection === 'function'
         && this._dragSource.renderDragStartSelection();
     },
 
@@ -242,19 +242,18 @@
      */
     _onDragEnd: function (e) {
       var didDrop = e.dataTransfer.dropEffect !== 'none',
-          dropTarget = didDrop ? this._activeObject : undefined;
-      this.fire('dragend', {
-        e: e,
-        target: this._dragSource,
-        subTargets: this.targets,
-        dragSource: this._dragSource,
-        didDrop: didDrop,
-        dropTarget: dropTarget
-      });
-      this._dragSource && typeof this._dragSource.onDragEnd === 'function'
-        && this._dragSource.onDragEnd(e);
+          dropTarget = didDrop ? this._activeObject : undefined,
+          options = {
+            e: e,
+            target: this._dragSource,
+            subTargets: this.targets,
+            dragSource: this._dragSource,
+            didDrop: didDrop,
+            dropTarget: dropTarget
+          };
+      this.fire('dragend', options);
+      this._dragSource && this._dragSource.fire('dragend', options)
       delete this._dragSource;
-
       // we need to call mouse up synthetically because the browser won't
       this._onMouseUp(e);
     },
@@ -269,37 +268,32 @@
       var eventType = 'dragover',
           target = this.findTarget(e),
           targets = this.targets,
-          canDrop = false,
           options = {
             e: e,
             target: target,
             subTargets: targets,
-            dragSource: this._dragSource
+            dragSource: this._dragSource,
+            canDrop: false,
+            dropTarget: undefined
           };
       this.fire(eventType, options);
-      if (target && target.canDrop(e)) {
-        canDrop = true;
-      }
-      else if (target) {
+      this._dragSource && this._dragSource.fire('drag', options);
+      if (target) {
+        //  render drag selection before rendering target cursor for correct visuals
+        target.canDrop(e) && this._renderDragStartSelection();
         target.fire(eventType, options);
       }
+      //  make sure we fire dragenter events before dragover
       this._fireEnterLeaveEvents(target, e);
       //  propagate the event to subtargets
-      if (!canDrop) {
-        for (var i = 0; i < targets.length; i++) {
-          target = targets[i];
-          if (target.canDrop(e)) {
-            canDrop = true;
-            break;
-          }
-        }
-      }
-      //  handle the event
-      this._renderDragStartSelection();
-      if (canDrop) {
-        e.preventDefault();
+      for (var i = 0; i < targets.length; i++) {
+        target = targets[i];
+        //  accept event only if previous targets didn't
+        !e.defaultPrevented && target.canDrop(e) && this._renderDragStartSelection();
         target.fire(eventType, options);
       }
+      //  render drag selection in case no target accepted the event
+      !e.defaultPrevented && this._renderDragStartSelection();
     },
 
     /**
@@ -308,16 +302,14 @@
      * @param {Event} [e] Event object fired on Event.js shake
      */
     _onDragEnter: function (e) {
-      var eventType = 'dragenter',
-          target = this.findTarget(e),
-          targets = this.targets,
-          options = {
-            e: e,
-            target: target,
-            subTargets: targets,
-            dragSource: this._dragSource
-          };
-      this.fire(eventType, options);
+      var target = this.findTarget(e), targets = this.targets;
+      this.fire('dragenter', {
+        e: e,
+        target: target,
+        subTargets: targets,
+        dragSource: this._dragSource
+      });
+      //  fire dragenter on targets
       this._fireEnterLeaveEvents(target, e);
     },
 
@@ -333,21 +325,33 @@
         subTargets: this.targets,
         dragSource: this._dragSource
       });
+      //  fire dragleave on targets 
       this._fireEnterLeaveEvents(null, e);
+      //  clear targets
       this.targets = [];
       this._hoveredTargets = [];
     },
 
     /**
-     * `drop:before` is a an event that allow you to schedule logic
+     * `drop:before` is a an event that allows you to schedule logic
      * before the `drop` event. Prefer `drop` event always, but if you need
      * to run some drop-disabling logic on an event, since there is no way
      * to handle event handlers ordering, use `drop:before`
+     * @private
      * @param {Event} e
      */
     _onDrop: function (e) {
-      this._simpleEventHandler('drop:before', e);
-      return this._simpleEventHandler('drop', e);
+      var options = this._simpleEventHandler('drop:before', e);
+      //  will be set by the drop target
+      options.didDrop = false;
+      //  will be set by the drop target, used in case options.target refuses the drop
+      options.dropTarget = undefined;
+      //  fire `drop`
+      this._basicEventHandler('drop', options);
+      //  inform canvas of the drop
+      //  we do this because canvas was unaware of what happened at the time the `drop` event was fired on it
+      //  use for side effects
+      this.fire('drop:after', options);
     },
 
     /**
@@ -355,12 +359,12 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onContextMenu: function (e) {
-      this._simpleEventHandler('contextmenu:before', e);
+      var options = this._simpleEventHandler('contextmenu:before', e);
       if (this.stopContextMenu) {
         e.stopPropagation();
         e.preventDefault();
       }
-      this._simpleEventHandler('contextmenu', e);
+      this._basicEventHandler('contextmenu', options);
       return false;
     },
 
@@ -633,25 +637,25 @@
      * Handle event firing for target and subtargets
      * @param {Event} e event from mouse
      * @param {String} eventType event to fire (up, down or move)
-     * @return {Fabric.Object} target return the the target found, for internal reasons.
+     * @return {object} options
      */
     _simpleEventHandler: function(eventType, e) {
-      var target = this.findTarget(e),
-          targets = this.targets,
-          options = {
-            e: e,
-            target: target,
-            subTargets: targets,
-          };
+      var target = this.findTarget(e), subTargets = this.targets || [];
+      return this._basicEventHandler(eventType, {
+        e: e,
+        target: target,
+        subTargets: subTargets,
+      });
+    },
+
+    _basicEventHandler: function (eventType, options) {
+      var target = options.target, subTargets = options.subTargets;
       this.fire(eventType, options);
       target && target.fire(eventType, options);
-      if (!targets) {
-        return target;
+      for (var i = 0; i < subTargets.length; i++) {
+        subTargets[i].fire(eventType, options);
       }
-      for (var i = 0; i < targets.length; i++) {
-        targets[i].fire(eventType, options);
-      }
-      return target;
+      return options;
     },
 
     /**

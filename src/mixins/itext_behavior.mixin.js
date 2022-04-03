@@ -15,9 +15,11 @@
       this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
       this.dragOverHandler = this.dragOverHandler.bind(this);
       this.dragLeaveHandler = this.dragLeaveHandler.bind(this);
+      this.dragEndHandler = this.dragEndHandler.bind(this);
       this.dropHandler = this.dropHandler.bind(this);
       this.on('dragover', this.dragOverHandler);
       this.on('dragleave', this.dragLeaveHandler);
+      this.on('dragend', this.dragEndHandler);
       this.on('drop', this.dropHandler);
     },
 
@@ -521,6 +523,8 @@
     canDrop: function (e) {
       if (this.editable && !this.__corner) {
         if (this.__isDragging && this.__dragStartSelection) {
+          //  drag source trying to drop over itself
+          //  allow dropping only outside of drag start selection
           var index = this.getSelectionStartFromPointer(e);
           var dragStartSelection = this.__dragStartSelection;
           return index < dragStartSelection.selectionStart || index > dragStartSelection.selectionEnd;
@@ -533,12 +537,15 @@
     /**
      * support native like text dragging
      * @private
+     * @param {object} options
+     * @param {DragEvent} options.e
      */
     dragOverHandler: function (options) {
-      var canDrop = this.canDrop(options.e);
+      var e = options.e;
+      var canDrop = !e.defaultPrevented && this.canDrop(e);
       if (!this.__isDraggingOver && canDrop) {
         this.__isDraggingOver = true;
-        this.enterEditing(options.e);
+        this.enterEditing(e);
         this.__isDragging && this.abortCursorAnimation();
       }
       else if (this.__isDraggingOver && !canDrop) {
@@ -548,7 +555,13 @@
         this.exitEditing();
       }
       if (this.__isDraggingOver) {
-        this.setCursorByClick(options.e);
+        //  can be dropped, inform browser
+        e.preventDefault();
+        //  inform event subscribers
+        options.canDrop = true;
+        options.dropTarget = this;
+        //  render
+        this.setCursorByClick(e);
         this._updateTextarea();
         this.restartCursorIfNeeded();
         this.renderCursorOrSelection();
@@ -573,9 +586,11 @@
      * handle changes to the drag source in case of a drop on another object or a cancellation
      * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#finishing_a_drag
      * @private
-     * @param {DragEvent} e
+     * @param {object} options
+     * @param {DragEvent} options.e
      */
-    onDragEnd: function (e) {
+    dragEndHandler: function (options) {
+      var e = options.e;
       if (this.__isDragging && this.__dragStartFired) {
         //  once the drop event finishes we check if we need to change the drag source
         //  if the drag source received the drop we bail out
@@ -605,8 +620,6 @@
             this.__lastSelected = false;
           }
         }
-
-        this.fire('dragend', { e: e });
       }
 
       this.__dragImageDisposer && this.__dragImageDisposer();
@@ -622,14 +635,16 @@
      * in order to change the drop value or to customize styling respectively, by listening to the `drop:before` event
      * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#performing_a_drop
      * @private
+     * @param {object} options
+     * @param {DragEvent} options.e
      */
     dropHandler: function (options) {
-      var e = options.e;
+      var e = options.e, didDrop = e.defaultPrevented;
       this.__isDraggingOver = false;
       // inform browser that the drop has been accepted
       e.preventDefault();
       var insert = e.dataTransfer.getData('text/plain');
-      if (insert) {
+      if (insert && !didDrop) {
         var insertAt = this.selectionStart;
         var data = e.dataTransfer.types.includes('application/fabric') ?
           JSON.parse(e.dataTransfer.getData('application/fabric')) :
@@ -659,6 +674,9 @@
           && (this._reNewline.test(this._text[insertAt]) || insertAt === this._text.length)) {
           insert = insert.trimEnd();
         }
+        //  inform subscribers
+        options.didDrop = true;
+        options.dropTarget = this;
         //  finalize
         this.insertChars(insert, styles, insertAt);
         this.selectionStart = Math.min(insertAt + selectionStartOffset, this._text.length);
