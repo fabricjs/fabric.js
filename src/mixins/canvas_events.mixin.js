@@ -221,6 +221,9 @@
       var activeObject = this.getActiveObject();
       if (activeObject && typeof activeObject.onDragStart === 'function' && activeObject.onDragStart(e)) {
         this._dragSource = activeObject;
+        var options = { e: e, target: activeObject };
+        this.fire('dragstart', options);
+        activeObject.fire('dragstart', options);
         addListener(this.upperCanvasEl, 'drag', this._onDragProgress);
         return;
       }

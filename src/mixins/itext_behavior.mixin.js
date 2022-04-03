@@ -509,7 +509,6 @@
         }));
         e.dataTransfer.effectAllowed = 'copyMove';
         this.setDragImage(e, data);
-        this.fire('dragstart', { e: e, data: data });
       }
       return this.__isDragging;
     },
