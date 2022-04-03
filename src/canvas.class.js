@@ -41,6 +41,28 @@
    * @fires drop
    * @fires after:render at the end of the render process, receives the context in the callback
    * @fires before:render at start the render process, receives the context in the callback
+   * 
+   * @fires contextmenu:before
+   * @fires contextmenu
+   * @example
+   * let handler;
+   * targets.forEach(target => {
+   *   target.on('contextmenu:before', opt => {
+   *     //  decide which target should handle the event before canvas hijacks it
+   *     if (someCaseHappens && opt.targets.includes(target)) {
+   *       handler = target;
+   *     }
+   *   });
+   *   target.on('contextmenu', opt => {
+   *     //  do something fantastic
+   *   });
+   * });
+   * canvas.on('contextmenu', opt => {
+   *   if (!handler) {
+   *     //  no one takes responsibility, it's always left to me
+   *     //  let's show them how it's done!
+   *   }
+   * });
    *
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
@@ -975,20 +997,12 @@
         this.upperCanvasEl = upperCanvasEl;
       }
       fabric.util.addClass(upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
-
+      this.upperCanvasEl.setAttribute('data-fabric', 'top');
       this.wrapperEl.appendChild(upperCanvasEl);
 
       this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
       this._applyCanvasStyle(upperCanvasEl);
       this.contextTop = upperCanvasEl.getContext('2d');
-    },
-
-    /**
-     * Returns context of top canvas where interactions are drawn
-     * @returns {CanvasRenderingContext2D}
-     */
-    getTopContext: function () {
-      return this.contextTop;
     },
 
     /**
@@ -1005,9 +1019,13 @@
      * @private
      */
     _initWrapperElement: function () {
+      if (this.wrapperEl) {
+        return;
+      }
       this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, 'div', {
         'class': this.containerClass
       });
+      this.wrapperEl.setAttribute('data-fabric', 'wrapper');
       fabric.util.setStyle(this.wrapperEl, {
         width: this.width + 'px',
         height: this.height + 'px',
@@ -1049,7 +1067,16 @@
     },
 
     /**
+     * Returns context of top canvas where interactions are drawn
+     * @returns {CanvasRenderingContext2D}
+     */
+    getTopContext: function () {
+      return this.contextTop;
+    },
+
+    /**
      * Returns context of canvas where object selection is drawn
+     * @alias
      * @return {CanvasRenderingContext2D}
      */
     getSelectionContext: function() {

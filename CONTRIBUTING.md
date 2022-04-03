@@ -18,21 +18,28 @@ If you are sure that it's a bug in Fabric.js or a suggestion, open a new [issue]
 
 ### Issue tracker guidelines
 
-- **Search:** Before opening a new issue please [search](https://github.com/fabricjs/fabric.js/search?q=&ref=cmdform&type=Issues) Fabric's existing issues.
+If you think you found a bug in Fabric file an [issue](https://github.com/fabricjs/fabric.js/issues).
+
+- **Gotchas**: Make sure you didn't fall into a known [fabric-gotcha](http://fabricjs.com/fabric-gotchas)
+
+- **Search:** Before opening a new issue please take the time to [search](https://github.com/fabricjs/fabric.js/search?q=&ref=cmdform&type=Issues) Fabric's existing issues. This is vital to prevent spamming and to keep the community in a good state.
 
 - **Title:** Choose an informative title.
 
 - **Description:** Use the questions above to describe the issue. Add logs, screenshots or videos if that makes sense.
 
-- **Test case:** Please post code to replicate the bug - best on [jsfiddle](http://jsfiddle.net). Ideally a failing test would be
-perfect, but even a simple script demonstrating the error would suffice. You could use [this jsfiddle template](http://jsfiddle.net/fabricjs/Da7SP/) as a
-starting point.
+- **Test case:** Make sure you create a minimal and immediate test case, demonstrating the bug, with relevant explanations. It should be extremely **easy** and **fast** for someone to understand your bug and reproduce it. Bug templates can be found within a [bug report](https://github.com/fabricjs/fabric.js/issues/new?assignees=&labels=&template=bug_report.md)
 
-- **Fabric.js version:** Make sure to specify which version of Fabric.js you are using. The version can be found in [fabric.js file](https://github.com/fabricjs/fabric.js/blob/master/dist/fabric.js#L5) or just by executing `fabric.version` in the browser console.
+- **Fabric.js version:** Make sure to specify which version of Fabric.js you are using. The version can be found in [fabric.js file](https://github.com/fabricjs/fabric.js/blob/master/dist/fabric.js#L5) or just by executing `fabric.version` in the browser console. It is advised you upgrade to the latest version before proceeding.
+
+**Without these requirements issues shall be closed.**
+
+If you're unsure about something that is not a bug, it's best to start a [discussion](https://github.com/fabricjs/fabric.js/discussions) or create a post on [Fabric's google group](groups.google.com/forum/?fromgroups#!forum/fabricjs) where someone might clarify some of the things.
 
 ## Pull requests
 
 We are very grateful for your pull requests! This is your chance to improve Fabric for everyone else.
+Before you begin read this through and take a look at [fabric-gotchas](http://fabricjs.com/fabric-gotchas)
 
 ### Online one-click setup for making PRs
 
@@ -57,9 +64,11 @@ To customize the dev server take a look at [`./scripts`](./scripts).
 
 #### symlinking
 You can symlink `fabric.js` and test your changes in a separate project.
-1. From `fabric.js` folder run `npm link`.
-1. From your project's folder run `npm link fabric`.
-See [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link).
+1. From `fabric.js` folder run `npm link` **OR** `yarn link`.
+1. From your project's folder run `npm link fabric` **OR** `yarn link fabric`.
+
+See [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link) **OR** [yarn link](https://yarnpkg.com/cli/link).\
+Don't forget to unlink the package once you're done.
 
 ### Working on `fabricjs.com`
 
@@ -71,6 +80,15 @@ If you are working on windows, check out [`jekyll` docs](https://jekyllrb.com/do
 Take a look at an existing [demo file](https://github.com/fabricjs/fabricjs.com/blob/gh-pages/posts/demos/_posts/2020-2-15-custom-control-render.md).
 Create a new file in the same directory (`posts/demos/_posts`) and you're good to go.
 
+### Tests
+Fabric has 2 test suites: 
+- `unit` testing logic and state
+- `visual` testing visual outcome against image refs
+
+#### Running Tests
+- **Node.js**: run `npm test -- -a -d` to run **a**ll tests in **d**ebug mode (pass `--help` to see more options).
+- **Browser**: start `fabricjs.com` (`npm start`) and navigate to the `tests` tab where you will find the test interface.
+
 ### Pull request guidelines
 
 Here are a few notes you should take into account:
@@ -79,7 +97,7 @@ Here are a few notes you should take into account:
 
 - **Distribution files:** Do your changes only in the [source files](https://github.com/fabricjs/fabric.js/tree/master/src). Don't include the [distribution files](https://github.com/fabricjs/fabric.js/tree/master/dist) in your commit.
 
-- **Add tests**: Tests are always a great addition - invest a little time and expand the [unit tests suite](https://github.com/fabricjs/fabric.js/tree/master/test/unit). More informations about [QUnit](http://qunitjs.com/) tests can be found in the [wiki](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric#testing-fabric).
+- **Add tests**: Tests are vital - invest time to extend the [tests suites](https://github.com/fabricjs/fabric.js/tree/master/test). More information about [QUnit](http://qunitjs.com/) tests can be found in the [wiki](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric#testing-fabric).
 
 - **Add documentation:** Fabric uses [JSDoc 3] for documentation. The generated documentation can be found at [fabricjs.com](http://fabricjs.com/docs).
 
