@@ -26150,7 +26150,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         this.setPathInfo();
       }
       this.__skipDimension = false;
-      this.styles = this._stylesFromArray();
       this.initDimensions();
       this.setCoords();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
@@ -27316,7 +27315,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     toObject: function(propertiesToInclude) {
       var allProperties = additionalProps.concat(propertiesToInclude);
       var obj = this.callSuper('toObject', allProperties);
-      obj.styles = this._stylesToArray();
+      // styles will be overridden with a properly cloned structure
+      obj.styles = clone(this.styles, true);
       if (obj.path) {
         obj.path = this.path.toObject();
       }
@@ -27822,87 +27822,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      */
     _deleteLineStyle: function(lineIndex) {
       delete this.styles[lineIndex];
-    },
-
-    /**
-     * Returns the array form of an object's styles property where styles are grouped in ranges
-     * rather than per character. This format is less verbose, and is better suited for storage
-     * so it is used in serialization (not during runtime).
-     * @return {Array}
-     */
-     _stylesToArray: function() {
-      // clone style structure to prevent mutation
-      var styles = fabric.util.object.clone(this.styles, true),
-          textLines = this.text.split('\n'),
-          charIndex = -1, prevStyle = {}, newStyles = [];
-      //loop through each textLine
-      for (var i = 0; i < textLines.length; i++) {
-        //if obj has a style for this line
-        if (styles[i]) {
-          //loop through each character of the current line
-          for (var c = 0; c < textLines[i].length; c++) {
-            charIndex++;
-            var thisStyle = styles[i][c];
-            //check if style exists for this character
-            if (thisStyle) {
-              var styleChanged = this._hasStyleChangedForSvg(prevStyle, thisStyle);
-              //check if no style exists for previous character, or if style has changed
-              if (styleChanged) {
-                newStyles.push({
-                  start: charIndex,
-                  end: charIndex + 1,
-                  style: thisStyle
-                });
-              }
-              else {
-                //if style is the same as previous character, increase end index
-                newStyles[newStyles.length - 1].end++;
-              }
-            }
-            prevStyle = thisStyle || {};
-          }
-        }
-        else {
-          //no styles exist for this line, so add the line's length to the charIndex total
-          charIndex += textLines[i].length;
-        }
-      }
-      return newStyles;
-    },
-
-    /**
-     * Returns the object form of the styles property where styles are assigned per
-     * character rather than grouped by range. This format is more verbose, and is
-     * only used during runtime (not for serialization/storage)
-     * @return {Object}
-     */
-    _stylesFromArray: function() {
-      if (!Array.isArray(this.styles)) {
-        return this.styles;
-      }
-      var textLines = this.text.split('\n'),
-          charIndex = -1, styleIndex = 0, newStyles = {};
-      //loop through each textLine
-      for (var i = 0; i < textLines.length; i++) {
-        //loop through each character of the current line
-        for (var c = 0; c < textLines[i].length; c++) {
-          charIndex++;
-          //check if there's a style collection for the current character
-          if (this.styles[styleIndex]
-            && this.styles[styleIndex].start <= charIndex
-            && charIndex < this.styles[styleIndex].end) {
-            //create object for line index if it doesn't exist
-            newStyles[i] = newStyles[i] || {};
-            //add a style entry for this character's index
-            newStyles[i][c] = this.styles[styleIndex].style;
-            //if character is at the end of the current style collection, move to the next
-            if (charIndex === this.styles[styleIndex].end - 1) {
-              styleIndex++;
-            }
-          }
-        }
-      }
-      return newStyles;
     }
   });
 })();

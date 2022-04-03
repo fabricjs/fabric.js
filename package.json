@@ -80,7 +80,7 @@
     "nyc": "^15.1.0",
     "onchange": "^7.1.0",
     "pixelmatch": "^4.0.2",
-    "qunit": "^2.18.1",
+    "qunit": "^2.17.2",
     "testem": "^3.2.0",
     "uglify-js": "3.3.x"
   },
@@ -88,7 +88,5 @@
     "node": ">=14.0.0"
   },
   "main": "./dist/fabric.js",
-  "dependencies": {
-    "lint": "^0.7.0"
-  }
+  "dependencies": {}
 }
