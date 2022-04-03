@@ -277,8 +277,8 @@ async function runIntreactiveTestSuite(options) {
     }, { unit: [], visual: [] });
     _.reduce(tests, async (queue, files, suite) => {
         await queue;
-        console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
         if (files.length > 0) {
+            console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
             return test(files, options);
         }
     }, Promise.resolve());
