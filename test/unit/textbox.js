@@ -99,6 +99,7 @@
   QUnit.test('toObject', function(assert) {
     var textbox = new fabric.Textbox('The quick \nbrown \nfox', { width: 120 });
     var obj = textbox.toObject();
+    obj.styles = [];
     assert.deepEqual(obj, TEXTBOX_OBJECT, 'JSON OUTPUT MATCH');
   });
 
