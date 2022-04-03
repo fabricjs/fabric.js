@@ -73,7 +73,7 @@
       scaleX:                   1,
       scaleY:                   1,
       shadow:                   null,
-      subTargetCheck:           true,
+      subTargetCheck:           false,
       interactive:              false,
       visible:                  true,
       backgroundColor:          '',
