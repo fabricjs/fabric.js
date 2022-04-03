@@ -4,24 +4,11 @@
       clone = fabric.util.object.clone;
 
   /**
+   * 
    * @typedef {Object} AnimationOptions
    * Animation of a value or list of values.
-   * When using lists, think of something like this:
-   * fabric.util.animate({
-   *   startValue: [1, 2, 3],
-   *   endValue: [2, 4, 6],
-   *   onChange: function([a, b, c]) {
-   *     canvas.zoomToPoint({x: b, y: c}, a)
-   *     canvas.renderAll()
-   *   }
-   * });
-   * @example
    * @property {Function} [onChange] Callback; invoked on every value change
    * @property {Function} [onComplete] Callback; invoked when value change is completed
-   * @example
-   * // Note: startValue, endValue, and byValue must match the type
-   * var animationOptions = { startValue: 0, endValue: 1, byValue: 0.25 }
-   * var animationOptions = { startValue: [0, 1], endValue: [1, 2], byValue: [0.25, 0.25] }
    * @property {number | number[]} [startValue=0] Starting value
    * @property {number | number[]} [endValue=100] Ending value
    * @property {number | number[]} [byValue=100] Value to modify the property by
@@ -138,10 +125,27 @@
    * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
    * @memberOf fabric.util
    * @param {AnimationOptions} [options] Animation options
+   *  When using lists, think of something like this:
    * @example
-   * // Note: startValue, endValue, and byValue must match the type
-   * fabric.util.animate({ startValue: 0, endValue: 1, byValue: 0.25 })
-   * fabric.util.animate({ startValue: [0, 1], endValue: [1, 2], byValue: [0.25, 0.25] })
+   * fabric.util.animate({
+   *   startValue: [1, 2, 3],
+   *   endValue: [2, 4, 6],
+   *   onChange: function([x, y, zoom]) {
+   *     canvas.zoomToPoint(new fabric.Point(x, y), zoom);
+   *     canvas.requestRenderAll();
+   *   }
+   * });
+   * 
+   * @example
+   * fabric.util.animate({
+   *   startValue: 1,
+   *   endValue: 0,
+   *   onChange: function(v) {
+   *     obj.set('opacity', v);
+   *     canvas.requestRenderAll();
+   *   }
+   * });
+   * 
    * @returns {CancelFunction} cancel function
    */
   function animate(options) {
