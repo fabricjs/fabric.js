@@ -32,7 +32,7 @@
     /**
      * @override
      */
-    subTargetCheck: true,
+    subTargetCheck: false,
 
     /**
      * @override
@@ -98,6 +98,17 @@
      */
     isOnACache: function() {
       return false;
+    },
+
+    /**
+     * @override
+     * @return {Boolean}
+     */
+    setCoords: function () {
+      this.callSuper('setCoords');
+      this.forEachObject(function (object) {
+        object.setCoords();
+      });
     },
 
     /**
