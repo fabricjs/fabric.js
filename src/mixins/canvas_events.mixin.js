@@ -107,6 +107,7 @@
       this._onDoubleClick = this._onDoubleClick.bind(this);
       this._onDragStart = this._onDragStart.bind(this);
       this._onDragEnd = this._onDragEnd.bind(this);
+      this._onDragProgress = this._onDragProgress.bind(this);
       this._onDragOver = this._onDragOver.bind(this);
       this._onDragEnter = this._onDragEnter.bind(this);
       this._onDragLeave = this._onDragLeave.bind(this);
@@ -220,6 +221,7 @@
       var activeObject = this.getActiveObject();
       if (activeObject && typeof activeObject.onDragStart === 'function' && activeObject.onDragStart(e)) {
         this._dragSource = activeObject;
+        addListener(this.upperCanvasEl, 'drag', this._onDragProgress);
         return;
       }
       e.preventDefault();
@@ -251,11 +253,27 @@
             didDrop: didDrop,
             dropTarget: dropTarget
           };
+      removeListener(this.upperCanvasEl, 'drag', this._onDragProgress);
       this.fire('dragend', options);
       this._dragSource && this._dragSource.fire('dragend', options)
       delete this._dragSource;
       // we need to call mouse up synthetically because the browser won't
       this._onMouseUp(e);
+    },
+
+    /**
+     * fire `drag` event on canvas and drag source
+     * @private
+     * @param {DragEvent} e 
+     */
+    _onDragProgress: function (e) {
+      var options = {
+        e: e,
+        dragSource: this._dragSource,
+        dropTarget: this._draggedoverTarget
+      };
+      this.fire('drag', options);
+      this._dragSource && this._dragSource.fire('drag', options);
     },
 
     /**
@@ -277,7 +295,6 @@
             dropTarget: undefined
           };
       this.fire(eventType, options);
-      this._dragSource && this._dragSource.fire('drag', options);
       if (target) {
         //  render drag selection before rendering target cursor for correct visuals
         target.canDrop(e) && this._renderDragStartSelection();
