@@ -189,8 +189,8 @@
     /**
      * While editing handle differently
      * @private
-     * @param {string} key 
-     * @param {*} value 
+     * @param {string} key
+     * @param {*} value
      */
     _set: function (key, value) {
       if (this.isEditing && this._savedProps && key in this._savedProps) {
