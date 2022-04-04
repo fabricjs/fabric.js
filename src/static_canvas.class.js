@@ -620,7 +620,7 @@
     _onObjectRemoved: function(obj) {
       this.fire('object:removed', { target: obj });
       obj.fire('removed');
-      delete obj.canvas;
+      obj._set('canvas', undefined);
     },
 
     /**
