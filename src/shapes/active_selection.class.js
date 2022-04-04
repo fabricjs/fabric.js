@@ -90,6 +90,30 @@
     },
 
     /**
+     * @private
+     * @param {'added'|'removed'} type
+     * @param {fabric.Object[]} targets
+     */
+    _onAfterObjectsChange: function (type, targets) {
+      var groups = [];
+      targets.forEach(function (object) {
+        object.group && !groups.includes(object.group) && groups.push(object.group);
+      });
+      if (type === 'removed') {
+        //  invalidate groups' layout and mark as dirty
+        groups.forEach(function (group) {
+          group._onAfterObjectsChange('added', targets);
+        });
+      }
+      else {
+        //  mark groups as dirty
+        groups.forEach(function (group) {
+          group._set('dirty', true);
+        });
+      }
+    },
+
+    /**
      * If returns true, deselection is cancelled.
      * @since 2.0.0
      * @return {Boolean} [cancel]
