@@ -1593,7 +1593,7 @@
      * @chainable
      */
       dispose: function () {
-      // cancel eventually ongoing renders
+        // cancel eventually ongoing renders
         if (this.isRendering) {
           fabric.util.cancelAnimFrame(this.isRendering);
           this.isRendering = 0;

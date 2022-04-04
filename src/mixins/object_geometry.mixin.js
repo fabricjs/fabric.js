@@ -566,14 +566,14 @@
     },
 
     calcOCoords: function() {
-      var rotateMatrix = this._calcRotateMatrix(),
-          translateMatrix = this._calcTranslateMatrix(),
-          vpt = this.getViewportTransform(),
-          startMatrix = this.group ? multiplyMatrices(vpt, this.group.calcTransformMatrix()) : vpt,
-          startMatrix = multiplyMatrices(startMatrix, translateMatrix),
-          finalMatrix = multiplyMatrices(startMatrix, rotateMatrix),
-          finalMatrix = multiplyMatrices(finalMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
-          dim = this._calculateCurrentDimensions(),
+      var vpt = this.getViewportTransform(),
+          tMatrix = this._calcTranslateMatrix(true),
+          rMatrix = this._calcRotateMatrix(true, !!this.group),
+          positionMatrix = multiplyMatrices(tMatrix, rMatrix),
+          startMatrix = multiplyMatrices(vpt, positionMatrix),
+          finalMatrix = multiplyMatrices(startMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
+          transformOptions = this.group ? fabric.util.qrDecompose(this.calcTransformMatrix()) : undefined,
+          dim = this._calculateCurrentDimensions(transformOptions),
           coords = {};
       this.forEachControl(function(control, key, fabricObject) {
         coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
@@ -591,7 +591,7 @@
            canvas.contextTop.fillRect(control.x, control.y, 3, 3);
          });
        }, 50);
-       */
+      */
       return coords;
     },
 
@@ -637,18 +637,22 @@
 
     /**
      * calculate rotation matrix of an object
+     * @param {boolean} [absolute] true means angle is measured relative to canvas, false means angle is measured realtive to parent
      * @return {Array} rotation matrix for the object
      */
-    _calcRotateMatrix: function() {
-      return util.calcRotateMatrix(this);
+    _calcRotateMatrix: function (absolute, accountForFlipping) {
+      var angle = absolute ? this.getTotalAngle() : this.angle;
+      accountForFlipping && this.flipX && (angle -= 180);
+      return util.calcRotateMatrix({ angle: angle });
     },
 
     /**
      * calculate the translation matrix for an object transform
+     * @param {boolean} [absolute] true means translation is relative to canvas, false means realtive to parent
      * @return {Array} rotation matrix for the object
      */
-    _calcTranslateMatrix: function() {
-      var center = this.getRelativeCenterPoint();
+    _calcTranslateMatrix: function(absolute) {
+      var center = absolute ? this.getCenterPoint() : this.getRelativeCenterPoint();
       return [1, 0, 0, 1, center.x, center.y];
     },
 
@@ -771,11 +775,12 @@
      * Calculate object dimensions for controls box, including padding and canvas zoom.
      * and active selection
      * @private
+     * @param {object} [options] transform options
      * @returns {fabric.Point} dimensions
      */
-    _calculateCurrentDimensions: function()  {
+    _calculateCurrentDimensions: function(options)  {
       var vpt = this.getViewportTransform(),
-          dim = this._getTransformedDimensions(),
+          dim = this._getTransformedDimensions(options),
           p = transformPoint(dim, vpt, true);
       return p.scalarAdd(2 * this.padding);
     },
