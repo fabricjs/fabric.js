@@ -14,7 +14,7 @@ about: Creating a PR
 
         PRing is not always simple, don't hestitate to ask for help (beware of 'em gotchas 😓).
         We appreciate your effort and would like the process to be productive and enjoyable.
-        A strong community means a stong and better product for everyone.
+        A strong community means a strong and better product for everyone.
 -->
 
 
@@ -27,6 +27,9 @@ about: Creating a PR
         It hurts us the throw away good work, effort and time put into fabric so please stay patient.
         You are welcome to join the migration effort 🔨
         https://github.com/fabricjs/fabric.js/issues/7596
+
+        If you remain strong minded about PRing and the fix is small you can submit a PR to the 5.x branch
+        During the migration we will port these changes to master
 -->
 
 
