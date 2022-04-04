@@ -255,8 +255,7 @@
       this.interactive && this._watchObject(true, object);
       var activeObject = this.canvas && this.canvas.getActiveObject && this.canvas.getActiveObject();
       // if we are adding the activeObject in a group
-      // TODO migrate back to isDescendantOf
-      if (activeObject && (activeObject === object || (object.contains && object.contains(activeObject)))) {
+      if (activeObject && (activeObject === object || object.isDescendantOf(activeObject))) {
         this._activeObjects.push(object);
       }
     },
