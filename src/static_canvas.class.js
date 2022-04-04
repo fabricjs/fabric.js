@@ -308,18 +308,23 @@
      */
       _createLowerCanvas: function (canvasEl) {
       // canvasEl === 'HTMLCanvasElement' does not work on jsdom/node
-        if (canvasEl && canvasEl.getContext) {
-          this.lowerCanvasEl = canvasEl;
-        }
-        else {
-          this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
-        }
-
-        fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
-        this._originalCanvasStyle = this.lowerCanvasEl.style;
-        if (this.interactive) {
-          this._applyCanvasStyle(this.lowerCanvasEl);
-        }
+      if (canvasEl && canvasEl.getContext) {
+        this.lowerCanvasEl = canvasEl;
+      }
+      else {
+        this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
+      }
+      if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
+        /* _DEV_MODE_START_ */
+        throw new Error('fabric.js: trying to initialize a canvas that has already been initialized');
+        /* _DEV_MODE_END_ */
+      }
+      fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
+      this.lowerCanvasEl.setAttribute('data-fabric', 'main');
+      if (this.interactive) {
+        this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
+        this._applyCanvasStyle(this.lowerCanvasEl);
+      }
 
         this.contextContainer = this.lowerCanvasEl.getContext('2d');
       },
@@ -1589,35 +1594,38 @@
      */
       dispose: function () {
       // cancel eventually ongoing renders
-        if (this.isRendering) {
-          fabric.util.cancelAnimFrame(this.isRendering);
-          this.isRendering = 0;
-        }
-        this.forEachObject(function(object) {
-          object.dispose && object.dispose();
-        });
-        this._objects = [];
-        if (this.backgroundImage && this.backgroundImage.dispose) {
-          this.backgroundImage.dispose();
-        }
-        this.backgroundImage = null;
-        if (this.overlayImage && this.overlayImage.dispose) {
-          this.overlayImage.dispose();
-        }
-        this.overlayImage = null;
-        this._iTextInstances = null;
-        this.contextContainer = null;
-        // restore canvas style
-        this.lowerCanvasEl.classList.remove('lower-canvas');
-        fabric.util.setStyle(this.lowerCanvasEl, this._originalCanvasStyle);
+      if (this.isRendering) {
+        fabric.util.cancelAnimFrame(this.isRendering);
+        this.isRendering = 0;
+      }
+      this.forEachObject(function(object) {
+        object.dispose && object.dispose();
+      });
+      this._objects = [];
+      if (this.backgroundImage && this.backgroundImage.dispose) {
+        this.backgroundImage.dispose();
+      }
+      this.backgroundImage = null;
+      if (this.overlayImage && this.overlayImage.dispose) {
+        this.overlayImage.dispose();
+      }
+      this.overlayImage = null;
+      this._iTextInstances = null;
+      this.contextContainer = null;
+      // restore canvas style and attributes
+      this.lowerCanvasEl.classList.remove('lower-canvas');
+      this.lowerCanvasEl.removeAttribute('data-fabric');
+      if (this.interactive) {
+        this.lowerCanvasEl.style.cssText = this._originalCanvasStyle;
         delete this._originalCanvasStyle;
-        // restore canvas size to original size in case retina scaling was applied
-        this.lowerCanvasEl.setAttribute('width', this.width);
-        this.lowerCanvasEl.setAttribute('height', this.height);
-        fabric.util.cleanUpJsdomNode(this.lowerCanvasEl);
-        this.lowerCanvasEl = undefined;
-        return this;
-      },
+      }
+      // restore canvas size to original size in case retina scaling was applied
+      this.lowerCanvasEl.setAttribute('width', this.width);
+      this.lowerCanvasEl.setAttribute('height', this.height);
+      fabric.util.cleanUpJsdomNode(this.lowerCanvasEl);
+      this.lowerCanvasEl = undefined;
+      return this;
+    },
 
       /**
      * Returns a string representation of an instance

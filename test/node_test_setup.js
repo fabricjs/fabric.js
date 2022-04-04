@@ -1,6 +1,26 @@
 // set the fabric framework as a global for tests
 var chalk = require('chalk');
 var diff = require('deep-object-diff').diff;
+var commander = require('commander');
+
+commander.program
+  .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
+  .option('-r, --recreate', 'recreate visual refs (golden images)', false)
+  .action(options => {
+    QUnit.debug = QUnit.debugVisual = options.debug;
+    QUnit.recreateVisualRefs = options.recreate;
+  }).parse(process.argv);
+//  for now accept an env variable because qunit doesn't allow passing unknown options
+if (process.env.QUNIT_DEBUG_VISUAL_TESTS === 'true') {
+  QUnit.debugVisual = true;
+}
+if (process.env.QUNIT_RECREATE_VISUAL_REFS === 'true') {
+  QUnit.recreateVisualRefs = true;
+}
+if (process.env.QUNIT_FILTER) {
+  QUnit.config.filter = process.env.QUNIT_FILTER;
+}
+
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
 global.fs = require('fs');

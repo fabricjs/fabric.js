@@ -68,7 +68,7 @@ jobs:
     - stage: Visual Tests
       env: LAUNCHER=Node
       node_js: "12"
-      script: npm run build:fast && npm run test:visual
+      script: npm run build:fast && npm run test -- --suite visual
     - stage: Visual Tests
       env: LAUNCHER=Chrome
       script: npm run build:fast && testem ci --port 8080 -f testem-visual.json -l $LAUNCHER
@@ -84,13 +84,13 @@ jobs:
     # - stage: Extra OS
     #   env: CANFAIL=TRUE
     #   node_js: "10"
-    #   script: npm run build:fast && npm run test:visual
+    #   script: npm run build:fast && npm run test -- --suite visual
     #   before_install: brew upgrade giflib && brew install pkg-config cairo pango libpng jpeg librsvg
     #   os: osx
     # - stage: Extra OS
     #   env: CANFAIL=TRUE
     #   node_js: "10"
-    #   script: npm run build:fast && npm run test:visual
+    #   script: npm run build:fast && npm run test -- --suite visual
     #   os: windows
 script: npm run build:fast && npm run test
 

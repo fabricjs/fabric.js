@@ -235,10 +235,12 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onContextMenu: function (e) {
+      this._simpleEventHandler('contextmenu:before', e);
       if (this.stopContextMenu) {
         e.stopPropagation();
         e.preventDefault();
       }
+      this._simpleEventHandler('contextmenu', e);
       return false;
     },
 
