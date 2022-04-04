@@ -97,20 +97,9 @@
       this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
       this._firstLayoutDone = false;
       this.callSuper('initialize', options);
-      if (objectsRelativeToGroup) {
-        this.forEachObject(function (object) {
-          this.enterGroup(object, false);
-        }, this);
-      }
-      else {
-        //  we need to preserve object's center point in relation to canvas and apply group's transform to it
-        var inv = invertTransform(this.calcTransformMatrix());
-        this.forEachObject(function (object) {
-          this.enterGroup(object, false);
-          var center = transformPoint(object.getCenterPoint(), inv);
-          object.setPositionByOrigin(center, 'center', 'center');
-        }, this);
-      }
+      this.forEachObject(function (object) {
+        this.enterGroup(object, false);
+      }, this);
       this._applyLayoutStrategy({
         type: 'initialization',
         options: options,
