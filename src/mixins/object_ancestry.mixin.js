@@ -39,7 +39,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   /**
    *
    * @param {fabric.Object} other
-   * @returns {{ index: number, otherIndex: number, ancestors: fabric.Object[] }} ancestors may include the passed objects if one is an ancestor of the other resulting in index of -1
+   * @returns {{ index: number, otherIndex: number, ancestors: fabric.Object[] } | boolean} ancestors may include the passed objects if one is an ancestor of the other resulting in index of -1
    */
   findCommonAncestors: function (other) {
     if (this === other) {
