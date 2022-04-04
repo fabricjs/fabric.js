@@ -223,8 +223,8 @@
     /**
      * Checks if object can enter group and logs relevant warnings
      * @private
-     * @param {fabric.Object} object 
-     * @returns 
+     * @param {fabric.Object} object
+     * @returns
      */
     canEnter: function (object) {
       if (object === this) {
