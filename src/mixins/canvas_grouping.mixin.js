@@ -54,7 +54,7 @@
     _updateActiveSelection: function(target, e) {
       var activeSelection = this._activeObject,
           currentActiveObjects = activeSelection._objects.slice(0);
-      if (activeSelection.contains(target)) {
+      if (target.group === activeSelection) {
         activeSelection.remove(target);
         this._hoveredTarget = target;
         this._hoveredTargets = this.targets.concat();
