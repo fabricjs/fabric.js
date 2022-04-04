@@ -892,7 +892,7 @@
      */
     searchPossibleTargets: function (objects, pointer) {
       var target = this._searchPossibleTargets(objects, pointer);
-        return target && target.interactive && this.targets[0] ? this.targets[0] : target;
+      return target && target.interactive && this.targets[0] ? this.targets[0] : target;
     },
 
     /**
