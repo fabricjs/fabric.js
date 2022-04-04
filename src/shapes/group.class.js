@@ -411,10 +411,29 @@
      */
     drawObject: function(ctx) {
       this._renderBackground(ctx);
-      for (var i = 0, len = this._objects.length; i < len; i++) {
-        this._objects[i].render(ctx);
-      }
+      this._renderObjects(ctx);
       this._drawClipPath(ctx, this.clipPath);
+    },
+
+    /**
+       * Render objects:\
+       * Canvas is in charge of rendering the selected objects in case of multiselection.\
+       * In case a single object is selected it's entire tree will be rendered by canvas above the other objects (`preserveObjectStacking = false`)
+       * @private
+       * @param {CanvasRenderingContext2D} ctx Context to render on
+       * @param {boolean} [renderAllObjects] override default behavior to render all objects, included selected objects
+       * @todo support perPixelTargetFind
+       */
+    _renderObjects: function (ctx, renderAllObjects) {
+      var localActiveObjects = this._activeObjects,
+        activeObjectsSize = this.canvas.getActiveObjects ? this.canvas.getActiveObjects().length : 0,
+        preserveObjectStacking = this.canvas.preserveObjectStacking;
+      this.forEachObject(function (object) {
+        if (renderAllObjects || preserveObjectStacking || activeObjectsSize <= 1
+          || localActiveObjects.length === 0 || localActiveObjects.indexOf(object) === -1) {
+          object.render(ctx);
+        }
+      }, this);
     },
 
     /**
