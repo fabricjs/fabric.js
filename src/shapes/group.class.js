@@ -214,29 +214,52 @@
     },
 
     /**
+     * Checks if object can enter group and logs relevant warnings
      * @private
-     * @param {fabric.Object} object
-     * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
-     * @returns {boolean} true if object entered group
+     * @param {fabric.Object} object 
+     * @returns 
      */
-    enterGroup: function (object, removeParentTransform) {
+    canEnter: function (object) {
       if (object === this) {
         /* _DEV_MODE_START_ */
         console.warn('fabric.Group: trying to add group to itself, this call has no effect');
         /* _DEV_MODE_END_ */
         return false;
       }
-      else if (object.group) {
-        if (object.group === this) {
-          /* _DEV_MODE_START_ */
-          console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
-          /* _DEV_MODE_END_ */
-          return false;
-        }
+      else if (object.group && object.group === this) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
+        /* _DEV_MODE_END_ */
+        return false;
+      }
+      return true;
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
+     * @returns {boolean} true if object entered group
+     */
+    enterGroup: function (object, removeParentTransform) {
+      if (!this.canEnter(object)) {
+        return false;
+      }
+      if (object.group) {
         object.group.remove(object);
       }
-      // can be this converted to utils?
+      this._enterGroup(object, removeParentTransform);
+      return true;
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
+     */
+    _enterGroup: function (object, removeParentTransform) {
       if (removeParentTransform) {
+        // can this be converted to utils (sendObjectToPlane)?
         applyTransformToObject(
           object,
           multiplyTransformMatrices(
@@ -254,7 +277,6 @@
       if (activeObject && (activeObject === object || object.isDescendantOf(activeObject))) {
         this._activeObjects.push(object);
       }
-      return true;
     },
 
     /**

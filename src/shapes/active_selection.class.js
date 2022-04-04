@@ -52,6 +52,27 @@
       this.setCoords();
     },
 
+
+    /**
+     * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
+     * @returns {boolean} true if object entered group
+     */
+    enterGroup: function (object, removeParentTransform) {
+      if (!this.canEnter(object)) {
+        return false;
+      }
+      if (object.group) {
+        //  save ref to group for later in order to return to it
+        var parent = object.group;
+        parent._exitGroup(object);
+        object.__owningGroup = parent;
+      }
+      this._enterGroup(object, removeParentTransform);
+      return true;
+    },
+
     /**
      * we want objects to retain their canvas ref when exiting instance
      * @private
@@ -60,6 +81,12 @@
      */
     exitGroup: function (object, removeParentTransform) {
       this._exitGroup(object, removeParentTransform);
+      var parent = object.__owningGroup;
+      if (parent) {
+        //  return to owning group
+        parent.enterGroup(object);
+        delete object.__owningGroup;
+      }
     },
 
     /**
