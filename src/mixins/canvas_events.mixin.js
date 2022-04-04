@@ -905,7 +905,7 @@
           //  transform pointer to target's containing coordinate plane
           //  both pointer and object should agree on every point
           localPointer = fabric.util.sendPointToPlane(pointer, null, target.group);
-      
+
       transform.reset = false;
       transform.shiftKey = e.shiftKey;
       transform.altKey = e[this.centeredKey];
