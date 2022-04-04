@@ -151,7 +151,7 @@
      * @param {Number} index Index to insert object at
      */
     insertAt: function (objects, index) {
-      fabric.Collection.insertAt.call(this, objects, index,  this._onObjectAdded);
+      fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
       this._onAfterObjectsChange('added', Array.isArray(objects) ? objects : [objects]);
     },
 
@@ -223,8 +223,8 @@
     /**
      * Checks if object can enter group and logs relevant warnings
      * @private
-     * @param {fabric.Object} object 
-     * @returns 
+     * @param {fabric.Object} object
+     * @returns
      */
     canEnter: function (object) {
       if (object === this) {
