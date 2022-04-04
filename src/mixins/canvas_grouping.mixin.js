@@ -13,8 +13,8 @@
      */
     _shouldGroup: function(e, target) {
       var activeObject = this._activeObject;
-      return activeObject && this._isSelectionKeyPressed(e)
-        && target && target.selectable && this.selection
+      return !!activeObject && this._isSelectionKeyPressed(e)
+        && !!target && target.selectable && this.selection
         && (activeObject !== target || activeObject.type === 'activeSelection')
         //  make sure `activeObject` and `target` aren't ancestors of each other
         && !target.isDescendantOf(activeObject) && !activeObject.isDescendantOf(target)
