@@ -446,7 +446,8 @@
         if (result) {
           //  handle positioning
           var newCenter = new fabric.Point(result.centerX, result.centerY);
-          var vector = center.subtract(newCenter).add(new fabric.Point(result.correctionX || 0, result.correctionY || 0));
+          var vector = center.subtract(newCenter)
+            .add(new fabric.Point(result.correctionX || 0, result.correctionY || 0));
           var diff = transformPoint(vector, invertTransform(this.calcOwnMatrix()), true);
           //  set dimensions
           this.set({ width: result.width, height: result.height });
@@ -470,7 +471,7 @@
             centerY: center.y,
             width: this.width,
             height: this.height,
-          }
+          };
         }
         else {
           //  no `result` so we return
