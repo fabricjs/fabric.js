@@ -17,6 +17,9 @@ if (process.env.QUNIT_DEBUG_VISUAL_TESTS === 'true') {
 if (process.env.QUNIT_RECREATE_VISUAL_REFS === 'true') {
   QUnit.recreateVisualRefs = true;
 }
+if (process.env.QUNIT_FILTER) {
+  QUnit.config.filter = process.env.QUNIT_FILTER;
+}
 
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');

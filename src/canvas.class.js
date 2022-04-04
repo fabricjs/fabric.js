@@ -42,6 +42,28 @@
    * @fires after:render at the end of the render process, receives the context in the callback
    * @fires before:render at start the render process, receives the context in the callback
    *
+   * @fires contextmenu:before
+   * @fires contextmenu
+   * @example
+   * let handler;
+   * targets.forEach(target => {
+   *   target.on('contextmenu:before', opt => {
+   *     //  decide which target should handle the event before canvas hijacks it
+   *     if (someCaseHappens && opt.targets.includes(target)) {
+   *       handler = target;
+   *     }
+   *   });
+   *   target.on('contextmenu', opt => {
+   *     //  do something fantastic
+   *   });
+   * });
+   * canvas.on('contextmenu', opt => {
+   *   if (!handler) {
+   *     //  no one takes responsibility, it's always left to me
+   *     //  let's show them how it's done!
+   *   }
+   * });
+   *
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
 
@@ -1304,7 +1326,7 @@
       var originalProperties = this._realizeGroupTransformOnObject(instance),
           object = this.callSuper('_toObject', instance, methodName, propertiesToInclude);
       //Undo the damage we did by changing all of its properties
-      this._unwindGroupTransformOnObject(instance, originalProperties);
+      originalProperties && instance.set(originalProperties);
       return object;
     },
 
@@ -1331,18 +1353,6 @@
     },
 
     /**
-     * Restores the changed properties of instance
-     * @private
-     * @param {fabric.Object} [instance] the object to un-transform (gets mutated)
-     * @param {Object} [originalValues] the original values of instance, as returned by _realizeGroupTransformOnObject
-     */
-    _unwindGroupTransformOnObject: function(instance, originalValues) {
-      if (originalValues) {
-        instance.set(originalValues);
-      }
-    },
-
-    /**
      * @private
      */
     _setSVGObject: function(markup, instance, reviver) {
@@ -1350,7 +1360,7 @@
       //object when the group is deselected
       var originalProperties = this._realizeGroupTransformOnObject(instance);
       this.callSuper('_setSVGObject', markup, instance, reviver);
-      this._unwindGroupTransformOnObject(instance, originalProperties);
+      originalProperties && instance.set(originalProperties);
     },
 
     setViewportTransform: function (vpt) {
