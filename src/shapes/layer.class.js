@@ -16,7 +16,7 @@
    * @mixes fabric.Collection
    * @see {@link fabric.Layer#initialize} for constructor definition
    */
-  fabric.Layer = fabric.util.createClass(fabric.Group, /** @lends fabric.Group.prototype */ {
+  fabric.Layer = fabric.util.createClass(fabric.Group, /** @lends fabric.Layer.prototype */ {
 
     /**
      * @default
