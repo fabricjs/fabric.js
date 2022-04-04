@@ -130,6 +130,13 @@
     },
 
     /**
+     * @private
+     */
+    _shouldSetNestedCoords: function () {
+      return this.subTargetCheck;
+    },
+
+    /**
      * Add objects
      * @param {...fabric.Object} objects
      */
@@ -268,7 +275,7 @@
           )
         );
       }
-      object.setCoords();
+      this._shouldSetNestedCoords() && object.setCoords();
       object._set('group', this);
       object._set('canvas', this.canvas);
       this.interactive && this._watchObject(true, object);
@@ -439,7 +446,7 @@
      */
     setCoords: function () {
       this.callSuper('setCoords');
-      (this.subTargetCheck || this.type === 'activeSelection') && this.forEachObject(function (object) {
+      this._shouldSetNestedCoords() && this.forEachObject(function (object) {
         object.setCoords();
       });
     },

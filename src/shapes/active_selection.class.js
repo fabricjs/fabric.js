@@ -52,6 +52,12 @@
       this.setCoords();
     },
 
+    /**
+     * @private
+     */
+    _shouldSetNestedCoords: function () {
+      return true;
+    },
 
     /**
      * @private
