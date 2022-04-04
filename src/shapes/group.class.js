@@ -230,7 +230,13 @@
      * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
      */
     enterGroup: function (object, removeParentTransform) {
-      if (object.group) {
+      if (object === this) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Group: trying to add group to itself, this call has no effect');
+        /* _DEV_MODE_END_ */
+        return;
+      }
+      else if (object.group) {
         if (object.group === this) {
           /* _DEV_MODE_START_ */
           console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
