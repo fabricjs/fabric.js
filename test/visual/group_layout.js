@@ -334,5 +334,5 @@
         });
     }
 */
-    // tests.forEach(visualTestLoop(QUnit));
+    tests.forEach(visualTestLoop(QUnit));
 })();
