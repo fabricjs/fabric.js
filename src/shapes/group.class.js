@@ -191,22 +191,6 @@
       },
 
       /**
-       * backward compatibility
-       * @deprecated
-       */
-      addWithUpdate: function () {
-        this.add.apply(this, arguments);
-      },
-
-      /**
-       * backward compatibility
-       * @deprecated
-       */
-      removeWithUpdate: function () {
-        this.remove.apply(this, arguments);
-      },
-
-      /**
        * invalidates layout on object modified
        * @private
        */
