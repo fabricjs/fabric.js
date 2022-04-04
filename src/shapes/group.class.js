@@ -237,7 +237,7 @@
         /* _DEV_MODE_START_ */
         console.warn('fabric.Group: nesting layers under groups is not supported, this call has no effect');
         /* _DEV_MODE_END_ */
-        return;
+        return false;
       }
       else if (object.group && object.group === this) {
         /* _DEV_MODE_START_ */
