@@ -97,20 +97,9 @@
       this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
       this._firstLayoutDone = false;
       this.callSuper('initialize', options);
-      if (objectsRelativeToGroup) {
-        this.forEachObject(function (object) {
-          this.enterGroup(object, false);
-        }, this);
-      }
-      else {
-        //  we need to preserve object's center point in relation to canvas and apply group's transform to it
-        var inv = invertTransform(this.calcTransformMatrix());
-        this.forEachObject(function (object) {
-          this.enterGroup(object, false);
-          var center = transformPoint(object.getCenterPoint(), inv);
-          object.setPositionByOrigin(center, 'center', 'center');
-        }, this);
-      }
+      this.forEachObject(function (object) {
+        this.enterGroup(object, false);
+      }, this);
       this._applyLayoutStrategy({
         type: 'initialization',
         options: options,
@@ -141,6 +130,13 @@
     },
 
     /**
+     * @private
+     */
+    _shouldSetNestedCoords: function () {
+      return this.subTargetCheck;
+    },
+
+    /**
      * Add objects
      * @param {...fabric.Object} objects
      */
@@ -155,7 +151,7 @@
      * @param {Number} index Index to insert object at
      */
     insertAt: function (objects, index) {
-      fabric.Collection.insertAt.call(this, objects, index,  this._onObjectAdded);
+      fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
       this._onAfterObjectsChange('added', Array.isArray(objects) ? objects : [objects]);
     },
 
@@ -225,16 +221,17 @@
     },
 
     /**
+     * Checks if object can enter group and logs relevant warnings
      * @private
      * @param {fabric.Object} object
-     * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
+     * @returns
      */
-    enterGroup: function (object, removeParentTransform) {
+    canEnter: function (object) {
       if (object === this) {
         /* _DEV_MODE_START_ */
         console.warn('fabric.Group: trying to add group to itself, this call has no effect');
         /* _DEV_MODE_END_ */
-        return;
+        return false;
       }
       else if (object.type === 'layer') {
         /* _DEV_MODE_START_ */
@@ -242,17 +239,40 @@
         /* _DEV_MODE_END_ */
         return;
       }
-      else if (object.group) {
-        if (object.group === this) {
-          /* _DEV_MODE_START_ */
-          console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
-          /* _DEV_MODE_END_ */
-          return;
-        }
+      else if (object.group && object.group === this) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
+        /* _DEV_MODE_END_ */
+        return false;
+      }
+      return true;
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
+     * @returns {boolean} true if object entered group
+     */
+    enterGroup: function (object, removeParentTransform) {
+      if (!this.canEnter(object)) {
+        return false;
+      }
+      if (object.group) {
         object.group.remove(object);
       }
-      // can be this converted to utils?
+      this._enterGroup(object, removeParentTransform);
+      return true;
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
+     */
+    _enterGroup: function (object, removeParentTransform) {
       if (removeParentTransform) {
+        // can this be converted to utils (sendObjectToPlane)?
         applyTransformToObject(
           object,
           multiplyTransformMatrices(
@@ -261,7 +281,7 @@
           )
         );
       }
-      object.setCoords();
+      this._shouldSetNestedCoords() && object.setCoords();
       object._set('group', this);
       object._set('canvas', this.canvas);
       this.interactive && this._watchObject(true, object);
@@ -432,7 +452,7 @@
      */
     setCoords: function () {
       this.callSuper('setCoords');
-      (this.subTargetCheck || this.type === 'activeSelection') && this.forEachObject(function (object) {
+      this._shouldSetNestedCoords() && this.forEachObject(function (object) {
         object.setCoords();
       });
     },
@@ -863,12 +883,27 @@
     /* _TO_SVG_START_ */
 
     /**
+     * @private
+     */
+    _createSVGBgRect: function (reviver) {
+      if (!this.backgroundColor) {
+        return '';
+      }
+      var fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
+      var commons = fillStroke.indexOf('COMMON_PARTS');
+      fillStroke[commons] = 'for="group" ';
+      return fillStroke.join('');
+    },
+
+    /**
      * Returns svg representation of an instance
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
     _toSVG: function (reviver) {
       var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
+      var bg = this._createSVGBgRect(reviver);
+      bg && svgString.push('\t\t', bg);
       for (var i = 0, len = this._objects.length; i < len; i++) {
         svgString.push('\t\t', this._objects[i].toSVG(reviver));
       }
@@ -898,6 +933,8 @@
      */
     toClipPathSVG: function (reviver) {
       var svgString = [];
+      var bg = this._createSVGBgRect(reviver);
+      bg && svgString.push('\t', bg);
       for (var i = 0, len = this._objects.length; i < len; i++) {
         svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
       }

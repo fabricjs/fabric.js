@@ -13,8 +13,8 @@
      */
     _shouldGroup: function(e, target) {
       var activeObject = this._activeObject;
-      return activeObject && this._isSelectionKeyPressed(e)
-        && target && target.selectable && this.selection
+      return !!activeObject && this._isSelectionKeyPressed(e)
+        && !!target && target.selectable && this.selection
         && (activeObject !== target || activeObject.type === 'activeSelection')
         //  make sure `activeObject` and `target` aren't ancestors of each other
         && !target.isDescendantOf(activeObject) && !activeObject.isDescendantOf(target)
@@ -54,7 +54,7 @@
     _updateActiveSelection: function(target, e) {
       var activeSelection = this._activeObject,
           currentActiveObjects = activeSelection._objects.slice(0);
-      if (activeSelection.contains(target)) {
+      if (target.group === activeSelection) {
         activeSelection.remove(target);
         this._hoveredTarget = target;
         this._hoveredTargets = this.targets.concat();
