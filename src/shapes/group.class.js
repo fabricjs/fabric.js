@@ -94,6 +94,7 @@
         this.__objectMonitor = this.__objectMonitor.bind(this);
         this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(this, true);
         this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
+        this._firstLayoutDone = false;
         this.callSuper('initialize', options);
         if (objectsRelativeToGroup) {
           this.forEachObject(function (object) {
@@ -104,12 +105,8 @@
           //  we need to preserve object's center point in relation to canvas and apply group's transform to it
           var inv = invertTransform(this.calcTransformMatrix());
           this.forEachObject(function (object) {
-            var t = multiplyTransformMatrices(
-              inv,
-              object.calcTransformMatrix()
-            );
-            var center = transformPoint(this.getCenterPoint(), t);
             this.enterGroup(object, false);
+            var center = transformPoint(object.getCenterPoint(), inv);
             object.setPositionByOrigin(center, 'center', 'center');
           }, this);
         }
@@ -191,22 +188,6 @@
         var remove = this._objects.slice();
         this.remove.apply(this, remove);
         return remove;
-      },
-
-      /**
-       * backward compatibility
-       * @deprecated
-       */
-      addWithUpdate: function () {
-        this.add.apply(this, arguments);
-      },
-
-      /**
-       * backward compatibility
-       * @deprecated
-       */
-      removeWithUpdate: function () {
-        this.remove.apply(this, arguments);
       },
 
       /**
@@ -456,37 +437,49 @@
        */
       _applyLayoutStrategy: function (context) {
         var isFirstLayout = context.type === 'initialization';
+        if (!isFirstLayout && !this._firstLayoutDone) {
+          //  reject layout requests before initialization layout
+          return;
+        }
         var center = this.getRelativeCenterPoint();
         var result = this.getLayoutStrategyResult(this.layout, this._objects.concat(), context);
-        if (!result) {
-          //  fire hook on first layout  (firing layout event won't have any effect because at this point no events have been registered)
-          isFirstLayout && this.onLayout(context, {
+        if (result) {
+          //  handle positioning
+          var newCenter = new fabric.Point(result.centerX, result.centerY);
+          var vector = center.subtract(newCenter)
+            .add(new fabric.Point(result.correctionX || 0, result.correctionY || 0));
+          var diff = transformPoint(vector, invertTransform(this.calcOwnMatrix()), true);
+          //  set dimensions
+          this.set({ width: result.width, height: result.height });
+          //  adjust objects to account for new center
+          !context.objectsRelativeToGroup && this.forEachObject(function (object) {
+            this._adjustObjectPosition(object, diff);
+          }, this);
+          //  clip path as well
+          !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
+            && this._adjustObjectPosition(this.clipPath, diff);
+          if (!newCenter.eq(center)) {
+            //  set position
+            this.setPositionByOrigin(newCenter, 'center', 'center');
+            this.setCoords();
+          }
+        }
+        else if (isFirstLayout) {
+          //  fill `result` with initial values for the layout hook
+          result = {
             centerX: center.x,
             centerY: center.y,
             width: this.width,
             height: this.height,
-          });
+          };
+        }
+        else {
+          //  no `result` so we return
           return;
         }
-        //  handle positioning
-        var newCenter = new fabric.Point(result.centerX, result.centerY);
-        var vector = center.subtract(newCenter).add(new fabric.Point(result.correctionX || 0, result.correctionY || 0));
-        var diff = transformPoint(vector, invertTransform(this.calcOwnMatrix()), true);
-        //  set dimensions
-        this.set({ width: result.width, height: result.height });
-        //  adjust objects to account for new center
-        !context.objectsRelativeToGroup && this.forEachObject(function (object) {
-          this._adjustObjectPosition(object, diff);
-        }, this);
-        //  clip path as well
-        !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
-          && this._adjustObjectPosition(this.clipPath, diff);
-        if (!newCenter.eq(center)) {
-          //  set position
-          this.setPositionByOrigin(newCenter, 'center', 'center');
-          this.setCoords();
-        }
-        //  fire layout hook and event
+        //  flag for next layouts
+        this._firstLayoutDone = true;
+        //  fire layout hook and event (event will fire only for layouts after initialization layout)
         this.onLayout(context, result);
         this.fire('layout', {
           context: context,
@@ -769,8 +762,8 @@
        * Provided for layout customization, override if necessary.
        * Complements `getLayoutStrategyResult`, which is called at the beginning of layout.
        * @public
-       * @param {*} context layout context
-       * @param {Object} result layout result
+       * @param {LayoutContext} context layout context
+       * @param {LayoutResult} result layout result
        */
       onLayout: function (/* context, result */) {
         //  override by subclass
@@ -781,7 +774,7 @@
        * @private
        * @param {'toObject'|'toDatalessObject'} [method]
        * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
-       * @returns {Object[]} serialized objects
+       * @returns {fabric.Object[]} serialized objects
        */
       __serializeObjects: function (method, propertiesToInclude) {
         var _includeDefaultValues = this.includeDefaultValues;
