@@ -71,12 +71,12 @@
      * @override
      */
     originX: 'center',
-    
+
     /**
      * @default
      * @override
-     */ 
-    originY:'center',
+     */
+    originY: 'center',
 
     /**
      * we don't want to int with the layer, only with it's objects
@@ -181,7 +181,7 @@
         var w = this.group.width, h = this.group.height;
         return {
           centerX: 0,
-          centerY:0,
+          centerY: 0,
           width: w,
           height: h
         };
