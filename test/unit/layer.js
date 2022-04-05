@@ -1,34 +1,50 @@
 (function() {
   var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
 
-  function makeLayerWith2Objects() {
+  function makeLayerWith2Objects(performLayout, subTargetCheck, interactive) {
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
         rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40, strokeWidth: 0 });
 
-    return new fabric.Layer([rect1, rect2], { strokeWidth: 0 });
+    var layer = new fabric.Layer([rect1, rect2], { strokeWidth: 0 });
+    if (performLayout) {
+      new fabric.Group([layer], { subTargetCheck, interactive });
+    }
+    return layer;
   }
 
-  function makeLayerWith2ObjectsWithOpacity() {
+  function makeLayerWith2ObjectsWithOpacity(performLayout, subTargetCheck, interactive) {
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0, opacity: 0.5 }),
         rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40, strokeWidth: 0, opacity: 0.8 });
 
-    return new fabric.Layer([rect1, rect2], {strokeWidth: 0});
+    var layer = new fabric.Layer([rect1, rect2], { strokeWidth: 0 });
+    if (performLayout) {
+      new fabric.Group([layer], { subTargetCheck, interactive });
+    }
+    return layer;
   }
 
-  function makeLayerWith2ObjectsAndNoExport() {
+  function makeLayerWith2ObjectsAndNoExport(performLayout, subTargetCheck, interactive) {
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
       rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40, strokeWidth: 0, excludeFromExport: true });
 
-    return new fabric.Layer([rect1, rect2], { strokeWidth: 0 });
+    var layer = new fabric.Layer([rect1, rect2], { strokeWidth: 0 });
+    if (performLayout) {
+      new fabric.Group([layer], { subTargetCheck, interactive });
+    }
+    return layer;
   }
 
-  function makeLayerWith4Objects() {
+  function makeLayerWith4Objects(performLayout, subTargetCheck, interactive) {
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
         rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40 }),
         rect3 = new fabric.Rect({ top: 40, left: 0, width: 20, height: 40 }),
         rect4 = new fabric.Rect({ top: 75, left: 75, width: 40, height: 40 });
 
-    return new fabric.Layer([rect1, rect2, rect3, rect4]);
+    var layer = new fabric.Layer([rect1, rect2, rect3, rect4]);
+    if (performLayout) {
+      new fabric.Group([layer], { subTargetCheck, interactive });
+    }
+    return layer;
   }
 
   QUnit.module('fabric.Layer', {
@@ -202,6 +218,17 @@
     assert.ok(layer !== clone, 'should produce different object');
     assert.ok(layer.getObjects() !== clone.objects, 'should produce different object array');
     assert.ok(layer.getObjects()[0] !== clone.objects[0], 'should produce different objects in array');
+
+    // peform layout
+    new fabric.Group([layer]);
+    clone = layer.toObject();
+
+    Object.assign(expectedObject, { width: 80, height: 60 });
+    assert.deepEqual(clone, expectedObject);
+
+    assert.ok(layer !== clone, 'should produce different object');
+    assert.ok(layer.getObjects() !== clone.objects, 'should produce different object array');
+    assert.ok(layer.getObjects()[0] !== clone.objects[0], 'should produce different objects in array');
   });
 
   QUnit.test('toObject without default values', function(assert) {
@@ -230,6 +257,19 @@
       type: 'layer',
       left: 0,
       top: 0,
+      objects: objects,
+    };
+    assert.deepEqual(clone, expectedObject);
+    // peform layout
+    new fabric.Group([layer]);
+    clone = layer.toObject();
+    expectedObject = {
+      version: fabric.version,
+      type: 'layer',
+      left: 0,
+      top: 0,
+      width: 80,
+      height: 60,
       objects: objects,
     };
     assert.deepEqual(clone, expectedObject);
@@ -304,7 +344,7 @@
   });
 
   QUnit.test('removeAll', function(assert) {
-    var layer = makeLayerWith2Objects(),
+    var layer = makeLayerWith2Objects(true),
         firstObject = layer.item(0),
         initialLeftValue = 100,
         initialTopValue = 100;
@@ -319,29 +359,36 @@
     assert.equal(firstObject.get('top'), initialTopValue, 'should restore initial top value');
   });
 
-  QUnit.test('containsPoint', function(assert) {
+  QUnit.test.only('containsPoint', function(assert) {
 
-    var layer = makeLayerWith2Objects();
-    layer.set({ originX: 'center', originY: 'center' }).setCoords();
+    var layer = makeLayerWith2Objects(true, true, true);
+    layer.group.setCoords();
 
     //  Rect #1     top: 100, left: 100, width: 30, height: 10
     //  Rect #2     top: 120, left: 50, width: 10, height: 40
 
     assert.ok(typeof layer.containsPoint === 'function');
 
-    assert.ok(!layer.containsPoint({ x: 0, y: 0 }));
+    function containsPoint(p) {
+      var localPoint = fabric.util.sendPointToPlane(p, null, layer.group.calcTransformMatrix());
+      console.log(localPoint)
+      return layer.containsPoint(localPoint);
+    }
+
+    assert.ok(!containsPoint({ x: 0, y: 0 }));
 
     layer.scale(2);
-    assert.ok(layer.containsPoint({ x: 50, y: 120 }));
-    assert.ok(layer.containsPoint({ x: 100, y: 160 }));
-    assert.ok(!layer.containsPoint({ x: 0, y: 0 }));
+    assert.ok(containsPoint({ x: 50, y: 120 }));
+    assert.ok(containsPoint({ x: 100, y: 160 }));
+    assert.ok(!containsPoint({ x: 0, y: 0 }));
 
     layer.scale(1);
-    layer.padding = 30;
-    layer.setCoords();
-    assert.ok(layer.containsPoint({ x: 50, y: 120 }));
-    assert.ok(!layer.containsPoint({ x: 100, y: 170 }));
-    assert.ok(!layer.containsPoint({ x: 0, y: 0 }));
+    layer.group.padding = 30;
+    layer.group.triggerLayout();
+    console.log(layer.width,layer.height)
+    assert.ok(containsPoint({ x: 50, y: 120 }));
+    assert.ok(!containsPoint({ x: 100, y: 170 }));
+    assert.ok(!containsPoint({ x: 0, y: 0 }));
   });
 
   QUnit.test('forEachObject', function(assert) {
@@ -366,6 +413,33 @@
     var groupObject = layer.toObject();
 
     fabric.Layer.fromObject(groupObject).then(function(newGroupFromObject) {
+
+      var objectFromOldGroup = layer.toObject();
+      var objectFromNewGroup = newGroupFromObject.toObject();
+
+      assert.ok(newGroupFromObject instanceof fabric.Layer);
+
+      assert.deepEqual(objectFromOldGroup.objects[0], objectFromNewGroup.objects[0]);
+      assert.deepEqual(objectFromOldGroup.objects[1], objectFromNewGroup.objects[1]);
+
+      // delete `objects` arrays, since `assertHashEqual` fails to compare them for equality
+      delete objectFromOldGroup.objects;
+      delete objectFromNewGroup.objects;
+
+      assert.deepEqual(objectFromOldGroup, objectFromNewGroup);
+
+      done();
+    });
+  });
+
+  QUnit.test('fromObject after layout', function (assert) {
+    var done = assert.async();
+    var layer = makeLayerWith2ObjectsWithOpacity(true);
+
+    assert.ok(typeof fabric.Layer.fromObject === 'function');
+    var groupObject = layer.toObject();
+
+    fabric.Layer.fromObject(groupObject).then(function (newGroupFromObject) {
 
       var objectFromOldGroup = layer.toObject();
       var objectFromNewGroup = newGroupFromObject.toObject();
@@ -419,7 +493,7 @@
 
   QUnit.test('fromObject restores oCoords', function(assert) {
     var done = assert.async();
-    var layer = makeLayerWith2ObjectsWithOpacity();
+    var layer = makeLayerWith2ObjectsWithOpacity(true);
 
     var groupObject = layer.toObject();
     groupObject.subTargetCheck = true;
@@ -444,21 +518,21 @@
   });
 
   QUnit.test('toSVG', function(assert) {
-    var layer = makeLayerWith2Objects();
+    var layer = makeLayerWith2Objects(true);
     assert.ok(typeof layer.toSVG === 'function');
     var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\"  >\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n';
     assert.equal(layer.toSVG(), expectedSVG);
   });
 
   QUnit.test('toSVG with a clipPath', function(assert) {
-    var layer = makeLayerWith2Objects();
+    var layer = makeLayerWith2Objects(true);
     layer.clipPath = new fabric.Rect({ width: 100, height: 100 });
     var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<rect transform=\"matrix(1 0 0 1 50.5 50.5)\" x=\"-50\" y=\"-50\" rx=\"0\" ry=\"0\" width=\"100\" height=\"100\" />\n</clipPath>\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n';
     assert.equal(layer.toSVG(), expectedSVG);
   });
 
   QUnit.test('toSVG with a clipPath absolutePositioned', function(assert) {
-    var layer = makeLayerWith2Objects();
+    var layer = makeLayerWith2Objects(true);
     layer.clipPath = new fabric.Rect({ width: 100, height: 100 });
     layer.clipPath.absolutePositioned = true;
     var expectedSVG = '<g clip-path=\"url(#CLIPPATH_0)\"  >\n<g transform=\"matrix(1 0 0 1 90 130)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<rect transform=\"matrix(1 0 0 1 50.5 50.5)\" x=\"-50\" y=\"-50\" rx=\"0\" ry=\"0\" width=\"100\" height=\"100\" />\n</clipPath>\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n</g>\n';
@@ -466,7 +540,7 @@
   });
 
   QUnit.test('toSVG with a layer as a clipPath', function(assert) {
-    var layer = makeLayerWith2Objects();
+    var layer = makeLayerWith2Objects(true);
     layer.clipPath = makeLayerWith2Objects();
     var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t\t<rect transform=\"matrix(1 0 0 1 115 105)\" x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n\t\t<rect transform=\"matrix(1 0 0 1 55 140)\" x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</clipPath>\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n';
     assert.equal(layer.toSVG(), expectedSVG);
@@ -474,7 +548,7 @@
 
   QUnit.test('cloning layer with 2 objects', function(assert) {
     var done = assert.async();
-    var layer = makeLayerWith2Objects();
+    var layer = makeLayerWith2Objects(true);
     layer.clone().then(function(clone) {
       assert.ok(clone !== layer);
       assert.deepEqual(clone.toObject(), layer.toObject());
