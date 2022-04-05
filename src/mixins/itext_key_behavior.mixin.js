@@ -456,7 +456,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     // getUpCursorOffset
     // getDownCursorOffset
     var action = 'get' + direction + 'CursorOffset',
-        offset = this[action](e, this._selectionDirection === 'right');
+        offset = this[action](e, this.selectionDirection === 'forward');
     if (e.shiftKey) {
       this.moveCursorWithShift(offset);
     }
