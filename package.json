@@ -68,6 +68,7 @@
     "@types/fs-extra": "^9.0.13",
     "@types/lodash": "^4.14.180",
     "@types/node": "^17.0.21",
+    "ansi-escape": "^1.1.0",
     "auto-changelog": "^2.3.0",
     "chalk": "^2.4.1",
     "commander": "^9.1.0",
@@ -87,6 +88,5 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "main": "./dist/fabric.js",
-  "dependencies": {}
+  "main": "./dist/fabric.js"
 }
