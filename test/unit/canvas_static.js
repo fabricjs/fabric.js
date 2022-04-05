@@ -288,13 +288,26 @@
   QUnit.test('add an object that belongs to a different canvas', function (assert) {
     var rect1 = makeRect();
     var control = [];
-    rect1.on('added', (opt) => {
-      opt.action = 'added';
-      control.push(opt);
+    canvas.on('object:added', (opt) => {
+      control.push({
+        action: 'added',
+        canvas: canvas,
+        target: opt.target
+      });
     });
-    rect1.on('removed', (opt) => {
-      opt.action = 'removed';
-      control.push(opt);
+    canvas.on('object:removed', (opt) => {
+      control.push({
+        action: 'removed',
+        canvas: canvas,
+        target: opt.target
+      });
+    });
+    canvas2.on('object:added', (opt) => {
+      control.push({
+        action: 'added',
+        canvas: canvas2,
+        target: opt.target
+      });
     });
     canvas.add(rect1);
     assert.strictEqual(canvas.item(0), rect1);
@@ -303,11 +316,11 @@
     assert.equal(canvas.size(), 0);
     assert.strictEqual(canvas2.item(0), rect1);
     var expected = [
-      { action: 'added', target: canvas },
-      { action: 'removed', target: canvas },
-      { action: 'added', target: canvas2 },
+      { action: 'added', target: rect1, canvas: canvas },
+      { action: 'removed', target: rect1, canvas: canvas },
+      { action: 'added', target: rect1, canvas: canvas2 },
     ]
-    assert.deepEqual(control, expected, 'should fire events as expected');
+    assert.deepEqual(control, expected);
   });
 
   QUnit.test('add renderOnAddRemove disabled', function(assert) {
