@@ -116,17 +116,24 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return;
     }
     var keyMap = this.direction === 'rtl' ? this.keysMapRtl : this.keysMap;
+    var func;
     if (e.key in keyMap) {
-      this[keyMap[e.key]](e);
+      func = keyMap[e.key];
     }
     else if (e.keyCode in keyMap) {
-      this[keyMap[e.keyCode]](e);
+      func = keyMap[e.keyCode];
     }
     else if ((e.key in this.ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
-      this[this.ctrlKeysMapDown[e.key]](e);
+      func = this.ctrlKeysMapDown[e.key];
     }
     else if ((e.keyCode in this.ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
-      this[this.ctrlKeysMapDown[e.keyCode]](e);
+      func = this.ctrlKeysMapDown[e.keyCode];
+    }
+    if (typeof func === 'string' && typeof this[func] === 'function') {
+      func = this[func];
+    }
+    if (typeof func === 'function') {
+      func.call(this, e);
     }
     else {
       return;
@@ -155,11 +162,18 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this._copyDone = false;
       return;
     }
+    var func;
     if ((e.key in this.ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
-      this[this.ctrlKeysMapUp[e.key]](e);
+      func = this.ctrlKeysMapUp[e.key];
     }
     else if ((e.keyCode in this.ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
-      this[this.ctrlKeysMapUp[e.keyCode]](e);
+      func = this.ctrlKeysMapUp[e.keyCode];
+    }
+    if (typeof func === 'string' && typeof this[func] === 'function') {
+      func = this[func];
+    }
+    if (typeof func === 'function') {
+      func.call(this, e);
     }
     else {
       return;
