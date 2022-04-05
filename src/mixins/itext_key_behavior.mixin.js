@@ -486,13 +486,18 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Moves cursor up / down without shift
+   * Moves cursor up without shift
    * @param {Number} offset
    */
   moveCursorWithoutShift: function(offset) {
-    // moves cursor down / up both start from selectionStart
-    this.selectionStart += offset;
-    this.selectionEnd = this.selectionStart;
+    if (offset < 0) {
+      this.selectionStart += offset;
+      this.selectionEnd = this.selectionStart;
+    }
+    else {
+      this.selectionEnd += offset;
+      this.selectionStart = this.selectionEnd;
+    }
     return offset !== 0;
   },
 

@@ -114,8 +114,8 @@
     iText.selectionEnd = 4;
     iText.moveCursorDown({ shiftKey: false });
     assert.equal(selection, 1, 'should fire');
-    assert.equal(iText.selectionStart, 21, 'should move to down line');
-    assert.equal(iText.selectionEnd, 21, 'should move to down line');
+    assert.equal(iText.selectionStart, 24, 'should move to down line');
+    assert.equal(iText.selectionEnd, 24, 'should move to down line');
     selection = 0;
 
     // test if the cursor moves to the correct position when an emoji appears in the text
