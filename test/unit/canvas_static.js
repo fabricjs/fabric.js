@@ -285,6 +285,31 @@
     assert.strictEqual(canvas.item(3), rect4);
   });
 
+  QUnit.test.only('add an object that belongs to a different canvas', function (assert) {
+    var rect1 = makeRect();
+    var control = [];
+    rect1.on('added', (opt) => {
+      opt.action = 'added';
+      control.push(opt);
+    });
+    rect1.on('removed', (opt) => {
+      opt.action = 'removed';
+      control.push(opt);
+    });
+    canvas.add(rect1);
+    assert.strictEqual(canvas.item(0), rect1);
+    canvas2.add(rect1);
+    assert.equal(canvas.item(0), undefined);
+    assert.equal(canvas.size(), 0);
+    assert.strictEqual(canvas2.item(0), rect1);
+    var expected = [
+      { action: 'added', target: canvas },
+      { action: 'removed', target: canvas },
+      { action: 'added', target: canvas2 },
+    ]
+    assert.deepEqual(control, expected, 'should fire events as expected');
+  });
+
   QUnit.test('add renderOnAddRemove disabled', function(assert) {
     var rect = makeRect(),
         originalRenderOnAddition,
