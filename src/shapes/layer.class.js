@@ -13,7 +13,6 @@
    * Layer class
    * @class fabric.Layer
    * @extends fabric.Group
-   * @mixes fabric.Collection
    * @see {@link fabric.Layer#initialize} for constructor definition
    */
   fabric.Layer = fabric.util.createClass(fabric.Group, /** @lends fabric.Layer.prototype */ {
@@ -159,6 +158,7 @@
     },
 
     /**
+     * Layer will layout itself once it is added to a canvas/group and by listening to it's parent `resize`/`layout` events respectively
      * Override this method to customize layout
      * @public
      * @param {string} layoutDirective
