@@ -795,10 +795,13 @@
       if (objects.length === 0) {
         return null;
       }
-      var objCenter, sizeVector, min, max, a, b;
+      var objCenter, sizeVector, min = new fabric.Point(0, 0), max = new fabric.Point(0, 0), a, b;
       objects.forEach(function (object, i) {
         if (object instanceof fabric.Layer) {
           var bbox = object.getObjectsBoundingBox(object._objects.slice(0));
+          if (!bbox) {
+            return;
+          }
           sizeVector = object._getTransformedDimensions({
             width: bbox.width,
             height: bbox.height
