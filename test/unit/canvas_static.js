@@ -285,7 +285,7 @@
     assert.strictEqual(canvas.item(3), rect4);
   });
 
-  QUnit.test.only('add an object that belongs to a different canvas', function (assert) {
+  QUnit.test('add an object that belongs to a different canvas', function (assert) {
     var rect1 = makeRect();
     var control = [];
     rect1.on('added', (opt) => {
