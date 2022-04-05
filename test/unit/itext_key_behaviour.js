@@ -251,10 +251,17 @@
       keyCode: 0
     };
     var iText = new fabric.IText('test');
+    iText.__test = function (e) {
+      control.push(e.keyCode);
+      assert.equal(this, iText, 'method should be bound to iText');
+    }
     var control = [];
     iText.keysMap = {
-      0: (e) => control.push(e.keyCode),
-      '\\': (e) => control.push(e.key),
+      0: '__test',
+      '\\': function (e) {
+        control.push(e.key);
+        assert.equal(this, iText, 'method should be bound to iText');
+      },
     };
     iText.enterEditing();
     iText.onKeyDown(event);
