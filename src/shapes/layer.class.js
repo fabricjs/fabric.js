@@ -193,7 +193,7 @@
     },
 
     dispose: function () {
-      this.on('added:initialized', this.__onAdded);
+      this.off('added:initialized', this.__onAdded);
       this.off('added', this.__onAdded);
       this.off('removed', this.__onRemoved);
       this._watchParent(false);
