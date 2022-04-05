@@ -116,10 +116,10 @@
     /**
      * @private
      * @param {boolean} watch
-     * @param {{target:fabric.Group|fabric.Canvas}} opt
+     * @param {{target:fabric.Group|fabric.Canvas}} [opt]
      */
     _watchParent: function (watch, opt) {
-      var target = opt.target;
+      var target = opt && opt.target;
       //  make sure we listen only once
       this.canvas && this.canvas.off('resize', this.__canvasMonitor);
       this.group && this.group.off('layout', this.__groupMonitor);
