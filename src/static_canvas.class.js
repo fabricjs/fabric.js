@@ -313,10 +313,15 @@
       else {
         this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
       }
-
+      if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
+        /* _DEV_MODE_START_ */
+        throw new Error('fabric.js: trying to initialize a canvas that has already been initialized');
+        /* _DEV_MODE_END_ */
+      }
       fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
-      this._originalCanvasStyle = this.lowerCanvasEl.style;
+      this.lowerCanvasEl.setAttribute('data-fabric', 'main');
       if (this.interactive) {
+        this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
         this._applyCanvasStyle(this.lowerCanvasEl);
       }
 
@@ -564,6 +569,13 @@
      */
     _onObjectAdded: function(obj) {
       this.stateful && obj.setupState();
+      if (obj.canvas && obj.canvas !== this) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
+          'Resulting to default behavior: removing object from previous canvas and adding to new canvas');
+        /* _DEV_MODE_END_ */
+        obj.canvas.remove(obj);
+      }
       obj._set('canvas', this);
       obj.setCoords();
       this.fire('object:added', { target: obj });
@@ -1569,10 +1581,13 @@
       this.overlayImage = null;
       this._iTextInstances = null;
       this.contextContainer = null;
-      // restore canvas style
+      // restore canvas style and attributes
       this.lowerCanvasEl.classList.remove('lower-canvas');
-      fabric.util.setStyle(this.lowerCanvasEl, this._originalCanvasStyle);
-      delete this._originalCanvasStyle;
+      this.lowerCanvasEl.removeAttribute('data-fabric');
+      if (this.interactive) {
+        this.lowerCanvasEl.style.cssText = this._originalCanvasStyle;
+        delete this._originalCanvasStyle;
+      }
       // restore canvas size to original size in case retina scaling was applied
       this.lowerCanvasEl.setAttribute('width', this.width);
       this.lowerCanvasEl.setAttribute('height', this.height);

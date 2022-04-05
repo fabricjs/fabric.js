@@ -61,16 +61,20 @@
     return fabric.isLikelyNode ? localPath('/..', finalName) : getAbsolutePath('/test' + finalName);
   }
 
+  function generateGolden(filename, original) {
+    if (fabric.isLikelyNode && original) {
+      var plainFileName = filename.replace('file://', '');
+      var dataUrl = original.toDataURL().split(',')[1];
+      console.log('creating original for ', filename);
+      fs.writeFileSync(plainFileName, dataUrl, { encoding: 'base64' });
+    }
+  }
+
   function getImage(filename, original, callback) {
     if (fabric.isLikelyNode && original) {
       var plainFileName = filename.replace('file://', '');
-      try {
-        fs.statSync(plainFileName);
-      }
-      catch (err) {
-        var dataUrl = original.toDataURL().split(',')[1];
-        console.log('creating original for ', filename);
-        fs.writeFileSync(plainFileName, dataUrl, { encoding: 'base64' });
+      if (!fs.existsSync(plainFileName)) {
+        generateGolden(filename, original);
       }
     }
     var img = fabric.document.createElement('img');
@@ -157,8 +161,11 @@
               var stringa = imageDataToChalk(output);
               console.log(stringa);
             }
-            done();
+            if ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs) {
+              generateGolden(getGoldeName(golden), renderedCanvas);
+            }
             fabricCanvas.dispose();
+            done();
           });
         });
       });

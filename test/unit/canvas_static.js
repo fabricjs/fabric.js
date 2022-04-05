@@ -197,6 +197,12 @@
     }
   });
 
+  QUnit.test('prevent multiple canvas initialization', function (assert) {
+    var canvas = new fabric.StaticCanvas();
+    assert.ok(canvas.lowerCanvasEl);
+    assert.throws(() => new fabric.StaticCanvas(canvas.lowerCanvasEl));
+  });
+
   QUnit.test('initialProperties', function(assert) {
     var canvas = new fabric.StaticCanvas();
     assert.ok('backgroundColor' in canvas);
@@ -277,6 +283,44 @@
     assert.strictEqual(canvas.item(1), rect2);
     assert.strictEqual(canvas.item(2), rect3);
     assert.strictEqual(canvas.item(3), rect4);
+  });
+
+  QUnit.test('add an object that belongs to a different canvas', function (assert) {
+    var rect1 = makeRect();
+    var control = [];
+    canvas.on('object:added', (opt) => {
+      control.push({
+        action: 'added',
+        canvas: canvas,
+        target: opt.target
+      });
+    });
+    canvas.on('object:removed', (opt) => {
+      control.push({
+        action: 'removed',
+        canvas: canvas,
+        target: opt.target
+      });
+    });
+    canvas2.on('object:added', (opt) => {
+      control.push({
+        action: 'added',
+        canvas: canvas2,
+        target: opt.target
+      });
+    });
+    canvas.add(rect1);
+    assert.strictEqual(canvas.item(0), rect1);
+    canvas2.add(rect1);
+    assert.equal(canvas.item(0), undefined);
+    assert.equal(canvas.size(), 0);
+    assert.strictEqual(canvas2.item(0), rect1);
+    var expected = [
+      { action: 'added', target: rect1, canvas: canvas },
+      { action: 'removed', target: rect1, canvas: canvas },
+      { action: 'added', target: rect1, canvas: canvas2 },
+    ]
+    assert.deepEqual(control, expected);
   });
 
   QUnit.test('add renderOnAddRemove disabled', function(assert) {
@@ -1555,9 +1599,12 @@
     var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
     assert.ok(typeof canvas2.dispose === 'function');
     canvas2.add(makeRect(), makeRect(), makeRect());
+    var lowerCanvas = canvas2.lowerCanvasEl;
+    assert.equal(lowerCanvas.getAttribute('data-fabric'), 'main', 'lowerCanvasEl should be marked by fabric');
     canvas2.dispose();
     assert.equal(canvas2.getObjects().length, 0, 'dispose should clear canvas');
     assert.equal(canvas2.lowerCanvasEl, null, 'dispose should clear lowerCanvasEl');
+    assert.equal(lowerCanvas.hasAttribute('data-fabric'), false, 'dispose should clear lowerCanvasEl data-fabric attr');
     assert.equal(canvas2.contextContainer, null, 'dispose should clear contextContainer');
   });
 
