@@ -43,15 +43,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
+   * @typedef {string | ((e: KeyboardEvent) => any)} EventFunction pass a function or the name of a bound function
+   * @typedef {{ [eventKey: number | string]: EventFunction }} EventKeyMap 
+   * Prefer using [KeyboardEvent#key]{@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key} 
+   * instead of [KeyboardEvent#keyCode]{@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode} as `eventKey`
+   *
    * For functionalities on keyDown
-   * Map a special key to a function of the instance/prototype
-   * If you need different behaviour for ESC or TAB or arrows, you have to change
-   * this map setting the name of a function that you build on the fabric.Itext or
-   * your prototype.
-   * the map change will affect all Instances unless you need for only some text Instances
-   * in that case you have to clone this object and assign your Instance.
-   * this.keysMap = fabric.util.object.clone(this.keysMap);
-   * The function must be in fabric.Itext.prototype.myFunction And will receive event as args[0]
+   * @type {EventKeyMap}
    */
   keysMap: {
     9:  'exitEditing',
@@ -66,6 +64,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     40: 'moveCursorDown',
   },
 
+  /**
+   * For functionalities on keyDown when `direction === 'rtl'`
+   * @type {EventKeyMap}
+   */
   keysMapRtl: {
     9:  'exitEditing',
     27: 'exitEditing',
@@ -81,6 +83,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * For functionalities on keyUp + ctrl || cmd
+   * @type {EventKeyMap}
    */
   ctrlKeysMapUp: {
     67: 'copy',
@@ -89,6 +92,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * For functionalities on keyDown + ctrl || cmd
+   * @type {EventKeyMap}
    */
   ctrlKeysMapDown: {
     65: 'selectAll'
