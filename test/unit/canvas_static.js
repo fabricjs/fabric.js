@@ -300,6 +300,44 @@
     assert.strictEqual(canvas.item(3), rect4);
   });
 
+  QUnit.test('add an object that belongs to a different canvas', function (assert) {
+    var rect1 = makeRect();
+    var control = [];
+    canvas.on('object:added', (opt) => {
+      control.push({
+        action: 'added',
+        canvas: canvas,
+        target: opt.target
+      });
+    });
+    canvas.on('object:removed', (opt) => {
+      control.push({
+        action: 'removed',
+        canvas: canvas,
+        target: opt.target
+      });
+    });
+    canvas2.on('object:added', (opt) => {
+      control.push({
+        action: 'added',
+        canvas: canvas2,
+        target: opt.target
+      });
+    });
+    canvas.add(rect1);
+    assert.strictEqual(canvas.item(0), rect1);
+    canvas2.add(rect1);
+    assert.equal(canvas.item(0), undefined);
+    assert.equal(canvas.size(), 0);
+    assert.strictEqual(canvas2.item(0), rect1);
+    var expected = [
+      { action: 'added', target: rect1, canvas: canvas },
+      { action: 'removed', target: rect1, canvas: canvas },
+      { action: 'added', target: rect1, canvas: canvas2 },
+    ]
+    assert.deepEqual(control, expected);
+  });
+
   QUnit.test('add renderOnAddRemove disabled', function(assert) {
     var rect = makeRect(),
         renderAllCount = 0;
