@@ -67,6 +67,18 @@
     lockMovementY: true,
 
     /**
+     * @default
+     * @override
+     */
+    originX: 'center',
+    
+    /**
+     * @default
+     * @override
+     */ 
+    originY:'center',
+
+    /**
      * we don't want to int with the layer, only with it's objects
      * this makes group selection possible over a layer
      * @override
@@ -84,41 +96,44 @@
     initialize: function (objects, options) {
       this.callSuper('initialize', objects, options);
       this.__canvasMonitor = this.__canvasMonitor.bind(this);
+      this.__groupMonitor = this.__groupMonitor.bind(this);
+      this.__onAdded = this._watchParent.bind(this, true);
+      this.__onRemoved = this._watchParent.bind(this, false);
+      this.on('added:initialized', this.__onAdded);
+      this.on('added', this.__onAdded);
+      this.on('removed', this.__onRemoved);
     },
 
     /**
-     *
-     * @param {string} key
-     * @param {*} value
-     */
-    _set: function (key, value) {
-      var settingCanvas = key === 'canvas';
-      if (settingCanvas) {
-        if (!value && this.canvas) {
-          //  detach canvas resize handler
-          this.canvas.off('resize', this.__canvasMonitor);
-        }
-        else if (value && (!this.canvas || this.canvas !== value)) {
-          //  attach canvas resize handler, make sure we listen to the resize event only once
-          this.canvas && this.canvas.off('resize', this.__canvasMonitor);
-          value.off('resize', this.__canvasMonitor);
-          value.on('resize', this.__canvasMonitor);
-        }
-      }
-      this.callSuper('_set', key, value);
-      //  apply layout after canvas is set
-      if (settingCanvas) {
-        this._applyLayoutStrategy({ type: 'canvas' });
-      }
-    },
-
-    /**
-     * we do not need to invalidate layout because layer fills the entire canvas
+     * we need to invalidate instance's group if objects have changed
      * @override
      * @private
      */
-    __objectMonitor: function () {
-      //  noop
+    __objectMonitor: function (opt) {
+      this.group && this.group.__objectMonitor(opt);
+    },
+
+    /**
+     * @private
+     * @param {boolean} watch
+     * @param {{target:fabric.Group|fabric.Canvas}} opt
+     */
+    _watchParent: function (watch, opt) {
+      var target = opt.target;
+      //  make sure we listen only once
+      this.canvas && this.canvas.off('resize', this.__canvasMonitor);
+      this.group && this.group.off('layout', this.__groupMonitor);
+      if (!watch) {
+        return;
+      }
+      else if (target instanceof fabric.Group) {
+        this._applyLayoutStrategy({ type: 'group' });
+        this.group.on('layout', this.__groupMonitor);
+      }
+      else if (target instanceof fabric.Canvas) {
+        this._applyLayoutStrategy({ type: 'canvas' });
+        this.canvas.on('resize', this.__canvasMonitor);
+      }
     },
 
     /**
@@ -126,6 +141,21 @@
      */
     __canvasMonitor: function () {
       this._applyLayoutStrategy({ type: 'canvas_resize' });
+    },
+
+    /**
+     * @private
+     */
+    __groupMonitor: function (context) {
+      this._applyLayoutStrategy(Object.assign({}, context, { type: 'group_layout' }));
+    },
+
+    /**
+     * @private
+     * @override we do not want to bubble layout
+     */
+    _bubbleLayout: function () {
+      //  noop
     },
 
     /**
@@ -147,6 +177,15 @@
           height: this.canvas.height
         };
       }
+      else if ((context.type === 'group' || context.type === 'group_layout') && this.group) {
+        var w = this.group.width, h = this.group.height;
+        return {
+          centerX: 0,
+          centerY:0,
+          width: w,
+          height: h
+        };
+      }
     },
 
     toString: function () {
@@ -154,7 +193,10 @@
     },
 
     dispose: function () {
-      this.canvas && this.canvas.off('resize', this.__canvasMonitor);
+      this.on('added:initialized', this.__onAdded);
+      this.off('added', this.__onAdded);
+      this.off('removed', this.__onRemoved);
+      this._watchParent(false);
       this.callSuper('dispose');
     }
 

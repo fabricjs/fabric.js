@@ -99,6 +99,7 @@
       this.callSuper('initialize', options);
       this.forEachObject(function (object) {
         this.enterGroup(object, false);
+        object.fire('added:initialized', { target: this });
       }, this);
       this._applyLayoutStrategy({
         type: 'initialization',
@@ -233,17 +234,16 @@
         /* _DEV_MODE_END_ */
         return false;
       }
-      else if (object.type === 'layer') {
-        /* _DEV_MODE_START_ */
-        console.warn('fabric.Group: nesting layers under groups is not supported, this call has no effect');
-        /* _DEV_MODE_END_ */
-        return false;
-      }
       else if (object.group && object.group === this) {
         /* _DEV_MODE_START_ */
         console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
         /* _DEV_MODE_END_ */
         return false;
+      }
+      else if (object.group) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Group: object is about to enter group and leave another');
+        /* _DEV_MODE_END_ */
       }
       return true;
     },
@@ -486,10 +486,17 @@
      * @param {fabric.Point} diff
      */
     _adjustObjectPosition: function (object, diff) {
-      object.set({
-        left: object.left + diff.x,
-        top: object.top + diff.y,
-      });
+      if (object instanceof fabric.Layer) {
+        object.forEachObject(function (obj) {
+          this._adjustObjectPosition(obj, diff);
+        }.bind(this));
+      }
+      else {
+        object.set({
+          left: object.left + diff.x,
+          top: object.top + diff.y,
+        });
+      }
     },
 
     /**
@@ -550,7 +557,14 @@
         result: result,
         diff: diff
       });
-      //  recursive up
+      this._bubbleLayout(context);
+    },
+
+    /**
+     * bubble layout recursive up
+     * @private
+     */
+    _bubbleLayout: function (context) {
       if (this.group && this.group._applyLayoutStrategy) {
         //  append the path recursion to context
         if (!context.path) {
@@ -561,7 +575,6 @@
         this.group._applyLayoutStrategy(context);
       }
     },
-
 
     /**
      * Override this method to customize layout.
@@ -784,8 +797,18 @@
       }
       var objCenter, sizeVector, min, max, a, b;
       objects.forEach(function (object, i) {
-        objCenter = object.getRelativeCenterPoint();
-        sizeVector = object._getTransformedDimensions().scalarDivideEquals(2);
+        if (object instanceof fabric.Layer) {
+          var bbox = object.getObjectsBoundingBox(object._objects.slice(0));
+          sizeVector = object._getTransformedDimensions({
+            width: bbox.width,
+            height: bbox.height
+          }).scalarDivideEquals(2);
+          objCenter = new fabric.Point(bbox.centerX, bbox.centerY);
+        }
+        else {
+          sizeVector = object._getTransformedDimensions().scalarDivideEquals(2);
+          objCenter = object.getRelativeCenterPoint();
+        }
         if (object.angle) {
           var rad = degreesToRadians(object.angle),
               sin = Math.abs(fabric.util.sin(rad)),
