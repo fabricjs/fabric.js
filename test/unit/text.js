@@ -11,7 +11,7 @@
   var REFERENCE_TEXT_OBJECT = {
     version:                   fabric.version,
     type:                      'text',
-    originX:                   'start',
+    originX:                   'left',
     originY:                   'top',
     left:                      0,
     top:                       0,
@@ -207,7 +207,6 @@
         width: 8,
         height: 18.08,
         fontSize: 16,
-        originX: 'start'
       });
       assert.deepEqual(text.toObject(), expectedObject, 'parsed object is what expected');
     });
