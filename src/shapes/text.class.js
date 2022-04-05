@@ -926,14 +926,14 @@
      * Measure and return the info of a single grapheme.
      * needs the the info of previous graphemes already filled
      * Override to customize measuring
-     * 
+     *
      * @typedef {object} GraphemeBBox
      * @property {number} width
      * @property {number} height
      * @property {number} kernedWidth
      * @property {number} left
      * @property {number} deltaY
-     * 
+     *
      * @param {String} grapheme to be measured
      * @param {Number} lineIndex index of the line where the char is
      * @param {Number} charIndex position in the line

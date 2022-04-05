@@ -397,7 +397,7 @@
 
       /**
        * Prepare the pattern for the erasing brush
-       * This pattern will be drawn on the top context after clipping the main context, 
+       * This pattern will be drawn on the top context after clipping the main context,
        * achieving a visual effect of erasing only erasable objects
        * @private
        */
