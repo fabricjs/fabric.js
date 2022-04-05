@@ -116,8 +116,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return;
     }
     var keyMap = this.direction === 'rtl' ? this.keysMapRtl : this.keysMap;
-    if (e.keyCode in keyMap) {
+    if (e.key in keyMap) {
+      this[keyMap[e.key]](e);
+    }
+    else if (e.keyCode in keyMap) {
       this[keyMap[e.keyCode]](e);
+    }
+    else if ((e.key in this.ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
+      this[this.ctrlKeysMapDown[e.key]](e);
     }
     else if ((e.keyCode in this.ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
       this[this.ctrlKeysMapDown[e.keyCode]](e);
@@ -149,7 +155,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this._copyDone = false;
       return;
     }
-    if ((e.keyCode in this.ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
+    if ((e.key in this.ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
+      this[this.ctrlKeysMapUp[e.key]](e);
+    }
+    else if ((e.keyCode in this.ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
       this[this.ctrlKeysMapUp[e.keyCode]](e);
     }
     else {
