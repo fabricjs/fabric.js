@@ -85,7 +85,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   ctrlKeysMapUp: {
     67: 'copy',
-    88: 'cut'
+    88: 'cut',
+    16: 'changeTextDirection',
   },
 
   /**
@@ -274,6 +275,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.compositionStart = e.target.selectionStart;
     this.compositionEnd = e.target.selectionEnd;
     this.updateTextareaPosition();
+  },
+
+  /**
+   * 
+   * @param {KeyboardEvent} e 
+   */
+  changeTextDirection: function (e) {
+    this.set('direction', e.code === 'ShiftRight' ? 'rtl' : 'ltr');
+    this.dirty = true;
+    this._updateTextarea();
   },
 
   /**
