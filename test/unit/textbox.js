@@ -9,7 +9,7 @@
   var TEXTBOX_OBJECT = {
     version: fabric.version,
     type: 'textbox',
-    originX: 'start',
+    originX: 'left',
     originY: 'top',
     left: 0,
     top: 0,
