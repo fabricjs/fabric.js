@@ -241,6 +241,30 @@
     // needed or test hangs
     iText.abortCursorAnimation();
   });
+
+  QUnit.test('keyboard event map', function (assert) {
+    var event = {
+      stopPropagation: function () { },
+      preventDefault: function () { },
+      stopImmediatePropagation: function () { },
+      key: '\\',
+      keyCode: 0
+    };
+    var iText = new fabric.IText('test');
+    var control = [];
+    iText.keysMap = {
+      0: (e) => control.push(e.keyCode),
+      '\\': (e) => control.push(e.key),
+    };
+    iText.enterEditing();
+    iText.onKeyDown(event);
+    delete iText.keysMap['\\'];
+    iText.onKeyDown(event);
+    assert.deepEqual(control, [event.key, event.keyCode], 'should fire events from key map');
+    iText.exitEditing();
+  });
+
+
   // QUnit.test('copy and paste', function(assert) {
   //   var event = { stopPropagation: function(){}, preventDefault: function(){} };
   //   var iText = new fabric.IText('test', { styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
