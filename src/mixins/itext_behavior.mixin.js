@@ -240,18 +240,6 @@
     },
 
     /**
-     *
-     * @param {'left'|'right'} from
-     * @param {number} startFrom
-     * @return {number} New selection index
-     */
-    findLineBoundary: function (from, startFrom) {
-      return from === 'right' ?
-        this.findLineBoundaryRight(startFrom) :
-        this.findLineBoundaryLeft(startFrom);
-    },
-
-    /**
      * Find new selection index representing start of current line according to current selection index
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
