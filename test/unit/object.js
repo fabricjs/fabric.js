@@ -622,7 +622,10 @@
     var object = new fabric.Object();
     var addedEventFired = false;
 
-    object.on('added', function() { addedEventFired = true; });
+    object.on('added', function (opt) {
+      addedEventFired = true;
+      assert.ok(opt.target === canvas, 'target should equal to canvas');
+    });
     canvas.add(object);
 
     assert.ok(addedEventFired);
@@ -645,7 +648,10 @@
 
     canvas.add(object);
 
-    object.on('removed', function() { removedEventFired = true; });
+    object.on('removed', function (opt) {
+      removedEventFired = true;
+      assert.ok(opt.target === canvas, 'target should equal to canvas');
+    });
     canvas.remove(object);
 
     assert.ok(removedEventFired);

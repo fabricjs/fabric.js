@@ -610,7 +610,7 @@
       obj._set('canvas', this);
       obj.setCoords();
       this.fire('object:added', { target: obj });
-      obj.fire('added');
+      obj.fire('added', { target: this });
     },
 
     /**
@@ -619,7 +619,7 @@
      */
     _onObjectRemoved: function(obj) {
       this.fire('object:removed', { target: obj });
-      obj.fire('removed');
+      obj.fire('removed', { target: this });
       obj._set('canvas', undefined);
     },
 
