@@ -345,9 +345,7 @@
           var thisStyle = styles[i][c];
           //check if style exists for this character
           if (thisStyle) {
-            //need to call _hasStyleChangedForSvg, not _hasStyleChanged so that overline,
-            //underline, and line-through are also checked
-            var styleChanged = this._hasStyleChangedForSvg(prevStyle, thisStyle);
+            var styleChanged = fabric.util._hasStyleChanged(prevStyle, thisStyle, true);
             if (styleChanged) {
               stylesArray.push({
                 start: charIndex,

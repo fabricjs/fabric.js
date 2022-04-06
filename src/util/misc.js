@@ -1215,5 +1215,27 @@
       }
       return new fabric.Group([a], { clipPath: b, inverted: inverted });
     },
+
+    /**
+     * @memberOf fabric.util
+     * @param {Object} prevStyle first style to compare
+     * @param {Object} thisStyle second style to compare
+     * @param {boolean} includeLineStyles whether to check overline, underline, and line-through properties
+     */
+    _hasStyleChanged: function(prevStyle, thisStyle, includeLineStyles) {
+      var includeLineStyles = includeLineStyles || false;
+      return (prevStyle.fill !== thisStyle.fill ||
+              prevStyle.stroke !== thisStyle.stroke ||
+              prevStyle.strokeWidth !== thisStyle.strokeWidth ||
+              prevStyle.fontSize !== thisStyle.fontSize ||
+              prevStyle.fontFamily !== thisStyle.fontFamily ||
+              prevStyle.fontWeight !== thisStyle.fontWeight ||
+              prevStyle.fontStyle !== thisStyle.fontStyle ||
+              prevStyle.deltaY !== thisStyle.deltaY) ||
+              (includeLineStyles &&
+                (prevStyle.overline !== thisStyle.overline ||
+                prevStyle.underline !== thisStyle.underline ||
+                prevStyle.linethrough !== thisStyle.linethrough));
+    },
   };
 })(typeof exports !== 'undefined' ? exports : this);
