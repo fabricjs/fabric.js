@@ -389,8 +389,8 @@
             && charIndex < this.styles[styleIndex].end) {
             //create object for line index if it doesn't exist
             stylesObject[i] = stylesObject[i] || {};
-            //add a style entry for this character's index
-            stylesObject[i][c] = this.styles[styleIndex].style;
+            //assign a style at this character's index
+            stylesObject[i][c] = Object.assign({}, this.styles[styleIndex].style);
             //if character is at the end of the current style collection, move to the next
             if (charIndex === this.styles[styleIndex].end - 1) {
               styleIndex++;

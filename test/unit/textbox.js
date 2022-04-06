@@ -167,6 +167,7 @@
     fabric.Textbox.fromObject(TEXTBOX_OBJECT, function(obj) {
       assert.deepEqual(obj.styles, textbox.styles, 'stylesFromArray output matches');
       assert.deepEqual(obj.styles[0], textbox.styles[0], 'styles match at line 0');
+      assert.notEqual(obj.styles[0][5], obj.styles[0][6], 'styles are separate objects');
       assert.deepEqual(obj.styles[0][5], textbox.styles[0][5], 'styles match at index 5');
       assert.deepEqual(obj.styles[0][6], textbox.styles[0][6], 'styles match at index 6');
       assert.deepEqual(obj.styles[0][7], textbox.styles[0][7], 'styles match at index 7');
