@@ -1243,7 +1243,7 @@
      * rather than per character. This format is less verbose, and is better suited for storage
      * so it is used in serialization (not during runtime).
      * @memberOf fabric.util
-     * @param {fabric.Object} styles per character styles for a text object
+     * @param {object} styles per character styles for a text object
      * @param {String} text the text string that the styles are applied to
      * @return {Array}
      */
