@@ -319,6 +319,6 @@
      */
     _deleteLineStyle: function(lineIndex) {
       delete this.styles[lineIndex];
-    },
+    }
   });
 })();
