@@ -359,9 +359,9 @@
     assert.equal(firstObject.get('top'), initialTopValue, 'should restore initial top value');
   });
 
-  QUnit.test.only('containsPoint', function(assert) {
+  QUnit.test('containsPoint', function(assert) {
 
-    var layer = makeLayerWith2Objects(true, true, true);
+    var layer = makeLayerWith2Objects(true);
     layer.group.setCoords();
 
     //  Rect #1     top: 100, left: 100, width: 30, height: 10
@@ -370,39 +370,20 @@
     assert.ok(typeof layer.containsPoint === 'function');
 
     function containsPoint(p) {
-      var localPoint = fabric.util.sendPointToPlane(p, null, layer.group.calcTransformMatrix());
-      console.log(localPoint)
-      return layer.containsPoint(localPoint);
+      return layer.group.containsPoint(p);
     }
 
     assert.ok(!containsPoint({ x: 0, y: 0 }));
 
-    layer.scale(2);
-    assert.ok(containsPoint({ x: 50, y: 120 }));
+    assert.ok(containsPoint({ x: 51, y: 121 }));
     assert.ok(containsPoint({ x: 100, y: 160 }));
     assert.ok(!containsPoint({ x: 0, y: 0 }));
 
-    layer.scale(1);
     layer.group.padding = 30;
     layer.group.triggerLayout();
-    console.log(layer.width,layer.height)
-    assert.ok(containsPoint({ x: 50, y: 120 }));
+    assert.ok(containsPoint({ x: 51, y: 121 }));
     assert.ok(!containsPoint({ x: 100, y: 170 }));
     assert.ok(!containsPoint({ x: 0, y: 0 }));
-  });
-
-  QUnit.test('forEachObject', function(assert) {
-    var layer = makeLayerWith2Objects();
-
-    assert.ok(typeof layer.forEachObject === 'function');
-
-    var iteratedObjects = [];
-    layer.forEachObject(function(groupObject) {
-      iteratedObjects.push(groupObject);
-    });
-
-    assert.equal(iteratedObjects[0], layer.getObjects()[0], 'iteration give back objects in same order');
-    assert.equal(iteratedObjects[1], layer.getObjects()[1], 'iteration give back objects in same order');
   });
 
   QUnit.test('fromObject', function(assert) {
@@ -505,36 +486,25 @@
     });
   });
 
-  QUnit.test('fromObject does not delete objects from source', function(assert) {
-    var done = assert.async();
-    var layer = makeLayerWith2ObjectsWithOpacity();
-    var groupObject = layer.toObject();
-
-    fabric.Layer.fromObject(groupObject).then(function(newGroupFromObject) {
-      assert.equal(newGroupFromObject.objects, undefined, 'the objects array has not been pulled in');
-      assert.notEqual(groupObject.objects, undefined, 'the objects array has not been deleted from object source');
-      done();
-    });
-  });
-
   QUnit.test('toSVG', function(assert) {
     var layer = makeLayerWith2Objects(true);
     assert.ok(typeof layer.toSVG === 'function');
-    var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\"  >\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n';
-    assert.equal(layer.toSVG(), expectedSVG);
+    var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\"  >\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 0 0)\"  >\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n</g>\n</g>\n';
+    assert.equal(layer.group.toSVG(), expectedSVG);
   });
 
   QUnit.test('toSVG with a clipPath', function(assert) {
     var layer = makeLayerWith2Objects(true);
     layer.clipPath = new fabric.Rect({ width: 100, height: 100 });
-    var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<rect transform=\"matrix(1 0 0 1 50.5 50.5)\" x=\"-50\" y=\"-50\" rx=\"0\" ry=\"0\" width=\"100\" height=\"100\" />\n</clipPath>\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n';
-    assert.equal(layer.toSVG(), expectedSVG);
+    var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\"  >\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 0 0)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<rect transform=\"matrix(1 0 0 1 50.5 50.5)\" x=\"-50\" y=\"-50\" rx=\"0\" ry=\"0\" width=\"100\" height=\"100\" />\n</clipPath>\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n</g>\n</g>\n';
+    assert.equal(layer.group.toSVG(), expectedSVG);
   });
 
   QUnit.test('toSVG with a clipPath absolutePositioned', function(assert) {
     var layer = makeLayerWith2Objects(true);
     layer.clipPath = new fabric.Rect({ width: 100, height: 100 });
     layer.clipPath.absolutePositioned = true;
+    console.log(JSON.stringify(layer.group.toSVG()))
     var expectedSVG = '<g clip-path=\"url(#CLIPPATH_0)\"  >\n<g transform=\"matrix(1 0 0 1 90 130)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<rect transform=\"matrix(1 0 0 1 50.5 50.5)\" x=\"-50\" y=\"-50\" rx=\"0\" ry=\"0\" width=\"100\" height=\"100\" />\n</clipPath>\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n</g>\n';
     assert.equal(layer.toSVG(), expectedSVG);
   });
@@ -757,7 +727,8 @@
   QUnit.test('layer add', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        layer = new fabric.Layer([rect1]);
+        layer = new fabric.Layer([rect1]),
+        group = new fabric.Group([layer], {subTargetCheck:true});
 
     var coords = layer.oCoords;
     layer.add(rect2);
@@ -884,16 +855,18 @@
     assert.equal(layer._objects[1].canvas, canvas, 'canvas has been set on object 0');
   });
 
-  QUnit.test('add and coordinates', function(assert) {
+  QUnit.test.only('add and coordinates', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' }),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 6, angle: 90, strokeWidth: 0, fill: 'red' }),
-        layer = new fabric.Layer([]);
+        layer = new fabric.Layer([]),
+        group = new fabric.Group([layer]);
     layer.add(rect1);
     layer.add(rect2);
-    layer.left = 5;
-    layer.top = 5;
-    layer.scaleX = 3;
-    layer.scaleY = 2;
+    group.left = 5;
+    group.top = 5;
+    group.scaleX = 3;
+    group.scaleY = 2;
+    group.triggerLayout();
     layer.removeAll();
     assert.equal(rect1.top, 5, 'top has been moved');
     assert.equal(rect1.left, 11, 'left has been moved');
