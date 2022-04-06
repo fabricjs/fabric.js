@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors,erasing requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '5.2.2' };
+var fabric = fabric || { version: '5.2.1' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -1838,112 +1838,6 @@ fabric.CommonMethods = {
       }
       return new fabric.Group([a], { clipPath: b, inverted: inverted });
     },
-
-    /**
-     * @memberOf fabric.util
-     * @param {Object} prevStyle first style to compare
-     * @param {Object} thisStyle second style to compare
-     * @param {boolean} includeLineStyles whether to check overline, underline, and line-through properties
-     */
-    hasStyleChanged: function(prevStyle, thisStyle, includeLineStyles) {
-      includeLineStyles = includeLineStyles || false;
-      return (prevStyle.fill !== thisStyle.fill ||
-              prevStyle.stroke !== thisStyle.stroke ||
-              prevStyle.strokeWidth !== thisStyle.strokeWidth ||
-              prevStyle.fontSize !== thisStyle.fontSize ||
-              prevStyle.fontFamily !== thisStyle.fontFamily ||
-              prevStyle.fontWeight !== thisStyle.fontWeight ||
-              prevStyle.fontStyle !== thisStyle.fontStyle ||
-              prevStyle.deltaY !== thisStyle.deltaY) ||
-              (includeLineStyles &&
-                (prevStyle.overline !== thisStyle.overline ||
-                prevStyle.underline !== thisStyle.underline ||
-                prevStyle.linethrough !== thisStyle.linethrough));
-    },
-
-    /**
-     * Returns the array form of a text object's inline styles property with styles grouped in ranges
-     * rather than per character. This format is less verbose, and is better suited for storage
-     * so it is used in serialization (not during runtime).
-     * @memberOf fabric.util
-     * @param {object} styles per character styles for a text object
-     * @param {String} text the text string that the styles are applied to
-     * @return {{start: number, end: number, style: object}[]}
-     */
-    stylesToArray: function(styles, text) {
-      // clone style structure to prevent mutation
-      var styles = fabric.util.object.clone(styles, true),
-          textLines = text.split('\n'),
-          charIndex = -1, prevStyle = {}, stylesArray = [];
-      //loop through each textLine
-      for (var i = 0; i < textLines.length; i++) {
-        if (!styles[i]) {
-          //no styles exist for this line, so add the line's length to the charIndex total
-          charIndex += textLines[i].length;
-          continue;
-        }
-        //loop through each character of the current line
-        for (var c = 0; c < textLines[i].length; c++) {
-          charIndex++;
-          var thisStyle = styles[i][c];
-          //check if style exists for this character
-          if (thisStyle) {
-            var styleChanged = fabric.util.hasStyleChanged(prevStyle, thisStyle, true);
-            if (styleChanged) {
-              stylesArray.push({
-                start: charIndex,
-                end: charIndex + 1,
-                style: thisStyle
-              });
-            }
-            else {
-              //if style is the same as previous character, increase end index
-              stylesArray[stylesArray.length - 1].end++;
-            }
-          }
-          prevStyle = thisStyle || {};
-        }
-      }
-      return stylesArray;
-    },
-
-    /**
-     * Returns the object form of the styles property with styles that are assigned per
-     * character rather than grouped by range. This format is more verbose, and is
-     * only used during runtime (not for serialization/storage)
-     * @memberOf fabric.util
-     * @param {Array} styles the serialized form of a text object's styles
-     * @param {String} text the text string that the styles are applied to
-     * @return {Object}
-     */
-    stylesFromArray: function(styles, text) {
-      if (!Array.isArray(styles)) {
-        return styles;
-      }
-      var textLines = text.split('\n'),
-          charIndex = -1, styleIndex = 0, stylesObject = {};
-      //loop through each textLine
-      for (var i = 0; i < textLines.length; i++) {
-        //loop through each character of the current line
-        for (var c = 0; c < textLines[i].length; c++) {
-          charIndex++;
-          //check if there's a style collection that includes the current character
-          if (styles[styleIndex]
-            && styles[styleIndex].start <= charIndex
-            && charIndex < styles[styleIndex].end) {
-            //create object for line index if it doesn't exist
-            stylesObject[i] = stylesObject[i] || {};
-            //assign a style at this character's index
-            stylesObject[i][c] = Object.assign({}, styles[styleIndex].style);
-            //if character is at the end of the current style collection, move to the next
-            if (charIndex === styles[styleIndex].end - 1) {
-              styleIndex++;
-            }
-          }
-        }
-      }
-      return stylesObject;
-    }
   };
 })(typeof exports !== 'undefined' ? exports : this);
 
@@ -26248,6 +26142,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @return {fabric.Text} thisArg
      */
     initialize: function(text, options) {
+      this.styles = options ? (options.styles || { }) : { };
       this.text = text;
       this.__skipDimension = true;
       this.callSuper('initialize', options);
@@ -26255,7 +26150,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         this.setPathInfo();
       }
       this.__skipDimension = false;
-      this.styles = fabric.util.stylesFromArray(options ? (options.styles || { }) : { }, this.text);
       this.initDimensions();
       this.setCoords();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
@@ -26962,7 +26856,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           // if we have charSpacing, we render char by char
           actualStyle = actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
           nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
-          timeToRender = fabric.util.hasStyleChanged(actualStyle, nextStyle, false);
+          timeToRender = this._hasStyleChanged(actualStyle, nextStyle);
         }
         if (timeToRender) {
           if (path) {
@@ -27130,6 +27024,34 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
           style = { fontSize: fontSize * schema.size, deltaY: dy + fontSize * schema.baseline };
       this.setSelectionStyles(style, start, end);
       return this;
+    },
+
+    /**
+     * @private
+     * @param {Object} prevStyle
+     * @param {Object} thisStyle
+     */
+    _hasStyleChanged: function(prevStyle, thisStyle) {
+      return prevStyle.fill !== thisStyle.fill ||
+              prevStyle.stroke !== thisStyle.stroke ||
+              prevStyle.strokeWidth !== thisStyle.strokeWidth ||
+              prevStyle.fontSize !== thisStyle.fontSize ||
+              prevStyle.fontFamily !== thisStyle.fontFamily ||
+              prevStyle.fontWeight !== thisStyle.fontWeight ||
+              prevStyle.fontStyle !== thisStyle.fontStyle ||
+              prevStyle.deltaY !== thisStyle.deltaY;
+    },
+
+    /**
+     * @private
+     * @param {Object} prevStyle
+     * @param {Object} thisStyle
+     */
+    _hasStyleChangedForSvg: function(prevStyle, thisStyle) {
+      return this._hasStyleChanged(prevStyle, thisStyle) ||
+        prevStyle.overline !== thisStyle.overline ||
+        prevStyle.underline !== thisStyle.underline ||
+        prevStyle.linethrough !== thisStyle.linethrough;
     },
 
     /**
@@ -27393,7 +27315,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     toObject: function(propertiesToInclude) {
       var allProperties = additionalProps.concat(propertiesToInclude);
       var obj = this.callSuper('toObject', allProperties);
-      obj.styles = fabric.util.stylesToArray(this.styles, this.text);
+      // styles will be overridden with a properly cloned structure
+      obj.styles = clone(this.styles, true);
       if (obj.path) {
         obj.path = this.path.toObject();
       }
@@ -30488,7 +30411,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
           // if we have charSpacing, we render char by char
           actualStyle = actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
           nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
-          timeToRender = fabric.util.hasStyleChanged(actualStyle, nextStyle, true);
+          timeToRender = this._hasStyleChangedForSvg(actualStyle, nextStyle);
         }
         if (timeToRender) {
           style = this._getStyleDeclaration(lineIndex, i) || { };
