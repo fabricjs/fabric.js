@@ -1285,7 +1285,7 @@
     },
 
     /**
-     * Returns the object form of the styles property with styles are assigned per
+     * Returns the object form of the styles property with styles that are assigned per
      * character rather than grouped by range. This format is more verbose, and is
      * only used during runtime (not for serialization/storage)
      * @memberOf fabric.util
