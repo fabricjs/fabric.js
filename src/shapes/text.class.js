@@ -373,7 +373,7 @@
         this.setPathInfo();
       }
       this.__skipDimension = false;
-      this.styles = this._stylesFromArray();
+      this.styles = fabric.util.stylesFromArray(this.styles, this.text);
       this.initDimensions();
       this.setCoords();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
@@ -1080,7 +1080,7 @@
           // if we have charSpacing, we render char by char
           actualStyle = actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
           nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
-          timeToRender = fabric.util._hasStyleChanged(actualStyle, nextStyle, false);
+          timeToRender = fabric.util.hasStyleChanged(actualStyle, nextStyle, false);
         }
         if (timeToRender) {
           if (path) {
@@ -1511,7 +1511,7 @@
     toObject: function(propertiesToInclude) {
       var allProperties = additionalProps.concat(propertiesToInclude);
       var obj = this.callSuper('toObject', allProperties);
-      obj.styles = this._stylesToArray();
+      obj.styles = fabric.util.stylesToArray(this.styles, this.text);
       if (obj.path) {
         obj.path = this.path.toObject();
       }

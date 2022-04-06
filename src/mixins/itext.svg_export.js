@@ -142,7 +142,7 @@
           // if we have charSpacing, we render char by char
           actualStyle = actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
           nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
-          timeToRender = fabric.util._hasStyleChanged(actualStyle, nextStyle, true);
+          timeToRender = fabric.util.hasStyleChanged(actualStyle, nextStyle, true);
         }
         if (timeToRender) {
           style = this._getStyleDeclaration(lineIndex, i) || { };
