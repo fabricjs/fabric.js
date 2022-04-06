@@ -323,37 +323,38 @@
     });
 
     function createObjectsForOriginTests(originX, originY, options) {
-        var rect1 = new fabric.Rect({ top: 100, left: 150, width: 30, height: 10, strokeWidth: 0 }),
-            rect2 = new fabric.Rect({ top: 120, left: 200, width: 10, height: 40, strokeWidth: 0 }),
-            controlPoint = new fabric.Circle({ radius: 5, fill: 'blue', left: 150, top: 100, originX: 'center', originY: 'center' });
+        var rect1 = new fabric.Rect({ left: 150, top: 100, width: 30, height: 10, strokeWidth: 0 }),
+            rect2 = new fabric.Rect({ left: 200, top: 120, width: 10, height: 40, strokeWidth: 0 }),
+            controlPoint = new fabric.Circle({ radius: 5, fill: 'blue', left: 150, top: 100, originX: 'center', originY: 'center' }),
+            tlControlPoint = new fabric.Circle({ radius: 5, fill: 'red', left: 150, top: 100, strokeWidth: 0 });
 
-        var g = new fabric.Group([rect1, rect2], Object.assign({}, options, {
-            originX, originY, strokeWidth: 1, stroke: 'blue'
+        var g = new fabric.Group([rect1, rect2, tlControlPoint], Object.assign({}, options, {
+            originX, originY, backgroundColor: 'pink'
         }));
-        return [controlPoint, g];
+        return [g, controlPoint];
     }
 
     var originX = ['left', 'center', 'right'];
     var originY = ['top', 'center', 'bottom'];
-/*
+
     for (let angle = 0; angle < 360; angle += 30) {
         originX.forEach(ox => {
             originY.forEach(oy => {
                 tests.push({
-                    test: `layout with originX=${ox}, originY=${oy} and angle=${angle} values - angle is WRONG`,
+                    test: `layout with originX=${ox}, originY=${oy} and angle=${angle} values`,
                     code: function (canvas, callback) {
                         canvas.add(...createObjectsForOriginTests(ox, oy, { angle }));
                         canvas.renderAll();
                         callback(canvas.lowerCanvasEl);
                     },
                     golden: `group-layout/origin-${ox}-${oy}-${angle}deg.png`,
-                    percentage: 0.06,
+                    percentage: 0.001,
                     width: 300,
-                    height: 300
+                    height: 200
                 });
             });
         });
     }
-*/
+
     tests.forEach(visualTestLoop(QUnit));
 })();
