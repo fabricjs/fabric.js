@@ -343,7 +343,7 @@
                 tests.push({
                     test: `layout with originX=${ox}, originY=${oy} and angle=${angle} values`,
                     code: function (canvas, callback) {
-                        canvas.add(...createObjectsForOriginTests(ox, oy, { angle }));
+                        canvas.add.apply(canvas, createObjectsForOriginTests(ox, oy, { angle }));
                         canvas.renderAll();
                         callback(canvas.lowerCanvasEl);
                     },
