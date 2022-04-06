@@ -156,7 +156,6 @@
             var differentPixels = _pixelMatch(imageDataCanvas, imageDataGolden, output.data, width, height, pixelmatchOptions);
             var percDiff = differentPixels / totalPixels * 100;
             var okDiff = totalPixels * percentage;
-            console.log(okDiff, differentPixels)
             var isOK = differentPixels < okDiff;
             assert.ok(
               isOK,
