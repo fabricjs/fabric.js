@@ -365,7 +365,6 @@
      * @return {fabric.Text} thisArg
      */
     initialize: function(text, options) {
-      this.styles = options ? (options.styles || { }) : { };
       this.text = text;
       this.__skipDimension = true;
       this.callSuper('initialize', options);
@@ -373,7 +372,7 @@
         this.setPathInfo();
       }
       this.__skipDimension = false;
-      this.styles = fabric.util.stylesFromArray(this.styles, this.text);
+      this.styles = fabric.util.stylesFromArray(options ? (options.styles || { }) : { }, this.text);
       this.initDimensions();
       this.setCoords();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
