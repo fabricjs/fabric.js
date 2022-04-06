@@ -1223,7 +1223,7 @@
      * @param {boolean} includeLineStyles whether to check overline, underline, and line-through properties
      */
     hasStyleChanged: function(prevStyle, thisStyle, includeLineStyles) {
-      var includeLineStyles = includeLineStyles || false;
+      includeLineStyles = includeLineStyles || false;
       return (prevStyle.fill !== thisStyle.fill ||
               prevStyle.stroke !== thisStyle.stroke ||
               prevStyle.strokeWidth !== thisStyle.strokeWidth ||
