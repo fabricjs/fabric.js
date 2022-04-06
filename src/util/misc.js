@@ -1245,7 +1245,7 @@
      * @memberOf fabric.util
      * @param {object} styles per character styles for a text object
      * @param {String} text the text string that the styles are applied to
-     * @return {Array}
+     * @return {{start: number, end: number, style: object}[]}
      */
     stylesToArray: function(styles, text) {
       // clone style structure to prevent mutation
