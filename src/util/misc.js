@@ -1239,7 +1239,7 @@
     },
 
     /**
-     * Returns the array form of an text object's inline styles property with styles grouped in ranges
+     * Returns the array form of a text object's inline styles property with styles grouped in ranges
      * rather than per character. This format is less verbose, and is better suited for storage
      * so it is used in serialization (not during runtime).
      * @memberOf fabric.util
