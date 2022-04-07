@@ -877,7 +877,11 @@
     /* _TO_SVG_START_ */
 
     /**
+     *
      * @private
+     * @param {'toObject'|'toDatalessObject'} [method]
+     * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @returns {fabric.Object[]} serialized objects
      */
     _createSVGBgRect: function (reviver) {
       if (!this.backgroundColor) {
