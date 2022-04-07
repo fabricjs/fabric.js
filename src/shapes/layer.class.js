@@ -101,6 +101,9 @@
       this.on('added:initialized', this.__onAdded);
       this.on('added', this.__onAdded);
       this.on('removed', this.__onRemoved);
+      //  trigger layout in case parent is passed in options
+      var parent = this.group || this.canvas;
+      parent && this.__onAdded({ target: parent });
     },
 
     /**
