@@ -130,7 +130,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     if (this._tempBuffer) {
       //  add last buffer to main buffer
       this._layoutBufferingGroup(this._tempBuffer);
-      group.addRelativeToGroup(this._tempBuffer);
+      group.addRelative(this._tempBuffer);
     }
     this._layoutBufferingGroup(group);
     this.shadow && group.set('shadow', new fabric.Shadow(this.shadow));
@@ -238,14 +238,14 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       });
       if (this._tempBuffer && this._tempBuffer.size() > this.bufferThreshold) {
         this._layoutBufferingGroup(this._tempBuffer);
-        this._buffer.addRelativeToGroup(this._tempBuffer);
+        this._buffer.addRelative(this._tempBuffer);
         this._tempBuffer.renderCache();
         this._tempBuffer = undefined;
       }
       if (!this._tempBuffer) {
         this._tempBuffer = this._createBufferingGroup();
       }
-      this._tempBuffer.addRelativeToGroup(rect);
+      this._tempBuffer.addRelative(rect);
     }
 
     this.sprayChunks.push(sprayChunkPoints);
