@@ -712,6 +712,7 @@
           }
         }
       }
+      this._objectsToRender = this._chooseObjectsToRender();
       this._handleEvent(e, 'down');
       // we must renderAll so that we update the visuals
       (shouldRender || shouldGroup) && this.requestRenderAll();
@@ -900,13 +901,19 @@
      */
     _transformObject: function(e) {
       var pointer = this.getPointer(e),
-          transform = this._currentTransform;
+          transform = this._currentTransform,
+          target = transform.target,
+          //  transform pointer to target's containing coordinate plane
+          //  both pointer and object should agree on every point
+          localPointer = target.group ?
+            fabric.util.sendPointToPlane(pointer, null, target.group.calcTransformMatrix()) :
+            pointer;
 
       transform.reset = false;
       transform.shiftKey = e.shiftKey;
       transform.altKey = e[this.centeredKey];
 
-      this._performTransformAction(e, transform, pointer);
+      this._performTransformAction(e, transform, localPointer);
       transform.actionPerformed && this.requestRenderAll();
     },
 

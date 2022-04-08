@@ -13,8 +13,12 @@
      */
     _shouldGroup: function(e, target) {
       var activeObject = this._activeObject;
-      return activeObject && this._isSelectionKeyPressed(e) && target && target.selectable && this.selection &&
-            (activeObject !== target || activeObject.type === 'activeSelection') && !target.onSelect({ e: e });
+      return !!activeObject && this._isSelectionKeyPressed(e)
+        && !!target && target.selectable && this.selection
+        && (activeObject !== target || activeObject.type === 'activeSelection')
+        //  make sure `activeObject` and `target` aren't ancestors of each other
+        && !target.isDescendantOf(activeObject) && !activeObject.isDescendantOf(target)
+        && !target.onSelect({ e: e });
     },
 
     /**
@@ -50,7 +54,7 @@
     _updateActiveSelection: function(target, e) {
       var activeSelection = this._activeObject,
           currentActiveObjects = activeSelection._objects.slice(0);
-      if (activeSelection.contains(target)) {
+      if (target.group === activeSelection) {
         activeSelection.remove(target);
         this._hoveredTarget = target;
         this._hoveredTargets = this.targets.concat();
@@ -80,17 +84,19 @@
       this._fireSelectionEvents(currentActives, e);
     },
 
+
     /**
      * @private
      * @param {Object} target
+     * @returns {fabric.ActiveSelection}
      */
     _createGroup: function(target) {
-      var objects = this._objects,
-          isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target),
-          groupObjects = isActiveLower
-            ? [this._activeObject, target]
-            : [target, this._activeObject];
-      this._activeObject.isEditing && this._activeObject.exitEditing();
+      var activeObject = this._activeObject;
+      var groupObjects = target.isInFrontOf(activeObject) ?
+        [activeObject, target] :
+        [target, activeObject];
+      activeObject.isEditing && activeObject.exitEditing();
+      //  handle case: target is nested
       return new fabric.ActiveSelection(groupObjects, {
         canvas: this
       });
