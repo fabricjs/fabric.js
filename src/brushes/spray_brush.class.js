@@ -45,6 +45,13 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    * @default
    */
   optimizeOverlapping:  true,
+  
+  /**
+   * Performance enhancement
+   * Threshold of dots before creating a new buffering group
+   * @type number
+   */
+  bufferThreshold: 500,
 
   /**
    * Constructor
@@ -54,6 +61,36 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   initialize: function(canvas) {
     this.canvas = canvas;
     this.sprayChunks = [];
+    this.memo = {};
+  },
+
+  /**
+   * create a group to contain some of the spray chunks, acting as a buffer
+   * position group center at canvas 0,0 so we can add objects relative to group, reducing calculations to a minimum
+   * @private
+   * @returns {fabric.Group}
+   */
+  _createBufferingGroup: function () {
+    return new fabric.Group([], {
+      objectCaching: true,
+      layout: 'none',
+      subTargetCheck: false,
+      originX: 'center',
+      originY: 'center',
+      width: this.canvas.width,
+      height: this.canvas.height,
+      canvas: this.canvas
+    });
+  },
+
+  /**
+   * layout once and disable future layouting by setting to `fixed`
+   * @private
+   * @param {fabric.Group} group 
+   */
+  _layoutBufferingGroup: function (group) {
+    group.triggerLayout({ layout: 'fit-content' });
+    group.triggerLayout({ layout: 'fixed' });
   },
 
   /**
@@ -61,12 +98,14 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    * @param {Object} pointer
    */
   onMouseDown: function(pointer) {
-    this.sprayChunks.length = 0;
+    this.sprayChunks = [];
+    this.memo = {};
+    this._buffer = this._createBufferingGroup();
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
 
-    this.addSprayChunk(pointer);
-    this.render(this.sprayChunkPoints);
+    var chunk = this.addSprayChunk(pointer);
+    this.renderChunk(chunk);
   },
 
   /**
@@ -77,8 +116,8 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
       return;
     }
-    this.addSprayChunk(pointer);
-    this.render(this.sprayChunkPoints);
+    var chunk = this.addSprayChunk(pointer);
+    this.renderChunk(chunk);
   },
 
   /**
@@ -87,70 +126,33 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   onMouseUp: function() {
     var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
     this.canvas.renderOnAddRemove = false;
-
-    var rects = [];
-
-    for (var i = 0, ilen = this.sprayChunks.length; i < ilen; i++) {
-      var sprayChunk = this.sprayChunks[i];
-
-      for (var j = 0, jlen = sprayChunk.length; j < jlen; j++) {
-
-        var rect = new fabric.Rect({
-          width: sprayChunk[j].width,
-          height: sprayChunk[j].width,
-          left: sprayChunk[j].x + 1,
-          top: sprayChunk[j].y + 1,
-          originX: 'center',
-          originY: 'center',
-          fill: this.color
-        });
-        rects.push(rect);
-      }
+    var group = this._buffer;
+    if (this._tempBuffer) {
+      //  add last buffer to main buffer
+      this._layoutBufferingGroup(this._tempBuffer);
+      group.addRelativeToGroup(this._tempBuffer);
     }
-
-    if (this.optimizeOverlapping) {
-      rects = this._getOptimizedRects(rects);
-    }
-
-    var group = new fabric.Group(rects, { objectCaching: true, layout: 'fixed', subTargetCheck: false });
+    this._layoutBufferingGroup(group);
     this.shadow && group.set('shadow', new fabric.Shadow(this.shadow));
+    // fire events and add
     this.canvas.fire('before:path:created', { path: group });
     this.canvas.add(group);
     this.canvas.fire('path:created', { path: group });
-
+    //  render
     this.canvas.clearContext(this.canvas.contextTop);
     this._resetShadow();
     this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
     this.canvas.requestRenderAll();
-  },
-
-  /**
-   * @private
-   * @param {Array} rects
-   */
-  _getOptimizedRects: function(rects) {
-
-    // avoid creating duplicate rects at the same coordinates
-    var uniqueRects = { }, key, i, len;
-
-    for (i = 0, len = rects.length; i < len; i++) {
-      key = rects[i].left + '' + rects[i].top;
-      if (!uniqueRects[key]) {
-        uniqueRects[key] = rects[i];
-      }
-    }
-    var uniqueRectsArray = [];
-    for (key in uniqueRects) {
-      uniqueRectsArray.push(uniqueRects[key]);
-    }
-
-    return uniqueRectsArray;
+    //  deallocate
+    this._buffer = undefined;
+    this._tempBuffer = undefined;
+    this.memo = {};
   },
 
   /**
    * Render new chunk of spray brush
    */
-  render: function(sprayChunk) {
+  renderChunk: function(sprayChunk) {
     var ctx = this.canvas.contextTop, i, len;
     ctx.fillStyle = this.color;
 
@@ -176,7 +178,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     this._saveAndTransform(ctx);
 
     for (i = 0, ilen = this.sprayChunks.length; i < ilen; i++) {
-      this.render(this.sprayChunks[i]);
+      this.renderChunk(this.sprayChunks[i]);
     }
     ctx.restore();
   },
@@ -185,9 +187,8 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    * @param {Object} pointer
    */
   addSprayChunk: function(pointer) {
-    this.sprayChunkPoints = [];
-
-    var x, y, width, radius = this.width / 2, i;
+    var sprayChunkPoints = [];
+    var i, x, y, key, width, radius = this.width / 2, r;
 
     for (i = 0; i < this.density; i++) {
 
@@ -204,6 +205,17 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
         width = this.dotWidth;
       }
 
+      if (this.optimizeOverlapping) {
+        // avoid creating duplicate rects at the same coordinates
+        key = x + ',' + y;
+        if (this.memo[key]) {
+          continue;
+        }
+        else {
+          this.memo[key] = true;
+        }
+      }
+
       var point = new fabric.Point(x, y);
       point.width = width;
 
@@ -211,9 +223,32 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
         point.opacity = fabric.util.getRandomInt(0, 100) / 100;
       }
 
-      this.sprayChunkPoints.push(point);
+      sprayChunkPoints.push(point);
+      r = point.width / 2;
+      var rect = new fabric.Rect({
+        width: point.width,
+        height: point.width,
+        left: point.x + r,
+        top: point.y + r,
+        originX: 'center',
+        originY: 'center',
+        fill: this.color,
+        objectCaching: false,
+        canvas: this.canvas
+      });
+      if (this._tempBuffer && this._tempBuffer.size() > this.bufferThreshold) {
+        this._layoutBufferingGroup(this._tempBuffer);
+        this._buffer.addRelativeToGroup(this._tempBuffer);
+        this._tempBuffer.renderCache();
+        this._tempBuffer = undefined;
+      }
+      if (!this._tempBuffer) {
+        this._tempBuffer = this._createBufferingGroup();
+      }
+      this._tempBuffer.addRelativeToGroup(rect);
     }
 
-    this.sprayChunks.push(this.sprayChunkPoints);
+    this.sprayChunks.push(sprayChunkPoints);
+    return sprayChunkPoints;
   }
 });
