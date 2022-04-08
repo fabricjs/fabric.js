@@ -118,6 +118,27 @@
         height: 300
     });
 
+    function fitContentNestedLayer(canvas, callback) {
+        var g = createGroupForLayoutTests('fit-content layout', {
+            backgroundColor: 'blue'
+        });
+        var objects = g.removeAll();
+        var layer = new fabric.Layer(objects, { backgroundColor: 'yellow' });
+        g.add(layer);
+        canvas.add(g);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+
+    tests.push({
+        test: 'fit-content with nested layer',
+        code: fitContentNestedLayer,
+        golden: 'group-layout/fit-content-nested-layer.png',
+        percentage: 0.06,
+        width: 400,
+        height: 300
+    });
+
     function nestedLayout(canvas, callback) {
         var rect3 = new fabric.Rect({
             width: 100,
