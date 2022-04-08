@@ -45,7 +45,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    * @default
    */
   optimizeOverlapping:  true,
-  
+
   /**
    * Performance enhancement
    * Threshold of dots before creating a new buffering group
@@ -86,7 +86,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   /**
    * layout once and disable future layouting by setting to `fixed`
    * @private
-   * @param {fabric.Group} group 
+   * @param {fabric.Group} group
    */
   _layoutBufferingGroup: function (group) {
     group.triggerLayout({ layout: 'fit-content' });
