@@ -484,11 +484,13 @@
      * @private
      * @param {fabric.Object} object
      * @param {fabric.Point} diff
+     * @param {boolean} [setCoords] perf enhancement, instead of iterating over objects again
      */
-    _adjustObjectPosition: function (object, diff) {
+    _adjustObjectPosition: function (object, diff, setCoords) {
+      //  layer doesn't need coords so we don't set them
       if (object instanceof fabric.Layer) {
         object.forEachObject(function (obj) {
-          this._adjustObjectPosition(obj, diff);
+          this._adjustObjectPosition(obj, diff, setCoords);
         }.bind(this));
       }
       else {
@@ -496,6 +498,7 @@
           left: object.left + diff.x,
           top: object.top + diff.y,
         });
+        setCoords && object.setCoords();
       }
     },
 
@@ -520,20 +523,25 @@
         var newCenter = new fabric.Point(result.centerX, result.centerY);
         var vector = center.subtract(newCenter).add(new fabric.Point(result.correctionX || 0, result.correctionY || 0));
         var diff = transformPoint(vector, invertTransform(this.calcOwnMatrix()), true);
+        var objectsSetCoords = false;
         //  set dimensions
         this.set({ width: result.width, height: result.height });
-        //  adjust objects to account for new center
-        !context.objectsRelativeToGroup && this.forEachObject(function (object) {
-          this._adjustObjectPosition(object, diff);
-        }, this);
-        //  clip path as well
-        !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
-          && this._adjustObjectPosition(this.clipPath, diff);
         if (!newCenter.eq(center)) {
           //  set position
           this.setPositionByOrigin(newCenter, 'center', 'center');
-          this.setCoords();
+          //  perf: avoid iterating over objects twice by setting coords only on instance
+          //  and delegating the task to `_adjustObjectPosition`
+          this.callSuper('setCoords');
+          objectsSetCoords = this.subTargetCheck;
         }
+        //  adjust objects to account for new center
+        !context.objectsRelativeToGroup && this.forEachObject(function (object) {
+          this._adjustObjectPosition(object, diff, objectsSetCoords);
+        }, this);
+        //  clip path as well
+        !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
+          && this._adjustObjectPosition(this.clipPath, diff, objectsSetCoords);
+        
       }
       else if (isFirstLayout) {
         //  fill `result` with initial values for the layout hook
