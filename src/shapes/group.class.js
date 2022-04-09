@@ -95,8 +95,8 @@
       this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(this, true);
       this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
       this._firstLayoutDone = false;
-      //  setting angle must occur after initial layout
-      this.callSuper('initialize', Object.assign({}, options, { angle: 0 }));
+      //  setting angle, skewX, skewY must occur after initial layout
+      this.callSuper('initialize', Object.assign({}, options, { angle: 0, skewX: 0, skewY: 0 }));
       this.forEachObject(function (object) {
         this.enterGroup(object, false);
       }, this);
@@ -518,11 +518,15 @@
         //  clip path as well
         !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
           && this._adjustObjectPosition(this.clipPath, diff);
-        var initialAngle = isFirstLayout && context.options && context.options.angle;
-        if (!newCenter.eq(center) || initialAngle) {
+        var initialTransform = isFirstLayout && context.options && {
+          angle: context.options.angle || 0,
+          skewX: context.options.skewX || 0,
+          skewY: context.options.skewY || 0,
+        };
+        if (!newCenter.eq(center) || initialTransform) {
           //  set position
           this.setPositionByOrigin(newCenter, 'center', 'center');
-          initialAngle && this.set('angle', initialAngle);
+          initialTransform && this.set(initialTransform);
           this.setCoords();
         }
       }
