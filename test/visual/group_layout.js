@@ -132,7 +132,7 @@
         code: fitContentLayoutWithSkewX,
         golden: 'group-layout/fit-content-skewX.png',
         percentage: 0.06,
-        width: 400,
+        width: 400 + Math.ceil(300 / Math.SQRT2),
         height: 300
     });
 
@@ -152,7 +152,7 @@
         golden: 'group-layout/fit-content-skewY.png',
         percentage: 0.06,
         width: 400,
-        height: 300
+        height: 400 + Math.ceil(400 / Math.SQRT2)
     });
 
     function nestedLayout(canvas, callback) {
