@@ -96,7 +96,8 @@
       this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(this, true);
       this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
       this._firstLayoutDone = false;
-      this.callSuper('initialize', options);
+      //  setting angle, skewX, skewY must occur after initial layout
+      this.callSuper('initialize', Object.assign({}, options, { angle: 0, skewX: 0, skewY: 0 }));
       this.forEachObject(function (object) {
         this.enterGroup(object, false);
         object.fire('added:initialized', { target: this });
@@ -516,6 +517,12 @@
         //  reject layout requests before initialization layout
         return;
       }
+      var options = isFirstLayout && context.options;
+      var initialTransform = options && {
+        angle: options.angle || 0,
+        skewX: options.skewX || 0,
+        skewY: options.skewY || 0,
+      };
       var center = this.getRelativeCenterPoint();
       var result = this.getLayoutStrategyResult(this.layout, this._objects.concat(), context);
       if (result) {
@@ -526,9 +533,10 @@
         var objectsSetCoords = false;
         //  set dimensions
         this.set({ width: result.width, height: result.height });
-        if (!newCenter.eq(center)) {
+        if (!newCenter.eq(center) || initialTransform) {
           //  set position
           this.setPositionByOrigin(newCenter, 'center', 'center');
+          initialTransform && this.set(initialTransform);
           //  perf: avoid iterating over objects twice by setting coords only on instance
           //  and delegating the task to `_adjustObjectPosition`
           this.callSuper('setCoords');
@@ -541,7 +549,6 @@
         //  clip path as well
         !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
           && this._adjustObjectPosition(this.clipPath, diff, objectsSetCoords);
-        
       }
       else if (isFirstLayout) {
         //  fill `result` with initial values for the layout hook
@@ -551,6 +558,7 @@
           width: this.width,
           height: this.height,
         };
+        initialTransform && this.set(initialTransform);
       }
       else {
         //  no `result` so we return
