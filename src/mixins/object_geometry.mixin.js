@@ -637,7 +637,7 @@
 
     /**
      * calculate rotation matrix of an object
-     * @param {boolean} [absolute] true means angle is measured relative to canvas, false means angle is measured realtive to parent
+     * @param {boolean} [absolute] true means angle is measured relative to canvas, false means angle is measured relative to parent
      * @return {Array} rotation matrix for the object
      */
     _calcRotateMatrix: function (absolute, accountForFlipping) {
