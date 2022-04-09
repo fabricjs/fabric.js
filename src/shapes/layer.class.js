@@ -132,7 +132,7 @@
         this._applyLayoutStrategy({ type: 'group' });
         this.group.on('layout', this.__groupMonitor);
       }
-      else if (target instanceof fabric.Canvas) {
+      else if (target instanceof fabric.StaticCanvas) {
         this._applyLayoutStrategy({ type: 'canvas' });
         this.canvas.on('resize', this.__canvasMonitor);
       }
