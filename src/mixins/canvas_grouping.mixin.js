@@ -13,8 +13,16 @@
      */
     _shouldGroup: function(e, target) {
       var activeObject = this._activeObject;
+      // first 2 lines are the pre-requisites for selecting.
+      // !!activeObject an activeObjectExists and the user is pressing the selectionKey
+      // on top of that the user also has to hit a target that is selectable.
+      // this.selection is the canvas switch to support multi selection.
       return !!activeObject && this._isSelectionKeyPressed(e)
         && !!target && target.selectable && this.selection
+        // if all pre-requisite pass, the target is either something different from the current
+        // activeObject or if an activeSelection already exists
+        // TODO at time of writing why `activeObject.type === 'activeSelection'` matter is unclear.
+        // is a very old condition uncertain if still valid.
         && (activeObject !== target || activeObject.type === 'activeSelection')
         //  make sure `activeObject` and `target` aren't ancestors of each other
         && !target.isDescendantOf(activeObject) && !activeObject.isDescendantOf(target)
