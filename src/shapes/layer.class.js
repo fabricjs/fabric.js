@@ -107,6 +107,48 @@
     },
 
     /**
+     * @override we want instance to fill parent so we disregard transformations
+     * @param {CanvasRenderingContext2D} ctx Context
+     */
+    transform: function (ctx) {
+      var m = this.calcTransformMatrix(!this.needsFullTransform(ctx));
+      ctx.transform(1, 0, 0, 1, m[4], m[5]);
+    },
+
+    /**
+     * @override apply instance's transformations on objects
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    drawObject: function (ctx) {
+      this._renderBackground(ctx);
+      ctx.save();
+      var m = this.calcTransformMatrix(!this.needsFullTransform(ctx));
+      ctx.transform(m[0], m[1], m[2], m[3], 0, 0);
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        this._objects[i].render(ctx);
+      }
+      ctx.restore();
+      this._drawClipPath(ctx, this.clipPath);
+    },
+
+    /**
+     * @private
+     * @override we want instance to fill parent so we disregard transformations
+     * @returns {fabric.Point} dimensions
+     */
+    _getTransformedDimensions: function () {
+      return this.callSuper('_getTransformedDimensions', {
+        scaleX: 1,
+        scaleY: 1,
+        skewX: 0,
+        skewY: 0,
+        width: this.width,
+        height: this.height,
+        strokeWidth: 0
+      });
+    },
+
+    /**
      * we need to invalidate instance's group if objects have changed
      * @override
      * @private
