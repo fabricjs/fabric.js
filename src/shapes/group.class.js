@@ -501,6 +501,12 @@
         //  reject layout requests before initialization layout
         return;
       }
+      var options = isFirstLayout && context.options;
+      var initialTransform = options && {
+        angle: options.angle || 0,
+        skewX: options.skewX || 0,
+        skewY: options.skewY || 0,
+      };
       var center = this.getRelativeCenterPoint();
       var result = this.getLayoutStrategyResult(this.layout, this._objects.concat(), context);
       if (result) {
@@ -517,11 +523,6 @@
         //  clip path as well
         !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
           && this._adjustObjectPosition(this.clipPath, diff);
-        var initialTransform = isFirstLayout && context.options && {
-          angle: context.options.angle || 0,
-          skewX: context.options.skewX || 0,
-          skewY: context.options.skewY || 0,
-        };
         if (!newCenter.eq(center) || initialTransform) {
           //  set position
           this.setPositionByOrigin(newCenter, 'center', 'center');
@@ -537,6 +538,7 @@
           width: this.width,
           height: this.height,
         };
+        initialTransform && this.set(initialTransform);
       }
       else {
         //  no `result` so we return
