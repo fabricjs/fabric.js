@@ -648,7 +648,7 @@
 
     /**
      * calculate the translation matrix for an object transform
-     * @param {boolean} [absolute] true means translation is relative to canvas, false means realtive to parent
+     * @param {boolean} [absolute] true means translation is relative to canvas, false means relative to parent
      * @return {Array} rotation matrix for the object
      */
     _calcTranslateMatrix: function(absolute) {
