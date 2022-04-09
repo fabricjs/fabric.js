@@ -91,7 +91,6 @@
         test: 'fit-content layout',
         code: fitContentLayoutRelative,
         golden: 'group-layout/fit-content.png',
-        newModule: 'Group Layout',
         percentage: 0.06,
         width: 400,
         height: 300
@@ -113,6 +112,44 @@
         test: 'fit-content relayout',
         code: fitContentReLayout,
         golden: 'group-layout/fit-content.png',
+        percentage: 0.06,
+        width: 400,
+        height: 300
+    });
+
+    function fitContentLayoutWithSkewX(canvas, callback) {
+        var g = createGroupForLayoutTests('fit-content layout', {
+            backgroundColor: 'blue',
+            skewX: 45
+        });
+        canvas.add(g);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+
+    tests.push({
+        test: 'fit-content layout',
+        code: fitContentLayoutWithSkewX,
+        golden: 'group-layout/fit-content-skewX.png',
+        percentage: 0.06,
+        width: 400,
+        height: 300
+    });
+
+    function fitContentLayoutWithSkewY(canvas, callback) {
+        var g = createGroupForLayoutTests('fit-content layout', {
+            backgroundColor: 'blue',
+            skewY: 45
+        });
+        canvas.add(g);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+
+    tests.push({
+        test: 'fit-content layout',
+        code: fitContentLayoutWithSkewY,
+        golden: 'group-layout/fit-content-skewY.png',
         percentage: 0.06,
         width: 400,
         height: 300
@@ -214,7 +251,6 @@
         test: 'fit-content layout add object',
         code: fitContentLayoutAdd,
         golden: 'group-layout/fit-content3.png',
-        newModule: 'Group Layout',
         percentage: 0.06,
         width: 400,
         height: 300
