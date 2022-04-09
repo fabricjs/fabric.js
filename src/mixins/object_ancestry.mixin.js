@@ -28,10 +28,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   getAncestors: function (strict) {
     var ancestors = [];
-    var parent = this.group || (!strict ? this.canvas : undefined);
+    var parent = this.group || (strict ? undefined : this.canvas);
     while (parent) {
       ancestors.push(parent);
-      parent = parent.group || (!strict ? parent.canvas : undefined);
+      parent = parent.group || (strict ? undefined : parent.canvas);
     }
     return ancestors;
   },
