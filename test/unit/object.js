@@ -847,7 +847,7 @@
     assert.deepEqual(object.getAncestors(), []);
   });
 
-  QUnit.test('findCommonAncestors', function (assert) {
+  function prepareObjectsForTreeTesting() {
     var Object = fabric.util.createClass(fabric.Object, {
       toJSON: function () {
         return {
@@ -860,9 +860,7 @@
       toString: function () {
         return JSON.stringify(this.toJSON(), null, '\t');
       }
-    })
-    var object = new Object({ id: 'object' });
-    var other = new Object({ id: 'other' });
+    });
     var Collection = fabric.util.createClass(Object, fabric.Collection, {
       initialize: function () {
         this._objects = [];
@@ -870,8 +868,8 @@
       add: function () {
         fabric.Collection.add.call(this, arguments, this._onObjectAdded);
       },
-      insertAt: function (objects, index, nonSplicing) {
-        fabric.Collection.insertAt.call(this, objects, index, nonSplicing, this._onObjectAdded);
+      insertAt: function (objects, index) {
+        fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
       },
       remove: function () {
         fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
@@ -886,9 +884,6 @@
         this.remove.apply(this, this._objects);
       }
     });
-    var a = new Collection({ id: 'a' });
-    var b = new Collection({ id: 'b' });
-    var c = new Collection({ id: 'c' });
     var canvas = fabric.util.object.extend(new Collection({ id: 'canvas' }), {
       _onObjectAdded: function (object) {
         object.canvas = this;
@@ -897,7 +892,17 @@
         delete object.canvas;
       },
     });
-    assert.ok(typeof object.findCommonAncestors === 'function');
+    return {
+      object: new Object({ id: 'object' }),
+      other: new Object({ id: 'other' }),
+      a: new Collection({ id: 'a' }),
+      b: new Collection({ id: 'b' }),
+      c: new Collection({ id: 'c' }),
+      canvas
+    }
+  }
+
+  QUnit.test('findCommonAncestors', function (assert) {
     function findCommonAncestors(object, other, strict, expected, message) {
       assert.deepEqual(
         object.findCommonAncestors(other, strict),
@@ -916,6 +921,8 @@
         `should match opposite check between '${object.id}' and '${other.id}'`
       );
     }
+    var { object, other, a, b, c, canvas } = prepareObjectsForTreeTesting();
+    assert.ok(typeof object.findCommonAncestors === 'function');
     assert.ok(Array.isArray(a._objects));
     assert.ok(a._objects !== b._objects);
     //  same object
@@ -1004,55 +1011,7 @@
   };
 
   QUnit.test('isInFrontOf', function (assert) {
-    var Object = fabric.util.createClass(fabric.Object, {
-      toJSON: function () {
-        return {
-          id: this.id,
-          objects: this._objects?.map(o => o.id),
-          parent: this.parent?.id,
-          canvas: this.canvas?.id
-        }
-      },
-      toString: function () {
-        return JSON.stringify(this.toJSON(), null, '\t');
-      }
-    })
-    var object = new Object({ id: 'object' });
-    var other = new Object({ id: 'other' });
-    var Collection = fabric.util.createClass(Object, fabric.Collection, {
-      initialize: function () {
-        this._objects = [];
-      },
-      add: function () {
-        fabric.Collection.add.call(this, arguments, this._onObjectAdded);
-      },
-      insertAt: function (objects, index) {
-        fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
-      },
-      remove: function () {
-        fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
-      },
-      _onObjectAdded: function (object) {
-        object.group = this;
-      },
-      _onObjectRemoved: function (object) {
-        delete object.group;
-      },
-      removeAll: function () {
-        this.remove.apply(this, this._objects);
-      }
-    });
-    var a = new Collection({ id: 'a' });
-    var b = new Collection({ id: 'b' });
-    var c = new Collection({ id: 'c' });
-    var canvas = fabric.util.object.extend(new Collection({ id: 'canvas' }), {
-      _onObjectAdded: function (object) {
-        object.canvas = this;
-      },
-      _onObjectRemoved: function (object) {
-        delete object.canvas;
-      },
-    });
+    var { object, other, a, b, c, canvas } = prepareObjectsForTreeTesting();
     assert.ok(typeof object.isInFrontOf === 'function');
     assert.ok(Array.isArray(a._objects));
     assert.ok(a._objects !== b._objects);
