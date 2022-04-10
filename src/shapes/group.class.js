@@ -158,10 +158,12 @@
     /**
      * Remove objects
      * @param {...fabric.Object} objects
+     * @returns {fabric.Object[]} removed objects
      */
     remove: function () {
-      fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
-      this._onAfterObjectsChange('removed', Array.from(arguments));
+      var removed = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
+      this._onAfterObjectsChange('removed', removed);
+      return removed;
     },
 
     /**

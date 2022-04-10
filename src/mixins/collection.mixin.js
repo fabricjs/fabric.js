@@ -50,22 +50,21 @@ fabric.Collection = {
    * @private
    * @param {fabric.Object[]} objectsToRemove objects to remove
    * @param {(object:fabric.Object) => any} [callback] function to call for each object removed
-   * @returns {boolean} true if objects were removed
+   * @returns {fabric.Object[]} removed objects
    */
   remove: function(objectsToRemove, callback) {
-    var objects = this._objects,
-        index, somethingRemoved = false;
-
-    for (var i = 0; i < objectsToRemove.length; i++) {
-      index = objects.indexOf(objectsToRemove[i]);
+    var objects = this._objects, index, removed = [];
+    for (var i = 0, object; i < objectsToRemove.length; i++) {
+      object = objectsToRemove[i];
+      index = objects.indexOf(object);
       // only call onObjectRemoved if an object was actually removed
       if (index !== -1) {
-        somethingRemoved = true;
         objects.splice(index, 1);
-        callback && callback.call(this, objectsToRemove[i]);
+        removed.push(object);
+        callback && callback.call(this, object);
       }
     }
-    return somethingRemoved;
+    return removed;
   },
 
   /**
