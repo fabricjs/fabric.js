@@ -100,10 +100,12 @@
         group = new fabric.Group([rect1, rect2, rect3]);
 
     assert.ok(typeof group.remove === 'function');
-    group.remove(rect2);
+    var removed = group.remove(rect2);
+    assert.deepEqual(removed, [rect2], 'should return removed objects');
     assert.deepEqual(group.getObjects(), [rect1, rect3], 'should remove object properly');
 
-    group.remove(rect1, rect3);
+    var removed = group.remove(rect1, rect3);
+    assert.deepEqual(removed, [rect1, rect3], 'should return removed objects');
     assert.equal(group.isEmpty(), true, 'group should be empty');
   });
 
@@ -316,7 +318,8 @@
     assert.ok(initialLeftValue !== firstObject.get('left'));
     assert.ok(initialTopValue !== firstObject.get('top'));
 
-    group.removeAll();
+    var objects = group.getObjects();
+    assert.deepEqual(group.removeAll(), objects, 'should remove all objects');
     assert.equal(firstObject.get('left'), initialLeftValue, 'should restore initial left value');
     assert.equal(firstObject.get('top'), initialTopValue, 'should restore initial top value');
   });
