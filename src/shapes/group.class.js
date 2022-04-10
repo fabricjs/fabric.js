@@ -58,7 +58,7 @@
 
     /**
      * Used to optimize performance
-     * set to `false` if you don't need caontained objects to be target of events
+     * set to `false` if you don't need contained objects to be targets of events
      * @default
      * @type boolean
      */
@@ -66,8 +66,8 @@
 
     /**
      * Used to allow targeting of object inside groups.
-     * set to true if you want to select an object inside a group.
-     * REQUIRES subTargetCheck set to true
+     * set to true if you want to select an object inside a group.\
+     * **REQUIRES** `subTargetCheck` set to true
      * @default
      * @type boolean
      */
