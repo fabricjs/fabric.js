@@ -53,8 +53,8 @@ fabric.Collection = {
    * @returns {fabric.Object[]} removed objects
    */
   remove: function(objectsToRemove, callback) {
-    var objects = this._objects, index, removed = [];
-    for (var i = 0, object; i < objectsToRemove.length; i++) {
+    var objects = this._objects, removed = [];
+    for (var i = 0, object, index; i < objectsToRemove.length; i++) {
       object = objectsToRemove[i];
       index = objects.indexOf(object);
       // only call onObjectRemoved if an object was actually removed
