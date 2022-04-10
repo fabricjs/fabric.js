@@ -172,9 +172,7 @@
      */
     removeAll: function () {
       this._activeObjects = [];
-      var remove = this._objects.slice();
-      this.remove.apply(this, remove);
-      return remove;
+      return this.remove.apply(this, this._objects.slice());
     },
 
     /**
