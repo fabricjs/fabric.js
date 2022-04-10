@@ -87,8 +87,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (this === other) {
       return undefined;
     }
-    var ancestors = this.getAncestors().reverse().concat(this);
-    var otherAncestors = other.getAncestors().reverse().concat(other);
+    var ancestors = this.getAncestors(true).reverse().concat(this);
+    var otherAncestors = other.getAncestors(true).reverse().concat(other);
     var i, j, found = false;
     //  find the common ancestor
     for (i = 0; i < ancestors.length; i++) {
