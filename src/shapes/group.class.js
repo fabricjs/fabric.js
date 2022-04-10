@@ -490,7 +490,7 @@
 
     /**
      * initial layout logic:
-     * calculate bbox of objects (if necessary) and translate it according to options recieved from the constructor (left, top, width, height)
+     * calculate bbox of objects (if necessary) and translate it according to options received from the constructor (left, top, width, height)
      * so it is placed in the center of the bbox received from the constructor
      *
      * @private
