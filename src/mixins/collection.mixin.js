@@ -20,7 +20,7 @@ fabric.Collection = {
   add: function (objects, callback) {
     var size = this._objects.push.apply(this._objects, objects);
     if (callback) {
-      for (var i = 0, length = objects.length; i < length; i++) {
+      for (var i = 0; i < objects.length; i++) {
         callback.call(this, objects[i]);
       }
     }
@@ -39,7 +39,7 @@ fabric.Collection = {
     var args = [index, 0].concat(objects);
     this._objects.splice.apply(this._objects, args);
     if (callback) {
-      for (var i = 2, length = args.length; i < length; i++) {
+      for (var i = 2; i < args.length; i++) {
         callback.call(this, args[i]);
       }
     }
@@ -56,7 +56,7 @@ fabric.Collection = {
     var objects = this._objects,
         index, somethingRemoved = false;
 
-    for (var i = 0, length = objectsToRemove.length; i < length; i++) {
+    for (var i = 0; i < objectsToRemove.length; i++) {
       index = objects.indexOf(objectsToRemove[i]);
       // only call onObjectRemoved if an object was actually removed
       if (index !== -1) {
@@ -82,7 +82,7 @@ fabric.Collection = {
    */
   forEachObject: function(callback, context) {
     var objects = this.getObjects();
-    for (var i = 0, len = objects.length; i < len; i++) {
+    for (var i = 0; i < objects.length; i++) {
       callback.call(context, objects[i], i, objects);
     }
     return this;
