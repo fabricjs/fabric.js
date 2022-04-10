@@ -227,7 +227,7 @@
      * @returns
      */
     canEnter: function (object) {
-      if (object === this) {
+      if (object === this || this.isDescendantOf(object)) {
         /* _DEV_MODE_START_ */
         console.warn('fabric.Group: trying to add group to itself, this call has no effect');
         /* _DEV_MODE_END_ */
