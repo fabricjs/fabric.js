@@ -405,6 +405,7 @@
       }
       this._initRetinaScaling();
       this.calcOffset();
+      this.fire('resize', dimensions);
 
       if (!options.cssOnly) {
         this.requestRenderAll();
