@@ -6,7 +6,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @chainable
    */
   sendToBack: function () {
-    var parent = this.group || this.canvas;
+    var parent = this.__owningGroup || this.group || this.canvas;
     parent && parent.sendToBack(this);
     return this;
   },
@@ -17,7 +17,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @chainable
    */
   bringToFront: function() {
-    var parent = this.group || this.canvas;
+    var parent = this.__owningGroup || this.group || this.canvas;
     parent && parent.bringToFront(this);
     return this;
   },
@@ -29,7 +29,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @chainable
    */
   sendBackwards: function(intersecting) {
-    var parent = this.group || this.canvas;
+    var parent = this.__owningGroup || this.group || this.canvas;
     parent && parent.sendBackwards(this, intersecting);
     return this;
   },
@@ -41,7 +41,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @chainable
    */
   bringForward: function(intersecting) {
-    var parent = this.group || this.canvas;
+    var parent = this.__owningGroup || this.group || this.canvas;
     parent && parent.bringForward(this, intersecting);
     return this;
   },
@@ -53,7 +53,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @chainable
    */
   moveTo: function(index) {
-    var parent = this.group || this.canvas;
+    var parent = this.__owningGroup || this.group || this.canvas;
     parent && parent.moveTo(this, index);
     return this;
   }
