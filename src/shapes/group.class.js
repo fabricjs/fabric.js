@@ -848,6 +848,60 @@
       }, this);
     },
 
+    /**
+     * Moves an object or the objects of a multiple selection
+     * to the bottom of the stack of drawn objects
+     * @param {fabric.Object} object Object to send to back
+     */
+    sendToBack: function (object) {
+      this.callSuper('sendToBack', object) && this._set('dirty', true);
+    },
+
+    /**
+     * Moves an object or the objects of a multiple selection
+     * to the top of the stack of drawn objects
+     * @param {fabric.Object} object Object to send
+     */
+    bringToFront: function (object) {
+      this.callSuper('bringToFront', object) && this._set('dirty', true);
+    },
+
+    /**
+     * Moves an object or a selection down in stack of drawn objects
+     * An optional parameter, `intersecting` allows to move the object in behind
+     * the first intersecting object. Where intersection is calculated with
+     * bounding box. If no intersection is found, there will not be change in the
+     * stack.
+     * @param {fabric.Object} object Object to send
+     * @param {boolean} [intersecting] If `true`, send object behind next lower intersecting object
+     */
+    sendBackwards: function (object, intersecting) {
+      this.callSuper('sendBackwards', object, intersecting) && this._set('dirty', true);
+    },
+
+    /**
+     * Moves an object or a selection up in stack of drawn objects
+     * An optional parameter, intersecting allows to move the object in front
+     * of the first intersecting object. Where intersection is calculated with
+     * bounding box. If no intersection is found, there will not be change in the
+     * stack.
+     * @param {fabric.Object} object Object to send
+     * @param {boolean} [intersecting] If `true`, send object in front of next upper intersecting object
+     */
+    bringForward: function (object, intersecting) {
+      this.callSuper('bringForward', object, intersecting) && this._set('dirty', true);
+    },
+
+    /**
+     * Moves an object to specified level in stack of drawn objects
+     * @param {fabric.Object} object Object to send
+     * @param {number} index Position to move to
+     */
+    moveTo: function (object, index) {
+      this.callSuper('moveTo', object, index);
+      this._set('dirty', true);
+    },
+
     /* _TO_SVG_START_ */
 
     /**

@@ -160,31 +160,34 @@ fabric.Collection = {
     }, 0);
   },
 
-
   /**
    * Moves an object or the objects of a multiple selection
    * to the bottom of the stack of drawn objects
    * @param {fabric.Object} object Object to send to back
+   * @returns {boolean} true if change occured
    */
   sendToBack: function (object) {
     if (!object) {
-      return;
+      return false;
     }
     removeFromArray(this._objects, object);
     this._objects.unshift(object);
+    return true;
   },
 
   /**
    * Moves an object or the objects of a multiple selection
    * to the top of the stack of drawn objects
    * @param {fabric.Object} object Object to send
+   * @returns {boolean} true if change occured
    */
   bringToFront: function (object) {
     if (!object) {
-      return;
+      return false;
     }
     removeFromArray(this._objects, object);
     this._objects.push(object);
+    return true;
   },
 
   /**
@@ -194,11 +197,12 @@ fabric.Collection = {
    * bounding box. If no intersection is found, there will not be change in the
    * stack.
    * @param {fabric.Object} object Object to send
-   * @param {Boolean} [intersecting] If `true`, send object behind next lower intersecting object
+   * @param {boolean} [intersecting] If `true`, send object behind next lower intersecting object
+   * @returns {boolean} true if change occured
    */
   sendBackwards: function (object, intersecting) {
     if (!object) {
-      return this;
+      return false;
     }
     var idx = this._objects.indexOf(object);
     if (idx !== 0) {
@@ -206,7 +210,9 @@ fabric.Collection = {
       var newIdx = this._findNewLowerIndex(object, idx, intersecting);
       removeFromArray(this._objects, object);
       this._objects.splice(newIdx, 0, object);
+      return true;
     }
+    return false;
   },
 
   /**
@@ -216,13 +222,12 @@ fabric.Collection = {
    * bounding box. If no intersection is found, there will not be change in the
    * stack.
    * @param {fabric.Object} object Object to send
-   * @param {Boolean} [intersecting] If `true`, send object in front of next upper intersecting object
-   * @return {fabric.Canvas} thisArg
-   * @chainable
+   * @param {boolean} [intersecting] If `true`, send object in front of next upper intersecting object
+   * @returns {boolean} true if change occured
    */
   bringForward: function (object, intersecting) {
     if (!object) {
-      return this;
+      return false;
     }
     var idx = this._objects.indexOf(object);
     if (idx !== this._objects.length - 1) {
@@ -230,15 +235,15 @@ fabric.Collection = {
       var newIdx = this._findNewUpperIndex(object, idx, intersecting);
       removeFromArray(this._objects, object);
       this._objects.splice(newIdx, 0, object);
+      return true;
     }
+    return false;
   },
 
   /**
    * Moves an object to specified level in stack of drawn objects
    * @param {fabric.Object} object Object to send
-   * @param {Number} index Position to move to
-   * @return {fabric.Canvas} thisArg
-   * @chainable
+   * @param {number} index Position to move to
    */
   moveTo: function (object, index) {
     removeFromArray(this._objects, object);
