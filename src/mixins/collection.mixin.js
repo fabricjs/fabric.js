@@ -165,7 +165,7 @@ fabric.Collection = {
    * @param {fabric.Object} object Object to send to back
    * @returns {boolean} true if change occured
    */
-  sendToBack: function (object) {
+  sendObjectToBack: function (object) {
     if (!object) {
       return false;
     }
@@ -180,7 +180,7 @@ fabric.Collection = {
    * @param {fabric.Object} object Object to send
    * @returns {boolean} true if change occured
    */
-  bringToFront: function (object) {
+  bringObjectToFront: function (object) {
     if (!object) {
       return false;
     }
@@ -199,7 +199,7 @@ fabric.Collection = {
    * @param {boolean} [intersecting] If `true`, send object behind next lower intersecting object
    * @returns {boolean} true if change occured
    */
-  sendBackwards: function (object, intersecting) {
+  sendObjectBackwards: function (object, intersecting) {
     if (!object) {
       return false;
     }
@@ -224,7 +224,7 @@ fabric.Collection = {
    * @param {boolean} [intersecting] If `true`, send object in front of next upper intersecting object
    * @returns {boolean} true if change occured
    */
-  bringForward: function (object, intersecting) {
+  bringObjectForward: function (object, intersecting) {
     if (!object) {
       return false;
     }
@@ -244,7 +244,7 @@ fabric.Collection = {
    * @param {fabric.Object} object Object to send
    * @param {number} index Position to move to
    */
-  moveTo: function (object, index) {
+  moveObjectTo: function (object, index) {
     removeFromArray(this._objects, object);
     this._objects.splice(index, 0, object);
   },

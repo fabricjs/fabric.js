@@ -853,8 +853,8 @@
      * to the bottom of the stack of drawn objects
      * @param {fabric.Object} object Object to send to back
      */
-    sendToBack: function (object) {
-      fabric.Collection.sendToBack.call(this, object) && this._set('dirty', true);
+    sendObjectToBack: function (object) {
+      fabric.Collection.sendObjectToBack.call(this, object) && this._set('dirty', true);
     },
 
     /**
@@ -862,8 +862,8 @@
      * to the top of the stack of drawn objects
      * @param {fabric.Object} object Object to send
      */
-    bringToFront: function (object) {
-      fabric.Collection.bringToFront.call(this, object) && this._set('dirty', true);
+    bringObjectToFront: function (object) {
+      fabric.Collection.bringObjectToFront.call(this, object) && this._set('dirty', true);
     },
 
     /**
@@ -875,8 +875,8 @@
      * @param {fabric.Object} object Object to send
      * @param {boolean} [intersecting] If `true`, send object behind next lower intersecting object
      */
-    sendBackwards: function (object, intersecting) {
-      fabric.Collection.sendBackwards.call(this, object, intersecting) && this._set('dirty', true);
+    sendObjectBackwards: function (object, intersecting) {
+      fabric.Collection.sendObjectBackwards.call(this, object, intersecting) && this._set('dirty', true);
     },
 
     /**
@@ -888,8 +888,8 @@
      * @param {fabric.Object} object Object to send
      * @param {boolean} [intersecting] If `true`, send object in front of next upper intersecting object
      */
-    bringForward: function (object, intersecting) {
-      fabric.Collection.bringForward.call(this, object, intersecting) && this._set('dirty', true);
+    bringObjectForward: function (object, intersecting) {
+      fabric.Collection.bringObjectForward.call(this, object, intersecting) && this._set('dirty', true);
     },
 
     /**
@@ -897,8 +897,8 @@
      * @param {fabric.Object} object Object to send
      * @param {number} index Position to move to
      */
-    moveTo: function (object, index) {
-      fabric.Collection.moveTo.call(this, object, index);
+    moveObjectTo: function (object, index) {
+      fabric.Collection.moveObjectTo.call(this, object, index);
       this._set('dirty', true);
     },
 
