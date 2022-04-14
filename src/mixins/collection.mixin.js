@@ -1,3 +1,5 @@
+var removeFromArray = fabric.util.removeFromArray;
+
 /**
  * @namespace fabric.Collection
  */
@@ -156,5 +158,149 @@ fabric.Collection = {
       memo += current.complexity ? current.complexity() : 0;
       return memo;
     }, 0);
-  }
+  },
+
+
+  /**
+   * Moves an object or the objects of a multiple selection
+   * to the bottom of the stack of drawn objects
+   * @param {fabric.Object} object Object to send to back
+   */
+  sendToBack: function (object) {
+    if (!object) {
+      return;
+    }
+    removeFromArray(this._objects, object);
+    this._objects.unshift(object);
+  },
+
+  /**
+   * Moves an object or the objects of a multiple selection
+   * to the top of the stack of drawn objects
+   * @param {fabric.Object} object Object to send
+   */
+  bringToFront: function (object) {
+    if (!object) {
+      return;
+    }
+    removeFromArray(this._objects, object);
+    this._objects.push(object);
+  },
+
+  /**
+   * Moves an object or a selection down in stack of drawn objects
+   * An optional parameter, `intersecting` allows to move the object in behind
+   * the first intersecting object. Where intersection is calculated with
+   * bounding box. If no intersection is found, there will not be change in the
+   * stack.
+   * @param {fabric.Object} object Object to send
+   * @param {Boolean} [intersecting] If `true`, send object behind next lower intersecting object
+   */
+  sendBackwards: function (object, intersecting) {
+    if (!object) {
+      return this;
+    }
+    var idx = this._objects.indexOf(object);
+    if (idx !== 0) {
+      // if object is not on the bottom of stack
+      var newIdx = this._findNewLowerIndex(object, idx, intersecting);
+      removeFromArray(this._objects, object);
+      this._objects.splice(newIdx, 0, object);
+    }
+  },
+
+  /**
+   * Moves an object or a selection up in stack of drawn objects
+   * An optional parameter, intersecting allows to move the object in front
+   * of the first intersecting object. Where intersection is calculated with
+   * bounding box. If no intersection is found, there will not be change in the
+   * stack.
+   * @param {fabric.Object} object Object to send
+   * @param {Boolean} [intersecting] If `true`, send object in front of next upper intersecting object
+   * @return {fabric.Canvas} thisArg
+   * @chainable
+   */
+  bringForward: function (object, intersecting) {
+    if (!object) {
+      return this;
+    }
+    var idx = this._objects.indexOf(object);
+    if (idx !== this._objects.length - 1) {
+      // if object is not on top of stack (last item in an array)
+      var newIdx = this._findNewUpperIndex(object, idx, intersecting);
+      removeFromArray(this._objects, object);
+      this._objects.splice(newIdx, 0, object);
+    }
+  },
+
+  /**
+   * Moves an object to specified level in stack of drawn objects
+   * @param {fabric.Object} object Object to send
+   * @param {Number} index Position to move to
+   * @return {fabric.Canvas} thisArg
+   * @chainable
+   */
+  moveTo: function (object, index) {
+    removeFromArray(this._objects, object);
+    this._objects.splice(index, 0, object);
+  },
+
+  /**
+   * @private
+   */
+  _findNewLowerIndex: function (object, idx, intersecting) {
+    var newIdx, i;
+
+    if (intersecting) {
+      newIdx = idx;
+
+      // traverse down the stack looking for the nearest intersecting object
+      for (i = idx - 1; i >= 0; --i) {
+
+        var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
+          object.isContainedWithinObject(this._objects[i]) ||
+          this._objects[i].isContainedWithinObject(object);
+
+        if (isIntersecting) {
+          newIdx = i;
+          break;
+        }
+      }
+    }
+    else {
+      newIdx = idx - 1;
+    }
+
+    return newIdx;
+  },
+
+  /**
+   * @private
+   */
+  _findNewUpperIndex: function (object, idx, intersecting) {
+    var newIdx, i, len;
+
+    if (intersecting) {
+      newIdx = idx;
+
+      // traverse up the stack looking for the nearest intersecting object
+      for (i = idx + 1, len = this._objects.length; i < len; ++i) {
+
+        var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
+          object.isContainedWithinObject(this._objects[i]) ||
+          this._objects[i].isContainedWithinObject(object);
+
+        if (isIntersecting) {
+          newIdx = i;
+          break;
+        }
+      }
+    }
+    else {
+      newIdx = idx + 1;
+    }
+
+    return newIdx;
+  },
+
 };
