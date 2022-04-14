@@ -11,8 +11,7 @@ fabric.Collection = {
   _objects: [],
 
   /**
-   * Adds objects to collection, Canvas or Group, then renders canvas
-   * (if `renderOnAddRemove` is not `false`).
+   * Adds objects to collection, Canvas or Group
    * Objects should be instances of (or inherit from) fabric.Object
    * @private
    * @param {fabric.Object[]} objects to add
@@ -30,7 +29,7 @@ fabric.Collection = {
   },
 
   /**
-   * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
+   * Inserts an object into collection at specified index
    * An object should be an instance of (or inherit from) fabric.Object
    * @private
    * @param {fabric.Object|fabric.Object[]} objects Object(s) to insert
@@ -48,13 +47,13 @@ fabric.Collection = {
   },
 
   /**
-   * Removes objects from a collection, then renders canvas (if `renderOnAddRemove` is not `false`)
+   * Removes objects from a collection
    * @private
    * @param {fabric.Object[]} objectsToRemove objects to remove
    * @param {(object:fabric.Object) => any} [callback] function to call for each object removed
    * @returns {boolean} true if objects were removed
    */
-  remove: function(objectsToRemove, callback) {
+  remove: function (objectsToRemove, callback) {
     var objects = this._objects,
         index, somethingRemoved = false;
 
@@ -72,7 +71,7 @@ fabric.Collection = {
 
   /**
    * Executes given function for each object in this group
-   * @param {Function} callback
+   * @param {(object: fabric.Object, index: number, collection: fabric.Object[]) => any} callback
    *                   Callback invoked with current object as first argument,
    *                   index - as second and an array of all objects - as third.
    *                   Callback is invoked in a context of Global Object (e.g. `window`)
@@ -82,7 +81,7 @@ fabric.Collection = {
    * @return {Self} thisArg
    * @chainable
    */
-  forEachObject: function(callback, context) {
+  forEachObject: function (callback, context) {
     var objects = this.getObjects();
     for (var i = 0, len = objects.length; i < len; i++) {
       callback.call(context, objects[i], i, objects);
@@ -95,7 +94,7 @@ fabric.Collection = {
    * @param {...String} [types] When specified, only objects of these types are returned
    * @return {Array}
    */
-  getObjects: function() {
+  getObjects: function () {
     if (arguments.length === 0) {
       return this._objects.concat();
     }
@@ -126,7 +125,7 @@ fabric.Collection = {
    * Returns a size of a collection (i.e: length of an array containing its objects)
    * @return {Number} Collection size
    */
-  size: function() {
+  size: function () {
     return this._objects.length;
   },
 
