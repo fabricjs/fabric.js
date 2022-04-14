@@ -1399,7 +1399,7 @@
         }
       }
       else {
-        this.callSuper('sendToBack', object);
+        fabric.Collection.sendToBack.call(this, object);
       }
       this.renderOnAddRemove && this.requestRenderAll();
       return this;
@@ -1427,7 +1427,7 @@
         }
       }
       else {
-        this.callSuper('bringToFront', object);
+        fabric.Collection.bringToFront.call(this, object);
       }
       this.renderOnAddRemove && this.requestRenderAll();
       return this;
@@ -1465,7 +1465,7 @@
         }
       }
       else {
-        this.callSuper('sendBackwards', object, intersecting);
+        fabric.Collection.sendBackwards.call(this, object, intersecting);
       }
       this.renderOnAddRemove && this.requestRenderAll();
       return this;
@@ -1503,7 +1503,7 @@
         }
       }
       else {
-        this.callSuper('bringForward', object, intersecting);
+        fabric.Collection.bringForward.call(this, object, intersecting);
       }
       this.renderOnAddRemove && this.requestRenderAll();
       return this;
@@ -1517,7 +1517,7 @@
      * @chainable
      */
     moveTo: function (object, index) {
-      this.callSuper('moveTo', object, index);
+      fabric.Collection.moveTo.call(this, object, index);
       return this.renderOnAddRemove && this.requestRenderAll();
     },
 

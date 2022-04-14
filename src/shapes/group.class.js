@@ -854,7 +854,7 @@
      * @param {fabric.Object} object Object to send to back
      */
     sendToBack: function (object) {
-      this.callSuper('sendToBack', object) && this._set('dirty', true);
+      fabric.Collection.sendToBack.call(this, object) && this._set('dirty', true);
     },
 
     /**
@@ -863,7 +863,7 @@
      * @param {fabric.Object} object Object to send
      */
     bringToFront: function (object) {
-      this.callSuper('bringToFront', object) && this._set('dirty', true);
+      fabric.Collection.bringToFront.call(this, object) && this._set('dirty', true);
     },
 
     /**
@@ -876,7 +876,7 @@
      * @param {boolean} [intersecting] If `true`, send object behind next lower intersecting object
      */
     sendBackwards: function (object, intersecting) {
-      this.callSuper('sendBackwards', object, intersecting) && this._set('dirty', true);
+      fabric.Collection.sendBackwards.call(this, object, intersecting) && this._set('dirty', true);
     },
 
     /**
@@ -889,7 +889,7 @@
      * @param {boolean} [intersecting] If `true`, send object in front of next upper intersecting object
      */
     bringForward: function (object, intersecting) {
-      this.callSuper('bringForward', object, intersecting) && this._set('dirty', true);
+      fabric.Collection.bringForward.call(this, object, intersecting) && this._set('dirty', true);
     },
 
     /**
@@ -898,7 +898,7 @@
      * @param {number} index Position to move to
      */
     moveTo: function (object, index) {
-      this.callSuper('moveTo', object, index);
+      fabric.Collection.moveTo.call(this, object, index);
       this._set('dirty', true);
     },
 
