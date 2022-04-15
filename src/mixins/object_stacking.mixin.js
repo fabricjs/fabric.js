@@ -6,7 +6,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   _getStackManager: function () {
     //  current logic is strange
-    //  if an object is selected as part of an ActiveSelection, acting with it's stack methods changes it's z-index in the origin parent
+    //  if an object is part of an ActiveSelection, acting with it's stack methods changes it's z-index in the origin parent
     return this.__owningGroup || (!!this.group && this.group.type !== 'activeSelection' && this.group) || this.canvas;
   },
 
