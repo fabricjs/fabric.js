@@ -166,7 +166,7 @@ fabric.Collection = {
    * @returns {boolean} true if change occured
    */
   sendObjectToBack: function (object) {
-    if (!object) {
+    if (!object || object === this._objects[0]) {
       return false;
     }
     removeFromArray(this._objects, object);
@@ -181,7 +181,7 @@ fabric.Collection = {
    * @returns {boolean} true if change occured
    */
   bringObjectToFront: function (object) {
-    if (!object) {
+    if (!object || object === this._objects[this._objects.length - 1]) {
       return false;
     }
     removeFromArray(this._objects, object);
@@ -243,10 +243,15 @@ fabric.Collection = {
    * Moves an object to specified level in stack of drawn objects
    * @param {fabric.Object} object Object to send
    * @param {number} index Position to move to
+   * @returns {boolean} true if change occured
    */
   moveObjectTo: function (object, index) {
+    if (object === this._objects[index]) {
+      return false;
+    }
     removeFromArray(this._objects, object);
     this._objects.splice(index, 0, object);
+    return true;
   },
 
   /**

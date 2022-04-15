@@ -898,8 +898,7 @@
      * @param {number} index Position to move to
      */
     moveObjectTo: function (object, index) {
-      fabric.Collection.moveObjectTo.call(this, object, index);
-      this._set('dirty', true);
+      fabric.Collection.moveObjectTo.call(this, object, index) && this._set('dirty', true);
     },
 
     /* _TO_SVG_START_ */
