@@ -1384,7 +1384,7 @@
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    sendToBack: function (object) {
+    sendObjectToBack: function (object) {
       if (!object) {
         return this;
       }
@@ -1412,7 +1412,7 @@
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    bringToFront: function (object) {
+    bringObjectToFront: function (object) {
       if (!object) {
         return this;
       }
@@ -1444,7 +1444,7 @@
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    sendBackwards: function (object, intersecting) {
+    sendObjectBackwards: function (object, intersecting) {
       if (!object) {
         return this;
       }
@@ -1482,7 +1482,7 @@
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    bringForward: function (object, intersecting) {
+    bringObjectForward: function (object, intersecting) {
       if (!object) {
         return this;
       }
@@ -1516,7 +1516,7 @@
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    moveTo: function (object, index) {
+    moveObjectTo: function (object, index) {
       fabric.Collection.moveObjectTo.call(this, object, index);
       return this.renderOnAddRemove && this.requestRenderAll();
     },
