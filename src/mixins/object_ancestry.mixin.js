@@ -22,18 +22,32 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   },
 
   /**
+   * Returns intance's ancestor **EXCLUDING** `ActiveSelection`
+   * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
+   * @returns {fabric.Object | fabric.StaticCanvas | undefined}
+   */
+  getAncestor: function (strict) {
+    return (
+      this.group && this.group.type === 'activeSelection' ?
+        this.__owningGroup :
+        this.group
+    ) || (strict ? undefined : this.canvas);
+  },
+
+  /**
    *
    * @typedef {fabric.Object[] | [...fabric.Object[], fabric.StaticCanvas]} Ancestors
    * 
+   * Returns an array of ancestors **EXCLUDING** `ActiveSelection`
    * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
    * @returns {Ancestors} ancestors from bottom to top
    */
   getAncestors: function (strict) {
     var ancestors = [];
-    var parent = this.group || (strict ? undefined : this.canvas);
+    var parent = this.getAncestor(strict);
     while (parent) {
       ancestors.push(parent);
-      parent = parent.group || (strict ? undefined : parent.canvas);
+      parent = parent.getAncestor && parent.getAncestor(strict);
     }
     return ancestors;
   },
