@@ -1,22 +1,12 @@
 fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
   /**
-   * @private
-   * @returns {fabric.Group | fabric.Canvas}
-   */
-  _getStackManager: function () {
-    //  current logic is strange
-    //  if an object is part of an ActiveSelection, acting with it's stack methods changes it's z-index in the origin parent
-    return this.__owningGroup || (!!this.group && this.group.type !== 'activeSelection' && this.group) || this.canvas;
-  },
-
-  /**
    * Moves an object to the bottom of the stack of drawn objects
    * @return {fabric.Object} thisArg
    * @chainable
    */
   sendToBack: function () {
-    var parent = this._getStackManager();
+    var parent = this.getParent();
     parent && parent.sendObjectToBack(this);
     return this;
   },
@@ -27,7 +17,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @chainable
    */
   bringToFront: function() {
-    var parent = this._getStackManager();
+    var parent = this.getParent();
     parent && parent.bringObjectToFront(this);
     return this;
   },
@@ -39,7 +29,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @chainable
    */
   sendBackwards: function(intersecting) {
-    var parent = this._getStackManager();
+    var parent = this.getParent();
     parent && parent.sendObjectBackwards(this, intersecting);
     return this;
   },
@@ -51,7 +41,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @chainable
    */
   bringForward: function(intersecting) {
-    var parent = this._getStackManager();
+    var parent = this.getParent();
     parent && parent.bringObjectForward(this, intersecting);
     return this;
   },
@@ -63,7 +53,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @chainable
    */
   moveTo: function(index) {
-    var parent = this._getStackManager();
+    var parent = this.getParent();
     parent && parent.moveObjectTo(this, index);
     return this;
   }
