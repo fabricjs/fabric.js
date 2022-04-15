@@ -26,7 +26,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
    * @returns {fabric.Object | fabric.StaticCanvas | undefined}
    */
-  getAncestor: function (strict) {
+  getParent: function (strict) {
     return (
       this.group && this.group.type === 'activeSelection' ?
         this.__owningGroup :
@@ -44,10 +44,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    */
   getAncestors: function (strict) {
     var ancestors = [];
-    var parent = this.getAncestor(strict);
+    var parent = this.getParent(strict);
     while (parent) {
       ancestors.push(parent);
-      parent = parent.getAncestor && parent.getAncestor(strict);
+      parent = parent.getParent && parent.getParent(strict);
     }
     return ancestors;
   },
