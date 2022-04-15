@@ -101,6 +101,7 @@
      * @param {fabric.Object[]} targets
      */
     _onAfterObjectsChange: function (type, targets) {
+      this.callSuper('_onAfterObjectsChange', type, targets);
       var groups = [];
       targets.forEach(function (object) {
         object.group && !groups.includes(object.group) && groups.push(object.group);
