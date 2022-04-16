@@ -841,7 +841,7 @@
     parent.canvas = canvas;
     assert.equal(parent.getParent(), canvas);
     parent.group = activeSelection;
-    assert.equal(parent.getParent(), canvas, 'should not cosider active selection as parent');
+    assert.equal(parent.getParent(), canvas, 'should not consider active selection as parent');
   });
 
   QUnit.test('getAncestors', function (assert) {
