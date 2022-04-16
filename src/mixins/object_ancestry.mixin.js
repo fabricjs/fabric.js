@@ -22,8 +22,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   },
 
   /**
-   * Returns intance's ancestor **EXCLUDING** `ActiveSelection`
-   * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
+   * Returns instance's parent **EXCLUDING** `ActiveSelection`
+   * @param {boolean} [strict] exclude canvas as well
    * @returns {fabric.Object | fabric.StaticCanvas | undefined}
    */
   getParent: function (strict) {
@@ -39,7 +39,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @typedef {fabric.Object[] | [...fabric.Object[], fabric.StaticCanvas]} Ancestors
    * 
    * Returns an array of ancestors **EXCLUDING** `ActiveSelection`
-   * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
+   * @param {boolean} [strict] returns only ancestors that are objects excluding canvas
    * @returns {Ancestors} ancestors from bottom to top
    */
   getAncestors: function (strict) {
@@ -55,7 +55,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   /**
    *
    * @param {fabric.Object} other
-   * @param {boolean} [strict] finds only ancestors that are objects (without canvas)
+   * @param {boolean} [strict] finds only ancestors that are objects excluding canvas
    * @returns {{ index: number, otherIndex: number, ancestors: Ancestors } | undefined} ancestors may include the passed objects if one is an ancestor of the other resulting in index of -1
    */
   findCommonAncestors: function (other, strict) {
@@ -90,7 +90,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   /**
    *
    * @param {fabric.Object} other
-   * @param {boolean} [strict] checks only ancestors that are objects (without canvas)
+   * @param {boolean} [strict] checks only ancestors that are objects excluding canvas
    * @returns {boolean}
    */
   hasCommonAncestors: function (other, strict) {
