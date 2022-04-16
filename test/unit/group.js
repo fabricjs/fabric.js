@@ -561,6 +561,7 @@
       group = new fabric.Group(),
       control = [],
       fired = [],
+      firedOnGroup = [],
       firingControl = [];
 
     group.add(rect1, rect2);
@@ -573,6 +574,7 @@
       assert.deepEqual(group.getObjects(), control, 'should equal control array ' + description);
       assert.deepEqual(fired.map(o => o.id), firingControl.map(o => o.id), 'fired events should equal control array ' + description);
       assert.deepEqual(fired, firingControl, 'fired events should equal control array ' + description);
+      assert.deepEqual(firedOnGroup, firingControl, 'fired events should equal control array ' + description);
     }
 
     assert.ok(typeof group._onObjectAdded === 'function', 'has a standard _onObjectAdded method');
@@ -581,6 +583,9 @@
         assert.equal(e.target, group);
         fired.push(obj);
       });
+    });
+    group.on('object:added', (e) => {
+      firedOnGroup.push(e.target);
     });
 
     group.insertAt(rect3, 1);
@@ -726,12 +731,22 @@
   });
 
   QUnit.test('group remove', function(assert) {
-    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        group = new fabric.Group([rect1, rect2]);
+    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
+        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
+        group = new fabric.Group([rect1, rect2]),
+        fired = [];
 
     var coords = group.oCoords;
+    group.on('object:removed', (e) => {
+      assert.equal(e.target, rect2);
+      fired.push(group);
+    });
+    rect2.on('removed', (e) => {
+      assert.equal(e.target, group);
+      fired.push(rect2);
+    });
     group.remove(rect2);
+    assert.deepEqual(fired, [group, rect2], 'should fire removed in correct order');
     var newCoords = group.oCoords;
     assert.notEqual(coords, newCoords, 'object coords have been recalculated - remove');
   });
