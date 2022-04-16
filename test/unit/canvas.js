@@ -453,7 +453,7 @@
     assert.equal(selection.getObjects().indexOf(rect2), 1, 'rect2 is the second object in the active selection');
   });
 
-  QUnit.test.only('update active selection respects order of objects', function (assert) {
+  QUnit.test('update active selection respects order of objects', function (assert) {
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     var rect3 = new fabric.Rect();
@@ -493,7 +493,7 @@
     assertNestedObjectsInOrder([rect1, rect2], rect3);
     assertNestedObjectsInOrder([rect1, rect3], rect2);
     assertNestedObjectsInOrder([rect2, rect3], rect1);
-    
+
     canvas.remove(rect1);
     group.insertAt(rect1, 0);
     group.remove(rect3);
