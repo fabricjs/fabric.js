@@ -423,7 +423,8 @@
     _chooseObjectsToRender: function() {
       var activeObjects = this.getActiveObjects(),
           object, objsToRender, activeGroupObjects;
-
+          
+      return this._objects;
       if (!this.preserveObjectStacking && activeObjects.length > 1) {
         objsToRender = [];
         activeGroupObjects = [];
@@ -874,7 +875,10 @@
         if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
           target = objects[i];
           if (target.subTargetCheck && Array.isArray(target._objects)) {
-            subTarget = this._searchPossibleTargets(target._objects, pointer);
+            var objects = target.clipPath ?
+              [target.clipPath].concat(target._objects) :
+              target._objects;
+            subTarget = this._searchPossibleTargets(objects, pointer);
             subTarget && this.targets.push(subTarget);
           }
           break;
