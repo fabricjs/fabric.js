@@ -829,6 +829,21 @@
     assert.ok(object.isDescendantOf(object) === false);
   });
 
+  QUnit.test('getParent', function (assert) {
+    var object = new fabric.Object();
+    var parent = new fabric.Object();
+    var activeSelection = new fabric.Object({ type: 'activeSelection' });
+    assert.ok(typeof object.getParent === 'function');
+    assert.equal(object.getParent(), undefined);
+    object.group = parent;
+    object.canvas = canvas;
+    assert.equal(object.getParent(), parent);
+    parent.canvas = canvas;
+    assert.equal(parent.getParent(), canvas);
+    parent.group = activeSelection;
+    assert.equal(parent.getParent(), canvas, 'should not cosider active selection as parent');
+  });
+
   QUnit.test('getAncestors', function (assert) {
     var object = new fabric.Object();
     var parent = new fabric.Object();
