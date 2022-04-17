@@ -64,13 +64,39 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
 
   limitedToCanvasSize: false,
 
+  initialize: function (layer) {
+    this.layer = layer;
+    this.canvas = this.layer.canvas;
+    var ctx = this.getContext();
+    ctx.save();
+    ctx.translate(-this.layer.width / 2, -this.layer.height / 2);
+  },
+
+  _isMainEvent: function (e) {
+    return this.canvas._isMainEvent(e);
+  },
+
+  getContext: function () {
+    if (!this.layer._cacheCanvas || !this.layer._cacheContext) {
+      this.layer._createCacheCanvas();
+    }
+    return this.layer._cacheContext;
+  },
+
+  resetContext: function () {
+    var canvas = this.layer._cacheCanvas, ctx = this.layer._cacheContext;
+    //console.log('reset')
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  },
 
   /**
    * Sets brush styles
    * @private
    * @param {CanvasRenderingContext2D} ctx
    */
-  _setBrushStyles: function (ctx) {
+  _setBrushStyles: function () {
+    ctx = this.getContext();
     ctx.strokeStyle = this.color;
     ctx.lineWidth = this.width;
     ctx.lineCap = this.strokeLineCap;
@@ -86,8 +112,11 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    */
   _saveAndTransform: function(ctx) {
     var v = this.canvas.viewportTransform;
+
+    this.layer._updateCacheCanvas();
     ctx.save();
-    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+    //ctx.translate(-this.layer.width / 2, -this.layer.height / 2);
+   // ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
   },
 
   /**

@@ -34,8 +34,8 @@
      * @param {fabric.Canvas} canvas
      * @return {fabric.PencilBrush} Instance of a pencil brush
      */
-    initialize: function(canvas) {
-      this.canvas = canvas;
+    initialize: function(layer) {
+      this.callSuper('initialize', layer);
       this._points = [];
     },
 
@@ -58,7 +58,7 @@
      * @param {Object} pointer
      */
     onMouseDown: function(pointer, options) {
-      if (!this.canvas._isMainEvent(options.e)) {
+      if (!this._isMainEvent(options.e)) {
         return;
       }
       this.drawStraightLine = options.e[this.straightLineKey];
@@ -74,7 +74,7 @@
      * @param {Object} pointer
      */
     onMouseMove: function(pointer, options) {
-      if (!this.canvas._isMainEvent(options.e)) {
+      if (!this._isMainEvent(options.e)) {
         return;
       }
       this.drawStraightLine = options.e[this.straightLineKey];
@@ -85,11 +85,11 @@
         if (this.needsFullRender()) {
           // redraw curve
           // clear top canvas
-          this.canvas.clearContext(this.canvas.contextTop);
+          this.getContext().reset();
           this._render();
         }
         else {
-          var points = this._points, length = points.length, ctx = this.canvas.contextTop;
+          var points = this._points, length = points.length, ctx = this.getContext();
           // draw the curve update
           this._saveAndTransform(ctx);
           if (this.oldEnd) {
@@ -98,6 +98,7 @@
           }
           this.oldEnd = this._drawSegment(ctx, points[length - 2], points[length - 1], true);
           ctx.stroke();
+          this.layer.drawCacheOnCanvas(this.canvas.contextTop);
           ctx.restore();
         }
       }
@@ -107,12 +108,13 @@
      * Invoked on mouse up
      */
     onMouseUp: function(options) {
-      if (!this.canvas._isMainEvent(options.e)) {
+      if (!this._isMainEvent(options.e)) {
         return true;
       }
       this.drawStraightLine = false;
       this.oldEnd = undefined;
       this._finalizeAndAddPath();
+      this.resetContext();
       return false;
     },
 
@@ -126,7 +128,7 @@
 
       this._reset();
       this._addPoint(p);
-      this.canvas.contextTop.moveTo(p.x, p.y);
+      this.getContext().moveTo(p.x, p.y);
     },
 
     /**
@@ -151,7 +153,7 @@
      */
     _reset: function() {
       this._points = [];
-      this._setBrushStyles(this.canvas.contextTop);
+      this._setBrushStyles(this.getContext());
       this._setShadow();
       this._hasStraightLine = false;
     },
@@ -174,7 +176,7 @@
       var i, len,
           p1 = this._points[0],
           p2 = this._points[1];
-      ctx = ctx || this.canvas.contextTop;
+      ctx = ctx || this.getContext();
       this._saveAndTransform(ctx);
       ctx.beginPath();
       //if we only have 2 points in the path and they are the same
@@ -279,7 +281,7 @@
      * and add it to the fabric canvas.
      */
     _finalizeAndAddPath: function() {
-      var ctx = this.canvas.contextTop;
+      var ctx = this.getContext();
       ctx.closePath();
       if (this.decimate) {
         this._points = this.decimatePoints(this._points, this.decimate);
@@ -295,7 +297,7 @@
       }
 
       var path = this.createPath(pathData);
-      this.canvas.clearContext(this.canvas.contextTop);
+      this.getContext().reset();
       this.canvas.fire('before:path:created', { path: path });
       this.canvas.add(path);
       this.canvas.requestRenderAll();
