@@ -98,6 +98,7 @@
           }
           this.oldEnd = this._drawSegment(ctx, points[length - 2], points[length - 1], true);
           ctx.stroke();
+          this.layer._drawClipPath(this.getContext(), this.layer.clipPath);
           this.layer.drawCacheOnCanvas(this.canvas.contextTop);
           ctx.restore();
         }
