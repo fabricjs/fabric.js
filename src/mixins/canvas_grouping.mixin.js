@@ -103,6 +103,7 @@
         [activeObject, target] :
         [target, activeObject];
       activeObject.isEditing && activeObject.exitEditing();
+      this._activeSelection.removeAll();
       this._activeSelection.add.apply(this._activeSelection, groupObjects);
       return this._activeSelection;
     },
