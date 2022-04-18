@@ -87,37 +87,21 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (this === other) {
       return undefined;
     }
-    var ancestors = this.getAncestors().reverse().concat(this);
-    var otherAncestors = other.getAncestors().reverse().concat(other);
-    var i, j, found = false;
-    //  find the common ancestor
-    for (i = 0; i < ancestors.length; i++) {
-      for (j = 0; j < otherAncestors.length; j++) {
-        if (ancestors[i] === otherAncestors[j]) {
-          found = true;
-          break;
-        }
-      }
-      if (found) {
-        break;
-      }
-    }
-    if (!found) {
+    var ancestorData = this.findCommonAncestors(other);
+    if (!ancestorData) {
       return undefined;
     }
-    //  compare trees from the common ancestor down
-    var tree = ancestors.slice(i),
-        otherTree = otherAncestors.slice(j),
-        a, b, parent;
-    for (i = 1; i < Math.min(tree.length, otherTree.length); i++) {
-      a = tree[i];
-      b = otherTree[i];
-      if (a !== b) {
-        parent = tree[i - 1];
-        return parent._objects.indexOf(a) > parent._objects.indexOf(b);
-      }
+    var firstCommonAncestor = ancestorData.ancestors[0],
+        headOfFork = ancestorData.fork.pop(),
+        headOfOtherFork = ancestorData.otherFork.pop(),
+        thisIndex = firstCommonAncestor._objects.indexOf(headOfFork),
+        otherIndex = firstCommonAncestor._objects.indexOf(headOfOtherFork);
+    if (thisIndex === otherIndex) {
+      // sameIndex means that one of the object contains the other.
+      return ancestorData.fork.length > ancestorData.otherFork.length;
     }
-    //  happens if a is ancestor of b or vice versa
-    return tree.length > otherTree.length;
+    else {
+      return thisIndex > otherIndex;
+    }
   }
 });

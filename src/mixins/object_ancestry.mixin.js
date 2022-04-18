@@ -24,7 +24,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   /**
    *
    * @typedef {fabric.Object[] | [...fabric.Object[], fabric.StaticCanvas]} Ancestors
-   * 
+   *
    * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
    * @returns {Ancestors} ancestors from bottom to top
    */
@@ -39,20 +39,25 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   },
 
   /**
-   *
+   * Returns an object that represent the ancestry situation.
+   * ancestors are the common ancestors of this and other.
+   * fork are the ancestors that are of this only,
+   * otherFork are the ancestors that are of other only.
    * @param {fabric.Object} other
    * @param {boolean} [strict] finds only ancestors that are objects (without canvas)
-   * @returns {{ index: number, otherIndex: number, ancestors: Ancestors } | undefined} ancestors may include the passed objects if one is an ancestor of the other resulting in index of -1
+   * @returns {{ fork: fabric.Object[], otherFork: fabric.Object[], ancestors: fabric.Object[] } | undefined} ancestors may include the passed objects if one is an ancestor of the other resulting in index of -1
    */
   findCommonAncestors: function (other, strict) {
-    if (this === other) {
+    if (this === other && !strict) {
       return {
-        index: 0,
-        otherIndex: 0,
-        ancestors: this.getAncestors(strict)
+        ancestors: this.getAncestors(strict),
+        fork: [this],
+        otherFork: [other],
       };
     }
     else if (!other) {
+      // meh, warn and inform, and not my issue.
+      // the argument is NOT optional, we can't end up here.
       return undefined;
     }
     var ancestors = this.getAncestors(strict);
@@ -64,9 +69,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       for (var j = 0; j < otherAncestors.length; j++) {
         if (ancestor === otherAncestors[j]) {
           return {
-            index: i - 1,
-            otherIndex: j - 1,
-            ancestors: ancestors.slice(i)
+            ancestors: ancestors.slice(i),
+            fork: ancestors.slice(0, i),
+            otherFork: otherAncestors.slice(0, j),
           };
         }
       }
@@ -80,6 +85,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @returns {boolean}
    */
   hasCommonAncestors: function (other, strict) {
-    return !!this.findCommonAncestors(other, strict);
+    var commonAncestors = this.findCommonAncestors(other, strict);
+    return commonAncestors && !!commonAncestors.ancestors.length;
   }
 });
