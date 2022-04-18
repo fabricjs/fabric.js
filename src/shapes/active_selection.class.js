@@ -98,7 +98,7 @@
       var parent = object.__owningGroup;
       if (parent) {
         //  return to owning group
-        parent.enterGroup(object);
+        parent._enterGroup(object, true);
         delete object.__owningGroup;
       }
     },
