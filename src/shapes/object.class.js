@@ -1733,6 +1733,7 @@
         enableRetinaScaling: false,
         renderOnAddRemove: false,
         skipOffscreen: false,
+        preserveObjectStacking: true
       });
       if (options.format === 'jpeg') {
         canvas.backgroundColor = '#fff';
