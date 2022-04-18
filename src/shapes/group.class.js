@@ -410,11 +410,12 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     drawObject: function (ctx) {
-      var preserveObjectStacking = this.canvas && this.canvas.preserveObjectStacking;
       this._renderBackground(ctx);
+      var preserveObjectStacking = this.canvas && this.canvas.preserveObjectStacking;
       for (var i = 0, object; i < this._objects.length; i++) {
         object = this._objects[i];
         if (preserveObjectStacking && object.group !== this) {
+          //  object is part of ActiveSelection
           ctx.save();
           ctx.transform.apply(ctx, invertTransform(this.calcTransformMatrix()));
           object.render(ctx);
