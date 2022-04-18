@@ -768,7 +768,6 @@
           pointer = this.getPointer(e, ignoreZoom),
           activeObject = this._activeObject,
           aObjects = this.getActiveObjects(),
-          activeTarget, activeTargetSubs,
           isTouch = isTouchEvent(e),
           shouldLookForActive = (aObjects.length > 1 && !skipGroup) || aObjects.length === 1;
 
@@ -782,7 +781,7 @@
         return activeObject;
       }
       if (aObjects.length > 1 && activeObject.type === 'activeSelection'
-        && !skipGroup && this.searchPossibleTargets([activeObject], pointer)) {
+        && !skipGroup && this.searchPossibleTargets([activeObject], pointer) && !e[this.altSelectionKey]) {
         return activeObject;
       }
       if (aObjects.length === 1 &&
@@ -790,17 +789,10 @@
         if (!this.preserveObjectStacking) {
           return activeObject;
         }
-        else {
-          activeTarget = activeObject;
-          activeTargetSubs = this.targets;
-          this.targets = [];
-        }
       }
-      var target = this.searchPossibleTargets(this._objects, pointer);
-      if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
-        target = activeTarget;
-        this.targets = activeTargetSubs;
-      }
+      var target = this.searchPossibleTargets(this._objects, pointer, e[this.altSelectionKey] && activeObject && {
+        target: activeObject,
+      });
       return target;
     },
 
@@ -839,7 +831,7 @@
      * @return {fabric.Object} **top most object from given `objects`** that contains pointer
      * @private
      */
-    _searchPossibleTargets: function(objects, pointer) {
+    _searchPossibleTargets: function(objects, pointer, continuationToken) {
       // Cache all targets where their bounding box contains point.
       var target, i = objects.length, subTarget;
       // Do not check for currently grouped objects, since we check the parent group itself.
@@ -851,10 +843,15 @@
         if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
           target = objects[i];
           if (target.subTargetCheck && Array.isArray(target._objects)) {
-            subTarget = this._searchPossibleTargets(target._objects, pointer);
+            subTarget = this._searchPossibleTargets(target._objects, pointer, continuationToken);
             subTarget && this.targets.push(subTarget);
           }
-          break;
+          if (!continuationToken || continuationToken.found) {
+            break;
+          }
+          else if (continuationToken && target === continuationToken.target) {
+            continuationToken.found = true;
+          }
         }
       }
       return target;
@@ -867,8 +864,8 @@
      * @param {Object} [pointer] x,y object of point coordinates we want to check.
      * @return {fabric.Object} **top most object on screen** that contains pointer
      */
-    searchPossibleTargets: function (objects, pointer) {
-      var target = this._searchPossibleTargets(objects, pointer);
+    searchPossibleTargets: function (objects, pointer, continuationToken) {
+      var target = this._searchPossibleTargets(objects, pointer, continuationToken);
       return target && target.interactive && this.targets[0] ? this.targets[0] : target;
     },
 
