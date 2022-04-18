@@ -105,14 +105,12 @@
       if (!this.canEnter(object)) {
         return false;
       }
-      var parent = object.group;
-      if (parent) {
+      if (object.group) {
         //  save ref to group for later in order to return to it
+        var parent = object.group;
         object.__owningGroup = parent;
-        parent._layoutInProgress = true;
       }
       this._enterGroup(object, removeParentTransform);
-      parent && (parent._layoutInProgress = false);
       return true;
     },
 
