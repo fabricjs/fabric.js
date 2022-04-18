@@ -292,6 +292,7 @@
     assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
 
     g.ownCaching = true;
+
     //  canvas.preserveObjectStacking
     canvas.preserveObjectStacking = false;
     g.set('canvas', canvas);
@@ -304,7 +305,7 @@
     assert.equal(g.dirty, false, 'Group should have dirty flag set');
     assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
 
-    this.stateProperties.indexOf(key)
+    canvas.preserveObjectStacking = true;
     g.dirty = false;
     activeSelection.dirty = false;
     obj.dirty = false;
