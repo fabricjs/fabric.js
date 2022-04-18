@@ -30,6 +30,7 @@
       canvas.clear();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.calcOffset();
+      canvas.preserveObjectStacking = false;
     }
   });
 
@@ -248,6 +249,7 @@
     var obj = new fabric.Object();
     var g = new fabric.Group([obj]);
     var activeSelection = new fabric.ActiveSelection([obj]);
+    assert.equal(activeSelection.canvas, undefined);
     assert.equal(obj.group, activeSelection);
     assert.equal(obj.__owningGroup, g);
 
@@ -288,6 +290,81 @@
     assert.equal(obj.dirty, true, 'Obj should have dirty flag');
     assert.equal(g.dirty, false, 'Group should have no dirty flag set');
     assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
+
+    g.ownCaching = true;
+    //  canvas.preserveObjectStacking
+    canvas.preserveObjectStacking = false;
+    g.set('canvas', canvas);
+    activeSelection.set('canvas', canvas);
+    g.dirty = false;
+    activeSelection.dirty = false;
+    obj.dirty = false;
+    obj.set('fill', 'yellow');
+    assert.equal(obj.dirty, true, 'Obj should have dirty flag set');
+    assert.equal(g.dirty, false, 'Group should have dirty flag set');
+    assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
+
+    this.stateProperties.indexOf(key)
+    g.dirty = false;
+    activeSelection.dirty = false;
+    obj.dirty = false;
+    obj.set('fill', 'green');
+    assert.equal(obj.dirty, true, 'Obj should have dirty flag set');
+    assert.equal(g.dirty, true, 'Group should have dirty flag set');
+    assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
   });
 
+  QUnit.test.only('dirty flag propagation from activ selection to owning groups', function (assert) {
+    var obj = new fabric.Object();
+    var g = new fabric.Group([obj], { canvas: canvas });
+    var activeSelection = new fabric.ActiveSelection([obj], { canvas: canvas });
+    assert.equal(obj.group, activeSelection);
+    assert.equal(obj.__owningGroup, g);
+
+    g.ownCaching = true;
+    canvas.preserveObjectStacking = true;
+
+    //  not state
+    g.dirty = false;
+    activeSelection.dirty = false;
+    obj.dirty = false;
+    assert.equal(g.dirty, false, 'Group should have no dirty flag set');
+    assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
+    activeSelection.set('foo', 'red');
+    assert.equal(g.dirty, false, 'Group should have no dirty flag set');
+    assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
+
+    //  state
+    g.dirty = false;
+    activeSelection.dirty = false;
+    activeSelection.set('angle', 5);
+    assert.equal(g.dirty, true, 'Group should have dirty flag set');
+    assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
+
+    //  no change
+    g.dirty = false;
+    activeSelection.dirty = false;
+    activeSelection.set('angle', 5);
+    assert.equal(g.dirty, false, 'Group should have no dirty flag set');
+    assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
+
+    //  no caching
+    g.ownCaching = false;
+    g.dirty = false;
+    activeSelection.dirty = false;
+    activeSelection.set('skewX', 45);
+    assert.equal(g.dirty, false, 'Group should have no dirty flag set');
+    assert.equal(activeSelection.dirty, false, 'ActiveSelection should have dirty flag set');
+
+    g.ownCaching = true;
+
+    //  canvas.preserveObjectStacking
+    canvas.preserveObjectStacking = false;
+    g.dirty = false;
+    activeSelection.dirty = false;
+    activeSelection.set('angle', 45);
+    assert.equal(g.dirty, false, 'Group should have no dirty flag set');
+    assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
+
+  });
 })();
