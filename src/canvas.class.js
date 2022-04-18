@@ -1065,6 +1065,14 @@
     },
 
     /**
+     * Returns instance's active selection
+     * @return {fabric.ActiveSelection} active selection
+     */
+    getActiveSelection: function () {
+      return this._activeSelection;
+    },
+
+    /**
      * @private
      * @param {fabric.Object} obj Object that was removed
      */
