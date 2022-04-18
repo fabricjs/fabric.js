@@ -314,7 +314,7 @@
     assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
   });
 
-  QUnit.test.only('dirty flag propagation from activ selection to owning groups', function (assert) {
+  QUnit.test('dirty flag propagation from active selection to owning groups', function (assert) {
     var obj = new fabric.Object();
     var g = new fabric.Group([obj], { canvas: canvas });
     var activeSelection = new fabric.ActiveSelection([obj], { canvas: canvas });
