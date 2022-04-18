@@ -61,6 +61,14 @@
 
     /**
      * @private
+     * @override we don't want the selection monitor to be active
+     */
+    __objectSelectionMonitor: function () {
+      //  noop
+    },
+
+    /**
+     * @private
      * @param {fabric.Object} object
      * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
      * @returns {boolean} true if object entered group
@@ -72,7 +80,7 @@
       if (object.group) {
         //  save ref to group for later in order to return to it
         var parent = object.group;
-        parent._exitGroup(object);
+        fabric.util.sendObjectToPlane(object, parent.calcTransformMatrix());
         object.__owningGroup = parent;
       }
       this._enterGroup(object, removeParentTransform);
@@ -101,6 +109,7 @@
      * @param {fabric.Object[]} targets
      */
     _onAfterObjectsChange: function (type, targets) {
+      this.callSuper('_onAfterObjectsChange', type, targets);
       var groups = [];
       targets.forEach(function (object) {
         object.group && !groups.includes(object.group) && groups.push(object.group);

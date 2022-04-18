@@ -256,6 +256,11 @@
         object.group.remove(object);
       }
       this._enterGroup(object, removeParentTransform);
+      var activeObject = this.canvas && this.canvas.getActiveObject && this.canvas.getActiveObject();
+      // if we are adding the activeObject in a group
+      if (activeObject && (activeObject === object || object.isDescendantOf(activeObject))) {
+        this._activeObjects.push(object);
+      }
       return true;
     },
 
@@ -279,11 +284,6 @@
       object._set('group', this);
       object._set('canvas', this.canvas);
       this.interactive && this._watchObject(true, object);
-      var activeObject = this.canvas && this.canvas.getActiveObject && this.canvas.getActiveObject();
-      // if we are adding the activeObject in a group
-      if (activeObject && (activeObject === object || object.isDescendantOf(activeObject))) {
-        this._activeObjects.push(object);
-      }
     },
 
     /**
@@ -409,10 +409,13 @@
      * Execute the drawing operation for an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    drawObject: function(ctx) {
+    drawObject: function (ctx) {
+      var preserveObjectStacking = this.canvas && this.canvas.preserveObjectStacking;
       this._renderBackground(ctx);
-      for (var i = 0; i < this._objects.length; i++) {
-        this._objects[i].render(ctx);
+      for (var i = 0, object; i < this._objects.length; i++) {
+        object = this._objects[i];
+        (preserveObjectStacking || (object.group === this && this._activeObjects.indexOf(object) === -1))
+          && object.render(ctx);
       }
       this._drawClipPath(ctx, this.clipPath);
     },
