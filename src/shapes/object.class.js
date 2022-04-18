@@ -986,7 +986,7 @@
      */
     _set: function(key, value) {
       var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY'),
-          isChanged = this[key] !== value, groupNeedsUpdate = false;
+          isChanged = this[key] !== value;
 
       if (shouldConstrainValue) {
         value = this._constrainScale(value);
@@ -1002,20 +1002,20 @@
       else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
         value = new fabric.Shadow(value);
       }
-      else if (key === 'dirty' && this.group) {
-        this.group.set('dirty', value);
+      else if (key === 'dirty' && value) {
+        this.group && this.group.set('dirty', true);
+        this.__owningGroup && this.__owningGroup.set('dirty', true);
       }
 
       this[key] = value;
 
       if (isChanged) {
-        groupNeedsUpdate = this.group && this.group.isOnACache();
-        if (this.cacheProperties.indexOf(key) > -1) {
-          this.dirty = true;
-          groupNeedsUpdate && this.group.set('dirty', true);
-        }
-        else if (groupNeedsUpdate && this.stateProperties.indexOf(key) > -1) {
-          this.group.set('dirty', true);
+        var isCacheProp = this.cacheProperties.indexOf(key) > -1;
+        var isStateProp = this.stateProperties.indexOf(key) > -1;
+        if (isCacheProp || isStateProp) {
+          isCacheProp && (this.dirty = true);
+          this.group && this.group.isOnACache() && this.group.set('dirty', true);
+          this.__owningGroup && this.__owningGroup.isOnACache() && this.__owningGroup.set('dirty', true);
         }
       }
       return this;
