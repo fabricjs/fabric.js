@@ -101,7 +101,6 @@
       if (object.group) {
         //  save ref to group for later in order to return to it
         var parent = object.group;
-        fabric.util.sendObjectToPlane(object, parent.calcTransformMatrix());
         object.__owningGroup = parent;
       }
       this._enterGroup(object, removeParentTransform);
