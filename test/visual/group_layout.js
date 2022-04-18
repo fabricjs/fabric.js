@@ -91,7 +91,6 @@
         test: 'fit-content layout',
         code: fitContentLayoutRelative,
         golden: 'group-layout/fit-content.png',
-        newModule: 'Group Layout',
         percentage: 0.06,
         width: 400,
         height: 300
@@ -214,7 +213,6 @@
         test: 'fit-content layout add object',
         code: fitContentLayoutAdd,
         golden: 'group-layout/fit-content3.png',
-        newModule: 'Group Layout',
         percentage: 0.06,
         width: 400,
         height: 300
