@@ -1004,7 +1004,8 @@
       }
       else if (key === 'dirty' && value) {
         this.group && this.group.set('dirty', true);
-        this.__owningGroup && this.__owningGroup.set('dirty', true);
+        this.__owningGroup && (!this.canvas || this.canvas.preserveObjectStacking)
+          && this.__owningGroup.set('dirty', true);
       }
 
       this[key] = value;
@@ -1015,7 +1016,8 @@
         if (isCacheProp || isStateProp) {
           isCacheProp && (this.dirty = true);
           this.group && this.group.isOnACache() && this.group.set('dirty', true);
-          this.__owningGroup && this.__owningGroup.isOnACache() && this.__owningGroup.set('dirty', true);
+          this.__owningGroup && (!this.canvas || this.canvas.preserveObjectStacking) && this.__owningGroup.isOnACache()
+            && this.__owningGroup.set('dirty', true);
         }
       }
       return this;

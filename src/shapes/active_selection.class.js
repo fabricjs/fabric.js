@@ -60,15 +60,12 @@
     _set: function (key, value) {
       var prev = this[key];
       this.callSuper('_set', key, value);
-      if (prev !== this[key]) {
-        var isCacheProp = this.cacheProperties.indexOf(key) > -1;
-        var isStateProp = this.stateProperties.indexOf(key) > -1;
-        if (isCacheProp || isStateProp) {
-          this.forEachObject(function (object) {
-            var group = object.__owningGroup;
-            group && group.isOnACache() && group.set('dirty', true);
-          });
-        }
+      if (prev !== this[key] && this.canvas && this.canvas.preserveObjectStacking
+        && this.stateProperties.indexOf(key) > -1) {
+        this.forEachObject(function (object) {
+          var group = object.__owningGroup;
+          group && group.isOnACache() && group.set('dirty', true);
+        });
       }
       return this;
     },
