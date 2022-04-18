@@ -1733,6 +1733,7 @@
         enableRetinaScaling: false,
         renderOnAddRemove: false,
         skipOffscreen: false,
+        //  needed to render group without filtering out selected objects
         preserveObjectStacking: true
       });
       if (options.format === 'jpeg') {
