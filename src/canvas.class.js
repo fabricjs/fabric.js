@@ -421,11 +421,12 @@
      * and one to render as activeGroup.
      * @return {Array} objects to render immediately and pushes the other in the activeGroup.
      */
-    _chooseObjectsToRender: function() {
-      if (!this.preserveObjectStacking && this._activeObject) {
+    _chooseObjectsToRender: function () {
+      var activeObject = this._activeObject;
+      if (!this.preserveObjectStacking && activeObject) {
         return this._objects.filter(function (object) {
-          return !object.group;
-        }).concat(this._activeObject);
+          return !object.group && object !== activeObject;
+        }).concat(activeObject);
       }
       else {
         return this._objects;
