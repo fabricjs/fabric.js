@@ -986,7 +986,7 @@
      */
     _set: function(key, value) {
       var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY'),
-          isChanged = this[key] !== value;
+          prevValue = this[key];
 
       if (shouldConstrainValue) {
         value = this._constrainScale(value);
@@ -1004,20 +1004,27 @@
       }
       else if (key === 'dirty' && value) {
         this.group && this.group.set('dirty', true);
+        //  mark owning group as dirty
+        //  if `preserveObjectStacking === false` the object isn't rendered by the group so there's no reason to flag it as dirty
         this.__owningGroup && (!this.canvas || this.canvas.preserveObjectStacking)
           && this.__owningGroup.set('dirty', true);
       }
 
       this[key] = value;
 
-      if (isChanged) {
+      if (prevValue !== value) {
         var isCacheProp = this.cacheProperties.indexOf(key) > -1;
         var isStateProp = this.stateProperties.indexOf(key) > -1;
         if (isCacheProp || isStateProp) {
           isCacheProp && (this.dirty = true);
-          this.group && this.group.isOnACache() && this.group.set('dirty', true);
-          this.__owningGroup && (!this.canvas || this.canvas.preserveObjectStacking) && this.__owningGroup.isOnACache()
-            && this.__owningGroup.set('dirty', true);
+          var invalidationContext = {
+            target: this,
+            key: key,
+            value: value,
+            prevValue: prevValue
+          }
+          this.group && this.group.invalidate(invalidationContext);
+          this.__owningGroup && this.__owningGroup.invalidate(invalidationContext);
         }
       }
       return this;

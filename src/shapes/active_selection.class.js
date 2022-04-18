@@ -62,9 +62,19 @@
       this.callSuper('_set', key, value);
       if (prev !== this[key] && this.canvas && this.canvas.preserveObjectStacking
         && this.stateProperties.indexOf(key) > -1) {
+        var invalidationContext = {
+          target: this,
+          key: key,
+          value: value,
+          prevValue: prev
+        }
+        var invalidatedGroups = [];
         this.forEachObject(function (object) {
           var group = object.__owningGroup;
-          group && group.isOnACache() && group.set('dirty', true);
+          if (group && invalidatedGroups.indexOf(group) === -1) {
+            group.invalidate(invalidationContext);
+            invalidatedGroups.push(group);
+          }
         });
       }
       return this;
@@ -143,6 +153,14 @@
           group._set('dirty', true);
         });
       }
+    },
+
+    /**
+     * @override there's no reason to invalidate because objects aren't selectable
+     * @private
+     */
+    invalidate: function () {
+      // noop
     },
 
     /**

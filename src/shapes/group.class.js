@@ -474,6 +474,24 @@
     },
 
     /**
+     * @typedef {object} InvalidationContext
+     * @property {fabric.Object} target either a child object or {@link fabric.ActiveSelection}
+     * @property {string} key
+     * @property {*} value
+     * @property {*} prevValue
+     * 
+     * @private
+     * @param {InvalidationContext} context
+     */
+    invalidate: function (context) {
+      this.isOnACache() && (!this.canvas || this.canvas.preserveObjectStacking)
+        && this._set('dirty', true);
+      this._applyLayoutStrategy(Object.assign({}, context, {
+        type: 'progress'
+      }));
+    },
+
+    /**
      * @public
      * @param {Partial<LayoutResult> & { layout?: string }} [context] pass values to use for layout calculations
      */
@@ -491,6 +509,9 @@
      * @param {fabric.Point} diff
      */
     _adjustObjectPosition: function (object, diff) {
+      if (object.group !== this) {
+        return;
+      }
       object.set({
         left: object.left + diff.x,
         top: object.top + diff.y,
@@ -511,9 +532,14 @@
         //  reject layout requests before initialization layout
         return;
       }
+      else if (context.type === 'progress' && this._layoutInProgress) {
+        //  prevent circular calls
+        return;
+      }
       var center = this.getRelativeCenterPoint();
       var result = this.getLayoutStrategyResult(this.layout, this._objects.concat(), context);
       if (result) {
+        this._layoutInProgress = true;
         //  handle positioning
         var newCenter = new fabric.Point(result.centerX, result.centerY);
         var vector = center.subtract(newCenter).add(new fabric.Point(result.correctionX || 0, result.correctionY || 0));
@@ -532,6 +558,7 @@
           this.setPositionByOrigin(newCenter, 'center', 'center');
           this.setCoords();
         }
+        this._layoutInProgress = false;
       }
       else if (isFirstLayout) {
         //  fill `result` with initial values for the layout hook
@@ -593,9 +620,12 @@
      * @returns {LayoutResult | undefined}
      */
     getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
+      if (context.type === 'progress' && layoutDirective !== 'fit-content-lazy' && layoutDirective !== 'fit-content') {
+        return;
+      }
       //  `fit-content-lazy` performance enhancement
       //  skip if instance had no objects before the `added` event because it may have kept layout after removing all previous objects
-      if (layoutDirective === 'fit-content-lazy'
+      else if (layoutDirective === 'fit-content-lazy'
           && context.type === 'added' && objects.length > context.targets.length) {
         //  calculate added objects' bbox with existing bbox
         var addedObjects = context.targets.concat(this);
