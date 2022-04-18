@@ -509,9 +509,6 @@
      * @param {fabric.Point} diff
      */
     _adjustObjectPosition: function (object, diff) {
-      if (object.group !== this) {
-        return;
-      }
       object.set({
         left: object.left + diff.x,
         top: object.top + diff.y,
@@ -548,7 +545,7 @@
         this.set({ width: result.width, height: result.height });
         //  adjust objects to account for new center
         !context.objectsRelativeToGroup && this.forEachObject(function (object) {
-          this._adjustObjectPosition(object, diff);
+          object.group === this && this._adjustObjectPosition(object, diff);
         }, this);
         //  clip path as well
         !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
