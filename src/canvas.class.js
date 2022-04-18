@@ -421,39 +421,14 @@
      * @return {Array} objects to render immediately and pushes the other in the activeGroup.
      */
     _chooseObjectsToRender: function() {
-      var activeObjects = this.getActiveObjects(),
-          object, objsToRender, activeGroupObjects;
-
-      if (!this.preserveObjectStacking && activeObjects.length > 1) {
-        objsToRender = [];
-        activeGroupObjects = [];
-        for (var i = 0, length = this._objects.length; i < length; i++) {
-          object = this._objects[i];
-          if (activeObjects.indexOf(object) === -1 ) {
-            objsToRender.push(object);
-          }
-          else {
-            activeGroupObjects.push(object);
-          }
-        }
-        if (activeObjects.length > 1) {
-          this._activeObject._objects = activeGroupObjects;
-        }
-        objsToRender.push.apply(objsToRender, activeGroupObjects);
-      }
-      //  in case a single object is selected render it's entire parent above the other objects
-      else if (!this.preserveObjectStacking && activeObjects.length === 1) {
-        var target = activeObjects[0], ancestors = target.getAncestors(true);
-        var topAncestor = ancestors.length === 0 ? target : ancestors.pop();
-        objsToRender = this._objects.slice();
-        var index = objsToRender.indexOf(topAncestor);
-        index > -1 && objsToRender.splice(objsToRender.indexOf(topAncestor), 1);
-        objsToRender.push(topAncestor);
+      if (!this.preserveObjectStacking && this._activeObject) {
+        return this._objects.filter(function (object) {
+          return !object.group;
+        }).concat(this._activeObject);
       }
       else {
-        objsToRender = this._objects;
+        return this._objects;
       }
-      return objsToRender;
     },
 
     /**
