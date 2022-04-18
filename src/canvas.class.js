@@ -387,6 +387,7 @@
     _initInteractive: function() {
       this._currentTransform = null;
       this._groupSelector = null;
+      this._activeSelection = new fabric.ActiveSelection([], { canvas: this });
       this._initWrapperElement();
       this._createUpperCanvas();
       this._initEventListeners();
