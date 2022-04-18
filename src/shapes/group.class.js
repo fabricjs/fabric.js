@@ -414,8 +414,15 @@
       this._renderBackground(ctx);
       for (var i = 0, object; i < this._objects.length; i++) {
         object = this._objects[i];
-        (preserveObjectStacking || (object.group === this && this._activeObjects.indexOf(object) === -1))
-          && object.render(ctx);
+        if (preserveObjectStacking && object.group !== this) {
+          ctx.save();
+          ctx.transform.apply(ctx, invertTransform(this.calcTransformMatrix()));
+          object.render(ctx);
+          ctx.restore();
+        }
+        else if (preserveObjectStacking || (object.group === this && this._activeObjects.indexOf(object) === -1)) {
+          object.render(ctx);
+        }
       }
       this._drawClipPath(ctx, this.clipPath);
     },
