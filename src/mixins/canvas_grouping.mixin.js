@@ -104,6 +104,7 @@
         [target, activeObject];
       activeObject.isEditing && activeObject.exitEditing();
       this._activeSelection.removeAll();
+      fabric.util.resetObjectTransform(this._activeSelection);
       this._activeSelection.add.apply(this._activeSelection, groupObjects);
       return this._activeSelection;
     },
