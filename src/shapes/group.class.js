@@ -620,7 +620,7 @@
      * @returns {LayoutResult | undefined}
      */
     getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
-      if (context.type === 'progress' && layoutDirective !== 'fit-content-lazy' && layoutDirective !== 'fit-content') {
+      if (context.type === 'progress'/* && layoutDirective !== 'fit-content-lazy' && layoutDirective !== 'fit-content'*/) {
         return;
       }
       //  `fit-content-lazy` performance enhancement
