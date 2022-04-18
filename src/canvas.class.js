@@ -550,6 +550,34 @@
     },
 
     /**
+     * @private
+     * @param {Event} e Event object
+     * @param {fabric.Object} target
+     */
+    _shouldClearSelection: function (e, target) {
+      var activeObjects = this.getActiveObjects(),
+          activeObject = this._activeObject;
+
+      return (
+        !target
+        ||
+        (target &&
+          activeObject &&
+          activeObjects.length > 1 &&
+          activeObjects.indexOf(target) === -1 &&
+          activeObject !== target &&
+          !this._isSelectionKeyPressed(e))
+        ||
+        (target && !target.evented)
+        ||
+        (target &&
+          !target.selectable &&
+          activeObject &&
+          activeObject !== target)
+      );
+    },
+
+    /**
      * centeredScaling from object can't override centeredScaling from canvas.
      * this should be fixed, since object setting should take precedence over canvas.
      * also this should be something that will be migrated in the control properties.

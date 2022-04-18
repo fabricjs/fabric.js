@@ -28,35 +28,6 @@
         && !target.onSelect({ e: e });
     },
 
-
-    /**
-     * @private
-     * @param {Event} e Event object
-     * @param {fabric.Object} target
-     */
-    _shouldClearSelection: function (e, target) {
-      var activeObjects = this.getActiveObjects(),
-        activeObject = this._activeObject;
-
-      return (
-        !target
-        ||
-        (target &&
-          activeObject &&
-          activeObjects.length > 1 &&
-          activeObjects.indexOf(target) === -1 &&
-          activeObject !== target &&
-          !this._isSelectionKeyPressed(e))
-        ||
-        (target && !target.evented)
-        ||
-        (target &&
-          !target.selectable &&
-          activeObject &&
-          activeObject !== target)
-      );
-    },
-
     /**
      * @private
      * @param {Event} e Event object
