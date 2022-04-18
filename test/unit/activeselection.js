@@ -244,4 +244,50 @@
     assert.equal(canvas.item(9999), undefined);
   });
 
+  QUnit.test('dirty flag propagation from children up', function (assert) {
+    var obj = new fabric.Object();
+    var g = new fabric.Group([obj]);
+    var activeSelection = new fabric.ActiveSelection([obj]);
+    assert.equal(obj.group, activeSelection);
+    assert.equal(obj.__owningGroup, g);
+
+    g.ownCaching = true;
+
+    //  cache
+    g.dirty = false;
+    activeSelection.dirty = false;
+    obj.dirty = false;
+    assert.equal(g.dirty, false, 'Group should have no dirty flag set');
+    assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
+    obj.set('fill', 'red');
+    assert.equal(obj.dirty, true, 'Obj should have dirty flag set');
+    assert.equal(g.dirty, true, 'Group should have dirty flag set');
+    assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
+
+    //  no change
+    g.dirty = false;
+    obj.dirty = false;
+    obj.set('fill', 'red');
+    assert.equal(obj.dirty, false, 'Obj should have no dirty flag set');
+    assert.equal(g.dirty, false, 'Group should have no dirty flag set');
+    assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
+
+    //  state
+    g.dirty = false;
+    obj.dirty = false;
+    obj.set('angle', 5);
+    assert.equal(obj.dirty, false, 'Obj should have dirty flag still false');
+    assert.equal(g.dirty, true, 'Group should have dirty flag set');
+    assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
+
+    //  no caching
+    g.ownCaching = false;
+    g.dirty = false;
+    obj.dirty = false;
+    obj.set('fill', 'blue');
+    assert.equal(obj.dirty, true, 'Obj should have dirty flag');
+    assert.equal(g.dirty, false, 'Group should have no dirty flag set');
+    assert.equal(activeSelection.dirty, false, 'ActiveSelection should have no dirty flag set');
+  });
+
 })();
