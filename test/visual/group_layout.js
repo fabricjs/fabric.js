@@ -234,7 +234,7 @@
         test: 'selected object',
         code: selectedObject,
         golden: 'group-layout/selected_object.png',
-        percentage: 0.005,
+        percentage: 0.02,
         width: 400,
         height: 300,
         fabricClass: 'Canvas'
@@ -251,10 +251,10 @@
     }
 
     tests.push({
-        test: 'selected object',
+        test: 'selected object - exported',
         code: selectedObjectExport,
         golden: 'group-layout/selected_object_exported.png',
-        percentage: 0.005,
+        percentage: 0.02,
         width: 400,
         height: 300,
         fabricClass: 'Canvas'
