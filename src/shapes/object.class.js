@@ -1022,7 +1022,7 @@
             key: key,
             value: value,
             prevValue: prevValue
-          }
+          };
           this.group && this.group.invalidate(invalidationContext);
           this.__owningGroup && this.__owningGroup.invalidate(invalidationContext);
         }

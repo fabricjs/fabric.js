@@ -67,7 +67,7 @@
           key: key,
           value: value,
           prevValue: prev
-        }
+        };
         var invalidatedGroups = [];
         this.forEachObject(function (object) {
           var group = object.__owningGroup;
