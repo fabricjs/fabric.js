@@ -234,7 +234,7 @@
         test: 'selected object',
         code: selectedObject,
         golden: 'group-layout/selected_object.png',
-        percentage: 0.001,
+        percentage: 0.005,
         width: 400,
         height: 300,
         fabricClass: 'Canvas'
@@ -254,7 +254,7 @@
         test: 'selected object',
         code: selectedObjectExport,
         golden: 'group-layout/selected_object_exported.png',
-        percentage: 0.001,
+        percentage: 0.005,
         width: 400,
         height: 300,
         fabricClass: 'Canvas'
