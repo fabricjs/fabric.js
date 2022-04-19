@@ -739,11 +739,10 @@
     /**
      * Renders background, objects, overlay and controls.
      * @param {CanvasRenderingContext2D} ctx
-     * @param {Array} objects to render
-     * @return {fabric.Canvas} instance
-     * @chainable
+     * @param {fabric.Object[]} objects to render
+     * @param {{ filter?: false | ((object: fabric.Object) => boolean) }} [renderingContext] filtering option used by `isTargetTransparent` and exporting
      */
-    renderCanvas: function(ctx, objects) {
+    renderCanvas: function(ctx, objects, renderingContext) {
       var v = this.viewportTransform, path = this.clipPath;
       this.cancelRequestedRender();
       this.calcViewportBoundaries();
@@ -755,7 +754,7 @@
       ctx.save();
       //apply viewport transform once for all rendering process
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-      this._renderObjects(ctx, objects);
+      this._renderObjects(ctx, objects, renderingContext);
       ctx.restore();
       if (!this.controlsAboveOverlay && this.interactive) {
         this.drawControls(ctx);
@@ -795,12 +794,13 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Array} objects to render
+     * @param {fabric.Object[]} objects to render
+     * @param {{ filter?: false | ((object: fabric.Object) => boolean) }} [renderingContext] filtering option used by `isTargetTransparent` and exporting
      */
-    _renderObjects: function(ctx, objects) {
+    _renderObjects: function(ctx, objects, renderingContext) {
       var i, len;
       for (i = 0, len = objects.length; i < len; ++i) {
-        objects[i] && objects[i].render(ctx);
+        objects[i] && objects[i].render(ctx, renderingContext);
       }
     },
 

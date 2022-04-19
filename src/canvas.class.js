@@ -501,7 +501,8 @@
     isTargetTransparent: function (target, x, y) {
       // in case the target is the activeObject, we cannot execute this optimization
       // because we need to draw controls too.
-      if (target.shouldCache() && target._cacheCanvas && target !== this._activeObject) {
+      if (target.shouldCache() && target._cacheCanvas && target !== this._activeObject
+        && (!(target instanceof fabric.Group) || (target._activeObjects.length === 0 || this.preserveObjectStacking))) {
         var normalizedPointer = this._normalizePointer(target, {x: x, y: y}),
             targetRelativeX = Math.max(target.cacheTranslationX + (normalizedPointer.x * target.zoomX), 0),
             targetRelativeY = Math.max(target.cacheTranslationY + (normalizedPointer.y * target.zoomY), 0);
@@ -521,7 +522,7 @@
 
       ctx.save();
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-      target.render(ctx);
+      target.render(ctx, { filter: false });
       ctx.restore();
 
       target.selectionBackgroundColor = originalColor;

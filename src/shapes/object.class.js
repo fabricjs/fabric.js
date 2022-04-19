@@ -1043,7 +1043,7 @@
       return fabric.iMatrix.concat();
     },
 
-    /*
+    /**
      * @private
      * return if the object would be visible in rendering
      * @memberOf fabric.Object.prototype
@@ -1056,10 +1056,18 @@
     },
 
     /**
-     * Renders an object on a specified context
+     * 
+     * @typedef {object} RenderingContext
+     * @property {boolean} [forClipping]
+     * @property {false | ((object: fabric.Object) => boolean)} [filter] filtering option by `isTargetTransparent` and exporting
+     * 
+     * 
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {RenderingContext} [renderingContext] options object for rendering
+     * 
+     * Renders an object on a specified context
      */
-    render: function(ctx) {
+    render: function (ctx, renderingContext) {
       // do not render if width/height are zeros or object is not visible
       if (this.isNotVisible()) {
         return;
@@ -1074,13 +1082,13 @@
       this._setOpacity(ctx);
       this._setShadow(ctx, this);
       if (this.shouldCache()) {
-        this.renderCache();
+        this.renderCache(renderingContext);
         this.drawCacheOnCanvas(ctx);
       }
       else {
         this._removeCacheCanvas();
         this.dirty = false;
-        this.drawObject(ctx);
+        this.drawObject(ctx, renderingContext);
         if (this.objectCaching && this.statefullCache) {
           this.saveState({ propertySet: 'cacheProperties' });
         }
@@ -1088,14 +1096,17 @@
       ctx.restore();
     },
 
-    renderCache: function(options) {
-      options = options || {};
+    /**
+     * 
+     * @param {RenderingContext} [renderingContext] 
+     */
+    renderCache: function (renderingContext) {
       if (!this._cacheCanvas || !this._cacheContext) {
         this._createCacheCanvas();
       }
       if (this.isCacheDirty()) {
         this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
-        this.drawObject(this._cacheContext, options.forClipping);
+        this.drawObject(this._cacheContext, renderingContext);
         this.dirty = false;
       }
     },
@@ -1213,10 +1224,11 @@
     /**
      * Execute the drawing operation for an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {RenderingContext} [renderingContext] filtering option by `isTargetTransparent` and exporting
      */
-    drawObject: function(ctx, forClipping) {
+    drawObject: function (ctx, renderingContext) {
       var originalFill = this.fill, originalStroke = this.stroke;
-      if (forClipping) {
+      if (renderingContext && renderingContext.forClipping) {
         this.fill = 'black';
         this.stroke = '';
         this._setClippingProperties(ctx);
@@ -1692,6 +1704,7 @@
      * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
      * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
      * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
+     * @param {Boolean} [options.filter] filter instance's objects
      * @return {HTMLCanvasElement} Returns DOM element <canvas> with the fabric.Object
      */
     toCanvasElement: function(options) {
@@ -1733,8 +1746,6 @@
         enableRetinaScaling: false,
         renderOnAddRemove: false,
         skipOffscreen: false,
-        //  needed to render group without filtering out selected objects
-        preserveObjectStacking: true
       });
       if (options.format === 'jpeg') {
         canvas.backgroundColor = '#fff';

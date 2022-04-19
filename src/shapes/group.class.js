@@ -408,20 +408,23 @@
     /**
      * Execute the drawing operation for an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {{ filter?: false | ((object: fabric.Object) => boolean) }} [renderingContext] filtering option used by `isTargetTransparent` and exporting
      */
-    drawObject: function (ctx) {
+    drawObject: function (ctx, renderingContext) {
       this._renderBackground(ctx);
       var preserveObjectStacking = this.canvas && this.canvas.preserveObjectStacking;
-      for (var i = 0, object; i < this._objects.length; i++) {
+      var filter = renderingContext && renderingContext.filter;
+      for (var i = 0, object, forceRendering; i < this._objects.length; i++) {
         object = this._objects[i];
-        if (preserveObjectStacking && object.group !== this) {
+        forceRendering = filter === false || (typeof filter === 'function' && filter(object));
+        if ((forceRendering || preserveObjectStacking) && object.group !== this) {
           //  object is part of ActiveSelection
           ctx.save();
           ctx.transform.apply(ctx, invertTransform(this.calcTransformMatrix()));
           object.render(ctx);
           ctx.restore();
         }
-        else if (preserveObjectStacking || (object.group === this && this._activeObjects.indexOf(object) === -1)) {
+        else if ((!filter || forceRendering) && object.group === this) {
           object.render(ctx);
         }
       }
@@ -443,10 +446,10 @@
      * Renders instance on a given context
      * @param {CanvasRenderingContext2D} ctx context to render instance on
      */
-    render: function (ctx) {
+    render: function (ctx, renderingContext) {
       //  used to inform objects not to double opacity
       this._transformDone = true;
-      this.callSuper('render', ctx);
+      this.callSuper('render', ctx, renderingContext);
       this._transformDone = false;
     },
 
