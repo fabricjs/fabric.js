@@ -50,9 +50,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   findCommonAncestors: function (other, strict) {
     if (this === other && !strict) {
       return {
-        ancestors: this.getAncestors(strict),
         fork: [this],
         otherFork: [other],
+        ancestors: this.getAncestors(strict)
       };
     }
     else if (!other) {
@@ -61,17 +61,29 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       return undefined;
     }
     var ancestors = this.getAncestors(strict);
-    ancestors.unshift(this);
     var otherAncestors = other.getAncestors(strict);
-    otherAncestors.unshift(other);
     for (var i = 0, ancestor; i < ancestors.length; i++) {
       ancestor = ancestors[i];
+      if (ancestor === other) {
+        return {
+          fork: [this].concat(ancestors.slice(0, i + 1)),
+          otherFork: [other],
+          ancestors: ancestors.slice(i + 1)
+        };
+      }
       for (var j = 0; j < otherAncestors.length; j++) {
+        if (this === otherAncestors[j]) {
+          return {
+            fork: [this],
+            otherFork: otherAncestors.slice(0, j + 1),
+            ancestors: ancestors
+          };
+        }
         if (ancestor === otherAncestors[j]) {
           return {
-            ancestors: ancestors.slice(i),
-            fork: ancestors.slice(0, i),
-            otherFork: otherAncestors.slice(0, j),
+            fork: [this].concat(ancestors.slice(0, i)),
+            otherFork: [other].concat(otherAncestors.slice(0, j)),
+            ancestors: ancestors.slice(i)
           };
         }
       }

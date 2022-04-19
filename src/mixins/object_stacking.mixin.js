@@ -91,8 +91,11 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (!ancestorData) {
       return undefined;
     }
-    var firstCommonAncestor = ancestorData.ancestors[0],
-        headOfFork = ancestorData.fork.pop(),
+    var firstCommonAncestor = ancestorData.ancestors[0];
+    if (!firstCommonAncestor) {
+      return firstCommonAncestor;
+    }
+    var headOfFork = ancestorData.fork.pop(),
         headOfOtherFork = ancestorData.otherFork.pop(),
         thisIndex = firstCommonAncestor._objects.indexOf(headOfFork),
         otherIndex = firstCommonAncestor._objects.indexOf(headOfOtherFork);
