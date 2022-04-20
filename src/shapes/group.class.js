@@ -406,6 +406,13 @@
     },
 
     /**
+     * @returns {boolean} true if group renders only non selected objects
+     */
+    filtersObjectsAtRendering: function () {
+      return this.canvas && !this.canvas.preserveObjectStacking && this._activeObjects.length > 0;
+    },
+
+    /**
      * Execute the drawing operation for an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @param {{ filter?: false | ((object: fabric.Object) => boolean) }} [renderingContext] filtering option used by `isTargetTransparent` and exporting

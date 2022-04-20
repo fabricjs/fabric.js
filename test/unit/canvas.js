@@ -2579,6 +2579,7 @@
     canvas.renderAll();
     canvas.setActiveObject(rect);
     assert.deepEqual(group._activeObjects, [rect]);
+    assert.ok(group.filtersObjectsAtRendering());
     assert.equal(canvas.isTargetTransparent(group, 0, 0), false, 'opaque on 0,0');
     assert.equal(canvas.isTargetTransparent(group, 1, 1), false, 'opaque on 1,1');
     assert.equal(canvas.isTargetTransparent(group, 2, 2), false, 'opaque on 2,2');
