@@ -421,14 +421,14 @@
           //  object is part of ActiveSelection
           ctx.save();
           ctx.transform.apply(ctx, invertTransform(this.calcTransformMatrix()));
-          object.render(ctx);
+          object.render(ctx, renderingContext);
           ctx.restore();
         }
         else if ((!filter || forceRendering) && object.group === this) {
-          object.render(ctx);
+          object.render(ctx, renderingContext);
         }
       }
-      this._drawClipPath(ctx, this.clipPath);
+      this._drawClipPath(ctx, this.clipPath, renderingContext);
     },
 
     /**

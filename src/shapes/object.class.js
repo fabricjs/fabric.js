@@ -1237,7 +1237,7 @@
         this._renderBackground(ctx);
       }
       this._render(ctx);
-      this._drawClipPath(ctx, this.clipPath);
+      this._drawClipPath(ctx, this.clipPath, renderingContext);
       this.fill = originalFill;
       this.stroke = originalStroke;
     },
@@ -1246,8 +1246,9 @@
      * Prepare clipPath state and cache and draw it on instance's cache
      * @param {CanvasRenderingContext2D} ctx
      * @param {fabric.Object} clipPath
+     * @param {RenderingContext} [renderingContext]
      */
-    _drawClipPath: function (ctx, clipPath) {
+    _drawClipPath: function (ctx, clipPath, renderingContext) {
       if (!clipPath) { return; }
       // needed to setup a couple of variables
       // path canvas gets overridden with this one.
@@ -1255,7 +1256,7 @@
       clipPath.canvas = this.canvas;
       clipPath.shouldCache();
       clipPath._transformDone = true;
-      clipPath.renderCache({ forClipping: true });
+      clipPath.renderCache(Object.assign(renderingContext || {}, { forClipping: true }));
       this.drawClipPathOnCache(ctx, clipPath);
     },
 
