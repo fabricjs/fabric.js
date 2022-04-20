@@ -365,6 +365,7 @@
      * @return {fabric.Text} thisArg
      */
     initialize: function(text, options) {
+      this.styles = options ? (options.styles || { }) : { };
       this.text = text;
       this.__skipDimension = true;
       this.callSuper('initialize', options);
@@ -372,7 +373,6 @@
         this.setPathInfo();
       }
       this.__skipDimension = false;
-      this.styles = fabric.util.stylesFromArray(options ? (options.styles || { }) : { }, this.text);
       this.initDimensions();
       this.setCoords();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
@@ -1676,6 +1676,7 @@
     var objectCopy = clone(object), path = object.path;
     delete objectCopy.path;
     return fabric.Object._fromObject('Text', objectCopy, function(textInstance) {
+      textInstance.styles = fabric.util.stylesFromArray(object.styles, object.text);
       if (path) {
         fabric.Object._fromObject('Path', path, function(pathInstance) {
           textInstance.set('path', pathInstance);

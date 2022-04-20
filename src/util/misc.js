@@ -1220,10 +1220,10 @@
      * @memberOf fabric.util
      * @param {Object} prevStyle first style to compare
      * @param {Object} thisStyle second style to compare
-     * @param {boolean} includeLineStyles whether to check overline, underline, and line-through properties
+     * @param {boolean} forTextSpans whether to check overline, underline, and line-through properties
      */
-    hasStyleChanged: function(prevStyle, thisStyle, includeLineStyles) {
-      includeLineStyles = includeLineStyles || false;
+    hasStyleChanged: function(prevStyle, thisStyle, forTextSpans) {
+      forTextSpans = forTextSpans || false;
       return (prevStyle.fill !== thisStyle.fill ||
               prevStyle.stroke !== thisStyle.stroke ||
               prevStyle.strokeWidth !== thisStyle.strokeWidth ||
@@ -1232,7 +1232,7 @@
               prevStyle.fontWeight !== thisStyle.fontWeight ||
               prevStyle.fontStyle !== thisStyle.fontStyle ||
               prevStyle.deltaY !== thisStyle.deltaY) ||
-              (includeLineStyles &&
+              (forTextSpans &&
                 (prevStyle.overline !== thisStyle.overline ||
                 prevStyle.underline !== thisStyle.underline ||
                 prevStyle.linethrough !== thisStyle.linethrough));
