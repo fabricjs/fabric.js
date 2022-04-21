@@ -2,7 +2,8 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = {}),
+      degreesToRadians = fabric.util.degreesToRadians;
 
   function Control(options) {
     for (var i in options) {
@@ -167,33 +168,30 @@
     /**
      * Returns control actionHandler
      * @param {Event} eventData the native mouse event
-     * @param {fabric.Object} fabricObject on which the control is displayed
      * @param {fabric.Control} control control for which the action handler is being asked
      * @return {Function} the action handler
      */
-    getActionHandler: function(/* eventData, fabricObject, control */) {
+    getActionHandler: function(/* eventData, control */) {
       return this.actionHandler;
     },
 
     /**
      * Returns control mouseDown handler
      * @param {Event} eventData the native mouse event
-     * @param {fabric.Object} fabricObject on which the control is displayed
      * @param {fabric.Control} control control for which the action handler is being asked
      * @return {Function} the action handler
      */
-    getMouseDownHandler: function(/* eventData, fabricObject, control */) {
+    getMouseDownHandler: function(/* eventData, control */) {
       return this.mouseDownHandler;
     },
 
     /**
      * Returns control mouseUp handler
      * @param {Event} eventData the native mouse event
-     * @param {fabric.Object} fabricObject on which the control is displayed
      * @param {fabric.Control} control control for which the action handler is being asked
      * @return {Function} the action handler
      */
-    getMouseUpHandler: function(/* eventData, fabricObject, control */) {
+    getMouseUpHandler: function(/* eventData, control */) {
       return this.mouseUpHandler;
     },
 
@@ -206,7 +204,7 @@
      * @param {fabric.Object} object on which the control is displayed
      * @return {String}
      */
-    cursorStyleHandler: function(eventData, control /* fabricObject */) {
+    cursorStyleHandler: function(eventData, control) {
       return control.cursorStyle;
     },
 
@@ -217,7 +215,7 @@
      * @param {fabric.Object} object on which the control is displayed
      * @return {String}
      */
-    getActionName: function(eventData, control /* fabricObject */) {
+    getActionName: function(eventData, control) {
       return control.actionName;
     },
 
@@ -227,11 +225,7 @@
      * @param {String} controlKey key where the control is memorized on the
      * @return {Boolean}
      */
-    getVisibility: function(fabricObject, controlKey) {
-      var objectVisibility = fabricObject._controlsVisibility;
-      if (objectVisibility && typeof objectVisibility[controlKey] !== 'undefined') {
-        return objectVisibility[controlKey];
-      }
+    getVisibility: function () {
       return this.visible;
     },
 
@@ -240,15 +234,16 @@
      * @param {Boolean} visibility for the object
      * @return {Void}
      */
-    setVisibility: function(visibility /* name, fabricObject */) {
+    setVisibility: function(visibility) {
       this.visible = visibility;
     },
 
 
-    positionHandler: function(dim, finalMatrix /*, fabricObject, currentControl */) {
-      var point = fabric.util.transformPoint({
-        x: this.x * dim.x + this.offsetX,
-        y: this.y * dim.y + this.offsetY }, finalMatrix);
+    positionHandler: function(dim, finalMatrix /*, currentControl */) {
+      var point = fabric.util.transformPoint(
+        new fabric.Point(this.x * dim.x + this.offsetX, this.y * dim.y + this.offsetY),
+        finalMatrix
+      );
       return point;
     },
 
@@ -322,18 +317,106 @@
     * @param {Number} left position of the canvas where we are about to render the control.
     * @param {Number} top position of the canvas where we are about to render the control.
     * @param {Object} styleOverride
-    * @param {fabric.Object} fabricObject the object where the control is about to be rendered
     */
-    render: function(ctx, left, top, styleOverride, fabricObject) {
+    render: function (ctx, left, top, styleOverride) {
       styleOverride = styleOverride || {};
-      switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
+      switch (styleOverride.cornerStyle || this.object.cornerStyle) {
         case 'circle':
-          fabric.controlsUtils.renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          this.renderCircleControl(ctx, left, top, styleOverride);
           break;
         default:
-          fabric.controlsUtils.renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          this.renderSquareControl(ctx, left, top, styleOverride);
       }
     },
+
+    /**
+     * Render a round control, as per fabric features.
+     * This function is written to respect object properties like transparentCorners, cornerSize
+     * cornerColor, cornerStrokeColor
+     * plus the addition of offsetY and offsetX.
+     * @param {CanvasRenderingContext2D} ctx context to render on
+     * @param {Number} left x coordinate where the control center should be
+     * @param {Number} top y coordinate where the control center should be
+     * @param {Object} styleOverride override for fabric.Object controls style
+     */
+    renderCircleControl: function (ctx, left, top, styleOverride) {
+      var fabricObject = this.object;
+      styleOverride = styleOverride || {};
+      var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
+        ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
+        transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
+          styleOverride.transparentCorners : fabricObject.transparentCorners,
+        methodName = transparentCorners ? 'stroke' : 'fill',
+        stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
+        myLeft = left,
+        myTop = top, size;
+      ctx.save();
+      ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
+      ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
+      // as soon as fabric react v5, remove ie11, use proper ellipse code.
+      if (xSize > ySize) {
+        size = xSize;
+        ctx.scale(1.0, ySize / xSize);
+        myTop = top * xSize / ySize;
+      }
+      else if (ySize > xSize) {
+        size = ySize;
+        ctx.scale(xSize / ySize, 1.0);
+        myLeft = left * ySize / xSize;
+      }
+      else {
+        size = xSize;
+      }
+      // this is still wrong
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(myLeft, myTop, size / 2, 0, 2 * Math.PI, false);
+      ctx[methodName]();
+      if (stroke) {
+        ctx.stroke();
+      }
+      ctx.restore();
+    },
+
+    /**
+     * Render a square control, as per fabric features.
+     * This function is written to respect object properties like transparentCorners, cornerSize
+     * cornerColor, cornerStrokeColor
+     * plus the addition of offsetY and offsetX.
+     * @param {CanvasRenderingContext2D} ctx context to render on
+     * @param {Number} left x coordinate where the control center should be
+     * @param {Number} top y coordinate where the control center should be
+     * @param {Object} styleOverride override for fabric.Object controls style
+     */
+    renderSquareControl: function (ctx, left, top, styleOverride) {
+      var fabricObject = this.object;
+      styleOverride = styleOverride || {};
+      var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
+        ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
+        transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
+          styleOverride.transparentCorners : fabricObject.transparentCorners,
+        methodName = transparentCorners ? 'stroke' : 'fill',
+        stroke = !transparentCorners && (
+          styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor
+        ), xSizeBy2 = xSize / 2, ySizeBy2 = ySize / 2;
+      ctx.save();
+      ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
+      ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
+      // this is still wrong
+      ctx.lineWidth = 1;
+      ctx.translate(left, top);
+      //  angle is relative to canvas plane
+      var angle = fabricObject.getTotalAngle();
+      ctx.rotate(degreesToRadians(angle));
+      // this does not work, and fixed with ( && ) does not make sense.
+      // to have real transparent corners we need the controls on upperCanvas
+      // transparentCorners || ctx.clearRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
+      ctx[methodName + 'Rect'](-xSizeBy2, -ySizeBy2, xSize, ySize);
+      if (stroke) {
+        ctx.strokeRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
+      }
+      ctx.restore();
+    }
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

@@ -79,6 +79,17 @@
     splitByGrapheme: false,
 
     /**
+     * Constructor
+     * @param {String} text Text string
+     * @param {Object} [options] Options object
+     * @return {fabric.Textbox} thisArg
+     */
+    initialize: function (text, options) {
+      this.callSuper('initialize', text, options);
+      (!options || !options.controls) && (this.controls = new fabric.TextboxControls(this));
+    },
+
+    /**
      * Unlike superclass's version of this function, Textbox does not update
      * its width.
      * @private

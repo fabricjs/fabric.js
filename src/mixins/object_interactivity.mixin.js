@@ -55,9 +55,7 @@
      * @param {Function} fn function to iterate over the controls over
      */
     forEachControl: function(fn) {
-      for (var i in this.controls) {
-        fn(this.controls[i], i, this);
-      };
+      this.controls.forEachControl(fn);
     },
 
     /**
@@ -194,10 +192,10 @@
           shouldStroke = false;
 
       ctx.beginPath();
-      this.forEachControl(function (control, key, fabricObject) {
+      this.forEachControl(function (control, key) {
         // in this moment, the ctx is centered on the object.
         // width and height of the above function are the size of the bbox.
-        if (control.withConnection && control.getVisibility(fabricObject, key)) {
+        if (control.withConnection && control.getVisibility()) {
           // reset movement for each control
           shouldStroke = true;
           ctx.moveTo(control.x * width, control.y * height);
@@ -232,10 +230,10 @@
       }
       this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray);
       this.setCoords();
-      this.forEachControl(function(control, key, fabricObject) {
-        if (control.getVisibility(fabricObject, key)) {
-          p = fabricObject.oCoords[key];
-          control.render(ctx, p.x, p.y, styleOverride, fabricObject);
+      this.forEachControl(function(control, key) {
+        if (control.getVisibility()) {
+          p = this.oCoords[key];
+          control.render(ctx, p.x, p.y, styleOverride);
         }
       });
       ctx.restore();
@@ -249,7 +247,7 @@
      * @returns {Boolean} true if the specified control is visible, false otherwise
      */
     isControlVisible: function(controlKey) {
-      return this.controls[controlKey] && this.controls[controlKey].getVisibility(this, controlKey);
+      return this.controls[controlKey] && this.controls[controlKey].getVisibility();
     },
 
     /**
@@ -260,10 +258,7 @@
      * @chainable
      */
     setControlVisible: function(controlKey, visible) {
-      if (!this._controlsVisibility) {
-        this._controlsVisibility = {};
-      }
-      this._controlsVisibility[controlKey] = visible;
+      this.controls[controlKey] && this.controls[controlKey].setVisibility(visible);
       return this;
     },
 

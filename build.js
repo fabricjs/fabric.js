@@ -150,7 +150,6 @@ var filesToInclude = [
   'src/intersection.class.js',
   'src/color.class.js',
   ifSpecifiedInclude('interaction', 'src/controls.actions.js'),
-  ifSpecifiedInclude('interaction', 'src/controls.render.js'),
   ifSpecifiedInclude('interaction', 'src/control.class.js'),
 
   ifSpecifiedInclude('gradient', 'src/gradient.class.js'),

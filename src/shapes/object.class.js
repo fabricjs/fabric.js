@@ -649,7 +649,8 @@
      * Constructor
      * @param {Object} [options] Options object
      */
-    initialize: function(options) {
+    initialize: function (options) {
+      this.controls = new fabric.ObjectControls(this);
       if (options) {
         this.setOptions(options);
       }

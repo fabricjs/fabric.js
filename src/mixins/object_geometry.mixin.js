@@ -61,12 +61,6 @@
     matrixCache: null,
 
     /**
-     * custom controls interface
-     * controls are added by default_controls.js
-     */
-    controls: { },
-
-    /**
      * return correct set of coordinates for intersection
      * this will return either aCoords or lineCoords.
      * @param {Boolean} absolute will return aCoords if true or lineCoords
@@ -467,8 +461,8 @@
           finalMatrix = multiplyMatrices(finalMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
           dim = this._calculateCurrentDimensions(),
           coords = {};
-      this.forEachControl(function(control, key, fabricObject) {
-        coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
+      this.forEachControl(function(control, key) {
+        coords[key] = control.positionHandler(dim, finalMatrix);
       });
 
       // debug code
