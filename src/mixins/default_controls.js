@@ -110,7 +110,7 @@
      */
     forEachControl(callback) {
       this.controls.forEach(function (key) {
-        callback.call(this.object, this[key], key);
+        callback(this[key], key);
       }.bind(this));
     }
   }

@@ -55,7 +55,7 @@
      * @param {Function} fn function to iterate over the controls over
      */
     forEachControl: function(fn) {
-      this.controls.forEachControl(fn);
+      this.controls.forEachControl(fn.bind(this));
     },
 
     /**
