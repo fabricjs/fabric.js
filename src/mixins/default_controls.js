@@ -10,7 +10,6 @@
 
   class ObjectControls {
     constructor(object) {
-      this.object = object;
       this.controls = [
         'ml',
         'mr',
@@ -29,7 +28,7 @@
         cursorStyleHandler: scaleSkewStyleHandler,
         actionHandler: scalingXOrSkewingY,
         getActionName: scaleOrSkewActionName,
-        object: this.object
+        object: object
       });
 
       this.mr = new fabric.Control({
@@ -38,7 +37,7 @@
         cursorStyleHandler: scaleSkewStyleHandler,
         actionHandler: scalingXOrSkewingY,
         getActionName: scaleOrSkewActionName,
-        object: this.object
+        object: object
       });
 
       this.mb = new fabric.Control({
@@ -47,7 +46,7 @@
         cursorStyleHandler: scaleSkewStyleHandler,
         actionHandler: scalingYOrSkewingX,
         getActionName: scaleOrSkewActionName,
-        object: this.object
+        object: object
       });
 
       this.mt = new fabric.Control({
@@ -56,7 +55,7 @@
         cursorStyleHandler: scaleSkewStyleHandler,
         actionHandler: scalingYOrSkewingX,
         getActionName: scaleOrSkewActionName,
-        object: this.object
+        object: object
       });
 
       this.tl = new fabric.Control({
@@ -64,7 +63,7 @@
         y: -0.5,
         cursorStyleHandler: scaleStyleHandler,
         actionHandler: scalingEqually,
-        object: this.object
+        object: object
       });
 
       this.tr = new fabric.Control({
@@ -72,7 +71,7 @@
         y: -0.5,
         cursorStyleHandler: scaleStyleHandler,
         actionHandler: scalingEqually,
-        object: this.object
+        object: object
       });
 
       this.bl = new fabric.Control({
@@ -80,7 +79,7 @@
         y: 0.5,
         cursorStyleHandler: scaleStyleHandler,
         actionHandler: scalingEqually,
-        object: this.object
+        object: object
       });
 
       this.br = new fabric.Control({
@@ -88,7 +87,7 @@
         y: 0.5,
         cursorStyleHandler: scaleStyleHandler,
         actionHandler: scalingEqually,
-        object: this.object
+        object: object
       });
 
       this.mtr = new fabric.Control({
@@ -99,7 +98,7 @@
         offsetY: -40,
         withConnection: true,
         actionName: 'rotate',
-        object: this.object
+        object: object
       });
     }
 
@@ -125,7 +124,7 @@
         actionHandler: controlsUtils.changeWidth,
         cursorStyleHandler: scaleSkewStyleHandler,
         actionName: 'resizing',
-        object: this.object
+        object: object
       })
 
       this.ml = new fabric.Control({
@@ -134,7 +133,7 @@
         actionHandler: controlsUtils.changeWidth,
         cursorStyleHandler: scaleSkewStyleHandler,
         actionName: 'resizing',
-        object: this.object
+        object: object
       })
     }
   }
