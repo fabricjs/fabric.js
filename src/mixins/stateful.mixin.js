@@ -3,16 +3,20 @@
   var extend = fabric.util.object.extend,
       originalSet = 'stateProperties';
 
+  function extractProps(origin, propsSet) {
+    var props = typeof propsSet === 'string' ? origin[propsSet] : propsSet;
+    return props.reduce(function (saved, prop) {
+      saved[prop] = origin[prop] instanceof fabric.Object ?
+        extractProps(origin[prop], originalSet) :
+        origin[prop];
+      return saved;
+    }, {});
+  }
   /*
     Depends on `stateProperties`
   */
   function saveProps(origin, destination, props) {
-    var tmpObj = { }, deep = true;
-    props.forEach(function(prop) {
-      tmpObj[prop] = origin[prop];
-    });
-
-    extend(origin[destination], tmpObj, deep);
+    extend(origin[destination], extractProps(origin, props), true);
   }
 
   function _isEqual(origValue, currentValue, firstPass) {
@@ -30,6 +34,9 @@
         }
       }
       return true;
+    }
+    else if (!firstPass && origValue && typeof origValue === 'object' && currentValue instanceof fabric.Object) {
+      return _isEqual(origValue, extractProps(currentValue, originalSet));
     }
     else if (origValue && typeof origValue === 'object') {
       var keys = Object.keys(origValue), key;
@@ -83,7 +90,7 @@
       if (!this[destination]) {
         return this.setupState(options);
       }
-      saveProps(this, destination, this[propertySet]);
+      saveProps(this, destination, propertySet);
       if (options && options.stateProperties) {
         saveProps(this, destination, options.stateProperties);
       }
