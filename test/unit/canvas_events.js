@@ -396,9 +396,7 @@
     var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
     var mouseUpCalled = false;
     var mouseDownCalled = false;
-    rect.controls = {
-      br: fabric.Object.prototype.controls.br,
-    };
+    rect.controls = new fabric.ObjectControls();
     rect.controls.br.mouseUpHandler = function() {
       mouseUpCalled = true;
     };
@@ -422,9 +420,7 @@
     var e3 = { clientX: 100, clientY: 100, which: 1 };
     var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
     var mouseUpCalled = false;
-    rect.controls = {
-      br: fabric.Object.prototype.controls.br,
-    };
+    rect.controls = new fabric.ObjectControls();
     rect.controls.br.mouseUpHandler = function() {
       mouseUpCalled = true;
     };
@@ -446,10 +442,7 @@
     var mouseUpCalled1 = false;
     var mouseUpCalled2 = false;
 
-    rect.controls = {
-      br: fabric.Object.prototype.controls.br,
-      tr: fabric.Object.prototype.controls.tr,
-    };
+    rect.controls = new fabric.ObjectControls();
     rect.controls.br.mouseUpHandler = function() {
       mouseUpCalled1 = true;
     };
