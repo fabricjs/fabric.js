@@ -228,16 +228,10 @@
      */
     canEnterGroup: function (object) {
       if (object === this || this.isDescendantOf(object)) {
-        /* _DEV_MODE_START_ */
-        console.warn('fabric.Group: trying to add group to itself, this call has no effect');
-        /* _DEV_MODE_END_ */
-        return false;
+        throw new Error('fabric.Group: trying to add group to itself');
       }
       else if (object.group && object.group === this) {
-        /* _DEV_MODE_START_ */
-        console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
-        /* _DEV_MODE_END_ */
-        return false;
+        throw new Error('fabric.Group: duplicate objects are not supported inside group');
       }
       return true;
     },
