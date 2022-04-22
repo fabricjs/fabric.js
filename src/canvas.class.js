@@ -502,7 +502,7 @@
       // in case the target is the activeObject, we cannot execute this optimization
       // because we need to draw controls too.
       if (target.shouldCache() && target._cacheCanvas && target !== this._activeObject
-        && (!(target instanceof fabric.Group) || !target.filtersObjectsAtRendering())) {
+        && (typeof target.filtersObjectsAtRendering !== 'function' || !target.filtersObjectsAtRendering())) {
         var normalizedPointer = this._normalizePointer(target, {x: x, y: y}),
             targetRelativeX = Math.max(target.cacheTranslationX + (normalizedPointer.x * target.zoomX), 0),
             targetRelativeY = Math.max(target.cacheTranslationY + (normalizedPointer.y * target.zoomY), 0);
