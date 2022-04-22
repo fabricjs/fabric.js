@@ -226,7 +226,7 @@
      * @param {fabric.Object} object
      * @returns
      */
-    canEnter: function (object) {
+    canEnterGroup: function (object) {
       if (object === this || this.isDescendantOf(object)) {
         /* _DEV_MODE_START_ */
         console.warn('fabric.Group: trying to add group to itself, this call has no effect');
@@ -249,7 +249,7 @@
      * @returns {boolean} true if object entered group
      */
     enterGroup: function (object, removeParentTransform) {
-      if (!this.canEnter(object)) {
+      if (!this.canEnterGroup(object)) {
         return false;
       }
       if (object.group) {
