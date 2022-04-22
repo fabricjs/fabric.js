@@ -1046,16 +1046,25 @@
         !this.visible;
     },
 
+    shouldRender: function () {
+      // do not render if width/height are zeros or object is not visible
+      if (this.isNotVisible()) {
+        return false;
+      }
+      if (this.canvas && this.canvas.skipOffscreen && !this.isOnScreen()) {
+        return false;
+      }
+      else {
+        return true;
+      }
+    },
+
     /**
      * Renders an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     render: function(ctx) {
-      // do not render if width/height are zeros or object is not visible
-      if (this.isNotVisible()) {
-        return;
-      }
-      if (this.canvas && this.canvas.skipOffscreen && !this.group && !this.isOnScreen()) {
+      if (!this.shouldRender()) {
         return;
       }
       ctx.save();

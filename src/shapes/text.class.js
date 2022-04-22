@@ -1518,11 +1518,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     render: function(ctx) {
-      // do not render if object is not visible
-      if (!this.visible) {
-        return;
-      }
-      if (this.canvas && this.canvas.skipOffscreen && !this.group && !this.isOnScreen()) {
+      if (!this.shouldRender()) {
         return;
       }
       if (this._shouldClearDimensionCache()) {
