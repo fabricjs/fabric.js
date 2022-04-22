@@ -702,27 +702,22 @@
       group = new fabric.Group([rect1]);
 
     //  duplicate
-    assert.notOk(group.canEnterGroup(rect1));
-    // group.add(rect1);
-    // assert.deepEqual(group.getObjects(), [rect1], 'objects should not have changed');
+    assert.throws(() => group.canEnterGroup(rect1), 'rect1 already exists in group');
+    assert.throws(() => group.add(rect1), 'rect1 already exists in group');
     //  duplicate on same call
     assert.ok(group.canEnterGroup(rect2));
-    // group.add(rect2, rect2);
-    // assert.deepEqual(group.getObjects(), [rect1, rect2], '`rect2` should have entered once');
+    assert.throws(() => group.add(rect2, rect2), '`rect2` should have entered once');
     //  adding self
-    assert.notOk(group.canEnterGroup(group));
-    // group.add(group);
-    // assert.deepEqual(group.getObjects(), [rect1, rect2], 'objects should not have changed');
+    assert.throws(() => group.canEnterGroup(group));
+    assert.throws(() => group.add(group));
     //  nested object should be removed from group
     var nestedGroup = new fabric.Group([rect1]);
     assert.ok(group.canEnterGroup(nestedGroup));
-    // group.add(nestedGroup);
-    // assert.deepEqual(group.getObjects(), [rect2, nestedGroup], '`rect1` was removed from group once it entered `nestedGroup`');
+    group.add(nestedGroup);
     //  circular group
     var circularGroup = new fabric.Group([rect2, group]);
-    assert.notOk(group.canEnterGroup(circularGroup), 'circular group should be denied entry');
-    // group.add(circularGroup);
-    // assert.deepEqual(group.getObjects(), [rect2, nestedGroup], 'objects should not have changed');
+    assert.throws(() => group.canEnterGroup(circularGroup), 'circular group should be denied entry');
+    assert.throws(() => group.add(circularGroup), 'circular group should be denied entry');
   });
 
   QUnit.test('group remove', function(assert) {
