@@ -1384,7 +1384,7 @@
     object.fill = 'transparent';
     assert.equal(object.hasFill(), false, 'with a color that is transparent, hasFill is true');
   });
-  QUnit.test.only('fill-parent layout - canvas', function (assert) {
+  QUnit.test('fill-parent layout - canvas', function (assert) {
     var object = new fabric.Object({ fill: 'blue', width: 100, height: 100, layout: 'fill-parent' });
     assert.equal(object.width, 100);
     assert.equal(object.height, 100);
@@ -1417,7 +1417,7 @@
     canvas.setDimensions({ width: canvas.width + 1, height: canvas.height + 1 });
     assert.equal(memo.length, 2, 'should not have fired a resize event on object after removal');
   });
-  QUnit.test.only('fill-parent layout - group', function (assert) {
+  QUnit.test('fill-parent layout - group', function (assert) {
     var object = new fabric.Object({ fill: 'blue', width: 100, height: 100, layout: 'fill-parent' });
     assert.equal(object.width, 100);
     assert.equal(object.height, 100);
