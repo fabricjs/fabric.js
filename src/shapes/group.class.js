@@ -811,10 +811,13 @@
       if (objects.length === 0) {
         return null;
       }
-      var objCenter, sizeVector, min, max, a, b;
+      var objCenter, sizeVector, min = new fabric.Point(0, 0), max = new fabric.Point(0, 0), a, b;
       objects.forEach(function (object, i) {
         if (object instanceof fabric.Layer) {
           var bbox = object.getObjectsBoundingBox(object._objects.slice(0));
+          if (!bbox) {
+            return;
+          }
           sizeVector = object._getTransformedDimensions({
             width: bbox.width,
             height: bbox.height
@@ -831,13 +834,13 @@
               cos = Math.abs(fabric.util.cos(rad)),
               rx = sizeVector.x * cos + sizeVector.y * sin,
               ry = sizeVector.x * sin + sizeVector.y * cos;
-          sizeVector = new fabric.Point(rx, ry);
+          sizeVector.setXY(rx, ry);
         }
         a = objCenter.subtract(sizeVector);
         b = objCenter.add(sizeVector);
         if (i === 0) {
-          min = new fabric.Point(Math.min(a.x, b.x), Math.min(a.y, b.y));
-          max = new fabric.Point(Math.max(a.x, b.x), Math.max(a.y, b.y));
+          min.setXY(Math.min(a.x, b.x), Math.min(a.y, b.y));
+          max.setXY(Math.max(a.x, b.x), Math.max(a.y, b.y));
         }
         else {
           min.setXY(Math.min(min.x, a.x, b.x), Math.min(min.y, a.y, b.y));
