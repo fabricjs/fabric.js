@@ -61,6 +61,55 @@ fabric.ParentResizeObserver = fabric.util.createClass({
     this.invokeCallback(Object.assign({}, context, { type: 'group_layout' }));
   },
 
+  fillParent: function (context) {
+    var object = this.object;
+    if (object.layout === 'fill-parent') {
+      var parent, pos;
+      if ((context.type === 'group' || context.type === 'group_layout') && object.group) {
+        parent = object.group;
+        pos = new fabric.Point(0, 0);
+      }
+      else if ((context.type === 'canvas' || context.type === 'canvas_resize') && object.canvas && !object.group) {
+        parent = object.canvas;
+        pos = new fabric.Point(parent.width, parent.height).scalarDivideEquals(2);
+      }
+      if (object.width !== parent.width || object.height !== parent.height) {
+        object.set({
+          width: parent.width,
+          height: parent.height
+        });
+        object.setPositionByOrigin(pos, 'center', 'center');
+        parent.interactive && object.setCoords();
+        object.fire('resize', context);
+      }
+    }
+  },
+
+  fillParentByScaling: function (context) {
+    var object = this.object;
+    if (object.layout === 'fill-parent') {
+      var parent, pos;
+      if ((context.type === 'group' || context.type === 'group_layout') && object.group) {
+        parent = object.group;
+        pos = new fabric.Point(0, 0);
+      }
+      else if ((context.type === 'canvas' || context.type === 'canvas_resize') && object.canvas && !object.group) {
+        parent = object.canvas;
+        pos = new fabric.Point(parent.width, parent.height).scalarDivideEquals(2);
+      }
+      var scale = fabric.util.findScaleToFit(object, parent);
+      if (scale !== object.scaleX || scale !== object.scaleY) {
+        object.set({
+          scaleX: scale,
+          scaleY: scale
+        });
+        object.setPositionByOrigin(pos, 'center', 'center');
+        parent.interactive && object.setCoords();
+        object.fire('resize', context);
+      }
+    }
+  },
+
   dispose: function () {
     var object = this.object;
     object.off('added:initialized', this.__onAdded);

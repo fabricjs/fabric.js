@@ -84,28 +84,24 @@
      */
     _onParentResize: function (context) {
       if (this.layout === 'fill-parent') {
-        var width, height, prevWidth = this.width, prevHeight = this.height;
-        if ((context.type === 'canvas' || context.type === 'canvas_resize') && this.canvas && !this.group) {
-          width = this.canvas.width;
-          height = this.canvas.height;
-          this.set({
-            rx: width / 2,
-            ry: height / 2
-          });
-          this.setPositionByOrigin(new fabric.Point(width, height).scalarDivideEquals(2), 'center', 'center');
-          this.setCoords();
+        var parent, pos;
+        if ((context.type === 'group' || context.type === 'group_layout') && this.group) {
+          parent = this.group;
+          pos = new fabric.Point(0, 0);
         }
-        else if ((context.type === 'group' || context.type === 'group_layout') && this.group) {
-          width = this.group.width;
-          height = this.group.height;
-          this.set({
-            rx: width / 2,
-            ry: height / 2
-          });
-          this.setPositionByOrigin(new fabric.Point(0, 0), 'center', 'center');
-          this.group.interactive && this.setCoords();
+        else if ((context.type === 'canvas' || context.type === 'canvas_resize') && this.canvas && !this.group) {
+          parent = this.canvas;
+          pos = new fabric.Point(parent.width, parent.height).scalarDivideEquals(2);
         }
-        if (prevWidth !== this.width || prevHeight !== this.height) {
+        var rx = parent.width / 2;
+        var ry = parent.height / 2;
+        if (rx !== this.rx || ry !== this.ry) {
+          this.set({
+            rx: rx,
+            ry: ry
+          });
+          this.setPositionByOrigin(pos, 'center', 'center');
+          parent.interactive && this.setCoords();
           this.fire('resize', context);
         }
       }

@@ -73,22 +73,20 @@
      */
     _onParentResize: function (context) {
       if (this.layout === 'fill-parent') {
-        var r = this.radius;
-        if ((context.type === 'canvas' || context.type === 'canvas_resize') && this.canvas && !this.group) {
-          this.setRadius(Math.min(this.canvas.width, this.canvas.height) / 2);
-          this.setPositionByOrigin(
-            new fabric.Point(this.canvas.width, this.canvas.height).scalarDivideEquals(2),
-            'center',
-            'center'
-          );
-          this.setCoords();
+        var parent, pos;
+        if ((context.type === 'group' || context.type === 'group_layout') && this.group) {
+          parent = this.group;
+          pos = new fabric.Point(0, 0);
         }
-        else if ((context.type === 'group' || context.type === 'group_layout') && this.group) {
-          this.setRadius(Math.min(this.group.width, this.group.height) / 2);
-          this.setPositionByOrigin(new fabric.Point(0, 0), 'center', 'center');
-          this.group.interactive && this.setCoords();
+        else if ((context.type === 'canvas' || context.type === 'canvas_resize') && this.canvas && !this.group) {
+          parent = this.canvas;
+          pos = new fabric.Point(parent.width, parent.height).scalarDivideEquals(2);
         }
+        var r = Math.min(parent.width, parent.height) / 2;
         if (r !== this.radius) {
+          this.setRadius(r);
+          this.setPositionByOrigin(pos, 'center', 'center');
+          parent.interactive && this.setCoords();
           this.fire('resize', context);
         }
       }
