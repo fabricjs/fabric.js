@@ -379,6 +379,15 @@
     },
 
     /**
+     * Called once instance is added to a parent and when parent resizes
+     * @private
+     * @param {*} context see {@link fabric.ParentResizeObserver}
+     */
+    _onParentResize: function (context) {
+      this._parentMonitor.fillParentByScaling(context);
+    },
+
+    /**
      * If text has a path, it will add the extra information needed
      * for path and text calculations
      * @return {fabric.Text} thisArg
