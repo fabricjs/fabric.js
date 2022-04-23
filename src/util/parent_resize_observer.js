@@ -61,24 +61,38 @@ fabric.ParentResizeObserver = fabric.util.createClass({
     this.invokeCallback(Object.assign({}, context, { type: 'group_layout' }));
   },
 
+  /**
+   * 
+   * @param {*} context 
+   * @returns {{ parent: fabric.Group | fabric.Canvas, center: fabric.Point }} data
+   */
+  extractDataFromResizeEvent: function(context) {
+    if ((context.type === 'group' || context.type === 'group_layout') && object.group) {
+      return {
+        parent: object.group,
+        center: new fabric.Point(0, 0)
+      };
+    }
+    else if ((context.type === 'canvas' || context.type === 'canvas_resize') && object.canvas && !object.group) {
+      var canvas = object.canvas;
+      return {
+        parent: canvas,
+        center: new fabric.Point(canvas.width, canvas.height).scalarDivideEquals(2)
+      };
+    }
+  },
+
   fillParent: function (context) {
     var object = this.object;
     if (object.layout === 'fill-parent') {
-      var parent, pos;
-      if ((context.type === 'group' || context.type === 'group_layout') && object.group) {
-        parent = object.group;
-        pos = new fabric.Point(0, 0);
-      }
-      else if ((context.type === 'canvas' || context.type === 'canvas_resize') && object.canvas && !object.group) {
-        parent = object.canvas;
-        pos = new fabric.Point(parent.width, parent.height).scalarDivideEquals(2);
-      }
+      var data = this.extractDataFromResizeEvent(context);
+      var parent = data.parent;
       if (object.width !== parent.width || object.height !== parent.height) {
         object.set({
           width: parent.width,
           height: parent.height
         });
-        object.setPositionByOrigin(pos, 'center', 'center');
+        object.setPositionByOrigin(data.center, 'center', 'center');
         parent.interactive && object.setCoords();
         object.fire('resize', context);
       }
@@ -88,22 +102,15 @@ fabric.ParentResizeObserver = fabric.util.createClass({
   fillParentByScaling: function (context) {
     var object = this.object;
     if (object.layout === 'fill-parent') {
-      var parent, pos;
-      if ((context.type === 'group' || context.type === 'group_layout') && object.group) {
-        parent = object.group;
-        pos = new fabric.Point(0, 0);
-      }
-      else if ((context.type === 'canvas' || context.type === 'canvas_resize') && object.canvas && !object.group) {
-        parent = object.canvas;
-        pos = new fabric.Point(parent.width, parent.height).scalarDivideEquals(2);
-      }
+      var data = this.extractDataFromResizeEvent(context);
+      var parent = data.parent;
       var scale = fabric.util.findScaleToFit(object, parent);
       if (scale !== object.scaleX || scale !== object.scaleY) {
         object.set({
           scaleX: scale,
           scaleY: scale
         });
-        object.setPositionByOrigin(pos, 'center', 'center');
+        object.setPositionByOrigin(data.center, 'center', 'center');
         parent.interactive && object.setCoords();
         object.fire('resize', context);
       }

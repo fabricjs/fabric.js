@@ -73,19 +73,12 @@
      */
     _onParentResize: function (context) {
       if (this.layout === 'fill-parent') {
-        var parent, pos;
-        if ((context.type === 'group' || context.type === 'group_layout') && this.group) {
-          parent = this.group;
-          pos = new fabric.Point(0, 0);
-        }
-        else if ((context.type === 'canvas' || context.type === 'canvas_resize') && this.canvas && !this.group) {
-          parent = this.canvas;
-          pos = new fabric.Point(parent.width, parent.height).scalarDivideEquals(2);
-        }
+        var data = this.extractDataFromResizeEvent(context);
+        var parent = data.parent;
         var r = Math.min(parent.width, parent.height) / 2;
         if (r !== this.radius) {
           this.setRadius(r);
-          this.setPositionByOrigin(pos, 'center', 'center');
+          this.setPositionByOrigin(data.center, 'center', 'center');
           parent.interactive && this.setCoords();
           this.fire('resize', context);
         }
