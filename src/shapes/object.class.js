@@ -679,6 +679,7 @@
             height: height
           });
           this.setPositionByOrigin(new fabric.Point(width, height).scalarDivideEquals(2), 'center', 'center');
+          this.setCoords();
         }
         else if ((context.type === 'group' || context.type === 'group_layout') && this.group) {
           width = this.group.width;
@@ -688,6 +689,7 @@
             height: height
           });
           this.setPositionByOrigin(new fabric.Point(0, 0), 'center', 'center');
+          this.group.interactive && this.setCoords();
         }
         if (prevWidth !== this.width || prevHeight !== this.height) {
           this.fire('resize', context);

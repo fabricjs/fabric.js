@@ -81,14 +81,15 @@
             'center',
             'center'
           );
+          this.setCoords();
         }
         else if ((context.type === 'group' || context.type === 'group_layout') && this.group) {
           this.setRadius(Math.min(this.group.width, this.group.height) / 2);
           this.setPositionByOrigin(new fabric.Point(0, 0), 'center', 'center');
+          this.group.interactive && this.setCoords();
         }
         if (r !== this.radius) {
           this.fire('resize', context);
-          this.canvas && this.canvas.requestRenderAll();
         }
       }
     },
