@@ -66,7 +66,8 @@ fabric.ParentResizeObserver = fabric.util.createClass({
    * @param {*} context 
    * @returns {{ parent: fabric.Group | fabric.Canvas, center: fabric.Point }} data
    */
-  extractDataFromResizeEvent: function(context) {
+  extractDataFromResizeEvent: function (context) {
+    var object = this.object;
     if ((context.type === 'group' || context.type === 'group_layout') && object.group) {
       return {
         parent: object.group,
@@ -86,6 +87,7 @@ fabric.ParentResizeObserver = fabric.util.createClass({
     var object = this.object;
     if (object.layout === 'fill-parent') {
       var data = this.extractDataFromResizeEvent(context);
+      console.log('fuccc', data,context);
       var parent = data.parent;
       if (object.width !== parent.width || object.height !== parent.height) {
         object.set({

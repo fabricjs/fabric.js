@@ -84,7 +84,7 @@
      */
     _onParentResize: function (context) {
       if (this.layout === 'fill-parent') {
-        var data = this.extractDataFromResizeEvent(context);
+        var data = this._parentMonitor.extractDataFromResizeEvent(context);
         var parent = data.parent;
         var rx = parent.width / 2;
         var ry = parent.height / 2;
