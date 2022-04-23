@@ -664,12 +664,13 @@
     },
 
     /**
+     * Called once instance is added to a parent and when parent resizes
      * @private
      * @param {*} context see {@link fabric.ParentResizeObserver}
      */
     _onParentResize: function (context) {
       if (this.layout === 'fill-parent') {
-        var width, height;
+        var width, height, prevWidth = this.width, prevHeight = this.height;
         if ((context.type === 'canvas' || context.type === 'canvas_resize') && this.canvas && !this.group) {
           width = this.canvas.width;
           height = this.canvas.height;
@@ -678,7 +679,6 @@
             height: height
           });
           this.setPositionByOrigin(new fabric.Point(width, height).scalarDivideEquals(2), 'center', 'center');
-          this.fire('resize', context);
         }
         else if ((context.type === 'group' || context.type === 'group_layout') && this.group) {
           width = this.group.width;
@@ -688,6 +688,8 @@
             height: height
           });
           this.setPositionByOrigin(new fabric.Point(0, 0), 'center', 'center');
+        }
+        if (prevWidth !== this.width || prevHeight !== this.height) {
           this.fire('resize', context);
         }
       }
