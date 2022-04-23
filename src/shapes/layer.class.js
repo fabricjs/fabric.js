@@ -138,6 +138,14 @@
 
     /**
      * @private
+     * @override handled by {@link fabric.Layer#getLayoutStrategyResult}
+     */
+    _onParentResize: function (context) {
+      this._applyLayoutStrategy(context);
+    },
+
+    /**
+     * @private
      * @override we do not want to bubble layout
      */
     _bubbleLayout: function () {

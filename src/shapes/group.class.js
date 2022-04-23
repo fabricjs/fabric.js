@@ -133,14 +133,6 @@
 
     /**
      * @private
-     * @override handled by {@link fabric.Group#getLayoutStrategyResult}, consider using {@link fabric.Layer}
-     */
-    _onParentResize: function (context) {
-      this._applyLayoutStrategy(context);
-    },
-
-    /**
-     * @private
      */
     _shouldSetNestedCoords: function () {
       return this.subTargetCheck;
@@ -228,6 +220,14 @@
       object[directive]('modified', this.__objectMonitor);
       object[directive]('selected', this.__objectSelectionTracker);
       object[directive]('deselected', this.__objectSelectionDisposer);
+    },
+
+    /**
+     * @private
+     * @override consider using {@link fabric.Layer} for `fill-parent` layout
+     */
+    _onParentResize: function () {
+      //  noop
     },
 
     /**
