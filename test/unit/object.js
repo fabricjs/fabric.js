@@ -1384,7 +1384,7 @@
     object.fill = 'transparent';
     assert.equal(object.hasFill(), false, 'with a color that is transparent, hasFill is true');
   });
-  QUnit.test.only('fill-parent layout', function (assert) {
+  QUnit.test.only('fill-parent layout - canvas', function (assert) {
     var object = new fabric.Object({ fill: 'blue', width: 100, height: 100, layout: 'fill-parent' });
     assert.equal(object.width, 100);
     assert.equal(object.height, 100);
@@ -1392,15 +1392,75 @@
     object.on('resize', (opt) => {
       memo.push(opt);
     });
+
     canvas.add(object);
+    assert.equal(memo.length, 1, 'should have fired a resize event on object');
+    assert.deepEqual(memo[0], { type: 'canvas' }, 'should have fired resize');
     assert.equal(object.width, canvas.width);
     assert.equal(object.height, canvas.height);
-    assert.equal(memo.length, 1, 'should have fired a resize event on object');
-    canvas.remove(object);
-    var group = new fabric.Group([object]);
-    assert.equal(object.width, group.width);
-    assert.equal(object.height, group.height);
+
+    canvas.setDimensions({ width: canvas.width - 1, height: canvas.height });
     assert.equal(memo.length, 2, 'should have fired a resize event on object');
+    assert.deepEqual(memo[1], { type: 'canvas_resize', width: 299, height: 150 }, 'should have fired resize');
+    assert.equal(object.width, canvas.width);
+    assert.equal(object.height, canvas.height);
+
+    canvas.setDimensions({ width: canvas.width, height: canvas.height });
+    assert.equal(memo.length, 2, 'should not have fired a resize event on object - size remains unchanged');
+
+    object.layout = '';
+    canvas.setDimensions({ width: canvas.width, height: canvas.height - 1 });
+    assert.equal(memo.length, 2, 'should not have fired a resize event on object - disabled layout');
+    
+    object.layout = 'fill-parent';
+    canvas.remove(object);
+    canvas.setDimensions({ width: canvas.width + 1, height: canvas.height + 1 });
+    assert.equal(memo.length, 2, 'should not have fired a resize event on object after removal');
+  });
+  QUnit.test.only('fill-parent layout - group', function (assert) {
+    var object = new fabric.Object({ fill: 'blue', width: 100, height: 100, layout: 'fill-parent' });
+    assert.equal(object.width, 100);
+    assert.equal(object.height, 100);
+    var memo = [];
+    object.on('resize', (opt) => {
+      memo.push(opt);
+    });
+
+    var group = new fabric.Group([object], { layout: 'fixed', width: 200, height: 100 });
+    assert.equal(memo.length, 1, 'should have fired a resize event on object');
+    assert.deepEqual(memo[0], { type: 'group' }, 'should have fired resize');
+    assert.equal(object.width, 200);
+    assert.equal(object.height, 100);
+
+    group.triggerLayout({ width: 199, height: 100 });
+    assert.equal(memo.length, 2, 'should have fired a resize event on object');
+    assert.deepEqual(memo[1].type, 'group_layout', 'should have fired resize');
+    assert.equal(object.width, 199);
+    assert.equal(object.height, 100);
+
+    group.triggerLayout({ width: 199, height: 100 });
+    assert.equal(memo.length, 2, 'should not have fired a resize event on object - size remains unchanged');
+    assert.equal(object.width, 199);
+    assert.equal(object.height, 100);
+
+    object.layout = '';
+    group.triggerLayout({ width: 199, height: 99 });
+    assert.equal(memo.length, 2, 'should not have fired a resize event on object - disabled layout');
+    assert.equal(object.width, 199);
+    assert.equal(object.height, 100);
+
+    object.layout = 'fill-parent';
+    group.remove(object);
+    group.triggerLayout({ width: 200, height: 100 });
+    assert.equal(memo.length, 2, 'should not have fired a resize event on object after removal');
+    assert.equal(object.width, 199);
+    assert.equal(object.height, 100);
+
+    object.width = 200;
+    group.add(object);
+    assert.equal(memo.length, 2, 'should not have fired a resize event on object - size remains unchanged');
+    assert.equal(object.width, 200);
+    assert.equal(object.height, 100);
   });
   QUnit.test('dispose', function (assert) {
     var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });
