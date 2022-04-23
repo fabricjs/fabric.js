@@ -6,16 +6,21 @@
   /*
     Depends on `stateProperties`
   */
-  function saveProps(origin, destination, props) {
-    var tmpObj = { }, deep = true;
-    props.forEach(function(prop) {
-      tmpObj[prop] = origin[prop];
-    });
-
-    extend(origin[destination], tmpObj, deep);
+  function _saveProps(origin, props) {
+    return props.reduce(function (saved, prop) {
+      var value = origin[prop];
+      saved[prop] = value instanceof fabric.Object ?
+        _saveProps(value, value[originalSet]) :
+        value;
+      return saved;
+    }, {});
   }
 
-  function _isEqual(origValue, currentValue, firstPass) {
+  function saveProps(origin, destination, props) {
+    extend(origin[destination], _saveProps(origin, props), true);
+  }
+
+  function _isEqual(origValue, currentValue, skipShallowTest) {
     if (origValue === currentValue) {
       // if the objects are identical, return
       return true;
@@ -35,7 +40,7 @@
       var keys = Object.keys(origValue), key;
       if (!currentValue ||
           typeof currentValue !== 'object' ||
-          (!firstPass && keys.length !== Object.keys(currentValue).length)
+          (!skipShallowTest && keys.length !== Object.keys(currentValue).length)
       ) {
         return false;
       }
@@ -47,7 +52,7 @@
         if (key === 'canvas' || key === 'group') {
           continue;
         }
-        if (!_isEqual(origValue[key], currentValue[key])) {
+        if (!_isEqual(origValue[key], currentValue[key], currentValue[key] instanceof fabric.Object)) {
           return false;
         }
       }
