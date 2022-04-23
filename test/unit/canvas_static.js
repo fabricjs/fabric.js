@@ -40,7 +40,7 @@
                   '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
                   '13.99], ["z"]]}], "background": "#ff5555","overlay": "rgba(0,0,0,0.2)"}';
 
-  var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
+  var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"layout":"","fill":"rgb(0,0,0)",' +
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                            '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
@@ -80,6 +80,7 @@
     top: 0,
     width: IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
     height: IMG_HEIGHT, // or does it now?
+    layout: '',
     fill: 'rgb(0,0,0)',
     stroke: null,
     strokeWidth: 0,
@@ -978,7 +979,7 @@
     canvas.overlayColor = 'rgba(0,0,0,0.2)';
     assert.equal(JSON.stringify(canvas.toJSON()), '{"version":"' + fabric.version + '","objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlay` value should be reflected in json');
     canvas.add(makeRect());
-    assert.deepEqual(JSON.stringify(canvas.toJSON()), RECT_JSON);
+    assert.deepEqual(canvas.toJSON(), JSON.parse(RECT_JSON));
   });
 
   QUnit.test('toJSON custom properties non-existence check', function(assert) {
@@ -1062,7 +1063,7 @@
       sourcePath: 'http://example.com/'
     });
     canvas.add(path);
-    assert.equal(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
+    assert.deepEqual(canvas.toDatalessJSON(), JSON.parse(PATH_DATALESS_JSON));
   });
 
   QUnit.test('toObject', function(assert) {
@@ -1301,7 +1302,7 @@
     var jsonWithoutFoo = JSON.stringify(canvas.toJSON(['padding']));
     var jsonWithFoo = JSON.stringify(canvas.toJSON(['padding', 'foo']));
 
-    assert.equal(jsonWithFoo, RECT_JSON_WITH_PADDING);
+    assert.deepEqual(JSON.parse(jsonWithFoo), JSON.parse(RECT_JSON_WITH_PADDING));
     assert.ok(jsonWithoutFoo !== RECT_JSON_WITH_PADDING);
 
     canvas.clear();

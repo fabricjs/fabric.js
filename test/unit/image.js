@@ -40,6 +40,7 @@
     top:                      0,
     width:                    IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
     height:                   IMG_HEIGHT, // or does it now?
+    layout:                   '',
     fill:                     'rgb(0,0,0)',
     stroke:                   null,
     strokeWidth:              0,

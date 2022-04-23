@@ -17,6 +17,7 @@
     top:                       0,
     width:                     CHAR_WIDTH,
     height:                    45.2,
+    layout:                   '',
     fill:                      'rgb(0,0,0)',
     stroke:                    null,
     strokeWidth:               1,

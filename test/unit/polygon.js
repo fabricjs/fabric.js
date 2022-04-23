@@ -16,6 +16,7 @@
     top:                      11.5,
     width:                    10,
     height:                   10,
+    layout:                   '',
     fill:                     'rgb(0,0,0)',
     stroke:                   null,
     strokeWidth:              1,
