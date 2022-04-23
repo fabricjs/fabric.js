@@ -107,10 +107,10 @@
 
     /**
      * Layout directive
-     * @type {'fill-parent' | undefined}
+     * @type {'fill-parent' | ''}
      * @default
      */
-    layout:                   undefined,
+    layout:                   '',
 
     /**
      * Object scale factor (horizontal)
