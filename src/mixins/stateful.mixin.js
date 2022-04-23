@@ -11,7 +11,9 @@
       var value = origin[prop];
       saved[prop] = value instanceof fabric.Object ?
         _saveProps(value, value[originalSet]) :
-        value;
+        value && typeof value.toObject === 'function' ?
+          value.toObject() :
+          value;
       return saved;
     }, {});
   }
