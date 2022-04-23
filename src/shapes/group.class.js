@@ -865,6 +865,7 @@
         this._watchObject(false, object);
         object.dispose && object.dispose();
       }, this);
+      this.callSuper('dispose');
     },
 
     /* _TO_SVG_START_ */
