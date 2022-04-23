@@ -859,7 +859,7 @@
 
     /**
      * @private
-     * @param {CanvasRenderingContext2D} ctx 
+     * @param {CanvasRenderingContext2D} ctx
      * @returns {boolean} true if object needs to fully transform ctx
      */
     needsFullTransform: function (ctx) {
