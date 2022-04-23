@@ -584,7 +584,7 @@
         return this.prepareBoundingBox(layoutDirective, addedObjects, context);
       }
       else if (layoutDirective === 'fit-content' || layoutDirective === 'fit-content-lazy'
-          || (layoutDirective === 'fixed' && context.type === 'initialization')) {
+        || (layoutDirective === 'fixed' && (context.type === 'initialization' || context.type === 'imperative'))) {
         return this.prepareBoundingBox(layoutDirective, objects, context);
       }
       else if (layoutDirective === 'clip-path' && this.clipPath) {
