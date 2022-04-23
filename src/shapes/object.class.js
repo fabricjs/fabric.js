@@ -596,7 +596,7 @@
      * @type Array
      */
     stateProperties: (
-      'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
+      'top left width height layout scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit ' +
       'angle opacity fill globalCompositeOperation shadow visible backgroundColor ' +
       'skewX skewY fillRule paintFirst clipPath strokeUniform'
