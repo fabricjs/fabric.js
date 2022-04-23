@@ -821,6 +821,9 @@
           }).scalarDivideEquals(2);
           objCenter = new fabric.Point(bbox.centerX, bbox.centerY);
         }
+        else if (object.layout === 'fill-parent') {
+          return;
+        }
         else {
           sizeVector = object._getTransformedDimensions().scalarDivideEquals(2);
           objCenter = object.getRelativeCenterPoint();
