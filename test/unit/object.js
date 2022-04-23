@@ -1398,12 +1398,14 @@
     assert.deepEqual(memo[0], { type: 'canvas' }, 'should have fired resize');
     assert.equal(object.width, canvas.width);
     assert.equal(object.height, canvas.height);
+    assert.deepEqual(object.getCenterPoint(), canvas.getCenterPoint());
 
     canvas.setDimensions({ width: canvas.width - 1, height: canvas.height });
     assert.equal(memo.length, 2, 'should have fired a resize event on object');
     assert.deepEqual(memo[1], { type: 'canvas_resize', width: 299, height: 150 }, 'should have fired resize');
     assert.equal(object.width, canvas.width);
     assert.equal(object.height, canvas.height);
+    assert.deepEqual(object.getCenterPoint(), canvas.getCenterPoint());
 
     canvas.setDimensions({ width: canvas.width, height: canvas.height });
     assert.equal(memo.length, 2, 'should not have fired a resize event on object - size remains unchanged');
@@ -1431,23 +1433,27 @@
     assert.deepEqual(memo[0], { type: 'group' }, 'should have fired resize');
     assert.equal(object.width, 200);
     assert.equal(object.height, 100);
+    assert.deepEqual(object.getRelativeCenterPoint(), new fabric.Point(0, 0));
 
     group.triggerLayout({ width: 199, height: 100 });
     assert.equal(memo.length, 2, 'should have fired a resize event on object');
     assert.deepEqual(memo[1].type, 'group_layout', 'should have fired resize');
     assert.equal(object.width, 199);
     assert.equal(object.height, 100);
+    assert.deepEqual(object.getRelativeCenterPoint(), new fabric.Point(0, 0));
 
     group.triggerLayout({ width: 199, height: 100 });
     assert.equal(memo.length, 2, 'should not have fired a resize event on object - size remains unchanged');
     assert.equal(object.width, 199);
     assert.equal(object.height, 100);
+    assert.deepEqual(object.getRelativeCenterPoint(), new fabric.Point(0, 0));
 
     object.layout = '';
     group.triggerLayout({ width: 199, height: 99 });
     assert.equal(memo.length, 2, 'should not have fired a resize event on object - disabled layout');
     assert.equal(object.width, 199);
     assert.equal(object.height, 100);
+    assert.deepEqual(object.getRelativeCenterPoint(), new fabric.Point(0, 0));
 
     object.layout = 'fill-parent';
     group.remove(object);
@@ -1461,6 +1467,7 @@
     assert.equal(memo.length, 2, 'should not have fired a resize event on object - size remains unchanged');
     assert.equal(object.width, 200);
     assert.equal(object.height, 100);
+    assert.deepEqual(object.getRelativeCenterPoint(), new fabric.Point(0, 0));
   });
   QUnit.test('dispose', function (assert) {
     var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });
