@@ -141,6 +141,43 @@
       };
     },
 
+
+    /**
+     * Called once instance is added to a parent and when parent resizes
+     * @private
+     * @param {*} context see {@link fabric.ParentResizeObserver}
+     */
+    _onParentResize: function (context) {
+      if (this.layout === 'fill-parent') {
+        var scale = 1;
+        if ((context.type === 'canvas' || context.type === 'canvas_resize') && this.canvas && !this.group) {
+          scale = fabric.util.findScaleToFit(this, this.canvas);
+          this.set({
+            scaleX: scale,
+            scaleY: scale
+          });
+          this.setPositionByOrigin(
+            new fabric.Point(this.canvas.width, this.canvas.height).scalarDivideEquals(2),
+            'center',
+            'center'
+          );
+          this.setCoords();
+        }
+        else if ((context.type === 'group' || context.type === 'group_layout') && this.group) {
+          scale = fabric.util.findScaleToFit(this, this.group);
+          this.set({
+            scaleX: scale,
+            scaleY: scale
+          });
+          this.setPositionByOrigin(new fabric.Point(0, 0), 'center', 'center');
+          this.group.interactive && this.setCoords();
+        }
+        if (scale !== 1) {
+          this.fire('resize', context);
+        }
+      }
+    },
+
     /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
