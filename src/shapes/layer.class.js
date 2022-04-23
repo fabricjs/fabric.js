@@ -86,18 +86,6 @@
     selectable: false,
 
     /**
-     * Constructor
-     *
-     * @param {fabric.Object[]} [objects] instance objects
-     * @param {Object} [options] Options object
-     * @return {fabric.Group} thisArg
-     */
-    initialize: function (objects, options) {
-      this.callSuper('initialize', objects, options);
-      this._parentMonitor = new fabric.ParentResizeObserver(this, this._applyLayoutStrategy.bind(this));
-    },
-
-    /**
      * @override we want instance to fill parent so we disregard transformations
      * @param {CanvasRenderingContext2D} ctx Context
      */
@@ -190,12 +178,6 @@
     toString: function () {
       return '#<fabric.Layer: (' + this.complexity() + ')>';
     },
-
-    dispose: function () {
-      this._parentMonitor && this._parentMonitor.dispose();
-      delete this._parentMonitor;
-      this.callSuper('dispose');
-    }
 
   });
 

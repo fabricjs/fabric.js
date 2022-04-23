@@ -133,6 +133,14 @@
 
     /**
      * @private
+     * @override handled by {@link fabric.Group#getLayoutStrategyResult}, consider using {@link fabric.Layer}
+     */
+    _onParentResize: function (context) {
+      this._applyLayoutStrategy(context);
+    },
+
+    /**
+     * @private
      */
     _shouldSetNestedCoords: function () {
       return this.subTargetCheck;

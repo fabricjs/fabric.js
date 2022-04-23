@@ -26,7 +26,7 @@
    *
    * @fires selected
    * @fires deselected
-   * @fires modified
+   * @fires resize
    * @fires modified
    * @fires moved
    * @fires scaled
@@ -104,6 +104,13 @@
      * @default
      */
     height:                   0,
+
+    /**
+     * Layout directive
+     * @type {'fill-parent' | undefined}
+     * @default
+     */
+    layout:                   undefined,
 
     /**
      * Object scale factor (horizontal)
@@ -649,9 +656,40 @@
      * Constructor
      * @param {Object} [options] Options object
      */
-    initialize: function(options) {
+    initialize: function (options) {
+      this._parentMonitor = new fabric.ParentResizeObserver(this, this._onParentResize.bind(this));
       if (options) {
         this.setOptions(options);
+      }
+    },
+
+    /**
+     * @private
+     * @param {*} context see {@link fabric.ParentResizeObserver}
+     */
+    _onParentResize: function (context) {
+      if (this.layout === 'fill-parent') {
+        var width, height;
+        if ((context.type === 'canvas' || context.type === 'canvas_resize') && this.canvas && !this.group) {
+          width = this.canvas.width;
+          height = this.canvas.height;
+          this.set({
+            width: width,
+            height: height
+          });
+          this.setPositionByOrigin(new fabric.Point(width, height).scalarDivideEquals(2), 'center', 'center');
+          this.fire('resize', context);
+        }
+        else if ((context.type === 'group' || context.type === 'group_layout') && this.group) {
+          width = this.group.width;
+          height = this.group.height;
+          this.set({
+            width: width,
+            height: height
+          });
+          this.setPositionByOrigin(new fabric.Point(0, 0), 'center', 'center');
+          this.fire('resize', context);
+        }
       }
     },
 
@@ -853,6 +891,7 @@
             top:                      toFixed(this.top, NUM_FRACTION_DIGITS),
             width:                    toFixed(this.width, NUM_FRACTION_DIGITS),
             height:                   toFixed(this.height, NUM_FRACTION_DIGITS),
+            layout:                   this.layout,
             fill:                     (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
             stroke:                   (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
             strokeWidth:              toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
@@ -1921,6 +1960,8 @@
       if (fabric.runningAnimations) {
         fabric.runningAnimations.cancelByTarget(this);
       }
+      this._parentMonitor && this._parentMonitor.dispose();
+      delete this._parentMonitor;
     }
   });
 
