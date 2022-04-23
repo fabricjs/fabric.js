@@ -6,6 +6,8 @@ fabric.ParentResizeObserver = fabric.util.createClass({
     initialize: function (object, callback) {
         this.object = object;
         this.callback = callback;
+        this.__canvasMonitor = this.__canvasMonitor.bind(this);
+        this.__groupMonitor = this.__groupMonitor.bind(this);
         this.__onAdded = this._watchParent.bind(this, true);
         this.__onRemoved = this._watchParent.bind(this, false);
         //  listen to parent add/remove
