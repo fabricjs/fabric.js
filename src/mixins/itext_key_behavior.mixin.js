@@ -285,7 +285,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     * @param {ClipboardEvent} e Event object
     */
   copy: function (e) {
-    this.setClipboardData(e) && this.fire('copy', { e: e });
+    if (this.setClipboardData(e)) {
+      this.canvas.fire('copy', { e: e, target: this });
+      this.fire('copy', { e: e });
+    }
   },
 
   /**
@@ -299,6 +302,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this.selectionEnd = this.selectionStart;
       this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
       this._updateTextarea();
+      this.canvas.fire('cut', { e: e, target: this });
       this.fire('cut', { e: e });
       this.fire('changed', { index: this.selectionStart, action: 'cut' });
       this.canvas.fire('text:changed', { target: this });
@@ -315,6 +319,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   paste: function (e) {
     e.preventDefault();
     //  fire event before logic to allow overriding clipboard data
+    this.canvas.fire('paste', { e: e, target: this });
     this.fire('paste', { e: e });
 
     var clipboardData = e.clipboardData;

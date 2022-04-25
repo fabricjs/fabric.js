@@ -284,7 +284,7 @@
     }
     dropTarget.paste(event);
     assert.equal(dropTarget.text, 'Hellteo World', 'paste in place');
-    assert.deepEqual(fired, { 'text:changed': 1, requestRenderAll: 1 }, 'fired changed event on canvas');
+    assert.deepEqual(fired, { copy: 1, paste: 1, 'text:changed': 1, requestRenderAll: 1 }, 'fired changed event on canvas');
     assert.notEqual(iText.styles[0][0], dropTarget.styles[0][4], 'style is not referenced');
     assert.notEqual(iText.styles[0][1], dropTarget.styles[0][5], 'style is not referenced');
     function cleanStyle(target) {
