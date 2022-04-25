@@ -241,72 +241,51 @@
     // needed or test hangs
     iText.abortCursorAnimation();
   });
-
-  QUnit.test('copy', function (assert) {
-    if (fabric.isLikelyNode) {
-      assert.expect(0);
-      return;
-    }
-    var event = new ClipboardEvent('copy', { clipboardData: new DataTransfer() });
+  // QUnit.test('copy and paste', function(assert) {
+  //   var event = { stopPropagation: function(){}, preventDefault: function(){} };
+  //   var iText = new fabric.IText('test', { styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+  //   iText.enterEditing();
+  //   iText.selectionStart = 0;
+  //   iText.selectionEnd = 2;
+  //   iText.hiddenTextarea.selectionStart = 0
+  //   iText.hiddenTextarea.selectionEnd = 2
+  //   iText.copy(event);
+  //   assert.equal(fabric.copiedText, 'te', 'it copied first 2 characters');
+  //   assert.equal(fabric.copiedTextStyle[0], iText.styles[0][0], 'style is referenced');
+  //   assert.equal(fabric.copiedTextStyle[1], iText.styles[0][1], 'style is referenced');
+  //   iText.selectionStart = 2;
+  //   iText.selectionEnd = 2;
+  //   iText.hiddenTextarea.value = 'tetest';
+  //   iText.paste(event);
+  //   assert.equal(iText.text, 'tetest', 'text has been copied');
+  //   assert.notEqual(iText.styles[0][0], iText.styles[0][2], 'style is not referenced');
+  //   assert.notEqual(iText.styles[0][1], iText.styles[0][3], 'style is not referenced');
+  //   assert.deepEqual(iText.styles[0][0], iText.styles[0][2], 'style is copied');
+  //   assert.deepEqual(iText.styles[0][1], iText.styles[0][3], 'style is copied');
+  // });
+  QUnit.test('copy', function(assert) {
+    var event = { stopPropagation: function(){}, preventDefault: function(){} };
     var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
     iText.selectionStart = 0;
     iText.selectionEnd = 2;
     iText.copy(event);
-    assert.equal(event.clipboardData.getData('text/plain'), 'te', 'it copied first 2 characters');
-    var data = JSON.parse(event.clipboardData.getData('application/fabric'));
-    assert.equal(data.value, 'te');
-    assert.equal(data.styles[0].fill, iText.styles[0][0].fill, 'style is cloned');
-    assert.equal(data.styles[1].fill, iText.styles[0][1].fill, 'style is referenced');
+    assert.equal(fabric.copiedText, 'te', 'it copied first 2 characters');
+    assert.equal(fabric.copiedTextStyle[0].fill, iText.styles[0][0].fill, 'style is cloned');
+    assert.equal(fabric.copiedTextStyle[1].fill, iText.styles[0][1].fill, 'style is referenced');
     assert.equal(iText.styles[0][1].fontSize, undefined, 'style had not fontSize');
-    assert.equal(data.styles[1].fontSize, 25, 'style took fontSize from text element');
+    assert.equal(fabric.copiedTextStyle[1].fontSize, 25, 'style took fontSize from text element');
   });
 
-  QUnit.test('copy paste', function (assert) {
-    if (fabric.isLikelyNode) {
-      assert.expect(0);
-      return;
-    }
-    var event = new ClipboardEvent('copy', { clipboardData: new DataTransfer() });
-    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' } } } });
+  QUnit.test('copy with fabric.disableStyleCopyPaste', function(assert) {
+    var event = { stopPropagation: function(){}, preventDefault: function(){} };
+    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
     iText.selectionStart = 0;
     iText.selectionEnd = 2;
+    fabric.disableStyleCopyPaste = true;
     iText.copy(event);
-    var dropTarget = new fabric.IText('Hello World');
-    dropTarget.selectionStart = dropTarget.selectionEnd = 4;
-    var fired = {};
-    dropTarget.canvas = {
-      fire(ev) {
-        fired[ev] = (fired[ev] || 0) + 1;
-      },
-      requestRenderAll() {
-        this.fire('requestRenderAll');
-      }
-    }
-    dropTarget.paste(event);
-    assert.equal(dropTarget.text, 'Hellteo World', 'paste in place');
-    assert.deepEqual(fired, { 'text:changed': 1, requestRenderAll: 1 }, 'fired changed event on canvas');
-    assert.notEqual(iText.styles[0][0], dropTarget.styles[0][4], 'style is not referenced');
-    assert.notEqual(iText.styles[0][1], dropTarget.styles[0][5], 'style is not referenced');
-    function cleanStyle(target) {
-      var ref = {
-        "deltaY": 0,
-        "fill": "blue",
-        "fontFamily": "Times New Roman",
-        "fontSize": 25,
-        "fontStyle": "normal",
-        "fontWeight": "normal",
-        "linethrough": false,
-        "overline": false,
-        "stroke": null,
-        "strokeWidth": 1,
-        "textBackgroundColor": "",
-        "underline": false
-      };
-      Object.keys(ref).forEach(key => target.cleanStyle(key));      
-    }
-    cleanStyle(dropTarget);
-    assert.deepEqual(Object.assign({}, iText.styles[0][0], { fontSize: 25 }), dropTarget.styles[0][4], 'style is copied fully and equal after cleanup');
-    assert.deepEqual(Object.assign({}, iText.styles[0][1], { fontSize: 25 }), dropTarget.styles[0][5], 'style is copied fully and equal after cleanup');
+    assert.equal(fabric.copiedText, 'te', 'it copied first 2 characters');
+    assert.equal(fabric.copiedTextStyle, null, 'style is not cloned');
+    fabric.disableStyleCopyPaste = false;
   });
 
   QUnit.test('removeChars', function(assert) {
