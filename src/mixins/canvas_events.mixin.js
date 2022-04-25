@@ -993,6 +993,8 @@
         oldTarget: _draggedoverTarget,
         evtOut: 'dragleave',
         evtIn: 'dragenter',
+        canvasEvtIn: 'drag:enter',
+        canvasEvtOut: 'drag:leave',
       });
       for (var i = 0; i < length; i++) {
         this.fireSyntheticInOutEvents(targets[i], data, {
