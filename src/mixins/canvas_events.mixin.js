@@ -297,14 +297,16 @@
             canDrop: false,
             dropTarget: undefined
           };
+      //  fire on canvas          
       this.fire(eventType, options);
+      //  make sure we fire dragenter events before dragover
+      //  if dragleave is needed, object will not fire dragover so we don't need to trouble ourselves with it
+      this._fireEnterLeaveEvents(target, e);
       if (target) {
         //  render drag selection before rendering target cursor for correct visuals
         target.canDrop(e) && this._renderDragStartSelection();
         target.fire(eventType, options);
       }
-      //  make sure we fire dragenter events before dragover
-      this._fireEnterLeaveEvents(target, e);
       //  propagate the event to subtargets
       for (var i = 0; i < targets.length; i++) {
         target = targets[i];
