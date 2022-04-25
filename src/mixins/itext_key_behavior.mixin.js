@@ -30,7 +30,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     fabric.util.addListener(this.hiddenTextarea, 'keyup', this.onKeyUp.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
-    fabric.util.addListener(this.hiddenTextarea, 'cut', this.copy.bind(this));
+    fabric.util.addListener(this.hiddenTextarea, 'cut', this.cut.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'compositionstart', this.onCompositionStart.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'compositionupdate', this.onCompositionUpdate.bind(this));
@@ -82,10 +82,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   /**
    * For functionalities on keyUp + ctrl || cmd
    */
-  ctrlKeysMapUp: {
-    67: 'copy',
-    88: 'cut'
-  },
+  ctrlKeysMapUp: {},
 
   /**
    * For functionalities on keyDown + ctrl || cmd
@@ -140,15 +137,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * Handles keyup event
-   * We handle KeyUp because ie11 and edge have difficulties copy/pasting
-   * if a copy/cut event fired, keyup is dismissed
    * @param {Event} e Event object
    */
   onKeyUp: function(e) {
-    if (!this.isEditing || this._copyDone || this.inCompositionMode) {
-      this._copyDone = false;
-      return;
-    }
     if ((e.keyCode in this.ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
       this[this.ctrlKeysMapUp[e.keyCode]](e);
     }
@@ -165,8 +156,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Event} e Event object
    */
   onInput: function(e) {
-    var fromPaste = this.fromPaste;
-    this.fromPaste = false;
     e && e.stopPropagation();
     if (!this.isEditing) {
       return;
@@ -239,12 +228,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       }
       this.removeStyleFromTo(removeFrom, removeTo);
     }
-    if (insertedText.length) {
-      if (fromPaste && insertedText.join('') === fabric.copiedText && !fabric.disableStyleCopyPaste) {
-        copiedStyle = fabric.copiedTextStyle;
-      }
-      this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
-    }
     this.updateFromTextArea();
     this.fire('changed');
     if (this.canvas) {
@@ -277,39 +260,78 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
   /**
    * Copies selected text
-   * @param {Event} e Event object
+   * @param {ClipboardEvent} e Event object
+   * @returns {boolean} handle event
    */
-  copy: function() {
+  setClipboardData: function (e) {
+    e.preventDefault();
     if (this.selectionStart === this.selectionEnd) {
-      //do not cut-copy if no selection
-      return;
+      e.clipboardData.effectAllowed = 'none';
+      return false;
     }
+    var clipboardData = e.clipboardData;
+    var value = this.getSelectedText();
+    clipboardData.effectAllowed = 'all';
+    clipboardData.setData('text/plain', value);
+    clipboardData.setData('application/fabric', JSON.stringify({
+      value: value,
+      styles: this.getSelectionStyles(this.selectionStart, this.selectionEnd, true)
+    }));
+    return true;
+  },
 
-    fabric.copiedText = this.getSelectedText();
-    if (!fabric.disableStyleCopyPaste) {
-      fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd, true);
+  /**
+    * Copies selected text
+    * @param {ClipboardEvent} e Event object
+    */
+  copy: function (e) {
+    this.setClipboardData(e) && this.fire('copy', { e: e });
+  },
+
+  /**
+   * Cuts selected text
+   * @param {ClipboardEvent} e Event object
+   */
+  cut: function (e) {
+    if (this.setClipboardData(e)) {
+      //  remove selection
+      this.insertChars('', null, this.selectionStart, this.selectionEnd);
+      this.selectionEnd = this.selectionStart;
+      this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
+      this._updateTextarea();
+      this.fire('cut', { e: e });
+      this.fire('changed', { index: this.selectionStart, action: 'cut' });
+      this.canvas.fire('text:changed', { target: this });
+      this.canvas.requestRenderAll();
     }
-    else {
-      fabric.copiedTextStyle = null;
-    }
-    this._copyDone = true;
   },
 
   /**
    * Pastes text
-   * @param {Event} e Event object
+   * Override the `text/plain | application/fabric` types of {@link ClipboardEvent#clipboardData}
+   * in order to change the pasted value or to customize styling respectively, by listening to the `paste` event
+   * @param {ClipboardEvent} e Event object
    */
-  paste: function() {
-    this.fromPaste = true;
-  },
+  paste: function (e) {
+    e.preventDefault();
+    //  fire event before logic to allow overriding clipboard data
+    this.fire('paste', { e: e });
 
-  /**
-   * @private
-   * @param {Event} e Event object
-   * @return {Object} Clipboard data object
-   */
-  _getClipboardData: function(e) {
-    return (e && e.clipboardData) || fabric.window.clipboardData;
+    var clipboardData = e.clipboardData;
+    var value = clipboardData.getData('text/plain');
+    var data = clipboardData.types.includes('application/fabric') ?
+      JSON.parse(clipboardData.getData('application/fabric')) :
+      {};
+
+    if (value) {
+      this.insertChars(value, data.styles, this.selectionStart, this.selectionEnd);
+      this.selectionStart = this.selectionEnd = this.selectionStart + value.length;
+      this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
+      this._updateTextarea();
+      this.fire('changed', { index: this.selectionStart, action: 'paste' });
+      this.canvas.fire('text:changed', { target: this });
+      this.canvas.requestRenderAll();
+    }
   },
 
   /**
