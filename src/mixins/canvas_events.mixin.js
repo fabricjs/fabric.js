@@ -301,7 +301,7 @@
       this.fire(eventType, options);
       //  make sure we fire dragenter events before dragover
       //  if dragleave is needed, object will not fire dragover so we don't need to trouble ourselves with it
-      this._fireEnterLeaveEvents(target, e);
+      this._fireEnterLeaveEvents(target, options);
       if (target) {
         //  render drag selection before rendering target cursor for correct visuals
         target.canDrop(e) && this._renderDragStartSelection();
@@ -324,15 +324,16 @@
      * @param {Event} [e] Event object fired on Event.js shake
      */
     _onDragEnter: function (e) {
-      var target = this.findTarget(e), targets = this.targets;
-      this.fire('dragenter', {
+      var target = this.findTarget(e);
+      var options = {
         e: e,
         target: target,
-        subTargets: targets,
+        subTargets: this.targets,
         dragSource: this._dragSource
-      });
+      };
+      this.fire('dragenter', options);
       //  fire dragenter on targets
-      this._fireEnterLeaveEvents(target, e);
+      this._fireEnterLeaveEvents(target, options);
     },
 
     /**
@@ -341,14 +342,15 @@
      * @param {Event} [e] Event object fired on Event.js shake
      */
     _onDragLeave: function (e) {
-      this.fire('dragleave', {
+      var options = {
         e: e,
         target: this._draggedoverTarget,
         subTargets: this.targets,
         dragSource: this._dragSource
-      });
+      };
+      this.fire('dragleave', options);
       //  fire dragleave on targets
-      this._fireEnterLeaveEvents(null, e);
+      this._fireEnterLeaveEvents(null, options);
       //  clear targets
       this.targets = [];
       this._hoveredTargets = [];
@@ -958,7 +960,7 @@
           _hoveredTargets = this._hoveredTargets, targets = this.targets,
           length = Math.max(_hoveredTargets.length, targets.length);
 
-      this.fireSyntheticInOutEvents(target, e, {
+      this.fireSyntheticInOutEvents(target, { e }, {
         oldTarget: _hoveredTarget,
         evtOut: 'mouseout',
         canvasEvtOut: 'mouse:out',
@@ -966,7 +968,7 @@
         canvasEvtIn: 'mouse:over',
       });
       for (var i = 0; i < length; i++){
-        this.fireSyntheticInOutEvents(targets[i], e, {
+        this.fireSyntheticInOutEvents(targets[i], { e }, {
           oldTarget: _hoveredTargets[i],
           evtOut: 'mouseout',
           evtIn: 'mouseover',
@@ -979,21 +981,21 @@
     /**
      * Manage the dragEnter, dragLeave events for the fabric objects on the canvas
      * @param {Fabric.Object} target the target where the target from the onDrag event
-     * @param {Event} e Event object fired on ondrag
+     * @param {Object} data Event object fired on dragover
      * @private
      */
-    _fireEnterLeaveEvents: function(target, e) {
+    _fireEnterLeaveEvents: function(target, data) {
       var _draggedoverTarget = this._draggedoverTarget,
           _hoveredTargets = this._hoveredTargets, targets = this.targets,
           length = Math.max(_hoveredTargets.length, targets.length);
 
-      this.fireSyntheticInOutEvents(target, e, {
+      this.fireSyntheticInOutEvents(target, data, {
         oldTarget: _draggedoverTarget,
         evtOut: 'dragleave',
         evtIn: 'dragenter',
       });
       for (var i = 0; i < length; i++) {
-        this.fireSyntheticInOutEvents(targets[i], e, {
+        this.fireSyntheticInOutEvents(targets[i], data, {
           oldTarget: _hoveredTargets[i],
           evtOut: 'dragleave',
           evtIn: 'dragenter',
@@ -1005,7 +1007,7 @@
     /**
      * Manage the synthetic in/out events for the fabric objects on the canvas
      * @param {Fabric.Object} target the target where the target from the supported events
-     * @param {Event} e Event object fired
+     * @param {Object} data Event object fired
      * @param {Object} config configuration for the function to work
      * @param {String} config.targetName property on the canvas where the old target is stored
      * @param {String} [config.canvasEvtOut] name of the event to fire at canvas level for out
@@ -1014,12 +1016,12 @@
      * @param {String} config.evtIn name of the event to fire for in
      * @private
      */
-    fireSyntheticInOutEvents: function(target, e, config) {
+    fireSyntheticInOutEvents: function(target, data, config) {
       var inOpt, outOpt, oldTarget = config.oldTarget, outFires, inFires,
           targetChanged = oldTarget !== target, canvasEvtIn = config.canvasEvtIn, canvasEvtOut = config.canvasEvtOut;
       if (targetChanged) {
-        inOpt = { e: e, target: target, previousTarget: oldTarget };
-        outOpt = { e: e, target: oldTarget, nextTarget: target };
+        inOpt = Object.assign({}, data, { target: target, previousTarget: oldTarget });
+        outOpt = Object.assign({}, data, { target: oldTarget, nextTarget: target });
       }
       inFires = target && targetChanged;
       outFires = oldTarget && targetChanged;
