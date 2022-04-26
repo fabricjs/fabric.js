@@ -848,7 +848,7 @@
   });
 
   function prepareObjectsForTreeTesting() {
-    var Object = fabric.util.createClass(fabric.Object, {
+    var TObject = fabric.util.createClass(fabric.Object, {
       toJSON: function () {
         return {
           id: this.id,
@@ -861,8 +861,9 @@
         return JSON.stringify(this.toJSON(), null, '\t');
       }
     });
-    var Collection = fabric.util.createClass(Object, fabric.Collection, {
-      initialize: function () {
+    var Collection = fabric.util.createClass(TObject, fabric.Collection, {
+      initialize: function ({ id }) {
+        this.id = id;
         this._objects = [];
       },
       add: function () {
@@ -882,7 +883,7 @@
       },
       removeAll: function () {
         this.remove.apply(this, this._objects);
-      }
+      },
     });
     var canvas = fabric.util.object.extend(new Collection({ id: 'canvas' }), {
       _onObjectAdded: function (object) {
@@ -893,8 +894,8 @@
       },
     });
     return {
-      object: new Object({ id: 'object' }),
-      other: new Object({ id: 'other' }),
+      object: new TObject({ id: 'object' }),
+      other: new TObject({ id: 'other' }),
       a: new Collection({ id: 'a' }),
       b: new Collection({ id: 'b' }),
       c: new Collection({ id: 'c' }),
@@ -904,21 +905,37 @@
 
   QUnit.test.only('findCommonAncestors', function (assert) {
     function findCommonAncestors(object, other, strict, expected, message) {
-      assert.equal(
-        JSON.stringify(object.findCommonAncestors(other, strict)),
-        JSON.stringify(expected),
-        message || `should match check between '${object.id}' and '${other.id}'`
+      var common = object.findCommonAncestors(other, strict);
+      assert.deepEqual(
+        common.fork.map((obj) => obj.id),
+        expected.fork.map((obj) => obj.id),
+        message || `fork property should match check between '${object.id}' and '${other.id}'`
       );
-      assert.equal(
-        JSON.stringify(other.findCommonAncestors(object, strict)),
-        typeof expected === 'object' ?
-        JSON.stringify({
-            fork: expected.otherFork,
-            otherFork: expected.fork,
-            ancestors: expected.ancestors
-          }) :
-          JSON.stringify(expected),
-        `should match opposite check between '${object.id}' and '${other.id}'`
+      assert.deepEqual(
+        common.otherFork.map((obj) => obj.id),
+        expected.otherFork.map((obj) => obj.id),
+        message || `otherFork property should match check between '${object.id}' and '${other.id}'`
+      );
+      assert.deepEqual(
+        common.ancestors.map((obj) => obj.id),
+        expected.ancestors.map((obj) => obj.id),
+        message || `ancestors property should match check between '${object.id}' and '${other.id}'`
+      );
+      var oppositeCommon = other.findCommonAncestors(object, strict);
+      assert.deepEqual(
+        oppositeCommon.fork.map((obj) => obj.id),
+        expected.otherFork.map((obj) => obj.id),
+        message || `fork property should match opposite check between '${other.id}' and '${object.id}'`
+      );
+      assert.deepEqual(
+        oppositeCommon.otherFork.map((obj) => obj.id),
+        expected.fork.map((obj) => obj.id),
+        message || `otherFork property should match opposite check between '${other.id}' and '${object.id}'`
+      );
+      assert.deepEqual(
+        oppositeCommon.ancestors.map((obj) => obj.id),
+        expected.ancestors.map((obj) => obj.id),
+        message || `ancestors property should match opposite check between '${other.id}' and '${object.id}'`
       );
     }
     var { object, other, a, b, c, canvas } = prepareObjectsForTreeTesting();
@@ -928,14 +945,14 @@
     //  same object
     findCommonAncestors(object, object, false, { fork: [object], otherFork: [object] , ancestors: [] });
     //  foreign objects
-    findCommonAncestors(object, other, false, undefined);
+    findCommonAncestors(object, other, false, { fork: [object], otherFork: [other] , ancestors: [] });
     //  same level
     a.add(object, other);
-    findCommonAncestors(object, other, false, { fork: [object], otherfork: [other], ancestors: [a] });
-    findCommonAncestors(object, a, false, { fork: [object, a], otherfork: [a], ancestors: [] });
-    findCommonAncestors(other, a, false, { fork: [other, a], otherfork: [a], ancestors: [] });
-    findCommonAncestors(a, object, false, { fork: [a], otherfork: [object, a], ancestors: [] });
-    findCommonAncestors(a, object, true, { fork: [a], otherfork: [object, a], ancestors: [] }, 'strict option should have no effect when outside canvas');
+    findCommonAncestors(object, other, false, { fork: [object], otherFork: [other], ancestors: [a] });
+    findCommonAncestors(object, a, false, { fork: [object, a], otherFork: [a], ancestors: [] });
+    findCommonAncestors(other, a, false, { fork: [other, a], otherFork: [a], ancestors: [] });
+    findCommonAncestors(a, object, false, { fork: [a], otherFork: [object, a], ancestors: [] });
+    findCommonAncestors(a, object, true, { fork: [a], otherFork: [object, a], ancestors: [] }, 'strict option should have no effect when outside canvas');
     // different level
     a.remove(object);
     b.add(object);
@@ -943,52 +960,52 @@
     findCommonAncestors(object, b, false, { fork: [object, b], otherFork: [b], ancestors: [a] });
     findCommonAncestors(b, a, false, { fork: [b, a], otherFork: [a], ancestors: [] });
     findCommonAncestors(object, other, false, { fork: [object, b], otherFork: [other], ancestors: [a] });
-    //  with common ancestor
+    // with common ancestor
     assert.equal(c.size(), 0, 'c should be empty');
     c.add(a);
     assert.equal(c.size(), 1, 'c should contain a');
     findCommonAncestors(object, b, false, { fork: [object, b], otherFork: [b], ancestors: [a, c] });
     findCommonAncestors(b, a, false, { fork: [b, a], otherFork: [a], ancestors: [c] });
     findCommonAncestors(object, other, false, { fork: [object, b], otherFork: [other], ancestors: [a, c] });
-    findCommonAncestors(object, c, false, { index: 2, otherIndex: -1, ancestors: [c] });
-    findCommonAncestors(other, c, false, { index: 1, otherIndex: -1, ancestors: [c] });
-    findCommonAncestors(b, c, false, { index: 1, otherIndex: -1, ancestors: [c] });
-    findCommonAncestors(a, c, false, { index: 0, otherIndex: -1, ancestors: [c] });
+    findCommonAncestors(object, c, false, { fork: [object, b, a, c], otherFork: [c], ancestors: [] });
+    findCommonAncestors(other, c, false, { fork: [other, a, c], otherFork: [c], ancestors: [] });
+    findCommonAncestors(b, c, false, { fork: [b, a, c], otherFork: [c], ancestors: [] });
+    findCommonAncestors(a, c, false, { fork: [a, c], otherFork: [c], ancestors: [] });
     //  deeper asymmetrical
     c.removeAll();
     assert.equal(c.size(), 0, 'c should be cleared');
     a.remove(other);
     c.add(other, a);
-    findCommonAncestors(object, b, false, { index: 0, otherIndex: -1, ancestors: [b, a, c] });
-    findCommonAncestors(b, a, false, { index: 0, otherIndex: -1, ancestors: [a, c] });
-    findCommonAncestors(a, other, false, { index: 0, otherIndex: 0, ancestors: [c] });
-    findCommonAncestors(object, other, false, { index: 2, otherIndex: 0, ancestors: [c] });
-    findCommonAncestors(object, c, false, { index: 2, otherIndex: -1, ancestors: [c] });
-    findCommonAncestors(other, c, false, { index: 0, otherIndex: -1, ancestors: [c] });
-    findCommonAncestors(b, c, false, { index: 1, otherIndex: -1, ancestors: [c] });
-    findCommonAncestors(a, c, false, { index: 0, otherIndex: -1, ancestors: [c] });
+    findCommonAncestors(object, b, false, { fork: [object, b], otherFork: [b], ancestors: [a, c] });
+    findCommonAncestors(b, a, false, { fork: [b, a], otherFork: [a], ancestors: [c] });
+    findCommonAncestors(a, other, false, { fork: [a], otherFork: [other], ancestors: [c] });
+    findCommonAncestors(object, other, false, { fork: [object, b, a], otherFork: [other], ancestors: [c] });
+    findCommonAncestors(object, c, false, { fork: [object, b, a, c], otherFork: [c], ancestors: [] });
+    findCommonAncestors(other, c, false, { fork: [other, c], otherFork: [c], ancestors: [] });
+    findCommonAncestors(b, c, false, { fork: [b, a, c], otherFork: [c], ancestors: [] });
+    findCommonAncestors(a, c, false, { fork: [a, c], otherFork: [c], ancestors: [] });
     //  with canvas
     a.removeAll();
     b.removeAll();
     c.removeAll();
     canvas.add(object, other);
-    findCommonAncestors(object, other, true, undefined);
-    findCommonAncestors(object, other, false, { index: 0, otherIndex: 0, ancestors: [canvas] });
-    findCommonAncestors(object, canvas, true, undefined);
-    findCommonAncestors(object, canvas, false, { index: 0, otherIndex: -1, ancestors: [canvas] });
-    findCommonAncestors(other, canvas, false, { index: 0, otherIndex: -1, ancestors: [canvas] });
+    findCommonAncestors(object, other, true, { fork: [object], otherFork: [other], ancestors: [] });
+    findCommonAncestors(object, other, false, { fork: [object], otherFork: [other], ancestors: [canvas] });
+    findCommonAncestors(object, canvas, true, { fork: [object], otherFork: [canvas], ancestors: [] });
+    findCommonAncestors(object, canvas, false, { fork: [object, canvas], otherFork: [canvas], ancestors: [] });
+    findCommonAncestors(other, canvas, false, { fork: [other, canvas], otherFork: [canvas], ancestors: [] });
     //  parent precedes canvas when checking ancestor
     a.add(object);
     assert.ok(object.canvas === canvas, 'object should have canvas set');
-    findCommonAncestors(object, other, true, undefined);
-    findCommonAncestors(object, other, false, undefined);
+    findCommonAncestors(object, other, true, { fork: [object, a], otherFork: [other], ancestors: [] });
+    findCommonAncestors(object, other, false, { fork: [object, a], otherFork: [other, canvas], ancestors: [] });
     canvas.insertAt(a, 0);
-    findCommonAncestors(object, other, true, undefined);
-    findCommonAncestors(object, other, false, { index: 1, otherIndex: 0, ancestors: [canvas] });
-    findCommonAncestors(a, other, false, { index: 0, otherIndex: 0, ancestors: [canvas] });
-    findCommonAncestors(a, canvas, false, { index: 0, otherIndex: -1, ancestors: [canvas] });
-    findCommonAncestors(object, canvas, false, { index: 1, otherIndex: -1, ancestors: [canvas] });
-    findCommonAncestors(other, canvas, false, { index: 0, otherIndex: -1, ancestors: [canvas] });
+    findCommonAncestors(object, other, true, { fork: [object, a], otherFork: [other], ancestors: [] });
+    findCommonAncestors(object, other, false, { fork: [object, a], otherFork: [other], ancestors: [canvas] });
+    findCommonAncestors(a, other, false, { fork: [a], otherFork: [other], ancestors: [canvas] });
+    findCommonAncestors(a, canvas, false, { fork: [a, canvas], otherFork: [canvas], ancestors: [] });
+    findCommonAncestors(object, canvas, false, { fork: [object, a, canvas], otherFork: [canvas], ancestors: [] });
+    findCommonAncestors(other, canvas, false, { fork: [other, canvas], otherFork: [canvas], ancestors: [] });
   });
 
   QUnit.assert.isInFrontOf = function (object, other, expected) {

@@ -75,7 +75,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         if (this === otherAncestors[j]) {
           return {
             fork: [this],
-            otherFork: otherAncestors.slice(0, j + 1),
+            otherFork: [other].concat(otherAncestors.slice(0, j + 1)),
             ancestors: ancestors
           };
         }
@@ -88,6 +88,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         }
       }
     }
+    // nothing shared
+    return {
+      fork: [this].concat(ancestors),
+      otherFork: [other].concat(otherAncestors),
+      ancestors: []
+    };
   },
 
   /**
