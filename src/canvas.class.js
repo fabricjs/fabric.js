@@ -42,6 +42,28 @@
    * @fires after:render at the end of the render process, receives the context in the callback
    * @fires before:render at start the render process, receives the context in the callback
    *
+   * @fires contextmenu:before
+   * @fires contextmenu
+   * @example
+   * let handler;
+   * targets.forEach(target => {
+   *   target.on('contextmenu:before', opt => {
+   *     //  decide which target should handle the event before canvas hijacks it
+   *     if (someCaseHappens && opt.targets.includes(target)) {
+   *       handler = target;
+   *     }
+   *   });
+   *   target.on('contextmenu', opt => {
+   *     //  do something fantastic
+   *   });
+   * });
+   * canvas.on('contextmenu', opt => {
+   *   if (!handler) {
+   *     //  no one takes responsibility, it's always left to me
+   *     //  let's show them how it's done!
+   *   }
+   * });
+   *
    */
   fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
 
@@ -353,6 +375,13 @@
     _hoveredTargets: [],
 
     /**
+     * hold the list of objects to render
+     * @type fabric.Object[]
+     * @private
+     */
+    _objectsToRender: undefined,
+
+    /**
      * @private
      */
     _initInteractive: function() {
@@ -370,6 +399,23 @@
     },
 
     /**
+     * @private
+     * @param {fabric.Object} obj Object that was added
+     */
+    _onObjectAdded: function (obj) {
+      this._objectsToRender = undefined;
+      this.callSuper('_onObjectAdded', obj);
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} obj Object that was removed
+     */
+    _onObjectRemoved: function (obj) {
+      this._objectsToRender = undefined;
+      this.callSuper('_onObjectRemoved', obj);
+    },
+    /**
      * Divides objects in two groups, one to render immediately
      * and one to render as activeGroup.
      * @return {Array} objects to render immediately and pushes the other in the activeGroup.
@@ -378,7 +424,7 @@
       var activeObjects = this.getActiveObjects(),
           object, objsToRender, activeGroupObjects;
 
-      if (activeObjects.length > 0 && !this.preserveObjectStacking) {
+      if (!this.preserveObjectStacking && activeObjects.length > 1) {
         objsToRender = [];
         activeGroupObjects = [];
         for (var i = 0, length = this._objects.length; i < length; i++) {
@@ -394,6 +440,15 @@
           this._activeObject._objects = activeGroupObjects;
         }
         objsToRender.push.apply(objsToRender, activeGroupObjects);
+      }
+      //  in case a single object is selected render it's entire above the other objects
+      else if (!this.preserveObjectStacking && activeObjects.length === 1) {
+        var target = activeObjects[0], ancestors = target.getAncestors(true);
+        var topAncestor = ancestors.length === 0 ? target : ancestors.pop();
+        objsToRender = this._objects.slice();
+        var index = objsToRender.indexOf(topAncestor);
+        index > -1 && objsToRender.splice(objsToRender.indexOf(topAncestor), 1);
+        objsToRender.push(topAncestor);
       }
       else {
         objsToRender = this._objects;
@@ -416,7 +471,8 @@
         this.hasLostContext = false;
       }
       var canvasToDrawOn = this.contextContainer;
-      this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
+      !this._objectsToRender && (this._objectsToRender = this._chooseObjectsToRender());
+      this.renderCanvas(canvasToDrawOn, this._objectsToRender);
       return this;
     },
 
@@ -507,7 +563,7 @@
     _isSelectionKeyPressed: function(e) {
       var selectionKeyPressed = false;
 
-      if (Object.prototype.toString.call(this.selectionKey) === '[object Array]') {
+      if (Array.isArray(this.selectionKey)) {
         selectionKeyPressed = !!this.selectionKey.find(function(key) { return e[key] === true; });
       }
       else {
@@ -622,14 +678,22 @@
       if (!target) {
         return;
       }
-
-      var pointer = this.getPointer(e), corner = target.__corner,
+      var pointer = this.getPointer(e);
+      if (target.group) {
+        //  transform pointer to target's containing coordinate plane
+        pointer = fabric.util.transformPoint(pointer, fabric.util.invertTransform(target.group.calcTransformMatrix()));
+      }
+      var corner = target.__corner,
           control = target.controls[corner],
           actionHandler = (alreadySelected && corner) ?
             control.getActionHandler(e, target, control) : fabric.controlsUtils.dragHandler,
           action = this._getActionFromCorner(alreadySelected, corner, e, target),
           origin = this._getOriginFromCorner(target, corner),
           altKey = e[this.centeredKey],
+          /**
+           * relative to target's containing coordinate plane
+           * both agree on every point
+           **/
           transform = {
             target: target,
             action: action,
@@ -639,7 +703,6 @@
             scaleY: target.scaleY,
             skewX: target.skewX,
             skewY: target.skewY,
-            // used by transation
             offsetX: pointer.x - target.left,
             offsetY: pointer.y - target.top,
             originX: origin.x,
@@ -648,11 +711,7 @@
             ey: pointer.y,
             lastX: pointer.x,
             lastY: pointer.y,
-            // unsure they are useful anymore.
-            // left: target.left,
-            // top: target.top,
             theta: degreesToRadians(target.angle),
-            // end of unsure
             width: target.width * target.scaleX,
             shiftKey: e.shiftKey,
             altKey: altKey,
@@ -745,11 +804,12 @@
       if (shouldLookForActive && activeObject._findTargetCorner(pointer, isTouch)) {
         return activeObject;
       }
-      if (aObjects.length > 1 && !skipGroup && activeObject === this._searchPossibleTargets([activeObject], pointer)) {
+      if (aObjects.length > 1 && activeObject.type === 'activeSelection'
+        && !skipGroup && this.searchPossibleTargets([activeObject], pointer)) {
         return activeObject;
       }
       if (aObjects.length === 1 &&
-        activeObject === this._searchPossibleTargets([activeObject], pointer)) {
+        activeObject === this.searchPossibleTargets([activeObject], pointer)) {
         if (!this.preserveObjectStacking) {
           return activeObject;
         }
@@ -759,7 +819,7 @@
           this.targets = [];
         }
       }
-      var target = this._searchPossibleTargets(this._objects, pointer);
+      var target = this.searchPossibleTargets(this._objects, pointer);
       if (e[this.altSelectionKey] && target && activeTarget && target !== activeTarget) {
         target = activeTarget;
         this.targets = activeTargetSubs;
@@ -796,10 +856,10 @@
     },
 
     /**
-     * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
+     * Internal Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
      * @param {Array} [objects] objects array to look into
      * @param {Object} [pointer] x,y object of point coordinates we want to check.
-     * @return {fabric.Object} object that contains pointer
+     * @return {fabric.Object} **top most object from given `objects`** that contains pointer
      * @private
      */
     _searchPossibleTargets: function(objects, pointer) {
@@ -813,13 +873,25 @@
           this._normalizePointer(objToCheck.group, pointer) : pointer;
         if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
           target = objects[i];
-          if (target.subTargetCheck && target instanceof fabric.Group) {
+          if (target.subTargetCheck && Array.isArray(target._objects)) {
             subTarget = this._searchPossibleTargets(target._objects, pointer);
             subTarget && this.targets.push(subTarget);
           }
           break;
         }
       }
+      return target;
+    },
+
+    /**
+     * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
+     * @see {@link fabric.Canvas#_searchPossibleTargets}
+     * @param {Array} [objects] objects array to look into
+     * @param {Object} [pointer] x,y object of point coordinates we want to check.
+     * @return {fabric.Object} **top most object on screen** that contains pointer
+     */
+    searchPossibleTargets: function (objects, pointer) {
+      var target = this._searchPossibleTargets(objects, pointer);
       return target;
     },
 
@@ -838,27 +910,27 @@
     /**
      * Returns pointer coordinates relative to canvas.
      * Can return coordinates with or without viewportTransform.
-     * ignoreZoom false gives back coordinates that represent
+     * ignoreVpt false gives back coordinates that represent
      * the point clicked on canvas element.
-     * ignoreZoom true gives back coordinates after being processed
+     * ignoreVpt true gives back coordinates after being processed
      * by the viewportTransform ( sort of coordinates of what is displayed
      * on the canvas where you are clicking.
-     * ignoreZoom true = HTMLElement coordinates relative to top,left
-     * ignoreZoom false, default = fabric space coordinates, the same used for shape position
-     * To interact with your shapes top and left you want to use ignoreZoom true
-     * most of the time, while ignoreZoom false will give you coordinates
+     * ignoreVpt true = HTMLElement coordinates relative to top,left
+     * ignoreVpt false, default = fabric space coordinates, the same used for shape position
+     * To interact with your shapes top and left you want to use ignoreVpt true
+     * most of the time, while ignoreVpt false will give you coordinates
      * compatible with the object.oCoords system.
      * of the time.
      * @param {Event} e
-     * @param {Boolean} ignoreZoom
+     * @param {Boolean} ignoreVpt
      * @return {Object} object with "x" and "y" number values
      */
-    getPointer: function (e, ignoreZoom) {
+    getPointer: function (e, ignoreVpt) {
       // return cached values if we are in the event processing chain
-      if (this._absolutePointer && !ignoreZoom) {
+      if (this._absolutePointer && !ignoreVpt) {
         return this._absolutePointer;
       }
-      if (this._pointer && ignoreZoom) {
+      if (this._pointer && ignoreVpt) {
         return this._pointer;
       }
 
@@ -881,7 +953,7 @@
       this.calcOffset();
       pointer.x = pointer.x - this._offset.left;
       pointer.y = pointer.y - this._offset.top;
-      if (!ignoreZoom) {
+      if (!ignoreVpt) {
         pointer = this.restorePointerVpt(pointer);
       }
 
@@ -925,7 +997,7 @@
         this.upperCanvasEl = upperCanvasEl;
       }
       fabric.util.addClass(upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
-
+      this.upperCanvasEl.setAttribute('data-fabric', 'top');
       this.wrapperEl.appendChild(upperCanvasEl);
 
       this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
@@ -947,9 +1019,13 @@
      * @private
      */
     _initWrapperElement: function () {
+      if (this.wrapperEl) {
+        return;
+      }
       this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, 'div', {
         'class': this.containerClass
       });
+      this.wrapperEl.setAttribute('data-fabric', 'wrapper');
       fabric.util.setStyle(this.wrapperEl, {
         width: this.width + 'px',
         height: this.height + 'px',
@@ -991,7 +1067,16 @@
     },
 
     /**
+     * Returns context of top canvas where interactions are drawn
+     * @returns {CanvasRenderingContext2D}
+     */
+    getTopContext: function () {
+      return this.contextTop;
+    },
+
+    /**
      * Returns context of canvas where object selection is drawn
+     * @alias
      * @return {CanvasRenderingContext2D}
      */
     getSelectionContext: function() {
@@ -1057,7 +1142,7 @@
      */
     _fireSelectionEvents: function(oldObjects, e) {
       var somethingChanged = false, objects = this.getActiveObjects(),
-          added = [], removed = [];
+          added = [], removed = [], invalidate = false;
       oldObjects.forEach(function(oldObject) {
         if (objects.indexOf(oldObject) === -1) {
           somethingChanged = true;
@@ -1079,6 +1164,7 @@
         }
       });
       if (oldObjects.length > 0 && objects.length > 0) {
+        invalidate = true;
         somethingChanged && this.fire('selection:updated', {
           e: e,
           selected: added,
@@ -1086,17 +1172,20 @@
         });
       }
       else if (objects.length > 0) {
+        invalidate = true;
         this.fire('selection:created', {
           e: e,
           selected: added,
         });
       }
       else if (oldObjects.length > 0) {
+        invalidate = true;
         this.fire('selection:cleared', {
           e: e,
           deselected: removed,
         });
       }
+      invalidate && (this._objectsToRender = undefined);
     },
 
     /**
@@ -1184,21 +1273,24 @@
      * @chainable
      */
     dispose: function () {
-      var wrapper = this.wrapperEl;
+      var wrapperEl = this.wrapperEl,
+          lowerCanvasEl = this.lowerCanvasEl,
+          upperCanvasEl = this.upperCanvasEl,
+          cacheCanvasEl = this.cacheCanvasEl;
       this.removeListeners();
-      wrapper.removeChild(this.upperCanvasEl);
-      wrapper.removeChild(this.lowerCanvasEl);
+      this.callSuper('dispose');
+      wrapperEl.removeChild(upperCanvasEl);
+      wrapperEl.removeChild(lowerCanvasEl);
       this.contextCache = null;
       this.contextTop = null;
-      ['upperCanvasEl', 'cacheCanvasEl'].forEach((function(element) {
-        fabric.util.cleanUpJsdomNode(this[element]);
-        this[element] = undefined;
-      }).bind(this));
-      if (wrapper.parentNode) {
-        wrapper.parentNode.replaceChild(this.lowerCanvasEl, this.wrapperEl);
+      fabric.util.cleanUpJsdomNode(upperCanvasEl);
+      this.upperCanvasEl = undefined;
+      fabric.util.cleanUpJsdomNode(cacheCanvasEl);
+      this.cacheCanvasEl = undefined;
+      if (wrapperEl.parentNode) {
+        wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
       }
       delete this.wrapperEl;
-      fabric.StaticCanvas.prototype.dispose.call(this);
       return this;
     },
 
@@ -1237,7 +1329,7 @@
       var originalProperties = this._realizeGroupTransformOnObject(instance),
           object = this.callSuper('_toObject', instance, methodName, propertiesToInclude);
       //Undo the damage we did by changing all of its properties
-      this._unwindGroupTransformOnObject(instance, originalProperties);
+      originalProperties && instance.set(originalProperties);
       return object;
     },
 
@@ -1264,18 +1356,6 @@
     },
 
     /**
-     * Restores the changed properties of instance
-     * @private
-     * @param {fabric.Object} [instance] the object to un-transform (gets mutated)
-     * @param {Object} [originalValues] the original values of instance, as returned by _realizeGroupTransformOnObject
-     */
-    _unwindGroupTransformOnObject: function(instance, originalValues) {
-      if (originalValues) {
-        instance.set(originalValues);
-      }
-    },
-
-    /**
      * @private
      */
     _setSVGObject: function(markup, instance, reviver) {
@@ -1283,7 +1363,7 @@
       //object when the group is deselected
       var originalProperties = this._realizeGroupTransformOnObject(instance);
       this.callSuper('_setSVGObject', markup, instance, reviver);
-      this._unwindGroupTransformOnObject(instance, originalProperties);
+      originalProperties && instance.set(originalProperties);
     },
 
     setViewportTransform: function (vpt) {

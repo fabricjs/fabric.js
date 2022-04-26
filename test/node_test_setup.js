@@ -1,5 +1,26 @@
 // set the fabric framework as a global for tests
 var chalk = require('chalk');
+var diff = require('deep-object-diff').diff;
+var commander = require('commander');
+
+commander.program
+  .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
+  .option('-r, --recreate', 'recreate visual refs (golden images)', false)
+  .action(options => {
+    QUnit.debug = QUnit.debugVisual = options.debug;
+    QUnit.recreateVisualRefs = options.recreate;
+  }).parse(process.argv);
+//  for now accept an env variable because qunit doesn't allow passing unknown options
+if (process.env.QUNIT_DEBUG_VISUAL_TESTS === 'true') {
+  QUnit.debugVisual = true;
+}
+if (process.env.QUNIT_RECREATE_VISUAL_REFS === 'true') {
+  QUnit.recreateVisualRefs = true;
+}
+if (process.env.QUNIT_FILTER) {
+  QUnit.config.filter = process.env.QUNIT_FILTER;
+}
+
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
 global.fs = require('fs');
@@ -31,7 +52,7 @@ global.imageDataToChalk = function(imageData) {
 };
 QUnit.config.testTimeout = 15000;
 QUnit.config.noglobals = true;
-QUnit.config.hidePassed = true;
+QUnit.config.hidepassed = true;
 
 var jsdom = require('jsdom');
 
@@ -59,3 +80,55 @@ fabric.jsdomImplForWrapper = require('jsdom/lib/jsdom/living/generated/utils').i
 fabric.nodeCanvas = require('jsdom/lib/jsdom/utils').Canvas;
 fabric.window = virtualWindow;
 DOMParser = fabric.window.DOMParser;
+
+
+//  QUnit Logging
+
+//  testID
+var objectInit = fabric.Object.prototype.initialize;
+var canvasInit = fabric.StaticCanvas.prototype.initialize;
+var testID = 0;
+fabric.Object.prototype.initialize = function () {
+  objectInit.apply(this, arguments);
+  this.testID = `${this.type}#${++testID}`;
+}
+fabric.StaticCanvas.prototype.initialize = function () {
+  canvasInit.apply(this, arguments);
+  this.testID = `Canvas#${++testID}`;
+}
+
+function getLoggingRepresentation(input) {
+  return typeof input === 'object' && input && input.testID ?
+    input.testID :
+    input;
+}
+
+//  https://api.qunitjs.com/extension/QUnit.dump.parse/
+QUnit.dump.maxDepth = 1;
+//  https://github.com/qunitjs/qunit/blob/main/src/assert.js
+QUnit.assert.deepEqual = function (actual, expected, message) {
+  actual = QUnit.dump.parse(actual);
+  expected = QUnit.dump.parse(expected);
+  this.pushResult({
+    result: QUnit.equiv(actual, expected),
+    message: `${message}\ndiff:\n${diff(actual, expected)}`,
+    actual,
+    expected
+  });
+};
+QUnit.assert.equal = function (actual, expected, message) {
+  this.pushResult({
+    result: actual == expected,
+    actual: getLoggingRepresentation(actual),
+    expected: getLoggingRepresentation(expected),
+    message
+  });
+};
+QUnit.assert.strictEqual = function (actual, expected, message) {
+  this.pushResult({
+    result: actual === expected,
+    actual: getLoggingRepresentation(actual),
+    expected: getLoggingRepresentation(expected),
+    message
+  });
+};

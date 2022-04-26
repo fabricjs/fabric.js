@@ -136,6 +136,12 @@
     }
   });
 
+  QUnit.test('prevent multiple canvas initialization', function (assert) {
+    var canvas = new fabric.Canvas();
+    assert.ok(canvas.lowerCanvasEl);
+    assert.throws(() => new fabric.Canvas(canvas.lowerCanvasEl));
+  });
+
   QUnit.test('initialProperties', function(assert) {
     assert.ok('backgroundColor' in canvas);
     assert.equal(canvas.includeDefaultValues, true);
@@ -207,6 +213,9 @@
 
   QUnit.test('_initInteractive', function(assert) {
     assert.ok(typeof canvas._initInteractive === 'function');
+    assert.equal(canvas.lowerCanvasEl.getAttribute('data-fabric'), 'main', 'el should be marked by canvas init');
+    assert.equal(canvas.upperCanvasEl.getAttribute('data-fabric'), 'top', 'el should be marked by canvas init');
+    assert.equal(canvas.wrapperEl.getAttribute('data-fabric'), 'wrapper', 'el should be marked by canvas init');
   });
 
   QUnit.test('renderTop', function(assert) {
@@ -739,8 +748,8 @@
       rect3Selected = true;
     });
     var currentObjects = canvas.getActiveObjects();
-    activeSelection.removeWithUpdate(rect1);
-    activeSelection.addWithUpdate(rect3);
+    activeSelection.remove(rect1);
+    activeSelection.add(rect3);
     canvas._fireSelectionEvents(currentObjects, {});
     assert.ok(rect3Selected, 'rect 3 selected');
     assert.ok(rect1Deselected, 'rect 1 deselected');
@@ -829,26 +838,31 @@
         group = new fabric.Group([rect, rect2]);
 
     canvas.add(group);
+
     target = canvas.findTarget({
       clientX: 5, clientY: 5
     }, true);
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], undefined, 'no subtarget should return');
+
     target = canvas.findTarget({
       clientX: 30, clientY: 30
     });
     assert.equal(target, group, 'Should return the group');
     group.subTargetCheck = true;
+    group.setCoords();
     target = canvas.findTarget({
       clientX: 5, clientY: 5
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], rect, 'should return the rect');
+
     target = canvas.findTarget({
       clientX: 15, clientY: 15
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], undefined, 'no subtarget should return');
+
     target = canvas.findTarget({
       clientX: 32, clientY: 32
     });
@@ -874,7 +888,7 @@
       [rect3, rect4],
       { scaleX: 0.5, scaleY: 0.5, top: 100, left: 0 });
     group3.subTargetCheck = true;
-
+    group3.setCoords();
     var rect1 = new fabric.Rect({
       width: 100,
       height: 100,
@@ -933,7 +947,6 @@
     assert.equal(target, g, 'Should return the group 106');
     assert.equal(canvas.targets[0], rect2, 'should find the target rect2 106');
     canvas.targets = [];
-
   });
 
   QUnit.test('findTarget with subTargetCheck on activeObject', function(assert) {
@@ -941,9 +954,10 @@
         rect2 = makeRect({ left: 30, top:  30}), target,
         group = new fabric.Group([rect, rect2]);
 
+
+    group.subTargetCheck = true;
     canvas.add(group);
     canvas.setActiveObject(group);
-    group.subTargetCheck = true;
     target = canvas.findTarget({
       clientX: 9, clientY: 9
     });
@@ -972,9 +986,9 @@
         rect2 = makeRect({ left: 30, top:  30}), target,
         group = new fabric.Group([rect, rect2]);
     canvas.preserveObjectStacking = true;
+    group.subTargetCheck = true;
     canvas.add(group);
     canvas.setActiveObject(group);
-    group.subTargetCheck = true;
     target = canvas.findTarget({
       clientX: 9, clientY: 9
     });
@@ -1110,7 +1124,7 @@
     canvas.add(rect1);
     canvas.add(rect2);
     canvas.add(rect3);
-    var group = new fabric.ActiveSelection([rect1, rect2]);
+    var group = new fabric.ActiveSelection([rect1, rect2], { subTargetCheck: true });
     canvas.setActiveObject(group);
     target = canvas.findTarget({
       clientX: 5, clientY: 5
@@ -1291,6 +1305,13 @@
     var center = canvas.getCenter();
     assert.equal(center.left, upperCanvasEl.width / 2);
     assert.equal(center.top, upperCanvasEl.height / 2);
+  });
+
+  QUnit.test('getCenterPoint', function(assert) {
+    assert.ok(typeof canvas.getCenterPoint === 'function');
+    var center = canvas.getCenterPoint();
+    assert.equal(center.x, upperCanvasEl.width / 2);
+    assert.equal(center.y, upperCanvasEl.height / 2);
   });
 
   QUnit.test('centerObjectH', function(assert) {
@@ -2056,10 +2077,17 @@
     parentEl.className = 'rootNode';
     parentEl.appendChild(el);
 
+    var originalDevicePixelRatio = fabric.devicePixelRatio;
+    fabric.devicePixelRatio = 1.25;
+
     assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
     assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
 
-    var canvas = new fabric.Canvas(el, {enableRetinaScaling: false, renderOnAddRemove: false });
+    el.style.position = 'relative';
+    var elStyle = el.style.cssText;
+    assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
+    
+    var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
     wrapperEl = canvas.wrapperEl;
     lowerCanvasEl = canvas.lowerCanvasEl;
     upperCanvasEl = canvas.upperCanvasEl;
@@ -2069,6 +2097,8 @@
     assert.equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
     assert.equal(wrapperEl.childNodes[0], lowerCanvasEl, 'First child should be lowerCanvas');
     assert.equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
+    assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+    assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
     if (!fabric.isLikelyNode) {
       assert.equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appendend to rootNode');
     }
@@ -2092,9 +2122,50 @@
     }
     assert.equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');
     assert.equal(canvas.upperCanvasEl, null, 'upperCanvas should be deleted');
+    assert.equal(canvas.lowerCanvasEl, null, 'lowerCanvasEl should be deleted');
     assert.equal(canvas.cacheCanvasEl, null, 'cacheCanvasEl should be deleted');
     assert.equal(canvas.contextTop, null, 'contextTop should be deleted');
     assert.equal(canvas.contextCache, null, 'contextCache should be deleted');
+    assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
+    assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
+    assert.equal(el.width, 200, 'restored width');
+    assert.equal(el.height, 200, 'restored height');
+
+    fabric.devicePixelRatio = originalDevicePixelRatio;
+  });
+
+  QUnit.test('dispose + set dimensions', function (assert) {
+    //made local vars to do not dispose the external canvas
+    var el = fabric.document.createElement('canvas'),
+      parentEl = fabric.document.createElement('div');
+    el.width = 200; el.height = 200;
+    parentEl.className = 'rootNode';
+    parentEl.appendChild(el);
+
+    var originalDevicePixelRatio = fabric.devicePixelRatio;
+    fabric.devicePixelRatio = 1.25;
+
+    assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
+    assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
+
+    el.style.position = 'relative';
+    var elStyle = el.style.cssText;
+    assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
+
+    var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
+
+    canvas.setDimensions({ width: 500, height: 500 });
+    assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+    assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
+
+    canvas.dispose();
+    assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
+    assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
+    assert.equal(el.width, 500, 'restored width');
+    assert.equal(el.height, 500, 'restored height');
+
+    fabric.devicePixelRatio = originalDevicePixelRatio;
+
   });
 
   // QUnit.test('dispose', function(assert) {
@@ -2519,6 +2590,11 @@
     });
 
     assert.ok(typeof InheritedCanvasClass === 'function');
+  });
+
+  QUnit.test('canvas getTopContext', function(assert) {
+    assert.ok(typeof canvas.getTopContext === 'function');
+    assert.equal(canvas.getTopContext(), canvas.contextTop, 'it jsut returns contextTop');
   });
 
   QUnit.test('_shouldCenterTransform', function(assert) {
