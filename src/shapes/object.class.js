@@ -1778,7 +1778,10 @@
         canvas.backgroundColor = '#fff';
       }
       this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
+      var originalCanvas = this.canvas;
+      this.set('canvas', canvas);
       var canvasEl = canvas.toCanvasElement(multiplier || 1, Object.assign(options, { objects: [this] }));
+      this.set('canvas', originalCanvas);
       this.shadow = originalShadow;
       if (originalGroup) {
         this.group = originalGroup;
