@@ -90,7 +90,7 @@
       this.width = scaledWidth;
       this.height = scaledHeight;
       this.calcViewportBoundaries();
-      this.renderCanvas(canvasEl.getContext('2d'), objectsToRender);
+      this.renderCanvas(canvasEl.getContext('2d'), objectsToRender, { filter: options.filter || false });
       this.viewportTransform = vp;
       this.width = originalWidth;
       this.height = originalHeight;

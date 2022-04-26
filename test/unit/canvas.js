@@ -2606,6 +2606,57 @@
 
   });
 
+  QUnit.test('isTargetTransparent on nested selected object', function (assert) {
+    var rect = new fabric.Rect({
+      width: 20,
+      height: 20,
+      strokeWidth: 4,
+      stroke: 'red',
+      fill: '',
+      top: 0,
+      left: 0,
+      objectCaching: true,
+    });
+    var group = new fabric.Group([rect], { objectCaching: true, subTargetCheck: true, interactive: true });
+    canvas.add(group);
+    canvas.renderAll();
+    canvas.setActiveObject(rect);
+    assert.deepEqual(group._activeObjects, [rect]);
+    assert.ok(group.filtersObjectsAtRendering());
+    assert.equal(canvas.isTargetTransparent(group, 0, 0), false, 'opaque on 0,0');
+    assert.equal(canvas.isTargetTransparent(group, 1, 1), false, 'opaque on 1,1');
+    assert.equal(canvas.isTargetTransparent(group, 2, 2), false, 'opaque on 2,2');
+    assert.equal(canvas.isTargetTransparent(group, 3, 3), false, 'opaque on 3,3');
+    assert.equal(canvas.isTargetTransparent(group, 4, 4), true, 'transparent on 4,4');
+    assert.equal(canvas.isTargetTransparent(group, 5, 5), true, 'transparent on 5, 5');
+    assert.equal(canvas.isTargetTransparent(group, 6, 6), true, 'transparent on 6, 6');
+    assert.equal(canvas.isTargetTransparent(group, 7, 7), true, 'transparent on 7, 7');
+    assert.equal(canvas.isTargetTransparent(group, 8, 8), true, 'transparent on 8, 8');
+    assert.equal(canvas.isTargetTransparent(group, 9, 9), true, 'transparent on 9, 9');
+    assert.equal(canvas.isTargetTransparent(group, 10, 10), true, 'transparent 10, 10');
+    assert.equal(canvas.isTargetTransparent(group, 11, 11), true, 'transparent 11, 11');
+    assert.equal(canvas.isTargetTransparent(group, 12, 12), true, 'transparent 12, 12');
+    assert.equal(canvas.isTargetTransparent(group, 13, 13), true, 'transparent 13, 13');
+    assert.equal(canvas.isTargetTransparent(group, 14, 14), true, 'transparent 14, 14');
+    assert.equal(canvas.isTargetTransparent(group, 15, 15), true, 'transparent 15, 15');
+    assert.equal(canvas.isTargetTransparent(group, 16, 16), true, 'transparent 16, 16');
+    assert.equal(canvas.isTargetTransparent(group, 17, 17), true, 'transparent 17, 17');
+    assert.equal(canvas.isTargetTransparent(group, 18, 18), true, 'transparent 18, 18');
+    assert.equal(canvas.isTargetTransparent(group, 19, 19), true, 'transparent 19, 19');
+    assert.equal(canvas.isTargetTransparent(group, 20, 20), false, 'opaque 20, 20');
+    assert.equal(canvas.isTargetTransparent(group, 21, 21), false, 'opaque 21, 21');
+    assert.equal(canvas.isTargetTransparent(group, 22, 22), false, 'opaque 22, 22');
+    assert.equal(canvas.isTargetTransparent(group, 23, 23), false, 'opaque 23, 23');
+    assert.equal(canvas.isTargetTransparent(group, 24, 24), true, 'transparent 24, 24');
+    assert.equal(canvas.isTargetTransparent(group, 25, 25), true, 'transparent 25, 25');
+    assert.equal(canvas.isTargetTransparent(group, 26, 26), true, 'transparent 26, 26');
+    assert.equal(canvas.isTargetTransparent(group, 27, 27), true, 'transparent 27, 27');
+    assert.equal(canvas.isTargetTransparent(group, 28, 28), true, 'transparent 28, 28');
+    assert.equal(canvas.isTargetTransparent(group, 29, 29), true, 'transparent 29, 29');
+    assert.equal(canvas.isTargetTransparent(group, 30, 30), true, 'transparent 30, 30');
+    assert.equal(canvas.isTargetTransparent(group, 31, 31), true, 'transparent 31, 31');
+  });
+
   QUnit.test('canvas inheritance', function(assert) {
 
     // this should not error out

@@ -1991,6 +1991,17 @@
     assert.equal(canvas2.isRendering, 0, 'rendering cancelled');
   });
 
+  QUnit.test('renderCanvas rendering context', function (assert) {
+    assert.expect(1);
+    var context = { foo: 'bar' };
+    var object = new fabric.Object();
+    object.drawObject = function (ctx, renderingContext) {
+      assert.equal(renderingContext, context, 'rendering context should be propagated');
+    }
+    var group = new fabric.Group([object]);
+    canvas.renderCanvas(canvas.getContext(), [group], context);
+  });
+
   // QUnit.test('backgroundImage', function(assert) {
   //   var done = assert.async();
   //   assert.deepEqual('', canvas.backgroundImage);
