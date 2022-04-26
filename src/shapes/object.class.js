@@ -1738,7 +1738,7 @@
       if (originalGroup) {
         this.group = originalGroup;
       }
-      this.set(origParams).setCoords();
+      this.set(origParams);
       // canvas.dispose will call image.dispose that will nullify the elements
       // since this canvas is a simple element for the process, we remove references
       // to objects in this way in order to avoid object trashing.
