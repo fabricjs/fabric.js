@@ -2,7 +2,10 @@
 
   var getPointer = fabric.util.getPointer,
       degreesToRadians = fabric.util.degreesToRadians,
-      isTouchEvent = fabric.util.isTouchEvent;
+      isTouchEvent = fabric.util.isTouchEvent,
+      invertTransform = fabric.util.invertTransform,
+      applyTransformToObject = fabric.util.applyTransformToObject,
+      multiplyTransformMatrices = fabric.util.multiplyTransformMatrices;
 
   /**
    * Canvas class
@@ -653,6 +656,7 @@
      * @param {fabric.Object} target
      */
     _setupCurrentTransform: function (e, target, alreadySelected) {
+      this._needsCurrentTransformSetup = false;
       if (!target) {
         return;
       }
@@ -1230,6 +1234,7 @@
           return false;
         }
         this._activeObject = null;
+        this._currentTransform = null;
       }
       return true;
     },
@@ -1286,7 +1291,6 @@
      * @chainable
      */
     clear: function () {
-      // this.discardActiveGroup();
       this.discardActiveObject();
       this.clearContext(this.contextTop);
       return this.callSuper('clear');
@@ -1352,11 +1356,32 @@
       originalProperties && instance.set(originalProperties);
     },
 
+    /**
+     * Sets viewport transformation of this canvas instance
+     * @param {Array} vpt a Canvas 2D API transform matrix
+     * @chainable
+     * @return {fabric.Canvas} instance
+     */
     setViewportTransform: function (vpt) {
-      if (this.renderOnAddRemove && this._activeObject && this._activeObject.isEditing) {
-        this._activeObject.clearContextTop();
+      var activeObject = this._activeObject, dirty = false;
+      if (activeObject) {
+        //  text editing
+        if (this.renderOnAddRemove && activeObject.isEditing) {
+          activeObject.clearContextTop();
+        }
+        //  interacting object should not be changed by vpt
+        if (this._currentTransform || activeObject.isEditing) {
+          var currentTransform = activeObject.calcTransformMatrix(),
+              t = multiplyTransformMatrices(invertTransform(vpt), currentTransform);
+          applyTransformToObject(activeObject, t);
+          this._needsCurrentTransformSetup = true;
+          dirty = true;
+        }
       }
-      fabric.StaticCanvas.prototype.setViewportTransform.call(this, vpt);
+      this._setViewportTransform(vpt);
+      activeObject && activeObject.setCoords();
+      (dirty || this.renderOnAddRemove) && this.requestRenderAll();
+      return this;
     }
   });
 

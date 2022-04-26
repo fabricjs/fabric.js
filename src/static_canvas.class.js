@@ -471,31 +471,36 @@
     /**
      * Sets viewport transformation of this canvas instance
      * @param {Array} vpt a Canvas 2D API transform matrix
-     * @return {fabric.Canvas} instance
+     * @return {fabric.StaticCanvas} instance
      * @chainable true
      */
     setViewportTransform: function (vpt) {
-      var activeObject = this._activeObject,
-          backgroundObject = this.backgroundImage,
+      this._setViewportTransform(vpt);
+      this.renderOnAddRemove && this.requestRenderAll();
+      return this;
+    },
+
+    /**
+     * Sets viewport transformation of this canvas instance
+     * @private
+     * @param {Array} vpt a Canvas 2D API transform matrix
+     */
+    _setViewportTransform: function (vpt) {
+      var backgroundObject = this.backgroundImage,
           overlayObject = this.overlayImage,
           object, i, len;
       this.viewportTransform = vpt;
       for (i = 0, len = this._objects.length; i < len; i++) {
         object = this._objects[i];
-        object.group || object.setCoords(true);
-      }
-      if (activeObject) {
-        activeObject.setCoords();
+        object.setCoords();
       }
       if (backgroundObject) {
-        backgroundObject.setCoords(true);
+        backgroundObject.setCoords();
       }
       if (overlayObject) {
-        overlayObject.setCoords(true);
+        overlayObject.setCoords();
       }
       this.calcViewportBoundaries();
-      this.renderOnAddRemove && this.requestRenderAll();
-      return this;
     },
 
     /**

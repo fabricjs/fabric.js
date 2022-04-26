@@ -814,11 +814,23 @@
     assert.equal(canvas.clearContext(canvas.getContext()), canvas, 'should be chainable');
   });
 
-  QUnit.test('clear', function(assert) {
+  QUnit.test('clear', function (assert) {
+    var rect = makeRect({ left: 0, top: 0 });
+    canvas.add(rect);
+    assert.deepEqual(canvas.getObjects(), [rect]);
+    //  select rect
+    canvas._onMouseDown({
+      clientX: 1,
+      clientY: 1
+    });
+    assert.equal(canvas.getActiveObject(), rect, 'rect should be selected');
+    assert.ok(canvas._currentTransform, 'should have set current transform');
     assert.ok(typeof canvas.clear === 'function');
 
     assert.equal(canvas.clear(), canvas, 'should be chainable');
     assert.equal(canvas.getObjects().length, 0);
+    assert.equal(canvas.getActiveObject(), null, 'should clear active object');
+    assert.equal(canvas._currentTransform, null, 'should clear current transform');
   });
 
   QUnit.test('renderAll', function(assert) {
@@ -2019,16 +2031,19 @@
     canvas.setActiveObject(group);
     assert.equal(canvas.discardActiveObject(), canvas, 'should be chainable');
     assert.equal(canvas.getActiveObject(), null, 'removing active group sets it to null');
+    assert.equal(canvas._currentTransform, null, 'should clear current transform');
   });
 
   QUnit.test('_discardActiveObject', function(assert) {
 
     canvas.add(makeRect());
     canvas.setActiveObject(canvas.item(0));
-
+    //  stub current transform data
+    canvas._currentTransform = { foo: 'bar' };
     canvas._discardActiveObject();
     assert.ok(!canvas.item(0).active);
     assert.equal(canvas.getActiveObject(), null);
+    assert.equal(canvas._currentTransform, null, 'should clear current transform');
   });
 
   QUnit.test('discardActiveObject', function(assert) {
@@ -2056,6 +2071,7 @@
     assert.ok(!canvas.item(0).active);
     assert.equal(canvas.getActiveObject(), null);
     assert.equal(canvas.getActiveObject(), null);
+    assert.equal(canvas._currentTransform, null, 'should clear current transform');
 
     for (var prop in eventsFired) {
       assert.ok(eventsFired[prop]);
@@ -2414,6 +2430,49 @@
     // assert.equal(t.originX, 'center', 'origin in center');
     // assert.equal(t.originY, 'center', 'origin in center');
     // canvas._currentTransform = false;
+  });
+
+  QUnit.test('setViewportTransform while actively transforming object', function (assert) {
+    var vpt = [2, 0, 0, 2, -50, -50];
+    assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var rect = new fabric.Rect({ width: 10, heigth: 10 });
+    canvas.add(rect);
+    //  control
+    canvas.setViewportTransform(vpt);
+    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(-50, -50), 'rect should be on screen -50,-50');
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+    assert.ok(rect.isOnScreen(), 'rect should be on screen 0,0');
+    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(0, 0), 'rect should be on screen 0,0');
+    //  select rect
+    canvas._onMouseDown({
+      clientX: 1,
+      clientY: 1
+    });
+    assert.equal(canvas.getActiveObject(), rect, 'rect should be selected');
+    //  apply vpt
+    canvas.setViewportTransform(vpt);
+    assert.ok(rect.isOnScreen(), 'rect should be unchanged from the viewer\'s perspective');
+    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(0, 0), 'rect should be on screen 0,0');
+  });
+
+  QUnit.test('setViewportTransform while editing text', function (assert) {
+    var vpt = [2, 0, 0, 2, -50, -50];
+    assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var itext = new fabric.IText('a');
+    canvas.add(itext);
+    //  control
+    canvas.setViewportTransform(vpt);
+    assert.deepEqual(itext.lineCoords.tl, new fabric.Point(-50, -50), 'itext should be on screen -50,-50');
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+    assert.ok(itext.isOnScreen(), 'itext should be on screen 0,0');
+    assert.deepEqual(itext.lineCoords.tl, new fabric.Point(0, 0), 'itext should be on screen 0,0');
+    //  select itext
+    canvas.setActiveObject(itext);
+    itext.enterEditing();
+    //  apply vpt
+    canvas.setViewportTransform(vpt);
+    assert.ok(itext.isOnScreen(), 'itext should be unchanged from the viewer\'s perspective');
+    assert.deepEqual(itext.lineCoords.tl, new fabric.Point(0, 0), 'itext should be on screen 0,0');
   });
 
   // QUnit.test('_rotateObject', function(assert) {

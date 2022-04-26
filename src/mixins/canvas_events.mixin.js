@@ -599,7 +599,8 @@
     _onMouseDownInDrawingMode: function(e) {
       this._isCurrentlyDrawing = true;
       if (this.getActiveObject()) {
-        this.discardActiveObject(e).requestRenderAll();
+        this.discardActiveObject(e);
+        this.requestRenderAll();
       }
       var pointer = this.getPointer(e);
       this.freeDrawingBrush.onMouseDown(pointer, { e: e, pointer: pointer });
@@ -903,7 +904,9 @@
      * @private
      * @param {Event} e Event fired on mousemove
      */
-    _transformObject: function(e) {
+    _transformObject: function (e) {
+      this._needsCurrentTransformSetup && this._setupCurrentTransform(e, this._currentTransform.target, true);
+
       var pointer = this.getPointer(e),
           transform = this._currentTransform,
           target = transform.target,
