@@ -1730,8 +1730,9 @@
       }
       this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
       var originalCanvas = this.canvas;
+      canvas._objects = [this];
       this.set('canvas', canvas);
-      var canvasEl = canvas.toCanvasElement(multiplier || 1, Object.assign(options, { objects: [this] }));
+      var canvasEl = canvas.toCanvasElement(multiplier || 1, options);
       this.set('canvas', originalCanvas);
       this.shadow = originalShadow;
       if (originalGroup) {
