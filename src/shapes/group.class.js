@@ -21,6 +21,8 @@
    * @class fabric.Group
    * @extends fabric.Object
    * @mixes fabric.Collection
+   * @fires object:added
+   * @fires object:removed
    * @fires layout once layout completes
    * @see {@link fabric.Group#initialize} for constructor definition
    */
@@ -334,6 +336,7 @@
      */
     _onObjectAdded: function (object) {
       this.enterGroup(object, true);
+      this.fire('object:added', { target: object });
       object.fire('added', { target: this });
     },
 
@@ -343,6 +346,7 @@
      */
     _onRelativeObjectAdded: function (object) {
       this.enterGroup(object, false);
+      this.fire('object:added', { target: object });
       object.fire('added', { target: this });
     },
 
@@ -353,6 +357,7 @@
      */
     _onObjectRemoved: function (object, removeParentTransform) {
       this.exitGroup(object, removeParentTransform);
+      this.fire('object:removed', { target: object });
       object.fire('removed', { target: this });
     },
 

@@ -71,7 +71,14 @@
         }
       }
       else {
-        activeSelection.add(target);
+        //  preserveObjectStacking in ActiveSelection
+        //  perf enhancement for large ActiveSelection: consider a binary search of `isInFrontOf`
+        var insertAt = activeSelection._objects.findIndex(function (obj) {
+          return obj.isInFrontOf(target);
+        });
+        //  target might be in front of all other objects
+        insertAt = insertAt === -1 ? activeSelection._objects.length : insertAt;
+        activeSelection.insertAt(target, insertAt);
         this._hoveredTarget = activeSelection;
         this._hoveredTargets = this.targets.concat();
       }

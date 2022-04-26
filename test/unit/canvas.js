@@ -453,6 +453,56 @@
     assert.equal(selection.getObjects().indexOf(rect2), 1, 'rect2 is the second object in the active selection');
   });
 
+  QUnit.test('update active selection respects order of objects', function (assert) {
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    var rect3 = new fabric.Rect();
+    var rect3 = new fabric.Rect();
+    canvas.add(rect1, rect2, rect3);
+
+    function assertObjectsInOrder(init, added) {
+      var activeSelection = new fabric.ActiveSelection(init);
+      canvas.setActiveObject(activeSelection);
+      canvas._updateActiveSelection(added, {});
+      assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3]);
+      activeSelection.removeAll();
+    }
+
+    function assertObjectsInOrderOnCanvas(init, added) {
+      assert.deepEqual(canvas.getObjects(), [rect1, rect2, rect3]);
+      assertObjectsInOrder(init, added);
+      assert.deepEqual(canvas.getObjects(), [rect1, rect2, rect3]);
+    }
+
+    assertObjectsInOrderOnCanvas([rect1, rect2], rect3);
+    assertObjectsInOrderOnCanvas([rect1, rect3], rect2);
+    assertObjectsInOrderOnCanvas([rect2, rect3], rect1);
+
+    canvas.remove(rect2, rect3);
+    var group = new fabric.Group([rect2, rect3], { subTargetCheck: true, interactive: true });
+    canvas.add(group);
+
+    function assertNestedObjectsInOrder(init, added) {
+      assert.deepEqual(canvas.getObjects(), [rect1, group]);
+      assert.deepEqual(group.getObjects(), [rect2, rect3]);
+      assertObjectsInOrder(init, added);
+      assert.deepEqual(canvas.getObjects(), [rect1, group]);
+      assert.deepEqual(group.getObjects(), [rect2, rect3]);
+    }
+
+    assertNestedObjectsInOrder([rect1, rect2], rect3);
+    assertNestedObjectsInOrder([rect1, rect3], rect2);
+    assertNestedObjectsInOrder([rect2, rect3], rect1);
+
+    canvas.remove(rect1);
+    group.insertAt(rect1, 0);
+    group.remove(rect3);
+    canvas.add(rect3);
+    assertNestedObjectsInOrder([rect1, rect2], rect3);
+    assertNestedObjectsInOrder([rect1, rect3], rect2);
+    assertNestedObjectsInOrder([rect2, rect3], rect1);
+  });
+
   QUnit.test('_groupSelectedObjects fires selected for objects', function(assert) {
     var fired = 0;
     var rect1 = new fabric.Rect();
