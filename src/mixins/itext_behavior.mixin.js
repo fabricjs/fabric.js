@@ -13,6 +13,16 @@
       this.initCursorSelectionHandlers();
       this.initDoubleClickSimulation();
       this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
+      this.dragEnterHandler = this.dragEnterHandler.bind(this);
+      this.dragOverHandler = this.dragOverHandler.bind(this);
+      this.dragLeaveHandler = this.dragLeaveHandler.bind(this);
+      this.dragEndHandler = this.dragEndHandler.bind(this);
+      this.dropHandler = this.dropHandler.bind(this);
+      this.on('dragenter', this.dragEnterHandler);
+      this.on('dragover', this.dragOverHandler);
+      this.on('dragleave', this.dragLeaveHandler);
+      this.on('dragend', this.dragEndHandler);
+      this.on('drop', this.dropHandler);
     },
 
     onDeselect: function() {
@@ -154,11 +164,10 @@
     },
 
     /**
-     * Aborts cursor animation and clears all timeouts
+     * Aborts cursor animation, clears all timeouts and clear textarea context if necessary
      */
     abortCursorAnimation: function() {
-      var shouldClear = this._currentTickState || this._currentTickCompleteState,
-          canvas = this.canvas;
+      var shouldClear = this._currentTickState || this._currentTickCompleteState;
       this._currentTickState && this._currentTickState.abort();
       this._currentTickCompleteState && this._currentTickCompleteState.abort();
 
@@ -166,12 +175,12 @@
       clearTimeout(this._cursorTimeout2);
 
       this._currentCursorOpacity = 0;
-      // to clear just itext area we need to transform the context
-      // it may not be worth it
-      if (shouldClear && canvas) {
-        canvas.clearContext(canvas.contextTop || canvas.contextContainer);
-      }
 
+      //  make sure we clear context even if instance is not editing
+      if (shouldClear) {
+        var ctx = this._clearContextTop();
+        ctx && ctx.restore();
+      }
     },
 
     /**
@@ -200,7 +209,7 @@
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findWordBoundaryLeft: function(startFrom) {
+    findWordBoundaryStart: function(startFrom) {
       var offset = 0, index = startFrom - 1;
 
       // remove space before cursor first
@@ -215,7 +224,7 @@
         index--;
       }
 
-      return startFrom - offset;
+      return Math.max(startFrom - offset, 0);
     },
 
     /**
@@ -223,7 +232,7 @@
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findWordBoundaryRight: function(startFrom) {
+    findWordBoundaryEnd: function(startFrom) {
       var offset = 0, index = startFrom;
 
       // remove space after cursor first
@@ -246,7 +255,7 @@
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findLineBoundaryLeft: function(startFrom) {
+    findLineBoundaryStart: function(startFrom) {
       var offset = 0, index = startFrom - 1;
 
       while (!/\n/.test(this._text[index]) && index > -1) {
@@ -254,7 +263,7 @@
         index--;
       }
 
-      return startFrom - offset;
+      return Math.max(startFrom - offset, 0);
     },
 
     /**
@@ -262,7 +271,7 @@
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findLineBoundaryRight: function(startFrom) {
+    findLineBoundaryEnd: function(startFrom) {
       var offset = 0, index = startFrom;
 
       while (!/\n/.test(this._text[index]) && index < this._text.length) {
@@ -320,8 +329,8 @@
      */
     selectLine: function(selectionStart) {
       selectionStart = selectionStart || this.selectionStart;
-      var newSelectionStart = this.findLineBoundaryLeft(selectionStart),
-          newSelectionEnd = this.findLineBoundaryRight(selectionStart);
+      var newSelectionStart = this.findLineBoundaryStart(selectionStart),
+          newSelectionEnd = this.findLineBoundaryEnd(selectionStart);
 
       this.selectionStart = newSelectionStart;
       this.selectionEnd = newSelectionEnd;
@@ -397,25 +406,305 @@
           currentStart = this.selectionStart,
           currentEnd = this.selectionEnd;
       if (
-        (newSelectionStart !== this.__selectionStartOnMouseDown || currentStart === currentEnd)
+        (newSelectionStart !== this.__selectionStartOrigin || currentStart === currentEnd)
         &&
         (currentStart === newSelectionStart || currentEnd === newSelectionStart)
       ) {
         return;
       }
-      if (newSelectionStart > this.__selectionStartOnMouseDown) {
-        this.selectionStart = this.__selectionStartOnMouseDown;
+      if (newSelectionStart > this.__selectionStartOrigin) {
+        this.selectionStart = this.__selectionStartOrigin;
         this.selectionEnd = newSelectionStart;
       }
       else {
         this.selectionStart = newSelectionStart;
-        this.selectionEnd = this.__selectionStartOnMouseDown;
+        this.selectionEnd = this.__selectionStartOrigin;
       }
       if (this.selectionStart !== currentStart || this.selectionEnd !== currentEnd) {
         this.restartCursorIfNeeded();
         this._fireSelectionChanged();
         this._updateTextarea();
         this.renderCursorOrSelection();
+      }
+    },
+
+    /**
+     * Override to customize the drag image
+     * https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setDragImage
+     * @param {DragEvent} e
+     * @param {object} data
+     * @param {number} data.selectionStart
+     * @param {number} data.selectionEnd
+     * @param {string} data.text
+     * @param {string} data.value selected text
+     */
+    setDragImage: function (e, data) {
+      var t = this.calcTransformMatrix();
+      var flipFactor = new fabric.Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
+      var boundaries = this._getCursorBoundaries(data.selectionStart);
+      var selectionPosition = new fabric.Point(
+        boundaries.left + boundaries.leftOffset,
+        boundaries.top + boundaries.topOffset
+      ).multiply(flipFactor);
+      var pos = fabric.util.transformPoint(selectionPosition, t);
+      var pointer = this.canvas.getPointer(e);
+      var diff = pointer.subtract(pos);
+      var enableRetinaScaling = this.canvas._isRetinaScaling();
+      var retinaScaling = this.canvas.getRetinaScaling();
+      var bbox = this.getBoundingRect(true);
+      var correction = pos.subtract(new fabric.Point(bbox.left, bbox.top));
+      var offset = correction.add(diff).scalarMultiply(retinaScaling);
+      //  prepare instance for drag image snapshot by making all non selected text invisible
+      var bgc = this.backgroundColor;
+      var styles = fabric.util.object.clone(this.styles, true);
+      delete this.backgroundColor;
+      var styleOverride = {
+        fill: 'transparent',
+        textBackgroundColor: 'transparent'
+      };
+      this.setSelectionStyles(styleOverride, 0, data.selectionStart);
+      this.setSelectionStyles(styleOverride, data.selectionEnd, data.text.length);
+      var dragImage = this.toCanvasElement({ enableRetinaScaling: enableRetinaScaling });
+      this.backgroundColor = bgc;
+      this.styles = styles;
+      //  handle retina scaling
+      if (enableRetinaScaling && retinaScaling > 1) {
+        var c = fabric.util.createCanvasElement();
+        c.width = dragImage.width / retinaScaling;
+        c.height = dragImage.height / retinaScaling;
+        var ctx = c.getContext('2d');
+        ctx.scale(1 / retinaScaling, 1 / retinaScaling);
+        ctx.drawImage(dragImage, 0, 0);
+        dragImage = c;
+      }
+      this.__dragImageDisposer && this.__dragImageDisposer();
+      this.__dragImageDisposer = function () {
+        dragImage.remove();
+      };
+      //  position drag image offsecreen
+      fabric.util.setStyle(dragImage, {
+        position: 'absolute',
+        left: -dragImage.width + 'px',
+        border: 'none'
+      });
+      fabric.document.body.appendChild(dragImage);
+      e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
+    },
+
+    /**
+     * support native like text dragging
+     * @private
+     * @param {DragEvent} e
+     * @returns {boolean} should handle event
+     */
+    onDragStart: function (e) {
+      this.__dragStartFired = true;
+      if (this.__isDragging) {
+        var selection = this.__dragStartSelection = {
+          selectionStart: this.selectionStart,
+          selectionEnd: this.selectionEnd,
+        };
+        var value = this._text.slice(selection.selectionStart, selection.selectionEnd).join('');
+        var data = Object.assign({ text: this.text, value: value }, selection);
+        e.dataTransfer.setData('text/plain', value);
+        e.dataTransfer.setData('application/fabric', JSON.stringify({
+          value: value,
+          styles: this.getSelectionStyles(selection.selectionStart, selection.selectionEnd, true)
+        }));
+        e.dataTransfer.effectAllowed = 'copyMove';
+        this.setDragImage(e, data);
+      }
+      return this.__isDragging;
+    },
+
+    /**
+     * Override to customize drag and drop behavior
+     * @public
+     * @param {DragEvent} e
+     * @returns {boolean}
+     */
+    canDrop: function (e) {
+      if (this.editable && !this.__corner) {
+        if (this.__isDragging && this.__dragStartSelection) {
+          //  drag source trying to drop over itself
+          //  allow dropping only outside of drag start selection
+          var index = this.getSelectionStartFromPointer(e);
+          var dragStartSelection = this.__dragStartSelection;
+          return index < dragStartSelection.selectionStart || index > dragStartSelection.selectionEnd;
+        }
+        return true;
+      }
+      return false;
+    },
+
+    /**
+     * support native like text dragging
+     * @private
+     * @param {object} options
+     * @param {DragEvent} options.e
+     */
+    dragEnterHandler: function (options) {
+      var e = options.e;
+      var canDrop = !e.defaultPrevented && this.canDrop(e);
+      if (!this.__isDraggingOver && canDrop) {
+        this.__isDraggingOver = true;
+        this.enterEditing(e);
+        this.__isDragging && this.abortCursorAnimation();
+      }
+    },
+
+    /**
+     * support native like text dragging
+     * @private
+     * @param {object} options
+     * @param {DragEvent} options.e
+     */
+    dragOverHandler: function (options) {
+      var e = options.e;
+      var canDrop = !e.defaultPrevented && this.canDrop(e);
+      if (!this.__isDraggingOver && canDrop) {
+        this.__isDraggingOver = true;
+        this.enterEditing(e);
+        this.__isDragging && this.abortCursorAnimation();
+      }
+      else if (this.__isDraggingOver && !canDrop) {
+        //  drop state has changed
+        this.__isDraggingOver = false;
+        !this.__isDragging && this.clearContextTop();
+        this.exitEditing();
+      }
+      if (this.__isDraggingOver) {
+        //  can be dropped, inform browser
+        e.preventDefault();
+        //  inform event subscribers
+        options.canDrop = true;
+        options.dropTarget = this;
+        //  render
+        this.setCursorByClick(e);
+        this._updateTextarea();
+        this.restartCursorIfNeeded();
+        this.renderCursorOrSelection();
+      }
+    },
+
+    /**
+     * support native like text dragging
+     * @private
+     */
+    dragLeaveHandler: function () {
+      if (this.__isDraggingOver || this.__isDragging) {
+        this.__isDraggingOver = false;
+        !this.__isDragging && this.clearContextTop();
+        this.exitEditing();
+      }
+    },
+
+    /**
+     * support native like text dragging
+     * fired only on the drag source
+     * handle changes to the drag source in case of a drop on another object or a cancellation
+     * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#finishing_a_drag
+     * @private
+     * @param {object} options
+     * @param {DragEvent} options.e
+     */
+    dragEndHandler: function (options) {
+      var e = options.e;
+      if (this.__isDragging && this.__dragStartFired) {
+        //  once the drop event finishes we check if we need to change the drag source
+        //  if the drag source received the drop we bail out
+        if (this.__dragStartSelection) {
+          var selectionStart = this.__dragStartSelection.selectionStart;
+          var selectionEnd = this.__dragStartSelection.selectionEnd;
+          var dropEffect = e.dataTransfer.dropEffect;
+          if (dropEffect === 'none') {
+            this.selectionStart = selectionStart;
+            this.selectionEnd = selectionEnd;
+            this._updateTextarea();
+          }
+          else {
+            var ctx = this._clearContextTop();
+            ctx && ctx.restore();
+            if (dropEffect === 'move') {
+              this.insertChars('', null, selectionStart, selectionEnd);
+              this.selectionStart = this.selectionEnd = selectionStart;
+              this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
+              this._updateTextarea();
+              this.fire('changed', { index: selectionStart, action: 'dragend' });
+              this.canvas.fire('text:changed', { target: this });
+              this.canvas.requestRenderAll();
+            }
+            this.exitEditing();
+            //  disable mouse up logic
+            this.__lastSelected = false;
+          }
+        }
+      }
+
+      this.__dragImageDisposer && this.__dragImageDisposer();
+      delete this.__dragImageDisposer;
+      delete this.__dragStartSelection;
+      this.__isDraggingOver = false;
+    },
+
+    /**
+     * support native like text dragging
+     *
+     * Override the `text/plain | application/fabric` types of {@link DragEvent#dataTransfer}
+     * in order to change the drop value or to customize styling respectively, by listening to the `drop:before` event
+     * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#performing_a_drop
+     * @private
+     * @param {object} options
+     * @param {DragEvent} options.e
+     */
+    dropHandler: function (options) {
+      var e = options.e, didDrop = e.defaultPrevented;
+      this.__isDraggingOver = false;
+      // inform browser that the drop has been accepted
+      e.preventDefault();
+      var insert = e.dataTransfer.getData('text/plain');
+      if (insert && !didDrop) {
+        var insertAt = this.selectionStart;
+        var data = e.dataTransfer.types.includes('application/fabric') ?
+          JSON.parse(e.dataTransfer.getData('application/fabric')) :
+          {};
+        var styles = data.styles;
+        var trailing = insert[Math.max(0, insert.length - 1)];
+        this.canvas.discardActiveObject();
+        this.canvas.setActiveObject(this);
+        this.enterEditing(e);
+        var selectionStartOffset = 0;
+        //  drag and drop in same instance
+        if (this.__dragStartSelection) {
+          var selectionStart = this.__dragStartSelection.selectionStart;
+          var selectionEnd = this.__dragStartSelection.selectionEnd;
+          if (insertAt > selectionStart && insertAt <= selectionEnd) {
+            insertAt = selectionStart;
+          }
+          else if (insertAt > selectionEnd) {
+            insertAt -= selectionEnd - selectionStart;
+          }
+          this.insertChars('', null, selectionStart, selectionEnd);
+          // prevent `dragend` from handling event
+          delete this.__dragStartSelection;
+        }
+        //  remove redundant line break
+        if (this._reNewline.test(trailing)
+          && (this._reNewline.test(this._text[insertAt]) || insertAt === this._text.length)) {
+          insert = insert.trimEnd();
+        }
+        //  inform subscribers
+        options.didDrop = true;
+        options.dropTarget = this;
+        //  finalize
+        this.insertChars(insert, styles, insertAt);
+        this.selectionStart = Math.min(insertAt + selectionStartOffset, this._text.length);
+        this.selectionEnd = Math.min(this.selectionStart + insert.length, this._text.length);
+        this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
+        this._updateTextarea();
+        this.fire('changed', { index: insertAt + selectionStartOffset, action: 'drop' });
+        this.canvas.fire('text:changed', { target: this });
+        this.canvas.requestRenderAll();
       }
     },
 
@@ -455,11 +744,15 @@
       var smallerTextStart = _text.slice(0, start),
           graphemeStart = smallerTextStart.join('').length;
       if (start === end) {
-        return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
+        return { selectionStart: graphemeStart, selectionEnd: graphemeStart, selectionDirection: 'forward' };
       }
       var smallerTextEnd = _text.slice(start, end),
           graphemeEnd = smallerTextEnd.join('').length;
-      return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
+      return {
+        selectionStart: graphemeStart,
+        selectionEnd: graphemeStart + graphemeEnd,
+        selectionDirection: graphemeStart < this.__selectionStartOrigin ? 'backward' : 'forward'
+      };
     },
 
     /**
@@ -472,8 +765,12 @@
       }
       if (!this.inCompositionMode) {
         var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd, this._text);
-        this.hiddenTextarea.selectionStart = newSelection.selectionStart;
-        this.hiddenTextarea.selectionEnd = newSelection.selectionEnd;
+        this.hiddenTextarea.setSelectionRange(
+          newSelection.selectionStart,
+          newSelection.selectionEnd,
+          newSelection.selectionDirection
+        );
+        this.selectionDirection = newSelection.selectionDirection;
       }
       this.updateTextareaPosition();
     },
@@ -497,6 +794,7 @@
       if (!this.inCompositionMode) {
         this.selectionStart = newSelection.selectionStart;
       }
+      this.selectionDirection = newSelection.selectionDirection;
       this.updateTextareaPosition();
     },
 
@@ -900,14 +1198,14 @@
         if (end === start) {
           this._selectionDirection = 'left';
         }
-        else if (this._selectionDirection === 'right') {
+        else if (this.selectionDirection === 'forward') {
           this._selectionDirection = 'left';
           this.selectionEnd = start;
         }
         this.selectionStart = newSelection;
       }
       else if (newSelection > start && newSelection < end) {
-        if (this._selectionDirection === 'right') {
+        if (this.selectionDirection === 'forward') {
           this.selectionEnd = newSelection;
         }
         else {
@@ -919,7 +1217,7 @@
         if (end === start) {
           this._selectionDirection = 'right';
         }
-        else if (this._selectionDirection === 'left') {
+        else if (this.selectionDirection === 'backward') {
           this._selectionDirection = 'right';
           this.selectionStart = end;
         }

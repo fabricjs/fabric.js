@@ -86,24 +86,45 @@
     selectable: false,
 
     /**
-     * Constructor
-     *
-     * @param {fabric.Object[]} [objects] instance objects
-     * @param {Object} [options] Options object
-     * @return {fabric.Group} thisArg
+     * @override we want instance to fill parent so we disregard transformations
+     * @param {CanvasRenderingContext2D} ctx Context
      */
-    initialize: function (objects, options) {
-      this.callSuper('initialize', objects, options);
-      this.__canvasMonitor = this.__canvasMonitor.bind(this);
-      this.__groupMonitor = this.__groupMonitor.bind(this);
-      this.__onAdded = this._watchParent.bind(this, true);
-      this.__onRemoved = this._watchParent.bind(this, false);
-      this.on('added:initialized', this.__onAdded);
-      this.on('added', this.__onAdded);
-      this.on('removed', this.__onRemoved);
-      //  trigger layout in case parent is passed in options
-      var parent = this.group || this.canvas;
-      parent && this.__onAdded({ target: parent });
+    transform: function (ctx) {
+      var m = this.calcTransformMatrix(!this.needsFullTransform(ctx));
+      ctx.transform(1, 0, 0, 1, m[4], m[5]);
+    },
+
+    /**
+     * @override apply instance's transformations on objects
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    drawObject: function (ctx) {
+      this._renderBackground(ctx);
+      ctx.save();
+      var m = this.calcTransformMatrix(!this.needsFullTransform(ctx));
+      ctx.transform(m[0], m[1], m[2], m[3], 0, 0);
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        this._objects[i].render(ctx);
+      }
+      ctx.restore();
+      this._drawClipPath(ctx, this.clipPath);
+    },
+
+    /**
+     * @private
+     * @override we want instance to fill parent so we disregard transformations
+     * @returns {fabric.Point} dimensions
+     */
+    _getTransformedDimensions: function () {
+      return this.callSuper('_getTransformedDimensions', {
+        scaleX: 1,
+        scaleY: 1,
+        skewX: 0,
+        skewY: 0,
+        width: this.width,
+        height: this.height,
+        strokeWidth: 0
+      });
     },
 
     /**
@@ -117,39 +138,10 @@
 
     /**
      * @private
-     * @param {boolean} watch
-     * @param {{target:fabric.Group|fabric.Canvas}} [opt]
+     * @override handled by {@link fabric.Layer#getLayoutStrategyResult}
      */
-    _watchParent: function (watch, opt) {
-      var target = opt && opt.target;
-      //  make sure we listen only once
-      this.canvas && this.canvas.off('resize', this.__canvasMonitor);
-      this.group && this.group.off('layout', this.__groupMonitor);
-      if (!watch) {
-        return;
-      }
-      else if (target instanceof fabric.Group) {
-        this._applyLayoutStrategy({ type: 'group' });
-        this.group.on('layout', this.__groupMonitor);
-      }
-      else if (target instanceof fabric.Canvas) {
-        this._applyLayoutStrategy({ type: 'canvas' });
-        this.canvas.on('resize', this.__canvasMonitor);
-      }
-    },
-
-    /**
-     * @private
-     */
-    __canvasMonitor: function () {
-      this._applyLayoutStrategy({ type: 'canvas_resize' });
-    },
-
-    /**
-     * @private
-     */
-    __groupMonitor: function (context) {
-      this._applyLayoutStrategy(Object.assign({}, context, { type: 'group_layout' }));
+    _onParentResize: function (context) {
+      this._applyLayoutStrategy(context);
     },
 
     /**
@@ -194,14 +186,6 @@
     toString: function () {
       return '#<fabric.Layer: (' + this.complexity() + ')>';
     },
-
-    dispose: function () {
-      this.off('added:initialized', this.__onAdded);
-      this.off('added', this.__onAdded);
-      this.off('removed', this.__onRemoved);
-      this._watchParent(false);
-      this.callSuper('dispose');
-    }
 
   });
 

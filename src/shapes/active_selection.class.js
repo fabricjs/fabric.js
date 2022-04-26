@@ -54,9 +54,45 @@
 
     /**
      * @private
+     * @param {string} key
+     * @param {*} value
+     */
+    _set: function (key, value) {
+      var prev = this[key];
+      this.callSuper('_set', key, value);
+      if (prev !== this[key] && this.canvas && this.canvas.preserveObjectStacking
+        && this.stateProperties.indexOf(key) > -1) {
+        var invalidationContext = {
+          target: this,
+          key: key,
+          value: value,
+          prevValue: prev
+        };
+        var invalidatedGroups = [];
+        this.forEachObject(function (object) {
+          var group = object.__owningGroup;
+          if (group && invalidatedGroups.indexOf(group) === -1) {
+            group.invalidate(invalidationContext);
+            invalidatedGroups.push(group);
+          }
+        });
+      }
+      return this;
+    },
+
+    /**
+     * @private
      */
     _shouldSetNestedCoords: function () {
       return true;
+    },
+
+    /**
+     * @private
+     * @override we don't want the selection monitor to be active
+     */
+    __objectSelectionMonitor: function () {
+      //  noop
     },
 
     /**
@@ -66,13 +102,12 @@
      * @returns {boolean} true if object entered group
      */
     enterGroup: function (object, removeParentTransform) {
-      if (!this.canEnter(object)) {
+      if (!this.canEnterGroup(object)) {
         return false;
       }
       if (object.group) {
         //  save ref to group for later in order to return to it
         var parent = object.group;
-        parent._exitGroup(object);
         object.__owningGroup = parent;
       }
       this._enterGroup(object, removeParentTransform);
@@ -90,7 +125,7 @@
       var parent = object.__owningGroup;
       if (parent) {
         //  return to owning group
-        parent.enterGroup(object);
+        parent._enterGroup(object, true);
         delete object.__owningGroup;
       }
     },
@@ -101,6 +136,7 @@
      * @param {fabric.Object[]} targets
      */
     _onAfterObjectsChange: function (type, targets) {
+      this.callSuper('_onAfterObjectsChange', type, targets);
       var groups = [];
       targets.forEach(function (object) {
         object.group && !groups.includes(object.group) && groups.push(object.group);
@@ -117,6 +153,14 @@
           group._set('dirty', true);
         });
       }
+    },
+
+    /**
+     * @override there's no reason to invalidate because objects aren't selectable
+     * @private
+     */
+    invalidate: function () {
+      // noop
     },
 
     /**

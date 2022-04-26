@@ -122,9 +122,9 @@ var filesToInclude = [
   ifSpecifiedInclude('gestures', 'lib/event.js'),
 
   'src/mixins/observable.mixin.js',
-  'src/mixins/collection.mixin.js',
   'src/mixins/shared_methods.mixin.js',
   'src/util/misc.js',
+  'src/mixins/collection.mixin.js',
   ifSpecifiedInclude('accessors', 'src/util/named_accessors.mixin.js'),
   'src/util/path.js',
   'src/util/lang_array.js',
@@ -135,6 +135,7 @@ var filesToInclude = [
   'src/util/dom_style.js',
   'src/util/dom_misc.js',
   'src/util/dom_request.js',
+  'src/util/parent_resize_observer.js',
 
   'src/log.js',
 

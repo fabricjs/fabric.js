@@ -67,6 +67,25 @@
     },
 
     /**
+     * Called once instance is added to a parent and when parent resizes
+     * @private
+     * @param {*} context see {@link fabric.ParentResizeObserver}
+     */
+    _onParentResize: function (context) {
+      if (this.layout === 'fill-parent') {
+        var data = this._parentMonitor.extractDataFromResizeEvent(context);
+        var parent = data.parent;
+        var r = Math.min(parent.width, parent.height) / 2;
+        if (r !== this.radius) {
+          this.setRadius(r);
+          this.setPositionByOrigin(data.center, 'center', 'center');
+          parent.interactive && this.setCoords();
+          this.fire('resize', context);
+        }
+      }
+    },
+
+    /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance

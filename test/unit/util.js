@@ -691,12 +691,6 @@
     assert.equal(fabric.util.getKlass('Sepia2', 'fabric.Image.filters'), fabric.Image.filters.Sepia2);
   });
 
-  QUnit.test('resolveNamespace', function(assert) {
-    assert.equal(fabric.util.resolveNamespace('fabric'), fabric);
-    assert.equal(fabric.util.resolveNamespace('fabric.Image'), fabric.Image);
-    assert.equal(fabric.util.resolveNamespace('fabric.Image.filters'), fabric.Image.filters);
-  });
-
   QUnit.test('clearFabricFontCache', function(assert) {
     assert.ok(typeof fabric.util.clearFabricFontCache === 'function');
     fabric.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
@@ -955,8 +949,9 @@
       applyTransformToObject = fabric.util.applyTransformToObject,
       invert = fabric.util.invertTransform,
       multiply = fabric.util.multiplyTransformMatrices;
-    //  silence group check
+    //  silence group checks
     obj1.isOnACache = () => false;
+    obj1.invalidate = () => {};
 
     applyTransformToObject(obj, m);
     applyTransformToObject(obj1, m1);

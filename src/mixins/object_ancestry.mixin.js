@@ -22,16 +22,32 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   },
 
   /**
+   * Returns instance's parent **EXCLUDING** `ActiveSelection`
+   * @param {boolean} [strict] exclude canvas as well
+   * @returns {fabric.Object | fabric.StaticCanvas | undefined}
+   */
+  getParent: function (strict) {
+    return (
+      this.group && this.group.type === 'activeSelection' ?
+        this.__owningGroup :
+        this.group
+    ) || (strict ? undefined : this.canvas);
+  },
+
+  /**
    *
-   * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
-   * @returns {(fabric.Object | fabric.StaticCanvas)[]} ancestors from bottom to top
+   * @typedef {fabric.Object[] | [...fabric.Object[], fabric.StaticCanvas]} Ancestors
+   * 
+   * Returns an array of ancestors **EXCLUDING** `ActiveSelection`
+   * @param {boolean} [strict] returns only ancestors that are objects excluding canvas
+   * @returns {Ancestors} ancestors from bottom to top
    */
   getAncestors: function (strict) {
     var ancestors = [];
-    var parent = this.group || (!strict ? this.canvas : undefined);
+    var parent = this.getParent(strict);
     while (parent) {
       ancestors.push(parent);
-      parent = parent.group || (!strict ? parent.canvas : undefined);
+      parent = parent.getParent && parent.getParent(strict);
     }
     return ancestors;
   },
@@ -39,23 +55,28 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   /**
    *
    * @param {fabric.Object} other
-   * @returns {{ index: number, otherIndex: number, ancestors: fabric.Object[] } | boolean} ancestors may include the passed objects if one is an ancestor of the other resulting in index of -1
+   * @param {boolean} [strict] finds only ancestors that are objects excluding canvas
+   * @returns {{ index: number, otherIndex: number, ancestors: Ancestors } | undefined} ancestors may include the passed objects if one is an ancestor of the other resulting in index of -1
    */
-  findCommonAncestors: function (other) {
+  findCommonAncestors: function (other, strict) {
     if (this === other) {
-      return true;
+      return {
+        index: 0,
+        otherIndex: 0,
+        ancestors: this.getAncestors(strict)
+      };
     }
     else if (!other) {
-      return false;
+      return undefined;
     }
-    var ancestors = this.getAncestors();
+    var ancestors = this.getAncestors(strict);
     ancestors.unshift(this);
-    var otherAncestors = other.getAncestors();
+    var otherAncestors = other.getAncestors(strict);
     otherAncestors.unshift(other);
     for (var i = 0, ancestor; i < ancestors.length; i++) {
       ancestor = ancestors[i];
       for (var j = 0; j < otherAncestors.length; j++) {
-        if (ancestor === otherAncestors[j] && !(ancestor instanceof fabric.StaticCanvas)) {
+        if (ancestor === otherAncestors[j]) {
           return {
             index: i - 1,
             otherIndex: j - 1,
@@ -69,9 +90,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   /**
    *
    * @param {fabric.Object} other
+   * @param {boolean} [strict] checks only ancestors that are objects excluding canvas
    * @returns {boolean}
    */
-  hasCommonAncestors: function (other) {
-    return !!this.findCommonAncestors(other);
+  hasCommonAncestors: function (other, strict) {
+    return !!this.findCommonAncestors(other, strict);
   }
 });

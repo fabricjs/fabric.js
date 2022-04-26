@@ -54,12 +54,12 @@
                       '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
                       '13.99], ["z", null]]}';
 
-  var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
+  var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"layout":"","fill":"rgb(0,0,0)",' +
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                            '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
 
-  var RECT_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"rect","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
+  var RECT_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"rect","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"layout":"","fill":"rgb(0,0,0)",' +
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                   '"shadow":null,' +
                   '"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
@@ -453,6 +453,56 @@
     assert.equal(selection.getObjects().indexOf(rect2), 1, 'rect2 is the second object in the active selection');
   });
 
+  QUnit.test('update active selection respects order of objects', function (assert) {
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    var rect3 = new fabric.Rect();
+    var rect3 = new fabric.Rect();
+    canvas.add(rect1, rect2, rect3);
+
+    function assertObjectsInOrder(init, added) {
+      var activeSelection = new fabric.ActiveSelection(init);
+      canvas.setActiveObject(activeSelection);
+      canvas._updateActiveSelection(added, {});
+      assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3]);
+      activeSelection.removeAll();
+    }
+
+    function assertObjectsInOrderOnCanvas(init, added) {
+      assert.deepEqual(canvas.getObjects(), [rect1, rect2, rect3]);
+      assertObjectsInOrder(init, added);
+      assert.deepEqual(canvas.getObjects(), [rect1, rect2, rect3]);
+    }
+
+    assertObjectsInOrderOnCanvas([rect1, rect2], rect3);
+    assertObjectsInOrderOnCanvas([rect1, rect3], rect2);
+    assertObjectsInOrderOnCanvas([rect2, rect3], rect1);
+
+    canvas.remove(rect2, rect3);
+    var group = new fabric.Group([rect2, rect3], { subTargetCheck: true, interactive: true });
+    canvas.add(group);
+
+    function assertNestedObjectsInOrder(init, added) {
+      assert.deepEqual(canvas.getObjects(), [rect1, group]);
+      assert.deepEqual(group.getObjects(), [rect2, rect3]);
+      assertObjectsInOrder(init, added);
+      assert.deepEqual(canvas.getObjects(), [rect1, group]);
+      assert.deepEqual(group.getObjects(), [rect2, rect3]);
+    }
+
+    assertNestedObjectsInOrder([rect1, rect2], rect3);
+    assertNestedObjectsInOrder([rect1, rect3], rect2);
+    assertNestedObjectsInOrder([rect2, rect3], rect1);
+
+    canvas.remove(rect1);
+    group.insertAt(rect1, 0);
+    group.remove(rect3);
+    canvas.add(rect3);
+    assertNestedObjectsInOrder([rect1, rect2], rect3);
+    assertNestedObjectsInOrder([rect1, rect3], rect2);
+    assertNestedObjectsInOrder([rect2, rect3], rect1);
+  });
+
   QUnit.test('_groupSelectedObjects fires selected for objects', function(assert) {
     var fired = 0;
     var rect1 = new fabric.Rect();
@@ -764,11 +814,23 @@
     assert.equal(canvas.clearContext(canvas.getContext()), canvas, 'should be chainable');
   });
 
-  QUnit.test('clear', function(assert) {
+  QUnit.test('clear', function (assert) {
+    var rect = makeRect({ left: 0, top: 0 });
+    canvas.add(rect);
+    assert.deepEqual(canvas.getObjects(), [rect]);
+    //  select rect
+    canvas._onMouseDown({
+      clientX: 1,
+      clientY: 1
+    });
+    assert.equal(canvas.getActiveObject(), rect, 'rect should be selected');
+    assert.ok(canvas._currentTransform, 'should have set current transform');
     assert.ok(typeof canvas.clear === 'function');
 
     assert.equal(canvas.clear(), canvas, 'should be chainable');
     assert.equal(canvas.getObjects().length, 0);
+    assert.equal(canvas.getActiveObject(), null, 'should clear active object');
+    assert.equal(canvas._currentTransform, null, 'should clear current transform');
   });
 
   QUnit.test('renderAll', function(assert) {
@@ -1170,7 +1232,7 @@
     canvas.preserveObjectStacking = false;
   });
 
-  QUnit.test('ActiveSelection sendToBack', function(assert) {
+  QUnit.test('ActiveSelection sendObjectToBack', function(assert) {
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1183,14 +1245,14 @@
     canvas.setActiveObject(activeSel);
     assert.equal(canvas._objects[0], rect1, 'rect1 should be last');
     assert.equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.sendToBack(activeSel);
+    canvas.sendObjectToBack(activeSel);
     assert.equal(canvas._objects[0], rect3, 'rect3 should be the new last');
     assert.equal(canvas._objects[1], rect4, 'rect3 should be the new second');
     assert.equal(canvas._objects[2], rect1, 'rect1 should be the third object');
     assert.equal(canvas._objects[3], rect2, 'rect2 should be on top now');
   });
 
-  QUnit.test('activeGroup bringToFront', function(assert) {
+  QUnit.test('activeGroup bringObjectToFront', function(assert) {
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1203,14 +1265,14 @@
     canvas.setActiveObject(activeSel);
     assert.equal(canvas._objects[0], rect1, 'rect1 should be last');
     assert.equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.bringToFront(activeSel);
+    canvas.bringObjectToFront(activeSel);
     assert.equal(canvas._objects[0], rect3, 'rect3 should be the new last');
     assert.equal(canvas._objects[1], rect4, 'rect3 should be the new second');
     assert.equal(canvas._objects[2], rect1, 'rect1 should be the third object');
     assert.equal(canvas._objects[3], rect2, 'rect2 should be on top now');
   });
 
-  QUnit.test('activeGroup bringForward', function(assert) {
+  QUnit.test('activeGroup bringObjectForward', function(assert) {
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1223,25 +1285,25 @@
     canvas.setActiveObject(activeSel);
     assert.equal(canvas._objects[0], rect1, 'rect1 should be last');
     assert.equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.bringForward(activeSel);
+    canvas.bringObjectForward(activeSel);
     assert.equal(canvas._objects[0], rect3, 'rect3 should be the new last');
     assert.equal(canvas._objects[1], rect1, 'rect1 should be the new second');
     assert.equal(canvas._objects[2], rect2, 'rect2 should be the third object');
     assert.equal(canvas._objects[3], rect4, 'rect4 did not move');
-    canvas.bringForward(activeSel);
+    canvas.bringObjectForward(activeSel);
     assert.equal(canvas._objects[0], rect3, 'rect3 should be the new last');
     assert.equal(canvas._objects[1], rect4, 'rect4 should be the new second');
     assert.equal(canvas._objects[2], rect1, 'rect1 should be the third object');
     assert.equal(canvas._objects[3], rect2, 'rect2 is the new top');
-    canvas.bringForward(activeSel);
-    canvas.bringForward(activeSel);
+    canvas.bringObjectForward(activeSel);
+    canvas.bringObjectForward(activeSel);
     assert.equal(canvas._objects[0], rect3, 'rect3 should be the new last');
     assert.equal(canvas._objects[1], rect4, 'rect4 should be the new second');
     assert.equal(canvas._objects[2], rect1, 'rect1 is still third');
     assert.equal(canvas._objects[3], rect2, 'rect2 is still new top');
   });
 
-  QUnit.test('activeGroup sendBackwards', function(assert) {
+  QUnit.test('activeGroup sendObjectBackwards', function(assert) {
     var rect1 = makeRect(),
         rect2 = makeRect(),
         rect3 = makeRect(),
@@ -1253,18 +1315,18 @@
     canvas.setActiveObject(activeSel);
     assert.equal(canvas._objects[0], rect1, 'rect1 should be last');
     assert.equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.sendBackwards(activeSel);
+    canvas.sendObjectBackwards(activeSel);
     assert.equal(canvas._objects[0], rect1, 'rect1 is still last');
     assert.equal(canvas._objects[1], rect3, 'rect3 should be shifted down by 1');
     assert.equal(canvas._objects[2], rect4, 'rect4 should be shifted down by 1');
     assert.equal(canvas._objects[3], rect2, 'rect2 is the new top');
-    canvas.sendBackwards(activeSel);
+    canvas.sendObjectBackwards(activeSel);
     assert.equal(canvas._objects[0], rect3, 'rect3 is  last');
     assert.equal(canvas._objects[1], rect4, 'rect4 should be shifted down by 1');
     assert.equal(canvas._objects[2], rect1, 'rect1 should be shifted down by 1');
     assert.equal(canvas._objects[3], rect2, 'rect2 is still on top');
-    canvas.sendBackwards(activeSel);
-    canvas.sendBackwards(activeSel);
+    canvas.sendObjectBackwards(activeSel);
+    canvas.sendObjectBackwards(activeSel);
     assert.equal(canvas._objects[0], rect3, 'rect3 is still last');
     assert.equal(canvas._objects[1], rect4, 'rect4 should be steady');
     assert.equal(canvas._objects[2], rect1, 'rect1 should be steady');
@@ -1777,8 +1839,8 @@
   // });
 
 
-  QUnit.test('sendToBack', function(assert) {
-    assert.ok(typeof canvas.sendToBack === 'function');
+  QUnit.test('sendObjectToBack', function(assert) {
+    assert.ok(typeof canvas.sendObjectToBack === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1786,18 +1848,18 @@
 
     canvas.add(rect1, rect2, rect3);
 
-    canvas.sendToBack(rect3);
+    canvas.sendObjectToBack(rect3);
     assert.equal(canvas.item(0), rect3, 'third should now be the first one');
 
-    canvas.sendToBack(rect2);
+    canvas.sendObjectToBack(rect2);
     assert.equal(canvas.item(0), rect2, 'second should now be the first one');
 
-    canvas.sendToBack(rect2);
+    canvas.sendObjectToBack(rect2);
     assert.equal(canvas.item(0), rect2, 'second should *still* be the first one');
   });
 
-  QUnit.test('bringToFront', function(assert) {
-    assert.ok(typeof canvas.bringToFront === 'function');
+  QUnit.test('bringObjectToFront', function(assert) {
+    assert.ok(typeof canvas.bringObjectToFront === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1805,18 +1867,18 @@
 
     canvas.add(rect1, rect2, rect3);
 
-    canvas.bringToFront(rect1);
+    canvas.bringObjectToFront(rect1);
     assert.equal(canvas.item(2), rect1, 'first should now be the last one');
 
-    canvas.bringToFront(rect2);
+    canvas.bringObjectToFront(rect2);
     assert.equal(canvas.item(2), rect2, 'second should now be the last one');
 
-    canvas.bringToFront(rect2);
+    canvas.bringObjectToFront(rect2);
     assert.equal(canvas.item(2), rect2, 'second should *still* be the last one');
   });
 
-  QUnit.test('sendBackwards', function(assert) {
-    assert.ok(typeof canvas.sendBackwards === 'function');
+  QUnit.test('sendObjectBackwards', function(assert) {
+    assert.ok(typeof canvas.sendObjectBackwards === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1829,42 +1891,42 @@
     assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.sendBackwards(rect3);
+    canvas.sendObjectBackwards(rect3);
 
     // moved 3 one level back — [1, 3, 2]
     assert.equal(canvas.item(0), rect1);
     assert.equal(canvas.item(2), rect2);
     assert.equal(canvas.item(1), rect3);
 
-    canvas.sendBackwards(rect3);
+    canvas.sendObjectBackwards(rect3);
 
     // moved 3 one level back — [3, 1, 2]
     assert.equal(canvas.item(1), rect1);
     assert.equal(canvas.item(2), rect2);
     assert.equal(canvas.item(0), rect3);
 
-    canvas.sendBackwards(rect3);
+    canvas.sendObjectBackwards(rect3);
 
     // 3 stays at the deepEqual position — [2, 3, 1]
     assert.equal(canvas.item(1), rect1);
     assert.equal(canvas.item(2), rect2);
     assert.equal(canvas.item(0), rect3);
 
-    canvas.sendBackwards(rect2);
+    canvas.sendObjectBackwards(rect2);
 
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(0), rect3);
 
-    canvas.sendBackwards(rect2);
+    canvas.sendObjectBackwards(rect2);
 
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(1), rect3);
   });
 
-  QUnit.test('bringForward', function(assert) {
-    assert.ok(typeof canvas.bringForward === 'function');
+  QUnit.test('bringObjectForward', function(assert) {
+    assert.ok(typeof canvas.bringObjectForward === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1877,28 +1939,28 @@
     assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.bringForward(rect1);
+    canvas.bringObjectForward(rect1);
 
     // 1 moves one way up — [ 2, 1, 3 ]
     assert.equal(canvas.item(1), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.bringForward(rect1);
+    canvas.bringObjectForward(rect1);
 
     // 1 moves one way up again — [ 2, 3, 1 ]
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(1), rect3);
 
-    canvas.bringForward(rect1);
+    canvas.bringObjectForward(rect1);
 
     // 1 is already all the way on top and so doesn't change position — [ 2, 3, 1 ]
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(1), rect3);
 
-    canvas.bringForward(rect3);
+    canvas.bringObjectForward(rect3);
 
     // 1 is already all the way on top and so doesn't change position — [ 2, 1, 3 ]
     assert.equal(canvas.item(1), rect1);
@@ -1969,16 +2031,19 @@
     canvas.setActiveObject(group);
     assert.equal(canvas.discardActiveObject(), canvas, 'should be chainable');
     assert.equal(canvas.getActiveObject(), null, 'removing active group sets it to null');
+    assert.equal(canvas._currentTransform, null, 'should clear current transform');
   });
 
   QUnit.test('_discardActiveObject', function(assert) {
 
     canvas.add(makeRect());
     canvas.setActiveObject(canvas.item(0));
-
+    //  stub current transform data
+    canvas._currentTransform = { foo: 'bar' };
     canvas._discardActiveObject();
     assert.ok(!canvas.item(0).active);
     assert.equal(canvas.getActiveObject(), null);
+    assert.equal(canvas._currentTransform, null, 'should clear current transform');
   });
 
   QUnit.test('discardActiveObject', function(assert) {
@@ -2006,6 +2071,7 @@
     assert.ok(!canvas.item(0).active);
     assert.equal(canvas.getActiveObject(), null);
     assert.equal(canvas.getActiveObject(), null);
+    assert.equal(canvas._currentTransform, null, 'should clear current transform');
 
     for (var prop in eventsFired) {
       assert.ok(eventsFired[prop]);
@@ -2042,30 +2108,6 @@
     var svgWithActiveGroup = canvas.toSVG();
 
     assert.equal(svg, svgWithActiveGroup);
-  });
-
-  QUnit.test('active group objects reordering', function(assert) {
-    var rect1 = new fabric.Rect({ width: 30, height: 30, left: 130, top: 130 });
-    var rect2 = new fabric.Rect({ width: 50, height: 50, left: 100, top: 100 });
-    var circle1 = new fabric.Circle({ radius: 10, left: 60, top: 60 });
-    var circle2 = new fabric.Circle({ radius: 50, left: 50, top: 50 });
-    canvas.add(rect1, rect2, circle1, circle2);
-    assert.equal(canvas._objects[0], rect1);
-    assert.equal(canvas._objects[1], rect2);
-    assert.equal(canvas._objects[2], circle1);
-    assert.equal(canvas._objects[3], circle2);
-    var aGroup = new fabric.ActiveSelection([rect2, circle2, rect1, circle1], { canvas: canvas });
-    // before rendering objects are ordered in insert order
-    assert.equal(aGroup._objects[0], rect2);
-    assert.equal(aGroup._objects[1], circle2);
-    assert.equal(aGroup._objects[2], rect1);
-    assert.equal(aGroup._objects[3], circle1);
-    canvas.setActiveObject(aGroup).renderAll();
-    // after rendering objects are ordered in canvas stack order
-    assert.equal(aGroup._objects[0], rect1);
-    assert.equal(aGroup._objects[1], rect2);
-    assert.equal(aGroup._objects[2], circle1);
-    assert.equal(aGroup._objects[3], circle2);
   });
 
   QUnit.test('dispose', function(assert) {
@@ -2390,6 +2432,49 @@
     // canvas._currentTransform = false;
   });
 
+  QUnit.test('setViewportTransform while actively transforming object', function (assert) {
+    var vpt = [2, 0, 0, 2, -50, -50];
+    assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var rect = new fabric.Rect({ width: 10, heigth: 10 });
+    canvas.add(rect);
+    //  control
+    canvas.setViewportTransform(vpt);
+    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(-50, -50), 'rect should be on screen -50,-50');
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+    assert.ok(rect.isOnScreen(), 'rect should be on screen 0,0');
+    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(0, 0), 'rect should be on screen 0,0');
+    //  select rect
+    canvas._onMouseDown({
+      clientX: 1,
+      clientY: 1
+    });
+    assert.equal(canvas.getActiveObject(), rect, 'rect should be selected');
+    //  apply vpt
+    canvas.setViewportTransform(vpt);
+    assert.ok(rect.isOnScreen(), 'rect should be unchanged from the viewer\'s perspective');
+    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(0, 0), 'rect should be on screen 0,0');
+  });
+
+  QUnit.test('setViewportTransform while editing text', function (assert) {
+    var vpt = [2, 0, 0, 2, -50, -50];
+    assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
+    var itext = new fabric.IText('a');
+    canvas.add(itext);
+    //  control
+    canvas.setViewportTransform(vpt);
+    assert.deepEqual(itext.lineCoords.tl, new fabric.Point(-50, -50), 'itext should be on screen -50,-50');
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+    assert.ok(itext.isOnScreen(), 'itext should be on screen 0,0');
+    assert.deepEqual(itext.lineCoords.tl, new fabric.Point(0, 0), 'itext should be on screen 0,0');
+    //  select itext
+    canvas.setActiveObject(itext);
+    itext.enterEditing();
+    //  apply vpt
+    canvas.setViewportTransform(vpt);
+    assert.ok(itext.isOnScreen(), 'itext should be unchanged from the viewer\'s perspective');
+    assert.deepEqual(itext.lineCoords.tl, new fabric.Point(0, 0), 'itext should be on screen 0,0');
+  });
+
   // QUnit.test('_rotateObject', function(assert) {
   //   assert.ok(typeof canvas._rotateObject === 'function');
   //   var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
@@ -2578,6 +2663,57 @@
     assert.equal(canvas.isTargetTransparent(rect, 30, 30), true, 'transparent 30, 30');
     assert.equal(canvas.isTargetTransparent(rect, 31, 31), true, 'transparent 31, 31');
 
+  });
+
+  QUnit.test('isTargetTransparent on nested selected object', function (assert) {
+    var rect = new fabric.Rect({
+      width: 20,
+      height: 20,
+      strokeWidth: 4,
+      stroke: 'red',
+      fill: '',
+      top: 0,
+      left: 0,
+      objectCaching: true,
+    });
+    var group = new fabric.Group([rect], { objectCaching: true, subTargetCheck: true, interactive: true });
+    canvas.add(group);
+    canvas.renderAll();
+    canvas.setActiveObject(rect);
+    assert.deepEqual(group._activeObjects, [rect]);
+    assert.ok(group.filtersObjectsAtRendering());
+    assert.equal(canvas.isTargetTransparent(group, 0, 0), false, 'opaque on 0,0');
+    assert.equal(canvas.isTargetTransparent(group, 1, 1), false, 'opaque on 1,1');
+    assert.equal(canvas.isTargetTransparent(group, 2, 2), false, 'opaque on 2,2');
+    assert.equal(canvas.isTargetTransparent(group, 3, 3), false, 'opaque on 3,3');
+    assert.equal(canvas.isTargetTransparent(group, 4, 4), true, 'transparent on 4,4');
+    assert.equal(canvas.isTargetTransparent(group, 5, 5), true, 'transparent on 5, 5');
+    assert.equal(canvas.isTargetTransparent(group, 6, 6), true, 'transparent on 6, 6');
+    assert.equal(canvas.isTargetTransparent(group, 7, 7), true, 'transparent on 7, 7');
+    assert.equal(canvas.isTargetTransparent(group, 8, 8), true, 'transparent on 8, 8');
+    assert.equal(canvas.isTargetTransparent(group, 9, 9), true, 'transparent on 9, 9');
+    assert.equal(canvas.isTargetTransparent(group, 10, 10), true, 'transparent 10, 10');
+    assert.equal(canvas.isTargetTransparent(group, 11, 11), true, 'transparent 11, 11');
+    assert.equal(canvas.isTargetTransparent(group, 12, 12), true, 'transparent 12, 12');
+    assert.equal(canvas.isTargetTransparent(group, 13, 13), true, 'transparent 13, 13');
+    assert.equal(canvas.isTargetTransparent(group, 14, 14), true, 'transparent 14, 14');
+    assert.equal(canvas.isTargetTransparent(group, 15, 15), true, 'transparent 15, 15');
+    assert.equal(canvas.isTargetTransparent(group, 16, 16), true, 'transparent 16, 16');
+    assert.equal(canvas.isTargetTransparent(group, 17, 17), true, 'transparent 17, 17');
+    assert.equal(canvas.isTargetTransparent(group, 18, 18), true, 'transparent 18, 18');
+    assert.equal(canvas.isTargetTransparent(group, 19, 19), true, 'transparent 19, 19');
+    assert.equal(canvas.isTargetTransparent(group, 20, 20), false, 'opaque 20, 20');
+    assert.equal(canvas.isTargetTransparent(group, 21, 21), false, 'opaque 21, 21');
+    assert.equal(canvas.isTargetTransparent(group, 22, 22), false, 'opaque 22, 22');
+    assert.equal(canvas.isTargetTransparent(group, 23, 23), false, 'opaque 23, 23');
+    assert.equal(canvas.isTargetTransparent(group, 24, 24), true, 'transparent 24, 24');
+    assert.equal(canvas.isTargetTransparent(group, 25, 25), true, 'transparent 25, 25');
+    assert.equal(canvas.isTargetTransparent(group, 26, 26), true, 'transparent 26, 26');
+    assert.equal(canvas.isTargetTransparent(group, 27, 27), true, 'transparent 27, 27');
+    assert.equal(canvas.isTargetTransparent(group, 28, 28), true, 'transparent 28, 28');
+    assert.equal(canvas.isTargetTransparent(group, 29, 29), true, 'transparent 29, 29');
+    assert.equal(canvas.isTargetTransparent(group, 30, 30), true, 'transparent 30, 30');
+    assert.equal(canvas.isTargetTransparent(group, 31, 31), true, 'transparent 31, 31');
   });
 
   QUnit.test('canvas inheritance', function(assert) {

@@ -40,7 +40,7 @@
                   '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
                   '13.99], ["z"]]}], "background": "#ff5555","overlay": "rgba(0,0,0,0.2)"}';
 
-  var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
+  var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"layout":"","fill":"rgb(0,0,0)",' +
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                            '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
@@ -80,6 +80,7 @@
     top: 0,
     width: IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
     height: IMG_HEIGHT, // or does it now?
+    layout: '',
     fill: 'rgb(0,0,0)',
     stroke: null,
     strokeWidth: 0,
@@ -1016,7 +1017,7 @@
     canvas.overlayColor = 'rgba(0,0,0,0.2)';
     assert.equal(JSON.stringify(canvas.toJSON()), '{"version":"' + fabric.version + '","objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlay` value should be reflected in json');
     canvas.add(makeRect());
-    assert.deepEqual(JSON.stringify(canvas.toJSON()), RECT_JSON);
+    assert.deepEqual(canvas.toJSON(), JSON.parse(RECT_JSON));
   });
 
   QUnit.test('toJSON custom properties non-existence check', function(assert) {
@@ -1100,7 +1101,7 @@
       sourcePath: 'http://example.com/'
     });
     canvas.add(path);
-    assert.equal(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
+    assert.deepEqual(canvas.toDatalessJSON(), JSON.parse(PATH_DATALESS_JSON));
   });
 
   QUnit.test('toObject', function(assert) {
@@ -1328,6 +1329,45 @@
     });
   });
 
+  QUnit.test('abort loadFromJSON with image background and color', function (assert) {
+    var done = assert.async();
+    assert.expect(8);
+    var serialized = JSON.parse(PATH_JSON);
+    serialized.background = 'green';
+    serialized.backgroundImage = { "type": "image", "originX": "left", "originY": "top", "left": 13.6, "top": -1.4, "width": 3000, "height": 3351, "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 0, "strokeDashArray": null, "strokeLineCap": "butt", "strokeDashOffset": 0, "strokeLineJoin": "miter", "strokeMiterLimit": 4, "scaleX": 0.05, "scaleY": 0.05, "angle": 0, "flipX": false, "flipY": false, "opacity": 1, "shadow": null, "visible": true, "backgroundColor": "", "fillRule": "nonzero", "globalCompositeOperation": "source-over", "skewX": 0, "skewY": 0, "src": IMG_SRC, "filters": [], "crossOrigin": "" };
+    canvas.on('loading:aborted', function (opt) {
+      assert.equal(opt.from, 'json');
+    });
+    canvas.loadFromJSON(serialized).catch(function (err) {
+      assert.equal(err.type, 'abort', 'should be an error object');
+      assert.ok(canvas.__abortController instanceof AbortController, 'abort controller of new task should be referenced');
+      assert.equal(canvas.__abortController.signal.aborted, false, 'should not be aborted');
+    });
+    canvas.loadFromJSON(serialized).then(function () {
+      assert.ok(!canvas.isEmpty(), 'canvas is not empty');
+      assert.equal(canvas.backgroundColor, 'green');
+      assert.ok(canvas.backgroundImage instanceof fabric.Image);
+      assert.equal(canvas.__abortController, undefined, 'abort controller reference should be cleared');
+      done();
+    });
+  });
+
+  QUnit.test('imperative abort loadFromJSON', function (assert) {
+    var done = assert.async();
+    assert.expect(5);
+    var serialized = JSON.parse(PATH_JSON);
+    serialized.background = 'green';
+    serialized.backgroundImage = { "type": "image", "originX": "left", "originY": "top", "left": 13.6, "top": -1.4, "width": 3000, "height": 3351, "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 0, "strokeDashArray": null, "strokeLineCap": "butt", "strokeDashOffset": 0, "strokeLineJoin": "miter", "strokeMiterLimit": 4, "scaleX": 0.05, "scaleY": 0.05, "angle": 0, "flipX": false, "flipY": false, "opacity": 1, "shadow": null, "visible": true, "backgroundColor": "", "fillRule": "nonzero", "globalCompositeOperation": "source-over", "skewX": 0, "skewY": 0, "src": IMG_SRC, "filters": [], "crossOrigin": "" };
+    canvas.loadFromJSON(serialized).catch(function (err) {
+      assert.equal(err.type, 'abort');
+    });
+    assert.ok(typeof canvas.abortLoadingTask === 'function');
+    assert.ok(canvas.abortLoadingTask(), 'should return true because loading was aborted');
+    assert.equal(canvas.__abortController, undefined, 'abort controller reference should be cleared');
+    assert.ok(canvas.isEmpty(), 'canvas is empty');
+    done();
+  });
+
   QUnit.test('loadFromJSON custom properties', function(assert) {
     var done = assert.async();
     var rect = new fabric.Rect({ width: 10, height: 20 });
@@ -1339,7 +1379,7 @@
     var jsonWithoutFoo = JSON.stringify(canvas.toJSON(['padding']));
     var jsonWithFoo = JSON.stringify(canvas.toJSON(['padding', 'foo']));
 
-    assert.equal(jsonWithFoo, RECT_JSON_WITH_PADDING);
+    assert.deepEqual(JSON.parse(jsonWithFoo), JSON.parse(RECT_JSON_WITH_PADDING));
     assert.ok(jsonWithoutFoo !== RECT_JSON_WITH_PADDING);
 
     canvas.clear();
@@ -1379,8 +1419,8 @@
     });
   });
 
-  QUnit.test('sendToBack', function(assert) {
-    assert.ok(typeof canvas.sendToBack === 'function');
+  QUnit.test('sendObjectToBack', function(assert) {
+    assert.ok(typeof canvas.sendObjectToBack === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1388,18 +1428,18 @@
 
     canvas.add(rect1, rect2, rect3);
 
-    canvas.sendToBack(rect3);
+    canvas.sendObjectToBack(rect3);
     assert.equal(canvas.item(0), rect3, 'third should now be the first one');
 
-    canvas.sendToBack(rect2);
+    canvas.sendObjectToBack(rect2);
     assert.equal(canvas.item(0), rect2, 'second should now be the first one');
 
-    canvas.sendToBack(rect2);
+    canvas.sendObjectToBack(rect2);
     assert.equal(canvas.item(0), rect2, 'second should *still* be the first one');
   });
 
-  QUnit.test('bringToFront', function(assert) {
-    assert.ok(typeof canvas.bringToFront === 'function');
+  QUnit.test('bringObjectToFront', function(assert) {
+    assert.ok(typeof canvas.bringObjectToFront === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1407,18 +1447,18 @@
 
     canvas.add(rect1, rect2, rect3);
 
-    canvas.bringToFront(rect1);
+    canvas.bringObjectToFront(rect1);
     assert.equal(canvas.item(2), rect1, 'first should now be the last one');
 
-    canvas.bringToFront(rect2);
+    canvas.bringObjectToFront(rect2);
     assert.equal(canvas.item(2), rect2, 'second should now be the last one');
 
-    canvas.bringToFront(rect2);
+    canvas.bringObjectToFront(rect2);
     assert.equal(canvas.item(2), rect2, 'second should *still* be the last one');
   });
 
-  QUnit.test('sendBackwards', function(assert) {
-    assert.ok(typeof canvas.sendBackwards === 'function');
+  QUnit.test('sendObjectBackwards', function(assert) {
+    assert.ok(typeof canvas.sendObjectBackwards === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1431,42 +1471,42 @@
     assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.sendBackwards(rect3);
+    canvas.sendObjectBackwards(rect3);
 
     // moved 3 one level back — [1, 3, 2]
     assert.equal(canvas.item(0), rect1);
     assert.equal(canvas.item(2), rect2);
     assert.equal(canvas.item(1), rect3);
 
-    canvas.sendBackwards(rect3);
+    canvas.sendObjectBackwards(rect3);
 
     // moved 3 one level back — [3, 1, 2]
     assert.equal(canvas.item(1), rect1);
     assert.equal(canvas.item(2), rect2);
     assert.equal(canvas.item(0), rect3);
 
-    canvas.sendBackwards(rect3);
+    canvas.sendObjectBackwards(rect3);
 
     // 3 stays at the deepEqual position — [2, 3, 1]
     assert.equal(canvas.item(1), rect1);
     assert.equal(canvas.item(2), rect2);
     assert.equal(canvas.item(0), rect3);
 
-    canvas.sendBackwards(rect2);
+    canvas.sendObjectBackwards(rect2);
 
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(0), rect3);
 
-    canvas.sendBackwards(rect2);
+    canvas.sendObjectBackwards(rect2);
 
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(1), rect3);
   });
 
-  QUnit.test('bringForward', function(assert) {
-    assert.ok(typeof canvas.bringForward === 'function');
+  QUnit.test('bringObjectForward', function(assert) {
+    assert.ok(typeof canvas.bringObjectForward === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1479,28 +1519,28 @@
     assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.bringForward(rect1);
+    canvas.bringObjectForward(rect1);
 
     // 1 moves one way up — [ 2, 1, 3 ]
     assert.equal(canvas.item(1), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.bringForward(rect1);
+    canvas.bringObjectForward(rect1);
 
     // 1 moves one way up again — [ 2, 3, 1 ]
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(1), rect3);
 
-    canvas.bringForward(rect1);
+    canvas.bringObjectForward(rect1);
 
     // 1 is already all the way on top and so doesn't change position — [ 2, 3, 1 ]
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(1), rect3);
 
-    canvas.bringForward(rect3);
+    canvas.bringObjectForward(rect3);
 
     // 1 is already all the way on top and so doesn't change position — [ 2, 1, 3 ]
     assert.equal(canvas.item(1), rect1);
@@ -1508,8 +1548,8 @@
     assert.equal(canvas.item(2), rect3);
   });
 
-  QUnit.test('moveTo', function(assert) {
-    assert.ok(typeof canvas.moveTo === 'function');
+  QUnit.test('moveObjectTo', function(assert) {
+    assert.ok(typeof canvas.moveObjectTo === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1522,42 +1562,42 @@
     assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.moveTo(rect3, 0);
+    canvas.moveObjectTo(rect3, 0);
 
     // moved 3 to level 0 — [3, 1, 2]
     assert.equal(canvas.item(1), rect1);
     assert.equal(canvas.item(2), rect2);
     assert.equal(canvas.item(0), rect3);
 
-    canvas.moveTo(rect3, 1);
+    canvas.moveObjectTo(rect3, 1);
 
     // moved 3 to level 1 — [1, 3, 2]
     assert.equal(canvas.item(0), rect1);
     assert.equal(canvas.item(2), rect2);
     assert.equal(canvas.item(1), rect3);
 
-    canvas.moveTo(rect3, 2);
+    canvas.moveObjectTo(rect3, 2);
 
     // moved 3 to level 2 — [1, 2, 3]
     assert.equal(canvas.item(0), rect1);
     assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.moveTo(rect3, 2);
+    canvas.moveObjectTo(rect3, 2);
 
     // moved 3 to same level 2 and so doesn't change position — [1, 2, 3]
     assert.equal(canvas.item(0), rect1);
     assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.moveTo(rect2, 0);
+    canvas.moveObjectTo(rect2, 0);
 
     // moved 2 to level 0 — [2, 1, 3]
     assert.equal(canvas.item(1), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.moveTo(rect2, 2);
+    canvas.moveObjectTo(rect2, 2);
 
     // moved 2 to level 2 — [1, 3, 2]
     assert.equal(canvas.item(0), rect1);
@@ -1989,6 +2029,17 @@
     assert.notEqual(canvas2.isRendering, 0, 'a rendering is scehduled');
     canvas2.cancelRequestedRender();
     assert.equal(canvas2.isRendering, 0, 'rendering cancelled');
+  });
+
+  QUnit.test('renderCanvas rendering context', function (assert) {
+    assert.expect(1);
+    var context = { foo: 'bar' };
+    var object = new fabric.Object();
+    object.drawObject = function (ctx, renderingContext) {
+      assert.equal(renderingContext, context, 'rendering context should be propagated');
+    }
+    var group = new fabric.Group([object]);
+    canvas.renderCanvas(canvas.getContext(), [group], context);
   });
 
   // QUnit.test('backgroundImage', function(assert) {

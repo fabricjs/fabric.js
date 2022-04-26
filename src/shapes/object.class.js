@@ -26,7 +26,7 @@
    *
    * @fires selected
    * @fires deselected
-   * @fires modified
+   * @fires resize
    * @fires modified
    * @fires moved
    * @fires scaled
@@ -104,6 +104,13 @@
      * @default
      */
     height:                   0,
+
+    /**
+     * Layout directive
+     * @type {'fill-parent' | ''}
+     * @default
+     */
+    layout:                   '',
 
     /**
      * Object scale factor (horizontal)
@@ -589,7 +596,7 @@
      * @type Array
      */
     stateProperties: (
-      'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
+      'top left width height layout scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit ' +
       'angle opacity fill globalCompositeOperation shadow visible backgroundColor ' +
       'skewX skewY fillRule paintFirst clipPath strokeUniform'
@@ -649,10 +656,20 @@
      * Constructor
      * @param {Object} [options] Options object
      */
-    initialize: function(options) {
+    initialize: function (options) {
+      this._parentMonitor = new fabric.ParentResizeObserver(this, this._onParentResize.bind(this));
       if (options) {
         this.setOptions(options);
       }
+    },
+
+    /**
+     * Called once instance is added to a parent and when parent resizes
+     * @private
+     * @param {*} context see {@link fabric.ParentResizeObserver}
+     */
+    _onParentResize: function (context) {
+      this._parentMonitor.fillParent(context);
     },
 
     /**
@@ -818,13 +835,21 @@
     },
 
     /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx
+     * @returns {boolean} true if object needs to fully transform ctx
+     */
+    needsFullTransform: function (ctx) {
+      return (this.group && !this.group._transformDone) ||
+        (this.group && this.canvas && ctx === this.canvas.contextTop);
+    },
+
+    /**
      * Transforms context when rendering an object
      * @param {CanvasRenderingContext2D} ctx Context
      */
     transform: function(ctx) {
-      var needFullTransform = (this.group && !this.group._transformDone) ||
-         (this.group && this.canvas && ctx === this.canvas.contextTop);
-      var m = this.calcTransformMatrix(!needFullTransform);
+      var m = this.calcTransformMatrix(!this.needsFullTransform(ctx));
       ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
     },
 
@@ -845,6 +870,7 @@
             top:                      toFixed(this.top, NUM_FRACTION_DIGITS),
             width:                    toFixed(this.width, NUM_FRACTION_DIGITS),
             height:                   toFixed(this.height, NUM_FRACTION_DIGITS),
+            layout:                   this.layout,
             fill:                     (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
             stroke:                   (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
             strokeWidth:              toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
@@ -986,7 +1012,7 @@
      */
     _set: function(key, value) {
       var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY'),
-          isChanged = this[key] !== value, groupNeedsUpdate = false;
+          prevValue = this[key];
 
       if (shouldConstrainValue) {
         value = this._constrainScale(value);
@@ -1002,20 +1028,29 @@
       else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
         value = new fabric.Shadow(value);
       }
-      else if (key === 'dirty' && this.group) {
-        this.group.set('dirty', value);
+      else if (key === 'dirty' && value) {
+        this.group && this.group.set('dirty', true);
+        //  mark owning group as dirty
+        //  if `preserveObjectStacking === false` the object isn't rendered by the group so there's no reason to flag it as dirty
+        this.__owningGroup && (!this.canvas || this.canvas.preserveObjectStacking)
+          && this.__owningGroup.set('dirty', true);
       }
 
       this[key] = value;
 
-      if (isChanged) {
-        groupNeedsUpdate = this.group && this.group.isOnACache();
-        if (this.cacheProperties.indexOf(key) > -1) {
-          this.dirty = true;
-          groupNeedsUpdate && this.group.set('dirty', true);
-        }
-        else if (groupNeedsUpdate && this.stateProperties.indexOf(key) > -1) {
-          this.group.set('dirty', true);
+      if (prevValue !== value) {
+        var isCacheProp = this.cacheProperties.indexOf(key) > -1;
+        var isStateProp = this.stateProperties.indexOf(key) > -1;
+        if (isCacheProp || isStateProp) {
+          isCacheProp && (this.dirty = true);
+          var invalidationContext = {
+            target: this,
+            key: key,
+            value: value,
+            prevValue: prevValue
+          };
+          this.group && this.group.invalidate(invalidationContext);
+          this.__owningGroup && this.__owningGroup.invalidate(invalidationContext);
         }
       }
       return this;
@@ -1034,7 +1069,7 @@
       return fabric.iMatrix.concat();
     },
 
-    /*
+    /**
      * @private
      * return if the object would be visible in rendering
      * @memberOf fabric.Object.prototype
@@ -1047,10 +1082,18 @@
     },
 
     /**
-     * Renders an object on a specified context
+     * 
+     * @typedef {object} RenderingContext
+     * @property {boolean} [forClipping]
+     * @property {false | ((object: fabric.Object) => boolean)} [filter] filtering option by `isTargetTransparent` and exporting
+     * 
+     * 
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {RenderingContext} [renderingContext] options object for rendering
+     * 
+     * Renders an object on a specified context
      */
-    render: function(ctx) {
+    render: function (ctx, renderingContext) {
       // do not render if width/height are zeros or object is not visible
       if (this.isNotVisible()) {
         return;
@@ -1065,13 +1108,13 @@
       this._setOpacity(ctx);
       this._setShadow(ctx, this);
       if (this.shouldCache()) {
-        this.renderCache();
+        this.renderCache(renderingContext);
         this.drawCacheOnCanvas(ctx);
       }
       else {
         this._removeCacheCanvas();
         this.dirty = false;
-        this.drawObject(ctx);
+        this.drawObject(ctx, renderingContext);
         if (this.objectCaching && this.statefullCache) {
           this.saveState({ propertySet: 'cacheProperties' });
         }
@@ -1079,14 +1122,17 @@
       ctx.restore();
     },
 
-    renderCache: function(options) {
-      options = options || {};
+    /**
+     * 
+     * @param {RenderingContext} [renderingContext] 
+     */
+    renderCache: function (renderingContext) {
       if (!this._cacheCanvas || !this._cacheContext) {
         this._createCacheCanvas();
       }
       if (this.isCacheDirty()) {
         this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
-        this.drawObject(this._cacheContext, options.forClipping);
+        this.drawObject(this._cacheContext, renderingContext);
         this.dirty = false;
       }
     },
@@ -1204,10 +1250,11 @@
     /**
      * Execute the drawing operation for an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {RenderingContext} [renderingContext] filtering option by `isTargetTransparent` and exporting
      */
-    drawObject: function(ctx, forClipping) {
+    drawObject: function (ctx, renderingContext) {
       var originalFill = this.fill, originalStroke = this.stroke;
-      if (forClipping) {
+      if (renderingContext && renderingContext.forClipping) {
         this.fill = 'black';
         this.stroke = '';
         this._setClippingProperties(ctx);
@@ -1216,7 +1263,7 @@
         this._renderBackground(ctx);
       }
       this._render(ctx);
-      this._drawClipPath(ctx, this.clipPath);
+      this._drawClipPath(ctx, this.clipPath, renderingContext);
       this.fill = originalFill;
       this.stroke = originalStroke;
     },
@@ -1225,8 +1272,9 @@
      * Prepare clipPath state and cache and draw it on instance's cache
      * @param {CanvasRenderingContext2D} ctx
      * @param {fabric.Object} clipPath
+     * @param {RenderingContext} [renderingContext]
      */
-    _drawClipPath: function (ctx, clipPath) {
+    _drawClipPath: function (ctx, clipPath, renderingContext) {
       if (!clipPath) { return; }
       // needed to setup a couple of variables
       // path canvas gets overridden with this one.
@@ -1234,7 +1282,7 @@
       clipPath.canvas = this.canvas;
       clipPath.shouldCache();
       clipPath._transformDone = true;
-      clipPath.renderCache({ forClipping: true });
+      clipPath.renderCache(Object.assign(renderingContext || {}, { forClipping: true }));
       this.drawClipPathOnCache(ctx, clipPath);
     },
 
@@ -1683,6 +1731,7 @@
      * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
      * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
      * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
+     * @param {Boolean} [options.filter] filter instance's objects
      * @return {HTMLCanvasElement} Returns DOM element <canvas> with the fabric.Object
      */
     toCanvasElement: function(options) {
@@ -1729,12 +1778,11 @@
         canvas.backgroundColor = '#fff';
       }
       this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
-
       var originalCanvas = this.canvas;
-      canvas.add(this);
-      var canvasEl = canvas.toCanvasElement(multiplier || 1, options);
-      this.shadow = originalShadow;
+      this.set('canvas', canvas);
+      var canvasEl = canvas.toCanvasElement(multiplier || 1, Object.assign(options, { objects: [this] }));
       this.set('canvas', originalCanvas);
+      this.shadow = originalShadow;
       if (originalGroup) {
         this.group = originalGroup;
       }
@@ -1913,6 +1961,8 @@
       if (fabric.runningAnimations) {
         fabric.runningAnimations.cancelByTarget(this);
       }
+      this._parentMonitor && this._parentMonitor.dispose();
+      delete this._parentMonitor;
     }
   });
 
@@ -1931,23 +1981,33 @@
   fabric.Object.NUM_FRACTION_DIGITS = 2;
 
   /**
-   * Defines which properties should be enlivened from the object passed to {@link fabric.Object._fromObject}
-   * @static
-   * @memberOf fabric.Object
-   * @constant
-   * @type string[]
+   *
+   * @param {Function} klass
+   * @param {object} object
+   * @param {object} [options]
+   * @param {string} [options.extraParam] property to pass as first argument to the constructor
+   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @returns {Promise<fabric.Object>}
    */
-
-  fabric.Object._fromObject = function(klass, object, extraParam) {
+  fabric.Object._fromObject = function(klass, object, options) {
     var serializedObject = clone(object, true);
-    return fabric.util.enlivenObjectEnlivables(serializedObject).then(function(enlivedMap) {
+    return fabric.util.enlivenObjectEnlivables(serializedObject, options).then(function(enlivedMap) {
       var newObject = Object.assign(object, enlivedMap);
-      return extraParam ? new klass(object[extraParam], newObject) : new klass(newObject);
+      return options && options.extraParam ? new klass(object[options.extraParam], newObject) : new klass(newObject);
     });
   };
 
-  fabric.Object.fromObject = function(object) {
-    return fabric.Object._fromObject(fabric.Object, object);
+  /**
+   *
+   * @static
+   * @memberOf fabric.Object
+   * @param {object} object
+   * @param {object} [options]
+   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @returns {Promise<fabric.Object>}
+   */
+  fabric.Object.fromObject = function(object, options) {
+    return fabric.Object._fromObject(fabric.Object, object, options);
   };
 
   /**

@@ -10,6 +10,12 @@
    * @fires selection:changed
    * @fires editing:entered
    * @fires editing:exited
+   * @fires dragstart
+   * @fires drag drag event firing on the drag source
+   * @fires dragend
+   * @fires copy
+   * @fires cut
+   * @fires paste
    *
    * @return {fabric.IText} thisArg
    * @see {@link fabric.IText#initialize} for constructor definition
@@ -67,6 +73,15 @@
      * @default
      */
     selectionEnd: 0,
+
+    /**
+     * Selection direction relative to initial selection start.
+     * Same as HTMLTextareaElement#selectionDirection
+     * @typedef {'forward' | 'backward' | 'none'} SelectionDirection
+     * @type {SelectionDirection}
+     * @default
+     */
+    selectionDirection: 'forward',
 
     /**
      * Color of text selection
@@ -220,6 +235,45 @@
     },
 
     /**
+     * {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/setSelectionRange}
+     * @param {number} selectionStart 
+     * @param {number} selectionEnd 
+     * @param {SelectionDirection} [selectionDirection]
+     */
+    setSelectionRange: function (selectionStart, selectionEnd, selectionDirection) {
+      this._setSelectionRange(selectionStart, selectionEnd, selectionDirection || 'none');
+    },
+
+    /**
+     * {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/setSelectionRange}
+     * @private
+     * @param {number} selectionStart 
+     * @param {number} selectionEnd 
+     * @param {SelectionDirection|false} [selectionDirection] pass `false` to preserve current `selectionDirection` value
+     */
+    _setSelectionRange: function (selectionStart, selectionEnd, selectionDirection) {
+      selectionStart = Math.max(selectionStart, 0);
+      selectionEnd = Math.min(selectionEnd, this.text.length);
+      if (selectionStart > selectionEnd) {
+        //  mimic HTMLTextareaElement behavior
+        selectionStart = selectionEnd;
+      }
+      var changed = selectionStart !== this.selectionStart || selectionEnd !== this.selectionEnd;
+      this.selectionStart = selectionStart;
+      this.selectionEnd = selectionEnd;
+      if (selectionDirection !== false) {
+        //  mimic HTMLTextareaElement behavior
+        this.selectionDirection = selectionDirection === 'backward' ? 'backward' : 'forward';
+        //  needed for future calcualtions of `selectionDirection`
+        this.__selectionStartOrigin = this.selectionDirection === 'forward' ?
+          this.selectionStart :
+          this.selectionEnd;
+      }
+      changed && this._fireSelectionChanged();
+      this._updateTextarea();
+    },
+
+    /**
      * @private
      * @param {String} property 'selectionStart' or 'selectionEnd'
      * @param {Number} index new position of property
@@ -258,7 +312,7 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    render: function(ctx) {
+    render: function (ctx) {
       this.clearContextTop();
       this.callSuper('render', ctx);
       // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
@@ -276,31 +330,57 @@
     },
 
     /**
-     * Prepare and clean the contextTop
+     * Prepare top context
+     * @returns {CanvasRenderingContext2D|undefined} ctx
      */
-    clearContextTop: function(skipRestore) {
-      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
+    prepareContextTop: function () {
+      if (!this.canvas || !this.canvas.contextTop) {
         return;
       }
       var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
       ctx.save();
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
       this.transform(ctx);
-      this._clearTextArea(ctx);
-      skipRestore || ctx.restore();
+      return ctx;
+    },
+
+    /**
+     * Prepare and clear top context
+     * @returns {CanvasRenderingContext2D|undefined} ctx
+     */
+    _clearContextTop: function () {
+      var ctx = this.prepareContextTop();
+      ctx && this._clearTextArea(ctx);
+      return ctx;
+    },
+
+    /**
+     * clear top context
+     * @returns {CanvasRenderingContext2D|undefined} ctx
+     */
+    clearContextTop: function() {
+      if (!this.isEditing) {
+        return;
+      }
+      var ctx = this._clearContextTop();
+      ctx && ctx.restore();
+      return ctx;
     },
     /**
      * Renders cursor or selection (depending on what exists)
      * it does on the contextTop. If contextTop is not available, do nothing.
      */
     renderCursorOrSelection: function() {
-      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
+      if (!this.isEditing && !this.__isDraggingOver) {
         return;
       }
-      var boundaries = this._getCursorBoundaries(),
-          ctx = this.canvas.contextTop;
-      this.clearContextTop(true);
+      var ctx = this._clearContextTop();
+      if (!ctx) {
+        return;
+      }
+      var boundaries = this._getCursorBoundaries();
       if (this.selectionStart === this.selectionEnd) {
+        this.__isDragging && this._renderDragStartSelection(ctx);
         this.renderCursor(boundaries, ctx);
       }
       else {
@@ -317,22 +397,19 @@
 
     /**
      * Returns cursor boundaries (left, top, leftOffset, topOffset)
+     * left/top are left/top of entire text box
+     * leftOffset/topOffset are offset from that left/top point of a text box
      * @private
-     * @param {Array} chars Array of characters
-     * @param {String} typeOfBoundaries
+     * @param {number} [index] index from start
+     * @param {boolean} [skipCaching]
      */
-    _getCursorBoundaries: function(position) {
-
-      // left/top are left/top of entire text box
-      // leftOffset/topOffset are offset from that left/top point of a text box
-
-      if (typeof position === 'undefined') {
-        position = this.selectionStart;
+    _getCursorBoundaries: function (index, skipCaching) {
+      if (typeof index === 'undefined') {
+        index = this.selectionStart;
       }
-
       var left = this._getLeftOffset(),
           top = this._getTopOffset(),
-          offsets = this._getCursorBoundariesOffsets(position);
+          offsets = this._getCursorBoundariesOffsets(index, skipCaching);
       return {
         left: left,
         top: top,
@@ -342,19 +419,34 @@
     },
 
     /**
+     * Caches and returns cursor left/top offset relative to instance's center point
      * @private
+     * @param {number} index index from start
+     * @param {boolean} [skipCaching]
      */
-    _getCursorBoundariesOffsets: function(position) {
+    _getCursorBoundariesOffsets: function (index, skipCaching) {
+      if (skipCaching) {
+        return this.__getCursorBoundariesOffsets(index);
+      }
       if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
         return this.cursorOffsetCache;
       }
+      return this.cursorOffsetCache = this.__getCursorBoundariesOffsets(index);
+    },
+
+    /**
+     * Calcualtes cursor left/top offset relative to instance's center point
+     * @private
+     * @param {number} index index from start
+     */
+    __getCursorBoundariesOffsets: function (index) {
       var lineLeftOffset,
           lineIndex,
           charIndex,
           topOffset = 0,
           leftOffset = 0,
           boundaries,
-          cursorPosition = this.get2DCursorLocation(position);
+          cursorPosition = this.get2DCursorLocation(index);
       charIndex = cursorPosition.charIndex;
       lineIndex = cursorPosition.lineIndex;
       for (var i = 0; i < lineIndex; i++) {
@@ -371,18 +463,33 @@
         left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
       };
       if (this.direction === 'rtl') {
-        if (this.textAlign === 'right' || this.textAlign === 'justify' || this.textAlign === 'justify-right') {
-          boundaries.left *= -1;
-        }
-        else if (this.textAlign === 'left' || this.textAlign === 'justify-left') {
-          boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
-        }
-        else if (this.textAlign === 'center' || this.textAlign === 'justify-center') {
-          boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+        switch (this.textAlign) {
+          case 'start':
+          case 'justify':
+          case 'justify-start':
+            boundaries.left *= -1;
+            break;
+          case 'end':
+          case 'justify-end':
+            boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+            break;
+          case 'left':
+          case 'justify-left':
+            boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+            break;
+          case 'center':
+          case 'justify-center':
+            boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+            break;
+          case 'right':
+          case 'justify-right':
+            boundaries.left *= -1;
+            break;
+          default:
+            break;
         }
       }
-      this.cursorOffsetCache = boundaries;
-      return this.cursorOffsetCache;
+      return boundaries;
     },
 
     /**
@@ -419,10 +526,51 @@
      * @param {Object} boundaries Object with left/top/leftOffset/topOffset
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
-    renderSelection: function(boundaries, ctx) {
+    renderSelection: function (boundaries, ctx) {
+      var selection = {
+        selectionStart: this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
+        selectionEnd: this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd
+      };
+      this._renderSelection(selection, boundaries, ctx);
+    },
 
-      var selectionStart = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
-          selectionEnd = this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd,
+    /**
+     * Renders drag start text selection
+     */
+    renderDragStartSelection: function () {
+      if (this.__isDragging) {
+        var ctx = this._clearContextTop();
+        if (ctx) {
+          this._renderDragStartSelection(ctx);
+          ctx.restore();
+        }
+      }
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx
+     */
+    _renderDragStartSelection: function (ctx) {
+      if (this.__dragStartSelection) {
+        this._renderSelection(
+          this.__dragStartSelection,
+          this._getCursorBoundaries(this.__dragStartSelection.selectionStart, true),
+          ctx
+        );
+      }
+    },
+
+    /**
+     * Renders text selection
+     * @private
+     * @param {{ selectionStart: number, selectionEnd: number }} selection
+     * @param {Object} boundaries Object with left/top/leftOffset/topOffset
+     * @param {CanvasRenderingContext2D} ctx transformed context to draw on
+     */
+    _renderSelection: function (selection, boundaries, ctx) {
+      var selectionStart = selection.selectionStart,
+          selectionEnd = selection.selectionEnd,
           isJustify = this.textAlign.indexOf('justify') !== -1,
           start = this.get2DCursorLocation(selectionStart),
           end = this.get2DCursorLocation(selectionEnd),
@@ -468,14 +616,30 @@
           ctx.fillStyle = this.selectionColor;
         }
         if (this.direction === 'rtl') {
-          if (this.textAlign === 'right' || this.textAlign === 'justify' || this.textAlign === 'justify-right') {
-            drawStart = this.width - drawStart - drawWidth;
-          }
-          else if (this.textAlign === 'left' || this.textAlign === 'justify-left') {
-            drawStart = boundaries.left + lineOffset - boxEnd;
-          }
-          else if (this.textAlign === 'center' || this.textAlign === 'justify-center') {
-            drawStart = boundaries.left + lineOffset - boxEnd;
+          switch (this.textAlign) {
+            case 'start':
+            case 'justify':
+            case 'justify-start':
+              drawStart = this.width - drawStart - drawWidth;
+              break;
+            case 'end':
+            case 'justify-end':
+              drawStart = boundaries.left + lineOffset - boxEnd;
+              break;
+            case 'left':
+            case 'justify-left':
+              drawStart = boundaries.left + lineOffset - boxEnd;
+              break;
+            case 'center':
+            case 'justify-center':
+              drawStart = boundaries.left + lineOffset - boxEnd;
+              break;
+            case 'right':
+            case 'justify-right':
+              drawStart = this.width - drawStart - drawWidth;
+              break;
+            default:
+              break;
           }
         }
         ctx.fillRect(
@@ -531,6 +695,6 @@
    * @returns {Promise<fabric.IText>}
    */
   fabric.IText.fromObject = function(object) {
-    return fabric.Object._fromObject(fabric.IText, object, 'text');
+    return fabric.Object._fromObject(fabric.IText, object, { extraParam: 'text' });
   };
 })();

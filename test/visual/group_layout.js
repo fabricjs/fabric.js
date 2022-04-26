@@ -10,7 +10,7 @@
 
     var tests = [];
 
-    function createGroupForLayoutTests(text, options) {
+    function createObjectsForLayoutTests(text) {
         var circle = new fabric.Circle({
             left: 100,
             top: 50,
@@ -27,11 +27,19 @@
             fill: 'red',
             opacity: 0.3
         })
-        return new fabric.Group([
+        return [
             rect,
             circle,
             itext
-        ], options);
+        ];
+    }
+
+    function createGroupForLayoutTests(text, options) {
+        return new fabric.Group(createObjectsForLayoutTests(text), options);
+    }
+
+    function createLayerForLayoutTests(text, options) {
+        return new fabric.Layer(createObjectsForLayoutTests(text), options);
     }
 
     function fixedLayout(canvas, callback) {
@@ -91,7 +99,6 @@
         test: 'fit-content layout',
         code: fitContentLayoutRelative,
         golden: 'group-layout/fit-content.png',
-        newModule: 'Group Layout',
         percentage: 0.06,
         width: 400,
         height: 300
@@ -118,25 +125,42 @@
         height: 300
     });
 
-    function fitContentNestedLayer(canvas, callback) {
+    function fitContentLayoutWithSkewX(canvas, callback) {
         var g = createGroupForLayoutTests('fit-content layout', {
-            backgroundColor: 'blue'
+            backgroundColor: 'blue',
+            skewX: 45
         });
-        var objects = g.removeAll();
-        var layer = new fabric.Layer(objects, { backgroundColor: 'yellow' });
-        g.add(layer);
         canvas.add(g);
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
     }
 
     tests.push({
-        test: 'fit-content with nested layer',
-        code: fitContentNestedLayer,
-        golden: 'group-layout/fit-content-nested-layer.png',
+        test: 'fit-content layout',
+        code: fitContentLayoutWithSkewX,
+        golden: 'group-layout/fit-content-skewX.png',
+        percentage: 0.06,
+        width: 400 + Math.ceil(300 / Math.SQRT2),
+        height: 300
+    });
+
+    function fitContentLayoutWithSkewY(canvas, callback) {
+        var g = createGroupForLayoutTests('fit-content layout', {
+            backgroundColor: 'blue',
+            skewY: 45
+        });
+        canvas.add(g);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+
+    tests.push({
+        test: 'fit-content layout',
+        code: fitContentLayoutWithSkewY,
+        golden: 'group-layout/fit-content-skewY.png',
         percentage: 0.06,
         width: 400,
-        height: 300
+        height: 400 + Math.ceil(400 / Math.SQRT2)
     });
 
     function nestedLayout(canvas, callback) {
@@ -235,10 +259,49 @@
         test: 'fit-content layout add object',
         code: fitContentLayoutAdd,
         golden: 'group-layout/fit-content3.png',
-        newModule: 'Group Layout',
         percentage: 0.06,
         width: 400,
         height: 300
+    });
+
+    function selectedObject(canvas, callback) {
+        var g = createGroupForLayoutTests('fit-content layout', {
+            backgroundColor: 'blue'
+        });
+        canvas.add(g);
+        canvas.setActiveObject(g.item(0));
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+
+    tests.push({
+        test: 'selected object',
+        code: selectedObject,
+        golden: 'group-layout/selected_object.png',
+        percentage: 0.02,
+        width: 400,
+        height: 300,
+        fabricClass: 'Canvas'
+    });
+
+    function selectedObjectExport(canvas, callback) {
+        var g = createGroupForLayoutTests('fit-content layout', {
+            backgroundColor: 'blue'
+        });
+        canvas.add(g);
+        canvas.setActiveObject(g.item(0));
+        canvas.renderAll();
+        callback(g.toCanvasElement());
+    }
+
+    tests.push({
+        test: 'selected object - exported',
+        code: selectedObjectExport,
+        golden: 'group-layout/selected_object_exported.png',
+        percentage: 0.02,
+        width: 400,
+        height: 300,
+        fabricClass: 'Canvas'
     });
 
     function clipPathLayout(canvas, callback) {
@@ -343,6 +406,66 @@
         height: 250
     });
 
+    function fitContentNestedLayer(canvas, callback) {
+        var g = createGroupForLayoutTests('fixed layout,\nlayer on top', {
+            layout: 'fixed',
+            backgroundColor: 'blue'
+        });
+        var objects = g.removeAll();
+        var layer = new fabric.Layer(objects, { backgroundColor: 'yellow' });
+        g.add(layer);
+        canvas.add(g);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+
+    tests.push({
+        test: 'layer nested in group',
+        code: fitContentNestedLayer,
+        golden: 'group-layout/nested-layer.png',
+        percentage: 0.06,
+        width: 400,
+        height: 300
+    });
+
+    function LayerLayout(canvas, callback) {
+        var layer = createLayerForLayoutTests('Layer', {
+            backgroundColor: 'blue',
+        });
+        canvas.add(layer);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+
+    tests.push({
+        test: 'layer',
+        code: LayerLayout,
+        golden: 'group-layout/layer.png',
+        percentage: 0.06,
+        width: 400,
+        height: 300
+    });
+
+    function LayerLayoutWithSkew(canvas, callback) {
+        var layer = createLayerForLayoutTests('Layer', {
+            backgroundColor: 'blue',
+            skewX: 45
+        });
+        canvas.add(layer);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+/*
+        tests.push({
+            test: 'layer with skewX',
+            code: LayerLayoutWithSkew,
+            golden: 'group-layout/layer-skewX.png',
+            percentage: 0.06,
+            width: 400,
+            height: 300
+        });
+    */
+
     function createObjectsForOriginTests(originX, originY, options) {
         var rect1 = new fabric.Rect({ left: 150, top: 100, width: 30, height: 10, strokeWidth: 0 }),
             rect2 = new fabric.Rect({ left: 200, top: 120, width: 10, height: 40, strokeWidth: 0 }),
@@ -357,6 +480,7 @@
 
     var originX = ['left', 'center', 'right'];
     var originY = ['top', 'center', 'bottom'];
+
     for (let angle = 0; angle < 360; angle += 30) {
         originX.forEach(ox => {
             originY.forEach(oy => {
@@ -375,5 +499,6 @@
             });
         });
     }
+
     tests.forEach(visualTestLoop(QUnit));
 })();

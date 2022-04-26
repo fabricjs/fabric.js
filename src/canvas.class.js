@@ -2,7 +2,10 @@
 
   var getPointer = fabric.util.getPointer,
       degreesToRadians = fabric.util.degreesToRadians,
-      isTouchEvent = fabric.util.isTouchEvent;
+      isTouchEvent = fabric.util.isTouchEvent,
+      invertTransform = fabric.util.invertTransform,
+      applyTransformToObject = fabric.util.applyTransformToObject,
+      multiplyTransformMatrices = fabric.util.multiplyTransformMatrices;
 
   /**
    * Canvas class
@@ -37,8 +40,42 @@
    * @fires dragover
    * @fires dragenter
    * @fires dragleave
-   * @fires drop:before before drop event. same native event. This is added to handle edge cases
+   * @fires drag:enter object drag enter
+   * @fires drag:leave object drag leave
+   * @fires drop:before before drop event. Prepare for the drop event (same native event).
    * @fires drop
+   * @fires drop:after after drop event. Run logic on canvas after event has been accepted/declined (same native event).
+   * @example
+   * let a: fabric.Object, b: fabric.Object;
+   * let flag = false;
+   * canvas.add(a, b);
+   * a.on('drop:before', opt => {
+   *  //  we want a to accept the drop even though it's below b in the stack
+   *  flag = this.canDrop(opt.e);
+   * });
+   * b.canDrop = function(e) {
+   *  !flag && this.callSuper('canDrop', e);
+   * }
+   * b.on('dragover', opt => b.set('fill', opt.dropTarget === b ? 'pink' : 'black'));
+   * a.on('drop', opt => {
+   *  opt.e.defaultPrevented  //  drop occured
+   *  opt.didDrop             //  drop occured on canvas
+   *  opt.target              //  drop target
+   *  opt.target !== a && a.set('text', 'I lost');
+   * });
+   * canvas.on('drop:after', opt => {
+   *  //  inform user who won
+   *  if(!opt.e.defaultPrevented) {
+   *    // no winners
+   *  }
+   *  else if(!opt.didDrop) {
+   *    //  my objects didn't win, some other lucky bastard
+   *  }
+   *  else {
+   *    //  we have a winner it's opt.target!!
+   *  }
+   * })
+   * 
    * @fires after:render at the end of the render process, receives the context in the callback
    * @fires before:render at start the render process, receives the context in the callback
    *
@@ -387,6 +424,7 @@
     _initInteractive: function() {
       this._currentTransform = null;
       this._groupSelector = null;
+      this._activeSelection = new fabric.ActiveSelection([], { canvas: this });
       this._initWrapperElement();
       this._createUpperCanvas();
       this._initEventListeners();
@@ -420,40 +458,16 @@
      * and one to render as activeGroup.
      * @return {Array} objects to render immediately and pushes the other in the activeGroup.
      */
-    _chooseObjectsToRender: function() {
-      var activeObjects = this.getActiveObjects(),
-          object, objsToRender, activeGroupObjects;
-
-      if (!this.preserveObjectStacking && activeObjects.length > 1) {
-        objsToRender = [];
-        activeGroupObjects = [];
-        for (var i = 0, length = this._objects.length; i < length; i++) {
-          object = this._objects[i];
-          if (activeObjects.indexOf(object) === -1 ) {
-            objsToRender.push(object);
-          }
-          else {
-            activeGroupObjects.push(object);
-          }
-        }
-        if (activeObjects.length > 1) {
-          this._activeObject._objects = activeGroupObjects;
-        }
-        objsToRender.push.apply(objsToRender, activeGroupObjects);
-      }
-      //  in case a single object is selected render it's entire above the other objects
-      else if (!this.preserveObjectStacking && activeObjects.length === 1) {
-        var target = activeObjects[0], ancestors = target.getAncestors(true);
-        var topAncestor = ancestors.length === 0 ? target : ancestors.pop();
-        objsToRender = this._objects.slice();
-        var index = objsToRender.indexOf(topAncestor);
-        index > -1 && objsToRender.splice(objsToRender.indexOf(topAncestor), 1);
-        objsToRender.push(topAncestor);
+    _chooseObjectsToRender: function () {
+      var activeObject = this._activeObject;
+      if (!this.preserveObjectStacking && activeObject) {
+        return this._objects.filter(function (object) {
+          return !object.group && object !== activeObject;
+        }).concat(activeObject);
       }
       else {
-        objsToRender = this._objects;
+        return this._objects;
       }
-      return objsToRender;
     },
 
     /**
@@ -524,7 +538,8 @@
     isTargetTransparent: function (target, x, y) {
       // in case the target is the activeObject, we cannot execute this optimization
       // because we need to draw controls too.
-      if (target.shouldCache() && target._cacheCanvas && target !== this._activeObject) {
+      if (target.shouldCache() && target._cacheCanvas && target !== this._activeObject
+        && (typeof target.filtersObjectsAtRendering !== 'function' || !target.filtersObjectsAtRendering())) {
         var normalizedPointer = this._normalizePointer(target, {x: x, y: y}),
             targetRelativeX = Math.max(target.cacheTranslationX + (normalizedPointer.x * target.zoomX), 0),
             targetRelativeY = Math.max(target.cacheTranslationY + (normalizedPointer.y * target.zoomY), 0);
@@ -544,7 +559,7 @@
 
       ctx.save();
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-      target.render(ctx);
+      target.render(ctx, { filter: false });
       ctx.restore();
 
       target.selectionBackgroundColor = originalColor;
@@ -675,6 +690,7 @@
      * @param {fabric.Object} target
      */
     _setupCurrentTransform: function (e, target, alreadySelected) {
+      this._needsCurrentTransformSetup = false;
       if (!target) {
         return;
       }
@@ -965,19 +981,16 @@
 
       if (boundsWidth === 0 || boundsHeight === 0) {
         // If bounds are not available (i.e. not visible), do not apply scale.
-        cssScale = { width: 1, height: 1 };
+        cssScale = { x: 1, y: 1 };
       }
       else {
         cssScale = {
-          width: upperCanvasEl.width / boundsWidth,
-          height: upperCanvasEl.height / boundsHeight
+          x: upperCanvasEl.width / boundsWidth,
+          y: upperCanvasEl.height / boundsHeight
         };
       }
 
-      return {
-        x: pointer.x * cssScale.width,
-        y: pointer.y * cssScale.height
-      };
+      return pointer.multiply(cssScale);
     },
 
     /**
@@ -1002,6 +1015,7 @@
 
       this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
       this._applyCanvasStyle(upperCanvasEl);
+      upperCanvasEl.setAttribute('draggable', 'true');
       this.contextTop = upperCanvasEl.getContext('2d');
     },
 
@@ -1114,6 +1128,14 @@
         }
       }
       return [];
+    },
+
+    /**
+     * Returns instance's active selection
+     * @return {fabric.ActiveSelection} active selection
+     */
+    getActiveSelection: function () {
+      return this._activeSelection;
     },
 
     /**
@@ -1244,6 +1266,7 @@
           return false;
         }
         this._activeObject = null;
+        this._currentTransform = null;
       }
       return true;
     },
@@ -1300,7 +1323,6 @@
      * @chainable
      */
     clear: function () {
-      // this.discardActiveGroup();
       this.discardActiveObject();
       this.clearContext(this.contextTop);
       return this.callSuper('clear');
@@ -1366,11 +1388,32 @@
       originalProperties && instance.set(originalProperties);
     },
 
+    /**
+     * Sets viewport transformation of this canvas instance
+     * @param {Array} vpt a Canvas 2D API transform matrix
+     * @chainable
+     * @return {fabric.Canvas} instance
+     */
     setViewportTransform: function (vpt) {
-      if (this.renderOnAddRemove && this._activeObject && this._activeObject.isEditing) {
-        this._activeObject.clearContextTop();
+      var activeObject = this._activeObject, dirty = false;
+      if (activeObject) {
+        //  text editing
+        if (this.renderOnAddRemove && activeObject.isEditing) {
+          activeObject.clearContextTop();
+        }
+        //  interacting object should not be changed by vpt
+        if (this._currentTransform || activeObject.isEditing) {
+          var currentTransform = activeObject.calcTransformMatrix(),
+              t = multiplyTransformMatrices(invertTransform(vpt), currentTransform);
+          applyTransformToObject(activeObject, t);
+          this._needsCurrentTransformSetup = true;
+          dirty = true;
+        }
       }
-      fabric.StaticCanvas.prototype.setViewportTransform.call(this, vpt);
+      this._setViewportTransform(vpt);
+      activeObject && activeObject.setCoords();
+      (dirty || this.renderOnAddRemove) && this.requestRenderAll();
+      return this;
     }
   });
 

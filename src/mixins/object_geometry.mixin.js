@@ -137,7 +137,12 @@
     },
 
     /**
-     * @param {fabric.Point} point position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in canvas coordinate plane
+     * Set an object position to a particular point, the point is intended in absolute ( canvas ) coordinate.
+     * You can specify {@link fabric.Object#originX} and {@link fabric.Object#originY} values,
+     * that otherwise are the object's current values.
+     * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
+     * object.setXY(new fabric.Point(5, 5), 'left', 'bottom').
+     * @param {fabric.Point} point position in canvas coordinate plane
      * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
      * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
      */
@@ -159,6 +164,7 @@
     },
 
     /**
+     * As {@link fabric.Object#setXY}, but in current parent's coordinate plane ( the current group if any or the canvas)
      * @param {fabric.Point} point position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
      * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
      * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
@@ -637,7 +643,7 @@
 
     /**
      * calculate rotation matrix of an object
-     * @param {boolean} [absolute] true means angle is measured relative to canvas, false means angle is measured realtive to parent
+     * @param {boolean} [absolute] true means angle is measured relative to canvas, false means angle is measured relative to parent
      * @return {Array} rotation matrix for the object
      */
     _calcRotateMatrix: function (absolute, accountForFlipping) {
@@ -648,7 +654,7 @@
 
     /**
      * calculate the translation matrix for an object transform
-     * @param {boolean} [absolute] true means translation is relative to canvas, false means realtive to parent
+     * @param {boolean} [absolute] true means translation is relative to canvas, false means relative to parent
      * @return {Array} rotation matrix for the object
      */
     _calcTranslateMatrix: function(absolute) {

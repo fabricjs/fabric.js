@@ -31,6 +31,7 @@
    * @fires canvas:cleared
    * @fires object:added
    * @fires object:removed
+   * @fires loading:aborted
    */
   // eslint-disable-next-line max-len
   fabric.StaticCanvas = fabric.util.createClass(fabric.CommonMethods, fabric.Collection, /** @lends fabric.StaticCanvas.prototype */ {
@@ -405,6 +406,7 @@
       }
       this._initRetinaScaling();
       this.calcOffset();
+      this.fire('resize', dimensions);
 
       if (!options.cssOnly) {
         this.requestRenderAll();
@@ -470,31 +472,36 @@
     /**
      * Sets viewport transformation of this canvas instance
      * @param {Array} vpt a Canvas 2D API transform matrix
-     * @return {fabric.Canvas} instance
+     * @return {fabric.StaticCanvas} instance
      * @chainable true
      */
     setViewportTransform: function (vpt) {
-      var activeObject = this._activeObject,
-          backgroundObject = this.backgroundImage,
+      this._setViewportTransform(vpt);
+      this.renderOnAddRemove && this.requestRenderAll();
+      return this;
+    },
+
+    /**
+     * Sets viewport transformation of this canvas instance
+     * @private
+     * @param {Array} vpt a Canvas 2D API transform matrix
+     */
+    _setViewportTransform: function (vpt) {
+      var backgroundObject = this.backgroundImage,
           overlayObject = this.overlayImage,
           object, i, len;
       this.viewportTransform = vpt;
       for (i = 0, len = this._objects.length; i < len; i++) {
         object = this._objects[i];
-        object.group || object.setCoords(true);
-      }
-      if (activeObject) {
-        activeObject.setCoords();
+        object.setCoords();
       }
       if (backgroundObject) {
-        backgroundObject.setCoords(true);
+        backgroundObject.setCoords();
       }
       if (overlayObject) {
-        overlayObject.setCoords(true);
+        overlayObject.setCoords();
       }
       this.calcViewportBoundaries();
-      this.renderOnAddRemove && this.requestRenderAll();
-      return this;
     },
 
     /**
@@ -586,7 +593,7 @@
      */
     insertAt: function (objects, index) {
       fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
-      this.renderOnAddRemove && this.requestRenderAll();
+      (Array.isArray(objects) ? objects.length > 0 : !!objects) && this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -596,8 +603,8 @@
      * @chainable
      */
     remove: function () {
-      var didRemove = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
-      didRemove && this.renderOnAddRemove && this.requestRenderAll();
+      var removed = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
+      removed.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -739,11 +746,10 @@
     /**
      * Renders background, objects, overlay and controls.
      * @param {CanvasRenderingContext2D} ctx
-     * @param {Array} objects to render
-     * @return {fabric.Canvas} instance
-     * @chainable
+     * @param {fabric.Object[]} objects to render
+     * @param {{ filter?: false | ((object: fabric.Object) => boolean) }} [renderingContext] filtering option used by `isTargetTransparent` and exporting
      */
-    renderCanvas: function(ctx, objects) {
+    renderCanvas: function(ctx, objects, renderingContext) {
       var v = this.viewportTransform, path = this.clipPath;
       this.cancelRequestedRender();
       this.calcViewportBoundaries();
@@ -755,7 +761,7 @@
       ctx.save();
       //apply viewport transform once for all rendering process
       ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-      this._renderObjects(ctx, objects);
+      this._renderObjects(ctx, objects, renderingContext);
       ctx.restore();
       if (!this.controlsAboveOverlay && this.interactive) {
         this.drawControls(ctx);
@@ -795,12 +801,13 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Array} objects to render
+     * @param {fabric.Object[]} objects to render
+     * @param {{ filter?: false | ((object: fabric.Object) => boolean) }} [renderingContext] filtering option used by `isTargetTransparent` and exporting
      */
-    _renderObjects: function(ctx, objects) {
+    _renderObjects: function(ctx, objects, renderingContext) {
       var i, len;
       for (i = 0, len = objects.length; i < len; ++i) {
-        objects[i] && objects[i].render(ctx);
+        objects[i] && objects[i].render(ctx, renderingContext);
       }
     },
 
@@ -1384,7 +1391,7 @@
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    sendToBack: function (object) {
+    sendObjectToBack: function (object) {
       if (!object) {
         return this;
       }
@@ -1399,8 +1406,7 @@
         }
       }
       else {
-        removeFromArray(this._objects, object);
-        this._objects.unshift(object);
+        fabric.Collection.sendObjectToBack.call(this, object);
       }
       this.renderOnAddRemove && this.requestRenderAll();
       return this;
@@ -1413,7 +1419,7 @@
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    bringToFront: function (object) {
+    bringObjectToFront: function (object) {
       if (!object) {
         return this;
       }
@@ -1428,8 +1434,7 @@
         }
       }
       else {
-        removeFromArray(this._objects, object);
-        this._objects.push(object);
+        fabric.Collection.bringObjectToFront.call(this, object);
       }
       this.renderOnAddRemove && this.requestRenderAll();
       return this;
@@ -1446,7 +1451,7 @@
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    sendBackwards: function (object, intersecting) {
+    sendObjectBackwards: function (object, intersecting) {
       if (!object) {
         return this;
       }
@@ -1467,45 +1472,10 @@
         }
       }
       else {
-        idx = this._objects.indexOf(object);
-        if (idx !== 0) {
-          // if object is not on the bottom of stack
-          newIdx = this._findNewLowerIndex(object, idx, intersecting);
-          removeFromArray(this._objects, object);
-          this._objects.splice(newIdx, 0, object);
-        }
+        fabric.Collection.sendObjectBackwards.call(this, object, intersecting);
       }
       this.renderOnAddRemove && this.requestRenderAll();
       return this;
-    },
-
-    /**
-     * @private
-     */
-    _findNewLowerIndex: function(object, idx, intersecting) {
-      var newIdx, i;
-
-      if (intersecting) {
-        newIdx = idx;
-
-        // traverse down the stack looking for the nearest intersecting object
-        for (i = idx - 1; i >= 0; --i) {
-
-          var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
-                               object.isContainedWithinObject(this._objects[i]) ||
-                               this._objects[i].isContainedWithinObject(object);
-
-          if (isIntersecting) {
-            newIdx = i;
-            break;
-          }
-        }
-      }
-      else {
-        newIdx = idx - 1;
-      }
-
-      return newIdx;
     },
 
     /**
@@ -1519,7 +1489,7 @@
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    bringForward: function (object, intersecting) {
+    bringObjectForward: function (object, intersecting) {
       if (!object) {
         return this;
       }
@@ -1540,45 +1510,10 @@
         }
       }
       else {
-        idx = this._objects.indexOf(object);
-        if (idx !== this._objects.length - 1) {
-          // if object is not on top of stack (last item in an array)
-          newIdx = this._findNewUpperIndex(object, idx, intersecting);
-          removeFromArray(this._objects, object);
-          this._objects.splice(newIdx, 0, object);
-        }
+        fabric.Collection.bringObjectForward.call(this, object, intersecting);
       }
       this.renderOnAddRemove && this.requestRenderAll();
       return this;
-    },
-
-    /**
-     * @private
-     */
-    _findNewUpperIndex: function(object, idx, intersecting) {
-      var newIdx, i, len;
-
-      if (intersecting) {
-        newIdx = idx;
-
-        // traverse up the stack looking for the nearest intersecting object
-        for (i = idx + 1, len = this._objects.length; i < len; ++i) {
-
-          var isIntersecting = object.intersectsWithObject(this._objects[i]) ||
-                               object.isContainedWithinObject(this._objects[i]) ||
-                               this._objects[i].isContainedWithinObject(object);
-
-          if (isIntersecting) {
-            newIdx = i;
-            break;
-          }
-        }
-      }
-      else {
-        newIdx = idx + 1;
-      }
-
-      return newIdx;
     },
 
     /**
@@ -1588,9 +1523,8 @@
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    moveTo: function (object, index) {
-      removeFromArray(this._objects, object);
-      this._objects.splice(index, 0, object);
+    moveObjectTo: function (object, index) {
+      fabric.Collection.moveObjectTo.call(this, object, index);
       return this.renderOnAddRemove && this.requestRenderAll();
     },
 

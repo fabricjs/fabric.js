@@ -47,9 +47,10 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx
      * @param {fabric.Object} clipPath
+     * @param {RenderingContext} [renderingContext]
      */
-    _drawClipPath: function (ctx, clipPath) {
-      __drawClipPath.call(this, ctx, clipPath);
+    _drawClipPath: function (ctx, clipPath, renderingContext) {
+      __drawClipPath.call(this, ctx, clipPath, renderingContext);
       if (this.eraser) {
         //  update eraser size to match instance
         var size = this._getNonTransformedDimensions();
@@ -57,7 +58,7 @@
           width: size.x,
           height: size.y
         });
-        __drawClipPath.call(this, ctx, this.eraser);
+        __drawClipPath.call(this, ctx, this.eraser, renderingContext);
       }
     },
 
@@ -216,12 +217,12 @@
      */
     layout: 'fixed',
 
-    drawObject: function (ctx) {
+    drawObject: function (ctx, renderingContext) {
       ctx.save();
       ctx.fillStyle = 'black';
       ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
       ctx.restore();
-      this.callSuper('drawObject', ctx);
+      this.callSuper('drawObject', ctx, renderingContext);
     },
 
     /* _TO_SVG_START_ */

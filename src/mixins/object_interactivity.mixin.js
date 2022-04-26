@@ -309,6 +309,17 @@
      */
     onSelect: function() {
       // implemented by sub-classes, as needed.
-    }
+    },
+
+    /**
+     * Override to customize drag and drop behavior
+     * @public
+     * @param {DragEvent} e
+     * @returns {boolean}
+     */
+    canDrop: function (e) { // eslint-disable-line no-unused-vars
+      return false;
+    },
+
   });
 })();

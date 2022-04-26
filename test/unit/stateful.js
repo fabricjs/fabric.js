@@ -125,6 +125,35 @@
     assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in object to null without throwing');
   });
 
+  QUnit.test('saveState with fabric class gradient to other types + circular ref', function (assert) {
+    var cObj = new fabric.Object();
+    var gradient = new fabric.Gradient({
+      type: 'linear',
+      coords: {
+        x1: 0,
+        y1: 10,
+        x2: 100,
+        y2: 200,
+      },
+      colorStops: [
+        { offset: 0, color: 'red', opacity: 0 },
+        { offset: 1, color: 'green' }
+      ],
+      object: cObj
+    });
+
+    cObj.set('fill', gradient);
+    cObj.setupState();
+    cObj.set('fill', 'red');
+    assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in object to string without throwing');
+    cObj.saveState();
+    cObj.set('fill', gradient);
+    assert.ok(cObj.hasStateChanged(), 'back to gradient');
+    cObj.saveState();
+    cObj.set('fill', null);
+    assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in object to null without throwing');
+  });
+
   QUnit.test('savestate with custom property set', function(assert) {
     var cObj = new fabric.Object();
     cObj.myProperties = ['a', 'b'];

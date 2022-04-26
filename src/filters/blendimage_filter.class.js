@@ -232,11 +232,13 @@
   /**
    * Create filter instance from an object representation
    * @static
-   * @param {Object} object Object to create an instance from
+   * @param {oject} object Object to create an instance from
+   * @param {object} [options]
+   * @param {AbortSignal} [options.signal] handle aborting image loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Image.filters.BlendImage>}
    */
-  fabric.Image.filters.BlendImage.fromObject = function(object) {
-    return fabric.Image.fromObject(object.image).then(function(image) {
+  fabric.Image.filters.BlendImage.fromObject = function(object, options) {
+    return fabric.Image.fromObject(object.image, options).then(function(image) {
       var options = fabric.util.object.clone(object);
       options.image = image;
       return new fabric.Image.filters.BlendImage(options);

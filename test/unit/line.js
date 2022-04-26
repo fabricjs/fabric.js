@@ -9,6 +9,7 @@
     top:                      12,
     width:                    2,
     height:                   2,
+    layout:                   '',
     fill:                     'rgb(0,0,0)',
     stroke:                   null,
     strokeWidth:              1,

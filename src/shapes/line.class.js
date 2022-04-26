@@ -111,6 +111,15 @@
     },
 
     /**
+     * Called once instance is added to a parent and when parent resizes
+     * @private
+     * @param {*} context see {@link fabric.ParentResizeObserver}
+     */
+    _onParentResize: function (context) {
+      this._parentMonitor.fillParentByScaling(context);
+    },
+
+    /**
      * @private
      * @return {Number} leftToOriginX Distance from left edge of canvas to originX of Line.
      */
@@ -289,7 +298,7 @@
   fabric.Line.fromObject = function(object) {
     var options = clone(object, true);
     options.points = [object.x1, object.y1, object.x2, object.y2];
-    return fabric.Object._fromObject(fabric.Line, options, 'points').then(function(fabricLine) {
+    return fabric.Object._fromObject(fabric.Line, options, { extraParam: 'points' }).then(function(fabricLine) {
       delete fabricLine.points;
       return fabricLine;
     });

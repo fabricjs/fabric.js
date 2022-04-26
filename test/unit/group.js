@@ -100,10 +100,12 @@
         group = new fabric.Group([rect1, rect2, rect3]);
 
     assert.ok(typeof group.remove === 'function');
-    group.remove(rect2);
+    var removed = group.remove(rect2);
+    assert.deepEqual(removed, [rect2], 'should return removed objects');
     assert.deepEqual(group.getObjects(), [rect1, rect3], 'should remove object properly');
 
-    group.remove(rect1, rect3);
+    var removed = group.remove(rect1, rect3);
+    assert.deepEqual(removed, [rect1, rect3], 'should return removed objects');
     assert.equal(group.isEmpty(), true, 'group should be empty');
   });
 
@@ -316,7 +318,8 @@
     assert.ok(initialLeftValue !== firstObject.get('left'));
     assert.ok(initialTopValue !== firstObject.get('top'));
 
-    group.removeAll();
+    var objects = group.getObjects();
+    assert.deepEqual(group.removeAll(), objects, 'should remove all objects');
     assert.equal(firstObject.get('left'), initialLeftValue, 'should restore initial left value');
     assert.equal(firstObject.get('top'), initialTopValue, 'should restore initial top value');
   });
@@ -507,7 +510,7 @@
     // assert.equal(group.get('lockRotation'), true);
   });
 
-  QUnit.test('z-index methods with group objects', function(assert) {
+  QUnit.test('object stacking methods with group objects', function (assert) {
 
     var textBg = new fabric.Rect({
       fill: '#abc',
@@ -516,22 +519,77 @@
     });
 
     var text = new fabric.Text('text');
-    var group = new fabric.Group([textBg, text]);
+    var obj = new fabric.Object();
+    var group = new fabric.Group([textBg, text, obj]);
+
+    assert.ok(typeof group.sendObjectToBack === 'function');
+    assert.ok(typeof group.bringObjectToFront === 'function');
+    assert.ok(typeof group.sendObjectBackwards === 'function');
+    assert.ok(typeof group.bringObjectForward === 'function');
+    assert.ok(typeof group.moveObjectTo === 'function');
 
     canvas.add(group);
 
-    assert.ok(group.getObjects()[0] === textBg);
-    assert.ok(group.getObjects()[1] === text);
+    assert.deepEqual(group.getObjects(), [textBg, text, obj]);
 
+    group.dirty = false;
     textBg.bringToFront();
+    assert.deepEqual(group.getObjects(), [text, obj, textBg]);
+    assert.ok(group.dirty, 'should invalidate group');
 
-    assert.ok(group.getObjects()[0] === text);
-    assert.ok(group.getObjects()[1] === textBg);
-
+    group.dirty = false;
     textBg.sendToBack();
+    assert.deepEqual(group.getObjects(), [textBg, text, obj]);
+    assert.ok(group.dirty, 'should invalidate group');
 
-    assert.ok(group.getObjects()[0] === textBg);
-    assert.ok(group.getObjects()[1] === text);
+    group.dirty = false;
+    group.bringObjectToFront(textBg);
+    assert.deepEqual(group.getObjects(), [text, obj, textBg]);
+    assert.ok(group.dirty, 'should invalidate group');
+
+    group.dirty = false;
+    group.bringObjectToFront(textBg);
+    assert.deepEqual(group.getObjects(), [text, obj, textBg], 'has no effect');
+    assert.ok(group.dirty === false, 'should not invalidate group');
+    
+    group.dirty = false;
+    group.sendObjectToBack(textBg);
+    assert.deepEqual(group.getObjects(), [textBg, text, obj]);
+    assert.ok(group.dirty, 'should invalidate group');
+    
+    group.dirty = false;
+    group.sendObjectToBack(textBg);
+    assert.deepEqual(group.getObjects(), [textBg, text, obj], 'has no effect');
+    assert.ok(group.dirty === false, 'should not invalidate group');
+    
+    group.dirty = false;
+    group.sendObjectBackwards(obj);
+    assert.deepEqual(group.getObjects(), [textBg, obj, text]);
+    assert.ok(group.dirty, 'should invalidate group');
+    
+    group.dirty = false;
+    group.bringObjectForward(text);
+    assert.deepEqual(group.getObjects(), [textBg, obj, text], 'has no effect');
+    assert.ok(group.dirty === false, 'should not invalidate group');
+    
+    group.dirty = false;
+    group.bringObjectForward(obj);
+    assert.deepEqual(group.getObjects(), [textBg, text, obj]);
+    assert.ok(group.dirty, 'should invalidate group');
+    
+    group.dirty = false;
+    group.bringObjectForward(textBg);
+    assert.deepEqual(group.getObjects(), [text, textBg, obj]);
+    assert.ok(group.dirty, 'should invalidate group');
+    
+    group.dirty = false;
+    group.moveObjectTo(obj, 2);
+    assert.deepEqual(group.getObjects(), [text, textBg, obj], 'has no effect');
+    assert.ok(group.dirty === false, 'should not invalidate group');
+    
+    group.dirty = false;
+    group.moveObjectTo(obj, 0);
+    assert.deepEqual(group.getObjects(), [obj, text, textBg]);
   });
 
   QUnit.test('group reference on an object', function(assert) {
@@ -558,6 +616,7 @@
       group = new fabric.Group(),
       control = [],
       fired = [],
+      firedOnGroup = [],
       firingControl = [];
 
     group.add(rect1, rect2);
@@ -570,6 +629,7 @@
       assert.deepEqual(group.getObjects(), control, 'should equal control array ' + description);
       assert.deepEqual(fired.map(o => o.id), firingControl.map(o => o.id), 'fired events should equal control array ' + description);
       assert.deepEqual(fired, firingControl, 'fired events should equal control array ' + description);
+      assert.deepEqual(firedOnGroup, firingControl, 'fired events should equal control array ' + description);
     }
 
     assert.ok(typeof group._onObjectAdded === 'function', 'has a standard _onObjectAdded method');
@@ -578,6 +638,9 @@
         assert.equal(e.target, group);
         fired.push(obj);
       });
+    });
+    group.on('object:added', (e) => {
+      firedOnGroup.push(e.target);
     });
 
     group.insertAt(rect3, 1);
@@ -693,13 +756,47 @@
     assert.notEqual(coords, newCoords, 'object coords have been recalculated - add');
   });
 
+  QUnit.test('group add edge cases', function (assert) {
+    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
+      rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
+      group = new fabric.Group([rect1]);
+
+    //  duplicate
+    assert.throws(() => group.canEnterGroup(rect1), 'rect1 already exists in group');
+    assert.throws(() => group.add(rect1), 'rect1 already exists in group');
+    //  duplicate on same call
+    assert.ok(group.canEnterGroup(rect2));
+    assert.throws(() => group.add(rect2, rect2), '`rect2` should have entered once');
+    //  adding self
+    assert.throws(() => group.canEnterGroup(group));
+    assert.throws(() => group.add(group));
+    //  nested object should be removed from group
+    var nestedGroup = new fabric.Group([rect1]);
+    assert.ok(group.canEnterGroup(nestedGroup));
+    group.add(nestedGroup);
+    //  circular group
+    var circularGroup = new fabric.Group([rect2, group]);
+    assert.throws(() => group.canEnterGroup(circularGroup), 'circular group should be denied entry');
+    assert.throws(() => group.add(circularGroup), 'circular group should be denied entry');
+  });
+
   QUnit.test('group remove', function(assert) {
-    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        group = new fabric.Group([rect1, rect2]);
+    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
+        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
+        group = new fabric.Group([rect1, rect2]),
+        fired = [];
 
     var coords = group.oCoords;
+    group.on('object:removed', (e) => {
+      assert.equal(e.target, rect2);
+      fired.push(group);
+    });
+    rect2.on('removed', (e) => {
+      assert.equal(e.target, group);
+      fired.push(rect2);
+    });
     group.remove(rect2);
+    assert.deepEqual(fired, [group, rect2], 'should fire removed in correct order');
     var newCoords = group.oCoords;
     assert.notEqual(coords, newCoords, 'object coords have been recalculated - remove');
   });
