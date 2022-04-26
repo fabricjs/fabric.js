@@ -66,7 +66,7 @@
      * @returns {boolean} true if object entered group
      */
     enterGroup: function (object, removeParentTransform) {
-      if (!this.canEnter(object)) {
+      if (!this.canEnterGroup(object)) {
         return false;
       }
       if (object.group) {

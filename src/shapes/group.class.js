@@ -226,18 +226,12 @@
      * @param {fabric.Object} object
      * @returns
      */
-    canEnter: function (object) {
+    canEnterGroup: function (object) {
       if (object === this || this.isDescendantOf(object)) {
-        /* _DEV_MODE_START_ */
-        console.warn('fabric.Group: trying to add group to itself, this call has no effect');
-        /* _DEV_MODE_END_ */
-        return false;
+        throw new Error('fabric.Group: trying to add group to itself');
       }
       else if (object.group && object.group === this) {
-        /* _DEV_MODE_START_ */
-        console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
-        /* _DEV_MODE_END_ */
-        return false;
+        throw new Error('fabric.Group: duplicate objects are not supported inside group');
       }
       return true;
     },
@@ -249,7 +243,7 @@
      * @returns {boolean} true if object entered group
      */
     enterGroup: function (object, removeParentTransform) {
-      if (!this.canEnter(object)) {
+      if (!this.canEnterGroup(object)) {
         return false;
       }
       if (object.group) {
@@ -410,7 +404,6 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     drawObject: function(ctx) {
-      this._renderBackground(ctx);
       for (var i = 0; i < this._objects.length; i++) {
         this._objects[i].render(ctx);
       }
@@ -591,7 +584,7 @@
         return this.prepareBoundingBox(layoutDirective, addedObjects, context);
       }
       else if (layoutDirective === 'fit-content' || layoutDirective === 'fit-content-lazy'
-          || (layoutDirective === 'fixed' && context.type === 'initialization')) {
+        || (layoutDirective === 'fixed' && (context.type === 'initialization' || context.type === 'imperative'))) {
         return this.prepareBoundingBox(layoutDirective, objects, context);
       }
       else if (layoutDirective === 'clip-path' && this.clipPath) {
@@ -872,23 +865,10 @@
         this._watchObject(false, object);
         object.dispose && object.dispose();
       }, this);
+      this.callSuper('dispose');
     },
 
     /* _TO_SVG_START_ */
-
-    /**
-     * @private
-     */
-    _createSVGBgRect: function (reviver) {
-      if (!this.backgroundColor) {
-        return '';
-      }
-      var fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
-      var commons = fillStroke.indexOf('COMMON_PARTS');
-      fillStroke[commons] = 'for="group" ';
-      return fillStroke.join('');
-    },
-
     /**
      * Returns svg representation of an instance
      * @param {Function} [reviver] Method for further parsing of svg representation.
@@ -896,8 +876,6 @@
      */
     _toSVG: function (reviver) {
       var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-      var bg = this._createSVGBgRect(reviver);
-      bg && svgString.push('\t\t', bg);
       for (var i = 0; i < this._objects.length; i++) {
         svgString.push('\t\t', this._objects[i].toSVG(reviver));
       }
@@ -927,8 +905,6 @@
      */
     toClipPathSVG: function (reviver) {
       var svgString = [];
-      var bg = this._createSVGBgRect(reviver);
-      bg && svgString.push('\t', bg);
       for (var i = 0; i < this._objects.length; i++) {
         svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
       }
