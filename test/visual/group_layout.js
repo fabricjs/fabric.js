@@ -256,6 +256,46 @@
         height: 300
     });
 
+    function selectedObject(canvas, callback) {
+        var g = createGroupForLayoutTests('fit-content layout', {
+            backgroundColor: 'blue'
+        });
+        canvas.add(g);
+        canvas.setActiveObject(g.item(0));
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+
+    tests.push({
+        test: 'selected object',
+        code: selectedObject,
+        golden: 'group-layout/selected_object.png',
+        percentage: 0.02,
+        width: 400,
+        height: 300,
+        fabricClass: 'Canvas'
+    });
+
+    function selectedObjectExport(canvas, callback) {
+        var g = createGroupForLayoutTests('fit-content layout', {
+            backgroundColor: 'blue'
+        });
+        canvas.add(g);
+        canvas.setActiveObject(g.item(0));
+        canvas.renderAll();
+        callback(g.toCanvasElement());
+    }
+
+    tests.push({
+        test: 'selected object - exported',
+        code: selectedObjectExport,
+        golden: 'group-layout/selected_object_exported.png',
+        percentage: 0.02,
+        width: 400,
+        height: 300,
+        fabricClass: 'Canvas'
+    });
+
     function clipPathLayout(canvas, callback) {
         var g = createGroupForLayoutTests('clip path layout', {
             backgroundColor: 'magenta',

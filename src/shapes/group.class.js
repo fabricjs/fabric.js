@@ -253,6 +253,11 @@
         object.group.remove(object);
       }
       this._enterGroup(object, removeParentTransform);
+      var activeObject = this.canvas && this.canvas.getActiveObject && this.canvas.getActiveObject();
+      // if we are adding the activeObject in a group
+      if (activeObject && (activeObject === object || object.isDescendantOf(activeObject))) {
+        this._activeObjects.push(object);
+      }
       return true;
     },
 
@@ -276,11 +281,6 @@
       object._set('group', this);
       object._set('canvas', this.canvas);
       this.interactive && this._watchObject(true, object);
-      var activeObject = this.canvas && this.canvas.getActiveObject && this.canvas.getActiveObject();
-      // if we are adding the activeObject in a group
-      if (activeObject && (activeObject === object || object.isDescendantOf(activeObject))) {
-        this._activeObjects.push(object);
-      }
     },
 
     /**
@@ -409,34 +409,23 @@
      * Execute the drawing operation for an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    drawObject: function(ctx) {
-      for (var i = 0; i < this._objects.length; i++) {
-        this._objects[i].render(ctx);
-      }
-      this._drawClipPath(ctx, this.clipPath);
-    },
-
-    /**
-     * Check if cache is dirty
-     */
-    isCacheDirty: function(skipCanvas) {
-      if (this.callSuper('isCacheDirty', skipCanvas)) {
-        return true;
-      }
-      if (!this.statefullCache) {
-        return false;
-      }
-      for (var i = 0; i < this._objects.length; i++) {
-        if (this._objects[i].isCacheDirty(true)) {
-          if (this._cacheCanvas) {
-            // if this group has not a cache canvas there is nothing to clean
-            var x = this.cacheWidth / this.zoomX, y = this.cacheHeight / this.zoomY;
-            this._cacheContext.clearRect(-x / 2, -y / 2, x, y);
-          }
-          return true;
+    drawObject: function (ctx) {
+      this._renderBackground(ctx);
+      var preserveObjectStacking = this.canvas && this.canvas.preserveObjectStacking;
+      for (var i = 0, object; i < this._objects.length; i++) {
+        object = this._objects[i];
+        if (preserveObjectStacking && object.group !== this) {
+          //  object is part of ActiveSelection
+          ctx.save();
+          ctx.transform.apply(ctx, invertTransform(this.calcTransformMatrix()));
+          object.render(ctx);
+          ctx.restore();
+        }
+        else if (preserveObjectStacking || (object.group === this && this._activeObjects.indexOf(object) === -1)) {
+          object.render(ctx);
         }
       }
-      return false;
+      this._drawClipPath(ctx, this.clipPath);
     },
 
     /**
@@ -459,6 +448,24 @@
       this._transformDone = true;
       this.callSuper('render', ctx);
       this._transformDone = false;
+    },
+
+    /**
+     * @typedef {object} InvalidationContext
+     * @property {fabric.Object} target either a child object or {@link fabric.ActiveSelection}
+     * @property {string} key
+     * @property {*} value
+     * @property {*} prevValue
+     *
+     * @private
+     * @param {InvalidationContext} context
+     */
+    invalidate: function (context) {
+      this.isOnACache() && (!this.canvas || this.canvas.preserveObjectStacking)
+        && this._set('dirty', true);
+      this._applyLayoutStrategy(Object.assign({}, context, {
+        type: 'progress'
+      }));
     },
 
     /**
@@ -499,6 +506,10 @@
         //  reject layout requests before initialization layout
         return;
       }
+      else if (context.type === 'progress' && this._layoutInProgress) {
+        //  prevent circular calls
+        return;
+      }
       var options = isFirstLayout && context.options;
       var initialTransform = options && {
         angle: options.angle || 0,
@@ -508,6 +519,7 @@
       var center = this.getRelativeCenterPoint();
       var result = this.getLayoutStrategyResult(this.layout, this._objects.concat(), context);
       if (result) {
+        this._layoutInProgress = true;
         //  handle positioning
         var newCenter = new fabric.Point(result.centerX, result.centerY);
         var vector = center.subtract(newCenter).add(new fabric.Point(result.correctionX || 0, result.correctionY || 0));
@@ -516,7 +528,7 @@
         this.set({ width: result.width, height: result.height });
         //  adjust objects to account for new center
         !context.objectsRelativeToGroup && this.forEachObject(function (object) {
-          this._adjustObjectPosition(object, diff);
+          object.group === this && this._adjustObjectPosition(object, diff);
         }, this);
         //  clip path as well
         !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
@@ -527,6 +539,7 @@
           initialTransform && this.set(initialTransform);
           this.setCoords();
         }
+        this._layoutInProgress = false;
       }
       else if (isFirstLayout) {
         //  fill `result` with initial values for the layout hook
@@ -589,9 +602,13 @@
      * @returns {LayoutResult | undefined}
      */
     getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
+      if (context.type === 'progress'
+      /* && layoutDirective !== 'fit-content-lazy' && layoutDirective !== 'fit-content'*/) {
+        return;
+      }
       //  `fit-content-lazy` performance enhancement
       //  skip if instance had no objects before the `added` event because it may have kept layout after removing all previous objects
-      if (layoutDirective === 'fit-content-lazy'
+      else if (layoutDirective === 'fit-content-lazy'
           && context.type === 'added' && objects.length > context.targets.length) {
         //  calculate added objects' bbox with existing bbox
         var addedObjects = context.targets.concat(this);

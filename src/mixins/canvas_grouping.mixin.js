@@ -110,10 +110,10 @@
         [activeObject, target] :
         [target, activeObject];
       activeObject.isEditing && activeObject.exitEditing();
-      //  handle case: target is nested
-      return new fabric.ActiveSelection(groupObjects, {
-        canvas: this
-      });
+      this._activeSelection.removeAll();
+      fabric.util.resetObjectTransform(this._activeSelection);
+      this._activeSelection.add.apply(this._activeSelection, groupObjects);
+      return this._activeSelection;
     },
 
     /**
@@ -121,19 +121,14 @@
      * @param {Event} e mouse event
      */
     _groupSelectedObjects: function (e) {
-
-      var group = this._collectObjects(e),
-          aGroup;
-
+      var objects = this._collectObjects(e);
       // do not create group for 1 element only
-      if (group.length === 1) {
-        this.setActiveObject(group[0], e);
+      if (objects.length === 1) {
+        this.setActiveObject(objects[0], e);
       }
-      else if (group.length > 1) {
-        aGroup = new fabric.ActiveSelection(group.reverse(), {
-          canvas: this
-        });
-        this.setActiveObject(aGroup, e);
+      else if (objects.length > 1) {
+        this._activeSelection.add.apply(this._activeSelection, objects.reverse());
+        this.setActiveObject(this._activeSelection, e);
       }
     },
 

@@ -986,7 +986,7 @@
      */
     _set: function(key, value) {
       var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY'),
-          isChanged = this[key] !== value, groupNeedsUpdate = false;
+          prevValue = this[key];
 
       if (shouldConstrainValue) {
         value = this._constrainScale(value);
@@ -1002,20 +1002,29 @@
       else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
         value = new fabric.Shadow(value);
       }
-      else if (key === 'dirty' && this.group) {
-        this.group.set('dirty', value);
+      else if (key === 'dirty' && value) {
+        this.group && this.group.set('dirty', true);
+        //  mark owning group as dirty
+        //  if `preserveObjectStacking === false` the object isn't rendered by the group so there's no reason to flag it as dirty
+        this.__owningGroup && (!this.canvas || this.canvas.preserveObjectStacking)
+          && this.__owningGroup.set('dirty', true);
       }
 
       this[key] = value;
 
-      if (isChanged) {
-        groupNeedsUpdate = this.group && this.group.isOnACache();
-        if (this.cacheProperties.indexOf(key) > -1) {
-          this.dirty = true;
-          groupNeedsUpdate && this.group.set('dirty', true);
-        }
-        else if (groupNeedsUpdate && this.stateProperties.indexOf(key) > -1) {
-          this.group.set('dirty', true);
+      if (prevValue !== value) {
+        var isCacheProp = this.cacheProperties.indexOf(key) > -1;
+        var isStateProp = this.stateProperties.indexOf(key) > -1;
+        if (isCacheProp || isStateProp) {
+          isCacheProp && (this.dirty = true);
+          var invalidationContext = {
+            target: this,
+            key: key,
+            value: value,
+            prevValue: prevValue
+          };
+          this.group && this.group.invalidate(invalidationContext);
+          this.__owningGroup && this.__owningGroup.invalidate(invalidationContext);
         }
       }
       return this;
@@ -1724,6 +1733,8 @@
         enableRetinaScaling: false,
         renderOnAddRemove: false,
         skipOffscreen: false,
+        //  needed to render group without filtering out selected objects
+        preserveObjectStacking: true
       });
       if (options.format === 'jpeg') {
         canvas.backgroundColor = '#fff';
