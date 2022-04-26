@@ -557,8 +557,8 @@
        * @return {fabric.Path} Path to add on canvas
        * @returns
        */
-      createPath: function (pathData) {
-        var path = this.callSuper('createPath', pathData);
+      createPath: async function (pathData) {
+        var path = await this.callSuper('createPath', pathData);
         path.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
         path.stroke = this.inverted ? 'white' : 'black';
         return path;
@@ -714,15 +714,15 @@
        * we use the points captured to create an new fabric path object
        * and add it to every intersected erasable object.
        */
-      _finalizeAndAddPath: function () {
-        var ctx = this.canvas.contextTop, canvas = this.canvas;
+      _finalizeAndAddPath: async function () {
+        var canvas = this.canvas, ctx = canvas.contextTop;
         ctx.closePath();
         if (this.decimate) {
           this._points = this.decimatePoints(this._points, this.decimate);
         }
 
         // clear
-        canvas.clearContext(canvas.contextTop);
+        canvas.clearContext(ctx);
         this._isErasing = false;
 
         var pathData = this._points && this._points.length > 1 ?
@@ -738,7 +738,7 @@
           return;
         }
 
-        var path = this.createPath(pathData);
+        var path = await this.createPath(pathData);
         //  needed for `intersectsWithObject`
         path.setCoords();
         //  commense event sequence
@@ -765,7 +765,7 @@
             }));
 
             canvas.requestRenderAll();
-            _this._resetShadow();
+            _this._resetShadow(ctx);
 
             // fire event 'path' created
             canvas.fire('path:created', { path: path });

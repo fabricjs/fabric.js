@@ -204,10 +204,9 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   /**
    * Removes brush shadow styles
    * @private
+   * @param {CanvasRenderingContext2D} ctx
    */
-  _resetShadow: function() {
-    var ctx = this.canvas.contextTop;
-
+  _resetShadow: function(ctx) {
     ctx.shadowColor = '';
     ctx.shadowBlur = ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
   },

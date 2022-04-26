@@ -84,9 +84,10 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   /**
    * Invoked on mouse up
    */
-  onMouseUp: function() {
-    var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
-    this.canvas.renderOnAddRemove = false;
+  onMouseUp: function () {
+    var canvas = this.canvas, ctx = canvas.contextTop;
+    var originalRenderOnAddRemove = canvas.renderOnAddRemove;
+    canvas.renderOnAddRemove = false;
 
     var rects = [];
 
@@ -114,16 +115,16 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
 
     var group = new fabric.Group(rects);
     this.shadow && group.set('shadow', new fabric.Shadow(this.shadow));
-    this._addClipPathToResult(group);
-
-    this.canvas.fire('before:path:created', { path: group });
-    this.canvas.add(group);
-    this.canvas.fire('path:created', { path: group });
-
-    this.canvas.clearContext(this.canvas.contextTop);
-    this._resetShadow();
-    this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
-    this.canvas.requestRenderAll();
+    this._addClipPathToResult(group)
+      .then(function () {
+        canvas.fire('before:path:created', { path: group });
+        canvas.add(group);
+        canvas.fire('path:created', { path: group });
+        canvas.clearContext(ctx);
+        this._resetShadow(ctx);
+        canvas.renderOnAddRemove = originalRenderOnAddRemove;
+        canvas.requestRenderAll();
+      }.bind(this));
   },
 
   /**

@@ -229,7 +229,7 @@
      * @param {(string|number)[][]} pathData Path data
      * @return {fabric.Path} Path to add on canvas
      */
-    createPath: function(pathData) {
+    createPath: async function(pathData) {
       var path = new fabric.Path(pathData, {
         fill: null,
         stroke: this.color,
@@ -243,7 +243,7 @@
         this.shadow.affectStroke = true;
         path.shadow = new fabric.Shadow(this.shadow);
       }
-      this._addClipPathToResult(path);
+      await this._addClipPathToResult(path);
       return path;
     },
 
@@ -277,8 +277,8 @@
      * we use the points captured to create an new fabric path object
      * and add it to the fabric canvas.
      */
-    _finalizeAndAddPath: function() {
-      var ctx = this.canvas.contextTop;
+    _finalizeAndAddPath: async function() {
+      var canvas = this.canvas, ctx = canvas.contextTop;
       ctx.closePath();
       if (this.decimate) {
         this._points = this.decimatePoints(this._points, this.decimate);
@@ -289,21 +289,19 @@
         // rendered inconsistently across browsers
         // Firefox 4, for example, renders a dot,
         // whereas Chrome 10 renders nothing
-        this.canvas.requestRenderAll();
+        canvas.requestRenderAll();
         return;
       }
-
-      var path = this.createPath(pathData);
-      this.canvas.clearContext(this.canvas.contextTop);
-      this.canvas.fire('before:path:created', { path: path });
-      this.canvas.add(path);
-      this.canvas.requestRenderAll();
+      var path = await this.createPath(pathData);
+      canvas.clearContext(ctx);
+      canvas.fire('before:path:created', { path: path });
+      canvas.add(path);
+      canvas.requestRenderAll();
       path.setCoords();
-      this._resetShadow();
-
+      this._resetShadow(ctx);
 
       // fire event 'path' created
-      this.canvas.fire('path:created', { path: path });
+      canvas.fire('path:created', { path: path });
     }
   });
 })();

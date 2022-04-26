@@ -105,18 +105,18 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
 
       circles.push(circle);
     }
-    var group = new fabric.Group(circles);
-    group.canvas = this.canvas;
-    this._addClipPathToResult(group);
-
-    this.canvas.fire('before:path:created', { path: group });
-    this.canvas.add(group);
-    this.canvas.fire('path:created', { path: group });
-
-    this.canvas.clearContext(this.canvas.contextTop);
-    this._resetShadow();
-    this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
-    this.canvas.requestRenderAll();
+    var canvas = this.canvas, ctx = canvas.contextTop;
+    var group = new fabric.Group(circles, { canvas: canvas });
+    this._addClipPathToResult(group)
+      .then(function () {
+        canvas.fire('before:path:created', { path: group });
+        canvas.add(group);
+        canvas.fire('path:created', { path: group });
+        canvas.clearContext(ctx);
+        this._resetShadow(ctx);
+        canvas.renderOnAddRemove = originalRenderOnAddRemove;
+        canvas.requestRenderAll();
+      }.bind(this));
   },
 
   /**
