@@ -32,8 +32,8 @@ fabric.ParentResizeObserver = fabric.util.createClass({
     var target = opt && opt.target;
     var object = this.object;
     //  make sure we listen only once
-    object.canvas && object.canvas.off('resize', this.__canvasMonitor);
-    object.group && object.group.off('layout', this.__groupMonitor);
+    target instanceof fabric.Group && target.off('layout', this.__groupMonitor);
+    target instanceof fabric.StaticCanvas && target.off('resize', this.__canvasMonitor);
     if (!watch) {
       return;
     }

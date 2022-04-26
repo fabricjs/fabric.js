@@ -826,8 +826,8 @@
       if (objects.length === 0) {
         return null;
       }
-      var objCenter, sizeVector, min = new fabric.Point(0, 0), max = new fabric.Point(0, 0), a, b;
-      objects.forEach(function (object, i) {
+      var objCenter, sizeVector, min = new fabric.Point(0, 0), max = new fabric.Point(0, 0), a, b, first = true;
+      objects.forEach(function (object) {
         if (object instanceof fabric.Layer) {
           var bbox = object.getObjectsBoundingBox(object._objects.slice(0));
           if (!bbox) {
@@ -856,7 +856,8 @@
         }
         a = objCenter.subtract(sizeVector);
         b = objCenter.add(sizeVector);
-        if (i === 0) {
+        if (first) {
+          first = false;
           min.setXY(Math.min(a.x, b.x), Math.min(a.y, b.y));
           max.setXY(Math.max(a.x, b.x), Math.max(a.y, b.y));
         }
