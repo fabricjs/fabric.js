@@ -40,16 +40,16 @@
 
     iText.selectionStart = 2;
     iText.selectionEnd = 2;
-    iText.moveCursorLeft({ shiftKey: false});
-    assert.equal(selection, 1, 'should fire once on moveCursorLeft');
+    iText.moveCursorBackward({ shiftKey: false});
+    assert.equal(selection, 1, 'should fire once on moveCursorBackward');
     assert.equal(iText.selectionStart, 1, 'should be 1 less than 2');
     assert.equal(iText.selectionEnd, 1, 'should be 1 less than 2');
     selection = 0;
 
     iText.selectionStart = 2;
     iText.selectionEnd = 2;
-    iText.moveCursorRight({ shiftKey: false});
-    assert.equal(selection, 1, 'should fire once on moveCursorRight');
+    iText.moveCursorForward({ shiftKey: false});
+    assert.equal(selection, 1, 'should fire once on moveCursorForward');
     assert.equal(iText.selectionStart, 3, 'should be 1 more than 2');
     assert.equal(iText.selectionEnd, 3, 'should be 1 more than 2');
     selection = 0;
@@ -80,7 +80,7 @@
 
     iText.selectionStart = 0;
     iText.selectionEnd = 0;
-    iText.moveCursorLeft({ shiftKey: false});
+    iText.moveCursorBackward({ shiftKey: false});
     assert.equal(selection, 0, 'should not fire with no change');
     assert.equal(iText.selectionStart, 0, 'should not move');
     assert.equal(iText.selectionEnd, 0, 'should not move');
@@ -92,7 +92,7 @@
 
     iText.selectionStart = 31;
     iText.selectionEnd = 31;
-    iText.moveCursorRight({ shiftKey: false});
+    iText.moveCursorForward({ shiftKey: false});
     assert.equal(selection, 0, 'should not fire with no change');
     assert.equal(iText.selectionStart, 31, 'should not move');
     assert.equal(iText.selectionEnd, 31, 'should not move');
@@ -110,21 +110,30 @@
     assert.equal(iText.selectionEnd, 9, 'should move to upper line end');
     selection = 0;
 
-    iText.selectionStart = 1;
-    iText.selectionEnd = 4;
+    iText.setSelectionRange(1, 4, 'forward');
+    assert.equal(selection, 1, 'should fire after setting selection range');
     iText.moveCursorDown({ shiftKey: false });
-    assert.equal(selection, 1, 'should fire');
+    assert.equal(selection, 2, 'should fire');
     assert.equal(iText.selectionStart, 24, 'should move to down line');
     assert.equal(iText.selectionEnd, 24, 'should move to down line');
     selection = 0;
 
-    iText.selectionStart = 28;
-    iText.selectionEnd = 31;
-    iText.moveCursorLeft({ shiftKey: false });
-    assert.equal(selection, 1, 'should fire');
+    iText.setSelectionRange(28, 31, 'backward');
+    assert.equal(selection, 1, 'should fire after setting selection range');
+    iText.moveCursorBackward({ shiftKey: false });
+    assert.equal(selection, 2, 'should fire');
     assert.equal(iText.selectionStart, 28, 'should move to selection Start');
     assert.equal(iText.selectionEnd, 28, 'should move to selection Start');
     selection = 0;
+
+    iText.setSelectionRange(28, 31, 'forward');
+    assert.equal(selection, 1, 'should fire after setting selection range');
+    iText.moveCursorBackward({ shiftKey: false });
+    assert.equal(selection, 2, 'should fire');
+    assert.equal(iText.selectionStart, 31, 'should move to selection Start');
+    assert.equal(iText.selectionEnd, 31, 'should move to selection Start');
+    selection = 0;
+
     // needed or test hangs
     iText.abortCursorAnimation();
     // TODO verify and dp
@@ -174,16 +183,16 @@
 
     iText.selectionStart = 2;
     iText.selectionEnd = 2;
-    iText.moveCursorLeft({ shiftKey: false});
-    assert.equal(selection, 1, 'should fire once on moveCursorLeft');
+    iText.moveCursorBackward({ shiftKey: false});
+    assert.equal(selection, 1, 'should fire once on moveCursorBackward');
     assert.equal(iText.selectionStart, 1, 'should be 1 less than 2');
     assert.equal(iText.selectionEnd, 1, 'should be 1 less than 2');
     selection = 0;
 
     iText.selectionStart = 2;
     iText.selectionEnd = 2;
-    iText.moveCursorRight({ shiftKey: false});
-    assert.equal(selection, 1, 'should fire once on moveCursorRight');
+    iText.moveCursorForward({ shiftKey: false});
+    assert.equal(selection, 1, 'should fire once on moveCursorForward');
     assert.equal(iText.selectionStart, 3, 'should be 1 more than 2');
     assert.equal(iText.selectionEnd, 3, 'should be 1 more than 2');
     selection = 0;
@@ -212,29 +221,26 @@
     assert.equal(iText.selectionEnd, 0, 'should be back on first line');
     selection = 0;
 
-    iText.selectionStart = 0;
-    iText.selectionEnd = 1;
-    iText._selectionDirection = 'left';
-    iText.moveCursorLeft({ shiftKey: true});
-    assert.equal(selection, 0, 'should not fire with no change');
+    iText.setSelectionRange(0, 1, 'backward');
+    assert.equal(selection, 1, 'should fire after setting selection range');
+    iText.moveCursorBackward({ shiftKey: true});
+    assert.equal(selection, 1, 'should not fire with no change');
     assert.equal(iText.selectionStart, 0, 'should not move');
     assert.equal(iText.selectionEnd, 1, 'should not move');
     iText.moveCursorUp({ shiftKey: true});
-    assert.equal(selection, 0, 'should not fire with no change');
+    assert.equal(selection, 1, 'should not fire with no change');
     assert.equal(iText.selectionStart, 0, 'should not move');
     assert.equal(iText.selectionEnd, 1, 'should not move');
     selection = 0;
 
-
-    iText.selectionStart = 30;
-    iText.selectionEnd = 31;
-    iText._selectionDirection = 'right';
-    iText.moveCursorRight({ shiftKey: true});
-    assert.equal(selection, 0, 'should not fire with no change');
+    iText.setSelectionRange(30, 31, 'forward');
+    assert.equal(selection, 1, 'should fire after setting selection range');
+    iText.moveCursorForward({ shiftKey: true});
+    assert.equal(selection, 1, 'should not fire with no change');
     assert.equal(iText.selectionStart, 30, 'should not move');
     assert.equal(iText.selectionEnd, 31, 'should not move');
     iText.moveCursorDown({ shiftKey: true});
-    assert.equal(selection, 0, 'should not fire with no change');
+    assert.equal(selection, 1, 'should not fire with no change');
     assert.equal(iText.selectionStart, 30, 'should not move');
     assert.equal(iText.selectionEnd, 31, 'should not move');
     selection = 0;

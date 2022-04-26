@@ -58,11 +58,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     27: 'exitEditing',
     33: 'moveCursorUp',
     34: 'moveCursorDown',
-    35: 'moveCursorRight',
-    36: 'moveCursorLeft',
-    37: 'moveCursorLeft',
+    35: 'moveCursorForward',
+    36: 'moveCursorBackward',
+    37: 'moveCursorBackward',
     38: 'moveCursorUp',
-    39: 'moveCursorRight',
+    39: 'moveCursorForward',
     40: 'moveCursorDown',
   },
 
@@ -71,11 +71,11 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     27: 'exitEditing',
     33: 'moveCursorUp',
     34: 'moveCursorDown',
-    35: 'moveCursorLeft',
-    36: 'moveCursorRight',
-    37: 'moveCursorRight',
+    35: 'moveCursorBackward',
+    36: 'moveCursorForward',
+    37: 'moveCursorForward',
     38: 'moveCursorUp',
-    39: 'moveCursorLeft',
+    39: 'moveCursorBackward',
     40: 'moveCursorDown',
   },
 
@@ -456,7 +456,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     // getUpCursorOffset
     // getDownCursorOffset
     var action = 'get' + direction + 'CursorOffset',
-        offset = this[action](e, this._selectionDirection === 'right');
+        offset = this[action](e, this.selectionDirection === 'forward');
     if (e.shiftKey) {
       this.moveCursorWithShift(offset);
     }
@@ -478,7 +478,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @param {Number} offset
    */
   moveCursorWithShift: function(offset) {
-    var newSelection = this._selectionDirection === 'left'
+    var newSelection = this.selectionDirection === 'backward'
       ? this.selectionStart + offset
       : this.selectionEnd + offset;
     this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, newSelection);
@@ -502,111 +502,86 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Moves cursor left
+   * Moves cursor back
    * @param {Event} e Event object
    */
-  moveCursorLeft: function(e) {
+  moveCursorBackward: function (e) {
     if (this.selectionStart === 0 && this.selectionEnd === 0) {
       return;
     }
-    this._moveCursorLeftOrRight('Left', e);
-  },
-
-  /**
-   * @private
-   * @return {Boolean} true if a change happened
-   */
-  _move: function(e, prop, direction) {
-    var newValue;
-    if (e.altKey) {
-      newValue = this['findWordBoundary' + direction](this[prop]);
-    }
-    else if (e.metaKey || e.keyCode === 35 ||  e.keyCode === 36 ) {
-      newValue = this['findLineBoundary' + direction](this[prop]);
+    var changed = false;
+    if (e.shiftKey) {
+      if (this.selectionDirection === 'forward' && this.selectionStart !== this.selectionEnd) {
+        changed = this._move(e, 'selectionEnd', -1);
+      }
+      else if (this.selectionStart !== 0) {
+        //this._selectionDirection = 'left';
+        this.__selectionStartOrigin = this.selectionEnd;
+        changed = this._move(e, 'selectionStart', -1);
+      }
     }
     else {
-      this[prop] += direction === 'Left' ? -1 : 1;
-      return true;
+      changed = true;
+      //this._selectionDirection = 'left';
+      // only move cursor when there is no selection,
+      // otherwise we discard it, and leave cursor on same place
+      if (this.selectionEnd === this.selectionStart) {
+        changed = this.selectionStart !== 0 && this._move(e, 'selectionStart', -1);
+        this.selectionEnd = this.selectionStart;
+      }
+      else if (this.selectionDirection === 'forward') {
+        this.selectionStart = this.selectionEnd;
+      }
+      else {
+        this.selectionEnd = this.selectionStart;
+      }
     }
-    if (typeof newValue !== undefined && this[prop] !== newValue) {
-      this[prop] = newValue;
-      return true;
-    }
+    this._invalidateCursor(changed);
   },
 
   /**
-   * @private
-   */
-  _moveLeft: function(e, prop) {
-    return this._move(e, prop, 'Left');
-  },
-
-  /**
-   * @private
-   */
-  _moveRight: function(e, prop) {
-    return this._move(e, prop, 'Right');
-  },
-
-  /**
-   * Moves cursor left without keeping selection
-   * @param {Event} e
-   */
-  moveCursorLeftWithoutShift: function(e) {
-    var change = true;
-    this._selectionDirection = 'left';
-
-    // only move cursor when there is no selection,
-    // otherwise we discard it, and leave cursor on same place
-    if (this.selectionEnd === this.selectionStart && this.selectionStart !== 0) {
-      change = this._moveLeft(e, 'selectionStart');
-
-    }
-    this.selectionEnd = this.selectionStart;
-    return change;
-  },
-
-  /**
-   * Moves cursor left while keeping selection
-   * @param {Event} e
-   */
-  moveCursorLeftWithShift: function(e) {
-    if (this._selectionDirection === 'right' && this.selectionStart !== this.selectionEnd) {
-      return this._moveLeft(e, 'selectionEnd');
-    }
-    else if (this.selectionStart !== 0){
-      this._selectionDirection = 'left';
-      return this._moveLeft(e, 'selectionStart');
-    }
-  },
-
-  /**
-   * Moves cursor right
+   * Moves cursor forward
    * @param {Event} e Event object
    */
-  moveCursorRight: function(e) {
+  moveCursorForward: function (e) {
     if (this.selectionStart >= this._text.length && this.selectionEnd >= this._text.length) {
       return;
     }
-    this._moveCursorLeftOrRight('Right', e);
+    var changed = false;
+    if (e.shiftKey) {
+      if (this.selectionDirection === 'backward' && this.selectionStart !== this.selectionEnd) {
+        changed = this._move(e, 'selectionStart', 1);
+      }
+      else if (this.selectionEnd !== this._text.length) {
+        //this._selectionDirection = 'right';
+        this.__selectionStartOrigin = this.selectionStart;
+        changed = this._move(e, 'selectionEnd', 1);
+      }
+    }
+    else {
+      changed = true;
+      //this._selectionDirection = 'right';
+      if (this.selectionStart === this.selectionEnd) {
+        changed = this._move(e, 'selectionStart', 1);
+        this.selectionEnd = this.selectionStart;
+      }
+      else if (this.selectionDirection === 'forward') {
+        this.selectionStart = this.selectionEnd;
+      }
+      else {
+        this.selectionEnd = this.selectionStart;
+      }
+    }
+    this._invalidateCursor(changed);
   },
 
   /**
-   * Moves cursor right or Left, fires event
-   * @param {String} direction 'Left', 'Right'
-   * @param {Event} e Event object
+   * @private
+   * @param {boolean} dirty
    */
-  _moveCursorLeftOrRight: function(direction, e) {
-    var actionName = 'moveCursor' + direction + 'With';
+  _invalidateCursor: function (dirty) {
     this._currentCursorOpacity = 1;
-
-    if (e.shiftKey) {
-      actionName += 'Shift';
-    }
-    else {
-      actionName += 'outShift';
-    }
-    if (this[actionName](e)) {
+    if (dirty) {
       this.abortCursorAnimation();
       this.initDelayedCursor();
       this._fireSelectionChanged();
@@ -615,35 +590,36 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   },
 
   /**
-   * Moves cursor right while keeping selection
-   * @param {Event} e
+   * @private
+   * @param {Event} e 
+   * @param {'selectionStart'|'selectionEnd'} prop 
+   * @param {number} direction 
+   * @returns {boolean} true if a change happened
    */
-  moveCursorRightWithShift: function(e) {
-    if (this._selectionDirection === 'left' && this.selectionStart !== this.selectionEnd) {
-      return this._moveRight(e, 'selectionStart');
+  _move: function(e, prop, direction) {
+    var newValue;
+    direction = Math.sign(direction);
+    if (direction === 0) {
+      return false;
     }
-    else if (this.selectionEnd !== this._text.length) {
-      this._selectionDirection = 'right';
-      return this._moveRight(e, 'selectionEnd');
+    if (e.altKey) {
+      newValue = direction > 0 ?
+        this.findWordBoundaryEnd(this[prop]) :
+        this.findWordBoundaryStart(this[prop]);
     }
-  },
-
-  /**
-   * Moves cursor right without keeping selection
-   * @param {Event} e Event object
-   */
-  moveCursorRightWithoutShift: function(e) {
-    var changed = true;
-    this._selectionDirection = 'right';
-
-    if (this.selectionStart === this.selectionEnd) {
-      changed = this._moveRight(e, 'selectionStart');
-      this.selectionEnd = this.selectionStart;
+    else if (e.metaKey || e.keyCode === 35 ||  e.keyCode === 36 ) {
+      newValue = direction > 0 ?
+        this.findLineBoundaryEnd(this[prop]) :
+        this.findLineBoundaryStart(this[prop]);
     }
     else {
-      this.selectionStart = this.selectionEnd;
+      this[prop] = Math.min(Math.max(this[prop] + direction, 0), this.text.length);
+      return true;
     }
-    return changed;
+    if (typeof newValue !== undefined && this[prop] !== newValue) {
+      this[prop] = newValue;
+      return true;
+    }
   },
 
   /**
