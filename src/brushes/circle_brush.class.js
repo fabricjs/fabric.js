@@ -84,7 +84,14 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
   /**
    * Invoked on mouse up
    */
-  onMouseUp: function() {
+  onMouseUp: function () {
+    this._finalizeAndAddPath();
+  },
+
+  /**
+   * @private
+   */
+  _finalizeAndAddPath: async function () {
     var originalRenderOnAddRemove = this.canvas.renderOnAddRemove, i, len;
     this.canvas.renderOnAddRemove = false;
 
@@ -102,21 +109,18 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
           });
 
       this.shadow && (circle.shadow = new fabric.Shadow(this.shadow));
-
       circles.push(circle);
     }
     var canvas = this.canvas, ctx = canvas.contextTop;
     var group = new fabric.Group(circles, { canvas: canvas });
-    this._addClipPathToResult(group)
-      .then(function () {
-        canvas.fire('before:path:created', { path: group });
-        canvas.add(group);
-        canvas.fire('path:created', { path: group });
-        canvas.clearContext(ctx);
-        this._resetShadow(ctx);
-        canvas.renderOnAddRemove = originalRenderOnAddRemove;
-        canvas.requestRenderAll();
-      }.bind(this));
+    await this._addClipPathToResult(group);
+    canvas.fire('before:path:created', { path: group });
+    canvas.add(group);
+    canvas.fire('path:created', { path: group });
+    canvas.clearContext(ctx);
+    this._resetShadow(ctx);
+    canvas.renderOnAddRemove = originalRenderOnAddRemove;
+    canvas.requestRenderAll();
   },
 
   /**

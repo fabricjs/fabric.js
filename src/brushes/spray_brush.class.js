@@ -85,6 +85,10 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    * Invoked on mouse up
    */
   onMouseUp: function () {
+    this._finalizeAndAddPath();
+  },
+
+  _finalizeAndAddPath: async function () {
     var canvas = this.canvas, ctx = canvas.contextTop;
     var originalRenderOnAddRemove = canvas.renderOnAddRemove;
     canvas.renderOnAddRemove = false;
@@ -115,16 +119,14 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
 
     var group = new fabric.Group(rects);
     this.shadow && group.set('shadow', new fabric.Shadow(this.shadow));
-    this._addClipPathToResult(group)
-      .then(function () {
-        canvas.fire('before:path:created', { path: group });
-        canvas.add(group);
-        canvas.fire('path:created', { path: group });
-        canvas.clearContext(ctx);
-        this._resetShadow(ctx);
-        canvas.renderOnAddRemove = originalRenderOnAddRemove;
-        canvas.requestRenderAll();
-      }.bind(this));
+    await this._addClipPathToResult(group);
+    canvas.fire('before:path:created', { path: group });
+    canvas.add(group);
+    canvas.fire('path:created', { path: group });
+    canvas.clearContext(ctx);
+    this._resetShadow(ctx);
+    canvas.renderOnAddRemove = originalRenderOnAddRemove;
+    canvas.requestRenderAll();
   },
 
   /**
