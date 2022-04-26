@@ -115,7 +115,8 @@
           );
           assert.equal(brush._points.length, 4, '2 points have been discarded');
         });
-        QUnit.test('fabric pencil brush multiple points not discarded', function(assert) {
+        QUnit.test('fabric pencil brush multiple points not discarded', function (assert) {
+          assert.expect(4);
           var fireBeforePathCreatedEvent = false;
           var firePathCreatedEvent = false;
           var added = null;
@@ -125,6 +126,12 @@
           canvas.on('path:created', function(opt) {
             firePathCreatedEvent = true;
             added = opt.path;
+            assert.equal(fireBeforePathCreatedEvent, true, 'before:path:created event is fired');
+            assert.equal(firePathCreatedEvent, true, 'path:created event is fired');
+            assert.ok(added instanceof fabric.Path, 'a path is added');
+            assert.ok(added.path.length, 6, 'path has 6 steps');
+
+            canvas.off();
           });
           var brush = new fabric.PencilBrush(canvas);
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
@@ -136,11 +143,6 @@
           brush.onMouseMove(pointer2, { e: {} });
           brush.onMouseMove(pointer3, { e: {} });
           brush.onMouseUp({ e: {} });
-          assert.equal(fireBeforePathCreatedEvent, true, 'before:path:created event is fired');
-          assert.equal(firePathCreatedEvent, true, 'path:created event is fired');
-          assert.ok(added instanceof fabric.Path, 'a path is added');
-          assert.ok(added.path.length, 6, 'path has 6 steps');
-          canvas.off();
         });
       });
     });
