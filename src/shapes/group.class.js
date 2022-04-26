@@ -431,7 +431,7 @@
           object.render(ctx, renderingContext);
           ctx.restore();
         }
-        else if ((!filter || forceRendering) && object.group === this) {
+        else if (((!filter && !this._activeObjects.includes(object)) || forceRendering) && object.group === this) {
           object.render(ctx, renderingContext);
         }
       }
