@@ -96,7 +96,8 @@
       this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(this, true);
       this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
       this._firstLayoutDone = false;
-      this.callSuper('initialize', options);
+      //  setting angle, skewX, skewY must occur after initial layout
+      this.callSuper('initialize', Object.assign({}, options, { angle: 0, skewX: 0, skewY: 0 }));
       this.forEachObject(function (object) {
         this.enterGroup(object, false);
       }, this);
@@ -493,6 +494,12 @@
         //  reject layout requests before initialization layout
         return;
       }
+      var options = isFirstLayout && context.options;
+      var initialTransform = options && {
+        angle: options.angle || 0,
+        skewX: options.skewX || 0,
+        skewY: options.skewY || 0,
+      };
       var center = this.getRelativeCenterPoint();
       var result = this.getLayoutStrategyResult(this.layout, this._objects.concat(), context);
       if (result) {
@@ -509,9 +516,10 @@
         //  clip path as well
         !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
           && this._adjustObjectPosition(this.clipPath, diff);
-        if (!newCenter.eq(center)) {
+        if (!newCenter.eq(center) || initialTransform) {
           //  set position
           this.setPositionByOrigin(newCenter, 'center', 'center');
+          initialTransform && this.set(initialTransform);
           this.setCoords();
         }
       }
@@ -523,6 +531,7 @@
           width: this.width,
           height: this.height,
         };
+        initialTransform && this.set(initialTransform);
       }
       else {
         //  no `result` so we return
@@ -707,24 +716,6 @@
           }),
           rotationCorrection = new fabric.Point(0, 0);
 
-      if (this.angle) {
-        var rad = degreesToRadians(this.angle),
-            sin = Math.abs(fabric.util.sin(rad)),
-            cos = Math.abs(fabric.util.cos(rad));
-        sizeAfter.setXY(
-          sizeAfter.x * cos + sizeAfter.y * sin,
-          sizeAfter.x * sin + sizeAfter.y * cos
-        );
-        bboxSizeAfter.setXY(
-          bboxSizeAfter.x * cos + bboxSizeAfter.y * sin,
-          bboxSizeAfter.x * sin + bboxSizeAfter.y * cos
-        );
-        strokeWidthVector = fabric.util.rotateVector(strokeWidthVector, rad);
-        //  correct center after rotating
-        var strokeCorrection = strokeWidthVector.multiply(origin.scalarAdd(-0.5).scalarDivide(-2));
-        rotationCorrection = sizeAfter.subtract(size).scalarDivide(2).add(strokeCorrection);
-        calculatedCenter.addEquals(rotationCorrection);
-      }
       //  calculate center and correction
       var originT = origin.scalarAdd(0.5);
       var originCorrection = sizeAfter.multiply(originT);
