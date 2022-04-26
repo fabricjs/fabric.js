@@ -133,24 +133,26 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   /**
    * @private
    * @param {CanvasRenderingContext2D} ctx
+   * @param {fabric.Object} clipPath
    */
-  drawClipPathOnCache: function (ctx) {
-    fabric.Object.prototype.drawClipPathOnCache.call(this, ctx);
+  drawClipPathOnCache: function (ctx, clipPath) {
+    fabric.Object.prototype.drawClipPathOnCache.call(this, ctx, clipPath);
   },
 
   /**
    * @private
    * @param {CanvasRenderingContext2D} ctx
+   * @param {fabric.Object} clipPath
    */
-  _drawClipPath: function (ctx) {
-    if (!this.clipPath) {
+  _drawClipPath: function (ctx, clipPath) {
+    if (!clipPath) {
       return;
     }
-    this.clipPath.canvas = this.canvas;
+    clipPath.canvas = this.canvas;
     var v = fabric.util.invertTransform(this.canvas.viewportTransform);
     ctx.save();
     ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-    fabric.Object.prototype._drawClipPath.call(this, ctx, this.clipPath);
+    fabric.Object.prototype._drawClipPath.call(this, ctx, clipPath);
     ctx.restore();
   },
 
@@ -161,20 +163,21 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    */
   _addClipPathToResult: function (result) {
     if (!this.clipPath) {
-      return;
+      return Promise.resolve();
     }
     var t = result.calcTransformMatrix();
     if (!this.clipPath.absolutePositioned) {
       t = fabric.util.multiplyTransformMatrices(this.canvas.viewportTransform, t);
     }
-    this.clipPath.clone(function (clipPath) {
-      var desiredTransform = fabric.util.multiplyTransformMatrices(
-        fabric.util.invertTransform(t),
-        clipPath.calcTransformMatrix()
-      );
-      fabric.util.applyTransformToObject(clipPath, desiredTransform);
-      result.set('clipPath', clipPath);
-    }, ['inverted']);
+    return this.clipPath.clone(['inverted'])
+      .then(function (clipPath) {
+        var desiredTransform = fabric.util.multiplyTransformMatrices(
+          fabric.util.invertTransform(t),
+          clipPath.calcTransformMatrix()
+        );
+        fabric.util.applyTransformToObject(clipPath, desiredTransform);
+        result.set('clipPath', clipPath);
+      });
   },
 
   /**
@@ -194,7 +197,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     var ctx = this.canvas.contextTop;
     this._saveAndTransform(ctx);
     this.render(ctx);
-    this._drawClipPath(ctx);
+    this._drawClipPath(ctx, this.clipPath);
     ctx.restore();
   },
 
