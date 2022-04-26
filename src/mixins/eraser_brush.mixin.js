@@ -58,7 +58,7 @@
           width: size.x,
           height: size.y
         });
-        __drawClipPath.call(this, ctx, this.eraser, renderingContext);
+        __drawClipPath.call(this, ctx, this.eraser);
       }
     },
 
@@ -217,12 +217,12 @@
      */
     layout: 'fixed',
 
-    drawObject: function (ctx, renderingContext) {
+    drawObject: function (ctx) {
       ctx.save();
       ctx.fillStyle = 'black';
       ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
       ctx.restore();
-      this.callSuper('drawObject', ctx, renderingContext);
+      this.callSuper('drawObject', ctx);
     },
 
     /* _TO_SVG_START_ */
