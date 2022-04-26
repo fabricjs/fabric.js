@@ -185,7 +185,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    * @private
    * @param {CanvasRenderingContext2D} ctx
    */
-  _render: function (ctx /* eslint-disable-line no-unused-vars */) {
+  _render: function (ctx) {  /* eslint-disable-line no-unused-vars */
 
   },
 
