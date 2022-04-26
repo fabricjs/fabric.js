@@ -91,20 +91,20 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (!ancestorData) {
       return undefined;
     }
+    if (ancestorData.fork.includes(other)) {
+      return true;
+    }
+    if (ancestorData.otherFork.includes(this)) {
+      return false;
+    }
     var firstCommonAncestor = ancestorData.ancestors[0];
     if (!firstCommonAncestor) {
-      return firstCommonAncestor;
+      return undefined;
     }
     var headOfFork = ancestorData.fork.pop(),
         headOfOtherFork = ancestorData.otherFork.pop(),
         thisIndex = firstCommonAncestor._objects.indexOf(headOfFork),
         otherIndex = firstCommonAncestor._objects.indexOf(headOfOtherFork);
-    if (thisIndex === otherIndex) {
-      // sameIndex means that one of the object contains the other.
-      return ancestorData.fork.length > ancestorData.otherFork.length;
-    }
-    else {
-      return thisIndex > otherIndex;
-    }
+    return thisIndex > otherIndex;
   }
 });

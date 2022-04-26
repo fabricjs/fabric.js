@@ -903,7 +903,7 @@
     }
   }
 
-  QUnit.test.only('findCommonAncestors', function (assert) {
+  QUnit.test('findCommonAncestors', function (assert) {
     function findCommonAncestors(object, other, strict, expected, message) {
       var common = object.findCommonAncestors(other, strict);
       assert.deepEqual(
