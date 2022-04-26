@@ -194,7 +194,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
    * Render all spray chunks
    * @param {CanvasRenderingContext2D} ctx
    */
-  render: function(ctx) {
+  _render: function(ctx) {
     var i, ilen;
     for (i = 0, ilen = this.sprayChunks.length; i < ilen; i++) {
       this._renderChunk(ctx, this.sprayChunks[i]);

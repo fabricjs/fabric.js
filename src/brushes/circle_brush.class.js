@@ -56,7 +56,7 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
    * @private
    * @param {CanvasRenderingContext2D} ctx
    */
-  render: function (ctx) {
+  _render: function (ctx) {
     var i, len, points = this.points;
     for (i = 0, len = points.length; i < len; i++) {
       this.dot(ctx, points[i]);
@@ -74,7 +74,7 @@ fabric.CircleBrush = fabric.util.createClass(fabric.BaseBrush, /** @lends fabric
     if (this.needsFullRender()) {
       this.canvas.clearContext(this.canvas.contextTop);
       this.addPoint(pointer);
-      this._render();
+      this.render();
     }
     else {
       this.drawDot(pointer);

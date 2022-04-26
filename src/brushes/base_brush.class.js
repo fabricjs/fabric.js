@@ -185,7 +185,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    * @private
    * @param {CanvasRenderingContext2D} ctx
    */
-  render: function (ctx /* eslint-disable-line no-unused-vars */) {
+  _render: function (ctx /* eslint-disable-line no-unused-vars */) {
 
   },
 
@@ -193,10 +193,10 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    * Render the full state of the brush
    * @private
    */
-  _render: function () {
+  render: function () {
     var ctx = this.canvas.contextTop;
     this._saveAndTransform(ctx);
-    this.render(ctx);
+    this._render(ctx);
     this._drawClipPath(ctx, this.clipPath);
     ctx.restore();
   },

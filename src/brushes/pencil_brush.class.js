@@ -66,7 +66,7 @@
       // capture coordinates immediately
       // this allows to draw dots (when movement never occurs)
       this._captureDrawingPath(pointer);
-      this._render();
+      this.render();
     },
 
     /**
@@ -86,7 +86,7 @@
           // redraw curve
           // clear top canvas
           this.canvas.clearContext(this.canvas.contextTop);
-          this._render();
+          this.render();
         }
         else {
           var points = this._points, length = points.length, ctx = this.canvas.contextTop;
@@ -171,7 +171,7 @@
      * @private
      * @param {CanvasRenderingContext2D} [ctx]
      */
-    render: function(ctx) {
+    _render: function(ctx) {
       var i, len,
           p1 = this._points[0],
           p2 = this._points[1];

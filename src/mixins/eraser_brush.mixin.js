@@ -309,7 +309,7 @@
      */
     _renderOverlay: function (ctx) {
       __renderOverlay.call(this, ctx);
-      this.isErasing() && this.freeDrawingBrush._render();
+      this.isErasing() && this.freeDrawingBrush.render();
     }
   });
 
@@ -523,7 +523,7 @@
         this.preparePattern();
         this._isErasing = true;
         this.canvas.fire('erasing:start');
-        this._render();
+        this.render();
       },
 
       /**
@@ -532,15 +532,15 @@
        * 2. Render brush with canvas pattern on top context
        *
        */
-      _render: function () {
+      render: function () {
         var ctx;
         //  clip canvas
         ctx = this.canvas.getContext();
-        this.callSuper('_render', ctx);
+        this.callSuper('render', ctx);
         //  render brush and mask it with pattern
         ctx = this.canvas.contextTop;
         this.canvas.clearContext(ctx);
-        this.callSuper('_render', ctx);
+        this.callSuper('render', ctx);
         ctx.save();
         var t = this.canvas.getRetinaScaling(), s = 1 / t;
         ctx.scale(s, s);
