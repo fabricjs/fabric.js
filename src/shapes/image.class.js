@@ -17,6 +17,7 @@
    * Image class
    * @class fabric.Image
    * @extends fabric.Object
+   * @fires loading:aborted
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
    * @see {@link fabric.Image#initialize} for constructor definition
    */
@@ -376,6 +377,19 @@
     },
 
     /**
+     * Aborts pending image loading task
+     * @returns {boolean} true if aborted
+     */
+    abortLoadingTask: function () {
+      if (this.__abortController) {
+        this.__abortController.abort();
+        delete this.__abortController;
+        return true;
+      }
+      return false;
+    },
+
+    /**
      * Sets source of an image
      * @param {String} src Source string (URL)
      * @param {Object} [options] Options object
@@ -385,10 +399,20 @@
      */
     setSrc: function(src, options) {
       var _this = this;
-      return fabric.util.loadImage(src, options).then(function(img) {
+      if (this.abortLoadingTask()) {
+        this.fire('loading:aborted');
+      }
+      var abortController = new AbortController();
+      this.__abortController = abortController;
+      var opts = Object.assign({}, options, { signal: abortController.signal });
+      return fabric.util.loadImage(src, opts).then(function(img) {
         _this.setElement(img, options);
         _this._setWidthHeight();
         return _this;
+      }).finally(function () {
+        if (abortController === _this.__abortController) {
+          delete _this.__abortController;
+        }
       });
     },
 
@@ -690,20 +714,24 @@
    * Creates an instance of fabric.Image from its object representation
    * @static
    * @param {Object} object Object to create an instance from
+   * @param {object} [options] Options object
+   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Image>}
    */
-  fabric.Image.fromObject = function(_object) {
+  fabric.Image.fromObject = function(_object, options) {
     var object = fabric.util.object.clone(_object),
         filters = object.filters,
         resizeFilter = object.resizeFilter;
     // the generic enliving will fail on filters for now
     delete object.resizeFilter;
     delete object.filters;
+    var imageOptions = Object.assign({}, options, { crossOrigin: _object.crossOrigin }),
+        filterOptions = Object.assign({}, options, { namespace: fabric.Image.filters });
     return Promise.all([
-      fabric.util.loadImage(object.src, { crossOrigin: _object.crossOrigin }),
-      filters && fabric.util.enlivenObjects(filters,  'fabric.Image.filters'),
-      resizeFilter && fabric.util.enlivenObjects([resizeFilter],  'fabric.Image.filters'),
-      fabric.util.enlivenObjectEnlivables(object),
+      fabric.util.loadImage(object.src, imageOptions),
+      filters && fabric.util.enlivenObjects(filters, filterOptions),
+      resizeFilter && fabric.util.enlivenObjects([resizeFilter], filterOptions),
+      fabric.util.enlivenObjectEnlivables(object, options),
     ])
       .then(function(imgAndFilters) {
         object.filters = imgAndFilters[1] || [];
@@ -716,7 +744,9 @@
    * Creates an instance of fabric.Image from an URL string
    * @static
    * @param {String} url URL to create an image from
-   * @param {Object} [imgOptions] Options object
+   * @param {object} [imgOptions] Options object
+   * @param {string} [options.crossOrigin] cors value for the image loading, default to anonymous
+   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Image>}
    */
   fabric.Image.fromURL = function(url, imgOptions) {
@@ -741,6 +771,7 @@
    * @static
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
+   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @param {Function} callback Callback to execute when fabric.Image object is created
    * @return {fabric.Image} Instance of fabric.Image
    */

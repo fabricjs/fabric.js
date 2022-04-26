@@ -344,7 +344,7 @@
    * @returns {Promise<fabric.Path>}
    */
   fabric.Path.fromObject = function(object) {
-    return fabric.Object._fromObject(fabric.Path, object, 'path');
+    return fabric.Object._fromObject(fabric.Path, object, { extraParam: 'path' });
   };
 
   /* _FROM_SVG_START_ */

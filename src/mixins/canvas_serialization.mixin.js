@@ -1,11 +1,24 @@
 fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
+
+  /**
+   * Aborts instance's loading task ({@link fabric.Canvas#loadFromJSON} etc.) if exists
+   * @returns {boolean} true if aborted
+   */
+  abortLoadingTask: function () {
+    if (this.__abortController) {
+      this.__abortController.abort();
+      delete this.__abortController;
+      return true;
+    }
+    return false;
+  },
+
   /**
    * Populates canvas with data from the specified JSON.
    * JSON format must conform to the one of {@link fabric.Canvas#toJSON}
    * @param {String|Object} json JSON string or object
    * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @return {Promise<fabric.Canvas>} instance
-   * @chainable
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#deserialization}
    * @see {@link http://jsfiddle.net/fabricjs/fmgXt/|jsFiddle demo}
    * @example <caption>loadFromJSON</caption>
@@ -20,8 +33,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * });
    */
   loadFromJSON: function (json, reviver) {
+    if (this.abortLoadingTask()) {
+      this.fire('loading:aborted', { from: 'json' });
+    }
     if (!json) {
-      return;
+      return Promise.reject(new Error('fabric.js: `json` is undefined'));
     }
 
     // serialize if it wasn't already
@@ -30,25 +46,33 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       : fabric.util.object.clone(json);
 
     var _this = this,
-        renderOnAddRemove = this.renderOnAddRemove;
+        renderOnAddRemove = this.renderOnAddRemove,
+        abortController = new AbortController();
 
+    this.__abortController = abortController;
     this.renderOnAddRemove = false;
 
-    return fabric.util.enlivenObjects(serialized.objects || [], '', reviver)
-      .then(function(enlived) {
+    return Promise.all([
+      fabric.util.enlivenObjects(serialized.objects || [], { reviver: reviver, signal: abortController.signal }),
+      fabric.util.enlivenObjectEnlivables({
+        backgroundImage: serialized.backgroundImage,
+        backgroundColor: serialized.background,
+        overlayImage: serialized.overlayImage,
+        overlayColor: serialized.overlay,
+        clipPath: serialized.clipPath,
+      }, { signal: abortController.signal })
+    ])
+      .then(function (res) {
+        var enlived = res[0], enlivedMap = res[1];
         _this.clear();
-        return fabric.util.enlivenObjectEnlivables({
-          backgroundImage: serialized.backgroundImage,
-          backgroundColor: serialized.background,
-          overlayImage: serialized.overlayImage,
-          overlayColor: serialized.overlay,
-          clipPath: serialized.clipPath,
-        })
-          .then(function(enlivedMap) {
-            _this.__setupCanvas(serialized, enlived, renderOnAddRemove);
-            _this.set(enlivedMap);
-            return _this;
-          });
+        _this.__setupCanvas(serialized, enlived);
+        _this.renderOnAddRemove = renderOnAddRemove;
+        _this.set(enlivedMap);
+        return _this;
+      }).finally(function () {
+        if (abortController === _this.__abortController) {
+          delete _this.__abortController;
+        }
       });
   },
 
@@ -56,16 +80,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @private
    * @param {Object} serialized Object with background and overlay information
    * @param {Array} enlivenedObjects canvas objects
-   * @param {boolean} renderOnAddRemove renderOnAddRemove setting for the canvas
    */
-  __setupCanvas: function(serialized, enlivenedObjects, renderOnAddRemove) {
+  __setupCanvas: function(serialized, enlivenedObjects) {
     var _this = this;
     enlivenedObjects.forEach(function(obj, index) {
       // we splice the array just in case some custom classes restored from JSON
       // will add more object to canvas at canvas init.
       _this.insertAt(obj, index);
     });
-    this.renderOnAddRemove = renderOnAddRemove;
     // remove parts i cannot set as options
     delete serialized.objects;
     delete serialized.backgroundImage;

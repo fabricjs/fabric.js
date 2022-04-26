@@ -1982,23 +1982,33 @@
   fabric.Object.NUM_FRACTION_DIGITS = 2;
 
   /**
-   * Defines which properties should be enlivened from the object passed to {@link fabric.Object._fromObject}
-   * @static
-   * @memberOf fabric.Object
-   * @constant
-   * @type string[]
+   *
+   * @param {Function} klass
+   * @param {object} object
+   * @param {object} [options]
+   * @param {string} [options.extraParam] property to pass as first argument to the constructor
+   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @returns {Promise<fabric.Object>}
    */
-
-  fabric.Object._fromObject = function(klass, object, extraParam) {
+  fabric.Object._fromObject = function(klass, object, options) {
     var serializedObject = clone(object, true);
-    return fabric.util.enlivenObjectEnlivables(serializedObject).then(function(enlivedMap) {
+    return fabric.util.enlivenObjectEnlivables(serializedObject, options).then(function(enlivedMap) {
       var newObject = Object.assign(object, enlivedMap);
-      return extraParam ? new klass(object[extraParam], newObject) : new klass(newObject);
+      return options && options.extraParam ? new klass(object[options.extraParam], newObject) : new klass(newObject);
     });
   };
 
-  fabric.Object.fromObject = function(object) {
-    return fabric.Object._fromObject(fabric.Object, object);
+  /**
+   *
+   * @static
+   * @memberOf fabric.Object
+   * @param {object} object
+   * @param {object} [options]
+   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @returns {Promise<fabric.Object>}
+   */
+  fabric.Object.fromObject = function(object, options) {
+    return fabric.Object._fromObject(fabric.Object, object, options);
   };
 
   /**

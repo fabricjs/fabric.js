@@ -206,6 +206,60 @@
     });
   });
 
+  QUnit.test('abort setSrc', function (assert) {
+    var done = assert.async(), called = 0;
+    assert.expect(10);
+    createImageObject(function (image) {
+      image.on('loading:aborted', function () {
+        called++;
+      });
+      image.setSrc(IMG_SRC, { crossOrigin: 'anonymous' }).catch(function (err) {
+        assert.ok(err instanceof Error);
+        assert.equal(basename(image.getSrc()), basename(IMG_SRC), 'should preserve prev src');
+        assert.ok(image.__abortController instanceof AbortController, 'abort controller of new task should be referenced');
+        assert.equal(image.__abortController.signal.aborted, false, 'should not be aborted');
+      });
+      image.setSrc(IMG_SRC, { crossOrigin: 'anonymous' }).then(function () {
+        assert.equal(image.width, IMG_WIDTH);
+        assert.equal(image.height, IMG_HEIGHT);
+        assert.equal(image.getCrossOrigin(), 'anonymous', 'setSrc will respect crossOrigin');
+        assert.ok(basename(image.getSrc()), basename(IMG_SRC));
+        assert.equal(image.__abortController, undefined, 'abort controller reference should be cleared');
+        assert.equal(called, 1, 'should have fired `loading:aborted` event once');
+        done();
+      });
+    });
+  });
+
+  QUnit.test('imperative abort setSrc', function (assert) {
+    var done = assert.async();
+    assert.expect(14);
+    createImageObject(async function (image) {
+      assert.ok(typeof image.abortLoadingTask === 'function');
+      await image.setSrc('');
+      assert.equal(image.getSrc(), '');
+      image.setSrc(IMG_SRC, { crossOrigin: 'anonymous' }).catch(function (err) {
+        assert.ok(err instanceof Error);
+        assert.equal(image.getSrc(), '', 'should preserve prev src');
+      });
+      assert.ok(image.abortLoadingTask(), 'should return true because loading was aborted');
+      assert.equal(image.__abortController, undefined, 'abort controller reference should be cleared');
+      assert.equal(image.getSrc(), '');
+      await image.setSrc(IMG_SRC);
+      var el = image.getElement();
+      assert.equal(basename(image.getSrc()), basename(IMG_SRC));
+      image.setSrc(IMG_URL_NON_EXISTING).catch(function (err) {
+        assert.ok(err instanceof Error);
+        assert.equal(basename(image.getSrc()), basename(IMG_SRC), 'should preserve prev src');
+        assert.equal(image.getElement(), el, 'should preserve image element');
+      });
+      assert.ok(image.abortLoadingTask(), 'should return true because loading was aborted');
+      assert.equal(image.__abortController, undefined, 'abort controller reference should be cleared');
+      assert.equal(image.getElement(), el);
+      done();
+    });
+  });
+
   QUnit.test('toObject with no element', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
