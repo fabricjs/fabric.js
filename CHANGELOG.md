@@ -78,6 +78,14 @@ Use this [code](https://gist.github.com/ShaMan123/6c5c4ca2cc720a2700848a2deb6add
 - docs(): Clarify viewport transformations doc [`#7401`](https://github.com/fabricjs/fabric.js/pull/7401)
 - docs(): specify default value and docs for enablePointerEvents [`#7386`](https://github.com/fabricjs/fabric.js/pull/7386)
 - feat(fabric.PencilBrush): add an option to draw a straight line while pressing a key [`#7034`](https://github.com/fabricjs/fabric.js/pull/7034)
+- feat(fabric.BaseBrush): added `clipPath` property [#7175](https://github.com/fabricjs/fabric.js/pull/7175).
+- feat(fabric.CircleBrush): added `clipPath` property [#7175](https://github.com/fabricjs/fabric.js/pull/7175).
+- feat(fabric.PencilBrush): added `clipPath` property [#7175](https://github.com/fabricjs/fabric.js/pull/7175).
+- feat(fabric.PatternBrush): added `clipPath` property [#7175](https://github.com/fabricjs/fabric.js/pull/7175).
+- feat(fabric.SprayBrush): added `clipPath` property [#7175](https://github.com/fabricjs/fabric.js/pull/7175).
+- feat(fabric.EraserBrush): added `clipPath` property [#7175](https://github.com/fabricjs/fabric.js/pull/7175).
+- Breaking: renamed `fabric.SprayBrush` `render` method to `renderChunk`.
+- Breaking: renamed `fabric.EraserBrush` `render` method to `renderAll`.
 
 
 ## [4.6.0]
