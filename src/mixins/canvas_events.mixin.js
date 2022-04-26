@@ -383,8 +383,9 @@
     /**
      * @private
      */
-    _onResize: function () {
+    _onResize: function (e) {
       this.calcOffset();
+      this.fire('window:resize', { e: e });
     },
 
     /**

@@ -10,7 +10,7 @@
 
     var tests = [];
 
-    function createGroupForLayoutTests(text, options) {
+    function createObjectsForLayoutTests(text) {
         var circle = new fabric.Circle({
             left: 100,
             top: 50,
@@ -27,11 +27,19 @@
             fill: 'red',
             opacity: 0.3
         })
-        return new fabric.Group([
+        return [
             rect,
             circle,
             itext
-        ], options);
+        ];
+    }
+
+    function createGroupForLayoutTests(text, options) {
+        return new fabric.Group(createObjectsForLayoutTests(text), options);
+    }
+
+    function createLayerForLayoutTests(text, options) {
+        return new fabric.Layer(createObjectsForLayoutTests(text), options);
     }
 
     function fixedLayout(canvas, callback) {
@@ -397,6 +405,66 @@
         width: 250,
         height: 250
     });
+
+    function fitContentNestedLayer(canvas, callback) {
+        var g = createGroupForLayoutTests('fixed layout,\nlayer on top', {
+            layout: 'fixed',
+            backgroundColor: 'blue'
+        });
+        var objects = g.removeAll();
+        var layer = new fabric.Layer(objects, { backgroundColor: 'yellow' });
+        g.add(layer);
+        canvas.add(g);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+
+    tests.push({
+        test: 'layer nested in group',
+        code: fitContentNestedLayer,
+        golden: 'group-layout/nested-layer.png',
+        percentage: 0.06,
+        width: 400,
+        height: 300
+    });
+
+    function LayerLayout(canvas, callback) {
+        var layer = createLayerForLayoutTests('Layer', {
+            backgroundColor: 'blue',
+        });
+        canvas.add(layer);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+
+    tests.push({
+        test: 'layer',
+        code: LayerLayout,
+        golden: 'group-layout/layer.png',
+        percentage: 0.06,
+        width: 400,
+        height: 300
+    });
+
+    function LayerLayoutWithSkew(canvas, callback) {
+        var layer = createLayerForLayoutTests('Layer', {
+            backgroundColor: 'blue',
+            skewX: 45
+        });
+        canvas.add(layer);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+/*
+        tests.push({
+            test: 'layer with skewX',
+            code: LayerLayoutWithSkew,
+            golden: 'group-layout/layer-skewX.png',
+            percentage: 0.06,
+            width: 400,
+            height: 300
+        });
+    */
 
     function createObjectsForOriginTests(originX, originY, options) {
         var rect1 = new fabric.Rect({ left: 150, top: 100, width: 30, height: 10, strokeWidth: 0 }),

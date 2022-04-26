@@ -818,13 +818,21 @@
     },
 
     /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx 
+     * @returns {boolean} true if object needs to fully transform ctx
+     */
+    needsFullTransform: function (ctx) {
+      return (this.group && !this.group._transformDone) ||
+        (this.group && this.canvas && ctx === this.canvas.contextTop);
+    },
+
+    /**
      * Transforms context when rendering an object
      * @param {CanvasRenderingContext2D} ctx Context
      */
     transform: function(ctx) {
-      var needFullTransform = (this.group && !this.group._transformDone) ||
-         (this.group && this.canvas && ctx === this.canvas.contextTop);
-      var m = this.calcTransformMatrix(!needFullTransform);
+      var m = this.calcTransformMatrix(!this.needsFullTransform(ctx));
       ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
     },
 

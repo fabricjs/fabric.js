@@ -102,6 +102,7 @@
       this.callSuper('initialize', Object.assign({}, options, { angle: 0, skewX: 0, skewY: 0 }));
       this.forEachObject(function (object) {
         this.enterGroup(object, false);
+        object.fire('added:initialized', { target: this });
       }, this);
       this._applyLayoutStrategy({
         type: 'initialization',
@@ -235,6 +236,11 @@
       }
       else if (object.group && object.group === this) {
         throw new Error('fabric.Group: duplicate objects are not supported inside group');
+      }
+      else if (object.group) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Group: object is about to enter group and leave another');
+        /* _DEV_MODE_END_ */
       }
       return true;
     },
@@ -494,12 +500,22 @@
      * @private
      * @param {fabric.Object} object
      * @param {fabric.Point} diff
+     * @param {boolean} [setCoords] perf enhancement, instead of iterating over objects again
      */
-    _adjustObjectPosition: function (object, diff) {
-      object.set({
-        left: object.left + diff.x,
-        top: object.top + diff.y,
-      });
+    _adjustObjectPosition: function (object, diff, setCoords) {
+      //  layer doesn't need coords so we don't set them
+      if (object instanceof fabric.Layer) {
+        object.forEachObject(function (obj) {
+          this._adjustObjectPosition(obj, diff, setCoords);
+        }.bind(this));
+      }
+      else {
+        object.set({
+          left: object.left + diff.x,
+          top: object.top + diff.y,
+        });
+        setCoords && object.setCoords();
+      }
     },
 
     /**
@@ -534,21 +550,25 @@
         var newCenter = new fabric.Point(result.centerX, result.centerY);
         var vector = center.subtract(newCenter).add(new fabric.Point(result.correctionX || 0, result.correctionY || 0));
         var diff = transformPoint(vector, invertTransform(this.calcOwnMatrix()), true);
+        var objectsSetCoords = false;
         //  set dimensions
         this.set({ width: result.width, height: result.height });
-        //  adjust objects to account for new center
-        !context.objectsRelativeToGroup && this.forEachObject(function (object) {
-          object.group === this && this._adjustObjectPosition(object, diff);
-        }, this);
-        //  clip path as well
-        !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
-          && this._adjustObjectPosition(this.clipPath, diff);
         if (!newCenter.eq(center) || initialTransform) {
           //  set position
           this.setPositionByOrigin(newCenter, 'center', 'center');
           initialTransform && this.set(initialTransform);
-          this.setCoords();
+          //  perf: avoid iterating over objects twice by setting coords only on instance
+          //  and delegating the task to `_adjustObjectPosition`
+          this.callSuper('setCoords');
+          objectsSetCoords = this.subTargetCheck;
         }
+        //  adjust objects to account for new center
+        !context.objectsRelativeToGroup && this.forEachObject(function (object) {
+          object.group === this && this._adjustObjectPosition(object, diff, objectsSetCoords);
+        }, this);
+        //  clip path as well
+        !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
+          && this._adjustObjectPosition(this.clipPath, diff, objectsSetCoords);
         this._layoutInProgress = false;
       }
       else if (isFirstLayout) {
@@ -574,7 +594,14 @@
         result: result,
         diff: diff
       });
-      //  recursive up
+      this._bubbleLayout(context);
+    },
+
+    /**
+     * bubble layout recursive up
+     * @private
+     */
+    _bubbleLayout: function (context) {
       if (this.group && this.group._applyLayoutStrategy) {
         //  append the path recursion to context
         if (!context.path) {
@@ -585,7 +612,6 @@
         this.group._applyLayoutStrategy(context);
       }
     },
-
 
     /**
      * Override this method to customize layout.
@@ -792,23 +818,36 @@
       if (objects.length === 0) {
         return null;
       }
-      var objCenter, sizeVector, min, max, a, b;
+      var objCenter, sizeVector, min = new fabric.Point(0, 0), max = new fabric.Point(0, 0), a, b;
       objects.forEach(function (object, i) {
-        objCenter = object.getRelativeCenterPoint();
-        sizeVector = object._getTransformedDimensions().scalarDivideEquals(2);
+        if (object instanceof fabric.Layer) {
+          var bbox = object.getObjectsBoundingBox(object._objects.slice(0));
+          if (!bbox) {
+            return;
+          }
+          sizeVector = object._getTransformedDimensions({
+            width: bbox.width,
+            height: bbox.height
+          }).scalarDivideEquals(2);
+          objCenter = new fabric.Point(bbox.centerX, bbox.centerY);
+        }
+        else {
+          sizeVector = object._getTransformedDimensions().scalarDivideEquals(2);
+          objCenter = object.getRelativeCenterPoint();
+        }
         if (object.angle) {
           var rad = degreesToRadians(object.angle),
               sin = Math.abs(fabric.util.sin(rad)),
               cos = Math.abs(fabric.util.cos(rad)),
               rx = sizeVector.x * cos + sizeVector.y * sin,
               ry = sizeVector.x * sin + sizeVector.y * cos;
-          sizeVector = new fabric.Point(rx, ry);
+          sizeVector.setXY(rx, ry);
         }
         a = objCenter.subtract(sizeVector);
         b = objCenter.add(sizeVector);
         if (i === 0) {
-          min = new fabric.Point(Math.min(a.x, b.x), Math.min(a.y, b.y));
-          max = new fabric.Point(Math.max(a.x, b.x), Math.max(a.y, b.y));
+          min.setXY(Math.min(a.x, b.x), Math.min(a.y, b.y));
+          max.setXY(Math.max(a.x, b.x), Math.max(a.y, b.y));
         }
         else {
           min.setXY(Math.min(min.x, a.x, b.x), Math.min(min.y, a.y, b.y));
