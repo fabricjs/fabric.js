@@ -97,7 +97,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * current compositionMode. It will be set to false.
    */
   _mouseDownHandler: function(options) {
-    if (!this.canvas || !this.editable || (options.e.button && options.e.button !== 1)) {
+    if (!this.canvas || !this.editable || this.__isDragging || (options.e.button && options.e.button !== 1)) {
       return;
     }
 
@@ -129,6 +129,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     // we want to avoid that an object that was selected and then becomes unselectable,
     // may trigger editing mode in some way.
     this.selected = this === this.canvas._activeObject;
+    // text dragging logic
+    var newSelection = this.getSelectionStartFromPointer(options.e);
+    this.__isDragging = this.isEditing && newSelection >= this.selectionStart && newSelection <= this.selectionEnd
+      && this.selectionStart < this.selectionEnd;
   },
 
   /**
@@ -150,7 +154,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * standard handler for mouse up, overridable
    * @private
    */
-  mouseUpHandler: function(options) {
+  mouseUpHandler: function (options) {
+    // restore selection state after dragging
+    if (this.__isDragging && !this.__dragStartFired) {
+      // drag didn't occur, so we revert to click behavior
+      this.__isDragging = false;
+      this._mouseDownHandler(options);
+    }
+    this.__isDragging = this.__dragStartFired = false;
+
     this.__isMousedown = false;
     if (!this.editable ||
       (this.group && !this.group.interactive) ||

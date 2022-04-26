@@ -40,8 +40,40 @@
    * @fires dragover
    * @fires dragenter
    * @fires dragleave
-   * @fires drop:before before drop event. same native event. This is added to handle edge cases
+   * @fires drop:before before drop event. Prepare for the drop event (same native event).
    * @fires drop
+   * @fires drop:after after drop event. Run logic on canvas after event has been accepted/declined (same native event).
+   * @example
+   * let a: fabric.Object, b: fabric.Object;
+   * let flag = false;
+   * canvas.add(a, b);
+   * a.on('drop:before', opt => {
+   *  //  we want a to accept the drop even though it's below b in the stack
+   *  flag = this.canDrop(opt.e);
+   * });
+   * b.canDrop = function(e) {
+   *  !flag && this.callSuper('canDrop', e);
+   * }
+   * b.on('dragover', opt => b.set('fill', opt.dropTarget === b ? 'pink' : 'black'));
+   * a.on('drop', opt => {
+   *  opt.e.defaultPrevented  //  drop occured
+   *  opt.didDrop             //  drop occured on canvas
+   *  opt.target              //  drop target
+   *  opt.target !== a && a.set('text', 'I lost');
+   * });
+   * canvas.on('drop:after', opt => {
+   *  //  inform user who won
+   *  if(!opt.e.defaultPrevented) {
+   *    // no winners
+   *  }
+   *  else if(!opt.didDrop) {
+   *    //  my objects didn't win, some other lucky bastard
+   *  }
+   *  else {
+   *    //  we have a winner it's opt.target!!
+   *  }
+   * })
+   * 
    * @fires after:render at the end of the render process, receives the context in the callback
    * @fires before:render at start the render process, receives the context in the callback
    *
@@ -947,19 +979,16 @@
 
       if (boundsWidth === 0 || boundsHeight === 0) {
         // If bounds are not available (i.e. not visible), do not apply scale.
-        cssScale = { width: 1, height: 1 };
+        cssScale = { x: 1, y: 1 };
       }
       else {
         cssScale = {
-          width: upperCanvasEl.width / boundsWidth,
-          height: upperCanvasEl.height / boundsHeight
+          x: upperCanvasEl.width / boundsWidth,
+          y: upperCanvasEl.height / boundsHeight
         };
       }
 
-      return {
-        x: pointer.x * cssScale.width,
-        y: pointer.y * cssScale.height
-      };
+      return pointer.multiply(cssScale);
     },
 
     /**
@@ -984,6 +1013,7 @@
 
       this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
       this._applyCanvasStyle(upperCanvasEl);
+      upperCanvasEl.setAttribute('draggable', 'true');
       this.contextTop = upperCanvasEl.getContext('2d');
     },
 
