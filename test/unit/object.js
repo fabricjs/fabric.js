@@ -398,7 +398,7 @@
 
   QUnit.test('toCanvasElement', function(assert) {
     var cObj = new fabric.Rect({
-      width: 100, height: 100, fill: 'red', strokeWidth: 0
+      width: 100, height: 100, fill: 'red', strokeWidth: 0, canvas: canvas
     });
 
     assert.ok(typeof cObj.toCanvasElement === 'function');
@@ -406,6 +406,7 @@
     var canvasEl = cObj.toCanvasElement();
 
     assert.ok(typeof canvasEl.getContext === 'function', 'the element returned is a canvas');
+    assert.ok(cObj.canvas === canvas, 'canvas ref should remain unchanged');
   });
 
   QUnit.test('toCanvasElement activeSelection', function(assert) {
