@@ -78,6 +78,29 @@
     },
 
     /**
+     * Called once instance is added to a parent and when parent resizes
+     * @private
+     * @param {*} context see {@link fabric.ParentResizeObserver}
+     */
+    _onParentResize: function (context) {
+      if (this.layout === 'fill-parent') {
+        var data = this._parentMonitor.extractDataFromResizeEvent(context);
+        var parent = data.parent;
+        var rx = parent.width / 2;
+        var ry = parent.height / 2;
+        if (rx !== this.rx || ry !== this.ry) {
+          this.set({
+            rx: rx,
+            ry: ry
+          });
+          this.setPositionByOrigin(data.center, 'center', 'center');
+          parent.interactive && this.setCoords();
+          this.fire('resize', context);
+        }
+      }
+    },
+
+    /**
      * Returns horizontal radius of an object (according to how an object is scaled)
      * @return {Number}
      */

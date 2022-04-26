@@ -34,6 +34,7 @@
       top:                      0,
       width:                    0,
       height:                   0,
+      layout:                   '',
       fill:                     'rgb(0,0,0)',
       stroke:                   null,
       strokeWidth:              1,

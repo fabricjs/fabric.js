@@ -105,13 +105,13 @@
   });
 
   QUnit.test('toJSON', function(assert) {
-    var emptyObjectJSON = '{"type":"object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",' +
+    var emptyObjectJSON = '{"type":"object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"layout":"","fill":"rgb(0,0,0)",' +
                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                           '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
                           '"skewX":0,"skewY":0}';
 
-    var augmentedJSON = '{"type":"object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",' +
+    var augmentedJSON = '{"type":"object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"layout":"","fill":"rgb(0,0,0)",' +
                         '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeDashOffset":0,"strokeLineJoin":"bevel","strokeUniform":false,"strokeMiterLimit":5,' +
                         '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,' +
                         '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
@@ -143,6 +143,7 @@
       top:                      0,
       width:                    0,
       height:                   0,
+      layout:                   '',
       fill:                     'rgb(0,0,0)',
       stroke:                   null,
       strokeWidth:              1,
@@ -177,6 +178,7 @@
       top:                      20,
       width:                    30,
       height:                   40,
+      layout:                   '',
       fill:                     'rgb(0,0,0)',
       stroke:                   null,
       strokeWidth:              1,
@@ -1491,6 +1493,91 @@
     assert.equal(object.hasFill(), false, 'without a color, hasFill is false');
     object.fill = 'transparent';
     assert.equal(object.hasFill(), false, 'with a color that is transparent, hasFill is true');
+  });
+  QUnit.test('fill-parent layout - canvas', function (assert) {
+    var object = new fabric.Object({ fill: 'blue', width: 100, height: 100, layout: 'fill-parent' });
+    assert.equal(object.width, 100);
+    assert.equal(object.height, 100);
+    var memo = [];
+    object.on('resize', (opt) => {
+      memo.push(opt);
+    });
+
+    canvas.add(object);
+    assert.equal(memo.length, 1, 'should have fired a resize event on object');
+    assert.deepEqual(memo[0], { type: 'canvas' }, 'should have fired resize');
+    assert.equal(object.width, canvas.width);
+    assert.equal(object.height, canvas.height);
+    assert.deepEqual(object.getCenterPoint(), canvas.getCenterPoint());
+
+    canvas.setDimensions({ width: canvas.width - 1, height: canvas.height });
+    assert.equal(memo.length, 2, 'should have fired a resize event on object');
+    assert.deepEqual(memo[1], { type: 'canvas_resize', width: 299, height: 150 }, 'should have fired resize');
+    assert.equal(object.width, canvas.width);
+    assert.equal(object.height, canvas.height);
+    assert.deepEqual(object.getCenterPoint(), canvas.getCenterPoint());
+
+    canvas.setDimensions({ width: canvas.width, height: canvas.height });
+    assert.equal(memo.length, 2, 'should not have fired a resize event on object - size remains unchanged');
+
+    object.layout = '';
+    canvas.setDimensions({ width: canvas.width, height: canvas.height - 1 });
+    assert.equal(memo.length, 2, 'should not have fired a resize event on object - disabled layout');
+    
+    object.layout = 'fill-parent';
+    canvas.remove(object);
+    canvas.setDimensions({ width: canvas.width + 1, height: canvas.height + 1 });
+    assert.equal(memo.length, 2, 'should not have fired a resize event on object after removal');
+  });
+  QUnit.test('fill-parent layout - group', function (assert) {
+    var object = new fabric.Object({ fill: 'blue', width: 100, height: 100, layout: 'fill-parent' });
+    assert.equal(object.width, 100);
+    assert.equal(object.height, 100);
+    var memo = [];
+    object.on('resize', (opt) => {
+      memo.push(opt);
+    });
+
+    var group = new fabric.Group([object], { layout: 'fixed', width: 200, height: 100 });
+    assert.equal(memo.length, 1, 'should have fired a resize event on object');
+    assert.deepEqual(memo[0], { type: 'group' }, 'should have fired resize');
+    assert.equal(object.width, 200);
+    assert.equal(object.height, 100);
+    assert.deepEqual(object.getRelativeCenterPoint(), new fabric.Point(0, 0));
+
+    group.triggerLayout({ width: 199, height: 100 });
+    assert.equal(memo.length, 2, 'should have fired a resize event on object');
+    assert.deepEqual(memo[1].type, 'group_layout', 'should have fired resize');
+    assert.equal(object.width, 199);
+    assert.equal(object.height, 100);
+    assert.deepEqual(object.getRelativeCenterPoint(), new fabric.Point(0, 0));
+
+    group.triggerLayout({ width: 199, height: 100 });
+    assert.equal(memo.length, 2, 'should not have fired a resize event on object - size remains unchanged');
+    assert.equal(object.width, 199);
+    assert.equal(object.height, 100);
+    assert.deepEqual(object.getRelativeCenterPoint(), new fabric.Point(0, 0));
+
+    object.layout = '';
+    group.triggerLayout({ width: 199, height: 99 });
+    assert.equal(memo.length, 2, 'should not have fired a resize event on object - disabled layout');
+    assert.equal(object.width, 199);
+    assert.equal(object.height, 100);
+    assert.deepEqual(object.getRelativeCenterPoint(), new fabric.Point(0, 0));
+
+    object.layout = 'fill-parent';
+    group.remove(object);
+    group.triggerLayout({ width: 200, height: 100 });
+    assert.equal(memo.length, 2, 'should not have fired a resize event on object after removal');
+    assert.equal(object.width, 199);
+    assert.equal(object.height, 100);
+
+    object.width = 200;
+    group.add(object);
+    assert.equal(memo.length, 2, 'should not have fired a resize event on object - size remains unchanged');
+    assert.equal(object.width, 200);
+    assert.equal(object.height, 100);
+    assert.deepEqual(object.getRelativeCenterPoint(), new fabric.Point(0, 0));
   });
   QUnit.test('dispose', function (assert) {
     var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });

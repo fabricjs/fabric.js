@@ -225,6 +225,14 @@
     },
 
     /**
+     * @private
+     * @override consider using {@link fabric.Layer} for `fill-parent` layout
+     */
+    _onParentResize: function () {
+      //  noop
+    },
+
+    /**
      * Checks if object can enter group and logs relevant warnings
      * @private
      * @param {fabric.Object} object
@@ -830,6 +838,9 @@
             height: bbox.height
           }).scalarDivideEquals(2);
           objCenter = new fabric.Point(bbox.centerX, bbox.centerY);
+        }
+        else if (object.layout === 'fill-parent') {
+          return;
         }
         else {
           sizeVector = object._getTransformedDimensions().scalarDivideEquals(2);

@@ -26,7 +26,7 @@
    *
    * @fires selected
    * @fires deselected
-   * @fires modified
+   * @fires resize
    * @fires modified
    * @fires moved
    * @fires scaled
@@ -104,6 +104,13 @@
      * @default
      */
     height:                   0,
+
+    /**
+     * Layout directive
+     * @type {'fill-parent' | ''}
+     * @default
+     */
+    layout:                   '',
 
     /**
      * Object scale factor (horizontal)
@@ -589,7 +596,7 @@
      * @type Array
      */
     stateProperties: (
-      'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
+      'top left width height layout scaleX scaleY flipX flipY originX originY transformMatrix ' +
       'stroke strokeWidth strokeDashArray strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit ' +
       'angle opacity fill globalCompositeOperation shadow visible backgroundColor ' +
       'skewX skewY fillRule paintFirst clipPath strokeUniform'
@@ -649,10 +656,20 @@
      * Constructor
      * @param {Object} [options] Options object
      */
-    initialize: function(options) {
+    initialize: function (options) {
+      this._parentMonitor = new fabric.ParentResizeObserver(this, this._onParentResize.bind(this));
       if (options) {
         this.setOptions(options);
       }
+    },
+
+    /**
+     * Called once instance is added to a parent and when parent resizes
+     * @private
+     * @param {*} context see {@link fabric.ParentResizeObserver}
+     */
+    _onParentResize: function (context) {
+      this._parentMonitor.fillParent(context);
     },
 
     /**
@@ -819,7 +836,7 @@
 
     /**
      * @private
-     * @param {CanvasRenderingContext2D} ctx 
+     * @param {CanvasRenderingContext2D} ctx
      * @returns {boolean} true if object needs to fully transform ctx
      */
     needsFullTransform: function (ctx) {
@@ -853,6 +870,7 @@
             top:                      toFixed(this.top, NUM_FRACTION_DIGITS),
             width:                    toFixed(this.width, NUM_FRACTION_DIGITS),
             height:                   toFixed(this.height, NUM_FRACTION_DIGITS),
+            layout:                   this.layout,
             fill:                     (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
             stroke:                   (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
             strokeWidth:              toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
@@ -1944,6 +1962,8 @@
       if (fabric.runningAnimations) {
         fabric.runningAnimations.cancelByTarget(this);
       }
+      this._parentMonitor && this._parentMonitor.dispose();
+      delete this._parentMonitor;
     }
   });
 

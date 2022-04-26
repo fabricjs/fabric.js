@@ -111,6 +111,15 @@
     },
 
     /**
+     * Called once instance is added to a parent and when parent resizes
+     * @private
+     * @param {*} context see {@link fabric.ParentResizeObserver}
+     */
+    _onParentResize: function (context) {
+      this._parentMonitor.fillParentByScaling(context);
+    },
+
+    /**
      * @private
      * @return {Number} leftToOriginX Distance from left edge of canvas to originX of Line.
      */

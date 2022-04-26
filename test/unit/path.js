@@ -9,6 +9,7 @@
     top:                      100,
     width:                    200,
     height:                   200,
+    layout:                   '',
     fill:                     'red',
     stroke:                   'blue',
     strokeWidth:              1,
