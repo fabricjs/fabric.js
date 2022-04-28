@@ -97,7 +97,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (ancestorData.otherFork.includes(this)) {
       return false;
     }
-    var firstCommonAncestor = ancestorData.ancestors[0];
+    var firstCommonAncestor = ancestorData.common[0];
     if (!firstCommonAncestor) {
       return undefined;
     }
@@ -105,6 +105,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         headOfOtherFork = ancestorData.otherFork.pop(),
         thisIndex = firstCommonAncestor._objects.indexOf(headOfFork),
         otherIndex = firstCommonAncestor._objects.indexOf(headOfOtherFork);
-    return thisIndex > otherIndex;
+    return thisIndex > -1 && thisIndex > otherIndex;
   }
 });

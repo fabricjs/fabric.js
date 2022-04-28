@@ -40,19 +40,23 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   /**
    * Returns an object that represent the ancestry situation.
-   * ancestors are the common ancestors of this and other.
-   * fork are the ancestors that are of this only,
-   * otherFork are the ancestors that are of other only.
+   * 
+   * @typedef {object} AncestryComparison
+   * @property {Ancestors} common ancestors of `this` and `other` (may include `this` | `other`)
+   * @property {Ancestors} fork ancestors that are of `this` only
+   * @property {Ancestors} otherFork ancestors that are of `other` only
+   * 
    * @param {fabric.Object} other
    * @param {boolean} [strict] finds only ancestors that are objects (without canvas)
-   * @returns {{ fork: fabric.Object[], otherFork: fabric.Object[], ancestors: fabric.Object[] } | undefined} ancestors may include the passed objects if one is an ancestor of the other resulting in index of -1
+   * @returns {AncestryComparison | undefined}
+   * 
    */
   findCommonAncestors: function (other, strict) {
     if (this === other) {
       return {
-        fork: [this],
-        otherFork: [other],
-        ancestors: this.getAncestors(strict)
+        fork: [],
+        otherFork: [],
+        common: [this].concat(this.getAncestors(strict))
       };
     }
     else if (!other) {
@@ -62,28 +66,37 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     }
     var ancestors = this.getAncestors(strict);
     var otherAncestors = other.getAncestors(strict);
+    //  if `this` has no ancestors and `this` is top ancestor of `other` we must handle the following case
+    if (ancestors.length === 0 && otherAncestors.length > 0 && this === otherAncestors[otherAncestors.length - 1]) {
+      return {
+        fork: [],
+        otherFork: [other].concat(otherAncestors.slice(0, otherAncestors.length - 1)),
+        common: [this]
+      };
+    }
+    //  compare ancestors
     for (var i = 0, ancestor; i < ancestors.length; i++) {
       ancestor = ancestors[i];
       if (ancestor === other) {
         return {
-          fork: [this].concat(ancestors.slice(0, i + 1)),
-          otherFork: [other],
-          ancestors: ancestors.slice(i + 1)
+          fork: [this].concat(ancestors.slice(0, i)),
+          otherFork: [],
+          common: ancestors.slice(i)
         };
       }
       for (var j = 0; j < otherAncestors.length; j++) {
         if (this === otherAncestors[j]) {
           return {
-            fork: [this],
-            otherFork: [other].concat(otherAncestors.slice(0, j + 1)),
-            ancestors: ancestors
+            fork: [],
+            otherFork: [other].concat(otherAncestors.slice(0, j)),
+            common: [this].concat(ancestors)
           };
         }
         if (ancestor === otherAncestors[j]) {
           return {
             fork: [this].concat(ancestors.slice(0, i)),
             otherFork: [other].concat(otherAncestors.slice(0, j)),
-            ancestors: ancestors.slice(i)
+            common: ancestors.slice(i)
           };
         }
       }
@@ -92,7 +105,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     return {
       fork: [this].concat(ancestors),
       otherFork: [other].concat(otherAncestors),
-      ancestors: []
+      common: []
     };
   },
 
