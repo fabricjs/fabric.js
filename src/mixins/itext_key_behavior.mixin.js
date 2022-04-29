@@ -124,6 +124,30 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     KeyA: 'selectAll'
   },
 
+  /**
+   * 
+   * @param {KeyboardEvent} e 
+   * @param {EventKeyMap} keyMap 
+   * @returns 
+   */
+  getActionFromKeyboardEvent: function (e, keyMap) {
+    var func;
+    if (e.key in keyMap) {
+      func = keyMap[e.key];
+    }
+    else if (e.code in keyMap) {
+      func = keyMap[e.code];
+    }
+    else if (e.keyCode in keyMap) {
+      warnKeyCodeDeprecated();
+      func = keyMap[e.keyCode];
+    }
+    if (typeof func === 'string' && typeof this[func] === 'function') {
+      return this[func];
+    }
+    return func;
+  },
+
   onClick: function() {
     // No need to trigger click event here, focus is enough to have the keyboard appear on Android
     this.hiddenTextarea && this.hiddenTextarea.focus();
@@ -145,49 +169,25 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (!this.isEditing) {
       return;
     }
-    var keyMap = this.direction === 'rtl' ? this.keysMapRtl : this.keysMap;
-    var func;
-    if (e.key in keyMap) {
-      func = keyMap[e.key];
-    }
-    else if (e.code in keyMap) {
-      func = keyMap[e.code];
-    }
-    else if (e.keyCode in keyMap) {
-      warnKeyCodeDeprecated();
-      func = keyMap[e.keyCode];
-    }
-    else if (e.ctrlKey || e.metaKey) {
-      if (e.key in this.ctrlKeysMapDown) {
-        func = this.ctrlKeysMapDown[e.key];
-      }
-      else if (e.code in this.ctrlKeysMapDown) {
-        func = this.ctrlKeysMapDown[e.code];
-      }
-      else if (e.keyCode in this.ctrlKeysMapDown) {
-        warnKeyCodeDeprecated();
-        func = this.ctrlKeysMapDown[e.keyCode];
-      }
-    }
-    if (typeof func === 'string' && typeof this[func] === 'function') {
-      func = this[func];
-    }
+    var keyMap = e.ctrlKey || e.metaKey ?
+      this.ctrlKeysMapDown :
+      this.direction === 'rtl' ?
+        this.keysMapRtl :
+        this.keysMap;
+    var func = this.getActionFromKeyboardEvent(e, keyMap);
     if (typeof func === 'function') {
       func.call(this, e);
-    }
-    else {
-      return;
-    }
-    e.stopImmediatePropagation();
-    e.preventDefault();
-    if (isNavigationKey(e.code)) {
-      // if i press a navigation key just update selection
-      this.inCompositionMode = false;
-      this.clearContextTop();
-      this.renderCursorOrSelection();
-    }
-    else {
-      this.canvas && this.canvas.requestRenderAll();
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      if (isNavigationKey(e.code)) {
+        // if i press a navigation key just update selection
+        this.inCompositionMode = false;
+        this.clearContextTop();
+        this.renderCursorOrSelection();
+      }
+      else {
+        this.canvas && this.canvas.requestRenderAll();
+      }
     }
   },
 
@@ -202,31 +202,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this._copyDone = false;
       return;
     }
-    var func;
-    if (e.ctrlKey || e.metaKey) {
-      if (e.key in this.ctrlKeysMapUp) {
-        func = this.ctrlKeysMapUp[e.key];
-      }
-      else if (e.code in this.ctrlKeysMapUp) {
-        func = this.ctrlKeysMapUp[e.code];
-      }
-      else if (e.keyCode in this.ctrlKeysMapUp) {
-        warnKeyCodeDeprecated();
-        func = this.ctrlKeysMapUp[e.keyCode];
-      }
-    }
-    if (typeof func === 'string' && typeof this[func] === 'function') {
-      func = this[func];
-    }
+    var func = this.getActionFromKeyboardEvent(e, this.ctrlKeysMapUp);
     if (typeof func === 'function') {
       func.call(this, e);
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      this.canvas && this.canvas.requestRenderAll();
     }
-    else {
-      return;
-    }
-    e.stopImmediatePropagation();
-    e.preventDefault();
-    this.canvas && this.canvas.requestRenderAll();
   },
 
   /**
