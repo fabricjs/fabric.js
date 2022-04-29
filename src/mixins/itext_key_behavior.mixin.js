@@ -1,3 +1,22 @@
+var NAVIGATION_KEYS = [
+  'PageUp',
+  'PageDown',
+  'End',
+  'Home',
+  'ArrowLeft',
+  'ArrowUp',
+  'ArrowRight',
+  'ArrowDown',
+];
+
+/**
+ * 
+ * @param {string} key 
+ */
+function isNavigationKey(key) {
+  return NAVIGATION_KEYS.includes(key);
+}
+
 fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
 
   /**
@@ -52,16 +71,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @type {EventKeyMap}
    */
   keysMap: {
-    9:  'exitEditing',
-    27: 'exitEditing',
-    33: 'moveCursorUp',
-    34: 'moveCursorDown',
-    35: 'moveCursorRight',
-    36: 'moveCursorLeft',
-    37: 'moveCursorLeft',
-    38: 'moveCursorUp',
-    39: 'moveCursorRight',
-    40: 'moveCursorDown',
+    Tab:  'exitEditing',
+    Escape: 'exitEditing',
+    PageUp: 'moveCursorUp',
+    PageDown: 'moveCursorDown',
+    End: 'moveCursorRight',
+    Home: 'moveCursorLeft',
+    ArrowLeft: 'moveCursorLeft',
+    ArrowUp: 'moveCursorUp',
+    ArrowRight: 'moveCursorRight',
+    ArrowDown: 'moveCursorDown',
   },
 
   /**
@@ -69,16 +88,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @type {EventKeyMap}
    */
   keysMapRtl: {
-    9:  'exitEditing',
-    27: 'exitEditing',
-    33: 'moveCursorUp',
-    34: 'moveCursorDown',
-    35: 'moveCursorLeft',
-    36: 'moveCursorRight',
-    37: 'moveCursorRight',
-    38: 'moveCursorUp',
-    39: 'moveCursorLeft',
-    40: 'moveCursorDown',
+    Tab:  'exitEditing',
+    Escape: 'exitEditing',
+    PageUp: 'moveCursorUp',
+    PageDown: 'moveCursorDown',
+    End: 'moveCursorLeft',
+    Home: 'moveCursorRight',
+    ArrowLeft: 'moveCursorRight',
+    ArrowUp: 'moveCursorUp',
+    ArrowRight: 'moveCursorLeft',
+    ArrowDown: 'moveCursorDown',
   },
 
   /**
@@ -144,8 +163,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
     e.stopImmediatePropagation();
     e.preventDefault();
-    if (e.keyCode >= 33 && e.keyCode <= 40) {
-      // if i press an arrow key just update selection
+    if (isNavigationKey(e.key)) {
+      // if i press a navigation key just update selection
       this.inCompositionMode = false;
       this.clearContextTop();
       this.renderCursorOrSelection();
@@ -367,7 +386,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         cursorLocation = this.get2DCursorLocation(selectionProp),
         lineIndex = cursorLocation.lineIndex;
     // if on last line, down cursor goes to end of line
-    if (lineIndex === this._textLines.length - 1 || e.metaKey || e.keyCode === 34) {
+    if (lineIndex === this._textLines.length - 1 || e.metaKey || e.key === 'PageDown') {
       // move to the end of a text
       return this._text.length - selectionProp;
     }
@@ -403,7 +422,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var selectionProp = this._getSelectionForOffset(e, isRight),
         cursorLocation = this.get2DCursorLocation(selectionProp),
         lineIndex = cursorLocation.lineIndex;
-    if (lineIndex === 0 || e.metaKey || e.keyCode === 33) {
+    if (lineIndex === 0 || e.metaKey || e.key === 'PageUp') {
       // if on first line, up cursor goes to start of line
       return -selectionProp;
     }
@@ -548,7 +567,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (e.altKey) {
       newValue = this['findWordBoundary' + direction](this[prop]);
     }
-    else if (e.metaKey || e.keyCode === 35 ||  e.keyCode === 36 ) {
+    else if (e.metaKey || e.key === 'End' ||  e.key === 'Home') {
       newValue = this['findLineBoundary' + direction](this[prop]);
     }
     else {
