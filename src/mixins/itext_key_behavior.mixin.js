@@ -19,7 +19,7 @@ function isNavigationKey(key) {
 
 function warnKeyCodeDeprecated() {
   /* _DEV_MODE_START_ */
-  console.warn('fabric.IText: `keyCode` is deprecated, use `key` instead.');
+  console.warn('fabric.IText: `KeyboardEvent#keyCode` is deprecated, use `key` or `code` instead.');
   /* _DEV_MODE_END_ */
 }
 
