@@ -128,7 +128,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * 
    * @param {KeyboardEvent} e 
    * @param {EventKeyMap} keyMap 
-   * @returns 
+   * @returns {EventFunction | undefined}
    */
   getActionFromKeyboardEvent: function (e, keyMap) {
     var func;
