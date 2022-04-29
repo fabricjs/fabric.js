@@ -71,6 +71,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @typedef {string | ((e: KeyboardEvent) => any)} EventFunction pass a function or the name of a bound function
    * @typedef {{ [eventKey: number | string]: EventFunction }} EventKeyMap 
    * Prefer using [KeyboardEvent#key]{@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key} 
+   * or [KeyboardEvent#code]{@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code} 
    * instead of **deprecated** [KeyboardEvent#keyCode]{@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode} as `eventKey`
    *
    * For functionalities on keyDown
@@ -111,8 +112,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @type {EventKeyMap}
    */
   ctrlKeysMapUp: {
-    67: 'copy',
-    88: 'cut'
+    keyC: 'copy',
+    keyX: 'cut'
   },
 
   /**
@@ -120,7 +121,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @type {EventKeyMap}
    */
   ctrlKeysMapDown: {
-    65: 'selectAll'
+    KeyA: 'selectAll'
   },
 
   onClick: function() {
@@ -149,12 +150,18 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (e.key in keyMap) {
       func = keyMap[e.key];
     }
+    else if (e.code in keyMap) {
+      func = keyMap[e.code];
+    }
     else if (e.keyCode in keyMap) {
       warnKeyCodeDeprecated();
       func = keyMap[e.keyCode];
     }
     else if ((e.key in this.ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
       func = this.ctrlKeysMapDown[e.key];
+    }
+    else if ((e.code in this.ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
+      func = this.ctrlKeysMapDown[e.code];
     }
     else if ((e.keyCode in this.ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
       warnKeyCodeDeprecated();
@@ -196,6 +203,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var func;
     if ((e.key in this.ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
       func = this.ctrlKeysMapUp[e.key];
+    }
+    else if ((e.code in this.ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
+      func = this.ctrlKeysMapUp[e.code];
     }
     else if ((e.keyCode in this.ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
       warnKeyCodeDeprecated();
