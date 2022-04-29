@@ -17,6 +17,12 @@ function isNavigationKey(key) {
   return NAVIGATION_KEYS.includes(key);
 }
 
+function warnKeyCodeDeprecated() {
+  /* _DEV_MODE_START_ */
+  console.warn('fabric.IText: `keyCode` is deprecated, use `key` instead.');
+  /* _DEV_MODE_END_ */
+}
+
 fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
 
   /**
@@ -65,7 +71,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * @typedef {string | ((e: KeyboardEvent) => any)} EventFunction pass a function or the name of a bound function
    * @typedef {{ [eventKey: number | string]: EventFunction }} EventKeyMap 
    * Prefer using [KeyboardEvent#key]{@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key} 
-   * instead of [KeyboardEvent#keyCode]{@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode} as `eventKey`
+   * instead of **deprecated** [KeyboardEvent#keyCode]{@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode} as `eventKey`
    *
    * For functionalities on keyDown
    * @type {EventKeyMap}
@@ -144,12 +150,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       func = keyMap[e.key];
     }
     else if (e.keyCode in keyMap) {
+      warnKeyCodeDeprecated();
       func = keyMap[e.keyCode];
     }
     else if ((e.key in this.ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
       func = this.ctrlKeysMapDown[e.key];
     }
     else if ((e.keyCode in this.ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
+      warnKeyCodeDeprecated();
       func = this.ctrlKeysMapDown[e.keyCode];
     }
     if (typeof func === 'string' && typeof this[func] === 'function') {
@@ -190,6 +198,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       func = this.ctrlKeysMapUp[e.key];
     }
     else if ((e.keyCode in this.ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
+      warnKeyCodeDeprecated();
       func = this.ctrlKeysMapUp[e.keyCode];
     }
     if (typeof func === 'string' && typeof this[func] === 'function') {
