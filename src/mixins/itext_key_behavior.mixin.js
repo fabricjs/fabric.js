@@ -178,7 +178,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     }
     e.stopImmediatePropagation();
     e.preventDefault();
-    if (isNavigationKey(e.key)) {
+    if (isNavigationKey(e.code)) {
       // if i press a navigation key just update selection
       this.inCompositionMode = false;
       this.clearContextTop();
