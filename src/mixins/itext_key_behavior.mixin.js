@@ -157,15 +157,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       warnKeyCodeDeprecated();
       func = keyMap[e.keyCode];
     }
-    else if ((e.key in this.ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
-      func = this.ctrlKeysMapDown[e.key];
-    }
-    else if ((e.code in this.ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
-      func = this.ctrlKeysMapDown[e.code];
-    }
-    else if ((e.keyCode in this.ctrlKeysMapDown) && (e.ctrlKey || e.metaKey)) {
-      warnKeyCodeDeprecated();
-      func = this.ctrlKeysMapDown[e.keyCode];
+    else if (e.ctrlKey || e.metaKey) {
+      if (e.key in this.ctrlKeysMapDown) {
+        func = this.ctrlKeysMapDown[e.key];
+      }
+      else if (e.code in this.ctrlKeysMapDown) {
+        func = this.ctrlKeysMapDown[e.code];
+      }
+      else if (e.keyCode in this.ctrlKeysMapDown) {
+        warnKeyCodeDeprecated();
+        func = this.ctrlKeysMapDown[e.keyCode];
+      }
     }
     if (typeof func === 'string' && typeof this[func] === 'function') {
       func = this[func];
@@ -201,15 +203,17 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       return;
     }
     var func;
-    if ((e.key in this.ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
-      func = this.ctrlKeysMapUp[e.key];
-    }
-    else if ((e.code in this.ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
-      func = this.ctrlKeysMapUp[e.code];
-    }
-    else if ((e.keyCode in this.ctrlKeysMapUp) && (e.ctrlKey || e.metaKey)) {
-      warnKeyCodeDeprecated();
-      func = this.ctrlKeysMapUp[e.keyCode];
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key in this.ctrlKeysMapUp) {
+        func = this.ctrlKeysMapUp[e.key];
+      }
+      else if (e.code in this.ctrlKeysMapUp) {
+        func = this.ctrlKeysMapUp[e.code];
+      }
+      else if (e.keyCode in this.ctrlKeysMapUp) {
+        warnKeyCodeDeprecated();
+        func = this.ctrlKeysMapUp[e.keyCode];
+      }
     }
     if (typeof func === 'string' && typeof this[func] === 'function') {
       func = this[func];
