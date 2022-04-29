@@ -748,8 +748,8 @@
       rect3Selected = true;
     });
     var currentObjects = canvas.getActiveObjects();
-    activeSelection.removeWithUpdate(rect1);
-    activeSelection.addWithUpdate(rect3);
+    activeSelection.remove(rect1);
+    activeSelection.add(rect3);
     canvas._fireSelectionEvents(currentObjects, {});
     assert.ok(rect3Selected, 'rect 3 selected');
     assert.ok(rect1Deselected, 'rect 1 deselected');
@@ -838,26 +838,31 @@
         group = new fabric.Group([rect, rect2]);
 
     canvas.add(group);
+
     target = canvas.findTarget({
       clientX: 5, clientY: 5
     }, true);
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], undefined, 'no subtarget should return');
+
     target = canvas.findTarget({
       clientX: 30, clientY: 30
     });
     assert.equal(target, group, 'Should return the group');
     group.subTargetCheck = true;
+    group.setCoords();
     target = canvas.findTarget({
       clientX: 5, clientY: 5
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], rect, 'should return the rect');
+
     target = canvas.findTarget({
       clientX: 15, clientY: 15
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], undefined, 'no subtarget should return');
+
     target = canvas.findTarget({
       clientX: 32, clientY: 32
     });
@@ -883,7 +888,7 @@
       [rect3, rect4],
       { scaleX: 0.5, scaleY: 0.5, top: 100, left: 0 });
     group3.subTargetCheck = true;
-
+    group3.setCoords();
     var rect1 = new fabric.Rect({
       width: 100,
       height: 100,
@@ -942,7 +947,6 @@
     assert.equal(target, g, 'Should return the group 106');
     assert.equal(canvas.targets[0], rect2, 'should find the target rect2 106');
     canvas.targets = [];
-
   });
 
   QUnit.test('findTarget with subTargetCheck on activeObject', function(assert) {
@@ -950,9 +954,10 @@
         rect2 = makeRect({ left: 30, top:  30}), target,
         group = new fabric.Group([rect, rect2]);
 
+
+    group.subTargetCheck = true;
     canvas.add(group);
     canvas.setActiveObject(group);
-    group.subTargetCheck = true;
     target = canvas.findTarget({
       clientX: 9, clientY: 9
     });
@@ -981,9 +986,9 @@
         rect2 = makeRect({ left: 30, top:  30}), target,
         group = new fabric.Group([rect, rect2]);
     canvas.preserveObjectStacking = true;
+    group.subTargetCheck = true;
     canvas.add(group);
     canvas.setActiveObject(group);
-    group.subTargetCheck = true;
     target = canvas.findTarget({
       clientX: 9, clientY: 9
     });
@@ -1119,7 +1124,7 @@
     canvas.add(rect1);
     canvas.add(rect2);
     canvas.add(rect3);
-    var group = new fabric.ActiveSelection([rect1, rect2]);
+    var group = new fabric.ActiveSelection([rect1, rect2], { subTargetCheck: true });
     canvas.setActiveObject(group);
     target = canvas.findTarget({
       clientX: 5, clientY: 5
@@ -1301,7 +1306,7 @@
     assert.equal(center.left, upperCanvasEl.width / 2);
     assert.equal(center.top, upperCanvasEl.height / 2);
   });
-  
+
   QUnit.test('getCenterPoint', function(assert) {
     assert.ok(typeof canvas.getCenterPoint === 'function');
     var center = canvas.getCenterPoint();
@@ -2130,7 +2135,6 @@
   });
 
   QUnit.test('dispose + set dimensions', function (assert) {
-    var done = assert.async();
     //made local vars to do not dispose the external canvas
     var el = fabric.document.createElement('canvas'),
       parentEl = fabric.document.createElement('div');
@@ -2150,24 +2154,18 @@
 
     var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
 
-    //  prevent a race condition
-    //  setDimensions requests rendering while disposing which throws an error
-    canvas.on('after:render', () => {
-      assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
-      assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
-
-      canvas.dispose();
-      assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
-      assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
-      assert.equal(el.width, 500, 'restored width');
-      assert.equal(el.height, 500, 'restored height');
-
-      fabric.devicePixelRatio = originalDevicePixelRatio;
-      done();
-    });
-
     canvas.setDimensions({ width: 500, height: 500 });
-    
+    assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+    assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
+
+    canvas.dispose();
+    assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
+    assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
+    assert.equal(el.width, 500, 'restored width');
+    assert.equal(el.height, 500, 'restored height');
+
+    fabric.devicePixelRatio = originalDevicePixelRatio;
+
   });
 
   // QUnit.test('dispose', function(assert) {
@@ -2593,7 +2591,7 @@
 
     assert.ok(typeof InheritedCanvasClass === 'function');
   });
-  
+
   QUnit.test('canvas getTopContext', function(assert) {
     assert.ok(typeof canvas.getTopContext === 'function');
     assert.equal(canvas.getTopContext(), canvas.contextTop, 'it jsut returns contextTop');

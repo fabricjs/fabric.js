@@ -899,10 +899,9 @@
      * @param {Object} object
      */
     _removeDefaultValues: function(object) {
-      var prototype = fabric.util.getKlass(object.type).prototype,
-          stateProperties = prototype.stateProperties;
-      stateProperties.forEach(function(prop) {
-        if (prop === 'left' || prop === 'top') {
+      var prototype = fabric.util.getKlass(object.type).prototype;
+      Object.keys(object).forEach(function(prop) {
+        if (prop === 'left' || prop === 'top' || prop === 'type') {
           return;
         }
         if (object[prop] === prototype[prop]) {
