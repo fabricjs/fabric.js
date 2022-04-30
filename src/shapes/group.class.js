@@ -141,8 +141,8 @@
      * @param {...fabric.Object} objects
      */
     add: function () {
-      var possibleObjects = Array.from(arguments).filter(function(object) {
-        return this.canEnterGroup(object);
+      var _this = this, possibleObjects = Array.from(arguments).filter(function(object) {
+        return _this.canEnterGroup(object);
       });
       fabric.Collection.add.call(this, possibleObjects, this._onObjectAdded);
       this._onAfterObjectsChange('added', possibleObjects);
