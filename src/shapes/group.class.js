@@ -225,6 +225,50 @@
     },
 
     /**
+     * Checks if object can enter group and logs relevant warnings
+     * @private
+     * @param {fabric.Object} object
+     * @returns
+     */
+    canEnter: function (object) {
+      if (object === this) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Group: trying to add group to itself, this call has no effect');
+        /* _DEV_MODE_END_ */
+        return false;
+      }
+      else if (object.group && object.group === this) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
+        /* _DEV_MODE_END_ */
+        return false;
+      }
+      else if (object.group) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Group: object is about to enter group and leave another');
+        /* _DEV_MODE_END_ */
+      }
+      return true;
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
+     * @returns {boolean} true if object entered group
+     */
+    enterGroup: function (object, removeParentTransform) {
+      if (!this.canEnter(object)) {
+        return false;
+      }
+      if (object.group) {
+        object.group.remove(object);
+      }
+      this._enterGroup(object, removeParentTransform);
+      return true;
+    },
+
+    /**
      * @private
      * @override consider using {@link fabric.Layer} for `fill-parent` layout
      */
@@ -996,6 +1040,19 @@
     },
 
     /* _TO_SVG_START_ */
+    /**
+     * @private
+     */
+    _createSVGBgRect: function (reviver) {
+      if (!this.backgroundColor) {
+        return '';
+      }
+      var fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
+      var commons = fillStroke.indexOf('COMMON_PARTS');
+      fillStroke[commons] = 'for="group" ';
+      return fillStroke.join('');
+    },
+
     /**
      * Returns svg representation of an instance
      * @param {Function} [reviver] Method for further parsing of svg representation.
