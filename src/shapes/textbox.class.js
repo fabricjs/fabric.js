@@ -85,8 +85,10 @@
      * @return {fabric.Textbox} thisArg
      */
     initialize: function (text, options) {
-      this.callSuper('initialize', text, options);
-      (!options || !options.controls) && (this.controls = new fabric.TextboxControls(this));
+      options || (options = {});
+      this.callSuper('initialize', text, Object.assign(options, {
+        controls: options.controls || new fabric.TextboxControls()
+      }));
     },
 
     /**

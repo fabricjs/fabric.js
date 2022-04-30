@@ -6,17 +6,19 @@
       scalingEqually = controlsUtils.scalingEqually,
       scalingYOrSkewingX = controlsUtils.scalingYOrSkewingX,
       scalingXOrSkewingY = controlsUtils.scalingXOrSkewingY,
-      scaleOrSkewActionName = controlsUtils.scaleOrSkewActionName;
+      scaleOrSkewActionName = controlsUtils.scaleOrSkewActionName,
+      rotationWithSnapping = controlsUtils.rotationWithSnapping,
+      rotationStyleHandler = controlsUtils.rotationStyleHandler,
+      changeWidth = controlsUtils.changeWidth;
 
   class ObjectControls {
-    constructor(object) {
+    constructor() { 
       this.ml = new fabric.Control({
         x: -0.5,
         y: 0,
         cursorStyleHandler: scaleSkewStyleHandler,
         actionHandler: scalingXOrSkewingY,
-        getActionName: scaleOrSkewActionName,
-        object: object
+        getActionName: scaleOrSkewActionName
       });
 
       this.mr = new fabric.Control({
@@ -24,8 +26,7 @@
         y: 0,
         cursorStyleHandler: scaleSkewStyleHandler,
         actionHandler: scalingXOrSkewingY,
-        getActionName: scaleOrSkewActionName,
-        object: object
+        getActionName: scaleOrSkewActionName
       });
 
       this.mb = new fabric.Control({
@@ -33,8 +34,7 @@
         y: 0.5,
         cursorStyleHandler: scaleSkewStyleHandler,
         actionHandler: scalingYOrSkewingX,
-        getActionName: scaleOrSkewActionName,
-        object: object
+        getActionName: scaleOrSkewActionName
       });
 
       this.mt = new fabric.Control({
@@ -42,51 +42,51 @@
         y: -0.5,
         cursorStyleHandler: scaleSkewStyleHandler,
         actionHandler: scalingYOrSkewingX,
-        getActionName: scaleOrSkewActionName,
-        object: object
+        getActionName: scaleOrSkewActionName
       });
 
       this.tl = new fabric.Control({
         x: -0.5,
         y: -0.5,
         cursorStyleHandler: scaleStyleHandler,
-        actionHandler: scalingEqually,
-        object: object
+        actionHandler: scalingEqually
       });
 
       this.tr = new fabric.Control({
         x: 0.5,
         y: -0.5,
         cursorStyleHandler: scaleStyleHandler,
-        actionHandler: scalingEqually,
-        object: object
+        actionHandler: scalingEqually
       });
 
       this.bl = new fabric.Control({
         x: -0.5,
         y: 0.5,
         cursorStyleHandler: scaleStyleHandler,
-        actionHandler: scalingEqually,
-        object: object
+        actionHandler: scalingEqually
       });
 
       this.br = new fabric.Control({
         x: 0.5,
         y: 0.5,
         cursorStyleHandler: scaleStyleHandler,
-        actionHandler: scalingEqually,
-        object: object
+        actionHandler: scalingEqually
       });
 
       this.mtr = new fabric.Control({
         x: 0,
         y: -0.5,
-        actionHandler: controlsUtils.rotationWithSnapping,
-        cursorStyleHandler: controlsUtils.rotationStyleHandler,
+        actionHandler: rotationWithSnapping,
+        cursorStyleHandler: rotationStyleHandler,
         offsetY: -40,
         withConnection: true,
-        actionName: 'rotate',
-        object: object
+        actionName: 'rotate'
+      });
+    }
+
+    attach(object) {
+      this.forEachControl(function (control) {
+        control.object = object;
       });
     }
 
@@ -103,25 +103,23 @@
   }
   
   class TextboxControls extends ObjectControls {
-    constructor(object) {
-      super(object);
+    constructor() {
+      super();
       
       this.mr = new fabric.Control({
         x: 0.5,
         y: 0,
-        actionHandler: controlsUtils.changeWidth,
+        actionHandler: changeWidth,
         cursorStyleHandler: scaleSkewStyleHandler,
-        actionName: 'resizing',
-        object: object
+        actionName: 'resizing'
       })
 
       this.ml = new fabric.Control({
         x: -0.5,
         y: 0,
-        actionHandler: controlsUtils.changeWidth,
+        actionHandler: changeWidth,
         cursorStyleHandler: scaleSkewStyleHandler,
-        actionName: 'resizing',
-        object: object
+        actionName: 'resizing'
       })
     }
   }

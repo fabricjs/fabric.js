@@ -650,10 +650,10 @@
      * @param {Object} [options] Options object
      */
     initialize: function (options) {
-      this.controls = new fabric.ObjectControls(this);
-      if (options) {
-        this.setOptions(options);
-      }
+      options || (options = {});
+      this.setOptions(Object.assign(options, {
+        controls: options.controls || new fabric.ObjectControls()
+      }));
     },
 
     /**
@@ -1002,6 +1002,9 @@
       }
       else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
         value = new fabric.Shadow(value);
+      }
+      else if (key === 'controls') {
+        value.attach(this);
       }
       else if (key === 'dirty' && this.group) {
         this.group.set('dirty', value);
