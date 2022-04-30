@@ -10,18 +10,6 @@
 
   class ObjectControls {
     constructor(object) {
-      this.controls = [
-        'ml',
-        'mr',
-        'mb',
-        'mt',
-        'tl',
-        'tr',
-        'bl',
-        'br',
-        'mtr'
-      ];
-
       this.ml = new fabric.Control({
         x: -0.5,
         y: 0,
@@ -108,9 +96,9 @@
      * @param {(control: fabric.Control, key: string) => any} callback function to iterate over the controls
      */
     forEachControl(callback) {
-      this.controls.forEach(function (key) {
+      for (var key in this) {
         callback(this[key], key);
-      }.bind(this));
+      }
     }
   }
   
