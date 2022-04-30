@@ -184,18 +184,23 @@
       assert.equal(iText.isEditing, false, 'iText should not enter editing');
       iText.exitEditing();
     });
-    QUnit.test('_mouseUpHandler on a text in a group does enter editing', function (assert) {
+    QUnit.test('_mouseUpHandler on a text in a group', function (assert) {
       var iText = new fabric.IText('test');
       iText.initDelayedCursor = function () { };
       iText.renderCursorOrSelection = function () { };
       assert.equal(iText.isEditing, false, 'iText not editing');
-      var group = new fabric.Group([iText], { subTargetCheck: true });
+      var group = new fabric.Group([iText], { subTargetCheck: true, interactive: true });
       canvas.add(group);
       iText.selected = true;
       iText.__lastSelected = true;
       canvas.__onMouseUp({ clientX: 1, clientY: 1 });
       assert.equal(iText.isEditing, true, 'iText should enter editing');
       iText.exitEditing();
+      group.interactive = false;
+      iText.selected = true;
+      iText.__lastSelected = true;
+      canvas.__onMouseUp({ clientX: 1, clientY: 1 });
+      assert.equal(iText.isEditing, false, 'iText should not enter editing');
     });
     QUnit.test('_mouseUpHandler on a corner of selected text DOES NOT enter edit', function(assert) {
       var iText = new fabric.IText('test');
