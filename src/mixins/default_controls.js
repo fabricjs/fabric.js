@@ -84,6 +84,10 @@
       });
     }
 
+    /**
+     * **MUST** be called for controls to function properly, see {@link fabric.Object#initialize}
+     * @param {fabric.Object} object 
+     */
     attach(object) {
       this.forEachControl(function (control) {
         control.object = object;
