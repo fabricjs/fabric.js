@@ -36,13 +36,14 @@
     assert.ok(fabric.Object);
 
     var cObj = new fabric.Object({ });
-    var cObj2 = new fabric.Object({ });
-
+    var cObj2 = new fabric.Object({});
+    assert.ok(cObj.controls instanceof fabric.ObjectControls, 'controls should exist');
+    assert.ok(cObj.controls !== cObj2.controls, 'controls should not be shared');
     cObj.setControlVisible('tl', false);
     assert.equal(cObj.isControlVisible('tl'), false, 'setting to false worked for cObj');
     assert.equal(cObj2.isControlVisible('tl'), true, 'setting to false did not work for cObj2');
     cObj.controls.tl.setVisibility(false);
-    assert.equal(cObj2.isControlVisible('tl'), false, 'setting directly on controls works for every object');
+    assert.equal(cObj2.isControlVisible('tl'), true, 'controls should not be shared');
     cObj.setControlVisible('tl', true);
     assert.equal(cObj.isControlVisible('tl'), true, 'object setting takes precedence');
     // restore original visibility
