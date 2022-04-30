@@ -396,7 +396,6 @@
     var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
     var mouseUpCalled = false;
     var mouseDownCalled = false;
-    rect.controls = new fabric.ObjectControls();
     rect.controls.br.mouseUpHandler = function() {
       mouseUpCalled = true;
     };
@@ -420,7 +419,6 @@
     var e3 = { clientX: 100, clientY: 100, which: 1 };
     var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
     var mouseUpCalled = false;
-    rect.controls = new fabric.ObjectControls();
     rect.controls.br.mouseUpHandler = function() {
       mouseUpCalled = true;
     };
@@ -433,7 +431,7 @@
     assert.equal(mouseUpCalled, true, 'mouse up handler for control has been called anyway');
   });
 
-  QUnit.test('A transform than ends on a new control, calls both mouseup handler', function(assert) {
+  QUnit.test('A transform that ends on a new control, calls both mouseup handler', function(assert) {
     var e = { clientX: 3, clientY: 3, which: 1 };
     var e1 = { clientX: 6, clientY: 6, which: 1 };
     var e2 = { clientX: 9, clientY: 9, which: 1 };
@@ -441,8 +439,6 @@
     var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
     var mouseUpCalled1 = false;
     var mouseUpCalled2 = false;
-
-    rect.controls = new fabric.ObjectControls();
     rect.controls.br.mouseUpHandler = function() {
       mouseUpCalled1 = true;
     };
