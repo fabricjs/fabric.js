@@ -441,7 +441,7 @@
         }
         objsToRender.push.apply(objsToRender, activeGroupObjects);
       }
-      //  in case a single object is selected render it's entire above the other objects
+      //  in case a single object is selected render it's entire parent above the other objects
       else if (!this.preserveObjectStacking && activeObjects.length === 1) {
         var target = activeObjects[0], ancestors = target.getAncestors(true);
         var topAncestor = ancestors.length === 0 ? target : ancestors.pop();
@@ -892,7 +892,7 @@
      */
     searchPossibleTargets: function (objects, pointer) {
       var target = this._searchPossibleTargets(objects, pointer);
-      return target;
+      return target && target.interactive && this.targets[0] ? this.targets[0] : target;
     },
 
     /**
