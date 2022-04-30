@@ -141,8 +141,11 @@
      * @param {...fabric.Object} objects
      */
     add: function () {
-      fabric.Collection.add.call(this, arguments, this._onObjectAdded);
-      this._onAfterObjectsChange('added', Array.from(arguments));
+      var possibleObjects = Array.from(arguments).filter(function(object) {
+        return this.canEnterGroup(object);
+      });
+      fabric.Collection.add.call(this, possibleObjects, this._onObjectAdded);
+      this._onAfterObjectsChange('added', possibleObjects);
     },
 
     /**
@@ -226,16 +229,16 @@
      * @param {fabric.Object} object
      * @returns
      */
-    canEnter: function (object) {
+    canEnterGroup: function (object) {
       if (object === this || this.isDescendantOf(object)) {
         /* _DEV_MODE_START_ */
-        console.warn('fabric.Group: trying to add group to itself, this call has no effect');
+        console.error('fabric.Group: trying to add group to itself, this call has no effect');
         /* _DEV_MODE_END_ */
         return false;
       }
       else if (object.group && object.group === this) {
         /* _DEV_MODE_START_ */
-        console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
+        console.error('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
         /* _DEV_MODE_END_ */
         return false;
       }
@@ -249,9 +252,6 @@
      * @returns {boolean} true if object entered group
      */
     enterGroup: function (object, removeParentTransform) {
-      if (!this.canEnter(object)) {
-        return false;
-      }
       if (object.group) {
         object.group.remove(object);
       }
