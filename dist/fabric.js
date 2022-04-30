@@ -15411,9 +15411,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     initialize: function (options) {
       this._parentMonitor = new fabric.ParentResizeObserver(this, this._onParentResize.bind(this));
-      if (options) {
-        this.setOptions(options);
-      }
+      options = Object.assign(options || {});
+      this.controls = options.controls || new fabric.ObjectControls();
+      this.controls.attach(this);
+      delete options.controls;
+      this.setOptions(options);
     },
 
     /**
