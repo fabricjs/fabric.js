@@ -17828,38 +17828,74 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
   },
 
   /**
-   *
+   * Returns an object that represent the ancestry situation.
+   * 
+   * @typedef {object} AncestryComparison
+   * @property {Ancestors} common ancestors of `this` and `other` (may include `this` | `other`)
+   * @property {Ancestors} fork ancestors that are of `this` only
+   * @property {Ancestors} otherFork ancestors that are of `other` only
+   * 
    * @param {fabric.Object} other
-   * @param {boolean} [strict] finds only ancestors that are objects excluding canvas
-   * @returns {{ index: number, otherIndex: number, ancestors: Ancestors } | undefined} ancestors may include the passed objects if one is an ancestor of the other resulting in index of -1
+   * @param {boolean} [strict] finds only ancestors that are objects (without canvas)
+   * @returns {AncestryComparison | undefined}
+   * 
    */
   findCommonAncestors: function (other, strict) {
     if (this === other) {
       return {
-        index: 0,
-        otherIndex: 0,
-        ancestors: this.getAncestors(strict)
+        fork: [],
+        otherFork: [],
+        common: [this].concat(this.getAncestors(strict))
       };
     }
     else if (!other) {
+      // meh, warn and inform, and not my issue.
+      // the argument is NOT optional, we can't end up here.
       return undefined;
     }
     var ancestors = this.getAncestors(strict);
-    ancestors.unshift(this);
     var otherAncestors = other.getAncestors(strict);
-    otherAncestors.unshift(other);
+    //  if `this` has no ancestors and `this` is top ancestor of `other` we must handle the following case
+    if (ancestors.length === 0 && otherAncestors.length > 0 && this === otherAncestors[otherAncestors.length - 1]) {
+      return {
+        fork: [],
+        otherFork: [other].concat(otherAncestors.slice(0, otherAncestors.length - 1)),
+        common: [this]
+      };
+    }
+    //  compare ancestors
     for (var i = 0, ancestor; i < ancestors.length; i++) {
       ancestor = ancestors[i];
+      if (ancestor === other) {
+        return {
+          fork: [this].concat(ancestors.slice(0, i)),
+          otherFork: [],
+          common: ancestors.slice(i)
+        };
+      }
       for (var j = 0; j < otherAncestors.length; j++) {
+        if (this === otherAncestors[j]) {
+          return {
+            fork: [],
+            otherFork: [other].concat(otherAncestors.slice(0, j)),
+            common: [this].concat(ancestors)
+          };
+        }
         if (ancestor === otherAncestors[j]) {
           return {
-            index: i - 1,
-            otherIndex: j - 1,
-            ancestors: ancestors.slice(i)
+            fork: [this].concat(ancestors.slice(0, i)),
+            otherFork: [other].concat(otherAncestors.slice(0, j)),
+            common: ancestors.slice(i)
           };
         }
       }
     }
+    // nothing shared
+    return {
+      fork: [this].concat(ancestors),
+      otherFork: [other].concat(otherAncestors),
+      common: []
+    };
   },
 
   /**
@@ -17869,7 +17905,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @returns {boolean}
    */
   hasCommonAncestors: function (other, strict) {
-    return !!this.findCommonAncestors(other, strict);
+    var commonAncestors = this.findCommonAncestors(other, strict);
+    return commonAncestors && !!commonAncestors.ancestors.length;
   }
 });
 
@@ -17943,38 +17980,25 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     if (this === other) {
       return undefined;
     }
-    var ancestors = this.getAncestors().reverse().concat(this);
-    var otherAncestors = other.getAncestors().reverse().concat(other);
-    var i, j, found = false;
-    //  find the common ancestor
-    for (i = 0; i < ancestors.length; i++) {
-      for (j = 0; j < otherAncestors.length; j++) {
-        if (ancestors[i] === otherAncestors[j]) {
-          found = true;
-          break;
-        }
-      }
-      if (found) {
-        break;
-      }
-    }
-    if (!found) {
+    var ancestorData = this.findCommonAncestors(other);
+    if (!ancestorData) {
       return undefined;
     }
-    //  compare trees from the common ancestor down
-    var tree = ancestors.slice(i),
-        otherTree = otherAncestors.slice(j),
-        a, b, parent;
-    for (i = 1; i < Math.min(tree.length, otherTree.length); i++) {
-      a = tree[i];
-      b = otherTree[i];
-      if (a !== b) {
-        parent = tree[i - 1];
-        return parent._objects.indexOf(a) > parent._objects.indexOf(b);
-      }
+    if (ancestorData.fork.includes(other)) {
+      return true;
     }
-    //  happens if a is ancestor of b or vice versa
-    return tree.length > otherTree.length;
+    if (ancestorData.otherFork.includes(this)) {
+      return false;
+    }
+    var firstCommonAncestor = ancestorData.common[0];
+    if (!firstCommonAncestor) {
+      return undefined;
+    }
+    var headOfFork = ancestorData.fork.pop(),
+        headOfOtherFork = ancestorData.otherFork.pop(),
+        thisIndex = firstCommonAncestor._objects.indexOf(headOfFork),
+        otherIndex = firstCommonAncestor._objects.indexOf(headOfOtherFork);
+    return thisIndex > -1 && thisIndex > otherIndex;
   }
 });
 
