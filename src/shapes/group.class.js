@@ -870,6 +870,19 @@
 
     /* _TO_SVG_START_ */
     /**
+     * @private
+     */
+    _createSVGBgRect: function (reviver) {
+      if (!this.backgroundColor) {
+        return '';
+      }
+      var fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
+      var commons = fillStroke.indexOf('COMMON_PARTS');
+      fillStroke[commons] = 'for="group" ';
+      return fillStroke.join('');
+    },
+
+    /**
      * Returns svg representation of an instance
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
