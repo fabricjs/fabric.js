@@ -61,10 +61,111 @@
     matrixCache: null,
 
     /**
-     * custom controls interface
-     * controls are added by default_controls.js
+     * @returns {number} x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
      */
-    controls: { },
+    getX: function () {
+      return this.getXY().x;
+    },
+
+    /**
+     * @param {number} value x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
+     */
+    setX: function (value) {
+      this.setXY(this.getXY().setX(value));
+    },
+
+    /**
+     * @returns {number} x position according to object's {@link fabric.Object#originX} property in parent's coordinate plane\
+     * if parent is canvas then this property is identical to {@link fabric.Object#getX}
+     */
+    getRelativeX: function () {
+      return this.left;
+    },
+
+    /**
+     * @param {number} value x position according to object's {@link fabric.Object#originX} property in parent's coordinate plane\
+     * if parent is canvas then this method is identical to {@link fabric.Object#setX}
+     */
+    setRelativeX: function (value) {
+      this.left = value;
+    },
+
+    /**
+     * @returns {number} y position according to object's {@link fabric.Object#originY} property in canvas coordinate plane
+     */
+    getY: function () {
+      return this.getXY().y;
+    },
+
+    /**
+     * @param {number} value y position according to object's {@link fabric.Object#originY} property in canvas coordinate plane
+     */
+    setY: function (value) {
+      this.setXY(this.getXY().setY(value));
+    },
+
+    /**
+     * @returns {number} y position according to object's {@link fabric.Object#originY} property in parent's coordinate plane\
+     * if parent is canvas then this property is identical to {@link fabric.Object#getY}
+     */
+    getRelativeY: function () {
+      return this.top;
+    },
+
+    /**
+     * @param {number} value y position according to object's {@link fabric.Object#originY} property in parent's coordinate plane\
+     * if parent is canvas then this property is identical to {@link fabric.Object#setY}
+     */
+    setRelativeY: function (value) {
+      this.top = value;
+    },
+
+    /**
+     * @returns {number} x position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in canvas coordinate plane
+     */
+    getXY: function () {
+      var relativePosition = this.getRelativeXY();
+      return this.group ?
+        fabric.util.transformPoint(relativePosition, this.group.calcTransformMatrix()) :
+        relativePosition;
+    },
+
+    /**
+     * Set an object position to a particular point, the point is intended in absolute ( canvas ) coordinate.
+     * You can specify {@link fabric.Object#originX} and {@link fabric.Object#originY} values,
+     * that otherwise are the object's current values.
+     * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
+     * object.setXY(new fabric.Point(5, 5), 'left', 'bottom').
+     * @param {fabric.Point} point position in canvas coordinate plane
+     * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
+     * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
+     */
+    setXY: function (point, originX, originY) {
+      if (this.group) {
+        point = fabric.util.transformPoint(
+          point,
+          fabric.util.invertTransform(this.group.calcTransformMatrix())
+        );
+      }
+      this.setRelativeXY(point, originX, originY);
+    },
+
+    /**
+     * @returns {number} x position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
+     */
+    getRelativeXY: function () {
+      return new fabric.Point(this.left, this.top);
+    },
+
+    /**
+     * As {@link fabric.Object#setXY}, but in current parent's coordinate plane ( the current group if any or the canvas)
+     * @param {fabric.Point} point position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
+     * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
+     * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
+     */
+    setRelativeXY: function (point, originX, originY) {
+      this.setPositionByOrigin(point, originX || this.originX, originY || this.originY);
+    },
 
     /**
      * @returns {number} x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
@@ -581,8 +682,8 @@
           transformOptions = this.group ? fabric.util.qrDecompose(this.calcTransformMatrix()) : undefined,
           dim = this._calculateCurrentDimensions(transformOptions),
           coords = {};
-      this.forEachControl(function(control, key, fabricObject) {
-        coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
+      this.forEachControl(function(control, key) {
+        coords[key] = control.positionHandler(dim, finalMatrix);
       });
 
       // debug code
