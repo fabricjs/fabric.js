@@ -343,13 +343,13 @@
       var fabricObject = this.object;
       styleOverride = styleOverride || {};
       var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-        ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
-        transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
-          styleOverride.transparentCorners : fabricObject.transparentCorners,
-        methodName = transparentCorners ? 'stroke' : 'fill',
-        stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
-        myLeft = left,
-        myTop = top, size;
+          ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
+          transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
+            styleOverride.transparentCorners : fabricObject.transparentCorners,
+          methodName = transparentCorners ? 'stroke' : 'fill',
+          stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
+          myLeft = left,
+          myTop = top, size;
       ctx.save();
       ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
       ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
@@ -392,13 +392,13 @@
       var fabricObject = this.object;
       styleOverride = styleOverride || {};
       var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-        ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
-        transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
-          styleOverride.transparentCorners : fabricObject.transparentCorners,
-        methodName = transparentCorners ? 'stroke' : 'fill',
-        stroke = !transparentCorners && (
-          styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor
-        ), xSizeBy2 = xSize / 2, ySizeBy2 = ySize / 2;
+          ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
+          transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
+            styleOverride.transparentCorners : fabricObject.transparentCorners,
+          methodName = transparentCorners ? 'stroke' : 'fill',
+          stroke = !transparentCorners && (
+            styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor
+          ), xSizeBy2 = xSize / 2, ySizeBy2 = ySize / 2;
       ctx.save();
       ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
       ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
