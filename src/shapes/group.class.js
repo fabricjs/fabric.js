@@ -141,8 +141,9 @@
      * @param {...fabric.Object} objects
      */
     add: function () {
-      var _this = this, possibleObjects = Array.from(arguments).filter(function(object) {
-        return _this.canEnterGroup(object);
+      var _this = this, possibleObjects = Array.from(arguments).filter(function(object, index, array) {
+        // can enter or is the first occurrence of the object in the passed args
+        return _this.canEnterGroup(object) && array.indexOf(object) === index;
       });
       fabric.Collection.add.call(this, possibleObjects, this._onObjectAdded);
       this._onAfterObjectsChange('added', possibleObjects);
@@ -236,7 +237,8 @@
         /* _DEV_MODE_END_ */
         return false;
       }
-      else if (object.group && object.group === this) {
+      else if (this._objects.indexOf(object) !== -1) {
+        // is already in the objects array
         /* _DEV_MODE_START_ */
         console.error('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
         /* _DEV_MODE_END_ */
