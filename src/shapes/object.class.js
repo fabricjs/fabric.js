@@ -650,10 +650,11 @@
      * @param {Object} [options] Options object
      */
     initialize: function (options) {
-      options || (options = {});
-      this.setOptions(Object.assign(options, {
-        controls: options.controls || new fabric.ObjectControls()
-      }));
+      options = Object.assign(options || {});
+      this.controls = options.controls || new fabric.ObjectControls();
+      this.controls.attach(this);
+      delete options.controls;
+      this.setOptions(options);
     },
 
     /**
