@@ -817,7 +817,7 @@
    * @param {number} numVertexes
    * @returns {(string|number)[][]} An array of SVG path commands
    */
-  function getRegularPolygonPath(radius, numVertexes) {
+  function getRegularPolygonPath(numVertexes, radius) {
     var interiorAngle = Math.PI * 2 / numVertexes;
     // rotationAdjustment rotates the path by 1/2 the interior angle so that the polygon always has a flat side on the bottom
     // This isn't strictly necessary, but it's how we tend to think of and expect polygons to be drawn
