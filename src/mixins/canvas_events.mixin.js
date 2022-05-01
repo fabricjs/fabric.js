@@ -712,10 +712,13 @@
           }
         }
       }
-      this._objectsToRender = this._chooseObjectsToRender();
+      var invalidate = shouldRender || shouldGroup;
+      //  we clear `_objectsToRender` in case of a change in order to repopulate it at rendering
+      //  run before firing the `down` event to give the dev a chance to populate it themselves
+      invalidate && (this._objectsToRender = undefined);
       this._handleEvent(e, 'down');
       // we must renderAll so that we update the visuals
-      (shouldRender || shouldGroup) && this.requestRenderAll();
+      invalidate && this.requestRenderAll();
     },
 
     /**

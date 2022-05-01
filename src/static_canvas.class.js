@@ -596,8 +596,8 @@
      * @chainable
      */
     remove: function () {
-      var didRemove = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
-      didRemove && this.renderOnAddRemove && this.requestRenderAll();
+      var removed = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
+      removed.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -607,10 +607,17 @@
      */
     _onObjectAdded: function(obj) {
       this.stateful && obj.setupState();
+      if (obj.canvas && obj.canvas !== this) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
+          'Resulting to default behavior: removing object from previous canvas and adding to new canvas');
+        /* _DEV_MODE_END_ */
+        obj.canvas.remove(obj);
+      }
       obj._set('canvas', this);
       obj.setCoords();
       this.fire('object:added', { target: obj });
-      obj.fire('added');
+      obj.fire('added', { target: this });
     },
 
     /**
@@ -619,7 +626,7 @@
      */
     _onObjectRemoved: function(obj) {
       this.fire('object:removed', { target: obj });
-      obj.fire('removed');
+      obj.fire('removed', { target: this });
       obj._set('canvas', undefined);
     },
 

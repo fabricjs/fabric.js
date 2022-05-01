@@ -58,7 +58,7 @@
 
     /**
      * Used to optimize performance
-     * set to `false` if you don't need caontained objects to be target of events
+     * set to `false` if you don't need contained objects to be targets of events
      * @default
      * @type boolean
      */
@@ -66,8 +66,8 @@
 
     /**
      * Used to allow targeting of object inside groups.
-     * set to true if you want to select an object inside a group.
-     * REQUIRES subTargetCheck set to true
+     * set to true if you want to select an object inside a group.\
+     * **REQUIRES** `subTargetCheck` set to true
      * @default
      * @type boolean
      */
@@ -158,10 +158,12 @@
     /**
      * Remove objects
      * @param {...fabric.Object} objects
+     * @returns {fabric.Object[]} removed objects
      */
     remove: function () {
-      fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
-      this._onAfterObjectsChange('removed', Array.from(arguments));
+      var removed = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
+      this._onAfterObjectsChange('removed', removed);
+      return removed;
     },
 
     /**
@@ -170,9 +172,7 @@
      */
     removeAll: function () {
       this._activeObjects = [];
-      var remove = this._objects.slice();
-      this.remove.apply(this, remove);
-      return remove;
+      return this.remove.apply(this, this._objects.slice());
     },
 
     /**
@@ -227,7 +227,7 @@
      * @returns
      */
     canEnter: function (object) {
-      if (object === this) {
+      if (object === this || this.isDescendantOf(object)) {
         /* _DEV_MODE_START_ */
         console.warn('fabric.Group: trying to add group to itself, this call has no effect');
         /* _DEV_MODE_END_ */
@@ -371,7 +371,7 @@
     shouldCache: function() {
       var ownCache = fabric.Object.prototype.shouldCache.call(this);
       if (ownCache) {
-        for (var i = 0, len = this._objects.length; i < len; i++) {
+        for (var i = 0; i < this._objects.length; i++) {
           if (this._objects[i].willDrawShadow()) {
             this.ownCaching = false;
             return false;
@@ -389,7 +389,7 @@
       if (fabric.Object.prototype.willDrawShadow.call(this)) {
         return true;
       }
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         if (this._objects[i].willDrawShadow()) {
           return true;
         }
@@ -411,7 +411,7 @@
      */
     drawObject: function(ctx) {
       this._renderBackground(ctx);
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         this._objects[i].render(ctx);
       }
       this._drawClipPath(ctx, this.clipPath);
@@ -427,7 +427,7 @@
       if (!this.statefullCache) {
         return false;
       }
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         if (this._objects[i].isCacheDirty(true)) {
           if (this._cacheCanvas) {
             // if this group has not a cache canvas there is nothing to clean
@@ -488,7 +488,7 @@
 
     /**
      * initial layout logic:
-     * calculate bbox of objects (if necessary) and translate it according to options recieved from the constructor (left, top, width, height)
+     * calculate bbox of objects (if necessary) and translate it according to options received from the constructor (left, top, width, height)
      * so it is placed in the center of the bbox received from the constructor
      *
      * @private
@@ -898,7 +898,7 @@
       var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
       var bg = this._createSVGBgRect(reviver);
       bg && svgString.push('\t\t', bg);
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         svgString.push('\t\t', this._objects[i].toSVG(reviver));
       }
       svgString.push('</g>\n');
@@ -929,7 +929,7 @@
       var svgString = [];
       var bg = this._createSVGBgRect(reviver);
       bg && svgString.push('\t', bg);
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
       }
       return this._createBaseClipPathSVGMarkup(svgString, { reviver: reviver });
