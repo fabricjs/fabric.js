@@ -859,6 +859,29 @@
       //  override by subclass
     },
 
+
+    /**
+     * Calculate object dimensions from its properties
+     * @override disregard `strokeWidth`
+     * @private
+     * @returns {fabric.Point} dimensions
+     */
+    _getNonTransformedDimensions: function () {
+      return new fabric.Point(this.width, this.height);
+    },
+
+    /**
+     * @private
+     * @override we want instance to fill parent so we disregard transformations
+     * @param {Object} [options]
+     * @param {Number} [options.width]
+     * @param {Number} [options.height]
+     * @returns {fabric.Point} dimensions
+     */
+    _getTransformedDimensions: function (options) {
+      return this.callSuper('_getTransformedDimensions', Object.assign(options || {}, { strokeWidth: 0 }));
+    },
+
     /**
      *
      * @private
