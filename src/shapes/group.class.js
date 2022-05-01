@@ -750,24 +750,6 @@
           }),
           rotationCorrection = new fabric.Point(0, 0);
 
-      if (this.angle) {
-        var rad = degreesToRadians(this.angle),
-            sin = Math.abs(fabric.util.sin(rad)),
-            cos = Math.abs(fabric.util.cos(rad));
-        sizeAfter.setXY(
-          sizeAfter.x * cos + sizeAfter.y * sin,
-          sizeAfter.x * sin + sizeAfter.y * cos
-        );
-        bboxSizeAfter.setXY(
-          bboxSizeAfter.x * cos + bboxSizeAfter.y * sin,
-          bboxSizeAfter.x * sin + bboxSizeAfter.y * cos
-        );
-        strokeWidthVector = fabric.util.rotateVector(strokeWidthVector, rad);
-        //  correct center after rotating
-        var strokeCorrection = strokeWidthVector.multiply(origin.scalarAdd(-0.5).scalarDivide(-2));
-        rotationCorrection = sizeAfter.subtract(size).scalarDivide(2).add(strokeCorrection);
-        calculatedCenter.addEquals(rotationCorrection);
-      }
       //  calculate center and correction
       var originT = origin.scalarAdd(0.5);
       var originCorrection = sizeAfter.multiply(originT);
