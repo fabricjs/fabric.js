@@ -53,7 +53,7 @@ class ICheckbox extends Checkbox {
 inquirer.registerPrompt('test-selection', ICheckbox);
 
 function build(options = {}) {
-    _.defaultsDeep(options, { exclude: ['gestures', 'accessors', 'erasing'] });
+    _.defaults(options, { exclude: ['gestures', 'accessors', 'erasing'] });
     const args = [
         `node`,
         `build.js`,
@@ -143,7 +143,7 @@ function exportToWebsite(options) {
 /**
  * 
  * @param {string[]} tests file paths
- * @param {{debug?:boolean,recreate?:boolean,show?:boolean,filter?:boolean}} [options] 
+ * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:boolean}} [options] 
  */
 function test(tests, options) {
     options = options || {};
@@ -161,7 +161,7 @@ function test(tests, options) {
             p.stdout.on('data', function (data) {
                 data = _.compact(data.toString().trim().split(/\n/));
                 data.forEach(line => {
-                    if (clearLines > 0 && !options.show) {
+                    if (clearLines > 0 && !options.verbose) {
                         process.stdout.write(ansiEscapes.cursorUp(1));
                         process.stdout.write(ansiEscapes.eraseDown);
                     }
@@ -321,7 +321,7 @@ program
     .option('-a, --all', 'run all tests', false)
     .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
     .option('-r, --recreate', 'recreate visual refs (golden images)', false)
-    .option('--show', 'show passing tests', false)
+    .option('-v, --verbose', 'log passing tests', false)
     .option('-cc, --clear-cache', 'clear CLI test cache', false)
     .action((options) => {
         if (options.clearCache) {

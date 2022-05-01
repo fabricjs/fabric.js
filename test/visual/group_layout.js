@@ -76,6 +76,27 @@
         height: 300
     });
 
+    function fitContentLayoutRelative(canvas, callback) {
+        var g = createGroupForLayoutTests('fit-content layout', {
+            backgroundColor: 'blue'
+        });
+        g.clone().then((clone) => {
+            canvas.add(clone);
+            canvas.renderAll();
+            callback(canvas.lowerCanvasEl);
+        })
+    }
+
+    tests.push({
+        test: 'fit-content layout',
+        code: fitContentLayoutRelative,
+        golden: 'group-layout/fit-content.png',
+        newModule: 'Group Layout',
+        percentage: 0.06,
+        width: 400,
+        height: 300
+    });
+
     function fitContentReLayout(canvas, callback) {
         var g = createGroupForLayoutTests('fit-content layout', {
             backgroundColor: 'blue'
@@ -334,5 +355,5 @@
         });
     }
 */
-    // tests.forEach(visualTestLoop(QUnit));
+    tests.forEach(visualTestLoop(QUnit));
 })();
