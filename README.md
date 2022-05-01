@@ -1,5 +1,5 @@
 ## Fabric.js
-.
+
 <!-- build/coverage status, climate -->
 
 [![Build Status](https://secure.travis-ci.org/fabricjs/fabric.js.svg?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
@@ -13,11 +13,6 @@
 [![NPM version](https://badge.fury.io/js/fabric.svg)](http://badge.fury.io/js/fabric)
 [![Downloads per month](https://img.shields.io/npm/dm/fabric.svg)](https://www.npmjs.org/package/fabric)
 [![CDNJS version](https://img.shields.io/cdnjs/v/fabric.js.svg)](https://cdnjs.com/libraries/fabric.js)
-
-<!-- deps status -->
-
-[![Dependency Status](https://david-dm.org/kangax/fabric.js.svg?theme=shields.io)](https://david-dm.org/kangax/fabric.js)
-[![devDependency Status](https://david-dm.org/kangax/fabric.js/dev-status.svg?theme=shields.io)](https://david-dm.org/kangax/fabric.js#info=devDependencies)
 
 <!-- bounties, tips -->
 
@@ -56,7 +51,7 @@ Fabric.js allows you to easily create simple shapes like rectangles, circles, tr
 - Opera 9.64+
 - Chrome (all versions)
 - Edge (chromium based, all versions)
-- IE11 and Edge legacy, supported but deprecated.
+- IE11 and Edge legacy, not supported. Fabric up to 5.0 is written with ES5 in mind, but no specific tests are run for those browsers.
 
 You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the browser.
 

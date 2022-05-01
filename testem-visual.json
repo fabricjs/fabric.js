@@ -27,7 +27,7 @@
   ],
   "launchers": {
     "Node": {
-      "command": "npm run test:visual",
+      "command": "npm run test -- --suite visual",
       "protocol": "tap"
     }
   },

@@ -3,7 +3,7 @@
     "browser": true
   },
   "globals": {
-    "ActiveXObject": true,
+    "Promise": true,
     "define": true,
     "eventjs": true,
     "exports": true,

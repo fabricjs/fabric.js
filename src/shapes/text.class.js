@@ -882,11 +882,20 @@
     /**
      * Measure and return the info of a single grapheme.
      * needs the the info of previous graphemes already filled
-     * @private
+     * Override to customize measuring
+     *
+     * @typedef {object} GraphemeBBox
+     * @property {number} width
+     * @property {number} height
+     * @property {number} kernedWidth
+     * @property {number} left
+     * @property {number} deltaY
+     *
      * @param {String} grapheme to be measured
      * @param {Number} lineIndex index of the line where the char is
      * @param {Number} charIndex position in the line
      * @param {String} [prevGrapheme] character preceding the one to be measured
+     * @returns {GraphemeBBox} grapheme bbox
      */
     _getGraphemeBox: function(grapheme, lineIndex, charIndex, prevGrapheme, skipLeft) {
       var style = this.getCompleteStyleDeclaration(lineIndex, charIndex),
@@ -1044,16 +1053,19 @@
           path = this.path,
           shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex) && !path,
           isLtr = this.direction === 'ltr', sign = this.direction === 'ltr' ? 1 : -1,
-          drawingLeft;
-
+          // this was changed in the PR #7674
+          // currentDirection = ctx.canvas.getAttribute('dir');
+          drawingLeft, currentDirection = ctx.direction;
       ctx.save();
+      if (currentDirection !== this.direction) {
+        ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
+        ctx.direction = isLtr ? 'ltr' : 'rtl';
+        ctx.textAlign = isLtr ? 'left' : 'right';
+      }
       top -= lineHeight * this._fontSizeFraction / this.lineHeight;
       if (shortCut) {
         // render all the line in one pass without checking
         // drawingLeft = isLtr ? left : left - this.getLineWidth(lineIndex);
-        ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
-        ctx.direction = isLtr ? 'ltr' : 'rtl';
-        ctx.textAlign = isLtr ? 'left' : 'right';
         this._renderChar(method, ctx, lineIndex, 0, line.join(''), left, top, lineHeight);
         ctx.restore();
         return;
@@ -1090,9 +1102,6 @@
           }
           else {
             drawingLeft = left;
-            ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
-            ctx.direction = isLtr ? 'ltr' : 'rtl';
-            ctx.textAlign = isLtr ? 'left' : 'right';
             this._renderChar(method, ctx, lineIndex, i, charsToRender, drawingLeft, top, lineHeight);
           }
           charsToRender = '';
@@ -1308,7 +1317,15 @@
         leftOffset = lineDiff;
       }
       if (direction === 'rtl') {
-        leftOffset -= lineDiff;
+        if (textAlign === 'right' || textAlign === 'justify' || textAlign === 'justify-right') {
+          leftOffset = 0;
+        }
+        else if (textAlign === 'left' || textAlign === 'justify-left') {
+          leftOffset = -lineDiff;
+        }
+        else if (textAlign === 'center' || textAlign === 'justify-center') {
+          leftOffset = -lineDiff / 2;
+        }
       }
       return leftOffset;
     },
@@ -1343,19 +1360,12 @@
      * @return {Number} Line width
      */
     getLineWidth: function(lineIndex) {
-      if (this.__lineWidths[lineIndex]) {
+      if (this.__lineWidths[lineIndex] !== undefined) {
         return this.__lineWidths[lineIndex];
       }
 
-      var width, line = this._textLines[lineIndex], lineInfo;
-
-      if (line === '') {
-        width = 0;
-      }
-      else {
-        lineInfo = this.measureLine(lineIndex);
-        width = lineInfo.width;
-      }
+      var lineInfo = this.measureLine(lineIndex);
+      var width = lineInfo.width;
       this.__lineWidths[lineIndex] = width;
       return width;
     },
@@ -1522,6 +1532,15 @@
     },
 
     /**
+     * Override this method to customize grapheme splitting
+     * @param {string} value
+     * @returns {string[]} array of graphemes
+     */
+    graphemeSplit: function (value) {
+      return fabric.util.string.graphemeSplit(value);
+    },
+
+    /**
      * Returns the text as an array of lines.
      * @param {String} text text to split
      * @returns {Array} Lines in the text
@@ -1532,7 +1551,7 @@
           newLine = ['\n'],
           newText = [];
       for (var i = 0; i < lines.length; i++) {
-        newLines[i] = fabric.util.string.graphemeSplit(lines[i]);
+        newLines[i] = this.graphemeSplit(lines[i]);
         newText = newText.concat(newLines[i], newLine);
       }
       newText.pop();
@@ -1708,22 +1727,10 @@
    * @static
    * @memberOf fabric.Text
    * @param {Object} object plain js Object to create an instance from
-   * @param {Function} [callback] Callback to invoke when an fabric.Text instance is created
+   * @returns {Promise<fabric.Text>}
    */
-  fabric.Text.fromObject = function(object, callback) {
-    var objectCopy = clone(object), path = object.path;
-    delete objectCopy.path;
-    return fabric.Object._fromObject('Text', objectCopy, function(textInstance) {
-      if (path) {
-        fabric.Object._fromObject('Path', path, function(pathInstance) {
-          textInstance.set('path', pathInstance);
-          callback(textInstance);
-        }, 'path');
-      }
-      else {
-        callback(textInstance);
-      }
-    }, 'text');
+  fabric.Text.fromObject = function(object) {
+    return fabric.Object._fromObject(fabric.Text, object, 'text');
   };
 
   fabric.Text.genericFonts = ['sans-serif', 'serif', 'cursive', 'fantasy', 'monospace'];

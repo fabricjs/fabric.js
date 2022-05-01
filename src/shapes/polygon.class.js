@@ -2,7 +2,8 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric || (global.fabric = {}),
+      projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
 
   if (fabric.Polygon) {
     fabric.warn('fabric.Polygon is already defined');
@@ -23,6 +24,13 @@
      * @default
      */
     type: 'polygon',
+
+    /**
+     * @private
+     */
+    _projectStrokeOnPoints: function () {
+      return projectStrokeOnPoints(this.points, this);
+    },
 
     /**
      * @private
@@ -63,11 +71,10 @@
    * @static
    * @memberOf fabric.Polygon
    * @param {Object} object Object to create an instance from
-   * @param {Function} [callback] Callback to invoke when an fabric.Path instance is created
-   * @return {void}
+   * @returns {Promise<fabric.Polygon>}
    */
-  fabric.Polygon.fromObject = function(object, callback) {
-    fabric.Object._fromObject('Polygon', object, callback, 'points');
+  fabric.Polygon.fromObject = function(object) {
+    return fabric.Object._fromObject(fabric.Polygon, object, 'points');
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

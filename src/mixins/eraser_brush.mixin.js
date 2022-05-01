@@ -1,9 +1,16 @@
 (function () {
   /** ERASER_START */
-  var __set = fabric.Object.prototype._set;
-  var _render = fabric.Object.prototype.render;
+
+  var __drawClipPath = fabric.Object.prototype._drawClipPath;
+  var _needsItsOwnCache = fabric.Object.prototype.needsItsOwnCache;
   var _toObject = fabric.Object.prototype.toObject;
+  var _getSvgCommons = fabric.Object.prototype.getSvgCommons;
+  var __createBaseClipPathSVGMarkup = fabric.Object.prototype._createBaseClipPathSVGMarkup;
   var __createBaseSVGMarkup = fabric.Object.prototype._createBaseSVGMarkup;
+
+  fabric.Object.prototype.cacheProperties.push('eraser');
+  fabric.Object.prototype.stateProperties.push('eraser');
+
   /**
    * @fires erasing:end
    */
@@ -21,76 +28,37 @@
     erasable: true,
 
     /**
-     *
-     * @returns {fabric.Group | undefined}
+     * @tutorial {@link http://fabricjs.com/erasing#eraser}
+     * @type fabric.Eraser
      */
-    getEraser: function () {
-      return this.clipPath && this.clipPath.eraser ? this.clipPath : undefined;
+    eraser: undefined,
+
+    /**
+     * @override
+     * @returns Boolean
+     */
+    needsItsOwnCache: function () {
+      return _needsItsOwnCache.call(this) || !!this.eraser;
     },
 
     /**
-     * Get the object's actual clip path regardless of clipping done by erasing
-     * @returns {fabric.Object | undefined}
-     */
-    getClipPath: function () {
-      var eraser = this.getEraser();
-      return eraser ? eraser._objects[0].clipPath : this.clipPath;
-    },
-
-    /**
-     * Set the object's actual clip path regardless of clipping done by erasing
-     * @param {fabric.Object} [clipPath]
-     */
-    setClipPath: function (clipPath) {
-      var eraser = this.getEraser();
-      var target = eraser ? eraser._objects[0] : this;
-      target.set('clipPath', clipPath);
-      this.set('dirty', true);
-    },
-
-    /**
-     * Updates eraser size and position to match object's size
+     * draw eraser above clip path
+     * @override
      * @private
-     * @param {Object} [dimensions] uses object's dimensions if unspecified
-     * @param {number} [dimensions.width]
-     * @param {number} [dimensions.height]
-     * @param {boolean} [center=false] postion the eraser relative to object's center or it's top left corner
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {fabric.Object} clipPath
      */
-    _updateEraserDimensions: function (dimensions, center) {
-      var eraser = this.getEraser();
-      if (eraser) {
-        var rect = eraser._objects[0];
-        var eraserSize = { width: rect.width, height: rect.height };
+    _drawClipPath: function (ctx, clipPath) {
+      __drawClipPath.call(this, ctx, clipPath);
+      if (this.eraser) {
+        //  update eraser size to match instance
         var size = this._getNonTransformedDimensions();
-        var newSize = fabric.util.object.extend({ width: size.x, height: size.y }, dimensions);
-        if (eraserSize.width === newSize.width && eraserSize.height === newSize.height) {
-          return;
-        }
-        var offset = new fabric.Point((eraserSize.width - newSize.width) / 2, (eraserSize.height - newSize.height) / 2);
-        eraser.set(newSize);
-        eraser.setPositionByOrigin(new fabric.Point(0, 0), 'center', 'center');
-        rect.set(newSize);
-        eraser.set('dirty', true);
-        if (!center) {
-          eraser.getObjects('path').forEach(function (path) {
-            path.setPositionByOrigin(path.getCenterPoint().add(offset), 'center', 'center');
-          });
-        }
-        this.setCoords();
+        this.eraser.isType('eraser') && this.eraser.set({
+          width: size.x,
+          height: size.y
+        });
+        __drawClipPath.call(this, ctx, this.eraser);
       }
-    },
-
-    _set: function (key, value) {
-      __set.call(this, key, value);
-      if (key === 'width' || key === 'height') {
-        this._updateEraserDimensions();
-      }
-      return this;
-    },
-
-    render: function (ctx) {
-      this._updateEraserDimensions();
-      _render.call(this, ctx);
     },
 
     /**
@@ -98,146 +66,212 @@
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} Object representation of an instance
      */
-    toObject: function (additionalProperties) {
-      return _toObject.call(this, ['erasable'].concat(additionalProperties));
+    toObject: function (propertiesToInclude) {
+      var object = _toObject.call(this, ['erasable'].concat(propertiesToInclude));
+      if (this.eraser && !this.eraser.excludeFromExport) {
+        object.eraser = this.eraser.toObject(propertiesToInclude);
+      }
+      return object;
+    },
+
+    /* _TO_SVG_START_ */
+    /**
+     * Returns id attribute for svg output
+     * @override
+     * @return {String}
+     */
+    getSvgCommons: function () {
+      return _getSvgCommons.call(this) + (this.eraser ? 'mask="url(#' + this.eraser.clipPathId + ')" ' : '');
     },
 
     /**
-     * use <mask> to achieve erasing for svg
-     * credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
-     * @param {Function} reviver
-     * @returns {string} markup
+     * create svg markup for eraser
+     * use <mask> to achieve erasing for svg, credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
+     * must be called before object markup creation as it relies on the `clipPathId` property of the mask
+     * @param {Function} [reviver]
+     * @returns
      */
-    eraserToSVG: function (options) {
-      var eraser = this.getEraser();
-      if (eraser) {
-        var fill = eraser._objects[0].fill;
-        eraser._objects[0].fill = 'white';
-        eraser.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
-        var commons = [
-          'id="' + eraser.clipPathId + '"',
-          /*options.additionalTransform ? ' transform="' + options.additionalTransform + '" ' : ''*/
-        ].join(' ');
-        var objectMarkup = ['<defs>', '<mask ' + commons + ' >', eraser.toSVG(options.reviver), '</mask>', '</defs>'];
-        eraser._objects[0].fill = fill;
-        return objectMarkup.join('\n');
+    _createEraserSVGMarkup: function (reviver) {
+      if (this.eraser) {
+        this.eraser.clipPathId = 'MASK_' + fabric.Object.__uid++;
+        return [
+          '<mask id="', this.eraser.clipPathId, '" >',
+          this.eraser.toSVG(reviver),
+          '</mask>', '\n'
+        ].join('');
       }
       return '';
     },
 
     /**
-     * use <mask> to achieve erasing for svg, override <clipPath>
-     * @param {string[]} objectMarkup
-     * @param {Object} options
-     * @returns
-     */
-    _createBaseSVGMarkup: function (objectMarkup, options) {
-      var eraser = this.getEraser();
-      if (eraser) {
-        var eraserMarkup = this.eraserToSVG(options);
-        this.clipPath = null;
-        var markup = __createBaseSVGMarkup.call(this, objectMarkup, options);
-        this.clipPath = eraser;
-        return [
-          eraserMarkup,
-          markup.replace('>', 'mask="url(#' + eraser.clipPathId + ')" >')
-        ].join('\n');
-      }
-      else {
-        return __createBaseSVGMarkup.call(this, objectMarkup, options);
-      }
-    }
-  });
-
-  var __restoreObjectsState = fabric.Group.prototype._restoreObjectsState;
-  var _groupToObject = fabric.Group.prototype.toObject;
-  var __getBounds = fabric.Group.prototype._getBounds;
-  fabric.util.object.extend(fabric.Group.prototype, {
-
-    /**
-     * If group is an eraser then dimensions should not change when paths are added or removed and should remain the size of the base rect
      * @private
      */
-    _getBounds: function (aX, aY, onlyWidthHeight) {
-      if (this.eraser) {
-        this.width = this._objects[0].width;
-        this.height = this._objects[0].height;
-        return;
-      }
-      __getBounds.call(this, aX, aY, onlyWidthHeight);
+    _createBaseClipPathSVGMarkup: function (objectMarkup, options) {
+      return [
+        this._createEraserSVGMarkup(options && options.reviver),
+        __createBaseClipPathSVGMarkup.call(this, objectMarkup, options)
+      ].join('');
     },
 
     /**
      * @private
+     */
+    _createBaseSVGMarkup: function (objectMarkup, options) {
+      return [
+        this._createEraserSVGMarkup(options && options.reviver),
+        __createBaseSVGMarkup.call(this, objectMarkup, options)
+      ].join('');
+    }
+    /* _TO_SVG_END_ */
+  });
+
+  fabric.util.object.extend(fabric.Group.prototype, {
+    /**
+     * @private
      * @param {fabric.Path} path
+     * @returns {Promise<fabric.Path[]>}
      */
     _addEraserPathToObjects: function (path) {
-      this._objects.forEach(function (object) {
-        fabric.EraserBrush.prototype._addPathToObjectEraser.call(
+      return Promise.all(this._objects.map(function (object) {
+        return fabric.EraserBrush.prototype._addPathToObjectEraser.call(
           fabric.EraserBrush.prototype,
           object,
           path
         );
-      });
+      }));
     },
 
     /**
      * Applies the group's eraser to its objects
      * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
+     * @returns {Promise<fabric.Path[]|fabric.Path[][]|void>}
      */
     applyEraserToObjects: function () {
-      var _this = this;
-      if (this.getEraser()) {
-        var transform = _this.calcTransformMatrix();
-        _this.getEraser().clone(function (eraser) {
-          var clipPath = eraser._objects[0].clipPath;
-          _this.clipPath = clipPath ? clipPath : undefined;
-          eraser.getObjects('path')
-            .forEach(function (path) {
-              //  first we transform the path from the group's coordinate system to the canvas'
-              var originalTransform = fabric.util.multiplyTransformMatrices(
-                transform,
-                path.calcTransformMatrix()
-              );
-              fabric.util.applyTransformToObject(path, originalTransform);
-              if (clipPath) {
-                clipPath.clone(function (_clipPath) {
-                  fabric.EraserBrush.prototype.applyClipPathToPath.call(
-                    fabric.EraserBrush.prototype,
-                    path,
-                    _clipPath,
-                    transform
-                  );
-                  _this._addEraserPathToObjects(path);
-                });
-              }
-              else {
-                _this._addEraserPathToObjects(path);
-              }
-            });
+      var _this = this, eraser = this.eraser;
+      return Promise.resolve()
+        .then(function () {
+          if (eraser) {
+            delete _this.eraser;
+            var transform = _this.calcTransformMatrix();
+            return eraser.clone()
+              .then(function (eraser) {
+                var clipPath = _this.clipPath;
+                return Promise.all(eraser.getObjects('path')
+                  .map(function (path) {
+                    //  first we transform the path from the group's coordinate system to the canvas'
+                    var originalTransform = fabric.util.multiplyTransformMatrices(
+                      transform,
+                      path.calcTransformMatrix()
+                    );
+                    fabric.util.applyTransformToObject(path, originalTransform);
+                    return clipPath ?
+                      clipPath.clone()
+                        .then(function (_clipPath) {
+                          var eraserPath = fabric.EraserBrush.prototype.applyClipPathToPath.call(
+                            fabric.EraserBrush.prototype,
+                            path,
+                            _clipPath,
+                            transform
+                          );
+                          return _this._addEraserPathToObjects(eraserPath);
+                        }, ['absolutePositioned', 'inverted']) :
+                      _this._addEraserPathToObjects(path);
+                  }));
+              });
+          }
         });
-      }
-    },
-
-    /**
-     * Propagate the group's eraser to its objects, crucial for proper functionality of the eraser within the group and nested objects.
-     * @private
-     */
-    _restoreObjectsState: function () {
-      this.erasable === true && this.applyEraserToObjects();
-      return __restoreObjectsState.call(this);
-    },
-
-    /**
-     * Returns an object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} Object representation of an instance
-     */
-    toObject: function (additionalProperties) {
-      return _groupToObject.call(this, ['eraser'].concat(additionalProperties));
     }
   });
 
+  /**
+   * An object's Eraser
+   * @private
+   * @class fabric.Eraser
+   * @extends fabric.Group
+   * @memberof fabric
+   */
+  fabric.Eraser = fabric.util.createClass(fabric.Group, {
+    /**
+     * @readonly
+     * @static
+     */
+    type: 'eraser',
+
+    /**
+     * @default
+     */
+    originX: 'center',
+
+    /**
+     * @default
+     */
+    originY: 'center',
+
+    /**
+     * eraser should retain size
+     * dimensions should not change when paths are added or removed
+     * handled by {@link fabric.Object#_drawClipPath}
+     * @override
+     * @private
+     */
+    layout: 'fixed',
+
+    drawObject: function (ctx) {
+      ctx.save();
+      ctx.fillStyle = 'black';
+      ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+      ctx.restore();
+      this.callSuper('drawObject', ctx);
+    },
+
+    /* _TO_SVG_START_ */
+    /**
+     * Returns svg representation of an instance
+     * use <mask> to achieve erasing for svg, credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
+     * for masking we need to add a white rect before all paths
+     *
+     * @param {Function} [reviver] Method for further parsing of svg representation.
+     * @return {String} svg representation of an instance
+     */
+    _toSVG: function (reviver) {
+      var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
+      var x = -this.width / 2, y = -this.height / 2;
+      var rectSvg = [
+        '<rect ', 'fill="white" ',
+        'x="', x, '" y="', y,
+        '" width="', this.width, '" height="', this.height,
+        '" />\n'
+      ].join('');
+      svgString.push('\t\t', rectSvg);
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        svgString.push('\t\t', this._objects[i].toSVG(reviver));
+      }
+      svgString.push('</g>\n');
+      return svgString;
+    },
+    /* _TO_SVG_END_ */
+  });
+
+  /**
+   * Returns instance from an object representation
+   * @static
+   * @memberOf fabric.Eraser
+   * @param {Object} object Object to create an Eraser from
+   * @returns {Promise<fabric.Eraser>}
+   */
+  fabric.Eraser.fromObject = function (object) {
+    var objects = object.objects || [],
+        options = fabric.util.object.clone(object, true);
+    delete options.objects;
+    return Promise.all([
+      fabric.util.enlivenObjects(objects),
+      fabric.util.enlivenObjectEnlivables(options)
+    ]).then(function (enlivedProps) {
+      return new fabric.Eraser(enlivedProps[0], Object.assign(options, enlivedProps[1]), true);
+    });
+  };
+
+  var __renderOverlay = fabric.Canvas.prototype._renderOverlay;
   /**
    * @fires erasing:start
    * @fires erasing:end
@@ -257,43 +291,34 @@
     },
 
     /**
-     * While erasing, the brush is in charge of rendering the canvas
-     * It uses both layers to achieve diserd erasing effect
-     *
-     * @returns fabric.Canvas
+     * While erasing the brush clips out the erasing path from canvas
+     * so we need to render it on top of canvas every render
+     * @param {CanvasRenderingContext2D} ctx
      */
-    renderAll: function () {
-      if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
-        this.clearContext(this.contextTop);
-        this.contextTopDirty = false;
-      }
-      // while erasing the brush is in charge of rendering the canvas so we return
-      if (this.isErasing()) {
-        this.freeDrawingBrush._render();
-        return;
-      }
-      if (this.hasLostContext) {
-        this.renderTopLayer(this.contextTop);
-      }
-      var canvasToDrawOn = this.contextContainer;
-      this.renderCanvas(canvasToDrawOn, this._chooseObjectsToRender());
-      return this;
+    _renderOverlay: function (ctx) {
+      __renderOverlay.call(this, ctx);
+      this.isErasing() && this.freeDrawingBrush._render();
     }
   });
 
   /**
    * EraserBrush class
    * Supports selective erasing meaning that only erasable objects are affected by the eraser brush.
-   * In order to support selective erasing all non erasable objects are rendered on the main/bottom ctx
-   * while the entire canvas is rendered on the top ctx.
-   * Canvas background/overlay images are handled as well.
-   * When erasing occurs, the path clips the top ctx and reveals the bottom ctx.
-   * This achieves the desired effect of seeming to erase only erasable objects.
-   * After erasing is done the created path is added to all intersected objects' `clipPath` property.
+   * Supports **inverted** erasing meaning that the brush can "undo" erasing.
+   *
+   * In order to support selective erasing, the brush clips the entire canvas
+   * and then draws all non-erasable objects over the erased path using a pattern brush so to speak (masking).
+   * If brush is **inverted** there is no need to clip canvas. The brush draws all erasable objects without their eraser.
+   * This achieves the desired effect of seeming to erase or unerase only erasable objects.
+   * After erasing is done the created path is added to all intersected objects' `eraser` property.
+   *
+   * In order to update the EraserBrush call `preparePattern`.
+   * It may come in handy when canvas changes during erasing (i.e animations) and you want the eraser to reflect the changes.
    *
    * @tutorial {@link http://fabricjs.com/erasing}
    * @class fabric.EraserBrush
    * @extends fabric.PencilBrush
+   * @memberof fabric
    */
   fabric.EraserBrush = fabric.util.createClass(
     fabric.PencilBrush,
@@ -301,51 +326,14 @@
       type: 'eraser',
 
       /**
-       * Indicates that the ctx is ready and rendering can begin.
-       * Used to prevent a race condition caused by {@link fabric.EraserBrush#onMouseMove} firing before {@link fabric.EraserBrush#onMouseDown} has completed
-       *
-       * @private
+       * When set to `true` the brush will create a visual effect of undoing erasing
        */
-      _ready: false,
-
-      /**
-       * @private
-       */
-      _drawOverlayOnTop: false,
+      inverted: false,
 
       /**
        * @private
        */
       _isErasing: false,
-
-      initialize: function (canvas) {
-        this.callSuper('initialize', canvas);
-        this._renderBound = this._render.bind(this);
-        this.render = this.render.bind(this);
-      },
-
-      /**
-       * Used to hide a drawable from the rendering process
-       * @param {fabric.Object} object
-       */
-      hideObject: function (object) {
-        if (object) {
-          object._originalOpacity = object.opacity;
-          object.set({ opacity: 0 });
-        }
-      },
-
-      /**
-       * Restores hiding an object
-       * {@link fabric.EraserBrush#hideObject}
-       * @param {fabric.Object} object
-       */
-      restoreObjectVisibility: function (object) {
-        if (object && object._originalOpacity) {
-          object.set({ opacity: object._originalOpacity });
-          object._originalOpacity = undefined;
-        }
-      },
 
       /**
        *
@@ -358,200 +346,142 @@
       },
 
       /**
-       * Drawing Logic For background drawables: (`backgroundImage`)
-       * 1. if erasable = true:
-       *    we need to hide the drawable on the bottom ctx so when the brush is erasing it will clip the top ctx and reveal white space underneath
-       * 2. if erasable = false:
-       *    we need to draw the drawable only on the bottom ctx so the brush won't affect it
-       * @param {'bottom' | 'top' | 'overlay'} layer
-       */
-      prepareCanvasBackgroundForLayer: function (layer) {
-        if (layer === 'overlay') {
-          return;
-        }
-        var canvas = this.canvas;
-        var image = canvas.backgroundImage;
-        var erasablesOnLayer = layer === 'top';
-        if (image && this._isErasable(image) === !erasablesOnLayer) {
-          this.hideObject(image);
-        }
-      },
-
-      /**
-       * Drawing Logic For overlay drawables (`overlayImage`)
-       * We must draw on top ctx to be on top of visible canvas
-       * 1. if erasable = true:
-       *    we need to draw the drawable on the top ctx as a normal object
-       * 2. if erasable = false:
-       *    we need to draw the drawable on top of the brush,
-       *    this means we need to repaint for every stroke
-       *
-       * @param {'bottom' | 'top' | 'overlay'} layer
-       * @returns boolean render overlay above brush
-       */
-      prepareCanvasOverlayForLayer: function (layer) {
-        var canvas = this.canvas;
-        var image = canvas.overlayImage;
-        var hasOverlayColor = !!canvas.overlayColor;
-        if (canvas.overlayColor && layer !== 'overlay') {
-          this.__overlayColor = canvas.overlayColor;
-          delete canvas.overlayColor;
-        }
-        if (layer === 'bottom') {
-          this.hideObject(image);
-          return false;
-        };
-        var erasablesOnLayer = layer === 'top';
-        var renderOverlayOnTop = (image && !this._isErasable(image)) || hasOverlayColor;
-        if (image && this._isErasable(image) === !erasablesOnLayer) {
-          this.hideObject(image);
-        }
-        return renderOverlayOnTop;
-      },
-
-      /**
        * @private
-       */
-      restoreCanvasDrawables: function () {
-        var canvas = this.canvas;
-        if (this.__overlayColor) {
-          canvas.overlayColor = this.__overlayColor;
-          delete this.__overlayColor;
-        }
-        this.restoreObjectVisibility(canvas.backgroundImage);
-        this.restoreObjectVisibility(canvas.overlayImage);
-      },
-
-      /**
-       * @private
-       * This is designed to support erasing a group with both erasable and non-erasable objects.
-       * Iterates over collections to allow nested selective erasing.
-       * Used by {@link fabric.EraserBrush#prepareCanvasObjectsForLayer}
-       * to prepare the bottom layer by hiding erasable nested objects
+       * This is designed to support erasing a collection with both erasable and non-erasable objects while maintaining object stacking.\
+       * Iterates over collections to allow nested selective erasing.\
+       * Prepares objects before rendering the pattern brush.\
+       * If brush is **NOT** inverted render all non-erasable objects.\
+       * If brush is inverted render all objects, erasable objects without their eraser.
+       * This will render the erased parts as if they were not erased in the first place, achieving an undo effect.
        *
        * @param {fabric.Collection} collection
+       * @param {CanvasRenderingContext2D} ctx
+       * @param {{ visibility: fabric.Object[], eraser: fabric.Object[], collection: fabric.Object[] }} restorationContext
        */
-      prepareCollectionTraversal: function (collection) {
-        var _this = this;
+      _prepareCollectionTraversal: function (collection, ctx, restorationContext) {
         collection.forEachObject(function (obj) {
           if (obj.forEachObject && obj.erasable === 'deep') {
-            _this.prepareCollectionTraversal(obj);
+            //  traverse
+            this._prepareCollectionTraversal(obj, ctx, restorationContext);
           }
-          else if (obj.erasable) {
-            _this.hideObject(obj);
+          else if (!this.inverted && obj.erasable && obj.visible) {
+            //  render only non-erasable objects
+            obj.visible = false;
+            collection.dirty = true;
+            restorationContext.visibility.push(obj);
+            restorationContext.collection.push(collection);
           }
+          else if (this.inverted && obj.erasable && obj.eraser && obj.visible) {
+            //  render all objects without eraser
+            var eraser = obj.eraser;
+            obj.eraser = undefined;
+            obj.dirty = true;
+            collection.dirty = true;
+            restorationContext.eraser.push([obj, eraser]);
+            restorationContext.collection.push(collection);
+          }
+        }, this);
+      },
+
+      /**
+       * Prepare the pattern for the erasing brush
+       * This pattern will be drawn on the top context after clipping the main context,
+       * achieving a visual effect of erasing only erasable objects
+       * @private
+       */
+      preparePattern: function () {
+        if (!this._patternCanvas) {
+          this._patternCanvas = fabric.util.createCanvasElement();
+        }
+        var canvas = this._patternCanvas;
+        canvas.width = this.canvas.width;
+        canvas.height = this.canvas.height;
+        var patternCtx = canvas.getContext('2d');
+        if (this.canvas._isRetinaScaling()) {
+          var retinaScaling = this.canvas.getRetinaScaling();
+          this.canvas.__initRetinaScaling(retinaScaling, canvas, patternCtx);
+        }
+        var backgroundImage = this.canvas.backgroundImage,
+            bgErasable = backgroundImage && this._isErasable(backgroundImage),
+            overlayImage = this.canvas.overlayImage,
+            overlayErasable = overlayImage && this._isErasable(overlayImage);
+        if (!this.inverted && ((backgroundImage && !bgErasable) || !!this.canvas.backgroundColor)) {
+          if (bgErasable) { this.canvas.backgroundImage = undefined; }
+          this.canvas._renderBackground(patternCtx);
+          if (bgErasable) { this.canvas.backgroundImage = backgroundImage; }
+        }
+        else if (this.inverted) {
+          var eraser = backgroundImage && backgroundImage.eraser;
+          if (eraser) {
+            backgroundImage.eraser = undefined;
+            backgroundImage.dirty = true;
+          }
+          this.canvas._renderBackground(patternCtx);
+          if (eraser) {
+            backgroundImage.eraser = eraser;
+            backgroundImage.dirty = true;
+          }
+        }
+        patternCtx.save();
+        patternCtx.transform.apply(patternCtx, this.canvas.viewportTransform);
+        var restorationContext = { visibility: [], eraser: [], collection: [] };
+        this._prepareCollectionTraversal(this.canvas, patternCtx, restorationContext);
+        this.canvas._renderObjects(patternCtx, this.canvas._objects);
+        restorationContext.visibility.forEach(function (obj) { obj.visible = true; });
+        restorationContext.eraser.forEach(function (entry) {
+          var obj = entry[0], eraser = entry[1];
+          obj.eraser = eraser;
+          obj.dirty = true;
         });
-      },
-
-      /**
-       * @private
-       * Used by {@link fabric.EraserBrush#prepareCanvasObjectsForLayer}
-       * to reverse the action of {@link fabric.EraserBrush#prepareCollectionTraversal}
-       *
-       * @param {fabric.Collection} collection
-       */
-      restoreCollectionTraversal: function (collection) {
-        var _this = this;
-        collection.forEachObject(function (obj) {
-          if (obj.forEachObject && obj.erasable === 'deep') {
-            _this.restoreCollectionTraversal(obj);
+        restorationContext.collection.forEach(function (obj) { obj.dirty = true; });
+        patternCtx.restore();
+        if (!this.inverted && ((overlayImage && !overlayErasable) || !!this.canvas.overlayColor)) {
+          if (overlayErasable) { this.canvas.overlayImage = undefined; }
+          __renderOverlay.call(this.canvas, patternCtx);
+          if (overlayErasable) { this.canvas.overlayImage = overlayImage; }
+        }
+        else if (this.inverted) {
+          var eraser = overlayImage && overlayImage.eraser;
+          if (eraser) {
+            overlayImage.eraser = undefined;
+            overlayImage.dirty = true;
           }
-          else {
-            _this.restoreObjectVisibility(obj);
+          __renderOverlay.call(this.canvas, patternCtx);
+          if (eraser) {
+            overlayImage.eraser = eraser;
+            overlayImage.dirty = true;
           }
-        });
+        }
       },
 
       /**
+       * Sets brush styles
        * @private
-       * This is designed to support erasing a group with both erasable and non-erasable objects.
+       * @param {CanvasRenderingContext2D} ctx
+       */
+      _setBrushStyles: function (ctx) {
+        this.callSuper('_setBrushStyles', ctx);
+        ctx.strokeStyle = 'black';
+      },
+
+      /**
+       * **Customiztion**
        *
-       * @param {'bottom' | 'top' | 'overlay'} layer
-       */
-      prepareCanvasObjectsForLayer: function (layer) {
-        if (layer !== 'bottom') { return; }
-        this.prepareCollectionTraversal(this.canvas);
-      },
-
-      /**
-       * @private
-       * @param {'bottom' | 'top' | 'overlay'} layer
-       */
-      restoreCanvasObjectsFromLayer: function (layer) {
-        if (layer !== 'bottom') { return; }
-        this.restoreCollectionTraversal(this.canvas);
-      },
-
-      /**
-       * @private
-       * @param {'bottom' | 'top' | 'overlay'} layer
-       * @returns boolean render overlay above brush
-       */
-      prepareCanvasForLayer: function (layer) {
-        this.prepareCanvasBackgroundForLayer(layer);
-        this.prepareCanvasObjectsForLayer(layer);
-        return this.prepareCanvasOverlayForLayer(layer);
-      },
-
-      /**
-      * @private
-      * @param {'bottom' | 'top' | 'overlay'} layer
-      */
-      restoreCanvasFromLayer: function (layer) {
-        this.restoreCanvasDrawables();
-        this.restoreCanvasObjectsFromLayer(layer);
-      },
-
-      /**
-       * Render all non-erasable objects on bottom layer with the exception of overlays to avoid being clipped by the brush.
-       * Groups are rendered for nested selective erasing, non-erasable objects are visible while erasable objects are not.
-       */
-      renderBottomLayer: function () {
-        var canvas = this.canvas;
-        this.prepareCanvasForLayer('bottom');
-        canvas.renderCanvas(
-          canvas.getContext(),
-          canvas.getObjects().filter(function (obj) {
-            return !obj.erasable || obj.forEachObject;
-          })
-        );
-        this.restoreCanvasFromLayer('bottom');
-      },
-
-      /**
-       * 1. Render all objects on top layer, erasable and non-erasable
-       *    This is important for cases such as overlapping objects, the background object erasable and the foreground object not erasable.
-       * 2. Render the brush
-       */
-      renderTopLayer: function () {
-        var canvas = this.canvas;
-        this._drawOverlayOnTop = this.prepareCanvasForLayer('top');
-        canvas.renderCanvas(
-          canvas.contextTop,
-          canvas.getObjects()
-        );
-        this.callSuper('_render');
-        this.restoreCanvasFromLayer('top');
-      },
-
-      /**
-       * Render all non-erasable overlays on top of the brush so that they won't get erased
-       */
-      renderOverlay: function () {
-        this.prepareCanvasForLayer('overlay');
-        var canvas = this.canvas;
-        var ctx = canvas.contextTop;
-        canvas._renderOverlay(ctx);
-        this.restoreCanvasFromLayer('overlay');
-      },
-
-      /**
-       * @extends @class fabric.BaseBrush
+       * if you need the eraser to update on each render (i.e animating during erasing) override this method by **adding** the following (performance may suffer):
+       * @example
+       * ```
+       * if(ctx === this.canvas.contextTop) {
+       *  this.preparePattern();
+       * }
+       * ```
+       *
+       * @override fabric.BaseBrush#_saveAndTransform
        * @param {CanvasRenderingContext2D} ctx
        */
       _saveAndTransform: function (ctx) {
         this.callSuper('_saveAndTransform', ctx);
-        ctx.globalCompositeOperation = 'destination-out';
+        this._setBrushStyles(ctx);
+        ctx.globalCompositeOperation = ctx === this.canvas.getContext() ? 'destination-out' : 'source-over';
       },
 
       /**
@@ -559,7 +489,7 @@
        * @returns
        */
       needsFullRender: function () {
-        return this.callSuper('needsFullRender') || this._drawOverlayOnTop;
+        return true;
       },
 
       /**
@@ -577,64 +507,72 @@
         // this allows to draw dots (when movement never occurs)
         this._captureDrawingPath(pointer);
 
+        //  prepare for erasing
+        this.preparePattern();
         this._isErasing = true;
         this.canvas.fire('erasing:start');
-        this._ready = true;
         this._render();
       },
 
       /**
-       * Rendering is done in 4 steps:
-       * 1. Draw all non-erasable objects on bottom ctx with the exception of overlays {@link fabric.EraserBrush#renderBottomLayer}
-       * 2. Draw all objects on top ctx including erasable drawables {@link fabric.EraserBrush#renderTopLayer}
-       * 3. Draw eraser {@link fabric.PencilBrush#_render} at {@link fabric.EraserBrush#renderTopLayer}
-       * 4. Draw non-erasable overlays {@link fabric.EraserBrush#renderOverlay}
+       * Rendering Logic:
+       * 1. Use brush to clip canvas by rendering it on top of canvas (unnecessary if `inverted === true`)
+       * 2. Render brush with canvas pattern on top context
        *
-       * @param {fabric.Canvas} canvas
        */
       _render: function () {
-        if (!this._ready) {
-          return;
-        }
-        this.isRendering = 1;
-        this.renderBottomLayer();
-        this.renderTopLayer();
-        this.renderOverlay();
-        this.isRendering = 0;
+        var ctx;
+        //  clip canvas
+        ctx = this.canvas.getContext();
+        this.callSuper('_render', ctx);
+        //  render brush and mask it with pattern
+        ctx = this.canvas.contextTop;
+        this.canvas.clearContext(ctx);
+        this.callSuper('_render', ctx);
+        ctx.save();
+        var t = this.canvas.getRetinaScaling(), s = 1 / t;
+        ctx.scale(s, s);
+        ctx.globalCompositeOperation = 'source-in';
+        ctx.drawImage(this._patternCanvas, 0, 0);
+        ctx.restore();
       },
 
       /**
-       * @public
+       * Creates fabric.Path object
+       * @override
+       * @private
+       * @param {(string|number)[][]} pathData Path data
+       * @return {fabric.Path} Path to add on canvas
+       * @returns
        */
-      render: function () {
-        if (this._isErasing) {
-          if (this.isRendering) {
-            this.isRendering = fabric.util.requestAnimFrame(this._renderBound);
-          }
-          else {
-            this._render();
-          }
-          return true;
-        }
-        return false;
+      createPath: function (pathData) {
+        var path = this.callSuper('createPath', pathData);
+        path.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
+        path.stroke = this.inverted ? 'white' : 'black';
+        return path;
       },
 
       /**
        * Utility to apply a clip path to a path.
        * Used to preserve clipping on eraser paths in nested objects.
        * Called when a group has a clip path that should be applied to the path before applying erasing on the group's objects.
-       * @param {fabric.Path} path The eraser path
+       * @param {fabric.Path} path The eraser path in canvas coordinate plane
        * @param {fabric.Object} clipPath The clipPath to apply to the path
        * @param {number[]} clipPathContainerTransformMatrix The transform matrix of the object that the clip path belongs to
        * @returns {fabric.Path} path with clip path
        */
       applyClipPathToPath: function (path, clipPath, clipPathContainerTransformMatrix) {
-        var pathTransform = path.calcTransformMatrix();
-        var clipPathTransform = clipPath.calcTransformMatrix();
-        var transform = fabric.util.multiplyTransformMatrices(
-          fabric.util.invertTransform(pathTransform),
-          clipPathContainerTransformMatrix
-        );
+        var pathInvTransform = fabric.util.invertTransform(path.calcTransformMatrix()),
+            clipPathTransform = clipPath.calcTransformMatrix(),
+            transform = clipPath.absolutePositioned ?
+              pathInvTransform :
+              fabric.util.multiplyTransformMatrices(
+                pathInvTransform,
+                clipPathContainerTransformMatrix
+              );
+        //  when passing down a clip path it becomes relative to the parent
+        //  so we transform it acoordingly and set `absolutePositioned` to false
+        clipPath.absolutePositioned = false;
         fabric.util.applyTransformToObject(
           clipPath,
           fabric.util.multiplyTransformMatrices(
@@ -642,7 +580,11 @@
             clipPathTransform
           )
         );
-        path.clipPath = clipPath;
+        //  We need to clip `path` with both `clipPath` and it's own clip path if existing (`path.clipPath`)
+        //  so in turn `path` erases an object only where it overlaps with all it's clip paths, regardless of how many there are.
+        //  this is done because both clip paths may have nested clip paths of their own (this method walks down a collection => this may reccur),
+        //  so we can't assign one to the other's clip path property.
+        path.clipPath = path.clipPath ? fabric.util.mergeClipPaths(clipPath, path.clipPath) : clipPath;
         return path;
       },
 
@@ -652,27 +594,31 @@
        * Called when a group has a clip path that should be applied to the path before applying erasing on the group's objects.
        * @param {fabric.Path} path The eraser path
        * @param {fabric.Object} object The clipPath to apply to path belongs to object
-       * @param {Function} callback Callback to be invoked with the cloned path after applying the clip path
+       * @returns {Promise<fabric.Path>}
        */
-      clonePathWithClipPath: function (path, object, callback) {
+      clonePathWithClipPath: function (path, object) {
         var objTransform = object.calcTransformMatrix();
-        var clipPath = object.getClipPath();
+        var clipPath = object.clipPath;
         var _this = this;
-        path.clone(function (_path) {
-          clipPath.clone(function (_clipPath) {
-            callback(_this.applyClipPathToPath(_path, _clipPath, objTransform));
-          });
+        return Promise.all([
+          path.clone(),
+          clipPath.clone(['absolutePositioned', 'inverted'])
+        ]).then(function (clones) {
+          return _this.applyClipPathToPath(clones[0], clones[1], objTransform);
         });
       },
 
       /**
-       * Adds path to existing clipPath of object
+       * Adds path to object's eraser, walks down object's descendants if necessary
        *
+       * @public
+       * @fires erasing:end on object
        * @param {fabric.Object} obj
        * @param {fabric.Path} path
+       * @param {Object} [context] context to assign erased objects to
+       * @returns {Promise<fabric.Path | fabric.Path[]>}
        */
-      _addPathToObjectEraser: function (obj, path) {
-        var clipObject;
+      _addPathToObjectEraser: function (obj, path, context) {
         var _this = this;
         //  object is collection, i.e group
         if (obj.forEachObject && obj.erasable === 'deep') {
@@ -680,59 +626,48 @@
             return _obj.erasable;
           });
           if (targets.length > 0 && obj.clipPath) {
-            this.clonePathWithClipPath(path, obj, function (_path) {
-              targets.forEach(function (_obj) {
-                _this._addPathToObjectEraser(_obj, _path);
+            return this.clonePathWithClipPath(path, obj)
+              .then(function (_path) {
+                return Promise.all(targets.map(function (_obj) {
+                  return _this._addPathToObjectEraser(_obj, _path, context);
+                }));
               });
-            });
           }
           else if (targets.length > 0) {
-            targets.forEach(function (_obj) {
-              _this._addPathToObjectEraser(_obj, path);
-            });
+            return Promise.all(targets.map(function (_obj) {
+              return _this._addPathToObjectEraser(_obj, path, context);
+            }));
           }
           return;
         }
-        if (!obj.getEraser()) {
-          var size = obj._getNonTransformedDimensions();
-          var rect = new fabric.Rect({
-            fill: 'rgb(0,0,0)',
-            width: size.x,
-            height: size.y,
-            clipPath: obj.clipPath,
-            originX: 'center',
-            originY: 'center'
-          });
-          clipObject = new fabric.Group([rect], {
-            eraser: true
-          });
+        //  prepare eraser
+        var eraser = obj.eraser;
+        if (!eraser) {
+          eraser = new fabric.Eraser();
+          obj.eraser = eraser;
         }
-        else {
-          clipObject = obj.clipPath;
-        }
-
-        path.clone(function (path) {
-          path.globalCompositeOperation = 'destination-out';
-          // http://fabricjs.com/using-transformations
-          var desiredTransform = fabric.util.multiplyTransformMatrices(
-            fabric.util.invertTransform(
-              obj.calcTransformMatrix()
-            ),
-            path.calcTransformMatrix()
-          );
-          fabric.util.applyTransformToObject(path, desiredTransform);
-          clipObject.addWithUpdate(path);
-          obj.set({
-            clipPath: clipObject,
-            dirty: true
+        //  clone and add path
+        return path.clone()
+          .then(function (path) {
+            // http://fabricjs.com/using-transformations
+            var desiredTransform = fabric.util.multiplyTransformMatrices(
+              fabric.util.invertTransform(
+                obj.calcTransformMatrix()
+              ),
+              path.calcTransformMatrix()
+            );
+            fabric.util.applyTransformToObject(path, desiredTransform);
+            eraser.add(path);
+            obj.set('dirty', true);
+            obj.fire('erasing:end', {
+              path: path
+            });
+            if (context) {
+              (obj.group ? context.subTargets : context.targets).push(obj);
+              //context.paths.set(obj, path);
+            }
+            return path;
           });
-          obj.fire('erasing:end', {
-            path: path
-          });
-          if (obj.group && Array.isArray(_this.__subTargets)) {
-            _this.__subTargets.push(obj);
-          }
-        });
       },
 
       /**
@@ -740,22 +675,26 @@
        *
        * @param {fabric.Canvas} source
        * @param {fabric.Canvas} path
-       * @returns {Object} canvas drawables that were erased by the path
+       * @param {Object} [context] context to assign erased objects to
+       * @returns {Promise<fabric.Path[]|void>} eraser paths
        */
-      applyEraserToCanvas: function (path) {
+      applyEraserToCanvas: function (path, context) {
         var canvas = this.canvas;
-        var drawables = {};
-        [
+        return Promise.all([
           'backgroundImage',
           'overlayImage',
-        ].forEach(function (prop) {
+        ].map(function (prop) {
           var drawable = canvas[prop];
-          if (drawable && drawable.erasable) {
-            this._addPathToObjectEraser(drawable, path);
-            drawables[prop] = drawable;
-          }
-        }, this);
-        return drawables;
+          return drawable && drawable.erasable &&
+            this._addPathToObjectEraser(drawable, path)
+              .then(function (path) {
+                if (context) {
+                  context.drawables[prop] = drawable;
+                  //context.paths.set(drawable, path);
+                }
+                return path;
+              });
+        }, this));
       },
 
       /**
@@ -790,33 +729,35 @@
         var path = this.createPath(pathData);
         //  needed for `intersectsWithObject`
         path.setCoords();
+        //  commense event sequence
         canvas.fire('before:path:created', { path: path });
 
         // finalize erasing
-        var drawables = this.applyEraserToCanvas(path);
         var _this = this;
-        this.__subTargets = [];
-        var targets = [];
-        canvas.forEachObject(function (obj) {
-          if (obj.erasable && obj.intersectsWithObject(path, true, true)) {
-            _this._addPathToObjectEraser(obj, path);
-            targets.push(obj);
-          }
+        var context = {
+          targets: [],
+          subTargets: [],
+          //paths: new Map(),
+          drawables: {}
+        };
+        var tasks = canvas._objects.map(function (obj) {
+          return obj.erasable && obj.intersectsWithObject(path, true, true) &&
+            _this._addPathToObjectEraser(obj, path, context);
         });
-        canvas.fire('erasing:end', {
-          path: path,
-          targets: targets,
-          subTargets: this.__subTargets,
-          drawables: drawables
-        });
-        delete this.__subTargets;
+        tasks.push(_this.applyEraserToCanvas(path, context));
+        return Promise.all(tasks)
+          .then(function () {
+            //  fire erasing:end
+            canvas.fire('erasing:end', Object.assign(context, {
+              path: path
+            }));
 
-        canvas.requestRenderAll();
-        path.setCoords();
-        this._resetShadow();
+            canvas.requestRenderAll();
+            _this._resetShadow();
 
-        // fire event 'path' created
-        canvas.fire('path:created', { path: path });
+            // fire event 'path' created
+            canvas.fire('path:created', { path: path });
+          });
       }
     }
   );

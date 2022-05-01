@@ -99,11 +99,10 @@
   });
 
   /**
-   * Returns filter instance from an object representation
+   * Create filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @param {function} [callback] to be invoked after filter creation
-   * @return {fabric.Image.filters.Invert} Instance of fabric.Image.filters.Invert
+   * @returns {Promise<fabric.Image.filters.Invert>}
    */
   fabric.Image.filters.Invert.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 

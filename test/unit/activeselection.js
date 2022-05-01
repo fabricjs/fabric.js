@@ -62,6 +62,7 @@
       width:                    80,
       height:                   60,
       fill:                     'rgb(0,0,0)',
+      layout:                   'fit-content',
       stroke:                   null,
       strokeWidth:              0,
       strokeDashArray:          null,
@@ -72,6 +73,8 @@
       scaleX:                   1,
       scaleY:                   1,
       shadow:                   null,
+      subTargetCheck:           false,
+      interactive:              false,
       visible:                  true,
       backgroundColor:          '',
       angle:                    0,
@@ -99,7 +102,7 @@
     group.includeDefaultValues = false;
     var clone = group.toObject();
     var objects = [{
-      version:                  fabric.version,
+      version: fabric.version,
       type: 'rect',
       left: 10,
       top: -30,
@@ -107,7 +110,7 @@
       height: 10,
       strokeWidth: 0
     }, {
-      version:                  fabric.version,
+      version: fabric.version,
       type: 'rect',
       left: -40,
       top: -10,
@@ -122,7 +125,7 @@
       top:                100,
       width:              80,
       height:             60,
-      objects:            objects
+      objects:            objects,
     };
     assert.deepEqual(clone, expectedObject);
   });
@@ -138,7 +141,7 @@
     assert.ok(typeof fabric.ActiveSelection.fromObject === 'function');
     var groupObject = group.toObject();
 
-    fabric.ActiveSelection.fromObject(groupObject, function(newGroupFromObject) {
+    fabric.ActiveSelection.fromObject(groupObject).then(function(newGroupFromObject) {
 
       var objectFromOldGroup = group.toObject();
       var objectFromNewGroup = newGroupFromObject.toObject();
@@ -181,42 +184,11 @@
     // assert.equal(group.get('lockRotation'), true);
   });
 
-  QUnit.test('insertAt', function(assert) {
-    var rect1 = new fabric.Rect(),
-        rect2 = new fabric.Rect(),
-        group = new fabric.Group();
-
-    group.add(rect1, rect2);
-
-    assert.ok(typeof group.insertAt === 'function', 'should respond to `insertAt` method');
-
-    group.insertAt(rect1, 1);
-    assert.equal(group.item(1), rect1);
-    group.insertAt(rect2, 2);
-    assert.equal(group.item(2), rect2);
-    assert.equal(group.insertAt(rect1, 2), group, 'should be chainable');
-  });
-
-  QUnit.test('group addWithUpdate', function(assert) {
-    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        group = new fabric.Group([rect1]);
-
-    var coords = group.oCoords;
-    group.addWithUpdate(rect2);
-    var newCoords = group.oCoords;
-    assert.notEqual(coords, newCoords, 'object coords have been recalculated - add');
-  });
-
-  QUnit.test('group removeWithUpdate', function(assert) {
-    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        group = new fabric.Group([rect1, rect2]);
-
-    var coords = group.oCoords;
-    group.removeWithUpdate(rect2);
-    var newCoords = group.oCoords;
-    assert.notEqual(coords, newCoords, 'object coords have been recalculated - remove');
+  QUnit.test('inherited methods', function (assert) {
+    var methods = ['add', 'insertAt', 'remove', 'removeAll'];
+    methods.forEach(method => {
+      assert.strictEqual(fabric.ActiveSelection.prototype[method], fabric.Group.prototype[method]);
+    });
   });
 
   QUnit.test('ActiveSelection shouldCache', function(assert) {

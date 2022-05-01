@@ -271,7 +271,7 @@
       var wrapped = [], i;
       this.isWrapping = true;
       for (i = 0; i < lines.length; i++) {
-        wrapped = wrapped.concat(this._wrapLine(lines[i], i, desiredWidth));
+        wrapped.push.apply(wrapped, this._wrapLine(lines[i], i, desiredWidth));
       }
       this.isWrapping = false;
       return wrapped;
@@ -279,13 +279,15 @@
 
     /**
      * Helper function to measure a string of text, given its lineIndex and charIndex offset
-     * it gets called when charBounds are not available yet.
+     * It gets called when charBounds are not available yet.
+     * Override if necessary
+     * Use with {@link fabric.Textbox#wordSplit}
+     *
      * @param {CanvasRenderingContext2D} ctx
      * @param {String} text
      * @param {number} lineIndex
      * @param {number} charOffset
      * @returns {number}
-     * @private
      */
     _measureWord: function(word, lineIndex, charOffset) {
       var width = 0, prevGrapheme, skipLeft = true;
@@ -296,6 +298,16 @@
         prevGrapheme = word[i];
       }
       return width;
+    },
+
+    /**
+     * Override this method to customize word splitting
+     * Use with {@link fabric.Textbox#_measureWord}
+     * @param {string} value
+     * @returns {string[]} array of words
+     */
+    wordSplit: function (value) {
+      return value.split(this._wordJoiners);
     },
 
     /**
@@ -313,7 +325,7 @@
           graphemeLines = [],
           line = [],
           // spaces in different languages?
-          words = splitByGrapheme ? fabric.util.string.graphemeSplit(_line) : _line.split(this._wordJoiners),
+          words = splitByGrapheme ? this.graphemeSplit(_line) : this.wordSplit(_line),
           word = '',
           offset = 0,
           infix = splitByGrapheme ? '' : ' ',
@@ -328,14 +340,25 @@
         words.push([]);
       }
       desiredWidth -= reservedSpace;
-      for (var i = 0; i < words.length; i++) {
+      // measure words
+      var data = words.map(function (word) {
         // if using splitByGrapheme words are already in graphemes.
-        word = splitByGrapheme ? words[i] : fabric.util.string.graphemeSplit(words[i]);
-        wordWidth = this._measureWord(word, lineIndex, offset);
+        word = splitByGrapheme ? word : this.graphemeSplit(word);
+        var width = this._measureWord(word, lineIndex, offset);
+        largestWordWidth = Math.max(width, largestWordWidth);
+        offset += word.length + 1;
+        return { word: word, width: width };
+      }.bind(this));
+      var maxWidth = Math.max(desiredWidth, largestWordWidth, this.dynamicMinWidth);
+      // layout words
+      offset = 0;
+      for (var i = 0; i < words.length; i++) {
+        word = data[i].word;
+        wordWidth = data[i].width;
         offset += word.length;
 
         lineWidth += infixWidth + wordWidth - additionalSpace;
-        if (lineWidth > desiredWidth && !lineJustStarted) {
+        if (lineWidth > maxWidth && !lineJustStarted) {
           graphemeLines.push(line);
           line = [];
           lineWidth = wordWidth;
@@ -353,10 +376,6 @@
         infixWidth = splitByGrapheme ? 0 : this._measureWord([infix], lineIndex, offset);
         offset++;
         lineJustStarted = false;
-        // keep track of largest word
-        if (wordWidth > largestWordWidth) {
-          largestWordWidth = wordWidth;
-        }
       }
 
       i && graphemeLines.push(line);
@@ -450,9 +469,9 @@
    * @static
    * @memberOf fabric.Textbox
    * @param {Object} object Object to create an instance from
-   * @param {Function} [callback] Callback to invoke when an fabric.Textbox instance is created
+   * @returns {Promise<fabric.Textbox>}
    */
-  fabric.Textbox.fromObject = function(object, callback) {
-    return fabric.Object._fromObject('Textbox', object, callback, 'text');
+  fabric.Textbox.fromObject = function(object) {
+    return fabric.Object._fromObject(fabric.Textbox, object, 'text');
   };
 })(typeof exports !== 'undefined' ? exports : this);

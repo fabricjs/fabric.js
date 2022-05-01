@@ -100,11 +100,10 @@
   });
 
   /**
-   * Returns filter instance from an object representation
+   * Create filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @param {function} [callback] to be invoked after filter creation
-   * @return {fabric.Image.filters.MyFilter} Instance of fabric.Image.filters.MyFilter
+   * @returns {Promise<fabric.Image.filters.MyFilter>}
    */
   fabric.Image.filters.MyFilter.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 

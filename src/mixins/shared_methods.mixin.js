@@ -15,32 +15,6 @@ fabric.CommonMethods = {
 
   /**
    * @private
-   * @param {Object} [filler] Options object
-   * @param {String} [property] property to set the Gradient to
-   */
-  _initGradient: function(filler, property) {
-    if (filler && filler.colorStops && !(filler instanceof fabric.Gradient)) {
-      this.set(property, new fabric.Gradient(filler));
-    }
-  },
-
-  /**
-   * @private
-   * @param {Object} [filler] Options object
-   * @param {String} [property] property to set the Pattern to
-   * @param {Function} [callback] callback to invoke after pattern load
-   */
-  _initPattern: function(filler, property, callback) {
-    if (filler && filler.source && !(filler instanceof fabric.Pattern)) {
-      this.set(property, new fabric.Pattern(filler, callback));
-    }
-    else {
-      callback && callback();
-    }
-  },
-
-  /**
-   * @private
    */
   _setObject: function(obj) {
     for (var prop in obj) {

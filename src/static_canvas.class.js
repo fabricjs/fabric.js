@@ -32,7 +32,8 @@
    * @fires object:added
    * @fires object:removed
    */
-  fabric.StaticCanvas = fabric.util.createClass(fabric.CommonMethods, /** @lends fabric.StaticCanvas.prototype */ {
+  // eslint-disable-next-line max-len
+  fabric.StaticCanvas = fabric.util.createClass(fabric.CommonMethods, fabric.Collection, /** @lends fabric.StaticCanvas.prototype */ {
 
     /**
      * Constructor
@@ -49,7 +50,6 @@
 
     /**
      * Background color of canvas instance.
-     * Should be set via {@link fabric.StaticCanvas#setBackgroundColor}.
      * @type {(String|fabric.Pattern)}
      * @default
      */
@@ -67,7 +67,6 @@
 
     /**
      * Overlay color of canvas instance.
-     * Should be set via {@link fabric.StaticCanvas#setOverlayColor}
      * @since 1.3.9
      * @type {(String|fabric.Pattern)}
      * @default
@@ -204,26 +203,12 @@
      * @param {Object} [options] Options object
      */
     _initStatic: function(el, options) {
-      var cb = this.requestRenderAllBound;
       this._objects = [];
       this._createLowerCanvas(el);
       this._initOptions(options);
       // only initialize retina scaling once
       if (!this.interactive) {
         this._initRetinaScaling();
-      }
-
-      if (options.overlayImage) {
-        this.setOverlayImage(options.overlayImage, cb);
-      }
-      if (options.backgroundImage) {
-        this.setBackgroundImage(options.backgroundImage, cb);
-      }
-      if (options.backgroundColor) {
-        this.setBackgroundColor(options.backgroundColor, cb);
-      }
-      if (options.overlayColor) {
-        this.setOverlayColor(options.overlayColor, cb);
       }
       this.calcOffset();
     },
@@ -232,7 +217,7 @@
      * @private
      */
     _isRetinaScaling: function() {
-      return (fabric.devicePixelRatio !== 1 && this.enableRetinaScaling);
+      return (fabric.devicePixelRatio > 1 && this.enableRetinaScaling);
     },
 
     /**
@@ -240,7 +225,7 @@
      * @return {Number} retinaScaling if applied, otherwise 1;
      */
     getRetinaScaling: function() {
-      return this._isRetinaScaling() ? fabric.devicePixelRatio : 1;
+      return this._isRetinaScaling() ? Math.max(1, fabric.devicePixelRatio) : 1;
     },
 
     /**
@@ -272,202 +257,6 @@
      */
     calcOffset: function () {
       this._offset = getElementOffset(this.lowerCanvasEl);
-      return this;
-    },
-
-    /**
-     * Sets {@link fabric.StaticCanvas#overlayImage|overlay image} for this canvas
-     * @param {(fabric.Image|String)} image fabric.Image instance or URL of an image to set overlay to
-     * @param {Function} callback callback to invoke when image is loaded and set as an overlay
-     * @param {Object} [options] Optional options to set for the {@link fabric.Image|overlay image}.
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     * @see {@link http://jsfiddle.net/fabricjs/MnzHT/|jsFiddle demo}
-     * @example <caption>Normal overlayImage with left/top = 0</caption>
-     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
-     *   // Needed to position overlayImage at 0/0
-     *   originX: 'left',
-     *   originY: 'top'
-     * });
-     * @example <caption>overlayImage with different properties</caption>
-     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
-     *   opacity: 0.5,
-     *   angle: 45,
-     *   left: 400,
-     *   top: 400,
-     *   originX: 'left',
-     *   originY: 'top'
-     * });
-     * @example <caption>Stretched overlayImage #1 - width/height correspond to canvas width/height</caption>
-     * fabric.Image.fromURL('http://fabricjs.com/assets/jail_cell_bars.png', function(img, isError) {
-     *    img.set({width: canvas.width, height: canvas.height, originX: 'left', originY: 'top'});
-     *    canvas.setOverlayImage(img, canvas.renderAll.bind(canvas));
-     * });
-     * @example <caption>Stretched overlayImage #2 - width/height correspond to canvas width/height</caption>
-     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
-     *   width: canvas.width,
-     *   height: canvas.height,
-     *   // Needed to position overlayImage at 0/0
-     *   originX: 'left',
-     *   originY: 'top'
-     * });
-     * @example <caption>overlayImage loaded from cross-origin</caption>
-     * canvas.setOverlayImage('http://fabricjs.com/assets/jail_cell_bars.png', canvas.renderAll.bind(canvas), {
-     *   opacity: 0.5,
-     *   angle: 45,
-     *   left: 400,
-     *   top: 400,
-     *   originX: 'left',
-     *   originY: 'top',
-     *   crossOrigin: 'anonymous'
-     * });
-     */
-    setOverlayImage: function (image, callback, options) {
-      return this.__setBgOverlayImage('overlayImage', image, callback, options);
-    },
-
-    /**
-     * Sets {@link fabric.StaticCanvas#backgroundImage|background image} for this canvas
-     * @param {(fabric.Image|String)} image fabric.Image instance or URL of an image to set background to
-     * @param {Function} callback Callback to invoke when image is loaded and set as background
-     * @param {Object} [options] Optional options to set for the {@link fabric.Image|background image}.
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     * @see {@link http://jsfiddle.net/djnr8o7a/28/|jsFiddle demo}
-     * @example <caption>Normal backgroundImage with left/top = 0</caption>
-     * canvas.setBackgroundImage('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
-     *   // Needed to position backgroundImage at 0/0
-     *   originX: 'left',
-     *   originY: 'top'
-     * });
-     * @example <caption>backgroundImage with different properties</caption>
-     * canvas.setBackgroundImage('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
-     *   opacity: 0.5,
-     *   angle: 45,
-     *   left: 400,
-     *   top: 400,
-     *   originX: 'left',
-     *   originY: 'top'
-     * });
-     * @example <caption>Stretched backgroundImage #1 - width/height correspond to canvas width/height</caption>
-     * fabric.Image.fromURL('http://fabricjs.com/assets/honey_im_subtle.png', function(img, isError) {
-     *    img.set({width: canvas.width, height: canvas.height, originX: 'left', originY: 'top'});
-     *    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
-     * });
-     * @example <caption>Stretched backgroundImage #2 - width/height correspond to canvas width/height</caption>
-     * canvas.setBackgroundImage('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
-     *   width: canvas.width,
-     *   height: canvas.height,
-     *   // Needed to position backgroundImage at 0/0
-     *   originX: 'left',
-     *   originY: 'top'
-     * });
-     * @example <caption>backgroundImage loaded from cross-origin</caption>
-     * canvas.setBackgroundImage('http://fabricjs.com/assets/honey_im_subtle.png', canvas.renderAll.bind(canvas), {
-     *   opacity: 0.5,
-     *   angle: 45,
-     *   left: 400,
-     *   top: 400,
-     *   originX: 'left',
-     *   originY: 'top',
-     *   crossOrigin: 'anonymous'
-     * });
-     */
-    // TODO: fix stretched examples
-    setBackgroundImage: function (image, callback, options) {
-      return this.__setBgOverlayImage('backgroundImage', image, callback, options);
-    },
-
-    /**
-     * Sets {@link fabric.StaticCanvas#overlayColor|foreground color} for this canvas
-     * @param {(String|fabric.Pattern)} overlayColor Color or pattern to set foreground color to
-     * @param {Function} callback Callback to invoke when foreground color is set
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     * @see {@link http://jsfiddle.net/fabricjs/pB55h/|jsFiddle demo}
-     * @example <caption>Normal overlayColor - color value</caption>
-     * canvas.setOverlayColor('rgba(255, 73, 64, 0.6)', canvas.renderAll.bind(canvas));
-     * @example <caption>fabric.Pattern used as overlayColor</caption>
-     * canvas.setOverlayColor({
-     *   source: 'http://fabricjs.com/assets/escheresque_ste.png'
-     * }, canvas.renderAll.bind(canvas));
-     * @example <caption>fabric.Pattern used as overlayColor with repeat and offset</caption>
-     * canvas.setOverlayColor({
-     *   source: 'http://fabricjs.com/assets/escheresque_ste.png',
-     *   repeat: 'repeat',
-     *   offsetX: 200,
-     *   offsetY: 100
-     * }, canvas.renderAll.bind(canvas));
-     */
-    setOverlayColor: function(overlayColor, callback) {
-      return this.__setBgOverlayColor('overlayColor', overlayColor, callback);
-    },
-
-    /**
-     * Sets {@link fabric.StaticCanvas#backgroundColor|background color} for this canvas
-     * @param {(String|fabric.Pattern)} backgroundColor Color or pattern to set background color to
-     * @param {Function} callback Callback to invoke when background color is set
-     * @return {fabric.Canvas} thisArg
-     * @chainable
-     * @see {@link http://jsfiddle.net/fabricjs/hXzvk/|jsFiddle demo}
-     * @example <caption>Normal backgroundColor - color value</caption>
-     * canvas.setBackgroundColor('rgba(255, 73, 64, 0.6)', canvas.renderAll.bind(canvas));
-     * @example <caption>fabric.Pattern used as backgroundColor</caption>
-     * canvas.setBackgroundColor({
-     *   source: 'http://fabricjs.com/assets/escheresque_ste.png'
-     * }, canvas.renderAll.bind(canvas));
-     * @example <caption>fabric.Pattern used as backgroundColor with repeat and offset</caption>
-     * canvas.setBackgroundColor({
-     *   source: 'http://fabricjs.com/assets/escheresque_ste.png',
-     *   repeat: 'repeat',
-     *   offsetX: 200,
-     *   offsetY: 100
-     * }, canvas.renderAll.bind(canvas));
-     */
-    setBackgroundColor: function(backgroundColor, callback) {
-      return this.__setBgOverlayColor('backgroundColor', backgroundColor, callback);
-    },
-
-    /**
-     * @private
-     * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundImage|backgroundImage}
-     * or {@link fabric.StaticCanvas#overlayImage|overlayImage})
-     * @param {(fabric.Image|String|null)} image fabric.Image instance, URL of an image or null to set background or overlay to
-     * @param {Function} callback Callback to invoke when image is loaded and set as background or overlay. The first argument is the created image, the second argument is a flag indicating whether an error occurred or not.
-     * @param {Object} [options] Optional options to set for the {@link fabric.Image|image}.
-     */
-    __setBgOverlayImage: function(property, image, callback, options) {
-      if (typeof image === 'string') {
-        fabric.util.loadImage(image, function(img, isError) {
-          if (img) {
-            var instance = new fabric.Image(img, options);
-            this[property] = instance;
-            instance.canvas = this;
-          }
-          callback && callback(img, isError);
-        }, this, options && options.crossOrigin);
-      }
-      else {
-        options && image.setOptions(options);
-        this[property] = image;
-        image && (image.canvas = this);
-        callback && callback(image, false);
-      }
-
-      return this;
-    },
-
-    /**
-     * @private
-     * @param {String} property Property to set ({@link fabric.StaticCanvas#backgroundColor|backgroundColor}
-     * or {@link fabric.StaticCanvas#overlayColor|overlayColor})
-     * @param {(Object|String|null)} color Object with pattern information, color value or null
-     * @param {Function} [callback] Callback is invoked when color is set
-     */
-    __setBgOverlayColor: function(property, color, callback) {
-      this[property] = color;
-      this._initGradient(color, property);
-      this._initPattern(color, property, callback);
       return this;
     },
 
@@ -525,10 +314,15 @@
       else {
         this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
       }
-
+      if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
+        /* _DEV_MODE_START_ */
+        throw new Error('fabric.js: trying to initialize a canvas that has already been initialized');
+        /* _DEV_MODE_END_ */
+      }
       fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
-      this._originalCanvasStyle = this.lowerCanvasEl.style;
+      this.lowerCanvasEl.setAttribute('data-fabric', 'main');
       if (this.interactive) {
+        this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
         this._applyCanvasStyle(this.lowerCanvasEl);
       }
 
@@ -607,7 +401,7 @@
         }
       }
       if (this._isCurrentlyDrawing) {
-        this.freeDrawingBrush && this.freeDrawingBrush._setBrushStyles();
+        this.freeDrawingBrush && this.freeDrawingBrush._setBrushStyles(this.contextTop);
       }
       this._initRetinaScaling();
       this.calcOffset();
@@ -771,15 +565,59 @@
     },
 
     /**
+     * @param {...fabric.Object} objects to add
+     * @return {Self} thisArg
+     * @chainable
+     */
+    add: function () {
+      fabric.Collection.add.call(this, arguments, this._onObjectAdded);
+      arguments.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
+      return this;
+    },
+
+    /**
+     * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
+     * An object should be an instance of (or inherit from) fabric.Object
+     * @param {fabric.Object|fabric.Object[]} objects Object(s) to insert
+     * @param {Number} index Index to insert object at
+     * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
+     * @return {Self} thisArg
+     * @chainable
+     */
+    insertAt: function (objects, index) {
+      fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
+      this.renderOnAddRemove && this.requestRenderAll();
+      return this;
+    },
+
+    /**
+     * @param {...fabric.Object} objects to remove
+     * @return {Self} thisArg
+     * @chainable
+     */
+    remove: function () {
+      var removed = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
+      removed.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
+      return this;
+    },
+
+    /**
      * @private
      * @param {fabric.Object} obj Object that was added
      */
     _onObjectAdded: function(obj) {
       this.stateful && obj.setupState();
+      if (obj.canvas && obj.canvas !== this) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
+          'Resulting to default behavior: removing object from previous canvas and adding to new canvas');
+        /* _DEV_MODE_END_ */
+        obj.canvas.remove(obj);
+      }
       obj._set('canvas', this);
       obj.setCoords();
       this.fire('object:added', { target: obj });
-      obj.fire('added');
+      obj.fire('added', { target: this });
     },
 
     /**
@@ -788,8 +626,8 @@
      */
     _onObjectRemoved: function(obj) {
       this.fire('object:removed', { target: obj });
-      obj.fire('removed');
-      delete obj.canvas;
+      obj.fire('removed', { target: this });
+      obj._set('canvas', undefined);
     },
 
     /**
@@ -1033,6 +871,7 @@
      * Returns coordinates of a center of canvas.
      * Returned value is an object with top and left properties
      * @return {Object} object with "top" and "left" number values
+     * @deprecated migrate to `getCenterPoint`
      */
     getCenter: function () {
       return {
@@ -1042,12 +881,20 @@
     },
 
     /**
+     * Returns coordinates of a center of canvas.
+     * @return {fabric.Point}
+     */
+    getCenterPoint: function () {
+      return new fabric.Point(this.width / 2, this.height / 2);
+    },
+
+    /**
      * Centers object horizontally in the canvas
      * @param {fabric.Object} object Object to center horizontally
      * @return {fabric.Canvas} thisArg
      */
     centerObjectH: function (object) {
-      return this._centerObject(object, new fabric.Point(this.getCenter().left, object.getCenterPoint().y));
+      return this._centerObject(object, new fabric.Point(this.getCenterPoint().x, object.getCenterPoint().y));
     },
 
     /**
@@ -1057,7 +904,7 @@
      * @chainable
      */
     centerObjectV: function (object) {
-      return this._centerObject(object, new fabric.Point(object.getCenterPoint().x, this.getCenter().top));
+      return this._centerObject(object, new fabric.Point(object.getCenterPoint().x, this.getCenterPoint().y));
     },
 
     /**
@@ -1067,9 +914,8 @@
      * @chainable
      */
     centerObject: function(object) {
-      var center = this.getCenter();
-
-      return this._centerObject(object, new fabric.Point(center.left, center.top));
+      var center = this.getCenterPoint();
+      return this._centerObject(object, center);
     },
 
     /**
@@ -1080,7 +926,6 @@
      */
     viewportCenterObject: function(object) {
       var vpCenter = this.getVpCenter();
-
       return this._centerObject(object, vpCenter);
     },
 
@@ -1114,9 +959,9 @@
      * @chainable
      */
     getVpCenter: function() {
-      var center = this.getCenter(),
+      var center = this.getCenterPoint(),
           iVpt = invertTransform(this.viewportTransform);
-      return transformPoint({ x: center.left, y: center.top }, iVpt);
+      return transformPoint(center, iVpt);
     },
 
     /**
@@ -1127,7 +972,7 @@
      * @chainable
      */
     _centerObject: function(object, center) {
-      object.setPositionByOrigin(center, 'center', 'center');
+      object.setXY(center, 'center', 'center');
       object.setCoords();
       this.renderOnAddRemove && this.requestRenderAll();
       return this;
@@ -1780,10 +1625,13 @@
       this.overlayImage = null;
       this._iTextInstances = null;
       this.contextContainer = null;
-      // restore canvas style
+      // restore canvas style and attributes
       this.lowerCanvasEl.classList.remove('lower-canvas');
-      fabric.util.setStyle(this.lowerCanvasEl, this._originalCanvasStyle);
-      delete this._originalCanvasStyle;
+      this.lowerCanvasEl.removeAttribute('data-fabric');
+      if (this.interactive) {
+        this.lowerCanvasEl.style.cssText = this._originalCanvasStyle;
+        delete this._originalCanvasStyle;
+      }
       // restore canvas size to original size in case retina scaling was applied
       this.lowerCanvasEl.setAttribute('width', this.width);
       this.lowerCanvasEl.setAttribute('height', this.height);
@@ -1803,7 +1651,6 @@
   });
 
   extend(fabric.StaticCanvas.prototype, fabric.Observable);
-  extend(fabric.StaticCanvas.prototype, fabric.Collection);
   extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
 
   extend(fabric.StaticCanvas, /** @lends fabric.StaticCanvas */ {

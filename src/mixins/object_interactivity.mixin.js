@@ -10,15 +10,10 @@
      * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
      */
     _findTargetCorner: function(pointer, forTouch) {
-      // objects in group, anykind, are not self modificable,
-      // must not return an hovered corner.
-      if (!this.hasControls || this.group || (!this.canvas || this.canvas._activeObject !== this)) {
+      if (!this.hasControls || (!this.canvas || this.canvas._activeObject !== this)) {
         return false;
       }
-
-      var ex = pointer.x,
-          ey = pointer.y,
-          xPoints,
+      var xPoints,
           lines, keys = Object.keys(this.oCoords),
           j = keys.length - 1, i;
       this.__corner = 0;
@@ -45,7 +40,7 @@
         // this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
         // this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
 
-        xPoints = this._findCrossPoints({ x: ex, y: ey }, lines);
+        xPoints = this._findCrossPoints(pointer, lines);
         if (xPoints !== 0 && xPoints % 2 === 1) {
           this.__corner = i;
           return i;
@@ -101,7 +96,7 @@
         return this;
       }
       ctx.save();
-      var center = this.getCenterPoint(), wh = this._calculateCurrentDimensions(),
+      var center = this.getRelativeCenterPoint(), wh = this._calculateCurrentDimensions(),
           vpt = this.canvas.viewportTransform;
       ctx.translate(center.x, center.y);
       ctx.scale(1 / vpt[0], 1 / vpt[3]);
@@ -128,8 +123,7 @@
           width = wh.x + strokeWidth,
           height = wh.y + strokeWidth,
           hasControls = typeof styleOverride.hasControls !== 'undefined' ?
-            styleOverride.hasControls : this.hasControls,
-          shouldStroke = false;
+            styleOverride.hasControls : this.hasControls;
 
       ctx.save();
       ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
@@ -141,26 +135,8 @@
         width,
         height
       );
+      hasControls && this.drawControlsConnectingLines(ctx);
 
-      if (hasControls) {
-        ctx.beginPath();
-        this.forEachControl(function(control, key, fabricObject) {
-          // in this moment, the ctx is centered on the object.
-          // width and height of the above function are the size of the bbox.
-          if (control.withConnection && control.getVisibility(fabricObject, key)) {
-            // reset movement for each control
-            shouldStroke = true;
-            ctx.moveTo(control.x * width, control.y * height);
-            ctx.lineTo(
-              control.x * width + control.offsetX,
-              control.y * height + control.offsetY
-            );
-          }
-        });
-        if (shouldStroke) {
-          ctx.stroke();
-        }
-      }
       ctx.restore();
       return this;
     },
@@ -184,7 +160,9 @@
           width =
             bbox.x + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleX) + borderScaleFactor,
           height =
-            bbox.y + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor;
+            bbox.y + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor,
+          hasControls = typeof styleOverride.hasControls !== 'undefined' ?
+            styleOverride.hasControls : this.hasControls;
       ctx.save();
       this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray);
       ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
@@ -194,8 +172,43 @@
         width,
         height
       );
+      hasControls && this.drawControlsConnectingLines(ctx);
 
       ctx.restore();
+      return this;
+    },
+
+    /**
+     * Draws lines from a borders of an object's bounding box to controls that have `withConnection` property set.
+     * Requires public properties: width, height
+     * Requires public options: padding, borderColor
+     * @param {CanvasRenderingContext2D} ctx Context to draw on
+     * @return {fabric.Object} thisArg
+     * @chainable
+     */
+    drawControlsConnectingLines: function (ctx) {
+      var wh = this._calculateCurrentDimensions(),
+          strokeWidth = this.borderScaleFactor,
+          width = wh.x + strokeWidth,
+          height = wh.y + strokeWidth,
+          shouldStroke = false;
+
+      ctx.beginPath();
+      this.forEachControl(function (control, key, fabricObject) {
+        // in this moment, the ctx is centered on the object.
+        // width and height of the above function are the size of the bbox.
+        if (control.withConnection && control.getVisibility(fabricObject, key)) {
+          // reset movement for each control
+          shouldStroke = true;
+          ctx.moveTo(control.x * width, control.y * height);
+          ctx.lineTo(
+            control.x * width + control.offsetX,
+            control.y * height + control.offsetY
+          );
+        }
+      });
+      shouldStroke && ctx.stroke();
+
       return this;
     },
 
@@ -211,7 +224,7 @@
     drawControls: function(ctx, styleOverride) {
       styleOverride = styleOverride || {};
       ctx.save();
-      var retinaScaling = this.canvas.getRetinaScaling(), matrix, p;
+      var retinaScaling = this.canvas.getRetinaScaling(), p;
       ctx.setTransform(retinaScaling, 0, 0, retinaScaling, 0, 0);
       ctx.strokeStyle = ctx.fillStyle = styleOverride.cornerColor || this.cornerColor;
       if (!this.transparentCorners) {
@@ -219,20 +232,9 @@
       }
       this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray);
       this.setCoords();
-      if (this.group) {
-        // fabricJS does not really support drawing controls inside groups,
-        // this piece of code here helps having at least the control in places.
-        // If an application needs to show some objects as selected because of some UI state
-        // can still call Object._renderControls() on any object they desire, independently of groups.
-        // using no padding, circular controls and hiding the rotating cursor is higly suggested,
-        matrix = this.group.calcTransformMatrix();
-      }
       this.forEachControl(function(control, key, fabricObject) {
-        p = fabricObject.oCoords[key];
         if (control.getVisibility(fabricObject, key)) {
-          if (matrix) {
-            p = fabric.util.transformPoint(p, matrix);
-          }
+          p = fabricObject.oCoords[key];
           control.render(ctx, p.x, p.y, styleOverride, fabricObject);
         }
       });

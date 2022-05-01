@@ -36,8 +36,9 @@
     image: null,
 
     /**
-     * Blend mode for the filter: one of multiply, add, diff, screen, subtract,
-     * darken, lighten, overlay, exclusion, tint.
+     * Blend mode for the filter (one of "multiply", "mask")
+     * @type String
+     * @default
      **/
     mode: 'multiply',
 
@@ -229,17 +230,16 @@
   });
 
   /**
-   * Returns filter instance from an object representation
+   * Create filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @param {function} callback to be invoked after filter creation
-   * @return {fabric.Image.filters.BlendImage} Instance of fabric.Image.filters.BlendImage
+   * @returns {Promise<fabric.Image.filters.BlendImage>}
    */
-  fabric.Image.filters.BlendImage.fromObject = function(object, callback) {
-    fabric.Image.fromObject(object.image, function(image) {
+  fabric.Image.filters.BlendImage.fromObject = function(object) {
+    return fabric.Image.fromObject(object.image).then(function(image) {
       var options = fabric.util.object.clone(object);
       options.image = image;
-      callback(new fabric.Image.filters.BlendImage(options));
+      return new fabric.Image.filters.BlendImage(options);
     });
   };
 

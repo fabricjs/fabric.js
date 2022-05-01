@@ -1,12 +1,18 @@
-(function(global) {
+(function (global) {
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { }),
-      min = fabric.util.array.min,
-      max = fabric.util.array.max;
+  var fabric = global.fabric || (global.fabric = {}),
+      multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
+      invertTransform = fabric.util.invertTransform,
+      transformPoint = fabric.util.transformPoint,
+      applyTransformToObject = fabric.util.applyTransformToObject,
+      degreesToRadians = fabric.util.degreesToRadians,
+      clone = fabric.util.object.clone,
+      extend = fabric.util.object.extend;
 
   if (fabric.Group) {
+    fabric.warn('fabric.Group is already defined');
     return;
   }
 
@@ -15,280 +21,344 @@
    * @class fabric.Group
    * @extends fabric.Object
    * @mixes fabric.Collection
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#groups}
+   * @fires layout once layout completes
    * @see {@link fabric.Group#initialize} for constructor definition
    */
   fabric.Group = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.Group.prototype */ {
 
     /**
      * Type of an object
-     * @type String
+     * @type string
      * @default
      */
     type: 'group',
 
     /**
+     * Specifies the **layout strategy** for instance
+     * Used by `getLayoutStrategyResult` to calculate layout
+     * `fit-content`, `fit-content-lazy`, `fixed`, `clip-path` are supported out of the box
+     * @type string
+     * @default
+     */
+    layout: 'fit-content',
+
+    /**
      * Width of stroke
      * @type Number
-     * @default
      */
     strokeWidth: 0,
 
     /**
-     * Indicates if click, mouseover, mouseout events & hoverCursor should also check for subtargets
-     * @type Boolean
+     * List of properties to consider when checking if state
+     * of an object is changed (fabric.Object#hasStateChanged)
+     * as well as for history (undo/redo) purposes
+     * @type string[]
+     */
+    stateProperties: fabric.Object.prototype.stateProperties.concat('layout'),
+
+    /**
+     * Used to optimize performance
+     * set to `false` if you don't need contained objects to be targets of events
      * @default
+     * @type boolean
      */
     subTargetCheck: false,
 
     /**
-     * Groups are container, do not render anything on theyr own, ence no cache properties
-     * @type Array
+     * Used to allow targeting of object inside groups.
+     * set to true if you want to select an object inside a group.\
+     * **REQUIRES** `subTargetCheck` set to true
      * @default
+     * @type boolean
      */
-    cacheProperties: [],
+    interactive: false,
 
     /**
-     * setOnGroup is a method used for TextBox that is no more used since 2.0.0 The behavior is still
-     * available setting this boolean to true.
-     * @type Boolean
-     * @since 2.0.0
-     * @default
+     * Used internally to optimize performance
+     * Once an object is selected, instance is rendered without the selected object.
+     * This way instance is cached only once for the entire interaction with the selected object.
+     * @private
      */
-    useSetOnGroup: false,
+    _activeObjects: undefined,
 
     /**
      * Constructor
-     * @param {Object} objects Group objects
+     *
+     * @param {fabric.Object[]} [objects] instance objects
      * @param {Object} [options] Options object
-     * @param {Boolean} [isAlreadyGrouped] if true, objects have been grouped already.
-     * @return {Object} thisArg
+     * @param {boolean} [objectsRelativeToGroup] true if objects exist in group coordinate plane
+     * @return {fabric.Group} thisArg
      */
-    initialize: function(objects, options, isAlreadyGrouped) {
-      options = options || {};
-      this._objects = [];
-      // if objects enclosed in a group have been grouped already,
-      // we cannot change properties of objects.
-      // Thus we need to set options to group without objects,
-      isAlreadyGrouped && this.callSuper('initialize', options);
+    initialize: function (objects, options, objectsRelativeToGroup) {
       this._objects = objects || [];
-      for (var i = this._objects.length; i--; ) {
-        this._objects[i].group = this;
-      }
-
-      if (!isAlreadyGrouped) {
-        var center = options && options.centerPoint;
-        // we want to set origins before calculating the bounding box.
-        // so that the topleft can be set with that in mind.
-        // if specific top and left are passed, are overwritten later
-        // with the callSuper('initialize', options)
-        if (options.originX !== undefined) {
-          this.originX = options.originX;
-        }
-        if (options.originY !== undefined) {
-          this.originY = options.originY;
-        }
-        // if coming from svg i do not want to calc bounds.
-        // i assume width and height are passed along options
-        center || this._calcBounds();
-        this._updateObjectsCoords(center);
-        delete options.centerPoint;
-        this.callSuper('initialize', options);
-      }
-      else {
-        this._updateObjectsACoords();
-      }
-
-      this.setCoords();
-    },
-
-    /**
-     * @private
-     */
-    _updateObjectsACoords: function() {
-      var skipControls = true;
-      for (var i = this._objects.length; i--; ){
-        this._objects[i].setCoords(skipControls);
-      }
-    },
-
-    /**
-     * @private
-     * @param {Boolean} [skipCoordsChange] if true, coordinates of objects enclosed in a group do not change
-     */
-    _updateObjectsCoords: function(center) {
-      var center = center || this.getCenterPoint();
-      for (var i = this._objects.length; i--; ){
-        this._updateObjectCoords(this._objects[i], center);
-      }
-    },
-
-    /**
-     * @private
-     * @param {Object} object
-     * @param {fabric.Point} center, current center of group.
-     */
-    _updateObjectCoords: function(object, center) {
-      var objectLeft = object.left,
-          objectTop = object.top,
-          skipControls = true;
-
-      object.set({
-        left: objectLeft - center.x,
-        top: objectTop - center.y
+      this._activeObjects = [];
+      this.__objectMonitor = this.__objectMonitor.bind(this);
+      this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(this, true);
+      this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
+      this._firstLayoutDone = false;
+      this.callSuper('initialize', options);
+      this.forEachObject(function (object) {
+        this.enterGroup(object, false);
+      }, this);
+      this._applyLayoutStrategy({
+        type: 'initialization',
+        options: options,
+        objectsRelativeToGroup: objectsRelativeToGroup
       });
-      object.group = this;
-      object.setCoords(skipControls);
     },
 
     /**
-     * Returns string represenation of a group
-     * @return {String}
+     * @private
+     * @param {string} key
+     * @param {*} value
      */
-    toString: function() {
-      return '#<fabric.Group: (' + this.complexity() + ')>';
-    },
-
-    /**
-     * Adds an object to a group; Then recalculates group's dimension, position.
-     * @param {Object} object
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    addWithUpdate: function(object) {
-      var nested = !!this.group;
-      this._restoreObjectsState();
-      fabric.util.resetObjectTransform(this);
-      if (object) {
-        if (nested) {
-          // if this group is inside another group, we need to pre transform the object
-          fabric.util.removeTransformFromObject(object, this.group.calcTransformMatrix());
-        }
-        this._objects.push(object);
-        object.group = this;
-        object._set('canvas', this.canvas);
+    _set: function (key, value) {
+      var prev = this[key];
+      this.callSuper('_set', key, value);
+      if (key === 'canvas' && prev !== value) {
+        this.forEachObject(function (object) {
+          object._set(key, value);
+        });
       }
-      this._calcBounds();
-      this._updateObjectsCoords();
-      this.dirty = true;
-      if (nested) {
-        this.group.addWithUpdate();
+      if (key === 'layout' && prev !== value) {
+        this._applyLayoutStrategy({ type: 'layout_change', layout: value, prevLayout: prev });
       }
-      else {
-        this.setCoords();
+      if (key === 'interactive') {
+        this.forEachObject(this._watchObject.bind(this, value));
       }
-      return this;
-    },
-
-    /**
-     * Removes an object from a group; Then recalculates group's dimension, position.
-     * @param {Object} object
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    removeWithUpdate: function(object) {
-      this._restoreObjectsState();
-      fabric.util.resetObjectTransform(this);
-
-      this.remove(object);
-      this._calcBounds();
-      this._updateObjectsCoords();
-      this.setCoords();
-      this.dirty = true;
       return this;
     },
 
     /**
      * @private
      */
-    _onObjectAdded: function(object) {
-      this.dirty = true;
-      object.group = this;
+    _shouldSetNestedCoords: function () {
+      return this.subTargetCheck;
+    },
+
+    /**
+     * Add objects
+     * @param {...fabric.Object} objects
+     */
+    add: function () {
+      fabric.Collection.add.call(this, arguments, this._onObjectAdded);
+      this._onAfterObjectsChange('added', Array.from(arguments));
+    },
+
+    /**
+     * Inserts an object into collection at specified index
+     * @param {fabric.Object} objects Object to insert
+     * @param {Number} index Index to insert object at
+     */
+    insertAt: function (objects, index) {
+      fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
+      this._onAfterObjectsChange('added', Array.isArray(objects) ? objects : [objects]);
+    },
+
+    /**
+     * Remove objects
+     * @param {...fabric.Object} objects
+     * @returns {fabric.Object[]} removed objects
+     */
+    remove: function () {
+      var removed = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
+      this._onAfterObjectsChange('removed', removed);
+      return removed;
+    },
+
+    /**
+     * Remove all objects
+     * @returns {fabric.Object[]} removed objects
+     */
+    removeAll: function () {
+      this._activeObjects = [];
+      return this.remove.apply(this, this._objects.slice());
+    },
+
+    /**
+     * invalidates layout on object modified
+     * @private
+     */
+    __objectMonitor: function (opt) {
+      this._applyLayoutStrategy(extend(clone(opt), {
+        type: 'object_modified'
+      }));
+      this._set('dirty', true);
+    },
+
+    /**
+     * keeps track of the selected objects
+     * @private
+     */
+    __objectSelectionMonitor: function (selected, opt) {
+      var object = opt.target;
+      if (selected) {
+        this._activeObjects.push(object);
+        this._set('dirty', true);
+      }
+      else if (this._activeObjects.length > 0) {
+        var index = this._activeObjects.indexOf(object);
+        if (index > -1) {
+          this._activeObjects.splice(index, 1);
+          this._set('dirty', true);
+        }
+      }
+    },
+
+    /**
+     * @private
+     * @param {boolean} watch
+     * @param {fabric.Object} object
+     */
+    _watchObject: function (watch, object) {
+      var directive = watch ? 'on' : 'off';
+      //  make sure we listen only once
+      watch && this._watchObject(false, object);
+      object[directive]('changed', this.__objectMonitor);
+      object[directive]('modified', this.__objectMonitor);
+      object[directive]('selected', this.__objectSelectionTracker);
+      object[directive]('deselected', this.__objectSelectionDisposer);
+    },
+
+    /**
+     * Checks if object can enter group and logs relevant warnings
+     * @private
+     * @param {fabric.Object} object
+     * @returns
+     */
+    canEnter: function (object) {
+      if (object === this || this.isDescendantOf(object)) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Group: trying to add group to itself, this call has no effect');
+        /* _DEV_MODE_END_ */
+        return false;
+      }
+      else if (object.group && object.group === this) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
+        /* _DEV_MODE_END_ */
+        return false;
+      }
+      return true;
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
+     * @returns {boolean} true if object entered group
+     */
+    enterGroup: function (object, removeParentTransform) {
+      if (!this.canEnter(object)) {
+        return false;
+      }
+      if (object.group) {
+        object.group.remove(object);
+      }
+      this._enterGroup(object, removeParentTransform);
+      return true;
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
+     */
+    _enterGroup: function (object, removeParentTransform) {
+      if (removeParentTransform) {
+        // can this be converted to utils (sendObjectToPlane)?
+        applyTransformToObject(
+          object,
+          multiplyTransformMatrices(
+            invertTransform(this.calcTransformMatrix()),
+            object.calcTransformMatrix()
+          )
+        );
+      }
+      this._shouldSetNestedCoords() && object.setCoords();
+      object._set('group', this);
       object._set('canvas', this.canvas);
+      this.interactive && this._watchObject(true, object);
+      var activeObject = this.canvas && this.canvas.getActiveObject && this.canvas.getActiveObject();
+      // if we are adding the activeObject in a group
+      if (activeObject && (activeObject === object || object.isDescendantOf(activeObject))) {
+        this._activeObjects.push(object);
+      }
     },
 
     /**
      * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
      */
-    _onObjectRemoved: function(object) {
-      this.dirty = true;
-      delete object.group;
+    exitGroup: function (object, removeParentTransform) {
+      this._exitGroup(object, removeParentTransform);
+      object._set('canvas', undefined);
     },
 
     /**
      * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
      */
-    _set: function(key, value) {
-      var i = this._objects.length;
-      if (this.useSetOnGroup) {
-        while (i--) {
-          this._objects[i].setOnGroup(key, value);
-        }
+    _exitGroup: function (object, removeParentTransform) {
+      object._set('group', undefined);
+      if (!removeParentTransform) {
+        applyTransformToObject(
+          object,
+          multiplyTransformMatrices(
+            this.calcTransformMatrix(),
+            object.calcTransformMatrix()
+          )
+        );
+        object.setCoords();
       }
-      if (key === 'canvas') {
-        while (i--) {
-          this._objects[i]._set(key, value);
-        }
+      this._watchObject(false, object);
+      var index = this._activeObjects.length > 0 ? this._activeObjects.indexOf(object) : -1;
+      if (index > -1) {
+        this._activeObjects.splice(index, 1);
       }
-      fabric.Object.prototype._set.call(this, key, value);
     },
 
     /**
-     * Returns object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} object representation of an instance
+     * @private
+     * @param {'added'|'removed'} type
+     * @param {fabric.Object[]} targets
      */
-    toObject: function(propertiesToInclude) {
-      var _includeDefaultValues = this.includeDefaultValues;
-      var objsToObject = this._objects
-        .filter(function (obj) {
-          return !obj.excludeFromExport;
-        })
-        .map(function (obj) {
-          var originalDefaults = obj.includeDefaultValues;
-          obj.includeDefaultValues = _includeDefaultValues;
-          var _obj = obj.toObject(propertiesToInclude);
-          obj.includeDefaultValues = originalDefaults;
-          return _obj;
-        });
-      var obj = fabric.Object.prototype.toObject.call(this, propertiesToInclude);
-      obj.objects = objsToObject;
-      return obj;
+    _onAfterObjectsChange: function (type, targets) {
+      this._applyLayoutStrategy({
+        type: type,
+        targets: targets
+      });
+      this._set('dirty', true);
     },
 
     /**
-     * Returns object representation of an instance, in dataless mode.
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} object representation of an instance
+     * @private
+     * @param {fabric.Object} object
      */
-    toDatalessObject: function(propertiesToInclude) {
-      var objsToObject, sourcePath = this.sourcePath;
-      if (sourcePath) {
-        objsToObject = sourcePath;
-      }
-      else {
-        var _includeDefaultValues = this.includeDefaultValues;
-        objsToObject = this._objects.map(function(obj) {
-          var originalDefaults = obj.includeDefaultValues;
-          obj.includeDefaultValues = _includeDefaultValues;
-          var _obj = obj.toDatalessObject(propertiesToInclude);
-          obj.includeDefaultValues = originalDefaults;
-          return _obj;
-        });
-      }
-      var obj = fabric.Object.prototype.toDatalessObject.call(this, propertiesToInclude);
-      obj.objects = objsToObject;
-      return obj;
+    _onObjectAdded: function (object) {
+      this.enterGroup(object, true);
+      object.fire('added', { target: this });
     },
 
     /**
-     * Renders instance on a given context
-     * @param {CanvasRenderingContext2D} ctx context to render instance on
+     * @private
+     * @param {fabric.Object} object
      */
-    render: function(ctx) {
-      this._transformDone = true;
-      this.callSuper('render', ctx);
-      this._transformDone = false;
+    _onRelativeObjectAdded: function (object) {
+      this.enterGroup(object, false);
+      object.fire('added', { target: this });
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
+     */
+    _onObjectRemoved: function (object, removeParentTransform) {
+      this.exitGroup(object, removeParentTransform);
+      object.fire('removed', { target: this });
     },
 
     /**
@@ -301,7 +371,7 @@
     shouldCache: function() {
       var ownCache = fabric.Object.prototype.shouldCache.call(this);
       if (ownCache) {
-        for (var i = 0, len = this._objects.length; i < len; i++) {
+        for (var i = 0; i < this._objects.length; i++) {
           if (this._objects[i].willDrawShadow()) {
             this.ownCaching = false;
             return false;
@@ -319,7 +389,7 @@
       if (fabric.Object.prototype.willDrawShadow.call(this)) {
         return true;
       }
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         if (this._objects[i].willDrawShadow()) {
           return true;
         }
@@ -328,11 +398,11 @@
     },
 
     /**
-     * Check if this group or its parent group are caching, recursively up
+     * Check if instance or its group are caching, recursively up
      * @return {Boolean}
      */
-    isOnACache: function() {
-      return this.ownCaching || (this.group && this.group.isOnACache());
+    isOnACache: function () {
+      return this.ownCaching || (!!this.group && this.group.isOnACache());
     },
 
     /**
@@ -340,10 +410,11 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     drawObject: function(ctx) {
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      this._renderBackground(ctx);
+      for (var i = 0; i < this._objects.length; i++) {
         this._objects[i].render(ctx);
       }
-      this._drawClipPath(ctx);
+      this._drawClipPath(ctx, this.clipPath);
     },
 
     /**
@@ -356,7 +427,7 @@
       if (!this.statefullCache) {
         return false;
       }
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         if (this._objects[i].isCacheDirty(true)) {
           if (this._cacheCanvas) {
             // if this group has not a cache canvas there is nothing to clean
@@ -370,166 +441,464 @@
     },
 
     /**
-     * Restores original state of each of group objects (original state is that which was before group was created).
-     * if the nested boolean is true, the original state will be restored just for the
-     * first group and not for all the group chain
-     * @private
-     * @param {Boolean} nested tell the function to restore object state up to the parent group and not more
-     * @return {fabric.Group} thisArg
-     * @chainable
+     * @override
+     * @return {Boolean}
      */
-    _restoreObjectsState: function() {
-      var groupMatrix = this.calcOwnMatrix();
-      this._objects.forEach(function(object) {
-        // instead of using _this = this;
-        fabric.util.addTransformToObject(object, groupMatrix);
-        delete object.group;
+    setCoords: function () {
+      this.callSuper('setCoords');
+      this._shouldSetNestedCoords() && this.forEachObject(function (object) {
         object.setCoords();
       });
-      return this;
     },
 
     /**
-     * Realises the transform from this group onto the supplied object
-     * i.e. it tells you what would happen if the supplied object was in
-     * the group, and then the group was destroyed. It mutates the supplied
-     * object.
-     * Warning: this method is not useful anymore, it has been kept to no break the api.
-     * is not used in the fabricJS codebase
-     * this method will be reduced to using the utility.
+     * Renders instance on a given context
+     * @param {CanvasRenderingContext2D} ctx context to render instance on
+     */
+    render: function (ctx) {
+      //  used to inform objects not to double opacity
+      this._transformDone = true;
+      this.callSuper('render', ctx);
+      this._transformDone = false;
+    },
+
+    /**
+     * @public
+     * @param {Partial<LayoutResult> & { layout?: string }} [context] pass values to use for layout calculations
+     */
+    triggerLayout: function (context) {
+      if (context && context.layout) {
+        context.prevLayout = this.layout;
+        this.layout = context.layout;
+      }
+      this._applyLayoutStrategy({ type: 'imperative', context: context });
+    },
+
+    /**
      * @private
-     * @deprecated
-     * @param {fabric.Object} object that is inside the group
-     * @param {Array} parentMatrix parent transformation of the object.
-     * @return {fabric.Object} transformedObject
+     * @param {fabric.Object} object
+     * @param {fabric.Point} diff
      */
-    realizeTransform: function(object, parentMatrix) {
-      fabric.util.addTransformToObject(
-        object,
-        parentMatrix || this.calcTransformMatrix()
-      );
-      return object;
-    },
-
-    /**
-     * Destroys a group (restoring state of its objects)
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    destroy: function() {
-      // when group is destroyed objects needs to get a repaint to be eventually
-      // displayed on canvas.
-      this._objects.forEach(function(object) {
-        object.set('dirty', true);
+    _adjustObjectPosition: function (object, diff) {
+      object.set({
+        left: object.left + diff.x,
+        top: object.top + diff.y,
       });
-      return this._restoreObjectsState();
     },
 
     /**
-     * make a group an active selection, remove the group from canvas
-     * the group has to be on canvas for this to work.
-     * @return {fabric.ActiveSelection} thisArg
-     * @chainable
+     * initial layout logic:
+     * calculate bbox of objects (if necessary) and translate it according to options received from the constructor (left, top, width, height)
+     * so it is placed in the center of the bbox received from the constructor
+     *
+     * @private
+     * @param {LayoutContext} context
      */
-    toActiveSelection: function() {
-      if (!this.canvas) {
+    _applyLayoutStrategy: function (context) {
+      var isFirstLayout = context.type === 'initialization';
+      if (!isFirstLayout && !this._firstLayoutDone) {
+        //  reject layout requests before initialization layout
         return;
       }
-      var objects = this._objects, canvas = this.canvas;
-      this._objects = [];
-      var options = this.toObject();
-      delete options.objects;
-      var activeSelection = new fabric.ActiveSelection([]);
-      activeSelection.set(options);
-      activeSelection.type = 'activeSelection';
-      canvas.remove(this);
-      objects.forEach(function(object) {
-        object.group = activeSelection;
-        object.dirty = true;
-        canvas.add(object);
-      });
-      activeSelection.canvas = canvas;
-      activeSelection._objects = objects;
-      canvas._activeObject = activeSelection;
-      activeSelection.setCoords();
-      return activeSelection;
-    },
-
-    /**
-     * Destroys a group (restoring state of its objects)
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    ungroupOnCanvas: function() {
-      return this._restoreObjectsState();
-    },
-
-    /**
-     * Sets coordinates of all objects inside group
-     * @return {fabric.Group} thisArg
-     * @chainable
-     */
-    setObjectsCoords: function() {
-      var skipControls = true;
-      this.forEachObject(function(object) {
-        object.setCoords(skipControls);
-      });
-      return this;
-    },
-
-    /**
-     * @private
-     */
-    _calcBounds: function(onlyWidthHeight) {
-      var aX = [],
-          aY = [],
-          o, prop, coords,
-          props = ['tr', 'br', 'bl', 'tl'],
-          i = 0, iLen = this._objects.length,
-          j, jLen = props.length;
-
-      for ( ; i < iLen; ++i) {
-        o = this._objects[i];
-        coords = o.calcACoords();
-        for (j = 0; j < jLen; j++) {
-          prop = props[j];
-          aX.push(coords[prop].x);
-          aY.push(coords[prop].y);
+      var center = this.getRelativeCenterPoint();
+      var result = this.getLayoutStrategyResult(this.layout, this._objects.concat(), context);
+      if (result) {
+        //  handle positioning
+        var newCenter = new fabric.Point(result.centerX, result.centerY);
+        var vector = center.subtract(newCenter).add(new fabric.Point(result.correctionX || 0, result.correctionY || 0));
+        var diff = transformPoint(vector, invertTransform(this.calcOwnMatrix()), true);
+        //  set dimensions
+        this.set({ width: result.width, height: result.height });
+        //  adjust objects to account for new center
+        !context.objectsRelativeToGroup && this.forEachObject(function (object) {
+          this._adjustObjectPosition(object, diff);
+        }, this);
+        //  clip path as well
+        !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
+          && this._adjustObjectPosition(this.clipPath, diff);
+        if (!newCenter.eq(center)) {
+          //  set position
+          this.setPositionByOrigin(newCenter, 'center', 'center');
+          this.setCoords();
         }
-        o.aCoords = coords;
       }
+      else if (isFirstLayout) {
+        //  fill `result` with initial values for the layout hook
+        result = {
+          centerX: center.x,
+          centerY: center.y,
+          width: this.width,
+          height: this.height,
+        };
+      }
+      else {
+        //  no `result` so we return
+        return;
+      }
+      //  flag for next layouts
+      this._firstLayoutDone = true;
+      //  fire layout hook and event (event will fire only for layouts after initialization layout)
+      this.onLayout(context, result);
+      this.fire('layout', {
+        context: context,
+        result: result,
+        diff: diff
+      });
+      //  recursive up
+      if (this.group && this.group._applyLayoutStrategy) {
+        //  append the path recursion to context
+        if (!context.path) {
+          context.path = [];
+        }
+        context.path.push(this);
+        //  all parents should invalidate their layout
+        this.group._applyLayoutStrategy(context);
+      }
+    },
 
-      this._getBounds(aX, aY, onlyWidthHeight);
+
+    /**
+     * Override this method to customize layout.
+     * If you need to run logic once layout completes use `onLayout`
+     * @public
+     *
+     * @typedef {'initialization'|'object_modified'|'added'|'removed'|'layout_change'|'imperative'} LayoutContextType
+     *
+     * @typedef LayoutContext context object with data regarding what triggered the call
+     * @property {LayoutContextType} type
+     * @property {fabric.Object[]} [path] array of objects starting from the object that triggered the call to the current one
+     *
+     * @typedef LayoutResult positioning and layout data **relative** to instance's parent
+     * @property {number} centerX new centerX as measured by the containing plane (same as `left` with `originX` set to `center`)
+     * @property {number} centerY new centerY as measured by the containing plane (same as `top` with `originY` set to `center`)
+     * @property {number} [correctionX] correctionX to translate objects by, measured as `centerX`
+     * @property {number} [correctionY] correctionY to translate objects by, measured as `centerY`
+     * @property {number} width
+     * @property {number} height
+     *
+     * @param {string} layoutDirective
+     * @param {fabric.Object[]} objects
+     * @param {LayoutContext} context
+     * @returns {LayoutResult | undefined}
+     */
+    getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
+      //  `fit-content-lazy` performance enhancement
+      //  skip if instance had no objects before the `added` event because it may have kept layout after removing all previous objects
+      if (layoutDirective === 'fit-content-lazy'
+          && context.type === 'added' && objects.length > context.targets.length) {
+        //  calculate added objects' bbox with existing bbox
+        var addedObjects = context.targets.concat(this);
+        return this.prepareBoundingBox(layoutDirective, addedObjects, context);
+      }
+      else if (layoutDirective === 'fit-content' || layoutDirective === 'fit-content-lazy'
+          || (layoutDirective === 'fixed' && context.type === 'initialization')) {
+        return this.prepareBoundingBox(layoutDirective, objects, context);
+      }
+      else if (layoutDirective === 'clip-path' && this.clipPath) {
+        var clipPath = this.clipPath;
+        var clipPathSizeAfter = clipPath._getTransformedDimensions();
+        if (clipPath.absolutePositioned && (context.type === 'initialization' || context.type === 'layout_change')) {
+          //  we want the center point to exist in group's containing plane
+          var clipPathCenter = clipPath.getCenterPoint();
+          if (this.group) {
+            //  send point from canvas plane to group's containing plane
+            var inv = invertTransform(this.group.calcTransformMatrix());
+            clipPathCenter = transformPoint(clipPathCenter, inv);
+          }
+          return {
+            centerX: clipPathCenter.x,
+            centerY: clipPathCenter.y,
+            width: clipPathSizeAfter.x,
+            height: clipPathSizeAfter.y,
+          };
+        }
+        else if (!clipPath.absolutePositioned) {
+          var center;
+          var clipPathRelativeCenter = clipPath.getRelativeCenterPoint(),
+              //  we want the center point to exist in group's containing plane, so we send it upwards
+              clipPathCenter = transformPoint(clipPathRelativeCenter, this.calcOwnMatrix(), true);
+          if (context.type === 'initialization' || context.type === 'layout_change') {
+            var bbox = this.prepareBoundingBox(layoutDirective, objects, context) || {};
+            center = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0);
+            return {
+              centerX: center.x + clipPathCenter.x,
+              centerY: center.y + clipPathCenter.y,
+              correctionX: bbox.correctionX - clipPathCenter.x,
+              correctionY: bbox.correctionY - clipPathCenter.y,
+              width: clipPath.width,
+              height: clipPath.height,
+            };
+          }
+          else {
+            center = this.getRelativeCenterPoint();
+            return {
+              centerX: center.x + clipPathCenter.x,
+              centerY: center.y + clipPathCenter.y,
+              width: clipPathSizeAfter.x,
+              height: clipPathSizeAfter.y,
+            };
+          }
+        }
+      }
+      else if (layoutDirective === 'svg' && context.type === 'initialization') {
+        var bbox = this.getObjectsBoundingBox(objects, true) || {};
+        return Object.assign(bbox, {
+          correctionX: -bbox.offsetX || 0,
+          correctionY: -bbox.offsetY || 0,
+        });
+      }
     },
 
     /**
-     * @private
+     * Override this method to customize layout.
+     * A wrapper around {@link fabric.Group#getObjectsBoundingBox}
+     * @public
+     * @param {string} layoutDirective
+     * @param {fabric.Object[]} objects
+     * @param {LayoutContext} context
+     * @returns {LayoutResult | undefined}
      */
-    _getBounds: function(aX, aY, onlyWidthHeight) {
-      var minXY = new fabric.Point(min(aX), min(aY)),
-          maxXY = new fabric.Point(max(aX), max(aY)),
-          top = minXY.y || 0, left = minXY.x || 0,
-          width = (maxXY.x - minXY.x) || 0,
-          height = (maxXY.y - minXY.y) || 0;
-      this.width = width;
-      this.height = height;
-      if (!onlyWidthHeight) {
-        // the bounding box always finds the topleft most corner.
-        // whatever is the group origin, we set up here the left/top position.
-        this.setPositionByOrigin({ x: left, y: top }, 'left', 'top');
+    prepareBoundingBox: function (layoutDirective, objects, context) {
+      if (context.type === 'initialization') {
+        return this.prepareInitialBoundingBox(layoutDirective, objects, context);
       }
+      else if (context.type === 'imperative' && context.context) {
+        return Object.assign(
+          this.getObjectsBoundingBox(objects) || {},
+          context.context
+        );
+      }
+      else {
+        return this.getObjectsBoundingBox(objects);
+      }
+    },
+
+    /**
+     * Calculates center taking into account originX, originY while not being sure that width/height are initialized
+     * @public
+     * @param {string} layoutDirective
+     * @param {fabric.Object[]} objects
+     * @param {LayoutContext} context
+     * @returns {LayoutResult | undefined}
+     */
+    prepareInitialBoundingBox: function (layoutDirective, objects, context) {
+      var options = context.options || {},
+          hasX = typeof options.left === 'number',
+          hasY = typeof options.top === 'number',
+          hasWidth = typeof options.width === 'number',
+          hasHeight = typeof options.height === 'number';
+
+      //  performance enhancement
+      //  skip layout calculation if bbox is defined
+      if ((hasX && hasY && hasWidth && hasHeight && context.objectsRelativeToGroup) || objects.length === 0) {
+        //  return nothing to skip layout
+        return;
+      }
+
+      var bbox = this.getObjectsBoundingBox(objects) || {};
+      var width = hasWidth ? this.width : (bbox.width || 0),
+          height = hasHeight ? this.height : (bbox.height || 0),
+          calculatedCenter = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0),
+          origin = new fabric.Point(this.resolveOriginX(this.originX), this.resolveOriginY(this.originY)),
+          size = new fabric.Point(width, height),
+          strokeWidthVector = this._getTransformedDimensions({ width: 0, height: 0 }),
+          sizeAfter = this._getTransformedDimensions({
+            width: width,
+            height: height,
+            strokeWidth: 0
+          }),
+          bboxSizeAfter = this._getTransformedDimensions({
+            width: bbox.width,
+            height: bbox.height,
+            strokeWidth: 0
+          }),
+          rotationCorrection = new fabric.Point(0, 0);
+
+      if (this.angle) {
+        var rad = degreesToRadians(this.angle),
+            sin = Math.abs(fabric.util.sin(rad)),
+            cos = Math.abs(fabric.util.cos(rad));
+        sizeAfter.setXY(
+          sizeAfter.x * cos + sizeAfter.y * sin,
+          sizeAfter.x * sin + sizeAfter.y * cos
+        );
+        bboxSizeAfter.setXY(
+          bboxSizeAfter.x * cos + bboxSizeAfter.y * sin,
+          bboxSizeAfter.x * sin + bboxSizeAfter.y * cos
+        );
+        strokeWidthVector = fabric.util.rotateVector(strokeWidthVector, rad);
+        //  correct center after rotating
+        var strokeCorrection = strokeWidthVector.multiply(origin.scalarAdd(-0.5).scalarDivide(-2));
+        rotationCorrection = sizeAfter.subtract(size).scalarDivide(2).add(strokeCorrection);
+        calculatedCenter.addEquals(rotationCorrection);
+      }
+      //  calculate center and correction
+      var originT = origin.scalarAdd(0.5);
+      var originCorrection = sizeAfter.multiply(originT);
+      var centerCorrection = new fabric.Point(
+        hasWidth ? bboxSizeAfter.x / 2 : originCorrection.x,
+        hasHeight ? bboxSizeAfter.y / 2 : originCorrection.y
+      );
+      var center = new fabric.Point(
+        hasX ? this.left - (sizeAfter.x + strokeWidthVector.x) * origin.x : calculatedCenter.x - centerCorrection.x,
+        hasY ? this.top - (sizeAfter.y + strokeWidthVector.y) * origin.y : calculatedCenter.y - centerCorrection.y
+      );
+      var offsetCorrection = new fabric.Point(
+        hasX ?
+          center.x - calculatedCenter.x + bboxSizeAfter.x * (hasWidth ? 0.5 : 0) :
+          -(hasWidth ? (sizeAfter.x - strokeWidthVector.x) * 0.5 : sizeAfter.x * originT.x),
+        hasY ?
+          center.y - calculatedCenter.y + bboxSizeAfter.y * (hasHeight ? 0.5 : 0) :
+          -(hasHeight ? (sizeAfter.y - strokeWidthVector.y) * 0.5 : sizeAfter.y * originT.y)
+      ).add(rotationCorrection);
+      var correction = new fabric.Point(
+        hasWidth ? -sizeAfter.x / 2 : 0,
+        hasHeight ? -sizeAfter.y / 2 : 0
+      ).add(offsetCorrection);
+
+      return {
+        centerX: center.x,
+        centerY: center.y,
+        correctionX: correction.x,
+        correctionY: correction.y,
+        width: size.x,
+        height: size.y,
+      };
+    },
+
+    /**
+     * Calculate the bbox of objects relative to instance's containing plane
+     * @public
+     * @param {fabric.Object[]} objects
+     * @returns {LayoutResult | null} bounding box
+     */
+    getObjectsBoundingBox: function (objects, ignoreOffset) {
+      if (objects.length === 0) {
+        return null;
+      }
+      var objCenter, sizeVector, min, max, a, b;
+      objects.forEach(function (object, i) {
+        objCenter = object.getRelativeCenterPoint();
+        sizeVector = object._getTransformedDimensions().scalarDivideEquals(2);
+        if (object.angle) {
+          var rad = degreesToRadians(object.angle),
+              sin = Math.abs(fabric.util.sin(rad)),
+              cos = Math.abs(fabric.util.cos(rad)),
+              rx = sizeVector.x * cos + sizeVector.y * sin,
+              ry = sizeVector.x * sin + sizeVector.y * cos;
+          sizeVector = new fabric.Point(rx, ry);
+        }
+        a = objCenter.subtract(sizeVector);
+        b = objCenter.add(sizeVector);
+        if (i === 0) {
+          min = new fabric.Point(Math.min(a.x, b.x), Math.min(a.y, b.y));
+          max = new fabric.Point(Math.max(a.x, b.x), Math.max(a.y, b.y));
+        }
+        else {
+          min.setXY(Math.min(min.x, a.x, b.x), Math.min(min.y, a.y, b.y));
+          max.setXY(Math.max(max.x, a.x, b.x), Math.max(max.y, a.y, b.y));
+        }
+      });
+
+      var size = max.subtract(min),
+          relativeCenter = ignoreOffset ? size.scalarDivide(2) : min.midPointFrom(max),
+          //  we send `relativeCenter` up to group's containing plane
+          offset = transformPoint(min, this.calcOwnMatrix()),
+          center = transformPoint(relativeCenter, this.calcOwnMatrix());
+
+      return {
+        offsetX: offset.x,
+        offsetY: offset.y,
+        centerX: center.x,
+        centerY: center.y,
+        width: size.x,
+        height: size.y,
+      };
+    },
+
+    /**
+     * Hook that is called once layout has completed.
+     * Provided for layout customization, override if necessary.
+     * Complements `getLayoutStrategyResult`, which is called at the beginning of layout.
+     * @public
+     * @param {LayoutContext} context layout context
+     * @param {LayoutResult} result layout result
+     */
+    onLayout: function (/* context, result */) {
+      //  override by subclass
+    },
+
+    /**
+     *
+     * @private
+     * @param {'toObject'|'toDatalessObject'} [method]
+     * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @returns {fabric.Object[]} serialized objects
+     */
+    __serializeObjects: function (method, propertiesToInclude) {
+      var _includeDefaultValues = this.includeDefaultValues;
+      return this._objects
+        .filter(function (obj) {
+          return !obj.excludeFromExport;
+        })
+        .map(function (obj) {
+          var originalDefaults = obj.includeDefaultValues;
+          obj.includeDefaultValues = _includeDefaultValues;
+          var data = obj[method || 'toObject'](propertiesToInclude);
+          obj.includeDefaultValues = originalDefaults;
+          //delete data.version;
+          return data;
+        });
+    },
+
+    /**
+     * Returns object representation of an instance
+     * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} object representation of an instance
+     */
+    toObject: function (propertiesToInclude) {
+      var obj = this.callSuper('toObject', ['layout', 'subTargetCheck', 'interactive'].concat(propertiesToInclude));
+      obj.objects = this.__serializeObjects('toObject', propertiesToInclude);
+      return obj;
+    },
+
+    toString: function () {
+      return '#<fabric.Group: (' + this.complexity() + ')>';
+    },
+
+    dispose: function () {
+      this._activeObjects = [];
+      this.forEachObject(function (object) {
+        this._watchObject(false, object);
+        object.dispose && object.dispose();
+      }, this);
     },
 
     /* _TO_SVG_START_ */
+
+    /**
+     * @private
+     */
+    _createSVGBgRect: function (reviver) {
+      if (!this.backgroundColor) {
+        return '';
+      }
+      var fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
+      var commons = fillStroke.indexOf('COMMON_PARTS');
+      fillStroke[commons] = 'for="group" ';
+      return fillStroke.join('');
+    },
+
     /**
      * Returns svg representation of an instance
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    _toSVG: function(reviver) {
+    _toSVG: function (reviver) {
       var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      var bg = this._createSVGBgRect(reviver);
+      bg && svgString.push('\t\t', bg);
+      for (var i = 0; i < this._objects.length; i++) {
         svgString.push('\t\t', this._objects[i].toSVG(reviver));
       }
       svgString.push('</g>\n');
@@ -556,45 +925,35 @@
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toClipPathSVG: function(reviver) {
+    toClipPathSVG: function (reviver) {
       var svgString = [];
-
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      var bg = this._createSVGBgRect(reviver);
+      bg && svgString.push('\t', bg);
+      for (var i = 0; i < this._objects.length; i++) {
         svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
       }
-
       return this._createBaseClipPathSVGMarkup(svgString, { reviver: reviver });
     },
     /* _TO_SVG_END_ */
   });
 
   /**
-   * Returns {@link fabric.Group} instance from an object representation
+   * @todo support loading from svg
+   * @private
    * @static
    * @memberOf fabric.Group
    * @param {Object} object Object to create a group from
-   * @param {Function} [callback] Callback to invoke when an group instance is created
+   * @returns {Promise<fabric.Group>}
    */
-  fabric.Group.fromObject = function(object, callback) {
-    var objects = object.objects,
-        options = fabric.util.object.clone(object, true);
+  fabric.Group.fromObject = function(object) {
+    var objects = object.objects || [],
+        options = clone(object, true);
     delete options.objects;
-    if (typeof objects === 'string') {
-      // it has to be an url or something went wrong.
-      fabric.loadSVGFromURL(objects, function (elements) {
-        var group = fabric.util.groupSVGElements(elements, object, objects);
-        group.set(options);
-        callback && callback(group);
-      });
-      return;
-    }
-    fabric.util.enlivenObjects(objects, function(enlivenedObjects) {
-      fabric.util.enlivenObjects([object.clipPath], function(enlivedClipPath) {
-        var options = fabric.util.object.clone(object, true);
-        options.clipPath = enlivedClipPath[0];
-        delete options.objects;
-        callback && callback(new fabric.Group(enlivenedObjects, options, true));
-      });
+    return Promise.all([
+      fabric.util.enlivenObjects(objects),
+      fabric.util.enlivenObjectEnlivables(options)
+    ]).then(function (enlivened) {
+      return new fabric.Group(enlivened[0], Object.assign(options, enlivened[1]), true);
     });
   };
 

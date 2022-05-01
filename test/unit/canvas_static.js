@@ -155,6 +155,28 @@
     return new fabric.Rect(fabric.util.object.extend(defaultOptions, options || { }));
   }
 
+  function basename(path) {
+    return path.slice(Math.max(path.lastIndexOf('\\'), path.lastIndexOf('/')) + 1);
+  }
+
+  /**
+   *
+   * @param {*} actual
+   * @param {*} [expected]
+   */
+  QUnit.assert.sameImageObject = function (actual, expected) {
+    var a = {}, b = {};
+    expected = expected || REFERENCE_IMG_OBJECT;
+    Object.assign(a, actual, { src: basename(actual.src) });
+    Object.assign(b, expected, { src: basename(expected.src) });
+    this.pushResult({
+      result: QUnit.equiv(a, b),
+      actual: actual,
+      expected: expected,
+      message: 'image object equal to ref'
+    })
+  }
+
   QUnit.module('fabric.StaticCanvas', {
     beforeEach: function() {
       fabric.Object.__uid = 0;
@@ -166,13 +188,22 @@
       canvas.overlayColor = fabric.StaticCanvas.prototype.overlayColor;
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.calcOffset();
+      canvas.requestRenderAll = fabric.StaticCanvas.prototype.requestRenderAll;
       canvas.cancelRequestedRender();
       canvas2.cancelRequestedRender();
+      canvas.renderOnAddRemove = false;
+      canvas2.renderOnAddRemove = false;
     },
     afterEach: function() {
       canvas.cancelRequestedRender();
       canvas2.cancelRequestedRender();
     }
+  });
+
+  QUnit.test('prevent multiple canvas initialization', function (assert) {
+    var canvas = new fabric.StaticCanvas();
+    assert.ok(canvas.lowerCanvasEl);
+    assert.throws(() => new fabric.StaticCanvas(canvas.lowerCanvasEl));
   });
 
   QUnit.test('initialProperties', function(assert) {
@@ -219,6 +250,7 @@
 
     assert.deepEqual(canvas.getObjects('rect'), [rect], 'should return rect only');
     assert.deepEqual(canvas.getObjects('circle'), [circle], 'should return circle only');
+    assert.deepEqual(canvas.getObjects('circle', 'rect'), [rect, circle], 'should return rect and circle');
   });
 
   QUnit.test('getElement', function(assert) {
@@ -243,33 +275,79 @@
     var rect1 = makeRect(),
         rect2 = makeRect(),
         rect3 = makeRect(),
-        rect4 = makeRect();
+        rect4 = makeRect(),
+        renderAllCount = 0;
 
+    function countRenderAll() {
+      renderAllCount++;
+    }
+    canvas.renderOnAddRemove = true;
+    canvas.requestRenderAll = countRenderAll;
     assert.ok(typeof canvas.add === 'function');
     assert.equal(canvas.add(rect1), canvas, 'should be chainable');
     assert.strictEqual(canvas.item(0), rect1);
+    assert.equal(renderAllCount, 1);
 
     canvas.add(rect2, rect3, rect4);
     assert.equal(canvas.getObjects().length, 4, 'should support multiple arguments');
+    assert.equal(renderAllCount, 2);
+
+    canvas.add();
+    assert.equal(renderAllCount, 2);
 
     assert.strictEqual(canvas.item(1), rect2);
     assert.strictEqual(canvas.item(2), rect3);
     assert.strictEqual(canvas.item(3), rect4);
   });
 
+  QUnit.test('add an object that belongs to a different canvas', function (assert) {
+    var rect1 = makeRect();
+    var control = [];
+    canvas.on('object:added', (opt) => {
+      control.push({
+        action: 'added',
+        canvas: canvas,
+        target: opt.target
+      });
+    });
+    canvas.on('object:removed', (opt) => {
+      control.push({
+        action: 'removed',
+        canvas: canvas,
+        target: opt.target
+      });
+    });
+    canvas2.on('object:added', (opt) => {
+      control.push({
+        action: 'added',
+        canvas: canvas2,
+        target: opt.target
+      });
+    });
+    canvas.add(rect1);
+    assert.strictEqual(canvas.item(0), rect1);
+    canvas2.add(rect1);
+    assert.equal(canvas.item(0), undefined);
+    assert.equal(canvas.size(), 0);
+    assert.strictEqual(canvas2.item(0), rect1);
+    var expected = [
+      { action: 'added', target: rect1, canvas: canvas },
+      { action: 'removed', target: rect1, canvas: canvas },
+      { action: 'added', target: rect1, canvas: canvas2 },
+    ]
+    assert.deepEqual(control, expected);
+  });
+
   QUnit.test('add renderOnAddRemove disabled', function(assert) {
     var rect = makeRect(),
-        originalRenderOnAddition,
         renderAllCount = 0;
 
     function countRenderAll() {
       renderAllCount++;
     }
 
-    originalRenderOnAddition = canvas.renderOnAddRemove;
     canvas.renderOnAddRemove = false;
-
-    canvas.on('after:render', countRenderAll);
+    canvas.requestRenderAll = countRenderAll;
 
     assert.equal(canvas.add(rect), canvas, 'should be chainable');
     assert.equal(renderAllCount, 0);
@@ -279,12 +357,6 @@
     canvas.add(makeRect(), makeRect(), makeRect());
     assert.equal(canvas.getObjects().length, 4, 'should support multiple arguments');
     assert.equal(renderAllCount, 0);
-
-    canvas.renderAll();
-    assert.equal(renderAllCount, 1);
-
-    canvas.off('after:render', countRenderAll);
-    canvas.renderOnAddRemove = originalRenderOnAddition;
   });
 
   QUnit.test('object:added', function(assert) {
@@ -315,34 +387,41 @@
 
   QUnit.test('insertAt', function(assert) {
     var rect1 = makeRect(),
-        rect2 = makeRect();
+        rect2 = makeRect(),
+        renderAllCount = 0;
 
     canvas.add(rect1, rect2);
 
     assert.ok(typeof canvas.insertAt === 'function', 'should respond to `insertAt` method');
 
+    function countRenderAll() {
+      renderAllCount++;
+    }
+    canvas.requestRenderAll = countRenderAll;
+    canvas.renderOnAddRemove = true;
+    assert.equal(renderAllCount, 0);
     var rect = makeRect();
     canvas.insertAt(rect, 1);
+    assert.equal(renderAllCount, 1);
     assert.strictEqual(canvas.item(1), rect);
     canvas.insertAt(rect, 2);
+    assert.equal(renderAllCount, 2);
     assert.strictEqual(canvas.item(2), rect);
     assert.equal(canvas.insertAt(rect, 2), canvas, 'should be chainable');
+    assert.equal(renderAllCount, 3);
   });
 
   QUnit.test('insertAt renderOnAddRemove disabled', function(assert) {
     var rect1 = makeRect(),
         rect2 = makeRect(),
-        originalRenderOnAddition,
         renderAllCount = 0;
 
     function countRenderAll() {
       renderAllCount++;
     }
 
-    originalRenderOnAddition = canvas.renderOnAddRemove;
     canvas.renderOnAddRemove = false;
-
-    canvas.on('after:render', countRenderAll);
+    canvas.requestRenderAll = countRenderAll;
 
     canvas.add(rect1, rect2);
     assert.equal(renderAllCount, 0);
@@ -355,47 +434,46 @@
     assert.strictEqual(canvas.item(1), rect);
     canvas.insertAt(rect, 2);
     assert.equal(renderAllCount, 0);
-
-    canvas.renderAll();
-    assert.equal(renderAllCount, 1);
-
-    canvas.off('after:render', countRenderAll);
-    canvas.renderOnAddRemove = originalRenderOnAddition;
   });
 
   QUnit.test('remove', function(assert) {
     var rect1 = makeRect(),
         rect2 = makeRect(),
         rect3 = makeRect(),
-        rect4 = makeRect();
-
-    canvas.add(rect1, rect2, rect3, rect4);
-
-    assert.ok(typeof canvas.remove === 'function');
-    assert.equal(canvas.remove(rect1), canvas, 'should be chainable');
-    assert.strictEqual(canvas.item(0), rect2, 'should be second object');
-
-    canvas.remove(rect2, rect3);
-    assert.strictEqual(canvas.item(0), rect4);
-
-    canvas.remove(rect4);
-    assert.equal(canvas.isEmpty(), true, 'canvas should be empty');
-  });
-
-  QUnit.test('remove renderOnAddRemove disabled', function(assert) {
-    var rect1 = makeRect(),
-        rect2 = makeRect(),
-        originalRenderOnAddition,
+        rect4 = makeRect(),
         renderAllCount = 0;
 
     function countRenderAll() {
       renderAllCount++;
     }
 
-    originalRenderOnAddition = canvas.renderOnAddRemove;
-    canvas.renderOnAddRemove = false;
+    canvas.add(rect1, rect2, rect3, rect4);
+    canvas.requestRenderAll = countRenderAll;
+    canvas.renderOnAddRemove = true;
+    assert.ok(typeof canvas.remove === 'function');
+    assert.equal(renderAllCount, 0);
+    assert.equal(canvas.remove(rect1), canvas, 'should be chainable');
+    assert.strictEqual(canvas.item(0), rect2, 'should be second object');
 
-    canvas.on('after:render', countRenderAll);
+    canvas.remove(rect2, rect3);
+    assert.equal(renderAllCount, 2);
+    assert.strictEqual(canvas.item(0), rect4);
+
+    canvas.remove(rect4);
+    assert.equal(renderAllCount, 3);
+    assert.equal(canvas.isEmpty(), true, 'canvas should be empty');
+  });
+
+  QUnit.test('remove renderOnAddRemove disabled', function(assert) {
+    var rect1 = makeRect(),
+        rect2 = makeRect(),
+        renderAllCount = 0;
+
+    function countRenderAll() {
+      renderAllCount++;
+    }
+    canvas.requestRenderAll = countRenderAll;
+    canvas.renderOnAddRemove = false;
 
     canvas.add(rect1, rect2);
     assert.equal(renderAllCount, 0);
@@ -403,12 +481,6 @@
     assert.equal(canvas.remove(rect1), canvas, 'should be chainable');
     assert.equal(renderAllCount, 0);
     assert.strictEqual(canvas.item(0), rect2, 'only second object should be left');
-
-    canvas.renderAll();
-    assert.equal(renderAllCount, 1);
-
-    canvas.off('after:render', countRenderAll);
-    canvas.renderOnAddRemove = originalRenderOnAddition;
   });
 
   QUnit.test('object:removed', function(assert) {
@@ -646,7 +718,7 @@
         croppingHeight = 50,
         dataURL = canvas.toDataURL({width: croppingWidth, height: croppingHeight});
 
-    fabric.Image.fromURL(dataURL, function (img) {
+    fabric.Image.fromURL(dataURL).then(function (img) {
       assert.equal(img.width, croppingWidth, 'Width of exported image should correspond to cropping width');
       assert.equal(img.height, croppingHeight, 'Height of exported image should correspond to cropping height');
       done();
@@ -657,7 +729,7 @@
     assert.ok(typeof canvas.centerObjectH === 'function');
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
-    assert.equal(canvas.centerObjectH(rect), canvas, 'should be chainable');
+    canvas.centerObjectH(rect);
     assert.equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "center.y" property should correspond to canvas element\'s center');
     canvas.setZoom(4);
     assert.equal(rect.getCenterPoint().x, canvas.height / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is transformed');
@@ -668,7 +740,7 @@
     assert.ok(typeof canvas.centerObjectV === 'function');
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
-    assert.equal(canvas.centerObjectV(rect), canvas, 'should be chainable');
+    canvas.centerObjectV(rect);
     assert.equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center');
     canvas.setZoom(2);
     assert.equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center when canvas is transformed');
@@ -679,7 +751,7 @@
     assert.ok(typeof canvas.centerObject === 'function');
     var rect = makeRect({ left: 102, top: 202 });
     canvas.add(rect);
-    assert.equal(canvas.centerObject(rect), canvas, 'should be chainable');
+    canvas.centerObject(rect);
 
     assert.equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center');
     assert.equal(rect.getCenterPoint().x, canvas.height / 2, 'object\'s "center.x" property should correspond to canvas element\'s center');
@@ -695,7 +767,7 @@
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     canvas.add(rect);
     var oldY = rect.top;
-    assert.equal(canvas.viewportCenterObjectH(rect), canvas, 'should be chainable');
+    canvas.viewportCenterObjectH(rect);
     assert.equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is not transformed');
     assert.equal(rect.top, oldY, 'object\'s "top" should not change');
     canvas.setZoom(2);
@@ -714,7 +786,7 @@
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     canvas.add(rect);
     var oldX = rect.left;
-    assert.equal(canvas.viewportCenterObjectV(rect), canvas, 'should be chainable');
+    canvas.viewportCenterObjectV(rect);
     assert.equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center when canvas is not transformed');
     assert.equal(rect.left, oldX, 'x position did not change');
     canvas.setZoom(2);
@@ -732,7 +804,7 @@
     var rect = makeRect({ left: 102, top: 202 }), pan = 10;
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     canvas.add(rect);
-    assert.equal(canvas.viewportCenterObject(rect), canvas, 'should be chainable');
+    canvas.viewportCenterObject(rect);
     assert.equal(rect.getCenterPoint().y, canvas.height / 2, 'object\'s "center.y" property should correspond to canvas element\'s center when canvas is not transformed');
     assert.equal(rect.getCenterPoint().x, canvas.width / 2, 'object\'s "center.x" property should correspond to canvas element\'s center when canvas is not transformed');
 
@@ -752,7 +824,7 @@
     assert.ok(typeof canvas.straightenObject === 'function');
     var rect = makeRect({ angle: 10 });
     canvas.add(rect);
-    assert.equal(canvas.straightenObject(rect), canvas, 'should be chainable');
+    canvas.straightenObject(rect);
     assert.equal(rect.get('angle'), 0, 'angle should be coerced to 0 (from 10)');
 
     rect.rotate('60');
@@ -856,8 +928,8 @@
 
     canvas.renderOnAddRemove = false;
     canvas.add(circle, rect, path1, tria, polygon, polyline, group, ellipse, image, pathGroup);
-    canvas.setBackgroundImage(imageBG);
-    canvas.setOverlayImage(imageOL);
+    canvas.backgroundImage = imageBG;
+    canvas.overlayImage = imageOL;
     var reviverCount = 0,
         len = canvas.size() + group.size() + pathGroup.size();
 
@@ -868,8 +940,8 @@
 
     canvas.toSVG(null, reviver);
     assert.equal(reviverCount, len + 2, 'reviver should include background and overlay image');
-    canvas.setBackgroundImage(null);
-    canvas.setOverlayImage(null);
+    canvas.backgroundImage = null;
+    canvas.overlayImage  = null;
     canvas.renderOnAddRemove = true;
   });
 
@@ -974,7 +1046,7 @@
       var json = canvas.toJSON();
 
       fixImageDimension(json.backgroundImage);
-      assert.deepEqual(json.backgroundImage, REFERENCE_IMG_OBJECT);
+      assert.sameImageObject(json.backgroundImage, REFERENCE_IMG_OBJECT);
 
       canvas.backgroundImage = null;
 
@@ -1003,7 +1075,7 @@
       var json = canvas.toJSON();
 
       fixImageDimension(json.overlayImage);
-      assert.deepEqual(json.overlayImage, REFERENCE_IMG_OBJECT);
+      assert.sameImageObject(json.overlayImage, REFERENCE_IMG_OBJECT);
 
       canvas.overlayImage = null;
 
@@ -1090,7 +1162,7 @@
     canvas.backgroundImage = rect;
     canvas.overlayImage = rect2;
     canvas.backgroundColor = bgColor;
-    canvas.setOverlayColor('red');
+    canvas.overlayColor = 'red';
     canvas.add(rect3);
     var rectToObject = rect.toObject();
     var rect2ToObject = rect2.toObject();
@@ -1156,7 +1228,7 @@
     var done = assert.async();
     assert.ok(typeof canvas.loadFromJSON === 'function');
 
-    canvas.loadFromJSON(PATH_JSON, function(){
+    canvas.loadFromJSON(PATH_JSON).then(function(){
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
@@ -1185,7 +1257,7 @@
     var done = assert.async();
     assert.ok(typeof canvas.loadFromJSON === 'function');
 
-    canvas.loadFromJSON(JSON.parse(PATH_JSON), function(){
+    canvas.loadFromJSON(JSON.parse(PATH_JSON)).then(function(){
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
@@ -1216,7 +1288,7 @@
     var done = assert.async();
     assert.ok(typeof canvas.loadFromJSON === 'function');
 
-    canvas.loadFromJSON(JSON.parse(PATH_WITHOUT_DEFAULTS_JSON), function(){
+    canvas.loadFromJSON(JSON.parse(PATH_WITHOUT_DEFAULTS_JSON)).then(function(){
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
@@ -1247,8 +1319,8 @@
     var done = assert.async();
     var serialized = JSON.parse(PATH_JSON);
     serialized.background = 'green';
-    serialized.backgroundImage = JSON.parse('{"type":"image","originX":"left","originY":"top","left":13.6,"top":-1.4,"width":3000,"height":3351,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":0.05,"scaleY":0.05,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"src":"' + IMG_SRC + '","filters":[],"crossOrigin":""}');
-    canvas.loadFromJSON(serialized, function() {
+    serialized.backgroundImage = { "type": "image", "originX": "left", "originY": "top", "left": 13.6, "top": -1.4, "width": 3000, "height": 3351, "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 0, "strokeDashArray": null, "strokeLineCap": "butt", "strokeDashOffset": 0, "strokeLineJoin": "miter", "strokeMiterLimit": 4, "scaleX": 0.05, "scaleY": 0.05, "angle": 0, "flipX": false, "flipY": false, "opacity": 1, "shadow": null, "visible": true, "backgroundColor": "", "fillRule": "nonzero", "globalCompositeOperation": "source-over", "skewX": 0, "skewY": 0, "src": IMG_SRC, "filters": [], "crossOrigin": "" };
+    canvas.loadFromJSON(serialized).then(function() {
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
       assert.equal(canvas.backgroundColor, 'green');
       assert.ok(canvas.backgroundImage instanceof fabric.Image);
@@ -1271,7 +1343,7 @@
     assert.ok(jsonWithoutFoo !== RECT_JSON_WITH_PADDING);
 
     canvas.clear();
-    canvas.loadFromJSON(jsonWithFoo, function() {
+    canvas.loadFromJSON(jsonWithFoo).then(function() {
       var obj = canvas.item(0);
 
       assert.equal(obj.padding, 123, 'padding on object is set properly');
@@ -1283,7 +1355,7 @@
   QUnit.test('loadFromJSON with text', function(assert) {
     var done = assert.async();
     var json = '{"objects":[{"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}],"background":"#ffffff"}';
-    canvas.loadFromJSON(json, function() {
+    canvas.loadFromJSON(json).then(function() {
 
       canvas.renderAll();
 
@@ -1298,10 +1370,11 @@
 
   QUnit.test('loadFromJSON with clipPath', function(assert) {
     var done = assert.async();
+    var canvas3 = new fabric.StaticCanvas();
     var json = '{"clipPath": {"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}}';
-    canvas.loadFromJSON(json, function() {
-      canvas.renderAll();
-      assert.equal('text', canvas.clipPath.type);
+    canvas3.loadFromJSON(json).then(function() {
+      assert.ok(canvas3.clipPath instanceof fabric.Text);
+      assert.equal('text', canvas3.clipPath.type);
       done();
     });
   });
@@ -1532,15 +1605,46 @@
     var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
     assert.ok(typeof canvas2.dispose === 'function');
     canvas2.add(makeRect(), makeRect(), makeRect());
+    var lowerCanvas = canvas2.lowerCanvasEl;
+    assert.equal(lowerCanvas.getAttribute('data-fabric'), 'main', 'lowerCanvasEl should be marked by fabric');
     canvas2.dispose();
     assert.equal(canvas2.getObjects().length, 0, 'dispose should clear canvas');
     assert.equal(canvas2.lowerCanvasEl, null, 'dispose should clear lowerCanvasEl');
+    assert.equal(lowerCanvas.hasAttribute('data-fabric'), false, 'dispose should clear lowerCanvasEl data-fabric attr');
     assert.equal(canvas2.contextContainer, null, 'dispose should clear contextContainer');
   });
 
   QUnit.test('clone', function(assert) {
+    var done = assert.async();
+    var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false, width: 10, height: 10 });
     assert.ok(typeof canvas.clone === 'function');
-    // TODO (kangax): test clone
+    var rect = new fabric.Rect();
+    canvas2.add(rect);
+    canvas2.clone().then(function(cloned) {
+      assert.ok(cloned instanceof fabric.Canvas, 'is cloned in a Canvas, sad but true');
+      var clonedRect = cloned.getObjects()[0];
+      assert.equal(clonedRect.type, 'rect', 'the rect has been cloned too');
+      assert.equal(clonedRect.width, rect.width, 'the rect has been cloned too with properties');
+      assert.equal(cloned.width, canvas2.width, 'the canvas has been cloned with properties');
+      done();
+    });
+  });
+
+  QUnit.test('cloneWithoutData', function(assert) {
+    var done = assert.async();
+    var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false, width: 10, height: 10 });
+    assert.ok(typeof canvas.clone === 'function');
+    var rect = new fabric.Rect();
+    canvas2.add(rect);
+    canvas2.backgroundColor = 'red';
+    canvas2.cloneWithoutData().then(function(cloned) {
+      assert.ok(cloned instanceof fabric.Canvas, 'is cloned in a Canvas, sad but true');
+      var clonedObjects = cloned.getObjects();
+      assert.equal(clonedObjects.length, 0, 'no cloend objects');
+      assert.equal(cloned.width, canvas2.width, 'the canvas has been cloned with properties');
+      assert.equal(cloned.backgroundColor, 'red', 'background color has been cloned');
+      done();
+    });
   });
 
   QUnit.test('getSetWidth', function(assert) {
@@ -1627,33 +1731,7 @@
     }
 
     assert.ok(canvas.item(0) === rect);
-    assert.equal(canvas.fxRemove(rect, { onComplete: onComplete }), canvas, 'should be chainable');
-  });
-
-  QUnit.test('options in setBackgroundImage from URL', function(assert) {
-    var done = assert.async();
-    canvas.setBackgroundImage(IMG_SRC, function() {
-      assert.equal(canvas.backgroundImage.canvas, canvas, 'canvas is referenced');
-      assert.equal(canvas.backgroundImage.left, 50);
-      assert.equal(canvas.backgroundImage.originX, 'right');
-      done();
-    }, {
-      left: 50,
-      originX: 'right'
-    });
-  });
-
-  QUnit.test('options in setOverlayImage from URL', function(assert) {
-    var done = assert.async();
-    canvas.setOverlayImage(IMG_SRC, function() {
-      assert.equal(canvas.overlayImage.canvas, canvas, 'canvas is referenced');
-      assert.equal(canvas.overlayImage.left, 50);
-      assert.equal(canvas.overlayImage.originX, 'right');
-      done();
-    }, {
-      left: 50,
-      originX: 'right'
-    });
+    assert.ok(typeof canvas.fxRemove(rect, { onComplete: onComplete }) === 'function', 'should return animation abort function');
   });
 
   QUnit.test('setViewportTransform', function(assert) {
@@ -1818,38 +1896,6 @@
     assert.equal(scaling, 1, 'retina is disabled, 1');
   });
 
-  QUnit.test('options in setBackgroundImage from image instance', function(assert) {
-    var done = assert.async();
-    createImageObject(function(imageInstance) {
-      canvas.setBackgroundImage(imageInstance, function() {
-        assert.equal(canvas.backgroundImage.canvas, canvas, 'canvas get referenced');
-        assert.equal(canvas.backgroundImage.left, 100);
-        assert.equal(canvas.backgroundImage.originX, 'center');
-
-        done();
-      }, {
-        left: 100,
-        originX: 'center'
-      });
-    });
-  });
-
-  QUnit.test('options in setOverlayImage from image instance', function(assert) {
-    var done = assert.async();
-    createImageObject(function(imageInstance) {
-      canvas.setOverlayImage(imageInstance, function() {
-        assert.equal(canvas.overlayImage, imageInstance);
-        assert.equal(imageInstance.left, 100);
-        assert.equal(imageInstance.originX, 'center');
-        assert.equal(imageInstance.canvas, canvas, 'canvas get referenced');
-        done();
-      }, {
-        left: 100,
-        originX: 'center'
-      });
-    });
-  });
-
   QUnit.test('createPNGStream', function(assert) {
     if (!fabric.isLikelyNode) {
       assert.ok(true, 'not supposed to run outside node');
@@ -1933,12 +1979,15 @@
   QUnit.test('toSVG with background pattern', function(assert) {
     fabric.Object.__uid = 0;
     var canvas2 = new fabric.StaticCanvas();
+
+    var img = fabric.document.createElement('img');
+    img.src = 'a.jpg';
     canvas2.backgroundColor = new fabric.Pattern({
-      source: 'a.jpeg',
       repeat: 'repeat',
+      source: img,
     });
     var svg = canvas2.toSVG();
-    var expectedSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="150" viewBox="0 0 300 150" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n<pattern id="SVGID_0" x="0" y="0" width="0" height="0">\n<image x="0" y="0" width="0" height="0" xlink:href=""></image>\n</pattern>\n</defs>\n<rect transform="matrix(1 0 0 1 0 0) translate(150,75)" x="-150" y="-75" width="300" height="150" fill="url(#SVGID_0)"></rect>\n</svg>';
+    var expectedSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="150" viewBox="0 0 300 150" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n<pattern id="SVGID_0" x="0" y="0" width="0" height="0">\n<image x="0" y="0" width="0" height="0" xlink:href="' + img.src + '"></image>\n</pattern>\n</defs>\n<rect transform="matrix(1 0 0 1 0 0) translate(150,75)" x="-150" y="-75" width="300" height="150" fill="url(#SVGID_0)"></rect>\n</svg>';
     assert.equal(svg, expectedSVG, 'svg is as expected');
   });
 

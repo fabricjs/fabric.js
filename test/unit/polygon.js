@@ -64,6 +64,27 @@
     assert.deepEqual(polygon.get('points'), [{ x: 10, y: 12 }, { x: 20, y: 22 }]);
   });
 
+  QUnit.test('polygon with exactBoundingBox false', function(assert) {
+    var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 }], {
+      exactBoundingBox: false,
+      strokeWidth: 60,
+    });
+    var dimensions = polygon._getNonTransformedDimensions();
+    assert.equal(dimensions.x, 70);
+    assert.equal(dimensions.y, 150);
+  });
+
+  QUnit.test('polygon with exactBoundingBox true', function(assert) {
+    var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 }], {
+      exactBoundingBox: true,
+      strokeWidth: 60,
+    });
+
+    var dimensions = polygon._getNonTransformedDimensions();
+    assert.equal(Math.round(dimensions.x), 74);
+    assert.equal(Math.round(dimensions.y), 162);
+  });
+
   QUnit.test('complexity', function(assert) {
     var polygon = new fabric.Polygon(getPoints());
     assert.ok(typeof polygon.complexity === 'function');
@@ -90,7 +111,7 @@
   QUnit.test('fromObject', function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Polygon.fromObject === 'function');
-    fabric.Polygon.fromObject(REFERENCE_OBJECT, function(polygon) {
+    fabric.Polygon.fromObject(REFERENCE_OBJECT).then(function(polygon) {
       assert.ok(polygon instanceof fabric.Polygon);
       assert.deepEqual(polygon.toObject(), REFERENCE_OBJECT);
       done();

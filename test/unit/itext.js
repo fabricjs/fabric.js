@@ -103,7 +103,7 @@
     QUnit.test('fromObject', function(assert) {
       var done = assert.async();
       assert.ok(typeof fabric.IText.fromObject === 'function');
-      fabric.IText.fromObject(ITEXT_OBJECT, function(iText) {
+      fabric.IText.fromObject(ITEXT_OBJECT).then(function(iText) {
         assert.ok(iText instanceof fabric.IText);
         assert.deepEqual(ITEXT_OBJECT, iText.toObject());
         done();
@@ -299,10 +299,17 @@
       assert.deepEqual(_savedProps, iText._savedProps, 'iText saves a copy of important props');
       assert.equal(iText.selectable, false, 'selectable is set to false');
       assert.equal(iText.hasControls, false, 'hasControls is set to false');
+      assert.equal(iText.lockMovementX, true, 'lockMovementX is set to true');
+      assert.equal(iText._savedProps.lockMovementX, false, 'lockMovementX is set to false originally');
+      iText.set({ hasControls: true, lockMovementX: true });
+      assert.equal(iText.hasControls, false, 'hasControls is still set to false');
+      assert.equal(iText._savedProps.lockMovementX, true, 'lockMovementX should have been set to true');
       iText.exitEditing();
+      assert.ok(!iText._savedProps, 'removed ref');
       iText.abortCursorAnimation();
       assert.equal(iText.selectable, true, 'selectable is set back to true');
       assert.equal(iText.hasControls, true, 'hasControls is set back to true');
+      assert.equal(iText.lockMovementX, true, 'lockMovementX is set back to true, after changing saved props');
       iText.selectable = false;
       iText.enterEditing();
       iText.exitEditing();
@@ -679,15 +686,8 @@
       };
       canvas.add(iText);
       assert.equal(typeof iText.toSVG, 'function');
-      var parser;
-      if (fabric.isLikelyNode) {
-        var XmlDomParser = require('xmldom').DOMParser;
-        parser = new XmlDomParser();
-      }
-      else {
-        parser = new DOMParser();
-      }
-      var svgString = canvas.toSVG(),
+      var parser = new DOMParser(),
+          svgString = canvas.toSVG(),
           doc = parser.parseFromString(svgString, 'image/svg+xml'),
           style = doc.getElementsByTagName('style')[0].firstChild.data;
       assert.equal(style, '\n\t\t@font-face {\n\t\t\tfont-family: \'Plaster\';\n\t\t\tsrc: url(\'path-to-plaster-font-file\');\n\t\t}\n\t\t@font-face {\n\t\t\tfont-family: \'Engagement\';\n\t\t\tsrc: url(\'path-to-engagement-font-file\');\n\t\t}\n');
