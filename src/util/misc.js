@@ -339,10 +339,10 @@
      */
     transformPointRelativeToCanvas: function (point, canvas, relationBefore, relationAfter) {
       if (relationBefore !== 'child' && relationBefore !== 'sibling') {
-        throw new Error('fabric.js: recieved bad argument ' + relationBefore);
+        throw new Error('fabric.js: received bad argument ' + relationBefore);
       }
       if (relationAfter !== 'child' && relationAfter !== 'sibling') {
-        throw new Error('fabric.js: recieved bad argument ' + relationAfter);
+        throw new Error('fabric.js: received bad argument ' + relationAfter);
       }
       if (relationBefore === relationAfter) {
         return point;
