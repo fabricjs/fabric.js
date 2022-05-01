@@ -33,7 +33,8 @@
    * @fires object:removed
    * @fires loading:aborted
    */
-  fabric.StaticCanvas = fabric.util.createClass(fabric.CommonMethods, /** @lends fabric.StaticCanvas.prototype */ {
+  // eslint-disable-next-line max-len
+  fabric.StaticCanvas = fabric.util.createClass(fabric.CommonMethods, fabric.Collection, /** @lends fabric.StaticCanvas.prototype */ {
 
     /**
      * Constructor
@@ -314,10 +315,15 @@
       else {
         this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
       }
-
+      if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
+        /* _DEV_MODE_START_ */
+        throw new Error('fabric.js: trying to initialize a canvas that has already been initialized');
+        /* _DEV_MODE_END_ */
+      }
       fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
-      this._originalCanvasStyle = this.lowerCanvasEl.style;
+      this.lowerCanvasEl.setAttribute('data-fabric', 'main');
       if (this.interactive) {
+        this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
         this._applyCanvasStyle(this.lowerCanvasEl);
       }
 
@@ -560,15 +566,59 @@
     },
 
     /**
+     * @param {...fabric.Object} objects to add
+     * @return {Self} thisArg
+     * @chainable
+     */
+    add: function () {
+      fabric.Collection.add.call(this, arguments, this._onObjectAdded);
+      arguments.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
+      return this;
+    },
+
+    /**
+     * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
+     * An object should be an instance of (or inherit from) fabric.Object
+     * @param {fabric.Object|fabric.Object[]} objects Object(s) to insert
+     * @param {Number} index Index to insert object at
+     * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
+     * @return {Self} thisArg
+     * @chainable
+     */
+    insertAt: function (objects, index) {
+      fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
+      this.renderOnAddRemove && this.requestRenderAll();
+      return this;
+    },
+
+    /**
+     * @param {...fabric.Object} objects to remove
+     * @return {Self} thisArg
+     * @chainable
+     */
+    remove: function () {
+      var removed = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
+      removed.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
+      return this;
+    },
+
+    /**
      * @private
      * @param {fabric.Object} obj Object that was added
      */
     _onObjectAdded: function(obj) {
       this.stateful && obj.setupState();
+      if (obj.canvas && obj.canvas !== this) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
+          'Resulting to default behavior: removing object from previous canvas and adding to new canvas');
+        /* _DEV_MODE_END_ */
+        obj.canvas.remove(obj);
+      }
       obj._set('canvas', this);
       obj.setCoords();
       this.fire('object:added', { target: obj });
-      obj.fire('added');
+      obj.fire('added', { target: this });
     },
 
     /**
@@ -577,8 +627,8 @@
      */
     _onObjectRemoved: function(obj) {
       this.fire('object:removed', { target: obj });
-      obj.fire('removed');
-      delete obj.canvas;
+      obj.fire('removed', { target: this });
+      obj._set('canvas', undefined);
     },
 
     /**
@@ -917,7 +967,7 @@
      * @chainable
      */
     _centerObject: function(object, center) {
-      object.setPositionByOrigin(center, 'center', 'center');
+      object.setXY(center, 'center', 'center');
       object.setCoords();
       this.renderOnAddRemove && this.requestRenderAll();
       return this;
@@ -1570,10 +1620,13 @@
       this.overlayImage = null;
       this._iTextInstances = null;
       this.contextContainer = null;
-      // restore canvas style
+      // restore canvas style and attributes
       this.lowerCanvasEl.classList.remove('lower-canvas');
-      fabric.util.setStyle(this.lowerCanvasEl, this._originalCanvasStyle);
-      delete this._originalCanvasStyle;
+      this.lowerCanvasEl.removeAttribute('data-fabric');
+      if (this.interactive) {
+        this.lowerCanvasEl.style.cssText = this._originalCanvasStyle;
+        delete this._originalCanvasStyle;
+      }
       // restore canvas size to original size in case retina scaling was applied
       this.lowerCanvasEl.setAttribute('width', this.width);
       this.lowerCanvasEl.setAttribute('height', this.height);
@@ -1593,7 +1646,6 @@
   });
 
   extend(fabric.StaticCanvas.prototype, fabric.Observable);
-  extend(fabric.StaticCanvas.prototype, fabric.Collection);
   extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
 
   extend(fabric.StaticCanvas, /** @lends fabric.StaticCanvas */ {

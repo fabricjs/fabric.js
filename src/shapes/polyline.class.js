@@ -83,6 +83,7 @@
     },
 
     _setPositionDimensions: function(options) {
+      options || (options = {});
       var calcDim = this._calcDimensions(options), correctLeftTop,
           correctSize = this.exactBoundingBox ? this.strokeWidth : 0;
       this.width = calcDim.width - correctSize;
