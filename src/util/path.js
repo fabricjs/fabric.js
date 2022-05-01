@@ -826,11 +826,6 @@
       rotationAdjustment += interiorAngle / 2;
     }
     var d = [];
-    // If an odd number of vertexes, add an additional point at the top of the polygon in order to shift the calculated center
-    // point of the shape so that the center point of the polygon is at 0,0 (otherwise the center is mis-located)
-    if (numVertexes % 2 === 1) {
-      d.push(['M', 0, radius]);
-    }
     for (var i = 0, rad, coord; i < numVertexes; i++) {
       rad = i * interiorAngle + rotationAdjustment;
       coord = new fabric.Point(Math.cos(rad), Math.sin(rad)).scalarMultiplyEquals(radius);
