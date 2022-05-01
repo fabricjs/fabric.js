@@ -412,7 +412,7 @@
     drawObject: function(ctx) {
       this._renderBackground(ctx);
       for (var i = 0; i < this._objects.length; i++) {
-        this._objects[i].group === this && this._objects[i].render(ctx);
+        this._objects[i].render(ctx);
       }
       this._drawClipPath(ctx, this.clipPath);
     },
