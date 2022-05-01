@@ -95,16 +95,19 @@
     assert.ok(typeof collection.remove === 'function', 'has remove method');
     var returned = collection.remove([obj]);
     assert.ok(returned, 'removed obj');
-    assert.ok(!collection.remove([{ prop: 'foo' }]), 'nothing removed');
+    assert.ok(Array.isArray(collection.remove([])), 'should return empty array');
+    assert.equal(collection.remove([{ prop: 'foo' }]).length, 0, 'nothing removed');
     assert.equal(collection._objects.indexOf(obj), -1, 'obj is no more in array');
     assert.equal(collection._objects.length, previousLength - 1, 'length has changed');
     assert.equal(fired, 0, 'fired is 0');
     var callback = function() {
       fired++;
     };
-    collection.remove([obj2], callback);
+    var removed = collection.remove([obj2], callback);
     assert.equal(fired, 1, 'fired is incremented if there is a callback');
-    collection.remove([obj2], callback);
+    assert.deepEqual(removed, [obj2], 'should return removed objects');
+    removed = collection.remove([obj2], callback);
+    assert.deepEqual(removed, [], 'should return removed objects');
     assert.equal(fired, 1, 'fired is not incremented again if there is no object to remove');
 
     collection.add([obj2]);
@@ -112,7 +115,8 @@
     collection.remove([obj2], callback);
     previousLength = collection._objects.length;
     fired = 0;
-    collection.remove([obj, obj3], callback);
+    removed = collection.remove([obj, obj3, obj2], callback);
+    assert.deepEqual(removed, [obj, obj3], 'should return removed objects');
     assert.equal(collection._objects.length, previousLength - 2, 'we have 2 objects less');
     assert.equal(fired, 2, 'fired is incremented for every object removed');
   });

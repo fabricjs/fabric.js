@@ -58,7 +58,7 @@
 
     /**
      * Used to optimize performance
-     * set to `false` if you don't need caontained objects to be target of events
+     * set to `false` if you don't need contained objects to be targets of events
      * @default
      * @type boolean
      */
@@ -66,8 +66,8 @@
 
     /**
      * Used to allow targeting of object inside groups.
-     * set to true if you want to select an object inside a group.
-     * REQUIRES subTargetCheck set to true
+     * set to true if you want to select an object inside a group.\
+     * **REQUIRES** `subTargetCheck` set to true
      * @default
      * @type boolean
      */
@@ -97,20 +97,9 @@
       this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
       this._firstLayoutDone = false;
       this.callSuper('initialize', options);
-      if (objectsRelativeToGroup) {
-        this.forEachObject(function (object) {
-          this.enterGroup(object, false);
-        }, this);
-      }
-      else {
-        //  we need to preserve object's center point in relation to canvas and apply group's transform to it
-        var inv = invertTransform(this.calcTransformMatrix());
-        this.forEachObject(function (object) {
-          this.enterGroup(object, false);
-          var center = transformPoint(object.getCenterPoint(), inv);
-          object.setPositionByOrigin(center, 'center', 'center');
-        }, this);
-      }
+      this.forEachObject(function (object) {
+        this.enterGroup(object, false);
+      }, this);
       this._applyLayoutStrategy({
         type: 'initialization',
         options: options,
@@ -141,6 +130,13 @@
     },
 
     /**
+     * @private
+     */
+    _shouldSetNestedCoords: function () {
+      return this.subTargetCheck;
+    },
+
+    /**
      * Add objects
      * @param {...fabric.Object} objects
      */
@@ -164,17 +160,19 @@
      * @param {Number} index Index to insert object at
      */
     insertAt: function (objects, index) {
-      fabric.Collection.insertAt.call(this, objects, index,  this._onObjectAdded);
+      fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
       this._onAfterObjectsChange('added', Array.isArray(objects) ? objects : [objects]);
     },
 
     /**
      * Remove objects
      * @param {...fabric.Object} objects
+     * @returns {fabric.Object[]} removed objects
      */
     remove: function () {
-      fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
-      this._onAfterObjectsChange('removed', Array.from(arguments));
+      var removed = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
+      this._onAfterObjectsChange('removed', removed);
+      return removed;
     },
 
     /**
@@ -183,9 +181,7 @@
      */
     removeAll: function () {
       this._activeObjects = [];
-      var remove = this._objects.slice();
-      this.remove.apply(this, remove);
-      return remove;
+      return this.remove.apply(this, this._objects.slice());
     },
 
     /**
@@ -234,22 +230,52 @@
     },
 
     /**
+     * Checks if object can enter group and logs relevant warnings
+     * @private
+     * @param {fabric.Object} object
+     * @returns
+     */
+    canEnter: function (object) {
+      if (object === this || this.isDescendantOf(object)) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Group: trying to add group to itself, this call has no effect');
+        /* _DEV_MODE_END_ */
+        return false;
+      }
+      else if (object.group && object.group === this) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
+        /* _DEV_MODE_END_ */
+        return false;
+      }
+      return true;
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
+     * @returns {boolean} true if object entered group
+     */
+    enterGroup: function (object, removeParentTransform) {
+      if (!this.canEnter(object)) {
+        return false;
+      }
+      if (object.group) {
+        object.group.remove(object);
+      }
+      this._enterGroup(object, removeParentTransform);
+      return true;
+    },
+
+    /**
      * @private
      * @param {fabric.Object} object
      * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
      */
-    enterGroup: function (object, removeParentTransform) {
-      if (object.group) {
-        if (object.group === this) {
-          /* _DEV_MODE_START_ */
-          console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
-          /* _DEV_MODE_END_ */
-          return;
-        }
-        object.group.remove(object);
-      }
-      // can be this converted to utils?
+    _enterGroup: function (object, removeParentTransform) {
       if (removeParentTransform) {
+        // can this be converted to utils (sendObjectToPlane)?
         applyTransformToObject(
           object,
           multiplyTransformMatrices(
@@ -258,14 +284,13 @@
           )
         );
       }
-      object.setCoords();
+      this._shouldSetNestedCoords() && object.setCoords();
       object._set('group', this);
       object._set('canvas', this.canvas);
       this.interactive && this._watchObject(true, object);
       var activeObject = this.canvas && this.canvas.getActiveObject && this.canvas.getActiveObject();
       // if we are adding the activeObject in a group
-      // TODO migrate back to isDescendantOf
-      if (activeObject && (activeObject === object || (object.contains && object.contains(activeObject)))) {
+      if (activeObject && (activeObject === object || object.isDescendantOf(activeObject))) {
         this._activeObjects.push(object);
       }
     },
@@ -355,7 +380,7 @@
     shouldCache: function() {
       var ownCache = fabric.Object.prototype.shouldCache.call(this);
       if (ownCache) {
-        for (var i = 0, len = this._objects.length; i < len; i++) {
+        for (var i = 0; i < this._objects.length; i++) {
           if (this._objects[i].willDrawShadow()) {
             this.ownCaching = false;
             return false;
@@ -373,7 +398,7 @@
       if (fabric.Object.prototype.willDrawShadow.call(this)) {
         return true;
       }
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         if (this._objects[i].willDrawShadow()) {
           return true;
         }
@@ -394,7 +419,8 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     drawObject: function(ctx) {
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      this._renderBackground(ctx);
+      for (var i = 0; i < this._objects.length; i++) {
         this._objects[i].render(ctx);
       }
       this._drawClipPath(ctx, this.clipPath);
@@ -410,7 +436,7 @@
       if (!this.statefullCache) {
         return false;
       }
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         if (this._objects[i].isCacheDirty(true)) {
           if (this._cacheCanvas) {
             // if this group has not a cache canvas there is nothing to clean
@@ -429,7 +455,7 @@
      */
     setCoords: function () {
       this.callSuper('setCoords');
-      (this.subTargetCheck || this.type === 'activeSelection') && this.forEachObject(function (object) {
+      this._shouldSetNestedCoords() && this.forEachObject(function (object) {
         object.setCoords();
       });
     },
@@ -471,7 +497,7 @@
 
     /**
      * initial layout logic:
-     * calculate bbox of objects (if necessary) and translate it according to options recieved from the constructor (left, top, width, height)
+     * calculate bbox of objects (if necessary) and translate it according to options received from the constructor (left, top, width, height)
      * so it is placed in the center of the bbox received from the constructor
      *
      * @private
@@ -860,13 +886,28 @@
     /* _TO_SVG_START_ */
 
     /**
+     * @private
+     */
+    _createSVGBgRect: function (reviver) {
+      if (!this.backgroundColor) {
+        return '';
+      }
+      var fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
+      var commons = fillStroke.indexOf('COMMON_PARTS');
+      fillStroke[commons] = 'for="group" ';
+      return fillStroke.join('');
+    },
+
+    /**
      * Returns svg representation of an instance
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
     _toSVG: function (reviver) {
       var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      var bg = this._createSVGBgRect(reviver);
+      bg && svgString.push('\t\t', bg);
+      for (var i = 0; i < this._objects.length; i++) {
         svgString.push('\t\t', this._objects[i].toSVG(reviver));
       }
       svgString.push('</g>\n');
@@ -895,7 +936,9 @@
      */
     toClipPathSVG: function (reviver) {
       var svgString = [];
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      var bg = this._createSVGBgRect(reviver);
+      bg && svgString.push('\t', bg);
+      for (var i = 0; i < this._objects.length; i++) {
         svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
       }
       return this._createBaseClipPathSVGMarkup(svgString, { reviver: reviver });

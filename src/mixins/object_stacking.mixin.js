@@ -76,5 +76,35 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this.canvas.moveTo(this, index);
     }
     return this;
+  },
+
+  /**
+   *
+   * @param {fabric.Object} other object to compare against
+   * @returns {boolean | undefined} if objects do not share a common ancestor or they are strictly equal it is impossible to determine which is in front of the other; in such cases the function returns `undefined`
+   */
+  isInFrontOf: function (other) {
+    if (this === other) {
+      return undefined;
+    }
+    var ancestorData = this.findCommonAncestors(other);
+    if (!ancestorData) {
+      return undefined;
+    }
+    if (ancestorData.fork.includes(other)) {
+      return true;
+    }
+    if (ancestorData.otherFork.includes(this)) {
+      return false;
+    }
+    var firstCommonAncestor = ancestorData.common[0];
+    if (!firstCommonAncestor) {
+      return undefined;
+    }
+    var headOfFork = ancestorData.fork.pop(),
+        headOfOtherFork = ancestorData.otherFork.pop(),
+        thisIndex = firstCommonAncestor._objects.indexOf(headOfFork),
+        otherIndex = firstCommonAncestor._objects.indexOf(headOfOtherFork);
+    return thisIndex > -1 && thisIndex > otherIndex;
   }
 });

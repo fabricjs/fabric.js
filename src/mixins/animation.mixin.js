@@ -25,11 +25,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     return fabric.util.animate({
       target: this,
-      startValue: object.left,
+      startValue: object.getX(),
       endValue: this.getCenterPoint().x,
       duration: this.FX_DURATION,
       onChange: function(value) {
-        object.set('left', value);
+        object.setX(value);
         _this.requestRenderAll();
         onChange();
       },
@@ -58,11 +58,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     return fabric.util.animate({
       target: this,
-      startValue: object.top,
+      startValue: object.getY(),
       endValue: this.getCenterPoint().y,
       duration: this.FX_DURATION,
       onChange: function(value) {
-        object.set('top', value);
+        object.setY(value);
         _this.requestRenderAll();
         onChange();
       },
