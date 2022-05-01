@@ -418,29 +418,6 @@
     },
 
     /**
-     * Check if cache is dirty
-     */
-    isCacheDirty: function(skipCanvas) {
-      if (this.callSuper('isCacheDirty', skipCanvas)) {
-        return true;
-      }
-      if (!this.statefullCache) {
-        return false;
-      }
-      for (var i = 0; i < this._objects.length; i++) {
-        if (this._objects[i].isCacheDirty(true)) {
-          if (this._cacheCanvas) {
-            // if this group has not a cache canvas there is nothing to clean
-            var x = this.cacheWidth / this.zoomX, y = this.cacheHeight / this.zoomY;
-            this._cacheContext.clearRect(-x / 2, -y / 2, x, y);
-          }
-          return true;
-        }
-      }
-      return false;
-    },
-
-    /**
      * @override
      * @return {Boolean}
      */

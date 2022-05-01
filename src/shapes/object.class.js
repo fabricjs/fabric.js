@@ -511,18 +511,6 @@
     objectCaching:            objectCaching,
 
     /**
-     * When `true`, object properties are checked for cache invalidation. In some particular
-     * situation you may want this to be disabled ( spray brush, very big, groups)
-     * or if your application does not allow you to modify properties for groups child you want
-     * to disable it for groups.
-     * default to false
-     * since 1.7.0
-     * @type Boolean
-     * @default false
-     */
-    statefullCache:            false,
-
-    /**
      * When `true`, cache does not get updated during scaling. The picture will get blocky if scaled
      * too much and will be redrawn with correct details at the end of scaling.
      * this setting is performance and application dependant.
@@ -586,6 +574,8 @@
      * List of properties to consider when checking if state
      * of an object is changed (fabric.Object#hasStateChanged)
      * as well as for history (undo/redo) purposes
+     * This list identify a list of properties that change how the object looks alike.
+     * Every App has its own needs, so change this list as you may see fit
      * @type Array
      */
     stateProperties: (
@@ -597,8 +587,8 @@
 
     /**
      * List of properties to consider when checking if cache needs refresh
-     * Those properties are checked by statefullCache ON ( or lazy mode if we want ) or from single
-     * calls to Object.set(key, value). If the key is in this list, the object is marked as dirty
+     * Those properties are checked by calls to Object.set(key, value).
+     * If the key is in this list, the object is marked as dirty
      * and refreshed at the next render
      * @type Array
      */
@@ -1072,9 +1062,6 @@
         this._removeCacheCanvas();
         this.dirty = false;
         this.drawObject(ctx);
-        if (this.objectCaching && this.statefullCache) {
-          this.saveState({ propertySet: 'cacheProperties' });
-        }
       }
       ctx.restore();
     },
@@ -1085,7 +1072,6 @@
         this._createCacheCanvas();
       }
       if (this.isCacheDirty()) {
-        this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
         this.drawObject(this._cacheContext, options.forClipping);
         this.dirty = false;
       }
@@ -1262,9 +1248,7 @@
       }
       else {
         if (this.dirty ||
-          (this.clipPath && this.clipPath.absolutePositioned) ||
-          (this.statefullCache && this.hasStateChanged('cacheProperties'))
-        ) {
+          (this.clipPath && this.clipPath.absolutePositioned)) {
           if (this._cacheCanvas && this._cacheContext && !skipCanvas) {
             var width = this.cacheWidth / this.zoomX;
             var height = this.cacheHeight / this.zoomY;

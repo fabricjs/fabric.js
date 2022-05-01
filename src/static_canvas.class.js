@@ -92,13 +92,6 @@
     includeDefaultValues: true,
 
     /**
-     * Indicates whether objects' state should be saved
-     * @type Boolean
-     * @default
-     */
-    stateful: false,
-
-    /**
      * Indicates whether {@link fabric.Collection.add}, {@link fabric.Collection.insertAt} and {@link fabric.Collection.remove},
      * {@link fabric.StaticCanvas.moveTo}, {@link fabric.StaticCanvas.clear} and many more, should also re-render canvas.
      * Disabling this option will not give a performance boost when adding/removing a lot of objects to/from canvas at once
@@ -606,7 +599,6 @@
      * @param {fabric.Object} obj Object that was added
      */
     _onObjectAdded: function(obj) {
-      this.stateful && obj.setupState();
       if (obj.canvas && obj.canvas !== this) {
         /* _DEV_MODE_START_ */
         console.warn('fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +

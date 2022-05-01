@@ -586,7 +586,7 @@
 
       target.setCoords();
 
-      if (transform.actionPerformed || (this.stateful && target.hasStateChanged())) {
+      if (transform.actionPerformed) {
         this._fire('modified', options);
       }
     },
@@ -749,7 +749,6 @@
      */
     _beforeTransform: function(e) {
       var t = this._currentTransform;
-      this.stateful && t.target.saveState();
       this.fire('before:transform', {
         e: e,
         transform: t,
