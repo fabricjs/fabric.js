@@ -172,7 +172,7 @@
         childrenOverride.hasControls = false;
       }
       childrenOverride.forActiveSelection = true;
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         this._objects[i]._renderControls(ctx, childrenOverride);
       }
       ctx.restore();

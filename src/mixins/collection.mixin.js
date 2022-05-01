@@ -20,7 +20,7 @@ fabric.Collection = {
   add: function (objects, callback) {
     var size = this._objects.push.apply(this._objects, objects);
     if (callback) {
-      for (var i = 0, length = objects.length; i < length; i++) {
+      for (var i = 0; i < objects.length; i++) {
         callback.call(this, objects[i]);
       }
     }
@@ -39,7 +39,7 @@ fabric.Collection = {
     var args = [index, 0].concat(objects);
     this._objects.splice.apply(this._objects, args);
     if (callback) {
-      for (var i = 2, length = args.length; i < length; i++) {
+      for (var i = 2; i < args.length; i++) {
         callback.call(this, args[i]);
       }
     }
@@ -50,22 +50,21 @@ fabric.Collection = {
    * @private
    * @param {fabric.Object[]} objectsToRemove objects to remove
    * @param {(object:fabric.Object) => any} [callback] function to call for each object removed
-   * @returns {boolean} true if objects were removed
+   * @returns {fabric.Object[]} removed objects
    */
   remove: function(objectsToRemove, callback) {
-    var objects = this._objects,
-        index, somethingRemoved = false;
-
-    for (var i = 0, length = objectsToRemove.length; i < length; i++) {
-      index = objects.indexOf(objectsToRemove[i]);
+    var objects = this._objects, removed = [];
+    for (var i = 0, object, index; i < objectsToRemove.length; i++) {
+      object = objectsToRemove[i];
+      index = objects.indexOf(object);
       // only call onObjectRemoved if an object was actually removed
       if (index !== -1) {
-        somethingRemoved = true;
         objects.splice(index, 1);
-        callback && callback.call(this, objectsToRemove[i]);
+        removed.push(object);
+        callback && callback.call(this, object);
       }
     }
-    return somethingRemoved;
+    return removed;
   },
 
   /**
@@ -82,7 +81,7 @@ fabric.Collection = {
    */
   forEachObject: function(callback, context) {
     var objects = this.getObjects();
-    for (var i = 0, len = objects.length; i < len; i++) {
+    for (var i = 0; i < objects.length; i++) {
       callback.call(context, objects[i], i, objects);
     }
     return this;
@@ -131,6 +130,7 @@ fabric.Collection = {
   /**
    * Returns true if collection contains an object.\
    * **Prefer using {@link `fabric.Object#isDescendantOf`} for performance reasons**
+   * instead of a.contains(b) use b.isDescendantOf(a)
    * @param {Object} object Object to check against
    * @param {Boolean} [deep=false] `true` to check all descendants, `false` to check only `_objects`
    * @return {Boolean} `true` if collection contains an object
