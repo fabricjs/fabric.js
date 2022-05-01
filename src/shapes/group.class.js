@@ -817,13 +817,13 @@
               cos = Math.abs(fabric.util.cos(rad)),
               rx = sizeVector.x * cos + sizeVector.y * sin,
               ry = sizeVector.x * sin + sizeVector.y * cos;
-          sizeVector = new fabric.Point(rx, ry);
+          sizeVector.setXY(rx, ry);
         }
         a = objCenter.subtract(sizeVector);
         b = objCenter.add(sizeVector);
         if (i === 0) {
-          min.setXY(new fabric.Point(Math.min(a.x, b.x), Math.min(a.y, b.y)));
-          max.setXY(new fabric.Point(Math.max(a.x, b.x), Math.max(a.y, b.y)));
+          min.setXY(Math.min(a.x, b.x), Math.min(a.y, b.y));
+          max.setXY(Math.max(a.x, b.x), Math.max(a.y, b.y));
         }
         else {
           min.setXY(Math.min(min.x, a.x, b.x), Math.min(min.y, a.y, b.y));
