@@ -25,57 +25,98 @@
     type: 'activeSelection',
 
     /**
-     * Constructor
-     * @param {Object} objects ActiveSelection objects
-     * @param {Object} [options] Options object
-     * @return {Object} thisArg
+     * @override
      */
-    initialize: function(objects, options) {
-      options = options || {};
-      this._objects = objects || [];
-      for (var i = this._objects.length; i--; ) {
-        this._objects[i].group = this;
-      }
+    layout: 'fit-content',
 
-      if (options.originX) {
-        this.originX = options.originX;
-      }
-      if (options.originY) {
-        this.originY = options.originY;
-      }
-      this._calcBounds();
-      this._updateObjectsCoords();
-      fabric.Object.prototype.initialize.call(this, options);
+    /**
+     * @override
+     */
+    subTargetCheck: false,
+
+    /**
+     * @override
+     */
+    interactive: false,
+
+    /**
+     * Constructor
+     *
+     * @param {fabric.Object[]} [objects] instance objects
+     * @param {Object} [options] Options object
+     * @param {boolean} [objectsRelativeToGroup] true if objects exist in group coordinate plane
+     * @return {fabric.ActiveSelection} thisArg
+     */
+    initialize: function (objects, options, objectsRelativeToGroup) {
+      this.callSuper('initialize', objects, options, objectsRelativeToGroup);
       this.setCoords();
     },
 
     /**
-     * Change te activeSelection to a normal group,
-     * High level function that automatically adds it to canvas as
-     * active object. no events fired.
-     * @since 2.0.0
-     * @return {fabric.Group}
+     * @private
      */
-    toGroup: function() {
-      var objects = this._objects.concat();
-      this._objects = [];
-      var options = fabric.Object.prototype.toObject.call(this);
-      var newGroup = new fabric.Group([]);
-      delete options.type;
-      newGroup.set(options);
-      objects.forEach(function(object) {
-        object.canvas.remove(object);
-        object.group = newGroup;
-      });
-      newGroup._objects = objects;
-      if (!this.canvas) {
-        return newGroup;
+    _shouldSetNestedCoords: function () {
+      return true;
+    },
+
+    /**
+     * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
+     * @returns {boolean} true if object entered group
+     */
+    enterGroup: function (object, removeParentTransform) {
+      if (!this.canEnter(object)) {
+        return false;
       }
-      var canvas = this.canvas;
-      canvas.add(newGroup);
-      canvas._activeObject = newGroup;
-      newGroup.setCoords();
-      return newGroup;
+      if (object.group) {
+        //  save ref to group for later in order to return to it
+        var parent = object.group;
+        parent._exitGroup(object);
+        object.__owningGroup = parent;
+      }
+      this._enterGroup(object, removeParentTransform);
+      return true;
+    },
+
+    /**
+     * we want objects to retain their canvas ref when exiting instance
+     * @private
+     * @param {fabric.Object} object
+     * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
+     */
+    exitGroup: function (object, removeParentTransform) {
+      this._exitGroup(object, removeParentTransform);
+      var parent = object.__owningGroup;
+      if (parent) {
+        //  return to owning group
+        parent.enterGroup(object);
+        delete object.__owningGroup;
+      }
+    },
+
+    /**
+     * @private
+     * @param {'added'|'removed'} type
+     * @param {fabric.Object[]} targets
+     */
+    _onAfterObjectsChange: function (type, targets) {
+      var groups = [];
+      targets.forEach(function (object) {
+        object.group && !groups.includes(object.group) && groups.push(object.group);
+      });
+      if (type === 'removed') {
+        //  invalidate groups' layout and mark as dirty
+        groups.forEach(function (group) {
+          group._onAfterObjectsChange('added', targets);
+        });
+      }
+      else {
+        //  mark groups as dirty
+        groups.forEach(function (group) {
+          group._set('dirty', true);
+        });
+      }
     },
 
     /**
@@ -84,7 +125,7 @@
      * @return {Boolean} [cancel]
      */
     onDeselect: function() {
-      this.destroy();
+      this.removeAll();
       return false;
     },
 
@@ -131,7 +172,7 @@
         childrenOverride.hasControls = false;
       }
       childrenOverride.forActiveSelection = true;
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         this._objects[i]._renderControls(ctx, childrenOverride);
       }
       ctx.restore();
