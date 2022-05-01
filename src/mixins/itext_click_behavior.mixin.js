@@ -152,7 +152,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   mouseUpHandler: function(options) {
     this.__isMousedown = false;
-    if (!this.editable || this.group ||
+    if (!this.editable ||
+      (this.group && !this.group.interactive) ||
       (options.transform && options.transform.actionPerformed) ||
       (options.e.button && options.e.button !== 1)) {
       return;
@@ -230,7 +231,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         break;
       }
     }
-    lineLeftOffset = this._getLineLeftOffset(lineIndex);
+    lineLeftOffset = Math.abs(this._getLineLeftOffset(lineIndex));
     width = lineLeftOffset * this.scaleX;
     line = this._textLines[lineIndex];
     // handling of RTL: in order to get things work correctly,
@@ -238,7 +239,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     // so in position detection we mirror the X offset, and when is time
     // of rendering it, we mirror it again.
     if (this.direction === 'rtl') {
-      mouseOffset.x = this.width * this.scaleX - mouseOffset.x + width;
+      mouseOffset.x = this.width * this.scaleX - mouseOffset.x;
     }
     for (var j = 0, jlen = line.length; j < jlen; j++) {
       prevWidth = width;

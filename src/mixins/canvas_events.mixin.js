@@ -713,9 +713,13 @@
           }
         }
       }
+      var invalidate = shouldRender || shouldGroup;
+      //  we clear `_objectsToRender` in case of a change in order to repopulate it at rendering
+      //  run before firing the `down` event to give the dev a chance to populate it themselves
+      invalidate && (this._objectsToRender = undefined);
       this._handleEvent(e, 'down');
       // we must renderAll so that we update the visuals
-      (shouldRender || shouldGroup) && this.requestRenderAll();
+      invalidate && this.requestRenderAll();
     },
 
     /**
@@ -903,13 +907,19 @@
       this._needsCurrentTransformSetup && this._setupCurrentTransform(e, this._currentTransform.target, true);
 
       var pointer = this.getPointer(e),
-          transform = this._currentTransform;
+          transform = this._currentTransform,
+          target = transform.target,
+          //  transform pointer to target's containing coordinate plane
+          //  both pointer and object should agree on every point
+          localPointer = target.group ?
+            fabric.util.sendPointToPlane(pointer, null, target.group.calcTransformMatrix()) :
+            pointer;
 
       transform.reset = false;
       transform.shiftKey = e.shiftKey;
       transform.altKey = e[this.centeredKey];
 
-      this._performTransformAction(e, transform, pointer);
+      this._performTransformAction(e, transform, localPointer);
       transform.actionPerformed && this.requestRenderAll();
     },
 

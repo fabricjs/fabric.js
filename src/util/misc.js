@@ -339,10 +339,10 @@
      */
     transformPointRelativeToCanvas: function (point, canvas, relationBefore, relationAfter) {
       if (relationBefore !== 'child' && relationBefore !== 'sibling') {
-        throw new Error('fabric.js: recieved bad argument ' + relationBefore);
+        throw new Error('fabric.js: received bad argument ' + relationBefore);
       }
       if (relationAfter !== 'child' && relationAfter !== 'sibling') {
-        throw new Error('fabric.js: recieved bad argument ' + relationAfter);
+        throw new Error('fabric.js: received bad argument ' + relationAfter);
       }
       if (relationBefore === relationAfter) {
         return point;
@@ -606,32 +606,13 @@
      * @static
      * @memberOf fabric.util
      * @param {Array} elements SVG elements to group
-     * @param {Object} [options] Options object
-     * @param {String} path Value to set sourcePath to
      * @return {fabric.Object|fabric.Group}
      */
-    groupSVGElements: function(elements, options, path) {
-      var object;
+    groupSVGElements: function(elements) {
       if (elements && elements.length === 1) {
         return elements[0];
       }
-      if (options) {
-        if (options.width && options.height) {
-          options.centerPoint = {
-            x: options.width / 2,
-            y: options.height / 2
-          };
-        }
-        else {
-          delete options.width;
-          delete options.height;
-        }
-      }
-      object = new fabric.Group(elements, options);
-      if (typeof path !== 'undefined') {
-        object.sourcePath = path;
-      }
-      return object;
+      return new fabric.Group(elements);
     },
 
     /**
@@ -1044,7 +1025,7 @@
      * this is equivalent to remove from that object that transformation, so that
      * added in a space with the removed transform, the object will be the same as before.
      * Removing from an object a transform that scale by 2 is like scaling it by 1/2.
-     * Removing from an object a transfrom that rotate by 30deg is like rotating by 30deg
+     * Removing from an object a transform that rotate by 30deg is like rotating by 30deg
      * in the opposite direction.
      * This util is used to add objects inside transformed groups or nested groups.
      * @memberOf fabric.util

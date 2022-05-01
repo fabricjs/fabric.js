@@ -44,7 +44,7 @@
    * @fires drop
    * @fires after:render at the end of the render process, receives the context in the callback
    * @fires before:render at start the render process, receives the context in the callback
-   * 
+   *
    * @fires contextmenu:before
    * @fires contextmenu
    * @example
@@ -444,7 +444,7 @@
         }
         objsToRender.push.apply(objsToRender, activeGroupObjects);
       }
-      //  in case a single object is selected render it's entire above the other objects
+      //  in case a single object is selected render it's entire parent above the other objects
       else if (!this.preserveObjectStacking && activeObjects.length === 1) {
         var target = activeObjects[0], ancestors = target.getAncestors(true);
         var topAncestor = ancestors.length === 0 ? target : ancestors.pop();
@@ -877,7 +877,7 @@
           this._normalizePointer(objToCheck.group, pointer) : pointer;
         if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
           target = objects[i];
-          if (target.subTargetCheck && target instanceof fabric.Group) {
+          if (target.subTargetCheck && Array.isArray(target._objects)) {
             subTarget = this._searchPossibleTargets(target._objects, pointer);
             subTarget && this.targets.push(subTarget);
           }
@@ -896,7 +896,7 @@
      */
     searchPossibleTargets: function (objects, pointer) {
       var target = this._searchPossibleTargets(objects, pointer);
-      return target;
+      return target && target.interactive && this.targets[0] ? this.targets[0] : target;
     },
 
     /**
@@ -1278,21 +1278,24 @@
      * @chainable
      */
     dispose: function () {
-      var wrapper = this.wrapperEl;
+      var wrapperEl = this.wrapperEl,
+          lowerCanvasEl = this.lowerCanvasEl,
+          upperCanvasEl = this.upperCanvasEl,
+          cacheCanvasEl = this.cacheCanvasEl;
       this.removeListeners();
-      wrapper.removeChild(this.upperCanvasEl);
-      wrapper.removeChild(this.lowerCanvasEl);
+      this.callSuper('dispose');
+      wrapperEl.removeChild(upperCanvasEl);
+      wrapperEl.removeChild(lowerCanvasEl);
       this.contextCache = null;
       this.contextTop = null;
-      ['upperCanvasEl', 'cacheCanvasEl'].forEach((function(element) {
-        fabric.util.cleanUpJsdomNode(this[element]);
-        this[element] = undefined;
-      }).bind(this));
-      if (wrapper.parentNode) {
-        wrapper.parentNode.replaceChild(this.lowerCanvasEl, this.wrapperEl);
+      fabric.util.cleanUpJsdomNode(upperCanvasEl);
+      this.upperCanvasEl = undefined;
+      fabric.util.cleanUpJsdomNode(cacheCanvasEl);
+      this.cacheCanvasEl = undefined;
+      if (wrapperEl.parentNode) {
+        wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
       }
       delete this.wrapperEl;
-      fabric.StaticCanvas.prototype.dispose.call(this);
       return this;
     },
 
@@ -1330,7 +1333,7 @@
       var originalProperties = this._realizeGroupTransformOnObject(instance),
           object = this.callSuper('_toObject', instance, methodName, propertiesToInclude);
       //Undo the damage we did by changing all of its properties
-      this._unwindGroupTransformOnObject(instance, originalProperties);
+      originalProperties && instance.set(originalProperties);
       return object;
     },
 
@@ -1357,18 +1360,6 @@
     },
 
     /**
-     * Restores the changed properties of instance
-     * @private
-     * @param {fabric.Object} [instance] the object to un-transform (gets mutated)
-     * @param {Object} [originalValues] the original values of instance, as returned by _realizeGroupTransformOnObject
-     */
-    _unwindGroupTransformOnObject: function(instance, originalValues) {
-      if (originalValues) {
-        instance.set(originalValues);
-      }
-    },
-
-    /**
      * @private
      */
     _setSVGObject: function(markup, instance, reviver) {
@@ -1376,7 +1367,7 @@
       //object when the group is deselected
       var originalProperties = this._realizeGroupTransformOnObject(instance);
       this.callSuper('_setSVGObject', markup, instance, reviver);
-      this._unwindGroupTransformOnObject(instance, originalProperties);
+      originalProperties && instance.set(originalProperties);
     },
 
     /**

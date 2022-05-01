@@ -5,7 +5,7 @@
     var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
         rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40, strokeWidth: 0 });
 
-    return new fabric.Group([rect1, rect2], {strokeWidth: 0});
+    return new fabric.Group([rect1, rect2], { strokeWidth: 0 });
   }
 
   function makeGroupWith2ObjectsWithOpacity() {
@@ -74,6 +74,7 @@
 
     assert.deepEqual(group.getObjects('rect'), [rect], 'should return rect only');
     assert.deepEqual(group.getObjects('circle'), [circle], 'should return circle only');
+    assert.deepEqual(group.getObjects('circle', 'rect'), [rect, circle], 'should return circle and rect, in the same order they are');
   });
 
   QUnit.test('add', function(assert) {
@@ -83,7 +84,7 @@
         rect3 = new fabric.Rect();
 
     assert.ok(typeof group.add === 'function');
-    assert.equal(group.add(rect1), group, 'should be chainable');
+    group.add(rect1);
     assert.strictEqual(group.item(group.size() - 1), rect1, 'last object should be newly added one');
     assert.equal(group.getObjects().length, 3, 'there should be 3 objects');
 
@@ -99,10 +100,12 @@
         group = new fabric.Group([rect1, rect2, rect3]);
 
     assert.ok(typeof group.remove === 'function');
-    assert.equal(group.remove(rect2), group, 'should be chainable');
+    var removed = group.remove(rect2);
+    assert.deepEqual(removed, [rect2], 'should return removed objects');
     assert.deepEqual(group.getObjects(), [rect1, rect3], 'should remove object properly');
 
-    group.remove(rect1, rect3);
+    var removed = group.remove(rect1, rect3);
+    assert.deepEqual(removed, [rect1, rect3], 'should return removed objects');
     assert.equal(group.isEmpty(), true, 'group should be empty');
   });
 
@@ -124,7 +127,7 @@
 
     assert.ok(typeof group.set === 'function');
 
-    assert.equal(group.set('opacity', 0.12345), group, 'should be chainable');
+    group.set('opacity', 0.12345);
     assert.equal(group.get('opacity'), 0.12345, 'group\'s "own" property should be set properly');
     assert.equal(firstObject.get('opacity'), 1, 'objects\' value of non delegated property should stay same');
 
@@ -168,6 +171,7 @@
       width:                    80,
       height:                   60,
       fill:                     'rgb(0,0,0)',
+      layout:                   'fit-content',
       stroke:                   null,
       strokeWidth:              0,
       strokeDashArray:          null,
@@ -190,7 +194,9 @@
       skewX:                    0,
       skewY:                    0,
       objects:                  clone.objects,
-      strokeUniform:            false
+      strokeUniform:            false,
+      subTargetCheck:           false,
+      interactive:              false,
     };
 
     assert.deepEqual(clone, expectedObject);
@@ -211,7 +217,7 @@
       top: -30,
       width: 30,
       height: 10,
-      strokeWidth: 0
+      strokeWidth: 0,
     }, {
       version: fabric.version,
       type: 'rect',
@@ -219,7 +225,7 @@
       top: -10,
       width: 10,
       height: 40,
-      strokeWidth: 0
+      strokeWidth: 0,
     }];
     var expectedObject = {
       version: fabric.version,
@@ -228,7 +234,7 @@
       top: 100,
       width: 80,
       height: 60,
-      objects: objects
+      objects: objects,
     };
     assert.deepEqual(clone, expectedObject);
   });
@@ -301,36 +307,21 @@
     assert.equal(group.complexity(), 2);
   });
 
-  QUnit.test('destroy', function(assert) {
+  QUnit.test('removeAll', function(assert) {
     var group = makeGroupWith2Objects(),
         firstObject = group.item(0),
         initialLeftValue = 100,
         initialTopValue = 100;
 
-    assert.ok(typeof group.destroy === 'function');
+    assert.ok(typeof group.removeAll === 'function');
 
     assert.ok(initialLeftValue !== firstObject.get('left'));
     assert.ok(initialTopValue !== firstObject.get('top'));
 
-    group.destroy();
+    var objects = group.getObjects();
+    assert.deepEqual(group.removeAll(), objects, 'should remove all objects');
     assert.equal(firstObject.get('left'), initialLeftValue, 'should restore initial left value');
     assert.equal(firstObject.get('top'), initialTopValue, 'should restore initial top value');
-  });
-
-  QUnit.test('setObjectCoords', function(assert) {
-    var group = makeGroupWith2Objects();
-
-    assert.ok(typeof group.setObjectsCoords === 'function');
-
-    var invokedObjects = [];
-    group.forEachObject(function(groupObject){
-      groupObject.setCoords = function() {
-        invokedObjects.push(this);
-      };
-    }, this);
-
-    assert.equal(group.setObjectsCoords(), group, 'should be chainable');
-    // this.assertEnumEqualUnordered(invokedObjects, group.getObjects(), 'setObjectsCoords should call setCoords on all objects');
   });
 
   QUnit.test('containsPoint', function(assert) {
@@ -362,7 +353,6 @@
     var group = makeGroupWith2Objects();
 
     assert.ok(typeof group.forEachObject === 'function');
-    assert.equal(group.forEachObject(function(){}), group, 'should be chainable');
 
     var iteratedObjects = [];
     group.forEachObject(function(groupObject) {
@@ -437,6 +427,7 @@
     var group = makeGroupWith2ObjectsWithOpacity();
 
     var groupObject = group.toObject();
+    groupObject.subTargetCheck = true;
 
     fabric.Group.fromObject(groupObject).then(function(newGroupFromObject) {
       assert.ok(newGroupFromObject._objects[0].lineCoords.tl, 'acoords 0 are restored');
@@ -558,20 +549,60 @@
     assert.ok(typeof firstObjInGroup.group === 'undefined');
   });
 
-  QUnit.test('insertAt', function(assert) {
-    var rect1 = new fabric.Rect(),
-        rect2 = new fabric.Rect(),
-        group = new fabric.Group();
+  QUnit.test('insertAt', function (assert) {
+    var rect1 = new fabric.Rect({ id: 1 }),
+      rect2 = new fabric.Rect({ id: 2 }),
+      rect3 = new fabric.Rect({ id: 3 }),
+      rect4 = new fabric.Rect({ id: 4 }),
+      rect5 = new fabric.Rect({ id: 5 }),
+      rect6 = new fabric.Rect({ id: 6 }),
+      rect7 = new fabric.Rect({ id: 7 }),
+      rect8 = new fabric.Rect({ id: 8 }),
+      group = new fabric.Group(),
+      control = [],
+      fired = [],
+      firingControl = [];
 
     group.add(rect1, rect2);
+    control.push(rect1, rect2);
 
     assert.ok(typeof group.insertAt === 'function', 'should respond to `insertAt` method');
 
-    group.insertAt(rect1, 1);
-    assert.equal(group.item(1), rect1);
-    group.insertAt(rect2, 2);
-    assert.equal(group.item(2), rect2);
-    assert.equal(group.insertAt(rect1, 2), group, 'should be chainable');
+    const equalsControl = (description) => {
+      assert.deepEqual(group.getObjects().map(o => o.id), control.map(o => o.id), 'should equal control array ' + description);
+      assert.deepEqual(group.getObjects(), control, 'should equal control array ' + description);
+      assert.deepEqual(fired.map(o => o.id), firingControl.map(o => o.id), 'fired events should equal control array ' + description);
+      assert.deepEqual(fired, firingControl, 'fired events should equal control array ' + description);
+    }
+
+    assert.ok(typeof group._onObjectAdded === 'function', 'has a standard _onObjectAdded method');
+    [rect1, rect2, rect3, rect4, rect5, rect6, rect7, rect8].forEach(obj => {
+      obj.on('added', e => {
+        assert.equal(e.target, group);
+        fired.push(obj);
+      });
+    });
+
+    group.insertAt(rect3, 1);
+    control.splice(1, 0, rect3);
+    firingControl.push(rect3);
+    equalsControl('rect3');
+    group.insertAt(rect4, 0);
+    control.splice(0, 0, rect4);
+    firingControl.push(rect4);
+    equalsControl('rect4');
+    group.insertAt(rect5, 2);
+    control.splice(2, 0, rect5);
+    firingControl.push(rect5);
+    equalsControl('rect5');
+    group.insertAt([rect6], 2);
+    control.splice(2, 0, rect6);
+    firingControl.push(rect6);
+    equalsControl('rect6');
+    group.insertAt([rect7, rect8], 3);
+    control.splice(3, 0, rect7, rect8);
+    firingControl.push(rect7, rect8);
+    equalsControl('rect7');
   });
 
   QUnit.test('dirty flag propagation from children up', function(assert) {
@@ -612,7 +643,7 @@
     assert.equal(g1.dirty, false, 'Group has no dirty flag set');
   });
 
-  QUnit.test('dirty flag propagation from children up with', function(assert) {
+  QUnit.test('dirty flag propagation from children up with', function (assert) {
     var g1 = makeGroupWith4Objects();
     var obj = g1.item(0);
     g1.dirty = false;
@@ -638,7 +669,7 @@
   QUnit.test('test group - pixels.', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        group = new fabric.Group([rect1, rect2], {opacity: 1, fill: 'blue', strokeWidth: 0, objectCaching: false}),
+        group = new fabric.Group([rect1, rect2], {opacity: 1, fill: '', strokeWidth: 0, objectCaching: false}),
         isTransparent = fabric.util.isTransparent,
         ctx = canvas.contextContainer;
     canvas.add(group);
@@ -654,34 +685,53 @@
     assert.equal(isTransparent(ctx, 7, 7, 0), true, '7,7 is transparent');
   });
 
-  QUnit.test('group toDatalessObject', function(assert) {
-    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        pathGroup = new fabric.Group([rect1, rect2], { sourcePath: 'sourcePath'}),
-        group = new fabric.Group([pathGroup]),
-        dataless = group.toDatalessObject();
-
-    assert.equal(dataless.objects[0].objects, 'sourcePath', 'the paths have been changed with the sourcePath');
-  });
-
-  QUnit.test('group addWithUpdate', function(assert) {
+  QUnit.test('group add', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         group = new fabric.Group([rect1]);
 
     var coords = group.oCoords;
-    group.addWithUpdate(rect2);
+    group.add(rect2);
     var newCoords = group.oCoords;
     assert.notEqual(coords, newCoords, 'object coords have been recalculated - add');
   });
 
-  QUnit.test('group removeWithUpdate', function(assert) {
+  QUnit.test('group add edge cases', function (assert) {
+    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
+      rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
+      group = new fabric.Group([rect1]);
+
+    //  duplicate
+    assert.notOk(group.canEnter(rect1));
+    // group.add(rect1);
+    // assert.deepEqual(group.getObjects(), [rect1], 'objects should not have changed');
+    //  duplicate on same call
+    assert.ok(group.canEnter(rect2));
+    // group.add(rect2, rect2);
+    // assert.deepEqual(group.getObjects(), [rect1, rect2], '`rect2` should have entered once');
+    //  adding self
+    assert.notOk(group.canEnter(group));
+    // group.add(group);
+    // assert.deepEqual(group.getObjects(), [rect1, rect2], 'objects should not have changed');
+    //  nested object should be removed from group
+    var nestedGroup = new fabric.Group([rect1]);
+    assert.ok(group.canEnter(nestedGroup));
+    // group.add(nestedGroup);
+    // assert.deepEqual(group.getObjects(), [rect2, nestedGroup], '`rect1` was removed from group once it entered `nestedGroup`');
+    //  circular group
+    var circularGroup = new fabric.Group([rect2, group]);
+    assert.notOk(group.canEnter(circularGroup), 'circular group should be denied entry');
+    // group.add(circularGroup);
+    // assert.deepEqual(group.getObjects(), [rect2, nestedGroup], 'objects should not have changed');
+  });
+
+  QUnit.test('group remove', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         group = new fabric.Group([rect1, rect2]);
 
     var coords = group.oCoords;
-    group.removeWithUpdate(rect2);
+    group.remove(rect2);
     var newCoords = group.oCoords;
     assert.notEqual(coords, newCoords, 'object coords have been recalculated - remove');
   });
@@ -759,31 +809,6 @@
 
   });
 
-  QUnit.test('useSetOnGroup', function(assert) {
-    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
-        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
-        group = new fabric.Group([rect1, rect2]);
-
-    var count = 0;
-    var inspectKey = '';
-    var inspectValue = '';
-    rect1.setOnGroup = function(key, value) {
-      count++;
-      inspectKey = key;
-      inspectValue = value;
-    };
-
-    group.set('fill', 'red');
-    assert.equal(count, 0, 'setOnGroup has not been called');
-    assert.equal(inspectKey, '', 'setOnGroup has not been called');
-    assert.equal(inspectValue, '', 'setOnGroup has not been called');
-    group.useSetOnGroup = true;
-    group.set('fill', 'red');
-    assert.equal(count, 1, 'setOnGroup has been called');
-    assert.equal(inspectKey, 'fill', 'setOnGroup has been called');
-    assert.equal(inspectValue, 'red', 'setOnGroup has been called');
-  });
-
   QUnit.test('canvas prop propagation with set', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
@@ -815,21 +840,21 @@
     assert.equal(group.canvas, canvas, 'canvas has been set');
     group.add(rect1);
     assert.equal(group._objects[0].canvas, canvas, 'canvas has been set on object 0');
-    group.addWithUpdate(rect2);
+    group.add(rect2);
     assert.equal(group._objects[1].canvas, canvas, 'canvas has been set on object 0');
   });
 
-  QUnit.test('addWithUpdate and coordinates', function(assert) {
+  QUnit.test('add and coordinates', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' }),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 6, angle: 90, strokeWidth: 0, fill: 'red' }),
         group = new fabric.Group([]);
-    group.addWithUpdate(rect1);
-    group.addWithUpdate(rect2);
+    group.add(rect1);
+    group.add(rect2);
     group.left = 5;
     group.top = 5;
     group.scaleX = 3;
     group.scaleY = 2;
-    group.destroy();
+    group.removeAll();
     assert.equal(rect1.top, 5, 'top has been moved');
     assert.equal(rect1.left, 11, 'left has been moved');
     assert.equal(rect1.scaleX, 3, 'scaleX has been scaled');
@@ -840,7 +865,7 @@
     assert.equal(rect2.scaleY, 3, 'scaleY has been scaled inverted because of angle 90');
   });
 
-  QUnit.test('addWithUpdate and coordinates with nested groups', function(assert) {
+  QUnit.skip('addRelativeToGroup and coordinates with nested groups', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' }),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 6, angle: 90, strokeWidth: 0, fill: 'red' }),
         group0 = new fabric.Group([rect1, rect2]),
@@ -850,13 +875,15 @@
         group = new fabric.Group([group0, group1], { angle: 90, scaleX: 2, scaleY: 0.5 }),
         rect5 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' });
 
-    group1.addWithUpdate(rect5);
+    group1.addRelativeToGroup(rect5);
+    var t = group1.calcTransformMatrix();
+    var pos = fabric.util.transformPoint(new fabric.Point(rect5.left, rect5.top), t);
     assert.equal(rect5.top, -5.5, 'top has been moved');
     assert.equal(rect5.left, -19.5, 'left has been moved');
     assert.equal(rect5.scaleX, 2, 'scaleX has been scaled');
     assert.equal(rect5.scaleY, 0.5, 'scaleY has been scaled');
-    group.destroy();
-    group1.destroy();
+    group.removeAll();
+    group1.removeAll();
     assert.equal(rect5.top, 1, 'top is back to original minus rounding errors');
     assert.equal(rect5.left, 1, 'left is back to original');
     assert.equal(rect5.scaleX, 1, 'scaleX is back to original');

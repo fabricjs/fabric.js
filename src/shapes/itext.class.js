@@ -189,8 +189,8 @@
     /**
      * While editing handle differently
      * @private
-     * @param {string} key 
-     * @param {*} value 
+     * @param {string} key
+     * @param {*} value
      */
     _set: function (key, value) {
       if (this.isEditing && this._savedProps && key in this._savedProps) {
@@ -371,7 +371,15 @@
         left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
       };
       if (this.direction === 'rtl') {
-        boundaries.left *= -1;
+        if (this.textAlign === 'right' || this.textAlign === 'justify' || this.textAlign === 'justify-right') {
+          boundaries.left *= -1;
+        }
+        else if (this.textAlign === 'left' || this.textAlign === 'justify-left') {
+          boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+        }
+        else if (this.textAlign === 'center' || this.textAlign === 'justify-center') {
+          boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+        }
       }
       this.cursorOffsetCache = boundaries;
       return this.cursorOffsetCache;
@@ -460,7 +468,15 @@
           ctx.fillStyle = this.selectionColor;
         }
         if (this.direction === 'rtl') {
-          drawStart = this.width - drawStart - drawWidth;
+          if (this.textAlign === 'right' || this.textAlign === 'justify' || this.textAlign === 'justify-right') {
+            drawStart = this.width - drawStart - drawWidth;
+          }
+          else if (this.textAlign === 'left' || this.textAlign === 'justify-left') {
+            drawStart = boundaries.left + lineOffset - boxEnd;
+          }
+          else if (this.textAlign === 'center' || this.textAlign === 'justify-center') {
+            drawStart = boundaries.left + lineOffset - boxEnd;
+          }
         }
         ctx.fillRect(
           drawStart,
