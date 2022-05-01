@@ -89,7 +89,7 @@
             backgroundColor: 'blue'
         });
         g.clone().then((clone) => {
-            canvas.add(g);
+            canvas.add(clone);
             canvas.renderAll();
             callback(canvas.lowerCanvasEl);
         })

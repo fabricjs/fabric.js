@@ -137,7 +137,12 @@
     },
 
     /**
-     * @param {fabric.Point} point position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in canvas coordinate plane
+     * Set an object position to a particular point, the point is intended in absolute ( canvas ) coordinate.
+     * You can specify {@link fabric.Object#originX} and {@link fabric.Object#originY} values,
+     * that otherwise are the object's current values.
+     * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
+     * object.setXY(new fabric.Point(5, 5), 'left', 'bottom').
+     * @param {fabric.Point} point position in canvas coordinate plane
      * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
      * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
      */
@@ -159,6 +164,7 @@
     },
 
     /**
+     * As {@link fabric.Object#setXY}, but in current parent's coordinate plane ( the current group if any or the canvas)
      * @param {fabric.Point} point position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
      * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
      * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
@@ -729,6 +735,8 @@
      * @param {Number} [options.scaleY]
      * @param {Number} [options.skewX]
      * @param {Number} [options.skewY]
+     * @param {Number} [options.width]
+     * @param {Number} [options.height]
      * @private
      * @returns {fabric.Point} dimensions
      */

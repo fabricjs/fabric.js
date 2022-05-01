@@ -58,7 +58,7 @@
 
     /**
      * Used to optimize performance
-     * set to `false` if you don't need caontained objects to be target of events
+     * set to `false` if you don't need contained objects to be targets of events
      * @default
      * @type boolean
      */
@@ -66,8 +66,8 @@
 
     /**
      * Used to allow targeting of object inside groups.
-     * set to true if you want to select an object inside a group.
-     * REQUIRES subTargetCheck set to true
+     * set to true if you want to select an object inside a group.\
+     * **REQUIRES** `subTargetCheck` set to true
      * @default
      * @type boolean
      */
@@ -160,10 +160,12 @@
     /**
      * Remove objects
      * @param {...fabric.Object} objects
+     * @returns {fabric.Object[]} removed objects
      */
     remove: function () {
-      fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
-      this._onAfterObjectsChange('removed', Array.from(arguments));
+      var removed = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
+      this._onAfterObjectsChange('removed', removed);
+      return removed;
     },
 
     /**
@@ -172,9 +174,7 @@
      */
     removeAll: function () {
       this._activeObjects = [];
-      var remove = this._objects.slice();
-      this.remove.apply(this, remove);
-      return remove;
+      return this.remove.apply(this, this._objects.slice());
     },
 
     /**
@@ -237,7 +237,7 @@
      * @returns
      */
     canEnter: function (object) {
-      if (object === this) {
+      if (object === this || this.isDescendantOf(object)) {
         /* _DEV_MODE_START_ */
         console.warn('fabric.Group: trying to add group to itself, this call has no effect');
         /* _DEV_MODE_END_ */
@@ -386,7 +386,7 @@
     shouldCache: function() {
       var ownCache = fabric.Object.prototype.shouldCache.call(this);
       if (ownCache) {
-        for (var i = 0, len = this._objects.length; i < len; i++) {
+        for (var i = 0; i < this._objects.length; i++) {
           if (this._objects[i].willDrawShadow()) {
             this.ownCaching = false;
             return false;
@@ -404,7 +404,7 @@
       if (fabric.Object.prototype.willDrawShadow.call(this)) {
         return true;
       }
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         if (this._objects[i].willDrawShadow()) {
           return true;
         }
@@ -426,7 +426,7 @@
      */
     drawObject: function(ctx) {
       this._renderBackground(ctx);
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         this._objects[i].render(ctx);
       }
       this._drawClipPath(ctx, this.clipPath);
@@ -442,7 +442,7 @@
       if (!this.statefullCache) {
         return false;
       }
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         if (this._objects[i].isCacheDirty(true)) {
           if (this._cacheCanvas) {
             // if this group has not a cache canvas there is nothing to clean
@@ -513,7 +513,7 @@
 
     /**
      * initial layout logic:
-     * calculate bbox of objects (if necessary) and translate it according to options recieved from the constructor (left, top, width, height)
+     * calculate bbox of objects (if necessary) and translate it according to options received from the constructor (left, top, width, height)
      * so it is placed in the center of the bbox received from the constructor
      *
      * @private
@@ -583,6 +583,7 @@
       });
       this._bubbleLayout(context);
     },
+
 
     /**
      * bubble layout recursive up
@@ -757,24 +758,6 @@
           }),
           rotationCorrection = new fabric.Point(0, 0);
 
-      if (this.angle) {
-        var rad = degreesToRadians(this.angle),
-            sin = Math.abs(fabric.util.sin(rad)),
-            cos = Math.abs(fabric.util.cos(rad));
-        sizeAfter.setXY(
-          sizeAfter.x * cos + sizeAfter.y * sin,
-          sizeAfter.x * sin + sizeAfter.y * cos
-        );
-        bboxSizeAfter.setXY(
-          bboxSizeAfter.x * cos + bboxSizeAfter.y * sin,
-          bboxSizeAfter.x * sin + bboxSizeAfter.y * cos
-        );
-        strokeWidthVector = fabric.util.rotateVector(strokeWidthVector, rad);
-        //  correct center after rotating
-        var strokeCorrection = strokeWidthVector.multiply(origin.scalarAdd(-0.5).scalarDivide(-2));
-        rotationCorrection = sizeAfter.subtract(size).scalarDivide(2).add(strokeCorrection);
-        calculatedCenter.addEquals(rotationCorrection);
-      }
       //  calculate center and correction
       var originT = origin.scalarAdd(0.5);
       var originCorrection = sizeAfter.multiply(originT);
@@ -888,6 +871,29 @@
       //  override by subclass
     },
 
+
+    /**
+     * Calculate object dimensions from its properties
+     * @override disregard `strokeWidth`
+     * @private
+     * @returns {fabric.Point} dimensions
+     */
+    _getNonTransformedDimensions: function () {
+      return new fabric.Point(this.width, this.height);
+    },
+
+    /**
+     * @private
+     * @override we want instance to fill parent so we disregard transformations
+     * @param {Object} [options]
+     * @param {Number} [options.width]
+     * @param {Number} [options.height]
+     * @returns {fabric.Point} dimensions
+     */
+    _getTransformedDimensions: function (options) {
+      return this.callSuper('_getTransformedDimensions', Object.assign(options || {}, { strokeWidth: 0 }));
+    },
+
     /**
      *
      * @private
@@ -958,7 +964,7 @@
       var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
       var bg = this._createSVGBgRect(reviver);
       bg && svgString.push('\t\t', bg);
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         svgString.push('\t\t', this._objects[i].toSVG(reviver));
       }
       svgString.push('</g>\n');
@@ -989,7 +995,7 @@
       var svgString = [];
       var bg = this._createSVGBgRect(reviver);
       bg && svgString.push('\t', bg);
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
       }
       return this._createBaseClipPathSVGMarkup(svgString, { reviver: reviver });
