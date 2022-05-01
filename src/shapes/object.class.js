@@ -727,7 +727,7 @@
     _getCacheCanvasDimensions: function() {
       var objectScale = this.getTotalObjectScaling(),
           // caculate dimensions without skewing
-          dim = this._getTransformedDimensions(0, 0),
+          dim = this._getTransformedDimensions({ skewX: 0, skewY: 0 }),
           neededX = dim.x * objectScale.x / this.scaleX,
           neededY = dim.y * objectScale.y / this.scaleY;
       return {
@@ -899,10 +899,9 @@
      * @param {Object} object
      */
     _removeDefaultValues: function(object) {
-      var prototype = fabric.util.getKlass(object.type).prototype,
-          stateProperties = prototype.stateProperties;
-      stateProperties.forEach(function(prop) {
-        if (prop === 'left' || prop === 'top') {
+      var prototype = fabric.util.getKlass(object.type).prototype;
+      Object.keys(object).forEach(function(prop) {
+        if (prop === 'left' || prop === 'top' || prop === 'type') {
           return;
         }
         if (object[prop] === prototype[prop]) {
@@ -928,7 +927,7 @@
 
     /**
      * Return the object scale factor counting also the group scaling
-     * @return {fabric.Point} 
+     * @return {fabric.Point}
      */
     getObjectScaling: function() {
       // if the object is a top level one, on the canvas, we go for simple aritmetic
@@ -967,6 +966,16 @@
         opacity *= this.group.getObjectOpacity();
       }
       return opacity;
+    },
+
+    /**
+     * Returns the object angle relative to canvas counting also the group property
+     * @returns {number}
+     */
+    getTotalAngle: function () {
+      return this.group ?
+        fabric.util.qrDecompose(this.calcTransformMatrix()).angle :
+        this.angle;
     },
 
     /**
@@ -1010,16 +1019,6 @@
         }
       }
       return this;
-    },
-
-    /**
-     * This callback function is called by the parent group of an object every
-     * time a non-delegated property changes on the group. It is passed the key
-     * and value as parameters. Not adding in this function's signature to avoid
-     * Travis build error about unused variables.
-     */
-    setOnGroup: function() {
-      // implemented by sub-classes, as needed.
     },
 
     /**
@@ -1170,6 +1169,7 @@
      * Check if this object or a child object will cast a shadow
      * used by Group.shouldCache to know if child has a shadow recursively
      * @return {Boolean}
+     * @deprecated
      */
     willDrawShadow: function() {
       return !!this.shadow && (this.shadow.offsetX !== 0 || this.shadow.offsetY !== 0);
@@ -1536,12 +1536,9 @@
       }
 
       ctx.save();
-      if (this.strokeUniform && this.group) {
+      if (this.strokeUniform) {
         var scaling = this.getObjectScaling();
         ctx.scale(1 / scaling.x, 1 / scaling.y);
-      }
-      else if (this.strokeUniform) {
-        ctx.scale(1 / this.scaleX, 1 / this.scaleY);
       }
       this._setLineDash(ctx, this.strokeDashArray);
       this._setStrokeStyles(ctx, this);
@@ -1694,7 +1691,8 @@
       var utils = fabric.util, origParams = utils.saveObjectTransform(this),
           originalGroup = this.group,
           originalShadow = this.shadow, abs = Math.abs,
-          multiplier = (options.multiplier || 1) * (options.enableRetinaScaling ? fabric.devicePixelRatio : 1);
+          retinaScaling = options.enableRetinaScaling ? Math.max(fabric.devicePixelRatio, 1) : 1,
+          multiplier = (options.multiplier || 1) * retinaScaling;
       delete this.group;
       if (options.withoutTransform) {
         utils.resetObjectTransform(this);
@@ -1731,16 +1729,18 @@
         canvas.backgroundColor = '#fff';
       }
       this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
-
       var originalCanvas = this.canvas;
-      canvas.add(this);
+      canvas._objects = [this];
+      this.set('canvas', canvas);
+      this.setCoords();
       var canvasEl = canvas.toCanvasElement(multiplier || 1, options);
-      this.shadow = originalShadow;
       this.set('canvas', originalCanvas);
+      this.shadow = originalShadow;
       if (originalGroup) {
         this.group = originalGroup;
       }
-      this.set(origParams).setCoords();
+      this.set(origParams);
+      this.setCoords();
       // canvas.dispose will call image.dispose that will nullify the elements
       // since this canvas is a simple element for the process, we remove references
       // to objects in this way in order to avoid object trashing.
@@ -1887,23 +1887,13 @@
     },
 
     /**
-     * Returns coordinates of a pointer relative to an object
-     * @param {Event} e Event to operate upon
-     * @param {Object} [pointer] Pointer to operate upon (instead of event)
-     * @return {Object} Coordinates of a pointer (x, y)
+     * This callback function is called by the parent group of an object every
+     * time a non-delegated property changes on the group. It is passed the key
+     * and value as parameters. Not adding in this function's signature to avoid
+     * Travis build error about unused variables.
      */
-    getLocalPointer: function(e, pointer) {
-      pointer = pointer || this.canvas.getPointer(e);
-      var pClicked = new fabric.Point(pointer.x, pointer.y),
-          objectLeftTop = this._getLeftTopCoords();
-      if (this.angle) {
-        pClicked = fabric.util.rotatePoint(
-          pClicked, objectLeftTop, degreesToRadians(-this.angle));
-      }
-      return {
-        x: pClicked.x - objectLeftTop.x,
-        y: pClicked.y - objectLeftTop.y
-      };
+    setOnGroup: function() {
+      // implemented by sub-classes, as needed.
     },
 
     /**

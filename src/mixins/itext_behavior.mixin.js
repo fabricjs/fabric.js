@@ -25,8 +25,9 @@
      */
     initAddedHandler: function() {
       var _this = this;
-      this.on('added', function() {
-        var canvas = _this.canvas;
+      this.on('added', function (opt) {
+        //  make sure we listen to the canvas added event
+        var canvas = opt.target;
         if (canvas) {
           if (!canvas._hasITextHandlers) {
             canvas._hasITextHandlers = true;
@@ -40,8 +41,9 @@
 
     initRemovedHandler: function() {
       var _this = this;
-      this.on('removed', function() {
-        var canvas = _this.canvas;
+      this.on('removed', function (opt) {
+        //  make sure we listen to the canvas removed event
+        var canvas = opt.target;
         if (canvas) {
           canvas._iTextInstances = canvas._iTextInstances || [];
           fabric.util.removeFromArray(canvas._iTextInstances, _this);
@@ -141,9 +143,14 @@
 
       this.abortCursorAnimation();
       this._currentCursorOpacity = 1;
-      this._cursorTimeout2 = setTimeout(function() {
-        _this._tick();
-      }, delay);
+      if (delay) {
+        this._cursorTimeout2 = setTimeout(function () {
+          _this._tick();
+        }, delay);
+      }
+      else {
+        this._tick();
+      }
     },
 
     /**
@@ -432,12 +439,12 @@
      */
     fromStringToGraphemeSelection: function(start, end, text) {
       var smallerTextStart = text.slice(0, start),
-          graphemeStart = fabric.util.string.graphemeSplit(smallerTextStart).length;
+          graphemeStart = this.graphemeSplit(smallerTextStart).length;
       if (start === end) {
         return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
       }
       var smallerTextEnd = text.slice(start, end),
-          graphemeEnd = fabric.util.string.graphemeSplit(smallerTextEnd).length;
+          graphemeEnd = this.graphemeSplit(smallerTextEnd).length;
       return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
     },
 
@@ -592,6 +599,8 @@
         this.canvas.defaultCursor = this._savedProps.defaultCursor;
         this.canvas.moveCursor = this._savedProps.moveCursor;
       }
+
+      delete this._savedProps;
     },
 
     /**

@@ -65,6 +65,50 @@
     height: 60,
   });
 
+  function renderStrokeWithNegativeScale(canvas, callback) {
+    var rect = new fabric.Rect({
+      width: 10,
+      height: 10,
+      fill: 'transparent',
+      stroke: 'blue',
+      strokeWidth: 15,
+      strokeUniform: true,
+      strokeDashArray: [2, 2],
+      top: 65,
+      left: 30,
+    });
+    // do not do this at init time or they will be positive
+    rect.scaleX = -2;
+    rect.scaleY = -4;
+
+    var rect2 = new fabric.Rect({
+      width: 10,
+      height: 10,
+      fill: 'transparent',
+      stroke: 'red',
+      strokeWidth: 15,
+      scaleX: -2,
+      scaleY: -4,
+      strokeDashArray: [2, 2],
+      strokeUniform: true,
+      top: 10,
+      left: 55,
+    });
+    canvas.add(rect, rect2);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Rect with strokeUniform: true and negative scaling',
+    code: renderStrokeWithNegativeScale,
+    golden: 'strokeNegativeScale.png',
+    percentage: 0.011,
+    disabled: fabric.isLikelyNode,
+    width: 100,
+    height: 100,
+  });
+
   function shadownonscaling(canvas, callback) {
     var obj = new fabric.Rect();
     obj.set({

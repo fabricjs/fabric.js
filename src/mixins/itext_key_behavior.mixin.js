@@ -16,7 +16,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     // https://bugs.chromium.org/p/chromium/issues/detail?id=870966
     this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top +
     '; left: ' + style.left + '; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px;' +
-    ' paddingｰtop: ' + style.fontSize + ';';
+    ' padding-top: ' + style.fontSize + ';';
 
     if (this.hiddenTextareaContainer) {
       this.hiddenTextareaContainer.appendChild(this.hiddenTextarea);
@@ -25,6 +25,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       fabric.document.body.appendChild(this.hiddenTextarea);
     }
 
+    fabric.util.addListener(this.hiddenTextarea, 'blur', this.blur.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'keyup', this.onKeyUp.bind(this));
     fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
@@ -96,6 +97,13 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
   onClick: function() {
     // No need to trigger click event here, focus is enough to have the keyboard appear on Android
     this.hiddenTextarea && this.hiddenTextarea.focus();
+  },
+
+  /**
+   * Override this method to customize cursor behavior on textbox blur
+   */
+  blur: function () {
+    this.abortCursorAnimation();
   },
 
   /**
@@ -679,7 +687,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (end > start) {
       this.removeStyleFromTo(start, end);
     }
-    var graphemes = fabric.util.string.graphemeSplit(text);
+    var graphemes = this.graphemeSplit(text);
     this.insertNewStyleBlock(graphemes, start, style);
     this._text = [].concat(this._text.slice(0, start), graphemes, this._text.slice(end));
     this.text = this._text.join('');

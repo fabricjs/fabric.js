@@ -67,6 +67,113 @@
     controls: {},
 
     /**
+     * @returns {number} x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
+     */
+    getX: function () {
+      return this.getXY().x;
+    },
+
+    /**
+     * @param {number} value x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
+     */
+    setX: function (value) {
+      this.setXY(this.getXY().setX(value));
+    },
+
+    /**
+     * @returns {number} x position according to object's {@link fabric.Object#originX} property in parent's coordinate plane\
+     * if parent is canvas then this property is identical to {@link fabric.Object#getX}
+     */
+    getRelativeX: function () {
+      return this.left;
+    },
+
+    /**
+     * @param {number} value x position according to object's {@link fabric.Object#originX} property in parent's coordinate plane\
+     * if parent is canvas then this method is identical to {@link fabric.Object#setX}
+     */
+    setRelativeX: function (value) {
+      this.left = value;
+    },
+
+    /**
+     * @returns {number} y position according to object's {@link fabric.Object#originY} property in canvas coordinate plane
+     */
+    getY: function () {
+      return this.getXY().y;
+    },
+
+    /**
+     * @param {number} value y position according to object's {@link fabric.Object#originY} property in canvas coordinate plane
+     */
+    setY: function (value) {
+      this.setXY(this.getXY().setY(value));
+    },
+
+    /**
+     * @returns {number} y position according to object's {@link fabric.Object#originY} property in parent's coordinate plane\
+     * if parent is canvas then this property is identical to {@link fabric.Object#getY}
+     */
+    getRelativeY: function () {
+      return this.top;
+    },
+
+    /**
+     * @param {number} value y position according to object's {@link fabric.Object#originY} property in parent's coordinate plane\
+     * if parent is canvas then this property is identical to {@link fabric.Object#setY}
+     */
+    setRelativeY: function (value) {
+      this.top = value;
+    },
+
+    /**
+     * @returns {number} x position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in canvas coordinate plane
+     */
+    getXY: function () {
+      var relativePosition = this.getRelativeXY();
+      return this.group ?
+        fabric.util.transformPoint(relativePosition, this.group.calcTransformMatrix()) :
+        relativePosition;
+    },
+
+    /**
+     * Set an object position to a particular point, the point is intended in absolute ( canvas ) coordinate.
+     * You can specify {@link fabric.Object#originX} and {@link fabric.Object#originY} values,
+     * that otherwise are the object's current values.
+     * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
+     * object.setXY(new fabric.Point(5, 5), 'left', 'bottom').
+     * @param {fabric.Point} point position in canvas coordinate plane
+     * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
+     * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
+     */
+    setXY: function (point, originX, originY) {
+      if (this.group) {
+        point = fabric.util.transformPoint(
+          point,
+          fabric.util.invertTransform(this.group.calcTransformMatrix())
+        );
+      }
+      this.setRelativeXY(point, originX, originY);
+    },
+
+    /**
+     * @returns {number} x position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
+     */
+    getRelativeXY: function () {
+      return new fabric.Point(this.left, this.top);
+    },
+
+    /**
+     * As {@link fabric.Object#setXY}, but in current parent's coordinate plane ( the current group if any or the canvas)
+     * @param {fabric.Point} point position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
+     * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
+     * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
+     */
+    setRelativeXY: function (point, originX, originY) {
+      this.setPositionByOrigin(point, originX || this.originX, originY || this.originY);
+    },
+
+    /**
      * return correct set of coordinates for intersection
      * this will return either aCoords or lineCoords.
      * @param {Boolean} absolute will return aCoords if true or lineCoords
@@ -89,7 +196,14 @@
      * @return {Array} [tl, tr, br, bl] of points
      */
     getCoords: function (absolute, calculate) {
-      return arrayFromCoords(this._getCoords(absolute, calculate));
+      var coords = arrayFromCoords(this._getCoords(absolute, calculate));
+      if (this.group) {
+        var t = this.group.calcTransformMatrix();
+        return coords.map(function (p) {
+          return util.transformPoint(p, t);
+        });
+      }
+      return coords;
     },
 
     /**
@@ -496,7 +610,7 @@
 
     calcLineCoords: function() {
       var vpt = this.getViewportTransform(),
-          padding = this.padding, angle = degreesToRadians(this.angle),
+          padding = this.padding, angle = degreesToRadians(this.getTotalAngle()),
           cos = util.cos(angle), sin = util.sin(angle),
           cosP = cos * padding, sinP = sin * padding, cosPSinP = cosP + sinP,
           cosPMinusSinP = cosP - sinP, aCoords = this.calcACoords();
@@ -526,7 +640,8 @@
       var rotateMatrix = this._calcRotateMatrix(),
           translateMatrix = this._calcTranslateMatrix(),
           vpt = this.getViewportTransform(),
-          startMatrix = multiplyMatrices(vpt, translateMatrix),
+          startMatrix = this.group ? multiplyMatrices(vpt, this.group.calcTransformMatrix()) : vpt,
+          startMatrix = multiplyMatrices(startMatrix, translateMatrix),
           finalMatrix = multiplyMatrices(startMatrix, rotateMatrix),
           finalMatrix = multiplyMatrices(finalMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
           dim = this._calculateCurrentDimensions(),
@@ -536,15 +651,18 @@
       });
 
       // debug code
-      // var canvas = this.canvas;
-      // setTimeout(function() {
-      //   canvas.contextTop.clearRect(0, 0, 700, 700);
-      //   canvas.contextTop.fillStyle = 'green';
-      //   Object.keys(coords).forEach(function(key) {
-      //     var control = coords[key];
-      //     canvas.contextTop.fillRect(control.x, control.y, 3, 3);
-      //   });
-      // }, 50);
+      /*
+       var canvas = this.canvas;
+      setTimeout(function () {
+        if (!canvas) return;
+         canvas.contextTop.clearRect(0, 0, 700, 700);
+         canvas.contextTop.fillStyle = 'green';
+         Object.keys(coords).forEach(function(key) {
+           var control = coords[key];
+           canvas.contextTop.fillRect(control.x, control.y, 3, 3);
+         });
+       }, 50);
+       */
       return coords;
     },
 
@@ -601,7 +719,7 @@
      * @return {Array} rotation matrix for the object
      */
     _calcTranslateMatrix: function() {
-      var center = this.getCenterPoint();
+      var center = this.getRelativeCenterPoint();
       return [1, 0, 0, 1, center.x, center.y];
     },
 
@@ -666,77 +784,65 @@
       return cache.value;
     },
 
-    /*
+    /**
      * Calculate object dimensions from its properties
      * @private
-     * @return {Object} .x width dimension
-     * @return {Object} .y height dimension
+     * @returns {fabric.Point} dimensions
      */
     _getNonTransformedDimensions: function() {
-      var strokeWidth = this.strokeWidth,
-          w = this.width + strokeWidth,
-          h = this.height + strokeWidth;
-      return { x: w, y: h };
+      return new fabric.Point(this.width, this.height).scalarAddEquals(this.strokeWidth);
     },
 
-    /*
+    /**
      * Calculate object bounding box dimensions from its properties scale, skew.
-     * @param {Number} skewX, a value to override current skewX
-     * @param {Number} skewY, a value to override current skewY
+     * @param {Object} [options]
+     * @param {Number} [options.scaleX]
+     * @param {Number} [options.scaleY]
+     * @param {Number} [options.skewX]
+     * @param {Number} [options.skewY]
      * @private
-     * @return {Object} .x width dimension
-     * @return {Object} .y height dimension
+     * @returns {fabric.Point} dimensions
      */
-    _getTransformedDimensions: function(skewX, skewY) {
-      if (typeof skewX === 'undefined') {
-        skewX = this.skewX;
-      }
-      if (typeof skewY === 'undefined') {
-        skewY = this.skewY;
-      }
-      var dimensions, dimX, dimY,
-          noSkew = skewX === 0 && skewY === 0;
-
-      if (this.strokeUniform) {
-        dimX = this.width;
-        dimY = this.height;
-      }
-      else {
-        dimensions = this._getNonTransformedDimensions();
-        dimX = dimensions.x;
-        dimY = dimensions.y;
-      }
-      if (noSkew) {
-        return this._finalizeDimensions(dimX * this.scaleX, dimY * this.scaleY);
-      }
-      var bbox = util.sizeAfterTransform(dimX, dimY, {
+    _getTransformedDimensions: function (options) {
+      options = Object.assign({
         scaleX: this.scaleX,
         scaleY: this.scaleY,
-        skewX: skewX,
-        skewY: skewY,
-      });
-      return this._finalizeDimensions(bbox.x, bbox.y);
+        skewX: this.skewX,
+        skewY: this.skewY,
+        width: this.width,
+        height: this.height,
+        strokeWidth: this.strokeWidth
+      }, options || {});
+      //  stroke is applied before/after transformations are applied according to `strokeUniform`
+      var preScalingStrokeValue, postScalingStrokeValue, strokeWidth = options.strokeWidth;
+      if (this.strokeUniform) {
+        preScalingStrokeValue = 0;
+        postScalingStrokeValue = strokeWidth;
+      }
+      else {
+        preScalingStrokeValue = strokeWidth;
+        postScalingStrokeValue = 0;
+      }
+      var dimX = options.width + preScalingStrokeValue,
+          dimY = options.height + preScalingStrokeValue,
+          finalDimensions,
+          noSkew = options.skewX === 0 && options.skewY === 0;
+      if (noSkew) {
+        finalDimensions = new fabric.Point(dimX * options.scaleX, dimY * options.scaleY);
+      }
+      else {
+        var bbox = util.sizeAfterTransform(dimX, dimY, options);
+        finalDimensions = new fabric.Point(bbox.x, bbox.y);
+      }
+
+      return finalDimensions.scalarAddEquals(postScalingStrokeValue);
     },
 
-    /*
-     * Calculate object bounding box dimensions from its properties scale, skew.
-     * @param Number width width of the bbox
-     * @param Number height height of the bbox
-     * @private
-     * @return {Object} .x finalized width dimension
-     * @return {Object} .y finalized height dimension
-     */
-    _finalizeDimensions: function(width, height) {
-      return this.strokeUniform ?
-        { x: width + this.strokeWidth, y: height + this.strokeWidth }
-        :
-        { x: width, y: height };
-    },
-
-    /*
+    /**
      * Calculate object dimensions for controls box, including padding and canvas zoom.
      * and active selection
-     * private
+     * @private
+     * @returns {fabric.Point} dimensions
      */
     _calculateCurrentDimensions: function()  {
       var vpt = this.getViewportTransform(),
