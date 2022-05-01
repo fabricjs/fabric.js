@@ -136,8 +136,8 @@
      * @override we want instance to fill parent so we disregard transformations
      * @returns {fabric.Point} dimensions
      */
-    _getTransformedDimensions: function () {
-      return this.callSuper('_getTransformedDimensions', {
+    _getTransformedDimensions: function (options) {
+      return this.callSuper('_getTransformedDimensions', Object.assign({
         scaleX: 1,
         scaleY: 1,
         skewX: 0,
@@ -145,7 +145,7 @@
         width: this.width,
         height: this.height,
         strokeWidth: 0
-      });
+      }, options));
     },
 
     /**
