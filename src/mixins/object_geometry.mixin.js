@@ -735,6 +735,8 @@
      * @param {Number} [options.scaleY]
      * @param {Number} [options.skewX]
      * @param {Number} [options.skewY]
+     * @param {Number} [options.width]
+     * @param {Number} [options.height]
      * @private
      * @returns {fabric.Point} dimensions
      */
