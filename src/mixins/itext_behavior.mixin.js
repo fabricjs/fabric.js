@@ -25,8 +25,9 @@
      */
     initAddedHandler: function() {
       var _this = this;
-      this.on('added', function() {
-        var canvas = _this.canvas;
+      this.on('added', function (opt) {
+        //  make sure we listen to the canvas added event
+        var canvas = opt.target;
         if (canvas) {
           if (!canvas._hasITextHandlers) {
             canvas._hasITextHandlers = true;
@@ -40,8 +41,9 @@
 
     initRemovedHandler: function() {
       var _this = this;
-      this.on('removed', function() {
-        var canvas = _this.canvas;
+      this.on('removed', function (opt) {
+        //  make sure we listen to the canvas removed event
+        var canvas = opt.target;
         if (canvas) {
           canvas._iTextInstances = canvas._iTextInstances || [];
           fabric.util.removeFromArray(canvas._iTextInstances, _this);

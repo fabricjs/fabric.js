@@ -13,8 +13,19 @@
      */
     _shouldGroup: function(e, target) {
       var activeObject = this._activeObject;
-      return activeObject && this._isSelectionKeyPressed(e) && target && target.selectable && this.selection &&
-            (activeObject !== target || activeObject.type === 'activeSelection') && !target.onSelect({ e: e });
+      // check if an active object exists on canvas and if the user is pressing the `selectionKey` while canvas supports multi selection.
+      return !!activeObject && this._isSelectionKeyPressed(e) && this.selection
+        // on top of that the user also has to hit a target that is selectable.
+        && !!target && target.selectable
+        // if all pre-requisite pass, the target is either something different from the current
+        // activeObject or if an activeSelection already exists
+        // TODO at time of writing why `activeObject.type === 'activeSelection'` matter is unclear.
+        // is a very old condition uncertain if still valid.
+        && (activeObject !== target || activeObject.type === 'activeSelection')
+        //  make sure `activeObject` and `target` aren't ancestors of each other
+        && !target.isDescendantOf(activeObject) && !activeObject.isDescendantOf(target)
+        //  target accepts selection
+        && !target.onSelect({ e: e });
     },
 
     /**
@@ -50,8 +61,8 @@
     _updateActiveSelection: function(target, e) {
       var activeSelection = this._activeObject,
           currentActiveObjects = activeSelection._objects.slice(0);
-      if (activeSelection.contains(target)) {
-        activeSelection.removeWithUpdate(target);
+      if (target.group === activeSelection) {
+        activeSelection.remove(target);
         this._hoveredTarget = target;
         this._hoveredTargets = this.targets.concat();
         if (activeSelection.size() === 1) {
@@ -60,7 +71,7 @@
         }
       }
       else {
-        activeSelection.addWithUpdate(target);
+        activeSelection.add(target);
         this._hoveredTarget = activeSelection;
         this._hoveredTargets = this.targets.concat();
       }
@@ -80,17 +91,19 @@
       this._fireSelectionEvents(currentActives, e);
     },
 
+
     /**
      * @private
      * @param {Object} target
+     * @returns {fabric.ActiveSelection}
      */
     _createGroup: function(target) {
-      var objects = this._objects,
-          isActiveLower = objects.indexOf(this._activeObject) < objects.indexOf(target),
-          groupObjects = isActiveLower
-            ? [this._activeObject, target]
-            : [target, this._activeObject];
-      this._activeObject.isEditing && this._activeObject.exitEditing();
+      var activeObject = this._activeObject;
+      var groupObjects = target.isInFrontOf(activeObject) ?
+        [activeObject, target] :
+        [target, activeObject];
+      activeObject.isEditing && activeObject.exitEditing();
+      //  handle case: target is nested
       return new fabric.ActiveSelection(groupObjects, {
         canvas: this
       });
