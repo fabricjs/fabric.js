@@ -840,8 +840,8 @@
         a = objCenter.subtract(sizeVector);
         b = objCenter.add(sizeVector);
         if (i === 0) {
-          min = new fabric.Point(Math.min(a.x, b.x), Math.min(a.y, b.y));
-          max = new fabric.Point(Math.max(a.x, b.x), Math.max(a.y, b.y));
+          min.setXY(new fabric.Point(Math.min(a.x, b.x), Math.min(a.y, b.y)));
+          max.setXY(new fabric.Point(Math.max(a.x, b.x), Math.max(a.y, b.y)));
         }
         else {
           min.setXY(Math.min(min.x, a.x, b.x), Math.min(min.y, a.y, b.y));
