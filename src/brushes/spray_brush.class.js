@@ -117,7 +117,12 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       rects = this._getOptimizedRects(rects);
     }
 
-    var group = new fabric.Group(rects);
+    var group = new fabric.Group(rects, {
+      objectCaching: true,
+      layout: 'fixed',
+      subTargetCheck: false,
+      interactive: false
+    });
     this.shadow && group.set('shadow', new fabric.Shadow(this.shadow));
     await this._addClipPathToResult(group);
     canvas.fire('before:path:created', { path: group });

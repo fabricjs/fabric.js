@@ -596,8 +596,8 @@
      * @chainable
      */
     remove: function () {
-      var didRemove = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
-      didRemove && this.renderOnAddRemove && this.requestRenderAll();
+      var removed = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
+      removed.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -617,7 +617,7 @@
       obj._set('canvas', this);
       obj.setCoords();
       this.fire('object:added', { target: obj });
-      obj.fire('added');
+      obj.fire('added', { target: this });
     },
 
     /**
@@ -626,8 +626,8 @@
      */
     _onObjectRemoved: function(obj) {
       this.fire('object:removed', { target: obj });
-      obj.fire('removed');
-      delete obj.canvas;
+      obj.fire('removed', { target: this });
+      obj._set('canvas', undefined);
     },
 
     /**
@@ -966,7 +966,7 @@
      * @chainable
      */
     _centerObject: function(object, center) {
-      object.setPositionByOrigin(center, 'center', 'center');
+      object.setXY(center, 'center', 'center');
       object.setCoords();
       this.renderOnAddRemove && this.requestRenderAll();
       return this;
