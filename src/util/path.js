@@ -813,8 +813,8 @@
 
   /**
    * Returns an array of path commands to create a regular polygon
-   * @param {number} radius 
-   * @param {number} numVertexes 
+   * @param {number} radius
+   * @param {number} numVertexes
    * @returns {(string|number)[][]} An array of SVG path commands
    */
   function getRegularPolygonPath(radius, numVertexes) {
@@ -822,19 +822,19 @@
     // rotationAdjustment rotates the path by 1/2 the interior angle so that the polygon always has a flat side on the bottom
     // This isn't strictly necessary, but it's how we tend to think of and expect polygons to be drawn
     var rotationAdjustment = -Math.PI / 2;
-    if (numVertexes % 2 == 0) {
+    if (numVertexes % 2 === 0) {
       rotationAdjustment += interiorAngle / 2;
     }
     var d = [];
     // If an odd number of vertexes, add an additional point at the top of the polygon in order to shift the calculated center
     // point of the shape so that the center point of the polygon is at 0,0 (otherwise the center is mis-located)
-    if (numVertexes % 2 == 1) {
+    if (numVertexes % 2 === 1) {
       d.push(['M', 0, radius]);
     }
     for (var i = 0, rad, coord; i < numVertexes; i++) {
       rad = i * interiorAngle + rotationAdjustment;
       coord = new fabric.Point(Math.cos(rad), Math.sin(rad)).scalarMultiplyEquals(radius);
-      d.push([i == 0 ? 'M' : 'L', coord.x, coord.y]);
+      d.push([i === 0 ? 'M' : 'L', coord.x, coord.y]);
     }
     d.push(['Z']);
     return d;
