@@ -309,7 +309,7 @@
   }
 
   tests.push({
-    test: 'controlboxes with skewY, green is wrong and needs fix',
+    test: 'controlboxes with skewY',
     code: controlBoxes,
     golden: 'controls12.png',
     percentage: 0.002,
@@ -319,7 +319,7 @@
   });
 
   function controlBoxes2(canvas, callback) {
-    canvas.loadFromJSON('{"version":"5.2.0","objects":[{"type":"rect","version":"5.2.0","left":38,"top":201,"width":150,"height":150,"fill":"red","skewX":0.15,"skewY":36},{"type":"rect","version":"5.2.0","left":20,"top":2,"width":150,"height":150,"fill":"#020aed","scaleX":1.24,"scaleY":0.81,"angle":35.95,"skewX":25.46},{"type":"group","version":"5.2.0","left":152.65,"top":21,"width":320.4,"height":335.5,"scaleX":0.75,"skewY":24.57,"objects":[{"type":"rect","version":"5.2.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"green","angle":30,"skewX":14.71,"skewY":36},{"type":"rect","version":"5.2.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"yellow","angle":45,"skewX":14.71}]},{"type":"group","version":"5.2.0","left":329.65,"top":65,"width":320.4,"height":335.5,"scaleX":1.29,"scaleY":1.29,"objects":[{"type":"rect","version":"5.2.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"purple","angle":30,"skewX":14.71,"skewY":36},{"type":"rect","version":"5.2.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"pink","angle":45,"skewX":14.71}]}]}')
+    canvas.loadFromJSON('{"version":"5.2.0","objects":[{"type":"rect","version":"5.2.0","left":38,"top":201,"width":150,"height":150,"fill":"red","skewX":0.15,"skewY":36},{"type":"rect","version":"5.2.0","left":20,"top":2,"width":150,"height":150,"fill":"#020aed","scaleX":1.24,"scaleY":0.81,"angle":35.95,"skewX":25.46},{"type":"group","version":"5.2.0","left":152.65,"top":21,"width":320.4,"height":335.5,"scaleX":0.75,"skewY":24.57, "objects":[{"type":"rect","version":"5.2.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"green","angle":30,"skewX":14.71,"skewY":36, "flipX": true, "flipY": true},{"type":"rect","version":"5.2.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"yellow","angle":45,"skewX":14.71}]},{"type":"group","version":"5.2.0","left":329.65,"top":65,"width":320.4,"height":335.5,"scaleX":1.29,"scaleY":1.29, "flipX": true,"objects":[{"type":"rect","version":"5.2.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"purple","angle":30,"skewX":14.71,"skewY":36},{"type":"rect","version":"5.2.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"pink","angle":45,"skewX":14.71}]}]}')
       .then(function() {
         canvas.renderAll();
         canvas.getObjects().forEach(function(object) {
@@ -343,7 +343,7 @@
   }
 
   tests.push({
-    test: 'controlboxes with skewY, green is wrong and needs fix',
+    test: 'controlboxes with skewY and flipX',
     code: controlBoxes2,
     golden: 'controls13.png',
     percentage: 0.002,
