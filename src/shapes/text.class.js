@@ -444,7 +444,6 @@
         // once text is measured we need to make space fatter to make justified text.
         this.enlargeSpaces();
       }
-      this.saveState({ propertySet: '_dimensionAffectingProps' });
     },
 
     /**
