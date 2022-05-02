@@ -168,13 +168,13 @@
       ctx.save();
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
       this.callSuper('_renderControls', ctx, styleOverride);
-      childrenOverride = childrenOverride || { };
-      if (typeof childrenOverride.hasControls === 'undefined') {
-        childrenOverride.hasControls = false;
-      }
-      childrenOverride.forActiveSelection = true;
+      var options = Object.assign(
+        { hasControls: false },
+        childrenOverride,
+        { forActiveSelection: true }
+      );
       for (var i = 0; i < this._objects.length; i++) {
-        this._objects[i]._renderControls(ctx, childrenOverride);
+        this._objects[i]._renderControls(ctx, options);
       }
       ctx.restore();
     },
@@ -192,7 +192,7 @@
         options = fabric.util.object.clone(object, true);
     delete options.objects;
     return fabric.util.enlivenObjects(objects).then(function(enlivenedObjects) {
-      return new fabric.ActiveSelection(enlivenedObjects, object, true);
+      return new fabric.ActiveSelection(enlivenedObjects, options, true);
     });
   };
 
