@@ -803,7 +803,7 @@
      * @param  {Boolean} [options.flipX]
      * @param  {Boolean} [options.flipY]
      * @param  {Number} [options.skewX]
-     * @param  {Number} [options.skewX]
+     * @param  {Number} [options.skewY]
      * @param  {Number} [options.translateX]
      * @param  {Number} [options.translateY]
      * @return {Number[]} transform matrix
