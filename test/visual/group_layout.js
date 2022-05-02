@@ -88,7 +88,7 @@
         var g = createGroupForLayoutTests('fit-content layout', {
             backgroundColor: 'blue'
         });
-        g.clone().then((clone) => {
+        g.clone().then(function (clone) {
             canvas.add(clone);
             canvas.renderAll();
             callback(canvas.lowerCanvasEl);
