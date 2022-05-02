@@ -571,15 +571,16 @@
       return lineCoords;
     },
 
-    calcOCoords: function() {
-      var rotateMatrix = this._calcRotateMatrix(),
-          translateMatrix = this._calcTranslateMatrix(),
-          vpt = this.getViewportTransform(),
-          startMatrix = this.group ? multiplyMatrices(vpt, this.group.calcTransformMatrix()) : vpt,
-          startMatrix = multiplyMatrices(startMatrix, translateMatrix),
-          finalMatrix = multiplyMatrices(startMatrix, rotateMatrix),
-          finalMatrix = multiplyMatrices(finalMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
-          dim = this._calculateCurrentDimensions(),
+    calcOCoords: function () {
+      var vpt = this.getViewportTransform(),
+          center = this.getCenterPoint(),
+          tMatrix = [1, 0, 0, 1, center.x, center.y],
+          rMatrix = util.calcRotateMatrix({ angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0) }),
+          positionMatrix = multiplyMatrices(tMatrix, rMatrix),
+          startMatrix = multiplyMatrices(vpt, positionMatrix),
+          finalMatrix = multiplyMatrices(startMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
+          transformOptions = this.group ? fabric.util.qrDecompose(this.calcTransformMatrix()) : undefined,
+          dim = this._calculateCurrentDimensions(transformOptions),
           coords = {};
       this.forEachControl(function(control, key, fabricObject) {
         coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
@@ -597,13 +598,14 @@
            canvas.contextTop.fillRect(control.x, control.y, 3, 3);
          });
        }, 50);
-       */
+      */
       return coords;
     },
 
     calcACoords: function() {
-      var rotateMatrix = this._calcRotateMatrix(),
-          translateMatrix = this._calcTranslateMatrix(),
+      var rotateMatrix = util.calcRotateMatrix({ angle: this.angle }),
+          center = this.getRelativeCenterPoint(),
+          translateMatrix = [1, 0, 0, 1, center.x, center.y],
           finalMatrix = multiplyMatrices(translateMatrix, rotateMatrix),
           dim = this._getTransformedDimensions(),
           w = dim.x / 2, h = dim.y / 2;
@@ -639,23 +641,6 @@
       this.oCoords = this.calcOCoords();
       this._setCornerCoords && this._setCornerCoords();
       return this;
-    },
-
-    /**
-     * calculate rotation matrix of an object
-     * @return {Array} rotation matrix for the object
-     */
-    _calcRotateMatrix: function() {
-      return util.calcRotateMatrix(this);
-    },
-
-    /**
-     * calculate the translation matrix for an object transform
-     * @return {Array} rotation matrix for the object
-     */
-    _calcTranslateMatrix: function() {
-      var center = this.getRelativeCenterPoint();
-      return [1, 0, 0, 1, center.x, center.y];
     },
 
     transformMatrixKey: function(skipGroup) {
@@ -702,11 +687,11 @@
       if (cache.key === key) {
         return cache.value;
       }
-      var tMatrix = this._calcTranslateMatrix(),
+      var center = this.getRelativeCenterPoint(),
           options = {
             angle: this.angle,
-            translateX: tMatrix[4],
-            translateY: tMatrix[5],
+            translateX: center.x,
+            translateY: center.y,
             scaleX: this.scaleX,
             scaleY: this.scaleY,
             skewX: this.skewX,
@@ -779,11 +764,12 @@
      * Calculate object dimensions for controls box, including padding and canvas zoom.
      * and active selection
      * @private
+     * @param {object} [options] transform options
      * @returns {fabric.Point} dimensions
      */
-    _calculateCurrentDimensions: function()  {
+    _calculateCurrentDimensions: function(options)  {
       var vpt = this.getViewportTransform(),
-          dim = this._getTransformedDimensions(),
+          dim = this._getTransformedDimensions(options),
           p = transformPoint(dim, vpt, true);
       return p.scalarAdd(2 * this.padding);
     },
