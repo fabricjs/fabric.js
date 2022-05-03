@@ -1,4 +1,4 @@
-/* build: `node build.js modules=ALL exclude=accessors,gestures requirejs minifier=uglifyjs` */
+/* build: `node build.js modules=ALL exclude=gestures,accessors,erasing requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var fabric = fabric || { version: '5.1.0' };
@@ -7774,8 +7774,110 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
-      degreesToRadians = fabric.util.degreesToRadians;
+  var fabric = global.fabric || (global.fabric = { }),
+      degreesToRadians = fabric.util.degreesToRadians,
+      controls = fabric.controlsUtils;
+
+  /**
+   * Render a round control, as per fabric features.
+   * This function is written to respect object properties like transparentCorners, cornerSize
+   * cornerColor, cornerStrokeColor
+   * plus the addition of offsetY and offsetX.
+   * @param {CanvasRenderingContext2D} ctx context to render on
+   * @param {Number} left x coordinate where the control center should be
+   * @param {Number} top y coordinate where the control center should be
+   * @param {Object} styleOverride override for fabric.Object controls style
+   * @param {fabric.Object} fabricObject the fabric object for which we are rendering controls
+   */
+  function renderCircleControl (ctx, left, top, styleOverride, fabricObject) {
+    styleOverride = styleOverride || {};
+    var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
+        ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
+        transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
+          styleOverride.transparentCorners : fabricObject.transparentCorners,
+        methodName = transparentCorners ? 'stroke' : 'fill',
+        stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
+        myLeft = left,
+        myTop = top, size;
+    ctx.save();
+    ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
+    ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
+    // as soon as fabric react v5, remove ie11, use proper ellipse code.
+    if (xSize > ySize) {
+      size = xSize;
+      ctx.scale(1.0, ySize / xSize);
+      myTop = top * xSize / ySize;
+    }
+    else if (ySize > xSize) {
+      size = ySize;
+      ctx.scale(xSize / ySize, 1.0);
+      myLeft = left * ySize / xSize;
+    }
+    else {
+      size = xSize;
+    }
+    // this is still wrong
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(myLeft, myTop, size / 2, 0, 2 * Math.PI, false);
+    ctx[methodName]();
+    if (stroke) {
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  /**
+   * Render a square control, as per fabric features.
+   * This function is written to respect object properties like transparentCorners, cornerSize
+   * cornerColor, cornerStrokeColor
+   * plus the addition of offsetY and offsetX.
+   * @param {CanvasRenderingContext2D} ctx context to render on
+   * @param {Number} left x coordinate where the control center should be
+   * @param {Number} top y coordinate where the control center should be
+   * @param {Object} styleOverride override for fabric.Object controls style
+   * @param {fabric.Object} fabricObject the fabric object for which we are rendering controls
+   */
+  function renderSquareControl(ctx, left, top, styleOverride, fabricObject) {
+    styleOverride = styleOverride || {};
+    var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
+        ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
+        transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
+          styleOverride.transparentCorners : fabricObject.transparentCorners,
+        methodName = transparentCorners ? 'stroke' : 'fill',
+        stroke = !transparentCorners && (
+          styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor
+        ), xSizeBy2 = xSize / 2, ySizeBy2 = ySize / 2;
+    ctx.save();
+    ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
+    ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
+    // this is still wrong
+    ctx.lineWidth = 1;
+    ctx.translate(left, top);
+    //  angle is relative to canvas plane
+    var angle = fabricObject.getTotalAngle();
+    ctx.rotate(degreesToRadians(angle));
+    // this does not work, and fixed with ( && ) does not make sense.
+    // to have real transparent corners we need the controls on upperCanvas
+    // transparentCorners || ctx.clearRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
+    ctx[methodName + 'Rect'](-xSizeBy2, -ySizeBy2, xSize, ySize);
+    if (stroke) {
+      ctx.strokeRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
+    }
+    ctx.restore();
+  }
+
+  controls.renderCircleControl = renderCircleControl;
+  controls.renderSquareControl = renderSquareControl;
+
+})(typeof exports !== 'undefined' ? exports : this);
+
+
+(function(global) {
+
+  'use strict';
+
+  var fabric = global.fabric || (global.fabric = { });
 
   function Control(options) {
     for (var i in options) {
@@ -7940,30 +8042,33 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     /**
      * Returns control actionHandler
      * @param {Event} eventData the native mouse event
+     * @param {fabric.Object} fabricObject on which the control is displayed
      * @param {fabric.Control} control control for which the action handler is being asked
      * @return {Function} the action handler
      */
-    getActionHandler: function(/* eventData, control */) {
+    getActionHandler: function(/* eventData, fabricObject, control */) {
       return this.actionHandler;
     },
 
     /**
      * Returns control mouseDown handler
      * @param {Event} eventData the native mouse event
+     * @param {fabric.Object} fabricObject on which the control is displayed
      * @param {fabric.Control} control control for which the action handler is being asked
      * @return {Function} the action handler
      */
-    getMouseDownHandler: function(/* eventData, control */) {
+    getMouseDownHandler: function(/* eventData, fabricObject, control */) {
       return this.mouseDownHandler;
     },
 
     /**
      * Returns control mouseUp handler
      * @param {Event} eventData the native mouse event
+     * @param {fabric.Object} fabricObject on which the control is displayed
      * @param {fabric.Control} control control for which the action handler is being asked
      * @return {Function} the action handler
      */
-    getMouseUpHandler: function(/* eventData, control */) {
+    getMouseUpHandler: function(/* eventData, fabricObject, control */) {
       return this.mouseUpHandler;
     },
 
@@ -7976,7 +8081,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @param {fabric.Object} object on which the control is displayed
      * @return {String}
      */
-    cursorStyleHandler: function(eventData, control) {
+    cursorStyleHandler: function(eventData, control /* fabricObject */) {
       return control.cursorStyle;
     },
 
@@ -7987,7 +8092,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @param {fabric.Object} object on which the control is displayed
      * @return {String}
      */
-    getActionName: function(eventData, control) {
+    getActionName: function(eventData, control /* fabricObject */) {
       return control.actionName;
     },
 
@@ -7997,7 +8102,11 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @param {String} controlKey key where the control is memorized on the
      * @return {Boolean}
      */
-    getVisibility: function () {
+    getVisibility: function(fabricObject, controlKey) {
+      var objectVisibility = fabricObject._controlsVisibility;
+      if (objectVisibility && typeof objectVisibility[controlKey] !== 'undefined') {
+        return objectVisibility[controlKey];
+      }
       return this.visible;
     },
 
@@ -8006,16 +8115,15 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @param {Boolean} visibility for the object
      * @return {Void}
      */
-    setVisibility: function(visibility) {
+    setVisibility: function(visibility /* name, fabricObject */) {
       this.visible = visibility;
     },
 
 
-    positionHandler: function(dim, finalMatrix /*, currentControl */) {
-      var point = fabric.util.transformPoint(
-        new fabric.Point(this.x * dim.x + this.offsetX, this.y * dim.y + this.offsetY),
-        finalMatrix
-      );
+    positionHandler: function(dim, finalMatrix /*, fabricObject, currentControl */) {
+      var point = fabric.util.transformPoint({
+        x: this.x * dim.x + this.offsetX,
+        y: this.y * dim.y + this.offsetY }, finalMatrix);
       return point;
     },
 
@@ -8089,106 +8197,18 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     * @param {Number} left position of the canvas where we are about to render the control.
     * @param {Number} top position of the canvas where we are about to render the control.
     * @param {Object} styleOverride
+    * @param {fabric.Object} fabricObject the object where the control is about to be rendered
     */
-    render: function (ctx, left, top, styleOverride) {
+    render: function(ctx, left, top, styleOverride, fabricObject) {
       styleOverride = styleOverride || {};
-      switch (styleOverride.cornerStyle || this.object.cornerStyle) {
+      switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
         case 'circle':
-          this.renderCircleControl(ctx, left, top, styleOverride);
+          fabric.controlsUtils.renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
           break;
         default:
-          this.renderSquareControl(ctx, left, top, styleOverride);
+          fabric.controlsUtils.renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
       }
     },
-
-    /**
-     * Render a round control, as per fabric features.
-     * This function is written to respect object properties like transparentCorners, cornerSize
-     * cornerColor, cornerStrokeColor
-     * plus the addition of offsetY and offsetX.
-     * @param {CanvasRenderingContext2D} ctx context to render on
-     * @param {Number} left x coordinate where the control center should be
-     * @param {Number} top y coordinate where the control center should be
-     * @param {Object} styleOverride override for fabric.Object controls style
-     */
-    renderCircleControl: function (ctx, left, top, styleOverride) {
-      var fabricObject = this.object;
-      styleOverride = styleOverride || {};
-      var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-          ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
-          transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
-            styleOverride.transparentCorners : fabricObject.transparentCorners,
-          methodName = transparentCorners ? 'stroke' : 'fill',
-          stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
-          myLeft = left,
-          myTop = top, size;
-      ctx.save();
-      ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
-      ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
-      // as soon as fabric react v5, remove ie11, use proper ellipse code.
-      if (xSize > ySize) {
-        size = xSize;
-        ctx.scale(1.0, ySize / xSize);
-        myTop = top * xSize / ySize;
-      }
-      else if (ySize > xSize) {
-        size = ySize;
-        ctx.scale(xSize / ySize, 1.0);
-        myLeft = left * ySize / xSize;
-      }
-      else {
-        size = xSize;
-      }
-      // this is still wrong
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(myLeft, myTop, size / 2, 0, 2 * Math.PI, false);
-      ctx[methodName]();
-      if (stroke) {
-        ctx.stroke();
-      }
-      ctx.restore();
-    },
-
-    /**
-     * Render a square control, as per fabric features.
-     * This function is written to respect object properties like transparentCorners, cornerSize
-     * cornerColor, cornerStrokeColor
-     * plus the addition of offsetY and offsetX.
-     * @param {CanvasRenderingContext2D} ctx context to render on
-     * @param {Number} left x coordinate where the control center should be
-     * @param {Number} top y coordinate where the control center should be
-     * @param {Object} styleOverride override for fabric.Object controls style
-     */
-    renderSquareControl: function (ctx, left, top, styleOverride) {
-      var fabricObject = this.object;
-      styleOverride = styleOverride || {};
-      var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-          ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
-          transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ?
-            styleOverride.transparentCorners : fabricObject.transparentCorners,
-          methodName = transparentCorners ? 'stroke' : 'fill',
-          stroke = !transparentCorners && (
-            styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor
-          ), xSizeBy2 = xSize / 2, ySizeBy2 = ySize / 2;
-      ctx.save();
-      ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
-      ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
-      // this is still wrong
-      ctx.lineWidth = 1;
-      ctx.translate(left, top);
-      //  angle is relative to canvas plane
-      var angle = fabricObject.getTotalAngle();
-      ctx.rotate(degreesToRadians(angle));
-      // this does not work, and fixed with ( && ) does not make sense.
-      // to have real transparent corners we need the controls on upperCanvas
-      // transparentCorners || ctx.clearRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
-      ctx[methodName + 'Rect'](-xSizeBy2, -ySizeBy2, xSize, ySize);
-      if (stroke) {
-        ctx.strokeRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
-      }
-      ctx.restore();
-    }
   };
 
 })(typeof exports !== 'undefined' ? exports : this);
@@ -15411,11 +15431,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     initialize: function (options) {
       this._parentMonitor = new fabric.ParentResizeObserver(this, this._onParentResize.bind(this));
-      options = Object.assign(options || {});
-      this.controls = options.controls || new fabric.ObjectControls();
-      this.controls.attach(this);
-      delete options.controls;
-      this.setOptions(options);
+      if (options) {
+        this.setOptions(options);
+      }
     },
 
     /**
@@ -17124,111 +17142,10 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     matrixCache: null,
 
     /**
-     * @returns {number} x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
+     * custom controls interface
+     * controls are added by default_controls.js
      */
-    getX: function () {
-      return this.getXY().x;
-    },
-
-    /**
-     * @param {number} value x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
-     */
-    setX: function (value) {
-      this.setXY(this.getXY().setX(value));
-    },
-
-    /**
-     * @returns {number} x position according to object's {@link fabric.Object#originX} property in parent's coordinate plane\
-     * if parent is canvas then this property is identical to {@link fabric.Object#getX}
-     */
-    getRelativeX: function () {
-      return this.left;
-    },
-
-    /**
-     * @param {number} value x position according to object's {@link fabric.Object#originX} property in parent's coordinate plane\
-     * if parent is canvas then this method is identical to {@link fabric.Object#setX}
-     */
-    setRelativeX: function (value) {
-      this.left = value;
-    },
-
-    /**
-     * @returns {number} y position according to object's {@link fabric.Object#originY} property in canvas coordinate plane
-     */
-    getY: function () {
-      return this.getXY().y;
-    },
-
-    /**
-     * @param {number} value y position according to object's {@link fabric.Object#originY} property in canvas coordinate plane
-     */
-    setY: function (value) {
-      this.setXY(this.getXY().setY(value));
-    },
-
-    /**
-     * @returns {number} y position according to object's {@link fabric.Object#originY} property in parent's coordinate plane\
-     * if parent is canvas then this property is identical to {@link fabric.Object#getY}
-     */
-    getRelativeY: function () {
-      return this.top;
-    },
-
-    /**
-     * @param {number} value y position according to object's {@link fabric.Object#originY} property in parent's coordinate plane\
-     * if parent is canvas then this property is identical to {@link fabric.Object#setY}
-     */
-    setRelativeY: function (value) {
-      this.top = value;
-    },
-
-    /**
-     * @returns {number} x position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in canvas coordinate plane
-     */
-    getXY: function () {
-      var relativePosition = this.getRelativeXY();
-      return this.group ?
-        fabric.util.transformPoint(relativePosition, this.group.calcTransformMatrix()) :
-        relativePosition;
-    },
-
-    /**
-     * Set an object position to a particular point, the point is intended in absolute ( canvas ) coordinate.
-     * You can specify {@link fabric.Object#originX} and {@link fabric.Object#originY} values,
-     * that otherwise are the object's current values.
-     * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
-     * object.setXY(new fabric.Point(5, 5), 'left', 'bottom').
-     * @param {fabric.Point} point position in canvas coordinate plane
-     * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
-     * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
-     */
-    setXY: function (point, originX, originY) {
-      if (this.group) {
-        point = fabric.util.transformPoint(
-          point,
-          fabric.util.invertTransform(this.group.calcTransformMatrix())
-        );
-      }
-      this.setRelativeXY(point, originX, originY);
-    },
-
-    /**
-     * @returns {number} x position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
-     */
-    getRelativeXY: function () {
-      return new fabric.Point(this.left, this.top);
-    },
-
-    /**
-     * As {@link fabric.Object#setXY}, but in current parent's coordinate plane ( the current group if any or the canvas)
-     * @param {fabric.Point} point position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
-     * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
-     * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
-     */
-    setRelativeXY: function (point, originX, originY) {
-      this.setPositionByOrigin(point, originX || this.originX, originY || this.originY);
-    },
+    controls: { },
 
     /**
      * @returns {number} x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
@@ -17745,8 +17662,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           transformOptions = this.group ? fabric.util.qrDecompose(this.calcTransformMatrix()) : undefined,
           dim = this._calculateCurrentDimensions(transformOptions),
           coords = {};
-      this.forEachControl(function(control, key) {
-        coords[key] = control.positionHandler(dim, finalMatrix);
+      this.forEachControl(function(control, key, fabricObject) {
+        coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
       });
 
       // debug code
@@ -18621,7 +18538,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {Function} fn function to iterate over the controls over
      */
     forEachControl: function(fn) {
-      this.controls.forEachControl(fn.bind(this));
+      for (var i in this.controls) {
+        fn(this.controls[i], i, this);
+      };
     },
 
     /**
@@ -18756,10 +18675,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       var shouldStroke = false;
 
       ctx.beginPath();
-      this.forEachControl(function (control, key) {
+      this.forEachControl(function (control, key, fabricObject) {
         // in this moment, the ctx is centered on the object.
         // width and height of the above function are the size of the bbox.
-        if (control.withConnection && control.getVisibility()) {
+        if (control.withConnection && control.getVisibility(fabricObject, key)) {
           // reset movement for each control
           shouldStroke = true;
           ctx.moveTo(control.x * width, control.y * height);
@@ -18794,10 +18713,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       }
       this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray);
       this.setCoords();
-      this.forEachControl(function(control, key) {
-        if (control.getVisibility()) {
-          p = this.oCoords[key];
-          control.render(ctx, p.x, p.y, styleOverride);
+      this.forEachControl(function(control, key, fabricObject) {
+        if (control.getVisibility(fabricObject, key)) {
+          p = fabricObject.oCoords[key];
+          control.render(ctx, p.x, p.y, styleOverride, fabricObject);
         }
       });
       ctx.restore();
@@ -18811,7 +18730,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @returns {Boolean} true if the specified control is visible, false otherwise
      */
     isControlVisible: function(controlKey) {
-      return this.controls[controlKey] && this.controls[controlKey].getVisibility();
+      return this.controls[controlKey] && this.controls[controlKey].getVisibility(this, controlKey);
     },
 
     /**
@@ -18822,7 +18741,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @chainable
      */
     setControlVisible: function(controlKey, visible) {
-      this.controls[controlKey] && this.controls[controlKey].setVisibility(visible);
+      if (!this._controlsVisibility) {
+        this._controlsVisibility = {};
+      }
+      this._controlsVisibility[controlKey] = visible;
       return this;
     },
 
@@ -32889,19 +32811,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     splitByGrapheme: false,
 
     /**
-     * Constructor
-     * @param {String} text Text string
-     * @param {Object} [options] Options object
-     * @return {fabric.Textbox} thisArg
-     */
-    initialize: function (text, options) {
-      options || (options = {});
-      this.callSuper('initialize', text, Object.assign(options, {
-        controls: options.controls || new fabric.TextboxControls()
-      }));
-    },
-
-    /**
      * Unlike superclass's version of this function, Textbox does not update
      * its width.
      * @private
@@ -33309,897 +33218,109 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       scalingYOrSkewingX = controlsUtils.scalingYOrSkewingX,
       scalingXOrSkewingY = controlsUtils.scalingXOrSkewingY,
       scaleOrSkewActionName = controlsUtils.scaleOrSkewActionName,
-      rotationWithSnapping = controlsUtils.rotationWithSnapping,
-      rotationStyleHandler = controlsUtils.rotationStyleHandler,
-      changeWidth = controlsUtils.changeWidth;
+      objectControls = fabric.Object.prototype.controls;
 
-  class ObjectControls {
-    constructor() { 
-      this.ml = new fabric.Control({
-        x: -0.5,
-        y: 0,
-        cursorStyleHandler: scaleSkewStyleHandler,
-        actionHandler: scalingXOrSkewingY,
-        getActionName: scaleOrSkewActionName
-      });
-
-      this.mr = new fabric.Control({
-        x: 0.5,
-        y: 0,
-        cursorStyleHandler: scaleSkewStyleHandler,
-        actionHandler: scalingXOrSkewingY,
-        getActionName: scaleOrSkewActionName
-      });
-
-      this.mb = new fabric.Control({
-        x: 0,
-        y: 0.5,
-        cursorStyleHandler: scaleSkewStyleHandler,
-        actionHandler: scalingYOrSkewingX,
-        getActionName: scaleOrSkewActionName
-      });
-
-      this.mt = new fabric.Control({
-        x: 0,
-        y: -0.5,
-        cursorStyleHandler: scaleSkewStyleHandler,
-        actionHandler: scalingYOrSkewingX,
-        getActionName: scaleOrSkewActionName
-      });
-
-      this.tl = new fabric.Control({
-        x: -0.5,
-        y: -0.5,
-        cursorStyleHandler: scaleStyleHandler,
-        actionHandler: scalingEqually
-      });
-
-      this.tr = new fabric.Control({
-        x: 0.5,
-        y: -0.5,
-        cursorStyleHandler: scaleStyleHandler,
-        actionHandler: scalingEqually
-      });
-
-      this.bl = new fabric.Control({
-        x: -0.5,
-        y: 0.5,
-        cursorStyleHandler: scaleStyleHandler,
-        actionHandler: scalingEqually
-      });
-
-      this.br = new fabric.Control({
-        x: 0.5,
-        y: 0.5,
-        cursorStyleHandler: scaleStyleHandler,
-        actionHandler: scalingEqually
-      });
-
-      this.mtr = new fabric.Control({
-        x: 0,
-        y: -0.5,
-        actionHandler: rotationWithSnapping,
-        cursorStyleHandler: rotationStyleHandler,
-        offsetY: -40,
-        withConnection: true,
-        actionName: 'rotate'
-      });
-    }
-
-    /**
-     * **MUST** be called for controls to function properly, see {@link fabric.Object#initialize}
-     * @param {fabric.Object} object 
-     */
-    attach(object) {
-      this.forEachControl(function (control) {
-        control.object = object;
-      });
-    }
-
-    /**
-     * Calls a function for each control. The function gets called,
-     * with the control, the object that is calling the iterator and the control's key
-     * @param {(control: fabric.Control, key: string) => any} callback function to iterate over the controls
-     */
-    forEachControl(callback) {
-      for (var key in this) {
-        callback(this[key], key);
-      }
-    }
-  }
-  
-  class TextboxControls extends ObjectControls {
-    constructor() {
-      super();
-      
-      this.mr = new fabric.Control({
-        x: 0.5,
-        y: 0,
-        actionHandler: changeWidth,
-        cursorStyleHandler: scaleSkewStyleHandler,
-        actionName: 'resizing'
-      })
-
-      this.ml = new fabric.Control({
-        x: -0.5,
-        y: 0,
-        actionHandler: changeWidth,
-        cursorStyleHandler: scaleSkewStyleHandler,
-        actionName: 'resizing'
-      })
-    }
-  }
-
-  fabric.ObjectControls = ObjectControls;
-  fabric.TextboxControls = TextboxControls;
-})();
-
-
-(function () {
-  /** ERASER_START */
-
-  var __drawClipPath = fabric.Object.prototype._drawClipPath;
-  var _needsItsOwnCache = fabric.Object.prototype.needsItsOwnCache;
-  var _toObject = fabric.Object.prototype.toObject;
-  var _getSvgCommons = fabric.Object.prototype.getSvgCommons;
-  var __createBaseClipPathSVGMarkup = fabric.Object.prototype._createBaseClipPathSVGMarkup;
-  var __createBaseSVGMarkup = fabric.Object.prototype._createBaseSVGMarkup;
-
-  fabric.Object.prototype.cacheProperties.push('eraser');
-  fabric.Object.prototype.stateProperties.push('eraser');
-
-  /**
-   * @fires erasing:end
-   */
-  fabric.util.object.extend(fabric.Object.prototype, {
-    /**
-     * Indicates whether this object can be erased by {@link fabric.EraserBrush}
-     * The `deep` option introduces fine grained control over a group's `erasable` property.
-     * When set to `deep` the eraser will erase nested objects if they are erasable, leaving the group and the other objects untouched.
-     * When set to `true` the eraser will erase the entire group. Once the group changes the eraser is propagated to its children for proper functionality.
-     * When set to `false` the eraser will leave all objects including the group untouched.
-     * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
-     * @type boolean | 'deep'
-     * @default true
-     */
-    erasable: true,
-
-    /**
-     * @tutorial {@link http://fabricjs.com/erasing#eraser}
-     * @type fabric.Eraser
-     */
-    eraser: undefined,
-
-    /**
-     * @override
-     * @returns Boolean
-     */
-    needsItsOwnCache: function () {
-      return _needsItsOwnCache.call(this) || !!this.eraser;
-    },
-
-    /**
-     * draw eraser above clip path
-     * @override
-     * @private
-     * @param {CanvasRenderingContext2D} ctx
-     * @param {fabric.Object} clipPath
-     * @param {RenderingContext} [renderingContext]
-     */
-    _drawClipPath: function (ctx, clipPath, renderingContext) {
-      __drawClipPath.call(this, ctx, clipPath, renderingContext);
-      if (this.eraser) {
-        //  update eraser size to match instance
-        var size = this._getNonTransformedDimensions();
-        this.eraser.isType('eraser') && this.eraser.set({
-          width: size.x,
-          height: size.y
-        });
-        __drawClipPath.call(this, ctx, this.eraser);
-      }
-    },
-
-    /**
-     * Returns an object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} Object representation of an instance
-     */
-    toObject: function (propertiesToInclude) {
-      var object = _toObject.call(this, ['erasable'].concat(propertiesToInclude));
-      if (this.eraser && !this.eraser.excludeFromExport) {
-        object.eraser = this.eraser.toObject(propertiesToInclude);
-      }
-      return object;
-    },
-
-    /* _TO_SVG_START_ */
-    /**
-     * Returns id attribute for svg output
-     * @override
-     * @return {String}
-     */
-    getSvgCommons: function () {
-      return _getSvgCommons.call(this) + (this.eraser ? 'mask="url(#' + this.eraser.clipPathId + ')" ' : '');
-    },
-
-    /**
-     * create svg markup for eraser
-     * use <mask> to achieve erasing for svg, credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
-     * must be called before object markup creation as it relies on the `clipPathId` property of the mask
-     * @param {Function} [reviver]
-     * @returns
-     */
-    _createEraserSVGMarkup: function (reviver) {
-      if (this.eraser) {
-        this.eraser.clipPathId = 'MASK_' + fabric.Object.__uid++;
-        return [
-          '<mask id="', this.eraser.clipPathId, '" >',
-          this.eraser.toSVG(reviver),
-          '</mask>', '\n'
-        ].join('');
-      }
-      return '';
-    },
-
-    /**
-     * @private
-     */
-    _createBaseClipPathSVGMarkup: function (objectMarkup, options) {
-      return [
-        this._createEraserSVGMarkup(options && options.reviver),
-        __createBaseClipPathSVGMarkup.call(this, objectMarkup, options)
-      ].join('');
-    },
-
-    /**
-     * @private
-     */
-    _createBaseSVGMarkup: function (objectMarkup, options) {
-      return [
-        this._createEraserSVGMarkup(options && options.reviver),
-        __createBaseSVGMarkup.call(this, objectMarkup, options)
-      ].join('');
-    }
-    /* _TO_SVG_END_ */
+  objectControls.ml = new fabric.Control({
+    x: -0.5,
+    y: 0,
+    cursorStyleHandler: scaleSkewStyleHandler,
+    actionHandler: scalingXOrSkewingY,
+    getActionName: scaleOrSkewActionName,
   });
 
-  fabric.util.object.extend(fabric.Group.prototype, {
-    /**
-     * @private
-     * @param {fabric.Path} path
-     * @returns {Promise<fabric.Path[]>}
-     */
-    _addEraserPathToObjects: function (path) {
-      return Promise.all(this._objects.map(function (object) {
-        return fabric.EraserBrush.prototype._addPathToObjectEraser.call(
-          fabric.EraserBrush.prototype,
-          object,
-          path
-        );
-      }));
-    },
-
-    /**
-     * Applies the group's eraser to its objects
-     * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
-     * @returns {Promise<fabric.Path[]|fabric.Path[][]|void>}
-     */
-    applyEraserToObjects: function () {
-      var _this = this, eraser = this.eraser;
-      return Promise.resolve()
-        .then(function () {
-          if (eraser) {
-            delete _this.eraser;
-            var transform = _this.calcTransformMatrix();
-            return eraser.clone()
-              .then(function (eraser) {
-                var clipPath = _this.clipPath;
-                return Promise.all(eraser.getObjects('path')
-                  .map(function (path) {
-                    //  first we transform the path from the group's coordinate system to the canvas'
-                    var originalTransform = fabric.util.multiplyTransformMatrices(
-                      transform,
-                      path.calcTransformMatrix()
-                    );
-                    fabric.util.applyTransformToObject(path, originalTransform);
-                    return clipPath ?
-                      clipPath.clone()
-                        .then(function (_clipPath) {
-                          var eraserPath = fabric.EraserBrush.prototype.applyClipPathToPath.call(
-                            fabric.EraserBrush.prototype,
-                            path,
-                            _clipPath,
-                            transform
-                          );
-                          return _this._addEraserPathToObjects(eraserPath);
-                        }, ['absolutePositioned', 'inverted']) :
-                      _this._addEraserPathToObjects(path);
-                  }));
-              });
-          }
-        });
-    }
+  objectControls.mr = new fabric.Control({
+    x: 0.5,
+    y: 0,
+    cursorStyleHandler: scaleSkewStyleHandler,
+    actionHandler: scalingXOrSkewingY,
+    getActionName: scaleOrSkewActionName,
   });
 
-  /**
-   * An object's Eraser
-   * @private
-   * @class fabric.Eraser
-   * @extends fabric.Group
-   * @memberof fabric
-   */
-  fabric.Eraser = fabric.util.createClass(fabric.Group, {
-    /**
-     * @readonly
-     * @static
-     */
-    type: 'eraser',
-
-    /**
-     * @default
-     */
-    originX: 'center',
-
-    /**
-     * @default
-     */
-    originY: 'center',
-
-    /**
-     * eraser should retain size
-     * dimensions should not change when paths are added or removed
-     * handled by {@link fabric.Object#_drawClipPath}
-     * @override
-     * @private
-     */
-    layout: 'fixed',
-
-    drawObject: function (ctx) {
-      ctx.save();
-      ctx.fillStyle = 'black';
-      ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
-      ctx.restore();
-      this.callSuper('drawObject', ctx);
-    },
-
-    /* _TO_SVG_START_ */
-    /**
-     * Returns svg representation of an instance
-     * use <mask> to achieve erasing for svg, credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
-     * for masking we need to add a white rect before all paths
-     *
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
-     */
-    _toSVG: function (reviver) {
-      var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-      var x = -this.width / 2, y = -this.height / 2;
-      var rectSvg = [
-        '<rect ', 'fill="white" ',
-        'x="', x, '" y="', y,
-        '" width="', this.width, '" height="', this.height,
-        '" />\n'
-      ].join('');
-      svgString.push('\t\t', rectSvg);
-      for (var i = 0, len = this._objects.length; i < len; i++) {
-        svgString.push('\t\t', this._objects[i].toSVG(reviver));
-      }
-      svgString.push('</g>\n');
-      return svgString;
-    },
-    /* _TO_SVG_END_ */
+  objectControls.mb = new fabric.Control({
+    x: 0,
+    y: 0.5,
+    cursorStyleHandler: scaleSkewStyleHandler,
+    actionHandler: scalingYOrSkewingX,
+    getActionName: scaleOrSkewActionName,
   });
 
-  /**
-   * Returns instance from an object representation
-   * @static
-   * @memberOf fabric.Eraser
-   * @param {Object} object Object to create an Eraser from
-   * @returns {Promise<fabric.Eraser>}
-   */
-  fabric.Eraser.fromObject = function (object) {
-    var objects = object.objects || [],
-        options = fabric.util.object.clone(object, true);
-    delete options.objects;
-    return Promise.all([
-      fabric.util.enlivenObjects(objects),
-      fabric.util.enlivenObjectEnlivables(options)
-    ]).then(function (enlivedProps) {
-      return new fabric.Eraser(enlivedProps[0], Object.assign(options, enlivedProps[1]), true);
+  objectControls.mt = new fabric.Control({
+    x: 0,
+    y: -0.5,
+    cursorStyleHandler: scaleSkewStyleHandler,
+    actionHandler: scalingYOrSkewingX,
+    getActionName: scaleOrSkewActionName,
+  });
+
+  objectControls.tl = new fabric.Control({
+    x: -0.5,
+    y: -0.5,
+    cursorStyleHandler: scaleStyleHandler,
+    actionHandler: scalingEqually
+  });
+
+  objectControls.tr = new fabric.Control({
+    x: 0.5,
+    y: -0.5,
+    cursorStyleHandler: scaleStyleHandler,
+    actionHandler: scalingEqually
+  });
+
+  objectControls.bl = new fabric.Control({
+    x: -0.5,
+    y: 0.5,
+    cursorStyleHandler: scaleStyleHandler,
+    actionHandler: scalingEqually
+  });
+
+  objectControls.br = new fabric.Control({
+    x: 0.5,
+    y: 0.5,
+    cursorStyleHandler: scaleStyleHandler,
+    actionHandler: scalingEqually
+  });
+
+  objectControls.mtr = new fabric.Control({
+    x: 0,
+    y: -0.5,
+    actionHandler: controlsUtils.rotationWithSnapping,
+    cursorStyleHandler: controlsUtils.rotationStyleHandler,
+    offsetY: -40,
+    withConnection: true,
+    actionName: 'rotate',
+  });
+
+  if (fabric.Textbox) {
+    // this is breaking the prototype inheritance, no time / ideas to fix it.
+    // is important to document that if you want to have all objects to have a
+    // specific custom control, you have to add it to Object prototype and to Textbox
+    // prototype. The controls are shared as references. So changes to control `tr`
+    // can still apply to all objects if needed.
+    var textBoxControls = fabric.Textbox.prototype.controls = { };
+
+    textBoxControls.mtr = objectControls.mtr;
+    textBoxControls.tr = objectControls.tr;
+    textBoxControls.br = objectControls.br;
+    textBoxControls.tl = objectControls.tl;
+    textBoxControls.bl = objectControls.bl;
+    textBoxControls.mt = objectControls.mt;
+    textBoxControls.mb = objectControls.mb;
+
+    textBoxControls.mr = new fabric.Control({
+      x: 0.5,
+      y: 0,
+      actionHandler: controlsUtils.changeWidth,
+      cursorStyleHandler: scaleSkewStyleHandler,
+      actionName: 'resizing',
     });
-  };
 
-  var __renderOverlay = fabric.Canvas.prototype._renderOverlay;
-  /**
-   * @fires erasing:start
-   * @fires erasing:end
-   */
-  fabric.util.object.extend(fabric.Canvas.prototype, {
-    /**
-     * Used by {@link #renderAll}
-     * @returns boolean
-     */
-    isErasing: function () {
-      return (
-        this.isDrawingMode &&
-        this.freeDrawingBrush &&
-        this.freeDrawingBrush.type === 'eraser' &&
-        this.freeDrawingBrush._isErasing
-      );
-    },
-
-    /**
-     * While erasing the brush clips out the erasing path from canvas
-     * so we need to render it on top of canvas every render
-     * @param {CanvasRenderingContext2D} ctx
-     */
-    _renderOverlay: function (ctx) {
-      __renderOverlay.call(this, ctx);
-      this.isErasing() && this.freeDrawingBrush.render();
-    }
-  });
-
-  /**
-   * EraserBrush class
-   * Supports selective erasing meaning that only erasable objects are affected by the eraser brush.
-   * Supports **inverted** erasing meaning that the brush can "undo" erasing.
-   *
-   * In order to support selective erasing, the brush clips the entire canvas
-   * and then draws all non-erasable objects over the erased path using a pattern brush so to speak (masking).
-   * If brush is **inverted** there is no need to clip canvas. The brush draws all erasable objects without their eraser.
-   * This achieves the desired effect of seeming to erase or unerase only erasable objects.
-   * After erasing is done the created path is added to all intersected objects' `eraser` property.
-   *
-   * In order to update the EraserBrush call `preparePattern`.
-   * It may come in handy when canvas changes during erasing (i.e animations) and you want the eraser to reflect the changes.
-   *
-   * @tutorial {@link http://fabricjs.com/erasing}
-   * @class fabric.EraserBrush
-   * @extends fabric.PencilBrush
-   * @memberof fabric
-   */
-  fabric.EraserBrush = fabric.util.createClass(
-    fabric.PencilBrush,
-    /** @lends fabric.EraserBrush.prototype */ {
-      type: 'eraser',
-
-      /**
-       * When set to `true` the brush will create a visual effect of undoing erasing
-       */
-      inverted: false,
-
-      /**
-       * @private
-       */
-      _isErasing: false,
-
-      /**
-       *
-       * @private
-       * @param {fabric.Object} object
-       * @returns boolean
-       */
-      _isErasable: function (object) {
-        return object.erasable !== false;
-      },
-
-      /**
-       * @private
-       * This is designed to support erasing a collection with both erasable and non-erasable objects while maintaining object stacking.\
-       * Iterates over collections to allow nested selective erasing.\
-       * Prepares objects before rendering the pattern brush.\
-       * If brush is **NOT** inverted render all non-erasable objects.\
-       * If brush is inverted render all objects, erasable objects without their eraser.
-       * This will render the erased parts as if they were not erased in the first place, achieving an undo effect.
-       *
-       * @param {fabric.Collection} collection
-       * @param {CanvasRenderingContext2D} ctx
-       * @param {{ visibility: fabric.Object[], eraser: fabric.Object[], collection: fabric.Object[] }} restorationContext
-       */
-      _prepareCollectionTraversal: function (collection, ctx, restorationContext) {
-        collection.forEachObject(function (obj) {
-          if (obj.forEachObject && obj.erasable === 'deep') {
-            //  traverse
-            this._prepareCollectionTraversal(obj, ctx, restorationContext);
-          }
-          else if (!this.inverted && obj.erasable && obj.visible) {
-            //  render only non-erasable objects
-            obj.visible = false;
-            collection.dirty = true;
-            restorationContext.visibility.push(obj);
-            restorationContext.collection.push(collection);
-          }
-          else if (this.inverted && obj.erasable && obj.eraser && obj.visible) {
-            //  render all objects without eraser
-            var eraser = obj.eraser;
-            obj.eraser = undefined;
-            obj.dirty = true;
-            collection.dirty = true;
-            restorationContext.eraser.push([obj, eraser]);
-            restorationContext.collection.push(collection);
-          }
-        }, this);
-      },
-
-      /**
-       * Prepare the pattern for the erasing brush
-       * This pattern will be drawn on the top context after clipping the main context,
-       * achieving a visual effect of erasing only erasable objects
-       * @private
-       */
-      preparePattern: function () {
-        if (!this._patternCanvas) {
-          this._patternCanvas = fabric.util.createCanvasElement();
-        }
-        var canvas = this._patternCanvas;
-        canvas.width = this.canvas.width;
-        canvas.height = this.canvas.height;
-        var patternCtx = canvas.getContext('2d');
-        if (this.canvas._isRetinaScaling()) {
-          var retinaScaling = this.canvas.getRetinaScaling();
-          this.canvas.__initRetinaScaling(retinaScaling, canvas, patternCtx);
-        }
-        var backgroundImage = this.canvas.backgroundImage,
-            bgErasable = backgroundImage && this._isErasable(backgroundImage),
-            overlayImage = this.canvas.overlayImage,
-            overlayErasable = overlayImage && this._isErasable(overlayImage);
-        if (!this.inverted && ((backgroundImage && !bgErasable) || !!this.canvas.backgroundColor)) {
-          if (bgErasable) { this.canvas.backgroundImage = undefined; }
-          this.canvas._renderBackground(patternCtx);
-          if (bgErasable) { this.canvas.backgroundImage = backgroundImage; }
-        }
-        else if (this.inverted) {
-          var eraser = backgroundImage && backgroundImage.eraser;
-          if (eraser) {
-            backgroundImage.eraser = undefined;
-            backgroundImage.dirty = true;
-          }
-          this.canvas._renderBackground(patternCtx);
-          if (eraser) {
-            backgroundImage.eraser = eraser;
-            backgroundImage.dirty = true;
-          }
-        }
-        patternCtx.save();
-        patternCtx.transform.apply(patternCtx, this.canvas.viewportTransform);
-        var restorationContext = { visibility: [], eraser: [], collection: [] };
-        this._prepareCollectionTraversal(this.canvas, patternCtx, restorationContext);
-        this.canvas._renderObjects(patternCtx, this.canvas._objects);
-        restorationContext.visibility.forEach(function (obj) { obj.visible = true; });
-        restorationContext.eraser.forEach(function (entry) {
-          var obj = entry[0], eraser = entry[1];
-          obj.eraser = eraser;
-          obj.dirty = true;
-        });
-        restorationContext.collection.forEach(function (obj) { obj.dirty = true; });
-        patternCtx.restore();
-        if (!this.inverted && ((overlayImage && !overlayErasable) || !!this.canvas.overlayColor)) {
-          if (overlayErasable) { this.canvas.overlayImage = undefined; }
-          __renderOverlay.call(this.canvas, patternCtx);
-          if (overlayErasable) { this.canvas.overlayImage = overlayImage; }
-        }
-        else if (this.inverted) {
-          var eraser = overlayImage && overlayImage.eraser;
-          if (eraser) {
-            overlayImage.eraser = undefined;
-            overlayImage.dirty = true;
-          }
-          __renderOverlay.call(this.canvas, patternCtx);
-          if (eraser) {
-            overlayImage.eraser = eraser;
-            overlayImage.dirty = true;
-          }
-        }
-      },
-
-      /**
-       * Sets brush styles
-       * @private
-       * @param {CanvasRenderingContext2D} ctx
-       */
-      _setBrushStyles: function (ctx) {
-        this.callSuper('_setBrushStyles', ctx);
-        ctx.strokeStyle = 'black';
-      },
-
-      /**
-       * **Customiztion**
-       *
-       * if you need the eraser to update on each render (i.e animating during erasing) override this method by **adding** the following (performance may suffer):
-       * @example
-       * ```
-       * if(ctx === this.canvas.contextTop) {
-       *  this.preparePattern();
-       * }
-       * ```
-       *
-       * @override fabric.BaseBrush#_saveAndTransform
-       * @param {CanvasRenderingContext2D} ctx
-       */
-      _saveAndTransform: function (ctx) {
-        this.callSuper('_saveAndTransform', ctx);
-        this._setBrushStyles(ctx);
-        ctx.globalCompositeOperation = ctx === this.canvas.getContext() ? 'destination-out' : 'source-over';
-      },
-
-      /**
-       * We indicate {@link fabric.PencilBrush} to repaint itself if necessary
-       * @returns
-       */
-      needsFullRender: function () {
-        return true;
-      },
-
-      /**
-       *
-       * @param {fabric.Point} pointer
-       * @param {fabric.IEvent} options
-       * @returns
-       */
-      onMouseDown: function (pointer, options) {
-        if (!this.canvas._isMainEvent(options.e)) {
-          return;
-        }
-        this._prepareForDrawing(pointer);
-        // capture coordinates immediately
-        // this allows to draw dots (when movement never occurs)
-        this._captureDrawingPath(pointer);
-
-        //  prepare for erasing
-        this.preparePattern();
-        this._isErasing = true;
-        this.canvas.fire('erasing:start');
-        this.render();
-      },
-
-      /**
-       * Rendering Logic:
-       * 1. Use brush to clip canvas by rendering it on top of canvas (unnecessary if `inverted === true`)
-       * 2. Render brush with canvas pattern on top context
-       *
-       */
-      render: function () {
-        var ctx;
-        //  clip canvas
-        ctx = this.canvas.getContext();
-        this.callSuper('render', ctx);
-        //  render brush and mask it with pattern
-        ctx = this.canvas.contextTop;
-        this.canvas.clearContext(ctx);
-        this.callSuper('render', ctx);
-        ctx.save();
-        var t = this.canvas.getRetinaScaling(), s = 1 / t;
-        ctx.scale(s, s);
-        ctx.globalCompositeOperation = 'source-in';
-        ctx.drawImage(this._patternCanvas, 0, 0);
-        ctx.restore();
-      },
-
-      /**
-       * Creates fabric.Path object
-       * @override
-       * @private
-       * @param {(string|number)[][]} pathData Path data
-       * @return {fabric.Path} Path to add on canvas
-       * @returns
-       */
-      createPath: async function (pathData) {
-        var path = await this.callSuper('createPath', pathData);
-        path.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
-        path.stroke = this.inverted ? 'white' : 'black';
-        return path;
-      },
-
-      /**
-       * Utility to apply a clip path to a path.
-       * Used to preserve clipping on eraser paths in nested objects.
-       * Called when a group has a clip path that should be applied to the path before applying erasing on the group's objects.
-       * @param {fabric.Path} path The eraser path in canvas coordinate plane
-       * @param {fabric.Object} clipPath The clipPath to apply to the path
-       * @param {number[]} clipPathContainerTransformMatrix The transform matrix of the object that the clip path belongs to
-       * @returns {fabric.Path} path with clip path
-       */
-      applyClipPathToPath: function (path, clipPath, clipPathContainerTransformMatrix) {
-        var pathInvTransform = fabric.util.invertTransform(path.calcTransformMatrix()),
-            clipPathTransform = clipPath.calcTransformMatrix(),
-            transform = clipPath.absolutePositioned ?
-              pathInvTransform :
-              fabric.util.multiplyTransformMatrices(
-                pathInvTransform,
-                clipPathContainerTransformMatrix
-              );
-        //  when passing down a clip path it becomes relative to the parent
-        //  so we transform it acoordingly and set `absolutePositioned` to false
-        clipPath.absolutePositioned = false;
-        fabric.util.applyTransformToObject(
-          clipPath,
-          fabric.util.multiplyTransformMatrices(
-            transform,
-            clipPathTransform
-          )
-        );
-        //  We need to clip `path` with both `clipPath` and it's own clip path if existing (`path.clipPath`)
-        //  so in turn `path` erases an object only where it overlaps with all it's clip paths, regardless of how many there are.
-        //  this is done because both clip paths may have nested clip paths of their own (this method walks down a collection => this may reccur),
-        //  so we can't assign one to the other's clip path property.
-        path.clipPath = path.clipPath ? fabric.util.mergeClipPaths(clipPath, path.clipPath) : clipPath;
-        return path;
-      },
-
-      /**
-       * Utility to apply a clip path to a path.
-       * Used to preserve clipping on eraser paths in nested objects.
-       * Called when a group has a clip path that should be applied to the path before applying erasing on the group's objects.
-       * @param {fabric.Path} path The eraser path
-       * @param {fabric.Object} object The clipPath to apply to path belongs to object
-       * @returns {Promise<fabric.Path>}
-       */
-      clonePathWithClipPath: function (path, object) {
-        var objTransform = object.calcTransformMatrix();
-        var clipPath = object.clipPath;
-        var _this = this;
-        return Promise.all([
-          path.clone(),
-          clipPath.clone(['absolutePositioned', 'inverted'])
-        ]).then(function (clones) {
-          return _this.applyClipPathToPath(clones[0], clones[1], objTransform);
-        });
-      },
-
-      /**
-       * Adds path to object's eraser, walks down object's descendants if necessary
-       *
-       * @public
-       * @fires erasing:end on object
-       * @param {fabric.Object} obj
-       * @param {fabric.Path} path
-       * @param {Object} [context] context to assign erased objects to
-       * @returns {Promise<fabric.Path | fabric.Path[]>}
-       */
-      _addPathToObjectEraser: function (obj, path, context) {
-        var _this = this;
-        //  object is collection, i.e group
-        if (obj.forEachObject && obj.erasable === 'deep') {
-          var targets = obj._objects.filter(function (_obj) {
-            return _obj.erasable;
-          });
-          if (targets.length > 0 && obj.clipPath) {
-            return this.clonePathWithClipPath(path, obj)
-              .then(function (_path) {
-                return Promise.all(targets.map(function (_obj) {
-                  return _this._addPathToObjectEraser(_obj, _path, context);
-                }));
-              });
-          }
-          else if (targets.length > 0) {
-            return Promise.all(targets.map(function (_obj) {
-              return _this._addPathToObjectEraser(_obj, path, context);
-            }));
-          }
-          return;
-        }
-        //  prepare eraser
-        var eraser = obj.eraser;
-        if (!eraser) {
-          eraser = new fabric.Eraser();
-          obj.eraser = eraser;
-        }
-        //  clone and add path
-        return path.clone()
-          .then(function (path) {
-            // http://fabricjs.com/using-transformations
-            var desiredTransform = fabric.util.multiplyTransformMatrices(
-              fabric.util.invertTransform(
-                obj.calcTransformMatrix()
-              ),
-              path.calcTransformMatrix()
-            );
-            fabric.util.applyTransformToObject(path, desiredTransform);
-            eraser.add(path);
-            obj.set('dirty', true);
-            obj.fire('erasing:end', {
-              path: path
-            });
-            if (context) {
-              (obj.group ? context.subTargets : context.targets).push(obj);
-              //context.paths.set(obj, path);
-            }
-            return path;
-          });
-      },
-
-      /**
-       * Add the eraser path to canvas drawables' clip paths
-       *
-       * @param {fabric.Canvas} source
-       * @param {fabric.Canvas} path
-       * @param {Object} [context] context to assign erased objects to
-       * @returns {Promise<fabric.Path[]|void>} eraser paths
-       */
-      applyEraserToCanvas: function (path, context) {
-        var canvas = this.canvas;
-        return Promise.all([
-          'backgroundImage',
-          'overlayImage',
-        ].map(function (prop) {
-          var drawable = canvas[prop];
-          return drawable && drawable.erasable &&
-            this._addPathToObjectEraser(drawable, path)
-              .then(function (path) {
-                if (context) {
-                  context.drawables[prop] = drawable;
-                  //context.paths.set(drawable, path);
-                }
-                return path;
-              });
-        }, this));
-      },
-
-      /**
-       * On mouseup after drawing the path on contextTop canvas
-       * we use the points captured to create an new fabric path object
-       * and add it to every intersected erasable object.
-       */
-      _finalizeAndAddPath: async function () {
-        var canvas = this.canvas, ctx = canvas.contextTop;
-        ctx.closePath();
-        if (this.decimate) {
-          this._points = this.decimatePoints(this._points, this.decimate);
-        }
-
-        // clear
-        canvas.clearContext(ctx);
-        this._isErasing = false;
-
-        var pathData = this._points && this._points.length > 1 ?
-          this.convertPointsToSVGPath(this._points) :
-          null;
-        if (!pathData || this._isEmptySVGPath(pathData)) {
-          canvas.fire('erasing:end');
-          // do not create 0 width/height paths, as they are
-          // rendered inconsistently across browsers
-          // Firefox 4, for example, renders a dot,
-          // whereas Chrome 10 renders nothing
-          canvas.requestRenderAll();
-          return;
-        }
-
-        var path = await this.createPath(pathData);
-        //  needed for `intersectsWithObject`
-        path.setCoords();
-        //  commense event sequence
-        canvas.fire('before:path:created', { path: path });
-
-        // finalize erasing
-        var _this = this;
-        var context = {
-          targets: [],
-          subTargets: [],
-          //paths: new Map(),
-          drawables: {}
-        };
-        var tasks = canvas._objects.map(function (obj) {
-          return obj.erasable && obj.intersectsWithObject(path, true, true) &&
-            _this._addPathToObjectEraser(obj, path, context);
-        });
-        tasks.push(_this.applyEraserToCanvas(path, context));
-        return Promise.all(tasks)
-          .then(function () {
-            //  fire erasing:end
-            canvas.fire('erasing:end', Object.assign(context, {
-              path: path
-            }));
-
-            canvas.requestRenderAll();
-            _this._resetShadow(ctx);
-
-            // fire event 'path' created
-            canvas.fire('path:created', { path: path });
-          });
-      }
-    }
-  );
-
-  /** ERASER_END */
+    textBoxControls.ml = new fabric.Control({
+      x: -0.5,
+      y: 0,
+      actionHandler: controlsUtils.changeWidth,
+      cursorStyleHandler: scaleSkewStyleHandler,
+      actionName: 'resizing',
+    });
+  }
 })();
 
