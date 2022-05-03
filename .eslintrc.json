@@ -7,7 +7,6 @@
   },
   "globals": {
     "Promise": true,
-    "class": true,
     "define": true,
     "eventjs": true,
     "exports": true,

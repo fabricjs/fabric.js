@@ -55,7 +55,9 @@
      * @param {Function} fn function to iterate over the controls over
      */
     forEachControl: function(fn) {
-      this.controls.forEachControl(fn.bind(this));
+      for (var i in this.controls) {
+        fn(this.controls[i], i, this);
+      };
     },
 
     /**
@@ -190,10 +192,10 @@
       var shouldStroke = false;
 
       ctx.beginPath();
-      this.forEachControl(function (control, key) {
+      this.forEachControl(function (control, key, fabricObject) {
         // in this moment, the ctx is centered on the object.
         // width and height of the above function are the size of the bbox.
-        if (control.withConnection && control.getVisibility()) {
+        if (control.withConnection && control.getVisibility(fabricObject, key)) {
           // reset movement for each control
           shouldStroke = true;
           ctx.moveTo(control.x * width, control.y * height);
@@ -228,10 +230,10 @@
       }
       this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray);
       this.setCoords();
-      this.forEachControl(function(control, key) {
-        if (control.getVisibility()) {
-          p = this.oCoords[key];
-          control.render(ctx, p.x, p.y, styleOverride);
+      this.forEachControl(function(control, key, fabricObject) {
+        if (control.getVisibility(fabricObject, key)) {
+          p = fabricObject.oCoords[key];
+          control.render(ctx, p.x, p.y, styleOverride, fabricObject);
         }
       });
       ctx.restore();
@@ -245,7 +247,7 @@
      * @returns {Boolean} true if the specified control is visible, false otherwise
      */
     isControlVisible: function(controlKey) {
-      return this.controls[controlKey] && this.controls[controlKey].getVisibility();
+      return this.controls[controlKey] && this.controls[controlKey].getVisibility(this, controlKey);
     },
 
     /**
@@ -256,7 +258,10 @@
      * @chainable
      */
     setControlVisible: function(controlKey, visible) {
-      this.controls[controlKey] && this.controls[controlKey].setVisibility(visible);
+      if (!this._controlsVisibility) {
+        this._controlsVisibility = {};
+      }
+      this._controlsVisibility[controlKey] = visible;
       return this;
     },
 
