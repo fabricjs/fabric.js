@@ -658,11 +658,9 @@
      */
     initialize: function (options) {
       this._parentMonitor = new fabric.ParentResizeObserver(this, this._onParentResize.bind(this));
-      options = Object.assign(options || {});
-      this.controls = options.controls || new fabric.ObjectControls();
-      this.controls.attach(this);
-      delete options.controls;
-      this.setOptions(options);
+      if (options) {
+        this.setOptions(options);
+      }
     },
 
     /**
