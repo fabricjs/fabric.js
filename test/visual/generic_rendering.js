@@ -421,7 +421,7 @@
     test: 'fill-parent layout',
     code: fillParent,
     golden: 'fill-parent.png',
-    percentage: 0.001,
+    percentage: 0.005,
     width: 250,
     height: 200,
   });
