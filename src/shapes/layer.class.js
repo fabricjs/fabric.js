@@ -113,18 +113,17 @@
     /**
      * @private
      * @override we want instance to fill parent so we disregard transformations
+     * @param {Object} [options]
+     * @param {Number} [options.width]
+     * @param {Number} [options.height]
      * @returns {fabric.Point} dimensions
      */
-    _getTransformedDimensions: function () {
-      return this.callSuper('_getTransformedDimensions', {
-        scaleX: 1,
-        scaleY: 1,
-        skewX: 0,
-        skewY: 0,
+    _getTransformedDimensions: function (options) {
+      options = Object.assign({
         width: this.width,
-        height: this.height,
-        strokeWidth: 0
-      });
+        height: this.height
+      }, options || {});
+      return new fabric.Point(options.width, options.height);
     },
 
     /**

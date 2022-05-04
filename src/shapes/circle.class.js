@@ -75,12 +75,14 @@
       if (this.layout === 'fill-parent') {
         var data = this._parentMonitor.extractDataFromResizeEvent(context);
         var parent = data.parent;
-        var r = Math.min(parent.width, parent.height) / 2;
-        if (r !== this.radius) {
+        var strokeCorrection = this.stroke ? this.strokeWidth : 0;
+        var r = Math.min(parent.width, parent.height) / 2 - strokeCorrection;
+        var resizing = r !== this.radius;
+        if (resizing || !this.getRelativeCenterPoint().eq(data.center)) {
           this.setRadius(r);
           this.setPositionByOrigin(data.center, 'center', 'center');
           parent.interactive && this.setCoords();
-          this.fire('resize', context);
+          resizing && this.fire('resize', context);
         }
       }
     },

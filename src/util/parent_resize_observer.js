@@ -62,8 +62,8 @@ fabric.ParentResizeObserver = fabric.util.createClass({
   },
 
   /**
-   * 
-   * @param {*} context 
+   *
+   * @param {*} context
    * @returns {{ parent: fabric.Group | fabric.Canvas, center: fabric.Point }} data
    */
   extractDataFromResizeEvent: function (context) {
@@ -88,32 +88,51 @@ fabric.ParentResizeObserver = fabric.util.createClass({
     if (object.layout === 'fill-parent') {
       var data = this.extractDataFromResizeEvent(context);
       var parent = data.parent;
-      if (object.width !== parent.width || object.height !== parent.height) {
+      var resizing = object.width !== parent.width || object.height !== parent.height;
+      if (resizing || !object.getRelativeCenterPoint().eq(data.center)) {
+        var storkeCorrection = this.stroke ? object.strokeWidth * 2 : 0;
         object.set({
-          width: parent.width,
-          height: parent.height
+          width: parent.width - storkeCorrection,
+          height: parent.height - storkeCorrection
         });
         object.setPositionByOrigin(data.center, 'center', 'center');
         parent.interactive && object.setCoords();
-        object.fire('resize', context);
+        resizing && object.fire('resize', context);
       }
     }
   },
 
-  fillParentByScaling: function (context) {
+  /**
+   * 
+   * @param {*} context 
+   * @param {{width: number, height: number}} [objectSize] override object size calculations by passing this arg
+   */
+  fillParentByScaling: function (context, objectSize) {
     var object = this.object;
     if (object.layout === 'fill-parent') {
-      var data = this.extractDataFromResizeEvent(context);
-      var parent = data.parent;
-      var scale = fabric.util.findScaleToFit(object, parent);
-      if (scale !== object.scaleX || scale !== object.scaleY) {
+      var data = this.extractDataFromResizeEvent(context),
+          parent = data.parent,
+          strokeFactor = this.stroke ? object.strokeWidth * 2 : 0,
+          objectStrokeFactor = object.strokeUniform ? 0 : strokeFactor,
+          parentStrokeFactor = object.strokeUniform ? strokeFactor : 0;
+      objectSize = objectSize || {
+        width: object.width + objectStrokeFactor,
+        height: object.height + objectStrokeFactor
+      };
+      var parentSize = {
+        width: parent.width - parentStrokeFactor,
+        height: parent.height - parentStrokeFactor
+      };
+      var scale = fabric.util.findScaleToFit(objectSize, parentSize);
+      var resizing = scale !== object.scaleX || scale !== object.scaleY;
+      if (resizing || !object.getRelativeCenterPoint().eq(data.center)) {
         object.set({
           scaleX: scale,
           scaleY: scale
         });
         object.setPositionByOrigin(data.center, 'center', 'center');
         parent.interactive && object.setCoords();
-        object.fire('resize', context);
+        resizing && object.fire('resize', context);
       }
     }
   },

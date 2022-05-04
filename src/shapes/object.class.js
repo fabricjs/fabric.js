@@ -1779,14 +1779,17 @@
       }
       this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
       var originalCanvas = this.canvas;
+      canvas._objects = [this];
       this.set('canvas', canvas);
-      var canvasEl = canvas.toCanvasElement(multiplier || 1, Object.assign(options, { objects: [this] }));
+      this.setCoords();
+      var canvasEl = canvas.toCanvasElement(multiplier || 1, options);
       this.set('canvas', originalCanvas);
       this.shadow = originalShadow;
       if (originalGroup) {
         this.group = originalGroup;
       }
-      this.set(origParams).setCoords();
+      this.set(origParams);
+      this.setCoords();
       // canvas.dispose will call image.dispose that will nullify the elements
       // since this canvas is a simple element for the process, we remove references
       // to objects in this way in order to avoid object trashing.

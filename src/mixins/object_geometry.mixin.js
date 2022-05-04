@@ -571,10 +571,11 @@
       return lineCoords;
     },
 
-    calcOCoords: function() {
+    calcOCoords: function () {
       var vpt = this.getViewportTransform(),
-          tMatrix = this._calcTranslateMatrix(true),
-          rMatrix = this._calcRotateMatrix(true, !!this.group),
+          center = this.getCenterPoint(),
+          tMatrix = [1, 0, 0, 1, center.x, center.y],
+          rMatrix = util.calcRotateMatrix({ angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0) }),
           positionMatrix = multiplyMatrices(tMatrix, rMatrix),
           startMatrix = multiplyMatrices(vpt, positionMatrix),
           finalMatrix = multiplyMatrices(startMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
@@ -602,8 +603,9 @@
     },
 
     calcACoords: function() {
-      var rotateMatrix = this._calcRotateMatrix(),
-          translateMatrix = this._calcTranslateMatrix(),
+      var rotateMatrix = util.calcRotateMatrix({ angle: this.angle }),
+          center = this.getRelativeCenterPoint(),
+          translateMatrix = [1, 0, 0, 1, center.x, center.y],
           finalMatrix = multiplyMatrices(translateMatrix, rotateMatrix),
           dim = this._getTransformedDimensions(),
           w = dim.x / 2, h = dim.y / 2;
@@ -639,27 +641,6 @@
       this.oCoords = this.calcOCoords();
       this._setCornerCoords && this._setCornerCoords();
       return this;
-    },
-
-    /**
-     * calculate rotation matrix of an object
-     * @param {boolean} [absolute] true means angle is measured relative to canvas, false means angle is measured relative to parent
-     * @return {Array} rotation matrix for the object
-     */
-    _calcRotateMatrix: function (absolute, accountForFlipping) {
-      var angle = absolute ? this.getTotalAngle() : this.angle;
-      accountForFlipping && this.flipX && (angle -= 180);
-      return util.calcRotateMatrix({ angle: angle });
-    },
-
-    /**
-     * calculate the translation matrix for an object transform
-     * @param {boolean} [absolute] true means translation is relative to canvas, false means relative to parent
-     * @return {Array} rotation matrix for the object
-     */
-    _calcTranslateMatrix: function(absolute) {
-      var center = absolute ? this.getCenterPoint() : this.getRelativeCenterPoint();
-      return [1, 0, 0, 1, center.x, center.y];
     },
 
     transformMatrixKey: function(skipGroup) {
@@ -706,11 +687,11 @@
       if (cache.key === key) {
         return cache.value;
       }
-      var tMatrix = this._calcTranslateMatrix(),
+      var center = this.getRelativeCenterPoint(),
           options = {
             angle: this.angle,
-            translateX: tMatrix[4],
-            translateY: tMatrix[5],
+            translateX: center.x,
+            translateY: center.y,
             scaleX: this.scaleX,
             scaleY: this.scaleY,
             skewX: this.skewX,
@@ -739,6 +720,8 @@
      * @param {Number} [options.scaleY]
      * @param {Number} [options.skewX]
      * @param {Number} [options.skewY]
+     * @param {Number} [options.width]
+     * @param {Number} [options.height]
      * @private
      * @returns {fabric.Point} dimensions
      */

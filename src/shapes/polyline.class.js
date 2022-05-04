@@ -148,7 +148,7 @@
      * @param {*} context see {@link fabric.ParentResizeObserver}
      */
     _onParentResize: function (context) {
-      this._parentMonitor.fillParentByScaling(context);
+      this._parentMonitor.fillParentByScaling(context, this._calcDimensions());
     },
 
     /**

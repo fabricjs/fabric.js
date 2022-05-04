@@ -88,7 +88,7 @@
         var g = createGroupForLayoutTests('fit-content layout', {
             backgroundColor: 'blue'
         });
-        g.clone().then((clone) => {
+        g.clone().then(function (clone) {
             canvas.add(clone);
             canvas.renderAll();
             callback(canvas.lowerCanvasEl);
@@ -122,6 +122,25 @@
         golden: 'group-layout/fit-content.png',
         percentage: 0.06,
         width: 400,
+        height: 300
+    });
+
+    function fitContentNestedLayer(canvas, callback) {
+        var g = createGroupForLayoutTests('fixed layout,\nlayer on top', {
+            layout: 'fixed',
+            backgroundColor: 'blue'
+        });
+        canvas.add(g);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+
+    tests.push({
+        test: 'fit-content nested layer',
+        code: fitContentNestedLayer,
+        golden: 'group-layout/fit-content-nested-layer.png',
+        percentage: 0.06,
+        width: 400 + Math.ceil(300 / Math.SQRT2),
         height: 300
     });
 
@@ -163,6 +182,25 @@
         height: 400 + Math.ceil(400 / Math.SQRT2)
     });
 
+    function LayerLayoutWithSkew(canvas, callback) {
+        var layer = createLayerForLayoutTests('Layer', {
+            backgroundColor: 'blue',
+            skewX: 45
+        });
+        canvas.add(layer);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+    }
+/*
+    tests.push({
+        test: 'layer with skewX',
+        code: LayerLayoutWithSkew,
+        golden: 'group-layout/layer-skewX.png',
+        percentage: 0.06,
+        width: 400,
+        height: 300
+    });
+*/
     function nestedLayout(canvas, callback) {
         var rect3 = new fabric.Rect({
             width: 100,
@@ -499,6 +537,5 @@
             });
         });
     }
-
     tests.forEach(visualTestLoop(QUnit));
 })();

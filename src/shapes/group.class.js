@@ -225,13 +225,21 @@
     },
 
     /**
+     * @private
+     * @override consider using {@link fabric.Layer} for `fill-parent` layout
+     */
+    _onParentResize: function () {
+      //  noop
+    },
+
+    /**
      * Checks if object can enter group and logs relevant warnings
      * @private
      * @param {fabric.Object} object
      * @returns
      */
     canEnter: function (object) {
-      if (object === this) {
+      if (object === this || this.isDescendantOf(object)) {
         /* _DEV_MODE_START_ */
         console.warn('fabric.Group: trying to add group to itself, this call has no effect');
         /* _DEV_MODE_END_ */
@@ -649,6 +657,7 @@
       this._bubbleLayout(context);
     },
 
+
     /**
      * bubble layout recursive up
      * @private
@@ -939,6 +948,29 @@
       //  override by subclass
     },
 
+
+    /**
+     * Calculate object dimensions from its properties
+     * @override disregard `strokeWidth`
+     * @private
+     * @returns {fabric.Point} dimensions
+     */
+    _getNonTransformedDimensions: function () {
+      return new fabric.Point(this.width, this.height);
+    },
+
+    /**
+     * @private
+     * @override we want instance to fill parent so we disregard transformations
+     * @param {Object} [options]
+     * @param {Number} [options.width]
+     * @param {Number} [options.height]
+     * @returns {fabric.Point} dimensions
+     */
+    _getTransformedDimensions: function (options) {
+      return this.callSuper('_getTransformedDimensions', Object.assign(options || {}, { strokeWidth: 0 }));
+    },
+
     /**
      *
      * @private
@@ -1040,18 +1072,6 @@
     },
 
     /* _TO_SVG_START_ */
-    /**
-     * @private
-     */
-    _createSVGBgRect: function (reviver) {
-      if (!this.backgroundColor) {
-        return '';
-      }
-      var fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
-      var commons = fillStroke.indexOf('COMMON_PARTS');
-      fillStroke[commons] = 'for="group" ';
-      return fillStroke.join('');
-    },
 
     /**
      * Returns svg representation of an instance
