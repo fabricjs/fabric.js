@@ -75,7 +75,8 @@
       if (this.layout === 'fill-parent') {
         var data = this._parentMonitor.extractDataFromResizeEvent(context);
         var parent = data.parent;
-        var r = Math.min(parent.width, parent.height) / 2;
+        var strokeCorrection = this.stroke ? this.strokeWidth : 0;
+        var r = Math.min(parent.width, parent.height) / 2 - strokeCorrection;
         var resizing = r !== this.radius;
         if (resizing || !this.getRelativeCenterPoint().eq(data.center)) {
           this.setRadius(r);
