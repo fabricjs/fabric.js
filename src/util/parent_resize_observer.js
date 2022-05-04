@@ -62,8 +62,8 @@ fabric.ParentResizeObserver = fabric.util.createClass({
   },
 
   /**
-   * 
-   * @param {*} context 
+   *
+   * @param {*} context
    * @returns {{ parent: fabric.Group | fabric.Canvas, center: fabric.Point }} data
    */
   extractDataFromResizeEvent: function (context) {
@@ -88,15 +88,15 @@ fabric.ParentResizeObserver = fabric.util.createClass({
     if (object.layout === 'fill-parent') {
       var data = this.extractDataFromResizeEvent(context);
       var parent = data.parent;
-      if (object.width !== parent.width || object.height !== parent.height
-        || !object.getRelativeCenterPoint().eq(data.center)) {
+      var resizing = object.width !== parent.width || object.height !== parent.height;
+      if (resizing || !object.getRelativeCenterPoint().eq(data.center)) {
         object.set({
           width: parent.width,
           height: parent.height
         });
         object.setPositionByOrigin(data.center, 'center', 'center');
         parent.interactive && object.setCoords();
-        object.fire('resize', context);
+        resizing && object.fire('resize', context);
       }
     }
   },
@@ -107,14 +107,15 @@ fabric.ParentResizeObserver = fabric.util.createClass({
       var data = this.extractDataFromResizeEvent(context);
       var parent = data.parent;
       var scale = fabric.util.findScaleToFit(object, parent);
-      if (scale !== object.scaleX || scale !== object.scaleY) {
+      var resizing = scale !== object.scaleX || scale !== object.scaleY;
+      if (resizing || !object.getRelativeCenterPoint().eq(data.center)) {
         object.set({
           scaleX: scale,
           scaleY: scale
         });
         object.setPositionByOrigin(data.center, 'center', 'center');
         parent.interactive && object.setCoords();
-        object.fire('resize', context);
+        resizing && object.fire('resize', context);
       }
     }
   },

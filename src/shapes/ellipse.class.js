@@ -88,14 +88,15 @@
         var parent = data.parent;
         var rx = parent.width / 2;
         var ry = parent.height / 2;
-        if (rx !== this.rx || ry !== this.ry) {
+        var resizing = rx !== this.rx || ry !== this.ry;
+        if (resizing || !this.getRelativeCenterPoint().eq(data.center)) {
           this.set({
             rx: rx,
             ry: ry
           });
           this.setPositionByOrigin(data.center, 'center', 'center');
           parent.interactive && this.setCoords();
-          this.fire('resize', context);
+          resizing && this.fire('resize', context);
         }
       }
     },
