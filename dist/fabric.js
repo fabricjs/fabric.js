@@ -1,4 +1,4 @@
-/* build: `node build.js modules=ALL exclude=gestures,accessors requirejs minifier=uglifyjs` */
+/* build: `node build.js modules=ALL exclude=accessors,gestures requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 var fabric = fabric || { version: '5.1.0' };
@@ -2515,7 +2515,7 @@ fabric.Collection = {
   }
 
   /**
-   * Run over a parsed and simplifed path and extrac some informations.
+   * Run over a parsed and simplifed path and extract some informations.
    * informations are length of each command and starting point
    * @param {Array} path fabricJS parsed path commands
    * @return {Array} path commands informations
@@ -2799,6 +2799,30 @@ fabric.Collection = {
   }
 
   /**
+   * Returns an array of path commands to create a regular polygon
+   * @param {number} radius
+   * @param {number} numVertexes
+   * @returns {(string|number)[][]} An array of SVG path commands
+   */
+  function getRegularPolygonPath(numVertexes, radius) {
+    var interiorAngle = Math.PI * 2 / numVertexes;
+    // rotationAdjustment rotates the path by 1/2 the interior angle so that the polygon always has a flat side on the bottom
+    // This isn't strictly necessary, but it's how we tend to think of and expect polygons to be drawn
+    var rotationAdjustment = -Math.PI / 2;
+    if (numVertexes % 2 === 0) {
+      rotationAdjustment += interiorAngle / 2;
+    }
+    var d = [];
+    for (var i = 0, rad, coord; i < numVertexes; i++) {
+      rad = i * interiorAngle + rotationAdjustment;
+      coord = new fabric.Point(Math.cos(rad), Math.sin(rad)).scalarMultiplyEquals(radius);
+      d.push([i === 0 ? 'M' : 'L', coord.x, coord.y]);
+    }
+    d.push(['Z']);
+    return d;
+  }
+
+  /**
    * Join path commands to go back to svg format
    * @param {Array} pathData fabricJS parsed path commands
    * @return {String} joined path 'M 0 0 L 20 30'
@@ -2813,6 +2837,7 @@ fabric.Collection = {
   fabric.util.getBoundsOfCurve = getBoundsOfCurve;
   fabric.util.getPointOnPath = getPointOnPath;
   fabric.util.transformPath = transformPath;
+  fabric.util.getRegularPolygonPath = getRegularPolygonPath;
 })();
 
 
@@ -3781,8 +3806,8 @@ fabric.ParentResizeObserver = fabric.util.createClass({
   },
 
   /**
-   * 
-   * @param {*} context 
+   *
+   * @param {*} context
    * @returns {{ parent: fabric.Group | fabric.Canvas, center: fabric.Point }} data
    */
   extractDataFromResizeEvent: function (context) {
@@ -3807,32 +3832,51 @@ fabric.ParentResizeObserver = fabric.util.createClass({
     if (object.layout === 'fill-parent') {
       var data = this.extractDataFromResizeEvent(context);
       var parent = data.parent;
-      if (object.width !== parent.width || object.height !== parent.height) {
+      var resizing = object.width !== parent.width || object.height !== parent.height;
+      if (resizing || !object.getRelativeCenterPoint().eq(data.center)) {
+        var storkeCorrection = this.stroke ? object.strokeWidth * 2 : 0;
         object.set({
-          width: parent.width,
-          height: parent.height
+          width: parent.width - storkeCorrection,
+          height: parent.height - storkeCorrection
         });
         object.setPositionByOrigin(data.center, 'center', 'center');
         parent.interactive && object.setCoords();
-        object.fire('resize', context);
+        resizing && object.fire('resize', context);
       }
     }
   },
 
-  fillParentByScaling: function (context) {
+  /**
+   * 
+   * @param {*} context 
+   * @param {{width: number, height: number}} [objectSize] override object size calculations by passing this arg
+   */
+  fillParentByScaling: function (context, objectSize) {
     var object = this.object;
     if (object.layout === 'fill-parent') {
-      var data = this.extractDataFromResizeEvent(context);
-      var parent = data.parent;
-      var scale = fabric.util.findScaleToFit(object, parent);
-      if (scale !== object.scaleX || scale !== object.scaleY) {
+      var data = this.extractDataFromResizeEvent(context),
+          parent = data.parent,
+          strokeFactor = this.stroke ? object.strokeWidth * 2 : 0,
+          objectStrokeFactor = object.strokeUniform ? 0 : strokeFactor,
+          parentStrokeFactor = object.strokeUniform ? strokeFactor : 0;
+      objectSize = objectSize || {
+        width: object.width + objectStrokeFactor,
+        height: object.height + objectStrokeFactor
+      };
+      var parentSize = {
+        width: parent.width - parentStrokeFactor,
+        height: parent.height - parentStrokeFactor
+      };
+      var scale = fabric.util.findScaleToFit(objectSize, parentSize);
+      var resizing = scale !== object.scaleX || scale !== object.scaleY;
+      if (resizing || !object.getRelativeCenterPoint().eq(data.center)) {
         object.set({
           scaleX: scale,
           scaleY: scale
         });
         object.setPositionByOrigin(data.center, 'center', 'center');
         parent.interactive && object.setCoords();
-        object.fire('resize', context);
+        resizing && object.fire('resize', context);
       }
     }
   },
@@ -16552,14 +16596,17 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
       this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
       var originalCanvas = this.canvas;
+      canvas._objects = [this];
       this.set('canvas', canvas);
-      var canvasEl = canvas.toCanvasElement(multiplier || 1, Object.assign(options, { objects: [this] }));
+      this.setCoords();
+      var canvasEl = canvas.toCanvasElement(multiplier || 1, options);
       this.set('canvas', originalCanvas);
       this.shadow = originalShadow;
       if (originalGroup) {
         this.group = originalGroup;
       }
-      this.set(origParams).setCoords();
+      this.set(origParams);
+      this.setCoords();
       // canvas.dispose will call image.dispose that will nullify the elements
       // since this canvas is a simple element for the process, we remove references
       // to objects in this way in order to avoid object trashing.
@@ -17652,10 +17699,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       return lineCoords;
     },
 
-    calcOCoords: function() {
+    calcOCoords: function () {
       var vpt = this.getViewportTransform(),
-          tMatrix = this._calcTranslateMatrix(true),
-          rMatrix = this._calcRotateMatrix(true, !!this.group),
+          center = this.getCenterPoint(),
+          tMatrix = [1, 0, 0, 1, center.x, center.y],
+          rMatrix = util.calcRotateMatrix({ angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0) }),
           positionMatrix = multiplyMatrices(tMatrix, rMatrix),
           startMatrix = multiplyMatrices(vpt, positionMatrix),
           finalMatrix = multiplyMatrices(startMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
@@ -17683,8 +17731,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     },
 
     calcACoords: function() {
-      var rotateMatrix = this._calcRotateMatrix(),
-          translateMatrix = this._calcTranslateMatrix(),
+      var rotateMatrix = util.calcRotateMatrix({ angle: this.angle }),
+          center = this.getRelativeCenterPoint(),
+          translateMatrix = [1, 0, 0, 1, center.x, center.y],
           finalMatrix = multiplyMatrices(translateMatrix, rotateMatrix),
           dim = this._getTransformedDimensions(),
           w = dim.x / 2, h = dim.y / 2;
@@ -17720,27 +17769,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       this.oCoords = this.calcOCoords();
       this._setCornerCoords && this._setCornerCoords();
       return this;
-    },
-
-    /**
-     * calculate rotation matrix of an object
-     * @param {boolean} [absolute] true means angle is measured relative to canvas, false means angle is measured relative to parent
-     * @return {Array} rotation matrix for the object
-     */
-    _calcRotateMatrix: function (absolute, accountForFlipping) {
-      var angle = absolute ? this.getTotalAngle() : this.angle;
-      accountForFlipping && this.flipX && (angle -= 180);
-      return util.calcRotateMatrix({ angle: angle });
-    },
-
-    /**
-     * calculate the translation matrix for an object transform
-     * @param {boolean} [absolute] true means translation is relative to canvas, false means relative to parent
-     * @return {Array} rotation matrix for the object
-     */
-    _calcTranslateMatrix: function(absolute) {
-      var center = absolute ? this.getCenterPoint() : this.getRelativeCenterPoint();
-      return [1, 0, 0, 1, center.x, center.y];
     },
 
     transformMatrixKey: function(skipGroup) {
@@ -17787,11 +17815,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (cache.key === key) {
         return cache.value;
       }
-      var tMatrix = this._calcTranslateMatrix(),
+      var center = this.getRelativeCenterPoint(),
           options = {
             angle: this.angle,
-            translateX: tMatrix[4],
-            translateY: tMatrix[5],
+            translateX: center.x,
+            translateY: center.y,
             scaleX: this.scaleX,
             scaleY: this.scaleY,
             skewX: this.skewX,
@@ -17820,6 +17848,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @param {Number} [options.scaleY]
      * @param {Number} [options.skewX]
      * @param {Number} [options.skewY]
+     * @param {Number} [options.width]
+     * @param {Number} [options.height]
      * @private
      * @returns {fabric.Point} dimensions
      */
@@ -19452,12 +19482,14 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (this.layout === 'fill-parent') {
         var data = this._parentMonitor.extractDataFromResizeEvent(context);
         var parent = data.parent;
-        var r = Math.min(parent.width, parent.height) / 2;
-        if (r !== this.radius) {
+        var strokeCorrection = this.stroke ? this.strokeWidth : 0;
+        var r = Math.min(parent.width, parent.height) / 2 - strokeCorrection;
+        var resizing = r !== this.radius;
+        if (resizing || !this.getRelativeCenterPoint().eq(data.center)) {
           this.setRadius(r);
           this.setPositionByOrigin(data.center, 'center', 'center');
           parent.interactive && this.setCoords();
-          this.fire('resize', context);
+          resizing && this.fire('resize', context);
         }
       }
     },
@@ -19788,16 +19820,18 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (this.layout === 'fill-parent') {
         var data = this._parentMonitor.extractDataFromResizeEvent(context);
         var parent = data.parent;
-        var rx = parent.width / 2;
-        var ry = parent.height / 2;
-        if (rx !== this.rx || ry !== this.ry) {
+        var strokeCorrection = this.stroke ? this.strokeWidth : 0;
+        var rx = parent.width / 2 - strokeCorrection;
+        var ry = parent.height / 2 - strokeCorrection;
+        var resizing = rx !== this.rx || ry !== this.ry;
+        if (resizing || !this.getRelativeCenterPoint().eq(data.center)) {
           this.set({
             rx: rx,
             ry: ry
           });
           this.setPositionByOrigin(data.center, 'center', 'center');
           parent.interactive && this.setCoords();
-          this.fire('resize', context);
+          resizing && this.fire('resize', context);
         }
       }
     },
@@ -20244,7 +20278,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @param {*} context see {@link fabric.ParentResizeObserver}
      */
     _onParentResize: function (context) {
-      this._parentMonitor.fillParentByScaling(context);
+      this._parentMonitor.fillParentByScaling(context, this._calcDimensions());
     },
 
     /**
@@ -21061,13 +21095,21 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
+     * @private
+     * @override consider using {@link fabric.Layer} for `fill-parent` layout
+     */
+    _onParentResize: function () {
+      //  noop
+    },
+
+    /**
      * Checks if object can enter group and logs relevant warnings
      * @private
      * @param {fabric.Object} object
      * @returns
      */
     canEnter: function (object) {
-      if (object === this) {
+      if (object === this || this.isDescendantOf(object)) {
         /* _DEV_MODE_START_ */
         console.warn('fabric.Group: trying to add group to itself, this call has no effect');
         /* _DEV_MODE_END_ */
@@ -21485,6 +21527,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this._bubbleLayout(context);
     },
 
+
     /**
      * bubble layout recursive up
      * @private
@@ -21775,6 +21818,29 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       //  override by subclass
     },
 
+
+    /**
+     * Calculate object dimensions from its properties
+     * @override disregard `strokeWidth`
+     * @private
+     * @returns {fabric.Point} dimensions
+     */
+    _getNonTransformedDimensions: function () {
+      return new fabric.Point(this.width, this.height);
+    },
+
+    /**
+     * @private
+     * @override we want instance to fill parent so we disregard transformations
+     * @param {Object} [options]
+     * @param {Number} [options.width]
+     * @param {Number} [options.height]
+     * @returns {fabric.Point} dimensions
+     */
+    _getTransformedDimensions: function (options) {
+      return this.callSuper('_getTransformedDimensions', Object.assign(options || {}, { strokeWidth: 0 }));
+    },
+
     /**
      *
      * @private
@@ -21876,18 +21942,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /* _TO_SVG_START_ */
-    /**
-     * @private
-     */
-    _createSVGBgRect: function (reviver) {
-      if (!this.backgroundColor) {
-        return '';
-      }
-      var fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
-      var commons = fillStroke.indexOf('COMMON_PARTS');
-      fillStroke[commons] = 'for="group" ';
-      return fillStroke.join('');
-    },
 
     /**
      * Returns svg representation of an instance
@@ -22071,18 +22125,17 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     /**
      * @private
      * @override we want instance to fill parent so we disregard transformations
+     * @param {Object} [options]
+     * @param {Number} [options.width]
+     * @param {Number} [options.height]
      * @returns {fabric.Point} dimensions
      */
-    _getTransformedDimensions: function () {
-      return this.callSuper('_getTransformedDimensions', {
-        scaleX: 1,
-        scaleY: 1,
-        skewX: 0,
-        skewY: 0,
+    _getTransformedDimensions: function (options) {
+      options = Object.assign({
         width: this.width,
-        height: this.height,
-        strokeWidth: 0
-      });
+        height: this.height
+      }, options || {});
+      return new fabric.Point(options.width, options.height);
     },
 
     /**
@@ -22387,7 +22440,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         childrenOverride,
         { forActiveSelection: true }
       );
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (var i = 0; i < this._objects.length; i++) {
         this._objects[i]._renderControls(ctx, options);
       }
       ctx.restore();
