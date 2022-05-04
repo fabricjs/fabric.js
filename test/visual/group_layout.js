@@ -139,7 +139,7 @@
             backgroundColor: 'blue'
         });
         var objects = g.removeAll();
-        var layer = new fabric.Layer(objects, { backgroundColor: 'yellow' });
+        var layer = new fabric.Layer(objects);
         g.add(layer);
         canvas.add(g);
         canvas.renderAll();
