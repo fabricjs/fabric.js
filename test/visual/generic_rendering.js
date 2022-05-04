@@ -289,6 +289,96 @@
     height: 300,
   });
 
+  function fillParent(canvas, callback) {
+    var canvasBg = new fabric.Rect({
+      layout: 'fill-parent',
+      fill: 'red'
+    });
+    var groupBg = new fabric.Rect({
+      layout: 'fill-parent',
+      fill: 'blue',
+      //  noise values
+      left: 300,
+      top: 500
+    });
+    var group = new fabric.Group([groupBg], {
+      layout: 'fixed',
+      width: 50,
+      height: 30,
+      left: 120,
+      top: 120
+    });
+    var rect1 = new fabric.Rect({
+      fill: 'magenta',
+      left: 50,
+      top: 10,
+      width: 50,
+      height: 50
+    });
+    var circle = new fabric.Circle({
+      layout: 'fill-parent',
+      fill: 'yellow',
+      //  noise values
+      left: 300,
+      top: 500
+    });
+    var group1 = new fabric.Group([rect1, circle]);
+    var rect2 = new fabric.Rect({
+      fill: 'magenta',
+      left: 30,
+      top: 70,
+      width: 200,
+      height: 40
+    });
+    var ellipse = new fabric.Ellipse({
+      layout: 'fill-parent',
+      stroke: 'cyan',
+      strokeWidth: 5,
+      fill: '',
+      //  noise values
+      left: 300,
+      top: 500
+    });
+    var group2 = new fabric.Group([rect2, ellipse]);
+    var polygon = new fabric.Polygon([
+      { x: 0, y: 216 },
+      { x: 125, y: 433 },
+      { x: 375, y: 433 },
+      { x: 500, y: 216 },
+      { x: 375, y: 0 },
+      { x: 125, y: 0 }
+    ], {
+      layout: 'fill-parent',
+      fill: 'cyan'
+    });
+    var groupBg2 = new fabric.Rect({
+      layout: 'fill-parent',
+      fill: 'blue',
+      //  noise values
+      left: 300,
+      top: 500
+    });
+    var group3 = new fabric.Group([groupBg2, polygon], {
+      layout: 'fixed',
+      width: 50,
+      height: 50,
+      left: 120,
+      top: 0
+    });
+    canvas.add(canvasBg, group, group1, group2, group3);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'fill-parent layout',
+    code: fillParent,
+    golden: 'fill-parent.png',
+    percentage: 0.001,
+    width: 250,
+    height: 200,
+  });
+
   function objectsInActiveSelections(canvas, callback) {
     canvas.setZoom(0.1);
     var rect1 = new fabric.Rect({ fill: 'purple', top: 30, left: 50, width: 30, height: 100, angle: 10 });
