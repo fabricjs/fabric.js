@@ -261,23 +261,6 @@
 
     /**
      * @private
-     * @param {fabric.Object} object
-     * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
-     * @returns {boolean} true if object entered group
-     */
-    enterGroup: function (object, removeParentTransform) {
-      if (!this.canEnter(object)) {
-        return false;
-      }
-      if (object.group) {
-        object.group.remove(object);
-      }
-      this._enterGroup(object, removeParentTransform);
-      return true;
-    },
-
-    /**
-     * @private
      * @override consider using {@link fabric.Layer} for `fill-parent` layout
      */
     _onParentResize: function () {
