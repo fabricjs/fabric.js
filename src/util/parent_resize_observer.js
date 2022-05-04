@@ -102,7 +102,12 @@ fabric.ParentResizeObserver = fabric.util.createClass({
     }
   },
 
-  fillParentByScaling: function (context) {
+  /**
+   * 
+   * @param {*} context 
+   * @param {{width: number, height: number}} [objectSize] override object size calculations by passing this arg
+   */
+  fillParentByScaling: function (context, objectSize) {
     var object = this.object;
     if (object.layout === 'fill-parent') {
       var data = this.extractDataFromResizeEvent(context),
@@ -110,7 +115,7 @@ fabric.ParentResizeObserver = fabric.util.createClass({
           strokeFactor = this.stroke ? object.strokeWidth * 2 : 0,
           objectStrokeFactor = object.strokeUniform ? 0 : strokeFactor,
           parentStrokeFactor = object.strokeUniform ? strokeFactor : 0;
-      var objectSize = {
+      objectSize = objectSize || {
         width: object.width + objectStrokeFactor,
         height: object.height + objectStrokeFactor
       };
