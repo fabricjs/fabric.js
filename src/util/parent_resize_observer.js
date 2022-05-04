@@ -106,18 +106,18 @@ fabric.ParentResizeObserver = fabric.util.createClass({
     var object = this.object;
     if (object.layout === 'fill-parent') {
       var data = this.extractDataFromResizeEvent(context),
-        parent = data.parent,
-        strokeFactor = this.stroke ? object.strokeWidth * 2 : 0,
-        objectStrokeFactor = object.strokeUniform ? 0 : strokeFactor,
-        parentStrokeFactor = object.strokeUniform ? strokeFactor : 0;
+          parent = data.parent,
+          strokeFactor = this.stroke ? object.strokeWidth * 2 : 0,
+          objectStrokeFactor = object.strokeUniform ? 0 : strokeFactor,
+          parentStrokeFactor = object.strokeUniform ? strokeFactor : 0;
       var objectSize = {
         width: object.width + objectStrokeFactor,
         height: object.height + objectStrokeFactor
-      }
+      };
       var parentSize = {
         width: parent.width - parentStrokeFactor,
         height: parent.height - parentStrokeFactor
-      }
+      };
       var scale = fabric.util.findScaleToFit(objectSize, parentSize);
       var resizing = scale !== object.scaleX || scale !== object.scaleY;
       if (resizing || !object.getRelativeCenterPoint().eq(data.center)) {
