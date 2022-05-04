@@ -88,7 +88,8 @@ fabric.ParentResizeObserver = fabric.util.createClass({
     if (object.layout === 'fill-parent') {
       var data = this.extractDataFromResizeEvent(context);
       var parent = data.parent;
-      if (object.width !== parent.width || object.height !== parent.height) {
+      if (object.width !== parent.width || object.height !== parent.height
+        || !object.getRelativeCenterPoint().eq(data.center)) {
         object.set({
           width: parent.width,
           height: parent.height
