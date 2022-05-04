@@ -10,7 +10,11 @@
 
     var tests = [];
 
-    function createObjectsForLayoutTests(text) {
+    function createObjectsForLayoutTests(text, bgColor) {
+        var bg = new fabric.Rect({
+            layout: 'fill-parent',
+            fill: bgColor || ''
+        });
         var circle = new fabric.Circle({
             left: 100,
             top: 50,
@@ -28,6 +32,7 @@
             opacity: 0.3
         })
         return [
+            bg,
             rect,
             circle,
             itext
@@ -35,11 +40,13 @@
     }
 
     function createGroupForLayoutTests(text, options) {
-        return new fabric.Group(createObjectsForLayoutTests(text), options);
+        var bg = options.backgroundColor;
+        return new fabric.Group(createObjectsForLayoutTests(text, bg), Object.assign({}, options, { backgroundColor: '' }));
     }
 
     function createLayerForLayoutTests(text, options) {
-        return new fabric.Layer(createObjectsForLayoutTests(text), options);
+        var bg = options.backgroundColor;
+        return new fabric.Layer(createObjectsForLayoutTests(text, bg), Object.assign({}, options, { backgroundColor: '' }));
     }
 
     function fixedLayout(canvas, callback) {
@@ -240,9 +247,9 @@
             new fabric.Point(50, 0),
             fabric.util.invertTransform(g.calcTransformMatrix())
         );
-        g.item(0).set({ left: point.x });
-        g.item(1).set({ skewX: -45 });
-        g.item(2).rotate(45);
+        g.item(1).set({ left: point.x });
+        g.item(2).set({ skewX: -45 });
+        g.item(3).rotate(45);
         g.triggerLayout();
         canvas.add(g);
         canvas.renderAll();
