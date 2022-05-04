@@ -290,9 +290,17 @@
   });
 
   function fillParent(canvas, callback) {
+    var points = [
+      { x: 0, y: 216 },
+      { x: 125, y: 433 },
+      { x: 375, y: 433 },
+      { x: 500, y: 216 },
+      { x: 375, y: 0 },
+      { x: 125, y: 0 }
+    ];
     var canvasBg = new fabric.Rect({
       layout: 'fill-parent',
-      fill: 'red'
+      fill: 'lightblue'
     });
     var groupBg = new fabric.Rect({
       layout: 'fill-parent',
@@ -311,7 +319,7 @@
     var rect1 = new fabric.Rect({
       fill: 'magenta',
       left: 50,
-      top: 10,
+      top: 60,
       width: 50,
       height: 50
     });
@@ -326,7 +334,7 @@
     var rect2 = new fabric.Rect({
       fill: 'magenta',
       left: 30,
-      top: 70,
+      top: 160,
       width: 200,
       height: 40
     });
@@ -340,7 +348,55 @@
       top: 500
     });
     var group2 = new fabric.Group([rect2, ellipse]);
-    var polygon = new fabric.Polygon([
+    var polygon = new fabric.Polygon(points, {
+      layout: 'fill-parent',
+      fill: 'cyan'
+    });
+    var groupBg3 = new fabric.Rect({
+      layout: 'fill-parent',
+      fill: 'blue',
+      //  noise values
+      left: 300,
+      top: 500
+    });
+    var group3 = new fabric.Group([groupBg3, polygon], {
+      layout: 'fixed',
+      width: 50,
+      height: 50,
+      left: 120,
+      top: 0
+    });
+    var polygon1 = new fabric.Polygon(points, {
+      layout: 'fill-parent',
+      fill: '',
+      stroke: 'magenta',
+      strokeWidth: 5,
+      strokeUniform: true,
+      exactBoundingBox: true
+    });
+    var polygon2 = new fabric.Polygon(points, {
+      layout: 'fill-parent',
+      fill: '',
+      stroke: 'red',
+      strokeWidth: 5,
+      exactBoundingBox: true
+    });
+    var groupBg4 = new fabric.Rect({
+      layout: 'fill-parent',
+      fill: 'blue',
+      //  noise values
+      left: 300,
+      top: 500
+    });
+    var group4 = new fabric.Group([groupBg4, polygon1, polygon2], {
+      layout: 'fixed',
+      width: 50,
+      height: 50,
+      left: 120,
+      top: 60
+    });
+
+    var polygonX = new fabric.Polygon([
       { x: 0, y: 216 },
       { x: 125, y: 433 },
       { x: 375, y: 433 },
@@ -349,23 +405,14 @@
       { x: 125, y: 0 }
     ], {
       layout: 'fill-parent',
-      fill: 'cyan'
+      fill: '',
+      stroke: 'red',
+      strokeWidth: 10,
+     // strokeUniform: true,
+      exactBoundingBox: true
     });
-    var groupBg2 = new fabric.Rect({
-      layout: 'fill-parent',
-      fill: 'blue',
-      //  noise values
-      left: 300,
-      top: 500
-    });
-    var group3 = new fabric.Group([groupBg2, polygon], {
-      layout: 'fixed',
-      width: 50,
-      height: 50,
-      left: 120,
-      top: 0
-    });
-    canvas.add(canvasBg, group, group1, group2, group3);
+
+    canvas.add(canvasBg, group, group1, group2, group3, group4, polygonX);
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
   }
