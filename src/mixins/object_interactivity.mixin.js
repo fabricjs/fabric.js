@@ -168,11 +168,11 @@
      */
     drawBordersInGroup: function (ctx, options, styleOverride) {
       var bbox = fabric.util.sizeAfterTransform(this.width, this.height, options),
-        strokeFactor = this.strokeUniform ?
-          new fabric.Point(0, 0).scalarAddEquals(this.canvas.getZoom()) :
-          new fabric.Point(options.scaleX, options.scaleY),
-        stroke = strokeFactor.scalarMultiplyEquals(this.strokeWidth),
-        size = bbox.scalarAddEquals(stroke).scalarAddEquals(this.borderScaleFactor);
+          strokeFactor = this.strokeUniform ?
+            new fabric.Point(0, 0).scalarAddEquals(this.canvas.getZoom()) :
+            new fabric.Point(options.scaleX, options.scaleY),
+          stroke = strokeFactor.scalarMultiplyEquals(this.strokeWidth),
+          size = bbox.scalarAddEquals(stroke).scalarAddEquals(this.borderScaleFactor);
       this._drawBorders(ctx, size, styleOverride);
       return this;
     },
