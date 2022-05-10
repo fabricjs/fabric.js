@@ -146,33 +146,24 @@
      * Requires public properties: width, height
      * Requires public options: padding, borderColor
      * @param {CanvasRenderingContext2D} ctx Context to draw on
-     * @param {Object} styleOverride object to override the object style
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    drawBorders: function (ctx, styleOverride) {
-      var size = this._calculateCurrentDimensions().scalarAddEquals(this.borderScaleFactor);
-      this._drawBorders(ctx, size, styleOverride);
-      return this;
-    },
-
-    /**
-     * Draws borders of an object's bounding box when it is inside a group.
-     * Requires public properties: width, height
-     * Requires public options: padding, borderColor
-     * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @param {object} options object representing current object parameters
-     * @param {Object} styleOverride object to override the object style
+     * @param {Object} [styleOverride] object to override the object style
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    drawBordersInGroup: function (ctx, options, styleOverride) {
-      var bbox = fabric.util.sizeAfterTransform(this.width, this.height, options),
+    drawBorders: function (ctx, options, styleOverride) {
+      var size;
+      if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
+        var bbox = fabric.util.sizeAfterTransform(this.width, this.height, options),
           strokeFactor = this.strokeUniform ?
             new fabric.Point(0, 0).scalarAddEquals(this.canvas.getZoom()) :
             new fabric.Point(options.scaleX, options.scaleY),
-          stroke = strokeFactor.scalarMultiplyEquals(this.strokeWidth),
-          size = bbox.addEquals(stroke).scalarAddEquals(this.borderScaleFactor);
+          stroke = strokeFactor.scalarMultiplyEquals(this.strokeWidth);
+        size = bbox.addEquals(stroke).scalarAddEquals(this.borderScaleFactor);
+      }
+      else {
+        size = this._calculateCurrentDimensions().scalarAddEquals(this.borderScaleFactor);
+      }
       this._drawBorders(ctx, size, styleOverride);
       return this;
     },
