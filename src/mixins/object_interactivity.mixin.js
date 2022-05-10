@@ -155,10 +155,10 @@
       var size;
       if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
         var bbox = fabric.util.sizeAfterTransform(this.width, this.height, options),
-          strokeFactor = this.strokeUniform ?
-            new fabric.Point(0, 0).scalarAddEquals(this.canvas.getZoom()) :
-            new fabric.Point(options.scaleX, options.scaleY),
-          stroke = strokeFactor.scalarMultiplyEquals(this.strokeWidth);
+            strokeFactor = this.strokeUniform ?
+              new fabric.Point(0, 0).scalarAddEquals(this.canvas.getZoom()) :
+              new fabric.Point(options.scaleX, options.scaleY),
+            stroke = strokeFactor.scalarMultiplyEquals(this.strokeWidth);
         size = bbox.addEquals(stroke).scalarAddEquals(this.borderScaleFactor);
       }
       else {
