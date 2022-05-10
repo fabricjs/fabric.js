@@ -172,7 +172,7 @@
             new fabric.Point(0, 0).scalarAddEquals(this.canvas.getZoom()) :
             new fabric.Point(options.scaleX, options.scaleY),
           stroke = strokeFactor.scalarMultiplyEquals(this.strokeWidth),
-          size = bbox.scalarAddEquals(stroke).scalarAddEquals(this.borderScaleFactor);
+          size = bbox.addEquals(stroke).scalarAddEquals(this.borderScaleFactor);
       this._drawBorders(ctx, size, styleOverride);
       return this;
     },
