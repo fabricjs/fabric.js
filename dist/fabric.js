@@ -1614,10 +1614,7 @@ fabric.CommonMethods = {
             }],
           transformMatrix = fabric.util.calcDimensionsMatrix(options),
           bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
-      return {
-        x: bbox.width,
-        y: bbox.height,
-      };
+      return new fabric.Point(bbox.width, bbox.height);
     },
 
     /**
@@ -16267,12 +16264,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         options.angle -= 180;
       }
       ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
-      if (drawBorders && (styleOverride.forActiveSelection || this.group)) {
-        this.drawBordersInGroup(ctx, options, styleOverride);
-      }
-      else if (drawBorders) {
-        this.drawBorders(ctx, styleOverride);
-      }
+      drawBorders && this.drawBorders(ctx, options, styleOverride);
       drawControls && this.drawControls(ctx, styleOverride);
       ctx.restore();
     },
@@ -18621,73 +18613,63 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     },
 
     /**
+     * @public override if necessary
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {fabric.Point} size
+     */
+    strokeBorders: function (ctx, size) {
+      ctx.strokeRect(
+        -size.x / 2,
+        -size.y / 2,
+        size.x,
+        size.y
+      );
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to draw on
+     * @param {fabric.Point} size
+     * @param {Object} styleOverride object to override the object style
+     */
+    _drawBorders: function (ctx, size, styleOverride) {
+      var options = Object.assign({
+        hasControls: this.hasControls,
+        borderColor: this.borderColor,
+        borderDashArray: this.borderDashArray
+      }, styleOverride || {});
+      ctx.save();
+      ctx.strokeStyle = options.borderColor;
+      this._setLineDash(ctx, options.borderDashArray);
+      this.strokeBorders(ctx, size);
+      options.hasControls && this.drawControlsConnectingLines(ctx, size);
+      ctx.restore();
+    },
+
+    /**
      * Draws borders of an object's bounding box.
      * Requires public properties: width, height
      * Requires public options: padding, borderColor
      * @param {CanvasRenderingContext2D} ctx Context to draw on
-     * @param {Object} styleOverride object to override the object style
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    drawBorders: function(ctx, styleOverride) {
-      styleOverride = styleOverride || {};
-      var wh = this._calculateCurrentDimensions(),
-          strokeWidth = this.borderScaleFactor,
-          width = wh.x + strokeWidth,
-          height = wh.y + strokeWidth,
-          hasControls = typeof styleOverride.hasControls !== 'undefined' ?
-            styleOverride.hasControls : this.hasControls;
-
-      ctx.save();
-      ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
-      this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray);
-
-      ctx.strokeRect(
-        -width / 2,
-        -height / 2,
-        width,
-        height
-      );
-      hasControls && this.drawControlsConnectingLines(ctx, width, height);
-
-      ctx.restore();
-      return this;
-    },
-
-    /**
-     * Draws borders of an object's bounding box when it is inside a group.
-     * Requires public properties: width, height
-     * Requires public options: padding, borderColor
-     * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @param {object} options object representing current object parameters
-     * @param {Object} styleOverride object to override the object style
+     * @param {Object} [styleOverride] object to override the object style
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    drawBordersInGroup: function(ctx, options, styleOverride) {
-      styleOverride = styleOverride || {};
-      var bbox = fabric.util.sizeAfterTransform(this.width, this.height, options),
-          strokeWidth = this.strokeWidth,
-          strokeUniform = this.strokeUniform,
-          borderScaleFactor = this.borderScaleFactor,
-          width =
-            bbox.x + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleX) + borderScaleFactor,
-          height =
-            bbox.y + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor,
-          hasControls = typeof styleOverride.hasControls !== 'undefined' ?
-            styleOverride.hasControls : this.hasControls;
-      ctx.save();
-      this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray);
-      ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
-      ctx.strokeRect(
-        -width / 2,
-        -height / 2,
-        width,
-        height
-      );
-      hasControls && this.drawControlsConnectingLines(ctx, width, height);
-
-      ctx.restore();
+    drawBorders: function (ctx, options, styleOverride) {
+      var size;
+      if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
+        var bbox = fabric.util.sizeAfterTransform(this.width, this.height, options),
+            strokeFactor = this.strokeUniform ?
+              new fabric.Point(0, 0).scalarAddEquals(this.canvas.getZoom()) :
+              new fabric.Point(options.scaleX, options.scaleY),
+            stroke = strokeFactor.scalarMultiplyEquals(this.strokeWidth);
+        size = bbox.addEquals(stroke).scalarAddEquals(this.borderScaleFactor);
+      }
+      else {
+        size = this._calculateCurrentDimensions().scalarAddEquals(this.borderScaleFactor);
+      }
+      this._drawBorders(ctx, size, styleOverride);
       return this;
     },
 
@@ -18701,7 +18683,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    drawControlsConnectingLines: function (ctx, width, height) {
+    drawControlsConnectingLines: function (ctx, size) {
       var shouldStroke = false;
 
       ctx.beginPath();
@@ -18711,10 +18693,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         if (control.withConnection && control.getVisibility(fabricObject, key)) {
           // reset movement for each control
           shouldStroke = true;
-          ctx.moveTo(control.x * width, control.y * height);
+          ctx.moveTo(control.x * size.x, control.y * size.y);
           ctx.lineTo(
-            control.x * width + control.offsetX,
-            control.y * height + control.offsetY
+            control.x * size.x + control.offsetX,
+            control.y * size.y + control.offsetY
           );
         }
       });
@@ -21126,23 +21108,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         console.warn('fabric.Group: object is about to enter group and leave another');
         /* _DEV_MODE_END_ */
       }
-      return true;
-    },
-
-    /**
-     * @private
-     * @param {fabric.Object} object
-     * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
-     * @returns {boolean} true if object entered group
-     */
-    enterGroup: function (object, removeParentTransform) {
-      if (!this.canEnter(object)) {
-        return false;
-      }
-      if (object.group) {
-        object.group.remove(object);
-      }
-      this._enterGroup(object, removeParentTransform);
       return true;
     },
 
