@@ -1189,10 +1189,7 @@
             }],
           transformMatrix = fabric.util.calcDimensionsMatrix(options),
           bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
-      return {
-        x: bbox.width,
-        y: bbox.height,
-      };
+      return new fabric.Point(bbox.width, bbox.height);
     },
 
     /**
