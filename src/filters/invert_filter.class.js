@@ -26,18 +26,39 @@
      */
     type: 'Invert',
 
-    fragmentSource: 'precision highp float;\n' +
-      'uniform sampler2D uTexture;\n' +
-      'uniform int uInvert;\n' +
-      'varying vec2 vTexCoord;\n' +
-      'void main() {\n' +
-        'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-        'if (uInvert == 1) {\n' +
-          'gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,color.a);\n' +
-        '} else {\n' +
-          'gl_FragColor = color;\n' +
-        '}\n' +
-      '}',
+    /**
+     * Invert also alpha.
+     * @type Boolean
+     * @default
+     **/
+    alpha: false,
+
+    fragmentSource: {
+      normal: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform int uInvert;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'vec4 color = texture2D(uTexture, vTexCoord);\n' +
+          'if (uInvert == 1) {\n' +
+            'gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,color.a);\n' +
+          '} else {\n' +
+            'gl_FragColor = color;\n' +
+          '}\n' +
+        '}',
+      alpha: 'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'uniform int uInvert;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'vec4 color = texture2D(uTexture, vTexCoord);\n' +
+          'if (uInvert == 1) {\n' +
+            'gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,1.0 -color.a);\n' +
+          '} else {\n' +
+            'gl_FragColor = color;\n' +
+          '}\n' +
+        '}',
+    },
 
     /**
      * Filter invert. if false, does nothing
@@ -47,6 +68,22 @@
     invert: true,
 
     mainParameter: 'invert',
+
+    /**
+     * Retrieves the cached shader.
+     * @param {Object} options
+     * @param {WebGLRenderingContext} options.context The GL context used for rendering.
+     * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+     */
+    retrieveShader: function(options) {
+      var mode = this.alpha ? 'alpha' : 'normal';
+      var cacheKey = this.type + '_' + mode;
+      var shaderSource = this.fragmentSource[mode];
+      if (!options.programCache.hasOwnProperty(cacheKey)) {
+        options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
+      }
+      return options.programCache[cacheKey];
+    },
 
     /**
      * Apply the Invert operation to a Uint8Array representing the pixels of an image.
@@ -62,6 +99,10 @@
         data[i] = 255 - data[i];
         data[i + 1] = 255 - data[i + 1];
         data[i + 2] = 255 - data[i + 2];
+
+        if (this.alpha) {
+          data[i + 3] = 255 - data[i + 3];
+        }
       }
     },
 
