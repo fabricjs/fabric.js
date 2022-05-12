@@ -66,6 +66,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
   /**
    * Same as fabric.Object `clipPath` property.
    * The clip path is positioned relative to the top left corner of the viewport.
+   * The `absolutePositioned` property renders the clip path w/o viewport transform.
    */
   clipPath: undefined,
 
@@ -127,7 +128,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
    * @private
    */
   calcTransformMatrix: function () {
-    return fabric.util.invertTransform(this.canvas.viewportTransform);
+    return this.canvas.viewportTransform;
   },
 
   /**
@@ -148,10 +149,7 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
     if (!clipPath) {
       return;
     }
-    clipPath.canvas = this.canvas;
-    var v = fabric.util.invertTransform(this.canvas.viewportTransform);
     ctx.save();
-    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
     fabric.Object.prototype._drawClipPath.call(this, ctx, clipPath);
     ctx.restore();
   },
@@ -166,8 +164,8 @@ fabric.BaseBrush = fabric.util.createClass(/** @lends fabric.BaseBrush.prototype
       return Promise.resolve();
     }
     var t = result.calcTransformMatrix();
-    if (!this.clipPath.absolutePositioned) {
-      t = fabric.util.multiplyTransformMatrices(this.canvas.viewportTransform, t);
+    if (this.clipPath.absolutePositioned) {
+      t = fabric.util.multiplyTransformMatrices(this.calcTransformMatrix(), t);
     }
     return this.clipPath.clone(['inverted'])
       .then(function (clipPath) {
