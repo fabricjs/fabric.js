@@ -7,7 +7,6 @@
   },
   "globals": {
     "Promise": true,
-    "async": true,
     "define": true,
     "eventjs": true,
     "exports": true,
