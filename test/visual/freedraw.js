@@ -2181,6 +2181,7 @@
         callback(canvas.upperCanvasEl);
       }
     }));
+    //  render top cotext over main context and compare against visuals after mouseup
     visualTester(Object.assign({}, test, {
       test: test.test + ' (context mesh)',
       code: function (canvas, callback) {
