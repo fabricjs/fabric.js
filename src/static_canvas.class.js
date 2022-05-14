@@ -761,7 +761,7 @@
         this.drawControls(ctx);
       }
       if (path) {
-        path.canvas = this;
+        path._set('canvas', this);
         // needed to setup a couple of variables
         path.shouldCache();
         path._transformDone = true;
