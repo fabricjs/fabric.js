@@ -45,6 +45,11 @@
     brush.onMouseUp(options);
   }
 
+  function eraserDrawer(points, brush) {
+    brush.canvas.calcViewportBoundaries();
+    pointDrawer(points, brush);
+  }
+
   var points = [
     {
       "x": 24.9,
@@ -2176,6 +2181,33 @@
     test: 'Simple free drawing, with high decimation',
     code: withDecimation,
     golden: 'freedrawing6.png',
+    percentage: 0.09,
+    width: 200,
+    height: 250,
+    fabricClass: 'Canvas'
+  });
+
+  function eraser(canvas, callback) {
+    canvas.isDrawingMode = true;
+    var brush = new fabric.EraserBrush(canvas);
+    canvas.add(
+      new fabric.Rect({ width: 100, height: 100, fill: 'blue' }),
+      new fabric.Rect({ width: 100, height: 100, left: 50, top: 50, fill: 'magenta', erasable: false }),
+      new fabric.Circle({ radius: 200 }),
+      new fabric.Rect({ width: 100, height: 100, left: 100, top: 100, fill: 'red', erasable: false }),
+    );
+    brush.width = 8;
+    brush.decimate = 7;
+    canvas.freeDrawingBrush = brush;
+    eraserDrawer(points, brush);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Eraser brush',
+    code: eraser,
+    golden: 'eraser.png',
     percentage: 0.09,
     width: 200,
     height: 250,
