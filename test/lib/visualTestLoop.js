@@ -137,7 +137,7 @@
    * @param {number} allowedPercentageDiff
    * @returns 
    */
-  async function compareVisuals(actual, expected, allowedPercentageDiff) {
+  function compareVisuals(actual, expected, allowedPercentageDiff) {
     var visualCallback;
     var imageDataToChalk;
     if (fabric.isLikelyNode) {
@@ -194,7 +194,7 @@
   }
 
   exports.compareVisuals = compareVisuals;
-  /*
+  
   exports.compareGoldens = function (assert, a, b, allowedPercentageDiff) {
     var done = assert.async();
     return Promise.all([
@@ -212,7 +212,7 @@
       !result.ok && result.diff.log();
       done();
     });
-  };*/
+  };
 
   exports.visualTestLoop = function(QUnit) {
     return function testCallback(testObj) {
