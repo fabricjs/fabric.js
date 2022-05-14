@@ -355,29 +355,33 @@
        * This will render the erased parts as if they were not erased in the first place, achieving an undo effect.
        *
        * @param {fabric.Collection} collection
+       * @param {fabric.Object[]} objects
        * @param {CanvasRenderingContext2D} ctx
        * @param {{ visibility: fabric.Object[], eraser: fabric.Object[], collection: fabric.Object[] }} restorationContext
        */
-      _prepareCollectionTraversal: function (collection, ctx, restorationContext) {
-        collection.forEachObject(function (obj) {
+      _prepareCollectionTraversal: function (collection, objects, ctx, restorationContext) {
+        objects.forEach(function (obj) {
+          var dirty = false;
           if (obj.forEachObject && obj.erasable === 'deep') {
             //  traverse
-            this._prepareCollectionTraversal(obj, ctx, restorationContext);
+            this._prepareCollectionTraversal(obj, obj._objects, ctx, restorationContext);
           }
           else if (!this.inverted && obj.erasable && obj.visible) {
             //  render only non-erasable objects
             obj.visible = false;
-            collection.dirty = true;
             restorationContext.visibility.push(obj);
-            restorationContext.collection.push(collection);
+            dirty = true;
           }
           else if (this.inverted && obj.erasable && obj.eraser && obj.visible) {
             //  render all objects without eraser
             var eraser = obj.eraser;
             obj.eraser = undefined;
             obj.dirty = true;
-            collection.dirty = true;
             restorationContext.eraser.push([obj, eraser]);
+            dirty = true;
+          }
+          if (dirty && collection instanceof fabric.Object) {
+            collection.dirty = true;
             restorationContext.collection.push(collection);
           }
         }, this);
@@ -388,12 +392,14 @@
        * This pattern will be drawn on the top context after clipping the main context,
        * achieving a visual effect of erasing only erasable objects
        * @private
+       * @param {fabric.Object[]} [objects]  override default behavior by passing objects to render on pattern
        */
-      preparePattern: function () {
+      preparePattern: function (objects) {
         if (!this._patternCanvas) {
           this._patternCanvas = fabric.util.createCanvasElement();
         }
         var canvas = this._patternCanvas;
+        objects = objects || this.canvas._objectsToRender || this.canvas._objects;
         canvas.width = this.canvas.width;
         canvas.height = this.canvas.height;
         var patternCtx = canvas.getContext('2d');
@@ -425,8 +431,8 @@
         patternCtx.save();
         patternCtx.transform.apply(patternCtx, this.canvas.viewportTransform);
         var restorationContext = { visibility: [], eraser: [], collection: [] };
-        this._prepareCollectionTraversal(this.canvas, patternCtx, restorationContext);
-        this.canvas._renderObjects(patternCtx, this.canvas._objects);
+        this._prepareCollectionTraversal(this.canvas, objects, patternCtx, restorationContext);
+        this.canvas._renderObjects(patternCtx, objects);
         restorationContext.visibility.forEach(function (obj) { obj.visible = true; });
         restorationContext.eraser.forEach(function (entry) {
           var obj = entry[0], eraser = entry[1];
