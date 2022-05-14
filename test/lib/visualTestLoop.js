@@ -173,7 +173,7 @@
     });
     var imageDataExpected = ctx.getImageData(0, 0, width, height);
     var differentPixels = pixelMatch(imageDataActual, imageDataExpected, output);
-    var percDiff = Math.round(differentPixels / totalPixels * 10000) / 100;
+    var percDiff = differentPixels / totalPixels * 100;
     var okDiff = totalPixels * allowedPercentageDiff;
     var isOK = differentPixels < okDiff
     return {
