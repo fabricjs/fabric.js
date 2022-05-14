@@ -34,20 +34,28 @@
   else {
     visualTestLoop = window.visualTestLoop;
   }
+  function setBrush(canvas, brush) {
+    canvas.isDrawingMode = true;
+    canvas.freeDrawingBrush = brush;
+  }
   var options = { e: { pointerId: 1 } };
-  function pointDrawer(points, brush) {
+  function pointDrawer(points, brush, fireUp = false) {
+    setBrush(brush.canvas, brush);
     brush.onMouseDown(points[0], options);
     for (var i = 1; i < points.length; i++) {
       points[i].x = parseFloat(points[i].x);
       points[i].y = parseFloat(points[i].y);
       brush.onMouseMove(points[i], options);
     }
+    fireUp && brush.onMouseUp(options);
+  }
+  function fireMouseUp(brush) {
     brush.onMouseUp(options);
   }
 
-  function eraserDrawer(points, brush) {
+  function eraserDrawer(points, brush, fireUp = false) {
     brush.canvas.calcViewportBoundaries();
-    pointDrawer(points, brush);
+    pointDrawer(points, brush, fireUp);
   }
 
   var points = [
@@ -2043,8 +2051,64 @@
 
   var tests = [];
 
-  function withOpacity(canvas, callback) {
-    canvas.isDrawingMode = true;
+  function freedrawing(canvas) {
+    // eslint-disable-next-line
+    var points = [{"x":14.940,"y":18.084},{"x":14.940,"y":20.076},{"x":14.940,"y":22.068},{"x":14.940,"y":25.056},{"x":14.940,"y":27.048},{"x":14.940,"y":29.040},{"x":14.940,"y":31.032},{"x":14.940,"y":33.024},{"x":14.940,"y":35.016},{"x":15.936,"y":36.012},{"x":17.928,"y":35.016},{"x":18.924,"y":34.020},{"x":19.920,"y":32.028},{"x":21.912,"y":31.032},{"x":22.908,"y":29.040},{"x":23.904,"y":27.048},{"x":24.900,"y":25.056},{"x":25.896,"y":24.060},{"x":26.892,"y":22.068},{"x":28.884,"y":23.064},{"x":29.880,"y":24.060},{"x":30.876,"y":25.056},{"x":32.869,"y":25.056},{"x":34.861,"y":25.056},{"x":36.853,"y":25.056},{"x":38.845,"y":25.056},{"x":40.837,"y":24.060},{"x":41.833,"y":23.064},{"x":42.829,"y":22.068},{"x":43.825,"y":21.072},{"x":44.821,"y":20.076},{"x":43.825,"y":24.060},{"x":43.825,"y":26.052},{"x":43.825,"y":30.036},{"x":43.825,"y":33.024},{"x":43.825,"y":35.016},{"x":43.825,"y":38.004},{"x":43.825,"y":40.992},{"x":43.825,"y":42.984},{"x":43.825,"y":44.976},{"x":44.821,"y":45.972},{"x":45.817,"y":46.968},{"x":47.809,"y":46.968},{"x":48.805,"y":45.972},{"x":50.797,"y":43.980},{"x":51.793,"y":41.988},{"x":52.789,"y":38.004},{"x":53.785,"y":37.008},{"x":53.785,"y":35.016},{"x":54.781,"y":33.024},{"x":54.781,"y":31.032},{"x":54.781,"y":33.024},{"x":56.773,"y":33.024},{"x":58.765,"y":34.020},{"x":60.757,"y":34.020},{"x":62.749,"y":34.020},{"x":63.745,"y":33.024}];
+    var brush = new fabric.PencilBrush(canvas);
+    brush.color = 'red';
+    brush.width = 2;
+    pointDrawer(points, brush);
+  }
+
+  tests.push({
+    test: 'Simple free drawing',
+    build: freedrawing,
+    golden: 'freedrawing1.png',
+    percentage: 0.09,
+    width: 100,
+    height: 100,
+    fabricClass: 'Canvas'
+  });
+
+  function noOffset(canvas) {
+    var brush = new fabric.PencilBrush(canvas);
+    brush.color = 'green';
+    brush.width = 16;
+    pointDrawer(points, brush);
+  }
+
+  tests.push({
+    test: 'Simple free drawing, large brush no offset',
+    build: noOffset,
+    golden: 'freedrawing2.png',
+    percentage: 0.09,
+    width: 200,
+    height: 250,
+    fabricClass: 'Canvas'
+  });
+
+  function withShadow(canvas) {
+    var brush = new fabric.PencilBrush(canvas);
+    brush.color = 'blue';
+    brush.shadow = new fabric.Shadow({
+      blur: 10,
+      color: 'red',
+    });
+    brush.width = 6;
+    pointDrawer(points, brush);
+  }
+
+  tests.push({
+    test: 'Simple free drawing, with shadow',
+    build: withShadow,
+    golden: 'freedrawing3.png',
+    percentage: 0.09,
+    width: 200,
+    height: 250,
+    fabricClass: 'Canvas'
+  });
+
+  function withOpacity(canvas) {
     var brush = new fabric.PencilBrush(canvas);
     brush.color = 'rgba(255, 255, 0, 0.4)';
     brush.shadow = new fabric.Shadow({
@@ -2052,15 +2116,12 @@
       color: 'green',
     });
     brush.width = 6;
-    canvas.freeDrawingBrush = brush;
-    pointDrawer(points, brush);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
+    pointDrawer(points, brush, false);
   }
 
   tests.push({
     test: 'Simple free drawing, with opacity',
-    code: withOpacity,
+    build: withOpacity,
     golden: 'freedrawing4.png',
     newModule: 'Free Drawing',
     percentage: 0.09,
@@ -2069,92 +2130,19 @@
     fabricClass: 'Canvas'
   });
 
-  function freedrawing(canvas, callback) {
-    // eslint-disable-next-line
-    var points = [{"x":14.940,"y":18.084},{"x":14.940,"y":20.076},{"x":14.940,"y":22.068},{"x":14.940,"y":25.056},{"x":14.940,"y":27.048},{"x":14.940,"y":29.040},{"x":14.940,"y":31.032},{"x":14.940,"y":33.024},{"x":14.940,"y":35.016},{"x":15.936,"y":36.012},{"x":17.928,"y":35.016},{"x":18.924,"y":34.020},{"x":19.920,"y":32.028},{"x":21.912,"y":31.032},{"x":22.908,"y":29.040},{"x":23.904,"y":27.048},{"x":24.900,"y":25.056},{"x":25.896,"y":24.060},{"x":26.892,"y":22.068},{"x":28.884,"y":23.064},{"x":29.880,"y":24.060},{"x":30.876,"y":25.056},{"x":32.869,"y":25.056},{"x":34.861,"y":25.056},{"x":36.853,"y":25.056},{"x":38.845,"y":25.056},{"x":40.837,"y":24.060},{"x":41.833,"y":23.064},{"x":42.829,"y":22.068},{"x":43.825,"y":21.072},{"x":44.821,"y":20.076},{"x":43.825,"y":24.060},{"x":43.825,"y":26.052},{"x":43.825,"y":30.036},{"x":43.825,"y":33.024},{"x":43.825,"y":35.016},{"x":43.825,"y":38.004},{"x":43.825,"y":40.992},{"x":43.825,"y":42.984},{"x":43.825,"y":44.976},{"x":44.821,"y":45.972},{"x":45.817,"y":46.968},{"x":47.809,"y":46.968},{"x":48.805,"y":45.972},{"x":50.797,"y":43.980},{"x":51.793,"y":41.988},{"x":52.789,"y":38.004},{"x":53.785,"y":37.008},{"x":53.785,"y":35.016},{"x":54.781,"y":33.024},{"x":54.781,"y":31.032},{"x":54.781,"y":33.024},{"x":56.773,"y":33.024},{"x":58.765,"y":34.020},{"x":60.757,"y":34.020},{"x":62.749,"y":34.020},{"x":63.745,"y":33.024}];
-    canvas.isDrawingMode = true;
-    var brush = new fabric.PencilBrush(canvas);
-    brush.color = 'red';
-    brush.width = 2;
-    canvas.freeDrawingBrush = brush;
-    pointDrawer(points, brush);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
-  }
-
-  tests.push({
-    test: 'Simple free drawing',
-    code: freedrawing,
-    golden: 'freedrawing1.png',
-    percentage: 0.09,
-    width: 100,
-    height: 100,
-    fabricClass: 'Canvas'
-  });
-
-  function noOffset(canvas, callback) {
-    canvas.isDrawingMode = true;
-    var brush = new fabric.PencilBrush(canvas);
-    brush.color = 'green';
-    brush.width = 16;
-    canvas.freeDrawingBrush = brush;
-    pointDrawer(points, brush);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
-  }
-
-  tests.push({
-    test: 'Simple free drawing, large brush no offset',
-    code: noOffset,
-    golden: 'freedrawing2.png',
-    percentage: 0.09,
-    width: 200,
-    height: 250,
-    fabricClass: 'Canvas'
-  });
-
-  function withShadow(canvas, callback) {
-    canvas.isDrawingMode = true;
-    var brush = new fabric.PencilBrush(canvas);
-    brush.color = 'blue';
-    brush.shadow = new fabric.Shadow({
-      blur: 10,
-      color: 'red',
-    });
-    brush.width = 6;
-    canvas.freeDrawingBrush = brush;
-    pointDrawer(points, brush);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
-  }
-
-  tests.push({
-    test: 'Simple free drawing, with shadow',
-    code: withShadow,
-    golden: 'freedrawing3.png',
-    percentage: 0.09,
-    width: 200,
-    height: 250,
-    fabricClass: 'Canvas'
-  });
-
-  function freedrawingWithDecimateToPoint(canvas, callback) {
+  function freedrawingWithDecimateToPoint(canvas) {
     // eslint-disable-next-line
     var points = [{"x":14.940,"y":18.084},{"x":14.940,"y":18.084},{"x":14.940,"y":18.084}];
-    canvas.isDrawingMode = true;
     var brush = new fabric.PencilBrush(canvas);
     brush.color = 'red';
     brush.width = 15;
     brush.decimate = 1;
-    canvas.freeDrawingBrush = brush;
     pointDrawer(points, brush);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
   }
 
   tests.push({
     test: 'Simple free drawing to dot',
-    code: freedrawingWithDecimateToPoint,
+    build: freedrawingWithDecimateToPoint,
     golden: 'freedrawing5.png',
     percentage: 0.09,
     width: 50,
@@ -2162,24 +2150,20 @@
     fabricClass: 'Canvas'
   });
 
-  function withDecimation(canvas, callback) {
-    canvas.isDrawingMode = true;
+  function withDecimation(canvas) {
     var brush = new fabric.PencilBrush(canvas);
     brush.color = 'red';
     brush.width = 8;
-    canvas.freeDrawingBrush = brush;
-    pointDrawer(points, brush);
+    pointDrawer(points, brush, true);
     brush.color = 'blue';
     brush.width = 2;
     brush.decimate = 7;
     pointDrawer(points, brush);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
   }
 
   tests.push({
     test: 'Simple free drawing, with high decimation',
-    code: withDecimation,
+    build: withDecimation,
     golden: 'freedrawing6.png',
     percentage: 0.09,
     width: 200,
@@ -2187,8 +2171,7 @@
     fabricClass: 'Canvas'
   });
 
-  function eraser(canvas, callback) {
-    canvas.isDrawingMode = true;
+  function eraser(canvas) {
     var brush = new fabric.EraserBrush(canvas);
     canvas.add(
       new fabric.Rect({ width: 100, height: 100, fill: 'blue' }),
@@ -2198,15 +2181,12 @@
     );
     brush.width = 8;
     brush.decimate = 7;
-    canvas.freeDrawingBrush = brush;
     eraserDrawer(points, brush);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
   }
 
   tests.push({
     test: 'Eraser brush',
-    code: eraser,
+    build: eraser,
     golden: 'eraser.png',
     percentage: 0.09,
     width: 200,
@@ -2214,5 +2194,47 @@
     fabricClass: 'Canvas'
   });
 
-  tests.forEach(visualTestLoop(QUnit));
+  function eraserCustomStack(canvas) {
+    var brush = new fabric.EraserBrush(canvas);
+    canvas.add(
+      new fabric.Rect({ width: 100, height: 100, fill: 'blue' }),
+      new fabric.Rect({ width: 100, height: 100, left: 50, top: 50, fill: 'magenta', erasable: false }),
+      new fabric.Circle({ radius: 200 }),
+      new fabric.Rect({ width: 100, height: 100, left: 100, top: 100, fill: 'red', erasable: false }),
+    );
+    brush.width = 8;
+    brush.decimate = 7;
+    canvas._objectsToRender = canvas.getObjects().reverse();
+    eraserDrawer(points, brush);
+  }
+
+  tests.push({
+    test: 'Eraser brush - custom stack ordering',
+    build: eraserCustomStack,
+    golden: 'eraser_custom_stack.png',
+    percentage: 0.09,
+    width: 200,
+    height: 250,
+    fabricClass: 'Canvas'
+  });
+
+  var visualTester = visualTestLoop(QUnit);
+  tests.forEach(function (test) {
+    visualTester(Object.assign({}, test, {
+      test: test.test + ' (top context)',
+      golden: 'top_ctx_' + test.golden,
+      code: function (canvas, callback) {
+        test.build(canvas);
+        callback(canvas.upperCanvasEl);
+      }
+    }));
+    visualTester(Object.assign({}, test, {
+      code: function (canvas, callback) {
+        test.build(canvas);
+        fireMouseUp(canvas.freeDrawingBrush);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+      }
+    }));
+  });
 })();
