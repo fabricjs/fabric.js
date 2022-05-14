@@ -2192,6 +2192,7 @@
       }
     }));
     visualTester(Object.assign({}, test, {
+      test: test.test + ' (result)',
       code: function (canvas, callback) {
         test.build(canvas);
         fireMouseUp(canvas.freeDrawingBrush);
