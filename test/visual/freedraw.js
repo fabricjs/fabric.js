@@ -2171,53 +2171,6 @@
     fabricClass: 'Canvas'
   });
 
-  function eraser(canvas) {
-    var brush = new fabric.EraserBrush(canvas);
-    canvas.add(
-      new fabric.Rect({ width: 100, height: 100, fill: 'blue' }),
-      new fabric.Rect({ width: 100, height: 100, left: 50, top: 50, fill: 'magenta', erasable: false }),
-      new fabric.Circle({ radius: 200 }),
-      new fabric.Rect({ width: 100, height: 100, left: 100, top: 100, fill: 'red', erasable: false }),
-    );
-    brush.width = 8;
-    brush.decimate = 7;
-    eraserDrawer(points, brush);
-  }
-
-  tests.push({
-    test: 'Eraser brush',
-    build: eraser,
-    golden: 'eraser.png',
-    percentage: 0.09,
-    width: 200,
-    height: 250,
-    fabricClass: 'Canvas'
-  });
-
-  function eraserCustomStack(canvas) {
-    var brush = new fabric.EraserBrush(canvas);
-    canvas.add(
-      new fabric.Rect({ width: 100, height: 100, fill: 'blue' }),
-      new fabric.Rect({ width: 100, height: 100, left: 50, top: 50, fill: 'magenta', erasable: false }),
-      new fabric.Circle({ radius: 200 }),
-      new fabric.Rect({ width: 100, height: 100, left: 100, top: 100, fill: 'red', erasable: false }),
-    );
-    brush.width = 8;
-    brush.decimate = 7;
-    canvas._objectsToRender = canvas.getObjects().reverse();
-    eraserDrawer(points, brush);
-  }
-
-  tests.push({
-    test: 'Eraser brush - custom stack ordering',
-    build: eraserCustomStack,
-    golden: 'eraser_custom_stack.png',
-    percentage: 0.09,
-    width: 200,
-    height: 250,
-    fabricClass: 'Canvas'
-  });
-
   var visualTester = visualTestLoop(QUnit);
   tests.forEach(function (test) {
     visualTester(Object.assign({}, test, {
