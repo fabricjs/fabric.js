@@ -2123,7 +2123,6 @@
     test: 'Simple free drawing, with opacity',
     build: withOpacity,
     golden: 'freedrawing4.png',
-    newModule: 'Free Drawing',
     percentage: 0.09,
     width: 200,
     height: 250,
@@ -2172,6 +2171,7 @@
   });
 
   var visualTester = visualTestLoop(QUnit);
+  tests[0].newModule = 'Free Drawing';
   tests.forEach(function (test) {
     visualTester(Object.assign({}, test, {
       test: test.test + ' (top context)',
