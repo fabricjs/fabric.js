@@ -2053,6 +2053,29 @@
 
   var tests = [];
 
+  var freeDrawingTestDefaults = {
+    /**
+     * render top context before mouseup
+     */
+    top: true,
+    /**
+     * render main context before mouseup
+     */
+    main: false,
+    /**
+     * render top and main context before mouseup
+     */
+    mesh: true,
+    /**
+     * render canvas after mouseup
+     */
+    result: true,
+    /**
+     * compare visuals between `mesh` and `result`
+     */
+    compare: true
+  }
+
   function freedrawing(canvas) {
     // eslint-disable-next-line
     var points = [{"x":14.940,"y":18.084},{"x":14.940,"y":20.076},{"x":14.940,"y":22.068},{"x":14.940,"y":25.056},{"x":14.940,"y":27.048},{"x":14.940,"y":29.040},{"x":14.940,"y":31.032},{"x":14.940,"y":33.024},{"x":14.940,"y":35.016},{"x":15.936,"y":36.012},{"x":17.928,"y":35.016},{"x":18.924,"y":34.020},{"x":19.920,"y":32.028},{"x":21.912,"y":31.032},{"x":22.908,"y":29.040},{"x":23.904,"y":27.048},{"x":24.900,"y":25.056},{"x":25.896,"y":24.060},{"x":26.892,"y":22.068},{"x":28.884,"y":23.064},{"x":29.880,"y":24.060},{"x":30.876,"y":25.056},{"x":32.869,"y":25.056},{"x":34.861,"y":25.056},{"x":36.853,"y":25.056},{"x":38.845,"y":25.056},{"x":40.837,"y":24.060},{"x":41.833,"y":23.064},{"x":42.829,"y":22.068},{"x":43.825,"y":21.072},{"x":44.821,"y":20.076},{"x":43.825,"y":24.060},{"x":43.825,"y":26.052},{"x":43.825,"y":30.036},{"x":43.825,"y":33.024},{"x":43.825,"y":35.016},{"x":43.825,"y":38.004},{"x":43.825,"y":40.992},{"x":43.825,"y":42.984},{"x":43.825,"y":44.976},{"x":44.821,"y":45.972},{"x":45.817,"y":46.968},{"x":47.809,"y":46.968},{"x":48.805,"y":45.972},{"x":50.797,"y":43.980},{"x":51.793,"y":41.988},{"x":52.789,"y":38.004},{"x":53.785,"y":37.008},{"x":53.785,"y":35.016},{"x":54.781,"y":33.024},{"x":54.781,"y":31.032},{"x":54.781,"y":33.024},{"x":56.773,"y":33.024},{"x":58.765,"y":34.020},{"x":60.757,"y":34.020},{"x":62.749,"y":34.020},{"x":63.745,"y":33.024}];
@@ -2067,7 +2090,6 @@
     build: freedrawing,
     golden: 'freedrawing1.png',
     percentage: 0.09,
-    compareGoldens: true,
     width: 100,
     height: 100,
     fabricClass: 'Canvas'
@@ -2085,7 +2107,6 @@
     build: noOffset,
     golden: 'freedrawing2.png',
     percentage: 0.09,
-    compareGoldens: true,
     width: 200,
     height: 250,
     fabricClass: 'Canvas'
@@ -2107,7 +2128,6 @@
     build: withShadow,
     golden: 'freedrawing3.png',
     percentage: 0.09,
-    compareGoldens: true,
     width: 200,
     height: 250,
     fabricClass: 'Canvas'
@@ -2131,7 +2151,10 @@
     percentage: 0.09,
     width: 200,
     height: 250,
-    fabricClass: 'Canvas'
+    fabricClass: 'Canvas',
+    targets: {
+      compare: false
+    }
   });
 
   function freedrawingWithDecimateToPoint(canvas) {
@@ -2151,7 +2174,10 @@
     percentage: 0.09,
     width: 50,
     height: 50,
-    fabricClass: 'Canvas'
+    fabricClass: 'Canvas',
+    targets: {
+      compare: false
+    }
   });
 
   function withDecimation(canvas) {
@@ -2172,14 +2198,19 @@
     percentage: 0.09,
     width: 200,
     height: 250,
-    fabricClass: 'Canvas'
+    fabricClass: 'Canvas',
+    targets: {
+      main: true,
+      compare: false
+    }
   });
 
   var visualTester = visualTestLoop(QUnit);
   var compareGoldens = compareGoldensTest(QUnit);
   tests[0].newModule = 'Free Drawing';
   tests.forEach(function (test) {
-    visualTester(Object.assign({}, test, {
+    var options = Object.assign({}, freeDrawingTestDefaults, test.targets);
+    options.top && visualTester(Object.assign({}, test, {
       test: test.test + ' (top context)',
       golden: 'top_ctx_' + test.golden,
       code: function (canvas, callback) {
@@ -2187,8 +2218,16 @@
         callback(canvas.upperCanvasEl);
       }
     }));
-    //  render top cotext over main context and compare against visuals after mouseup
-    visualTester(Object.assign({}, test, {
+    options.main && visualTester(Object.assign({}, test, {
+      test: test.test + ' (main context)',
+      golden: 'main_ctx_' + test.golden,
+      code: function (canvas, callback) {
+        test.build(canvas);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+      }
+    }));
+    options.mesh && visualTester(Object.assign({}, test, {
       test: test.test + ' (context mesh)',
       golden: 'mesh_' + test.golden,
       code: function (canvas, callback) {
@@ -2198,7 +2237,7 @@
         callback(canvas.lowerCanvasEl);
       }
     }));
-    visualTester(Object.assign({}, test, {
+    options.result && visualTester(Object.assign({}, test, {
       test: test.test + ' (result)',
       code: function (canvas, callback) {
         test.build(canvas);
@@ -2207,6 +2246,6 @@
         callback(canvas.lowerCanvasEl);
       }
     }));
-    /*test.compareGoldens &&*/ compareGoldens(test.test + ' (mesh <> result)', test.golden, 'mesh_' + test.golden, test.percentage);
+    options.compare && compareGoldens(test.test + ' (mesh <> result)', test.golden, 'mesh_' + test.golden, test.percentage);
   });
 })();
