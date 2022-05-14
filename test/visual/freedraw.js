@@ -2207,6 +2207,6 @@
         callback(canvas.lowerCanvasEl);
       }
     }));
-    /*test.compareGoldens &&*/ compareGoldens(test.test + ' (golden comparison)', test.golden, 'mesh_' + test.golden, test.percentage);
+    /*test.compareGoldens &&*/ compareGoldens(test.test + ' (mesh <> result)', test.golden, 'mesh_' + test.golden, test.percentage);
   });
 })();
