@@ -27,12 +27,14 @@
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
   fabric.Object.prototype.objectCaching = true;
-  var visualTestLoop;
+  var visualTestLoop, compareGoldensTest;
   if (fabric.isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
+    compareGoldensTest = global.compareGoldensTest;
   }
   else {
     visualTestLoop = window.visualTestLoop;
+    compareGoldensTest = window.compareGoldensTest;
   }
   function setBrush(canvas, brush) {
     canvas.isDrawingMode = true;
@@ -2065,6 +2067,7 @@
     build: freedrawing,
     golden: 'freedrawing1.png',
     percentage: 0.09,
+    compareGoldens: true,
     width: 100,
     height: 100,
     fabricClass: 'Canvas'
@@ -2082,6 +2085,7 @@
     build: noOffset,
     golden: 'freedrawing2.png',
     percentage: 0.09,
+    compareGoldens: true,
     width: 200,
     height: 250,
     fabricClass: 'Canvas'
@@ -2103,6 +2107,7 @@
     build: withShadow,
     golden: 'freedrawing3.png',
     percentage: 0.09,
+    compareGoldens: true,
     width: 200,
     height: 250,
     fabricClass: 'Canvas'
@@ -2171,6 +2176,7 @@
   });
 
   var visualTester = visualTestLoop(QUnit);
+  var compareGoldens = compareGoldensTest(QUnit);
   tests[0].newModule = 'Free Drawing';
   tests.forEach(function (test) {
     visualTester(Object.assign({}, test, {
@@ -2184,6 +2190,7 @@
     //  render top cotext over main context and compare against visuals after mouseup
     visualTester(Object.assign({}, test, {
       test: test.test + ' (context mesh)',
+      golden: 'mesh_' + test.golden,
       code: function (canvas, callback) {
         test.build(canvas);
         canvas.renderAll();
@@ -2200,5 +2207,6 @@
         callback(canvas.lowerCanvasEl);
       }
     }));
+    /*test.compareGoldens &&*/ compareGoldens(test.test + ' (golden comparison)', test.golden, 'mesh_' + test.golden, test.percentage);
   });
 })();
