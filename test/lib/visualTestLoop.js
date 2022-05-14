@@ -159,7 +159,7 @@
             var isOK = differentPixels < okDiff;
             assert.ok(
               isOK,
-              testName + ' has too many different pixels ' + differentPixels + '(' + okDiff + ') representing ' + percDiff + '%'
+              testName + ' [' + golden + '] has too many different pixels ' + differentPixels + ' (>' + okDiff + ') representing ' + Math.round(percDiff) + '%' + ' (>' + percentage*100 + '%)'
             );
             if (!isOK) {
               var stringa = imageDataToChalk(output);
