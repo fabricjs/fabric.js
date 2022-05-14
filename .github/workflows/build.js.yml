@@ -36,7 +36,7 @@ jobs:
       with:
         node-version: 16.x
     - run: npm ci
-    - run: npm run build:fast
+    - run: npm run build -- -f -x gestures,accessors
     - run: npm run test:coverage && npm run test:visual:coverage
     - uses: ChristiaanScheermeijer/jest-reporter-action@v0.4.0
       with:
