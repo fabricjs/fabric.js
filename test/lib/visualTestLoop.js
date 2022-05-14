@@ -195,24 +195,30 @@
 
   exports.compareVisuals = compareVisuals;
   
-  exports.compareGoldens = function (assert, a, b, allowedPercentageDiff) {
-    var done = assert.async();
-    return Promise.all([
-      new Promise(resolve => getImage(a, null, resolve)),
-      new Promise(resolve => getImage(b, null, resolve))
-    ]).then((a, b) => {
-      return compareVisuals(a, b, allowedPercentageDiff);
-    }).then((result) => {
-      assert.ok(
-        result.ok,
-        `${a} <> ${b} have too many different pixels ` +
-        result.diff.pixels + ' (>' + result.stats.allowedDiff + ') representing ' +
-        result.diff.percent + '%' + ' (>' + percentage * 100 + '%)'
-      );
-      !result.ok && result.diff.log();
-      done();
-    });
-  };
+  exports.compareGoldensTest = function (QUnit) {
+    return function compareGoldens(testName, a, b, allowedPercentageDiff) {
+      QUnit.test(testName, function (assert) {
+        var done = assert.async();
+        var aPath = getGoldeName(a);
+        var bPath = getGoldeName(b);
+        Promise.all([
+          new Promise(resolve => getImage(aPath, null, resolve)),
+          new Promise(resolve => getImage(bPath, null, resolve))
+        ]).then((images) => {
+          return compareVisuals(images[0], images[1], allowedPercentageDiff);
+        }).then((result) => {
+          assert.ok(
+            result.ok,
+            `${a} <> ${b} have too many different pixels ` +
+            result.diff.pixels + ' (>' + result.stats.allowedDiff + ') representing ' +
+            result.diff.percent + '%' + ' (>' + allowedPercentageDiff * 100 + '%)'
+          );
+          !result.ok && result.diff.log();
+          done();
+        });
+      });
+    }
+  }
 
   exports.visualTestLoop = function(QUnit) {
     return function testCallback(testObj) {
