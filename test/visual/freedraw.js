@@ -2182,20 +2182,19 @@
       }
     }));
     visualTester(Object.assign({}, test, {
-      code: function (canvas, callback) {
-        test.build(canvas);
-        fireMouseUp(canvas.freeDrawingBrush);
-        canvas.renderAll();
-        callback(canvas.lowerCanvasEl);
-      }
-    }));
-    //  render top cotext over main context and compare against visuals after mouseup
-    visualTester(Object.assign({}, test, {
       test: test.test + ' (context mesh)',
       code: function (canvas, callback) {
         test.build(canvas);
         canvas.renderAll();
         canvas.contextContainer.drawImage(canvas.upperCanvasEl, 0, 0);
+        callback(canvas.lowerCanvasEl);
+      }
+    }));
+    visualTester(Object.assign({}, test, {
+      code: function (canvas, callback) {
+        test.build(canvas);
+        fireMouseUp(canvas.freeDrawingBrush);
+        canvas.renderAll();
         callback(canvas.lowerCanvasEl);
       }
     }));
