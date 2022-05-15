@@ -2246,6 +2246,6 @@
         callback(canvas.lowerCanvasEl);
       }
     }));
-    //options.compare && compareGoldens(`${test.test} (mesh <> result)`, test.golden, `mesh_${test.golden}`, test.percentage);
+    options.compare && compareGoldens(`${test.test} (mesh <> result)`, test.golden, `mesh_${test.golden}`, test.percentage);
   });
 })();
