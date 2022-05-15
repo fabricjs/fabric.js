@@ -156,10 +156,11 @@
             var differentPixels = _pixelMatch(imageDataCanvas, imageDataGolden, output.data, width, height, pixelmatchOptions);
             var percDiff = differentPixels / totalPixels * 100;
             var okDiff = totalPixels * percentage;
-            var isOK = differentPixels < okDiff;
+            var isOK = differentPixels <= okDiff;
             assert.ok(
               isOK,
-              testName + ' has too many different pixels ' + differentPixels + '(' + okDiff + ') representing ' + percDiff + '%'
+              `${testName} [${golden}] has ${differentPixels} (>${okDiff}) different pixels
+              representing ${percDiff}% (>${percentage * 100}%)`
             );
             if (!isOK) {
               var stringa = imageDataToChalk(output);
