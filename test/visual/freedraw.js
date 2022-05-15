@@ -2211,16 +2211,16 @@
   tests.forEach(function (test) {
     var options = Object.assign({}, freeDrawingTestDefaults, test.targets);
     options.top && visualTester(Object.assign({}, test, {
-      test: test.test + ' (top context)',
-      golden: 'top_ctx_' + test.golden,
+      test: `${test.test} (top context)`,
+      golden: `top_ctx_${test.golden}`,
       code: function (canvas, callback) {
         test.build(canvas);
         callback(canvas.upperCanvasEl);
       }
     }));
     options.main && visualTester(Object.assign({}, test, {
-      test: test.test + ' (main context)',
-      golden: 'main_ctx_' + test.golden,
+      test: `${test.test} (main context)`,
+      golden: `main_ctx_${test.golden}`,
       code: function (canvas, callback) {
         test.build(canvas);
         canvas.renderAll();
@@ -2228,8 +2228,8 @@
       }
     }));
     options.mesh && visualTester(Object.assign({}, test, {
-      test: test.test + ' (context mesh)',
-      golden: 'mesh_' + test.golden,
+      test: `${test.test} (context mesh)`,
+      golden: `mesh_${test.golden}`,
       code: function (canvas, callback) {
         test.build(canvas);
         canvas.renderAll();
@@ -2238,7 +2238,7 @@
       }
     }));
     options.result && visualTester(Object.assign({}, test, {
-      test: test.test + ' (result)',
+      test: `${test.test} (result)`,
       code: function (canvas, callback) {
         test.build(canvas);
         fireMouseUp(canvas.freeDrawingBrush);
@@ -2246,6 +2246,6 @@
         callback(canvas.lowerCanvasEl);
       }
     }));
-    options.compare && compareGoldens(test.test + ' (mesh <> result)', test.golden, 'mesh_' + test.golden, test.percentage);
+    options.compare && compareGoldens(`${test.test} (mesh <> result)`, test.golden, `mesh_${test.golden}`, test.percentage);
   });
 })();
