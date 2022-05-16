@@ -1279,7 +1279,7 @@
       // needed to setup a couple of variables
       // path canvas gets overridden with this one.
       // TODO find a better solution?
-      clipPath.canvas = this.canvas;
+      clipPath._set('canvas', this.canvas);
       clipPath.shouldCache();
       clipPath._transformDone = true;
       clipPath.renderCache(Object.assign(renderingContext || {}, { forClipping: true }));
