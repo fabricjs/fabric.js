@@ -16,10 +16,15 @@
 [![Downloads per month](https://img.shields.io/npm/dm/fabric.svg)](https://www.npmjs.org/package/fabric)
 [![Bower version](https://badge.fury.io/bo/fabric.svg)](http://badge.fury.io/bo/fabric)
 
-<br/>
-
-
-Using Fabric.js, you can create and populate objects on canvas; objects like simple geometrical shapes — rectangles, circles, ellipses, polygons, or more complex shapes consisting of hundreds or thousands of simple paths. You can then scale, move, and rotate these objects with the mouse; modify their properties — color, transparency, z-index, etc. You can also manipulate these objects altogether — grouping them with a simple mouse selection. Fabric.js will also allow you to convert an SVG image into JavaScript data that can be used for putting it onto the `<canvas>` element.
+## Features 
+- drag-n-drop objects on canvas,
+- scale, move, rotate and group objects with mouse,
+- use predefined shapes or create custom objects,
+- works super-fast with many objects,
+- supports JPG, PNG, JSON and SVG formats,
+- ready-to-use image filters,
+- create animations,
+- and much more!
 
 <br />
 
@@ -34,13 +39,11 @@ Using Fabric.js, you can create and populate objects on canvas; objects like sim
 <a href="http://fabricjs.com/benchmarks/">Benchmarks</a>
 <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
 <a href="https://github.com/fabricjs/fabric.js/wiki">Contribution</a>
-<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-<a href="#sponsor">Sponsor authors</a>
 <br />
 
 <hr />
 
-<h3 id="npm-install">Quick Start</h3>
+## Quick Start
 
 ```
 $ npm install fabric --save
@@ -62,9 +65,9 @@ NOTE: If you are using Fabric.js in a Node.js script, you will depend on [node-c
 
 NOTE: es6 imports won't work in browser or with bundlers which expect es6 module like vite. Use commonjs syntax instead.
 
-### Usage
+## Usage
 
-#### Plain HTML
+### Plain HTML
 
 ```html
 <canvas id="canvas" width="300" height="300"></canvas>
@@ -85,7 +88,7 @@ NOTE: es6 imports won't work in browser or with bundlers which expect es6 module
 </script>
 ```
 
-#### ReactJS
+### ReactJS
 
 ```tsx
 import React, {useEffect, useRef} from 'react'
@@ -94,31 +97,25 @@ import {fabric} from 'fabric'
 const FabricJSCanvas = () => {
   const canvasEl = useRef(null)
   useEffect(() => {
-    const canvas = new fabric.Canvas(canvasEl.current);
-    const rect = new fabric.Rect({
-            top : 100,
-            left : 100,
-            width : 60,
-            height : 70,
-            fill : 'red'
-    });
-    
-    canvas.add(rect);
+    const options = { ... };
+    const canvas = new fabric.Canvas(canvasEl.current, options);
+    // make the fabric.Canvas instance available to your app
+    updateCanvasContext(canvas);
     return () => {
+      updateCanvasContext(null);
       canvas.dispose()
     }
   }, []);
   
   return (<canvas width="300" height="300" ref={canvasEl}/>)
 });
-
 export default FabricJSCanvas;
 ```
 
 NOTE: Fabric.js requires a `window` object.
 
 
-<h3 id="fabric-building">Building</h3>
+## Building
 
 1. Build distribution file  **[~77K minified, ~20K gzipped]**
 
@@ -173,21 +170,15 @@ NOTE: Fabric.js requires a `window` object.
 
         $ npm run lint && npm run lint_tests
 
-<h3 id="fabric-building">Testing</h3>
+## Testing
 
-#### 1. Install NPM packages
+### 1. Install NPM packages
 
 ```
 $ npm install
 ```
 
-#### 2. Install testem
-
-```
-$ npm install -g testem
-```
-
-#### 3. Run tests Chrome and Node (by default):
+### 2. Run tests Chrome and Node (by default):
 
 ```
 $ testem
@@ -195,7 +186,7 @@ $ testem
 
 See testem docs for more info: https://github.com/testem/testem
 
-### Optional modules
+## Optional modules
 
 These are the optional modules that could be specified for inclusion, when building custom version of fabric:
 
@@ -225,7 +216,7 @@ For example:
     node build.js modules=ALL exclude=json no-strict no-svg-export
 
 
-### Goals
+## Goals
 
 - Unit tested (1150+ tests at the moment, 79%+ coverage)
 - Modular (~60 small ["classes", modules, mixins](http://fabricjs.com/docs/))
@@ -237,7 +228,7 @@ For example:
 - Runs on a server under [Node.js](http://nodejs.org/) (active stable releases and latest of current) (see [Node.js limitations](https://github.com/kangax/fabric.js/wiki/Fabric-limitations-in-node.js))
 - Follows [Semantic Versioning](http://semver.org/)
 
-### Supported browsers
+## Supported browsers
 
 - Firefox 4+
 - Safari 5+
@@ -249,12 +240,10 @@ For example:
 You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the browser.
 
 
-### More resources
+## More resources
 
 - [Fabric.js on Twitter](https://twitter.com/fabricjs)
-- [Fabric.js on Google Groups](https://groups.google.com/group/fabricjs)
 - [Fabric.js on CodeTriage](https://www.codetriage.com/kangax/fabric.js)
-- [Fabric.js on Bountysource](https://www.bountysource.com/trackers/23217-fabric-js)
 - [Fabric.js on Stackoverflow](https://stackoverflow.com/questions/tagged/fabricjs)
 - [Fabric.js on jsfiddle](https://jsfiddle.net/user/fabricjs/fiddles/)
 - [Fabric.js on Codepen.io](https://codepen.io/tag/fabricjs)
@@ -262,7 +251,7 @@ You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the 
 - [Presentation from Falsy Values](http://www.slideshare.net/kangax/fabric-falsy-values-8067834)
 
 
-### Credits
+## Credits
 
 - [@kangax](https://twitter.com/kangax)
 - [Andrea Bogazzi](https://twitter.com/AndreaBogazzi) for help with bugs, new features, documentation, GitHub issues
@@ -274,14 +263,17 @@ You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the 
 - [And all the other GitHub contributors](https://github.com/kangax/fabric.js/graphs/contributors)
 
 
-<h3 id="sponsor">Sponsor authors</h3>
+## Sponsor authors
 
 - https://flattr.com/@kangax
 - https://github.com/sponsors/asturur
 - https://www.patreon.com/fabricJS
 
+## History
 
-### MIT License
+Fabric.js started as a foundation for design editor on [printio.ru](http://printio.ru) — interactive online store with ability to create your own designs. The idea was to create [Javascript-based editor](http://printio.ru/ringer_man_tees/new), which would make it easy to manipulate vector shapes and images on T-Shirts. Since performance was one of the most critical requirements, we chose canvas over SVG. While SVG is excellent with static shapes, it's not as performant as canvas when it comes to dynamic manipulation of objects (movement, scaling, rotation, etc.). Fabric.js was heavily inspired by [Ernest Delgado's canvas experiment](http://www.ernestdelgado.com/public-tests/canvasphoto/demo/canvas.html). In fact, code from Ernest's experiment was the foundation of an entire framework. Later, Fabric.js grew into a collection of distinct object types and got an SVG-to-canvas parser.
+
+## MIT License
 
 Copyright (c) 2008-2015 Printio (Juriy Zaytsev, Maxim Chernyak)
 
