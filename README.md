@@ -58,7 +58,7 @@ Or you can use this instead if your build pipeline supports ES6 imports:
 import { fabric } from "fabric";
 ```
 
-NOTE: If you are using Fabric.js in a Node.js script, you will depend from [node-canvas](https://github.com/Automattic/node-canvas).`node-canvas` is an HTML canvas replacement that works on top of native libraries. Please [follow the instructions](https://github.com/Automattic/node-canvas#compiling) to get it up and running.
+NOTE: If you are using Fabric.js in a Node.js script, you will depend on [node-canvas](https://github.com/Automattic/node-canvas). `node-canvas` is an HTML canvas replacement that works on top of native libraries. Please [follow the instructions](https://github.com/Automattic/node-canvas#compiling) to get it up and running.
 
 NOTE: es6 imports won't work in browser or with bundlers which expect es6 module like vite. Use commonjs syntax instead.
 
