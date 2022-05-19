@@ -2216,7 +2216,8 @@
       code: function (canvas, callback) {
         test.build(canvas);
         callback(canvas.upperCanvasEl);
-      }
+      },
+      disabled: fabric.isLikelyNode
     }));
     options.main && visualTester(Object.assign({}, test, {
       test: `${test.test} (main context)`,
@@ -2225,7 +2226,8 @@
         test.build(canvas);
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
-      }
+      },
+      disabled: fabric.isLikelyNode
     }));
     options.mesh && visualTester(Object.assign({}, test, {
       test: `${test.test} (context mesh)`,
@@ -2235,7 +2237,8 @@
         canvas.renderAll();
         canvas.contextContainer.drawImage(canvas.upperCanvasEl, 0, 0);
         callback(canvas.lowerCanvasEl);
-      }
+      },
+      disabled: fabric.isLikelyNode
     }));
     options.result && visualTester(Object.assign({}, test, {
       test: `${test.test} (result)`,
