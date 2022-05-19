@@ -23,8 +23,8 @@
       fabricCopy.getContext('2d').drawImage(fabricCanvas, 0, 0);
 
       var data = {
-        actual: goldenCanvasRef,
-        expected: fabricCopy,
+        actual: fabricCopy,
+        expected: goldenCanvasRef,
         diff
       };
 
