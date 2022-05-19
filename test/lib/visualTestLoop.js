@@ -150,7 +150,8 @@
               enabled: true,
               golden: canvas,
               fabric: canvas2,
-              diff: output
+              diff: output,
+              goldenName: golden
             });
             var imageDataGolden = ctx.getImageData(0, 0, width, height).data;
             var differentPixels = _pixelMatch(imageDataCanvas, imageDataGolden, output.data, width, height, pixelmatchOptions);
