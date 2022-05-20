@@ -1243,6 +1243,10 @@
         if (obj.onDeselect({ e: e, object: object })) {
           return false;
         }
+        if (this._currentTransform && this._currentTransform.target === obj) {
+          this._finalizeCurrentTransform(e);
+          this._currentTransform = null;
+        }
         this._activeObject = null;
       }
       return true;
