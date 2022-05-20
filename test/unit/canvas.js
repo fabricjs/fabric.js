@@ -1977,7 +1977,20 @@
     canvas.setActiveObject(canvas.item(0));
 
     canvas._discardActiveObject();
-    assert.ok(!canvas.item(0).active);
+    assert.equal(canvas.getActiveObject(), null);
+  });
+
+  QUnit.test('discard moving active object', function (assert) {
+    var e = { clientX: 5, clientY: 5, which: 1, target: canvas.upperCanvasEl };
+    canvas.add(makeRect());
+    // we want to drag the object around
+    canvas.item(0).hasControls = false;
+    canvas.setActiveObject(canvas.item(0));
+    canvas._setupCurrentTransform(e, canvas.item(0), true);
+    assert.ok(canvas._currentTransform, 'transform should be set');
+    canvas._discardActiveObject();
+    assert.ok(!canvas._currentTransform, 'transform should be cleared');
+    assert.ok(!canvas.item(0).isMoving, 'moving flag should have been negated');
     assert.equal(canvas.getActiveObject(), null);
   });
 
@@ -2003,7 +2016,6 @@
     });
 
     canvas.discardActiveObject();
-    assert.ok(!canvas.item(0).active);
     assert.equal(canvas.getActiveObject(), null);
     assert.equal(canvas.getActiveObject(), null);
 
