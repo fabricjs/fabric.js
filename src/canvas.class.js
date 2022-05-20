@@ -1246,6 +1246,7 @@
         if (this._currentTransform && this._currentTransform.target === obj) {
           this._finalizeCurrentTransform(e);
           this._currentTransform = null;
+          obj.isMoving = false;
         }
         this._activeObject = null;
       }
