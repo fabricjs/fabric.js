@@ -260,14 +260,6 @@
     },
 
     /**
-     * @private
-     * @override consider using {@link fabric.Layer} for `fill-parent` layout
-     */
-    _onParentResize: function () {
-      //  noop
-    },
-
-    /**
      * Checks if object can enter group and logs relevant warnings
      * @private
      * @param {fabric.Object} object
