@@ -106,6 +106,35 @@
       parent && this.__onAdded({ target: parent });
     },
 
+    drawObject: function (ctx) {
+      ctx.save();
+      this.perfOnly && ctx.translate(-this.width / 2, -this.height / 2);
+      this.callSuper('drawObject', ctx);
+      ctx.restore();
+    },
+
+    setCoords: function () {
+      
+    },
+
+    _adjustObjectPosition: function () {
+
+    },
+
+    enterGroup: function () {
+      
+    },
+
+    exitGroup: function () {
+
+    },
+
+    drawObject: function (ctx) {
+      for (var i = 0, len = this._objects.length; i < len; i++) {
+        this._objects[i].render(ctx);
+      }
+    },
+
     /**
      * @override we want instance to fill parent so we disregard transformations
      * @param {CanvasRenderingContext2D} ctx Context
