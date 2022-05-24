@@ -1055,7 +1055,7 @@
       if (this.isNotVisible()) {
         return;
       }
-      if (this.canvas && this.canvas.skipOffscreen && !this.group && !this.isOnScreen()) {
+      if (this.canvas && this.canvas.skipOffscreen && !this.group && !this.isOnScreen() && !this.isShadowOnScreen()) {
         return;
       }
       ctx.save();
