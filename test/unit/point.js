@@ -18,7 +18,7 @@
     var x = 5, y = 6;
     point = new fabric.Point(x, y);
     assert.equal(point.x, x, 'constructor pass x value');
-    assert.equal(point.y, y, 'constructor pass y value');   
+    assert.equal(point.y, y, 'constructor pass y value');
   });
 
   QUnit.test('point add', function(assert) {
