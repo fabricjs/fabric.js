@@ -101,6 +101,9 @@
           value = this.minWidth;
         }
       }
+      if (key === 'maxWidth' && this.minWidth > value) {
+        value = this.minWidth;
+      }
       this.callSuper('_set', key, value);
       if ((key === 'maxWidth' && this.width > value) || (key === 'minWidth' && this.width < value)) {
         this._set('width', value);
