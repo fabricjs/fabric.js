@@ -37,6 +37,17 @@
       assert.equal(target.left, 0);
       assert.equal(target.top, 0);
     });
+    QUnit.test('changeWidth does not change the width of target\'s other side', function (assert) {
+      assert.equal(transform.target.width, 100);
+      var changed = fabric.controlsUtils.changeWidth(eventData, Object.assign({}, transform, { corner: 'ml' }), 200, 300);
+      assert.ok(!changed, 'control should not have changed target');
+      assert.equal(transform.target.width, 100);
+      changed = fabric.controlsUtils.changeWidth(eventData, Object.assign({}, transform, { corner: 'mr' }), -200, 300);
+      assert.ok(!changed, 'control should not have changed target');
+      assert.equal(transform.target.width, 100);
+      assert.equal(transform.target.left, 0);
+      assert.equal(transform.target.top, 0);
+    });
     QUnit.test('changeWidth changes the width with centered transform', function(assert) {
       transform.originX = 'center';
       transform.originY = 'center';
