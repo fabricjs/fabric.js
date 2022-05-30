@@ -688,17 +688,18 @@
   function changeWidth(eventData, transform, x, y) {
     var localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
     //  make sure the control changes width ONLY from it's side of target
-    if ((transform.corner === 'ml' && localPoint.x > 0) || (transform.corner === 'mr' && localPoint.x < 0)) {
-      return false;
-    }
-    var target = transform.target,
+    console.log(transform.corner)
+    if ((transform.corner === 'ml' && localPoint.x < 0) || (transform.corner === 'mr' && localPoint.x > 0)) {
+      var target = transform.target,
         strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
         multiplier = isTransformCentered(transform) ? 2 : 1,
         oldWidth = target.width,
         newWidth = Math.ceil(Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding);
-    target.set('width', Math.max(newWidth, 0));
-    //  check against actual target width in case `newWidth` was rejected
-    return oldWidth !== target.width;
+      target.set('width', Math.max(newWidth, 0));
+      //  check against actual target width in case `newWidth` was rejected
+      return oldWidth !== target.width;
+    }
+    return false;
   }
 
   /**
