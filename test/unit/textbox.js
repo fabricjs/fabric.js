@@ -51,6 +51,7 @@
     charSpacing: 0,
     styles: { },
     minWidth: 20,
+    maxWidth: undefined,
     splitByGrapheme: false,
     strokeUniform: false,
     path: null,
