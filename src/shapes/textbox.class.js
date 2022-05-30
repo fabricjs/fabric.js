@@ -493,7 +493,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return this.callSuper('toObject', ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude));
+      return this.callSuper('toObject', ['minWidth', 'maxWidth', 'splitByGrapheme'].concat(propertiesToInclude));
     }
   });
 
