@@ -32,6 +32,14 @@
     minWidth: 20,
 
     /**
+     * Maximum width of textbox, in pixels.
+     * Use the `resizing` event to change this value on the fly
+     * @type {Number | undefined}
+     * @default
+     */
+    maxWidth: undefined,
+
+    /**
      * Minimum calculated width of a textbox, in pixels.
      * fixed to 2 so that an empty textbox cannot go to 0
      * and is still selectable without text.
@@ -350,6 +358,9 @@
         return { word: word, width: width };
       }.bind(this));
       var maxWidth = Math.max(desiredWidth, largestWordWidth, this.dynamicMinWidth);
+      if (typeof this.maxWidth === 'number' && maxWidth > this.maxWidth) {
+        maxWidth = this.maxWidth;
+      }
       // layout words
       offset = 0;
       for (var i = 0; i < words.length; i++) {
