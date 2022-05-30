@@ -28,37 +28,28 @@
 
     /**
      * Invert also alpha.
-     * @type Boolean
+     * @param {Boolean} alpha
      * @default
      **/
     alpha: false,
 
-    fragmentSource: {
-      normal: 'precision highp float;\n' +
+    fragmentSource: 'precision highp float;\n' +
         'uniform sampler2D uTexture;\n' +
         'uniform int uInvert;\n' +
+        'uniform int uAlpha;\n' +
         'varying vec2 vTexCoord;\n' +
         'void main() {\n' +
           'vec4 color = texture2D(uTexture, vTexCoord);\n' +
           'if (uInvert == 1) {\n' +
-            'gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,color.a);\n' +
+            'if (uAlpha == 1) {\n' +
+              'gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,1.0 -color.a);\n' +
+            '} else {\n' +
+              'gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,color.a);\n' +
+            '}\n' +
           '} else {\n' +
             'gl_FragColor = color;\n' +
           '}\n' +
         '}',
-      alpha: 'precision highp float;\n' +
-        'uniform sampler2D uTexture;\n' +
-        'uniform int uInvert;\n' +
-        'varying vec2 vTexCoord;\n' +
-        'void main() {\n' +
-          'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-          'if (uInvert == 1) {\n' +
-            'gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,1.0 -color.a);\n' +
-          '} else {\n' +
-            'gl_FragColor = color;\n' +
-          '}\n' +
-        '}',
-    },
 
     /**
      * Filter invert. if false, does nothing
@@ -76,11 +67,9 @@
      * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
      */
     retrieveShader: function(options) {
-      var mode = this.alpha ? 'alpha' : 'normal';
-      var cacheKey = this.type + '_' + mode;
-      var shaderSource = this.fragmentSource[mode];
+      var cacheKey = this.type + '_' + (this.alpha ? 'alpha' : 'normal');
       if (!options.programCache.hasOwnProperty(cacheKey)) {
-        options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
+        options.programCache[cacheKey] = this.createProgram(options.context, this.fragmentSource);
       }
       return options.programCache[cacheKey];
     },
@@ -125,6 +114,7 @@
     getUniformLocations: function(gl, program) {
       return {
         uInvert: gl.getUniformLocation(program, 'uInvert'),
+        uAlpha: gl.getUniformLocation(program, 'uAlpha'),
       };
     },
 
@@ -136,6 +126,7 @@
      */
     sendUniformData: function(gl, uniformLocations) {
       gl.uniform1i(uniformLocations.uInvert, this.invert);
+      gl.uniform1i(uniformLocations.uAlpha, this.alpha);
     },
   });
 
