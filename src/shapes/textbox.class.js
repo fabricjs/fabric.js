@@ -104,8 +104,9 @@
       // wrap lines
       this._styleMap = this._generateStyleMap(this._splitText());
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
-      if (this.dynamicMinWidth > this.width) {
-        this._set('width', this.dynamicMinWidth);
+      var minWidth = this.getMinWidth();
+      if (minWidth > this.width) {
+        this._set('width', minWidth);
       }
       if (this.textAlign.indexOf('justify') !== -1) {
         // once text is measured we need to make space fatter to make justified text.
@@ -357,7 +358,7 @@
         offset += word.length + 1;
         return { word: word, width: width };
       }.bind(this));
-      var maxWidth = Math.max(desiredWidth, largestWordWidth, this.dynamicMinWidth);
+      var maxWidth = Math.max(desiredWidth, largestWordWidth, this.getMinWidth());
       if (typeof this.maxWidth === 'number' && maxWidth > this.maxWidth) {
         maxWidth = this.maxWidth;
       }
