@@ -74,7 +74,7 @@
   });
 
   QUnit.test('constructor with width too small', function(assert) {
-    var textbox = new fabric.Textbox('test', { width: 5, minWidth: 5 });
+    var textbox = new fabric.Textbox('test', { minWidth: 5, width: 5 });
     assert.equal(Math.round(textbox.width), 56, 'width is calculated by constructor');
   });
 
@@ -473,8 +473,8 @@
     }
     var textbox = new fabric.Textbox(text, {
       styles: { 0: styles },
+      minWidth: 5,
       width: 5,
-      minWidth: 5
     });
     assert.equal(typeof textbox._deleteStyleDeclaration, 'function', 'function exists');
     textbox._deleteStyleDeclaration(2, 2);
@@ -490,8 +490,8 @@
     }
     var textbox = new fabric.Textbox(text, {
       styles: { 0: styles },
+      minWidth: 5,
       width: 5,
-      minWidth: 5
     });
     assert.equal(typeof textbox._setStyleDeclaration, 'function', 'function exists');
     var newStyle = { fontSize: 10 };
