@@ -87,6 +87,27 @@
     splitByGrapheme: false,
 
     /**
+     * While editing handle differently
+     * @private
+     * @param {string} key
+     * @param {*} value
+     */
+    _set: function (key, value) {
+      if (key === 'width') {
+        if (typeof this.maxWidth === 'number' && this.maxWidth < value) {
+          value = this.maxWidth;
+        }
+        if (typeof this.minWidth === 'number' && this.minWidth > value) {
+          value = this.minWidth;
+        }
+      }
+      this.callSuper('_set', key, value);
+      if ((key === 'maxWidth' && this.width > value) || (key === 'minWidth' && this.width < value)) {
+        this._set('width', value);
+      }
+    },
+
+    /**
      * Unlike superclass's version of this function, Textbox does not update
      * its width.
      * @private
