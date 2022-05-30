@@ -690,10 +690,10 @@
     //  make sure the control changes width ONLY from it's side of target
     if ((transform.originX === 'right' && localPoint.x < 0) || (transform.originX === 'left' && localPoint.x > 0)) {
       var target = transform.target,
-        strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
-        multiplier = isTransformCentered(transform) ? 2 : 1,
-        oldWidth = target.width,
-        newWidth = Math.ceil(Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding);
+          strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
+          multiplier = isTransformCentered(transform) ? 2 : 1,
+          oldWidth = target.width,
+          newWidth = Math.ceil(Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding);
       target.set('width', Math.max(newWidth, 0));
       //  check against actual target width in case `newWidth` was rejected
       return oldWidth !== target.width;
