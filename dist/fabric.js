@@ -3317,7 +3317,7 @@ fabric.Collection = {
         var normalizedProperty = (property === 'float' || property === 'cssFloat')
           ? (typeof elementStyle.styleFloat === 'undefined' ? 'cssFloat' : 'styleFloat')
           : property;
-        elementStyle[normalizedProperty] = styles[property];
+        elementStyle.setProperty(normalizedProperty, styles[property]);
       }
     }
     return element;
@@ -5926,8 +5926,8 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
    * @return {fabric.Point} thisArg
    */
   function Point(x, y) {
-    this.x = x;
-    this.y = y;
+    this.x = x || 0;
+    this.y = y || 0;
   }
 
   Point.prototype = /** @lends fabric.Point.prototype */ {
@@ -7754,14 +7754,21 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
    * @return {Boolean} true if some change happened
    */
   function changeWidth(eventData, transform, x, y) {
-    var target = transform.target, localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
-        strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
-        multiplier = isTransformCentered(transform) ? 2 : 1,
-        oldWidth = target.width,
-        newWidth = Math.ceil(Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding);
-    target.set('width', Math.max(newWidth, 0));
-    //  check against actual target width in case `newWidth` was rejected
-    return oldWidth !== target.width;
+    var localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
+    //  make sure the control changes width ONLY from it's side of target
+    if (transform.originX === 'center' ||
+      (transform.originX === 'right' && localPoint.x < 0) ||
+      (transform.originX === 'left' && localPoint.x > 0)) {
+      var target = transform.target,
+          strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
+          multiplier = isTransformCentered(transform) ? 2 : 1,
+          oldWidth = target.width,
+          newWidth = Math.ceil(Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding);
+      target.set('width', Math.max(newWidth, 0));
+      //  check against actual target width in case `newWidth` was rejected
+      return oldWidth !== target.width;
+    }
+    return false;
   }
 
   /**
@@ -32765,6 +32772,14 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     minWidth: 20,
 
     /**
+     * Maximum width of textbox, in pixels.
+     * Use the `resizing` event to change this value on the fly
+     * @type {Number | undefined}
+     * @default
+     */
+    maxWidth: undefined,
+
+    /**
      * Minimum calculated width of a textbox, in pixels.
      * fixed to 2 so that an empty textbox cannot go to 0
      * and is still selectable without text.
@@ -32812,6 +32827,33 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     splitByGrapheme: false,
 
     /**
+     * While editing handle differently
+     * @private
+     * @param {string} key
+     * @param {*} value
+     */
+    _set: function (key, value) {
+      if (key === 'width') {
+        if (typeof this.maxWidth === 'number' && this.maxWidth < value) {
+          value = this.maxWidth;
+        }
+        if (typeof this.minWidth === 'number' && this.minWidth > value) {
+          value = this.minWidth;
+        }
+      }
+      if (key === 'maxWidth' && this.minWidth > value) {
+        value = this.minWidth;
+      }
+      this.callSuper('_set', key, value);
+      if (key === 'minWidth' && this.maxWidth < value) {
+        this._set('maxWidth', value);
+      }
+      if ((key === 'maxWidth' && this.width > value) || (key === 'minWidth' && this.width < value)) {
+        this._set('width', value);
+      }
+    },
+
+    /**
      * Unlike superclass's version of this function, Textbox does not update
      * its width.
      * @private
@@ -32829,8 +32871,9 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       // wrap lines
       this._styleMap = this._generateStyleMap(this._splitText());
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
-      if (this.dynamicMinWidth > this.width) {
-        this._set('width', this.dynamicMinWidth);
+      var minWidth = this.getMinWidth();
+      if (minWidth > this.width) {
+        this._set('width', minWidth);
       }
       if (this.textAlign.indexOf('justify') !== -1) {
         // once text is measured we need to make space fatter to make justified text.
@@ -33082,7 +33125,10 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         offset += word.length + 1;
         return { word: word, width: width };
       }.bind(this));
-      var maxWidth = Math.max(desiredWidth, largestWordWidth, this.dynamicMinWidth);
+      var maxWidth = Math.max(desiredWidth, largestWordWidth, this.getMinWidth());
+      if (typeof this.maxWidth === 'number' && maxWidth > this.maxWidth) {
+        maxWidth = this.maxWidth;
+      }
       // layout words
       offset = 0;
       for (var i = 0; i < words.length; i++) {
@@ -33193,7 +33239,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return this.callSuper('toObject', ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude));
+      return this.callSuper('toObject', ['minWidth', 'maxWidth', 'splitByGrapheme'].concat(propertiesToInclude));
     }
   });
 
