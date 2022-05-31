@@ -1208,8 +1208,6 @@
     drawObject: function(ctx, forClipping) {
       var originalFill = this.fill, originalStroke = this.stroke;
       if (forClipping) {
-        this.fill = 'black';
-        this.stroke = '';
         this._setClippingProperties(ctx);
       }
       else {
