@@ -32,6 +32,14 @@
     minWidth: 20,
 
     /**
+     * Maximum width of textbox, in pixels.
+     * Use the `resizing` event to change this value on the fly
+     * @type {Number | undefined}
+     * @default
+     */
+    maxWidth: undefined,
+
+    /**
      * Minimum calculated width of a textbox, in pixels.
      * fixed to 2 so that an empty textbox cannot go to 0
      * and is still selectable without text.
@@ -79,6 +87,33 @@
     splitByGrapheme: false,
 
     /**
+     * While editing handle differently
+     * @private
+     * @param {string} key
+     * @param {*} value
+     */
+    _set: function (key, value) {
+      if (key === 'width') {
+        if (typeof this.maxWidth === 'number' && this.maxWidth < value) {
+          value = this.maxWidth;
+        }
+        if (typeof this.minWidth === 'number' && this.minWidth > value) {
+          value = this.minWidth;
+        }
+      }
+      if (key === 'maxWidth' && this.minWidth > value) {
+        value = this.minWidth;
+      }
+      this.callSuper('_set', key, value);
+      if (key === 'minWidth' && this.maxWidth < value) {
+        this._set('maxWidth', value);
+      }
+      if ((key === 'maxWidth' && this.width > value) || (key === 'minWidth' && this.width < value)) {
+        this._set('width', value);
+      }
+    },
+
+    /**
      * Unlike superclass's version of this function, Textbox does not update
      * its width.
      * @private
@@ -96,8 +131,9 @@
       // wrap lines
       this._styleMap = this._generateStyleMap(this._splitText());
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
-      if (this.dynamicMinWidth > this.width) {
-        this._set('width', this.dynamicMinWidth);
+      var minWidth = this.getMinWidth();
+      if (minWidth > this.width) {
+        this._set('width', minWidth);
       }
       if (this.textAlign.indexOf('justify') !== -1) {
         // once text is measured we need to make space fatter to make justified text.
@@ -349,7 +385,10 @@
         offset += word.length + 1;
         return { word: word, width: width };
       }.bind(this));
-      var maxWidth = Math.max(desiredWidth, largestWordWidth, this.dynamicMinWidth);
+      var maxWidth = Math.max(desiredWidth, largestWordWidth, this.getMinWidth());
+      if (typeof this.maxWidth === 'number' && maxWidth > this.maxWidth) {
+        maxWidth = this.maxWidth;
+      }
       // layout words
       offset = 0;
       for (var i = 0; i < words.length; i++) {
@@ -460,7 +499,7 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return this.callSuper('toObject', ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude));
+      return this.callSuper('toObject', ['minWidth', 'maxWidth', 'splitByGrapheme'].concat(propertiesToInclude));
     }
   });
 
