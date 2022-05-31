@@ -30,7 +30,7 @@
   });
 
   function clipping01(canvas, callback) {
-    var clipPath = new fabric.Circle({ radius: 50, strokeWidth: 40, top: -50, left: -50, fill: 'transparent' });
+    var clipPath = new fabric.Circle({ radius: 50, strokeWidth: 40, top: -50, left: -50, fill: 'rgba(0,255,0,0.5)' });
     var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 200, height: 200, fill: 'rgba(0,255,0,0.5)'});
     obj.clipPath = clipPath;
     canvas.add(obj);
@@ -41,12 +41,12 @@
   tests.push({
     test: 'A clippath ignores fill and stroke for drawing, not positioning',
     code: clipping01,
-    golden: 'clipping01.png',
+    golden: 'clipping001.png',
     percentage: 0.06,
   });
 
   function clipping02(canvas, callback) {
-    var clipPath = new fabric.Circle({ radius: 50, strokeWidth: 40, top: -50, left: -50, fill: '' });
+    var clipPath = new fabric.Circle({ radius: 50, strokeWidth: 40, top: -50, left: -50, fill: 'black' });
     var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 200, height: 200, fill: 'rgba(0,255,0,0.5)'});
     obj.clipPath = clipPath;
     canvas.add(obj);
