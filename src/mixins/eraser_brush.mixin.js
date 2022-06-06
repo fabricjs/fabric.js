@@ -542,8 +542,8 @@
         ctx = this.canvas.getContext();
         //  a hack that fixes https://github.com/fabricjs/fabric.js/issues/7984 by reducing path width
         //  the issue's cause is unknown at time of writing (@ShaMan123 06/2022)
-        if (lineWidth - this.erasingWidthAliasing > 0) {
-          this.width = lineWidth - this.erasingWidthAliasing;
+        if (Math.floor(lineWidth - this.erasingWidthAliasing) > 0) {
+          this.width = Math.floor(lineWidth - this.erasingWidthAliasing);
           this.callSuper('_render', ctx);
           this.width = lineWidth;
         }
