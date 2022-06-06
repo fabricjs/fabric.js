@@ -495,7 +495,7 @@
       _saveAndTransform: function (ctx) {
         this.callSuper('_saveAndTransform', ctx);
         this._setBrushStyles(ctx);
-        ctx.globalCompositeOperation = ctx === this.canvas.getContext() ? 'destination-out' : 'source-over';
+        ctx.globalCompositeOperation = ctx === this.canvas.getContext() ? 'destination-out' : 'destination-in';
       },
 
       /**
@@ -550,12 +550,11 @@
         //  render brush and mask it with pattern
         ctx = this.canvas.contextTop;
         this.canvas.clearContext(ctx);
-        this.callSuper('_render', ctx);
         ctx.save();
         ctx.scale(s, s);
-        ctx.globalCompositeOperation = 'source-in';
         ctx.drawImage(this._patternCanvas, 0, 0);
         ctx.restore();
+        this.callSuper('_render', ctx);
       },
 
       /**
