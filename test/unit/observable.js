@@ -354,7 +354,7 @@ QUnit.test('disposing', function(assert) {
       })
     ];
   }
-  var disposers;
+  var disposers = [];
   var fireAll = function () {
     fired.forEach(function (__, index) {
       foo.fire(getEventName(index));
@@ -368,9 +368,7 @@ QUnit.test('disposing', function(assert) {
 
   //  dispose before firing
   disposers = attach();
-  disposers.forEach(function (disposer) {
-    disposer();
-  });
+  dispose();
   fireAll();
   assert.deepEqual(fired, new Array(fired.length).fill(false));
 
