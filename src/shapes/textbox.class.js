@@ -41,6 +41,11 @@
     maxWidth: Infinity,
 
     /**
+     * @private
+     */
+    _actualMaxWidth: Infinity,
+
+    /**
      * Minimum calculated width of a textbox, in pixels.
      * fixed to 2 so that an empty textbox cannot go to 0
      * and is still selectable without text.
@@ -88,25 +93,27 @@
     splitByGrapheme: false,
 
     /**
-     * While editing handle differently
      * @private
      * @param {string} key
      * @param {*} value
      */
     _set: function (key, value) {
       if (key === 'width') {
-        value = Math.max(this.minWidth, Math.min(value, this.maxWidth));
+        value = Math.max(this.minWidth, Math.min(value, Math.max(this.maxWidth, this._actualMaxWidth)));
       }
       if (key === 'maxWidth' && this.minWidth > value) {
-        value = this.minWidth;
+        value = Infinity;
       }
       this.callSuper('_set', key, value);
       if (key === 'minWidth' && this.maxWidth < value) {
-        this._set('maxWidth', value);
+        this._set('maxWidth', Infinity);
       }
       /* _DEV_MODE_START_ */
       if ((key === 'maxWidth' && this.width > value) || (key === 'minWidth' && this.width < value)) {
-        console.warn(`fabric.Textbox: setting ${key} to ${value}, width is out of range (${this.width})`);
+        console.warn(
+          `fabric.Textbox: setting ${key} to ${value}, width is out of range (${this.width}). 
+          This may result in a broken state.`
+        );
       }
       /* _DEV_MODE_END_ */
     },
@@ -383,10 +390,8 @@
         offset += word.length + 1;
         return { word: word, width: width };
       }.bind(this));
-      var maxWidth = Math.max(desiredWidth, largestWordWidth, this.getMinWidth());
-      if (maxWidth > this.maxWidth) {
-        maxWidth = this.maxWidth;
-      }
+      var maxWidth = Math.max(desiredWidth, this.getMinWidth(), largestWordWidth);
+      this._actualMaxWidth = maxWidth;
       // layout words
       offset = 0;
       for (var i = 0; i < words.length; i++) {
