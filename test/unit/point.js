@@ -12,8 +12,8 @@
     assert.ok(point.constructor === fabric.Point);
     assert.ok(typeof point.constructor === 'function');
     assert.equal(point.type, 'point');
-    assert.equal(point.x, undefined, 'no default values for x');
-    assert.equal(point.y, undefined, 'no default values for y');
+    assert.strictEqual(point.x, 0, 'constructor assign x value');
+    assert.strictEqual(point.y, 0, 'constructor assign y value');
 
     var x = 5, y = 6;
     point = new fabric.Point(x, y);
