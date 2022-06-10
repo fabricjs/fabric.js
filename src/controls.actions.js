@@ -191,19 +191,14 @@
    * Wrap an action handler with saving/restoring object position on the transform.
    * this is the code that permits to objects to keep their position while transforming.
    * @param {Function} actionHandler the function to wrap
-   * @param {string|number} [originX] override transform value
-   * @param {string|number} [originY] override transform value
    * @return {Function} a function with an action handler signature
    */
-  function wrapWithFixedAnchor(actionHandler, originX, originY) {
-    return function (eventData, transform, x, y) {
-      var target = transform.target,
-          centerPoint = target.getRelativeCenterPoint(),
-          _originX = originX || transform.originX,
-          _originY = originY || transform.originY,
-          constraint = target.translateToOriginPoint(centerPoint, _originX, _originY),
+  function wrapWithFixedAnchor(actionHandler) {
+    return function(eventData, transform, x, y) {
+      var target = transform.target, centerPoint = target.getRelativeCenterPoint(),
+          constraint = target.translateToOriginPoint(centerPoint, transform.originX, transform.originY),
           actionPerformed = actionHandler(eventData, transform, x, y);
-      target.setPositionByOrigin(constraint, _originX, _originY);
+      target.setPositionByOrigin(constraint, transform.originX, transform.originY);
       return actionPerformed;
     };
   }
