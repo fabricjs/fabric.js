@@ -34,7 +34,7 @@
     /**
      * Maximum width of textbox, in pixels.
      * Use the `resizing` event to change this value on the fly
-     * @type {Number | undefined}
+     * @type {Number}
      * @default
      */
     maxWidth: Infinity,
