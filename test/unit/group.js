@@ -696,7 +696,7 @@
     assert.notEqual(coords, newCoords, 'object coords have been recalculated - add');
   });
 
-  QUnit.test.only('group add edge cases', function (assert) {
+  QUnit.test('group add edge cases', function (assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
       rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
       group = new fabric.Group([rect1]);
