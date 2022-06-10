@@ -94,12 +94,7 @@
      */
     _set: function (key, value) {
       if (key === 'width') {
-        if (typeof this.maxWidth === 'number' && this.maxWidth < value) {
-          value = this.maxWidth;
-        }
-        if (typeof this.minWidth === 'number' && this.minWidth > value) {
-          value = this.minWidth;
-        }
+        value = Math.max(this.minWidth, Math.min(value, this.maxWidth));
       }
       if (key === 'maxWidth' && this.minWidth > value) {
         value = this.minWidth;
