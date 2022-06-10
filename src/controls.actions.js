@@ -197,12 +197,13 @@
    */
   function wrapWithFixedAnchor(actionHandler, originX, originY) {
     return function (eventData, transform, x, y) {
-      originX = originX || transform.originX;
-      originY = originY || transform.originY;
-      var target = transform.target, centerPoint = target.getRelativeCenterPoint(),
-          constraint = target.translateToOriginPoint(centerPoint, originX, originY),
+      var target = transform.target,
+          centerPoint = target.getRelativeCenterPoint(),
+          _originX = originX || transform.originX,
+          _originY = originY || transform.originY,
+          constraint = target.translateToOriginPoint(centerPoint, _originX, _originY),
           actionPerformed = actionHandler(eventData, transform, x, y);
-      target.setPositionByOrigin(constraint, originX, originY);
+      target.setPositionByOrigin(constraint, _originX, _originY);
       return actionPerformed;
     };
   }
@@ -739,7 +740,7 @@
   controls.scalingY = wrapWithFireEvent('scaling', wrapWithFixedAnchor(scaleObjectY));
   controls.scalingYOrSkewingX = scalingYOrSkewingX;
   controls.scalingXOrSkewingY = scalingXOrSkewingY;
-  controls.changeWidth = wrapWithFireEvent('resizing', wrapWithFixedAnchor(changeWidth, null, 'center'));
+  controls.changeWidth = wrapWithFireEvent('resizing', wrapWithFixedAnchor(changeWidth, undefined, 'center'));
   controls.skewHandlerX = skewHandlerX;
   controls.skewHandlerY = skewHandlerY;
   controls.dragHandler = dragHandler;
