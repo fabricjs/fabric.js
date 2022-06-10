@@ -335,7 +335,7 @@
     assert.equal(opt.currentTarget, rect2, 'options match model - currentTarget');
   });
 
-  QUnit.test('fires object:modified and object:moved', function(assert) {
+  QUnit.test('fires object:modified', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1 };
     var e2 = { clientX: 31, clientY: 31, which: 1 };
     var rect = new fabric.Rect({ left: 0, top: 0, width: 50, height: 50 });
