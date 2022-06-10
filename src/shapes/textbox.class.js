@@ -25,7 +25,8 @@
 
     /**
      * Minimum width of textbox, in pixels.\
-     * Overrides `maxWidth` in case of conflict (if `minWidth` > `maxWidth` then `maxWidth` = `minWidth`), @see {@link fabric.Textbox#_set}.
+     * Use the `resizing` event to change this value on the fly.\
+     * Overrides {@link #maxWidth} in case of conflict.
      * @type Number
      * @default
      */
@@ -34,13 +35,14 @@
     /**
      * Maximum width of textbox, in pixels.\
      * Use the `resizing` event to change this value on the fly.\
-     * Will be overriden by `minWidth` in case of conflict (if `minWidth` > `maxWidth` then `maxWidth` = `minWidth`), @see {@link fabric.Textbox#_set}.
+     * Will be overriden by {@link #minWidth} and by {@link #_actualMaxWidth} in case of conflict.
      * @type {Number}
      * @default
      */
     maxWidth: Infinity,
 
     /**
+     * Holds the calculated max width value taking into account the largest word and minimum values
      * @private
      */
     _actualMaxWidth: Infinity,
