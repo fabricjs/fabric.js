@@ -191,14 +191,18 @@
    * Wrap an action handler with saving/restoring object position on the transform.
    * this is the code that permits to objects to keep their position while transforming.
    * @param {Function} actionHandler the function to wrap
+   * @param {string|number} [originX] override transform value
+   * @param {string|number} [originY] override transform value
    * @return {Function} a function with an action handler signature
    */
-  function wrapWithFixedAnchor(actionHandler) {
-    return function(eventData, transform, x, y) {
+  function wrapWithFixedAnchor(actionHandler, originX, originY) {
+    return function (eventData, transform, x, y) {
+      originX = originX || transform.originX;
+      originY = originY || transform.originY;
       var target = transform.target, centerPoint = target.getRelativeCenterPoint(),
-          constraint = target.translateToOriginPoint(centerPoint, transform.originX, transform.originY),
+          constraint = target.translateToOriginPoint(centerPoint, originX, originY),
           actionPerformed = actionHandler(eventData, transform, x, y);
-      target.setPositionByOrigin(constraint, transform.originX, transform.originY);
+      target.setPositionByOrigin(constraint, originX, originY);
       return actionPerformed;
     };
   }
@@ -735,7 +739,7 @@
   controls.scalingY = wrapWithFireEvent('scaling', wrapWithFixedAnchor(scaleObjectY));
   controls.scalingYOrSkewingX = scalingYOrSkewingX;
   controls.scalingXOrSkewingY = scalingXOrSkewingY;
-  controls.changeWidth = wrapWithFireEvent('resizing', wrapWithFixedAnchor(changeWidth));
+  controls.changeWidth = wrapWithFireEvent('resizing', wrapWithFixedAnchor(changeWidth, null, 'center'));
   controls.skewHandlerX = skewHandlerX;
   controls.skewHandlerY = skewHandlerY;
   controls.dragHandler = dragHandler;
