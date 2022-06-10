@@ -99,21 +99,12 @@
      */
     _set: function (key, value) {
       if (key === 'width') {
-        value = Math.max(this.minWidth, Math.min(value, Math.max(this.maxWidth, this._actualMaxWidth)));
-      }
-      if (key === 'maxWidth' && this.minWidth > value) {
-        value = Infinity;
+        value = Math.max(this.minWidth, Math.min(value, Math.max(this.minWidth, this.maxWidth, this._actualMaxWidth)));
       }
       this.callSuper('_set', key, value);
-      if (key === 'minWidth' && this.maxWidth < value) {
-        this._set('maxWidth', Infinity);
-      }
       /* _DEV_MODE_START_ */
       if ((key === 'maxWidth' && this.width > value) || (key === 'minWidth' && this.width < value)) {
-        console.warn(
-          `fabric.Textbox: setting ${key} to ${value}, width is out of range (${this.width}). 
-          This may result in a broken state.`
-        );
+        console.warn(`fabric.Textbox: setting ${key} to ${value}, width is out of range (${this.width})`);
       }
       /* _DEV_MODE_END_ */
     },
