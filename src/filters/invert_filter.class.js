@@ -61,20 +61,6 @@
     mainParameter: 'invert',
 
     /**
-     * Retrieves the cached shader.
-     * @param {Object} options
-     * @param {WebGLRenderingContext} options.context The GL context used for rendering.
-     * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
-     */
-    retrieveShader: function(options) {
-      var cacheKey = this.type + '_' + (this.alpha ? 'alpha' : 'normal');
-      if (!options.programCache.hasOwnProperty(cacheKey)) {
-        options.programCache[cacheKey] = this.createProgram(options.context, this.fragmentSource);
-      }
-      return options.programCache[cacheKey];
-    },
-
-    /**
      * Apply the Invert operation to a Uint8Array representing the pixels of an image.
      *
      * @param {Object} options
