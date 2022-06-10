@@ -327,8 +327,16 @@
 
       /**
        * When set to `true` the brush will create a visual effect of undoing erasing
+       * @type boolean
        */
       inverted: false,
+
+      /**
+       * Used to fix https://github.com/fabricjs/fabric.js/issues/7984
+       * Reduces the path width while clipping the main context, resulting in a better visual overlap of both contexts
+       * @type number
+       */
+      erasingWidthAliasing: 4,
 
       /**
        * @private
@@ -355,29 +363,33 @@
        * This will render the erased parts as if they were not erased in the first place, achieving an undo effect.
        *
        * @param {fabric.Collection} collection
+       * @param {fabric.Object[]} objects
        * @param {CanvasRenderingContext2D} ctx
        * @param {{ visibility: fabric.Object[], eraser: fabric.Object[], collection: fabric.Object[] }} restorationContext
        */
-      _prepareCollectionTraversal: function (collection, ctx, restorationContext) {
-        collection.forEachObject(function (obj) {
+      _prepareCollectionTraversal: function (collection, objects, ctx, restorationContext) {
+        objects.forEach(function (obj) {
+          var dirty = false;
           if (obj.forEachObject && obj.erasable === 'deep') {
             //  traverse
-            this._prepareCollectionTraversal(obj, ctx, restorationContext);
+            this._prepareCollectionTraversal(obj, obj._objects, ctx, restorationContext);
           }
           else if (!this.inverted && obj.erasable && obj.visible) {
             //  render only non-erasable objects
             obj.visible = false;
-            collection.dirty = true;
             restorationContext.visibility.push(obj);
-            restorationContext.collection.push(collection);
+            dirty = true;
           }
           else if (this.inverted && obj.erasable && obj.eraser && obj.visible) {
             //  render all objects without eraser
             var eraser = obj.eraser;
             obj.eraser = undefined;
             obj.dirty = true;
-            collection.dirty = true;
             restorationContext.eraser.push([obj, eraser]);
+            dirty = true;
+          }
+          if (dirty && collection instanceof fabric.Object) {
+            collection.dirty = true;
             restorationContext.collection.push(collection);
           }
         }, this);
@@ -388,12 +400,14 @@
        * This pattern will be drawn on the top context after clipping the main context,
        * achieving a visual effect of erasing only erasable objects
        * @private
+       * @param {fabric.Object[]} [objects]  override default behavior by passing objects to render on pattern
        */
-      preparePattern: function () {
+      preparePattern: function (objects) {
         if (!this._patternCanvas) {
           this._patternCanvas = fabric.util.createCanvasElement();
         }
         var canvas = this._patternCanvas;
+        objects = objects || this.canvas._objectsToRender || this.canvas._objects;
         canvas.width = this.canvas.width;
         canvas.height = this.canvas.height;
         var patternCtx = canvas.getContext('2d');
@@ -425,8 +439,8 @@
         patternCtx.save();
         patternCtx.transform.apply(patternCtx, this.canvas.viewportTransform);
         var restorationContext = { visibility: [], eraser: [], collection: [] };
-        this._prepareCollectionTraversal(this.canvas, patternCtx, restorationContext);
-        this.canvas._renderObjects(patternCtx, this.canvas._objects);
+        this._prepareCollectionTraversal(this.canvas, objects, patternCtx, restorationContext);
+        this.canvas._renderObjects(patternCtx, objects);
         restorationContext.visibility.forEach(function (obj) { obj.visible = true; });
         restorationContext.eraser.forEach(function (entry) {
           var obj = entry[0], eraser = entry[1];
@@ -481,7 +495,7 @@
       _saveAndTransform: function (ctx) {
         this.callSuper('_saveAndTransform', ctx);
         this._setBrushStyles(ctx);
-        ctx.globalCompositeOperation = ctx === this.canvas.getContext() ? 'destination-out' : 'source-over';
+        ctx.globalCompositeOperation = ctx === this.canvas.getContext() ? 'destination-out' : 'destination-in';
       },
 
       /**
@@ -519,22 +533,28 @@
        * 1. Use brush to clip canvas by rendering it on top of canvas (unnecessary if `inverted === true`)
        * 2. Render brush with canvas pattern on top context
        *
+       * @todo provide a better solution to https://github.com/fabricjs/fabric.js/issues/7984
        */
       _render: function () {
-        var ctx;
+        var ctx, lineWidth = this.width;
+        var t = this.canvas.getRetinaScaling(), s = 1 / t;
         //  clip canvas
         ctx = this.canvas.getContext();
-        this.callSuper('_render', ctx);
+        //  a hack that fixes https://github.com/fabricjs/fabric.js/issues/7984 by reducing path width
+        //  the issue's cause is unknown at time of writing (@ShaMan123 06/2022)
+        if (lineWidth - this.erasingWidthAliasing > 0) {
+          this.width = lineWidth - this.erasingWidthAliasing;
+          this.callSuper('_render', ctx);
+          this.width = lineWidth;
+        }
         //  render brush and mask it with pattern
         ctx = this.canvas.contextTop;
         this.canvas.clearContext(ctx);
-        this.callSuper('_render', ctx);
         ctx.save();
-        var t = this.canvas.getRetinaScaling(), s = 1 / t;
         ctx.scale(s, s);
-        ctx.globalCompositeOperation = 'source-in';
         ctx.drawImage(this._patternCanvas, 0, 0);
         ctx.restore();
+        this.callSuper('_render', ctx);
       },
 
       /**

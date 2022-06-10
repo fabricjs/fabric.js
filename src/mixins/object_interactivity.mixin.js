@@ -135,7 +135,7 @@
         width,
         height
       );
-      hasControls && this.drawControlsConnectingLines(ctx);
+      hasControls && this.drawControlsConnectingLines(ctx, width, height);
 
       ctx.restore();
       return this;
@@ -172,7 +172,7 @@
         width,
         height
       );
-      hasControls && this.drawControlsConnectingLines(ctx);
+      hasControls && this.drawControlsConnectingLines(ctx, width, height);
 
       ctx.restore();
       return this;
@@ -183,15 +183,13 @@
      * Requires public properties: width, height
      * Requires public options: padding, borderColor
      * @param {CanvasRenderingContext2D} ctx Context to draw on
+     * @param {number} width object final width
+     * @param {number} height object final height
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    drawControlsConnectingLines: function (ctx) {
-      var wh = this._calculateCurrentDimensions(),
-          strokeWidth = this.borderScaleFactor,
-          width = wh.x + strokeWidth,
-          height = wh.y + strokeWidth,
-          shouldStroke = false;
+    drawControlsConnectingLines: function (ctx, width, height) {
+      var shouldStroke = false;
 
       ctx.beginPath();
       this.forEachControl(function (control, key, fabricObject) {

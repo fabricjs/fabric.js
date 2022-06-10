@@ -586,7 +586,7 @@
      */
     insertAt: function (objects, index) {
       fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
-      this.renderOnAddRemove && this.requestRenderAll();
+      (Array.isArray(objects) ? objects.length > 0 : !!objects) && this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -761,7 +761,7 @@
         this.drawControls(ctx);
       }
       if (path) {
-        path.canvas = this;
+        path._set('canvas', this);
         // needed to setup a couple of variables
         path.shouldCache();
         path._transformDone = true;
