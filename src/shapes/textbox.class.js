@@ -109,7 +109,7 @@
       this.callSuper('_set', key, value);
       /* _DEV_MODE_START_ */
       if ((key === 'maxWidth' && this.width > value) || (key === 'minWidth' && this.width < value)) {
-        console.warn(`fabric.Textbox: setting ${key} to ${value}, width is out of range (${this.width})`);
+        console.warn('fabric.Textbox: setting ' + key + ', width is out of range');
       }
       /* _DEV_MODE_END_ */
     },
@@ -383,7 +383,11 @@
         offset += word.length + 1;
         return { word: word, width: width };
       }.bind(this));
-      var maxWidth = Math.max(Math.min(desiredWidth, this.maxWidth) - reservedSpace, this.getMinWidth(), largestWordWidth);
+      var maxWidth = Math.max(
+        Math.min(desiredWidth, this.maxWidth) - reservedSpace,
+        this.getMinWidth(),
+        largestWordWidth
+      );
       this._actualMaxWidth = maxWidth;
       // layout words
       offset = 0;
