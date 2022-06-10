@@ -143,7 +143,7 @@
      */
     _filterObjectsBeforeEnteringGroup: function (objects) {
       return objects.filter(function (object, index, array) {
-        // can enter or is the first occurrence of the object in the passed args
+        // can enter AND is the first occurrence of the object in the passed args (to prevent adding duplicates)
         return this.canEnterGroup(object) && array.indexOf(object) === index;
       }, this);
     },
