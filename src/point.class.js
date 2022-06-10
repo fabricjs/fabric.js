@@ -23,8 +23,8 @@
    * @return {fabric.Point} thisArg
    */
   function Point(x, y) {
-    this.x = x;
-    this.y = y;
+    this.x = x || 0;
+    this.y = y || 0;
   }
 
   Point.prototype = /** @lends fabric.Point.prototype */ {
