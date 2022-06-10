@@ -593,7 +593,7 @@
         return this.prepareBoundingBox(layoutDirective, addedObjects, context);
       }
       else if (layoutDirective === 'fit-content' || layoutDirective === 'fit-content-lazy'
-          || (layoutDirective === 'fixed' && context.type === 'initialization')) {
+          || (layoutDirective === 'fixed' && (context.type === 'initialization' || context.type === 'imperative'))) {
         return this.prepareBoundingBox(layoutDirective, objects, context);
       }
       else if (layoutDirective === 'clip-path' && this.clipPath) {
@@ -874,6 +874,7 @@
         this._watchObject(false, object);
         object.dispose && object.dispose();
       }, this);
+      this.callSuper('dispose');
     },
 
     /* _TO_SVG_START_ */
