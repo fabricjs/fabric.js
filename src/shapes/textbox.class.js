@@ -103,6 +103,9 @@
       if (key === 'width') {
         value = Math.max(this.minWidth, Math.min(value, Math.max(this.minWidth, this.maxWidth, this._actualMaxWidth)));
       }
+      if (key === 'maxWidth' && !value) {
+        value = Infinity;
+      }
       this.callSuper('_set', key, value);
       /* _DEV_MODE_START_ */
       if ((key === 'maxWidth' && this.width > value) || (key === 'minWidth' && this.width < value)) {
@@ -492,7 +495,11 @@
      * @return {Object} object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      return this.callSuper('toObject', ['minWidth', 'maxWidth', 'splitByGrapheme'].concat(propertiesToInclude));
+      var object = this.callSuper('toObject', ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude));
+      if (this.maxWidth < Infinity) {
+        object.maxWidth = this.maxWidth;
+      }
+      return object;
     }
   });
 

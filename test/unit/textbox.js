@@ -51,7 +51,6 @@
     charSpacing: 0,
     styles: { },
     minWidth: 20,
-    maxWidth: undefined,
     splitByGrapheme: false,
     strokeUniform: false,
     path: null,
@@ -78,6 +77,11 @@
     assert.equal(Math.round(textbox.width), 56, 'width is calculated by constructor');
   });
 
+  QUnit.test('constructor with illegal maxWidth', function (assert) {
+    var textbox = new fabric.Textbox('test', { maxWidth: null });
+    assert.equal(textbox.maxWidth, Infinity, 'maxWidth is taken by contstructor');
+  });
+
   QUnit.test('initial properties', function(assert) {
     var textbox = new fabric.Textbox('test');
     assert.equal(textbox.text, 'test');
@@ -89,30 +93,20 @@
   QUnit.test('width properties', function (assert) {
     var textbox = new fabric.Textbox('test', { minWidth: 10, width: 9, maxWidth: 8 });
     assert.equal(textbox.minWidth, 10);
-    assert.equal(textbox.width, 10);
-    assert.equal(textbox.maxWidth, 10);
-    textbox.set({ minWidth: 11 });
-    assert.equal(textbox.minWidth, 11);
-    assert.equal(textbox.width, 11);
-    assert.equal(textbox.maxWidth, 11);
-    textbox.set({ maxWidth: 9 });
-    assert.equal(textbox.minWidth, 11);
-    assert.equal(textbox.width, 11);
-    assert.equal(textbox.maxWidth, 11);
-    textbox.set({ width: 9 });
-    assert.equal(textbox.minWidth, 11);
-    assert.equal(textbox.width, 11);
-    assert.equal(textbox.maxWidth, 11);
-    textbox.set({ maxWidth: 12 });
-    assert.equal(textbox.minWidth, 11);
-    assert.equal(textbox.width, 11);
-    assert.equal(textbox.maxWidth, 12);
+    assert.equal(textbox.width, 55.6);
+    assert.equal(textbox.maxWidth, 8);
   });
 
   QUnit.test('toObject', function(assert) {
     var textbox = new fabric.Textbox('x');
     var obj = textbox.toObject();
     assert.deepEqual(obj, TEXTBOX_OBJECT, 'JSON OUTPUT MATCH');
+  });
+
+  QUnit.test('toObject with maxWidth', function (assert) {
+    var textbox = new fabric.Textbox('x', { maxWidth: 400 });
+    var obj = textbox.toObject();
+    assert.deepEqual(obj, Object.assign(TEXTBOX_OBJECT, { maxWidth: 400 }), 'JSON OUTPUT MATCH');
   });
 
   QUnit.test('fromObject', function(assert) {
