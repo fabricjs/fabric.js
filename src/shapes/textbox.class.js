@@ -76,7 +76,7 @@
      * @type Object
      * @private
      */
-    _dimensionAffectingProps: fabric.Text.prototype._dimensionAffectingProps.concat('width'),
+    _dimensionAffectingProps: fabric.Text.prototype._dimensionAffectingProps.concat('width', 'minWidth', 'maxWidth'),
 
     /**
      * Use this regular expression to split strings in breakable lines
@@ -124,13 +124,11 @@
       this._clearCache();
       // clear dynamicMinWidth as it will be different after we re-wrap line
       this.dynamicMinWidth = 0;
+      this._actualMaxWidth = Infinity;
       // wrap lines
       this._styleMap = this._generateStyleMap(this._splitText());
       // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
-      var minWidth = this.getMinWidth();
-      if (minWidth > this.width) {
-        this._set('width', minWidth);
-      }
+      this._set('width', Math.max(this.getMinWidth(), this.width));
       if (this.textAlign.indexOf('justify') !== -1) {
         // once text is measured we need to make space fatter to make justified text.
         this.enlargeSpaces();
@@ -371,7 +369,6 @@
       if (words.length === 0) {
         words.push([]);
       }
-      desiredWidth -= reservedSpace;
       // measure words
       var data = words.map(function (word) {
         // if using splitByGrapheme words are already in graphemes.
@@ -381,7 +378,7 @@
         offset += word.length + 1;
         return { word: word, width: width };
       }.bind(this));
-      var maxWidth = Math.max(desiredWidth, this.getMinWidth(), largestWordWidth);
+      var maxWidth = Math.max(Math.min(desiredWidth, this.maxWidth) - reservedSpace, this.getMinWidth(), largestWordWidth);
       this._actualMaxWidth = maxWidth;
       // layout words
       offset = 0;
