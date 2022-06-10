@@ -740,7 +740,7 @@
   controls.scalingY = wrapWithFireEvent('scaling', wrapWithFixedAnchor(scaleObjectY));
   controls.scalingYOrSkewingX = scalingYOrSkewingX;
   controls.scalingXOrSkewingY = scalingXOrSkewingY;
-  controls.changeWidth = wrapWithFireEvent('resizing', wrapWithFixedAnchor(changeWidth, undefined, 'center'));
+  controls.changeWidth = wrapWithFireEvent('resizing', wrapWithFixedAnchor(changeWidth));
   controls.skewHandlerX = skewHandlerX;
   controls.skewHandlerY = skewHandlerY;
   controls.dragHandler = dragHandler;
