@@ -37,7 +37,7 @@
      * @type {Number | undefined}
      * @default
      */
-    maxWidth: undefined,
+    maxWidth: Infinity,
 
     /**
      * Minimum calculated width of a textbox, in pixels.
