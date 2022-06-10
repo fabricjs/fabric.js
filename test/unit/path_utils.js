@@ -58,4 +58,32 @@
     assert.deepEqual(infos[3].length, 20, 'the command 3 a L has length 20');
     assert.deepEqual(infos[4].length, 20, 'the command 4 a Z has length 20');
   });
+
+  QUnit.test('fabric.util.getRegularPolygonPath', function (assert) {
+    assert.ok(typeof fabric.util.getRegularPolygonPath === 'function');
+    var penta = fabric.util.getRegularPolygonPath(5, 50);
+    var hexa = fabric.util.getRegularPolygonPath(6, 50);
+
+    var expetedPenta = [
+      ["M", 3.061616997868383e-15, -50],
+      ["L", 47.552825814757675, -15.450849718747369],
+      ["L", 29.389262614623657, 40.45084971874737],
+      ["L", -29.38926261462365, 40.45084971874737],
+      ["L", -47.55282581475768, -15.450849718747364],
+      ["Z"]
+    ];
+
+    var expetedHexa = [
+      ["M", 24.999999999999993, -43.30127018922194],
+      ["L", 50, -1.1102230246251565e-14],
+      ["L", 25.000000000000018, 43.301270189221924],
+      ["L", -24.99999999999999, 43.30127018922194],
+      ["L", -50, 2.8327694488239898e-14],
+      ["L", -25.00000000000006, -43.301270189221896],
+      ["Z"]
+    ];
+
+    assert.deepEqual(penta, expetedPenta, 'regualr pentagon should match');
+    assert.deepEqual(hexa, expetedHexa, 'regualr hexagon should match');
+  });
 })();

@@ -5,20 +5,23 @@
     hooks.beforeEach(function() {
       var target = new fabric.Rect({ width: 100, height: 100 });
       canvas.add(target);
-      eventData = {
-      };
-      transform = {
-        originX: 'left',
-        originY: 'top',
-        target: target,
-        corner: 'mr',
-        signX: 1,
-        signY: 1,
-      };
+      eventData = {};
+      transform = prepareTransform(target, 'mr');
     });
     hooks.afterEach(function() {
       canvas.clear();
     });
+    function prepareTransform(target, corner) {
+      var origin = canvas._getOriginFromCorner(target, corner);
+      return {
+        target,
+        corner,
+        originX: origin.x,
+        originY: origin.y,
+        signX: 1,
+        signY: 1,
+      };
+    }
     QUnit.test('changeWidth changes the width', function(assert) {
       assert.equal(transform.target.width, 100);
       var changed = fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
@@ -36,6 +39,17 @@
       assert.equal(target.width, 100);
       assert.equal(target.left, 0);
       assert.equal(target.top, 0);
+    });
+    QUnit.test('changeWidth does not change the width of target\'s other side', function (assert) {
+      assert.equal(transform.target.width, 100);
+      var changed = fabric.controlsUtils.changeWidth(eventData, prepareTransform(transform.target, 'ml'), 200, 300);
+      assert.ok(!changed, 'control should not have changed target');
+      assert.equal(transform.target.width, 100);
+      changed = fabric.controlsUtils.changeWidth(eventData, prepareTransform(transform.target, 'mr'), -200, 300);
+      assert.ok(!changed, 'control should not have changed target');
+      assert.equal(transform.target.width, 100);
+      assert.equal(transform.target.left, 0);
+      assert.equal(transform.target.top, 0);
     });
     QUnit.test('changeWidth changes the width with centered transform', function(assert) {
       transform.originX = 'center';
