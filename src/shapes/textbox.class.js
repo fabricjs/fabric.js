@@ -103,9 +103,11 @@
       if (key === 'minWidth' && this.maxWidth < value) {
         this._set('maxWidth', value);
       }
+      /* _DEV_MODE_START_ */
       if ((key === 'maxWidth' && this.width > value) || (key === 'minWidth' && this.width < value)) {
-        this._set('width', value);
+        console.warn(`fabric.Textbox: setting ${key} to ${value}, width is out of range (${this.width})`);
       }
+      /* _DEV_MODE_END_ */
     },
 
     /**
@@ -381,7 +383,7 @@
         return { word: word, width: width };
       }.bind(this));
       var maxWidth = Math.max(desiredWidth, largestWordWidth, this.getMinWidth());
-      if (typeof this.maxWidth === 'number' && maxWidth > this.maxWidth) {
+      if (maxWidth > this.maxWidth) {
         maxWidth = this.maxWidth;
       }
       // layout words
