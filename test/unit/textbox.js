@@ -77,6 +77,11 @@
     assert.equal(Math.round(textbox.width), 56, 'width is calculated by constructor');
   });
 
+  QUnit.test('constructor with minWidth override', function (assert) {
+    var textbox = new fabric.Textbox('test', { minWidth: 60, width: 5 });
+    assert.equal(Math.round(textbox.width), 60, 'width is taken by minWidth');
+  });
+
   QUnit.test('constructor with illegal maxWidth', function (assert) {
     var textbox = new fabric.Textbox('test', { maxWidth: null });
     assert.equal(textbox.maxWidth, Infinity, 'maxWidth is taken by contstructor');
