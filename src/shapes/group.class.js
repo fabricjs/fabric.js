@@ -137,8 +137,8 @@
     },
 
     /**
-     * Override this method to boost performance (for groups with a lot of objects).
-     * Be sure not pass illegal objects to group if you do - it will break your app.
+     * Override this method to enhance performance (for groups with a lot of objects).
+     * If Overriding, be sure not pass illegal objects to group - it will break your app.
      * @private
      */
     _filterObjectsBeforeEnteringGroup: function (objects) {
