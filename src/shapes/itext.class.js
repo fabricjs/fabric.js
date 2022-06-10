@@ -4,7 +4,6 @@
    * prefix when observing canvas.
    * @class fabric.IText
    * @extends fabric.Text
-   * @mixes fabric.Observable
    *
    * @fires changed
    * @fires selection:changed
@@ -45,7 +44,7 @@
    *   Select line:                    triple click
    * </pre>
    */
-  fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lends fabric.IText.prototype */ {
+  fabric.IText = fabric.util.createClass(fabric.Text, /** @lends fabric.IText.prototype */ {
 
     /**
      * Type of an object
