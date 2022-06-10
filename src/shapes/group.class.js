@@ -244,7 +244,7 @@
       if (object === this || this.isDescendantOf(object)) {
         //  prevent circular object tree
         /* _DEV_MODE_START_ */
-        console.warn('fabric.Group: trying to add group to itself, this call has no effect');
+        console.warn('fabric.Group: circular object trees are not supported, this call has no effect');
         /* _DEV_MODE_END_ */
         return false;
       }
