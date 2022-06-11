@@ -178,7 +178,7 @@ ${baseClassNS ? `${baseClassNS} = ${funcName}(${baseClassNS});`:''}
 
 function getMixinName(file) {
     const name = path.parse(file).name.replace('mixin', '').split('.').map(val=>_.upperFirst(_.camelCase(val))).join('');
-    return name + 'Mixin';
+    return name.replace('Itext','IText') + 'Mixin';
 }
 
 function transformFile(raw, { namespace, name } = {}) {
