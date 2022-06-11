@@ -40,17 +40,35 @@ function findMixinNS(raw) {
 
 function findClass(raw) {
     const keyWord = getVariableNameOfNS(raw, 'fabric.util.createClass');
-    const classNS = getVariableNameOfKey(raw, keyWord);
     const regex = new RegExp(`(.+)=\\s*${keyWord.replaceAll('.', '\\.')}\\((\.*)\\{`, 'm');
     const result = regex.exec(raw);
-    console.log(result)
     if (!result) return;
-    const superClasses = result[1].trim().split(',').filter(raw => !raw.match(/\/\*+/));
-  //  console.log(result)
-    return {
-        namespace: classNS,
-        superClasses
+    const [match, classNSRaw, superClassRaw] = result;
+    console.log(...result)
+    const superClasses = superClassRaw.trim().split(',').filter(raw => !raw.match(/\/\*+/));
+    const classStart = raw.indexOf('{', result.index);
+    let index = classStart;
+    let counter = 0;
+    while (index < raw.length) {
+        if (raw[index] === '{') {
+            counter++;
+        }
+        else if (raw[index] === '}') {
+            counter--;
+            if (counter === 0) {
+                break;
+            }
+        }
+        index++;
     }
+    
+    return {
+        namespace: classNSRaw.trim(),
+        superClasses,
+        start: classStart,
+        end: index,
+        raw: raw.slice(classStart, index + 1)
+    };
 }
 
 transformFile('src/parser.js')
