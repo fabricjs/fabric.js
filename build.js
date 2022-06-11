@@ -1,6 +1,5 @@
-var fs = require('fs-extra'),
-    exec = require('child_process').exec,
-    execSync = require('child_process').execSync;
+var fs = require('fs'),
+    exec = require('child_process').exec;
 
 var buildArgs = process.argv.slice(2),
     buildArgsAsObject = { },
@@ -12,13 +11,6 @@ buildArgs.forEach(function(arg) {
 
   buildArgsAsObject[key] = value;
 });
-
-try {
-  fs.removeSync('./dist');
-  execSync('npm run tsc', { stdio: 'inherit' });
-} catch (error) {
-  
-}
 
 var modulesToInclude = buildArgsAsObject.modules ? buildArgsAsObject.modules.split(',') : [];
 var modulesToExclude = buildArgsAsObject.exclude ? buildArgsAsObject.exclude.split(',') : [];
@@ -97,7 +89,7 @@ function appendFileContents(fileNames, callback) {
     fs.readFile(__dirname + '/' + fileName, function (err, data) {
       if (err) throw err;
       var strData = String(data);
-      if (fileName === 'dist/HEADER.js' && amdLib === false) {
+      if (fileName === 'src/HEADER.js' && amdLib === false) {
         strData = strData.replace(/\/\* _AMD_START_ \*\/[\s\S]*?\/\* _AMD_END_ \*\//g, '');
       }
       if (noStrict) {
@@ -126,125 +118,125 @@ function ifSpecifiedInclude(moduleName, fileName) {
 
 var filesToInclude = [
   'HEADER.js',
-  ifSpecifiedInclude('global', 'dist/globalFabric.js'),
+  ifSpecifiedInclude('global', 'src/globalFabric.js'),
   ifSpecifiedInclude('gestures', 'lib/event.js'),
 
-  'dist/mixins/observable.mixin.js',
-  'dist/mixins/collection.mixin.js',
-  'dist/mixins/shared_methods.mixin.js',
-  'dist/util/misc.js',
-  ifSpecifiedInclude('accessors', 'dist/util/named_accessors.mixin.js'),
-  'dist/util/path.js',
-  'dist/util/lang_array.js',
-  'dist/util/lang_object.js',
-  'dist/util/lang_string.js',
-  'dist/util/lang_class.js',
-  ifSpecifiedInclude('interaction', 'dist/util/dom_event.js'),
-  'dist/util/dom_style.js',
-  'dist/util/dom_misc.js',
-  'dist/util/dom_request.js',
+  'src/mixins/observable.mixin.js',
+  'src/mixins/collection.mixin.js',
+  'src/mixins/shared_methods.mixin.js',
+  'src/util/misc.js',
+  ifSpecifiedInclude('accessors', 'src/util/named_accessors.mixin.js'),
+  'src/util/path.js',
+  'src/util/lang_array.js',
+  'src/util/lang_object.js',
+  'src/util/lang_string.js',
+  'src/util/lang_class.js',
+  ifSpecifiedInclude('interaction', 'src/util/dom_event.js'),
+  'src/util/dom_style.js',
+  'src/util/dom_misc.js',
+  'src/util/dom_request.js',
 
-  'dist/log.js',
+  'src/log.js',
 
-  ifSpecifiedInclude('animation', 'dist/util/animate.js'),
-  ifSpecifiedInclude('animation', 'dist/util/animate_color.js'),
-  //'dist/util/animate.js',
-  ifSpecifiedInclude('easing', 'dist/util/anim_ease.js'),
+  ifSpecifiedInclude('animation', 'src/util/animate.js'),
+  ifSpecifiedInclude('animation', 'src/util/animate_color.js'),
+  //'src/util/animate.js',
+  ifSpecifiedInclude('easing', 'src/util/anim_ease.js'),
 
-  ifSpecifiedInclude('parser', 'dist/parser.js'),
-  ifSpecifiedInclude('parser', 'dist/elements_parser.js'),
+  ifSpecifiedInclude('parser', 'src/parser.js'),
+  ifSpecifiedInclude('parser', 'src/elements_parser.js'),
 
-  'dist/point.class.js',
-  'dist/intersection.class.js',
-  'dist/color.class.js',
-  ifSpecifiedInclude('interaction', 'dist/controls.actions.js'),
-  ifSpecifiedInclude('interaction', 'dist/controls.render.js'),
-  ifSpecifiedInclude('interaction', 'dist/control.class.js'),
+  'src/point.class.js',
+  'src/intersection.class.js',
+  'src/color.class.js',
+  ifSpecifiedInclude('interaction', 'src/controls.actions.js'),
+  ifSpecifiedInclude('interaction', 'src/controls.render.js'),
+  ifSpecifiedInclude('interaction', 'src/control.class.js'),
 
-  ifSpecifiedInclude('gradient', 'dist/gradient.class.js'),
-  ifSpecifiedInclude('pattern', 'dist/pattern.class.js'),
-  ifSpecifiedInclude('shadow', 'dist/shadow.class.js'),
+  ifSpecifiedInclude('gradient', 'src/gradient.class.js'),
+  ifSpecifiedInclude('pattern', 'src/pattern.class.js'),
+  ifSpecifiedInclude('shadow', 'src/shadow.class.js'),
 
-  'dist/static_canvas.class.js',
+  'src/static_canvas.class.js',
 
-  ifSpecifiedInclude('freedrawing', 'dist/brushes/base_brush.class.js'),
+  ifSpecifiedInclude('freedrawing', 'src/brushes/base_brush.class.js'),
 
-  ifSpecifiedInclude('freedrawing', 'dist/brushes/pencil_brush.class.js'),
-  ifSpecifiedInclude('freedrawing', 'dist/brushes/circle_brush.class.js'),
-  ifSpecifiedInclude('freedrawing', 'dist/brushes/spray_brush.class.js'),
-  ifSpecifiedInclude('freedrawing', 'dist/brushes/pattern_brush.class.js'),
+  ifSpecifiedInclude('freedrawing', 'src/brushes/pencil_brush.class.js'),
+  ifSpecifiedInclude('freedrawing', 'src/brushes/circle_brush.class.js'),
+  ifSpecifiedInclude('freedrawing', 'src/brushes/spray_brush.class.js'),
+  ifSpecifiedInclude('freedrawing', 'src/brushes/pattern_brush.class.js'),
 
-  ifSpecifiedInclude('interaction', 'dist/canvas.class.js'),
-  ifSpecifiedInclude('interaction', 'dist/mixins/canvas_events.mixin.js'),
-  ifSpecifiedInclude('interaction', 'dist/mixins/canvas_grouping.mixin.js'),
+  ifSpecifiedInclude('interaction', 'src/canvas.class.js'),
+  ifSpecifiedInclude('interaction', 'src/mixins/canvas_events.mixin.js'),
+  ifSpecifiedInclude('interaction', 'src/mixins/canvas_grouping.mixin.js'),
 
-  'dist/mixins/canvas_dataurl_exporter.mixin.js',
+  'src/mixins/canvas_dataurl_exporter.mixin.js',
 
-  ifSpecifiedInclude('serialization', 'dist/mixins/canvas_serialization.mixin.js'),
-  ifSpecifiedInclude('gestures', 'dist/mixins/canvas_gestures.mixin.js'),
+  ifSpecifiedInclude('serialization', 'src/mixins/canvas_serialization.mixin.js'),
+  ifSpecifiedInclude('gestures', 'src/mixins/canvas_gestures.mixin.js'),
 
-  'dist/shapes/object.class.js',
-  'dist/mixins/object_origin.mixin.js',
-  'dist/mixins/object_geometry.mixin.js',
-  'dist/mixins/object_ancestry.mixin.js',
-  'dist/mixins/object_stacking.mixin.js',
-  'dist/mixins/object.svg_export.js',
-  'dist/mixins/stateful.mixin.js',
+  'src/shapes/object.class.js',
+  'src/mixins/object_origin.mixin.js',
+  'src/mixins/object_geometry.mixin.js',
+  'src/mixins/object_ancestry.mixin.js',
+  'src/mixins/object_stacking.mixin.js',
+  'src/mixins/object.svg_export.js',
+  'src/mixins/stateful.mixin.js',
 
-  ifSpecifiedInclude('interaction', 'dist/mixins/object_interactivity.mixin.js'),
+  ifSpecifiedInclude('interaction', 'src/mixins/object_interactivity.mixin.js'),
 
-  ifSpecifiedInclude('animation', 'dist/mixins/animation.mixin.js'),
+  ifSpecifiedInclude('animation', 'src/mixins/animation.mixin.js'),
 
-  'dist/shapes/line.class.js',
-  'dist/shapes/circle.class.js',
-  'dist/shapes/triangle.class.js',
-  'dist/shapes/ellipse.class.js',
-  'dist/shapes/rect.class.js',
-  'dist/shapes/polyline.class.js',
-  'dist/shapes/polygon.class.js',
-  'dist/shapes/path.class.js',
-  'dist/shapes/group.class.js',
-  ifSpecifiedInclude('interaction', 'dist/shapes/active_selection.class.js'),
-  'dist/shapes/image.class.js',
+  'src/shapes/line.class.js',
+  'src/shapes/circle.class.js',
+  'src/shapes/triangle.class.js',
+  'src/shapes/ellipse.class.js',
+  'src/shapes/rect.class.js',
+  'src/shapes/polyline.class.js',
+  'src/shapes/polygon.class.js',
+  'src/shapes/path.class.js',
+  'src/shapes/group.class.js',
+  ifSpecifiedInclude('interaction', 'src/shapes/active_selection.class.js'),
+  'src/shapes/image.class.js',
 
-  ifSpecifiedInclude('object_straightening', 'dist/mixins/object_straightening.mixin.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/webgl_backend.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/2d_backend.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/base_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/colormatrix_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/brightness_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/convolute_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/grayscale_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/invert_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/noise_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/pixelate_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/removecolor_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/filter_generator.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/blendcolor_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/blendimage_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/resize_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/contrast_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/saturate_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/vibrance_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/blur_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/gamma_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/composed_filter.class.js'),
-  ifSpecifiedInclude('image_filters', 'dist/filters/hue_rotation.class.js'),
+  ifSpecifiedInclude('object_straightening', 'src/mixins/object_straightening.mixin.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/webgl_backend.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/2d_backend.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/base_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/colormatrix_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/brightness_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/convolute_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/grayscale_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/invert_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/noise_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/pixelate_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/removecolor_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/filter_generator.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/blendcolor_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/blendimage_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/resize_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/contrast_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/saturate_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/vibrance_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/blur_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/gamma_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/composed_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/hue_rotation.class.js'),
 
-  ifSpecifiedInclude('text', 'dist/shapes/text.class.js'),
-  ifSpecifiedInclude('text', 'dist/mixins/text_style.mixin.js'),
+  ifSpecifiedInclude('text', 'src/shapes/text.class.js'),
+  ifSpecifiedInclude('text', 'src/mixins/text_style.mixin.js'),
 
-  ifSpecifiedInclude('itext', 'dist/shapes/itext.class.js'),
-  ifSpecifiedInclude('itext', 'dist/mixins/itext_behavior.mixin.js'),
-  ifSpecifiedInclude('itext', 'dist/mixins/itext_click_behavior.mixin.js'),
-  ifSpecifiedInclude('itext', 'dist/mixins/itext_key_behavior.mixin.js'),
-  ifSpecifiedInclude('itext', 'dist/mixins/itext.svg_export.js'),
+  ifSpecifiedInclude('itext', 'src/shapes/itext.class.js'),
+  ifSpecifiedInclude('itext', 'src/mixins/itext_behavior.mixin.js'),
+  ifSpecifiedInclude('itext', 'src/mixins/itext_click_behavior.mixin.js'),
+  ifSpecifiedInclude('itext', 'src/mixins/itext_key_behavior.mixin.js'),
+  ifSpecifiedInclude('itext', 'src/mixins/itext.svg_export.js'),
 
-  ifSpecifiedInclude('textbox', 'dist/shapes/textbox.class.js'),
-  ifSpecifiedInclude('interaction', 'dist/mixins/default_controls.js'),
+  ifSpecifiedInclude('textbox', 'src/shapes/textbox.class.js'),
+  ifSpecifiedInclude('interaction', 'src/mixins/default_controls.js'),
 
   //  extends fabric.StaticCanvas, fabric.Canvas, fabric.Object, depends on fabric.PencilBrush and fabric.Rect
-  ifSpecifiedInclude('erasing', 'dist/mixins/eraser_brush.mixin.js'),
+  ifSpecifiedInclude('erasing', 'src/mixins/eraser_brush.mixin.js'),
 ];
 
 if (buildMinified) {

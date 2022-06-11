@@ -12,16 +12,17 @@ function readFile(file) {
     return fs.readFileSync(path.resolve(wd, file)).toString('utf-8');;
 }
 
-function getVariableNameOfKey(raw, key) {
-    const regex = new RegExp(`(.+)=\\s*${key.replaceAll('.', '\\.')}`, 'm');
-    const result = regex.exec(raw);
-    return result && result[1].trim();
-}
-
 function getVariableNameOfNS(raw, namespace) {
-    const regex = new RegExp(`(.+)=\\s*${namespace.replaceAll('.', '\\.')}\\.+$`, 'm');
+    const regex = new RegExp(`\\s*(.+)=\\s*${namespace.replaceAll('.', '\\.')}[^(]+`, 'm');
     const result = regex.exec(raw);
     return result ? result[1].trim() : namespace;
+}
+
+function getNSFromVariableName(raw, varname) {
+    if (varname === 'fabric') return 'fabric';
+    const regex = new RegExp(`\\s*${varname}\\s*=\\s*(.*)\\s*?,\\s*`, 'gm');
+    const result = regex.exec(raw);
+    return result ? result[1].trim() : null;
 }
 
 function findObject(raw, charStart, charEnd, startFrom = 0) {
@@ -50,42 +51,55 @@ function findObject(raw, charStart, charEnd, startFrom = 0) {
 }
 
 
-function removeCommas(raw) {
+function parseRawClass(raw) {
     let index = 0;
     const pairs = [
-        { opening: '{', closing: '}' },
-        { opening: '[', closing: ']' },
-        { opening: '(', closing: ')' },
+        { opening: '{', closing: '}', test(key, index, input) { return input[index] === this[key] } },
+        { opening: '[', closing: ']', test(key, index, input) { return input[index] === this[key] } },
+        { opening: '(', closing: ')', test(key, index, input) { return input[index] === this[key] } },
+        {
+            blocking: true, opening: '/*',
+            closing: '*/',
+            test(key, index, input) {
+                return key === 'closing' ?
+                    input[index - 1] === this[key][0] && input[index] === this[key][1] :
+                    input[index] === this[key][0] && input[index + 1] === this[key][1];
+            }
+        },
     ];
     const stack = [];
     const commas = [];
+    const fields = [];
     while (index < raw.length) {
-        if (pairs.some(({ opening }) => raw[index] === opening)) {
-            stack.push(raw[index]);
-        }
-        else if (pairs.some(({ closing }) => raw[index] === closing)) {
+        const top = stack[stack.length - 1];
+        //console.log(raw[index],top)
+        if (top && top.test('closing', index, raw)) {
             stack.pop();
         }
-        else if (raw[index] === ',' && stack.length === 1) {
-            commas.push(index);
+        else if (!top || !top.blocking) {
+            const found = pairs.find(t => t.test('opening', index, raw));
+            if (found) {
+                stack.push(found);
+            }
+            else if (pairs.some(t => t.test('closing', index, raw))) {
+                stack.pop();
+            }
+            else if (raw[index] === ',' && stack.length === 1) {
+                commas.push(index);
+            }
+            else if (raw[index] === ':' && stack.length === 1) {
+                const trim = raw.slice(0, index).trim();
+                const result = /\s*(.+)$/.exec(trim);
+                result && fields.push(result[1])
+            }
         }
+       
         index++;
     }
     commas.reverse().forEach(pos => {
         raw = raw.slice(0, pos) + raw.slice(pos + 1);
     })
-    return raw;
-}
-
-function removeComments(raw) {
-    const startChar = '/**', endChar = '*/';
-    let start = raw.indexOf(), end;
-    while (start > -1) {
-        end = raw.indexOf(endChar, start);
-        raw = raw.slice(0, start) + raw.slice(end + endChar.length + 1);
-        start = raw.indexOf(startChar);
-    }
-    return raw;
+    return { raw, fields };
 }
 
 /**
@@ -95,11 +109,17 @@ function removeComments(raw) {
  */
 function findClassBase(raw, regex) {
     const result = regex.exec(raw);
-    if (!result) throw new Error(chalk.red('FAILED TO PARSE'));
+    if (!result) throw new Error('FAILED TO PARSE');
     const [match, classNSRaw, superClassRaw] = result;
-    const namespace = classNSRaw.trim();
+    const [first, ...rest] = classNSRaw.trim().split('.');
+    const namespace = [getNSFromVariableName(raw, first), ...rest].join('.');
     const name = namespace.slice(namespace.lastIndexOf('.') + 1);
-    const superClasses = superClassRaw?.trim().split(',').filter(raw => !raw.match(/\/\*+/) && raw).map(key => key.trim()) || [];
+    const superClasses = superClassRaw?.trim().split(',')
+        .filter(raw => !raw.match(/\/\*+/) && raw).map(key => key.trim())
+        .map(val => {
+            const [first, ...rest] = val.split('.');
+            return [getNSFromVariableName(raw, first), ...rest].join('.');
+        }) || [];
     const rawObject = findObject(raw, '{', '}', result.index);
     const NS = namespace.slice(0, namespace.lastIndexOf('.'));
     const klass = fabric.util.resolveNamespace(NS === 'fabric' ? null : NS)[name];
@@ -114,8 +134,7 @@ function findClassBase(raw, regex) {
             value: match
         },
         ...rawObject,
-        klass,
-        prototype: klass.prototype
+        klass
     };
 }
 
@@ -135,7 +154,7 @@ function transformSuperCall(raw) {
     const regex = /this.callSuper\((.+)\)/g;
     const result = regex.exec(raw);
     if (!result) {
-        if (raw.indexOf('callSuper') > -1) throw new Error(chalk.red(`failed to replace 'callSuper'`));
+        if (raw.indexOf('callSuper') > -1) throw new Error(`failed to replace 'callSuper'`);
         return raw;
     }
     const [rawMethodName, ...args] = result[1].split(',');
@@ -146,14 +165,17 @@ function transformSuperCall(raw) {
     return raw.slice(0, result.index) + transformedCall + raw.slice(result.index + result[0].length);
 }
 
-function generateClass(rawClass, className, superClass) {
-    return `export class ${className}${superClass ? ` extends ${superClass}` : ''} ${rawClass}`;
+function generateClass(rawClass, className, superClass, useExports) {
+    return `${useExports ? 'export ' : ''}class ${className}${superClass ? ` extends ${superClass}` : ''} ${rawClass}`;
 }
 
-function generateMixin(rawClass, mixinName, baseClassNS) {
+/**
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#mix-ins
+ */
+function generateMixin(rawClass, mixinName, baseClassNS, useExports) {
     const funcName = `${mixinName}Generator`;
     return `
-export function ${funcName}(Klass) {
+${useExports ? 'export ' : ''}function ${funcName}(Klass) {
   return class ${mixinName||''} extends Klass ${rawClass}
 }
 
@@ -167,7 +189,7 @@ function getMixinName(file) {
 }
 
 function transformFile(raw, { namespace, name } = {}) {
-    if (raw.startsWith('(function')) {
+    if (raw.replace(/\/\*.*\*\\s*/).startsWith('(function')) {
         const wrapper = findObject(raw, '{', '}');
         raw = wrapper.raw.slice(1, wrapper.raw.length - 1);
     }
@@ -179,7 +201,6 @@ function transformFile(raw, { namespace, name } = {}) {
         raw = raw.slice(0, result.index) + raw.slice(found.end+1);
     }
     raw = `//@ts-nocheck\n${raw}`;
-    //raw = `${raw}\n/** @todo TODO_JS_MIGRATION remove next line after refactoring build */\n${namespace} = ${name};\n`;
     return raw;
 }
 
@@ -189,45 +210,49 @@ function transformFile(raw, { namespace, name } = {}) {
  * @param {'class'|'mixin'} type 
  * @returns 
  */
-function transformClass(type, raw, className) {
-    if (!type) throw new Error(chalk.red(`INVALID_ARGUMENT type`));
-    let {
-        prototype,
+function transformClass(type, raw, options = {}) {
+    const { className, useExports } = options;
+    if (!type) throw new Error(`INVALID_ARGUMENT type`);
+    const {
         match,
         name,
         namespace,
         superClass,
-        raw: rawClass,
+        raw: _rawClass,
         end,
         requiresSuperClassResolution,
         superClasses
     } = type === 'mixin' ? findMixin(raw) : findClass(raw);
-    const getPropStart = (key) => {
-        const searchPhrase = `${key}\\s*:\\s*`;
-        const regex = new RegExp(searchPhrase);
-        return { start: regex.exec(rawClass)?.index || -1, regex };
+    let { raw: rawClass, fields } = parseRawClass(_rawClass);
+    const getPropStart = (key, raw) => {
+        const searchPhrase = `^(\\s*)${key}\\s*:\\s*`;
+        const regex = new RegExp(searchPhrase, 'm');
+        const result = regex.exec(raw);
+        const whitespace = result[1];
+        return {
+            start: result?.index + whitespace.length || -1,
+            regex,
+            value: `${whitespace}${key} = `
+        };
     }
     const staticCandidantes = [];
-    Object.keys(prototype).forEach((key) => {
-        const object = prototype[key];
-        if (typeof object === 'function') {
-            const searchPhrase = `^(\\s*)${key}\\s*:\\s*function\\s*\\(`;
-            const regex = new RegExp(searchPhrase, 'm');
-            const result = regex.exec(rawClass);
-            if (!result) return;
+    fields.forEach((key) => {
+        const searchPhrase = `^(\\s*)${key}\\s*:\\s*function\\s*\\(`;
+        const regex = new RegExp(searchPhrase, 'm');
+        const result = regex.exec(rawClass);
+        if (result) {
             const whitespace = result[1];
             const start = result.index + whitespace.length;
             const func = findObject(rawClass, '{', '}', start);
             start && func.raw.indexOf('this') === -1 && staticCandidantes.push(key);
             rawClass = rawClass.replace(regex, `${whitespace}${key === 'initialize' ? 'constructor' : key}(`);
             if (regex.exec(rawClass)) {
-                throw new Error(chalk.red(`dupliate method found ${name}#${key}`));
-            }
-            
+                throw new Error(`dupliate method found ${name}#${key}`);
+            }            
         }
         else {
-            const start = getPropStart(key);
-            rawClass = rawClass.replace(start.regex, `${key} = `);
+            const start = getPropStart(key, rawClass);
+            rawClass = rawClass.replace(start.regex, start.value);
         }
     });
     let transformed = rawClass;
@@ -239,24 +264,26 @@ function transformClass(type, raw, className) {
             console.error(error);
         }
     } while (transformed !== rawClass);
-    rawClass = removeCommas(rawClass);
     const classDirective = type === 'mixin' ?
-        generateMixin(rawClass, className.indexOf(name)===-1?`${_.upperFirst(name)}${className}`:className || name, namespace) :
-        generateClass(rawClass, className || name, superClass);
+        generateMixin(rawClass, `${_.upperFirst(name)}${className.replace(new RegExp(name.toLowerCase()==='staticcanvas'?'canvas':name, 'i'), '')}` || name, namespace, useExports) :
+        generateClass(rawClass, className || name, superClass, useExports);
     raw = `${raw.slice(0, match.index)}${classDirective}${raw.slice(end + 1).replace(/\s*\)\s*;?/, '')}`;
-    raw = transformFile(raw, { namespace, name });
     if (type === 'mixin') {
         //  in case of multiple mixins in one file
         try {
-            return transformClass(type, raw, className);
+            return transformClass(type, raw, options);
         } catch (error) {
             
         }
     }
+    if (type === 'class' && !useExports) {
+        raw = `${raw}\n/** @todo TODO_JS_MIGRATION remove next line after refactoring build */\n${namespace} = ${name};\n`;
+    }
+    raw = transformFile(raw, { namespace, name });
     return { name, raw, staticCandidantes, requiresSuperClassResolution, superClasses };
 }
 
-function convertFile(type, source, dest) {
+function convertFile(type, source, dest, options) {
     try {
         const {
             name,
@@ -264,40 +291,88 @@ function convertFile(type, source, dest) {
             staticCandidantes,
              requiresSuperClassResolution, 
             superClasses
-        } = transformClass(type, readFile(source), type === 'mixin' && getMixinName(path.parse(source).name));
+        } = transformClass(type, readFile(source), {
+            className: type === 'mixin' && getMixinName(path.parse(source).name),
+            ...options
+        });
         dest = (typeof dest === 'function' ? dest(name) : dest) || source;
         fs.writeFileSync(dest, raw);
         console.log({
             state: 'success',
+            type,
             source: path.relative(wd, source),
             destination: path.relative(wd, dest),
             class: name,
             requiresSuperClassResolution: requiresSuperClassResolution ? superClasses : false,
             staticCandidantes: staticCandidantes.length > 0? staticCandidantes: 'none'
         });
-    } catch (e) {
-        console.error(chalk.bold(chalk.yellow(`failed to convert ${path.relative(wd, source)}`)), e);
+        return dest;
+    } catch (error) {
+        const file = path.relative(wd, source);
+        console.log({
+            state: 'failure',
+            type,
+            source: path.relative(wd, source),
+            error: error.message
+        });
+        error.file = file;
+        return error;
     }
-}
-
-function logError(source, e) {
-    console.error(chalk.bold(chalk.yellow(`failed to convert ${path.relative(wd, source)}`)), e);
 }
 
 const classDirs = ['shapes', 'brushes', 'filters'];
 const mixinsDir = path.resolve(wd, './src/mixins');
 const srcDir = path.resolve(wd, './src');
-classDirs.forEach(klsDir => {
-    const dir = path.resolve(srcDir, klsDir);
-    fs.readdirSync(dir).forEach(file => {
-        convertFile('class', path.resolve(dir, file), name => path.resolve(dir, `${name}.ts`));
-    });
-})
 
-fs.readdirSync(mixinsDir).forEach(file => {
-    convertFile('mixin', path.resolve(mixinsDir, file), path.resolve(mixinsDir, `${getMixinName(file)}.ts`));
-});
-const additionalFile = fs.readdirSync(srcDir).filter(file => !fs.lstatSync(path.resolve(srcDir, file)).isDirectory());
-additionalFile.forEach(file => {
-    convertFile('class', path.resolve(srcDir, file), name => path.resolve(srcDir, `${name}.ts`));
-});
+function generateIndexFile(dir, files, ext) {
+    const file = path.resolve(dir, `index.${ext}`);
+    fs.writeFileSync(file, _.compact(files).map(file => {
+        const name = path.parse(file).name;
+        return `export * from ./${name};\n`;
+    }).join(''));
+    console.log(chalk.bold(`created ${path.relative(wd, file)}`));
+}
+
+function convert(options = {}) {
+    const failed = [];
+    const { overwriteExisitingFiles, ext, createIndex } = _.defaults(options, { overwriteExisitingFiles: true, ext: 'js', createIndex: true, useExports: true });
+    const finalize = (dir, result) => {
+        const [errors, files] = _.partition(result, file => file instanceof Error);
+        failed.push(...errors);
+        createIndex && generateIndexFile(dir, files, ext);
+        overwriteExisitingFiles && ext === 'ts' && files.forEach(file => fs.removeSync(path.resolve(dir, file.replace('.ts', '.js'))));
+    }
+    
+    classDirs.forEach(klsDir => {
+        const dir = path.resolve(srcDir, klsDir);
+        const result = fs.readdirSync(dir).map(file => {
+            const dest = overwriteExisitingFiles ?
+                ext === 'ts' ? path.resolve(dir, file.replace('.js', '.ts')) : false :
+                name => path.resolve(dir, `${name}.${ext}`);
+            return convertFile('class', path.resolve(dir, file), dest, options);
+        });
+        finalize(dir, result);
+    });
+
+    const mixinFiles = fs.readdirSync(mixinsDir).map(file => {
+        const dest = overwriteExisitingFiles ?
+            ext === 'ts' ? path.resolve(mixinsDir, file.replace('.js', '.ts')) : false :
+            path.resolve(mixinsDir, `${getMixinName(file)}.${ext}`);
+        return convertFile('mixin', path.resolve(mixinsDir, file), dest, options);
+    });
+    finalize(mixinsDir, mixinFiles);
+
+    const additionalFile = fs.readdirSync(srcDir).filter(file => !fs.lstatSync(path.resolve(srcDir, file)).isDirectory());
+    const additionalFiles = additionalFile.map(file => {
+        const dest = overwriteExisitingFiles ?
+            ext === 'ts' ? path.resolve(srcDir, file.replace('.js', '.ts')) : false :
+            name => path.resolve(srcDir, `${name}.${ext}`);
+        return convertFile('class', path.resolve(srcDir, file), dest, options);
+    });
+    finalize(mixinsDir, additionalFiles);
+    return;
+    console.error(`failed files:`);
+    failed.map(console.error)
+}
+
+module.exports = { convert };
