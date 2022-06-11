@@ -268,26 +268,17 @@ function convertFile(type, source, dest) {
     try {
         const { name, raw, staticCandidantes, requiresSuperClassResolution, superClasses } = transformClass(source, type);
         dest = (typeof dest === 'function' ? dest(name) : dest) || source;
-        if (staticCandidantes.length > 0) {
-            console.log({
-                class: name,
-                origin: source,
-                file: dest,
-                staticCandidantes
-            })
-        }
-        if (requiresSuperClassResolution) {
-            console.warn({
-                class: name,
-                origin: source,
-                file: dest,
-                requiresSuperClassResolution: superClasses
-
-            })
-        }
         fs.writeFileSync(dest, raw);
+        console.log({
+            state: 'success',
+            source: path.relative(wd, source),
+            destination: path.relative(wd, dest),
+            class: name,
+            requiresSuperClassResolution: requiresSuperClassResolution ? superClasses : false,
+            staticCandidantes: staticCandidantes.length > 0? staticCandidantes: 'none'
+        });
     } catch (e) {
-        console.error(type, source, e);
+        console.error(`failed to convert ${path.relative(wd, source)}`, e);
     }
 }
 
