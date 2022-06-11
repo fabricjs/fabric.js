@@ -335,7 +335,7 @@
     assert.equal(opt.currentTarget, rect2, 'options match model - currentTarget');
   });
 
-  QUnit.test('fires object:modified and object:moved', function(assert) {
+  QUnit.test('fires object:modified', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1 };
     var e2 = { clientX: 31, clientY: 31, which: 1 };
     var rect = new fabric.Rect({ left: 0, top: 0, width: 50, height: 50 });
@@ -488,9 +488,9 @@
       c._onDragLeave,
       c._onDrop,
     ];
-    // initialize canvas more than once
-    c.initialize();
-    c.initialize();
+    // _initEventListeners canvas more than once
+    c._initEventListeners();
+    c._initEventListeners();
     var eventsArray2 = [
       c._onMouseDown,
       c._onMouseMove,
@@ -510,7 +510,7 @@
       c._onDragLeave,
       c._onDrop,
     ];
-    assert.deepEqual(eventsArray, eventsArray2, 'after first initialize, functions do not change.');
+    assert.deepEqual(eventsArray, eventsArray2, 'after first _initEventListeners, functions do not change.');
   });
 
   ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
@@ -522,9 +522,9 @@
       c[funcName] = function() {
         counter++;
       };
-      // initialize canvas more than once
-      c.initialize(c.lowerCanvasEl);
-      c.initialize(c.lowerCanvasEl);
+      // _initEventListeners canvas more than once
+      c._initEventListeners(c.lowerCanvasEl);
+      c._initEventListeners(c.lowerCanvasEl);
       var event = fabric.document.createEvent('HTMLEvents');
       event.initEvent(eventName, true, true);
       c.upperCanvasEl.dispatchEvent(event);
@@ -769,9 +769,9 @@
       c[funcName] = function() {
         counter++;
       };
-      // initialize canvas more than once
-      c.initialize(c.lowerCanvasEl);
-      c.initialize(c.lowerCanvasEl);
+      // _initEventListeners canvas more than once
+      c._initEventListeners(c.lowerCanvasEl);
+      c._initEventListeners(c.lowerCanvasEl);
       var event = fabric.document.createEvent('MouseEvent');
       event.initEvent(eventName, true, true);
       c.upperCanvasEl.dispatchEvent(event);
@@ -787,9 +787,9 @@
       counter++;
     };
     var c = new fabric.Canvas();
-    // initialize canvas more than once
-    c.initialize(c.lowerCanvasEl);
-    c.initialize(c.lowerCanvasEl);
+    // _initEventListeners canvas more than once
+    c._initEventListeners(c.lowerCanvasEl);
+    c._initEventListeners(c.lowerCanvasEl);
 
     // a mouse down is necessary to register mouse up.
     var _event = fabric.document.createEvent('MouseEvent');
@@ -857,9 +857,9 @@
       counter++;
     };
     var c = new fabric.Canvas();
-    // initialize canvas more than once
-    c.initialize(c.lowerCanvasEl);
-    c.initialize(c.lowerCanvasEl);
+    // _initEventListeners canvas more than once
+    c._initEventListeners(c.lowerCanvasEl);
+    c._initEventListeners(c.lowerCanvasEl);
     var event = fabric.document.createEvent('UIEvents');
     event.initUIEvent('resize', true, false, fabric.window, 0);
     fabric.window.dispatchEvent(event);

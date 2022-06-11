@@ -883,14 +883,14 @@
      * Measure and return the info of a single grapheme.
      * needs the the info of previous graphemes already filled
      * Override to customize measuring
-     * 
+     *
      * @typedef {object} GraphemeBBox
      * @property {number} width
      * @property {number} height
      * @property {number} kernedWidth
      * @property {number} left
      * @property {number} deltaY
-     * 
+     *
      * @param {String} grapheme to be measured
      * @param {Number} lineIndex index of the line where the char is
      * @param {Number} charIndex position in the line
@@ -1053,7 +1053,9 @@
           path = this.path,
           shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex) && !path,
           isLtr = this.direction === 'ltr', sign = this.direction === 'ltr' ? 1 : -1,
-          drawingLeft, currentDirection = ctx.canvas.getAttribute('dir');
+          // this was changed in the PR #7674
+          // currentDirection = ctx.canvas.getAttribute('dir');
+          drawingLeft, currentDirection = ctx.direction;
       ctx.save();
       if (currentDirection !== this.direction) {
         ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
@@ -1315,7 +1317,15 @@
         leftOffset = lineDiff;
       }
       if (direction === 'rtl') {
-        leftOffset -= lineDiff;
+        if (textAlign === 'right' || textAlign === 'justify' || textAlign === 'justify-right') {
+          leftOffset = 0;
+        }
+        else if (textAlign === 'left' || textAlign === 'justify-left') {
+          leftOffset = -lineDiff;
+        }
+        else if (textAlign === 'center' || textAlign === 'justify-center') {
+          leftOffset = -lineDiff / 2;
+        }
       }
       return leftOffset;
     },

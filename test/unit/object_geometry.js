@@ -448,36 +448,6 @@
       43.50067533516962], 'translate matrix scale skewX skewY angle flipX flipY');
   });
 
-  QUnit.test('_calcRotateMatrix', function(assert) {
-    var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0, angle: 90 });
-    assert.ok(typeof cObj._calcRotateMatrix === 'function', '_calcRotateMatrix should exist');
-    var matrix = cObj._calcRotateMatrix();
-    var expected = [
-      0,
-      1,
-      -1,
-      0,
-      0,
-      0
-    ];
-    assert.deepEqual(matrix, expected, 'rotate matrix is equal');
-  });
-
-  QUnit.test('_calcTranslateMatrix', function(assert) {
-    var cObj = new fabric.Object({ top: 5, width: 10, height: 15, strokeWidth: 0, angle: 90 });
-    assert.ok(typeof cObj._calcTranslateMatrix === 'function', '_calcTranslateMatrix should exist');
-    var matrix = cObj._calcTranslateMatrix();
-    var expected = [
-      1,
-      0,
-      0,
-      1,
-      -7.5,
-      10
-    ];
-    assert.deepEqual(matrix, expected, 'translate matrix is equal');
-  });
-
   QUnit.test('scaleToWidth', function(assert) {
     var cObj = new fabric.Object({ width: 560, strokeWidth: 0 });
     assert.ok(typeof cObj.scaleToWidth === 'function',  'scaleToWidth should exist');
