@@ -14,7 +14,7 @@
       multiplyMatrices = util.multiplyTransformMatrices,
       transformPoint = util.transformPoint;
 
-  util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
+  fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
     /**
      * Describe object's corner position in canvas element coordinates.
