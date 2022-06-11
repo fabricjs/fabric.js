@@ -111,8 +111,7 @@ function findClass(raw) {
 
 function transformClass(file) {
     let raw = readFile(file);
-    const { prototype, match, name, namespace, superClass } = findClass(raw);
-    raw = raw.replace(match.value, `export class ${name}${superClass ? ` extends ${superClass}` : ''} {`);
+    let { prototype, match, name, namespace, superClass, raw: rawClass, end } = findClass(raw);
     const getPropStart = (key) => {
         const searchPhrase = `${key}\\s*:\\s*`;
         const regex = new RegExp(searchPhrase);
@@ -123,13 +122,13 @@ function transformClass(file) {
         if (typeof object === 'function') {
             const searchPhrase = `${key}\\s*:\\s*function\\s*\\(`;
             const regex = new RegExp(searchPhrase);
-            const start = regex.exec(raw)?.index;
-            const func = findObject(raw, '{', '}', start);
-            const indexOfComma = raw.indexOf(',', func.end);
+            const start = regex.exec(rawClass)?.index;
+            const func = findObject(rawClass, '{', '}', start);
+            const indexOfComma = rawClass.indexOf(',', func.end);
             if (indexOfComma > -1) {
-                raw = raw.slice(0, indexOfComma) + raw.slice(indexOfComma + 1);
+                rawClass = rawClass.slice(0, indexOfComma) + rawClass.slice(indexOfComma + 1);
             }
-            raw = raw.replace(regex, `${key}(`);
+            rawClass = rawClass.replace(regex, `${key}(`);
         }
         else {
             const start = getPropStart(key);
@@ -140,19 +139,22 @@ function transformClass(file) {
                 ++nextIndex;
             }
             const next = getPropStart(array[index + 1]);
-            const indexOfComma = raw.lastIndexOf(',', next.start);
+            const indexOfComma = rawClass.lastIndexOf(',', next.start);
             if (indexOfComma > -1) {
-                raw = raw.slice(0, indexOfComma) + raw.slice(indexOfComma + 1);
+                rawClass = rawClass.slice(0, indexOfComma) + rawClass.slice(indexOfComma + 1);
             }
-            raw = raw.replace(start.regex, `${key} = `);
+            rawClass = rawClass.replace(start.regex, `${key} = `);
         }
     });
+
+    const classDirective = `export class ${name}${superClass ? ` extends ${superClass}` : ''} ${rawClass}`;
+    console.log(raw.slice(end+1))
+    raw = `${raw.slice(0, match.index)}${classDirective}${raw.slice(end+1).replace(/\s*\)\s*;?/,'')}`;
     if (raw.startsWith('(function')) {
         const wrapper = findObject(raw, '{', '}');
-        console.log(wrapper.raw)
         raw = wrapper.raw.slice(1, wrapper.raw.length - 1);
     }
-    raw = `${raw}\n${namespace} = ${name};\n`;
+    raw = `${raw}\n/** @todo remove next line */\n${namespace} = ${name};\n`;
     return raw;
 }
 
