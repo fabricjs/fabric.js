@@ -14,9 +14,17 @@ const CLI_CACHE = path.resolve(__dirname, 'cli_cache.json');
 const wd = path.resolve(__dirname, '..');
 
 
+const { fabric } = require(wd);
+
+function readFile(file) {
+    return fs.readFileSync(path.resolve(wd, file)).toString('utf-8');;
+}
+
 function transformFile(file) {
     const raw = fs.readFileSync(path.resolve(wd, file)).toString('utf-8');
-    console.log(findMixinNS(raw), findClass(raw))
+    console.log(findMixinNS(raw))
+    const { keys } = findClass(raw)||{};
+    console.log(keys)
 }
 
 function getVariableNameOfKey(raw, key) {
@@ -38,22 +46,15 @@ function findMixinNS(raw) {
     return result && result[1].trim();
 }
 
-function findClass(raw) {
-    const keyWord = getVariableNameOfNS(raw, 'fabric.util.createClass');
-    const regex = new RegExp(`(.+)=\\s*${keyWord.replaceAll('.', '\\.')}\\((\.*)\\{`, 'm');
-    const result = regex.exec(raw);
-    if (!result) return;
-    const [match, classNSRaw, superClassRaw] = result;
-    console.log(...result)
-    const superClasses = superClassRaw.trim().split(',').filter(raw => !raw.match(/\/\*+/));
-    const classStart = raw.indexOf('{', result.index);
-    let index = classStart;
+function findObject(raw, charStart, charEnd, startFrom = 0) {
+    const start = raw.indexOf(charStart, startFrom);
+    let index = start;
     let counter = 0;
     while (index < raw.length) {
-        if (raw[index] === '{') {
+        if (raw[index] === charStart) {
             counter++;
         }
-        else if (raw[index] === '}') {
+        else if (raw[index] === charEnd) {
             counter--;
             if (counter === 0) {
                 break;
@@ -61,21 +62,103 @@ function findClass(raw) {
         }
         index++;
     }
-    
+    return start > -1 ?
+        {
+            start,
+            end: index,
+            raw: raw.slice(start, index + charEnd.length)
+        } :
+        null;
+}
+
+function removeComments(raw) {
+    const startChar = '/**', endChar = '*/';
+    let start = raw.indexOf(), end;
+    while (start > -1) {
+        end = raw.indexOf(endChar, start);
+        raw = raw.slice(0, start) + raw.slice(end + endChar.length + 1);
+        start = raw.indexOf(startChar);
+    }
+    return raw;
+}
+
+function findClass(raw) {
+    const keyWord = getVariableNameOfNS(raw, 'fabric.util.createClass');
+    const regex = new RegExp(`(.+)=\\s*${keyWord.replaceAll('.', '\\.')}\\((\.*)\\{`, 'm');
+    const result = regex.exec(raw);
+    if (!result) return;
+    const [match, classNSRaw, superClassRaw] = result;
+    const namespace = classNSRaw.trim();
+    const name = namespace.slice(namespace.lastIndexOf('.') + 1);
+    const superClasses = superClassRaw.trim().split(',').filter(raw => !raw.match(/\/\*+/));
+    const rawObject = findObject(raw, '{', '}', result.index);
+    const klass = fabric.util.resolveNamespace(namespace.slice(0, namespace.lastIndexOf('.')))[name];
     return {
-        namespace: classNSRaw.trim(),
+        name,
+        namespace,
         superClasses,
         superClass: superClasses.length > 0 ? superClasses[superClasses.length - 1] : undefined,
         requiresSuperClassResolution: superClasses.length > 0,
-        start: classStart,
-        end: index,
-        raw: raw.slice(classStart, index + 1)
+        match: {
+            index: result.index,
+            value: match
+        },
+        ...rawObject,
+        klass,
+        prototype: klass.prototype
     };
 }
 
-transformFile('src/parser.js')
-transformFile('src/canvas.class.js')
-transformFile('src/mixins/canvas_events.mixin.js')
+function transformClass(file) {
+    let raw = readFile(file);
+    const { prototype, match, name, namespace, superClass } = findClass(raw);
+    raw = raw.replace(match.value, `export class ${name}${superClass ? ` extends ${superClass}` : ''} {`);
+    const getPropStart = (key) => {
+        const searchPhrase = `${key}\\s*:\\s*`;
+        const regex = new RegExp(searchPhrase);
+        return { start: regex.exec(raw)?.index || -1, regex };
+    }
+    Object.keys(prototype).forEach((key,index,array) => {
+        const object = prototype[key];
+        if (typeof object === 'function') {
+            const searchPhrase = `${key}\\s*:\\s*function\\s*\\(`;
+            const regex = new RegExp(searchPhrase);
+            const start = regex.exec(raw)?.index;
+            const func = findObject(raw, '{', '}', start);
+            const indexOfComma = raw.indexOf(',', func.end);
+            if (indexOfComma > -1) {
+                raw = raw.slice(0, indexOfComma) + raw.slice(indexOfComma + 1);
+            }
+            raw = raw.replace(regex, `${key}(`);
+        }
+        else {
+            const start = getPropStart(key);
+            let nextIndex = ++index;
+            let nextStart = -1;
+            while (nextIndex < array.length && nextStart === -1) {
+                nextStart = getPropStart(array[nextIndex]).start;
+                ++nextIndex;
+            }
+            const next = getPropStart(array[index + 1]);
+            const indexOfComma = raw.lastIndexOf(',', next.start);
+            if (indexOfComma > -1) {
+                raw = raw.slice(0, indexOfComma) + raw.slice(indexOfComma + 1);
+            }
+            raw = raw.replace(start.regex, `${key} = `);
+        }
+    });
+    if (raw.startsWith('(function')) {
+        const wrapper = findObject(raw, '{', '}');
+        console.log(wrapper.raw)
+        raw = wrapper.raw.slice(1, wrapper.raw.length - 1);
+    }
+    raw = `${raw}\n${namespace} = ${name};\n`;
+    return raw;
+}
+
+//transformFile('src/parser.js')
+fs.writeFileSync(path.resolve(wd, './src/Canvas.js'), transformClass('src/canvas.class.js'));
+//transformFile('src/mixins/canvas_events.mixin.js')
 
 /**
  * 
