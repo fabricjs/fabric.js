@@ -65,6 +65,8 @@ function findClass(raw) {
     return {
         namespace: classNSRaw.trim(),
         superClasses,
+        superClass: superClasses.length > 0 ? superClasses[superClasses.length - 1] : undefined,
+        requiresSuperClassResolution: superClasses.length > 0,
         start: classStart,
         end: index,
         raw: raw.slice(classStart, index + 1)
