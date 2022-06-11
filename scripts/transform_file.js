@@ -166,13 +166,18 @@ function generateClass(rawClass, className, superClass) {
 }
 
 function generateMixin(rawClass, mixinName, baseClassNS) {
+    const funcName = `${mixinName}Generator`;
     return `
-export function Mixier(Klass) {
+export function ${funcName}(Klass) {
   return class ${mixinName||''} extends Klass ${rawClass}
 }
 
-${baseClassNS ? `${baseClassNS} = Mixier(${baseClassNS});`:''}
+${baseClassNS ? `${baseClassNS} = ${funcName}(${baseClassNS});`:''}
 `;
+}
+
+function getMixinName(file) {
+    return _.upperFirst(_.camelCase(path.parse(file).name.split('.')[0]) + 'Mixin');
 }
 
 function transformFile(raw, { namespace, name } = {}) {
@@ -251,7 +256,7 @@ function transformClass(file, type) {
     } while (transformed !== rawClass);
     rawClass = removeCommas(rawClass);
     const classDirective = type === 'mixin' ?
-        generateMixin(rawClass, _.camelCase(path.parse(file).name.split('.')[0]) + 'Mixin', namespace) :
+        generateMixin(rawClass, getMixinName(file), namespace) :
         generateClass(rawClass, name, superClass);
     raw = `${raw.slice(0, match.index)}${classDirective}${raw.slice(end + 1).replace(/\s*\)\s*;?/, '')}`;
     raw = transformFile(raw, { namespace, name });
@@ -266,7 +271,7 @@ function convertFile(type, source, dest) {
         if (staticCandidantes.length > 0) {
             console.log({
                 class: name,
-                origin: file,
+                origin: source,
                 file: dest,
                 staticCandidantes
             })
@@ -274,7 +279,7 @@ function convertFile(type, source, dest) {
         if (requiresSuperClassResolution) {
             console.warn({
                 class: name,
-                origin: file,
+                origin: source,
                 file: dest,
                 requiresSuperClassResolution: superClasses
 
@@ -282,7 +287,7 @@ function convertFile(type, source, dest) {
         }
         fs.writeFileSync(dest, raw);
     } catch (e) {
-        console.error(file, e);
+        console.error(type, source, e);
     }
 }
 
@@ -293,7 +298,7 @@ fs.readdirSync(shapesDir).forEach(file => {
     convertFile('class', path.resolve(shapesDir, file), name => path.resolve(shapesDir, `${name}.ts`));
 });
 fs.readdirSync(mixinsDir).forEach(file => {
-    convertFile('mixin', path.resolve(mixinsDir, file), name => path.resolve(mixinsDir, `${_.camelCase(path.parse(file).name.split('.')[0]) + 'Mixin'}${name}.ts`));
+    convertFile('mixin', path.resolve(mixinsDir, file), name => path.resolve(mixinsDir, `${getMixinName(file)}.ts`));
 });
 
 //fs.writeFileSync(path.resolve(wd, './src/Canvas.js'), transformClass('src/canvas.class.js').raw);
