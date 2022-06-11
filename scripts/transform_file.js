@@ -161,6 +161,10 @@ function transformSuperCall(raw) {
     return raw.slice(0, result.index) + transformedCall + raw.slice(result.index + result[0].length);
 }
 
+function generateClass(rawClass, className, superClass) {
+    return `export class ${className}${superClass ? ` extends ${superClass}` : ''} ${rawClass}`;
+}
+
 function generateMixin(rawClass, mixinName, baseClassNS) {
     return `
 export function Mixier(Klass) {
@@ -188,9 +192,26 @@ function transformFile(raw, { namespace, name } = {}) {
     return raw;
 }
 
-function transformClass(file) {
+/**
+ * 
+ * @param {string} file 
+ * @param {'class'|'mixin'} type 
+ * @returns 
+ */
+function transformClass(file, type) {
+    if (!type) throw new Error(`INVALID_ARGUMENT type`);
     let raw = readFile(file);
-    let { prototype, match, name, namespace, superClass, raw: rawClass, end, requiresSuperClassResolution, superClasses } = findClass(raw);
+    let {
+        prototype,
+        match,
+        name,
+        namespace,
+        superClass,
+        raw: rawClass,
+        end,
+        requiresSuperClassResolution,
+        superClasses
+    } = type === 'mixin' ? findMixin(raw) : findClass(raw);
     const getPropStart = (key) => {
         const searchPhrase = `${key}\\s*:\\s*`;
         const regex = new RegExp(searchPhrase);
@@ -228,26 +249,25 @@ function transformClass(file) {
             console.error(error);
         }
     } while (transformed !== rawClass);
-    const classDirective = `export class ${name}${superClass ? ` extends ${superClass}` : ''} ${removeCommas(rawClass)}`;
+    rawClass = removeCommas(rawClass);
+    const classDirective = type === 'mixin' ?
+        generateMixin(rawClass, _.camelCase(path.parse(file).name.split('.')[0]) + 'Mixin', namespace) :
+        generateClass(rawClass, name, superClass);
     raw = `${raw.slice(0, match.index)}${classDirective}${raw.slice(end + 1).replace(/\s*\)\s*;?/, '')}`;
     raw = transformFile(raw, { namespace, name });
     return { name, raw, staticCandidantes, requiresSuperClassResolution, superClasses };
 }
 
-//transformFile('src/parser.js')
-const shapes = fs.readdirSync(path.resolve(wd, './src/shapes'));
-shapes.forEach(file => {
-    if (path.parse(file).ext !== '.js') return;
-    const source = path.join('src', 'shapes', file);
+function convertFile(type, source, dest) {
+    if (path.parse(source).ext !== '.js') return;
     try {
-        const { name, raw, staticCandidantes,requiresSuperClassResolution,superClasses } = transformClass(source);
-        const destFile = `${name}.ts`;
-        const dest = path.resolve(wd, 'src', 'shapes', destFile);
+        const { name, raw, staticCandidantes, requiresSuperClassResolution, superClasses } = transformClass(source, type);
+        dest = (typeof dest === 'function' ? dest(name) : dest) || source;
         if (staticCandidantes.length > 0) {
             console.log({
                 class: name,
                 origin: file,
-                file: destFile,
+                file: dest,
                 staticCandidantes
             })
         }
@@ -255,16 +275,27 @@ shapes.forEach(file => {
             console.warn({
                 class: name,
                 origin: file,
-                file: destFile,
+                file: dest,
                 requiresSuperClassResolution: superClasses
 
             })
         }
         fs.writeFileSync(dest, raw);
     } catch (e) {
-        console.error(file, e)
+        console.error(file, e);
     }
-})
+}
+
+//transformFile('src/parser.js')
+const shapesDir = path.resolve(wd, './src/shapes');
+const mixinsDir = path.resolve(wd, './src/mixins');
+fs.readdirSync(shapesDir).forEach(file => {
+    convertFile('class', path.resolve(shapesDir, file), name => path.resolve(shapesDir, `${name}.ts`));
+});
+fs.readdirSync(mixinsDir).forEach(file => {
+    convertFile('mixin', path.resolve(mixinsDir, file), name => path.resolve(mixinsDir, `${_.camelCase(path.parse(file).name.split('.')[0]) + 'Mixin'}${name}.ts`));
+});
+
 //fs.writeFileSync(path.resolve(wd, './src/Canvas.js'), transformClass('src/canvas.class.js').raw);
 
 
