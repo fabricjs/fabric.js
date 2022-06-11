@@ -2,17 +2,9 @@
 const fs = require('fs-extra');
 const _ = require('lodash');
 const path = require('path');
-const cp = require('child_process');
-const inquirer = require('inquirer');
-const ansiEscapes = require('ansi-escapes');
-const fuzzy = require('fuzzy');
 const chalk = require('chalk');
-const moment = require('moment');
-const Checkbox = require('inquirer-checkbox-plus-prompt');
 
-const CLI_CACHE = path.resolve(__dirname, 'cli_cache.json');
 const wd = path.resolve(__dirname, '..');
-
 
 const { fabric } = require(wd);
 
@@ -30,13 +22,6 @@ function getVariableNameOfNS(raw, namespace) {
     const regex = new RegExp(`(.+)=\\s*${namespace.replaceAll('.', '\\.')}\\.+$`, 'm');
     const result = regex.exec(raw);
     return result ? result[1].trim() : namespace;
-}
-
-function findMixinNS(raw) {
-    const keyWord = getVariableNameOfNS(raw, 'fabric.util.object.extend');
-    const regex = new RegExp(`${keyWord.replaceAll('.', '\\.')}\\((.+)\\.prototype,\.*\\{`, 'm');
-    const result = regex.exec(raw);
-    return result && result[1].trim();
 }
 
 function findObject(raw, charStart, charEnd, startFrom = 0) {
@@ -110,7 +95,7 @@ function removeComments(raw) {
  */
 function findClassBase(raw, regex) {
     const result = regex.exec(raw);
-    if (!result) throw new Error('NOT_FOUND');
+    if (!result) throw new Error(chalk.red('FAILED TO PARSE'));
     const [match, classNSRaw, superClassRaw] = result;
     const namespace = classNSRaw.trim();
     const name = namespace.slice(namespace.lastIndexOf('.') + 1);
@@ -150,7 +135,7 @@ function transformSuperCall(raw) {
     const regex = /this.callSuper\((.+)\)/g;
     const result = regex.exec(raw);
     if (!result) {
-        if (raw.indexOf('callSuper') > -1) throw new Error(`failed to replace 'callSuper'`);
+        if (raw.indexOf('callSuper') > -1) throw new Error(chalk.red(`failed to replace 'callSuper'`));
         return raw;
     }
     const [rawMethodName, ...args] = result[1].split(',');
@@ -204,9 +189,8 @@ function transformFile(raw, { namespace, name } = {}) {
  * @param {'class'|'mixin'} type 
  * @returns 
  */
-function transformClass(file, type) {
-    if (!type) throw new Error(`INVALID_ARGUMENT type`);
-    let raw = readFile(file);
+function transformClass(type, raw, className) {
+    if (!type) throw new Error(chalk.red(`INVALID_ARGUMENT type`));
     let {
         prototype,
         match,
@@ -237,7 +221,7 @@ function transformClass(file, type) {
             start && func.raw.indexOf('this') === -1 && staticCandidantes.push(key);
             rawClass = rawClass.replace(regex, `${whitespace}${key === 'initialize' ? 'constructor' : key}(`);
             if (regex.exec(rawClass)) {
-                throw new Error(`dupliate method found ${name}#${key}`)
+                throw new Error(chalk.red(`dupliate method found ${name}#${key}`));
             }
             
         }
@@ -257,17 +241,30 @@ function transformClass(file, type) {
     } while (transformed !== rawClass);
     rawClass = removeCommas(rawClass);
     const classDirective = type === 'mixin' ?
-        generateMixin(rawClass, getMixinName(file), namespace) :
-        generateClass(rawClass, name, superClass);
+        generateMixin(rawClass, className.indexOf(name)===-1?`${_.upperFirst(name)}${className}`:className || name, namespace) :
+        generateClass(rawClass, className || name, superClass);
     raw = `${raw.slice(0, match.index)}${classDirective}${raw.slice(end + 1).replace(/\s*\)\s*;?/, '')}`;
     raw = transformFile(raw, { namespace, name });
+    if (type === 'mixin') {
+        //  in case of multiple mixins in one file
+        try {
+            return transformClass(type, raw, className);
+        } catch (error) {
+            
+        }
+    }
     return { name, raw, staticCandidantes, requiresSuperClassResolution, superClasses };
 }
 
 function convertFile(type, source, dest) {
-    if (path.parse(source).ext !== '.js') return;
     try {
-        const { name, raw, staticCandidantes, requiresSuperClassResolution, superClasses } = transformClass(source, type);
+        const {
+            name,
+            raw,
+            staticCandidantes,
+             requiresSuperClassResolution, 
+            superClasses
+        } = transformClass(type, readFile(source), type === 'mixin' && getMixinName(path.parse(source).name));
         dest = (typeof dest === 'function' ? dest(name) : dest) || source;
         fs.writeFileSync(dest, raw);
         console.log({
@@ -279,33 +276,28 @@ function convertFile(type, source, dest) {
             staticCandidantes: staticCandidantes.length > 0? staticCandidantes: 'none'
         });
     } catch (e) {
-        console.error(`failed to convert ${path.relative(wd, source)}`, e);
+        console.error(chalk.bold(chalk.yellow(`failed to convert ${path.relative(wd, source)}`)), e);
     }
 }
 
-//transformFile('src/parser.js')
-const shapesDir = path.resolve(wd, './src/shapes');
-const mixinsDir = path.resolve(wd, './src/mixins');
-fs.readdirSync(shapesDir).forEach(file => {
-    convertFile('class', path.resolve(shapesDir, file), name => path.resolve(shapesDir, `${name}.ts`));
-});
-fs.readdirSync(mixinsDir).forEach(file => {
-    convertFile('mixin', path.resolve(mixinsDir, file), name => path.resolve(mixinsDir, `${getMixinName(file)}.ts`));
-});
-
-//fs.writeFileSync(path.resolve(wd, './src/Canvas.js'), transformClass('src/canvas.class.js').raw);
-
-
-//console.log(findMixin(readFile('src/mixins/canvas_events.mixin.js')))
-
-/**
- * 
- * @param {string} text 
- */
-function findStartPoint(text) {
-    const findMixin = /fabric\.util\.object\.extend\((.+)\.prototype,.+\{/m;
-    const what = 'fabric.util.object.extend';
-    const findExtend = new RegExp(`(.+)=\s?${what.replaceAll('.', '\\.')}`, 'm');
-    const phrases = ['fabric.util.createClass(', 'fabric.util.object.extend('];
-text.indexOf()
+function logError(source, e) {
+    console.error(chalk.bold(chalk.yellow(`failed to convert ${path.relative(wd, source)}`)), e);
 }
+
+const classDirs = ['shapes', 'brushes', 'filters'];
+const mixinsDir = path.resolve(wd, './src/mixins');
+const srcDir = path.resolve(wd, './src');
+classDirs.forEach(klsDir => {
+    const dir = path.resolve(srcDir, klsDir);
+    fs.readdirSync(dir).forEach(file => {
+        convertFile('class', path.resolve(dir, file), name => path.resolve(dir, `${name}.ts`));
+    });
+})
+
+fs.readdirSync(mixinsDir).forEach(file => {
+    convertFile('mixin', path.resolve(mixinsDir, file), path.resolve(mixinsDir, `${getMixinName(file)}.ts`));
+});
+const additionalFile = fs.readdirSync(srcDir).filter(file => !fs.lstatSync(path.resolve(srcDir, file)).isDirectory());
+additionalFile.forEach(file => {
+    convertFile('class', path.resolve(srcDir, file), name => path.resolve(srcDir, `${name}.ts`));
+});
