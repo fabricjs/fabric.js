@@ -115,15 +115,17 @@ function transformClass(file) {
     const getPropStart = (key) => {
         const searchPhrase = `${key}\\s*:\\s*`;
         const regex = new RegExp(searchPhrase);
-        return { start: regex.exec(raw)?.index || -1, regex };
+        return { start: regex.exec(rawClass)?.index || -1, regex };
     }
-    Object.keys(prototype).forEach((key,index,array) => {
+    const staticCandidantes = [];
+    Object.keys(prototype).forEach((key) => {
         const object = prototype[key];
         if (typeof object === 'function') {
             const searchPhrase = `${key}\\s*:\\s*function\\s*\\(`;
             const regex = new RegExp(searchPhrase);
             const start = regex.exec(rawClass)?.index;
             const func = findObject(rawClass, '{', '}', start);
+            func.raw.indexOf('this') === -1 && staticCandidantes.push(key);
             const indexOfComma = rawClass.indexOf(',', func.end);
             if (indexOfComma > -1) {
                 rawClass = rawClass.slice(0, indexOfComma) + rawClass.slice(indexOfComma + 1);
@@ -132,34 +134,39 @@ function transformClass(file) {
         }
         else {
             const start = getPropStart(key);
-            let nextIndex = ++index;
-            let nextStart = -1;
-            while (nextIndex < array.length && nextStart === -1) {
-                nextStart = getPropStart(array[nextIndex]).start;
-                ++nextIndex;
+            const type = typeof prototype[key];
+            switch (typeof prototype[key]) {
+                case 'object':
+                    const a = findObject('[', ']', start.start);
+                    const b = findObject('(', ')', start.start);
+                    const c = findObject('{', '}', start.start);
+                    if (!a || !b || !c) {
+                        break;
+                    }
+                default:
+                    const indexOfComma = rawClass.indexOf(',', start.start);
+                    if (indexOfComma > -1) {
+                        rawClass = rawClass.slice(0, indexOfComma) + rawClass.slice(indexOfComma + 1);
+                    }
+                    break;
             }
-            const next = getPropStart(array[index + 1]);
-            const indexOfComma = rawClass.lastIndexOf(',', next.start);
-            if (indexOfComma > -1) {
-                rawClass = rawClass.slice(0, indexOfComma) + rawClass.slice(indexOfComma + 1);
-            }
+
             rawClass = rawClass.replace(start.regex, `${key} = `);
         }
     });
 
     const classDirective = `export class ${name}${superClass ? ` extends ${superClass}` : ''} ${rawClass}`;
-    console.log(raw.slice(end+1))
     raw = `${raw.slice(0, match.index)}${classDirective}${raw.slice(end+1).replace(/\s*\)\s*;?/,'')}`;
     if (raw.startsWith('(function')) {
         const wrapper = findObject(raw, '{', '}');
         raw = wrapper.raw.slice(1, wrapper.raw.length - 1);
     }
-    raw = `${raw}\n/** @todo remove next line */\n${namespace} = ${name};\n`;
-    return raw;
+    raw = `${raw}\n/** @todo remove next line after refactoring build */\n${namespace} = ${name};\n`;
+    return { raw, staticCandidantes };
 }
 
 //transformFile('src/parser.js')
-fs.writeFileSync(path.resolve(wd, './src/Canvas.js'), transformClass('src/canvas.class.js'));
+fs.writeFileSync(path.resolve(wd, './src/Canvas.js'), transformClass('src/canvas.class.js').raw);
 //transformFile('src/mixins/canvas_events.mixin.js')
 
 /**
