@@ -378,12 +378,17 @@ function listFiles() {
 function convert(options = {}) {
     options = _.defaults(options, { overwriteExisitingFiles: true, ext: 'js', createIndex: true, useExports: true });
 
-    const result = listFiles().map(({ dir, file, type }) => {
-        return Object.assign(
-            convertFile(type, path.resolve(dir, file), resolveDest(dir, file, { type, ...options }), options),
-            { dir, file, type }
-        );
-    });
+    const result = listFiles()
+        .filter(({ dir, file }) => {
+            return !options.files || options.files.length === 0 ?
+                true :
+                options.files.includes(path.resolve(dir, file));
+        }).map(({ dir, file, type }) => {
+            return Object.assign(
+                convertFile(type, path.resolve(dir, file), resolveDest(dir, file, { type, ...options }), options),
+                { dir, file, type }
+            );
+        });
     
     const [errors, files] = _.partition(result, file => file instanceof Error);
     const dirs = files.reduce((dirs, { dir, file }) => {

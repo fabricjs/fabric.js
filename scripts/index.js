@@ -226,7 +226,7 @@ function createChoiceData(type, file) {
 }
 
 async function selectFileToTransform() {
-    const files = _.map(listFiles(), ({ dir, file }) => createChoiceData(path.relative(wd, dir).replaceAll('\\','/'), file));
+    const files = _.map(listFiles(), ({ dir, file }) => createChoiceData(path.relative(path.resolve(wd,'src'), dir).replaceAll('\\','/'), file));
     console.log(files)
     const { tests: filteredTests } = await inquirer.prompt([
         {
@@ -248,7 +248,7 @@ async function selectFileToTransform() {
             }
         }
     ]);
-    return filteredTests;
+    return filteredTests.map(({ type, file }) => path.resolve(path.resolve(wd, 'src'), type, file));
 }
 
 async function selectTestFile() {
@@ -399,14 +399,16 @@ program
     .option('-i, --index', 'create index files', true)
     .option('-ts, --typescript', 'transform into typescript', false)
     .option('-v, --verbose', 'verbose logging', true)
-    .action(async ({ overwrite, exports, index, typescript, verbose } = {}) => {
-        console.log(await selectFileToTransform())
+    .option('-a, --all', 'transform all files', false)
+    .action(async ({ overwrite, exports, index, typescript, verbose, all } = {}) => {
+        const files = all ? [] : await selectFileToTransform();
         convert({
             overwriteExisitingFiles: overwrite,
             useExports: exports,
             createIndex: index,
             ext: typescript ? 'ts' : 'js',
-            verbose
+            verbose,
+            files
         });
     });
 
