@@ -6,8 +6,6 @@ const chalk = require('chalk');
 
 const wd = path.resolve(__dirname, '..');
 
-const { fabric } = require(wd);
-
 function readFile(file) {
     return fs.readFileSync(path.resolve(wd, file)).toString('utf-8');;
 }
@@ -122,6 +120,7 @@ function findClassBase(raw, regex) {
         }) || [];
     const rawObject = findObject(raw, '{', '}', result.index);
     const NS = namespace.slice(0, namespace.lastIndexOf('.'));
+    const { fabric } = require(wd);
     const klass = fabric.util.resolveNamespace(NS === 'fabric' ? null : NS)[name];
     return {
         name,
@@ -297,7 +296,7 @@ function convertFile(type, source, dest, options) {
         });
         dest = (typeof dest === 'function' ? dest(name) : dest) || source;
         fs.writeFileSync(dest, raw);
-        console.log({
+        options.verbose && console.log({
             state: 'success',
             type,
             source: path.relative(wd, source),
@@ -309,7 +308,7 @@ function convertFile(type, source, dest, options) {
         return dest;
     } catch (error) {
         const file = path.relative(wd, source);
-        console.log({
+        options.verbose && console.log({
             state: 'failure',
             type,
             source: path.relative(wd, source),
@@ -333,46 +332,72 @@ function generateIndexFile(dir, files, ext) {
     console.log(chalk.bold(`created ${path.relative(wd, file)}`));
 }
 
-function convert(options = {}) {
-    const failed = [];
-    const { overwriteExisitingFiles, ext, createIndex } = _.defaults(options, { overwriteExisitingFiles: true, ext: 'js', createIndex: true, useExports: true });
-    const finalize = (dir, result) => {
-        const [errors, files] = _.partition(result, file => file instanceof Error);
-        failed.push(...errors);
-        createIndex && generateIndexFile(dir, files, ext);
-        overwriteExisitingFiles && ext === 'ts' && files.forEach(file => fs.removeSync(path.resolve(dir, file.replace('.ts', '.js'))));
-    }
-    
-    classDirs.forEach(klsDir => {
-        const dir = path.resolve(srcDir, klsDir);
-        const result = fs.readdirSync(dir).map(file => {
-            const dest = overwriteExisitingFiles ?
-                ext === 'ts' ? path.resolve(dir, file.replace('.js', '.ts')) : false :
-                name => path.resolve(dir, `${name}.${ext}`);
-            return convertFile('class', path.resolve(dir, file), dest, options);
-        });
-        finalize(dir, result);
-    });
-
-    const mixinFiles = fs.readdirSync(mixinsDir).map(file => {
-        const dest = overwriteExisitingFiles ?
-            ext === 'ts' ? path.resolve(mixinsDir, file.replace('.js', '.ts')) : false :
-            path.resolve(mixinsDir, `${getMixinName(file)}.${ext}`);
-        return convertFile('mixin', path.resolve(mixinsDir, file), dest, options);
-    });
-    finalize(mixinsDir, mixinFiles);
-
-    const additionalFile = fs.readdirSync(srcDir).filter(file => !fs.lstatSync(path.resolve(srcDir, file)).isDirectory());
-    const additionalFiles = additionalFile.map(file => {
-        const dest = overwriteExisitingFiles ?
-            ext === 'ts' ? path.resolve(srcDir, file.replace('.js', '.ts')) : false :
-            name => path.resolve(srcDir, `${name}.${ext}`);
-        return convertFile('class', path.resolve(srcDir, file), dest, options);
-    });
-    finalize(mixinsDir, additionalFiles);
-    return;
-    console.error(`failed files:`);
-    failed.map(console.error)
+function resolveDest(dir, file, { type, overwriteExisitingFiles, ext }) {
+    return overwriteExisitingFiles ?
+        ext === 'ts' ?
+            path.resolve(dir, file.replace('.js', '.ts')) :
+            false :
+        type === 'mixin' ?
+            path.resolve(mixinsDir, `${getMixinName(file)}.${ext}`) :
+            name => path.resolve(dir, `${name}.${ext}`);
 }
 
-module.exports = { convert };
+function listFiles() {
+    const paths = [];
+    classDirs.forEach(klsDir => {
+        const dir = path.resolve(srcDir, klsDir);
+        fs.readdirSync(dir).map(file => {
+            paths.push({
+                dir, 
+                file,
+                type: 'class'
+            });
+        });
+    });
+
+    fs.readdirSync(mixinsDir).map(file => {
+        paths.push({
+            dir: mixinsDir,
+            file,
+            type: 'mixin'
+        });
+    });
+
+    const additionalFiles = fs.readdirSync(srcDir).filter(file => !fs.lstatSync(path.resolve(srcDir, file)).isDirectory());
+     additionalFiles.map(file => {
+         paths.push({
+             dir: srcDir,
+             file,
+             type: 'class'
+         });
+     });
+    
+    return paths;
+}
+
+function convert(options = {}) {
+    options = _.defaults(options, { overwriteExisitingFiles: true, ext: 'js', createIndex: true, useExports: true });
+
+    const result = listFiles().map(({ dir, file, type }) => {
+        return Object.assign(
+            convertFile(type, path.resolve(dir, file), resolveDest(dir, file, { type, ...options }), options),
+            { dir, file, type }
+        );
+    });
+    
+    const [errors, files] = _.partition(result, file => file instanceof Error);
+    const dirs = files.reduce((dirs, { dir, file }) => {
+        (dirs[dir] || (dirs[dir] = [])).push(file);
+        return dirs;
+    }, {});
+    options.createIndex && _.map(dirs, (files, dir) => generateIndexFile(dir, files, options.ext));
+    options.overwriteExisitingFiles && options.ext === 'ts' &&
+        files.forEach(({ dir, file }) => fs.removeSync(path.resolve(dir, file.replace('.ts', '.js'))));
+    
+    if (!options.verbose) {
+        console.error(`failed files:`);
+        errors.map(console.error);
+    }
+}
+
+module.exports = { convert, listFiles };

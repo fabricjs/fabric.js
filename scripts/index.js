@@ -12,6 +12,8 @@ const Checkbox = require('inquirer-checkbox-plus-prompt');
 const commander = require('commander');
 const program = new commander.Command();
 
+const { convert, listFiles } = require('./transform_file');
+
 const CLI_CACHE = path.resolve(__dirname, 'cli_cache.json');
 const wd = path.resolve(__dirname, '..');
 const websiteDir = path.resolve(wd, '../fabricjs.com');
@@ -223,6 +225,32 @@ function createChoiceData(type, file) {
     }
 }
 
+async function selectFileToTransform() {
+    const files = _.map(listFiles(), ({ dir, file }) => createChoiceData(path.relative(wd, dir).replaceAll('\\','/'), file));
+    console.log(files)
+    const { tests: filteredTests } = await inquirer.prompt([
+        {
+            type: 'test-selection',
+            name: 'tests',
+            message: 'Select files to transform to es6',
+            highlight: true,
+            searchable: true,
+            default: [],
+            pageSize: 10,
+            source(answersSoFar, input = '') {
+                return new Promise(resolve => {
+                    const value = _.map(this.getCurrentValue(), value => createChoiceData(value.type, value.file));
+                    const res = fuzzy.filter(input, files, {
+                        extract: (item) => item.name
+                    }).map((element) => element.original);
+                    resolve(value.concat(_.differenceBy(res, value, 'name')));
+                });
+            }
+        }
+    ]);
+    return filteredTests;
+}
+
 async function selectTestFile() {
     const selected = readCLIFile();
     const unitTests = listTestFiles('unit').map(file => createChoiceData('unit', file));
@@ -370,12 +398,15 @@ program
     .option('-x, --exports', 'use exports', true)
     .option('-i, --index', 'create index files', true)
     .option('-ts, --typescript', 'transform into typescript', false)
-    .action(({ overwrite, exports, index, typescript } = {}) => {
-        require('./transform_file').convert({
+    .option('-v, --verbose', 'verbose logging', true)
+    .action(async ({ overwrite, exports, index, typescript, verbose } = {}) => {
+        console.log(await selectFileToTransform())
+        convert({
             overwriteExisitingFiles: overwrite,
             useExports: exports,
             createIndex: index,
             ext: typescript ? 'ts' : 'js',
+            verbose
         });
     });
 
