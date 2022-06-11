@@ -113,7 +113,10 @@ function findClass(raw) {
 function transformSuperCall(raw) {
     const regex = /this.callSuper\((.+)\)/g;
     const result = regex.exec(raw);
-    if (!result) return raw;
+    if (!result) {
+        if (raw.indexOf('callSuper') > -1) throw new Error(`failed to replace 'callSuper'`);
+        return raw;
+    }
     const [rawMethodName, ...args] = result[1].split(',');
     const methodName = rawMethodName.replace(/'|"/g, '');
     const firstArgIndex = result[1].indexOf(args[0]);
@@ -163,7 +166,16 @@ function transformClass(file) {
             if (indexOfComma > -1) {
                 rawClass = rawClass.slice(0, indexOfComma) + rawClass.slice(indexOfComma + 1);
             }
-            rawClass = rawClass.replace(regex, `${whitespace}${key==='initialize'?'constructor':key}(`);
+            rawClass = rawClass.replace(regex, `${whitespace}${key === 'initialize' ? 'constructor' : key}(`);
+            let transformed = rawClass;
+            do {
+                rawClass = transformed;
+                try {
+                    transformed = transformSuperCall(rawClass);
+                } catch (error) {
+                    console.error(error)
+                }
+            } while (transformed !== rawClass);
             if (regex.exec(rawClass)) {
                 throw new Error(`dupliate method found ${name}#${key}`)
             }
@@ -196,14 +208,10 @@ function transformClass(file) {
                     }
                     break;
             }
-            let transformed = rawClass;
-            do {
-                rawClass = transformed;
-                transformed = transformSuperCall(rawClass);
-            } while (transformed !== rawClass);
-            
+
             rawClass = rawClass.replace(start.regex, `${key} = `);
         }
+
     });
 
     const classDirective = `export class ${name}${superClass ? ` extends ${superClass}` : ''} ${rawClass}`;
