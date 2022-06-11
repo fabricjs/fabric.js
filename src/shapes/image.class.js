@@ -263,14 +263,11 @@
         }
       });
       var object = extend(
-        this.callSuper(
-          'toObject',
-          ['cropX', 'cropY'].concat(propertiesToInclude)
-        ), {
-          src: this.getSrc(),
-          crossOrigin: this.getCrossOrigin(),
-          filters: filters,
-        });
+        this.callSuper('toObject', ['cropX', 'cropY'].concat(propertiesToInclude)), {
+        src: this.getSrc(),
+        crossOrigin: this.getCrossOrigin(),
+        filters: filters,
+      });
       if (this.resizeFilter) {
         object.resizeFilter = this.resizeFilter.toObject();
       }
