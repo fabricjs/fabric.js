@@ -423,7 +423,7 @@
     _chooseObjectsToRender: function() {
       var activeObjects = this.getActiveObjects(),
           object, objsToRender, activeGroupObjects;
-          
+
       return this._objects;
       if (!this.preserveObjectStacking && activeObjects.length > 1) {
         objsToRender = [];
