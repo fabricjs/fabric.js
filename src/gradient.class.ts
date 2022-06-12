@@ -1,4 +1,5 @@
-(function() {
+//@ts-nocheck
+
 
   /* _FROM_SVG_START_ */
   function getColorStop(el, multiplier) {
@@ -77,21 +78,21 @@
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#gradients}
    * @see {@link fabric.Gradient#initialize} for constructor definition
    */
-  fabric.Gradient = fabric.util.createClass(/** @lends fabric.Gradient.prototype */ {
+export class Gradient {
 
     /**
      * Horizontal offset for aligning gradients coming from SVG when outside pathgroups
      * @type Number
      * @default 0
      */
-    offsetX: 0,
+    offsetX = 0
 
     /**
      * Vertical offset for aligning gradients coming from SVG when outside pathgroups
      * @type Number
      * @default 0
      */
-    offsetY: 0,
+    offsetY = 0
 
     /**
      * A transform matrix to apply to the gradient before painting.
@@ -101,7 +102,7 @@
      * @type Number[]
      * @default null
      */
-    gradientTransform: null,
+    gradientTransform = null
 
     /**
      * coordinates units for coords.
@@ -112,14 +113,14 @@
      * @type String
      * @default 'pixels'
      */
-    gradientUnits: 'pixels',
+    gradientUnits = 'pixels'
 
     /**
      * Gradient type linear or radial
      * @type String
      * @default 'pixels'
      */
-    type: 'linear',
+    type = 'linear'
 
     /**
      * Constructor
@@ -138,7 +139,7 @@
      * @param {Number} [options.coords.r2] only for radial gradient, radius of the external circle
      * @return {fabric.Gradient} thisArg
      */
-    initialize: function(options) {
+    constructor(options) {
       options || (options = { });
       options.coords || (options.coords = { });
 
@@ -170,14 +171,14 @@
 
       this.coords = coords;
       this.colorStops = options.colorStops.slice();
-    },
+    }
 
     /**
      * Adds another colorStop
      * @param {Object} colorStop Object with offset and color
      * @return {fabric.Gradient} thisArg
      */
-    addColorStop: function(colorStops) {
+    addColorStop(colorStops) {
       for (var position in colorStops) {
         var color = new fabric.Color(colorStops[position]);
         this.colorStops.push({
@@ -187,14 +188,14 @@
         });
       }
       return this;
-    },
+    }
 
     /**
      * Returns object representation of a gradient
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object}
      */
-    toObject: function(propertiesToInclude) {
+    toObject(propertiesToInclude) {
       var object = {
         type: this.type,
         coords: this.coords,
@@ -207,7 +208,7 @@
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
 
       return object;
-    },
+    }
 
     /* _TO_SVG_START_ */
     /**
@@ -215,7 +216,7 @@
      * @param {Object} object Object to create a gradient for
      * @return {String} SVG representation of an gradient (linear/radial)
      */
-    toSVG: function(object, options) {
+    toSVG(object, options) {
       var coords = this.coords, i, len, options = options || {},
           markup, commonAttributes, colorStops = this.colorStops,
           needsSwap = coords.r1 > coords.r2,
@@ -309,7 +310,7 @@
       markup.push((this.type === 'linear' ? '</linearGradient>\n' : '</radialGradient>\n'));
 
       return markup.join('');
-    },
+    }
     /* _TO_SVG_END_ */
 
     /**
@@ -317,7 +318,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      * @return {CanvasGradient}
      */
-    toLive: function(ctx) {
+    toLive(ctx) {
       var gradient, coords = this.coords, i, len;
 
       if (!this.type) {
@@ -346,7 +347,7 @@
 
       return gradient;
     }
-  });
+  }
 
   fabric.util.object.extend(fabric.Gradient, {
 
@@ -485,4 +486,3 @@
       options[prop] = finalValue;
     });
   }
-})();
