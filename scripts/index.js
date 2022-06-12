@@ -26,20 +26,22 @@ function execGitCommand(cmd) {
         .filter(value => value.length > 0);
 }
 
-function getGitInfo() {
+function getGitInfo(branchRef) {
     const branch = execGitCommand('git branch --show-current')[0];
     const tag = execGitCommand('git describe --tags')[0];
-    const changes = execGitCommand('git status --porcelain').map(value => {
+    const uncommittedChanges = execGitCommand('git status --porcelain').map(value => {
         const [type, path] = value.split(' ');
         return { type, path };
     });
+    const changes = execGitCommand(`git diff ${branchRef} --name-only`);
     const userName = execGitCommand('git config user.name')[0];
     return {
         branch,
         tag,
+        uncommittedChanges,
         changes,
         user: userName
-    }
+    };
 }
 
 class ICheckbox extends Checkbox {
@@ -271,7 +273,7 @@ async function selectFileToTransform() {
             }
         }
     ]);
-    return filteredTests.map(({ type, file }) => path.resolve(path.resolve(wd, 'src'), type, file));
+    return filteredTests.map(({ type, file }) => path.resolve(wd, 'src', type, file));
 }
 
 async function selectTestFile() {
@@ -418,13 +420,22 @@ program
     .command('transform')
     .description('transforms files into es6')
     .option('-o, --overwrite', 'overwrite exisitng files', false)
-    .option('-x, --exports', 'use exports', true)
-    .option('-i, --index', 'create index files', true)
+    .option('-x, --no-exports', 'do not use exports')
+    .option('-i, --index', 'create index files', false)
     .option('-ts, --typescript', 'transform into typescript', false)
     .option('-v, --verbose', 'verbose logging', true)
     .option('-a, --all', 'transform all files', false)
-    .action(async ({ overwrite, exports, index, typescript, verbose, all } = {}) => {
-        const files = all ? [] : await selectFileToTransform();
+    .option('-d, --diff [branch]', 'compare against given branch (default: master) and transform all files with diff')
+    .action(async ({ overwrite, exports, index, typescript, verbose, all, diff: gitRef } = {}) => {
+        let files = [];
+        if (gitRef) {
+            gitRef = gitRef === true ? 'master' : gitRef;
+            const { changes } = getGitInfo(gitRef);
+            files = changes.map(change => path.resolve(wd, change));
+        }
+        else if (!all) {
+            files = await selectFileToTransform();
+        }
         convert({
             overwriteExisitingFiles: overwrite,
             useExports: exports,
@@ -433,13 +444,6 @@ program
             verbose,
             files
         });
-    })
-    .command('pr')
-    .description('start fabricjs.com dev server')
-    .allowExcessArguments()
-    .allowUnknownOption()
-    .action(d => {
-        console.log(getGitInfo().changes)
     });
 
 program.parse(process.argv);
