@@ -53,7 +53,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
    * your prototype.
    * the map change will affect all Instances unless you need for only some text Instances
    * in that case you have to clone this object and assign your Instance.
-   * this.keysMap = fabric.util.object.clone(this.keysMap);
+   * this.keysMap = Object.assign({}, this.keysMap);
    * The function must be in fabric.Itext.prototype.myFunction And will receive event as args[0]
    */
   keysMap = {

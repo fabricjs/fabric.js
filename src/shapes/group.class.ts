@@ -9,8 +9,7 @@
       transformPoint = fabric.util.transformPoint,
       applyTransformToObject = fabric.util.applyTransformToObject,
       degreesToRadians = fabric.util.degreesToRadians,
-      clone = fabric.util.object.clone,
-      extend = fabric.util.object.extend;
+      clone = fabric.util.object.clone;
 
   
 
@@ -182,7 +181,7 @@ export class Group extends fabric.Collection {
      * @private
      */
     __objectMonitor(opt) {
-      this._applyLayoutStrategy(extend(clone(opt), {
+      this._applyLayoutStrategy(Object.assign({}, opt, {
         type: 'object_modified'
       }));
       this._set('dirty', true);
