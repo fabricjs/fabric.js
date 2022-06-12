@@ -237,7 +237,7 @@
    */
   fabric.Image.filters.BlendImage.fromObject = function(object) {
     return fabric.Image.fromObject(object.image).then(function(image) {
-      return new fabric.Image.filters.BlendImage(Object.assign({}, options, { image: image }));
+      return new fabric.Image.filters.BlendImage(Object.assign({}, object, { image: image }));
     });
   };
 

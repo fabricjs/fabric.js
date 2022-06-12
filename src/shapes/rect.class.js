@@ -2,8 +2,7 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Rect) {
     fabric.warn('fabric.Rect is already defined');
