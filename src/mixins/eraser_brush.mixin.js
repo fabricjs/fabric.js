@@ -327,8 +327,16 @@
 
       /**
        * When set to `true` the brush will create a visual effect of undoing erasing
+       * @type boolean
        */
       inverted: false,
+
+      /**
+       * Used to fix https://github.com/fabricjs/fabric.js/issues/7984
+       * Reduces the path width while clipping the main context, resulting in a better visual overlap of both contexts
+       * @type number
+       */
+      erasingWidthAliasing: 4,
 
       /**
        * @private
@@ -487,7 +495,7 @@
       _saveAndTransform: function (ctx) {
         this.callSuper('_saveAndTransform', ctx);
         this._setBrushStyles(ctx);
-        ctx.globalCompositeOperation = ctx === this.canvas.getContext() ? 'destination-out' : 'source-over';
+        ctx.globalCompositeOperation = ctx === this.canvas.getContext() ? 'destination-out' : 'destination-in';
       },
 
       /**
@@ -525,22 +533,28 @@
        * 1. Use brush to clip canvas by rendering it on top of canvas (unnecessary if `inverted === true`)
        * 2. Render brush with canvas pattern on top context
        *
+       * @todo provide a better solution to https://github.com/fabricjs/fabric.js/issues/7984
        */
       _render: function () {
-        var ctx;
+        var ctx, lineWidth = this.width;
+        var t = this.canvas.getRetinaScaling(), s = 1 / t;
         //  clip canvas
         ctx = this.canvas.getContext();
-        this.callSuper('_render', ctx);
+        //  a hack that fixes https://github.com/fabricjs/fabric.js/issues/7984 by reducing path width
+        //  the issue's cause is unknown at time of writing (@ShaMan123 06/2022)
+        if (lineWidth - this.erasingWidthAliasing > 0) {
+          this.width = lineWidth - this.erasingWidthAliasing;
+          this.callSuper('_render', ctx);
+          this.width = lineWidth;
+        }
         //  render brush and mask it with pattern
         ctx = this.canvas.contextTop;
         this.canvas.clearContext(ctx);
-        this.callSuper('_render', ctx);
         ctx.save();
-        var t = this.canvas.getRetinaScaling(), s = 1 / t;
         ctx.scale(s, s);
-        ctx.globalCompositeOperation = 'source-in';
         ctx.drawImage(this._patternCanvas, 0, 0);
         ctx.restore();
+        this.callSuper('_render', ctx);
       },
 
       /**
