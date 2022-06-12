@@ -1221,6 +1221,7 @@
      * @param {Object} prevStyle first style to compare
      * @param {Object} thisStyle second style to compare
      * @param {boolean} forTextSpans whether to check overline, underline, and line-through properties
+     * @return {boolean} true if the style changed
      */
     hasStyleChanged: function(prevStyle, thisStyle, forTextSpans) {
       forTextSpans = forTextSpans || false;
