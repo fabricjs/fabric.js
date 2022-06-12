@@ -510,6 +510,7 @@
    * @param {function} [callback] invoked with new instance as argument
    */
   fabric.IText.fromObject = function(object, callback) {
+    object.styles = fabric.util.stylesFromArray(object.styles, object.text);
     parseDecoration(object);
     if (object.styles) {
       for (var i in object.styles) {
