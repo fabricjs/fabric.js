@@ -18,6 +18,30 @@ const CLI_CACHE = path.resolve(__dirname, 'cli_cache.json');
 const wd = path.resolve(__dirname, '..');
 const websiteDir = path.resolve(wd, '../fabricjs.com');
 
+function execGitCommand(cmd) {
+    return cp.execSync(cmd, { cwd: wd }).toString()
+        .replace(/\n/g, ',')
+        .split(',')
+        .map(value => value.trim())
+        .filter(value => value.length > 0);
+}
+
+function getGitInfo() {
+    const branch = execGitCommand('git branch --show-current')[0];
+    const tag = execGitCommand('git describe --tags')[0];
+    const changes = execGitCommand('git status --porcelain').map(value => {
+        const [type, path] = value.split(' ');
+        return { type, path };
+    });
+    const userName = execGitCommand('git config user.name')[0];
+    return {
+        branch,
+        tag,
+        changes,
+        user: userName
+    }
+}
+
 class ICheckbox extends Checkbox {
     constructor(questions, rl, answers) {
         super(questions, rl, answers);
@@ -227,7 +251,6 @@ function createChoiceData(type, file) {
 
 async function selectFileToTransform() {
     const files = _.map(listFiles(), ({ dir, file }) => createChoiceData(path.relative(path.resolve(wd,'src'), dir).replaceAll('\\','/'), file));
-    console.log(files)
     const { tests: filteredTests } = await inquirer.prompt([
         {
             type: 'test-selection',
@@ -410,6 +433,13 @@ program
             verbose,
             files
         });
+    })
+    .command('pr')
+    .description('start fabricjs.com dev server')
+    .allowExcessArguments()
+    .allowUnknownOption()
+    .action(d => {
+        console.log(getGitInfo().changes)
     });
 
 program.parse(process.argv);
