@@ -869,8 +869,8 @@
     cObj.top = -110;
     cObj.setCoords();
     assert.equal(cObj.isPartiallyOnScreen(true), false,'object is completely offScreen and not partial');
-    cObj.left = 50;
-    cObj.top = 50;
+    cObj.left = 45;
+    cObj.top = 45;
     cObj.setCoords();
     assert.equal(cObj.isPartiallyOnScreen(true), false, 'object is completely on screen and not partial');
     canvas.setZoom(2);
