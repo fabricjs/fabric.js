@@ -8,8 +8,7 @@
       transformPoint = fabric.util.transformPoint,
       applyTransformToObject = fabric.util.applyTransformToObject,
       degreesToRadians = fabric.util.degreesToRadians,
-      clone = fabric.util.object.clone,
-      extend = fabric.util.object.extend;
+      clone = fabric.util.object.clone;
 
   if (fabric.Group) {
     fabric.warn('fabric.Group is already defined');
@@ -184,7 +183,7 @@
      * @private
      */
     __objectMonitor: function (opt) {
-      this._applyLayoutStrategy(extend(clone(opt), {
+      this._applyLayoutStrategy(Object.assign({}, opt, {
         type: 'object_modified'
       }));
       this._set('dirty', true);

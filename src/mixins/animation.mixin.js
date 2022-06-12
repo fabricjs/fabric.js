@@ -157,12 +157,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
     to = to.toString();
 
-    if (!options) {
-      options = { };
-    }
-    else {
-      options = fabric.util.object.clone(options);
-    }
+    options = Object.assign({}, options);
 
     if (~property.indexOf('.')) {
       propPair = property.split('.');

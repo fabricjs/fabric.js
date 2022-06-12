@@ -8,8 +8,6 @@
    */
 
   var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
-      clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
       parseUnit = fabric.util.parseUnit,
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
@@ -742,7 +740,7 @@
         delete fabric.cssRules[svgUid];
         delete fabric.clipPaths[svgUid];
       }
-    }, clone(options), reviver, parsingOptions);
+    }, Object.assign({}, options), reviver, parsingOptions);
   };
 
   function recursivelyParseGradientsXlink(doc, gradient) {
@@ -773,7 +771,7 @@
       fabric.reNum +
     '(?:px|cm|mm|em|pt|pc|in)*)(?:\\/(normal|' + fabric.reNum + '))?\\s+(.*)');
 
-  extend(fabric, {
+  fabric.util.object.extend(fabric, {
     /**
      * Parses a short font declaration, building adding its properties to a style object
      * @static
