@@ -876,11 +876,11 @@
       }, { });
       // add values parsed from style, which take precedence over attributes
       // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
-      var cssAttrs = extend(
+      var cssAttrs = Object.assign(
         getGlobalStylesForElement(element, svgUid),
         fabric.parseStyleAttribute(element)
       );
-      ownAttributes = extend(
+      ownAttributes = Object.assign(
         ownAttributes,
         cssAttrs
       );
@@ -902,7 +902,7 @@
       if (normalizedStyle && normalizedStyle.font) {
         fabric.parseFontDeclaration(normalizedStyle.font, normalizedStyle);
       }
-      var mergedAttrs = extend(parentAttributes, normalizedStyle);
+      var mergedAttrs = Object.assign(parentAttributes, normalizedStyle);
       return fabric.svgValidParentsRegEx.test(element.nodeName) ? mergedAttrs : _setStrokeFillOpacity(mergedAttrs);
     },
 
@@ -1026,10 +1026,10 @@
               return;
             }
             if (allRules[_rule]) {
-              fabric.util.object.extend(allRules[_rule], ruleObj);
+              Object.assign(allRules[_rule], ruleObj);
             }
             else {
-              allRules[_rule] = fabric.util.object.clone(ruleObj);
+              allRules[_rule] = Object.assign({}, ruleObj);
             }
           });
         });

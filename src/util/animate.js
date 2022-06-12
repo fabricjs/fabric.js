@@ -1,8 +1,5 @@
 (function () {
 
-  var extend = fabric.util.object.extend,
-      clone = fabric.util.object.clone;
-
   /**
    * 
    * @typedef {Object} AnimationOptions
@@ -157,7 +154,7 @@
           return index > -1 && fabric.runningAnimations.splice(index, 1)[0];
         };
 
-    context = extend(clone(options), {
+    context = Object.assign({}, options, {
       cancel: function () {
         cancel = true;
         return removeFromRegistry();
