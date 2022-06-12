@@ -1,4 +1,7 @@
-fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
+//@ts-nocheck
+
+export function StaticCanvasSerializationMixinGenerator(Klass) {
+  return class StaticCanvasSerializationMixin extends Klass {
   /**
    * Populates canvas with data from the specified JSON.
    * JSON format must conform to the one of {@link fabric.Canvas#toJSON}
@@ -19,7 +22,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    *   ... canvas is restored, add your code.
    * });
    */
-  loadFromJSON: function (json, reviver) {
+  loadFromJSON(json, reviver) {
     if (!json) {
       return;
     }
@@ -50,7 +53,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
             return _this;
           });
       });
-  },
+  }
 
   /**
    * @private
@@ -58,7 +61,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Array} enlivenedObjects canvas objects
    * @param {boolean} renderOnAddRemove renderOnAddRemove setting for the canvas
    */
-  __setupCanvas: function(serialized, enlivenedObjects, renderOnAddRemove) {
+  __setupCanvas(serialized, enlivenedObjects, renderOnAddRemove) {
     var _this = this;
     enlivenedObjects.forEach(function(obj, index) {
       // we splice the array just in case some custom classes restored from JSON
@@ -77,19 +80,19 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     // create the Object instance. Here the Canvas is
     // already an instance and we are just loading things over it
     this._setOptions(serialized);
-  },
+  }
 
   /**
    * Clones canvas instance
    * @param {Array} [properties] Array of properties to include in the cloned canvas and children
    * @returns {Promise<fabric.Canvas>}
    */
-  clone: function (properties) {
+  clone(properties) {
     var data = JSON.stringify(this.toJSON(properties));
     return this.cloneWithoutData().then(function(clone) {
       return clone.loadFromJSON(data);
     });
-  },
+  }
 
   /**
    * Clones canvas instance without cloning existing data.
@@ -97,7 +100,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * but leaves data empty (so that you can populate it with your own)
    * @returns {Promise<fabric.Canvas>}
    */
-  cloneWithoutData: function() {
+  cloneWithoutData() {
     var el = fabric.util.createCanvasElement();
 
     el.width = this.width;
@@ -113,4 +116,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     }
     return clone.loadFromJSON(data);
   }
-});
+}
+}
+
+fabric.StaticCanvas = StaticCanvasSerializationMixinGenerator(fabric.StaticCanvas);
+

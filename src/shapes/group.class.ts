@@ -1,4 +1,5 @@
-(function (global) {
+//@ts-nocheck
+
 
   'use strict';
 
@@ -10,10 +11,7 @@
       degreesToRadians = fabric.util.degreesToRadians,
       clone = fabric.util.object.clone;
 
-  if (fabric.Group) {
-    fabric.warn('fabric.Group is already defined');
-    return;
-  }
+  
 
   /**
    * Group class
@@ -23,14 +21,14 @@
    * @fires layout once layout completes
    * @see {@link fabric.Group#initialize} for constructor definition
    */
-  fabric.Group = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.Group.prototype */ {
+export class Group extends fabric.Collection {
 
     /**
      * Type of an object
      * @type string
      * @default
      */
-    type: 'group',
+    type = 'group'
 
     /**
      * Specifies the **layout strategy** for instance
@@ -39,13 +37,13 @@
      * @type string
      * @default
      */
-    layout: 'fit-content',
+    layout = 'fit-content'
 
     /**
      * Width of stroke
      * @type Number
      */
-    strokeWidth: 0,
+    strokeWidth = 0
 
     /**
      * List of properties to consider when checking if state
@@ -53,7 +51,7 @@
      * as well as for history (undo/redo) purposes
      * @type string[]
      */
-    stateProperties: fabric.Object.prototype.stateProperties.concat('layout'),
+    stateProperties = fabric.Object.prototype.stateProperties.concat('layout')
 
     /**
      * Used to optimize performance
@@ -61,7 +59,7 @@
      * @default
      * @type boolean
      */
-    subTargetCheck: false,
+    subTargetCheck = false
 
     /**
      * Used to allow targeting of object inside groups.
@@ -70,7 +68,7 @@
      * @default
      * @type boolean
      */
-    interactive: false,
+    interactive = false
 
     /**
      * Used internally to optimize performance
@@ -78,7 +76,7 @@
      * This way instance is cached only once for the entire interaction with the selected object.
      * @private
      */
-    _activeObjects: undefined,
+    _activeObjects = undefined
 
     /**
      * Constructor
@@ -88,14 +86,14 @@
      * @param {boolean} [objectsRelativeToGroup] true if objects exist in group coordinate plane
      * @return {fabric.Group} thisArg
      */
-    initialize: function (objects, options, objectsRelativeToGroup) {
+    constructor(objects, options, objectsRelativeToGroup) {
       this._objects = objects || [];
       this._activeObjects = [];
       this.__objectMonitor = this.__objectMonitor.bind(this);
       this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(this, true);
       this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
       this._firstLayoutDone = false;
-      this.callSuper('initialize', options);
+      super(options);
       this.forEachObject(function (object) {
         this.enterGroup(object, false);
       }, this);
@@ -104,16 +102,16 @@
         options: options,
         objectsRelativeToGroup: objectsRelativeToGroup
       });
-    },
+    }
 
     /**
      * @private
      * @param {string} key
      * @param {*} value
      */
-    _set: function (key, value) {
+    _set(key, value) {
       var prev = this[key];
-      this.callSuper('_set', key, value);
+      super._set(key, value);
       if (key === 'canvas' && prev !== value) {
         this.forEachObject(function (object) {
           object._set(key, value);
@@ -126,74 +124,74 @@
         this.forEachObject(this._watchObject.bind(this, value));
       }
       return this;
-    },
+    }
 
     /**
      * @private
      */
-    _shouldSetNestedCoords: function () {
+    _shouldSetNestedCoords() {
       return this.subTargetCheck;
-    },
+    }
 
     /**
      * Add objects
      * @param {...fabric.Object} objects
      */
-    add: function () {
+    add() {
       var _this = this, possibleObjects = Array.from(arguments).filter(function(object, index, array) {
         // can enter or is the first occurrence of the object in the passed args
         return _this.canEnterGroup(object) && array.indexOf(object) === index;
       });
       fabric.Collection.add.call(this, possibleObjects, this._onObjectAdded);
       this._onAfterObjectsChange('added', possibleObjects);
-    },
+    }
 
     /**
      * Inserts an object into collection at specified index
      * @param {fabric.Object} objects Object to insert
      * @param {Number} index Index to insert object at
      */
-    insertAt: function (objects, index) {
+    insertAt(objects, index) {
       fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
       this._onAfterObjectsChange('added', Array.isArray(objects) ? objects : [objects]);
-    },
+    }
 
     /**
      * Remove objects
      * @param {...fabric.Object} objects
      * @returns {fabric.Object[]} removed objects
      */
-    remove: function () {
+    remove() {
       var removed = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
       this._onAfterObjectsChange('removed', removed);
       return removed;
-    },
+    }
 
     /**
      * Remove all objects
      * @returns {fabric.Object[]} removed objects
      */
-    removeAll: function () {
+    removeAll() {
       this._activeObjects = [];
       return this.remove.apply(this, this._objects.slice());
-    },
+    }
 
     /**
      * invalidates layout on object modified
      * @private
      */
-    __objectMonitor: function (opt) {
+    __objectMonitor(opt) {
       this._applyLayoutStrategy(Object.assign({}, opt, {
         type: 'object_modified'
       }));
       this._set('dirty', true);
-    },
+    }
 
     /**
      * keeps track of the selected objects
      * @private
      */
-    __objectSelectionMonitor: function (selected, opt) {
+    __objectSelectionMonitor(selected, opt) {
       var object = opt.target;
       if (selected) {
         this._activeObjects.push(object);
@@ -206,14 +204,14 @@
           this._set('dirty', true);
         }
       }
-    },
+    }
 
     /**
      * @private
      * @param {boolean} watch
      * @param {fabric.Object} object
      */
-    _watchObject: function (watch, object) {
+    _watchObject(watch, object) {
       var directive = watch ? 'on' : 'off';
       //  make sure we listen only once
       watch && this._watchObject(false, object);
@@ -221,7 +219,7 @@
       object[directive]('modified', this.__objectMonitor);
       object[directive]('selected', this.__objectSelectionTracker);
       object[directive]('deselected', this.__objectSelectionDisposer);
-    },
+    }
 
     /**
      * Checks if object can enter group and logs relevant warnings
@@ -229,7 +227,7 @@
      * @param {fabric.Object} object
      * @returns
      */
-    canEnterGroup: function (object) {
+    canEnterGroup(object) {
       if (object === this || this.isDescendantOf(object)) {
         /* _DEV_MODE_START_ */
         console.error('fabric.Group: trying to add group to itself, this call has no effect');
@@ -244,7 +242,7 @@
         return false;
       }
       return true;
-    },
+    }
 
     /**
      * @private
@@ -252,20 +250,20 @@
      * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
      * @returns {boolean} true if object entered group
      */
-    enterGroup: function (object, removeParentTransform) {
+    enterGroup(object, removeParentTransform) {
       if (object.group) {
         object.group.remove(object);
       }
       this._enterGroup(object, removeParentTransform);
       return true;
-    },
+    }
 
     /**
      * @private
      * @param {fabric.Object} object
      * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
      */
-    _enterGroup: function (object, removeParentTransform) {
+    _enterGroup(object, removeParentTransform) {
       if (removeParentTransform) {
         // can this be converted to utils (sendObjectToPlane)?
         applyTransformToObject(
@@ -285,24 +283,24 @@
       if (activeObject && (activeObject === object || object.isDescendantOf(activeObject))) {
         this._activeObjects.push(object);
       }
-    },
+    }
 
     /**
      * @private
      * @param {fabric.Object} object
      * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
      */
-    exitGroup: function (object, removeParentTransform) {
+    exitGroup(object, removeParentTransform) {
       this._exitGroup(object, removeParentTransform);
       object._set('canvas', undefined);
-    },
+    }
 
     /**
      * @private
      * @param {fabric.Object} object
      * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
      */
-    _exitGroup: function (object, removeParentTransform) {
+    _exitGroup(object, removeParentTransform) {
       object._set('group', undefined);
       if (!removeParentTransform) {
         applyTransformToObject(
@@ -319,48 +317,48 @@
       if (index > -1) {
         this._activeObjects.splice(index, 1);
       }
-    },
+    }
 
     /**
      * @private
      * @param {'added'|'removed'} type
      * @param {fabric.Object[]} targets
      */
-    _onAfterObjectsChange: function (type, targets) {
+    _onAfterObjectsChange(type, targets) {
       this._applyLayoutStrategy({
         type: type,
         targets: targets
       });
       this._set('dirty', true);
-    },
+    }
 
     /**
      * @private
      * @param {fabric.Object} object
      */
-    _onObjectAdded: function (object) {
+    _onObjectAdded(object) {
       this.enterGroup(object, true);
       object.fire('added', { target: this });
-    },
+    }
 
     /**
      * @private
      * @param {fabric.Object} object
      */
-    _onRelativeObjectAdded: function (object) {
+    _onRelativeObjectAdded(object) {
       this.enterGroup(object, false);
       object.fire('added', { target: this });
-    },
+    }
 
     /**
      * @private
      * @param {fabric.Object} object
      * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
      */
-    _onObjectRemoved: function (object, removeParentTransform) {
+    _onObjectRemoved(object, removeParentTransform) {
       this.exitGroup(object, removeParentTransform);
       object.fire('removed', { target: this });
-    },
+    }
 
     /**
      * Decide if the object should cache or not. Create its own cache level
@@ -369,7 +367,7 @@
      * Generally you do not cache objects in groups because the group is already cached.
      * @return {Boolean}
      */
-    shouldCache: function() {
+    shouldCache() {
       var ownCache = fabric.Object.prototype.shouldCache.call(this);
       if (ownCache) {
         for (var i = 0; i < this._objects.length; i++) {
@@ -380,13 +378,13 @@
         }
       }
       return ownCache;
-    },
+    }
 
     /**
      * Check if this object or a child object will cast a shadow
      * @return {Boolean}
      */
-    willDrawShadow: function() {
+    willDrawShadow() {
       if (fabric.Object.prototype.willDrawShadow.call(this)) {
         return true;
       }
@@ -396,33 +394,33 @@
         }
       }
       return false;
-    },
+    }
 
     /**
      * Check if instance or its group are caching, recursively up
      * @return {Boolean}
      */
-    isOnACache: function () {
+    isOnACache() {
       return this.ownCaching || (!!this.group && this.group.isOnACache());
-    },
+    }
 
     /**
      * Execute the drawing operation for an object on a specified context
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    drawObject: function(ctx) {
+    drawObject(ctx) {
       this._renderBackground(ctx);
       for (var i = 0; i < this._objects.length; i++) {
         this._objects[i].render(ctx);
       }
       this._drawClipPath(ctx, this.clipPath);
-    },
+    }
 
     /**
      * Check if cache is dirty
      */
-    isCacheDirty: function(skipCanvas) {
-      if (this.callSuper('isCacheDirty', skipCanvas)) {
+    isCacheDirty(skipCanvas) {
+      if (super.isCacheDirty(skipCanvas)) {
         return true;
       }
       if (!this.statefullCache) {
@@ -439,53 +437,53 @@
         }
       }
       return false;
-    },
+    }
 
     /**
      * @override
      * @return {Boolean}
      */
-    setCoords: function () {
-      this.callSuper('setCoords');
+    setCoords() {
+      super.setCoords();
       this._shouldSetNestedCoords() && this.forEachObject(function (object) {
         object.setCoords();
       });
-    },
+    }
 
     /**
      * Renders instance on a given context
      * @param {CanvasRenderingContext2D} ctx context to render instance on
      */
-    render: function (ctx) {
+    render(ctx) {
       //  used to inform objects not to double opacity
       this._transformDone = true;
-      this.callSuper('render', ctx);
+      super.render(ctx);
       this._transformDone = false;
-    },
+    }
 
     /**
      * @public
      * @param {Partial<LayoutResult> & { layout?: string }} [context] pass values to use for layout calculations
      */
-    triggerLayout: function (context) {
+    triggerLayout(context) {
       if (context && context.layout) {
         context.prevLayout = this.layout;
         this.layout = context.layout;
       }
       this._applyLayoutStrategy({ type: 'imperative', context: context });
-    },
+    }
 
     /**
      * @private
      * @param {fabric.Object} object
      * @param {fabric.Point} diff
      */
-    _adjustObjectPosition: function (object, diff) {
+    _adjustObjectPosition(object, diff) {
       object.set({
         left: object.left + diff.x,
         top: object.top + diff.y,
       });
-    },
+    }
 
     /**
      * initial layout logic:
@@ -495,7 +493,7 @@
      * @private
      * @param {LayoutContext} context
      */
-    _applyLayoutStrategy: function (context) {
+    _applyLayoutStrategy(context) {
       var isFirstLayout = context.type === 'initialization';
       if (!isFirstLayout && !this._firstLayoutDone) {
         //  reject layout requests before initialization layout
@@ -555,7 +553,7 @@
         //  all parents should invalidate their layout
         this.group._applyLayoutStrategy(context);
       }
-    },
+    }
 
 
     /**
@@ -582,7 +580,7 @@
      * @param {LayoutContext} context
      * @returns {LayoutResult | undefined}
      */
-    getLayoutStrategyResult: function (layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
+    getLayoutStrategyResult(layoutDirective, objects, context) {  // eslint-disable-line no-unused-vars
       //  `fit-content-lazy` performance enhancement
       //  skip if instance had no objects before the `added` event because it may have kept layout after removing all previous objects
       if (layoutDirective === 'fit-content-lazy'
@@ -648,7 +646,7 @@
           correctionY: -bbox.offsetY || 0,
         });
       }
-    },
+    }
 
     /**
      * Override this method to customize layout.
@@ -659,7 +657,7 @@
      * @param {LayoutContext} context
      * @returns {LayoutResult | undefined}
      */
-    prepareBoundingBox: function (layoutDirective, objects, context) {
+    prepareBoundingBox(layoutDirective, objects, context) {
       if (context.type === 'initialization') {
         return this.prepareInitialBoundingBox(layoutDirective, objects, context);
       }
@@ -672,7 +670,7 @@
       else {
         return this.getObjectsBoundingBox(objects);
       }
-    },
+    }
 
     /**
      * Calculates center taking into account originX, originY while not being sure that width/height are initialized
@@ -682,7 +680,7 @@
      * @param {LayoutContext} context
      * @returns {LayoutResult | undefined}
      */
-    prepareInitialBoundingBox: function (layoutDirective, objects, context) {
+    prepareInitialBoundingBox(layoutDirective, objects, context) {
       var options = context.options || {},
           hasX = typeof options.left === 'number',
           hasY = typeof options.top === 'number',
@@ -765,7 +763,7 @@
         width: size.x,
         height: size.y,
       };
-    },
+    }
 
     /**
      * Calculate the bbox of objects relative to instance's containing plane
@@ -773,7 +771,7 @@
      * @param {fabric.Object[]} objects
      * @returns {LayoutResult | null} bounding box
      */
-    getObjectsBoundingBox: function (objects, ignoreOffset) {
+    getObjectsBoundingBox(objects, ignoreOffset) {
       if (objects.length === 0) {
         return null;
       }
@@ -815,7 +813,7 @@
         width: size.x,
         height: size.y,
       };
-    },
+    }
 
     /**
      * Hook that is called once layout has completed.
@@ -825,9 +823,9 @@
      * @param {LayoutContext} context layout context
      * @param {LayoutResult} result layout result
      */
-    onLayout: function (/* context, result */) {
+    onLayout(/* context, result */) {
       //  override by subclass
-    },
+    }
 
     /**
      *
@@ -836,7 +834,7 @@
      * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @returns {fabric.Object[]} serialized objects
      */
-    __serializeObjects: function (method, propertiesToInclude) {
+    __serializeObjects(method, propertiesToInclude) {
       var _includeDefaultValues = this.includeDefaultValues;
       return this._objects
         .filter(function (obj) {
@@ -850,38 +848,38 @@
           //delete data.version;
           return data;
         });
-    },
+    }
 
     /**
      * Returns object representation of an instance
      * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
-    toObject: function (propertiesToInclude) {
-      var obj = this.callSuper('toObject', ['layout', 'subTargetCheck', 'interactive'].concat(propertiesToInclude));
+    toObject(propertiesToInclude) {
+      var obj = super.toObject(['layout', 'subTargetCheck', 'interactive'].concat(propertiesToInclude));
       obj.objects = this.__serializeObjects('toObject', propertiesToInclude);
       return obj;
-    },
+    }
 
-    toString: function () {
+    toString() {
       return '#<fabric.Group: (' + this.complexity() + ')>';
-    },
+    }
 
-    dispose: function () {
+    dispose() {
       this._activeObjects = [];
       this.forEachObject(function (object) {
         this._watchObject(false, object);
         object.dispose && object.dispose();
       }, this);
-      this.callSuper('dispose');
-    },
+      super.dispose();
+    }
 
     /* _TO_SVG_START_ */
 
     /**
      * @private
      */
-    _createSVGBgRect: function (reviver) {
+    _createSVGBgRect(reviver) {
       if (!this.backgroundColor) {
         return '';
       }
@@ -889,14 +887,14 @@
       var commons = fillStroke.indexOf('COMMON_PARTS');
       fillStroke[commons] = 'for="group" ';
       return fillStroke.join('');
-    },
+    }
 
     /**
      * Returns svg representation of an instance
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    _toSVG: function (reviver) {
+    _toSVG(reviver) {
       var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
       var bg = this._createSVGBgRect(reviver);
       bg && svgString.push('\t\t', bg);
@@ -905,13 +903,13 @@
       }
       svgString.push('</g>\n');
       return svgString;
-    },
+    }
 
     /**
      * Returns styles-string for svg-export, specific version for group
      * @return {String}
      */
-    getSvgStyles: function() {
+    getSvgStyles() {
       var opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ?
             'opacity: ' + this.opacity + ';' : '',
           visibility = this.visible ? '' : ' visibility: hidden;';
@@ -920,14 +918,14 @@
         this.getSvgFilter(),
         visibility
       ].join('');
-    },
+    }
 
     /**
      * Returns svg clipPath representation of an instance
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toClipPathSVG: function (reviver) {
+    toClipPathSVG(reviver) {
       var svgString = [];
       var bg = this._createSVGBgRect(reviver);
       bg && svgString.push('\t', bg);
@@ -935,9 +933,9 @@
         svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
       }
       return this._createBaseClipPathSVGMarkup(svgString, { reviver: reviver });
-    },
+    }
     /* _TO_SVG_END_ */
-  });
+  }
 
   /**
    * @todo support loading from svg
@@ -959,4 +957,3 @@
     });
   };
 
-})(typeof exports !== 'undefined' ? exports : this);

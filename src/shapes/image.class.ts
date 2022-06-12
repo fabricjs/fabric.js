@@ -1,4 +1,5 @@
-(function(global) {
+//@ts-nocheck
+
 
   'use strict';
 
@@ -8,10 +9,7 @@
     global.fabric = { };
   }
 
-  if (global.fabric.Image) {
-    fabric.warn('fabric.Image is already defined.');
-    return;
-  }
+  
 
   /**
    * Image class
@@ -20,14 +18,14 @@
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
    * @see {@link fabric.Image#initialize} for constructor definition
    */
-  fabric.Image = fabric.util.createClass(fabric.Object, /** @lends fabric.Image.prototype */ {
+export class Image extends fabric.Object {
 
     /**
      * Type of an object
      * @type String
      * @default
      */
-    type: 'image',
+    type = 'image'
 
     /**
      * Width of a stroke.
@@ -35,7 +33,7 @@
      * @type Number
      * @default
      */
-    strokeWidth: 0,
+    strokeWidth = 0
 
     /**
      * When calling {@link fabric.Image.getSrc}, return value from element src with `element.getAttribute('src')`.
@@ -44,7 +42,7 @@
      * @type Boolean
      * @default
      */
-    srcFromAttribute: false,
+    srcFromAttribute = false
 
     /**
      * private
@@ -52,7 +50,7 @@
      * if the Image got resized after the last Render
      * @type Number
      */
-    _lastScaleX: 1,
+    _lastScaleX = 1
 
     /**
      * private
@@ -60,21 +58,21 @@
      * if the Image got resized after the last Render
      * @type Number
      */
-    _lastScaleY: 1,
+    _lastScaleY = 1
 
     /**
      * private
      * contains last value of scaling applied by the apply filter chain
      * @type Number
      */
-    _filterScalingX: 1,
+    _filterScalingX = 1
 
     /**
      * private
      * contains last value of scaling applied by the apply filter chain
      * @type Number
      */
-    _filterScalingY: 1,
+    _filterScalingY = 1
 
     /**
      * minimum scale factor under which any resizeFilter is triggered to resize the image
@@ -82,7 +80,7 @@
      * number bigger than 1 are not implemented yet.
      * @type Number
      */
-    minimumScaleTrigger: 0.5,
+    minimumScaleTrigger = 0.5
 
     /**
      * List of properties to consider when checking if
@@ -90,7 +88,7 @@
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: fabric.Object.prototype.stateProperties.concat('cropX', 'cropY'),
+    stateProperties = fabric.Object.prototype.stateProperties.concat('cropX', 'cropY')
 
     /**
      * List of properties to consider when checking if cache needs refresh
@@ -99,7 +97,7 @@
      * and refreshed at the next render
      * @type Array
      */
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat('cropX', 'cropY'),
+    cacheProperties = fabric.Object.prototype.cacheProperties.concat('cropX', 'cropY')
 
     /**
      * key used to retrieve the texture representing this image
@@ -107,7 +105,7 @@
      * @type String
      * @default
      */
-    cacheKey: '',
+    cacheKey = ''
 
     /**
      * Image crop in pixels from original image size.
@@ -115,7 +113,7 @@
      * @type Number
      * @default
      */
-    cropX: 0,
+    cropX = 0
 
     /**
      * Image crop in pixels from original image size.
@@ -123,7 +121,7 @@
      * @type Number
      * @default
      */
-    cropY: 0,
+    cropY = 0
 
     /**
      * Indicates whether this canvas will use image smoothing when painting this image.
@@ -132,7 +130,7 @@
      * @type Boolean
      * @default
      */
-    imageSmoothing: true,
+    imageSmoothing = true
 
     /**
      * Constructor
@@ -144,21 +142,21 @@
      * @param {Object} [options] Options object
      * @return {fabric.Image} thisArg
      */
-    initialize: function(element, options) {
+    constructor(element, options) {
       options || (options = { });
       this.filters = [];
       this.cacheKey = 'texture' + fabric.Object.__uid++;
-      this.callSuper('initialize', options);
+      super(options);
       this._initElement(element, options);
-    },
+    }
 
     /**
      * Returns image element which this instance if based on
      * @return {HTMLImageElement} Image element
      */
-    getElement: function() {
+    getElement() {
       return this._element || {};
-    },
+    }
 
     /**
      * Sets image element for this instance to a specified one.
@@ -169,7 +167,7 @@
      * @return {fabric.Image} thisArg
      * @chainable
      */
-    setElement: function(element, options) {
+    setElement(element, options) {
       this.removeTexture(this.cacheKey);
       this.removeTexture(this.cacheKey + '_filtered');
       this._element = element;
@@ -186,23 +184,23 @@
         this.applyResizeFilters();
       }
       return this;
-    },
+    }
 
     /**
      * Delete a single texture if in webgl mode
      */
-    removeTexture: function(key) {
+    removeTexture(key) {
       var backend = fabric.filterBackend;
       if (backend && backend.evictCachesForKey) {
         backend.evictCachesForKey(key);
       }
-    },
+    }
 
     /**
      * Delete textures, reference to elements and eventually JSDOM cleanup
      */
-    dispose: function () {
-      this.callSuper('dispose');
+    dispose() {
+      super.dispose();
       this.removeTexture(this.cacheKey);
       this.removeTexture(this.cacheKey + '_filtered');
       this._cacheContext = undefined;
@@ -210,32 +208,32 @@
         fabric.util.cleanUpJsdomNode(this[element]);
         this[element] = undefined;
       }).bind(this));
-    },
+    }
 
     /**
      * Get the crossOrigin value (of the corresponding image element)
      */
-    getCrossOrigin: function() {
+    getCrossOrigin() {
       return this._originalElement && (this._originalElement.crossOrigin || null);
-    },
+    }
 
     /**
      * Returns original size of an image
      * @return {Object} Object with "width" and "height" properties
      */
-    getOriginalSize: function() {
+    getOriginalSize() {
       var element = this.getElement();
       return {
         width: element.naturalWidth || element.width,
         height: element.naturalHeight || element.height
       };
-    },
+    }
 
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _stroke: function(ctx) {
+    _stroke(ctx) {
       if (!this.stroke || this.strokeWidth === 0) {
         return;
       }
@@ -247,14 +245,14 @@
       ctx.lineTo(-w, h);
       ctx.lineTo(-w, -h);
       ctx.closePath();
-    },
+    }
 
     /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} Object representation of an instance
      */
-    toObject: function(propertiesToInclude) {
+    toObject(propertiesToInclude) {
       var filters = [];
 
       this.filters.forEach(function(filterObj) {
@@ -275,15 +273,15 @@
         object.resizeFilter = this.resizeFilter.toObject();
       }
       return object;
-    },
+    }
 
     /**
      * Returns true if an image has crop applied, inspecting values of cropX,cropY,width,height.
      * @return {Boolean}
      */
-    hasCrop: function() {
+    hasCrop() {
       return this.cropX || this.cropY || this.width < this._element.width || this.height < this._element.height;
-    },
+    }
 
     /* _TO_SVG_START_ */
     /**
@@ -291,7 +289,7 @@
      * @return {Array} an array of strings with the specific svg representation
      * of the instance
      */
-    _toSVG: function() {
+    _toSVG() {
       var svgString = [], imageMarkup = [], strokeSvg, element = this._element,
           x = -this.width / 2, y = -this.height / 2, clipPath = '', imageRendering = '';
       if (!element) {
@@ -339,7 +337,7 @@
         svgString = svgString.concat(imageMarkup, strokeSvg);
       }
       return svgString;
-    },
+    }
     /* _TO_SVG_END_ */
 
     /**
@@ -347,7 +345,7 @@
      * @param {Boolean} filtered indicates if the src is needed for svg
      * @return {String} Source of an image
      */
-    getSrc: function(filtered) {
+    getSrc(filtered) {
       var element = filtered ? this._element : this._originalElement;
       if (element) {
         if (element.toDataURL) {
@@ -364,7 +362,7 @@
       else {
         return this.src || '';
       }
-    },
+    }
 
     /**
      * Sets source of an image
@@ -374,24 +372,24 @@
      * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
      * @return {Promise<fabric.Image>} thisArg
      */
-    setSrc: function(src, options) {
+    setSrc(src, options) {
       var _this = this;
       return fabric.util.loadImage(src, options).then(function(img) {
         _this.setElement(img, options);
         _this._setWidthHeight();
         return _this;
       });
-    },
+    }
 
     /**
      * Returns string representation of an instance
      * @return {String} String representation of an instance
      */
-    toString: function() {
+    toString() {
       return '#<fabric.Image: { src: "' + this.getSrc() + '" }>';
-    },
+    }
 
-    applyResizeFilters: function() {
+    applyResizeFilters() {
       var filter = this.resizeFilter,
           minimumScale = this.minimumScaleTrigger,
           objectScale = this.getTotalObjectScaling(),
@@ -424,7 +422,7 @@
         [filter], elementToFilter, sourceWidth, sourceHeight, this._element, cacheKey);
       this._filterScalingX = canvasEl.width / this._originalElement.width;
       this._filterScalingY = canvasEl.height / this._originalElement.height;
-    },
+    }
 
     /**
      * Applies filters assigned to this image (from "filters" array) or from filter param
@@ -434,7 +432,7 @@
      * @return {thisArg} return the fabric.Image object
      * @chainable
      */
-    applyFilters: function(filters) {
+    applyFilters(filters) {
 
       filters = filters || this.filters || [];
       filters = filters.filter(function(filter) { return filter && !filter.isNeutralState(); });
@@ -483,30 +481,30 @@
         this._filterScalingY = this._element.height / this._originalElement.height;
       }
       return this;
-    },
+    }
 
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _render: function(ctx) {
+    _render(ctx) {
       fabric.util.setImageSmoothing(ctx, this.imageSmoothing);
       if (this.isMoving !== true && this.resizeFilter && this._needsResize()) {
         this.applyResizeFilters();
       }
       this._stroke(ctx);
       this._renderPaintInOrder(ctx);
-    },
+    }
 
     /**
      * Paint the cached copy of the object on the target context.
      * it will set the imageSmoothing for the draw operation
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    drawCacheOnCanvas: function(ctx) {
+    drawCacheOnCanvas(ctx) {
       fabric.util.setImageSmoothing(ctx, this.imageSmoothing);
       fabric.Object.prototype.drawCacheOnCanvas.call(this, ctx);
-    },
+    }
 
     /**
      * Decide if the object should cache or not. Create its own cache level
@@ -519,11 +517,11 @@
      * A full performance audit should be done.
      * @return {Boolean}
      */
-    shouldCache: function() {
+    shouldCache() {
       return this.needsItsOwnCache();
-    },
+    }
 
-    _renderFill: function(ctx) {
+    _renderFill(ctx) {
       var elementToDraw = this._element;
       if (!elementToDraw) {
         return;
@@ -544,23 +542,23 @@
           maxDestH = min(h, elHeight / scaleY - cropY);
 
       elementToDraw && ctx.drawImage(elementToDraw, sX, sY, sW, sH, x, y, maxDestW, maxDestH);
-    },
+    }
 
     /**
      * needed to check if image needs resize
      * @private
      */
-    _needsResize: function() {
+    _needsResize() {
       var scale = this.getTotalObjectScaling();
       return (scale.x !== this._lastScaleX || scale.y !== this._lastScaleY);
-    },
+    }
 
     /**
      * @private
      */
-    _resetWidthHeight: function() {
+    _resetWidthHeight() {
       this.set(this.getOriginalSize());
-    },
+    }
 
     /**
      * The Image class's initialization method. This method is automatically
@@ -569,20 +567,20 @@
      * @param {HTMLImageElement|String} element The element representing the image
      * @param {Object} [options] Options object
      */
-    _initElement: function(element, options) {
+    _initElement(element, options) {
       this.setElement(fabric.util.getById(element), options);
       fabric.util.addClass(this.getElement(), fabric.Image.CSS_CANVAS);
-    },
+    }
 
     /**
      * @private
      * @param {Object} [options] Options object
      */
-    _initConfig: function(options) {
+    _initConfig(options) {
       options || (options = { });
       this.setOptions(options);
       this._setWidthHeight(options);
-    },
+    }
 
     /**
      * @private
@@ -590,12 +588,12 @@
      * options.
      * @param {Object} [options] Object with width/height properties
      */
-    _setWidthHeight: function(options) {
+    _setWidthHeight(options) {
       options || (options = { });
       var el = this.getElement();
       this.width = options.width || el.naturalWidth || el.width || 0;
       this.height = options.height || el.naturalHeight || el.height || 0;
-    },
+    }
 
     /**
      * Calculate offset for center and scale factor for the image in order to respect
@@ -603,7 +601,7 @@
      * @private
      * @return {Object}
      */
-    parsePreserveAspectRatioAttribute: function() {
+    parsePreserveAspectRatioAttribute() {
       var pAR = fabric.util.parsePreserveAspectRatioAttribute(this.preserveAspectRatio || ''),
           rWidth = this._element.width, rHeight = this._element.height,
           scaleX = 1, scaleY = 1, offsetLeft = 0, offsetTop = 0, cropX = 0, cropY = 0,
@@ -661,7 +659,7 @@
         cropY: cropY
       };
     }
-  });
+  }
 
   /**
    * Default CSS class name for canvas
@@ -744,4 +742,3 @@
   };
   /* _FROM_SVG_END_ */
 
-})(typeof exports !== 'undefined' ? exports : this);

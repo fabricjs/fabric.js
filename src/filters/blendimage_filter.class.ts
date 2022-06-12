@@ -1,4 +1,5 @@
-(function(global) {
+//@ts-nocheck
+
   'use strict';
 
   var fabric = global.fabric,
@@ -26,29 +27,29 @@
    * canvas.renderAll();
    */
 
-  filters.BlendImage = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.BlendImage.prototype */ {
-    type: 'BlendImage',
+export class BlendImage extends fabric.Image.filters.BaseFilter {
+    type = 'BlendImage'
 
     /**
      * Color to make the blend operation with. default to a reddish color since black or white
      * gives always strong result.
      **/
-    image: null,
+    image = null
 
     /**
      * Blend mode for the filter (one of "multiply", "mask")
      * @type String
      * @default
      **/
-    mode: 'multiply',
+    mode = 'multiply'
 
     /**
      * alpha value. represent the strength of the blend image operation.
      * not implemented.
      **/
-    alpha: 1,
+    alpha = 1
 
-    vertexSource: 'attribute vec2 aPosition;\n' +
+    vertexSource = 'attribute vec2 aPosition;\n' +
       'varying vec2 vTexCoord;\n' +
       'varying vec2 vTexCoord2;\n' +
       'uniform mat3 uTransformMatrix;\n' +
@@ -56,12 +57,12 @@
         'vTexCoord = aPosition;\n' +
         'vTexCoord2 = (uTransformMatrix * vec3(aPosition, 1.0)).xy;\n' +
         'gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n' +
-      '}',
+      '}'
 
     /**
      * Fragment source for the Multiply program
      */
-    fragmentSource: {
+    fragmentSource = {
       multiply: 'precision highp float;\n' +
         'uniform sampler2D uTexture;\n' +
         'uniform sampler2D uImage;\n' +
@@ -86,7 +87,7 @@
           'color.a = color2.a;\n' +
           'gl_FragColor = color;\n' +
         '}',
-    },
+    }
 
     /**
      * Retrieves the cached shader.
@@ -94,27 +95,27 @@
      * @param {WebGLRenderingContext} options.context The GL context used for rendering.
      * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
      */
-    retrieveShader: function(options) {
+    retrieveShader(options) {
       var cacheKey = this.type + '_' + this.mode;
       var shaderSource = this.fragmentSource[this.mode];
       if (!options.programCache.hasOwnProperty(cacheKey)) {
         options.programCache[cacheKey] = this.createProgram(options.context, shaderSource);
       }
       return options.programCache[cacheKey];
-    },
+    }
 
-    applyToWebGL: function(options) {
+    applyToWebGL(options) {
       // load texture to blend.
       var gl = options.context,
           texture = this.createTexture(options.filterBackend, this.image);
       this.bindAdditionalTexture(gl, texture, gl.TEXTURE1);
-      this.callSuper('applyToWebGL', options);
+      super.applyToWebGL(options);
       this.unbindAdditionalTexture(gl, gl.TEXTURE1);
-    },
+    }
 
-    createTexture: function(backend, image) {
+    createTexture(backend, image) {
       return backend.getCachedTexture(image.cacheKey, image._element);
-    },
+    }
 
     /**
      * Calculate a transformMatrix to adapt the image to blend over
@@ -122,7 +123,7 @@
      * @param {WebGLRenderingContext} options.context The GL context used for rendering.
      * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
      */
-    calculateMatrix: function() {
+    calculateMatrix() {
       var image = this.image,
           width = image._element.width,
           height = image._element.height;
@@ -131,7 +132,7 @@
         0, 1 / image.scaleY, 0,
         -image.left / width, -image.top / height, 1
       ];
-    },
+    }
 
     /**
      * Apply the Blend operation to a Uint8ClampedArray representing the pixels of an image.
@@ -139,7 +140,7 @@
      * @param {Object} options
      * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
      */
-    applyTo2d: function(options) {
+    applyTo2d(options) {
       var imageData = options.imageData,
           resources = options.filterBackend.resources,
           data = imageData.data, iLen = data.length,
@@ -188,7 +189,7 @@
             break;
         }
       }
-    },
+    }
 
     /**
      * Return WebGL uniform locations for this filter's shader.
@@ -196,12 +197,12 @@
      * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
      * @param {WebGLShaderProgram} program This filter's compiled shader program.
      */
-    getUniformLocations: function(gl, program) {
+    getUniformLocations(gl, program) {
       return {
         uTransformMatrix: gl.getUniformLocation(program, 'uTransformMatrix'),
         uImage: gl.getUniformLocation(program, 'uImage'),
       };
-    },
+    }
 
     /**
      * Send data from this filter to its shader program's uniforms.
@@ -209,17 +210,17 @@
      * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
      * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
      */
-    sendUniformData: function(gl, uniformLocations) {
+    sendUniformData(gl, uniformLocations) {
       var matrix = this.calculateMatrix();
       gl.uniform1i(uniformLocations.uImage, 1); // texture unit 1.
       gl.uniformMatrix3fv(uniformLocations.uTransformMatrix, false, matrix);
-    },
+    }
 
     /**
      * Returns object representation of an instance
      * @return {Object} Object representation of an instance
      */
-    toObject: function() {
+    toObject() {
       return {
         type: this.type,
         image: this.image && this.image.toObject(),
@@ -227,7 +228,7 @@
         alpha: this.alpha
       };
     }
-  });
+  }
 
   /**
    * Create filter instance from an object representation
@@ -241,4 +242,3 @@
     });
   };
 
-})(typeof exports !== 'undefined' ? exports : this);

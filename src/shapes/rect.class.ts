@@ -1,13 +1,11 @@
-(function(global) {
+//@ts-nocheck
+
 
   'use strict';
 
   var fabric = global.fabric || (global.fabric = { });
 
-  if (fabric.Rect) {
-    fabric.warn('fabric.Rect is already defined');
-    return;
-  }
+  
 
   /**
    * Rectangle class
@@ -16,66 +14,66 @@
    * @return {fabric.Rect} thisArg
    * @see {@link fabric.Rect#initialize} for constructor definition
    */
-  fabric.Rect = fabric.util.createClass(fabric.Object, /** @lends fabric.Rect.prototype */ {
+export class Rect extends fabric.Object {
 
     /**
      * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: fabric.Object.prototype.stateProperties.concat('rx', 'ry'),
+    stateProperties = fabric.Object.prototype.stateProperties.concat('rx', 'ry')
 
     /**
      * Type of an object
      * @type String
      * @default
      */
-    type: 'rect',
+    type = 'rect'
 
     /**
      * Horizontal border radius
      * @type Number
      * @default
      */
-    rx:   0,
+    rx = 0
 
     /**
      * Vertical border radius
      * @type Number
      * @default
      */
-    ry:   0,
+    ry = 0
 
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat('rx', 'ry'),
+    cacheProperties = fabric.Object.prototype.cacheProperties.concat('rx', 'ry')
 
     /**
      * Constructor
      * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
-    initialize: function(options) {
-      this.callSuper('initialize', options);
+    constructor(options) {
+      super(options);
       this._initRxRy();
-    },
+    }
 
     /**
      * Initializes rx/ry attributes
      * @private
      */
-    _initRxRy: function() {
+    _initRxRy() {
       if (this.rx && !this.ry) {
         this.ry = this.rx;
       }
       else if (this.ry && !this.rx) {
         this.rx = this.ry;
       }
-    },
+    }
 
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _render: function(ctx) {
+    _render(ctx) {
 
       // 1x1 case (used in spray brush) optimization was removed because
       // with caching and higher zoom level this makes more damage than help
@@ -108,16 +106,16 @@
       ctx.closePath();
 
       this._renderPaintInOrder(ctx);
-    },
+    }
 
     /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
-    toObject: function(propertiesToInclude) {
-      return this.callSuper('toObject', ['rx', 'ry'].concat(propertiesToInclude));
-    },
+    toObject(propertiesToInclude) {
+      return super.toObject(['rx', 'ry'].concat(propertiesToInclude));
+    }
 
     /* _TO_SVG_START_ */
     /**
@@ -125,7 +123,7 @@
      * @return {Array} an array of strings with the specific svg representation
      * of the instance
      */
-    _toSVG: function() {
+    _toSVG() {
       var x = -this.width / 2, y = -this.height / 2;
       return [
         '<rect ', 'COMMON_PARTS',
@@ -134,9 +132,9 @@
         '" width="', this.width, '" height="', this.height,
         '" />\n'
       ];
-    },
+    }
     /* _TO_SVG_END_ */
-  });
+  }
 
   /* _FROM_SVG_START_ */
   /**
@@ -183,4 +181,3 @@
     return fabric.Object._fromObject(fabric.Rect, object);
   };
 
-})(typeof exports !== 'undefined' ? exports : this);

@@ -1,11 +1,14 @@
-fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
+//@ts-nocheck
+
+export function StaticCanvasAnimationMixinGenerator(Klass) {
+  return class StaticCanvasAnimationMixin extends Klass {
 
   /**
    * Animation duration (in ms) for fx* methods
    * @type Number
    * @default
    */
-  FX_DURATION: 500,
+  FX_DURATION = 500
 
   /**
    * Centers object horizontally with animation.
@@ -15,7 +18,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Function} [callbacks.onChange] Invoked on every step of animation
    * @return {fabric.AnimationContext} context
    */
-  fxCenterObjectH: function (object, callbacks) {
+  fxCenterObjectH(object, callbacks) {
     callbacks = callbacks || { };
 
     var empty = function() { },
@@ -38,7 +41,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         onComplete();
       }
     });
-  },
+  }
 
   /**
    * Centers object vertically with animation.
@@ -48,7 +51,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Function} [callbacks.onChange] Invoked on every step of animation
    * @return {fabric.AnimationContext} context
    */
-  fxCenterObjectV: function (object, callbacks) {
+  fxCenterObjectV(object, callbacks) {
     callbacks = callbacks || { };
 
     var empty = function() { },
@@ -71,7 +74,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         onComplete();
       }
     });
-  },
+  }
 
   /**
    * Same as `fabric.Canvas#remove` but animated
@@ -81,7 +84,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @param {Function} [callbacks.onChange] Invoked on every step of animation
    * @return {fabric.AnimationContext} context
    */
-  fxRemove: function (object, callbacks) {
+  fxRemove(object, callbacks) {
     callbacks = callbacks || { };
 
     var empty = function() { },
@@ -105,9 +108,15 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
     });
   }
-});
+}
+}
 
-fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
+fabric.StaticCanvas = StaticCanvasAnimationMixinGenerator(fabric.StaticCanvas);
+
+
+
+export function ObjectAnimationMixinGenerator(Klass) {
+  return class ObjectAnimationMixin extends Klass {
   /**
    * Animates object's properties
    * @param {String|Object} property Property to animate (if string) or properties to animate (if object)
@@ -127,7 +136,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * object.animate('left', { duration: ... });
    *
    */
-  animate: function () {
+  animate() {
     if (arguments[0] && typeof arguments[0] === 'object') {
       var propsToAnimate = [], prop, skipCallbacks, out = [];
       for (prop in arguments[0]) {
@@ -143,7 +152,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     else {
       return this._animate.apply(this, arguments);
     }
-  },
+  }
 
   /**
    * @private
@@ -152,7 +161,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
    * @param {Object} [options] Options object
    * @param {Boolean} [skipCallbacks] When true, callbacks like onchange and oncomplete are not invoked
    */
-  _animate: function(property, to, options, skipCallbacks) {
+  _animate(property, to, options, skipCallbacks) {
     var _this = this, propPair;
 
     to = to.toString();
@@ -223,4 +232,8 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       return fabric.util.animate(_options);
     }
   }
-});
+}
+}
+
+fabric.Object = ObjectAnimationMixinGenerator(fabric.Object);
+

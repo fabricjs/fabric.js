@@ -1,27 +1,30 @@
-(function() {
+//@ts-nocheck
 
-  fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
+
+  
+export function ITextBehaviorMixinGenerator(Klass) {
+  return class ITextBehaviorMixin extends Klass {
 
     /**
      * Initializes all the interactive behavior of IText
      */
-    initBehavior: function() {
+    initBehavior() {
       this.initAddedHandler();
       this.initRemovedHandler();
       this.initCursorSelectionHandlers();
       this.initDoubleClickSimulation();
       this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
-    },
+    }
 
-    onDeselect: function() {
+    onDeselect() {
       this.isEditing && this.exitEditing();
       this.selected = false;
-    },
+    }
 
     /**
      * Initializes "added" event handler
      */
-    initAddedHandler: function() {
+    initAddedHandler() {
       var _this = this;
       this.on('added', function (opt) {
         //  make sure we listen to the canvas added event
@@ -35,9 +38,9 @@
           canvas._iTextInstances.push(_this);
         }
       });
-    },
+    }
 
-    initRemovedHandler: function() {
+    initRemovedHandler() {
       var _this = this;
       this.on('removed', function (opt) {
         //  make sure we listen to the canvas removed event
@@ -51,13 +54,13 @@
           }
         }
       });
-    },
+    }
 
     /**
      * register canvas event to manage exiting on other instances
      * @private
      */
-    _initCanvasHandlers: function(canvas) {
+    _initCanvasHandlers(canvas) {
       canvas._mouseUpITextHandler = function() {
         if (canvas._iTextInstances) {
           canvas._iTextInstances.forEach(function(obj) {
@@ -66,27 +69,27 @@
         }
       };
       canvas.on('mouse:up', canvas._mouseUpITextHandler);
-    },
+    }
 
     /**
      * remove canvas event to manage exiting on other instances
      * @private
      */
-    _removeCanvasHandlers: function(canvas) {
+    _removeCanvasHandlers(canvas) {
       canvas.off('mouse:up', canvas._mouseUpITextHandler);
-    },
+    }
 
     /**
      * @private
      */
-    _tick: function() {
+    _tick() {
       this._currentTickState = this._animateCursor(this, 1, this.cursorDuration, '_onTickComplete');
-    },
+    }
 
     /**
      * @private
      */
-    _animateCursor: function(obj, targetOpacity, duration, completeMethod) {
+    _animateCursor(obj, targetOpacity, duration, completeMethod) {
 
       var tickState;
 
@@ -115,12 +118,12 @@
         }
       });
       return tickState;
-    },
+    }
 
     /**
      * @private
      */
-    _onTickComplete: function() {
+    _onTickComplete() {
 
       var _this = this;
 
@@ -130,12 +133,12 @@
       this._cursorTimeout1 = setTimeout(function() {
         _this._currentTickCompleteState = _this._animateCursor(_this, 0, this.cursorDuration / 2, '_tick');
       }, 100);
-    },
+    }
 
     /**
      * Initializes delayed cursor
      */
-    initDelayedCursor: function(restart) {
+    initDelayedCursor(restart) {
       var _this = this,
           delay = restart ? 0 : this.cursorDelay;
 
@@ -149,12 +152,12 @@
       else {
         this._tick();
       }
-    },
+    }
 
     /**
      * Aborts cursor animation and clears all timeouts
      */
-    abortCursorAnimation: function() {
+    abortCursorAnimation() {
       var shouldClear = this._currentTickState || this._currentTickCompleteState,
           canvas = this.canvas;
       this._currentTickState && this._currentTickState.abort();
@@ -170,35 +173,35 @@
         canvas.clearContext(canvas.contextTop || canvas.contextContainer);
       }
 
-    },
+    }
 
     /**
      * Selects entire text
      * @return {fabric.IText} thisArg
      * @chainable
      */
-    selectAll: function() {
+    selectAll() {
       this.selectionStart = 0;
       this.selectionEnd = this._text.length;
       this._fireSelectionChanged();
       this._updateTextarea();
       return this;
-    },
+    }
 
     /**
      * Returns selected text
      * @return {String}
      */
-    getSelectedText: function() {
+    getSelectedText() {
       return this._text.slice(this.selectionStart, this.selectionEnd).join('');
-    },
+    }
 
     /**
      * Find new selection index representing start of current word according to current selection index
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findWordBoundaryLeft: function(startFrom) {
+    findWordBoundaryLeft(startFrom) {
       var offset = 0, index = startFrom - 1;
 
       // remove space before cursor first
@@ -214,14 +217,14 @@
       }
 
       return startFrom - offset;
-    },
+    }
 
     /**
      * Find new selection index representing end of current word according to current selection index
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findWordBoundaryRight: function(startFrom) {
+    findWordBoundaryRight(startFrom) {
       var offset = 0, index = startFrom;
 
       // remove space after cursor first
@@ -237,14 +240,14 @@
       }
 
       return startFrom + offset;
-    },
+    }
 
     /**
      * Find new selection index representing start of current line according to current selection index
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findLineBoundaryLeft: function(startFrom) {
+    findLineBoundaryLeft(startFrom) {
       var offset = 0, index = startFrom - 1;
 
       while (!/\n/.test(this._text[index]) && index > -1) {
@@ -253,14 +256,14 @@
       }
 
       return startFrom - offset;
-    },
+    }
 
     /**
      * Find new selection index representing end of current line according to current selection index
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findLineBoundaryRight: function(startFrom) {
+    findLineBoundaryRight(startFrom) {
       var offset = 0, index = startFrom;
 
       while (!/\n/.test(this._text[index]) && index < this._text.length) {
@@ -269,7 +272,7 @@
       }
 
       return startFrom + offset;
-    },
+    }
 
     /**
      * Finds index corresponding to beginning or end of a word
@@ -277,7 +280,7 @@
      * @param {Number} direction 1 or -1
      * @return {Number} Index of the beginning or end of a word
      */
-    searchWordBoundary: function(selectionStart, direction) {
+    searchWordBoundary(selectionStart, direction) {
       var text = this._text,
           index     = this._reSpace.test(text[selectionStart]) ? selectionStart - 1 : selectionStart,
           _char     = text[index],
@@ -292,13 +295,13 @@
         index += direction === 1 ? 0 : 1;
       }
       return index;
-    },
+    }
 
     /**
      * Selects a word based on the index
      * @param {Number} selectionStart Index of a character
      */
-    selectWord: function(selectionStart) {
+    selectWord(selectionStart) {
       selectionStart = selectionStart || this.selectionStart;
       var newSelectionStart = this.searchWordBoundary(selectionStart, -1), /* search backwards */
           newSelectionEnd = this.searchWordBoundary(selectionStart, 1); /* search forward */
@@ -308,7 +311,7 @@
       this._fireSelectionChanged();
       this._updateTextarea();
       this.renderCursorOrSelection();
-    },
+    }
 
     /**
      * Selects a line based on the index
@@ -316,7 +319,7 @@
      * @return {fabric.IText} thisArg
      * @chainable
      */
-    selectLine: function(selectionStart) {
+    selectLine(selectionStart) {
       selectionStart = selectionStart || this.selectionStart;
       var newSelectionStart = this.findLineBoundaryLeft(selectionStart),
           newSelectionEnd = this.findLineBoundaryRight(selectionStart);
@@ -326,14 +329,14 @@
       this._fireSelectionChanged();
       this._updateTextarea();
       return this;
-    },
+    }
 
     /**
      * Enters editing state
      * @return {fabric.IText} thisArg
      * @chainable
      */
-    enterEditing: function(e) {
+    enterEditing(e) {
       if (this.isEditing || !this.editable) {
         return;
       }
@@ -363,9 +366,9 @@
       this.initMouseMoveHandler();
       this.canvas.requestRenderAll();
       return this;
-    },
+    }
 
-    exitEditingOnOthers: function(canvas) {
+    exitEditingOnOthers(canvas) {
       if (canvas._iTextInstances) {
         canvas._iTextInstances.forEach(function(obj) {
           obj.selected = false;
@@ -374,19 +377,19 @@
           }
         });
       }
-    },
+    }
 
     /**
      * Initializes "mousemove" event handler
      */
-    initMouseMoveHandler: function() {
+    initMouseMoveHandler() {
       this.canvas.on('mouse:move', this.mouseMoveHandler);
-    },
+    }
 
     /**
      * @private
      */
-    mouseMoveHandler: function(options) {
+    mouseMoveHandler(options) {
       if (!this.__isMousedown || !this.isEditing) {
         return;
       }
@@ -415,12 +418,12 @@
         this._updateTextarea();
         this.renderCursorOrSelection();
       }
-    },
+    }
 
     /**
      * @private
      */
-    _setEditingProps: function() {
+    _setEditingProps() {
       this.hoverCursor = 'text';
 
       if (this.canvas) {
@@ -430,12 +433,12 @@
       this.borderColor = this.editingBorderColor;
       this.hasControls = this.selectable = false;
       this.lockMovementX = this.lockMovementY = true;
-    },
+    }
 
     /**
      * convert from textarea to grapheme indexes
      */
-    fromStringToGraphemeSelection: function(start, end, text) {
+    fromStringToGraphemeSelection(start, end, text) {
       var smallerTextStart = text.slice(0, start),
           graphemeStart = this.graphemeSplit(smallerTextStart).length;
       if (start === end) {
@@ -444,12 +447,12 @@
       var smallerTextEnd = text.slice(start, end),
           graphemeEnd = this.graphemeSplit(smallerTextEnd).length;
       return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
-    },
+    }
 
     /**
      * convert from fabric to textarea values
      */
-    fromGraphemeToStringSelection: function(start, end, _text) {
+    fromGraphemeToStringSelection(start, end, _text) {
       var smallerTextStart = _text.slice(0, start),
           graphemeStart = smallerTextStart.join('').length;
       if (start === end) {
@@ -458,12 +461,12 @@
       var smallerTextEnd = _text.slice(start, end),
           graphemeEnd = smallerTextEnd.join('').length;
       return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
-    },
+    }
 
     /**
      * @private
      */
-    _updateTextarea: function() {
+    _updateTextarea() {
       this.cursorOffsetCache = { };
       if (!this.hiddenTextarea) {
         return;
@@ -474,12 +477,12 @@
         this.hiddenTextarea.selectionEnd = newSelection.selectionEnd;
       }
       this.updateTextareaPosition();
-    },
+    }
 
     /**
      * @private
      */
-    updateFromTextArea: function() {
+    updateFromTextArea() {
       if (!this.hiddenTextarea) {
         return;
       }
@@ -496,24 +499,24 @@
         this.selectionStart = newSelection.selectionStart;
       }
       this.updateTextareaPosition();
-    },
+    }
 
     /**
      * @private
      */
-    updateTextareaPosition: function() {
+    updateTextareaPosition() {
       if (this.selectionStart === this.selectionEnd) {
         var style = this._calcTextareaPosition();
         this.hiddenTextarea.style.left = style.left;
         this.hiddenTextarea.style.top = style.top;
       }
-    },
+    }
 
     /**
      * @private
      * @return {Object} style contains style for hiddenTextarea
      */
-    _calcTextareaPosition: function() {
+    _calcTextareaPosition() {
       if (!this.canvas) {
         return { x: 1, y: 1 };
       }
@@ -560,12 +563,12 @@
       p.y += this.canvas._offset.top;
 
       return { left: p.x + 'px', top: p.y + 'px', fontSize: charHeight + 'px', charHeight: charHeight };
-    },
+    }
 
     /**
      * @private
      */
-    _saveEditingProps: function() {
+    _saveEditingProps() {
       this._savedProps = {
         hasControls: this.hasControls,
         borderColor: this.borderColor,
@@ -576,12 +579,12 @@
         defaultCursor: this.canvas && this.canvas.defaultCursor,
         moveCursor: this.canvas && this.canvas.moveCursor
       };
-    },
+    }
 
     /**
      * @private
      */
-    _restoreEditingProps: function() {
+    _restoreEditingProps() {
       if (!this._savedProps) {
         return;
       }
@@ -599,14 +602,14 @@
       }
 
       delete this._savedProps;
-    },
+    }
 
     /**
      * Exits from editing state
      * @return {fabric.IText} thisArg
      * @chainable
      */
-    exitEditing: function() {
+    exitEditing() {
       var isTextChanged = (this._textBeforeEdit !== this.text);
       var hiddenTextarea = this.hiddenTextarea;
       this.selected = false;
@@ -634,25 +637,25 @@
         isTextChanged && this.canvas.fire('object:modified', { target: this });
       }
       return this;
-    },
+    }
 
     /**
      * @private
      */
-    _removeExtraneousStyles: function() {
+    _removeExtraneousStyles() {
       for (var prop in this.styles) {
         if (!this._textLines[prop]) {
           delete this.styles[prop];
         }
       }
-    },
+    }
 
     /**
      * remove and reflow a style block from start to end.
      * @param {Number} start linear start position for removal (included in removal)
      * @param {Number} end linear end position for removal ( excluded from removal )
      */
-    removeStyleFromTo: function(start, end) {
+    removeStyleFromTo(start, end) {
       var cursorStart = this.get2DCursorLocation(start, true),
           cursorEnd = this.get2DCursorLocation(end, true),
           lineStart = cursorStart.lineIndex,
@@ -701,14 +704,14 @@
           }
         }
       }
-    },
+    }
 
     /**
      * Shifts line styles up or down
      * @param {Number} lineIndex Index of a line
      * @param {Number} offset Can any number?
      */
-    shiftLineStyles: function(lineIndex, offset) {
+    shiftLineStyles(lineIndex, offset) {
       // shift all line styles by offset upward or downward
       // do not clone deep. we need new array, not new style objects
       var clonedStyles = Object.assign({}, this.styles);
@@ -721,15 +724,15 @@
           }
         }
       }
-    },
+    }
 
-    restartCursorIfNeeded: function() {
+    restartCursorIfNeeded() {
       if (!this._currentTickState || this._currentTickState.isAborted
         || !this._currentTickCompleteState || this._currentTickCompleteState.isAborted
       ) {
         this.initDelayedCursor();
       }
-    },
+    }
 
     /**
      * Handle insertion of more consecutive style lines for when one or more
@@ -741,7 +744,7 @@
      * @param {Number} qty number of lines to add
      * @param {Array} copiedStyle Array of objects styles
      */
-    insertNewlineStyleObject: function(lineIndex, charIndex, qty, copiedStyle) {
+    insertNewlineStyleObject(lineIndex, charIndex, qty, copiedStyle) {
       var currentCharStyle,
           newLineStyles = {},
           somethingAdded = false,
@@ -791,7 +794,7 @@
         qty--;
       }
       this._forceClearCache = true;
-    },
+    }
 
     /**
      * Inserts style object for a given line/char index
@@ -800,7 +803,7 @@
      * @param {Number} quantity number Style object to insert, if given
      * @param {Array} copiedStyle array of style objects
      */
-    insertCharStyleObject: function(lineIndex, charIndex, quantity, copiedStyle) {
+    insertCharStyleObject(lineIndex, charIndex, quantity, copiedStyle) {
       if (!this.styles) {
         this.styles = {};
       }
@@ -840,7 +843,7 @@
       while (newStyle && quantity--) {
         this.styles[lineIndex][charIndex + quantity] = Object.assign({}, newStyle);
       }
-    },
+    }
 
     /**
      * Inserts style object(s)
@@ -848,7 +851,7 @@
      * @param {Number} start cursor index for inserting style
      * @param {Array} [copiedStyle] array of style objects to insert.
      */
-    insertNewStyleBlock: function(insertedText, start, copiedStyle) {
+    insertNewStyleBlock(insertedText, start, copiedStyle) {
       var cursorLoc = this.get2DCursorLocation(start, true),
           addedLines = [0], linesLength = 0;
       // get an array of how many char per lines are being added.
@@ -887,13 +890,13 @@
       if (addedLines[i] > 0) {
         this.insertCharStyleObject(cursorLoc.lineIndex + i, 0, addedLines[i], copiedStyle);
       }
-    },
+    }
 
     /**
      * Set the selectionStart and selectionEnd according to the new position of cursor
      * mimic the key - mouse navigation when shift is pressed.
      */
-    setSelectionStartEndWithShift: function(start, end, newSelection) {
+    setSelectionStartEndWithShift(start, end, newSelection) {
       if (newSelection <= start) {
         if (end === start) {
           this._selectionDirection = 'left';
@@ -923,9 +926,9 @@
         }
         this.selectionEnd = newSelection;
       }
-    },
+    }
 
-    setSelectionInBoundaries: function() {
+    setSelectionInBoundaries() {
       var length = this.text.length;
       if (this.selectionStart > length) {
         this.selectionStart = length;
@@ -940,5 +943,8 @@
         this.selectionEnd = 0;
       }
     }
-  });
-})();
+  }
+}
+
+fabric.IText = ITextBehaviorMixinGenerator(fabric.IText);
+
