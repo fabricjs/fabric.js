@@ -334,6 +334,24 @@
   QUnit.test('isOnScreen', function(assert) {
     var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100, strokeWidth: 0});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    canvas.calcViewportBoundaries();
+    cObj.canvas = canvas;
+    cObj.setCoords();
+    assert.ok(cObj.isOnScreen(), 'object is onScreen');
+    cObj.top = 1000;
+    assert.ok(cObj.isOnScreen(), 'object is still wrongly on screen since setCoords is not called and calculate is not set, even when top is already at 1000');
+    assert.ok(!cObj.isOnScreen(true), 'object is not onScreen with top 1000 with calculate true and no setCoords call');
+    cObj.setCoords();
+    assert.ok(!cObj.isOnScreen(), 'object is not onScreen with top 1000');
+    canvas.setZoom(0.1);
+    cObj.setCoords();
+    assert.ok(cObj.isOnScreen(), 'zooming out the object is again on screen');
+  });
+
+  QUnit.test('isOnScreen flipped vpt', function (assert) {
+    var cObj = new fabric.Object({ left: -50, top: -50, width: 100, height: 100, strokeWidth: 0 });
+    canvas.viewportTransform = [-1, 0, 0, -1, 0, 0];
+    canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
     cObj.setCoords();
     assert.ok(cObj.isOnScreen(), 'object is onScreen');
@@ -381,6 +399,7 @@
     var cObj = new fabric.Object(
       { left: -10, top: -10, width: canvas.getWidth() + 100, height: canvas.getHeight(), strokeWidth: 0});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
     cObj.setCoords();
     assert.equal(cObj.isOnScreen(), true, 'object is onScreen because it include the canvas');
@@ -393,6 +412,7 @@
   QUnit.test('isOnScreen with object that is in top left corner of canvas', function(assert) {
     var cObj = new fabric.Rect({left: -46.56, top: -9.23, width: 50,height: 50, angle: 314.57});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
     cObj.setCoords();
     assert.ok(cObj.isOnScreen(), 'object is onScreen because it intersect a canvas line');
@@ -809,6 +829,7 @@
   QUnit.test('isPartiallyOnScreen', function(assert) {
     var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100, strokeWidth: 0});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
     cObj.left = -60;
     cObj.top = -60;
@@ -818,8 +839,8 @@
     cObj.top = -110;
     cObj.setCoords();
     assert.equal(cObj.isPartiallyOnScreen(true), false,'object is completely offScreen and not partial');
-    cObj.left = 50;
-    cObj.top = 50;
+    cObj.left = 45;
+    cObj.top = 45;
     cObj.setCoords();
     assert.equal(cObj.isPartiallyOnScreen(true), false, 'object is completely on screen and not partial');
     canvas.setZoom(2);
