@@ -97,9 +97,19 @@
     var rect1 = new fabric.Rect(),
         rect2 = new fabric.Rect(),
         rect3 = new fabric.Rect(),
-        group = new fabric.Group([rect1, rect2, rect3]);
+        group = new fabric.Group([rect1, rect2, rect3]),
+        fired = false, targets = [];
 
     assert.ok(typeof group.remove === 'function');
+    assert.ok(rect1.group === group, 'group should be referenced');
+    group.on('object:removed', (opt) => {
+      targets.push(opt.target);
+    });
+    rect1.on('removed', (opt) => {
+      assert.equal(opt.target, group);
+      assert.ok(rect1.group === undefined, 'group should not be referenced');
+      fired = true;
+    });
     var removed = group.remove(rect2);
     assert.deepEqual(removed, [rect2], 'should return removed objects');
     assert.deepEqual(group.getObjects(), [rect1, rect3], 'should remove object properly');
@@ -107,6 +117,8 @@
     var removed = group.remove(rect1, rect3);
     assert.deepEqual(removed, [rect1, rect3], 'should return removed objects');
     assert.equal(group.isEmpty(), true, 'group should be empty');
+    assert.ok(fired, 'should have fired removed event on rect1');
+    //assert.deepEqual(targets, [rect2, rect1, rect3], 'should contain removed objects');
   });
 
   QUnit.test('size', function(assert) {
