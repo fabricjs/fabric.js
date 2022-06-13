@@ -8,8 +8,7 @@
       transformPoint = fabric.util.transformPoint,
       applyTransformToObject = fabric.util.applyTransformToObject,
       degreesToRadians = fabric.util.degreesToRadians,
-      clone = fabric.util.object.clone,
-      extend = fabric.util.object.extend;
+      clone = fabric.util.object.clone;
 
   if (fabric.Group) {
     fabric.warn('fabric.Group is already defined');
@@ -141,8 +140,12 @@
      * @param {...fabric.Object} objects
      */
     add: function () {
-      fabric.Collection.add.call(this, arguments, this._onObjectAdded);
-      this._onAfterObjectsChange('added', Array.from(arguments));
+      var _this = this, possibleObjects = Array.from(arguments).filter(function(object, index, array) {
+        // can enter or is the first occurrence of the object in the passed args
+        return _this.canEnterGroup(object) && array.indexOf(object) === index;
+      });
+      fabric.Collection.add.call(this, possibleObjects, this._onObjectAdded);
+      this._onAfterObjectsChange('added', possibleObjects);
     },
 
     /**
@@ -180,7 +183,7 @@
      * @private
      */
     __objectMonitor: function (opt) {
-      this._applyLayoutStrategy(extend(clone(opt), {
+      this._applyLayoutStrategy(Object.assign({}, opt, {
         type: 'object_modified'
       }));
       this._set('dirty', true);
@@ -226,16 +229,17 @@
      * @param {fabric.Object} object
      * @returns
      */
-    canEnter: function (object) {
+    canEnterGroup: function (object) {
       if (object === this || this.isDescendantOf(object)) {
         /* _DEV_MODE_START_ */
-        console.warn('fabric.Group: trying to add group to itself, this call has no effect');
+        console.error('fabric.Group: trying to add group to itself, this call has no effect');
         /* _DEV_MODE_END_ */
         return false;
       }
-      else if (object.group && object.group === this) {
+      else if (this._objects.indexOf(object) !== -1) {
+        // is already in the objects array
         /* _DEV_MODE_START_ */
-        console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
+        console.error('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
         /* _DEV_MODE_END_ */
         return false;
       }
@@ -249,9 +253,6 @@
      * @returns {boolean} true if object entered group
      */
     enterGroup: function (object, removeParentTransform) {
-      if (!this.canEnter(object)) {
-        return false;
-      }
       if (object.group) {
         object.group.remove(object);
       }
@@ -591,7 +592,7 @@
         return this.prepareBoundingBox(layoutDirective, addedObjects, context);
       }
       else if (layoutDirective === 'fit-content' || layoutDirective === 'fit-content-lazy'
-          || (layoutDirective === 'fixed' && context.type === 'initialization')) {
+          || (layoutDirective === 'fixed' && (context.type === 'initialization' || context.type === 'imperative'))) {
         return this.prepareBoundingBox(layoutDirective, objects, context);
       }
       else if (layoutDirective === 'clip-path' && this.clipPath) {
@@ -872,6 +873,7 @@
         this._watchObject(false, object);
         object.dispose && object.dispose();
       }, this);
+      this.callSuper('dispose');
     },
 
     /**

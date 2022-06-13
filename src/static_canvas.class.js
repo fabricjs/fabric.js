@@ -586,7 +586,7 @@
      */
     insertAt: function (objects, index) {
       fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
-      this.renderOnAddRemove && this.requestRenderAll();
+      (Array.isArray(objects) ? objects.length > 0 : !!objects) && this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -719,14 +719,20 @@
      * @chainable
      */
     calcViewportBoundaries: function() {
-      var points = { }, width = this.width, height = this.height,
-          iVpt = invertTransform(this.viewportTransform);
-      points.tl = transformPoint({ x: 0, y: 0 }, iVpt);
-      points.br = transformPoint({ x: width, y: height }, iVpt);
-      points.tr = new fabric.Point(points.br.x, points.tl.y);
-      points.bl = new fabric.Point(points.tl.x, points.br.y);
-      this.vptCoords = points;
-      return points;
+      var width = this.width, height = this.height,
+          iVpt = invertTransform(this.viewportTransform),
+          a = transformPoint({ x: 0, y: 0 }, iVpt),
+          b = transformPoint({ x: width, y: height }, iVpt),
+          // we don't support vpt flipping
+          // but the code is robust enough to mostly work with flipping
+          min = a.min(b),
+          max = a.max(b);
+      return this.vptCoords = {
+        tl: min,
+        tr: new fabric.Point(max.x, min.y),
+        bl: new fabric.Point(min.x, max.y),
+        br: max,
+      };
     },
 
     cancelRequestedRender: function() {
@@ -761,7 +767,7 @@
         this.drawControls(ctx);
       }
       if (path) {
-        path.canvas = this;
+        path._set('canvas', this);
         // needed to setup a couple of variables
         path.shouldCache();
         path._transformDone = true;

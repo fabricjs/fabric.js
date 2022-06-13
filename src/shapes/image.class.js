@@ -684,7 +684,7 @@
    * @returns {Promise<fabric.Image>}
    */
   fabric.Image.fromObject = function(_object) {
-    var object = fabric.util.object.clone(_object),
+    var object = Object.assign({}, _object),
         filters = object.filters,
         resizeFilter = object.resizeFilter;
     // the generic enliving will fail on filters for now

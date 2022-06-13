@@ -35,6 +35,7 @@ fabric.Collection = {
    * @param {fabric.Object|fabric.Object[]} objects Object(s) to insert
    * @param {Number} index Index to insert object at
    * @param {(object:fabric.Object) => any} [callback]
+   * @returns {number} new array length
    */
   insertAt: function (objects, index, callback) {
     var args = [index, 0].concat(objects);
@@ -44,6 +45,7 @@ fabric.Collection = {
         callback.call(this, args[i]);
       }
     }
+    return this._objects.length;
   },
 
   /**

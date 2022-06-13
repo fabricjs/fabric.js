@@ -26,18 +26,30 @@
      */
     type: 'Invert',
 
+    /**
+     * Invert also alpha.
+     * @param {Boolean} alpha
+     * @default
+     **/
+    alpha: false,
+
     fragmentSource: 'precision highp float;\n' +
-      'uniform sampler2D uTexture;\n' +
-      'uniform int uInvert;\n' +
-      'varying vec2 vTexCoord;\n' +
-      'void main() {\n' +
-        'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-        'if (uInvert == 1) {\n' +
-          'gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,color.a);\n' +
-        '} else {\n' +
-          'gl_FragColor = color;\n' +
-        '}\n' +
-      '}',
+        'uniform sampler2D uTexture;\n' +
+        'uniform int uInvert;\n' +
+        'uniform int uAlpha;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'void main() {\n' +
+          'vec4 color = texture2D(uTexture, vTexCoord);\n' +
+          'if (uInvert == 1) {\n' +
+            'if (uAlpha == 1) {\n' +
+              'gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,1.0 -color.a);\n' +
+            '} else {\n' +
+              'gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,color.a);\n' +
+            '}\n' +
+          '} else {\n' +
+            'gl_FragColor = color;\n' +
+          '}\n' +
+        '}',
 
     /**
      * Filter invert. if false, does nothing
@@ -62,6 +74,10 @@
         data[i] = 255 - data[i];
         data[i + 1] = 255 - data[i + 1];
         data[i + 2] = 255 - data[i + 2];
+
+        if (this.alpha) {
+          data[i + 3] = 255 - data[i + 3];
+        }
       }
     },
 
@@ -84,6 +100,7 @@
     getUniformLocations: function(gl, program) {
       return {
         uInvert: gl.getUniformLocation(program, 'uInvert'),
+        uAlpha: gl.getUniformLocation(program, 'uAlpha'),
       };
     },
 
@@ -95,6 +112,7 @@
      */
     sendUniformData: function(gl, uniformLocations) {
       gl.uniform1i(uniformLocations.uInvert, this.invert);
+      gl.uniform1i(uniformLocations.uAlpha, this.alpha);
     },
   });
 
