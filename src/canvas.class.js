@@ -393,7 +393,11 @@
 
       this._initRetinaScaling();
 
-      this.freeDrawingBrush = fabric.PencilBrush && new fabric.PencilBrush(this);
+      if (fabric.PencilBrush) {
+        var drawingLayer = new fabric.Layer([], { canvas: this, objectCaching: true });
+        this.add(drawingLayer);
+        this.freeDrawingBrush = new fabric.PencilBrush(drawingLayer);
+      }
 
       this.calcOffset();
     },
