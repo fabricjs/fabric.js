@@ -71,8 +71,6 @@
   }
   /* _FROM_SVG_END_ */
 
-  var clone = fabric.util.object.clone;
-
   /**
    * Gradient class
    * @class fabric.Gradient
@@ -218,8 +216,8 @@
      * @return {String} SVG representation of an gradient (linear/radial)
      */
     toSVG: function(object, options) {
-      var coords = clone(this.coords, true), i, len, options = options || {},
-          markup, commonAttributes, colorStops = clone(this.colorStops, true),
+      var coords = this.coords, i, len, options = options || {},
+          markup, commonAttributes, colorStops = this.colorStops,
           needsSwap = coords.r1 > coords.r2,
           transform = this.gradientTransform ? this.gradientTransform.concat() : fabric.iMatrix.concat(),
           offsetX = -this.offsetX, offsetY = -this.offsetY,
@@ -320,7 +318,7 @@
      * @return {CanvasGradient}
      */
     toLive: function(ctx) {
-      var gradient, coords = fabric.util.object.clone(this.coords), i, len;
+      var gradient, coords = this.coords, i, len;
 
       if (!this.type) {
         return;

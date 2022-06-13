@@ -32,10 +32,8 @@
 
   function fireEvent(eventName, options) {
     var target = options.transform.target,
-        canvas = target.canvas,
-        canvasOptions = fabric.util.object.clone(options);
-    canvasOptions.target = target;
-    canvas && canvas.fire('object:' + eventName, canvasOptions);
+        canvas = target.canvas;
+    canvas && canvas.fire('object:' + eventName, Object.assign({}, options, { target: target }));
     target.fire(eventName, options);
   }
 
@@ -686,14 +684,21 @@
    * @return {Boolean} true if some change happened
    */
   function changeWidth(eventData, transform, x, y) {
-    var target = transform.target, localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
-        strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
-        multiplier = isTransformCentered(transform) ? 2 : 1,
-        oldWidth = target.width,
-        newWidth = Math.ceil(Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding);
-    target.set('width', Math.max(newWidth, 0));
-    //  check against actual target width in case `newWidth` was rejected
-    return oldWidth !== target.width;
+    var localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
+    //  make sure the control changes width ONLY from it's side of target
+    if (transform.originX === 'center' ||
+      (transform.originX === 'right' && localPoint.x < 0) ||
+      (transform.originX === 'left' && localPoint.x > 0)) {
+      var target = transform.target,
+          strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
+          multiplier = isTransformCentered(transform) ? 2 : 1,
+          oldWidth = target.width,
+          newWidth = Math.ceil(Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding);
+      target.set('width', Math.max(newWidth, 0));
+      //  check against actual target width in case `newWidth` was rejected
+      return oldWidth !== target.width;
+    }
+    return false;
   }
 
   /**

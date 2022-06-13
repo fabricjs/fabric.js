@@ -28,6 +28,7 @@ global.visualCallback = {
   addArguments: function() {},
 };
 global.visualTestLoop = require('./lib/visualTestLoop').visualTestLoop;
+global.compareGoldensTest = require('./lib/visualTestLoop').compareGoldensTest;
 global.getFixture = require('./lib/visualTestLoop').getFixture;
 global.getAsset = require('./lib/visualTestLoop').getAsset;
 global.getAssetName = require('./lib/visualTestLoop').getAssetName;
