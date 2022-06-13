@@ -414,8 +414,20 @@
      */
     _onObjectRemoved: function (obj) {
       this._objectsToRender = undefined;
+      // removing active object should fire "selection:cleared" events
+      if (obj === this._activeObject) {
+        this.fire('before:selection:cleared', { target: obj });
+        this._discardActiveObject();
+        this.fire('selection:cleared', { target: obj });
+        obj.fire('deselected');
+      }
+      if (obj === this._hoveredTarget) {
+        this._hoveredTarget = null;
+        this._hoveredTargets = [];
+      }
       this.callSuper('_onObjectRemoved', obj);
     },
+
     /**
      * Divides objects in two groups, one to render immediately
      * and one to render as activeGroup.
@@ -1099,25 +1111,6 @@
      */
     getActiveSelection: function () {
       return this._activeSelection;
-    },
-
-    /**
-     * @private
-     * @param {fabric.Object} obj Object that was removed
-     */
-    _onObjectRemoved: function(obj) {
-      // removing active object should fire "selection:cleared" events
-      if (obj === this._activeObject) {
-        this.fire('before:selection:cleared', { target: obj });
-        this._discardActiveObject();
-        this.fire('selection:cleared', { target: obj });
-        obj.fire('deselected');
-      }
-      if (obj === this._hoveredTarget){
-        this._hoveredTarget = null;
-        this._hoveredTargets = [];
-      }
-      this.callSuper('_onObjectRemoved', obj);
     },
 
     /**

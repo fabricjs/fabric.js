@@ -27,7 +27,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     // serialize if it wasn't already
     var serialized = (typeof json === 'string')
       ? JSON.parse(json)
-      : fabric.util.object.clone(json);
+      : Object.assign({}, json);
 
     var _this = this,
         renderOnAddRemove = this.renderOnAddRemove;

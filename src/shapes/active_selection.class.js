@@ -102,9 +102,6 @@
      * @returns {boolean} true if object entered group
      */
     enterGroup: function (object, removeParentTransform) {
-      if (!this.canEnter(object)) {
-        return false;
-      }
       if (object.group) {
         //  save ref to group for later in order to return to it
         var parent = object.group;

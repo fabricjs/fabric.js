@@ -24,8 +24,7 @@
    * @alias on
    * @param {String|Object} eventName Event name (eg. 'after:render') or object with key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
-   * @return {Self} thisArg
-   * @chainable
+   * @return {Function} disposer
    */
   function on(eventName, handler) {
     if (!this.__eventListeners) {
@@ -43,7 +42,7 @@
       }
       this.__eventListeners[eventName].push(handler);
     }
-    return this;
+    return off.bind(this, eventName, handler);
   }
 
   function _once(eventName, handler) {
@@ -52,19 +51,30 @@
       this.off(eventName, _handler);
     }.bind(this);
     this.on(eventName, _handler);
+    return _handler;
   }
 
+  /**
+   * Observes specified event **once**
+   * @memberOf fabric.Observable
+   * @alias once
+   * @param {String|Object} eventName Event name (eg. 'after:render') or object with key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
+   * @param {Function} handler Function that receives a notification when an event of the specified type occurs
+   * @return {Function} disposer
+   */
   function once(eventName, handler) {
     // one object with key/value pairs was passed
     if (arguments.length === 1) {
+      var handlers = {};
       for (var prop in eventName) {
-        _once.call(this, prop, eventName[prop]);
+        handlers[prop] = _once.call(this, prop, eventName[prop]);
       }
+      return off.bind(this, handlers);
     }
     else {
-      _once.call(this, eventName, handler);
+      var _handler = _once.call(this, eventName, handler);
+      return off.bind(this, eventName, _handler);
     }
-    return this;
   }
 
   /**
@@ -74,12 +84,10 @@
    * @alias off
    * @param {String|Object} eventName Event name (eg. 'after:render') or object with key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function to be deleted from EventListeners
-   * @return {Self} thisArg
-   * @chainable
    */
   function off(eventName, handler) {
     if (!this.__eventListeners) {
-      return this;
+      return;
     }
 
     // remove all key/value pairs (event name -> event handler)
@@ -89,7 +97,7 @@
       }
     }
     // one object with key/value pairs was passed
-    else if (arguments.length === 1 && typeof arguments[0] === 'object') {
+    else if (typeof eventName === 'object' && typeof handler === 'undefined') {
       for (var prop in eventName) {
         _removeEventListener.call(this, prop, eventName[prop]);
       }
@@ -97,7 +105,6 @@
     else {
       _removeEventListener.call(this, eventName, handler);
     }
-    return this;
   }
 
   /**
@@ -105,17 +112,15 @@
    * @memberOf fabric.Observable
    * @param {String} eventName Event name to fire
    * @param {Object} [options] Options object
-   * @return {Self} thisArg
-   * @chainable
    */
   function fire(eventName, options) {
     if (!this.__eventListeners) {
-      return this;
+      return;
     }
 
     var listenersForEvent = this.__eventListeners[eventName];
     if (!listenersForEvent) {
-      return this;
+      return;
     }
 
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
@@ -124,7 +129,6 @@
     this.__eventListeners[eventName] = listenersForEvent.filter(function(value) {
       return value !== false;
     });
-    return this;
   }
 
   /**
