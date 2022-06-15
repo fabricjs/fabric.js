@@ -1649,7 +1649,7 @@
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES),
         parsedAnchor = parsedAttributes.textAnchor || 'left';
-    options = fabric.util.object.extend((options ? clone(options) : { }), parsedAttributes);
+    options = Object.assign({}, options, parsedAttributes);
 
     options.top = options.top || 0;
     options.left = options.left || 0;
