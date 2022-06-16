@@ -118,7 +118,7 @@
     assert.deepEqual(removed, [rect1, rect3], 'should return removed objects');
     assert.equal(group.isEmpty(), true, 'group should be empty');
     assert.ok(fired, 'should have fired removed event on rect1');
-    //assert.deepEqual(targets, [rect2, rect1, rect3], 'should contain removed objects');
+    assert.deepEqual(targets, [rect2, rect1, rect3], 'should contain removed objects');
   });
 
   QUnit.test('size', function(assert) {
