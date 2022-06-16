@@ -2,8 +2,7 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { }),
-      clone = fabric.util.object.clone;
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Text) {
     fabric.warn('fabric.Text is already defined');
