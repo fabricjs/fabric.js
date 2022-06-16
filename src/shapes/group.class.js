@@ -138,26 +138,36 @@
     },
 
     /**
+     * Override this method to enhance performance (for groups with a lot of objects).
+     * If Overriding, be sure not pass illegal objects to group - it will break your app.
+     * @private
+     */
+    _filterObjectsBeforeEnteringGroup: function (objects) {
+      return objects.filter(function (object, index, array) {
+        // can enter AND is the first occurrence of the object in the passed args (to prevent adding duplicates)
+        return this.canEnterGroup(object) && array.indexOf(object) === index;
+      }, this);
+    },
+
+    /**
      * Add objects
      * @param {...fabric.Object} objects
      */
     add: function () {
-      var _this = this, possibleObjects = Array.from(arguments).filter(function(object, index, array) {
-        // can enter or is the first occurrence of the object in the passed args
-        return _this.canEnterGroup(object) && array.indexOf(object) === index;
-      });
-      fabric.Collection.add.call(this, possibleObjects, this._onObjectAdded);
-      this._onAfterObjectsChange('added', possibleObjects);
+      var allowedObjects = this._filterObjectsBeforeEnteringGroup(Array.from(arguments));
+      fabric.Collection.add.call(this, allowedObjects, this._onObjectAdded);
+      this._onAfterObjectsChange('added', allowedObjects);
     },
 
     /**
      * Inserts an object into collection at specified index
-     * @param {fabric.Object} objects Object to insert
+     * @param {fabric.Object | fabric.Object[]} objects Object to insert
      * @param {Number} index Index to insert object at
      */
     insertAt: function (objects, index) {
-      fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
-      this._onAfterObjectsChange('added', Array.isArray(objects) ? objects : [objects]);
+      var allowedObjects = this._filterObjectsBeforeEnteringGroup(Array.isArray(objects) ? objects : [objects]);
+      fabric.Collection.insertAt.call(this, allowedObjects, index, this._onObjectAdded);
+      this._onAfterObjectsChange('added', allowedObjects);
     },
 
     /**
@@ -233,8 +243,9 @@
      */
     canEnterGroup: function (object) {
       if (object === this || this.isDescendantOf(object)) {
+        //  prevent circular object tree
         /* _DEV_MODE_START_ */
-        console.error('fabric.Group: trying to add group to itself, this call has no effect');
+        console.error('fabric.Group: circular object trees are not supported, this call has no effect');
         /* _DEV_MODE_END_ */
         return false;
       }
@@ -450,7 +461,6 @@
 
     /**
      * @override
-     * @return {Boolean}
      */
     setCoords: function () {
       this.callSuper('setCoords');

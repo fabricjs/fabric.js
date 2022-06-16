@@ -10,7 +10,7 @@
 
     var tests = [];
 
-    function createObjectsForLayoutTests(text) {
+    function createGroupForLayoutTests(text, options) {
         var circle = new fabric.Circle({
             left: 100,
             top: 50,
@@ -27,19 +27,11 @@
             fill: 'red',
             opacity: 0.3
         })
-        return [
+        return new fabric.Group([
             rect,
             circle,
             itext
-        ];
-    }
-
-    function createGroupForLayoutTests(text, options) {
-        return new fabric.Group(createObjectsForLayoutTests(text), options);
-    }
-
-    function createLayerForLayoutTests(text, options) {
-        return new fabric.Layer(createObjectsForLayoutTests(text), options);
+        ], options);
     }
 
     function fixedLayout(canvas, callback) {
@@ -99,7 +91,6 @@
         test: 'fit-content layout',
         code: fitContentLayoutRelative,
         golden: 'group-layout/fit-content.png',
-        newModule: 'Group Layout',
         percentage: 0.06,
         width: 400,
         height: 300
@@ -126,65 +117,44 @@
         height: 300
     });
 
-    function fitContentNestedLayer(canvas, callback) {
-        var g = createGroupForLayoutTests('fixed layout,\nlayer on top', {
-            layout: 'fixed',
-            backgroundColor: 'blue'
+    function fitContentLayoutWithSkewX(canvas, callback) {
+        var g = createGroupForLayoutTests('fit-content layout', {
+            backgroundColor: 'blue',
+            skewX: 45
         });
-        var objects = g.removeAll();
-        var layer = new fabric.Layer(objects, { backgroundColor: 'yellow' });
-        g.add(layer);
         canvas.add(g);
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
     }
 
     tests.push({
-        test: 'layer nested in group',
-        code: fitContentNestedLayer,
-        golden: 'group-layout/nested-layer.png',
+        test: 'fit-content layout',
+        code: fitContentLayoutWithSkewX,
+        golden: 'group-layout/fit-content-skewX.png',
         percentage: 0.06,
-        width: 400,
+        width: 400 + Math.ceil(300 / Math.SQRT2),
         height: 300
     });
 
-    function LayerLayout(canvas, callback) {
-        var layer = createLayerForLayoutTests('Layer', {
+    function fitContentLayoutWithSkewY(canvas, callback) {
+        var g = createGroupForLayoutTests('fit-content layout', {
             backgroundColor: 'blue',
+            skewY: 45
         });
-        canvas.add(layer);
+        canvas.add(g);
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
     }
 
     tests.push({
-        test: 'layer',
-        code: LayerLayout,
-        golden: 'group-layout/layer.png',
+        test: 'fit-content layout',
+        code: fitContentLayoutWithSkewY,
+        golden: 'group-layout/fit-content-skewY.png',
         percentage: 0.06,
         width: 400,
-        height: 300
+        height: 400 + Math.ceil(400 / Math.SQRT2)
     });
 
-    function LayerLayoutWithSkew(canvas, callback) {
-        var layer = createLayerForLayoutTests('Layer', {
-            backgroundColor: 'blue',
-            skewX: 45
-        });
-        canvas.add(layer);
-        canvas.renderAll();
-        callback(canvas.lowerCanvasEl);
-    }
-/*
-    tests.push({
-        test: 'layer with skewX',
-        code: LayerLayoutWithSkew,
-        golden: 'group-layout/layer-skewX.png',
-        percentage: 0.06,
-        width: 400,
-        height: 300
-    });
-*/
     function nestedLayout(canvas, callback) {
         var rect3 = new fabric.Rect({
             width: 100,
@@ -281,7 +251,6 @@
         test: 'fit-content layout add object',
         code: fitContentLayoutAdd,
         golden: 'group-layout/fit-content3.png',
-        newModule: 'Group Layout',
         percentage: 0.06,
         width: 400,
         height: 300
@@ -390,37 +359,39 @@
     });
 
     function createObjectsForOriginTests(originX, originY, options) {
-        var rect1 = new fabric.Rect({ top: 100, left: 150, width: 30, height: 10, strokeWidth: 0 }),
-            rect2 = new fabric.Rect({ top: 120, left: 200, width: 10, height: 40, strokeWidth: 0 }),
-            controlPoint = new fabric.Circle({ radius: 5, fill: 'blue', left: 150, top: 100, originX: 'center', originY: 'center' });
+        var rect1 = new fabric.Rect({ left: 150, top: 100, width: 30, height: 10, strokeWidth: 0 }),
+            rect2 = new fabric.Rect({ left: 200, top: 120, width: 10, height: 40, strokeWidth: 0 }),
+            controlPoint = new fabric.Circle({ radius: 5, fill: 'blue', left: 150, top: 100, originX: 'center', originY: 'center' }),
+            tlControlPoint = new fabric.Circle({ radius: 5, fill: 'red', left: 150, top: 100, strokeWidth: 0 });
 
-        var g = new fabric.Group([rect1, rect2], Object.assign({}, options, {
-            originX, originY, strokeWidth: 1, stroke: 'blue'
+        var g = new fabric.Group([rect1, rect2, tlControlPoint], Object.assign({}, options, {
+            originX, originY, backgroundColor: 'pink'
         }));
-        return [controlPoint, g];
+        return [g, controlPoint];
     }
 
     var originX = ['left', 'center', 'right'];
     var originY = ['top', 'center', 'bottom'];
-/*
+
     for (let angle = 0; angle < 360; angle += 30) {
         originX.forEach(ox => {
             originY.forEach(oy => {
                 tests.push({
-                    test: `layout with originX=${ox}, originY=${oy} and angle=${angle} values - angle is WRONG`,
+                    test: `layout with originX=${ox}, originY=${oy} and angle=${angle} values`,
                     code: function (canvas, callback) {
-                        canvas.add(...createObjectsForOriginTests(ox, oy, { angle }));
+                        canvas.add.apply(canvas, createObjectsForOriginTests(ox, oy, { angle }));
+                        canvas.setViewportTransform([1, 0, 0, 1, -50, 0]);
                         canvas.renderAll();
                         callback(canvas.lowerCanvasEl);
                     },
                     golden: `group-layout/origin-${ox}-${oy}-${angle}deg.png`,
-                    percentage: 0.06,
-                    width: 300,
-                    height: 300
+                    percentage: 0.001,
+                    width: 200,
+                    height: 200
                 });
             });
         });
     }
-*/
+
     tests.forEach(visualTestLoop(QUnit));
 })();

@@ -1410,12 +1410,7 @@
         options.angle -= 180;
       }
       ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
-      if (drawBorders && (styleOverride.forActiveSelection || this.group)) {
-        this.drawBordersInGroup(ctx, options, styleOverride);
-      }
-      else if (drawBorders) {
-        this.drawBorders(ctx, styleOverride);
-      }
+      drawBorders && this.drawBorders(ctx, options, styleOverride);
       drawControls && this.drawControls(ctx, styleOverride);
       ctx.restore();
     },
