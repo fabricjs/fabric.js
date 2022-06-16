@@ -112,6 +112,7 @@
     });
     var removed = group.remove(rect2);
     assert.deepEqual(removed, [rect2], 'should return removed objects');
+    assert.deepEqual(targets, [rect2], 'should contain removed objects');
     assert.deepEqual(group.getObjects(), [rect1, rect3], 'should remove object properly');
 
     var removed = group.remove(rect1, rect3);
