@@ -188,7 +188,10 @@
     var done = assert.async();
     assert.ok(typeof fabric.Text.fromObject === 'function');
     fabric.Text.fromObject(REFERENCE_TEXT_OBJECT).then(function(text) {
-      assert.deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
+      // change styles from array to object for comparison
+      var object = text.toObject();
+      object.styles = {};
+      assert.deepEqual(object, REFERENCE_TEXT_OBJECT);
       done();
     });
   });
@@ -207,9 +210,12 @@
         width: 8,
         height: 18.08,
         fontSize: 16,
-        originX: 'left'
+        originX: 'left',
       });
-      assert.deepEqual(text.toObject(), expectedObject, 'parsed object is what expected');
+      // change styles from array to object for comparison
+      var object = text.toObject();
+      object.styles = {};
+      assert.deepEqual(object, expectedObject, 'parsed object is what expected');
     });
   });
 
@@ -264,8 +270,10 @@
         fontSize:         123,
         underline:        true,
       });
-
-      assert.deepEqual(textWithAttrs.toObject(), expectedObject);
+      // change styles from array to object for comparison
+      var object = textWithAttrs.toObject();
+      object.styles = {};
+      assert.deepEqual(object, expectedObject);
     });
   });
 
