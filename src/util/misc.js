@@ -1210,7 +1210,7 @@
      * @param {boolean} forTextSpans whether to check overline, underline, and line-through properties
      * @return {boolean} true if the style changed
      */
-     hasStyleChanged: function(prevStyle, thisStyle, forTextSpans) {
+    hasStyleChanged: function(prevStyle, thisStyle, forTextSpans) {
       forTextSpans = forTextSpans || false;
       return (prevStyle.fill !== thisStyle.fill ||
               prevStyle.stroke !== thisStyle.stroke ||

@@ -1701,6 +1701,7 @@
    * @returns {Promise<fabric.Text>}
    */
   fabric.Text.fromObject = function(object) {
+    object.styles = fabric.util.stylesFromArray(object.styles, object.text);
     return fabric.Object._fromObject(fabric.Text, object, 'text');
   };
 
