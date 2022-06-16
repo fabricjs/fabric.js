@@ -531,6 +531,7 @@
    * @returns {Promise<fabric.IText>}
    */
   fabric.IText.fromObject = function(object) {
+    object.styles = fabric.util.stylesFromArray(object.styles, object.text);
     return fabric.Object._fromObject(fabric.IText, object, 'text');
   };
 })();

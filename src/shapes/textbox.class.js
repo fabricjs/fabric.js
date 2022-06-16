@@ -472,6 +472,7 @@
    * @returns {Promise<fabric.Textbox>}
    */
   fabric.Textbox.fromObject = function(object) {
+    object.styles = fabric.util.stylesFromArray(object.styles, object.text);
     return fabric.Object._fromObject(fabric.Textbox, object, 'text');
   };
 })(typeof exports !== 'undefined' ? exports : this);
