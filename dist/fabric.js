@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors,erasing requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '5.2.1' };
+var fabric = fabric || { version: '5.1.0' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -1304,7 +1304,7 @@ fabric.CommonMethods = {
      * @return {Array} properties Properties names to include
      */
     populateWithProperties: function(source, destination, properties) {
-      if (properties && Array.isArray(properties)) {
+      if (properties && Object.prototype.toString.call(properties) === '[object Array]') {
         for (var i = 0, len = properties.length; i < len; i++) {
           if (properties[i] in source) {
             destination[properties[i]] = source[properties[i]];
@@ -4382,7 +4382,8 @@ fabric.warn = console.warn;
   }
 
   function normalizeValue(attr, value, parentAttributes, fontSize) {
-    var isArray = Array.isArray(value), parsed;
+    var isArray = Object.prototype.toString.call(value) === '[object Array]',
+        parsed;
 
     if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
       value = '';
@@ -4780,7 +4781,7 @@ fabric.warn = console.warn;
         return;
       }
 
-      var xlink = xlinkAttribute.slice(1),
+      var xlink = xlinkAttribute.substr(1),
           x = el.getAttribute('x') || 0,
           y = el.getAttribute('y') || 0,
           el2 = elementById(doc, xlink).cloneNode(true),
@@ -5052,7 +5053,7 @@ fabric.warn = console.warn;
   function recursivelyParseGradientsXlink(doc, gradient) {
     var gradientsAttrs = ['gradientTransform', 'x1', 'x2', 'y1', 'y2', 'gradientUnits', 'cx', 'cy', 'r', 'fx', 'fy'],
         xlinkAttr = 'xlink:href',
-        xLink = gradient.getAttribute(xlinkAttr).slice(1),
+        xLink = gradient.getAttribute(xlinkAttr).substr(1),
         referencedGradient = elementById(doc, xLink);
     if (referencedGradient && referencedGradient.getAttribute(xlinkAttr)) {
       recursivelyParseGradientsXlink(doc, referencedGradient);
@@ -9792,7 +9793,6 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * Returns coordinates of a center of canvas.
      * Returned value is an object with top and left properties
      * @return {Object} object with "top" and "left" number values
-     * @deprecated migrate to `getCenterPoint`
      */
     getCenter: function () {
       return {
@@ -9802,20 +9802,12 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
     },
 
     /**
-     * Returns coordinates of a center of canvas.
-     * @return {fabric.Point} 
-     */
-    getCenterPoint: function () {
-      return new fabric.Point(this.width / 2, this.height / 2);
-    },
-
-    /**
      * Centers object horizontally in the canvas
      * @param {fabric.Object} object Object to center horizontally
      * @return {fabric.Canvas} thisArg
      */
     centerObjectH: function (object) {
-      return this._centerObject(object, new fabric.Point(this.getCenterPoint().x, object.getCenterPoint().y));
+      return this._centerObject(object, new fabric.Point(this.getCenter().left, object.getCenterPoint().y));
     },
 
     /**
@@ -9825,7 +9817,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @chainable
      */
     centerObjectV: function (object) {
-      return this._centerObject(object, new fabric.Point(object.getCenterPoint().x, this.getCenterPoint().y));
+      return this._centerObject(object, new fabric.Point(object.getCenterPoint().x, this.getCenter().top));
     },
 
     /**
@@ -9835,8 +9827,9 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @chainable
      */
     centerObject: function(object) {
-      var center = this.getCenterPoint();
-      return this._centerObject(object, center);
+      var center = this.getCenter();
+
+      return this._centerObject(object, new fabric.Point(center.left, center.top));
     },
 
     /**
@@ -9847,6 +9840,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      */
     viewportCenterObject: function(object) {
       var vpCenter = this.getVpCenter();
+
       return this._centerObject(object, vpCenter);
     },
 
@@ -9880,9 +9874,9 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
      * @chainable
      */
     getVpCenter: function() {
-      var center = this.getCenterPoint(),
+      var center = this.getCenter(),
           iVpt = invertTransform(this.viewportTransform);
-      return transformPoint(center, iVpt);
+      return transformPoint({ x: center.left, y: center.top }, iVpt);
     },
 
     /**
@@ -12039,7 +12033,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
     _isSelectionKeyPressed: function(e) {
       var selectionKeyPressed = false;
 
-      if (Array.isArray(this.selectionKey)) {
+      if (Object.prototype.toString.call(this.selectionKey) === '[object Array]') {
         selectionKeyPressed = !!this.selectionKey.find(function(key) { return e[key] === true; });
       }
       else {
@@ -12463,14 +12457,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
       this._applyCanvasStyle(upperCanvasEl);
       this.contextTop = upperCanvasEl.getContext('2d');
-    },
-
-    /**
-     * Returns context of top canvas where interactions are drawn
-     * @returns {CanvasRenderingContext2D}
-     */
-    getTopContext: function () {
-      return this.contextTop;
     },
 
     /**
@@ -15250,9 +15236,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         if (object[prop] === prototype[prop]) {
           delete object[prop];
         }
+        var isArray = Object.prototype.toString.call(object[prop]) === '[object Array]' &&
+                      Object.prototype.toString.call(prototype[prop]) === '[object Array]';
+
         // basically a check for [] === []
-        if (Array.isArray(object[prop]) && Array.isArray(prototype[prop])
-          && object[prop].length === 0 && prototype[prop].length === 0) {
+        if (isArray && object[prop].length === 0 && prototype[prop].length === 0) {
           delete object[prop];
         }
       });
@@ -15428,7 +15416,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
     renderCache: function(options) {
       options = options || {};
-      if (!this._cacheCanvas || !this._cacheContext) {
+      if (!this._cacheCanvas) {
         this._createCacheCanvas();
       }
       if (this.isCacheDirty()) {
@@ -15443,7 +15431,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      */
     _removeCacheCanvas: function() {
       this._cacheCanvas = null;
-      this._cacheContext = null;
       this.cacheWidth = 0;
       this.cacheHeight = 0;
     },
@@ -15602,7 +15589,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       if (this.isNotVisible()) {
         return false;
       }
-      if (this._cacheCanvas && this._cacheContext && !skipCanvas && this._updateCacheCanvas()) {
+      if (this._cacheCanvas && !skipCanvas && this._updateCacheCanvas()) {
         // in this case the context is already cleared.
         return true;
       }
@@ -15611,7 +15598,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           (this.clipPath && this.clipPath.absolutePositioned) ||
           (this.statefullCache && this.hasStateChanged('cacheProperties'))
         ) {
-          if (this._cacheCanvas && this._cacheContext && !skipCanvas) {
+          if (this._cacheCanvas && !skipCanvas) {
             var width = this.cacheWidth / this.zoomX;
             var height = this.cacheHeight / this.zoomY;
             this._cacheContext.clearRect(-width / 2, -height / 2, width, height);
@@ -16145,7 +16132,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
      * @return {Boolean}
      */
     isType: function(type) {
-      return arguments.length > 1 ? Array.from(arguments).includes(this.type) : this.type === type;
+      return this.type === type;
     },
 
     /**
@@ -18083,7 +18070,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     return fabric.util.animate({
       target: this,
       startValue: object.left,
-      endValue: this.getCenterPoint().x,
+      endValue: this.getCenter().left,
       duration: this.FX_DURATION,
       onChange: function(value) {
         object.set('left', value);
@@ -18116,7 +18103,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     return fabric.util.animate({
       target: this,
       startValue: object.top,
-      endValue: this.getCenterPoint().y,
+      endValue: this.getCenter().top,
       duration: this.FX_DURATION,
       onChange: function(value) {
         object.set('top', value);
@@ -19655,6 +19642,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       max = fabric.util.array.max,
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
+      _toString = Object.prototype.toString,
       toFixed = fabric.util.toFixed;
 
   if (fabric.Path) {
@@ -19708,8 +19696,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     * @param {Object} [options] Options object
     */
     _setPath: function (path, options) {
+      var fromArray = _toString.call(path) === '[object Array]';
+
       this.path = fabric.util.makePathSimpler(
-        Array.isArray(path) ? path : fabric.util.parsePath(path)
+        fromArray ? path : fabric.util.parsePath(path)
       );
 
       fabric.Polyline.prototype._setPositionDimensions.call(this, options || {});

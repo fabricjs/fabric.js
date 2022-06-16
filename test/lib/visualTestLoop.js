@@ -130,7 +130,7 @@
           var width = renderedCanvas.width;
           var height = renderedCanvas.height;
           var totalPixels = width * height;
-          var imageDataCanvas = renderedCanvas.getContext('2d').getImageData(0, 0, width, height).data;
+          var imageDataCanvas = renderedCanvas.getContext('2d').getImageData(0, 0, width, height);
           var canvas = fabric.document.createElement('canvas');
           canvas.width = width;
           canvas.height = height;
@@ -141,11 +141,11 @@
             visualCallback.addArguments({
               enabled: true,
               golden: canvas,
-              fabric: renderedCanvas,
+              fabric: imageDataCanvas,
               diff: output
             });
             var imageDataGolden = ctx.getImageData(0, 0, width, height).data;
-            var differentPixels = _pixelMatch(imageDataCanvas, imageDataGolden, output.data, width, height, pixelmatchOptions);
+            var differentPixels = _pixelMatch(imageDataCanvas.data, imageDataGolden, output.data, width, height, pixelmatchOptions);
             var percDiff = differentPixels / totalPixels * 100;
             var okDiff = totalPixels * percentage;
             var isOK = differentPixels < okDiff;
