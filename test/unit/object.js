@@ -639,6 +639,7 @@
     object.on('removed', function (opt) {
       removedEventFired = true;
       assert.ok(opt.target === canvas, 'target should equal to canvas');
+      assert.ok(object.canvas === undefined, 'canvas should not be referenced');
     });
     canvas.remove(object);
 
