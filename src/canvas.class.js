@@ -10,6 +10,9 @@
    * @extends fabric.StaticCanvas
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
    * @see {@link fabric.Canvas#initialize} for constructor definition
+   * 
+   * @fires resize
+   * @fires window:resize
    *
    * @fires object:modified at the end of a transform or any change when statefull is true
    * @fires object:rotating while an object is being rotated from the control
