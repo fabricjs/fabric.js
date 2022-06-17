@@ -1,5 +1,3 @@
-const { fabric } = require("fabric/dist/fabric.min");
-
 (function() {
   var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
 
