@@ -108,7 +108,7 @@
         // change styles from array to object for comparison
         var object = iText.toObject();
             object.styles = {};
-        assert.deepEqual(ITEXT_OBJECT, object);
+        assert.deepEqual(object, ITEXT_OBJECT);
         done();
       });
     });
