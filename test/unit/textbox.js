@@ -128,7 +128,7 @@
 
   QUnit.test('fromObject', function(assert) {
     var done = assert.async();
-    fabric.Textbox.fromObject(TEXTBOX_OBJECT, function(textbox) {
+    fabric.Textbox.fromObject(TEXTBOX_OBJECT).then(function(textbox) {
       assert.equal(textbox.text, 'The quick \nbrown \nfox', 'properties are respected');
       assert.ok(textbox instanceof fabric.Textbox, 'the generated object is a textbox');
       done();
@@ -157,7 +157,7 @@
         }
       }
     });
-    fabric.Textbox.fromObject(TEXTBOX_OBJECT, function(obj) {
+    fabric.Textbox.fromObject(TEXTBOX_OBJECT).then(function(obj) {
       assert.deepEqual(obj.styles, textbox.styles, 'stylesFromArray output matches');
       assert.deepEqual(obj.styles[0], textbox.styles[0], 'styles match at line 0');
       assert.notEqual(obj.styles[0][5], obj.styles[0][6], 'styles are separate objects');
