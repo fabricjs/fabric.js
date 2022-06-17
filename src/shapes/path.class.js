@@ -340,7 +340,15 @@
       fabric.loadSVGFromURL(pathUrl, function (elements) {
         var path = elements[0];
         path.setOptions(object);
-        callback && callback(path);
+        if (object.clipPath) {
+          fabric.util.enlivenObjects([object.clipPath], function(elivenedObjects) {
+            path.clipPath = elivenedObjects[0];
+            callback && callback(path);
+          });
+        }
+        else {
+          callback && callback(path);
+        }
       });
     }
     else {

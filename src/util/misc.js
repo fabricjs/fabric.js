@@ -651,6 +651,9 @@
     groupSVGElements: function(elements, options, path) {
       var object;
       if (elements && elements.length === 1) {
+        if (typeof path !== 'undefined') {
+          elements[0].sourcePath = path;
+        }
         return elements[0];
       }
       if (options) {

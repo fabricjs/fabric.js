@@ -400,4 +400,22 @@
       done();
     });
   });
+
+  QUnit.test('path toDatalessObject with clipPath', function(assert) {
+    var svgurl = 'https://cdn.images.beta.adorilabs.com/static/audiogram-assets/e2d01023-42a2-44ba-ad00-fe3e9213c082.svg';
+    var done = assert.async();
+    var canvas = new fabric.StaticCanvas();
+    var canvas2 = new fabric.StaticCanvas();
+    fabric.loadSVGFromURL(svgurl, function(objects, d) {
+      var group = fabric.util.groupSVGElements(objects, d, svgurl);
+      canvas.add(group);
+      var jsonData = canvas.toDatalessJSON();
+      canvas.clear();
+      canvas2.loadFromJSON(jsonData, function() {
+        assert.ok(canvas2._objects[0] instanceof fabric.Path, 'is enlived properly');
+        assert.ok(canvas2._objects[0].clipPath instanceof fabric.Path, 'clipPath is enlived properly');
+        done();
+      });
+    });
+  });
 })();

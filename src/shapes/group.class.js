@@ -569,18 +569,25 @@
       // it has to be an url or something went wrong.
       fabric.loadSVGFromURL(objects, function (elements) {
         var group = fabric.util.groupSVGElements(elements, object, objects);
+        var clipPath = options.clipPath;
+        // delete options.clipPath;
         group.set(options);
-        callback && callback(group);
+        if (clipPath) {
+          fabric.util.enlivenObjects([clipPath], function(elivenedObjects) {
+            group.clipPath = elivenedObjects[0];
+            callback && callback(group);
+          });
+        }
+        else {
+          callback && callback(group);
+        }
       });
       return;
     }
     fabric.util.enlivenObjects(objects, function (enlivenedObjects) {
-      var options = fabric.util.object.clone(object, true);
-      delete options.objects;
       fabric.util.enlivenObjectEnlivables(object, options, function () {
         callback && callback(new fabric.Group(enlivenedObjects, options, true));
       });
     });
   };
-
 })(typeof exports !== 'undefined' ? exports : this);
