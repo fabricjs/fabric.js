@@ -4,11 +4,7 @@ var fabric = fabric || { version: '5.1.0' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
-/* _AMD_START_ */
-else if (typeof define === 'function' && define.amd) {
-  define([], function() { return fabric; });
-}
-/* _AMD_END_ */
+
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
   if (document instanceof (typeof HTMLDocument !== 'undefined' ? HTMLDocument : Document)) {
     fabric.document = document;
@@ -33,7 +29,7 @@ else {
   fabric.jsdomImplForWrapper = require('jsdom/lib/jsdom/living/generated/utils').implForWrapper;
   fabric.nodeCanvas = require('jsdom/lib/jsdom/utils').Canvas;
   fabric.window = virtualWindow;
-  DOMParser = fabric.window.DOMParser;
+  global.DOMParser = fabric.window.DOMParser;
 }
 
 /**
@@ -201,3 +197,5 @@ fabric.initFilterBackend = function() {
     return (new fabric.Canvas2dFilterBackend());
   }
 };
+
+export { fabric };

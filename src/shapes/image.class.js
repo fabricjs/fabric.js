@@ -1,9 +1,5 @@
-var extend = fabric.util.object.extend;
-
-if (!exports.fabric) {
-  exports.fabric = { };
-}
-
+var extend = fabric.util.object.extend,
+    fabric = exports.fabric || (exports.fabric = {});
 /**
    * Image class
    * @class fabric.Image
