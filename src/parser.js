@@ -1049,15 +1049,9 @@
      */
     loadSVGFromURL: function(url, callback, reviver, options) {
 
-      url = url.replace(/^\n\s*/, '').trim();
-      new fabric.util.request(url, {
-        method: 'get',
-        onComplete: onComplete
-      });
-
       function onComplete(r) {
-
         var xml = r.responseXML;
+
         if (!xml || !xml.documentElement) {
           callback && callback(null);
           return false;
@@ -1067,6 +1061,13 @@
           callback && callback(results, _options, elements, allElements);
         }, reviver, options);
       }
+
+      url = url.replace(/^\n\s*/, '').trim();
+      new fabric.util.request(url, {
+        method: 'get',
+        onComplete: onComplete
+      });
+
     },
 
     /**
