@@ -638,7 +638,7 @@
     var targetControl = [];
     [o1, o2, o3].forEach(target => {
       target.on(canvasEventName.replace(':', ''), (ev) => {
-        targetControl.push(ev);
+        targetControl.push(target);
       });
     });
     canvas.add(o1, o2, o3);
@@ -654,16 +654,17 @@
     c.upperCanvasEl.dispatchEvent(event);
     assert.equal(c._hoveredTarget, null, 'should clear `_hoveredTarget` ref');
     assert.deepEqual(c._hoveredTargets, [], 'should clear `_hoveredTargets` ref');
-    const expected = [o3, o2, o1].map(target => ({ e: event, target }));
-    assert.deepEqual(control, expected, 'should equal control');
+    const expected = [o3, o2, o1];
+    assert.deepEqual(control.map(ev => ev.target), expected, 'should equal control');
     assert.deepEqual(targetControl, expected, 'should equal target control');
 
     //  without targets
     control = [];
     targetControl = [];
     c.upperCanvasEl.dispatchEvent(event);
-    assert.deepEqual(control, [{ e: event, target: null }]);
-    assert.deepEqual(targetControl, []);
+    assert.equal(control.length, 1, 'should have fired once');
+    assert.equal(control[0].target, null, 'no target should be referenced');
+    assert.deepEqual(targetControl, [], 'no target should be referenced');
   });
 
   QUnit.test('mouseover and mouseout with subtarget check', function(assert) {
