@@ -1,5 +1,3 @@
-(function() {
-
   var extend = fabric.util.object.extend,
       originalSet = 'stateProperties';
 
@@ -104,4 +102,3 @@
       return this;
     }
   });
-})();

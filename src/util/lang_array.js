@@ -1,5 +1,3 @@
-(function() {
-
   var slice = Array.prototype.slice;
 
   /**
@@ -90,5 +88,3 @@
     min: min,
     max: max
   };
-
-})();

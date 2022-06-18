@@ -1,4 +1,3 @@
-(function() {
   fabric.util.object.extend(fabric.Text.prototype, /** @lends fabric.Text.prototype */ {
     /**
      * Returns true if object has no styling or no styling in a line
@@ -321,4 +320,3 @@
       delete this.styles[lineIndex];
     }
   });
-})();

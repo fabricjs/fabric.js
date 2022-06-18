@@ -1,5 +1,3 @@
-(function() {
-
   /* _FROM_SVG_START_ */
   function getColorStop(el, multiplier) {
     var style = el.getAttribute('style'),
@@ -485,4 +483,3 @@
       options[prop] = finalValue;
     });
   }
-})();

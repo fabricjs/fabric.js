@@ -2,7 +2,7 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
+  var fabric = exports.fabric || (exports.fabric = {}),
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
       invertTransform = fabric.util.invertTransform,
       transformPoint = fabric.util.transformPoint,

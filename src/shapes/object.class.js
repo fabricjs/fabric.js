@@ -1,8 +1,4 @@
-(function(global) {
-
-  'use strict';
-
-  var fabric = global.fabric || (global.fabric = { }),
+  var fabric = exports.fabric || (exports.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
@@ -10,10 +6,6 @@
       degreesToRadians = fabric.util.degreesToRadians,
       objectCaching = !fabric.isLikelyNode,
       ALIASING_LIMIT = 2;
-
-  if (fabric.Object) {
-    return;
-  }
 
   /**
    * Root object class from which all 2d shape classes inherit from
@@ -1954,4 +1946,3 @@
    * @type Number
    */
   fabric.Object.__uid = 0;
-})(typeof exports !== 'undefined' ? exports : this);

@@ -1,14 +1,5 @@
-(function(global) {
-
-  'use strict';
-
-  var fabric = global.fabric || (global.fabric = {}),
+  var fabric = exports.fabric || (exports.fabric = {}),
       projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
-
-  if (fabric.Polygon) {
-    fabric.warn('fabric.Polygon is already defined');
-    return;
-  }
 
   /**
    * Polygon class
@@ -76,5 +67,3 @@
   fabric.Polygon.fromObject = function(object) {
     return fabric.Object._fromObject(fabric.Polygon, object, 'points');
   };
-
-})(typeof exports !== 'undefined' ? exports : this);

@@ -1,6 +1,5 @@
-(function(global) {
-
-  var sqrt = Math.sqrt,
+  var fabric = exports.fabric || (exports.fabric = { }),
+      sqrt = Math.sqrt,
       atan2 = Math.atan2,
       pow = Math.pow,
       PiBy180 = Math.PI / 180,
@@ -1199,4 +1198,3 @@
       return new fabric.Group([a], { clipPath: b, inverted: inverted });
     },
   };
-})(typeof exports !== 'undefined' ? exports : this);

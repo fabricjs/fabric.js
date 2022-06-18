@@ -1,14 +1,5 @@
-(function(global) {
-
-  'use strict';
-
-  var fabric = global.fabric || (global.fabric = { }),
+  var fabric = exports.fabric || (exports.fabric = { }),
       degreesToRadians = fabric.util.degreesToRadians;
-
-  if (fabric.Circle) {
-    fabric.warn('fabric.Circle is already defined.');
-    return;
-  }
 
   /**
    * Circle class
@@ -205,5 +196,3 @@
   fabric.Circle.fromObject = function(object) {
     return fabric.Object._fromObject(fabric.Circle, object);
   };
-
-})(typeof exports !== 'undefined' ? exports : this);

@@ -1,5 +1,3 @@
-(function() {
-
   /**
    * Creates accessors (getXXX, setXXX) for a "class", based on "stateProperties" array
    * @static
@@ -424,5 +422,3 @@
    * @return {fabric.Object} thisArg
    * @chainable
    */
-
-})(typeof exports !== 'undefined' ? exports : this);

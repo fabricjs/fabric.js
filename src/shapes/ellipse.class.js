@@ -1,8 +1,4 @@
-(function(global) {
-
-  'use strict';
-
-  var fabric = global.fabric || (global.fabric = { }),
+  var fabric = exports.fabric || (exports.fabric = { }),
       piBy2   = Math.PI * 2;
 
   if (fabric.Ellipse) {
@@ -176,5 +172,3 @@
   fabric.Ellipse.fromObject = function(object) {
     return fabric.Object._fromObject(fabric.Ellipse, object);
   };
-
-})(typeof exports !== 'undefined' ? exports : this);

@@ -1,5 +1,3 @@
-(function() {
-
   var degreesToRadians = fabric.util.degreesToRadians,
       originXOffset = {
         left: -0.5,
@@ -280,5 +278,3 @@
       return this.translateToOriginPoint(this.getRelativeCenterPoint(), 'left', 'top');
     },
   });
-
-})();

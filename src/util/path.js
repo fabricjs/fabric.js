@@ -1,4 +1,3 @@
-(function() {
   var _join = Array.prototype.join,
       commandLengths = {
         m: 2,
@@ -851,4 +850,3 @@
   fabric.util.getPointOnPath = getPointOnPath;
   fabric.util.transformPath = transformPath;
   fabric.util.getRegularPolygonPath = getRegularPolygonPath;
-})();

@@ -1,5 +1,4 @@
 /* _TO_SVG_START_ */
-(function() {
   var toFixed = fabric.util.toFixed,
       multipleSpacesRegex = /  +/g;
 
@@ -246,5 +245,4 @@
       return svgStyle + ' white-space: pre;';
     },
   });
-})();
 /* _TO_SVG_END_ */

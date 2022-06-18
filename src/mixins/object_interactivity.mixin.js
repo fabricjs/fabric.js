@@ -1,5 +1,3 @@
-(function() {
-
   var degreesToRadians = fabric.util.degreesToRadians;
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
@@ -301,4 +299,3 @@
       // implemented by sub-classes, as needed.
     }
   });
-})();

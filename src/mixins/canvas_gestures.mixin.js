@@ -7,7 +7,6 @@
  * - touch:shake
  * - touch:longpress
  */
-(function() {
 
   var degreesToRadians = fabric.util.degreesToRadians,
       radiansToDegrees = fabric.util.radiansToDegrees;
@@ -146,4 +145,3 @@
       });
     }
   });
-})();

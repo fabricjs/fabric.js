@@ -1,12 +1,4 @@
-(function(global) {
-
-  'use strict';
-
-  var fabric = global.fabric || (global.fabric = { });
-
-  if (fabric.ActiveSelection) {
-    return;
-  }
+  var fabric = exports.fabric || (exports.fabric = { });
 
   /**
    * Group class
@@ -191,5 +183,3 @@
       return new fabric.ActiveSelection(enlivenedObjects, options, true);
     });
   };
-
-})(typeof exports !== 'undefined' ? exports : this);

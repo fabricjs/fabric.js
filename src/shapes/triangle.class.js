@@ -1,13 +1,4 @@
-(function(global) {
-
-  'use strict';
-
-  var fabric = global.fabric || (global.fabric = { });
-
-  if (fabric.Triangle) {
-    fabric.warn('fabric.Triangle is already defined');
-    return;
-  }
+  var fabric = exports.fabric || (exports.fabric = { });
 
   /**
    * Triangle class
@@ -89,5 +80,3 @@
   fabric.Triangle.fromObject = function(object) {
     return fabric.Object._fromObject(fabric.Triangle, object);
   };
-
-})(typeof exports !== 'undefined' ? exports : this);

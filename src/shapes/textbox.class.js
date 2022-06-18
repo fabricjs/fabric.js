@@ -1,8 +1,4 @@
-(function(global) {
-
-  'use strict';
-
-  var fabric = global.fabric || (global.fabric = {});
+  var fabric = exports.fabric || (exports.fabric = {});
 
   /**
    * Textbox class, based on IText, allows the user to resize the text rectangle
@@ -474,4 +470,3 @@
   fabric.Textbox.fromObject = function(object) {
     return fabric.Object._fromObject(fabric.Textbox, object, 'text');
   };
-})(typeof exports !== 'undefined' ? exports : this);

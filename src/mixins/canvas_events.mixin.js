@@ -1,5 +1,3 @@
-(function() {
-
   var addListener = fabric.util.addListener,
       removeListener = fabric.util.removeListener,
       RIGHT_CLICK = 3, MIDDLE_CLICK = 2, LEFT_CLICK = 1,
@@ -991,4 +989,3 @@
       return control.cursorStyleHandler(e, control, target);
     }
   });
-})();

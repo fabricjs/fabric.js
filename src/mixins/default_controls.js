@@ -1,5 +1,3 @@
-(function() {
-
   var controlsUtils = fabric.controlsUtils,
       scaleSkewStyleHandler = controlsUtils.scaleSkewCursorStyleHandler,
       scaleStyleHandler = controlsUtils.scaleCursorStyleHandler,
@@ -111,4 +109,3 @@
       actionName: 'resizing',
     });
   }
-})();

@@ -1,13 +1,4 @@
-(function(global) {
-
-  'use strict';
-
-  var fabric = global.fabric || (global.fabric = { });
-
-  if (fabric.Rect) {
-    fabric.warn('fabric.Rect is already defined');
-    return;
-  }
+  var fabric = exports.fabric || (exports.fabric = { });
 
   /**
    * Rectangle class
@@ -182,5 +173,3 @@
   fabric.Rect.fromObject = function(object) {
     return fabric.Object._fromObject(fabric.Rect, object);
   };
-
-})(typeof exports !== 'undefined' ? exports : this);

@@ -1,14 +1,5 @@
-(function(global) {
-
-  'use strict';
-
-  var fabric = global.fabric || (global.fabric = { }),
+  var fabric = exports.fabric || (exports.fabric = { }),
       clone = fabric.util.object.clone;
-
-  if (fabric.Text) {
-    fabric.warn('fabric.Text is already defined');
-    return;
-  }
 
   var additionalProps =
     ('fontFamily fontWeight fontSize text underline overline linethrough' +
@@ -1736,5 +1727,3 @@
   fabric.Text.genericFonts = ['sans-serif', 'serif', 'cursive', 'fantasy', 'monospace'];
 
   fabric.util.createAccessors && fabric.util.createAccessors(fabric.Text);
-
-})(typeof exports !== 'undefined' ? exports : this);

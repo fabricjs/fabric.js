@@ -1,10 +1,6 @@
-(function(global) {
-
-  'use strict';
-
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = exports.fabric || (exports.fabric = { });
 
   if (fabric.Point) {
     fabric.warn('fabric.Point is already defined');
@@ -347,5 +343,3 @@
       return new Point(this.x, this.y);
     }
   };
-
-})(typeof exports !== 'undefined' ? exports : this);

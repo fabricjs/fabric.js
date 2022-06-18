@@ -1,7 +1,3 @@
-(function() {
-
-  'use strict';
-
   var toFixed = fabric.util.toFixed;
 
   /**
@@ -183,4 +179,3 @@
         return new fabric.Pattern(patternOptions);
       });
   };
-})();

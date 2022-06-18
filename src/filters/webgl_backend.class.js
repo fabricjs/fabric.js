@@ -1,7 +1,3 @@
-(function() {
-
-  'use strict';
-
   /**
    * Tests if webgl supports certain precision
    * @param {WebGL} Canvas WebGL context to test on
@@ -335,7 +331,6 @@
       return gpuInfo;
     },
   };
-})();
 
 function resizeCanvasIfNeeded(pipelineState) {
   var targetCanvas = pipelineState.targetCanvas,

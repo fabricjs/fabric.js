@@ -1,8 +1,4 @@
-(function(global) {
-
-  'use strict';
-
-  var fabric  = global.fabric || (global.fabric = { }),
+  var fabric  = exports.fabric || (exports.fabric = { }),
       filters = fabric.Image.filters,
       createClass = fabric.util.createClass;
 
@@ -149,5 +145,3 @@
    * @returns {Promise<fabric.Image.filters.Grayscale>}
    */
   fabric.Image.filters.Grayscale.fromObject = fabric.Image.filters.BaseFilter.fromObject;
-
-})(typeof exports !== 'undefined' ? exports : this);

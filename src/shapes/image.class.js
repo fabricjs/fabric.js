@@ -1,14 +1,10 @@
-(function(global) {
-
-  'use strict';
-
   var extend = fabric.util.object.extend;
 
-  if (!global.fabric) {
-    global.fabric = { };
+  if (!exports.fabric) {
+    exports.fabric = { };
   }
 
-  if (global.fabric.Image) {
+  if (exports.fabric.Image) {
     fabric.warn('fabric.Image is already defined.');
     return;
   }
@@ -743,5 +739,3 @@
       });
   };
   /* _FROM_SVG_END_ */
-
-})(typeof exports !== 'undefined' ? exports : this);

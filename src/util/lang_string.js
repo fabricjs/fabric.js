@@ -1,5 +1,3 @@
-(function() {
-
   /**
    * Camelizes a string
    * @memberOf fabric.util.string
@@ -107,4 +105,3 @@
     escapeXml: escapeXml,
     graphemeSplit: graphemeSplit
   };
-})();

@@ -1,8 +1,4 @@
-(function(global) {
-
-  'use strict';
-
-  var fabric  = global.fabric || (global.fabric = { }), pow = Math.pow, floor = Math.floor,
+  var fabric  = exports.fabric || (exports.fabric = { }), pow = Math.pow, floor = Math.floor,
       sqrt = Math.sqrt, abs = Math.abs, round = Math.round, sin = Math.sin,
       ceil = Math.ceil,
       filters = fabric.Image.filters,
@@ -485,5 +481,3 @@
    * @returns {Promise<fabric.Image.filters.Resize>}
    */
   fabric.Image.filters.Resize.fromObject = fabric.Image.filters.BaseFilter.fromObject;
-
-})(typeof exports !== 'undefined' ? exports : this);

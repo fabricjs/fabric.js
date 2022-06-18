@@ -1,5 +1,3 @@
-(function() {
-
   /**
    * @private
    * @param {String} eventName
@@ -142,4 +140,3 @@
     once: once,
     off: off,
   };
-})();

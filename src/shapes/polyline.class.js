@@ -1,18 +1,9 @@
-(function(global) {
-
-  'use strict';
-
-  var fabric = global.fabric || (global.fabric = { }),
+  var fabric = exports.fabric || (exports.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
       toFixed = fabric.util.toFixed,
       projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
-
-  if (fabric.Polyline) {
-    fabric.warn('fabric.Polyline is already defined');
-    return;
-  }
 
   /**
    * Polyline class
@@ -265,5 +256,3 @@
   fabric.Polyline.fromObject = function(object) {
     return fabric.Object._fromObject(fabric.Polyline, object, 'points');
   };
-
-})(typeof exports !== 'undefined' ? exports : this);

@@ -1,5 +1,3 @@
-(function() {
-
   function addParamToUrl(url, param) {
     return url + (/\?/.test(url) ? '&' : '?') + param;
   }
@@ -52,4 +50,3 @@
   }
 
   fabric.util.request = request;
-})();

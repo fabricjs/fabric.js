@@ -1,5 +1,4 @@
 /* _TO_SVG_START_ */
-(function() {
   function getSvgColorString(prop, value) {
     if (!value) {
       return prop + ': none; ';
@@ -254,5 +253,4 @@
       return this.paintFirst !== 'fill' ? ' paint-order="' + this.paintFirst + '" ' : '';
     }
   });
-})();
 /* _TO_SVG_END_ */

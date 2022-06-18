@@ -1,5 +1,3 @@
-(function() {
-
   function arrayFromCoords(coords) {
     return [
       new fabric.Point(coords.tl.x, coords.tl.y),
@@ -772,4 +770,3 @@
       return p.scalarAdd(2 * this.padding);
     },
   });
-})();

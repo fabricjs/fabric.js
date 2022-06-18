@@ -1,5 +1,3 @@
-(function() {
-
   fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
 
     /**
@@ -941,4 +939,3 @@
       }
     }
   });
-})();

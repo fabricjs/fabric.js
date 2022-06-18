@@ -1,13 +1,9 @@
-(function(global) {
-
-  'use strict';
-
   /**
    * @name fabric
    * @namespace
    */
 
-  var fabric = global.fabric || (global.fabric = { }),
+  var fabric = exports.fabric || (exports.fabric = { }),
       toFixed = fabric.util.toFixed,
       parseUnit = fabric.util.parseUnit,
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
@@ -1084,5 +1080,3 @@
       }, reviver, options);
     }
   });
-
-})(typeof exports !== 'undefined' ? exports : this);
