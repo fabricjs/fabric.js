@@ -570,7 +570,7 @@
       fabric.loadSVGFromURL(objects, function (elements) {
         var group = fabric.util.groupSVGElements(elements, object, objects);
         var clipPath = options.clipPath;
-        // delete options.clipPath;
+        delete options.clipPath;
         group.set(options);
         if (clipPath) {
           fabric.util.enlivenObjects([clipPath], function(elivenedObjects) {
