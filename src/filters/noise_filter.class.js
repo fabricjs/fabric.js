@@ -1,9 +1,9 @@
-  var fabric  = exports.fabric || (exports.fabric = { }),
-      extend = fabric.util.object.extend,
-      filters = fabric.Image.filters,
-      createClass = fabric.util.createClass;
+var fabric  = exports.fabric || (exports.fabric = { }),
+    extend = fabric.util.object.extend,
+    filters = fabric.Image.filters,
+    createClass = fabric.util.createClass;
 
-  /**
+/**
    * Noise filter class
    * @class fabric.Image.filters.Noise
    * @memberOf fabric.Image.filters
@@ -18,19 +18,19 @@
    * object.applyFilters();
    * canvas.renderAll();
    */
-  filters.Noise = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Noise.prototype */ {
+filters.Noise = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Noise.prototype */ {
 
-    /**
+  /**
      * Filter type
      * @param {String} type
      * @default
      */
-    type: 'Noise',
+  type: 'Noise',
 
-    /**
+  /**
      * Fragment source for the noise program
      */
-    fragmentSource: 'precision highp float;\n' +
+  fragmentSource: 'precision highp float;\n' +
       'uniform sampler2D uTexture;\n' +
       'uniform float uStepH;\n' +
       'uniform float uNoise;\n' +
@@ -45,83 +45,83 @@
         'gl_FragColor = color;\n' +
       '}',
 
-    /**
+  /**
      * Describe the property that is the filter parameter
      * @param {String} m
      * @default
      */
-    mainParameter: 'noise',
+  mainParameter: 'noise',
 
-    /**
+  /**
      * Noise value, from
      * @param {Number} noise
      * @default
      */
-    noise: 0,
+  noise: 0,
 
-    /**
+  /**
      * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.
      *
      * @param {Object} options
      * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
      */
-    applyTo2d: function(options) {
-      if (this.noise === 0) {
-        return;
-      }
-      var imageData = options.imageData,
-          data = imageData.data, i, len = data.length,
-          noise = this.noise, rand;
+  applyTo2d: function(options) {
+    if (this.noise === 0) {
+      return;
+    }
+    var imageData = options.imageData,
+        data = imageData.data, i, len = data.length,
+        noise = this.noise, rand;
 
-      for (i = 0, len = data.length; i < len; i += 4) {
+    for (i = 0, len = data.length; i < len; i += 4) {
 
-        rand = (0.5 - Math.random()) * noise;
+      rand = (0.5 - Math.random()) * noise;
 
-        data[i] += rand;
-        data[i + 1] += rand;
-        data[i + 2] += rand;
-      }
-    },
+      data[i] += rand;
+      data[i + 1] += rand;
+      data[i + 2] += rand;
+    }
+  },
 
-    /**
+  /**
      * Return WebGL uniform locations for this filter's shader.
      *
      * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
      * @param {WebGLShaderProgram} program This filter's compiled shader program.
      */
-    getUniformLocations: function(gl, program) {
-      return {
-        uNoise: gl.getUniformLocation(program, 'uNoise'),
-        uSeed: gl.getUniformLocation(program, 'uSeed'),
-      };
-    },
+  getUniformLocations: function(gl, program) {
+    return {
+      uNoise: gl.getUniformLocation(program, 'uNoise'),
+      uSeed: gl.getUniformLocation(program, 'uSeed'),
+    };
+  },
 
-    /**
+  /**
      * Send data from this filter to its shader program's uniforms.
      *
      * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
      * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
      */
-    sendUniformData: function(gl, uniformLocations) {
-      gl.uniform1f(uniformLocations.uNoise, this.noise / 255);
-      gl.uniform1f(uniformLocations.uSeed, Math.random());
-    },
+  sendUniformData: function(gl, uniformLocations) {
+    gl.uniform1f(uniformLocations.uNoise, this.noise / 255);
+    gl.uniform1f(uniformLocations.uSeed, Math.random());
+  },
 
-    /**
+  /**
      * Returns object representation of an instance
      * @return {Object} Object representation of an instance
      */
-    toObject: function() {
-      return extend(this.callSuper('toObject'), {
-        noise: this.noise
-      });
-    }
-  });
+  toObject: function() {
+    return extend(this.callSuper('toObject'), {
+      noise: this.noise
+    });
+  }
+});
 
-  /**
+/**
    * Create filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
    * @returns {Promise<fabric.Image.filters.Noise>}
    */
-  fabric.Image.filters.Noise.fromObject = fabric.Image.filters.BaseFilter.fromObject;
+fabric.Image.filters.Noise.fromObject = fabric.Image.filters.BaseFilter.fromObject;

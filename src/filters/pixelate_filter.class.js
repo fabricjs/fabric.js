@@ -1,8 +1,8 @@
-  var fabric  = exports.fabric || (exports.fabric = { }),
-      filters = fabric.Image.filters,
-      createClass = fabric.util.createClass;
+var fabric  = exports.fabric || (exports.fabric = { }),
+    filters = fabric.Image.filters,
+    createClass = fabric.util.createClass;
 
-  /**
+/**
    * Pixelate filter class
    * @class fabric.Image.filters.Pixelate
    * @memberOf fabric.Image.filters
@@ -16,23 +16,23 @@
    * object.filters.push(filter);
    * object.applyFilters();
    */
-  filters.Pixelate = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Pixelate.prototype */ {
+filters.Pixelate = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.Pixelate.prototype */ {
 
-    /**
+  /**
      * Filter type
      * @param {String} type
      * @default
      */
-    type: 'Pixelate',
+  type: 'Pixelate',
 
-    blocksize: 4,
+  blocksize: 4,
 
-    mainParameter: 'blocksize',
+  mainParameter: 'blocksize',
 
-    /**
+  /**
      * Fragment source for the Pixelate program
      */
-    fragmentSource: 'precision highp float;\n' +
+  fragmentSource: 'precision highp float;\n' +
       'uniform sampler2D uTexture;\n' +
       'uniform float uBlocksize;\n' +
       'uniform float uStepW;\n' +
@@ -50,81 +50,81 @@
         'gl_FragColor = color;\n' +
       '}',
 
-    /**
+  /**
      * Apply the Pixelate operation to a Uint8ClampedArray representing the pixels of an image.
      *
      * @param {Object} options
      * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
      */
-    applyTo2d: function(options) {
-      var imageData = options.imageData,
-          data = imageData.data,
-          iLen = imageData.height,
-          jLen = imageData.width,
-          index, i, j, r, g, b, a,
-          _i, _j, _iLen, _jLen;
+  applyTo2d: function(options) {
+    var imageData = options.imageData,
+        data = imageData.data,
+        iLen = imageData.height,
+        jLen = imageData.width,
+        index, i, j, r, g, b, a,
+        _i, _j, _iLen, _jLen;
 
-      for (i = 0; i < iLen; i += this.blocksize) {
-        for (j = 0; j < jLen; j += this.blocksize) {
+    for (i = 0; i < iLen; i += this.blocksize) {
+      for (j = 0; j < jLen; j += this.blocksize) {
 
-          index = (i * 4) * jLen + (j * 4);
+        index = (i * 4) * jLen + (j * 4);
 
-          r = data[index];
-          g = data[index + 1];
-          b = data[index + 2];
-          a = data[index + 3];
+        r = data[index];
+        g = data[index + 1];
+        b = data[index + 2];
+        a = data[index + 3];
 
-          _iLen = Math.min(i + this.blocksize, iLen);
-          _jLen = Math.min(j + this.blocksize, jLen);
-          for (_i = i; _i < _iLen; _i++) {
-            for (_j = j; _j < _jLen; _j++) {
-              index = (_i * 4) * jLen + (_j * 4);
-              data[index] = r;
-              data[index + 1] = g;
-              data[index + 2] = b;
-              data[index + 3] = a;
-            }
+        _iLen = Math.min(i + this.blocksize, iLen);
+        _jLen = Math.min(j + this.blocksize, jLen);
+        for (_i = i; _i < _iLen; _i++) {
+          for (_j = j; _j < _jLen; _j++) {
+            index = (_i * 4) * jLen + (_j * 4);
+            data[index] = r;
+            data[index + 1] = g;
+            data[index + 2] = b;
+            data[index + 3] = a;
           }
         }
       }
-    },
+    }
+  },
 
-    /**
+  /**
      * Indicate when the filter is not gonna apply changes to the image
      **/
-    isNeutralState: function() {
-      return this.blocksize === 1;
-    },
+  isNeutralState: function() {
+    return this.blocksize === 1;
+  },
 
-    /**
+  /**
      * Return WebGL uniform locations for this filter's shader.
      *
      * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
      * @param {WebGLShaderProgram} program This filter's compiled shader program.
      */
-    getUniformLocations: function(gl, program) {
-      return {
-        uBlocksize: gl.getUniformLocation(program, 'uBlocksize'),
-        uStepW: gl.getUniformLocation(program, 'uStepW'),
-        uStepH: gl.getUniformLocation(program, 'uStepH'),
-      };
-    },
+  getUniformLocations: function(gl, program) {
+    return {
+      uBlocksize: gl.getUniformLocation(program, 'uBlocksize'),
+      uStepW: gl.getUniformLocation(program, 'uStepW'),
+      uStepH: gl.getUniformLocation(program, 'uStepH'),
+    };
+  },
 
-    /**
+  /**
      * Send data from this filter to its shader program's uniforms.
      *
      * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
      * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
      */
-    sendUniformData: function(gl, uniformLocations) {
-      gl.uniform1f(uniformLocations.uBlocksize, this.blocksize);
-    },
-  });
+  sendUniformData: function(gl, uniformLocations) {
+    gl.uniform1f(uniformLocations.uBlocksize, this.blocksize);
+  },
+});
 
-  /**
+/**
    * Create filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
    * @returns {Promise<fabric.Image.filters.Pixelate>}
    */
-  fabric.Image.filters.Pixelate.fromObject = fabric.Image.filters.BaseFilter.fromObject;
+fabric.Image.filters.Pixelate.fromObject = fabric.Image.filters.BaseFilter.fromObject;
