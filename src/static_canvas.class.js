@@ -2,11 +2,6 @@
 
   'use strict';
 
-  if (fabric.StaticCanvas) {
-    fabric.warn('fabric.StaticCanvas is already defined.');
-    return;
-  }
-
   // aliases for faster resolution
   var extend = fabric.util.object.extend,
       getElementOffset = fabric.util.getElementOffset,

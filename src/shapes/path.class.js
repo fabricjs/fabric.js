@@ -5,11 +5,6 @@
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed;
 
-  if (fabric.Path) {
-    fabric.warn('fabric.Path is already defined');
-    return;
-  }
-
   /**
    * Path class
    * @class fabric.Path

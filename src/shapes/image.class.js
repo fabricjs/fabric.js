@@ -4,11 +4,6 @@
     exports.fabric = { };
   }
 
-  if (exports.fabric.Image) {
-    fabric.warn('fabric.Image is already defined.');
-    return;
-  }
-
   /**
    * Image class
    * @class fabric.Image

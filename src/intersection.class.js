@@ -1,11 +1,6 @@
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
   var fabric = exports.fabric || (exports.fabric = { });
 
-  if (fabric.Intersection) {
-    fabric.warn('fabric.Intersection is already defined');
-    return;
-  }
-
   /**
    * Intersection class
    * @class fabric.Intersection

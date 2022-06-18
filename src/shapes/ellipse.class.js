@@ -1,11 +1,6 @@
   var fabric = exports.fabric || (exports.fabric = { }),
       piBy2   = Math.PI * 2;
 
-  if (fabric.Ellipse) {
-    fabric.warn('fabric.Ellipse is already defined.');
-    return;
-  }
-
   /**
    * Ellipse class
    * @class fabric.Ellipse

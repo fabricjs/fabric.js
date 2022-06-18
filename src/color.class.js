@@ -1,10 +1,5 @@
 var fabric = exports.fabric || (exports.fabric = { });
 
-if (fabric.Color) {
-  fabric.warn('fabric.Color is already defined.');
-  return;
-}
-
 /**
  * Color class
  * The purpose of {@link fabric.Color} is to abstract and encapsulate common color operations;

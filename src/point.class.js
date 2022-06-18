@@ -2,11 +2,6 @@
 
   var fabric = exports.fabric || (exports.fabric = { });
 
-  if (fabric.Point) {
-    fabric.warn('fabric.Point is already defined');
-    return;
-  }
-
   fabric.Point = Point;
 
   /**
