@@ -97,6 +97,10 @@ import './src/mixins/default_controls.js'; // optional interaction
 //  extends fabric.StaticCanvas, fabric.Canvas, fabric.Object, depends on fabric.PencilBrush and fabric.Rect
 // import './src/mixins/eraser_brush.mixin.js'; // optional erasing
 
+if (typeof window !== 'undefined') {
+  window.fabric = fabric;
+}
+
 export {
   fabric,
 };
