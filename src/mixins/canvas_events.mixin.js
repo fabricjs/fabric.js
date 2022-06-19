@@ -146,9 +146,9 @@
       this._hoveredTarget = null;
       target && target.fire('mouseout', { e: e });
 
-      this._hoveredTargets.forEach(function(_target){
-        this.fire('mouse:out', { target: _target, e: e });
-        _target && _target.fire('mouseout', { e: e });
+      this._hoveredTargets.forEach(function(nestedTarget){
+        this.fire('mouse:out', { target: nestedTarget, e: e });
+        nestedTarget && nestedTarget.fire('mouseout', { e: e });
       }, this);
       this._hoveredTargets = [];
 
