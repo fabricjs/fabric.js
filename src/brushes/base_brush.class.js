@@ -137,7 +137,8 @@
      * @private
     */
     _isOutSideCanvas: function(pointer) {
-      return pointer.x < 0 || pointer.x > this.canvas.getWidth() || pointer.y < 0 || pointer.y > this.canvas.getHeight();
+      return pointer.x < 0 || pointer.x > this.canvas.getWidth() ||
+        pointer.y < 0 || pointer.y > this.canvas.getHeight();
     }
   });
 })(typeof exports !== 'undefined' ? exports : window);

@@ -1,5 +1,5 @@
 (function(global){
-    var fabric = global.fabric;
+  var fabric = global.fabric;
   /**
    * @namespace fabric.CommonMethods
    */
