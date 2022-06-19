@@ -53,15 +53,16 @@ class ICheckbox extends Checkbox {
 inquirer.registerPrompt('test-selection', ICheckbox);
 
 function build(options = {}) {
-    _.defaults(options, { exclude: ['gestures', 'accessors', 'erasing'] });
-    const args = [
-        `node`,
-        `build.js`,
-        `modules=${options.modules && options.modules.length > 0 ? options.modules.join(',') : 'ALL'}`,
-        `requirejs`,
-        `${options.fast ? 'fast' : ''}`,
-        `exclude=${options.exclude.join(',')}`
-    ]
+    // _.defaults(options, { exclude: ['gestures', 'accessors', 'erasing'] });
+    // const args = [
+    //     `npm run`,
+    //     `build.js`,
+    //     `modules=${options.modules && options.modules.length > 0 ? options.modules.join(',') : 'ALL'}`,
+    //     `requirejs`,
+    //     `${options.fast ? 'fast' : ''}`,
+    //     `exclude=${options.exclude.join(',')}`
+    // ]
+    const args = ['npm run', 'build-rollup'];
     cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd });
 }
 
@@ -141,9 +142,9 @@ function exportToWebsite(options) {
 }
 
 /**
- * 
+ *
  * @param {string[]} tests file paths
- * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:boolean}} [options] 
+ * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:boolean}} [options]
  */
 function test(tests, options) {
     options = options || {};
@@ -193,9 +194,9 @@ function test(tests, options) {
 }
 
 /**
- * 
+ *
  * @param {'unit'|'visual'} type correspondes to the test directories
- * @returns 
+ * @returns
  */
 function listTestFiles(type) {
     return fs.readdirSync(path.resolve(wd, './test', type)).filter(p => {

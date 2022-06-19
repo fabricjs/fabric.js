@@ -9,11 +9,11 @@ export default {
         name: 'fabric',
         format: 'cjs',
     },
-    // {
-    //     file: './dist/fabric.min.js',
-    //     format: 'iife',
-    //     name: 'fabric',
-    //     plugins: [terser()],
-    // },
+    {
+        file: './dist/fabric.min.js',
+        format: 'iife',
+        name: 'fabric',
+        plugins: [terser()],
+    },
   ],
 };
