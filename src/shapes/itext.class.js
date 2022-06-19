@@ -1,4 +1,6 @@
-/**
+(function(global) {
+  var fabric = global.fabric;
+  /**
    * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
    * prefix when observing canvas.
    * @class fabric.IText
@@ -44,65 +46,65 @@
    *   Select line:                    triple click
    * </pre>
    */
-fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lends fabric.IText.prototype */ {
+  fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lends fabric.IText.prototype */ {
 
-  /**
+    /**
      * Type of an object
      * @type String
      * @default
      */
-  type: 'i-text',
+    type: 'i-text',
 
-  /**
+    /**
      * Index where text selection starts (or where cursor is when there is no selection)
      * @type Number
      * @default
      */
-  selectionStart: 0,
+    selectionStart: 0,
 
-  /**
+    /**
      * Index where text selection ends
      * @type Number
      * @default
      */
-  selectionEnd: 0,
+    selectionEnd: 0,
 
-  /**
+    /**
      * Color of text selection
      * @type String
      * @default
      */
-  selectionColor: 'rgba(17,119,255,0.3)',
+    selectionColor: 'rgba(17,119,255,0.3)',
 
-  /**
+    /**
      * Indicates whether text is in editing mode
      * @type Boolean
      * @default
      */
-  isEditing: false,
+    isEditing: false,
 
-  /**
+    /**
      * Indicates whether a text can be edited
      * @type Boolean
      * @default
      */
-  editable: true,
+    editable: true,
 
-  /**
+    /**
      * Border color of text object while it's in editing mode
      * @type String
      * @default
      */
-  editingBorderColor: 'rgba(102,153,255,0.25)',
+    editingBorderColor: 'rgba(102,153,255,0.25)',
 
-  /**
+    /**
      * Width of cursor (in px)
      * @type Number
      * @default
      */
-  cursorWidth: 2,
+    cursorWidth: 2,
 
-  /**
+    /**
      * Color of text cursor color in editing mode.
      * if not set (default) will take color from the text.
      * if set to a color value that fabric can understand, it will
@@ -110,30 +112,30 @@ fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lend
      * @type String
      * @default
      */
-  cursorColor: '',
+    cursorColor: '',
 
-  /**
+    /**
      * Delay between cursor blink (in ms)
      * @type Number
      * @default
      */
-  cursorDelay: 1000,
+    cursorDelay: 1000,
 
-  /**
+    /**
      * Duration of cursor fadein (in ms)
      * @type Number
      * @default
      */
-  cursorDuration: 600,
+    cursorDuration: 600,
 
-  /**
+    /**
      * Indicates whether internal text char widths can be cached
      * @type Boolean
      * @default
      */
-  caching: true,
+    caching: true,
 
-  /**
+    /**
      * DOM container to append the hiddenTextarea.
      * An alternative to attaching to the document.body.
      * Useful to reduce laggish redraw of the full document.body tree and
@@ -141,364 +143,364 @@ fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lend
      * @type HTMLElement
      * @default
      */
-  hiddenTextareaContainer: null,
+    hiddenTextareaContainer: null,
 
-  /**
+    /**
      * @private
      */
-  _reSpace: /\s|\n/,
+    _reSpace: /\s|\n/,
 
-  /**
+    /**
      * @private
      */
-  _currentCursorOpacity: 0,
+    _currentCursorOpacity: 0,
 
-  /**
+    /**
      * @private
      */
-  _selectionDirection: null,
+    _selectionDirection: null,
 
-  /**
+    /**
      * @private
      */
-  _abortCursorAnimation: false,
+    _abortCursorAnimation: false,
 
-  /**
+    /**
      * @private
      */
-  __widthOfSpace: [],
+    __widthOfSpace: [],
 
-  /**
+    /**
      * Helps determining when the text is in composition, so that the cursor
      * rendering is altered.
      */
-  inCompositionMode: false,
+    inCompositionMode: false,
 
-  /**
+    /**
      * Constructor
      * @param {String} text Text string
      * @param {Object} [options] Options object
      * @return {fabric.IText} thisArg
      */
-  initialize: function(text, options) {
-    this.callSuper('initialize', text, options);
-    this.initBehavior();
-  },
+    initialize: function(text, options) {
+      this.callSuper('initialize', text, options);
+      this.initBehavior();
+    },
 
-  /**
+    /**
      * While editing handle differently
      * @private
      * @param {string} key
      * @param {*} value
      */
-  _set: function (key, value) {
-    if (this.isEditing && this._savedProps && key in this._savedProps) {
-      this._savedProps[key] = value;
-    }
-    else {
-      this.callSuper('_set', key, value);
-    }
-  },
+    _set: function (key, value) {
+      if (this.isEditing && this._savedProps && key in this._savedProps) {
+        this._savedProps[key] = value;
+      }
+      else {
+        this.callSuper('_set', key, value);
+      }
+    },
 
-  /**
+    /**
      * Sets selection start (left boundary of a selection)
      * @param {Number} index Index to set selection start to
      */
-  setSelectionStart: function(index) {
-    index = Math.max(index, 0);
-    this._updateAndFire('selectionStart', index);
-  },
+    setSelectionStart: function(index) {
+      index = Math.max(index, 0);
+      this._updateAndFire('selectionStart', index);
+    },
 
-  /**
+    /**
      * Sets selection end (right boundary of a selection)
      * @param {Number} index Index to set selection end to
      */
-  setSelectionEnd: function(index) {
-    index = Math.min(index, this.text.length);
-    this._updateAndFire('selectionEnd', index);
-  },
+    setSelectionEnd: function(index) {
+      index = Math.min(index, this.text.length);
+      this._updateAndFire('selectionEnd', index);
+    },
 
-  /**
+    /**
      * @private
      * @param {String} property 'selectionStart' or 'selectionEnd'
      * @param {Number} index new position of property
      */
-  _updateAndFire: function(property, index) {
-    if (this[property] !== index) {
-      this._fireSelectionChanged();
-      this[property] = index;
-    }
-    this._updateTextarea();
-  },
+    _updateAndFire: function(property, index) {
+      if (this[property] !== index) {
+        this._fireSelectionChanged();
+        this[property] = index;
+      }
+      this._updateTextarea();
+    },
 
-  /**
+    /**
      * Fires the even of selection changed
      * @private
      */
-  _fireSelectionChanged: function() {
-    this.fire('selection:changed');
-    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
-  },
+    _fireSelectionChanged: function() {
+      this.fire('selection:changed');
+      this.canvas && this.canvas.fire('text:selection:changed', { target: this });
+    },
 
-  /**
+    /**
      * Initialize text dimensions. Render all text on given context
      * or on a offscreen canvas to get the text width with measureText.
      * Updates this.width and this.height with the proper values.
      * Does not return dimensions.
      * @private
      */
-  initDimensions: function() {
-    this.isEditing && this.initDelayedCursor();
-    this.clearContextTop();
-    this.callSuper('initDimensions');
-  },
+    initDimensions: function() {
+      this.isEditing && this.initDelayedCursor();
+      this.clearContextTop();
+      this.callSuper('initDimensions');
+    },
 
-  /**
+    /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-  render: function(ctx) {
-    this.clearContextTop();
-    this.callSuper('render', ctx);
-    // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
-    // the correct position but not at every cursor animation.
-    this.cursorOffsetCache = { };
-    this.renderCursorOrSelection();
-  },
+    render: function(ctx) {
+      this.clearContextTop();
+      this.callSuper('render', ctx);
+      // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
+      // the correct position but not at every cursor animation.
+      this.cursorOffsetCache = { };
+      this.renderCursorOrSelection();
+    },
 
-  /**
+    /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-  _render: function(ctx) {
-    this.callSuper('_render', ctx);
-  },
+    _render: function(ctx) {
+      this.callSuper('_render', ctx);
+    },
 
-  /**
+    /**
      * Prepare and clean the contextTop
      */
-  clearContextTop: function(skipRestore) {
-    if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
-      return;
-    }
-    var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
-    ctx.save();
-    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-    this.transform(ctx);
-    this._clearTextArea(ctx);
-    skipRestore || ctx.restore();
-  },
-  /**
+    clearContextTop: function(skipRestore) {
+      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
+        return;
+      }
+      var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
+      ctx.save();
+      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+      this.transform(ctx);
+      this._clearTextArea(ctx);
+      skipRestore || ctx.restore();
+    },
+    /**
      * Renders cursor or selection (depending on what exists)
      * it does on the contextTop. If contextTop is not available, do nothing.
      */
-  renderCursorOrSelection: function() {
-    if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
-      return;
-    }
-    var boundaries = this._getCursorBoundaries(),
-        ctx = this.canvas.contextTop;
-    this.clearContextTop(true);
-    if (this.selectionStart === this.selectionEnd) {
-      this.renderCursor(boundaries, ctx);
-    }
-    else {
-      this.renderSelection(boundaries, ctx);
-    }
-    ctx.restore();
-  },
+    renderCursorOrSelection: function() {
+      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
+        return;
+      }
+      var boundaries = this._getCursorBoundaries(),
+          ctx = this.canvas.contextTop;
+      this.clearContextTop(true);
+      if (this.selectionStart === this.selectionEnd) {
+        this.renderCursor(boundaries, ctx);
+      }
+      else {
+        this.renderSelection(boundaries, ctx);
+      }
+      ctx.restore();
+    },
 
-  _clearTextArea: function(ctx) {
-    // we add 4 pixel, to be sure to do not leave any pixel out
-    var width = this.width + 4, height = this.height + 4;
-    ctx.clearRect(-width / 2, -height / 2, width, height);
-  },
+    _clearTextArea: function(ctx) {
+      // we add 4 pixel, to be sure to do not leave any pixel out
+      var width = this.width + 4, height = this.height + 4;
+      ctx.clearRect(-width / 2, -height / 2, width, height);
+    },
 
-  /**
+    /**
      * Returns cursor boundaries (left, top, leftOffset, topOffset)
      * @private
      * @param {Array} chars Array of characters
      * @param {String} typeOfBoundaries
      */
-  _getCursorBoundaries: function(position) {
+    _getCursorBoundaries: function(position) {
 
-    // left/top are left/top of entire text box
-    // leftOffset/topOffset are offset from that left/top point of a text box
+      // left/top are left/top of entire text box
+      // leftOffset/topOffset are offset from that left/top point of a text box
 
-    if (typeof position === 'undefined') {
-      position = this.selectionStart;
-    }
+      if (typeof position === 'undefined') {
+        position = this.selectionStart;
+      }
 
-    var left = this._getLeftOffset(),
-        top = this._getTopOffset(),
-        offsets = this._getCursorBoundariesOffsets(position);
-    return {
-      left: left,
-      top: top,
-      leftOffset: offsets.left,
-      topOffset: offsets.top
-    };
-  },
+      var left = this._getLeftOffset(),
+          top = this._getTopOffset(),
+          offsets = this._getCursorBoundariesOffsets(position);
+      return {
+        left: left,
+        top: top,
+        leftOffset: offsets.left,
+        topOffset: offsets.top
+      };
+    },
 
-  /**
+    /**
      * @private
      */
-  _getCursorBoundariesOffsets: function(position) {
-    if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
+    _getCursorBoundariesOffsets: function(position) {
+      if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
+        return this.cursorOffsetCache;
+      }
+      var lineLeftOffset,
+          lineIndex,
+          charIndex,
+          topOffset = 0,
+          leftOffset = 0,
+          boundaries,
+          cursorPosition = this.get2DCursorLocation(position);
+      charIndex = cursorPosition.charIndex;
+      lineIndex = cursorPosition.lineIndex;
+      for (var i = 0; i < lineIndex; i++) {
+        topOffset += this.getHeightOfLine(i);
+      }
+      lineLeftOffset = this._getLineLeftOffset(lineIndex);
+      var bound = this.__charBounds[lineIndex][charIndex];
+      bound && (leftOffset = bound.left);
+      if (this.charSpacing !== 0 && charIndex === this._textLines[lineIndex].length) {
+        leftOffset -= this._getWidthOfCharSpacing();
+      }
+      boundaries = {
+        top: topOffset,
+        left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
+      };
+      if (this.direction === 'rtl') {
+        if (this.textAlign === 'right' || this.textAlign === 'justify' || this.textAlign === 'justify-right') {
+          boundaries.left *= -1;
+        }
+        else if (this.textAlign === 'left' || this.textAlign === 'justify-left') {
+          boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+        }
+        else if (this.textAlign === 'center' || this.textAlign === 'justify-center') {
+          boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+        }
+      }
+      this.cursorOffsetCache = boundaries;
       return this.cursorOffsetCache;
-    }
-    var lineLeftOffset,
-        lineIndex,
-        charIndex,
-        topOffset = 0,
-        leftOffset = 0,
-        boundaries,
-        cursorPosition = this.get2DCursorLocation(position);
-    charIndex = cursorPosition.charIndex;
-    lineIndex = cursorPosition.lineIndex;
-    for (var i = 0; i < lineIndex; i++) {
-      topOffset += this.getHeightOfLine(i);
-    }
-    lineLeftOffset = this._getLineLeftOffset(lineIndex);
-    var bound = this.__charBounds[lineIndex][charIndex];
-    bound && (leftOffset = bound.left);
-    if (this.charSpacing !== 0 && charIndex === this._textLines[lineIndex].length) {
-      leftOffset -= this._getWidthOfCharSpacing();
-    }
-    boundaries = {
-      top: topOffset,
-      left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
-    };
-    if (this.direction === 'rtl') {
-      if (this.textAlign === 'right' || this.textAlign === 'justify' || this.textAlign === 'justify-right') {
-        boundaries.left *= -1;
-      }
-      else if (this.textAlign === 'left' || this.textAlign === 'justify-left') {
-        boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
-      }
-      else if (this.textAlign === 'center' || this.textAlign === 'justify-center') {
-        boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
-      }
-    }
-    this.cursorOffsetCache = boundaries;
-    return this.cursorOffsetCache;
-  },
+    },
 
-  /**
+    /**
      * Renders cursor
      * @param {Object} boundaries
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
-  renderCursor: function(boundaries, ctx) {
-    var cursorLocation = this.get2DCursorLocation(),
-        lineIndex = cursorLocation.lineIndex,
-        charIndex = cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
-        charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
-        multiplier = this.scaleX * this.canvas.getZoom(),
-        cursorWidth = this.cursorWidth / multiplier,
-        topOffset = boundaries.topOffset,
-        dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY');
-    topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex) / this.lineHeight
+    renderCursor: function(boundaries, ctx) {
+      var cursorLocation = this.get2DCursorLocation(),
+          lineIndex = cursorLocation.lineIndex,
+          charIndex = cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
+          charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
+          multiplier = this.scaleX * this.canvas.getZoom(),
+          cursorWidth = this.cursorWidth / multiplier,
+          topOffset = boundaries.topOffset,
+          dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY');
+      topOffset += (1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex) / this.lineHeight
         - charHeight * (1 - this._fontSizeFraction);
 
-    if (this.inCompositionMode) {
-      this.renderSelection(boundaries, ctx);
-    }
-    ctx.fillStyle = this.cursorColor || this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
-    ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
-    ctx.fillRect(
-      boundaries.left + boundaries.leftOffset - cursorWidth / 2,
-      topOffset + boundaries.top + dy,
-      cursorWidth,
-      charHeight);
-  },
+      if (this.inCompositionMode) {
+        this.renderSelection(boundaries, ctx);
+      }
+      ctx.fillStyle = this.cursorColor || this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
+      ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
+      ctx.fillRect(
+        boundaries.left + boundaries.leftOffset - cursorWidth / 2,
+        topOffset + boundaries.top + dy,
+        cursorWidth,
+        charHeight);
+    },
 
-  /**
+    /**
      * Renders text selection
      * @param {Object} boundaries Object with left/top/leftOffset/topOffset
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
-  renderSelection: function(boundaries, ctx) {
+    renderSelection: function(boundaries, ctx) {
 
-    var selectionStart = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
-        selectionEnd = this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd,
-        isJustify = this.textAlign.indexOf('justify') !== -1,
-        start = this.get2DCursorLocation(selectionStart),
-        end = this.get2DCursorLocation(selectionEnd),
-        startLine = start.lineIndex,
-        endLine = end.lineIndex,
-        startChar = start.charIndex < 0 ? 0 : start.charIndex,
-        endChar = end.charIndex < 0 ? 0 : end.charIndex;
+      var selectionStart = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
+          selectionEnd = this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd,
+          isJustify = this.textAlign.indexOf('justify') !== -1,
+          start = this.get2DCursorLocation(selectionStart),
+          end = this.get2DCursorLocation(selectionEnd),
+          startLine = start.lineIndex,
+          endLine = end.lineIndex,
+          startChar = start.charIndex < 0 ? 0 : start.charIndex,
+          endChar = end.charIndex < 0 ? 0 : end.charIndex;
 
-    for (var i = startLine; i <= endLine; i++) {
-      var lineOffset = this._getLineLeftOffset(i) || 0,
-          lineHeight = this.getHeightOfLine(i),
-          realLineHeight = 0, boxStart = 0, boxEnd = 0;
+      for (var i = startLine; i <= endLine; i++) {
+        var lineOffset = this._getLineLeftOffset(i) || 0,
+            lineHeight = this.getHeightOfLine(i),
+            realLineHeight = 0, boxStart = 0, boxEnd = 0;
 
-      if (i === startLine) {
-        boxStart = this.__charBounds[startLine][startChar].left;
-      }
-      if (i >= startLine && i < endLine) {
-        boxEnd = isJustify && !this.isEndOfWrapping(i) ? this.width : this.getLineWidth(i) || 5; // WTF is this 5?
-      }
-      else if (i === endLine) {
-        if (endChar === 0) {
-          boxEnd = this.__charBounds[endLine][endChar].left;
+        if (i === startLine) {
+          boxStart = this.__charBounds[startLine][startChar].left;
+        }
+        if (i >= startLine && i < endLine) {
+          boxEnd = isJustify && !this.isEndOfWrapping(i) ? this.width : this.getLineWidth(i) || 5; // WTF is this 5?
+        }
+        else if (i === endLine) {
+          if (endChar === 0) {
+            boxEnd = this.__charBounds[endLine][endChar].left;
+          }
+          else {
+            var charSpacing = this._getWidthOfCharSpacing();
+            boxEnd = this.__charBounds[endLine][endChar - 1].left
+              + this.__charBounds[endLine][endChar - 1].width - charSpacing;
+          }
+        }
+        realLineHeight = lineHeight;
+        if (this.lineHeight < 1 || (i === endLine && this.lineHeight > 1)) {
+          lineHeight /= this.lineHeight;
+        }
+        var drawStart = boundaries.left + lineOffset + boxStart,
+            drawWidth = boxEnd - boxStart,
+            drawHeight = lineHeight, extraTop = 0;
+        if (this.inCompositionMode) {
+          ctx.fillStyle = this.compositionColor || 'black';
+          drawHeight = 1;
+          extraTop = lineHeight;
         }
         else {
-          var charSpacing = this._getWidthOfCharSpacing();
-          boxEnd = this.__charBounds[endLine][endChar - 1].left
-              + this.__charBounds[endLine][endChar - 1].width - charSpacing;
+          ctx.fillStyle = this.selectionColor;
         }
-      }
-      realLineHeight = lineHeight;
-      if (this.lineHeight < 1 || (i === endLine && this.lineHeight > 1)) {
-        lineHeight /= this.lineHeight;
-      }
-      var drawStart = boundaries.left + lineOffset + boxStart,
-          drawWidth = boxEnd - boxStart,
-          drawHeight = lineHeight, extraTop = 0;
-      if (this.inCompositionMode) {
-        ctx.fillStyle = this.compositionColor || 'black';
-        drawHeight = 1;
-        extraTop = lineHeight;
-      }
-      else {
-        ctx.fillStyle = this.selectionColor;
-      }
-      if (this.direction === 'rtl') {
-        if (this.textAlign === 'right' || this.textAlign === 'justify' || this.textAlign === 'justify-right') {
-          drawStart = this.width - drawStart - drawWidth;
+        if (this.direction === 'rtl') {
+          if (this.textAlign === 'right' || this.textAlign === 'justify' || this.textAlign === 'justify-right') {
+            drawStart = this.width - drawStart - drawWidth;
+          }
+          else if (this.textAlign === 'left' || this.textAlign === 'justify-left') {
+            drawStart = boundaries.left + lineOffset - boxEnd;
+          }
+          else if (this.textAlign === 'center' || this.textAlign === 'justify-center') {
+            drawStart = boundaries.left + lineOffset - boxEnd;
+          }
         }
-        else if (this.textAlign === 'left' || this.textAlign === 'justify-left') {
-          drawStart = boundaries.left + lineOffset - boxEnd;
-        }
-        else if (this.textAlign === 'center' || this.textAlign === 'justify-center') {
-          drawStart = boundaries.left + lineOffset - boxEnd;
-        }
+        ctx.fillRect(
+          drawStart,
+          boundaries.top + boundaries.topOffset + extraTop,
+          drawWidth,
+          drawHeight);
+        boundaries.topOffset += realLineHeight;
       }
-      ctx.fillRect(
-        drawStart,
-        boundaries.top + boundaries.topOffset + extraTop,
-        drawWidth,
-        drawHeight);
-      boundaries.topOffset += realLineHeight;
-    }
-  },
+    },
 
-  /**
+    /**
      * High level function to know the height of the cursor.
      * the currentChar is the one that precedes the cursor
      * Returns fontSize of char at the current cursor
      * Unused from the library, is for the end user
      * @return {Number} Character font size
      */
-  getCurrentCharFontSize: function() {
-    var cp = this._getCurrentCharIndex();
-    return this.getValueOfPropertyAt(cp.l, cp.c, 'fontSize');
-  },
+    getCurrentCharFontSize: function() {
+      var cp = this._getCurrentCharIndex();
+      return this.getValueOfPropertyAt(cp.l, cp.c, 'fontSize');
+    },
 
-  /**
+    /**
      * High level function to know the color of the cursor.
      * the currentChar is the one that precedes the cursor
      * Returns color (fill) of char at the current cursor
@@ -506,29 +508,30 @@ fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lend
      * Unused by the library, is for the end user
      * @return {String | fabric.Gradient | fabric.Pattern} Character color (fill)
      */
-  getCurrentCharColor: function() {
-    var cp = this._getCurrentCharIndex();
-    return this.getValueOfPropertyAt(cp.l, cp.c, 'fill');
-  },
+    getCurrentCharColor: function() {
+      var cp = this._getCurrentCharIndex();
+      return this.getValueOfPropertyAt(cp.l, cp.c, 'fill');
+    },
 
-  /**
+    /**
      * Returns the cursor position for the getCurrent.. functions
      * @private
      */
-  _getCurrentCharIndex: function() {
-    var cursorPosition = this.get2DCursorLocation(this.selectionStart, true),
-        charIndex = cursorPosition.charIndex > 0 ? cursorPosition.charIndex - 1 : 0;
-    return { l: cursorPosition.lineIndex, c: charIndex };
-  }
-});
+    _getCurrentCharIndex: function() {
+      var cursorPosition = this.get2DCursorLocation(this.selectionStart, true),
+          charIndex = cursorPosition.charIndex > 0 ? cursorPosition.charIndex - 1 : 0;
+      return { l: cursorPosition.lineIndex, c: charIndex };
+    }
+  });
 
-/**
+  /**
    * Returns fabric.IText instance from an object representation
    * @static
    * @memberOf fabric.IText
    * @param {Object} object Object to create an instance from
    * @returns {Promise<fabric.IText>}
    */
-fabric.IText.fromObject = function(object) {
-  return fabric.Object._fromObject(fabric.IText, object, 'text');
-};
+  fabric.IText.fromObject = function(object) {
+    return fabric.Object._fromObject(fabric.IText, object, 'text');
+  };
+})(typeof exports !== 'undefined' ? exports : window);

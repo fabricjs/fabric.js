@@ -1,33 +1,34 @@
-var fabric = exports.fabric || (exports.fabric = { }),
-    extend = fabric.util.object.extend,
-    min = fabric.util.array.min,
-    max = fabric.util.array.max,
-    toFixed = fabric.util.toFixed,
-    projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
+(function(global) {
+  var fabric = global.fabric || (global.fabric = { }),
+      extend = fabric.util.object.extend,
+      min = fabric.util.array.min,
+      max = fabric.util.array.max,
+      toFixed = fabric.util.toFixed,
+      projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
 
-/**
+  /**
    * Polyline class
    * @class fabric.Polyline
    * @extends fabric.Object
    * @see {@link fabric.Polyline#initialize} for constructor definition
    */
-fabric.Polyline = fabric.util.createClass(fabric.Object, /** @lends fabric.Polyline.prototype */ {
+  fabric.Polyline = fabric.util.createClass(fabric.Object, /** @lends fabric.Polyline.prototype */ {
 
-  /**
+    /**
      * Type of an object
      * @type String
      * @default
      */
-  type: 'polyline',
+    type: 'polyline',
 
-  /**
+    /**
      * Points array
      * @type Array
      * @default
      */
-  points: null,
+    points: null,
 
-  /**
+    /**
      * WARNING: Feature in progress
      * Calculate the exact bounding box taking in account strokeWidth on acute angles
      * this will be turned to true by default on fabric 6.0
@@ -36,11 +37,11 @@ fabric.Polyline = fabric.util.createClass(fabric.Object, /** @lends fabric.Polyl
      * @type Boolean
      * @default false
      */
-  exactBoundingBox: false,
+    exactBoundingBox: false,
 
-  cacheProperties: fabric.Object.prototype.cacheProperties.concat('points'),
+    cacheProperties: fabric.Object.prototype.cacheProperties.concat('points'),
 
-  /**
+    /**
      * Constructor
      * @param {Array} points Array of points (where each point is an object with x and y)
      * @param {Object} [options] Options object
@@ -59,52 +60,52 @@ fabric.Polyline = fabric.util.createClass(fabric.Object, /** @lends fabric.Polyl
      *   top: 100
      * });
      */
-  initialize: function(points, options) {
-    options = options || {};
-    this.points = points || [];
-    this.callSuper('initialize', options);
-    this._setPositionDimensions(options);
-  },
+    initialize: function(points, options) {
+      options = options || {};
+      this.points = points || [];
+      this.callSuper('initialize', options);
+      this._setPositionDimensions(options);
+    },
 
-  /**
+    /**
      * @private
      */
-  _projectStrokeOnPoints: function () {
-    return projectStrokeOnPoints(this.points, this, true);
-  },
+    _projectStrokeOnPoints: function () {
+      return projectStrokeOnPoints(this.points, this, true);
+    },
 
-  _setPositionDimensions: function(options) {
-    options || (options = {});
-    var calcDim = this._calcDimensions(options), correctLeftTop,
-        correctSize = this.exactBoundingBox ? this.strokeWidth : 0;
-    this.width = calcDim.width - correctSize;
-    this.height = calcDim.height - correctSize;
-    if (!options.fromSVG) {
-      correctLeftTop = this.translateToGivenOrigin(
-        {
-          // this looks bad, but is one way to keep it optional for now.
-          x: calcDim.left - this.strokeWidth / 2 + correctSize / 2,
-          y: calcDim.top - this.strokeWidth / 2 + correctSize / 2
-        },
-        'left',
-        'top',
-        this.originX,
-        this.originY
-      );
-    }
-    if (typeof options.left === 'undefined') {
-      this.left = options.fromSVG ? calcDim.left : correctLeftTop.x;
-    }
-    if (typeof options.top === 'undefined') {
-      this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
-    }
-    this.pathOffset = {
-      x: calcDim.left + this.width / 2 + correctSize / 2,
-      y: calcDim.top + this.height / 2 + correctSize / 2
-    };
-  },
+    _setPositionDimensions: function(options) {
+      options || (options = {});
+      var calcDim = this._calcDimensions(options), correctLeftTop,
+          correctSize = this.exactBoundingBox ? this.strokeWidth : 0;
+      this.width = calcDim.width - correctSize;
+      this.height = calcDim.height - correctSize;
+      if (!options.fromSVG) {
+        correctLeftTop = this.translateToGivenOrigin(
+          {
+            // this looks bad, but is one way to keep it optional for now.
+            x: calcDim.left - this.strokeWidth / 2 + correctSize / 2,
+            y: calcDim.top - this.strokeWidth / 2 + correctSize / 2
+          },
+          'left',
+          'top',
+          this.originX,
+          this.originY
+        );
+      }
+      if (typeof options.left === 'undefined') {
+        this.left = options.fromSVG ? calcDim.left : correctLeftTop.x;
+      }
+      if (typeof options.top === 'undefined') {
+        this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
+      }
+      this.pathOffset = {
+        x: calcDim.left + this.width / 2 + correctSize / 2,
+        y: calcDim.top + this.height / 2 + correctSize / 2
+      };
+    },
 
-  /**
+    /**
      * Calculate the polygon min and max point from points array,
      * returning an object with left, top, width, height to measure the
      * polygon size
@@ -114,113 +115,113 @@ fabric.Polyline = fabric.util.createClass(fabric.Object, /** @lends fabric.Polyl
      * @return {Object} object.height distance between Y coordinates of the polygon topmost and bottommost point
      * @private
      */
-  _calcDimensions: function() {
+    _calcDimensions: function() {
 
-    var points = this.exactBoundingBox ? this._projectStrokeOnPoints() : this.points,
-        minX = min(points, 'x') || 0,
-        minY = min(points, 'y') || 0,
-        maxX = max(points, 'x') || 0,
-        maxY = max(points, 'y') || 0,
-        width = (maxX - minX),
-        height = (maxY - minY);
+      var points = this.exactBoundingBox ? this._projectStrokeOnPoints() : this.points,
+          minX = min(points, 'x') || 0,
+          minY = min(points, 'y') || 0,
+          maxX = max(points, 'x') || 0,
+          maxY = max(points, 'y') || 0,
+          width = (maxX - minX),
+          height = (maxY - minY);
 
-    return {
-      left: minX,
-      top: minY,
-      width: width,
-      height: height,
-    };
-  },
+      return {
+        left: minX,
+        top: minY,
+        width: width,
+        height: height,
+      };
+    },
 
-  /**
+    /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} Object representation of an instance
      */
-  toObject: function(propertiesToInclude) {
-    return extend(this.callSuper('toObject', propertiesToInclude), {
-      points: this.points.concat()
-    });
-  },
+    toObject: function(propertiesToInclude) {
+      return extend(this.callSuper('toObject', propertiesToInclude), {
+        points: this.points.concat()
+      });
+    },
 
-  /* _TO_SVG_START_ */
-  /**
+    /* _TO_SVG_START_ */
+    /**
      * Returns svg representation of an instance
      * @return {Array} an array of strings with the specific svg representation
      * of the instance
      */
-  _toSVG: function() {
-    var points = [], diffX = this.pathOffset.x, diffY = this.pathOffset.y,
-        NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+    _toSVG: function() {
+      var points = [], diffX = this.pathOffset.x, diffY = this.pathOffset.y,
+          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
-    for (var i = 0, len = this.points.length; i < len; i++) {
-      points.push(
-        toFixed(this.points[i].x - diffX, NUM_FRACTION_DIGITS), ',',
-        toFixed(this.points[i].y - diffY, NUM_FRACTION_DIGITS), ' '
-      );
-    }
-    return [
-      '<' + this.type + ' ', 'COMMON_PARTS',
-      'points="', points.join(''),
-      '" />\n'
-    ];
-  },
-  /* _TO_SVG_END_ */
+      for (var i = 0, len = this.points.length; i < len; i++) {
+        points.push(
+          toFixed(this.points[i].x - diffX, NUM_FRACTION_DIGITS), ',',
+          toFixed(this.points[i].y - diffY, NUM_FRACTION_DIGITS), ' '
+        );
+      }
+      return [
+        '<' + this.type + ' ', 'COMMON_PARTS',
+        'points="', points.join(''),
+        '" />\n'
+      ];
+    },
+    /* _TO_SVG_END_ */
 
 
-  /**
+    /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-  commonRender: function(ctx) {
-    var point, len = this.points.length,
-        x = this.pathOffset.x,
-        y = this.pathOffset.y;
+    commonRender: function(ctx) {
+      var point, len = this.points.length,
+          x = this.pathOffset.x,
+          y = this.pathOffset.y;
 
-    if (!len || isNaN(this.points[len - 1].y)) {
-      // do not draw if no points or odd points
-      // NaN comes from parseFloat of a empty string in parser
-      return false;
-    }
-    ctx.beginPath();
-    ctx.moveTo(this.points[0].x - x, this.points[0].y - y);
-    for (var i = 0; i < len; i++) {
-      point = this.points[i];
-      ctx.lineTo(point.x - x, point.y - y);
-    }
-    return true;
-  },
+      if (!len || isNaN(this.points[len - 1].y)) {
+        // do not draw if no points or odd points
+        // NaN comes from parseFloat of a empty string in parser
+        return false;
+      }
+      ctx.beginPath();
+      ctx.moveTo(this.points[0].x - x, this.points[0].y - y);
+      for (var i = 0; i < len; i++) {
+        point = this.points[i];
+        ctx.lineTo(point.x - x, point.y - y);
+      }
+      return true;
+    },
 
-  /**
+    /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-  _render: function(ctx) {
-    if (!this.commonRender(ctx)) {
-      return;
-    }
-    this._renderPaintInOrder(ctx);
-  },
+    _render: function(ctx) {
+      if (!this.commonRender(ctx)) {
+        return;
+      }
+      this._renderPaintInOrder(ctx);
+    },
 
-  /**
+    /**
      * Returns complexity of an instance
      * @return {Number} complexity of this instance
      */
-  complexity: function() {
-    return this.get('points').length;
-  }
-});
+    complexity: function() {
+      return this.get('points').length;
+    }
+  });
 
-/* _FROM_SVG_START_ */
-/**
+  /* _FROM_SVG_START_ */
+  /**
    * List of attribute names to account for when parsing SVG element (used by {@link fabric.Polyline.fromElement})
    * @static
    * @memberOf fabric.Polyline
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolylineElement
    */
-fabric.Polyline.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat();
+  fabric.Polyline.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat();
 
-/**
+  /**
    * Returns fabric.Polyline instance from an SVG element
    * @static
    * @memberOf fabric.Polyline
@@ -228,31 +229,33 @@ fabric.Polyline.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat();
    * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-fabric.Polyline.fromElementGenerator = function(_class) {
-  return function(element, callback, options) {
-    if (!element) {
-      return callback(null);
-    }
-    options || (options = { });
+  fabric.Polyline.fromElementGenerator = function(_class) {
+    return function(element, callback, options) {
+      if (!element) {
+        return callback(null);
+      }
+      options || (options = { });
 
-    var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric[_class].ATTRIBUTE_NAMES);
-    parsedAttributes.fromSVG = true;
-    callback(new fabric[_class](points, extend(parsedAttributes, options)));
+      var points = fabric.parsePointsAttribute(element.getAttribute('points')),
+          parsedAttributes = fabric.parseAttributes(element, fabric[_class].ATTRIBUTE_NAMES);
+      parsedAttributes.fromSVG = true;
+      callback(new fabric[_class](points, extend(parsedAttributes, options)));
+    };
   };
-};
 
-fabric.Polyline.fromElement = fabric.Polyline.fromElementGenerator('Polyline');
+  fabric.Polyline.fromElement = fabric.Polyline.fromElementGenerator('Polyline');
 
-/* _FROM_SVG_END_ */
+  /* _FROM_SVG_END_ */
 
-/**
+  /**
    * Returns fabric.Polyline instance from an object representation
    * @static
    * @memberOf fabric.Polyline
    * @param {Object} object Object to create an instance from
    * @returns {Promise<fabric.Polyline>}
    */
-fabric.Polyline.fromObject = function(object) {
-  return fabric.Object._fromObject(fabric.Polyline, object, 'points');
-};
+  fabric.Polyline.fromObject = function(object) {
+    return fabric.Object._fromObject(fabric.Polyline, object, 'points');
+  };
+
+})(typeof exports !== 'undefined' ? exports : window);

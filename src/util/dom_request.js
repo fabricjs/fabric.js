@@ -1,10 +1,12 @@
-function addParamToUrl(url, param) {
-  return url + (/\?/.test(url) ? '&' : '?') + param;
-}
+(function(global) {
+  var fabric = global.fabric;
+  function addParamToUrl(url, param) {
+    return url + (/\?/.test(url) ? '&' : '?') + param;
+  }
 
-function emptyFn() { }
+  function emptyFn() { }
 
-/**
+  /**
    * Cross-browser abstraction for sending XMLHttpRequest
    * @memberOf fabric.util
    * @deprecated this has to go away, we can use a modern browser method to do the same.
@@ -16,37 +18,38 @@ function emptyFn() { }
    * @param {Function} options.onComplete Callback to invoke when request is completed
    * @return {XMLHttpRequest} request
    */
-function request(url, options) {
-  options || (options = { });
+  function request(url, options) {
+    options || (options = { });
 
-  var method = options.method ? options.method.toUpperCase() : 'GET',
-      onComplete = options.onComplete || function() { },
-      xhr = new fabric.window.XMLHttpRequest(),
-      body = options.body || options.parameters;
+    var method = options.method ? options.method.toUpperCase() : 'GET',
+        onComplete = options.onComplete || function() { },
+        xhr = new fabric.window.XMLHttpRequest(),
+        body = options.body || options.parameters;
 
-  /** @ignore */
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState === 4) {
-      onComplete(xhr);
-      xhr.onreadystatechange = emptyFn;
+    /** @ignore */
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        onComplete(xhr);
+        xhr.onreadystatechange = emptyFn;
+      }
+    };
+
+    if (method === 'GET') {
+      body = null;
+      if (typeof options.parameters === 'string') {
+        url = addParamToUrl(url, options.parameters);
+      }
     }
-  };
 
-  if (method === 'GET') {
-    body = null;
-    if (typeof options.parameters === 'string') {
-      url = addParamToUrl(url, options.parameters);
+    xhr.open(method, url, true);
+
+    if (method === 'POST' || method === 'PUT') {
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     }
+
+    xhr.send(body);
+    return xhr;
   }
 
-  xhr.open(method, url, true);
-
-  if (method === 'POST' || method === 'PUT') {
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  }
-
-  xhr.send(body);
-  return xhr;
-}
-
-fabric.util.request = request;
+  fabric.util.request = request;
+})(typeof exports !== 'undefined' ? exports : window);

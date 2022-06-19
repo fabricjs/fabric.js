@@ -1,5 +1,4 @@
-(function () {
-
+(function (global) {
   /**
    *
    * @typedef {Object} AnimationOptions
@@ -29,7 +28,7 @@
    * @memberof fabric
    * @type {AnimationContext[]}
    */
-  var RUNNING_ANIMATIONS = [];
+  var fabric = global.fabric, RUNNING_ANIMATIONS = [];
   fabric.util.object.extend(RUNNING_ANIMATIONS, {
 
     /**
@@ -262,4 +261,4 @@
   fabric.util.requestAnimFrame = requestAnimFrame;
   fabric.util.cancelAnimFrame = cancelAnimFrame;
   fabric.runningAnimations = RUNNING_ANIMATIONS;
-})();
+})(typeof exports !== 'undefined' ? exports : window);

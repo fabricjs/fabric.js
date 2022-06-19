@@ -1,5 +1,5 @@
-(function () {
-
+(function (global) {
+  var fabric = global.fabric;
   /**
    * Cross-browser wrapper for setting element's style
    * @memberOf fabric.util
@@ -67,4 +67,4 @@
 
   fabric.util.setStyle = setStyle;
 
-})();
+})(typeof exports !== 'undefined' ? exports : window);

@@ -1,3 +1,4 @@
 var all = require('./dist/fabric.js');
 
-console.log(all);
+const fabric = all.fabric;
+console.log(fabric.version)

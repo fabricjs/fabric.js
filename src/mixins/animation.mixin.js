@@ -1,226 +1,229 @@
-fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
+(function (global) {
+  var fabric = global.fabric;
+  fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
-  /**
-   * Animation duration (in ms) for fx* methods
-   * @type Number
-   * @default
-   */
-  FX_DURATION: 500,
+    /**
+     * Animation duration (in ms) for fx* methods
+     * @type Number
+     * @default
+     */
+    FX_DURATION: 500,
 
-  /**
-   * Centers object horizontally with animation.
-   * @param {fabric.Object} object Object to center
-   * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
-   * @param {Function} [callbacks.onComplete] Invoked on completion
-   * @param {Function} [callbacks.onChange] Invoked on every step of animation
-   * @return {fabric.AnimationContext} context
-   */
-  fxCenterObjectH: function (object, callbacks) {
-    callbacks = callbacks || { };
+    /**
+     * Centers object horizontally with animation.
+     * @param {fabric.Object} object Object to center
+     * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
+     * @param {Function} [callbacks.onComplete] Invoked on completion
+     * @param {Function} [callbacks.onChange] Invoked on every step of animation
+     * @return {fabric.AnimationContext} context
+     */
+    fxCenterObjectH: function (object, callbacks) {
+      callbacks = callbacks || { };
 
-    var empty = function() { },
-        onComplete = callbacks.onComplete || empty,
-        onChange = callbacks.onChange || empty,
-        _this = this;
+      var empty = function() { },
+          onComplete = callbacks.onComplete || empty,
+          onChange = callbacks.onChange || empty,
+          _this = this;
 
-    return fabric.util.animate({
-      target: this,
-      startValue: object.getX(),
-      endValue: this.getCenterPoint().x,
-      duration: this.FX_DURATION,
-      onChange: function(value) {
-        object.setX(value);
-        _this.requestRenderAll();
-        onChange();
-      },
-      onComplete: function() {
-        object.setCoords();
-        onComplete();
-      }
-    });
-  },
+      return fabric.util.animate({
+        target: this,
+        startValue: object.getX(),
+        endValue: this.getCenterPoint().x,
+        duration: this.FX_DURATION,
+        onChange: function(value) {
+          object.setX(value);
+          _this.requestRenderAll();
+          onChange();
+        },
+        onComplete: function() {
+          object.setCoords();
+          onComplete();
+        }
+      });
+    },
 
-  /**
-   * Centers object vertically with animation.
-   * @param {fabric.Object} object Object to center
-   * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
-   * @param {Function} [callbacks.onComplete] Invoked on completion
-   * @param {Function} [callbacks.onChange] Invoked on every step of animation
-   * @return {fabric.AnimationContext} context
-   */
-  fxCenterObjectV: function (object, callbacks) {
-    callbacks = callbacks || { };
+    /**
+     * Centers object vertically with animation.
+     * @param {fabric.Object} object Object to center
+     * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
+     * @param {Function} [callbacks.onComplete] Invoked on completion
+     * @param {Function} [callbacks.onChange] Invoked on every step of animation
+     * @return {fabric.AnimationContext} context
+     */
+    fxCenterObjectV: function (object, callbacks) {
+      callbacks = callbacks || { };
 
-    var empty = function() { },
-        onComplete = callbacks.onComplete || empty,
-        onChange = callbacks.onChange || empty,
-        _this = this;
+      var empty = function() { },
+          onComplete = callbacks.onComplete || empty,
+          onChange = callbacks.onChange || empty,
+          _this = this;
 
-    return fabric.util.animate({
-      target: this,
-      startValue: object.getY(),
-      endValue: this.getCenterPoint().y,
-      duration: this.FX_DURATION,
-      onChange: function(value) {
-        object.setY(value);
-        _this.requestRenderAll();
-        onChange();
-      },
-      onComplete: function() {
-        object.setCoords();
-        onComplete();
-      }
-    });
-  },
+      return fabric.util.animate({
+        target: this,
+        startValue: object.getY(),
+        endValue: this.getCenterPoint().y,
+        duration: this.FX_DURATION,
+        onChange: function(value) {
+          object.setY(value);
+          _this.requestRenderAll();
+          onChange();
+        },
+        onComplete: function() {
+          object.setCoords();
+          onComplete();
+        }
+      });
+    },
 
-  /**
-   * Same as `fabric.Canvas#remove` but animated
-   * @param {fabric.Object} object Object to remove
-   * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
-   * @param {Function} [callbacks.onComplete] Invoked on completion
-   * @param {Function} [callbacks.onChange] Invoked on every step of animation
-   * @return {fabric.AnimationContext} context
-   */
-  fxRemove: function (object, callbacks) {
-    callbacks = callbacks || { };
+    /**
+     * Same as `fabric.Canvas#remove` but animated
+     * @param {fabric.Object} object Object to remove
+     * @param {Object} [callbacks] Callbacks object with optional "onComplete" and/or "onChange" properties
+     * @param {Function} [callbacks.onComplete] Invoked on completion
+     * @param {Function} [callbacks.onChange] Invoked on every step of animation
+     * @return {fabric.AnimationContext} context
+     */
+    fxRemove: function (object, callbacks) {
+      callbacks = callbacks || { };
 
-    var empty = function() { },
-        onComplete = callbacks.onComplete || empty,
-        onChange = callbacks.onChange || empty,
-        _this = this;
+      var empty = function() { },
+          onComplete = callbacks.onComplete || empty,
+          onChange = callbacks.onChange || empty,
+          _this = this;
 
-    return fabric.util.animate({
-      target: this,
-      startValue: object.opacity,
-      endValue: 0,
-      duration: this.FX_DURATION,
-      onChange: function(value) {
-        object.set('opacity', value);
-        _this.requestRenderAll();
-        onChange();
-      },
-      onComplete: function () {
-        _this.remove(object);
-        onComplete();
-      }
-    });
-  }
-});
-
-fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
-  /**
-   * Animates object's properties
-   * @param {String|Object} property Property to animate (if string) or properties to animate (if object)
-   * @param {Number|Object} value Value to animate property to (if string was given first) or options object
-   * @return {fabric.Object} thisArg
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#animation}
-   * @return {fabric.AnimationContext | fabric.AnimationContext[]} animation context (or an array if passed multiple properties)
-   *
-   * As object — multiple properties
-   *
-   * object.animate({ left: ..., top: ... });
-   * object.animate({ left: ..., top: ... }, { duration: ... });
-   *
-   * As string — one property
-   *
-   * object.animate('left', ...);
-   * object.animate('left', { duration: ... });
-   *
-   */
-  animate: function () {
-    if (arguments[0] && typeof arguments[0] === 'object') {
-      var propsToAnimate = [], prop, skipCallbacks, out = [];
-      for (prop in arguments[0]) {
-        propsToAnimate.push(prop);
-      }
-      for (var i = 0, len = propsToAnimate.length; i < len; i++) {
-        prop = propsToAnimate[i];
-        skipCallbacks = i !== len - 1;
-        out.push(this._animate(prop, arguments[0][prop], arguments[1], skipCallbacks));
-      }
-      return out;
+      return fabric.util.animate({
+        target: this,
+        startValue: object.opacity,
+        endValue: 0,
+        duration: this.FX_DURATION,
+        onChange: function(value) {
+          object.set('opacity', value);
+          _this.requestRenderAll();
+          onChange();
+        },
+        onComplete: function () {
+          _this.remove(object);
+          onComplete();
+        }
+      });
     }
-    else {
-      return this._animate.apply(this, arguments);
-    }
-  },
+  });
 
-  /**
-   * @private
-   * @param {String} property Property to animate
-   * @param {String} to Value to animate to
-   * @param {Object} [options] Options object
-   * @param {Boolean} [skipCallbacks] When true, callbacks like onchange and oncomplete are not invoked
-   */
-  _animate: function(property, to, options, skipCallbacks) {
-    var _this = this, propPair;
-
-    to = to.toString();
-
-    options = Object.assign({}, options);
-
-    if (~property.indexOf('.')) {
-      propPair = property.split('.');
-    }
-
-    var propIsColor =
-      _this.colorProperties.indexOf(property) > -1 ||
-      (propPair && _this.colorProperties.indexOf(propPair[1]) > -1);
-
-    var currentValue = propPair
-      ? this.get(propPair[0])[propPair[1]]
-      : this.get(property);
-
-    if (!('from' in options)) {
-      options.from = currentValue;
-    }
-
-    if (!propIsColor) {
-      if (~to.indexOf('=')) {
-        to = currentValue + parseFloat(to.replace('=', ''));
+  fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
+    /**
+     * Animates object's properties
+     * @param {String|Object} property Property to animate (if string) or properties to animate (if object)
+     * @param {Number|Object} value Value to animate property to (if string was given first) or options object
+     * @return {fabric.Object} thisArg
+     * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#animation}
+     * @return {fabric.AnimationContext | fabric.AnimationContext[]} animation context (or an array if passed multiple properties)
+     *
+     * As object — multiple properties
+     *
+     * object.animate({ left: ..., top: ... });
+     * object.animate({ left: ..., top: ... }, { duration: ... });
+     *
+     * As string — one property
+     *
+     * object.animate('left', ...);
+     * object.animate('left', { duration: ... });
+     *
+     */
+    animate: function () {
+      if (arguments[0] && typeof arguments[0] === 'object') {
+        var propsToAnimate = [], prop, skipCallbacks, out = [];
+        for (prop in arguments[0]) {
+          propsToAnimate.push(prop);
+        }
+        for (var i = 0, len = propsToAnimate.length; i < len; i++) {
+          prop = propsToAnimate[i];
+          skipCallbacks = i !== len - 1;
+          out.push(this._animate(prop, arguments[0][prop], arguments[1], skipCallbacks));
+        }
+        return out;
       }
       else {
-        to = parseFloat(to);
+        return this._animate.apply(this, arguments);
       }
-    }
+    },
 
-    var _options = {
-      target: this,
-      startValue: options.from,
-      endValue: to,
-      byValue: options.by,
-      easing: options.easing,
-      duration: options.duration,
-      abort: options.abort && function(value, valueProgress, timeProgress) {
-        return options.abort.call(_this, value, valueProgress, timeProgress);
-      },
-      onChange: function (value, valueProgress, timeProgress) {
-        if (propPair) {
-          _this[propPair[0]][propPair[1]] = value;
+    /**
+     * @private
+     * @param {String} property Property to animate
+     * @param {String} to Value to animate to
+     * @param {Object} [options] Options object
+     * @param {Boolean} [skipCallbacks] When true, callbacks like onchange and oncomplete are not invoked
+     */
+    _animate: function(property, to, options, skipCallbacks) {
+      var _this = this, propPair;
+
+      to = to.toString();
+
+      options = Object.assign({}, options);
+
+      if (~property.indexOf('.')) {
+        propPair = property.split('.');
+      }
+
+      var propIsColor =
+        _this.colorProperties.indexOf(property) > -1 ||
+        (propPair && _this.colorProperties.indexOf(propPair[1]) > -1);
+
+      var currentValue = propPair
+        ? this.get(propPair[0])[propPair[1]]
+        : this.get(property);
+
+      if (!('from' in options)) {
+        options.from = currentValue;
+      }
+
+      if (!propIsColor) {
+        if (~to.indexOf('=')) {
+          to = currentValue + parseFloat(to.replace('=', ''));
         }
         else {
-          _this.set(property, value);
+          to = parseFloat(to);
         }
-        if (skipCallbacks) {
-          return;
-        }
-        options.onChange && options.onChange(value, valueProgress, timeProgress);
-      },
-      onComplete: function (value, valueProgress, timeProgress) {
-        if (skipCallbacks) {
-          return;
-        }
-
-        _this.setCoords();
-        options.onComplete && options.onComplete(value, valueProgress, timeProgress);
       }
-    };
 
-    if (propIsColor) {
-      return fabric.util.animateColor(_options.startValue, _options.endValue, _options.duration, _options);
+      var _options = {
+        target: this,
+        startValue: options.from,
+        endValue: to,
+        byValue: options.by,
+        easing: options.easing,
+        duration: options.duration,
+        abort: options.abort && function(value, valueProgress, timeProgress) {
+          return options.abort.call(_this, value, valueProgress, timeProgress);
+        },
+        onChange: function (value, valueProgress, timeProgress) {
+          if (propPair) {
+            _this[propPair[0]][propPair[1]] = value;
+          }
+          else {
+            _this.set(property, value);
+          }
+          if (skipCallbacks) {
+            return;
+          }
+          options.onChange && options.onChange(value, valueProgress, timeProgress);
+        },
+        onComplete: function (value, valueProgress, timeProgress) {
+          if (skipCallbacks) {
+            return;
+          }
+
+          _this.setCoords();
+          options.onComplete && options.onComplete(value, valueProgress, timeProgress);
+        }
+      };
+
+      if (propIsColor) {
+        return fabric.util.animateColor(_options.startValue, _options.endValue, _options.duration, _options);
+      }
+      else {
+        return fabric.util.animate(_options);
+      }
     }
-    else {
-      return fabric.util.animate(_options);
-    }
-  }
-});
+  });
+})(typeof exports !== 'undefined' ? exports : window);
