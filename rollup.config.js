@@ -7,7 +7,7 @@ export default {
     {
         file: './dist/fabric.js',
         name: 'fabric',
-        format: 'iife',
+        format: 'cjs',
     },
     // {
     //     file: './dist/fabric.min.js',
