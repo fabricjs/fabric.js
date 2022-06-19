@@ -614,22 +614,57 @@
     });
   });
 
-  ['mouseout', 'mouseenter'].forEach(function(eventType) {
-    QUnit.test('Fabric event fired - ' + eventType, function(assert) {
-      var eventname = eventType.slice(0, 5) + ':' + eventType.slice(5);
-      if (eventType === 'mouseenter') {
-        eventname = 'mouse:over';
-      }
-      var counter = 0;
-      var c = new fabric.Canvas();
-      c.on(eventname, function() {
-        counter++;
-      });
-      var event = fabric.document.createEvent('HTMLEvents');
-      event.initEvent(eventType, true, true);
-      c.upperCanvasEl.dispatchEvent(event);
-      assert.equal(counter, 1, eventname + ' fabric event fired');
+  QUnit.test('mouseenter (mouse:over)', function (assert) {
+    var eventname = 'mouse:over'
+    var counter = 0;
+    var c = new fabric.Canvas();
+    c.on(eventname, function () {
+      counter++;
     });
+    var event = fabric.document.createEvent('HTMLEvents');
+    event.initEvent('mouseenter', true, true);
+    c.upperCanvasEl.dispatchEvent(event);
+    assert.equal(counter, 1, eventname + ' fabric event fired');
+  });
+
+  QUnit.test('mouseout', function (assert) {
+    var eventName = 'mouseout';
+    var canvasEventName = 'mouse:out';
+    var c = new fabric.Canvas();
+    var o1 = new fabric.Object();
+    var o2 = new fabric.Object();
+    var o3 = new fabric.Object();
+    var control = [];
+    var targetControl = [];
+    [o1, o2, o3].forEach(target => {
+      target.on(canvasEventName.replace(':', ''), (ev) => {
+        targetControl.push(target);
+      });
+    });
+    canvas.add(o1, o2, o3);
+    c.on(canvasEventName, function (ev) {
+      control.push(ev);
+    });
+    var event = fabric.document.createEvent('HTMLEvents');
+    event.initEvent(eventName, true, true);
+
+    //  with targets
+    c._hoveredTarget = o3;
+    c._hoveredTargets = [o2, o1];
+    c.upperCanvasEl.dispatchEvent(event);
+    assert.equal(c._hoveredTarget, null, 'should clear `_hoveredTarget` ref');
+    assert.deepEqual(c._hoveredTargets, [], 'should clear `_hoveredTargets` ref');
+    const expected = [o3, o2, o1];
+    assert.deepEqual(control.map(ev => ev.target), expected, 'should equal control');
+    assert.deepEqual(targetControl, expected, 'should equal target control');
+
+    //  without targets
+    control = [];
+    targetControl = [];
+    c.upperCanvasEl.dispatchEvent(event);
+    assert.equal(control.length, 1, 'should have fired once');
+    assert.equal(control[0].target, null, 'no target should be referenced');
+    assert.deepEqual(targetControl, [], 'no target should be referenced');
   });
 
   QUnit.test('mouseover and mouseout with subtarget check', function(assert) {
