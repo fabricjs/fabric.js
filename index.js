@@ -1,5 +1,4 @@
 import { fabric } from './HEADER.js';
-import './src/globalFabric.js'; // optional for global object. default OFF
 // import './lib/event.js'), // optional gestures
 import './src/mixins/observable.mixin.js';
 import './src/mixins/collection.mixin.js';
@@ -100,7 +99,3 @@ import './src/mixins/default_controls.js'; // optional interaction
 if (typeof window !== 'undefined') {
   window.fabric = fabric;
 }
-
-export {
-  fabric,
-};
