@@ -69,6 +69,15 @@
     selectionEnd: 0,
 
     /**
+     * Selection direction relative to initial selection start.
+     * Same as HTMLTextareaElement#selectionDirection
+     * @typedef {'forward' | 'backward' | 'none'} SelectionDirection
+     * @type {SelectionDirection}
+     * @default
+     */
+    selectionDirection: 'forward',
+
+    /**
      * Color of text selection
      * @type String
      * @default
@@ -217,6 +226,45 @@
     setSelectionEnd: function(index) {
       index = Math.min(index, this.text.length);
       this._updateAndFire('selectionEnd', index);
+    },
+
+    /**
+     * {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/setSelectionRange}
+     * @param {number} selectionStart 
+     * @param {number} selectionEnd 
+     * @param {SelectionDirection} [selectionDirection]
+     */
+    setSelectionRange: function (selectionStart, selectionEnd, selectionDirection) {
+      this._setSelectionRange(selectionStart, selectionEnd, selectionDirection || 'none');
+    },
+
+    /**
+     * {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/setSelectionRange}
+     * @private
+     * @param {number} selectionStart 
+     * @param {number} selectionEnd 
+     * @param {SelectionDirection|false} [selectionDirection] pass `false` to preserve current `selectionDirection` value
+     */
+    _setSelectionRange: function (selectionStart, selectionEnd, selectionDirection) {
+      selectionStart = Math.max(selectionStart, 0);
+      selectionEnd = Math.min(selectionEnd, this.text.length);
+      if (selectionStart > selectionEnd) {
+        //  mimic HTMLTextareaElement behavior
+        selectionStart = selectionEnd;
+      }
+      var changed = selectionStart !== this.selectionStart || selectionEnd !== this.selectionEnd;
+      this.selectionStart = selectionStart;
+      this.selectionEnd = selectionEnd;
+      if (selectionDirection !== false) {
+        //  mimic HTMLTextareaElement behavior
+        this.selectionDirection = selectionDirection === 'backward' ? 'backward' : 'forward';
+        //  needed for future calcualtions of `selectionDirection`
+        this.__selectionStartOrigin = this.selectionDirection === 'forward' ?
+          this.selectionStart :
+          this.selectionEnd;
+      }
+      changed && this._fireSelectionChanged();
+      this._updateTextarea();
     },
 
     /**
@@ -371,14 +419,30 @@
         left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
       };
       if (this.direction === 'rtl') {
-        if (this.textAlign === 'right' || this.textAlign === 'justify' || this.textAlign === 'justify-right') {
-          boundaries.left *= -1;
-        }
-        else if (this.textAlign === 'left' || this.textAlign === 'justify-left') {
-          boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
-        }
-        else if (this.textAlign === 'center' || this.textAlign === 'justify-center') {
-          boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+        switch (this.textAlign) {
+          case 'start':
+          case 'justify':
+          case 'justify-start':
+            boundaries.left *= -1;
+            break;
+          case 'end':
+          case 'justify-end':
+            boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+            break;
+          case 'left':
+          case 'justify-left':
+            boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+            break;
+          case 'center':
+          case 'justify-center':
+            boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+            break;
+          case 'right':
+          case 'justify-right':
+            boundaries.left *= -1;
+            break;
+          default:
+            break;
         }
       }
       this.cursorOffsetCache = boundaries;
@@ -468,14 +532,30 @@
           ctx.fillStyle = this.selectionColor;
         }
         if (this.direction === 'rtl') {
-          if (this.textAlign === 'right' || this.textAlign === 'justify' || this.textAlign === 'justify-right') {
-            drawStart = this.width - drawStart - drawWidth;
-          }
-          else if (this.textAlign === 'left' || this.textAlign === 'justify-left') {
-            drawStart = boundaries.left + lineOffset - boxEnd;
-          }
-          else if (this.textAlign === 'center' || this.textAlign === 'justify-center') {
-            drawStart = boundaries.left + lineOffset - boxEnd;
+          switch (this.textAlign) {
+            case 'start':
+            case 'justify':
+            case 'justify-start':
+              drawStart = this.width - drawStart - drawWidth;
+              break;
+            case 'end':
+            case 'justify-end':
+              drawStart = boundaries.left + lineOffset - boxEnd;
+              break;
+            case 'left':
+            case 'justify-left':
+              drawStart = boundaries.left + lineOffset - boxEnd;
+              break;
+            case 'center':
+            case 'justify-center':
+              drawStart = boundaries.left + lineOffset - boxEnd;
+              break;
+            case 'right':
+            case 'justify-right':
+              drawStart = this.width - drawStart - drawWidth;
+              break;
+            default:
+              break;
           }
         }
         ctx.fillRect(

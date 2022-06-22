@@ -122,12 +122,12 @@
     linethrough:       false,
 
     /**
-     * Text alignment. Possible values: "left", "center", "right", "justify",
-     * "justify-left", "justify-center" or "justify-right".
-     * @type String
+     * Text alignment.
+     * @typedef {'start' | 'center' | 'end' | 'left' | 'right' | 'justify' | 'justify-start' | 'justify-center' | 'justify-end' | 'justify-left' | 'justify-right'} TextAlign
+     * @type {TextAlign}
      * @default
      */
-    textAlign:            'left',
+    textAlign:            'start',
 
     /**
      * Font style . Possible values: "", "normal", "italic" or "oblique".
@@ -235,10 +235,10 @@
     /**
      * Which side of the path the text should be drawn on.
      * Only used when text has a path
-     * @type {String} 'left|right'
+     * @type {'left'|'right'|'start'|'end'}
      * @default
      */
-    pathSide:               'left',
+    pathSide:               'start',
 
     /**
      * How text is aligned to the path. This property determines
@@ -307,7 +307,6 @@
     /**
      * WARNING: EXPERIMENTAL. NOT SUPPORTED YET
      * determine the direction of the text.
-     * This has to be set manually together with textAlign and originX for proper
      * experience.
      * some interesting link for the future
      * https://www.w3.org/International/questions/qa-bidi-unicode-controls
@@ -376,6 +375,35 @@
       this.initDimensions();
       this.setCoords();
       this.setupState({ propertySet: '_dimensionAffectingProps' });
+    },
+
+    /**
+     *
+     * @param {TextAlign} directive
+     * @param {boolean} rtl
+     * @returns {TextAlign}
+     */
+    resolveDirectionDirective: function (directive, rtl) {
+      switch (directive) {
+        case 'start':
+          return rtl ? 'right' : 'left';
+        case 'end':
+          return rtl ? 'left' : 'right';
+        case 'justify-start':
+          return rtl ? 'justify-right' : 'justify-left';
+        case 'justify-end':
+          return rtl ? 'justify-left' : 'justify-right';
+        default:
+          return directive;
+      }
+    },
+
+    /**
+     * @private
+     * @returns {boolean}
+     */
+    _isPathReversed: function () {
+      return this.resolveDirectionDirective(this.pathSide, this.direction === 'rtl') === 'right';
     },
 
     /**
@@ -805,7 +833,8 @@
       var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
           graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length),
           positionInPath = 0, startingPoint, totalPathLength, path = this.path,
-          reverse = this.pathSide === 'right';
+          reverse = this._isPathReversed(),
+          textAlign = this.textAlign;
 
       this.__charBounds[lineIndex] = lineBounds;
       for (i = 0; i < line.length; i++) {
@@ -828,17 +857,31 @@
         startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
         startingPoint.x += path.pathOffset.x;
         startingPoint.y += path.pathOffset.y;
-        switch (this.textAlign) {
+        var size = totalPathLength - width;
+        switch (textAlign) {
+          case 'start':
+          case 'justify':
+          case 'justify-start':
+            positionInPath = 0;
+            break;
+          case 'end':
+          case 'justify-end':
+            positionInPath = size;
+            break;
           case 'left':
-            positionInPath = reverse ? (totalPathLength - width) : 0;
+          case 'justify-left':
+            positionInPath = reverse ? size : 0;
             break;
           case 'center':
-            positionInPath = (totalPathLength - width) / 2;
+          case 'justify-center':
+            positionInPath = size / 2;
             break;
           case 'right':
-            positionInPath = reverse ? 0 : (totalPathLength - width);
+          case 'justify-right':
+            positionInPath = reverse ? 0 : size;
             break;
-          //todo - add support for justify
+          default:
+            break;
         }
         positionInPath += this.pathStartOffset * (reverse ? -1 : 1);
         for (i = reverse ? line.length - 1 : 0;
@@ -876,7 +919,7 @@
       var info = fabric.util.getPointOnPath(path.path, centerPosition, path.segmentsInfo);
       graphemeInfo.renderLeft = info.x - startingPoint.x;
       graphemeInfo.renderTop = info.y - startingPoint.y;
-      graphemeInfo.angle = info.angle + (this.pathSide ===  'right' ? Math.PI : 0);
+      graphemeInfo.angle = info.angle + (this._isPathReversed() ? Math.PI : 0);
     },
 
     /**
@@ -1295,37 +1338,35 @@
      */
     _getLineLeftOffset: function(lineIndex) {
       var lineWidth = this.getLineWidth(lineIndex),
-          lineDiff = this.width - lineWidth, textAlign = this.textAlign, direction = this.direction,
+          lineDiff = this.width - lineWidth, textAlign = this.textAlign, rtl = this.direction === 'rtl',
           isEndOfWrapping, leftOffset = 0, isEndOfWrapping = this.isEndOfWrapping(lineIndex);
-      if (textAlign === 'justify'
-        || (textAlign === 'justify-center' && !isEndOfWrapping)
-        || (textAlign === 'justify-right' && !isEndOfWrapping)
-        || (textAlign === 'justify-left' && !isEndOfWrapping)
-      ) {
+      if (textAlign === 'justify' || (textAlign.startsWith('justify') && !isEndOfWrapping)) {
         return 0;
       }
-      if (textAlign === 'center') {
-        leftOffset = lineDiff / 2;
-      }
-      if (textAlign === 'right') {
-        leftOffset = lineDiff;
-      }
-      if (textAlign === 'justify-center') {
-        leftOffset = lineDiff / 2;
-      }
-      if (textAlign === 'justify-right') {
-        leftOffset = lineDiff;
-      }
-      if (direction === 'rtl') {
-        if (textAlign === 'right' || textAlign === 'justify' || textAlign === 'justify-right') {
+      switch (textAlign) {
+        case 'start':
+        case 'justify':
+        case 'justify-start':
           leftOffset = 0;
-        }
-        else if (textAlign === 'left' || textAlign === 'justify-left') {
-          leftOffset = -lineDiff;
-        }
-        else if (textAlign === 'center' || textAlign === 'justify-center') {
-          leftOffset = -lineDiff / 2;
-        }
+          break;
+        case 'end':
+        case 'justify-end':
+          leftOffset = rtl ? -lineDiff : lineDiff;
+          break;
+        case 'left':
+        case 'justify-left':
+          leftOffset = rtl ? -lineDiff : 0;
+          break;
+        case 'center':
+        case 'justify-center':
+          leftOffset = rtl ? -lineDiff / 2 : lineDiff / 2;
+          break;
+        case 'right':
+        case 'justify-right':
+          leftOffset = rtl ? 0 : lineDiff;
+          break;
+        default:
+          break;
       }
       return leftOffset;
     },

@@ -198,7 +198,7 @@
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findWordBoundaryLeft: function(startFrom) {
+    findWordBoundaryStart: function(startFrom) {
       var offset = 0, index = startFrom - 1;
 
       // remove space before cursor first
@@ -213,7 +213,7 @@
         index--;
       }
 
-      return startFrom - offset;
+      return Math.max(startFrom - offset, 0);
     },
 
     /**
@@ -221,7 +221,7 @@
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findWordBoundaryRight: function(startFrom) {
+    findWordBoundaryEnd: function(startFrom) {
       var offset = 0, index = startFrom;
 
       // remove space after cursor first
@@ -244,7 +244,7 @@
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findLineBoundaryLeft: function(startFrom) {
+    findLineBoundaryStart: function(startFrom) {
       var offset = 0, index = startFrom - 1;
 
       while (!/\n/.test(this._text[index]) && index > -1) {
@@ -252,7 +252,7 @@
         index--;
       }
 
-      return startFrom - offset;
+      return Math.max(startFrom - offset, 0);
     },
 
     /**
@@ -260,7 +260,7 @@
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findLineBoundaryRight: function(startFrom) {
+    findLineBoundaryEnd: function(startFrom) {
       var offset = 0, index = startFrom;
 
       while (!/\n/.test(this._text[index]) && index < this._text.length) {
@@ -318,8 +318,8 @@
      */
     selectLine: function(selectionStart) {
       selectionStart = selectionStart || this.selectionStart;
-      var newSelectionStart = this.findLineBoundaryLeft(selectionStart),
-          newSelectionEnd = this.findLineBoundaryRight(selectionStart);
+      var newSelectionStart = this.findLineBoundaryStart(selectionStart),
+          newSelectionEnd = this.findLineBoundaryEnd(selectionStart);
 
       this.selectionStart = newSelectionStart;
       this.selectionEnd = newSelectionEnd;
@@ -395,19 +395,19 @@
           currentStart = this.selectionStart,
           currentEnd = this.selectionEnd;
       if (
-        (newSelectionStart !== this.__selectionStartOnMouseDown || currentStart === currentEnd)
+        (newSelectionStart !== this.__selectionStartOrigin || currentStart === currentEnd)
         &&
         (currentStart === newSelectionStart || currentEnd === newSelectionStart)
       ) {
         return;
       }
-      if (newSelectionStart > this.__selectionStartOnMouseDown) {
-        this.selectionStart = this.__selectionStartOnMouseDown;
+      if (newSelectionStart > this.__selectionStartOrigin) {
+        this.selectionStart = this.__selectionStartOrigin;
         this.selectionEnd = newSelectionStart;
       }
       else {
         this.selectionStart = newSelectionStart;
-        this.selectionEnd = this.__selectionStartOnMouseDown;
+        this.selectionEnd = this.__selectionStartOrigin;
       }
       if (this.selectionStart !== currentStart || this.selectionEnd !== currentEnd) {
         this.restartCursorIfNeeded();
@@ -453,11 +453,15 @@
       var smallerTextStart = _text.slice(0, start),
           graphemeStart = smallerTextStart.join('').length;
       if (start === end) {
-        return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
+        return { selectionStart: graphemeStart, selectionEnd: graphemeStart, selectionDirection: 'forward' };
       }
       var smallerTextEnd = _text.slice(start, end),
           graphemeEnd = smallerTextEnd.join('').length;
-      return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
+      return {
+        selectionStart: graphemeStart,
+        selectionEnd: graphemeStart + graphemeEnd,
+        selectionDirection: graphemeStart < this.__selectionStartOrigin ? 'backward' : 'forward'
+      };
     },
 
     /**
@@ -470,8 +474,12 @@
       }
       if (!this.inCompositionMode) {
         var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd, this._text);
-        this.hiddenTextarea.selectionStart = newSelection.selectionStart;
-        this.hiddenTextarea.selectionEnd = newSelection.selectionEnd;
+        this.hiddenTextarea.setSelectionRange(
+          newSelection.selectionStart,
+          newSelection.selectionEnd,
+          newSelection.selectionDirection
+        );
+        this.selectionDirection = newSelection.selectionDirection;
       }
       this.updateTextareaPosition();
     },
@@ -495,6 +503,7 @@
       if (!this.inCompositionMode) {
         this.selectionStart = newSelection.selectionStart;
       }
+      this.selectionDirection = newSelection.selectionDirection;
       this.updateTextareaPosition();
     },
 
@@ -898,14 +907,14 @@
         if (end === start) {
           this._selectionDirection = 'left';
         }
-        else if (this._selectionDirection === 'right') {
+        else if (this.selectionDirection === 'forward') {
           this._selectionDirection = 'left';
           this.selectionEnd = start;
         }
         this.selectionStart = newSelection;
       }
       else if (newSelection > start && newSelection < end) {
-        if (this._selectionDirection === 'right') {
+        if (this.selectionDirection === 'forward') {
           this.selectionEnd = newSelection;
         }
         else {
@@ -917,7 +926,7 @@
         if (end === start) {
           this._selectionDirection = 'right';
         }
-        else if (this._selectionDirection === 'left') {
+        else if (this.selectionDirection === 'backward') {
           this._selectionDirection = 'right';
           this.selectionStart = end;
         }
