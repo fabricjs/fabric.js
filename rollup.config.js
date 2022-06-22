@@ -1,4 +1,5 @@
 import { terser } from 'rollup-plugin-terser';
+import ts from "rollup-plugin-ts";
 
 // rollup.config.js
 export default {
@@ -16,4 +17,9 @@ export default {
         plugins: [terser()],
     },
   ],
+  plugins: [
+		ts({
+			/* Plugin options */
+		})
+	]
 };
