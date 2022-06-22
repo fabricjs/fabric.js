@@ -67,7 +67,6 @@
     "jsdom": "^19.0.0"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "^8.3.3",
     "@types/fs-extra": "^9.0.13",
     "@types/lodash": "^4.14.180",
     "@types/node": "^17.0.21",
