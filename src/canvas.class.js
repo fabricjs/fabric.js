@@ -987,6 +987,22 @@
     },
 
     /**
+     * Sets dimensions (width, height) of this canvas instance. when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
+     * @param {Object}        dimensions                    Object with width/height properties
+     * @param {Number|String} [dimensions.width]            Width of canvas element
+     * @param {Number|String} [dimensions.height]           Height of canvas element
+     * @param {Object}        [options]                     Options object
+     * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
+     * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    setDimensions: function (dimensions, options) {
+      this._resetTransformEventData();
+      return this.callSuper('setDimensions', dimensions, options);
+    },
+
+    /**
      * @private
      * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
      */
