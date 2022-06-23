@@ -405,6 +405,7 @@
       }
       this._initRetinaScaling();
       this.calcOffset();
+      this._resetTransformEventData();
 
       if (!options.cssOnly) {
         this.requestRenderAll();
