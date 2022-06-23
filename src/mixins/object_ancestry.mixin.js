@@ -40,16 +40,16 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
 
   /**
    * Returns an object that represent the ancestry situation.
-   * 
+   *
    * @typedef {object} AncestryComparison
    * @property {Ancestors} common ancestors of `this` and `other` (may include `this` | `other`)
    * @property {Ancestors} fork ancestors that are of `this` only
    * @property {Ancestors} otherFork ancestors that are of `other` only
-   * 
+   *
    * @param {fabric.Object} other
    * @param {boolean} [strict] finds only ancestors that are objects (without canvas)
    * @returns {AncestryComparison | undefined}
-   * 
+   *
    */
   findCommonAncestors: function (other, strict) {
     if (this === other) {
