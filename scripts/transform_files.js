@@ -7,7 +7,7 @@ const chalk = require('chalk');
 const wd = path.resolve(__dirname, '..');
 
 function readFile(file) {
-    return fs.readFileSync(path.resolve(wd, file)).toString('utf-8');;
+    return fs.readFileSync(path.resolve(wd, file)).toString('utf-8');
 }
 
 function getVariableNameOfNS(raw, namespace) {
