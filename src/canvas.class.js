@@ -935,7 +935,7 @@
      * of the time.
      * @param {Event} e
      * @param {Boolean} ignoreVpt
-     * @return {Object} object with "x" and "y" number values
+     * @return {fabric.Point} 
      */
     getPointer: function (e, ignoreVpt) {
       // return cached values if we are in the event processing chain
@@ -975,21 +975,15 @@
         pointer.y /= retinaScaling;
       }
 
-      if (boundsWidth === 0 || boundsHeight === 0) {
+      cssScale = boundsWidth === 0 || boundsHeight === 0 ?
         // If bounds are not available (i.e. not visible), do not apply scale.
-        cssScale = { width: 1, height: 1 };
-      }
-      else {
-        cssScale = {
-          width: upperCanvasEl.width / boundsWidth,
-          height: upperCanvasEl.height / boundsHeight
-        };
-      }
+        new fabric.Point(1, 1) :
+        new fabric.Point(upperCanvasEl.width / boundsWidth, upperCanvasEl.height / boundsHeight);
 
-      return {
-        x: pointer.x * cssScale.width,
-        y: pointer.y * cssScale.height
-      };
+      return new fabric.Point(
+        pointer.x * cssScale.x,
+        pointer.y * cssScale.y
+      );
     },
 
     /**
