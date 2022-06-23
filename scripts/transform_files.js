@@ -375,7 +375,7 @@ function listFiles() {
     return paths;
 }
 
-function convert(options = {}) {
+function transform(options = {}) {
     options = _.defaults(options, { overwriteExisitingFiles: true, ext: 'js', createIndex: true, useExports: true });
 
     const result = listFiles()
@@ -405,4 +405,4 @@ function convert(options = {}) {
     }
 }
 
-module.exports = { convert, listFiles };
+module.exports = { transform, listFiles };
