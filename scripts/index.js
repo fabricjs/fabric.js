@@ -12,7 +12,7 @@ const Checkbox = require('inquirer-checkbox-plus-prompt');
 const commander = require('commander');
 const program = new commander.Command();
 
-const { transform: transformFiles, listFiles } = require('./transform_file');
+const { transform: transformFiles, listFiles } = require('./transform_files');
 
 const CLI_CACHE = path.resolve(__dirname, 'cli_cache.json');
 const wd = path.resolve(__dirname, '..');
