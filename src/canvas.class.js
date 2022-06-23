@@ -935,7 +935,7 @@
      * of the time.
      * @param {Event} e
      * @param {Boolean} ignoreVpt
-     * @return {fabric.Point} 
+     * @return {fabric.Point}
      */
     getPointer: function (e, ignoreVpt) {
       // return cached values if we are in the event processing chain
