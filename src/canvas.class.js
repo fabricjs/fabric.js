@@ -975,8 +975,8 @@
         pointer.y /= retinaScaling;
       }
 
+      // If bounds are not available (i.e. not visible), do not apply scale.
       cssScale = boundsWidth === 0 || boundsHeight === 0 ?
-        // If bounds are not available (i.e. not visible), do not apply scale.
         new fabric.Point(1, 1) :
         new fabric.Point(upperCanvasEl.width / boundsWidth, upperCanvasEl.height / boundsHeight);
 
