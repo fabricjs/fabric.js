@@ -409,7 +409,7 @@
     var object = new fabric.Object({ left: 123, top: 124 });
     var started = false;
     var t = new Date();
-    var abort = object._animate('left', 223, {
+    object._animate('left', 223, {
       onStart: function () {
         started = true;
         assert.gte(new Date() - t, 500, 'animation delay');
@@ -419,7 +419,6 @@
       delay: 500
     });
     assert.ok(started === false);
-    abort();
   });
 
   QUnit.test('animate easing easeInQuad', function(assert) {
