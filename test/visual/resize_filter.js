@@ -11,7 +11,7 @@
   else {
     visualTestLoop = window.visualTestLoop;
     getFixture = window.getFixture;
-    isFirefox = global.navigator.userAgent.includes('Firefox/')
+    isFirefox = window.navigator.userAgent.includes('Firefox/')
   }
 
   var tests = [];
