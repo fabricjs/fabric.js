@@ -12,7 +12,7 @@ export default {
     },
     {
         file: './dist/fabric.min.js',
-        format: 'iife',
+        format: 'cjs',
         name: 'fabric',
         plugins: [terser()],
     },

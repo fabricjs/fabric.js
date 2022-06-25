@@ -1,5 +1,5 @@
+import { cos } from './index.ts';
 (function(global) {
-
   var fabric = global.fabric, sqrt = Math.sqrt,
       atan2 = Math.atan2,
       pow = Math.pow,
@@ -1176,5 +1176,6 @@
       }
       return new fabric.Group([a], { clipPath: b, inverted: inverted });
     },
+    cos: cos,
   };
 })(typeof exports !== 'undefined' ? exports : window);
