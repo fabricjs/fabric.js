@@ -80,7 +80,6 @@
     "commander": "^9.1.0",
     "deep-object-diff": "^1.1.7",
     "eslint": "^8.18.0",
-    "eslint-plugin-disable": "^2.0.3",
     "fs-extra": "^10.0.1",
     "fuzzy": "^0.1.3",
     "inquirer": "^8.2.1",
