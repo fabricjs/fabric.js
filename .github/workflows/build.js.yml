@@ -15,7 +15,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 16.x
-    - run: npm install uglify-js@3.3.x
+    - run: npm ci
     - run: npm run build
   lint:
     runs-on: ubuntu-latest
@@ -25,7 +25,6 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 16.x
-    - run: npm install eslint@4.7.x
     - run: npm run lint
   coverage:
     runs-on: ubuntu-latest
@@ -35,7 +34,6 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 16.x
-    - run: npm ci
     - run: npm run build:fast
     - run: npm run test:coverage && npm run test:visual:coverage
     - uses: ChristiaanScheermeijer/jest-reporter-action@v0.4.0
