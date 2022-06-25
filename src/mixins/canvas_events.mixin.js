@@ -250,7 +250,7 @@
     _onDoubleClick: function (e) {
       this._cacheTransformEventData(e);
       this._handleEvent(e, 'dblclick');
-      this._resetTransformEventData(e);
+      this._resetTransformEventData();
     },
 
     /**
@@ -384,6 +384,7 @@
      */
     _onResize: function () {
       this.calcOffset();
+      this._resetTransformEventData();
     },
 
     /**
