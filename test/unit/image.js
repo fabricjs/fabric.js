@@ -99,7 +99,7 @@
 
   function setSrc(img, src, callback) {
     img.onload = function() {
-      callback && callback();
+      if (callback) { callback(); }
     };
     img.src = src;
   }

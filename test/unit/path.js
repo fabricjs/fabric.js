@@ -59,7 +59,9 @@
   function updatePath(pathObject, value, preservePosition) {
     const { left, top } = pathObject;
     pathObject._setPath(value);
-    preservePosition && pathObject.set({ left, top });
+    if (preservePosition) {
+      pathObject.set({ left, top });
+    }
   }
 
   QUnit.module('fabric.Path', {

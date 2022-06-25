@@ -34,18 +34,18 @@
         ], options);
     }
 
-    function fixedLayout(canvas, callback) {
-        var g = createGroupForLayoutTests('fixed layout', {
-            backgroundColor: 'azure',
-            layout: 'fixed',
-            width: 50,
-            height: 50,
-            angle: 30
-        });
-        canvas.add(g);
-        canvas.renderAll();
-        callback(canvas.lowerCanvasEl);
-    }
+    // function fixedLayout(canvas, callback) {
+    //     var g = createGroupForLayoutTests('fixed layout', {
+    //         backgroundColor: 'azure',
+    //         layout: 'fixed',
+    //         width: 50,
+    //         height: 50,
+    //         angle: 30
+    //     });
+    //     canvas.add(g);
+    //     canvas.renderAll();
+    //     callback(canvas.lowerCanvasEl);
+    // }
 /*
     tests.push({
         test: 'fixed layout with width, height, angle values',
