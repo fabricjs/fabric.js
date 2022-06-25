@@ -250,10 +250,7 @@
         }
       });
       var object = extend(
-        this.callSuper(
-          'toObject',
-          ['cropX', 'cropY'].concat(propertiesToInclude)
-        ), {
+        this.callSuper('toObject', ['cropX', 'cropY'].concat(propertiesToInclude)), {
           src: this.getSrc(),
           crossOrigin: this.getCrossOrigin(),
           filters: filters,

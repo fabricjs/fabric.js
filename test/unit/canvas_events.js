@@ -26,6 +26,7 @@
       canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
       canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
       canvas.off();
+      canvas.setDimensions({ width: 600, height: 600 });
       canvas.calcOffset();
       upperCanvasEl.style.display = 'none';
       canvas.cancelRequestedRender();
@@ -84,20 +85,35 @@
   QUnit.test('cache and reset event properties', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl };
     var rect = new fabric.Rect({ width: 60, height: 60 });
+    function cacheAndAssertTransformEvent() {
+      canvas._cacheTransformEventData(e);
+      assert.deepEqual(canvas._pointer, new fabric.Point(30, 30), 'pointer has been cached');
+      assert.deepEqual(canvas._absolutePointer, new fabric.Point(15, 15), 'absolute pointer has been cached');
+    }
+    function assertTransformEventCacheIsReset() {
+      assert.equal(canvas._pointer, null);
+      assert.equal(canvas._absolutePointer, null);
+      assert.equal(canvas._target, null);
+    }
     canvas._currentTransform = null;
     canvas.add(rect);
-    assert.equal(canvas._pointer, null);
-    assert.equal(canvas._absolutePointer, null);
-    assert.equal(canvas._target, null);
+    assertTransformEventCacheIsReset();
     canvas.viewportTransform = [2, 0, 0, 2, 0, 0];
-    canvas._cacheTransformEventData(e);
-    assert.deepEqual(canvas._pointer, { x: 30, y: 30 }, 'pointer has been cached');
-    assert.deepEqual(canvas._absolutePointer, new fabric.Point(15, 15), 'absolute pointer has been cached');
+
+    cacheAndAssertTransformEvent();
     assert.ok(canvas._target === rect);
     canvas._resetTransformEventData();
-    assert.equal(canvas._pointer, null);
-    assert.equal(canvas._absolutePointer, null);
-    assert.equal(canvas._target, null);
+    assertTransformEventCacheIsReset();
+
+    //  canvas resize
+    cacheAndAssertTransformEvent();
+    canvas.setDimensions({ width: 200, height: 200 });
+    assertTransformEventCacheIsReset();
+
+    //  window resize
+    cacheAndAssertTransformEvent();
+    canvas._onResize();
+    assertTransformEventCacheIsReset();
   });
 
   QUnit.test('mouse:down with different buttons', function(assert) {
