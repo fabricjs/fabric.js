@@ -12,7 +12,7 @@ import { halfPI } from '../constants';
  */
 export const cos = (angle: TRadian): number => {
   if (angle === 0) { return 1; }
-  var angleSlice = Math.abs(angle) / halfPI;
+  const angleSlice = Math.abs(angle) / halfPI;
   switch (angleSlice) {
     case 1: case 3: return 0;
     case 2: return -1;
