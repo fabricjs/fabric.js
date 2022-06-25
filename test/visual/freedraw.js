@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars, no-unused-expressions */
 (function() {
   if (fabric.isLikelyNode) {
     if (process.env.launcher === 'Firefox') {
@@ -27,6 +28,7 @@
   fabric.enableGLFiltering = false;
   fabric.isWebglSupported = false;
   fabric.Object.prototype.objectCaching = true;
+  // eslint-disable-next-line
   var visualTestLoop, compareGoldensTest;
   if (fabric.isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
@@ -49,16 +51,18 @@
       points[i].y = parseFloat(points[i].y);
       brush.onMouseMove(points[i], options);
     }
-    fireUp && brush.onMouseUp(options);
+    if (fireUp) {
+      brush.onMouseUp(options);
+    }
   }
   function fireMouseUp(brush) {
     brush.onMouseUp(options);
   }
 
-  function eraserDrawer(points, brush, fireUp = false) {
-    brush.canvas.calcViewportBoundaries();
-    pointDrawer(points, brush, fireUp);
-  }
+  // function eraserDrawer(points, brush, fireUp = false) {
+  //   brush.canvas.calcViewportBoundaries();
+  //   pointDrawer(points, brush, fireUp);
+  // }
 
   var points = [
     {
@@ -2210,15 +2214,17 @@
   tests[0].newModule = 'Free Drawing';
   tests.forEach(function (test) {
     var options = Object.assign({}, freeDrawingTestDefaults, test.targets);
-    options.top && visualTester(Object.assign({}, test, {
-      test: `${test.test} (top context)`,
-      golden: `top_ctx_${test.golden}`,
-      code: function (canvas, callback) {
-        test.build(canvas);
-        callback(canvas.upperCanvasEl);
-      },
-      disabled: fabric.isLikelyNode
-    }));
+    if (options.top) {
+      visualTester(Object.assign({}, test, {
+        test: `${test.test} (top context)`,
+        golden: `top_ctx_${test.golden}`,
+        code: function (canvas, callback) {
+          test.build(canvas);
+          callback(canvas.upperCanvasEl);
+        },
+        disabled: fabric.isLikelyNode
+      }));
+    }
     options.main && visualTester(Object.assign({}, test, {
       test: `${test.test} (main context)`,
       golden: `main_ctx_${test.golden}`,

@@ -112,7 +112,7 @@
 
   function text4(canvas, callback) {
     var text = new fabric.Text('lorem ipsum\ndolor\nsit Amet2\nconsectgetur', {
-      fontSize: 30, scaleX: 20, scaleY: 30, skewX: 30, skewY: 25, skewY: 15, angle: 25
+      fontSize: 30, scaleX: 20, scaleY: 30, skewX: 30, skewY: 15, angle: 25
     });
     var matrix = text.calcTransformMatrix();
     canvas.viewportTransform = fabric.util.invertTransform(matrix);

@@ -57,7 +57,7 @@
     "coverage:report": "nyc report --reporter=lcov --reporter=text",
     "jslint": "eslint --config .eslintrc.json src/**/*.js",
     "tslint": "eslint --config .eslintrc.cjs src/**/*.ts",
-    "lint": "jslint && tslint",
+    "lint": "npm run jslint && npm run tslint",
     "lint-fix": "eslint --fix --config .eslintrc.json src",
     "lint_tests": "eslint test/unit --config .eslintrc_tests && eslint test/visual --config .eslintrc_tests",
     "all": "npm run build && npm run test -- --all && npm run lint && npm run lint_tests && npm run export",

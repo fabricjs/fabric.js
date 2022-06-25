@@ -419,6 +419,7 @@
       delay: 500
     });
     assert.ok(started === false);
+    abort();
   });
 
   QUnit.test('animate easing easeInQuad', function(assert) {
