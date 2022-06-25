@@ -520,7 +520,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
       this[prop] += direction === 'Left' ? -1 : 1;
       return true;
     }
-    if (typeof newValue !== undefined && this[prop] !== newValue) {
+    if (typeof newValue !== 'undefined' && this[prop] !== newValue) {
       this[prop] = newValue;
       return true;
     }
