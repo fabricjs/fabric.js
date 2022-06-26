@@ -706,25 +706,25 @@
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Image>}
    */
-  fabric.Image.fromObject = function (_object, options) {
-    var object = Object.assign({}, _object),
-        filters = object.filters,
-        resizeFilter = object.resizeFilter;
+  fabric.Image.fromObject = function (object, options) {
+    var _object = Object.assign({}, object),
+        filters = _object.filters,
+        resizeFilter = _object.resizeFilter;
     // the generic enliving will fail on filters for now
-    delete object.resizeFilter;
-    delete object.filters;
+    delete _object.resizeFilter;
+    delete _object.filters;
     var imageOptions = Object.assign({}, options, { crossOrigin: _object.crossOrigin }),
         filterOptions = Object.assign({}, options, { namespace: fabric.Image.filters });
     return Promise.all([
-      fabric.util.loadImage(object.src, imageOptions),
+      fabric.util.loadImage(_object.src, imageOptions),
       filters && fabric.util.enlivenObjects(filters, filterOptions),
       resizeFilter && fabric.util.enlivenObjects([resizeFilter], filterOptions),
-      fabric.util.enlivenObjectEnlivables(object, options),
+      fabric.util.enlivenObjectEnlivables(_object, options),
     ])
       .then(function(imgAndFilters) {
-        object.filters = imgAndFilters[1] || [];
-        object.resizeFilter = imgAndFilters[2] && imgAndFilters[2][0];
-        return new fabric.Image(imgAndFilters[0], Object.assign(object, imgAndFilters[3]));
+        _object.filters = imgAndFilters[1] || [];
+        _object.resizeFilter = imgAndFilters[2] && imgAndFilters[2][0];
+        return new fabric.Image(imgAndFilters[0], Object.assign(_object, imgAndFilters[3]));
       });
   };
 
