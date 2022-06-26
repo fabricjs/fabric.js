@@ -732,14 +732,14 @@
    * Creates an instance of fabric.Image from an URL string
    * @static
    * @param {String} url URL to create an image from
-   * @param {object} [imgOptions] Options object
+   * @param {object} [options] Options object
    * @param {string} [options.crossOrigin] cors value for the image loading, default to anonymous
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Image>}
    */
-  fabric.Image.fromURL = function(url, imgOptions) {
-    return fabric.util.loadImage(url, imgOptions || {}).then(function(img) {
-      return new fabric.Image(img, imgOptions);
+  fabric.Image.fromURL = function(url, options) {
+    return fabric.util.loadImage(url, options || {}).then(function(img) {
+      return new fabric.Image(img, options);
     });
   };
 
