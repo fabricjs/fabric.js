@@ -8,8 +8,6 @@
    */
 
   var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
-      clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
       parseUnit = fabric.util.parseUnit,
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
@@ -746,7 +744,7 @@
         delete fabric.cssRules[svgUid];
         delete fabric.clipPaths[svgUid];
       }
-    }, clone(options), reviver, parsingOptions);
+    }, Object.assign({}, options), reviver, parsingOptions);
   };
 
   function recursivelyParseGradientsXlink(doc, gradient) {
@@ -777,7 +775,7 @@
       fabric.reNum +
     '(?:px|cm|mm|em|pt|pc|in)*)(?:\\/(normal|' + fabric.reNum + '))?\\s+(.*)');
 
-  extend(fabric, {
+  fabric.util.object.extend(fabric, {
     /**
      * Parses a short font declaration, building adding its properties to a style object
      * @static
@@ -880,11 +878,11 @@
       }, { });
       // add values parsed from style, which take precedence over attributes
       // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
-      var cssAttrs = extend(
+      var cssAttrs = Object.assign(
         getGlobalStylesForElement(element, svgUid),
         fabric.parseStyleAttribute(element)
       );
-      ownAttributes = extend(
+      ownAttributes = Object.assign(
         ownAttributes,
         cssAttrs
       );
@@ -906,7 +904,7 @@
       if (normalizedStyle && normalizedStyle.font) {
         fabric.parseFontDeclaration(normalizedStyle.font, normalizedStyle);
       }
-      var mergedAttrs = extend(parentAttributes, normalizedStyle);
+      var mergedAttrs = Object.assign(parentAttributes, normalizedStyle);
       return fabric.svgValidParentsRegEx.test(element.nodeName) ? mergedAttrs : _setStrokeFillOpacity(mergedAttrs);
     },
 
@@ -1030,10 +1028,10 @@
               return;
             }
             if (allRules[_rule]) {
-              fabric.util.object.extend(allRules[_rule], ruleObj);
+              Object.assign(allRules[_rule], ruleObj);
             }
             else {
-              allRules[_rule] = fabric.util.object.clone(ruleObj);
+              allRules[_rule] = Object.assign({}, ruleObj);
             }
           });
         });

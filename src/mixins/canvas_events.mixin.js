@@ -146,11 +146,10 @@
       this._hoveredTarget = null;
       target && target.fire('mouseout', { e: e });
 
-      var _this = this;
-      this._hoveredTargets.forEach(function(_target){
-        _this.fire('mouse:out', { target: target, e: e });
-        _target && target.fire('mouseout', { e: e });
-      });
+      this._hoveredTargets.forEach(function(nestedTarget){
+        this.fire('mouse:out', { target: nestedTarget, e: e });
+        nestedTarget && nestedTarget.fire('mouseout', { e: e });
+      }, this);
       this._hoveredTargets = [];
 
       if (this._iTextInstances) {
@@ -251,7 +250,7 @@
     _onDoubleClick: function (e) {
       this._cacheTransformEventData(e);
       this._handleEvent(e, 'dblclick');
-      this._resetTransformEventData(e);
+      this._resetTransformEventData();
     },
 
     /**
@@ -385,6 +384,7 @@
      */
     _onResize: function () {
       this.calcOffset();
+      this._resetTransformEventData();
     },
 
     /**

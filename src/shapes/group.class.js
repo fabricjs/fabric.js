@@ -8,8 +8,7 @@
       transformPoint = fabric.util.transformPoint,
       applyTransformToObject = fabric.util.applyTransformToObject,
       degreesToRadians = fabric.util.degreesToRadians,
-      clone = fabric.util.object.clone,
-      extend = fabric.util.object.extend;
+      clone = fabric.util.object.clone;
 
   if (fabric.Group) {
     fabric.warn('fabric.Group is already defined');
@@ -96,7 +95,8 @@
       this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(this, true);
       this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
       this._firstLayoutDone = false;
-      this.callSuper('initialize', options);
+      //  setting angle, skewX, skewY must occur after initial layout
+      this.callSuper('initialize', Object.assign({}, options, { angle: 0, skewX: 0, skewY: 0 }));
       this.forEachObject(function (object) {
         this.enterGroup(object, false);
       }, this);
@@ -137,22 +137,36 @@
     },
 
     /**
+     * Override this method to enhance performance (for groups with a lot of objects).
+     * If Overriding, be sure not pass illegal objects to group - it will break your app.
+     * @private
+     */
+    _filterObjectsBeforeEnteringGroup: function (objects) {
+      return objects.filter(function (object, index, array) {
+        // can enter AND is the first occurrence of the object in the passed args (to prevent adding duplicates)
+        return this.canEnterGroup(object) && array.indexOf(object) === index;
+      }, this);
+    },
+
+    /**
      * Add objects
      * @param {...fabric.Object} objects
      */
     add: function () {
-      fabric.Collection.add.call(this, arguments, this._onObjectAdded);
-      this._onAfterObjectsChange('added', Array.from(arguments));
+      var allowedObjects = this._filterObjectsBeforeEnteringGroup(Array.from(arguments));
+      fabric.Collection.add.call(this, allowedObjects, this._onObjectAdded);
+      this._onAfterObjectsChange('added', allowedObjects);
     },
 
     /**
      * Inserts an object into collection at specified index
-     * @param {fabric.Object} objects Object to insert
+     * @param {fabric.Object | fabric.Object[]} objects Object to insert
      * @param {Number} index Index to insert object at
      */
     insertAt: function (objects, index) {
-      fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
-      this._onAfterObjectsChange('added', Array.isArray(objects) ? objects : [objects]);
+      var allowedObjects = this._filterObjectsBeforeEnteringGroup(Array.isArray(objects) ? objects : [objects]);
+      fabric.Collection.insertAt.call(this, allowedObjects, index, this._onObjectAdded);
+      this._onAfterObjectsChange('added', allowedObjects);
     },
 
     /**
@@ -180,7 +194,7 @@
      * @private
      */
     __objectMonitor: function (opt) {
-      this._applyLayoutStrategy(extend(clone(opt), {
+      this._applyLayoutStrategy(Object.assign({}, opt, {
         type: 'object_modified'
       }));
       this._set('dirty', true);
@@ -226,16 +240,18 @@
      * @param {fabric.Object} object
      * @returns
      */
-    canEnter: function (object) {
+    canEnterGroup: function (object) {
       if (object === this || this.isDescendantOf(object)) {
+        //  prevent circular object tree
         /* _DEV_MODE_START_ */
-        console.warn('fabric.Group: trying to add group to itself, this call has no effect');
+        console.error('fabric.Group: circular object trees are not supported, this call has no effect');
         /* _DEV_MODE_END_ */
         return false;
       }
-      else if (object.group && object.group === this) {
+      else if (this._objects.indexOf(object) !== -1) {
+        // is already in the objects array
         /* _DEV_MODE_START_ */
-        console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
+        console.error('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
         /* _DEV_MODE_END_ */
         return false;
       }
@@ -249,9 +265,6 @@
      * @returns {boolean} true if object entered group
      */
     enterGroup: function (object, removeParentTransform) {
-      if (!this.canEnter(object)) {
-        return false;
-      }
       if (object.group) {
         object.group.remove(object);
       }
@@ -500,6 +513,12 @@
         //  reject layout requests before initialization layout
         return;
       }
+      var options = isFirstLayout && context.options;
+      var initialTransform = options && {
+        angle: options.angle || 0,
+        skewX: options.skewX || 0,
+        skewY: options.skewY || 0,
+      };
       var center = this.getRelativeCenterPoint();
       var result = this.getLayoutStrategyResult(this.layout, this._objects.concat(), context);
       if (result) {
@@ -516,9 +535,10 @@
         //  clip path as well
         !isFirstLayout && this.layout !== 'clip-path' && this.clipPath && !this.clipPath.absolutePositioned
           && this._adjustObjectPosition(this.clipPath, diff);
-        if (!newCenter.eq(center)) {
+        if (!newCenter.eq(center) || initialTransform) {
           //  set position
           this.setPositionByOrigin(newCenter, 'center', 'center');
+          initialTransform && this.set(initialTransform);
           this.setCoords();
         }
       }
@@ -530,6 +550,7 @@
           width: this.width,
           height: this.height,
         };
+        initialTransform && this.set(initialTransform);
       }
       else {
         //  no `result` so we return
@@ -591,7 +612,7 @@
         return this.prepareBoundingBox(layoutDirective, addedObjects, context);
       }
       else if (layoutDirective === 'fit-content' || layoutDirective === 'fit-content-lazy'
-          || (layoutDirective === 'fixed' && context.type === 'initialization')) {
+          || (layoutDirective === 'fixed' && (context.type === 'initialization' || context.type === 'imperative'))) {
         return this.prepareBoundingBox(layoutDirective, objects, context);
       }
       else if (layoutDirective === 'clip-path' && this.clipPath) {
@@ -714,24 +735,6 @@
           }),
           rotationCorrection = new fabric.Point(0, 0);
 
-      if (this.angle) {
-        var rad = degreesToRadians(this.angle),
-            sin = Math.abs(fabric.util.sin(rad)),
-            cos = Math.abs(fabric.util.cos(rad));
-        sizeAfter.setXY(
-          sizeAfter.x * cos + sizeAfter.y * sin,
-          sizeAfter.x * sin + sizeAfter.y * cos
-        );
-        bboxSizeAfter.setXY(
-          bboxSizeAfter.x * cos + bboxSizeAfter.y * sin,
-          bboxSizeAfter.x * sin + bboxSizeAfter.y * cos
-        );
-        strokeWidthVector = fabric.util.rotateVector(strokeWidthVector, rad);
-        //  correct center after rotating
-        var strokeCorrection = strokeWidthVector.multiply(origin.scalarAdd(-0.5).scalarDivide(-2));
-        rotationCorrection = sizeAfter.subtract(size).scalarDivide(2).add(strokeCorrection);
-        calculatedCenter.addEquals(rotationCorrection);
-      }
       //  calculate center and correction
       var originT = origin.scalarAdd(0.5);
       var originCorrection = sizeAfter.multiply(originT);
@@ -872,6 +875,7 @@
         this._watchObject(false, object);
         object.dispose && object.dispose();
       }, this);
+      this.callSuper('dispose');
     },
 
     /* _TO_SVG_START_ */

@@ -108,73 +108,63 @@
     },
 
     /**
+     * @public override this function in order to customize the drawing of the control box, e.g. rounded corners, different border style.
+     * @param {CanvasRenderingContext2D} ctx ctx is rotated and translated so that (0,0) is at object's center
+     * @param {fabric.Point} size the control box size used
+     */
+    strokeBorders: function (ctx, size) {
+      ctx.strokeRect(
+        -size.x / 2,
+        -size.y / 2,
+        size.x,
+        size.y
+      );
+    },
+
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to draw on
+     * @param {fabric.Point} size
+     * @param {Object} styleOverride object to override the object style
+     */
+    _drawBorders: function (ctx, size, styleOverride) {
+      var options = Object.assign({
+        hasControls: this.hasControls,
+        borderColor: this.borderColor,
+        borderDashArray: this.borderDashArray
+      }, styleOverride || {});
+      ctx.save();
+      ctx.strokeStyle = options.borderColor;
+      this._setLineDash(ctx, options.borderDashArray);
+      this.strokeBorders(ctx, size);
+      options.hasControls && this.drawControlsConnectingLines(ctx, size);
+      ctx.restore();
+    },
+
+    /**
      * Draws borders of an object's bounding box.
      * Requires public properties: width, height
      * Requires public options: padding, borderColor
      * @param {CanvasRenderingContext2D} ctx Context to draw on
-     * @param {Object} styleOverride object to override the object style
-     * @return {fabric.Object} thisArg
-     * @chainable
-     */
-    drawBorders: function(ctx, styleOverride) {
-      styleOverride = styleOverride || {};
-      var wh = this._calculateCurrentDimensions(),
-          strokeWidth = this.borderScaleFactor,
-          width = wh.x + strokeWidth,
-          height = wh.y + strokeWidth,
-          hasControls = typeof styleOverride.hasControls !== 'undefined' ?
-            styleOverride.hasControls : this.hasControls;
-
-      ctx.save();
-      ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
-      this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray);
-
-      ctx.strokeRect(
-        -width / 2,
-        -height / 2,
-        width,
-        height
-      );
-      hasControls && this.drawControlsConnectingLines(ctx);
-
-      ctx.restore();
-      return this;
-    },
-
-    /**
-     * Draws borders of an object's bounding box when it is inside a group.
-     * Requires public properties: width, height
-     * Requires public options: padding, borderColor
-     * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @param {object} options object representing current object parameters
-     * @param {Object} styleOverride object to override the object style
+     * @param {Object} [styleOverride] object to override the object style
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    drawBordersInGroup: function(ctx, options, styleOverride) {
-      styleOverride = styleOverride || {};
-      var bbox = fabric.util.sizeAfterTransform(this.width, this.height, options),
-          strokeWidth = this.strokeWidth,
-          strokeUniform = this.strokeUniform,
-          borderScaleFactor = this.borderScaleFactor,
-          width =
-            bbox.x + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleX) + borderScaleFactor,
-          height =
-            bbox.y + strokeWidth * (strokeUniform ? this.canvas.getZoom() : options.scaleY) + borderScaleFactor,
-          hasControls = typeof styleOverride.hasControls !== 'undefined' ?
-            styleOverride.hasControls : this.hasControls;
-      ctx.save();
-      this._setLineDash(ctx, styleOverride.borderDashArray || this.borderDashArray);
-      ctx.strokeStyle = styleOverride.borderColor || this.borderColor;
-      ctx.strokeRect(
-        -width / 2,
-        -height / 2,
-        width,
-        height
-      );
-      hasControls && this.drawControlsConnectingLines(ctx);
-
-      ctx.restore();
+    drawBorders: function (ctx, options, styleOverride) {
+      var size;
+      if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
+        var bbox = fabric.util.sizeAfterTransform(this.width, this.height, options),
+            strokeFactor = this.strokeUniform ?
+              new fabric.Point(0, 0).scalarAddEquals(this.canvas.getZoom()) :
+              new fabric.Point(options.scaleX, options.scaleY),
+            stroke = strokeFactor.scalarMultiplyEquals(this.strokeWidth);
+        size = bbox.addEquals(stroke).scalarAddEquals(this.borderScaleFactor);
+      }
+      else {
+        size = this._calculateCurrentDimensions().scalarAddEquals(this.borderScaleFactor);
+      }
+      this._drawBorders(ctx, size, styleOverride);
       return this;
     },
 
@@ -183,15 +173,13 @@
      * Requires public properties: width, height
      * Requires public options: padding, borderColor
      * @param {CanvasRenderingContext2D} ctx Context to draw on
+     * @param {number} width object final width
+     * @param {number} height object final height
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    drawControlsConnectingLines: function (ctx) {
-      var wh = this._calculateCurrentDimensions(),
-          strokeWidth = this.borderScaleFactor,
-          width = wh.x + strokeWidth,
-          height = wh.y + strokeWidth,
-          shouldStroke = false;
+    drawControlsConnectingLines: function (ctx, size) {
+      var shouldStroke = false;
 
       ctx.beginPath();
       this.forEachControl(function (control, key, fabricObject) {
@@ -200,10 +188,10 @@
         if (control.withConnection && control.getVisibility(fabricObject, key)) {
           // reset movement for each control
           shouldStroke = true;
-          ctx.moveTo(control.x * width, control.y * height);
+          ctx.moveTo(control.x * size.x, control.y * size.y);
           ctx.lineTo(
-            control.x * width + control.offsetX,
-            control.y * height + control.offsetY
+            control.x * size.x + control.offsetX,
+            control.y * size.y + control.offsetY
           );
         }
       });

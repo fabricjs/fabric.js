@@ -1231,7 +1231,7 @@
       // needed to setup a couple of variables
       // path canvas gets overridden with this one.
       // TODO find a better solution?
-      clipPath.canvas = this.canvas;
+      clipPath._set('canvas', this.canvas);
       clipPath.shouldCache();
       clipPath._transformDone = true;
       clipPath.renderCache({ forClipping: true });
@@ -1402,12 +1402,7 @@
         options.angle -= 180;
       }
       ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
-      if (styleOverride.forActiveSelection || this.group) {
-        drawBorders && this.drawBordersInGroup(ctx, options, styleOverride);
-      }
-      else {
-        drawBorders && this.drawBorders(ctx, styleOverride);
-      }
+      drawBorders && this.drawBorders(ctx, options, styleOverride);
       drawControls && this.drawControls(ctx, styleOverride);
       ctx.restore();
     },

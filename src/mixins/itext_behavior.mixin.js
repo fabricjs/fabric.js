@@ -1,7 +1,5 @@
 (function() {
 
-  var clone = fabric.util.object.clone;
-
   fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
 
     /**
@@ -713,7 +711,7 @@
     shiftLineStyles: function(lineIndex, offset) {
       // shift all line styles by offset upward or downward
       // do not clone deep. we need new array, not new style objects
-      var clonedStyles = clone(this.styles);
+      var clonedStyles = Object.assign({}, this.styles);
       for (var line in this.styles) {
         var numericLine = parseInt(line, 10);
         if (numericLine > lineIndex) {
@@ -782,10 +780,10 @@
       // we clone current char style onto the next (otherwise empty) line
       while (qty > 0) {
         if (copiedStyle && copiedStyle[qty - 1]) {
-          this.styles[lineIndex + qty] = { 0: clone(copiedStyle[qty - 1]) };
+          this.styles[lineIndex + qty] = { 0: Object.assign({}, copiedStyle[qty - 1]) };
         }
         else if (currentCharStyle) {
-          this.styles[lineIndex + qty] = { 0: clone(currentCharStyle) };
+          this.styles[lineIndex + qty] = { 0: Object.assign({}, currentCharStyle) };
         }
         else {
           delete this.styles[lineIndex + qty];
@@ -806,8 +804,8 @@
       if (!this.styles) {
         this.styles = {};
       }
-      var currentLineStyles       = this.styles[lineIndex],
-          currentLineStylesCloned = currentLineStyles ? clone(currentLineStyles) : {};
+      var currentLineStyles = this.styles[lineIndex],
+          currentLineStylesCloned = currentLineStyles ? Object.assign({}, currentLineStyles) : {};
 
       quantity || (quantity = 1);
       // shift all char styles by quantity forward
@@ -831,7 +829,7 @@
           if (!this.styles[lineIndex]) {
             this.styles[lineIndex] = {};
           }
-          this.styles[lineIndex][charIndex + quantity] = clone(copiedStyle[quantity]);
+          this.styles[lineIndex][charIndex + quantity] = Object.assign({}, copiedStyle[quantity]);
         }
         return;
       }
@@ -840,7 +838,7 @@
       }
       var newStyle = currentLineStyles[charIndex ? charIndex - 1 : 1];
       while (newStyle && quantity--) {
-        this.styles[lineIndex][charIndex + quantity] = clone(newStyle);
+        this.styles[lineIndex][charIndex + quantity] = Object.assign({}, newStyle);
       }
     },
 

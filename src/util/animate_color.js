@@ -33,7 +33,7 @@
         originalOnChange = options.onChange;
     options = options || {};
 
-    return fabric.util.animate(fabric.util.object.extend(options, {
+    return fabric.util.animate(Object.assign(options, {
       duration: duration || 500,
       startValue: startColor,
       endValue: endColor,

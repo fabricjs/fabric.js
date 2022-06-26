@@ -264,10 +264,7 @@
         }
       });
       var object = extend(
-        this.callSuper(
-          'toObject',
-          ['cropX', 'cropY'].concat(propertiesToInclude)
-        ), {
+        this.callSuper('toObject', ['cropX', 'cropY'].concat(propertiesToInclude)), {
           src: this.getSrc(),
           crossOrigin: this.getCrossOrigin(),
           filters: filters,
@@ -709,8 +706,8 @@
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Image>}
    */
-  fabric.Image.fromObject = function(_object, options) {
-    var object = fabric.util.object.clone(_object),
+  fabric.Image.fromObject = function (_object, options) {
+    var object = Object.assign({}, _object),
         filters = object.filters,
         resizeFilter = object.resizeFilter;
     // the generic enliving will fail on filters for now

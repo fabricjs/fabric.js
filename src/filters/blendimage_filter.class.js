@@ -239,9 +239,7 @@
    */
   fabric.Image.filters.BlendImage.fromObject = function(object, options) {
     return fabric.Image.fromObject(object.image, options).then(function(image) {
-      var options = fabric.util.object.clone(object);
-      options.image = image;
-      return new fabric.Image.filters.BlendImage(options);
+      return new fabric.Image.filters.BlendImage(Object.assign({}, object, { image: image }));
     });
   };
 

@@ -90,6 +90,20 @@
     assert.deepEqual(fabric.util.radiansToDegrees(), NaN);
   });
 
+  QUnit.test('calcRotateMatrix', function (assert) {
+    assert.ok(typeof fabric.util.calcRotateMatrix === 'function', 'calcRotateMatrix should exist');
+    var matrix = fabric.util.calcRotateMatrix({ angle: 90 });
+    var expected = [
+      0,
+      1,
+      -1,
+      0,
+      0,
+      0
+    ];
+    assert.deepEqual(matrix, expected, 'rotate matrix is equal');
+  });
+
   QUnit.test('fabric.util.getRandomInt', function(assert) {
     assert.ok(typeof fabric.util.getRandomInt === 'function');
 

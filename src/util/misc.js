@@ -1165,8 +1165,7 @@
      * @param {Number} options.scaleY
      * @param {Number} options.skewX
      * @param {Number} options.skewY
-     * @return {Object.x} width of containing
-     * @return {Object.y} height of containing
+     * @returns {fabric.Point} size
      */
     sizeAfterTransform: function(width, height, options) {
       var dimX = width / 2, dimY = height / 2,
@@ -1189,10 +1188,7 @@
             }],
           transformMatrix = fabric.util.calcDimensionsMatrix(options),
           bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
-      return {
-        x: bbox.width,
-        y: bbox.height,
-      };
+      return new fabric.Point(bbox.width, bbox.height);
     },
 
     /**

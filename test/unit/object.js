@@ -579,29 +579,16 @@
     }, 1000);
   });
 
-  QUnit.test('on off fire are chainable', function(assert) {
-    var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
-    var ret;
-    ret = object.fire('');
-    assert.equal(ret, object, 'fire is chainable when no events are registered at all');
-    ret = object.on('hi', function() {});
-    assert.equal(ret, object, 'on is chainable');
-    ret = object.fire('bye');
-    assert.equal(ret, object, 'fire is chainable when firing a non registerd event');
-    ret = object.fire('hi');
-    assert.equal(ret, object, 'fire is chainable when firing a registerd event');
-    ret = object.off('hi');
-    assert.equal(ret, object, 'off is chainable');
-  });
-
   QUnit.test('observable', function(assert) {
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
 
     var fooFired = false,
         barFired = false;
 
-    object.on('foo', function() { fooFired = true; });
-    object.on('bar', function() { barFired = true; });
+    var fooDisposer = object.on('foo', function() { fooFired = true; });
+    var barDisposer = object.on('bar', function () { barFired = true; });
+    assert.ok(typeof fooDisposer === 'function', 'should return disposer');
+    assert.ok(typeof barDisposer === 'function', 'should return disposer');
 
     object.fire('foo');
     assert.ok(fooFired);
@@ -652,6 +639,7 @@
     object.on('removed', function (opt) {
       removedEventFired = true;
       assert.ok(opt.target === canvas, 'target should equal to canvas');
+      assert.ok(object.canvas === undefined, 'canvas should not be referenced');
     });
     canvas.remove(object);
 
