@@ -473,6 +473,7 @@
         this.hiddenTextarea.selectionStart = newSelection.selectionStart;
         this.hiddenTextarea.selectionEnd = newSelection.selectionEnd;
       }
+      this.hiddenTextarea.setAttribute('dir', this.direction);
       this.updateTextareaPosition();
     },
 

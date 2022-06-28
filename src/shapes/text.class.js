@@ -2,8 +2,9 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { }),
-      clone = fabric.util.object.clone;
+  var fabric = global.fabric || (global.fabric = {}),
+      clone = fabric.util.object.clone,
+      _reWords = /\S+/g;
 
   if (fabric.Text) {
     fabric.warn('fabric.Text is already defined');
@@ -16,6 +17,164 @@
     ' direction path pathStartOffset pathSide pathAlign').split(' ');
 
   /**
+   * @see https://unicode.org/reports/tr9
+   */
+  var BidiResolver = fabric.util.createClass({
+
+    /**
+     * @see https://stackoverflow.com/questions/12006095/javascript-how-to-check-if-character-is-rtl/14824756#14824756
+     * RLE @see http://www.unicode.org/reports/tr9/#Explicit_Directional_Embeddings
+     */
+    _reExplicitRTL: /^[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC\u202B\u202E\u2067\u200F\u061C]+$/,
+
+    /**
+     * @see https://stackoverflow.com/questions/12006095/javascript-how-to-check-if-character-is-rtl/14824756#14824756
+     * LRE @see http://www.unicode.org/reports/tr9/#Explicit_Directional_Embeddings
+     */
+    // eslint-disable-next-line max-len
+    _reExplicitLTR: /^[A-Za-z0-9%\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF\u202A\u202D\u2066\u200E]+$/,
+
+    _reContext: /^[.!?,:;]+$/,
+
+    /**
+     * @private
+     * @type {{[char:string]:CharacterDirection}}
+     */
+    cache: {},
+
+    /**
+     *
+     * @typedef {'L'|'R'} StrongCharacterDirection
+     * @typedef {StrongCharacterDirection|'W'} CharacterDirection
+     * @typedef {'ltr'|'rtl'} ExplicitDirection
+     * @typedef {ExplicitDirection|'auto'} Direction
+     *
+     * @param {string} grapheme
+     * @param {boolean} [calculate]
+     * @returns {CharacterDirection} direction
+     */
+    resolve: function (grapheme, calculate) {
+      if (!calculate && this.cache[grapheme]) {
+        return this.cache[grapheme];
+      }
+      var value;
+      if (this._reExplicitRTL.test(grapheme)) {
+        value = 'R';
+      }
+      else if (this._reExplicitLTR.test(grapheme)) {
+        value = 'L';
+      }
+      else {
+        value = 'W';
+      }
+      return this.cache[grapheme] = value;
+    },
+
+    /**
+     *
+     * @param {Direction} direction
+     * @returns {CharacterDirection}
+     */
+    resolveDirection: function (direction) {
+      switch (direction) {
+        case 'rtl':
+          return 'R';
+        case 'ltr':
+          return 'L';
+        default:
+          return 'W';
+      }
+    },
+
+    /**
+     *
+     * @param {string} char
+     * @returns {boolean}
+     */
+    isDirectionalStart: function (resolvedDirectional) {
+      return !!resolvedDirectional
+        && !this.isDirectionalTerminate(resolvedDirectional)
+        && resolvedDirectional !== 'FSI';
+    },
+
+    /**
+     *
+     * @param {string} char
+     * @returns {boolean}
+     */
+    isDirectionalTerminate: function (resolvedDirectional) {
+      return resolvedDirectional === 'PDF' || resolvedDirectional === 'PDI';
+    },
+
+    /**
+     *
+     * @param {string} char
+     * @returns {string}
+     */
+    resolveDirectionals: function (char) {
+      switch (char) {
+
+        case '\u202A':
+          return 'LRE';
+        case '\u202B':
+          return 'RLE';
+        case '\u202C':
+          return 'PDF';
+        case '\u202D':
+          return 'LRO';
+        case '\u202E':
+          return 'RLO';
+
+        case '\u2066':
+          return 'LRI';
+        case '\u2067':
+          return 'RLI';
+        case '\u2068':
+          return 'FSI';
+        case '\u2069':
+          return 'PDI';
+
+        case '\u200E':
+          return 'LRM';
+        case '\u200F':
+          return 'RLM';
+        case '\u061C':
+          return 'ALM';
+
+        default:
+          return;
+      }
+    },
+
+    /**
+     *
+     * @param {string} grapheme
+     * @param {CharacterDirection} before
+     * @param {CharacterDirection} after
+     * @param {StrongCharacterDirection} base
+     * @returns {CharacterDirection} direction
+     */
+    resolveUndetermined: function (grapheme, before, after, base) {
+      if (before === 'W') {
+        return 'W';
+      }
+      else if (this._reContext.test(grapheme)) {
+        return before === after ?
+          before :
+          base;
+      }
+      else if (_reWords.test(grapheme)) {
+        //  weak char that is not a space
+        return before;
+      }
+      else {
+        return 'W';
+      }
+    },
+
+  });
+
+  /**
    * Text class
    * @class fabric.Text
    * @extends fabric.Object
@@ -24,6 +183,14 @@
    * @see {@link fabric.Text#initialize} for constructor definition
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @lends fabric.Text.prototype */ {
+
+
+    /**
+     * Should be shard between all instances
+     * Override if necessary
+     * @static
+     */
+    bidiResolver: new BidiResolver(),
 
     /**
      * Properties which when set cause object to change dimensions
@@ -70,7 +237,7 @@
      * Mostly used when text is 'justify' aligned.
      * @private
      */
-    _reWords: /\S+/g,
+    _reWords: _reWords,
 
     /**
      * Type of an object
@@ -312,7 +479,7 @@
      * some interesting link for the future
      * https://www.w3.org/International/questions/qa-bidi-unicode-controls
      * @since 4.5.0
-     * @type {String} 'ltr|rtl'
+     * @type {'ltr'|'rtl'}
      * @default
      */
     direction: 'ltr',
@@ -785,44 +952,48 @@
      * @return {Number} Line width
      */
     measureLine: function(lineIndex) {
-      var lineInfo = this._measureLine(lineIndex);
+      var width = this._measureLine(lineIndex);
       if (this.charSpacing !== 0) {
-        lineInfo.width -= this._getWidthOfCharSpacing();
+        width -= this._getWidthOfCharSpacing();
       }
-      if (lineInfo.width < 0) {
-        lineInfo.width = 0;
+      if (width < 0) {
+        width = 0;
       }
-      return lineInfo;
+      return width;
     },
 
     /**
      * measure every grapheme of a line, populating __charBounds
      * @param {Number} lineIndex
-     * @return {Object} object.width total width of characters
-     * @return {Object} object.widthOfSpaces length of chars that match this._reSpacesAndTabs
+     * @return {Number} total width of characters
      */
     _measureLine: function(lineIndex) {
       var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme,
-          graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length),
+          graphemeInfo, lineBounds = new Array(line.length),
           positionInPath = 0, startingPoint, totalPathLength, path = this.path,
           reverse = this.pathSide === 'right';
 
       this.__charBounds[lineIndex] = lineBounds;
       for (i = 0; i < line.length; i++) {
         grapheme = line[i];
-        graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
+        graphemeInfo = this._getGraphemeBox(grapheme, line, lineIndex, i, prevGrapheme);
         lineBounds[i] = graphemeInfo;
         width += graphemeInfo.kernedWidth;
         prevGrapheme = grapheme;
       }
+      //  mutates `lineBounds`
+      var eol = this._resolveLineDirection(lineIndex, this.direction);
       // this latest bound box represent the last character of the line
       // to simplify cursor handling in interactive mode.
-      lineBounds[i] = {
-        left: graphemeInfo ? graphemeInfo.left + graphemeInfo.width : 0,
+      lineBounds.push({
+        left: eol,
         width: 0,
         kernedWidth: 0,
-        height: this.fontSize
-      };
+        height: this.fontSize,
+        dir: this.bidiResolver.resolveDirection(this.direction),
+        type: 'EOL'
+      });
+
       if (path) {
         totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
         startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
@@ -857,7 +1028,7 @@
           positionInPath += graphemeInfo.kernedWidth;
         }
       }
-      return { width: width, numOfSpaces: numOfSpaces };
+      return width;
     },
 
     /**
@@ -880,6 +1051,203 @@
     },
 
     /**
+     *
+     * @param {string} grapheme
+     * @param {number} lineIndex index of the line where the char is
+     * @param {number} charIndex position in the line
+     * @param {ExplicitDirection} baseDirection
+     * @returns {{direction:CharacterDirection, type?: string}} direction data
+     */
+    _getGraphemeDirection: function (grapheme, line, lineIndex, charIndex, baseDirection) {
+      var cdir = this.bidiResolver.resolve(grapheme), c,
+          cBaseDirection = this.bidiResolver.resolveDirection(baseDirection),
+          type = this.bidiResolver.resolveDirectionals(grapheme),
+          isTerminate = this.bidiResolver.isDirectionalTerminate(type),
+          lineBounds = this.__charBounds[lineIndex];
+
+      if (isTerminate) {
+        c = charIndex - 1;
+        cdir = 'W';
+        var overrides = [];
+        while (c >= 0) {
+          var data = lineBounds[c--];
+          if (this.bidiResolver.isDirectionalStart(data.type)) {
+            cdir = data.dir;
+            break;
+          }
+          overrides.push(data);
+        }
+        if (cdir !== 'W') {
+          for (var i = 0; i < overrides.length; i++) {
+            data = overrides[i];
+            data.originalDir = data.dir;
+            data.dir = cdir;
+          }
+        }
+        return { direction: cdir, type: type };
+      }
+      else if (cdir === 'W' && charIndex === line.length - 1) {
+        //  the direction of the last grapheme should set by `baseDirection`
+        cdir = cBaseDirection;
+      }
+      if (cdir === 'W') {
+        var before = 'W', after = 'W';
+        //  check graphemes up to start of line
+        c = charIndex - 1;
+        while (before === 'W' && c >= 0) {
+          before = this.bidiResolver.resolve(line[c--]);
+        }
+        //  check graphemes up to end of line
+        c = charIndex + 1;
+        while (after === 'W' && c < line.length) {
+          after = this.bidiResolver.resolve(line[c++]);
+        }
+        //  resolve special cases
+        //  in case a char returns a `W` dir it will be overriden by the next strong char or by the last char
+        cdir = this.bidiResolver.resolveUndetermined(grapheme, before, after, cBaseDirection);
+      }
+      if (cdir === 'W') {
+        if (before === 'W' || after === 'W') {
+          //  weak line start/end
+        }
+        else if (before === after) {
+          //  weak char between 2 strong chars with the same direction
+          cdir = before;
+        }
+        else {
+          //  weak char between 2 strong chars with different direction
+          cdir = cBaseDirection;
+        }
+        return { direction: cdir, type: 'FSI' };
+      }
+      else {
+        //  strong character
+        //  resolve all preceding `W` character direction values for the given line to strong values (`L`|`R`)
+        //  https://unicode.org/reports/tr9/#Explicit_Directional_Isolates
+        //  we use `FSI` to mark a weak grapheme overriden by a FS (first strong) grapheme, differently from the spec
+        var weaklings = [], isBaseDir = cdir === cBaseDirection, wdir = cdir;
+        c = charIndex - 1;
+        while (lineBounds && c >= 0) {
+          var data = lineBounds[c--];
+          if ((data.dir === 'W' || (data.type === 'FSI' && data.dir !== cdir))
+            && !this.bidiResolver.isDirectionalTerminate(data.type)) {
+            if (isBaseDir) {
+              data.dir = cdir;
+            }
+            else {
+              //  we are not sure what is the preceding strong character so we store for later
+              weaklings.push(data);
+            }
+          }
+          else {
+            if (data.dir === cBaseDirection) {
+              //  the preceding strong character should take over
+              wdir = cBaseDirection;
+            }
+            break;
+          }
+        }
+        for (var i = 0; i < weaklings.length; i++) {
+          weaklings[i].dir = wdir;
+        }
+        return { direction: cdir, type: type };
+      }
+    },
+
+    /**
+     * Used at the end of a line to resolve line direction by mutating relevant grapheme bboxes
+     * Wraps the words that are opposite to the base direction in LRI/RLI...PDI (not if it's a single grapheme) and appends directional graphemes (if exisitng)
+     * @see https://unicode.org/reports/tr9
+     * @private
+     * @param {number} lineIndex index of the line where the char is
+     * @param {ExplicitDirection} baseDirection
+     * @returns {number} width of line in px
+     */
+    _resolveLineDirection: function (lineIndex, baseDirection) {
+      var c = 0, lineBounds = this.__charBounds[lineIndex];
+      //  at this point the the direction of line's graphemes are resolved (='L'|'R') except for some redundant direction terminates (='PDF'|'PDI')
+      //  now we need to reorder char bounds of words that are opposite to the base direction
+      var width = 0, offset = 0, prev, start = -1, oppositeBounds = [], eol,
+          cBaseDirection = this.bidiResolver.resolveDirection(baseDirection),
+          isBaseDir, isTerminate, isStarter = false, type, typeStart;
+
+      while (lineBounds && c < lineBounds.length) {
+        var data = lineBounds[c];
+        if (!data) {
+          c++;
+          continue;
+        }
+        eol = data.left + data.width;
+        isBaseDir = data.dir === cBaseDirection;
+        type = data.type;
+        isTerminate = this.bidiResolver.isDirectionalTerminate(type);
+        if (!isBaseDir && !isTerminate) {
+          oppositeBounds.push(data);
+          if (start === -1) {
+            start = c;
+            typeStart = type;
+            isStarter = this.bidiResolver.isDirectionalStart(type);
+            prev = c > 0 ? lineBounds[c - 1] : undefined;
+            offset = prev ? prev.left + prev.width : 0;
+          }
+          width += data.width;
+        }
+        if ((isBaseDir || c === lineBounds.length - 1 || isTerminate)
+          && oppositeBounds.length > 0) {
+          data = oppositeBounds[0];
+          eol = data.left = width + offset;
+          if (oppositeBounds.length > 1) {
+            //  insert bdo bbox for cursor handling
+            //  in order to insert the closing bdo tag in the correct place we insert it before inserting the opening bdo tag
+            //  https://unicode.org/reports/tr9/#Explicit_Directional_Isolates
+            lineBounds.splice(start + oppositeBounds.length, isTerminate, {
+              width: 0,
+              kernedWidth: 0,
+              height: data.height,
+              left: eol,
+              dir: data.dir,
+              type: isTerminate ? type : 'PDI'
+            });
+            lineBounds.splice(start, isStarter, {
+              width: 0,
+              kernedWidth: 0,
+              height: data.height,
+              left: data.left,
+              dir: data.dir,
+              type: isStarter ?
+                typeStart :
+                data.dir === 'R' ?
+                  'RLI' :
+                  'LRI'
+            });
+            c += (!isStarter + !isTerminate);
+            for (var i = 1; i < oppositeBounds.length; i++) {
+              data = oppositeBounds[i];
+              prev = oppositeBounds[i - 1];
+              data.left = prev.left - prev.width + data.kernedWidth - data.width;
+            }
+          }
+          else if (isStarter) {
+            lineBounds.splice(start, 1);
+            c--;
+            lineBounds[start].dir = data.dir;
+          }
+          else if (isTerminate) {
+            lineBounds.splice(c, 1);
+            c--;
+          }
+          width = offset = 0;
+          oppositeBounds = [];
+          start = -1;
+          isStarter = false;
+          prev = undefined;
+        }
+        c++;
+      }
+      return eol || 0;
+    },
+
+    /**
      * Measure and return the info of a single grapheme.
      * needs the the info of previous graphemes already filled
      * Override to customize measuring
@@ -897,7 +1265,7 @@
      * @param {String} [prevGrapheme] character preceding the one to be measured
      * @returns {GraphemeBBox} grapheme bbox
      */
-    _getGraphemeBox: function(grapheme, lineIndex, charIndex, prevGrapheme, skipLeft) {
+    _getGraphemeBox: function(grapheme, line, lineIndex, charIndex, prevGrapheme, skipLeft) {
       var style = this.getCompleteStyleDeclaration(lineIndex, charIndex),
           prevStyle = prevGrapheme ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1) : { },
           info = this._measureChar(grapheme, style, prevGrapheme, prevStyle),
@@ -910,13 +1278,18 @@
         kernedWidth += charSpacing;
       }
 
+      var dir = this._getGraphemeDirection(grapheme, line, lineIndex, charIndex, this.direction);
       var box = {
         width: width,
         left: 0,
         height: style.fontSize,
         kernedWidth: kernedWidth,
         deltaY: style.deltaY,
+        dir: dir.direction,
       };
+      if (dir.type) {
+        box.type = dir.type;
+      }
       if (charIndex > 0 && !skipLeft) {
         var previousBox = this.__charBounds[lineIndex][charIndex - 1];
         box.left = previousBox.left + previousBox.width + info.kernedWidth - info.width;
@@ -1363,11 +1736,7 @@
       if (this.__lineWidths[lineIndex] !== undefined) {
         return this.__lineWidths[lineIndex];
       }
-
-      var lineInfo = this.measureLine(lineIndex);
-      var width = lineInfo.width;
-      this.__lineWidths[lineIndex] = width;
-      return width;
+      return this.__lineWidths[lineIndex] = this.measureLine(lineIndex);
     },
 
     _getWidthOfCharSpacing: function() {

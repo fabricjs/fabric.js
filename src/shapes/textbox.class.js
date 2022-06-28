@@ -289,11 +289,11 @@
      * @param {number} charOffset
      * @returns {number}
      */
-    _measureWord: function(word, lineIndex, charOffset) {
+    _measureWord: function (word, line, lineIndex, charOffset) {
       var width = 0, prevGrapheme, skipLeft = true;
       charOffset = charOffset || 0;
       for (var i = 0, len = word.length; i < len; i++) {
-        var box = this._getGraphemeBox(word[i], lineIndex, i + charOffset, prevGrapheme, skipLeft);
+        var box = this._getGraphemeBox(word[i], line, lineIndex, charOffset + i, prevGrapheme, skipLeft);
         width += box.kernedWidth;
         prevGrapheme = word[i];
       }
@@ -319,7 +319,7 @@
      * @returns {Array} Array of line(s) into which the given text is wrapped
      * to.
      */
-    _wrapLine: function(_line, lineIndex, desiredWidth, reservedSpace) {
+    _wrapLine: function (_line, lineIndex, desiredWidth, reservedSpace) {
       var lineWidth = 0,
           splitByGrapheme = this.splitByGrapheme,
           graphemeLines = [],
@@ -344,7 +344,7 @@
       var data = words.map(function (word) {
         // if using splitByGrapheme words are already in graphemes.
         word = splitByGrapheme ? word : this.graphemeSplit(word);
-        var width = this._measureWord(word, lineIndex, offset);
+        var width = this._measureWord(word, _line, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
         offset += word.length + 1;
         return { word: word, width: width };
@@ -373,7 +373,7 @@
         }
         line = line.concat(word);
 
-        infixWidth = splitByGrapheme ? 0 : this._measureWord([infix], lineIndex, offset);
+        infixWidth = splitByGrapheme ? 0 : this._measureWord([infix], infix, lineIndex, 0);
         offset++;
         lineJustStarted = false;
       }

@@ -11,6 +11,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.hiddenTextarea.setAttribute('spellcheck', 'false');
     this.hiddenTextarea.setAttribute('data-fabric-hiddentextarea', '');
     this.hiddenTextarea.setAttribute('wrap', 'off');
+    this.hiddenTextarea.setAttribute('dir', this.direction);
     var style = this._calcTextareaPosition();
     // line-height: 1px; was removed from the style to fix this:
     // https://bugs.chromium.org/p/chromium/issues/detail?id=870966
@@ -84,7 +85,8 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    */
   ctrlKeysMapUp: {
     67: 'copy',
-    88: 'cut'
+    88: 'cut',
+    16: 'changeTextDirection',
   },
 
   /**
@@ -273,6 +275,16 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     this.compositionStart = e.target.selectionStart;
     this.compositionEnd = e.target.selectionEnd;
     this.updateTextareaPosition();
+  },
+
+  /**
+   * 
+   * @param {KeyboardEvent} e 
+   */
+  changeTextDirection: function (e) {
+    this.set('direction', e.code === 'ShiftRight' ? 'rtl' : 'ltr');
+    this.dirty = true;
+    this._updateTextarea();
   },
 
   /**
