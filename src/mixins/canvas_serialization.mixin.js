@@ -35,7 +35,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
     this.renderOnAddRemove = false;
 
     return Promise.all([
-      fabric.util.enlivenObjects(serialized.objects || [], Object.assign({ reviver: reviver }, options)),
+      fabric.util.enlivenObjects(serialized.objects || [], { reviver: reviver, signal: options && options.signal }),
       fabric.util.enlivenObjectEnlivables({
         backgroundImage: serialized.backgroundImage,
         backgroundColor: serialized.background,
