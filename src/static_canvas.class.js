@@ -31,7 +31,6 @@
    * @fires canvas:cleared
    * @fires object:added
    * @fires object:removed
-   * @fires loading:aborted
    */
   // eslint-disable-next-line max-len
   fabric.StaticCanvas = fabric.util.createClass(fabric.CommonMethods, fabric.Collection, /** @lends fabric.StaticCanvas.prototype */ {

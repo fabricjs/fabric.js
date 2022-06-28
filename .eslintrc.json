@@ -12,8 +12,7 @@
     "Buffer": true,
     "process": true,
     "QUnit": true,
-    "assert": true,
-    "AbortController": true
+    "assert": true
   },
   "rules": {
     "semi": 2,

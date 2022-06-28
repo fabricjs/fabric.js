@@ -17,7 +17,6 @@
    * Image class
    * @class fabric.Image
    * @extends fabric.Object
-   * @fires loading:aborted
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
    * @see {@link fabric.Image#initialize} for constructor definition
    */
@@ -365,42 +364,21 @@
     },
 
     /**
-     * Aborts pending image loading task
-     * @returns {boolean} true if aborted
-     */
-    abortLoadingTask: function () {
-      if (this.__abortController) {
-        this.__abortController.abort();
-        delete this.__abortController;
-        return true;
-      }
-      return false;
-    },
-
-    /**
-     * Sets source of an image
+     * Loads and sets source of an image\
+     * **IMPORTANT**: It is recommended to abort loading tasks before calling this method to prevent race conditions and unnecessary networking
      * @param {String} src Source string (URL)
      * @param {Object} [options] Options object
+     * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
      * @param {String} [options.crossOrigin] crossOrigin value (one of "", "anonymous", "use-credentials")
      * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
      * @return {Promise<fabric.Image>} thisArg
      */
     setSrc: function(src, options) {
       var _this = this;
-      if (this.abortLoadingTask()) {
-        this.fire('loading:aborted');
-      }
-      var abortController = new AbortController();
-      this.__abortController = abortController;
-      var opts = Object.assign({}, options, { signal: abortController.signal });
-      return fabric.util.loadImage(src, opts).then(function(img) {
+      return fabric.util.loadImage(src, options).then(function (img) {
         _this.setElement(img, options);
         _this._setWidthHeight();
         return _this;
-      }).finally(function () {
-        if (abortController === _this.__abortController) {
-          delete _this.__abortController;
-        }
       });
     },
 
