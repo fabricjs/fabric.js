@@ -42,7 +42,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         overlayImage: serialized.overlayImage,
         overlayColor: serialized.overlay,
         clipPath: serialized.clipPath,
-      }, { signal: abortController.signal })
+      }, { signal: options && options.signal })
     ])
       .then(function (res) {
         var enlived = res[0], enlivedMap = res[1];
