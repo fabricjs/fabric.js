@@ -86,7 +86,7 @@
     "uglify-js": "^3.15.5"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=14.0.0"
   },
   "main": "./dist/fabric.js"
 }
