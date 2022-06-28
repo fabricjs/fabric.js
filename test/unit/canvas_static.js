@@ -1328,43 +1328,19 @@
     });
   });
 
-  QUnit.test('abort loadFromJSON with image background and color', function (assert) {
+  QUnit.test('loadFromJSON with AbortController', function (assert) {
     var done = assert.async();
-    assert.expect(8);
+    assert.expect(1);
     var serialized = JSON.parse(PATH_JSON);
     serialized.background = 'green';
     serialized.backgroundImage = { "type": "image", "originX": "left", "originY": "top", "left": 13.6, "top": -1.4, "width": 3000, "height": 3351, "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 0, "strokeDashArray": null, "strokeLineCap": "butt", "strokeDashOffset": 0, "strokeLineJoin": "miter", "strokeMiterLimit": 4, "scaleX": 0.05, "scaleY": 0.05, "angle": 0, "flipX": false, "flipY": false, "opacity": 1, "shadow": null, "visible": true, "backgroundColor": "", "fillRule": "nonzero", "globalCompositeOperation": "source-over", "skewX": 0, "skewY": 0, "src": IMG_SRC, "filters": [], "crossOrigin": "" };
-    canvas.on('loading:aborted', function (opt) {
-      assert.equal(opt.from, 'json');
-    });
-    canvas.loadFromJSON(serialized).catch(function (err) {
-      assert.equal(err.type, 'abort', 'should be an error object');
-      assert.ok(canvas.__abortController instanceof AbortController, 'abort controller of new task should be referenced');
-      assert.equal(canvas.__abortController.signal.aborted, false, 'should not be aborted');
-    });
-    canvas.loadFromJSON(serialized).then(function () {
-      assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(canvas.backgroundColor, 'green');
-      assert.ok(canvas.backgroundImage instanceof fabric.Image);
-      assert.equal(canvas.__abortController, undefined, 'abort controller reference should be cleared');
-      done();
-    });
-  });
-
-  QUnit.test('imperative abort loadFromJSON', function (assert) {
-    var done = assert.async();
-    assert.expect(5);
-    var serialized = JSON.parse(PATH_JSON);
-    serialized.background = 'green';
-    serialized.backgroundImage = { "type": "image", "originX": "left", "originY": "top", "left": 13.6, "top": -1.4, "width": 3000, "height": 3351, "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 0, "strokeDashArray": null, "strokeLineCap": "butt", "strokeDashOffset": 0, "strokeLineJoin": "miter", "strokeMiterLimit": 4, "scaleX": 0.05, "scaleY": 0.05, "angle": 0, "flipX": false, "flipY": false, "opacity": 1, "shadow": null, "visible": true, "backgroundColor": "", "fillRule": "nonzero", "globalCompositeOperation": "source-over", "skewX": 0, "skewY": 0, "src": IMG_SRC, "filters": [], "crossOrigin": "" };
-    canvas.loadFromJSON(serialized).catch(function (err) {
-      assert.equal(err.type, 'abort');
-    });
-    assert.ok(typeof canvas.abortLoadingTask === 'function');
-    assert.ok(canvas.abortLoadingTask(), 'should return true because loading was aborted');
-    assert.equal(canvas.__abortController, undefined, 'abort controller reference should be cleared');
-    assert.ok(canvas.isEmpty(), 'canvas is empty');
-    done();
+    var abortController = new AbortController();
+    canvas.loadFromJSON(serialized, null, { signal: abortController.signal })
+      .catch(function (err) {
+        assert.equal(err.type, 'abort', 'should be an abort event');
+        done();
+      });
+    abortController.abort();
   });
 
   QUnit.test('loadFromJSON custom properties', function(assert) {

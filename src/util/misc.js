@@ -513,9 +513,9 @@
           return reject(new Error('`options.signal` is in `aborted` state'));
         }
         else if (signal) {
-          abort = function () {
+          abort = function (err) {
             img.src = '';
-            reject(new Error('aborted'));
+            reject(err);
           };
           signal.addEventListener('abort', abort, { once: true });
         }
