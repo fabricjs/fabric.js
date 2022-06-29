@@ -755,6 +755,7 @@
       this.calcViewportBoundaries();
       this.clearContext(ctx);
       fabric.util.setImageSmoothing(ctx, this.imageSmoothingEnabled);
+      ctx.patternQuality = 'best';
       this.fire('before:render', { ctx: ctx, });
       this._renderBackground(ctx);
 
