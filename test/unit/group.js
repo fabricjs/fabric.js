@@ -771,6 +771,8 @@
   QUnit.test('group add edge cases', function (assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
       rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
+      rect3 = new fabric.Rect({ top: 10, left: 10, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
+      rect4 = new fabric.Rect({ top: 15, left: 15, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
       group = new fabric.Group([rect1]);
 
     //  duplicate
@@ -795,6 +797,17 @@
     assert.notOk(group.canEnterGroup(circularGroup), 'circular group should be denied entry');
     group.add(circularGroup);
     assert.deepEqual(group.getObjects(), [rect2, nestedGroup], 'objects should not have changed');
+    //  remove from prev group
+    var group2 = new fabric.Group([rect3]);
+    group.add(rect3);
+    assert.deepEqual(group.getObjects(), [rect2, nestedGroup, rect3], 'rect3 should have been added');
+    assert.deepEqual(group2.getObjects(), [], 'rect3 should have been removed from prev group');
+    //  remove from canvas
+    canvas.add(rect4);
+    assert.deepEqual(canvas.getObjects(), [rect4], 'rect4 should have been added to canvas');
+    group.add(rect4);
+    assert.deepEqual(group.getObjects(), [rect2, nestedGroup, rect3, rect4], 'rect4 should have been added');
+    assert.deepEqual(canvas.getObjects(), [], 'rect4 should have been removed from canvas');
   });
 
   QUnit.test('group remove', function(assert) {
