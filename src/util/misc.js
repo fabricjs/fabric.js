@@ -1165,8 +1165,7 @@
      * @param {Number} options.scaleY
      * @param {Number} options.skewX
      * @param {Number} options.skewY
-     * @return {Object.x} width of containing
-     * @return {Object.y} height of containing
+     * @returns {fabric.Point} size
      */
     sizeAfterTransform: function(width, height, options) {
       var dimX = width / 2, dimY = height / 2,

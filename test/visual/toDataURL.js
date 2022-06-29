@@ -445,24 +445,6 @@
     height: 600,
   });
 
-  function toDataURLWithDeepFilter(fabricCanvas, callback) {
-    fabricCanvas.loadFromJSON(canvasWithObjects).then(function () {
-      var objects = fabricCanvas.getObjects().slice(200);
-      fabricCanvas.remove(...objects);
-      var dataurl = fabricCanvas.toDataURL({ filter: object => object.isType('polygon', 'rect') });
-      callback(dataurl);
-    });
-  }
-
-  tests.push({
-    test: 'Canvas toDataURL with filtered objects - deep',
-    code: toDataURLWithDeepFilter,
-    golden: 'dataurl4_filter.png',
-    percentage: 0.09,
-    width: 800,
-    height: 600,
-  });
-
   function testWrapper(test) {
     var actualTest = test.code;
     test.code = function(fabricCanvas, callback) {

@@ -108,9 +108,9 @@
     },
 
     /**
-     * @public override if necessary
-     * @param {CanvasRenderingContext2D} ctx
-     * @param {fabric.Point} size
+     * @public override this function in order to customize the drawing of the control box, e.g. rounded corners, different border style.
+     * @param {CanvasRenderingContext2D} ctx ctx is rotated and translated so that (0,0) is at object's center
+     * @param {fabric.Point} size the control box size used
      */
     strokeBorders: function (ctx, size) {
       ctx.strokeRect(

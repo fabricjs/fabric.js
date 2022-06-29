@@ -8,8 +8,7 @@
       transformPoint = fabric.util.transformPoint,
       applyTransformToObject = fabric.util.applyTransformToObject,
       degreesToRadians = fabric.util.degreesToRadians,
-      clone = fabric.util.object.clone,
-      extend = fabric.util.object.extend;
+      clone = fabric.util.object.clone;
 
   if (fabric.Group) {
     fabric.warn('fabric.Group is already defined');
@@ -141,22 +140,36 @@
     },
 
     /**
+     * Override this method to enhance performance (for groups with a lot of objects).
+     * If Overriding, be sure not pass illegal objects to group - it will break your app.
+     * @private
+     */
+    _filterObjectsBeforeEnteringGroup: function (objects) {
+      return objects.filter(function (object, index, array) {
+        // can enter AND is the first occurrence of the object in the passed args (to prevent adding duplicates)
+        return this.canEnterGroup(object) && array.indexOf(object) === index;
+      }, this);
+    },
+
+    /**
      * Add objects
      * @param {...fabric.Object} objects
      */
     add: function () {
-      fabric.Collection.add.call(this, arguments, this._onObjectAdded);
-      this._onAfterObjectsChange('added', Array.from(arguments));
+      var allowedObjects = this._filterObjectsBeforeEnteringGroup(Array.from(arguments));
+      fabric.Collection.add.call(this, allowedObjects, this._onObjectAdded);
+      this._onAfterObjectsChange('added', allowedObjects);
     },
 
     /**
      * Inserts an object into collection at specified index
-     * @param {fabric.Object} objects Object to insert
+     * @param {fabric.Object | fabric.Object[]} objects Object to insert
      * @param {Number} index Index to insert object at
      */
     insertAt: function (objects, index) {
-      fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
-      this._onAfterObjectsChange('added', Array.isArray(objects) ? objects : [objects]);
+      var allowedObjects = this._filterObjectsBeforeEnteringGroup(Array.isArray(objects) ? objects : [objects]);
+      fabric.Collection.insertAt.call(this, allowedObjects, index, this._onObjectAdded);
+      this._onAfterObjectsChange('added', allowedObjects);
     },
 
     /**
@@ -184,7 +197,7 @@
      * @private
      */
     __objectMonitor: function (opt) {
-      this._applyLayoutStrategy(extend(clone(opt), {
+      this._applyLayoutStrategy(Object.assign({}, opt, {
         type: 'object_modified'
       }));
       this._set('dirty', true);
@@ -238,16 +251,18 @@
      * @param {fabric.Object} object
      * @returns
      */
-    canEnter: function (object) {
+    canEnterGroup: function (object) {
       if (object === this || this.isDescendantOf(object)) {
+        //  prevent circular object tree
         /* _DEV_MODE_START_ */
-        console.warn('fabric.Group: trying to add group to itself, this call has no effect');
+        console.error('fabric.Group: circular object trees are not supported, this call has no effect');
         /* _DEV_MODE_END_ */
         return false;
       }
-      else if (object.group && object.group === this) {
+      else if (this._objects.indexOf(object) !== -1) {
+        // is already in the objects array
         /* _DEV_MODE_START_ */
-        console.warn('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
+        console.error('fabric.Group: duplicate objects are not supported inside group, this call has no effect');
         /* _DEV_MODE_END_ */
         return false;
       }
@@ -287,9 +302,6 @@
      * @returns {boolean} true if object entered group
      */
     enterGroup: function (object, removeParentTransform) {
-      if (!this.canEnterGroup(object)) {
-        return false;
-      }
       if (object.group) {
         object.group.remove(object);
       }
@@ -687,7 +699,7 @@
         return this.prepareBoundingBox(layoutDirective, addedObjects, context);
       }
       else if (layoutDirective === 'fit-content' || layoutDirective === 'fit-content-lazy'
-        || (layoutDirective === 'fixed' && (context.type === 'initialization' || context.type === 'imperative'))) {
+          || (layoutDirective === 'fixed' && (context.type === 'initialization' || context.type === 'imperative'))) {
         return this.prepareBoundingBox(layoutDirective, objects, context);
       }
       else if (layoutDirective === 'clip-path' && this.clipPath) {

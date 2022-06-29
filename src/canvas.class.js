@@ -951,7 +951,7 @@
      * of the time.
      * @param {Event} e
      * @param {Boolean} ignoreVpt
-     * @return {Object} object with "x" and "y" number values
+     * @return {fabric.Point}
      */
     getPointer: function (e, ignoreVpt) {
       // return cached values if we are in the event processing chain
@@ -991,18 +991,31 @@
         pointer.y /= retinaScaling;
       }
 
-      if (boundsWidth === 0 || boundsHeight === 0) {
-        // If bounds are not available (i.e. not visible), do not apply scale.
-        cssScale = { x: 1, y: 1 };
-      }
-      else {
-        cssScale = {
-          x: upperCanvasEl.width / boundsWidth,
-          y: upperCanvasEl.height / boundsHeight
-        };
-      }
+      // If bounds are not available (i.e. not visible), do not apply scale.
+      cssScale = boundsWidth === 0 || boundsHeight === 0 ?
+        new fabric.Point(1, 1) :
+        new fabric.Point(upperCanvasEl.width / boundsWidth, upperCanvasEl.height / boundsHeight);
 
-      return pointer.multiply(cssScale);
+      return new fabric.Point(
+        pointer.x * cssScale.x,
+        pointer.y * cssScale.y
+      );
+    },
+
+    /**
+     * Sets dimensions (width, height) of this canvas instance. when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
+     * @param {Object}        dimensions                    Object with width/height properties
+     * @param {Number|String} [dimensions.width]            Width of canvas element
+     * @param {Number|String} [dimensions.height]           Height of canvas element
+     * @param {Object}        [options]                     Options object
+     * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
+     * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
+     * @return {fabric.Canvas} thisArg
+     * @chainable
+     */
+    setDimensions: function (dimensions, options) {
+      this._resetTransformEventData();
+      return this.callSuper('setDimensions', dimensions, options);
     },
 
     /**

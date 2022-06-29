@@ -9,7 +9,7 @@
 
   visualCallback.prototype.testDone = function(details) {
     if (window && document && this.currentArgs.enabled) {
-      var fabricCanvas = this.currentArgs.fabric;
+      var fabricCanvasDataRef = this.currentArgs.fabric;
       var ouputImageDataRef = this.currentArgs.diff;
       var goldenCanvasRef = this.currentArgs.golden;
       var goldenName = this.currentArgs.goldenName;
@@ -17,15 +17,15 @@
       var node = document.getElementById(id);
       var fabricCopy = document.createElement('canvas');
       var diff = document.createElement('canvas');
-      diff.width = fabricCopy.width = fabricCanvas.width;
-      diff.height = fabricCopy.height = fabricCanvas.height;
+      diff.width = fabricCopy.width = fabricCanvasDataRef.width;
+      diff.height = fabricCopy.height = fabricCanvasDataRef.height;
       diff.getContext('2d').putImageData(ouputImageDataRef, 0, 0);
-      fabricCopy.getContext('2d').drawImage(fabricCanvas, 0, 0);
+      fabricCopy.getContext('2d').putImageData(fabricCanvasDataRef, 0, 0);
 
       var data = {
         actual: fabricCopy,
         expected: goldenCanvasRef,
-        diff
+        diff: diff,
       };
 
       var template = document.getElementById('error_output');
@@ -41,8 +41,9 @@
           link.click();
         }
       });
-      node.appendChild(errorOutput);
-      
+      if (node) {
+        node.appendChild(errorOutput);
+      }
       // after one run, disable
       this.currentArgs.enabled = false;
     }

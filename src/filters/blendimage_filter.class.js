@@ -237,11 +237,9 @@
    * @param {AbortSignal} [options.signal] handle aborting image loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Image.filters.BlendImage>}
    */
-  fabric.Image.filters.BlendImage.fromObject = function(object, options) {
-    return fabric.Image.fromObject(object.image, options).then(function(image) {
-      var options = fabric.util.object.clone(object);
-      options.image = image;
-      return new fabric.Image.filters.BlendImage(options);
+  fabric.Image.filters.BlendImage.fromObject = function(object) {
+    return fabric.Image.fromObject(object.image).then(function(image) {
+      return new fabric.Image.filters.BlendImage(Object.assign({}, object, { image: image }));
     });
   };
 
