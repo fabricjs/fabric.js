@@ -21162,6 +21162,9 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       if (object.group) {
         object.group.remove(object);
       }
+      else if (object.canvas) {
+        object.canvas.remove(object);
+      }
       this._enterGroup(object, removeParentTransform);
       var activeObject = this.canvas && this.canvas.getActiveObject && this.canvas.getActiveObject();
       // if we are adding the activeObject in a group
