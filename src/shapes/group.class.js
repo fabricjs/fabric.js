@@ -268,6 +268,9 @@
       if (object.group) {
         object.group.remove(object);
       }
+      else if (object.canvas) {
+        object.canvas.remove(object);
+      }
       this._enterGroup(object, removeParentTransform);
       return true;
     },
