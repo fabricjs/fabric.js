@@ -254,9 +254,9 @@
         points.forEach(function (point) {
           projectedPoints.push(
             point.add(projectionVector),
-            point.subtract(projectionVector),
+            point.subtract(projectionVector)
           );
-        })
+        });
         return projectedPoints;
       }
       else {
@@ -270,18 +270,18 @@
     _calcDimensions: function() {
 
       var aX = [],
-        aY = [],
-        current, // current instruction
-        subpathStart = new fabric.Point(0, 0),
-        subpathSecond = new fabric.Point(0, 0),
-        point = new fabric.Point(0, 0),
-        prev = new fabric.Point(0, 0),
-        beforePrev = new fabric.Point(0, 0),
-        opening = false,
-        second = false,
-        closing = false,
-        projectedPoints = [],
-        bounds;
+          aY = [],
+          current, // current instruction
+          subpathStart = new fabric.Point(0, 0),
+          subpathSecond = new fabric.Point(0, 0),
+          point = new fabric.Point(0, 0),
+          prev = new fabric.Point(0, 0),
+          beforePrev = new fabric.Point(0, 0),
+          opening = false,
+          second = false,
+          closing = false,
+          projectedPoints = [],
+          bounds;
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
@@ -389,7 +389,7 @@
     _setPositionDimensions: function (options) {
       options || (options = {});
       var calcDim = this._calcDimensions(options), origin,
-        sizeCorrection = options.correction || 0;
+          sizeCorrection = options.correction || 0;
       this.width = calcDim.width - sizeCorrection;
       this.height = calcDim.height - sizeCorrection;
       if (!options.fromSVG) {
