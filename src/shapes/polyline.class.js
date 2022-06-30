@@ -90,11 +90,11 @@
       this.height = calcDim.height - correctSize;
       if (!options.fromSVG) {
         correctLeftTop = this.translateToGivenOrigin(
-          {
-            // this looks bad, but is one way to keep it optional for now.
-            x: calcDim.left - this.strokeWidth / 2 + correctSize / 2,
-            y: calcDim.top - this.strokeWidth / 2 + correctSize / 2
-          },
+          // this looks bad, but is one way to keep it optional for now.
+          new fabric.Point(
+            calcDim.left - this.strokeWidth / 2 + correctSize / 2,
+            calcDim.top - this.strokeWidth / 2 + correctSize / 2
+          ),
           'left',
           'top',
           this.originX,
