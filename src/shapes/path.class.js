@@ -240,7 +240,7 @@
     /**
      * @private
      */
-    _projectStrokeOnPoints: function (A, B, C, points) {
+    _projectStrokeOnSegmentBBox: function (A, B, C, points) {
       var v1 = fabric.util.createVector(A, B);
       var v2 = fabric.util.createVector(B, C);
       var angle = fabric.util.calcAngleBetweenVectors(v1, v2);
@@ -342,11 +342,11 @@
 
         if (this.strokeLineJoin === 'miter') {
           if (!opening && !second) {
-            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnPoints(beforePrev, prev, point, bounds));
+            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnSegmentBBox(beforePrev, prev, point, bounds));
           }
           if (closing) {
             //  project stroke on sub path start
-            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnPoints(prev, subpathStart, subpathSecond, bounds));
+            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnSegmentBBox(prev, subpathStart, subpathSecond, bounds));
           }
         }
         else {
