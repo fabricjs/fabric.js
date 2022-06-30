@@ -243,13 +243,18 @@
     _calcDimensions: function() {
 
       var aX = [],
-          aY = [],
-          current, // current instruction
-          subpathStartX = 0,
-          subpathStartY = 0,
-          x = 0, // current x
-          y = 0, // current y
-          bounds;
+        aY = [],
+        current, // current instruction
+        subpathStartX = 0,
+        subpathStartY = 0,
+        x = 0, // current x
+        y = 0, // current y
+        prevX = 0,
+        prevY = 0,
+        firstTrend = new fabric.Point(0, 0),
+        trend = new fabric.Point(0, 0),
+        prevTrend = new fabric.Point(0, 0),
+        bounds;
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
@@ -303,12 +308,57 @@
             y = subpathStartY;
             break;
         }
+
+        if (i > 0) {
+          prevTrend.setFromPoint(trend);
+          trend.setXY(x - prevX, y - prevY);
+          if (i === 1) {
+            firstTrend.setFromPoint(trend);
+          }
+          var angle = fabric.util.calcAngleBetweenVectors(prevTrend, trend);
+          if (this.strokeLineJoin === 'miter' && Math.abs(angle) < Math.PI / 2) {
+            var projection = fabric.util.projectStrokeOnPoints([
+              new fabric.Point(prevX, prevY).subtract(prevTrend),
+              new fabric.Point(prevX, prevY),
+              new fabric.Point(x, y)
+            ], this, true);
+            projection.slice(1, projection.length - 1).forEach(function (point) {
+              aX.push(point.x);
+              aY.push(point.y);
+            });
+            if (bounds.length > 0) {
+              //  translate bbox
+            }
+          }
+        }
+        prevX = x;
+        prevY = y;
+
         bounds.forEach(function (point) {
           aX.push(point.x);
           aY.push(point.y);
         });
+
         aX.push(x);
         aY.push(y);
+      }
+
+      if (current[0].toLowerCase() === 'z') {
+        var angle = fabric.util.calcAngleBetweenVectors(trend, firstTrend);
+        if (this.strokeLineJoin === 'miter' && Math.abs(angle) < Math.PI / 2) {
+          var projection = fabric.util.projectStrokeOnPoints([
+            new fabric.Point(x, y),
+            new fabric.Point(subpathStartX, subpathStartY),
+            new fabric.Point(subpathStartX, subpathStartY).add(firstTrend),
+          ], this, true);
+          projection.slice(1, projection.length - 1).forEach(function (point) {
+            aX.push(point.x);
+            aY.push(point.y);
+          });
+          if (bounds.length > 0) {
+            //  translate bbox
+          }
+        }
       }
 
       var minX = min(aX) || 0,
