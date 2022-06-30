@@ -237,6 +237,23 @@
       return this.path.length;
     },
 
+    _projectStrokeOnPoints: function (A, B, C) {
+      var v1 = fabric.util.createVector(A, B);
+      var v2 = fabric.util.createVector(B, C);
+      var angle = fabric.util.calcAngleBetweenVectors(v1, v2);
+      if (Math.abs(angle) < Math.PI / 2) {
+        var projection = fabric.util.projectStrokeOnPoints([
+          A,
+          B,
+          C
+        ], this, true);
+        return projection.slice(2, 4);
+      }
+      else {
+        return [];
+      }
+    },
+
     /**
      * @private
      */
@@ -245,39 +262,46 @@
       var aX = [],
         aY = [],
         current, // current instruction
-        subpathStartX = 0,
-        subpathStartY = 0,
-        x = 0, // current x
-        y = 0, // current y
-        prevX = 0,
-        prevY = 0,
-        firstTrend = new fabric.Point(0, 0),
-        trend = new fabric.Point(0, 0),
-        prevTrend = new fabric.Point(0, 0),
+        subpathStart = new fabric.Point(0, 0),
+        subpathSecond = new fabric.Point(0, 0),
+        point = new fabric.Point(0, 0),
+        prev = new fabric.Point(0, 0),
+        beforePrev = new fabric.Point(0, 0),
+        opening = false,
+        second = false,
+        closing = false,
+        projectedPoints = [],
         bounds;
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
         current = this.path[i];
+        if (opening) {
+          second = true;
+        }
+        opening = closing = false;
+        beforePrev.setFromPoint(prev);
+        prev.setFromPoint(point);
 
         switch (current[0]) { // first letter
 
           case 'L': // lineto, absolute
-            x = current[1];
-            y = current[2];
+            point.setXY(current[1], current[2]);
             bounds = [];
             break;
 
           case 'M': // moveTo, absolute
-            x = current[1];
-            y = current[2];
-            subpathStartX = x;
-            subpathStartY = y;
+            point.setXY(current[1], current[2]);
+            subpathStart.setFromPoint(point);
+            prev.setFromPoint(point);
+            beforePrev.setFromPoint(point);
+            opening = true;
             bounds = [];
             break;
 
           case 'C': // bezierCurveTo, absolute
-            bounds = fabric.util.getBoundsOfCurve(x, y,
+            point.setXY(current[5], current[6]);
+            bounds = fabric.util.getBoundsOfCurve(point.x, point.y,
               current[1],
               current[2],
               current[3],
@@ -285,12 +309,11 @@
               current[5],
               current[6]
             );
-            x = current[5];
-            y = current[6];
             break;
 
           case 'Q': // quadraticCurveTo, absolute
-            bounds = fabric.util.getBoundsOfCurve(x, y,
+            point.setXY(current[3], current[4]);
+            bounds = fabric.util.getBoundsOfCurve(point.x, point.y,
               current[1],
               current[2],
               current[1],
@@ -298,68 +321,45 @@
               current[3],
               current[4]
             );
-            x = current[3];
-            y = current[4];
             break;
 
           case 'z':
           case 'Z':
-            x = subpathStartX;
-            y = subpathStartY;
+            point.setFromPoint(subpathStart);
+            closing = true;
             break;
         }
 
-        if (i > 0) {
-          prevTrend.setFromPoint(trend);
-          trend.setXY(x - prevX, y - prevY);
-          if (i === 1) {
-            firstTrend.setFromPoint(trend);
+        if (this.strokeLineJoin === 'miter') {
+          if (!opening && !second) {
+            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnPoints(beforePrev, prev, point));
           }
-          var angle = fabric.util.calcAngleBetweenVectors(prevTrend, trend);
-          if (this.strokeLineJoin === 'miter' && Math.abs(angle) < Math.PI / 2) {
-            var projection = fabric.util.projectStrokeOnPoints([
-              new fabric.Point(prevX, prevY).subtract(prevTrend),
-              new fabric.Point(prevX, prevY),
-              new fabric.Point(x, y)
-            ], this, true);
-            projection.slice(1, projection.length - 1).forEach(function (point) {
-              aX.push(point.x);
-              aY.push(point.y);
-            });
-            if (bounds.length > 0) {
-              //  translate bbox
-            }
+          if (closing) {
+            //  project stroke on sub path start
+            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnPoints(prev, subpathStart, subpathSecond));
           }
         }
-        prevX = x;
-        prevY = y;
+        else {
+          aX.push(point.x);
+          aY.push(point.y);
+        }
 
         bounds.forEach(function (point) {
           aX.push(point.x);
           aY.push(point.y);
         });
 
-        aX.push(x);
-        aY.push(y);
+        if (second) {
+          subpathSecond.setFromPoint(point);
+          second = false;
+        }
+
       }
 
-      if (current[0].toLowerCase() === 'z') {
-        var angle = fabric.util.calcAngleBetweenVectors(trend, firstTrend);
-        if (this.strokeLineJoin === 'miter' && Math.abs(angle) < Math.PI / 2) {
-          var projection = fabric.util.projectStrokeOnPoints([
-            new fabric.Point(x, y),
-            new fabric.Point(subpathStartX, subpathStartY),
-            new fabric.Point(subpathStartX, subpathStartY).add(firstTrend),
-          ], this, true);
-          projection.slice(1, projection.length - 1).forEach(function (point) {
-            aX.push(point.x);
-            aY.push(point.y);
-          });
-          if (bounds.length > 0) {
-            //  translate bbox
-          }
-        }
-      }
+      projectedPoints.forEach(function (point) {
+        aX.push(point.x);
+        aY.push(point.y);
+      });
 
       var minX = min(aX) || 0,
           minY = min(aY) || 0,
