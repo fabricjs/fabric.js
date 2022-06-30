@@ -1,11 +1,16 @@
 fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
+
   /**
    * Populates canvas with data from the specified JSON.
    * JSON format must conform to the one of {@link fabric.Canvas#toJSON}
+   * 
+   * **IMPORTANT**: It is recommended to abort loading tasks before calling this method to prevent race conditions and unnecessary networking
+   * 
    * @param {String|Object} json JSON string or object
    * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
+   * @param {Object} [options] options
+   * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @return {Promise<fabric.Canvas>} instance
-   * @chainable
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#deserialization}
    * @see {@link http://jsfiddle.net/fabricjs/fmgXt/|jsFiddle demo}
    * @example <caption>loadFromJSON</caption>
@@ -18,10 +23,11 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * }).then((canvas) => {
    *   ... canvas is restored, add your code.
    * });
+   * 
    */
-  loadFromJSON: function (json, reviver) {
+  loadFromJSON: function (json, reviver, options) {
     if (!json) {
-      return;
+      return Promise.reject(new Error('fabric.js: `json` is undefined'));
     }
 
     // serialize if it wasn't already
@@ -29,26 +35,26 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       ? JSON.parse(json)
       : Object.assign({}, json);
 
-    var _this = this,
-        renderOnAddRemove = this.renderOnAddRemove;
-
+    var _this = this, renderOnAddRemove = this.renderOnAddRemove;
     this.renderOnAddRemove = false;
 
-    return fabric.util.enlivenObjects(serialized.objects || [], '', reviver)
-      .then(function(enlived) {
+    return Promise.all([
+      fabric.util.enlivenObjects(serialized.objects || [], { reviver: reviver, signal: options && options.signal }),
+      fabric.util.enlivenObjectEnlivables({
+        backgroundImage: serialized.backgroundImage,
+        backgroundColor: serialized.background,
+        overlayImage: serialized.overlayImage,
+        overlayColor: serialized.overlay,
+        clipPath: serialized.clipPath,
+      }, { signal: options && options.signal })
+    ])
+      .then(function (res) {
+        var enlived = res[0], enlivedMap = res[1];
         _this.clear();
-        return fabric.util.enlivenObjectEnlivables({
-          backgroundImage: serialized.backgroundImage,
-          backgroundColor: serialized.background,
-          overlayImage: serialized.overlayImage,
-          overlayColor: serialized.overlay,
-          clipPath: serialized.clipPath,
-        })
-          .then(function(enlivedMap) {
-            _this.__setupCanvas(serialized, enlived, renderOnAddRemove);
-            _this.set(enlivedMap);
-            return _this;
-          });
+        _this.__setupCanvas(serialized, enlived);
+        _this.renderOnAddRemove = renderOnAddRemove;
+        _this.set(enlivedMap);
+        return _this;
       });
   },
 
@@ -56,16 +62,14 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * @private
    * @param {Object} serialized Object with background and overlay information
    * @param {Array} enlivenedObjects canvas objects
-   * @param {boolean} renderOnAddRemove renderOnAddRemove setting for the canvas
    */
-  __setupCanvas: function(serialized, enlivenedObjects, renderOnAddRemove) {
+  __setupCanvas: function(serialized, enlivenedObjects) {
     var _this = this;
     enlivenedObjects.forEach(function(obj, index) {
       // we splice the array just in case some custom classes restored from JSON
       // will add more object to canvas at canvas init.
       _this.insertAt(obj, index);
     });
-    this.renderOnAddRemove = renderOnAddRemove;
     // remove parts i cannot set as options
     delete serialized.objects;
     delete serialized.backgroundImage;

@@ -1701,7 +1701,7 @@
    */
   fabric.Text.fromObject = function(object) {
     object.styles = fabric.util.stylesFromArray(object.styles, object.text);
-    return fabric.Object._fromObject(fabric.Text, object, 'text');
+    return fabric.Object._fromObject(fabric.Text, object, { extraParam: 'text' });
   };
 
   fabric.Text.genericFonts = ['sans-serif', 'serif', 'cursive', 'fantasy', 'monospace'];

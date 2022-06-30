@@ -146,11 +146,10 @@
       this._hoveredTarget = null;
       target && target.fire('mouseout', { e: e });
 
-      var _this = this;
-      this._hoveredTargets.forEach(function(_target){
-        _this.fire('mouse:out', { target: target, e: e });
-        _target && target.fire('mouseout', { e: e });
-      });
+      this._hoveredTargets.forEach(function(nestedTarget){
+        this.fire('mouse:out', { target: nestedTarget, e: e });
+        nestedTarget && nestedTarget.fire('mouseout', { e: e });
+      }, this);
       this._hoveredTargets = [];
 
       if (this._iTextInstances) {
@@ -251,7 +250,7 @@
     _onDoubleClick: function (e) {
       this._cacheTransformEventData(e);
       this._handleEvent(e, 'dblclick');
-      this._resetTransformEventData(e);
+      this._resetTransformEventData();
     },
 
     /**
@@ -385,6 +384,7 @@
      */
     _onResize: function () {
       this.calcOffset();
+      this._resetTransformEventData();
     },
 
     /**
@@ -563,6 +563,22 @@
       for (var i = 0; i < targets.length; i++) {
         targets[i].fire('mouse' + eventType, options);
       }
+    },
+
+    /**
+     * End the current transfrom.
+     * You don't usually need to call this method unless you are interupting a user initiated transform
+     * because of some other event ( a press of key combination, or something that block the user UX )
+     * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
+     */
+    endCurrentTransform: function(e) {
+      var transform = this._currentTransform;
+      this._finalizeCurrentTransform(e);
+      if (transform && transform.target) {
+        // this could probably go inside _finalizeCurrentTransform
+        transform.target.isMoving = false;
+      };
+      this._currentTransform = null;
     },
 
     /**

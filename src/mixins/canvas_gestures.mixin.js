@@ -1,17 +1,17 @@
-/**
- * Adds support for multi-touch gestures using the Event.js library.
- * Fires the following custom events:
- * - touch:gesture
- * - touch:drag
- * - touch:orientation
- * - touch:shake
- * - touch:longpress
- */
 (function() {
 
   var degreesToRadians = fabric.util.degreesToRadians,
       radiansToDegrees = fabric.util.radiansToDegrees;
 
+  /**
+   * Adds support for multi-touch gestures using the Event.js library.
+   * Fires the following custom events:
+   * - touch:gesture
+   * - touch:drag
+   * - touch:orientation
+   * - touch:shake
+   * - touch:longpress
+   */
   fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
     /**
      * Method that defines actions when an Event.js gesture is detected on an object. Currently only supports
