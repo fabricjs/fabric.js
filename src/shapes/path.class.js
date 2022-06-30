@@ -237,17 +237,24 @@
       return this.path.length;
     },
 
-    _projectStrokeOnPoints: function (A, B, C) {
+    _projectStrokeOnPoints: function (A, B, C, points) {
       var v1 = fabric.util.createVector(A, B);
       var v2 = fabric.util.createVector(B, C);
       var angle = fabric.util.calcAngleBetweenVectors(v1, v2);
       if (Math.abs(angle) < Math.PI / 2) {
-        var projection = fabric.util.projectStrokeOnPoints([
+        var projectedPoints = fabric.util.projectStrokeOnPoints([
           A,
           B,
           C
-        ], this, true);
-        return projection.slice(2, 4);
+        ], this, true).slice(2, 4);
+        var projectionVector = projectedPoints[0].subtract(projectedPoints[1]).scalarDivide(2);
+        points.forEach(function (point) {
+          projectedPoints.push(
+            point.add(projectionVector),
+            point.subtract(projectionVector),
+          );
+        })
+        return projectedPoints;
       }
       else {
         return [];
@@ -332,11 +339,11 @@
 
         if (this.strokeLineJoin === 'miter') {
           if (!opening && !second) {
-            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnPoints(beforePrev, prev, point));
+            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnPoints(beforePrev, prev, point, bounds));
           }
           if (closing) {
             //  project stroke on sub path start
-            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnPoints(prev, subpathStart, subpathSecond));
+            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnPoints(prev, subpathStart, subpathSecond, bounds));
           }
         }
         else {
