@@ -237,6 +237,9 @@
       return this.path.length;
     },
 
+    /**
+     * @private
+     */
     _projectStrokeOnPoints: function (A, B, C, points) {
       var v1 = fabric.util.createVector(A, B);
       var v2 = fabric.util.createVector(B, C);
