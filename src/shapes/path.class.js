@@ -388,12 +388,12 @@
 
     _setPositionDimensions: function (options) {
       options || (options = {});
-      var calcDim = this._calcDimensions(options), correctLeftTop,
+      var calcDim = this._calcDimensions(options), origin,
         sizeCorrection = options.correction || 0;
       this.width = calcDim.width - sizeCorrection;
       this.height = calcDim.height - sizeCorrection;
       if (!options.fromSVG) {
-        correctLeftTop = this.translateToGivenOrigin(
+        origin = this.translateToGivenOrigin(
           // this looks bad, but is one way to keep it optional for now.
           new fabric.Point(
             calcDim.left - this.strokeWidth / 2 + sizeCorrection / 2,
@@ -406,10 +406,10 @@
         );
       }
       if (typeof options.left === 'undefined') {
-        this.left = options.fromSVG ? calcDim.left : correctLeftTop.x;
+        this.left = options.fromSVG ? calcDim.left : origin.x;
       }
       if (typeof options.top === 'undefined') {
-        this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
+        this.top = options.fromSVG ? calcDim.top : origin.y;
       }
       this.pathOffset = new fabric.Point(
         calcDim.left + this.width / 2 + sizeCorrection / 2,
