@@ -64,7 +64,7 @@
         Array.isArray(path) ? path : fabric.util.parsePath(path)
       );
 
-      fabric.Polyline.prototype._setPositionDimensions.call(this, options || {});
+      this._setPositionDimensions.call(this, options);
     },
 
     /**
@@ -384,7 +384,39 @@
         width: deltaX,
         height: deltaY
       };
-    }
+    },
+
+    _setPositionDimensions: function (options) {
+      options || (options = {});
+      var calcDim = this._calcDimensions(options), correctLeftTop,
+        sizeCorrection = options.correction || 0;
+      this.width = calcDim.width - sizeCorrection;
+      this.height = calcDim.height - sizeCorrection;
+      if (!options.fromSVG) {
+        correctLeftTop = this.translateToGivenOrigin(
+          // this looks bad, but is one way to keep it optional for now.
+          new fabric.Point(
+            calcDim.left - this.strokeWidth / 2 + sizeCorrection / 2,
+            calcDim.top - this.strokeWidth / 2 + sizeCorrection / 2
+          ),
+          'left',
+          'top',
+          this.originX,
+          this.originY
+        );
+      }
+      if (typeof options.left === 'undefined') {
+        this.left = options.fromSVG ? calcDim.left : correctLeftTop.x;
+      }
+      if (typeof options.top === 'undefined') {
+        this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
+      }
+      this.pathOffset = new fabric.Point(
+        calcDim.left + this.width / 2 + sizeCorrection / 2,
+        calcDim.top + this.height / 2 + sizeCorrection / 2
+      );
+    },
+
   });
 
   /**

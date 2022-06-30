@@ -83,34 +83,7 @@
     },
 
     _setPositionDimensions: function(options) {
-      options || (options = {});
-      var calcDim = this._calcDimensions(options), correctLeftTop,
-          correctSize = this.exactBoundingBox ? this.strokeWidth : 0;
-      this.width = calcDim.width - correctSize;
-      this.height = calcDim.height - correctSize;
-      if (!options.fromSVG) {
-        correctLeftTop = this.translateToGivenOrigin(
-          // this looks bad, but is one way to keep it optional for now.
-          new fabric.Point(
-            calcDim.left - this.strokeWidth / 2 + correctSize / 2,
-            calcDim.top - this.strokeWidth / 2 + correctSize / 2
-          ),
-          'left',
-          'top',
-          this.originX,
-          this.originY
-        );
-      }
-      if (typeof options.left === 'undefined') {
-        this.left = options.fromSVG ? calcDim.left : correctLeftTop.x;
-      }
-      if (typeof options.top === 'undefined') {
-        this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
-      }
-      this.pathOffset = {
-        x: calcDim.left + this.width / 2 + correctSize / 2,
-        y: calcDim.top + this.height / 2 + correctSize / 2
-      };
+      fabric.Path.prototype._setPositionDimensions.call(this, Object.assign({ correction: this.strokeWidth }, options));
     },
 
     /**
@@ -125,7 +98,7 @@
      */
     _calcDimensions: function() {
 
-      var points = this.exactBoundingBox ? this._projectStrokeOnPoints() : this.points,
+      var points = this._projectStrokeOnPoints(),
           minX = min(points, 'x') || 0,
           minY = min(points, 'y') || 0,
           maxX = max(points, 'x') || 0,
