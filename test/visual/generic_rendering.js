@@ -516,7 +516,6 @@
       hasControls: false,
       //strokeLineJoin:'bevel'
     });
-    console.log(path.width,path.height)
     canvas.add(
       path
     );
