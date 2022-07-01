@@ -240,18 +240,18 @@
     /**
      * @private
      */
-    _projectStrokeOnSegmentBBox: function (A, B, C, points) {
-      var v1 = fabric.util.createVector(A, B);
-      var v2 = fabric.util.createVector(B, C);
+    _projectStrokeOnSegmentBBox: function (point, c1, c2, bboxPoints) {
+      var v1 = c1.subtract(point);
+      var v2 = c2.subtract(point);
       var angle = fabric.util.calcAngleBetweenVectors(v1, v2);
       if (Math.abs(angle) < Math.PI / 2) {
         var projectedPoints = fabric.util.projectStrokeOnPoints([
-          A,
-          B,
-          C
+          c1,
+          point,
+          c2
         ], this, true).slice(2, 4);
         var projectionVector = projectedPoints[0].subtract(projectedPoints[1]).scalarDivide(2);
-        points.forEach(function (point) {
+        bboxPoints.forEach(function (point) {
           projectedPoints.push(
             point.add(projectionVector),
             point.subtract(projectionVector)
@@ -342,11 +342,11 @@
 
         if (this.strokeLineJoin === 'miter') {
           if (!opening && !second) {
-            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnSegmentBBox(beforePrev, prev, point, bounds));
+            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnSegmentBBox(prev, beforePrev, point, bounds));
           }
           if (closing) {
             //  project stroke on sub path start
-            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnSegmentBBox(prev, subpathStart, subpathSecond, bounds));
+            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnSegmentBBox(subpathStart, prev, subpathSecond, bounds));
           }
         }
         else {
