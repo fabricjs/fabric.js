@@ -419,8 +419,8 @@
         this.top = options.fromSVG ? calcDim.top : origin.y;
       }
       this.pathOffset = new fabric.Point(
-        calcDim.left + this.width / 2,
-        calcDim.top + this.height / 2
+        calcDim.left + this.width / 2 + this.strokeWidth / 2,
+        calcDim.top + this.height / 2 + this.strokeWidth / 2
       );
     },
 
