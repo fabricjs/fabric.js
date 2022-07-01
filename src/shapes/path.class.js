@@ -281,7 +281,8 @@
           second = false,
           closing = false,
           projectedPoints = [],
-          bounds;
+          prevBounds,
+          bounds = [];
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
@@ -292,6 +293,8 @@
         opening = closing = false;
         beforePrev.setFromPoint(prev);
         prev.setFromPoint(point);
+        prevBounds = bounds;
+        bounds = [];
 
         switch (current[0]) { // first letter
 
@@ -342,7 +345,7 @@
 
         if (this.strokeLineJoin === 'miter') {
           if (!opening && !second) {
-            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnSegmentBBox(prev, beforePrev, point, bounds));
+            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnSegmentBBox(prev, beforePrev, point, prevBounds));
           }
           if (closing) {
             //  project stroke on sub path start
