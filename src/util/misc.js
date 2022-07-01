@@ -180,6 +180,7 @@
     },
 
     /**
+     * Let A, B, C be vertexes of a triangle, calculate the bisector of A
      * @static
      * @memberOf fabric.util
      * @param {Point} A the vertex of the bisector
