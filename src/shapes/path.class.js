@@ -245,12 +245,16 @@
       var v2 = pointAfter.subtract(point);
       var angle = fabric.util.calcAngleBetweenVectors(v1, v2);
       if (Math.abs(angle) < Math.PI / 2) {
-        var projectedPoints = fabric.util.projectStrokeOnPoints([
+        var projectionVector = fabric.util.calcStrokeProjection(
           pointBefore,
           point,
-          pointAfter
-        ], this, true).slice(2, 4);
-        var projectionVector = projectedPoints[0].subtract(projectedPoints[1]).scalarDivide(2);
+          pointAfter,
+          this
+        );
+        var projectedPoints = [
+          point.add(projectionVector),
+          point.subtract(projectionVector),
+        ];
         Array.isArray(bboxPoints) && bboxPoints.forEach(function (point) {
           projectedPoints.push(
             point.add(projectionVector),
