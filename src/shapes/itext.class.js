@@ -531,7 +531,9 @@
    * @returns {Promise<fabric.IText>}
    */
   fabric.IText.fromObject = function(object) {
-    object.styles = fabric.util.stylesFromArray(object.styles, object.text);
-    return fabric.Object._fromObject(fabric.IText, object, { extraParam: 'text' });
+    var styles = fabric.util.stylesFromArray(object.styles, object.text);
+    //copy object to prevent mutation
+    var objCopy = Object.assign({}, object, { styles: styles });
+    return fabric.Object._fromObject(fabric.IText, objCopy, { extraParam: 'text' });
   };
 })();
