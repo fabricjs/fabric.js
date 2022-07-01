@@ -504,60 +504,62 @@
 
   var pathWithStrokeBBoxProjectionStr = 'M0,150c0-0.2,0-0.3,0-0.6c3.6-2.7,6.8-5.7,9.7-8.9c4.5-5,8-10.6,9.8-17.1c2-6.6,1.7-13.3,0.3-19.9c-1.5-7.2-3.4-14.3-5-21.5  c-1.5-6.8-2.8-13.6-2.4-20.7c0.3-6.8,2.2-13.1,5.4-19.1c4.4-8.2,10.4-15,18-20.5c7.7-5.4,16.4-8,25.8-8.3c6.7-0.2,13.3,0.7,19.8,2  c5.7,1,11.2,2.4,16.8,3.6c5.8,1.2,11.7,2.2,17.5,3.1c5.4,0.9,11,0.9,16.4,0.1c5.6-0.8,10.6-2.8,15.4-5.8c4.3-2.7,8.1-6.1,11.2-10.2  c1.6-2,2.9-4.2,4.3-6.2c0.1,0,0.2,0,0.2,0c2.4,4.2,5.3,8,8.8,11.3c8.4,8.2,18.5,12.1,30.3,12.3c6.2,0,12.5-1,18.6-2.1  c8.6-1.5,17-3.6,25.6-5.2c6-1.2,12-1.9,18.3-1.6c6,0.2,11.8,1.4,17.3,3.6c4.2,1.6,8,3.9,11.4,6.7c4.3,3.4,7.9,7.3,11.1,11.7  c3.5,4.7,6.2,9.9,7.9,15.6c1.7,6,2.4,12.3,1.5,18.5c-0.8,5.7-1.7,11.2-3,16.8c-1.6,7.3-3.6,14.6-4.4,22.1  c-0.8,7.5,0.1,14.6,3.5,21.4c2.3,4.7,5.3,8.9,9,12.6c2.5,2.4,5.2,4.7,7.9,7.3c-0.2,0.2-0.6,0.6-0.9,0.8c-4.7,3.8-9.3,7.9-12.8,12.8  c-2.9,4-5.2,8.3-6.5,13.1c-1.7,6.6-1.6,13.4-0.2,20.1c1.6,7.9,3.6,15.7,5.2,23.6c1.2,5.2,1.9,10.5,1.7,16  c-0.2,6.6-1.6,12.8-4.5,18.7c-2,4.2-4.4,8-7.3,11.4c-3.4,4-7.1,7.7-11.4,10.8c-7.1,4.9-14.8,7.6-23.2,8.3c-3.9,0.3-7.9,0.2-11.8-0.2  c-6.9-0.9-13.8-2.1-20.6-3.4c-8-1.5-16-3.2-23.9-4.7c-4.3-0.8-8.6-0.9-13-0.7c-6.2,0.3-11.9,2-17.3,5c-4.7,2.7-8.7,6.2-12.1,10.4  c-1.9,2.2-3.5,4.6-5.2,7.1c-0.3-0.5-0.7-0.9-0.9-1.3c-2.1-2.8-4-5.8-6.4-8.4c-3.2-3.6-6.9-6.5-11.2-8.9c-4.6-2.5-9.6-3.9-14.7-4.6  c-6.5-0.8-13-0.1-19.3,1.2c-9.6,1.9-19.1,3.9-28.7,5.7c-4.4,0.8-8.7,1.5-13.2,1.7c-3.5,0.2-7.1,0-10.5-0.2c-8-0.6-15.4-3.4-22-7.9  c-5.8-3.9-10.3-9-14.3-14.8c-8.1-11.6-10.9-24.3-8.1-38c1.4-7.1,3.1-14,4.6-21c1.5-6.8,3-13.6,2.3-20.7c-0.5-4.9-1.9-9.4-4-13.8  c-2.7-5.3-6.5-9.7-10.8-13.6C4.4,153.4,2.2,151.7,0,150z';
 
-  function pathWithStrokeBBoxProjection(canvas, callback) {
-    var path = new fabric.Path(pathWithStrokeBBoxProjectionStr, {
-      fill: 'black',
-      stroke: 'red',
-      strokeWidth: 100,
-      paintFirst: 'stroke',
-      hasControls: false
+  ['miter', 'bevel', 'round'].forEach(strokeLineJoin => {
+    function pathWithStrokeBBoxProjection(canvas, callback) {
+      var path = new fabric.Path(pathWithStrokeBBoxProjectionStr, {
+        fill: 'black',
+        stroke: 'red',
+        strokeWidth: 100,
+        paintFirst: 'stroke',
+        hasControls: false,
+        strokeLineJoin
+      });
+      canvas.add(
+        path
+      );
+      canvas.setActiveObject(path);
+      canvas.renderAll();
+      callback(canvas.lowerCanvasEl);
+    }
+
+    function pathWithStrokeBBoxProjectionWithPosition(canvas, callback) {
+      var path = new fabric.Path(pathWithStrokeBBoxProjectionStr, {
+        fill: 'black',
+        stroke: 'red',
+        strokeWidth: 100,
+        paintFirst: 'stroke',
+        hasControls: false,
+        strokeLineJoin
+      });
+      canvas.add(
+        path
+      );
+      canvas.setActiveObject(path);
+      canvas.renderAll();
+      callback(canvas.lowerCanvasEl);
+    }
+
+    tests.push({
+      test: 'path with stroke bbox projection ' + strokeLineJoin,
+      code: pathWithStrokeBBoxProjection,
+      golden: 'path_stroke_projection_' + strokeLineJoin+'.png',
+      newModule: 'bbox',
+      percentage: 0.004,
+      width: 700,
+      height: 600,
+      fabricClass: 'Canvas'
     });
-    canvas.add(
-      path
-    );
-    canvas.setActiveObject(path);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
-  }
 
-  tests.push({
-    test: 'path with stroke bbox projection',
-    code: pathWithStrokeBBoxProjection,
-    golden: 'pathWithStrokeBBoxProjection.png',
-    newModule: 'bbox',
-    percentage: 0.04,
-    width: 700,
-    height: 600,
-    fabricClass: 'Canvas'
-  });
-
-  function pathWithStrokeBBoxProjection2(canvas, callback) {
-    var path = new fabric.Path(pathWithStrokeBBoxProjectionStr, {
-      fill: 'black',
-      stroke: 'red',
-      strokeWidth: 100,
-      paintFirst: 'stroke',
-      hasControls: false,
-      left: 0,
-      top: 0
+    tests.push({
+      test: 'path with stroke bbox projection ' + strokeLineJoin,
+      code: pathWithStrokeBBoxProjectionWithPosition,
+      golden: 'path_stroke_projection_' + strokeLineJoin + '.png',
+      newModule: 'bbox',
+      percentage: 0.004,
+      width: 700,
+      height: 600,
+      fabricClass: 'Canvas'
     });
-    canvas.add(
-      path
-    );
-    canvas.setActiveObject(path);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
-  }
-
-  tests.push({
-    test: 'path with stroke bbox projection',
-    code: pathWithStrokeBBoxProjection2,
-    golden: 'pathWithStrokeBBoxProjection2.png',
-    newModule: 'bbox',
-    percentage: 0.04,
-    width: 700,
-    height: 600,
-    fabricClass: 'Canvas'
   });
 
   tests.forEach(visualTestLoop(QUnit));
