@@ -190,7 +190,7 @@
     getBisector: function (A, B, C) {
       var AB = fabric.util.createVector(A, B), AC = fabric.util.createVector(A, C);
       var alpha = fabric.util.calcAngleBetweenVectors(AB, AC);
-      //  check if alpha is relative to AB->BC
+      //  check if alpha is relative to AB->AC
       var ro = fabric.util.calcAngleBetweenVectors(fabric.util.rotateVector(AB, alpha), AC);
       var phi = alpha * (ro === 0 ? 1 : -1) / 2;
       return {
