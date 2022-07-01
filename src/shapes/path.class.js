@@ -251,7 +251,7 @@
           c2
         ], this, true).slice(2, 4);
         var projectionVector = projectedPoints[0].subtract(projectedPoints[1]).scalarDivide(2);
-        bboxPoints.forEach(function (point) {
+        Array.isArray(bboxPoints) && bboxPoints.forEach(function (point) {
           projectedPoints.push(
             point.add(projectionVector),
             point.subtract(projectionVector)
@@ -358,7 +358,7 @@
             );
           }
         }
-        
+
         aX.push(point.x);
         aY.push(point.y);
 
