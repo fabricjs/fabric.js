@@ -244,7 +244,7 @@
         this.shadow.affectStroke = true;
         path.shadow = new fabric.Shadow(this.shadow);
       }
-
+      path.pathOffset.scalarAddEquals(path.strokeWidth / 2);
       return path;
     },
 
