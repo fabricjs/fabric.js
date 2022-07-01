@@ -374,15 +374,15 @@
 
       }
 
-      var minBefore = new fabric.Point(min(aX) || 0, min(aY) || 0);
+      var minBefore = new fabric.Point(min(aX), min(aY));
 
       projectedPoints.forEach(function (point) {
         aX.push(point.x);
         aY.push(point.y);
       });
 
-      var minPoint = new fabric.Point(min(aX) || 0, min(aY) || 0),
-          maxPoint = new fabric.Point(max(aX) || 0, max(aY) || 0),
+      var minPoint = new fabric.Point(min(aX), min(aY)),
+          maxPoint = new fabric.Point(max(aX), max(aY)),
           delta = maxPoint.subtract(minPoint);
 
       return {
