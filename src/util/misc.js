@@ -182,9 +182,9 @@
     /**
      * @static
      * @memberOf fabric.util
-     * @param {Point} A
-     * @param {Point} B
-     * @param {Point} C
+     * @param {Point} A the vertex of the bisector
+     * @param {Point} B a vertex that defines a side of the angle
+     * @param {Point} C a second vertex that defines the other side of the angle
      * @returns {{ vector: Point, angle: number }} vector representing the bisector of A and A's angle
      */
     getBisector: function (A, B, C) {
@@ -204,8 +204,8 @@
      * @static
      * @memberOf fabric.util
      * @param {Point} point the point to project
-     * @param {Point} pointBefore a point that defines one vertex
-     * @param {Point} pointAfter a point that defines a second vertex
+     * @param {Point} pointBefore a vertex that defines one side of the angle
+     * @param {Point} pointAfter a vertex that defines a second side of the angle
      * @param {Object} options
      * @param {number} options.strokeWidth
      * @param {'miter'|'bevel'|'round'} options.strokeLineJoin
