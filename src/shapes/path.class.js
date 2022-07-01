@@ -345,11 +345,17 @@
 
         if (this.strokeLineJoin === 'miter') {
           if (!opening && !second) {
-            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnSegmentBBox(prev, beforePrev, point, prevBounds));
+            projectedPoints.push.apply(
+              projectedPoints,
+              this._projectStrokeOnSegmentBBox(prev, beforePrev, point, prevBounds)
+            );
           }
           if (closing) {
             //  project stroke on sub path start
-            projectedPoints.push.apply(projectedPoints, this._projectStrokeOnSegmentBBox(subpathStart, prev, subpathSecond, bounds));
+            projectedPoints.push.apply(
+              projectedPoints,
+              this._projectStrokeOnSegmentBBox(subpathStart, prev, subpathSecond, bounds)
+            );
           }
         }
         else {
@@ -376,16 +382,16 @@
         aY.push(point.y);
       });
 
-      var min = new fabric.Point(min(aX) || 0, min(aY) || 0),
-        max = new fabric.Point(max(aX) || 0, max(aY) || 0),
-        delta = max.subtract(min);
+      var minPoint = new fabric.Point(min(aX) || 0, min(aY) || 0),
+          maxPoint = new fabric.Point(max(aX) || 0, max(aY) || 0),
+          delta = maxPoint.subtract(minPoint);
 
       return {
-        left: min.x,
-        top: min.y,
+        left: minPoint.x,
+        top: minPoint.y,
         width: delta.x,
         height: delta.y,
-        strokeOffset: min.subtract(minBefore)
+        strokeOffset: minPoint.subtract(minBefore)
       };
     },
 
@@ -414,8 +420,8 @@
         this.top = options.fromSVG ? calcDim.top : origin.y;
       }
       this.pathOffset = new fabric.Point(
-        calcDim.left + this.width / 2 + this.strokeWidth / 2,
-        calcDim.top + this.height / 2 + this.strokeWidth / 2
+        calcDim.left + this.width / 2 - this.strokeWidth / 2 + calcDim.strokeOffset.x,
+        calcDim.top + this.height / 2 - this.strokeWidth / 2 + calcDim.strokeOffset.y
       );
     },
 
