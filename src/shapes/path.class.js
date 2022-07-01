@@ -313,7 +313,6 @@
             break;
 
           case 'C': // bezierCurveTo, absolute
-            point.setXY(current[5], current[6]);
             bounds = fabric.util.getBoundsOfCurve(point.x, point.y,
               current[1],
               current[2],
@@ -322,10 +321,10 @@
               current[5],
               current[6]
             );
+            point.setXY(current[5], current[6]);
             break;
 
           case 'Q': // quadraticCurveTo, absolute
-            point.setXY(current[3], current[4]);
             bounds = fabric.util.getBoundsOfCurve(point.x, point.y,
               current[1],
               current[2],
@@ -334,6 +333,7 @@
               current[3],
               current[4]
             );
+            point.setXY(current[3], current[4]);
             break;
 
           case 'z':
