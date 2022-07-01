@@ -188,9 +188,9 @@
     var done = assert.async();
     assert.ok(typeof fabric.Text.fromObject === 'function');
     fabric.Text.fromObject(REFERENCE_TEXT_OBJECT).then(function(text) {
-      // change styles from array to object for comparison
       var object = text.toObject();
-      object.styles = {};
+      // change styles from object to array for comparison
+      object.styles = [];
       assert.deepEqual(object, REFERENCE_TEXT_OBJECT);
       done();
     });
@@ -212,9 +212,9 @@
         fontSize: 16,
         originX: 'left',
       });
-      // change styles from array to object for comparison
       var object = text.toObject();
-      object.styles = {};
+      // change styles from array to object for comparison
+      object.styles = expectedObject.styles = {};
       assert.deepEqual(object, expectedObject, 'parsed object is what expected');
     });
   });
@@ -270,9 +270,9 @@
         fontSize:         123,
         underline:        true,
       });
-      // change styles from array to object for comparison
       var object = textWithAttrs.toObject();
-      object.styles = {};
+      // change styles from array to object for comparison
+      object.styles = expectedObject.styles = {};
       assert.deepEqual(object, expectedObject);
     });
   });

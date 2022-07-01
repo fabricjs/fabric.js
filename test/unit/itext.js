@@ -105,9 +105,9 @@
       assert.ok(typeof fabric.IText.fromObject === 'function');
       fabric.IText.fromObject(ITEXT_OBJECT).then(function(iText) {
         assert.ok(iText instanceof fabric.IText);
-        // change styles from array to object for comparison
         var object = iText.toObject();
-            object.styles = {};
+        // change styles from object to array for comparison
+        object.styles = [];
         assert.deepEqual(object, ITEXT_OBJECT);
         done();
       });
