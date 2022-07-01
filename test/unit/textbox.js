@@ -158,6 +158,7 @@
       }
     });
     fabric.Textbox.fromObject(TEXTBOX_OBJECT).then(function(obj) {
+      assert.notEqual(obj.styles, textbox.styles, 'styles is a different object after initialization');
       assert.deepEqual(obj.styles, textbox.styles, 'stylesFromArray output matches');
       assert.deepEqual(obj.styles[0], textbox.styles[0], 'styles match at line 0');
       assert.notEqual(obj.styles[0][5], obj.styles[0][6], 'styles are separate objects');
