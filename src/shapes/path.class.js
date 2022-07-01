@@ -374,8 +374,6 @@
 
       }
 
-      var minBefore = new fabric.Point(min(aX) || 0, min(aY) || 0);
-
       projectedPoints.forEach(function (point) {
         aX.push(point.x);
         aY.push(point.y);
@@ -389,8 +387,7 @@
         left: minPoint.x,
         top: minPoint.y,
         width: delta.x,
-        height: delta.y,
-        strokeOffset: minPoint.subtract(minBefore)
+        height: delta.y
       };
     },
 
