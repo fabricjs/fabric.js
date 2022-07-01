@@ -425,6 +425,14 @@
       );
     },
 
+    /**
+     * @override stroke is already accounted for in size
+     * @returns {fabric.Point} dimensions
+     */
+    _getNonTransformedDimensions: function () {
+      return new fabric.Point(this.width, this.height);
+    },
+
   });
 
   /**
