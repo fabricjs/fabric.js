@@ -240,7 +240,7 @@
     /**
      * @private
      */
-    _projectStrokeOnSegmentBBox: function (point, pointBefore, pointAfter, bboxPoints, includeEndProjection) {
+    _projectStrokeOnSegmentBBox: function (point, pointBefore, pointAfter, bboxPoints) {
       var v1 = pointBefore.subtract(point);
       var v2 = pointAfter.subtract(point);
       var angle = fabric.util.calcAngleBetweenVectors(v1, v2);
@@ -249,7 +249,7 @@
           pointBefore,
           point,
           pointAfter
-        ], this, true).slice(2, includeEndProjection ? 6 : 4);
+        ], this, true).slice(2, 4);
         var projectionVector = projectedPoints[0].subtract(projectedPoints[1]).scalarDivide(2);
         Array.isArray(bboxPoints) && bboxPoints.forEach(function (point) {
           projectedPoints.push(
@@ -347,7 +347,7 @@
           if (!opening && !second) {
             projectedPoints.push.apply(
               projectedPoints,
-              this._projectStrokeOnSegmentBBox(prev, beforePrev, point, prevBounds, !closing && i === len - 1)
+              this._projectStrokeOnSegmentBBox(prev, beforePrev, point, prevBounds)
             );
           }
           if (closing) {
