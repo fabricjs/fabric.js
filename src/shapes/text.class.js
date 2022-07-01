@@ -1730,7 +1730,7 @@
    * @returns {Promise<fabric.Text>}
    */
   fabric.Text.fromObject = function(object) {
-    return fabric.Object._fromObject(fabric.Text, object, 'text');
+    return fabric.Object._fromObject(fabric.Text, object, { extraParam: 'text' });
   };
 
   fabric.Text.genericFonts = ['sans-serif', 'serif', 'cursive', 'fantasy', 'monospace'];

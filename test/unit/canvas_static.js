@@ -1328,6 +1328,21 @@
     });
   });
 
+  QUnit.test('loadFromJSON with AbortController', function (assert) {
+    var done = assert.async();
+    assert.expect(1);
+    var serialized = JSON.parse(PATH_JSON);
+    serialized.background = 'green';
+    serialized.backgroundImage = { "type": "image", "originX": "left", "originY": "top", "left": 13.6, "top": -1.4, "width": 3000, "height": 3351, "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 0, "strokeDashArray": null, "strokeLineCap": "butt", "strokeDashOffset": 0, "strokeLineJoin": "miter", "strokeMiterLimit": 4, "scaleX": 0.05, "scaleY": 0.05, "angle": 0, "flipX": false, "flipY": false, "opacity": 1, "shadow": null, "visible": true, "backgroundColor": "", "fillRule": "nonzero", "globalCompositeOperation": "source-over", "skewX": 0, "skewY": 0, "src": IMG_SRC, "filters": [], "crossOrigin": "" };
+    var abortController = new AbortController();
+    canvas.loadFromJSON(serialized, null, { signal: abortController.signal })
+      .catch(function (err) {
+        assert.equal(err.type, 'abort', 'should be an abort event');
+        done();
+      });
+    abortController.abort();
+  });
+
   QUnit.test('loadFromJSON custom properties', function(assert) {
     var done = assert.async();
     var rect = new fabric.Rect({ width: 10, height: 20 });
