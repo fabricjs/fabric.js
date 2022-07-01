@@ -358,10 +358,9 @@
             );
           }
         }
-        else {
-          aX.push(point.x);
-          aY.push(point.y);
-        }
+        
+        aX.push(point.x);
+        aY.push(point.y);
 
         bounds.forEach(function (point) {
           aX.push(point.x);
