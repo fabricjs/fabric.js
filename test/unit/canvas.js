@@ -2041,7 +2041,20 @@
     //  stub current transform data
     canvas._currentTransform = { foo: 'bar' };
     canvas._discardActiveObject();
-    assert.ok(!canvas.item(0).active);
+    assert.equal(canvas.getActiveObject(), null);
+  });
+
+  QUnit.test('_discardActiveObject - cleanup transform', function (assert) {
+    var e = { clientX: 5, clientY: 5, which: 1, target: canvas.upperCanvasEl };
+    var target = makeRect();
+    canvas.add(target);
+    canvas.setActiveObject(target);
+    canvas._setupCurrentTransform(e, target, true);
+    assert.ok(canvas._currentTransform, 'transform should be set');
+    target.isMoving = true;
+    canvas._discardActiveObject();
+    assert.ok(!canvas._currentTransform, 'transform should be cleared');
+    assert.ok(!target.isMoving, 'moving flag should have been negated');
     assert.equal(canvas.getActiveObject(), null);
     assert.equal(canvas._currentTransform, null, 'should clear current transform');
   });
@@ -2068,7 +2081,6 @@
     });
 
     canvas.discardActiveObject();
-    assert.ok(!canvas.item(0).active);
     assert.equal(canvas.getActiveObject(), null);
     assert.equal(canvas.getActiveObject(), null);
     assert.equal(canvas._currentTransform, null, 'should clear current transform');

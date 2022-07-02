@@ -17,7 +17,6 @@
    * Image class
    * @class fabric.Image
    * @extends fabric.Object
-   * @fires loading:aborted
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
    * @see {@link fabric.Image#initialize} for constructor definition
    */
@@ -187,15 +186,6 @@
         this.applyResizeFilters();
       }
       return this;
-    },
-
-    /**
-     * Called once instance is added to a parent and when parent resizes
-     * @private
-     * @param {*} context see {@link fabric.ParentResizeObserver}
-     */
-    _onParentResize: function (context) {
-      this._parentMonitor.fillParentByScaling(context);
     },
 
     /**
@@ -374,42 +364,21 @@
     },
 
     /**
-     * Aborts pending image loading task
-     * @returns {boolean} true if aborted
-     */
-    abortLoadingTask: function () {
-      if (this.__abortController) {
-        this.__abortController.abort();
-        delete this.__abortController;
-        return true;
-      }
-      return false;
-    },
-
-    /**
-     * Sets source of an image
+     * Loads and sets source of an image\
+     * **IMPORTANT**: It is recommended to abort loading tasks before calling this method to prevent race conditions and unnecessary networking
      * @param {String} src Source string (URL)
      * @param {Object} [options] Options object
+     * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
      * @param {String} [options.crossOrigin] crossOrigin value (one of "", "anonymous", "use-credentials")
      * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
      * @return {Promise<fabric.Image>} thisArg
      */
     setSrc: function(src, options) {
       var _this = this;
-      if (this.abortLoadingTask()) {
-        this.fire('loading:aborted');
-      }
-      var abortController = new AbortController();
-      this.__abortController = abortController;
-      var opts = Object.assign({}, options, { signal: abortController.signal });
-      return fabric.util.loadImage(src, opts).then(function(img) {
+      return fabric.util.loadImage(src, options).then(function (img) {
         _this.setElement(img, options);
         _this._setWidthHeight();
         return _this;
-      }).finally(function () {
-        if (abortController === _this.__abortController) {
-          delete _this.__abortController;
-        }
       });
     },
 
@@ -715,25 +684,25 @@
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Image>}
    */
-  fabric.Image.fromObject = function(_object) {
-    var object = Object.assign({}, _object),
-        filters = object.filters,
-        resizeFilter = object.resizeFilter;
+  fabric.Image.fromObject = function (object, options) {
+    var _object = Object.assign({}, object),
+        filters = _object.filters,
+        resizeFilter = _object.resizeFilter;
     // the generic enliving will fail on filters for now
-    delete object.resizeFilter;
-    delete object.filters;
+    delete _object.resizeFilter;
+    delete _object.filters;
     var imageOptions = Object.assign({}, options, { crossOrigin: _object.crossOrigin }),
         filterOptions = Object.assign({}, options, { namespace: fabric.Image.filters });
     return Promise.all([
-      fabric.util.loadImage(object.src, imageOptions),
+      fabric.util.loadImage(_object.src, imageOptions),
       filters && fabric.util.enlivenObjects(filters, filterOptions),
       resizeFilter && fabric.util.enlivenObjects([resizeFilter], filterOptions),
-      fabric.util.enlivenObjectEnlivables(object, options),
+      fabric.util.enlivenObjectEnlivables(_object, options),
     ])
       .then(function(imgAndFilters) {
-        object.filters = imgAndFilters[1] || [];
-        object.resizeFilter = imgAndFilters[2] && imgAndFilters[2][0];
-        return new fabric.Image(imgAndFilters[0], Object.assign(object, imgAndFilters[3]));
+        _object.filters = imgAndFilters[1] || [];
+        _object.resizeFilter = imgAndFilters[2] && imgAndFilters[2][0];
+        return new fabric.Image(imgAndFilters[0], Object.assign(_object, imgAndFilters[3]));
       });
   };
 
@@ -741,14 +710,14 @@
    * Creates an instance of fabric.Image from an URL string
    * @static
    * @param {String} url URL to create an image from
-   * @param {object} [imgOptions] Options object
+   * @param {object} [options] Options object
    * @param {string} [options.crossOrigin] cors value for the image loading, default to anonymous
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Image>}
    */
-  fabric.Image.fromURL = function(url, imgOptions) {
-    return fabric.util.loadImage(url, imgOptions || {}).then(function(img) {
-      return new fabric.Image(img, imgOptions);
+  fabric.Image.fromURL = function(url, options) {
+    return fabric.util.loadImage(url, options || {}).then(function(img) {
+      return new fabric.Image(img, options);
     });
   };
 

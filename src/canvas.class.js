@@ -1257,7 +1257,7 @@
     /**
      * This is a private method for now.
      * This is supposed to be equivalent to discardActiveObject but without firing
-     * any events. There is commitment to have this stay this way.
+     * any selection events ( can still fire object transformation events ). There is commitment to have this stay this way.
      * This is the functional part of discardActiveObject.
      * @param {Event} [e] Event (passed along when firing "object:deselected")
      * @param {Object} object to set as active
@@ -1270,6 +1270,9 @@
         // onDeselect return TRUE to cancel selection;
         if (obj.onDeselect({ e: e, object: object })) {
           return false;
+        }
+        if (this._currentTransform && this._currentTransform.target === obj) {
+          this.endCurrentTransform(e);
         }
         this._activeObject = null;
         this._currentTransform = null;

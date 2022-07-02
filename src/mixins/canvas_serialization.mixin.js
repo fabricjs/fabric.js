@@ -1,23 +1,15 @@
 fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
   /**
-   * Aborts instance's loading task ({@link fabric.Canvas#loadFromJSON} etc.) if exists
-   * @returns {boolean} true if aborted
-   */
-  abortLoadingTask: function () {
-    if (this.__abortController) {
-      this.__abortController.abort();
-      delete this.__abortController;
-      return true;
-    }
-    return false;
-  },
-
-  /**
    * Populates canvas with data from the specified JSON.
    * JSON format must conform to the one of {@link fabric.Canvas#toJSON}
+   * 
+   * **IMPORTANT**: It is recommended to abort loading tasks before calling this method to prevent race conditions and unnecessary networking
+   * 
    * @param {String|Object} json JSON string or object
    * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
+   * @param {Object} [options] options
+   * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @return {Promise<fabric.Canvas>} instance
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#deserialization}
    * @see {@link http://jsfiddle.net/fabricjs/fmgXt/|jsFiddle demo}
@@ -31,11 +23,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * }).then((canvas) => {
    *   ... canvas is restored, add your code.
    * });
+   * 
    */
-  loadFromJSON: function (json, reviver) {
-    if (this.abortLoadingTask()) {
-      this.fire('loading:aborted', { from: 'json' });
-    }
+  loadFromJSON: function (json, reviver, options) {
     if (!json) {
       return Promise.reject(new Error('fabric.js: `json` is undefined'));
     }
@@ -45,22 +35,18 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       ? JSON.parse(json)
       : Object.assign({}, json);
 
-    var _this = this,
-        renderOnAddRemove = this.renderOnAddRemove,
-        abortController = new AbortController();
-
-    this.__abortController = abortController;
+    var _this = this, renderOnAddRemove = this.renderOnAddRemove;
     this.renderOnAddRemove = false;
 
     return Promise.all([
-      fabric.util.enlivenObjects(serialized.objects || [], { reviver: reviver, signal: abortController.signal }),
+      fabric.util.enlivenObjects(serialized.objects || [], { reviver: reviver, signal: options && options.signal }),
       fabric.util.enlivenObjectEnlivables({
         backgroundImage: serialized.backgroundImage,
         backgroundColor: serialized.background,
         overlayImage: serialized.overlayImage,
         overlayColor: serialized.overlay,
         clipPath: serialized.clipPath,
-      }, { signal: abortController.signal })
+      }, { signal: options && options.signal })
     ])
       .then(function (res) {
         var enlived = res[0], enlivedMap = res[1];
@@ -69,10 +55,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this.renderOnAddRemove = renderOnAddRemove;
         _this.set(enlivedMap);
         return _this;
-      }).finally(function () {
-        if (abortController === _this.__abortController) {
-          delete _this.__abortController;
-        }
       });
   },
 
