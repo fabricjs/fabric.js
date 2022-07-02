@@ -64,7 +64,7 @@
         Array.isArray(path) ? path : fabric.util.parsePath(path)
       );
 
-      this._setPositionDimensions.call(this, options);
+      this._setPositionDimensions(options);
     },
 
     /**
