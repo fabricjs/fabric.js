@@ -379,7 +379,7 @@
     test: 'Export complex gradients',
     code: clipping13,
     golden: 'clipping13.png',
-    percentage: 0.06,
+    percentage: 0.02,
     width: 290,
     height: 400,
   });
