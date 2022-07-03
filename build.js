@@ -193,6 +193,7 @@ var filesToInclude = [
   'src/shapes/rect.class.js',
   'src/shapes/polyline.class.js',
   'src/shapes/polygon.class.js',
+  'src/shapes/arrow.class.js',
   'src/shapes/path.class.js',
   'src/shapes/group.class.js',
   ifSpecifiedInclude('interaction', 'src/shapes/active_selection.class.js'),
