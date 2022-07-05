@@ -8,8 +8,6 @@
    */
 
   var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
-      clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
       parseUnit = fabric.util.parseUnit,
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
@@ -688,12 +686,15 @@
    * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
    * @param {Object} [parsingOptions] options for parsing document
    * @param {String} [parsingOptions.crossOrigin] crossOrigin settings
+   * @param {AbortSignal} [parsingOptions.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    */
   fabric.parseSVGDocument = function(doc, callback, reviver, parsingOptions) {
     if (!doc) {
       return;
     }
-
+    if (parsingOptions && parsingOptions.signal && parsingOptions.signal.aborted) {
+      throw new Error('`options.signal` is in `aborted` state');
+    }
     parseUseDirectives(doc);
 
     var svgUid =  fabric.Object.__uid++, i, len,
@@ -701,6 +702,7 @@
         descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
     options.crossOrigin = parsingOptions && parsingOptions.crossOrigin;
     options.svgUid = svgUid;
+    options.signal = parsingOptions && parsingOptions.signal;
 
     if (descendants.length === 0 && fabric.isLikelyNode) {
       // we're likely in node, where "o3-xml" library fails to gEBTN("*")
@@ -742,7 +744,7 @@
         delete fabric.cssRules[svgUid];
         delete fabric.clipPaths[svgUid];
       }
-    }, clone(options), reviver, parsingOptions);
+    }, Object.assign({}, options), reviver, parsingOptions);
   };
 
   function recursivelyParseGradientsXlink(doc, gradient) {
@@ -773,7 +775,7 @@
       fabric.reNum +
     '(?:px|cm|mm|em|pt|pc|in)*)(?:\\/(normal|' + fabric.reNum + '))?\\s+(.*)');
 
-  extend(fabric, {
+  fabric.util.object.extend(fabric, {
     /**
      * Parses a short font declaration, building adding its properties to a style object
      * @static
@@ -876,11 +878,11 @@
       }, { });
       // add values parsed from style, which take precedence over attributes
       // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
-      var cssAttrs = extend(
+      var cssAttrs = Object.assign(
         getGlobalStylesForElement(element, svgUid),
         fabric.parseStyleAttribute(element)
       );
-      ownAttributes = extend(
+      ownAttributes = Object.assign(
         ownAttributes,
         cssAttrs
       );
@@ -902,7 +904,7 @@
       if (normalizedStyle && normalizedStyle.font) {
         fabric.parseFontDeclaration(normalizedStyle.font, normalizedStyle);
       }
-      var mergedAttrs = extend(parentAttributes, normalizedStyle);
+      var mergedAttrs = Object.assign(parentAttributes, normalizedStyle);
       return fabric.svgValidParentsRegEx.test(element.nodeName) ? mergedAttrs : _setStrokeFillOpacity(mergedAttrs);
     },
 
@@ -1026,10 +1028,10 @@
               return;
             }
             if (allRules[_rule]) {
-              fabric.util.object.extend(allRules[_rule], ruleObj);
+              Object.assign(allRules[_rule], ruleObj);
             }
             else {
-              allRules[_rule] = fabric.util.object.clone(ruleObj);
+              allRules[_rule] = Object.assign({}, ruleObj);
             }
           });
         });
@@ -1046,13 +1048,15 @@
      * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
      * @param {Object} [options] Object containing options for parsing
      * @param {String} [options.crossOrigin] crossOrigin crossOrigin setting to use for external resources
+     * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
      */
     loadSVGFromURL: function(url, callback, reviver, options) {
 
       url = url.replace(/^\n\s*/, '').trim();
       new fabric.util.request(url, {
         method: 'get',
-        onComplete: onComplete
+        onComplete: onComplete,
+        signal: options && options.signal
       });
 
       function onComplete(r) {
@@ -1077,6 +1081,7 @@
      * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
      * @param {Object} [options] Object containing options for parsing
      * @param {String} [options.crossOrigin] crossOrigin crossOrigin setting to use for external resources
+     * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
      */
     loadSVGFromString: function(string, callback, reviver, options) {
       var parser = new fabric.window.DOMParser(),

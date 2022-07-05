@@ -1328,6 +1328,21 @@
     });
   });
 
+  QUnit.test('loadFromJSON with AbortController', function (assert) {
+    var done = assert.async();
+    assert.expect(1);
+    var serialized = JSON.parse(PATH_JSON);
+    serialized.background = 'green';
+    serialized.backgroundImage = { "type": "image", "originX": "left", "originY": "top", "left": 13.6, "top": -1.4, "width": 3000, "height": 3351, "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 0, "strokeDashArray": null, "strokeLineCap": "butt", "strokeDashOffset": 0, "strokeLineJoin": "miter", "strokeMiterLimit": 4, "scaleX": 0.05, "scaleY": 0.05, "angle": 0, "flipX": false, "flipY": false, "opacity": 1, "shadow": null, "visible": true, "backgroundColor": "", "fillRule": "nonzero", "globalCompositeOperation": "source-over", "skewX": 0, "skewY": 0, "src": IMG_SRC, "filters": [], "crossOrigin": "" };
+    var abortController = new AbortController();
+    canvas.loadFromJSON(serialized, null, { signal: abortController.signal })
+      .catch(function (err) {
+        assert.equal(err.type, 'abort', 'should be an abort event');
+        done();
+      });
+    abortController.abort();
+  });
+
   QUnit.test('loadFromJSON custom properties', function(assert) {
     var done = assert.async();
     var rect = new fabric.Rect({ width: 10, height: 20 });
@@ -1847,6 +1862,16 @@
     assert.deepEqual(canvas.vptCoords.tr, new fabric.Point(30 + canvas.getWidth() / 2, -30), 'tl is 0,0');
     assert.deepEqual(canvas.vptCoords.bl, new fabric.Point(30, canvas.getHeight() / 2 - 30), 'tl is 0,0');
     assert.deepEqual(canvas.vptCoords.br, new fabric.Point(30 + canvas.getWidth() / 2, canvas.getHeight() / 2 - 30), 'tl is 0,0');
+  });
+
+  QUnit.test('calcViewportBoundaries with flipped zoom and translation', function (assert) {
+    assert.ok(typeof canvas.calcViewportBoundaries === 'function');
+    canvas.setViewportTransform([2, 0, 0, -2, -60, 60]);
+    canvas.calcViewportBoundaries();
+    assert.deepEqual({ x: canvas.vptCoords.tl.x, y: canvas.vptCoords.tl.y }, { x: 30, y: -145 }, 'tl is 30, -145');
+    assert.deepEqual({ x: canvas.vptCoords.tr.x, y: canvas.vptCoords.tr.y }, { x: 130, y: -145 }, 'tr is 130, -145');
+    assert.deepEqual({ x: canvas.vptCoords.bl.x, y: canvas.vptCoords.bl.y }, { x: 30,  y: 30 }, 'bl is 30,-70');
+    assert.deepEqual({ x: canvas.vptCoords.br.x, y: canvas.vptCoords.br.y }, { x: 130,  y: 30 }, 'br is 130,-70');
   });
 
   QUnit.test('_isRetinaScaling', function(assert) {

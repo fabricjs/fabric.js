@@ -32,10 +32,8 @@
 
   function fireEvent(eventName, options) {
     var target = options.transform.target,
-        canvas = target.canvas,
-        canvasOptions = fabric.util.object.clone(options);
-    canvasOptions.target = target;
-    canvas && canvas.fire('object:' + eventName, canvasOptions);
+        canvas = target.canvas;
+    canvas && canvas.fire('object:' + eventName, Object.assign({}, options, { target: target }));
     target.fire(eventName, options);
   }
 
