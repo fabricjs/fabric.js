@@ -275,27 +275,6 @@
     },
 
     /**
-     * Checks if object can enter group and logs relevant warnings
-     * @private
-     * @param {fabric.Object} object
-     * @returns
-     */
-    canEnterGroup: function (object) {
-      if (object === this || this.isDescendantOf(object)) {
-        throw new Error('fabric.Group: trying to add group to itself');
-      }
-      else if (object.group && object.group === this) {
-        throw new Error('fabric.Group: duplicate objects are not supported inside group');
-      }
-      else if (object.group) {
-        /* _DEV_MODE_START_ */
-        console.warn('fabric.Group: object is about to enter group and leave another');
-        /* _DEV_MODE_END_ */
-      }
-      return true;
-    },
-
-    /**
      * @private
      * @param {fabric.Object} object
      * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
