@@ -11,10 +11,12 @@
       this.initCursorSelectionHandlers();
       this.initDoubleClickSimulation();
       this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
+      this.dragEnterHandler = this.dragEnterHandler.bind(this);
       this.dragOverHandler = this.dragOverHandler.bind(this);
       this.dragLeaveHandler = this.dragLeaveHandler.bind(this);
       this.dragEndHandler = this.dragEndHandler.bind(this);
       this.dropHandler = this.dropHandler.bind(this);
+      this.on('dragenter', this.dragEnterHandler);
       this.on('dragover', this.dragOverHandler);
       this.on('dragleave', this.dragLeaveHandler);
       this.on('dragend', this.dragEndHandler);
@@ -531,6 +533,22 @@
         return true;
       }
       return false;
+    },
+
+    /**
+     * support native like text dragging
+     * @private
+     * @param {object} options
+     * @param {DragEvent} options.e
+     */
+    dragEnterHandler: function (options) {
+      var e = options.e;
+      var canDrop = !e.defaultPrevented && this.canDrop(e);
+      if (!this.__isDraggingOver && canDrop) {
+        this.__isDraggingOver = true;
+        this.enterEditing(e);
+        this.__isDragging && this.abortCursorAnimation();
+      }
     },
 
     /**

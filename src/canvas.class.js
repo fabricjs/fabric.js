@@ -37,6 +37,8 @@
    * @fires dragover
    * @fires dragenter
    * @fires dragleave
+   * @fires drag:enter object drag enter
+   * @fires drag:leave object drag leave
    * @fires drop:before before drop event. Prepare for the drop event (same native event).
    * @fires drop
    * @fires drop:after after drop event. Run logic on canvas after event has been accepted/declined (same native event).
