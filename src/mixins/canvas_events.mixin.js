@@ -296,7 +296,7 @@
             canDrop: false,
             dropTarget: undefined
           };
-      //  fire on canvas          
+      //  fire on canvas
       this.fire(eventType, options);
       //  make sure we fire dragenter events before dragover
       //  if dragleave is needed, object will not fire dragover so we don't need to trouble ourselves with it
@@ -980,7 +980,7 @@
           _hoveredTargets = this._hoveredTargets, targets = this.targets,
           length = Math.max(_hoveredTargets.length, targets.length);
 
-      this.fireSyntheticInOutEvents(target, { e }, {
+      this.fireSyntheticInOutEvents(target, { e: e }, {
         oldTarget: _hoveredTarget,
         evtOut: 'mouseout',
         canvasEvtOut: 'mouse:out',
@@ -988,7 +988,7 @@
         canvasEvtIn: 'mouse:over',
       });
       for (var i = 0; i < length; i++){
-        this.fireSyntheticInOutEvents(targets[i], { e }, {
+        this.fireSyntheticInOutEvents(targets[i], { e: e }, {
           oldTarget: _hoveredTargets[i],
           evtOut: 'mouseout',
           evtIn: 'mouseover',

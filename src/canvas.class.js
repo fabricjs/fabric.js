@@ -72,7 +72,7 @@
    *    //  we have a winner it's opt.target!!
    *  }
    * })
-   * 
+   *
    * @fires after:render at the end of the render process, receives the context in the callback
    * @fires before:render at start the render process, receives the context in the callback
    *
