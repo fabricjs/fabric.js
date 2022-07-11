@@ -159,6 +159,15 @@
     },
 
     /**
+     * Add objects
+     * @param {...fabric.Object} objects
+     */
+    addRelative: function () {
+      fabric.Collection.add.call(this, arguments, this._onRelativeObjectAdded);
+      this._onAfterObjectsChange('added', Array.from(arguments));
+    },
+
+    /**
      * Inserts an object into collection at specified index
      * @param {fabric.Object | fabric.Object[]} objects Object to insert
      * @param {Number} index Index to insert object at
