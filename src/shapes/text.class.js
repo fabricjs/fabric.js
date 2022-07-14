@@ -680,7 +680,7 @@
         if (currentColor && !path) {
           drawStart = leftOffset + lineLeftOffset + boxStart;
           if (this.direction === 'rtl') {
-            drawStart = this.width - drawStart - boxWidth;
+            drawStart = leftOffset + lineLeftOffset - boxWidth;
           }
           ctx.fillStyle = currentColor;
           ctx.fillRect(
