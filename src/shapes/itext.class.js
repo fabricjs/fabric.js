@@ -510,15 +510,17 @@
    * @param {function} [callback] invoked with new instance as argument
    */
   fabric.IText.fromObject = function(object, callback) {
-    object.styles = fabric.util.stylesFromArray(object.styles, object.text);
-    parseDecoration(object);
-    if (object.styles) {
-      for (var i in object.styles) {
-        for (var j in object.styles[i]) {
-          parseDecoration(object.styles[i][j]);
+    var styles = fabric.util.stylesFromArray(object.styles, object.text);
+    //copy object to prevent mutation
+    var objCopy = Object.assign({}, object, { styles: styles });
+    parseDecoration(objCopy);
+    if (objCopy.styles) {
+      for (var i in objCopy.styles) {
+        for (var j in objCopy.styles[i]) {
+          parseDecoration(objCopy.styles[i][j]);
         }
       }
     }
-    fabric.Object._fromObject('IText', object, callback, 'text');
+    fabric.Object._fromObject('IText', objCopy, callback, 'text');
   };
 })();

@@ -158,6 +158,7 @@
       }
     });
     fabric.Textbox.fromObject(TEXTBOX_OBJECT, function(obj) {
+      assert.notEqual(obj.styles, textbox.styles, 'styles is a different object after initialization');
       assert.deepEqual(obj.styles, textbox.styles, 'stylesFromArray output matches');
       assert.deepEqual(obj.styles[0], textbox.styles[0], 'styles match at line 0');
       assert.notEqual(obj.styles[0][5], obj.styles[0][6], 'styles are separate objects');
@@ -172,7 +173,10 @@
       assert.deepEqual(obj.styles[2], textbox.styles[2], 'styles match at line 2');
       assert.deepEqual(obj.styles[2][0], textbox.styles[2][0], 'styles match at index 0');
       assert.deepEqual(obj.styles[2][1], textbox.styles[2][1], 'styles match at index 1');
-      done();
+      fabric.Textbox.fromObject(obj, function(obj2) {
+        assert.notEqual(obj.styles, obj2.styles, 'styles copy is a different object after initialization');
+        done();
+      });
     });
   });
 
