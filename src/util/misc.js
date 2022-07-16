@@ -530,9 +530,9 @@
         }
         else {
           img.onload = done;
-          img.onerror = function (err) {
+          img.onerror = function () {
             signal && abort && signal.removeEventListener('abort', abort);
-            reject(err);
+            reject(new Error('Error loading ' + img.src));
           };
           options && options.crossOrigin && (img.crossOrigin = options.crossOrigin);
           img.src = url;
