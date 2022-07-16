@@ -2,6 +2,9 @@
   "env": {
     "browser": true
   },
+  "parserOptions": {
+    "ecmaVersion": 8
+  },
   "globals": {
     "Promise": true,
     "define": true,

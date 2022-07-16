@@ -66,7 +66,7 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
     this._setShadow();
 
     this.addSprayChunk(pointer);
-    this.render(this.sprayChunkPoints);
+    this.renderChunk(this.sprayChunkPoints);
   },
 
   /**
@@ -78,15 +78,20 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       return;
     }
     this.addSprayChunk(pointer);
-    this.render(this.sprayChunkPoints);
+    this.renderChunk(this.sprayChunkPoints);
   },
 
   /**
    * Invoked on mouse up
    */
-  onMouseUp: function() {
-    var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
-    this.canvas.renderOnAddRemove = false;
+  onMouseUp: function () {
+    this._finalizeAndAddPath();
+  },
+
+  _finalizeAndAddPath: async function () {
+    var canvas = this.canvas, ctx = canvas.contextTop;
+    var originalRenderOnAddRemove = canvas.renderOnAddRemove;
+    canvas.renderOnAddRemove = false;
 
     var rects = [];
 
@@ -119,14 +124,14 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       interactive: false
     });
     this.shadow && group.set('shadow', new fabric.Shadow(this.shadow));
-    this.canvas.fire('before:path:created', { path: group });
-    this.canvas.add(group);
-    this.canvas.fire('path:created', { path: group });
-
-    this.canvas.clearContext(this.canvas.contextTop);
-    this._resetShadow();
-    this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
-    this.canvas.requestRenderAll();
+    await this._addClipPathToResult(group);
+    canvas.fire('before:path:created', { path: group });
+    canvas.add(group);
+    canvas.fire('path:created', { path: group });
+    canvas.clearContext(ctx);
+    this._resetShadow(ctx);
+    canvas.renderOnAddRemove = originalRenderOnAddRemove;
+    canvas.requestRenderAll();
   },
 
   /**
@@ -153,14 +158,22 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
   },
 
   /**
-   * Render new chunk of spray brush
+   * Sets the transformation and fillStyle on given context
+   * @param {RenderingContext2d} ctx context to render on
+   * @private
    */
-  render: function(sprayChunk) {
-    var ctx = this.canvas.contextTop, i, len;
+  _saveAndTransform: function (ctx) {
+    this.callSuper('_saveAndTransform', ctx);
     ctx.fillStyle = this.color;
+  },
 
-    this._saveAndTransform(ctx);
-
+  /**
+   * @private
+   * Render new chunk of spray brush
+   * @param {CanvasRenderingContext2D} ctx
+   */
+  _renderChunk: function (ctx, sprayChunk) {
+    var i, len;
     for (i = 0, len = sprayChunk.length; i < len; i++) {
       var point = sprayChunk[i];
       if (typeof point.opacity !== 'undefined') {
@@ -168,22 +181,29 @@ fabric.SprayBrush = fabric.util.createClass( fabric.BaseBrush, /** @lends fabric
       }
       ctx.fillRect(point.x, point.y, point.width, point.width);
     }
+  },
+
+  /**
+   * @private
+   * @param {fabric.Object} sprayChunk
+   */
+  renderChunk: function (sprayChunk) {
+    var ctx = this.canvas.contextTop;
+    this._saveAndTransform(ctx);
+    this._renderChunk(ctx, sprayChunk);
+    this._drawClipPath(ctx, this.clipPath);
     ctx.restore();
   },
 
   /**
    * Render all spray chunks
+   * @param {CanvasRenderingContext2D} ctx
    */
-  _render: function() {
-    var ctx = this.canvas.contextTop, i, ilen;
-    ctx.fillStyle = this.color;
-
-    this._saveAndTransform(ctx);
-
+  _render: function(ctx) {
+    var i, ilen;
     for (i = 0, ilen = this.sprayChunks.length; i < ilen; i++) {
-      this.render(this.sprayChunks[i]);
+      this._renderChunk(ctx, this.sprayChunks[i]);
     }
-    ctx.restore();
   },
 
   /**

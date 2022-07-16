@@ -297,7 +297,7 @@
      */
     _renderOverlay: function (ctx) {
       __renderOverlay.call(this, ctx);
-      this.isErasing() && this.freeDrawingBrush._render();
+      this.isErasing() && this.freeDrawingBrush.render();
     }
   });
 
@@ -525,7 +525,7 @@
         this.preparePattern();
         this._isErasing = true;
         this.canvas.fire('erasing:start');
-        this._render();
+        this.render();
       },
 
       /**
@@ -535,7 +535,7 @@
        *
        * @todo provide a better solution to https://github.com/fabricjs/fabric.js/issues/7984
        */
-      _render: function () {
+      render: function () {
         var ctx, lineWidth = this.width;
         var t = this.canvas.getRetinaScaling(), s = 1 / t;
         //  clip canvas
@@ -544,7 +544,7 @@
         //  the issue's cause is unknown at time of writing (@ShaMan123 06/2022)
         if (lineWidth - this.erasingWidthAliasing > 0) {
           this.width = lineWidth - this.erasingWidthAliasing;
-          this.callSuper('_render', ctx);
+          this.callSuper('render', ctx);
           this.width = lineWidth;
         }
         //  render brush and mask it with pattern
@@ -554,7 +554,7 @@
         ctx.scale(s, s);
         ctx.drawImage(this._patternCanvas, 0, 0);
         ctx.restore();
-        this.callSuper('_render', ctx);
+        this.callSuper('render', ctx);
       },
 
       /**
@@ -565,8 +565,8 @@
        * @return {fabric.Path} Path to add on canvas
        * @returns
        */
-      createPath: function (pathData) {
-        var path = this.callSuper('createPath', pathData);
+      createPath: async function (pathData) {
+        var path = await this.callSuper('createPath', pathData);
         path.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
         path.stroke = this.inverted ? 'white' : 'black';
         return path;
@@ -722,15 +722,15 @@
        * we use the points captured to create an new fabric path object
        * and add it to every intersected erasable object.
        */
-      _finalizeAndAddPath: function () {
-        var ctx = this.canvas.contextTop, canvas = this.canvas;
+      _finalizeAndAddPath: async function () {
+        var canvas = this.canvas, ctx = canvas.contextTop;
         ctx.closePath();
         if (this.decimate) {
           this._points = this.decimatePoints(this._points, this.decimate);
         }
 
         // clear
-        canvas.clearContext(canvas.contextTop);
+        canvas.clearContext(ctx);
         this._isErasing = false;
 
         var pathData = this._points && this._points.length > 1 ?
@@ -746,7 +746,7 @@
           return;
         }
 
-        var path = this.createPath(pathData);
+        var path = await this.createPath(pathData);
         //  needed for `intersectsWithObject`
         path.setCoords();
         //  commense event sequence
@@ -773,7 +773,7 @@
             }));
 
             canvas.requestRenderAll();
-            _this._resetShadow();
+            _this._resetShadow(ctx);
 
             // fire event 'path' created
             canvas.fire('path:created', { path: path });
