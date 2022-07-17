@@ -100,7 +100,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (!this.canvas || !this.editable || this.__isDragging || (options.e.button && options.e.button !== 1)) {
       return;
     }
-
     this.__isMousedown = true;
 
     if (this.selected) {
@@ -154,15 +153,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
    * standard handler for mouse up, overridable
    * @private
    */
-  mouseUpHandler: function (options) {
-    // restore selection state after dragging
-    if (this.__isDragging && !this.__dragStartFired) {
-      // drag didn't occur, so we revert to click behavior
-      this.__isDragging = false;
-      this._mouseDownHandler(options);
-    }
-    this.__isDragging = this.__dragStartFired = false;
-
+  mouseUpHandler: function(options) {
     this.__isMousedown = false;
     if (!this.editable ||
       (this.group && !this.group.interactive) ||

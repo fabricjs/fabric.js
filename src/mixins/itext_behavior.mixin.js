@@ -346,7 +346,6 @@
       if (this.isEditing || !this.editable) {
         return;
       }
-console.log('enterEditing');
       if (this.canvas) {
         this.canvas.calcOffset();
         this.exitEditingOnOthers(this.canvas);
@@ -567,7 +566,7 @@ console.log('enterEditing');
         this.__isDraggingOver = false;
         !this.__isDragging && this.clearContextTop();
       }
-      if (this.__isDraggingOver) {
+      if (this.__isDraggingOver && canDrop) {
         //  can be dropped, inform browser
         e.preventDefault();
         //  inform event subscribers
@@ -655,15 +654,12 @@ console.log('enterEditing');
       e.preventDefault();
       var insert = e.dataTransfer.getData('text/plain');
       if (insert && !didDrop) {
-        var insertAt = this.selectionStart;
+        var insertAt = this.getSelectionStartFromPointer(e);
         var data = e.dataTransfer.types.includes('application/fabric') ?
           JSON.parse(e.dataTransfer.getData('application/fabric')) :
           {};
         var styles = data.styles;
         var trailing = insert[Math.max(0, insert.length - 1)];
-        this.canvas.discardActiveObject();
-        this.canvas.setActiveObject(this);
-        this.enterEditing(e);
         var selectionStartOffset = 0;
         //  drag and drop in same instance
         if (this.__dragStartSelection) {
@@ -689,12 +685,9 @@ console.log('enterEditing');
         options.dropTarget = this;
         //  finalize
         this.insertChars(insert, styles, insertAt);
-        this.selectionStart = Math.min(insertAt + selectionStartOffset, this._text.length);
-        this.selectionEnd = Math.min(this.selectionStart + insert.length, this._text.length);
-        this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
-        this._updateTextarea();
         this.fire('changed', { index: insertAt + selectionStartOffset, action: 'drop' });
         this.canvas.fire('text:changed', { target: this });
+        this.canvas.contextTopDirty = true;
         this.canvas.requestRenderAll();
       }
     },
@@ -889,7 +882,6 @@ console.log('enterEditing');
      * @chainable
      */
     exitEditing: function() {
-      console.log('exitEditing');
       var isTextChanged = (this._textBeforeEdit !== this.text);
       var hiddenTextarea = this.hiddenTextarea;
       this.selected = false;
