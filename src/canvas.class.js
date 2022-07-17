@@ -66,7 +66,7 @@
    *    // no winners
    *  }
    *  else if(!opt.didDrop) {
-   *    //  my objects didn't win, some other lucky bastard
+   *    //  my objects didn't win, some other lucky object
    *  }
    *  else {
    *    //  we have a winner it's opt.target!!
