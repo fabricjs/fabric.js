@@ -346,7 +346,7 @@
       if (this.isEditing || !this.editable) {
         return;
       }
-
+console.log('enterEditing');
       if (this.canvas) {
         this.canvas.calcOffset();
         this.exitEditingOnOthers(this.canvas);
@@ -497,6 +497,7 @@
      */
     onDragStart: function (e) {
       this.__dragStartFired = true;
+      this.abortCursorAnimation();
       if (this.__isDragging) {
         var selection = this.__dragStartSelection = {
           selectionStart: this.selectionStart,
@@ -546,8 +547,6 @@
       var canDrop = !e.defaultPrevented && this.canDrop(e);
       if (!this.__isDraggingOver && canDrop) {
         this.__isDraggingOver = true;
-        this.enterEditing(e);
-        this.__isDragging && this.abortCursorAnimation();
       }
     },
 
@@ -562,14 +561,11 @@
       var canDrop = !e.defaultPrevented && this.canDrop(e);
       if (!this.__isDraggingOver && canDrop) {
         this.__isDraggingOver = true;
-        this.enterEditing(e);
-        this.__isDragging && this.abortCursorAnimation();
       }
       else if (this.__isDraggingOver && !canDrop) {
         //  drop state has changed
         this.__isDraggingOver = false;
         !this.__isDragging && this.clearContextTop();
-        this.exitEditing();
       }
       if (this.__isDraggingOver) {
         //  can be dropped, inform browser
@@ -577,11 +573,9 @@
         //  inform event subscribers
         options.canDrop = true;
         options.dropTarget = this;
-        //  render
-        this.setCursorByClick(e);
-        this._updateTextarea();
-        this.restartCursorIfNeeded();
-        this.renderCursorOrSelection();
+        // find cursor under the drag part.
+        var dragSelection = this.getSelectionStartFromPointer(e);
+        this.renderCursorAt(dragSelection);
       }
     },
 
@@ -593,7 +587,6 @@
       if (this.__isDraggingOver || this.__isDragging) {
         this.__isDraggingOver = false;
         !this.__isDragging && this.clearContextTop();
-        this.exitEditing();
       }
     },
 
@@ -896,6 +889,7 @@
      * @chainable
      */
     exitEditing: function() {
+      console.log('exitEditing');
       var isTextChanged = (this._textBeforeEdit !== this.text);
       var hiddenTextarea = this.hiddenTextarea;
       this.selected = false;

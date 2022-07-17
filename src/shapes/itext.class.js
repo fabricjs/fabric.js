@@ -318,12 +318,13 @@
       ctx && ctx.restore();
       return ctx;
     },
+
     /**
      * Renders cursor or selection (depending on what exists)
      * it does on the contextTop. If contextTop is not available, do nothing.
      */
     renderCursorOrSelection: function() {
-      if (!this.isEditing && !this.__isDraggingOver) {
+      if (!this.isEditing) {
         return;
       }
       var ctx = this._clearContextTop();
@@ -341,7 +342,25 @@
       ctx.restore();
     },
 
+    /**
+     * Renders cursor on context Top, outside the animation cycle, on request
+     * Used for the drag/drop effect.
+     * If contextTop is not available, do nothing.
+     */
+    renderCursorAt: function(selectionStart) {
+      var ctx = this._clearContextTop();
+      if (!ctx) {
+        return;
+      }
+      console.log('renderCursorAt', selectionStart);
+      var boundaries = this._getCursorBoundaries(selectionStart, true);
+      this._renderCursor(boundaries, selectionStart, ctx);
+      ctx.restore();
+    },
+
+
     _clearTextArea: function(ctx) {
+      console.log('clearing for', this.text)
       // we add 4 pixel, to be sure to do not leave any pixel out
       var width = this.width + 4, height = this.height + 4;
       ctx.clearRect(-width / 2, -height / 2, width, height);
@@ -434,7 +453,11 @@
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
     renderCursor: function(boundaries, ctx) {
-      var cursorLocation = this.get2DCursorLocation(),
+      this._renderCursor(boundaries, this.selectionStart, ctx);
+    },
+
+    _renderCursor: function(boundaries, selectionStart, ctx) {
+      var cursorLocation = this.get2DCursorLocation(selectionStart),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
           charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
@@ -446,6 +469,8 @@
         - charHeight * (1 - this._fontSizeFraction);
 
       if (this.inCompositionMode) {
+        // TODO: investigate why there isn't a return inside the if,
+        // and when this actually happen
         this.renderSelection(boundaries, ctx);
       }
       ctx.fillStyle = this.cursorColor || this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
