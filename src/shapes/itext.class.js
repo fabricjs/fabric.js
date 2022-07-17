@@ -468,7 +468,7 @@
 
       if (this.inCompositionMode) {
         // TODO: investigate why there isn't a return inside the if,
-        // and when this actually happen
+        // and why can't happe top of the function
         this.renderSelection(boundaries, ctx);
       }
       ctx.fillStyle = this.cursorColor || this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
