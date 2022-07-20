@@ -365,7 +365,7 @@
      */
     initialize: function(text, options) {
       this.styles = options ? (options.styles || { }) : { };
-      this.text = text;
+      this.text = text || '';
       this.__skipDimension = true;
       this.callSuper('initialize', options);
       if (this.path) {
