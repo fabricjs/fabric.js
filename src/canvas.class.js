@@ -935,14 +935,15 @@
      * of the time.
      * @param {Event} e
      * @param {Boolean} ignoreVpt
+     * @param {Boolean} [recalculate] force recalculation in case of cached pointers
      * @return {fabric.Point}
      */
-    getPointer: function (e, ignoreVpt) {
+    getPointer: function (e, ignoreVpt, recalculate) {
       // return cached values if we are in the event processing chain
-      if (this._absolutePointer && !ignoreVpt) {
+      if (this._absolutePointer && !ignoreVpt && !recalculate) {
         return this._absolutePointer;
       }
-      if (this._pointer && ignoreVpt) {
+      if (this._pointer && ignoreVpt && !recalculate) {
         return this._pointer;
       }
 
