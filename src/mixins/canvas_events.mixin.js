@@ -795,7 +795,6 @@
       var pointer = this.getPointer(e);
       this._isCurrentlyDrawing = this.freeDrawingBrush.onMouseUp({ e: e, pointer: pointer });
       this._handleEvent(e, 'up');
-      this._absolutePointer = null;
     },
 
     /**
