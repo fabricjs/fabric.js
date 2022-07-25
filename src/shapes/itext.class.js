@@ -333,7 +333,7 @@
       }
       var boundaries = this._getCursorBoundaries();
       if (this.selectionStart === this.selectionEnd) {
-        this.__isDragging && this._renderDragStartSelection(ctx);
+        this.__isDragging && this._renderDragSourceEffect(ctx);
         this.renderCursor(boundaries, ctx);
       }
       else {
@@ -496,11 +496,11 @@
     /**
      * Renders drag start text selection
      */
-    renderDragStartSelection: function () {
+    renderDragSourceEffect: function () {
       if (this.__isDragging) {
         var ctx = this._clearContextTop();
         if (ctx) {
-          this._renderDragStartSelection(ctx);
+          this._renderDragSourceEffect(ctx);
           ctx.restore();
         }
       }
@@ -510,7 +510,7 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx
      */
-    _renderDragStartSelection: function (ctx) {
+    _renderDragSourceEffect: function (ctx) {
       if (this.__dragStartSelection) {
         this._renderSelection(
           this.__dragStartSelection,

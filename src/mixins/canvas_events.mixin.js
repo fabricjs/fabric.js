@@ -233,9 +233,9 @@
     /**
      * @private
      */
-    _renderDragStartSelection: function () {
-      this._dragSource && typeof this._dragSource.renderDragStartSelection === 'function'
-        && this._dragSource.renderDragStartSelection();
+    _renderDragSourceEffect: function () {
+      this._dragSource && typeof this._dragSource.renderDragSourceEffect === 'function'
+        && this._dragSource.renderDragSourceEffect();
     },
 
     /**
@@ -303,18 +303,18 @@
       this._fireEnterLeaveEvents(target, options);
       if (target) {
         //  render drag selection before rendering target cursor for correct visuals
-        target.canDrop(e) && this._renderDragStartSelection();
+        target.canDrop(e) && this._renderDragSourceEffect();
         target.fire(eventType, options);
       }
       //  propagate the event to subtargets
       for (var i = 0; i < targets.length; i++) {
         target = targets[i];
         //  accept event only if previous targets didn't
-        !e.defaultPrevented && target.canDrop(e) && this._renderDragStartSelection();
+        !e.defaultPrevented && target.canDrop(e) && this._renderDragSourceEffect();
         target.fire(eventType, options);
       }
       //  render drag selection in case no target accepted the event
-      !e.defaultPrevented && this._renderDragStartSelection();
+      !e.defaultPrevented && this._renderDragSourceEffect();
     },
 
     /**
