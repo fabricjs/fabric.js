@@ -334,10 +334,10 @@
       var boundaries = this._getCursorBoundaries();
       if (this.selectionStart === this.selectionEnd) {
         this.__isDragging && this._renderDragSourceEffect(ctx);
-        this.renderCursor(boundaries, ctx);
+        this.renderCursor(ctx, boundaries);
       }
       else {
-        this.renderSelection(boundaries, ctx);
+        this.renderSelection(ctx, boundaries);
       }
       ctx.restore();
     },
@@ -352,11 +352,14 @@
       if (!ctx) {
         return;
       }
-      var boundaries = this._getCursorBoundaries(selectionStart, true);
-      this._renderCursor(boundaries, selectionStart, ctx);
+      this._renderCursorAt(selectionStart);
       ctx.restore();
     },
 
+    _renderCursorAt: function(selecetionStart) {
+      var boundaries = this._getCursorBoundaries(selectionStart, true);
+      this._renderCursor(ctx, boundaries, selectionStart);
+    },
 
     _clearTextArea: function(ctx) {
       // we add 4 pixel, to be sure to do not leave any pixel out
@@ -451,10 +454,10 @@
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
     renderCursor: function(boundaries, ctx) {
-      this._renderCursor(boundaries, this.selectionStart, ctx);
+      this._renderCursor(ctx, boundaries, this.selectionStart);
     },
 
-    _renderCursor: function(boundaries, selectionStart, ctx) {
+    _renderCursor: function(ctx, boundaries, selectionStart) {
       var cursorLocation = this.get2DCursorLocation(selectionStart),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
@@ -485,23 +488,26 @@
      * @param {Object} boundaries Object with left/top/leftOffset/topOffset
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
-    renderSelection: function (boundaries, ctx) {
+    renderSelection: function (ctx, boundaries) {
       var selection = {
         selectionStart: this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
         selectionEnd: this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd
       };
-      this._renderSelection(selection, boundaries, ctx);
+      this._renderSelection(ctx, selection, boundaries);
     },
 
     /**
      * Renders drag start text selection
      */
-    renderDragSourceEffect: function () {
+    renderDragSourceEffect: function (e) {
       if (this.__isDragging) {
         var ctx = this._clearContextTop();
         if (ctx) {
           this._renderDragSourceEffect(ctx);
           ctx.restore();
+          if (this.canDrop(e)) {
+            this.renderDropTargetEffect(e, true)
+          }
         }
       }
     },
@@ -513,10 +519,20 @@
     _renderDragSourceEffect: function (ctx) {
       if (this.__dragStartSelection) {
         this._renderSelection(
+          ctx,
           this.__dragStartSelection,
           this._getCursorBoundaries(this.__dragStartSelection.selectionStart, true),
-          ctx
         );
+      }
+    },
+
+    renderDropTargetEffect: function(e, withoutClearing) {
+      var dragSelection = this.getSelectionStartFromPointer(e);
+      if (withoutClearing) {
+        this._renderCursorAt(dragSelection);
+      }
+      else {
+        this.renderCursorAt(dragSelection);
       }
     },
 
@@ -527,7 +543,7 @@
      * @param {Object} boundaries Object with left/top/leftOffset/topOffset
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
-    _renderSelection: function (selection, boundaries, ctx) {
+    _renderSelection: function (ctx, selection, boundaries, ctx) {
       var selectionStart = selection.selectionStart,
           selectionEnd = selection.selectionEnd,
           isJustify = this.textAlign.indexOf('justify') !== -1,

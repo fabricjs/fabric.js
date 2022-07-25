@@ -573,8 +573,7 @@
         options.canDrop = true;
         options.dropTarget = this;
         // find cursor under the drag part.
-        var dragSelection = this.getSelectionStartFromPointer(e);
-        this.renderCursorAt(dragSelection);
+        this.renderDropTargetEffect(e);
       }
     },
 
