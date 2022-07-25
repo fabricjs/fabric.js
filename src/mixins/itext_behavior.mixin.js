@@ -566,7 +566,7 @@
         this.__isDraggingOver = false;
         !this.__isDragging && this.clearContextTop();
       }
-      if (this.__isDraggingOver && canDrop) {
+      if (this.__isDraggingOver) {
         //  can be dropped, inform browser
         e.preventDefault();
         //  inform event subscribers
@@ -685,6 +685,13 @@
         options.dropTarget = this;
         //  finalize
         this.insertChars(insert, styles, insertAt);
+        // can this part be moved in an outside event? andrea to check.
+        this.canvas.setActiveObject(this);
+        this.enterEditing();
+        this.selectionStart = Math.min(insertAt + selectionStartOffset, this._text.length);
+        this.selectionEnd = Math.min(this.selectionStart + insert.length, this._text.length);
+        this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
+        this._updateTextarea();
         this.fire('changed', { index: insertAt + selectionStartOffset, action: 'drop' });
         this.canvas.fire('text:changed', { target: this });
         this.canvas.contextTopDirty = true;
