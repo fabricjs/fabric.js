@@ -14,6 +14,17 @@
    * @namespace fabric.util
    */
   fabric.util = {
+    /**
+     * Calculate the arccosine of an angle, avoiding values outside [-1, 1]
+     * @static
+     * @memberOf fabric.util
+     * @param {Number} value the value of the cosine
+     * @return {Number}
+     */
+    acos: function(value) {
+      var adjustedValue= Math.max(-1, Math.min(value, 1));
+      return Math.acos(adjustedValue);
+    },
 
     /**
      * Calculate the cos of an angle, avoiding returning floats for known results
@@ -166,7 +177,9 @@
      * @returns the angle in radian between the vectors
      */
     calcAngleBetweenVectors: function (a, b) {
-      return Math.acos((a.x * b.x + a.y * b.y) / (Math.hypot(a.x, a.y) * Math.hypot(b.x, b.y)));
+      return fabric.util.acos(
+        (a.x * b.x + a.y * b.y) / (Math.sqrt(a.x * a.x + a.y * a.y) * Math.sqrt(b.x * b.x + b.y * b.y))
+      );
     },
 
     /**
