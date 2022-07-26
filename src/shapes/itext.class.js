@@ -166,16 +166,6 @@
     _selectionDirection: null,
 
     /**
-     * @private
-     */
-    _abortCursorAnimation: false,
-
-    /**
-     * @private
-     */
-    __widthOfSpace: [],
-
-    /**
      * Helps determining when the text is in composition, so that the cursor
      * rendering is altered.
      */
@@ -530,7 +520,10 @@
       var dragSelection = this.getSelectionStartFromPointer(e);
       if (withoutClearing) {
         var ctx = this.canvas.contextTop;
+        ctx.save();
+        this.transform(ctx);
         this._renderCursorAt(ctx, dragSelection);
+        ctx.restore();
       }
       else {
         this.renderCursorAt(dragSelection);
