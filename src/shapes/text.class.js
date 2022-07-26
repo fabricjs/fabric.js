@@ -378,6 +378,19 @@
     },
 
     /**
+     * @private
+     * @param {String} key
+     * @param {*} value
+     */
+     _set: function (key, value) {
+      const enforceDefault = { text: '', fontFamily: 'Times New Roman', textAlign: 'left', fontStyle: 'normal',  };
+      if (value == null && key in enforceDefault) {
+        value = enforceDefault[key];
+      }
+      return this.callSuper('_set', key, value);
+    },
+
+    /**
      * If text has a path, it will add the extra information needed
      * for path and text calculations
      * @return {fabric.Text} thisArg
