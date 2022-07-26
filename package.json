@@ -55,6 +55,7 @@
     "test:visual:coverage": "nyc --silent --no-clean qunit test/node_test_setup.js test/lib test/visual",
     "coverage:report": "nyc report --reporter=lcov --reporter=text",
     "lint": "eslint --config .eslintrc.json src",
+    "lint:fix": "eslint --fix --config .eslintrc.json src",
     "lint_tests": "eslint test/unit --config .eslintrc_tests && eslint test/visual --config .eslintrc_tests",
     "all": "npm run build && npm run test -- --all && npm run lint && npm run lint_tests && npm run export",
     "testem": "testem .",
