@@ -323,7 +323,6 @@
       }
       var boundaries = this._getCursorBoundaries();
       if (this.selectionStart === this.selectionEnd) {
-        this.__isDragging && this._renderDragSourceEffect(ctx);
         this.renderCursor(ctx, boundaries);
       }
       else {
@@ -489,15 +488,12 @@
     /**
      * Renders drag start text selection
      */
-    renderDragSourceEffect: function (e) {
+    renderDragSourceEffect: function () {
       if (this.__isDragging) {
         var ctx = this._clearContextTop();
         if (ctx) {
           this._renderDragSourceEffect(ctx);
           ctx.restore();
-          if (this.canDrop(e)) {
-            this.renderDropTargetEffect(e, true)
-          }
         }
       }
     },
@@ -511,14 +507,14 @@
         this._renderSelection(
           ctx,
           this.__dragStartSelection,
-          this._getCursorBoundaries(this.__dragStartSelection.selectionStart, true),
+          this._getCursorBoundaries(this.__dragStartSelection.selectionStart, true)
         );
       }
     },
 
-    renderDropTargetEffect: function(e, withoutClearing) {
+    renderDropTargetEffect: function(e, dontClear) {
       var dragSelection = this.getSelectionStartFromPointer(e);
-      if (withoutClearing) {
+      if (dontClear) {
         var ctx = this.canvas.contextTop;
         ctx.save();
         this.transform(ctx);

@@ -97,10 +97,7 @@
      * @private
      */
     _animateCursor: function(obj, targetOpacity, duration, completeMethod) {
-
-      var tickState;
-
-      tickState = {
+      var tickState = {
         isAborted: false,
         abort: function() {
           this.isAborted = true;
@@ -150,7 +147,6 @@
           delay = restart ? 0 : this.cursorDelay;
 
       this.abortCursorAnimation();
-      this._currentCursorOpacity = 1;
       if (delay) {
         this._cursorTimeout2 = setTimeout(function () {
           _this._tick();
@@ -172,7 +168,7 @@
       clearTimeout(this._cursorTimeout1);
       clearTimeout(this._cursorTimeout2);
 
-      this._currentCursorOpacity = 0;
+      this._currentCursorOpacity = 1;
 
       //  make sure we clear context even if instance is not editing
       if (shouldClear) {
@@ -496,7 +492,6 @@
      */
     onDragStart: function (e) {
       this.__dragStartFired = true;
-      this.abortCursorAnimation();
       if (this.__isDragging) {
         var selection = this.__dragStartSelection = {
           selectionStart: this.selectionStart,
@@ -512,6 +507,7 @@
         e.dataTransfer.effectAllowed = 'copyMove';
         this.setDragImage(e, data);
       }
+      this.abortCursorAnimation();
       return this.__isDragging;
     },
 
@@ -564,7 +560,6 @@
       else if (this.__isDraggingOver && !canDrop) {
         //  drop state has changed
         this.__isDraggingOver = false;
-        !this.__isDragging && this.clearContextTop();
       }
       if (this.__isDraggingOver) {
         //  can be dropped, inform browser
@@ -573,7 +568,6 @@
         options.canDrop = true;
         options.dropTarget = this;
         // find cursor under the drag part.
-        this.renderDropTargetEffect(e);
       }
     },
 
@@ -584,7 +578,6 @@
     dragLeaveHandler: function () {
       if (this.__isDraggingOver || this.__isDragging) {
         this.__isDraggingOver = false;
-        !this.__isDragging && this.clearContextTop();
       }
     },
 
@@ -902,7 +895,6 @@
       this.hiddenTextarea = null;
       this.abortCursorAnimation();
       this._restoreEditingProps();
-      this._currentCursorOpacity = 0;
       if (this._shouldClearDimensionCache()) {
         this.initDimensions();
         this.setCoords();

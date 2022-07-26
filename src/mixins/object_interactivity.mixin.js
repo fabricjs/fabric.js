@@ -311,5 +311,13 @@
       return false;
     },
 
+    renderDragSourceEffect: function() {
+      // for subclasses
+    },
+
+    renderDropTargetEffect: function(/* e, dontClear */) {
+      // for subclasses
+    },
+
   });
 })();
