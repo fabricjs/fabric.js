@@ -352,11 +352,11 @@
       if (!ctx) {
         return;
       }
-      this._renderCursorAt(selectionStart);
+      this._renderCursorAt(ctx, selectionStart);
       ctx.restore();
     },
 
-    _renderCursorAt: function(selecetionStart) {
+    _renderCursorAt: function(ctx, selectionStart) {
       var boundaries = this._getCursorBoundaries(selectionStart, true);
       this._renderCursor(ctx, boundaries, selectionStart);
     },
@@ -453,7 +453,7 @@
      * @param {Object} boundaries
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
-    renderCursor: function(boundaries, ctx) {
+    renderCursor: function(ctx, boundaries) {
       this._renderCursor(ctx, boundaries, this.selectionStart);
     },
 
@@ -472,7 +472,7 @@
       if (this.inCompositionMode) {
         // TODO: investigate why there isn't a return inside the if,
         // and why can't happe top of the function
-        this.renderSelection(boundaries, ctx);
+        this.renderSelection(ctx, boundaries);
       }
       ctx.fillStyle = this.cursorColor || this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
@@ -529,7 +529,8 @@
     renderDropTargetEffect: function(e, withoutClearing) {
       var dragSelection = this.getSelectionStartFromPointer(e);
       if (withoutClearing) {
-        this._renderCursorAt(dragSelection);
+        var ctx = this.canvas.contextTop;
+        this._renderCursorAt(ctx, dragSelection);
       }
       else {
         this.renderCursorAt(dragSelection);
@@ -543,7 +544,7 @@
      * @param {Object} boundaries Object with left/top/leftOffset/topOffset
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
-    _renderSelection: function (ctx, selection, boundaries, ctx) {
+    _renderSelection: function (ctx, selection, boundaries) {
       var selectionStart = selection.selectionStart,
           selectionEnd = selection.selectionEnd,
           isJustify = this.textAlign.indexOf('justify') !== -1,

@@ -233,9 +233,9 @@
     /**
      * @private
      */
-    _renderDragSourceEffect: function () {
+    _renderDragSourceEffect: function (e) {
       this._dragSource && typeof this._dragSource.renderDragSourceEffect === 'function'
-        && this._dragSource.renderDragSourceEffect();
+        && this._dragSource.renderDragSourceEffect(e);
     },
 
     /**
@@ -302,19 +302,19 @@
       //  if dragleave is needed, object will not fire dragover so we don't need to trouble ourselves with it
       this._fireEnterLeaveEvents(target, options);
       if (target) {
-        //  render drag selection before rendering target cursor for correct visuals
-        target.canDrop(e) && this._renderDragSourceEffect();
+        // render drag selection before rendering target cursor for correct visuals
+        target.canDrop(e) && this._renderDragSourceEffect(e);
         target.fire(eventType, options);
       }
       //  propagate the event to subtargets
       for (var i = 0; i < targets.length; i++) {
         target = targets[i];
         //  accept event only if previous targets didn't
-        !e.defaultPrevented && target.canDrop(e) && this._renderDragSourceEffect();
+        !e.defaultPrevented && target.canDrop(e) && this._renderDragSourceEffect(e);
         target.fire(eventType, options);
       }
       //  render drag selection in case no target accepted the event
-      !e.defaultPrevented && this._renderDragSourceEffect();
+      !e.defaultPrevented && this._renderDragSourceEffect(e);
     },
 
     /**
