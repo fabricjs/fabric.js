@@ -205,7 +205,7 @@
       var alpha = fabric.util.calcAngleBetweenVectors(AB, AC);
       //  check if alpha is relative to AB->BC
       var ro = fabric.util.calcAngleBetweenVectors(fabric.util.rotateVector(AB, alpha), AC);
-      var phi = alpha * (ro === 0 ? 1 : -1) / 2;
+      var phi = alpha * (Math.abs(ro) <= 1e-7 ? 1 : -1) / 2;
       return {
         vector: fabric.util.getHatVector(fabric.util.rotateVector(AB, phi)),
         angle: alpha
