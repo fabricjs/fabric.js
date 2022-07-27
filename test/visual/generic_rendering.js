@@ -502,23 +502,22 @@
     height: 100,
   });
 
-  (function () {
-
-    function renderPolyTest(canvas, options) {
+  QUnit.module('stroke projection', function () {
+    function renderStrokeTest(canvas, testOptions, polyOptions) {
       var scale = new fabric.Point(4, 5);
       var v = new fabric.Point(100, 0);
-      var v1 = fabric.util.rotateVector(v, fabric.util.degreesToRadians(angle));
+      var v1 = fabric.util.rotateVector(v, fabric.util.degreesToRadians(testOptions.angle));
       var A = canvas.getVpCenter();
       var B = A.subtract(v);
       var C = A.subtract(v1);
-      var poly = new builder([B, A, C], {
+      var poly = new testOptions.builder([B, A, C], {
         fill: `rgb(255, 0, 0)`,
         strokeWidth: 10,
         stroke: 'rgb(120, 0, 0)',
         cornerColor: 'white',
         objectCaching: false,
         exactBoundingBox: true,
-        ...options
+        ...polyOptions
       });
       poly.scaleX = scale.x;
       poly.scaleY = scale.y;
@@ -542,7 +541,6 @@
       canvas.renderAll();
     }
 
-    QUnit.module('stroke projection');
     for (let angle = 0, step = 15; angle < 360; angle += step) {
       [fabric.Polyline, fabric.Polygon].forEach((builder) => {
         ['miter', 'round', 'bevel'].forEach((strokeLineJoin) => {
@@ -550,10 +548,16 @@
             tests.push({
               test: `bbox with strokeLineJoin=${strokeLineJoin}, strokeUniform=${strokeUniform} and angle=${angle} values`,
               code: function (canvas, callback) {
-                renderPolyTest(canvas, {
-                  strokeLineJoin,
-                  strokeUniform
-                });
+                renderStrokeTest(canvas,
+                  {
+                    builder,
+                    angle
+                  },
+                  {
+                    strokeLineJoin,
+                    strokeUniform
+                  }
+                );
                 callback(canvas.lowerCanvasEl);
               },
               golden: `stroke-projection/${strokeLineJoin}/${strokeUniform ? 'uniform-' : ''}${builder.prototype.type}-${angle}deg.png`,
@@ -574,11 +578,17 @@
             tests.push({
               test: `bbox with strokeMiterLimit=${strokeMiterLimit}, strokeUniform=${strokeUniform} and angle=${angle} values`,
               code: function (canvas, callback) {
-                renderPolyTest(canvas, {
-                  strokeLineJoin: 'miter',
-                  strokeUniform,
-                  strokeMiterLimit
-                });
+                renderStrokeTest(canvas,
+                  {
+                    builder,
+                    angle
+                  },
+                  {
+                    strokeLineJoin: 'miter',
+                    strokeUniform,
+                    strokeMiterLimit
+                  }
+                );
                 callback(canvas.lowerCanvasEl);
               },
               golden: `stroke-projection/miter-limit/${strokeUniform ? 'uniform-' : ''}${builder.prototype.type}-miter${strokeMiterLimit}-${angle}deg.png`,
@@ -591,7 +601,7 @@
         });
       });
     }
-  })();
+  });
 
   tests.forEach(visualTestLoop(QUnit));
 })();
