@@ -502,63 +502,121 @@
     height: 100,
   });
 
-  for (let angle = 0, step = 15; angle < 360; angle += step) {
-    [fabric.Polyline, fabric.Polygon].forEach((builder) => {
-      ['miter', 'round', 'bevel'].forEach((strokeLineJoin) => {
-        [true, false].forEach((strokeUniform) => {
-          tests.push({
-            test: `bbox with strokeLineJoin=${strokeLineJoin}, strokeUniform=${strokeUniform} and angle=${angle} values`,
-            code: function (canvas, callback) {
-              var scale = new fabric.Point(4, 5);
-              var v = new fabric.Point(100, 0);
-              var v1 = fabric.util.rotateVector(v, fabric.util.degreesToRadians(angle));
-              var A = canvas.getVpCenter();
-              var B = A.subtract(v);
-              var C = A.subtract(v1);
-              var poly = new builder([B, A, C], {
-                fill: `rgb(255, 0, 0)`,
-                strokeWidth: 10,
-                stroke: 'rgb(120, 0, 0)',
-                cornerColor: 'white',
-                strokeUniform: strokeUniform,
-                strokeLineJoin: strokeLineJoin,
-                objectCaching: false,
-                exactBoundingBox: true
-              });
-              poly.scaleX = scale.x;
-              poly.scaleY = scale.y;
-              poly._setPositionDimensions();
-              var size = poly._getTransformedDimensions();
-              var bg = new fabric.Rect({
-                width: size.x,
-                height: size.y,
-                left: poly.left,
-                top: poly.top,
-                originX: poly.originX,
-                originY: poly.originY,
-                fill: 'blue'
-              });
-              canvas.add(bg, poly);
-              canvas.setActiveObject(poly);
-              canvas.setViewportTransform([0.5, 0, 0, 1.5, 0, 0]);
-              bg.viewportCenter();
-              poly.viewportCenter();
-              canvas.backgroundColor = 'white';
-              canvas.renderAll();
-              callback(canvas.lowerCanvasEl);
-            },
-            golden: `stroke-projection/${strokeLineJoin}/${strokeUniform ? 'uniform-' : ''}${builder.prototype.type}-${angle}deg.png`,
-            percentage: 0.001,
-            width: 600,
-            height: 900,
-            fabricClass: 'Canvas',
-            newModule: 'stroke projection'
+  (function () {
+    QUnit.module('stroke projection');
+    for (let angle = 0, step = 15; angle < 360; angle += step) {
+      [fabric.Polyline, fabric.Polygon].forEach((builder) => {
+        ['miter', 'round', 'bevel'].forEach((strokeLineJoin) => {
+          [true, false].forEach((strokeUniform) => {
+            tests.push({
+              test: `bbox with strokeLineJoin=${strokeLineJoin}, strokeUniform=${strokeUniform} and angle=${angle} values`,
+              code: function (canvas, callback) {
+                var scale = new fabric.Point(4, 5);
+                var v = new fabric.Point(100, 0);
+                var v1 = fabric.util.rotateVector(v, fabric.util.degreesToRadians(angle));
+                var A = canvas.getVpCenter();
+                var B = A.subtract(v);
+                var C = A.subtract(v1);
+                var poly = new builder([B, A, C], {
+                  fill: `rgb(255, 0, 0)`,
+                  strokeWidth: 10,
+                  stroke: 'rgb(120, 0, 0)',
+                  cornerColor: 'white',
+                  strokeUniform: strokeUniform,
+                  strokeLineJoin: strokeLineJoin,
+                  objectCaching: false,
+                  exactBoundingBox: true
+                });
+                poly.scaleX = scale.x;
+                poly.scaleY = scale.y;
+                poly._setPositionDimensions();
+                var size = poly._getTransformedDimensions();
+                var bg = new fabric.Rect({
+                  width: size.x,
+                  height: size.y,
+                  left: poly.left,
+                  top: poly.top,
+                  originX: poly.originX,
+                  originY: poly.originY,
+                  fill: 'blue'
+                });
+                canvas.add(bg, poly);
+                canvas.setActiveObject(poly);
+                canvas.setViewportTransform([0.5, 0, 0, 1.5, 0, 0]);
+                bg.viewportCenter();
+                poly.viewportCenter();
+                canvas.backgroundColor = 'white';
+                canvas.renderAll();
+                callback(canvas.lowerCanvasEl);
+              },
+              golden: `stroke-projection/${strokeLineJoin}/${strokeUniform ? 'uniform-' : ''}${builder.prototype.type}-${angle}deg.png`,
+              percentage: 0.001,
+              width: 600,
+              height: 900,
+              fabricClass: 'Canvas'
+            });
           });
         });
       });
-    });
-  }
+    }
 
+    for (let angle = 0, step = 1; angle <= 90; angle += step) {
+      [fabric.Polyline, fabric.Polygon].forEach((builder) => {
+        [4, 16, 64, 999].forEach((strokeMiterLimit) => {
+          [true, false].forEach((strokeUniform) => {
+            tests.push({
+              test: `bbox with strokeMiterLimit=${strokeMiterLimit}, strokeUniform=${strokeUniform} and angle=${angle} values`,
+              code: function (canvas, callback) {
+                var scale = new fabric.Point(4, 5);
+                var v = new fabric.Point(100, 0);
+                var v1 = fabric.util.rotateVector(v, fabric.util.degreesToRadians(angle));
+                var A = canvas.getVpCenter();
+                var B = A.subtract(v);
+                var C = A.subtract(v1);
+                var poly = new builder([B, A, C], {
+                  fill: `rgb(255, 0, 0)`,
+                  strokeWidth: 10,
+                  stroke: 'rgb(120, 0, 0)',
+                  cornerColor: 'white',
+                  strokeUniform: strokeUniform,
+                  strokeMiterLimit: strokeMiterLimit,
+                  strokeLineJoin: 'miter',
+                  objectCaching: false,
+                  exactBoundingBox: true
+                });
+                poly.scaleX = scale.x;
+                poly.scaleY = scale.y;
+                poly._setPositionDimensions();
+                var size = poly._getTransformedDimensions();
+                var bg = new fabric.Rect({
+                  width: size.x,
+                  height: size.y,
+                  left: poly.left,
+                  top: poly.top,
+                  originX: poly.originX,
+                  originY: poly.originY,
+                  fill: 'blue'
+                });
+                canvas.add(bg, poly);
+                canvas.setActiveObject(poly);
+                canvas.setViewportTransform([0.5, 0, 0, 1.5, 0, 0]);
+                bg.viewportCenter();
+                poly.viewportCenter();
+                canvas.backgroundColor = 'white';
+                canvas.renderAll();
+                callback(canvas.lowerCanvasEl);
+              },
+              golden: `stroke-projection/miter-limit/${strokeUniform ? 'uniform-' : ''}${builder.prototype.type}-miter${strokeMiterLimit}-${angle}deg.png`,
+              percentage: 0.001,
+              width: 600,
+              height: 900,
+              fabricClass: 'Canvas'
+            });
+          });
+        });
+      });
+    }
+  })();
 
   tests.forEach(visualTestLoop(QUnit));
 })();
