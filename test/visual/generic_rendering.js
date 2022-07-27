@@ -503,6 +503,7 @@
   });
 
   QUnit.module('stroke projection', function () {
+    
     function renderStrokeTest(canvas, testOptions, polyOptions) {
       var scale = new fabric.Point(4, 5);
       var v = new fabric.Point(100, 0);
@@ -571,9 +572,9 @@
       });
     }
 
-    for (let angle = 0, step = 1; angle <= 90; angle += step) {
+    for (let angle = 0, step = 1; angle <= 45; angle += step) {
       [fabric.Polyline, fabric.Polygon].forEach((builder) => {
-        [4, 16, 64, 999].forEach((strokeMiterLimit) => {
+        [4, 16].forEach((strokeMiterLimit) => {
           [true, false].forEach((strokeUniform) => {
             tests.push({
               test: `bbox with strokeMiterLimit=${strokeMiterLimit}, strokeUniform=${strokeUniform} and angle=${angle} values`,
