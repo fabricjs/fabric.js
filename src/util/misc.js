@@ -222,6 +222,9 @@
      * - `bevel`: 4 points corresponding to the bevel possible boundaries, orthogonal to the stroke.
      * - `round`: same as `bevel`
      * Used to calculate object's bounding box
+     * 
+     * @see https://github.com/fabricjs/fabric.js/pull/8083
+     * 
      * @static
      * @memberOf fabric.util
      * @param {Point[]} points
