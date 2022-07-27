@@ -542,12 +542,15 @@
       canvas.renderAll();
     }
 
+    let newModule = true;
+
     for (let angle = 0, step = 15; angle < 360; angle += step) {
       [fabric.Polyline, fabric.Polygon].forEach((builder) => {
+        var type = builder.prototype.type;
         ['miter', 'round', 'bevel'].forEach((strokeLineJoin) => {
           [true, false].forEach((strokeUniform) => {
             tests.push({
-              test: `bbox with strokeLineJoin=${strokeLineJoin}, strokeUniform=${strokeUniform} and angle=${angle} values`,
+              test: `${type} with strokeLineJoin=${strokeLineJoin}, strokeUniform=${strokeUniform} and angle=${angle} values`,
               code: function (canvas, callback) {
                 renderStrokeTest(canvas,
                   {
@@ -561,23 +564,32 @@
                 );
                 callback(canvas.lowerCanvasEl);
               },
-              golden: `stroke-projection/${strokeLineJoin}/${strokeUniform ? 'uniform-' : ''}${builder.prototype.type}-${angle}deg.png`,
+              golden: `stroke-projection/${strokeLineJoin}/${strokeUniform ? 'uniform-' : ''}${type}-${angle}deg.png`,
               percentage: 0.001,
               width: 600,
               height: 900,
-              fabricClass: 'Canvas'
+              fabricClass: 'Canvas',
+              newModule: newModule ? 'stroke projection' : undefined,
             });
+            newModule = false;
           });
         });
       });
     }
 
-    for (let angle = 0, step = 1; angle <= 45; angle += step) {
+    for (let angle = 0, step = 1; angle <= 90; angle += step) {
+      if (angle === 15) {
+        step = 5;
+      }
+      else if (angle === 45) {
+        step = 15;
+      }
       [fabric.Polyline, fabric.Polygon].forEach((builder) => {
+        var type = builder.prototype.type;
         [4, 16].forEach((strokeMiterLimit) => {
           [true, false].forEach((strokeUniform) => {
             tests.push({
-              test: `bbox with strokeMiterLimit=${strokeMiterLimit}, strokeUniform=${strokeUniform} and angle=${angle} values`,
+              test: `${type} with strokeMiterLimit=${strokeMiterLimit}, strokeUniform=${strokeUniform} and angle=${angle} values`,
               code: function (canvas, callback) {
                 renderStrokeTest(canvas,
                   {
@@ -592,7 +604,7 @@
                 );
                 callback(canvas.lowerCanvasEl);
               },
-              golden: `stroke-projection/miter-limit/${strokeUniform ? 'uniform-' : ''}${builder.prototype.type}-miter${strokeMiterLimit}-${angle}deg.png`,
+              golden: `stroke-projection/miter-limit/${strokeUniform ? 'uniform-' : ''}${type}-miter${strokeMiterLimit}-${angle}deg.png`,
               percentage: 0.001,
               width: 600,
               height: 900,
