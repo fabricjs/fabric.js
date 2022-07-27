@@ -175,7 +175,7 @@
      * @static
      * @memberOf fabric.util
      * @param {Point} v
-     * @returns {Point} vector representing the unit vector of pointing to the direction of `v`
+     * @returns {Point} vector representing the unit vector pointing to the direction of `v`
      */
     getHatVector: function (v) {
       var hypot = Math.sqrt(v.x * v.x + v.y * v.y);
