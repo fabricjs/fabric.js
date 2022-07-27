@@ -15,18 +15,6 @@
    */
   fabric.util = {
     /**
-     * Calculate the arccosine of an angle, avoiding values outside [-1, 1]
-     * @static
-     * @memberOf fabric.util
-     * @param {Number} value the value of the cosine
-     * @return {Number}
-     */
-    acos: function(value) {
-      var adjustedValue= Math.max(-1, Math.min(value, 1));
-      return Math.acos(adjustedValue);
-    },
-
-    /**
      * Calculate the cos of an angle, avoiding returning floats for known results
      * @static
      * @memberOf fabric.util
@@ -169,7 +157,7 @@
     },
 
     /**
-     * Calculates angle between 2 vectors using dot product
+     * Calculates angle between 2 vectors using atan2
      * @static
      * @memberOf fabric.util
      * @param {Point} a
@@ -177,9 +165,10 @@
      * @returns the angle in radian between the vectors
      */
     calcAngleBetweenVectors: function (a, b) {
-      return fabric.util.acos(
-        (a.x * b.x + a.y * b.y) / (Math.sqrt(a.x * a.x + a.y * a.y) * Math.sqrt(b.x * b.x + b.y * b.y))
-      );
+      var dot = a.x * b.x + a.y * b.y,
+				det = a.x * b.y - a.y * b.x;
+    
+      return Math.atan2(det, dot);
     },
 
     /**
@@ -203,12 +192,10 @@
     getBisector: function (A, B, C) {
       var AB = fabric.util.createVector(A, B), AC = fabric.util.createVector(A, C);
       var alpha = fabric.util.calcAngleBetweenVectors(AB, AC);
-      //  check if alpha is relative to AB->BC
-      var ro = fabric.util.calcAngleBetweenVectors(fabric.util.rotateVector(AB, alpha), AC);
-      var phi = alpha * (Math.abs(ro) <= 1e-7 ? 1 : -1) / 2;
+      var phi = alpha / 2;
       return {
         vector: fabric.util.getHatVector(fabric.util.rotateVector(AB, phi)),
-        angle: alpha
+        angle: Math.abs(alpha)
       };
     },
 
