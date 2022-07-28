@@ -1409,7 +1409,7 @@
 
     setViewportTransform: function (vpt) {
       if (this.renderOnAddRemove && this._activeObject && this._activeObject.isEditing) {
-        this._activeObject.clearContextTop();
+        this._activeObject.clearContextTop(true);
       }
       fabric.StaticCanvas.prototype.setViewportTransform.call(this, vpt);
     }

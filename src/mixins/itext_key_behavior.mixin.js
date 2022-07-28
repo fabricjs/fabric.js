@@ -130,7 +130,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     if (e.keyCode >= 33 && e.keyCode <= 40) {
       // if i press an arrow key just update selection
       this.inCompositionMode = false;
-      this.clearContextTop();
+      this.clearContextTop(true);
       this.renderCursorOrSelection();
     }
     else {

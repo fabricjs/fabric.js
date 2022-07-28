@@ -89,7 +89,7 @@
         return;
       }
       this.isEditing && this.initDelayedCursor();
-      this.clearContextTop();
+      this.clearContextTop(true);
       this._clearCache();
       // clear dynamicMinWidth as it will be different after we re-wrap line
       this.dynamicMinWidth = 0;

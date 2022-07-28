@@ -236,14 +236,14 @@
     _renderDragEffects: function (e, source, target) {
       var ctx = this.contextTop;
       if (source) {
-        source.clearContextTop(true);
+        source.clearContextTop(false);
         source.renderDragSourceEffect(e);
       }
       if (target) {
         if (target !== source) {
           ctx.restore();
           ctx.save();
-          target.clearContextTop(true);
+          target.clearContextTop(false);
         }
         target.renderDropTargetEffect(e);
       }
