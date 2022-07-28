@@ -234,9 +234,20 @@
      * @private
      */
     _renderDragEffects: function (e, source, target) {
-      this.clearContext(this.contextTop);
-      source && source.renderDragSourceEffect(e);
-      target && target.renderDropTargetEffect(e, source === target);
+      var ctx = this.contextTop;
+      if (source) {
+        source.clearContextTop(true);
+        source.renderDragSourceEffect(e);
+      }
+      if (target) {
+        if (target !== source) {
+          ctx.restore();
+          ctx.save();
+          target.clearContextTop(true);
+        }
+        target.renderDropTargetEffect(e);
+      }
+      ctx.restore();
     },
 
     /**

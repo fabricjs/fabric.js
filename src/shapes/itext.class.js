@@ -272,44 +272,6 @@
     },
 
     /**
-     * Prepare top context
-     * @returns {CanvasRenderingContext2D|undefined} ctx
-     */
-    prepareContextTop: function () {
-      if (!this.canvas || !this.canvas.contextTop) {
-        return;
-      }
-      var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
-      ctx.save();
-      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-      this.transform(ctx);
-      return ctx;
-    },
-
-    /**
-     * Prepare and clear top context
-     * @returns {CanvasRenderingContext2D|undefined} ctx
-     */
-    _clearContextTop: function () {
-      var ctx = this.prepareContextTop();
-      ctx && this._clearTextArea(ctx);
-      return ctx;
-    },
-
-    /**
-     * clear top context
-     * @returns {CanvasRenderingContext2D|undefined} ctx
-     */
-    clearContextTop: function() {
-      if (!this.isEditing) {
-        return;
-      }
-      var ctx = this._clearContextTop();
-      ctx && ctx.restore();
-      return ctx;
-    },
-
-    /**
      * Renders cursor or selection (depending on what exists)
      * it does on the contextTop. If contextTop is not available, do nothing.
      */
@@ -317,7 +279,7 @@
       if (!this.isEditing) {
         return;
       }
-      var ctx = this._clearContextTop();
+      var ctx = this.clearContextTop(true);
       if (!ctx) {
         return;
       }
@@ -337,23 +299,8 @@
      * If contextTop is not available, do nothing.
      */
     renderCursorAt: function(selectionStart) {
-      var ctx = this._clearContextTop();
-      if (!ctx) {
-        return;
-      }
-      this._renderCursorAt(ctx, selectionStart);
-      ctx.restore();
-    },
-
-    _renderCursorAt: function(ctx, selectionStart) {
       var boundaries = this._getCursorBoundaries(selectionStart, true);
-      this._renderCursor(ctx, boundaries, selectionStart);
-    },
-
-    _clearTextArea: function(ctx) {
-      // we add 4 pixel, to be sure to do not leave any pixel out
-      var width = this.width + 4, height = this.height + 4;
-      ctx.clearRect(-width / 2, -height / 2, width, height);
+      this._renderCursor(this.canvas.contextTop, boundaries, selectionStart);
     },
 
     /**
@@ -489,41 +436,18 @@
      * Renders drag start text selection
      */
     renderDragSourceEffect: function () {
-      if (this.__isDragging) {
-        var ctx = this._clearContextTop();
-        if (ctx) {
-          this._renderDragSourceEffect(ctx);
-          ctx.restore();
-        }
-      }
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx
-     */
-    _renderDragSourceEffect: function (ctx) {
-      if (this.__dragStartSelection) {
+      if (this.__isDragging && this.__dragStartSelection && this.__dragStartSelection) {
         this._renderSelection(
-          ctx,
+          this.canvas.contextTop,
           this.__dragStartSelection,
           this._getCursorBoundaries(this.__dragStartSelection.selectionStart, true)
         );
       }
     },
 
-    renderDropTargetEffect: function(e, dontClear) {
+    renderDropTargetEffect: function(e) {
       var dragSelection = this.getSelectionStartFromPointer(e);
-      if (dontClear) {
-        var ctx = this.canvas.contextTop;
-        ctx.save();
-        this.transform(ctx);
-        this._renderCursorAt(ctx, dragSelection);
-        ctx.restore();
-      }
-      else {
-        this.renderCursorAt(dragSelection);
-      }
+      this.renderCursorAt(dragSelection);
     },
 
     /**
