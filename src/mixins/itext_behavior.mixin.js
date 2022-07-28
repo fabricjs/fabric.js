@@ -97,10 +97,7 @@
      * @private
      */
     _animateCursor: function(obj, targetOpacity, duration, completeMethod) {
-
-      var tickState;
-
-      tickState = {
+      var tickState = {
         isAborted: false,
         abort: function() {
           this.isAborted = true;
@@ -150,7 +147,6 @@
           delay = restart ? 0 : this.cursorDelay;
 
       this.abortCursorAnimation();
-      this._currentCursorOpacity = 1;
       if (delay) {
         this._cursorTimeout2 = setTimeout(function () {
           _this._tick();
@@ -172,12 +168,11 @@
       clearTimeout(this._cursorTimeout1);
       clearTimeout(this._cursorTimeout2);
 
-      this._currentCursorOpacity = 0;
+      this._currentCursorOpacity = 1;
 
       //  make sure we clear context even if instance is not editing
       if (shouldClear) {
-        var ctx = this._clearContextTop();
-        ctx && ctx.restore();
+        this.clearContextTop();
       }
     },
 
@@ -346,7 +341,6 @@
       if (this.isEditing || !this.editable) {
         return;
       }
-
       if (this.canvas) {
         this.canvas.calcOffset();
         this.exitEditingOnOthers(this.canvas);
@@ -512,6 +506,7 @@
         e.dataTransfer.effectAllowed = 'copyMove';
         this.setDragImage(e, data);
       }
+      this.abortCursorAnimation();
       return this.__isDragging;
     },
 
@@ -546,8 +541,6 @@
       var canDrop = !e.defaultPrevented && this.canDrop(e);
       if (!this.__isDraggingOver && canDrop) {
         this.__isDraggingOver = true;
-        this.enterEditing(e);
-        this.__isDragging && this.abortCursorAnimation();
       }
     },
 
@@ -562,14 +555,10 @@
       var canDrop = !e.defaultPrevented && this.canDrop(e);
       if (!this.__isDraggingOver && canDrop) {
         this.__isDraggingOver = true;
-        this.enterEditing(e);
-        this.__isDragging && this.abortCursorAnimation();
       }
       else if (this.__isDraggingOver && !canDrop) {
         //  drop state has changed
         this.__isDraggingOver = false;
-        !this.__isDragging && this.clearContextTop();
-        this.exitEditing();
       }
       if (this.__isDraggingOver) {
         //  can be dropped, inform browser
@@ -577,11 +566,7 @@
         //  inform event subscribers
         options.canDrop = true;
         options.dropTarget = this;
-        //  render
-        this.setCursorByClick(e);
-        this._updateTextarea();
-        this.restartCursorIfNeeded();
-        this.renderCursorOrSelection();
+        // find cursor under the drag part.
       }
     },
 
@@ -592,8 +577,6 @@
     dragLeaveHandler: function () {
       if (this.__isDraggingOver || this.__isDragging) {
         this.__isDraggingOver = false;
-        !this.__isDragging && this.clearContextTop();
-        this.exitEditing();
       }
     },
 
@@ -621,8 +604,7 @@
             this._updateTextarea();
           }
           else {
-            var ctx = this._clearContextTop();
-            ctx && ctx.restore();
+            this.clearContextTop();
             if (dropEffect === 'move') {
               this.insertChars('', null, selectionStart, selectionEnd);
               this.selectionStart = this.selectionEnd = selectionStart;
@@ -662,15 +644,12 @@
       e.preventDefault();
       var insert = e.dataTransfer.getData('text/plain');
       if (insert && !didDrop) {
-        var insertAt = this.selectionStart;
+        var insertAt = this.getSelectionStartFromPointer(e);
         var data = e.dataTransfer.types.includes('application/fabric') ?
           JSON.parse(e.dataTransfer.getData('application/fabric')) :
           {};
         var styles = data.styles;
         var trailing = insert[Math.max(0, insert.length - 1)];
-        this.canvas.discardActiveObject();
-        this.canvas.setActiveObject(this);
-        this.enterEditing(e);
         var selectionStartOffset = 0;
         //  drag and drop in same instance
         if (this.__dragStartSelection) {
@@ -696,12 +675,16 @@
         options.dropTarget = this;
         //  finalize
         this.insertChars(insert, styles, insertAt);
+        // can this part be moved in an outside event? andrea to check.
+        this.canvas.setActiveObject(this);
+        this.enterEditing();
         this.selectionStart = Math.min(insertAt + selectionStartOffset, this._text.length);
         this.selectionEnd = Math.min(this.selectionStart + insert.length, this._text.length);
         this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
         this._updateTextarea();
         this.fire('changed', { index: insertAt + selectionStartOffset, action: 'drop' });
         this.canvas.fire('text:changed', { target: this });
+        this.canvas.contextTopDirty = true;
         this.canvas.requestRenderAll();
       }
     },
@@ -910,7 +893,6 @@
       this.hiddenTextarea = null;
       this.abortCursorAnimation();
       this._restoreEditingProps();
-      this._currentCursorOpacity = 0;
       if (this._shouldClearDimensionCache()) {
         this.initDimensions();
         this.setCoords();

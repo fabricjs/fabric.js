@@ -233,9 +233,21 @@
     /**
      * @private
      */
-    _renderDragStartSelection: function () {
-      this._dragSource && typeof this._dragSource.renderDragStartSelection === 'function'
-        && this._dragSource.renderDragStartSelection();
+    _renderDragEffects: function (e, source, target) {
+      var ctx = this.contextTop;
+      if (source) {
+        source.clearContextTop(true);
+        source.renderDragSourceEffect(e);
+      }
+      if (target) {
+        if (target !== source) {
+          ctx.restore();
+          ctx.save();
+          target.clearContextTop(true);
+        }
+        target.renderDropTargetEffect(e);
+      }
+      ctx.restore();
     },
 
     /**
@@ -295,26 +307,29 @@
             dragSource: this._dragSource,
             canDrop: false,
             dropTarget: undefined
-          };
+          },
+          dropTarget;
       //  fire on canvas
       this.fire(eventType, options);
       //  make sure we fire dragenter events before dragover
       //  if dragleave is needed, object will not fire dragover so we don't need to trouble ourselves with it
       this._fireEnterLeaveEvents(target, options);
       if (target) {
-        //  render drag selection before rendering target cursor for correct visuals
-        target.canDrop(e) && this._renderDragStartSelection();
+        // render drag selection before rendering target cursor for correct visuals
+        if (target.canDrop(e)) { dropTarget = target; };
         target.fire(eventType, options);
       }
       //  propagate the event to subtargets
       for (var i = 0; i < targets.length; i++) {
         target = targets[i];
         //  accept event only if previous targets didn't
-        !e.defaultPrevented && target.canDrop(e) && this._renderDragStartSelection();
+        if (!e.defaultPrevented && target.canDrop(e)) {
+          dropTarget = target;
+        }
         target.fire(eventType, options);
       }
-      //  render drag selection in case no target accepted the event
-      !e.defaultPrevented && this._renderDragStartSelection();
+      //  render drag effects now that relations between source and target is clear
+      this._renderDragEffects(e, this._dragSource, dropTarget);
     },
 
     /**
