@@ -287,7 +287,7 @@
      * // TODO: discuss swapping restoreManually with a renderCallback, but think of async issues
      * @param {Boolean} [restoreManually] When true won't restore the context after clear, in order to draw something else.
      * @return {CanvasRenderingContext2D|undefined} canvas.contextTop that is either still transformed
-     * with the object transformMatrix, or restord to neutral transform
+     * with the object transformMatrix, or restored to neutral transform
      */
     clearContextTop: function(restoreManually) {
       if (!this.canvas || !this.canvas.contextTop) {
