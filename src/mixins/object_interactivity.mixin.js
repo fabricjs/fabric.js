@@ -279,6 +279,34 @@
       return this;
     },
 
+    /**
+     * Clears the canvas.contextTop in a specific area that corresponds to the object's bounding box
+     * that is in the canvas.contextContainer.
+     * This function is used to clear pieces of contextTop where we render ephemeral effects on top of the object.
+     * Example: blinking cursror text selection, drag effects.
+     * // TODO: discuss swapping restoreManually with a renderCallback, but think of async issues
+     * @param {Boolean} [restoreManually] When true won't restore the context after clear, in order to draw something else.
+     * @return {CanvasRenderingContext2D|undefined} canvas.contextTop that is either still transformed
+     * with the object transformMatrix, or restored to neutral transform
+     */
+    clearContextTop: function(restoreManually) {
+      if (!this.canvas || !this.canvas.contextTop) {
+        return;
+      }
+      var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
+      if (!ctx) {
+        return;
+      }
+      ctx.save();
+      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+      this.transform(ctx);
+      // we add 4 pixel, to be sure to do not leave any pixel out
+      var width = this.width + 4, height = this.height + 4;
+      ctx.clearRect(-width / 2, -height / 2, width, height);
+
+      restoreManually || ctx.restore();
+      return ctx;
+    },
 
     /**
      * This callback function is called every time _discardActiveObject or _setActiveObject
@@ -299,6 +327,25 @@
      */
     onSelect: function() {
       // implemented by sub-classes, as needed.
-    }
+    },
+
+    /**
+     * Override to customize drag and drop behavior
+     * @public
+     * @param {DragEvent} e
+     * @returns {boolean}
+     */
+    canDrop: function (e) { // eslint-disable-line no-unused-vars
+      return false;
+    },
+
+    renderDragSourceEffect: function() {
+      // for subclasses
+    },
+
+    renderDropTargetEffect: function(/* e */) {
+      // for subclasses
+    },
+
   });
 })();
