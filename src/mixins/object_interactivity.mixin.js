@@ -280,7 +280,7 @@
     },
 
     /**
-     * Clears the canvas.contextTop in a specific area that correspond to the object's bounding box
+     * Clears the canvas.contextTop in a specific area that corresponds to the object's bounding box
      * that is in the canvas.contextContainer.
      * This function is used to clear pieces of contextTop where we render ephemeral effects on top of the object.
      * Example: blinking cursror text selection, drag effects.
