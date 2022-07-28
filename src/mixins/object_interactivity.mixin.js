@@ -280,12 +280,14 @@
     },
 
     /**
-     * Clears the canvas.contextTop on top of the object.
-     * This function is used to clear pieces of contextTop where we render ephemeral effects
-     * Example: blinking cursror text selection.
+     * Clears the canvas.contextTop in a specific area that correspond to the object's bounding box
+     * that is in the canvas.contextContainer.
+     * This function is used to clear pieces of contextTop where we render ephemeral effects on top of the object.
+     * Example: blinking cursror text selection, drag effects.
      * // TODO: discuss swapping restoreManually with a renderCallback, but think of async issues
-     * @param {Boolean} [restoreManually] true to don't restore the context after clear, in order to draw something else.
-     * @returns {CanvasRenderingContext2D|undefined} canvas.contextTop transformed on the object center
+     * @param {Boolean} [restoreManually] When true won't restore the context after clear, in order to draw something else.
+     * @return {CanvasRenderingContext2D|undefined} canvas.contextTop that is either still transformed
+     * with the object transformMatrix, or restord to neutral transform
      */
     clearContextTop: function(restoreManually) {
       if (!this.canvas || !this.canvas.contextTop) {
