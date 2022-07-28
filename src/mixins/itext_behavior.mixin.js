@@ -172,7 +172,7 @@
 
       //  make sure we clear context even if instance is not editing
       if (shouldClear) {
-        this.clearContextTop();
+        this.clearContextTop(true);
       }
     },
 
@@ -604,7 +604,7 @@
             this._updateTextarea();
           }
           else {
-            this.clearContextTop();
+            this.clearContextTop(true);
             if (dropEffect === 'move') {
               this.insertChars('', null, selectionStart, selectionEnd);
               this.selectionStart = this.selectionEnd = selectionStart;

@@ -246,7 +246,7 @@
      */
     initDimensions: function() {
       this.isEditing && this.initDelayedCursor();
-      this.clearContextTop();
+      this.clearContextTop(true);
       this.callSuper('initDimensions');
     },
 
@@ -255,7 +255,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     render: function (ctx) {
-      this.clearContextTop();
+      this.clearContextTop(true);
       this.callSuper('render', ctx);
       // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
       // the correct position but not at every cursor animation.
@@ -279,7 +279,7 @@
       if (!this.isEditing) {
         return;
       }
-      var ctx = this.clearContextTop(true);
+      var ctx = this.clearContextTop(false);
       if (!ctx) {
         return;
       }
