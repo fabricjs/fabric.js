@@ -50,6 +50,8 @@
       functor(canvasElement, 'wheel', this._onMouseWheel);
       functor(canvasElement, 'contextmenu', this._onContextMenu);
       functor(canvasElement, 'dblclick', this._onDoubleClick);
+      functor(canvasElement, 'dragstart', this._onDragStart);
+      functor(canvasElement, 'dragend', this._onDragEnd);
       functor(canvasElement, 'dragover', this._onDragOver);
       functor(canvasElement, 'dragenter', this._onDragEnter);
       functor(canvasElement, 'dragleave', this._onDragLeave);
@@ -103,9 +105,12 @@
       this._onMouseEnter = this._onMouseEnter.bind(this);
       this._onContextMenu = this._onContextMenu.bind(this);
       this._onDoubleClick = this._onDoubleClick.bind(this);
+      this._onDragStart = this._onDragStart.bind(this);
+      this._onDragEnd = this._onDragEnd.bind(this);
+      this._onDragProgress = this._onDragProgress.bind(this);
       this._onDragOver = this._onDragOver.bind(this);
-      this._onDragEnter = this._simpleEventHandler.bind(this, 'dragenter');
-      this._onDragLeave = this._simpleEventHandler.bind(this, 'dragleave');
+      this._onDragEnter = this._onDragEnter.bind(this);
+      this._onDragLeave = this._onDragLeave.bind(this);
       this._onDrop = this._onDrop.bind(this);
       this.eventsBound = true;
     },
@@ -207,26 +212,184 @@
     },
 
     /**
-     * prevent default to allow drop event to be fired
+     * supports native like text dragging
      * @private
-     * @param {Event} [e] Event object fired on Event.js shake
+     * @param {DragEvent} e
      */
-    _onDragOver: function(e) {
+    _onDragStart: function (e) {
+      var activeObject = this.getActiveObject();
+      if (activeObject && typeof activeObject.onDragStart === 'function' && activeObject.onDragStart(e)) {
+        this._dragSource = activeObject;
+        var options = { e: e, target: activeObject };
+        this.fire('dragstart', options);
+        activeObject.fire('dragstart', options);
+        addListener(this.upperCanvasEl, 'drag', this._onDragProgress);
+        return;
+      }
       e.preventDefault();
-      var target = this._simpleEventHandler('dragover', e);
-      this._fireEnterLeaveEvents(target, e);
+      e.stopPropagation();
     },
 
     /**
-     * `drop:before` is a an event that allow you to schedule logic
+     * @private
+     */
+    _renderDragEffects: function (e, source, target) {
+      var ctx = this.contextTop;
+      if (source) {
+        source.clearContextTop(true);
+        source.renderDragSourceEffect(e);
+      }
+      if (target) {
+        if (target !== source) {
+          ctx.restore();
+          ctx.save();
+          target.clearContextTop(true);
+        }
+        target.renderDropTargetEffect(e);
+      }
+      ctx.restore();
+    },
+
+    /**
+     * supports native like text dragging
+     * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#finishing_a_drag
+     * @private
+     * @param {DragEvent} e
+     */
+    _onDragEnd: function (e) {
+      var didDrop = e.dataTransfer.dropEffect !== 'none',
+          dropTarget = didDrop ? this._activeObject : undefined,
+          options = {
+            e: e,
+            target: this._dragSource,
+            subTargets: this.targets,
+            dragSource: this._dragSource,
+            didDrop: didDrop,
+            dropTarget: dropTarget
+          };
+      removeListener(this.upperCanvasEl, 'drag', this._onDragProgress);
+      this.fire('dragend', options);
+      this._dragSource && this._dragSource.fire('dragend', options);
+      delete this._dragSource;
+      // we need to call mouse up synthetically because the browser won't
+      this._onMouseUp(e);
+    },
+
+    /**
+     * fire `drag` event on canvas and drag source
+     * @private
+     * @param {DragEvent} e
+     */
+    _onDragProgress: function (e) {
+      var options = {
+        e: e,
+        dragSource: this._dragSource,
+        dropTarget: this._draggedoverTarget
+      };
+      this.fire('drag', options);
+      this._dragSource && this._dragSource.fire('drag', options);
+    },
+
+    /**
+     * prevent default to allow drop event to be fired
+     * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#specifying_drop_targets
+     * @private
+     * @param {Event} [e] Event object fired on Event.js shake
+     */
+    _onDragOver: function (e) {
+      var eventType = 'dragover',
+          target = this.findTarget(e),
+          targets = this.targets,
+          options = {
+            e: e,
+            target: target,
+            subTargets: targets,
+            dragSource: this._dragSource,
+            canDrop: false,
+            dropTarget: undefined
+          },
+          dropTarget;
+      //  fire on canvas
+      this.fire(eventType, options);
+      //  make sure we fire dragenter events before dragover
+      //  if dragleave is needed, object will not fire dragover so we don't need to trouble ourselves with it
+      this._fireEnterLeaveEvents(target, options);
+      if (target) {
+        // render drag selection before rendering target cursor for correct visuals
+        if (target.canDrop(e)) { dropTarget = target; };
+        target.fire(eventType, options);
+      }
+      //  propagate the event to subtargets
+      for (var i = 0; i < targets.length; i++) {
+        target = targets[i];
+        //  accept event only if previous targets didn't
+        if (!e.defaultPrevented && target.canDrop(e)) {
+          dropTarget = target;
+        }
+        target.fire(eventType, options);
+      }
+      //  render drag effects now that relations between source and target is clear
+      this._renderDragEffects(e, this._dragSource, dropTarget);
+    },
+
+    /**
+     * fire `dragleave` on `dragover` targets
+     * @private
+     * @param {Event} [e] Event object fired on Event.js shake
+     */
+    _onDragEnter: function (e) {
+      var target = this.findTarget(e);
+      var options = {
+        e: e,
+        target: target,
+        subTargets: this.targets,
+        dragSource: this._dragSource
+      };
+      this.fire('dragenter', options);
+      //  fire dragenter on targets
+      this._fireEnterLeaveEvents(target, options);
+    },
+
+    /**
+     * fire `dragleave` on `dragover` targets
+     * @private
+     * @param {Event} [e] Event object fired on Event.js shake
+     */
+    _onDragLeave: function (e) {
+      var options = {
+        e: e,
+        target: this._draggedoverTarget,
+        subTargets: this.targets,
+        dragSource: this._dragSource
+      };
+      this.fire('dragleave', options);
+      //  fire dragleave on targets
+      this._fireEnterLeaveEvents(null, options);
+      //  clear targets
+      this.targets = [];
+      this._hoveredTargets = [];
+    },
+
+    /**
+     * `drop:before` is a an event that allows you to schedule logic
      * before the `drop` event. Prefer `drop` event always, but if you need
      * to run some drop-disabling logic on an event, since there is no way
      * to handle event handlers ordering, use `drop:before`
+     * @private
      * @param {Event} e
      */
     _onDrop: function (e) {
-      this._simpleEventHandler('drop:before', e);
-      return this._simpleEventHandler('drop', e);
+      var options = this._simpleEventHandler('drop:before', e, { dragSource: this._dragSource });
+      //  will be set by the drop target
+      options.didDrop = false;
+      //  will be set by the drop target, used in case options.target refuses the drop
+      options.dropTarget = undefined;
+      //  fire `drop`
+      this._basicEventHandler('drop', options);
+      //  inform canvas of the drop
+      //  we do this because canvas was unaware of what happened at the time the `drop` event was fired on it
+      //  use for side effects
+      this.fire('drop:after', options);
     },
 
     /**
@@ -234,12 +397,12 @@
      * @param {Event} e Event object fired on mousedown
      */
     _onContextMenu: function (e) {
-      this._simpleEventHandler('contextmenu:before', e);
+      var options = this._simpleEventHandler('contextmenu:before', e);
       if (this.stopContextMenu) {
         e.stopPropagation();
         e.preventDefault();
       }
-      this._simpleEventHandler('contextmenu', e);
+      this._basicEventHandler('contextmenu', options);
       return false;
     },
 
@@ -375,7 +538,9 @@
      * @param {Event} e Event object fired on mousemove
      */
     _onMouseMove: function (e) {
-      !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
+      var activeObject = this.getActiveObject();
+      !this.allowTouchScrolling && (!activeObject || !activeObject.__isDragging)
+        && e.preventDefault && e.preventDefault();
       this.__onMouseMove(e);
     },
 
@@ -511,25 +676,26 @@
      * Handle event firing for target and subtargets
      * @param {Event} e event from mouse
      * @param {String} eventType event to fire (up, down or move)
-     * @return {Fabric.Object} target return the the target found, for internal reasons.
+     * @param {object} [data] event data overrides
+     * @return {object} options
      */
-    _simpleEventHandler: function(eventType, e) {
-      var target = this.findTarget(e),
-          targets = this.targets,
-          options = {
-            e: e,
-            target: target,
-            subTargets: targets,
-          };
+    _simpleEventHandler: function(eventType, e, data) {
+      var target = this.findTarget(e), subTargets = this.targets || [];
+      return this._basicEventHandler(eventType, Object.assign({}, {
+        e: e,
+        target: target,
+        subTargets: subTargets,
+      }, data));
+    },
+
+    _basicEventHandler: function (eventType, options) {
+      var target = options.target, subTargets = options.subTargets;
       this.fire(eventType, options);
       target && target.fire(eventType, options);
-      if (!targets) {
-        return target;
+      for (var i = 0; i < subTargets.length; i++) {
+        subTargets[i].fire(eventType, options);
       }
-      for (var i = 0; i < targets.length; i++) {
-        targets[i].fire(eventType, options);
-      }
-      return target;
+      return options;
     },
 
     /**
@@ -829,7 +995,7 @@
           _hoveredTargets = this._hoveredTargets, targets = this.targets,
           length = Math.max(_hoveredTargets.length, targets.length);
 
-      this.fireSyntheticInOutEvents(target, e, {
+      this.fireSyntheticInOutEvents(target, { e: e }, {
         oldTarget: _hoveredTarget,
         evtOut: 'mouseout',
         canvasEvtOut: 'mouse:out',
@@ -837,7 +1003,7 @@
         canvasEvtIn: 'mouse:over',
       });
       for (var i = 0; i < length; i++){
-        this.fireSyntheticInOutEvents(targets[i], e, {
+        this.fireSyntheticInOutEvents(targets[i], { e: e }, {
           oldTarget: _hoveredTargets[i],
           evtOut: 'mouseout',
           evtIn: 'mouseover',
@@ -850,21 +1016,23 @@
     /**
      * Manage the dragEnter, dragLeave events for the fabric objects on the canvas
      * @param {Fabric.Object} target the target where the target from the onDrag event
-     * @param {Event} e Event object fired on ondrag
+     * @param {Object} data Event object fired on dragover
      * @private
      */
-    _fireEnterLeaveEvents: function(target, e) {
+    _fireEnterLeaveEvents: function(target, data) {
       var _draggedoverTarget = this._draggedoverTarget,
           _hoveredTargets = this._hoveredTargets, targets = this.targets,
           length = Math.max(_hoveredTargets.length, targets.length);
 
-      this.fireSyntheticInOutEvents(target, e, {
+      this.fireSyntheticInOutEvents(target, data, {
         oldTarget: _draggedoverTarget,
         evtOut: 'dragleave',
         evtIn: 'dragenter',
+        canvasEvtIn: 'drag:enter',
+        canvasEvtOut: 'drag:leave',
       });
       for (var i = 0; i < length; i++) {
-        this.fireSyntheticInOutEvents(targets[i], e, {
+        this.fireSyntheticInOutEvents(targets[i], data, {
           oldTarget: _hoveredTargets[i],
           evtOut: 'dragleave',
           evtIn: 'dragenter',
@@ -876,7 +1044,7 @@
     /**
      * Manage the synthetic in/out events for the fabric objects on the canvas
      * @param {Fabric.Object} target the target where the target from the supported events
-     * @param {Event} e Event object fired
+     * @param {Object} data Event object fired
      * @param {Object} config configuration for the function to work
      * @param {String} config.targetName property on the canvas where the old target is stored
      * @param {String} [config.canvasEvtOut] name of the event to fire at canvas level for out
@@ -885,12 +1053,12 @@
      * @param {String} config.evtIn name of the event to fire for in
      * @private
      */
-    fireSyntheticInOutEvents: function(target, e, config) {
+    fireSyntheticInOutEvents: function(target, data, config) {
       var inOpt, outOpt, oldTarget = config.oldTarget, outFires, inFires,
           targetChanged = oldTarget !== target, canvasEvtIn = config.canvasEvtIn, canvasEvtOut = config.canvasEvtOut;
       if (targetChanged) {
-        inOpt = { e: e, target: target, previousTarget: oldTarget };
-        outOpt = { e: e, target: oldTarget, nextTarget: target };
+        inOpt = Object.assign({}, data, { target: target, previousTarget: oldTarget });
+        outOpt = Object.assign({}, data, { target: oldTarget, nextTarget: target });
       }
       inFires = target && targetChanged;
       outFires = oldTarget && targetChanged;

@@ -1,7 +1,7 @@
 (function () {
 
   /**
-   * 
+   *
    * @typedef {Object} AnimationOptions
    * Animation of a value or list of values.
    * @property {Function} [onChange] Callback; invoked on every value change
@@ -132,7 +132,7 @@
    *     canvas.requestRenderAll();
    *   }
    * });
-   * 
+   *
    * @example
    * fabric.util.animate({
    *   startValue: 1,
@@ -142,7 +142,7 @@
    *     canvas.requestRenderAll();
    *   }
    * });
-   * 
+   *
    * @returns {CancelFunction} cancel function
    */
   function animate(options) {

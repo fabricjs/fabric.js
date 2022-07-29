@@ -37,8 +37,42 @@
    * @fires dragover
    * @fires dragenter
    * @fires dragleave
-   * @fires drop:before before drop event. same native event. This is added to handle edge cases
+   * @fires drag:enter object drag enter
+   * @fires drag:leave object drag leave
+   * @fires drop:before before drop event. Prepare for the drop event (same native event).
    * @fires drop
+   * @fires drop:after after drop event. Run logic on canvas after event has been accepted/declined (same native event).
+   * @example
+   * let a: fabric.Object, b: fabric.Object;
+   * let flag = false;
+   * canvas.add(a, b);
+   * a.on('drop:before', opt => {
+   *  //  we want a to accept the drop even though it's below b in the stack
+   *  flag = this.canDrop(opt.e);
+   * });
+   * b.canDrop = function(e) {
+   *  !flag && this.callSuper('canDrop', e);
+   * }
+   * b.on('dragover', opt => b.set('fill', opt.dropTarget === b ? 'pink' : 'black'));
+   * a.on('drop', opt => {
+   *  opt.e.defaultPrevented  //  drop occured
+   *  opt.didDrop             //  drop occured on canvas
+   *  opt.target              //  drop target
+   *  opt.target !== a && a.set('text', 'I lost');
+   * });
+   * canvas.on('drop:after', opt => {
+   *  //  inform user who won
+   *  if(!opt.e.defaultPrevented) {
+   *    // no winners
+   *  }
+   *  else if(!opt.didDrop) {
+   *    //  my objects didn't win, some other lucky object
+   *  }
+   *  else {
+   *    //  we have a winner it's opt.target!!
+   *  }
+   * })
+   *
    * @fires after:render at the end of the render process, receives the context in the callback
    * @fires before:render at start the render process, receives the context in the callback
    *
@@ -1024,6 +1058,7 @@
 
       this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
       this._applyCanvasStyle(upperCanvasEl);
+      upperCanvasEl.setAttribute('draggable', 'true');
       this.contextTop = upperCanvasEl.getContext('2d');
     },
 

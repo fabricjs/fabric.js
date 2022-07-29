@@ -11,6 +11,16 @@
       this.initCursorSelectionHandlers();
       this.initDoubleClickSimulation();
       this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
+      this.dragEnterHandler = this.dragEnterHandler.bind(this);
+      this.dragOverHandler = this.dragOverHandler.bind(this);
+      this.dragLeaveHandler = this.dragLeaveHandler.bind(this);
+      this.dragEndHandler = this.dragEndHandler.bind(this);
+      this.dropHandler = this.dropHandler.bind(this);
+      this.on('dragenter', this.dragEnterHandler);
+      this.on('dragover', this.dragOverHandler);
+      this.on('dragleave', this.dragLeaveHandler);
+      this.on('dragend', this.dragEndHandler);
+      this.on('drop', this.dropHandler);
     },
 
     onDeselect: function() {
@@ -87,10 +97,7 @@
      * @private
      */
     _animateCursor: function(obj, targetOpacity, duration, completeMethod) {
-
-      var tickState;
-
-      tickState = {
+      var tickState = {
         isAborted: false,
         abort: function() {
           this.isAborted = true;
@@ -140,7 +147,6 @@
           delay = restart ? 0 : this.cursorDelay;
 
       this.abortCursorAnimation();
-      this._currentCursorOpacity = 1;
       if (delay) {
         this._cursorTimeout2 = setTimeout(function () {
           _this._tick();
@@ -152,24 +158,22 @@
     },
 
     /**
-     * Aborts cursor animation and clears all timeouts
+     * Aborts cursor animation, clears all timeouts and clear textarea context if necessary
      */
     abortCursorAnimation: function() {
-      var shouldClear = this._currentTickState || this._currentTickCompleteState,
-          canvas = this.canvas;
+      var shouldClear = this._currentTickState || this._currentTickCompleteState;
       this._currentTickState && this._currentTickState.abort();
       this._currentTickCompleteState && this._currentTickCompleteState.abort();
 
       clearTimeout(this._cursorTimeout1);
       clearTimeout(this._cursorTimeout2);
 
-      this._currentCursorOpacity = 0;
-      // to clear just itext area we need to transform the context
-      // it may not be worth it
-      if (shouldClear && canvas) {
-        canvas.clearContext(canvas.contextTop || canvas.contextContainer);
-      }
+      this._currentCursorOpacity = 1;
 
+      //  make sure we clear context even if instance is not editing
+      if (shouldClear) {
+        this.clearContextTop();
+      }
     },
 
     /**
@@ -337,7 +341,6 @@
       if (this.isEditing || !this.editable) {
         return;
       }
-
       if (this.canvas) {
         this.canvas.calcOffset();
         this.exitEditingOnOthers(this.canvas);
@@ -414,6 +417,275 @@
         this._fireSelectionChanged();
         this._updateTextarea();
         this.renderCursorOrSelection();
+      }
+    },
+
+    /**
+     * Override to customize the drag image
+     * https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setDragImage
+     * @param {DragEvent} e
+     * @param {object} data
+     * @param {number} data.selectionStart
+     * @param {number} data.selectionEnd
+     * @param {string} data.text
+     * @param {string} data.value selected text
+     */
+    setDragImage: function (e, data) {
+      var t = this.calcTransformMatrix();
+      var flipFactor = new fabric.Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
+      var boundaries = this._getCursorBoundaries(data.selectionStart);
+      var selectionPosition = new fabric.Point(
+        boundaries.left + boundaries.leftOffset,
+        boundaries.top + boundaries.topOffset
+      ).multiply(flipFactor);
+      var pos = fabric.util.transformPoint(selectionPosition, t);
+      var pointer = this.canvas.getPointer(e);
+      var diff = pointer.subtract(pos);
+      var enableRetinaScaling = this.canvas._isRetinaScaling();
+      var retinaScaling = this.canvas.getRetinaScaling();
+      var bbox = this.getBoundingRect(true);
+      var correction = pos.subtract(new fabric.Point(bbox.left, bbox.top));
+      var offset = correction.add(diff).scalarMultiply(retinaScaling);
+      //  prepare instance for drag image snapshot by making all non selected text invisible
+      var bgc = this.backgroundColor;
+      var styles = fabric.util.object.clone(this.styles, true);
+      delete this.backgroundColor;
+      var styleOverride = {
+        fill: 'transparent',
+        textBackgroundColor: 'transparent'
+      };
+      this.setSelectionStyles(styleOverride, 0, data.selectionStart);
+      this.setSelectionStyles(styleOverride, data.selectionEnd, data.text.length);
+      var dragImage = this.toCanvasElement({ enableRetinaScaling: enableRetinaScaling });
+      this.backgroundColor = bgc;
+      this.styles = styles;
+      //  handle retina scaling
+      if (enableRetinaScaling && retinaScaling > 1) {
+        var c = fabric.util.createCanvasElement();
+        c.width = dragImage.width / retinaScaling;
+        c.height = dragImage.height / retinaScaling;
+        var ctx = c.getContext('2d');
+        ctx.scale(1 / retinaScaling, 1 / retinaScaling);
+        ctx.drawImage(dragImage, 0, 0);
+        dragImage = c;
+      }
+      this.__dragImageDisposer && this.__dragImageDisposer();
+      this.__dragImageDisposer = function () {
+        dragImage.remove();
+      };
+      //  position drag image offsecreen
+      fabric.util.setStyle(dragImage, {
+        position: 'absolute',
+        left: -dragImage.width + 'px',
+        border: 'none'
+      });
+      fabric.document.body.appendChild(dragImage);
+      e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
+    },
+
+    /**
+     * support native like text dragging
+     * @private
+     * @param {DragEvent} e
+     * @returns {boolean} should handle event
+     */
+    onDragStart: function (e) {
+      this.__dragStartFired = true;
+      if (this.__isDragging) {
+        var selection = this.__dragStartSelection = {
+          selectionStart: this.selectionStart,
+          selectionEnd: this.selectionEnd,
+        };
+        var value = this._text.slice(selection.selectionStart, selection.selectionEnd).join('');
+        var data = Object.assign({ text: this.text, value: value }, selection);
+        e.dataTransfer.setData('text/plain', value);
+        e.dataTransfer.setData('application/fabric', JSON.stringify({
+          value: value,
+          styles: this.getSelectionStyles(selection.selectionStart, selection.selectionEnd, true)
+        }));
+        e.dataTransfer.effectAllowed = 'copyMove';
+        this.setDragImage(e, data);
+      }
+      this.abortCursorAnimation();
+      return this.__isDragging;
+    },
+
+    /**
+     * Override to customize drag and drop behavior
+     * @public
+     * @param {DragEvent} e
+     * @returns {boolean}
+     */
+    canDrop: function (e) {
+      if (this.editable && !this.__corner) {
+        if (this.__isDragging && this.__dragStartSelection) {
+          //  drag source trying to drop over itself
+          //  allow dropping only outside of drag start selection
+          var index = this.getSelectionStartFromPointer(e);
+          var dragStartSelection = this.__dragStartSelection;
+          return index < dragStartSelection.selectionStart || index > dragStartSelection.selectionEnd;
+        }
+        return true;
+      }
+      return false;
+    },
+
+    /**
+     * support native like text dragging
+     * @private
+     * @param {object} options
+     * @param {DragEvent} options.e
+     */
+    dragEnterHandler: function (options) {
+      var e = options.e;
+      var canDrop = !e.defaultPrevented && this.canDrop(e);
+      if (!this.__isDraggingOver && canDrop) {
+        this.__isDraggingOver = true;
+      }
+    },
+
+    /**
+     * support native like text dragging
+     * @private
+     * @param {object} options
+     * @param {DragEvent} options.e
+     */
+    dragOverHandler: function (options) {
+      var e = options.e;
+      var canDrop = !e.defaultPrevented && this.canDrop(e);
+      if (!this.__isDraggingOver && canDrop) {
+        this.__isDraggingOver = true;
+      }
+      else if (this.__isDraggingOver && !canDrop) {
+        //  drop state has changed
+        this.__isDraggingOver = false;
+      }
+      if (this.__isDraggingOver) {
+        //  can be dropped, inform browser
+        e.preventDefault();
+        //  inform event subscribers
+        options.canDrop = true;
+        options.dropTarget = this;
+        // find cursor under the drag part.
+      }
+    },
+
+    /**
+     * support native like text dragging
+     * @private
+     */
+    dragLeaveHandler: function () {
+      if (this.__isDraggingOver || this.__isDragging) {
+        this.__isDraggingOver = false;
+      }
+    },
+
+    /**
+     * support native like text dragging
+     * fired only on the drag source
+     * handle changes to the drag source in case of a drop on another object or a cancellation
+     * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#finishing_a_drag
+     * @private
+     * @param {object} options
+     * @param {DragEvent} options.e
+     */
+    dragEndHandler: function (options) {
+      var e = options.e;
+      if (this.__isDragging && this.__dragStartFired) {
+        //  once the drop event finishes we check if we need to change the drag source
+        //  if the drag source received the drop we bail out
+        if (this.__dragStartSelection) {
+          var selectionStart = this.__dragStartSelection.selectionStart;
+          var selectionEnd = this.__dragStartSelection.selectionEnd;
+          var dropEffect = e.dataTransfer.dropEffect;
+          if (dropEffect === 'none') {
+            this.selectionStart = selectionStart;
+            this.selectionEnd = selectionEnd;
+            this._updateTextarea();
+          }
+          else {
+            this.clearContextTop();
+            if (dropEffect === 'move') {
+              this.insertChars('', null, selectionStart, selectionEnd);
+              this.selectionStart = this.selectionEnd = selectionStart;
+              this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
+              this._updateTextarea();
+              this.fire('changed', { index: selectionStart, action: 'dragend' });
+              this.canvas.fire('text:changed', { target: this });
+              this.canvas.requestRenderAll();
+            }
+            this.exitEditing();
+            //  disable mouse up logic
+            this.__lastSelected = false;
+          }
+        }
+      }
+
+      this.__dragImageDisposer && this.__dragImageDisposer();
+      delete this.__dragImageDisposer;
+      delete this.__dragStartSelection;
+      this.__isDraggingOver = false;
+    },
+
+    /**
+     * support native like text dragging
+     *
+     * Override the `text/plain | application/fabric` types of {@link DragEvent#dataTransfer}
+     * in order to change the drop value or to customize styling respectively, by listening to the `drop:before` event
+     * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#performing_a_drop
+     * @private
+     * @param {object} options
+     * @param {DragEvent} options.e
+     */
+    dropHandler: function (options) {
+      var e = options.e, didDrop = e.defaultPrevented;
+      this.__isDraggingOver = false;
+      // inform browser that the drop has been accepted
+      e.preventDefault();
+      var insert = e.dataTransfer.getData('text/plain');
+      if (insert && !didDrop) {
+        var insertAt = this.getSelectionStartFromPointer(e);
+        var data = e.dataTransfer.types.includes('application/fabric') ?
+          JSON.parse(e.dataTransfer.getData('application/fabric')) :
+          {};
+        var styles = data.styles;
+        var trailing = insert[Math.max(0, insert.length - 1)];
+        var selectionStartOffset = 0;
+        //  drag and drop in same instance
+        if (this.__dragStartSelection) {
+          var selectionStart = this.__dragStartSelection.selectionStart;
+          var selectionEnd = this.__dragStartSelection.selectionEnd;
+          if (insertAt > selectionStart && insertAt <= selectionEnd) {
+            insertAt = selectionStart;
+          }
+          else if (insertAt > selectionEnd) {
+            insertAt -= selectionEnd - selectionStart;
+          }
+          this.insertChars('', null, selectionStart, selectionEnd);
+          // prevent `dragend` from handling event
+          delete this.__dragStartSelection;
+        }
+        //  remove redundant line break
+        if (this._reNewline.test(trailing)
+          && (this._reNewline.test(this._text[insertAt]) || insertAt === this._text.length)) {
+          insert = insert.trimEnd();
+        }
+        //  inform subscribers
+        options.didDrop = true;
+        options.dropTarget = this;
+        //  finalize
+        this.insertChars(insert, styles, insertAt);
+        // can this part be moved in an outside event? andrea to check.
+        this.canvas.setActiveObject(this);
+        this.enterEditing();
+        this.selectionStart = Math.min(insertAt + selectionStartOffset, this._text.length);
+        this.selectionEnd = Math.min(this.selectionStart + insert.length, this._text.length);
+        this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
+        this._updateTextarea();
+        this.fire('changed', { index: insertAt + selectionStartOffset, action: 'drop' });
+        this.canvas.fire('text:changed', { target: this });
+        this.canvas.contextTopDirty = true;
+        this.canvas.requestRenderAll();
       }
     },
 
@@ -621,7 +893,6 @@
       this.hiddenTextarea = null;
       this.abortCursorAnimation();
       this._restoreEditingProps();
-      this._currentCursorOpacity = 0;
       if (this._shouldClearDimensionCache()) {
         this.initDimensions();
         this.setCoords();

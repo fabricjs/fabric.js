@@ -3,9 +3,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
   /**
    * Populates canvas with data from the specified JSON.
    * JSON format must conform to the one of {@link fabric.Canvas#toJSON}
-   * 
+   *
    * **IMPORTANT**: It is recommended to abort loading tasks before calling this method to prevent race conditions and unnecessary networking
-   * 
+   *
    * @param {String|Object} json JSON string or object
    * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
    * @param {Object} [options] options
@@ -23,7 +23,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
    * }).then((canvas) => {
    *   ... canvas is restored, add your code.
    * });
-   * 
+   *
    */
   loadFromJSON: function (json, reviver, options) {
     if (!json) {

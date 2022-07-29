@@ -10,6 +10,12 @@
    * @fires selection:changed
    * @fires editing:entered
    * @fires editing:exited
+   * @fires dragstart
+   * @fires drag drag event firing on the drag source
+   * @fires dragend
+   * @fires copy
+   * @fires cut
+   * @fires paste
    *
    * @return {fabric.IText} thisArg
    * @see {@link fabric.IText#initialize} for constructor definition
@@ -152,22 +158,12 @@
     /**
      * @private
      */
-    _currentCursorOpacity: 0,
+    _currentCursorOpacity: 1,
 
     /**
      * @private
      */
     _selectionDirection: null,
-
-    /**
-     * @private
-     */
-    _abortCursorAnimation: false,
-
-    /**
-     * @private
-     */
-    __widthOfSpace: [],
 
     /**
      * Helps determining when the text is in composition, so that the cursor
@@ -258,7 +254,7 @@
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    render: function(ctx) {
+    render: function (ctx) {
       this.clearContextTop();
       this.callSuper('render', ctx);
       // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
@@ -276,63 +272,52 @@
     },
 
     /**
-     * Prepare and clean the contextTop
-     */
-    clearContextTop: function(skipRestore) {
-      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
-        return;
-      }
-      var ctx = this.canvas.contextTop, v = this.canvas.viewportTransform;
-      ctx.save();
-      ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-      this.transform(ctx);
-      this._clearTextArea(ctx);
-      skipRestore || ctx.restore();
-    },
-    /**
      * Renders cursor or selection (depending on what exists)
      * it does on the contextTop. If contextTop is not available, do nothing.
      */
     renderCursorOrSelection: function() {
-      if (!this.isEditing || !this.canvas || !this.canvas.contextTop) {
+      if (!this.isEditing) {
         return;
       }
-      var boundaries = this._getCursorBoundaries(),
-          ctx = this.canvas.contextTop;
-      this.clearContextTop(true);
+      var ctx = this.clearContextTop(true);
+      if (!ctx) {
+        return;
+      }
+      var boundaries = this._getCursorBoundaries();
       if (this.selectionStart === this.selectionEnd) {
-        this.renderCursor(boundaries, ctx);
+        this.renderCursor(ctx, boundaries);
       }
       else {
-        this.renderSelection(boundaries, ctx);
+        this.renderSelection(ctx, boundaries);
       }
       ctx.restore();
     },
 
-    _clearTextArea: function(ctx) {
-      // we add 4 pixel, to be sure to do not leave any pixel out
-      var width = this.width + 4, height = this.height + 4;
-      ctx.clearRect(-width / 2, -height / 2, width, height);
+    /**
+     * Renders cursor on context Top, outside the animation cycle, on request
+     * Used for the drag/drop effect.
+     * If contextTop is not available, do nothing.
+     */
+    renderCursorAt: function(selectionStart) {
+      var boundaries = this._getCursorBoundaries(selectionStart, true);
+      this._renderCursor(this.canvas.contextTop, boundaries, selectionStart);
     },
 
     /**
      * Returns cursor boundaries (left, top, leftOffset, topOffset)
+     * left/top are left/top of entire text box
+     * leftOffset/topOffset are offset from that left/top point of a text box
      * @private
-     * @param {Array} chars Array of characters
-     * @param {String} typeOfBoundaries
+     * @param {number} [index] index from start
+     * @param {boolean} [skipCaching]
      */
-    _getCursorBoundaries: function(position) {
-
-      // left/top are left/top of entire text box
-      // leftOffset/topOffset are offset from that left/top point of a text box
-
-      if (typeof position === 'undefined') {
-        position = this.selectionStart;
+    _getCursorBoundaries: function (index, skipCaching) {
+      if (typeof index === 'undefined') {
+        index = this.selectionStart;
       }
-
       var left = this._getLeftOffset(),
           top = this._getTopOffset(),
-          offsets = this._getCursorBoundariesOffsets(position);
+          offsets = this._getCursorBoundariesOffsets(index, skipCaching);
       return {
         left: left,
         top: top,
@@ -342,19 +327,34 @@
     },
 
     /**
+     * Caches and returns cursor left/top offset relative to instance's center point
      * @private
+     * @param {number} index index from start
+     * @param {boolean} [skipCaching]
      */
-    _getCursorBoundariesOffsets: function(position) {
+    _getCursorBoundariesOffsets: function (index, skipCaching) {
+      if (skipCaching) {
+        return this.__getCursorBoundariesOffsets(index);
+      }
       if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
         return this.cursorOffsetCache;
       }
+      return this.cursorOffsetCache = this.__getCursorBoundariesOffsets(index);
+    },
+
+    /**
+     * Calcualtes cursor left/top offset relative to instance's center point
+     * @private
+     * @param {number} index index from start
+     */
+    __getCursorBoundariesOffsets: function (index) {
       var lineLeftOffset,
           lineIndex,
           charIndex,
           topOffset = 0,
           leftOffset = 0,
           boundaries,
-          cursorPosition = this.get2DCursorLocation(position);
+          cursorPosition = this.get2DCursorLocation(index);
       charIndex = cursorPosition.charIndex;
       lineIndex = cursorPosition.lineIndex;
       for (var i = 0; i < lineIndex; i++) {
@@ -381,8 +381,7 @@
           boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
         }
       }
-      this.cursorOffsetCache = boundaries;
-      return this.cursorOffsetCache;
+      return boundaries;
     },
 
     /**
@@ -390,8 +389,12 @@
      * @param {Object} boundaries
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
-    renderCursor: function(boundaries, ctx) {
-      var cursorLocation = this.get2DCursorLocation(),
+    renderCursor: function(ctx, boundaries) {
+      this._renderCursor(ctx, boundaries, this.selectionStart);
+    },
+
+    _renderCursor: function(ctx, boundaries, selectionStart) {
+      var cursorLocation = this.get2DCursorLocation(selectionStart),
           lineIndex = cursorLocation.lineIndex,
           charIndex = cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
           charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
@@ -403,7 +406,9 @@
         - charHeight * (1 - this._fontSizeFraction);
 
       if (this.inCompositionMode) {
-        this.renderSelection(boundaries, ctx);
+        // TODO: investigate why there isn't a return inside the if,
+        // and why can't happe top of the function
+        this.renderSelection(ctx, boundaries);
       }
       ctx.fillStyle = this.cursorColor || this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
       ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
@@ -419,10 +424,42 @@
      * @param {Object} boundaries Object with left/top/leftOffset/topOffset
      * @param {CanvasRenderingContext2D} ctx transformed context to draw on
      */
-    renderSelection: function(boundaries, ctx) {
+    renderSelection: function (ctx, boundaries) {
+      var selection = {
+        selectionStart: this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
+        selectionEnd: this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd
+      };
+      this._renderSelection(ctx, selection, boundaries);
+    },
 
-      var selectionStart = this.inCompositionMode ? this.hiddenTextarea.selectionStart : this.selectionStart,
-          selectionEnd = this.inCompositionMode ? this.hiddenTextarea.selectionEnd : this.selectionEnd,
+    /**
+     * Renders drag start text selection
+     */
+    renderDragSourceEffect: function () {
+      if (this.__isDragging && this.__dragStartSelection && this.__dragStartSelection) {
+        this._renderSelection(
+          this.canvas.contextTop,
+          this.__dragStartSelection,
+          this._getCursorBoundaries(this.__dragStartSelection.selectionStart, true)
+        );
+      }
+    },
+
+    renderDropTargetEffect: function(e) {
+      var dragSelection = this.getSelectionStartFromPointer(e);
+      this.renderCursorAt(dragSelection);
+    },
+
+    /**
+     * Renders text selection
+     * @private
+     * @param {{ selectionStart: number, selectionEnd: number }} selection
+     * @param {Object} boundaries Object with left/top/leftOffset/topOffset
+     * @param {CanvasRenderingContext2D} ctx transformed context to draw on
+     */
+    _renderSelection: function (ctx, selection, boundaries) {
+      var selectionStart = selection.selectionStart,
+          selectionEnd = selection.selectionEnd,
           isJustify = this.textAlign.indexOf('justify') !== -1,
           start = this.get2DCursorLocation(selectionStart),
           end = this.get2DCursorLocation(selectionEnd),
