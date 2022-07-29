@@ -284,6 +284,8 @@
           B = points[index - 1];
           C = points[index + 1];
         }
+        B = new fabric.Point(B.x, B.y);
+        C = new fabric.Point(C.x, C.y);
 
         if (openPath && (index === 0 || index === points.length - 1)) {
           var D = index === 0 ? C : B,
