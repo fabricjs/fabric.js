@@ -187,14 +187,8 @@
     bounds[0][jlen + 1] = x3;
     bounds[1][jlen + 1] = y3;
     var result = [
-      {
-        x: min.apply(null, bounds[0]),
-        y: min.apply(null, bounds[1])
-      },
-      {
-        x: max.apply(null, bounds[0]),
-        y: max.apply(null, bounds[1])
-      }
+      new fabric.Point(min.apply(null, bounds[0]), min.apply(null, bounds[1])),
+      new fabric.Point(max.apply(null, bounds[0]), max.apply(null, bounds[1]))
     ];
     if (fabric.cachesBoundsOfCurve) {
       fabric.boundsOfCurveCache[argsString] = result;

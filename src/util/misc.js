@@ -180,23 +180,62 @@
     },
 
     /**
+     * Let A, B, C be vertexes of a triangle, calculate the bisector of A
      * @static
      * @memberOf fabric.util
-     * @param {Point} A
-     * @param {Point} B
-     * @param {Point} C
+     * @param {Point} A the vertex of the bisector
+     * @param {Point} B a vertex that defines a side of the angle
+     * @param {Point} C a second vertex that defines the other side of the angle
      * @returns {{ vector: Point, angle: number }} vector representing the bisector of A and A's angle
      */
     getBisector: function (A, B, C) {
       var AB = fabric.util.createVector(A, B), AC = fabric.util.createVector(A, C);
       var alpha = fabric.util.calcAngleBetweenVectors(AB, AC);
-      //  check if alpha is relative to AB->BC
+      //  check if alpha is relative to AB->AC
       var ro = fabric.util.calcAngleBetweenVectors(fabric.util.rotateVector(AB, alpha), AC);
       var phi = alpha * (ro === 0 ? 1 : -1) / 2;
       return {
         vector: fabric.util.getHatVector(fabric.util.rotateVector(AB, phi)),
         angle: alpha
       };
+    },
+
+    /**
+     * Calculates the stroke projection vector to apply to `point`
+     * @static
+     * @memberOf fabric.util
+     * @param {Point} point the point to project
+     * @param {Point} pointBefore a vertex that defines one side of the angle
+     * @param {Point} pointAfter a vertex that defines a second side of the angle
+     * @param {Object} options
+     * @param {number} options.strokeWidth
+     * @param {'miter'|'bevel'|'round'} options.strokeLineJoin
+     * @param {number} options.strokeMiterLimit https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
+     * @param {boolean} options.strokeUniform
+     * @param {number} options.scaleX
+     * @param {number} options.scaleY
+     * @returns {fabric.Point} a vector representing the stroke projection (direction sign can't be determined)
+     */
+    calcStrokeProjection: function (point, pointBefore, pointAfter, options) {
+      var s = options.strokeWidth / 2,
+          strokeUniformScalar = options.strokeUniform ?
+            new fabric.Point(1 / options.scaleX, 1 / options.scaleY) :
+            new fabric.Point(1, 1),
+          bisector = fabric.util.getBisector(point, pointBefore, pointAfter),
+          bisectorVector = bisector.vector.multiply(strokeUniformScalar),
+          alpha = bisector.angle,
+          scalar = -s / Math.sin(alpha / 2),
+          miterVector = bisectorVector.scalarMultiply(scalar);
+      if (options.strokeLineJoin === 'miter' &&
+        Math.hypot(miterVector.x, miterVector.y) / s <= options.strokeMiterLimit) {
+        return miterVector;
+      }
+      else {
+        //  calculate bevel, round projections
+        //  incorrect approximation
+        scalar = -s * Math.SQRT2;
+        return bisectorVector.scalarMultiply(scalar);
+      }
     },
 
     /**
@@ -241,28 +280,7 @@
           B = points[index - 1];
           C = points[index + 1];
         }
-        var bisector = fabric.util.getBisector(A, B, C),
-            bisectorVector = bisector.vector,
-            alpha = bisector.angle,
-            scalar,
-            miterVector;
-        if (options.strokeLineJoin === 'miter') {
-          scalar = -s / Math.sin(alpha / 2);
-          miterVector = new fabric.Point(
-            bisectorVector.x * scalar * strokeUniformScalar.x,
-            bisectorVector.y * scalar * strokeUniformScalar.y
-          );
-          if (Math.hypot(miterVector.x, miterVector.y) / s <= options.strokeMiterLimit) {
-            coords.push(A.add(miterVector));
-            coords.push(A.subtract(miterVector));
-            return;
-          }
-        }
-        scalar = -s * Math.SQRT2;
-        miterVector = new fabric.Point(
-          bisectorVector.x * scalar * strokeUniformScalar.x,
-          bisectorVector.y * scalar * strokeUniformScalar.y
-        );
+        var miterVector = fabric.util.calcStrokeProjection(A, B, C, options);
         coords.push(A.add(miterVector));
         coords.push(A.subtract(miterVector));
       });

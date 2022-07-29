@@ -64,7 +64,7 @@
         Array.isArray(path) ? path : fabric.util.parsePath(path)
       );
 
-      fabric.Polyline.prototype._setPositionDimensions.call(this, options || {});
+      this._setPositionDimensions(options);
     },
 
     /**
@@ -240,39 +240,84 @@
     /**
      * @private
      */
+    _projectStrokeOnSegmentBBox: function (point, pointBefore, pointAfter, bboxPoints) {
+      var v1 = pointBefore.subtract(point);
+      var v2 = pointAfter.subtract(point);
+      var angle = fabric.util.calcAngleBetweenVectors(v1, v2);
+      if (Math.abs(angle) < Math.PI / 2) {
+        var projectionVector = fabric.util.calcStrokeProjection(
+          pointBefore,
+          point,
+          pointAfter,
+          this
+        );
+        var projectedPoints = [
+          point.add(projectionVector),
+          point.subtract(projectionVector),
+        ];
+        Array.isArray(bboxPoints) && bboxPoints.forEach(function (point) {
+          projectedPoints.push(
+            point.add(projectionVector),
+            point.subtract(projectionVector)
+          );
+        });
+        return projectedPoints;
+      }
+      else {
+        return [];
+      }
+    },
+
+    /**
+     * @private
+     */
     _calcDimensions: function() {
 
       var aX = [],
           aY = [],
           current, // current instruction
-          subpathStartX = 0,
-          subpathStartY = 0,
-          x = 0, // current x
-          y = 0, // current y
-          bounds;
+          subpathStart = new fabric.Point(0, 0),
+          subpathSecond = new fabric.Point(0, 0),
+          point = new fabric.Point(0, 0),
+          prev = new fabric.Point(0, 0),
+          beforePrev = new fabric.Point(0, 0),
+          opening = false,
+          second = false,
+          closing = false,
+          projectedPoints = [],
+          prevBounds,
+          bounds = [];
 
       for (var i = 0, len = this.path.length; i < len; ++i) {
 
         current = this.path[i];
+        if (opening) {
+          second = true;
+        }
+        opening = closing = false;
+        beforePrev.setFromPoint(prev);
+        prev.setFromPoint(point);
+        prevBounds = bounds;
+        bounds = [];
 
         switch (current[0]) { // first letter
 
           case 'L': // lineto, absolute
-            x = current[1];
-            y = current[2];
+            point.setXY(current[1], current[2]);
             bounds = [];
             break;
 
           case 'M': // moveTo, absolute
-            x = current[1];
-            y = current[2];
-            subpathStartX = x;
-            subpathStartY = y;
+            point.setXY(current[1], current[2]);
+            subpathStart.setFromPoint(point);
+            prev.setFromPoint(point);
+            beforePrev.setFromPoint(point);
+            opening = true;
             bounds = [];
             break;
 
           case 'C': // bezierCurveTo, absolute
-            bounds = fabric.util.getBoundsOfCurve(x, y,
+            bounds = fabric.util.getBoundsOfCurve(point.x, point.y,
               current[1],
               current[2],
               current[3],
@@ -280,12 +325,11 @@
               current[5],
               current[6]
             );
-            x = current[5];
-            y = current[6];
+            point.setXY(current[5], current[6]);
             break;
 
           case 'Q': // quadraticCurveTo, absolute
-            bounds = fabric.util.getBoundsOfCurve(x, y,
+            bounds = fabric.util.getBoundsOfCurve(point.x, point.y,
               current[1],
               current[2],
               current[1],
@@ -293,38 +337,102 @@
               current[3],
               current[4]
             );
-            x = current[3];
-            y = current[4];
+            point.setXY(current[3], current[4]);
             break;
 
           case 'z':
           case 'Z':
-            x = subpathStartX;
-            y = subpathStartY;
+            point.setFromPoint(subpathStart);
+            closing = true;
             break;
         }
+
+        if (this.strokeLineJoin === 'miter') {
+          if (!opening && !second) {
+            projectedPoints.push.apply(
+              projectedPoints,
+              this._projectStrokeOnSegmentBBox(prev, beforePrev, point, prevBounds)
+            );
+          }
+          if (closing) {
+            //  project stroke on sub path start
+            projectedPoints.push.apply(
+              projectedPoints,
+              this._projectStrokeOnSegmentBBox(subpathStart, prev, subpathSecond, bounds)
+            );
+          }
+        }
+
+        aX.push(point.x);
+        aY.push(point.y);
+
         bounds.forEach(function (point) {
           aX.push(point.x);
           aY.push(point.y);
         });
-        aX.push(x);
-        aY.push(y);
+
+        if (second) {
+          subpathSecond.setFromPoint(point);
+          second = false;
+        }
+
       }
 
-      var minX = min(aX) || 0,
-          minY = min(aY) || 0,
-          maxX = max(aX) || 0,
-          maxY = max(aY) || 0,
-          deltaX = maxX - minX,
-          deltaY = maxY - minY;
+      projectedPoints.forEach(function (point) {
+        aX.push(point.x);
+        aY.push(point.y);
+      });
+
+      var minPoint = new fabric.Point(min(aX) || 0, min(aY) || 0),
+          maxPoint = new fabric.Point(max(aX) || 0, max(aY) || 0),
+          delta = maxPoint.subtract(minPoint);
 
       return {
-        left: minX,
-        top: minY,
-        width: deltaX,
-        height: deltaY
+        left: minPoint.x,
+        top: minPoint.y,
+        width: delta.x,
+        height: delta.y
       };
-    }
+    },
+
+    _setPositionDimensions: function (options) {
+      options || (options = {});
+      var calcDim = this._calcDimensions(options), origin;
+      this.width = calcDim.width;
+      this.height = calcDim.height;
+      if (!options.fromSVG) {
+        origin = this.translateToGivenOrigin(
+          // this looks bad, but is one way to keep it optional for now.
+          new fabric.Point(
+            calcDim.left,
+            calcDim.top
+          ),
+          'left',
+          'top',
+          this.originX,
+          this.originY
+        );
+      }
+      if (typeof options.left === 'undefined') {
+        this.left = options.fromSVG ? calcDim.left : origin.x;
+      }
+      if (typeof options.top === 'undefined') {
+        this.top = options.fromSVG ? calcDim.top : origin.y;
+      }
+      this.pathOffset = new fabric.Point(
+        calcDim.left + this.width / 2,
+        calcDim.top + this.height / 2
+      );
+    },
+
+    /**
+     * @override stroke is already accounted for in size
+     * @returns {fabric.Point} dimensions
+     */
+    _getNonTransformedDimensions: function () {
+      return new fabric.Point(this.width, this.height);
+    },
+
   });
 
   /**
