@@ -157,7 +157,7 @@
     },
 
     /**
-     * Calculates angle between 2 vectors using atan2
+     * Calculates angle between 2 vectors
      * @static
      * @memberOf fabric.util
      * @param {Point} a
