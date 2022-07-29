@@ -85,16 +85,8 @@
     _setPositionDimensions: function(options) {
       options || (options = {});
       var calcDim = this._calcDimensions(options), correctLeftTop,
-          correctSizeX = this.exactBoundingBox
-                        ? this.strokeUniform
-                          ? this.strokeWidth/this.scaleX
-                          : this.strokeWidth
-                        : 0,
-          correctSizeY = this.exactBoundingBox
-                        ? this.strokeUniform
-                          ? this.strokeWidth/this.scaleY
-                          : this.strokeWidth
-                        : 0;
+          correctSizeX = this.strokeUniform ? this.strokeWidth/this.scaleX : this.strokeWidth,
+          correctSizeY = this.strokeUniform ? this.strokeWidth/this.scaleY : this.strokeWidth;
       this.width = calcDim.width - correctSizeX;
       this.height = calcDim.height - correctSizeY;
       if (!options.fromSVG) {
