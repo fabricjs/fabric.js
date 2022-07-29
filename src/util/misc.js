@@ -68,7 +68,7 @@
     hypot: function () {
       var sumOfSquares = 0;
       for (var i = 0; i < arguments.length; i++) {
-        sumOfSquares += arguments[i] ^ 2;
+        sumOfSquares += arguments[i] * arguments[i];
       }
       return Math.sqrt(sumOfSquares);
     },
