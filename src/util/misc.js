@@ -221,13 +221,11 @@
      * @param {Boolean} counterClockwise the direction of the orthogonal vector
      * @returns {Point} the unit orthogonal vector
      */
-    getOrthogonalUnitVector: function(vector, counterClockwise) {
-      var clockwise = !counterClockwise;
-
+    getOrthogonalUnitVector: function(vector, counterClockwise = true) {
       return fabric.util.getHatVector(
         new fabric.Point(
-          clockwise ? vector.y : -vector.y,
-          clockwise ? -vector.x : vector.x
+          counterClockwise ? -vector.y : vector.y,
+          counterClockwise ? vector.x : -vector.x
         )
       );
     },
