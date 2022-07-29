@@ -218,10 +218,12 @@
      * @static
      * @memberOf fabric.util
      * @param {Point} vector
-     * @param {Boolean} counterClockwise the direction of the orthogonal vector
+     * @param {Boolean} [counterClockwise] the direction of the orthogonal vector, defaults to `true`
      * @returns {Point} the unit orthogonal vector
      */
-    getOrthogonalUnitVector: function(vector, counterClockwise = true) {
+    getOrthogonalUnitVector: function (vector, counterClockwise /** = true */) {
+      //  TODO remove next line after es6 migration and set `counterClockwise` arg to `true` by default
+      counterClockwise = counterClockwise !== false;
       return fabric.util.getHatVector(
         new fabric.Point(
           counterClockwise ? -vector.y : vector.y,
