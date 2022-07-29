@@ -193,9 +193,8 @@
     getBisector: function (A, B, C) {
       var AB = fabric.util.createVector(A, B), AC = fabric.util.createVector(A, C);
       var alpha = fabric.util.calcAngleBetweenVectors(AB, AC);
-      var phi = alpha / 2;
       return {
-        vector: fabric.util.getHatVector(fabric.util.rotateVector(AB, phi)),
+        vector: fabric.util.getHatVector(fabric.util.rotateVector(AB, alpha/2)),
         angle: Math.abs(alpha)
       };
     },
