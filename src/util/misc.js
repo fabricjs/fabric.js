@@ -245,6 +245,7 @@
       if (points.length <= 1) {return coords;}
 
       points.forEach(function (p, index) {
+        var scale = new fabric.Point(options.scaleX, options.scaleY);
         var A = new fabric.Point(p.x, p.y), B, C;
         if (index === 0) {
           C = points[index + 1];
@@ -259,32 +260,14 @@
           C = points[index + 1];
         }
 
-        if (openPath && index === 0) {
-          var scaledA = new fabric.Point(A.x * options.scaleX, A.y * options.scaleY),
-              scaledC = new fabric.Point(C.x * options.scaleX, C.y * options.scaleY);
+        if (openPath && (index === 0 || index === points.length - 1)) {
+          var D = index === 0 ? C : B,
+            scaledA = new fabric.Point(A).multiply(scale),
+            scaledD = new fabric.Point(D).multiply(scale);
 
           var vector = fabric.util.createVector(
                         options.strokeUniform ? scaledA : A,
-                        options.strokeUniform ? scaledC : C
-                      ),
-              hatOrthogonalVector = fabric.util.getOrthogonalUnitVector(vector),
-              orthogonalVector = new fabric.Point(
-                hatOrthogonalVector.x * s * strokeUniformScalar.x, 
-                hatOrthogonalVector.y * s * strokeUniformScalar.y 
-              );
-
-          coords.push(A.add(orthogonalVector));
-          coords.push(A.subtract(orthogonalVector));
-          return;
-        }
-
-        if (openPath && index === points.length - 1) {
-          var scaledA = new fabric.Point(A.x * options.scaleX, A.y * options.scaleY),
-              scaledB = new fabric.Point(B.x * options.scaleX, B.y * options.scaleY);
-
-          var vector = fabric.util.createVector(
-                        options.strokeUniform ? scaledA : A,
-                        options.strokeUniform ? scaledB : B
+                        options.strokeUniform ? scaledD : D
                       ),
               hatOrthogonalVector = fabric.util.getOrthogonalUnitVector(vector),
               orthogonalVector = new fabric.Point(
@@ -302,10 +285,9 @@
             scaledB,
             scaledC;
         if (options.strokeUniform) {
-          scaledA = new fabric.Point(A.x * options.scaleX, A.y * options.scaleY);
-          scaledB = new fabric.Point(B.x * options.scaleX, B.y * options.scaleY);
-          scaledC = new fabric.Point(C.x * options.scaleX, C.y * options.scaleY);
-
+          scaledA = new fabric.Point(A).multiply(scale);
+          scaledB = new fabric.Point(B).multiply(scale);
+          scaledC = new fabric.Point(C).multiply(scale);
           bisector = fabric.util.getBisector(scaledA, scaledB, scaledC);
         } else {
           bisector = fabric.util.getBisector(A, B, C);
@@ -326,12 +308,11 @@
 
           var strokeMiterLimit;
           if (options.strokeUniform) {
-            var miterLimitLenght = options.strokeMiterLimit * s,
+            var miterLimitLength = options.strokeMiterLimit * s,
                 miterLimitVector = new fabric.Point(
-                  bisectorVector.x * miterLimitLenght * strokeUniformScalar.x,
-                  bisectorVector.y * miterLimitLenght * strokeUniformScalar.y
+                  bisectorVector.x * miterLimitLength * strokeUniformScalar.x,
+                  bisectorVector.y * miterLimitLength * strokeUniformScalar.y
                 );
-            strokeMiterLimit = Math.hypot(miterLimitVector.x, miterLimitVector.y) / s;
             strokeMiterLimit = Math.sqrt(miterLimitVector.x * miterLimitVector.x + miterLimitVector.y * miterLimitVector.y) / s;
           } else {
             strokeMiterLimit = options.strokeMiterLimit;
@@ -343,70 +324,34 @@
             return;
           } 
         }
-
-        if (options.strokeLineJoin === 'bevel' || options.strokeLineJoin === 'miter') { // miter greater than stroke miter limit
+        else if (options.strokeLineJoin === 'bevel' 
+          || options.strokeLineJoin === 'miter'  // miter greater than stroke miter limit
+          || (options.strokeLineJoin === 'round' && alpha > PiBy2) 
+        ) {
 
           var AB = fabric.util.createVector(
-                    options.strokeUniform ? scaledA : A,
-                    options.strokeUniform ? scaledB : B
-                  ),
-              hatOrthogonalAB = fabric.util.getOrthogonalUnitVector(AB),
-              orthogonalAB = new fabric.Point(
-                hatOrthogonalAB.x * s * strokeUniformScalar.x, 
-                hatOrthogonalAB.y * s * strokeUniformScalar.y 
+              options.strokeUniform ? scaledA : A,
+              options.strokeUniform ? scaledB : B
+            ),
+            AC = fabric.util.createVector(
+              options.strokeUniform ? scaledA : A,
+              options.strokeUniform ? scaledC : C
+            );
+
+          ;[AB, AC].forEach(vector => {
+            var hatOrthogonal = fabric.util.getOrthogonalUnitVector(AB),
+              orthogonal = new fabric.Point(
+                hatOrthogonal.x * s * strokeUniformScalar.x, 
+                hatOrthogonal.y * s * strokeUniformScalar.y 
               );
 
-          var AC = fabric.util.createVector(
-                    options.strokeUniform ? scaledA : A,
-                    options.strokeUniform ? scaledC : C
-                  ),
-              hatOrthogonalAC = fabric.util.getOrthogonalUnitVector(AC),
-              orthogonalAC = new fabric.Point(
-                hatOrthogonalAC.x * s * strokeUniformScalar.x, 
-                hatOrthogonalAC.y * s * strokeUniformScalar.y 
-              );
-          
-
-          coords.push(A.add(orthogonalAB));
-          coords.push(A.subtract(orthogonalAB));
-
-          coords.push(A.add(orthogonalAC));
-          coords.push(A.subtract(orthogonalAC));
+            coords.push(A.add(orthogonal));
+            coords.push(A.subtract(orthogonal));
+          });
 
           return;
         }
-
-        if (options.strokeLineJoin === 'round') {
-
-          if (alpha > PiBy2) {
-            var AB = fabric.util.createVector(
-                      options.strokeUniform ? scaledA : A,
-                      options.strokeUniform ? scaledB : B
-                    ),
-                hatOrthogonalAB = fabric.util.getOrthogonalUnitVector(AB)
-                orthogonalAB = new fabric.Point(
-                  hatOrthogonalAB.x * s * strokeUniformScalar.x, 
-                  hatOrthogonalAB.y * s * strokeUniformScalar.y 
-                );
-
-            var AC = fabric.util.createVector(
-                    options.strokeUniform ? scaledA : A,
-                    options.strokeUniform ? scaledC : C
-                  ),
-                hatOrthogonalAC = fabric.util.getOrthogonalUnitVector(AC),
-                orthogonalAC = new fabric.Point(
-                  hatOrthogonalAC.x * s * strokeUniformScalar.x, 
-                  hatOrthogonalAC.y * s * strokeUniformScalar.y 
-                )
-
-            coords.push(A.add(orthogonalAB));
-            coords.push(A.subtract(orthogonalAB));
-
-            coords.push(A.add(orthogonalAC));
-            coords.push(A.subtract(orthogonalAC));
-
-            return;
-          }
+        else if (options.strokeLineJoin === 'round') {
 
           var radiusOnAxisX = new fabric.Point(s * strokeUniformScalar.x, 0),
               radiusOnAxisY = new fabric.Point(0, s * strokeUniformScalar.y);
@@ -420,6 +365,7 @@
           return;
         }
       });
+
       return coords;
     },
 
