@@ -162,7 +162,7 @@
      * @memberOf fabric.util
      * @param {Point} a
      * @param {Point} b
-     * @returns the angle in radian between the vectors
+     * @returns the angle in radians from `a` to `b`
      */
     calcAngleBetweenVectors: function (a, b) {
       var dot = a.x * b.x + a.y * b.y,
