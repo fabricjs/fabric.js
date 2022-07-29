@@ -64,19 +64,8 @@
     assert.deepEqual(polygon.get('points'), [{ x: 10, y: 12 }, { x: 20, y: 22 }]);
   });
 
-  QUnit.test('polygon with exactBoundingBox false', function(assert) {
+  QUnit.test('polygon bbox calculation', function(assert) {
     var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 }], {
-      exactBoundingBox: false,
-      strokeWidth: 60,
-    });
-    var dimensions = polygon._getNonTransformedDimensions();
-    assert.equal(dimensions.x, 70);
-    assert.equal(dimensions.y, 150);
-  });
-
-  QUnit.test('polygon with exactBoundingBox true', function(assert) {
-    var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 }], {
-      exactBoundingBox: true,
       strokeWidth: 60,
     });
 
