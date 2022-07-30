@@ -1,8 +1,11 @@
 //@ts-nocheck
 
-import { incrementUID } from "./constants";
+import { Color } from "./color";
+import { iMatrix, incrementUID } from "./constants";
+import { matrixToSVG, populateWithProperties } from "./util";
+import { parseTransformAttribute } from "./_parser";
 
-var fabric = global.fabric;
+
 /* _FROM_SVG_START_ */
 function getColorStop(el, multiplier) {
   var style = el.getAttribute('style'),
@@ -41,7 +44,7 @@ function getColorStop(el, multiplier) {
     opacity = el.getAttribute('stop-opacity');
   }
 
-  color = new fabric.Color(color);
+  color = new Color(color);
   colorAlpha = color.getAlpha();
   opacity = isNaN(parseFloat(opacity)) ? 1 : parseFloat(opacity);
   opacity *= colorAlpha * multiplier;
@@ -76,9 +79,8 @@ function getRadialCoords(el) {
 
 /**
  * Gradient class
- * @class fabric.Gradient
+ * @class Gradient
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#gradients}
- * @see {@link fabric.Gradient#initialize} for constructor definition
  */
 export class Gradient {
 
@@ -139,7 +141,7 @@ export class Gradient {
    * @param {Number} [options.coords.y2] Y coordiante of the second point for linear or of the center point for radial
    * @param {Number} [options.coords.r1] only for radial gradient, radius of the inner circle
    * @param {Number} [options.coords.r2] only for radial gradient, radius of the external circle
-   * @return {fabric.Gradient} thisArg
+   * @return {Gradient} thisArg
    */
   constructor(options) {
     options || (options = {});
@@ -178,11 +180,11 @@ export class Gradient {
   /**
    * Adds another colorStop
    * @param {Object} colorStop Object with offset and color
-   * @return {fabric.Gradient} thisArg
+   * @return {Gradient} thisArg
    */
   addColorStop(colorStops) {
     for (var position in colorStops) {
-      var color = new fabric.Color(colorStops[position]);
+      var color = new Color(colorStops[position]);
       this.colorStops.push({
         offset: parseFloat(position),
         color: color.toRgb(),
@@ -207,7 +209,7 @@ export class Gradient {
       gradientUnits: this.gradientUnits,
       gradientTransform: this.gradientTransform ? this.gradientTransform.concat() : this.gradientTransform
     };
-    fabric.util.populateWithProperties(this, object, propertiesToInclude);
+    populateWithProperties(this, object, propertiesToInclude);
 
     return object;
   }
@@ -222,7 +224,7 @@ export class Gradient {
     var coords = this.coords, i, len, options = options || {},
       markup, commonAttributes, colorStops = this.colorStops,
       needsSwap = coords.r1 > coords.r2,
-      transform = this.gradientTransform ? this.gradientTransform.concat() : fabric.iMatrix.concat(),
+      transform = this.gradientTransform ? this.gradientTransform.concat() : iMatrix.concat(),
       offsetX = -this.offsetX, offsetY = -this.offsetY,
       withViewport = !!options.additionalTransform,
       gradientUnits = this.gradientUnits === 'pixels' ? 'userSpaceOnUse' : 'objectBoundingBox';
@@ -251,7 +253,7 @@ export class Gradient {
     commonAttributes = 'id="SVGID_' + this.id +
       '" gradientUnits="' + gradientUnits + '"';
     commonAttributes += ' gradientTransform="' + (withViewport ?
-      options.additionalTransform + ' ' : '') + fabric.util.matrixToSVG(transform) + '" ';
+      options.additionalTransform + ' ' : '') + matrixToSVG(transform) + '" ';
 
     if (this.type === 'linear') {
       markup = [
@@ -342,24 +344,22 @@ export class Gradient {
         offset = this.colorStops[i].offset;
 
       if (typeof opacity !== 'undefined') {
-        color = new fabric.Color(color).setAlpha(opacity).toRgba();
+        color = new Color(color).setAlpha(opacity).toRgba();
       }
       gradient.addColorStop(offset, color);
     }
 
     return gradient;
   }
-}
 
-fabric.util.object.extend(fabric.Gradient, {
 
   /* _FROM_SVG_START_ */
   /**
-   * Returns {@link fabric.Gradient} instance from an SVG element
+   * Returns {@link Gradient} instance from an SVG element
    * @static
-   * @memberOf fabric.Gradient
+   * @memberOf Gradient
    * @param {SVGGradientElement} el SVG gradient element
-   * @param {fabric.Object} instance
+   * @param {FabricObject} instance
    * @param {String} opacityAttr A fill-opacity or stroke-opacity attribute to multiply to each stop's opacity.
    * @param {Object} svgOptions an object containing the size of the SVG in order to parse correctly gradients
    * that uses gradientUnits as 'userSpaceOnUse' and percentages.
@@ -367,11 +367,11 @@ fabric.util.object.extend(fabric.Gradient, {
    * @param {Object.number} viewBoxHeight height part of the viewBox attribute on svg
    * @param {Object.number} width width part of the svg tag if viewBox is not specified
    * @param {Object.number} height height part of the svg tag if viewBox is not specified
-   * @return {fabric.Gradient} Gradient instance
+   * @return {Gradient} Gradient instance
    * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
    * @see http://www.w3.org/TR/SVG/pservers.html#RadialGradientElement
    */
-  fromElement: function (el, instance, opacityAttr, svgOptions) {
+  static fromElement(el, instance, opacityAttr, svgOptions) {
     /**
      *  @example:
      *
@@ -432,7 +432,7 @@ fabric.util.object.extend(fabric.Gradient, {
       colorStops.push(getColorStop(colorStopEls[i], multiplier));
     }
 
-    transformMatrix = fabric.parseTransformAttribute(gradientTransform);
+    transformMatrix = parseTransformAttribute(gradientTransform);
 
     __convertPercentUnitsToValues(instance, coords, svgOptions, gradientUnits);
 
@@ -441,7 +441,7 @@ fabric.util.object.extend(fabric.Gradient, {
       offsetY = -instance.top;
     }
 
-    var gradient = new fabric.Gradient({
+    var gradient = new Gradient({
       id: el.getAttribute('id'),
       type: type,
       coords: coords,
@@ -455,7 +455,8 @@ fabric.util.object.extend(fabric.Gradient, {
     return gradient;
   }
   /* _FROM_SVG_END_ */
-});
+}
+
 
 /**
  * @private
