@@ -1,10 +1,10 @@
 import { Control } from "../control.class";
-import { changeWidth, rotationStyleHandler, rotationWithSnapping, scaleCursorStyleHandler, scaleOrSkewActionName, scalingEqually, scalingXOrSkewingY, scalingYOrSkewingX } from "../controls.actions";
+import { changeWidth, rotationStyleHandler, scaleSkewCursorStyleHandler, rotationWithSnapping, scaleCursorStyleHandler, scaleOrSkewActionName, scalingEqually, scalingXOrSkewingY, scalingYOrSkewingX } from "../controls.actions";
 
 export const ml = new Control({
   x: -0.5,
   y: 0,
-  cursorStyleHandler: scaleCursorStyleHandler,
+  cursorStyleHandler: scaleSkewCursorStyleHandler,
   actionHandler: scalingXOrSkewingY,
   getActionName: scaleOrSkewActionName,
 });
@@ -12,7 +12,7 @@ export const ml = new Control({
 export const mr = new Control({
   x: 0.5,
   y: 0,
-  cursorStyleHandler: scaleCursorStyleHandler,
+  cursorStyleHandler: scaleSkewCursorStyleHandler,
   actionHandler: scalingXOrSkewingY,
   getActionName: scaleOrSkewActionName,
 });
@@ -20,7 +20,7 @@ export const mr = new Control({
 export const mb = new Control({
   x: 0,
   y: 0.5,
-  cursorStyleHandler: scaleCursorStyleHandler,
+  cursorStyleHandler: scaleSkewCursorStyleHandler,
   actionHandler: scalingYOrSkewingX,
   getActionName: scaleOrSkewActionName,
 });
@@ -28,7 +28,7 @@ export const mb = new Control({
 export const mt = new Control({
   x: 0,
   y: -0.5,
-  cursorStyleHandler: scaleCursorStyleHandler,
+  cursorStyleHandler: scaleSkewCursorStyleHandler,
   actionHandler: scalingYOrSkewingX,
   getActionName: scaleOrSkewActionName,
 });
@@ -36,28 +36,28 @@ export const mt = new Control({
 export const tl = new Control({
   x: -0.5,
   y: -0.5,
-  cursorStyleHandler: scaleStyleHandler,
+  cursorStyleHandler: scaleCursorStyleHandler,
   actionHandler: scalingEqually
 });
 
 export const tr = new Control({
   x: 0.5,
   y: -0.5,
-  cursorStyleHandler: scaleStyleHandler,
+  cursorStyleHandler: scaleCursorStyleHandler,
   actionHandler: scalingEqually
 });
 
 export const bl = new Control({
   x: -0.5,
   y: 0.5,
-  cursorStyleHandler: scaleStyleHandler,
+  cursorStyleHandler: scaleCursorStyleHandler,
   actionHandler: scalingEqually
 });
 
 export const br = new Control({
   x: 0.5,
   y: 0.5,
-  cursorStyleHandler: scaleStyleHandler,
+  cursorStyleHandler: scaleCursorStyleHandler,
   actionHandler: scalingEqually
 });
 
@@ -88,7 +88,7 @@ export const mrTextbox = new Control({
 });
 
 export const ObjectControls = {
-  ml, mr, mb, mt, tl, tr, bl, bt, mtr
+  ml, mr, mb, mt, tl, tr, bl, br, mtr
 }
 
 export const TextboxControls = {
