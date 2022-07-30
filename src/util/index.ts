@@ -1,6 +1,7 @@
 //@ts-nocheck
 const fabric = { util: {} };
 export * from './cos';
+export * from './removeDefaultValues';
 import './animate'; // optional animation
 import './animate_color'; // optional animation
 import './anim_ease'; // optional easing
@@ -17,6 +18,7 @@ import './path';
 
 
 const {
+    sin,
     getElementOffset,
     removeFromArray,
     toFixed,
@@ -40,9 +42,38 @@ const {
     findScaleToCover,
     stylesFromArray,
     stylesToArray,
-    hasStyleChanged
+    hasStyleChanged,
+    getPathSegmentsInfo,
+    getPointOnPath,
+    string: {
+        graphemeSplit,
+        capitalize
+    },
+    projectStrokeOnPoints,
+    array: {
+        min,
+        max
+    },
+    makePathSimpler,
+    parsePath,
+    joinPath,
+    getBoundsOfCurve,
+    limitDimsByArea,
+    capValue: clamp,
+    populateWithProperties,
+    qrDecompose,
+    saveObjectTransform,
+    resetObjectTransform,
+    object: {
+        clone
+    },
+    matrixToSVG,
+    sizeAfterTransform,
+    animate,
+    animateColor
 } = fabric.util;
 export {
+    sin,
     getElementOffset,
     removeFromArray,
     toFixed,
@@ -67,5 +98,27 @@ export {
     stylesFromArray,
     stylesFromArray,
     stylesToArray,
-    hasStyleChanged
+    hasStyleChanged,
+    getPathSegmentsInfo,
+    getPointOnPath,
+    graphemeSplit,
+    capitalize,
+    projectStrokeOnPoints,
+    min,
+    max,
+    makePathSimpler,
+    parsePath,
+    joinPath,
+    getBoundsOfCurve,
+    limitDimsByArea,
+    clamp,
+    populateWithProperties,
+    qrDecompose,
+    saveObjectTransform,
+    resetObjectTransform,
+    clone,
+    matrixToSVG,
+    sizeAfterTransform,
+    animate,
+    animateColor
 };
