@@ -1,7 +1,7 @@
 //@ts-nocheck
 
-  var fabric = global.fabric;
-  
+var fabric = global.fabric;
+
 export function ObjectStraighteningMixinGenerator(Klass) {
   return class ObjectStraighteningMixin extends Klass {
 
@@ -34,23 +34,23 @@ export function ObjectStraighteningMixinGenerator(Klass) {
      * @return {fabric.Object} thisArg
      */
     fxStraighten(callbacks) {
-      callbacks = callbacks || { };
+      callbacks = callbacks || {};
 
-      var empty = function() { },
-          onComplete = callbacks.onComplete || empty,
-          onChange = callbacks.onChange || empty,
-          _this = this;
+      var empty = function () { },
+        onComplete = callbacks.onComplete || empty,
+        onChange = callbacks.onChange || empty,
+        _this = this;
 
       return fabric.util.animate({
         target: this,
         startValue: this.get('angle'),
         endValue: this._getAngleValueForStraighten(),
         duration: this.FX_DURATION,
-        onChange: function(value) {
+        onChange: function (value) {
           _this.rotate(value);
           onChange();
         },
-        onComplete: function() {
+        onComplete: function () {
           _this.setCoords();
           onComplete();
         },
@@ -59,10 +59,6 @@ export function ObjectStraighteningMixinGenerator(Klass) {
   }
 }
 
-fabric.Object = ObjectStraighteningMixinGenerator(fabric.Object);
-
-
-  
 export function StaticCanvasObjectStraighteningMixinGenerator(Klass) {
   return class StaticCanvasObjectStraighteningMixin extends Klass {
 
@@ -91,5 +87,4 @@ export function StaticCanvasObjectStraighteningMixinGenerator(Klass) {
   }
 }
 
-fabric.StaticCanvas = StaticCanvasObjectStraighteningMixinGenerator(fabric.StaticCanvas);
 
