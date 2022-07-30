@@ -1,4 +1,4 @@
-export * from './animation.mixin';
+export * from './canvas_animation.mixin';
 export * from './canvas_dataurl_exporter.mixin';
 export * from './canvas_events.mixin';
 export * from './canvas_gestures.mixin';
@@ -11,8 +11,10 @@ export * from './itext_click_behavior.mixin';
 export * from './itext_key_behavior.mixin';
 export * from './object.svg_export';
 export * from './object_ancestry.mixin';
+export * from './object_animation.mixin';
 export * from './object_interactivity.mixin';
 export * from './object_origin.mixin';
 export * from './object_stacking.mixin';
 export * from './object_straightening.mixin';
 export * from './text_style.mixin';
+
