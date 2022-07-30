@@ -36,7 +36,7 @@ export class Observable {
       if (!this.__eventListeners[arg0]) {
         this.__eventListeners[arg0] = [];
       }
-      this.__eventListeners[arg0].push(handler);
+      this.__eventListeners[arg0].push(handler!);
     }
     return () => this.off(arg0, handler);
   }
@@ -83,12 +83,13 @@ export class Observable {
     if (!this.__eventListeners[eventName]) {
       return;
     }
-    var eventListener = this.__eventListeners[eventName];
     if (handler) {
-      eventListener[eventListener.indexOf(handler)] = false;
+      const eventListener = this.__eventListeners[eventName];
+      const index = eventListener.indexOf(handler);
+      eventListener.splice(index, 1);
     }
     else {
-      fabric.util.array.fill(eventListener, false);
+      this.__eventListeners[eventName] = [];
     }
   }
 
@@ -141,9 +142,7 @@ export class Observable {
     }
 
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
-      listenersForEvent[i] && listenersForEvent[i].call(this, options || {});
+      listenersForEvent[i].call(this, options || {});
     }
-    //  TODO why is cleanup done here?
-    this.__eventListeners[eventName] = listenersForEvent.filter((value) => value !== false);
   }
 }
