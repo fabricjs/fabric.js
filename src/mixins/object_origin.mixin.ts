@@ -1,24 +1,28 @@
 //@ts-nocheck
 
+import { Point } from "../point.class";
+import { degreesToRadians } from "../util";
 
-  var fabric = global.fabric, degreesToRadians = fabric.util.degreesToRadians,
-      originXOffset = {
-        left: -0.5,
-        center: 0,
-        right: 0.5
-      },
-      originYOffset = {
-        top: -0.5,
-        center: 0,
-        bottom: 0.5
-      };
 
-  /**
-   * @typedef {number | 'left' | 'center' | 'right'} OriginX
-   * @typedef {number | 'top' | 'center' | 'bottom'} OriginY
-   */
+var fabric = global.fabric;
+const originXOffset = {
+  left: -0.5,
+  center: 0,
+  right: 0.5
+},
+  originYOffset = {
+    top: -0.5,
+    center: 0,
+    bottom: 0.5
+  };
 
-  
+
+/**
+ * @typedef {number | 'left' | 'center' | 'right'} OriginX
+ * @typedef {number | 'top' | 'center' | 'bottom'} OriginY
+ */
+
+
 export function ObjectOriginMixinGenerator(Klass) {
   return class ObjectOriginMixin extends Klass {
 
@@ -48,19 +52,19 @@ export function ObjectOriginMixinGenerator(Klass) {
 
     /**
      * Translates the coordinates from a set of origin to another (based on the object's dimensions)
-     * @param {fabric.Point} point The point which corresponds to the originX and originY params
+     * @param {Point} point The point which corresponds to the originX and originY params
      * @param {OriginX} fromOriginX Horizontal origin: 'left', 'center' or 'right'
      * @param {OriginY} fromOriginY Vertical origin: 'top', 'center' or 'bottom'
      * @param {OriginX} toOriginX Horizontal origin: 'left', 'center' or 'right'
      * @param {OriginY} toOriginY Vertical origin: 'top', 'center' or 'bottom'
-     * @return {fabric.Point}
+     * @return {Point}
      */
     translateToGivenOrigin(point, fromOriginX, fromOriginY, toOriginX, toOriginY) {
       var x = point.x,
-          y = point.y,
-          dim,
-          offsetX = this.resolveOriginX(toOriginX) - this.resolveOriginX(fromOriginX),
-          offsetY = this.resolveOriginY(toOriginY) - this.resolveOriginY(fromOriginY);
+        y = point.y,
+        dim,
+        offsetX = this.resolveOriginX(toOriginX) - this.resolveOriginX(fromOriginX),
+        offsetY = this.resolveOriginY(toOriginY) - this.resolveOriginY(fromOriginY);
 
       if (offsetX || offsetY) {
         dim = this._getTransformedDimensions();
@@ -68,53 +72,53 @@ export function ObjectOriginMixinGenerator(Klass) {
         y = point.y + offsetY * dim.y;
       }
 
-      return new fabric.Point(x, y);
+      return new Point(x, y);
     }
 
     /**
      * Translates the coordinates from origin to center coordinates (based on the object's dimensions)
-     * @param {fabric.Point} point The point which corresponds to the originX and originY params
+     * @param {Point} point The point which corresponds to the originX and originY params
      * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
      * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
-     * @return {fabric.Point}
+     * @return {Point}
      */
     translateToCenterPoint(point, originX, originY) {
       var p = this.translateToGivenOrigin(point, originX, originY, 'center', 'center');
       if (this.angle) {
-        return fabric.util.rotatePoint(p, point, degreesToRadians(this.angle));
+        return rotatePoint(p, point, degreesToRadians(this.angle));
       }
       return p;
     }
 
     /**
      * Translates the coordinates from center to origin coordinates (based on the object's dimensions)
-     * @param {fabric.Point} center The point which corresponds to center of the object
+     * @param {Point} center The point which corresponds to center of the object
      * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
      * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
-     * @return {fabric.Point}
+     * @return {Point}
      */
     translateToOriginPoint(center, originX, originY) {
       var p = this.translateToGivenOrigin(center, 'center', 'center', originX, originY);
       if (this.angle) {
-        return fabric.util.rotatePoint(p, center, degreesToRadians(this.angle));
+        return rotatePoint(p, center, degreesToRadians(this.angle));
       }
       return p;
     }
 
     /**
      * Returns the center coordinates of the object relative to canvas
-     * @return {fabric.Point}
+     * @return {Point}
      */
     getCenterPoint() {
       var relCenter = this.getRelativeCenterPoint();
       return this.group ?
-        fabric.util.transformPoint(relCenter, this.group.calcTransformMatrix()) :
+        transformPoint(relCenter, this.group.calcTransformMatrix()) :
         relCenter;
     }
 
     /**
      * Returns the center coordinates of the object relative to it's containing group or null
-     * @return {fabric.Point|null} point or null of object has no parent group
+     * @return {Point|null} point or null of object has no parent group
      */
     getCenterPointRelativeToParent() {
       return this.group ? this.getRelativeCenterPoint() : null;
@@ -122,16 +126,16 @@ export function ObjectOriginMixinGenerator(Klass) {
 
     /**
      * Returns the center coordinates of the object relative to it's parent
-     * @return {fabric.Point}
+     * @return {Point}
      */
     getRelativeCenterPoint() {
-      return this.translateToCenterPoint(new fabric.Point(this.left, this.top), this.originX, this.originY);
+      return this.translateToCenterPoint(new Point(this.left, this.top), this.originX, this.originY);
     }
 
     /**
      * Returns the coordinates of the object based on center coordinates
-     * @param {fabric.Point} point The point which corresponds to the originX and originY params
-     * @return {fabric.Point}
+     * @param {Point} point The point which corresponds to the originX and originY params
+     * @return {Point}
      */
     // getOriginPoint(center) {
     //   return this.translateToOriginPoint(center, this.originX, this.originY);
@@ -141,7 +145,7 @@ export function ObjectOriginMixinGenerator(Klass) {
      * Returns the coordinates of the object as if it has a different origin
      * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
      * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
-     * @return {fabric.Point}
+     * @return {Point}
      */
     getPointByOrigin(originX, originY) {
       var center = this.getRelativeCenterPoint();
@@ -150,23 +154,23 @@ export function ObjectOriginMixinGenerator(Klass) {
 
     /**
      * Returns the normalized point (rotated relative to center) in local coordinates
-     * @param {fabric.Point} point The point relative to instance coordinate system
+     * @param {Point} point The point relative to instance coordinate system
      * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
      * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
-     * @return {fabric.Point}
+     * @return {Point}
      */
     normalizePoint(point, originX, originY) {
       var center = this.getRelativeCenterPoint(), p, p2;
-      if (typeof originX !== 'undefined' && typeof originY !== 'undefined' ) {
+      if (typeof originX !== 'undefined' && typeof originY !== 'undefined') {
         p = this.translateToGivenOrigin(center, 'center', 'center', originX, originY);
       }
       else {
-        p = new fabric.Point(this.left, this.top);
+        p = new Point(this.left, this.top);
       }
 
-      p2 = new fabric.Point(point.x, point.y);
+      p2 = new Point(point.x, point.y);
       if (this.angle) {
-        p2 = fabric.util.rotatePoint(p2, center, -degreesToRadians(this.angle));
+        p2 = rotatePoint(p2, center, -degreesToRadians(this.angle));
       }
       return p2.subtractEquals(p);
     }
@@ -179,31 +183,31 @@ export function ObjectOriginMixinGenerator(Klass) {
      */
     getLocalPointer(e, pointer) {
       pointer = pointer || this.canvas.getPointer(e);
-      return fabric.util.transformPoint(
-        new fabric.Point(pointer.x, pointer.y),
-        fabric.util.invertTransform(this.calcTransformMatrix())
-      ).addEquals(new fabric.Point(this.width / 2, this.height / 2));
+      return transformPoint(
+        new Point(pointer.x, pointer.y),
+        invertTransform(this.calcTransformMatrix())
+      ).addEquals(new Point(this.width / 2, this.height / 2));
     }
 
     /**
      * Returns the point in global coordinates
-     * @param {fabric.Point} The point relative to the local coordinate system
-     * @return {fabric.Point}
+     * @param {Point} The point relative to the local coordinate system
+     * @return {Point}
      */
     // toGlobalPoint(point) {
-    //   return fabric.util.rotatePoint(point, this.getCenterPoint(), degreesToRadians(this.angle)).addEquals(new fabric.Point(this.left, this.top));
+    //   return rotatePoint(point, this.getCenterPoint(), degreesToRadians(this.angle)).addEquals(new Point(this.left, this.top));
     // }
 
     /**
      * Sets the position of the object taking into consideration the object's origin
-     * @param {fabric.Point} pos The new position of the object
+     * @param {Point} pos The new position of the object
      * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
      * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {void}
      */
     setPositionByOrigin(pos, originX, originY) {
       var center = this.translateToCenterPoint(pos, originX, originY),
-          position = this.translateToOriginPoint(center, this.originX, this.originY);
+        position = this.translateToOriginPoint(center, this.originX, this.originY);
       this.set('left', position.x);
       this.set('top', position.y);
     }
@@ -213,10 +217,10 @@ export function ObjectOriginMixinGenerator(Klass) {
      */
     adjustPosition(to) {
       var angle = degreesToRadians(this.angle),
-          hypotFull = this.getScaledWidth(),
-          xFull = fabric.util.cos(angle) * hypotFull,
-          yFull = fabric.util.sin(angle) * hypotFull,
-          offsetFrom, offsetTo;
+        hypotFull = this.getScaledWidth(),
+        xFull = cos(angle) * hypotFull,
+        yFull = sin(angle) * hypotFull,
+        offsetFrom, offsetTo;
 
       //TODO: this function does not consider mixed situation like top, center.
       if (typeof this.originX === 'string') {
@@ -285,6 +289,5 @@ export function ObjectOriginMixinGenerator(Klass) {
   }
 }
 
-fabric.Object = ObjectOriginMixinGenerator(fabric.Object);
 
 
