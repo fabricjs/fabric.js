@@ -2,8 +2,8 @@
 
 import { charWidthsCache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE, isLikelyNode, SHARED_ATTRIBUTES } from '../constants';
-import { parseAttributes } from '../parser';
-import { createCanvasElement, hasStyleChanged, stylesFromArray, stylesToArray } from '../util';
+import { createCanvasElement, graphemeSplit, hasStyleChanged, stylesFromArray, stylesToArray } from '../util';
+import { parseAttributes } from "../_parser";
 import { FabricObject } from './object.class';
 
 const additionalProps =
@@ -1505,7 +1505,7 @@ export class Text extends FabricObject {
    * @returns {string[]} array of graphemes
    */
   graphemeSplit(value) {
-    return string.graphemeSplit(value);
+    return graphemeSplit(value);
   }
 
   /**

@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { SHARED_ATTRIBUTES } from '../constants';
-import { parseAttributes } from '../parser';
+import { parseAttributes } from "../_parser";
 import {
   cos,
   degreesToRadians, sin

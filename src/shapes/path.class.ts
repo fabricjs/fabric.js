@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { SHARED_ATTRIBUTES } from '../constants';
-import { parseAttributes } from '../parser';
+import { parseAttributes } from "../_parser";
 import {
   getBoundsOfCurve, joinPath, makePathSimpler, max, min, parsePath, toFixed
 } from '../util';

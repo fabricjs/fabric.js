@@ -2,7 +2,7 @@
 
 var fabric = global.fabric;
 import { incrementUID, SHARED_ATTRIBUTES } from '../constants';
-import { parseAttributes } from '../parser';
+import { parseAttributes } from "../_parser";
 import {
   addClass, cleanUpJsdomNode, createCanvasElement, enlivenObjectEnlivables, enlivenObjects, findScaleToCover, findScaleToFit, getById, loadImage, parsePreserveAspectRatioAttribute, setImageSmoothing
 } from '../util';

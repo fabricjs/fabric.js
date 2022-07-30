@@ -65,7 +65,8 @@ const {
     saveObjectTransform,
     resetObjectTransform,
     object: {
-        clone
+        clone,
+        extend
     },
     matrixToSVG,
     sizeAfterTransform,
@@ -75,7 +76,10 @@ const {
     cancelAnimFrame,
     rotateVector,
     getRandomInt,
-    getSmoothPathFromPoints
+    getSmoothPathFromPoints,
+    parseUnit,
+    toArray,
+    request
 } = fabric.util;
 export {
     sin,
@@ -121,6 +125,7 @@ export {
     saveObjectTransform,
     resetObjectTransform,
     clone,
+    extend,
     matrixToSVG,
     sizeAfterTransform,
     animate,
@@ -129,5 +134,9 @@ export {
     cancelAnimFrame,
     rotateVector,
     getRandomInt,
-    getSmoothPathFromPoints
+    getSmoothPathFromPoints,
+    parseUnit,
+    toArray,
+    request
 };
+export default fabric.util;
