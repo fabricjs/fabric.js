@@ -1,3 +1,4 @@
+import { renderCircleControl, renderSquareControl } from "./controls.render";
 import { Point } from "./point.class";
 
 
@@ -323,10 +324,10 @@ export class Control {
     styleOverride = styleOverride || {};
     switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
       case 'circle':
-        fabric.controlsUtils.renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
+        renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
         break;
       default:
-        fabric.controlsUtils.renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
+        renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
     }
   }
 }
