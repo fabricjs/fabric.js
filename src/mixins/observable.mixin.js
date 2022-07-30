@@ -1,22 +1,14 @@
-(function(global) {
-  var fabric = global.fabric;
-  /**
-   * @private
-   * @param {String} eventName
-   * @param {Function} handler
-   */
-  function _removeEventListener(eventName, handler) {
-    if (!this.__eventListeners[eventName]) {
-      return;
-    }
-    var eventListener = this.__eventListeners[eventName];
-    if (handler) {
-      eventListener[eventListener.indexOf(handler)] = false;
-    }
-    else {
-      fabric.util.array.fill(eventListener, false);
-    }
-  }
+
+var fabric = global.fabric;
+
+
+/**
+ * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#events}
+ * @see {@link http://fabricjs.com/events|Events demo}
+ */
+export class Observable {
+
+  __eventListeners
 
   /**
    * Observes specified event
@@ -26,9 +18,9 @@
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
    * @return {Function} disposer
    */
-  function on(eventName, handler) {
+  on(eventName, handler) {
     if (!this.__eventListeners) {
-      this.__eventListeners = { };
+      this.__eventListeners = {};
     }
     // one object with key/value pairs was passed
     if (arguments.length === 1) {
@@ -45,7 +37,7 @@
     return off.bind(this, eventName, handler);
   }
 
-  function _once(eventName, handler) {
+  _once(eventName, handler) {
     var _handler = function () {
       handler.apply(this, arguments);
       this.off(eventName, _handler);
@@ -62,7 +54,7 @@
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
    * @return {Function} disposer
    */
-  function once(eventName, handler) {
+  once(eventName, handler) {
     // one object with key/value pairs was passed
     if (arguments.length === 1) {
       var handlers = {};
@@ -78,6 +70,24 @@
   }
 
   /**
+   * @private
+   * @param {string} eventName 
+   * @param {Function} handler 
+   */
+  _removeEventListener(eventName, handler) {
+    if (!this.__eventListeners[eventName]) {
+      return;
+    }
+    var eventListener = this.__eventListeners[eventName];
+    if (handler) {
+      eventListener[eventListener.indexOf(handler)] = false;
+    }
+    else {
+      fabric.util.array.fill(eventListener, false);
+    }
+  }
+
+  /**
    * Stops event observing for a particular event handler. Calling this method
    * without arguments removes all handlers for all events
    * @memberOf fabric.Observable
@@ -85,7 +95,7 @@
    * @param {String|Object} eventName Event name (eg. 'after:render') or object with key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function to be deleted from EventListeners
    */
-  function off(eventName, handler) {
+  off(eventName, handler) {
     if (!this.__eventListeners) {
       return;
     }
@@ -113,7 +123,7 @@
    * @param {String} eventName Event name to fire
    * @param {Object} [options] Options object
    */
-  function fire(eventName, options) {
+  fire(eventName, options) {
     if (!this.__eventListeners) {
       return;
     }
@@ -124,22 +134,8 @@
     }
 
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
-      listenersForEvent[i] && listenersForEvent[i].call(this, options || { });
+      listenersForEvent[i] && listenersForEvent[i].call(this, options || {});
     }
-    this.__eventListeners[eventName] = listenersForEvent.filter(function(value) {
-      return value !== false;
-    });
+    this.__eventListeners[eventName] = listenersForEvent.filter((value) => value !== false);
   }
-
-  /**
-   * @namespace fabric.Observable
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#events}
-   * @see {@link http://fabricjs.com/events|Events demo}
-   */
-  fabric.Observable = {
-    fire: fire,
-    on: on,
-    once: once,
-    off: off,
-  };
-})(typeof exports !== 'undefined' ? exports : window);
+}
