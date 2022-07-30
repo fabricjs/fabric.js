@@ -70,7 +70,10 @@ const {
     matrixToSVG,
     sizeAfterTransform,
     animate,
-    animateColor
+    animateColor,
+    requestAnimFrame,
+    cancelAnimFrame,
+
 } = fabric.util;
 export {
     sin,
