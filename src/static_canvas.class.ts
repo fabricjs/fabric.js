@@ -1651,39 +1651,6 @@ export class StaticCanvas extends CollectionMixinGenerator(CommonMethods) {
 extend(fabric.StaticCanvas.prototype, fabric.Observable);
 extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
 
-extend(fabric.StaticCanvas, /** @lends fabric.StaticCanvas */ {
-
-  /**
-   * Provides a way to check support of some of the canvas methods
-   * (either those of HTMLCanvasElement itself, or rendering context)
-   *
-   * @param {String} methodName Method to check support for;
-   *                            Could be one of "setLineDash"
-   * @return {Boolean | null} `true` if method is supported (or at least exists),
-   *                          `null` if canvas element or context can not be initialized
-   */
-  supports: function (methodName) {
-    var el = createCanvasElement();
-
-    if (!el || !el.getContext) {
-      return null;
-    }
-
-    var ctx = el.getContext('2d');
-    if (!ctx) {
-      return null;
-    }
-
-    switch (methodName) {
-
-      case 'setLineDash':
-        return typeof ctx.setLineDash !== 'undefined';
-
-      default:
-        return null;
-    }
-  }
-});
 
 /**
  * Returns Object representation of canvas
