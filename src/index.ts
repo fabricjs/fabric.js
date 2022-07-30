@@ -1,4 +1,4 @@
-export * from './canvas.class';
+import './canvas.class';
 export * from './gradient.class';
 export * from './pattern.class';
 export * from './shadow.class';
