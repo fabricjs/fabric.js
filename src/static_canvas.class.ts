@@ -9,7 +9,7 @@ import { CollectionMixinGenerator } from "./mixins/collection.mixin";
 import { CommonMethods } from "./mixins/common_methods.mixin";
 import { NodeCanvasStreamsMixinGenerator } from "./mixins/node_canvas_streams.mixin";
 import {
-  addClass, cleanUpJsdomNode, createCanvasElement, getById, getElementOffset, invertTransform, populateWithProperties, removeFromArray, setImageSmoothing, toFixed,
+  addClass, cancelAnimFrame, cleanUpJsdomNode, createCanvasElement, getById, getElementOffset, invertTransform, matrixToSVG, populateWithProperties, removeFromArray, requestAnimFrame, setImageSmoothing, toFixed,
   transformPoint
 } from './util';
 
