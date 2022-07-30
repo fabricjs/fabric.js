@@ -30,18 +30,26 @@ import './src/gradient.class'; // optional gradient
 import './src/pattern.class'; // optional pattern
 import './src/shadow.class'; // optional shadow
 import './src/static_canvas.class';
-import './src/brushes/base_brush.class'; // optional freedrawing
-import './src/brushes/pencil_brush.class'; // optional freedrawing
-import './src/brushes/circle_brush.class'; // optional freedrawing
-import './src/brushes/spray_brush.class'; // optional freedrawing
-import './src/brushes/pattern_brush.class'; // optional freedrawing
+// import './src/brushes/base_brush.class'; // optional freedrawing
+// import './src/brushes/pencil_brush.class'; // optional freedrawing
+// import './src/brushes/circle_brush.class'; // optional freedrawing
+// import './src/brushes/spray_brush.class'; // optional freedrawing
+// import './src/brushes/pattern_brush.class'; // optional freedrawing
+import { BaseBrush, CircleBrush, PatternBrush, PencilBrush, SprayBrush } from './src/brushes'
+fabric.BaseBrush = BaseBrush;
+fabric.CircleBrush = CircleBrush;
+fabric.PatternBrush = PatternBrush;
+fabric.PencilBrush = PencilBrush;
+fabric.SprayBrush = SprayBrush;
 import './src/canvas.class'; // optional interaction
 import './src/mixins/canvas_events.mixin'; // optional interaction
 import './src/mixins/canvas_grouping.mixin'; // optional interaction
 import './src/mixins/canvas_dataurl_exporter.mixin';
 import './src/mixins/canvas_serialization.mixin'; // optiona serialization
 import './src/mixins/canvas_gestures.mixin'; // optional gestures
-import './src/shapes/object.class';
+import { FabricObject as Object } from './src/shapes/object.class';
+
+fabric.Object = Object;
 import './src/mixins/object_origin.mixin';
 import './src/mixins/object_geometry.mixin';
 import './src/mixins/object_ancestry.mixin';
@@ -50,17 +58,32 @@ import './src/mixins/object.svg_export';
 import './src/mixins/stateful.mixin';
 import './src/mixins/object_interactivity.mixin'; // optional interaction
 import './src/mixins/animation.mixin'; // optional animation
-import './src/shapes/line.class';
-import './src/shapes/circle.class';
-import './src/shapes/triangle.class';
-import './src/shapes/ellipse.class';
-import './src/shapes/rect.class';
-import './src/shapes/polyline.class';
-import './src/shapes/polygon.class';
-import './src/shapes/path.class';
-import './src/shapes/group.class';
-import './src/shapes/active_selection.class'; // optional interaction
-import './src/shapes/image.class';
+// import './src/shapes/line.class';
+// import './src/shapes/circle.class';
+// import './src/shapes/triangle.class';
+// import './src/shapes/ellipse.class';
+// import './src/shapes/rect.class';
+// import './src/shapes/polyline.class';
+// import './src/shapes/polygon.class';
+// import './src/shapes/path.class';
+// import './src/shapes/group.class';
+// import './src/shapes/active_selection.class'; // optional interaction
+// import './src/shapes/image.class';
+import { ActiveSelection, Circle, Ellipse, Group, IText, Image, Line, Path, Polygon, Polyline, Rect, Text, Textbox, Triangle } from './src/shapes';
+fabric.ActiveSelection = ActiveSelection;
+fabric.Circle = Circle;
+fabric.Ellipse = Ellipse;
+fabric.Group = Group;
+fabric.IText = IText;
+fabric.Image = Image;
+fabric.Line = Line;
+fabric.Path = Path;
+fabric.Polygon = Polygon;
+fabric.Polyline = Polyline;
+fabric.Rect = Rect;
+fabric.Text = Text;
+fabric.Textbox = Textbox;
+fabric.Triangle = Triangle;
 import './src/mixins/object_straightening.mixin'; // optional objectstraightening
 import './src/filters/webgl_backend.class'; // optional image_filters
 import './src/filters/2d_backend.class'; // optional image_filters
