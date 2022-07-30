@@ -2,7 +2,7 @@ import { fabric } from './HEADER.js';
 // import './lib/event.js'), // optional gestures
 import './src/mixins/observable.mixin.js';
 import './src/mixins/collection.mixin.js';
-import './src/mixins/shared_methods.mixin.js';
+import './src/mixins/common_methods.mixin.js';
 import './src/util/misc.js';
 // import './src/util/named_accessors.mixin.js'; i would imagine dead forever or proper setters/getters
 import './src/util/path.js';
