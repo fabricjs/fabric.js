@@ -37,7 +37,10 @@ const {
     addClass,
     parsePreserveAspectRatioAttribute,
     findScaleToFit,
-    findScaleToCover
+    findScaleToCover,
+    stylesFromArray,
+    stylesToArray,
+    hasStyleChanged
 } = fabric.util;
 export {
     getElementOffset,
@@ -60,5 +63,9 @@ export {
     addClass,
     parsePreserveAspectRatioAttribute,
     findScaleToFit,
-    findScaleToCover
+    findScaleToCover,
+    stylesFromArray,
+    stylesFromArray,
+    stylesToArray,
+    hasStyleChanged
 };
