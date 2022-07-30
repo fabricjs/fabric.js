@@ -1,6 +1,5 @@
 (function(global) {
-  var fabric = global.fabric || (global.fabric = { }),
-      clone = fabric.util.object.clone;
+  var fabric = global.fabric || (global.fabric = { });
 
   var additionalProps =
     ('fontFamily fontWeight fontSize text underline overline linethrough' +

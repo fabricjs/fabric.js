@@ -335,7 +335,7 @@
      * @param {DragEvent} e
      * @returns {boolean}
      */
-    canDrop: function (e) { // eslint-disable-line no-unused-vars
+    canDrop: function (/* e */) {
       return false;
     },
 
