@@ -58,7 +58,7 @@ import { CanvasSerializationMixinGenerator } from './src/mixins/canvas_serializa
 fabric.StaticCanvas = CanvasSerializationMixinGenerator(fabric.StaticCanvas);
 import { CanvasGesturesMixinGenerator } from './src/mixins/canvas_gestures.mixin'; // optional gestures
 fabric.Canvas = CanvasGesturesMixinGenerator(fabric.Canvas);
-import { FabricObject as Object } from './src/shapes/object.class';
+import { FabricObject, FabricObject as Object } from './src/shapes/object.class';
 
 fabric.Object = Object;
 import './src/mixins/object_origin.mixin';
@@ -136,7 +136,15 @@ import './src/mixins/itext_click_behavior.mixin'; // optional itext
 import './src/mixins/itext_key_behavior.mixin'; // optional itext
 import './src/mixins/itext.svg_export'; // optional itext
 import './src/shapes/textbox.class'; // optional textbox
-import './src/mixins/default_controls'; // optional interaction
+import { ObjectControls, TextboxControls } from './src/mixins/default_controls'; // optional interaction
+FabricObject.prototype.controls = ObjectControls;
+// this is breaking the prototype inheritance, no time / ideas to fix it.
+// is important to document that if you want to have all objects to have a
+// specific custom control, you have to add it to Object prototype and to Textbox
+// prototype. The controls are shared as references. So changes to control `tr`
+// can still apply to all objects if needed.
+//  OR STOP USING SHARED OBJECTS!
+Textbox.prototype.controls = TextboxControls;
 //  extends fabric.StaticCanvas, fabric.Canvas, fabric.Object, depends on fabric.PencilBrush and fabric.Rect
 // import './src/mixins/eraser_brush.mixin'; // optional erasing
 if (typeof exports !== 'undefined') {

@@ -1,114 +1,96 @@
-(function(global) {
+import { Control } from "../control.class";
+import { changeWidth, rotationStyleHandler, rotationWithSnapping, scaleCursorStyleHandler, scaleOrSkewActionName, scalingEqually, scalingXOrSkewingY, scalingYOrSkewingX } from "../controls.actions";
 
-  var fabric = global.fabric, controlsUtils = fabric.controlsUtils,
-      scaleSkewStyleHandler = controlsUtils.scaleSkewCursorStyleHandler,
-      scaleStyleHandler = controlsUtils.scaleCursorStyleHandler,
-      scalingEqually = controlsUtils.scalingEqually,
-      scalingYOrSkewingX = controlsUtils.scalingYOrSkewingX,
-      scalingXOrSkewingY = controlsUtils.scalingXOrSkewingY,
-      scaleOrSkewActionName = controlsUtils.scaleOrSkewActionName,
-      objectControls = fabric.Object.prototype.controls;
+export const ml = new Control({
+  x: -0.5,
+  y: 0,
+  cursorStyleHandler: scaleCursorStyleHandler,
+  actionHandler: scalingXOrSkewingY,
+  getActionName: scaleOrSkewActionName,
+});
 
-  objectControls.ml = new fabric.Control({
-    x: -0.5,
-    y: 0,
-    cursorStyleHandler: scaleSkewStyleHandler,
-    actionHandler: scalingXOrSkewingY,
-    getActionName: scaleOrSkewActionName,
-  });
+export const mr = new Control({
+  x: 0.5,
+  y: 0,
+  cursorStyleHandler: scaleCursorStyleHandler,
+  actionHandler: scalingXOrSkewingY,
+  getActionName: scaleOrSkewActionName,
+});
 
-  objectControls.mr = new fabric.Control({
-    x: 0.5,
-    y: 0,
-    cursorStyleHandler: scaleSkewStyleHandler,
-    actionHandler: scalingXOrSkewingY,
-    getActionName: scaleOrSkewActionName,
-  });
+export const mb = new Control({
+  x: 0,
+  y: 0.5,
+  cursorStyleHandler: scaleCursorStyleHandler,
+  actionHandler: scalingYOrSkewingX,
+  getActionName: scaleOrSkewActionName,
+});
 
-  objectControls.mb = new fabric.Control({
-    x: 0,
-    y: 0.5,
-    cursorStyleHandler: scaleSkewStyleHandler,
-    actionHandler: scalingYOrSkewingX,
-    getActionName: scaleOrSkewActionName,
-  });
+export const mt = new Control({
+  x: 0,
+  y: -0.5,
+  cursorStyleHandler: scaleCursorStyleHandler,
+  actionHandler: scalingYOrSkewingX,
+  getActionName: scaleOrSkewActionName,
+});
 
-  objectControls.mt = new fabric.Control({
-    x: 0,
-    y: -0.5,
-    cursorStyleHandler: scaleSkewStyleHandler,
-    actionHandler: scalingYOrSkewingX,
-    getActionName: scaleOrSkewActionName,
-  });
+export const tl = new Control({
+  x: -0.5,
+  y: -0.5,
+  cursorStyleHandler: scaleStyleHandler,
+  actionHandler: scalingEqually
+});
 
-  objectControls.tl = new fabric.Control({
-    x: -0.5,
-    y: -0.5,
-    cursorStyleHandler: scaleStyleHandler,
-    actionHandler: scalingEqually
-  });
+export const tr = new Control({
+  x: 0.5,
+  y: -0.5,
+  cursorStyleHandler: scaleStyleHandler,
+  actionHandler: scalingEqually
+});
 
-  objectControls.tr = new fabric.Control({
-    x: 0.5,
-    y: -0.5,
-    cursorStyleHandler: scaleStyleHandler,
-    actionHandler: scalingEqually
-  });
+export const bl = new Control({
+  x: -0.5,
+  y: 0.5,
+  cursorStyleHandler: scaleStyleHandler,
+  actionHandler: scalingEqually
+});
 
-  objectControls.bl = new fabric.Control({
-    x: -0.5,
-    y: 0.5,
-    cursorStyleHandler: scaleStyleHandler,
-    actionHandler: scalingEqually
-  });
+export const br = new Control({
+  x: 0.5,
+  y: 0.5,
+  cursorStyleHandler: scaleStyleHandler,
+  actionHandler: scalingEqually
+});
 
-  objectControls.br = new fabric.Control({
-    x: 0.5,
-    y: 0.5,
-    cursorStyleHandler: scaleStyleHandler,
-    actionHandler: scalingEqually
-  });
+export const mtr = new Control({
+  x: 0,
+  y: -0.5,
+  actionHandler: rotationWithSnapping,
+  cursorStyleHandler: rotationStyleHandler,
+  offsetY: -40,
+  withConnection: true,
+  actionName: 'rotate',
+});
 
-  objectControls.mtr = new fabric.Control({
-    x: 0,
-    y: -0.5,
-    actionHandler: controlsUtils.rotationWithSnapping,
-    cursorStyleHandler: controlsUtils.rotationStyleHandler,
-    offsetY: -40,
-    withConnection: true,
-    actionName: 'rotate',
-  });
+export const mlTextbox = new Control({
+  x: -0.5,
+  y: 0,
+  actionHandler: changeWidth,
+  cursorStyleHandler: scaleCursorStyleHandler,
+  actionName: 'resizing',
+});
 
-  if (fabric.Textbox) {
-    // this is breaking the prototype inheritance, no time / ideas to fix it.
-    // is important to document that if you want to have all objects to have a
-    // specific custom control, you have to add it to Object prototype and to Textbox
-    // prototype. The controls are shared as references. So changes to control `tr`
-    // can still apply to all objects if needed.
-    var textBoxControls = fabric.Textbox.prototype.controls = { };
+export const mrTextbox = new Control({
+  x: 0.5,
+  y: 0,
+  actionHandler: changeWidth,
+  cursorStyleHandler: scaleCursorStyleHandler,
+  actionName: 'resizing',
+});
 
-    textBoxControls.mtr = objectControls.mtr;
-    textBoxControls.tr = objectControls.tr;
-    textBoxControls.br = objectControls.br;
-    textBoxControls.tl = objectControls.tl;
-    textBoxControls.bl = objectControls.bl;
-    textBoxControls.mt = objectControls.mt;
-    textBoxControls.mb = objectControls.mb;
+export const ObjectControls = {
+  ml, mr, mb, mt, tl, tr, bl, bt, mtr
+}
 
-    textBoxControls.mr = new fabric.Control({
-      x: 0.5,
-      y: 0,
-      actionHandler: controlsUtils.changeWidth,
-      cursorStyleHandler: scaleSkewStyleHandler,
-      actionName: 'resizing',
-    });
-
-    textBoxControls.ml = new fabric.Control({
-      x: -0.5,
-      y: 0,
-      actionHandler: controlsUtils.changeWidth,
-      cursorStyleHandler: scaleSkewStyleHandler,
-      actionName: 'resizing',
-    });
-  }
-})(typeof exports !== 'undefined' ? exports : window);
+export const TextboxControls = {
+  ...ObjectControls, ml: mlTextbox, mr: mrTextbox
+}
