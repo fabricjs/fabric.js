@@ -1,6 +1,4 @@
 
-var fabric = global.fabric;
-
 type EventRegistryObject = { [eventName: string]: Function };
 
 
