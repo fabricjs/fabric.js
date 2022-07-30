@@ -12,6 +12,7 @@ export * from './itext_key_behavior.mixin';
 export * from './object.svg_export';
 export * from './object_ancestry.mixin';
 export * from './object_animation.mixin';
+export * from './object_geometry.mixin';
 export * from './object_interactivity.mixin';
 export * from './object_origin.mixin';
 export * from './object_stacking.mixin';
