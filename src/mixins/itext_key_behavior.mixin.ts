@@ -1,7 +1,9 @@
 //@ts-nocheck
 
-  var fabric = global.fabric;
-  
+var fabric = global.fabric;
+
+import { context } from "../../context";
+
 export function ITextKeyBehaviorMixinGenerator(Klass) {
   return class ITextKeyBehaviorMixin extends Klass {
 
@@ -9,7 +11,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
      * Initializes hidden textarea (needed to bring up keyboard in iOS)
      */
     initHiddenTextarea() {
-      this.hiddenTextarea = fabric.document.createElement('textarea');
+      this.hiddenTextarea = context.document.createElement('textarea');
       this.hiddenTextarea.setAttribute('autocapitalize', 'off');
       this.hiddenTextarea.setAttribute('autocorrect', 'off');
       this.hiddenTextarea.setAttribute('autocomplete', 'off');
@@ -20,8 +22,8 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
       // line-height: 1px; was removed from the style to fix this:
       // https://bugs.chromium.org/p/chromium/issues/detail?id=870966
       this.hiddenTextarea.style.cssText = 'position: absolute; top: ' + style.top +
-      '; left: ' + style.left + '; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px;' +
-      ' padding-top: ' + style.fontSize + ';';
+        '; left: ' + style.left + '; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px;' +
+        ' padding-top: ' + style.fontSize + ';';
 
       if (this.hiddenTextareaContainer) {
         this.hiddenTextareaContainer.appendChild(this.hiddenTextarea);
@@ -59,7 +61,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
      * The function must be in fabric.Itext.prototype.myFunction And will receive event as args[0]
      */
     keysMap = {
-      9:  'exitEditing',
+      9: 'exitEditing',
       27: 'exitEditing',
       33: 'moveCursorUp',
       34: 'moveCursorDown',
@@ -72,7 +74,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
     }
 
     keysMapRtl = {
-      9:  'exitEditing',
+      9: 'exitEditing',
       27: 'exitEditing',
       33: 'moveCursorUp',
       34: 'moveCursorDown',
@@ -178,15 +180,15 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
       }
       // decisions about style changes.
       var nextText = this._splitTextIntoLines(this.hiddenTextarea.value).graphemeText,
-          charCount = this._text.length,
-          nextCharCount = nextText.length,
-          removedText, insertedText,
-          charDiff = nextCharCount - charCount,
-          selectionStart = this.selectionStart, selectionEnd = this.selectionEnd,
-          selection = selectionStart !== selectionEnd,
-          copiedStyle, removeFrom, removeTo;
+        charCount = this._text.length,
+        nextCharCount = nextText.length,
+        removedText, insertedText,
+        charDiff = nextCharCount - charCount,
+        selectionStart = this.selectionStart, selectionEnd = this.selectionEnd,
+        selection = selectionStart !== selectionEnd,
+        copiedStyle, removeFrom, removeTo;
       if (this.hiddenTextarea.value === '') {
-        this.styles = { };
+        this.styles = {};
         this.updateFromTextArea();
         this.fire('changed');
         if (this.canvas) {
@@ -223,7 +225,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
           // is bigger than 0.
           copiedStyle = this.getSelectionStyles(selectionStart, selectionStart + 1, false);
           // now duplicate the style one for each inserted text.
-          copiedStyle = insertedText.map(function() {
+          copiedStyle = insertedText.map(function () {
             // this return an array of references, but that is fine since we are
             // copying the style later.
             return copiedStyle[0];
@@ -342,17 +344,17 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
      */
     getDownCursorOffset(e, isRight) {
       var selectionProp = this._getSelectionForOffset(e, isRight),
-          cursorLocation = this.get2DCursorLocation(selectionProp),
-          lineIndex = cursorLocation.lineIndex;
+        cursorLocation = this.get2DCursorLocation(selectionProp),
+        lineIndex = cursorLocation.lineIndex;
       // if on last line, down cursor goes to end of line
       if (lineIndex === this._textLines.length - 1 || e.metaKey || e.keyCode === 34) {
         // move to the end of a text
         return this._text.length - selectionProp;
       }
       var charIndex = cursorLocation.charIndex,
-          widthBeforeCursor = this._getWidthBeforeCursor(lineIndex, charIndex),
-          indexOnOtherLine = this._getIndexOnLine(lineIndex + 1, widthBeforeCursor),
-          textAfterCursor = this._textLines[lineIndex].slice(charIndex);
+        widthBeforeCursor = this._getWidthBeforeCursor(lineIndex, charIndex),
+        indexOnOtherLine = this._getIndexOnLine(lineIndex + 1, widthBeforeCursor),
+        textAfterCursor = this._textLines[lineIndex].slice(charIndex);
       return textAfterCursor.length + indexOnOtherLine + 1 + this.missingNewlineOffset(lineIndex);
     }
 
@@ -379,20 +381,20 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
      */
     getUpCursorOffset(e, isRight) {
       var selectionProp = this._getSelectionForOffset(e, isRight),
-          cursorLocation = this.get2DCursorLocation(selectionProp),
-          lineIndex = cursorLocation.lineIndex;
+        cursorLocation = this.get2DCursorLocation(selectionProp),
+        lineIndex = cursorLocation.lineIndex;
       if (lineIndex === 0 || e.metaKey || e.keyCode === 33) {
         // if on first line, up cursor goes to start of line
         return -selectionProp;
       }
       var charIndex = cursorLocation.charIndex,
-          widthBeforeCursor = this._getWidthBeforeCursor(lineIndex, charIndex),
-          indexOnOtherLine = this._getIndexOnLine(lineIndex - 1, widthBeforeCursor),
-          textBeforeCursor = this._textLines[lineIndex].slice(0, charIndex),
-          missingNewlineOffset = this.missingNewlineOffset(lineIndex - 1);
+        widthBeforeCursor = this._getWidthBeforeCursor(lineIndex, charIndex),
+        indexOnOtherLine = this._getIndexOnLine(lineIndex - 1, widthBeforeCursor),
+        textBeforeCursor = this._textLines[lineIndex].slice(0, charIndex),
+        missingNewlineOffset = this.missingNewlineOffset(lineIndex - 1);
       // return a negative offset
       return -this._textLines[lineIndex - 1].length
-      + indexOnOtherLine - textBeforeCursor.length + (1 - missingNewlineOffset);
+        + indexOnOtherLine - textBeforeCursor.length + (1 - missingNewlineOffset);
     }
 
     /**
@@ -402,9 +404,9 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
     _getIndexOnLine(lineIndex, width) {
 
       var line = this._textLines[lineIndex],
-          lineLeftOffset = this._getLineLeftOffset(lineIndex),
-          widthOfCharsOnLine = lineLeftOffset,
-          indexOnLine = 0, charWidth, foundMatch;
+        lineLeftOffset = this._getLineLeftOffset(lineIndex),
+        widthOfCharsOnLine = lineLeftOffset,
+        indexOnLine = 0, charWidth, foundMatch;
 
       for (var j = 0, jlen = line.length; j < jlen; j++) {
         charWidth = this.__charBounds[lineIndex][j].width;
@@ -412,9 +414,9 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
         if (widthOfCharsOnLine > width) {
           foundMatch = true;
           var leftEdge = widthOfCharsOnLine - charWidth,
-              rightEdge = widthOfCharsOnLine,
-              offsetFromLeftEdge = Math.abs(leftEdge - width),
-              offsetFromRightEdge = Math.abs(rightEdge - width);
+            rightEdge = widthOfCharsOnLine,
+            offsetFromLeftEdge = Math.abs(leftEdge - width),
+            offsetFromRightEdge = Math.abs(rightEdge - width);
 
           indexOnLine = offsetFromRightEdge < offsetFromLeftEdge ? j : (j - 1);
           break;
@@ -461,7 +463,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
       // getUpCursorOffset
       // getDownCursorOffset
       var action = 'get' + direction + 'CursorOffset',
-          offset = this[action](e, this._selectionDirection === 'right');
+        offset = this[action](e, this._selectionDirection === 'right');
       if (e.shiftKey) {
         this.moveCursorWithShift(offset);
       }
@@ -526,7 +528,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
       if (e.altKey) {
         newValue = this['findWordBoundary' + direction](this[prop]);
       }
-      else if (e.metaKey || e.keyCode === 35 ||  e.keyCode === 36 ) {
+      else if (e.metaKey || e.keyCode === 35 || e.keyCode === 36) {
         newValue = this['findLineBoundary' + direction](this[prop]);
       }
       else {
@@ -579,7 +581,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
       if (this._selectionDirection === 'right' && this.selectionStart !== this.selectionEnd) {
         return this._moveLeft(e, 'selectionEnd');
       }
-      else if (this.selectionStart !== 0){
+      else if (this.selectionStart !== 0) {
         this._selectionDirection = 'left';
         return this._moveLeft(e, 'selectionStart');
       }
@@ -707,5 +709,4 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
   }
 }
 
-fabric.IText = ITextKeyBehaviorMixinGenerator(fabric.IText);
 

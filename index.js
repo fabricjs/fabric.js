@@ -87,20 +87,20 @@ fabric.Object = ObjectAnimationMixinGenerator(fabric.Object);
 // import './src/shapes/group.class';
 // import './src/shapes/active_selection.class'; // optional interaction
 // import './src/shapes/image.class';
-import { ActiveSelection, Circle, Ellipse, Group, IText, Image, Line, Path, Polygon, Polyline, Rect, Text, Textbox, Triangle } from './src/shapes';
+import { ActiveSelection, Circle, Ellipse, Group, Image, Line, Path, Polygon, Polyline, Rect, Triangle } from './src/shapes';
 fabric.ActiveSelection = ActiveSelection;
 fabric.Circle = Circle;
 fabric.Ellipse = Ellipse;
 fabric.Group = Group;
-fabric.IText = IText;
 fabric.Image = Image;
 fabric.Line = Line;
 fabric.Path = Path;
 fabric.Polygon = Polygon;
 fabric.Polyline = Polyline;
 fabric.Rect = Rect;
-fabric.Text = Text;
-fabric.Textbox = Textbox;
+// fabric.Text = Text;
+// fabric.IText = IText;
+// fabric.Textbox = Textbox;
 fabric.Triangle = Triangle;
 import { ObjectStraighteningMixinGenerator, StaticCanvasObjectStraighteningMixinGenerator } from './src/mixins/object_straightening.mixin'; // optional objectstraightening
 
@@ -128,14 +128,21 @@ import './src/filters/blur_filter.class'; // optional image_filters
 import './src/filters/gamma_filter.class'; // optional image_filters
 import './src/filters/composed_filter.class'; // optional image_filters
 import './src/filters/hue_rotation.class'; // optional image_filters
-import './src/shapes/text.class'; // optional text
-import './src/mixins/text_style.mixin'; // optional text
-import './src/shapes/itext.class'; // optional itext
-import './src/mixins/itext_behavior.mixin'; // optional itext
-import './src/mixins/itext_click_behavior.mixin'; // optional itext
-import './src/mixins/itext_key_behavior.mixin'; // optional itext
-import './src/mixins/itext.svg_export'; // optional itext
-import './src/shapes/textbox.class'; // optional textbox
+import { Text } from './src/shapes/text.class'; // optional text
+import { TextStyleMixinGenerator } from './src/mixins/text_style.mixin'; // optional Text
+fabric.Text = TextStyleMixinGenerator(Text);
+import { IText } from './src/shapes/itext.class'; // optional itext
+fabric.IText = IText;
+import { ITextBehaviorMixinGenerator } from './src/mixins/itext_behavior.mixin'; // optional itext_behavior
+fabric.IText = ITextBehaviorMixinGenerator(fabric.IText);
+import { ITextClickBehaviorMixinGenerator } from './src/mixins/itext_click_behavior.mixin'; // optional itext
+fabric.IText = ITextClickBehaviorMixinGenerator(fabric.IText);
+import { ITextKeyBehaviorMixinGenerator } from './src/mixins/itext_key_behavior.mixin'; // optional itext_behavior
+fabric.IText = ITextKeyBehaviorMixinGenerator(fabric.IText);
+import { TextIMixinGenerator } from './src/mixins/itext.svg_export'; // optional itext
+fabric.Text = TextIMixinGenerator(fabric.Text);
+import { Textbox } from './src/shapes/textbox.class'; // optional textbox
+// fabric.Textbox = Textbox;
 import { ObjectControls, TextboxControls } from './src/mixins/default_controls'; // optional interaction
 FabricObject.prototype.controls = ObjectControls;
 // this is breaking the prototype inheritance, no time / ideas to fix it.

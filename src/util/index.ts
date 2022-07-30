@@ -16,7 +16,6 @@ import './lang_string';
 import './misc';
 import './path';
 
-console.log(fabric)
 const {
     sin,
     getElementOffset,
@@ -47,7 +46,8 @@ const {
     getPointOnPath,
     string: {
         graphemeSplit,
-        capitalize
+        capitalize,
+        escapeXml
     },
     projectStrokeOnPoints,
     array: {
@@ -84,7 +84,8 @@ const {
     removeListener,
     isTouchEvent,
     sendPointToPlane,
-    radiansToDegrees
+    radiansToDegrees,
+    setStyle
 } = fabric.util;
 export {
     sin,
@@ -116,6 +117,7 @@ export {
     getPointOnPath,
     graphemeSplit,
     capitalize,
+    escapeXml,
     projectStrokeOnPoints,
     min,
     max,
@@ -147,6 +149,7 @@ export {
     removeListener,
     isTouchEvent,
     sendPointToPlane,
-    radiansToDegrees
+    radiansToDegrees,
+    setStyle
 };
 export default fabric.util;

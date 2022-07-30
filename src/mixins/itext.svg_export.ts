@@ -1,8 +1,15 @@
 //@ts-nocheck
 /* _TO_SVG_START_ */
 
-var fabric = global.fabric, toFixed = fabric.util.toFixed,
-  multipleSpacesRegex = /  +/g;
+import { Color } from "../color";
+import { toFixed } from "../util";
+
+import { NUM_FRACTION_DIGITS } from '../config';
+import {
+  escapeXml, hasStyleChanged
+} from '../util';
+
+const multipleSpacesRegex = /  +/g;
 
 
 export function TextIMixinGenerator(Klass) {
@@ -102,8 +109,7 @@ export function TextIMixinGenerator(Klass) {
       var shouldUseWhitespace = _char !== _char.trim() || _char.match(multipleSpacesRegex),
         styleProps = this.getSvgSpanStyles(styleDecl, shouldUseWhitespace),
         fillStyles = styleProps ? 'style="' + styleProps + '"' : '',
-        dy = styleDecl.deltaY, dySpan = '',
-        NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+        dy = styleDecl.deltaY, dySpan = '';
       if (dy) {
         dySpan = ' dy="' + toFixed(dy, NUM_FRACTION_DIGITS) + '" ';
       }
@@ -111,7 +117,7 @@ export function TextIMixinGenerator(Klass) {
         '<tspan x="', toFixed(left, NUM_FRACTION_DIGITS), '" y="',
         toFixed(top, NUM_FRACTION_DIGITS), '" ', dySpan,
         fillStyles, '>',
-        fabric.util.string.escapeXml(_char),
+        escapeXml(_char),
         '</tspan>'
       ].join('');
     }
@@ -149,7 +155,7 @@ export function TextIMixinGenerator(Klass) {
           // if we have charSpacing, we render char by char
           actualStyle = actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
           nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
-          timeToRender = fabric.util.hasStyleChanged(actualStyle, nextStyle, true);
+          timeToRender = hasStyleChanged(actualStyle, nextStyle, true);
         }
         if (timeToRender) {
           style = this._getStyleDeclaration(lineIndex, i) || {};
@@ -168,7 +174,6 @@ export function TextIMixinGenerator(Klass) {
     }
 
     _pushTextBgRect(textBgRects, color, left, top, width, height) {
-      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
       textBgRects.push(
         '\t\t<rect ',
         this._getFillAttributes(color),
@@ -217,7 +222,7 @@ export function TextIMixinGenerator(Klass) {
      * @return {String}
      */
     _getFillAttributes(value) {
-      var fillColor = (value && typeof value === 'string') ? new fabric.Color(value) : '';
+      var fillColor = (value && typeof value === 'string') ? new Color(value) : '';
       if (!fillColor || !fillColor.getSource() || fillColor.getAlpha() === 1) {
         return 'fill="' + value + '"';
       }
@@ -245,13 +250,13 @@ export function TextIMixinGenerator(Klass) {
      * @return {String}
      */
     getSvgStyles(skipShadow) {
-      var svgStyle = fabric.Object.prototype.getSvgStyles.call(this, skipShadow);
+      var svgStyle = super.getSvgStyles(skipShadow);
       return svgStyle + ' white-space: pre;';
     }
   }
 }
 
-fabric.Text = TextIMixinGenerator(fabric.Text);
+
 
 
 /* _TO_SVG_END_ */

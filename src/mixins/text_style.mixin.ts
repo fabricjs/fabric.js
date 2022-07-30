@@ -1,7 +1,6 @@
 //@ts-nocheck
 
-  var fabric = global.fabric;
-  
+
 export function TextStyleMixinGenerator(Klass) {
   return class TextStyleMixin extends Klass {
     /**
@@ -70,14 +69,14 @@ export function TextStyleMixinGenerator(Klass) {
         return false;
       }
       var obj = this.styles, stylesCount = 0, letterCount, stylePropertyValue,
-          allStyleObjectPropertiesMatch = true, graphemeCount = 0, styleObject;
+        allStyleObjectPropertiesMatch = true, graphemeCount = 0, styleObject;
       // eslint-disable-next-line
       for (var p1 in obj) {
         letterCount = 0;
         // eslint-disable-next-line
         for (var p2 in obj[p1]) {
           var styleObject = obj[p1][p2],
-              stylePropertyHasBeenSet = styleObject.hasOwnProperty(property);
+            stylePropertyHasBeenSet = styleObject.hasOwnProperty(property);
 
           stylesCount++;
 
@@ -160,7 +159,7 @@ export function TextStyleMixinGenerator(Klass) {
         this._setStyleDeclaration(loc.lineIndex, loc.charIndex, {});
       }
 
-      fabric.util.object.extend(this._getStyleDeclaration(loc.lineIndex, loc.charIndex), styles);
+      Object.assign(this._getStyleDeclaration(loc.lineIndex, loc.charIndex), styles);
     }
 
     /**
@@ -173,7 +172,7 @@ export function TextStyleMixinGenerator(Klass) {
         selectionStart = this.selectionStart;
       }
       var lines = skipWrapping ? this._unwrappedTextLines : this._textLines,
-          len = lines.length;
+        len = lines.length;
       for (var i = 0; i < len; i++) {
         if (selectionStart <= lines[i].length) {
           return {
@@ -220,8 +219,8 @@ export function TextStyleMixinGenerator(Klass) {
      */
     getStyleAtPosition(position, complete) {
       var loc = this.get2DCursorLocation(position),
-          style = complete ? this.getCompleteStyleDeclaration(loc.lineIndex, loc.charIndex) :
-            this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
+        style = complete ? this.getCompleteStyleDeclaration(loc.lineIndex, loc.charIndex) :
+          this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
       return style || {};
     }
 
@@ -230,7 +229,6 @@ export function TextStyleMixinGenerator(Klass) {
      * @param {Object} [styles] Styles object
      * @param {Number} [startIndex] Start index to get styles at
      * @param {Number} [endIndex] End index to get styles at, if not specified selectionEnd or startIndex + 1
-     * @return {fabric.IText} thisArg
      * @chainable
      */
     setSelectionStyles(styles, startIndex, endIndex) {
@@ -270,8 +268,8 @@ export function TextStyleMixinGenerator(Klass) {
      * @return {Object} style object
      */
     getCompleteStyleDeclaration(lineIndex, charIndex) {
-      var style = this._getStyleDeclaration(lineIndex, charIndex) || { },
-          styleObject = { }, prop;
+      var style = this._getStyleDeclaration(lineIndex, charIndex) || {},
+        styleObject = {}, prop;
       for (var i = 0; i < this._styleProperties.length; i++) {
         prop = this._styleProperties[i];
         styleObject[prop] = typeof style[prop] === 'undefined' ? this[prop] : style[prop];
@@ -327,5 +325,4 @@ export function TextStyleMixinGenerator(Klass) {
   }
 }
 
-fabric.Text = TextStyleMixinGenerator(fabric.Text);
 

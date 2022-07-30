@@ -1,7 +1,12 @@
 //@ts-nocheck
 
-  var fabric = global.fabric;
-  
+import { context } from "../../context";
+import { reNonWord } from "../constants";
+import {
+  clone, createCanvasElement, removeFromArray, transformPoint
+} from '../util';
+import { Point } from './point.class';
+
 export function ITextBehaviorMixinGenerator(Klass) {
   return class ITextBehaviorMixin extends Klass {
 
@@ -57,7 +62,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
         var canvas = opt.target;
         if (canvas) {
           canvas._iTextInstances = canvas._iTextInstances || [];
-          fabric.util.removeFromArray(canvas._iTextInstances, _this);
+          removeFromArray(canvas._iTextInstances, _this);
           if (canvas._iTextInstances.length === 0) {
             canvas._hasITextHandlers = false;
             _this._removeCanvasHandlers(canvas);
@@ -71,9 +76,9 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @private
      */
     _initCanvasHandlers(canvas) {
-      canvas._mouseUpITextHandler = function() {
+      canvas._mouseUpITextHandler = function () {
         if (canvas._iTextInstances) {
-          canvas._iTextInstances.forEach(function(obj) {
+          canvas._iTextInstances.forEach(function (obj) {
             obj.__isMousedown = false;
           });
         }
@@ -102,25 +107,25 @@ export function ITextBehaviorMixinGenerator(Klass) {
     _animateCursor(obj, targetOpacity, duration, completeMethod) {
       var tickState = {
         isAborted: false,
-        abort: function() {
+        abort: function () {
           this.isAborted = true;
         },
       };
 
       obj.animate('_currentCursorOpacity', targetOpacity, {
         duration: duration,
-        onComplete: function() {
+        onComplete: function () {
           if (!tickState.isAborted) {
             obj[completeMethod]();
           }
         },
-        onChange: function() {
+        onChange: function () {
           // we do not want to animate a selection, only cursor
           if (obj.canvas && obj.selectionStart === obj.selectionEnd) {
             obj.renderCursorOrSelection();
           }
         },
-        abort: function() {
+        abort: function () {
           return tickState.isAborted;
         }
       });
@@ -137,7 +142,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
       if (this._cursorTimeout1) {
         clearTimeout(this._cursorTimeout1);
       }
-      this._cursorTimeout1 = setTimeout(function() {
+      this._cursorTimeout1 = setTimeout(function () {
         _this._currentTickCompleteState = _this._animateCursor(_this, 0, this.cursorDuration / 2, '_tick');
       }, 100);
     }
@@ -147,7 +152,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
      */
     initDelayedCursor(restart) {
       var _this = this,
-          delay = restart ? 0 : this.cursorDelay;
+        delay = restart ? 0 : this.cursorDelay;
 
       this.abortCursorAnimation();
       if (delay) {
@@ -181,7 +186,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
 
     /**
      * Selects entire text
-     * @return {fabric.IText} thisArg
+     * @return {IText} thisArg
      * @chainable
      */
     selectAll() {
@@ -286,10 +291,9 @@ export function ITextBehaviorMixinGenerator(Klass) {
      */
     searchWordBoundary(selectionStart, direction) {
       var text = this._text,
-          index     = this._reSpace.test(text[selectionStart]) ? selectionStart - 1 : selectionStart,
-          _char     = text[index],
-          // wrong
-          reNonWord = fabric.reNonWord;
+        index = this._reSpace.test(text[selectionStart]) ? selectionStart - 1 : selectionStart,
+        _char = text[index],
+      // `reNonWord` wrong... Had this comment here, @ShaMan123 I don't know what it means 31/07/22
 
       while (!reNonWord.test(_char) && index > 0 && index < text.length) {
         index += direction;
@@ -308,7 +312,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
     selectWord(selectionStart) {
       selectionStart = selectionStart || this.selectionStart;
       var newSelectionStart = this.searchWordBoundary(selectionStart, -1), /* search backwards */
-          newSelectionEnd = this.searchWordBoundary(selectionStart, 1); /* search forward */
+        newSelectionEnd = this.searchWordBoundary(selectionStart, 1); /* search forward */
 
       this.selectionStart = newSelectionStart;
       this.selectionEnd = newSelectionEnd;
@@ -320,13 +324,13 @@ export function ITextBehaviorMixinGenerator(Klass) {
     /**
      * Selects a line based on the index
      * @param {Number} selectionStart Index of a character
-     * @return {fabric.IText} thisArg
+     * @return {IText} thisArg
      * @chainable
      */
     selectLine(selectionStart) {
       selectionStart = selectionStart || this.selectionStart;
       var newSelectionStart = this.findLineBoundaryLeft(selectionStart),
-          newSelectionEnd = this.findLineBoundaryRight(selectionStart);
+        newSelectionEnd = this.findLineBoundaryRight(selectionStart);
 
       this.selectionStart = newSelectionStart;
       this.selectionEnd = newSelectionEnd;
@@ -337,7 +341,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
 
     /**
      * Enters editing state
-     * @return {fabric.IText} thisArg
+     * @return {IText} thisArg
      * @chainable
      */
     enterEditing(e) {
@@ -373,7 +377,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
 
     exitEditingOnOthers(canvas) {
       if (canvas._iTextInstances) {
-        canvas._iTextInstances.forEach(function(obj) {
+        canvas._iTextInstances.forEach(function (obj) {
           obj.selected = false;
           if (obj.isEditing) {
             obj.exitEditing();
@@ -398,8 +402,8 @@ export function ITextBehaviorMixinGenerator(Klass) {
       }
 
       var newSelectionStart = this.getSelectionStartFromPointer(options.e),
-          currentStart = this.selectionStart,
-          currentEnd = this.selectionEnd;
+        currentStart = this.selectionStart,
+        currentEnd = this.selectionEnd;
       if (
         (newSelectionStart !== this.__selectionStartOnMouseDown || currentStart === currentEnd)
         &&
@@ -435,23 +439,23 @@ export function ITextBehaviorMixinGenerator(Klass) {
      */
     setDragImage(e, data) {
       var t = this.calcTransformMatrix();
-      var flipFactor = new fabric.Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
+      var flipFactor = new Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
       var boundaries = this._getCursorBoundaries(data.selectionStart);
-      var selectionPosition = new fabric.Point(
+      var selectionPosition = new Point(
         boundaries.left + boundaries.leftOffset,
         boundaries.top + boundaries.topOffset
       ).multiply(flipFactor);
-      var pos = fabric.util.transformPoint(selectionPosition, t);
+      var pos = transformPoint(selectionPosition, t);
       var pointer = this.canvas.getPointer(e);
       var diff = pointer.subtract(pos);
       var enableRetinaScaling = this.canvas._isRetinaScaling();
       var retinaScaling = this.canvas.getRetinaScaling();
       var bbox = this.getBoundingRect(true);
-      var correction = pos.subtract(new fabric.Point(bbox.left, bbox.top));
+      var correction = pos.subtract(new Point(bbox.left, bbox.top));
       var offset = correction.add(diff).scalarMultiply(retinaScaling);
       //  prepare instance for drag image snapshot by making all non selected text invisible
       var bgc = this.backgroundColor;
-      var styles = fabric.util.object.clone(this.styles, true);
+      var styles = clone(this.styles, true);
       delete this.backgroundColor;
       var styleOverride = {
         fill: 'transparent',
@@ -464,7 +468,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
       this.styles = styles;
       //  handle retina scaling
       if (enableRetinaScaling && retinaScaling > 1) {
-        var c = fabric.util.createCanvasElement();
+        var c = createCanvasElement();
         c.width = dragImage.width / retinaScaling;
         c.height = dragImage.height / retinaScaling;
         var ctx = c.getContext('2d');
@@ -477,12 +481,12 @@ export function ITextBehaviorMixinGenerator(Klass) {
         dragImage.remove();
       };
       //  position drag image offsecreen
-      fabric.util.setStyle(dragImage, {
+      setStyle(dragImage, {
         position: 'absolute',
         left: -dragImage.width + 'px',
         border: 'none'
       });
-      fabric.document.body.appendChild(dragImage);
+      context.document.body.appendChild(dragImage);
       e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
     }
 
@@ -712,12 +716,12 @@ export function ITextBehaviorMixinGenerator(Klass) {
      */
     fromStringToGraphemeSelection(start, end, text) {
       var smallerTextStart = text.slice(0, start),
-          graphemeStart = this.graphemeSplit(smallerTextStart).length;
+        graphemeStart = this.graphemeSplit(smallerTextStart).length;
       if (start === end) {
         return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
       }
       var smallerTextEnd = text.slice(start, end),
-          graphemeEnd = this.graphemeSplit(smallerTextEnd).length;
+        graphemeEnd = this.graphemeSplit(smallerTextEnd).length;
       return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
     }
 
@@ -726,12 +730,12 @@ export function ITextBehaviorMixinGenerator(Klass) {
      */
     fromGraphemeToStringSelection(start, end, _text) {
       var smallerTextStart = _text.slice(0, start),
-          graphemeStart = smallerTextStart.join('').length;
+        graphemeStart = smallerTextStart.join('').length;
       if (start === end) {
         return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
       }
       var smallerTextEnd = _text.slice(start, end),
-          graphemeEnd = smallerTextEnd.join('').length;
+        graphemeEnd = smallerTextEnd.join('').length;
       return { selectionStart: graphemeStart, selectionEnd: graphemeStart + graphemeEnd };
     }
 
@@ -739,7 +743,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @private
      */
     _updateTextarea() {
-      this.cursorOffsetCache = { };
+      this.cursorOffsetCache = {};
       if (!this.hiddenTextarea) {
         return;
       }
@@ -758,7 +762,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
       if (!this.hiddenTextarea) {
         return;
       }
-      this.cursorOffsetCache = { };
+      this.cursorOffsetCache = {};
       this.text = this.hiddenTextarea.value;
       if (this._shouldClearDimensionCache()) {
         this.initDimensions();
@@ -793,28 +797,28 @@ export function ITextBehaviorMixinGenerator(Klass) {
         return { x: 1, y: 1 };
       }
       var desiredPosition = this.inCompositionMode ? this.compositionStart : this.selectionStart,
-          boundaries = this._getCursorBoundaries(desiredPosition),
-          cursorLocation = this.get2DCursorLocation(desiredPosition),
-          lineIndex = cursorLocation.lineIndex,
-          charIndex = cursorLocation.charIndex,
-          charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize') * this.lineHeight,
-          leftOffset = boundaries.leftOffset,
-          m = this.calcTransformMatrix(),
-          p = {
-            x: boundaries.left + leftOffset,
-            y: boundaries.top + boundaries.topOffset + charHeight
-          },
-          retinaScaling = this.canvas.getRetinaScaling(),
-          upperCanvas = this.canvas.upperCanvasEl,
-          upperCanvasWidth = upperCanvas.width / retinaScaling,
-          upperCanvasHeight = upperCanvas.height / retinaScaling,
-          maxWidth = upperCanvasWidth - charHeight,
-          maxHeight = upperCanvasHeight - charHeight,
-          scaleX = upperCanvas.clientWidth / upperCanvasWidth,
-          scaleY = upperCanvas.clientHeight / upperCanvasHeight;
+        boundaries = this._getCursorBoundaries(desiredPosition),
+        cursorLocation = this.get2DCursorLocation(desiredPosition),
+        lineIndex = cursorLocation.lineIndex,
+        charIndex = cursorLocation.charIndex,
+        charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize') * this.lineHeight,
+        leftOffset = boundaries.leftOffset,
+        m = this.calcTransformMatrix(),
+        p = {
+          x: boundaries.left + leftOffset,
+          y: boundaries.top + boundaries.topOffset + charHeight
+        },
+        retinaScaling = this.canvas.getRetinaScaling(),
+        upperCanvas = this.canvas.upperCanvasEl,
+        upperCanvasWidth = upperCanvas.width / retinaScaling,
+        upperCanvasHeight = upperCanvas.height / retinaScaling,
+        maxWidth = upperCanvasWidth - charHeight,
+        maxHeight = upperCanvasHeight - charHeight,
+        scaleX = upperCanvas.clientWidth / upperCanvasWidth,
+        scaleY = upperCanvas.clientHeight / upperCanvasHeight;
 
-      p = fabric.util.transformPoint(p, m);
-      p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
+      p = transformPoint(p, m);
+      p = transformPoint(p, this.canvas.viewportTransform);
       p.x *= scaleX;
       p.y *= scaleY;
       if (p.x < 0) {
@@ -878,7 +882,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
 
     /**
      * Exits from editing state
-     * @return {fabric.IText} thisArg
+     * @return {IText} thisArg
      * @chainable
      */
     exitEditing() {
@@ -928,12 +932,12 @@ export function ITextBehaviorMixinGenerator(Klass) {
      */
     removeStyleFromTo(start, end) {
       var cursorStart = this.get2DCursorLocation(start, true),
-          cursorEnd = this.get2DCursorLocation(end, true),
-          lineStart = cursorStart.lineIndex,
-          charStart = cursorStart.charIndex,
-          lineEnd = cursorEnd.lineIndex,
-          charEnd = cursorEnd.charIndex,
-          i, styleObj;
+        cursorEnd = this.get2DCursorLocation(end, true),
+        lineStart = cursorStart.lineIndex,
+        charStart = cursorStart.charIndex,
+        lineEnd = cursorEnd.lineIndex,
+        charEnd = cursorEnd.charIndex,
+        i, styleObj;
       if (lineStart !== lineEnd) {
         // step1 remove the trailing of lineStart
         if (this.styles[lineStart]) {
@@ -946,7 +950,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
           for (i = charEnd; i < this._unwrappedTextLines[lineEnd].length; i++) {
             styleObj = this.styles[lineEnd][i];
             if (styleObj) {
-              this.styles[lineStart] || (this.styles[lineStart] = { });
+              this.styles[lineStart] || (this.styles[lineStart] = {});
               this.styles[lineStart][charStart + i - charEnd] = styleObj;
             }
           }
@@ -1017,9 +1021,9 @@ export function ITextBehaviorMixinGenerator(Klass) {
      */
     insertNewlineStyleObject(lineIndex, charIndex, qty, copiedStyle) {
       var currentCharStyle,
-          newLineStyles = {},
-          somethingAdded = false,
-          isEndOfLine = this._unwrappedTextLines[lineIndex].length === charIndex;
+        newLineStyles = {},
+        somethingAdded = false,
+        isEndOfLine = this._unwrappedTextLines[lineIndex].length === charIndex;
 
       qty || (qty = 1);
       this.shiftLineStyles(lineIndex, qty);
@@ -1079,7 +1083,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
         this.styles = {};
       }
       var currentLineStyles = this.styles[lineIndex],
-          currentLineStylesCloned = currentLineStyles ? Object.assign({}, currentLineStyles) : {};
+        currentLineStylesCloned = currentLineStyles ? Object.assign({}, currentLineStyles) : {};
 
       quantity || (quantity = 1);
       // shift all char styles by quantity forward
@@ -1124,7 +1128,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
      */
     insertNewStyleBlock(insertedText, start, copiedStyle) {
       var cursorLoc = this.get2DCursorLocation(start, true),
-          addedLines = [0], linesLength = 0;
+        addedLines = [0], linesLength = 0;
       // get an array of how many char per lines are being added.
       for (var i = 0; i < insertedText.length; i++) {
         if (insertedText[i] === '\n') {
@@ -1217,5 +1221,4 @@ export function ITextBehaviorMixinGenerator(Klass) {
   }
 }
 
-fabric.IText = ITextBehaviorMixinGenerator(fabric.IText);
 

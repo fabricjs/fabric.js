@@ -1,7 +1,5 @@
 //@ts-nocheck
 
-  var fabric = global.fabric;
-  
 export function ITextClickBehaviorMixinGenerator(Klass) {
   return class ITextClickBehaviorMixin extends Klass {
     /**
@@ -15,7 +13,7 @@ export function ITextClickBehaviorMixinGenerator(Klass) {
       // for triple click
       this.__lastLastClickTime = +new Date();
 
-      this.__lastPointer = { };
+      this.__lastPointer = {};
 
       this.on('mousedown', this.onMouseDown);
     }
@@ -43,9 +41,9 @@ export function ITextClickBehaviorMixinGenerator(Klass) {
 
     isTripleClick(newPointer) {
       return this.__newClickTime - this.__lastClickTime < 500 &&
-          this.__lastClickTime - this.__lastLastClickTime < 500 &&
-          this.__lastPointer.x === newPointer.x &&
-          this.__lastPointer.y === newPointer.y;
+        this.__lastClickTime - this.__lastLastClickTime < 500 &&
+        this.__lastPointer.x === newPointer.x &&
+        this.__lastPointer.y === newPointer.y;
     }
 
     /**
@@ -200,7 +198,7 @@ export function ITextClickBehaviorMixinGenerator(Klass) {
      */
     setCursorByClick(e) {
       var newSelection = this.getSelectionStartFromPointer(e),
-          start = this.selectionStart, end = this.selectionEnd;
+        start = this.selectionStart, end = this.selectionEnd;
       if (e.shiftKey) {
         this.setSelectionStartEndWithShift(start, end, newSelection);
       }
@@ -221,13 +219,13 @@ export function ITextClickBehaviorMixinGenerator(Klass) {
      */
     getSelectionStartFromPointer(e) {
       var mouseOffset = this.getLocalPointer(e),
-          prevWidth = 0,
-          width = 0,
-          height = 0,
-          charIndex = 0,
-          lineIndex = 0,
-          lineLeftOffset,
-          line;
+        prevWidth = 0,
+        width = 0,
+        height = 0,
+        charIndex = 0,
+        lineIndex = 0,
+        lineLeftOffset,
+        line;
       for (var i = 0, len = this._textLines.length; i < len; i++) {
         if (height <= mouseOffset.y) {
           height += this.getHeightOfLine(i) * this.scaleY;
@@ -270,10 +268,10 @@ export function ITextClickBehaviorMixinGenerator(Klass) {
     _getNewSelectionStartFromOffset(mouseOffset, prevWidth, width, index, jlen) {
       // we need Math.abs because when width is after the last char, the offset is given as 1, while is 0
       var distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth,
-          distanceBtwNextCharAndCursor = width - mouseOffset.x,
-          offset = distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor ||
-            distanceBtwNextCharAndCursor < 0 ? 0 : 1,
-          newSelectionStart = index + offset;
+        distanceBtwNextCharAndCursor = width - mouseOffset.x,
+        offset = distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor ||
+          distanceBtwNextCharAndCursor < 0 ? 0 : 1,
+        newSelectionStart = index + offset;
       // if object is horizontally flipped, mirror cursor location from the end
       if (this.flipX) {
         newSelectionStart = jlen - newSelectionStart;
@@ -288,5 +286,4 @@ export function ITextClickBehaviorMixinGenerator(Klass) {
   }
 }
 
-fabric.IText = ITextClickBehaviorMixinGenerator(fabric.IText);
 
