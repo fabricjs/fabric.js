@@ -99,7 +99,6 @@ export {
     findScaleToFit,
     findScaleToCover,
     stylesFromArray,
-    stylesFromArray,
     stylesToArray,
     hasStyleChanged,
     getPathSegmentsInfo,
@@ -123,5 +122,7 @@ export {
     matrixToSVG,
     sizeAfterTransform,
     animate,
-    animateColor
+    animateColor,
+    requestAnimFrame,
+    cancelAnimFrame,
 };
