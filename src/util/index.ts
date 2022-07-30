@@ -1,7 +1,7 @@
 //@ts-nocheck
-const fabric = { util: {} };
 export * from './cos';
 export * from './removeDefaultValues';
+import { fabric } from '../../main'
 import './animate'; // optional animation
 import './animate_color'; // optional animation
 import './anim_ease'; // optional easing
@@ -16,7 +16,7 @@ import './lang_string';
 import './misc';
 import './path';
 
-
+console.log(fabric)
 const {
     sin,
     getElementOffset,
