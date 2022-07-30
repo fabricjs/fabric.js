@@ -1,62 +1,58 @@
-(function(global){
-  var fabric = global.fabric;
-  /**
-   * @namespace fabric.Collection
-   */
-  fabric.Collection = {
+import type { Object } from "../shapes/object.class";
+
+export function CollectionMixinGenerator<T extends new (...args: any[]) => any>(Klass: T) {
+  return class Collection extends Klass {
 
     /**
-     * @type {fabric.Object[]}
+     * @type {Object[]}
      */
-    _objects: [],
+    _objects: Object[] = [];
 
     /**
      * Adds objects to collection, Canvas or Group, then renders canvas
      * (if `renderOnAddRemove` is not `false`).
-     * Objects should be instances of (or inherit from) fabric.Object
+     * Objects should be instances of (or inherit from) Object
      * @private
-     * @param {fabric.Object[]} objects to add
-     * @param {(object:fabric.Object) => any} [callback]
+     * @param {Object[]} objects to add
+     * @param {(object:Object) => any} [callback]
      * @returns {number} new array length
      */
-    add: function (objects, callback) {
-      var size = this._objects.push.apply(this._objects, objects);
+    add(objects: Object[], callback: (object: object) => any): number {
+      var size = this._objects.push(...objects);
       if (callback) {
         for (var i = 0; i < objects.length; i++) {
           callback.call(this, objects[i]);
         }
       }
       return size;
-    },
+    }
 
     /**
      * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
-     * An object should be an instance of (or inherit from) fabric.Object
-     * @private
-     * @param {fabric.Object|fabric.Object[]} objects Object(s) to insert
+     * An object should be an instance of (or inherit from) Object
+     * 
+     * @param {Object | Object[]} arg Object(s) to insert
      * @param {Number} index Index to insert object at
-     * @param {(object:fabric.Object) => any} [callback]
+     * @param {(object: Object) => any} [callback]
      * @returns {number} new array length
      */
-    insertAt: function (objects, index, callback) {
-      var args = [index, 0].concat(objects);
-      this._objects.splice.apply(this._objects, args);
+    insertAt(arg: Object | Object[], index: number, callback: (object: Object) => any): number {
+      const objects = Array.isArray(arg) ? arg : [arg];
+      this._objects.splice(index, 0, ...objects);
       if (callback) {
-        for (var i = 2; i < args.length; i++) {
-          callback.call(this, args[i]);
-        }
+        objects.forEach(callback.bind(this));
       }
       return this._objects.length;
-    },
+    }
 
     /**
      * Removes objects from a collection, then renders canvas (if `renderOnAddRemove` is not `false`)
      * @private
-     * @param {fabric.Object[]} objectsToRemove objects to remove
-     * @param {(object:fabric.Object) => any} [callback] function to call for each object removed
-     * @returns {fabric.Object[]} removed objects
+     * @param {Object[]} objectsToRemove objects to remove
+     * @param {(object:Object) => any} [callback] function to call for each object removed
+     * @returns {Object[]} removed objects
      */
-    remove: function(objectsToRemove, callback) {
+    remove(objectsToRemove: Object[], callback: (object: Object) => any): Object[] {
       var objects = this._objects, removed = [];
       for (var i = 0, object, index; i < objectsToRemove.length; i++) {
         object = objectsToRemove[i];
@@ -69,7 +65,7 @@
         }
       }
       return removed;
-    },
+    }
 
     /**
      * Executes given function for each object in this group
@@ -80,66 +76,60 @@
      *                   when no `context` argument is given
      *
      * @param {Object} context Context (aka thisObject)
-     * @return {Self} thisArg
      * @chainable
      */
-    forEachObject: function(callback, context) {
+    forEachObject(callback: (object: Object, index: number, array: Object[]) => any, context?: object) {
       var objects = this.getObjects();
       for (var i = 0; i < objects.length; i++) {
         callback.call(context, objects[i], i, objects);
       }
       return this;
-    },
+    }
 
     /**
      * Returns an array of children objects of this instance
      * @param {...String} [types] When specified, only objects of these types are returned
-     * @return {Array}
      */
-    getObjects: function() {
-      if (arguments.length === 0) {
+    getObjects(...types: string[]) {
+      if (types.length === 0) {
         return this._objects.concat();
       }
-      var types = Array.from(arguments);
-      return this._objects.filter(function (o) {
-        return types.indexOf(o.type) > -1;
-      });
-    },
+      return this._objects.filter((o) => types.includes(o.type));
+    }
 
     /**
      * Returns object at specified index
      * @param {Number} index
-     * @return {Self} thisArg
      */
-    item: function (index) {
+    item(index: number) {
       return this._objects[index];
-    },
+    }
 
     /**
      * Returns true if collection contains no objects
      * @return {Boolean} true if collection is empty
      */
-    isEmpty: function () {
+    isEmpty(): boolean {
       return this._objects.length === 0;
-    },
+    }
 
     /**
      * Returns a size of a collection (i.e: length of an array containing its objects)
      * @return {Number} Collection size
      */
-    size: function() {
+    size(): number {
       return this._objects.length;
-    },
+    }
 
     /**
      * Returns true if collection contains an object.\
-     * **Prefer using {@link `fabric.Object#isDescendantOf`} for performance reasons**
+     * **Prefer using {@link `Object#isDescendantOf`} for performance reasons**
      * instead of a.contains(b) use b.isDescendantOf(a)
      * @param {Object} object Object to check against
      * @param {Boolean} [deep=false] `true` to check all descendants, `false` to check only `_objects`
      * @return {Boolean} `true` if collection contains an object
      */
-    contains: function (object, deep) {
+    contains(object: Object, deep: boolean = false): boolean {
       if (this._objects.indexOf(object) > -1) {
         return true;
       }
@@ -149,17 +139,17 @@
         });
       }
       return false;
-    },
+    }
 
     /**
      * Returns number representation of a collection complexity
      * @return {Number} complexity
      */
-    complexity: function () {
+    complexity(): number {
       return this._objects.reduce(function (memo, current) {
         memo += current.complexity ? current.complexity() : 0;
         return memo;
       }, 0);
     }
-  };
-})(typeof exports !== 'undefined' ? exports : window);
+  }
+}
