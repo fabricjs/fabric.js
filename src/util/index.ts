@@ -73,7 +73,7 @@ const {
     animateColor,
     requestAnimFrame,
     cancelAnimFrame,
-
+    rotateVector
 } = fabric.util;
 export {
     sin,
@@ -125,4 +125,5 @@ export {
     animateColor,
     requestAnimFrame,
     cancelAnimFrame,
+    rotateVector
 };
