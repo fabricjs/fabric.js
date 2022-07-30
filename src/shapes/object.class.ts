@@ -1,18 +1,18 @@
 //@ts-nocheck
 
+import { RUNNING_ANIMATIONS } from 'util/animate';
 import { browserShadowBlurConstant, maxCacheSideLimit, minCacheSideLimit, NUM_FRACTION_DIGITS } from '../config';
 import { ALIASING_LIMIT, devicePixelRatio, iMatrix, isLikelyNode } from '../constants';
 import { CommonMethods } from '../mixins/common_methods.mixin';
 import { Point } from '../point.class';
+import { StaticCanvas } from '../static_canvas.class';
 import {
-  capitalize, clamp, createCanvasElement, degreesToRadians, enlivenObjectEnlivables, invertTransform, limitDimsByArea, multiplyTransformMatrices, populateWithProperties,
+  capitalize, clamp, clone, createCanvasElement, degreesToRadians, enlivenObjectEnlivables, invertTransform, limitDimsByArea, multiplyTransformMatrices, populateWithProperties,
   qrDecompose, resetObjectTransform, saveObjectTransform, toDataURL, toFixed,
   transformPoint
 } from '../util';
 import { Image } from './image.class';
 import { Text } from './text.class';
-import { StaticCanvas } from '../static_canvas.class';
-import { RUNNING_ANIMATIONS } from 'util/animate';
 
 const objectCaching = !isLikelyNode;
 
