@@ -1,18 +1,18 @@
 //@ts-nocheck
 
+import { max } from "lodash";
+import { Point } from "../point.class";
+import { ActiveSelection } from "../shapes";
+import { min } from "../util";
 
-  var fabric = global.fabric,
-      min = Math.min,
-      max = Math.max;
 
-  
 export function CanvasGroupingMixinGenerator(Klass) {
   return class CanvasGroupingMixin extends Klass {
 
     /**
      * @private
      * @param {Event} e Event object
-     * @param {fabric.Object} target
+     * @param {FabricObject} target
      * @return {Boolean}
      */
     _shouldGroup(e, target) {
@@ -35,7 +35,7 @@ export function CanvasGroupingMixinGenerator(Klass) {
     /**
      * @private
      * @param {Event} e Event object
-     * @param {fabric.Object} target
+     * @param {FabricObject} target
      */
     _handleGrouping(e, target) {
       var activeObject = this._activeObject;
@@ -64,7 +64,7 @@ export function CanvasGroupingMixinGenerator(Klass) {
      */
     _updateActiveSelection(target, e) {
       var activeSelection = this._activeObject,
-          currentActiveObjects = activeSelection._objects.slice(0);
+        currentActiveObjects = activeSelection._objects.slice(0);
       if (target.group === activeSelection) {
         activeSelection.remove(target);
         this._hoveredTarget = target;
@@ -99,7 +99,7 @@ export function CanvasGroupingMixinGenerator(Klass) {
     /**
      * @private
      * @param {Object} target
-     * @returns {fabric.ActiveSelection}
+     * @returns {ActiveSelection}
      */
     _createGroup(target) {
       var activeObject = this._activeObject;
@@ -108,7 +108,7 @@ export function CanvasGroupingMixinGenerator(Klass) {
         [target, activeObject];
       activeObject.isEditing && activeObject.exitEditing();
       //  handle case: target is nested
-      return new fabric.ActiveSelection(groupObjects, {
+      return new ActiveSelection(groupObjects, {
         canvas: this
       });
     }
@@ -120,14 +120,14 @@ export function CanvasGroupingMixinGenerator(Klass) {
     _groupSelectedObjects(e) {
 
       var group = this._collectObjects(e),
-          aGroup;
+        aGroup;
 
       // do not create group for 1 element only
       if (group.length === 1) {
         this.setActiveObject(group[0], e);
       }
       else if (group.length > 1) {
-        aGroup = new fabric.ActiveSelection(group.reverse(), {
+        aGroup = new ActiveSelection(group.reverse(), {
           canvas: this
         });
         this.setActiveObject(aGroup, e);
@@ -139,17 +139,17 @@ export function CanvasGroupingMixinGenerator(Klass) {
      */
     _collectObjects(e) {
       var group = [],
-          currentObject,
-          x1 = this._groupSelector.ex,
-          y1 = this._groupSelector.ey,
-          x2 = x1 + this._groupSelector.left,
-          y2 = y1 + this._groupSelector.top,
-          selectionX1Y1 = new fabric.Point(min(x1, x2), min(y1, y2)),
-          selectionX2Y2 = new fabric.Point(max(x1, x2), max(y1, y2)),
-          allowIntersect = !this.selectionFullyContained,
-          isClick = x1 === x2 && y1 === y2;
+        currentObject,
+        x1 = this._groupSelector.ex,
+        y1 = this._groupSelector.ey,
+        x2 = x1 + this._groupSelector.left,
+        y2 = y1 + this._groupSelector.top,
+        selectionX1Y1 = new Point(min(x1, x2), min(y1, y2)),
+        selectionX2Y2 = new Point(max(x1, x2), max(y1, y2)),
+        allowIntersect = !this.selectionFullyContained,
+        isClick = x1 === x2 && y1 === y2;
       // we iterate reverse order to collect top first in case of click.
-      for (var i = this._objects.length; i--; ) {
+      for (var i = this._objects.length; i--;) {
         currentObject = this._objects[i];
 
         if (!currentObject || !currentObject.selectable || !currentObject.visible) {
@@ -157,9 +157,9 @@ export function CanvasGroupingMixinGenerator(Klass) {
         }
 
         if ((allowIntersect && currentObject.intersectsWithRect(selectionX1Y1, selectionX2Y2, true)) ||
-            currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2, true) ||
-            (allowIntersect && currentObject.containsPoint(selectionX1Y1, null, true)) ||
-            (allowIntersect && currentObject.containsPoint(selectionX2Y2, null, true))
+          currentObject.isContainedWithinRect(selectionX1Y1, selectionX2Y2, true) ||
+          (allowIntersect && currentObject.containsPoint(selectionX1Y1, null, true)) ||
+          (allowIntersect && currentObject.containsPoint(selectionX2Y2, null, true))
         ) {
           group.push(currentObject);
           // only add one object if it's a click
@@ -170,7 +170,7 @@ export function CanvasGroupingMixinGenerator(Klass) {
       }
 
       if (group.length > 1) {
-        group = group.filter(function(object) {
+        group = group.filter(function (object) {
           return !object.onSelect({ e: e });
         });
       }
@@ -192,6 +192,5 @@ export function CanvasGroupingMixinGenerator(Klass) {
   }
 }
 
-fabric.Canvas = CanvasGroupingMixinGenerator(fabric.Canvas);
 
 

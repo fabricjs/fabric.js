@@ -1,9 +1,12 @@
 //@ts-nocheck
 
-  var fabric = global.fabric;
-  
-export function StaticCanvasSerializationMixinGenerator(Klass) {
-  return class StaticCanvasSerializationMixin extends Klass {
+
+import {
+  createCanvasElement, enlivenObjectEnlivables, enlivenObjects
+} from '../util';
+
+export function CanvasSerializationMixinGenerator(Klass) {
+  return class CanvasSerializationMixin extends Klass {
 
     /**
      * Populates canvas with data from the specified JSON.
@@ -44,8 +47,8 @@ export function StaticCanvasSerializationMixinGenerator(Klass) {
       this.renderOnAddRemove = false;
 
       return Promise.all([
-        fabric.util.enlivenObjects(serialized.objects || [], { reviver: reviver, signal: options && options.signal }),
-        fabric.util.enlivenObjectEnlivables({
+        enlivenObjects(serialized.objects || [], { reviver: reviver, signal: options && options.signal }),
+        enlivenObjectEnlivables({
           backgroundImage: serialized.backgroundImage,
           backgroundColor: serialized.background,
           overlayImage: serialized.overlayImage,
@@ -70,7 +73,7 @@ export function StaticCanvasSerializationMixinGenerator(Klass) {
      */
     __setupCanvas(serialized, enlivenedObjects) {
       var _this = this;
-      enlivenedObjects.forEach(function(obj, index) {
+      enlivenedObjects.forEach(function (obj, index) {
         // we splice the array just in case some custom classes restored from JSON
         // will add more object to canvas at canvas init.
         _this.insertAt(obj, index);
@@ -95,7 +98,7 @@ export function StaticCanvasSerializationMixinGenerator(Klass) {
      */
     clone(properties) {
       var data = JSON.stringify(this.toJSON(properties));
-      return this.cloneWithoutData().then(function(clone) {
+      return this.cloneWithoutData().then(function (clone) {
         return clone.loadFromJSON(data);
       });
     }
@@ -107,12 +110,11 @@ export function StaticCanvasSerializationMixinGenerator(Klass) {
      * @returns {Promise<fabric.Canvas>}
      */
     cloneWithoutData() {
-      var el = fabric.util.createCanvasElement();
+      var el = createCanvasElement();
 
       el.width = this.width;
       el.height = this.height;
-      // this seems wrong. either Canvas or StaticCanvas
-      var clone = new fabric.Canvas(el);
+      var clone = new this.constructor(el);
       var data = {};
       if (this.backgroundImage) {
         data.backgroundImage = this.backgroundImage.toObject();
@@ -125,5 +127,4 @@ export function StaticCanvasSerializationMixinGenerator(Klass) {
   }
 }
 
-fabric.StaticCanvas = StaticCanvasSerializationMixinGenerator(fabric.StaticCanvas);
 

@@ -1,19 +1,19 @@
 //@ts-nocheck
 
+import { scalingEqually } from "../controls.actions";
+import { degreesToRadians, radiansToDegrees } from "../util";
 
-  var fabric = global.fabric, degreesToRadians = fabric.util.degreesToRadians,
-      radiansToDegrees = fabric.util.radiansToDegrees;
 
-  /**
-   * Adds support for multi-touch gestures using the Event.js library.
-   * Fires the following custom events:
-   * - touch:gesture
-   * - touch:drag
-   * - touch:orientation
-   * - touch:shake
-   * - touch:longpress
-   */
-  
+/**
+ * Adds support for multi-touch gestures using the Event.js library.
+ * Fires the following custom events:
+ * - touch:gesture
+ * - touch:drag
+ * - touch:orientation
+ * - touch:shake
+ * - touch:longpress
+ */
+
 export function CanvasGesturesMixinGenerator(Klass) {
   return class CanvasGesturesMixin extends Klass {
     /**
@@ -51,8 +51,8 @@ export function CanvasGesturesMixinGenerator(Klass) {
       }
 
       var self = this.__gesturesParams.self,
-          t = this._currentTransform,
-          e = this.__gesturesParams.e;
+        t = this._currentTransform,
+        e = this.__gesturesParams.e;
 
       t.action = 'scale';
       t.originX = t.originY = 'center';
@@ -124,10 +124,10 @@ export function CanvasGesturesMixinGenerator(Klass) {
      */
     _scaleObjectBy(s, e) {
       var t = this._currentTransform,
-          target = t.target;
+        target = t.target;
       t.gestureScale = s;
       target._scaling = true;
-      return fabric.controlsUtils.scalingEqually(e, t, 0, 0);
+      return scalingEqually(e, t, 0, 0);
     }
 
     /**
@@ -151,5 +151,4 @@ export function CanvasGesturesMixinGenerator(Klass) {
   }
 }
 
-fabric.Canvas = CanvasGesturesMixinGenerator(fabric.Canvas);
 
