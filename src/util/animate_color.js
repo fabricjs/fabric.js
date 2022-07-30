@@ -1,4 +1,5 @@
-(function() {
+(function(global) {
+  var fabric = global.fabric;
   // Calculate an in-between color. Returns a "rgba()" string.
   // Credit: Edwin Martin <edwin@bitstorm.org>
   //         http://www.bitstorm.org/jquery/color-animation/jquery.animate-colors.js
@@ -71,4 +72,4 @@
 
   fabric.util.animateColor = animateColor;
 
-})();
+})(typeof exports !== 'undefined' ? exports : window);

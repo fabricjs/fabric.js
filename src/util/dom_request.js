@@ -1,5 +1,5 @@
-(function() {
-
+(function(global) {
+  var fabric = global.fabric;
   function addParamToUrl(url, param) {
     return url + (/\?/.test(url) ? '&' : '?') + param;
   }
@@ -71,4 +71,4 @@
   }
 
   fabric.util.request = request;
-})();
+})(typeof exports !== 'undefined' ? exports : window);

@@ -1,6 +1,6 @@
-(function() {
+(function(global) {
 
-  var degreesToRadians = fabric.util.degreesToRadians,
+  var fabric = global.fabric, degreesToRadians = fabric.util.degreesToRadians,
       radiansToDegrees = fabric.util.radiansToDegrees;
 
   /**
@@ -146,4 +146,4 @@
       });
     }
   });
-})();
+})(typeof exports !== 'undefined' ? exports : window);

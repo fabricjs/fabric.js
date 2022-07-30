@@ -1,6 +1,6 @@
 /* _TO_SVG_START_ */
-(function() {
-  var toFixed = fabric.util.toFixed,
+(function(global) {
+  var fabric = global.fabric, toFixed = fabric.util.toFixed,
       multipleSpacesRegex = /  +/g;
 
   fabric.util.object.extend(fabric.Text.prototype, /** @lends fabric.Text.prototype */ {
@@ -246,5 +246,5 @@
       return svgStyle + ' white-space: pre;';
     },
   });
-})();
+})(typeof exports !== 'undefined' ? exports : window);
 /* _TO_SVG_END_ */

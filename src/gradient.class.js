@@ -1,5 +1,5 @@
-(function() {
-
+(function(global) {
+  var fabric = global.fabric;
   /* _FROM_SVG_START_ */
   function getColorStop(el, multiplier) {
     var style = el.getAttribute('style'),
@@ -485,4 +485,4 @@
       options[prop] = finalValue;
     });
   }
-})();
+})(typeof exports !== 'undefined' ? exports : window);

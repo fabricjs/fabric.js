@@ -1,4 +1,4 @@
-(function() {
+(function(global) {
 
   function arrayFromCoords(coords) {
     return [
@@ -9,7 +9,7 @@
     ];
   }
 
-  var util = fabric.util,
+  var fabric = global.fabric, util = fabric.util,
       degreesToRadians = util.degreesToRadians,
       multiplyMatrices = util.multiplyTransformMatrices,
       transformPoint = util.transformPoint;
@@ -772,4 +772,4 @@
       return p.scalarAdd(2 * this.padding);
     },
   });
-})();
+})(typeof exports !== 'undefined' ? exports : window);

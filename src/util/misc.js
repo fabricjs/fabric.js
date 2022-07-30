@@ -1,6 +1,6 @@
-(function() {
-
-  var sqrt = Math.sqrt,
+import { cos } from './index.ts';
+(function(global) {
+  var fabric = global.fabric, sqrt = Math.sqrt,
       atan2 = Math.atan2,
       pow = Math.pow,
       PiBy180 = Math.PI / 180,
@@ -14,28 +14,6 @@
    * @namespace fabric.util
    */
   fabric.util = {
-
-    /**
-     * Calculate the cos of an angle, avoiding returning floats for known results
-     * @static
-     * @memberOf fabric.util
-     * @param {Number} angle the angle in radians or in degree
-     * @return {Number}
-     */
-    cos: function(angle) {
-      if (angle === 0) { return 1; }
-      if (angle < 0) {
-        // cos(a) = cos(-a)
-        angle = -angle;
-      }
-      var angleSlice = angle / PiBy2;
-      switch (angleSlice) {
-        case 1: case 3: return 0;
-        case 2: return -1;
-      }
-      return Math.cos(angle);
-    },
-
     /**
      * Calculate the sin of an angle, avoiding returning floats for known results
      * @static
@@ -1234,6 +1212,8 @@
       return new fabric.Group([a], { clipPath: b, inverted: inverted });
     },
 
+    cos: cos,
+
     /**
      * @memberOf fabric.util
      * @param {Object} prevStyle first style to compare
@@ -1341,4 +1321,4 @@
       return stylesObject;
     }
   };
-})(typeof exports !== 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : window);

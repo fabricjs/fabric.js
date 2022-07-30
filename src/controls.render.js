@@ -1,7 +1,4 @@
 (function(global) {
-
-  'use strict';
-
   var fabric = global.fabric || (global.fabric = { }),
       degreesToRadians = fabric.util.degreesToRadians,
       controls = fabric.controlsUtils;
@@ -98,4 +95,4 @@
   controls.renderCircleControl = renderCircleControl;
   controls.renderSquareControl = renderSquareControl;
 
-})(typeof exports !== 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : window);

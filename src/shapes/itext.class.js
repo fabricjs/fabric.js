@@ -1,4 +1,5 @@
-(function() {
+(function(global) {
+  var fabric = global.fabric;
   /**
    * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
    * prefix when observing canvas.
@@ -573,4 +574,4 @@
     var objCopy = Object.assign({}, object, { styles: styles });
     return fabric.Object._fromObject(fabric.IText, objCopy, { extraParam: 'text' });
   };
-})();
+})(typeof exports !== 'undefined' ? exports : window);

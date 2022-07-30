@@ -1,6 +1,6 @@
-(function() {
+(function(global) {
 
-  var slice = Array.prototype.slice;
+  var fabric = global.fabric, slice = Array.prototype.slice;
 
   /**
    * Invokes method on all items in a given array
@@ -91,4 +91,4 @@
     max: max
   };
 
-})();
+})(typeof exports !== 'undefined' ? exports : window);

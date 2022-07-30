@@ -1,5 +1,5 @@
-(function() {
-
+(function(global) {
+  var fabric = global.fabric;
   fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
 
     /**
@@ -1212,4 +1212,4 @@
       }
     }
   });
-})();
+})(typeof exports !== 'undefined' ? exports : window);

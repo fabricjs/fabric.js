@@ -1,5 +1,6 @@
-(function () {
-
+(function (global) {
+  var fabric = global.fabric;
+  /* this file needs to go away, cross browser style support is not fabricjs domain.
   /**
    * Cross-browser wrapper for setting element's style
    * @memberOf fabric.util
@@ -35,7 +36,7 @@
   var parseEl = fabric.document.createElement('div'),
       supportsOpacity = typeof parseEl.style.opacity === 'string',
       supportsFilters = typeof parseEl.style.filter === 'string',
-      reOpacity = /alpha\s*\(\s*opacity\s*=\s*([^\)]+)\)/,
+      reOpacity = /alpha\s*\(\s*opacity\s*=\s*([^)]+)\)/,
 
       /** @ignore */
       setOpacity = function (element) { return element; };
@@ -67,4 +68,4 @@
 
   fabric.util.setStyle = setStyle;
 
-})();
+})(typeof exports !== 'undefined' ? exports : window);

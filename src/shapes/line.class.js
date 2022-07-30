@@ -1,16 +1,8 @@
 (function(global) {
-
-  'use strict';
-
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
       coordProps = { x1: 1, x2: 1, y1: 1, y2: 1 };
-
-  if (fabric.Line) {
-    fabric.warn('fabric.Line is already defined');
-    return;
-  }
 
   /**
    * Line class
@@ -320,4 +312,4 @@
 
   }
 
-})(typeof exports !== 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : window);

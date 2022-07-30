@@ -1,4 +1,5 @@
-(function () {
+(function (global) {
+  var fabric = global.fabric;
   fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.StaticCanvas.prototype */ {
 
     /**
@@ -102,4 +103,4 @@
     },
   });
 
-})();
+})(typeof exports !== 'undefined' ? exports : window);

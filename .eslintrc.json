@@ -15,7 +15,20 @@
     "assert": true,
     "AbortController": true
   },
+  "overrides": [
+    {
+      "files": ["**/*.js"]
+    }
+  ],
+  "parserOptions": {
+    "sourceType": "module"
+  },
   "rules": {
+    "@typescript-eslint/no-empty-function": 0,
+    "@typescript-eslint/no-this-alias": 0,
+    "@typescript-eslint/no-extra-semi": 0,
+    "no-prototype-builtins": 0,
+    "no-redeclare": 0,
     "semi": 2,
     "eqeqeq": 2,
     "no-eq-null": 2,

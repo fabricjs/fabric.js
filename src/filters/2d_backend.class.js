@@ -1,8 +1,5 @@
-(function() {
-
-  'use strict';
-
-  var noop = function() {};
+(function(global) {
+  var fabric = global.fabric, noop = function() {};
 
   fabric.Canvas2dFilterBackend = Canvas2dFilterBackend;
 
@@ -62,4 +59,4 @@
     },
 
   };
-})();
+})(typeof exports !== 'undefined' ? exports : window);

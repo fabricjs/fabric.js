@@ -1,5 +1,6 @@
-(function() {
-  var _join = Array.prototype.join,
+(function(global) {
+  var fabric = global.fabric,
+      _join = Array.prototype.join,
       commandLengths = {
         m: 2,
         l: 2,
@@ -851,4 +852,4 @@
   fabric.util.getPointOnPath = getPointOnPath;
   fabric.util.transformPath = transformPath;
   fabric.util.getRegularPolygonPath = getRegularPolygonPath;
-})();
+})(typeof exports !== 'undefined' ? exports : window);

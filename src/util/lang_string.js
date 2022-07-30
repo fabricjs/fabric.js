@@ -1,5 +1,5 @@
-(function() {
-
+(function(global) {
+  var fabric = global.fabric;
   /**
    * Camelizes a string
    * @memberOf fabric.util.string
@@ -107,4 +107,4 @@
     escapeXml: escapeXml,
     graphemeSplit: graphemeSplit
   };
-})();
+})(typeof exports !== 'undefined' ? exports : window);

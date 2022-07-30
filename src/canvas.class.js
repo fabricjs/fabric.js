@@ -1,6 +1,6 @@
-(function() {
+(function(global) {
 
-  var getPointer = fabric.util.getPointer,
+  var fabric = global.fabric, getPointer = fabric.util.getPointer,
       degreesToRadians = fabric.util.degreesToRadians,
       isTouchEvent = fabric.util.isTouchEvent;
 
@@ -1422,4 +1422,4 @@
       fabric.Canvas[prop] = fabric.StaticCanvas[prop];
     }
   }
-})();
+})(typeof exports !== 'undefined' ? exports : window);

@@ -1,7 +1,4 @@
 (function(global) {
-
-  'use strict';
-
   var fabric = global.fabric || (global.fabric = {});
 
   /**
@@ -477,4 +474,4 @@
     var objCopy = Object.assign({}, object, { styles: styles });
     return fabric.Object._fromObject(fabric.Textbox, objCopy, { extraParam: 'text' });
   };
-})(typeof exports !== 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : window);

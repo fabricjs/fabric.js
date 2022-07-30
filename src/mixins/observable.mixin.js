@@ -1,5 +1,5 @@
-(function() {
-
+(function(global) {
+  var fabric = global.fabric;
   /**
    * @private
    * @param {String} eventName
@@ -142,4 +142,4 @@
     once: once,
     off: off,
   };
-})();
+})(typeof exports !== 'undefined' ? exports : window);

@@ -1,6 +1,6 @@
-(function() {
+(function(global) {
 
-  var degreesToRadians = fabric.util.degreesToRadians,
+  var fabric = global.fabric, degreesToRadians = fabric.util.degreesToRadians,
       originXOffset = {
         left: -0.5,
         center: 0,
@@ -281,4 +281,4 @@
     },
   });
 
-})();
+})(typeof exports !== 'undefined' ? exports : window);

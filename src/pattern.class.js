@@ -1,8 +1,5 @@
-(function() {
-
-  'use strict';
-
-  var toFixed = fabric.util.toFixed;
+(function(global) {
+  var fabric = global.fabric, toFixed = fabric.util.toFixed;
 
   /**
    * Pattern class
@@ -191,4 +188,4 @@
         return new fabric.Pattern(patternOptions);
       });
   };
-})();
+})(typeof exports !== 'undefined' ? exports : window);

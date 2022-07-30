@@ -1,7 +1,7 @@
-(function () {
+(function (global) {
   /** ERASER_START */
 
-  var __drawClipPath = fabric.Object.prototype._drawClipPath;
+  var fabric = global.fabric, __drawClipPath = fabric.Object.prototype._drawClipPath;
   var _needsItsOwnCache = fabric.Object.prototype.needsItsOwnCache;
   var _toObject = fabric.Object.prototype.toObject;
   var _getSvgCommons = fabric.Object.prototype.getSvgCommons;
@@ -783,4 +783,4 @@
   );
 
   /** ERASER_END */
-})();
+})(typeof exports !== 'undefined' ? exports : window);

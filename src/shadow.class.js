@@ -1,14 +1,6 @@
 (function(global) {
-
-  'use strict';
-
   var fabric = global.fabric || (global.fabric = { }),
       toFixed = fabric.util.toFixed;
-
-  if (fabric.Shadow) {
-    fabric.warn('fabric.Shadow is already defined.');
-    return;
-  }
 
   /**
    * Shadow class
@@ -192,4 +184,4 @@
   // eslint-disable-next-line max-len
   fabric.Shadow.reOffsetsAndBlur = /(?:\s|^)(-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?(-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?(\d+(?:\.\d*)?(?:px)?)?(?:\s?|$)(?:$|\s)/;
 
-})(typeof exports !== 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : window);

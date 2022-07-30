@@ -105,7 +105,6 @@
    */
   QUnit.assert.sameImageObject = function (actual, expected) {
     var a = {}, b = {};
-    expected = expected || REFERENCE_IMG_OBJECT;
     Object.assign(a, actual, { src: basename(actual.src) });
     Object.assign(b, expected, { src: basename(expected.src) });
     this.pushResult({
@@ -2098,7 +2097,7 @@
     el.style.position = 'relative';
     var elStyle = el.style.cssText;
     assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
-    
+
     var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
     wrapperEl = canvas.wrapperEl;
     lowerCanvasEl = canvas.lowerCanvasEl;

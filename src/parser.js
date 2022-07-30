@@ -1,7 +1,4 @@
 (function(global) {
-
-  'use strict';
-
   /**
    * @name fabric
    * @namespace
@@ -343,7 +340,7 @@
       }
       return combinedMatrix;
     };
-  })();
+  })(typeof exports !== 'undefined' ? exports : window);
 
   /**
    * @private
@@ -1092,4 +1089,4 @@
     }
   });
 
-})(typeof exports !== 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : window);

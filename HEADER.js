@@ -33,7 +33,7 @@ else {
   fabric.jsdomImplForWrapper = require('jsdom/lib/jsdom/living/generated/utils').implForWrapper;
   fabric.nodeCanvas = require('jsdom/lib/jsdom/utils').Canvas;
   fabric.window = virtualWindow;
-  DOMParser = fabric.window.DOMParser;
+  global.DOMParser = fabric.window.DOMParser;
 }
 
 /**
@@ -201,3 +201,5 @@ fabric.initFilterBackend = function() {
     return (new fabric.Canvas2dFilterBackend());
   }
 };
+
+export { fabric };

@@ -1,6 +1,7 @@
-(function() {
+(function(global) {
 
-  var min = Math.min,
+  var fabric = global.fabric,
+      min = Math.min,
       max = Math.max;
 
   fabric.util.object.extend(fabric.Canvas.prototype, /** @lends fabric.Canvas.prototype */ {
@@ -187,4 +188,4 @@
     }
   });
 
-})();
+})(typeof exports !== 'undefined' ? exports : window);

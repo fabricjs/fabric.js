@@ -1,16 +1,6 @@
-(function() {
+(function(global) {
 
-  var slice = Array.prototype.slice, emptyFunction = function() { },
-
-      IS_DONTENUM_BUGGY = (function() {
-        for (var p in { toString: 1 }) {
-          if (p === 'toString') {
-            return false;
-          }
-        }
-        return true;
-      })(),
-
+  var fabric = global.fabric, slice = Array.prototype.slice, emptyFunction = function() { },
       /** @ignore */
       addMethods = function(klass, source, parent) {
         for (var property in source) {
@@ -35,15 +25,6 @@
           }
           else {
             klass.prototype[property] = source[property];
-          }
-
-          if (IS_DONTENUM_BUGGY) {
-            if (source.toString !== Object.prototype.toString) {
-              klass.prototype.toString = source.toString;
-            }
-            if (source.valueOf !== Object.prototype.valueOf) {
-              klass.prototype.valueOf = source.valueOf;
-            }
           }
         }
       };
@@ -112,4 +93,4 @@
   }
 
   fabric.util.createClass = createClass;
-})();
+})(typeof exports !== 'undefined' ? exports : window);

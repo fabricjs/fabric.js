@@ -1,6 +1,6 @@
-(function() {
+(function(global) {
 
-  var controlsUtils = fabric.controlsUtils,
+  var fabric = global.fabric, controlsUtils = fabric.controlsUtils,
       scaleSkewStyleHandler = controlsUtils.scaleSkewCursorStyleHandler,
       scaleStyleHandler = controlsUtils.scaleCursorStyleHandler,
       scalingEqually = controlsUtils.scalingEqually,
@@ -111,4 +111,4 @@
       actionName: 'resizing',
     });
   }
-})();
+})(typeof exports !== 'undefined' ? exports : window);

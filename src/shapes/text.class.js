@@ -1,13 +1,5 @@
 (function(global) {
-
-  'use strict';
-
   var fabric = global.fabric || (global.fabric = { });
-
-  if (fabric.Text) {
-    fabric.warn('fabric.Text is already defined');
-    return;
-  }
 
   var additionalProps =
     ('fontFamily fontWeight fontSize text underline overline linethrough' +
@@ -1710,4 +1702,4 @@
 
   fabric.util.createAccessors && fabric.util.createAccessors(fabric.Text);
 
-})(typeof exports !== 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : window);

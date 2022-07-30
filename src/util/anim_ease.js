@@ -1,5 +1,5 @@
-(function() {
-
+(function(global) {
+  var fabric = global.fabric;
   function normalize(a, c, p, s) {
     if (a < Math.abs(c)) {
       a = c;
@@ -395,4 +395,4 @@
     easeInOutBounce: easeInOutBounce
   };
 
-})();
+})(typeof exports !== 'undefined' ? exports : window);

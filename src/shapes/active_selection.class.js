@@ -1,12 +1,5 @@
 (function(global) {
-
-  'use strict';
-
   var fabric = global.fabric || (global.fabric = { });
-
-  if (fabric.ActiveSelection) {
-    return;
-  }
 
   /**
    * Group class
@@ -192,4 +185,4 @@
     });
   };
 
-})(typeof exports !== 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : window);

@@ -357,7 +357,6 @@
     var rect = new fabric.Rect({ left: 0, top: 0, width: 50, height: 50 });
     canvas.add(rect);
     var count = 0;
-    var count2 = 0;
     var opt;
     canvas.on('object:modified', function(_opt) {
       count++;
@@ -657,7 +656,7 @@
     var control = [];
     var targetControl = [];
     [o1, o2, o3].forEach(target => {
-      target.on(canvasEventName.replace(':', ''), (ev) => {
+      target.on(canvasEventName.replace(':', ''), () => {
         targetControl.push(target);
       });
     });

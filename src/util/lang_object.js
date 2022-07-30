@@ -1,4 +1,5 @@
-(function() {
+(function(global) {
+  var fabric = global.fabric;
   /**
    * Copies all enumerable properties of one js object to another
    * this does not and cannot compete with generic utils.
@@ -72,4 +73,4 @@
     clone: clone
   };
   fabric.util.object.extend(fabric.util, fabric.Observable);
-})();
+})(typeof exports !== 'undefined' ? exports : window);

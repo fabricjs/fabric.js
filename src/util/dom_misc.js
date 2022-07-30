@@ -1,6 +1,6 @@
-(function() {
+(function(global) {
 
-  var _slice = Array.prototype.slice;
+  var fabric = global.fabric, _slice = Array.prototype.slice;
 
   /**
    * Takes id and returns an element with that id (if one exists in a document)
@@ -250,7 +250,7 @@
 
     fabric.util.makeElementUnselectable = makeElementUnselectable;
     fabric.util.makeElementSelectable = makeElementSelectable;
-  })();
+  })(typeof exports !== 'undefined' ? exports : window);
 
   function getNodeCanvas(element) {
     var impl = fabric.jsdomImplForWrapper(element);
@@ -297,4 +297,4 @@
   fabric.util.getNodeCanvas = getNodeCanvas;
   fabric.util.cleanUpJsdomNode = cleanUpJsdomNode;
 
-})();
+})(typeof exports !== 'undefined' ? exports : window);

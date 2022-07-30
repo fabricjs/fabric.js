@@ -1,5 +1,6 @@
 /* _TO_SVG_START_ */
-(function() {
+(function(global) {
+  var fabric = global.fabric;
   function getSvgColorString(prop, value) {
     if (!value) {
       return prop + ': none; ';
@@ -19,7 +20,7 @@
     }
   }
 
-  var toFixed = fabric.util.toFixed;
+  var toFixed = fabric = global.fabric, toFixed = fabric.util.toFixed;
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
     /**
@@ -254,5 +255,5 @@
       return this.paintFirst !== 'fill' ? ' paint-order="' + this.paintFirst + '" ' : '';
     }
   });
-})();
+})(typeof exports !== 'undefined' ? exports : window);
 /* _TO_SVG_END_ */

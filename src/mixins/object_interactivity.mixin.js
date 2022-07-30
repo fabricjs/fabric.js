@@ -1,6 +1,6 @@
-(function() {
+(function(global) {
 
-  var degreesToRadians = fabric.util.degreesToRadians;
+  var fabric = global.fabric, degreesToRadians = fabric.util.degreesToRadians;
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
     /**
@@ -335,7 +335,7 @@
      * @param {DragEvent} e
      * @returns {boolean}
      */
-    canDrop: function (e) { // eslint-disable-line no-unused-vars
+    canDrop: function (/* e */) {
       return false;
     },
 
@@ -348,4 +348,4 @@
     },
 
   });
-})();
+})(typeof exports !== 'undefined' ? exports : window);

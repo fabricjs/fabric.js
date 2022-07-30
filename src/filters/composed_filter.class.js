@@ -73,4 +73,4 @@
       return new fabric.Image.filters.Composed({ subFilters: enlivedFilters });
     });
   };
-})(typeof exports !== 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : window);

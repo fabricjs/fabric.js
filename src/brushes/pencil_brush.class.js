@@ -1,4 +1,5 @@
-(function() {
+(function(global) {
+  var fabric = global.fabric;
   /**
    * PencilBrush class
    * @class fabric.PencilBrush
@@ -307,4 +308,4 @@
       this.canvas.fire('path:created', { path: path });
     }
   });
-})();
+})(typeof exports !== 'undefined' ? exports : window);

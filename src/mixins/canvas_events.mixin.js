@@ -1,6 +1,7 @@
-(function() {
+(function(global) {
 
-  var addListener = fabric.util.addListener,
+  var fabric = global.fabric,
+      addListener = fabric.util.addListener,
       removeListener = fabric.util.removeListener,
       RIGHT_CLICK = 3, MIDDLE_CLICK = 2, LEFT_CLICK = 1,
       addEventOptions = { passive: false };
@@ -1175,4 +1176,4 @@
       return control.cursorStyleHandler(e, control, target);
     }
   });
-})();
+})(typeof exports !== 'undefined' ? exports : window);

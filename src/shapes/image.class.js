@@ -1,18 +1,5 @@
 (function(global) {
-
-  'use strict';
-
-  var extend = fabric.util.object.extend;
-
-  if (!global.fabric) {
-    global.fabric = { };
-  }
-
-  if (global.fabric.Image) {
-    fabric.warn('fabric.Image is already defined.');
-    return;
-  }
-
+  var fabric = global.fabric, extend = fabric.util.object.extend;
   /**
    * Image class
    * @class fabric.Image
@@ -750,4 +737,4 @@
   };
   /* _FROM_SVG_END_ */
 
-})(typeof exports !== 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : window);

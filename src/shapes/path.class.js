@@ -1,18 +1,10 @@
 (function(global) {
-
-  'use strict';
-
   var fabric = global.fabric || (global.fabric = { }),
       min = fabric.util.array.min,
       max = fabric.util.array.max,
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed;
-
-  if (fabric.Path) {
-    fabric.warn('fabric.Path is already defined');
-    return;
-  }
 
   /**
    * Path class
@@ -363,4 +355,4 @@
   };
   /* _FROM_SVG_END_ */
 
-})(typeof exports !== 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : window);

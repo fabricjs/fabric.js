@@ -1,15 +1,6 @@
 (function(global) {
-
-  'use strict';
-
   var fabric = global.fabric || (global.fabric = { }),
       piBy2   = Math.PI * 2;
-
-  if (fabric.Ellipse) {
-    fabric.warn('fabric.Ellipse is already defined.');
-    return;
-  }
-
   /**
    * Ellipse class
    * @class fabric.Ellipse
@@ -177,4 +168,4 @@
     return fabric.Object._fromObject(fabric.Ellipse, object);
   };
 
-})(typeof exports !== 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : window);

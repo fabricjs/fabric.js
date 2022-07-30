@@ -1,7 +1,4 @@
 (function (global) {
-
-  'use strict';
-
   var fabric = global.fabric || (global.fabric = {}),
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
       invertTransform = fabric.util.invertTransform,
@@ -9,12 +6,6 @@
       applyTransformToObject = fabric.util.applyTransformToObject,
       degreesToRadians = fabric.util.degreesToRadians,
       clone = fabric.util.object.clone;
-
-  if (fabric.Group) {
-    fabric.warn('fabric.Group is already defined');
-    return;
-  }
-
   /**
    * Group class
    * @class fabric.Group
@@ -961,4 +952,4 @@
     });
   };
 
-})(typeof exports !== 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : window);

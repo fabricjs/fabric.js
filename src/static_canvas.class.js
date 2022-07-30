@@ -1,14 +1,6 @@
-(function () {
-
-  'use strict';
-
-  if (fabric.StaticCanvas) {
-    fabric.warn('fabric.StaticCanvas is already defined.');
-    return;
-  }
-
+(function (global) {
   // aliases for faster resolution
-  var extend = fabric.util.object.extend,
+  var fabric = global.fabric, extend = fabric.util.object.extend,
       getElementOffset = fabric.util.getElementOffset,
       removeFromArray = fabric.util.removeFromArray,
       toFixed = fabric.util.toFixed,
@@ -1725,4 +1717,4 @@
       return impl && impl.createJPEGStream(opts);
     };
   }
-})();
+})(typeof exports !== 'undefined' ? exports : window);

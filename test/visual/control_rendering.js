@@ -295,14 +295,16 @@
             borderColor: object.fill,
             cornerColor: object.fill,
           });
-          object._objects && object.getObjects().forEach(function(subTarget) {
-            subTarget.borderScaleFactor = 3;
-            subTarget.transparentCorners = false;
-            subTarget._renderControls(canvas.contextContainer, {
-              borderColor: subTarget.fill,
-              cornerColor: subTarget.fill,
+          if (object.getObjects) {
+            object.getObjects().forEach(function(subTarget) {
+              subTarget.borderScaleFactor = 3;
+              subTarget.transparentCorners = false;
+              subTarget._renderControls(canvas.contextContainer, {
+                borderColor: subTarget.fill,
+                cornerColor: subTarget.fill,
+              });
             });
-          });
+          }
         });
         callback(canvas.lowerCanvasEl);
       });
@@ -329,14 +331,16 @@
             borderColor: object.fill,
             cornerColor: object.fill,
           });
-          object._objects && object.getObjects().forEach(function(subTarget) {
-            subTarget.borderScaleFactor = 3;
-            subTarget.transparentCorners = false;
-            subTarget._renderControls(canvas.contextContainer, {
-              borderColor: subTarget.fill,
-              cornerColor: subTarget.fill,
+          if (object.getObjects) {
+            object.getObjects().forEach(function(subTarget) {
+              subTarget.borderScaleFactor = 3;
+              subTarget.transparentCorners = false;
+              subTarget._renderControls(canvas.contextContainer, {
+                borderColor: subTarget.fill,
+                cornerColor: subTarget.fill,
+              });
             });
-          });
+          }
         });
         callback(canvas.lowerCanvasEl);
       });
