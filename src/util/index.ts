@@ -79,7 +79,12 @@ const {
     getSmoothPathFromPoints,
     parseUnit,
     toArray,
-    request
+    request,
+    addListener,
+    removeListener,
+    isTouchEvent,
+    sendPointToPlane,
+    radiansToDegrees
 } = fabric.util;
 export {
     sin,
@@ -137,6 +142,11 @@ export {
     getSmoothPathFromPoints,
     parseUnit,
     toArray,
-    request
+    request,
+    addListener,
+    removeListener,
+    isTouchEvent,
+    sendPointToPlane,
+    radiansToDegrees
 };
 export default fabric.util;

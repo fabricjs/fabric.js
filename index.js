@@ -25,7 +25,8 @@ fabric.Point = Point;
 import './src/intersection.class';
 import { Color } from './src/color/color.class';
 fabric.Color = Color;
-import './src/controls.actions'; // optional interaction
+import * as controlsUtils from './src/controls.actions'; // optional interaction
+fabric.controlsUtils = controlsUtils;
 import './src/controls.render'; // optional interaction
 import './src/control.class'; // optional interaction
 import { Gradient } from './src/gradient.class'; // optional gradient
@@ -48,7 +49,8 @@ fabric.PatternBrush = PatternBrush;
 fabric.PencilBrush = PencilBrush;
 fabric.SprayBrush = SprayBrush;
 import './src/canvas.class'; // optional interaction
-import './src/mixins/canvas_events.mixin'; // optional interaction
+import { CanvasEventsMixinGenerator } from './src/mixins/canvas_events.mixin'; // optional interaction
+fabric.Canvas = CanvasEventsMixinGenerator(fabric.Canvas);
 import './src/mixins/canvas_grouping.mixin'; // optional interaction
 import './src/mixins/canvas_dataurl_exporter.mixin';
 import './src/mixins/canvas_serialization.mixin'; // optiona serialization

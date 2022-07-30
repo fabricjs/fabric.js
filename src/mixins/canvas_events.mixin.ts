@@ -1,17 +1,18 @@
 //@ts-nocheck
 
+import { addListener, removeListener } from "../util";
+import { context } from '../../context';
+import { fireEvent } from "../controls.actions";
 
-  var fabric = global.fabric,
-      addListener = fabric.util.addListener,
-      removeListener = fabric.util.removeListener,
-      RIGHT_CLICK = 3, MIDDLE_CLICK = 2, LEFT_CLICK = 1,
-      addEventOptions = { passive: false };
+var fabric = global.fabric;
+const addEventOptions = { passive: false };
 
-  function checkClick(e, value) {
-    return e.button && (e.button === value - 1);
-  }
 
-  
+function checkClick(e, value) {
+  return e.button && (e.button === value - 1);
+}
+
+
 export function CanvasEventsMixinGenerator(Klass) {
   return class CanvasEventsMixin extends Klass {
 
@@ -45,8 +46,8 @@ export function CanvasEventsMixinGenerator(Klass) {
 
     addOrRemove(functor, eventjsFunctor) {
       var canvasElement = this.upperCanvasEl,
-          eventTypePrefix = this._getEventPrefix();
-      functor(fabric.window, 'resize', this._onResize);
+        eventTypePrefix = this._getEventPrefix();
+      functor(context.window, 'resize', this._onResize);
       functor(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
       functor(canvasElement, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
       functor(canvasElement, eventTypePrefix + 'out', this._onMouseOut);
@@ -79,10 +80,10 @@ export function CanvasEventsMixinGenerator(Klass) {
       this.addOrRemove(removeListener, 'remove');
       // if you dispose on a mouseDown, before mouse up, you need to clean document to...
       var eventTypePrefix = this._getEventPrefix();
-      removeListener(fabric.document, eventTypePrefix + 'up', this._onMouseUp);
-      removeListener(fabric.document, 'touchend', this._onTouchEnd, addEventOptions);
-      removeListener(fabric.document, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
-      removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
+      removeListener(context.document, eventTypePrefix + 'up', this._onMouseUp);
+      removeListener(context.document, 'touchend', this._onTouchEnd, addEventOptions);
+      removeListener(context.document, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
+      removeListener(context.document, 'touchmove', this._onMouseMove, addEventOptions);
     }
 
     /**
@@ -155,14 +156,14 @@ export function CanvasEventsMixinGenerator(Klass) {
       this._hoveredTarget = null;
       target && target.fire('mouseout', { e: e });
 
-      this._hoveredTargets.forEach(function(nestedTarget){
+      this._hoveredTargets.forEach(function (nestedTarget) {
         this.fire('mouse:out', { target: nestedTarget, e: e });
         nestedTarget && nestedTarget.fire('mouseout', { e: e });
       }, this);
       this._hoveredTargets = [];
 
       if (this._iTextInstances) {
-        this._iTextInstances.forEach(function(obj) {
+        this._iTextInstances.forEach(function (obj) {
           if (obj.isEditing) {
             obj.hiddenTextarea.focus();
           }
@@ -262,15 +263,15 @@ export function CanvasEventsMixinGenerator(Klass) {
      */
     _onDragEnd(e) {
       var didDrop = e.dataTransfer.dropEffect !== 'none',
-          dropTarget = didDrop ? this._activeObject : undefined,
-          options = {
-            e: e,
-            target: this._dragSource,
-            subTargets: this.targets,
-            dragSource: this._dragSource,
-            didDrop: didDrop,
-            dropTarget: dropTarget
-          };
+        dropTarget = didDrop ? this._activeObject : undefined,
+        options = {
+          e: e,
+          target: this._dragSource,
+          subTargets: this.targets,
+          dragSource: this._dragSource,
+          didDrop: didDrop,
+          dropTarget: dropTarget
+        };
       removeListener(this.upperCanvasEl, 'drag', this._onDragProgress);
       this.fire('dragend', options);
       this._dragSource && this._dragSource.fire('dragend', options);
@@ -302,17 +303,17 @@ export function CanvasEventsMixinGenerator(Klass) {
      */
     _onDragOver(e) {
       var eventType = 'dragover',
-          target = this.findTarget(e),
-          targets = this.targets,
-          options = {
-            e: e,
-            target: target,
-            subTargets: targets,
-            dragSource: this._dragSource,
-            canDrop: false,
-            dropTarget: undefined
-          },
-          dropTarget;
+        target = this.findTarget(e),
+        targets = this.targets,
+        options = {
+          e: e,
+          target: target,
+          subTargets: targets,
+          dragSource: this._dragSource,
+          canDrop: false,
+          dropTarget: undefined
+        },
+        dropTarget;
       //  fire on canvas
       this.fire(eventType, options);
       //  make sure we fire dragenter events before dragover
@@ -473,9 +474,9 @@ export function CanvasEventsMixinGenerator(Klass) {
       this.__onMouseDown(e);
       this._resetTransformEventData();
       var canvasElement = this.upperCanvasEl,
-          eventTypePrefix = this._getEventPrefix();
-      addListener(fabric.document, 'touchend', this._onTouchEnd, addEventOptions);
-      addListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
+        eventTypePrefix = this._getEventPrefix();
+      addListener(context.document, 'touchend', this._onTouchEnd, addEventOptions);
+      addListener(context.document, 'touchmove', this._onMouseMove, addEventOptions);
       // Unbind mousedown to prevent double triggers from touch devices
       removeListener(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
     }
@@ -488,10 +489,10 @@ export function CanvasEventsMixinGenerator(Klass) {
       this.__onMouseDown(e);
       this._resetTransformEventData();
       var canvasElement = this.upperCanvasEl,
-          eventTypePrefix = this._getEventPrefix();
+        eventTypePrefix = this._getEventPrefix();
       removeListener(canvasElement, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
-      addListener(fabric.document, eventTypePrefix + 'up', this._onMouseUp);
-      addListener(fabric.document, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
+      addListener(context.document, eventTypePrefix + 'up', this._onMouseUp);
+      addListener(context.document, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
     }
 
     /**
@@ -507,13 +508,13 @@ export function CanvasEventsMixinGenerator(Klass) {
       this._resetTransformEventData();
       this.mainTouchId = null;
       var eventTypePrefix = this._getEventPrefix();
-      removeListener(fabric.document, 'touchend', this._onTouchEnd, addEventOptions);
-      removeListener(fabric.document, 'touchmove', this._onMouseMove, addEventOptions);
+      removeListener(context.document, 'touchend', this._onTouchEnd, addEventOptions);
+      removeListener(context.document, 'touchmove', this._onMouseMove, addEventOptions);
       var _this = this;
       if (this._willAddMouseDown) {
         clearTimeout(this._willAddMouseDown);
       }
-      this._willAddMouseDown = setTimeout(function() {
+      this._willAddMouseDown = setTimeout(function () {
         // Wait 400ms before rebinding mousedown to prevent double triggers
         // from touch devices
         addListener(_this.upperCanvasEl, eventTypePrefix + 'down', _this._onMouseDown);
@@ -529,10 +530,10 @@ export function CanvasEventsMixinGenerator(Klass) {
       this.__onMouseUp(e);
       this._resetTransformEventData();
       var canvasElement = this.upperCanvasEl,
-          eventTypePrefix = this._getEventPrefix();
+        eventTypePrefix = this._getEventPrefix();
       if (this._isMainEvent(e)) {
-        removeListener(fabric.document, eventTypePrefix + 'up', this._onMouseUp);
-        removeListener(fabric.document, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
+        removeListener(context.document, eventTypePrefix + 'up', this._onMouseUp);
+        removeListener(context.document, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
         addListener(canvasElement, eventTypePrefix + 'move', this._onMouseMove, addEventOptions);
       }
     }
@@ -589,8 +590,8 @@ export function CanvasEventsMixinGenerator(Klass) {
      */
     __onMouseUp(e) {
       var target, transform = this._currentTransform,
-          groupSelector = this._groupSelector, shouldRender = false,
-          isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
+        groupSelector = this._groupSelector, shouldRender = false,
+        isClick = (!groupSelector || (groupSelector.left === 0 && groupSelector.top === 0));
       this._cacheTransformEventData(e);
       target = this._target;
       this._handleEvent(e, 'up:before');
@@ -637,7 +638,7 @@ export function CanvasEventsMixinGenerator(Klass) {
       if (target) {
         corner = target._findTargetCorner(
           this.getPointer(e, true),
-          fabric.util.isTouchEvent(e)
+          isTouchEvent(e)
         );
         if (target.selectable && target !== this._activeObject && target.activeOn === 'up') {
           this.setActiveObject(target, e);
@@ -645,7 +646,7 @@ export function CanvasEventsMixinGenerator(Klass) {
         }
         else {
           var control = target.controls[corner],
-              mouseUpHandler = control && control.getMouseUpHandler(e, target, control);
+            mouseUpHandler = control && control.getMouseUpHandler(e, target, control);
           if (mouseUpHandler) {
             pointer = this.getPointer(e);
             mouseUpHandler(e, transform, pointer.x, pointer.y);
@@ -657,7 +658,7 @@ export function CanvasEventsMixinGenerator(Klass) {
       // fire the original mouse up from the corner that started the transform
       if (transform && (transform.target !== target || transform.corner !== corner)) {
         var originalControl = transform.target && transform.target.controls[transform.corner],
-            originalMouseUpHandler = originalControl && originalControl.getMouseUpHandler(e, target, control);
+          originalMouseUpHandler = originalControl && originalControl.getMouseUpHandler(e, target, control);
         pointer = pointer || this.getPointer(e);
         originalMouseUpHandler && originalMouseUpHandler(e, transform, pointer.x, pointer.y);
       }
@@ -713,17 +714,17 @@ export function CanvasEventsMixinGenerator(Klass) {
      */
     _handleEvent(e, eventType, button, isClick) {
       var target = this._target,
-          targets = this.targets || [],
-          options = {
-            e: e,
-            target: target,
-            subTargets: targets,
-            button: button || LEFT_CLICK,
-            isClick: isClick || false,
-            pointer: this._pointer,
-            absolutePointer: this._absolutePointer,
-            transform: this._currentTransform
-          };
+        targets = this.targets || [],
+        options = {
+          e: e,
+          target: target,
+          subTargets: targets,
+          button: button || LEFT_CLICK,
+          isClick: isClick || false,
+          pointer: this._pointer,
+          absolutePointer: this._absolutePointer,
+          transform: this._currentTransform
+        };
       if (eventType === 'up') {
         options.currentTarget = this.findTarget(e);
         options.currentSubTargets = this.targets;
@@ -758,13 +759,13 @@ export function CanvasEventsMixinGenerator(Klass) {
     _finalizeCurrentTransform(e) {
 
       var transform = this._currentTransform,
-          target = transform.target,
-          options = {
-            e: e,
-            target: target,
-            transform: transform,
-            action: transform.action,
-          };
+        target = transform.target,
+        options = {
+          e: e,
+          target: target,
+          transform: transform,
+          action: transform.action,
+        };
 
       if (target._scaling) {
         target._scaling = false;
@@ -859,7 +860,7 @@ export function CanvasEventsMixinGenerator(Klass) {
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
       var shouldRender = this._shouldRender(target),
-          shouldGroup = this._shouldGroup(e, target);
+        shouldGroup = this._shouldGroup(e, target);
       if (this._shouldClearSelection(e, target)) {
         this.discardActiveObject(e);
       }
@@ -885,14 +886,14 @@ export function CanvasEventsMixinGenerator(Klass) {
         }
         var corner = target._findTargetCorner(
           this.getPointer(e, true),
-          fabric.util.isTouchEvent(e)
+          isTouchEvent(e)
         );
         target.__corner = corner;
         if (target === this._activeObject && (corner || !shouldGroup)) {
           this._setupCurrentTransform(e, target, alreadySelected);
           var control = target.controls[corner],
-              pointer = this.getPointer(e),
-              mouseDownHandler = control && control.getMouseDownHandler(e, target, control);
+            pointer = this.getPointer(e),
+            mouseDownHandler = control && control.getMouseDownHandler(e, target, control);
           if (mouseDownHandler) {
             mouseDownHandler(e, this._currentTransform, pointer.x, pointer.y);
           }
@@ -996,8 +997,8 @@ export function CanvasEventsMixinGenerator(Klass) {
      */
     _fireOverOutEvents(target, e) {
       var _hoveredTarget = this._hoveredTarget,
-          _hoveredTargets = this._hoveredTargets, targets = this.targets,
-          length = Math.max(_hoveredTargets.length, targets.length);
+        _hoveredTargets = this._hoveredTargets, targets = this.targets,
+        length = Math.max(_hoveredTargets.length, targets.length);
 
       this.fireSyntheticInOutEvents(target, { e: e }, {
         oldTarget: _hoveredTarget,
@@ -1006,7 +1007,7 @@ export function CanvasEventsMixinGenerator(Klass) {
         evtIn: 'mouseover',
         canvasEvtIn: 'mouse:over',
       });
-      for (var i = 0; i < length; i++){
+      for (var i = 0; i < length; i++) {
         this.fireSyntheticInOutEvents(targets[i], { e: e }, {
           oldTarget: _hoveredTargets[i],
           evtOut: 'mouseout',
@@ -1025,8 +1026,8 @@ export function CanvasEventsMixinGenerator(Klass) {
      */
     _fireEnterLeaveEvents(target, data) {
       var _draggedoverTarget = this._draggedoverTarget,
-          _hoveredTargets = this._hoveredTargets, targets = this.targets,
-          length = Math.max(_hoveredTargets.length, targets.length);
+        _hoveredTargets = this._hoveredTargets, targets = this.targets,
+        length = Math.max(_hoveredTargets.length, targets.length);
 
       this.fireSyntheticInOutEvents(target, data, {
         oldTarget: _draggedoverTarget,
@@ -1059,7 +1060,7 @@ export function CanvasEventsMixinGenerator(Klass) {
      */
     fireSyntheticInOutEvents(target, data, config) {
       var inOpt, outOpt, oldTarget = config.oldTarget, outFires, inFires,
-          targetChanged = oldTarget !== target, canvasEvtIn = config.canvasEvtIn, canvasEvtOut = config.canvasEvtOut;
+        targetChanged = oldTarget !== target, canvasEvtIn = config.canvasEvtIn, canvasEvtOut = config.canvasEvtOut;
       if (targetChanged) {
         inOpt = Object.assign({}, data, { target: target, previousTarget: oldTarget });
         outOpt = Object.assign({}, data, { target: oldTarget, nextTarget: target });
@@ -1092,13 +1093,13 @@ export function CanvasEventsMixinGenerator(Klass) {
      */
     _transformObject(e) {
       var pointer = this.getPointer(e),
-          transform = this._currentTransform,
-          target = transform.target,
-          //  transform pointer to target's containing coordinate plane
-          //  both pointer and object should agree on every point
-          localPointer = target.group ?
-            fabric.util.sendPointToPlane(pointer, null, target.group.calcTransformMatrix()) :
-            pointer;
+        transform = this._currentTransform,
+        target = transform.target,
+        //  transform pointer to target's containing coordinate plane
+        //  both pointer and object should agree on every point
+        localPointer = target.group ?
+          sendPointToPlane(pointer, null, target.group.calcTransformMatrix()) :
+          pointer;
 
       transform.reset = false;
       transform.shiftKey = e.shiftKey;
@@ -1113,11 +1114,11 @@ export function CanvasEventsMixinGenerator(Klass) {
      */
     _performTransformAction(e, transform, pointer) {
       var x = pointer.x,
-          y = pointer.y,
-          action = transform.action,
-          actionPerformed = false,
-          actionHandler = transform.actionHandler;
-          // this object could be created from the function in the control handlers
+        y = pointer.y,
+        action = transform.action,
+        actionPerformed = false,
+        actionHandler = transform.actionHandler;
+      // this object could be created from the function in the control handlers
 
 
       if (actionHandler) {
@@ -1133,7 +1134,7 @@ export function CanvasEventsMixinGenerator(Klass) {
     /**
      * @private
      */
-    _fire = fabric.controlsUtils.fireEvent
+    _fire = fireEvent
 
     /**
      * Sets the cursor depending on where the canvas is being hovered.
@@ -1147,20 +1148,20 @@ export function CanvasEventsMixinGenerator(Klass) {
         return false;
       }
       var hoverCursor = target.hoverCursor || this.hoverCursor,
-          activeSelection = this._activeObject && this._activeObject.type === 'activeSelection' ?
-            this._activeObject : null,
-          // only show proper corner when group selection is not active
-          corner = (!activeSelection || !activeSelection.contains(target))
+        activeSelection = this._activeObject && this._activeObject.type === 'activeSelection' ?
+          this._activeObject : null,
+        // only show proper corner when group selection is not active
+        corner = (!activeSelection || !activeSelection.contains(target))
           // here we call findTargetCorner always with undefined for the touch parameter.
           // we assume that if you are using a cursor you do not need to interact with
           // the bigger touch area.
-                    && target._findTargetCorner(this.getPointer(e, true));
+          && target._findTargetCorner(this.getPointer(e, true));
 
       if (!corner) {
-        if (target.subTargetCheck){
+        if (target.subTargetCheck) {
           // hoverCursor should come from top-most subTarget,
           // so we walk the array backwards
-          this.targets.concat().reverse().map(function(_target){
+          this.targets.concat().reverse().map(function (_target) {
             hoverCursor = _target.hoverCursor || hoverCursor;
           });
         }
@@ -1181,5 +1182,4 @@ export function CanvasEventsMixinGenerator(Klass) {
   }
 }
 
-fabric.Canvas = CanvasEventsMixinGenerator(fabric.Canvas);
 

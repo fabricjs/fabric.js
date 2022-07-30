@@ -72,3 +72,5 @@ export let uid = 0;
 export function incrementUID() {
     return uid++;
 }
+
+export const RIGHT_CLICK = 3, MIDDLE_CLICK = 2, LEFT_CLICK = 1;
