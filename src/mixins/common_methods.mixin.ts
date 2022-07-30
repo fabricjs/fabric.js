@@ -1,4 +1,6 @@
-export class CommonMethods {
+import { Observable } from "./observable.mixin";
+
+export class CommonMethods extends Observable {
 
   /**
    * Sets object's properties from options
