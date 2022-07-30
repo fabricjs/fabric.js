@@ -1,5 +1,4 @@
-//@ts-nocheck
-
+(function(global) {
 
   var fabric = global.fabric, getPointer = fabric.util.getPointer,
       degreesToRadians = fabric.util.degreesToRadians,
@@ -100,7 +99,7 @@
    * });
    *
    */
-export class Canvas extends fabric.StaticCanvas {
+  fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, /** @lends fabric.Canvas.prototype */ {
 
     /**
      * Constructor
@@ -108,14 +107,14 @@ export class Canvas extends fabric.StaticCanvas {
      * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
-    constructor(el, options) {
+    initialize: function(el, options) {
       options || (options = { });
       this.renderAndResetBound = this.renderAndReset.bind(this);
       this.requestRenderAllBound = this.requestRenderAll.bind(this);
       this._initStatic(el, options);
       this._initInteractive();
       this._createCacheCanvas();
-    }
+    },
 
     /**
      * When true, objects can be transformed by one side (unproportionally)
@@ -124,7 +123,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @default
      * @since fabric 4.0 // changed name and default value
      */
-    uniformScaling = true
+    uniformScaling:      true,
 
     /**
      * Indicates which key switches uniform scaling.
@@ -138,7 +137,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @type String
      * @default
      */
-    uniScaleKey = 'shiftKey'
+    uniScaleKey:           'shiftKey',
 
     /**
      * When true, objects use center point as the origin of scale transformation.
@@ -147,7 +146,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @type Boolean
      * @default
      */
-    centeredScaling = false
+    centeredScaling:        false,
 
     /**
      * When true, objects use center point as the origin of rotate transformation.
@@ -156,7 +155,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @type Boolean
      * @default
      */
-    centeredRotation = false
+    centeredRotation:       false,
 
     /**
      * Indicates which key enable centered Transform
@@ -167,7 +166,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @type String
      * @default
      */
-    centeredKey = 'altKey'
+    centeredKey:           'altKey',
 
     /**
      * Indicates which key enable alternate action on corner
@@ -178,21 +177,21 @@ export class Canvas extends fabric.StaticCanvas {
      * @type String
      * @default
      */
-    altActionKey = 'shiftKey'
+    altActionKey:           'shiftKey',
 
     /**
      * Indicates that canvas is interactive. This property should not be changed.
      * @type Boolean
      * @default
      */
-    interactive = true
+    interactive:            true,
 
     /**
      * Indicates whether group selection should be enabled
      * @type Boolean
      * @default
      */
-    selection = true
+    selection:              true,
 
     /**
      * Indicates which key or keys enable multiple click selection
@@ -204,7 +203,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @type String|Array
      * @default
      */
-    selectionKey = 'shiftKey'
+    selectionKey:           'shiftKey',
 
     /**
      * Indicates which key enable alternative selection
@@ -218,70 +217,70 @@ export class Canvas extends fabric.StaticCanvas {
      * @type null|String
      * @default
      */
-    altSelectionKey = null
+    altSelectionKey:           null,
 
     /**
      * Color of selection
      * @type String
      * @default
      */
-    selectionColor = 'rgba(100, 100, 255, 0.3)' // blue
+    selectionColor:         'rgba(100, 100, 255, 0.3)', // blue
 
     /**
      * Default dash array pattern
      * If not empty the selection border is dashed
      * @type Array
      */
-    selectionDashArray = []
+    selectionDashArray:     [],
 
     /**
      * Color of the border of selection (usually slightly darker than color of selection itself)
      * @type String
      * @default
      */
-    selectionBorderColor = 'rgba(255, 255, 255, 0.3)'
+    selectionBorderColor:   'rgba(255, 255, 255, 0.3)',
 
     /**
      * Width of a line used in object/group selection
      * @type Number
      * @default
      */
-    selectionLineWidth = 1
+    selectionLineWidth:     1,
 
     /**
      * Select only shapes that are fully contained in the dragged selection rectangle.
      * @type Boolean
      * @default
      */
-    selectionFullyContained = false
+    selectionFullyContained: false,
 
     /**
      * Default cursor value used when hovering over an object on canvas
      * @type String
      * @default
      */
-    hoverCursor = 'move'
+    hoverCursor:            'move',
 
     /**
      * Default cursor value used when moving an object on canvas
      * @type String
      * @default
      */
-    moveCursor = 'move'
+    moveCursor:             'move',
 
     /**
      * Default cursor value used for the entire canvas
      * @type String
      * @default
      */
-    defaultCursor = 'default'
+    defaultCursor:          'default',
 
     /**
      * Cursor value used during free drawing
      * @type String
      * @default
      */
-    freeDrawingCursor = 'crosshair'
+    freeDrawingCursor:      'crosshair',
 
     /**
      * Cursor value used for disabled elements ( corners with disabled action )
@@ -289,28 +288,28 @@ export class Canvas extends fabric.StaticCanvas {
      * @since 2.0.0
      * @default
      */
-    notAllowedCursor = 'not-allowed'
+    notAllowedCursor:         'not-allowed',
 
     /**
      * Default element class that's given to wrapper (div) element of canvas
      * @type String
      * @default
      */
-    containerClass = 'canvas-container'
+    containerClass:         'canvas-container',
 
     /**
      * When true, object detection happens on per-pixel basis rather than on per-bounding-box
      * @type Boolean
      * @default
      */
-    perPixelTargetFind = false
+    perPixelTargetFind:     false,
 
     /**
      * Number of pixels around target pixel to tolerate (consider active) during object detection
      * @type Number
      * @default
      */
-    targetFindTolerance = 0
+    targetFindTolerance:    0,
 
     /**
      * When true, target detection is skipped. Target detection will return always undefined.
@@ -321,7 +320,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @type Boolean
      * @default
      */
-    skipTargetFind = false
+    skipTargetFind:         false,
 
     /**
      * When true, mouse events on canvas (mousedown/mousemove/mouseup) result in free drawing.
@@ -331,7 +330,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @type Boolean
      * @default
      */
-    isDrawingMode = false
+    isDrawingMode:          false,
 
     /**
      * Indicates whether objects should remain in current stack position when selected.
@@ -339,7 +338,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @type Boolean
      * @default
      */
-    preserveObjectStacking = false
+    preserveObjectStacking: false,
 
     /**
      * Indicates the angle that an object will lock to while rotating.
@@ -347,7 +346,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @since 1.6.7
      * @default
      */
-    snapAngle = 0
+    snapAngle: 0,
 
     /**
      * Indicates the distance from the snapAngle the rotation will lock to the snapAngle.
@@ -356,7 +355,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @since 1.6.7
      * @default
      */
-    snapThreshold = null
+    snapThreshold: null,
 
     /**
      * Indicates if the right click on canvas can output the context menu or not
@@ -364,7 +363,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @since 1.6.5
      * @default
      */
-    stopContextMenu = false
+    stopContextMenu: false,
 
     /**
      * Indicates if the canvas can fire right click events
@@ -372,7 +371,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @since 1.6.5
      * @default
      */
-    fireRightClick = false
+    fireRightClick: false,
 
     /**
      * Indicates if the canvas can fire middle click events
@@ -380,46 +379,46 @@ export class Canvas extends fabric.StaticCanvas {
      * @since 1.7.8
      * @default
      */
-    fireMiddleClick = false
+    fireMiddleClick: false,
 
     /**
      * Keep track of the subTargets for Mouse Events
      * @type fabric.Object[]
      */
-    targets = []
+    targets: [],
 
     /**
      * When the option is enabled, PointerEvent is used instead of MouseEvent.
      * @type Boolean
      * @default
      */
-    enablePointerEvents = false
+    enablePointerEvents: false,
 
     /**
      * Keep track of the hovered target
      * @type fabric.Object
      * @private
      */
-    _hoveredTarget = null
+    _hoveredTarget: null,
 
     /**
      * hold the list of nested targets hovered
      * @type fabric.Object[]
      * @private
      */
-    _hoveredTargets = []
+    _hoveredTargets: [],
 
     /**
      * hold the list of objects to render
      * @type fabric.Object[]
      * @private
      */
-    _objectsToRender = undefined
+    _objectsToRender: undefined,
 
     /**
      * @private
      */
-    _initInteractive() {
+    _initInteractive: function() {
       this._currentTransform = null;
       this._groupSelector = null;
       this._initWrapperElement();
@@ -431,22 +430,22 @@ export class Canvas extends fabric.StaticCanvas {
       this.freeDrawingBrush = fabric.PencilBrush && new fabric.PencilBrush(this);
 
       this.calcOffset();
-    }
+    },
 
     /**
      * @private
      * @param {fabric.Object} obj Object that was added
      */
-    _onObjectAdded(obj) {
+    _onObjectAdded: function (obj) {
       this._objectsToRender = undefined;
-      super._onObjectAdded(obj);
-    }
+      this.callSuper('_onObjectAdded', obj);
+    },
 
     /**
      * @private
      * @param {fabric.Object} obj Object that was removed
      */
-    _onObjectRemoved(obj) {
+    _onObjectRemoved: function (obj) {
       this._objectsToRender = undefined;
       // removing active object should fire "selection:cleared" events
       if (obj === this._activeObject) {
@@ -459,15 +458,15 @@ export class Canvas extends fabric.StaticCanvas {
         this._hoveredTarget = null;
         this._hoveredTargets = [];
       }
-      super._onObjectRemoved(obj);
-    }
+      this.callSuper('_onObjectRemoved', obj);
+    },
 
     /**
      * Divides objects in two groups, one to render immediately
      * and one to render as activeGroup.
      * @return {Array} objects to render immediately and pushes the other in the activeGroup.
      */
-    _chooseObjectsToRender() {
+    _chooseObjectsToRender: function() {
       var activeObjects = this.getActiveObjects(),
           object, objsToRender, activeGroupObjects;
 
@@ -501,14 +500,14 @@ export class Canvas extends fabric.StaticCanvas {
         objsToRender = this._objects;
       }
       return objsToRender;
-    }
+    },
 
     /**
      * Renders both the top canvas and the secondary container canvas.
      * @return {fabric.Canvas} instance
      * @chainable
      */
-    renderAll() {
+    renderAll: function () {
       if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
         this.clearContext(this.contextTop);
         this.contextTopDirty = false;
@@ -521,9 +520,9 @@ export class Canvas extends fabric.StaticCanvas {
       !this._objectsToRender && (this._objectsToRender = this._chooseObjectsToRender());
       this.renderCanvas(canvasToDrawOn, this._objectsToRender);
       return this;
-    }
+    },
 
-    renderTopLayer(ctx) {
+    renderTopLayer: function(ctx) {
       ctx.save();
       if (this.isDrawingMode && this._isCurrentlyDrawing) {
         this.freeDrawingBrush && this.freeDrawingBrush._render();
@@ -535,7 +534,7 @@ export class Canvas extends fabric.StaticCanvas {
         this.contextTopDirty = true;
       }
       ctx.restore();
-    }
+    },
 
     /**
      * Method to render only the top canvas.
@@ -543,23 +542,23 @@ export class Canvas extends fabric.StaticCanvas {
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    renderTop() {
+    renderTop: function () {
       var ctx = this.contextTop;
       this.clearContext(ctx);
       this.renderTopLayer(ctx);
       this.fire('after:render');
       return this;
-    }
+    },
 
     /**
      * @private
      */
-    _normalizePointer(object, pointer) {
+    _normalizePointer: function (object, pointer) {
       var m = object.calcTransformMatrix(),
           invertedM = fabric.util.invertTransform(m),
           vptPointer = this.restorePointerVpt(pointer);
       return fabric.util.transformPoint(vptPointer, invertedM);
-    }
+    },
 
     /**
      * Returns true if object is transparent at a certain location
@@ -568,7 +567,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @param {Number} y Top coordinate
      * @return {Boolean}
      */
-    isTargetTransparent(target, x, y) {
+    isTargetTransparent: function (target, x, y) {
       // in case the target is the activeObject, we cannot execute this optimization
       // because we need to draw controls too.
       if (target.shouldCache() && target._cacheCanvas && target !== this._activeObject) {
@@ -600,14 +599,14 @@ export class Canvas extends fabric.StaticCanvas {
         ctx, x, y, this.targetFindTolerance);
 
       return isTransparent;
-    }
+    },
 
     /**
      * takes an event and determines if selection key has been pressed
      * @private
      * @param {Event} e Event object
      */
-    _isSelectionKeyPressed(e) {
+    _isSelectionKeyPressed: function(e) {
       var selectionKeyPressed = false;
 
       if (Array.isArray(this.selectionKey)) {
@@ -618,14 +617,14 @@ export class Canvas extends fabric.StaticCanvas {
       }
 
       return selectionKeyPressed;
-    }
+    },
 
     /**
      * @private
      * @param {Event} e Event object
      * @param {fabric.Object} target
      */
-    _shouldClearSelection(e, target) {
+    _shouldClearSelection: function (e, target) {
       var activeObjects = this.getActiveObjects(),
           activeObject = this._activeObject;
 
@@ -646,7 +645,7 @@ export class Canvas extends fabric.StaticCanvas {
           activeObject &&
           activeObject !== target)
       );
-    }
+    },
 
     /**
      * centeredScaling from object can't override centeredScaling from canvas.
@@ -658,7 +657,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @param {String} action
      * @param {Boolean} altKey
      */
-    _shouldCenterTransform(target, action, altKey) {
+    _shouldCenterTransform: function (target, action, altKey) {
       if (!target) {
         return;
       }
@@ -673,13 +672,13 @@ export class Canvas extends fabric.StaticCanvas {
       }
 
       return centerTransform ? !altKey : altKey;
-    }
+    },
 
     /**
      * should disappear before release 4.0
      * @private
      */
-    _getOriginFromCorner(target, corner) {
+    _getOriginFromCorner: function(target, corner) {
       var origin = {
         x: target.originX,
         y: target.originY
@@ -699,7 +698,7 @@ export class Canvas extends fabric.StaticCanvas {
         origin.y = 'top';
       }
       return origin;
-    }
+    },
 
     /**
      * @private
@@ -708,20 +707,20 @@ export class Canvas extends fabric.StaticCanvas {
      * @param {Event} e Event object
      * @param {fabric.Object} [target] inserted back to help overriding. Unused
      */
-    _getActionFromCorner(alreadySelected, corner, e, target) {
+    _getActionFromCorner: function(alreadySelected, corner, e, target) {
       if (!corner || !alreadySelected) {
         return 'drag';
       }
       var control = target.controls[corner];
       return control.getActionName(e, control, target);
-    }
+    },
 
     /**
      * @private
      * @param {Event} e Event object
      * @param {fabric.Object} target
      */
-    _setupCurrentTransform(e, target, alreadySelected) {
+    _setupCurrentTransform: function (e, target, alreadySelected) {
       if (!target) {
         return;
       }
@@ -773,22 +772,22 @@ export class Canvas extends fabric.StaticCanvas {
       transform.original.originY = origin.y;
       this._currentTransform = transform;
       this._beforeTransform(e);
-    }
+    },
 
     /**
      * Set the cursor type of the canvas element
      * @param {String} value Cursor type of the canvas element.
      * @see http://www.w3.org/TR/css3-ui/#cursor
      */
-    setCursor(value) {
+    setCursor: function (value) {
       this.upperCanvasEl.style.cursor = value;
-    }
+    },
 
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx to draw the selection on
      */
-    _drawSelection(ctx) {
+    _drawSelection: function (ctx) {
       var selector = this._groupSelector,
           viewportStart = new fabric.Point(selector.ex, selector.ey),
           start = fabric.util.transformPoint(viewportStart, this.viewportTransform),
@@ -818,7 +817,7 @@ export class Canvas extends fabric.StaticCanvas {
       // selection border
       fabric.Object.prototype._setLineDash.call(this, ctx, this.selectionDashArray);
       ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
-    }
+    },
 
     /**
      * Method that determines what object we are clicking on
@@ -829,7 +828,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @param {Boolean} skipGroup when true, activeGroup is skipped and only objects are traversed through
      * @return {fabric.Object} the target found
      */
-    findTarget(e, skipGroup) {
+    findTarget: function (e, skipGroup) {
       if (this.skipTargetFind) {
         return;
       }
@@ -872,7 +871,7 @@ export class Canvas extends fabric.StaticCanvas {
         this.targets = activeTargetSubs;
       }
       return target;
-    }
+    },
 
     /**
      * Checks point is inside the object.
@@ -882,7 +881,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @return {Boolean} true if point is contained within an area of given object
      * @private
      */
-    _checkTarget(pointer, obj, globalPointer) {
+    _checkTarget: function(pointer, obj, globalPointer) {
       if (obj &&
           obj.visible &&
           obj.evented &&
@@ -900,7 +899,7 @@ export class Canvas extends fabric.StaticCanvas {
           return true;
         }
       }
-    }
+    },
 
     /**
      * Internal Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
@@ -909,7 +908,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @return {fabric.Object} **top most object from given `objects`** that contains pointer
      * @private
      */
-    _searchPossibleTargets(objects, pointer) {
+    _searchPossibleTargets: function(objects, pointer) {
       // Cache all targets where their bounding box contains point.
       var target, i = objects.length, subTarget;
       // Do not check for currently grouped objects, since we check the parent group itself.
@@ -928,7 +927,7 @@ export class Canvas extends fabric.StaticCanvas {
         }
       }
       return target;
-    }
+    },
 
     /**
      * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
@@ -937,22 +936,22 @@ export class Canvas extends fabric.StaticCanvas {
      * @param {Object} [pointer] x,y object of point coordinates we want to check.
      * @return {fabric.Object} **top most object on screen** that contains pointer
      */
-    searchPossibleTargets(objects, pointer) {
+    searchPossibleTargets: function (objects, pointer) {
       var target = this._searchPossibleTargets(objects, pointer);
       return target && target.interactive && this.targets[0] ? this.targets[0] : target;
-    }
+    },
 
     /**
      * Returns pointer coordinates without the effect of the viewport
      * @param {Object} pointer with "x" and "y" number values
      * @return {Object} object with "x" and "y" number values
      */
-    restorePointerVpt(pointer) {
+    restorePointerVpt: function(pointer) {
       return fabric.util.transformPoint(
         pointer,
         fabric.util.invertTransform(this.viewportTransform)
       );
-    }
+    },
 
     /**
      * Returns pointer coordinates relative to canvas.
@@ -972,7 +971,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @param {Boolean} ignoreVpt
      * @return {fabric.Point}
      */
-    getPointer(e, ignoreVpt) {
+    getPointer: function (e, ignoreVpt) {
       // return cached values if we are in the event processing chain
       if (this._absolutePointer && !ignoreVpt) {
         return this._absolutePointer;
@@ -1019,7 +1018,7 @@ export class Canvas extends fabric.StaticCanvas {
         pointer.x * cssScale.x,
         pointer.y * cssScale.y
       );
-    }
+    },
 
     /**
      * Sets dimensions (width, height) of this canvas instance. when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
@@ -1032,18 +1031,18 @@ export class Canvas extends fabric.StaticCanvas {
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    setDimensions(dimensions, options) {
+    setDimensions: function (dimensions, options) {
       this._resetTransformEventData();
-      return super.setDimensions(dimensions, options);
-    }
+      return this.callSuper('setDimensions', dimensions, options);
+    },
 
     /**
      * @private
      * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
      */
-    _createUpperCanvas() {
-      var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, '')
-          lowerCanvasEl = this.lowerCanvasEl upperCanvasEl = this.upperCanvasEl;
+    _createUpperCanvas: function () {
+      var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, ''),
+          lowerCanvasEl = this.lowerCanvasEl, upperCanvasEl = this.upperCanvasEl;
 
       // there is no need to create a new upperCanvas element if we have already one.
       if (upperCanvasEl) {
@@ -1097,7 +1096,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @param {HTMLElement} element canvas element to apply styles on
      */
     _applyCanvasStyle: function (element) {
-      var width = this.width || element.width
+      var width = this.width || element.width,
           height = this.height || element.height;
 
       fabric.util.setStyle(element, {
@@ -1120,7 +1119,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @param {Element} fromEl Element style is copied from
      * @param {Element} toEl Element copied style is applied to
      */
-    _copyCanvasStyle: function (fromEl toEl) {
+    _copyCanvasStyle: function (fromEl, toEl) {
       toEl.style.cssText = fromEl.style.cssText;
     },
 
@@ -1179,9 +1178,9 @@ export class Canvas extends fabric.StaticCanvas {
      * Compares the old activeObject with the current one and fires correct events
      * @param {fabric.Object} obj old activeObject
      */
-    _fireSelectionEvents: function(oldObjects e) {
-      var somethingChanged = false objects = this.getActiveObjects()
-          added = [] removed = [] invalidate = false;
+    _fireSelectionEvents: function(oldObjects, e) {
+      var somethingChanged = false, objects = this.getActiveObjects(),
+          added = [], removed = [], invalidate = false;
       oldObjects.forEach(function(oldObject) {
         if (objects.indexOf(oldObject) === -1) {
           somethingChanged = true;
@@ -1234,7 +1233,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    setActiveObject: function (object e) {
+    setActiveObject: function (object, e) {
       var currentActives = this.getActiveObjects();
       this._setActiveObject(object, e);
       this._fireSelectionEvents(currentActives, e);
@@ -1251,7 +1250,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @param {Event} [e] Event (passed along when firing "object:selected")
      * @return {Boolean} true if the selection happened
      */
-    _setActiveObject: function(object e) {
+    _setActiveObject: function(object, e) {
       if (this._activeObject === object) {
         return false;
       }
@@ -1275,7 +1274,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @return {Boolean} true if the selection happened
      * @private
      */
-    _discardActiveObject: function(e object) {
+    _discardActiveObject: function(e, object) {
       var obj = this._activeObject;
       if (obj) {
         // onDeselect return TRUE to cancel selection;
@@ -1300,7 +1299,7 @@ export class Canvas extends fabric.StaticCanvas {
      * @chainable
      */
     discardActiveObject: function (e) {
-      var currentActives = this.getActiveObjects() activeObject = this.getActiveObject();
+      var currentActives = this.getActiveObjects(), activeObject = this.getActiveObject();
       if (currentActives.length) {
         this.fire('before:selection:cleared', { target: activeObject, e: e });
       }
@@ -1315,12 +1314,12 @@ export class Canvas extends fabric.StaticCanvas {
      * @chainable
      */
     dispose: function () {
-      var wrapperEl = this.wrapperEl
-          lowerCanvasEl = this.lowerCanvasEl
-          upperCanvasEl = this.upperCanvasEl
+      var wrapperEl = this.wrapperEl,
+          lowerCanvasEl = this.lowerCanvasEl,
+          upperCanvasEl = this.upperCanvasEl,
           cacheCanvasEl = this.cacheCanvasEl;
       this.removeListeners();
-      super.dispose();
+      this.callSuper('dispose');
       wrapperEl.removeChild(upperCanvasEl);
       wrapperEl.removeChild(lowerCanvasEl);
       this.contextCache = null;
@@ -1345,7 +1344,7 @@ export class Canvas extends fabric.StaticCanvas {
       // this.discardActiveGroup();
       this.discardActiveObject();
       this.clearContext(this.contextTop);
-      return super.clear();
+      return this.callSuper('clear');
     },
 
     /**
@@ -1363,13 +1362,13 @@ export class Canvas extends fabric.StaticCanvas {
     /**
      * @private
      */
-    _toObject: function(instance methodName propertiesToInclude) {
-      //If the object is part of the current selection group it should
+    _toObject: function(instance, methodName, propertiesToInclude) {
+      //If the object is part of the current selection group, it should
       //be transformed appropriately
       //i.e. it should be serialised as it would appear if the selection group
       //were to be destroyed.
-      var originalProperties = this._realizeGroupTransformOnObject(instance)
-          object = super._toObject(instance, methodName, propertiesToInclude);
+      var originalProperties = this._realizeGroupTransformOnObject(instance),
+          object = this.callSuper('_toObject', instance, methodName, propertiesToInclude);
       //Undo the damage we did by changing all of its properties
       originalProperties && instance.set(originalProperties);
       return object;
@@ -1400,11 +1399,11 @@ export class Canvas extends fabric.StaticCanvas {
     /**
      * @private
      */
-    _setSVGObject: function(markup instance reviver) {
-      //If the object is in a selection group simulate what would happen to that
+    _setSVGObject: function(markup, instance, reviver) {
+      //If the object is in a selection group, simulate what would happen to that
       //object when the group is deselected
       var originalProperties = this._realizeGroupTransformOnObject(instance);
-      super._setSVGObject(markup, instance, reviver);
+      this.callSuper('_setSVGObject', markup, instance, reviver);
       originalProperties && instance.set(originalProperties);
     },
 
@@ -1414,7 +1413,7 @@ export class Canvas extends fabric.StaticCanvas {
       }
       fabric.StaticCanvas.prototype.setViewportTransform.call(this, vpt);
     }
-  }
+  });
 
   // copying static properties manually to work around Opera's bug,
   // where "prototype" property is enumerable and overrides existing prototype
@@ -1423,3 +1422,4 @@ export class Canvas extends fabric.StaticCanvas {
       fabric.Canvas[prop] = fabric.StaticCanvas[prop];
     }
   }
+})(typeof exports !== 'undefined' ? exports : window);
