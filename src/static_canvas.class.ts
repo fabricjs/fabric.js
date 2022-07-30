@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { FabricObject } from "shapes/object.class";
+import { FabricObject } from "./shapes/object.class";
 import { VERSION } from '../context';
 import { NUM_FRACTION_DIGITS } from './config';
 import { devicePixelRatio, fontPaths, iMatrix, incrementUID, isLikelyNode } from './constants';

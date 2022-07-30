@@ -1,10 +1,9 @@
 //@ts-nocheck
 
-import { Point } from "point.class";
 import { CollectionMixinGenerator } from "../mixins/collection.mixin";
+import { Point } from "../point.class";
 import {
-  applyTransformToObject, sin, cos,
-  degreesToRadians, enlivenObjectEnlivables, enlivenObjects, invertTransform, multiplyTransformMatrices, transformPoint
+  applyTransformToObject, degreesToRadians, enlivenObjectEnlivables, enlivenObjects, invertTransform, multiplyTransformMatrices, transformPoint
 } from '../util';
 import { FabricObject } from "./object.class";
 import { Rect } from "./rect.class";

@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { animate, animateColor } from "util";
+import { animate, animateColor } from "../util";
 
 export function ObjectAnimationMixinGenerator(Klass) {
   return class ObjectAnimationMixin extends Klass {

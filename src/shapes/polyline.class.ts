@@ -1,7 +1,7 @@
 //@ts-nocheck
 
-import { parseAttributes, parsePointsAttribute } from 'parser';
 import { SHARED_ATTRIBUTES } from '../constants';
+import { parseAttributes, parsePointsAttribute } from '../parser';
 import {
   max, min, projectStrokeOnPoints, toFixed
 } from '../util';

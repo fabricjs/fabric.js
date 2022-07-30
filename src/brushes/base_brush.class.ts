@@ -1,7 +1,7 @@
 //@ts-nocheck
 
-import { Color } from "color";
-import { devicePixelRatio } from "constants";
+import { Color } from "../color";
+import { devicePixelRatio } from "../constants";
 
 /**
  * BaseBrush class

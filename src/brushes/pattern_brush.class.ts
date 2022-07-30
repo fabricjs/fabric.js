@@ -1,7 +1,7 @@
 //@ts-nocheck
 
-import { Pattern } from "pattern.class";
-import { createCanvasElement } from "util";
+import { Pattern } from "../pattern.class";
+import { createCanvasElement } from "../util";
 import { PencilBrush } from "./pencil_brush.class";
 
 /**

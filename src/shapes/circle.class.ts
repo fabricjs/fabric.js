@@ -1,12 +1,11 @@
 //@ts-nocheck
 
 import { SHARED_ATTRIBUTES } from '../constants';
+import { parseAttributes } from '../parser';
 import {
-  sin,
   cos,
-  degreesToRadians
+  degreesToRadians, sin
 } from '../util';
-import { parseAttributes } from 'parser';
 import { FabricObject } from './object.class';
 
 function isValidRadius(attributes) {

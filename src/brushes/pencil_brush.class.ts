@@ -1,10 +1,9 @@
 //@ts-nocheck
 
-import { Point } from "point.class";
-import { Shadow } from "shadow.class";
-import { Path } from "shapes";
-import { joinPath } from "util";
-import { getSmoothPathFromPoints } from "util";
+import { Point } from "../point.class";
+import { Shadow } from "../shadow.class";
+import { Path } from "../shapes";
+import { getSmoothPathFromPoints, joinPath } from "../util";
 import { BaseBrush } from "./base_brush.class";
 
 /**

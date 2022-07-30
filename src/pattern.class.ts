@@ -1,10 +1,10 @@
 //@ts-nocheck
 
-import { NUM_FRACTION_DIGITS } from 'config';
-import { incrementUID } from 'constants';
+import { NUM_FRACTION_DIGITS } from './config';
+import { incrementUID } from './constants';
 import {
   loadImage, populateWithProperties, toFixed
-} from 'util';
+} from './util';
 
 
 /**

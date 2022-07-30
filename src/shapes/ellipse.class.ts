@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { halfPI, SHARED_ATTRIBUTES } from '../constants';
-import { parseAttributes } from 'parser';
+import { parseAttributes } from '../parser';
 import { FabricObject } from './object.class';
 /**
  * Ellipse class

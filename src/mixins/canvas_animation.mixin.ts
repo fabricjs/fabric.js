@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { animate } from "util";
+import { animate } from "../util";
 
 
 export function StaticCanvasAnimationMixinGenerator(Klass) {

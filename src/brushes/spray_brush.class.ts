@@ -1,9 +1,9 @@
 //@ts-nocheck
 
-import { Point } from "point.class";
-import { Shadow } from "shadow.class";
-import { Group, Rect } from "shapes";
-import { getRandomInt } from "util";
+import { Point } from "../point.class";
+import { Shadow } from "../shadow.class";
+import { Group, Rect } from "../shapes";
+import { getRandomInt } from "../util";
 import { BaseBrush } from "./base_brush.class";
 
 /**

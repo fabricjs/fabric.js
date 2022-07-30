@@ -1,10 +1,9 @@
 //@ts-nocheck
 
-import { IText } from "./itext.class";
-
 import {
   stylesFromArray
 } from '../util';
+import { IText } from "./itext.class";
 import { FabricObject } from './object.class';
 
 const wordJoiners = /[ \t\r]/;

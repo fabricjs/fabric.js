@@ -1,10 +1,10 @@
 //@ts-nocheck
 /* _TO_SVG_START_ */
 
-import { Color } from 'color';
-import { incrementUID } from 'constants';
-import { toFixed } from "util";
+import { Color } from '../color';
 import { NUM_FRACTION_DIGITS } from '../config';
+import { incrementUID } from '../constants';
+import { toFixed } from "../util";
 
 function getSvgColorString(prop, value) {
   if (!value) {

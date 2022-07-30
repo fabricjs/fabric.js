@@ -1,7 +1,7 @@
 //@ts-nocheck
 
-import { VERSION } from 'context';
-import { RUNNING_ANIMATIONS } from 'util/animate';
+import { VERSION } from '../../context';
+import { RUNNING_ANIMATIONS } from '../util/animate';
 import { browserShadowBlurConstant, maxCacheSideLimit, minCacheSideLimit, NUM_FRACTION_DIGITS } from '../config';
 import { ALIASING_LIMIT, devicePixelRatio, iMatrix, isLikelyNode, uid } from '../constants';
 import { CommonMethods } from '../mixins/common_methods.mixin';

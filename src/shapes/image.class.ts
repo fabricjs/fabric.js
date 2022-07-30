@@ -1,8 +1,8 @@
 //@ts-nocheck
 
 var fabric = global.fabric;
-import { parseAttributes } from 'parser';
 import { incrementUID, SHARED_ATTRIBUTES } from '../constants';
+import { parseAttributes } from '../parser';
 import {
   addClass, cleanUpJsdomNode, createCanvasElement, enlivenObjectEnlivables, enlivenObjects, findScaleToCover, findScaleToFit, getById, loadImage, parsePreserveAspectRatioAttribute, setImageSmoothing
 } from '../util';

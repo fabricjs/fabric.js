@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { incrementUID } from "constants";
+import { incrementUID } from "./constants";
 
 var fabric = global.fabric;
 /* _FROM_SVG_START_ */

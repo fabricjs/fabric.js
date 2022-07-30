@@ -1,10 +1,10 @@
 //@ts-nocheck
 
-import { Color } from "color";
-import { Point } from "point.class";
-import { Shadow } from "shadow.class";
-import { Circle, Group } from "shapes";
-import { getRandomInt } from "util";
+import { Color } from "../color";
+import { Point } from "../point.class";
+import { Shadow } from "../shadow.class";
+import { Circle, Group } from "../shapes";
+import { getRandomInt } from "../util";
 import { BaseBrush } from "./base_brush.class";
 
 /**

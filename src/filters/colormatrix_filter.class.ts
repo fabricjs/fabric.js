@@ -1,12 +1,5 @@
 //@ts-nocheck
 
-
-'use strict';
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
-
 import { BaseFilter } from "./base_filter.class";
 
 /**

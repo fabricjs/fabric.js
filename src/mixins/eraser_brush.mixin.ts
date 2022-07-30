@@ -1,7 +1,7 @@
 //@ts-nocheck
 
-import { isEmptySVGPath, PencilBrush } from "brushes/pencil_brush.class";
-import { uid } from "constants";
+import { isEmptySVGPath, PencilBrush } from "../brushes/pencil_brush.class";
+import { incrementUID } from "../constants";
 
 /** ERASER_START */
 

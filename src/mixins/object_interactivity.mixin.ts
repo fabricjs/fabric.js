@@ -1,7 +1,7 @@
 //@ts-nocheck
 
-import { degreesToRadians, sizeAfterTransform } from "util";
-import { Point } from "point.class";
+import { degreesToRadians, sizeAfterTransform } from "../util";
+import { Point } from "../point.class";
 
 export function ObjectInteractivityMixinGenerator(Klass) {
   return class ObjectInteractivityMixin extends Klass {

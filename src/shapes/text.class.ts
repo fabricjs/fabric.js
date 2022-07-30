@@ -1,8 +1,8 @@
 //@ts-nocheck
 
-import { charWidthsCache } from 'cache';
-import { parseAttributes } from 'parser';
+import { charWidthsCache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE, isLikelyNode, SHARED_ATTRIBUTES } from '../constants';
+import { parseAttributes } from '../parser';
 import { createCanvasElement, hasStyleChanged, stylesFromArray, stylesToArray } from '../util';
 import { FabricObject } from './object.class';
 

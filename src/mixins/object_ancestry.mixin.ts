@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import type { FabricObject } from "shapes/object.class";
-import { StaticCanvas } from "static_canvas.class";
+import { StaticCanvas } from "../static_canvas.class";
 
 export function ObjectAncestryMixinGenerator(Klass) {
   return class ObjectAncestryMixin extends Klass {

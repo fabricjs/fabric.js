@@ -33,7 +33,7 @@ export const SHARED_ATTRIBUTES = [
  * Device Pixel Ratio
  * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
  */
-export let devicePixelRatio = context.window.devicePixelRatio ||
+export let devicePixelRatio: number = context.window.devicePixelRatio ||
     context.window.webkitDevicePixelRatio ||
     context.window.mozDevicePixelRatio ||
     1;

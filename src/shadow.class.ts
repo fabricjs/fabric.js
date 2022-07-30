@@ -1,9 +1,9 @@
 //@ts-nocheck
 
-import { Color } from "color";
-import { incrementUID } from "constants";
-import { Point } from "point.class";
-import { degreesToRadians, rotateVector, toFixed } from "util";
+import { Color } from "./color";
+import { incrementUID } from "./constants";
+import { Point } from "./point.class";
+import { degreesToRadians, rotateVector, toFixed } from "./util";
 
 /**
 * Regex matching shadow offsetX, offsetY and blur (ex: "2px 2px 10px rgba(0,0,0,0.2)", "rgb(0,255,0) 2px 2px")

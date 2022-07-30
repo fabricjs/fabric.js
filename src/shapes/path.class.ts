@@ -1,11 +1,11 @@
 //@ts-nocheck
 import { SHARED_ATTRIBUTES } from '../constants';
+import { parseAttributes } from '../parser';
 import {
   getBoundsOfCurve, joinPath, makePathSimpler, max, min, parsePath, toFixed
 } from '../util';
 import { FabricObject } from './object.class';
 import { Polyline } from './polyline.class';
-import { parseAttributes } from 'parser';
 
 /**
  * Path class
