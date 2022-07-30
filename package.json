@@ -71,6 +71,7 @@
   "devDependencies": {
     "@rollup/plugin-json": "^4.1.0",
     "@types/fs-extra": "^9.0.13",
+    "@types/jsdom": "^20.0.0",
     "@types/lodash": "^4.14.180",
     "@types/node": "^17.0.21",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
