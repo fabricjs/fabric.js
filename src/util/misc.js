@@ -439,13 +439,13 @@ import { cos } from './index.ts';
      * Returns klass "Class" object of given namespace
      * @memberOf fabric.util
      * @param {String} type Type of object (eg. 'circle')
-     * @param {String} namespace Namespace to get klass "Class" object from
+     * @param {object} namespace Namespace to get klass "Class" object from
      * @return {Object} klass "Class"
      */
     getKlass: function(type, namespace) {
       // capitalize first letter only
       type = fabric.util.string.camelize(type.charAt(0).toUpperCase() + type.slice(1));
-      return fabric.util.resolveNamespace(namespace)[type];
+      return (namespace || fabric)[type];
     },
 
     /**
@@ -476,40 +476,31 @@ import { cos } from './index.ts';
     },
 
     /**
-     * Returns object of given namespace
-     * @memberOf fabric.util
-     * @param {String} namespace Namespace string e.g. 'fabric.Image.filter' or 'fabric'
-     * @return {Object} Object for given namespace (default fabric)
-     */
-    resolveNamespace: function(namespace) {
-      if (!namespace) {
-        return fabric;
-      }
-
-      var parts = namespace.split('.'),
-          len = parts.length, i,
-          obj = global || fabric.window;
-
-      for (i = 0; i < len; ++i) {
-        obj = obj[parts[i]];
-      }
-
-      return obj;
-    },
-
-    /**
      * Loads image element from given url and resolve it, or catch.
      * @memberOf fabric.util
      * @param {String} url URL representing an image
      * @param {Object} [options] image loading options
      * @param {string} [options.crossOrigin] cors value for the image loading, default to anonymous
+     * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
      * @param {Promise<fabric.Image>} img the loaded image.
      */
-    loadImage: function(url, options) {
-      return new Promise(function(resolve, reject) {
+    loadImage: function (url, options) {
+      var abort, signal = options && options.signal;
+      return new Promise(function (resolve, reject) {
+        if (signal && signal.aborted) {
+          return reject(new Error('`options.signal` is in `aborted` state'));
+        }
+        else if (signal) {
+          abort = function (err) {
+            img.src = '';
+            reject(err);
+          };
+          signal.addEventListener('abort', abort, { once: true });
+        }
         var img = fabric.util.createImage();
         var done = function() {
           img.onload = img.onerror = null;
+          signal && abort && signal.removeEventListener('abort', abort);
           resolve(img);
         };
         if (!url) {
@@ -518,6 +509,7 @@ import { cos } from './index.ts';
         else {
           img.onload = done;
           img.onerror = function () {
+            signal && abort && signal.removeEventListener('abort', abort);
             reject(new Error('Error loading ' + img.src));
           };
           options && options.crossOrigin && (img.crossOrigin = options.crossOrigin);
@@ -531,51 +523,94 @@ import { cos } from './index.ts';
      * @static
      * @memberOf fabric.util
      * @param {Object[]} objects Objects to enliven
-     * @param {String} namespace Namespace to get klass "Class" object from
-     * @param {Function} reviver Method for further parsing of object elements,
+     * @param {object} [options]
+     * @param {object} [options.namespace] Namespace to get klass "Class" object from
+     * @param {(serializedObj: object, instance: fabric.Object) => any} [options.reviver] Method for further parsing of object elements,
      * called after each fabric object created.
+     * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+     * @returns {Promise<fabric.Object[]>}
      */
-    enlivenObjects: function(objects, namespace, reviver) {
-      return Promise.all(objects.map(function(obj) {
-        var klass = fabric.util.getKlass(obj.type, namespace);
-        return klass.fromObject(obj).then(function(fabricInstance) {
-          reviver && reviver(obj, fabricInstance);
-          return fabricInstance;
-        });
-      }));
+    enlivenObjects: function(objects, options) {
+      options = options || {};
+      var instances = [], signal = options && options.signal;
+      return new Promise(function (resolve, reject) {
+        signal && signal.addEventListener('abort', reject, { once: true });
+        Promise.all(objects.map(function (obj) {
+          var klass = fabric.util.getKlass(obj.type, options.namespace || fabric);
+          return klass.fromObject(obj, options).then(function (fabricInstance) {
+            options.reviver && options.reviver(obj, fabricInstance);
+            instances.push(fabricInstance);
+            return fabricInstance;
+          });
+        }))
+          .then(resolve)
+          .catch(function (error) {
+            // cleanup
+            instances.forEach(function (instance) {
+              instance.dispose && instance.dispose();
+            });
+            reject(error);
+          })
+          .finally(function () {
+            signal && signal.removeEventListener('abort', reject);
+          });
+      });
     },
 
     /**
      * Creates corresponding fabric instances residing in an object, e.g. `clipPath`
+     * @static
+     * @memberOf fabric.util
      * @param {Object} object with properties to enlive ( fill, stroke, clipPath, path )
-     * @returns {Promise<object>} the input object with enlived values
+     * @param {object} [options]
+     * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+     * @returns {Promise<{[key:string]:fabric.Object|fabric.Pattern|fabric.Gradient|null}>} the input object with enlived values
      */
-
-    enlivenObjectEnlivables: function (serializedObject) {
-      // enlive every possible property
-      var promises = Object.values(serializedObject).map(function(value) {
-        if (!value) {
+    enlivenObjectEnlivables: function (serializedObject, options) {
+      var instances = [], signal = options && options.signal;
+      return new Promise(function (resolve, reject) {
+        signal && signal.addEventListener('abort', reject, { once: true });
+        // enlive every possible property
+        var promises = Object.values(serializedObject).map(function (value) {
+          if (!value) {
+            return value;
+          }
+          if (value.colorStops) {
+            return new fabric.Gradient(value);
+          }
+          if (value.type) {
+            return fabric.util.enlivenObjects([value], options).then(function (enlived) {
+              var instance = enlived[0];
+              instances.push(instance);
+              return instance;
+            });
+          }
+          if (value.source) {
+            return fabric.Pattern.fromObject(value, options).then(function (pattern) {
+              instances.push(pattern);
+              return pattern;
+            });
+          }
           return value;
-        }
-        if (value.colorStops) {
-          return new fabric.Gradient(value);
-        }
-        if (value.type) {
-          return fabric.util.enlivenObjects([value]).then(function (enlived) {
-            return enlived[0];
+        });
+        var keys = Object.keys(serializedObject);
+        Promise.all(promises).then(function (enlived) {
+          return enlived.reduce(function (acc, instance, index) {
+            acc[keys[index]] = instance;
+            return acc;
+          }, {});
+        })
+          .then(resolve)
+          .catch(function (error) {
+            // cleanup
+            instances.forEach(function (instance) {
+              instance.dispose && instance.dispose();
+            });
+            reject(error);
+          })
+          .finally(function () {
+            signal && signal.removeEventListener('abort', reject);
           });
-        }
-        if (value.source) {
-          return fabric.Pattern.fromObject(value);
-        }
-        return value;
-      });
-      var keys = Object.keys(serializedObject);
-      return Promise.all(promises).then(function(enlived) {
-        return enlived.reduce(function(acc, instance, index) {
-          acc[keys[index]] = instance;
-          return acc;
-        }, {});
       });
     },
 
@@ -1176,6 +1211,114 @@ import { cos } from './index.ts';
       }
       return new fabric.Group([a], { clipPath: b, inverted: inverted });
     },
+
     cos: cos,
+
+    /**
+     * @memberOf fabric.util
+     * @param {Object} prevStyle first style to compare
+     * @param {Object} thisStyle second style to compare
+     * @param {boolean} forTextSpans whether to check overline, underline, and line-through properties
+     * @return {boolean} true if the style changed
+     */
+    hasStyleChanged: function(prevStyle, thisStyle, forTextSpans) {
+      forTextSpans = forTextSpans || false;
+      return (prevStyle.fill !== thisStyle.fill ||
+              prevStyle.stroke !== thisStyle.stroke ||
+              prevStyle.strokeWidth !== thisStyle.strokeWidth ||
+              prevStyle.fontSize !== thisStyle.fontSize ||
+              prevStyle.fontFamily !== thisStyle.fontFamily ||
+              prevStyle.fontWeight !== thisStyle.fontWeight ||
+              prevStyle.fontStyle !== thisStyle.fontStyle ||
+              prevStyle.deltaY !== thisStyle.deltaY) ||
+              (forTextSpans &&
+                (prevStyle.overline !== thisStyle.overline ||
+                prevStyle.underline !== thisStyle.underline ||
+                prevStyle.linethrough !== thisStyle.linethrough));
+    },
+
+    /**
+     * Returns the array form of a text object's inline styles property with styles grouped in ranges
+     * rather than per character. This format is less verbose, and is better suited for storage
+     * so it is used in serialization (not during runtime).
+     * @memberOf fabric.util
+     * @param {object} styles per character styles for a text object
+     * @param {String} text the text string that the styles are applied to
+     * @return {{start: number, end: number, style: object}[]}
+     */
+    stylesToArray: function(styles, text) {
+      // clone style structure to prevent mutation
+      var styles = fabric.util.object.clone(styles, true),
+          textLines = text.split('\n'),
+          charIndex = -1, prevStyle = {}, stylesArray = [];
+      //loop through each textLine
+      for (var i = 0; i < textLines.length; i++) {
+        if (!styles[i]) {
+          //no styles exist for this line, so add the line's length to the charIndex total
+          charIndex += textLines[i].length;
+          continue;
+        }
+        //loop through each character of the current line
+        for (var c = 0; c < textLines[i].length; c++) {
+          charIndex++;
+          var thisStyle = styles[i][c];
+          //check if style exists for this character
+          if (thisStyle) {
+            var styleChanged = fabric.util.hasStyleChanged(prevStyle, thisStyle, true);
+            if (styleChanged) {
+              stylesArray.push({
+                start: charIndex,
+                end: charIndex + 1,
+                style: thisStyle
+              });
+            }
+            else {
+              //if style is the same as previous character, increase end index
+              stylesArray[stylesArray.length - 1].end++;
+            }
+          }
+          prevStyle = thisStyle || {};
+        }
+      }
+      return stylesArray;
+    },
+
+    /**
+     * Returns the object form of the styles property with styles that are assigned per
+     * character rather than grouped by range. This format is more verbose, and is
+     * only used during runtime (not for serialization/storage)
+     * @memberOf fabric.util
+     * @param {Array} styles the serialized form of a text object's styles
+     * @param {String} text the text string that the styles are applied to
+     * @return {Object}
+     */
+    stylesFromArray: function(styles, text) {
+      if (!Array.isArray(styles)) {
+        return styles;
+      }
+      var textLines = text.split('\n'),
+          charIndex = -1, styleIndex = 0, stylesObject = {};
+      //loop through each textLine
+      for (var i = 0; i < textLines.length; i++) {
+        //loop through each character of the current line
+        for (var c = 0; c < textLines[i].length; c++) {
+          charIndex++;
+          //check if there's a style collection that includes the current character
+          if (styles[styleIndex]
+            && styles[styleIndex].start <= charIndex
+            && charIndex < styles[styleIndex].end) {
+            //create object for line index if it doesn't exist
+            stylesObject[i] = stylesObject[i] || {};
+            //assign a style at this character's index
+            stylesObject[i][c] = Object.assign({}, styles[styleIndex].style);
+            //if character is at the end of the current style collection, move to the next
+            if (charIndex === styles[styleIndex].end - 1) {
+              styleIndex++;
+            }
+          }
+        }
+      }
+      return stylesObject;
+    }
   };
 })(typeof exports !== 'undefined' ? exports : window);

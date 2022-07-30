@@ -255,7 +255,7 @@
    * @returns {Promise<fabric.Polyline>}
    */
   fabric.Polyline.fromObject = function(object) {
-    return fabric.Object._fromObject(fabric.Polyline, object, 'points');
+    return fabric.Object._fromObject(fabric.Polyline, object, { extraParam: 'points' });
   };
 
 })(typeof exports !== 'undefined' ? exports : window);

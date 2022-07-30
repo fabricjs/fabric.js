@@ -38,10 +38,7 @@
     var element = event.target,
         scroll = fabric.util.getScrollLeftTop(element),
         _evt = getTouchInfo(event);
-    return {
-      x: _evt.clientX + scroll.left,
-      y: _evt.clientY + scroll.top
-    };
+    return new fabric.Point(_evt.clientX + scroll.left, _evt.clientY + scroll.top);
   };
 
   fabric.util.isTouchEvent = function(event) {

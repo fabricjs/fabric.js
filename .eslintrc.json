@@ -12,7 +12,8 @@
     "Buffer": true,
     "process": true,
     "QUnit": true,
-    "assert": true
+    "assert": true,
+    "AbortController": true
   },
   "overrides": [
     {

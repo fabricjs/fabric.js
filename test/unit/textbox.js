@@ -13,8 +13,8 @@
     originY: 'top',
     left: 0,
     top: 0,
-    width: 20,
-    height: 45.2,
+    width: 120,
+    height: 202.5,
     fill: 'rgb(0,0,0)',
     stroke: null,
     strokeWidth: 1,
@@ -31,7 +31,7 @@
     opacity: 1,
     shadow: null,
     visible: true,
-    text: 'x',
+    text: 'The quick \nbrown \nfox',
     fontSize: 40,
     fontWeight: 'normal',
     fontFamily: 'Times New Roman',
@@ -49,7 +49,18 @@
     skewX: 0,
     skewY: 0,
     charSpacing: 0,
-    styles: { },
+    styles: [
+      {
+        start: 5,
+        end: 9,
+        style: { fill: "red" }
+      },
+      {
+        start: 13,
+        end: 18,
+        style: { underline: true }
+      }
+    ],
     minWidth: 20,
     splitByGrapheme: false,
     strokeUniform: false,
@@ -86,17 +97,86 @@
   });
 
   QUnit.test('toObject', function(assert) {
-    var textbox = new fabric.Textbox('x');
+    var textbox = new fabric.Textbox('The quick \nbrown \nfox', {
+      width: 120,
+      styles: {
+        "0":{
+          "5":{fill:"red"},
+          "6":{fill:"red"},
+          "7":{fill:"red"},
+          "8":{fill:"red"}
+        },
+        "1":{
+          "3":{underline:true},
+          "4":{underline:true},
+          "5":{underline:true}
+        },
+        "2":{
+          "0":{underline:true},
+          "1":{underline:true}
+        }
+      }
+    });
     var obj = textbox.toObject();
     assert.deepEqual(obj, TEXTBOX_OBJECT, 'JSON OUTPUT MATCH');
+    assert.deepEqual(obj.styles, TEXTBOX_OBJECT.styles, 'stylesToArray output matches');
+    assert.deepEqual(obj.styles[0], TEXTBOX_OBJECT.styles[0], 'styles array matches at first index');
+    assert.deepEqual(obj.styles[0].style, TEXTBOX_OBJECT.styles[0].style, 'style properties match at first index');
+    assert.deepEqual(obj.styles[1], TEXTBOX_OBJECT.styles[1], 'styles array matches at second index');
+    assert.deepEqual(obj.styles[1].style, TEXTBOX_OBJECT.styles[1].style, 'style properties match at second index');
   });
 
   QUnit.test('fromObject', function(assert) {
     var done = assert.async();
     fabric.Textbox.fromObject(TEXTBOX_OBJECT).then(function(textbox) {
-      assert.equal(textbox.text, 'x', 'properties are respected');
+      assert.equal(textbox.text, 'The quick \nbrown \nfox', 'properties are respected');
       assert.ok(textbox instanceof fabric.Textbox, 'the generated object is a textbox');
       done();
+    });
+  });
+
+  QUnit.test('fromObjectWithStyles', function(assert) {
+    var done = assert.async();
+    var textbox = new fabric.Textbox('The quick \nbrown \nfox', {
+      width: 120,
+      styles: {
+        "0":{
+          "5":{fill:"red"},
+          "6":{fill:"red"},
+          "7":{fill:"red"},
+          "8":{fill:"red"}
+        },
+        "1":{
+          "3":{underline:true},
+          "4":{underline:true},
+          "5":{underline:true}
+        },
+        "2":{
+          "0":{underline:true},
+          "1":{underline:true}
+        }
+      }
+    });
+    fabric.Textbox.fromObject(TEXTBOX_OBJECT).then(function(obj) {
+      assert.notEqual(obj.styles, textbox.styles, 'styles is a different object after initialization');
+      assert.deepEqual(obj.styles, textbox.styles, 'stylesFromArray output matches');
+      assert.deepEqual(obj.styles[0], textbox.styles[0], 'styles match at line 0');
+      assert.notEqual(obj.styles[0][5], obj.styles[0][6], 'styles are separate objects');
+      assert.deepEqual(obj.styles[0][5], textbox.styles[0][5], 'styles match at index 5');
+      assert.deepEqual(obj.styles[0][6], textbox.styles[0][6], 'styles match at index 6');
+      assert.deepEqual(obj.styles[0][7], textbox.styles[0][7], 'styles match at index 7');
+      assert.deepEqual(obj.styles[0][8], textbox.styles[0][8], 'styles match at index 8');
+      assert.deepEqual(obj.styles[1], textbox.styles[1], 'styles match at line 1');
+      assert.deepEqual(obj.styles[1][3], textbox.styles[1][3], 'styles match at index 3');
+      assert.deepEqual(obj.styles[1][4], textbox.styles[1][4], 'styles match at index 4');
+      assert.deepEqual(obj.styles[1][5], textbox.styles[1][5], 'styles match at index 5');
+      assert.deepEqual(obj.styles[2], textbox.styles[2], 'styles match at line 2');
+      assert.deepEqual(obj.styles[2][0], textbox.styles[2][0], 'styles match at index 0');
+      assert.deepEqual(obj.styles[2][1], textbox.styles[2][1], 'styles match at index 1');
+      fabric.Textbox.fromObject(obj).then(function(obj2) {
+        assert.notEqual(obj.styles, obj2.styles, 'styles copy is a different object after initialization');
+        done();
+      });
     });
   });
 

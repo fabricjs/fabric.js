@@ -59,11 +59,16 @@
 
   /**
    * Deserialize a JSON definition of a ComposedFilter into a concrete instance.
+   * @static
+   * @param {oject} object Object to create an instance from
+   * @param {object} [options]
+   * @param {AbortSignal} [options.signal] handle aborting `BlendImage` filter loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @returns {Promise<fabric.Image.filters.Composed>}
    */
-  fabric.Image.filters.Composed.fromObject = function(object) {
+  fabric.Image.filters.Composed.fromObject = function(object, options) {
     var filters = object.subFilters || [];
     return Promise.all(filters.map(function(filter) {
-      return fabric.Image.filters[filter.type].fromObject(filter);
+      return fabric.Image.filters[filter.type].fromObject(filter, options);
     })).then(function(enlivedFilters) {
       return new fabric.Image.filters.Composed({ subFilters: enlivedFilters });
     });

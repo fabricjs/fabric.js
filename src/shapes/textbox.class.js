@@ -469,6 +469,9 @@
    * @returns {Promise<fabric.Textbox>}
    */
   fabric.Textbox.fromObject = function(object) {
-    return fabric.Object._fromObject(fabric.Textbox, object, 'text');
+    var styles = fabric.util.stylesFromArray(object.styles, object.text);
+    //copy object to prevent mutation
+    var objCopy = Object.assign({}, object, { styles: styles });
+    return fabric.Object._fromObject(fabric.Textbox, objCopy, { extraParam: 'text' });
   };
 })(typeof exports !== 'undefined' ? exports : window);

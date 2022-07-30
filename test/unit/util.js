@@ -503,13 +503,23 @@
     }
   });
 
-
   QUnit.test('fabric.util.loadImage with url for a non exsiting image', function(assert) {
     var done = assert.async();
     fabric.util.loadImage(IMG_URL_NON_EXISTING).catch(function(err) {
       assert.ok(err instanceof Error, 'callback should be invoked with error set to true');
       done();
     });
+  });
+
+  QUnit.test('fabric.util.loadImage with AbortController', function (assert) {
+    var done = assert.async();
+    var abortController = new AbortController();
+    fabric.util.loadImage(IMG_URL, { signal: abortController.signal })
+      .catch(function (err) {
+        assert.equal(err.type, 'abort', 'should be an abort event');
+        done();
+      });
+    abortController.abort();
   });
 
   var SVG_WITH_1_ELEMENT = '<?xml version="1.0"?>\
@@ -703,12 +713,6 @@
     assert.equal(fabric.util.getKlass('rect'), fabric.Rect);
     assert.equal(fabric.util.getKlass('RemoveWhite', 'fabric.Image.filters'), fabric.Image.filters.RemoveWhite);
     assert.equal(fabric.util.getKlass('Sepia2', 'fabric.Image.filters'), fabric.Image.filters.Sepia2);
-  });
-
-  QUnit.test('resolveNamespace', function(assert) {
-    assert.equal(fabric.util.resolveNamespace('fabric'), fabric);
-    assert.equal(fabric.util.resolveNamespace('fabric.Image'), fabric.Image);
-    assert.equal(fabric.util.resolveNamespace('fabric.Image.filters'), fabric.Image.filters);
   });
 
   QUnit.test('clearFabricFontCache', function(assert) {

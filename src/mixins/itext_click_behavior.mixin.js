@@ -131,6 +131,10 @@
       // we want to avoid that an object that was selected and then becomes unselectable,
       // may trigger editing mode in some way.
       this.selected = this === this.canvas._activeObject;
+      // text dragging logic
+      var newSelection = this.getSelectionStartFromPointer(options.e);
+      this.__isDragging = this.isEditing && newSelection >= this.selectionStart && newSelection <= this.selectionEnd
+        && this.selectionStart < this.selectionEnd;
     },
 
     /**
