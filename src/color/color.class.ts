@@ -1,4 +1,5 @@
 
+//@ts-nocheck
 import { max, min } from '../util';
 import { ColorNameMap } from './color_map';
 import { reHSLa, reHex, reRGBa } from './constants';
