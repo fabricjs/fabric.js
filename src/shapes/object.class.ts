@@ -1,5 +1,6 @@
 //@ts-nocheck
 
+import { VERSION } from 'context';
 import { RUNNING_ANIMATIONS } from 'util/animate';
 import { browserShadowBlurConstant, maxCacheSideLimit, minCacheSideLimit, NUM_FRACTION_DIGITS } from '../config';
 import { ALIASING_LIMIT, devicePixelRatio, iMatrix, isLikelyNode } from '../constants';
@@ -837,7 +838,7 @@ export class FabricObject extends CommonMethods {
 
       object = {
         type: this.type,
-        version: version,
+        version: VERSION,
         originX: this.originX,
         originY: this.originY,
         left: toFixed(this.left, NUM_FRACTION_DIGITS),
