@@ -1,5 +1,6 @@
 //@ts-nocheck
 
+import { CanvasDataURLExporterMixinGenerator } from "./mixins/canvas_dataurl_exporter.mixin";
 import { CollectionMixinGenerator } from "./mixins/collection.mixin";
 import { CommonMethods } from "./mixins/common_methods.mixin";
 
@@ -28,8 +29,8 @@ var fabric = global.fabric, extend = fabric.util.object.extend,
  * @fires object:added
  * @fires object:removed
  */
-// eslint-disable-next-line max-len
-export class StaticCanvas extends CollectionMixinGenerator(CommonMethods) {
+
+class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
 
   /**
    * Background color of canvas instance.
@@ -183,11 +184,10 @@ export class StaticCanvas extends CollectionMixinGenerator(CommonMethods) {
 
   /**
    * Constructor
-   * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
+   * @param {HTMLCanvasElement | String} el &lt;canvas> element to initialize instance on
    * @param {Object} [options] Options object
-   * @return {Object} thisArg
    */
-  constructor(el, options = {}) {
+  constructor(el: HTMLCanvasElement | string, options: object = {}) {
     super();
     this.renderAndResetBound = this.renderAndReset.bind(this);
     this.requestRenderAllBound = this.requestRenderAll.bind(this);
@@ -196,7 +196,7 @@ export class StaticCanvas extends CollectionMixinGenerator(CommonMethods) {
 
   /**
    * @private
-   * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
+   * @param {HTMLCanvasElement | String} el &lt;canvas> element to initialize instance on
    * @param {Object} [options] Options object
    */
   _initStatic(el, options) {
@@ -986,17 +986,40 @@ export class StaticCanvas extends CollectionMixinGenerator(CommonMethods) {
 
   /**
    * Returns object representation of canvas
+   * @alias toJSON
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {Object} object representation of an instance
+   * @return {object} object representation of an instance
    */
   toObject(propertiesToInclude) {
     return this._toObjectMethod('toObject', propertiesToInclude);
   }
 
   /**
+   * Returns object representation of canvas
+   * This alias is provided for `JSON.stringify` calls which invoke the `toJSON` method.
+   * 
+   * @alias toObject
+   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+   * @return {Object} JSON representation of an instance
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization serialization}
+   * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
+   * 
+   * @example <caption>JSON without additional properties</caption>
+   * var json = canvas.toJSON();
+   * @example <caption>JSON with additional properties included</caption>
+   * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY']);
+   * @example <caption>JSON without default values</caption>
+   * canvas.includeDefaultValues = false;
+   * var json = canvas.toJSON();
+   */
+  toJSON(propertiesToInclude) {
+    return this._toObjectMethod('toObject', propertiesToInclude);
+  }
+
+  /**
    * Returns dataless object representation of canvas
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {Object} object representation of an instance
+   * @return {object} object representation of an instance
    */
   toDatalessObject(propertiesToInclude) {
     return this._toObjectMethod('toDatalessObject', propertiesToInclude);
@@ -1014,9 +1037,11 @@ export class StaticCanvas extends CollectionMixinGenerator(CommonMethods) {
     if (clipPath && !clipPath.excludeFromExport) {
       data.clipPath = this._toObject(this.clipPath, methodName, propertiesToInclude);
     }
-    extend(data, this.__serializeBgOverlay(methodName, propertiesToInclude));
 
-    fabric.util.populateWithProperties(this, data, propertiesToInclude);
+    fabric.util.populateWithProperties(
+      this,
+      { ...data, ...this.__serializeBgOverlay(methodName, propertiesToInclude) },
+      propertiesToInclude);
 
     return data;
   }
@@ -1647,30 +1672,8 @@ export class StaticCanvas extends CollectionMixinGenerator(CommonMethods) {
   }
 }
 
+export const StaticCanvas = CanvasDataURLExporterMixinGenerator(StaticCanvasBase);
 
-extend(fabric.StaticCanvas.prototype, fabric.Observable);
-extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
-
-
-/**
- * Returns Object representation of canvas
- * this alias is provided because if you call JSON.stringify on an instance,
- * the toJSON object will be invoked if it exists.
- * Having a toJSON method means you can do JSON.stringify(myCanvas)
- * @function
- * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
- * @return {Object} JSON compatible object
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization}
- * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
- * @example <caption>JSON without additional properties</caption>
- * var json = canvas.toJSON();
- * @example <caption>JSON with additional properties included</caption>
- * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY']);
- * @example <caption>JSON without default values</caption>
- * canvas.includeDefaultValues = false;
- * var json = canvas.toJSON();
- */
-fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
 
 if (fabric.isLikelyNode) {
   fabric.StaticCanvas.prototype.createPNGStream = function () {
