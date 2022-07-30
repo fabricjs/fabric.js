@@ -3,7 +3,7 @@ import { context } from './context';
 import cache from './src/cache';
 import config from './src/config';
 var fabric = fabric || { version: '5.1.0' };
-global.fabric = fabric;
+
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
