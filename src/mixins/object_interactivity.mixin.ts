@@ -1,9 +1,8 @@
 //@ts-nocheck
 
+import { degreesToRadians, sizeAfterTransform } from "util";
+import { Point } from "point.class";
 
-  var fabric = global.fabric, degreesToRadians = fabric.util.degreesToRadians;
-
-  
 export function ObjectInteractivityMixinGenerator(Klass) {
   return class ObjectInteractivityMixin extends Klass {
     /**
@@ -17,8 +16,8 @@ export function ObjectInteractivityMixinGenerator(Klass) {
         return false;
       }
       var xPoints,
-          lines, keys = Object.keys(this.oCoords),
-          j = keys.length - 1, i;
+        lines, keys = Object.keys(this.oCoords),
+        j = keys.length - 1, i;
       this.__corner = 0;
 
       // cycle in reverse order so we pick first the one on top
@@ -88,7 +87,6 @@ export function ObjectInteractivityMixinGenerator(Klass) {
      * this function is called when the context is transformed
      * has checks to be skipped when the object is on a staticCanvas
      * @param {CanvasRenderingContext2D} ctx Context to draw on
-     * @return {fabric.Object} thisArg
      * @chainable
      */
     drawSelectionBackground(ctx) {
@@ -100,7 +98,7 @@ export function ObjectInteractivityMixinGenerator(Klass) {
       }
       ctx.save();
       var center = this.getRelativeCenterPoint(), wh = this._calculateCurrentDimensions(),
-          vpt = this.canvas.viewportTransform;
+        vpt = this.canvas.viewportTransform;
       ctx.translate(center.x, center.y);
       ctx.scale(1 / vpt[0], 1 / vpt[3]);
       ctx.rotate(degreesToRadians(this.angle));
@@ -113,7 +111,7 @@ export function ObjectInteractivityMixinGenerator(Klass) {
     /**
      * @public override this function in order to customize the drawing of the control box, e.g. rounded corners, different border style.
      * @param {CanvasRenderingContext2D} ctx ctx is rotated and translated so that (0,0) is at object's center
-     * @param {fabric.Point} size the control box size used
+     * @param {Point} size the control box size used
      */
     strokeBorders(ctx, size) {
       ctx.strokeRect(
@@ -127,7 +125,7 @@ export function ObjectInteractivityMixinGenerator(Klass) {
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to draw on
-     * @param {fabric.Point} size
+     * @param {Point} size
      * @param {Object} styleOverride object to override the object style
      */
     _drawBorders(ctx, size, styleOverride) {
@@ -151,17 +149,16 @@ export function ObjectInteractivityMixinGenerator(Klass) {
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @param {object} options object representing current object parameters
      * @param {Object} [styleOverride] object to override the object style
-     * @return {fabric.Object} thisArg
      * @chainable
      */
     drawBorders(ctx, options, styleOverride) {
       var size;
       if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
-        var bbox = fabric.util.sizeAfterTransform(this.width, this.height, options),
-            strokeFactor = this.strokeUniform ?
-              new fabric.Point(0, 0).scalarAddEquals(this.canvas.getZoom()) :
-              new fabric.Point(options.scaleX, options.scaleY),
-            stroke = strokeFactor.scalarMultiplyEquals(this.strokeWidth);
+        var bbox = sizeAfterTransform(this.width, this.height, options),
+          strokeFactor = this.strokeUniform ?
+            new Point(0, 0).scalarAddEquals(this.canvas.getZoom()) :
+            new Point(options.scaleX, options.scaleY),
+          stroke = strokeFactor.scalarMultiplyEquals(this.strokeWidth);
         size = bbox.addEquals(stroke).scalarAddEquals(this.borderScaleFactor);
       }
       else {
@@ -178,7 +175,6 @@ export function ObjectInteractivityMixinGenerator(Klass) {
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @param {number} width object final width
      * @param {number} height object final height
-     * @return {fabric.Object} thisArg
      * @chainable
      */
     drawControlsConnectingLines(ctx, size) {
@@ -209,7 +205,6 @@ export function ObjectInteractivityMixinGenerator(Klass) {
      * Requires public options: cornerSize, padding
      * @param {CanvasRenderingContext2D} ctx Context to draw on
      * @param {Object} styleOverride object to override the object style
-     * @return {fabric.Object} thisArg
      * @chainable
      */
     drawControls(ctx, styleOverride) {
@@ -223,7 +218,7 @@ export function ObjectInteractivityMixinGenerator(Klass) {
       }
       this._setLineDash(ctx, styleOverride.cornerDashArray || this.cornerDashArray);
       this.setCoords();
-      this.forEachControl(function(control, key, fabricObject) {
+      this.forEachControl(function (control, key, fabricObject) {
         if (control.getVisibility(fabricObject, key)) {
           p = fabricObject.oCoords[key];
           control.render(ctx, p.x, p.y, styleOverride, fabricObject);
@@ -247,7 +242,6 @@ export function ObjectInteractivityMixinGenerator(Klass) {
      * Sets the visibility of the specified control.
      * @param {String} controlKey The key of the control. Possible values are 'tl', 'tr', 'br', 'bl', 'ml', 'mt', 'mr', 'mb', 'mtr'.
      * @param {Boolean} visible true to set the specified control visible, false otherwise
-     * @return {fabric.Object} thisArg
      * @chainable
      */
     setControlVisible(controlKey, visible) {
@@ -270,11 +264,10 @@ export function ObjectInteractivityMixinGenerator(Klass) {
      * @param {Boolean} [options.tl] true to enable the top-left control, false to disable it
      * @param {Boolean} [options.tr] true to enable the top-right control, false to disable it
      * @param {Boolean} [options.mtr] true to enable the middle-top-rotate control, false to disable it
-     * @return {fabric.Object} thisArg
      * @chainable
      */
     setControlsVisibility(options) {
-      options || (options = { });
+      options || (options = {});
 
       for (var p in options) {
         this.setControlVisible(p, options[p]);
@@ -353,5 +346,5 @@ export function ObjectInteractivityMixinGenerator(Klass) {
   }
 }
 
-fabric.Object = ObjectInteractivityMixinGenerator(fabric.Object);
+
 

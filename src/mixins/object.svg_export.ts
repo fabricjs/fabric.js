@@ -1,7 +1,11 @@
 //@ts-nocheck
 /* _TO_SVG_START_ */
 
-var fabric = global.fabric;
+import { Color } from 'color';
+import { toFixed } from "util";
+import { NUM_FRACTION_DIGITS } from '../config';
+import { FabricObject } from '../shapes/object.class';
+
 function getSvgColorString(prop, value) {
   if (!value) {
     return prop + ': none; ';
@@ -10,7 +14,7 @@ function getSvgColorString(prop, value) {
     return prop + ': url(#SVGID_' + value.id + '); ';
   }
   else {
-    var color = new fabric.Color(value),
+    var color = new Color(value),
       str = prop + ': ' + color.toRgb() + '; ',
       opacity = color.getAlpha();
     if (opacity !== 1) {
@@ -20,9 +24,6 @@ function getSvgColorString(prop, value) {
     return str;
   }
 }
-
-var toFixed = fabric.util.toFixed;
-
 
 export function ObjectSVGExportMixinGenerator(Klass) {
   return class ObjectSVGExportMixin extends Klass {
@@ -137,14 +138,13 @@ export function ObjectSVGExportMixinGenerator(Klass) {
      */
     getSvgTransform(full, additionalTransform) {
       var transform = full ? this.calcTransformMatrix() : this.calcOwnMatrix(),
-        svgTransform = 'transform="' + fabric.util.matrixToSVG(transform);
+        svgTransform = 'transform="' + matrixToSVG(transform);
       return svgTransform +
         (additionalTransform || '') + '" ';
     }
 
     _setSVGBg(textBgRects) {
       if (this.backgroundColor) {
-        var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
         textBgRects.push(
           '\t\t<rect ',
           this._getFillAttributes(this.backgroundColor),
@@ -213,7 +213,7 @@ export function ObjectSVGExportMixinGenerator(Klass) {
         index = objectMarkup.indexOf('COMMON_PARTS'),
         additionalTransform = options.additionalTransform;
       if (clipPath) {
-        clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+        clipPath.clipPathId = 'CLIPPATH_' + FabricObject.__uid++;
         clipPathMarkup = '<clipPath id="' + clipPath.clipPathId + '" >\n' +
           clipPath.toClipPathSVG(reviver) +
           '</clipPath>\n';

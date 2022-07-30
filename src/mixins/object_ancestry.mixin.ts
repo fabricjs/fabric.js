@@ -1,14 +1,15 @@
 //@ts-nocheck
 
-  var fabric = global.fabric;
-  
+import type { FabricObject } from "shapes/object.class";
+import { StaticCanvas } from "static_canvas.class";
+
 export function ObjectAncestryMixinGenerator(Klass) {
   return class ObjectAncestryMixin extends Klass {
 
     /**
      * Checks if object is decendant of target
-     * Should be used instead of @link {fabric.Collection.contains} for performance reasons
-     * @param {fabric.Object|fabric.StaticCanvas} target
+     * Should be used instead of @link {Collection#contains} for performance reasons
+     * @param {FabricObject|StaticCanvas} target
      * @returns {boolean}
      */
     isDescendantOf(target) {
@@ -17,7 +18,7 @@ export function ObjectAncestryMixinGenerator(Klass) {
         if (target === parent) {
           return true;
         }
-        else if (parent instanceof fabric.StaticCanvas) {
+        else if (parent instanceof StaticCanvas) {
           //  happens after all parents were traversed through without a match
           return false;
         }
@@ -28,7 +29,7 @@ export function ObjectAncestryMixinGenerator(Klass) {
 
     /**
      *
-     * @typedef {fabric.Object[] | [...fabric.Object[], fabric.StaticCanvas]} Ancestors
+     * @typedef {FabricObject[] | [...FabricObject[], StaticCanvas]} Ancestors
      *
      * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
      * @returns {Ancestors} ancestors from bottom to top
@@ -51,7 +52,7 @@ export function ObjectAncestryMixinGenerator(Klass) {
      * @property {Ancestors} fork ancestors that are of `this` only
      * @property {Ancestors} otherFork ancestors that are of `other` only
      *
-     * @param {fabric.Object} other
+     * @param {FabricObject} other
      * @param {boolean} [strict] finds only ancestors that are objects (without canvas)
      * @returns {AncestryComparison | undefined}
      *
@@ -116,7 +117,7 @@ export function ObjectAncestryMixinGenerator(Klass) {
 
     /**
      *
-     * @param {fabric.Object} other
+     * @param {FabricObject} other
      * @param {boolean} [strict] checks only ancestors that are objects (without canvas)
      * @returns {boolean}
      */
@@ -127,5 +128,5 @@ export function ObjectAncestryMixinGenerator(Klass) {
   }
 }
 
-fabric.Object = ObjectAncestryMixinGenerator(fabric.Object);
+
 
