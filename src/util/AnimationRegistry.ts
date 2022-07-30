@@ -10,7 +10,7 @@ export class AnimationRegistry extends Array {
             animation.cancel();
         });
         return animations;
-    },
+    }
 
     /**
      * cancel all running animations attached to canvas at the next requestAnimFrame
@@ -28,7 +28,7 @@ export class AnimationRegistry extends Array {
             animation.cancel();
         });
         return cancelled;
-    },
+    }
 
     /**
      * cancel all running animations for target at the next requestAnimFrame
@@ -41,7 +41,7 @@ export class AnimationRegistry extends Array {
             animation.cancel();
         });
         return cancelled;
-    },
+    }
 
     /**
      *
@@ -50,7 +50,7 @@ export class AnimationRegistry extends Array {
      */
     findAnimationIndex(cancelFunc) {
         return this.indexOf(this.findAnimation(cancelFunc));
-    },
+    }
 
     /**
      *
@@ -61,7 +61,7 @@ export class AnimationRegistry extends Array {
         return this.find(function (animation) {
             return animation.cancel === cancelFunc;
         });
-    },
+    }
 
     /**
      *
