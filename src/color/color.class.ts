@@ -55,7 +55,7 @@ export class Color {
     if (source) {
       this.setSource(source);
     }
-  },
+  }
 
   /**
    * Adapted from <a href="https://rawgithub.com/mjijackson/mjijackson.github.com/master/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript.html">https://github.com/mjijackson</a>
@@ -99,7 +99,7 @@ export class Color {
       Math.round(s * 100),
       Math.round(l * 100)
     ];
-  },
+  }
 
   /**
    * Returns source of this color (where source is an array representation; ex: [200, 200, 100, 1])
@@ -107,7 +107,7 @@ export class Color {
    */
   getSource() {
     return this._source;
-  },
+  }
 
   /**
    * Sets source of this color (where source is an array representation; ex: [200, 200, 100, 1])
@@ -115,7 +115,7 @@ export class Color {
    */
   setSource(source) {
     this._source = source;
-  },
+  }
 
   /**
    * Returns color representation in RGB format
@@ -124,7 +124,7 @@ export class Color {
   toRgb() {
     var source = this.getSource();
     return 'rgb(' + source[0] + ',' + source[1] + ',' + source[2] + ')';
-  },
+  }
 
   /**
    * Returns color representation in RGBA format
@@ -133,7 +133,7 @@ export class Color {
   toRgba() {
     var source = this.getSource();
     return 'rgba(' + source[0] + ',' + source[1] + ',' + source[2] + ',' + source[3] + ')';
-  },
+  }
 
   /**
    * Returns color representation in HSL format
@@ -144,7 +144,7 @@ export class Color {
       hsl = this._rgbToHsl(source[0], source[1], source[2]);
 
     return 'hsl(' + hsl[0] + ',' + hsl[1] + '%,' + hsl[2] + '%)';
-  },
+  }
 
   /**
    * Returns color representation in HSLA format
@@ -155,7 +155,7 @@ export class Color {
       hsl = this._rgbToHsl(source[0], source[1], source[2]);
 
     return 'hsla(' + hsl[0] + ',' + hsl[1] + '%,' + hsl[2] + '%,' + source[3] + ')';
-  },
+  }
 
   /**
    * Returns color representation in HEX format
@@ -174,7 +174,7 @@ export class Color {
     b = (b.length === 1) ? ('0' + b) : b;
 
     return r.toUpperCase() + g.toUpperCase() + b.toUpperCase();
-  },
+  }
 
   /**
    * Returns color representation in HEXA format
@@ -188,7 +188,7 @@ export class Color {
     a = (a.length === 1) ? ('0' + a) : a;
 
     return this.toHex() + a.toUpperCase();
-  },
+  }
 
   /**
    * Gets value of alpha channel for this color
@@ -196,7 +196,7 @@ export class Color {
    */
   getAlpha() {
     return this.getSource()[3];
-  },
+  }
 
   /**
    * Sets value of alpha channel for this color
@@ -208,7 +208,7 @@ export class Color {
     source[3] = alpha;
     this.setSource(source);
     return this;
-  },
+  }
 
   /**
    * Transforms color to its grayscale representation
@@ -220,7 +220,7 @@ export class Color {
       currentAlpha = source[3];
     this.setSource([average, average, average, currentAlpha]);
     return this;
-  },
+  }
 
   /**
    * Transforms color to its black and white representation
@@ -237,7 +237,7 @@ export class Color {
     average = (Number(average) < Number(threshold)) ? 0 : 255;
     this.setSource([average, average, average, currentAlpha]);
     return this;
-  },
+  }
 
   /**
    * Overlays color with another color
