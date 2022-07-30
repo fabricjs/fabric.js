@@ -1908,7 +1908,6 @@ export class Object extends CommonMethods {
   }
 }
 
-fabric.util.createAccessors && fabric.util.createAccessors(fabric.Object);
 
 /**
  * Defines the number of fraction digits to use when serializing object values.
