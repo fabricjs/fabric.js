@@ -20,9 +20,11 @@ import './src/util/animate_color'; // optional animation
 import './src/util/anim_ease'; // optional easing
 import './src/parser'; // optional parser
 import './src/elements_parser'; // optional parser
-import './src/point.class';
+import { Point } from './src/point.class';
+fabric.Point = Point;
 import './src/intersection.class';
-import './src/color.class';
+import { Color } from './src/color/color.class';
+fabric.Color = Color;
 import './src/controls.actions'; // optional interaction
 import './src/controls.render'; // optional interaction
 import './src/control.class'; // optional interaction
@@ -52,12 +54,19 @@ import { FabricObject as Object } from './src/shapes/object.class';
 fabric.Object = Object;
 import './src/mixins/object_origin.mixin';
 import './src/mixins/object_geometry.mixin';
-import './src/mixins/object_ancestry.mixin';
-import './src/mixins/object_stacking.mixin';
-import './src/mixins/object.svg_export';
+import { ObjectAncestryMixinGenerator } from './src/mixins/object_ancestry.mixin';
+fabric.Object = ObjectAncestryMixinGenerator(fabric.Object);
+import { ObjectStackingMixinGenerator } from './src/mixins/object_stacking.mixin';
+fabric.Object = ObjectStackingMixinGenerator(fabric.Object);
+import { ObjectSVGExportMixinGenerator } from './src/mixins/object.svg_export';
+fabric.Object = ObjectSVGExportMixinGenerator(fabric.Object);
 import './src/mixins/stateful.mixin';
-import './src/mixins/object_interactivity.mixin'; // optional interaction
-import './src/mixins/animation.mixin'; // optional animation
+import { ObjectInteractivityMixinGenerator } from './src/mixins/object_interactivity.mixin'; // optional interaction
+fabric.Object = ObjectInteractivityMixinGenerator(fabric.Object);
+import { ObjectAnimationMixinGenerator } from './src/mixins/object_animation.mixin'; // optional animation
+import { StaticCanvasAnimationMixinGenerator } from './src/mixins/canvas_animation.mixin; // optional animation
+fabric.StaticCanvas = StaticCanvasAnimationMixinGenerator(fabric.StaticCanvas);
+fabric.Object = ObjectAnimationMixinGenerator(fabric.Object);
 // import './src/shapes/line.class';
 // import './src/shapes/circle.class';
 // import './src/shapes/triangle.class';
