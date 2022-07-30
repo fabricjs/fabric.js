@@ -64,7 +64,7 @@ import './src/mixins/stateful.mixin';
 import { ObjectInteractivityMixinGenerator } from './src/mixins/object_interactivity.mixin'; // optional interaction
 fabric.Object = ObjectInteractivityMixinGenerator(fabric.Object);
 import { ObjectAnimationMixinGenerator } from './src/mixins/object_animation.mixin'; // optional animation
-import { StaticCanvasAnimationMixinGenerator } from './src/mixins/canvas_animation.mixin; // optional animation
+import { StaticCanvasAnimationMixinGenerator } from './src/mixins/canvas_animation.mixin'; // optional animation
 fabric.StaticCanvas = StaticCanvasAnimationMixinGenerator(fabric.StaticCanvas);
 fabric.Object = ObjectAnimationMixinGenerator(fabric.Object);
 // import './src/shapes/line.class';
@@ -93,7 +93,10 @@ fabric.Rect = Rect;
 fabric.Text = Text;
 fabric.Textbox = Textbox;
 fabric.Triangle = Triangle;
-import './src/mixins/object_straightening.mixin'; // optional objectstraightening
+import { ObjectStraighteningMixinGenerator, StaticCanvasObjectStraighteningMixinGenerator } from './src/mixins/object_straightening.mixin'; // optional objectstraightening
+
+fabric.Object = ObjectStraighteningMixinGenerator(fabric.Object);
+fabric.StaticCanvas = StaticCanvasObjectStraighteningMixinGenerator(fabric.StaticCanvas);
 import './src/filters/webgl_backend.class'; // optional image_filters
 import './src/filters/2d_backend.class'; // optional image_filters
 import './src/filters/base_filter.class'; // optional image_filters
