@@ -69,6 +69,7 @@
     "jsdom": "^19.0.0"
   },
   "devDependencies": {
+    "@rollup/plugin-json": "^4.1.0",
     "@types/fs-extra": "^9.0.13",
     "@types/lodash": "^4.14.180",
     "@types/node": "^17.0.21",
@@ -97,6 +98,5 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "main": "./dist/fabric.js",
-  "dependencies": {}
+  "main": "./dist/fabric.js"
 }
