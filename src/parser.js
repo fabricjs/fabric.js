@@ -1,4 +1,4 @@
-import { DEFAULT_SVG_FONT_SIZE } from '../constants';
+import { DEFAULT_SVG_FONT_SIZE } from './constants';
 
 const svgValidTagNames = ['path', 'circle', 'polygon', 'polyline', 'ellipse', 'rect', 'line',
   'image', 'text'],
