@@ -332,6 +332,14 @@ export class Point {
   }
 
   /**
+   * 
+   * @returns absolute point
+   */
+  abs() {
+    return new Point(Math.abs(this.x), Math.abs(this.y));
+  }
+
+  /**
    * return a cloned instance of the point
    * @return {Point}
    */
