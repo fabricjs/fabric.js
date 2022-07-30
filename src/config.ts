@@ -89,8 +89,11 @@ export let cachesBoundsOfCurve = true;
  */
 export let forceGLPutImageData = false;
 
+export let NUM_FRACTION_DIGITS = 2;
+
 export default {
     DPI,
+    NUM_FRACTION_DIGITS,
     browserShadowBlurConstant,
     cachesBoundsOfCurve,
     disableStyleCopyPaste,
