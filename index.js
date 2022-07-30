@@ -28,10 +28,14 @@ fabric.Color = Color;
 import './src/controls.actions'; // optional interaction
 import './src/controls.render'; // optional interaction
 import './src/control.class'; // optional interaction
-import './src/gradient.class'; // optional gradient
-import './src/pattern.class'; // optional pattern
-import './src/shadow.class'; // optional shadow
-import './src/static_canvas.class';
+import { Gradient } from './src/gradient.class'; // optional gradient
+fabric.Gradient = Gradient;
+import { Pattern } from './src/pattern.class'; // optional pattern
+fabric.Pattern = Pattern;
+import { Shadow } from './src/shadow.class'; // optional shadow
+fabric.Shadow = Shadow;
+import { StaticCanvas } from './src/static_canvas.class';
+fabric.StaticCanvas = StaticCanvas;
 // import './src/brushes/base_brush.class'; // optional freedrawing
 // import './src/brushes/pencil_brush.class'; // optional freedrawing
 // import './src/brushes/circle_brush.class'; // optional freedrawing
