@@ -1,4 +1,4 @@
-import { context } from "./context";
+import { context } from "../context";
 
 export const halfPI = Math.PI / 2;
 
@@ -66,3 +66,4 @@ export const isTouchSupported = 'ontouchstart' in context.window || 'ontouchstar
 export const isLikelyNode = typeof Buffer !== 'undefined' &&
     typeof window === 'undefined';
 
+export let uid = 0;
