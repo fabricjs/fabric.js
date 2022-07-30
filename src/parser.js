@@ -1,6 +1,6 @@
-import { incrementUID, reNum } from './constants';
-import { svgValidTagNamesRegEx, svgViewBoxElementsRegEx, svgInvalidAncestorsRegEx, applyViewboxTransform, hasAncestorWithNodeName, reViewBoxAttrValue, svgValidParentsRegEx, clipPaths, cssRules, doesSomeParentMatch, elementById, elementMatchesRule, getGlobalStylesForElement, gradientDefs, parseAttributes, parseFontDeclaration, parsePointsAttribute, parseStyleAttribute, parseStyleObject, parseStyleString, parseUseDirectives, selectorMatches, parseTransformAttribute, _getMultipleNodes } from './_parser';
-import { parseUnit } from './util';
+import { incrementUID } from './constants';
+import { extend } from './util';
+import { applyViewboxTransform, clipPaths, cssRules, elementById, gradientDefs, hasAncestorWithNodeName, parseAttributes, parseFontDeclaration, parsePointsAttribute, parseStyleAttribute, parseTransformAttribute, parseUseDirectives, svgInvalidAncestorsRegEx, svgValidParentsRegEx, svgValidTagNamesRegEx, svgViewBoxElementsRegEx, _getMultipleNodes } from './_parser';
 
 
 (function (global) {
