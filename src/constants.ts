@@ -4,6 +4,13 @@ export const halfPI = Math.PI / 2;
 
 export const ALIASING_LIMIT = 2;
 
+/**
+ * Default SVG font size
+ * @static
+ * @memberOf Text
+ */
+export const DEFAULT_SVG_FONT_SIZE = 16;
+
 /* _FROM_SVG_START_ */
 /**
  * Attributes parsed from all SVG elements
