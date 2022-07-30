@@ -1,27 +1,26 @@
 //@ts-nocheck
 
+import { FabricObject } from "shapes/object.class";
+import { NUM_FRACTION_DIGITS } from './config';
+import { devicePixelRatio, fontPaths, iMatrix, isLikelyNode } from './constants';
+import { VERSION } from './context';
 import { CanvasDataURLExporterMixinGenerator } from "./mixins/canvas_dataurl_exporter.mixin";
 import { CollectionMixinGenerator } from "./mixins/collection.mixin";
 import { CommonMethods } from "./mixins/common_methods.mixin";
 import { NodeCanvasStreamsMixinGenerator } from "./mixins/node_canvas_streams.mixin";
 import {
-  getElementOffset,
-  removeFromArray,
-  toFixed,
-  transformPoint,
-  invertTransform,
-  createCanvasElement
+  addClass, cleanUpJsdomNode, createCanvasElement, getById, getElementOffset, invertTransform, populateWithProperties, removeFromArray, setImageSmoothing, toFixed,
+  transformPoint
 } from './util';
 
 const CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
 
 /**
  * Static canvas class
- * @class fabric.StaticCanvas
- * @mixes fabric.Collection
- * @mixes fabric.Observable
+ * @class StaticCanvas
+ * @mixes Collection
+ * @mixes Observable
  * @see {@link http://fabricjs.com/static_canvas|StaticCanvas demo}
- * @see {@link fabric.StaticCanvas#initialize} for constructor definition
  * @fires before:render
  * @fires after:render
  * @fires canvas:cleared
@@ -33,7 +32,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
 
   /**
    * Background color of canvas instance.
-   * @type {(String|fabric.Pattern)}
+   * @type {(String|Pattern)}
    * @default
    */
   backgroundColor = ''
@@ -51,7 +50,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
   /**
    * Overlay color of canvas instance.
    * @since 1.3.9
-   * @type {(String|fabric.Pattern)}
+   * @type {(String|Pattern)}
    * @default
    */
   overlayColor = ''
@@ -82,8 +81,8 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
   stateful = false
 
   /**
-   * Indicates whether {@link fabric.Collection.add}, {@link fabric.Collection.insertAt} and {@link fabric.Collection.remove},
-   * {@link fabric.StaticCanvas.moveTo}, {@link fabric.StaticCanvas.clear} and many more, should also re-render canvas.
+   * Indicates whether {@link Collection.add}, {@link Collection.insertAt} and {@link Collection.remove},
+   * {@link StaticCanvas.moveTo}, {@link StaticCanvas.clear} and many more, should also re-render canvas.
    * Disabling this option will not give a performance boost when adding/removing a lot of objects to/from canvas at once
    * since the renders are quequed and executed one per frame.
    * Disabling is suggested anyway and managing the renders of the app manually is not a big effort ( canvas.requestRenderAll() )
@@ -123,7 +122,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
    * canvas.viewportTransform = [0.7, 0, 0, 0.7, 50, 50];
    * @default
    */
-  viewportTransform = fabric.iMatrix.concat()
+  viewportTransform = iMatrix.concat()
 
   /**
    * if set to false background image is not affected by viewport transform
@@ -155,7 +154,6 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
    * if canvas is viewportTransformed you those points indicate the extension
    * of canvas element in plain untrasformed coordinates
    * The coordinates get updated with @method calcViewportBoundaries.
-   * @memberOf fabric.StaticCanvas.prototype
    */
   vptCoords = {}
 
@@ -165,7 +163,6 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
    * May greatly help in applications with crowded canvas and use of zoom/pan
    * If One of the corner of the bounding box of the object is on the canvas
    * the objects get rendered.
-   * @memberOf fabric.StaticCanvas.prototype
    * @type Boolean
    * @default
    */
@@ -176,7 +173,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
    * the clipPath object gets used when the canvas has rendered, and the context is placed in the
    * top left corner of the canvas.
    * clipPath will clip away controls, if you do not want this to happen use controlsAboveOverlay = true
-   * @type fabric.Object
+   * @type FabricObject
    */
   clipPath = undefined
 
@@ -212,7 +209,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
    * @private
    */
   _isRetinaScaling() {
-    return (fabric.devicePixelRatio > 1 && this.enableRetinaScaling);
+    return (devicePixelRatio > 1 && this.enableRetinaScaling);
   }
 
   /**
@@ -220,7 +217,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
    * @return {Number} retinaScaling if applied, otherwise 1;
    */
   getRetinaScaling() {
-    return this._isRetinaScaling() ? Math.max(1, fabric.devicePixelRatio) : 1;
+    return this._isRetinaScaling() ? Math.max(1, devicePixelRatio) : 1;
   }
 
   /**
@@ -230,7 +227,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
     if (!this._isRetinaScaling()) {
       return;
     }
-    var scaleRatio = fabric.devicePixelRatio;
+    var scaleRatio = devicePixelRatio;
     this.__initRetinaScaling(scaleRatio, this.lowerCanvasEl, this.contextContainer);
     if (this.upperCanvasEl) {
       this.__initRetinaScaling(scaleRatio, this.upperCanvasEl, this.contextTop);
@@ -307,14 +304,14 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
       this.lowerCanvasEl = canvasEl;
     }
     else {
-      this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
+      this.lowerCanvasEl = getById(canvasEl) || this._createCanvasElement();
     }
     if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
       /* _DEV_MODE_START_ */
       throw new Error('fabric.js: trying to initialize a canvas that has already been initialized');
       /* _DEV_MODE_END_ */
     }
-    fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
+    addClass(this.lowerCanvasEl, 'lower-canvas');
     this.lowerCanvasEl.setAttribute('data-fabric', 'main');
     if (this.interactive) {
       this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
@@ -497,7 +494,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
    * meaning that following zoom to point with the same point will have the visual
    * effect of the zoom originating from that point. The point won't move.
    * It has nothing to do with canvas center or visual center of the viewport.
-   * @param {fabric.Point} point to zoom with respect to
+   * @param {Point} point to zoom with respect to
    * @param {Number} value to set zoom to, less than 1 zooms out
    * @return {fabric.Canvas} instance
    * @chainable true
@@ -521,13 +518,13 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
    * @chainable true
    */
   setZoom(value) {
-    this.zoomToPoint(new fabric.Point(0, 0), value);
+    this.zoomToPoint(new Point(0, 0), value);
     return this;
   }
 
   /**
    * Pan viewport so as to place point at top left corner of canvas
-   * @param {fabric.Point} point to move to
+   * @param {Point} point to move to
    * @return {fabric.Canvas} instance
    * @chainable true
    */
@@ -540,12 +537,12 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
 
   /**
    * Pans viewpoint relatively
-   * @param {fabric.Point} point (position vector) to move by
+   * @param {Point} point (position vector) to move by
    * @return {fabric.Canvas} instance
    * @chainable true
    */
   relativePan(point) {
-    return this.absolutePan(new fabric.Point(
+    return this.absolutePan(new Point(
       -point.x - this.viewportTransform[4],
       -point.y - this.viewportTransform[5]
     ));
@@ -560,45 +557,45 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
   }
 
   /**
-   * @param {...fabric.Object} objects to add
+   * @param {...FabricObject} objects to add
    * @return {Self} thisArg
    * @chainable
    */
-  add() {
-    fabric.Collection.add.call(this, arguments, this._onObjectAdded);
-    arguments.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
+  add(...objects: FabricObject[]) {
+    super.add(objects, this._onObjectAdded);
+    objects.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
     return this;
   }
 
   /**
    * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
-   * An object should be an instance of (or inherit from) fabric.Object
-   * @param {fabric.Object|fabric.Object[]} objects Object(s) to insert
+   * An object should be an instance of (or inherit from) FabricObject
+   * @param {FabricObject|FabricObject[]} objects Object(s) to insert
    * @param {Number} index Index to insert object at
    * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
    * @return {Self} thisArg
    * @chainable
    */
   insertAt(objects, index) {
-    fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
+    super.insertAt(objects, index, this._onObjectAdded);
     (Array.isArray(objects) ? objects.length > 0 : !!objects) && this.renderOnAddRemove && this.requestRenderAll();
     return this;
   }
 
   /**
-   * @param {...fabric.Object} objects to remove
+   * @param {...FabricObject} objects to remove
    * @return {Self} thisArg
    * @chainable
    */
-  remove() {
-    var removed = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
+  remove(...objects: FabricObject[]) {
+    var removed = super.remove(objects, this._onObjectRemoved);
     removed.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
     return this;
   }
 
   /**
    * @private
-   * @param {fabric.Object} obj Object that was added
+   * @param {FabricObject} obj Object that was added
    */
   _onObjectAdded(obj) {
     this.stateful && obj.setupState();
@@ -617,7 +614,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
 
   /**
    * @private
-   * @param {fabric.Object} obj Object that was removed
+   * @param {FabricObject} obj Object that was removed
    */
   _onObjectRemoved(obj) {
     obj._set('canvas', undefined);
@@ -701,7 +698,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
    */
   requestRenderAll() {
     if (!this.isRendering) {
-      this.isRendering = fabric.util.requestAnimFrame(this.renderAndResetBound);
+      this.isRendering = requestAnimFrame(this.renderAndResetBound);
     }
     return this;
   }
@@ -724,15 +721,15 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
       max = a.max(b);
     return this.vptCoords = {
       tl: min,
-      tr: new fabric.Point(max.x, min.y),
-      bl: new fabric.Point(min.x, max.y),
+      tr: new Point(max.x, min.y),
+      bl: new Point(min.x, max.y),
       br: max,
     };
   }
 
   cancelRequestedRender() {
     if (this.isRendering) {
-      fabric.util.cancelAnimFrame(this.isRendering);
+      cancelAnimFrame(this.isRendering);
       this.isRendering = 0;
     }
   }
@@ -749,7 +746,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
     this.cancelRequestedRender();
     this.calcViewportBoundaries();
     this.clearContext(ctx);
-    fabric.util.setImageSmoothing(ctx, this.imageSmoothingEnabled);
+    setImageSmoothing(ctx, this.imageSmoothingEnabled);
     ctx.patternQuality = 'best';
     this.fire('before:render', { ctx: ctx, });
     this._renderBackground(ctx);
@@ -878,34 +875,34 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
 
   /**
    * Returns coordinates of a center of canvas.
-   * @return {fabric.Point}
+   * @return {Point}
    */
   getCenterPoint() {
-    return new fabric.Point(this.width / 2, this.height / 2);
+    return new Point(this.width / 2, this.height / 2);
   }
 
   /**
    * Centers object horizontally in the canvas
-   * @param {fabric.Object} object Object to center horizontally
+   * @param {FabricObject} object Object to center horizontally
    * @return {fabric.Canvas} thisArg
    */
   centerObjectH(object) {
-    return this._centerObject(object, new fabric.Point(this.getCenterPoint().x, object.getCenterPoint().y));
+    return this._centerObject(object, new Point(this.getCenterPoint().x, object.getCenterPoint().y));
   }
 
   /**
    * Centers object vertically in the canvas
-   * @param {fabric.Object} object Object to center vertically
+   * @param {FabricObject} object Object to center vertically
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
   centerObjectV(object) {
-    return this._centerObject(object, new fabric.Point(object.getCenterPoint().x, this.getCenterPoint().y));
+    return this._centerObject(object, new Point(object.getCenterPoint().x, this.getCenterPoint().y));
   }
 
   /**
    * Centers object vertically and horizontally in the canvas
-   * @param {fabric.Object} object Object to center vertically and horizontally
+   * @param {FabricObject} object Object to center vertically and horizontally
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
@@ -916,7 +913,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
 
   /**
    * Centers object vertically and horizontally in the viewport
-   * @param {fabric.Object} object Object to center vertically and horizontally
+   * @param {FabricObject} object Object to center vertically and horizontally
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
@@ -927,31 +924,31 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
 
   /**
    * Centers object horizontally in the viewport, object.top is unchanged
-   * @param {fabric.Object} object Object to center vertically and horizontally
+   * @param {FabricObject} object Object to center vertically and horizontally
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
   viewportCenterObjectH(object) {
     var vpCenter = this.getVpCenter();
-    this._centerObject(object, new fabric.Point(vpCenter.x, object.getCenterPoint().y));
+    this._centerObject(object, new Point(vpCenter.x, object.getCenterPoint().y));
     return this;
   }
 
   /**
    * Centers object Vertically in the viewport, object.top is unchanged
-   * @param {fabric.Object} object Object to center vertically and horizontally
+   * @param {FabricObject} object Object to center vertically and horizontally
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
   viewportCenterObjectV(object) {
     var vpCenter = this.getVpCenter();
 
-    return this._centerObject(object, new fabric.Point(object.getCenterPoint().x, vpCenter.y));
+    return this._centerObject(object, new Point(object.getCenterPoint().x, vpCenter.y));
   }
 
   /**
    * Calculate the point in canvas that correspond to the center of actual viewport.
-   * @return {fabric.Point} vpCenter, viewport center
+   * @return {Point} vpCenter, viewport center
    * @chainable
    */
   getVpCenter() {
@@ -962,8 +959,8 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
 
   /**
    * @private
-   * @param {fabric.Object} object Object to center
-   * @param {fabric.Point} center Center point
+   * @param {FabricObject} object Object to center
+   * @param {Point} center Center point
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
@@ -1030,14 +1027,14 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
   _toObjectMethod(methodName, propertiesToInclude) {
 
     var clipPath = this.clipPath, data = {
-      version: fabric.version,
+      version: VERSION,
       objects: this._toObjects(methodName, propertiesToInclude),
     };
     if (clipPath && !clipPath.excludeFromExport) {
       data.clipPath = this._toObject(this.clipPath, methodName, propertiesToInclude);
     }
 
-    fabric.util.populateWithProperties(
+    populateWithProperties(
       this,
       { ...data, ...this.__serializeBgOverlay(methodName, propertiesToInclude) },
       propertiesToInclude);
@@ -1199,8 +1196,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
   _setSVGHeader(markup, options) {
     var width = options.width || this.width,
       height = options.height || this.height,
-      vpt, viewBox = 'viewBox="0 0 ' + this.width + ' ' + this.height + '" ',
-      NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+      vpt, viewBox = 'viewBox="0 0 ' + this.width + ' ' + this.height + '" ';
 
     if (options.viewBox) {
       viewBox = 'viewBox="' +
@@ -1229,7 +1225,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
       'height="', height, '" ',
       viewBox,
       'xml:space="preserve">\n',
-      '<desc>Created with Fabric.js ', fabric.version, '</desc>\n',
+      '<desc>Created with Fabric.js ', VERSION, '</desc>\n',
       '<defs>\n',
       this.createSVGFontFacesMarkup(),
       this.createSVGRefElementsMarkup(),
@@ -1241,7 +1237,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
   createSVGClipPathMarkup(options) {
     var clipPath = this.clipPath;
     if (clipPath) {
-      clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+      clipPath.clipPathId = 'CLIPPATH_' + FabricObject.__uid++;
       return '<clipPath id="' + clipPath.clipPathId + '" >\n' +
         this.clipPath.toClipPathSVG(options.reviver) +
         '</clipPath>\n';
@@ -1265,7 +1261,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
             };
           return fill.toSVG(
             object,
-            { additionalTransform: shouldTransform ? fabric.util.matrixToSVG(vpt) : '' }
+            { additionalTransform: shouldTransform ? matrixToSVG(vpt) : '' }
           );
         }
       });
@@ -1281,8 +1277,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
    */
   createSVGFontFacesMarkup() {
     var markup = '', fontList = {}, obj, fontFamily,
-      style, row, rowIndex, _char, charIndex, i, len,
-      fontPaths = fabric.fontPaths, objects = [];
+      style, row, rowIndex, _char, charIndex, i, len, objects = [];
 
     this._objects.forEach(function add(object) {
       objects.push(object);
@@ -1376,8 +1371,8 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
       return;
     }
     if (filler.toLive) {
-      var repeat = filler.repeat, iVpt = fabric.util.invertTransform(vpt), shouldInvert = this[property + 'Vpt'],
-        additionalTransform = shouldInvert ? fabric.util.matrixToSVG(iVpt) : '';
+      var repeat = filler.repeat, iVpt = invertTransform(vpt), shouldInvert = this[property + 'Vpt'],
+        additionalTransform = shouldInvert ? matrixToSVG(iVpt) : '';
       markup.push(
         '<rect transform="' + additionalTransform + ' translate(', finalWidth / 2, ',', finalHeight / 2, ')"',
         ' x="', filler.offsetX - finalWidth / 2,
@@ -1407,7 +1402,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
   /**
    * Moves an object or the objects of a multiple selection
    * to the bottom of the stack of drawn objects
-   * @param {fabric.Object} object Object to send to back
+   * @param {FabricObject} object Object to send to back
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
@@ -1436,7 +1431,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
   /**
    * Moves an object or the objects of a multiple selection
    * to the top of the stack of drawn objects
-   * @param {fabric.Object} object Object to send
+   * @param {FabricObject} object Object to send
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
@@ -1468,7 +1463,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
    * the first intersecting object. Where intersection is calculated with
    * bounding box. If no intersection is found, there will not be change in the
    * stack.
-   * @param {fabric.Object} object Object to send
+   * @param {FabricObject} object Object to send
    * @param {Boolean} [intersecting] If `true`, send object behind next lower intersecting object
    * @return {fabric.Canvas} thisArg
    * @chainable
@@ -1541,7 +1536,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
    * of the first intersecting object. Where intersection is calculated with
    * bounding box. If no intersection is found, there will not be change in the
    * stack.
-   * @param {fabric.Object} object Object to send
+   * @param {FabricObject} object Object to send
    * @param {Boolean} [intersecting] If `true`, send object in front of next upper intersecting object
    * @return {fabric.Canvas} thisArg
    * @chainable
@@ -1610,7 +1605,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
 
   /**
    * Moves an object to specified level in stack of drawn objects
-   * @param {fabric.Object} object Object to send
+   * @param {FabricObject} object Object to send
    * @param {Number} index Position to move to
    * @return {fabric.Canvas} thisArg
    * @chainable
@@ -1629,7 +1624,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
   dispose() {
     // cancel eventually ongoing renders
     if (this.isRendering) {
-      fabric.util.cancelAnimFrame(this.isRendering);
+      cancelAnimFrame(this.isRendering);
       this.isRendering = 0;
     }
     this.forEachObject(function (object) {
@@ -1656,7 +1651,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
     // restore canvas size to original size in case retina scaling was applied
     this.lowerCanvasEl.setAttribute('width', this.width);
     this.lowerCanvasEl.setAttribute('height', this.height);
-    fabric.util.cleanUpJsdomNode(this.lowerCanvasEl);
+    cleanUpJsdomNode(this.lowerCanvasEl);
     this.lowerCanvasEl = undefined;
     return this;
   }
@@ -1673,7 +1668,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
 
 let StaticCanvas = CanvasDataURLExporterMixinGenerator(StaticCanvasBase);
 
-if (fabric.isLikelyNode) {
+if (isLikelyNode) {
   StaticCanvas = NodeCanvasStreamsMixinGenerator(StaticCanvas);
 }
 
