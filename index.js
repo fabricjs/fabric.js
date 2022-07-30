@@ -103,7 +103,6 @@ fabric.Rect = Rect;
 // fabric.Textbox = Textbox;
 fabric.Triangle = Triangle;
 import { ObjectStraighteningMixinGenerator, StaticCanvasObjectStraighteningMixinGenerator } from './src/mixins/object_straightening.mixin'; // optional objectstraightening
-
 fabric.Object = ObjectStraighteningMixinGenerator(fabric.Object);
 fabric.StaticCanvas = StaticCanvasObjectStraighteningMixinGenerator(fabric.StaticCanvas);
 import './src/filters/webgl_backend.class'; // optional image_filters
