@@ -1,10 +1,10 @@
-import { cos } from './index.ts';
-(function(global) {
+import { cos } from './cos';
+(function (global) {
   var fabric = global.fabric, sqrt = Math.sqrt,
-      atan2 = Math.atan2,
-      pow = Math.pow,
-      PiBy180 = Math.PI / 180,
-      PiBy2 = Math.PI / 2;
+    atan2 = Math.atan2,
+    pow = Math.pow,
+    PiBy180 = Math.PI / 180,
+    PiBy2 = Math.PI / 2;
 
   /**
    * @typedef {[number,number,number,number,number,number]} Matrix
@@ -21,7 +21,7 @@ import { cos } from './index.ts';
      * @param {Number} angle the angle in radians or in degree
      * @return {Number}
      */
-    sin: function(angle) {
+    sin: function (angle) {
       if (angle === 0) { return 0; }
       var angleSlice = angle / PiBy2, sign = 1;
       if (angle < 0) {
@@ -45,7 +45,7 @@ import { cos } from './index.ts';
      * @param {*} value
      * @return {Array} original array
      */
-    removeFromArray: function(array, value) {
+    removeFromArray: function (array, value) {
       var idx = array.indexOf(value);
       if (idx !== -1) {
         array.splice(idx, 1);
@@ -61,7 +61,7 @@ import { cos } from './index.ts';
      * @param {Number} max upper limit
      * @return {Number} random value (between min and max)
      */
-    getRandomInt: function(min, max) {
+    getRandomInt: function (min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     },
 
@@ -72,7 +72,7 @@ import { cos } from './index.ts';
      * @param {Number} degrees value in degrees
      * @return {Number} value in radians
      */
-    degreesToRadians: function(degrees) {
+    degreesToRadians: function (degrees) {
       return degrees * PiBy180;
     },
 
@@ -83,7 +83,7 @@ import { cos } from './index.ts';
      * @param {Number} radians value in radians
      * @return {Number} value in degrees
      */
-    radiansToDegrees: function(radians) {
+    radiansToDegrees: function (radians) {
       return radians / PiBy180;
     },
 
@@ -96,9 +96,9 @@ import { cos } from './index.ts';
      * @param {Number} radians The radians of the angle for the rotation
      * @return {fabric.Point} The new rotated point
      */
-    rotatePoint: function(point, origin, radians) {
+    rotatePoint: function (point, origin, radians) {
       var newPoint = new fabric.Point(point.x - origin.x, point.y - origin.y),
-          v = fabric.util.rotateVector(newPoint, radians);
+        v = fabric.util.rotateVector(newPoint, radians);
       return v.addEquals(origin);
     },
 
@@ -110,11 +110,11 @@ import { cos } from './index.ts';
      * @param {Number} radians The radians of the angle for the rotation
      * @return {fabric.Point} The new rotated point
      */
-    rotateVector: function(vector, radians) {
+    rotateVector: function (vector, radians) {
       var sin = fabric.util.sin(radians),
-          cos = fabric.util.cos(radians),
-          rx = vector.x * cos - vector.y * sin,
-          ry = vector.x * sin + vector.y * cos;
+        cos = fabric.util.cos(radians),
+        rx = vector.x * cos - vector.y * sin,
+        ry = vector.x * sin + vector.y * cos;
       return new fabric.Point(rx, ry);
     },
 
@@ -198,13 +198,13 @@ import { cos } from './index.ts';
      */
     projectStrokeOnPoints: function (points, options, openPath) {
       var coords = [], s = options.strokeWidth / 2,
-          strokeUniformScalar = options.strokeUniform ?
-            new fabric.Point(1 / options.scaleX, 1 / options.scaleY) : new fabric.Point(1, 1),
-          getStrokeHatVector = function (v) {
-            var scalar = s / (Math.hypot(v.x, v.y));
-            return new fabric.Point(v.x * scalar * strokeUniformScalar.x, v.y * scalar * strokeUniformScalar.y);
-          };
-      if (points.length <= 1) {return coords;}
+        strokeUniformScalar = options.strokeUniform ?
+          new fabric.Point(1 / options.scaleX, 1 / options.scaleY) : new fabric.Point(1, 1),
+        getStrokeHatVector = function (v) {
+          var scalar = s / (Math.hypot(v.x, v.y));
+          return new fabric.Point(v.x * scalar * strokeUniformScalar.x, v.y * scalar * strokeUniformScalar.y);
+        };
+      if (points.length <= 1) { return coords; }
       points.forEach(function (p, index) {
         var A = new fabric.Point(p.x, p.y), B, C;
         if (index === 0) {
@@ -220,10 +220,10 @@ import { cos } from './index.ts';
           C = points[index + 1];
         }
         var bisector = fabric.util.getBisector(A, B, C),
-            bisectorVector = bisector.vector,
-            alpha = bisector.angle,
-            scalar,
-            miterVector;
+          bisectorVector = bisector.vector,
+          alpha = bisector.angle,
+          scalar,
+          miterVector;
         if (options.strokeLineJoin === 'miter') {
           scalar = -s / Math.sin(alpha / 2);
           miterVector = new fabric.Point(
@@ -256,7 +256,7 @@ import { cos } from './index.ts';
      * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
      * @return {fabric.Point} The transformed point
      */
-    transformPoint: function(p, t, ignoreOffset) {
+    transformPoint: function (p, t, ignoreOffset) {
       if (ignoreOffset) {
         return new fabric.Point(
           t[0] * p.x + t[2] * p.y,
@@ -337,20 +337,20 @@ import { cos } from './index.ts';
      * @param {Array} [transform] an array of 6 numbers representing a 2x3 transform matrix
      * @return {Object} Object with left, top, width, height properties
      */
-    makeBoundingBoxFromPoints: function(points, transform) {
+    makeBoundingBoxFromPoints: function (points, transform) {
       if (transform) {
         for (var i = 0; i < points.length; i++) {
           points[i] = fabric.util.transformPoint(points[i], transform);
         }
       }
       var xPoints = [points[0].x, points[1].x, points[2].x, points[3].x],
-          minX = fabric.util.array.min(xPoints),
-          maxX = fabric.util.array.max(xPoints),
-          width = maxX - minX,
-          yPoints = [points[0].y, points[1].y, points[2].y, points[3].y],
-          minY = fabric.util.array.min(yPoints),
-          maxY = fabric.util.array.max(yPoints),
-          height = maxY - minY;
+        minX = fabric.util.array.min(xPoints),
+        maxX = fabric.util.array.max(xPoints),
+        width = maxX - minX,
+        yPoints = [points[0].y, points[1].y, points[2].y, points[3].y],
+        minY = fabric.util.array.min(yPoints),
+        maxY = fabric.util.array.max(yPoints),
+        height = maxY - minY;
 
       return {
         left: minX,
@@ -367,10 +367,10 @@ import { cos } from './index.ts';
      * @param {Array} t The transform
      * @return {Array} The inverted transform
      */
-    invertTransform: function(t) {
+    invertTransform: function (t) {
       var a = 1 / (t[0] * t[3] - t[1] * t[2]),
-          r = [a * t[3], -a * t[1], -a * t[2], a * t[0]],
-          o = fabric.util.transformPoint({ x: t[4], y: t[5] }, r, true);
+        r = [a * t[3], -a * t[1], -a * t[2], a * t[0]],
+        o = fabric.util.transformPoint({ x: t[4], y: t[5] }, r, true);
       r[4] = -o.x;
       r[5] = -o.y;
       return r;
@@ -384,7 +384,7 @@ import { cos } from './index.ts';
      * @param {Number} fractionDigits number of fraction digits to "leave"
      * @return {Number}
      */
-    toFixed: function(number, fractionDigits) {
+    toFixed: function (number, fractionDigits) {
       return parseFloat(Number(number).toFixed(fractionDigits));
     },
 
@@ -395,9 +395,9 @@ import { cos } from './index.ts';
      * @param {Number} fontSize
      * @return {Number|String}
      */
-    parseUnit: function(value, fontSize) {
+    parseUnit: function (value, fontSize) {
       var unit = /\D{0,2}$/.exec(value),
-          number = parseFloat(value);
+        number = parseFloat(value);
       if (!fontSize) {
         fontSize = fabric.Text.DEFAULT_SVG_FONT_SIZE;
       }
@@ -431,7 +431,7 @@ import { cos } from './index.ts';
      * @memberOf fabric.util
      * @return {Boolean}
      */
-    falseFunction: function() {
+    falseFunction: function () {
       return false;
     },
 
@@ -442,7 +442,7 @@ import { cos } from './index.ts';
      * @param {object} namespace Namespace to get klass "Class" object from
      * @return {Object} klass "Class"
      */
-    getKlass: function(type, namespace) {
+    getKlass: function (type, namespace) {
       // capitalize first letter only
       type = fabric.util.string.camelize(type.charAt(0).toUpperCase() + type.slice(1));
       return (namespace || fabric)[type];
@@ -454,7 +454,7 @@ import { cos } from './index.ts';
      * @param {String} type Type of svg element (eg. 'circle')
      * @return {Array} string names of supported attributes
      */
-    getSvgAttributes: function(type) {
+    getSvgAttributes: function (type) {
       var attributes = [
         'instantiated_by_use',
         'style',
@@ -498,7 +498,7 @@ import { cos } from './index.ts';
           signal.addEventListener('abort', abort, { once: true });
         }
         var img = fabric.util.createImage();
-        var done = function() {
+        var done = function () {
           img.onload = img.onerror = null;
           signal && abort && signal.removeEventListener('abort', abort);
           resolve(img);
@@ -530,7 +530,7 @@ import { cos } from './index.ts';
      * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
      * @returns {Promise<fabric.Object[]>}
      */
-    enlivenObjects: function(objects, options) {
+    enlivenObjects: function (objects, options) {
       options = options || {};
       var instances = [], signal = options && options.signal;
       return new Promise(function (resolve, reject) {
@@ -621,7 +621,7 @@ import { cos } from './index.ts';
      * @param {Array} elements SVG elements to group
      * @return {fabric.Object|fabric.Group}
      */
-    groupSVGElements: function(elements) {
+    groupSVGElements: function (elements) {
       if (elements && elements.length === 1) {
         return elements[0];
       }
@@ -636,7 +636,7 @@ import { cos } from './index.ts';
      * @param {Object} destination Destination object
      * @return {Array} properties Properties names to include
      */
-    populateWithProperties: function(source, destination, properties) {
+    populateWithProperties: function (source, destination, properties) {
       if (properties && Array.isArray(properties)) {
         for (var i = 0, len = properties.length; i < len; i++) {
           if (properties[i] in source) {
@@ -652,7 +652,7 @@ import { cos } from './index.ts';
      * @memberOf fabric.util
      * @return {CanvasElement} initialized canvas element
      */
-    createCanvasElement: function() {
+    createCanvasElement: function () {
       return fabric.document.createElement('canvas');
     },
 
@@ -663,7 +663,7 @@ import { cos } from './index.ts';
      * @memberOf fabric.util
      * @return {CanvasElement} initialized canvas element
      */
-    copyCanvasElement: function(canvas) {
+    copyCanvasElement: function (canvas) {
       var newCanvas = fabric.util.createCanvasElement();
       newCanvas.width = canvas.width;
       newCanvas.height = canvas.height;
@@ -680,7 +680,7 @@ import { cos } from './index.ts';
      * @memberOf fabric.util
      * @return {String} data url
      */
-    toDataURL: function(canvasEl, format, quality) {
+    toDataURL: function (canvasEl, format, quality) {
       return canvasEl.toDataURL('image/' + format, quality);
     },
 
@@ -690,7 +690,7 @@ import { cos } from './index.ts';
      * @memberOf fabric.util
      * @return {HTMLImageElement} HTML image element
      */
-    createImage: function() {
+    createImage: function () {
       return fabric.document.createElement('img');
     },
 
@@ -703,7 +703,7 @@ import { cos } from './index.ts';
      * @param  {Boolean} is2x2 flag to multiply matrices as 2x2 matrices
      * @return {Array} The product of the two transform matrices
      */
-    multiplyTransformMatrices: function(a, b, is2x2) {
+    multiplyTransformMatrices: function (a, b, is2x2) {
       // Matrix multiply a * b
       return [
         a[0] * b[0] + a[2] * b[1],
@@ -722,12 +722,12 @@ import { cos } from './index.ts';
      * @param  {Array} a transformMatrix
      * @return {Object} Components of transform
      */
-    qrDecompose: function(a) {
+    qrDecompose: function (a) {
       var angle = atan2(a[1], a[0]),
-          denom = pow(a[0], 2) + pow(a[1], 2),
-          scaleX = sqrt(denom),
-          scaleY = (a[0] * a[3] - a[2] * a[1]) / scaleX,
-          skewX = atan2(a[0] * a[2] + a[1] * a [3], denom);
+        denom = pow(a[0], 2) + pow(a[1], 2),
+        scaleX = sqrt(denom),
+        scaleY = (a[0] * a[3] - a[2] * a[1]) / scaleX,
+        skewX = atan2(a[0] * a[2] + a[1] * a[3], denom);
       return {
         angle: angle / PiBy180,
         scaleX: scaleX,
@@ -749,13 +749,13 @@ import { cos } from './index.ts';
      * @param  {Number} [options.angle] angle in degrees
      * @return {Number[]} transform matrix
      */
-    calcRotateMatrix: function(options) {
+    calcRotateMatrix: function (options) {
       if (!options.angle) {
         return fabric.iMatrix.concat();
       }
       var theta = fabric.util.degreesToRadians(options.angle),
-          cos = fabric.util.cos(theta),
-          sin = fabric.util.sin(theta);
+        cos = fabric.util.cos(theta),
+        sin = fabric.util.sin(theta);
       return [cos, sin, -sin, cos, 0, 0];
     },
 
@@ -776,18 +776,18 @@ import { cos } from './index.ts';
      * @param  {Number} [options.skewY]
      * @return {Number[]} transform matrix
      */
-    calcDimensionsMatrix: function(options) {
+    calcDimensionsMatrix: function (options) {
       var scaleX = typeof options.scaleX === 'undefined' ? 1 : options.scaleX,
-          scaleY = typeof options.scaleY === 'undefined' ? 1 : options.scaleY,
-          scaleMatrix = [
-            options.flipX ? -scaleX : scaleX,
-            0,
-            0,
-            options.flipY ? -scaleY : scaleY,
-            0,
-            0],
-          multiply = fabric.util.multiplyTransformMatrices,
-          degreesToRadians = fabric.util.degreesToRadians;
+        scaleY = typeof options.scaleY === 'undefined' ? 1 : options.scaleY,
+        scaleMatrix = [
+          options.flipX ? -scaleX : scaleX,
+          0,
+          0,
+          options.flipY ? -scaleY : scaleY,
+          0,
+          0],
+        multiply = fabric.util.multiplyTransformMatrices,
+        degreesToRadians = fabric.util.degreesToRadians;
       if (options.skewX) {
         scaleMatrix = multiply(
           scaleMatrix,
@@ -821,14 +821,14 @@ import { cos } from './index.ts';
      * @param  {Number} [options.translateY]
      * @return {Number[]} transform matrix
      */
-    composeMatrix: function(options) {
+    composeMatrix: function (options) {
       var matrix = [1, 0, 0, 1, options.translateX || 0, options.translateY || 0],
-          multiply = fabric.util.multiplyTransformMatrices;
+        multiply = fabric.util.multiplyTransformMatrices;
       if (options.angle) {
         matrix = multiply(matrix, fabric.util.calcRotateMatrix(options));
       }
       if (options.scaleX !== 1 || options.scaleY !== 1 ||
-          options.skewX || options.skewY || options.flipX || options.flipY) {
+        options.skewX || options.skewY || options.flipX || options.flipY) {
         matrix = multiply(matrix, fabric.util.calcDimensionsMatrix(options));
       }
       return matrix;
@@ -879,7 +879,7 @@ import { cos } from './index.ts';
      * @param {Number} y y coordinate
      * @param {Number} tolerance Tolerance
      */
-    isTransparent: function(ctx, x, y, tolerance) {
+    isTransparent: function (ctx, x, y, tolerance) {
 
       // If tolerance is > 0 adjust start coords to take into account.
       // If moves off Canvas fix to 0
@@ -899,8 +899,8 @@ import { cos } from './index.ts';
       }
 
       var _isTransparent = true, i, temp,
-          imageData = ctx.getImageData(x, y, (tolerance * 2) || 1, (tolerance * 2) || 1),
-          l = imageData.data.length;
+        imageData = ctx.getImageData(x, y, (tolerance * 2) || 1, (tolerance * 2) || 1),
+        l = imageData.data.length;
 
       // Split image data - for tolerance > 1, pixelDataSize = 4;
       for (i = 3; i < l; i += 4) {
@@ -921,9 +921,9 @@ import { cos } from './index.ts';
      * @param {string} attribute to be parsed
      * @return {Object} an object containing align and meetOrSlice attribute
      */
-    parsePreserveAspectRatioAttribute: function(attribute) {
+    parsePreserveAspectRatioAttribute: function (attribute) {
       var meetOrSlice = 'meet', alignX = 'Mid', alignY = 'Mid',
-          aspectRatioAttrs = attribute.split(' '), align;
+        aspectRatioAttrs = attribute.split(' '), align;
 
       if (aspectRatioAttrs && aspectRatioAttrs.length) {
         meetOrSlice = aspectRatioAttrs.pop();
@@ -957,10 +957,10 @@ import { cos } from './index.ts';
      * @memberOf fabric.util
      * @param {String} [fontFamily] font family to clear
      */
-    clearFabricFontCache: function(fontFamily) {
+    clearFabricFontCache: function (fontFamily) {
       fontFamily = (fontFamily || '').toLowerCase();
       if (!fontFamily) {
-        fabric.charWidthsCache = { };
+        fabric.charWidthsCache = {};
       }
       else if (fabric.charWidthsCache[fontFamily]) {
         delete fabric.charWidthsCache[fontFamily];
@@ -976,13 +976,13 @@ import { cos } from './index.ts';
      * @return {Object.x} Limited dimensions by X
      * @return {Object.y} Limited dimensions by Y
      */
-    limitDimsByArea: function(ar, maximumArea) {
+    limitDimsByArea: function (ar, maximumArea) {
       var roughWidth = Math.sqrt(maximumArea * ar),
-          perfLimitSizeY = Math.floor(maximumArea / roughWidth);
+        perfLimitSizeY = Math.floor(maximumArea / roughWidth);
       return { x: Math.floor(roughWidth), y: perfLimitSizeY };
     },
 
-    capValue: function(min, value, max) {
+    capValue: function (min, value, max) {
       return Math.max(min, Math.min(value, max));
     },
 
@@ -999,7 +999,7 @@ import { cos } from './index.ts';
      * @param {Number} destination.width natural unscaled width of the object
      * @return {Number} scale factor to apply to source to fit into destination
      */
-    findScaleToFit: function(source, destination) {
+    findScaleToFit: function (source, destination) {
       return Math.min(destination.width / source.width, destination.height / source.height);
     },
 
@@ -1016,7 +1016,7 @@ import { cos } from './index.ts';
      * @param {Number} destination.width natural unscaled width of the object
      * @return {Number} scale factor to apply to source to cover destination
      */
-    findScaleToCover: function(source, destination) {
+    findScaleToCover: function (source, destination) {
       return Math.max(destination.width / source.width, destination.height / source.height);
     },
 
@@ -1027,8 +1027,8 @@ import { cos } from './index.ts';
      * @return {String} transform matrix for svg
      * @return {Object.y} Limited dimensions by Y
      */
-    matrixToSVG: function(transform) {
-      return 'matrix(' + transform.map(function(value) {
+    matrixToSVG: function (transform) {
+      return 'matrix(' + transform.map(function (value) {
         return fabric.util.toFixed(value, fabric.Object.NUM_FRACTION_DIGITS);
       }).join(' ') + ')';
     },
@@ -1045,9 +1045,9 @@ import { cos } from './index.ts';
      * @param {fabric.Object} object the object you want to transform
      * @param {Array} transform the destination transform
      */
-    removeTransformFromObject: function(object, transform) {
+    removeTransformFromObject: function (object, transform) {
       var inverted = fabric.util.invertTransform(transform),
-          finalTransform = fabric.util.multiplyTransformMatrices(inverted, object.calcOwnMatrix());
+        finalTransform = fabric.util.multiplyTransformMatrices(inverted, object.calcOwnMatrix());
       fabric.util.applyTransformToObject(object, finalTransform);
     },
 
@@ -1060,7 +1060,7 @@ import { cos } from './index.ts';
      * @param {fabric.Object} object the object you want to transform
      * @param {Array} transform the destination transform
      */
-    addTransformToObject: function(object, transform) {
+    addTransformToObject: function (object, transform) {
       fabric.util.applyTransformToObject(
         object,
         fabric.util.multiplyTransformMatrices(transform, object.calcOwnMatrix())
@@ -1073,9 +1073,9 @@ import { cos } from './index.ts';
      * @param {fabric.Object} object the object you want to transform
      * @param {Array} transform the destination transform
      */
-    applyTransformToObject: function(object, transform) {
+    applyTransformToObject: function (object, transform) {
       var options = fabric.util.qrDecompose(transform),
-          center = new fabric.Point(options.translateX, options.translateY);
+        center = new fabric.Point(options.translateX, options.translateY);
       object.flipX = false;
       object.flipY = false;
       object.set('scaleX', options.scaleX);
@@ -1145,27 +1145,27 @@ import { cos } from './index.ts';
      * @param {Number} options.skewY
      * @returns {fabric.Point} size
      */
-    sizeAfterTransform: function(width, height, options) {
+    sizeAfterTransform: function (width, height, options) {
       var dimX = width / 2, dimY = height / 2,
-          points = [
-            {
-              x: -dimX,
-              y: -dimY
-            },
-            {
-              x: dimX,
-              y: -dimY
-            },
-            {
-              x: -dimX,
-              y: dimY
-            },
-            {
-              x: dimX,
-              y: dimY
-            }],
-          transformMatrix = fabric.util.calcDimensionsMatrix(options),
-          bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
+        points = [
+          {
+            x: -dimX,
+            y: -dimY
+          },
+          {
+            x: dimX,
+            y: -dimY
+          },
+          {
+            x: -dimX,
+            y: dimY
+          },
+          {
+            x: dimX,
+            y: dimY
+          }],
+        transformMatrix = fabric.util.calcDimensionsMatrix(options),
+        bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
       return new fabric.Point(bbox.width, bbox.height);
     },
 
@@ -1221,20 +1221,20 @@ import { cos } from './index.ts';
      * @param {boolean} forTextSpans whether to check overline, underline, and line-through properties
      * @return {boolean} true if the style changed
      */
-    hasStyleChanged: function(prevStyle, thisStyle, forTextSpans) {
+    hasStyleChanged: function (prevStyle, thisStyle, forTextSpans) {
       forTextSpans = forTextSpans || false;
       return (prevStyle.fill !== thisStyle.fill ||
-              prevStyle.stroke !== thisStyle.stroke ||
-              prevStyle.strokeWidth !== thisStyle.strokeWidth ||
-              prevStyle.fontSize !== thisStyle.fontSize ||
-              prevStyle.fontFamily !== thisStyle.fontFamily ||
-              prevStyle.fontWeight !== thisStyle.fontWeight ||
-              prevStyle.fontStyle !== thisStyle.fontStyle ||
-              prevStyle.deltaY !== thisStyle.deltaY) ||
-              (forTextSpans &&
-                (prevStyle.overline !== thisStyle.overline ||
-                prevStyle.underline !== thisStyle.underline ||
-                prevStyle.linethrough !== thisStyle.linethrough));
+        prevStyle.stroke !== thisStyle.stroke ||
+        prevStyle.strokeWidth !== thisStyle.strokeWidth ||
+        prevStyle.fontSize !== thisStyle.fontSize ||
+        prevStyle.fontFamily !== thisStyle.fontFamily ||
+        prevStyle.fontWeight !== thisStyle.fontWeight ||
+        prevStyle.fontStyle !== thisStyle.fontStyle ||
+        prevStyle.deltaY !== thisStyle.deltaY) ||
+        (forTextSpans &&
+          (prevStyle.overline !== thisStyle.overline ||
+            prevStyle.underline !== thisStyle.underline ||
+            prevStyle.linethrough !== thisStyle.linethrough));
     },
 
     /**
@@ -1246,11 +1246,11 @@ import { cos } from './index.ts';
      * @param {String} text the text string that the styles are applied to
      * @return {{start: number, end: number, style: object}[]}
      */
-    stylesToArray: function(styles, text) {
+    stylesToArray: function (styles, text) {
       // clone style structure to prevent mutation
       var styles = fabric.util.object.clone(styles, true),
-          textLines = text.split('\n'),
-          charIndex = -1, prevStyle = {}, stylesArray = [];
+        textLines = text.split('\n'),
+        charIndex = -1, prevStyle = {}, stylesArray = [];
       //loop through each textLine
       for (var i = 0; i < textLines.length; i++) {
         if (!styles[i]) {
@@ -1292,12 +1292,12 @@ import { cos } from './index.ts';
      * @param {String} text the text string that the styles are applied to
      * @return {Object}
      */
-    stylesFromArray: function(styles, text) {
+    stylesFromArray: function (styles, text) {
       if (!Array.isArray(styles)) {
         return styles;
       }
       var textLines = text.split('\n'),
-          charIndex = -1, styleIndex = 0, stylesObject = {};
+        charIndex = -1, styleIndex = 0, stylesObject = {};
       //loop through each textLine
       for (var i = 0; i < textLines.length; i++) {
         //loop through each character of the current line
