@@ -1,10 +1,10 @@
 //@ts-nocheck
 /* _TO_SVG_START_ */
-(function(global) {
-  var fabric = global.fabric, toFixed = fabric.util.toFixed,
-      multipleSpacesRegex = /  +/g;
 
-  
+var fabric = global.fabric, toFixed = fabric.util.toFixed,
+  multipleSpacesRegex = /  +/g;
+
+
 export function TextIMixinGenerator(Klass) {
   return class TextIMixin extends Klass {
 
@@ -15,7 +15,7 @@ export function TextIMixinGenerator(Klass) {
      */
     _toSVG() {
       var offsets = this._getSVGLeftTopOffsets(),
-          textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
+        textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
       return this._wrapSVGTextAndBg(textAndBg);
     }
 
@@ -47,7 +47,7 @@ export function TextIMixinGenerator(Klass) {
      */
     _wrapSVGTextAndBg(textAndBg) {
       var noShadow = true,
-          textDecoration = this.getSvgTextDecoration(this);
+        textDecoration = this.getSvgTextDecoration(this);
       return [
         textAndBg.textBgRects.join(''),
         '\t\t<text xml:space="preserve" ',
@@ -71,8 +71,8 @@ export function TextIMixinGenerator(Klass) {
      */
     _getSVGTextAndBg(textTopOffset, textLeftOffset) {
       var textSpans = [],
-          textBgRects = [],
-          height = textTopOffset, lineOffset;
+        textBgRects = [],
+        height = textTopOffset, lineOffset;
       // bounding-box background
       this._setSVGBg(textBgRects);
 
@@ -100,10 +100,10 @@ export function TextIMixinGenerator(Klass) {
      */
     _createTextCharSpan(_char, styleDecl, left, top) {
       var shouldUseWhitespace = _char !== _char.trim() || _char.match(multipleSpacesRegex),
-          styleProps = this.getSvgSpanStyles(styleDecl, shouldUseWhitespace),
-          fillStyles = styleProps ? 'style="' + styleProps + '"' : '',
-          dy = styleDecl.deltaY, dySpan = '',
-          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+        styleProps = this.getSvgSpanStyles(styleDecl, shouldUseWhitespace),
+        fillStyles = styleProps ? 'style="' + styleProps + '"' : '',
+        dy = styleDecl.deltaY, dySpan = '',
+        NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
       if (dy) {
         dySpan = ' dy="' + toFixed(dy, NUM_FRACTION_DIGITS) + '" ';
       }
@@ -119,14 +119,14 @@ export function TextIMixinGenerator(Klass) {
     _setSVGTextLineText(textSpans, lineIndex, textLeftOffset, textTopOffset) {
       // set proper line offset
       var lineHeight = this.getHeightOfLine(lineIndex),
-          isJustify = this.textAlign.indexOf('justify') !== -1,
-          actualStyle,
-          nextStyle,
-          charsToRender = '',
-          charBox, style,
-          boxWidth = 0,
-          line = this._textLines[lineIndex],
-          timeToRender;
+        isJustify = this.textAlign.indexOf('justify') !== -1,
+        actualStyle,
+        nextStyle,
+        charsToRender = '',
+        charBox, style,
+        boxWidth = 0,
+        line = this._textLines[lineIndex],
+        timeToRender;
 
       textTopOffset += lineHeight * (1 - this._fontSizeFraction) / this.lineHeight;
       for (var i = 0, len = line.length - 1; i <= len; i++) {
@@ -152,7 +152,7 @@ export function TextIMixinGenerator(Klass) {
           timeToRender = fabric.util.hasStyleChanged(actualStyle, nextStyle, true);
         }
         if (timeToRender) {
-          style = this._getStyleDeclaration(lineIndex, i) || { };
+          style = this._getStyleDeclaration(lineIndex, i) || {};
           textSpans.push(this._createTextCharSpan(charsToRender, style, textLeftOffset, textTopOffset));
           charsToRender = '';
           actualStyle = nextStyle;
@@ -185,11 +185,11 @@ export function TextIMixinGenerator(Klass) {
 
     _setSVGTextLineBg(textBgRects, i, leftOffset, textTopOffset) {
       var line = this._textLines[i],
-          heightOfLine = this.getHeightOfLine(i) / this.lineHeight,
-          boxWidth = 0,
-          boxStart = 0,
-          charBox, currentColor,
-          lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
+        heightOfLine = this.getHeightOfLine(i) / this.lineHeight,
+        boxWidth = 0,
+        boxStart = 0,
+        charBox, currentColor,
+        lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
       for (var j = 0, jlen = line.length; j < jlen; j++) {
         charBox = this.__charBounds[i][j];
         currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
@@ -253,5 +253,5 @@ export function TextIMixinGenerator(Klass) {
 
 fabric.Text = TextIMixinGenerator(fabric.Text);
 
-})(typeof exports !== 'undefined' ? exports : window);
+
 /* _TO_SVG_END_ */

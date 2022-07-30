@@ -1,4 +1,4 @@
-
+//@ts-nocheck
 type EventRegistryObject = { [eventName: string]: Function };
 
 

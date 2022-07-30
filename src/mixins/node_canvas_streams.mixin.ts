@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { getNodeCanvas } from '../util';
 
 export function NodeCanvasStreamsMixinGenerator<T extends new (...args: any[]) => any>(Klass: T) {

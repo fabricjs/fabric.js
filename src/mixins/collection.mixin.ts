@@ -1,3 +1,4 @@
+//@ts-nocheck
 import type { FabricObject } from "../shapes/object.class";
 
 export function CollectionMixinGenerator<T extends new (...args: any[]) => any>(Klass: T) {

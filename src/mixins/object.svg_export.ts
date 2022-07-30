@@ -1,31 +1,31 @@
 //@ts-nocheck
 /* _TO_SVG_START_ */
-(function(global) {
-  var fabric = global.fabric;
-  function getSvgColorString(prop, value) {
-    if (!value) {
-      return prop + ': none; ';
-    }
-    else if (value.toLive) {
-      return prop + ': url(#SVGID_' + value.id + '); ';
-    }
-    else {
-      var color = new fabric.Color(value),
-          str = prop + ': ' + color.toRgb() + '; ',
-          opacity = color.getAlpha();
-      if (opacity !== 1) {
-        //change the color in rgb + opacity
-        str += prop + '-opacity: ' + opacity.toString() + '; ';
-      }
-      return str;
-    }
+
+var fabric = global.fabric;
+function getSvgColorString(prop, value) {
+  if (!value) {
+    return prop + ': none; ';
   }
+  else if (value.toLive) {
+    return prop + ': url(#SVGID_' + value.id + '); ';
+  }
+  else {
+    var color = new fabric.Color(value),
+      str = prop + ': ' + color.toRgb() + '; ',
+      opacity = color.getAlpha();
+    if (opacity !== 1) {
+      //change the color in rgb + opacity
+      str += prop + '-opacity: ' + opacity.toString() + '; ';
+    }
+    return str;
+  }
+}
 
-  var toFixed = fabric = global.fabric, toFixed = fabric.util.toFixed;
+var toFixed = fabric.util.toFixed;
 
-  
-export function ObjectMixinGenerator(Klass) {
-  return class ObjectMixin extends Klass {
+
+export function ObjectSVGExportMixinGenerator(Klass) {
+  return class ObjectSVGExportMixin extends Klass {
     /**
      * Returns styles-string for svg-export
      * @param {Boolean} skipShadow a boolean to skip shadow filter output
@@ -34,17 +34,17 @@ export function ObjectMixinGenerator(Klass) {
     getSvgStyles(skipShadow) {
 
       var fillRule = this.fillRule ? this.fillRule : 'nonzero',
-          strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
-          strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : 'none',
-          strokeDashOffset = this.strokeDashOffset ? this.strokeDashOffset : '0',
-          strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt',
-          strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter',
-          strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4',
-          opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
-          visibility = this.visible ? '' : ' visibility: hidden;',
-          filter = skipShadow ? '' : this.getSvgFilter(),
-          fill = getSvgColorString('fill', this.fill),
-          stroke = getSvgColorString('stroke', this.stroke);
+        strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
+        strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(' ') : 'none',
+        strokeDashOffset = this.strokeDashOffset ? this.strokeDashOffset : '0',
+        strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt',
+        strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter',
+        strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : '4',
+        opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
+        visibility = this.visible ? '' : ' visibility: hidden;',
+        filter = skipShadow ? '' : this.getSvgFilter(),
+        fill = getSvgColorString('fill', this.fill),
+        stroke = getSvgColorString('stroke', this.stroke);
 
       return [
         stroke,
@@ -72,16 +72,16 @@ export function ObjectMixinGenerator(Klass) {
       var term = '; ';
       var fontFamily = style.fontFamily ?
         'font-family: ' + (((style.fontFamily.indexOf('\'') === -1 && style.fontFamily.indexOf('"') === -1) ?
-          '\'' + style.fontFamily  + '\'' : style.fontFamily)) + term : '';
+          '\'' + style.fontFamily + '\'' : style.fontFamily)) + term : '';
       var strokeWidth = style.strokeWidth ? 'stroke-width: ' + style.strokeWidth + term : '',
-          fontFamily = fontFamily,
-          fontSize = style.fontSize ? 'font-size: ' + style.fontSize + 'px' + term : '',
-          fontStyle = style.fontStyle ? 'font-style: ' + style.fontStyle + term : '',
-          fontWeight = style.fontWeight ? 'font-weight: ' + style.fontWeight + term : '',
-          fill = style.fill ? getSvgColorString('fill', style.fill) : '',
-          stroke = style.stroke ? getSvgColorString('stroke', style.stroke) : '',
-          textDecoration = this.getSvgTextDecoration(style),
-          deltaY = style.deltaY ? 'baseline-shift: ' + (-style.deltaY) + '; ' : '';
+        fontFamily = fontFamily,
+        fontSize = style.fontSize ? 'font-size: ' + style.fontSize + 'px' + term : '',
+        fontStyle = style.fontStyle ? 'font-style: ' + style.fontStyle + term : '',
+        fontWeight = style.fontWeight ? 'font-weight: ' + style.fontWeight + term : '',
+        fill = style.fill ? getSvgColorString('fill', style.fill) : '',
+        stroke = style.stroke ? getSvgColorString('stroke', style.stroke) : '',
+        textDecoration = this.getSvgTextDecoration(style),
+        deltaY = style.deltaY ? 'baseline-shift: ' + (-style.deltaY) + '; ' : '';
       if (textDecoration) {
         textDecoration = 'text-decoration: ' + textDecoration + term;
       }
@@ -106,7 +106,7 @@ export function ObjectMixinGenerator(Klass) {
      * @return {String}
      */
     getSvgTextDecoration(style) {
-      return ['overline', 'underline', 'line-through'].filter(function(decoration) {
+      return ['overline', 'underline', 'line-through'].filter(function (decoration) {
         return style[decoration.replace('-', '')];
       }).join(' ');
     }
@@ -137,7 +137,7 @@ export function ObjectMixinGenerator(Klass) {
      */
     getSvgTransform(full, additionalTransform) {
       var transform = full ? this.calcTransformMatrix() : this.calcOwnMatrix(),
-          svgTransform = 'transform="' + fabric.util.matrixToSVG(transform);
+        svgTransform = 'transform="' + fabric.util.matrixToSVG(transform);
       return svgTransform +
         (additionalTransform || '') + '" ';
     }
@@ -184,13 +184,13 @@ export function ObjectMixinGenerator(Klass) {
     _createBaseClipPathSVGMarkup(objectMarkup, options) {
       options = options || {};
       var reviver = options.reviver,
-          additionalTransform = options.additionalTransform || '',
-          commonPieces = [
-            this.getSvgTransform(true, additionalTransform),
-            this.getSvgCommons(),
-          ].join(''),
-          // insert commons in the markup, style and svgCommons
-          index = objectMarkup.indexOf('COMMON_PARTS');
+        additionalTransform = options.additionalTransform || '',
+        commonPieces = [
+          this.getSvgTransform(true, additionalTransform),
+          this.getSvgCommons(),
+        ].join(''),
+        // insert commons in the markup, style and svgCommons
+        index = objectMarkup.indexOf('COMMON_PARTS');
       objectMarkup[index] = commonPieces;
       return reviver ? reviver(objectMarkup.join('')) : objectMarkup.join('');
     }
@@ -201,17 +201,17 @@ export function ObjectMixinGenerator(Klass) {
     _createBaseSVGMarkup(objectMarkup, options) {
       options = options || {};
       var noStyle = options.noStyle,
-          reviver = options.reviver,
-          styleInfo = noStyle ? '' : 'style="' + this.getSvgStyles() + '" ',
-          shadowInfo = options.withShadow ? 'style="' + this.getSvgFilter() + '" ' : '',
-          clipPath = this.clipPath,
-          vectorEffect = this.strokeUniform ? 'vector-effect="non-scaling-stroke" ' : '',
-          absoluteClipPath = clipPath && clipPath.absolutePositioned,
-          stroke = this.stroke, fill = this.fill, shadow = this.shadow,
-          commonPieces, markup = [], clipPathMarkup,
-          // insert commons in the markup, style and svgCommons
-          index = objectMarkup.indexOf('COMMON_PARTS'),
-          additionalTransform = options.additionalTransform;
+        reviver = options.reviver,
+        styleInfo = noStyle ? '' : 'style="' + this.getSvgStyles() + '" ',
+        shadowInfo = options.withShadow ? 'style="' + this.getSvgFilter() + '" ' : '',
+        clipPath = this.clipPath,
+        vectorEffect = this.strokeUniform ? 'vector-effect="non-scaling-stroke" ' : '',
+        absoluteClipPath = clipPath && clipPath.absolutePositioned,
+        stroke = this.stroke, fill = this.fill, shadow = this.shadow,
+        commonPieces, markup = [], clipPathMarkup,
+        // insert commons in the markup, style and svgCommons
+        index = objectMarkup.indexOf('COMMON_PARTS'),
+        additionalTransform = options.additionalTransform;
       if (clipPath) {
         clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
         clipPathMarkup = '<clipPath id="' + clipPath.clipPathId + '" >\n' +
@@ -260,7 +260,3 @@ export function ObjectMixinGenerator(Klass) {
   }
 }
 
-fabric.Object = ObjectMixinGenerator(fabric.Object);
-
-})(typeof exports !== 'undefined' ? exports : window);
-/* _TO_SVG_END_ */
