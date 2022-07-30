@@ -5,7 +5,7 @@ export * from './group.class';
 export * from './image.class';
 export * from './itext.class';
 export * from './line.class';
-export * from './object.class';
+export { FabricObject as object } from './object.class';
 export * from './path.class';
 export * from './polygon.class';
 export * from './polyline.class';
