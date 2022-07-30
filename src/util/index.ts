@@ -73,7 +73,9 @@ const {
     animateColor,
     requestAnimFrame,
     cancelAnimFrame,
-    rotateVector
+    rotateVector,
+    getRandomInt,
+    getSmoothPathFromPoints
 } = fabric.util;
 export {
     sin,
@@ -125,5 +127,7 @@ export {
     animateColor,
     requestAnimFrame,
     cancelAnimFrame,
-    rotateVector
+    rotateVector,
+    getRandomInt,
+    getSmoothPathFromPoints
 };

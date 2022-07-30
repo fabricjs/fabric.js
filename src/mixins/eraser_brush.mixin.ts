@@ -1,5 +1,6 @@
 //@ts-nocheck
 
+import { isEmptySVGPath, PencilBrush } from "brushes/pencil_brush.class";
 import { uid } from "constants";
 
 /** ERASER_START */
@@ -342,7 +343,7 @@ fabric.Canvas = CanvasEraserBrushMixinGenerator(fabric.Canvas);
  * @memberof fabric
  */
 fabric.EraserBrush = fabric.util.createClass(
-  fabric.PencilBrush,
+  PencilBrush,
     /** @lends fabric.EraserBrush.prototype */ {
     type: 'eraser',
 
@@ -757,7 +758,7 @@ fabric.EraserBrush = fabric.util.createClass(
       var pathData = this._points && this._points.length > 1 ?
         this.convertPointsToSVGPath(this._points) :
         null;
-      if (!pathData || this._isEmptySVGPath(pathData)) {
+      if (!pathData || isEmptySVGPath(pathData)) {
         canvas.fire('erasing:end');
         // do not create 0 width/height paths, as they are
         // rendered inconsistently across browsers
