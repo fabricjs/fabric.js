@@ -1,5 +1,5 @@
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
-import { context } from './src/context';
+import { context } from './context';
 import cache from './src/cache';
 import config from './src/config';
 var fabric = fabric || { version: '5.1.0' };
