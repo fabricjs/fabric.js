@@ -1,20 +1,25 @@
 //@ts-nocheck
 
-var fabric = global.fabric || (global.fabric = {}),
-  extend = fabric.util.object.extend,
-  clone = fabric.util.object.clone,
-  toFixed = fabric.util.toFixed,
-  capitalize = fabric.util.string.capitalize,
-  degreesToRadians = fabric.util.degreesToRadians,
-  objectCaching = !fabric.isLikelyNode;
+import { browserShadowBlurConstant, maxCacheSideLimit, minCacheSideLimit, NUM_FRACTION_DIGITS } from '../config';
+import { ALIASING_LIMIT, devicePixelRatio, iMatrix, isLikelyNode } from '../constants';
+import { CommonMethods } from '../mixins/common_methods.mixin';
+import { Point } from '../point.class';
+import {
+  capitalize, clamp, createCanvasElement, degreesToRadians, enlivenObjectEnlivables, invertTransform, limitDimsByArea, multiplyTransformMatrices, populateWithProperties,
+  qrDecompose, resetObjectTransform, saveObjectTransform, toDataURL, toFixed,
+  transformPoint
+} from '../util';
+import { Image } from './image.class';
+import { Text } from './text.class';
+import { StaticCanvas } from '../static_canvas.class';
+import { RUNNING_ANIMATIONS } from 'util/animate';
 
-import { CommonMethods } from "../mixins/common_methods.mixin";
+const objectCaching = !isLikelyNode;
 
 /**
  * Root object class from which all 2d shape classes inherit from
- * @class fabric.Object
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#objects}
- * @see {@link fabric.Object#initialize} for constructor definition
+ * @class FabricObject
+ * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#objects objects}
  *
  * @fires added
  * @fires removed
@@ -272,7 +277,7 @@ export class FabricObject extends CommonMethods {
   /**
    * Fill rule used to fill an object
    * accepted values are nonzero, evenodd
-   * <b>Backwards incompatibility note:</b> This property was used for setting globalCompositeOperation until v1.4.12 (use `fabric.Object#globalCompositeOperation` instead)
+   * <b>Backwards incompatibility note:</b> This property was used for setting globalCompositeOperation until v1.4.12 (use `FabricObject#globalCompositeOperation` instead)
    * @type String
    * @default
    */
@@ -352,7 +357,7 @@ export class FabricObject extends CommonMethods {
 
   /**
    * Shadow object representing shadow of this shape
-   * @type fabric.Shadow
+   * @type Shadow
    * @default
    */
   shadow = null
@@ -579,7 +584,7 @@ export class FabricObject extends CommonMethods {
 
   /**
    * List of properties to consider when checking if state
-   * of an object is changed (fabric.Object#hasStateChanged)
+   * of an object is changed (FabricObject#hasStateChanged)
    * as well as for history (undo/redo) purposes
    * @type Array
    */
@@ -615,7 +620,7 @@ export class FabricObject extends CommonMethods {
    * the clipPath object gets used when the object has rendered, and the context is placed in the center
    * of the object cacheCanvas.
    * If you want 0,0 of a clipPath to align with an object center, use clipPath.originX/Y to 'center'
-   * @type fabric.Object
+   * @type FabricObject
    */
   clipPath = undefined
 
@@ -656,7 +661,7 @@ export class FabricObject extends CommonMethods {
    */
   _createCacheCanvas() {
     this._cacheProperties = {};
-    this._cacheCanvas = fabric.util.createCanvasElement();
+    this._cacheCanvas = createCanvasElement();
     this._cacheContext = this._cacheCanvas.getContext('2d');
     this._updateCacheCanvas();
     // if canvas gets created, is empty, so dirty.
@@ -664,8 +669,8 @@ export class FabricObject extends CommonMethods {
   }
 
   /**
-   * Limit the cache dimensions so that X * Y do not cross fabric.perfLimitSizeTotal
-   * and each side do not cross fabric.cacheSideLimit
+   * Limit the cache dimensions so that X * Y do not cross `perfLimitSizeTotal`
+   * and each side do not cross `cacheSideLimit`
    * those numbers are configurable so that you can get as much detail as you want
    * making bargain with performances.
    * @param {object} dims
@@ -679,9 +684,9 @@ export class FabricObject extends CommonMethods {
    * @return {number}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
   _limitCacheSize(dims) {
-    var perfLimitSizeTotal = fabric.perfLimitSizeTotal,
+    var perfLimitSizeTotal = perfLimitSizeTotal,
       width = dims.width, height = dims.height,
-      max = fabric.maxCacheSideLimit, min = fabric.minCacheSideLimit;
+      max = maxCacheSideLimit, min = minCacheSideLimit;
     if (width <= max && height <= max && width * height <= perfLimitSizeTotal) {
       if (width < min) {
         dims.width = min;
@@ -691,10 +696,9 @@ export class FabricObject extends CommonMethods {
       }
       return dims;
     }
-    var ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal),
-      capValue = fabric.util.capValue,
-      x = capValue(min, limitedDims.x, max),
-      y = capValue(min, limitedDims.y, max);
+    var ar = width / height, limitedDims = limitDimsByArea(ar, perfLimitSizeTotal),
+      x = clamp(min, limitedDims.x, max),
+      y = clamp(min, limitedDims.y, max);
     if (width > x) {
       dims.zoomX /= width / x;
       dims.width = x;
@@ -755,7 +759,7 @@ export class FabricObject extends CommonMethods {
     }
     var canvas = this._cacheCanvas,
       dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-      minCacheSize = fabric.minCacheSideLimit,
+      minCacheSize = minCacheSideLimit,
       width = dims.width, height = dims.height, drawingWidth, drawingHeight,
       zoomX = dims.zoomX, zoomY = dims.zoomY,
       dimensionsChanged = width !== this.cacheWidth || height !== this.cacheHeight,
@@ -774,7 +778,7 @@ export class FabricObject extends CommonMethods {
         additionalHeight = height * 0.1;
       }
     }
-    if (this instanceof fabric.Text && this.path) {
+    if (this instanceof Text && this.path) {
       shouldRedraw = true;
       shouldResizeCanvas = true;
       additionalWidth += this.getHeightOfLine(0) * this.zoomX;
@@ -829,11 +833,11 @@ export class FabricObject extends CommonMethods {
    * @return {object} Object representation of an instance
    */
   toObject(propertiesToInclude) {
-    var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+    var NUM_FRACTION_DIGITS = FabricObject.NUM_FRACTION_DIGITS,
 
       object = {
         type: this.type,
-        version: fabric.version,
+        version: version,
         originX: this.originX,
         originY: this.originY,
         left: toFixed(this.left, NUM_FRACTION_DIGITS),
@@ -871,9 +875,9 @@ export class FabricObject extends CommonMethods {
       object.clipPath.absolutePositioned = this.clipPath.absolutePositioned;
     }
 
-    fabric.util.populateWithProperties(this, object, propertiesToInclude);
+    populateWithProperties(this, object, propertiesToInclude);
     if (!this.includeDefaultValues) {
-      object = this._removeDefaultValues(object);
+      object = removeDefaultValues(object, Object.getPrototypeOf(this));
     }
 
     return object;
@@ -890,29 +894,6 @@ export class FabricObject extends CommonMethods {
   }
 
   /**
-   * @private
-   * @param {Object} object
-   */
-  _removeDefaultValues(object) {
-    var prototype = fabric.util.getKlass(object.type).prototype;
-    Object.keys(object).forEach(function (prop) {
-      if (prop === 'left' || prop === 'top' || prop === 'type') {
-        return;
-      }
-      if (object[prop] === prototype[prop]) {
-        delete object[prop];
-      }
-      // basically a check for [] === []
-      if (Array.isArray(object[prop]) && Array.isArray(prototype[prop])
-        && object[prop].length === 0 && prototype[prop].length === 0) {
-        delete object[prop];
-      }
-    });
-
-    return object;
-  }
-
-  /**
    * Returns a string representation of an instance
    * @return {String}
    */
@@ -922,7 +903,7 @@ export class FabricObject extends CommonMethods {
 
   /**
    * Return the object scale factor counting also the group scaling
-   * @return {fabric.Point}
+   * @return {Point}
    */
   getObjectScaling() {
     // if the object is a top level one, on the canvas, we go for simple aritmetic
@@ -930,11 +911,11 @@ export class FabricObject extends CommonMethods {
     // and will likely kill the cache when not needed
     // https://github.com/fabricjs/fabric.js/issues/7157
     if (!this.group) {
-      return new fabric.Point(Math.abs(this.scaleX), Math.abs(this.scaleY));
+      return new Point(this.scaleX, this.scaleY).abs();
     }
     // if we are inside a group total zoom calculation is complex, we defer to generic matrices
-    var options = fabric.util.qrDecompose(this.calcTransformMatrix());
-    return new fabric.Point(Math.abs(options.scaleX), Math.abs(options.scaleY));
+    var options = qrDecompose(this.calcTransformMatrix());
+    return new Point(options.scaleX, options.scaleY).abs();
   }
 
   /**
@@ -969,7 +950,7 @@ export class FabricObject extends CommonMethods {
    */
   getTotalAngle() {
     return this.group ?
-      fabric.util.qrDecompose(this.calcTransformMatrix()).angle :
+      qrDecompose(this.calcTransformMatrix()).angle :
       this.angle;
   }
 
@@ -977,7 +958,7 @@ export class FabricObject extends CommonMethods {
    * @private
    * @param {String} key
    * @param {*} value
-   * @return {fabric.Object} thisArg
+   * @return {FabricObject} thisArg
    */
   _set(key, value) {
     var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY'),
@@ -994,8 +975,8 @@ export class FabricObject extends CommonMethods {
       this.flipY = !this.flipY;
       value *= -1;
     }
-    else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
-      value = new fabric.Shadow(value);
+    else if (key === 'shadow' && value && !(value instanceof Shadow)) {
+      value = new Shadow(value);
     }
     else if (key === 'dirty' && this.group) {
       this.group.set('dirty', value);
@@ -1019,14 +1000,14 @@ export class FabricObject extends CommonMethods {
   /**
    * Retrieves viewportTransform from Object's canvas if possible
    * @method getViewportTransform
-   * @memberOf fabric.Object.prototype
+   * @memberOf FabricObject.prototype
    * @return {Array}
    */
   getViewportTransform() {
     if (this.canvas && this.canvas.viewportTransform) {
       return this.canvas.viewportTransform;
     }
-    return fabric.iMatrix.concat();
+    return iMatrix.concat();
   }
 
   /**
@@ -1172,7 +1153,7 @@ export class FabricObject extends CommonMethods {
   /**
    * Execute the drawing operation for an object clipPath
    * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {fabric.Object} clipPath
+   * @param {FabricObject} clipPath
    */
   drawClipPathOnCache(ctx, clipPath) {
     ctx.save();
@@ -1186,7 +1167,7 @@ export class FabricObject extends CommonMethods {
     }
     //ctx.scale(1 / 2, 1 / 2);
     if (clipPath.absolutePositioned) {
-      var m = fabric.util.invertTransform(this.calcTransformMatrix());
+      var m = invertTransform(this.calcTransformMatrix());
       ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
     }
     clipPath.transform(ctx);
@@ -1218,7 +1199,7 @@ export class FabricObject extends CommonMethods {
   /**
    * Prepare clipPath state and cache and draw it on instance's cache
    * @param {CanvasRenderingContext2D} ctx
-   * @param {fabric.Object} clipPath
+   * @param {FabricObject} clipPath
    */
   _drawClipPath(ctx, clipPath) {
     if (!clipPath) { return; }
@@ -1384,8 +1365,8 @@ export class FabricObject extends CommonMethods {
     styleOverride = styleOverride || {};
     drawBorders = typeof styleOverride.hasBorders !== 'undefined' ? styleOverride.hasBorders : this.hasBorders;
     drawControls = typeof styleOverride.hasControls !== 'undefined' ? styleOverride.hasControls : this.hasControls;
-    matrix = fabric.util.multiplyTransformMatrices(vpt, matrix);
-    options = fabric.util.qrDecompose(matrix);
+    matrix = multiplyTransformMatrices(vpt, matrix);
+    options = qrDecompose(matrix);
     ctx.save();
     ctx.translate(options.translateX, options.translateY);
     ctx.lineWidth = 1 * this.borderScaleFactor;
@@ -1413,13 +1394,13 @@ export class FabricObject extends CommonMethods {
     var shadow = this.shadow, canvas = this.canvas,
       multX = (canvas && canvas.viewportTransform[0]) || 1,
       multY = (canvas && canvas.viewportTransform[3]) || 1,
-      scaling = shadow.nonScaling ? new fabric.Point(1, 1) : this.getObjectScaling();
+      scaling = shadow.nonScaling ? new Point(1, 1) : this.getObjectScaling();
     if (canvas && canvas._isRetinaScaling()) {
-      multX *= fabric.devicePixelRatio;
-      multY *= fabric.devicePixelRatio;
+      multX *= devicePixelRatio;
+      multY *= devicePixelRatio;
     }
     ctx.shadowColor = shadow.color;
-    ctx.shadowBlur = shadow.blur * fabric.browserShadowBlurConstant *
+    ctx.shadowBlur = shadow.blur * browserShadowBlurConstant *
       (multX + multY) * (scaling.x + scaling.y) / 4;
     ctx.shadowOffsetX = shadow.offsetX * multX * scaling.x;
     ctx.shadowOffsetY = shadow.offsetY * multY * scaling.y;
@@ -1441,7 +1422,7 @@ export class FabricObject extends CommonMethods {
   /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {Object} filler fabric.Pattern or fabric.Gradient
+   * @param {Pattern|Gradient} filler
    * @return {number} .offsetX offset for text rendering
    * @return {number} .offsetY offset for text rendering
    */
@@ -1544,11 +1525,11 @@ export class FabricObject extends CommonMethods {
    * is limited.
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {fabric.Gradient} filler a fabric gradient instance
+   * @param {Gradient} filler a fabric gradient instance
    */
   _applyPatternForTransformedGradient(ctx, filler) {
     var dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-      pCanvas = fabric.util.createCanvasElement(), pCtx, retinaScaling = this.canvas.getRetinaScaling(),
+      pCanvas = createCanvasElement(), pCtx, retinaScaling = this.canvas.getRetinaScaling(),
       width = dims.x / this.scaleX / retinaScaling, height = dims.y / this.scaleY / retinaScaling;
     pCanvas.width = width;
     pCanvas.height = height;
@@ -1575,10 +1556,10 @@ export class FabricObject extends CommonMethods {
    * This function is an helper for svg import. it returns the center of the object in the svg
    * untransformed coordinates
    * @private
-   * @return {fabric.Point} center point from element coordinates
+   * @return {Point} center point from element coordinates
    */
   _findCenterFromElement() {
-    return new fabric.Point(this.left + this.width / 2, this.top + this.height / 2);
+    return new Point(this.left + this.width / 2, this.top + this.height / 2);
   }
 
   /**
@@ -1590,7 +1571,7 @@ export class FabricObject extends CommonMethods {
    */
   _assignTransformMatrixProps() {
     if (this.transformMatrix) {
-      var options = fabric.util.qrDecompose(this.transformMatrix);
+      var options = qrDecompose(this.transformMatrix);
       this.flipX = false;
       this.flipY = false;
       this.set('scaleX', options.scaleX);
@@ -1612,7 +1593,7 @@ export class FabricObject extends CommonMethods {
     var center = this._findCenterFromElement();
     if (this.transformMatrix) {
       this._assignTransformMatrixProps();
-      center = fabric.util.transformPoint(center, this.transformMatrix);
+      center = transformPoint(center, this.transformMatrix);
     }
     this.transformMatrix = null;
     if (preserveAspectRatioOptions) {
@@ -1631,7 +1612,7 @@ export class FabricObject extends CommonMethods {
   /**
    * Clones an instance.
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @returns {Promise<fabric.Object>}
+   * @returns {Promise<FabricObject>}
    */
   clone(propertiesToInclude) {
     var objectForm = this.toObject(propertiesToInclude);
@@ -1654,11 +1635,11 @@ export class FabricObject extends CommonMethods {
    * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
-   * @return {fabric.Image} Object cloned as image.
+   * @return {Image} Object cloned as image.
    */
   cloneAsImage(options) {
     var canvasEl = this.toCanvasElement(options);
-    return new fabric.Image(canvasEl);
+    return new Image(canvasEl);
   }
 
   /**
@@ -1672,25 +1653,25 @@ export class FabricObject extends CommonMethods {
    * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
-   * @return {HTMLCanvasElement} Returns DOM element <canvas> with the fabric.Object
+   * @return {HTMLCanvasElement} Returns DOM element <canvas> with the FabricObject
    */
   toCanvasElement(options) {
     options || (options = {});
 
-    var utils = fabric.util, origParams = utils.saveObjectTransform(this),
+    var origParams = saveObjectTransform(this),
       originalGroup = this.group,
       originalShadow = this.shadow, abs = Math.abs,
-      retinaScaling = options.enableRetinaScaling ? Math.max(fabric.devicePixelRatio, 1) : 1,
+      retinaScaling = options.enableRetinaScaling ? Math.max(devicePixelRatio, 1) : 1,
       multiplier = (options.multiplier || 1) * retinaScaling;
     delete this.group;
     if (options.withoutTransform) {
-      utils.resetObjectTransform(this);
+      resetObjectTransform(this);
     }
     if (options.withoutShadow) {
       this.shadow = null;
     }
 
-    var el = fabric.util.createCanvasElement(),
+    var el = createCanvasElement(),
       // skip canvas zoom and calculate with setCoords now.
       boundingRect = this.getBoundingRect(true, true),
       shadow = this.shadow, shadowOffset = { x: 0, y: 0 },
@@ -1698,7 +1679,7 @@ export class FabricObject extends CommonMethods {
 
     if (shadow) {
       var shadowBlur = shadow.blur;
-      var scaling = shadow.nonScaling ? new fabric.Point(1, 1) : this.getObjectScaling();
+      var scaling = shadow.nonScaling ? new Point(1, 1) : this.getObjectScaling();
       // consider non scaling shadow.
       shadowOffset.x = 2 * Math.round(abs(shadow.offsetX) + shadowBlur) * (abs(scaling.x));
       shadowOffset.y = 2 * Math.round(abs(shadow.offsetY) + shadowBlur) * (abs(scaling.y));
@@ -1709,7 +1690,7 @@ export class FabricObject extends CommonMethods {
     // we need to make it so.
     el.width = Math.ceil(width);
     el.height = Math.ceil(height);
-    var canvas = new fabric.StaticCanvas(el, {
+    var canvas = new StaticCanvas(el, {
       enableRetinaScaling: false,
       renderOnAddRemove: false,
       skipOffscreen: false,
@@ -1717,7 +1698,7 @@ export class FabricObject extends CommonMethods {
     if (options.format === 'jpeg') {
       canvas.backgroundColor = '#fff';
     }
-    this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
+    this.setPositionByOrigin(new Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
     var originalCanvas = this.canvas;
     canvas._objects = [this];
     this.set('canvas', canvas);
@@ -1757,7 +1738,7 @@ export class FabricObject extends CommonMethods {
    */
   toDataURL(options) {
     options || (options = {});
-    return fabric.util.toDataURL(this.toCanvasElement(options), options.format || 'png', options.quality || 1);
+    return toDataURL(this.toCanvasElement(options), options.format || 'png', options.quality || 1);
   }
 
   /**
@@ -1790,7 +1771,7 @@ export class FabricObject extends CommonMethods {
   /**
    * Sets "angle" of an instance with centered rotation
    * @param {Number} angle Angle value (in degrees)
-   * @return {fabric.Object} thisArg
+   * @return {FabricObject} thisArg
    * @chainable
    */
   rotate(angle) {
@@ -1812,7 +1793,7 @@ export class FabricObject extends CommonMethods {
   /**
    * Centers object horizontally on canvas to which it was added last.
    * You might need to call `setCoords` on an object after centering, to update controls area.
-   * @return {fabric.Object} thisArg
+   * @return {FabricObject} thisArg
    * @chainable
    */
   centerH() {
@@ -1823,7 +1804,7 @@ export class FabricObject extends CommonMethods {
   /**
    * Centers object horizontally on current viewport of canvas to which it was added last.
    * You might need to call `setCoords` on an object after centering, to update controls area.
-   * @return {fabric.Object} thisArg
+   * @return {FabricObject} thisArg
    * @chainable
    */
   viewportCenterH() {
@@ -1834,7 +1815,7 @@ export class FabricObject extends CommonMethods {
   /**
    * Centers object vertically on canvas to which it was added last.
    * You might need to call `setCoords` on an object after centering, to update controls area.
-   * @return {fabric.Object} thisArg
+   * @return {FabricObject} thisArg
    * @chainable
    */
   centerV() {
@@ -1845,7 +1826,7 @@ export class FabricObject extends CommonMethods {
   /**
    * Centers object vertically on current viewport of canvas to which it was added last.
    * You might need to call `setCoords` on an object after centering, to update controls area.
-   * @return {fabric.Object} thisArg
+   * @return {FabricObject} thisArg
    * @chainable
    */
   viewportCenterV() {
@@ -1856,7 +1837,7 @@ export class FabricObject extends CommonMethods {
   /**
    * Centers object vertically and horizontally on canvas to which is was added last
    * You might need to call `setCoords` on an object after centering, to update controls area.
-   * @return {fabric.Object} thisArg
+   * @return {FabricObject} thisArg
    * @chainable
    */
   center() {
@@ -1867,7 +1848,7 @@ export class FabricObject extends CommonMethods {
   /**
    * Centers object on current viewport of canvas to which it was added last.
    * You might need to call `setCoords` on an object after centering, to update controls area.
-   * @return {fabric.Object} thisArg
+   * @return {FabricObject} thisArg
    * @chainable
    */
   viewportCenter() {
@@ -1901,9 +1882,7 @@ export class FabricObject extends CommonMethods {
    * override if necessary to dispose artifacts such as `clipPath`
    */
   dispose() {
-    if (fabric.runningAnimations) {
-      fabric.runningAnimations.cancelByTarget(this);
-    }
+    RUNNING_ANIMATIONS.cancelByTarget(this);
   }
 
 
@@ -1911,11 +1890,11 @@ export class FabricObject extends CommonMethods {
  * Defines the number of fraction digits to use when serializing object values.
  * You can use it to increase/decrease precision of such values like left, top, scaleX, scaleY, etc.
  * @static
- * @memberOf fabric.Object
+ * @memberOf FabricObject
  * @constant
  * @type Number
  */
-  static NUM_FRACTION_DIGITS = 2;
+  static NUM_FRACTION_DIGITS = NUM_FRACTION_DIGITS;
 
   /**
    *
@@ -1924,11 +1903,11 @@ export class FabricObject extends CommonMethods {
    * @param {object} [options]
    * @param {string} [options.extraParam] property to pass as first argument to the constructor
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   * @returns {Promise<fabric.Object>}
+   * @returns {Promise<FabricObject>}
    */
-  static _fromObject = function (klass, object, options) {
+  static _fromObject(klass, object, options) {
     var serializedObject = clone(object, true);
-    return fabric.util.enlivenObjectEnlivables(serializedObject, options).then(function (enlivedMap) {
+    return enlivenObjectEnlivables(serializedObject, options).then(function (enlivedMap) {
       var newObject = Object.assign(object, enlivedMap);
       return options && options.extraParam ? new klass(object[options.extraParam], newObject) : new klass(newObject);
     });
@@ -1937,20 +1916,20 @@ export class FabricObject extends CommonMethods {
   /**
    *
    * @static
-   * @memberOf fabric.Object
+   * @memberOf FabricObject
    * @param {object} object
    * @param {object} [options]
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   * @returns {Promise<fabric.Object>}
+   * @returns {Promise<FabricObject>}
    */
-  static fromObject = function (object, options) {
-    return fabric.Object._fromObject(fabric.Object, object, options);
+  static fromObject(object, options) {
+    return FabricObject._fromObject(FabricObject, object, options);
   };
 
   /**
    * Unique id used internally when creating SVG elements
    * @static
-   * @memberOf fabric.Object
+   * @memberOf FabricObject
    * @type Number
    */
   static __uid = 0;

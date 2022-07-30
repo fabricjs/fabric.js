@@ -1,3 +1,6 @@
+import { AnimationRegistry } from "./AnimationRegistry";
+
+export const RUNNING_ANIMATIONS = new AnimationRegistry(0);
 (function (global) {
   /**
    *
@@ -28,86 +31,7 @@
    * @memberof fabric
    * @type {AnimationContext[]}
    */
-  var fabric = global.fabric, RUNNING_ANIMATIONS = [];
-  fabric.util.object.extend(RUNNING_ANIMATIONS, {
-
-    /**
-     * cancel all running animations at the next requestAnimFrame
-     * @returns {AnimationContext[]}
-     */
-    cancelAll: function () {
-      var animations = this.splice(0);
-      animations.forEach(function (animation) {
-        animation.cancel();
-      });
-      return animations;
-    },
-
-    /**
-     * cancel all running animations attached to canvas at the next requestAnimFrame
-     * @param {fabric.Canvas} canvas
-     * @returns {AnimationContext[]}
-     */
-    cancelByCanvas: function (canvas) {
-      if (!canvas) {
-        return [];
-      }
-      var cancelled = this.filter(function (animation) {
-        return typeof animation.target === 'object' && animation.target.canvas === canvas;
-      });
-      cancelled.forEach(function (animation) {
-        animation.cancel();
-      });
-      return cancelled;
-    },
-
-    /**
-     * cancel all running animations for target at the next requestAnimFrame
-     * @param {*} target
-     * @returns {AnimationContext[]}
-     */
-    cancelByTarget: function (target) {
-      var cancelled = this.findAnimationsByTarget(target);
-      cancelled.forEach(function (animation) {
-        animation.cancel();
-      });
-      return cancelled;
-    },
-
-    /**
-     *
-     * @param {CancelFunction} cancelFunc the function returned by animate
-     * @returns {number}
-     */
-    findAnimationIndex: function (cancelFunc) {
-      return this.indexOf(this.findAnimation(cancelFunc));
-    },
-
-    /**
-     *
-     * @param {CancelFunction} cancelFunc the function returned by animate
-     * @returns {AnimationContext | undefined} animation's options object
-     */
-    findAnimation: function (cancelFunc) {
-      return this.find(function (animation) {
-        return animation.cancel === cancelFunc;
-      });
-    },
-
-    /**
-     *
-     * @param {*} target the object that is assigned to the target property of the animation context
-     * @returns {AnimationContext[]} array of animation options object associated with target
-     */
-    findAnimationsByTarget: function (target) {
-      if (!target) {
-        return [];
-      }
-      return this.filter(function (animation) {
-        return animation.target === target;
-      });
-    }
-  });
+  var fabric = global.fabric;
 
   function noop() {
     return false;
@@ -147,11 +71,11 @@
   function animate(options) {
     options || (options = {});
     var cancel = false,
-        context,
-        removeFromRegistry = function () {
-          var index = fabric.runningAnimations.indexOf(context);
-          return index > -1 && fabric.runningAnimations.splice(index, 1)[0];
-        };
+      context,
+      removeFromRegistry = function () {
+        var index = fabric.runningAnimations.indexOf(context);
+        return index > -1 && fabric.runningAnimations.splice(index, 1)[0];
+      };
 
     context = Object.assign({}, options, {
       cancel: function () {
@@ -166,30 +90,30 @@
 
     var runner = function (timestamp) {
       var start = timestamp || +new Date(),
-          duration = options.duration || 500,
-          finish = start + duration, time,
-          onChange = options.onChange || noop,
-          abort = options.abort || noop,
-          onComplete = options.onComplete || noop,
-          easing = options.easing || defaultEasing,
-          isMany = 'startValue' in options ? options.startValue.length > 0 : false,
-          startValue = 'startValue' in options ? options.startValue : 0,
-          endValue = 'endValue' in options ? options.endValue : 100,
-          byValue = options.byValue || (isMany ? startValue.map(function(value, i) {
-            return endValue[i] - startValue[i];
-          }) : endValue - startValue);
+        duration = options.duration || 500,
+        finish = start + duration, time,
+        onChange = options.onChange || noop,
+        abort = options.abort || noop,
+        onComplete = options.onComplete || noop,
+        easing = options.easing || defaultEasing,
+        isMany = 'startValue' in options ? options.startValue.length > 0 : false,
+        startValue = 'startValue' in options ? options.startValue : 0,
+        endValue = 'endValue' in options ? options.endValue : 100,
+        byValue = options.byValue || (isMany ? startValue.map(function (value, i) {
+          return endValue[i] - startValue[i];
+        }) : endValue - startValue);
 
       options.onStart && options.onStart();
 
       (function tick(ticktime) {
         time = ticktime || +new Date();
         var currentTime = time > finish ? duration : (time - start),
-            timePerc = currentTime / duration,
-            current = isMany ? startValue.map(function(_value, i) {
-              return easing(currentTime, startValue[i], byValue[i], duration);
-            }) : easing(currentTime, startValue, byValue, duration),
-            valuePerc = isMany ? Math.abs((current[0] - startValue[0]) / byValue[0])
-              : Math.abs((current - startValue) / byValue);
+          timePerc = currentTime / duration,
+          current = isMany ? startValue.map(function (_value, i) {
+            return easing(currentTime, startValue[i], byValue[i], duration);
+          }) : easing(currentTime, startValue, byValue, duration),
+          valuePerc = isMany ? Math.abs((current[0] - startValue[0]) / byValue[0])
+            : Math.abs((current - startValue) / byValue);
         //  update context
         context.currentValue = isMany ? current.slice() : current;
         context.completionRate = valuePerc;
@@ -231,14 +155,14 @@
     return context.cancel;
   }
 
-  var _requestAnimFrame = fabric.window.requestAnimationFrame       ||
-                          fabric.window.webkitRequestAnimationFrame ||
-                          fabric.window.mozRequestAnimationFrame    ||
-                          fabric.window.oRequestAnimationFrame      ||
-                          fabric.window.msRequestAnimationFrame     ||
-                          function(callback) {
-                            return fabric.window.setTimeout(callback, 1000 / 60);
-                          };
+  var _requestAnimFrame = fabric.window.requestAnimationFrame ||
+    fabric.window.webkitRequestAnimationFrame ||
+    fabric.window.mozRequestAnimationFrame ||
+    fabric.window.oRequestAnimationFrame ||
+    fabric.window.msRequestAnimationFrame ||
+    function (callback) {
+      return fabric.window.setTimeout(callback, 1000 / 60);
+    };
 
   var _cancelAnimFrame = fabric.window.cancelAnimationFrame || fabric.window.clearTimeout;
 
