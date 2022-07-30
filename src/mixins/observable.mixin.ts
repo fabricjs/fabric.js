@@ -1,6 +1,8 @@
 
 var fabric = global.fabric;
 
+type EventRegistryObject = { [eventName: string]: Function };
+
 
 /**
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#events}
@@ -8,7 +10,7 @@ var fabric = global.fabric;
  */
 export class Observable {
 
-  __eventListeners
+  private __eventListeners: { [eventName: string]: Function[] } = {};
 
   /**
    * Observes specified event
@@ -18,63 +20,66 @@ export class Observable {
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
    * @return {Function} disposer
    */
-  on(eventName, handler) {
+  on(eventName: string, handler: Function): Function
+  on(handlers: EventRegistryObject): Function
+  on(arg0: string | EventRegistryObject, handler?: Function): Function {
     if (!this.__eventListeners) {
       this.__eventListeners = {};
     }
     // one object with key/value pairs was passed
-    if (arguments.length === 1) {
-      for (var prop in eventName) {
-        this.on(prop, eventName[prop]);
+    if (typeof arg0 === 'object') {
+      for (var prop in arg0) {
+        this.on(prop, arg0[prop]);
       }
     }
     else {
-      if (!this.__eventListeners[eventName]) {
-        this.__eventListeners[eventName] = [];
+      if (!this.__eventListeners[arg0]) {
+        this.__eventListeners[arg0] = [];
       }
-      this.__eventListeners[eventName].push(handler);
+      this.__eventListeners[arg0].push(handler);
     }
-    return off.bind(this, eventName, handler);
-  }
-
-  _once(eventName, handler) {
-    var _handler = function () {
-      handler.apply(this, arguments);
-      this.off(eventName, _handler);
-    }.bind(this);
-    this.on(eventName, _handler);
-    return _handler;
+    return () => this.off(arg0, handler);
   }
 
   /**
    * Observes specified event **once**
    * @memberOf fabric.Observable
    * @alias once
-   * @param {String|Object} eventName Event name (eg. 'after:render') or object with key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
+   * @param {String|Object} arg0 Event name (eg. 'after:render') or object with key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
    * @return {Function} disposer
    */
-  once(eventName, handler) {
+  once(eventName: string, handler: Function): Function
+  once(handlers: EventRegistryObject): Function
+  once(arg0: string | EventRegistryObject, handler?: Function): Function {
     // one object with key/value pairs was passed
-    if (arguments.length === 1) {
-      var handlers = {};
-      for (var prop in eventName) {
-        handlers[prop] = _once.call(this, prop, eventName[prop]);
+    if (typeof arg0 === 'object') {
+      const disposers: Function[] = [];
+      for (let prop in arg0) {
+        const _handler = arg0[prop];
+        const disposer = this.on(prop, (...args: any[]) => {
+          _handler.apply(this, args);
+          this.off(prop, disposer);
+        });
+        disposers.push(disposer);
       }
-      return off.bind(this, handlers);
+      return () => disposers.forEach(d => d());
     }
     else {
-      var _handler = _once.call(this, eventName, handler);
-      return off.bind(this, eventName, _handler);
+      const disposer = this.on(arg0, (...args: any[]) => {
+        handler!.apply(this, args);
+        this.off(arg0, disposer);
+      });
+      return disposer;
     }
   }
 
   /**
    * @private
    * @param {string} eventName 
-   * @param {Function} handler 
+   * @param {Function} [handler] 
    */
-  _removeEventListener(eventName, handler) {
+  private _removeEventListener(eventName: string, handler?: Function) {
     if (!this.__eventListeners[eventName]) {
       return;
     }
@@ -95,25 +100,27 @@ export class Observable {
    * @param {String|Object} eventName Event name (eg. 'after:render') or object with key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function to be deleted from EventListeners
    */
-  off(eventName, handler) {
+  off(eventName: string, handler: Function): void
+  off(handlers: EventRegistryObject): void
+  off(arg0?: string | EventRegistryObject, handler?: Function) {
     if (!this.__eventListeners) {
       return;
     }
 
     // remove all key/value pairs (event name -> event handler)
-    if (arguments.length === 0) {
-      for (eventName in this.__eventListeners) {
-        _removeEventListener.call(this, eventName);
+    if (typeof arg0 === 'undefined') {
+      for (arg0 in this.__eventListeners) {
+        this._removeEventListener(arg0);
       }
     }
     // one object with key/value pairs was passed
-    else if (typeof eventName === 'object' && typeof handler === 'undefined') {
-      for (var prop in eventName) {
-        _removeEventListener.call(this, prop, eventName[prop]);
+    else if (typeof arg0 === 'object') {
+      for (var prop in arg0) {
+        this._removeEventListener(prop, arg0[prop]);
       }
     }
     else {
-      _removeEventListener.call(this, eventName, handler);
+      this._removeEventListener(arg0, handler);
     }
   }
 
@@ -123,7 +130,7 @@ export class Observable {
    * @param {String} eventName Event name to fire
    * @param {Object} [options] Options object
    */
-  fire(eventName, options) {
+  fire(eventName: string, options: object) {
     if (!this.__eventListeners) {
       return;
     }
@@ -136,6 +143,7 @@ export class Observable {
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
       listenersForEvent[i] && listenersForEvent[i].call(this, options || {});
     }
+    //  TODO why is cleanup done here?
     this.__eventListeners[eventName] = listenersForEvent.filter((value) => value !== false);
   }
 }
