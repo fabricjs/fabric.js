@@ -1671,14 +1671,12 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
   }
 }
 
-const StaticCanvas = CanvasDataURLExporterMixinGenerator(StaticCanvasBase);
+let StaticCanvas = CanvasDataURLExporterMixinGenerator(StaticCanvasBase);
 
 if (fabric.isLikelyNode) {
-  const NodeCanvas = NodeCanvasStreamsMixinGenerator(StaticCanvas);
-  export { NodeCanvas as StaticCanvas };
+  StaticCanvas = NodeCanvasStreamsMixinGenerator(StaticCanvas);
 }
-else {
-  export { StaticCanvas };
-}
+
+export { StaticCanvas };
 
 
