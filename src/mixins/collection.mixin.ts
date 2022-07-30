@@ -6,7 +6,7 @@ export function CollectionMixinGenerator<T extends new (...args: any[]) => any>(
     /**
      * @type {Object[]}
      */
-    _objects: Object[] = [];
+    _objects: Object[] = []
 
     /**
      * Adds objects to collection, Canvas or Group, then renders canvas
