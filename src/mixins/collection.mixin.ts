@@ -1,23 +1,23 @@
-import type { Object } from "../shapes/object.class";
+import type { FabricObject } from "../shapes/object.class";
 
 export function CollectionMixinGenerator<T extends new (...args: any[]) => any>(Klass: T) {
   return class Collection extends Klass {
 
     /**
-     * @type {Object[]}
+     * @type {FabricObject[]}
      */
-    _objects: Object[] = []
+    _objects: FabricObject[] = []
 
     /**
      * Adds objects to collection, Canvas or Group, then renders canvas
      * (if `renderOnAddRemove` is not `false`).
      * Objects should be instances of (or inherit from) Object
      * @private
-     * @param {Object[]} objects to add
-     * @param {(object:Object) => any} [callback]
+     * @param {FabricObject[]} objects to add
+     * @param {(object:FabricObject) => any} [callback]
      * @returns {number} new array length
      */
-    add(objects: Object[], callback: (object: object) => any): number {
+    add(objects: FabricObject[], callback: (object: object) => any): number {
       var size = this._objects.push(...objects);
       if (callback) {
         for (var i = 0; i < objects.length; i++) {
@@ -31,12 +31,12 @@ export function CollectionMixinGenerator<T extends new (...args: any[]) => any>(
      * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
      * An object should be an instance of (or inherit from) Object
      * 
-     * @param {Object | Object[]} arg Object(s) to insert
+     * @param {FabricObject | FabricObject[]} arg Object(s) to insert
      * @param {Number} index Index to insert object at
-     * @param {(object: Object) => any} [callback]
+     * @param {(object: FabricObject) => any} [callback]
      * @returns {number} new array length
      */
-    insertAt(arg: Object | Object[], index: number, callback: (object: Object) => any): number {
+    insertAt(arg: FabricObject | FabricObject[], index: number, callback: (object: FabricObject) => any): number {
       const objects = Array.isArray(arg) ? arg : [arg];
       this._objects.splice(index, 0, ...objects);
       if (callback) {
@@ -48,11 +48,11 @@ export function CollectionMixinGenerator<T extends new (...args: any[]) => any>(
     /**
      * Removes objects from a collection, then renders canvas (if `renderOnAddRemove` is not `false`)
      * @private
-     * @param {Object[]} objectsToRemove objects to remove
-     * @param {(object:Object) => any} [callback] function to call for each object removed
-     * @returns {Object[]} removed objects
+     * @param {FabricObject[]} objectsToRemove objects to remove
+     * @param {(object:FabricObject) => any} [callback] function to call for each object removed
+     * @returns {FabricObject[]} removed objects
      */
-    remove(objectsToRemove: Object[], callback: (object: Object) => any): Object[] {
+    remove(objectsToRemove: FabricObject[], callback: (object: FabricObject) => any): FabricObject[] {
       var objects = this._objects, removed = [];
       for (var i = 0, object, index; i < objectsToRemove.length; i++) {
         object = objectsToRemove[i];
@@ -75,10 +75,10 @@ export function CollectionMixinGenerator<T extends new (...args: any[]) => any>(
      *                   Callback is invoked in a context of Global Object (e.g. `window`)
      *                   when no `context` argument is given
      *
-     * @param {Object} context Context (aka thisObject)
+     * @param {FabricObject} context Context (aka thisObject)
      * @chainable
      */
-    forEachObject(callback: (object: Object, index: number, array: Object[]) => any, context?: object) {
+    forEachObject(callback: (object: FabricObject, index: number, array: FabricObject[]) => any, context?: object) {
       var objects = this.getObjects();
       for (var i = 0; i < objects.length; i++) {
         callback.call(context, objects[i], i, objects);
@@ -125,11 +125,11 @@ export function CollectionMixinGenerator<T extends new (...args: any[]) => any>(
      * Returns true if collection contains an object.\
      * **Prefer using {@link `Object#isDescendantOf`} for performance reasons**
      * instead of a.contains(b) use b.isDescendantOf(a)
-     * @param {Object} object Object to check against
+     * @param {FabricObject} object Object to check against
      * @param {Boolean} [deep=false] `true` to check all descendants, `false` to check only `_objects`
      * @return {Boolean} `true` if collection contains an object
      */
-    contains(object: Object, deep: boolean = false): boolean {
+    contains(object: FabricObject, deep: boolean = false): boolean {
       if (this._objects.indexOf(object) > -1) {
         return true;
       }

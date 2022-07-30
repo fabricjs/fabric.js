@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { CollectionMixinGenerator } from "../mixins/collection.mixin";
-import { Object } from "./object.class";
+import { FabricObject } from "./object.class";
 import {
   multiplyTransformMatrices,
   invertTransform,
@@ -15,11 +15,11 @@ import {
 /**
  * Group class
  * @class Group
- * @extends Object
+ * @extends FabricObject
  * @mixes Collection
  * @fires layout once layout completes
  */
-export class Group extends CollectionMixinGenerator(Object) {
+export class Group extends CollectionMixinGenerator(FabricObject) {
 
   /**
    * Type of an object
@@ -49,7 +49,7 @@ export class Group extends CollectionMixinGenerator(Object) {
    * as well as for history (undo/redo) purposes
    * @type string[]
    */
-  stateProperties: string[] = Object.prototype.stateProperties.concat('layout')
+  stateProperties: string[] = FabricObject.prototype.stateProperties.concat('layout')
 
   /**
    * Used to optimize performance
@@ -74,18 +74,18 @@ export class Group extends CollectionMixinGenerator(Object) {
    * This way instance is cached only once for the entire interaction with the selected object.
    * @private
    */
-  private _activeObjects: Object[] = [];
+  private _activeObjects: FabricObject[] = [];
 
   private _firstLayoutDone: boolean = false;
 
   /**
    * Constructor
    *
-   * @param {Object[]} [objects] instance objects
-   * @param {Object} [options] Options object
+   * @param {FabricObject[]} [objects] instance objects
+   * @param {object} [options] Options object
    * @param {boolean} [objectsRelativeToGroup] true if objects exist in group coordinate plane
    */
-  constructor(objects: Object[], options: object, objectsRelativeToGroup: boolean) {
+  constructor(objects: FabricObject[], options: object, objectsRelativeToGroup: boolean) {
     //  setting angle, skewX, skewY must occur after initial layout
     super({ ...options, _objects: objects || [], angle: 0, skewX: 0, skewY: 0 });
     this.__objectMonitor = this.__objectMonitor.bind(this);
@@ -135,7 +135,7 @@ export class Group extends CollectionMixinGenerator(Object) {
    * If Overriding, be sure not pass illegal objects to group - it will break your app.
    * @private
    */
-  protected _filterObjectsBeforeEnteringGroup(objects: Object[]) {
+  protected _filterObjectsBeforeEnteringGroup(objects: FabricObject[]) {
     return objects.filter((object, index, array) => {
       // can enter AND is the first occurrence of the object in the passed args (to prevent adding duplicates)
       return this.canEnterGroup(object) && array.indexOf(object) === index;
@@ -144,9 +144,9 @@ export class Group extends CollectionMixinGenerator(Object) {
 
   /**
    * Add objects
-   * @param {...Object} objects
+   * @param {...FabricObject} objects
    */
-  add(...objects: Object[]) {
+  add(...objects: FabricObject[]) {
     var allowedObjects = this._filterObjectsBeforeEnteringGroup(objects);
     super.add(allowedObjects, this._onObjectAdded);
     this._onAfterObjectsChange('added', allowedObjects);
@@ -154,10 +154,10 @@ export class Group extends CollectionMixinGenerator(Object) {
 
   /**
    * Inserts an object into collection at specified index
-   * @param {Object | Object[]} objects Object to insert
+   * @param {FabricObject | FabricObject[]} objects Object to insert
    * @param {Number} index Index to insert object at
    */
-  insertAt(objects: Object | Object[], index: number) {
+  insertAt(objects: FabricObject | FabricObject[], index: number) {
     var allowedObjects = this._filterObjectsBeforeEnteringGroup(Array.isArray(objects) ? objects : [objects]);
     super.insertAt(allowedObjects, index, this._onObjectAdded);
     this._onAfterObjectsChange('added', allowedObjects);
@@ -165,10 +165,10 @@ export class Group extends CollectionMixinGenerator(Object) {
 
   /**
    * Remove objects
-   * @param {...Object} objects
-   * @returns {Object[]} removed objects
+   * @param {...FabricObject} objects
+   * @returns {FabricObject[]} removed objects
    */
-  remove(...objects: Object[]): Object[] {
+  remove(...objects: FabricObject[]): FabricObject[] {
     var removed = super.remove(objects, this._onObjectRemoved);
     this._onAfterObjectsChange('removed', removed);
     return removed;
@@ -176,9 +176,9 @@ export class Group extends CollectionMixinGenerator(Object) {
 
   /**
    * Remove all objects
-   * @returns {Object[]} removed objects
+   * @returns {FabricObject[]} removed objects
    */
-  removeAll(): Object[] {
+  removeAll(): FabricObject[] {
     this._activeObjects = [];
     return this.remove(...this._objects.slice());
   }
@@ -216,9 +216,9 @@ export class Group extends CollectionMixinGenerator(Object) {
   /**
    * @private
    * @param {boolean} watch
-   * @param {Object} object
+   * @param {FabricObject} object
    */
-  protected _watchObject(watch: boolean, object: Object) {
+  protected _watchObject(watch: boolean, object: FabricObject) {
     var directive = watch ? 'on' : 'off';
     //  make sure we listen only once
     watch && this._watchObject(false, object);
@@ -231,10 +231,10 @@ export class Group extends CollectionMixinGenerator(Object) {
   /**
    * Checks if object can enter group and logs relevant warnings
    * @private
-   * @param {Object} object
+   * @param {FabricObject} object
    * @returns
    */
-  protected canEnterGroup(object: Object) {
+  protected canEnterGroup(object: FabricObject) {
     if (object === this || this.isDescendantOf(object)) {
       //  prevent circular object tree
       /* _DEV_MODE_START_ */
@@ -254,11 +254,11 @@ export class Group extends CollectionMixinGenerator(Object) {
 
   /**
    * @private
-   * @param {Object} object
+   * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
    * @returns {boolean} true if object entered group
    */
-  enterGroup(object: Object, removeParentTransform: boolean): boolean {
+  enterGroup(object: FabricObject, removeParentTransform: boolean): boolean {
     if (object.group) {
       object.group.remove(object);
     }
@@ -268,10 +268,10 @@ export class Group extends CollectionMixinGenerator(Object) {
 
   /**
    * @private
-   * @param {Object} object
+   * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
    */
-  protected _enterGroup(object: Object, removeParentTransform: boolean) {
+  protected _enterGroup(object: FabricObject, removeParentTransform: boolean) {
     if (removeParentTransform) {
       // can this be converted to utils (sendObjectToPlane)?
       applyTransformToObject(
@@ -295,20 +295,20 @@ export class Group extends CollectionMixinGenerator(Object) {
 
   /**
    * @private
-   * @param {Object} object
+   * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
    */
-  exitGroup(object: Object, removeParentTransform: boolean) {
+  exitGroup(object: FabricObject, removeParentTransform: boolean) {
     this._exitGroup(object, removeParentTransform);
     object._set('canvas', undefined);
   }
 
   /**
    * @private
-   * @param {Object} object
+   * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
    */
-  protected _exitGroup(object: Object, removeParentTransform: boolean) {
+  protected _exitGroup(object: FabricObject, removeParentTransform: boolean) {
     object._set('group', undefined);
     if (!removeParentTransform) {
       applyTransformToObject(
@@ -330,9 +330,9 @@ export class Group extends CollectionMixinGenerator(Object) {
   /**
    * @private
    * @param {'added'|'removed'} type
-   * @param {Object[]} targets
+   * @param {FabricObject[]} targets
    */
-  protected _onAfterObjectsChange(type: 'added' | 'removed', targets: Object[]) {
+  protected _onAfterObjectsChange(type: 'added' | 'removed', targets: FabricObject[]) {
     this._applyLayoutStrategy({
       type: type,
       targets: targets
@@ -342,28 +342,28 @@ export class Group extends CollectionMixinGenerator(Object) {
 
   /**
    * @private
-   * @param {Object} object
+   * @param {FabricObject} object
    */
-  protected _onObjectAdded(object: Object) {
+  protected _onObjectAdded(object: FabricObject) {
     this.enterGroup(object, true);
     object.fire('added', { target: this });
   }
 
   /**
    * @private
-   * @param {Object} object
+   * @param {FabricObject} object
    */
-  protected _onRelativeObjectAdded(object: Object) {
+  protected _onRelativeObjectAdded(object: FabricObject) {
     this.enterGroup(object, false);
     object.fire('added', { target: this });
   }
 
   /**
    * @private
-   * @param {Object} object
+   * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
    */
-  protected _onObjectRemoved(object: Object, removeParentTransform: boolean) {
+  protected _onObjectRemoved(object: FabricObject, removeParentTransform: boolean) {
     this.exitGroup(object, removeParentTransform);
     object.fire('removed', { target: this });
   }
@@ -376,16 +376,16 @@ export class Group extends CollectionMixinGenerator(Object) {
    * @return {Boolean}
    */
   shouldCache(): boolean {
-    var ownCache = Object.prototype.shouldCache.call(this);
-    if (ownCache) {
+    if (super.shouldCache()) {
       for (var i = 0; i < this._objects.length; i++) {
         if (this._objects[i].willDrawShadow()) {
           this.ownCaching = false;
           return false;
         }
       }
+      return true
     }
-    return ownCache;
+    return false;
   }
 
   /**
@@ -393,7 +393,7 @@ export class Group extends CollectionMixinGenerator(Object) {
    * @return {Boolean}
    */
   willDrawShadow(): boolean {
-    if (Object.prototype.willDrawShadow.call(this)) {
+    if (super.willDrawShadow()) {
       return true;
     }
     for (var i = 0; i < this._objects.length; i++) {
@@ -482,10 +482,10 @@ export class Group extends CollectionMixinGenerator(Object) {
 
   /**
    * @private
-   * @param {Object} object
+   * @param {FabricObject} object
    * @param {fabric.Point} diff
    */
-  private _adjustObjectPosition(object: Object, diff: fabric.Point) {
+  private _adjustObjectPosition(object: FabricObject, diff: fabric.Point) {
     object.set({
       left: object.left + diff.x,
       top: object.top + diff.y,
@@ -580,7 +580,7 @@ export class Group extends CollectionMixinGenerator(Object) {
    *
    * @typedef LayoutContext context object with data regarding what triggered the call
    * @property {LayoutContextType} type
-   * @property {Object[]} [path] array of objects starting from the object that triggered the call to the current one
+   * @property {FabricObject[]} [path] array of objects starting from the object that triggered the call to the current one
    *
    * @typedef LayoutResult positioning and layout data **relative** to instance's parent
    * @property {number} centerX new centerX as measured by the containing plane (same as `left` with `originX` set to `center`)
@@ -591,11 +591,11 @@ export class Group extends CollectionMixinGenerator(Object) {
    * @property {number} height
    *
    * @param {string} layoutDirective
-   * @param {Object[]} objects
+   * @param {FabricObject[]} objects
    * @param {LayoutContext} context
    * @returns {LayoutResult | undefined}
    */
-  getLayoutStrategyResult(layoutDirective: string, objects: Object[], context: LayoutContext): LayoutResult | undefined {  // eslint-disable-line no-unused-vars
+  getLayoutStrategyResult(layoutDirective: string, objects: FabricObject[], context: LayoutContext): LayoutResult | undefined {  // eslint-disable-line no-unused-vars
     //  `fit-content-lazy` performance enhancement
     //  skip if instance had no objects before the `added` event because it may have kept layout after removing all previous objects
     if (layoutDirective === 'fit-content-lazy'
@@ -668,11 +668,11 @@ export class Group extends CollectionMixinGenerator(Object) {
    * A wrapper around {@link Group#getObjectsBoundingBox}
    * @public
    * @param {string} layoutDirective
-   * @param {Object[]} objects
+   * @param {FabricObject[]} objects
    * @param {LayoutContext} context
    * @returns {LayoutResult | undefined}
    */
-  prepareBoundingBox(layoutDirective: string, objects: Object[], context: LayoutContext): LayoutResult | undefined {
+  prepareBoundingBox(layoutDirective: string, objects: FabricObject[], context: LayoutContext): LayoutResult | undefined {
     if (context.type === 'initialization') {
       return this.prepareInitialBoundingBox(layoutDirective, objects, context);
     }
@@ -691,11 +691,11 @@ export class Group extends CollectionMixinGenerator(Object) {
    * Calculates center taking into account originX, originY while not being sure that width/height are initialized
    * @public
    * @param {string} layoutDirective
-   * @param {Object[]} objects
+   * @param {FabricObject[]} objects
    * @param {LayoutContext} context
    * @returns {LayoutResult | undefined}
    */
-  protected prepareInitialBoundingBox(layoutDirective: string, objects: Object[], context: LayoutContext): LayoutResult | undefined {
+  protected prepareInitialBoundingBox(layoutDirective: string, objects: FabricObject[], context: LayoutContext): LayoutResult | undefined {
     var options = context.options || {},
       hasX = typeof options.left === 'number',
       hasY = typeof options.top === 'number',
@@ -765,10 +765,10 @@ export class Group extends CollectionMixinGenerator(Object) {
   /**
    * Calculate the bbox of objects relative to instance's containing plane
    * @public
-   * @param {Object[]} objects
+   * @param {FabricObject[]} objects
    * @returns {LayoutResult | null} bounding box
    */
-  getObjectsBoundingBox(objects: Object[], ignoreOffset?: boolean): LayoutResult | null {
+  getObjectsBoundingBox(objects: FabricObject[], ignoreOffset?: boolean): LayoutResult | null {
     if (objects.length === 0) {
       return null;
     }
@@ -829,9 +829,9 @@ export class Group extends CollectionMixinGenerator(Object) {
    * @private
    * @param {'toObject'|'toDatalessObject'} [method]
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @returns {Object[]} serialized objects
+   * @returns {object[]} serialized objects
    */
-  private __serializeObjects(method: 'toObject' | 'toDatalessObject', propertiesToInclude: string[]): Object[] {
+  private __serializeObjects(method: 'toObject' | 'toDatalessObject', propertiesToInclude: string[]) {
     var _includeDefaultValues = this.includeDefaultValues;
     return this._objects
       .filter(function (obj) {
@@ -938,7 +938,7 @@ export class Group extends CollectionMixinGenerator(Object) {
    * @private
    * @static
    * @memberOf Group
-   * @param {Object} object Object to create a group from
+   * @param {object} object Object to create a group from
    * @returns {Promise<Group>}
    */
   static async fromObject({ objects: serializedObjects, ...serializedOptions }): Promise<Group> {

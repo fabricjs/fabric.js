@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { enlivenObjects } from '../util';
 import { Group } from './group.class';
-import type { Object } from './object.class';
+import type { FabricObject } from './object.class';
 
 /**
  * @class ActiveSelection
@@ -35,12 +35,12 @@ export class ActiveSelection extends Group {
   /**
    * Constructor
    *
-   * @param {Object[]} [objects] instance objects
-   * @param {Object} [options] Options object
+   * @param {FabricObject[]} [objects] instance objects
+   * @param {FabricObject} [options] Options object
    * @param {boolean} [objectsRelativeToGroup] true if objects exist in group coordinate plane
    * @return {ActiveSelection} thisArg
    */
-  constructor(objects: Object[], options: object, objectsRelativeToGroup: boolean) {
+  constructor(objects: FabricObject[], options: object, objectsRelativeToGroup: boolean) {
     super(objects, options, objectsRelativeToGroup);
     this.setCoords();
   }
@@ -54,11 +54,11 @@ export class ActiveSelection extends Group {
 
   /**
    * @private
-   * @param {Object} object
+   * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
    * @returns {boolean} true if object entered group
    */
-  enterGroup(object: Object, removeParentTransform: boolean): boolean {
+  enterGroup(object: FabricObject, removeParentTransform: boolean): boolean {
     if (object.group) {
       //  save ref to group for later in order to return to it
       var parent = object.group;
@@ -72,10 +72,10 @@ export class ActiveSelection extends Group {
   /**
    * we want objects to retain their canvas ref when exiting instance
    * @private
-   * @param {Object} object
+   * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
    */
-  exitGroup(object: Object, removeParentTransform: boolean) {
+  exitGroup(object: FabricObject, removeParentTransform: boolean) {
     this._exitGroup(object, removeParentTransform);
     var parent = object.__owningGroup;
     if (parent) {
@@ -88,9 +88,9 @@ export class ActiveSelection extends Group {
   /**
    * @private
    * @param {'added'|'removed'} type
-   * @param {Object[]} targets
+   * @param {FabricObject[]} targets
    */
-  protected _onAfterObjectsChange(type: 'added' | 'removed', targets: Object[]) {
+  protected _onAfterObjectsChange(type: 'added' | 'removed', targets: FabricObject[]) {
     var groups = [] as Group[];
     targets.forEach(function (object) {
       object.group && !groups.includes(object.group) && groups.push(object.group);
@@ -150,18 +150,14 @@ export class ActiveSelection extends Group {
   /**
    * Renders controls and borders for the object
    * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {Object} [styleOverride] properties to override the object style
-   * @param {Object} [childrenOverride] properties to override the children overrides
+   * @param {object} [styleOverride] properties to override the object style
+   * @param {object} [childrenOverride] properties to override the children overrides
    */
   _renderControls(ctx: CanvasRenderingContext2D, styleOverride: object, childrenOverride: object) {
     ctx.save();
     ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
     super._renderControls(ctx, styleOverride);
-    var options = Object.assign(
-      { hasControls: false },
-      childrenOverride,
-      { forActiveSelection: true }
-    );
+    var options = { hasControls: false, ...childrenOverride, forActiveSelection: true };
     for (var i = 0; i < this._objects.length; i++) {
       this._objects[i]._renderControls(ctx, options);
     }
@@ -172,7 +168,7 @@ export class ActiveSelection extends Group {
    * Returns {@link ActiveSelection} instance from an object representation
    * @static
    * @memberOf ActiveSelection
-   * @param {Object} object Object to create a group from
+   * @param {object} object Object to create a group from
    * @returns {Promise<ActiveSelection>}
    */
   static async fromObject({ objects, ...options }: object): Promise<ActiveSelection> {

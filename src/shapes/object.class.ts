@@ -45,7 +45,7 @@ import { CommonMethods } from "../mixins/common_methods.mixin";
  * @fires dragleave
  * @fires drop
  */
-export class Object extends CommonMethods {
+export class FabricObject extends CommonMethods {
 
   /**
    * Type of an object (rect, circle, path, etc.).
@@ -642,7 +642,7 @@ export class Object extends CommonMethods {
 
   /**
    * Constructor
-   * @param {Object} [options] Options object
+   * @param {object} [options] Options object
    */
   constructor(options) {
     if (options) {
@@ -668,15 +668,15 @@ export class Object extends CommonMethods {
    * and each side do not cross fabric.cacheSideLimit
    * those numbers are configurable so that you can get as much detail as you want
    * making bargain with performances.
-   * @param {Object} dims
-   * @param {Object} dims.width width of canvas
-   * @param {Object} dims.height height of canvas
-   * @param {Object} dims.zoomX zoomX zoom value to unscale the canvas before drawing cache
-   * @param {Object} dims.zoomY zoomY zoom value to unscale the canvas before drawing cache
-   * @return {Object}.width width of canvas
-   * @return {Object}.height height of canvas
-   * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
-   * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
+   * @param {object} dims
+   * @param {number} dims.width width of canvas
+   * @param {number} dims.height height of canvas
+   * @param {number} dims.zoomX zoomX zoom value to unscale the canvas before drawing cache
+   * @param {number} dims.zoomY zoomY zoom value to unscale the canvas before drawing cache
+   * @return {number}.width width of canvas
+   * @return {number}.height height of canvas
+   * @return {number}.zoomX zoomX zoom value to unscale the canvas before drawing cache
+   * @return {number}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
   _limitCacheSize(dims) {
     var perfLimitSizeTotal = fabric.perfLimitSizeTotal,
@@ -712,12 +712,12 @@ export class Object extends CommonMethods {
    * Return the dimension and the zoom level needed to create a cache canvas
    * big enough to host the object to be cached.
    * @private
-   * @return {Object}.x width of object to be cached
-   * @return {Object}.y height of object to be cached
-   * @return {Object}.width width of canvas
-   * @return {Object}.height height of canvas
-   * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
-   * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
+   * @return {number}.x width of object to be cached
+   * @return {number}.y height of object to be cached
+   * @return {number}.width width of canvas
+   * @return {number}.height height of canvas
+   * @return {number}.zoomX zoomX zoom value to unscale the canvas before drawing cache
+   * @return {number}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
   _getCacheCanvasDimensions() {
     var objectScale = this.getTotalObjectScaling(),
@@ -806,7 +806,7 @@ export class Object extends CommonMethods {
 
   /**
    * Sets object's properties from options
-   * @param {Object} [options] Options object
+   * @param {object} [options] Options object
    */
   setOptions(options) {
     this._setOptions(options);
@@ -826,7 +826,7 @@ export class Object extends CommonMethods {
   /**
    * Returns an object representation of an instance
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {Object} Object representation of an instance
+   * @return {object} Object representation of an instance
    */
   toObject(propertiesToInclude) {
     var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
@@ -882,7 +882,7 @@ export class Object extends CommonMethods {
   /**
    * Returns (dataless) object representation of an instance
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {Object} Object representation of an instance
+   * @return {object} Object representation of an instance
    */
   toDatalessObject(propertiesToInclude) {
     // will be overwritten by subclasses
@@ -1029,10 +1029,9 @@ export class Object extends CommonMethods {
     return fabric.iMatrix.concat();
   }
 
-  /*
+  /**
    * @private
    * return if the object would be visible in rendering
-   * @memberOf fabric.Object.prototype
    * @return {Boolean}
    */
   isNotVisible() {
@@ -1443,8 +1442,8 @@ export class Object extends CommonMethods {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {Object} filler fabric.Pattern or fabric.Gradient
-   * @return {Object} offset.offsetX offset for text rendering
-   * @return {Object} offset.offsetY offset for text rendering
+   * @return {number} .offsetX offset for text rendering
+   * @return {number} .offsetY offset for text rendering
    */
   _applyPatternGradientTransform(ctx, filler) {
     if (!filler || !filler.toLive) {
@@ -1576,10 +1575,10 @@ export class Object extends CommonMethods {
    * This function is an helper for svg import. it returns the center of the object in the svg
    * untransformed coordinates
    * @private
-   * @return {Object} center point from element coordinates
+   * @return {fabric.Point} center point from element coordinates
    */
   _findCenterFromElement() {
-    return { x: this.left + this.width / 2, y: this.top + this.height / 2 };
+    return new fabric.Point(this.left + this.width / 2, this.top + this.height / 2);
   }
 
   /**
@@ -1606,7 +1605,7 @@ export class Object extends CommonMethods {
    * This function is an helper for svg import. it removes the transform matrix
    * and set to object properties that fabricjs can handle
    * @private
-   * @param {Object} preserveAspectRatioOptions
+   * @param {object} preserveAspectRatioOptions
    * @return {thisArg}
    */
   _removeTransformMatrix(preserveAspectRatioOptions) {
@@ -1646,7 +1645,7 @@ export class Object extends CommonMethods {
    * and format option. toCanvasElement is faster and produce no loss of quality.
    * If you need to get a real Jpeg or Png from an object, using toDataURL is the right way to do it.
    * toCanvasElement and then toBlob from the obtained canvas is also a good option.
-   * @param {Object} [options] for clone as image, passed to toDataURL
+   * @param {object} [options] for clone as image, passed to toDataURL
    * @param {Number} [options.multiplier=1] Multiplier to scale by
    * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
    * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
@@ -1664,7 +1663,7 @@ export class Object extends CommonMethods {
 
   /**
    * Converts an object into a HTMLCanvas element
-   * @param {Object} options Options object
+   * @param {object} options Options object
    * @param {Number} [options.multiplier=1] Multiplier to scale by
    * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
    * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
@@ -1743,7 +1742,7 @@ export class Object extends CommonMethods {
 
   /**
    * Converts an object into a data-url-like string
-   * @param {Object} options Options object
+   * @param {object} options Options object
    * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
    * @param {Number} [options.quality=1] Quality level (0..1). Only used for jpeg.
    * @param {Number} [options.multiplier=1] Multiplier to scale by
@@ -1781,7 +1780,7 @@ export class Object extends CommonMethods {
   /**
    * Returns a JSON representation of an instance
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {Object} JSON
+   * @return {object} JSON
    */
   toJSON(propertiesToInclude) {
     // delegate, not alias
@@ -1906,10 +1905,9 @@ export class Object extends CommonMethods {
       fabric.runningAnimations.cancelByTarget(this);
     }
   }
-}
 
 
-/**
+  /**
  * Defines the number of fraction digits to use when serializing object values.
  * You can use it to increase/decrease precision of such values like left, top, scaleX, scaleY, etc.
  * @static
@@ -1917,42 +1915,46 @@ export class Object extends CommonMethods {
  * @constant
  * @type Number
  */
-fabric.Object.NUM_FRACTION_DIGITS = 2;
+  static NUM_FRACTION_DIGITS = 2;
 
-/**
- *
- * @param {Function} klass
- * @param {object} object
- * @param {object} [options]
- * @param {string} [options.extraParam] property to pass as first argument to the constructor
- * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
- * @returns {Promise<fabric.Object>}
- */
-fabric.Object._fromObject = function (klass, object, options) {
-  var serializedObject = clone(object, true);
-  return fabric.util.enlivenObjectEnlivables(serializedObject, options).then(function (enlivedMap) {
-    var newObject = Object.assign(object, enlivedMap);
-    return options && options.extraParam ? new klass(object[options.extraParam], newObject) : new klass(newObject);
-  });
-};
+  /**
+   *
+   * @param {Function} klass
+   * @param {object} object
+   * @param {object} [options]
+   * @param {string} [options.extraParam] property to pass as first argument to the constructor
+   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @returns {Promise<fabric.Object>}
+   */
+  static _fromObject = function (klass, object, options) {
+    var serializedObject = clone(object, true);
+    return fabric.util.enlivenObjectEnlivables(serializedObject, options).then(function (enlivedMap) {
+      var newObject = Object.assign(object, enlivedMap);
+      return options && options.extraParam ? new klass(object[options.extraParam], newObject) : new klass(newObject);
+    });
+  };
 
-/**
- *
- * @static
- * @memberOf fabric.Object
- * @param {object} object
- * @param {object} [options]
- * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
- * @returns {Promise<fabric.Object>}
- */
-fabric.Object.fromObject = function (object, options) {
-  return fabric.Object._fromObject(fabric.Object, object, options);
-};
+  /**
+   *
+   * @static
+   * @memberOf fabric.Object
+   * @param {object} object
+   * @param {object} [options]
+   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @returns {Promise<fabric.Object>}
+   */
+  static fromObject = function (object, options) {
+    return fabric.Object._fromObject(fabric.Object, object, options);
+  };
 
-/**
- * Unique id used internally when creating SVG elements
- * @static
- * @memberOf fabric.Object
- * @type Number
- */
-fabric.Object.__uid = 0;
+  /**
+   * Unique id used internally when creating SVG elements
+   * @static
+   * @memberOf fabric.Object
+   * @type Number
+   */
+  static __uid = 0;
+}
+
+
+
