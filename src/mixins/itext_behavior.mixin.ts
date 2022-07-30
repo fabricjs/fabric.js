@@ -2,10 +2,10 @@
 
 import { context } from "../../context";
 import { reNonWord } from "../constants";
+import { Point } from '../point.class';
 import {
   clone, createCanvasElement, removeFromArray, transformPoint
 } from '../util';
-import { Point } from './point.class';
 
 export function ITextBehaviorMixinGenerator(Klass) {
   return class ITextBehaviorMixin extends Klass {

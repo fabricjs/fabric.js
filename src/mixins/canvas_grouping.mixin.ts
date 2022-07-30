@@ -1,9 +1,8 @@
 //@ts-nocheck
 
-import { max } from "lodash";
 import { Point } from "../point.class";
 import { ActiveSelection } from "../shapes";
-import { min } from "../util";
+import { min, max } from "../util";
 
 
 export function CanvasGroupingMixinGenerator(Klass) {
