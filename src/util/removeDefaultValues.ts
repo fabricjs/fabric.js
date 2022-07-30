@@ -1,4 +1,4 @@
-
+//@ts-nocheck
 export function removeDefaultValues(object, prototype) {
     Object.keys(object).forEach(function (prop) {
         if (prop === 'left' || prop === 'top' || prop === 'type') {
