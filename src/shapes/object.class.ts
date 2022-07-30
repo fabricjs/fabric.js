@@ -3,7 +3,7 @@
 import { VERSION } from 'context';
 import { RUNNING_ANIMATIONS } from 'util/animate';
 import { browserShadowBlurConstant, maxCacheSideLimit, minCacheSideLimit, NUM_FRACTION_DIGITS } from '../config';
-import { ALIASING_LIMIT, devicePixelRatio, iMatrix, isLikelyNode } from '../constants';
+import { ALIASING_LIMIT, devicePixelRatio, iMatrix, isLikelyNode, uid } from '../constants';
 import { CommonMethods } from '../mixins/common_methods.mixin';
 import { Point } from '../point.class';
 import { StaticCanvas } from '../static_canvas.class';
@@ -1933,7 +1933,7 @@ export class FabricObject extends CommonMethods {
    * @memberOf FabricObject
    * @type Number
    */
-  static __uid = 0;
+  static __uid = uid;
 }
 
 

@@ -2,9 +2,9 @@
 /* _TO_SVG_START_ */
 
 import { Color } from 'color';
+import { uid } from 'constants';
 import { toFixed } from "util";
 import { NUM_FRACTION_DIGITS } from '../config';
-import { FabricObject } from '../shapes/object.class';
 
 function getSvgColorString(prop, value) {
   if (!value) {
@@ -213,7 +213,7 @@ export function ObjectSVGExportMixinGenerator(Klass) {
         index = objectMarkup.indexOf('COMMON_PARTS'),
         additionalTransform = options.additionalTransform;
       if (clipPath) {
-        clipPath.clipPathId = 'CLIPPATH_' + FabricObject.__uid++;
+        clipPath.clipPathId = 'CLIPPATH_' + uid++;
         clipPathMarkup = '<clipPath id="' + clipPath.clipPathId + '" >\n' +
           clipPath.toClipPathSVG(reviver) +
           '</clipPath>\n';

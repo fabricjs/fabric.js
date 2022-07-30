@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { NUM_FRACTION_DIGITS } from 'config';
-import { FabricObject } from 'shapes/object.class';
+import { uid } from 'constants';
 import {
   loadImage, populateWithProperties, toFixed
 } from 'util';
@@ -63,7 +63,7 @@ export class Pattern {
    */
   constructor(options) {
     options || (options = {});
-    this.id = FabricObject.__uid++;
+    this.id = uid++;
     this.setOptions(options);
   }
 

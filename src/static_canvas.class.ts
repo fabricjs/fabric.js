@@ -2,7 +2,7 @@
 
 import { FabricObject } from "shapes/object.class";
 import { NUM_FRACTION_DIGITS } from './config';
-import { devicePixelRatio, fontPaths, iMatrix, isLikelyNode } from './constants';
+import { devicePixelRatio, fontPaths, iMatrix, isLikelyNode, uid } from './constants';
 import { VERSION } from './context';
 import { CanvasDataURLExporterMixinGenerator } from "./mixins/canvas_dataurl_exporter.mixin";
 import { CollectionMixinGenerator } from "./mixins/collection.mixin";
@@ -1237,7 +1237,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
   createSVGClipPathMarkup(options) {
     var clipPath = this.clipPath;
     if (clipPath) {
-      clipPath.clipPathId = 'CLIPPATH_' + FabricObject.__uid++;
+      clipPath.clipPathId = 'CLIPPATH_' + uid++;
       return '<clipPath id="' + clipPath.clipPathId + '" >\n' +
         this.clipPath.toClipPathSVG(options.reviver) +
         '</clipPath>\n';
