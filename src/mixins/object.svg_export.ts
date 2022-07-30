@@ -2,7 +2,7 @@
 /* _TO_SVG_START_ */
 
 import { Color } from 'color';
-import { uid } from 'constants';
+import { incrementUID } from 'constants';
 import { toFixed } from "util";
 import { NUM_FRACTION_DIGITS } from '../config';
 
@@ -213,7 +213,7 @@ export function ObjectSVGExportMixinGenerator(Klass) {
         index = objectMarkup.indexOf('COMMON_PARTS'),
         additionalTransform = options.additionalTransform;
       if (clipPath) {
-        clipPath.clipPathId = 'CLIPPATH_' + uid++;
+        clipPath.clipPathId = 'CLIPPATH_' + incrementUID();
         clipPathMarkup = '<clipPath id="' + clipPath.clipPathId + '" >\n' +
           clipPath.toClipPathSVG(reviver) +
           '</clipPath>\n';

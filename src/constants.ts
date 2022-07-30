@@ -67,3 +67,7 @@ export const isLikelyNode = typeof Buffer !== 'undefined' &&
     typeof window === 'undefined';
 
 export let uid = 0;
+
+export function incrementUID() {
+    return uid++;
+}

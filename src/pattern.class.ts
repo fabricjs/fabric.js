@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { NUM_FRACTION_DIGITS } from 'config';
-import { uid } from 'constants';
+import { incrementUID } from 'constants';
 import {
   loadImage, populateWithProperties, toFixed
 } from 'util';
@@ -63,7 +63,7 @@ export class Pattern {
    */
   constructor(options) {
     options || (options = {});
-    this.id = uid++;
+    this.id = incrementUID();
     this.setOptions(options);
   }
 

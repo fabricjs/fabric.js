@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { uid } from "constants";
+import { incrementUID } from "constants";
 
 var fabric = global.fabric;
 /* _FROM_SVG_START_ */
@@ -153,10 +153,10 @@ export class Gradient {
     });
 
     if (this.id) {
-      this.id += '_' + uid++;
+      this.id += '_' + incrementUID();
     }
     else {
-      this.id = uid++;
+      this.id = incrementUID();
     }
 
     coords = {

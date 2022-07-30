@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { Color } from "color";
-import { uid } from "constants";
+import { incrementUID } from "constants";
 import { Point } from "point.class";
 import { degreesToRadians, rotateVector, toFixed } from "util";
 
@@ -87,7 +87,7 @@ export class Shadow {
       this[prop] = options[prop];
     }
 
-    this.id = uid++;
+    this.id = incrementUID();
   }
 
   /**

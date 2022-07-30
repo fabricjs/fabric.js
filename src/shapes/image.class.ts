@@ -2,7 +2,7 @@
 
 var fabric = global.fabric;
 import { parseAttributes } from 'parser';
-import { SHARED_ATTRIBUTES, uid } from '../constants';
+import { incrementUID, SHARED_ATTRIBUTES } from '../constants';
 import {
   addClass, cleanUpJsdomNode, createCanvasElement, enlivenObjectEnlivables, enlivenObjects, findScaleToCover, findScaleToFit, getById, loadImage, parsePreserveAspectRatioAttribute, setImageSmoothing
 } from '../util';
@@ -141,7 +141,7 @@ export class Image extends FabricObject {
   constructor(element, options) {
     options || (options = {});
     this.filters = [];
-    this.cacheKey = 'texture' + uid++;
+    this.cacheKey = 'texture' + incrementUID();
     super(options);
     this._initElement(element, options);
   }
@@ -287,7 +287,7 @@ export class Image extends FabricObject {
       return [];
     }
     if (this.hasCrop()) {
-      var clipPathId = uid++;
+      var clipPathId = incrementUID();
       svgString.push(
         '<clipPath id="imageCrop_' + clipPathId + '">\n',
         '\t<rect x="' + x + '" y="' + y + '" width="' + this.width + '" height="' + this.height + '" />\n',

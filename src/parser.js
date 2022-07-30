@@ -1,4 +1,4 @@
-import { DEFAULT_SVG_FONT_SIZE, uid } from './constants';
+import { DEFAULT_SVG_FONT_SIZE, incrementUID } from './constants';
 
 const svgValidTagNames = ['path', 'circle', 'polygon', 'polyline', 'ellipse', 'rect', 'line',
   'image', 'text'],
@@ -848,7 +848,7 @@ export function parseAttributes(element, attributes, svgUid) {
     }
     parseUseDirectives(doc);
 
-    var svgUid = uid++, i, len,
+    var svgUid = incrementUID(), i, len,
       options = applyViewboxTransform(doc),
       descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
     options.crossOrigin = parsingOptions && parsingOptions.crossOrigin;

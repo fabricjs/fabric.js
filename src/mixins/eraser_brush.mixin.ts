@@ -99,7 +99,7 @@ export function ObjectEraserBrushMixinGenerator(Klass) {
      */
     _createEraserSVGMarkup(reviver) {
       if (this.eraser) {
-        this.eraser.clipPathId = 'MASK_' + uid++;
+        this.eraser.clipPathId = 'MASK_' + incrementUID();
         return [
           '<mask id="', this.eraser.clipPathId, '" >',
           this.eraser.toSVG(reviver),
