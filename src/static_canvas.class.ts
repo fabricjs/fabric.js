@@ -3,18 +3,17 @@
 import { CanvasDataURLExporterMixinGenerator } from "./mixins/canvas_dataurl_exporter.mixin";
 import { CollectionMixinGenerator } from "./mixins/collection.mixin";
 import { CommonMethods } from "./mixins/common_methods.mixin";
+import { NodeCanvasStreamsMixinGenerator } from "./mixins/node_canvas_streams.mixin";
+import {
+  getElementOffset,
+  removeFromArray,
+  toFixed,
+  transformPoint,
+  invertTransform,
+  createCanvasElement
+} from './util';
 
-// aliases for faster resolution
-var fabric = global.fabric, extend = fabric.util.object.extend,
-  getElementOffset = fabric.util.getElementOffset,
-  removeFromArray = fabric.util.removeFromArray,
-  toFixed = fabric.util.toFixed,
-  transformPoint = fabric.util.transformPoint,
-  invertTransform = fabric.util.invertTransform,
-  getNodeCanvas = fabric.util.getNodeCanvas,
-  createCanvasElement = fabric.util.createCanvasElement,
-
-  CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
+const CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
 
 /**
  * Static canvas class
@@ -1672,18 +1671,14 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
   }
 }
 
-export const StaticCanvas = CanvasDataURLExporterMixinGenerator(StaticCanvasBase);
-
+const StaticCanvas = CanvasDataURLExporterMixinGenerator(StaticCanvasBase);
 
 if (fabric.isLikelyNode) {
-  fabric.StaticCanvas.prototype.createPNGStream = function () {
-    var impl = getNodeCanvas(this.lowerCanvasEl);
-    return impl && impl.createPNGStream();
-  };
-  fabric.StaticCanvas.prototype.createJPEGStream = function (opts) {
-    var impl = getNodeCanvas(this.lowerCanvasEl);
-    return impl && impl.createJPEGStream(opts);
-  };
+  const NodeCanvas = NodeCanvasStreamsMixinGenerator(StaticCanvas);
+  export { NodeCanvas as StaticCanvas };
+}
+else {
+  export { StaticCanvas };
 }
 
 
