@@ -5,7 +5,7 @@
  * @param {Number} t
  * @return {Number}
  */
-export function hue2rgb(p, q, t) {
+export function hue2rgb(p: number, q: number, t: number): number {
     if (t < 0) {
         t += 1;
     }
