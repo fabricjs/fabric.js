@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { createCanvasElement, toDataURL } from './util';
+import { createCanvasElement, toDataURL } from '../util';
 
 export function CanvasDataURLExporterMixinGenerator<T extends new (...args: any[]) => any>(Klass: T) {
   return class CanvasDataURLExporterMixin extends Klass {
