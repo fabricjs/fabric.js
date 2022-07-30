@@ -1,9 +1,9 @@
 //@ts-nocheck
 
-  var fabric = global.fabric;
-  
-export function StaticCanvasDataurlExporterMixinGenerator(Klass) {
-  return class StaticCanvasDataurlExporterMixin extends Klass {
+import { createCanvasElement, toDataURL } from './util';
+
+export function CanvasDataURLExporterMixinGenerator<T extends new (...args: any[]) => any>(Klass: T) {
+  return class CanvasDataURLExporterMixin extends Klass {
 
     /**
      * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
@@ -43,14 +43,12 @@ export function StaticCanvasDataurlExporterMixinGenerator(Klass) {
      *   filter: (object) => object.isContainedWithinObject(myObject) || object.intersectsWithObject(myObject)
      * });
      */
-    toDataURL(options) {
-      options || (options = { });
-
+    toDataURL(options = {}) {
       var format = options.format || 'png',
-          quality = options.quality || 1,
-          multiplier = (options.multiplier || 1) * (options.enableRetinaScaling ? this.getRetinaScaling() : 1),
-          canvasEl = this.toCanvasElement(multiplier, options);
-      return fabric.util.toDataURL(canvasEl, format, quality);
+        quality = options.quality || 1,
+        multiplier = (options.multiplier || 1) * (options.enableRetinaScaling ? this.getRetinaScaling() : 1),
+        canvasEl = this.toCanvasElement(multiplier, options);
+      return toDataURL(canvasEl, format, quality);
     }
 
     /**
@@ -67,24 +65,23 @@ export function StaticCanvasDataurlExporterMixinGenerator(Klass) {
      * @param {Number} [options.height] Cropping height.
      * @param {(object: fabric.Object) => boolean} [options.filter] Function to filter objects.
      */
-    toCanvasElement(multiplier, options) {
+    toCanvasElement(multiplier = 1, options = {}) {
       multiplier = multiplier || 1;
-      options = options || { };
       var scaledWidth = (options.width || this.width) * multiplier,
-          scaledHeight = (options.height || this.height) * multiplier,
-          zoom = this.getZoom(),
-          originalWidth = this.width,
-          originalHeight = this.height,
-          newZoom = zoom * multiplier,
-          vp = this.viewportTransform,
-          translateX = (vp[4] - (options.left || 0)) * multiplier,
-          translateY = (vp[5] - (options.top || 0)) * multiplier,
-          originalInteractive = this.interactive,
-          newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
-          originalRetina = this.enableRetinaScaling,
-          canvasEl = fabric.util.createCanvasElement(),
-          originalContextTop = this.contextTop,
-          objectsToRender = options.filter ? this._objects.filter(options.filter) : this._objects;
+        scaledHeight = (options.height || this.height) * multiplier,
+        zoom = this.getZoom(),
+        originalWidth = this.width,
+        originalHeight = this.height,
+        newZoom = zoom * multiplier,
+        vp = this.viewportTransform,
+        translateX = (vp[4] - (options.left || 0)) * multiplier,
+        translateY = (vp[5] - (options.top || 0)) * multiplier,
+        originalInteractive = this.interactive,
+        newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
+        originalRetina = this.enableRetinaScaling,
+        canvasEl = createCanvasElement(),
+        originalContextTop = this.contextTop,
+        objectsToRender = options.filter ? this._objects.filter(options.filter) : this._objects;
       canvasEl.width = scaledWidth;
       canvasEl.height = scaledHeight;
       this.contextTop = null;
@@ -107,6 +104,5 @@ export function StaticCanvasDataurlExporterMixinGenerator(Klass) {
   }
 }
 
-fabric.StaticCanvas = StaticCanvasDataurlExporterMixinGenerator(fabric.StaticCanvas);
 
 
