@@ -1,4 +1,9 @@
 
+interface IPoint {
+  x: number
+  y: number
+}
+
 /**
  * Adaptation of work of Kevin Lindsey(kevin@kevlindev.com)
  */
@@ -10,8 +15,12 @@ export class Point {
 
   type = 'point'
 
-  static toPoint(from) {
+  static toPoint(from: IPoint) {
     return new Point(from.x, from.y);
+  }
+
+  static createVector(from: IPoint, to: IPoint) {
+    return Point.toPoint(to).subtract(from);
   }
 
   constructor(x: number = 0, y: number = 0) {
@@ -24,7 +33,7 @@ export class Point {
    * @param {Point} that
    * @return {Point} new Point instance with added values
    */
-  add(that) {
+  add(that: Point): Point {
     return new Point(this.x + that.x, this.y + that.y);
   }
 
@@ -34,7 +43,7 @@ export class Point {
    * @return {Point} thisArg
    * @chainable
    */
-  addEquals(that) {
+  addEquals(that: Point): Point {
     this.x += that.x;
     this.y += that.y;
     return this;
@@ -45,7 +54,7 @@ export class Point {
    * @param {Number} scalar
    * @return {Point} new Point with added value
    */
-  scalarAdd(scalar) {
+  scalarAdd(scalar: number): Point {
     return new Point(this.x + scalar, this.y + scalar);
   }
 
@@ -55,7 +64,7 @@ export class Point {
    * @return {Point} thisArg
    * @chainable
    */
-  scalarAddEquals(scalar) {
+  scalarAddEquals(scalar: number): Point {
     this.x += scalar;
     this.y += scalar;
     return this;
@@ -63,10 +72,10 @@ export class Point {
 
   /**
    * Subtracts another point from this point and returns a new one
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Point} new Point object with subtracted values
    */
-  subtract(that) {
+  subtract(that: IPoint): Point {
     return new Point(this.x - that.x, this.y - that.y);
   }
 
@@ -76,7 +85,7 @@ export class Point {
    * @return {Point} thisArg
    * @chainable
    */
-  subtractEquals(that) {
+  subtractEquals(that: Point): Point {
     this.x -= that.x;
     this.y -= that.y;
     return this;
@@ -87,7 +96,7 @@ export class Point {
    * @param {Number} scalar
    * @return {Point}
    */
-  scalarSubtract(scalar) {
+  scalarSubtract(scalar: number): Point {
     return new Point(this.x - scalar, this.y - scalar);
   }
 
@@ -97,7 +106,7 @@ export class Point {
    * @return {Point} thisArg
    * @chainable
    */
-  scalarSubtractEquals(scalar) {
+  scalarSubtractEquals(scalar: number): Point {
     this.x -= scalar;
     this.y -= scalar;
     return this;
@@ -108,7 +117,7 @@ export class Point {
    * @param {Point} that
    * @return {Point}
    */
-  multiply(that) {
+  multiply(that: Point): Point {
     return new Point(this.x * that.x, this.y * that.y);
   }
 
@@ -117,7 +126,7 @@ export class Point {
    * @param {Number} scalar
    * @return {Point}
    */
-  scalarMultiply(scalar) {
+  scalarMultiply(scalar: number): Point {
     return new Point(this.x * scalar, this.y * scalar);
   }
 
@@ -127,7 +136,7 @@ export class Point {
    * @return {Point} thisArg
    * @chainable
    */
-  scalarMultiplyEquals(scalar) {
+  scalarMultiplyEquals(scalar: number): Point {
     this.x *= scalar;
     this.y *= scalar;
     return this;
@@ -138,7 +147,7 @@ export class Point {
    * @param {Point} that
    * @return {Point}
    */
-  divide(that) {
+  divide(that: Point): Point {
     return new Point(this.x / that.x, this.y / that.y);
   }
 
@@ -147,7 +156,7 @@ export class Point {
    * @param {Number} scalar
    * @return {Point}
    */
-  scalarDivide(scalar) {
+  scalarDivide(scalar: number): Point {
     return new Point(this.x / scalar, this.y / scalar);
   }
 
@@ -157,7 +166,7 @@ export class Point {
    * @return {Point} thisArg
    * @chainable
    */
-  scalarDivideEquals(scalar) {
+  scalarDivideEquals(scalar: number): Point {
     this.x /= scalar;
     this.y /= scalar;
     return this;
@@ -168,7 +177,7 @@ export class Point {
    * @param {Point} that
    * @return {Boolean}
    */
-  eq(that) {
+  eq(that: Point): boolean {
     return (this.x === that.x && this.y === that.y);
   }
 
@@ -177,7 +186,7 @@ export class Point {
    * @param {Point} that
    * @return {Boolean}
    */
-  lt(that) {
+  lt(that: Point): boolean {
     return (this.x < that.x && this.y < that.y);
   }
 
@@ -186,7 +195,7 @@ export class Point {
    * @param {Point} that
    * @return {Boolean}
    */
-  lte(that) {
+  lte(that: Point): boolean {
     return (this.x <= that.x && this.y <= that.y);
   }
 
@@ -196,7 +205,7 @@ export class Point {
    * @param {Point} that
    * @return {Boolean}
    */
-  gt(that) {
+  gt(that: Point): boolean {
     return (this.x > that.x && this.y > that.y);
   }
 
@@ -205,7 +214,7 @@ export class Point {
    * @param {Point} that
    * @return {Boolean}
    */
-  gte(that) {
+  gte(that: Point): boolean {
     return (this.x >= that.x && this.y >= that.y);
   }
 
@@ -215,10 +224,7 @@ export class Point {
    * @param {Number} t , position of interpolation, between 0 and 1 default 0.5
    * @return {Point}
    */
-  lerp(that, t) {
-    if (typeof t === 'undefined') {
-      t = 0.5;
-    }
+  lerp(that: Point, t: number = 0.5): Point {
     t = Math.max(Math.min(1, t), 0);
     return new Point(this.x + (that.x - this.x) * t, this.y + (that.y - this.y) * t);
   }
@@ -228,7 +234,7 @@ export class Point {
    * @param {Point} that
    * @return {Number}
    */
-  distanceFrom(that) {
+  distanceFrom(that: Point): number {
     var dx = this.x - that.x,
       dy = this.y - that.y;
     return Math.sqrt(dx * dx + dy * dy);
@@ -239,7 +245,7 @@ export class Point {
    * @param {Point} that
    * @return {Point}
    */
-  midPointFrom(that) {
+  midPointFrom(that: Point): Point {
     return this.lerp(that);
   }
 
@@ -248,7 +254,7 @@ export class Point {
    * @param {Point} that
    * @return {Point}
    */
-  min(that) {
+  min(that: Point): Point {
     return new Point(Math.min(this.x, that.x), Math.min(this.y, that.y));
   }
 
@@ -257,7 +263,7 @@ export class Point {
    * @param {Point} that
    * @return {Point}
    */
-  max(that) {
+  max(that: Point): Point {
     return new Point(Math.max(this.x, that.x), Math.max(this.y, that.y));
   }
 
@@ -265,7 +271,7 @@ export class Point {
    * Returns string representation of this point
    * @return {String}
    */
-  toString() {
+  toString(): string {
     return this.x + ',' + this.y;
   }
 
@@ -275,7 +281,7 @@ export class Point {
    * @param {Number} y
    * @chainable
    */
-  setXY(x, y) {
+  setXY(x: number, y: number) {
     this.x = x;
     this.y = y;
     return this;
@@ -286,7 +292,7 @@ export class Point {
    * @param {Number} x
    * @chainable
    */
-  setX(x) {
+  setX(x: number) {
     this.x = x;
     return this;
   }
@@ -296,7 +302,7 @@ export class Point {
    * @param {Number} y
    * @chainable
    */
-  setY(y) {
+  setY(y: number) {
     this.y = y;
     return this;
   }
@@ -306,7 +312,7 @@ export class Point {
    * @param {Point} that
    * @chainable
    */
-  setFromPoint(that) {
+  setFromPoint(that: Point) {
     this.x = that.x;
     this.y = that.y;
     return this;
@@ -316,7 +322,7 @@ export class Point {
    * Swaps x/y of this point and another point
    * @param {Point} that
    */
-  swap(that) {
+  swap(that: Point) {
     var x = this.x,
       y = this.y;
     this.x = that.x;
@@ -329,7 +335,7 @@ export class Point {
    * return a cloned instance of the point
    * @return {Point}
    */
-  clone() {
+  clone(): Point {
     return new Point(this.x, this.y);
   }
 }
