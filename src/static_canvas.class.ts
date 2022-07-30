@@ -1,9 +1,9 @@
 //@ts-nocheck
 
 import { FabricObject } from "shapes/object.class";
+import { VERSION } from '../context';
 import { NUM_FRACTION_DIGITS } from './config';
 import { devicePixelRatio, fontPaths, iMatrix, isLikelyNode, uid } from './constants';
-import { VERSION } from './context';
 import { CanvasDataURLExporterMixinGenerator } from "./mixins/canvas_dataurl_exporter.mixin";
 import { CollectionMixinGenerator } from "./mixins/collection.mixin";
 import { CommonMethods } from "./mixins/common_methods.mixin";
