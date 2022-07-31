@@ -1,7 +1,7 @@
 //@ts-nocheck
 export * from './cos';
 export * from './removeDefaultValues';
-import { fabric } from '../../main'
+import { fabric } from '../main'
 import './animate'; // optional animation
 import './animate_color'; // optional animation
 import './anim_ease'; // optional easing
