@@ -17,5 +17,6 @@ export * from './object_interactivity.mixin';
 export * from './object_origin.mixin';
 export * from './object_stacking.mixin';
 export * from './object_straightening.mixin';
+export * from './stateful.mixin';
 export * from './text_style.mixin';
 

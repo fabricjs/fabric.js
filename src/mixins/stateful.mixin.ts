@@ -1,17 +1,18 @@
-(function(global) {
-  var fabric = global.fabric, extend = fabric.util.object.extend,
-      originalSet = 'stateProperties';
+//@ts-nocheck
+
+  var fabric = global.fabric,
+    originalSet = 'stateProperties';
 
   /*
     Depends on `stateProperties`
   */
   function saveProps(origin, destination, props) {
-    var tmpObj = { }, deep = true;
-    props.forEach(function(prop) {
+    var tmpObj = {}, deep = true;
+    props.forEach(function (prop) {
       tmpObj[prop] = origin[prop];
     });
 
-    extend(origin[destination], tmpObj, deep);
+    fabric.util.object.extend(origin[destination], tmpObj, deep);
   }
 
   function _isEqual(origValue, currentValue, firstPass) {
@@ -33,8 +34,8 @@
     else if (origValue && typeof origValue === 'object') {
       var keys = Object.keys(origValue), key;
       if (!currentValue ||
-          typeof currentValue !== 'object' ||
-          (!firstPass && keys.length !== Object.keys(currentValue).length)
+        typeof currentValue !== 'object' ||
+        (!firstPass && keys.length !== Object.keys(currentValue).length)
       ) {
         return false;
       }
@@ -55,30 +56,32 @@
   }
 
 
-  fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
+  
+export function ObjectStatefulMixinGenerator(Klass) {
+  return class ObjectStatefulMixin extends Klass {
 
     /**
      * Returns true if object state (one of its state properties) was changed
      * @param {String} [propertySet] optional name for the set of property we want to save
      * @return {Boolean} true if instance' state has changed since `{@link fabric.Object#saveState}` was called
      */
-    hasStateChanged: function(propertySet) {
+    hasStateChanged(propertySet) {
       propertySet = propertySet || originalSet;
       var dashedPropertySet = '_' + propertySet;
       if (Object.keys(this[dashedPropertySet]).length < this[propertySet].length) {
         return true;
       }
       return !_isEqual(this[dashedPropertySet], this, true);
-    },
+    }
 
     /**
      * Saves state of an object
      * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
      * @return {fabric.Object} thisArg
      */
-    saveState: function(options) {
+    saveState(options) {
       var propertySet = options && options.propertySet || originalSet,
-          destination = '_' + propertySet;
+        destination = '_' + propertySet;
       if (!this[destination]) {
         return this.setupState(options);
       }
@@ -87,20 +90,23 @@
         saveProps(this, destination, options.stateProperties);
       }
       return this;
-    },
+    }
 
     /**
      * Setups state of an object
      * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
      * @return {fabric.Object} thisArg
      */
-    setupState: function(options) {
-      options = options || { };
+    setupState(options) {
+      options = options || {};
       var propertySet = options.propertySet || originalSet;
       options.propertySet = propertySet;
-      this['_' + propertySet] = { };
+      this['_' + propertySet] = {};
       this.saveState(options);
       return this;
     }
-  });
-})(typeof exports !== 'undefined' ? exports : window);
+  }
+}
+
+fabric.Object = ObjectStatefulMixinGenerator(fabric.Object);
+
