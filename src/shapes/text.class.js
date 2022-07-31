@@ -343,6 +343,11 @@
     __charBounds: [],
 
     /**
+     * When exporting toObject, if true, choose a more compact style representation.
+     */
+    reduceStyleOutput: false,
+
+    /**
      * use this size when measuring text. To avoid IE11 rounding errors
      * @type {Number}
      * @default
@@ -1510,7 +1515,8 @@
     toObject: function(propertiesToInclude) {
       var allProperties = additionalProps.concat(propertiesToInclude);
       var obj = this.callSuper('toObject', allProperties);
-      obj.styles = fabric.util.stylesToArray(this.styles, this.text);
+      obj.styles = this.reduceStyleOutput ?
+        fabric.util.stylesToArray(this.styles, this.text) : clone(this.styles, true);
       if (obj.path) {
         obj.path = this.path.toObject();
       }
