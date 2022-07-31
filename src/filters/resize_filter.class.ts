@@ -1,11 +1,6 @@
 //@ts-nocheck
-
-import { WebglFilterBackend } from "./webgl_backend.class"
-
-
-
-
-var fabric = global.fabric || (global.fabric = {})
+import { BaseFilter } from "./base_filter.class";
+import { WebglFilterBackend } from "./webgl_backend.class";
 
 const pow = Math.pow, floor = Math.floor,
   sqrt = Math.sqrt, abs = Math.abs, round = Math.round, sin = Math.sin,
