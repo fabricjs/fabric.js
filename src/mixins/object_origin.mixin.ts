@@ -4,7 +4,6 @@ import { Point } from "../point.class";
 import { degreesToRadians } from "../util";
 
 
-var fabric = global.fabric;
 const originXOffset = {
   left: -0.5,
   center: 0,

@@ -1,8 +1,8 @@
 import { fabric } from './HEADER';
 // import './lib/event'), // optional gestures
-import './src/mixins/observable.mixin';
-import './src/mixins/collection.mixin';
-import './src/mixins/common_methods.mixin';
+// import './src/mixins/observable.mixin';
+// import './src/mixins/collection.mixin';
+// import './src/mixins/common_methods.mixin';
 import './src/util/misc';
 // import './src/util/named_accessors.mixin'; i would imagine dead forever or proper setters/getters
 import './src/util/path';
@@ -62,6 +62,7 @@ import { FabricObject, FabricObject as Object } from './src/shapes/object.class'
 
 fabric.Object = Object;
 import { ObjectOriginMixinGenerator } from './src/mixins/object_origin.mixin';
+fabric.Object = ObjectOriginMixinGenerator(fabric.Object);
 import { ObjectGeometryMixinGenerator } from './src/mixins/object_geometry.mixin';
 fabric.Object = ObjectGeometryMixinGenerator(fabric.Object);
 import { ObjectAncestryMixinGenerator } from './src/mixins/object_ancestry.mixin';
