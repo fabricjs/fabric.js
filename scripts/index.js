@@ -91,7 +91,7 @@ function build(options = {}) {
     //     `exclude=${options.exclude.join(',')}`
     // ]
     const args = ['npm run', 'build-rollup'];
-    cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd, env: { MINIFY: Number(!options.fast) } });
+    cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd, env: { ...process.env, MINIFY: Number(!options.fast) } });
 }
 
 function startWebsite() {
