@@ -1,10 +1,17 @@
 //@ts-nocheck
 
-import { VERSION } from '../../context';
-import { RUNNING_ANIMATIONS } from '../util/animate';
 import { browserShadowBlurConstant, maxCacheSideLimit, minCacheSideLimit, NUM_FRACTION_DIGITS } from '../config';
-import { ALIASING_LIMIT, devicePixelRatio, iMatrix, isLikelyNode, uid } from '../constants';
+import { ALIASING_LIMIT, cacheProperties, devicePixelRatio, iMatrix, isLikelyNode, stateProperties } from '../constants';
+import { VERSION } from '../context';
+import { applyMixins } from '../mixins';
 import { CommonMethods } from '../mixins/common_methods.mixin';
+import { ObjectSVGExportMixinGenerator } from '../mixins/object.svg_export';
+import { ObjectAncestryMixinGenerator } from '../mixins/object_ancestry.mixin';
+import { ObjectGeometryMixinGenerator } from '../mixins/object_geometry.mixin';
+import { ObjectInteractivityMixinGenerator } from '../mixins/object_interactivity.mixin'; // optional interaction
+import { ObjectOriginMixinGenerator } from '../mixins/object_origin.mixin';
+import { ObjectStackingMixinGenerator } from '../mixins/object_stacking.mixin';
+import { ObjectStatefulMixinGenerator } from '../mixins/stateful.mixin';
 import { Point } from '../point.class';
 import { StaticCanvas } from '../static_canvas.class';
 import {
@@ -12,8 +19,8 @@ import {
   qrDecompose, resetObjectTransform, saveObjectTransform, toDataURL, toFixed,
   transformPoint
 } from '../util';
-import { Image } from './image.class';
-import { Text } from './text.class';
+import { RUNNING_ANIMATIONS } from '../util/animate';
+//import { Image } from './image.class';
 
 const objectCaching = !isLikelyNode;
 
@@ -51,7 +58,7 @@ const objectCaching = !isLikelyNode;
  * @fires dragleave
  * @fires drop
  */
-export class FabricObject extends CommonMethods {
+class FabricObjectBase extends CommonMethods {
 
   /**
    * Type of an object (rect, circle, path, etc.).
@@ -589,12 +596,7 @@ export class FabricObject extends CommonMethods {
    * as well as for history (undo/redo) purposes
    * @type Array
    */
-  stateProperties = (
-    'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
-    'stroke strokeWidth strokeDashArray strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit ' +
-    'angle opacity fill globalCompositeOperation shadow visible backgroundColor ' +
-    'skewX skewY fillRule paintFirst clipPath strokeUniform'
-  ).split(' ')
+  stateProperties = stateProperties
 
   /**
    * List of properties to consider when checking if cache needs refresh
@@ -603,10 +605,7 @@ export class FabricObject extends CommonMethods {
    * and refreshed at the next render
    * @type Array
    */
-  cacheProperties = (
-    'fill stroke strokeWidth strokeDashArray width height paintFirst strokeUniform' +
-    ' strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit backgroundColor clipPath'
-  ).split(' ')
+  cacheProperties = cacheProperties
 
   /**
    * List of properties to consider for animating colors.
@@ -651,6 +650,7 @@ export class FabricObject extends CommonMethods {
    * @param {object} [options] Options object
    */
   constructor(options) {
+    super();
     if (options) {
       this.setOptions(options);
     }
@@ -744,6 +744,44 @@ export class FabricObject extends CommonMethods {
   }
 
   /**
+   * @private
+   */
+  _shouldRedrawCache(dims) {
+    var width = dims.width, height = dims.height,
+      zoomX = dims.zoomX, zoomY = dims.zoomY,
+      dimensionsChanged = width !== this.cacheWidth || height !== this.cacheHeight,
+      zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY,
+      shouldRedraw = dimensionsChanged || zoomChanged;
+
+    return shouldRedraw;
+  }
+
+  /**
+   * @private
+   */
+  _shouldResizeCache(dims) {
+    var minCacheSize = minCacheSideLimit,
+      width = dims.width, height = dims.height,
+      dimensionsChanged = width !== this.cacheWidth || height !== this.cacheHeight,
+      additionalWidth = 0, additionalHeight = 0, shouldResizeCanvas = false;
+    if (dimensionsChanged) {
+      var canvasWidth = this._cacheCanvas.width,
+        canvasHeight = this._cacheCanvas.height,
+        sizeGrowing = width > canvasWidth || height > canvasHeight,
+        sizeShrinking = (width < canvasWidth * 0.9 || height < canvasHeight * 0.9) &&
+          canvasWidth > minCacheSize && canvasHeight > minCacheSize;
+      shouldResizeCanvas = sizeGrowing || sizeShrinking;
+      if (sizeGrowing && !dims.capped && (width > minCacheSize || height > minCacheSize)) {
+        additionalWidth = width * 0.1;
+        additionalHeight = height * 0.1;
+      }
+    }
+    return shouldResizeCanvas ?
+      new Point(additionalWidth, additionalHeight) :
+      new Point();
+  }
+
+  /**
    * Update width and height of the canvas for cache
    * returns true or false if canvas needed resize.
    * @private
@@ -760,35 +798,15 @@ export class FabricObject extends CommonMethods {
     }
     var canvas = this._cacheCanvas,
       dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-      minCacheSize = minCacheSideLimit,
       width = dims.width, height = dims.height, drawingWidth, drawingHeight,
       zoomX = dims.zoomX, zoomY = dims.zoomY,
-      dimensionsChanged = width !== this.cacheWidth || height !== this.cacheHeight,
-      zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY,
-      shouldRedraw = dimensionsChanged || zoomChanged,
-      additionalWidth = 0, additionalHeight = 0, shouldResizeCanvas = false;
-    if (dimensionsChanged) {
-      var canvasWidth = this._cacheCanvas.width,
-        canvasHeight = this._cacheCanvas.height,
-        sizeGrowing = width > canvasWidth || height > canvasHeight,
-        sizeShrinking = (width < canvasWidth * 0.9 || height < canvasHeight * 0.9) &&
-          canvasWidth > minCacheSize && canvasHeight > minCacheSize;
-      shouldResizeCanvas = sizeGrowing || sizeShrinking;
-      if (sizeGrowing && !dims.capped && (width > minCacheSize || height > minCacheSize)) {
-        additionalWidth = width * 0.1;
-        additionalHeight = height * 0.1;
-      }
-    }
-    if (this instanceof Text && this.path) {
-      shouldRedraw = true;
-      shouldResizeCanvas = true;
-      additionalWidth += this.getHeightOfLine(0) * this.zoomX;
-      additionalHeight += this.getHeightOfLine(0) * this.zoomY;
-    }
+      shouldRedraw = this._shouldRedrawCache(dims),
+      additionalSize = this._shouldResizeCache(dims);
+
     if (shouldRedraw) {
-      if (shouldResizeCanvas) {
-        canvas.width = Math.ceil(width + additionalWidth);
-        canvas.height = Math.ceil(height + additionalHeight);
+      if (additionalSize.x > 0 || additionalSize.y > 0) {
+        canvas.width = Math.ceil(width + additionalSize.x);
+        canvas.height = Math.ceil(height + additionalSize.y);
       }
       else {
         this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
@@ -834,41 +852,39 @@ export class FabricObject extends CommonMethods {
    * @return {object} Object representation of an instance
    */
   toObject(propertiesToInclude) {
-    var NUM_FRACTION_DIGITS = FabricObject.NUM_FRACTION_DIGITS,
-
-      object = {
-        type: this.type,
-        version: VERSION,
-        originX: this.originX,
-        originY: this.originY,
-        left: toFixed(this.left, NUM_FRACTION_DIGITS),
-        top: toFixed(this.top, NUM_FRACTION_DIGITS),
-        width: toFixed(this.width, NUM_FRACTION_DIGITS),
-        height: toFixed(this.height, NUM_FRACTION_DIGITS),
-        fill: (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
-        stroke: (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
-        strokeWidth: toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
-        strokeDashArray: this.strokeDashArray ? this.strokeDashArray.concat() : this.strokeDashArray,
-        strokeLineCap: this.strokeLineCap,
-        strokeDashOffset: this.strokeDashOffset,
-        strokeLineJoin: this.strokeLineJoin,
-        strokeUniform: this.strokeUniform,
-        strokeMiterLimit: toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
-        scaleX: toFixed(this.scaleX, NUM_FRACTION_DIGITS),
-        scaleY: toFixed(this.scaleY, NUM_FRACTION_DIGITS),
-        angle: toFixed(this.angle, NUM_FRACTION_DIGITS),
-        flipX: this.flipX,
-        flipY: this.flipY,
-        opacity: toFixed(this.opacity, NUM_FRACTION_DIGITS),
-        shadow: (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
-        visible: this.visible,
-        backgroundColor: this.backgroundColor,
-        fillRule: this.fillRule,
-        paintFirst: this.paintFirst,
-        globalCompositeOperation: this.globalCompositeOperation,
-        skewX: toFixed(this.skewX, NUM_FRACTION_DIGITS),
-        skewY: toFixed(this.skewY, NUM_FRACTION_DIGITS),
-      };
+    const object = {
+      type: this.type,
+      version: VERSION,
+      originX: this.originX,
+      originY: this.originY,
+      left: toFixed(this.left, NUM_FRACTION_DIGITS),
+      top: toFixed(this.top, NUM_FRACTION_DIGITS),
+      width: toFixed(this.width, NUM_FRACTION_DIGITS),
+      height: toFixed(this.height, NUM_FRACTION_DIGITS),
+      fill: (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
+      stroke: (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
+      strokeWidth: toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
+      strokeDashArray: this.strokeDashArray ? this.strokeDashArray.concat() : this.strokeDashArray,
+      strokeLineCap: this.strokeLineCap,
+      strokeDashOffset: this.strokeDashOffset,
+      strokeLineJoin: this.strokeLineJoin,
+      strokeUniform: this.strokeUniform,
+      strokeMiterLimit: toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
+      scaleX: toFixed(this.scaleX, NUM_FRACTION_DIGITS),
+      scaleY: toFixed(this.scaleY, NUM_FRACTION_DIGITS),
+      angle: toFixed(this.angle, NUM_FRACTION_DIGITS),
+      flipX: this.flipX,
+      flipY: this.flipY,
+      opacity: toFixed(this.opacity, NUM_FRACTION_DIGITS),
+      shadow: (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
+      visible: this.visible,
+      backgroundColor: this.backgroundColor,
+      fillRule: this.fillRule,
+      paintFirst: this.paintFirst,
+      globalCompositeOperation: this.globalCompositeOperation,
+      skewX: toFixed(this.skewX, NUM_FRACTION_DIGITS),
+      skewY: toFixed(this.skewY, NUM_FRACTION_DIGITS),
+    };
 
     if (this.clipPath && !this.clipPath.excludeFromExport) {
       object.clipPath = this.clipPath.toObject(propertiesToInclude);
@@ -1640,7 +1656,7 @@ export class FabricObject extends CommonMethods {
    */
   cloneAsImage(options) {
     var canvasEl = this.toCanvasElement(options);
-    return new Image(canvasEl);
+    //return new Image(canvasEl);
   }
 
   /**
@@ -1909,8 +1925,8 @@ export class FabricObject extends CommonMethods {
   static _fromObject(klass, object, options) {
     var serializedObject = clone(object, true);
     return enlivenObjectEnlivables(serializedObject, options).then(function (enlivedMap) {
-      var newObject = Object.assign(object, enlivedMap);
-      return options && options.extraParam ? new klass(object[options.extraParam], newObject) : new klass(newObject);
+      var opts = { ...object, ...enlivedMap };
+      return options?.extraParam ? new klass(object[options.extraParam], opts) : new klass(opts);
     });
   };
 
@@ -1924,17 +1940,21 @@ export class FabricObject extends CommonMethods {
    * @returns {Promise<FabricObject>}
    */
   static fromObject(object, options) {
-    return FabricObject._fromObject(FabricObject, object, options);
+    return FabricObjectBase._fromObject(this.constructor, object, options);
   };
 
-  /**
-   * Unique id used internally when creating SVG elements
-   * @static
-   * @memberOf FabricObject
-   * @type Number
-   */
-  static __uid = uid;
 }
+
+export const FabricObject = applyMixins(FabricObjectBase, [
+  ObjectOriginMixinGenerator,
+  ObjectGeometryMixinGenerator,
+  ObjectAncestryMixinGenerator,
+  ObjectStackingMixinGenerator,
+  ObjectSVGExportMixinGenerator,
+  ObjectStatefulMixinGenerator,
+  ObjectInteractivityMixinGenerator
+]);
+
 
 
 

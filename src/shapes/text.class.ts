@@ -3,6 +3,7 @@
 import { charWidthsCache } from '../cache';
 import { cacheProperties, DEFAULT_SVG_FONT_SIZE, isLikelyNode, SHARED_ATTRIBUTES, stateProperties } from '../constants';
 import { TextStyleMixinGenerator } from '../mixins/text_style.mixin'; // optional Text
+import { Point } from '../point.class';
 import { createCanvasElement, graphemeSplit, hasStyleChanged, stylesFromArray, stylesToArray } from '../util';
 import { parseAttributes } from "../_parser";
 import { FabricObject } from './object.class';
@@ -374,6 +375,16 @@ export class TextBase extends FabricObject {
     this.initDimensions();
     this.setCoords();
     this.setupState({ propertySet: '_dimensionAffectingProps' });
+  }
+
+  _shouldRedrawCache(dims) {
+    return super._shouldRedrawCache(dims) || this.path;
+  }
+
+  _shouldResizeCache(dims) {
+    var lineHeight = this.getHeightOfLine(0);
+    return super._shouldResizeCache(dims)
+      .add(this.path ? new Point(this.zoomX, this.zoomY).scalarMultiply(lineHeight) : new Point());
   }
 
   /**
