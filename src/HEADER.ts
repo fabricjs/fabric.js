@@ -2,7 +2,7 @@
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 import cache from './cache';
 import config from './config';
-import constants from './constants';
+import * as constants from './constants';
 import { context } from './context';
 import { fabric } from './main';
 
