@@ -1,6 +1,5 @@
 //@ts-nocheck
 
-import { FabricObject } from "./shapes/object.class";
 import { VERSION } from '../context';
 import { NUM_FRACTION_DIGITS } from './config';
 import { devicePixelRatio, fontPaths, iMatrix, incrementUID, isLikelyNode } from './constants';
@@ -8,6 +7,8 @@ import { CanvasDataURLExporterMixinGenerator } from "./mixins/canvas_dataurl_exp
 import { CollectionMixinGenerator } from "./mixins/collection.mixin";
 import { CommonMethods } from "./mixins/common_methods.mixin";
 import { NodeCanvasStreamsMixinGenerator } from "./mixins/node_canvas_streams.mixin";
+import { Point } from "./point.class";
+import { FabricObject } from "./shapes/object.class";
 import {
   addClass, cancelAnimFrame, cleanUpJsdomNode, createCanvasElement, getById, getElementOffset, invertTransform, matrixToSVG, populateWithProperties, removeFromArray, requestAnimFrame, setImageSmoothing, toFixed,
   transformPoint
