@@ -1,3 +1,4 @@
+import config from '../config';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { cos } from './cos';
 (function (global) {
@@ -1030,7 +1031,7 @@ import { cos } from './cos';
      */
     matrixToSVG: function (transform) {
       return 'matrix(' + transform.map(function (value) {
-        return fabric.util.toFixed(value, fabric.Object.NUM_FRACTION_DIGITS);
+        return fabric.util.toFixed(value, config.NUM_FRACTION_DIGITS);
       }).join(' ') + ')';
     },
 

@@ -1,9 +1,11 @@
 //@ts-nocheck
-
+import config from './config';
 import { Color } from "./color";
 import { incrementUID } from "./constants";
 import { Point } from "./point.class";
 import { degreesToRadians, rotateVector, toFixed } from "./util";
+
+const { NUM_FRACTION_DIGITS } = config;
 
 /**
 * Regex matching shadow offsetX, offsetY and blur (ex: "2px 2px 10px rgba(0,0,0,0.2)", "rgb(0,255,0) 2px 2px")
@@ -97,8 +99,8 @@ export class Shadow {
    */
   _parseShadow(shadow) {
     var shadowStr = shadow.trim(),
-      offsetsAndBlur = Shadow.reOffsetsAndBlur.exec(shadowStr) || [],
-      color = shadowStr.replace(Shadow.reOffsetsAndBlur, '') || 'rgb(0,0,0)';
+      offsetsAndBlur = reOffsetsAndBlur.exec(shadowStr) || [],
+      color = shadowStr.replace(reOffsetsAndBlur, '') || 'rgb(0,0,0)';
 
     return {
       color: color.trim(),

@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { NUM_FRACTION_DIGITS } from './config';
+import config from './config';
 import { incrementUID } from './constants';
 import {
   loadImage, populateWithProperties, toFixed
@@ -89,8 +89,8 @@ export class Pattern {
       source: source,
       repeat: this.repeat,
       crossOrigin: this.crossOrigin,
-      offsetX: toFixed(this.offsetX, NUM_FRACTION_DIGITS),
-      offsetY: toFixed(this.offsetY, NUM_FRACTION_DIGITS),
+      offsetX: toFixed(this.offsetX, config.NUM_FRACTION_DIGITS),
+      offsetY: toFixed(this.offsetY, config.NUM_FRACTION_DIGITS),
       patternTransform: this.patternTransform ? this.patternTransform.concat() : null
     };
     populateWithProperties(this, object, propertiesToInclude);

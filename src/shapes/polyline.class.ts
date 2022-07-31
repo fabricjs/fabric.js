@@ -1,5 +1,6 @@
 //@ts-nocheck
 
+import config from '../config';
 import { cacheProperties, SHARED_ATTRIBUTES } from '../constants';
 import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
@@ -173,7 +174,7 @@ export class Polyline extends FabricObject {
    */
   _toSVG() {
     var points = [], diffX = this.pathOffset.x, diffY = this.pathOffset.y,
-      NUM_FRACTION_DIGITS = FabricObject.NUM_FRACTION_DIGITS;
+      NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
 
     for (var i = 0, len = this.points.length; i < len; i++) {
       points.push(

@@ -4,7 +4,7 @@
 import { Color } from "../color";
 import { toFixed } from "../util";
 
-import { NUM_FRACTION_DIGITS } from '../config';
+import config from '../config';
 import {
   escapeXml, hasStyleChanged
 } from '../util';
@@ -111,11 +111,11 @@ export function ITextSVGExportMixinGenerator(Klass) {
         fillStyles = styleProps ? 'style="' + styleProps + '"' : '',
         dy = styleDecl.deltaY, dySpan = '';
       if (dy) {
-        dySpan = ' dy="' + toFixed(dy, NUM_FRACTION_DIGITS) + '" ';
+        dySpan = ' dy="' + toFixed(dy, config.NUM_FRACTION_DIGITS) + '" ';
       }
       return [
-        '<tspan x="', toFixed(left, NUM_FRACTION_DIGITS), '" y="',
-        toFixed(top, NUM_FRACTION_DIGITS), '" ', dySpan,
+        '<tspan x="', toFixed(left, config.NUM_FRACTION_DIGITS), '" y="',
+        toFixed(top, config.NUM_FRACTION_DIGITS), '" ', dySpan,
         fillStyles, '>',
         escapeXml(_char),
         '</tspan>'
@@ -178,13 +178,13 @@ export function ITextSVGExportMixinGenerator(Klass) {
         '\t\t<rect ',
         this._getFillAttributes(color),
         ' x="',
-        toFixed(left, NUM_FRACTION_DIGITS),
+        toFixed(left, config.NUM_FRACTION_DIGITS),
         '" y="',
-        toFixed(top, NUM_FRACTION_DIGITS),
+        toFixed(top, config.NUM_FRACTION_DIGITS),
         '" width="',
-        toFixed(width, NUM_FRACTION_DIGITS),
+        toFixed(width, config.NUM_FRACTION_DIGITS),
         '" height="',
-        toFixed(height, NUM_FRACTION_DIGITS),
+        toFixed(height, config.NUM_FRACTION_DIGITS),
         '"></rect>\n');
     }
 

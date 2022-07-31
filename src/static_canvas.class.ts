@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { NUM_FRACTION_DIGITS } from './config';
+import config from './config';
 import { devicePixelRatio, fontPaths, iMatrix, incrementUID, isLikelyNode } from './constants';
 import { VERSION } from './context';
 import { applyMixins } from './mixins/apply_mixins';
@@ -1212,10 +1212,10 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
       if (this.svgViewportTransformation) {
         vpt = this.viewportTransform;
         viewBox = 'viewBox="' +
-          toFixed(-vpt[4] / vpt[0], NUM_FRACTION_DIGITS) + ' ' +
-          toFixed(-vpt[5] / vpt[3], NUM_FRACTION_DIGITS) + ' ' +
-          toFixed(this.width / vpt[0], NUM_FRACTION_DIGITS) + ' ' +
-          toFixed(this.height / vpt[3], NUM_FRACTION_DIGITS) + '" ';
+          toFixed(-vpt[4] / vpt[0], config.NUM_FRACTION_DIGITS) + ' ' +
+          toFixed(-vpt[5] / vpt[3], config.NUM_FRACTION_DIGITS) + ' ' +
+          toFixed(this.width / vpt[0], config.NUM_FRACTION_DIGITS) + ' ' +
+          toFixed(this.height / vpt[3], config.NUM_FRACTION_DIGITS) + '" ';
       }
     }
 

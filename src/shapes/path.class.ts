@@ -1,4 +1,5 @@
 //@ts-nocheck
+import config from '../config';
 import { cacheProperties, SHARED_ATTRIBUTES, stateProperties } from '../constants';
 import { parseAttributes } from '../parser/parseAttributes';
 import {
@@ -192,7 +193,7 @@ export class Path extends FabricObject {
   }
 
   _getOffsetTransform() {
-    var digits = FabricObject.NUM_FRACTION_DIGITS;
+    var digits = config.NUM_FRACTION_DIGITS;
     return ' translate(' + toFixed(-this.pathOffset.x, digits) + ', ' +
       toFixed(-this.pathOffset.y, digits) + ')';
   }

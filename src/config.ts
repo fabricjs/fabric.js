@@ -13,13 +13,13 @@
 * @type Number
 * @default 1
 */
-export let browserShadowBlurConstant = 1;
+let browserShadowBlurConstant = 1;
 
 
 /**
  * Pixel per Inch as a default value set to 96. Can be changed for more realistic conversion.
  */
-export let DPI = 96;
+let DPI = 96;
 
 /**
  * Pixel limit for cache canvases. 1Mpx , 4Mpx should be fine.
@@ -27,7 +27,7 @@ export let DPI = 96;
  * @type Number
  * @default
  */
-export let perfLimitSizeTotal = 2097152;
+let perfLimitSizeTotal = 2097152;
 
 /**
  * Pixel limit for cache canvases width or height. IE fixes the maximum at 5000
@@ -35,7 +35,7 @@ export let perfLimitSizeTotal = 2097152;
  * @type Number
  * @default
  */
-export let maxCacheSideLimit = 4096;
+let maxCacheSideLimit = 4096;
 
 /**
  * Lowest pixel limit for cache canvases, set at 256PX
@@ -43,7 +43,7 @@ export let maxCacheSideLimit = 4096;
  * @type Number
  * @default
  */
-export let minCacheSideLimit = 256;
+let minCacheSideLimit = 256;
 
 /**
  * if webgl is enabled and available, textureSize will determine the size
@@ -52,7 +52,7 @@ export let minCacheSideLimit = 256;
  * @type Number
  * @default
  */
-export let textureSize = 2048;
+let textureSize = 2048;
 
 /**
  * When 'true', style information is not retained when copy/pasting text, making
@@ -61,7 +61,7 @@ export let textureSize = 2048;
  * @type Boolean
  * @default
  */
-export let disableStyleCopyPaste = false;
+let disableStyleCopyPaste = false;
 
 /**
  * Enable webgl for filtering picture is available
@@ -71,14 +71,14 @@ export let disableStyleCopyPaste = false;
  * @type Boolean
  * @default
  */
-export let enableGLFiltering = true;
+let enableGLFiltering = true;
 
 
 /**
  * If disabled boundsOfCurveCache is not used. For apps that make heavy usage of pencil drawing probably disabling it is better
  * @default true
  */
-export let cachesBoundsOfCurve = true;
+let cachesBoundsOfCurve = true;
 
 /**
  * Skip performance testing of setupGLContext and force the use of putImageData that seems to be the one that works best on
@@ -87,9 +87,9 @@ export let cachesBoundsOfCurve = true;
  * @type Boolean
  * @default false
  */
-export let forceGLPutImageData = false;
+let forceGLPutImageData = false;
 
-export let NUM_FRACTION_DIGITS = 2;
+let NUM_FRACTION_DIGITS = 2;
 
 export default {
     DPI,

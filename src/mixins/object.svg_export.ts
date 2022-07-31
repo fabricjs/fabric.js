@@ -2,7 +2,7 @@
 /* _TO_SVG_START_ */
 
 import { Color } from '../color';
-import { NUM_FRACTION_DIGITS } from '../config';
+import config from '../config';
 import { incrementUID } from '../constants';
 import { matrixToSVG, toFixed } from "../util";
 
@@ -149,13 +149,13 @@ export function ObjectSVGExportMixinGenerator(Klass) {
           '\t\t<rect ',
           this._getFillAttributes(this.backgroundColor),
           ' x="',
-          toFixed(-this.width / 2, NUM_FRACTION_DIGITS),
+          toFixed(-this.width / 2, config.NUM_FRACTION_DIGITS),
           '" y="',
-          toFixed(-this.height / 2, NUM_FRACTION_DIGITS),
+          toFixed(-this.height / 2, config.NUM_FRACTION_DIGITS),
           '" width="',
-          toFixed(this.width, NUM_FRACTION_DIGITS),
+          toFixed(this.width, config.NUM_FRACTION_DIGITS),
           '" height="',
-          toFixed(this.height, NUM_FRACTION_DIGITS),
+          toFixed(this.height, config.NUM_FRACTION_DIGITS),
           '"></rect>\n');
       }
     }

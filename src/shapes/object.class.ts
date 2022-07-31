@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { browserShadowBlurConstant, maxCacheSideLimit, minCacheSideLimit, NUM_FRACTION_DIGITS } from '../config';
+import config from '../config';
 import { ALIASING_LIMIT, cacheProperties, devicePixelRatio, iMatrix, isLikelyNode, stateProperties } from '../constants';
 import { VERSION } from '../context';
 import { applyMixins } from '../mixins/apply_mixins';
@@ -23,6 +23,7 @@ import {
 import { RUNNING_ANIMATIONS } from '../util/animate';
 //import { Image } from './image.class';
 
+const { browserShadowBlurConstant, maxCacheSideLimit, minCacheSideLimit, NUM_FRACTION_DIGITS } = config;
 const objectCaching = !isLikelyNode;
 
 /**
