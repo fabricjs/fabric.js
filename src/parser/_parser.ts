@@ -3,76 +3,8 @@ import { Color } from '../color';
 import { commaWsp, DEFAULT_SVG_FONT_SIZE, reNum, svgNS } from '../constants';
 import { FabricObject } from '../shapes/object.class';
 import { cos, degreesToRadians, multiplyTransformMatrices, parseUnit, sin, toFixed } from '../util';
-
-export const cssRules = {};
-export const gradientDefs = {};
-export const clipPaths = {};
-
-const reFontDeclaration = new RegExp(
-    '(normal|italic)?\\s*(normal|small-caps)?\\s*' +
-    '(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\\s*(' +
-    reNum +
-    '(?:px|cm|mm|em|pt|pc|in)*)(?:\\/(normal|' + reNum + '))?\\s+(.*)');
-
-const svgValidTagNames = ['path', 'circle', 'polygon', 'polyline', 'ellipse', 'rect', 'line',
-    'image', 'text'], svgViewBoxElements = ['symbol', 'image', 'marker', 'pattern', 'view', 'svg'], svgInvalidAncestors = ['pattern', 'defs', 'symbol', 'metadata', 'clipPath', 'mask', 'desc'], svgValidParents = ['symbol', 'g', 'a', 'svg', 'clipPath', 'defs'], attributesMap = {
-        cx: 'left',
-        x: 'left',
-        r: 'radius',
-        cy: 'top',
-        y: 'top',
-        display: 'visible',
-        visibility: 'visible',
-        transform: 'transformMatrix',
-        'fill-opacity': 'fillOpacity',
-        'fill-rule': 'fillRule',
-        'font-family': 'fontFamily',
-        'font-size': 'fontSize',
-        'font-style': 'fontStyle',
-        'font-weight': 'fontWeight',
-        'letter-spacing': 'charSpacing',
-        'paint-order': 'paintFirst',
-        'stroke-dasharray': 'strokeDashArray',
-        'stroke-dashoffset': 'strokeDashOffset',
-        'stroke-linecap': 'strokeLineCap',
-        'stroke-linejoin': 'strokeLineJoin',
-        'stroke-miterlimit': 'strokeMiterLimit',
-        'stroke-opacity': 'strokeOpacity',
-        'stroke-width': 'strokeWidth',
-        'text-decoration': 'textDecoration',
-        'text-anchor': 'textAnchor',
-        opacity: 'opacity',
-        'clip-path': 'clipPath',
-        'clip-rule': 'clipRule',
-        'vector-effect': 'strokeUniform',
-        'image-rendering': 'imageSmoothing',
-    }, colorAttributes = {
-        stroke: 'strokeOpacity',
-        fill: 'fillOpacity'
-    }, fSize = 'font-size', cPath = 'clip-path';
-export const svgValidTagNamesRegEx = getSvgRegex(svgValidTagNames);
-export const svgViewBoxElementsRegEx = getSvgRegex(svgViewBoxElements);
-export const svgInvalidAncestorsRegEx = getSvgRegex(svgInvalidAncestors);
-export const svgValidParentsRegEx = getSvgRegex(svgValidParents);
-
-
-export function parseStyleAttribute(element) {
-    var oStyle = {}, style = element.getAttribute('style');
-
-    if (!style) {
-        return oStyle;
-    }
-
-    if (typeof style === 'string') {
-        parseStyleString(style, oStyle);
-    }
-    else {
-        parseStyleObject(style, oStyle);
-    }
-
-    return oStyle;
-}
-
+import { reFontDeclaration, attributesMap, colorAttributes, svgValidParentsRegEx, cPath, fSize, cssRules, svgViewBoxElementsRegEx, reViewBoxAttrValue } from './constants';
+import { parseStyleAttribute } from './parseStyleAttribute';
 
 export function parseFontDeclaration(value, oStyle) {
     var match = value.match(reFontDeclaration);
@@ -101,14 +33,14 @@ export function parseFontDeclaration(value, oStyle) {
         oStyle.lineHeight = lineHeight === 'normal' ? 1 : lineHeight;
     }
 }
-function normalizeAttr(attr) {
+export function normalizeAttr(attr) {
     // transform attribute names
     if (attr in attributesMap) {
         return attributesMap[attr];
     }
     return attr;
 }
-function normalizeValue(attr, value, parentAttributes, fontSize) {
+export function normalizeValue(attr, value, parentAttributes, fontSize) {
     var isArray = Array.isArray(value), parsed;
 
     if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
@@ -180,14 +112,14 @@ function normalizeValue(attr, value, parentAttributes, fontSize) {
 /**
   * @private
   */
-function getSvgRegex(arr) {
+export function getSvgRegex(arr) {
     return new RegExp('^(' + arr.join('|') + ')\\b', 'i');
 }
 /**
  * @private
  * @param {Object} attributes Array of attributes to parse
  */
-function _setStrokeFillOpacity(attributes) {
+export function setStrokeFillOpacity(attributes) {
     for (var attr in colorAttributes) {
 
         if (typeof attributes[colorAttributes[attr]] === 'undefined' || attributes[attr] === '') {
@@ -249,7 +181,7 @@ export function parsePointsAttribute(points) {
     // }
     return parsedPoints;
 }
-function rotateMatrix(matrix, args) {
+export function rotateMatrix(matrix, args) {
     var cosValue = cos(args[0]), sinValue = sin(args[0]), x = 0, y = 0;
     if (args.length === 3) {
         x = args[1];
@@ -263,16 +195,16 @@ function rotateMatrix(matrix, args) {
     matrix[4] = x - (cosValue * x - sinValue * y);
     matrix[5] = y - (sinValue * x + cosValue * y);
 }
-function scaleMatrix(matrix, args) {
+export function scaleMatrix(matrix, args) {
     var multiplierX = args[0], multiplierY = (args.length === 2) ? args[1] : args[0];
 
     matrix[0] = multiplierX;
     matrix[3] = multiplierY;
 }
-function skewMatrix(matrix, args, pos) {
+export function skewMatrix(matrix, args, pos) {
     matrix[pos] = Math.tan(degreesToRadians(args[0]));
 }
-function translateMatrix(matrix, args) {
+export function translateMatrix(matrix, args) {
     matrix[4] = args[0];
     if (args.length === 2) {
         matrix[5] = args[1];
@@ -414,7 +346,7 @@ export function parseAttributes(element, attributes, svgUid) {
         parseFontDeclaration(normalizedStyle.font, normalizedStyle);
     }
     var mergedAttrs = Object.assign(parentAttributes, normalizedStyle);
-    return svgValidParentsRegEx.test(element.nodeName) ? mergedAttrs : _setStrokeFillOpacity(mergedAttrs);
+    return svgValidParentsRegEx.test(element.nodeName) ? mergedAttrs : setStrokeFillOpacity(mergedAttrs);
 }
 
 /**
@@ -600,16 +532,6 @@ export function parseUseDirectives(doc) {
 }
 
 
-// http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
-// matches, e.g.: +14.56e-12, etc.
-export const reViewBoxAttrValue = new RegExp(
-    '^' +
-    '\\s*(' + reNum + '+)\\s*,?' +
-    '\\s*(' + reNum + '+)\\s*,?' +
-    '\\s*(' + reNum + '+)\\s*,?' +
-    '\\s*(' + reNum + '+)\\s*' +
-    '$'
-);
 
 /**
  * Add a <g> element that envelop all child elements and makes the viewbox transformMatrix descend on all elements

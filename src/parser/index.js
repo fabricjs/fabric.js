@@ -1,6 +1,8 @@
 import { incrementUID } from '../constants';
 import { extend, toArray } from '../util';
-import { applyViewboxTransform, clipPaths, cssRules, elementById, gradientDefs, hasAncestorWithNodeName, parseAttributes, parseFontDeclaration, parsePointsAttribute, parseStyleAttribute, parseTransformAttribute, parseUseDirectives, svgInvalidAncestorsRegEx, svgValidParentsRegEx, svgValidTagNamesRegEx, svgViewBoxElementsRegEx, _getMultipleNodes } from './_parser';
+import { applyViewboxTransform, elementById, hasAncestorWithNodeName, parseAttributes, parseFontDeclaration, parsePointsAttribute, parseTransformAttribute, parseUseDirectives, _getMultipleNodes } from './_parser';
+import { parseStyleAttribute } from "./parseStyleAttribute";
+import { clipPaths, cssRules, gradientDefs, svgInvalidAncestorsRegEx, svgValidParentsRegEx, svgValidTagNamesRegEx, svgViewBoxElementsRegEx } from "./constants";
 
 
 (function (global) {
