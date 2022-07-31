@@ -55,7 +55,7 @@ fabric.Canvas = CanvasGroupingMixinGenerator(fabric.Canvas);
 import { CanvasGesturesMixinGenerator } from './src/mixins/canvas_gestures.mixin'; // optional gestures
 fabric.Canvas = CanvasGesturesMixinGenerator(fabric.Canvas);
 
-import { FabricObject, ActiveSelection, Circle, Ellipse, Group, Image, Line, Path, Polygon, Polyline, Rect, Triangle } from './src/shapes';
+import { Object as FabricObject, ActiveSelection, Circle, Ellipse, Group, Image, Line, Path, Polygon, Polyline, Rect, Triangle } from './src/shapes';
 fabric.Object = FabricObject;
 fabric.ActiveSelection = ActiveSelection;
 fabric.Circle = Circle;
