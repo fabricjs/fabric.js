@@ -47,6 +47,7 @@ export class Rect extends fabric.Object {
    */
   constructor(options) {
     super(options);
+    this.setOptions(options);
     this._initRxRy();
   }
 
@@ -108,6 +109,7 @@ export class Rect extends fabric.Object {
    * @return {Object} object representation of an instance
    */
   toObject(propertiesToInclude) {
+    console.log(this.rx, this.ry)
     return super.toObject(['rx', 'ry'].concat(propertiesToInclude));
   }
 
