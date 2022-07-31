@@ -4,7 +4,7 @@
 import { Color } from '../color';
 import { NUM_FRACTION_DIGITS } from '../config';
 import { incrementUID } from '../constants';
-import { toFixed } from "../util";
+import { matrixToSVG, toFixed } from "../util";
 
 function getSvgColorString(prop, value) {
   if (!value) {
