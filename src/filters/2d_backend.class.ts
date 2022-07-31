@@ -1,3 +1,6 @@
+//@ts-nocheck
+
+const noop = () => { };
 
 export class Canvas2dFilterBackend {
 

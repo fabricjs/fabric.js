@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { enableGLFiltering, forceGLPutImageData, textureSize } from '../config';
 import { isLikelyNode } from '../constants';
 import {
