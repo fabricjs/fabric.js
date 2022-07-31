@@ -81,7 +81,7 @@ class ICheckbox extends Checkbox {
 inquirer.registerPrompt('test-selection', ICheckbox);
 
 function build(options = {}) {
-    // _.defaults(options, { exclude: ['gestures', 'accessors', 'erasing'] });
+    //  _.defaults(options, { exclude: ['gestures', 'accessors', 'erasing'] });
     // const args = [
     //     `npm run`,
     //     `build.js`,
@@ -91,7 +91,7 @@ function build(options = {}) {
     //     `exclude=${options.exclude.join(',')}`
     // ]
     const args = ['npm run', 'build-rollup'];
-    cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd });
+    cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd, env: { ...process.env, MINIFY: Number(!options.fast) } });
 }
 
 function startWebsite() {

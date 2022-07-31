@@ -10,12 +10,13 @@ export default {
         name: 'fabric',
         format: 'cjs',
     },
-    {
+    Number(process.env.MINIFY) ?
+      {
         file: './dist/fabric.min.js',
         format: 'cjs',
         name: 'fabric',
         plugins: [terser()],
-    },
+      } : null,
   ],
   plugins: [
 		ts({
