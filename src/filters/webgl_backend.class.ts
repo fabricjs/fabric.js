@@ -1,10 +1,12 @@
 //@ts-nocheck
-import { enableGLFiltering, forceGLPutImageData, textureSize } from '../config';
+import config from '../config';
 import { isLikelyNode } from '../constants';
 import {
   createCanvasElement
 } from '../util';
 import { Canvas2dFilterBackend } from './2d_backend.class';
+
+const { enableGLFiltering, forceGLPutImageData, textureSize } = config;
 
 /**
  * Tests if webgl supports certain precision
