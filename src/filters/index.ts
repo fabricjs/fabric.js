@@ -1,3 +1,4 @@
+export * from './2d_backend.class';
 export * from './base_filter.class';
 export * from './blendcolor_filter.class';
 export * from './blendimage_filter.class';
@@ -19,3 +20,5 @@ export * from './removecolor_filter.class';
 export * from './resize_filter.class';
 export * from './saturate_filter.class';
 export * from './vibrance_filter.class';
+export * from './webgl_backend.class';
+
