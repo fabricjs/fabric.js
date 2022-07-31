@@ -1,4 +1,4 @@
-import { version } from '../package.json';
+import { version } from '../../package.json';
 export const VERSION = version;
 
 //import { context as browser } from './browser_context';

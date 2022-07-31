@@ -4,7 +4,7 @@ import json from '@rollup/plugin-json';
 
 // rollup.config.js
 export default {
-  input: ['./index.js'],
+  input: ['./src/index.ts'],
   output: [
     {
       file: './dist/fabric.js',
