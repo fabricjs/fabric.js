@@ -47,7 +47,6 @@ export function isWebglSupported(tileSize) {
       };
     }
   }
-  this.isSupported = isSupported;
   return isSupported;
 };
 
