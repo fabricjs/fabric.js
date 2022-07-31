@@ -1,8 +1,8 @@
 //@ts-nocheck
 
-import { addListener, removeListener } from "../util";
-import { context } from '../../context';
+import { context } from '../context';
 import { fireEvent } from "../controls.actions";
+import { addListener, removeListener } from "../util";
 
 const addEventOptions = { passive: false };
 

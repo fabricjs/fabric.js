@@ -1,8 +1,8 @@
 //@ts-nocheck
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
+import cache from './cache';
+import config from './config';
 import { context } from './context';
-import cache from './src/cache';
-import config from './src/config';
 import { fabric } from './main';
 
 if (typeof exports !== 'undefined') {
@@ -18,3 +18,4 @@ if (context.DOMParser) {
   global.DOMParser = context.DOMParser;
 }
 export { fabric };
+

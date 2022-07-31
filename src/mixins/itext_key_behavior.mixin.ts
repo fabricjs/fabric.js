@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { context } from "../../context";
+import { context } from '../context';
 import { disableStyleCopyPaste } from "../config";
 import { addListener } from "../util";
 
