@@ -61,7 +61,7 @@ import { Text } from './text.class';
  *   Select line:                    triple click
  * </pre>
  */
-export class ITextBase extends Text {
+class ITextBase extends Text {
 
   /**
    * Type of an object

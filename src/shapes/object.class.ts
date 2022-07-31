@@ -20,7 +20,7 @@ import {
   transformPoint
 } from '../util';
 import { RUNNING_ANIMATIONS } from '../util/animate';
-import { Image } from './image.class';
+//import { Image } from './image.class';
 
 const objectCaching = !isLikelyNode;
 
@@ -1656,7 +1656,7 @@ class FabricObjectBase extends CommonMethods {
    */
   cloneAsImage(options) {
     var canvasEl = this.toCanvasElement(options);
-    return new Image(canvasEl);
+    //return new Image(canvasEl);
   }
 
   /**

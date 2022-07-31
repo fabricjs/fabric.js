@@ -13,3 +13,4 @@ export * from './rect.class';
 export * from './text.class';
 export * from './textbox.class';
 export * from './triangle.class';
+

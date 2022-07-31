@@ -1,12 +1,15 @@
 //@ts-nocheck
 import { fabric } from './HEADER';
 // import './lib/event'), // optional gestures
+import * as constants from './constants';
+Object.assign(fabric, constants);
+
 import { Observable } from './mixins/observable.mixin';
 import { CollectionMixinGenerator } from './mixins/collection.mixin';
 import { CommonMethods } from './mixins/common_methods.mixin';
 
 fabric.Observable = Observable;
-fabric.Collection = CollectionMixinGenerator(new class { });
+fabric.Collection = CollectionMixinGenerator(class { });
 fabric.CommonMethods = CommonMethods;
 
 import './util/misc';
@@ -56,23 +59,23 @@ fabric.Canvas = CanvasGroupingMixinGenerator(fabric.Canvas);
 import { CanvasGesturesMixinGenerator } from './mixins/canvas_gestures.mixin'; // optional gestures
 fabric.Canvas = CanvasGesturesMixinGenerator(fabric.Canvas);
 
-//import { Object as FabricObject, ActiveSelection, Circle, Ellipse, Group, Image, Line, Path, Polygon, Polyline, Rect, Triangle } from './src/shapes';
-import { FabricObject } from './shapes/object.class';
+import { Object as FabricObject, ActiveSelection, Circle, Ellipse, Group, Image, Line, Path, Polygon, Polyline, Rect, Triangle, IText, Text, Textbox } from './shapes';
+//import { FabricObject } from './shapes/object.class';
 fabric.Object = FabricObject;
-// fabric.ActiveSelection = ActiveSelection;
-// fabric.Circle = Circle;
-// fabric.Ellipse = Ellipse;
-// fabric.Group = Group;
-// fabric.Image = Image;
-// fabric.Line = Line;
-// fabric.Path = Path;
-// fabric.Polygon = Polygon;
-// fabric.Polyline = Polyline;
-// fabric.Rect = Rect;
-// fabric.Text = Text;
-// fabric.IText = IText;
-// fabric.Textbox = Textbox;
-// fabric.Triangle = Triangle;
+fabric.ActiveSelection = ActiveSelection;
+fabric.Circle = Circle;
+fabric.Ellipse = Ellipse;
+fabric.Group = Group;
+fabric.Image = Image;
+fabric.Line = Line;
+fabric.Path = Path;
+fabric.Polygon = Polygon;
+fabric.Polyline = Polyline;
+fabric.Rect = Rect;
+fabric.Text = Text;
+fabric.IText = IText;
+fabric.Textbox = Textbox;
+fabric.Triangle = Triangle;
 import { ObjectStraighteningMixinGenerator, CanvasObjectStraighteningMixinGenerator } from './mixins/object_straightening.mixin'; // optional objectstraightening
 fabric.Object = ObjectStraighteningMixinGenerator(fabric.Object);
 fabric.StaticCanvas = CanvasObjectStraighteningMixinGenerator(fabric.StaticCanvas);
@@ -89,7 +92,7 @@ FabricObject.prototype.controls = ObjectControls;
 // prototype. The controls are shared as references. So changes to control `tr`
 // can still apply to all objects if needed.
 //  OR STOP USING SHARED OBJECTS!
-Textbox.prototype.controls = TextboxControls;
+fabric.Textbox.prototype.controls = TextboxControls;
 
 import { BaseBrush, CircleBrush, PatternBrush, PencilBrush, SprayBrush } from './brushes'
 fabric.BaseBrush = BaseBrush;

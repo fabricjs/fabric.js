@@ -70,7 +70,7 @@ const _reWords = /\S+/g
  * @extends FabricObject
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  */
-export class TextBase extends FabricObject {
+class TextBase extends FabricObject {
 
   /**
    * Properties which when set cause object to change dimensions
