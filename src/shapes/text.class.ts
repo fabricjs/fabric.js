@@ -15,6 +15,21 @@ const additionalProps =
     ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles' +
     ' direction path pathStartOffset pathSide pathAlign').split(' ');
 
+const styleProperties = [
+  'stroke',
+  'strokeWidth',
+  'fill',
+  'fontFamily',
+  'fontSize',
+  'fontWeight',
+  'fontStyle',
+  'underline',
+  'overline',
+  'linethrough',
+  'deltaY',
+  'textBackgroundColor',
+]
+
 let _measuringContext;
 
 /**
@@ -355,23 +370,12 @@ class TextBase extends FabricObject {
    * @type {Array}
    * @default
    */
-  _styleProperties = [
-    'stroke',
-    'strokeWidth',
-    'fill',
-    'fontFamily',
-    'fontSize',
-    'fontWeight',
-    'fontStyle',
-    'underline',
-    'overline',
-    'linethrough',
-    'deltaY',
-    'textBackgroundColor',
-  ]
+  _styleProperties = styleProperties
 
   /**
    * contains characters bounding boxes
+   * 
+   * @todo should this be moved to caches? or shared between all instances?
    */
   __charBounds = []
 
@@ -391,6 +395,8 @@ class TextBase extends FabricObject {
    */
   MIN_TEXT_WIDTH = 2
 
+  private __skipDimension = true;
+
   /**
    * Constructor
    * @param {String} text Text string
@@ -398,10 +404,9 @@ class TextBase extends FabricObject {
    * @return {Text} thisArg
    */
   constructor(text, options) {
-    this.styles = options ? (options.styles || {}) : {};
-    this.text = text;
-    this.__skipDimension = true;
     super(options);
+    this.styles = options?.styles || {};
+    this.text = text;
     if (this.path) {
       this.setPathInfo();
     }
