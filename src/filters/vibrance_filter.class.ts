@@ -1,18 +1,11 @@
 //@ts-nocheck
-
-
-
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
+import { BaseFilter } from "./base_filter.class";
 
 /**
  * Vibrance filter class
  * @class Vibrance
  * @memberOf fabric.Image.filters
  * @extends BaseFilter
- * @see {@link fabric.Image.filters.Vibrance#initialize} for constructor definition
  * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
  * var filter = new Vibrance({
@@ -110,12 +103,3 @@ export class Vibrance extends BaseFilter {
     gl.uniform1f(uniformLocations.uVibrance, -this.vibrance);
   }
 }
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.filters.Vibrance>}
- */
-fabric.Image.filters.Vibrance.fromObject = fabric.Image.filters.BaseFilter.fromObject;
-

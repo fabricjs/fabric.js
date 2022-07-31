@@ -1,11 +1,5 @@
 //@ts-nocheck
-
-
-
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
+import { BaseFilter } from "./base_filter.class";
 
 /**
  * Grayscale image filter class
@@ -142,12 +136,3 @@ export class Grayscale extends BaseFilter {
     return false;
   }
 }
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.filters.Grayscale>}
- */
-fabric.Image.filters.Grayscale.fromObject = fabric.Image.filters.BaseFilter.fromObject;
-

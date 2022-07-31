@@ -1,18 +1,12 @@
 //@ts-nocheck
+import { BaseFilter } from "./base_filter.class";
 
-
-
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
 
 /**
  * Saturate filter class
  * @class Saturation
  * @memberOf fabric.Image.filters
  * @extends BaseFilter
- * @see {@link fabric.Image.filters.Saturation#initialize} for constructor definition
  * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
  * var filter = new Saturation({
@@ -107,12 +101,3 @@ export class Saturation extends BaseFilter {
     gl.uniform1f(uniformLocations.uSaturation, -this.saturation);
   }
 }
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.filters.Saturation>}
- */
-fabric.Image.filters.Saturation.fromObject = fabric.Image.filters.BaseFilter.fromObject;
-

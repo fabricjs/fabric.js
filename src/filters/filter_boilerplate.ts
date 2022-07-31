@@ -1,18 +1,10 @@
 //@ts-nocheck
-
-
-
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
-
+import { BaseFilter } from "./base_filter.class";
 /**
  * MyFilter filter class
  * @class MyFilter
  * @memberOf fabric.Image.filters
  * @extends BaseFilter
- * @see {@link fabric.Image.filters.MyFilter#initialize} for constructor definition
  * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
  * var filter = new MyFilter({
@@ -100,11 +92,4 @@ export class MyFilter extends BaseFilter {
   }
 }
 
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.filters.MyFilter>}
- */
-fabric.Image.filters.MyFilter.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 

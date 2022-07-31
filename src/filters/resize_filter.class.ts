@@ -5,9 +5,7 @@
 
 var fabric = global.fabric || (global.fabric = {}), pow = Math.pow, floor = Math.floor,
   sqrt = Math.sqrt, abs = Math.abs, round = Math.round, sin = Math.sin,
-  ceil = Math.ceil,
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
+  ceil = Math.ceil
 
 /**
  * Resize image filter class
@@ -478,12 +476,3 @@ export class Resize extends BaseFilter {
     };
   }
 }
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.filters.Resize>}
- */
-fabric.Image.filters.Resize.fromObject = fabric.Image.filters.BaseFilter.fromObject;
-

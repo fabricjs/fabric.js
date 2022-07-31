@@ -1,19 +1,10 @@
 //@ts-nocheck
-
-
-
-
-var fabric = global.fabric || (global.fabric = {}),
-  extend = fabric.util.object.extend,
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
-
+import { BaseFilter } from "./base_filter.class";
 /**
  * Noise filter class
  * @class Noise
  * @memberOf fabric.Image.filters
  * @extends BaseFilter
- * @see {@link fabric.Image.filters.Noise#initialize} for constructor definition
  * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
  * var filter = new Noise({
@@ -117,17 +108,9 @@ export class Noise extends BaseFilter {
    * @return {Object} Object representation of an instance
    */
   toObject() {
-    return extend(super.toObject(), {
+    return {
+      ...super.toObject(),
       noise: this.noise
-    });
+    };
   }
 }
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.filters.Noise>}
- */
-fabric.Image.filters.Noise.fromObject = fabric.Image.filters.BaseFilter.fromObject;
-

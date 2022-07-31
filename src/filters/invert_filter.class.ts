@@ -1,12 +1,5 @@
 //@ts-nocheck
-
-
-
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
-
+import { BaseFilter } from "./base_filter.class";
 /**
  * Invert filter class
  * @class Invert
@@ -116,13 +109,3 @@ export class Invert extends BaseFilter {
     gl.uniform1i(uniformLocations.uAlpha, this.alpha);
   }
 }
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.filters.Invert>}
- */
-fabric.Image.filters.Invert.fromObject = fabric.Image.filters.BaseFilter.fromObject;
-
-

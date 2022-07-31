@@ -1,18 +1,11 @@
 //@ts-nocheck
-
-
-
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
+import { BaseFilter } from "./base_filter.class";
 
 /**
  * Pixelate filter class
  * @class Pixelate
  * @memberOf fabric.Image.filters
  * @extends BaseFilter
- * @see {@link fabric.Image.filters.Pixelate#initialize} for constructor definition
  * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
  * var filter = new Pixelate({
@@ -125,12 +118,3 @@ export class Pixelate extends BaseFilter {
     gl.uniform1f(uniformLocations.uBlocksize, this.blocksize);
   }
 }
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.filters.Pixelate>}
- */
-fabric.Image.filters.Pixelate.fromObject = fabric.Image.filters.BaseFilter.fromObject;
-

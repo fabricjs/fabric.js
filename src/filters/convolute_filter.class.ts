@@ -1,12 +1,6 @@
 //@ts-nocheck
 
-
-
-
-var fabric = global.fabric || (global.fabric = {}),
-  extend = fabric.util.object.extend,
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
+import { BaseFilter } from "./base_filter.class";
 
 /**
  * Adapted from <a href="http://www.html5rocks.com/en/tutorials/canvas/imagefilters/">html5rocks article</a>
@@ -334,18 +328,12 @@ export class Convolute extends BaseFilter {
    * @return {Object} Object representation of an instance
    */
   toObject() {
-    return extend(super.toObject(), {
+    return {
+      ...super.toObject(),
       opaque: this.opaque,
       matrix: this.matrix
-    });
+    };
   }
 }
 
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.filters.Convolute>}
- */
-fabric.Image.filters.Convolute.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 

@@ -1,19 +1,12 @@
 //@ts-nocheck
-
-
-
-
-var fabric = global.fabric || (global.fabric = {}),
-  extend = fabric.util.object.extend,
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
+import { Color } from "../color";
+import { BaseFilter } from "./base_filter.class";
 
 /**
  * Remove white filter class
  * @class RemoveColor
  * @memberOf fabric.Image.filters
  * @extends BaseFilter
- * @see {@link fabric.Image.filters.RemoveColor#initialize} for constructor definition
  * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
  * var filter = new RemoveColor({
@@ -83,7 +76,7 @@ export class RemoveColor extends BaseFilter {
       data = imageData.data, i,
       distance = this.distance * 255,
       r, g, b,
-      source = new fabric.Color(this.color).getSource(),
+      source = new Color(this.color).getSource(),
       lowC = [
         source[0] - distance,
         source[1] - distance,
@@ -132,7 +125,7 @@ export class RemoveColor extends BaseFilter {
    * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
   sendUniformData(gl, uniformLocations) {
-    var source = new fabric.Color(this.color).getSource(),
+    var source = new Color(this.color).getSource(),
       distance = parseFloat(this.distance),
       lowC = [
         0 + source[0] / 255 - distance,
@@ -155,18 +148,10 @@ export class RemoveColor extends BaseFilter {
    * @return {Object} Object representation of an instance
    */
   toObject() {
-    return extend(super.toObject(), {
+    return {
+      ...super.toObject(),
       color: this.color,
       distance: this.distance
-    });
+    };
   }
 }
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.filters.RemoveColor>}
- */
-fabric.Image.filters.RemoveColor.fromObject = fabric.Image.filters.BaseFilter.fromObject;
-

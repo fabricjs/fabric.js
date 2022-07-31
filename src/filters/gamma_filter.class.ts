@@ -1,18 +1,11 @@
 //@ts-nocheck
-
-
-
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
+import { BaseFilter } from "./base_filter.class";
 
 /**
  * Gamma filter class
  * @class Gamma
  * @memberOf fabric.Image.filters
  * @extends BaseFilter
- * @see {@link fabric.Image.filters.Gamma#initialize} for constructor definition
  * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
  * var filter = new Gamma({
@@ -63,8 +56,7 @@ export class Gamma extends BaseFilter {
    * @param {Object} [options] Options object
    */
   constructor(options) {
-    this.gamma = [1, 1, 1];
-    filters.BaseFilter.prototype.initialize.call(this, options);
+    super({ ...options, gamma: [1, 1, 1] });
   }
 
   /**
@@ -124,12 +116,3 @@ export class Gamma extends BaseFilter {
     gl.uniform3fv(uniformLocations.uGamma, this.gamma);
   }
 }
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.filters.Gamma>}
- */
-fabric.Image.filters.Gamma.fromObject = fabric.Image.filters.BaseFilter.fromObject;
-

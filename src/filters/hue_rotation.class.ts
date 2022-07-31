@@ -1,18 +1,17 @@
 //@ts-nocheck
 
+import {
+  cos, sin
+} from '../util';
+import { BaseFilter } from "./base_filter.class";
+import { ColorMatrix } from "./colormatrix_filter.class";
 
-
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
 
 /**
  * HueRotation filter class
  * @class HueRotation
  * @memberOf fabric.Image.filters
  * @extends BaseFilter
- * @see {@link fabric.Image.filters.HueRotation#initialize} for constructor definition
  * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
  * var filter = new HueRotation({
@@ -21,7 +20,7 @@ var fabric = global.fabric || (global.fabric = {}),
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class HueRotation extends fabric.Image.filters.ColorMatrix {
+export class HueRotation extends ColorMatrix {
 
   /**
    * Filter type
@@ -46,23 +45,23 @@ export class HueRotation extends fabric.Image.filters.ColorMatrix {
   mainParameter = 'rotation'
 
   calculateMatrix() {
-    var rad = this.rotation * Math.PI, cos = fabric.util.cos(rad), sin = fabric.util.sin(rad),
-      aThird = 1 / 3, aThirdSqtSin = Math.sqrt(aThird) * sin, OneMinusCos = 1 - cos;
+    var rad = this.rotation * Math.PI, cosValue = cos(rad), sinValue = sin(rad),
+      aThird = 1 / 3, aThirdSqtSin = Math.sqrt(aThird) * sinValue, OneMinusCos = 1 - cosValue;
     this.matrix = [
       1, 0, 0, 0, 0,
       0, 1, 0, 0, 0,
       0, 0, 1, 0, 0,
       0, 0, 0, 1, 0
     ];
-    this.matrix[0] = cos + OneMinusCos / 3;
+    this.matrix[0] = cosValue + OneMinusCos / 3;
     this.matrix[1] = aThird * OneMinusCos - aThirdSqtSin;
     this.matrix[2] = aThird * OneMinusCos + aThirdSqtSin;
     this.matrix[5] = aThird * OneMinusCos + aThirdSqtSin;
-    this.matrix[6] = cos + aThird * OneMinusCos;
+    this.matrix[6] = cosValue + aThird * OneMinusCos;
     this.matrix[7] = aThird * OneMinusCos - aThirdSqtSin;
     this.matrix[10] = aThird * OneMinusCos - aThirdSqtSin;
     this.matrix[11] = aThird * OneMinusCos + aThirdSqtSin;
-    this.matrix[12] = cos + aThird * OneMinusCos;
+    this.matrix[12] = cosValue + aThird * OneMinusCos;
   }
 
   /**
@@ -73,7 +72,7 @@ export class HueRotation extends fabric.Image.filters.ColorMatrix {
    **/
   isNeutralState(options) {
     this.calculateMatrix();
-    return filters.BaseFilter.prototype.isNeutralState.call(this, options);
+    return super.isNeutralState(options);
   }
 
   /**
@@ -91,16 +90,7 @@ export class HueRotation extends fabric.Image.filters.ColorMatrix {
    */
   applyTo(options) {
     this.calculateMatrix();
-    filters.BaseFilter.prototype.applyTo.call(this, options);
+    super.applyTo(options);
   }
 
 }
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.filters.HueRotation>}
- */
-fabric.Image.filters.HueRotation.fromObject = fabric.Image.filters.BaseFilter.fromObject;
-
