@@ -1,9 +1,9 @@
 //@ts-nocheck
 import { cacheProperties, SHARED_ATTRIBUTES, stateProperties } from '../constants';
+import { parseAttributes } from '../parser/parseAttributes';
 import {
   getBoundsOfCurve, joinPath, makePathSimpler, max, min, parsePath, toFixed
 } from '../util';
-import { parseAttributes } from "../parser/_parser";
 import { FabricObject } from './object.class';
 import { Polyline } from './polyline.class';
 

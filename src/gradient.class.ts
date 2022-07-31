@@ -2,8 +2,8 @@
 
 import { Color } from "./color";
 import { iMatrix, incrementUID } from "./constants";
+import { parseTransformAttribute } from "./parser/parseTransformAttribute";
 import { matrixToSVG, populateWithProperties } from "./util";
-import { parseTransformAttribute } from "./parser/_parser";
 
 
 /* _FROM_SVG_START_ */
