@@ -1,10 +1,11 @@
 //@ts-nocheck
 
 import { cacheProperties, SHARED_ATTRIBUTES } from '../constants';
+import { parseAttributes } from '../parser/parseAttributes';
+import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import {
   max, min, projectStrokeOnPoints, toFixed
 } from '../util';
-import { parseAttributes, parsePointsAttribute } from "../parser/_parser";
 import { FabricObject } from './object.class';
 
 /**
