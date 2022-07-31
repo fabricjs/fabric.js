@@ -67,10 +67,17 @@ export const isTouchSupported = 'ontouchstart' in context.window || 'ontouchstar
 export const isLikelyNode = typeof Buffer !== 'undefined' &&
     typeof window === 'undefined';
 
+/**
+ * Unique id used internally when creating SVG elements
+ */
 export let uid = 0;
 
 export function incrementUID() {
     return uid++;
+}
+
+export function setUID(value = 0) {
+    uid = value;
 }
 
 export const RIGHT_CLICK = 3, MIDDLE_CLICK = 2, LEFT_CLICK = 1;

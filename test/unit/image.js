@@ -1,3 +1,4 @@
+const { fabric } = require('../../main');
 const { WebglFilterBackend } = require('../../src/filters/webgl_backend.class');
 
 (function () {
@@ -310,7 +311,7 @@ const { WebglFilterBackend } = require('../../src/filters/webgl_backend.class');
       image.cropY = 1;
       image.width -= 2;
       image.height -= 2;
-      fabric.Object.__uid = 1;
+      fabric.setUID(); (1);
       var expectedSVG = '<g transform=\"matrix(1 0 0 1 137 54)\"  >\n<clipPath id=\"imageCrop_1\">\n\t<rect x=\"-137\" y=\"-54\" width=\"274\" height=\"108\" />\n</clipPath>\n\t<image style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  xlink:href=\"' + IMG_SRC + '\" x=\"-138\" y=\"-55\" width=\"276\" height=\"110\" clip-path=\"url(#imageCrop_1)\" ></image>\n</g>\n';
       assert.equalImageSVG(image.toSVG(), expectedSVG);
       done();

@@ -1,15 +1,15 @@
-(function() {
+(function () {
 
   QUnit.module('fabric.Shadow');
 
   var REFERENCE_SHADOW_OBJECT = {
-    'color':   'rgb(0,255,0)',
-    'blur':    10,
+    'color': 'rgb(0,255,0)',
+    'blur': 10,
     'offsetX': 20,
     'offsetY': 5
   };
 
-  QUnit.test('constructor', function(assert) {
+  QUnit.test('constructor', function (assert) {
     assert.ok(fabric.Shadow);
 
     var shadow = new fabric.Shadow();
@@ -17,7 +17,7 @@
   });
 
 
-  QUnit.test('initializing with object', function(assert) {
+  QUnit.test('initializing with object', function (assert) {
     assert.ok(fabric.Shadow);
 
     var shadow = new fabric.Shadow(REFERENCE_SHADOW_OBJECT);
@@ -27,7 +27,7 @@
     assert.equal(shadow.blur, 10);
   });
 
-  QUnit.test('initializing with string', function(assert) {
+  QUnit.test('initializing with string', function (assert) {
     assert.ok(fabric.Shadow);
 
     // old text-shadow definition - color offsetX offsetY blur
@@ -139,7 +139,7 @@
     assert.equal(shadow15.blur, 1);
   });
 
-  QUnit.test('properties', function(assert) {
+  QUnit.test('properties', function (assert) {
     var shadow = new fabric.Shadow();
 
     assert.equal(shadow.blur, 0);
@@ -148,14 +148,14 @@
     assert.equal(shadow.offsetY, 0);
   });
 
-  QUnit.test('toString', function(assert) {
+  QUnit.test('toString', function (assert) {
     var shadow = new fabric.Shadow();
     assert.ok(typeof shadow.toString === 'function');
 
     assert.equal(shadow.toString(), '0px 0px 0px rgb(0,0,0)');
   });
 
-  QUnit.test('toObject', function(assert) {
+  QUnit.test('toObject', function (assert) {
     var shadow = new fabric.Shadow();
     assert.ok(typeof shadow.toObject === 'function');
 
@@ -163,17 +163,17 @@
     assert.equal(JSON.stringify(object), '{"color":"rgb(0,0,0)","blur":0,"offsetX":0,"offsetY":0,"affectStroke":false,"nonScaling":false}');
   });
 
-  QUnit.test('clone with affectStroke', function(assert) {
-    var shadow = new fabric.Shadow({affectStroke: true, blur: 5});
+  QUnit.test('clone with affectStroke', function (assert) {
+    var shadow = new fabric.Shadow({ affectStroke: true, blur: 5 });
     assert.ok(typeof shadow.toObject === 'function');
     var object = shadow.toObject(),
-        shadow2 = new fabric.Shadow(object),
-        object2 = shadow2.toObject();
+      shadow2 = new fabric.Shadow(object),
+      object2 = shadow2.toObject();
     assert.equal(shadow.affectStroke, shadow2.affectStroke);
     assert.deepEqual(object, object2);
   });
 
-  QUnit.test('toObject without default value', function(assert) {
+  QUnit.test('toObject without default value', function (assert) {
     var shadow = new fabric.Shadow();
     shadow.includeDefaultValues = false;
 
@@ -186,12 +186,12 @@
     assert.equal(JSON.stringify(shadow.toObject()), '{"color":"red","offsetX":15}');
   });
 
-  QUnit.test('toSVG', function(assert) {
+  QUnit.test('toSVG', function (assert) {
     // reset uid
-    fabric.Object.__uid = 0;
+    fabric.setUID();
 
-    var shadow = new fabric.Shadow({color: '#FF0000', offsetX: 10, offsetY: -10, blur: 2});
-    var object = new fabric.Object({fill: '#FF0000'});
+    var shadow = new fabric.Shadow({ color: '#FF0000', offsetX: 10, offsetY: -10, blur: 2 });
+    var object = new fabric.Object({ fill: '#FF0000' });
 
     assert.equal(shadow.toSVG(object), '<filter id="SVGID_0" y="-40%" height="180%" x="-40%" width="180%" >\n\t<feGaussianBlur in="SourceAlpha" stdDeviation="1"></feGaussianBlur>\n\t<feOffset dx="10" dy="-10" result="oBlur" ></feOffset>\n\t<feFlood flood-color="rgb(255,0,0)" flood-opacity="1"/>\n\t<feComposite in2="oBlur" operator="in" />\n\t<feMerge>\n\t\t<feMergeNode></feMergeNode>\n\t\t<feMergeNode in="SourceGraphic"></feMergeNode>\n\t</feMerge>\n</filter>\n');
 
@@ -202,33 +202,33 @@
     assert.equal(shadow.toSVG(object), '<filter id="SVGID_0" y="-40%" height="180%" x="-40%" width="180%" >\n\t<feGaussianBlur in="SourceAlpha" stdDeviation="1"></feGaussianBlur>\n\t<feOffset dx="10" dy="-10" result="oBlur" ></feOffset>\n\t<feFlood flood-color="rgb(0,0,0)" flood-opacity="1"/>\n\t<feComposite in2="oBlur" operator="in" />\n\t<feMerge>\n\t\t<feMergeNode></feMergeNode>\n\t\t<feMergeNode in="SourceGraphic"></feMergeNode>\n\t</feMerge>\n</filter>\n');
   });
 
-  QUnit.test('toSVG with flipped object', function(assert) {
+  QUnit.test('toSVG with flipped object', function (assert) {
     // reset uid
-    fabric.Object.__uid = 0;
+    fabric.setUID();
 
-    var shadow = new fabric.Shadow({color: '#FF0000', offsetX: 10, offsetY: -10, blur: 2});
-    var object = new fabric.Object({fill: '#FF0000', flipX: true, flipY: true});
+    var shadow = new fabric.Shadow({ color: '#FF0000', offsetX: 10, offsetY: -10, blur: 2 });
+    var object = new fabric.Object({ fill: '#FF0000', flipX: true, flipY: true });
 
     assert.equal(shadow.toSVG(object), '<filter id="SVGID_0" y="-40%" height="180%" x="-40%" width="180%" >\n\t<feGaussianBlur in="SourceAlpha" stdDeviation="1"></feGaussianBlur>\n\t<feOffset dx="-10" dy="10" result="oBlur" ></feOffset>\n\t<feFlood flood-color="rgb(255,0,0)" flood-opacity="1"/>\n\t<feComposite in2="oBlur" operator="in" />\n\t<feMerge>\n\t\t<feMergeNode></feMergeNode>\n\t\t<feMergeNode in="SourceGraphic"></feMergeNode>\n\t</feMerge>\n</filter>\n');
 
   });
 
-  QUnit.test('toSVG with rotated object', function(assert) {
+  QUnit.test('toSVG with rotated object', function (assert) {
     // reset uid
-    fabric.Object.__uid = 0;
+    fabric.setUID();
 
-    var shadow = new fabric.Shadow({color: '#FF0000', offsetX: 10, offsetY: 10, blur: 2});
-    var object = new fabric.Object({fill: '#FF0000', angle: 45});
+    var shadow = new fabric.Shadow({ color: '#FF0000', offsetX: 10, offsetY: 10, blur: 2 });
+    var object = new fabric.Object({ fill: '#FF0000', angle: 45 });
 
     assert.equal(shadow.toSVG(object), '<filter id="SVGID_0" y="-40%" height="180%" x="-40%" width="180%" >\n\t<feGaussianBlur in="SourceAlpha" stdDeviation="1"></feGaussianBlur>\n\t<feOffset dx="14.14" dy="0" result="oBlur" ></feOffset>\n\t<feFlood flood-color="rgb(255,0,0)" flood-opacity="1"/>\n\t<feComposite in2="oBlur" operator="in" />\n\t<feMerge>\n\t\t<feMergeNode></feMergeNode>\n\t\t<feMergeNode in="SourceGraphic"></feMergeNode>\n\t</feMerge>\n</filter>\n');
   });
 
-  QUnit.test('toSVG with rotated flipped object', function(assert) {
+  QUnit.test('toSVG with rotated flipped object', function (assert) {
     // reset uid
-    fabric.Object.__uid = 0;
+    fabric.setUID();
 
-    var shadow = new fabric.Shadow({color: '#FF0000', offsetX: 10, offsetY: 10, blur: 2});
-    var object = new fabric.Object({fill: '#FF0000', angle: 45, flipX: true});
+    var shadow = new fabric.Shadow({ color: '#FF0000', offsetX: 10, offsetY: 10, blur: 2 });
+    var object = new fabric.Object({ fill: '#FF0000', angle: 45, flipX: true });
 
     assert.equal(shadow.toSVG(object), '<filter id="SVGID_0" y="-40%" height="180%" x="-40%" width="180%" >\n\t<feGaussianBlur in="SourceAlpha" stdDeviation="1"></feGaussianBlur>\n\t<feOffset dx="-14.14" dy="0" result="oBlur" ></feOffset>\n\t<feFlood flood-color="rgb(255,0,0)" flood-opacity="1"/>\n\t<feComposite in2="oBlur" operator="in" />\n\t<feMerge>\n\t\t<feMergeNode></feMergeNode>\n\t\t<feMergeNode in="SourceGraphic"></feMergeNode>\n\t</feMerge>\n</filter>\n');
   });
