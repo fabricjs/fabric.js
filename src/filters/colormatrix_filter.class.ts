@@ -4,15 +4,15 @@ import { BaseFilter } from "./base_filter.class";
 
 /**
  * Color Matrix filter class
- * @class fabric.Image.filters.ColorMatrix
+ * @class ColorMatrix
  * @memberOf fabric.Image.filters
- * @extends fabric.Image.filters.BaseFilter
+ * @extends BaseFilter
  * @see {@link fabric.Image.filters.ColorMatrix#initialize} for constructor definition
  * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @see {@Link http://www.webwasp.co.uk/tutorials/219/Color_Matrix_Filter.php}
  * @see {@Link http://phoboslab.org/log/2013/11/fast-image-filters-with-webgl}
  * @example <caption>Kodachrome filter</caption>
- * var filter = new fabric.Image.filters.ColorMatrix({
+ * var filter = new ColorMatrix({
  *  matrix: [
      1.1285582396593525, -0.3967382283601348, -0.03992559172921793, 0, 63.72958762196502,
      -0.16404339962244616, 1.0835251566291304, -0.05498805115633132, 0, 24.732407896706203,

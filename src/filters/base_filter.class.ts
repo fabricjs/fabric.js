@@ -5,7 +5,7 @@ var fabric = global.fabric;
 
 /**
  * Root filter class from which all filter classes inherit from
- * @class fabric.Image.filters.BaseFilter
+ * @class BaseFilter
  * @memberOf fabric.Image.filters
  */
 export class BaseFilter {

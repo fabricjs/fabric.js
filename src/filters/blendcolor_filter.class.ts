@@ -2,22 +2,22 @@
 
 'use strict';
 
-var fabric = global.fabric,
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
+var fabric = global.fabric;
+
+
 
 /**
  * Color Blend filter class
- * @class fabric.Image.filter.BlendColor
- * @memberOf fabric.Image.filters
- * @extends fabric.Image.filters.BaseFilter
+ * BlendColor
+ * @memberOf Image.filters
+ * @extends BaseFilter
  * @example
- * var filter = new fabric.Image.filters.BlendColor({
+ * var filter = new BlendColor({
  *  color: '#000',
  *  mode: 'multiply'
  * });
  *
- * var filter = new fabric.Image.filters.BlendImage({
+ * var filter = new BlendImage({
  *  image: fabricImageObject,
  *  mode: 'multiply',
  *  alpha: 0.5
@@ -27,7 +27,7 @@ var fabric = global.fabric,
  * canvas.renderAll();
  */
 
-export class BlendColor extends fabric.Image.filters.BaseFilter {
+export class BlendColor extends BaseFilter {
   type = 'BlendColor'
 
   /**
