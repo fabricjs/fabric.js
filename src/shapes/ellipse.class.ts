@@ -1,8 +1,9 @@
 //@ts-nocheck
 
-import { halfPI, SHARED_ATTRIBUTES } from '../constants';
+import { cacheProperties, halfPI, SHARED_ATTRIBUTES } from '../constants';
 import { parseAttributes } from "../_parser";
 import { FabricObject } from './object.class';
+
 /**
  * Ellipse class
  * @class Ellipse
@@ -31,7 +32,7 @@ export class Ellipse extends FabricObject {
    */
   ry = 0
 
-  cacheProperties = FabricObject.prototype.cacheProperties.concat('rx', 'ry')
+  cacheProperties = cacheProperties.concat('rx', 'ry')
 
   /**
    * Constructor

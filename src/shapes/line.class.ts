@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { SHARED_ATTRIBUTES } from '../constants';
+import { cacheProperties, SHARED_ATTRIBUTES } from '../constants';
 import {
   clone
 } from '../util';
@@ -50,7 +50,7 @@ export class Line extends FabricObject {
    */
   y2 = 0
 
-  cacheProperties = FabricObject.prototype.cacheProperties.concat('x1', 'x2', 'y1', 'y2')
+  cacheProperties = cacheProperties.concat('x1', 'x2', 'y1', 'y2')
 
   /**
    * Constructor

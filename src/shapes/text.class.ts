@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { charWidthsCache } from '../cache';
-import { DEFAULT_SVG_FONT_SIZE, isLikelyNode, SHARED_ATTRIBUTES } from '../constants';
+import { cacheProperties, DEFAULT_SVG_FONT_SIZE, isLikelyNode, SHARED_ATTRIBUTES, stateProperties } from '../constants';
 import { createCanvasElement, graphemeSplit, hasStyleChanged, stylesFromArray, stylesToArray } from '../util';
 import { parseAttributes } from "../_parser";
 import { FabricObject } from './object.class';
@@ -172,13 +172,13 @@ export class Text extends FabricObject {
    * as well as for history (undo/redo) purposes
    * @type Array
    */
-  stateProperties = FabricObject.prototype.stateProperties.concat(additionalProps)
+  stateProperties = stateProperties.concat(additionalProps)
 
   /**
    * List of properties to consider when checking if cache needs refresh
    * @type Array
    */
-  cacheProperties = FabricObject.prototype.cacheProperties.concat(additionalProps)
+  cacheProperties = cacheProperties.concat(additionalProps)
 
   /**
    * When defined, an object is rendered via stroke and this property specifies its color.

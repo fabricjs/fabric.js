@@ -1,10 +1,10 @@
 //@ts-nocheck
 
-import { SHARED_ATTRIBUTES } from '../constants';
-import { parseAttributes, parsePointsAttribute } from "../_parser";
+import { cacheProperties, SHARED_ATTRIBUTES } from '../constants';
 import {
   max, min, projectStrokeOnPoints, toFixed
 } from '../util';
+import { parseAttributes, parsePointsAttribute } from "../_parser";
 import { FabricObject } from './object.class';
 
 /**
@@ -59,7 +59,7 @@ export class Polyline extends FabricObject {
    */
   exactBoundingBox = false
 
-  cacheProperties = FabricObject.prototype.cacheProperties.concat('points')
+  cacheProperties = cacheProperties.concat('points')
 
   /**
    * Constructor

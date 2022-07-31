@@ -1,5 +1,6 @@
 //@ts-nocheck
 
+import { stateProperties } from '../constants';
 import { CollectionMixinGenerator } from "../mixins/collection.mixin";
 import { Point } from "../point.class";
 import {
@@ -45,7 +46,7 @@ export class Group extends CollectionMixinGenerator(FabricObject) {
    * as well as for history (undo/redo) purposes
    * @type string[]
    */
-  stateProperties: string[] = FabricObject.prototype.stateProperties.concat('layout')
+  stateProperties: string[] = stateProperties.concat('layout')
 
   /**
    * Used to optimize performance

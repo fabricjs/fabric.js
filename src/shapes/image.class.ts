@@ -1,12 +1,12 @@
 //@ts-nocheck
 
-import { incrementUID, SHARED_ATTRIBUTES } from '../constants';
-import { parseAttributes } from "../_parser";
+import { cacheProperties, incrementUID, SHARED_ATTRIBUTES, stateProperties } from '../constants';
+import { WebglFilterBackend } from '../filters/webgl_backend.class';
 import {
   addClass, cleanUpJsdomNode, createCanvasElement, enlivenObjectEnlivables, enlivenObjects, findScaleToCover, findScaleToFit, getById, loadImage, parsePreserveAspectRatioAttribute, setImageSmoothing
 } from '../util';
+import { parseAttributes } from "../_parser";
 import { FabricObject } from "./object.class";
-import { WebglFilterBackend } from '../filters/webgl_backend.class';
 
 /**
  * Image class
@@ -84,7 +84,7 @@ export class Image extends FabricObject {
    * as well as for history (undo/redo) purposes
    * @type Array
    */
-  stateProperties = FabricObject.prototype.stateProperties.concat('cropX', 'cropY')
+  stateProperties = stateProperties.concat('cropX', 'cropY')
 
   /**
    * List of properties to consider when checking if cache needs refresh
@@ -93,7 +93,7 @@ export class Image extends FabricObject {
    * and refreshed at the next render
    * @type Array
    */
-  cacheProperties = FabricObject.prototype.cacheProperties.concat('cropX', 'cropY')
+  cacheProperties = cacheProperties.concat('cropX', 'cropY')
 
   /**
    * key used to retrieve the texture representing this image

@@ -1,9 +1,9 @@
 //@ts-nocheck
-import { SHARED_ATTRIBUTES } from '../constants';
-import { parseAttributes } from "../_parser";
+import { cacheProperties, SHARED_ATTRIBUTES, stateProperties } from '../constants';
 import {
   getBoundsOfCurve, joinPath, makePathSimpler, max, min, parsePath, toFixed
 } from '../util';
+import { parseAttributes } from "../_parser";
 import { FabricObject } from './object.class';
 import { Polyline } from './polyline.class';
 
@@ -29,9 +29,9 @@ export class Path extends FabricObject {
    */
   path = null
 
-  cacheProperties = FabricObject.prototype.cacheProperties.concat('path', 'fillRule')
+  cacheProperties = cacheProperties.concat('path', 'fillRule')
 
-  stateProperties = FabricObject.prototype.stateProperties.concat('path')
+  stateProperties = stateProperties.concat('path')
 
   /**
    * Constructor

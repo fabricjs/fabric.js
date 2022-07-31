@@ -1,11 +1,11 @@
 //@ts-nocheck
 
-import { SHARED_ATTRIBUTES } from '../constants';
-import { parseAttributes } from "../_parser";
+import { cacheProperties, SHARED_ATTRIBUTES } from '../constants';
 import {
   cos,
   degreesToRadians, sin
 } from '../util';
+import { parseAttributes } from "../_parser";
 import { FabricObject } from './object.class';
 
 function isValidRadius(attributes) {
@@ -49,7 +49,7 @@ export class Circle extends FabricObject {
    */
   endAngle = 360
 
-  cacheProperties = FabricObject.prototype.cacheProperties.concat('radius', 'startAngle', 'endAngle')
+  cacheProperties = cacheProperties.concat('radius', 'startAngle', 'endAngle')
 
   /**
    * @private

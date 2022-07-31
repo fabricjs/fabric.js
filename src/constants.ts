@@ -74,3 +74,28 @@ export function incrementUID() {
 }
 
 export const RIGHT_CLICK = 3, MIDDLE_CLICK = 2, LEFT_CLICK = 1;
+
+/**
+ * List of properties to consider when checking if state
+ * of an object is changed (FabricObject#hasStateChanged)
+ * as well as for history (undo/redo) purposes
+ * @type Array
+ */
+export const stateProperties = (
+    'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
+    'stroke strokeWidth strokeDashArray strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit ' +
+    'angle opacity fill globalCompositeOperation shadow visible backgroundColor ' +
+    'skewX skewY fillRule paintFirst clipPath strokeUniform'
+).split(' ')
+
+/**
+ * List of properties to consider when checking if cache needs refresh
+ * Those properties are checked by statefullCache ON ( or lazy mode if we want ) or from single
+ * calls to Object.set(key, value). If the key is in this list, the object is marked as dirty
+ * and refreshed at the next render
+ * @type Array
+ */
+export const cacheProperties = (
+    'fill stroke strokeWidth strokeDashArray width height paintFirst strokeUniform' +
+    ' strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit backgroundColor clipPath'
+).split(' ')

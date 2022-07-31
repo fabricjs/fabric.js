@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 
-import { SHARED_ATTRIBUTES } from '../constants';
+import { cacheProperties, SHARED_ATTRIBUTES, stateProperties } from '../constants';
 import { FabricObject } from './object.class';
 
 /**
@@ -16,7 +16,7 @@ export class Rect extends FabricObject {
    * as well as for history (undo/redo) purposes
    * @type Array
    */
-  stateProperties = FabricObject.prototype.stateProperties.concat('rx', 'ry')
+  stateProperties = stateProperties.concat('rx', 'ry')
 
   /**
    * Type of an object
@@ -39,7 +39,7 @@ export class Rect extends FabricObject {
    */
   ry = 0
 
-  cacheProperties = FabricObject.prototype.cacheProperties.concat('rx', 'ry')
+  cacheProperties = cacheProperties.concat('rx', 'ry')
 
   /**
    * Constructor

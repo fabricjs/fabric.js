@@ -3,7 +3,7 @@
 import { SHARED_ATTRIBUTES } from '../constants';
 import { projectStrokeOnPoints } from '../util';
 import { FabricObject } from './object.class';
-import { Polyline, fromElementGenerator } from './polyline.class';
+import { fromElementGenerator, Polyline } from './polyline.class';
 
 /**
  * Polygon class
