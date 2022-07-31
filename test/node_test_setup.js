@@ -2,6 +2,7 @@
 var chalk = require('chalk');
 var diff = require('deep-object-diff').diff;
 var commander = require('commander');
+require('source-map-support').install();
 
 commander.program
   .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
