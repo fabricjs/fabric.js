@@ -3,7 +3,7 @@
 import { Color } from "./color";
 import { iMatrix, incrementUID } from "./constants";
 import { matrixToSVG, populateWithProperties } from "./util";
-import { parseTransformAttribute } from "./_parser";
+import { parseTransformAttribute } from "./parser/_parser";
 
 
 /* _FROM_SVG_START_ */

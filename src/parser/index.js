@@ -1,5 +1,5 @@
-import { incrementUID } from './constants';
-import { extend, toArray } from './util';
+import { incrementUID } from '../constants';
+import { extend, toArray } from '../util';
 import { applyViewboxTransform, clipPaths, cssRules, elementById, gradientDefs, hasAncestorWithNodeName, parseAttributes, parseFontDeclaration, parsePointsAttribute, parseStyleAttribute, parseTransformAttribute, parseUseDirectives, svgInvalidAncestorsRegEx, svgValidParentsRegEx, svgValidTagNamesRegEx, svgViewBoxElementsRegEx, _getMultipleNodes } from './_parser';
 
 

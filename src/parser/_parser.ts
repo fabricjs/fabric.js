@@ -1,8 +1,8 @@
 //@ts-nocheck
-import { Color } from './color';
-import { commaWsp, DEFAULT_SVG_FONT_SIZE, reNum, svgNS } from './constants';
-import { FabricObject } from './shapes/object.class';
-import { cos, degreesToRadians, multiplyTransformMatrices, parseUnit, sin, toFixed } from './util';
+import { Color } from '../color';
+import { commaWsp, DEFAULT_SVG_FONT_SIZE, reNum, svgNS } from '../constants';
+import { FabricObject } from '../shapes/object.class';
+import { cos, degreesToRadians, multiplyTransformMatrices, parseUnit, sin, toFixed } from '../util';
 
 export const cssRules = {};
 export const gradientDefs = {};

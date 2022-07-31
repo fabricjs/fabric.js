@@ -3,7 +3,7 @@ import { cacheProperties, SHARED_ATTRIBUTES, stateProperties } from '../constant
 import {
   getBoundsOfCurve, joinPath, makePathSimpler, max, min, parsePath, toFixed
 } from '../util';
-import { parseAttributes } from "../_parser";
+import { parseAttributes } from "../parser/_parser";
 import { FabricObject } from './object.class';
 import { Polyline } from './polyline.class';
 

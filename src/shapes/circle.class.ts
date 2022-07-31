@@ -5,7 +5,7 @@ import {
   cos,
   degreesToRadians, sin
 } from '../util';
-import { parseAttributes } from "../_parser";
+import { parseAttributes } from "../parser/_parser";
 import { FabricObject } from './object.class';
 
 function isValidRadius(attributes) {

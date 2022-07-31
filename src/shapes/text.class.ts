@@ -2,10 +2,11 @@
 
 import { charWidthsCache } from '../cache';
 import { cacheProperties, DEFAULT_SVG_FONT_SIZE, isLikelyNode, SHARED_ATTRIBUTES, stateProperties } from '../constants';
+import { applyMixins } from '../mixins/apply_mixins';
 import { TextStyleMixinGenerator } from '../mixins/text_style.mixin'; // optional Text
 import { Point } from '../point.class';
 import { createCanvasElement, graphemeSplit, hasStyleChanged, stylesFromArray, stylesToArray } from '../util';
-import { parseAttributes } from "../_parser";
+import { parseAttributes } from "../parser/_parser";
 import { FabricObject } from './object.class';
 
 
@@ -15,6 +16,53 @@ const additionalProps =
     ' direction path pathStartOffset pathSide pathAlign').split(' ');
 
 let _measuringContext;
+
+/**
+ * Properties which when set cause object to change dimensions
+ * @type Array
+ * @private
+ */
+const dimensionAffectingTextProps = [
+  'fontSize',
+  'fontWeight',
+  'fontFamily',
+  'fontStyle',
+  'lineHeight',
+  'text',
+  'charSpacing',
+  'textAlign',
+  'styles',
+  'path',
+  'pathStartOffset',
+  'pathSide',
+  'pathAlign'
+]
+
+/**
+ * @private
+ */
+const _reNewline = /\r?\n/
+
+/**
+ * Use this regular expression to filter for whitespaces that is not a new line.
+ * Mostly used when text is 'justify' aligned.
+ * @private
+ */
+const _reSpacesAndTabs = /[ \t\r]/g
+
+/**
+ * Use this regular expression to filter for whitespace that is not a new line.
+ * Mostly used when text is 'justify' aligned.
+ * @private
+ */
+const _reSpaceAndTab = /[ \t\r]/
+
+/**
+ * Use this regular expression to filter consecutive groups of non spaces.
+ * Mostly used when text is 'justify' aligned.
+ * @private
+ */
+const _reWords = /\S+/g
 
 /**
  * Text class
@@ -29,47 +77,33 @@ export class TextBase extends FabricObject {
    * @type Array
    * @private
    */
-  _dimensionAffectingProps = [
-    'fontSize',
-    'fontWeight',
-    'fontFamily',
-    'fontStyle',
-    'lineHeight',
-    'text',
-    'charSpacing',
-    'textAlign',
-    'styles',
-    'path',
-    'pathStartOffset',
-    'pathSide',
-    'pathAlign'
-  ]
+  _dimensionAffectingProps = dimensionAffectingTextProps
 
   /**
    * @private
    */
-  _reNewline = /\r?\n/
+  _reNewline = _reNewline
 
   /**
    * Use this regular expression to filter for whitespaces that is not a new line.
    * Mostly used when text is 'justify' aligned.
    * @private
    */
-  _reSpacesAndTabs = /[ \t\r]/g
+  _reSpacesAndTabs = _reSpacesAndTabs
 
   /**
    * Use this regular expression to filter for whitespace that is not a new line.
    * Mostly used when text is 'justify' aligned.
    * @private
    */
-  _reSpaceAndTab = /[ \t\r]/
+  _reSpaceAndTab = _reSpaceAndTab
 
   /**
    * Use this regular expression to filter consecutive groups of non spaces.
    * Mostly used when text is 'justify' aligned.
    * @private
    */
-  _reWords = /\S+/g
+  _reWords = _reWords
 
   /**
    * Type of an object

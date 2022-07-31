@@ -1,14 +1,14 @@
 //@ts-nocheck
 
-import { applyMixins } from '../mixins';
-import {
-  stylesFromArray
-} from '../util';
-import { FabricObject } from "./object.class";
+import { applyMixins } from '../mixins/apply_mixins';
 import { ITextSVGExportMixinGenerator } from '../mixins/itext.svg_export'; // optional itext
 import { ITextBehaviorMixinGenerator } from '../mixins/itext_behavior.mixin'; // optional itext_behavior
 import { ITextClickBehaviorMixinGenerator } from '../mixins/itext_click_behavior.mixin'; // optional itext
 import { ITextKeyBehaviorMixinGenerator } from '../mixins/itext_key_behavior.mixin'; // optional itext_behavior
+import {
+  stylesFromArray
+} from '../util';
+import { FabricObject } from "./object.class";
 import { Text } from './text.class';
 
 

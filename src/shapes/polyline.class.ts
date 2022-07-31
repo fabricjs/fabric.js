@@ -4,7 +4,7 @@ import { cacheProperties, SHARED_ATTRIBUTES } from '../constants';
 import {
   max, min, projectStrokeOnPoints, toFixed
 } from '../util';
-import { parseAttributes, parsePointsAttribute } from "../_parser";
+import { parseAttributes, parsePointsAttribute } from "../parser/_parser";
 import { FabricObject } from './object.class';
 
 /**
