@@ -121,6 +121,7 @@ export class Observable {
     else {
       this._removeEventListener(arg0, handler);
     }
+
   }
 
   /**
@@ -134,11 +135,10 @@ export class Observable {
       return;
     }
 
-    var listenersForEvent = this.__eventListeners[eventName];
+    var listenersForEvent = this.__eventListeners[eventName].concat();
     if (!listenersForEvent) {
       return;
     }
-
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
       listenersForEvent[i].call(this, options || {});
     }
