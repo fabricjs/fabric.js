@@ -1,3 +1,4 @@
+//@ts-nocheck
 var fabric;
 // temporary hack till all fabric uses exports/imports
 (function(global) {
