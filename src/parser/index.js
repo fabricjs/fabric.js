@@ -1,6 +1,14 @@
 import { incrementUID } from '../constants';
 import { extend, toArray } from '../util';
-import { applyViewboxTransform, elementById, hasAncestorWithNodeName, parseAttributes, parseFontDeclaration, parsePointsAttribute, parseTransformAttribute, parseUseDirectives, _getMultipleNodes } from './_parser';
+import { hasAncestorWithNodeName } from "./hasAncestorWithNodeName";
+import { applyViewboxTransform } from "./applyViewboxTransform";
+import { parseUseDirectives } from "./parseUseDirectives";
+import { elementById } from "./elementById";
+import { parseAttributes } from "./parseAttributes";
+import { parseTransformAttribute } from "./parseTransformAttribute";
+import { parsePointsAttribute } from "./parsePointsAttribute";
+import { getMultipleNodes } from "./getMultipleNodes";
+import { parseFontDeclaration } from "./parseFontDeclaration";
 import { parseStyleAttribute } from "./parseStyleAttribute";
 import { clipPaths, cssRules, gradientDefs, svgInvalidAncestorsRegEx, svgValidParentsRegEx, svgValidTagNamesRegEx, svgViewBoxElementsRegEx } from "./constants";
 
@@ -157,7 +165,7 @@ import { clipPaths, cssRules, gradientDefs, svgInvalidAncestorsRegEx, svgValidPa
         'radialGradient',
         'svg:linearGradient',
         'svg:radialGradient'],
-        elList = _getMultipleNodes(doc, tagArray),
+        elList = getMultipleNodes(doc, tagArray),
         el, j = 0, gradientDefs = {};
       j = elList.length;
       while (j--) {

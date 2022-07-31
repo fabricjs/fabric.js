@@ -6,7 +6,7 @@ import { applyMixins } from '../mixins/apply_mixins';
 import { TextStyleMixinGenerator } from '../mixins/text_style.mixin'; // optional Text
 import { Point } from '../point.class';
 import { createCanvasElement, graphemeSplit, hasStyleChanged, stylesFromArray, stylesToArray } from '../util';
-import { parseAttributes } from "../parser/_parser";
+import { parseAttributes } from "../parser/parseAttributes";
 import { FabricObject } from './object.class';
 
 

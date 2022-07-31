@@ -1,5 +1,6 @@
+//@ts-nocheck
 import { reNum } from '../constants';
-import { getSvgRegex } from './_parser';
+import { getSvgRegex } from "./getSvgRegex";
 
 
 export const cssRules = {};

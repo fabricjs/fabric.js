@@ -5,7 +5,7 @@ import { WebglFilterBackend } from '../filters/webgl_backend.class';
 import {
   addClass, cleanUpJsdomNode, createCanvasElement, enlivenObjectEnlivables, enlivenObjects, findScaleToCover, findScaleToFit, getById, loadImage, parsePreserveAspectRatioAttribute, setImageSmoothing
 } from '../util';
-import { parseAttributes } from "../parser/_parser";
+import { parseAttributes } from "../parser/parseAttributes";
 import { FabricObject } from "./object.class";
 
 /**

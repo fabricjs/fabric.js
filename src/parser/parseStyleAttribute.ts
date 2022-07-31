@@ -1,4 +1,6 @@
-import { parseStyleString, parseStyleObject } from './_parser';
+//@ts-nocheck
+import { parseStyleObject } from "./parseStyleObject";
+import { parseStyleString } from "./parseStyleString";
 
 
 export function parseStyleAttribute(element) {
