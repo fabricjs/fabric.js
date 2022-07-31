@@ -2,7 +2,7 @@
 
 import { Point } from '../point.class';
 import {
-  calcRotateMatrix, cos, degreesToRadians, invertTransform, makeBoundingBoxFromPoints, multiplyTransformMatrices as multiplyMatrices, qrDecompose, sin, sizeAfterTransform, transformPoint
+  calcRotateMatrix, composeMatrix, cos, degreesToRadians, invertTransform, makeBoundingBoxFromPoints, multiplyTransformMatrices as multiplyMatrices, qrDecompose, sin, sizeAfterTransform, transformPoint
 } from '../util';
 
 export function arrayFromCoords(coords) {

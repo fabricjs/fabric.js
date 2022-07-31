@@ -1,7 +1,8 @@
 //@ts-nocheck
 
 import { Point } from "../point.class";
-import { degreesToRadians } from "../util";
+import { degreesToRadians, rotatePoint } from "../util";
+import { OriginX, OriginY } from "../typedefs";
 
 
 const originXOffset = {
@@ -16,12 +17,6 @@ const originXOffset = {
   };
 
 
-/**
- * @typedef {number | 'left' | 'center' | 'right'} OriginX
- * @typedef {number | 'top' | 'center' | 'bottom'} OriginY
- */
-
-
 export function ObjectOriginMixinGenerator(Klass) {
   return class ObjectOriginMixin extends Klass {
 
@@ -31,7 +26,7 @@ export function ObjectOriginMixinGenerator(Klass) {
      * @param {OriginX} originX
      * @returns number
      */
-    resolveOriginX(originX) {
+    resolveOriginX(originX: OriginX) {
       return typeof originX === 'string' ?
         originXOffset[originX] :
         originX - 0.5;
@@ -43,7 +38,7 @@ export function ObjectOriginMixinGenerator(Klass) {
      * @param {OriginY} originY
      * @returns number
      */
-    resolveOriginY(originY) {
+    resolveOriginY(originY: OriginY) {
       return typeof originY === 'string' ?
         originYOffset[originY] :
         originY - 0.5;
@@ -58,7 +53,7 @@ export function ObjectOriginMixinGenerator(Klass) {
      * @param {OriginY} toOriginY Vertical origin: 'top', 'center' or 'bottom'
      * @return {Point}
      */
-    translateToGivenOrigin(point, fromOriginX, fromOriginY, toOriginX, toOriginY) {
+    translateToGivenOrigin(point: Point, fromOriginX: OriginX, fromOriginY: OriginY, toOriginX: OriginX, toOriginY: OriginY): Point {
       var x = point.x,
         y = point.y,
         dim,
@@ -81,7 +76,7 @@ export function ObjectOriginMixinGenerator(Klass) {
      * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {Point}
      */
-    translateToCenterPoint(point, originX, originY) {
+    translateToCenterPoint(point: Point, originX: OriginX, originY: OriginY): Point {
       var p = this.translateToGivenOrigin(point, originX, originY, 'center', 'center');
       if (this.angle) {
         return rotatePoint(p, point, degreesToRadians(this.angle));
@@ -96,7 +91,7 @@ export function ObjectOriginMixinGenerator(Klass) {
      * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {Point}
      */
-    translateToOriginPoint(center, originX, originY) {
+    translateToOriginPoint(center: Point, originX: OriginX, originY: OriginY): Point {
       var p = this.translateToGivenOrigin(center, 'center', 'center', originX, originY);
       if (this.angle) {
         return rotatePoint(p, center, degreesToRadians(this.angle));
@@ -108,7 +103,7 @@ export function ObjectOriginMixinGenerator(Klass) {
      * Returns the center coordinates of the object relative to canvas
      * @return {Point}
      */
-    getCenterPoint() {
+    getCenterPoint(): Point {
       var relCenter = this.getRelativeCenterPoint();
       return this.group ?
         transformPoint(relCenter, this.group.calcTransformMatrix()) :
@@ -119,7 +114,7 @@ export function ObjectOriginMixinGenerator(Klass) {
      * Returns the center coordinates of the object relative to it's containing group or null
      * @return {Point|null} point or null of object has no parent group
      */
-    getCenterPointRelativeToParent() {
+    getCenterPointRelativeToParent(): Point | null {
       return this.group ? this.getRelativeCenterPoint() : null;
     }
 
@@ -127,7 +122,7 @@ export function ObjectOriginMixinGenerator(Klass) {
      * Returns the center coordinates of the object relative to it's parent
      * @return {Point}
      */
-    getRelativeCenterPoint() {
+    getRelativeCenterPoint(): Point {
       return this.translateToCenterPoint(new Point(this.left, this.top), this.originX, this.originY);
     }
 
@@ -146,7 +141,7 @@ export function ObjectOriginMixinGenerator(Klass) {
      * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {Point}
      */
-    getPointByOrigin(originX, originY) {
+    getPointByOrigin(originX: OriginX, originY: OriginY): Point {
       var center = this.getRelativeCenterPoint();
       return this.translateToOriginPoint(center, originX, originY);
     }
@@ -158,7 +153,7 @@ export function ObjectOriginMixinGenerator(Klass) {
      * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {Point}
      */
-    normalizePoint(point, originX, originY) {
+    normalizePoint(point: Point, originX: OriginX, originY: OriginY): Point {
       var center = this.getRelativeCenterPoint(), p, p2;
       if (typeof originX !== 'undefined' && typeof originY !== 'undefined') {
         p = this.translateToGivenOrigin(center, 'center', 'center', originX, originY);
@@ -180,7 +175,7 @@ export function ObjectOriginMixinGenerator(Klass) {
      * @param {Object} [pointer] Pointer to operate upon (instead of event)
      * @return {Object} Coordinates of a pointer (x, y)
      */
-    getLocalPointer(e, pointer) {
+    getLocalPointer(e: Event, pointer: object): object {
       pointer = pointer || this.canvas.getPointer(e);
       return transformPoint(
         new Point(pointer.x, pointer.y),
@@ -204,7 +199,7 @@ export function ObjectOriginMixinGenerator(Klass) {
      * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {void}
      */
-    setPositionByOrigin(pos, originX, originY) {
+    setPositionByOrigin(pos: Point, originX: OriginX, originY: OriginY): void {
       var center = this.translateToCenterPoint(pos, originX, originY),
         position = this.translateToOriginPoint(center, this.originX, this.originY);
       this.set('left', position.x);
@@ -214,7 +209,7 @@ export function ObjectOriginMixinGenerator(Klass) {
     /**
      * @param {String} to One of 'left', 'center', 'right'
      */
-    adjustPosition(to) {
+    adjustPosition(to: string) {
       var angle = degreesToRadians(this.angle),
         hypotFull = this.getScaledWidth(),
         xFull = cos(angle) * hypotFull,
@@ -245,7 +240,7 @@ export function ObjectOriginMixinGenerator(Klass) {
      * @private
      * @return {void}
      */
-    _setOriginToCenter() {
+    _setOriginToCenter(): void {
       this._originalOriginX = this.originX;
       this._originalOriginY = this.originY;
 
@@ -263,7 +258,7 @@ export function ObjectOriginMixinGenerator(Klass) {
      * @private
      * @return {void}
      */
-    _resetOrigin() {
+    _resetOrigin(): void {
       var originPoint = this.translateToOriginPoint(
         this.getRelativeCenterPoint(),
         this._originalOriginX,

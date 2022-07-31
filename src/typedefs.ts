@@ -4,8 +4,12 @@ interface NominalTag<T> {
 
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
 
-const enum Degree {}
-const enum Radian {}
+const enum Degree { }
+const enum Radian { }
 
 export type TDegree = Nominal<number, Degree>;
 export type TRadian = Nominal<number, Radian>;
+
+
+export type OriginX = number | 'left' | 'center' | 'right';
+export type OriginY = number | 'top' | 'center' | 'bottom';

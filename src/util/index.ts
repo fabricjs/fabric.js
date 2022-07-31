@@ -87,7 +87,9 @@ const {
     radiansToDegrees,
     setStyle,
     calcRotateMatrix,
-    makeBoundingBoxFromPoints
+    makeBoundingBoxFromPoints,
+    composeMatrix,
+    rotatePoint,
 } = fabric.util;
 export {
     sin,
@@ -154,6 +156,8 @@ export {
     radiansToDegrees,
     setStyle,
     calcRotateMatrix,
-    makeBoundingBoxFromPoints
+    makeBoundingBoxFromPoints,
+    composeMatrix,
+    rotatePoint
 };
 export default fabric.util;
