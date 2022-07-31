@@ -354,9 +354,8 @@ export class BaseFilter {
    * Create filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @returns {Promise<fabric.Image.filters.BaseFilter>}
    */
   static async fromObject(object) {
-    return new fabric.Image.filters[object.type](object);
+    return new this(object);
   };
 }
