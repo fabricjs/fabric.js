@@ -1,15 +1,15 @@
 //@ts-nocheck
-export function removeDefaultValues(object, prototype) {
+export function removeDefaultValues(object, defaults) {
     Object.keys(object).forEach(function (prop) {
         if (prop === 'left' || prop === 'top' || prop === 'type') {
             return;
         }
-        if (object[prop] === prototype[prop]) {
+        if (object[prop] === defaults[prop]) {
             delete object[prop];
         }
         // basically a check for [] === []
-        if (Array.isArray(object[prop]) && Array.isArray(prototype[prop])
-            && object[prop].length === 0 && prototype[prop].length === 0) {
+        if (Array.isArray(object[prop]) && Array.isArray(defaults[prop])
+            && object[prop].length === 0 && defaults[prop].length === 0) {
             delete object[prop];
         }
     });
