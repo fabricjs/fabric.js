@@ -1079,6 +1079,7 @@
       if (this.isCacheDirty()) {
         this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
         this.drawObject(this._cacheContext, options.forClipping);
+        this.applyFilters();
         this.dirty = false;
       }
     },
@@ -1240,7 +1241,8 @@
     },
 
     /**
-     * Check if cache is dirty
+     * Check if cache is dirty, and if it is, it clears the context.
+     * The name is misleading.
      * @param {Boolean} skipCanvas skip canvas checks because this object is painted
      * on parent canvas.
      */
@@ -1534,6 +1536,40 @@
     },
 
     /**
+     * Apply some image filters to an object.
+     * @param {Array} filters
+     */
+    applyFilters: function(filters) {
+      filters = filters || this.filters;
+      if (!filters || filters.length === 0) {
+        return;
+      }
+      if (!fabric.filterBackend) {
+        fabric.filterBackend = fabric.initFilterBackend();
+      }
+      if (!this._cacheCanvas) {
+        this.renderCache();
+      }
+
+      var cacheCanvas = this._cacheCanvas,
+          sourceWidth = cacheCanvas.width,
+          sourceHeight = cacheCanvas.height,
+          newCanvas = fabric.util.createCanvasElement(cacheCanvas),
+          newContext = newCanvas.getContext('2d');
+      fabric.filterBackend.applyFilters(
+        filters,
+        cacheCanvas,
+        sourceWidth,
+        sourceHeight,
+        newCanvas,
+        '');
+      newContext.translate(this.cacheTranslationX, this.cacheTranslationY);
+      newContext.scale(this.zoomX, this.zoomY);
+      this._cacheCanvas = newCanvas;
+      this._cacheContext = newContext;
+    },
+
+    /**
      * This function try to patch the missing gradientTransform on canvas gradients.
      * transforming a context to transform the gradient, is going to transform the stroke too.
      * we want to transform the gradient but not the stroke operation, so we create
@@ -1569,6 +1605,7 @@
       ctx.strokeStyle = pCtx.createPattern(pCanvas, 'no-repeat');
     },
 
+    /* _FROM_SVG_START_ */
     /**
      * This function is an helper for svg import. it returns the center of the object in the svg
      * untransformed coordinates
@@ -1626,6 +1663,7 @@
       this.setPositionByOrigin(center, 'center', 'center');
     },
 
+    /* _FROM_SVG_END_ */
     /**
      * Clones an instance.
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
