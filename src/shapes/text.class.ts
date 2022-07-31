@@ -381,9 +381,9 @@ export class TextBase extends FabricObject {
     return super._shouldRedrawCache(dims) || this.path;
   }
 
-  _shouldResizeCache(dims) {
+  _calcCacheResizing(dims) {
     var lineHeight = this.getHeightOfLine(0);
-    return super._shouldResizeCache(dims)
+    return super._calcCacheResizing(dims)
       .add(this.path ? new Point(this.zoomX, this.zoomY).scalarMultiply(lineHeight) : new Point());
   }
 

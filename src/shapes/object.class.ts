@@ -759,7 +759,7 @@ class FabricObjectBase extends CommonMethods {
   /**
    * @private
    */
-  _shouldResizeCache(dims) {
+  _calcCacheResizing(dims) {
     var minCacheSize = minCacheSideLimit,
       width = dims.width, height = dims.height,
       dimensionsChanged = width !== this.cacheWidth || height !== this.cacheHeight,
@@ -801,7 +801,7 @@ class FabricObjectBase extends CommonMethods {
       width = dims.width, height = dims.height, drawingWidth, drawingHeight,
       zoomX = dims.zoomX, zoomY = dims.zoomY,
       shouldRedraw = this._shouldRedrawCache(dims),
-      additionalSize = this._shouldResizeCache(dims);
+      additionalSize = this._calcCacheResizing(dims);
 
     if (shouldRedraw) {
       if (additionalSize.x > 0 || additionalSize.y > 0) {
