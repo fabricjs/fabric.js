@@ -16,7 +16,7 @@ import { Point } from '../point.class';
 import { StaticCanvas } from '../static_canvas.class';
 import {
   capitalize, clamp, clone, createCanvasElement, degreesToRadians, enlivenObjectEnlivables, invertTransform, limitDimsByArea, multiplyTransformMatrices, populateWithProperties,
-  qrDecompose, resetObjectTransform, saveObjectTransform, toDataURL, toFixed,
+  qrDecompose, removeDefaultValues, resetObjectTransform, saveObjectTransform, toDataURL, toFixed,
   transformPoint
 } from '../util';
 import { RUNNING_ANIMATIONS } from '../util/animate';
@@ -893,11 +893,10 @@ class FabricObjectBase extends CommonMethods {
     }
 
     populateWithProperties(this, object, propertiesToInclude);
-    if (!this.includeDefaultValues) {
-      object = removeDefaultValues(object, Object.getPrototypeOf(this));
-    }
 
-    return object;
+    return !this.includeDefaultValues ?
+      removeDefaultValues(object, Object.getPrototypeOf(this)) :
+      object;
   }
 
   /**

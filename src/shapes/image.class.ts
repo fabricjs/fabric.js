@@ -101,7 +101,7 @@ export class Image extends FabricObject {
    * @type String
    * @default
    */
-  cacheKey = ''
+  cacheKey: string
 
   /**
    * Image crop in pixels from original image size.
@@ -128,6 +128,8 @@ export class Image extends FabricObject {
    */
   imageSmoothing = true
 
+  filters = []
+
   /**
    * Constructor
    * Image can be initialized with any canvas drawable or a string.
@@ -138,11 +140,9 @@ export class Image extends FabricObject {
    * @param {Object} [options] Options object
    * @return {Image} thisArg
    */
-  constructor(element, options) {
-    options || (options = {});
-    this.filters = [];
-    this.cacheKey = 'texture' + incrementUID();
+  constructor(element, options = {}) {
     super(options);
+    this.cacheKey = 'texture' + incrementUID();
     this._initElement(element, options);
   }
 

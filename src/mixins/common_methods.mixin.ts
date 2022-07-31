@@ -20,14 +20,16 @@ export class CommonMethods extends Observable {
    * @param {Object|Function} value Property value (if function, the value is passed into it and its return value is used as a new one)
    * @chainable
    */
-  set(key, value) {
-    if (typeof key === 'object') {
-      for (var prop in obj) {
-        this._set(prop, obj[prop]);
+  set<K extends keyof this, T extends this[K]>(key: string, value: T): void
+  set<K extends keyof this, T extends this[K]>(object: { [key: K]: T }): void
+  set(arg0, value?) {
+    if (typeof arg0 === 'object') {
+      for (var prop in arg0) {
+        this._set(prop, arg0[prop]);
       }
     }
     else {
-      this._set(key, value);
+      this._set(arg0, value);
     }
     return this;
   }
