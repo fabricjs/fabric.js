@@ -1,9 +1,5 @@
 //@ts-nocheck
-var _fabric;
-// temporary hack till all fabric uses exports/imports
-(function(global) {
-  _fabric = global.fabric;
-})(typeof exports !== 'undefined' ? exports : window);
+import { fabric } from '../../HEADER';
 
 /**
  * Rectangle class
@@ -157,12 +153,12 @@ Rect.fromElement = function(element, callback, options) {
   }
   options = options || { };
 
-  var parsedAttributes = fabric.parseAttributes(element, fabric.Rect.ATTRIBUTE_NAMES);
+  var parsedAttributes = fabric.parseAttributes(element, Rect.ATTRIBUTE_NAMES);
   parsedAttributes.left = parsedAttributes.left || 0;
   parsedAttributes.top  = parsedAttributes.top  || 0;
   parsedAttributes.height  = parsedAttributes.height || 0;
   parsedAttributes.width  = parsedAttributes.width || 0;
-  var rect = new fabric.Rect(Object.assign({}, options, parsedAttributes));
+  var rect = new Rect(Object.assign({}, options, parsedAttributes));
   rect.visible = rect.visible && rect.width > 0 && rect.height > 0;
   callback(rect);
 };
@@ -176,7 +172,7 @@ Rect.fromElement = function(element, callback, options) {
  * @returns {Promise<fabric.Rect>}
  */
 Rect.fromObject = function(object) {
-  return fabric.Object._fromObject(fabric.Rect, object);
+  return fabric.Object._fromObject(Rect, object);
 };
 
-_fabric.Rect = Rect;
+fabric.Rect = Rect;
