@@ -1,21 +1,19 @@
 //@ts-nocheck
 
+import { Point } from '../point.class';
+import {
+  calcRotateMatrix, cos, degreesToRadians, invertTransform, makeBoundingBoxFromPoints, multiplyTransformMatrices as multiplyMatrices, qrDecompose, sin, sizeAfterTransform, transformPoint
+} from '../util';
 
-  function arrayFromCoords(coords) {
-    return [
-      new fabric.Point(coords.tl.x, coords.tl.y),
-      new fabric.Point(coords.tr.x, coords.tr.y),
-      new fabric.Point(coords.br.x, coords.br.y),
-      new fabric.Point(coords.bl.x, coords.bl.y)
-    ];
-  }
+export function arrayFromCoords(coords) {
+  return [
+    new Point(coords.tl.x, coords.tl.y),
+    new Point(coords.tr.x, coords.tr.y),
+    new Point(coords.br.x, coords.br.y),
+    new Point(coords.bl.x, coords.bl.y)
+  ];
+}
 
-  var fabric = global.fabric, util = fabric.util,
-    degreesToRadians = util.degreesToRadians,
-    multiplyMatrices = util.multiplyTransformMatrices,
-    transformPoint = util.transformPoint;
-
-  
 export function ObjectGeometryMixinGenerator(Klass) {
   return class ObjectGeometryMixin extends Klass {
 
@@ -27,7 +25,6 @@ export function ObjectGeometryMixinGenerator(Klass) {
      * interactive area of the corner.
      * The coordinates depends from the controls positionHandler and are used
      * to draw and locate controls
-     * @memberOf fabric.Object.prototype
      */
     oCoords = null
 
@@ -41,7 +38,6 @@ export function ObjectGeometryMixinGenerator(Klass) {
      * with oCoords but they do not need to be updated when zoom or panning change.
      * The coordinates get updated with @method setCoords.
      * You can calculate them without updating with @method calcACoords();
-     * @memberOf fabric.Object.prototype
      */
     aCoords = null
 
@@ -49,7 +45,6 @@ export function ObjectGeometryMixinGenerator(Klass) {
      * Describe object's corner position in canvas element coordinates.
      * includes padding. Used of object detection.
      * set and refreshed with setCoords.
-     * @memberOf fabric.Object.prototype
      */
     lineCoords = null
 
@@ -70,105 +65,105 @@ export function ObjectGeometryMixinGenerator(Klass) {
     controls = {}
 
     /**
-     * @returns {number} x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
+     * @returns {number} x position according to object's {@link FabricObject#originX} property in canvas coordinate plane
      */
     getX() {
       return this.getXY().x;
     }
 
     /**
-     * @param {number} value x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
+     * @param {number} value x position according to object's {@link FabricObject#originX} property in canvas coordinate plane
      */
     setX(value) {
       this.setXY(this.getXY().setX(value));
     }
 
     /**
-     * @returns {number} x position according to object's {@link fabric.Object#originX} property in parent's coordinate plane\
-     * if parent is canvas then this property is identical to {@link fabric.Object#getX}
+     * @returns {number} x position according to object's {@link FabricObject#originX} property in parent's coordinate plane\
+     * if parent is canvas then this property is identical to {@link FabricObject#getX}
      */
     getRelativeX() {
       return this.left;
     }
 
     /**
-     * @param {number} value x position according to object's {@link fabric.Object#originX} property in parent's coordinate plane\
-     * if parent is canvas then this method is identical to {@link fabric.Object#setX}
+     * @param {number} value x position according to object's {@link FabricObject#originX} property in parent's coordinate plane\
+     * if parent is canvas then this method is identical to {@link FabricObject#setX}
      */
     setRelativeX(value) {
       this.left = value;
     }
 
     /**
-     * @returns {number} y position according to object's {@link fabric.Object#originY} property in canvas coordinate plane
+     * @returns {number} y position according to object's {@link FabricObject#originY} property in canvas coordinate plane
      */
     getY() {
       return this.getXY().y;
     }
 
     /**
-     * @param {number} value y position according to object's {@link fabric.Object#originY} property in canvas coordinate plane
+     * @param {number} value y position according to object's {@link FabricObject#originY} property in canvas coordinate plane
      */
     setY(value) {
       this.setXY(this.getXY().setY(value));
     }
 
     /**
-     * @returns {number} y position according to object's {@link fabric.Object#originY} property in parent's coordinate plane\
-     * if parent is canvas then this property is identical to {@link fabric.Object#getY}
+     * @returns {number} y position according to object's {@link FabricObject#originY} property in parent's coordinate plane\
+     * if parent is canvas then this property is identical to {@link FabricObject#getY}
      */
     getRelativeY() {
       return this.top;
     }
 
     /**
-     * @param {number} value y position according to object's {@link fabric.Object#originY} property in parent's coordinate plane\
-     * if parent is canvas then this property is identical to {@link fabric.Object#setY}
+     * @param {number} value y position according to object's {@link FabricObject#originY} property in parent's coordinate plane\
+     * if parent is canvas then this property is identical to {@link FabricObject#setY}
      */
     setRelativeY(value) {
       this.top = value;
     }
 
     /**
-     * @returns {number} x position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in canvas coordinate plane
+     * @returns {number} x position according to object's {@link FabricObject#originX} {@link FabricObject#originY} properties in canvas coordinate plane
      */
     getXY() {
       var relativePosition = this.getRelativeXY();
       return this.group ?
-        fabric.util.transformPoint(relativePosition, this.group.calcTransformMatrix()) :
+        transformPoint(relativePosition, this.group.calcTransformMatrix()) :
         relativePosition;
     }
 
     /**
      * Set an object position to a particular point, the point is intended in absolute ( canvas ) coordinate.
-     * You can specify {@link fabric.Object#originX} and {@link fabric.Object#originY} values,
+     * You can specify {@link FabricObject#originX} and {@link FabricObject#originY} values,
      * that otherwise are the object's current values.
      * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
-     * object.setXY(new fabric.Point(5, 5), 'left', 'bottom').
-     * @param {fabric.Point} point position in canvas coordinate plane
+     * object.setXY(new Point(5, 5), 'left', 'bottom').
+     * @param {Point} point position in canvas coordinate plane
      * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
      * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
      */
     setXY(point, originX, originY) {
       if (this.group) {
-        point = fabric.util.transformPoint(
+        point = transformPoint(
           point,
-          fabric.util.invertTransform(this.group.calcTransformMatrix())
+          invertTransform(this.group.calcTransformMatrix())
         );
       }
       this.setRelativeXY(point, originX, originY);
     }
 
     /**
-     * @returns {number} x position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
+     * @returns {number} x position according to object's {@link FabricObject#originX} {@link FabricObject#originY} properties in parent's coordinate plane
      */
     getRelativeXY() {
-      return new fabric.Point(this.left, this.top);
+      return new Point(this.left, this.top);
     }
 
     /**
-     * As {@link fabric.Object#setXY}, but in current parent's coordinate plane ( the current group if any or the canvas)
-     * @param {fabric.Point} point position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
+     * As {@link FabricObject#setXY}, but in current parent's coordinate plane ( the current group if any or the canvas)
+     * @param {Point} point position according to object's {@link FabricObject#originX} {@link FabricObject#originY} properties in parent's coordinate plane
      * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
      * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
      */
@@ -203,7 +198,7 @@ export function ObjectGeometryMixinGenerator(Klass) {
       if (this.group) {
         var t = this.group.calcTransformMatrix();
         return coords.map(function (p) {
-          return util.transformPoint(p, t);
+          return transformPoint(p, t);
         });
       }
       return coords;
@@ -219,7 +214,7 @@ export function ObjectGeometryMixinGenerator(Klass) {
      */
     intersectsWithRect(pointTL, pointBR, absolute, calculate) {
       var coords = this.getCoords(absolute, calculate),
-        intersection = fabric.Intersection.intersectPolygonRectangle(
+        intersection = Intersection.intersectPolygonRectangle(
           coords,
           pointTL,
           pointBR
@@ -235,7 +230,7 @@ export function ObjectGeometryMixinGenerator(Klass) {
      * @return {Boolean} true if object intersects with another object
      */
     intersectsWithObject(other, absolute, calculate) {
-      var intersection = fabric.Intersection.intersectPolygonPolygon(
+      var intersection = Intersection.intersectPolygonPolygon(
         this.getCoords(absolute, calculate),
         other.getCoords(absolute, calculate)
       );
@@ -285,7 +280,7 @@ export function ObjectGeometryMixinGenerator(Klass) {
 
     /**
      * Checks if point is inside the object
-     * @param {fabric.Point} point Point to check against
+     * @param {Point} point Point to check against
      * @param {Object} [lines] object returned from @method _getImageLines
      * @param {Boolean} [absolute] use coordinates without viewportTransform
      * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
@@ -411,7 +406,7 @@ export function ObjectGeometryMixinGenerator(Klass) {
      * Helper method to determine how many cross points are between the 4 object edges
      * and the horizontal line determined by a point on canvas
      * @private
-     * @param {fabric.Point} point Point to check
+     * @param {Point} point Point to check
      * @param {Object} lines Coordinates of the object being evaluated
      */
     // remove yi not used but left code here just in case.
@@ -466,7 +461,7 @@ export function ObjectGeometryMixinGenerator(Klass) {
      */
     getBoundingRect(absolute, calculate) {
       var coords = this.getCoords(absolute, calculate);
-      return util.makeBoundingBoxFromPoints(coords);
+      return makeBoundingBoxFromPoints(coords);
     }
 
     /**
@@ -511,7 +506,7 @@ export function ObjectGeometryMixinGenerator(Klass) {
     /**
      * Scales an object (equally by x and y)
      * @param {Number} value Scale factor
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      * @chainable
      */
     scale(value) {
@@ -524,7 +519,7 @@ export function ObjectGeometryMixinGenerator(Klass) {
      * Scales an object to a given width, with respect to bounding box (scaling by x/y equally)
      * @param {Number} value New width value
      * @param {Boolean} absolute ignore viewport
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      * @chainable
      */
     scaleToWidth(value, absolute) {
@@ -537,7 +532,7 @@ export function ObjectGeometryMixinGenerator(Klass) {
      * Scales an object to a given height, with respect to bounding box (scaling by x/y equally)
      * @param {Number} value New height value
      * @param {Boolean} absolute ignore viewport
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      * @chainable
      */
     scaleToHeight(value, absolute) {
@@ -549,8 +544,7 @@ export function ObjectGeometryMixinGenerator(Klass) {
     calcLineCoords() {
       var vpt = this.getViewportTransform(),
         padding = this.padding, angle = degreesToRadians(this.getTotalAngle()),
-        cos = util.cos(angle), sin = util.sin(angle),
-        cosP = cos * padding, sinP = sin * padding, cosPSinP = cosP + sinP,
+        cosP = cos(angle) * padding, sinP = sin(angle) * padding, cosPSinP = cosP + sinP,
         cosPMinusSinP = cosP - sinP, aCoords = this.calcACoords();
 
       var lineCoords = {
@@ -578,11 +572,11 @@ export function ObjectGeometryMixinGenerator(Klass) {
       var vpt = this.getViewportTransform(),
         center = this.getCenterPoint(),
         tMatrix = [1, 0, 0, 1, center.x, center.y],
-        rMatrix = util.calcRotateMatrix({ angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0) }),
+        rMatrix = calcRotateMatrix({ angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0) }),
         positionMatrix = multiplyMatrices(tMatrix, rMatrix),
         startMatrix = multiplyMatrices(vpt, positionMatrix),
         finalMatrix = multiplyMatrices(startMatrix, [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0]),
-        transformOptions = this.group ? fabric.util.qrDecompose(this.calcTransformMatrix()) : undefined,
+        transformOptions = this.group ? qrDecompose(this.calcTransformMatrix()) : undefined,
         dim = this._calculateCurrentDimensions(transformOptions),
         coords = {};
       this.forEachControl(function (control, key, fabricObject) {
@@ -606,7 +600,7 @@ export function ObjectGeometryMixinGenerator(Klass) {
     }
 
     calcACoords() {
-      var rotateMatrix = util.calcRotateMatrix({ angle: this.angle }),
+      var rotateMatrix = calcRotateMatrix({ angle: this.angle }),
         center = this.getRelativeCenterPoint(),
         translateMatrix = [1, 0, 0, 1, center.x, center.y],
         finalMatrix = multiplyMatrices(translateMatrix, rotateMatrix),
@@ -629,7 +623,7 @@ export function ObjectGeometryMixinGenerator(Klass) {
      * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
      *
      * @param {Boolean} [skipCorners] skip calculation of oCoords.
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      * @chainable
      */
     setCoords(skipCorners) {
@@ -703,17 +697,17 @@ export function ObjectGeometryMixinGenerator(Klass) {
           flipY: this.flipY,
         };
       cache.key = key;
-      cache.value = util.composeMatrix(options);
+      cache.value = composeMatrix(options);
       return cache.value;
     }
 
     /**
      * Calculate object dimensions from its properties
      * @private
-     * @returns {fabric.Point} dimensions
+     * @returns {Point} dimensions
      */
     _getNonTransformedDimensions() {
-      return new fabric.Point(this.width, this.height).scalarAddEquals(this.strokeWidth);
+      return new Point(this.width, this.height).scalarAddEquals(this.strokeWidth);
     }
 
     /**
@@ -724,7 +718,7 @@ export function ObjectGeometryMixinGenerator(Klass) {
      * @param {Number} [options.skewX]
      * @param {Number} [options.skewY]
      * @private
-     * @returns {fabric.Point} dimensions
+     * @returns {Point} dimensions
      */
     _getTransformedDimensions(options) {
       options = Object.assign({
@@ -751,11 +745,11 @@ export function ObjectGeometryMixinGenerator(Klass) {
         finalDimensions,
         noSkew = options.skewX === 0 && options.skewY === 0;
       if (noSkew) {
-        finalDimensions = new fabric.Point(dimX * options.scaleX, dimY * options.scaleY);
+        finalDimensions = new Point(dimX * options.scaleX, dimY * options.scaleY);
       }
       else {
-        var bbox = util.sizeAfterTransform(dimX, dimY, options);
-        finalDimensions = new fabric.Point(bbox.x, bbox.y);
+        var bbox = sizeAfterTransform(dimX, dimY, options);
+        finalDimensions = new Point(bbox.x, bbox.y);
       }
 
       return finalDimensions.scalarAddEquals(postScalingStrokeValue);
@@ -766,7 +760,7 @@ export function ObjectGeometryMixinGenerator(Klass) {
      * and active selection
      * @private
      * @param {object} [options] transform options
-     * @returns {fabric.Point} dimensions
+     * @returns {Point} dimensions
      */
     _calculateCurrentDimensions(options) {
       var vpt = this.getViewportTransform(),
@@ -777,5 +771,4 @@ export function ObjectGeometryMixinGenerator(Klass) {
   }
 }
 
-fabric.Object = ObjectGeometryMixinGenerator(fabric.Object);
 

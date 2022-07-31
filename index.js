@@ -61,8 +61,9 @@ fabric.Canvas = CanvasGesturesMixinGenerator(fabric.Canvas);
 import { FabricObject, FabricObject as Object } from './src/shapes/object.class';
 
 fabric.Object = Object;
-import './src/mixins/object_origin.mixin';
-import './src/mixins/object_geometry.mixin';
+import { ObjectOriginMixinGenerator } from './src/mixins/object_origin.mixin';
+import { ObjectGeometryMixinGenerator } from './src/mixins/object_geometry.mixin';
+fabric.Object = ObjectGeometryMixinGenerator(fabric.Object);
 import { ObjectAncestryMixinGenerator } from './src/mixins/object_ancestry.mixin';
 fabric.Object = ObjectAncestryMixinGenerator(fabric.Object);
 import { ObjectStackingMixinGenerator } from './src/mixins/object_stacking.mixin';

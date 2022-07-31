@@ -85,7 +85,9 @@ const {
     isTouchEvent,
     sendPointToPlane,
     radiansToDegrees,
-    setStyle
+    setStyle,
+    calcRotateMatrix,
+    makeBoundingBoxFromPoints
 } = fabric.util;
 export {
     sin,
@@ -150,6 +152,8 @@ export {
     isTouchEvent,
     sendPointToPlane,
     radiansToDegrees,
-    setStyle
+    setStyle,
+    calcRotateMatrix,
+    makeBoundingBoxFromPoints
 };
 export default fabric.util;
