@@ -130,51 +130,51 @@ export class Rect extends fabric.Object {
     ];
   }
   /* _TO_SVG_END_ */
+
+  /* _FROM_SVG_START_ */
+  /**
+   * List of attribute names to account for when parsing SVG element (used by `fabric.Rect.fromElement`)
+   * @static
+   * @memberOf fabric.Rect
+   * @see: http://www.w3.org/TR/SVG/shapes.html#RectElement
+   */
+  static ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('x y rx ry width height'.split(' '));
+
+  /**
+   * Returns {@link fabric.Rect} instance from an SVG element
+   * @static
+   * @memberOf fabric.Rect
+   * @param {SVGElement} element Element to parse
+   * @param {Function} callback callback function invoked after parsing
+   * @param {Object} [options] Options object
+   */
+  static fromElement = function(element, callback, options) {
+    if (!element) {
+      return callback(null);
+    }
+    options = options || { };
+
+    var parsedAttributes = fabric.parseAttributes(element, Rect.ATTRIBUTE_NAMES);
+    parsedAttributes.left = parsedAttributes.left || 0;
+    parsedAttributes.top  = parsedAttributes.top  || 0;
+    parsedAttributes.height  = parsedAttributes.height || 0;
+    parsedAttributes.width  = parsedAttributes.width || 0;
+    var rect = new Rect(Object.assign({}, options, parsedAttributes));
+    rect.visible = rect.visible && rect.width > 0 && rect.height > 0;
+    callback(rect);
+  };
+  /* _FROM_SVG_END_ */
+
+  /**
+   * Returns {@link fabric.Rect} instance from an object representation
+   * @static
+   * @memberOf fabric.Rect
+   * @param {Object} object Object to create an instance from
+   * @returns {Promise<fabric.Rect>}
+   */
+  static fromObject = function(object) {
+    return fabric.Object._fromObject(Rect, object);
+  };
 }
-
-/* _FROM_SVG_START_ */
-/**
- * List of attribute names to account for when parsing SVG element (used by `fabric.Rect.fromElement`)
- * @static
- * @memberOf fabric.Rect
- * @see: http://www.w3.org/TR/SVG/shapes.html#RectElement
- */
-Rect.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('x y rx ry width height'.split(' '));
-
-/**
- * Returns {@link fabric.Rect} instance from an SVG element
- * @static
- * @memberOf fabric.Rect
- * @param {SVGElement} element Element to parse
- * @param {Function} callback callback function invoked after parsing
- * @param {Object} [options] Options object
- */
-Rect.fromElement = function(element, callback, options) {
-  if (!element) {
-    return callback(null);
-  }
-  options = options || { };
-
-  var parsedAttributes = fabric.parseAttributes(element, Rect.ATTRIBUTE_NAMES);
-  parsedAttributes.left = parsedAttributes.left || 0;
-  parsedAttributes.top  = parsedAttributes.top  || 0;
-  parsedAttributes.height  = parsedAttributes.height || 0;
-  parsedAttributes.width  = parsedAttributes.width || 0;
-  var rect = new Rect(Object.assign({}, options, parsedAttributes));
-  rect.visible = rect.visible && rect.width > 0 && rect.height > 0;
-  callback(rect);
-};
-/* _FROM_SVG_END_ */
-
-/**
- * Returns {@link fabric.Rect} instance from an object representation
- * @static
- * @memberOf fabric.Rect
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Rect>}
- */
-Rect.fromObject = function(object) {
-  return fabric.Object._fromObject(Rect, object);
-};
 
 fabric.Rect = Rect;
