@@ -1,9 +1,13 @@
 //@ts-nocheck
 
+import { WebglFilterBackend } from "./webgl_backend.class"
 
 
 
-var fabric = global.fabric || (global.fabric = {}), pow = Math.pow, floor = Math.floor,
+
+var fabric = global.fabric || (global.fabric = {})
+
+const pow = Math.pow, floor = Math.floor,
   sqrt = Math.sqrt, abs = Math.abs, round = Math.round, sin = Math.sin,
   ceil = Math.ceil
 
@@ -250,7 +254,7 @@ export class Resize extends BaseFilter {
   sliceByTwo(options, oW, oH, dW, dH) {
     var imageData = options.imageData,
       mult = 0.5, doneW = false, doneH = false, stepW = oW * mult,
-      stepH = oH * mult, resources = fabric.filterBackend.resources,
+      stepH = oH * mult, resources = WebglFilterBackend.backend.resources,
       tmpCanvas, ctx, sX = 0, sY = 0, dX = oW, dY = 0;
     if (!resources.sliceByTwo) {
       resources.sliceByTwo = document.createElement('canvas');

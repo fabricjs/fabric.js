@@ -51,15 +51,7 @@ export function isWebglSupported(tileSize) {
   return isSupported;
 };
 
-class WebglFilterBackend {
-
-  constructor(options) {
-    if (options && options.tileSize) {
-      this.tileSize = options.tileSize;
-    }
-    this.setupGLContext(this.tileSize, this.tileSize);
-    this.captureGPUInfo();
-  }
+export class WebglFilterBackend {
 
   tileSize = 2048
 
@@ -71,6 +63,17 @@ class WebglFilterBackend {
    * cleared never. Clearing is left to the developer.
    **/
   resources = {}
+
+  static backend;
+
+
+  constructor(options) {
+    if (options && options.tileSize) {
+      this.tileSize = options.tileSize;
+    }
+    this.setupGLContext(this.tileSize, this.tileSize);
+    this.captureGPUInfo();
+  }
 
   /**
    * Setup a WebGL context suitable for filtering, and bind any needed event handlers.
@@ -203,7 +206,7 @@ class WebglFilterBackend {
       aPosition: this.aPosition,
       programCache: this.programCache,
       pass: 0,
-      filterBackend: this,
+      backend: this,
       targetCanvas: targetCanvas
     };
     var tempFbo = gl.createFramebuffer();
@@ -334,16 +337,15 @@ class WebglFilterBackend {
   static initFilterBackend() {
     if (enableGLFiltering && isWebglSupported && isWebglSupported(textureSize)) {
       console.log('max texture size: ' + maxTextureSize);
-      return (new WebglFilterBackend({ tileSize: textureSize }));
+      WebglFilterBackend.backend = new WebglFilterBackend({ tileSize: textureSize });
     }
     else if (Canvas2dFilterBackend) {
-      return (new Canvas2dFilterBackend());
+      WebglFilterBackend.backend = new Canvas2dFilterBackend();
     }
+    return WebglFilterBackend.backend;
   }
 
 }
-
-
 
 
 function resizeCanvasIfNeeded(pipelineState) {

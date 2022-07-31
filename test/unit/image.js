@@ -1,4 +1,6 @@
-(function() {
+const { WebglFilterBackend } = require('../../src/filters/webgl_backend.class');
+
+(function () {
 
   function getAbsolutePath(path) {
     var isAbsolute = /^https?:/.test(path);
@@ -12,10 +14,10 @@
 
   function makeImageElement(attributes) {
     var element = {};
-    element.getAttribute = function(x) {
+    element.getAttribute = function (x) {
       return element[x];
     };
-    element.setAttribute = function(x, value) {
+    element.setAttribute = function (x, value) {
       element[x] = value;
     };
     for (var prop in attributes) {
@@ -24,50 +26,50 @@
     return element;
   }
 
-  var IMG_SRC     = fabric.isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : getAbsolutePath('../fixtures/test_image.gif'),
-      IMG_SRC_REL = fabric.isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : '../fixtures/test_image.gif',
-      IMG_WIDTH   = 276,
-      IMG_HEIGHT  = 110;
+  var IMG_SRC = fabric.isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : getAbsolutePath('../fixtures/test_image.gif'),
+    IMG_SRC_REL = fabric.isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : '../fixtures/test_image.gif',
+    IMG_WIDTH = 276,
+    IMG_HEIGHT = 110;
 
   var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
 
   var REFERENCE_IMG_OBJECT = {
-    version:                  fabric.version,
-    type:                     'image',
-    originX:                  'left',
-    originY:                  'top',
-    left:                     0,
-    top:                      0,
-    width:                    IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
-    height:                   IMG_HEIGHT, // or does it now?
-    fill:                     'rgb(0,0,0)',
-    stroke:                   null,
-    strokeWidth:              0,
-    strokeDashArray:          null,
-    strokeLineCap:            'butt',
-    strokeDashOffset:         0,
-    strokeLineJoin:           'miter',
-    strokeMiterLimit:         4,
-    scaleX:                   1,
-    scaleY:                   1,
-    angle:                    0,
-    flipX:                    false,
-    flipY:                    false,
-    opacity:                  1,
-    src:                      IMG_SRC,
-    shadow:                   null,
-    visible:                  true,
-    backgroundColor:          '',
-    filters:                  [],
-    fillRule:                 'nonzero',
-    paintFirst:               'fill',
+    version: fabric.version,
+    type: 'image',
+    originX: 'left',
+    originY: 'top',
+    left: 0,
+    top: 0,
+    width: IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
+    height: IMG_HEIGHT, // or does it now?
+    fill: 'rgb(0,0,0)',
+    stroke: null,
+    strokeWidth: 0,
+    strokeDashArray: null,
+    strokeLineCap: 'butt',
+    strokeDashOffset: 0,
+    strokeLineJoin: 'miter',
+    strokeMiterLimit: 4,
+    scaleX: 1,
+    scaleY: 1,
+    angle: 0,
+    flipX: false,
+    flipY: false,
+    opacity: 1,
+    src: IMG_SRC,
+    shadow: null,
+    visible: true,
+    backgroundColor: '',
+    filters: [],
+    fillRule: 'nonzero',
+    paintFirst: 'fill',
     globalCompositeOperation: 'source-over',
-    skewX:                    0,
-    skewY:                    0,
-    crossOrigin:              null,
-    cropX:                    0,
-    cropY:                    0,
-    strokeUniform:            false
+    skewX: 0,
+    skewY: 0,
+    crossOrigin: null,
+    cropX: 0,
+    cropY: 0,
+    strokeUniform: false
   };
 
   function _createImageElement() {
@@ -78,7 +80,7 @@
     options = options || {};
     src = src || IMG_SRC;
     var elImage = _createImageElement();
-    setSrc(elImage, src, function() {
+    setSrc(elImage, src, function () {
       options.width = width;
       options.height = height;
       callback(new fabric.Image(elImage, options));
@@ -98,7 +100,7 @@
   }
 
   function setSrc(img, src, callback) {
-    img.onload = function() {
+    img.onload = function () {
       if (callback) { callback(); }
     };
     img.src = src;
@@ -141,11 +143,11 @@
 
   QUnit.module('fabric.Image');
 
-  QUnit.test('constructor', function(assert) {
+  QUnit.test('constructor', function (assert) {
     var done = assert.async();
     assert.ok(fabric.Image);
 
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       assert.ok(image instanceof fabric.Image);
       assert.ok(image instanceof fabric.Object);
 
@@ -155,9 +157,9 @@
     });
   });
 
-  QUnit.test('toObject', function(assert) {
+  QUnit.test('toObject', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       assert.ok(typeof image.toObject === 'function');
       var toObject = image.toObject();
       // workaround for node-canvas sometimes producing images with width/height and sometimes not
@@ -172,15 +174,15 @@
     });
   });
 
-  QUnit.test('setSrc', function(assert) {
+  QUnit.test('setSrc', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       image.width = 100;
       image.height = 100;
       assert.ok(typeof image.setSrc === 'function');
       assert.equal(image.width, 100);
       assert.equal(image.height, 100);
-      image.setSrc(IMG_SRC).then(function() {
+      image.setSrc(IMG_SRC).then(function () {
         assert.equal(image.width, IMG_WIDTH);
         assert.equal(image.height, IMG_HEIGHT);
         done();
@@ -188,15 +190,15 @@
     });
   });
 
-  QUnit.test('setSrc with crossOrigin', function(assert) {
+  QUnit.test('setSrc with crossOrigin', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       image.width = 100;
       image.height = 100;
       assert.ok(typeof image.setSrc === 'function');
       assert.equal(image.width, 100);
       assert.equal(image.height, 100);
-      image.setSrc(IMG_SRC, { crossOrigin: 'anonymous' }).then(function() {
+      image.setSrc(IMG_SRC, { crossOrigin: 'anonymous' }).then(function () {
         assert.equal(image.width, IMG_WIDTH);
         assert.equal(image.height, IMG_HEIGHT);
         assert.equal(image.getCrossOrigin(), 'anonymous', 'setSrc will respect crossOrigin');
@@ -205,9 +207,9 @@
     });
   });
 
-  QUnit.test('toObject with no element', function(assert) {
+  QUnit.test('toObject with no element', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       assert.ok(typeof image.toObject === 'function');
       var toObject = image.toObject();
       // workaround for node-canvas sometimes producing images with width/height and sometimes not
@@ -222,19 +224,19 @@
     });
   });
 
-  QUnit.test('toObject with resize filter', function(assert) {
+  QUnit.test('toObject with resize filter', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       assert.ok(typeof image.toObject === 'function');
-      var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear', scaleX: 0.3, scaleY: 0.3});
+      var filter = new fabric.Image.filters.Resize({ resizeType: 'bilinear', scaleX: 0.3, scaleY: 0.3 });
       image.resizeFilter = filter;
       assert.ok(image.resizeFilter instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
       var toObject = image.toObject();
       assert.deepEqual(toObject.resizeFilter, filter.toObject(), 'the filter is in object form now');
-      fabric.Image.fromObject(toObject).then(function(imageFromObject) {
+      fabric.Image.fromObject(toObject).then(function (imageFromObject) {
         var filterFromObj = imageFromObject.resizeFilter;
         assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
-        assert.deepEqual(filterFromObj, filter,  'the filter has been restored');
+        assert.deepEqual(filterFromObj, filter, 'the filter has been restored');
         assert.equal(filterFromObj.scaleX, 0.3);
         assert.equal(filterFromObj.scaleY, 0.3);
         assert.equal(filterFromObj.resizeType, 'bilinear');
@@ -243,10 +245,10 @@
     });
   });
 
-  QUnit.test('toObject with normal filter and resize filter', function(assert) {
+  QUnit.test('toObject with normal filter and resize filter', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
-      var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear' });
+    createImageObject(function (image) {
+      var filter = new fabric.Image.filters.Resize({ resizeType: 'bilinear' });
       image.resizeFilter = filter;
       var filterBg = new fabric.Image.filters.Brightness({ brightness: 0.8 });
       image.filters = [filterBg];
@@ -255,7 +257,7 @@
       var toObject = image.toObject();
       assert.deepEqual(toObject.resizeFilter, filter.toObject(), 'the filter is in object form now');
       assert.deepEqual(toObject.filters[0], filterBg.toObject(), 'the filter is in object form now brightness');
-      fabric.Image.fromObject(toObject).then(function(imageFromObject) {
+      fabric.Image.fromObject(toObject).then(function (imageFromObject) {
         var filterFromObj = imageFromObject.resizeFilter;
         var brightnessFromObj = imageFromObject.filters[0];
         assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
@@ -265,11 +267,11 @@
     });
   });
 
-  QUnit.test('toObject with applied resize filter', function(assert) {
+  QUnit.test('toObject with applied resize filter', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       assert.ok(typeof image.toObject === 'function');
-      var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear', scaleX: 0.2, scaleY: 0.2});
+      var filter = new fabric.Image.filters.Resize({ resizeType: 'bilinear', scaleX: 0.2, scaleY: 0.2 });
       image.filters.push(filter);
       var width = image.width, height = image.height;
       assert.ok(image.filters[0] instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
@@ -282,7 +284,7 @@
       assert.deepEqual(toObject.filters[0], filter.toObject());
       assert.equal(toObject.width, width, 'width is stored as before filters');
       assert.equal(toObject.height, height, 'height is stored as before filters');
-      fabric.Image.fromObject(toObject).then(function(_imageFromObject) {
+      fabric.Image.fromObject(toObject).then(function (_imageFromObject) {
         var filterFromObj = _imageFromObject.filters[0];
         assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
         assert.equal(filterFromObj.scaleY, 0.2);
@@ -292,18 +294,18 @@
     });
   });
 
-  QUnit.test('toString', function(assert) {
+  QUnit.test('toString', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       assert.ok(typeof image.toString === 'function');
       assert.equal(image.toString(), '#<fabric.Image: { src: "' + image.getSrc() + '" }>');
       done();
     });
   });
 
-  QUnit.test('toSVG with crop', function(assert) {
+  QUnit.test('toSVG with crop', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       image.cropX = 1;
       image.cropY = 1;
       image.width -= 2;
@@ -315,9 +317,9 @@
     });
   });
 
-  QUnit.test('hasCrop', function(assert) {
+  QUnit.test('hasCrop', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       assert.ok(typeof image.hasCrop === 'function');
       assert.equal(image.hasCrop(), false, 'standard image has no crop');
       image.cropX = 1;
@@ -334,9 +336,9 @@
     });
   });
 
-  QUnit.test('toSVG', function(assert) {
+  QUnit.test('toSVG', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       assert.ok(typeof image.toSVG === 'function');
       var expectedSVG = '<g transform=\"matrix(1 0 0 1 138 55)\"  >\n\t<image style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  xlink:href=\"' + IMG_SRC + '\" x=\"-138\" y=\"-55\" width=\"276\" height=\"110\"></image>\n</g>\n';
       assert.equalImageSVG(image.toSVG(), expectedSVG);
@@ -344,9 +346,9 @@
     });
   });
 
-  QUnit.test('toSVG with imageSmoothing false', function(assert) {
+  QUnit.test('toSVG with imageSmoothing false', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       image.imageSmoothing = false;
       assert.ok(typeof image.toSVG === 'function');
       var expectedSVG = '<g transform="matrix(1 0 0 1 138 55)"  >\n\t<image style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  xlink:href=\"' + IMG_SRC + '\" x=\"-138\" y=\"-55\" width=\"276\" height=\"110\" image-rendering=\"optimizeSpeed\"></image>\n</g>\n';
@@ -355,9 +357,9 @@
     });
   });
 
-  QUnit.test('toSVG with missing element', function(assert) {
+  QUnit.test('toSVG with missing element', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       delete image._element;
       assert.ok(typeof image.toSVG === 'function');
       var expectedSVG = '<g transform="matrix(1 0 0 1 138 55)"  >\n</g>\n';
@@ -366,38 +368,38 @@
     });
   });
 
-  QUnit.test('getSrc', function(assert) {
+  QUnit.test('getSrc', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       assert.ok(typeof image.getSrc === 'function');
       assert.equal(basename(image.getSrc()), basename(IMG_SRC));
       done();
     });
   });
 
-  QUnit.test('getSrc with srcFromAttribute', function(assert) {
+  QUnit.test('getSrc with srcFromAttribute', function (assert) {
     var done = assert.async();
-    createImageObjectWithSrc(function(image) {
+    createImageObjectWithSrc(function (image) {
       assert.equal(image.getSrc(), IMG_SRC_REL);
       done();
     },
-    {
-      srcFromAttribute: true
-    },
-    IMG_SRC_REL
+      {
+        srcFromAttribute: true
+      },
+      IMG_SRC_REL
     );
   });
 
-  QUnit.test('getElement', function(assert) {
+  QUnit.test('getElement', function (assert) {
     var elImage = _createImageElement();
     var image = new fabric.Image(elImage);
     assert.ok(typeof image.getElement === 'function');
     assert.equal(image.getElement(), elImage);
   });
 
-  QUnit.test('setElement', function(assert) {
+  QUnit.test('setElement', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       assert.ok(typeof image.setElement === 'function');
 
       var elImage = _createImageElement();
@@ -409,28 +411,28 @@
     });
   });
 
-  QUnit.test('setElement resets the webgl cache', function(assert) {
+  QUnit.test('setElement resets the webgl cache', function (assert) {
     var done = assert.async();
-    var fabricBackend = fabric.filterBackend;
-    createImageObject(function(image) {
-      fabric.filterBackend = {
+    var backend = WebglFilterBackend.backend;
+    createImageObject(function (image) {
+      WebglFilterBackend.backend = {
         textureCache: {},
-        evictCachesForKey: function(key) {
+        evictCachesForKey: function (key) {
           delete this.textureCache[key];
         }
       };
       var elImage = _createImageElement();
-      fabric.filterBackend.textureCache[image.cacheKey] = 'something';
+      WebglFilterBackend.backend.textureCache[image.cacheKey] = 'something';
       assert.equal(image.setElement(elImage), image, 'chainable');
-      assert.equal(fabric.filterBackend.textureCache[image.cacheKey], undefined);
-      fabric.filterBackend = fabricBackend;
+      assert.equal(WebglFilterBackend.backend.textureCache[image.cacheKey], undefined);
+      WebglFilterBackend.backend = backend;
       done();
     });
   });
 
-  QUnit.test('crossOrigin', function(assert) {
+  QUnit.test('crossOrigin', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       assert.equal(image.getCrossOrigin(), null, 'initial crossOrigin value should be set');
 
       var elImage = _createImageElement();
@@ -453,18 +455,18 @@
         done();
         return;
       }
-      fabric.Image.fromObject(objRepr).then(function(img) {
+      fabric.Image.fromObject(objRepr).then(function (img) {
         assert.equal(img.getCrossOrigin(), null, 'image without src return no element');
         done();
       });
     });
   });
 
-  QUnit.test('clone', function(assert) {
+  QUnit.test('clone', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       assert.ok(typeof image.clone === 'function');
-      image.clone().then(function(clone) {
+      image.clone().then(function (clone) {
         assert.ok(clone instanceof fabric.Image);
         assert.deepEqual(clone.toObject(), image.toObject(), 'clone and original image are equal');
         done();
@@ -472,10 +474,10 @@
     });
   });
 
-  QUnit.test('cloneWidthHeight', function(assert) {
+  QUnit.test('cloneWidthHeight', function (assert) {
     var done = assert.async();
-    createSmallImageObject(function(image) {
-      image.clone().then(function(clone) {
+    createSmallImageObject(function (image) {
+      image.clone().then(function (clone) {
         assert.equal(clone.width, IMG_WIDTH / 2,
           'clone\'s element should have width identical to that of original image');
         assert.equal(clone.height, IMG_HEIGHT / 2,
@@ -485,7 +487,7 @@
     });
   });
 
-  QUnit.test('fromObject', function(assert) {
+  QUnit.test('fromObject', function (assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Image.fromObject === 'function');
 
@@ -493,27 +495,27 @@
     var obj = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_IMG_OBJECT), {
       src: IMG_SRC
     });
-    fabric.Image.fromObject(obj).then(function(instance){
+    fabric.Image.fromObject(obj).then(function (instance) {
       assert.ok(instance instanceof fabric.Image);
       done();
     });
   });
 
-  QUnit.test('fromObject with clipPath', function(assert) {
+  QUnit.test('fromObject with clipPath', function (assert) {
     var done = assert.async();
     // should not throw error when no callback is given
     var obj = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_IMG_OBJECT), {
       src: IMG_SRC,
       clipPath: (new fabric.Rect({ width: 100, height: 100 })).toObject(),
     });
-    fabric.Image.fromObject(obj).then(function(instance){
+    fabric.Image.fromObject(obj).then(function (instance) {
       assert.ok(instance instanceof fabric.Image);
       assert.ok(instance.clipPath instanceof fabric.Rect);
       done();
     });
   });
 
-  QUnit.test('fromObject does not mutate data', function(assert) {
+  QUnit.test('fromObject does not mutate data', function (assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Image.fromObject === 'function');
 
@@ -534,7 +536,7 @@
     var copyOfBrighteness = brightness;
     var copyOfContrast = contrast;
     var copyOfObject = obj;
-    fabric.Image.fromObject(obj).then(function(){
+    fabric.Image.fromObject(obj).then(function () {
       assert.ok(copyOfFilters === obj.filters, 'filters array did not mutate');
       assert.ok(copyOfBrighteness === copyOfFilters[0], 'filter is same object');
       assert.deepEqual(copyOfBrighteness, obj.filters[0], 'did not mutate filter');
@@ -546,28 +548,28 @@
     });
   });
 
-  QUnit.test('fromURL', function(assert) {
+  QUnit.test('fromURL', function (assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Image.fromURL === 'function');
-    fabric.Image.fromURL(IMG_SRC).then(function(instance) {
+    fabric.Image.fromURL(IMG_SRC).then(function (instance) {
       assert.ok(instance instanceof fabric.Image);
       assert.sameImageObject(REFERENCE_IMG_OBJECT, instance.toObject());
       done();
     });
   });
 
-  QUnit.test('fromURL error', function(assert) {
+  QUnit.test('fromURL error', function (assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Image.fromURL === 'function');
-    fabric.Image.fromURL(IMG_URL_NON_EXISTING, function(instance) {
+    fabric.Image.fromURL(IMG_URL_NON_EXISTING, function (instance) {
       assert.ok(instance instanceof fabric.Image);
-    }).catch(function(e) {
+    }).catch(function (e) {
       assert.ok(e instanceof Error);
       done();
     });
   });
 
-  QUnit.test('fromElement', function(assert) {
+  QUnit.test('fromElement', function (assert) {
     var done = assert.async();
 
     var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
@@ -580,7 +582,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl, function (imgObject) {
       assert.ok(imgObject instanceof fabric.Image);
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
@@ -589,7 +591,7 @@
     });
   });
 
-  QUnit.test('fromElement imageSmoothing', function(assert) {
+  QUnit.test('fromElement imageSmoothing', function (assert) {
     var done = assert.async();
 
     var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
@@ -603,14 +605,14 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl, function (imgObject) {
       assert.ok(imgObject instanceof fabric.Image);
       assert.deepEqual(imgObject.get('imageSmoothing'), false, 'imageSmoothing set to false');
       done();
     });
   });
 
-  QUnit.test('fromElement with preserveAspectRatio', function(assert) {
+  QUnit.test('fromElement with preserveAspectRatio', function (assert) {
     var done = assert.async();
 
     var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
@@ -623,7 +625,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl, function (imgObject) {
       imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
       assert.ok(imgObject instanceof fabric.Image);
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
@@ -635,7 +637,7 @@
     });
   });
 
-  QUnit.test('fromElement with preserveAspectRatio and smaller bbox', function(assert) {
+  QUnit.test('fromElement with preserveAspectRatio and smaller bbox', function (assert) {
     var done = assert.async();
 
     var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
@@ -651,7 +653,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl, function (imgObject) {
       imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
@@ -664,7 +666,7 @@
     });
   });
 
-  QUnit.test('fromElement with preserveAspectRatio and smaller bbox xMidYmax', function(assert) {
+  QUnit.test('fromElement with preserveAspectRatio and smaller bbox xMidYmax', function (assert) {
     var done = assert.async();
 
     var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
@@ -680,7 +682,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl, function (imgObject) {
       imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
@@ -693,7 +695,7 @@
     });
   });
 
-  QUnit.test('fromElement with preserveAspectRatio and smaller bbox xMidYmin', function(assert) {
+  QUnit.test('fromElement with preserveAspectRatio and smaller bbox xMidYmin', function (assert) {
     var done = assert.async();
 
     var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
@@ -709,7 +711,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl, function (imgObject) {
       imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
@@ -722,7 +724,7 @@
     });
   });
 
-  QUnit.test('fromElement with preserveAspectRatio and smaller V bbox xMinYMin', function(assert) {
+  QUnit.test('fromElement with preserveAspectRatio and smaller V bbox xMinYMin', function (assert) {
     var done = assert.async();
 
     var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
@@ -738,7 +740,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl, function (imgObject) {
       imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
@@ -751,7 +753,7 @@
     });
   });
 
-  QUnit.test('fromElement with preserveAspectRatio and smaller V bbox xMidYmin', function(assert) {
+  QUnit.test('fromElement with preserveAspectRatio and smaller V bbox xMidYmin', function (assert) {
     var done = assert.async();
 
     var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
@@ -767,7 +769,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl, function (imgObject) {
       imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
@@ -780,7 +782,7 @@
     });
   });
 
-  QUnit.test('fromElement with preserveAspectRatio and smaller V bbox xMaxYMin', function(assert) {
+  QUnit.test('fromElement with preserveAspectRatio and smaller V bbox xMaxYMin', function (assert) {
     var done = assert.async();
 
     var IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAARCAYAAADtyJ2fAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAVBJREFUeNqMU7tOBDEMtENuy614/QE/gZBOuvJK+Et6CiQ6JP6ExxWI7bhL1vgVExYKLPmsTTIzjieHd+MZZSBIAJwEyJU0EWaum+lNljRux3O6nl70Gx/GUwUeyYcDJWZNhMK1aEXYe95Mz4iP44kDTRUZSWSq1YEHri0/HZxXfGSFBN+qDEJTrNI+QXRBviZ7eWCQgjsg+IHiHYB30MhqUxwcmH1Arc2kFDwkBldeFGJLPqs/AbbF2dWgUym6Z2Tb6RVzYxG1wUnmaNcOonZiU0++l6C7FzoQY42g3+8jz+GZ+dWMr1rRH0OjAFhPO+VJFx/vWDqPmk8H97CGBUYUiqAGW0PVe1+aX8j2Ll0tgHtvLx6AK9Tu1ZTFTQ0ojChqGD4qkOzeAuzVfgzsaTym1ClS+IdwtQCFooQMBTumNun1H6Bfcc9/MUn4R3wJMAAZH6MmA4ht4gAAAABJRU5ErkJggg==';
@@ -796,7 +798,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl, function (imgObject) {
       imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
@@ -809,9 +811,9 @@
     });
   });
 
-  QUnit.test('consecutive dataURLs give same result.', function(assert) {
+  QUnit.test('consecutive dataURLs give same result.', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       var data1 = image.toDataURL();
       var data2 = image.toDataURL();
       var data3 = image.toDataURL();
@@ -821,14 +823,14 @@
     });
   });
 
-  QUnit.test('apply filters run isNeutralState implementation of filters', function(assert) {
+  QUnit.test('apply filters run isNeutralState implementation of filters', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       var run = false;
       image.dirty = false;
       var filter = new fabric.Image.filters.Brightness();
       image.filters = [filter];
-      filter.isNeutralState = function() {
+      filter.isNeutralState = function () {
         run = true;
       };
       assert.equal(run, false, 'isNeutralState did not run yet');
@@ -838,9 +840,9 @@
     });
   });
 
-  QUnit.test('apply filters set the image dirty', function(assert) {
+  QUnit.test('apply filters set the image dirty', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       image.dirty = false;
       assert.equal(image.dirty, false, 'false apply filter dirty is false');
       image.applyFilters();
@@ -849,9 +851,9 @@
     });
   });
 
-  QUnit.test('apply filters reset _element and _filteredEl', function(assert) {
+  QUnit.test('apply filters reset _element and _filteredEl', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       var contrast = new fabric.Image.filters.Contrast({ contrast: 0.5 });
       image.applyFilters();
       var element = image._element;
@@ -865,9 +867,9 @@
     });
   });
 
-  QUnit.test('apply filters and resize filter', function(assert) {
+  QUnit.test('apply filters and resize filter', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       var contrast = new fabric.Image.filters.Contrast({ contrast: 0.5 });
       var resizeFilter = new fabric.Image.filters.Resize();
       image.filters = [contrast];
@@ -893,9 +895,9 @@
     });
   });
 
-  QUnit.test('apply filters set the image dirty and also the group', function(assert) {
+  QUnit.test('apply filters set the image dirty and also the group', function (assert) {
     var done = assert.async();
-    createImageObject(function(image) {
+    createImageObject(function (image) {
       var group = new fabric.Group([image]);
       image.dirty = false;
       group.dirty = false;
@@ -921,7 +923,7 @@
         height: 200,
       },
     }, {
-      drawImage: function(src, sX, sY, sW, sH) {
+      drawImage: function (src, sX, sY, sW, sH) {
         assert.ok(sX >= 0, 'sX should be positive');
         assert.ok(sY >= 0, 'sY should be positive');
         assert.ok(sW <= 200, 'sW should not be larger than image width');
@@ -943,7 +945,7 @@
         height: 200,
       },
     }, {
-      drawImage: function(src, sX, sY, sW, sH) {
+      drawImage: function (src, sX, sY, sW, sH) {
         assert.ok(sX === 15, 'sX should be cropX * filterScalingX');
         assert.ok(sY === 15, 'sY should be cropY * filterScalingY');
         assert.ok(sW === 105, 'sW will be width * filterScalingX if is < of element width');

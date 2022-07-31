@@ -1,12 +1,12 @@
 //@ts-nocheck
 
-var fabric = global.fabric;
 import { incrementUID, SHARED_ATTRIBUTES } from '../constants';
 import { parseAttributes } from "../_parser";
 import {
   addClass, cleanUpJsdomNode, createCanvasElement, enlivenObjectEnlivables, enlivenObjects, findScaleToCover, findScaleToFit, getById, loadImage, parsePreserveAspectRatioAttribute, setImageSmoothing
 } from '../util';
 import { FabricObject } from "./object.class";
+import { WebglFilterBackend } from '../filters/webgl_backend.class';
 
 /**
  * Image class
@@ -186,7 +186,7 @@ export class Image extends FabricObject {
    * Delete a single texture if in webgl mode
    */
   removeTexture(key) {
-    var backend = fabric.filterBackend;
+    var backend = WebglFilterBackend.backend;
     if (backend && backend.evictCachesForKey) {
       backend.evictCachesForKey(key);
     }
@@ -400,8 +400,8 @@ export class Image extends FabricObject {
       this._lastScaleY = scaleY;
       return;
     }
-    if (!fabric.filterBackend) {
-      fabric.filterBackend = fabric.initFilterBackend();
+    if (!WebglFilterBackend.backend) {
+      WebglFilterBackend.initFilterBackend();
     }
     var canvasEl = createCanvasElement(),
       cacheKey = this._filteredEl ? (this.cacheKey + '_filtered') : this.cacheKey,
@@ -411,7 +411,7 @@ export class Image extends FabricObject {
     this._element = canvasEl;
     this._lastScaleX = filter.scaleX = scaleX;
     this._lastScaleY = filter.scaleY = scaleY;
-    fabric.filterBackend.applyFilters(
+    WebglFilterBackend.backend.applyFilters(
       [filter], elementToFilter, sourceWidth, sourceHeight, this._element, cacheKey);
     this._filterScalingX = canvasEl.width / this._originalElement.width;
     this._filterScalingY = canvasEl.height / this._originalElement.height;
@@ -463,10 +463,10 @@ export class Image extends FabricObject {
       this._lastScaleX = 1;
       this._lastScaleY = 1;
     }
-    if (!fabric.filterBackend) {
-      fabric.filterBackend = fabric.initFilterBackend();
+    if (!WebglFilterBackend.backend) {
+      WebglFilterBackend.initFilterBackend();
     }
-    fabric.filterBackend.applyFilters(
+    WebglFilterBackend.backend.applyFilters(
       filters, this._originalElement, sourceWidth, sourceHeight, this._element, this.cacheKey);
     if (this._originalElement.width !== this._element.width ||
       this._originalElement.height !== this._element.height) {
