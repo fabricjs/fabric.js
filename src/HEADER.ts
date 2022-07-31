@@ -1,3 +1,4 @@
+//@ts-nocheck
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 import { context } from './context';
 import cache from './src/cache';

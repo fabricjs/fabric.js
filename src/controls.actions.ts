@@ -1,5 +1,7 @@
+//@ts-nocheck
 import { Point } from "./point.class";
 import { radiansToDegrees } from "./util";
+
 const scaleMap = ['e', 'se', 's', 'sw', 'w', 'nw', 'n', 'ne', 'e'],
   skewMap = ['ns', 'nesw', 'ew', 'nwse'],
   controls = {},

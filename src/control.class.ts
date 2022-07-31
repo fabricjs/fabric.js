@@ -1,8 +1,10 @@
+//@ts-nocheck
 import { renderCircleControl, renderSquareControl } from "./controls.render";
 import { Point } from "./point.class";
 
 
 export class Control {
+
   constructor(options) {
     for (var i in options) {
       this[i] = options[i];

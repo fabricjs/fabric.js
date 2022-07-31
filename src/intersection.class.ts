@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { Point } from "./point.class";
 
 /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
