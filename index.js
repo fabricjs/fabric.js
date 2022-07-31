@@ -71,7 +71,8 @@ import { ObjectStackingMixinGenerator } from './src/mixins/object_stacking.mixin
 fabric.Object = ObjectStackingMixinGenerator(fabric.Object);
 import { ObjectSVGExportMixinGenerator } from './src/mixins/object.svg_export';
 fabric.Object = ObjectSVGExportMixinGenerator(fabric.Object);
-import './src/mixins/stateful.mixin';
+import { ObjectStatefulMixinGenerator } from './src/mixins/stateful.mixin';
+fabric.Object = ObjectStatefulMixinGenerator(fabric.Object);
 import { ObjectInteractivityMixinGenerator } from './src/mixins/object_interactivity.mixin'; // optional interaction
 fabric.Object = ObjectInteractivityMixinGenerator(fabric.Object);
 import { ObjectAnimationMixinGenerator } from './src/mixins/object_animation.mixin'; // optional animation

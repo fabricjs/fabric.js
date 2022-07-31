@@ -1,69 +1,70 @@
 //@ts-nocheck
 
-  var fabric = global.fabric,
-    originalSet = 'stateProperties';
+import { extend } from "../util";
 
-  /*
-    Depends on `stateProperties`
-  */
-  function saveProps(origin, destination, props) {
-    var tmpObj = {}, deep = true;
-    props.forEach(function (prop) {
-      tmpObj[prop] = origin[prop];
-    });
+const originalSet = 'stateProperties';
 
-    fabric.util.object.extend(origin[destination], tmpObj, deep);
+/*
+  Depends on `stateProperties`
+*/
+function saveProps(origin, destination, props) {
+  var tmpObj = {}, deep = true;
+  props.forEach(function (prop) {
+    tmpObj[prop] = origin[prop];
+  });
+
+  extend(origin[destination], tmpObj, deep);
+}
+
+function _isEqual(origValue, currentValue, firstPass) {
+  if (origValue === currentValue) {
+    // if the objects are identical, return
+    return true;
   }
-
-  function _isEqual(origValue, currentValue, firstPass) {
-    if (origValue === currentValue) {
-      // if the objects are identical, return
-      return true;
+  else if (Array.isArray(origValue)) {
+    if (!Array.isArray(currentValue) || origValue.length !== currentValue.length) {
+      return false;
     }
-    else if (Array.isArray(origValue)) {
-      if (!Array.isArray(currentValue) || origValue.length !== currentValue.length) {
+    for (var i = 0, len = origValue.length; i < len; i++) {
+      if (!_isEqual(origValue[i], currentValue[i])) {
         return false;
       }
-      for (var i = 0, len = origValue.length; i < len; i++) {
-        if (!_isEqual(origValue[i], currentValue[i])) {
-          return false;
-        }
-      }
-      return true;
     }
-    else if (origValue && typeof origValue === 'object') {
-      var keys = Object.keys(origValue), key;
-      if (!currentValue ||
-        typeof currentValue !== 'object' ||
-        (!firstPass && keys.length !== Object.keys(currentValue).length)
-      ) {
+    return true;
+  }
+  else if (origValue && typeof origValue === 'object') {
+    var keys = Object.keys(origValue), key;
+    if (!currentValue ||
+      typeof currentValue !== 'object' ||
+      (!firstPass && keys.length !== Object.keys(currentValue).length)
+    ) {
+      return false;
+    }
+    for (var i = 0, len = keys.length; i < len; i++) {
+      key = keys[i];
+      // since clipPath is in the statefull cache list and the clipPath objects
+      // would be iterated as an object, this would lead to possible infinite recursion
+      // we do not want to compare those.
+      if (key === 'canvas' || key === 'group') {
+        continue;
+      }
+      if (!_isEqual(origValue[key], currentValue[key])) {
         return false;
       }
-      for (var i = 0, len = keys.length; i < len; i++) {
-        key = keys[i];
-        // since clipPath is in the statefull cache list and the clipPath objects
-        // would be iterated as an object, this would lead to possible infinite recursion
-        // we do not want to compare those.
-        if (key === 'canvas' || key === 'group') {
-          continue;
-        }
-        if (!_isEqual(origValue[key], currentValue[key])) {
-          return false;
-        }
-      }
-      return true;
     }
+    return true;
   }
+}
 
 
-  
+
 export function ObjectStatefulMixinGenerator(Klass) {
   return class ObjectStatefulMixin extends Klass {
 
     /**
      * Returns true if object state (one of its state properties) was changed
      * @param {String} [propertySet] optional name for the set of property we want to save
-     * @return {Boolean} true if instance' state has changed since `{@link fabric.Object#saveState}` was called
+     * @return {Boolean} true if instance' state has changed since `{@link FabricObject#saveState}` was called
      */
     hasStateChanged(propertySet) {
       propertySet = propertySet || originalSet;
@@ -108,5 +109,4 @@ export function ObjectStatefulMixinGenerator(Klass) {
   }
 }
 
-fabric.Object = ObjectStatefulMixinGenerator(fabric.Object);
 
