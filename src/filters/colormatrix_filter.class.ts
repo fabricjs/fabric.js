@@ -144,14 +144,6 @@ export class ColorMatrix extends BaseFilter {
   }
 }
 
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.filters.ColorMatrix>}
- */
-//fabric.Image.filters.ColorMatrix.fromObject = fabric.Image.filters.BaseFilter.fromObject;
-
 
 export function createColorMatrixClass(key: string, matrix) {
   const klass = class DefinedColorMatrix extends ColorMatrix {

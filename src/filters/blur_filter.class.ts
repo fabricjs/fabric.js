@@ -1,18 +1,16 @@
 //@ts-nocheck
 
+import {
+  createCanvasElement
+} from '../util';
+import { BaseFilter } from "./base_filter.class";
 
-'use strict';
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
 
 /**
  * Blur filter class
  * @class Blur
  * @memberOf fabric.Image.filters
  * @extends BaseFilter
- * @see {@link fabric.Image.filters.Blur#initialize} for constructor definition
  * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
  * var filter = new Blur({
@@ -112,8 +110,8 @@ export class Blur extends BaseFilter {
       height = options.imageData.height;
 
     if (!resources.blurLayer1) {
-      resources.blurLayer1 = fabric.util.createCanvasElement();
-      resources.blurLayer2 = fabric.util.createCanvasElement();
+      resources.blurLayer1 = createCanvasElement();
+      resources.blurLayer2 = createCanvasElement();
     }
     canvas1 = resources.blurLayer1;
     canvas2 = resources.blurLayer2;
@@ -209,12 +207,4 @@ export class Blur extends BaseFilter {
     return delta;
   }
 }
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.filters.Blur>}
- */
-filters.Blur.fromObject = fabric.Image.filters.BaseFilter.fromObject;
 

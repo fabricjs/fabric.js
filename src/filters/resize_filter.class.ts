@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 
-'use strict';
+
 
 var fabric = global.fabric || (global.fabric = {}), pow = Math.pow, floor = Math.floor,
   sqrt = Math.sqrt, abs = Math.abs, round = Math.round, sin = Math.sin,

@@ -1,9 +1,7 @@
 //@ts-nocheck
 
-'use strict';
-
-var fabric = global.fabric;
-
+import { Color } from "../color";
+import { BaseFilter } from "./base_filter.class";
 
 
 /**
@@ -133,7 +131,7 @@ export class BlendColor extends BaseFilter {
       r, g, b,
       source, alpha1 = 1 - this.alpha;
 
-    source = new fabric.Color(this.color).getSource();
+    source = new Color(this.color).getSource();
     tr = source[0] * this.alpha;
     tg = source[1] * this.alpha;
     tb = source[2] * this.alpha;
@@ -218,7 +216,7 @@ export class BlendColor extends BaseFilter {
    * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
   sendUniformData(gl, uniformLocations) {
-    var source = new fabric.Color(this.color).getSource();
+    var source = new Color(this.color).getSource();
     source[0] = this.alpha * source[0] / 255;
     source[1] = this.alpha * source[1] / 255;
     source[2] = this.alpha * source[2] / 255;

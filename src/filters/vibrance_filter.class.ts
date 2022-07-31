@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 
-'use strict';
+
 
 var fabric = global.fabric || (global.fabric = {}),
   filters = fabric.Image.filters,

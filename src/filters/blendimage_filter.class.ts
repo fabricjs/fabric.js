@@ -1,10 +1,10 @@
 //@ts-nocheck
 
-'use strict';
-
-var fabric = global.fabric,
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
+import { Image } from "../shapes";
+import {
+  createCanvasElement
+} from '../util';
+import { BaseFilter } from "./base_filter.class";
 
 /**
  * Image Blend filter class
@@ -151,7 +151,7 @@ export class BlendImage extends BaseFilter {
       canvas1, context, image = this.image, blendData;
 
     if (!resources.blendImage) {
-      resources.blendImage = fabric.util.createCanvasElement();
+      resources.blendImage = createCanvasElement();
     }
     canvas1 = resources.blendImage;
     context = canvas1.getContext('2d');
@@ -228,19 +228,21 @@ export class BlendImage extends BaseFilter {
       alpha: this.alpha
     };
   }
+
+  /**
+   * Create filter instance from an object representation
+   * @static
+   * @param {object} object Object to create an instance from
+   * @param {object} [options]
+   * @param {AbortSignal} [options.signal] handle aborting image loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @returns {Promise<fabric.Image.filters.BlendImage>}
+   */
+  static fromObject(object, options) {
+    return Image.fromObject(object.image, options).then(function (image) {
+      return new BlendImage(Object.assign({}, object, { image: image }));
+    });
+  }
 }
 
-/**
- * Create filter instance from an object representation
- * @static
- * @param {object} object Object to create an instance from
- * @param {object} [options]
- * @param {AbortSignal} [options.signal] handle aborting image loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
- * @returns {Promise<fabric.Image.filters.BlendImage>}
- */
-fabric.Image.filters.BlendImage.fromObject = function (object, options) {
-  return fabric.Image.fromObject(object.image, options).then(function (image) {
-    return new fabric.Image.filters.BlendImage(Object.assign({}, object, { image: image }));
-  });
-};
+
 

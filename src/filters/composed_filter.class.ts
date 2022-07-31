@@ -1,11 +1,8 @@
 //@ts-nocheck
 
+import { Image } from "../shapes";
+import { BaseFilter } from "./base_filter.class";
 
-'use strict';
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = fabric.util.createClass;
 
 /**
  * A container class that knows how to apply a sequence of filters to an input image.
@@ -48,29 +45,32 @@ export class Composed extends BaseFilter {
    * @returns {Object} A JSON representation of this filter.
    */
   toObject() {
-    return fabric.util.object.extend(super.toObject(), {
+    return {
+      ...super.toObject(),
       subFilters: this.subFilters.map(function (filter) { return filter.toObject(); }),
-    });
+    };
   }
 
   isNeutralState() {
     return !this.subFilters.some(function (filter) { return !filter.isNeutralState(); });
   }
+
+  /**
+   * Deserialize a JSON definition of a ComposedFilter into a concrete instance.
+   * @static
+   * @param {oject} object Object to create an instance from
+   * @param {object} [options]
+   * @param {AbortSignal} [options.signal] handle aborting `BlendImage` filter loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @returns {Promise<fabric.Image.filters.Composed>}
+   */
+  static fromObject(object, options) {
+    var filters = object.subFilters || [];
+    return Promise.all(filters.map(function (filter) {
+      return Image.filters[filter.type].fromObject(filter, options);
+    })).then(function (enlivedFilters) {
+      return new Composed({ subFilters: enlivedFilters });
+    });
+  }
 }
 
-/**
- * Deserialize a JSON definition of a ComposedFilter into a concrete instance.
- * @static
- * @param {oject} object Object to create an instance from
- * @param {object} [options]
- * @param {AbortSignal} [options.signal] handle aborting `BlendImage` filter loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
- * @returns {Promise<fabric.Image.filters.Composed>}
- */
-fabric.Image.filters.Composed.fromObject = function (object, options) {
-  var filters = object.subFilters || [];
-  return Promise.all(filters.map(function (filter) {
-    return fabric.Image.filters[filter.type].fromObject(filter, options);
-  })).then(function (enlivedFilters) {
-    return new fabric.Image.filters.Composed({ subFilters: enlivedFilters });
-  });
-};
+
