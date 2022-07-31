@@ -2,8 +2,8 @@
 import { animate } from "../util";
 
 
-export function StaticCanvasAnimationMixinGenerator(Klass) {
-    return class StaticCanvasAnimationMixin extends Klass {
+export function CanvasAnimationMixinGenerator(Klass) {
+    return class CanvasAnimationMixin extends Klass {
 
         /**
          * Animation duration (in ms) for fx* methods

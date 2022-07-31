@@ -4,6 +4,7 @@ import { NUM_FRACTION_DIGITS } from './config';
 import { devicePixelRatio, fontPaths, iMatrix, incrementUID, isLikelyNode } from './constants';
 import { VERSION } from './context';
 import { applyMixins } from './mixins/apply_mixins';
+import { CanvasAnimationMixinGenerator } from './mixins/canvas_animation.mixin';
 import { CanvasDataURLExporterMixinGenerator } from "./mixins/canvas_dataurl_exporter.mixin";
 import { CanvasSerializationMixinGenerator } from './mixins/canvas_serialization.mixin';
 import { CollectionMixinGenerator } from "./mixins/collection.mixin";
@@ -1670,7 +1671,8 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
 
 const mixins = [
   CanvasDataURLExporterMixinGenerator,
-  CanvasSerializationMixinGenerator
+  CanvasSerializationMixinGenerator,
+  CanvasAnimationMixinGenerator
 ];
 
 if (isLikelyNode) {

@@ -53,12 +53,18 @@ fabric.Shadow = Shadow;
 fabric.Control = Control;
 fabric.Gradient = Gradient;
 
+import { CanvasObjectStraighteningMixinGenerator } from "./mixins/canvas_straightening.mixin";
+
 fabric.StaticCanvas = StaticCanvas;
+fabric.StaticCanvas = CanvasObjectStraighteningMixinGenerator(fabric.StaticCanvas);
+
 
 import './canvas.class'; // optional interaction
 import { CanvasEventsMixinGenerator } from './mixins/canvas_events.mixin'; // optional interaction
 import { CanvasGroupingMixinGenerator } from './mixins/canvas_grouping.mixin'; // optional interaction
 import { CanvasGesturesMixinGenerator } from './mixins/canvas_gestures.mixin'; // optional gestures
+
+
 fabric.Canvas = applyMixins(fabric.Canvas, [
   CanvasEventsMixinGenerator,
   CanvasGroupingMixinGenerator,
@@ -68,9 +74,6 @@ fabric.Canvas = applyMixins(fabric.Canvas, [
 import { FabricObject } from './shapes/object.class';
 fabric.Object = FabricObject;
 
-import { ObjectStraighteningMixinGenerator, CanvasObjectStraighteningMixinGenerator } from './mixins/object_straightening.mixin'; // optional objectstraightening
-fabric.Object = ObjectStraighteningMixinGenerator(fabric.Object);
-fabric.StaticCanvas = CanvasObjectStraighteningMixinGenerator(fabric.StaticCanvas);
 
 import { ActiveSelection, Circle, Ellipse, Group, Image, Line, Path, Polygon, Polyline, Rect, Triangle, IText, Text, Textbox } from './shapes';
 fabric.ActiveSelection = ActiveSelection;
@@ -90,7 +93,7 @@ fabric.Triangle = Triangle;
 
 
 import * as filters from './filters'
-Object.assign(fabric, filters);
+Object.assign(fabric.Image, { filters });
 
 
 import { ObjectControls, TextboxControls } from './mixins/default_controls'; // optional interaction

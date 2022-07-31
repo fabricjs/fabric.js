@@ -23,5 +23,6 @@ export default {
     ts({
       /* Plugin options */
     })
-  ]
+  ],
+  external: ['jsdom']
 };
