@@ -18,7 +18,7 @@ class Intersection {
   appendPoint(point) {
     this.points.push(point);
     return this;
-  },
+  }
 
   /**
    * Appends points to intersection
@@ -67,7 +67,7 @@ class Intersection {
       }
     }
     return result;
-  };
+  }
 
   /**
    * Checks if line intersects polygon
@@ -95,7 +95,7 @@ class Intersection {
       result.status = 'Intersection';
     }
     return result;
-  };
+  }
 
   /**
    * Checks if polygon intersects another polygon
@@ -119,7 +119,7 @@ class Intersection {
       result.status = 'Intersection';
     }
     return result;
-  };
+  }
 
   /**
    * Checks if polygon intersects rectangle
@@ -149,7 +149,7 @@ class Intersection {
       result.status = 'Intersection';
     }
     return result;
-  };
+  }
 
 }
 
