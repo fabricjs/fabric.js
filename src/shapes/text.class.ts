@@ -2,9 +2,11 @@
 
 import { charWidthsCache } from '../cache';
 import { cacheProperties, DEFAULT_SVG_FONT_SIZE, isLikelyNode, SHARED_ATTRIBUTES, stateProperties } from '../constants';
+import { TextStyleMixinGenerator } from '../mixins/text_style.mixin'; // optional Text
 import { createCanvasElement, graphemeSplit, hasStyleChanged, stylesFromArray, stylesToArray } from '../util';
 import { parseAttributes } from "../_parser";
 import { FabricObject } from './object.class';
+
 
 const additionalProps =
   ('fontFamily fontWeight fontSize text underline overline linethrough' +
@@ -19,7 +21,7 @@ let _measuringContext;
  * @extends FabricObject
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  */
-export class Text extends FabricObject {
+export class TextBase extends FabricObject {
 
   /**
    * Properties which when set cause object to change dimensions
@@ -1699,9 +1701,13 @@ export class Text extends FabricObject {
   static fromObject(object) {
     var styles = stylesFromArray(object.styles, object.text);
     //  spread object to prevent mutation
-    return FabricObject._fromObject(Text, { ...object, styles }, { extraParam: 'text' });
+    return FabricObject._fromObject(this.constructor, { ...object, styles }, { extraParam: 'text' });
   };
 
   static genericFonts = ['sans-serif', 'serif', 'cursive', 'fantasy', 'monospace'];
 
 }
+
+export const Text = applyMixins(TextBase, [
+  TextStyleMixinGenerator
+]);

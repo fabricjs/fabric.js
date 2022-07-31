@@ -12,8 +12,8 @@ import {
 const multipleSpacesRegex = /  +/g;
 
 
-export function TextIMixinGenerator(Klass) {
-  return class TextIMixin extends Klass {
+export function ITextSVGExportMixinGenerator(Klass) {
+  return class ITextSVGExportMixin extends Klass {
 
     /**
      * Returns SVG representation of an instance

@@ -161,7 +161,7 @@ export class Rect extends FabricObject {
     var rect = new Rect(Object.assign({}, options, parsedAttributes));
     rect.visible = rect.visible && rect.width > 0 && rect.height > 0;
     callback(rect);
-  };
+  }
   /* _FROM_SVG_END_ */
 
   /**
@@ -173,7 +173,7 @@ export class Rect extends FabricObject {
    */
   static fromObject(object) {
     return FabricObject._fromObject(Rect, object);
-  };
+  }
 
 }
 

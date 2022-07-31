@@ -1,10 +1,16 @@
 //@ts-nocheck
 
+import { applyMixins } from '../mixins';
 import {
   stylesFromArray
 } from '../util';
 import { FabricObject } from "./object.class";
+import { ITextSVGExportMixinGenerator } from '../mixins/itext.svg_export'; // optional itext
+import { ITextBehaviorMixinGenerator } from '../mixins/itext_behavior.mixin'; // optional itext_behavior
+import { ITextClickBehaviorMixinGenerator } from '../mixins/itext_click_behavior.mixin'; // optional itext
+import { ITextKeyBehaviorMixinGenerator } from '../mixins/itext_key_behavior.mixin'; // optional itext_behavior
 import { Text } from './text.class';
+
 
 /**
  * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
@@ -55,7 +61,7 @@ import { Text } from './text.class';
  *   Select line:                    triple click
  * </pre>
  */
-export class IText extends Text {
+export class ITextBase extends Text {
 
   /**
    * Type of an object
@@ -572,10 +578,16 @@ export class IText extends Text {
  */
   static fromObject(object) {
     var styles = stylesFromArray(object.styles, object.text);
-    //copy object to prevent mutation
-    var objCopy = Object.assign({}, object, { styles: styles });
-    return FabricObject._fromObject(IText, objCopy, { extraParam: 'text' });
+    //  spread object to prevent mutation
+    return FabricObject._fromObject(this.constructor, { ...object, styles }, { extraParam: 'text' });
   };
 
 }
 
+
+export const IText = applyMixins(ITextBase, [
+  ITextBehaviorMixinGenerator,
+  ITextClickBehaviorMixinGenerator,
+  ITextKeyBehaviorMixinGenerator,
+  ITextSVGExportMixinGenerator
+]);
