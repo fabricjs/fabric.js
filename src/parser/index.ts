@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { incrementUID } from '../constants';
 import { extend, toArray } from '../util';
 import { hasAncestorWithNodeName } from "./hasAncestorWithNodeName";
