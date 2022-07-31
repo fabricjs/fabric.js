@@ -78,7 +78,7 @@ export function ObjectStatefulMixinGenerator(Klass) {
     /**
      * Saves state of an object
      * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      */
     saveState(options) {
       var propertySet = options && options.propertySet || originalSet,
@@ -96,7 +96,7 @@ export function ObjectStatefulMixinGenerator(Klass) {
     /**
      * Setups state of an object
      * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      */
     setupState(options) {
       options = options || {};

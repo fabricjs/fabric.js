@@ -1,8 +1,17 @@
 //@ts-nocheck
 
-var fabric = global.fabric;
-
 import { context } from "../../context";
+import { disableStyleCopyPaste } from "../config";
+import { addListener } from "../util";
+
+/**
+ * @deprecated
+ */
+export const COPIED_TEXT = {
+  copiedTextStyle: null,
+  copiedText: undefined
+}
+
 
 export function ITextKeyBehaviorMixinGenerator(Klass) {
   return class ITextKeyBehaviorMixin extends Klass {
@@ -29,22 +38,22 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
         this.hiddenTextareaContainer.appendChild(this.hiddenTextarea);
       }
       else {
-        fabric.document.body.appendChild(this.hiddenTextarea);
+        context.document.body.appendChild(this.hiddenTextarea);
       }
 
-      fabric.util.addListener(this.hiddenTextarea, 'blur', this.blur.bind(this));
-      fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
-      fabric.util.addListener(this.hiddenTextarea, 'keyup', this.onKeyUp.bind(this));
-      fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
-      fabric.util.addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
-      fabric.util.addListener(this.hiddenTextarea, 'cut', this.copy.bind(this));
-      fabric.util.addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
-      fabric.util.addListener(this.hiddenTextarea, 'compositionstart', this.onCompositionStart.bind(this));
-      fabric.util.addListener(this.hiddenTextarea, 'compositionupdate', this.onCompositionUpdate.bind(this));
-      fabric.util.addListener(this.hiddenTextarea, 'compositionend', this.onCompositionEnd.bind(this));
+      addListener(this.hiddenTextarea, 'blur', this.blur.bind(this));
+      addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
+      addListener(this.hiddenTextarea, 'keyup', this.onKeyUp.bind(this));
+      addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
+      addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
+      addListener(this.hiddenTextarea, 'cut', this.copy.bind(this));
+      addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
+      addListener(this.hiddenTextarea, 'compositionstart', this.onCompositionStart.bind(this));
+      addListener(this.hiddenTextarea, 'compositionupdate', this.onCompositionUpdate.bind(this));
+      addListener(this.hiddenTextarea, 'compositionend', this.onCompositionEnd.bind(this));
 
       if (!this._clickHandlerInitialized && this.canvas) {
-        fabric.util.addListener(this.canvas.upperCanvasEl, 'click', this.onClick.bind(this));
+        addListener(this.canvas.upperCanvasEl, 'click', this.onClick.bind(this));
         this._clickHandlerInitialized = true;
       }
     }
@@ -247,8 +256,8 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
         this.removeStyleFromTo(removeFrom, removeTo);
       }
       if (insertedText.length) {
-        if (fromPaste && insertedText.join('') === fabric.copiedText && !fabric.disableStyleCopyPaste) {
-          copiedStyle = fabric.copiedTextStyle;
+        if (fromPaste && insertedText.join('') === COPIED_TEXT.copiedText && !disableStyleCopyPaste) {
+          copiedStyle = COPIED_TEXT.copiedTextStyle;
         }
         this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
       }
@@ -292,13 +301,11 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
         return;
       }
 
-      fabric.copiedText = this.getSelectedText();
-      if (!fabric.disableStyleCopyPaste) {
-        fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd, true);
-      }
-      else {
-        fabric.copiedTextStyle = null;
-      }
+      COPIED_TEXT.copiedText = this.getSelectedText();
+      COPIED_TEXT.copiedTextStyle = !disableStyleCopyPaste ?
+        this.getSelectionStyles(this.selectionStart, this.selectionEnd, true) :
+        null;
+
       this._copyDone = true;
     }
 
@@ -316,7 +323,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
      * @return {Object} Clipboard data object
      */
     _getClipboardData(e) {
-      return (e && e.clipboardData) || fabric.window.clipboardData;
+      return (e && e.clipboardData) || context.window.clipboardData;
     }
 
     /**

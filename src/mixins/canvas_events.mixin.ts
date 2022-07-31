@@ -4,7 +4,6 @@ import { addListener, removeListener } from "../util";
 import { context } from '../../context';
 import { fireEvent } from "../controls.actions";
 
-var fabric = global.fabric;
 const addEventOptions = { passive: false };
 
 
@@ -991,7 +990,7 @@ export function CanvasEventsMixinGenerator(Klass) {
 
     /**
      * Manage the mouseout, mouseover events for the fabric object on the canvas
-     * @param {Fabric.Object} target the target where the target from the mousemove event
+     * @param {FabricObject} target the target where the target from the mousemove event
      * @param {Event} e Event object fired on mousemove
      * @private
      */
@@ -1020,7 +1019,7 @@ export function CanvasEventsMixinGenerator(Klass) {
 
     /**
      * Manage the dragEnter, dragLeave events for the fabric objects on the canvas
-     * @param {Fabric.Object} target the target where the target from the onDrag event
+     * @param {FabricObject} target the target where the target from the onDrag event
      * @param {Object} data Event object fired on dragover
      * @private
      */
@@ -1048,7 +1047,7 @@ export function CanvasEventsMixinGenerator(Klass) {
 
     /**
      * Manage the synthetic in/out events for the fabric objects on the canvas
-     * @param {Fabric.Object} target the target where the target from the supported events
+     * @param {FabricObject} target the target where the target from the supported events
      * @param {Object} data Event object fired
      * @param {Object} config configuration for the function to work
      * @param {String} config.targetName property on the canvas where the old target is stored

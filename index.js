@@ -71,9 +71,9 @@ fabric.Text = Text;
 fabric.IText = IText;
 fabric.Textbox = Textbox;
 fabric.Triangle = Triangle;
-import { ObjectStraighteningMixinGenerator, StaticCanvasObjectStraighteningMixinGenerator } from './src/mixins/object_straightening.mixin'; // optional objectstraightening
+import { ObjectStraighteningMixinGenerator, CanvasObjectStraighteningMixinGenerator } from './src/mixins/object_straightening.mixin'; // optional objectstraightening
 fabric.Object = ObjectStraighteningMixinGenerator(fabric.Object);
-fabric.StaticCanvas = StaticCanvasObjectStraighteningMixinGenerator(fabric.StaticCanvas);
+fabric.StaticCanvas = CanvasObjectStraighteningMixinGenerator(fabric.StaticCanvas);
 
 import * as filters from './src/filters'
 Object.assign(fabric, filters);

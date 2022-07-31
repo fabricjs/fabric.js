@@ -12,7 +12,6 @@ export class Observable {
 
   /**
    * Observes specified event
-   * @memberOf fabric.Observable
    * @alias on
    * @param {String|Object} eventName Event name (eg. 'after:render') or object with key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
@@ -41,7 +40,6 @@ export class Observable {
 
   /**
    * Observes specified event **once**
-   * @memberOf fabric.Observable
    * @alias once
    * @param {String|Object} arg0 Event name (eg. 'after:render') or object with key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
@@ -94,8 +92,6 @@ export class Observable {
   /**
    * Stops event observing for a particular event handler. Calling this method
    * without arguments removes all handlers for all events
-   * @memberOf fabric.Observable
-   * @alias off
    * @param {String|Object} eventName Event name (eg. 'after:render') or object with key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function to be deleted from EventListeners
    */
@@ -126,7 +122,6 @@ export class Observable {
 
   /**
    * Fires event with an optional options object
-   * @memberOf fabric.Observable
    * @param {String} eventName Event name to fire
    * @param {Object} [options] Options object
    */

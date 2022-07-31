@@ -1,6 +1,5 @@
 //@ts-nocheck
-
-var fabric = global.fabric;
+import { animate } from "../util";
 
 export function ObjectStraighteningMixinGenerator(Klass) {
   return class ObjectStraighteningMixin extends Klass {
@@ -19,7 +18,7 @@ export function ObjectStraighteningMixinGenerator(Klass) {
 
     /**
      * Straightens an object (rotating it from current angle to one of 0, 90, 180, 270, etc. depending on which is closer)
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      * @chainable
      */
     straighten() {
@@ -27,11 +26,11 @@ export function ObjectStraighteningMixinGenerator(Klass) {
     }
 
     /**
-     * Same as {@link fabric.Object.prototype.straighten} but with animation
+     * Same as {@link FabricObject#straighten} but with animation
      * @param {Object} callbacks Object with callback functions
      * @param {Function} [callbacks.onComplete] Invoked on completion
      * @param {Function} [callbacks.onChange] Invoked on every step of animation
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      */
     fxStraighten(callbacks) {
       callbacks = callbacks || {};
@@ -41,7 +40,7 @@ export function ObjectStraighteningMixinGenerator(Klass) {
         onChange = callbacks.onChange || empty,
         _this = this;
 
-      return fabric.util.animate({
+      return animate({
         target: this,
         startValue: this.get('angle'),
         endValue: this._getAngleValueForStraighten(),
@@ -59,12 +58,12 @@ export function ObjectStraighteningMixinGenerator(Klass) {
   }
 }
 
-export function StaticCanvasObjectStraighteningMixinGenerator(Klass) {
-  return class StaticCanvasObjectStraighteningMixin extends Klass {
+export function CanvasObjectStraighteningMixinGenerator(Klass) {
+  return class CanvasObjectStraighteningMixin extends Klass {
 
     /**
      * Straightens object, then rerenders canvas
-     * @param {fabric.Object} object Object to straighten
+     * @param {FabricObject} object Object to straighten
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
@@ -75,8 +74,8 @@ export function StaticCanvasObjectStraighteningMixinGenerator(Klass) {
     }
 
     /**
-     * Same as {@link fabric.Canvas.prototype.straightenObject}, but animated
-     * @param {fabric.Object} object Object to straighten
+     * Same as {@link #straightenObject}, but animated
+     * @param {FabricObject} object Object to straighten
      * @return {fabric.Canvas} thisArg
      */
     fxStraightenObject(object) {
