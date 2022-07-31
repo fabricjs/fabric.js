@@ -146,7 +146,7 @@ export class ColorMatrix extends BaseFilter {
 
 
 export function createColorMatrixClass(key: string, matrix) {
-  const klass = class DefinedColorMatrix extends ColorMatrix {
+  return class DefinedColorMatrix extends ColorMatrix {
 
     /**
      * Filter type
@@ -174,6 +174,4 @@ export function createColorMatrixClass(key: string, matrix) {
     colorsOnly = true
 
   }
-  klass.name = key;
-  return klass;
 }
