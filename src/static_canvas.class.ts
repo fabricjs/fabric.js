@@ -3,8 +3,9 @@
 import { NUM_FRACTION_DIGITS } from './config';
 import { devicePixelRatio, fontPaths, iMatrix, incrementUID, isLikelyNode } from './constants';
 import { VERSION } from './context';
-import { applyMixins, CanvasSerializationMixinGenerator } from './mixins';
+import { applyMixins } from './mixins/apply_mixins';
 import { CanvasDataURLExporterMixinGenerator } from "./mixins/canvas_dataurl_exporter.mixin";
+import { CanvasSerializationMixinGenerator } from './mixins/canvas_serialization.mixin';
 import { CollectionMixinGenerator } from "./mixins/collection.mixin";
 import { CommonMethods } from "./mixins/common_methods.mixin";
 import { NodeCanvasStreamsMixinGenerator } from "./mixins/node_canvas_streams.mixin";

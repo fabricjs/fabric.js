@@ -3,7 +3,7 @@
 import { browserShadowBlurConstant, maxCacheSideLimit, minCacheSideLimit, NUM_FRACTION_DIGITS } from '../config';
 import { ALIASING_LIMIT, cacheProperties, devicePixelRatio, iMatrix, isLikelyNode, stateProperties } from '../constants';
 import { VERSION } from '../context';
-import { applyMixins } from '../mixins';
+import { applyMixins } from '../mixins/apply_mixins';
 import { CommonMethods } from '../mixins/common_methods.mixin';
 import { ObjectSVGExportMixinGenerator } from '../mixins/object.svg_export';
 import { ObjectAncestryMixinGenerator } from '../mixins/object_ancestry.mixin';
@@ -20,7 +20,7 @@ import {
   transformPoint
 } from '../util';
 import { RUNNING_ANIMATIONS } from '../util/animate';
-//import { Image } from './image.class';
+import { Image } from './image.class';
 
 const objectCaching = !isLikelyNode;
 
@@ -1656,7 +1656,7 @@ class FabricObjectBase extends CommonMethods {
    */
   cloneAsImage(options) {
     var canvasEl = this.toCanvasElement(options);
-    //return new Image(canvasEl);
+    return new Image(canvasEl);
   }
 
   /**
