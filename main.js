@@ -1,1 +1,2 @@
-export const fabric = { version: '5.1.0' };
+import { VERSION } from './context';
+export const fabric = { version: VERSION };
