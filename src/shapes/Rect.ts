@@ -1,8 +1,8 @@
 //@ts-nocheck
-var fabric;
+var _fabric;
 // temporary hack till all fabric uses exports/imports
 (function(global) {
-  fabric = global.fabric;
+  _fabric = global.fabric;
 })(typeof exports !== 'undefined' ? exports : window);
 
 /**
@@ -179,4 +179,4 @@ Rect.fromObject = function(object) {
   return fabric.Object._fromObject(fabric.Rect, object);
 };
 
-fabric.Rect = Rect;
+_fabric.Rect = Rect;
