@@ -518,7 +518,7 @@
     assert.equal(canvas.clearContext(canvas.contextContainer), canvas, 'should be chainable');
   });
 
-  QUnit.test.only('clear', function (assert) {
+  QUnit.test('clear', function (assert) {
     assert.ok(typeof canvas.clear === 'function');
     var bg = new fabric.Rect({ width: 10, height: 20 });
     canvas.backgroundColor = '#FF0000';
