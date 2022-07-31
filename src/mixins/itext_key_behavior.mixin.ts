@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { context } from '../context';
-import { disableStyleCopyPaste } from "../config";
+import config, { disableStyleCopyPaste } from "../config";
 import { addListener } from "../util";
 
 /**
@@ -256,7 +256,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
         this.removeStyleFromTo(removeFrom, removeTo);
       }
       if (insertedText.length) {
-        if (fromPaste && insertedText.join('') === COPIED_TEXT.copiedText && !disableStyleCopyPaste) {
+        if (fromPaste && insertedText.join('') === COPIED_TEXT.copiedText && !config.disableStyleCopyPaste) {
           copiedStyle = COPIED_TEXT.copiedTextStyle;
         }
         this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
@@ -302,7 +302,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
       }
 
       COPIED_TEXT.copiedText = this.getSelectedText();
-      COPIED_TEXT.copiedTextStyle = !disableStyleCopyPaste ?
+      COPIED_TEXT.copiedTextStyle = !config.disableStyleCopyPaste ?
         this.getSelectionStyles(this.selectionStart, this.selectionEnd, true) :
         null;
 

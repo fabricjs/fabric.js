@@ -60,6 +60,7 @@ let textureSize = 2048;
  * Defaults to 'false'.
  * @type Boolean
  * @default
+ * @deprecated
  */
 let disableStyleCopyPaste = false;
 
