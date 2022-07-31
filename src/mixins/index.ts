@@ -1,3 +1,4 @@
+export * from './apply_mixins';
 export * from './canvas_animation.mixin';
 export * from './canvas_dataurl_exporter.mixin';
 export * from './canvas_events.mixin';

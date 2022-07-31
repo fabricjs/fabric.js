@@ -3,6 +3,7 @@
 import { VERSION } from '../context';
 import { NUM_FRACTION_DIGITS } from './config';
 import { devicePixelRatio, fontPaths, iMatrix, incrementUID, isLikelyNode } from './constants';
+import { applyMixins, CanvasSerializationMixinGenerator } from './mixins';
 import { CanvasDataURLExporterMixinGenerator } from "./mixins/canvas_dataurl_exporter.mixin";
 import { CollectionMixinGenerator } from "./mixins/collection.mixin";
 import { CommonMethods } from "./mixins/common_methods.mixin";
@@ -1667,12 +1668,16 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
   }
 }
 
-let StaticCanvas = CanvasDataURLExporterMixinGenerator(StaticCanvasBase);
+const mixins = [
+  CanvasDataURLExporterMixinGenerator,
+  CanvasSerializationMixinGenerator
+];
 
 if (isLikelyNode) {
-  StaticCanvas = NodeCanvasStreamsMixinGenerator(StaticCanvas);
+  mixins.push(NodeCanvasStreamsMixinGenerator);
 }
 
-export { StaticCanvas };
+export const StaticCanvas = applyMixins(StaticCanvasBase, mixins);
+
 
 

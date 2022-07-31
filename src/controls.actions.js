@@ -731,3 +731,5 @@ export const scalingY = wrapWithFireEvent('scaling', wrapWithFixedAnchor(scaleOb
 
 export const changeWidth = wrapWithFireEvent('resizing', wrapWithFixedAnchor(changeObjectWidth));
 
+export * from './controls.render';
+
