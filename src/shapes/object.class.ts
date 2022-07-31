@@ -4,7 +4,6 @@ import { browserShadowBlurConstant, maxCacheSideLimit, minCacheSideLimit, NUM_FR
 import { ALIASING_LIMIT, cacheProperties, devicePixelRatio, iMatrix, isLikelyNode, stateProperties } from '../constants';
 import { VERSION } from '../context';
 import { applyMixins } from '../mixins/apply_mixins';
-import { CanvasObjectStraighteningMixinGenerator } from '../mixins/canvas_straightening.mixin';
 import { CommonMethods } from '../mixins/common_methods.mixin';
 import { ObjectSVGExportMixinGenerator } from '../mixins/object.svg_export';
 import { ObjectAncestryMixinGenerator } from '../mixins/object_ancestry.mixin';
@@ -12,6 +11,7 @@ import { ObjectGeometryMixinGenerator } from '../mixins/object_geometry.mixin';
 import { ObjectInteractivityMixinGenerator } from '../mixins/object_interactivity.mixin'; // optional interaction
 import { ObjectOriginMixinGenerator } from '../mixins/object_origin.mixin';
 import { ObjectStackingMixinGenerator } from '../mixins/object_stacking.mixin';
+import { ObjectStraighteningMixinGenerator } from '../mixins/object_straightening.mixin';
 import { ObjectStatefulMixinGenerator } from '../mixins/stateful.mixin';
 import { Point } from '../point.class';
 import { StaticCanvas } from '../static_canvas.class';
@@ -1953,7 +1953,7 @@ export const FabricObject = applyMixins(FabricObjectBase, [
   ObjectSVGExportMixinGenerator,
   ObjectStatefulMixinGenerator,
   ObjectInteractivityMixinGenerator,
-  CanvasObjectStraighteningMixinGenerator
+  ObjectStraighteningMixinGenerator
 ]);
 
 

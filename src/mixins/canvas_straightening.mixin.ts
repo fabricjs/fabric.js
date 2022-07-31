@@ -1,6 +1,6 @@
 //@ts-nocheck
-export function CanvasObjectStraighteningMixinGenerator(Klass) {
-    return class CanvasObjectStraighteningMixin extends Klass {
+export function CanvasStraighteningMixinGenerator(Klass) {
+    return class CanvasStraighteningMixin extends Klass {
 
         /**
          * Straightens object, then rerenders canvas

@@ -4,7 +4,7 @@ import { fabric } from './HEADER';
 import * as constants from './constants';
 Object.assign(fabric, constants);
 
-console.log(fabric)
+// console.log(fabric)
 
 import { Observable } from './mixins/observable.mixin';
 import { CollectionMixinGenerator } from './mixins/collection.mixin';
@@ -53,10 +53,10 @@ fabric.Shadow = Shadow;
 fabric.Control = Control;
 fabric.Gradient = Gradient;
 
-import { CanvasObjectStraighteningMixinGenerator } from "./mixins/canvas_straightening.mixin";
+import { CanvasStraighteningMixinGenerator } from "./mixins/canvas_straightening.mixin";
 
 fabric.StaticCanvas = StaticCanvas;
-fabric.StaticCanvas = CanvasObjectStraighteningMixinGenerator(fabric.StaticCanvas);
+fabric.StaticCanvas = CanvasStraighteningMixinGenerator(fabric.StaticCanvas);
 
 
 import './canvas.class'; // optional interaction
