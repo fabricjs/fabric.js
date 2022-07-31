@@ -92,15 +92,70 @@ let forceGLPutImageData = false;
 let NUM_FRACTION_DIGITS = 2;
 
 export default {
-    DPI,
-    NUM_FRACTION_DIGITS,
-    browserShadowBlurConstant,
-    cachesBoundsOfCurve,
-    disableStyleCopyPaste,
-    enableGLFiltering,
-    forceGLPutImageData,
-    maxCacheSideLimit,
-    minCacheSideLimit,
-    perfLimitSizeTotal,
-    textureSize
+    get DPI() {
+        return DPI;
+    },
+    set DPI(value: number) {
+        DPI = value;
+    },
+    get NUM_FRACTION_DIGITS() {
+        return NUM_FRACTION_DIGITS;
+    },
+    set NUM_FRACTION_DIGITS(value: number) {
+        NUM_FRACTION_DIGITS = value;
+    },
+    get browserShadowBlurConstant() {
+        return browserShadowBlurConstant;
+    },
+    set browserShadowBlurConstant(value: number) {
+        browserShadowBlurConstant = value;
+    },
+    get cachesBoundsOfCurve() {
+        return cachesBoundsOfCurve;
+    },
+    set cachesBoundsOfCurve(value: boolean) {
+        cachesBoundsOfCurve = value;
+    },
+    get disableStyleCopyPaste() {
+        return disableStyleCopyPaste;
+    },
+    set disableStyleCopyPaste(value: boolean) {
+        disableStyleCopyPaste = value;
+    },
+    get enableGLFiltering() {
+        return enableGLFiltering;
+    },
+    set enableGLFiltering(value: boolean) {
+        enableGLFiltering = value;
+    },
+    get forceGLPutImageData() {
+        return forceGLPutImageData;
+    },
+    set forceGLPutImageData(value: boolean) {
+        forceGLPutImageData = value;
+    },
+    get maxCacheSideLimit() {
+        return maxCacheSideLimit;
+    },
+    set maxCacheSideLimit(value: number) {
+        maxCacheSideLimit = value;
+    },
+    get minCacheSideLimit() {
+        return minCacheSideLimit;
+    },
+    set minCacheSideLimit(value: number) {
+        minCacheSideLimit = value;
+    },
+    get perfLimitSizeTotal() {
+        return perfLimitSizeTotal;
+    },
+    set perfLimitSizeTotal(value: number) {
+        perfLimitSizeTotal = value;
+    },
+    get textureSize() {
+        return textureSize;
+    },
+    set textureSize(value: number) {
+        textureSize = value;
+    },
 }
