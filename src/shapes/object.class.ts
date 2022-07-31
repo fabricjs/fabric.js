@@ -1924,11 +1924,11 @@ class FabricObjectBase extends CommonMethods {
    */
   static _fromObject(klass, object, options) {
     var serializedObject = clone(object, true);
-    return enlivenObjectEnlivables(serializedObject, options).then(function (enlivedMap) {
+    return enlivenObjectEnlivables(serializedObject, options).then((enlivedMap) => {
       var opts = { ...object, ...enlivedMap };
-      return options?.extraParam ? new klass(object[options.extraParam], opts) : new klass(opts);
+      return options && options.extraParam ? new klass(object[options.extraParam], opts) : new klass(opts);
     });
-  };
+  }
 
   /**
    *
@@ -1941,7 +1941,7 @@ class FabricObjectBase extends CommonMethods {
    */
   static fromObject(object, options) {
     return FabricObjectBase._fromObject(this.constructor, object, options);
-  };
+  }
 
 }
 
