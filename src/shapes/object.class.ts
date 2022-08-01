@@ -1,5 +1,5 @@
 //@ts-nocheck
-
+import { DEFAULTS } from '../../defaults';
 import config from '../config';
 import { ALIASING_LIMIT, cacheProperties, devicePixelRatio, iMatrix, isLikelyNode, stateProperties } from '../constants';
 import { VERSION } from '../context';
@@ -897,7 +897,7 @@ class FabricObjectBase extends CommonMethods {
     populateWithProperties(this, object, propertiesToInclude);
 
     return !this.includeDefaultValues ?
-      removeDefaultValues(object, Object.getPrototypeOf(this)) :
+      removeDefaultValues(object, DEFAULTS[this.type] || Object.getPrototypeOf(this)) :
       object;
   }
 
