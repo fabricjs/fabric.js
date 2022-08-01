@@ -1649,6 +1649,7 @@ import { Observable } from "./mixins/Observable";
   fabric.StaticCanvas.prototype.once = Observable.prototype.once;
   fabric.StaticCanvas.prototype.off = Observable.prototype.off;
   fabric.StaticCanvas.prototype.fire = Observable.prototype.fire;
+  fabric.StaticCanvas.prototype._removeEventListener = Observable.prototype._removeEventListener;
   extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
 
   extend(fabric.StaticCanvas, /** @lends fabric.StaticCanvas */ {

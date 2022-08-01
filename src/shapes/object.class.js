@@ -1913,6 +1913,7 @@ import { Observable } from "../mixins/Observable";
   fabric.Object.prototype.once = Observable.prototype.once;
   fabric.Object.prototype.off = Observable.prototype.off;
   fabric.Object.prototype.fire = Observable.prototype.fire;
+  fabric.Object.prototype._removeEventListener = Observable.prototype._removeEventListener;
 
   /**
    * Defines the number of fraction digits to use when serializing object values.
