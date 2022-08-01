@@ -2,7 +2,7 @@
 import { animate } from "../util";
 
 
-export function CanvasAnimationMixinGenerator(Klass) {
+export function CanvasAnimationMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
     return class CanvasAnimationMixin extends Klass {
 
         /**

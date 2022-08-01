@@ -2,7 +2,7 @@
 
 import { createCanvasElement, toDataURL } from '../util';
 
-export function CanvasDataURLExporterMixinGenerator<T extends new (...args: any[]) => any>(Klass: T) {
+export function CanvasDataURLExporterMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class CanvasDataURLExporterMixin extends Klass {
 
     /**

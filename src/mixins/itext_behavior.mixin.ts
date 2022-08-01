@@ -7,7 +7,7 @@ import {
   clone, createCanvasElement, removeFromArray, transformPoint
 } from '../util';
 
-export function ITextBehaviorMixinGenerator(Klass) {
+export function ITextBehaviorMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class ITextBehaviorMixin extends Klass {
 
     /**

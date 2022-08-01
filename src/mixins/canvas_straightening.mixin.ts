@@ -1,5 +1,5 @@
 //@ts-nocheck
-export function CanvasStraighteningMixinGenerator(Klass) {
+export function CanvasStraighteningMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
     return class CanvasStraighteningMixin extends Klass {
 
         /**

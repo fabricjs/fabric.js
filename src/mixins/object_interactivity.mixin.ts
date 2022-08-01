@@ -3,7 +3,7 @@
 import { degreesToRadians, sizeAfterTransform } from "../util";
 import { Point } from "../point.class";
 
-export function ObjectInteractivityMixinGenerator(Klass) {
+export function ObjectInteractivityMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class ObjectInteractivityMixin extends Klass {
     /**
      * Determines which corner has been clicked

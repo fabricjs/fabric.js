@@ -5,7 +5,7 @@ import { ActiveSelection } from "../shapes";
 import { min, max } from "../util";
 
 
-export function CanvasGroupingMixinGenerator(Klass) {
+export function CanvasGroupingMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class CanvasGroupingMixin extends Klass {
 
     /**

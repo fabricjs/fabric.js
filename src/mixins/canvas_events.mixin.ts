@@ -12,7 +12,7 @@ function checkClick(e, value) {
 }
 
 
-export function CanvasEventsMixinGenerator(Klass) {
+export function CanvasEventsMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class CanvasEventsMixin extends Klass {
 
     /**

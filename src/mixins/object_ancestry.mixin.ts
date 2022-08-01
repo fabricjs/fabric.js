@@ -3,7 +3,7 @@
 import type { FabricObject } from "shapes/object.class";
 import { StaticCanvas } from "../static_canvas.class";
 
-export function ObjectAncestryMixinGenerator(Klass) {
+export function ObjectAncestryMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class ObjectAncestryMixin extends Klass {
 
     /**

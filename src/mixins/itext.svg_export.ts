@@ -12,7 +12,7 @@ import {
 const multipleSpacesRegex = /  +/g;
 
 
-export function ITextSVGExportMixinGenerator(Klass) {
+export function ITextSVGExportMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class ITextSVGExportMixin extends Klass {
 
     /**

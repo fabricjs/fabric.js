@@ -17,7 +17,7 @@ const originXOffset = {
   };
 
 
-export function ObjectOriginMixinGenerator(Klass) {
+export function ObjectOriginMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class ObjectOriginMixin extends Klass {
 
     /**
@@ -282,6 +282,3 @@ export function ObjectOriginMixinGenerator(Klass) {
     }
   }
 }
-
-
-

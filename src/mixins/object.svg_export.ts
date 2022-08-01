@@ -25,7 +25,7 @@ function getSvgColorString(prop, value) {
   }
 }
 
-export function ObjectSVGExportMixinGenerator(Klass) {
+export function ObjectSVGExportMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class ObjectSVGExportMixin extends Klass {
     /**
      * Returns styles-string for svg-export

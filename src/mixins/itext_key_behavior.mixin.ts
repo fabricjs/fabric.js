@@ -13,7 +13,7 @@ export const COPIED_TEXT = {
 }
 
 
-export function ITextKeyBehaviorMixinGenerator(Klass) {
+export function ITextKeyBehaviorMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class ITextKeyBehaviorMixin extends Klass {
 
     /**

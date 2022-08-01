@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-export function ITextClickBehaviorMixinGenerator(Klass) {
+export function ITextClickBehaviorMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class ITextClickBehaviorMixin extends Klass {
     /**
      * Initializes "dbclick" event handler

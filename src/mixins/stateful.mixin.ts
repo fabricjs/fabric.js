@@ -58,7 +58,7 @@ function _isEqual(origValue, currentValue, firstPass) {
 
 
 
-export function ObjectStatefulMixinGenerator(Klass) {
+export function ObjectStatefulMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class ObjectStatefulMixin extends Klass {
 
     /**

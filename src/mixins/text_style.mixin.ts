@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 
-export function TextStyleMixinGenerator(Klass) {
+export function TextStyleMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class TextStyleMixin extends Klass {
     /**
      * Returns true if object has no styling or no styling in a line

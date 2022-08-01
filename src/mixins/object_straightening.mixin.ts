@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { animate } from "../util";
 
-export function ObjectStraighteningMixinGenerator(Klass) {
+export function ObjectStraighteningMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class ObjectStraighteningMixin extends Klass {
 
     /**

@@ -2,7 +2,7 @@
 
 import { animate, animateColor } from "../util";
 
-export function ObjectAnimationMixinGenerator(Klass) {
+export function ObjectAnimationMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class ObjectAnimationMixin extends Klass {
     /**
      * Animates object's properties

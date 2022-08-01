@@ -5,7 +5,7 @@ import {
   createCanvasElement, enlivenObjectEnlivables, enlivenObjects
 } from '../util';
 
-export function CanvasSerializationMixinGenerator(Klass) {
+export function CanvasSerializationMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class CanvasSerializationMixin extends Klass {
 
     /**

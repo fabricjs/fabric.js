@@ -14,7 +14,7 @@ import { degreesToRadians, radiansToDegrees } from "../util";
  * - touch:longpress
  */
 
-export function CanvasGesturesMixinGenerator(Klass) {
+export function CanvasGesturesMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class CanvasGesturesMixin extends Klass {
     /**
      * Method that defines actions when an Event.js gesture is detected on an object. Currently only supports

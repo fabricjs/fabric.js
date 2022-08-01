@@ -14,7 +14,7 @@ export function arrayFromCoords(coords) {
   ];
 }
 
-export function ObjectGeometryMixinGenerator(Klass) {
+export function ObjectGeometryMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class ObjectGeometryMixin extends Klass {
 
     /**

@@ -19,7 +19,7 @@ fabric.Object.prototype.stateProperties.push('eraser');
  * @fires erasing:end
  */
 
-export function ObjectEraserBrushMixinGenerator(Klass) {
+export function ObjectEraserBrushMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class ObjectEraserBrushMixin extends Klass {
     /**
      * Indicates whether this object can be erased by {@link fabric.EraserBrush}
@@ -136,7 +136,7 @@ fabric.Object = ObjectEraserBrushMixinGenerator(fabric.Object);
 
 
 
-export function GroupEraserBrushMixinGenerator(Klass) {
+export function GroupEraserBrushMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class GroupEraserBrushMixin extends Klass {
     /**
      * @private
@@ -293,7 +293,7 @@ var __renderOverlay = fabric.Canvas.prototype._renderOverlay;
  * @fires erasing:end
  */
 
-export function CanvasEraserBrushMixinGenerator(Klass) {
+export function CanvasEraserBrushMixinGenerator<T extends new (...args: unknown[]) => unknown>(Klass: T) {
   return class CanvasEraserBrushMixin extends Klass {
     /**
      * Used by {@link #renderAll}
