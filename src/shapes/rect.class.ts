@@ -2,6 +2,7 @@
 
 
 import { cacheProperties, SHARED_ATTRIBUTES, stateProperties } from '../constants';
+import { parseAttributes } from '../parser/parseAttributes';
 import { FabricObject } from './object.class';
 
 /**
