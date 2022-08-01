@@ -2,9 +2,9 @@ import { fabric } from './HEADER';
 // import './lib/event'), // optional gestures
 import './src/mixins/collection.mixin';
 
-import './src/mixins/Observable';
-// import { Observable } from './src/mixins/Observable';
-// fabric.Observable = Observable;
+// import './src/mixins/Observable';
+import { Observable } from './src/mixins/Observable';
+fabric.Observable = Observable;
 import './src/mixins/shared_methods.mixin';
 
 
