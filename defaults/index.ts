@@ -1,5 +1,6 @@
-import * as Rect from './Rect.json';
+import * as DObject from './Object.json';
+import * as DRect from './Rect.json';
 
 export const DEFAULTS = {
-    rect: Rect
+    rect: { ...DObject, ...DRect }
 };
