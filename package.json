@@ -12,6 +12,10 @@
     {
       "name": "Steve Eberhardt",
       "email": "melchiar2@gmail.com"
+    },
+    {
+      "name": "Shachar Nencel",
+      "email": "Shacharnen@gmail.com"
     }
   ],
   "keywords": [
@@ -70,12 +74,14 @@
   },
   "devDependencies": {
     "@rollup/plugin-json": "^4.1.0",
+    "@rollup/pluginutils": "^4.2.1",
     "@types/fs-extra": "^9.0.13",
     "@types/jsdom": "^20.0.0",
     "@types/lodash": "^4.14.180",
     "@types/node": "^17.0.21",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
     "@typescript-eslint/parser": "^5.29.0",
+    "acorn": "^8.8.0",
     "ansi-escape": "^1.1.0",
     "auto-changelog": "^2.3.0",
     "chalk": "^2.4.1",
