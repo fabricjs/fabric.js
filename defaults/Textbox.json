@@ -1,0 +1,9 @@
+{
+	"type": "textbox",
+	"minWidth": 20,
+	"dynamicMinWidth": 2,
+	"__cachedLines": null,
+	"lockScalingFlip": true,
+	"noScaleCache": false,
+	"splitByGrapheme": false
+}
