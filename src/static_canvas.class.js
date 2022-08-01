@@ -1,3 +1,5 @@
+import { Observable } from "./mixins/Observable";
+
 (function (global) {
   // aliases for faster resolution
   var fabric = global.fabric, extend = fabric.util.object.extend,
@@ -1643,7 +1645,10 @@
     }
   });
 
-  extend(fabric.StaticCanvas.prototype, fabric.Observable);
+  fabric.StaticCanvas.prototype.on = Observable.prototype.on;
+  fabric.StaticCanvas.prototype.once = Observable.prototype.once;
+  fabric.StaticCanvas.prototype.off = Observable.prototype.off;
+  fabric.StaticCanvas.prototype.fire = Observable.prototype.fire;
   extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
 
   extend(fabric.StaticCanvas, /** @lends fabric.StaticCanvas */ {

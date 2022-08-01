@@ -1,3 +1,5 @@
+import { Observable } from "../mixins/Observable";
+
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
@@ -1905,9 +1907,12 @@
     }
   });
 
-  fabric.util.createAccessors && fabric.util.createAccessors(fabric.Object);
+  // fabric.util.createAccessors && fabric.util.createAccessors(fabric.Object);
 
-  extend(fabric.Object.prototype, fabric.Observable);
+  fabric.Object.prototype.on = Observable.prototype.on;
+  fabric.Object.prototype.once = Observable.prototype.once;
+  fabric.Object.prototype.off = Observable.prototype.off;
+  fabric.Object.prototype.fire = Observable.prototype.fire;
 
   /**
    * Defines the number of fraction digits to use when serializing object values.
