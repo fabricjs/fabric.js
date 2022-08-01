@@ -1,6 +1,7 @@
 import { terser } from 'rollup-plugin-terser';
 import ts from "rollup-plugin-ts";
 import { parseClassDefaultProperties } from './rollup.plugin';
+import json from '@rollup/plugin-json';
 
 // rollup.config.js
 export default {
@@ -21,6 +22,7 @@ export default {
       null,
   ],
   plugins: [
+    json(),
     parseClassDefaultProperties(),
     ts({
       /* Plugin options */
