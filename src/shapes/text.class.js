@@ -1700,6 +1700,6 @@
 
   fabric.Text.genericFonts = ['sans-serif', 'serif', 'cursive', 'fantasy', 'monospace'];
 
-  fabric.util.createAccessors && fabric.util.createAccessors(fabric.Text);
+  // fabric.util.createAccessors && fabric.util.createAccessors(fabric.Text);
 
 })(typeof exports !== 'undefined' ? exports : window);
