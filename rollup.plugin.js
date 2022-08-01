@@ -31,7 +31,11 @@ export function parseClassDefaultProperties(options = {}) {
                                         value
                                     }
                                 })
-                                .filter(value => value.value !== undefined);
+                                .filter(value => value.value !== undefined)
+                                .reduce((defaults, curr) => {
+                                    defaults[curr.name] = curr.value;
+                                    return defaults;
+                                }, {});
                             return {
                                 name,
                                 fields
