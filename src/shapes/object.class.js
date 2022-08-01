@@ -7,9 +7,9 @@ import { DEFAULTS } from '../../defaults';
       capitalize = fabric.util.string.capitalize,
       degreesToRadians = fabric.util.degreesToRadians,
       objectCaching = !fabric.isLikelyNode,
-    ALIASING_LIMIT = 2;
-  
-  
+      ALIASING_LIMIT = 2;
+
+
   function removeDefaultValues(object, defaults) {
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
@@ -891,7 +891,7 @@ import { DEFAULTS } from '../../defaults';
 
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
       if (!this.includeDefaultValues) {
-        object = removeDefaultValues(object, DEFAULTS[this.type]);
+        object = removeDefaultValues(object, DEFAULTS[this.type] || Object.getPrototypeOf(this));
       }
 
       return object;
