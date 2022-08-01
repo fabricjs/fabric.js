@@ -1,4 +1,5 @@
-(function(global) {
+import { DEFAULTS } from '../../defaults';
+(function (global) {
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
@@ -6,7 +7,27 @@
       capitalize = fabric.util.string.capitalize,
       degreesToRadians = fabric.util.degreesToRadians,
       objectCaching = !fabric.isLikelyNode,
-      ALIASING_LIMIT = 2;
+    ALIASING_LIMIT = 2;
+  
+  
+  function removeDefaultValues(object, defaults) {
+    Object.keys(object).forEach(function (prop) {
+      if (prop === 'left' || prop === 'top' || prop === 'type') {
+        return;
+      }
+      if (object[prop] === defaults[prop]) {
+        delete object[prop];
+      }
+      // basically a check for [] === []
+      if (Array.isArray(object[prop]) && Array.isArray(defaults[prop])
+        && object[prop].length === 0 && defaults[prop].length === 0) {
+        delete object[prop];
+      }
+    });
+
+    return object;
+  }
+
   /**
    * Root object class from which all 2d shape classes inherit from
    * @class fabric.Object
@@ -870,7 +891,7 @@
 
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
       if (!this.includeDefaultValues) {
-        object = this._removeDefaultValues(object);
+        object = removeDefaultValues(object, DEFAULTS[this.type]);
       }
 
       return object;
@@ -884,29 +905,6 @@
     toDatalessObject: function(propertiesToInclude) {
       // will be overwritten by subclasses
       return this.toObject(propertiesToInclude);
-    },
-
-    /**
-     * @private
-     * @param {Object} object
-     */
-    _removeDefaultValues: function(object) {
-      var prototype = fabric.util.getKlass(object.type).prototype;
-      Object.keys(object).forEach(function(prop) {
-        if (prop === 'left' || prop === 'top' || prop === 'type') {
-          return;
-        }
-        if (object[prop] === prototype[prop]) {
-          delete object[prop];
-        }
-        // basically a check for [] === []
-        if (Array.isArray(object[prop]) && Array.isArray(prototype[prop])
-          && object[prop].length === 0 && prototype[prop].length === 0) {
-          delete object[prop];
-        }
-      });
-
-      return object;
     },
 
     /**

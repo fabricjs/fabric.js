@@ -91,7 +91,7 @@ function parseRawClass(raw) {
                 result && fields.push(result[1])
             }
         }
-       
+
         index++;
     }
     commas.reverse().forEach(pos => {
@@ -175,16 +175,16 @@ function generateMixin(rawClass, mixinName, baseClassNS, useExports) {
     const funcName = `${mixinName}Generator`;
     return `
 ${useExports ? 'export ' : ''}function ${funcName}(Klass) {
-  return class ${mixinName||''} extends Klass ${rawClass}
+  return class ${mixinName || ''} extends Klass ${rawClass}
 }
 
-${baseClassNS ? `${baseClassNS} = ${funcName}(${baseClassNS});`:''}
+${baseClassNS ? `${baseClassNS} = ${funcName}(${baseClassNS});` : ''}
 `;
 }
 
 function getMixinName(file) {
-    const name = path.parse(file).name.replace('mixin', '').split('.').map(val=>_.upperFirst(_.camelCase(val))).join('');
-    return name.replace('Itext','IText') + 'Mixin';
+    const name = path.parse(file).name.replace('mixin', '').split('.').map(val => _.upperFirst(_.camelCase(val))).join('');
+    return name.replace('Itext', 'IText') + 'Mixin';
 }
 
 function transformFile(raw, { namespace, name } = {}) {
@@ -197,7 +197,7 @@ function transformFile(raw, { namespace, name } = {}) {
     const result = annoyingCheck.exec(raw);
     if (result) {
         const found = findObject(raw, '{', '}', result.index);
-        raw = raw.slice(0, result.index) + raw.slice(found.end+1);
+        raw = raw.slice(0, result.index) + raw.slice(found.end + 1);
     }
     raw = `//@ts-nocheck\n${raw}`;
     return raw;
@@ -247,7 +247,7 @@ function transformClass(type, raw, options = {}) {
             rawClass = rawClass.replace(regex, `${whitespace}${key === 'initialize' ? 'constructor' : key}(`);
             if (regex.exec(rawClass)) {
                 throw new Error(`dupliate method found ${name}#${key}`);
-            }            
+            }
         }
         else {
             const start = getPropStart(key, rawClass);
@@ -264,7 +264,7 @@ function transformClass(type, raw, options = {}) {
         }
     } while (transformed !== rawClass);
     const classDirective = type === 'mixin' ?
-        generateMixin(rawClass, `${_.upperFirst(name)}${className.replace(new RegExp(name.toLowerCase()==='staticcanvas'?'canvas':name, 'i'), '')}` || name, namespace, useExports) :
+        generateMixin(rawClass, `${_.upperFirst(name)}${className.replace(new RegExp(name.toLowerCase() === 'staticcanvas' ? 'canvas' : name, 'i'), '')}` || name, namespace, useExports) :
         generateClass(rawClass, className || name, superClass, useExports);
     raw = `${raw.slice(0, match.index)}${classDirective}${raw.slice(end + 1).replace(/\s*\)\s*;?/, '')}`;
     if (type === 'mixin') {
@@ -272,7 +272,7 @@ function transformClass(type, raw, options = {}) {
         try {
             return transformClass(type, raw, options);
         } catch (error) {
-            
+
         }
     }
     if (type === 'class' && !useExports) {
@@ -288,7 +288,7 @@ function convertFile(type, source, dest, options) {
             name,
             raw,
             staticCandidantes,
-             requiresSuperClassResolution, 
+            requiresSuperClassResolution,
             superClasses
         } = transformClass(type, readFile(source), {
             className: type === 'mixin' && getMixinName(path.parse(source).name),
@@ -303,7 +303,7 @@ function convertFile(type, source, dest, options) {
             destination: path.relative(wd, dest),
             class: name,
             requiresSuperClassResolution: requiresSuperClassResolution ? superClasses : false,
-            staticCandidantes: staticCandidantes.length > 0? staticCandidantes: 'none'
+            staticCandidantes: staticCandidantes.length > 0 ? staticCandidantes : 'none'
         });
         return dest;
     } catch (error) {
@@ -327,7 +327,7 @@ function generateIndexFile(dir, files, ext) {
     const file = path.resolve(dir, `index.${ext}`);
     fs.writeFileSync(file, _.compact(files).map(file => {
         const name = path.parse(file).name;
-        return `export * from ./${name};\n`;
+        return `export * from './${name}';\n`;
     }).join(''));
     console.log(chalk.bold(`created ${path.relative(wd, file)}`));
 }
@@ -348,7 +348,7 @@ function listFiles() {
         const dir = path.resolve(srcDir, klsDir);
         fs.readdirSync(dir).map(file => {
             paths.push({
-                dir, 
+                dir,
                 file,
                 type: 'class'
             });
@@ -364,14 +364,14 @@ function listFiles() {
     });
 
     const additionalFiles = fs.readdirSync(srcDir).filter(file => !fs.lstatSync(path.resolve(srcDir, file)).isDirectory());
-     additionalFiles.map(file => {
-         paths.push({
-             dir: srcDir,
-             file,
-             type: 'class'
-         });
-     });
-    
+    additionalFiles.map(file => {
+        paths.push({
+            dir: srcDir,
+            file,
+            type: 'class'
+        });
+    });
+
     return paths;
 }
 
@@ -389,7 +389,7 @@ function transform(options = {}) {
                 { dir, file, type }
             );
         });
-    
+
     const [errors, files] = _.partition(result, file => file instanceof Error);
     const dirs = files.reduce((dirs, { dir, file }) => {
         (dirs[dir] || (dirs[dir] = [])).push(file);
@@ -398,7 +398,7 @@ function transform(options = {}) {
     options.createIndex && _.map(dirs, (files, dir) => generateIndexFile(dir, files, options.ext));
     options.overwriteExisitingFiles && options.ext === 'ts' &&
         files.forEach(({ dir, file }) => fs.removeSync(path.resolve(dir, file.replace('.ts', '.js'))));
-    
+
     if (!options.verbose) {
         console.error(`failed files:`);
         errors.map(console.error);
