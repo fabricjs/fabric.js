@@ -5,17 +5,29 @@ function isEmptyArray(value) {
     return Array.isArray(value) && value.length === 0;
 }
 
-export function removeDefaultValues(object, defaults, include = []) {
-    const dest = {};
+/**
+ * mutates object
+ * @param object 
+ * @param defaults 
+ * @returns 
+ */
+export function removeDefaultValues(object, defaults) {
     for (const key in object) {
-        if (include.includes(key)
-            || !(object[key] === defaults[key] || (isEmptyArray(object[key]) && isEmptyArray(defaults[key])))) {
-            dest[key] = object[key];
+        if (object[key] === defaults[key] || (isEmptyArray(object[key]) && isEmptyArray(defaults[key]))) {
+            delete object[key];
         }
     }
-    return dest;
+    return object;
 }
 
+/**
+ * mutates object
+ * @param object 
+ * @param defaults 
+ * @returns 
+ */
 export function removeObjectDefaultValues(object, defaults) {
-    return removeDefaultValues(object, defaults, include);
+    return removeDefaultValues(object, include.reduce(key => {
+        delete defaults[key];
+    }, { ...defaults }));
 }
