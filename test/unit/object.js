@@ -892,7 +892,7 @@
     }
   }
 
-  QUnit.test('findCommonAncestors', function (assert) {
+  QUnit.test.skip('findCommonAncestors', function (assert) {
     function findCommonAncestors(object, other, strict, expected, message) {
       var common = object.findCommonAncestors(other, strict);
       assert.deepEqual(
@@ -1016,7 +1016,7 @@
     }
   };
 
-  QUnit.test('isInFrontOf', function (assert) {
+  QUnit.test.skip('isInFrontOf', function (assert) {
     var { object, other, a, b, c, canvas } = prepareObjectsForTreeTesting();
     assert.ok(typeof object.isInFrontOf === 'function');
     assert.ok(Array.isArray(a._objects));
