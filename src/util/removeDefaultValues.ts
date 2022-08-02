@@ -13,7 +13,7 @@ function isEmptyArray(value) {
  */
 export function removeDefaultValues(object, defaults) {
     for (const key in object) {
-        if (object[key] === defaults[key] || (isEmptyArray(object[key]) && isEmptyArray(defaults[key]))) {
+        if (key in defaults && (object[key] === defaults[key] || (isEmptyArray(object[key]) && isEmptyArray(defaults[key])))) {
             delete object[key];
         }
     }
