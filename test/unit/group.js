@@ -218,39 +218,6 @@
     assert.ok(group.getObjects()[0] !== clone.objects[0], 'should produce different objects in array');
   });
 
-  QUnit.skip('toObject without default values', function(assert) {
-    var group = makeGroupWith2Objects();
-    var clone = group.toObject();
-    var objects = [{
-      version: fabric.version,
-      type: 'rect',
-      left: 10,
-      top: -30,
-      width: 30,
-      height: 10,
-      strokeWidth: 0,
-    }, {
-      version: fabric.version,
-      type: 'rect',
-      left: -40,
-      top: -10,
-      width: 10,
-      height: 40,
-      strokeWidth: 0,
-    }];
-    var expectedObject = {
-      version: fabric.version,
-      type: 'group',
-      left: 50,
-      top: 100,
-      width: 80,
-      height: 60,
-      objects: objects,
-    };
-    assert.deepEqual(clone, expectedObject);
-  });
-
-
   QUnit.test('toObject with excludeFromExport set on an object', function (assert) {
     var group = makeGroupWith2Objects();
     var group2 = makeGroupWith2ObjectsAndNoExport();

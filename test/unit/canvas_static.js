@@ -1115,14 +1115,6 @@
     assert.equal(canvas.toObject().objects[0].type, rect.type);
   });
 
-  QUnit.skip('toObject non includeDefaultValues', function(assert) {
-    var rect = makeRect();
-    canvas.add(rect);
-    var cObject = canvas.toObject();
-    var expectedRect = { version: fabric.version, type: 'rect', width: 10, height: 10, top: 0, left: 0 };
-    assert.deepEqual(cObject.objects[0], expectedRect, 'Rect should be exported withoud defaults');
-  });
-
   QUnit.test('toObject excludeFromExport', function(assert) {
     var rect = makeRect(), rect2 = makeRect(), rect3 = makeRect(), clipPath = makeRect();
     canvas.clear();

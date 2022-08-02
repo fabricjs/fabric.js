@@ -239,45 +239,6 @@
     testFractionDigits.call(this, 0, 167);
   });
 
-  QUnit.skip('toObject without default values', function(assert) {
-
-    var emptyObjectRepr = { version: fabric.version, type: 'object', top: 0, left: 0 };
-
-    var augmentedObjectRepr = {
-      version: fabric.version,
-      type: 'object',
-      left: 10,
-      top: 20,
-      width: 30,
-      height: 40,
-      strokeDashArray: [5, 2],
-      strokeLineCap: 'round',
-      strokeLineJoin: 'bevel',
-      strokeMiterLimit: 5,
-      flipX: true,
-      opacity: 0.13,
-    };
-
-    var cObj = new fabric.Object(),
-        toObjectObj;
-    assert.deepEqual(emptyObjectRepr, cObj.toObject(), 'top and left are always maintained');
-
-    cObj.set('left', 10)
-      .set('top', 20)
-      .set('width', 30)
-      .set('height', 40)
-      .set('flipX', true)
-      .set('opacity', 0.13)
-      .set('strokeDashArray', [5, 2])
-      .set('strokeLineCap', 'round')
-      .set('strokeLineJoin', 'bevel')
-      .set('strokeMiterLimit', 5);
-    toObjectObj = cObj.toObject();
-    assert.deepEqual(augmentedObjectRepr, toObjectObj);
-    assert.notEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
-    assert.deepEqual(augmentedObjectRepr.strokeDashArray, toObjectObj.strokeDashArray);
-  });
-
   QUnit.test('toDatalessObject', function(assert) {
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.toDatalessObject === 'function');
