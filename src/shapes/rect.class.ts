@@ -48,7 +48,8 @@ export class Rect extends FabricObject {
    * @return {Object} thisArg
    */
   constructor(options) {
-    super(options);
+    super();
+    this.set(options);
     this._initRxRy();
   }
 
