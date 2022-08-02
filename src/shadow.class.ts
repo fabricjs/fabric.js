@@ -1,3 +1,5 @@
+import { removeDefaultValues } from "./util/removeDefaultValues";
+
 //@ts-nocheck
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
@@ -165,7 +167,7 @@
      * @return {Object} Object representation of a shadow instance
      */
     toObject: function() {
-      return this.toDefaultObject();
+      return removeDefaultValues(this.toDefaultObject(), this.includeDefaultValues ? {} : fabric.Shadow.prototype);
     }
   });
 
