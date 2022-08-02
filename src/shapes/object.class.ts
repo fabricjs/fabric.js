@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { pick } from "../util/pick";
+
 (function (global) {
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
@@ -9,13 +11,6 @@
       objectCaching = !fabric.isLikelyNode,
       ALIASING_LIMIT = 2;
 
-
-  function pick(object, keys) {
-    return keys.reduce((dest, key) => {
-      dest[key] = object[key];
-      return dest;
-    }, {});
-  }
 
   /**
    * Root object class from which all 2d shape classes inherit from
@@ -831,9 +826,9 @@
     },
 
     toDefaultObject() {
-      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
 
-        object = {
+      return {
           type: this.type,
           version: fabric.version,
           originX: this.originX,
@@ -866,14 +861,6 @@
           skewX: toFixed(this.skewX, NUM_FRACTION_DIGITS),
           skewY: toFixed(this.skewY, NUM_FRACTION_DIGITS),
         };
-
-      if (this.clipPath && !this.clipPath.excludeFromExport) {
-        object.clipPath = this.clipPath.toObject(propertiesToInclude);
-        object.clipPath.inverted = this.clipPath.inverted;
-        object.clipPath.absolutePositioned = this.clipPath.absolutePositioned;
-      }
-
-      return object;
     },
 
     /**
@@ -883,11 +870,18 @@
      */
     toObject(propertiesToInclude = []) {
       const defaults = this.toDefaultObject();
-      propertiesToInclude = propertiesToInclude.concat(Object.keys(defaults));
+      const clipPath = this.clipPath && !this.clipPath.excludeFromExport ?
+        {
+          ...this.clipPath.toObject(propertiesToInclude),
+          inverted : this.clipPath.inverted,
+          absolutePositioned : this.clipPath.absolutePositioned
+        } :
+        null;
       return {
         ...pick(this, propertiesToInclude),
-        ...pick(defaults, propertiesToInclude)
-      }
+        ...defaults,
+        ...(clipPath ? { clipPath } : null)
+      };
     },
 
     /**
