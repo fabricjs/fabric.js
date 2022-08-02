@@ -164,10 +164,10 @@
 
 
     //  TODO: remove the following for TS, just temporary 08/22
-    "@typescript-eslint/ban-ts-comment": "off",
-    "prefer-const": "off",
-    "no-var": "off",
-    "prefer-spread": "off",
-    "prefer-rest-params": "off"
+    "@typescript-eslint/ban-ts-comment": 0,
+    "prefer-const": 0,
+    "no-var": 0,
+    "prefer-spread": 0,
+    "prefer-rest-params": 0
   }
 }
