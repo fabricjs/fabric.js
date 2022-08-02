@@ -1615,12 +1615,12 @@ export class Text extends applyMixins(FabricObject, mixins) {
         if (_key === 'path') {
           this.setPathInfo();
         }
-        needsDims = needsDims || this._dimensionAffectingProps.indexOf(_key) !== -1;
+        needsDims = needsDims || dimensionAffectingTextProps.indexOf(_key) !== -1;
         isAddingPath = isAddingPath || _key === 'path';
       }
     }
     else {
-      needsDims = this._dimensionAffectingProps.indexOf(key) !== -1;
+      needsDims = dimensionAffectingTextProps.indexOf(key) !== -1;
       isAddingPath = key === 'path';
     }
     if (isAddingPath) {
