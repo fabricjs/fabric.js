@@ -55,10 +55,7 @@
     "test:coverage": "nyc --silent qunit test/node_test_setup.js test/lib test/unit",
     "test:visual:coverage": "nyc --silent --no-clean qunit test/node_test_setup.js test/lib test/visual",
     "coverage:report": "nyc report --reporter=lcov --reporter=text",
-    "jslint": "eslint --config .eslintrc.json src/**/*.js",
-    "tslint": "eslint --config .eslintrc.js src/**/*.ts",
-    "lint": "npm run jslint && npm run tslint",
-    "lint-fix": "eslint --fix --config .eslintrc.json src",
+    "lint": "eslint --config .eslintrc.js src/**/*.ts",
     "lint_tests": "eslint test/unit --config .eslintrc_tests && eslint test/visual --config .eslintrc_tests",
     "all": "npm run build && npm run test -- --all && npm run lint && npm run lint_tests && npm run export",
     "testem": "testem .",
@@ -79,7 +76,7 @@
     "chalk": "^2.4.1",
     "commander": "^9.1.0",
     "deep-object-diff": "^1.1.7",
-    "eslint": "^8.18.0",
+    "eslint": "^8.21.0",
     "fs-extra": "^10.0.1",
     "fuzzy": "^0.1.3",
     "inquirer": "^8.2.1",
@@ -91,12 +88,11 @@
     "rollup": "^2.75.6",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-ts": "^3.0.2",
-    "testem": "^3.2.0",
+    "testem": "^3.8.0",
     "typescript": "^4.7.4"
   },
   "engines": {
     "node": ">=14.0.0"
   },
-  "main": "./dist/fabric.js",
-  "dependencies": {}
+  "main": "./dist/fabric.js"
 }
