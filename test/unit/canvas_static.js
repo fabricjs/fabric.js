@@ -1350,8 +1350,8 @@
 
     canvas.add(rect);
 
-    var jsonWithoutFoo = JSON.stringify(canvas.toObject(['padding']));
-    var jsonWithFoo = JSON.stringify(canvas.toObject(['padding', 'foo']));
+    var jsonWithoutFoo = canvas.toObject(['padding']);
+    var jsonWithFoo = canvas.toObject(['padding', 'foo']);
 
     assert.deepEqual(jsonWithFoo, JSON.parse(RECT_JSON_WITH_PADDING));
     assert.notDeepEqual(jsonWithoutFoo, JSON.parse(RECT_JSON_WITH_PADDING));
