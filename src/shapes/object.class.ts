@@ -26,7 +26,6 @@ import {
 import { RUNNING_ANIMATIONS } from '../util/animate';
 //import { Image } from './image.class';
 
-const { browserShadowBlurConstant, maxCacheSideLimit, minCacheSideLimit, NUM_FRACTION_DIGITS } = config;
 const objectCaching = !isLikelyNode;
 
 export const FabricObjectBase = applyMixins(CommonMethods, [
@@ -704,7 +703,7 @@ export class FabricObject extends FabricObjectBase {
   _limitCacheSize(dims) {
     var perfLimitSizeTotal = perfLimitSizeTotal,
       width = dims.width, height = dims.height,
-      max = maxCacheSideLimit, min = minCacheSideLimit;
+      max = config.maxCacheSideLimit, min = config.minCacheSideLimit;
     if (width <= max && height <= max && width * height <= perfLimitSizeTotal) {
       if (width < min) {
         dims.width = min;
@@ -777,7 +776,7 @@ export class FabricObject extends FabricObjectBase {
    * @private
    */
   _calcCacheResizing(dims) {
-    var minCacheSize = minCacheSideLimit,
+    var minCacheSize = config.minCacheSideLimit,
       width = dims.width, height = dims.height,
       dimensionsChanged = width !== this.cacheWidth || height !== this.cacheHeight,
       additionalWidth = 0, additionalHeight = 0, shouldResizeCanvas = false;
@@ -874,33 +873,33 @@ export class FabricObject extends FabricObjectBase {
       version: VERSION,
       originX: this.originX,
       originY: this.originY,
-      left: toFixed(this.left, NUM_FRACTION_DIGITS),
-      top: toFixed(this.top, NUM_FRACTION_DIGITS),
-      width: toFixed(this.width, NUM_FRACTION_DIGITS),
-      height: toFixed(this.height, NUM_FRACTION_DIGITS),
+      left: toFixed(this.left, config.NUM_FRACTION_DIGITS),
+      top: toFixed(this.top, config.NUM_FRACTION_DIGITS),
+      width: toFixed(this.width, config.NUM_FRACTION_DIGITS),
+      height: toFixed(this.height, config.NUM_FRACTION_DIGITS),
       fill: (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
       stroke: (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
-      strokeWidth: toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
+      strokeWidth: toFixed(this.strokeWidth, config.NUM_FRACTION_DIGITS),
       strokeDashArray: this.strokeDashArray ? this.strokeDashArray.concat() : this.strokeDashArray,
       strokeLineCap: this.strokeLineCap,
       strokeDashOffset: this.strokeDashOffset,
       strokeLineJoin: this.strokeLineJoin,
       strokeUniform: this.strokeUniform,
-      strokeMiterLimit: toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
-      scaleX: toFixed(this.scaleX, NUM_FRACTION_DIGITS),
-      scaleY: toFixed(this.scaleY, NUM_FRACTION_DIGITS),
-      angle: toFixed(this.angle, NUM_FRACTION_DIGITS),
+      strokeMiterLimit: toFixed(this.strokeMiterLimit, config.NUM_FRACTION_DIGITS),
+      scaleX: toFixed(this.scaleX, config.NUM_FRACTION_DIGITS),
+      scaleY: toFixed(this.scaleY, config.NUM_FRACTION_DIGITS),
+      angle: toFixed(this.angle, config.NUM_FRACTION_DIGITS),
       flipX: this.flipX,
       flipY: this.flipY,
-      opacity: toFixed(this.opacity, NUM_FRACTION_DIGITS),
+      opacity: toFixed(this.opacity, config.NUM_FRACTION_DIGITS),
       shadow: (this.shadow && this.shadow.toObject) ? this.shadow.toObject() : this.shadow,
       visible: this.visible,
       backgroundColor: this.backgroundColor,
       fillRule: this.fillRule,
       paintFirst: this.paintFirst,
       globalCompositeOperation: this.globalCompositeOperation,
-      skewX: toFixed(this.skewX, NUM_FRACTION_DIGITS),
-      skewY: toFixed(this.skewY, NUM_FRACTION_DIGITS),
+      skewX: toFixed(this.skewX, config.NUM_FRACTION_DIGITS),
+      skewY: toFixed(this.skewY, config.NUM_FRACTION_DIGITS),
     };
 
     if (this.clipPath && !this.clipPath.excludeFromExport) {
@@ -1433,7 +1432,7 @@ export class FabricObject extends FabricObjectBase {
       multY *= devicePixelRatio;
     }
     ctx.shadowColor = shadow.color;
-    ctx.shadowBlur = shadow.blur * browserShadowBlurConstant *
+    ctx.shadowBlur = shadow.blur * config.browserShadowBlurConstant *
       (multX + multY) * (scaling.x + scaling.y) / 4;
     ctx.shadowOffsetX = shadow.offsetX * multX * scaling.x;
     ctx.shadowOffsetY = shadow.offsetY * multY * scaling.y;
@@ -1927,7 +1926,7 @@ export class FabricObject extends FabricObjectBase {
  * @constant
  * @type Number
  */
-  static NUM_FRACTION_DIGITS = NUM_FRACTION_DIGITS;
+  static config.NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
 
   /**
    *

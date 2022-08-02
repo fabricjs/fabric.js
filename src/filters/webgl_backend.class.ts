@@ -6,8 +6,6 @@ import {
 } from '../util';
 import { Canvas2dFilterBackend } from './2d_backend.class';
 
-const { enableGLFiltering, forceGLPutImageData, textureSize } = config;
-
 /**
  * Tests if webgl supports certain precision
  * @param {WebGL} Canvas WebGL context to test on
@@ -113,7 +111,7 @@ export class WebglFilterBackend {
     var targetCanvas = createCanvasElement();
     // eslint-disable-next-line no-undef
     var imageBuffer = new ArrayBuffer(width * height * 4);
-    if (forceGLPutImageData) {
+    if (config.forceGLPutImageData) {
       this.imageBuffer = imageBuffer;
       this.copyGLTo2D = copyGLTo2DPutImageData;
       return;
@@ -337,9 +335,9 @@ export class WebglFilterBackend {
   }
 
   static initFilterBackend() {
-    if (enableGLFiltering && isWebglSupported && isWebglSupported(textureSize)) {
+    if (config.enableGLFiltering && isWebglSupported && isWebglSupported(config.textureSize)) {
       console.log('max texture size: ' + maxTextureSize);
-      WebglFilterBackend.backend = new WebglFilterBackend({ tileSize: textureSize });
+      WebglFilterBackend.backend = new WebglFilterBackend({ tileSize: config.textureSize });
     }
     else if (Canvas2dFilterBackend) {
       WebglFilterBackend.backend = new Canvas2dFilterBackend();

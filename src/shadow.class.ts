@@ -5,8 +5,6 @@ import { incrementUID } from "./constants";
 import { Point } from "./point.class";
 import { degreesToRadians, rotateVector, toFixed } from "./util";
 
-const { NUM_FRACTION_DIGITS } = config;
-
 /**
 * Regex matching shadow offsetX, offsetY and blur (ex: "2px 2px 10px rgba(0,0,0,0.2)", "rgb(0,255,0) 2px 2px")
 * @static
@@ -135,8 +133,8 @@ export class Shadow {
     if (object.width && object.height) {
       //http://www.w3.org/TR/SVG/filters.html#FilterEffectsRegion
       // we add some extra space to filter box to contain the blur ( 20 )
-      fBoxX = toFixed((Math.abs(offset.x) + this.blur) / object.width, NUM_FRACTION_DIGITS) * 100 + BLUR_BOX;
-      fBoxY = toFixed((Math.abs(offset.y) + this.blur) / object.height, NUM_FRACTION_DIGITS) * 100 + BLUR_BOX;
+      fBoxX = toFixed((Math.abs(offset.x) + this.blur) / object.width, config.NUM_FRACTION_DIGITS) * 100 + BLUR_BOX;
+      fBoxY = toFixed((Math.abs(offset.y) + this.blur) / object.height, config.NUM_FRACTION_DIGITS) * 100 + BLUR_BOX;
     }
     if (object.flipX) {
       offset.x *= -1;
@@ -149,9 +147,9 @@ export class Shadow {
       '<filter id="SVGID_' + this.id + '" y="-' + fBoxY + '%" height="' + (100 + 2 * fBoxY) + '%" ' +
       'x="-' + fBoxX + '%" width="' + (100 + 2 * fBoxX) + '%" ' + '>\n' +
       '\t<feGaussianBlur in="SourceAlpha" stdDeviation="' +
-      toFixed(this.blur ? this.blur / 2 : 0, NUM_FRACTION_DIGITS) + '"></feGaussianBlur>\n' +
-      '\t<feOffset dx="' + toFixed(offset.x, NUM_FRACTION_DIGITS) +
-      '" dy="' + toFixed(offset.y, NUM_FRACTION_DIGITS) + '" result="oBlur" ></feOffset>\n' +
+      toFixed(this.blur ? this.blur / 2 : 0, config.NUM_FRACTION_DIGITS) + '"></feGaussianBlur>\n' +
+      '\t<feOffset dx="' + toFixed(offset.x, config.NUM_FRACTION_DIGITS) +
+      '" dy="' + toFixed(offset.y, config.NUM_FRACTION_DIGITS) + '" result="oBlur" ></feOffset>\n' +
       '\t<feFlood flood-color="' + color.toRgb() + '" flood-opacity="' + color.getAlpha() + '"/>\n' +
       '\t<feComposite in2="oBlur" operator="in" />\n' +
       '\t<feMerge>\n' +
