@@ -1,5 +1,8 @@
 
 //@ts-nocheck
+
+import { context } from "./context";
+
 /**
 * Browser-specific constant to adjust CanvasRenderingContext2D.shadowBlur value,
 * which is unitless and not rendered equally across browsers.
