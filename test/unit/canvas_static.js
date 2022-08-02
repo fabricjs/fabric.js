@@ -220,6 +220,7 @@
     assert.ok('backgroundVpt' in canvas);
     assert.ok('overlayVpt' in canvas);
 
+    assert.equal(canvas.includeDefaultValues, true);
     assert.equal(canvas.stateful, false);
     assert.equal(canvas.renderOnAddRemove, true);
     assert.equal(canvas.controlsAboveOverlay, false);
@@ -1115,7 +1116,7 @@
     assert.equal(canvas.toObject().objects[0].type, rect.type);
   });
 
-  QUnit.skip('toObject non includeDefaultValues', function(assert) {
+  QUnit.test('toObject non includeDefaultValues', function(assert) {
     canvas.includeDefaultValues = false;
     var rect = makeRect();
     canvas.add(rect);
