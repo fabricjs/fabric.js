@@ -27,7 +27,8 @@ export function removeDefaultValues(object, defaults) {
  * @returns 
  */
 export function removeObjectDefaultValues(object, defaults) {
-    return removeDefaultValues(object, include.reduce(key => {
+    return removeDefaultValues(object, include.reduce((defaults, key) => {
         delete defaults[key];
+        return defaults;
     }, { ...defaults }));
 }
