@@ -990,6 +990,26 @@
       return this._toObjectMethod('toObject', propertiesToInclude);
     },
 
+
+    /**
+     * Returns Object representation of canvas
+     * this alias is provided because if you call JSON.stringify on an instance,
+     * the toJSON object will be invoked if it exists.
+     * Having a toJSON method means you can do JSON.stringify(myCanvas)
+     * @return {Object} JSON compatible object
+     * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization}
+     * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
+     * @example <caption>JSON without additional properties</caption>
+     * var json = canvas.toJSON();
+     * @example <caption>JSON with additional properties included</caption>
+     * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY']);
+     * @example <caption>JSON without default values</caption>
+     * var json = canvas.toJSON();
+     */
+    toJSON: function() {
+      return this.toObject();
+    },
+
     /**
      * Returns dataless object representation of canvas
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
@@ -1688,25 +1708,6 @@
     }
   });
 
-  /**
-   * Returns Object representation of canvas
-   * this alias is provided because if you call JSON.stringify on an instance,
-   * the toJSON object will be invoked if it exists.
-   * Having a toJSON method means you can do JSON.stringify(myCanvas)
-   * @function
-   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {Object} JSON compatible object
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization}
-   * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
-   * @example <caption>JSON without additional properties</caption>
-   * var json = canvas.toJSON();
-   * @example <caption>JSON with additional properties included</caption>
-   * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY']);
-   * @example <caption>JSON without default values</caption>
-   * canvas.includeDefaultValues = false;
-   * var json = canvas.toJSON();
-   */
-  fabric.StaticCanvas.prototype.toJSON = fabric.StaticCanvas.prototype.toObject;
 
   if (fabric.isLikelyNode) {
     fabric.StaticCanvas.prototype.createPNGStream = function() {
