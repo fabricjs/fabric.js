@@ -777,10 +777,10 @@ export class Group extends CollectionMixinGenerator(FabricObject) {
       sizeVector = object._getTransformedDimensions().scalarDivideEquals(2);
       if (object.angle) {
         var rad = degreesToRadians(object.angle),
-          sin = Math.abs(sin(rad)),
-          cos = Math.abs(cos(rad)),
-          rx = sizeVector.x * cos + sizeVector.y * sin,
-          ry = sizeVector.x * sin + sizeVector.y * cos;
+          sinValue = Math.abs(sin(rad)),
+          cosValue = Math.abs(cos(rad)),
+          rx = sizeVector.x * cosValue + sizeVector.y * sinValue,
+          ry = sizeVector.x * sinValue + sizeVector.y * cosValue;
         sizeVector = new Point(rx, ry);
       }
       a = objCenter.subtract(sizeVector);
