@@ -1957,7 +1957,7 @@ export class FabricObject extends FabricObjectBase {
    * @returns {Promise<FabricObject>}
    */
   static fromObject(object, options) {
-    return FabricObject._fromObject(this.constructor, object, options);
+    return FabricObject._fromObject(FabricObject, object, options);
   }
 
 }
