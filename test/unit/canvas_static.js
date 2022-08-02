@@ -1027,7 +1027,7 @@
 
     canvas.bar = 456;
 
-    var data = canvas.toJSON(['padding', 'foo', 'bar', 'baz']);
+    var data = canvas.toObject(['padding', 'foo', 'bar', 'baz']);
     assert.ok('padding' in data.objects[0]);
     assert.ok('foo' in data.objects[0], 'foo shouldn\'t be included if it\'s not in an object');
     assert.ok(!('bar' in data.objects[0]), 'bar shouldn\'t be included if it\'s not in an object');
@@ -1059,7 +1059,7 @@
     createImageObject(function(image) {
       canvas.backgroundImage = image;
       image.custom = 'yes';
-      var json = canvas.toJSON(['custom']);
+      var json = canvas.toObject(['custom']);
       assert.equal(json.backgroundImage.custom, 'yes');
       canvas.backgroundImage = null;
       done();
@@ -1088,7 +1088,7 @@
     createImageObject(function(image) {
       canvas.overlayImage = image;
       image.custom = 'yes';
-      var json = canvas.toJSON(['custom']);
+      var json = canvas.toObject(['custom']);
       assert.equal(json.overlayImage.custom, 'yes');
       canvas.overlayImage = null;
       done();
@@ -1351,8 +1351,8 @@
 
     canvas.add(rect);
 
-    var jsonWithoutFoo = JSON.stringify(canvas.toJSON(['padding']));
-    var jsonWithFoo = JSON.stringify(canvas.toJSON(['padding', 'foo']));
+    var jsonWithoutFoo = JSON.stringify(canvas.toObject(['padding']));
+    var jsonWithFoo = JSON.stringify(canvas.toObject(['padding', 'foo']));
 
     assert.equal(jsonWithFoo, RECT_JSON_WITH_PADDING);
     assert.ok(jsonWithoutFoo !== RECT_JSON_WITH_PADDING);
