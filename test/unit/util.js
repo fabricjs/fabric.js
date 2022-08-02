@@ -1243,4 +1243,35 @@
     ];
     assert.deepEqual(matrix, expected, 'dimensions matrix flipped is equal');
   });
+
+  QUnit('removeDefaultValues, removeDefaultValues', function (assert) {
+    assert.ok(typeof fabric.util.removeDefaultValues === 'function');
+    assert.ok(typeof fabric.util.removeObjectDefaultValues === 'function');
+    assert.deepEqual(
+      fabric.util.removeDefaultValues(
+        { foo: 'bar', mip: 'pip' },
+        {}
+      ),
+      { foo: 'bar', mip: 'pip' },
+      'should preserve all'
+    );
+    assert.deepEqual(
+      fabric.util.removeDefaultValues(
+        { foo: 'bar', mip: 'pip' },
+        { foo: 'bar' }
+      ), 
+      { mip: 'pip' },
+      'should remove `foo`'
+    );
+    assert.deepEqual(
+      fabric.util.removeObjectDefaultValues(
+        { foo: 'bar', mip: 'pip', left: 10 },
+        { foo: 'bar', mip: 'pop', left: 10 }
+      ),
+      { mip: 'pip', left: 10 },
+      'should preserve `left` even though it is equal to default'
+    );
+  });
+
+
 })();
