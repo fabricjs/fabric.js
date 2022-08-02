@@ -1,4 +1,5 @@
 
+//@ts-nocheck
 /**
 * Browser-specific constant to adjust CanvasRenderingContext2D.shadowBlur value,
 * which is unitless and not rendered equally across browsers.
@@ -92,6 +93,15 @@ let forceGLPutImageData = false;
 
 let NUM_FRACTION_DIGITS = 2;
 
+/**
+ * Device Pixel Ratio
+ * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
+ */
+export let devicePixelRatio: number = context.window.devicePixelRatio ||
+    context.window.webkitDevicePixelRatio ||
+    context.window.mozDevicePixelRatio ||
+    1;
+
 export default {
     get DPI() {
         return DPI;
@@ -159,4 +169,10 @@ export default {
     set textureSize(value: number) {
         textureSize = value;
     },
+    get devicePixelRatio() {
+        return devicePixelRatio
+    },
+    set devicePixelRatio(value) {
+        devicePixelRatio = value;
+    }
 }

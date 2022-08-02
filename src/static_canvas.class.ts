@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import config from './config';
-import { devicePixelRatio, fontPaths, iMatrix, incrementUID, isLikelyNode } from './constants';
+import { fontPaths, iMatrix, incrementUID, isLikelyNode } from './constants';
 import { VERSION } from './context';
 import { applyMixins } from './mixins/apply_mixins';
 import { CanvasAnimationMixinGenerator } from './mixins/canvas_animation.mixin';
@@ -212,7 +212,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
    * @private
    */
   _isRetinaScaling() {
-    return (devicePixelRatio > 1 && this.enableRetinaScaling);
+    return (config.devicePixelRatio > 1 && this.enableRetinaScaling);
   }
 
   /**
@@ -220,7 +220,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
    * @return {Number} retinaScaling if applied, otherwise 1;
    */
   getRetinaScaling() {
-    return this._isRetinaScaling() ? Math.max(1, devicePixelRatio) : 1;
+    return this._isRetinaScaling() ? Math.max(1, config.devicePixelRatio) : 1;
   }
 
   /**
@@ -230,7 +230,7 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
     if (!this._isRetinaScaling()) {
       return;
     }
-    var scaleRatio = devicePixelRatio;
+    var scaleRatio = config.devicePixelRatio;
     this.__initRetinaScaling(scaleRatio, this.lowerCanvasEl, this.contextContainer);
     if (this.upperCanvasEl) {
       this.__initRetinaScaling(scaleRatio, this.upperCanvasEl, this.contextTop);

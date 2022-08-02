@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { Color } from "../color";
-import { devicePixelRatio } from "../constants";
+import config from "../config";
 
 /**
  * BaseBrush class
@@ -109,7 +109,7 @@ export class BaseBrush {
       ctx = canvas.contextTop,
       zoom = canvas.getZoom();
     if (canvas && canvas._isRetinaScaling()) {
-      zoom *= devicePixelRatio;
+      zoom *= config.devicePixelRatio;
     }
 
     ctx.shadowColor = shadow.color;

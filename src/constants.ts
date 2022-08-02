@@ -30,15 +30,6 @@ export const SHARED_ATTRIBUTES = [
 ];
 /* _FROM_SVG_END_ */
 
-/**
- * Device Pixel Ratio
- * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
- */
-export let devicePixelRatio: number = context.window.devicePixelRatio ||
-    context.window.webkitDevicePixelRatio ||
-    context.window.mozDevicePixelRatio ||
-    1;
-
 export const reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:[eE][-+]?\\d+)?)';
 
 export const commaWsp = '(?:\\s+,?\\s*|,\\s*)';

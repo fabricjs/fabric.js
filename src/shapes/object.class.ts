@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { DEFAULTS } from '../../defaults';
 import config from '../config';
-import { ALIASING_LIMIT, cacheProperties, devicePixelRatio, iMatrix, isLikelyNode, stateProperties } from '../constants';
+import { ALIASING_LIMIT, cacheProperties, iMatrix, isLikelyNode, stateProperties } from '../constants';
 import { VERSION } from '../context';
 import { applyMixins } from '../mixins/apply_mixins';
 import { CommonMethods } from '../mixins/common_methods.mixin';
@@ -1428,8 +1428,8 @@ export class FabricObject extends FabricObjectBase {
       multY = (canvas && canvas.viewportTransform[3]) || 1,
       scaling = shadow.nonScaling ? new Point(1, 1) : this.getObjectScaling();
     if (canvas && canvas._isRetinaScaling()) {
-      multX *= devicePixelRatio;
-      multY *= devicePixelRatio;
+      multX *= config.devicePixelRatio;
+      multY *= config.devicePixelRatio;
     }
     ctx.shadowColor = shadow.color;
     ctx.shadowBlur = shadow.blur * config.browserShadowBlurConstant *
@@ -1693,7 +1693,7 @@ export class FabricObject extends FabricObjectBase {
     var origParams = saveObjectTransform(this),
       originalGroup = this.group,
       originalShadow = this.shadow, abs = Math.abs,
-      retinaScaling = options.enableRetinaScaling ? Math.max(devicePixelRatio, 1) : 1,
+      retinaScaling = options.enableRetinaScaling ? Math.max(config.devicePixelRatio, 1) : 1,
       multiplier = (options.multiplier || 1) * retinaScaling;
     delete this.group;
     if (options.withoutTransform) {
