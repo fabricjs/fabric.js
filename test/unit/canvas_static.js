@@ -1098,7 +1098,7 @@
       sourcePath: 'http://example.com/'
     });
     canvas.add(path);
-    assert.equal(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
+    assert.equal(canvas.toDatalessJSON(), JSON.parse(PATH_DATALESS_JSON));
   });
 
   QUnit.test('toObject', function(assert) {
@@ -1349,11 +1349,11 @@
 
     canvas.add(rect);
 
-    var jsonWithoutFoo = JSON.stringify(canvas.toJSON(['padding']));
-    var jsonWithFoo = JSON.stringify(canvas.toJSON(['padding', 'foo']));
+    var jsonWithoutFoo = canvas.toJSON(['padding']);
+    var jsonWithFoo = canvas.toJSON(['padding', 'foo']);
 
-    assert.equal(jsonWithFoo, RECT_JSON_WITH_PADDING);
-    assert.ok(jsonWithoutFoo !== RECT_JSON_WITH_PADDING);
+    assert.deepEqual(jsonWithFoo, JSON.parse(RECT_JSON_WITH_PADDING));
+    assert.notDeepEqual(jsonWithoutFoo, JSON.parse(RECT_JSON_WITH_PADDING));
 
     canvas.clear();
     canvas.loadFromJSON(jsonWithFoo).then(function() {
