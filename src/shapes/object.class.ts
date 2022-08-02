@@ -882,7 +882,7 @@ import { removeObjectDefaultValues } from "../util/removeDefaultValues";
         ...pick(this, propertiesToInclude),
         ...defaults,
         ...(clipPath ? { clipPath } : null)
-      }, this.includeDefaultValues ? {} : Object.getPrototypeOf(this));
+      }, this.includeDefaultValues ? {} : fabric.util.getKlass(this.type).prototype);
     },
 
     /**
