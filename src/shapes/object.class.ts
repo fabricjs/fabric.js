@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { pick } from "../util/pick";
+import { removeObjectDefaultValues } from "../util/removeDefaultValues";
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = { }),
@@ -877,11 +878,11 @@ import { pick } from "../util/pick";
           absolutePositioned : this.clipPath.absolutePositioned
         } :
         null;
-      return {
+      return removeObjectDefaultValues({
         ...pick(this, propertiesToInclude),
         ...defaults,
         ...(clipPath ? { clipPath } : null)
-      };
+      }, this.includeDefaultValues ? {} : Object.getPrototypeOf(this));
     },
 
     /**
