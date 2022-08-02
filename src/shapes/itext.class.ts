@@ -11,6 +11,13 @@ import {
 import { FabricObject } from "./object.class";
 import { Text } from './text.class';
 
+const mixins = [
+  ITextBehaviorMixinGenerator,
+  ITextClickBehaviorMixinGenerator,
+  ITextKeyBehaviorMixinGenerator,
+  ITextSVGExportMixinGenerator
+];
+
 
 /**
  * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
@@ -61,7 +68,7 @@ import { Text } from './text.class';
  *   Select line:                    triple click
  * </pre>
  */
-class ITextBase extends Text {
+export class IText extends applyMixins(Text, mixins) {
 
   /**
    * Type of an object
@@ -580,15 +587,7 @@ class ITextBase extends Text {
   static fromObject(object) {
     var styles = stylesFromArray(object.styles, object.text);
     //  spread object to prevent mutation
-    return FabricObject._fromObject(this.constructor, { ...object, styles }, { extraParam: 'text' });
-  };
-
+    return FabricObject._fromObject(IText, { ...object, styles }, { extraParam: 'text' });
+  }
 }
 
-
-export const IText = applyMixins(ITextBase, [
-  ITextBehaviorMixinGenerator,
-  ITextClickBehaviorMixinGenerator,
-  ITextKeyBehaviorMixinGenerator,
-  ITextSVGExportMixinGenerator
-]);
