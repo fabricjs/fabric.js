@@ -173,6 +173,18 @@
     assert.deepEqual(object, object2);
   });
 
+  QUnit.skip('toObject without default value', function(assert) {
+    var shadow = new fabric.Shadow();
+
+    assert.equal(JSON.stringify(shadow.toObject()), '{}');
+
+    shadow.color = 'red';
+    assert.equal(JSON.stringify(shadow.toObject()), '{"color":"red"}');
+
+    shadow.offsetX = 15;
+    assert.equal(JSON.stringify(shadow.toObject()), '{"color":"red","offsetX":15}');
+  });
+
   QUnit.test('toSVG', function(assert) {
     // reset uid
     fabric.Object.__uid = 0;

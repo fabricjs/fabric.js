@@ -204,6 +204,12 @@
     assert.equal(svg, '<g transform=\"matrix(1 0 0 1 50.5 50.5)\"  >\n<rect style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  paint-order=\"stroke\"  x=\"-50\" y=\"-50\" rx=\"0\" ry=\"0\" width=\"100\" height=\"100\" />\n</g>\n');
   });
 
+  QUnit.skip('toObject without default values', function(assert) {
+    var options = { type: 'rect', width: 69, height: 50, left: 10, top: 20, version: fabric.version, };
+    var rect = new fabric.Rect(options);
+    assert.deepEqual(rect.toObject(), options);
+  });
+
   QUnit.test('paintFirst life cycle', function(assert) {
     var done = assert.async();
     var svg = '<svg><rect x="10" y="10" height="50" width="55" fill="red" stroke="blue" paint-order="stroke" /></svg>';
