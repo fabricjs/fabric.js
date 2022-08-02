@@ -5,7 +5,7 @@ import { cacheProperties, DEFAULT_SVG_FONT_SIZE, isLikelyNode, SHARED_ATTRIBUTES
 import { applyMixins } from '../mixins/apply_mixins';
 import { TextStyleMixinGenerator } from '../mixins/text_style.mixin'; // optional Text
 import { Point } from '../point.class';
-import { createCanvasElement, getPathSegmentsInfo, graphemeSplit, hasStyleChanged, stylesFromArray, stylesToArray } from '../util';
+import { createCanvasElement, getPathSegmentsInfo, getPointOnPath, graphemeSplit, hasStyleChanged, stylesFromArray, stylesToArray } from '../util';
 import { parseAttributes } from "../parser/parseAttributes";
 import { FabricObject } from './object.class';
 
