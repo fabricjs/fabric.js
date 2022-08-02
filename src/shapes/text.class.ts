@@ -404,7 +404,8 @@ class TextBase extends FabricObject {
    * @return {Text} thisArg
    */
   constructor(text, options) {
-    super(options);
+    super();
+    this.set(options);
     this.styles = options?.styles || {};
     this.text = text;
     if (this.path) {

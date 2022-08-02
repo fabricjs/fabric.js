@@ -19,6 +19,12 @@ export class Polygon extends Polyline {
    */
   type = 'polygon'
 
+  constructor(points = [], options = {}) {
+    super(points, options);
+    this.set(options);
+    this._setPositionDimensions(options);
+  }
+
   /**
    * @private
    */

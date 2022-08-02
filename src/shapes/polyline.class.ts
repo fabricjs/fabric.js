@@ -83,7 +83,8 @@ export class Polyline extends FabricObject {
    * });
    */
   constructor(points = [], options = {}) {
-    super(options);
+    super();
+    this.set(options);
     this.points = points;
     this._setPositionDimensions(options);
   }

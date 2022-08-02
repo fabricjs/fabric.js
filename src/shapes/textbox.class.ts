@@ -79,6 +79,11 @@ export class Textbox extends IText {
    */
   splitByGrapheme = false
 
+  constructor(text, options) {
+    super(text, options);
+    this.set(options);
+  }
+
   /**
    * Unlike superclass's version of this function, Textbox does not update
    * its width.

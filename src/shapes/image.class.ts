@@ -141,7 +141,8 @@ export class Image extends FabricObject {
    * @return {Image} thisArg
    */
   constructor(element, options = {}) {
-    super(options);
+    super();
+    this.set(options);
     this.cacheKey = 'texture' + incrementUID();
     this._initElement(element, options);
   }

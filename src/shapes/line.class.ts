@@ -58,18 +58,12 @@ export class Line extends FabricObject {
    * @param {Object} [options] Options object
    * @return {Line} thisArg
    */
-  constructor(points, options) {
-    if (!points) {
-      points = [0, 0, 0, 0];
-    }
-
-    super(options);
-
-    this.set('x1', points[0]);
-    this.set('y1', points[1]);
-    this.set('x2', points[2]);
-    this.set('y2', points[3]);
-
+  constructor([x1,y1,x2,y2] = [0, 0, 0, 0], options) {
+    super();
+    this.set({
+      ...options,
+      x1, y1, x2, y2
+    });
     this._setWidthHeight(options);
   }
 

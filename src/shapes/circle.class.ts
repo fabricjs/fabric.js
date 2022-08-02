@@ -51,6 +51,11 @@ export class Circle extends FabricObject {
 
   cacheProperties = cacheProperties.concat('radius', 'startAngle', 'endAngle')
 
+  constructor(options) {
+    super();
+    this.set(options);
+  }
+
   /**
    * @private
    * @param {String} key

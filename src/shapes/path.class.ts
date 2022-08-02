@@ -41,7 +41,8 @@ export class Path extends FabricObject {
    * @return {Path} thisArg
    */
   constructor(path, { path: _, ...options }) {
-    super(options);
+    super();
+    this.set(options);
     this._setPath(path || [], options);
   }
 

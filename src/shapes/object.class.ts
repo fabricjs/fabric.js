@@ -26,6 +26,17 @@ import { RUNNING_ANIMATIONS } from '../util/animate';
 const { browserShadowBlurConstant, maxCacheSideLimit, minCacheSideLimit, NUM_FRACTION_DIGITS } = config;
 const objectCaching = !isLikelyNode;
 
+export const FabricObjectBase = applyMixins(CommonMethods, [
+  ObjectOriginMixinGenerator,
+  ObjectGeometryMixinGenerator,
+  ObjectAncestryMixinGenerator,
+  ObjectStackingMixinGenerator,
+  ObjectSVGExportMixinGenerator,
+  ObjectStatefulMixinGenerator,
+  ObjectInteractivityMixinGenerator,
+  ObjectStraighteningMixinGenerator
+]);
+
 /**
  * Root object class from which all 2d shape classes inherit from
  * @class FabricObject
@@ -60,7 +71,7 @@ const objectCaching = !isLikelyNode;
  * @fires dragleave
  * @fires drop
  */
-class FabricObjectBase extends CommonMethods {
+export class FabricObject extends FabricObjectBase {
 
   /**
    * Type of an object (rect, circle, path, etc.).
@@ -653,9 +664,7 @@ class FabricObjectBase extends CommonMethods {
    */
   constructor(options) {
     super();
-    if (options) {
-      this.setOptions(options);
-    }
+    this.set(options);
   }
 
   /**
@@ -1941,21 +1950,12 @@ class FabricObjectBase extends CommonMethods {
    * @returns {Promise<FabricObject>}
    */
   static fromObject(object, options) {
-    return FabricObjectBase._fromObject(this.constructor, object, options);
+    return FabricObject._fromObject(this.constructor, object, options);
   }
 
 }
 
-export const FabricObject = applyMixins(FabricObjectBase, [
-  ObjectOriginMixinGenerator,
-  ObjectGeometryMixinGenerator,
-  ObjectAncestryMixinGenerator,
-  ObjectStackingMixinGenerator,
-  ObjectSVGExportMixinGenerator,
-  ObjectStatefulMixinGenerator,
-  ObjectInteractivityMixinGenerator,
-  ObjectStraighteningMixinGenerator
-]);
+
 
 
 

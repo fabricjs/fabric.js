@@ -30,6 +30,10 @@ export class Triangle extends FabricObject {
    */
   height = 100
 
+  constructor(options) {
+    this.set(options);
+  }
+
   /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on

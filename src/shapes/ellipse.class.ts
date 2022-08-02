@@ -40,9 +40,12 @@ export class Ellipse extends FabricObject {
    * @return {Ellipse} thisArg
    */
   constructor(options) {
-    super(options);
-    this.set('rx', options && options.rx || 0);
-    this.set('ry', options && options.ry || 0);
+    super();
+    this.set({
+      ...options,
+      rx: options?.rx || 0,
+      ry: options?.ry || 0
+    });
   }
 
   /**

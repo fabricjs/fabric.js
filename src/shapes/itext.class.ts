@@ -189,6 +189,7 @@ class ITextBase extends Text {
    */
   constructor(text, options) {
     super(text, options);
+    this.set(options);
     this.initBehavior();
   }
 
