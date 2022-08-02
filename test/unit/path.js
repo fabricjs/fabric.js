@@ -162,7 +162,7 @@
     });
   });
 
-  QUnit.skip('toObject', function(assert) {
+  QUnit.test('toObject', function(assert) {
     var done = assert.async();
     makePathObject(function(path) {
       path.top = fabric.Object.prototype.top;

@@ -218,7 +218,7 @@
     assert.ok(group.getObjects()[0] !== clone.objects[0], 'should produce different objects in array');
   });
 
-  QUnit.skip('toObject without default values', function(assert) {
+  QUnit.test('toObject without default values', function(assert) {
     var group = makeGroupWith2Objects();
     group.includeDefaultValues = false;
     var clone = group.toObject();
