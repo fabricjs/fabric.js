@@ -1006,7 +1006,7 @@
      * @example <caption>JSON without default values</caption>
      * var json = canvas.toJSON();
      */
-    toJSON() {
+    toJSON: function() {
       return this.toObject();
     },
 
