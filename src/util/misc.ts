@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { cos } from './index.ts';
+import { cos, removeDefaultValues, removeObjectDefaultValues } from '.';
 (function(global) {
   var fabric = global.fabric, sqrt = Math.sqrt,
       atan2 = Math.atan2,
@@ -1320,6 +1320,10 @@ import { cos } from './index.ts';
         }
       }
       return stylesObject;
-    }
+    },
+
+    removeDefaultValues,
+    removeObjectDefaultValues
+    
   };
 })(typeof exports !== 'undefined' ? exports : window);

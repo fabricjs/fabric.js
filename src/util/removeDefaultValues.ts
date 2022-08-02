@@ -9,7 +9,7 @@ export function removeDefaultValues(object, defaults, include = []) {
     const dest = {};
     for (const key in object) {
         if (include.includes(key)
-            || !(object[prop] === defaults[prop] || (isEmptyArray(object[prop]) && isEmptyArray(defaults[prop])))) {
+            || !(object[key] === defaults[key] || (isEmptyArray(object[key]) && isEmptyArray(defaults[key])))) {
             dest[key] = object[key];
         }
     }
