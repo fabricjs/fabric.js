@@ -240,7 +240,7 @@
     testFractionDigits.call(this, 0, 167);
   });
 
-  QUnit.skip('toObject without default values', function(assert) {
+  QUnit('toObject without default values', function(assert) {
 
     var emptyObjectRepr = { version: fabric.version, type: 'object', top: 0, left: 0 };
 
