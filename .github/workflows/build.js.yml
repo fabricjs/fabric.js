@@ -17,16 +17,16 @@ jobs:
         node-version: 16.x
     - run: npm ci
     - run: npm run build
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Linting
-      uses: actions/setup-node@v1
-      with:
-        node-version: 16.x
-    - run: npm ci
-    - run: npm run lint
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Linting
+  #     uses: actions/setup-node@v1
+  #     with:
+  #       node-version: 16.x
+  #   - run: npm ci
+  #   - run: npm run lint
   coverage:
     runs-on: ubuntu-latest
     steps:
