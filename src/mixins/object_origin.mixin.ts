@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { Point } from "../point.class";
-import { cos, degreesToRadians, rotatePoint, sin } from "../util";
+import { cos, degreesToRadians, invertTransform, rotatePoint, sin, transformPoint } from "../util";
 import { OriginX, OriginY } from "../typedefs";
 
 
