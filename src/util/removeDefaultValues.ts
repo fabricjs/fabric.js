@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { pick } from "./pick";
+
 const include = ['left', 'top', 'type'];
 
 function isEmptyArray(value) {
@@ -7,6 +9,7 @@ function isEmptyArray(value) {
 
 /**
  * mutates object
+ * @todo don't mutate object (need to import clone)
  * @param object 
  * @param defaults 
  * @returns 
@@ -27,8 +30,9 @@ export function removeDefaultValues(object, defaults) {
  * @returns 
  */
 export function removeObjectDefaultValues(object, defaults) {
-    return removeDefaultValues(object, include.reduce((defaults, key) => {
-        delete defaults[key];
-        return defaults;
-    }, { ...defaults }));
+    const _include = pick(object, include);
+    return {
+        ...removeDefaultValues(object, defaults),
+        ..._include
+    };
 }
