@@ -1244,7 +1244,7 @@
     assert.deepEqual(matrix, expected, 'dimensions matrix flipped is equal');
   });
 
-  QUnit('removeDefaultValues, removeDefaultValues', function (assert) {
+  QUnit.test('removeDefaultValues, removeDefaultValues', function (assert) {
     assert.ok(typeof fabric.util.removeDefaultValues === 'function');
     assert.ok(typeof fabric.util.removeObjectDefaultValues === 'function');
     assert.deepEqual(
