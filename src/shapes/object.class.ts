@@ -1755,12 +1755,11 @@ import { pick } from "../util/pick";
 
     /**
      * Returns a JSON representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} JSON
      */
-    toJSON: function(propertiesToInclude) {
+    toJSON: function() {
       // delegate, not alias
-      return this.toObject(propertiesToInclude);
+      return this.toObject();
     },
 
     /**
