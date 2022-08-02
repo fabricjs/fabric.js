@@ -18,6 +18,18 @@ import {
 
 const CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
 
+const mixins = [
+  CollectionMixinGenerator,
+  CanvasDataURLExporterMixinGenerator,
+  CanvasSerializationMixinGenerator,
+  CanvasAnimationMixinGenerator
+];
+
+if (isLikelyNode) {
+  mixins.push(NodeCanvasStreamsMixinGenerator);
+}
+
+
 /**
  * Static canvas class
  * @class StaticCanvas
@@ -30,8 +42,7 @@ const CANVAS_INIT_ERROR = new Error('Could not initialize `canvas` element');
  * @fires object:added
  * @fires object:removed
  */
-
-class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
+export class StaticCanvas extends applyMixins(CommonMethods, mixins) {
 
   /**
    * Background color of canvas instance.
@@ -1668,18 +1679,3 @@ class StaticCanvasBase extends CollectionMixinGenerator(CommonMethods) {
       '{ objects: ' + this._objects.length + ' }>';
   }
 }
-
-const mixins = [
-  CanvasDataURLExporterMixinGenerator,
-  CanvasSerializationMixinGenerator,
-  CanvasAnimationMixinGenerator
-];
-
-if (isLikelyNode) {
-  mixins.push(NodeCanvasStreamsMixinGenerator);
-}
-
-export const StaticCanvas = applyMixins(StaticCanvasBase, mixins);
-
-
-
