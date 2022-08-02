@@ -108,9 +108,7 @@ export const Rect = fabric.util.createClass(fabric.Object, /** @lends fabric.Rec
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject: function(propertiesToInclude) {
-    return this.callSuper('toObject', ['rx', 'ry'].concat(propertiesToInclude));
-  },
+  toObject = (propertiesToInclude) => this.callSuper('toObject', ['rx', 'ry'].concat(propertiesToInclude)),
 
   /* _TO_SVG_START_ */
   /**
@@ -175,8 +173,6 @@ Rect.fromElement = function(element, callback, options) {
  * @param {Object} object Object to create an instance from
  * @returns {Promise<fabric.Rect>}
  */
-Rect.fromObject = function(object) {
-  return fabric.Object._fromObject(Rect, object);
-};
+Rect.fromObject = (object) => fabric.Object._fromObject(Rect, object);
 
 fabric.Rect = Rect;
