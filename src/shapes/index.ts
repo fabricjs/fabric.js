@@ -3,7 +3,7 @@ export * from './Circle';
 export * from './Ellipse';
 export * from './Group';
 export * from './Image';
-export * from './Itext';
+export * from './IText';
 export * from './Line';
 export * from './Object';
 export * from './Path';
