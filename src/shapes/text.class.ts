@@ -5,7 +5,7 @@ import { cacheProperties, DEFAULT_SVG_FONT_SIZE, isLikelyNode, SHARED_ATTRIBUTES
 import { applyMixins } from '../mixins/apply_mixins';
 import { TextStyleMixinGenerator } from '../mixins/text_style.mixin'; // optional Text
 import { Point } from '../point.class';
-import { createCanvasElement, graphemeSplit, hasStyleChanged, stylesFromArray, stylesToArray } from '../util';
+import { createCanvasElement, getPathSegmentsInfo, graphemeSplit, hasStyleChanged, stylesFromArray, stylesToArray } from '../util';
 import { parseAttributes } from "../parser/parseAttributes";
 import { FabricObject } from './object.class';
 
@@ -79,13 +79,18 @@ const _reSpaceAndTab = /[ \t\r]/
  */
 const _reWords = /\S+/g
 
+
+export const mixins = [
+  TextStyleMixinGenerator
+];
+
 /**
  * Text class
  * @class Text
  * @extends FabricObject
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  */
-class TextBase extends FabricObject {
+export class Text extends applyMixins(FabricObject, mixins) {
 
   /**
    * Properties which when set cause object to change dimensions
@@ -1739,7 +1744,7 @@ class TextBase extends FabricObject {
       strokeWidth: typeof originalStrokeWidth !== 'undefined' ? originalStrokeWidth : 1,
     });
     callback(text);
-  };
+  }
   /* _FROM_SVG_END_ */
 
   /**
@@ -1752,13 +1757,9 @@ class TextBase extends FabricObject {
   static fromObject(object) {
     var styles = stylesFromArray(object.styles, object.text);
     //  spread object to prevent mutation
-    return FabricObject._fromObject(this.constructor, { ...object, styles }, { extraParam: 'text' });
-  };
+    return FabricObject._fromObject(Text, { ...object, styles }, { extraParam: 'text' });
+  }
 
   static genericFonts = ['sans-serif', 'serif', 'cursive', 'fantasy', 'monospace'];
 
 }
-
-export const Text = applyMixins(TextBase, [
-  TextStyleMixinGenerator
-]);
