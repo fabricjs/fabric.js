@@ -91,7 +91,15 @@ function build(options = {}) {
     //     `exclude=${options.exclude.join(',')}`
     // ]
     const args = ['npm run', 'build-rollup'];
-    cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd, env: { ...process.env, MINIFY: Number(!options.fast) } });
+    let done = false;
+    const task = cp.spawn(args.join(' '), { stdio: 'inherit', shell: true, cwd: wd, env: { ...process.env, MINIFY: Number(!options.fast) } })
+        .on('exit', () => (done = true));
+    return () => {
+        if (!done) {
+            done = true;
+            task.kill();            
+        }
+    };
 }
 
 function startWebsite() {
@@ -363,7 +371,11 @@ program
     .action((options) => {
         const { watch: w, ...rest } = options || {};
         build(rest);
-        w && watch(path.resolve(wd, 'src'), () => build(rest));
+        let kill;
+        w && watch(path.resolve(wd, 'src'), () => {
+            kill && kill();
+            kill = build(rest);
+        });
     });
 
 program
