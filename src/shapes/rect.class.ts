@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 // @ts-nocheck
 import { fabric } from '../../HEADER';
 
