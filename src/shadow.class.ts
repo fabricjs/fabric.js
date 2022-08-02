@@ -1,6 +1,7 @@
+//@ts-nocheck
+
 import { removeDefaultValues } from "./util/removeDefaultValues";
 
-//@ts-nocheck
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
       toFixed = fabric.util.toFixed;
