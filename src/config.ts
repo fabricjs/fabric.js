@@ -173,7 +173,7 @@ export default {
         textureSize = value;
     },
     get devicePixelRatio() {
-        return devicePixelRatio
+        return devicePixelRatio;
     },
     set devicePixelRatio(value) {
         devicePixelRatio = value;
