@@ -5,7 +5,7 @@ function isEmptyArray(value) {
     return Array.isArray(value) && value.length === 0;
 }
 
-export function removeDefaultValues(object, defaults, include) {
+export function removeDefaultValues(object, defaults, include = []) {
     const dest = {};
     for (const key in object) {
         if (include.includes(key)
