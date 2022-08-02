@@ -1,7 +1,7 @@
 import * as DCircle from './Circle.json';
 import * as DEllipse from './Ellipse.json';
 import * as DLine from './Line.json';
-import * as DObject from './Object.json';
+import * as DObject from './FabricObject.json';
 import * as DPath from './Path.json';
 import * as DPolygon from './Polygon.json';
 import * as DPolyline from './Polyline.json';
