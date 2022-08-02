@@ -1,5 +1,6 @@
 //@ts-nocheck
 
+import { TextboxControls } from '../mixins/default_controls';
 import {
   stylesFromArray
 } from '../util';
@@ -83,6 +84,13 @@ export class Textbox extends IText {
   constructor(text, options) {
     super(text, options);
     this.set(options);
+    // this is breaking the prototype inheritance, no time / ideas to fix it.
+    // is important to document that if you want to have all objects to have a
+    // specific custom control, you have to add it to Object prototype and to Textbox
+    // prototype. The controls are shared as references. So changes to control `tr`
+    // can still apply to all objects if needed.
+    //  OR STOP USING SHARED OBJECTS!
+    this.controls = TextboxControls;
   }
 
   /**

@@ -96,16 +96,6 @@ import * as filters from './filters'
 Object.assign(fabric.Image, { filters });
 
 
-import { ObjectControls, TextboxControls } from './mixins/default_controls'; // optional interaction
-FabricObject.prototype.controls = ObjectControls;
-// this is breaking the prototype inheritance, no time / ideas to fix it.
-// is important to document that if you want to have all objects to have a
-// specific custom control, you have to add it to Object prototype and to Textbox
-// prototype. The controls are shared as references. So changes to control `tr`
-// can still apply to all objects if needed.
-//  OR STOP USING SHARED OBJECTS!
-fabric.Textbox.prototype.controls = TextboxControls;
-
 import { BaseBrush, CircleBrush, PatternBrush, PencilBrush, SprayBrush } from './brushes';
 fabric.BaseBrush = BaseBrush;
 fabric.CircleBrush = CircleBrush;

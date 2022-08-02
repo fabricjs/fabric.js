@@ -5,8 +5,10 @@ import { ALIASING_LIMIT, cacheProperties, devicePixelRatio, iMatrix, isLikelyNod
 import { VERSION } from '../context';
 import { applyMixins } from '../mixins/apply_mixins';
 import { CommonMethods } from '../mixins/common_methods.mixin';
+import { ObjectControls } from '../mixins/default_controls';
 import { ObjectSVGExportMixinGenerator } from '../mixins/object.svg_export';
 import { ObjectAncestryMixinGenerator } from '../mixins/object_ancestry.mixin';
+import { ObjectAnimationMixinGenerator } from '../mixins/object_animation.mixin';
 import { ObjectGeometryMixinGenerator } from '../mixins/object_geometry.mixin';
 import { ObjectInteractivityMixinGenerator } from '../mixins/object_interactivity.mixin'; // optional interaction
 import { ObjectOriginMixinGenerator } from '../mixins/object_origin.mixin';
@@ -14,6 +16,7 @@ import { ObjectStackingMixinGenerator } from '../mixins/object_stacking.mixin';
 import { ObjectStraighteningMixinGenerator } from '../mixins/object_straightening.mixin';
 import { ObjectStatefulMixinGenerator } from '../mixins/stateful.mixin';
 import { Point } from '../point.class';
+import { Shadow } from '../shadow.class';
 import { StaticCanvas } from '../static_canvas.class';
 import {
   capitalize, clamp, clone, createCanvasElement, degreesToRadians, enlivenObjectEnlivables, invertTransform, limitDimsByArea, multiplyTransformMatrices, populateWithProperties,
@@ -34,6 +37,7 @@ export const FabricObjectBase = applyMixins(CommonMethods, [
   ObjectSVGExportMixinGenerator,
   ObjectStatefulMixinGenerator,
   ObjectInteractivityMixinGenerator,
+  ObjectAnimationMixinGenerator,
   ObjectStraighteningMixinGenerator
 ]);
 
@@ -665,6 +669,8 @@ export class FabricObject extends FabricObjectBase {
   constructor(options) {
     super();
     this.set(options);
+    //  TODO: still a shared object, transform to class
+    this.controls = ObjectControls;
   }
 
   /**
