@@ -120,6 +120,7 @@
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.toJSON === 'function');
     assert.equal(JSON.stringify(cObj.toJSON()), emptyObjectJSON);
+    assert.equal(JSON.stringify(cObj), emptyObjectJSON);
 
     cObj.set('opacity', 0.88)
       .set('scaleX', 1.3)
