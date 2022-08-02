@@ -88,7 +88,6 @@
     toDefaultObject() {
       return {
         ...this.callSuper('toDefaultObject'),
-        radius: this.radius,
         rx: this.rx,
         ry: this.ry
       }
