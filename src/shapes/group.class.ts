@@ -84,7 +84,9 @@ export class Group extends CollectionMixinGenerator(FabricObject) {
    */
   constructor(objects: FabricObject[], options: object, objectsRelativeToGroup: boolean) {
     //  setting angle, skewX, skewY must occur after initial layout
-    super({ ...options, _objects: objects || [], angle: 0, skewX: 0, skewY: 0 });
+    super();
+    this.set({ ...options, angle: 0, skewX: 0, skewY: 0 });
+    this._objects = objects || [];
     this.__objectMonitor = this.__objectMonitor.bind(this);
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(this, true);
     this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(this, false);
