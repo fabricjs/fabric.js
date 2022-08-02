@@ -160,6 +160,14 @@
       {
         "ignoreComments": true
       }
-    ]
+    ],
+
+
+    //  TODO: remove the following for TS, just temporary 08/22
+    "@typescript-eslint/ban-ts-comment": "off",
+    "prefer-const": "off",
+    "no-var": "off",
+    "prefer-spread": "off",
+    "prefer-rest-params": "off"
   }
 }
