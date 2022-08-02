@@ -1,3 +1,4 @@
+//@ts-nocheck
 (function (global) {
   var fabric = global.fabric;
   /* this file needs to go away, cross browser style support is not fabricjs domain.

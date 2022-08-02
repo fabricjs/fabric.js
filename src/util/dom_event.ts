@@ -1,3 +1,4 @@
+//@ts-nocheck
 (function (global) {
   // since ie11 can use addEventListener but they do not support options, i need to check
   var fabric = global.fabric, couldUseAttachEvent = !!fabric.document.createElement('div').attachEvent,

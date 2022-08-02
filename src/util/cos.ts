@@ -1,3 +1,4 @@
+//@ts-nocheck
 import type { TRadian } from '../typedefs';
 import { halfPI } from '../constants';
 

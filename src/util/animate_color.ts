@@ -1,3 +1,4 @@
+//@ts-nocheck
 (function(global) {
   var fabric = global.fabric;
   // Calculate an in-between color. Returns a "rgba()" string.

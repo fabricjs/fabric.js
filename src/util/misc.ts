@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { cos } from './index.ts';
 (function(global) {
   var fabric = global.fabric, sqrt = Math.sqrt,

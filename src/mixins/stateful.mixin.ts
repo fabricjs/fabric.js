@@ -1,3 +1,4 @@
+//@ts-nocheck
 (function(global) {
   var fabric = global.fabric, extend = fabric.util.object.extend,
       originalSet = 'stateProperties';

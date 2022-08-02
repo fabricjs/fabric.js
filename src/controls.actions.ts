@@ -1,3 +1,4 @@
+//@ts-nocheck
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
       scaleMap = ['e', 'se', 's', 'sw', 'w', 'nw', 'n', 'ne', 'e'],

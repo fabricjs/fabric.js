@@ -1,3 +1,4 @@
+//@ts-nocheck
 /* _TO_SVG_START_ */
 (function(global) {
   var fabric = global.fabric;

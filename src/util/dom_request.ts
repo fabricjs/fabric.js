@@ -1,3 +1,4 @@
+//@ts-nocheck
 (function(global) {
   var fabric = global.fabric;
   function addParamToUrl(url, param) {

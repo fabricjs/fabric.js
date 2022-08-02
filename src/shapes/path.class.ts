@@ -1,3 +1,4 @@
+//@ts-nocheck
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
       min = fabric.util.array.min,

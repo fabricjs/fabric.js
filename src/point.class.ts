@@ -1,3 +1,4 @@
+//@ts-nocheck
 (function(global) {
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 

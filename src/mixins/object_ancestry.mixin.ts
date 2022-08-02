@@ -1,3 +1,4 @@
+//@ts-nocheck
 (function (global) {
   var fabric = global.fabric;
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {

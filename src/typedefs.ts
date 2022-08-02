@@ -1,3 +1,4 @@
+//@ts-nocheck
 interface NominalTag<T> {
   'nominalTag': T;
 }

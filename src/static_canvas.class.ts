@@ -1,3 +1,4 @@
+//@ts-nocheck
 (function (global) {
   // aliases for faster resolution
   var fabric = global.fabric, extend = fabric.util.object.extend,
