@@ -143,6 +143,7 @@
 
   QUnit.test('initialProperties', function(assert) {
     assert.ok('backgroundColor' in canvas);
+    assert.equal(canvas.includeDefaultValues, true);
   });
 
   QUnit.test('getObjects', function(assert) {
