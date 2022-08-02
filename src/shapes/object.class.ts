@@ -701,7 +701,7 @@ export class FabricObject extends FabricObjectBase {
    * @return {number}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
   _limitCacheSize(dims) {
-    var perfLimitSizeTotal = perfLimitSizeTotal,
+    var perfLimitSizeTotal = config.perfLimitSizeTotal,
       width = dims.width, height = dims.height,
       max = config.maxCacheSideLimit, min = config.minCacheSideLimit;
     if (width <= max && height <= max && width * height <= perfLimitSizeTotal) {
