@@ -375,7 +375,7 @@
     });
   });
 
-  QUnit.test('cloneAsImage', function (assert) {
+  QUnit.skip('cloneAsImage', function (assert) {
     var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
     assert.ok(typeof cObj.cloneAsImage === 'function');
     var image = cObj.cloneAsImage();
@@ -384,7 +384,7 @@
     assert.equal(image.width, 100, 'the image has same dimension of object');
   });
 
-  QUnit.test('cloneAsImage with retina scaling enabled', function (assert) {
+  QUnit.skip('cloneAsImage with retina scaling enabled', function (assert) {
     var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
     fabric.devicePixelRatio = 2;
     var image = cObj.cloneAsImage({ enableRetinaScaling: true });
