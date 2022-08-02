@@ -5,6 +5,7 @@
   var fabric = global.fabric, __drawClipPath = fabric.Object.prototype._drawClipPath;
   var _needsItsOwnCache = fabric.Object.prototype.needsItsOwnCache;
   var _toObject = fabric.Object.prototype.toObject;
+  var _toDefaultObject = fabric.Object.prototype.toDefaultObject;
   var _getSvgCommons = fabric.Object.prototype.getSvgCommons;
   var __createBaseClipPathSVGMarkup = fabric.Object.prototype._createBaseClipPathSVGMarkup;
   var __createBaseSVGMarkup = fabric.Object.prototype._createBaseSVGMarkup;
@@ -62,17 +63,24 @@
       }
     },
 
+    toDefaultObject() {
+      return {
+        ..._toDefaultObject.call(this),
+        erasable: this.erasable
+      };
+    },
+
     /**
      * Returns an object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} Object representation of an instance
      */
     toObject: function (propertiesToInclude) {
-      var object = _toObject.call(this, ['erasable'].concat(propertiesToInclude));
-      if (this.eraser && !this.eraser.excludeFromExport) {
-        object.eraser = this.eraser.toObject(propertiesToInclude);
-      }
-      return object;
+      const eraser = this.eraser && !this.eraser.excludeFromExport && this.eraser.toObject(propertiesToInclude);
+      return {
+        ..._toObject.call(this, propertiesToInclude),
+        ...(eraser ? { eraser } : null)
+      };
     },
 
     /* _TO_SVG_START_ */

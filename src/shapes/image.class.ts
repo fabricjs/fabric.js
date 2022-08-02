@@ -237,29 +237,25 @@
       ctx.closePath();
     },
 
-    /**
-     * Returns object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} Object representation of an instance
-     */
-    toObject: function(propertiesToInclude) {
-      var filters = [];
+    toDefaultObject() {
+      const filters = [];
+      const resizeFilter = this.resizeFilter?.toObject();
 
-      this.filters.forEach(function(filterObj) {
+      this.filters.forEach(function (filterObj) {
         if (filterObj) {
           filters.push(filterObj.toObject());
         }
       });
-      var object = extend(
-        this.callSuper('toObject', ['cropX', 'cropY'].concat(propertiesToInclude)), {
-          src: this.getSrc(),
-          crossOrigin: this.getCrossOrigin(),
-          filters: filters,
-        });
-      if (this.resizeFilter) {
-        object.resizeFilter = this.resizeFilter.toObject();
-      }
-      return object;
+
+      return {
+        ...this.callSuper('toDefaultObject'),
+        cropX: this.cropX,
+        cropY: this.cropY,
+        src: this.getSrc(),
+        crossOrigin: this.getCrossOrigin(),
+        filters,
+        ...(resizeFilter ? { resizeFilter } : null)
+      };
     },
 
     /**

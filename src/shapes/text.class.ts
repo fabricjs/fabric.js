@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { pick } from "../util/pick";
+
 (function(global) {
   var fabric = global.fabric || (global.fabric = { });
 
@@ -1522,19 +1525,14 @@
       return { _unwrappedLines: newLines, lines: lines, graphemeText: newText, graphemeLines: newLines };
     },
 
-    /**
-     * Returns object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} Object representation of an instance
-     */
-    toObject: function(propertiesToInclude) {
-      var allProperties = additionalProps.concat(propertiesToInclude);
-      var obj = this.callSuper('toObject', allProperties);
-      obj.styles = fabric.util.stylesToArray(this.styles, this.text);
-      if (obj.path) {
-        obj.path = this.path.toObject();
-      }
-      return obj;
+    toDefaultObject() {
+      const path = this.path?.toObject();
+      return {
+        ...this.callSuper('toDefaultObject'),
+        ...pick(this, additionalProps),
+        styles: fabric.util.stylesToArray(this.styles, this.text),
+        ...(path ? { path } : null)
+      };
     },
 
     /**

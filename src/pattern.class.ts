@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { pick } from "./util/pick";
+
 (function(global) {
   var fabric = global.fabric, toFixed = fabric.util.toFixed;
 
@@ -63,15 +66,9 @@
       this.setOptions(options);
     },
 
-    /**
-     * Returns object representation of a pattern
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} Object representation of a pattern instance
-     */
-    toObject: function(propertiesToInclude) {
-      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
-          source, object;
-
+    toDefaultObject() {
+      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+      let source;
       // <img> element
       if (typeof this.source.src === 'string') {
         source = this.source.src;
@@ -80,19 +77,28 @@
       else if (typeof this.source === 'object' && this.source.toDataURL) {
         source = this.source.toDataURL();
       }
-
-      object = {
+      return {
         type: 'pattern',
-        source: source,
+        source,
         repeat: this.repeat,
         crossOrigin: this.crossOrigin,
         offsetX: toFixed(this.offsetX, NUM_FRACTION_DIGITS),
         offsetY: toFixed(this.offsetY, NUM_FRACTION_DIGITS),
         patternTransform: this.patternTransform ? this.patternTransform.concat() : null
       };
-      fabric.util.populateWithProperties(this, object, propertiesToInclude);
+    },
 
-      return object;
+
+    /**
+     * Returns object representation of a pattern
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} Object representation of a pattern instance
+     */
+    toObject: function(propertiesToInclude) {
+      return {
+        ...pick(this, propertiesToInclude),
+        ...this.toDefaultObject()
+      };
     },
 
     /* _TO_SVG_START_ */

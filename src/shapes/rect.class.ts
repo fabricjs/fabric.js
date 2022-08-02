@@ -103,13 +103,12 @@
       this._renderPaintInOrder(ctx);
     },
 
-    /**
-     * Returns object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} object representation of an instance
-     */
-    toObject: function(propertiesToInclude) {
-      return this.callSuper('toObject', ['rx', 'ry'].concat(propertiesToInclude));
+    toDefaultObject() {
+      return {
+        ...this.callSuper('toDefaultObject'),
+        rx: this.rx,
+        ry: this.ry
+      }
     },
 
     /* _TO_SVG_START_ */

@@ -846,15 +846,26 @@
         });
     },
 
+    toDefaultObject() {
+      return {
+        ...this.callSuper('toDefaultObject'),
+        layout: this.layout,
+        subTargetCheck: this.subTargetCheck,
+        interactive: this.interactive,
+        objects: []
+      };
+    },
+
     /**
      * Returns object representation of an instance
      * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
     toObject: function (propertiesToInclude) {
-      var obj = this.callSuper('toObject', ['layout', 'subTargetCheck', 'interactive'].concat(propertiesToInclude));
-      obj.objects = this.__serializeObjects('toObject', propertiesToInclude);
-      return obj;
+      return {
+        ...this.callSuper('toObject', propertiesToInclude),
+        objects: this.__serializeObjects('toObject', propertiesToInclude)
+      };
     },
 
     toString: function () {

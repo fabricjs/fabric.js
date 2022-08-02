@@ -58,13 +58,13 @@
       return this;
     },
 
-    /**
-     * Returns object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} object representation of an instance
-     */
-    toObject: function(propertiesToInclude) {
-      return this.callSuper('toObject', ['radius', 'startAngle', 'endAngle'].concat(propertiesToInclude));
+    toDefaultObject() {
+      return {
+        ...this.callSuper('toDefaultObject'),
+        radius: this.radius,
+        startAngle: this.startAngle,
+        endAngle: this.endAngle
+      }
     },
 
     /* _TO_SVG_START_ */

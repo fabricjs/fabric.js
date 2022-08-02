@@ -149,30 +149,23 @@
     },
     /* _TO_SVG_END_ */
 
+    toDefaultObject() {
+      return {
+        color: this.color,
+        blur: this.blur,
+        offsetX: this.offsetX,
+        offsetY: this.offsetY,
+        affectStroke: this.affectStroke,
+        nonScaling: this.nonScaling
+      };
+    },
+
     /**
      * Returns object representation of a shadow
      * @return {Object} Object representation of a shadow instance
      */
     toObject: function() {
-      if (this.includeDefaultValues) {
-        return {
-          color: this.color,
-          blur: this.blur,
-          offsetX: this.offsetX,
-          offsetY: this.offsetY,
-          affectStroke: this.affectStroke,
-          nonScaling: this.nonScaling
-        };
-      }
-      var obj = { }, proto = fabric.Shadow.prototype;
-
-      ['color', 'blur', 'offsetX', 'offsetY', 'affectStroke', 'nonScaling'].forEach(function(prop) {
-        if (this[prop] !== proto[prop]) {
-          obj[prop] = this[prop];
-        }
-      }, this);
-
-      return obj;
+      return this.toDefaultObject();
     }
   });
 

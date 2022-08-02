@@ -153,15 +153,11 @@
         '): { "top": ' + this.top + ', "left": ' + this.left + ' }>';
     },
 
-    /**
-     * Returns object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} object representation of an instance
-     */
-    toObject: function(propertiesToInclude) {
-      return extend(this.callSuper('toObject', propertiesToInclude), {
-        path: this.path.map(function(item) { return item.slice(); }),
-      });
+    toDefaultObject() {
+      return {
+        ...this.callSuper('toDefaultObject'),
+        path: this.path.map((item) => item.slice())
+      }
     },
 
     /**

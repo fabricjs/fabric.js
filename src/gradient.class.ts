@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { pick } from "./util/pick";
+
 (function(global) {
   var fabric = global.fabric;
   /* _FROM_SVG_START_ */
@@ -139,14 +141,14 @@
      * @param {Number} [options.coords.r2] only for radial gradient, radius of the external circle
      * @return {fabric.Gradient} thisArg
      */
-    initialize: function(options) {
-      options || (options = { });
-      options.coords || (options.coords = { });
+    initialize: function (options) {
+      options || (options = {});
+      options.coords || (options.coords = {});
 
       var coords, _this = this;
 
       // sets everything, then coords and colorstops get sets again
-      Object.keys(options).forEach(function(option) {
+      Object.keys(options).forEach(function (option) {
         _this[option] = options[option];
       });
 
@@ -178,7 +180,7 @@
      * @param {Object} colorStop Object with offset and color
      * @return {fabric.Gradient} thisArg
      */
-    addColorStop: function(colorStops) {
+    addColorStop: function (colorStops) {
       for (var position in colorStops) {
         var color = new fabric.Color(colorStops[position]);
         this.colorStops.push({
@@ -190,13 +192,8 @@
       return this;
     },
 
-    /**
-     * Returns object representation of a gradient
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object}
-     */
-    toObject: function(propertiesToInclude) {
-      var object = {
+    toDefaultObject() {
+      return {
         type: this.type,
         coords: this.coords,
         colorStops: this.colorStops,
@@ -205,9 +202,18 @@
         gradientUnits: this.gradientUnits,
         gradientTransform: this.gradientTransform ? this.gradientTransform.concat() : this.gradientTransform
       };
-      fabric.util.populateWithProperties(this, object, propertiesToInclude);
+    },
 
-      return object;
+    /**
+     * Returns object representation of a gradient
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object}
+     */
+    toObject: function (propertiesToInclude) {
+      return {
+        ...pick(this, propertiesToInclude),
+        ...this.toDefaultObject()
+      };
     },
 
     /* _TO_SVG_START_ */
