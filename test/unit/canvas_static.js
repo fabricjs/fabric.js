@@ -212,7 +212,6 @@
     assert.ok('overlayColor' in canvas);
     assert.ok('backgroundImage' in canvas);
     assert.ok('overlayImage' in canvas);
-    assert.ok('includeDefaultValues' in canvas);
     assert.ok('stateful' in canvas);
     assert.ok('renderOnAddRemove' in canvas);
     assert.ok('controlsAboveOverlay' in canvas);
@@ -221,7 +220,6 @@
     assert.ok('backgroundVpt' in canvas);
     assert.ok('overlayVpt' in canvas);
 
-    assert.equal(canvas.includeDefaultValues, true);
     assert.equal(canvas.stateful, false);
     assert.equal(canvas.renderOnAddRemove, true);
     assert.equal(canvas.controlsAboveOverlay, false);
@@ -1117,7 +1115,7 @@
     assert.equal(canvas.toObject().objects[0].type, rect.type);
   });
 
-  QUnit.test('toObject non includeDefaultValues', function(assert) {
+  QUnit.skip('toObject non includeDefaultValues', function(assert) {
     canvas.includeDefaultValues = false;
     var rect = makeRect();
     canvas.add(rect);

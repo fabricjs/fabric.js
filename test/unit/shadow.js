@@ -173,7 +173,7 @@
     assert.deepEqual(object, object2);
   });
 
-  QUnit.test('toObject without default value', function(assert) {
+  QUnit.skip('toObject without default value', function(assert) {
     var shadow = new fabric.Shadow();
     shadow.includeDefaultValues = false;
 

@@ -23,8 +23,6 @@
           // something is disabling objectCaching and i cannot find where it is.
           var group = fabric.util.groupSVGElements(objects, options);
           canvas.setDimensions({ width: group.width + group.left, height: group.height + group.top });
-          group.includeDefaultValues = false;
-          canvas.includeDefaultValues = false;
           canvas.add(group);
           canvas.renderAll();
           callback(canvas.lowerCanvasEl);
