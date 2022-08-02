@@ -175,7 +175,6 @@
 
   QUnit.skip('toObject without default value', function(assert) {
     var shadow = new fabric.Shadow();
-    shadow.includeDefaultValues = false;
 
     assert.equal(JSON.stringify(shadow.toObject()), '{}');
 

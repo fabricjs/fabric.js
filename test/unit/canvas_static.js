@@ -1116,13 +1116,11 @@
   });
 
   QUnit.skip('toObject non includeDefaultValues', function(assert) {
-    canvas.includeDefaultValues = false;
     var rect = makeRect();
     canvas.add(rect);
     var cObject = canvas.toObject();
     var expectedRect = { version: fabric.version, type: 'rect', width: 10, height: 10, top: 0, left: 0 };
     assert.deepEqual(cObject.objects[0], expectedRect, 'Rect should be exported withoud defaults');
-    canvas.includeDefaultValues = true;
   });
 
   QUnit.test('toObject excludeFromExport', function(assert) {

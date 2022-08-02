@@ -427,13 +427,6 @@ import { pick } from "../util/pick";
     perPixelTargetFind: false,
 
     /**
-     * When `false`, default object's values are not included in its serialization
-     * @type Boolean
-     * @default
-     */
-    includeDefaultValues: true,
-
-    /**
      * When `true`, object horizontal movement is locked
      * @type Boolean
      * @default

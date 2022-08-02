@@ -167,7 +167,6 @@
     makePathObject(function(path) {
       path.top = fabric.Object.prototype.top;
       path.left = fabric.Object.prototype.left;
-      path.includeDefaultValues = false;
       var obj = path.toObject();
       assert.equal(obj.top, fabric.Object.prototype.top, 'top is available also when equal to prototype');
       assert.equal(obj.left, fabric.Object.prototype.left, 'left is available also when equal to prototype');

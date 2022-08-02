@@ -260,7 +260,6 @@
 
     var cObj = new fabric.Object(),
         toObjectObj;
-    cObj.includeDefaultValues = false;
     assert.deepEqual(emptyObjectRepr, cObj.toObject(), 'top and left are always maintained');
 
     cObj.set('left', 10)
