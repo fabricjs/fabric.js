@@ -31,6 +31,7 @@ export class Triangle extends FabricObject {
   height = 100
 
   constructor(options) {
+    super();
     this.set(options);
   }
 
