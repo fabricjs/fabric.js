@@ -1,4 +1,4 @@
-(function(global) {
+
   var fabric = global.fabric || (global.fabric = { });
 
   /**
@@ -8,7 +8,7 @@
    * @return {fabric.Rect} thisArg
    * @see {@link fabric.Rect#initialize} for constructor definition
    */
-  fabric.Rect = fabric.util.createClass(fabric.Object, /** @lends fabric.Rect.prototype */ {
+  export const Rect = fabric.util.createClass(fabric.Object, /** @lends fabric.Rect.prototype */ {
 
     /**
      * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
@@ -174,5 +174,3 @@
   fabric.Rect.fromObject = function(object) {
     return fabric.Object._fromObject(fabric.Rect, object);
   };
-
-})(typeof exports !== 'undefined' ? exports : window);

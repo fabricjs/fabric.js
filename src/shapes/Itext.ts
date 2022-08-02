@@ -1,4 +1,4 @@
-(function(global) {
+
   var fabric = global.fabric;
   /**
    * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
@@ -52,7 +52,7 @@
    *   Select line:                    triple click
    * </pre>
    */
-  fabric.IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lends fabric.IText.prototype */ {
+  export const IText = fabric.util.createClass(fabric.Text, fabric.Observable, /** @lends fabric.IText.prototype */ {
 
     /**
      * Type of an object
@@ -573,5 +573,5 @@
     //copy object to prevent mutation
     var objCopy = Object.assign({}, object, { styles: styles });
     return fabric.Object._fromObject(fabric.IText, objCopy, { extraParam: 'text' });
-  };
-})(typeof exports !== 'undefined' ? exports : window);
+};
+  

@@ -1,4 +1,4 @@
-(function(global) {
+
   var fabric = global.fabric || (global.fabric = {}),
       projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
   /**
@@ -7,7 +7,7 @@
    * @extends fabric.Polyline
    * @see {@link fabric.Polygon#initialize} for constructor definition
    */
-  fabric.Polygon = fabric.util.createClass(fabric.Polyline, /** @lends fabric.Polygon.prototype */ {
+  export const Polygon = fabric.util.createClass(fabric.Polyline, /** @lends fabric.Polygon.prototype */ {
 
     /**
      * Type of an object
@@ -67,5 +67,3 @@
   fabric.Polygon.fromObject = function(object) {
     return fabric.Object._fromObject(fabric.Polygon, object, { extraParam: 'points' });
   };
-
-})(typeof exports !== 'undefined' ? exports : window);

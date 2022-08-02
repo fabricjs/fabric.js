@@ -1,4 +1,4 @@
-(function(global) {
+
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
@@ -10,7 +10,7 @@
    * @extends fabric.Object
    * @see {@link fabric.Line#initialize} for constructor definition
    */
-  fabric.Line = fabric.util.createClass(fabric.Object, /** @lends fabric.Line.prototype */ {
+  export const Line = fabric.util.createClass(fabric.Object, /** @lends fabric.Line.prototype */ {
 
     /**
      * Type of an object
@@ -312,4 +312,4 @@
 
   }
 
-})(typeof exports !== 'undefined' ? exports : window);
+

@@ -1,4 +1,4 @@
-(function(global) {
+
   var fabric = global.fabric || (global.fabric = { }),
       min = fabric.util.array.min,
       max = fabric.util.array.max,
@@ -13,7 +13,7 @@
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#path_and_pathgroup}
    * @see {@link fabric.Path#initialize} for constructor definition
    */
-  fabric.Path = fabric.util.createClass(fabric.Object, /** @lends fabric.Path.prototype */ {
+  export const Path = fabric.util.createClass(fabric.Object, /** @lends fabric.Path.prototype */ {
 
     /**
      * Type of an object
@@ -355,4 +355,4 @@
   };
   /* _FROM_SVG_END_ */
 
-})(typeof exports !== 'undefined' ? exports : window);
+

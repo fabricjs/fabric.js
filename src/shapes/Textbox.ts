@@ -1,4 +1,4 @@
-(function(global) {
+
   var fabric = global.fabric || (global.fabric = {});
 
   /**
@@ -12,7 +12,7 @@
    * @return {fabric.Textbox} thisArg
    * @see {@link fabric.Textbox#initialize} for constructor definition
    */
-  fabric.Textbox = fabric.util.createClass(fabric.IText, fabric.Observable, {
+  export const Textbox = fabric.util.createClass(fabric.IText, {
 
     /**
      * Type of an object
@@ -473,5 +473,5 @@
     //copy object to prevent mutation
     var objCopy = Object.assign({}, object, { styles: styles });
     return fabric.Object._fromObject(fabric.Textbox, objCopy, { extraParam: 'text' });
-  };
-})(typeof exports !== 'undefined' ? exports : window);
+};
+  

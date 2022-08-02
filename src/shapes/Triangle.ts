@@ -1,4 +1,4 @@
-(function(global) {
+
   var fabric = global.fabric || (global.fabric = { });
   /**
    * Triangle class
@@ -7,7 +7,7 @@
    * @return {fabric.Triangle} thisArg
    * @see {@link fabric.Triangle#initialize} for constructor definition
    */
-  fabric.Triangle = fabric.util.createClass(fabric.Object, /** @lends fabric.Triangle.prototype */ {
+  export const Triangle = fabric.util.createClass(fabric.Object, /** @lends fabric.Triangle.prototype */ {
 
     /**
      * Type of an object
@@ -80,5 +80,3 @@
   fabric.Triangle.fromObject = function(object) {
     return fabric.Object._fromObject(fabric.Triangle, object);
   };
-
-})(typeof exports !== 'undefined' ? exports : window);

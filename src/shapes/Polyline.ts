@@ -1,4 +1,4 @@
-(function(global) {
+
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
@@ -12,7 +12,7 @@
    * @extends fabric.Object
    * @see {@link fabric.Polyline#initialize} for constructor definition
    */
-  fabric.Polyline = fabric.util.createClass(fabric.Object, /** @lends fabric.Polyline.prototype */ {
+  export const Polyline = fabric.util.createClass(fabric.Object, /** @lends fabric.Polyline.prototype */ {
 
     /**
      * Type of an object
@@ -257,5 +257,3 @@
   fabric.Polyline.fromObject = function(object) {
     return fabric.Object._fromObject(fabric.Polyline, object, { extraParam: 'points' });
   };
-
-})(typeof exports !== 'undefined' ? exports : window);

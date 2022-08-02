@@ -1,4 +1,3 @@
-(function(global) {
   var fabric = global.fabric || (global.fabric = { });
 
   /**
@@ -8,7 +7,7 @@
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#groups}
    * @see {@link fabric.ActiveSelection#initialize} for constructor definition
    */
-  fabric.ActiveSelection = fabric.util.createClass(fabric.Group, /** @lends fabric.ActiveSelection.prototype */ {
+  export const ActiveSelection = fabric.util.createClass(fabric.Group, /** @lends fabric.ActiveSelection.prototype */ {
 
     /**
      * Type of an object
@@ -185,4 +184,3 @@
     });
   };
 
-})(typeof exports !== 'undefined' ? exports : window);

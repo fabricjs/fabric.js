@@ -1,4 +1,4 @@
-(function(global) {
+
   var fabric = global.fabric, extend = fabric.util.object.extend;
   /**
    * Image class
@@ -7,7 +7,7 @@
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
    * @see {@link fabric.Image#initialize} for constructor definition
    */
-  fabric.Image = fabric.util.createClass(fabric.Object, /** @lends fabric.Image.prototype */ {
+  export const Image = fabric.util.createClass(fabric.Object, /** @lends fabric.Image.prototype */ {
 
     /**
      * Type of an object
@@ -737,4 +737,3 @@
   };
   /* _FROM_SVG_END_ */
 
-})(typeof exports !== 'undefined' ? exports : window);

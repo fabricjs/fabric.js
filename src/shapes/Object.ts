@@ -1,4 +1,4 @@
-(function(global) {
+
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
@@ -42,7 +42,7 @@
    * @fires dragleave
    * @fires drop
    */
-  fabric.Object = fabric.util.createClass(fabric.CommonMethods, /** @lends fabric.Object.prototype */ {
+  export const Object = fabric.util.createClass(fabric.CommonMethods, /** @lends fabric.Object.prototype */ {
 
     /**
      * Type of an object (rect, circle, path, etc.).
@@ -1955,5 +1955,5 @@
    * @memberOf fabric.Object
    * @type Number
    */
-  fabric.Object.__uid = 0;
-})(typeof exports !== 'undefined' ? exports : window);
+fabric.Object.__uid = 0;
+  

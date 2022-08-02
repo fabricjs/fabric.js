@@ -1,4 +1,3 @@
-(function(global) {
   var fabric = global.fabric || (global.fabric = { }),
       degreesToRadians = fabric.util.degreesToRadians;
   /**
@@ -7,7 +6,7 @@
    * @extends fabric.Object
    * @see {@link fabric.Circle#initialize} for constructor definition
    */
-  fabric.Circle = fabric.util.createClass(fabric.Object, /** @lends fabric.Circle.prototype */ {
+  export const Circle = fabric.util.createClass(fabric.Object, /** @lends fabric.Circle.prototype */ {
 
     /**
      * Type of an object
@@ -197,4 +196,4 @@
     return fabric.Object._fromObject(fabric.Circle, object);
   };
 
-})(typeof exports !== 'undefined' ? exports : window);
+

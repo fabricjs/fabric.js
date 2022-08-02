@@ -1,4 +1,4 @@
-(function (global) {
+
   var fabric = global.fabric || (global.fabric = {}),
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
       invertTransform = fabric.util.invertTransform,
@@ -14,7 +14,7 @@
    * @fires layout once layout completes
    * @see {@link fabric.Group#initialize} for constructor definition
    */
-  fabric.Group = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.Group.prototype */ {
+  export const Group = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.Group.prototype */ {
 
     /**
      * Type of an object
@@ -951,5 +951,3 @@
       return new fabric.Group(enlivened[0], Object.assign(options, enlivened[1]), true);
     });
   };
-
-})(typeof exports !== 'undefined' ? exports : window);

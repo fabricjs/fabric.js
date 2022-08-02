@@ -1,4 +1,4 @@
-(function(global) {
+
   var fabric = global.fabric || (global.fabric = { });
 
   var additionalProps =
@@ -14,7 +14,7 @@
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
    * @see {@link fabric.Text#initialize} for constructor definition
    */
-  fabric.Text = fabric.util.createClass(fabric.Object, /** @lends fabric.Text.prototype */ {
+  export const Text = fabric.util.createClass(fabric.Object, /** @lends fabric.Text.prototype */ {
 
     /**
      * Properties which when set cause object to change dimensions
@@ -1700,6 +1700,4 @@
 
   fabric.Text.genericFonts = ['sans-serif', 'serif', 'cursive', 'fantasy', 'monospace'];
 
-  fabric.util.createAccessors && fabric.util.createAccessors(fabric.Text);
-
-})(typeof exports !== 'undefined' ? exports : window);
+  // fabric.util.createAccessors && fabric.util.createAccessors(fabric.Text);
