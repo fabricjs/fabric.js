@@ -1,5 +1,5 @@
-const { fabric } = require('../../main');
-const { WebglFilterBackend } = require('../../src/filters/webgl_backend.class');
+// const { fabric } = require('../../main');
+// const { fabric.WebglFilterBackend } = require('../../src/filters/webgl_backend.class');
 
 (function () {
 
@@ -414,19 +414,19 @@ const { WebglFilterBackend } = require('../../src/filters/webgl_backend.class');
 
   QUnit.test('setElement resets the webgl cache', function (assert) {
     var done = assert.async();
-    var backend = WebglFilterBackend.backend;
+    var backend = fabric.WebglFilterBackend.backend;
     createImageObject(function (image) {
-      WebglFilterBackend.backend = {
+      fabric.WebglFilterBackend.backend = {
         textureCache: {},
         evictCachesForKey: function (key) {
           delete this.textureCache[key];
         }
       };
       var elImage = _createImageElement();
-      WebglFilterBackend.backend.textureCache[image.cacheKey] = 'something';
+      fabric.WebglFilterBackend.backend.textureCache[image.cacheKey] = 'something';
       assert.equal(image.setElement(elImage), image, 'chainable');
-      assert.equal(WebglFilterBackend.backend.textureCache[image.cacheKey], undefined);
-      WebglFilterBackend.backend = backend;
+      assert.equal(fabric.WebglFilterBackend.backend.textureCache[image.cacheKey], undefined);
+      fabric.WebglFilterBackend.backend = backend;
       done();
     });
   });
