@@ -1,5 +1,6 @@
 //@ts-nocheck
 
+import { Intersection } from '../intersection.class';
 import { Point } from '../point.class';
 import {
   calcRotateMatrix, composeMatrix, cos, degreesToRadians, invertTransform, makeBoundingBoxFromPoints, multiplyTransformMatrices as multiplyMatrices, qrDecompose, sin, sizeAfterTransform, transformPoint
@@ -636,6 +637,7 @@ export function ObjectGeometryMixinGenerator<T extends new (...args: unknown[]) 
       }
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this.oCoords = this.calcOCoords();
+      console.log(this.calcOCoords(), this.oCoords)
       this._setCornerCoords && this._setCornerCoords();
       return this;
     }

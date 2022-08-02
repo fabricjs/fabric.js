@@ -23,7 +23,10 @@ export class CommonMethods extends Observable {
   set<K extends keyof this, T extends this[K]>(key: string, value: T): void
   set<K extends keyof this, T extends this[K]>(object: { [key: K]: T }): void
   set(arg0, value?) {
-    if (arg0 && typeof arg0 === 'object') {
+    if (!arg0) {
+      //  noop
+    }
+    else if (typeof arg0 === 'object') {
       for (var prop in arg0) {
         this._set(prop, arg0[prop]);
       }

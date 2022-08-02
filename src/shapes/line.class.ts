@@ -1,6 +1,7 @@
 //@ts-nocheck
 
 import { cacheProperties, SHARED_ATTRIBUTES } from '../constants';
+import { parseAttributes } from '../parser/parseAttributes';
 import {
   clone
 } from '../util';

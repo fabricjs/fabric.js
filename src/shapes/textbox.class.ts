@@ -5,6 +5,7 @@ import {
 } from '../util';
 import { IText } from "./itext.class";
 import { FabricObject } from './object.class';
+import { dimensionAffectingTextProps } from './text.class';
 
 const wordJoiners = /[ \t\r]/;
 
@@ -63,7 +64,7 @@ export class Textbox extends IText {
    * @type Object
    * @private
    */
-  _dimensionAffectingProps = IText.prototype._dimensionAffectingProps.concat('width')
+  _dimensionAffectingProps = dimensionAffectingTextProps.concat('width')
 
   /**
    * Use this regular expression to split strings in breakable lines

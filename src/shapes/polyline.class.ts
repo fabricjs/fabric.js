@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import config from '../config';
-import { cacheProperties, SHARED_ATTRIBUTES } from '../constants';
+import { cacheProperties, iMatrix, SHARED_ATTRIBUTES } from '../constants';
 import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import {
@@ -85,7 +85,7 @@ export class Polyline extends FabricObject {
   constructor(points = [], options = {}) {
     super();
     this.set(options);
-    this.points = points;
+    this.points = points || [];
     this._setPositionDimensions(options);
   }
 

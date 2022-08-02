@@ -37,7 +37,7 @@ let _measuringContext;
  * @type Array
  * @private
  */
-const dimensionAffectingTextProps = [
+export const dimensionAffectingTextProps = [
   'fontSize',
   'fontWeight',
   'fontFamily',
