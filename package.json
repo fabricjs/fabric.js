@@ -91,12 +91,11 @@
     "rollup": "^2.75.6",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-ts": "^3.0.2",
-    "testem": "^3.2.0",
+    "testem": "^3.8.0",
     "typescript": "^4.7.4"
   },
   "engines": {
     "node": ">=14.0.0"
   },
-  "main": "./dist/fabric.js",
-  "dependencies": {}
+  "main": "./dist/fabric.js"
 }
