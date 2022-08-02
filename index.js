@@ -54,7 +54,7 @@ import './src/shapes/line.class.js';
 import './src/shapes/circle.class.js';
 import './src/shapes/triangle.class.js';
 import './src/shapes/ellipse.class.js';
-import './src/shapes/rect.class.js';
+import './src/shapes/rect.class.ts';
 import './src/shapes/polyline.class.js';
 import './src/shapes/polygon.class.js';
 import './src/shapes/path.class.js';
