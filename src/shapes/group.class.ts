@@ -831,12 +831,16 @@
      * @returns {fabric.Object[]} serialized objects
      */
     __serializeObjects: function (method, propertiesToInclude) {
+      var _includeDefaultValues = this.includeDefaultValues;
       return this._objects
         .filter(function (obj) {
           return !obj.excludeFromExport;
         })
         .map(function (obj) {
+          var originalDefaults = obj.includeDefaultValues;
+          obj.includeDefaultValues = _includeDefaultValues;
           var data = obj[method || 'toObject'](propertiesToInclude);
+          obj.includeDefaultValues = originalDefaults;
           //delete data.version;
           return data;
         });

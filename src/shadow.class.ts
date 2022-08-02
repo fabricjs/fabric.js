@@ -46,6 +46,13 @@
     affectStroke: false,
 
     /**
+     * Indicates whether toObject should include default values
+     * @type Boolean
+     * @default
+     */
+    includeDefaultValues: true,
+
+    /**
      * When `false`, the shadow will scale with the object.
      * When `true`, the shadow's offsetX, offsetY, and blur will not be affected by the object's scale.
      * default to false

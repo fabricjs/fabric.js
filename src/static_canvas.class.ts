@@ -77,6 +77,14 @@
     overlayImage: null,
 
     /**
+     * Indicates whether toObject/toDatalessObject should include default values
+     * if set to false, takes precedence over the object value.
+     * @type Boolean
+     * @default
+     */
+    includeDefaultValues: true,
+
+    /**
      * Indicates whether objects' state should be saved
      * @type Boolean
      * @default
@@ -1045,7 +1053,18 @@
      * @private
      */
     _toObject: function(instance, methodName, propertiesToInclude) {
-      return instance[methodName](propertiesToInclude);
+      var originalValue;
+
+      if (!this.includeDefaultValues) {
+        originalValue = instance.includeDefaultValues;
+        instance.includeDefaultValues = false;
+      }
+
+      var object = instance[methodName](propertiesToInclude);
+      if (!this.includeDefaultValues) {
+        instance.includeDefaultValues = originalValue;
+      }
+      return object;
     },
 
     /**
