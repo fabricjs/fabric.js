@@ -1,3 +1,4 @@
+import { Object } from "./Object";
 
   var fabric = global.fabric || (global.fabric = { });
   /**
@@ -7,7 +8,7 @@
    * @return {fabric.Triangle} thisArg
    * @see {@link fabric.Triangle#initialize} for constructor definition
    */
-  export const Triangle = fabric.util.createClass(fabric.Object, /** @lends fabric.Triangle.prototype */ {
+  export const Triangle = fabric.util.createClass(Object, /** @lends fabric.Triangle.prototype */ {
 
     /**
      * Type of an object

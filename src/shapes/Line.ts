@@ -1,3 +1,4 @@
+import { Object } from "./Object";
 
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
@@ -10,7 +11,7 @@
    * @extends fabric.Object
    * @see {@link fabric.Line#initialize} for constructor definition
    */
-  export const Line = fabric.util.createClass(fabric.Object, /** @lends fabric.Line.prototype */ {
+  export const Line = fabric.util.createClass(Object, /** @lends fabric.Line.prototype */ {
 
     /**
      * Type of an object

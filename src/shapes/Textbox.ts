@@ -1,3 +1,4 @@
+import { IText } from "./IText";
 
   var fabric = global.fabric || (global.fabric = {});
 
@@ -12,7 +13,7 @@
    * @return {fabric.Textbox} thisArg
    * @see {@link fabric.Textbox#initialize} for constructor definition
    */
-  export const Textbox = fabric.util.createClass(fabric.IText, {
+  export const Textbox = fabric.util.createClass(IText, {
 
     /**
      * Type of an object

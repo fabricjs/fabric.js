@@ -1,3 +1,4 @@
+import { Object } from "./Object";
 
   var fabric = global.fabric || (global.fabric = { }),
       piBy2   = Math.PI * 2;
@@ -8,7 +9,7 @@
    * @return {fabric.Ellipse} thisArg
    * @see {@link fabric.Ellipse#initialize} for constructor definition
    */
-  export const Ellipse = fabric.util.createClass(fabric.Object, /** @lends fabric.Ellipse.prototype */ {
+  export const Ellipse = fabric.util.createClass(Object, /** @lends fabric.Ellipse.prototype */ {
 
     /**
      * Type of an object

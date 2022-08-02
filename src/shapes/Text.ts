@@ -1,3 +1,4 @@
+import { Object } from "./Object";
 
   var fabric = global.fabric || (global.fabric = { });
 
@@ -14,7 +15,7 @@
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
    * @see {@link fabric.Text#initialize} for constructor definition
    */
-  export const Text = fabric.util.createClass(fabric.Object, /** @lends fabric.Text.prototype */ {
+  export const Text = fabric.util.createClass(Object, /** @lends fabric.Text.prototype */ {
 
     /**
      * Properties which when set cause object to change dimensions

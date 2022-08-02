@@ -1,3 +1,4 @@
+import { Polyline } from "./Polyline";
 
   var fabric = global.fabric || (global.fabric = {}),
       projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
@@ -7,7 +8,7 @@
    * @extends fabric.Polyline
    * @see {@link fabric.Polygon#initialize} for constructor definition
    */
-  export const Polygon = fabric.util.createClass(fabric.Polyline, /** @lends fabric.Polygon.prototype */ {
+  export const Polygon = fabric.util.createClass(Polyline, /** @lends fabric.Polygon.prototype */ {
 
     /**
      * Type of an object

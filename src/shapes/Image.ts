@@ -1,3 +1,4 @@
+import { Object } from "./Object";
 
   var fabric = global.fabric, extend = fabric.util.object.extend;
   /**
@@ -7,7 +8,7 @@
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
    * @see {@link fabric.Image#initialize} for constructor definition
    */
-  export const Image = fabric.util.createClass(fabric.Object, /** @lends fabric.Image.prototype */ {
+  export const Image = fabric.util.createClass(Object, /** @lends fabric.Image.prototype */ {
 
     /**
      * Type of an object

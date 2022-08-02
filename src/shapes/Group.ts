@@ -1,3 +1,4 @@
+import { Object } from "./Object";
 
   var fabric = global.fabric || (global.fabric = {}),
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
@@ -14,7 +15,7 @@
    * @fires layout once layout completes
    * @see {@link fabric.Group#initialize} for constructor definition
    */
-  export const Group = fabric.util.createClass(fabric.Object, fabric.Collection, /** @lends fabric.Group.prototype */ {
+  export const Group = fabric.util.createClass(Object, fabric.Collection, /** @lends fabric.Group.prototype */ {
 
     /**
      * Type of an object

@@ -1,3 +1,4 @@
+import { Object } from "./Object";
 
   var fabric = global.fabric || (global.fabric = { });
 
@@ -8,7 +9,7 @@
    * @return {fabric.Rect} thisArg
    * @see {@link fabric.Rect#initialize} for constructor definition
    */
-  export const Rect = fabric.util.createClass(fabric.Object, /** @lends fabric.Rect.prototype */ {
+  export const Rect = fabric.util.createClass(Object, /** @lends fabric.Rect.prototype */ {
 
     /**
      * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})

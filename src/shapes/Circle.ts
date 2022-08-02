@@ -1,3 +1,5 @@
+import { Object } from "./Object";
+
   var fabric = global.fabric || (global.fabric = { }),
       degreesToRadians = fabric.util.degreesToRadians;
   /**
@@ -6,7 +8,7 @@
    * @extends fabric.Object
    * @see {@link fabric.Circle#initialize} for constructor definition
    */
-  export const Circle = fabric.util.createClass(fabric.Object, /** @lends fabric.Circle.prototype */ {
+  export const Circle = fabric.util.createClass(Object, /** @lends fabric.Circle.prototype */ {
 
     /**
      * Type of an object
