@@ -145,7 +145,7 @@ function exportBuildToWebsite(options = {}) {
     copy(path.resolve(wd, './dist/fabric.js'), path.resolve(websiteDir, './lib/fabric.js'));
     copy(path.resolve(wd, './package.json'), path.resolve(websiteDir, './lib/package.json'));
     BUILD_SOURCE.forEach(p => copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p)));
-    console.log(chalk.bold(`[${moment().format('HH:MM')}] exported build to fabricjs.com`));
+    console.log(chalk.bold(`[${moment().format('HH:mm')}] exported build to fabricjs.com`));
 }
 
 function exportTestsToWebsite() {
@@ -156,7 +156,7 @@ function exportTestsToWebsite() {
         './test/lib',
     ]
     paths.forEach(location => copy(path.resolve(wd, location), path.resolve(websiteDir, location)));
-    console.log(chalk.bold(`[${moment().format('HH:MM')}] exported tests to fabricjs.com`));
+    console.log(chalk.bold(`[${moment().format('HH:mm')}] exported tests to fabricjs.com`));
 }
 
 function exportToWebsite(options) {
