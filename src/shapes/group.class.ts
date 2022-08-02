@@ -4,7 +4,7 @@ import { stateProperties } from '../constants';
 import { CollectionMixinGenerator } from "../mixins/collection.mixin";
 import { Point } from "../point.class";
 import {
-  applyTransformToObject, degreesToRadians, enlivenObjectEnlivables, enlivenObjects, invertTransform, multiplyTransformMatrices, transformPoint
+  applyTransformToObject, cos, degreesToRadians, enlivenObjectEnlivables, enlivenObjects, invertTransform, multiplyTransformMatrices, sin, transformPoint
 } from '../util';
 import { FabricObject } from "./object.class";
 import { Rect } from "./rect.class";
