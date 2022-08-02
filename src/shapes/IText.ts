@@ -1,4 +1,4 @@
-import { Text } from "./Text";
+//@ts-nocheck
 
   var fabric = global.fabric;
   /**
@@ -53,7 +53,7 @@ import { Text } from "./Text";
    *   Select line:                    triple click
    * </pre>
    */
-  export const IText = fabric.util.createClass(Text, /** @lends fabric.IText.prototype */ {
+  export const IText = fabric.util.createClass(fabric.Text, /** @lends fabric.IText.prototype */ {
 
     /**
      * Type of an object

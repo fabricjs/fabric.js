@@ -1,6 +1,6 @@
 /* _TO_SVG_START_ */
-(function(global) {
-  var fabric = global.fabric;
+export default function(fabric) {
+
   function getSvgColorString(prop, value) {
     if (!value) {
       return prop + ': none; ';
@@ -255,5 +255,5 @@
       return this.paintFirst !== 'fill' ? ' paint-order="' + this.paintFirst + '" ' : '';
     }
   });
-})(typeof exports !== 'undefined' ? exports : window);
+}
 /* _TO_SVG_END_ */

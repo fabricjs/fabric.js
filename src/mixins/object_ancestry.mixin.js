@@ -1,5 +1,5 @@
-(function (global) {
-  var fabric = global.fabric;
+export default function(fabric) {
+
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
     /**
@@ -122,4 +122,4 @@
       return commonAncestors && !!commonAncestors.ancestors.length;
     }
   });
-})(typeof exports !== 'undefined' ? exports : window);
+}

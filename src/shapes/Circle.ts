@@ -1,6 +1,7 @@
-import { Object } from "./Object";
+//@ts-nocheck
+import { FabricObject } from "./Object";
 
-  var fabric = global.fabric || (global.fabric = { }),
+  var fabric = global.fabric,
       degreesToRadians = fabric.util.degreesToRadians;
   /**
    * Circle class
@@ -8,7 +9,7 @@ import { Object } from "./Object";
    * @extends fabric.Object
    * @see {@link fabric.Circle#initialize} for constructor definition
    */
-  export const Circle = fabric.util.createClass(Object, /** @lends fabric.Circle.prototype */ {
+  export const Circle = fabric.util.createClass(FabricObject, /** @lends fabric.Circle.prototype */ {
 
     /**
      * Type of an object

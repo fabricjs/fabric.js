@@ -1,4 +1,5 @@
-import { Object } from "./Object";
+//@ts-nocheck
+import { FabricObject } from "./Object";
 
   var fabric = global.fabric, extend = fabric.util.object.extend;
   /**
@@ -8,7 +9,7 @@ import { Object } from "./Object";
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
    * @see {@link fabric.Image#initialize} for constructor definition
    */
-  export const Image = fabric.util.createClass(Object, /** @lends fabric.Image.prototype */ {
+  export const Image = fabric.util.createClass(FabricObject, /** @lends fabric.Image.prototype */ {
 
     /**
      * Type of an object
@@ -673,14 +674,14 @@ import { Object } from "./Object";
    * @returns {Promise<fabric.Image>}
    */
   fabric.Image.fromObject = function (object, options) {
-    var _object = Object.assign({}, object),
+    var _object = FabricObject.assign({}, object),
         filters = _object.filters,
         resizeFilter = _object.resizeFilter;
     // the generic enliving will fail on filters for now
     delete _object.resizeFilter;
     delete _object.filters;
-    var imageOptions = Object.assign({}, options, { crossOrigin: _object.crossOrigin }),
-        filterOptions = Object.assign({}, options, { namespace: fabric.Image.filters });
+    var imageOptions = FabricObject.assign({}, options, { crossOrigin: _object.crossOrigin }),
+        filterOptions = FabricObject.assign({}, options, { namespace: fabric.Image.filters });
     return Promise.all([
       fabric.util.loadImage(_object.src, imageOptions),
       filters && fabric.util.enlivenObjects(filters, filterOptions),
@@ -690,7 +691,7 @@ import { Object } from "./Object";
       .then(function(imgAndFilters) {
         _object.filters = imgAndFilters[1] || [];
         _object.resizeFilter = imgAndFilters[2] && imgAndFilters[2][0];
-        return new fabric.Image(imgAndFilters[0], Object.assign(_object, imgAndFilters[3]));
+        return new fabric.Image(imgAndFilters[0], FabricObject.assign(_object, imgAndFilters[3]));
       });
   };
 
@@ -731,7 +732,7 @@ import { Object } from "./Object";
    */
   fabric.Image.fromElement = function(element, callback, options) {
     var parsedAttributes = fabric.parseAttributes(element, fabric.Image.ATTRIBUTE_NAMES);
-    fabric.Image.fromURL(parsedAttributes['xlink:href'], Object.assign({ }, options || { }, parsedAttributes))
+    fabric.Image.fromURL(parsedAttributes['xlink:href'], FabricObject.assign({ }, options || { }, parsedAttributes))
       .then(function(fabricImage) {
         callback(fabricImage);
       });

@@ -1,6 +1,7 @@
-import { Object } from "./Object";
+//@ts-nocheck
+import { FabricObject } from "./Object";
 
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric;
   /**
    * Triangle class
    * @class fabric.Triangle
@@ -8,7 +9,7 @@ import { Object } from "./Object";
    * @return {fabric.Triangle} thisArg
    * @see {@link fabric.Triangle#initialize} for constructor definition
    */
-  export const Triangle = fabric.util.createClass(Object, /** @lends fabric.Triangle.prototype */ {
+  export const Triangle = fabric.util.createClass(FabricObject, /** @lends fabric.Triangle.prototype */ {
 
     /**
      * Type of an object

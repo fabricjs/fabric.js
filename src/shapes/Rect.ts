@@ -1,6 +1,7 @@
-import { Object } from "./Object";
+//@ts-nocheck
+import { FabricObject } from "./Object";
 
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric;
 
   /**
    * Rectangle class
@@ -9,7 +10,7 @@ import { Object } from "./Object";
    * @return {fabric.Rect} thisArg
    * @see {@link fabric.Rect#initialize} for constructor definition
    */
-  export const Rect = fabric.util.createClass(Object, /** @lends fabric.Rect.prototype */ {
+  export const Rect = fabric.util.createClass(FabricObject, /** @lends fabric.Rect.prototype */ {
 
     /**
      * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
@@ -159,7 +160,7 @@ import { Object } from "./Object";
     parsedAttributes.top  = parsedAttributes.top  || 0;
     parsedAttributes.height  = parsedAttributes.height || 0;
     parsedAttributes.width  = parsedAttributes.width || 0;
-    var rect = new fabric.Rect(Object.assign({}, options, parsedAttributes));
+    var rect = new fabric.Rect(FabricObject.assign({}, options, parsedAttributes));
     rect.visible = rect.visible && rect.width > 0 && rect.height > 0;
     callback(rect);
   };

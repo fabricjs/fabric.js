@@ -1,6 +1,7 @@
-import { IText } from "./IText";
+//@ts-nocheck
 
-  var fabric = global.fabric || (global.fabric = {});
+
+  var fabric = global.fabric;
 
   /**
    * Textbox class, based on IText, allows the user to resize the text rectangle
@@ -13,7 +14,7 @@ import { IText } from "./IText";
    * @return {fabric.Textbox} thisArg
    * @see {@link fabric.Textbox#initialize} for constructor definition
    */
-  export const Textbox = fabric.util.createClass(IText, {
+  export const Textbox = fabric.util.createClass(fabric.IText, {
 
     /**
      * Type of an object

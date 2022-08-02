@@ -1,6 +1,6 @@
-
-  var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
+//@ts-nocheck
+import { fabric } from '../../HEADER';
+var extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
@@ -9,9 +9,9 @@
       ALIASING_LIMIT = 2;
   /**
    * Root object class from which all 2d shape classes inherit from
-   * @class fabric.Object
+   * @class FabricObject
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#objects}
-   * @see {@link fabric.Object#initialize} for constructor definition
+   * @see {@link FabricObject#initialize} for constructor definition
    *
    * @fires added
    * @fires removed
@@ -42,7 +42,7 @@
    * @fires dragleave
    * @fires drop
    */
-  export const Object = fabric.util.createClass(fabric.CommonMethods, /** @lends fabric.Object.prototype */ {
+  export const FabricObject = fabric.util.createClass(fabric.CommonMethods, /** @lends FabricObject.prototype */ {
 
     /**
      * Type of an object (rect, circle, path, etc.).
@@ -269,7 +269,7 @@
     /**
      * Fill rule used to fill an object
      * accepted values are nonzero, evenodd
-     * <b>Backwards incompatibility note:</b> This property was used for setting globalCompositeOperation until v1.4.12 (use `fabric.Object#globalCompositeOperation` instead)
+     * <b>Backwards incompatibility note:</b> This property was used for setting globalCompositeOperation until v1.4.12 (use `FabricObject#globalCompositeOperation` instead)
      * @type String
      * @default
      */
@@ -576,7 +576,7 @@
 
     /**
      * List of properties to consider when checking if state
-     * of an object is changed (fabric.Object#hasStateChanged)
+     * of an object is changed (FabricObject#hasStateChanged)
      * as well as for history (undo/redo) purposes
      * @type Array
      */
@@ -612,7 +612,7 @@
      * the clipPath object gets used when the object has rendered, and the context is placed in the center
      * of the object cacheCanvas.
      * If you want 0,0 of a clipPath to align with an object center, use clipPath.originX/Y to 'center'
-     * @type fabric.Object
+     * @type FabricObject
      */
     clipPath: undefined,
 
@@ -826,7 +826,7 @@
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+      var NUM_FRACTION_DIGITS = FabricObject.NUM_FRACTION_DIGITS,
 
           object = {
             type:                     this.type,
@@ -974,7 +974,7 @@
      * @private
      * @param {String} key
      * @param {*} value
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      */
     _set: function(key, value) {
       var shouldConstrainValue = (key === 'scaleX' || key === 'scaleY'),
@@ -1016,7 +1016,7 @@
     /**
      * Retrieves viewportTransform from Object's canvas if possible
      * @method getViewportTransform
-     * @memberOf fabric.Object.prototype
+     * @memberOf FabricObject.prototype
      * @return {Array}
      */
     getViewportTransform: function() {
@@ -1029,7 +1029,7 @@
     /*
      * @private
      * return if the object would be visible in rendering
-     * @memberOf fabric.Object.prototype
+     * @memberOf FabricObject.prototype
      * @return {Boolean}
      */
     isNotVisible: function() {
@@ -1170,7 +1170,7 @@
     /**
      * Execute the drawing operation for an object clipPath
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {fabric.Object} clipPath
+     * @param {FabricObject} clipPath
      */
     drawClipPathOnCache: function(ctx, clipPath) {
       ctx.save();
@@ -1216,7 +1216,7 @@
     /**
      * Prepare clipPath state and cache and draw it on instance's cache
      * @param {CanvasRenderingContext2D} ctx
-     * @param {fabric.Object} clipPath
+     * @param {FabricObject} clipPath
      */
     _drawClipPath: function (ctx, clipPath) {
       if (!clipPath) { return; }
@@ -1629,7 +1629,7 @@
     /**
      * Clones an instance.
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @returns {Promise<fabric.Object>}
+     * @returns {Promise<FabricObject>}
      */
     clone: function(propertiesToInclude) {
       var objectForm = this.toObject(propertiesToInclude);
@@ -1670,7 +1670,7 @@
      * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
      * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
      * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
-     * @return {HTMLCanvasElement} Returns DOM element <canvas> with the fabric.Object
+     * @return {HTMLCanvasElement} Returns DOM element <canvas> with the FabricObject
      */
     toCanvasElement: function(options) {
       options || (options = { });
@@ -1788,7 +1788,7 @@
     /**
      * Sets "angle" of an instance with centered rotation
      * @param {Number} angle Angle value (in degrees)
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      * @chainable
      */
     rotate: function(angle) {
@@ -1810,7 +1810,7 @@
     /**
      * Centers object horizontally on canvas to which it was added last.
      * You might need to call `setCoords` on an object after centering, to update controls area.
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      * @chainable
      */
     centerH: function () {
@@ -1821,7 +1821,7 @@
     /**
      * Centers object horizontally on current viewport of canvas to which it was added last.
      * You might need to call `setCoords` on an object after centering, to update controls area.
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      * @chainable
      */
     viewportCenterH: function () {
@@ -1832,7 +1832,7 @@
     /**
      * Centers object vertically on canvas to which it was added last.
      * You might need to call `setCoords` on an object after centering, to update controls area.
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      * @chainable
      */
     centerV: function () {
@@ -1843,7 +1843,7 @@
     /**
      * Centers object vertically on current viewport of canvas to which it was added last.
      * You might need to call `setCoords` on an object after centering, to update controls area.
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      * @chainable
      */
     viewportCenterV: function () {
@@ -1854,7 +1854,7 @@
     /**
      * Centers object vertically and horizontally on canvas to which is was added last
      * You might need to call `setCoords` on an object after centering, to update controls area.
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      * @chainable
      */
     center: function () {
@@ -1865,7 +1865,7 @@
     /**
      * Centers object on current viewport of canvas to which it was added last.
      * You might need to call `setCoords` on an object after centering, to update controls area.
-     * @return {fabric.Object} thisArg
+     * @return {FabricObject} thisArg
      * @chainable
      */
     viewportCenter: function () {
@@ -1905,19 +1905,19 @@
     }
   });
 
-  fabric.util.createAccessors && fabric.util.createAccessors(fabric.Object);
+  // fabric.util.createAccessors && fabric.util.createAccessors(FabricObject);
 
-  extend(fabric.Object.prototype, fabric.Observable);
+  extend(FabricObject.prototype, fabric.Observable);
 
   /**
    * Defines the number of fraction digits to use when serializing object values.
    * You can use it to increase/decrease precision of such values like left, top, scaleX, scaleY, etc.
    * @static
-   * @memberOf fabric.Object
+   * @memberOf FabricObject
    * @constant
    * @type Number
    */
-  fabric.Object.NUM_FRACTION_DIGITS = 2;
+  FabricObject.NUM_FRACTION_DIGITS = 2;
 
   /**
    *
@@ -1926,9 +1926,9 @@
    * @param {object} [options]
    * @param {string} [options.extraParam] property to pass as first argument to the constructor
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   * @returns {Promise<fabric.Object>}
+   * @returns {Promise<FabricObject>}
    */
-  fabric.Object._fromObject = function(klass, object, options) {
+  FabricObject._fromObject = function(klass, object, options) {
     var serializedObject = clone(object, true);
     return fabric.util.enlivenObjectEnlivables(serializedObject, options).then(function(enlivedMap) {
       var newObject = Object.assign(object, enlivedMap);
@@ -1939,21 +1939,21 @@
   /**
    *
    * @static
-   * @memberOf fabric.Object
+   * @memberOf FabricObject
    * @param {object} object
    * @param {object} [options]
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   * @returns {Promise<fabric.Object>}
+   * @returns {Promise<FabricObject>}
    */
-  fabric.Object.fromObject = function(object, options) {
-    return fabric.Object._fromObject(fabric.Object, object, options);
+  FabricObject.fromObject = function(object, options) {
+    return FabricObject._fromObject(FabricObject, object, options);
   };
 
   /**
    * Unique id used internally when creating SVG elements
    * @static
-   * @memberOf fabric.Object
+   * @memberOf FabricObject
    * @type Number
    */
-fabric.Object.__uid = 0;
+FabricObject.__uid = 0;
   

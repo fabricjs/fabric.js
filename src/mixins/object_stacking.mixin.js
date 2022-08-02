@@ -1,5 +1,5 @@
-(function (global) {
-  var fabric = global.fabric;
+export default function(fabric) {
+
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
 
     /**
@@ -110,4 +110,4 @@
       return thisIndex > -1 && thisIndex > otherIndex;
     }
   });
-})(typeof exports !== 'undefined' ? exports : window);
+}

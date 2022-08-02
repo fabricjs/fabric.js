@@ -1,6 +1,7 @@
+//@ts-nocheck
 import { Polyline } from "./Polyline";
 
-  var fabric = global.fabric || (global.fabric = {}),
+  var fabric = global.fabric,
       projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
   /**
    * Polygon class

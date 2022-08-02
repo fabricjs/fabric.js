@@ -1,5 +1,5 @@
-(function(global) {
-  var fabric = global.fabric, extend = fabric.util.object.extend,
+export default function(fabric) {
+  var extend = fabric.util.object.extend,
       originalSet = 'stateProperties';
 
   /*
@@ -103,4 +103,5 @@
       return this;
     }
   });
-})(typeof exports !== 'undefined' ? exports : window);
+
+}

@@ -1,6 +1,7 @@
-import { Object } from "./Object";
+//@ts-nocheck
+import { FabricObject } from "./Object";
 
-  var fabric = global.fabric || (global.fabric = { }),
+  var fabric = global.fabric,
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
       coordProps = { x1: 1, x2: 1, y1: 1, y2: 1 };
@@ -11,7 +12,7 @@ import { Object } from "./Object";
    * @extends fabric.Object
    * @see {@link fabric.Line#initialize} for constructor definition
    */
-  export const Line = fabric.util.createClass(Object, /** @lends fabric.Line.prototype */ {
+  export const Line = fabric.util.createClass(FabricObject, /** @lends fabric.Line.prototype */ {
 
     /**
      * Type of an object

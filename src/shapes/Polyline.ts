@@ -1,6 +1,7 @@
-import { Object } from "./Object";
+//@ts-nocheck
+import { FabricObject } from "./Object";
 
-  var fabric = global.fabric || (global.fabric = { }),
+  var fabric = global.fabric,
       extend = fabric.util.object.extend,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
@@ -13,7 +14,7 @@ import { Object } from "./Object";
    * @extends fabric.Object
    * @see {@link fabric.Polyline#initialize} for constructor definition
    */
-  export const Polyline = fabric.util.createClass(Object, /** @lends fabric.Polyline.prototype */ {
+  export const Polyline = fabric.util.createClass(FabricObject, /** @lends fabric.Polyline.prototype */ {
 
     /**
      * Type of an object

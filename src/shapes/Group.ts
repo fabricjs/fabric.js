@@ -1,6 +1,7 @@
-import { Object } from "./Object";
+//@ts-nocheck
+import { FabricObject as FabricObject } from "./Object";
 
-  var fabric = global.fabric || (global.fabric = {}),
+  var fabric = global.fabric,
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
       invertTransform = fabric.util.invertTransform,
       transformPoint = fabric.util.transformPoint,
@@ -10,12 +11,12 @@ import { Object } from "./Object";
   /**
    * Group class
    * @class fabric.Group
-   * @extends fabric.Object
+   * @extends FabricObject
    * @mixes fabric.Collection
    * @fires layout once layout completes
    * @see {@link fabric.Group#initialize} for constructor definition
    */
-  export const Group = fabric.util.createClass(Object, fabric.Collection, /** @lends fabric.Group.prototype */ {
+export const Group = fabric.util.createClass(FabricObject, fabric.Collection, /** @lends fabric.Group.prototype */ {
 
     /**
      * Type of an object
@@ -41,11 +42,11 @@ import { Object } from "./Object";
 
     /**
      * List of properties to consider when checking if state
-     * of an object is changed (fabric.Object#hasStateChanged)
+     * of an object is changed (FabricObject#hasStateChanged)
      * as well as for history (undo/redo) purposes
      * @type string[]
      */
-    stateProperties: fabric.Object.prototype.stateProperties.concat('layout'),
+    stateProperties: FabricObject.prototype.stateProperties.concat('layout'),
 
     /**
      * Used to optimize performance
@@ -75,7 +76,7 @@ import { Object } from "./Object";
     /**
      * Constructor
      *
-     * @param {fabric.Object[]} [objects] instance objects
+     * @param {FabricObject[]} [objects] instance objects
      * @param {Object} [options] Options object
      * @param {boolean} [objectsRelativeToGroup] true if objects exist in group coordinate plane
      * @return {fabric.Group} thisArg
@@ -142,7 +143,7 @@ import { Object } from "./Object";
 
     /**
      * Add objects
-     * @param {...fabric.Object} objects
+     * @param {...FabricObject} objects
      */
     add: function () {
       var allowedObjects = this._filterObjectsBeforeEnteringGroup(Array.from(arguments));
@@ -152,7 +153,7 @@ import { Object } from "./Object";
 
     /**
      * Inserts an object into collection at specified index
-     * @param {fabric.Object | fabric.Object[]} objects Object to insert
+     * @param {FabricObject | FabricObject[]} objects Object to insert
      * @param {Number} index Index to insert object at
      */
     insertAt: function (objects, index) {
@@ -163,8 +164,8 @@ import { Object } from "./Object";
 
     /**
      * Remove objects
-     * @param {...fabric.Object} objects
-     * @returns {fabric.Object[]} removed objects
+     * @param {...FabricObject} objects
+     * @returns {FabricObject[]} removed objects
      */
     remove: function () {
       var removed = fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
@@ -174,7 +175,7 @@ import { Object } from "./Object";
 
     /**
      * Remove all objects
-     * @returns {fabric.Object[]} removed objects
+     * @returns {FabricObject[]} removed objects
      */
     removeAll: function () {
       this._activeObjects = [];
@@ -214,7 +215,7 @@ import { Object } from "./Object";
     /**
      * @private
      * @param {boolean} watch
-     * @param {fabric.Object} object
+     * @param {FabricObject} object
      */
     _watchObject: function (watch, object) {
       var directive = watch ? 'on' : 'off';
@@ -229,7 +230,7 @@ import { Object } from "./Object";
     /**
      * Checks if object can enter group and logs relevant warnings
      * @private
-     * @param {fabric.Object} object
+     * @param {FabricObject} object
      * @returns
      */
     canEnterGroup: function (object) {
@@ -252,7 +253,7 @@ import { Object } from "./Object";
 
     /**
      * @private
-     * @param {fabric.Object} object
+     * @param {FabricObject} object
      * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
      * @returns {boolean} true if object entered group
      */
@@ -266,7 +267,7 @@ import { Object } from "./Object";
 
     /**
      * @private
-     * @param {fabric.Object} object
+     * @param {FabricObject} object
      * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
      */
     _enterGroup: function (object, removeParentTransform) {
@@ -293,7 +294,7 @@ import { Object } from "./Object";
 
     /**
      * @private
-     * @param {fabric.Object} object
+     * @param {FabricObject} object
      * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
      */
     exitGroup: function (object, removeParentTransform) {
@@ -303,7 +304,7 @@ import { Object } from "./Object";
 
     /**
      * @private
-     * @param {fabric.Object} object
+     * @param {FabricObject} object
      * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
      */
     _exitGroup: function (object, removeParentTransform) {
@@ -328,7 +329,7 @@ import { Object } from "./Object";
     /**
      * @private
      * @param {'added'|'removed'} type
-     * @param {fabric.Object[]} targets
+     * @param {FabricObject[]} targets
      */
     _onAfterObjectsChange: function (type, targets) {
       this._applyLayoutStrategy({
@@ -340,7 +341,7 @@ import { Object } from "./Object";
 
     /**
      * @private
-     * @param {fabric.Object} object
+     * @param {FabricObject} object
      */
     _onObjectAdded: function (object) {
       this.enterGroup(object, true);
@@ -349,7 +350,7 @@ import { Object } from "./Object";
 
     /**
      * @private
-     * @param {fabric.Object} object
+     * @param {FabricObject} object
      */
     _onRelativeObjectAdded: function (object) {
       this.enterGroup(object, false);
@@ -358,7 +359,7 @@ import { Object } from "./Object";
 
     /**
      * @private
-     * @param {fabric.Object} object
+     * @param {FabricObject} object
      * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
      */
     _onObjectRemoved: function (object, removeParentTransform) {
@@ -374,7 +375,7 @@ import { Object } from "./Object";
      * @return {Boolean}
      */
     shouldCache: function() {
-      var ownCache = fabric.Object.prototype.shouldCache.call(this);
+      var ownCache = FabricObject.prototype.shouldCache.call(this);
       if (ownCache) {
         for (var i = 0; i < this._objects.length; i++) {
           if (this._objects[i].willDrawShadow()) {
@@ -391,7 +392,7 @@ import { Object } from "./Object";
      * @return {Boolean}
      */
     willDrawShadow: function() {
-      if (fabric.Object.prototype.willDrawShadow.call(this)) {
+      if (FabricObject.prototype.willDrawShadow.call(this)) {
         return true;
       }
       for (var i = 0; i < this._objects.length; i++) {
@@ -481,7 +482,7 @@ import { Object } from "./Object";
 
     /**
      * @private
-     * @param {fabric.Object} object
+     * @param {FabricObject} object
      * @param {fabric.Point} diff
      */
     _adjustObjectPosition: function (object, diff) {
@@ -579,7 +580,7 @@ import { Object } from "./Object";
      *
      * @typedef LayoutContext context object with data regarding what triggered the call
      * @property {LayoutContextType} type
-     * @property {fabric.Object[]} [path] array of objects starting from the object that triggered the call to the current one
+     * @property {FabricObject[]} [path] array of objects starting from the object that triggered the call to the current one
      *
      * @typedef LayoutResult positioning and layout data **relative** to instance's parent
      * @property {number} centerX new centerX as measured by the containing plane (same as `left` with `originX` set to `center`)
@@ -590,7 +591,7 @@ import { Object } from "./Object";
      * @property {number} height
      *
      * @param {string} layoutDirective
-     * @param {fabric.Object[]} objects
+     * @param {FabricObject[]} objects
      * @param {LayoutContext} context
      * @returns {LayoutResult | undefined}
      */
@@ -667,7 +668,7 @@ import { Object } from "./Object";
      * A wrapper around {@link fabric.Group#getObjectsBoundingBox}
      * @public
      * @param {string} layoutDirective
-     * @param {fabric.Object[]} objects
+     * @param {FabricObject[]} objects
      * @param {LayoutContext} context
      * @returns {LayoutResult | undefined}
      */
@@ -690,7 +691,7 @@ import { Object } from "./Object";
      * Calculates center taking into account originX, originY while not being sure that width/height are initialized
      * @public
      * @param {string} layoutDirective
-     * @param {fabric.Object[]} objects
+     * @param {FabricObject[]} objects
      * @param {LayoutContext} context
      * @returns {LayoutResult | undefined}
      */
@@ -764,7 +765,7 @@ import { Object } from "./Object";
     /**
      * Calculate the bbox of objects relative to instance's containing plane
      * @public
-     * @param {fabric.Object[]} objects
+     * @param {FabricObject[]} objects
      * @returns {LayoutResult | null} bounding box
      */
     getObjectsBoundingBox: function (objects, ignoreOffset) {
@@ -828,7 +829,7 @@ import { Object } from "./Object";
      * @private
      * @param {'toObject'|'toDatalessObject'} [method]
      * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @returns {fabric.Object[]} serialized objects
+     * @returns {FabricObject[]} serialized objects
      */
     __serializeObjects: function (method, propertiesToInclude) {
       var _includeDefaultValues = this.includeDefaultValues;

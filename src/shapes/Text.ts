@@ -1,6 +1,7 @@
-import { Object } from "./Object";
+//@ts-nocheck
+import { FabricObject } from "./Object";
 
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric;
 
   var additionalProps =
     ('fontFamily fontWeight fontSize text underline overline linethrough' +
@@ -15,7 +16,7 @@ import { Object } from "./Object";
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
    * @see {@link fabric.Text#initialize} for constructor definition
    */
-  export const Text = fabric.util.createClass(Object, /** @lends fabric.Text.prototype */ {
+  export const Text = fabric.util.createClass(FabricObject, /** @lends fabric.Text.prototype */ {
 
     /**
      * Properties which when set cause object to change dimensions
@@ -1612,7 +1613,7 @@ import { Object } from "./Object";
 
     var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES),
         parsedAnchor = parsedAttributes.textAnchor || 'left';
-    options = Object.assign({}, options, parsedAttributes);
+    options = FabricObject.assign({}, options, parsedAttributes);
 
     options.top = options.top || 0;
     options.left = options.left || 0;
@@ -1695,7 +1696,7 @@ import { Object } from "./Object";
   fabric.Text.fromObject = function(object) {
     var styles = fabric.util.stylesFromArray(object.styles, object.text);
     //copy object to prevent mutation
-    var objCopy = Object.assign({}, object, { styles: styles });
+    var objCopy = FabricObject.assign({}, object, { styles: styles });
     return fabric.Object._fromObject(fabric.Text, objCopy, { extraParam: 'text' });
   };
 

@@ -1,6 +1,7 @@
-import { Object } from "./Object";
+//@ts-nocheck
+import { FabricObject } from "./Object";
 
-  var fabric = global.fabric || (global.fabric = { }),
+  var fabric = global.fabric,
       min = fabric.util.array.min,
       max = fabric.util.array.max,
       extend = fabric.util.object.extend,
@@ -14,7 +15,7 @@ import { Object } from "./Object";
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#path_and_pathgroup}
    * @see {@link fabric.Path#initialize} for constructor definition
    */
-  export const Path = fabric.util.createClass(Object, /** @lends fabric.Path.prototype */ {
+  export const Path = fabric.util.createClass(FabricObject, /** @lends fabric.Path.prototype */ {
 
     /**
      * Type of an object

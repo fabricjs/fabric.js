@@ -1,6 +1,7 @@
+//@ts-nocheck
 import { Group } from "./Group";
 
-  var fabric = global.fabric || (global.fabric = { });
+  var fabric = global.fabric;
 
   /**
    * Group class

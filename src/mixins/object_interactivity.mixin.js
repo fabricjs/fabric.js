@@ -1,6 +1,6 @@
-(function(global) {
+export default function(fabric) {
 
-  var fabric = global.fabric, degreesToRadians = fabric.util.degreesToRadians;
+  var degreesToRadians = fabric.util.degreesToRadians;
 
   fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
     /**
@@ -348,4 +348,4 @@
     },
 
   });
-})(typeof exports !== 'undefined' ? exports : window);
+}
