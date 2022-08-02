@@ -1926,7 +1926,9 @@ export class FabricObject extends FabricObjectBase {
  * @constant
  * @type Number
  */
-  static config.NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
+  static get NUM_FRACTION_DIGITS() {
+    return config.NUM_FRACTION_DIGITS;
+  }
 
   /**
    *
