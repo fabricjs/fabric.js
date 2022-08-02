@@ -15,18 +15,18 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 16.x
-    - run: npm install uglify-js@3.3.x
+    - run: npm ci
     - run: npm run build
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Linting
-      uses: actions/setup-node@v1
-      with:
-        node-version: 16.x
-    - run: npm install eslint@4.7.x
-    - run: npm run lint
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Linting
+  #     uses: actions/setup-node@v1
+  #     with:
+  #       node-version: 16.x
+  #   - run: npm ci
+  #   - run: npm run lint
   coverage:
     runs-on: ubuntu-latest
     steps:
