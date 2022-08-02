@@ -744,8 +744,8 @@
     assert.equal(height1, height2, 'should have same height');
   });
 
-  QUnit.test('_measureChar handles 0 width chars', function (assert) {
-    fabric.charWidthsCache = {};
+  QUnit.test.only('_measureChar handles 0 width chars', function (assert) {
+    fabric.clearCharWidthsCache();
     var zwc = '\u200b';
     var text = new fabric.Text('');
     var style = text.getCompleteStyleDeclaration(0, 0);

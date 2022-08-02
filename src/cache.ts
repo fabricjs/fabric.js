@@ -1,3 +1,4 @@
+//@ts-nocheck
 /**
  * Cache Object for widths of chars in text rendering.
  */
@@ -20,8 +21,21 @@ export const arcToSegmentsCache = {};
  */
 export const boundsOfCurveCache = {};
 
+export function setCharWidthsCache(values) {
+    clearCharWidthsCache();
+    Object.assign(charWidthsCache, values);
+}
+
+export function clearCharWidthsCache() {
+    for (const key in charWidthsCache) {
+        delete charWidthsCache[key];
+    }
+}
+
 export default {
     charWidthsCache,
     arcToSegmentsCache,
-    boundsOfCurveCache
+    boundsOfCurveCache,
+    clearCharWidthsCache,
+    setCharWidthsCache
 }

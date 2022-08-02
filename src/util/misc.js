@@ -962,7 +962,7 @@ import { cos } from './cos';
     clearFabricFontCache: function (fontFamily) {
       fontFamily = (fontFamily || '').toLowerCase();
       if (!fontFamily) {
-        fabric.charWidthsCache = {};
+        fabric.clearCharWidthsCache();
       }
       else if (fabric.charWidthsCache[fontFamily]) {
         delete fabric.charWidthsCache[fontFamily];
