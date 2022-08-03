@@ -189,9 +189,7 @@ import { cos } from './index.ts';
      * @param {Boolean} [counterClockwise] the direction of the orthogonal vector, defaults to `true`
      * @returns {Point} the unit orthogonal vector
      */
-    getOrthogonalUnitVector: function (vector, counterClockwise /** = true */) {
-      //  TODO remove next line after es6 migration and set `counterClockwise` arg to `true` by default
-      counterClockwise = counterClockwise !== false;
+    getOrthogonalUnitVector: function (vector, counterClockwise = true) {
       return fabric.util.getHatVector(
         new fabric.Point(
           counterClockwise ? -vector.y : vector.y,
@@ -260,6 +258,7 @@ import { cos } from './index.ts';
           B = points[index - 1];
           C = points[index + 1];
         }
+        //  safeguard in case `points` are not `Point`
         B = new fabric.Point(B.x, B.y);
         C = new fabric.Point(C.x, C.y);
 
