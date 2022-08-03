@@ -215,8 +215,8 @@ import { cos } from './index.ts';
 
     /**
      * Project stroke width on points returning projections for each point as follows:
-     * - `miter`: 2 points corresponding to the outer boundary and the inner boundary of stroke.
-     * - `bevel`: 4 points corresponding to the bevel possible boundaries, orthogonal to the stroke.
+     * - `miter`: 1 point corresponding to the outer boundary and the inner boundary of stroke.
+     * - `bevel`: 2 points corresponding to the bevel possible boundaries, orthogonal to the stroke.
      * - `round`: same as `bevel`
      * Used to calculate object's bounding box
      *
@@ -233,7 +233,7 @@ import { cos } from './index.ts';
      * @param {number} options.scaleX
      * @param {number} options.scaleY
      * @param {boolean} [openPath] whether the shape is open or not, affects the calculations of the first and last points
-     * @returns {fabric.Point[]} array of size 2n/4n of all suspected points
+     * @returns {fabric.Point[]} array of size n (for miter stroke) or 2n (for bevel or round) of all suspected points
      */
     projectStrokeOnPoints: function (points, options, openPath) {
 
@@ -318,23 +318,20 @@ import { cos } from './index.ts';
 
           if (fabric.util.hypot(miterVector.x, miterVector.y) / s <= strokeMiterLimit) {
             coords.push(A.add(miterVector));
-            coords.push(A.subtract(miterVector));
             return;
           }
         }
-        if (options.strokeLineJoin === 'round' && alpha <= PiBy2) {
+        if (options.strokeLineJoin === 'round') {
 
-          var radiusOnAxisX = new fabric.Point(s * strokeUniformScalar.x, 0),
-              radiusOnAxisY = new fabric.Point(0, s * strokeUniformScalar.y);
+          var correctSide = Math.abs(Math.atan2(bisectorVector.y, bisectorVector.x)) >= PiBy2 ? 1 : -1,
+              radiusOnAxisX = new fabric.Point(s * strokeUniformScalar.x * correctSide, 0),
+              radiusOnAxisY = new fabric.Point(0, s * strokeUniformScalar.y * correctSide);
 
           coords.push(A.add(radiusOnAxisX));
-          coords.push(A.subtract(radiusOnAxisX));
-
           coords.push(A.add(radiusOnAxisY));
-          coords.push(A.subtract(radiusOnAxisY));
         }
         else {
-          //  bevel, miter greater than stroke miter limit, round with a non-acute angle
+          //  bevel or miter greater than stroke miter limit
 
           var AB = fabric.util.createVector(
                 options.strokeUniform ? scaledA : A,
@@ -347,10 +344,10 @@ import { cos } from './index.ts';
 
           [AB, AC].forEach(function(vector) {
             var hatOrthogonal = fabric.util.getOrthogonalUnitVector(vector),
-                orthogonal = scaleHatVector(hatOrthogonal, s);
+                correctSide = Math.abs(fabric.util.calcAngleBetweenVectors(hatOrthogonal, bisectorVector)) >= PiBy2 ? 1 : -1,
+                orthogonal = scaleHatVector(hatOrthogonal, s * correctSide);
 
             coords.push(A.add(orthogonal));
-            coords.push(A.subtract(orthogonal));
           });
         }
       });
