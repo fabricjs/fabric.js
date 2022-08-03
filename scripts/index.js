@@ -435,8 +435,8 @@ program
     .option('-f, --fast', 'skip minifying')
     .option('-w, --watch')
     .option('-d, --dest [path]', 'specify the build destination path')
-    // .option('-x, --exclude [exclude...]')
-    // .option('-m, --modules [modules...]')
+    .option('-x, --exclude [exclude...]')
+    .option('-m, --modules [modules...]')
     .action((options) => {
         const { dest: destination, ...rest } = options || {};
         build({ ...rest, destination });
