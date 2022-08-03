@@ -233,9 +233,12 @@ import { cos } from './index.ts';
      * @param {number} options.scaleX
      * @param {number} options.scaleY
      * @param {boolean} [openPath] whether the shape is open or not, affects the calculations of the first and last points
+     * @param {boolean} [traceProjections] also returns the point and bisector that originated the projection
      * @returns {fabric.Point[]} array of size n (for miter stroke) or 2n (for bevel or round) of all suspected points
      */
-    projectStrokeOnPoints: function (points, options, openPath) {
+    projectStrokeOnPoints: function (points, options, openPath, traceProjections /** = false */) {
+      //  TODO remove next line after es6 migration and set `counterClockwise` arg to `true` by default
+      traceProjections = traceProjections === true;
 
       if (points.length <= 1) { return []; }
 
@@ -249,6 +252,12 @@ import { cos } from './index.ts';
       function scaleHatVector(hatVector, scalar) {
         return hatVector.multiply(strokeUniformScalar).scalarMultiply(scalar);
       }
+
+      function storeTraceProjections(projection, origin, bisector) {
+        projection.origin = origin;
+        projection.bisector = bisector;
+        return projection;
+      };
 
       points.forEach(function (p, index) {
         var A = new fabric.Point(p.x, p.y), B, C;
@@ -279,8 +288,12 @@ import { cos } from './index.ts';
               hatOrthogonalVector = fabric.util.getOrthogonalUnitVector(vector),
               orthogonalVector = scaleHatVector(hatOrthogonalVector, s);
 
-          coords.push(A.add(orthogonalVector));
-          coords.push(A.subtract(orthogonalVector));
+          var proj1 = A.add(orthogonalVector),
+              proj2 = A.subtract(orthogonalVector);
+
+          coords.push(traceProjections ? storeTraceProjections(proj1, A, bisector) : proj1);
+          coords.push(traceProjections ? storeTraceProjections(proj2, A, bisector) : proj2);
+
           return;
         }
 
@@ -317,7 +330,9 @@ import { cos } from './index.ts';
           }
 
           if (fabric.util.hypot(miterVector.x, miterVector.y) / s <= strokeMiterLimit) {
-            coords.push(A.add(miterVector));
+            var proj1 = A.add(miterVector);
+
+            coords.push(traceProjections ? storeTraceProjections(proj1, A, bisector) : proj1);
             return;
           }
         }
@@ -327,8 +342,11 @@ import { cos } from './index.ts';
               radiusOnAxisX = new fabric.Point(s * strokeUniformScalar.x * correctSide, 0),
               radiusOnAxisY = new fabric.Point(0, s * strokeUniformScalar.y * correctSide);
 
-          coords.push(A.add(radiusOnAxisX));
-          coords.push(A.add(radiusOnAxisY));
+          var proj1 = A.add(radiusOnAxisX),
+              proj2 = A.add(radiusOnAxisY);
+
+          coords.push(traceProjections ? storeTraceProjections(proj1, A, bisector) : proj1);
+          coords.push(traceProjections ? storeTraceProjections(proj2, A, bisector) : proj2);
         }
         else {
           //  bevel or miter greater than stroke miter limit
@@ -347,7 +365,9 @@ import { cos } from './index.ts';
                 correctSide = Math.abs(fabric.util.calcAngleBetweenVectors(hatOrthogonal, bisectorVector)) >= PiBy2 ? 1 : -1,
                 orthogonal = scaleHatVector(hatOrthogonal, s * correctSide);
 
-            coords.push(A.add(orthogonal));
+            var proj1 = A.add(orthogonal);
+
+            coords.push(traceProjections ? storeTraceProjections(proj1, A, bisector) : proj1);
           });
         }
       });
