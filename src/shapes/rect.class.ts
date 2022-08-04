@@ -146,19 +146,21 @@ Rect.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('x y rx ry width height'.
  * @param {Function} callback callback function invoked after parsing
  * @param {Object} [options] Options object
  */
-Rect.fromElement = function(element, callback, options) {
+Rect.fromElement = function(element, callback, options = {}) {
   if (!element) {
     return callback(null);
   }
-  options = options || { };
-
-  const parsedAttributes = fabric.parseAttributes(element, Rect.ATTRIBUTE_NAMES);
-  parsedAttributes.left = parsedAttributes.left || 0;
-  parsedAttributes.top  = parsedAttributes.top  || 0;
-  parsedAttributes.height  = parsedAttributes.height || 0;
-  parsedAttributes.width  = parsedAttributes.width || 0;
-  const rect = new Rect(Object.assign({}, options, parsedAttributes));
-  rect.visible = rect.visible && rect.width > 0 && rect.height > 0;
+  const {
+    left = 0,
+    top = 0,
+    width = 0,
+    height = 0,
+    visible,
+    ...RestOfparsedAttributes
+  } = fabric.parseAttributes(element, Rect.ATTRIBUTE_NAMES);
+  const rect = new Rect(Object.assign({}, options, RestOfparsedAttributes, {
+    left, top, width, height, visible: visible && width && height,
+  }));
   callback(rect);
 };
 /* _FROM_SVG_END_ */
