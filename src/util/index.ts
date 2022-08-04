@@ -1,5 +1,6 @@
 //@ts-nocheck
-export * from './cos';
+export * from './misc';
+export * from './internals';
 import { fabric } from '../../HEADER'
 import './animate'; // optional animation
 import './animate_color'; // optional animation
@@ -16,9 +17,7 @@ import './misc';
 import './path';
 
 const {
-    sin,
     getElementOffset,
-    removeFromArray,
     toFixed,
     transformPoint,
     invertTransform,
@@ -27,7 +26,6 @@ const {
     toDataURL,
     multiplyTransformMatrices,
     applyTransformToObject,
-    degreesToRadians,
     enlivenObjects,
     enlivenObjectEnlivables,
     cleanUpJsdomNode,
@@ -83,7 +81,6 @@ const {
     removeListener,
     isTouchEvent,
     sendPointToPlane,
-    radiansToDegrees,
     setStyle,
     calcRotateMatrix,
     makeBoundingBoxFromPoints,

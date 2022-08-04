@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { Point } from '../point.class';
 
-import { cos } from './cos';
+import { cos } from './misc/cos';
 (function(global) {
   var fabric = global.fabric, sqrt = Math.sqrt,
       atan2 = Math.atan2,
@@ -17,44 +17,6 @@ import { cos } from './cos';
    * @namespace fabric.util
    */
   fabric.util = {
-    /**
-     * Calculate the sin of an angle, avoiding returning floats for known results
-     * @static
-     * @memberOf fabric.util
-     * @param {Number} angle the angle in radians or in degree
-     * @return {Number}
-     */
-    sin: function(angle) {
-      if (angle === 0) { return 0; }
-      var angleSlice = angle / PiBy2, sign = 1;
-      if (angle < 0) {
-        // sin(-a) = -sin(a)
-        sign = -1;
-      }
-      switch (angleSlice) {
-        case 1: return sign;
-        case 2: return 0;
-        case 3: return -sign;
-      }
-      return Math.sin(angle);
-    },
-
-    /**
-     * Removes value from an array.
-     * Presence of value (and its position in an array) is determined via `Array.prototype.indexOf`
-     * @static
-     * @memberOf fabric.util
-     * @param {Array} array
-     * @param {*} value
-     * @return {Array} original array
-     */
-    removeFromArray: function(array, value) {
-      var idx = array.indexOf(value);
-      if (idx !== -1) {
-        array.splice(idx, 1);
-      }
-      return array;
-    },
 
     /**
      * Returns random number between 2 specified ones.
@@ -66,28 +28,6 @@ import { cos } from './cos';
      */
     getRandomInt: function(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
-    },
-
-    /**
-     * Transforms degrees to radians.
-     * @static
-     * @memberOf fabric.util
-     * @param {Number} degrees value in degrees
-     * @return {Number} value in radians
-     */
-    degreesToRadians: function(degrees) {
-      return degrees * PiBy180;
-    },
-
-    /**
-     * Transforms radians to degrees.
-     * @static
-     * @memberOf fabric.util
-     * @param {Number} radians value in radians
-     * @return {Number} value in degrees
-     */
-    radiansToDegrees: function(radians) {
-      return radians / PiBy180;
     },
 
     /**
@@ -426,16 +366,6 @@ import { cos } from './cos';
         default:
           return number;
       }
-    },
-
-    /**
-     * Function which always returns `false`.
-     * @static
-     * @memberOf fabric.util
-     * @return {Boolean}
-     */
-    falseFunction: function() {
-      return false;
     },
 
     /**
