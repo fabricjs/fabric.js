@@ -1,4 +1,5 @@
 //@ts-nocheck
+
 (function(global) {
   var fabric = global.fabric || (global.fabric = { });
   /**
