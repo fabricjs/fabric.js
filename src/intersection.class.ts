@@ -1,48 +1,42 @@
 //@ts-nocheck
-import { Point } from './point.class';
+import { Point } from "./point.class";
+import { fabric } from '../HEADER';
 
-(function(global) {
-  /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
-  var fabric = global.fabric || (global.fabric = { });
-  /**
-   * Intersection class
-   * @class fabric.Intersection
-   * @memberOf fabric
-   * @constructor
-   */
-  function Intersection(status) {
+/* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
+
+type IntersectionType = 'Intersection' | 'Coincident' | 'Parallel';
+
+export class Intersection {
+
+  points: Point[]
+
+  constructor(status?: IntersectionType) {
     this.status = status;
     this.points = [];
   }
 
-  fabric.Intersection = Intersection;
+  /**
+   * Appends a point to intersection
+   * @param {Point} point
+   * @return {Intersection} thisArg
+   * @chainable
+   */
+  appendPoint(point) {
+    this.points.push(point);
+    return this;
+  }
 
-  fabric.Intersection.prototype = /** @lends fabric.Intersection.prototype */ {
+  /**
+   * Appends points to intersection
+   * @param {Array} points
+   * @return {Intersection} thisArg
+   * @chainable
+   */
+  appendPoints(points) {
+    this.points = this.points.concat(points);
+    return this;
+  }
 
-    constructor: Intersection,
-
-    /**
-     * Appends a point to intersection
-     * @param {Point} point
-     * @return {fabric.Intersection} thisArg
-     * @chainable
-     */
-    appendPoint: function (point) {
-      this.points.push(point);
-      return this;
-    },
-
-    /**
-     * Appends points to intersection
-     * @param {Array} points
-     * @return {fabric.Intersection} thisArg
-     * @chainable
-     */
-    appendPoints: function (points) {
-      this.points = this.points.concat(points);
-      return this;
-    }
-  };
 
   /**
    * Checks if one line intersects another
@@ -52,16 +46,16 @@ import { Point } from './point.class';
    * @param {Point} a2
    * @param {Point} b1
    * @param {Point} b2
-   * @return {fabric.Intersection}
+   * @return {Intersection}
    */
-  fabric.Intersection.intersectLineLine = function (a1, a2, b1, b2) {
-    var result,
-        uaT = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x),
-        ubT = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x),
-        uB = (b2.y - b1.y) * (a2.x - a1.x) - (b2.x - b1.x) * (a2.y - a1.y);
+  static intersectLineLine(a1, a2, b1, b2) {
+    let result,
+      uaT = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x),
+      ubT = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x),
+      uB = (b2.y - b1.y) * (a2.x - a1.x) - (b2.x - b1.x) * (a2.y - a1.y);
     if (uB !== 0) {
-      var ua = uaT / uB,
-          ub = ubT / uB;
+      const ua = uaT / uB,
+        ub = ubT / uB;
       if (0 <= ua && ua <= 1 && 0 <= ub && ub <= 1) {
         result = new Intersection('Intersection');
         result.appendPoint(new Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y)));
@@ -79,7 +73,7 @@ import { Point } from './point.class';
       }
     }
     return result;
-  };
+  }
 
   /**
    * Checks if line intersects polygon
@@ -89,14 +83,14 @@ import { Point } from './point.class';
    * @param {Point} a1
    * @param {Point} a2
    * @param {Array} points
-   * @return {fabric.Intersection}
+   * @return {Intersection}
    */
-  fabric.Intersection.intersectLinePolygon = function(a1, a2, points) {
-    var result = new Intersection(),
-        length = points.length,
-        b1, b2, inter, i;
+  static intersectLinePolygon(a1, a2, points) {
+    const result = new Intersection(),
+      length = points.length;
+    let b1, b2, inter;
 
-    for (i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       b1 = points[i];
       b2 = points[(i + 1) % length];
       inter = Intersection.intersectLineLine(a1, a2, b1, b2);
@@ -107,23 +101,23 @@ import { Point } from './point.class';
       result.status = 'Intersection';
     }
     return result;
-  };
+  }
 
   /**
    * Checks if polygon intersects another polygon
    * @static
    * @param {Array} points1
    * @param {Array} points2
-   * @return {fabric.Intersection}
+   * @return {Intersection}
    */
-  fabric.Intersection.intersectPolygonPolygon = function (points1, points2) {
-    var result = new Intersection(),
-        length = points1.length, i;
+  static intersectPolygonPolygon(points1, points2) {
+    const result = new Intersection(),
+      length = points1.length;
 
-    for (i = 0; i < length; i++) {
-      var a1 = points1[i],
-          a2 = points1[(i + 1) % length],
-          inter = Intersection.intersectLinePolygon(a1, a2, points2);
+    for (let i = 0; i < length; i++) {
+      const a1 = points1[i],
+        a2 = points1[(i + 1) % length],
+        inter = Intersection.intersectLinePolygon(a1, a2, points2);
 
       result.appendPoints(inter.points);
     }
@@ -131,7 +125,7 @@ import { Point } from './point.class';
       result.status = 'Intersection';
     }
     return result;
-  };
+  }
 
   /**
    * Checks if polygon intersects rectangle
@@ -139,18 +133,18 @@ import { Point } from './point.class';
    * @param {Array} points
    * @param {Point} r1
    * @param {Point} r2
-   * @return {fabric.Intersection}
+   * @return {Intersection}
    */
-  fabric.Intersection.intersectPolygonRectangle = function (points, r1, r2) {
-    var min = r1.min(r2),
-        max = r1.max(r2),
-        topRight = new Point(max.x, min.y),
-        bottomLeft = new Point(min.x, max.y),
-        inter1 = Intersection.intersectLinePolygon(min, topRight, points),
-        inter2 = Intersection.intersectLinePolygon(topRight, max, points),
-        inter3 = Intersection.intersectLinePolygon(max, bottomLeft, points),
-        inter4 = Intersection.intersectLinePolygon(bottomLeft, min, points),
-        result = new Intersection();
+  static intersectPolygonRectangle(points, r1, r2) {
+    const min = r1.min(r2),
+      max = r1.max(r2),
+      topRight = new Point(max.x, min.y),
+      bottomLeft = new Point(min.x, max.y),
+      inter1 = Intersection.intersectLinePolygon(min, topRight, points),
+      inter2 = Intersection.intersectLinePolygon(topRight, max, points),
+      inter3 = Intersection.intersectLinePolygon(max, bottomLeft, points),
+      inter4 = Intersection.intersectLinePolygon(bottomLeft, min, points),
+      result = new Intersection();
 
     result.appendPoints(inter1.points);
     result.appendPoints(inter2.points);
@@ -161,6 +155,8 @@ import { Point } from './point.class';
       result.status = 'Intersection';
     }
     return result;
-  };
+  }
 
-})(typeof exports !== 'undefined' ? exports : window);
+}
+
+fabric.Intersection = Intersection;
