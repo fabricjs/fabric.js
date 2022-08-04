@@ -1,8 +1,8 @@
 //@ts-nocheck
 
 export function parseStyleObject(style, oStyle) {
-    var attr, value;
-    for (var prop in style) {
+    let attr, value;
+    for (const prop in style) {
         if (typeof style[prop] === 'undefined') {
             continue;
         }

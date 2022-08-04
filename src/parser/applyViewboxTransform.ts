@@ -1,6 +1,6 @@
 //@ts-nocheck
-import { svgNS } from '../constants';
-import { parseUnit } from '../util';
+import { svgNS } from './constants';
+import { parsePreserveAspectRatioAttribute, parseUnit } from '../util';
 import { svgViewBoxElementsRegEx, reViewBoxAttrValue } from './constants';
 
 /**
@@ -11,7 +11,7 @@ export function applyViewboxTransform(element) {
     if (!svgViewBoxElementsRegEx.test(element.nodeName)) {
         return {};
     }
-    var viewBoxAttr = element.getAttribute('viewBox'), scaleX = 1, scaleY = 1, minX = 0, minY = 0, viewBoxWidth, viewBoxHeight, matrix, el, widthAttr = element.getAttribute('width'), heightAttr = element.getAttribute('height'), x = element.getAttribute('x') || 0, y = element.getAttribute('y') || 0, preserveAspectRatio = element.getAttribute('preserveAspectRatio') || '', missingViewBox = (!viewBoxAttr || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))), missingDimAttr = (!widthAttr || !heightAttr || widthAttr === '100%' || heightAttr === '100%'), toBeParsed = missingViewBox && missingDimAttr, parsedDim = {}, translateMatrix = '', widthDiff = 0, heightDiff = 0;
+    let viewBoxAttr = element.getAttribute('viewBox'), scaleX = 1, scaleY = 1, minX = 0, minY = 0, viewBoxWidth, viewBoxHeight, matrix, el, widthAttr = element.getAttribute('width'), heightAttr = element.getAttribute('height'), x = element.getAttribute('x') || 0, y = element.getAttribute('y') || 0, preserveAspectRatio = element.getAttribute('preserveAspectRatio') || '', missingViewBox = (!viewBoxAttr || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue))), missingDimAttr = (!widthAttr || !heightAttr || widthAttr === '100%' || heightAttr === '100%'), toBeParsed = missingViewBox && missingDimAttr, parsedDim = {}, translateMatrix = '', widthDiff = 0, heightDiff = 0;
 
     parsedDim.width = 0;
     parsedDim.height = 0;
@@ -98,7 +98,7 @@ export function applyViewboxTransform(element) {
         (minX * scaleX + widthDiff) + ' ' +
         (minY * scaleY + heightDiff) + ') ';
     // seems unused.
-    // parsedDim.viewboxTransform = fabric.parseTransformAttribute(matrix);
+    // parsedDim.viewboxTransform = parseTransformAttribute(matrix);
     if (element.nodeName === 'svg') {
         el = element.ownerDocument.createElementNS(svgNS, 'g');
         // element.firstChild != null

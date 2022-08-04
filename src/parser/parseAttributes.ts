@@ -1,13 +1,13 @@
 //@ts-nocheck
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { parseUnit } from '../util';
-import { svgValidParentsRegEx, cPath, fSize } from './constants';
+import { cPath, fSize, svgValidParentsRegEx } from './constants';
+import { getGlobalStylesForElement } from "./getGlobalStylesForElement";
 import { normalizeAttr } from './normalizeAttr';
 import { normalizeValue } from './normalizeValue';
 import { parseFontDeclaration } from './parseFontDeclaration';
 import { parseStyleAttribute } from './parseStyleAttribute';
 import { setStrokeFillOpacity } from './setStrokeFillOpacity';
-import { getGlobalStylesForElement } from "./getGlobalStylesForElement";
 
 /**
  * Returns an object of attributes' name/value, given element and an array of attribute names;
@@ -16,14 +16,13 @@ import { getGlobalStylesForElement } from "./getGlobalStylesForElement";
  * @param {Array} attributes Array of attributes to parse
  * @return {Object} object containing parsed attributes' names/values
  */
-
 export function parseAttributes(element, attributes, svgUid) {
 
     if (!element) {
         return;
     }
 
-    var value, parentAttributes = {}, fontSize, parentFontSize;
+    let value, parentAttributes = {}, fontSize, parentFontSize;
 
     if (typeof svgUid === 'undefined') {
         svgUid = element.getAttribute('svgUid');
@@ -33,7 +32,7 @@ export function parseAttributes(element, attributes, svgUid) {
         parentAttributes = parseAttributes(element.parentNode, attributes, svgUid);
     }
 
-    var ownAttributes = attributes.reduce(function (memo, attr) {
+    let ownAttributes = attributes.reduce(function (memo, attr) {
         value = element.getAttribute(attr);
         if (value) { // eslint-disable-line
             memo[attr] = value;
@@ -42,7 +41,7 @@ export function parseAttributes(element, attributes, svgUid) {
     }, {});
     // add values parsed from style, which take precedence over attributes
     // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
-    var cssAttrs = Object.assign(
+    const cssAttrs = Object.assign(
         getGlobalStylesForElement(element, svgUid),
         parseStyleAttribute(element)
     );
@@ -59,8 +58,8 @@ export function parseAttributes(element, attributes, svgUid) {
         ownAttributes[fSize] = fontSize = parseUnit(ownAttributes[fSize], parentFontSize);
     }
 
-    var normalizedAttr, normalizedValue, normalizedStyle = {};
-    for (var attr in ownAttributes) {
+    let normalizedAttr, normalizedValue, normalizedStyle = {};
+    for (const attr in ownAttributes) {
         normalizedAttr = normalizeAttr(attr);
         normalizedValue = normalizeValue(normalizedAttr, ownAttributes[attr], parentAttributes, fontSize);
         normalizedStyle[normalizedAttr] = normalizedValue;
@@ -68,6 +67,6 @@ export function parseAttributes(element, attributes, svgUid) {
     if (normalizedStyle && normalizedStyle.font) {
         parseFontDeclaration(normalizedStyle.font, normalizedStyle);
     }
-    var mergedAttrs = Object.assign(parentAttributes, normalizedStyle);
+    const mergedAttrs = Object.assign(parentAttributes, normalizedStyle);
     return svgValidParentsRegEx.test(element.nodeName) ? mergedAttrs : setStrokeFillOpacity(mergedAttrs);
 }

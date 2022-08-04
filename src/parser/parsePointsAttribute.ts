@@ -1,5 +1,13 @@
 //@ts-nocheck
 
+
+/**
+ * Parses "points" attribute, returning an array of values
+ * @static
+ * @memberOf fabric
+ * @param {String} points points attribute string
+ * @return {Array} array of points
+ */
 export function parsePointsAttribute(points) {
 
     // points attribute is required and must not be empty
@@ -11,7 +19,7 @@ export function parsePointsAttribute(points) {
     points = points.replace(/,/g, ' ').trim();
 
     points = points.split(/\s+/);
-    var parsedPoints = [], i, len;
+    let parsedPoints = [], i, len;
 
     for (i = 0, len = points.length; i < len; i += 2) {
         parsedPoints.push({

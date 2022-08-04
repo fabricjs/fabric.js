@@ -2,14 +2,21 @@
 import { parseUnit } from '../util';
 import { reFontDeclaration } from './constants';
 
-
+/**
+ * Parses a short font declaration, building adding its properties to a style object
+ * @static
+ * @function
+ * @memberOf fabric
+ * @param {String} value font declaration
+ * @param {Object} oStyle definition
+ */
 export function parseFontDeclaration(value, oStyle) {
-    var match = value.match(reFontDeclaration);
+    const match = value.match(reFontDeclaration);
 
     if (!match) {
         return;
     }
-    var fontStyle = match[1],
+    const fontStyle = match[1],
         // font variant is not used
         // fontVariant = match[2],
         fontWeight = match[3], fontSize = match[4], lineHeight = match[5], fontFamily = match[6];

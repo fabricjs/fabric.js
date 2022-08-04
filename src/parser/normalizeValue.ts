@@ -4,7 +4,7 @@ import { parseTransformAttribute } from "./parseTransformAttribute";
 
 
 export function normalizeValue(attr, value, parentAttributes, fontSize) {
-    var isArray = Array.isArray(value), parsed;
+    let isArray = Array.isArray(value), parsed;
 
     if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
         value = '';
@@ -50,8 +50,8 @@ export function normalizeValue(attr, value, parentAttributes, fontSize) {
         parsed = parseUnit(value, fontSize) / fontSize * 1000;
     }
     else if (attr === 'paintFirst') {
-        var fillIndex = value.indexOf('fill');
-        var strokeIndex = value.indexOf('stroke');
+        const fillIndex = value.indexOf('fill');
+        const strokeIndex = value.indexOf('stroke');
         var value = 'fill';
         if (fillIndex > -1 && strokeIndex > -1 && strokeIndex < fillIndex) {
             value = 'stroke';

@@ -1,11 +1,18 @@
 //@ts-nocheck
-import { reNum } from '../constants';
 import { getSvgRegex } from "./getSvgRegex";
 
 
 export const cssRules = {};
 export const gradientDefs = {};
 export const clipPaths = {};
+
+export const reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:[eE][-+]?\\d+)?)';
+
+export const svgNS = 'http://www.w3.org/2000/svg';
+
+export const commaWsp = '(?:\\s+,?\\s*|,\\s*)';
+
+export const rePathCommand = /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:[eE][-+]?\d+)?)/ig;
 
 export const reFontDeclaration = new RegExp(
     '(normal|italic)?\\s*(normal|small-caps)?\\s*' +
@@ -49,13 +56,17 @@ export const svgValidTagNames = ['path', 'circle', 'polygon', 'polyline', 'ellip
         stroke: 'strokeOpacity',
         fill: 'fillOpacity'
     }, fSize = 'font-size', cPath = 'clip-path';
+
 export const svgValidTagNamesRegEx = getSvgRegex(svgValidTagNames);
+
 export const svgViewBoxElementsRegEx = getSvgRegex(svgViewBoxElements);
+
 export const svgInvalidAncestorsRegEx = getSvgRegex(svgInvalidAncestors);
+
 export const svgValidParentsRegEx = getSvgRegex(svgValidParents);
+
 // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
 // matches, e.g.: +14.56e-12, etc.
-
 export const reViewBoxAttrValue = new RegExp(
     '^' +
     '\\s*(' + reNum + '+)\\s*,?' +

@@ -2,7 +2,7 @@
 
 
 export function selectorMatches(element, selector) {
-    var nodeName = element.nodeName, classNames = element.getAttribute('class'), id = element.getAttribute('id'), matcher, i;
+    let nodeName = element.nodeName, classNames = element.getAttribute('class'), id = element.getAttribute('id'), matcher, i;
     // i check if a selector matches slicing away part from it.
     // if i get empty string i should match
     matcher = new RegExp('^' + nodeName, 'i');
