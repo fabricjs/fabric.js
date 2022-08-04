@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { Color } from "./color";
+
 (function(global) {
   /**
    * @name fabric
@@ -172,7 +175,7 @@
         continue;
       }
 
-      var color = new fabric.Color(attributes[attr]);
+      var color = new Color(attributes[attr]);
       attributes[attr] = color.setAlpha(toFixed(color.getAlpha() * attributes[colorAttributes[attr]], 2)).toRgba();
     }
     return attributes;

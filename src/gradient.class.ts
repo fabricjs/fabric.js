@@ -1,4 +1,8 @@
 //@ts-nocheck
+
+import { Color } from "./color";
+
+
 (function(global) {
   var fabric = global.fabric;
   /* _FROM_SVG_START_ */
@@ -39,7 +43,7 @@
       opacity = el.getAttribute('stop-opacity');
     }
 
-    color = new fabric.Color(color);
+    color = new Color(color);
     colorAlpha = color.getAlpha();
     opacity = isNaN(parseFloat(opacity)) ? 1 : parseFloat(opacity);
     opacity *= colorAlpha * multiplier;
@@ -180,7 +184,7 @@
      */
     addColorStop: function(colorStops) {
       for (var position in colorStops) {
-        var color = new fabric.Color(colorStops[position]);
+        var color = new Color(colorStops[position]);
         this.colorStops.push({
           offset: parseFloat(position),
           color: color.toRgb(),
@@ -340,7 +344,7 @@
             offset = this.colorStops[i].offset;
 
         if (typeof opacity !== 'undefined') {
-          color = new fabric.Color(color).setAlpha(opacity).toRgba();
+          color = new Color(color).setAlpha(opacity).toRgba();
         }
         gradient.addColorStop(offset, color);
       }
