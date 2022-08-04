@@ -8,7 +8,7 @@ import { fabric } from '../../HEADER';
    * @return {Rect} thisArg
    * @see {@link Rect#initialize} for constructor definition
    */
-  Rect = fabric.util.createClass(fabric.Object, /** @lends Rect.prototype */ {
+  const Rect = fabric.util.createClass(fabric.Object, /** @lends Rect.prototype */ {
 
     /**
      * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
