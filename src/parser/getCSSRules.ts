@@ -1,12 +1,11 @@
+//@ts-nocheck
+
+
 /**
  * Returns CSS rules for a given SVG document
- * @static
- * @function
- * @memberOf fabric
  * @param {SVGDocument} doc SVG document to parse
  * @return {Object} CSS rules of this document
  */
-
 export function getCSSRules(doc) {
   var styles = doc.getElementsByTagName('style'), i, len, allRules = {}, rules;
 
