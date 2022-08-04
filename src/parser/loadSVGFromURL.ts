@@ -1,5 +1,6 @@
 //@ts-nocheck
 
+import { request } from "../util";
 import { parseSVGDocument } from "./parseSVGDocument";
 
 /**
@@ -15,8 +16,7 @@ import { parseSVGDocument } from "./parseSVGDocument";
  */
 export function loadSVGFromURL(url, callback, reviver, options) {
 
-  url = url.replace(/^\n\s*/, '').trim();
-  new request(url, {
+  new request(url.replace(/^\n\s*/, '').trim(), {
     method: 'get',
     onComplete: onComplete,
     signal: options && options.signal
