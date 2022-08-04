@@ -713,7 +713,7 @@ import { Point } from '../point.class';
      * @returns {Point} dimensions
      */
     _getNonTransformedDimensions: function() {
-      return new Point(this.width, this.height).scalarAddEquals(this.strokeWidth);
+      return new Point(this.width, this.height).scalarAdd(this.strokeWidth);
     },
 
     /**
@@ -758,7 +758,7 @@ import { Point } from '../point.class';
         finalDimensions = new Point(bbox.x, bbox.y);
       }
 
-      return finalDimensions.scalarAddEquals(postScalingStrokeValue);
+      return finalDimensions.scalarAdd(postScalingStrokeValue);
     },
 
     /**

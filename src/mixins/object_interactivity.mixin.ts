@@ -157,15 +157,15 @@ import { Point } from '../point.class';
     drawBorders: function (ctx, options, styleOverride) {
       var size;
       if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
-        var bbox = fabric.util.sizeAfterTransform(this.width, this.height, options),
-            strokeFactor = this.strokeUniform ?
-              new Point(0, 0).scalarAddEquals(this.canvas.getZoom()) :
-              new Point(options.scaleX, options.scaleY),
-            stroke = strokeFactor.scalarMultiplyEquals(this.strokeWidth);
-        size = bbox.addEquals(stroke).scalarAddEquals(this.borderScaleFactor);
+        const bbox = fabric.util.sizeAfterTransform(this.width, this.height, options),
+          stroke = (this.strokeUniform ?
+            new Point().scalarAdd(this.canvas.getZoom()) :
+            new Point(options.scaleX, options.scaleY))
+            .scalarMultiply(this.strokeWidth);
+        size = bbox.add(stroke).scalarAdd(this.borderScaleFactor);
       }
       else {
-        size = this._calculateCurrentDimensions().scalarAddEquals(this.borderScaleFactor);
+        size = this._calculateCurrentDimensions().scalarAdd(this.borderScaleFactor);
       }
       this._drawBorders(ctx, size, styleOverride);
       return this;

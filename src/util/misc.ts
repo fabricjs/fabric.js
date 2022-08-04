@@ -102,7 +102,7 @@ import { cos } from './cos';
     rotatePoint: function(point, origin, radians) {
       var newPoint = new Point(point.x - origin.x, point.y - origin.y),
           v = fabric.util.rotateVector(newPoint, radians);
-      return v.addEquals(origin);
+      return v.add(origin);
     },
 
     /**
@@ -212,11 +212,11 @@ import { cos } from './cos';
         var A = new Point(p.x, p.y), B, C;
         if (index === 0) {
           C = points[index + 1];
-          B = openPath ? getStrokeHatVector(fabric.util.createVector(C, A)).addEquals(A) : points[points.length - 1];
+          B = openPath ? getStrokeHatVector(fabric.util.createVector(C, A)).add(A) : points[points.length - 1];
         }
         else if (index === points.length - 1) {
           B = points[index - 1];
-          C = openPath ? getStrokeHatVector(fabric.util.createVector(B, A)).addEquals(A) : points[0];
+          C = openPath ? getStrokeHatVector(fabric.util.createVector(B, A)).add(A) : points[0];
         }
         else {
           B = points[index - 1];

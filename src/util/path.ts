@@ -832,7 +832,7 @@ import { Point } from '../point.class';
     var d = [];
     for (var i = 0, rad, coord; i < numVertexes; i++) {
       rad = i * interiorAngle + rotationAdjustment;
-      coord = new Point(Math.cos(rad), Math.sin(rad)).scalarMultiplyEquals(radius);
+      coord = new Point(Math.cos(rad), Math.sin(rad)).scalarMultiply(radius);
       d.push([i === 0 ? 'M' : 'L', coord.x, coord.y]);
     }
     d.push(['Z']);
