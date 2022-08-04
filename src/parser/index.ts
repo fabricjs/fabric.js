@@ -1,11 +1,10 @@
 //@ts-nocheck
+import { fabric } from '../../HEADER';
 import { extend, toArray } from '../util';
 import { applyViewboxTransform } from "./applyViewboxTransform";
 import { clipPaths, cssRules, gradientDefs, svgInvalidAncestorsRegEx, svgValidParentsRegEx, svgValidTagNamesRegEx, svgViewBoxElementsRegEx } from "./constants";
-import { elementById } from "./elementById";
 import { getCSSRules } from './getCSSRules';
 import { getGradientDefs } from './getGradientDefs';
-import { getMultipleNodes } from "./getMultipleNodes";
 import { hasAncestorWithNodeName } from "./hasAncestorWithNodeName";
 import { loadSVGFromString } from './loadSVGFromString';
 import { loadSVGFromURL } from './loadSVGFromURL';
@@ -18,14 +17,6 @@ import { parseTransformAttribute } from "./parseTransformAttribute";
 import { parseUseDirectives } from "./parseUseDirectives";
 
 
-(function (global) {
-  /**
-   * @name fabric
-   * @namespace
-   */
-
-  var fabric = global.fabric || (global.fabric = {});
-
 
 
   fabric.svgValidTagNamesRegEx = svgValidTagNamesRegEx;
@@ -37,15 +28,6 @@ import { parseUseDirectives } from "./parseUseDirectives";
   fabric.gradientDefs = gradientDefs;
   fabric.clipPaths = clipPaths;
 
-
-  /**
-   * Parses "transform" attribute, returning an array of values
-   * @static
-   * @function
-   * @memberOf fabric
-   * @param {String} attributeValue String containing attribute value
-   * @return {Array} Array of 6 elements representing transformation matrix
-   */
   fabric.parseTransformAttribute = parseTransformAttribute;
 
 
@@ -121,28 +103,6 @@ import { parseUseDirectives } from "./parseUseDirectives";
     }, Object.assign({}, options), reviver, parsingOptions);
   };
 
-  function recursivelyParseGradientsXlink(doc, gradient) {
-    var gradientsAttrs = ['gradientTransform', 'x1', 'x2', 'y1', 'y2', 'gradientUnits', 'cx', 'cy', 'r', 'fx', 'fy'],
-      xlinkAttr = 'xlink:href',
-      xLink = gradient.getAttribute(xlinkAttr).slice(1),
-      referencedGradient = elementById(doc, xLink);
-    if (referencedGradient && referencedGradient.getAttribute(xlinkAttr)) {
-      recursivelyParseGradientsXlink(doc, referencedGradient);
-    }
-    gradientsAttrs.forEach(function (attr) {
-      if (referencedGradient && !gradient.hasAttribute(attr) && referencedGradient.hasAttribute(attr)) {
-        gradient.setAttribute(attr, referencedGradient.getAttribute(attr));
-      }
-    });
-    if (!gradient.children.length) {
-      var referenceClone = referencedGradient.cloneNode(true);
-      while (referenceClone.firstChild) {
-        gradient.appendChild(referenceClone.firstChild);
-      }
-    }
-    gradient.removeAttribute(xlinkAttr);
-  }
-
 
 
   extend(fabric, {
@@ -155,15 +115,6 @@ import { parseUseDirectives } from "./parseUseDirectives";
 
     parseAttributes,
 
-    /**
-     * Transforms an array of svg elements to corresponding fabric.* instances
-     * @static
-     * @memberOf fabric
-     * @param {Array} elements Array of elements to parse
-     * @param {Function} callback Being passed an array of fabric instances (transformed from SVG elements)
-     * @param {Object} [options] Options object
-     * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
-     */
     parseElements,
 
     parseStyleAttribute,
@@ -178,4 +129,3 @@ import { parseUseDirectives } from "./parseUseDirectives";
     loadSVGFromString
   });
 
-})(typeof exports !== 'undefined' ? exports : window);
