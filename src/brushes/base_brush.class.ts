@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { Color } from "../color";
+
 (function(global) {
   var fabric = global.fabric;
   /**
@@ -117,7 +120,7 @@
     },
 
     needsFullRender: function() {
-      var color = new fabric.Color(this.color);
+      var color = new Color(this.color);
       return color.getAlpha() < 1 || !!this.shadow;
     },
 

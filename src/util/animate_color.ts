@@ -1,4 +1,8 @@
 //@ts-nocheck
+
+import { Color } from "../color";
+
+
 (function(global) {
   var fabric = global.fabric;
   // Calculate an in-between color. Returns a "rgba()" string.
@@ -29,8 +33,8 @@
    * @returns {Function} abort function
    */
   function animateColor(fromColor, toColor, duration, options) {
-    var startColor = new fabric.Color(fromColor).getSource(),
-        endColor = new fabric.Color(toColor).getSource(),
+    var startColor = new Color(fromColor).getSource(),
+        endColor = new Color(toColor).getSource(),
         originalOnComplete = options.onComplete,
         originalOnChange = options.onChange;
     options = options || {};
