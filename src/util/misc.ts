@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { cos } from './index.ts';
+import { cos } from './cos';
 (function(global) {
   var fabric = global.fabric, sqrt = Math.sqrt,
       atan2 = Math.atan2,
