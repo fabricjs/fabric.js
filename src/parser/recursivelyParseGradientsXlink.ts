@@ -1,8 +1,13 @@
+//@ts-nocheck
+
 import { elementById } from "./elementById";
+
+const gradientsAttrs = ['gradientTransform', 'x1', 'x2', 'y1', 'y2', 'gradientUnits', 'cx', 'cy', 'r', 'fx', 'fy'];
+const xlinkAttr = 'xlink:href';
 
 
 export function recursivelyParseGradientsXlink(doc, gradient) {
-  var gradientsAttrs = ['gradientTransform', 'x1', 'x2', 'y1', 'y2', 'gradientUnits', 'cx', 'cy', 'r', 'fx', 'fy'], xlinkAttr = 'xlink:href', xLink = gradient.getAttribute(xlinkAttr).slice(1), referencedGradient = elementById(doc, xLink);
+  const xLink = gradient.getAttribute(xlinkAttr).slice(1), referencedGradient = elementById(doc, xLink);
   if (referencedGradient && referencedGradient.getAttribute(xlinkAttr)) {
     recursivelyParseGradientsXlink(doc, referencedGradient);
   }
@@ -12,7 +17,7 @@ export function recursivelyParseGradientsXlink(doc, gradient) {
     }
   });
   if (!gradient.children.length) {
-    var referenceClone = referencedGradient.cloneNode(true);
+    const referenceClone = referencedGradient.cloneNode(true);
     while (referenceClone.firstChild) {
       gradient.appendChild(referenceClone.firstChild);
     }
