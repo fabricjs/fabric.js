@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from '../point.class';
+
 (function(global) {
   var fabric = global.fabric;
   fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
@@ -433,9 +435,9 @@
      */
     setDragImage: function (e, data) {
       var t = this.calcTransformMatrix();
-      var flipFactor = new fabric.Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
+      var flipFactor = new Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
       var boundaries = this._getCursorBoundaries(data.selectionStart);
-      var selectionPosition = new fabric.Point(
+      var selectionPosition = new Point(
         boundaries.left + boundaries.leftOffset,
         boundaries.top + boundaries.topOffset
       ).multiply(flipFactor);
@@ -445,7 +447,7 @@
       var enableRetinaScaling = this.canvas._isRetinaScaling();
       var retinaScaling = this.canvas.getRetinaScaling();
       var bbox = this.getBoundingRect(true);
-      var correction = pos.subtract(new fabric.Point(bbox.left, bbox.top));
+      var correction = pos.subtract(new Point(bbox.left, bbox.top));
       var offset = correction.add(diff).scalarMultiply(retinaScaling);
       //  prepare instance for drag image snapshot by making all non selected text invisible
       var bgc = this.backgroundColor;

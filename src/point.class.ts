@@ -1,3 +1,4 @@
+import { fabric } from '../HEADER';
 
 interface IPoint {
   x: number
@@ -68,10 +69,10 @@ export class Point {
 
   /**
    * Subtracts another point from this point and returns a new one
-   * @param {IPoint} that
+   * @param {Point} that
    * @return {Point} new Point object with subtracted values
    */
-  subtract(that: IPoint): Point {
+  subtract(that: Point): Point {
     return new Point(this.x - that.x, this.y - that.y);
   }
 
@@ -344,3 +345,4 @@ export class Point {
   }
 }
 
+fabric.Point = Point;
