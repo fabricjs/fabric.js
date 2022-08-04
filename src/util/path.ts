@@ -1,4 +1,8 @@
 //@ts-nocheck
+
+import { commaWsp, rePathCommand } from "../parser/constants";
+
+
 (function(global) {
   var fabric = global.fabric,
       _join = Array.prototype.join,
@@ -680,10 +684,10 @@
         coords = [],
         currentPath,
         parsed,
-        re = fabric.rePathCommand,
+        re = rePathCommand,
         rNumber = '[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?\\s*',
-        rNumberCommaWsp = '(' + rNumber + ')' + fabric.commaWsp,
-        rFlagCommaWsp = '([01])' + fabric.commaWsp + '?',
+        rNumberCommaWsp = '(' + rNumber + ')' + commaWsp,
+        rFlagCommaWsp = '([01])' + commaWsp + '?',
         rArcSeq = rNumberCommaWsp + '?' + rNumberCommaWsp + '?' + rNumberCommaWsp + rFlagCommaWsp + rFlagCommaWsp +
           rNumberCommaWsp + '?(' + rNumber + ')',
         regArcArgumentSequence = new RegExp(rArcSeq, 'g'),
