@@ -32,6 +32,14 @@ let number = reNum, skewX = '(?:(skewX)\\s*\\(\\s*(' + number + ')\\s*\\))', ske
     // == end transform regexp
     reTransform = new RegExp(transform, 'g');
 
+/**
+ * Parses "transform" attribute, returning an array of values
+ * @static
+ * @function
+ * @memberOf fabric
+ * @param {String} attributeValue String containing attribute value
+ * @return {Array} Array of 6 elements representing transformation matrix
+ */
 export function parseTransformAttribute(attributeValue) {
 
     // start with identity matrix
