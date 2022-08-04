@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { fabric } from '../../HEADER';
-import { clipPaths, cssRules, gradientDefs, svgInvalidAncestorsRegEx, svgValidParentsRegEx, svgValidTagNamesRegEx, svgViewBoxElementsRegEx } from "./constants";
+import { clipPaths, cssRules, gradientDefs } from "./constants";
 import { getCSSRules } from './getCSSRules';
 import { getGradientDefs } from './getGradientDefs';
 import { loadSVGFromString } from './loadSVGFromString';
