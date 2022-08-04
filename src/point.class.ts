@@ -44,6 +44,7 @@ export class Point {
    * @param {Point} that
    * @return {Point} thisArg
    * @chainable
+   * @deprecated
    */
   addEquals(that: Point): Point {
     this.x += that.x;
@@ -65,6 +66,7 @@ export class Point {
    * @param {Number} scalar
    * @return {Point} thisArg
    * @chainable
+   * @deprecated
    */
   scalarAddEquals(scalar: number): Point {
     this.x += scalar;
@@ -86,6 +88,7 @@ export class Point {
    * @param {Point} that
    * @return {Point} thisArg
    * @chainable
+   * @deprecated
    */
   subtractEquals(that: Point): Point {
     this.x -= that.x;
@@ -107,6 +110,7 @@ export class Point {
    * @param {Number} scalar
    * @return {Point} thisArg
    * @chainable
+   * @deprecated
    */
   scalarSubtractEquals(scalar: number): Point {
     this.x -= scalar;
@@ -137,6 +141,7 @@ export class Point {
    * @param {Number} scalar
    * @return {Point} thisArg
    * @chainable
+   * @deprecated
    */
   scalarMultiplyEquals(scalar: number): Point {
     this.x *= scalar;
@@ -167,6 +172,7 @@ export class Point {
    * @param {Number} scalar
    * @return {Point} thisArg
    * @chainable
+   * @deprecated
    */
   scalarDivideEquals(scalar: number): Point {
     this.x /= scalar;
