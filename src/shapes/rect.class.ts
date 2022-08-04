@@ -77,7 +77,7 @@ const Rect = fabric.util.createClass(fabric.Object, /** @lends Rect.prototype */
     const x = -w / 2;
     const y = -h / 2;
     rx = rx ? Math.min(rx, w / 2) : 0;
-    ry = this.ry ? Math.min(ry, h / 2) : 0;
+    ry = ry ? Math.min(ry, h / 2) : 0;
     const isRounded = rx !== 0 || ry !== 0;
 
     ctx.beginPath();
@@ -156,11 +156,14 @@ Rect.fromElement = function(element, callback, options = {}) {
     width = 0,
     height = 0,
     visible = true,
-    ...RestOfparsedAttributes
+    ...restOfparsedAttributes
   } = fabric.parseAttributes(element, Rect.ATTRIBUTE_NAMES);
-  const rect = new Rect(Object.assign({}, options, RestOfparsedAttributes, {
+
+  const rect = new Rect({
+    ...options,
+    ...restOfparsedAttributes,
     left, top, width, height, visible: Boolean(visible && width && height),
-  }));
+  });
   callback(rect);
 };
 /* _FROM_SVG_END_ */
