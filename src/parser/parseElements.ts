@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { fabric } from '../../HEADER';
+import { fabric } from '../HEADER';
 
 /**
  * Transforms an array of svg elements to corresponding fabric.* instances

@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { fabric } from '../../HEADER';
+import { fabric } from '../HEADER';
 import { clipPaths, cssRules, gradientDefs } from "./constants";
 import { getCSSRules } from './getCSSRules';
 import { getGradientDefs } from './getGradientDefs';

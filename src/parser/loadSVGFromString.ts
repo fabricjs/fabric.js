@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { fabric } from "../../HEADER";
+import { fabric } from "../HEADER";
 import { parseSVGDocument } from "./parseSVGDocument";
 
 /**

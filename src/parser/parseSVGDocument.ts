@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { fabric } from '../../HEADER';
+import { fabric } from '../HEADER';
 import { toArray } from '../util';
 import { applyViewboxTransform } from "./applyViewboxTransform";
 import { clipPaths, cssRules, gradientDefs, svgInvalidAncestorsRegEx, svgValidTagNamesRegEx } from "./constants";
