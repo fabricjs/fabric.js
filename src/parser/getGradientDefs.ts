@@ -1,21 +1,22 @@
+//@ts-nocheck
+
 import { getMultipleNodes } from "./getMultipleNodes";
 import { recursivelyParseGradientsXlink } from './recursivelyParseGradientsXlink';
 
+const tagArray = [
+  'linearGradient',
+  'radialGradient',
+  'svg:linearGradient',
+  'svg:radialGradient'
+];
+
 /**
  * Parses an SVG document, returning all of the gradient declarations found in it
- * @static
- * @function
- * @memberOf fabric
  * @param {SVGDocument} doc SVG document to parse
  * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition element
  */
-function getGradientDefs(doc) {
-  var tagArray = [
-    'linearGradient',
-    'radialGradient',
-    'svg:linearGradient',
-    'svg:radialGradient'
-  ], elList = getMultipleNodes(doc, tagArray), el, j = 0, gradientDefs = {};
+export function getGradientDefs(doc) {
+  var elList = getMultipleNodes(doc, tagArray), el, j = 0, gradientDefs = {};
   j = elList.length;
   while (j--) {
     el = elList[j];
