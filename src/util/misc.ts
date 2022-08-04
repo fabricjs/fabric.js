@@ -1,5 +1,7 @@
 //@ts-nocheck
+import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { cos } from './cos';
+
 (function(global) {
   var fabric = global.fabric, sqrt = Math.sqrt,
       atan2 = Math.atan2,
@@ -400,7 +402,7 @@ import { cos } from './cos';
       var unit = /\D{0,2}$/.exec(value),
           number = parseFloat(value);
       if (!fontSize) {
-        fontSize = fabric.Text.DEFAULT_SVG_FONT_SIZE;
+        fontSize = DEFAULT_SVG_FONT_SIZE;
       }
       switch (unit[0]) {
         case 'mm':

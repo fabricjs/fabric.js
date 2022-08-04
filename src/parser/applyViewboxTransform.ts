@@ -1,6 +1,6 @@
 //@ts-nocheck
-import { svgNS } from '../constants';
-import { parseUnit } from '../util';
+import { svgNS } from './constants';
+import { parsePreserveAspectRatioAttribute, parseUnit } from '../util';
 import { svgViewBoxElementsRegEx, reViewBoxAttrValue } from './constants';
 
 /**

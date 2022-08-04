@@ -1,11 +1,16 @@
 //@ts-nocheck
-import { reNum } from '../constants';
 import { getSvgRegex } from "./getSvgRegex";
 
 
 export const cssRules = {};
 export const gradientDefs = {};
 export const clipPaths = {};
+
+export const reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:[eE][-+]?\\d+)?)';
+
+export const svgNS = 'http://www.w3.org/2000/svg';
+
+export const commaWsp = '(?:\\s+,?\\s*|,\\s*)';
 
 export const reFontDeclaration = new RegExp(
     '(normal|italic)?\\s*(normal|small-caps)?\\s*' +

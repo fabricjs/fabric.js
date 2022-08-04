@@ -1,17 +1,16 @@
 //@ts-nocheck
-import { incrementUID } from '../constants';
 import { extend, toArray } from '../util';
-import { hasAncestorWithNodeName } from "./hasAncestorWithNodeName";
 import { applyViewboxTransform } from "./applyViewboxTransform";
-import { parseUseDirectives } from "./parseUseDirectives";
-import { elementById } from "./elementById";
-import { parseAttributes } from "./parseAttributes";
-import { parseTransformAttribute } from "./parseTransformAttribute";
-import { parsePointsAttribute } from "./parsePointsAttribute";
-import { getMultipleNodes } from "./getMultipleNodes";
-import { parseFontDeclaration } from "./parseFontDeclaration";
-import { parseStyleAttribute } from "./parseStyleAttribute";
 import { clipPaths, cssRules, gradientDefs, svgInvalidAncestorsRegEx, svgValidParentsRegEx, svgValidTagNamesRegEx, svgViewBoxElementsRegEx } from "./constants";
+import { elementById } from "./elementById";
+import { getMultipleNodes } from "./getMultipleNodes";
+import { hasAncestorWithNodeName } from "./hasAncestorWithNodeName";
+import { parseAttributes } from "./parseAttributes";
+import { parseFontDeclaration } from "./parseFontDeclaration";
+import { parsePointsAttribute } from "./parsePointsAttribute";
+import { parseStyleAttribute } from "./parseStyleAttribute";
+import { parseTransformAttribute } from "./parseTransformAttribute";
+import { parseUseDirectives } from "./parseUseDirectives";
 
 
 (function (global) {
@@ -67,7 +66,7 @@ import { clipPaths, cssRules, gradientDefs, svgInvalidAncestorsRegEx, svgValidPa
     }
     parseUseDirectives(doc);
 
-    var svgUid = incrementUID(), i, len,
+    var svgUid = fabric.Object.__uid++, i, len,
       options = applyViewboxTransform(doc),
       descendants = toArray(doc.getElementsByTagName('*'));
     options.crossOrigin = parsingOptions && parsingOptions.crossOrigin;

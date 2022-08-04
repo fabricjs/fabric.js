@@ -1,6 +1,6 @@
 //@ts-nocheck
+import { fabric } from '../../HEADER';
 import { Color } from '../color';
-import { FabricObject } from '../shapes/object.class';
 import { toFixed } from '../util';
 import { colorAttributes } from './constants';
 
@@ -17,10 +17,10 @@ export function setStrokeFillOpacity(attributes) {
         }
 
         if (typeof attributes[attr] === 'undefined') {
-            if (!FabricObject.prototype[attr]) {
+            if (!fabric.Object.prototype[attr]) {
                 continue;
             }
-            attributes[attr] = FabricObject.prototype[attr];
+            attributes[attr] = fabric.Object.prototype[attr];
         }
 
         if (attributes[attr].indexOf('url(') === 0) {

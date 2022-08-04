@@ -1,13 +1,13 @@
 //@ts-nocheck
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { parseUnit } from '../util';
-import { svgValidParentsRegEx, cPath, fSize } from './constants';
+import { cPath, fSize, svgValidParentsRegEx } from './constants';
+import { getGlobalStylesForElement } from "./getGlobalStylesForElement";
 import { normalizeAttr } from './normalizeAttr';
 import { normalizeValue } from './normalizeValue';
 import { parseFontDeclaration } from './parseFontDeclaration';
 import { parseStyleAttribute } from './parseStyleAttribute';
 import { setStrokeFillOpacity } from './setStrokeFillOpacity';
-import { getGlobalStylesForElement } from "./getGlobalStylesForElement";
 
 /**
  * Returns an object of attributes' name/value, given element and an array of attribute names;

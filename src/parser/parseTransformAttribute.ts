@@ -1,5 +1,6 @@
 //@ts-nocheck
-import { commaWsp, iMatrix, reNum } from '../constants';
+import {  iMatrix } from '../constants';
+import { commaWsp,reNum } from './constants';
 import { degreesToRadians, multiplyTransformMatrices } from '../util';
 import { rotateMatrix } from './rotateMatrix';
 import { scaleMatrix } from './scaleMatrix';

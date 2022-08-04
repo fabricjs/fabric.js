@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { svgNS } from '../constants';
+import { svgNS } from './constants';
 import { elementById } from './elementById';
 import { getMultipleNodes } from './getMultipleNodes';
 import { applyViewboxTransform } from "./applyViewboxTransform";
