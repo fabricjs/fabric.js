@@ -72,7 +72,7 @@ import { fabric } from '../../HEADER';
       // 1x1 case (used in spray brush) optimization was removed because
       // with caching and higher zoom level this makes more damage than help
 
-      var rx = this.rx ? Math.min(this.rx, this.width / 2) : 0,
+      const rx = this.rx ? Math.min(this.rx, this.width / 2) : 0,
           ry = this.ry ? Math.min(this.ry, this.height / 2) : 0,
           w = this.width,
           h = this.height,
@@ -118,7 +118,7 @@ import { fabric } from '../../HEADER';
      * of the instance
      */
     _toSVG: function() {
-      var x = -this.width / 2, y = -this.height / 2;
+      const x = -this.width / 2, y = -this.height / 2;
       return [
         '<rect ', 'COMMON_PARTS',
         'x="', x, '" y="', y,
@@ -153,12 +153,12 @@ import { fabric } from '../../HEADER';
     }
     options = options || { };
 
-    var parsedAttributes = fabric.parseAttributes(element, Rect.ATTRIBUTE_NAMES);
+    const parsedAttributes = fabric.parseAttributes(element, Rect.ATTRIBUTE_NAMES);
     parsedAttributes.left = parsedAttributes.left || 0;
     parsedAttributes.top  = parsedAttributes.top  || 0;
     parsedAttributes.height  = parsedAttributes.height || 0;
     parsedAttributes.width  = parsedAttributes.width || 0;
-    var rect = new Rect(Object.assign({}, options, parsedAttributes));
+    const rect = new Rect(Object.assign({}, options, parsedAttributes));
     rect.visible = rect.visible && rect.width > 0 && rect.height > 0;
     callback(rect);
   };
