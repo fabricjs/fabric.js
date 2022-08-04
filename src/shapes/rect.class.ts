@@ -172,9 +172,7 @@ Rect.fromElement = function(element, callback, options = {}) {
  * @param {Object} object Object to create an instance from
  * @returns {Promise<Rect>}
  */
-Rect.fromObject = function(object) {
-  return fabric.Object._fromObject(Rect, object);
-};
+Rect.fromObject = (object) =>  fabric.Object._fromObject(Rect, object);
 
 fabric.Rect = Rect;
 export {
