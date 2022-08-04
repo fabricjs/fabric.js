@@ -7,11 +7,11 @@
  * @return {Object} CSS rules of this document
  */
 export function getCSSRules(doc) {
-  var styles = doc.getElementsByTagName('style'), i, len, allRules = {}, rules;
+  let styles = doc.getElementsByTagName('style'), i, len, allRules = {}, rules;
 
   // very crude parsing of style contents
   for (i = 0, len = styles.length; i < len; i++) {
-    var styleContents = styles[i].textContent;
+    let styleContents = styles[i].textContent;
 
     // remove comments
     styleContents = styleContents.replace(/\/\*[\s\S]*?\*\//g, '');
@@ -27,10 +27,10 @@ export function getCSSRules(doc) {
     // eslint-disable-next-line no-loop-func
     rules.forEach(function (rule) {
 
-      var match = rule.split('{'), ruleObj = {}, declaration = match[1].trim(), propertyValuePairs = declaration.split(';').filter(function (pair) { return pair.trim(); });
+      const match = rule.split('{'), ruleObj = {}, declaration = match[1].trim(), propertyValuePairs = declaration.split(';').filter(function (pair) { return pair.trim(); });
 
       for (i = 0, len = propertyValuePairs.length; i < len; i++) {
-        var pair = propertyValuePairs[i].split(':'), property = pair[0].trim(), value = pair[1].trim();
+        const pair = propertyValuePairs[i].split(':'), property = pair[0].trim(), value = pair[1].trim();
         ruleObj[property] = value;
       }
       rule = match[0].trim();

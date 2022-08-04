@@ -24,7 +24,7 @@ export function loadSVGFromURL(url, callback, reviver, options) {
 
   function onComplete(r) {
 
-    var xml = r.responseXML;
+    const xml = r.responseXML;
     if (!xml || !xml.documentElement) {
       callback && callback(null);
       return false;

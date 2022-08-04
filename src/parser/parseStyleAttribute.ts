@@ -10,7 +10,7 @@ import { parseStyleString } from "./parseStyleString";
  * @return {Object} Objects with values parsed from style attribute of an element
  */
 export function parseStyleAttribute(element) {
-    var oStyle = {}, style = element.getAttribute('style');
+    const oStyle = {}, style = element.getAttribute('style');
 
     if (!style) {
         return oStyle;

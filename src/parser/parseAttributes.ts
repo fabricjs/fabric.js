@@ -22,7 +22,7 @@ export function parseAttributes(element, attributes, svgUid) {
         return;
     }
 
-    var value, parentAttributes = {}, fontSize, parentFontSize;
+    let value, parentAttributes = {}, fontSize, parentFontSize;
 
     if (typeof svgUid === 'undefined') {
         svgUid = element.getAttribute('svgUid');
@@ -32,7 +32,7 @@ export function parseAttributes(element, attributes, svgUid) {
         parentAttributes = parseAttributes(element.parentNode, attributes, svgUid);
     }
 
-    var ownAttributes = attributes.reduce(function (memo, attr) {
+    let ownAttributes = attributes.reduce(function (memo, attr) {
         value = element.getAttribute(attr);
         if (value) { // eslint-disable-line
             memo[attr] = value;
@@ -41,7 +41,7 @@ export function parseAttributes(element, attributes, svgUid) {
     }, {});
     // add values parsed from style, which take precedence over attributes
     // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
-    var cssAttrs = Object.assign(
+    const cssAttrs = Object.assign(
         getGlobalStylesForElement(element, svgUid),
         parseStyleAttribute(element)
     );
@@ -58,8 +58,8 @@ export function parseAttributes(element, attributes, svgUid) {
         ownAttributes[fSize] = fontSize = parseUnit(ownAttributes[fSize], parentFontSize);
     }
 
-    var normalizedAttr, normalizedValue, normalizedStyle = {};
-    for (var attr in ownAttributes) {
+    let normalizedAttr, normalizedValue, normalizedStyle = {};
+    for (const attr in ownAttributes) {
         normalizedAttr = normalizeAttr(attr);
         normalizedValue = normalizeValue(normalizedAttr, ownAttributes[attr], parentAttributes, fontSize);
         normalizedStyle[normalizedAttr] = normalizedValue;
@@ -67,6 +67,6 @@ export function parseAttributes(element, attributes, svgUid) {
     if (normalizedStyle && normalizedStyle.font) {
         parseFontDeclaration(normalizedStyle.font, normalizedStyle);
     }
-    var mergedAttrs = Object.assign(parentAttributes, normalizedStyle);
+    const mergedAttrs = Object.assign(parentAttributes, normalizedStyle);
     return svgValidParentsRegEx.test(element.nodeName) ? mergedAttrs : setStrokeFillOpacity(mergedAttrs);
 }

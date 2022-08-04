@@ -3,7 +3,7 @@ import { selectorMatches } from "./selectorMatches";
 
 
 export function doesSomeParentMatch(element, selectors) {
-    var selector, parentMatching = true;
+    let selector, parentMatching = true;
     while (element.parentNode && element.parentNode.nodeType === 1 && selectors.length) {
         if (parentMatching) {
             selector = selectors.pop();

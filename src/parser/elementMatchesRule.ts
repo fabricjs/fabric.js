@@ -8,7 +8,7 @@ import { doesSomeParentMatch } from "./doesSomeParentMatch";
  */
 
 export function elementMatchesRule(element, selectors) {
-    var firstMatching, parentMatching = true;
+    let firstMatching, parentMatching = true;
     //start from rightmost selector.
     firstMatching = selectorMatches(element, selectors.pop());
     if (firstMatching && selectors.length) {

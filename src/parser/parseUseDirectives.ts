@@ -7,9 +7,9 @@ import { applyViewboxTransform } from "./applyViewboxTransform";
 
 
 export function parseUseDirectives(doc) {
-    var nodelist = getMultipleNodes(doc, ['use', 'svg:use']), i = 0;
+    let nodelist = getMultipleNodes(doc, ['use', 'svg:use']), i = 0;
     while (nodelist.length && i < nodelist.length) {
-        var el = nodelist[i], xlinkAttribute = el.getAttribute('xlink:href') || el.getAttribute('href');
+        const el = nodelist[i], xlinkAttribute = el.getAttribute('xlink:href') || el.getAttribute('href');
 
         if (xlinkAttribute === null) {
             return;
@@ -19,7 +19,7 @@ export function parseUseDirectives(doc) {
 
         applyViewboxTransform(el2);
         if (/^svg$/i.test(el2.nodeName)) {
-            var el3 = el2.ownerDocument.createElementNS(namespace, 'g');
+            const el3 = el2.ownerDocument.createElementNS(namespace, 'g');
             for (j = 0, attrs = el2.attributes, len = attrs.length; j < len; j++) {
                 attr = attrs.item(j);
                 el3.setAttributeNS(namespace, attr.nodeName, attr.nodeValue);

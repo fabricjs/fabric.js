@@ -32,7 +32,7 @@ export function parseSVGDocument(doc, callback, reviver, parsingOptions) {
   }
   parseUseDirectives(doc);
 
-  var svgUid = fabric.Object.__uid++, i, len, options = applyViewboxTransform(doc), descendants = toArray(doc.getElementsByTagName('*'));
+  let svgUid = fabric.Object.__uid++, i, len, options = applyViewboxTransform(doc), descendants = toArray(doc.getElementsByTagName('*'));
   options.crossOrigin = parsingOptions && parsingOptions.crossOrigin;
   options.svgUid = svgUid;
   options.signal = parsingOptions && parsingOptions.signal;
@@ -41,14 +41,14 @@ export function parseSVGDocument(doc, callback, reviver, parsingOptions) {
     // we're likely in node, where "o3-xml" library fails to gEBTN("*")
     // https://github.com/ajaxorg/node-o3-xml/issues/21
     descendants = doc.selectNodes('//*[name(.)!="svg"]');
-    var arr = [];
+    const arr = [];
     for (i = 0, len = descendants.length; i < len; i++) {
       arr[i] = descendants[i];
     }
     descendants = arr;
   }
 
-  var elements = descendants.filter(function (el) {
+  const elements = descendants.filter(function (el) {
     applyViewboxTransform(el);
     return svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', '')) &&
       !hasAncestorWithNodeName(el, svgInvalidAncestorsRegEx); // http://www.w3.org/TR/SVG/struct.html#DefsElement
@@ -61,7 +61,7 @@ export function parseSVGDocument(doc, callback, reviver, parsingOptions) {
   descendants.filter(function (el) {
     return el.nodeName.replace('svg:', '') === 'clipPath';
   }).forEach(function (el) {
-    var id = el.getAttribute('id');
+    const id = el.getAttribute('id');
     localClipPaths[id] = toArray(el.getElementsByTagName('*')).filter(function (el) {
       return svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''));
     });

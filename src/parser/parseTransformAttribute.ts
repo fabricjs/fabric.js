@@ -8,7 +8,7 @@ import { skewMatrix } from './skewMatrix';
 import { translateMatrix } from './translateMatrix';
 
 // == begin transform regexp
-let number = reNum, skewX = '(?:(skewX)\\s*\\(\\s*(' + number + ')\\s*\\))', skewY = '(?:(skewY)\\s*\\(\\s*(' + number + ')\\s*\\))', rotate = '(?:(rotate)\\s*\\(\\s*(' + number + ')(?:' +
+const number = reNum, skewX = '(?:(skewX)\\s*\\(\\s*(' + number + ')\\s*\\))', skewY = '(?:(skewY)\\s*\\(\\s*(' + number + ')\\s*\\))', rotate = '(?:(rotate)\\s*\\(\\s*(' + number + ')(?:' +
     commaWsp + '(' + number + ')' +
     commaWsp + '(' + number + '))?\\s*\\))', scale = '(?:(scale)\\s*\\(\\s*(' + number + ')(?:' +
         commaWsp + '(' + number + '))?\\s*\\))', translate = '(?:(translate)\\s*\\(\\s*(' + number + ')(?:' +
@@ -43,7 +43,7 @@ let number = reNum, skewX = '(?:(skewX)\\s*\\(\\s*(' + number + ')\\s*\\))', ske
 export function parseTransformAttribute(attributeValue) {
 
     // start with identity matrix
-    var matrix = iMatrix.concat(), matrices = [];
+    let matrix = iMatrix.concat(), matrices = [];
 
     // return if no argument was given or
     // an argument does not match transform attribute regexp
@@ -53,7 +53,7 @@ export function parseTransformAttribute(attributeValue) {
 
     attributeValue.replace(reTransform, function (match) {
 
-        var m = new RegExp(transform).exec(match).filter(function (match) {
+        const m = new RegExp(transform).exec(match).filter(function (match) {
             // match !== '' && match != null
             return (!!match);
         }), operation = m[1], args = m.slice(2).map(parseFloat);
@@ -86,7 +86,7 @@ export function parseTransformAttribute(attributeValue) {
         matrix = iMatrix.concat();
     });
 
-    var combinedMatrix = matrices[0];
+    let combinedMatrix = matrices[0];
     while (matrices.length > 1) {
         matrices.shift();
         combinedMatrix = multiplyTransformMatrices(combinedMatrix, matrices[0]);

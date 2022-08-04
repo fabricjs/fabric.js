@@ -7,10 +7,10 @@ import { elementMatchesRule } from "./elementMatchesRule";
  */
 
 export function getGlobalStylesForElement(element, svgUid) {
-    var styles = {};
-    for (var rule in cssRules[svgUid]) {
+    const styles = {};
+    for (const rule in cssRules[svgUid]) {
         if (elementMatchesRule(element, rule.split(' '))) {
-            for (var property in cssRules[svgUid][rule]) {
+            for (const property in cssRules[svgUid][rule]) {
                 styles[property] = cssRules[svgUid][rule][property];
             }
         }

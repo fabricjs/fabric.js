@@ -10,7 +10,7 @@ import { colorAttributes } from './constants';
  */
 
 export function setStrokeFillOpacity(attributes) {
-    for (var attr in colorAttributes) {
+    for (const attr in colorAttributes) {
 
         if (typeof attributes[colorAttributes[attr]] === 'undefined' || attributes[attr] === '') {
             continue;
@@ -27,7 +27,7 @@ export function setStrokeFillOpacity(attributes) {
             continue;
         }
 
-        var color = new Color(attributes[attr]);
+        const color = new Color(attributes[attr]);
         attributes[attr] = color.setAlpha(toFixed(color.getAlpha() * attributes[colorAttributes[attr]], 2)).toRgba();
     }
     return attributes;

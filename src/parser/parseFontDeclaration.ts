@@ -11,12 +11,12 @@ import { reFontDeclaration } from './constants';
  * @param {Object} oStyle definition
  */
 export function parseFontDeclaration(value, oStyle) {
-    var match = value.match(reFontDeclaration);
+    const match = value.match(reFontDeclaration);
 
     if (!match) {
         return;
     }
-    var fontStyle = match[1],
+    const fontStyle = match[1],
         // font variant is not used
         // fontVariant = match[2],
         fontWeight = match[3], fontSize = match[4], lineHeight = match[5], fontFamily = match[6];
