@@ -41,47 +41,47 @@
     assert.equal(intersection.points.length, 2, 'now intersection contains 2 points');
   });
 
-  QUnit.test('intersectLineLine simple intersection', function(assert) {
+  QUnit.test('intersectSegmentSegment simple intersection', function(assert) {
     var p1 = new fabric.Point(0, 0), p2 = new fabric.Point(10,10),
         p3 = new fabric.Point(0, 10), p4 = new fabric.Point(10, 0),
-        intersection = fabric.Intersection.intersectLineLine(p1, p2, p3, p4);
-    assert.ok(typeof fabric.Intersection.intersectLineLine === 'function', 'has intersectLineLine function');
+        intersection = fabric.Intersection.intersectSegmentSegment(p1, p2, p3, p4);
+    assert.ok(typeof fabric.Intersection.intersectSegmentSegment === 'function', 'has intersectSegmentSegment function');
     assert.ok(intersection instanceof fabric.Intersection, 'returns a fabric.Intersection');
     assert.equal(intersection.status, 'Intersection', 'it return a intersection result');
     assert.deepEqual(intersection.points[0], new fabric.Point(5, 5), 'intersect in 5,5');
   });
 
-  QUnit.test('intersectLineLine parallel', function(assert) {
+  QUnit.test('intersectSegmentSegment parallel', function(assert) {
     var p1 = new fabric.Point(0, 0), p2 = new fabric.Point(0,10),
         p3 = new fabric.Point(10, 0), p4 = new fabric.Point(10, 10),
-        intersection = fabric.Intersection.intersectLineLine(p1, p2, p3, p4);
+        intersection = fabric.Intersection.intersectSegmentSegment(p1, p2, p3, p4);
     assert.ok(intersection instanceof fabric.Intersection, 'returns a fabric.Intersection');
     assert.equal(intersection.status, 'Parallel', 'it return a Parallel result');
     assert.deepEqual(intersection.points, [], 'no point of intersections');
   });
 
-  QUnit.test('intersectLineLine coincident', function(assert) {
+  QUnit.test('intersectSegmentSegment coincident', function(assert) {
     var p1 = new fabric.Point(0, 0), p2 = new fabric.Point(0, 10),
         p3 = new fabric.Point(0, 0), p4 = new fabric.Point(0, 10),
-        intersection = fabric.Intersection.intersectLineLine(p1, p2, p3, p4);
+        intersection = fabric.Intersection.intersectSegmentSegment(p1, p2, p3, p4);
     assert.ok(intersection instanceof fabric.Intersection, 'returns a fabric.Intersection');
     assert.equal(intersection.status, 'Coincident', 'it return a Coincident result');
     assert.deepEqual(intersection.points, [], 'no point of intersections');
   });
 
-  QUnit.test('intersectLineLine coincident but different', function(assert) {
+  QUnit.test('intersectSegmentSegment coincident but different', function(assert) {
     var p1 = new fabric.Point(0, 0), p2 = new fabric.Point(0, 10),
         p3 = new fabric.Point(0, 1), p4 = new fabric.Point(0, 9),
-        intersection = fabric.Intersection.intersectLineLine(p1, p2, p3, p4);
+        intersection = fabric.Intersection.intersectSegmentSegment(p1, p2, p3, p4);
     assert.ok(intersection instanceof fabric.Intersection, 'returns a fabric.Intersection');
     assert.equal(intersection.status, 'Coincident', 'it return a Coincident result');
     assert.deepEqual(intersection.points, [], 'no point of intersections');
   });
 
-  QUnit.test('intersectLineLine no intersect', function(assert) {
+  QUnit.test('intersectSegmentSegment no intersect', function(assert) {
     var p1 = new fabric.Point(0, 0), p2 = new fabric.Point(0,10),
         p3 = new fabric.Point(10, 0), p4 = new fabric.Point(1, 10),
-        intersection = fabric.Intersection.intersectLineLine(p1, p2, p3, p4);
+        intersection = fabric.Intersection.intersectSegmentSegment(p1, p2, p3, p4);
     assert.ok(intersection instanceof fabric.Intersection, 'returns a fabric.Intersection');
     assert.equal(intersection.status, undefined, 'it return a undefined status result');
     assert.deepEqual(intersection.points, [], 'no point of intersections');

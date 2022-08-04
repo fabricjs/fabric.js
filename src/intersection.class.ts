@@ -39,8 +39,9 @@ export class Intersection {
 
 
   /**
-   * Checks if one line intersects another
-   * TODO: rename in intersectSegmentSegment
+   * Checks if a segment intersects another\
+   * As opposed to an infinite line, a segment is limited to the points that define it
+   * meaning that this method checks intersection **ONLY** between the given points
    * @static
    * @param {Point} a1
    * @param {Point} a2
@@ -48,7 +49,7 @@ export class Intersection {
    * @param {Point} b2
    * @return {Intersection}
    */
-  static intersectLineLine(a1, a2, b1, b2) {
+  static intersectSegmentSegment(a1, a2, b1, b2) {
     let result,
       uaT = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x),
       ubT = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x),
@@ -93,7 +94,7 @@ export class Intersection {
     for (let i = 0; i < length; i++) {
       b1 = points[i];
       b2 = points[(i + 1) % length];
-      inter = Intersection.intersectLineLine(a1, a2, b1, b2);
+      inter = Intersection.intersectSegmentSegment(a1, a2, b1, b2);
 
       result.appendPoints(inter.points);
     }
