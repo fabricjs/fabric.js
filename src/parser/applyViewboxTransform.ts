@@ -98,7 +98,7 @@ export function applyViewboxTransform(element) {
         (minX * scaleX + widthDiff) + ' ' +
         (minY * scaleY + heightDiff) + ') ';
     // seems unused.
-    // parsedDim.viewboxTransform = fabric.parseTransformAttribute(matrix);
+    // parsedDim.viewboxTransform = parseTransformAttribute(matrix);
     if (element.nodeName === 'svg') {
         el = element.ownerDocument.createElementNS(svgNS, 'g');
         // element.firstChild != null
