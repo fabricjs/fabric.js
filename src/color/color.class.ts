@@ -30,7 +30,7 @@ export class Color {
    * @param {String|Array} color Color value to parse
    */
   _tryParsingColor(color) {
-    var source;
+    let source;
 
     if (color in ColorNameMap) {
       color = ColorNameMap[color];
@@ -69,7 +69,7 @@ export class Color {
   _rgbToHsl(r, g, b) {
     r /= 255; g /= 255; b /= 255;
 
-    var h, s, l,
+    let h, s, l,
       maxValue = max([r, g, b]),
       minValue = min([r, g, b]);
 
@@ -79,7 +79,7 @@ export class Color {
       h = s = 0; // achromatic
     }
     else {
-      var d = maxValue - minValue;
+      const d = maxValue - minValue;
       s = l > 0.5 ? d / (2 - maxValue - minValue) : d / (maxValue + minValue);
       switch (maxValue) {
         case r:
@@ -123,7 +123,7 @@ export class Color {
    * @return {String} ex: rgb(0-255,0-255,0-255)
    */
   toRgb() {
-    var source = this.getSource();
+    const source = this.getSource();
     return 'rgb(' + source[0] + ',' + source[1] + ',' + source[2] + ')';
   }
 
@@ -132,7 +132,7 @@ export class Color {
    * @return {String} ex: rgba(0-255,0-255,0-255,0-1)
    */
   toRgba() {
-    var source = this.getSource();
+    const source = this.getSource();
     return 'rgba(' + source[0] + ',' + source[1] + ',' + source[2] + ',' + source[3] + ')';
   }
 
@@ -141,7 +141,7 @@ export class Color {
    * @return {String} ex: hsl(0-360,0%-100%,0%-100%)
    */
   toHsl() {
-    var source = this.getSource(),
+    const source = this.getSource(),
       hsl = this._rgbToHsl(source[0], source[1], source[2]);
 
     return 'hsl(' + hsl[0] + ',' + hsl[1] + '%,' + hsl[2] + '%)';
@@ -152,7 +152,7 @@ export class Color {
    * @return {String} ex: hsla(0-360,0%-100%,0%-100%,0-1)
    */
   toHsla() {
-    var source = this.getSource(),
+    const source = this.getSource(),
       hsl = this._rgbToHsl(source[0], source[1], source[2]);
 
     return 'hsla(' + hsl[0] + ',' + hsl[1] + '%,' + hsl[2] + '%,' + source[3] + ')';
@@ -163,7 +163,7 @@ export class Color {
    * @return {String} ex: FF5555
    */
   toHex() {
-    var source = this.getSource(), r, g, b;
+    let source = this.getSource(), r, g, b;
 
     r = source[0].toString(16);
     r = (r.length === 1) ? ('0' + r) : r;
@@ -182,7 +182,7 @@ export class Color {
    * @return {String} ex: FF5555CC
    */
   toHexa() {
-    var source = this.getSource(), a;
+    let source = this.getSource(), a;
 
     a = Math.round(source[3] * 255);
     a = a.toString(16);
@@ -205,7 +205,7 @@ export class Color {
    * @return {Color} thisArg
    */
   setAlpha(alpha) {
-    var source = this.getSource();
+    const source = this.getSource();
     source[3] = alpha;
     this.setSource(source);
     return this;
@@ -216,7 +216,7 @@ export class Color {
    * @return {Color} thisArg
    */
   toGrayscale() {
-    var source = this.getSource(),
+    const source = this.getSource(),
       average = parseInt((source[0] * 0.3 + source[1] * 0.59 + source[2] * 0.11).toFixed(0), 10),
       currentAlpha = source[3];
     this.setSource([average, average, average, currentAlpha]);
@@ -229,7 +229,7 @@ export class Color {
    * @return {Color} thisArg
    */
   toBlackWhite(threshold) {
-    var source = this.getSource(),
+    let source = this.getSource(),
       average = (source[0] * 0.3 + source[1] * 0.59 + source[2] * 0.11).toFixed(0),
       currentAlpha = source[3];
 
@@ -250,7 +250,7 @@ export class Color {
       otherColor = new Color(otherColor);
     }
 
-    var result = [],
+    let result = [],
       alpha = this.getAlpha(),
       otherAlpha = 0.5,
       source = this.getSource(),
@@ -275,7 +275,7 @@ export class Color {
    */
   static fromRgb(color) {
     return Color.fromSource(Color.sourceFromRgb(color));
-  };
+  }
 
   /**
    * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in RGB or RGBA format
@@ -284,9 +284,9 @@ export class Color {
    * @return {Array} source
    */
   static sourceFromRgb(color) {
-    var match = color.match(reRGBa);
+    const match = color.match(reRGBa);
     if (match) {
-      var r = parseInt(match[1], 10) / (/%$/.test(match[1]) ? 100 : 1) * (/%$/.test(match[1]) ? 255 : 1),
+      const r = parseInt(match[1], 10) / (/%$/.test(match[1]) ? 100 : 1) * (/%$/.test(match[1]) ? 255 : 1),
         g = parseInt(match[2], 10) / (/%$/.test(match[2]) ? 100 : 1) * (/%$/.test(match[2]) ? 255 : 1),
         b = parseInt(match[3], 10) / (/%$/.test(match[3]) ? 100 : 1) * (/%$/.test(match[3]) ? 255 : 1);
 
@@ -297,7 +297,7 @@ export class Color {
         match[4] ? parseFloat(match[4]) : 1
       ];
     }
-  };
+  }
 
   /**
    * Returns new color object, when given a color in RGBA format
@@ -307,7 +307,7 @@ export class Color {
    * @param {String} color
    * @return {Color}
    */
-  static fromRgba = Color.fromRgb;
+  static fromRgba = Color.fromRgb
 
   /**
    * Returns new color object, when given a color in HSL format
@@ -317,7 +317,7 @@ export class Color {
    */
   static fromHsl(color) {
     return Color.fromSource(Color.sourceFromHsl(color));
-  };
+  }
 
   /**
    * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in HSL or HSLA format.
@@ -328,12 +328,12 @@ export class Color {
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
    */
   static sourceFromHsl(color) {
-    var match = color.match(reHSLa);
+    const match = color.match(reHSLa);
     if (!match) {
       return;
     }
 
-    var h = (((parseFloat(match[1]) % 360) + 360) % 360) / 360,
+    let h = (((parseFloat(match[1]) % 360) + 360) % 360) / 360,
       s = parseFloat(match[2]) / (/%$/.test(match[2]) ? 100 : 1),
       l = parseFloat(match[3]) / (/%$/.test(match[3]) ? 100 : 1),
       r, g, b;
@@ -342,7 +342,7 @@ export class Color {
       r = g = b = l;
     }
     else {
-      var q = l <= 0.5 ? l * (s + 1) : l + s - l * s,
+      const q = l <= 0.5 ? l * (s + 1) : l + s - l * s,
         p = l * 2 - q;
 
       r = hue2rgb(p, q, h + 1 / 3);
@@ -356,7 +356,7 @@ export class Color {
       Math.round(b * 255),
       match[4] ? parseFloat(match[4]) : 1
     ];
-  };
+  }
 
   /**
    * Returns new color object, when given a color in HSLA format
@@ -366,7 +366,7 @@ export class Color {
    * @param {String} color
    * @return {Color}
    */
-  static fromHsla = Color.fromHsl;
+  static fromHsla = Color.fromHsl
 
   /**
    * Returns new color object, when given a color in HEX format
@@ -377,7 +377,7 @@ export class Color {
    */
   static fromHex(color) {
     return Color.fromSource(Color.sourceFromHex(color));
-  };
+  }
 
   /**
    * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in HEX format
@@ -388,7 +388,7 @@ export class Color {
    */
   static sourceFromHex(color) {
     if (color.match(reHex)) {
-      var value = color.slice(color.indexOf('#') + 1),
+      const value = color.slice(color.indexOf('#') + 1),
         isShortNotation = (value.length === 3 || value.length === 4),
         isRGBa = (value.length === 8 || value.length === 4),
         r = isShortNotation ? (value.charAt(0) + value.charAt(0)) : value.substring(0, 2),
@@ -403,7 +403,7 @@ export class Color {
         parseFloat((parseInt(a, 16) / 255).toFixed(2))
       ];
     }
-  };
+  }
 
   /**
    * Returns new color object, when given color in array representation (ex: [200, 100, 100, 0.5])
@@ -413,13 +413,13 @@ export class Color {
    * @return {Color}
    */
   static fromSource(source) {
-    var oColor = new Color();
+    const oColor = new Color();
     oColor.setSource(source);
     return oColor;
-  };
+  }
 
 
-};
+}
 
 
 
