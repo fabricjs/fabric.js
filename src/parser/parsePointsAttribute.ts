@@ -1,5 +1,13 @@
 //@ts-nocheck
 
+
+/**
+ * Parses "points" attribute, returning an array of values
+ * @static
+ * @memberOf fabric
+ * @param {String} points points attribute string
+ * @return {Array} array of points
+ */
 export function parsePointsAttribute(points) {
 
     // points attribute is required and must not be empty
