@@ -73,11 +73,11 @@ const Rect = fabric.util.createClass(fabric.Object, /** @lends Rect.prototype */
     // 1x1 case (used in spray brush) optimization was removed because
     // with caching and higher zoom level this makes more damage than help
     let { rx, ry } = this;
-    const { width, height } = this;
-    const x = -width / 2;
-    const y = -height / 2;
-    rx = rx ? Math.min(rx, width / 2) : 0;
-    ry = this.ry ? Math.min(ry, height / 2) : 0;
+    const { width: w, height: h } = this;
+    const x = -w / 2;
+    const y = -h / 2;
+    rx = rx ? Math.min(rx, w / 2) : 0;
+    ry = this.ry ? Math.min(ry, h / 2) : 0;
     const isRounded = rx !== 0 || ry !== 0;
 
     ctx.beginPath();
