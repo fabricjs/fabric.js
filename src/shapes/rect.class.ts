@@ -1,6 +1,5 @@
 //@ts-nocheck
-(function(global) {
-  var fabric = global.fabric || (global.fabric = { });
+import { fabric } from '../../HEADER';
 
   /**
    * Rectangle class
@@ -176,4 +175,7 @@
     return fabric.Object._fromObject(fabric.Rect, object);
   };
 
-})(typeof exports !== 'undefined' ? exports : window);
+const Rect = fabric.Rect;
+export {
+  Rect,
+}
