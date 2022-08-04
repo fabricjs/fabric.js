@@ -1,7 +1,5 @@
 //@ts-nocheck
 
-import { max as arrayMax, min as arrayMin } from "../util/index";
-
 /**
  * Color class
  * The purpose of {@link Color} is to abstract and encapsulate common color operations;
@@ -70,8 +68,8 @@ Color.prototype = /** @lends Color.prototype */ {
     r /= 255; g /= 255; b /= 255;
 
     var h, s, l,
-      max = arrayMax([r, g, b]),
-      min = arrayMin([r, g, b]);
+      max = fabric.util.array.max([r, g, b]),
+      min = fabric.util.array.min([r, g, b]);
 
     l = (max + min) / 2;
 
