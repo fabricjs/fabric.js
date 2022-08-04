@@ -1,5 +1,7 @@
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
+import { iMatrix } from './src/constants';
+
 var fabric = fabric || { version: '5.1.0' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
@@ -74,7 +76,7 @@ fabric.SHARED_ATTRIBUTES = [
 fabric.DPI = 96;
 fabric.reNonWord = /[ \n\.,;!\?\-]/;
 fabric.fontPaths = { };
-fabric.iMatrix = [1, 0, 0, 1, 0, 0];
+fabric.iMatrix = iMatrix;
 
 
 /**
