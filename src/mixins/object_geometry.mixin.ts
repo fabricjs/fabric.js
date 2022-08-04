@@ -1,4 +1,5 @@
 //@ts-nocheck
+import { Intersection } from '../intersection.class';
 import { Point } from '../point.class';
 
 (function(global) {
@@ -235,7 +236,7 @@ import { Point } from '../point.class';
      * @return {Boolean} true if object intersects with another object
      */
     intersectsWithObject: function(other, absolute, calculate) {
-      var intersection = fabric.Intersection.intersectPolygonPolygon(
+      var intersection = Intersection.intersectPolygonPolygon(
         this.getCoords(absolute, calculate),
         other.getCoords(absolute, calculate)
       );
