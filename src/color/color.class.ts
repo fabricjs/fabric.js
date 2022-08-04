@@ -1,7 +1,5 @@
 //@ts-nocheck
 
-(function(global) {
-  var fabric = global.fabric || (global.fabric = { });
   /**
    * Color class
    * The purpose of {@link fabric.Color} is to abstract and encapsulate common color operations;
@@ -626,4 +624,5 @@
     return oColor;
   };
 
-})(typeof exports !== 'undefined' ? exports : window);
+
+export { Color };
