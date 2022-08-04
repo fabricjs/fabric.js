@@ -14,17 +14,24 @@ import { parseSVGDocument } from "./parseSVGDocument";
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  */
 export function loadSVGFromURL(url, callback, reviver, options) {
-  return fetch(url.replace(/^\n\s*/, '').trim(), {
+
+  url = url.replace(/^\n\s*/, '').trim();
+  new request(url, {
     method: 'get',
     onComplete: onComplete,
     signal: options && options.signal
-  }).then(({ responseXML: xml }) => {
+  });
+
+  function onComplete(r) {
+
+    const xml = r.responseXML;
     if (!xml || !xml.documentElement) {
       callback && callback(null);
       return false;
     }
-    return parseSVGDocument(xml.documentElement, (results, _options, elements, allElements) => {
-        callback && callback(results, _options, elements, allElements);
-      }, reviver, options);
-  });
+
+    parseSVGDocument(xml.documentElement, function (results, _options, elements, allElements) {
+      callback && callback(results, _options, elements, allElements);
+    }, reviver, options);
+  }
 }
