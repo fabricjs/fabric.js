@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from '../point.class';
+
 (function(global) {
   var fabric = global.fabric,
       _join = Array.prototype.join,
@@ -643,15 +645,15 @@
         return { x: segInfo.x, y: segInfo.y, angle: 0 };
       case 'Z':
       case 'z':
-        info = new fabric.Point(segInfo.x, segInfo.y).lerp(
-          new fabric.Point(segInfo.destX, segInfo.destY),
+        info = new Point(segInfo.x, segInfo.y).lerp(
+          new Point(segInfo.destX, segInfo.destY),
           segPercent
         );
         info.angle = Math.atan2(segInfo.destY - segInfo.y, segInfo.destX - segInfo.x);
         return info;
       case 'L':
-        info = new fabric.Point(segInfo.x, segInfo.y).lerp(
-          new fabric.Point(segment[1], segment[2]),
+        info = new Point(segInfo.x, segInfo.y).lerp(
+          new Point(segment[1], segment[2]),
           segPercent
         );
         info.angle = Math.atan2(segment[2] - segInfo.y, segment[1] - segInfo.x);
@@ -752,8 +754,8 @@
    */
   function getSmoothPathFromPoints(points, correction) {
     var path = [], i,
-        p1 = new fabric.Point(points[0].x, points[0].y),
-        p2 = new fabric.Point(points[1].x, points[1].y),
+        p1 = new Point(points[0].x, points[0].y),
+        p2 = new Point(points[1].x, points[1].y),
         len = points.length, multSignX = 1, multSignY = 0, manyPoints = len > 2;
     correction = correction || 0;
 
@@ -830,7 +832,7 @@
     var d = [];
     for (var i = 0, rad, coord; i < numVertexes; i++) {
       rad = i * interiorAngle + rotationAdjustment;
-      coord = new fabric.Point(Math.cos(rad), Math.sin(rad)).scalarMultiplyEquals(radius);
+      coord = new Point(Math.cos(rad), Math.sin(rad)).scalarMultiply(radius);
       d.push([i === 0 ? 'M' : 'L', coord.x, coord.y]);
     }
     d.push(['Z']);
