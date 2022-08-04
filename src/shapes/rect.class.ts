@@ -155,11 +155,11 @@ Rect.fromElement = function(element, callback, options = {}) {
     top = 0,
     width = 0,
     height = 0,
-    visible,
+    visible = true,
     ...RestOfparsedAttributes
   } = fabric.parseAttributes(element, Rect.ATTRIBUTE_NAMES);
   const rect = new Rect(Object.assign({}, options, RestOfparsedAttributes, {
-    left, top, width, height, visible: visible && width && height,
+    left, top, width, height, visible: Boolean(visible && width && height),
   }));
   callback(rect);
 };
