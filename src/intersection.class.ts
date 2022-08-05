@@ -31,7 +31,12 @@ export class Intersection {
     this.points = [];
   }
 
-  private contains(point) {
+  /**
+   * 
+   * @param {Point} point 
+   * @returns 
+   */
+  contains(point) {
     return this.points.some(p => p.eq(point));
   }
 
@@ -68,7 +73,8 @@ export class Intersection {
    * @param {Point} a2
    * @param {Point} b1
    * @param {Point} b2
-   * @param {boolean} [infinite=true] check segment intersection by passing `false`
+   * @param {boolean} [aIinfinite=true] check intersection by passing `false`
+   * @param {boolean} [bIinfinite=true] check intersection by passing `false`
    * @return {Intersection}
    */
   static intersectLineLine(a1, a2, b1, b2, aIinfinite = true, bIinfinite = true) {
