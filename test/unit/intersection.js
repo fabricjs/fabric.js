@@ -171,8 +171,8 @@
     assert.equal(intersection.points.length, 0, 'infinte points of intersections');
   });
 
-  QUnit.test.skip('intersectLinePolygon one point', function (assert) {
-    var p1 = new fabric.Point(0, 1), p2 = new fabric.Point(0, 0),
+  QUnit.test('intersectLinePolygon one point', function (assert) {
+    var p1 = new fabric.Point(1, 0), p2 = new fabric.Point(0, 0),
       p3 = new fabric.Point(5, 0), p4 = new fabric.Point(2, 10),
       p5 = new fabric.Point(8, 10), points = [p3, p4, p5],
       intersection = fabric.Intersection.intersectLinePolygon(p1, p2, points);

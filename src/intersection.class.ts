@@ -146,6 +146,9 @@ export class Intersection {
 
     if (result.points.length > 0) {
       result.status = 'Intersection';
+      result.points = result.points.reduce((all, curr) => {
+        return all.every(p => !p.eq(curr)) ? all.concat(curr) : all;
+      }, []);
     }
 
     return result;
