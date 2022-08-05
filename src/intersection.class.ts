@@ -12,7 +12,7 @@ type IntersectionType = 'Intersection' | 'Coincident' | 'Parallel';
  * @param T 
  * @param A 
  * @param B 
- * @returns 
+ * @returns true if `T` is contained
  */
 const isContainedInInterval = (T: Point, A: Point, B: Point) => {
   const TA = new Point(T).subtract(A);
@@ -38,7 +38,9 @@ export class Intersection {
    * @chainable
    */
   appendPoint(point) {
-    this.points.push(point);
+    if (this.points.every(p => !p.eq(point))) {
+      this.points.push(point);
+    }
     return this;
   }
 
@@ -49,7 +51,9 @@ export class Intersection {
    * @chainable
    */
   appendPoints(points) {
-    this.points = this.points.concat(points);
+    this.points = this.points.concat(points.filter(point => {
+      return this.points.every(p => !p.eq(point));
+    }));
     return this;
   }
 
@@ -146,9 +150,6 @@ export class Intersection {
 
     if (result.points.length > 0) {
       result.status = 'Intersection';
-      result.points = result.points.reduce((all, curr) => {
-        return all.every(p => !p.eq(curr)) ? all.concat(curr) : all;
-      }, []);
     }
 
     return result;
@@ -196,11 +197,6 @@ export class Intersection {
     }
     else if (result.points.length > 0) {
       result.status = 'Intersection';
-      if (coincidents.length > 0) {
-        result.points = result.points.reduce((all, curr) => {
-          return all.every(p => !p.eq(curr)) ? all.concat(curr) : all;
-        }, []);
-      }
     }
 
     return result;
