@@ -44,28 +44,13 @@ export class Intersection {
 
   /**
    * Appends points to intersection
-   * @param {Array} points
+   * @param {Point[]} points
    * @return {Intersection} thisArg
    * @chainable
    */
   appendPoints(points) {
     this.points = this.points.concat(points);
     return this;
-  }
-
-  /**
-   * Checks if a segment intersects another\
-   * As opposed to an infinite line, a segment is limited to the points that define it
-   * meaning that this method checks intersection **ONLY** between the given points
-   * @static
-   * @param {Point} a1
-   * @param {Point} a2
-   * @param {Point} b1
-   * @param {Point} b2
-   * @return {Intersection}
-   */
-  static intersectSegmentSegment(a1, a2, b1, b2) { 
-    return Intersection.intersectLineLine(a1, a2, b1, b2, false);
   }
 
   /**
@@ -107,38 +92,70 @@ export class Intersection {
     return result;
   }
 
+
+  /**
+   * Checks if a segment intersects another
+   * @see {@link intersectLineLine} for line intersection
+   * @static
+   * @param {Point} a1
+   * @param {Point} a2
+   * @param {Point} b1
+   * @param {Point} b2
+   * @return {Intersection}
+   */
+  static intersectSegmentSegment(a1, a2, b1, b2) {
+    return Intersection.intersectLineLine(a1, a2, b1, b2, false);
+  }
+
   /**
    * Checks if line intersects polygon
    * fix detection of coincident
    * @static
    * @param {Point} a1
    * @param {Point} a2
-   * @param {Array} points
+   * @param {Point[]} points
+   * @param {boolean} [infinite=true] check segment intersection by passing `false`
    * @return {Intersection}
    */
-  static intersectSegmentPolygon(a1, a2, points) {
-    const result = new Intersection(),
-      length = points.length;
-    let b1, b2, inter;
+  static intersectLinePolygon(a1, a2, points, infinite = true) {
+    const result = new Intersection();
+    const length = points.length;
 
-    for (let i = 0; i < length; i++) {
+    for (let i = 0, b1, b2, inter; i < length; i++) {
       b1 = points[i];
       b2 = points[(i + 1) % length];
-      inter = Intersection.intersectSegmentSegment(a1, a2, b1, b2);
-
+      inter = Intersection.intersectLineLine(a1, a2, b1, b2, infinite);
+      if (inter.status === 'Coincident') {
+        return inter;
+      }
       result.appendPoints(inter.points);
     }
+
     if (result.points.length > 0) {
       result.status = 'Intersection';
     }
+
     return result;
+  }
+
+  /**
+   * Checks if segment intersects polygon
+   * fix detection of coincident
+   * @static
+   * @param {Point} a1
+   * @param {Point} a2
+   * @param {Point[]} points
+   * @return {Intersection}
+   */
+  static intersectSegmentPolygon(a1, a2, points) {
+    return Intersection.intersectLinePolygon(a1, a2, points, false);
   }
 
   /**
    * Checks if polygon intersects another polygon
    * @static
-   * @param {Array} points1
-   * @param {Array} points2
+   * @param {Point[]} points1
+   * @param {Point[]} points2
    * @return {Intersection}
    */
   static intersectPolygonPolygon(points1, points2) {
@@ -149,19 +166,20 @@ export class Intersection {
       const a1 = points1[i],
         a2 = points1[(i + 1) % length],
         inter = Intersection.intersectSegmentPolygon(a1, a2, points2);
-
       result.appendPoints(inter.points);
     }
+
     if (result.points.length > 0) {
       result.status = 'Intersection';
     }
+
     return result;
   }
 
   /**
    * Checks if polygon intersects rectangle
    * @static
-   * @param {Array} points
+   * @param {Point[]} points
    * @param {Point} r1
    * @param {Point} r2
    * @return {Intersection}
