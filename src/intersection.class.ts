@@ -109,7 +109,6 @@ export class Intersection {
 
   /**
    * Checks if line intersects polygon
-   * fix detection of coincident
    * @static
    * @param {Point} a1
    * @param {Point} a2
