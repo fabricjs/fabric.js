@@ -6,6 +6,20 @@ import { fabric } from '../HEADER';
 
 type IntersectionType = 'Intersection' | 'Coincident' | 'Parallel';
 
+/**
+ * **Assuming `T`, `A`, `B` are points on the same line**,
+ * check if `T` is contained in `[A, B]` by comparing the direction of the vectors from `T` to `A` and `B`
+ * @param T 
+ * @param A 
+ * @param B 
+ * @returns 
+ */
+const isContainedInInterval = (T: Point, A: Point, B: Point) => {
+  const TA = new Point(T).subtract(A);
+  const TB = new Point(T).subtract(B);
+  return Math.sign(TA.x) !== Math.sign(TB.x) || Math.sign(TA.y) !== Math.sign(TB.y);
+}
+
 export class Intersection {
 
   points: Point[]
@@ -39,7 +53,6 @@ export class Intersection {
     return this;
   }
 
-
   /**
    * Checks if a segment intersects another\
    * As opposed to an infinite line, a segment is limited to the points that define it
@@ -51,7 +64,21 @@ export class Intersection {
    * @param {Point} b2
    * @return {Intersection}
    */
-  static intersectSegmentSegment(a1, a2, b1, b2) {
+  static intersectSegmentSegment(a1, a2, b1, b2) { 
+    return Intersection.intersectLineLine(a1, a2, b1, b2, false);
+  }
+
+  /**
+   * Checks if a line intersects another
+   * @static
+   * @param {Point} a1
+   * @param {Point} a2
+   * @param {Point} b1
+   * @param {Point} b2
+   * @param {boolean} [infinite=true] check segment intersection by passing `false`
+   * @return {Intersection}
+   */
+  static intersectLineLine(a1, a2, b1, b2, infinite = true) {
     let result;
     const uaT = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x),
       ubT = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x),
@@ -59,7 +86,7 @@ export class Intersection {
     if (uB !== 0) {
       const ua = uaT / uB,
         ub = ubT / uB;
-      if (0 <= ua && ua <= 1 && 0 <= ub && ub <= 1) {
+      if (infinite || (0 <= ua && ua <= 1 && 0 <= ub && ub <= 1)) {
         result = new Intersection('Intersection');
         result.appendPoint(new Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y)));
       }
@@ -69,7 +96,9 @@ export class Intersection {
     }
     else {
       if (uaT === 0 || ubT === 0) {
-        result = new Intersection('Coincident');
+        const segmentsCoincide = infinite || isContainedInInterval(a1, b1, b2) || isContainedInInterval(a2, b1, b2)
+          || isContainedInInterval(b1, a1, a2) || isContainedInInterval(b2, a1, a2);
+        result = new Intersection(segmentsCoincide ? 'Coincident' : undefined);
       }
       else {
         result = new Intersection('Parallel');
