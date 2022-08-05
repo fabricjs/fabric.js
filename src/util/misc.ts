@@ -1,7 +1,8 @@
 //@ts-nocheck
+import { hypot } from './hypot';
+import { cos } from './index.ts';
 import { Point } from '../point.class';
 
-import { cos } from './cos';
 (function(global) {
   var fabric = global.fabric, sqrt = Math.sqrt,
       atan2 = Math.atan2,
@@ -38,6 +39,8 @@ import { cos } from './cos';
       }
       return Math.sin(angle);
     },
+
+    hypot,
 
     /**
      * Removes value from an array.
@@ -139,25 +142,28 @@ import { cos } from './cos';
     },
 
     /**
-     * Calculates angle between 2 vectors using dot product
+     * Calculates angle between 2 vectors
      * @static
      * @memberOf fabric.util
      * @param {Point} a
      * @param {Point} b
-     * @returns the angle in radian between the vectors
+     * @returns the angle in radians from `a` to `b`
      */
     calcAngleBetweenVectors: function (a, b) {
-      return Math.acos((a.x * b.x + a.y * b.y) / (Math.hypot(a.x, a.y) * Math.hypot(b.x, b.y)));
+      var dot = a.x * b.x + a.y * b.y,
+          det = a.x * b.y - a.y * b.x;
+
+      return Math.atan2(det, dot);
     },
 
     /**
      * @static
      * @memberOf fabric.util
      * @param {Point} v
-     * @returns {Point} vector representing the unit vector of pointing to the direction of `v`
+     * @returns {Point} vector representing the unit vector pointing to the direction of `v`
      */
     getHatVector: function (v) {
-      return new Point(v.x, v.y).scalarMultiply(1 / Math.hypot(v.x, v.y));
+      return new Point(v.x, v.y).scalarMultiply(1 / fabric.util.hypot(v.x, v.y));
     },
 
     /**
@@ -171,21 +177,37 @@ import { cos } from './cos';
     getBisector: function (A, B, C) {
       var AB = fabric.util.createVector(A, B), AC = fabric.util.createVector(A, C);
       var alpha = fabric.util.calcAngleBetweenVectors(AB, AC);
-      //  check if alpha is relative to AB->BC
-      var ro = fabric.util.calcAngleBetweenVectors(fabric.util.rotateVector(AB, alpha), AC);
-      var phi = alpha * (ro === 0 ? 1 : -1) / 2;
       return {
-        vector: fabric.util.getHatVector(fabric.util.rotateVector(AB, phi)),
-        angle: alpha
+        vector: fabric.util.getHatVector(fabric.util.rotateVector(AB, alpha / 2)),
+        angle: Math.abs(alpha)
       };
     },
 
     /**
-     * Project stroke width on points returning 2 projections for each point as follows:
-     * - `miter`: 2 points corresponding to the outer boundary and the inner boundary of stroke.
-     * - `bevel`: 2 points corresponding to the bevel boundaries, tangent to the bisector.
+     * @static
+     * @memberOf fabric.util
+     * @param {Point} vector
+     * @param {Boolean} [counterClockwise] the direction of the orthogonal vector, defaults to `true`
+     * @returns {Point} the unit orthogonal vector
+     */
+    getOrthogonalUnitVector: function (vector, counterClockwise = true) {
+      return fabric.util.getHatVector(
+        new Point(
+          counterClockwise ? -vector.y : vector.y,
+          counterClockwise ? vector.x : -vector.x
+        )
+      );
+    },
+
+    /**
+     * Project stroke width on points returning projections for each point as follows:
+     * - `miter`: 1 point corresponding to the outer boundary and the inner boundary of stroke.
+     * - `bevel`: 2 points corresponding to the bevel possible boundaries, orthogonal to the stroke.
      * - `round`: same as `bevel`
      * Used to calculate object's bounding box
+     *
+     * @see https://github.com/fabricjs/fabric.js/pull/8083
+     *
      * @static
      * @memberOf fabric.util
      * @param {Point[]} points
@@ -197,56 +219,146 @@ import { cos } from './cos';
      * @param {number} options.scaleX
      * @param {number} options.scaleY
      * @param {boolean} [openPath] whether the shape is open or not, affects the calculations of the first and last points
-     * @returns {Point[]} array of size 2n/4n of all suspected points
+     * @param {boolean} [traceProjections] also returns the point and bisector that originated the projection
+     * @returns {Point[]} array of size n (for miter stroke) or 2n (for bevel or round) of all suspected points
      */
-    projectStrokeOnPoints: function (points, options, openPath) {
-      var coords = [], s = options.strokeWidth / 2,
+    projectStrokeOnPoints: function (points, options, openPath, traceProjections /** = false */) {
+      //  TODO remove next line after es6 migration and set `counterClockwise` arg to `true` by default
+      traceProjections = traceProjections === true;
+
+      if (points.length <= 1) { return []; }
+
+      var coords = [],
+          s = options.strokeWidth / 2,
+          scale = new Point(options.scaleX, options.scaleY),
           strokeUniformScalar = options.strokeUniform ?
-            new Point(1 / options.scaleX, 1 / options.scaleY) : new Point(1, 1),
-          getStrokeHatVector = function (v) {
-            var scalar = s / (Math.hypot(v.x, v.y));
-            return new Point(v.x * scalar * strokeUniformScalar.x, v.y * scalar * strokeUniformScalar.y);
-          };
-      if (points.length <= 1) {return coords;}
+            new Point(1 / options.scaleX, 1 / options.scaleY) :
+            new Point(1, 1);
+
+      function scaleHatVector(hatVector, scalar) {
+        return hatVector.multiply(strokeUniformScalar).scalarMultiply(scalar);
+      }
+
+      function storeTraceProjections(projection, origin, bisector) {
+        projection.origin = origin;
+        projection.bisector = bisector;
+        return projection;
+      };
+
       points.forEach(function (p, index) {
         var A = new Point(p.x, p.y), B, C;
         if (index === 0) {
           C = points[index + 1];
-          B = openPath ? getStrokeHatVector(fabric.util.createVector(C, A)).add(A) : points[points.length - 1];
+          B = openPath ? A : points[points.length - 1];
         }
         else if (index === points.length - 1) {
           B = points[index - 1];
-          C = openPath ? getStrokeHatVector(fabric.util.createVector(B, A)).add(A) : points[0];
+          C = openPath ? A : points[0];
         }
         else {
           B = points[index - 1];
           C = points[index + 1];
         }
-        var bisector = fabric.util.getBisector(A, B, C),
-            bisectorVector = bisector.vector,
+        //  safeguard in case `points` are not `Point`
+        B = new Point(B.x, B.y);
+        C = new Point(C.x, C.y);
+
+        if (openPath && (index === 0 || index === points.length - 1)) {
+          var D = index === 0 ? C : B,
+              scaledA = A.multiply(scale),
+              scaledD = D.multiply(scale);
+
+          var vector = fabric.util.createVector(
+                options.strokeUniform ? scaledA : A,
+                options.strokeUniform ? scaledD : D
+              ),
+              hatOrthogonalVector = fabric.util.getOrthogonalUnitVector(vector),
+              orthogonalVector = scaleHatVector(hatOrthogonalVector, s);
+
+          var proj1 = A.add(orthogonalVector),
+              proj2 = A.subtract(orthogonalVector);
+
+          coords.push(traceProjections ? storeTraceProjections(proj1, A, bisector) : proj1);
+          coords.push(traceProjections ? storeTraceProjections(proj2, A, bisector) : proj2);
+
+          return;
+        }
+
+        var bisector,
+            scaledA,
+            scaledB,
+            scaledC;
+        if (options.strokeUniform) {
+          scaledA = A.multiply(scale);
+          scaledB = B.multiply(scale);
+          scaledC = C.multiply(scale);
+          bisector = fabric.util.getBisector(scaledA, scaledB, scaledC);
+        }
+        else {
+          bisector = fabric.util.getBisector(A, B, C);
+        }
+
+        var bisectorVector = bisector.vector,
             alpha = bisector.angle,
             scalar,
             miterVector;
+
         if (options.strokeLineJoin === 'miter') {
           scalar = -s / Math.sin(alpha / 2);
-          miterVector = new Point(
-            bisectorVector.x * scalar * strokeUniformScalar.x,
-            bisectorVector.y * scalar * strokeUniformScalar.y
-          );
-          if (Math.hypot(miterVector.x, miterVector.y) / s <= options.strokeMiterLimit) {
-            coords.push(A.add(miterVector));
-            coords.push(A.subtract(miterVector));
+          miterVector = scaleHatVector(bisectorVector, scalar);
+
+          var strokeMiterLimit;
+          if (options.strokeUniform) {
+            var miterLimitVector = scaleHatVector(bisectorVector, options.strokeMiterLimit * s);
+            strokeMiterLimit = fabric.util.hypot(miterLimitVector.x, miterLimitVector.y) / s;
+          }
+          else {
+            strokeMiterLimit = options.strokeMiterLimit;
+          }
+
+          if (fabric.util.hypot(miterVector.x, miterVector.y) / s <= strokeMiterLimit) {
+            var proj1 = A.add(miterVector);
+
+            coords.push(traceProjections ? storeTraceProjections(proj1, A, bisector) : proj1);
             return;
           }
         }
-        scalar = -s * Math.SQRT2;
-        miterVector = new Point(
-          bisectorVector.x * scalar * strokeUniformScalar.x,
-          bisectorVector.y * scalar * strokeUniformScalar.y
-        );
-        coords.push(A.add(miterVector));
-        coords.push(A.subtract(miterVector));
+        if (options.strokeLineJoin === 'round') {
+
+          var correctSide = Math.abs(Math.atan2(bisectorVector.y, bisectorVector.x)) >= PiBy2 ? 1 : -1,
+              radiusOnAxisX = new Point(s * strokeUniformScalar.x * correctSide, 0),
+              radiusOnAxisY = new Point(0, s * strokeUniformScalar.y * correctSide);
+
+          var proj1 = A.add(radiusOnAxisX),
+              proj2 = A.add(radiusOnAxisY);
+
+          coords.push(traceProjections ? storeTraceProjections(proj1, A, bisector) : proj1);
+          coords.push(traceProjections ? storeTraceProjections(proj2, A, bisector) : proj2);
+        }
+        else {
+          //  bevel or miter greater than stroke miter limit
+
+          var AB = fabric.util.createVector(
+                options.strokeUniform ? scaledA : A,
+                options.strokeUniform ? scaledB : B
+              ),
+              AC = fabric.util.createVector(
+                options.strokeUniform ? scaledA : A,
+                options.strokeUniform ? scaledC : C
+              );
+
+          [AB, AC].forEach(function(vector) {
+            var hatOrthogonal = fabric.util.getOrthogonalUnitVector(vector),
+                correctSide = Math.abs(fabric.util.calcAngleBetweenVectors(hatOrthogonal, bisectorVector)) >= PiBy2 ? 1 : -1,
+                orthogonal = scaleHatVector(hatOrthogonal, s * correctSide);
+
+            var proj1 = A.add(orthogonal);
+
+            coords.push(traceProjections ? storeTraceProjections(proj1, A, bisector) : proj1);
+          });
+        }
       });
+
       return coords;
     },
 
