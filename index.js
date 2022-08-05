@@ -22,7 +22,7 @@ import './src/parser'; // optional parser
 import './src/elements_parser'; // optional parser
 import './src/point.class';
 import './src/intersection.class';
-import './src/color.class';
+import './src/color';
 import './src/controls.actions'; // optional interaction
 import './src/controls.render'; // optional interaction
 import './src/control.class'; // optional interaction

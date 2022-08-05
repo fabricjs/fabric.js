@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from '../point.class';
+
 (function(global) {
   var fabric = global.fabric;
   /**
@@ -212,7 +214,7 @@
           width = this.dotWidth;
         }
 
-        var point = new fabric.Point(x, y);
+        var point = new Point(x, y);
         point.width = width;
 
         if (this.randomOpacity) {

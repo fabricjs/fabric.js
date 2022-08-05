@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from '../point.class';
+
 (function(global) {
 
   var fabric = global.fabric,
@@ -142,8 +144,8 @@
           y1 = this._groupSelector.ey,
           x2 = x1 + this._groupSelector.left,
           y2 = y1 + this._groupSelector.top,
-          selectionX1Y1 = new fabric.Point(min(x1, x2), min(y1, y2)),
-          selectionX2Y2 = new fabric.Point(max(x1, x2), max(y1, y2)),
+          selectionX1Y1 = new Point(min(x1, x2), min(y1, y2)),
+          selectionX2Y2 = new Point(max(x1, x2), max(y1, y2)),
           allowIntersect = !this.selectionFullyContained,
           isClick = x1 === x2 && y1 === y2;
       // we iterate reverse order to collect top first in case of click.

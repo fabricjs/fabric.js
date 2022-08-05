@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const fs = require('fs-extra');
+const os = require('os');
 const _ = require('lodash');
 const path = require('path');
 const cp = require('child_process');
@@ -10,6 +11,8 @@ const chalk = require('chalk');
 const moment = require('moment');
 const Checkbox = require('inquirer-checkbox-plus-prompt');
 const commander = require('commander');
+// const rollup = require('rollup');
+// const loadConfigFile = require('rollup/loadConfigFile');
 const program = new commander.Command();
 
 const { transform: transformFiles, listFiles } = require('./transform_files');
@@ -80,7 +83,37 @@ class ICheckbox extends Checkbox {
 }
 inquirer.registerPrompt('test-selection', ICheckbox);
 
+// async function rollupBuild(options = {}, onComplete) {
+//     const { options: buildOptions, warnings } = await loadConfigFile(path.resolve(__dirname, '..', 'rollup.config.js'), { format: 'es' });
+//     warnings.flush();
+//     if (options.destination) {
+//         buildOptions.output = [options.destination];
+//     }
+//     if (options.watch) {
+//         const watcher = rollup.watch(buildOptions);
+//         watcher.on('END', () => {
+//             onComplete && onComplete();
+//         });
+//         watcher.on('event', ({ result }) => {
+//             if (result) {
+//                 result.close();
+//             }
+//         });
+//         process.on('beforeExit', () => watcher.close());
+//     }
+//     else {
+//         for (const optionsObj of buildOptions) {
+//             const bundle = await rollup.rollup(optionsObj);
+//             await Promise.all(optionsObj.output.map(bundle.write));
+//         }
+
+//         onComplete && onComplete();
+//     }
+// }
+
+
 function build(options = {}) {
+
     //  _.defaults(options, { exclude: ['gestures', 'accessors', 'erasing'] });
     // const args = [
     //     `npm run`,
@@ -90,23 +123,41 @@ function build(options = {}) {
     //     `${options.fast ? 'fast' : ''}`,
     //     `exclude=${options.exclude.join(',')}`
     // ]
-    const args = ['npm run', 'build-rollup'];
-    let done = false;
-    const task = cp.spawn(args.join(' '), { stdio: 'inherit', shell: true, cwd: wd, env: { ...process.env, MINIFY: Number(!options.fast) } })
-        .on('exit', () => (done = true));
-    return () => {
-        if (!done) {
-            done = true;
-            task.kill();            
-        }
-    };
+    const args = ['npm run', 'build-rollup', '--', options.watch ? '--watch' : ''];
+    let minDest;
+    if (options.destination && !options.fast) {
+        const { name, base, ...rest } = path.parse(path.resolve(options.destination));
+        minDest = path.format({ name: `${name}.min`, ...rest });
+    }
+    return cp.spawn(args.join(' '), {
+        stdio: 'inherit',
+        shell: true,
+        cwd: wd,
+        env: {
+            ...process.env,
+            MINIFY: Number(!options.fast),
+            BUILD_DESTINATION: options.destination,
+            MIN_BUILD_DESTINATION: minDest
+        },
+    });
 }
 
 function startWebsite() {
     if (require(path.resolve(websiteDir, 'package.json')).name !== 'fabricjs.com') {
         console.log(chalk.red('Could not locate fabricjs.com directory'));
     }
-    cp.spawn('npm', ['run', 'start:dev'], {
+    const args = ['run', 'start:dev'];
+
+    //  WSL ubuntu
+    // https://github.com/microsoft/WSL/issues/216 
+    // os.platform() === 'win32' && args.push('--', '--force_polling', '--livereload');
+    if (os.platform() === 'win32') {
+        console.log(chalk.green('Consider using ubuntu on WSL to run jekyll with the following options:'));
+        console.log(chalk.yellow('-- force_polling --livereload'));
+        console.log(chalk.gray('https://github.com/microsoft/WSL/issues/216'));
+    }
+
+    cp.spawn('npm', args, {
         stdio: 'inherit',
         cwd: websiteDir,
         shell: true,
@@ -137,42 +188,59 @@ const BUILD_SOURCE = ['src', 'lib', 'HEADER.js'];
 
 function exportBuildToWebsite(options = {}) {
     _.defaultsDeep(options, { gestures: true });
+    build({
+        destination: path.resolve(websiteDir, './lib/fabric.js'),
+        fast: true,
+        watch: options.watch
+    });
     if (options.gestures) {
-        build({ exclude: ['accessors'] });
-        copy(path.resolve(wd, './dist/fabric.js'), path.resolve(websiteDir, './lib/fabric_with_gestures.js'));
+        build({
+            exclude: ['accessors'],
+            destination: path.resolve(websiteDir, './lib/fabric_with_gestures.js'),
+            fast: true,
+            watch: options.watch
+        });
     }
-    build();
-    copy(path.resolve(wd, './dist/fabric.js'), path.resolve(websiteDir, './lib/fabric.js'));
-    copy(path.resolve(wd, './package.json'), path.resolve(websiteDir, './lib/package.json'));
-    BUILD_SOURCE.forEach(p => copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p)));
-    console.log(chalk.bold(`[${moment().format('HH:MM')}] exported build to fabricjs.com`));
 }
 
-function exportTestsToWebsite() {
-    const paths = [
-        './test/unit',
-        './test/visual',
-        './test/fixtures',
-        './test/lib',
-    ]
-    paths.forEach(location => copy(path.resolve(wd, location), path.resolve(websiteDir, location)));
-    console.log(chalk.bold(`[${moment().format('HH:MM')}] exported tests to fabricjs.com`));
+function exportAssetsToWebsite(options) {
+    copy(path.resolve(wd, './package.json'), path.resolve(websiteDir, './lib/package.json'));
+    BUILD_SOURCE.forEach(p => copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p)));
+    console.log(chalk.bold(`[${moment().format('HH:mm')}] exported assets to fabricjs.com`));
+    options.watch && BUILD_SOURCE.forEach(p => {
+        watch(path.resolve(wd, p), () => {
+            copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p));
+            console.log(chalk.bold(`[${moment().format('HH:mm')}] exported ${p} to fabricjs.com`));
+        });
+    });
+}
+
+function exportTestsToWebsite(options) {
+    const exportTests = () => {
+        const paths = [
+            './test/unit',
+            './test/visual',
+            './test/fixtures',
+            './test/lib',
+        ]
+        paths.forEach(location => copy(path.resolve(wd, location), path.resolve(websiteDir, location)));
+        console.log(chalk.bold(`[${moment().format('HH:mm')}] exported tests to fabricjs.com`));
+    }
+    exportTests();
+    options.watch && watch(path.resolve(wd, './test'), exportTests);
 }
 
 function exportToWebsite(options) {
     if (!options.include  || options.include.length === 0) {
         options.include  = ['build', 'tests'];
     }
-    options.include .forEach(x => {
+    options.include.forEach(x => {
         if (x === 'build') {
-            exportBuildToWebsite();
-            options.watch && BUILD_SOURCE.forEach(p => {
-                watch(path.resolve(wd, p), exportBuildToWebsite);
-            });
+            exportBuildToWebsite(options);
+            exportAssetsToWebsite(options);
         }
         else if (x === 'tests') {
-            exportTestsToWebsite();
-            options.watch && watch(path.resolve(wd, './test'), exportTestsToWebsite);
+            exportTestsToWebsite(options);
         }
     })
 }
@@ -364,18 +432,14 @@ program
 program
     .command('build')
     .description('build dist')
-    .option('-f, --fast')
+    .option('-f, --fast', 'skip minifying')
     .option('-w, --watch')
+    .option('-d, --dest [path]', 'specify the build destination path')
     .option('-x, --exclude [exclude...]')
     .option('-m, --modules [modules...]')
     .action((options) => {
-        const { watch: w, ...rest } = options || {};
-        build(rest);
-        let kill;
-        w && watch(path.resolve(wd, 'src'), () => {
-            kill && kill();
-            kill = build(rest);
-        });
+        const { dest: destination, ...rest } = options || {};
+        build({ ...rest, destination });
     });
 
 program

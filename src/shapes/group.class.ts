@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from '../point.class';
+
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
       multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
@@ -482,7 +484,7 @@
     /**
      * @private
      * @param {fabric.Object} object
-     * @param {fabric.Point} diff
+     * @param {Point} diff
      */
     _adjustObjectPosition: function (object, diff) {
       object.set({
@@ -515,8 +517,8 @@
       var result = this.getLayoutStrategyResult(this.layout, this._objects.concat(), context);
       if (result) {
         //  handle positioning
-        var newCenter = new fabric.Point(result.centerX, result.centerY);
-        var vector = center.subtract(newCenter).add(new fabric.Point(result.correctionX || 0, result.correctionY || 0));
+        var newCenter = new Point(result.centerX, result.centerY);
+        var vector = center.subtract(newCenter).add(new Point(result.correctionX || 0, result.correctionY || 0));
         var diff = transformPoint(vector, invertTransform(this.calcOwnMatrix()), true);
         //  set dimensions
         this.set({ width: result.width, height: result.height });
@@ -632,7 +634,7 @@
               clipPathCenter = transformPoint(clipPathRelativeCenter, this.calcOwnMatrix(), true);
           if (context.type === 'initialization' || context.type === 'layout_change') {
             var bbox = this.prepareBoundingBox(layoutDirective, objects, context) || {};
-            center = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0);
+            center = new Point(bbox.centerX || 0, bbox.centerY || 0);
             return {
               centerX: center.x + clipPathCenter.x,
               centerY: center.y + clipPathCenter.y,
@@ -711,9 +713,9 @@
       var bbox = this.getObjectsBoundingBox(objects) || {};
       var width = hasWidth ? this.width : (bbox.width || 0),
           height = hasHeight ? this.height : (bbox.height || 0),
-          calculatedCenter = new fabric.Point(bbox.centerX || 0, bbox.centerY || 0),
-          origin = new fabric.Point(this.resolveOriginX(this.originX), this.resolveOriginY(this.originY)),
-          size = new fabric.Point(width, height),
+          calculatedCenter = new Point(bbox.centerX || 0, bbox.centerY || 0),
+          origin = new Point(this.resolveOriginX(this.originX), this.resolveOriginY(this.originY)),
+          size = new Point(width, height),
           strokeWidthVector = this._getTransformedDimensions({ width: 0, height: 0 }),
           sizeAfter = this._getTransformedDimensions({
             width: width,
@@ -725,20 +727,20 @@
             height: bbox.height,
             strokeWidth: 0
           }),
-          rotationCorrection = new fabric.Point(0, 0);
+          rotationCorrection = new Point(0, 0);
 
       //  calculate center and correction
       var originT = origin.scalarAdd(0.5);
       var originCorrection = sizeAfter.multiply(originT);
-      var centerCorrection = new fabric.Point(
+      var centerCorrection = new Point(
         hasWidth ? bboxSizeAfter.x / 2 : originCorrection.x,
         hasHeight ? bboxSizeAfter.y / 2 : originCorrection.y
       );
-      var center = new fabric.Point(
+      var center = new Point(
         hasX ? this.left - (sizeAfter.x + strokeWidthVector.x) * origin.x : calculatedCenter.x - centerCorrection.x,
         hasY ? this.top - (sizeAfter.y + strokeWidthVector.y) * origin.y : calculatedCenter.y - centerCorrection.y
       );
-      var offsetCorrection = new fabric.Point(
+      var offsetCorrection = new Point(
         hasX ?
           center.x - calculatedCenter.x + bboxSizeAfter.x * (hasWidth ? 0.5 : 0) :
           -(hasWidth ? (sizeAfter.x - strokeWidthVector.x) * 0.5 : sizeAfter.x * originT.x),
@@ -746,7 +748,7 @@
           center.y - calculatedCenter.y + bboxSizeAfter.y * (hasHeight ? 0.5 : 0) :
           -(hasHeight ? (sizeAfter.y - strokeWidthVector.y) * 0.5 : sizeAfter.y * originT.y)
       ).add(rotationCorrection);
-      var correction = new fabric.Point(
+      var correction = new Point(
         hasWidth ? -sizeAfter.x / 2 : 0,
         hasHeight ? -sizeAfter.y / 2 : 0
       ).add(offsetCorrection);
@@ -774,20 +776,20 @@
       var objCenter, sizeVector, min, max, a, b;
       objects.forEach(function (object, i) {
         objCenter = object.getRelativeCenterPoint();
-        sizeVector = object._getTransformedDimensions().scalarDivideEquals(2);
+        sizeVector = object._getTransformedDimensions().scalarDivide(2);
         if (object.angle) {
           var rad = degreesToRadians(object.angle),
               sin = Math.abs(fabric.util.sin(rad)),
               cos = Math.abs(fabric.util.cos(rad)),
               rx = sizeVector.x * cos + sizeVector.y * sin,
               ry = sizeVector.x * sin + sizeVector.y * cos;
-          sizeVector = new fabric.Point(rx, ry);
+          sizeVector = new Point(rx, ry);
         }
         a = objCenter.subtract(sizeVector);
         b = objCenter.add(sizeVector);
         if (i === 0) {
-          min = new fabric.Point(Math.min(a.x, b.x), Math.min(a.y, b.y));
-          max = new fabric.Point(Math.max(a.x, b.x), Math.max(a.y, b.y));
+          min = new Point(Math.min(a.x, b.x), Math.min(a.y, b.y));
+          max = new Point(Math.max(a.x, b.x), Math.max(a.y, b.y));
         }
         else {
           min.setXY(Math.min(min.x, a.x, b.x), Math.min(min.y, a.y, b.y));

@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from '../point.class';
+
 (function(global) {
   var fabric = global.fabric;
   /**
@@ -124,7 +126,7 @@
      */
     _prepareForDrawing: function(pointer) {
 
-      var p = new fabric.Point(pointer.x, pointer.y);
+      var p = new Point(pointer.x, pointer.y);
 
       this._reset();
       this._addPoint(p);
@@ -133,7 +135,7 @@
 
     /**
      * @private
-     * @param {fabric.Point} point Point to be added to points array
+     * @param {Point} point Point to be added to points array
      */
     _addPoint: function(point) {
       if (this._points.length > 1 && point.eq(this._points[this._points.length - 1])) {
@@ -163,7 +165,7 @@
      * @param {Object} pointer Actual mouse position related to the canvas.
      */
     _captureDrawingPath: function(pointer) {
-      var pointerPoint = new fabric.Point(pointer.x, pointer.y);
+      var pointerPoint = new Point(pointer.x, pointer.y);
       return this._addPoint(pointerPoint);
     },
 
@@ -185,8 +187,8 @@
       //that's why we set them apart a bit
       if (this._points.length === 2 && p1.x === p2.x && p1.y === p2.y) {
         var width = this.width / 1000;
-        p1 = new fabric.Point(p1.x, p1.y);
-        p2 = new fabric.Point(p2.x, p2.y);
+        p1 = new Point(p1.x, p1.y);
+        p2 = new Point(p2.x, p2.y);
         p1.x -= width;
         p2.x += width;
       }

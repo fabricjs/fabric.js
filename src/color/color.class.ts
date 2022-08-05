@@ -1,14 +1,15 @@
 //@ts-nocheck
-(function(global) {
-  var fabric = global.fabric || (global.fabric = { });
+
+import { max as arrayMax, min as arrayMin } from "../util/index";
+
   /**
    * Color class
-   * The purpose of {@link fabric.Color} is to abstract and encapsulate common color operations;
-   * {@link fabric.Color} is a constructor and creates instances of {@link fabric.Color} objects.
+   * The purpose of {@link Color} is to abstract and encapsulate common color operations;
+   * {@link Color} is a constructor and creates instances of {@link Color} objects.
    *
-   * @class fabric.Color
+   * @class Color
    * @param {String} color optional in hex or rgb(a) or hsl format or from known color list
-   * @return {fabric.Color} thisArg
+   * @return {Color} thisArg
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#colors}
    */
   function Color(color) {
@@ -20,9 +21,9 @@
     }
   }
 
-  fabric.Color = Color;
+  Color = Color;
 
-  fabric.Color.prototype = /** @lends fabric.Color.prototype */ {
+  Color.prototype = /** @lends Color.prototype */ {
 
     /**
      * @private
@@ -69,8 +70,8 @@
       r /= 255; g /= 255; b /= 255;
 
       var h, s, l,
-          max = fabric.util.array.max([r, g, b]),
-          min = fabric.util.array.min([r, g, b]);
+          max = arrayMax([r, g, b]),
+          min = arrayMin([r, g, b]);
 
       l = (max + min) / 2;
 
@@ -201,7 +202,7 @@
     /**
      * Sets value of alpha channel for this color
      * @param {Number} alpha Alpha value 0-1
-     * @return {fabric.Color} thisArg
+     * @return {Color} thisArg
      */
     setAlpha: function(alpha) {
       var source = this.getSource();
@@ -212,7 +213,7 @@
 
     /**
      * Transforms color to its grayscale representation
-     * @return {fabric.Color} thisArg
+     * @return {Color} thisArg
      */
     toGrayscale: function() {
       var source = this.getSource(),
@@ -225,7 +226,7 @@
     /**
      * Transforms color to its black and white representation
      * @param {Number} threshold
-     * @return {fabric.Color} thisArg
+     * @return {Color} thisArg
      */
     toBlackWhite: function(threshold) {
       var source = this.getSource(),
@@ -241,8 +242,8 @@
 
     /**
      * Overlays color with another color
-     * @param {String|fabric.Color} otherColor
-     * @return {fabric.Color} thisArg
+     * @param {String|Color} otherColor
+     * @return {Color} thisArg
      */
     overlayWith: function(otherColor) {
       if (!(otherColor instanceof Color)) {
@@ -269,35 +270,35 @@
    * Regex matching color in RGB or RGBA formats (ex: rgb(0, 0, 0), rgba(255, 100, 10, 0.5), rgba( 255 , 100 , 10 , 0.5 ), rgb(1,1,1), rgba(100%, 60%, 10%, 0.5))
    * @static
    * @field
-   * @memberOf fabric.Color
+   * @memberOf Color
    */
   // eslint-disable-next-line max-len
-  fabric.Color.reRGBa = /^rgba?\(\s*(\d{1,3}(?:\.\d+)?%?)\s*,\s*(\d{1,3}(?:\.\d+)?%?)\s*,\s*(\d{1,3}(?:\.\d+)?%?)\s*(?:\s*,\s*((?:\d*\.?\d+)?)\s*)?\)$/i;
+  Color.reRGBa = /^rgba?\(\s*(\d{1,3}(?:\.\d+)?%?)\s*,\s*(\d{1,3}(?:\.\d+)?%?)\s*,\s*(\d{1,3}(?:\.\d+)?%?)\s*(?:\s*,\s*((?:\d*\.?\d+)?)\s*)?\)$/i;
 
   /**
    * Regex matching color in HSL or HSLA formats (ex: hsl(200, 80%, 10%), hsla(300, 50%, 80%, 0.5), hsla( 300 , 50% , 80% , 0.5 ))
    * @static
    * @field
-   * @memberOf fabric.Color
+   * @memberOf Color
    */
-  fabric.Color.reHSLa = /^hsla?\(\s*(\d{1,3})\s*,\s*(\d{1,3}%)\s*,\s*(\d{1,3}%)\s*(?:\s*,\s*(\d+(?:\.\d+)?)\s*)?\)$/i;
+  Color.reHSLa = /^hsla?\(\s*(\d{1,3})\s*,\s*(\d{1,3}%)\s*,\s*(\d{1,3}%)\s*(?:\s*,\s*(\d+(?:\.\d+)?)\s*)?\)$/i;
 
   /**
    * Regex matching color in HEX format (ex: #FF5544CC, #FF5555, 010155, aff)
    * @static
    * @field
-   * @memberOf fabric.Color
+   * @memberOf Color
    */
-  fabric.Color.reHex = /^#?([0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{4}|[0-9a-f]{3})$/i;
+  Color.reHex = /^#?([0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{4}|[0-9a-f]{3})$/i;
 
   /**
    * Map of the 148 color names with HEX code
    * @static
    * @field
-   * @memberOf fabric.Color
+   * @memberOf Color
    * @see: https://www.w3.org/TR/css3-color/#svg-color
    */
-  fabric.Color.colorNameMap = {
+  Color.colorNameMap = {
     aliceblue:            '#F0F8FF',
     antiquewhite:         '#FAEBD7',
     aqua:                 '#00FFFF',
@@ -476,21 +477,21 @@
 
   /**
    * Returns new color object, when given a color in RGB format
-   * @memberOf fabric.Color
+   * @memberOf Color
    * @param {String} color Color value ex: rgb(0-255,0-255,0-255)
-   * @return {fabric.Color}
+   * @return {Color}
    */
-  fabric.Color.fromRgb = function(color) {
+  Color.fromRgb = function(color) {
     return Color.fromSource(Color.sourceFromRgb(color));
   };
 
   /**
    * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in RGB or RGBA format
-   * @memberOf fabric.Color
+   * @memberOf Color
    * @param {String} color Color value ex: rgb(0-255,0-255,0-255), rgb(0%-100%,0%-100%,0%-100%)
    * @return {Array} source
    */
-  fabric.Color.sourceFromRgb = function(color) {
+  Color.sourceFromRgb = function(color) {
     var match = color.match(Color.reRGBa);
     if (match) {
       var r = parseInt(match[1], 10) / (/%$/.test(match[1]) ? 100 : 1) * (/%$/.test(match[1]) ? 255 : 1),
@@ -510,31 +511,31 @@
    * Returns new color object, when given a color in RGBA format
    * @static
    * @function
-   * @memberOf fabric.Color
+   * @memberOf Color
    * @param {String} color
-   * @return {fabric.Color}
+   * @return {Color}
    */
-  fabric.Color.fromRgba = Color.fromRgb;
+  Color.fromRgba = Color.fromRgb;
 
   /**
    * Returns new color object, when given a color in HSL format
    * @param {String} color Color value ex: hsl(0-260,0%-100%,0%-100%)
-   * @memberOf fabric.Color
-   * @return {fabric.Color}
+   * @memberOf Color
+   * @return {Color}
    */
-  fabric.Color.fromHsl = function(color) {
+  Color.fromHsl = function(color) {
     return Color.fromSource(Color.sourceFromHsl(color));
   };
 
   /**
    * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in HSL or HSLA format.
    * Adapted from <a href="https://rawgithub.com/mjijackson/mjijackson.github.com/master/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript.html">https://github.com/mjijackson</a>
-   * @memberOf fabric.Color
+   * @memberOf Color
    * @param {String} color Color value ex: hsl(0-360,0%-100%,0%-100%) or hsla(0-360,0%-100%,0%-100%, 0-1)
    * @return {Array} source
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
    */
-  fabric.Color.sourceFromHsl = function(color) {
+  Color.sourceFromHsl = function(color) {
     var match = color.match(Color.reHSLa);
     if (!match) {
       return;
@@ -569,31 +570,31 @@
    * Returns new color object, when given a color in HSLA format
    * @static
    * @function
-   * @memberOf fabric.Color
+   * @memberOf Color
    * @param {String} color
-   * @return {fabric.Color}
+   * @return {Color}
    */
-  fabric.Color.fromHsla = Color.fromHsl;
+  Color.fromHsla = Color.fromHsl;
 
   /**
    * Returns new color object, when given a color in HEX format
    * @static
-   * @memberOf fabric.Color
+   * @memberOf Color
    * @param {String} color Color value ex: FF5555
-   * @return {fabric.Color}
+   * @return {Color}
    */
-  fabric.Color.fromHex = function(color) {
+  Color.fromHex = function(color) {
     return Color.fromSource(Color.sourceFromHex(color));
   };
 
   /**
    * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in HEX format
    * @static
-   * @memberOf fabric.Color
+   * @memberOf Color
    * @param {String} color ex: FF5555 or FF5544CC (RGBa)
    * @return {Array} source
    */
-  fabric.Color.sourceFromHex = function(color) {
+  Color.sourceFromHex = function(color) {
     if (color.match(Color.reHex)) {
       var value = color.slice(color.indexOf('#') + 1),
           isShortNotation = (value.length === 3 || value.length === 4),
@@ -615,14 +616,15 @@
   /**
    * Returns new color object, when given color in array representation (ex: [200, 100, 100, 0.5])
    * @static
-   * @memberOf fabric.Color
+   * @memberOf Color
    * @param {Array} source
-   * @return {fabric.Color}
+   * @return {Color}
    */
-  fabric.Color.fromSource = function(source) {
+  Color.fromSource = function(source) {
     var oColor = new Color();
     oColor.setSource(source);
     return oColor;
   };
 
-})(typeof exports !== 'undefined' ? exports : window);
+
+export { Color };

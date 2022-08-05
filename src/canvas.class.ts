@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from './point.class';
+
 (function(global) {
 
   var fabric = global.fabric, getPointer = fabric.util.getPointer,
@@ -790,9 +792,9 @@
      */
     _drawSelection: function (ctx) {
       var selector = this._groupSelector,
-          viewportStart = new fabric.Point(selector.ex, selector.ey),
+          viewportStart = new Point(selector.ex, selector.ey),
           start = fabric.util.transformPoint(viewportStart, this.viewportTransform),
-          viewportExtent = new fabric.Point(selector.ex + selector.left, selector.ey + selector.top),
+          viewportExtent = new Point(selector.ex + selector.left, selector.ey + selector.top),
           extent = fabric.util.transformPoint(viewportExtent, this.viewportTransform),
           minX = Math.min(start.x, extent.x),
           minY = Math.min(start.y, extent.y),
@@ -970,7 +972,7 @@
      * of the time.
      * @param {Event} e
      * @param {Boolean} ignoreVpt
-     * @return {fabric.Point}
+     * @return {Point}
      */
     getPointer: function (e, ignoreVpt) {
       // return cached values if we are in the event processing chain
@@ -1012,10 +1014,10 @@
 
       // If bounds are not available (i.e. not visible), do not apply scale.
       cssScale = boundsWidth === 0 || boundsHeight === 0 ?
-        new fabric.Point(1, 1) :
-        new fabric.Point(upperCanvasEl.width / boundsWidth, upperCanvasEl.height / boundsHeight);
+        new Point(1, 1) :
+        new Point(upperCanvasEl.width / boundsWidth, upperCanvasEl.height / boundsHeight);
 
-      return new fabric.Point(
+      return new Point(
         pointer.x * cssScale.x,
         pointer.y * cssScale.y
       );

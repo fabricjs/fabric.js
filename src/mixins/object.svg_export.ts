@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { Color } from "../color";
+
 /* _TO_SVG_START_ */
 (function(global) {
   var fabric = global.fabric;
@@ -10,7 +13,7 @@
       return prop + ': url(#SVGID_' + value.id + '); ';
     }
     else {
-      var color = new fabric.Color(value),
+      var color = new Color(value),
           str = prop + ': ' + color.toRgb() + '; ',
           opacity = color.getAlpha();
       if (opacity !== 1) {

@@ -1,4 +1,8 @@
 //@ts-nocheck
+
+import { Color } from "../color";
+
+
 (function(global) {
 
   'use strict';
@@ -83,7 +87,7 @@
           data = imageData.data, i,
           distance = this.distance * 255,
           r, g, b,
-          source = new fabric.Color(this.color).getSource(),
+          source = new Color(this.color).getSource(),
           lowC = [
             source[0] - distance,
             source[1] - distance,
@@ -132,7 +136,7 @@
      * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
      */
     sendUniformData: function(gl, uniformLocations) {
-      var source = new fabric.Color(this.color).getSource(),
+      var source = new Color(this.color).getSource(),
           distance = parseFloat(this.distance),
           lowC = [
             0 + source[0] / 255 - distance,

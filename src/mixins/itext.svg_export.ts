@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { Color } from "../color";
+
 /* _TO_SVG_START_ */
 (function(global) {
   var fabric = global.fabric, toFixed = fabric.util.toFixed,
@@ -215,7 +218,7 @@
      * @return {String}
      */
     _getFillAttributes: function(value) {
-      var fillColor = (value && typeof value === 'string') ? new fabric.Color(value) : '';
+      var fillColor = (value && typeof value === 'string') ? new Color(value) : '';
       if (!fillColor || !fillColor.getSource() || fillColor.getAlpha() === 1) {
         return 'fill="' + value + '"';
       }

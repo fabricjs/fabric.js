@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { Color } from "./color";
+
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
       toFixed = fabric.util.toFixed;
@@ -117,7 +120,7 @@
           offset = fabric.util.rotateVector(
             { x: this.offsetX, y: this.offsetY },
             fabric.util.degreesToRadians(-object.angle)),
-          BLUR_BOX = 20, color = new fabric.Color(this.color);
+          BLUR_BOX = 20, color = new Color(this.color);
 
       if (object.width && object.height) {
         //http://www.w3.org/TR/SVG/filters.html#FilterEffectsRegion
