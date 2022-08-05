@@ -16,13 +16,18 @@ export class Point {
 
   type = 'point'
 
-  static toPoint(from: IPoint) {
-    return new Point(from.x, from.y);
-  }
-
-  constructor(x = 0, y = 0) {
-    this.x = x;
-    this.y = y;
+  constructor()
+  constructor(x: number, y: number)
+  constructor(point: IPoint)
+  constructor(arg0: number | IPoint = 0, y = 0) {
+    if (typeof arg0 === 'object') {
+      this.x = arg0.x;
+      this.y = arg0.y;
+    }
+    else {
+      this.x = arg0;
+      this.y = y;
+    }
   }
 
   /**
@@ -39,6 +44,7 @@ export class Point {
    * @param {Point} that
    * @return {Point} thisArg
    * @chainable
+   * @deprecated
    */
   addEquals(that: Point): Point {
     this.x += that.x;
@@ -60,6 +66,7 @@ export class Point {
    * @param {Number} scalar
    * @return {Point} thisArg
    * @chainable
+   * @deprecated
    */
   scalarAddEquals(scalar: number): Point {
     this.x += scalar;
@@ -81,6 +88,7 @@ export class Point {
    * @param {Point} that
    * @return {Point} thisArg
    * @chainable
+   * @deprecated
    */
   subtractEquals(that: Point): Point {
     this.x -= that.x;
@@ -102,6 +110,7 @@ export class Point {
    * @param {Number} scalar
    * @return {Point} thisArg
    * @chainable
+   * @deprecated
    */
   scalarSubtractEquals(scalar: number): Point {
     this.x -= scalar;
@@ -132,6 +141,7 @@ export class Point {
    * @param {Number} scalar
    * @return {Point} thisArg
    * @chainable
+   * @deprecated
    */
   scalarMultiplyEquals(scalar: number): Point {
     this.x *= scalar;
@@ -162,6 +172,7 @@ export class Point {
    * @param {Number} scalar
    * @return {Point} thisArg
    * @chainable
+   * @deprecated
    */
   scalarDivideEquals(scalar: number): Point {
     this.x /= scalar;
@@ -326,14 +337,6 @@ export class Point {
     this.y = that.y;
     that.x = x;
     that.y = y;
-  }
-
-  /**
-   * 
-   * @returns absolute point
-   */
-  abs() {
-    return new Point(Math.abs(this.x), Math.abs(this.y));
   }
 
   /**

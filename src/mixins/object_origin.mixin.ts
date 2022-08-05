@@ -168,7 +168,7 @@ import { Point } from '../point.class';
       if (this.angle) {
         p2 = fabric.util.rotatePoint(p2, center, -degreesToRadians(this.angle));
       }
-      return p2.subtractEquals(p);
+      return p2.subtract(p);
     },
 
     /**
@@ -182,7 +182,7 @@ import { Point } from '../point.class';
       return fabric.util.transformPoint(
         new Point(pointer.x, pointer.y),
         fabric.util.invertTransform(this.calcTransformMatrix())
-      ).addEquals(new Point(this.width / 2, this.height / 2));
+      ).add(new Point(this.width / 2, this.height / 2));
     },
 
     /**
@@ -191,7 +191,7 @@ import { Point } from '../point.class';
      * @return {Point}
      */
     // toGlobalPoint: function(point) {
-    //   return fabric.util.rotatePoint(point, this.getCenterPoint(), degreesToRadians(this.angle)).addEquals(new Point(this.left, this.top));
+    //   return fabric.util.rotatePoint(point, this.getCenterPoint(), degreesToRadians(this.angle)).add(new Point(this.left, this.top));
     // },
 
     /**

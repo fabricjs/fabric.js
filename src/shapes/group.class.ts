@@ -776,7 +776,7 @@ import { Point } from '../point.class';
       var objCenter, sizeVector, min, max, a, b;
       objects.forEach(function (object, i) {
         objCenter = object.getRelativeCenterPoint();
-        sizeVector = object._getTransformedDimensions().scalarDivideEquals(2);
+        sizeVector = object._getTransformedDimensions().scalarDivide(2);
         if (object.angle) {
           var rad = degreesToRadians(object.angle),
               sin = Math.abs(fabric.util.sin(rad)),

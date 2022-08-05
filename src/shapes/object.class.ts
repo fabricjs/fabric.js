@@ -946,7 +946,7 @@ import { Point } from '../point.class';
       if (this.canvas) {
         var zoom = this.canvas.getZoom();
         var retina = this.canvas.getRetinaScaling();
-        scale.scalarMultiplyEquals(zoom * retina);
+        return scale.scalarMultiply(zoom * retina);
       }
       return scale;
     },
