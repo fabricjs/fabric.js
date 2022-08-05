@@ -31,6 +31,10 @@ export class Intersection {
     this.points = [];
   }
 
+  private contains(point) {
+    return this.points.some(p => p.eq(point));
+  }
+
   /**
    * Appends a point to intersection
    * @param {Point} point
@@ -38,7 +42,7 @@ export class Intersection {
    * @chainable
    */
   appendPoint(point) {
-    if (this.points.every(p => !p.eq(point))) {
+    if (!this.contains(point)) {
       this.points.push(point);
     }
     return this;
@@ -52,7 +56,7 @@ export class Intersection {
    */
   appendPoints(points) {
     this.points = this.points.concat(points.filter(point => {
-      return this.points.every(p => !p.eq(point));
+      return !this.contains(point);
     }));
     return this;
   }
