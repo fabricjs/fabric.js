@@ -80,7 +80,6 @@ export class Intersection {
 
   /**
    * Checks if line intersects polygon
-   * TODO: rename in intersectSegmentPolygon
    * fix detection of coincident
    * @static
    * @param {Point} a1
@@ -88,7 +87,7 @@ export class Intersection {
    * @param {Array} points
    * @return {Intersection}
    */
-  static intersectLinePolygon(a1, a2, points) {
+  static intersectSegmentPolygon(a1, a2, points) {
     const result = new Intersection(),
       length = points.length;
     let b1, b2, inter;
@@ -120,7 +119,7 @@ export class Intersection {
     for (let i = 0; i < length; i++) {
       const a1 = points1[i],
         a2 = points1[(i + 1) % length],
-        inter = Intersection.intersectLinePolygon(a1, a2, points2);
+        inter = Intersection.intersectSegmentPolygon(a1, a2, points2);
 
       result.appendPoints(inter.points);
     }
@@ -143,10 +142,10 @@ export class Intersection {
       max = r1.max(r2),
       topRight = new Point(max.x, min.y),
       bottomLeft = new Point(min.x, max.y),
-      inter1 = Intersection.intersectLinePolygon(min, topRight, points),
-      inter2 = Intersection.intersectLinePolygon(topRight, max, points),
-      inter3 = Intersection.intersectLinePolygon(max, bottomLeft, points),
-      inter4 = Intersection.intersectLinePolygon(bottomLeft, min, points),
+      inter1 = Intersection.intersectSegmentPolygon(min, topRight, points),
+      inter2 = Intersection.intersectSegmentPolygon(topRight, max, points),
+      inter3 = Intersection.intersectSegmentPolygon(max, bottomLeft, points),
+      inter4 = Intersection.intersectSegmentPolygon(bottomLeft, min, points),
       result = new Intersection();
 
     result.appendPoints(inter1.points);

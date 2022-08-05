@@ -87,46 +87,46 @@
     assert.deepEqual(intersection.points, [], 'no point of intersections');
   });
 
-  QUnit.test('intersectLinePolygon', function(assert) {
+  QUnit.test('intersectSegmentPolygon', function(assert) {
     var p1 = new fabric.Point(0, 5), p2 = new fabric.Point(10, 5),
         p3 = new fabric.Point(5, 0), p4 = new fabric.Point(2, 10),
         p5 = new fabric.Point(8, 10), points = [p3, p4, p5],
-        intersection = fabric.Intersection.intersectLinePolygon(p1, p2, points);
+        intersection = fabric.Intersection.intersectSegmentPolygon(p1, p2, points);
     assert.ok(intersection instanceof fabric.Intersection, 'returns a fabric.Intersection');
-    assert.ok(typeof fabric.Intersection.intersectLinePolygon === 'function', 'has intersectLinePolygon function');
+    assert.ok(typeof fabric.Intersection.intersectSegmentPolygon === 'function', 'has intersectSegmentPolygon function');
     assert.equal(intersection.status, 'Intersection', 'it return a Intersection result');
     assert.equal(intersection.points.length, 2, '2 points of intersections');
     assert.deepEqual(intersection.points[0], new fabric.Point(3.5, 5), 'intersect in 3.5 ,5');
     assert.deepEqual(intersection.points[1], new fabric.Point(6.5, 5), 'intersect in 6.5 ,5');
   });
 
-  QUnit.test('intersectLinePolygon in one point', function(assert) {
+  QUnit.test('intersectSegmentPolygon in one point', function(assert) {
     var p1 = new fabric.Point(0, 5), p2 = new fabric.Point(5, 5),
         p3 = new fabric.Point(5, 0), p4 = new fabric.Point(2, 10),
         p5 = new fabric.Point(8, 10), points = [p3, p4, p5],
-        intersection = fabric.Intersection.intersectLinePolygon(p1, p2, points);
+        intersection = fabric.Intersection.intersectSegmentPolygon(p1, p2, points);
     assert.ok(intersection instanceof fabric.Intersection, 'returns a fabric.Intersection');
     assert.equal(intersection.status, 'Intersection', 'it return a Intersection result');
     assert.equal(intersection.points.length, 1, '1 points of intersections');
     assert.deepEqual(intersection.points[0], new fabric.Point(3.5, 5), 'intersect in 3.5 ,5');
   });
 
-  QUnit.test('intersectLinePolygon in one point', function(assert) {
+  QUnit.test('intersectSegmentPolygon in one point', function(assert) {
     var p1 = new fabric.Point(0, 5), p2 = new fabric.Point(3, 5),
         p3 = new fabric.Point(5, 0), p4 = new fabric.Point(2, 10),
         p5 = new fabric.Point(8, 10), points = [p3, p4, p5],
-        intersection = fabric.Intersection.intersectLinePolygon(p1, p2, points);
+        intersection = fabric.Intersection.intersectSegmentPolygon(p1, p2, points);
     assert.ok(intersection instanceof fabric.Intersection, 'returns a fabric.Intersection');
     assert.equal(intersection.status, undefined, 'it return a undefined result');
     assert.equal(intersection.points.length, 0, '0 points of intersections');
   });
 
-  QUnit.test('intersectLinePolygon on a polygon segment', function(assert) {
+  QUnit.test('intersectSegmentPolygon on a polygon segment', function(assert) {
     //TODO: fix this. it should return coincident.
     var p1 = new fabric.Point(1, 10), p2 = new fabric.Point(9, 10),
         p3 = new fabric.Point(5, 0), p4 = new fabric.Point(2, 10),
         p5 = new fabric.Point(8, 10), points = [p3, p4, p5],
-        intersection = fabric.Intersection.intersectLinePolygon(p1, p2, points);
+        intersection = fabric.Intersection.intersectSegmentPolygon(p1, p2, points);
     assert.ok(intersection instanceof fabric.Intersection, 'returns a fabric.Intersection');
     assert.equal(intersection.status, 'Intersection', 'it return a Intersection result');
     assert.equal(intersection.points.length, 2, '2 points of intersections');
