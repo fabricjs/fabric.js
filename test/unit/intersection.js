@@ -20,21 +20,11 @@
     assert.equal(intersection.status, status, 'constructor pass status value');
   });
 
-  QUnit.test('appendPoint', function(assert) {
+  QUnit.test('append', function(assert) {
     var point = new fabric.Point(1, 1);
     var intersection = new fabric.Intersection();
-    assert.ok(typeof intersection.appendPoint === 'function', 'has appendPoint method');
-    var returned = intersection.appendPoint(point);
-    assert.ok(returned instanceof fabric.Intersection, 'returns a fabric.Intersection');
-    assert.equal(returned, intersection, 'is chainable');
-    assert.equal(intersection.points.indexOf(point), 0, 'now intersection contain points');
-  });
-
-  QUnit.test('appendPoints', function(assert) {
-    var point = new fabric.Point(1, 1);
-    var intersection = new fabric.Intersection();
-    assert.ok(typeof intersection.appendPoints === 'function', 'has appendPoint method');
-    var returned = intersection.appendPoints([point, point]);
+    assert.ok(typeof intersection.append === 'function', 'has appendPoint method');
+    var returned = intersection.append(point, point);
     assert.ok(returned instanceof fabric.Intersection, 'returns a fabric.Intersection');
     assert.equal(returned, intersection, 'is chainable');
     assert.equal(intersection.points.indexOf(point), 0, 'now intersection contain points');

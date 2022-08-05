@@ -41,25 +41,12 @@ export class Intersection {
   }
 
   /**
-   * Appends a point to intersection
-   * @param {Point} point
+   * Appends points of intersection
+   * @param {...Point[]} points
    * @return {Intersection} thisArg
    * @chainable
    */
-  appendPoint(point) {
-    if (!this.contains(point)) {
-      this.points.push(point);
-    }
-    return this;
-  }
-
-  /**
-   * Appends points to intersection
-   * @param {Point[]} points
-   * @return {Intersection} thisArg
-   * @chainable
-   */
-  appendPoints(points) {
+  private append(...points) {
     this.points = this.points.concat(points.filter(point => {
       return !this.contains(point);
     }));
@@ -87,7 +74,7 @@ export class Intersection {
         ub = ubT / uB;
       if ((aIinfinite || (0 <= ua && ua <= 1)) && (bIinfinite || (0 <= ub && ub <= 1))) {
         result = new Intersection('Intersection');
-        result.appendPoint(new Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y)));
+        result.append(new Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y)));
       }
       else {
         result = new Intersection();
@@ -155,7 +142,7 @@ export class Intersection {
       if (inter.status === 'Coincident') {
         return inter;
       }
-      result.appendPoints(inter.points);
+      result.append(...inter.points);
     }
 
     if (result.points.length > 0) {
@@ -195,10 +182,10 @@ export class Intersection {
         inter = Intersection.intersectSegmentPolygon(a1, a2, points2);
       if (inter.status === 'Coincident') {
         coincidents.push(inter);
-        result.appendPoints([a1, a2]);
+        result.append(a1, a2);
       }
       else {
-        result.appendPoints(inter.points);
+        result.append(...inter.points);
       }
     }
 
