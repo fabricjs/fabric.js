@@ -13,11 +13,7 @@ import { halfPI } from '../../constants';
 export const sin = (angle: TRadian): number => {
   if (angle === 0) { return 0; }
   const angleSlice = angle / halfPI;
-  let value = 1;
-  if (angle < 0) {
-    // sin(-a) = -sin(a)
-    value = -1;
-  }
+  const value = Math.sign(angle);
   switch (angleSlice) {
     case 1: return value;
     case 2: return 0;
