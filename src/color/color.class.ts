@@ -48,7 +48,7 @@ export class Color {
   }
 
   /**
-   * Adapted from <a href="https://rawgithub.com/mjijackson/mjijackson.github.com/master/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript.html">https://github.com/mjijackson</a>
+   * Adapted from {@link https://gist.github.com/mjackson/5311256 https://gist.github.com/mjackson}
    * @private
    * @param {Number} r Red color value
    * @param {Number} g Green color value
