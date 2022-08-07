@@ -99,7 +99,7 @@ export class Color {
 
   /**
    * Returns source of this color (where source is an array representation; ex: [200, 200, 100, 1])
-   * @return {Array}
+   * @return {TColorAlphaSource}
    */
   getSource() {
     return this._source;
@@ -107,7 +107,7 @@ export class Color {
 
   /**
    * Sets source of this color (where source is an array representation; ex: [200, 200, 100, 1])
-   * @param {Array} source
+   * @param {TColorAlphaSource} source
    */
   setSource(source: TColorAlphaSource) {
     this._source = source;
