@@ -72,7 +72,6 @@ const {
     requestAnimFrame,
     cancelAnimFrame,
     rotateVector,
-    getRandomInt,
     getSmoothPathFromPoints,
     parseUnit,
     toArray,
@@ -85,7 +84,6 @@ const {
     calcRotateMatrix,
     makeBoundingBoxFromPoints,
     composeMatrix,
-    rotatePoint,
 } = fabric.util;
 export {
     sin,
@@ -140,7 +138,6 @@ export {
     requestAnimFrame,
     cancelAnimFrame,
     rotateVector,
-    getRandomInt,
     getSmoothPathFromPoints,
     parseUnit,
     toArray,
@@ -154,6 +151,5 @@ export {
     calcRotateMatrix,
     makeBoundingBoxFromPoints,
     composeMatrix,
-    rotatePoint
 };
 export default fabric.util;

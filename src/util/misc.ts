@@ -19,33 +19,6 @@ import { cos } from './misc/cos';
   fabric.util = {
 
     /**
-     * Returns random number between 2 specified ones.
-     * @static
-     * @memberOf fabric.util
-     * @param {Number} min lower limit
-     * @param {Number} max upper limit
-     * @return {Number} random value (between min and max)
-     */
-    getRandomInt: function(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    },
-
-    /**
-     * Rotates `point` around `origin` with `radians`
-     * @static
-     * @memberOf fabric.util
-     * @param {Point} point The point to rotate
-     * @param {Point} origin The origin of the rotation
-     * @param {Number} radians The radians of the angle for the rotation
-     * @return {Point} The new rotated point
-     */
-    rotatePoint: function(point, origin, radians) {
-      var newPoint = new Point(point.x - origin.x, point.y - origin.y),
-          v = fabric.util.rotateVector(newPoint, radians);
-      return v.add(origin);
-    },
-
-    /**
      * Rotates `vector` with `radians`
      * @static
      * @memberOf fabric.util

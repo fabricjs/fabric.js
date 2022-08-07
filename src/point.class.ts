@@ -1,4 +1,5 @@
 import { fabric } from '../HEADER';
+import { TRadian } from './typedefs';
 
 interface IPoint {
   x: number
@@ -345,6 +346,18 @@ export class Point {
    */
   clone(): Point {
     return new Point(this.x, this.y);
+  }
+
+  /**
+   * Rotates `point` around `origin` with `radians`
+   * @static
+   * @memberOf fabric.util
+   * @param {Point} origin The origin of the rotation
+   * @param {TRadian} radians The radians of the angle for the rotation
+   * @return {Point} The new rotated point
+   */
+  rotate(origin: Point, radians: TRadian): Point {
+    return fabric.util.rotateVector(this.subtract(origin), radians).add(origin);
   }
 }
 
