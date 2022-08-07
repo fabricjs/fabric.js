@@ -10,18 +10,17 @@ type TColorSource = [number, number, number];
 type TColorAlphaSource = [number, number, number, number];
 
 /**
- * Color class
- * The purpose of {@link Color} is to abstract and encapsulate common color operations
- *
- * @class Color
- * @param {String} color optional in hex or rgb(a) or hsl format or from known color list
- * @return {Color} thisArg
+ * @class Color common color operations
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#colors colors}
  */
 export class Color {
 
   private _source: TColorAlphaSource;
 
+  /**
+   * 
+   * @param {string} [color] optional in hex or rgb(a) or hsl format or from known color list 
+   */
   constructor(color?: string) {
     if (!color) {
       this.setSource([0, 0, 0, 1]);
