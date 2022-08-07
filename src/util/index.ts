@@ -1,5 +1,5 @@
 //@ts-nocheck
-export * from './misc';
+export * from './misc/index';
 export * from './internals';
 import { fabric } from '../../HEADER'
 import './animate'; // optional animation
@@ -13,7 +13,6 @@ import './lang_array';
 import './lang_class';
 import './lang_object';
 import './lang_string';
-import './misc';
 import './path';
 
 const {
@@ -71,7 +70,6 @@ const {
     animateColor,
     requestAnimFrame,
     cancelAnimFrame,
-    rotateVector,
     getSmoothPathFromPoints,
     parseUnit,
     toArray,
@@ -85,10 +83,9 @@ const {
     makeBoundingBoxFromPoints,
     composeMatrix,
 } = fabric.util;
+
 export {
-    sin,
     getElementOffset,
-    removeFromArray,
     toFixed,
     transformPoint,
     invertTransform,
@@ -97,7 +94,6 @@ export {
     toDataURL,
     multiplyTransformMatrices,
     applyTransformToObject,
-    degreesToRadians,
     enlivenObjects,
     enlivenObjectEnlivables,
     cleanUpJsdomNode,
@@ -137,7 +133,6 @@ export {
     animateColor,
     requestAnimFrame,
     cancelAnimFrame,
-    rotateVector,
     getSmoothPathFromPoints,
     parseUnit,
     toArray,
@@ -146,10 +141,8 @@ export {
     removeListener,
     isTouchEvent,
     sendPointToPlane,
-    radiansToDegrees,
     setStyle,
     calcRotateMatrix,
     makeBoundingBoxFromPoints,
     composeMatrix,
 };
-export default fabric.util;
