@@ -32,7 +32,7 @@ export class Color {
 
   /**
    * @private
-   * @param {String|Array} color Color value to parse
+   * @param {string} [color] Color value to parse
    */
   _tryParsingColor(color?: string) {
 
