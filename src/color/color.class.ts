@@ -3,7 +3,7 @@
 import { max, min } from '../util';
 import { ColorNameMap } from './color_map';
 import { reHSLa, reHex, reRGBa } from './constants';
-import { hue2rgb, parseHex } from './util';
+import { hue2rgb, hexify } from './util';
 
 /**
  * Color class
@@ -152,7 +152,7 @@ export class Color {
    */
   toHex() {
     const [r, g, b] = this.getSource();
-    return `${parseHex(r)}${parseHex(g)}${parseHex(b)}`;
+    return `${hexify(r)}${hexify(g)}${hexify(b)}`;
   }
 
   /**
@@ -161,7 +161,7 @@ export class Color {
    */
   toHexa() {
     const source = this.getSource();
-    return `${this.toHex()}${parseHex(Math.round(source[3] * 255))}`;
+    return `${this.toHex()}${hexify(Math.round(source[3] * 255))}`;
   }
 
   /**
