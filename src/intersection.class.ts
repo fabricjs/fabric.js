@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from './point.class';
+
 (function(global) {
   /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
   var fabric = global.fabric || (global.fabric = { });
@@ -21,7 +23,7 @@
 
     /**
      * Appends a point to intersection
-     * @param {fabric.Point} point
+     * @param {Point} point
      * @return {fabric.Intersection} thisArg
      * @chainable
      */
@@ -46,10 +48,10 @@
    * Checks if one line intersects another
    * TODO: rename in intersectSegmentSegment
    * @static
-   * @param {fabric.Point} a1
-   * @param {fabric.Point} a2
-   * @param {fabric.Point} b1
-   * @param {fabric.Point} b2
+   * @param {Point} a1
+   * @param {Point} a2
+   * @param {Point} b1
+   * @param {Point} b2
    * @return {fabric.Intersection}
    */
   fabric.Intersection.intersectLineLine = function (a1, a2, b1, b2) {
@@ -62,7 +64,7 @@
           ub = ubT / uB;
       if (0 <= ua && ua <= 1 && 0 <= ub && ub <= 1) {
         result = new Intersection('Intersection');
-        result.appendPoint(new fabric.Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y)));
+        result.appendPoint(new Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y)));
       }
       else {
         result = new Intersection();
@@ -84,8 +86,8 @@
    * TODO: rename in intersectSegmentPolygon
    * fix detection of coincident
    * @static
-   * @param {fabric.Point} a1
-   * @param {fabric.Point} a2
+   * @param {Point} a1
+   * @param {Point} a2
    * @param {Array} points
    * @return {fabric.Intersection}
    */
@@ -135,15 +137,15 @@
    * Checks if polygon intersects rectangle
    * @static
    * @param {Array} points
-   * @param {fabric.Point} r1
-   * @param {fabric.Point} r2
+   * @param {Point} r1
+   * @param {Point} r2
    * @return {fabric.Intersection}
    */
   fabric.Intersection.intersectPolygonRectangle = function (points, r1, r2) {
     var min = r1.min(r2),
         max = r1.max(r2),
-        topRight = new fabric.Point(max.x, min.y),
-        bottomLeft = new fabric.Point(min.x, max.y),
+        topRight = new Point(max.x, min.y),
+        bottomLeft = new Point(min.x, max.y),
         inter1 = Intersection.intersectLinePolygon(min, topRight, points),
         inter2 = Intersection.intersectLinePolygon(topRight, max, points),
         inter3 = Intersection.intersectLinePolygon(max, bottomLeft, points),

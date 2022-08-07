@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from './point.class';
+
 (function (global) {
   // aliases for faster resolution
   var fabric = global.fabric, extend = fabric.util.object.extend,
@@ -495,7 +497,7 @@
      * meaning that following zoom to point with the same point will have the visual
      * effect of the zoom originating from that point. The point won't move.
      * It has nothing to do with canvas center or visual center of the viewport.
-     * @param {fabric.Point} point to zoom with respect to
+     * @param {Point} point to zoom with respect to
      * @param {Number} value to set zoom to, less than 1 zooms out
      * @return {fabric.Canvas} instance
      * @chainable true
@@ -519,13 +521,13 @@
      * @chainable true
      */
     setZoom: function (value) {
-      this.zoomToPoint(new fabric.Point(0, 0), value);
+      this.zoomToPoint(new Point(0, 0), value);
       return this;
     },
 
     /**
      * Pan viewport so as to place point at top left corner of canvas
-     * @param {fabric.Point} point to move to
+     * @param {Point} point to move to
      * @return {fabric.Canvas} instance
      * @chainable true
      */
@@ -538,12 +540,12 @@
 
     /**
      * Pans viewpoint relatively
-     * @param {fabric.Point} point (position vector) to move by
+     * @param {Point} point (position vector) to move by
      * @return {fabric.Canvas} instance
      * @chainable true
      */
     relativePan: function (point) {
-      return this.absolutePan(new fabric.Point(
+      return this.absolutePan(new Point(
         -point.x - this.viewportTransform[4],
         -point.y - this.viewportTransform[5]
       ));
@@ -722,8 +724,8 @@
           max = a.max(b);
       return this.vptCoords = {
         tl: min,
-        tr: new fabric.Point(max.x, min.y),
-        bl: new fabric.Point(min.x, max.y),
+        tr: new Point(max.x, min.y),
+        bl: new Point(min.x, max.y),
         br: max,
       };
     },
@@ -876,10 +878,10 @@
 
     /**
      * Returns coordinates of a center of canvas.
-     * @return {fabric.Point}
+     * @return {Point}
      */
     getCenterPoint: function () {
-      return new fabric.Point(this.width / 2, this.height / 2);
+      return new Point(this.width / 2, this.height / 2);
     },
 
     /**
@@ -888,7 +890,7 @@
      * @return {fabric.Canvas} thisArg
      */
     centerObjectH: function (object) {
-      return this._centerObject(object, new fabric.Point(this.getCenterPoint().x, object.getCenterPoint().y));
+      return this._centerObject(object, new Point(this.getCenterPoint().x, object.getCenterPoint().y));
     },
 
     /**
@@ -898,7 +900,7 @@
      * @chainable
      */
     centerObjectV: function (object) {
-      return this._centerObject(object, new fabric.Point(object.getCenterPoint().x, this.getCenterPoint().y));
+      return this._centerObject(object, new Point(object.getCenterPoint().x, this.getCenterPoint().y));
     },
 
     /**
@@ -931,7 +933,7 @@
      */
     viewportCenterObjectH: function(object) {
       var vpCenter = this.getVpCenter();
-      this._centerObject(object, new fabric.Point(vpCenter.x, object.getCenterPoint().y));
+      this._centerObject(object, new Point(vpCenter.x, object.getCenterPoint().y));
       return this;
     },
 
@@ -944,12 +946,12 @@
     viewportCenterObjectV: function(object) {
       var vpCenter = this.getVpCenter();
 
-      return this._centerObject(object, new fabric.Point(object.getCenterPoint().x, vpCenter.y));
+      return this._centerObject(object, new Point(object.getCenterPoint().x, vpCenter.y));
     },
 
     /**
      * Calculate the point in canvas that correspond to the center of actual viewport.
-     * @return {fabric.Point} vpCenter, viewport center
+     * @return {Point} vpCenter, viewport center
      * @chainable
      */
     getVpCenter: function() {
@@ -961,7 +963,7 @@
     /**
      * @private
      * @param {fabric.Object} object Object to center
-     * @param {fabric.Point} center Center point
+     * @param {Point} center Center point
      * @return {fabric.Canvas} thisArg
      * @chainable
      */

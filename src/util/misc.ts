@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from '../point.class';
+
 import { cos } from './cos';
 (function(global) {
   var fabric = global.fabric, sqrt = Math.sqrt,
@@ -92,15 +94,15 @@ import { cos } from './cos';
      * Rotates `point` around `origin` with `radians`
      * @static
      * @memberOf fabric.util
-     * @param {fabric.Point} point The point to rotate
-     * @param {fabric.Point} origin The origin of the rotation
+     * @param {Point} point The point to rotate
+     * @param {Point} origin The origin of the rotation
      * @param {Number} radians The radians of the angle for the rotation
-     * @return {fabric.Point} The new rotated point
+     * @return {Point} The new rotated point
      */
     rotatePoint: function(point, origin, radians) {
-      var newPoint = new fabric.Point(point.x - origin.x, point.y - origin.y),
+      var newPoint = new Point(point.x - origin.x, point.y - origin.y),
           v = fabric.util.rotateVector(newPoint, radians);
-      return v.addEquals(origin);
+      return v.add(origin);
     },
 
     /**
@@ -109,14 +111,14 @@ import { cos } from './cos';
      * @memberOf fabric.util
      * @param {Object} vector The vector to rotate (x and y)
      * @param {Number} radians The radians of the angle for the rotation
-     * @return {fabric.Point} The new rotated point
+     * @return {Point} The new rotated point
      */
     rotateVector: function(vector, radians) {
       var sin = fabric.util.sin(radians),
           cos = fabric.util.cos(radians),
           rx = vector.x * cos - vector.y * sin,
           ry = vector.x * sin + vector.y * cos;
-      return new fabric.Point(rx, ry);
+      return new Point(rx, ry);
     },
 
     /**
@@ -133,7 +135,7 @@ import { cos } from './cos';
      * @returns {Point} vector
      */
     createVector: function (from, to) {
-      return new fabric.Point(to.x - from.x, to.y - from.y);
+      return new Point(to.x - from.x, to.y - from.y);
     },
 
     /**
@@ -155,7 +157,7 @@ import { cos } from './cos';
      * @returns {Point} vector representing the unit vector of pointing to the direction of `v`
      */
     getHatVector: function (v) {
-      return new fabric.Point(v.x, v.y).scalarMultiply(1 / Math.hypot(v.x, v.y));
+      return new Point(v.x, v.y).scalarMultiply(1 / Math.hypot(v.x, v.y));
     },
 
     /**
@@ -195,26 +197,26 @@ import { cos } from './cos';
      * @param {number} options.scaleX
      * @param {number} options.scaleY
      * @param {boolean} [openPath] whether the shape is open or not, affects the calculations of the first and last points
-     * @returns {fabric.Point[]} array of size 2n/4n of all suspected points
+     * @returns {Point[]} array of size 2n/4n of all suspected points
      */
     projectStrokeOnPoints: function (points, options, openPath) {
       var coords = [], s = options.strokeWidth / 2,
           strokeUniformScalar = options.strokeUniform ?
-            new fabric.Point(1 / options.scaleX, 1 / options.scaleY) : new fabric.Point(1, 1),
+            new Point(1 / options.scaleX, 1 / options.scaleY) : new Point(1, 1),
           getStrokeHatVector = function (v) {
             var scalar = s / (Math.hypot(v.x, v.y));
-            return new fabric.Point(v.x * scalar * strokeUniformScalar.x, v.y * scalar * strokeUniformScalar.y);
+            return new Point(v.x * scalar * strokeUniformScalar.x, v.y * scalar * strokeUniformScalar.y);
           };
       if (points.length <= 1) {return coords;}
       points.forEach(function (p, index) {
-        var A = new fabric.Point(p.x, p.y), B, C;
+        var A = new Point(p.x, p.y), B, C;
         if (index === 0) {
           C = points[index + 1];
-          B = openPath ? getStrokeHatVector(fabric.util.createVector(C, A)).addEquals(A) : points[points.length - 1];
+          B = openPath ? getStrokeHatVector(fabric.util.createVector(C, A)).add(A) : points[points.length - 1];
         }
         else if (index === points.length - 1) {
           B = points[index - 1];
-          C = openPath ? getStrokeHatVector(fabric.util.createVector(B, A)).addEquals(A) : points[0];
+          C = openPath ? getStrokeHatVector(fabric.util.createVector(B, A)).add(A) : points[0];
         }
         else {
           B = points[index - 1];
@@ -227,7 +229,7 @@ import { cos } from './cos';
             miterVector;
         if (options.strokeLineJoin === 'miter') {
           scalar = -s / Math.sin(alpha / 2);
-          miterVector = new fabric.Point(
+          miterVector = new Point(
             bisectorVector.x * scalar * strokeUniformScalar.x,
             bisectorVector.y * scalar * strokeUniformScalar.y
           );
@@ -238,7 +240,7 @@ import { cos } from './cos';
           }
         }
         scalar = -s * Math.SQRT2;
-        miterVector = new fabric.Point(
+        miterVector = new Point(
           bisectorVector.x * scalar * strokeUniformScalar.x,
           bisectorVector.y * scalar * strokeUniformScalar.y
         );
@@ -252,19 +254,19 @@ import { cos } from './cos';
      * Apply transform t to point p
      * @static
      * @memberOf fabric.util
-     * @param  {fabric.Point} p The point to transform
+     * @param  {Point} p The point to transform
      * @param  {Array} t The transform
      * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
-     * @return {fabric.Point} The transformed point
+     * @return {Point} The transformed point
      */
     transformPoint: function(p, t, ignoreOffset) {
       if (ignoreOffset) {
-        return new fabric.Point(
+        return new Point(
           t[0] * p.x + t[2] * p.y,
           t[1] * p.x + t[3] * p.y
         );
       }
-      return new fabric.Point(
+      return new Point(
         t[0] * p.x + t[2] * p.y + t[4],
         t[1] * p.x + t[3] * p.y + t[5]
       );
@@ -277,17 +279,17 @@ import { cos } from './cos';
      * @example <caption>Send point from canvas plane to group plane</caption>
      * var obj = new fabric.Rect({ left: 20, top: 20, width: 60, height: 60, strokeWidth: 0 });
      * var group = new fabric.Group([obj], { strokeWidth: 0 });
-     * var sentPoint1 = fabric.util.sendPointToPlane(new fabric.Point(50, 50), null, group.calcTransformMatrix());
-     * var sentPoint2 = fabric.util.sendPointToPlane(new fabric.Point(50, 50), fabric.iMatrix, group.calcTransformMatrix());
+     * var sentPoint1 = fabric.util.sendPointToPlane(new Point(50, 50), null, group.calcTransformMatrix());
+     * var sentPoint2 = fabric.util.sendPointToPlane(new Point(50, 50), fabric.iMatrix, group.calcTransformMatrix());
      * console.log(sentPoint1, sentPoint2) //  both points print (0,0) which is the center of group
      *
      * @static
      * @memberOf fabric.util
      * @see {fabric.util.transformPointRelativeToCanvas} for transforming relative to canvas
-     * @param {fabric.Point} point
+     * @param {Point} point
      * @param {Matrix} [from] plane matrix containing object. Passing `null` is equivalent to passing the identity matrix, which means `point` exists in the canvas coordinate plane.
      * @param {Matrix} [to] destination plane matrix to contain object. Passing `null` means `point` should be sent to the canvas coordinate plane.
-     * @returns {fabric.Point} transformed point
+     * @returns {Point} transformed point
      */
     sendPointToPlane: function (point, from, to) {
       //  we are actually looking for the transformation from the destination plane to the source plane (which is a linear mapping)
@@ -310,11 +312,11 @@ import { cos } from './cos';
      *
      * @static
      * @memberOf fabric.util
-     * @param {fabric.Point} point
+     * @param {Point} point
      * @param {fabric.StaticCanvas} canvas
      * @param {'sibling'|'child'} relationBefore current relation of point to canvas
      * @param {'sibling'|'child'} relationAfter desired relation of point to canvas
-     * @returns {fabric.Point} transformed point
+     * @returns {Point} transformed point
      */
     transformPointRelativeToCanvas: function (point, canvas, relationBefore, relationAfter) {
       if (relationBefore !== 'child' && relationBefore !== 'sibling') {
@@ -1076,7 +1078,7 @@ import { cos } from './cos';
      */
     applyTransformToObject: function(object, transform) {
       var options = fabric.util.qrDecompose(transform),
-          center = new fabric.Point(options.translateX, options.translateY);
+          center = new Point(options.translateX, options.translateY);
       object.flipX = false;
       object.flipY = false;
       object.set('scaleX', options.scaleX);
@@ -1144,7 +1146,7 @@ import { cos } from './cos';
      * @param {Number} options.scaleY
      * @param {Number} options.skewX
      * @param {Number} options.skewY
-     * @returns {fabric.Point} size
+     * @returns {Point} size
      */
     sizeAfterTransform: function(width, height, options) {
       var dimX = width / 2, dimY = height / 2,
@@ -1167,7 +1169,7 @@ import { cos } from './cos';
             }],
           transformMatrix = fabric.util.calcDimensionsMatrix(options),
           bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
-      return new fabric.Point(bbox.width, bbox.height);
+      return new Point(bbox.width, bbox.height);
     },
 
     /**

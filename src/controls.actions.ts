@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from './point.class';
+
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
       scaleMap = ['e', 'se', 's', 'sw', 'w', 'nw', 'n', 'ne', 'e'],
@@ -229,7 +231,7 @@
         control = target.controls[transform.corner],
         zoom = target.canvas.getZoom(),
         padding = target.padding / zoom,
-        localPoint = target.normalizePoint(new fabric.Point(x, y), originX, originY);
+        localPoint = target.normalizePoint(new Point(x, y), originX, originY);
     if (localPoint.x >= padding) {
       localPoint.x -= padding;
     }

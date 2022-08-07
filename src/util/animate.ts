@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from '../point.class';
+
 (function (global) {
   /**
    *
@@ -128,7 +130,7 @@
    *   startValue: [1, 2, 3],
    *   endValue: [2, 4, 6],
    *   onChange: function([x, y, zoom]) {
-   *     canvas.zoomToPoint(new fabric.Point(x, y), zoom);
+   *     canvas.zoomToPoint(new Point(x, y), zoom);
    *     canvas.requestRenderAll();
    *   }
    * });

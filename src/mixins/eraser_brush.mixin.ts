@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from '../point.class';
+
 (function (global) {
   /** ERASER_START */
 
@@ -509,7 +511,7 @@
 
       /**
        *
-       * @param {fabric.Point} pointer
+       * @param {Point} pointer
        * @param {fabric.IEvent} options
        * @returns
        */
