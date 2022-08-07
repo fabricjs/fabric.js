@@ -272,9 +272,9 @@ export class Color {
    * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in RGB or RGBA format
    * @memberOf Color
    * @param {String} color Color value ex: rgb(0-255,0-255,0-255), rgb(0%-100%,0%-100%,0%-100%)
-   * @return {TColorAlphaSource} source
+   * @return {TColorAlphaSource | undefined} source
    */
-  static sourceFromRgb(color: string): TColorAlphaSource {
+  static sourceFromRgb(color: string): TColorAlphaSource | undefined {
     const match = color.match(reRGBa);
     if (match) {
       const r = parseInt(match[1], 10) / (/%$/.test(match[1]) ? 100 : 1) * (/%$/.test(match[1]) ? 255 : 1),
@@ -318,10 +318,10 @@ export class Color {
    * Adapted from <a href="https://rawgithub.com/mjijackson/mjijackson.github.com/master/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript.html">https://github.com/mjijackson</a>
    * @memberOf Color
    * @param {String} color Color value ex: hsl(0-360,0%-100%,0%-100%) or hsla(0-360,0%-100%,0%-100%, 0-1)
-   * @return {TColorAlphaSource} source
+   * @return {TColorAlphaSource | undefined} source
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
    */
-  static sourceFromHsl(color: string): TColorAlphaSource {
+  static sourceFromHsl(color: string): TColorAlphaSource | undefined {
     const match = color.match(reHSLa);
     if (!match) {
       return;
@@ -368,9 +368,9 @@ export class Color {
    * @static
    * @memberOf Color
    * @param {String} color ex: FF5555 or FF5544CC (RGBa)
-   * @return {TColorAlphaSource} source
+   * @return {TColorAlphaSource | undefined} source
    */
-  static sourceFromHex(color: string): TColorAlphaSource {
+  static sourceFromHex(color: string): TColorAlphaSource | undefined {
     if (color.match(reHex)) {
       const value = color.slice(color.indexOf('#') + 1),
         isShortNotation = (value.length === 3 || value.length === 4),
