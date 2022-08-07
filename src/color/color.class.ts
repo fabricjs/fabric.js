@@ -3,7 +3,7 @@
 import { max, min } from '../util';
 import { ColorNameMap } from './color_map';
 import { reHSLa, reHex, reRGBa } from './constants';
-import { hue2rgb } from './hue2rgb';
+import { hue2rgb, parseHex } from './util';
 
 /**
  * Color class
@@ -151,19 +151,8 @@ export class Color {
    * @return {String} ex: FF5555
    */
   toHex() {
-    const source = this.getSource();
-    let r, g, b;
-
-    r = source[0].toString(16);
-    r = (r.length === 1) ? `0${r}` : r;
-
-    g = source[1].toString(16);
-    g = (g.length === 1) ? `0${g}` : g;
-
-    b = source[2].toString(16);
-    b = (b.length === 1) ? `0${b}` : b;
-
-    return `${r.toUpperCase()}${g.toUpperCase()}${b.toUpperCase()}`;
+    const [r, g, b] = this.getSource();
+    return `${parseHex(r)}${parseHex(g)}${parseHex(b)}`;
   }
 
   /**
@@ -172,11 +161,7 @@ export class Color {
    */
   toHexa() {
     const source = this.getSource();
-
-    let a = Math.round(source[3] * 255).toString(16);
-    a = a.length === 1 ? `0${a}` : a;
-
-    return `${this.toHex()}${a.toUpperCase()}`;
+    return `${this.toHex()}${parseHex(Math.round(source[3] * 255))}`;
   }
 
   /**

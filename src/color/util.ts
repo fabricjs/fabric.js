@@ -23,3 +23,8 @@ export function hue2rgb(p: number, q: number, t: number): number {
     }
     return p;
 }
+
+export function parseHex(value: number) {
+    const hexValue = value.toString(16).toUpperCase();
+    return hexValue.length === 1 ? `0${hexValue}` : hexValue;
+}
