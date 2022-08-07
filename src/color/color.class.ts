@@ -225,9 +225,9 @@ export class Color {
       alpha = this.getAlpha(),
       otherAlpha = 0.5,
       source = this.getSource(),
-      otherSource = otherColor.getSource(), i;
+      otherSource = otherColor.getSource();
 
-    for (i = 0; i < 3; i++) {
+    for (let i = 0; i < 3; i++) {
       result.push(Math.round((source[i] * (1 - otherAlpha)) + (otherSource[i] * otherAlpha)));
     }
 
