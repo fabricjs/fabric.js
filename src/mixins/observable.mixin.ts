@@ -114,8 +114,8 @@ export class Observable {
     }
     // one object with key/value pairs was passed
     else if (typeof arg0 === 'object') {
-      for (const prop in arg0) {
-        this._removeEventListener(prop, arg0[prop]);
+      for (const eventName in arg0) {
+        this._removeEventListener(eventName, arg0[eventName]);
       }
     }
     else {
