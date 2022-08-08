@@ -19,9 +19,9 @@ export class Observable {
    * @param {string} eventName Event name (eg. 'after:render')
    * @param {EventRegistryObject} handlers key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
-   * @return {Function} disposer
+   * @return {Function | undefined} disposer
    */
-  on(eventName: string, handler: Function): Function
+  on(eventName: string, handler: Function): Function | undefined
   on(handlers: EventRegistryObject): Function
   on(arg0: string | EventRegistryObject, handler?: Function): Function {
     if (!this.__eventListeners) {
@@ -49,21 +49,16 @@ export class Observable {
    * @param {string} eventName Event name (eg. 'after:render')
    * @param {EventRegistryObject} handlers key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
-   * @return {Function} disposer
+   * @return {Function | undefined} disposer
    */
   once(eventName: string, handler: Function): Function
   once(handlers: EventRegistryObject): Function
-  once(arg0: string | EventRegistryObject, handler?: Function): Function {
+  once(arg0: string | EventRegistryObject, handler?: Function): Function | undefined {
     // one object with key/value pairs was passed
     if (typeof arg0 === 'object') {
       const disposers: Function[] = [];
       for (const eventName in arg0) {
-        const _handler = arg0[eventName];
-        const disposer = this.on(eventName, (...args: any[]) => {
-          _handler(...args);
-          disposer();
-        });
-        disposers.push(disposer);
+        disposers.push(this.once(eventName, arg0[eventName]));
       }
       return () => disposers.forEach(d => d());
     }
