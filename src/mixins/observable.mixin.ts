@@ -21,9 +21,9 @@ export class Observable {
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
    * @return {Function | undefined} disposer
    */
-  on(eventName: string, handler: Function): Function | undefined
+  on(eventName: string, handler: Function): Function
   on(handlers: EventRegistryObject): Function
-  on(arg0: string | EventRegistryObject, handler?: Function): Function {
+  on(arg0: string | EventRegistryObject, handler?: Function): Function | undefined {
     if (!this.__eventListeners) {
       this.__eventListeners = {};
     }
