@@ -57,8 +57,8 @@ export class Observable {
       for (const prop in arg0) {
         const _handler = arg0[prop];
         const disposer = this.on(prop, (...args: any[]) => {
-          _handler.apply(this, args);
-          this.off(prop, disposer);
+          _handler(...args);
+          disposer();
         });
         disposers.push(disposer);
       }
@@ -66,8 +66,8 @@ export class Observable {
     }
     else {
       const disposer = this.on(arg0, (...args: any[]) => {
-        handler!.apply(this, args);
-        this.off(arg0, disposer);
+        handler!(...args);
+        disposer();
       });
       return disposer;
     }
