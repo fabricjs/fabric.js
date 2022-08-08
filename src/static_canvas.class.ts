@@ -1668,11 +1668,15 @@ import { Observable } from "./mixins/observable.mixin";
     }
   });
 
-  fabric.StaticCanvas.prototype.on = Observable.prototype.on;
-  fabric.StaticCanvas.prototype.once = Observable.prototype.once;
-  fabric.StaticCanvas.prototype.off = Observable.prototype.off;
-  fabric.StaticCanvas.prototype.fire = Observable.prototype.fire;
-  fabric.StaticCanvas.prototype._removeEventListener = Observable.prototype._removeEventListener;
+  // hack - class methods are not enumrable
+  // TODO remove when migrating to es6
+  Object.getOwnPropertyNames(Observable.prototype).forEach(key => {
+    if (key === 'constructor') return;
+    Object.defineProperty(fabric.Object.prototype, key, {
+      value: Observable.prototype[key]
+    });
+  });
+
   extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
 
   extend(fabric.StaticCanvas, /** @lends fabric.StaticCanvas */ {

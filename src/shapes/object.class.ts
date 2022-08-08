@@ -1911,11 +1911,14 @@ import { Observable } from "../mixins/observable.mixin";
 
   // fabric.util.createAccessors && fabric.util.createAccessors(fabric.Object);
 
-  fabric.Object.prototype.on = Observable.prototype.on;
-  fabric.Object.prototype.once = Observable.prototype.once;
-  fabric.Object.prototype.off = Observable.prototype.off;
-  fabric.Object.prototype.fire = Observable.prototype.fire;
-  fabric.Object.prototype._removeEventListener = Observable.prototype._removeEventListener;
+  // hack - class methods are not enumrable
+  // TODO remove when migrating to es6
+  Object.getOwnPropertyNames(Observable.prototype).forEach(key => {
+    if (key === 'constructor') return;
+    Object.defineProperty(fabric.Object.prototype, key, {
+      value: Observable.prototype[key]
+    });
+  });
 
   /**
    * Defines the number of fraction digits to use when serializing object values.
