@@ -16,7 +16,8 @@ export class Observable {
   /**
    * Observes specified event
    * @alias on
-   * @param {String|Object} eventName Event name (eg. 'after:render') or object with key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
+   * @param {string} eventName Event name (eg. 'after:render')
+   * @param {EventRegistryObject} handlers key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
    * @return {Function} disposer
    */
@@ -31,20 +32,22 @@ export class Observable {
       for (const eventName in arg0) {
         this.on(eventName, arg0[eventName]);
       }
+      return () => this.off(arg0);
     }
-    else {
+    else if (handler) {
       if (!this.__eventListeners[arg0]) {
         this.__eventListeners[arg0] = [];
       }
-      this.__eventListeners[arg0].push(handler!);
+      this.__eventListeners[arg0].push(handler);
+      return () => this.off(arg0, handler);
     }
-    return () => this.off(arg0, handler);
   }
 
   /**
    * Observes specified event **once**
    * @alias once
-   * @param {String|Object} arg0 Event name (eg. 'after:render') or object with key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
+   * @param {string} eventName Event name (eg. 'after:render')
+   * @param {EventRegistryObject} handlers key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
    * @return {Function} disposer
    */
@@ -64,9 +67,9 @@ export class Observable {
       }
       return () => disposers.forEach(d => d());
     }
-    else {
+    else if (handler) {
       const disposer = this.on(arg0, (...args: any[]) => {
-        handler!(...args);
+        handler(...args);
         disposer();
       });
       return disposer;
@@ -96,7 +99,8 @@ export class Observable {
   /**
    * Stops event observing for a particular event handler. Calling this method
    * without arguments removes all handlers for all events
-   * @param {String|Object} eventName Event name (eg. 'after:render') or object with key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
+   * @param {string} eventName Event name (eg. 'after:render')
+   * @param {EventRegistryObject} handlers key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function to be deleted from EventListeners
    */
   off(eventName: string, handler: Function): void
