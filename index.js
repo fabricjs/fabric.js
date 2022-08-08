@@ -1,13 +1,8 @@
 import { fabric } from './HEADER';
 // import './lib/event'), // optional gestures
+import './src/mixins/observable.mixin';
 import './src/mixins/collection.mixin';
-
-// import './src/mixins/Observable';
-import { Observable } from './src/mixins/Observable';
-fabric.Observable = Observable;
 import './src/mixins/shared_methods.mixin';
-
-
 import './src/util/misc';
 // import './src/util/named_accessors.mixin'; i would imagine dead forever or proper setters/getters
 import './src/util/path';
@@ -27,7 +22,7 @@ import './src/parser'; // optional parser
 import './src/elements_parser'; // optional parser
 import './src/point.class';
 import './src/intersection.class';
-import './src/color.class';
+import './src/color';
 import './src/controls.actions'; // optional interaction
 import './src/controls.render'; // optional interaction
 import './src/control.class'; // optional interaction

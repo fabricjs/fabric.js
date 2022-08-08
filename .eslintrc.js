@@ -13,4 +13,7 @@ module.exports = {
       files: ['**/*.ts'],
     }
   ],
+  rules: {
+    '@typescript-eslint/ban-ts-comment': 1,
+  }
 };
