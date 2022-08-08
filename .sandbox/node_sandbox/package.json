@@ -1,0 +1,16 @@
+{
+  "name": "fabricjs-node-sandbox",
+  "version": "1.0.0",
+  "description": "fabric.js node andbox",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "nodemon src/index.js localhost 8080"
+  },
+  "dependencies": {
+    "fabric": "*"
+  },
+  "devDependencies": {
+    "nodemon": "*"
+  },
+  "keywords": []
+}
