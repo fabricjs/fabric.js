@@ -108,8 +108,8 @@ export class Observable {
 
     // remove all key/value pairs (event name -> event handler)
     if (typeof arg0 === 'undefined') {
-      for (arg0 in this.__eventListeners) {
-        this._removeEventListener(arg0);
+      for (const eventName in this.__eventListeners) {
+        this._removeEventListener(eventName);
       }
     }
     // one object with key/value pairs was passed
