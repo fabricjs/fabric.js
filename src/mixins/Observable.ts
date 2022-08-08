@@ -1,6 +1,8 @@
 //@ts-nocheck
 
-type EventRegistryObject = { [eventName: string]: Function };
+import { fabric } from '../../HEADER';
+
+type EventRegistryObject = Record<string, Function>;
 
 
 /**
@@ -9,7 +11,7 @@ type EventRegistryObject = { [eventName: string]: Function };
  */
 export class Observable {
 
-  private __eventListeners: { [eventName: string]: Function[] } = {};
+  private __eventListeners: Record<Function[]> = {};
 
   /**
    * Observes specified event
@@ -26,7 +28,7 @@ export class Observable {
     }
     // one object with key/value pairs was passed
     if (typeof arg0 === 'object') {
-      for (var prop in arg0) {
+      for (const prop in arg0) {
         this.on(prop, arg0[prop]);
       }
     }
@@ -52,7 +54,7 @@ export class Observable {
     // one object with key/value pairs was passed
     if (typeof arg0 === 'object') {
       const disposers: Function[] = [];
-      for (let prop in arg0) {
+      for (const prop in arg0) {
         const _handler = arg0[prop];
         const disposer = this.on(prop, (...args: any[]) => {
           _handler.apply(this, args);
@@ -111,7 +113,7 @@ export class Observable {
     }
     // one object with key/value pairs was passed
     else if (typeof arg0 === 'object') {
-      for (var prop in arg0) {
+      for (const prop in arg0) {
         this._removeEventListener(prop, arg0[prop]);
       }
     }
@@ -131,12 +133,16 @@ export class Observable {
       return;
     }
 
-    var listenersForEvent = this.__eventListeners[eventName]?.concat();
+    const listenersForEvent = this.__eventListeners[eventName]?.concat();
     if (!listenersForEvent) {
       return;
     }
-    for (var i = 0, len = listenersForEvent.length; i < len; i++) {
+    for (let i = 0, len = listenersForEvent.length; i < len; i++) {
       listenersForEvent[i].call(this, options || {});
     }
   }
 }
+
+fabric.Observable = Observable;
+
+
