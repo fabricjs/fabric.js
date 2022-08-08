@@ -19,16 +19,16 @@ export class Observable {
    * @param {string} eventName Event name (eg. 'after:render')
    * @param {EventRegistryObject} handlers key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
-   * @return {Function | undefined} disposer
+   * @return {Function} disposer
    */
   on(eventName: string, handler: Function): Function
   on(handlers: EventRegistryObject): Function
-  on(arg0: string | EventRegistryObject, handler?: Function): Function | undefined {
+  on(arg0: string | EventRegistryObject, handler?: Function): Function {
     if (!this.__eventListeners) {
       this.__eventListeners = {};
     }
-    // one object with key/value pairs was passed
     if (typeof arg0 === 'object') {
+      // one object with key/value pairs was passed
       for (const eventName in arg0) {
         this.on(eventName, arg0[eventName]);
       }
@@ -42,6 +42,10 @@ export class Observable {
       this.__eventListeners[eventName].push(handler);
       return () => this.off(eventName, handler);
     }
+    else {
+      // noop
+      return () => false;
+    }
   }
 
   /**
@@ -50,13 +54,13 @@ export class Observable {
    * @param {string} eventName Event name (eg. 'after:render')
    * @param {EventRegistryObject} handlers key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
-   * @return {Function | undefined} disposer
+   * @return {Function} disposer
    */
   once(eventName: string, handler: Function): Function
   once(handlers: EventRegistryObject): Function
-  once(arg0: string | EventRegistryObject, handler?: Function): Function | undefined {
-    // one object with key/value pairs was passed
+  once(arg0: string | EventRegistryObject, handler?: Function): Function {
     if (typeof arg0 === 'object') {
+      // one object with key/value pairs was passed
       const disposers: Function[] = [];
       for (const eventName in arg0) {
         disposers.push(this.once(eventName, arg0[eventName]));
@@ -69,6 +73,10 @@ export class Observable {
         disposer();
       });
       return disposer;
+    }
+    else {
+      // noop
+      return () => false;
     }
   }
 
