@@ -54,9 +54,9 @@ export class Observable {
     // one object with key/value pairs was passed
     if (typeof arg0 === 'object') {
       const disposers: Function[] = [];
-      for (const prop in arg0) {
-        const _handler = arg0[prop];
-        const disposer = this.on(prop, (...args: any[]) => {
+      for (const eventName in arg0) {
+        const _handler = arg0[eventName];
+        const disposer = this.on(eventName, (...args: any[]) => {
           _handler(...args);
           disposer();
         });
