@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { Point } from '../point.class';
-import { Observable } from "../mixins/Observable";
+import { Observable } from "../mixins/observable.mixin";
 
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
