@@ -276,8 +276,13 @@
     assert.deepEqual(intersection.points, [], 'result should be empty');
 
     intersection = fabric.Intersection.intersectPolygonPolygon(points, points.concat(points[1].clone()));
-    assert.equal(intersection.status, 'Intersection', 'it return a Coincident result');
+    assert.equal(intersection.status, 'Intersection', 'Intersection result');
     assert.equal(intersection.points.length, points.length, 'all points intersect');
     assert.deepEqual(intersection.points, points, 'result should equal points');
+
+    intersection = fabric.Intersection.intersectPolygonPolygon(points, points.slice(0, -1));
+    assert.equal(intersection.status, 'Intersection', 'Intersection result');
+    assert.equal(intersection.points.length, points.length - 1, 'all points intersect accept the last');
+    assert.deepEqual(intersection.points, points.slice(0, -1), 'result should equal points accept the last');
   });
 })();
