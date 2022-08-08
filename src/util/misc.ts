@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { hypot } from './hypot';
-import { cos } from './index.ts';
+import { cos } from './cos';
 import { Point } from '../point.class';
 
 (function(global) {
