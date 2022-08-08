@@ -58,7 +58,7 @@ export const getHatVector = (v: Point): Point => v.scalarMultiply(1 / Math.hypot
  * @param {Point} C
  * @returns {{ vector: Point, angle: number }} vector representing the bisector of A and A's angle
  */
-export const getBisector = (a: Point, b: Point, c: Point) {
+export const getBisector = (a: Point, b: Point, c: Point) => {
   const ab = createVector(a, b), ac = createVector(a, c);
   const alpha = calcAngleBetweenVectors(ab, ac);
   //  check if alpha is relative to AB->BC
@@ -66,9 +66,9 @@ export const getBisector = (a: Point, b: Point, c: Point) {
     rotateVector(ab, alpha),
     ac
   );
-  const phi = alpha * (ro === 0 ? 1 : -1) / 2;
+  const phi = alpha * (ro === 0 ? 1 : -1) / 2 as TRadian;
   return {
     vector: getHatVector(rotateVector(ab, phi)),
     angle: alpha
   };
-},
+};
