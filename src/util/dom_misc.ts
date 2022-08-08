@@ -162,7 +162,7 @@
       offset[offsetAttributes[attr]] += parseInt(getElementStyle(element, attr), 10) || 0;
     }
 
-    docElem = doc.documentElement;
+    docElem = doc.documentElement || doc.host;
     if ( typeof element.getBoundingClientRect !== 'undefined' ) {
       box = element.getBoundingClientRect();
     }
