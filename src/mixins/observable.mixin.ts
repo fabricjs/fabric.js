@@ -35,11 +35,12 @@ export class Observable {
       return () => this.off(arg0);
     }
     else if (handler) {
-      if (!this.__eventListeners[arg0]) {
-        this.__eventListeners[arg0] = [];
+      const eventName = arg0;
+      if (!this.__eventListeners[eventName]) {
+        this.__eventListeners[eventName] = [];
       }
-      this.__eventListeners[arg0].push(handler);
-      return () => this.off(arg0, handler);
+      this.__eventListeners[eventName].push(handler);
+      return () => this.off(eventName, handler);
     }
   }
 
