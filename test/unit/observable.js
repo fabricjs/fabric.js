@@ -25,8 +25,7 @@ QUnit.test('fire once', function (assert) {
   var foo = new fabric.Observable();
 
   var eventFired = 0;
-  foo.once('bar:baz', function () {
-    assert.equal(this, foo);
+  foo.once('bar:baz', () => {
     eventFired++;
   });
 
@@ -43,18 +42,15 @@ QUnit.test('fire once multiple handlers', function (assert) {
   var eventFired3 = 0;
   var eventData = { a: 'b', c: 'd' };
   foo.once({
-    'bar:baz': function () {
+    'bar:baz': () => {
       eventFired++;
-      assert.equal(this, foo);
     },
-    'blah:blah': function () {
+    'blah:blah': () => {
       eventFired2++;
-      assert.equal(this, foo);
     },
-    'blah:blah:bloo': function (e) {
+    'blah:blah:bloo': (e) => {
       eventFired3++;
-      assert.equal(this, foo);
-      assert.deepEqual(arguments[0], eventData);
+      assert.deepEqual(e, eventData);
       assert.equal(e, eventData);
     }
   });
