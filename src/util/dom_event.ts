@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from '../point.class';
+
 (function (global) {
   // since ie11 can use addEventListener but they do not support options, i need to check
   var fabric = global.fabric, couldUseAttachEvent = !!fabric.document.createElement('div').attachEvent,
@@ -39,7 +41,7 @@
     var element = event.target,
         scroll = fabric.util.getScrollLeftTop(element),
         _evt = getTouchInfo(event);
-    return new fabric.Point(_evt.clientX + scroll.left, _evt.clientY + scroll.top);
+    return new Point(_evt.clientX + scroll.left, _evt.clientY + scroll.top);
   };
 
   fabric.util.isTouchEvent = function(event) {

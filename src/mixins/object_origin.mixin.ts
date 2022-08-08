@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from '../point.class';
+
 (function(global) {
 
   var fabric = global.fabric, degreesToRadians = fabric.util.degreesToRadians,
@@ -46,12 +48,12 @@
 
     /**
      * Translates the coordinates from a set of origin to another (based on the object's dimensions)
-     * @param {fabric.Point} point The point which corresponds to the originX and originY params
+     * @param {Point} point The point which corresponds to the originX and originY params
      * @param {OriginX} fromOriginX Horizontal origin: 'left', 'center' or 'right'
      * @param {OriginY} fromOriginY Vertical origin: 'top', 'center' or 'bottom'
      * @param {OriginX} toOriginX Horizontal origin: 'left', 'center' or 'right'
      * @param {OriginY} toOriginY Vertical origin: 'top', 'center' or 'bottom'
-     * @return {fabric.Point}
+     * @return {Point}
      */
     translateToGivenOrigin: function(point, fromOriginX, fromOriginY, toOriginX, toOriginY) {
       var x = point.x,
@@ -66,15 +68,15 @@
         y = point.y + offsetY * dim.y;
       }
 
-      return new fabric.Point(x, y);
+      return new Point(x, y);
     },
 
     /**
      * Translates the coordinates from origin to center coordinates (based on the object's dimensions)
-     * @param {fabric.Point} point The point which corresponds to the originX and originY params
+     * @param {Point} point The point which corresponds to the originX and originY params
      * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
      * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
-     * @return {fabric.Point}
+     * @return {Point}
      */
     translateToCenterPoint: function(point, originX, originY) {
       var p = this.translateToGivenOrigin(point, originX, originY, 'center', 'center');
@@ -86,10 +88,10 @@
 
     /**
      * Translates the coordinates from center to origin coordinates (based on the object's dimensions)
-     * @param {fabric.Point} center The point which corresponds to center of the object
+     * @param {Point} center The point which corresponds to center of the object
      * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
      * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
-     * @return {fabric.Point}
+     * @return {Point}
      */
     translateToOriginPoint: function(center, originX, originY) {
       var p = this.translateToGivenOrigin(center, 'center', 'center', originX, originY);
@@ -101,7 +103,7 @@
 
     /**
      * Returns the center coordinates of the object relative to canvas
-     * @return {fabric.Point}
+     * @return {Point}
      */
     getCenterPoint: function() {
       var relCenter = this.getRelativeCenterPoint();
@@ -112,7 +114,7 @@
 
     /**
      * Returns the center coordinates of the object relative to it's containing group or null
-     * @return {fabric.Point|null} point or null of object has no parent group
+     * @return {Point|null} point or null of object has no parent group
      */
     getCenterPointRelativeToParent: function () {
       return this.group ? this.getRelativeCenterPoint() : null;
@@ -120,16 +122,16 @@
 
     /**
      * Returns the center coordinates of the object relative to it's parent
-     * @return {fabric.Point}
+     * @return {Point}
      */
     getRelativeCenterPoint: function () {
-      return this.translateToCenterPoint(new fabric.Point(this.left, this.top), this.originX, this.originY);
+      return this.translateToCenterPoint(new Point(this.left, this.top), this.originX, this.originY);
     },
 
     /**
      * Returns the coordinates of the object based on center coordinates
-     * @param {fabric.Point} point The point which corresponds to the originX and originY params
-     * @return {fabric.Point}
+     * @param {Point} point The point which corresponds to the originX and originY params
+     * @return {Point}
      */
     // getOriginPoint: function(center) {
     //   return this.translateToOriginPoint(center, this.originX, this.originY);
@@ -139,7 +141,7 @@
      * Returns the coordinates of the object as if it has a different origin
      * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
      * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
-     * @return {fabric.Point}
+     * @return {Point}
      */
     getPointByOrigin: function(originX, originY) {
       var center = this.getRelativeCenterPoint();
@@ -148,10 +150,10 @@
 
     /**
      * Returns the normalized point (rotated relative to center) in local coordinates
-     * @param {fabric.Point} point The point relative to instance coordinate system
+     * @param {Point} point The point relative to instance coordinate system
      * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
      * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
-     * @return {fabric.Point}
+     * @return {Point}
      */
     normalizePoint: function(point, originX, originY) {
       var center = this.getRelativeCenterPoint(), p, p2;
@@ -159,14 +161,14 @@
         p = this.translateToGivenOrigin(center, 'center', 'center', originX, originY);
       }
       else {
-        p = new fabric.Point(this.left, this.top);
+        p = new Point(this.left, this.top);
       }
 
-      p2 = new fabric.Point(point.x, point.y);
+      p2 = new Point(point.x, point.y);
       if (this.angle) {
         p2 = fabric.util.rotatePoint(p2, center, -degreesToRadians(this.angle));
       }
-      return p2.subtractEquals(p);
+      return p2.subtract(p);
     },
 
     /**
@@ -178,23 +180,23 @@
     getLocalPointer: function (e, pointer) {
       pointer = pointer || this.canvas.getPointer(e);
       return fabric.util.transformPoint(
-        new fabric.Point(pointer.x, pointer.y),
+        new Point(pointer.x, pointer.y),
         fabric.util.invertTransform(this.calcTransformMatrix())
-      ).addEquals(new fabric.Point(this.width / 2, this.height / 2));
+      ).add(new Point(this.width / 2, this.height / 2));
     },
 
     /**
      * Returns the point in global coordinates
-     * @param {fabric.Point} The point relative to the local coordinate system
-     * @return {fabric.Point}
+     * @param {Point} The point relative to the local coordinate system
+     * @return {Point}
      */
     // toGlobalPoint: function(point) {
-    //   return fabric.util.rotatePoint(point, this.getCenterPoint(), degreesToRadians(this.angle)).addEquals(new fabric.Point(this.left, this.top));
+    //   return fabric.util.rotatePoint(point, this.getCenterPoint(), degreesToRadians(this.angle)).add(new Point(this.left, this.top));
     // },
 
     /**
      * Sets the position of the object taking into consideration the object's origin
-     * @param {fabric.Point} pos The new position of the object
+     * @param {Point} pos The new position of the object
      * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
      * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
      * @return {void}

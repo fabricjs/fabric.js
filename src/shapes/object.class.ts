@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from '../point.class';
+
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
@@ -920,7 +922,7 @@
 
     /**
      * Return the object scale factor counting also the group scaling
-     * @return {fabric.Point}
+     * @return {Point}
      */
     getObjectScaling: function() {
       // if the object is a top level one, on the canvas, we go for simple aritmetic
@@ -928,11 +930,11 @@
       // and will likely kill the cache when not needed
       // https://github.com/fabricjs/fabric.js/issues/7157
       if (!this.group) {
-        return new fabric.Point(Math.abs(this.scaleX), Math.abs(this.scaleY));
+        return new Point(Math.abs(this.scaleX), Math.abs(this.scaleY));
       }
       // if we are inside a group total zoom calculation is complex, we defer to generic matrices
       var options = fabric.util.qrDecompose(this.calcTransformMatrix());
-      return new fabric.Point(Math.abs(options.scaleX), Math.abs(options.scaleY));
+      return new Point(Math.abs(options.scaleX), Math.abs(options.scaleY));
     },
 
     /**
@@ -944,7 +946,7 @@
       if (this.canvas) {
         var zoom = this.canvas.getZoom();
         var retina = this.canvas.getRetinaScaling();
-        scale.scalarMultiplyEquals(zoom * retina);
+        return scale.scalarMultiply(zoom * retina);
       }
       return scale;
     },
@@ -1412,7 +1414,7 @@
       var shadow = this.shadow, canvas = this.canvas,
           multX = (canvas && canvas.viewportTransform[0]) || 1,
           multY = (canvas && canvas.viewportTransform[3]) || 1,
-          scaling = shadow.nonScaling ? new fabric.Point(1, 1) : this.getObjectScaling();
+          scaling = shadow.nonScaling ? new Point(1, 1) : this.getObjectScaling();
       if (canvas && canvas._isRetinaScaling()) {
         multX *= fabric.devicePixelRatio;
         multY *= fabric.devicePixelRatio;
@@ -1697,7 +1699,7 @@
 
       if (shadow) {
         var shadowBlur = shadow.blur;
-        var scaling = shadow.nonScaling ? new fabric.Point(1, 1) : this.getObjectScaling();
+        var scaling = shadow.nonScaling ? new Point(1, 1) : this.getObjectScaling();
         // consider non scaling shadow.
         shadowOffset.x = 2 * Math.round(abs(shadow.offsetX) + shadowBlur) * (abs(scaling.x));
         shadowOffset.y = 2 * Math.round(abs(shadow.offsetY) + shadowBlur) * (abs(scaling.y));
@@ -1716,7 +1718,7 @@
       if (options.format === 'jpeg') {
         canvas.backgroundColor = '#fff';
       }
-      this.setPositionByOrigin(new fabric.Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
+      this.setPositionByOrigin(new Point(canvas.width / 2, canvas.height / 2), 'center', 'center');
       var originalCanvas = this.canvas;
       canvas._objects = [this];
       this.set('canvas', canvas);

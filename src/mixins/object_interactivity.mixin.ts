@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from '../point.class';
+
 (function(global) {
 
   var fabric = global.fabric, degreesToRadians = fabric.util.degreesToRadians;
@@ -111,7 +113,7 @@
     /**
      * @public override this function in order to customize the drawing of the control box, e.g. rounded corners, different border style.
      * @param {CanvasRenderingContext2D} ctx ctx is rotated and translated so that (0,0) is at object's center
-     * @param {fabric.Point} size the control box size used
+     * @param {Point} size the control box size used
      */
     strokeBorders: function (ctx, size) {
       ctx.strokeRect(
@@ -125,7 +127,7 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to draw on
-     * @param {fabric.Point} size
+     * @param {Point} size
      * @param {Object} styleOverride object to override the object style
      */
     _drawBorders: function (ctx, size, styleOverride) {
@@ -155,15 +157,15 @@
     drawBorders: function (ctx, options, styleOverride) {
       var size;
       if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
-        var bbox = fabric.util.sizeAfterTransform(this.width, this.height, options),
-            strokeFactor = this.strokeUniform ?
-              new fabric.Point(0, 0).scalarAddEquals(this.canvas.getZoom()) :
-              new fabric.Point(options.scaleX, options.scaleY),
-            stroke = strokeFactor.scalarMultiplyEquals(this.strokeWidth);
-        size = bbox.addEquals(stroke).scalarAddEquals(this.borderScaleFactor);
+        const bbox = fabric.util.sizeAfterTransform(this.width, this.height, options),
+          stroke = (this.strokeUniform ?
+            new Point().scalarAdd(this.canvas.getZoom()) :
+            new Point(options.scaleX, options.scaleY))
+            .scalarMultiply(this.strokeWidth);
+        size = bbox.add(stroke).scalarAdd(this.borderScaleFactor);
       }
       else {
-        size = this._calculateCurrentDimensions().scalarAddEquals(this.borderScaleFactor);
+        size = this._calculateCurrentDimensions().scalarAdd(this.borderScaleFactor);
       }
       this._drawBorders(ctx, size, styleOverride);
       return this;

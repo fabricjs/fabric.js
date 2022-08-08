@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { Point } from '../point.class';
+
 
 import { Color } from "../color";
 
@@ -128,10 +130,10 @@ import { Color } from "../color";
 
     /**
      * @param {Object} pointer
-     * @return {fabric.Point} Just added pointer point
+     * @return {Point} Just added pointer point
      */
     addPoint: function(pointer) {
-      var pointerPoint = new fabric.Point(pointer.x, pointer.y),
+      var pointerPoint = new Point(pointer.x, pointer.y),
 
           circleRadius = fabric.util.getRandomInt(
             Math.max(0, this.width - 20), this.width + 20) / 2,

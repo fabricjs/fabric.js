@@ -1,12 +1,14 @@
 //@ts-nocheck
+import { Point } from '../point.class';
+
 (function(global) {
 
   function arrayFromCoords(coords) {
     return [
-      new fabric.Point(coords.tl.x, coords.tl.y),
-      new fabric.Point(coords.tr.x, coords.tr.y),
-      new fabric.Point(coords.br.x, coords.br.y),
-      new fabric.Point(coords.bl.x, coords.bl.y)
+      new Point(coords.tl.x, coords.tl.y),
+      new Point(coords.tr.x, coords.tr.y),
+      new Point(coords.br.x, coords.br.y),
+      new Point(coords.bl.x, coords.bl.y)
     ];
   }
 
@@ -142,8 +144,8 @@
      * You can specify {@link fabric.Object#originX} and {@link fabric.Object#originY} values,
      * that otherwise are the object's current values.
      * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
-     * object.setXY(new fabric.Point(5, 5), 'left', 'bottom').
-     * @param {fabric.Point} point position in canvas coordinate plane
+     * object.setXY(new Point(5, 5), 'left', 'bottom').
+     * @param {Point} point position in canvas coordinate plane
      * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
      * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
      */
@@ -161,12 +163,12 @@
      * @returns {number} x position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
      */
     getRelativeXY: function () {
-      return new fabric.Point(this.left, this.top);
+      return new Point(this.left, this.top);
     },
 
     /**
      * As {@link fabric.Object#setXY}, but in current parent's coordinate plane ( the current group if any or the canvas)
-     * @param {fabric.Point} point position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
+     * @param {Point} point position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
      * @param {'left'|'center'|'right'|number} [originX] Horizontal origin: 'left', 'center' or 'right'
      * @param {'top'|'center'|'bottom'|number} [originY] Vertical origin: 'top', 'center' or 'bottom'
      */
@@ -283,7 +285,7 @@
 
     /**
      * Checks if point is inside the object
-     * @param {fabric.Point} point Point to check against
+     * @param {Point} point Point to check against
      * @param {Object} [lines] object returned from @method _getImageLines
      * @param {Boolean} [absolute] use coordinates without viewportTransform
      * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
@@ -409,7 +411,7 @@
      * Helper method to determine how many cross points are between the 4 object edges
      * and the horizontal line determined by a point on canvas
      * @private
-     * @param {fabric.Point} point Point to check
+     * @param {Point} point Point to check
      * @param {Object} lines Coordinates of the object being evaluated
      */
     // remove yi, not used but left code here just in case.
@@ -708,10 +710,10 @@
     /**
      * Calculate object dimensions from its properties
      * @private
-     * @returns {fabric.Point} dimensions
+     * @returns {Point} dimensions
      */
     _getNonTransformedDimensions: function() {
-      return new fabric.Point(this.width, this.height).scalarAddEquals(this.strokeWidth);
+      return new Point(this.width, this.height).scalarAdd(this.strokeWidth);
     },
 
     /**
@@ -722,7 +724,7 @@
      * @param {Number} [options.skewX]
      * @param {Number} [options.skewY]
      * @private
-     * @returns {fabric.Point} dimensions
+     * @returns {Point} dimensions
      */
     _getTransformedDimensions: function (options) {
       options = Object.assign({
@@ -749,14 +751,14 @@
           finalDimensions,
           noSkew = options.skewX === 0 && options.skewY === 0;
       if (noSkew) {
-        finalDimensions = new fabric.Point(dimX * options.scaleX, dimY * options.scaleY);
+        finalDimensions = new Point(dimX * options.scaleX, dimY * options.scaleY);
       }
       else {
         var bbox = util.sizeAfterTransform(dimX, dimY, options);
-        finalDimensions = new fabric.Point(bbox.x, bbox.y);
+        finalDimensions = new Point(bbox.x, bbox.y);
       }
 
-      return finalDimensions.scalarAddEquals(postScalingStrokeValue);
+      return finalDimensions.scalarAdd(postScalingStrokeValue);
     },
 
     /**
@@ -764,7 +766,7 @@
      * and active selection
      * @private
      * @param {object} [options] transform options
-     * @returns {fabric.Point} dimensions
+     * @returns {Point} dimensions
      */
     _calculateCurrentDimensions: function(options)  {
       var vpt = this.getViewportTransform(),
