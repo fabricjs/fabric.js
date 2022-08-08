@@ -261,13 +261,22 @@
 
     let intersection = fabric.Intersection.intersectPolygonPolygon(points, points.concat());
     assert.ok(intersection instanceof fabric.Intersection, 'returns a fabric.Intersection');
-    assert.equal(intersection.status, 'Coincident', 'it return a Coincident result');
-    assert.equal(intersection.points.length, 0, '0 points of intersections');
+    assert.equal(intersection.status, 'Coincident', 'Coincident result');
+    assert.equal(intersection.points.length, 0, 'Coincident');
+    assert.deepEqual(intersection.points, [], 'result should be empty');
 
-    // though actually this is a coincident I defined it to return Intersection 
-    // because we don't want to determine if the polygons differ in sides (points can be arranged in a differnet order)
-    intersection = fabric.Intersection.intersectPolygonPolygon(points, points.concat(new fabric.Point(0, 0)));
-    assert.equal(intersection.status, 'Intersection', 'it return a Intersection result');
+    intersection = fabric.Intersection.intersectPolygonPolygon(points, points.concat(points[0].clone()));
+    assert.equal(intersection.status, 'Coincident', 'Coincident result');
+    assert.equal(intersection.points.length, 0, 'Coincident');
+    assert.deepEqual(intersection.points, [], 'result should be empty');
+
+    intersection = fabric.Intersection.intersectPolygonPolygon(points, points.concat(points[points.length - 1].clone()));
+    assert.equal(intersection.status, 'Coincident', 'Coincident result');
+    assert.equal(intersection.points.length, 0, 'Coincident');
+    assert.deepEqual(intersection.points, [], 'result should be empty');
+
+    intersection = fabric.Intersection.intersectPolygonPolygon(points, points.concat(points[1].clone()));
+    assert.equal(intersection.status, 'Intersection', 'it return a Coincident result');
     assert.equal(intersection.points.length, points.length, 'all points intersect');
     assert.deepEqual(intersection.points, points, 'result should equal points');
   });

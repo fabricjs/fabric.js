@@ -189,7 +189,7 @@ export class Intersection {
       }
     }
 
-    if (coincidents.length > 0 && coincidents.length === points1.length && coincidents.length === points2.length) {
+    if (coincidents.length > 0 && coincidents.length === points1.length) {
       return new Intersection('Coincident');
     }
     else if (result.points.length > 0) {
