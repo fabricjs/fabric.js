@@ -143,11 +143,10 @@ export class Observable {
     }
 
     const listenersForEvent = this.__eventListeners[eventName]?.concat();
-    if (!listenersForEvent) {
-      return;
-    }
-    for (let i = 0, len = listenersForEvent.length; i < len; i++) {
-      listenersForEvent[i].call(this, options || {});
+    if (listenersForEvent) {
+      for (let i = 0; i < listenersForEvent.length; i++) {
+        listenersForEvent[i].call(this, options || {});
+      }
     }
   }
 }
