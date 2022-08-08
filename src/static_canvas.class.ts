@@ -1672,7 +1672,7 @@ import { Observable } from "./mixins/observable.mixin";
   // TODO remove when migrating to es6
   Object.getOwnPropertyNames(Observable.prototype).forEach(key => {
     if (key === 'constructor') return;
-    Object.defineProperty(fabric.Object.prototype, key, {
+    Object.defineProperty(fabric.StaticCanvas.prototype, key, {
       value: Observable.prototype[key]
     });
   });
