@@ -3,7 +3,7 @@
     "sandboxes": [
         "vanilla",
         "new",
-        "/.sandbox/node_sandbox"
+        "/.codesandbox/node_sandbox"
     ],
     "node": "16"
 }
