@@ -219,12 +219,9 @@ import { Point } from '../point.class';
      * @param {number} options.scaleX
      * @param {number} options.scaleY
      * @param {boolean} [openPath] whether the shape is open or not, affects the calculations of the first and last points
-     * @param {boolean} [traceProjections] also returns the point and bisector that originated the projection
-     * @returns {Point[]} array of size n (for miter stroke) or 2n (for bevel or round) of all suspected points
+     * @returns {Object[]} array of size n (for miter stroke) or 2n (for bevel or round) of all suspected points. Each element is an object with projectedPoint, originPoint and bisector.
      */
-    projectStrokeOnPoints: function (points, options, openPath, traceProjections /** = false */) {
-      //  TODO remove next line after es6 migration and set `counterClockwise` arg to `true` by default
-      traceProjections = traceProjections === true;
+    projectStrokeOnPoints: function (points, options, openPath) {
 
       if (points.length <= 1) { return []; }
 
@@ -238,12 +235,6 @@ import { Point } from '../point.class';
       function scaleHatVector(hatVector, scalar) {
         return hatVector.multiply(strokeUniformScalar).scalarMultiply(scalar);
       }
-
-      function storeTraceProjections(projection, origin, bisector) {
-        projection.origin = origin;
-        projection.bisector = bisector;
-        return projection;
-      };
 
       points.forEach(function (p, index) {
         var A = new Point(p.x, p.y), B, C;
@@ -278,8 +269,13 @@ import { Point } from '../point.class';
           var proj1 = A.add(orthogonalVector),
               proj2 = A.subtract(orthogonalVector);
 
-          coords.push(traceProjections ? storeTraceProjections(proj1, A, bisector) : proj1);
-          coords.push(traceProjections ? storeTraceProjections(proj2, A, bisector) : proj2);
+          [proj1, proj2].forEach(proj => {
+            coords.push({ 
+              'projectedPoint': proj,
+              'originPoint': A,
+              'bisector': bisector
+            });
+          });
 
           return;
         }
@@ -319,21 +315,31 @@ import { Point } from '../point.class';
           if (fabric.util.hypot(miterVector.x, miterVector.y) / s <= strokeMiterLimit) {
             var proj1 = A.add(miterVector);
 
-            coords.push(traceProjections ? storeTraceProjections(proj1, A, bisector) : proj1);
+            coords.push({ 
+              'projectedPoint': proj1,
+              'originPoint': A,
+              'bisector': bisector
+            });
             return;
           }
         }
         if (options.strokeLineJoin === 'round') {
 
-          var correctSide = Math.abs(Math.atan2(bisectorVector.y, bisectorVector.x)) >= PiBy2 ? 1 : -1,
-              radiusOnAxisX = new Point(s * strokeUniformScalar.x * correctSide, 0),
-              radiusOnAxisY = new Point(0, s * strokeUniformScalar.y * correctSide);
+          var correctSideX = Math.abs(Math.atan2(bisectorVector.y, bisectorVector.x)) >= PiBy2 ? 1 : -1,
+              correctSideY = Math.abs(Math.atan2(bisectorVector.x, bisectorVector.y)) >= PiBy2 ? 1 : -1,
+              radiusOnAxisX = new Point(s * strokeUniformScalar.x * correctSideX, 0),
+              radiusOnAxisY = new Point(0, s * strokeUniformScalar.y * correctSideY);
 
           var proj1 = A.add(radiusOnAxisX),
               proj2 = A.add(radiusOnAxisY);
 
-          coords.push(traceProjections ? storeTraceProjections(proj1, A, bisector) : proj1);
-          coords.push(traceProjections ? storeTraceProjections(proj2, A, bisector) : proj2);
+          [proj1, proj2].forEach(proj => {
+            coords.push({ 
+              'projectedPoint': proj,
+              'originPoint': A,
+              'bisector': bisector
+            });
+          });
         }
         else {
           //  bevel or miter greater than stroke miter limit
@@ -354,7 +360,11 @@ import { Point } from '../point.class';
 
             var proj1 = A.add(orthogonal);
 
-            coords.push(traceProjections ? storeTraceProjections(proj1, A, bisector) : proj1);
+            coords.push({ 
+              'projectedPoint': proj1,
+              'originPoint': A,
+              'bisector': bisector
+            });
           });
         }
       });

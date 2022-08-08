@@ -127,7 +127,7 @@
      */
     _calcDimensions: function() {
 
-      var points = this.exactBoundingBox ? this._projectStrokeOnPoints() : this.points,
+      var points = this.exactBoundingBox ? this._projectStrokeOnPoints().map(elem => elem.projectedPoint) : this.points,
           minX = min(points, 'x') || 0,
           minY = min(points, 'y') || 0,
           maxX = max(points, 'x') || 0,
