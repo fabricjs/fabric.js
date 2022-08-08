@@ -82,10 +82,11 @@ export class Observable {
     if (!this.__eventListeners[eventName]) {
       return;
     }
+
     if (handler) {
       const eventListener = this.__eventListeners[eventName];
       const index = eventListener.indexOf(handler);
-      eventListener.splice(index, 1);
+      index > -1 && eventListener.splice(index, 1);
     }
     else {
       this.__eventListeners[eventName] = [];
