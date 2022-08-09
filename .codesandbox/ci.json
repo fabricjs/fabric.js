@@ -3,7 +3,8 @@
     "sandboxes": [
         "vanilla",
         "new",
-        "/.codesandbox/templates/node"
+        "/.codesandbox/templates/node",
+        "/.codesandbox/templates/next"
     ],
     "node": "16"
 }
