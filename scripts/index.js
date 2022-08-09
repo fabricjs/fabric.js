@@ -299,7 +299,7 @@ function startGoldensServer() {
                 const port = server.address().port;
                 const url = `http://localhost:${port}/`;
                 console.log(chalk.bold('goldens server listening on'), chalk.blue(url));
-                resolve({ url, server });
+                resolve(url);
             });
     });
 }
@@ -312,7 +312,6 @@ function startGoldensServer() {
  */
 async function test(suite, tests, options = {}) {
     // create testem temp config for this run
-    let task;
     const tempConfig = path.resolve(wd, '.dumps', `testem-${suite}.temp.json`);
     const data = require(path.resolve(wd, suite === 'visual' ? 'testem-visual.json' : 'testem.json'));
     data.serve_files = data.serve_files
@@ -320,11 +319,7 @@ async function test(suite, tests, options = {}) {
         .concat(tests || []);
     data.launchers.Node.command = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' ');
     if (suite === 'visual') {
-        const { url, server } = await startGoldensServer();
-        data.proxies['/goldens'].target = url;
-        if (options.ci) {
-            task = () => server.close();
-        }
+        data.proxies['/goldens'].target = await startGoldensServer();
     }
     fs.writeFileSync(tempConfig, JSON.stringify({
         ...data,
