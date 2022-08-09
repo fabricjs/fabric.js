@@ -299,7 +299,7 @@ function startGoldensServer() {
                 const port = server.address().port;
                 const url = `http://localhost:${port}/`;
                 console.log(chalk.bold('goldens server listening on'), chalk.blue(url));
-                resolve(url);
+                resolve({ url, server });
             });
     });
 }
@@ -318,8 +318,11 @@ async function test(suite, tests, options = {}) {
         .filter(p => p !== `test/${suite}/*.js` || !tests)
         .concat(tests || []);
     data.launchers.Node.command = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' ');
+    let close = () => { };
     if (suite === 'visual') {
-        data.proxies['/goldens'].target = await startGoldensServer();
+        const { url, server } = await startGoldensServer();
+        close = () => server.close();
+        data.proxies['/goldens'].target = url;
     }
     fs.writeFileSync(tempConfig, JSON.stringify({
         ...data,
@@ -351,7 +354,11 @@ async function test(suite, tests, options = {}) {
         shell: true,
         stdio: 'pipe',
         detached: !options.ci
-    }).stdout.on('data', (b) => console.log(chalk.blue(`[${suite}]`), b.toString().trim()));
+    })
+        .on('exit', close)
+        .on('close', close)
+        .on('disconnect', close)
+        .stdout.on('data', (b) => console.log(chalk.blue(`[${suite}]`), b.toString().trim()));
 }
 
 /**
