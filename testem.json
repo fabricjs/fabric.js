@@ -34,7 +34,7 @@
   ],
   "launchers": {
     "Node": {
-      "command": "npm run test -- --suite unit",
+      "command": "qunit test/node_test_setup.js test/lib test/unit",
       "protocol": "tap"
     }
   },

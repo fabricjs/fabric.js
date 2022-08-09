@@ -37,7 +37,7 @@
   ],
   "launchers": {
     "Node": {
-      "command": "npm run test -- --suite visual",
+      "command": "qunit test/node_test_setup.js test/lib test/visual",
       "protocol": "tap"
     }
   },
