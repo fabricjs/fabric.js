@@ -87,6 +87,13 @@
         generateGolden(filename, original);
       }
     }
+    else if (original) {
+      fetch(`/goldens/${filename}`, { method: 'GET' })
+        .then(res => res.json())
+        .then(res => {
+          !res.exists && generateGolden(filename, original);
+        });
+    }
     var img = fabric.document.createElement('img');
     img.onload = function() {
       img.onload = null;

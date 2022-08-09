@@ -10,15 +10,27 @@ const chalk = require('chalk');
 const moment = require('moment');
 const Checkbox = require('inquirer-checkbox-plus-prompt');
 const commander = require('commander');
-const kill = require('kill-port')
+const kill = require('kill-port');
+const http = require('http');
+const busboy = require('busboy');
 // const rollup = require('rollup');
 // const loadConfigFile = require('rollup/loadConfigFile');
 const program = new commander.Command();
 
 const { transform: transformFiles, listFiles } = require('./transform_files');
 
-const CLI_CACHE = path.resolve(__dirname, 'cli_cache.json');
+
+function ensureDumps() {
+    const dumpsPath = path.resolve(wd, '.dumps');
+    if (!fs.existsSync(dumpsPath)) {
+        fs.mkdirSync(dumpsPath)
+    }
+}
+
+ensureDumps();
+
 const wd = path.resolve(__dirname, '..');
+const CLI_CACHE = path.resolve(__dirname, '..', '.dumps', 'cli_cache.json');
 const websiteDir = path.resolve(wd, '../fabricjs.com');
 
 function execGitCommand(cmd) {
@@ -245,6 +257,59 @@ function exportToWebsite(options) {
     })
 }
 
+function parseRequest(req/*: http.IncomingMessage*/) {
+    const bb = busboy({ headers: req.headers });
+    return new Promise/*<{ files: Array<{ rawData: Buffer; } & busboy.FileInfo>; fields: { [key: string]: string | number; }; }>*/(resolve => {
+        const files = []; //as Array<{ rawData: Buffer; } & busboy.FileInfo>;
+        const fields = {};
+        bb.on('file', (name, file, info) => {
+            const raw = [];
+            file.on('data', (data) => {
+                raw.push(data);
+            }).on('close', () => {
+                files.push({ rawData: Buffer.concat(raw), ...info });
+            });
+        });
+        bb.on('field', (name, value, info) => {
+            fields[name] = value;
+        });
+        bb.on('close', () => {
+            resolve({ files, fields });
+        });
+        req.pipe(bb);
+    });
+}
+
+function startGoldensServer() {
+    return new Promise((resolve) => {
+        const server = http
+            .createServer(async (req, res) => {
+                if (req.method.toUpperCase() === 'GET' && req.url === '/') {
+                    res.end('This endpoint is used by fabric.js and testem to generate goldens');
+                }
+                else if (req.method.toUpperCase() === 'GET') {
+                    const filename = req.url.split('/golden/')[1];
+                    const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
+                    res.end(JSON.stringify({ exists: fs.existsSync(goldenPath) }));
+                }
+                else if (req.method.toUpperCase() === 'POST') {
+                    const { files: [{ rawData, filename }] } = await parseRequest(req);
+                    const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
+                    console.log(`creating golden ${path.relative(wd, goldenPath)}`);
+                    fs.writeFileSync(goldenPath, rawData, { encoding: 'binary' });
+                    res.end();
+                }
+            })
+            .listen()
+            .on('listening', () => {
+                const port = server.address().port;
+                const url = `http://localhost:${port}/`;
+                console.log(chalk.bold('goldens server listening on'), chalk.blue(url));
+                resolve(url);
+            });
+    });
+}
+
 /**
  *
  * @param {'unit' | 'visual'} suite
@@ -253,12 +318,15 @@ function exportToWebsite(options) {
  */
 async function test(suite, tests, options = {}) {
     // create testem temp config for this run
-    const tempConfig = path.resolve(wd, 'scripts', `testem-${suite}.temp.json`);
+    const tempConfig = path.resolve(wd, '.dumps', `testem-${suite}.temp.json`);
     const data = require(path.resolve(wd, suite === 'visual' ? 'testem-visual.json' : 'testem.json'));
     data.serve_files = data.serve_files
         .filter(p => p !== `test/${suite}/*.js` || !tests)
         .concat(tests || []);
     data.launchers.Node.command = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' ');
+    if (suite === 'visual') {
+        data.proxies['/goldens'].target = await startGoldensServer();
+    }
     fs.writeFileSync(tempConfig, JSON.stringify({
         ...data,
         qunit: options,
@@ -283,7 +351,7 @@ async function test(suite, tests, options = {}) {
     const start = (os.platform() == 'darwin' ? 'open' : os.platform() == 'win32' ? 'start' : 'xdg-open');
     options.launch && cp.exec([start, url].join(' '));
     // run
-    cp[options.ci ? 'spawnSync' : 'spawn'](args.join(' '), {
+    cp.spawn(args.join(' '), {
         cwd: wd,
         env: process.env,
         shell: true,
