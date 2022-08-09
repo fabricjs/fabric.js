@@ -1,0 +1,10 @@
+.canvas-container, #static-canvas { 
+  position: absolute;
+  left: 0; 
+  top: 0; 
+  display: none;
+}
+
+.text-center {
+  text-align: center !important;
+}
