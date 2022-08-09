@@ -289,7 +289,7 @@ function startGoldensServer() {
                 else if (req.method.toUpperCase() === 'POST') {
                     const { files: [{ rawData, filename }] } = await parseRequest(req);
                     const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
-                    console.log(`creating golden ${path.relative(wd, goldenPath)}`);
+                    console.log(chalk.gray('[info]'), `creating golden ${path.relative(wd, goldenPath)}`);
                     fs.writeFileSync(goldenPath, rawData, { encoding: 'binary' });
                     res.end();
                 }
@@ -351,7 +351,7 @@ async function test(suite, tests, options = {}) {
         shell: true,
         stdio: 'pipe',
         detached: !options.ci
-    }).stdout.on('data', (b) => console.log(chalk.gray(`[${suite}]`), b.toString().trim()));
+    }).stdout.on('data', (b) => console.log(chalk.blue(`[${suite}]`), b.toString().trim()));
 }
 
 /**
