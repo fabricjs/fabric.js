@@ -1243,4 +1243,16 @@
     ];
     assert.deepEqual(matrix, expected, 'dimensions matrix flipped is equal');
   });
+
+  QUnit.test.only('getElementOffset inside iframe', function (assert) {
+    var frame = fabric.document.createElement('iframe');
+    fabric.document.body.appendChild(frame);
+    var iframeDoc = frame.contentDocument || frame.contentWindow.document;
+    var el = fabric.document.createElement('canvas');
+    iframeDoc.body.appendChild(el);
+    frame.style.left = '200px';
+    el.style.left = '200px';
+    assert.deepEqual(fabric.util.getElementOffset(el), { left: 400, top: 0 });
+  });
+
 })();
