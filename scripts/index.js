@@ -351,7 +351,7 @@ async function test(suite, tests, options = {}) {
         shell: true,
         stdio: 'pipe',
         detached: !options.ci
-    }).stdout.on('data', (b) => console.log(chalk.bold(`${suite}:`), b.toString()));
+    }).stdout.on('data', (b) => console.log(chalk.gray(`[${suite}]`), b.toString().trim()));
 }
 
 /**
