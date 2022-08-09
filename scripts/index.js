@@ -20,9 +20,9 @@ const program = new commander.Command();
 const { transform: transformFiles, listFiles } = require('./transform_files');
 
 const wd = path.resolve(__dirname, '..');
-const CLI_CACHE = path.resolve(__dirname, '..', '.dumps', 'cli_cache.json');
-const websiteDir = path.resolve(wd, '../fabricjs.com');
 const dumpsPath = path.resolve(wd, '.dumps');
+const CLI_CACHE = path.resolve(dumpsPath, 'cli_cache.json');
+const websiteDir = path.resolve(wd, '../fabricjs.com');
 if (!fs.existsSync(dumpsPath)) {
     fs.mkdirSync(dumpsPath);
 }
@@ -312,7 +312,7 @@ function startGoldensServer() {
  */
 async function test(suite, tests, options = {}) {
     // create testem temp config for this run
-    const tempConfig = path.resolve(wd, '.dumps', `testem-${suite}.temp.json`);
+    const tempConfig = path.resolve(dumpsPath, `testem-${suite}.temp.json`);
     const data = require(path.resolve(wd, suite === 'visual' ? 'testem-visual.json' : 'testem.json'));
     data.serve_files = data.serve_files
         .filter(p => p !== `test/${suite}/*.js` || !tests)
