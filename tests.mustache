@@ -28,9 +28,28 @@ function downloadGoldens() {
         link.click();
     });
 }
-QUnit.recreateVisualRefs = {{qunit.recreate}};
-QUnit.debugVisual = {{qunit.debug}};
-QUnit.config.filter = {{qunit.filter}};
+
+var isChromium = window.chrome;
+var winNav = window.navigator;
+var vendorName = winNav.vendor;
+var isOpera = typeof window.opr !== "undefined";
+var isIEedge = winNav.userAgent.indexOf("Edg") > -1;
+var isIOSChrome = winNav.userAgent.match("CriOS");
+
+if(
+  isIOSChrome || 
+  (isChromium !== null &&
+  typeof isChromium !== "undefined" &&
+  vendorName === "Google Inc." &&
+  isOpera === false &&
+  isIEedge === false)
+) {
+   // is Google Chrome
+    QUnit.recreateVisualRefs = {{qunit.recreate}};
+    QUnit.debugVisual = {{qunit.debug}};
+    QUnit.config.filter = {{qunit.filter}};
+}
+
 </script>
 {{/visual}}
 

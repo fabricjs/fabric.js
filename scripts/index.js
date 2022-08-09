@@ -269,11 +269,11 @@ async function test(suite, tests, options = {}) {
     }
     const args = ['testem', options.ci ? 'ci' : '', '--port', port, '-f', tempConfig, '-l', options.context.map(_.upperFirst)];
     // env
-    process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
-    process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
-    if (options.filter) {
-        process.env.QUNIT_FILTER = options.filter;
-    }
+    // process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
+    // process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
+    // if (options.filter) {
+    //     process.env.QUNIT_FILTER = options.filter;
+    // }
     // open localhost
     const url = `http://localhost:${port}/`;
     const start = (os.platform() == 'darwin' ? 'open' : os.platform() == 'win32' ? 'start' : 'xdg-open');
