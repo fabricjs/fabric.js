@@ -1245,14 +1245,11 @@
   });
 
   QUnit.test.only('getElementOffset inside iframe', function (assert) {
-    var frame = fabric.document.createElement('iframe');
-    fabric.document.body.appendChild(frame);
-    var iframeDoc = frame.contentDocument || frame.contentWindow.document;
+    const shadowOpen = fabric.document.body.attachShadow({mode: 'open'});
     var el = fabric.document.createElement('canvas');
-    iframeDoc.body.appendChild(el);
-    frame.style.left = '200px';
+    shadowOpen.appendChild(el);
     el.style.left = '200px';
-    assert.equal(fabric.util.getElementOffset(el).left, 400);
+    assert.equal(fabric.util.getElementOffset(el).left, 200);
     assert.equal(fabric.util.getElementOffset(el).top, 0);
   });
 
