@@ -1,5 +1,6 @@
 import { NextPage } from "next";
 import React from "react";
+import { fabric } from "fabric";
 import { useCanvas } from "../util/useCanvas";
 
 const IndexPage: NextPage = () => {
