@@ -401,15 +401,17 @@
     canvas.requestRenderAll = countRenderAll;
     canvas.renderOnAddRemove = true;
     assert.equal(renderAllCount, 0);
-    var rect = makeRect();
+    var rect = makeRect(), otherRect = makeRect();
     canvas.insertAt(rect, 1);
     assert.equal(renderAllCount, 1);
     assert.strictEqual(canvas.item(1), rect);
     canvas.insertAt(rect, 2);
+    assert.equal(renderAllCount, 1, 'last insertAt call was rejected');
+    assert.strictEqual(canvas.item(1), rect, 'last insertAt call was rejected');
+    canvas.insertAt(otherRect, 2);
+    assert.strictEqual(canvas.item(2), otherRect);
     assert.equal(renderAllCount, 2);
-    assert.strictEqual(canvas.item(2), rect);
-    assert.equal(canvas.insertAt(rect, 2), canvas, 'should be chainable');
-    assert.equal(renderAllCount, 3);
+    assert.deepEqual(canvas.getObjects(), [rect1, rect, otherRect, rect2]);
   });
 
   QUnit.test('insertAt renderOnAddRemove disabled', function(assert) {

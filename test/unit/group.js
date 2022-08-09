@@ -808,6 +808,11 @@
     group.add(rect4);
     assert.deepEqual(group.getObjects(), [rect2, nestedGroup, rect3, rect4], 'rect4 should have been added');
     assert.deepEqual(canvas.getObjects(), [], 'rect4 should have been removed from canvas');
+    //  remove from group, add to canvas
+    assert.ok(group.contains(rect4), 'rect4 is contained in group');
+    canvas.add(rect4);
+    assert.deepEqual(canvas.getObjects(), [rect4], 'rect4 should have been added to canvas');
+    assert.deepEqual(group.getObjects(), [rect2, nestedGroup, rect3], 'rect4 should have been removed');
   });
 
   QUnit.test('group remove', function(assert) {
