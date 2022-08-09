@@ -69,7 +69,6 @@
       fs.writeFileSync(plainFileName, dataUrl, { encoding: 'base64' });
     }
     else if (original) {
-      console.log('creating golden for ', filename);
       original.toBlob(blob => {
         const formData = new FormData();
         formData.append('file', blob, filename);
