@@ -69,7 +69,6 @@
     "@types/node": "^17.0.21",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
     "@typescript-eslint/parser": "^5.29.0",
-    "ansi-escape": "^1.1.0",
     "auto-changelog": "^2.3.0",
     "chalk": "^2.4.1",
     "commander": "^9.1.0",

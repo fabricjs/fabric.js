@@ -5,7 +5,6 @@ const _ = require('lodash');
 const path = require('path');
 const cp = require('child_process');
 const inquirer = require('inquirer');
-const ansiEscapes = require('ansi-escapes');
 const fuzzy = require('fuzzy');
 const chalk = require('chalk');
 const moment = require('moment');
@@ -263,7 +262,7 @@ async function test(suite, tests, options = {}) {
     fs.writeFileSync(tempConfig, JSON.stringify(data, null, '\t'));
     // args
     const port = options.port || suite === 'visual' ? 8081 : 8080;
-    await kill(port);
+    await kill(port).catch();
     const args = ['testem', options.ci ? 'ci' : '', '--port', port, '-f', tempConfig, '-l', options.context.map(_.upperFirst)];
     // env
     process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
