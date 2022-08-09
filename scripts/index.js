@@ -24,7 +24,7 @@ const CLI_CACHE = path.resolve(__dirname, '..', '.dumps', 'cli_cache.json');
 const websiteDir = path.resolve(wd, '../fabricjs.com');
 const dumpsPath = path.resolve(wd, '.dumps');
 if (!fs.existsSync(dumpsPath)) {
-    fs.mkdirSync(dumpsPath)
+    fs.mkdirSync(dumpsPath);
 }
 
 function execGitCommand(cmd) {
@@ -299,7 +299,7 @@ function startGoldensServer() {
                 const port = server.address().port;
                 const url = `http://localhost:${port}/`;
                 console.log(chalk.bold('goldens server listening on'), chalk.blue(url));
-                resolve(url);
+                resolve({ url, server });
             });
     });
 }
@@ -312,6 +312,7 @@ function startGoldensServer() {
  */
 async function test(suite, tests, options = {}) {
     // create testem temp config for this run
+    let task;
     const tempConfig = path.resolve(wd, '.dumps', `testem-${suite}.temp.json`);
     const data = require(path.resolve(wd, suite === 'visual' ? 'testem-visual.json' : 'testem.json'));
     data.serve_files = data.serve_files
@@ -319,7 +320,11 @@ async function test(suite, tests, options = {}) {
         .concat(tests || []);
     data.launchers.Node.command = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' ');
     if (suite === 'visual') {
-        data.proxies['/goldens'].target = await startGoldensServer();
+        const { url, server } = await startGoldensServer();
+        data.proxies['/goldens'].target = url;
+        if (options.ci) {
+            task = () => server.close();
+        }
     }
     fs.writeFileSync(tempConfig, JSON.stringify({
         ...data,
@@ -349,9 +354,9 @@ async function test(suite, tests, options = {}) {
         cwd: wd,
         env: process.env,
         shell: true,
-        stdio: 'inherit',
+        stdio: 'pipe',
         detached: !options.ci
-    });
+    }).stdout.on('data', (b) => console.log(chalk.bold(`${suite}:`), b.toString()));
 }
 
 /**
