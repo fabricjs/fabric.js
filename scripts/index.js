@@ -258,20 +258,21 @@ function test(suite, tests, options = {}) {
     data.serve_files = data.serve_files.filter(p => p !== `test/${suite}/*.js` || tests.includes(`test/${suite}`)).concat(tests);
     data.launchers.Node.command = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests).join(' ');
     fs.writeFileSync(tempConfig, JSON.stringify(data, null, '\t'));
-    // run
+    // args
     const port = suite === 'visual' ? 8081 : 8080;
-    const args = ['testem', '--port', port, '-f', tempConfig, '-l', 'Chrome,Node,Firefox'];
+    const args = ['testem', 'ci', '--port', port, '-f', tempConfig, '-l', options.browsers.concat('node').map(_.upperFirst)];
     // env
     process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
     process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
     if (options.filter) {
         process.env.QUNIT_FILTER = options.filter;
     }
+    // open localhost
     const url = `http://localhost:${port}/`;
     const start = (os.platform() == 'darwin' ? 'open' : os.platform() == 'win32' ? 'start' : 'xdg-open');
-    cp.exec([start, url].join(' '));
-    // spawn
-    cp.spawn(args.join(' '), { cwd: wd, env: process.env, shell: true, detached: true });
+    options.launch && cp.exec([start, url].join(' '));
+    // run
+    cp.spawnSync(args.join(' '), { cwd: wd, env: process.env, shell: true, stdio: 'inherit' });
 }
 
 /**
@@ -429,6 +430,8 @@ program
     .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
     .option('-r, --recreate', 'recreate visual refs (golden images)', false)
     .option('-v, --verbose', 'log passing tests', false)
+    .option('-l, --launch', 'launch tests in the browser', false)
+    .addOption(new commander.Option('-b, --browsers [browsers...]', 'browsers to test on').choices(['chrome', 'firefox']).default(['chrome']))
     .option('-cc, --clear-cache', 'clear CLI test cache', false)
     .action((options) => {
         if (options.clearCache) {
