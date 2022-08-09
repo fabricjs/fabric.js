@@ -1,0 +1,32 @@
+{
+  "name": "fabric-nextjs",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "type-check": "tsc"
+  },
+  "dependencies": {
+    "bootstrap": "5.2.0",
+    "fabric": "*",
+    "jsdom": "20.0.0",
+    "next": "latest",
+    "node-canvas": "2.9.0",
+    "react": "^16.10.1",
+    "react-bootstrap": "2.5.0",
+    "react-dom": "^16.10.1"
+  },
+  "devDependencies": {
+    "@types/node": "^12.7.8",
+    "@types/react": "^16.9.3",
+    "@types/react-dom": "^16.9.1",
+    "typescript": "3.6.3"
+  },
+  "license": "ISC",
+  "keywords": [
+    "fabric",
+    "next.js"
+  ],
+  "description": ""
+}
