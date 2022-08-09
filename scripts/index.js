@@ -288,7 +288,7 @@ function startGoldensServer() {
                     res.end('This endpoint is used by fabric.js and testem to generate goldens');
                 }
                 else if (req.method.toUpperCase() === 'GET') {
-                    const filename = req.url.split('/golden/')[1];
+                    const filename = req.url.split('/golden/')[1] || req.url;
                     const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
                     res.end(JSON.stringify({ exists: fs.existsSync(goldenPath) }));
                 }
