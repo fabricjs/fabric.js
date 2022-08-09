@@ -19,19 +19,13 @@ const program = new commander.Command();
 
 const { transform: transformFiles, listFiles } = require('./transform_files');
 
-
-function ensureDumps() {
-    const dumpsPath = path.resolve(wd, '.dumps');
-    if (!fs.existsSync(dumpsPath)) {
-        fs.mkdirSync(dumpsPath)
-    }
-}
-
-ensureDumps();
-
 const wd = path.resolve(__dirname, '..');
 const CLI_CACHE = path.resolve(__dirname, '..', '.dumps', 'cli_cache.json');
 const websiteDir = path.resolve(wd, '../fabricjs.com');
+const dumpsPath = path.resolve(wd, '.dumps');
+if (!fs.existsSync(dumpsPath)) {
+    fs.mkdirSync(dumpsPath)
+}
 
 function execGitCommand(cmd) {
     return cp.execSync(cmd, { cwd: wd }).toString()
