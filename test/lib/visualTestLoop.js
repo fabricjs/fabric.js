@@ -65,8 +65,18 @@
     if (fabric.isLikelyNode && original) {
       var plainFileName = filename.replace('file://', '');
       var dataUrl = original.toDataURL().split(',')[1];
-      console.log('creating original for ', filename);
+      console.log('creating golden for ', filename);
       fs.writeFileSync(plainFileName, dataUrl, { encoding: 'base64' });
+    }
+    else if (original) {
+      console.log('creating golden for ', filename);
+      original.toBlob(blob => {
+        const formData = new FormData();
+        formData.append('file', blob, filename);
+        const request = new XMLHttpRequest();
+        request.open('POST', '/goldens', true);
+        request.send(formData);
+      }, 'image/png');
     }
   }
 

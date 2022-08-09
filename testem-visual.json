@@ -42,5 +42,16 @@
     }
   },
   "timeout": 540,
-  "parallel": 4
+  "parallel": 4,
+  "proxies": {
+    "/goldens": {
+      "target": "http://localhost:5000",
+      "secure": false
+    }
+  },
+  "qunit":{
+    "recreate": false,
+    "debug": false,
+    "filter": null
+  }
 }
