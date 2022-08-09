@@ -28,21 +28,25 @@
         diff: diff,
       };
 
-      var template = document.getElementById('error_output');
-      var errorOutput = template.content.cloneNode(true);
-      Object.keys(data).forEach(key => {
-        const canvas = data[key];
-        errorOutput.querySelector(`*[data-canvas-type="${key}"]`).appendChild(canvas);
-        canvas.style.cursor = 'pointer';
-        canvas.onclick = () => {
-          const link = document.createElement('a');
-          link.href = fabric.util.toDataURL(canvas, 'png', 1);
-          link.download = `(${key}) ${goldenName}`;
-          link.click();
-        }
-      });
       if (node) {
+        var template = document.getElementById('error_output');
+        var errorOutput = template.content.cloneNode(true);       
+        Object.keys(data).forEach(key => {
+          const canvas = data[key];
+          errorOutput.querySelector(`*[data-canvas-type="${key}"]`).appendChild(canvas);
+          canvas.style.cursor = 'pointer';
+          canvas.onclick = () => {
+            const link = document.createElement('a');
+            link.href = fabric.util.toDataURL(canvas, 'png', 1);
+            link.download = `(${key}) ${goldenName}`;
+            link.click();
+          }
+        });
         node.appendChild(errorOutput);
+        !!node.querySelector('.qunit-collapsed') && node.querySelector('table').classList.add('qunit-collapsed');
+        node.firstChild.addEventListener('click', () => {
+          node.querySelector('table').classList.toggle('qunit-collapsed');
+        });
       }
       // after one run, disable
       this.currentArgs.enabled = false;
