@@ -82,7 +82,6 @@
     "inquirer-checkbox-plus-prompt": "^1.0.1",
     "kill-port": "^2.0.1",
     "moment": "^2.29.1",
-    "nodemon": "^2.0.19",
     "nyc": "^15.1.0",
     "pixelmatch": "^4.0.2",
     "qunit": "^2.17.2",
