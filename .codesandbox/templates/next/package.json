@@ -1,5 +1,5 @@
 {
-  "name": "fabric-nextjs",
+  "name": "fabric-nextjs-sandbox",
   "version": "1.0.0",
   "scripts": {
     "dev": "next",
@@ -28,5 +28,5 @@
     "fabric",
     "next.js"
   ],
-  "description": ""
+  "description": "fabric.js on next.js"
 }
