@@ -11,6 +11,7 @@ const chalk = require('chalk');
 const moment = require('moment');
 const Checkbox = require('inquirer-checkbox-plus-prompt');
 const commander = require('commander');
+const kill = require('kill-port')
 // const rollup = require('rollup');
 // const loadConfigFile = require('rollup/loadConfigFile');
 const program = new commander.Command();
@@ -251,7 +252,7 @@ function exportToWebsite(options) {
  * @param {string[]} tests file paths
  * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:boolean}} [options]
  */
-function test(suite, tests, options = {}) {
+async function test(suite, tests, options = {}) {
     // create testem temp config for this run
     const tempConfig = path.resolve(wd, 'scripts', `testem-${suite}.temp.json`);
     const data = require(path.resolve(wd, suite === 'visual' ? 'testem-visual.json' : 'testem.json'));
@@ -260,7 +261,8 @@ function test(suite, tests, options = {}) {
     fs.writeFileSync(tempConfig, JSON.stringify(data, null, '\t'));
     // args
     const port = suite === 'visual' ? 8081 : 8080;
-    const args = ['testem', 'ci', '--port', port, '-f', tempConfig, '-l', options.browsers.concat('node').map(_.upperFirst)];
+    await kill(port);
+    const args = ['testem', options.ci ? 'ci' : '', '--port', port, '-f', tempConfig, '-l', options.browsers.concat('node').map(_.upperFirst)];
     // env
     process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
     process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
@@ -272,7 +274,13 @@ function test(suite, tests, options = {}) {
     const start = (os.platform() == 'darwin' ? 'open' : os.platform() == 'win32' ? 'start' : 'xdg-open');
     options.launch && cp.exec([start, url].join(' '));
     // run
-    cp.spawnSync(args.join(' '), { cwd: wd, env: process.env, shell: true, stdio: 'inherit' });
+    cp[options.ci ? 'spawnSync' : 'spawn'](args.join(' '), {
+        cwd: wd,
+        env: process.env,
+        shell: true,
+        stdio: 'inherit',
+        detached: !options.ci
+    });
 }
 
 /**
@@ -431,8 +439,9 @@ program
     .option('-r, --recreate', 'recreate visual refs (golden images)', false)
     .option('-v, --verbose', 'log passing tests', false)
     .option('-l, --launch', 'launch tests in the browser', false)
+    .option('--ci, --no-ci', 'runs testem with a `ci` flag', true)
     .addOption(new commander.Option('-b, --browsers [browsers...]', 'browsers to test on').choices(['chrome', 'firefox']).default(['chrome']))
-    .option('-cc, --clear-cache', 'clear CLI test cache', false)
+    .option('--clear-cache', 'clear CLI test cache', false)
     .action((options) => {
         if (options.clearCache) {
             fs.removeSync(CLI_CACHE);
