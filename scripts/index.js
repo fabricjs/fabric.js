@@ -249,7 +249,7 @@ function exportToWebsite(options) {
  *
  * @param {'unit' | 'visual'} suite
  * @param {string[] | null} tests file paths
- * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:boolean}} [options]
+ * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:string}} [options]
  */
 async function test(suite, tests, options = {}) {
     // create testem temp config for this run
@@ -259,7 +259,11 @@ async function test(suite, tests, options = {}) {
         .filter(p => p !== `test/${suite}/*.js` || !tests)
         .concat(tests || []);
     data.launchers.Node.command = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' ');
-    fs.writeFileSync(tempConfig, JSON.stringify({ ...data, qunit: options }, null, '\t'));
+    fs.writeFileSync(tempConfig, JSON.stringify({
+        ...data,
+        qunit: options,
+        tap_failed_tests_only: !options.verbose
+    }, null, '\t'));
     // args
     const port = options.port || suite === 'visual' ? 8081 : 8080;
     try {
