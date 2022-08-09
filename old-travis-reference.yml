@@ -54,7 +54,7 @@ jobs:
         apt:
           packages: # avoid installing packages
     - stage: Unit Tests
-      env: LAUNCHER=Firefox
+      env: LAUNCHER=firefox
       script: npm run build:fast && npm run test -- -s unit -p 8080 -c $LAUNCHER
       addons:
         apt:
