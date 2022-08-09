@@ -47,7 +47,7 @@ if(
    // is Google Chrome
     QUnit.recreateVisualRefs = {{qunit.recreate}};
     QUnit.debugVisual = {{qunit.debug}};
-    QUnit.config.filter = {{qunit.filter}};
+    {{#qunit.filter}}QUnit.config.filter = {{qunit.filter}};{{/qunit.filter}}
 }
 
 </script>
