@@ -282,9 +282,15 @@
      */
     enterGroup: function (object, removeParentTransform) {
       if (object.group) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Group: removing object from group before entering another', object, object.group, this);
+        /* _DEV_MODE_END_ */
         object.group.remove(object);
       }
       else if (object.canvas) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Group: removing object from canvas before entering group', object, object.canvas, this);
+        /* _DEV_MODE_END_ */
         object.canvas.remove(object);
       }
       this._enterGroup(object, removeParentTransform);

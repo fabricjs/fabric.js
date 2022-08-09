@@ -571,14 +571,32 @@
       return this.lowerCanvasEl;
     },
 
+    canEnterCanvas: function (object) {
+      if (object.canvas && object.canvas === this) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Canvas: duplicate objects are not supported inside canvas, this call has no effect', object, this);
+        /* _DEV_MODE_END_ */
+        return false;
+      }
+      return true;
+    },
+
+    _filterObjectsBeforeEnteringCanvas: function (objects) {
+      return objects.filter(function (object, index, array) {
+        // can enter AND is the first occurrence of the object in the passed args (to prevent adding duplicates)
+        return this.canEnterCanvas(object) && array.indexOf(object) === index;
+      }, this);
+    },
+
     /**
      * @param {...fabric.Object} objects to add
      * @return {Self} thisArg
      * @chainable
      */
     add: function () {
-      fabric.Collection.add.call(this, arguments, this._onObjectAdded);
-      arguments.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
+      var allowedObjects = this._filterObjectsBeforeEnteringCanvas(Array.from(arguments));
+      fabric.Collection.add.call(this, allowedObjects, this._onObjectAdded);
+      allowedObjects.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -592,8 +610,9 @@
      * @chainable
      */
     insertAt: function (objects, index) {
-      fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
-      (Array.isArray(objects) ? objects.length > 0 : !!objects) && this.renderOnAddRemove && this.requestRenderAll();
+      var allowedObjects = this._filterObjectsBeforeEnteringCanvas(Array.isArray(objects) ? objects : [objects]);
+      fabric.Collection.insertAt.call(this, allowedObjects, index, this._onObjectAdded);
+      allowedObjects.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
       return this;
     },
 
@@ -610,21 +629,26 @@
 
     /**
      * @private
-     * @param {fabric.Object} obj Object that was added
+     * @param {fabric.Object} object Object that was added
      */
-    _onObjectAdded: function(obj) {
-      this.stateful && obj.setupState();
-      if (obj.canvas && obj.canvas !== this) {
+    _onObjectAdded: function(object) {
+      this.stateful && object.setupState();
+      if (object.group && object.group instanceof fabric.ActiveSelection === false) {
         /* _DEV_MODE_START_ */
-        console.warn('fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
-          'Resulting to default behavior: removing object from previous canvas and adding to new canvas');
+        console.warn('fabric.Canvas: removing object from group before entering canvas', object, object.group, this);
         /* _DEV_MODE_END_ */
-        obj.canvas.remove(obj);
+        object.group.remove(object);
       }
-      obj._set('canvas', this);
-      obj.setCoords();
-      this.fire('object:added', { target: obj });
-      obj.fire('added', { target: this });
+      else if (object.canvas) {
+        /* _DEV_MODE_START_ */
+        console.warn('fabric.Canvas: removing object from canvas before entering another', object, object.canvas, this);
+        /* _DEV_MODE_END_ */
+        object.canvas.remove(object);
+      }
+      object._set('canvas', this);
+      object.setCoords();
+      this.fire('object:added', { target: object });
+      object.fire('added', { target: this });
     },
 
     /**

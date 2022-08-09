@@ -277,12 +277,14 @@
 
     assert.ok(typeof canvas.insertAt === 'function', 'should respond to `insertAt` method');
 
-    var rect = makeRect();
+    var rect = makeRect(), otherRect = makeRect();
     canvas.insertAt(rect, 1);
     assert.strictEqual(canvas.item(1), rect);
     canvas.insertAt(rect, 2);
-    assert.strictEqual(canvas.item(2), rect);
-    assert.equal(canvas.insertAt(rect, 2), canvas, 'should be chainable');
+    assert.strictEqual(canvas.item(1), rect, 'should not change anything');
+    canvas.insertAt(otherRect, 2);
+    assert.strictEqual(canvas.item(2), otherRect);
+    assert.deepEqual(canvas.getObjects(), [rect1, rect, otherRect, rect2]);
   });
 
   QUnit.test('remove', function(assert) {
