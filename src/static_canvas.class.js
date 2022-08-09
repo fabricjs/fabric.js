@@ -564,17 +564,24 @@
       return this.lowerCanvasEl;
     },
 
+    _onBeforeObjectsAdded: function (objects) {
+      objects.forEach(function (object) {
+        if (object.group) {
+          /* _DEV_MODE_START_ */
+          console.warn('fabric.Canvas: removing object from group before entering canvas', object, object.group, this);
+          /* _DEV_MODE_END_ */
+          object.group.remove(object);
+        }
+      });
+    },
+
     /**
      * @param {...fabric.Object} objects to add
      * @return {Self} thisArg
      * @chainable
      */
     add: function () {
-      Array.from(arguments).forEach(function (object) {
-        if (object.group) {
-          object.group.remove(object);
-        }
-      });
+      this._onBeforeObjectsAdded(Array.from(arguments));
       fabric.Collection.add.call(this, arguments, this._onObjectAdded);
       arguments.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
       return this;
@@ -590,11 +597,7 @@
      * @chainable
      */
     insertAt: function (objects, index) {
-      Array.from(arguments).forEach(function (object) {
-        if (object.group) {
-          object.group.remove(object);
-        }
-      });
+      this._onBeforeObjectsAdded(Array.from(arguments));
       fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
       (Array.isArray(objects) ? objects.length > 0 : !!objects) && this.renderOnAddRemove && this.requestRenderAll();
       return this;
