@@ -249,15 +249,17 @@ function exportToWebsite(options) {
 /**
  *
  * @param {'unit' | 'visual'} suite
- * @param {string[]} tests file paths
+ * @param {string[] | null} tests file paths
  * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:boolean}} [options]
  */
 async function test(suite, tests, options = {}) {
     // create testem temp config for this run
     const tempConfig = path.resolve(wd, 'scripts', `testem-${suite}.temp.json`);
     const data = require(path.resolve(wd, suite === 'visual' ? 'testem-visual.json' : 'testem.json'));
-    data.serve_files = data.serve_files.filter(p => p !== `test/${suite}/*.js` || tests.includes(`test/${suite}`)).concat(tests);
-    data.launchers.Node.command = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests).join(' ');
+    data.serve_files = data.serve_files
+        .filter(p => p !== `test/${suite}/*.js` || !tests)
+        .concat(tests || []);
+    data.launchers.Node.command = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' ');
     fs.writeFileSync(tempConfig, JSON.stringify(data, null, '\t'));
     // args
     const port = suite === 'visual' ? 8081 : 8080;
@@ -388,12 +390,21 @@ async function runIntreactiveTestSuite(options) {
     //  some tests fail because of some pollution when run from the same context
     // test(_.map(await selectTestFile(), curr => `test/${curr.type}/${curr.file}`))
     const tests = _.reduce(await selectTestFile(), (acc, curr) => {
-        acc[curr.type].push(`test/${curr.type}/${curr.file}`);
+        if (!curr.file) {
+            acc[curr.type] = true;
+        }
+        else if (Array.isArray(acc[curr.type])) {
+            acc[curr.type].push(`test/${curr.type}/${curr.file}`);
+        }
         return acc;
     }, { unit: [], visual: [] });
     _.reduce(tests, async (queue, files, suite) => {
         await queue;
-        if (files.length > 0) {
+        if (files === true) {
+            console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
+            return test(suite, null, options);
+        }
+        else if (Array.isArray(files) && files.length > 0) {
             console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
             return test(suite, files, options);
         }
