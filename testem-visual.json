@@ -1,5 +1,6 @@
 {
   "framework": "qunit",
+  "visual": true,
   "serve_files": [
     "dist/fabric.js",
     "test/lib/pixelmatch.js",
@@ -7,13 +8,22 @@
     "test/lib/visualCallbackQunit.js",
     "test/visual/*.js"
   ],
+  "styles": [
+    "test/lib/tests.css"
+  ],
   "routes": {
     "/fixtures": "test/fixtures"
   },
   "test_page": "tests.mustache?hidepassed&hideskipped&timeout=60000",
   "browser_args": {
-    "Chrome": [ "--headless", "--disable-gpu", "--remote-debugging-port=9222" ],
-    "Firefox": [ "--headless" ]
+    "Chrome": [
+      "--headless",
+      "--disable-gpu",
+      "--remote-debugging-port=9222"
+    ],
+    "Firefox": [
+      "--headless"
+    ]
   },
   "launch_in_dev": [
     "Chrome",
