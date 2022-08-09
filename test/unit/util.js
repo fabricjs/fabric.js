@@ -1252,7 +1252,8 @@
     iframeDoc.body.appendChild(el);
     frame.style.left = '200px';
     el.style.left = '200px';
-    assert.deepEqual(fabric.util.getElementOffset(el), { left: 400, top: 0 });
+    assert.equal(fabric.util.getElementOffset(el).left, 400);
+    assert.equal(fabric.util.getElementOffset(el).top, 0);
   });
 
 })();
