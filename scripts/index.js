@@ -262,9 +262,9 @@ async function test(suite, tests, options = {}) {
     data.launchers.Node.command = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' ');
     fs.writeFileSync(tempConfig, JSON.stringify(data, null, '\t'));
     // args
-    const port = suite === 'visual' ? 8081 : 8080;
+    const port = options.port || suite === 'visual' ? 8081 : 8080;
     await kill(port);
-    const args = ['testem', options.ci ? 'ci' : '', '--port', port, '-f', tempConfig, '-l', options.browsers.concat('node').map(_.upperFirst)];
+    const args = ['testem', options.ci ? 'ci' : '', '--port', port, '-f', tempConfig, '-l', options.context.map(_.upperFirst)];
     // env
     process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
     process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
@@ -451,7 +451,8 @@ program
     .option('-v, --verbose', 'log passing tests', false)
     .option('-l, --launch', 'launch tests in the browser', false)
     .option('--ci, --no-ci', 'runs testem with a `ci` flag', true)
-    .addOption(new commander.Option('-b, --browsers [browsers...]', 'browsers to test on').choices(['chrome', 'firefox']).default(['chrome']))
+    .addOption(new commander.Option('-c, --context [context...]', 'context to test in').choices(['chrome', 'firefox', 'node']).default(['chrome', 'node']))
+    .option('-p, --port')
     .option('--clear-cache', 'clear CLI test cache', false)
     .action((options) => {
         if (options.clearCache) {

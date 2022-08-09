@@ -48,14 +48,14 @@ jobs:
         apt:
           packages: # avoid installing packages
     - stage: Unit Tests
-      env: LAUNCHER=Chrome
-      script: npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER
+      env: LAUNCHER=chrome
+      script: npm run build:fast && npm run test -- -s unit -p 8080 -c $LAUNCHER
       addons:
         apt:
           packages: # avoid installing packages
     - stage: Unit Tests
       env: LAUNCHER=Firefox
-      script: npm run build:fast && testem ci --port 8080 -f testem.json -l $LAUNCHER
+      script: npm run build:fast && npm run test -- -s unit -p 8080 -c $LAUNCHER
       addons:
         apt:
           packages: # avoid installing packages
