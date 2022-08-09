@@ -570,6 +570,11 @@
      * @chainable
      */
     add: function () {
+      Array.from(arguments).forEach(function (object) {
+        if (object.group) {
+          object.group.remove(object);
+        }
+      });
       fabric.Collection.add.call(this, arguments, this._onObjectAdded);
       arguments.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
       return this;
@@ -585,6 +590,11 @@
      * @chainable
      */
     insertAt: function (objects, index) {
+      Array.from(arguments).forEach(function (object) {
+        if (object.group) {
+          object.group.remove(object);
+        }
+      });
       fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
       (Array.isArray(objects) ? objects.length > 0 : !!objects) && this.renderOnAddRemove && this.requestRenderAll();
       return this;
