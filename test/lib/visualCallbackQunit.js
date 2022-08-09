@@ -14,7 +14,6 @@
       var goldenCanvasRef = this.currentArgs.golden;
       var goldenName = this.currentArgs.goldenName;
       var id = 'qunit-test-output-' + details.testId;
-      var node = document.getElementById(id);
       var fabricCopy = document.createElement('canvas');
       var diff = document.createElement('canvas');
       diff.width = fabricCopy.width = fabricCanvasDataRef.width;
