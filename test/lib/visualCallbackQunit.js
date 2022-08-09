@@ -35,6 +35,7 @@
           const canvas = data[key];
           errorOutput.querySelector(`*[data-canvas-type="${key}"]`).appendChild(canvas);
           canvas.style.cursor = 'pointer';
+          canvas.setAttribute('data-golden', goldenName);
           canvas.onclick = () => {
             const link = document.createElement('a');
             link.href = fabric.util.toDataURL(canvas, 'png', 1);

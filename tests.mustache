@@ -12,8 +12,24 @@
 
 <script>
 QUnit.config.reorder = false;
-{{#visual}}QUnit.testDone(visualCallback.testDone.bind(visualCallback));{{/visual}}
 </script>
+
+{{#visual}}
+<script>
+QUnit.testDone(visualCallback.testDone.bind(visualCallback));
+
+function downloadGoldens() {
+    const checkbox = document.getElementById('qunit-urlconfig-hidepassed');
+    checkbox.checked && checkbox.click();
+    document.querySelectorAll('[data-canvas-type="actual"] > canvas').forEach(canvas => {
+        const link = document.createElement('a');
+        link.href = fabric.util.toDataURL(canvas, 'png', 1);
+        link.download = canvas.getAttribute('data-golden');
+        link.click();
+    });
+}
+</script>
+{{/visual}}
 
 {{#styles}}<link rel="stylesheet" href="{{.}}">{{/styles}}
 
@@ -48,6 +64,12 @@ QUnit.config.reorder = false;
         </tbody>
     </table>
 </template>
+
+{{#visual}}
+<footer>
+    <button onclick="downloadGoldens()" class="tr-button">Download Goldens</button>
+</footer>
+{{/visual}}
 
 </body>
 </html>
