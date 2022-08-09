@@ -247,54 +247,31 @@ function exportToWebsite(options) {
 
 /**
  *
+ * @param {'unit' | 'visual'} suite
  * @param {string[]} tests file paths
  * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:boolean}} [options]
  */
-function test(tests, options) {
-    options = options || {};
-    const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests);
+function test(suite, tests, options = {}) {
+    // create testem temp config for this run
+    const tempConfig = path.resolve(wd, 'scripts', `testem-${suite}.temp.json`);
+    const data = require(path.resolve(wd, suite === 'visual' ? 'testem-visual.json' : 'testem.json'));
+    data.serve_files = data.serve_files.filter(p => p !== `test/${suite}/*.js` || tests.includes(`test/${suite}`)).concat(tests);
+    data.launchers.Node.command = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests).join(' ');
+    fs.writeFileSync(tempConfig, JSON.stringify(data, null, '\t'));
+    // run
+    const port = suite === 'visual' ? 8081 : 8080;
+    const args = ['testem', '--port', port, '-f', tempConfig, '-l', 'Chrome,Node,Firefox'];
+    // env
     process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
     process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
     if (options.filter) {
         process.env.QUNIT_FILTER = options.filter;
     }
-    return new Promise((resolve, reject) => {
-        try {
-            var p = cp.spawn(args.join(' '), { cwd: wd, env: process.env, shell: true, stdio: 'pipe' });
-            let clearLines = 0;
-            process.stdout.write(ansiEscapes.cursorHide);
-            p.stdout.on('data', function (data) {
-                data = _.compact(data.toString().trim().split(/\n/));
-                data.forEach(line => {
-                    if (clearLines > 0 && !options.verbose) {
-                        process.stdout.write(ansiEscapes.cursorUp(1));
-                        process.stdout.write(ansiEscapes.eraseDown);
-                    }
-                    if (line.startsWith('ok')) {
-                        clearLines = 1;
-                        console.log(chalk.green(line));
-                    }
-                    else if (line.startsWith('not ok')) {
-                        clearLines = 0;
-                        console.log(chalk.bold(chalk.red('not ok') + line.slice(6)));
-                    }
-                    else {
-                        clearLines = 0;
-                        console.log(line);
-                    }
-                });
-            });
-            p.stdout.once('end', () => {
-                process.stdout.write(ansiEscapes.cursorDown());
-                process.stdout.write(ansiEscapes.cursorShow);
-                resolve();
-            });
-        } catch (error) {
-            process.stdout.write(ansiEscapes.cursorDown());
-            process.stdout.write(ansiEscapes.cursorShow);
-            reject(error);
-        }
-    });
+    const url = `http://localhost:${port}/`;
+    const start = (os.platform() == 'darwin' ? 'open' : os.platform() == 'win32' ? 'start' : 'xdg-open');
+    cp.exec([start, url].join(' '));
+    // spawn
+    cp.spawn(args.join(' '), { cwd: wd, env: process.env, shell: true, detached: true });
 }
 
 /**
@@ -409,7 +386,7 @@ async function runIntreactiveTestSuite(options) {
         await queue;
         if (files.length > 0) {
             console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
-            return test(files, options);
+            return test(suite, files, options);
         }
     }, Promise.resolve());
 }
@@ -464,11 +441,11 @@ program
             _.reduce(options.suite, async (queue, suite) => {
                 await queue;
                 console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
-                return test(`test/${suite}`, options);
+                return test(suite, null, options);
             }, Promise.resolve());
         }
         else if (options.file) {
-            test(`test/${options.file}`, options);
+            test(options.file.startsWith('visual') ? 'visual' : 'unit', [`test/${options.file}`], options);
         }
         else {
             runIntreactiveTestSuite(options);

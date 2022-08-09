@@ -11,3 +11,4 @@ before_commit
 /dist/fabric.require.js
 /dist/fabric.min.js.gz
 /scripts/cli_cache.json
+/scripts/testem*.temp.json
