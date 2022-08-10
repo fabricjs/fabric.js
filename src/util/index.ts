@@ -1,5 +1,4 @@
 //@ts-nocheck
-export * from './cos';
 import { fabric } from '../../HEADER'
 import './animate'; // optional animation
 import './animate_color'; // optional animation
@@ -12,10 +11,11 @@ import './lang_array';
 import './lang_class';
 import './lang_object';
 import './lang_string';
-import './misc/misc.ts';
+import './misc/misc';
 import './path';
 
 const {
+    cos,
     sin,
     getElementOffset,
     removeFromArray,
@@ -91,6 +91,7 @@ const {
     rotatePoint,
 } = fabric.util;
 export {
+    cos,
     sin,
     getElementOffset,
     removeFromArray,
@@ -159,4 +160,3 @@ export {
     composeMatrix,
     rotatePoint
 };
-export default fabric.util;

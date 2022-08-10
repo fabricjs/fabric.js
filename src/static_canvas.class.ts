@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { Point } from './point.class';
 import { removeFromArray } from './util/internals';
+
 (function (global) {
   // aliases for faster resolution
   var fabric = global.fabric, extend = fabric.util.object.extend,

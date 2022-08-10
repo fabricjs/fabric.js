@@ -1,9 +1,9 @@
 //@ts-nocheck
-import { fabric } from '../../HEADER'
-import { DEFAULT_SVG_FONT_SIZE } from '../constants';
-import { Point } from '../point.class';
-import { cos } from './misc/cos';
-import { sin } from './misc/sin';
+import { fabric } from '../../../HEADER'
+import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
+import { Point } from '../../point.class';
+import { cos } from './cos';
+import { sin } from './sin';
 import { rotateVector, createVector, calcAngleBetweenVectors, getHatVector, getBisector } from './vectors';
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
 import { rotatePoint } from './rotatePoint';

@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Point } from '../point.class';
-import { removeFromArray } from './util/internals';
+import { removeFromArray } from '../util/internals';
 
 (function(global) {
   var fabric = global.fabric;
