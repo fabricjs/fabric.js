@@ -1,15 +1,18 @@
 //@ts-nocheck
+import { fabric } from '../../HEADER'
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { Point } from '../point.class';
 import { cos } from './misc/cos';
+import { sin } from './misc/sin';
+import { rotateVector, createVector, calcAngleBetweenVectors, getHatVector, getBisector } from './vectors';
+import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
+import { rotatePoint } from './rotatePoint';
+import { getRandomInt, removeFromArray } from '../internals';
+import { PiBy180 } from '../../constants';
 
-(function(global) {
-  var fabric = global.fabric, sqrt = Math.sqrt,
-      atan2 = Math.atan2,
-      pow = Math.pow,
-      PiBy180 = Math.PI / 180,
-      PiBy2 = Math.PI / 2;
-
+const sqrt = Math.sqrt,
+    atan2 = Math.atan2,
+    pow = Math.pow;
   /**
    * @typedef {[number,number,number,number,number,number]} Matrix
    */
@@ -18,6 +21,20 @@ import { cos } from './misc/cos';
    * @namespace fabric.util
    */
   fabric.util = {
+
+    cos,
+    sin,
+    rotateVector,
+    createVector,
+    calcAngleBetweenVectors,
+    getHatVector,
+    getBisector,
+    degreesToRadians,
+    radiansToDegrees,
+    rotatePoint,
+    // probably we should stop exposing this from the interface
+    getRandomInt,
+    removeFromArray,
     /**
      * Project stroke width on points returning 2 projections for each point as follows:
      * - `miter`: 2 points corresponding to the outer boundary and the inner boundary of stroke.
@@ -1043,8 +1060,6 @@ import { cos } from './misc/cos';
       return new fabric.Group([a], { clipPath: b, inverted: inverted });
     },
 
-    cos: cos,
-
     /**
      * @memberOf fabric.util
      * @param {Object} prevStyle first style to compare
@@ -1152,4 +1167,5 @@ import { cos } from './misc/cos';
       return stylesObject;
     }
   };
-})(typeof exports !== 'undefined' ? exports : window);
+
+

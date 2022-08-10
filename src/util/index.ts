@@ -1,6 +1,5 @@
 //@ts-nocheck
-export * from './misc/index';
-export * from './internals';
+export * from './cos';
 import { fabric } from '../../HEADER'
 import './animate'; // optional animation
 import './animate_color'; // optional animation
@@ -13,10 +12,13 @@ import './lang_array';
 import './lang_class';
 import './lang_object';
 import './lang_string';
+import './misc/misc.ts';
 import './path';
 
 const {
+    sin,
     getElementOffset,
+    removeFromArray,
     toFixed,
     transformPoint,
     invertTransform,
@@ -25,6 +27,7 @@ const {
     toDataURL,
     multiplyTransformMatrices,
     applyTransformToObject,
+    degreesToRadians,
     enlivenObjects,
     enlivenObjectEnlivables,
     cleanUpJsdomNode,
@@ -70,6 +73,8 @@ const {
     animateColor,
     requestAnimFrame,
     cancelAnimFrame,
+    rotateVector,
+    getRandomInt,
     getSmoothPathFromPoints,
     parseUnit,
     toArray,
@@ -78,14 +83,17 @@ const {
     removeListener,
     isTouchEvent,
     sendPointToPlane,
+    radiansToDegrees,
     setStyle,
     calcRotateMatrix,
     makeBoundingBoxFromPoints,
     composeMatrix,
+    rotatePoint,
 } = fabric.util;
-
 export {
+    sin,
     getElementOffset,
+    removeFromArray,
     toFixed,
     transformPoint,
     invertTransform,
@@ -94,6 +102,7 @@ export {
     toDataURL,
     multiplyTransformMatrices,
     applyTransformToObject,
+    degreesToRadians,
     enlivenObjects,
     enlivenObjectEnlivables,
     cleanUpJsdomNode,
@@ -133,6 +142,8 @@ export {
     animateColor,
     requestAnimFrame,
     cancelAnimFrame,
+    rotateVector,
+    getRandomInt,
     getSmoothPathFromPoints,
     parseUnit,
     toArray,
@@ -141,8 +152,11 @@ export {
     removeListener,
     isTouchEvent,
     sendPointToPlane,
+    radiansToDegrees,
     setStyle,
     calcRotateMatrix,
     makeBoundingBoxFromPoints,
     composeMatrix,
+    rotatePoint
 };
+export default fabric.util;

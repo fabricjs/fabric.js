@@ -3,8 +3,17 @@ import { fabric } from './HEADER';
 import './src/mixins/observable.mixin';
 import './src/mixins/collection.mixin';
 import './src/mixins/shared_methods.mixin';
-import * as util from './src/util';
-fabric.util = { ...util };
+import './src/util/misc';
+// import './src/util/named_accessors.mixin'; i would imagine dead forever or proper setters/getters
+import './src/util/path';
+import './src/util/lang_array';
+import './src/util/lang_object';
+import './src/util/lang_string';
+import './src/util/lang_class';
+import './src/util/dom_event'; // optional interaction
+import './src/util/dom_style';
+import './src/util/dom_misc';
+import './src/util/dom_request';
 import './src/log';
 import './src/util/animate'; // optional animation
 import './src/util/animate_color'; // optional animation
