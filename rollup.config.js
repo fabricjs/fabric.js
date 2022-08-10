@@ -13,8 +13,8 @@ export default {
     Number(process.env.MINIFY) ?
       {
         file: process.env.BUILD_MIN_OUTPUT || './dist/fabric.min.js',
-        format: 'cjs',
         name: 'fabric',
+        format: 'cjs',
         plugins: [terser()],
       } : null,
   ],
