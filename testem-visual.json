@@ -12,9 +12,13 @@
     "test/lib/tests.css"
   ],
   "routes": {
+    "/golden_maker": "test/lib/goldenMaker.html",
+    "/golden_maker.html": "test/lib/goldenMaker.html",
     "/fixtures": "test/fixtures"
   },
-  "test_page": "tests.mustache?hidepassed&hideskipped&timeout=60000",
+  "test_page": [
+    "tests.mustache?hidepassed&hideskipped&timeout=60000"
+  ],
   "browser_args": {
     "Chrome": [
       "--headless",
