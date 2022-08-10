@@ -3,7 +3,7 @@ import ts from "rollup-plugin-ts";
 
 // https://rollupjs.org/guide/en/#configuration-files
 export default {
-  external: ['Qunit'],
+  external: ['qunit'],
   input: ['test/unit/index.ts', 'test/visual/index.ts'],
   output: [
     {
