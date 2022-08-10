@@ -7,7 +7,7 @@ export default {
   input: ['test/unit/index.ts', 'test/visual/index.ts'],
   output: [
     {
-      dir: ".dumps/tests",
+      dir: ".dumps/test",
       format: "cjs",
       exports: "named",
       preserveModules: true, // Keep directory structure and files
