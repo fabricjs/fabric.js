@@ -337,7 +337,7 @@ async function test(suite, tests, options = {}) {
     } catch (error) {
         
     }
-    const args = ['testem', options.ci ? 'ci' : '', '--port', port, '-f', tempConfig, '-l', options.context.map(_.upperFirst)];
+    const args = ['testem', !options.dev ? 'ci' : '', '--port', port, '-f', tempConfig, '-l', options.context.map(_.upperFirst)];
     // env
     // process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
     // process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
@@ -354,7 +354,7 @@ async function test(suite, tests, options = {}) {
         env: process.env,
         shell: true,
         stdio: 'pipe',
-        detached: !options.ci
+        detached: options.dev
     })
         .on('exit', close)
         .on('close', close)
@@ -527,7 +527,7 @@ program
     .option('-r, --recreate', 'recreate visual refs (golden images)', false)
     .option('-v, --verbose', 'log passing tests', false)
     .option('-l, --launch', 'launch tests in the browser', false)
-    .option('--ci, --no-ci', 'runs testem with a `ci` flag', true)
+    .option('--dev', 'runs testem in `dev` mode, without a `ci` flag', false)
     .addOption(new commander.Option('-c, --context [context...]', 'context to test in').choices(['chrome', 'firefox', 'node']).default(['chrome', 'node']))
     .option('-p, --port')
     .option('--clear-cache', 'clear CLI test cache', false)
