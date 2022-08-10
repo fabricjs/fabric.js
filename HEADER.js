@@ -19,6 +19,7 @@ if (typeof document !== 'undefined' && typeof window !== 'undefined') {
     fabric.document = document.implementation.createHTMLDocument('');
   }
   fabric.window = window;
+  window.fabric = fabric;
 }
 else {
   // assume we're running under node.js when document/window are not present
