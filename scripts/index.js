@@ -92,8 +92,8 @@ inquirer.registerPrompt('test-selection', ICheckbox);
 // async function rollupBuild(options = {}, onComplete) {
 //     const { options: buildOptions, warnings } = await loadConfigFile(path.resolve(__dirname, '..', 'rollup.config.js'), { format: 'es' });
 //     warnings.flush();
-//     if (options.destination) {
-//         buildOptions.output = [options.destination];
+//     if (options.output) {
+//         buildOptions.output = [options.output];
 //     }
 //     if (options.watch) {
 //         const watcher = rollup.watch(buildOptions);
@@ -131,8 +131,8 @@ function build(options = {}) {
     // ]
     const args = ['npm run', 'build-rollup', '--', options.watch ? '--watch' : ''];
     let minDest;
-    if (options.destination && !options.fast) {
-        const { name, base, ...rest } = path.parse(path.resolve(options.destination));
+    if (options.output && !options.fast) {
+        const { name, base, ...rest } = path.parse(path.resolve(options.output));
         minDest = path.format({ name: `${name}.min`, ...rest });
     }
     return cp.spawn(args.join(' '), {
@@ -142,7 +142,8 @@ function build(options = {}) {
         env: {
             ...process.env,
             MINIFY: Number(!options.fast),
-            BUILD_OUTPUT: options.destination,
+            BUILD_INPUT: options.input,
+            BUILD_OUTPUT: options.output,
             BUILD_MIN_OUTPUT: minDest
         },
     });
@@ -195,14 +196,14 @@ const BUILD_SOURCE = ['src', 'lib', 'HEADER.js'];
 function exportBuildToWebsite(options = {}) {
     _.defaultsDeep(options, { gestures: true });
     build({
-        destination: path.resolve(websiteDir, './lib/fabric.js'),
+        output: path.resolve(websiteDir, './lib/fabric.js'),
         fast: true,
         watch: options.watch
     });
     if (options.gestures) {
         build({
             exclude: ['accessors'],
-            destination: path.resolve(websiteDir, './lib/fabric_with_gestures.js'),
+            output: path.resolve(websiteDir, './lib/fabric_with_gestures.js'),
             fast: true,
             watch: options.watch
         });
@@ -507,12 +508,12 @@ program
     .description('build dist')
     .option('-f, --fast', 'skip minifying')
     .option('-w, --watch')
-    .option('-d, --dest [path]', 'specify the build destination path')
+    .option('-i, --input [...path]', 'specify the build input paths')
+    .option('-o, --output [path]', 'specify the build output path')
     .option('-x, --exclude [exclude...]')
     .option('-m, --modules [modules...]')
     .action((options) => {
-        const { dest: destination, ...rest } = options || {};
-        build({ ...rest, destination });
+        build(options);
     });
 
 program
