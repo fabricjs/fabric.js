@@ -1,15 +1,12 @@
-export * from './assets';
-export * from './clippath';
-export * from './control_rendering';
-export * from './freedraw';
-export * from './generic_rendering';
-export * from './golden';
-export * from './goldenMaker';
-export * from './group_layout';
-export * from './index';
-export * from './resize_filter';
-export * from './svg_import';
-export * from './text';
-export * from './text_path';
-export * from './toDataURL';
-export * from './z_svg_export';
+import './clippath';
+import './control_rendering';
+import './freedraw';
+import './generic_rendering';
+import './group_layout';
+import './resize_filter';
+import './svg_import';
+import './text';
+import './text_path';
+import './toDataURL';
+import './z_svg_export';
+
