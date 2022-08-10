@@ -142,8 +142,8 @@ function build(options = {}) {
         env: {
             ...process.env,
             MINIFY: Number(!options.fast),
-            BUILD_DESTINATION: options.destination,
-            MIN_BUILD_DESTINATION: minDest
+            BUILD_OUTPUT: options.destination,
+            BUILD_MIN_OUTPUT: minDest
         },
     });
 }

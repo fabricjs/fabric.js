@@ -3,16 +3,16 @@ import ts from "rollup-plugin-ts";
 
 // rollup.config.js
 export default {
-  input: ['./index.js'],
+  input: process.env.BUILD_INPUT?.split(',') || ['./index.js'],
   output: [
     {
-        file: process.env.BUILD_DESTINATION || './dist/fabric.js',
+        file: process.env.BUILD_OUTPUT || './dist/fabric.js',
         name: 'fabric',
         format: 'cjs',
     },
     Number(process.env.MINIFY) ?
       {
-        file: process.env.MIN_BUILD_DESTINATION || './dist/fabric.min.js',
+        file: process.env.BUILD_MIN_OUTPUT || './dist/fabric.min.js',
         format: 'cjs',
         name: 'fabric',
         plugins: [terser()],
