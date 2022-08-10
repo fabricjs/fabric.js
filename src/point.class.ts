@@ -1,7 +1,7 @@
 import { fabric } from '../HEADER';
 import { TRadian } from './typedefs';
 
-interface IPoint {
+export interface IPoint {
   x: number
   y: number
 }
@@ -36,7 +36,7 @@ export class Point {
    * @param {Point} that
    * @return {Point} new Point instance with added values
    */
-  add(that: Point): Point {
+  add(that: IPoint): Point {
     return new Point(this.x + that.x, this.y + that.y);
   }
 
@@ -47,7 +47,7 @@ export class Point {
    * @chainable
    * @deprecated
    */
-  addEquals(that: Point): Point {
+  addEquals(that: IPoint): Point {
     this.x += that.x;
     this.y += that.y;
     return this;
@@ -80,7 +80,7 @@ export class Point {
    * @param {Point} that
    * @return {Point} new Point object with subtracted values
    */
-  subtract(that: Point): Point {
+  subtract(that: IPoint): Point {
     return new Point(this.x - that.x, this.y - that.y);
   }
 
@@ -91,7 +91,7 @@ export class Point {
    * @chainable
    * @deprecated
    */
-  subtractEquals(that: Point): Point {
+  subtractEquals(that: IPoint): Point {
     this.x -= that.x;
     this.y -= that.y;
     return this;
@@ -155,7 +155,7 @@ export class Point {
    * @param {Point} that
    * @return {Point}
    */
-  divide(that: Point): Point {
+  divide(that: IPoint): Point {
     return new Point(this.x / that.x, this.y / that.y);
   }
 
@@ -186,7 +186,7 @@ export class Point {
    * @param {Point} that
    * @return {Boolean}
    */
-  eq(that: Point): boolean {
+  eq(that: IPoint): boolean {
     return (this.x === that.x && this.y === that.y);
   }
 
@@ -195,7 +195,7 @@ export class Point {
    * @param {Point} that
    * @return {Boolean}
    */
-  lt(that: Point): boolean {
+  lt(that: IPoint): boolean {
     return (this.x < that.x && this.y < that.y);
   }
 
@@ -204,7 +204,7 @@ export class Point {
    * @param {Point} that
    * @return {Boolean}
    */
-  lte(that: Point): boolean {
+  lte(that: IPoint): boolean {
     return (this.x <= that.x && this.y <= that.y);
   }
 
@@ -214,7 +214,7 @@ export class Point {
    * @param {Point} that
    * @return {Boolean}
    */
-  gt(that: Point): boolean {
+  gt(that: IPoint): boolean {
     return (this.x > that.x && this.y > that.y);
   }
 
@@ -223,7 +223,7 @@ export class Point {
    * @param {Point} that
    * @return {Boolean}
    */
-  gte(that: Point): boolean {
+  gte(that: IPoint): boolean {
     return (this.x >= that.x && this.y >= that.y);
   }
 
@@ -233,7 +233,7 @@ export class Point {
    * @param {Number} t , position of interpolation, between 0 and 1 default 0.5
    * @return {Point}
    */
-  lerp(that: Point, t = 0.5): Point {
+  lerp(that: IPoint, t = 0.5): Point {
     t = Math.max(Math.min(1, t), 0);
     return new Point(this.x + (that.x - this.x) * t, this.y + (that.y - this.y) * t);
   }
@@ -243,7 +243,7 @@ export class Point {
    * @param {Point} that
    * @return {Number}
    */
-  distanceFrom(that: Point): number {
+  distanceFrom(that: IPoint): number {
     const dx = this.x - that.x,
       dy = this.y - that.y;
     return Math.sqrt(dx * dx + dy * dy);
@@ -254,7 +254,7 @@ export class Point {
    * @param {Point} that
    * @return {Point}
    */
-  midPointFrom(that: Point): Point {
+  midPointFrom(that: IPoint): Point {
     return this.lerp(that);
   }
 
@@ -263,7 +263,7 @@ export class Point {
    * @param {Point} that
    * @return {Point}
    */
-  min(that: Point): Point {
+  min(that: IPoint): Point {
     return new Point(Math.min(this.x, that.x), Math.min(this.y, that.y));
   }
 
@@ -272,7 +272,7 @@ export class Point {
    * @param {Point} that
    * @return {Point}
    */
-  max(that: Point): Point {
+  max(that: IPoint): Point {
     return new Point(Math.max(this.x, that.x), Math.max(this.y, that.y));
   }
 
