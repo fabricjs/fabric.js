@@ -51,6 +51,7 @@
     "dev": "node ./scripts",
     "start": "node ./scripts start",
     "export": "node ./scripts website export",
+    "build-tests": "rollup -c ./rollup.test.config.js",
     "test": "node ./scripts test",
     "test:coverage": "nyc --silent qunit test/node_test_setup.js test/lib test/unit",
     "test:visual:coverage": "nyc --silent --no-clean qunit test/node_test_setup.js test/lib test/visual",
@@ -64,6 +65,7 @@
     "jsdom": "^19.0.0"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^22.0.2",
     "@types/fs-extra": "^9.0.13",
     "@types/lodash": "^4.14.180",
     "@types/node": "^17.0.21",

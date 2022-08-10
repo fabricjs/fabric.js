@@ -1,7 +1,7 @@
 import { terser } from 'rollup-plugin-terser';
 import ts from "rollup-plugin-ts";
 
-// rollup.config.js
+// https://rollupjs.org/guide/en/#configuration-files
 export default {
   input: process.env.BUILD_INPUT?.split(',') || ['./index.js'],
   output: [
