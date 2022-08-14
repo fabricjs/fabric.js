@@ -186,7 +186,7 @@ Circle.fromElement = function(element, callback) {
 
   // this probably requires to be fixed for default origins not being top/left.
   callback(new fabric.Circle({
-    ...parsedAttributes,
+    ...otherParsedAttributes,
     radius,
     left: left - radius,
     top: top - radius,
