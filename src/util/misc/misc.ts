@@ -1,15 +1,18 @@
 //@ts-nocheck
-import { DEFAULT_SVG_FONT_SIZE } from '../constants';
-import { Point } from '../point.class';
+import { fabric } from '../../../HEADER'
+import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
+import { Point } from '../../point.class';
 import { cos } from './cos';
+import { sin } from './sin';
+import { rotateVector, createVector, calcAngleBetweenVectors, getHatVector, getBisector } from './vectors';
+import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
+import { rotatePoint } from './rotatePoint';
+import { getRandomInt, removeFromArray } from '../internals';
+import { PiBy180 } from '../../constants';
 
-(function(global) {
-  var fabric = global.fabric, sqrt = Math.sqrt,
-      atan2 = Math.atan2,
-      pow = Math.pow,
-      PiBy180 = Math.PI / 180,
-      PiBy2 = Math.PI / 2;
-
+const sqrt = Math.sqrt,
+    atan2 = Math.atan2,
+    pow = Math.pow;
   /**
    * @typedef {[number,number,number,number,number,number]} Matrix
    */
@@ -18,169 +21,20 @@ import { cos } from './cos';
    * @namespace fabric.util
    */
   fabric.util = {
-    /**
-     * Calculate the sin of an angle, avoiding returning floats for known results
-     * @static
-     * @memberOf fabric.util
-     * @param {Number} angle the angle in radians or in degree
-     * @return {Number}
-     */
-    sin: function(angle) {
-      if (angle === 0) { return 0; }
-      var angleSlice = angle / PiBy2, sign = 1;
-      if (angle < 0) {
-        // sin(-a) = -sin(a)
-        sign = -1;
-      }
-      switch (angleSlice) {
-        case 1: return sign;
-        case 2: return 0;
-        case 3: return -sign;
-      }
-      return Math.sin(angle);
-    },
 
-    /**
-     * Removes value from an array.
-     * Presence of value (and its position in an array) is determined via `Array.prototype.indexOf`
-     * @static
-     * @memberOf fabric.util
-     * @param {Array} array
-     * @param {*} value
-     * @return {Array} original array
-     */
-    removeFromArray: function(array, value) {
-      var idx = array.indexOf(value);
-      if (idx !== -1) {
-        array.splice(idx, 1);
-      }
-      return array;
-    },
-
-    /**
-     * Returns random number between 2 specified ones.
-     * @static
-     * @memberOf fabric.util
-     * @param {Number} min lower limit
-     * @param {Number} max upper limit
-     * @return {Number} random value (between min and max)
-     */
-    getRandomInt: function(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    },
-
-    /**
-     * Transforms degrees to radians.
-     * @static
-     * @memberOf fabric.util
-     * @param {Number} degrees value in degrees
-     * @return {Number} value in radians
-     */
-    degreesToRadians: function(degrees) {
-      return degrees * PiBy180;
-    },
-
-    /**
-     * Transforms radians to degrees.
-     * @static
-     * @memberOf fabric.util
-     * @param {Number} radians value in radians
-     * @return {Number} value in degrees
-     */
-    radiansToDegrees: function(radians) {
-      return radians / PiBy180;
-    },
-
-    /**
-     * Rotates `point` around `origin` with `radians`
-     * @static
-     * @memberOf fabric.util
-     * @param {Point} point The point to rotate
-     * @param {Point} origin The origin of the rotation
-     * @param {Number} radians The radians of the angle for the rotation
-     * @return {Point} The new rotated point
-     */
-    rotatePoint: function(point, origin, radians) {
-      var newPoint = new Point(point.x - origin.x, point.y - origin.y),
-          v = fabric.util.rotateVector(newPoint, radians);
-      return v.add(origin);
-    },
-
-    /**
-     * Rotates `vector` with `radians`
-     * @static
-     * @memberOf fabric.util
-     * @param {Object} vector The vector to rotate (x and y)
-     * @param {Number} radians The radians of the angle for the rotation
-     * @return {Point} The new rotated point
-     */
-    rotateVector: function(vector, radians) {
-      var sin = fabric.util.sin(radians),
-          cos = fabric.util.cos(radians),
-          rx = vector.x * cos - vector.y * sin,
-          ry = vector.x * sin + vector.y * cos;
-      return new Point(rx, ry);
-    },
-
-    /**
-     * Creates a vetor from points represented as a point
-     * @static
-     * @memberOf fabric.util
-     *
-     * @typedef {Object} Point
-     * @property {number} x
-     * @property {number} y
-     *
-     * @param {Point} from
-     * @param {Point} to
-     * @returns {Point} vector
-     */
-    createVector: function (from, to) {
-      return new Point(to.x - from.x, to.y - from.y);
-    },
-
-    /**
-     * Calculates angle between 2 vectors using dot product
-     * @static
-     * @memberOf fabric.util
-     * @param {Point} a
-     * @param {Point} b
-     * @returns the angle in radian between the vectors
-     */
-    calcAngleBetweenVectors: function (a, b) {
-      return Math.acos((a.x * b.x + a.y * b.y) / (Math.hypot(a.x, a.y) * Math.hypot(b.x, b.y)));
-    },
-
-    /**
-     * @static
-     * @memberOf fabric.util
-     * @param {Point} v
-     * @returns {Point} vector representing the unit vector of pointing to the direction of `v`
-     */
-    getHatVector: function (v) {
-      return new Point(v.x, v.y).scalarMultiply(1 / Math.hypot(v.x, v.y));
-    },
-
-    /**
-     * @static
-     * @memberOf fabric.util
-     * @param {Point} A
-     * @param {Point} B
-     * @param {Point} C
-     * @returns {{ vector: Point, angle: number }} vector representing the bisector of A and A's angle
-     */
-    getBisector: function (A, B, C) {
-      var AB = fabric.util.createVector(A, B), AC = fabric.util.createVector(A, C);
-      var alpha = fabric.util.calcAngleBetweenVectors(AB, AC);
-      //  check if alpha is relative to AB->BC
-      var ro = fabric.util.calcAngleBetweenVectors(fabric.util.rotateVector(AB, alpha), AC);
-      var phi = alpha * (ro === 0 ? 1 : -1) / 2;
-      return {
-        vector: fabric.util.getHatVector(fabric.util.rotateVector(AB, phi)),
-        angle: alpha
-      };
-    },
-
+    cos,
+    sin,
+    rotateVector,
+    createVector,
+    calcAngleBetweenVectors,
+    getHatVector,
+    getBisector,
+    degreesToRadians,
+    radiansToDegrees,
+    rotatePoint,
+    // probably we should stop exposing this from the interface
+    getRandomInt,
+    removeFromArray,
     /**
      * Project stroke width on points returning 2 projections for each point as follows:
      * - `miter`: 2 points corresponding to the outer boundary and the inner boundary of stroke.
@@ -427,16 +281,6 @@ import { cos } from './cos';
         default:
           return number;
       }
-    },
-
-    /**
-     * Function which always returns `false`.
-     * @static
-     * @memberOf fabric.util
-     * @return {Boolean}
-     */
-    falseFunction: function() {
-      return false;
     },
 
     /**
@@ -1216,8 +1060,6 @@ import { cos } from './cos';
       return new fabric.Group([a], { clipPath: b, inverted: inverted });
     },
 
-    cos: cos,
-
     /**
      * @memberOf fabric.util
      * @param {Object} prevStyle first style to compare
@@ -1325,4 +1167,5 @@ import { cos } from './cos';
       return stylesObject;
     }
   };
-})(typeof exports !== 'undefined' ? exports : window);
+
+

@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Point } from '../point.class';
-
+import { getRandomInt } from '../util/internals'
 
 import { Color } from "../color";
 
@@ -135,11 +135,11 @@ import { Color } from "../color";
     addPoint: function(pointer) {
       var pointerPoint = new Point(pointer.x, pointer.y),
 
-          circleRadius = fabric.util.getRandomInt(
+          circleRadius = getRandomInt(
             Math.max(0, this.width - 20), this.width + 20) / 2,
 
           circleColor = new Color(this.color)
-            .setAlpha(fabric.util.getRandomInt(0, 100) / 100)
+            .setAlpha(getRandomInt(0, 100) / 100)
             .toRgba();
 
       pointerPoint.radius = circleRadius;

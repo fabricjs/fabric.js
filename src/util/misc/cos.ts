@@ -1,6 +1,5 @@
-//@ts-nocheck
-import type { TRadian } from '../typedefs';
-import { halfPI } from '../constants';
+import type { TRadian } from '../../typedefs';
+import { halfPI } from '../../constants';
 
 /**
  * Calculate the cos of an angle, avoiding returning floats for known results
