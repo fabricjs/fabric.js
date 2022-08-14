@@ -135,7 +135,7 @@ const Circle = fabric.util.createClass(fabric.Object, /** @lends Circle.prototyp
         '" />\n',
       ];
     } else {
-      const {radius} = this;
+      const { radius } = this;
       const start = degreesToRadians(this.startAngle),
         end = degreesToRadians(this.endAngle),
         startX = fabric.util.cos(start) * radius,
@@ -172,29 +172,26 @@ Circle.ATTRIBUTE_NAMES = ['cx', 'cy', 'r', ...fabric.SHARED_ATTRIBUTES];
  * @param {Object} [options] Partial Circle object to default missing properties on the element.
  * @throws {Error} If value of `r` attribute is missing or invalid
  */
-Circle.fromElement = function(element, callback, options = {}) {
-  const parsedAttributes = fabric.parseAttributes(element, Circle.ATTRIBUTE_NAMES);
+Circle.fromElement = function(element, callback) {
+  const {
+    left = 0,
+    top = 0,
+    radius,
+    ...otherParsedAttributes,
+  } = fabric.parseAttributes(element, Circle.ATTRIBUTE_NAMES);
 
-  if (!isValidRadius(parsedAttributes)) {
+  if (!radius || radius < 0) {
     throw new Error('value of `r` attribute is required and can not be negative');
   }
 
-  const left = (parsedAttributes.left || 0) - parsedAttributes.radius;
-  const top = (parsedAttributes.top || 0) - parsedAttributes.radius;
-
+  // this probably requires to be fixed for default origins not being top/left.
   callback(new fabric.Circle({
-    ...options, ...parsedAttributes,
-    left,
-    top,
+    ...parsedAttributes,
+    radius,
+    left: left - radius,
+    top: top - radius,
   }));
 };
-
-/**
- * @private
- */
-function isValidRadius(attributes) {
-  return (('radius' in attributes) && (attributes.radius >= 0));
-}
 
 /* _FROM_SVG_END_ */
 
