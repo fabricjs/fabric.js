@@ -1,6 +1,6 @@
 import { sin } from './sin';
 import { cos } from './cos';
-import { Point } from '../../point.class';
+import { IPoint, Point } from '../../point.class';
 import { TRadian } from '../../typedefs';
 
 /**
@@ -29,7 +29,7 @@ export const rotateVector = (vector: Point, radians: TRadian) => {
  * @param {Point} to
  * @returns {Point} vector
  */
-export const createVector = (from: Point, to: Point): Point => to.subtract(from);
+export const createVector = (from: Point | IPoint, to: Point): Point => new Point(to).subtract(from);
 
     /**
      * Calculates angle between 2 vectors using dot product
