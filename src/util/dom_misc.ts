@@ -219,7 +219,7 @@
      */
     function makeElementUnselectable(element) {
       if (typeof element.onselectstart !== 'undefined') {
-        element.onselectstart = fabric.util.falseFunction;
+        element.onselectstart = () => false;
       }
       if (selectProp) {
         element.style[selectProp] = 'none';

@@ -1,7 +1,6 @@
 //@ts-nocheck
-(function(global) {
 
-  var fabric = global.fabric, slice = Array.prototype.slice;
+  const slice = Array.prototype.slice;
 
   /**
    * Invokes method on all items in a given array
@@ -10,7 +9,7 @@
    * @param {String} method Name of a method to invoke
    * @return {Array}
    */
-  function invoke(array, method) {
+  export function invoke(array, method) {
     var args = slice.call(arguments, 2), result = [];
     for (var i = 0, len = array.length; i < len; i++) {
       result[i] = args.length ? array[i][method].apply(array[i], args) : array[i][method].call(array[i]);
@@ -25,7 +24,7 @@
    * @param {String} byProperty
    * @return {*}
    */
-  function max(array, byProperty) {
+export function max(array, byProperty) {
     return find(array, byProperty, function(value1, value2) {
       return value1 >= value2;
     });
@@ -38,7 +37,7 @@
    * @param {String} byProperty
    * @return {*}
    */
-  function min(array, byProperty) {
+export function min(array, byProperty) {
     return find(array, byProperty, function(value1, value2) {
       return value1 < value2;
     });
@@ -47,7 +46,7 @@
   /**
    * @private
    */
-  function fill(array, value) {
+export function fill(array, value) {
     var k = array.length;
     while (k--) {
       array[k] = value;
@@ -58,7 +57,7 @@
   /**
    * @private
    */
-  function find(array, byProperty, condition) {
+export function find(array, byProperty, condition) {
     if (!array || array.length === 0) {
       return;
     }
@@ -82,14 +81,3 @@
     return result;
   }
 
-  /**
-   * @namespace fabric.util.array
-   */
-  fabric.util.array = {
-    fill: fill,
-    invoke: invoke,
-    min: min,
-    max: max
-  };
-
-})(typeof exports !== 'undefined' ? exports : window);
