@@ -16,6 +16,7 @@ const commander = require('commander');
 const program = new commander.Command();
 
 const { transform: transformFiles, listFiles } = require('./transform_files');
+const { createCodeSandbox } = require('../.codesandbox/deploy');
 
 const CLI_CACHE = path.resolve(__dirname, 'cli_cache.json');
 const wd = path.resolve(__dirname, '..');
@@ -521,6 +522,16 @@ program
             verbose,
             files
         });
+    });
+
+
+const codesandboxTemplatesDir = path.resolve(wd, '.codesandbox', 'templates');
+program
+    .command('sandbox')
+    .description('create a sandbox')
+    .addOption(new commander.Option('-t, --template <template>').choices(fs.readdirSync(codesandboxTemplatesDir)).default('next', '"next" template`'))
+    .action(({ template }) => {
+        createCodeSandbox(path.resolve(codesandboxTemplatesDir, template));
     });
 
 program.parse(process.argv);
