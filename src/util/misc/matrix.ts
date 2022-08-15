@@ -100,7 +100,7 @@ export const qrDecompose = (a: TMat2D): TComposeMatrixArgs => {
     translateX: a[4],
     translateY: a[5]
   };
-},
+};
 
 /**
  * Returns a transform matrix starting from an object of the same kind of
@@ -121,7 +121,7 @@ export const calcRotateMatrix = ({ angle }: TRotateMatrixArgs): TMat2D => {
         cosin = cos(theta),
         sinus = sin(theta);
   return [cosin, sinus, -sinus, cosin, 0, 0];
-},
+};
 
 /**
  * Returns a transform matrix starting from an object of the same kind of
