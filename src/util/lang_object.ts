@@ -63,13 +63,3 @@ export const extend = (destination, source, deep) => {
 
 //TODO: this function return an empty object if you try to clone null
 export const clone = (object: any, deep: boolean) => deep ? extend({ }, object, deep) : { ...object };
-
-(function(global) {
-  var fabric = global.fabric;
-  /** @namespace fabric.util.object */
-  fabric.util.object = {
-    extend: extend,
-    clone: clone
-  };
-  fabric.util.object.extend(fabric.util, fabric.Observable);
-})(typeof exports !== 'undefined' ? exports : window);

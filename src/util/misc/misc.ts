@@ -19,6 +19,7 @@ import {
   multiplyTransformMatrices,
 } from './matrix';
 import { stylesFromArray, stylesToArray, hasStyleChanged } from './textStyles';
+import { clone, extend } from '../lang_object';
 
   /**
    * @typedef {[number,number,number,number,number,number]} Matrix
@@ -28,7 +29,6 @@ import { stylesFromArray, stylesToArray, hasStyleChanged } from './textStyles';
    * @namespace fabric.util
    */
   fabric.util = {
-
     cos,
     sin,
     rotateVector,
@@ -55,6 +55,10 @@ import { stylesFromArray, stylesToArray, hasStyleChanged } from './textStyles';
     stylesFromArray,
     stylesToArray,
     hasStyleChanged,
+    object: {
+      clone,
+      extend,
+    },
 
     /**
      * Sends a point from the source coordinate plane to the destination coordinate plane.\
