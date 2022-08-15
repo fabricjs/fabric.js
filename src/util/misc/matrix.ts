@@ -1,4 +1,6 @@
-import { cos, degreesToRadians, sin } from "..";
+import { cos } from "./cos";
+import { sin } from "./sin";
+import { degreesToRadians } from "./radiansDegreesConversion";
 import { iMatrix, PiBy180 } from "../../constants";
 import { IPoint, Point } from "../../point.class";
 import { TDegree, TMat2D } from "../../typedefs";
