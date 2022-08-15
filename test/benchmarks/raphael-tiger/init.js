@@ -25,10 +25,10 @@
                 var startTime = new Date();
 
                 var group = new fabric.Group(objects, {
-                    left: 65,
-                    top: 100,
-                    width: 495,
-                    height: 511,
+                    left: 300,
+                    top: 300,
+                    originX: 'center',
+                    originY: 'center',
                     subTargetCheck: true,
                     interactive: true,
                     transparentCorners: false

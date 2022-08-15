@@ -5,7 +5,7 @@ var numObjects = parseInt(search.get('n'), 10) || 200,
     width = 500,
     height = 500,
     optimizeCaching = parseInt(search.get('optimize_caching'));
-    
+
 (function () {
     function getRandomNum(min, max) {
         return Math.random() * (max - min) + min;
@@ -27,7 +27,7 @@ var numObjects = parseInt(search.get('n'), 10) || 200,
 
         (function testRaphael() {
 
-            var paper = Raphael(550, 213, width, height),
+            var paper = Raphael("raphael", width, height),
                 startTime = new Date(),
                 circle;
 
