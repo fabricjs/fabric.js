@@ -73,6 +73,7 @@
     "@typescript-eslint/parser": "^5.29.0",
     "ansi-escape": "^1.1.0",
     "auto-changelog": "^2.3.0",
+    "axios": "^0.27.2",
     "chalk": "^2.4.1",
     "commander": "^9.1.0",
     "deep-object-diff": "^1.1.7",
