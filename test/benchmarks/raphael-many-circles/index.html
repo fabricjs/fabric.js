@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>vs. Raphael (Many Simple Shapes) | Fabric.js Benchmarks</title>
+  <link rel="stylesheet" href="/benchmarks/styles.css">
+  <script src="https://cdn.jsdelivr.net/gh/DmitryBaranovskiy/raphael@latest/raphael.min.js"></script>
+  <script src="/fabric.js"></script>
+  <script src="/benchmarks/raphael-many-circles/init.js"></script>
+</head>
+
+<body>
+  <div id="bd-wrapper">
+    <h2><span>Fabric.js benchmarks</span> &middot; vs. Raphael (Many Simple Shapes)</h2>
+    <header>
+      Rendering a large number (<span id="numshapes"></span>) of simple shapes
+      <div>
+        <input id="optimize_caching" type="checkbox">
+        <label for="optimize_caching">Optimize caching</label>
+        <input id="object_stacking" type="checkbox">
+        <label for="object_stacking">Preserve object stacking</label>
+      </div>
+      <ul>
+        <li><a href="#" onclick="return reload(10)">10 shapes</a></li>
+        <li><a href="#" onclick="return reload(100)">100 shapes</a></li>
+        <li><a href="#" onclick="return reload(500)">500 shapes</a></li>
+        <li><a href="#" onclick="return reload(1000)">1000 shapes</a></li>
+        <li><a href="#" onclick="return reload(2000)">2000 shapes</a></li>
+        <li><a href="#" onclick="return reload(5000)">5000 shapes</a></li>
+      </ul>
+    </header>
+    <div>
+      <canvas id="canvas" width="500" height="500"></canvas>
+      <div id="raphael"></div>
+    </div>
+    <p id="log"></p>
+
+  </div>
+</body>
+
+</html>

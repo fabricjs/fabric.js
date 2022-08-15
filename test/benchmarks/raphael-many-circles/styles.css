@@ -1,0 +1,12 @@
+svg {
+    border: 1px solid #000;
+}
+
+.canvas_container {
+    display: block;
+}
+
+#bd-wrapper ul,
+#bd-wrapper ul li {
+    display: inline-block;
+}
