@@ -349,7 +349,7 @@ async function test(suite, tests, options = {}) {
     const start = (os.platform() == 'darwin' ? 'open' : os.platform() == 'win32' ? 'start' : 'xdg-open');
     options.launch && cp.exec([start, url].join(' '));
     // run
-    cp.spawn(args.join(' '), {
+    const proc = cp.spawn(args.join(' '), {
         cwd: wd,
         env: process.env,
         shell: true,
@@ -358,8 +358,9 @@ async function test(suite, tests, options = {}) {
     })
         .on('exit', close)
         .on('close', close)
-        .on('disconnect', close)
-        .stdout.on('data', (b) => console.log(chalk.blue(`[${suite}]`), b.toString().trim()));
+        .on('disconnect', close);
+    proc.stdout.on('data', (b) => console.log(chalk.blue(`[${suite}]`), b.toString().trim()));
+    proc.stderr.pipe(process.stderr);
 }
 
 /**
