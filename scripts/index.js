@@ -20,7 +20,7 @@ const program = new commander.Command();
 const { transform: transformFiles, listFiles } = require('./transform_files');
 
 const wd = path.resolve(__dirname, '..');
-const dumpsPath = path.resolve(wd, '.dumps');
+const dumpsPath = path.resolve(wd, '.fabric');
 const CLI_CACHE = path.resolve(dumpsPath, 'cli_cache.json');
 const websiteDir = path.resolve(wd, '../fabricjs.com');
 if (!fs.existsSync(dumpsPath)) {
