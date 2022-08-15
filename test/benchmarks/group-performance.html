@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Group performance | Fabric.js Benchmarks</title>
+
+    <link rel="stylesheet" href="../css/master.css">
+
+    <script src="../lib/fabric.js"></script>
+    <!--[if lt IE 9]>
+      <script src="../lib/excanvas.js"></script>
+    <![endif]-->
+    <script src="../js/master.js"></script>
+
+  </head>
+  <body>
+    <ul id="header">
+  <li><a href="/">Home</a></li>
+  <li><a href="/demos">Demos</a></li>
+  <li><a href="/articles">Tutorial</a></li>
+  <li><a href="/docs">Docs</a></li>
+  <li><a href="/build">Custom Build</a></li>
+  <li><a href="/help">Support</a></li>
+  <li><a href="/test">Tests/Benchmarks</a></li>
+  <li><a href="/team">Team</a></li>
+  <li class="github secondary">
+    <a class="github-button" href="https://github.com/fabricjs/fabric.js" data-size="large" data-show-count="true" aria-label="Star fabricjs/fabric.js on GitHub">Star</a>
+  </li>
+  <li class="twitter secondary">
+    <a href="https://twitter.com/fabricjs" class="twitter-follow-button" data-show-count="true">Follow @fabricjs</a>
+  </li>
+</ul>
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+<script>
+(function() {
+  if (document.location.hostname !== 'localhost') {
+    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+  }
+})();
+</script>
+
+
+    <div id="bd-wrapper">
+      <h2><span>Fabric.js benchmarks</span> &middot; Group performance</h2>
+
+      <button id="start">start</button>
+<button id="stop">stop</button>
+<p id="status">started</p>
+<p>Below is a set of 1200 groups, all grouped togheter, consisting of text and circle objects. Press "start" and try hovering over with a mouse to see how responsive mouse circle is.</p>
+
+<canvas id="c" width="1000" height="750" style="border:1px solid #ccc"></canvas>
+
+<script>
+(function() {
+  fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
+
+  var canvas = this.__canvas = new fabric.Canvas('c');
+  var status = document.getElementById('status');
+  var mouseShape;
+
+  // add shapes
+  var shapes = [];
+  for (var i=1; i < 30; i++) {
+    for (var j=1; j < 40; j++) {
+      var circle = new fabric.Circle({
+        radius: 10
+      });
+      var text = new fabric.Text(i+','+j, {
+        fill: '#fff',
+        fontSize: 8,
+        fontFamily: 'sans-serif'
+      });
+      shapes.push(new fabric.Group([circle, text], {
+        left: j * 25,
+        top: i * 25,
+        hasControls: false,
+        layout: 'fixed'
+      }));
+    }
+  }
+  var sameGroup = new fabric.Group(shapes);
+  canvas.add.apply(canvas, [sameGroup]);
+
+  function start() {
+    // cache the shapes
+    // ??
+
+    // disable editing
+    __canvas.selection = false;
+    __canvas.skipTargetFind = true;
+
+    // do some intensive animation
+    __canvas.on('mouse:move', function(o) {
+        var pos = __canvas.getPointer(o.e);
+        if (mouseShape) {
+          mouseShape.set({ left: pos.x, top: pos.y });
+          __canvas.requestRenderAll();
+        }
+        else {
+          mouseShape = new fabric.Circle({
+            selectable: false,
+            radius: 30,
+            fill: 'rgba(0,0,255,0.5)',
+            left: pos.x,
+            top: pos.y
+          });
+          __canvas.add(mouseShape);
+        }
+    });
+
+    status.innerHTML = 'started';
+  }
+
+  document.getElementById("start").addEventListener("click", start);
+  document.getElementById("stop").addEventListener("click", function() {
+    // remove shapes from cache
+
+    // ??
+    // enable editing
+    __canvas.selection = true;
+
+    // remove animation
+    __canvas.off('mouse:move');
+    __canvas.remove(mouseShape);
+    mouseShape = null;
+
+    status.innerHTML = 'stopped';
+  });
+
+  start();
+})();
+</script>
+
+<script>
+(function() {
+  window.addEventListener('load', function() {
+    var canvas = this.__canvas || this.canvas,
+        canvases = this.__canvases || this.canvases;
+
+    canvas && canvas.calcOffset && canvas.calcOffset();
+
+    if (canvases && canvases.length) {
+      for (var i = 0, len = canvases.length; i < len; i++) {
+        canvases[i].calcOffset();
+      }
+    }
+  });
+})();
+</script>
+
+
+    </div>
+  </body>
+</html>
