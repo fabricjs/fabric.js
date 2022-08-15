@@ -19,10 +19,9 @@ on:
     branches: [ master ]
   schedule:
     - cron: '28 13 * * 4'
-
-paths:
-  - src
-  - lib
+  paths:
+    - src
+    - lib
 
 jobs:
   analyze:
