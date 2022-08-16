@@ -119,16 +119,6 @@ inquirer.registerPrompt('test-selection', ICheckbox);
 
 
 function build(options = {}) {
-
-    //  _.defaults(options, { exclude: ['gestures', 'accessors', 'erasing'] });
-    // const args = [
-    //     `npm run`,
-    //     `build.js`,
-    //     `modules=${options.modules && options.modules.length > 0 ? options.modules.join(',') : 'ALL'}`,
-    //     `requirejs`,
-    //     `${options.fast ? 'fast' : ''}`,
-    //     `exclude=${options.exclude.join(',')}`
-    // ]
     const args = ['rollup', '-c', options.watch ? '--watch' : ''];
     let minDest;
     if (options.output && !options.fast) {
