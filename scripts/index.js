@@ -129,7 +129,7 @@ function build(options = {}) {
     //     `${options.fast ? 'fast' : ''}`,
     //     `exclude=${options.exclude.join(',')}`
     // ]
-    const args = ['npm run', 'build-rollup', '--', options.watch ? '--watch' : ''];
+    const args = ['rollup', '-c', options.watch ? '--watch' : ''];
     let minDest;
     if (options.output && !options.fast) {
         const { name, base, ...rest } = path.parse(path.resolve(options.output));

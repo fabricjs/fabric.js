@@ -46,7 +46,6 @@
   "scripts": {
     "changelog": "auto-changelog -o change-output.md --unreleased-only",
     "build": "node ./scripts build",
-    "build-rollup": "rollup -c",
     "build:fast": "npm run build -- --fast",
     "dev": "node ./scripts",
     "start": "node ./scripts start",
