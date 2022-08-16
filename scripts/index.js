@@ -26,6 +26,7 @@ const websiteDir = path.resolve(wd, '../fabricjs.com');
 if (!fs.existsSync(dumpsPath)) {
     fs.mkdirSync(dumpsPath);
 }
+const package = require(path.resolve(wd, 'package.json'));
 
 function execGitCommand(cmd) {
     return cp.execSync(cmd, { cwd: wd }).toString()
@@ -482,6 +483,7 @@ async function runIntreactiveTestSuite(options) {
 program
     .name('fabric.js')
     .description('fabric.js DEV CLI tools')
+    .version(package.version)
     .showSuggestionAfterError();
 
 program
