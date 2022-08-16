@@ -1,7 +1,12 @@
-(function () {
+
+function start() {
 
     const baseUrl = '/benchmarks/raphael-images';
     const url = `${baseUrl}/pug.jpg`;
+    const testResult = {
+        fabric: 0,
+        raphael: 0
+    }
 
     fabric.Object.prototype.transparentCorners = false;
 
@@ -10,63 +15,58 @@
     }
 
     var numObjects = 20,
-        loadedObjects = 0,
         width = 500,
         height = 500,
         opacity = 0.75;
+    var logEl = document.getElementById('log');
 
-    window.onload = function () {
+    (function testRaphael() {
+        var startTime = new Date();
+        var paper = Raphael("raphael", width, height)
 
-        var logEl = document.getElementById('log');
 
-        (function testRaphael() {
+        for (var i = numObjects; i--;) {
+            img = paper.image(url, getRandomNum(-25, width), getRandomNum(-25, height), 100, 100);
+            img.rotate(getRandomNum(0, 90));
+            img.attr('opacity', opacity);
+        }
 
-            var paper = Raphael("raphael", width, height),
-                startTime = new Date();
+        testResult.raphael = new Date() - startTime;
 
-            for (var i = numObjects; i--;) {
-                img = paper.image(url, getRandomNum(-25, width), getRandomNum(-25, height), 100, 100);
-                img.rotate(getRandomNum(0, 90));
-                img.attr('opacity', opacity);
-            }
+        logEl.innerHTML = `Raphael: <b class="bench">${testResult.raphael}</b> ms<br>`;
+    })();
 
-            logEl.innerHTML = 'Raphael: <b class="bench">' + (new Date() - startTime) + '</b> ms<br>';
+    (function testFabric() {
+        var startTime = new Date();
+        var canvas = this.__canvas = new fabric.Canvas('canvas', {
+            renderOnAddRemove: false,
+            stateful: false
+        });
+        var tasks = [];
 
-        })();
-
-        (function testFabric() {
-
-            var canvas = this.__canvas = new fabric.Canvas('canvas', {
-                renderOnAddRemove: false,
-                stateful: false
-            }), totalTime = 0;
-
-            function loaded() {
-                if (++loadedObjects === numObjects) {
-                    canvas.renderAll();
-                    logEl.innerHTML += 'fabric: <b class="bench">' + totalTime + '</b> ms';
-                }
-            }
-
-            for (var i = numObjects; i--;) {
-                fabric.Image.fromURL(url)
-                    .then((o) => {
-                        var startTime = new Date();
-
-                        o.set('left', getRandomNum(-25, width))
-                            .set('top', getRandomNum(-25, height))
-                            .scale(0.2)
-                            .setCoords();
-                        o.rotate(getRandomNum(0, 90));
-                        o.set('opacity', opacity);
-                        canvas.add(o);
-                        totalTime += (new Date() - startTime);
-
-                        loaded();
+        for (var i = numObjects; i--;) {
+            tasks.push(fabric.Image.fromURL(url)
+                .then((img) => {
+                    // var startTime = new Date();
+                    img.set({
+                        left: getRandomNum(-25, width),
+                        top: getRandomNum(-25, height),
+                        opacity
                     });
-            }
+                    img.scale(0.2);
+                    img.rotate(getRandomNum(0, 90));
+                    img.setCoords();
+                    canvas.add(img);
+                    // totalTime += (new Date() - startTime);
+                }));
+        }
 
-            canvas.calcOffset();
-        })();
-    };
-})();
+        Promise.all(tasks)
+            .then(() => {
+                canvas.calcOffset();
+                canvas.renderAll();
+                testResult.fabric = new Date() - startTime;
+                logEl.innerHTML += 'fabric: <b class="bench">' + testResult.fabric + '</b> ms';
+            });
+    })();
+}

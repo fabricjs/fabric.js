@@ -13,7 +13,7 @@
 <body>
   <div id="bd-wrapper">
     <h2><span>Fabric.js benchmarks</span> &middot; vs. Raphael (Images)</h2>
-    <img src="/benchmarks/raphael-images/pug.jpg" style="position:absolute;left:-999px;top:-999px">
+    <img id="preload" src="/benchmarks/raphael-images/pug.jpg" style="position:absolute;left:-999px;top:-999px" onload="start()">
     <div>
       <canvas id="canvas" width="500" height="500"></canvas>
       <div id="raphael"></div>
