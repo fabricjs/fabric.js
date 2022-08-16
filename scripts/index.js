@@ -495,6 +495,14 @@ program
     });
 
 program
+    .command('dev')
+    .description('watch for changes in `src` and `test` directories')
+    .action(() => {
+        cp.spawn('npm run build -- -f -w', { stdio: 'inherit', shell: true });
+        cp.spawn('npm run build-tests -- -w', { stdio: 'inherit', shell: true });
+    });
+
+program
     .command('build')
     .description('build dist')
     .option('-f, --fast', 'skip minifying')
