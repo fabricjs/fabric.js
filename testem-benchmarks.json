@@ -1,0 +1,56 @@
+{
+  "framework": "qunit",
+  "serve_files": [
+    "/node_modules/qunit/qunit/qunit.js",
+    "https://cdn.jsdelivr.net/gh/DmitryBaranovskiy/raphael@latest/raphael.min.js",
+    "dist/fabric.js"
+  ],
+  "styles": [
+    "test/benchmarks/styles.css"
+  ],
+  "routes": {
+    "/benchmarks": "test/benchmarks",
+    "/raphael": "test/benchmarks/raphael",
+    "/raphael-images": "test/benchmarks/raphael-images/index.mustache",
+    "/bip": "test/benchmarks/raphael-images/bip.html",
+    "/fabric.js": "dist/fabric.js"
+  },
+  "test_page": [
+    "bip"
+  ],
+  "raphael": {
+    "tests": {
+      "images": {
+        "assets": [
+          {
+            "tag": "img",
+            "src": "/raphael/assets/pug.jpg"
+          }
+        ],
+        "scripts": [
+          "/raphael/images.js"
+        ]
+      }
+    }
+  },
+  "browser_args": {
+    "Chrome": [
+      "--headless",
+      "--disable-gpu",
+      "--remote-debugging-port=9222"
+    ],
+    "Firefox": [
+      "--headless"
+    ]
+  },
+  "launch_in_dev": [
+    "Chrome",
+    "Firefox"
+  ],
+  "launch_in_ci": [
+    "Chrome",
+    "Firefox"
+  ],
+  "timeout": 540,
+  "parallel": 4
+}
