@@ -3,6 +3,8 @@ module.exports = {
   serve_files: [
     'https://cdn.jsdelivr.net/gh/DmitryBaranovskiy/raphael@latest/raphael.min.js',
     'dist/fabric.js',
+    'test/benchmarks/raphael/init.js',
+    'test/benchmarks/raphael/qunit.js',
   ],
   css_files: [
     'test/benchmarks/styles.css'

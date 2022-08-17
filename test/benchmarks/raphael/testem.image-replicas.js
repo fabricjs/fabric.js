@@ -5,13 +5,12 @@ module.exports = {
   name: 'Image Replicas',
   serve_files: [
     ...config.serve_files,
-    'test/benchmarks/raphael-images/init.js',
-    'test/benchmarks/raphael-images/qunit.js'
+    'test/benchmarks/raphael/image-replicas.js',
   ],
   routes: {
     ...config.routes,
-    '/main': 'test/benchmarks/raphael-images/index.mustache',
-    '/asset': 'test/benchmarks/raphael-images/pug.jpg'
+    '/main': 'test/benchmarks/raphael/index.mustache',
+    '/asset': 'test/benchmarks/raphael/assets/pug.jpg'
   },
   assets: [
     {
