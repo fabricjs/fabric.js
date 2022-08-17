@@ -25,6 +25,12 @@
   "test_page": [
     "raphael-images"
   ],
+  "assets": [
+    {
+      "tag": "img",
+      "src": "/pug"
+    }
+  ],
   "raphael": {
     "assets": [
       "/benchmarks/raphael-images/pug.jpg"

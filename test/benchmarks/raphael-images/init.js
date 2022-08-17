@@ -129,6 +129,21 @@ async function test(raphaelContainer, canvasEl) {
     }, '*');
 }
 
+const preloaded = [];
+function preload(target) {
+    preloaded.push(target);
+    const children = document.getElementById('preload').children;
+    for (let index = 0; index < children.length; index++) {
+        if (!preloaded.includes(children[index])) return;
+    }
+    start();
+}
+
 function start() {
     test(document.getElementById('raphael'), document.getElementById('canvas'));
 }
+
+window.addEventListener('load', () => {
+    const children = document.getElementById('preload').children;
+    if (children.length === 0) start();
+})
