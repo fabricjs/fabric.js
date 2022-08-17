@@ -22,18 +22,17 @@ svg {
     border: 1px solid #000;
 }
 
-#bd-wrapper ul,
-#bd-wrapper ul li {
-    display: inline-block;
-}
-
-#bd-wrapper {
+.p-1 {
     padding: 15px;
-    padding-right: 150px
 }
 
-#bd-wrapper>ul>li {
-    margin-bottom: 5px
+b.bench {
+    font-family: monospace;
+    font-size: 18px;
+    background: #ffc;
+    padding: 0 3px;
+    border: 1px solid #eee;
+    line-height: 1.5
 }
 
 pre {

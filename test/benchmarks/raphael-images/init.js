@@ -1,6 +1,5 @@
 
-const baseUrl = '/benchmarks/raphael-images';
-const url = `${baseUrl}/pug.jpg`;
+const url = '/pug';
 const numObjects = 20,
     width = 500,
     height = 500,
@@ -26,7 +25,7 @@ function runRaphael(container) {
 }
 
 async function runFabric(canvasEl) {
-    const canvas = this.__canvas = new fabric.Canvas(canvasEl, {
+    const canvas = new fabric.Canvas(canvasEl, {
         renderOnAddRemove: false,
         stateful: false
     });
@@ -34,7 +33,6 @@ async function runFabric(canvasEl) {
     for (let i = numObjects; i--;) {
         tasks.push(fabric.Image.fromURL(url)
             .then((img) => {
-                // var startTime = new Date();
                 img.set({
                     left: getRandomNum(-25, width),
                     top: getRandomNum(-25, height),
@@ -45,7 +43,6 @@ async function runFabric(canvasEl) {
                 img.rotate(getRandomNum(0, 90));
                 img.setCoords();
                 canvas.add(img);
-                // totalTime += (new Date() - startTime);
             }));
     }
 
@@ -62,14 +59,15 @@ async function test(raphaelContainer, canvasEl) {
     document.getElementById('raphael_result').innerHTML = raphaelResult;
     document.getElementById('fabric_result').innerHTML = fabricResult;
 
-    QUnit.test('mip', assert => {
-        assert.ok(fabricResult < raphaelResult, 'dkdkd')
-    })
-    // window.parent.postMessage({
-    //     type: 'test',
-    //     name: 'raphael-images',
-    //     fabric: fabricResult,
-    //     raphael: raphaelResult
-    // }, '*');
+    window.parent.postMessage({
+        type: 'test',
+        name: 'image replicas',
+        fabric: fabricResult,
+        raphael: raphaelResult,
+        maxResult: 40
+    }, '*');
+}
 
+function start() {
+    test(document.getElementById('raphael'), document.getElementById('canvas'));
 }

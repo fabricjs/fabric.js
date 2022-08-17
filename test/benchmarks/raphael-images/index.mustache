@@ -14,26 +14,23 @@
   {{/css_files}}
 </head>
 
-<body>
-  <table>
-
-  </table>
-  <div id="bd-wrapper">
+<body class="p-1">
+  <div>
     <h2><span>Fabric.js benchmarks</span> &middot; vs. Raphael (Images)</h2>
     <div class="preload">
-      <img id="preload" src="/benchmarks/raphael-images/pug.jpg"
-        onload="test(document.getElementById('raphael'), document.getElementById('canvas'))">
+      <img src="/pug" onload="start()" />
     </div>
-
     <div class="flex-row">
-      <canvas id="canvas" width="500" height="500"></canvas>
-      <div id="raphael"></div>
+      <div class="p-1">
+        <h2><span>fabric</span> <b id="fabric_result" class="bench"></b> ms</h2>
+        <canvas id="canvas" width="500" height="500"></canvas>
+      </div>
+      <div class="p-1">
+        <h2><span>Raphael</span> <b id="raphael_result" class="bench"></b> ms</h2>
+        <div id="raphael">
+        </div>
+      </div>
     </div>
-  </div>
-  <p id="results">
-    Raphael: <b id="raphael_result" class="bench"></b> ms<br>
-    fabric: <b id="fabric_result" class="bench"></b> ms<br>
-  </p>
 </body>
 
 </html>

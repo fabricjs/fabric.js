@@ -3,12 +3,13 @@
   "serve_files": [
     "https://cdn.jsdelivr.net/gh/DmitryBaranovskiy/raphael@latest/raphael.min.js",
     "dist/fabric.js",
-    "test/benchmarks/raphael-images/init.js"
+    "test/benchmarks/raphael-images/init.js",
+    "test/benchmarks/raphael-images/qunit.js"
   ],
   "watch_files": [
     "dist/fabric.js",
     "test/benchmarks/**",
-    "test/benchmarks/**/**"
+    "test/benchmarks/raphael-images/**"
   ],
   "css_files": [
     "test/benchmarks/styles.css"
@@ -17,13 +18,16 @@
     "/benchmarks": "test/benchmarks",
     "/raphael": "test/benchmarks/raphael",
     "/raphael-images": "test/benchmarks/raphael-images/index.mustache",
-    "/bip": "test/benchmarks/raphael-images/bip.html",
+    "/pug": "test/benchmarks/raphael-images/pug.jpg",
     "/fabric.js": "dist/fabric.js"
   },
   "test_page": [
     "raphael-images"
   ],
   "raphael": {
+    "assets": [
+      "/benchmarks/raphael-images/pug.jpg"
+    ],
     "tests": {
       "images": {
         "assets": [
@@ -56,6 +60,7 @@
     "Chrome",
     "Firefox"
   ],
+  "ignore_missing_launchers": true,
   "timeout": 540,
   "parallel": 4
 }
