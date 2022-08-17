@@ -121,11 +121,6 @@
     assert.ok(!areAllTheSame);
   });
 
-  QUnit.test('fabric.util.falseFunction', function(assert) {
-    assert.ok(typeof fabric.util.falseFunction === 'function');
-    assert.equal(fabric.util.falseFunction(), false);
-  });
-
   QUnit.test('String.prototype.trim', function(assert) {
     assert.ok(typeof String.prototype.trim === 'function');
     assert.equal('\t\n   foo bar \n    \xA0  '.trim(), 'foo bar');
@@ -375,8 +370,9 @@
     el.appendChild(fabric.document.createTextNode('foo'));
 
     assert.equal(el, makeElementUnselectable(el), 'should be "chainable"');
+
     if (typeof el.onselectstart !== 'undefined') {
-      assert.equal(el.onselectstart, fabric.util.falseFunction);
+      assert.equal(el.onselectstart.toString(), (() => false).toString());
     }
 
     // not sure if it's a good idea to test implementation details here

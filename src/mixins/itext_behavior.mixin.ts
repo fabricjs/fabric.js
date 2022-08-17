@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Point } from '../point.class';
+import { removeFromArray } from '../util/internals';
 
 (function(global) {
   var fabric = global.fabric;
@@ -57,7 +58,7 @@ import { Point } from '../point.class';
         var canvas = opt.target;
         if (canvas) {
           canvas._iTextInstances = canvas._iTextInstances || [];
-          fabric.util.removeFromArray(canvas._iTextInstances, _this);
+          removeFromArray(canvas._iTextInstances, _this);
           if (canvas._iTextInstances.length === 0) {
             canvas._hasITextHandlers = false;
             _this._removeCanvasHandlers(canvas);

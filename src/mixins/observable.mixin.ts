@@ -1,6 +1,7 @@
 //@ts-nocheck
 (function(global) {
   var fabric = global.fabric;
+
   /**
    * @private
    * @param {String} eventName
