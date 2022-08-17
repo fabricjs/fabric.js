@@ -1,7 +1,7 @@
 const url = '/asset',
     numObjects = 20,
-    width = 500,
-    height = 500,
+    width = 600,
+    height = 600,
     opacity = 0.75;
 
 function getRandomNum(min, max) {
