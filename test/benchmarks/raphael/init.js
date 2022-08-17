@@ -67,9 +67,9 @@ async function test(raphaelContainer, canvasEl) {
         name: 'image replicas',
         fabric: fabricResults,
         raphael: raphaelResults,
-        maxResults: {
-            total: 40
-        }
+        // maxResults: {
+        //     total: 40
+        // }
     }, '*');
 }
 
