@@ -1,6 +1,6 @@
 
 //@ts-nocheck
-import { max, min } from '../util';
+import { max, min } from '../util/lang_array';
 import { ColorNameMap } from './color_map';
 import { reHSLa, reHex, reRGBa } from './constants';
 import { hue2rgb, hexify } from './util';

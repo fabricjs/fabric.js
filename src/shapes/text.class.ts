@@ -1,4 +1,8 @@
 //@ts-nocheck
+
+import { DEFAULT_SVG_FONT_SIZE } from "../constants";
+
+
 (function(global) {
   var fabric = global.fabric || (global.fabric = { });
 
@@ -1591,13 +1595,6 @@
     'x y dx dy font-family font-style font-weight font-size letter-spacing text-decoration text-anchor'.split(' '));
 
   /**
-   * Default SVG font size
-   * @static
-   * @memberOf fabric.Text
-   */
-  fabric.Text.DEFAULT_SVG_FONT_SIZE = 16;
-
-  /**
    * Returns fabric.Text instance from an SVG element (<b>not yet implemented</b>)
    * @static
    * @memberOf fabric.Text
@@ -1636,7 +1633,7 @@
       options.top += parsedAttributes.dy;
     }
     if (!('fontSize' in options)) {
-      options.fontSize = fabric.Text.DEFAULT_SVG_FONT_SIZE;
+      options.fontSize = DEFAULT_SVG_FONT_SIZE;
     }
 
     var textContent = '';

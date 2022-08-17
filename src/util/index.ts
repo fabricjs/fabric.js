@@ -1,5 +1,4 @@
 //@ts-nocheck
-export * from './cos';
 import { fabric } from '../../HEADER'
 import './animate'; // optional animation
 import './animate_color'; // optional animation
@@ -8,14 +7,17 @@ import './dom_event'; // optional interaction
 import './dom_misc';
 import './dom_request';
 import './dom_style';
-import './lang_array';
+import * as arrayUtils from './lang_array';
 import './lang_class';
 import './lang_object';
 import './lang_string';
-import './misc';
+import './misc/misc';
 import './path';
 
+fabric.util.array = arrayUtils;
+
 const {
+    cos,
     sin,
     getElementOffset,
     removeFromArray,
@@ -91,6 +93,7 @@ const {
     rotatePoint,
 } = fabric.util;
 export {
+    cos,
     sin,
     getElementOffset,
     removeFromArray,
@@ -159,4 +162,3 @@ export {
     composeMatrix,
     rotatePoint
 };
-export default fabric.util;

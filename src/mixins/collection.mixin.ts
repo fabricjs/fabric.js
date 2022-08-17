@@ -110,7 +110,7 @@
     /**
      * Returns object at specified index
      * @param {Number} index
-     * @return {Self} thisArg
+     * @return {Object} object at index
      */
     item: function (index) {
       return this._objects[index];
