@@ -158,9 +158,6 @@ export class Intersection {
 
   /**
    * Checks if segment intersects polygon
-   * 
-   * @todo account for stroke
-   * 
    * @static
    * @see {@link intersectLinePolygon} for line intersection
    * @param {Point} a1 boundary point of segment
