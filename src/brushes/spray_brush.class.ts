@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Point } from '../point.class';
+import { getRandomInt } from '../util/internals'
 
 (function(global) {
   var fabric = global.fabric;
@@ -201,11 +202,11 @@ import { Point } from '../point.class';
 
       for (i = 0; i < this.density; i++) {
 
-        x = fabric.util.getRandomInt(pointer.x - radius, pointer.x + radius);
-        y = fabric.util.getRandomInt(pointer.y - radius, pointer.y + radius);
+        x = getRandomInt(pointer.x - radius, pointer.x + radius);
+        y = getRandomInt(pointer.y - radius, pointer.y + radius);
 
         if (this.dotWidthVariance) {
-          width = fabric.util.getRandomInt(
+          width = getRandomInt(
             // bottom clamp width to 1
             Math.max(1, this.dotWidth - this.dotWidthVariance),
             this.dotWidth + this.dotWidthVariance);
@@ -218,7 +219,7 @@ import { Point } from '../point.class';
         point.width = width;
 
         if (this.randomOpacity) {
-          point.opacity = fabric.util.getRandomInt(0, 100) / 100;
+          point.opacity = getRandomInt(0, 100) / 100;
         }
 
         this.sprayChunkPoints.push(point);

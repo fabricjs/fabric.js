@@ -1,11 +1,11 @@
 //@ts-nocheck
 import { Point } from './point.class';
+import { removeFromArray } from './util/internals';
 
 (function (global) {
   // aliases for faster resolution
   var fabric = global.fabric, extend = fabric.util.object.extend,
       getElementOffset = fabric.util.getElementOffset,
-      removeFromArray = fabric.util.removeFromArray,
       toFixed = fabric.util.toFixed,
       transformPoint = fabric.util.transformPoint,
       invertTransform = fabric.util.invertTransform,
