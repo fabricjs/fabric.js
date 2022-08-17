@@ -10,10 +10,10 @@ module.exports = {
     'test/benchmarks/styles.css'
   ],
   routes: {
-    '/raphael': 'test/benchmarks/raphael',
+    '/benchmark': 'test/benchmarks/raphael/index.mustache',
   },
   test_page: [
-    'main'
+    'benchmark'
   ],
   browser_args: {
     Chrome: [

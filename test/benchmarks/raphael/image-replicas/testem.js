@@ -1,16 +1,19 @@
-const config = require('./testem.raphael');
+const config = require('../testem.raphael');
+
+const entry = 'test/benchmarks/raphael/image-replicas';
 
 module.exports = {
   ...config,
   name: 'Image Replicas',
   serve_files: [
     ...config.serve_files,
-    'test/benchmarks/raphael/image-replicas.js',
+    `${entry}/common.js`,
+    `${entry}/raphael.js`,
+    `${entry}/fabric.js`,
   ],
   routes: {
     ...config.routes,
-    '/main': 'test/benchmarks/raphael/index.mustache',
-    '/asset': 'test/benchmarks/raphael/assets/pug.jpg'
+    '/asset': `${entry}/pug.jpg`
   },
   assets: [
     {

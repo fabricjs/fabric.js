@@ -19,22 +19,21 @@
     <h2><span>Fabric.js benchmarks</span> &middot; vs. Raphael ({{name}})</h2>
     <div id="preload" class="preload">
       {{#assets}}
-      <{{tag}} src="{{src}}" onload="preload(this)" />
+      <{{tag}} src="{{src}}" onload="preload(this)"></{{tag}}>
       {{/assets}}
     </div>
     <div class="flex-row">
       <div class="px-1">
+        <canvas id="canvas" width="600" height="600"></canvas>        
         <h2><span>fabric</span><br>
           <b id="fabric_result" class="bench"></b>
         </h2>
-        <canvas id="canvas" width="500" height="500"></canvas>
       </div>
       <div class="px-1">
+        <div id="raphael"></div>
         <h2><span>Raphael</span><br>
           <b id="raphael_result" class="bench"></b>
         </h2>
-        <div id="raphael">
-        </div>
       </div>
     </div>
 </body>
