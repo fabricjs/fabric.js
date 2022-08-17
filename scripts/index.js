@@ -10,14 +10,16 @@ const chalk = require('chalk');
 const moment = require('moment');
 const Checkbox = require('inquirer-checkbox-plus-prompt');
 const commander = require('commander');
-const kill = require('kill-port');
-const http = require('http');
-const busboy = require('busboy');
+const killPort = require('kill-port');
+
 // const rollup = require('rollup');
 // const loadConfigFile = require('rollup/loadConfigFile');
+
 const program = new commander.Command();
 
 const { transform: transformFiles, listFiles } = require('./transform_files');
+const { startGoldensServer } = require("./GoldensServer");
+
 
 const wd = path.resolve(__dirname, '..');
 const dumpsPath = path.resolve(wd, '.fabric');
@@ -172,7 +174,7 @@ function watch(path, callback, debounce = 500) {
     }, debounce, { trailing: true }));
 }
 
-function copy(from ,to) {
+function copy(from, to) {
     try {
         fs.copySync(from, to);
         const containingFolder = path.resolve(wd, '..');
@@ -229,8 +231,8 @@ function exportTestsToWebsite(options) {
 }
 
 function exportToWebsite(options) {
-    if (!options.include  || options.include.length === 0) {
-        options.include  = ['build', 'tests'];
+    if (!options.include || options.include.length === 0) {
+        options.include = ['build', 'tests'];
     }
     options.include.forEach(x => {
         if (x === 'build') {
@@ -243,58 +245,6 @@ function exportToWebsite(options) {
     })
 }
 
-function parseRequest(req/*: http.IncomingMessage*/) {
-    const bb = busboy({ headers: req.headers });
-    return new Promise/*<{ files: Array<{ rawData: Buffer; } & busboy.FileInfo>; fields: { [key: string]: string | number; }; }>*/(resolve => {
-        const files = []; //as Array<{ rawData: Buffer; } & busboy.FileInfo>;
-        const fields = {};
-        bb.on('file', (name, file, info) => {
-            const raw = [];
-            file.on('data', (data) => {
-                raw.push(data);
-            }).on('close', () => {
-                files.push({ rawData: Buffer.concat(raw), ...info });
-            });
-        });
-        bb.on('field', (name, value, info) => {
-            fields[name] = value;
-        });
-        bb.on('close', () => {
-            resolve({ files, fields });
-        });
-        req.pipe(bb);
-    });
-}
-
-function startGoldensServer() {
-    return new Promise((resolve) => {
-        const server = http
-            .createServer(async (req, res) => {
-                if (req.method.toUpperCase() === 'GET' && req.url === '/') {
-                    res.end('This endpoint is used by fabric.js and testem to generate goldens');
-                }
-                else if (req.method.toUpperCase() === 'GET') {
-                    const filename = req.url.split('/golden/')[1] || req.url;
-                    const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
-                    res.end(JSON.stringify({ exists: fs.existsSync(goldenPath) }));
-                }
-                else if (req.method.toUpperCase() === 'POST') {
-                    const { files: [{ rawData, filename }] } = await parseRequest(req);
-                    const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
-                    console.log(chalk.gray('[info]'), `creating golden ${path.relative(wd, goldenPath)}`);
-                    fs.writeFileSync(goldenPath, rawData, { encoding: 'binary' });
-                    res.end();
-                }
-            })
-            .listen()
-            .on('listening', () => {
-                const port = server.address().port;
-                const url = `http://localhost:${port}/`;
-                console.log(chalk.bold('goldens server listening on'), chalk.blue(url));
-                resolve({ url, server });
-            });
-    });
-}
 
 /**
  *
@@ -303,55 +253,43 @@ function startGoldensServer() {
  * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:string}} [options]
  */
 async function test(suite, tests, options = {}) {
-    // create testem temp config for this run
-    const tempConfig = path.resolve(dumpsPath, `testem-${suite}.temp.json`);
-    const data = require(path.resolve(wd, suite === 'visual' ? 'testem-visual.json' : 'testem.json'));
-    data.serve_files = data.serve_files
-        .filter(p => p !== `test/${suite}/*.js` || !tests)
-        .concat(tests || []);
-    data.launchers.Node.command = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' ');
-    let close = () => { };
-    if (suite === 'visual') {
-        const { url, server } = await startGoldensServer();
-        close = () => server.close();
-        data.proxies['/goldens'].target = url;
-    }
-    fs.writeFileSync(tempConfig, JSON.stringify({
-        ...data,
-        qunit: options,
-        tap_failed_tests_only: !options.verbose
-    }, null, '\t'));
-    // args
     const port = options.port || suite === 'visual' ? 8081 : 8080;
     try {
-        await kill(port);
+        await killPort(port);
     } catch (error) {
-        
+
     }
-    const args = ['testem', !options.dev ? 'ci' : '', '--port', port, '-f', tempConfig, '-l', options.context.map(_.upperFirst)];
-    // env
-    // process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
-    // process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
-    // if (options.filter) {
-    //     process.env.QUNIT_FILTER = options.filter;
-    // }
-    // open localhost
-    const url = `http://localhost:${port}/`;
-    const start = (os.platform() == 'darwin' ? 'open' : os.platform() == 'win32' ? 'start' : 'xdg-open');
-    options.launch && cp.exec([start, url].join(' '));
-    // run
-    const proc = cp.spawn(args.join(' '), {
+
+    const args = [
+        'testem',
+        !options.dev ? 'ci' : '',
+        '-p', port,
+        '-f', `test/testem.${suite}.js`,
+        '-l', options.context.map(_.upperFirst).join(',')
+    ];
+
+    cp.spawn(args.join(' '), {
         cwd: wd,
-        env: process.env,
+        env: {
+            ...process.env,
+            TEST_FILES: (tests || []).join(','),
+            NODE_CMD: ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' '),
+            VERBOSE: Number(options.verbose),
+            QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
+            QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
+            QUNIT_FILTER: options.filter
+        },
         shell: true,
-        stdio: 'pipe',
+        stdio: 'inherit',
         detached: options.dev
-    })
-        .on('exit', close)
-        .on('close', close)
-        .on('disconnect', close);
-    proc.stdout.on('data', (b) => console.log(chalk.blue(`[${suite}]`), b.toString().trim()));
-    proc.stderr.pipe(process.stderr);
+    });
+
+    if (options.launch) {
+        // open localhost
+        const url = `http://localhost:${port}/`;
+        const start = (os.platform() == 'darwin' ? 'open' : os.platform() == 'win32' ? 'start' : 'xdg-open');
+        cp.exec([start, url].join(' '));
+    }
 }
 
 /**
@@ -386,7 +324,7 @@ function createChoiceData(type, file) {
 }
 
 async function selectFileToTransform() {
-    const files = _.map(listFiles(), ({ dir, file }) => createChoiceData(path.relative(path.resolve(wd,'src'), dir).replaceAll('\\','/'), file));
+    const files = _.map(listFiles(), ({ dir, file }) => createChoiceData(path.relative(path.resolve(wd, 'src'), dir).replaceAll('\\', '/'), file));
     const { tests: filteredTests } = await inquirer.prompt([
         {
             type: 'test-selection',
