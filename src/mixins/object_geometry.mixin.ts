@@ -243,6 +243,7 @@ import { Point } from '../point.class';
       );
 
       return intersection.status === 'Intersection'
+        || intersection.status === 'Coincident'
         || other.isContainedWithinObject(this, absolute, calculate)
         || this.isContainedWithinObject(other, absolute, calculate);
     },
