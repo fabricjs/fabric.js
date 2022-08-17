@@ -60,8 +60,8 @@ export class Intersection {
    * @param {Point} a2
    * @param {Point} b1
    * @param {Point} b2
-   * @param {boolean} [aIinfinite=true] check intersection by passing `false`
-   * @param {boolean} [bIinfinite=true] check intersection by passing `false`
+   * @param {boolean} [aIinfinite=true] check segment intersection by passing `false`
+   * @param {boolean} [bIinfinite=true] check segment intersection by passing `false`
    * @return {Intersection}
    */
   static intersectLineLine(a1, a2, b1, b2, aIinfinite = true, bIinfinite = true) {
@@ -95,13 +95,13 @@ export class Intersection {
   }
 
   /**
-   * Checks if a segment intersects another
+   * Checks if a segment intersects a line
    * @see {@link intersectLineLine} for line intersection
    * @static
-   * @param {Point} s1
-   * @param {Point} s2
-   * @param {Point} l1
-   * @param {Point} l2
+   * @param {Point} s1 boundary point of segment
+   * @param {Point} s2 other boundary point of segment
+   * @param {Point} l1 point on line
+   * @param {Point} l2 other point on line
    * @return {Intersection}
    */
   static intersectSegmentLine(s1, s2, l1, l2) {
@@ -112,10 +112,10 @@ export class Intersection {
    * Checks if a segment intersects another
    * @see {@link intersectLineLine} for line intersection
    * @static
-   * @param {Point} a1
-   * @param {Point} a2
-   * @param {Point} b1
-   * @param {Point} b2
+   * @param {Point} a1 boundary point of segment
+   * @param {Point} a2 other boundary point of segment
+   * @param {Point} b1 boundary point of segment
+   * @param {Point} b2 other boundary point of segment
    * @return {Intersection}
    */
   static intersectSegmentSegment(a1, a2, b1, b2) {
@@ -124,10 +124,14 @@ export class Intersection {
 
   /**
    * Checks if line intersects polygon
+   * 
+   * @todo account for stroke
+   * 
    * @static
-   * @param {Point} a1
-   * @param {Point} a2
-   * @param {Point[]} points
+   * @see {@link intersectSegmentPolygon} for segment intersection
+   * @param {Point} a1 point on line
+   * @param {Point} a2 other point on line
+   * @param {Point[]} points polygon points
    * @param {boolean} [infinite=true] check segment intersection by passing `false`
    * @return {Intersection}
    */
@@ -154,10 +158,14 @@ export class Intersection {
 
   /**
    * Checks if segment intersects polygon
+   * 
+   * @todo account for stroke
+   * 
    * @static
-   * @param {Point} a1
-   * @param {Point} a2
-   * @param {Point[]} points
+   * @see {@link intersectLinePolygon} for line intersection
+   * @param {Point} a1 boundary point of segment
+   * @param {Point} a2 other boundary point of segment
+   * @param {Point[]} points polygon points
    * @return {Intersection}
    */
   static intersectSegmentPolygon(a1, a2, points) {
@@ -166,6 +174,9 @@ export class Intersection {
 
   /**
    * Checks if polygon intersects another polygon
+   * 
+   * @todo account for stroke
+   * 
    * @static
    * @param {Point[]} points1
    * @param {Point[]} points2
@@ -202,9 +213,10 @@ export class Intersection {
   /**
    * Checks if polygon intersects rectangle
    * @static
-   * @param {Point[]} points
-   * @param {Point} r1
-   * @param {Point} r2
+   * @see {@link intersectPolygonPolygon} for polygon intersection
+   * @param {Point[]} points polygon points
+   * @param {Point} r1 top left point of rect
+   * @param {Point} r2 bottom right point of rect
    * @return {Intersection}
    */
   static intersectPolygonRectangle(points, r1, r2) {
