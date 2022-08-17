@@ -1,13 +1,19 @@
 window.addEventListener('message', e => {
     if (e.data.type === 'test') {
-        const { name, fabric: fabricResult, raphael: raphaelResult, maxResult } = e.data;
-        QUnit.module('fabric vs. Raphael benchmarks');
-        console.log(fabricResult, raphaelResult)
-        QUnit[fabricResult < raphaelResult ? 'test' : 'todo'](name, assert => {
-            assert.ok(fabricResult <= raphaelResult, `fabric (${fabricResult} ms) vs. Raphael (${raphaelResult} ms) => Raphael won`);
-        });
-        QUnit.test(`${name} time`, assert => {
-            assert.ok(fabricResult <= maxResult, `fabric took too long to complete (${fabricResult} ms, should be less than ${maxResult} ms)`)
-        })
+        const { name, fabric: fabricResult, raphael: raphaelResult, maxResults } = e.data;
+        QUnit.module(`benchmarks / fabric vs. Raphael / ${name}`);
+        for (const key in fabricResult) {
+            const f = fabricResult[key];
+            const r = raphaelResult[key];
+            QUnit[f < r ? 'test' : 'todo'](key, assert => {
+                assert.ok(f <= r, `fabric (${f} ms) vs. Raphael (${r} ms) => Raphael won`);
+            });
+            if (maxResults && maxResults[key]) {
+                QUnit.test(`${name} ${key} limit`, assert => {
+                    assert.ok(f <= maxResults[key], `fabric took too long to complete (${f} ms, should be less than ${maxResults[key]} ms)`)
+                });
+            }
+        }
+
     }
 })
