@@ -26,6 +26,7 @@ svg {
 #bd-wrapper ul li {
     display: inline-block;
 }
+
 #bd-wrapper {
     padding: 15px;
     padding-right: 150px
@@ -57,8 +58,13 @@ h2 span {
     font-weight: normal;
 }
 
-img.preload {
+.preload {
     position: absolute;
-        top: -999px;
-        left: -999px
+    top: -999px;
+    left: -999px
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
 }

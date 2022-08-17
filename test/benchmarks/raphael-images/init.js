@@ -25,13 +25,13 @@ function runRaphael(container) {
     }
 }
 
-function runFabric(canvasEl) {
-    var canvas = this.__canvas = new fabric.Canvas(canvasEl, {
+async function runFabric(canvasEl) {
+    const canvas = this.__canvas = new fabric.Canvas(canvasEl, {
         renderOnAddRemove: false,
         stateful: false
     });
     const tasks = [];
-    for (var i = numObjects; i--;) {
+    for (let i = numObjects; i--;) {
         tasks.push(fabric.Image.fromURL(url)
             .then((img) => {
                 // var startTime = new Date();
@@ -49,11 +49,9 @@ function runFabric(canvasEl) {
             }));
     }
 
-    return Promise.all(tasks)
-        .then(() => {
-            canvas.calcOffset();
-            canvas.renderAll();
-        });
+    await Promise.all(tasks);
+    canvas.calcOffset();
+    canvas.renderAll();
 }
 
 

@@ -1,11 +1,16 @@
 {
   "framework": "qunit",
   "serve_files": [
-    "/node_modules/qunit/qunit/qunit.js",
     "https://cdn.jsdelivr.net/gh/DmitryBaranovskiy/raphael@latest/raphael.min.js",
-    "dist/fabric.js"
+    "dist/fabric.js",
+    "test/benchmarks/raphael-images/init.js"
   ],
-  "styles": [
+  "watch_files": [
+    "dist/fabric.js",
+    "test/benchmarks/**",
+    "test/benchmarks/**/**"
+  ],
+  "css_files": [
     "test/benchmarks/styles.css"
   ],
   "routes": {
@@ -16,7 +21,7 @@
     "/fabric.js": "dist/fabric.js"
   },
   "test_page": [
-    "bip"
+    "raphael-images"
   ],
   "raphael": {
     "tests": {

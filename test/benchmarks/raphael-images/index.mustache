@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Fabric.js vs. Raphael Benchmarks</title>
+  <script src="/node_modules/qunit/qunit/qunit.js"></script>
+  <script src="/testem.js"></script>
+  {{#serve_files}}
+  <script src="{{src}}"></script>
+  {{/serve_files}}
+  {{#css_files}}
+  <link rel="stylesheet" href="{{src}}">
+  {{/css_files}}
+</head>
+
+<body>
+  <table>
+
+  </table>
+  <div id="bd-wrapper">
+    <h2><span>Fabric.js benchmarks</span> &middot; vs. Raphael (Images)</h2>
+    <div class="preload">
+      <img id="preload" src="/benchmarks/raphael-images/pug.jpg"
+        onload="test(document.getElementById('raphael'), document.getElementById('canvas'))">
+    </div>
+
+    <div class="flex-row">
+      <canvas id="canvas" width="500" height="500"></canvas>
+      <div id="raphael"></div>
+    </div>
+  </div>
+  <p id="results">
+    Raphael: <b id="raphael_result" class="bench"></b> ms<br>
+    fabric: <b id="fabric_result" class="bench"></b> ms<br>
+  </p>
+</body>
+
+</html>
