@@ -1,72 +1,77 @@
 
-function start() {
+const baseUrl = '/benchmarks/raphael-images';
+const url = `${baseUrl}/pug.jpg`;
+const numObjects = 20,
+    width = 500,
+    height = 500,
+    opacity = 0.75;
 
-    const baseUrl = '/benchmarks/raphael-images';
-    const url = `${baseUrl}/pug.jpg`;
-    const testResult = {
-        fabric: 0,
-        raphael: 0
+function getRandomNum(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+async function run(runner) {
+    const startTime = new Date();
+    await runner();
+    return new Date() - startTime;
+}
+
+function runRaphael(container) {
+    const paper = Raphael(container, width, height);
+    for (let i = numObjects, img; i--;) {
+        img = paper.image(url, getRandomNum(-25, width), getRandomNum(-25, height), 100, 100);
+        img.rotate(getRandomNum(0, 90));
+        img.attr('opacity', opacity);
+    }
+}
+
+function runFabric(canvasEl) {
+    var canvas = this.__canvas = new fabric.Canvas(canvasEl, {
+        renderOnAddRemove: false,
+        stateful: false
+    });
+    const tasks = [];
+    for (var i = numObjects; i--;) {
+        tasks.push(fabric.Image.fromURL(url)
+            .then((img) => {
+                // var startTime = new Date();
+                img.set({
+                    left: getRandomNum(-25, width),
+                    top: getRandomNum(-25, height),
+                    opacity,
+                    transparentCorners: true
+                });
+                img.scale(0.2);
+                img.rotate(getRandomNum(0, 90));
+                img.setCoords();
+                canvas.add(img);
+                // totalTime += (new Date() - startTime);
+            }));
     }
 
-    fabric.Object.prototype.transparentCorners = false;
-
-    function getRandomNum(min, max) {
-        return Math.random() * (max - min) + min;
-    }
-
-    var numObjects = 20,
-        width = 500,
-        height = 500,
-        opacity = 0.75;
-    var logEl = document.getElementById('log');
-
-    (function testRaphael() {
-        var startTime = new Date();
-        var paper = Raphael("raphael", width, height)
-
-
-        for (var i = numObjects; i--;) {
-            img = paper.image(url, getRandomNum(-25, width), getRandomNum(-25, height), 100, 100);
-            img.rotate(getRandomNum(0, 90));
-            img.attr('opacity', opacity);
-        }
-
-        testResult.raphael = new Date() - startTime;
-
-        logEl.innerHTML = `Raphael: <b class="bench">${testResult.raphael}</b> ms<br>`;
-    })();
-
-    (function testFabric() {
-        var startTime = new Date();
-        var canvas = this.__canvas = new fabric.Canvas('canvas', {
-            renderOnAddRemove: false,
-            stateful: false
+    return Promise.all(tasks)
+        .then(() => {
+            canvas.calcOffset();
+            canvas.renderAll();
         });
-        var tasks = [];
+}
 
-        for (var i = numObjects; i--;) {
-            tasks.push(fabric.Image.fromURL(url)
-                .then((img) => {
-                    // var startTime = new Date();
-                    img.set({
-                        left: getRandomNum(-25, width),
-                        top: getRandomNum(-25, height),
-                        opacity
-                    });
-                    img.scale(0.2);
-                    img.rotate(getRandomNum(0, 90));
-                    img.setCoords();
-                    canvas.add(img);
-                    // totalTime += (new Date() - startTime);
-                }));
-        }
 
-        Promise.all(tasks)
-            .then(() => {
-                canvas.calcOffset();
-                canvas.renderAll();
-                testResult.fabric = new Date() - startTime;
-                logEl.innerHTML += 'fabric: <b class="bench">' + testResult.fabric + '</b> ms';
-            });
-    })();
+async function test(raphaelContainer, canvasEl) {
+    const raphaelResult = await run(() => runRaphael(raphaelContainer));
+    const fabricResult = await run(() => runFabric(canvasEl));
+
+    document.getElementById('raphael_result').innerHTML = raphaelResult;
+    document.getElementById('fabric_result').innerHTML = fabricResult;
+
+    QUnit.test('mip', assert => {
+        assert.ok(fabricResult < raphaelResult, 'dkdkd')
+    })
+    // window.parent.postMessage({
+    //     type: 'test',
+    //     name: 'raphael-images',
+    //     fabric: fabricResult,
+    //     raphael: raphaelResult
+    // }, '*');
+
 }

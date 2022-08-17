@@ -4,6 +4,10 @@
 <head>
   <meta charset="utf-8">
   <title>vs. Raphael (Images) | Fabric.js Benchmarks</title>
+  <script src="/node_modules/qunit/qunit/qunit.js"></script>
+  <link rel="stylesheet" href="/node_modules/qunit/qunit/qunit.css" />
+
+  <script src="/testem.js"></script>
   <link rel="stylesheet" href="/benchmarks/styles.css">
   <script src="https://cdn.jsdelivr.net/gh/DmitryBaranovskiy/raphael@latest/raphael.min.js"></script>
   <script src="/fabric.js"></script>
@@ -13,13 +17,17 @@
 <body>
   <div id="bd-wrapper">
     <h2><span>Fabric.js benchmarks</span> &middot; vs. Raphael (Images)</h2>
-    <img id="preload" src="/benchmarks/raphael-images/pug.jpg" style="position:absolute;left:-999px;top:-999px" onload="start()">
+    <img id="preload" src="/benchmarks/raphael-images/pug.jpg" style="position:absolute;left:-999px;top:-999px"
+      onload="test(document.getElementById('raphael'), document.getElementById('canvas'))">
     <div>
       <canvas id="canvas" width="500" height="500"></canvas>
       <div id="raphael"></div>
     </div>
   </div>
-  <p id="log"></p>
+  <p id="results">
+    Raphael: <b id="raphael_result" class="bench"></b> ms<br>
+    fabric: <b id="fabric_result" class="bench"></b> ms<br>
+  </p>
 </body>
 
 </html>
