@@ -18,7 +18,6 @@ const killPort = require('kill-port');
 const program = new commander.Command();
 
 const { transform: transformFiles, listFiles } = require('./transform_files');
-const { startGoldensServer } = require("./GoldensServer");
 
 
 const wd = path.resolve(__dirname, '..');
