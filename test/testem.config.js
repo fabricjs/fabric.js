@@ -1,6 +1,7 @@
 
 /**
- * common config
+ * common config 
+ * @see https://github.com/testem/testem/blob/master/docs/config_file.md
  */
 module.exports = {
   framework: 'qunit',
@@ -36,7 +37,7 @@ module.exports = {
     'Firefox'
   ],
   tap_failed_tests_only: !Number(process.env.VERBOSE) || false,
-  ignore_missing_launchers: true,
+  ignore_missing_launchers: false,
   qunit: {
     filter: process.env.QUNIT_FILTER || null,
   },

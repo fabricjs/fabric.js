@@ -34,6 +34,9 @@ function parseRequest(req) {
     });
 }
 
+/**
+ * handles updating/checking goldens from the browser
+ */
 function startGoldensServer() {
     const server = http
         .createServer(async (req, res) => {
