@@ -1,5 +1,5 @@
 const config = require('./testem.config');
-const { startGoldensServer } = require('../scripts/GoldensServer');
+const { startGoldensServer } = require('./GoldensServer');
 
 module.exports = {
   ...config,
