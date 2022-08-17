@@ -11,5 +11,5 @@ QUnit.test('benchmark', assert => {
             done();
         }
     }, { once: true });
-})
+});
 
