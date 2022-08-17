@@ -14,19 +14,23 @@
   {{/css_files}}
 </head>
 
-<body class="p-1">
+<body class="px-1">
   <div>
-    <h2><span>Fabric.js benchmarks</span> &middot; vs. Raphael (Images)</h2>
+    <h2><span>Fabric.js benchmarks</span> &middot; vs. Raphael ({{name}})</h2>
     <div class="preload">
       <img src="/pug" onload="start()" />
     </div>
     <div class="flex-row">
-      <div class="p-1">
-        <h2><span>fabric</span> <b id="fabric_result" class="bench"></b> ms</h2>
+      <div class="px-1">
+        <h2><span>fabric</span><br>
+          <b id="fabric_result" class="bench"></b>
+        </h2>
         <canvas id="canvas" width="500" height="500"></canvas>
       </div>
-      <div class="p-1">
-        <h2><span>Raphael</span> <b id="raphael_result" class="bench"></b> ms</h2>
+      <div class="px-1">
+        <h2><span>Raphael</span><br>
+          <b id="raphael_result" class="bench"></b>
+        </h2>
         <div id="raphael">
         </div>
       </div>

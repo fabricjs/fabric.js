@@ -108,17 +108,21 @@ async function runFabric(canvasEl, testContext) {
 
 
 async function test(raphaelContainer, canvasEl) {
-    const raphaelResult = await run((testContext) => runRaphael(raphaelContainer, testContext));
-    const fabricResult = await run((testContext) => runFabric(canvasEl, testContext));
+    const raphaelResults = await run((testContext) => runRaphael(raphaelContainer, testContext));
+    const fabricResults = await run((testContext) => runFabric(canvasEl, testContext));
 
-    document.getElementById('raphael_result').innerHTML = raphaelResult;
-    document.getElementById('fabric_result').innerHTML = fabricResult;
+    function parseResults(res) {
+        return Object.keys(res).map(key => `${key}: ${res[key]} ms`).join('<br>');
+    }
+
+    document.getElementById('raphael_result').innerHTML = parseResults(raphaelResults)
+    document.getElementById('fabric_result').innerHTML = parseResults(fabricResults);
 
     window.parent.postMessage({
         type: 'test',
         name: 'image replicas',
-        fabric: fabricResult,
-        raphael: raphaelResult,
+        fabric: fabricResults,
+        raphael: raphaelResults,
         maxResults: {
             total: 40
         }

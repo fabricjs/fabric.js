@@ -1,5 +1,6 @@
 {
   "framework": "qunit",
+  "name": "Image Replicas",
   "serve_files": [
     "https://cdn.jsdelivr.net/gh/DmitryBaranovskiy/raphael@latest/raphael.min.js",
     "dist/fabric.js",
