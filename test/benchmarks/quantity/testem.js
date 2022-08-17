@@ -10,7 +10,7 @@ module.exports = {
   serve_files: [
     'dist/fabric.js',
     'test/benchmarks/TestContext.js',
-    // `${entry}/qunit.js`,
+    `${entry}/qunit.js`,
     `${entry}/index.js`,
   ],
   css_files: [
