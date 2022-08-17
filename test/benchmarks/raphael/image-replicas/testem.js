@@ -1,6 +1,7 @@
-const config = require('../testem.raphael');
+const config = require('../testem');
+const path = require('path');
 
-const entry = 'test/benchmarks/raphael/image-replicas';
+const entry = path.relative(process.cwd(), __dirname);
 
 module.exports = {
   ...config,
