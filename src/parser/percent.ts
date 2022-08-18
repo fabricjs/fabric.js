@@ -16,7 +16,7 @@ export function isPercent(value: string | null) {
  * @returns ∈ [0, 1]
  */
 export function parsePercent(value: string | number | null, valueIfNaN?: number) {
-    const parsed = typeof value == 'number' ?
+    const parsed = typeof value === 'number' ?
         value :
         typeof value === 'string' ?
             parseFloat(value) / (isPercent(value) ? 100 : 1) :
