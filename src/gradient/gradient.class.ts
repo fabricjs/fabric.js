@@ -6,7 +6,12 @@ import { iMatrix } from "../constants";
 import { parseTransformAttribute } from "../parser/parseTransformAttribute";
 import { matrixToSVG, populateWithProperties } from "../util";
 import { parseColorStops, parseCoords, parseGradientUnits, parseType } from "./parser";
-import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnits, RadialGradientCoords, SVGBBoxOptions } from "./typedefs";
+import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnits, SVGBBoxOptions } from "./typedefs";
+
+/**
+ * @todo remove this transient junk
+ */
+type FabricObject = any;
 
 /**
  * Gradient class
@@ -147,7 +152,7 @@ export class Gradient<T extends GradientType = GradientType> {
    * @param {fabric.Object} object Object to create a gradient for
    * @return {String} SVG representation of an gradient (linear/radial)
    */
-  toSVG(object: fabric.Object, { additionalTransform: preTransform }: { additionalTransform?: string } = {}) {
+  toSVG(object: FabricObject, { additionalTransform: preTransform }: { additionalTransform?: string } = {}) {
     const markup = [],
       transform = this.gradientTransform ? this.gradientTransform.concat() : iMatrix.concat(),
       gradientUnits = this.gradientUnits === 'pixels' ? 'userSpaceOnUse' : 'objectBoundingBox';
@@ -311,7 +316,7 @@ export class Gradient<T extends GradientType = GradientType> {
    *  </radialGradient>
    *
    */
-  static fromElement(el: SVGGradientElement, instance: fabric.Object, opacityAttr: string, svgBBoxOptions: SVGBBoxOptions): Gradient {
+  static fromElement(el: SVGGradientElement, instance: FabricObject, opacityAttr: string, svgBBoxOptions: SVGBBoxOptions): Gradient {
     const gradientUnits = parseGradientUnits(el);
     return new Gradient({
       id: el.getAttribute('id') || undefined,
