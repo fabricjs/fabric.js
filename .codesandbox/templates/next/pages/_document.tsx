@@ -6,7 +6,6 @@ export default function Document() {
       <Head>
         <meta name="description" content="fabric sandbox" />
         <meta charSet="utf-8" />
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <body>
         <Main />
