@@ -6,7 +6,7 @@ import { iMatrix } from "../constants";
 import { parseTransformAttribute } from "../parser/parseTransformAttribute";
 import { matrixToSVG, populateWithProperties } from "../util";
 import { parseColorStops, parseCoords, parseGradientUnits, parseType } from "./parser";
-import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnits, SVGBBoxOptions } from "./typedefs";
+import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnits, SVGOptions } from "./typedefs";
 
 /**
  * @todo remove this transient junk
@@ -278,8 +278,8 @@ export class Gradient<T extends GradientType = GradientType> {
    * @memberOf Gradient
    * @param {SVGGradientElement} el SVG gradient element
    * @param {FabricObject} instance
-   * @param {String} opacityAttr A fill-opacity or stroke-opacity attribute to multiply to each stop's opacity.
-   * @param {SVGBBoxOptions} svgBBoxOptions an object containing the size of the SVG in order to parse correctly gradients
+   * @param {String} opacity A fill-opacity or stroke-opacity attribute to multiply to each stop's opacity.
+   * @param {SVGOptions} svgOptions an object containing the size of the SVG in order to parse correctly gradients
    * that uses gradientUnits as 'userSpaceOnUse' and percentages.
    * @return {Gradient} Gradient instance
    * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
@@ -316,16 +316,16 @@ export class Gradient<T extends GradientType = GradientType> {
    *  </radialGradient>
    *
    */
-  static fromElement(el: SVGGradientElement, instance: FabricObject, opacityAttr: string, svgBBoxOptions: SVGBBoxOptions): Gradient {
+  static fromElement(el: SVGGradientElement, instance: FabricObject, svgOptions: SVGOptions): Gradient {
     const gradientUnits = parseGradientUnits(el);
     return new Gradient({
       id: el.getAttribute('id') || undefined,
       type: parseType(el),
       coords: parseCoords(el, {
-        width: svgBBoxOptions.viewBoxWidth || svgBBoxOptions.width,
-        height: svgBBoxOptions.viewBoxHeight || svgBBoxOptions.height,
+        width: svgOptions.viewBoxWidth || svgOptions.width,
+        height: svgOptions.viewBoxHeight || svgOptions.height,
       }),
-      colorStops: parseColorStops(el, opacityAttr),
+      colorStops: parseColorStops(el, svgOptions.opacity),
       gradientUnits,
       gradientTransform: parseTransformAttribute(el.getAttribute('gradientTransform') || ''),
       ...(gradientUnits === 'pixels' ?

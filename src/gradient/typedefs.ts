@@ -82,7 +82,7 @@ export type GradientOptions<T extends GradientType> = {
   offsetY?: number;
 };
 
-export type SVGBBoxOptions = {
+export type SVGOptions = {
   /**
    * width part of the viewBox attribute on svg
    */
@@ -99,4 +99,6 @@ export type SVGBBoxOptions = {
    * height part of the svg tag if viewBox is not specified
    */
   height: number;
+
+  opacity: string | null;
 };

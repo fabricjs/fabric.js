@@ -79,7 +79,7 @@
       var gradientDef = this.extractPropertyDefinition(obj, property, 'gradientDefs');
       if (gradientDef) {
         var opacityAttr = el.getAttribute(property + '-opacity');
-        var gradient = fabric.Gradient.fromElement(gradientDef, obj, opacityAttr, this.options);
+        var gradient = fabric.Gradient.fromElement(gradientDef, obj, { ...this.options, opacity: opacityAttr });
         obj.set(property, gradient);
       }
     };
