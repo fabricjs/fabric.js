@@ -68,18 +68,16 @@ export class Gradient<T extends GradientType = GradientType> {
 
   private id: string | number
 
-  /**
-   * Constructor
-   * @param {Object} options Options object with type, coords, gradientUnits and colorStops
-   * @param {Object} [options.type] gradient type linear or radial
-   * @param {Object} [options.gradientUnits] gradient units
-   * @param {Object} [options.offsetX] SVG import compatibility
-   * @param {Object} [options.offsetY] SVG import compatibility
-   * @param {Object[]} options.colorStops contains the colorstops.
-   * @param {Object} options.coords contains the coords of the gradient
-   * @return {Gradient} thisArg
-   */
-  constructor({ type, gradientUnits = 'pixels', coords, colorStops = [], offsetX = 0, offsetY = 0, gradientTransform, id }: GradientOptions<T>) {
+  constructor({
+    type,
+    gradientUnits = 'pixels',
+    coords,
+    colorStops = [],
+    offsetX = 0,
+    offsetY = 0,
+    gradientTransform,
+    id
+  }: GradientOptions<T>) {
     const uid = fabric.Object.__uid++;
     this.id = id ? `${id}_${uid}` : uid;
     this.type = type;
