@@ -1,0 +1,11 @@
+{
+    "ignoreRoot": [
+        ".next"
+    ],
+    "watch": [
+        "node_modules/fabric/src",
+        "node_modules/fabric/dist",
+        "."
+    ],
+    "ext": "js mjs cjs json ts jsx tsx"
+}
