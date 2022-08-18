@@ -52,6 +52,7 @@
     "start": "node ./scripts start",
     "export": "node ./scripts website export",
     "test": "node ./scripts test",
+    "sandbox": "node ./scripts sandbox",
     "test:coverage": "nyc --silent qunit test/node_test_setup.js test/lib test/unit",
     "test:visual:coverage": "nyc --silent --no-clean qunit test/node_test_setup.js test/lib test/visual",
     "coverage:report": "nyc report --reporter=lcov --reporter=text",
