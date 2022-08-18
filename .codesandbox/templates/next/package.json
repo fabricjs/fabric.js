@@ -2,7 +2,7 @@
   "name": "fabric-nextjs-sandbox",
   "version": "1.0.0",
   "scripts": {
-    "dev": "next",
+    "dev": "node dev.js",
     "build": "next build",
     "start": "next start",
     "type-check": "tsc"
@@ -10,18 +10,16 @@
   "dependencies": {
     "bootstrap": "5.2.0",
     "fabric": "*",
-    "jsdom": "20.0.0",
-    "next": "latest",
-    "node-canvas": "2.9.0",
-    "react": "^16.10.1",
+    "next": "^12.2.5",
+    "react": "^18.2.0",
     "react-bootstrap": "2.5.0",
-    "react-dom": "^16.10.1"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/node": "^12.7.8",
-    "@types/react": "^16.9.3",
-    "@types/react-dom": "^16.9.1",
-    "typescript": "3.6.3"
+    "@types/react": "^18.0.17",
+    "@types/react-dom": "^18.0.6",
+    "typescript": "^4.7.4"
   },
   "license": "ISC",
   "keywords": [
