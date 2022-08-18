@@ -4,7 +4,8 @@
   "description": "fabric.js on node",
   "main": "src/index.js",
   "scripts": {
-    "start": "nodemon src/index.js localhost 8080"
+    "dev": "nodemon src/index.js localhost 8080",
+    "start": "node src/index.js"
   },
   "dependencies": {
     "fabric": "*"

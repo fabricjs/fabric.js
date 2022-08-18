@@ -9,7 +9,9 @@ http
     canvas.add(rect, text);
     canvas.renderAll();
     canvas.createPNGStream().pipe(res);
+
     // or send HTML markup
+    
     // const imageData = canvas.toDataURL();
     // res.writeHead(200, '', { 'Content-Type': 'text/html' });
     // res.write(`<img src="${imageData}" />`); //write a response to the client

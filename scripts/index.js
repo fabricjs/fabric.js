@@ -550,7 +550,7 @@ sandbox
     .action((template, destination) => {
         destination = destination || path.resolve(wd, '.fabric', template);
         fs.copySync(path.resolve(codesandboxTemplatesDir, template), destination)
-        cp.execSync('npm i --include=dev && npm start', { cwd: destination, stdio: 'inherit' });
+        cp.execSync('npm i --include=dev && npm run dev', { cwd: destination, stdio: 'inherit' });
     });
 
 program.parse(process.argv);

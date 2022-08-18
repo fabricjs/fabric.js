@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "fabric on Vanilla.js",
   "scripts": {
-    "start": "parcel index.html --open",
+    "dev": "parcel index.html --open",
+    "start": "parcel index.html",
     "build": "parcel build index.html"
   },
   "dependencies": {
