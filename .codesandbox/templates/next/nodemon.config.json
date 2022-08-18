@@ -1,6 +1,7 @@
 {
     "ignoreRoot": [
-        ".next"
+        ".next",
+        "node_modules"
     ],
     "watch": [
         "node_modules/fabric/src",
