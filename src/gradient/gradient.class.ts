@@ -1,54 +1,33 @@
-//@ts-nocheck
+
 
 import { fabric } from "../../HEADER";
 import { Color } from "../color";
-import { iMatrix, incrementUID } from "../constants";
+import { iMatrix } from "../constants";
 import { parseTransformAttribute } from "../parser/parseTransformAttribute";
 import { matrixToSVG, populateWithProperties } from "../util";
-import { convertPercentUnitsToValues } from "./convertPercentUnitsToValues";
-import { parseColorStops } from "./parseColorStops";
-import { parseCoords, parseType } from "./parser";
-
-type SVGOptions = {
-  /**
-   * width part of the viewBox attribute on svg
-   */
-  viewBoxWidth: number,
-  /**
-   * height part of the viewBox attribute on svg
-   */
-  viewBoxHeight: number,
-  /**
-   * width part of the svg tag if viewBox is not specified
-   */
-  width: number,
-  /**
-   * height part of the svg tag if viewBox is not specified
-   */
-}
-type GradientUnits = 'pixels' | 'percentage';
-type GradientType = 'linear' | 'radial';
+import { parseColorStops, parseCoords, parseGradientUnits, parseType } from "./parser";
+import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnit, SVGBBoxOptions } from "./typedefs";
 
 /**
  * Gradient class
  * @class Gradient
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#gradients}
  */
-export class Gradient {
+export class Gradient<T extends GradientType = GradientType> {
 
   /**
    * Horizontal offset for aligning gradients coming from SVG when outside pathgroups
    * @type Number
    * @default 0
    */
-  offsetX = 0
+  offsetX
 
   /**
    * Vertical offset for aligning gradients coming from SVG when outside pathgroups
    * @type Number
    * @default 0
    */
-  offsetY = 0
+  offsetY
 
   /**
    * A transform matrix to apply to the gradient before painting.
@@ -58,7 +37,7 @@ export class Gradient {
    * @type Number[]
    * @default null
    */
-  gradientTransform = null
+  gradientTransform: number[] | null = null
 
   /**
    * coordinates units for coords.
@@ -66,17 +45,23 @@ export class Gradient {
    * If set as `percentage` the coords are still a number, but 1 means 100% of width
    * for the X and 100% of the height for the y. It can be bigger than 1 and negative.
    * allowed values pixels or percentage.
-   * @type GradientUnits
+   * @type GradientUnit
    * @default 'pixels'
    */
-  gradientUnits: GradientUnits = 'pixels'
+  gradientUnits: GradientUnit
 
   /**
    * Gradient type linear or radial
    * @type GradientType
    * @default 'linear'
    */
-  type: GradientType = 'linear'
+  type: T
+
+  coords: GradientCoords<T>
+
+  colorStops: ColorStop[]
+
+  private id: string | number
 
   /**
    * Constructor
@@ -87,45 +72,43 @@ export class Gradient {
    * @param {Object} [options.offsetY] SVG import compatibility
    * @param {Object[]} options.colorStops contains the colorstops.
    * @param {Object} options.coords contains the coords of the gradient
-   * @param {Number} [options.coords.x1] X coordiante of the first point for linear or of the focal point for radial
-   * @param {Number} [options.coords.y1] Y coordiante of the first point for linear or of the focal point for radial
-   * @param {Number} [options.coords.x2] X coordiante of the second point for linear or of the center point for radial
-   * @param {Number} [options.coords.y2] Y coordiante of the second point for linear or of the center point for radial
-   * @param {Number} [options.coords.r1] only for radial gradient, radius of the inner circle
-   * @param {Number} [options.coords.r2] only for radial gradient, radius of the external circle
    * @return {Gradient} thisArg
    */
-  constructor({ coords, colorStops, ...options } = {}) {
-    // sets everything, then coords and colorstops get sets again
-    Object.keys(options).forEach((option) => {
-      this[option] = options[option];
-    });
-
+  constructor({ type, gradientUnits = 'pixels', offsetX = 0, offsetY = 0, id, gradientTransform, coords: _coords, colorStops = [] }: GradientOptions<T>) {
     const uid = fabric.Object.__uid++;
-    this.id = this.id ? `${this.id}_${uid}` : uid;
+    this.id = id ? `${id}_${uid}` : uid;
+    this.type = type;
+    this.gradientUnits = gradientUnits;
+    this.gradientTransform = gradientTransform;
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
 
     const coords = {
       x1 = 0,
       y1 = 0,
       x2 = 0,
       y2 = 0
-    } = options.coords || {};
+    } = _coords;
     const radii = this.type === 'radial' ?
       {
         r1 = 0,
         r2 = 0,
-      } = options.coords || {} :
+      } = _coords :
       {};
     this.coords = { ...coords, ...radii };
     this.colorStops = colorStops.slice();
   }
 
+  // isType(type: T): this is Gradient<T> {
+  //   return this.type === type;
+  // }
+
   /**
    * Adds another colorStop
-   * @param {Object} colorStop Object with offset and color
+   * @param {Record<string, string>} colorStop Object with offset and color
    * @return {Gradient} thisArg
    */
-  addColorStop(colorStops) {
+  addColorStop(colorStops: Record<string, string>) {
     for (const position in colorStops) {
       const color = new Color(colorStops[position]);
       this.colorStops.push({
@@ -142,7 +125,7 @@ export class Gradient {
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object}
    */
-  toObject(propertiesToInclude: string[]) {
+  toObject(propertiesToInclude?: string[]) {
     const object = {
       type: this.type,
       coords: this.coords,
@@ -160,13 +143,13 @@ export class Gradient {
   /* _TO_SVG_START_ */
   /**
    * Returns SVG representation of an gradient
-   * @param {object} object Object to create a gradient for
+   * @param {fabric.Object} object Object to create a gradient for
    * @return {String} SVG representation of an gradient (linear/radial)
    */
-  toSVG(object: object, options = {}) {
+  toSVG(object: fabric.Object, { additionalTransform: preTransform }: { additionalTransform?: string } = {}) {
     const markup = [],
       coords = this.coords,
-      needsSwap = coords.r1 > coords.r2,
+      needsSwap = this.type === 'radial' && coords.r1 > coords.r2,
       transform = this.gradientTransform ? this.gradientTransform.concat() : iMatrix.concat(),
       gradientUnits = this.gradientUnits === 'pixels' ? 'userSpaceOnUse' : 'objectBoundingBox';
     // colorStops must be sorted ascending
@@ -193,7 +176,7 @@ export class Gradient {
     const commonAttributes = [
       `id="SVGID_${this.id}"`,
       `gradientUnits="${gradientUnits}"`,
-      `gradientTransform="${options.additionalTransform ? options.additionalTransform + ' ' : ''}${matrixToSVG(transform)}"`,
+      `gradientTransform="${preTransform ? preTransform + ' ' : ''}${matrixToSVG(transform)}"`,
       ''
     ].join(' ');
 
@@ -268,16 +251,9 @@ export class Gradient {
     }
 
     const coords = this.coords;
-    let gradient: CanvasGradient;
-
-    if (this.type === 'linear') {
-      gradient = ctx.createLinearGradient(
-        coords.x1, coords.y1, coords.x2, coords.y2);
-    }
-    else if (this.type === 'radial') {
-      gradient = ctx.createRadialGradient(
-        coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
-    }
+    const gradient = this.type === 'linear' ?
+      ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2) :
+      ctx.createRadialGradient(coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
 
     this.colorStops.forEach(({ color, opacity, offset }) => {
       gradient.addColorStop(
@@ -299,7 +275,7 @@ export class Gradient {
    * @param {SVGGradientElement} el SVG gradient element
    * @param {FabricObject} instance
    * @param {String} opacityAttr A fill-opacity or stroke-opacity attribute to multiply to each stop's opacity.
-   * @param {SVGOptions} svgOptions an object containing the size of the SVG in order to parse correctly gradients
+   * @param {SVGBBoxOptions} svgBBoxOptions an object containing the size of the SVG in order to parse correctly gradients
    * that uses gradientUnits as 'userSpaceOnUse' and percentages.
    * @return {Gradient} Gradient instance
    * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
@@ -336,20 +312,15 @@ export class Gradient {
    *  </radialGradient>
    *
    */
-  static fromElement(el: SVGGradientElement, instance: fabric.Object, opacityAttr: string, svgOptions: SVGOptions): Gradient {
-
-    const gradientUnits = el.getAttribute('gradientUnits') === 'userSpaceOnUse' ?
-        'pixels' :
-        'percentage';
-
+  static fromElement(el: SVGGradientElement, instance: fabric.Object, opacityAttr: string, svgBBoxOptions: SVGBBoxOptions): Gradient {
+    const gradientUnits = parseGradientUnits(el);
     return new Gradient({
-      id: el.getAttribute('id'),
+      id: el.getAttribute('id') || undefined,
       type: parseType(el),
-      coords: convertPercentUnitsToValues(
-        parseCoords(el),
-        svgOptions,
-        gradientUnits
-      ),
+      coords: parseCoords(el, {
+        width: svgBBoxOptions.viewBoxWidth || svgBBoxOptions.width,
+        height: svgBBoxOptions.viewBoxHeight || svgBBoxOptions.height,
+      }),
       colorStops: parseColorStops(el, opacityAttr),
       gradientUnits,
       gradientTransform: parseTransformAttribute(el.getAttribute('gradientTransform') || ''),
@@ -362,7 +333,6 @@ export class Gradient {
           offsetY: 0
         })
     });
-
   }
   /* _FROM_SVG_END_ */
 }
