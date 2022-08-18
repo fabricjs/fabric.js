@@ -1,6 +1,10 @@
-const { execSync } = require("child_process");
+// workaround next bug
+// https://stackoverflow.com/questions/67376052/error-when-running-next-js-typeerror-0-react-jsx-dev-runtime-webpack-impo
 
-execSync('npx nodemon --config nodemon.config.json server.js 3000', {
+const { spawnSync } = require("child_process");
+
+spawnSync('npx nodemon', ['--config nodemon.config.json', 'server.js', process.argv.slice(2)], {
     env: { ...process.env, NODE_ENV: 'development' },
     stdio: 'inherit',
+    shell: true
 });
