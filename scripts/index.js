@@ -526,12 +526,31 @@ program
 
 
 const codesandboxTemplatesDir = path.resolve(wd, '.codesandbox', 'templates');
-program
+
+const sandbox = program
     .command('sandbox')
-    .description('create a sandbox')
-    .addOption(new commander.Option('-t, --template <template>').choices(fs.readdirSync(codesandboxTemplatesDir)).default('next', '"next" template`'))
-    .action(({ template }) => {
-        createCodeSandbox(path.resolve(codesandboxTemplatesDir, template));
+    .description('sandbox commands');
+
+const templates = fs.readdirSync(codesandboxTemplatesDir);
+
+sandbox
+    .command('deploy [path]')
+    .description('deploy a sandbox to codesandbox')
+    .addOption(new commander.Option('-t, --template <template>', 'template to use')
+        .choices(templates).default('next', '"next" template`'))
+    .action((deploy, { template }) => {
+        createCodeSandbox(deploy || path.resolve(codesandboxTemplatesDir, template));
+    });
+
+sandbox
+    .command('build')
+    .description('build and start a sandbox')
+    .addArgument(new commander.Argument('<template>', 'template to use').choices(templates))
+    .argument('[destination]', 'build destination')
+    .action((template, destination) => {
+        destination = destination || path.resolve(wd, '.fabric', template);
+        fs.copySync(path.resolve(codesandboxTemplatesDir, template), destination)
+        cp.execSync('npm i --include=dev && npm start', { cwd: destination, stdio: 'inherit' });
     });
 
 program.parse(process.argv);
