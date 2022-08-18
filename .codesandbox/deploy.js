@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const Axios = require('axios');
 const chalk = require('chalk');
 const path = require('path');
+const _ = require('lodash');
 
 const BINARY_EXT = [
     'png',
@@ -19,8 +20,11 @@ function bufferToBase64DataUrl(buffer, mimeType) {
  */
 async function createCodeSandbox(appPath) {
     const files = {};
+    const gitignore = path.resolve(appPath, '.gitignore');
+    const ignore = fs.existsSync(gitignore) ? _.compact(fs.readFileSync(gitignore).toString().split('\n')).map(p => new RegExp(p.trim())) : [];
     const processFile = (fileName) => {
         const filePath = path.resolve(appPath, fileName);
+        if (ignore.some(r => r.test(fileName))) return;
         const ext = path.extname(fileName).slice(1);
         if (fs.lstatSync(filePath).isDirectory()) {
             fs.readdirSync(filePath)
