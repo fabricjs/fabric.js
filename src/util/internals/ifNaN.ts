@@ -6,5 +6,5 @@
  * @returns `fallback` is `value is NaN
  */
 export const ifNaN = (value: number, valueIfNaN?: number) => {
-    return isNaN(value) ? valueIfNaN || NaN : value;
+    return isNaN(value) && typeof valueIfNaN === 'number' ? valueIfNaN : value;
 }
