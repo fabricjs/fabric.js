@@ -69,7 +69,8 @@ export class Gradient<T extends GradientType = GradientType> {
   private id: string | number
 
   constructor({
-    type,
+    // @ts-ignore
+    type = 'linear',
     gradientUnits = 'pixels',
     coords,
     colorStops = [],
