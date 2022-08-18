@@ -1,20 +1,11 @@
 import { isPercent } from "../../parser/percent";
+import { TSize } from "../../typedefs";
 import { GradientCoords, GradientType, GradientUnits } from "../typedefs";
 import { parseGradientUnits, parseType } from "./misc";
 
-
-
 function convertPercentUnitsToValues<T extends GradientType, K extends keyof GradientCoords<T>>(
     values: Record<K, string | number>,
-    {
-        width,
-        height,
-        gradientUnits
-    }: {
-        width: number,
-        height: number,
-        gradientUnits: GradientUnits
-    }
+    { width, height, gradientUnits }: TSize & { gradientUnits: GradientUnits }
 ) {
     let finalValue;
     return (Object.keys(values) as K[]).reduce((acc, prop) => {
@@ -69,7 +60,7 @@ export function parseRadialCoords(el: SVGGradientElement) {
     };
 }
 
-export function parseCoords(el: SVGGradientElement, size: { width: number, height: number }) {
+export function parseCoords(el: SVGGradientElement, size: TSize) {
     return convertPercentUnitsToValues(
         parseType(el) === 'linear' ? parseLinearCoords(el) : parseRadialCoords(el),
         {

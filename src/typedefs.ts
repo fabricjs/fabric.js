@@ -1,4 +1,4 @@
-//@ts-nocheck
+
 interface NominalTag<T> {
   'nominalTag': T;
 }
@@ -6,9 +6,16 @@ interface NominalTag<T> {
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
 
 // eslint-disable-next-line no-unused-vars
-const enum Degree {}
+const enum Degree { }
 // eslint-disable-next-line no-unused-vars
-const enum Radian {}
+const enum Radian { }
 
 export type TDegree = Nominal<number, Degree>;
 export type TRadian = Nominal<number, Radian>;
+
+export type TSize = {
+  width: number;
+  height: number;
+}
+
+export type Percent = `${number}%`;

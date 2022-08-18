@@ -1,11 +1,10 @@
+import { Percent } from "../typedefs";
 
 export type GradientUnits = 'pixels' | 'percentage';
 
 export type GradientType = 'linear' | 'radial';
 
-export type Percent = `${number}%`;
-
-export type GradientValue = number | Percent;
+export type GradientValue = number | Percent | string;
 
 export type ColorStop = {
   color: string;
@@ -13,53 +12,55 @@ export type ColorStop = {
   offset: number;
 };
 
-export type LinearGradientCoords<T> = {
+export type LinearGradientCoords<T extends GradientValue> = {
   /**
    * X coordiante of the first point
    */
-  x1: GradientValue;
+  x1: T;
   /**
    * Y coordiante of the first point
    */
-  y1: GradientValue;
+  y1: T;
   /**
    * X coordiante of the second point
    */
-  x2: GradientValue;
+  x2: T;
   /**
    * Y coordiante of the second point
    */
-  y2: GradientValue;
+  y2: T;
 };
 
-export type RadialGradientCoords = {
+export type RadialGradientCoords<T extends GradientValue> = {
   /**
    * X coordiante of the first focal point
    */
-  x1: GradientValue;
+  x1: T;
   /**
    * Y coordiante of the first focal point
    */
-  y1: GradientValue;
+  y1: T;
   /**
    * X coordiante of the second focal point
    */
-  x2: GradientValue;
+  x2: T;
   /**
    * Y coordiante of the second focal point
    */
-  y2: GradientValue;
+  y2: T;
   /**
    * radius of the inner circle
    */
-  r1: GradientValue;
+  r1: T;
   /**
    * radius of the outer circle
    */
-  r2: GradientValue;
+  r2: T;
 };
 
-export type GradientCoords<T extends GradientType> = T extends 'linear' ? LinearGradientCoords : RadialGradientCoords;
+export type GradientCoords<T extends GradientType> = T extends 'linear' ?
+  LinearGradientCoords<number> :
+  RadialGradientCoords<number>;
 
 export type GradientOptions<T extends GradientType> = {
   type: T;
