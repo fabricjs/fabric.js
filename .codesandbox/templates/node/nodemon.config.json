@@ -1,0 +1,8 @@
+{
+    "ignoreRoot": [],
+    "watch":[
+        "node_modules/fabric/src",
+        "node_modules/fabric/dist",
+        "."
+    ]
+}

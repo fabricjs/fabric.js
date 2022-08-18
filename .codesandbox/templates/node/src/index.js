@@ -1,6 +1,8 @@
 const http = require('http');
 const { fabric } = require('fabric');
 
+const port = Number(process.argv[2]);
+
 http
   .createServer((req, res) => {
     const canvas = new fabric.Canvas(null, { width: 100, height: 100 });
@@ -17,5 +19,5 @@ http
     // res.write(`<img src="${imageData}" />`); //write a response to the client
     // res.end(); //end the response
   })
-  .listen(8080)
-  .on('listening', () => console.log(`server running on http://localhost:8080/`))
+  .listen(port)
+  .on('listening', () => console.log(`server running on http://localhost:${port}/`))
