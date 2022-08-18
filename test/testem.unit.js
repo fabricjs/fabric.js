@@ -2,6 +2,7 @@ const config = require('./testem.config');
 
 module.exports = {
   ...config,
+  report_file: '.fabric/test_results/unit.txt',
   serve_files: [
     ...config.serve_files,
     'test/lib/event.simulate.js',

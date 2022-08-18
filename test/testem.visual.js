@@ -4,6 +4,7 @@ const { startGoldensServer } = require('./GoldensServer');
 module.exports = {
   ...config,
   visual: true,
+  report_file: '.fabric/test_results/visual.txt',
   serve_files: [
     ...config.serve_files,
     'test/lib/pixelmatch.js',
