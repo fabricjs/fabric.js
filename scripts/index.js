@@ -286,7 +286,7 @@ async function test(suite, tests, options = {}) {
     if (options.launch) {
         // open localhost
         const url = `http://localhost:${port}/`;
-        const start = (os.platform() == 'darwin' ? 'open' : os.platform() == 'win32' ? 'start' : 'xdg-open');
+        const start = (os.platform() === 'darwin' ? 'open' : os.platform() === 'win32' ? 'start' : 'xdg-open');
         cp.exec([start, url].join(' '));
     }
 }
