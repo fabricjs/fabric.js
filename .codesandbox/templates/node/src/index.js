@@ -19,5 +19,7 @@ http
     // res.write(`<img src="${imageData}" />`); //write a response to the client
     // res.end(); //end the response
   })
-  .listen(port)
-  .on('listening', () => console.log(`server running on http://localhost:${port}/`))
+  .listen(port, (err) => {
+    if (err) throw err;
+    console.log(`> Ready on http://localhost:${port}`);
+  })
