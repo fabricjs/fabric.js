@@ -1,3 +1,4 @@
+// https://www.typescriptlang.org/docs/handbook/utility-types.html
 
 interface NominalTag<T> {
   'nominalTag': T;
