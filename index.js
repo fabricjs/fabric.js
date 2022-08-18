@@ -26,7 +26,7 @@ import './src/color';
 import './src/controls.actions'; // optional interaction
 import './src/controls.render'; // optional interaction
 import './src/control.class'; // optional interaction
-import './src/gradient.class'; // optional gradient
+import './src/gradient'; // optional gradient
 import './src/pattern.class'; // optional pattern
 import './src/shadow.class'; // optional shadow
 import './src/static_canvas.class';
