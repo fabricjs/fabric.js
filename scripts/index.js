@@ -407,11 +407,9 @@ async function runIntreactiveTestSuite(options) {
     _.reduce(tests, async (queue, files, suite) => {
         await queue;
         if (files === true) {
-            console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
             return test(suite, null, options);
         }
         else if (Array.isArray(files) && files.length > 0) {
-            console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
             return test(suite, files, options);
         }
     }, Promise.resolve());
@@ -479,7 +477,6 @@ program
         if (options.suite) {
             _.reduce(options.suite, async (queue, suite) => {
                 await queue;
-                console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
                 return test(suite, null, options);
             }, Promise.resolve());
         }
