@@ -6,7 +6,7 @@ import { iMatrix } from "../constants";
 import { parseTransformAttribute } from "../parser/parseTransformAttribute";
 import { matrixToSVG, populateWithProperties } from "../util";
 import { parseColorStops, parseCoords, parseGradientUnits, parseType } from "./parser";
-import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnits, SVGBBoxOptions } from "./typedefs";
+import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnits, RadialGradientCoords, SVGBBoxOptions } from "./typedefs";
 
 /**
  * Gradient class
@@ -100,8 +100,8 @@ export class Gradient<T extends GradientType = GradientType> {
     this.colorStops = colorStops.slice();
   }
 
-  // isType(type: T): this is Gradient<T> {
-  //   return this.type === type;
+  // isType<S extends GradientType>(type: S): this is Gradient<S> {
+  //   return (this.type as GradientType) === type;
   // }
 
   /**
@@ -149,12 +149,10 @@ export class Gradient<T extends GradientType = GradientType> {
    */
   toSVG(object: fabric.Object, { additionalTransform: preTransform }: { additionalTransform?: string } = {}) {
     const markup = [],
-      coords = this.coords,
-      needsSwap = this.type === 'radial' && coords.r1 > coords.r2,
       transform = this.gradientTransform ? this.gradientTransform.concat() : iMatrix.concat(),
       gradientUnits = this.gradientUnits === 'pixels' ? 'userSpaceOnUse' : 'objectBoundingBox';
     // colorStops must be sorted ascending
-    let colorStops = this.colorStops.sort(function (a, b) {
+    let colorStops = this.colorStops.sort((a, b) => {
       return a.offset - b.offset;
     });
 
@@ -182,31 +180,31 @@ export class Gradient<T extends GradientType = GradientType> {
     ].join(' ');
 
     if (this.type === 'linear') {
+      const { x1, y1, x2, y2 } = this.coords;
       markup.push(
         '<linearGradient ',
         commonAttributes,
-        ' x1="', coords.x1,
-        '" y1="', coords.y1,
-        '" x2="', coords.x2,
-        '" y2="', coords.y2,
+        ' x1="', x1,
+        '" y1="', y1,
+        '" x2="', x2,
+        '" y2="', y2,
         '">\n'
       );
     }
     else if (this.type === 'radial') {
+      const { x1, y1, x2, y2, r1, r2 } = this.coords as GradientCoords<'radial'>;
+      const needsSwap = r1 > r2;
       // svg radial gradient has just 1 radius. the biggest.
       markup.push(
         '<radialGradient ',
         commonAttributes,
-        ' cx="', needsSwap ? coords.x1 : coords.x2,
-        '" cy="', needsSwap ? coords.y1 : coords.y2,
-        '" r="', needsSwap ? coords.r1 : coords.r2,
-        '" fx="', needsSwap ? coords.x2 : coords.x1,
-        '" fy="', needsSwap ? coords.y2 : coords.y1,
+        ' cx="', needsSwap ? x1 : x2,
+        '" cy="', needsSwap ? y1 : y2,
+        '" r="', needsSwap ? r1 : r2,
+        '" fx="', needsSwap ? x2 : x1,
+        '" fy="', needsSwap ? y2 : y1,
         '">\n'
       );
-    }
-
-    if (this.type === 'radial') {
       if (needsSwap) {
         // svg goes from internal to external radius. if radius are inverted, swap color stops.
         colorStops = colorStops.reverse();
@@ -214,10 +212,10 @@ export class Gradient<T extends GradientType = GradientType> {
           colorStop.offset = 1 - colorStop.offset;
         });
       }
-      const minRadius = Math.min(coords.r1, coords.r2);
+      const minRadius = Math.min(r1, r2);
       if (minRadius > 0) {
         // i have to shift all colorStops and add new one in 0.
-        const maxRadius = Math.max(coords.r1, coords.r2),
+        const maxRadius = Math.max(r1, r2),
           percentageShift = minRadius / maxRadius;
         colorStops.forEach(colorStop => {
           colorStop.offset += percentageShift * (1 - colorStop.offset);
@@ -225,12 +223,12 @@ export class Gradient<T extends GradientType = GradientType> {
       }
     }
 
-    colorStops.forEach(colorStop => {
+    colorStops.forEach(({ color, offset, opacity }) => {
       markup.push(
         '<stop ',
-        'offset="', (colorStop.offset * 100) + '%',
-        '" style="stop-color:', colorStop.color,
-        (typeof colorStop.opacity !== 'undefined' ? ';stop-opacity: ' + colorStop.opacity : ';'),
+        'offset="', (offset * 100) + '%',
+        '" style="stop-color:', color,
+        (typeof opacity !== 'undefined' ? ';stop-opacity: ' + opacity : ';'),
         '"/>\n'
       );
     });
@@ -251,7 +249,7 @@ export class Gradient<T extends GradientType = GradientType> {
       return;
     }
 
-    const coords = this.coords;
+    const coords = this.coords as GradientCoords<'radial'>;
     const gradient = this.type === 'linear' ?
       ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2) :
       ctx.createRadialGradient(coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
