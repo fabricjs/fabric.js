@@ -74,28 +74,29 @@ export class Gradient<T extends GradientType = GradientType> {
    * @param {Object} options.coords contains the coords of the gradient
    * @return {Gradient} thisArg
    */
-  constructor({ type, gradientUnits = 'pixels', offsetX = 0, offsetY = 0, id, gradientTransform, coords: _coords, colorStops = [] }: GradientOptions<T>) {
+  constructor({ type, gradientUnits = 'pixels', coords, colorStops = [], offsetX = 0, offsetY = 0, gradientTransform, id }: GradientOptions<T>) {
     const uid = fabric.Object.__uid++;
     this.id = id ? `${id}_${uid}` : uid;
     this.type = type;
     this.gradientUnits = gradientUnits;
-    this.gradientTransform = gradientTransform;
+    this.gradientTransform = gradientTransform || null;
     this.offsetX = offsetX;
     this.offsetY = offsetY;
-
-    const coords = {
-      x1 = 0,
-      y1 = 0,
-      x2 = 0,
-      y2 = 0
-    } = _coords;
-    const radii = this.type === 'radial' ?
-      {
-        r1 = 0,
-        r2 = 0,
-      } = _coords :
-      {};
-    this.coords = { ...coords, ...radii };
+    this.coords = {
+      x1: 0,
+      y1: 0,
+      x2: 0,
+      y2: 0,
+      ...(
+        this.type === 'radial' ?
+          {
+            r1: 0,
+            r2: 0,
+          } :
+          {}
+      ),
+      ...coords
+    } as GradientCoords<T>;
     this.colorStops = colorStops.slice();
   }
 

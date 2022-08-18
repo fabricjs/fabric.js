@@ -64,13 +64,13 @@ export type GradientCoords<T extends GradientType> = T extends 'linear' ?
 
 export type GradientOptions<T extends GradientType> = {
   type: T;
-  gradientUnits: GradientUnits;
-  colorStops: ColorStop[];
-  coords: GradientCoords<T>;
+  gradientUnits?: GradientUnits;
+  colorStops?: ColorStop[];
+  coords: Partial<GradientCoords<T>>;
   /**
    * @todo rename?
    */
-  gradientTransform: number[];
+  gradientTransform?: number[];
   id?: string;
   /**
    * SVG import compatibility
