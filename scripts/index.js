@@ -276,7 +276,8 @@ async function test(suite, tests, options = {}) {
             VERBOSE: Number(options.verbose),
             QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
             QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
-            QUNIT_FILTER: options.filter
+            QUNIT_FILTER: options.filter,
+            REPORT_FILE: options.out
         },
         shell: true,
         stdio: 'inherit',
@@ -444,10 +445,10 @@ program
     .description('build dist')
     .option('-f, --fast', 'skip minifying')
     .option('-w, --watch')
-    .option('-i, --input [...path]', 'specify the build input paths')
-    .option('-o, --output [path]', 'specify the build output path')
-    .option('-x, --exclude [exclude...]')
-    .option('-m, --modules [modules...]')
+    .option('-i, --input <...path>', 'specify the build input paths')
+    .option('-o, --output <path>', 'specify the build output path')
+    .option('-x, --exclude <exclude...>')
+    .option('-m, --modules <modules...>')
     .action((options) => {
         build(options);
     });
@@ -455,17 +456,18 @@ program
 program
     .command('test')
     .description('run test suite')
-    .addOption(new commander.Option('-s, --suite [suite...]', 'test suite to run').choices(['unit', 'visual']))
-    .option('-f, --file [file]', 'run a specific test file')
-    .option('--filter [filter]', 'filter tests by name')
+    .addOption(new commander.Option('-s, --suite <suite...>', 'test suite to run').choices(['unit', 'visual']))
+    .option('-f, --file <file>', 'run a specific test file')
+    .option('--filter <filter>', 'filter tests by name')
     .option('-a, --all', 'run all tests', false)
     .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
     .option('-r, --recreate', 'recreate visual refs (golden images)', false)
     .option('-v, --verbose', 'log passing tests', false)
     .option('-l, --launch', 'launch tests in the browser', false)
     .option('--dev', 'runs testem in `dev` mode, without a `ci` flag', false)
-    .addOption(new commander.Option('-c, --context [context...]', 'context to test in').choices(['chrome', 'firefox', 'node']).default(['chrome', 'node']))
+    .addOption(new commander.Option('-c, --context <context...>', 'context to test in').choices(['chrome', 'firefox', 'node']).default(['chrome', 'node']))
     .option('-p, --port')
+    .option('-o, --out <out>', 'path to report test results to')
     .option('--clear-cache', 'clear CLI test cache', false)
     .action((options) => {
         if (options.clearCache) {
@@ -502,7 +504,7 @@ website
 website
     .command('export')
     .description('export files to fabricjs.com directory')
-    .addOption(new commander.Option('-i, --include [what...]').choices(['build', 'tests']).default(['build', 'tests'], 'export all'))
+    .addOption(new commander.Option('-i, --include <what...>').choices(['build', 'tests']).default(['build', 'tests'], 'export all'))
     .option('-w, --watch')
     .action(exportToWebsite);
 
@@ -515,7 +517,7 @@ program
     .option('-ts, --typescript', 'transform into typescript', false)
     .option('-v, --verbose', 'verbose logging', true)
     .option('-a, --all', 'transform all files', false)
-    .option('-d, --diff [branch]', 'compare against given branch (default: master) and transform all files with diff')
+    .option('-d, --diff <branch>', 'compare against given branch (default: master) and transform all files with diff')
     .action(async ({ overwrite, exports, index, typescript, verbose, all, diff: gitRef } = {}) => {
         let files = [];
         if (gitRef) {
