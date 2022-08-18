@@ -550,8 +550,14 @@ sandbox
     .action((template, destination) => {
         destination = destination || path.resolve(wd, '.fabric', template);
         fs.copySync(path.resolve(codesandboxTemplatesDir, template), destination);
-        console.log(`${chalk.blue(`building ${chalk.bold(template)} sandbox`)} at ${chalk.gray(destination)}`);
-        cp.execSync('npm i --include=dev && npm run dev', { cwd: destination, stdio: 'inherit' });
+        console.log(`${chalk.blue(`> building ${chalk.bold(template)} sandbox`)} at ${chalk.gray(destination)}`);
+        console.log(chalk.blue('\n> linking fabric'));
+        cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
+        cp.execSync('npm link fabric --save', { cwd: destination, stdio: 'inherit' });
+        console.log(chalk.blue('> intalling deps'));
+        cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
+        console.log(chalk.blue('> starting'));
+        cp.execSync('npm run dev', { cwd: destination, stdio: 'inherit' });
     });
 
 program.parse(process.argv);
