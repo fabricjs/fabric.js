@@ -4,12 +4,12 @@ import { GradientCoords, GradientType, GradientUnits } from "../typedefs";
 import { parseGradientUnits, parseType } from "./misc";
 
 function convertPercentUnitsToValues<T extends GradientType, K extends keyof GradientCoords<T>>(
-    values: Record<K, string | number>,
+    valuesToConvert: Record<K, string | number>,
     { width, height, gradientUnits }: TSize & { gradientUnits: GradientUnits }
 ) {
     let finalValue;
-    return (Object.keys(values) as K[]).reduce((acc, prop) => {
-        const propValue = values[prop];
+    return (Object.keys(valuesToConvert) as K[]).reduce((acc, prop) => {
+        const propValue = valuesToConvert[prop];
         if (propValue === 'Infinity') {
             finalValue = 1;
         }
