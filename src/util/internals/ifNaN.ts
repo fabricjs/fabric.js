@@ -2,9 +2,9 @@
 /**
  * 
  * @param value value to check if NaN
- * @param [fallback]
+ * @param [valueIfNaN]
  * @returns `fallback` is `value is NaN
  */
-export const ifNaN = (value: number, fallback?: number) => {
-    return isNaN(value) ? fallback || NaN : value;
+export const ifNaN = (value: number, valueIfNaN?: number) => {
+    return isNaN(value) ? valueIfNaN || NaN : value;
 }
