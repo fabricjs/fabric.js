@@ -314,7 +314,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    *  </radialGradient>
    *
    */
-  static fromElement(el: SVGGradientElement, instance: FabricObject, svgOptions: SVGOptions): Gradient {
+  static fromElement(el: SVGGradientElement, instance: FabricObject, svgOptions: SVGOptions): Gradient<GradientType> {
     const gradientUnits = parseGradientUnits(el);
     return new Gradient({
       id: el.getAttribute('id') || undefined,
