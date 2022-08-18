@@ -1,4 +1,4 @@
-# Fabric Next.js Sandbox
+# Fabric Vanilla.js Sandbox
 
 A `Vanilla.js` app for reproducing `fabric` issues and creating examples.
 
