@@ -549,7 +549,8 @@ sandbox
     .argument('[destination]', 'build destination')
     .action((template, destination) => {
         destination = destination || path.resolve(wd, '.fabric', template);
-        fs.copySync(path.resolve(codesandboxTemplatesDir, template), destination)
+        fs.copySync(path.resolve(codesandboxTemplatesDir, template), destination);
+        console.log(`${chalk.blue(`building ${chalk.bold(template)} sandbox`)} at ${chalk.gray(destination)}`);
         cp.execSync('npm i --include=dev && npm run dev', { cwd: destination, stdio: 'inherit' });
     });
 
