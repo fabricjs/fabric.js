@@ -18,7 +18,7 @@ type FabricObject = any;
  * @class Gradient
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#gradients}
  */
-export class Gradient<T extends GradientType = GradientType> {
+export class Gradient<S, T extends GradientType = S extends GradientType ? S : 'linear'> {
 
   /**
    * Horizontal offset for aligning gradients coming from SVG when outside pathgroups
@@ -69,8 +69,7 @@ export class Gradient<T extends GradientType = GradientType> {
   private id: string | number
 
   constructor({
-    // @ts-ignore
-    type = 'linear',
+    type = 'linear' as T,
     gradientUnits = 'pixels',
     coords,
     colorStops = [],
