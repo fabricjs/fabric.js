@@ -554,7 +554,7 @@ sandbox
         console.log(chalk.blue('\n> linking fabric'));
         cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
         cp.execSync('npm link fabric --save', { cwd: destination, stdio: 'inherit' });
-        console.log(chalk.blue('> intalling deps'));
+        console.log(chalk.blue('> installing deps'));
         cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
         console.log(chalk.blue('> starting'));
         cp.execSync('npm run dev', { cwd: destination, stdio: 'inherit' });
