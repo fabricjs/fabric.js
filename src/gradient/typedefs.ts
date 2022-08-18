@@ -1,5 +1,5 @@
 
-export type GradientUnit = 'pixels' | 'percentage';
+export type GradientUnits = 'pixels' | 'percentage';
 
 export type GradientType = 'linear' | 'radial';
 
@@ -13,7 +13,7 @@ export type ColorStop = {
   offset: number;
 };
 
-export type LinearGradientCoords = {
+export type LinearGradientCoords<T> = {
   /**
    * X coordiante of the first point
    */
@@ -63,7 +63,7 @@ export type GradientCoords<T extends GradientType> = T extends 'linear' ? Linear
 
 export type GradientOptions<T extends GradientType> = {
   type: T;
-  gradientUnits: GradientUnit;
+  gradientUnits: GradientUnits;
   colorStops: ColorStop[];
   coords: GradientCoords<T>;
   /**

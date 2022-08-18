@@ -6,7 +6,7 @@ import { iMatrix } from "../constants";
 import { parseTransformAttribute } from "../parser/parseTransformAttribute";
 import { matrixToSVG, populateWithProperties } from "../util";
 import { parseColorStops, parseCoords, parseGradientUnits, parseType } from "./parser";
-import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnit, SVGBBoxOptions } from "./typedefs";
+import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnits, SVGBBoxOptions } from "./typedefs";
 
 /**
  * Gradient class
@@ -45,10 +45,10 @@ export class Gradient<T extends GradientType = GradientType> {
    * If set as `percentage` the coords are still a number, but 1 means 100% of width
    * for the X and 100% of the height for the y. It can be bigger than 1 and negative.
    * allowed values pixels or percentage.
-   * @type GradientUnit
+   * @type GradientUnits
    * @default 'pixels'
    */
-  gradientUnits: GradientUnit
+  gradientUnits: GradientUnits
 
   /**
    * Gradient type linear or radial

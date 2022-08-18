@@ -1,5 +1,5 @@
 import { isPercent } from "../../parser/percent";
-import { GradientCoords, GradientType, GradientUnit } from "../typedefs";
+import { GradientCoords, GradientType, GradientUnits } from "../typedefs";
 import { parseGradientUnits, parseType } from "./misc";
 
 
@@ -13,7 +13,7 @@ function convertPercentUnitsToValues<T extends GradientType, K extends keyof Gra
     }: {
         width: number,
         height: number,
-        gradientUnits: GradientUnit
+        gradientUnits: GradientUnits
     }
 ) {
     let finalValue;
