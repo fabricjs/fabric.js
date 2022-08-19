@@ -90,6 +90,19 @@ npm run sandbox deploy -- --template node
 
 npm run sandbox -- --help
 
+> Usage: fabric.js sandbox [options] [command]
+
+> sandbox commands
+
+Options:
+  -h, --help                      display help for command
+
+Commands:
+  deploy [options] [path]         deploy a sandbox to codesandbox
+  build <template> [destination]  build and start a sandbox
+  start <path>                    start a sandbox
+  help [command]                  display help for command
+
 ```
 
 ### symlinking
