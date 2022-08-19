@@ -11,8 +11,8 @@ const chalk = require('chalk');
 const moment = require('moment');
 const Checkbox = require('inquirer-checkbox-plus-prompt');
 const commander = require('commander');
-// const rollup = require('rollup');
-// const loadConfigFile = require('rollup/loadConfigFile');
+const rollup = require('rollup');
+const loadConfigFile = require('rollup/loadConfigFile');
 const program = new commander.Command();
 
 const { transform: transformFiles, listFiles } = require('./transform_files');
@@ -84,33 +84,42 @@ class ICheckbox extends Checkbox {
 }
 inquirer.registerPrompt('test-selection', ICheckbox);
 
-// async function rollupBuild(options = {}, onComplete) {
-//     const { options: buildOptions, warnings } = await loadConfigFile(path.resolve(__dirname, '..', 'rollup.config.js'), { format: 'es' });
-//     warnings.flush();
-//     if (options.destination) {
-//         buildOptions.output = [options.destination];
-//     }
-//     if (options.watch) {
-//         const watcher = rollup.watch(buildOptions);
-//         watcher.on('END', () => {
-//             onComplete && onComplete();
-//         });
-//         watcher.on('event', ({ result }) => {
-//             if (result) {
-//                 result.close();
-//             }
-//         });
-//         process.on('beforeExit', () => watcher.close());
-//     }
-//     else {
-//         for (const optionsObj of buildOptions) {
-//             const bundle = await rollup.rollup(optionsObj);
-//             await Promise.all(optionsObj.output.map(bundle.write));
-//         }
+async function rollupBuild(options = {}, onComplete) {
+    const { options: [buildOptions], warnings } = await loadConfigFile(path.resolve(wd, 'rollup.config.js'), { format: 'es' });
+    warnings.flush();
+    // if (options.destination) {
+    //     buildOptions.output = [options.destination];
+    // }
+    if (options.watch) {
+        const watcher = rollup.watch(buildOptions);
+        const outLog = buildOptions.output.map(output => output.file).join(', ');
+        let start;
+        watcher.on('event', ({ result, code }) => {
+            switch (code) {
+                case 'START':
+                    start = new Date();
+                    console.log(`\n${chalk.cyan('bundles')} ${chalk.cyanBright(buildOptions.input.join(', '))} ${chalk.cyan('→')} ${chalk.cyanBright(`${outLog}...`)}`)
+                    break;
+                case 'END':
+                    console.log(chalk.green(`created ${chalk.bold(outLog)} in ${chalk.bold(`${((new Date() - start) / 1000).toFixed(1)}s`)}`));
+                    console.log(`\n[${moment().format('YYYY-MM-DD HH:mm:ss')}] waiting for changes...`);
+                    onComplete && onComplete();
+                    break;
+            }
+            result && result.close();
+        });
+        process.on('exit', () => watcher.close());
+        process.on('beforeExit', () => watcher.close());
+    }
+    else {
+        for (const optionsObj of buildOptions) {
+            const bundle = await rollup.rollup(optionsObj);
+            await Promise.all(optionsObj.output.map(bundle.write));
+        }
 
-//         onComplete && onComplete();
-//     }
-// }
+        onComplete && onComplete();
+    }
+}
 
 
 function build(options = {}) {
@@ -549,15 +558,17 @@ sandbox
     .argument('[destination]', 'build destination')
     .action((template, destination) => {
         destination = destination || path.resolve(wd, '.fabric', template);
+        const pathToTrigger = path.resolve(destination, '.trigger');
         fs.copySync(path.resolve(codesandboxTemplatesDir, template), destination);
-        console.log(`${chalk.blue(`> building ${chalk.bold(template)} sandbox`)} at ${chalk.gray(destination)}`);
+        console.log(`${chalk.blue(`> building ${chalk.bold(template)} sandbox`)} at ${chalk.cyanBright(destination)}`);
         console.log(chalk.blue('\n> linking fabric'));
         cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
         cp.execSync('npm link fabric --save', { cwd: destination, stdio: 'inherit' });
+        rollupBuild({ watch: true }, () => fs.appendFile(pathToTrigger, `${moment().format('YYYY-MM-DD HH:mm:ss')}\n`));
         console.log(chalk.blue('> installing deps'));
         cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
         console.log(chalk.blue('> starting'));
-        cp.execSync('npm run dev', { cwd: destination, stdio: 'inherit' });
+        cp.spawn('npm run dev', { cwd: destination, stdio: 'inherit', shell: true });
     });
 
 program.parse(process.argv);
