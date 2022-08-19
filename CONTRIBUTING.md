@@ -6,7 +6,7 @@
 Questions are legit but that doesn't make them bug reports...\
 Please do not open an issue in such a case.
 
-To find an answer first search the repository, in contains a lot of threads.
+To find an answer first search the repository, it contains a lot of threads.\
 Ask & search `Fabric's google group`, `StackOverflow` and [`Fabric's IRC channel`](irc://irc.freenode.net/#fabric.js), see [links](#-links).
 
 Questions might inspire you to [improve the docs](#-improving-docs) for other devs and for the sake of the repository.\
