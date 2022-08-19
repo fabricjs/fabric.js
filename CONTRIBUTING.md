@@ -42,8 +42,7 @@ If it's not a bug **OR** if you're unsure, start a 🤠 [discussion](https://git
 1. Install dependencies 🕹️ `npm i --include=dev`
 
 ### 🧭 Prototyping 
-`.codesandbox/templates` contains templates for **INSTANT** out-of-the-box prototyping.
-**👍 Try it out** 
+`.codesandbox/templates` contains templates for **INSTANT** out-of-the-box prototyping **👍 Try it out** 
 
 ```bash
 
