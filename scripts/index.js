@@ -556,6 +556,13 @@ sandbox
         console.log(chalk.yellow(`> created codesandbox ${uri}`));
     });
 
+
+/**
+ * Writes a timestamp in `package.json` file of `dest` dir
+ * This is done to invoke the watcher watching `dest` and serving the app from it
+ * I looked for other ways to tell the watcher to watch changes in fabric but I came out with this options only (symlinking and other stuff).
+ * @param {string} dest 
+ */
 function watchFabricAndTriggerSandbox(dest) {
     const pathToTrigger = path.resolve(dest, 'package.json');
     rollupBuild({ watch: true }, (code) => {
