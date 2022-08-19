@@ -2,5 +2,5 @@
     "ignore": [
         ".next"
     ],
-    "ext": "js mjs cjs json ts jsx tsx trigger"
+    "ext": "js mjs cjs json ts jsx tsx"
 }
