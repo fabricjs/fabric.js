@@ -551,6 +551,16 @@ sandbox
         createCodeSandbox(deploy || path.resolve(codesandboxTemplatesDir, template));
     });
 
+function watchFabricAndTriggerSandbox(dest) {
+    const pathToTrigger = path.resolve(dest, 'package.json');
+    rollupBuild({ watch: true }, () => {
+        fs.writeFileSync(pathToTrigger, JSON.stringify({
+            ...require(pathToTrigger),
+            tigger: moment().format('YYYY-MM-DD HH:mm:ss')
+        }));
+    });
+}
+
 sandbox
     .command('build')
     .description('build and start a sandbox')
@@ -558,22 +568,25 @@ sandbox
     .argument('[destination]', 'build destination')
     .action((template, destination) => {
         destination = destination || path.resolve(wd, '.fabric', template);
-        const pathToTrigger = path.resolve(destination, 'package.json');
         fs.copySync(path.resolve(codesandboxTemplatesDir, template), destination);
         console.log(`${chalk.blue(`> building ${chalk.bold(template)} sandbox`)} at ${chalk.cyanBright(destination)}`);
         console.log(chalk.blue('\n> linking fabric'));
         cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
         cp.execSync('npm link fabric --save', { cwd: destination, stdio: 'inherit' });
-        rollupBuild({ watch: true }, () => {
-            fs.writeFileSync(pathToTrigger, JSON.stringify({
-                ...require(pathToTrigger),
-                tigger: moment().format('YYYY-MM-DD HH:mm:ss')
-            }));
-        });
+        watchFabricAndTriggerSandbox(destination);
         console.log(chalk.blue('> installing deps'));
         cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
         console.log(chalk.blue('> starting'));
         cp.spawn('npm run dev', { cwd: destination, stdio: 'inherit', shell: true });
+    });
+
+sandbox
+    .command('start <path>')
+    .description('start a sandbox')
+    .action((pathToSandbox) => {
+        watchFabricAndTriggerSandbox(pathToSandbox)
+        console.log(chalk.blue('> starting'));
+        cp.spawn('npm run dev', { cwd: pathToSandbox, stdio: 'inherit', shell: true });
     });
 
 program.parse(process.argv);
