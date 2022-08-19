@@ -6,7 +6,7 @@
 Questions are legit but that doesn't make them bug reports...\
 Please do not open an issue in such a case.
 
-To find an answer ask & search `Fabric's google group`, `StackOverflow` and [Fabric's IRC channel](irc://irc.freenode.net/#fabric.js), see [links](#-links).
+To find an answer ask & search `Fabric's google group`, `StackOverflow` and [`Fabric's IRC channel`](irc://irc.freenode.net/#fabric.js), see [links](#-links).
 
 For news about Fabric you can follow [@fabric.js], [@AndreaBogazzi], [@kangax], or [@kienzle_s] on Twitter.
 Demos and examples 🤓 can be found on [jsfiddle], [codepen.io] and [fabricjs.com].
