@@ -77,10 +77,10 @@ Contribute to fabricjs using a fully featured online development environment tha
 ```bash
 
 npm run sandbox build next [/path/to/sandbox]
-> building node sandbox at /path/to/sandbox
+> building next app at /path/to/sandbox
 
 npm run sandbox start </path/to/sandbox>
-> starting
+> starting dev server
 
 npm run sandbox deploy </path/to/sandbox>
 > created codesandbox https://codesandbox.io/s/fgh476
@@ -103,7 +103,7 @@ Don't forget to unlink the package once you're done.
 
 ## Improving Doc
 
-Improving **DOCS** is **SUPER** important
+Improving **DOCS** is **SUPER** important for everyone
 
 ### `fabricjs.com` (deprecated)
 
@@ -129,6 +129,27 @@ npm test -- -s visual --dev -l -c chrome
 > Running live visual tests on chrome (navigate to see)
 
 npm test -- --help
+
+> Usage: fabric.js test [options]
+
+> run test suite
+
+Options:
+  -s, --suite <suite...>      test suite to run (choices: "unit", "visual")
+  -f, --file <file>           run a specific test file
+  --filter <filter>           filter tests by name
+  -a, --all                   run all tests (default: false)
+  -d, --debug                 debug visual tests by overriding refs (golden images) in case of visual changes (default:
+                              false)
+  -r, --recreate              recreate visual refs (golden images) (default: false)
+  -v, --verbose               log passing tests (default: false)
+  -l, --launch                launch tests in the browser (default: false)
+  --dev                       runs testem in `dev` mode, without a `ci` flag (default: false)
+  -c, --context <context...>  context to test in (choices: "chrome", "firefox", "node", default: ["chrome","node"])
+  -p, --port
+  -o, --out <out>             path to report test results to
+  --clear-cache               clear CLI test cache (default: false)
+  -h, --help                  display help for command
 
 ```
 
