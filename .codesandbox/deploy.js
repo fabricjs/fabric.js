@@ -19,12 +19,19 @@ function bufferToBase64DataUrl(buffer, mimeType) {
  * https://codesandbox.io/docs/api/#define-api
  */
 async function createCodeSandbox(appPath) {
-    const files = {};
+    const { trigger: __, ...package } = require(path.resolve(appPath, 'package.json'));
+    // omit linked package
+    if (package.dependencies.fabric.startsWith('file:')) {
+        package.dependencies.fabric = '*';
+    }
+    const files = { 'package.json': JSON.stringify(package, null, '\t') };
+
     const gitignore = path.resolve(appPath, '.gitignore');
     const ignore = fs.existsSync(gitignore) ? _.compact(fs.readFileSync(gitignore).toString().split('\n')).map(p => new RegExp(p.trim())) : [];
+
     const processFile = (fileName) => {
         const filePath = path.resolve(appPath, fileName);
-        if (ignore.some(r => r.test(fileName))) return;
+        if (ignore.some(r => r === 'package.json' || r.test(fileName))) return;
         const ext = path.extname(fileName).slice(1);
         if (fs.lstatSync(filePath).isDirectory()) {
             fs.readdirSync(filePath)
@@ -45,11 +52,8 @@ async function createCodeSandbox(appPath) {
         const { data: { sandbox_id } } = await Axios.post("https://codesandbox.io/api/v1/sandboxes/define?json=1", {
             template: JSON.parse(fs.readFileSync(path.resolve(appPath, 'sandbox.config.json')) || null).template,
             files,
-
         });
-        const uri = `https://codesandbox.io/s/${sandbox_id}`;
-        console.log(chalk.yellow(`> created codesandbox ${uri}`));
-        return uri;
+        return `https://codesandbox.io/s/${sandbox_id}`;
     } catch (error) {
         throw error.toJSON();
     }

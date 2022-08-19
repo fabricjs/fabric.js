@@ -547,8 +547,9 @@ sandbox
     .description('deploy a sandbox to codesandbox')
     .addOption(new commander.Option('-t, --template <template>', 'template to use')
         .choices(templates).default('next', '"next" template`'))
-    .action((deploy, { template }) => {
-        createCodeSandbox(deploy || path.resolve(codesandboxTemplatesDir, template));
+    .action(async (deploy, { template }) => {
+        const uri = await createCodeSandbox(deploy || path.resolve(codesandboxTemplatesDir, template));
+        console.log(chalk.yellow(`> created codesandbox ${uri}`));
     });
 
 function watchFabricAndTriggerSandbox(dest) {
@@ -556,8 +557,8 @@ function watchFabricAndTriggerSandbox(dest) {
     rollupBuild({ watch: true }, () => {
         fs.writeFileSync(pathToTrigger, JSON.stringify({
             ...require(pathToTrigger),
-            tigger: moment().format('YYYY-MM-DD HH:mm:ss')
-        }));
+            trigger: moment().format('YYYY-MM-DD HH:mm:ss')
+        }, null, '\t'));
     });
 }
 
