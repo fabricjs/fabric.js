@@ -12,7 +12,7 @@ Ask & search `Fabric's google group`, `StackOverflow` and [`Fabric's IRC channel
 Questions might inspire you to [improve the docs](#-improving-docs) for other devs and for the sake of the repository.\
 🌈 Please do 🌟.
 
-Demos and examples 🤓 can be found on [jsfiddle], [codepen.io] and [fabricjs.com].
+Demos and examples 🤓 can be found on [jsfiddle], [codepen.io] and [fabricjs.com](http://fabricjs.com/demos/).
 
 
 ## 🏷️ Issue Tracker 
