@@ -24,8 +24,7 @@ Demos and examples 🤓 can be found on [jsfiddle], [codepen.io] and [fabricjs.c
    Use the questions above to describe the issue. Add (📎) logs, screenshots or videos if that makes sense.
 - **Test Case:** 
    Make sure you create a minimal and immediate test case, demonstrating the bug, with relevant explanations. It should be extremely **easy** and **fast** for someone to understand your bug and reproduce it. Bug templates can be found within a [bug report](https://github.com/fabricjs/fabric.js/issues/new?assignees=&labels=&template=bug_report.md)
-- **version:** 
-   Make sure to specify which version of Fabric.js you are using. The version can be found in [fabric.js file](https://github.com/fabricjs/fabric.js/blob/master/dist/fabric.js#L5) or just by executing `fabric.version` in the browser console. It is advised you **upgrade** to the latest version before proceeding, your bug may have been resolved 🦋.
+- specify which **version** of Fabric.js you are using. The version can be found in [fabric.js file](https://github.com/fabricjs/fabric.js/blob/master/dist/fabric.js#L5) or just by executing `fabric.version` in the browser console. It is advised you **upgrade** to the latest version before proceeding, your bug may have been resolved 🦋.
 
 **These are minimal requirements. Without them issues shall be closed ⛔.**
 
