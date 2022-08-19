@@ -558,13 +558,18 @@ sandbox
     .argument('[destination]', 'build destination')
     .action((template, destination) => {
         destination = destination || path.resolve(wd, '.fabric', template);
-        const pathToTrigger = path.resolve(destination, '.trigger');
+        const pathToTrigger = path.resolve(destination, 'package.json');
         fs.copySync(path.resolve(codesandboxTemplatesDir, template), destination);
         console.log(`${chalk.blue(`> building ${chalk.bold(template)} sandbox`)} at ${chalk.cyanBright(destination)}`);
         console.log(chalk.blue('\n> linking fabric'));
         cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
         cp.execSync('npm link fabric --save', { cwd: destination, stdio: 'inherit' });
-        rollupBuild({ watch: true }, () => fs.appendFile(pathToTrigger, `${moment().format('YYYY-MM-DD HH:mm:ss')}\n`));
+        rollupBuild({ watch: true }, () => {
+            fs.writeFileSync(pathToTrigger, JSON.stringify({
+                ...require(pathToTrigger),
+                tigger: moment().format('YYYY-MM-DD HH:mm:ss')
+            }));
+        });
         console.log(chalk.blue('> installing deps'));
         cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
         console.log(chalk.blue('> starting'));
