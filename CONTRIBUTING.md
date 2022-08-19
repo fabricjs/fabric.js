@@ -56,14 +56,24 @@ You can decide how you prefer to work:
 
 #### prototype
 
-- Build a sandbox
+- Build sandbox
 ```bash
-npm run sandbox build vanilla/next/node /path/to/folder
+npm run sandbox build <template> [/path/to/folder]
 ```
 
-- Deploy your sandbox
+- Start sandbox
 ```bash
-npm run sandbox deploy /path/to/folder
+npm run sandbox start </path/to/folder>
+```
+
+- Deploy sandbox
+```bash
+npm run sandbox deploy </path/to/folder>
+```
+
+- Create codesandbox from a template
+```bash
+npm run sandbox deploy -- -t <template>
 ```
 
 #### symlinking
