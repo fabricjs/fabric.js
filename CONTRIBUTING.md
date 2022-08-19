@@ -71,7 +71,7 @@ npm run sandbox start </path/to/folder>
 npm run sandbox deploy </path/to/folder>
 ```
 
-- Create codesandbox from a template
+- Create `codesandbox` from template
 ```bash
 npm run sandbox deploy -- -t <template>
 ```
