@@ -1,7 +1,7 @@
-# Contributing to Fabric 🎉🥳
+# 🎉 Contributing to Fabric 🥳
 
 
-## Questions?!? 🧐
+## 🧐 Questions?!? 
 
 To get your questions answered, please ask/search on [Fabric's google group], [StackOverflow] or on Fabric's [IRC channel](irc://irc.freenode.net/#fabric.js).
 Please do not open an issue if you're not sure it's a bug or if it's not a feature/suggestion.
@@ -10,7 +10,7 @@ For news about Fabric you can follow [@fabric.js], [@AndreaBogazzi], [@kangax], 
 Demos and examples 🤓 can be found on [jsfiddle], [codepen.io] and [fabricjs.com].
 
 
-## Issue Tracker 🏷️
+## 🏷️ Issue Tracker 
 
 - **Before U Begin** 🎬
   - 📌 Make sure you didn't fall into a known [**gotcha**](http://fabricjs.com/fabric-gotchas)
@@ -37,9 +37,9 @@ If it's not a bug **OR** if you're unsure, start a 🤠 [discussion](https://git
 1. 💾 Clone your fork to your machine
 1. 🕹️ Install dependencies: `npm i --include=dev`
 
-### Prototyping 🧭
+### 🧭 Prototyping 
 `.codesandbox/templates` contains templates for **INSTANT** out-of-the-box prototyping.\
-**Try it out** 👍
+**👍 Try it out** 
 
 ```bash
 
@@ -72,7 +72,7 @@ Commands:
 
 ```
 
-### symlinking 🔮
+### 🔮 Symlinking 
 Establish symlinking to work with a local version on separate projects.
 
 1. From `fabric.js` folder run `npm link` **OR** `yarn link`.
@@ -82,7 +82,7 @@ See [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link) **OR** [yarn lin
 Don't forget to unlink the package once you're done.
 
 
-## Improving Docs 🔍
+## 🔎 Improving Docs 
 
 Improving **DOCS** is **SUPER** important for everyone.\
 Even if it's a small fix it is valuable 💎... **don't hestitate**!
@@ -99,7 +99,7 @@ Create a new file in the same directory (`posts/demos/_posts`) and you're good t
 
 
 
-## Pull Requests 🚀
+## 🚀 Pull Requests 
 
 We are very grateful for your pull requests! This is your chance to improve Fabric for everyone else.
 Before you begin read this through and take a look at [fabric-gotchas](http://fabricjs.com/fabric-gotchas)
@@ -110,7 +110,7 @@ Contribute to fabricjs using a fully featured online development environment tha
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
 
-### Guidelines ✅
+### ✅ Guidelines 
 
 - **Code style, notes:** Make sure you have complied with the [guidelines](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric#code-style-notes)
 
@@ -126,7 +126,7 @@ Contribute to fabricjs using a fully featured online development environment tha
 
 
 
-## Testing 🧪
+## 🧪 Testing 
 Test suites run on [QUnit](http://qunitjs.com/) and [`testem`](https://github.com/testem/testem)
 - `unit` tests: test logic and state
 - `visual` tests: test visual outcome against image refs located at `/test/visual/golden`
@@ -167,7 +167,7 @@ Options:
 Read the [wiki](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric#testing-fabric) for more information.
 
 
-## Links 🚩
+## 🚩 Links 
 
 - [Fabric's google group](https://groups.google.com/forum/#!forum/fabricjs)
 - [stackoverflow](http://stackoverflow.com/questions/tagged/fabricjs)
