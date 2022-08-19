@@ -16,7 +16,7 @@ If you are sure that it's a bug in Fabric.js or a suggestion, open a new [issue]
 - What did you expect to happen?
 - What happened instead?
 
-### Issue tracker guidelines
+### Issue Tracker guidelines
 
 If you think you found a bug in Fabric file an [issue](https://github.com/fabricjs/fabric.js/issues).
 
@@ -168,15 +168,15 @@ Options:
 
 ## Links
 
-[Fabric's google group](https://groups.google.com/forum/#!forum/fabricjs)
-[stackoverflow](http://stackoverflow.com/questions/tagged/fabricjs)
-[@fabric.js](https://twitter.com/fabricjs)
-[@AndreaBogazzi](https://twitter.com/AndreaBogazzi)
-[@kangax](https://twitter.com/kangax)
-[@kienzle_s](https://twitter.com/kienzle_s)
-[jsfiddle](http://jsfiddle.net/user/fabricjs/fiddles)
-[codepen.io](http://codepen.io/tag/fabricjs)
-[fabricjs.com](http://fabricjs.com/demos)
-[fabricjs.com/docs](http://fabricjs.com/docs)
-[JSDoc 3](http://usejsdoc.org/)
-[issue](https://github.com/fabric/fabric.js/issues)
+- [Fabric's google group](https://groups.google.com/forum/#!forum/fabricjs)
+- [stackoverflow](http://stackoverflow.com/questions/tagged/fabricjs)
+- [@fabric.js](https://twitter.com/fabricjs)
+- [@AndreaBogazzi](https://twitter.com/AndreaBogazzi)
+- [@kangax](https://twitter.com/kangax)
+- [@kienzle_s](https://twitter.com/kienzle_s)
+- [jsfiddle](http://jsfiddle.net/user/fabricjs/fiddles)
+- [codepen.io](http://codepen.io/tag/fabricjs)
+- [fabricjs.com](http://fabricjs.com/demos)
+- [fabricjs.com/docs](http://fabricjs.com/docs)
+- [JSDoc 3](http://usejsdoc.org/)
+- [issue](https://github.com/fabric/fabric.js/issues)
