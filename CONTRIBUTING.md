@@ -15,7 +15,7 @@ Demos and examples 🤓 can be found on [jsfiddle], [codepen.io] and [fabricjs.c
 ## 🏷️ Issue Tracker 
 
 - **Before U Begin** 🎬
-  - 📌 Make sure you didn't fall into a known [**gotcha**](http://fabricjs.com/fabric-gotchas)
+  - 📌 Make sure you didn't fall into a known [**GOTCHA**](http://fabricjs.com/fabric-gotchas)
   - 🔎 [**Search**](https://github.com/fabricjs/fabric.js/search?q=&ref=cmdform&type=Issues) for existing issues and discussions 🔋 **VITAL** in order to keep the community in a good state and prevent spamming 👎.
 - **Title:** 
    Choose an informative short title 🧿.
