@@ -19,7 +19,7 @@ Demos and examples 🤓 can be found on [jsfiddle], [codepen.io] and [fabricjs.c
   - 🔎 [**Search**](https://github.com/fabricjs/fabric.js/search?q=&ref=cmdform&type=Issues) for existing issues and discussions 🔋 **VITAL** in order to keep the community in a good state and prevent spamming 👎.
 - **Title:** 
    Choose an informative short title 🧿.
-- Fill out the 🐛 report with care, it is there for a reason.
+- **Fill out the 🐛 report with care**, it is there for a reason.
 - **Description:** 
    Use the questions above to describe the issue. Add (📎) logs, screenshots or videos if that makes sense.
 - **Test Case:** 
