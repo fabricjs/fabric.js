@@ -8,8 +8,8 @@ export type GradientValue = number | Percent | string;
 
 export type ColorStop = {
   color: string;
-  opacity: number;
   offset: number;
+  opacity?: number;
 };
 
 export type LinearGradientCoords<T extends GradientValue> = {
