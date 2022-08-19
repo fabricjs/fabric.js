@@ -107,13 +107,15 @@ Create a new file in the same directory (`posts/demos/_posts`) and you're good t
 
 ## 🚀 Pull Requests 
 
-Before you begin read this through and take a look at [fabric-gotchas](http://fabricjs.com/fabric-gotchas).
+Before you begin read this section through and take a look at [fabric-gotchas](http://fabricjs.com/fabric-gotchas).
 
-This is your chance to improve Fabric for everyone else.
+This is your chance to improve Fabric for the greater good 🌺.
+
+Fabric is an open source project 🦄 and as such depends on the community.
 
 ### Simple Online Setup
 
-Contribute to fabricjs using a fully featured online development environment that will automatically with a single click: clone the repo and install the dependencies.
+Contribute to fabric using a fully featured online development environment that is set up in a single click.
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
 
