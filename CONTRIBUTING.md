@@ -54,27 +54,13 @@ Contribute to fabricjs using a fully featured online development environment tha
 
 You can decide how you prefer to work:
 
-#### prototype
-
-- Build sandbox
-```bash
-npm run sandbox build <template> [/path/to/folder]
-```
-
-- Start sandbox
-```bash
-npm run sandbox start </path/to/folder>
-```
-
-- Deploy sandbox
-```bash
-npm run sandbox deploy </path/to/folder>
-```
-
-- Create `codesandbox` from template
-```bash
-npm run sandbox deploy -- -t <template>
-```
+#### `fabricjs.com`
+You can start the dev server that runs fabric's website and test live changes.
+After setting up `fabricjs.com` on your machine run `npm start` from the `fabric.js` folder.
+This will start the dev server and watch for changes in both repositories.
+While working, you might need to refresh the page for changes to take place.
+See [Working on fabricjs.com](#working-on-fabricjscom).
+To customize the dev server take a look at [`./scripts`](./scripts).
 
 #### symlinking
 You can symlink `fabric.js` and test your changes in a separate project.
