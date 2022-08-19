@@ -35,8 +35,8 @@ If it's not a bug **OR** if you're unsure, start a 🤠 [discussion](https://git
 ## 🚧🎢 Developing 💡✨
 
 1. 🍴 Fork the repository
-1. 💾 Clone your fork to your machine
-1. 🕹️ Install dependencies: `npm i --include=dev`
+1. 💾 Clone your 🍴 to your 💻
+1. Install dependencies 🕹️ `npm i --include=dev`
 
 ### 🧭 Prototyping 
 `.codesandbox/templates` contains templates for **INSTANT** out-of-the-box prototyping.\
