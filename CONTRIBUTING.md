@@ -91,7 +91,8 @@ Don't forget to unlink the package once you're done.
 ## 🔎 Improving Docs 
 
 Improving **DOCS** is **SUPER** important for everyone.\
-Even if it's a small fix it is valuable 💎... **don't hestitate**!
+Even if it's a small fix it is valuable 💎... **don't hestitate**!\
+We plan on building a brand new website, stay tuned.
 
 ### ~~`fabricjs.com`~~ (*deprecated*)
 
