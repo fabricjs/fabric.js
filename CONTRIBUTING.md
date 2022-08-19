@@ -9,25 +9,30 @@ Please do not open an issue in such a case.
 To find an answer first search the repository, it contains a lot of threads.\
 Ask & search `Fabric's google group`, `StackOverflow` and [`Fabric's IRC channel`](irc://irc.freenode.net/#fabric.js), see [links](#-links).
 
-Questions might inspire you to [improve the docs](#-improving-docs) for other devs and for the sake of the repository.\
-🌈 Please do 🌟.
+Questions might inspire you to [improve the docs](#-improving-docs) 🌈 Please do 🌟.
 
-Demos and examples 🤓 can be found on [jsfiddle], [codepen.io] and [fabricjs.com](http://fabricjs.com/demos/).
+Demos and examples 🤓 can be found on [fabricjs.com](http://fabricjs.com/demos/), `jsfiddle`, `codepen.io` and more.
 
 
 ## 🏷️ Issue Tracker 
 
-- **Before U Begin** 🎬
+- **Before You Begin** 🎬
   - 📌 Make sure you didn't fall into a known [**GOTCHA**](http://fabricjs.com/fabric-gotchas)
-  - 🔎 [**Search**](https://github.com/fabricjs/fabric.js/search?q=&ref=cmdform&type=Issues) for existing issues and discussions 🔋 **VITAL** in order to keep the community in a good state and prevent spamming 👎.
-- **Title:** 
-   Choose an informative short title 🧿 to the point.
+  - 🔎 [**Searching**](https://github.com/fabricjs/fabric.js/search?q=&ref=cmdform&type=Issues) for existing issues and discussions is
+  🔋 **VITAL** in order to keep the community in a good state, prevent spamming 👎 and become a skilled fabric dev 🦉.
+- The **Title** must be informative, short and 🧿 to the point.
 - **Fill out the 🐛 report with care**, it is there for a reason.
-- **Description:** 
-   Use the questions above to describe the issue. Add (📎) logs, screenshots or videos if that makes sense.
-- **Test Case:** 
-   Make sure you create a minimal and immediate test case, demonstrating the bug, with relevant explanations. It should be extremely **easy** and **fast** for someone to understand your bug and reproduce it. Bug templates can be found within a [bug report](https://github.com/fabricjs/fabric.js/issues/new?assignees=&labels=&template=bug_report.md)
-- specify which **version** of Fabric.js you are using. The version can be found in [fabric.js file](https://github.com/fabricjs/fabric.js/blob/master/dist/fabric.js#L5) or just by executing `fabric.version` in the browser console. It is advised you **upgrade** to the latest version before proceeding, your bug may have been resolved 🦋.
+- **Description** 
+   - Describe the issue making sure you are very clear.
+   - Add (📎) logs, screenshots or videos if that makes sense.
+   - Make an effort explaining yourself
+   - A good description has been read at least 3 times before submitting.
+- **Test Case** 
+   - Create a minimal and immediate test case, demonstrating the bug, with relevant explanations. 
+   - It should be extremely **easy** and **fast** for someone to understand your bug and reproduce it. 
+   - Bug templates can be found within a [bug report](https://github.com/fabricjs/fabric.js/issues/new?assignees=&labels=&template=bug_report.md)
+- Specify which **version** of Fabric.js you are using. 
+- **Upgrade** to the latest version before proceeding, your 🐛 may have turned into a 🦋.
 
 **These are minimal requirements. Without them issues shall be ⛔.**
 
@@ -78,7 +83,6 @@ Commands:
 
 ```
 
-**Developing easily becomes a [PR](#-pull-requests) 😉**
 
 ### 🔮 Symlinking 
 Establish symlinking to work with a local version on separate projects.
@@ -89,6 +93,11 @@ Establish symlinking to work with a local version on separate projects.
 See [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link) **OR** [yarn link](https://yarnpkg.com/cli/link).\
 Don't forget to unlink the package once you're done.
 
+---
+
+**Developing easily becomes a [PR](#-pull-requests) 😉**
+
+------
 
 ## 🔎 Improving Docs 
 
@@ -135,7 +144,7 @@ Follow [Devleoping](#-developing-) **OR** [![Open in Gitpod](https://gitpod.io/b
 
 
 ## 🧪 Testing 
-Test suites run on [`QUnit`](https://qunitjs.com/) and [`testem`](https://github.com/testem/testem)
+Test suites use [`QUnit`](https://qunitjs.com/) for assertions and [`testem`](https://github.com/testem/testem) for serving
 - `unit` tests: test logic and state
 - `visual` tests: test visual outcome against image refs located at `/test/visual/golden`
 
