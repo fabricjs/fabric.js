@@ -3,8 +3,10 @@
 
 ## 🧐 Questions?!? 
 
-To get your questions answered, please ask/search on [Fabric's google group], [StackOverflow] or on Fabric's [IRC channel](irc://irc.freenode.net/#fabric.js).
-Please do not open an issue if you're not sure it's a bug or if it's not a feature/suggestion.
+Questions are legit but that doesn't make them bug reports...\
+Please do not open an issue in such a case.
+
+To find an answer ask & search `Fabric's google group`, `StackOverflow` and [Fabric's IRC channel](irc://irc.freenode.net/#fabric.js), see [links](#🚩-links).
 
 For news about Fabric you can follow [@fabric.js], [@AndreaBogazzi], [@kangax], or [@kienzle_s] on Twitter.
 Demos and examples 🤓 can be found on [jsfiddle], [codepen.io] and [fabricjs.com].
@@ -72,6 +74,8 @@ Commands:
 
 ```
 
+**Developing easily becomes a [PR](#🚀-pull-requests) 😉**
+
 ### 🔮 Symlinking 
 Establish symlinking to work with a local version on separate projects.
 
@@ -112,10 +116,10 @@ Contribute to fabricjs using a fully featured online development environment tha
 
 ### ✅ Guidelines 
 
-- **Code style, notes:** Make sure you have complied with the [guidelines](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric#code-style-notes)
+- **Code style & notes:** Make sure you have complied with the [guidelines](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric#code-style-notes)
 - **⛔ Distribution files:** Do your changes only in the [source files](https://github.com/fabricjs/fabric.js/tree/master/src). Don't include the [distribution files](https://github.com/fabricjs/fabric.js/tree/master/dist) in your commit.
-- **Add tests**: Tests are vital, invest time to extend the them, see (TESTING)[#Testing].
-- **Add documentation:** Fabric uses [JSDoc 3] for documentation. The generated documentation can be found at [fabricjs.com](http://fabricjs.com/docs).
+- **Add tests**: Tests are vital, invest time to extend the them, see [TESTING](#🧪-testing).
+- **Add documentation:** Fabric uses [JSDoc 3] for documentation. The generated documentation can be found at [fabricjs.com](http://fabricjs.com/docs), see [DOCS](#🔎-improving-docs).
 - **One pull request per feature/bug**. Create a new branch for every pull request. If you want to do more than one thing, send multiple pull requests.
 - **And there you go!** If you still have questions we're always happy to help. Also feel free to consult [wiki](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric).
 
