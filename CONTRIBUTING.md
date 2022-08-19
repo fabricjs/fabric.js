@@ -37,9 +37,12 @@ If it's not a bug **OR** if you're unsure, start a 🤠 [discussion](https://git
 
 ## 🚧🎢 Developing 💡✨
 
+### Getting Started
+
 1. 🍴 Fork the repository
 1. 💾 Clone your 🍴 to your 💻
 1. Install dependencies 🕹️ `npm i --include=dev`
+1. Next Up [Prototyping](#-prototyping) & [Testing](#-testing)
 
 ### 🧭 Prototyping 
 `.codesandbox/templates` contains templates for **INSTANT** out-of-the-box prototyping **👍 Try it out** 
