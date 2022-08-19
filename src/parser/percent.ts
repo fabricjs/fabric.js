@@ -15,7 +15,7 @@ export function isPercent(value: string | null) {
  * @param valueIfNaN 
  * @returns ∈ [0, 1]
  */
-export function parsePercent(value: string | number | null, valueIfNaN?: number) {
+export function parsePercent(value: string | number | null | undefined, valueIfNaN?: number) {
     const parsed = typeof value === 'number' ?
         value :
         typeof value === 'string' ?
