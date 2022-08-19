@@ -13,10 +13,12 @@ const Checkbox = require('inquirer-checkbox-plus-prompt');
 const commander = require('commander');
 const rollup = require('rollup');
 const loadConfigFile = require('rollup/loadConfigFile');
-const program = new commander.Command();
 
 const { transform: transformFiles, listFiles } = require('./transform_files');
 const { createCodeSandbox } = require('../.codesandbox/deploy');
+
+
+const program = new commander.Command();
 
 const CLI_CACHE = path.resolve(__dirname, 'cli_cache.json');
 const wd = path.resolve(__dirname, '..');
@@ -84,12 +86,15 @@ class ICheckbox extends Checkbox {
 }
 inquirer.registerPrompt('test-selection', ICheckbox);
 
-async function rollupBuild(options = {}, onComplete) {
+/**
+ * https://rollupjs.org/guide/en/#rollupwatch
+ * https://rollupjs.org/guide/en/#programmatically-loading-a-config-file
+ * @param {*} options 
+ * @param {*} cb 
+ */
+async function rollupBuild(options = {}, cb) {
     const { options: [buildOptions], warnings } = await loadConfigFile(path.resolve(wd, 'rollup.config.js'), { format: 'es' });
     warnings.flush();
-    // if (options.destination) {
-    //     buildOptions.output = [options.destination];
-    // }
     if (options.watch) {
         const watcher = rollup.watch(buildOptions);
         const outLog = buildOptions.output.map(output => output.file).join(', ');
@@ -103,13 +108,12 @@ async function rollupBuild(options = {}, onComplete) {
                 case 'END':
                     console.log(chalk.green(`created ${chalk.bold(outLog)} in ${chalk.bold(`${((new Date() - start) / 1000).toFixed(1)}s`)}`));
                     console.log(`\n[${moment().format('YYYY-MM-DD HH:mm:ss')}] waiting for changes...`);
-                    onComplete && onComplete();
                     break;
             }
+            // rollup internal thing
             result && result.close();
+            cb && cb(code);
         });
-        process.on('exit', () => watcher.close());
-        process.on('beforeExit', () => watcher.close());
     }
     else {
         for (const optionsObj of buildOptions) {
@@ -117,7 +121,7 @@ async function rollupBuild(options = {}, onComplete) {
             await Promise.all(optionsObj.output.map(bundle.write));
         }
 
-        onComplete && onComplete();
+        cb && cb('END');
     }
 }
 
@@ -554,8 +558,8 @@ sandbox
 
 function watchFabricAndTriggerSandbox(dest) {
     const pathToTrigger = path.resolve(dest, 'package.json');
-    rollupBuild({ watch: true }, () => {
-        fs.writeFileSync(pathToTrigger, JSON.stringify({
+    rollupBuild({ watch: true }, (code) => {
+        code === 'END' && fs.writeFileSync(pathToTrigger, JSON.stringify({
             ...require(pathToTrigger),
             trigger: moment().format('YYYY-MM-DD HH:mm:ss')
         }, null, '\t'));
