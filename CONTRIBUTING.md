@@ -4,7 +4,7 @@
 ## 🧐 Questions?!? 
 
 Questions are legit but that doesn't make them bug reports...\
-Please do not open an issue in such a case.
+Please refer to available resources (read below) and refrain from opening an issue in such a case.
 
 To find an answer first search the repository, it contains a lot of threads.\
 Ask & search `Fabric's google group`, `StackOverflow` and [`Fabric's IRC channel`](irc://irc.freenode.net/#fabric.js), see [links](#-links).
