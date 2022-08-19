@@ -6,9 +6,12 @@
 Questions are legit but that doesn't make them bug reports...\
 Please do not open an issue in such a case.
 
-To find an answer ask & search `Fabric's google group`, `StackOverflow` and [`Fabric's IRC channel`](irc://irc.freenode.net/#fabric.js), see [links](#-links).
+To find an answer first search the repository, in contains a lot of threads.
+Ask & search `Fabric's google group`, `StackOverflow` and [`Fabric's IRC channel`](irc://irc.freenode.net/#fabric.js), see [links](#-links).
 
-For news about Fabric you can follow [@fabric.js], [@AndreaBogazzi], [@kangax], or [@kienzle_s] on Twitter.
+Your question might inspire you to [improve the docs](#-improving-docs) for other devs and for the sake of the repository.
+🌈 Please do 🌟.
+
 Demos and examples 🤓 can be found on [jsfiddle], [codepen.io] and [fabricjs.com].
 
 
@@ -18,7 +21,7 @@ Demos and examples 🤓 can be found on [jsfiddle], [codepen.io] and [fabricjs.c
   - 📌 Make sure you didn't fall into a known [**GOTCHA**](http://fabricjs.com/fabric-gotchas)
   - 🔎 [**Search**](https://github.com/fabricjs/fabric.js/search?q=&ref=cmdform&type=Issues) for existing issues and discussions 🔋 **VITAL** in order to keep the community in a good state and prevent spamming 👎.
 - **Title:** 
-   Choose an informative short title 🧿.
+   Choose an informative short title 🧿 to the point.
 - **Fill out the 🐛 report with care**, it is there for a reason.
 - **Description:** 
    Use the questions above to describe the issue. Add (📎) logs, screenshots or videos if that makes sense.
@@ -164,6 +167,8 @@ Options:
 
 
 ## 🚩 Links 
+
+For news about Fabric you can follow [@fabric.js], [@AndreaBogazzi], [@kangax], or [@kienzle_s] on Twitter.
 
 - [Fabric's google group](https://groups.google.com/forum/#!forum/fabricjs)
 - [stackoverflow](http://stackoverflow.com/questions/tagged/fabricjs)
