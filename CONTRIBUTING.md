@@ -6,8 +6,9 @@
 Questions are legit but that doesn't make them bug reports...\
 Please refer to available resources (read below) and refrain from opening an issue in such a case.
 
-To find an answer first search the repository, it contains a lot of threads.\
-Ask & search `Fabric's google group`, `StackOverflow` and [`Fabric's IRC channel`](irc://irc.freenode.net/#fabric.js), see [links](#-links).
+To find an answer first [search the repository](https://github.com/fabricjs/fabric.js/search?q=&type=Issues), it contains a lot of useful threads.\
+Refer to `Fabric's google group`, `StackOverflow` and [`Fabric's IRC channel`](irc://irc.freenode.net/#fabric.js) as well.\
+See [Links](#-links).
 
 Questions might inspire you to [improve the docs](#-improving-docs) 🌈 Please do 🌟.
 
@@ -28,8 +29,9 @@ Demos and examples 🤓 can be found on [fabricjs.com](http://fabricjs.com/demos
    - Make an effort explaining yourself
    - A good description has been read at least 3 times before submitting.
 - **Test Case** 
-   - Create a minimal and immediate test case, demonstrating the bug, with relevant explanations. 
-   - It should be extremely **easy** and **fast** for someone to understand your bug and reproduce it. 
+   - Create a minimal and immediate test case, reproducing the bug.
+   - Add relevant explanations.
+   - It should be extremely **easy** for someone to understand your bug and **fast** to reproduce it. **Don't leave it to us to do your part**.
    - Bug templates can be found within a [bug report](https://github.com/fabricjs/fabric.js/issues/new?assignees=&labels=&template=bug_report.md)
 - Specify which **version** of Fabric.js you are using. 
 - **Upgrade** to the latest version before proceeding, your 🐛 may have turned into a 🦋.
