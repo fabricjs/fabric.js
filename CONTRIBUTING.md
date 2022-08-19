@@ -107,8 +107,9 @@ Create a new file in the same directory (`posts/demos/_posts`) and you're good t
 
 ## 🚀 Pull Requests 
 
-We are very grateful for your pull requests! This is your chance to improve Fabric for everyone else.
-Before you begin read this through and take a look at [fabric-gotchas](http://fabricjs.com/fabric-gotchas)
+Before you begin read this through and take a look at [fabric-gotchas](http://fabricjs.com/fabric-gotchas).
+
+This is your chance to improve Fabric for everyone else.
 
 ### Simple Online Setup
 
