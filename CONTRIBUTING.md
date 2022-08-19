@@ -10,17 +10,9 @@ Demos and examples can be found on [jsfiddle], [codepen.io] and [fabricjs.com].
 
 ## Issue Tracker 🏷️
 
-If you are sure that it's a bug in Fabric.js or a suggestion, open a new [issue] and try to answer the following questions:
-
-- What did you do?
-- What did you expect to happen?
-- What happened instead?
-
-### Guidelines
-
-- **Before you begin**:
-  - Make sure you didn't fall into a known [**gotcha**](http://fabricjs.com/fabric-gotchas)
-  - 📌 [**Search**](https://github.com/fabricjs/fabric.js/search?q=&ref=cmdform&type=Issues) for existing issues and discussions. This is **VITAL** in order to keep the community in a good state and prevent spamming 👎.
+- **Before you begin** 🎬
+  - 📌 Make sure you didn't fall into a known [**gotcha**](http://fabricjs.com/fabric-gotchas)
+  - 🔎 [**Search**](https://github.com/fabricjs/fabric.js/search?q=&ref=cmdform&type=Issues) for existing issues and discussions. This is **VITAL** in order to keep the community in a good state and prevent spamming 👎.
 
 - **Title:** Choose an informative short title.
 
@@ -36,7 +28,7 @@ If you are sure that it's a bug in Fabric.js or a suggestion, open a new [issue]
 
 If you're unsure about something that is not a bug, it's best to start a [discussion](https://github.com/fabricjs/fabric.js/discussions) or create a post on [Fabric's google group](groups.google.com/forum/?fromgroups#!forum/fabricjs) where someone might clarify some of the things.
 
-## Pull Requests 💡
+## Pull Requests 🚀
 
 We are very grateful for your pull requests! This is your chance to improve Fabric for everyone else.
 Before you begin read this through and take a look at [fabric-gotchas](http://fabricjs.com/fabric-gotchas)
@@ -47,7 +39,7 @@ Contribute to fabricjs using a fully featured online development environment tha
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
 
-### Guidelines
+### Guidelines ✅
 
 - **Code style, notes:** Make sure you have complied with the [guidelines](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric#code-style-notes)
 
@@ -62,7 +54,7 @@ Contribute to fabricjs using a fully featured online development environment tha
 - **And there you go!** If you still have questions we're always happy to help. Also feel free to consult [wiki](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric).
 
 
-## Developing
+## 🚧🎢 Developing 💡
 
 1. Fork the repository
 1. Clone your fork to your machine
@@ -112,10 +104,10 @@ Establish symlinking to work with a local version on separate projects.
 See [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link) **OR** [yarn link](https://yarnpkg.com/cli/link).\
 Don't forget to unlink the package once you're done.
 
-## Improving Doc
+## Improving Doc 🔍
 
 Improving **DOCS** is **SUPER** important for everyone.\
-Even if it's a small fix it is valuable... **don't hestitate**!
+Even if it's a small fix it is valuable 💎... **don't hestitate**!
 
 ### ~~`fabricjs.com`~~ (deprecated)
 
@@ -127,7 +119,7 @@ If you are working on windows, check out [`jekyll` docs](https://jekyllrb.com/do
 Take a look at an existing [demo file](https://github.com/fabricjs/fabricjs.com/blob/gh-pages/posts/demos/_posts/2020-2-15-custom-control-render.md).
 Create a new file in the same directory (`posts/demos/_posts`) and you're good to go.
 
-## Testing
+## Testing 🧪
 Test suites run on [QUnit](http://qunitjs.com/) and [`testem`](https://github.com/testem/testem)
 - `unit` tests: test logic and state
 - `visual` tests: test visual outcome against image refs located at `/test/visual/golden`
@@ -167,7 +159,7 @@ Options:
 
 Read the [wiki](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric#testing-fabric) for more information.
 
-## Links
+## Links 🚩
 
 - [Fabric's google group](https://groups.google.com/forum/#!forum/fabricjs)
 - [stackoverflow](http://stackoverflow.com/questions/tagged/fabricjs)
