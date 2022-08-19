@@ -9,7 +9,7 @@ Please do not open an issue in such a case.
 To find an answer first search the repository, in contains a lot of threads.
 Ask & search `Fabric's google group`, `StackOverflow` and [`Fabric's IRC channel`](irc://irc.freenode.net/#fabric.js), see [links](#-links).
 
-Your question might inspire you to [improve the docs](#-improving-docs) for other devs and for the sake of the repository.
+Questions might inspire you to [improve the docs](#-improving-docs) for other devs and for the sake of the repository.\
 🌈 Please do 🌟.
 
 Demos and examples 🤓 can be found on [jsfiddle], [codepen.io] and [fabricjs.com].
