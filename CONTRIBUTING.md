@@ -121,7 +121,8 @@ Test suites run on [`testem`](https://github.com/testem/testem)
 npm test -- -a -d
 > Running all tests in debug mode (read more in the help section)
 
-npm test -- -s visual --dev
+npm test -- -s visual --dev -l -c chrome
+> Running live visual tests on chrome (navigate to see)
 
 npm test -- --help
 
