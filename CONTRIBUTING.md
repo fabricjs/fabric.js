@@ -122,7 +122,7 @@ Contribute to fabricjs using a fully featured online development environment tha
 
 
 ## 🧪 Testing 
-Test suites run on [QUnit](http://qunitjs.com/) and [`testem`](https://github.com/testem/testem)
+Test suites run on [`QUnit`](https://qunitjs.com/) and [`testem`](https://github.com/testem/testem)
 - `unit` tests: test logic and state
 - `visual` tests: test visual outcome against image refs located at `/test/visual/golden`
 
