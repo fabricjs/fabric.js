@@ -82,7 +82,7 @@ See [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link) **OR** [yarn lin
 Don't forget to unlink the package once you're done.
 
 
-## Improving Doc 🔍
+## Improving Docs 🔍
 
 Improving **DOCS** is **SUPER** important for everyone.\
 Even if it's a small fix it is valuable 💎... **don't hestitate**!
