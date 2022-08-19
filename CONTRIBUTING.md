@@ -163,8 +163,6 @@ Options:
 
 ```
 
-Read the [wiki](https://github.com/fabricjs/fabric.js/wiki/How-to-contribute-to-Fabric#testing-fabric) for more information.
-
 
 ## 🚩 Links 
 
