@@ -10,14 +10,15 @@ const chalk = require('chalk');
 const moment = require('moment');
 const Checkbox = require('inquirer-checkbox-plus-prompt');
 const commander = require('commander');
-const kill = require('kill-port');
-const http = require('http');
-const busboy = require('busboy');
+const killPort = require('kill-port');
+
 // const rollup = require('rollup');
 // const loadConfigFile = require('rollup/loadConfigFile');
+
 const program = new commander.Command();
 
 const { transform: transformFiles, listFiles } = require('./transform_files');
+
 
 const wd = path.resolve(__dirname, '..');
 const dumpsPath = path.resolve(wd, '.fabric');
@@ -26,6 +27,7 @@ const websiteDir = path.resolve(wd, '../fabricjs.com');
 if (!fs.existsSync(dumpsPath)) {
     fs.mkdirSync(dumpsPath);
 }
+const package = require(path.resolve(wd, 'package.json'));
 
 function execGitCommand(cmd) {
     return cp.execSync(cmd, { cwd: wd }).toString()
@@ -119,17 +121,7 @@ inquirer.registerPrompt('test-selection', ICheckbox);
 
 
 function build(options = {}) {
-
-    //  _.defaults(options, { exclude: ['gestures', 'accessors', 'erasing'] });
-    // const args = [
-    //     `npm run`,
-    //     `build.js`,
-    //     `modules=${options.modules && options.modules.length > 0 ? options.modules.join(',') : 'ALL'}`,
-    //     `requirejs`,
-    //     `${options.fast ? 'fast' : ''}`,
-    //     `exclude=${options.exclude.join(',')}`
-    // ]
-    const args = ['npm run', 'build-rollup', '--', options.watch ? '--watch' : ''];
+    const args = ['rollup', '-c', options.watch ? '--watch' : ''];
     let minDest;
     if (options.output && !options.fast) {
         const { name, base, ...rest } = path.parse(path.resolve(options.output));
@@ -181,7 +173,7 @@ function watch(path, callback, debounce = 500) {
     }, debounce, { trailing: true }));
 }
 
-function copy(from ,to) {
+function copy(from, to) {
     try {
         fs.copySync(from, to);
         const containingFolder = path.resolve(wd, '..');
@@ -238,8 +230,8 @@ function exportTestsToWebsite(options) {
 }
 
 function exportToWebsite(options) {
-    if (!options.include  || options.include.length === 0) {
-        options.include  = ['build', 'tests'];
+    if (!options.include || options.include.length === 0) {
+        options.include = ['build', 'tests'];
     }
     options.include.forEach(x => {
         if (x === 'build') {
@@ -252,58 +244,6 @@ function exportToWebsite(options) {
     })
 }
 
-function parseRequest(req/*: http.IncomingMessage*/) {
-    const bb = busboy({ headers: req.headers });
-    return new Promise/*<{ files: Array<{ rawData: Buffer; } & busboy.FileInfo>; fields: { [key: string]: string | number; }; }>*/(resolve => {
-        const files = []; //as Array<{ rawData: Buffer; } & busboy.FileInfo>;
-        const fields = {};
-        bb.on('file', (name, file, info) => {
-            const raw = [];
-            file.on('data', (data) => {
-                raw.push(data);
-            }).on('close', () => {
-                files.push({ rawData: Buffer.concat(raw), ...info });
-            });
-        });
-        bb.on('field', (name, value, info) => {
-            fields[name] = value;
-        });
-        bb.on('close', () => {
-            resolve({ files, fields });
-        });
-        req.pipe(bb);
-    });
-}
-
-function startGoldensServer() {
-    return new Promise((resolve) => {
-        const server = http
-            .createServer(async (req, res) => {
-                if (req.method.toUpperCase() === 'GET' && req.url === '/') {
-                    res.end('This endpoint is used by fabric.js and testem to generate goldens');
-                }
-                else if (req.method.toUpperCase() === 'GET') {
-                    const filename = req.url.split('/golden/')[1] || req.url;
-                    const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
-                    res.end(JSON.stringify({ exists: fs.existsSync(goldenPath) }));
-                }
-                else if (req.method.toUpperCase() === 'POST') {
-                    const { files: [{ rawData, filename }] } = await parseRequest(req);
-                    const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
-                    console.log(chalk.gray('[info]'), `creating golden ${path.relative(wd, goldenPath)}`);
-                    fs.writeFileSync(goldenPath, rawData, { encoding: 'binary' });
-                    res.end();
-                }
-            })
-            .listen()
-            .on('listening', () => {
-                const port = server.address().port;
-                const url = `http://localhost:${port}/`;
-                console.log(chalk.bold('goldens server listening on'), chalk.blue(url));
-                resolve({ url, server });
-            });
-    });
-}
 
 /**
  *
@@ -312,55 +252,44 @@ function startGoldensServer() {
  * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:string}} [options]
  */
 async function test(suite, tests, options = {}) {
-    // create testem temp config for this run
-    const tempConfig = path.resolve(dumpsPath, `testem-${suite}.temp.json`);
-    const data = require(path.resolve(wd, suite === 'visual' ? 'testem-visual.json' : 'testem.json'));
-    data.serve_files = data.serve_files
-        .filter(p => p !== `test/${suite}/*.js` || !tests)
-        .concat(tests || []);
-    data.launchers.Node.command = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' ');
-    let close = () => { };
-    if (suite === 'visual') {
-        const { url, server } = await startGoldensServer();
-        close = () => server.close();
-        data.proxies['/goldens'].target = url;
-    }
-    fs.writeFileSync(tempConfig, JSON.stringify({
-        ...data,
-        qunit: options,
-        tap_failed_tests_only: !options.verbose
-    }, null, '\t'));
-    // args
     const port = options.port || suite === 'visual' ? 8081 : 8080;
     try {
-        await kill(port);
+        await killPort(port);
     } catch (error) {
-        
+
     }
-    const args = ['testem', !options.dev ? 'ci' : '', '--port', port, '-f', tempConfig, '-l', options.context.map(_.upperFirst)];
-    // env
-    // process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
-    // process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
-    // if (options.filter) {
-    //     process.env.QUNIT_FILTER = options.filter;
-    // }
-    // open localhost
-    const url = `http://localhost:${port}/`;
-    const start = (os.platform() == 'darwin' ? 'open' : os.platform() == 'win32' ? 'start' : 'xdg-open');
-    options.launch && cp.exec([start, url].join(' '));
-    // run
-    const proc = cp.spawn(args.join(' '), {
+
+    const args = [
+        'testem',
+        !options.dev ? 'ci' : '',
+        '-p', port,
+        '-f', `test/testem.${suite}.js`,
+        '-l', options.context.map(_.upperFirst).join(',')
+    ];
+
+    cp.spawn(args.join(' '), {
         cwd: wd,
-        env: process.env,
+        env: {
+            ...process.env,
+            TEST_FILES: (tests || []).join(','),
+            NODE_CMD: ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' '),
+            VERBOSE: Number(options.verbose),
+            QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
+            QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
+            QUNIT_FILTER: options.filter,
+            REPORT_FILE: options.out
+        },
         shell: true,
-        stdio: 'pipe',
+        stdio: 'inherit',
         detached: options.dev
-    })
-        .on('exit', close)
-        .on('close', close)
-        .on('disconnect', close);
-    proc.stdout.on('data', (b) => console.log(chalk.blue(`[${suite}]`), b.toString().trim()));
-    proc.stderr.pipe(process.stderr);
+    });
+
+    if (options.launch) {
+        // open localhost
+        const url = `http://localhost:${port}/`;
+        const start = (os.platform() === 'darwin' ? 'open' : os.platform() === 'win32' ? 'start' : 'xdg-open');
+        cp.exec([start, url].join(' '));
+    }
 }
 
 /**
@@ -395,7 +324,7 @@ function createChoiceData(type, file) {
 }
 
 async function selectFileToTransform() {
-    const files = _.map(listFiles(), ({ dir, file }) => createChoiceData(path.relative(path.resolve(wd,'src'), dir).replaceAll('\\','/'), file));
+    const files = _.map(listFiles(), ({ dir, file }) => createChoiceData(path.relative(path.resolve(wd, 'src'), dir).replaceAll('\\', '/'), file));
     const { tests: filteredTests } = await inquirer.prompt([
         {
             type: 'test-selection',
@@ -479,11 +408,9 @@ async function runIntreactiveTestSuite(options) {
     _.reduce(tests, async (queue, files, suite) => {
         await queue;
         if (files === true) {
-            console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
             return test(suite, null, options);
         }
         else if (Array.isArray(files) && files.length > 0) {
-            console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
             return test(suite, files, options);
         }
     }, Promise.resolve());
@@ -492,6 +419,7 @@ async function runIntreactiveTestSuite(options) {
 program
     .name('fabric.js')
     .description('fabric.js DEV CLI tools')
+    .version(package.version)
     .showSuggestionAfterError();
 
 program
@@ -505,14 +433,22 @@ program
     });
 
 program
+    .command('dev')
+    .description('watch for changes in `src` and `test` directories')
+    .action(() => {
+        cp.spawn('npm run build -- -f -w', { stdio: 'inherit', shell: true });
+        cp.spawn('npm run build-tests -- -w', { stdio: 'inherit', shell: true });
+    });
+
+program
     .command('build')
     .description('build dist')
     .option('-f, --fast', 'skip minifying')
     .option('-w, --watch')
-    .option('-i, --input [...path]', 'specify the build input paths')
-    .option('-o, --output [path]', 'specify the build output path')
-    .option('-x, --exclude [exclude...]')
-    .option('-m, --modules [modules...]')
+    .option('-i, --input <...path>', 'specify the build input paths')
+    .option('-o, --output <path>', 'specify the build output path')
+    .option('-x, --exclude <exclude...>')
+    .option('-m, --modules <modules...>')
     .action((options) => {
         build(options);
     });
@@ -520,17 +456,18 @@ program
 program
     .command('test')
     .description('run test suite')
-    .addOption(new commander.Option('-s, --suite [suite...]', 'test suite to run').choices(['unit', 'visual']))
-    .option('-f, --file [file]', 'run a specific test file')
-    .option('--filter [filter]', 'filter tests by name')
+    .addOption(new commander.Option('-s, --suite <suite...>', 'test suite to run').choices(['unit', 'visual']))
+    .option('-f, --file <file>', 'run a specific test file')
+    .option('--filter <filter>', 'filter tests by name')
     .option('-a, --all', 'run all tests', false)
     .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
     .option('-r, --recreate', 'recreate visual refs (golden images)', false)
     .option('-v, --verbose', 'log passing tests', false)
     .option('-l, --launch', 'launch tests in the browser', false)
     .option('--dev', 'runs testem in `dev` mode, without a `ci` flag', false)
-    .addOption(new commander.Option('-c, --context [context...]', 'context to test in').choices(['chrome', 'firefox', 'node']).default(['chrome', 'node']))
+    .addOption(new commander.Option('-c, --context <context...>', 'context to test in').choices(['chrome', 'firefox', 'node']).default(['chrome', 'node']))
     .option('-p, --port')
+    .option('-o, --out <out>', 'path to report test results to')
     .option('--clear-cache', 'clear CLI test cache', false)
     .action((options) => {
         if (options.clearCache) {
@@ -542,7 +479,6 @@ program
         if (options.suite) {
             _.reduce(options.suite, async (queue, suite) => {
                 await queue;
-                console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
                 return test(suite, null, options);
             }, Promise.resolve());
         }
@@ -568,7 +504,7 @@ website
 website
     .command('export')
     .description('export files to fabricjs.com directory')
-    .addOption(new commander.Option('-i, --include [what...]').choices(['build', 'tests']).default(['build', 'tests'], 'export all'))
+    .addOption(new commander.Option('-i, --include <what...>').choices(['build', 'tests']).default(['build', 'tests'], 'export all'))
     .option('-w, --watch')
     .action(exportToWebsite);
 
@@ -581,7 +517,7 @@ program
     .option('-ts, --typescript', 'transform into typescript', false)
     .option('-v, --verbose', 'verbose logging', true)
     .option('-a, --all', 'transform all files', false)
-    .option('-d, --diff [branch]', 'compare against given branch (default: master) and transform all files with diff')
+    .option('-d, --diff <branch>', 'compare against given branch (default: master) and transform all files with diff')
     .action(async ({ overwrite, exports, index, typescript, verbose, all, diff: gitRef } = {}) => {
         let files = [];
         if (gitRef) {

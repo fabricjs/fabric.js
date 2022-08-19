@@ -46,9 +46,9 @@
   "scripts": {
     "changelog": "auto-changelog -o change-output.md --unreleased-only",
     "build": "node ./scripts build",
-    "build-rollup": "rollup -c",
     "build:fast": "npm run build -- --fast",
-    "dev": "node ./scripts",
+    "fabric": "node ./scripts",
+    "dev": "node ./scripts dev",
     "start": "node ./scripts start",
     "export": "node ./scripts website export",
     "build-tests": "rollup -c ./rollup.test.config.js",
