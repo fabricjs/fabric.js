@@ -350,6 +350,8 @@ export class Point {
 
   /**
    * Rotates `point` around `origin` with `radians`
+   * WARNING: this is probably a source of circular dependency.
+   * evaluate what to do when importing rotateVector directly from the file
    * @static
    * @memberOf fabric.util
    * @param {Point} origin The origin of the rotation
