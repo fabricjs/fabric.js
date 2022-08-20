@@ -33,18 +33,7 @@ type TComposeMatrixArgs = TTranslateMatrixArgs & TRotateMatrixArgs & TScaleMatri
  * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
  * @return {Point} The transformed point
  */
-export const transformPoint = (p: Point | IPoint, t: TMat2D, ignoreOffset: boolean): Point => {
-  if (ignoreOffset) {
-    return new Point(
-      t[0] * p.x + t[2] * p.y,
-      t[1] * p.x + t[3] * p.y
-    );
-  }
-  return new Point(
-    t[0] * p.x + t[2] * p.y + t[4],
-    t[1] * p.x + t[3] * p.y + t[5]
-  );
-};
+export const transformPoint = (p: Point | IPoint, t: TMat2D, ignoreOffset: boolean): Point => p.transform(t, ignoreOffset);
 
 /**
  * Invert transformation t
@@ -56,7 +45,7 @@ export const transformPoint = (p: Point | IPoint, t: TMat2D, ignoreOffset: boole
 export const invertTransform = (t: TMat2D): TMat2D => {
   const a = 1 / (t[0] * t[3] - t[1] * t[2]),
         r = [a * t[3], -a * t[1], -a * t[2], a * t[0], 0, 0] as TMat2D,
-        { x, y } = transformPoint({ x: t[4], y: t[5] }, r, true);
+        { x, y } = transformPoint(new Point(t[4], t[5]), r, true);
   r[4] = -x;
   r[5] = -y;
   return r;
