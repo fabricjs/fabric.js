@@ -7,11 +7,18 @@
   "contributors": [
     {
       "name": "Andrea Bogazzi",
-      "email": "andreabogazzi79@gmail.com"
+      "email": "andreabogazzi79@gmail.com",
+      "url": "https://github.com/asturur"
     },
     {
       "name": "Steve Eberhardt",
-      "email": "melchiar2@gmail.com"
+      "email": "melchiar2@gmail.com",
+      "url": "https://github.com/melchiar"
+    },
+    {
+      "name": "Shachar Nencel",
+      "email": "shacharnen@gmail.com",
+      "url": "https://github.com/ShaMan123"
     }
   ],
   "keywords": [
