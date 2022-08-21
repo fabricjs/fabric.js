@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { fabric } from '../../../HEADER'
+import { fabric } from '../../../HEADER';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
 import { Point } from '../../point.class';
 import { cos } from './cos';
@@ -20,7 +20,7 @@ import {
 } from './matrix';
 import { stylesFromArray, stylesToArray, hasStyleChanged } from './textStyles';
 import { clone, extend } from '../lang_object';
-
+import { createCanvasElement, createImage, copyCanvasElement, toDataURL } from './dom';
   /**
    * @typedef {[number,number,number,number,number,number]} Matrix
    */
@@ -59,6 +59,10 @@ import { clone, extend } from '../lang_object';
       clone,
       extend,
     },
+    createCanvasElement,
+    createImage,
+    copyCanvasElement,
+    toDataURL,
 
     /**
      * Sends a point from the source coordinate plane to the destination coordinate plane.\
@@ -409,54 +413,6 @@ import { clone, extend } from '../lang_object';
           }
         }
       }
-    },
-
-    /**
-     * Creates canvas element
-     * @static
-     * @memberOf fabric.util
-     * @return {CanvasElement} initialized canvas element
-     */
-    createCanvasElement: function() {
-      return fabric.document.createElement('canvas');
-    },
-
-    /**
-     * Creates a canvas element that is a copy of another and is also painted
-     * @param {CanvasElement} canvas to copy size and content of
-     * @static
-     * @memberOf fabric.util
-     * @return {CanvasElement} initialized canvas element
-     */
-    copyCanvasElement: function(canvas) {
-      var newCanvas = fabric.util.createCanvasElement();
-      newCanvas.width = canvas.width;
-      newCanvas.height = canvas.height;
-      newCanvas.getContext('2d').drawImage(canvas, 0, 0);
-      return newCanvas;
-    },
-
-    /**
-     * since 2.6.0 moved from canvas instance to utility.
-     * @param {CanvasElement} canvasEl to copy size and content of
-     * @param {String} format 'jpeg' or 'png', in some browsers 'webp' is ok too
-     * @param {Number} quality <= 1 and > 0
-     * @static
-     * @memberOf fabric.util
-     * @return {String} data url
-     */
-    toDataURL: function(canvasEl, format, quality) {
-      return canvasEl.toDataURL('image/' + format, quality);
-    },
-
-    /**
-     * Creates image element (works on client and node)
-     * @static
-     * @memberOf fabric.util
-     * @return {HTMLImageElement} HTML image element
-     */
-    createImage: function() {
-      return fabric.document.createElement('img');
     },
 
     /**

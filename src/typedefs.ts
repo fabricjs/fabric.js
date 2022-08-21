@@ -17,4 +17,10 @@ export const enum StrokeLineJoin {
   round = 'round',
 }
 
+export const enum ImageFormat {
+  jpeg = 'jpeg',
+  jpg = 'jpeg',
+  png = 'png',
+}
+
 export type TMat2D = [number, number, number, number, number, number];
