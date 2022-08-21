@@ -630,23 +630,6 @@
     assert.ok(true, 'test did not throw on null element removeListener');
   });
 
-  QUnit.test('fabric.util.array.invoke', function(assert) {
-    assert.ok(typeof fabric.util.array.invoke === 'function');
-
-    var obj1 = { toString: function(){ return 'obj1'; } };
-    var obj2 = { toString: function(){ return 'obj2'; } };
-    var obj3 = { toString: function(){ return 'obj3'; } };
-
-    assert.deepEqual(['obj1', 'obj2', 'obj3'],
-      fabric.util.array.invoke([obj1, obj2, obj3], 'toString'));
-
-    assert.deepEqual(['f', 'b', 'b'],
-      fabric.util.array.invoke(['foo', 'bar', 'baz'], 'charAt', 0));
-
-    assert.deepEqual(['o', 'a', 'a'],
-      fabric.util.array.invoke(['foo', 'bar', 'baz'], 'charAt', 1));
-  });
-
   QUnit.test('fabric.util.array.min', function(assert) {
     assert.ok(typeof fabric.util.array.min === 'function');
 
