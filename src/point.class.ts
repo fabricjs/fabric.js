@@ -362,6 +362,14 @@ export class Point {
     return fabric.util.rotateVector(this.subtract(origin), radians).add(origin);
   }
 
+  /**
+   * Apply transform t to point p
+   * @static
+   * @memberOf fabric.util
+   * @param  {TMat2D} t The transform
+   * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
+   * @return {Point} The transformed point
+   */
   transform(t: TMat2D, ignoreOffset: boolean): Point {
     return new Point(
       t[0] * this.x + t[2] * this.y + (ignoreOffset ? 0 : t[4]),
