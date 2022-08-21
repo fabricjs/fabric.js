@@ -98,17 +98,16 @@ type TPreserveArParsed = {
 // align can be either none or undefined or a combination of mid/max
 const parseAlign = (align: string): MinMidMax[] => {
   //divide align in alignX and alignY
-  if (align) {
-    if (align !== MinMidMax.none) {
-      return [
-        align.slice(1, 4) as MinMidMax,
-        align.slice(5, 8) as MinMidMax,
-      ];
-    }
-    return [MinMidMax.none, MinMidMax.none];
-  } else {
-    return [MinMidMax.mid, MinMidMax.mid]
+  if (align !== MinMidMax.none) {
+    return [
+      align.slice(1, 4) as MinMidMax,
+      align.slice(5, 8) as MinMidMax,
+    ];
   }
+  else if (align === MinMidMax.none) {
+    return [align, align];
+  }
+  return [MinMidMax.mid, MinMidMax.mid];
 };
 
 /**
