@@ -8,11 +8,19 @@ import { rotateVector, createVector, calcAngleBetweenVectors, getHatVector, getB
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
 import { rotatePoint } from './rotatePoint';
 import { getRandomInt, removeFromArray } from '../internals';
-import { PiBy180 } from '../../constants';
+import { projectStrokeOnPoints } from './projectStroke';
+import {
+  transformPoint,
+  invertTransform,
+  composeMatrix,
+  qrDecompose,
+  calcDimensionsMatrix,
+  calcRotateMatrix,
+  multiplyTransformMatrices,
+} from './matrix';
+import { stylesFromArray, stylesToArray, hasStyleChanged } from './textStyles';
+import { clone, extend } from '../lang_object';
 
-const sqrt = Math.sqrt,
-    atan2 = Math.atan2,
-    pow = Math.pow;
   /**
    * @typedef {[number,number,number,number,number,number]} Matrix
    */
@@ -21,7 +29,6 @@ const sqrt = Math.sqrt,
    * @namespace fabric.util
    */
   fabric.util = {
-
     cos,
     sin,
     rotateVector,
@@ -35,96 +42,22 @@ const sqrt = Math.sqrt,
     // probably we should stop exposing this from the interface
     getRandomInt,
     removeFromArray,
-    /**
-     * Project stroke width on points returning 2 projections for each point as follows:
-     * - `miter`: 2 points corresponding to the outer boundary and the inner boundary of stroke.
-     * - `bevel`: 2 points corresponding to the bevel boundaries, tangent to the bisector.
-     * - `round`: same as `bevel`
-     * Used to calculate object's bounding box
-     * @static
-     * @memberOf fabric.util
-     * @param {Point[]} points
-     * @param {Object} options
-     * @param {number} options.strokeWidth
-     * @param {'miter'|'bevel'|'round'} options.strokeLineJoin
-     * @param {number} options.strokeMiterLimit https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
-     * @param {boolean} options.strokeUniform
-     * @param {number} options.scaleX
-     * @param {number} options.scaleY
-     * @param {boolean} [openPath] whether the shape is open or not, affects the calculations of the first and last points
-     * @returns {Point[]} array of size 2n/4n of all suspected points
-     */
-    projectStrokeOnPoints: function (points, options, openPath) {
-      var coords = [], s = options.strokeWidth / 2,
-          strokeUniformScalar = options.strokeUniform ?
-            new Point(1 / options.scaleX, 1 / options.scaleY) : new Point(1, 1),
-          getStrokeHatVector = function (v) {
-            var scalar = s / (Math.hypot(v.x, v.y));
-            return new Point(v.x * scalar * strokeUniformScalar.x, v.y * scalar * strokeUniformScalar.y);
-          };
-      if (points.length <= 1) {return coords;}
-      points.forEach(function (p, index) {
-        var A = new Point(p.x, p.y), B, C;
-        if (index === 0) {
-          C = points[index + 1];
-          B = openPath ? getStrokeHatVector(fabric.util.createVector(C, A)).add(A) : points[points.length - 1];
-        }
-        else if (index === points.length - 1) {
-          B = points[index - 1];
-          C = openPath ? getStrokeHatVector(fabric.util.createVector(B, A)).add(A) : points[0];
-        }
-        else {
-          B = points[index - 1];
-          C = points[index + 1];
-        }
-        var bisector = fabric.util.getBisector(A, B, C),
-            bisectorVector = bisector.vector,
-            alpha = bisector.angle,
-            scalar,
-            miterVector;
-        if (options.strokeLineJoin === 'miter') {
-          scalar = -s / Math.sin(alpha / 2);
-          miterVector = new Point(
-            bisectorVector.x * scalar * strokeUniformScalar.x,
-            bisectorVector.y * scalar * strokeUniformScalar.y
-          );
-          if (Math.hypot(miterVector.x, miterVector.y) / s <= options.strokeMiterLimit) {
-            coords.push(A.add(miterVector));
-            coords.push(A.subtract(miterVector));
-            return;
-          }
-        }
-        scalar = -s * Math.SQRT2;
-        miterVector = new Point(
-          bisectorVector.x * scalar * strokeUniformScalar.x,
-          bisectorVector.y * scalar * strokeUniformScalar.y
-        );
-        coords.push(A.add(miterVector));
-        coords.push(A.subtract(miterVector));
-      });
-      return coords;
-    },
-
-    /**
-     * Apply transform t to point p
-     * @static
-     * @memberOf fabric.util
-     * @param  {Point} p The point to transform
-     * @param  {Array} t The transform
-     * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
-     * @return {Point} The transformed point
-     */
-    transformPoint: function(p, t, ignoreOffset) {
-      if (ignoreOffset) {
-        return new Point(
-          t[0] * p.x + t[2] * p.y,
-          t[1] * p.x + t[3] * p.y
-        );
-      }
-      return new Point(
-        t[0] * p.x + t[2] * p.y + t[4],
-        t[1] * p.x + t[3] * p.y + t[5]
-      );
+    projectStrokeOnPoints,
+    // matrix.ts file
+    transformPoint,
+    invertTransform,
+    composeMatrix,
+    qrDecompose,
+    calcDimensionsMatrix,
+    calcRotateMatrix,
+    multiplyTransformMatrices,
+    // textStyles.ts file
+    stylesFromArray,
+    stylesToArray,
+    hasStyleChanged,
+    object: {
+      clone,
+      extend,
     },
 
     /**
@@ -216,22 +149,6 @@ const sqrt = Math.sqrt,
         width: width,
         height: height
       };
-    },
-
-    /**
-     * Invert transformation t
-     * @static
-     * @memberOf fabric.util
-     * @param {Array} t The transform
-     * @return {Array} The inverted transform
-     */
-    invertTransform: function(t) {
-      var a = 1 / (t[0] * t[3] - t[1] * t[2]),
-          r = [a * t[3], -a * t[1], -a * t[2], a * t[0]],
-          o = fabric.util.transformPoint({ x: t[4], y: t[5] }, r, true);
-      r[4] = -o.x;
-      r[5] = -o.y;
-      return r;
     },
 
     /**
@@ -540,146 +457,6 @@ const sqrt = Math.sqrt,
      */
     createImage: function() {
       return fabric.document.createElement('img');
-    },
-
-    /**
-     * Multiply matrix A by matrix B to nest transformations
-     * @static
-     * @memberOf fabric.util
-     * @param  {Array} a First transformMatrix
-     * @param  {Array} b Second transformMatrix
-     * @param  {Boolean} is2x2 flag to multiply matrices as 2x2 matrices
-     * @return {Array} The product of the two transform matrices
-     */
-    multiplyTransformMatrices: function(a, b, is2x2) {
-      // Matrix multiply a * b
-      return [
-        a[0] * b[0] + a[2] * b[1],
-        a[1] * b[0] + a[3] * b[1],
-        a[0] * b[2] + a[2] * b[3],
-        a[1] * b[2] + a[3] * b[3],
-        is2x2 ? 0 : a[0] * b[4] + a[2] * b[5] + a[4],
-        is2x2 ? 0 : a[1] * b[4] + a[3] * b[5] + a[5]
-      ];
-    },
-
-    /**
-     * Decomposes standard 2x3 matrix into transform components
-     * @static
-     * @memberOf fabric.util
-     * @param  {Array} a transformMatrix
-     * @return {Object} Components of transform
-     */
-    qrDecompose: function(a) {
-      var angle = atan2(a[1], a[0]),
-          denom = pow(a[0], 2) + pow(a[1], 2),
-          scaleX = sqrt(denom),
-          scaleY = (a[0] * a[3] - a[2] * a[1]) / scaleX,
-          skewX = atan2(a[0] * a[2] + a[1] * a [3], denom);
-      return {
-        angle: angle / PiBy180,
-        scaleX: scaleX,
-        scaleY: scaleY,
-        skewX: skewX / PiBy180,
-        skewY: 0,
-        translateX: a[4],
-        translateY: a[5]
-      };
-    },
-
-    /**
-     * Returns a transform matrix starting from an object of the same kind of
-     * the one returned from qrDecompose, useful also if you want to calculate some
-     * transformations from an object that is not enlived yet
-     * @static
-     * @memberOf fabric.util
-     * @param  {Object} options
-     * @param  {Number} [options.angle] angle in degrees
-     * @return {Number[]} transform matrix
-     */
-    calcRotateMatrix: function(options) {
-      if (!options.angle) {
-        return fabric.iMatrix.concat();
-      }
-      var theta = fabric.util.degreesToRadians(options.angle),
-          cos = fabric.util.cos(theta),
-          sin = fabric.util.sin(theta);
-      return [cos, sin, -sin, cos, 0, 0];
-    },
-
-    /**
-     * Returns a transform matrix starting from an object of the same kind of
-     * the one returned from qrDecompose, useful also if you want to calculate some
-     * transformations from an object that is not enlived yet.
-     * is called DimensionsTransformMatrix because those properties are the one that influence
-     * the size of the resulting box of the object.
-     * @static
-     * @memberOf fabric.util
-     * @param  {Object} options
-     * @param  {Number} [options.scaleX]
-     * @param  {Number} [options.scaleY]
-     * @param  {Boolean} [options.flipX]
-     * @param  {Boolean} [options.flipY]
-     * @param  {Number} [options.skewX]
-     * @param  {Number} [options.skewY]
-     * @return {Number[]} transform matrix
-     */
-    calcDimensionsMatrix: function(options) {
-      var scaleX = typeof options.scaleX === 'undefined' ? 1 : options.scaleX,
-          scaleY = typeof options.scaleY === 'undefined' ? 1 : options.scaleY,
-          scaleMatrix = [
-            options.flipX ? -scaleX : scaleX,
-            0,
-            0,
-            options.flipY ? -scaleY : scaleY,
-            0,
-            0],
-          multiply = fabric.util.multiplyTransformMatrices,
-          degreesToRadians = fabric.util.degreesToRadians;
-      if (options.skewX) {
-        scaleMatrix = multiply(
-          scaleMatrix,
-          [1, 0, Math.tan(degreesToRadians(options.skewX)), 1],
-          true);
-      }
-      if (options.skewY) {
-        scaleMatrix = multiply(
-          scaleMatrix,
-          [1, Math.tan(degreesToRadians(options.skewY)), 0, 1],
-          true);
-      }
-      return scaleMatrix;
-    },
-
-    /**
-     * Returns a transform matrix starting from an object of the same kind of
-     * the one returned from qrDecompose, useful also if you want to calculate some
-     * transformations from an object that is not enlived yet
-     * @static
-     * @memberOf fabric.util
-     * @param  {Object} options
-     * @param  {Number} [options.angle]
-     * @param  {Number} [options.scaleX]
-     * @param  {Number} [options.scaleY]
-     * @param  {Boolean} [options.flipX]
-     * @param  {Boolean} [options.flipY]
-     * @param  {Number} [options.skewX]
-     * @param  {Number} [options.skewX]
-     * @param  {Number} [options.translateX]
-     * @param  {Number} [options.translateY]
-     * @return {Number[]} transform matrix
-     */
-    composeMatrix: function(options) {
-      var matrix = [1, 0, 0, 1, options.translateX || 0, options.translateY || 0],
-          multiply = fabric.util.multiplyTransformMatrices;
-      if (options.angle) {
-        matrix = multiply(matrix, fabric.util.calcRotateMatrix(options));
-      }
-      if (options.scaleX !== 1 || options.scaleY !== 1 ||
-          options.skewX || options.skewY || options.flipX || options.flipY) {
-        matrix = multiply(matrix, fabric.util.calcDimensionsMatrix(options));
-      }
-      return matrix;
     },
 
     /**
@@ -1059,113 +836,4 @@ const sqrt = Math.sqrt,
       }
       return new fabric.Group([a], { clipPath: b, inverted: inverted });
     },
-
-    /**
-     * @memberOf fabric.util
-     * @param {Object} prevStyle first style to compare
-     * @param {Object} thisStyle second style to compare
-     * @param {boolean} forTextSpans whether to check overline, underline, and line-through properties
-     * @return {boolean} true if the style changed
-     */
-    hasStyleChanged: function(prevStyle, thisStyle, forTextSpans) {
-      forTextSpans = forTextSpans || false;
-      return (prevStyle.fill !== thisStyle.fill ||
-              prevStyle.stroke !== thisStyle.stroke ||
-              prevStyle.strokeWidth !== thisStyle.strokeWidth ||
-              prevStyle.fontSize !== thisStyle.fontSize ||
-              prevStyle.fontFamily !== thisStyle.fontFamily ||
-              prevStyle.fontWeight !== thisStyle.fontWeight ||
-              prevStyle.fontStyle !== thisStyle.fontStyle ||
-              prevStyle.deltaY !== thisStyle.deltaY) ||
-              (forTextSpans &&
-                (prevStyle.overline !== thisStyle.overline ||
-                prevStyle.underline !== thisStyle.underline ||
-                prevStyle.linethrough !== thisStyle.linethrough));
-    },
-
-    /**
-     * Returns the array form of a text object's inline styles property with styles grouped in ranges
-     * rather than per character. This format is less verbose, and is better suited for storage
-     * so it is used in serialization (not during runtime).
-     * @memberOf fabric.util
-     * @param {object} styles per character styles for a text object
-     * @param {String} text the text string that the styles are applied to
-     * @return {{start: number, end: number, style: object}[]}
-     */
-    stylesToArray: function(styles, text) {
-      // clone style structure to prevent mutation
-      var styles = fabric.util.object.clone(styles, true),
-          textLines = text.split('\n'),
-          charIndex = -1, prevStyle = {}, stylesArray = [];
-      //loop through each textLine
-      for (var i = 0; i < textLines.length; i++) {
-        if (!styles[i]) {
-          //no styles exist for this line, so add the line's length to the charIndex total
-          charIndex += textLines[i].length;
-          continue;
-        }
-        //loop through each character of the current line
-        for (var c = 0; c < textLines[i].length; c++) {
-          charIndex++;
-          var thisStyle = styles[i][c];
-          //check if style exists for this character
-          if (thisStyle) {
-            var styleChanged = fabric.util.hasStyleChanged(prevStyle, thisStyle, true);
-            if (styleChanged) {
-              stylesArray.push({
-                start: charIndex,
-                end: charIndex + 1,
-                style: thisStyle
-              });
-            }
-            else {
-              //if style is the same as previous character, increase end index
-              stylesArray[stylesArray.length - 1].end++;
-            }
-          }
-          prevStyle = thisStyle || {};
-        }
-      }
-      return stylesArray;
-    },
-
-    /**
-     * Returns the object form of the styles property with styles that are assigned per
-     * character rather than grouped by range. This format is more verbose, and is
-     * only used during runtime (not for serialization/storage)
-     * @memberOf fabric.util
-     * @param {Array} styles the serialized form of a text object's styles
-     * @param {String} text the text string that the styles are applied to
-     * @return {Object}
-     */
-    stylesFromArray: function(styles, text) {
-      if (!Array.isArray(styles)) {
-        return styles;
-      }
-      var textLines = text.split('\n'),
-          charIndex = -1, styleIndex = 0, stylesObject = {};
-      //loop through each textLine
-      for (var i = 0; i < textLines.length; i++) {
-        //loop through each character of the current line
-        for (var c = 0; c < textLines[i].length; c++) {
-          charIndex++;
-          //check if there's a style collection that includes the current character
-          if (styles[styleIndex]
-            && styles[styleIndex].start <= charIndex
-            && charIndex < styles[styleIndex].end) {
-            //create object for line index if it doesn't exist
-            stylesObject[i] = stylesObject[i] || {};
-            //assign a style at this character's index
-            stylesObject[i][c] = Object.assign({}, styles[styleIndex].style);
-            //if character is at the end of the current style collection, move to the next
-            if (charIndex === styles[styleIndex].end - 1) {
-              styleIndex++;
-            }
-          }
-        }
-      }
-      return stylesObject;
-    }
   };
-
-

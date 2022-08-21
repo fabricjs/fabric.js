@@ -5,10 +5,16 @@ interface NominalTag<T> {
 
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
 
-// eslint-disable-next-line no-unused-vars
 const enum Degree {}
-// eslint-disable-next-line no-unused-vars
 const enum Radian {}
 
 export type TDegree = Nominal<number, Degree>;
 export type TRadian = Nominal<number, Radian>;
+
+export const enum StrokeLineJoin {
+  miter = 'miter',
+  bevel = 'bevel',
+  round = 'round',
+}
+
+export type TMat2D = [number, number, number, number, number, number];

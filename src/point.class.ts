@@ -1,5 +1,5 @@
 import { fabric } from '../HEADER';
-import { TRadian } from './typedefs';
+import { TMat2D, TRadian } from './typedefs';
 
 export interface IPoint {
   x: number
@@ -350,6 +350,8 @@ export class Point {
 
   /**
    * Rotates `point` around `origin` with `radians`
+   * WARNING: this is probably a source of circular dependency.
+   * evaluate what to do when importing rotateVector directly from the file
    * @static
    * @memberOf fabric.util
    * @param {Point} origin The origin of the rotation
@@ -358,6 +360,13 @@ export class Point {
    */
   rotate(origin: Point, radians: TRadian): Point {
     return fabric.util.rotateVector(this.subtract(origin), radians).add(origin);
+  }
+
+  transform(t: TMat2D, ignoreOffset: boolean): Point {
+    return new Point(
+      t[0] * this.x + t[2] * this.y + (ignoreOffset ? 0 : t[4]),
+      t[1] * this.x + t[3] * this.y + (ignoreOffset ? 0 : t[5])
+    );
   }
 }
 
