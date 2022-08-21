@@ -1,6 +1,5 @@
 //@ts-nocheck
 import { fabric } from '../../../HEADER';
-import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
 import { Point } from '../../point.class';
 import { cos } from './cos';
 import { sin } from './sin';
@@ -21,6 +20,14 @@ import {
 import { stylesFromArray, stylesToArray, hasStyleChanged } from './textStyles';
 import { clone, extend } from '../lang_object';
 import { createCanvasElement, createImage, copyCanvasElement, toDataURL } from './dom';
+import { toFixed } from './toFixed';
+import {
+  matrixToSVG,
+  parsePreserveAspectRatioAttribute,
+  groupSVGElements,
+  parseUnit,
+  getSvgAttributes,
+} from './svgParsing';
   /**
    * @typedef {[number,number,number,number,number,number]} Matrix
    */
@@ -63,6 +70,12 @@ import { createCanvasElement, createImage, copyCanvasElement, toDataURL } from '
     createImage,
     copyCanvasElement,
     toDataURL,
+    toFixed,
+    matrixToSVG,
+    parsePreserveAspectRatioAttribute,
+    groupSVGElements,
+    parseUnit,
+    getSvgAttributes,
 
     /**
      * Sends a point from the source coordinate plane to the destination coordinate plane.\
@@ -156,55 +169,6 @@ import { createCanvasElement, createImage, copyCanvasElement, toDataURL } from '
     },
 
     /**
-     * A wrapper around Number#toFixed, which contrary to native method returns number, not string.
-     * @static
-     * @memberOf fabric.util
-     * @param {Number|String} number number to operate on
-     * @param {Number} fractionDigits number of fraction digits to "leave"
-     * @return {Number}
-     */
-    toFixed: function(number, fractionDigits) {
-      return parseFloat(Number(number).toFixed(fractionDigits));
-    },
-
-    /**
-     * Converts from attribute value to pixel value if applicable.
-     * Returns converted pixels or original value not converted.
-     * @param {Number|String} value number to operate on
-     * @param {Number} fontSize
-     * @return {Number|String}
-     */
-    parseUnit: function(value, fontSize) {
-      var unit = /\D{0,2}$/.exec(value),
-          number = parseFloat(value);
-      if (!fontSize) {
-        fontSize = DEFAULT_SVG_FONT_SIZE;
-      }
-      switch (unit[0]) {
-        case 'mm':
-          return number * fabric.DPI / 25.4;
-
-        case 'cm':
-          return number * fabric.DPI / 2.54;
-
-        case 'in':
-          return number * fabric.DPI;
-
-        case 'pt':
-          return number * fabric.DPI / 72; // or * 4 / 3
-
-        case 'pc':
-          return number * fabric.DPI / 72 * 12; // or * 16
-
-        case 'em':
-          return number * fontSize;
-
-        default:
-          return number;
-      }
-    },
-
-    /**
      * Returns klass "Class" object of given namespace
      * @memberOf fabric.util
      * @param {String} type Type of object (eg. 'circle')
@@ -215,33 +179,6 @@ import { createCanvasElement, createImage, copyCanvasElement, toDataURL } from '
       // capitalize first letter only
       type = fabric.util.string.camelize(type.charAt(0).toUpperCase() + type.slice(1));
       return (namespace || fabric)[type];
-    },
-
-    /**
-     * Returns array of attributes for given svg that fabric parses
-     * @memberOf fabric.util
-     * @param {String} type Type of svg element (eg. 'circle')
-     * @return {Array} string names of supported attributes
-     */
-    getSvgAttributes: function(type) {
-      var attributes = [
-        'instantiated_by_use',
-        'style',
-        'id',
-        'class'
-      ];
-      switch (type) {
-        case 'linearGradient':
-          attributes = attributes.concat(['x1', 'y1', 'x2', 'y2', 'gradientUnits', 'gradientTransform']);
-          break;
-        case 'radialGradient':
-          attributes = attributes.concat(['gradientUnits', 'gradientTransform', 'cx', 'cy', 'r', 'fx', 'fy', 'fr']);
-          break;
-        case 'stop':
-          attributes = attributes.concat(['offset', 'stop-color', 'stop-opacity']);
-          break;
-      }
-      return attributes;
     },
 
     /**
@@ -384,20 +321,6 @@ import { createCanvasElement, createImage, copyCanvasElement, toDataURL } from '
     },
 
     /**
-     * Groups SVG elements (usually those retrieved from SVG document)
-     * @static
-     * @memberOf fabric.util
-     * @param {Array} elements SVG elements to group
-     * @return {fabric.Object|fabric.Group}
-     */
-    groupSVGElements: function(elements) {
-      if (elements && elements.length === 1) {
-        return elements[0];
-      }
-      return new fabric.Group(elements);
-    },
-
-    /**
      * Populates an object with properties of another object
      * @static
      * @memberOf fabric.util
@@ -498,35 +421,6 @@ import { createCanvasElement, createImage, copyCanvasElement, toDataURL } from '
     },
 
     /**
-     * Parse preserveAspectRatio attribute from element
-     * @param {string} attribute to be parsed
-     * @return {Object} an object containing align and meetOrSlice attribute
-     */
-    parsePreserveAspectRatioAttribute: function(attribute) {
-      var meetOrSlice = 'meet', alignX = 'Mid', alignY = 'Mid',
-          aspectRatioAttrs = attribute.split(' '), align;
-
-      if (aspectRatioAttrs && aspectRatioAttrs.length) {
-        meetOrSlice = aspectRatioAttrs.pop();
-        if (meetOrSlice !== 'meet' && meetOrSlice !== 'slice') {
-          align = meetOrSlice;
-          meetOrSlice = 'meet';
-        }
-        else if (aspectRatioAttrs.length) {
-          align = aspectRatioAttrs.pop();
-        }
-      }
-      //divide align in alignX and alignY
-      alignX = align !== 'none' ? align.slice(1, 4) : 'none';
-      alignY = align !== 'none' ? align.slice(5, 8) : 'none';
-      return {
-        meetOrSlice: meetOrSlice,
-        alignX: alignX,
-        alignY: alignY
-      };
-    },
-
-    /**
      * Clear char widths cache for the given font family or all the cache if no
      * fontFamily is specified.
      * Use it if you know you are loading fonts in a lazy way and you are not waiting
@@ -601,18 +495,7 @@ import { createCanvasElement, createImage, copyCanvasElement, toDataURL } from '
       return Math.max(destination.width / source.width, destination.height / source.height);
     },
 
-    /**
-     * given an array of 6 number returns something like `"matrix(...numbers)"`
-     * @memberOf fabric.util
-     * @param {Array} transform an array with 6 numbers
-     * @return {String} transform matrix for svg
-     * @return {Object.y} Limited dimensions by Y
-     */
-    matrixToSVG: function(transform) {
-      return 'matrix(' + transform.map(function(value) {
-        return fabric.util.toFixed(value, fabric.Object.NUM_FRACTION_DIGITS);
-      }).join(' ') + ')';
-    },
+
 
     /**
      * given an object and a transform, apply the inverse transform to the object,
