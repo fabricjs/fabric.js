@@ -1,6 +1,4 @@
 //@ts-nocheck
-
-import { request } from "../util";
 import { parseSVGDocument } from "./parseSVGDocument";
 
 /**
@@ -16,7 +14,7 @@ import { parseSVGDocument } from "./parseSVGDocument";
  */
 export function loadSVGFromURL(url, callback, reviver, options) {
 
-  new request(url.replace(/^\n\s*/, '').trim(), {
+  new fabric.util.request(url.replace(/^\n\s*/, '').trim(), {
     method: 'get',
     onComplete: onComplete,
     signal: options && options.signal

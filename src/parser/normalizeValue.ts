@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { multiplyTransformMatrices } from '../util/misc/matrix';
-import { parseUnit } from '../util/misc/svgParsing';
+import { parseUnit } from './svgParsing';
 import { parseTransformAttribute } from "./parseTransformAttribute";
 
 

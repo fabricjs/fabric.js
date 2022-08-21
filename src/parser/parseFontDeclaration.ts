@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { parseUnit } from '../util/misc/svgParsing';
+import { parseUnit } from './svgParsing';
 import { reFontDeclaration } from './constants';
 
 /**
