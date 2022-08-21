@@ -28,6 +28,9 @@ import {
   parseUnit,
   getSvgAttributes,
 } from './svgParsing';
+import { findScaleToFit, findScaleToCover } from './findScaleTo';
+import { capValue } from './capValue';
+
   /**
    * @typedef {[number,number,number,number,number,number]} Matrix
    */
@@ -76,7 +79,9 @@ import {
     groupSVGElements,
     parseUnit,
     getSvgAttributes,
-
+    findScaleToFit,
+    findScaleToCover,
+    capValue,
     /**
      * Sends a point from the source coordinate plane to the destination coordinate plane.\
      * From the canvas/viewer's perspective the point remains unchanged.
@@ -456,46 +461,6 @@ import {
           perfLimitSizeY = Math.floor(maximumArea / roughWidth);
       return { x: Math.floor(roughWidth), y: perfLimitSizeY };
     },
-
-    capValue: function(min, value, max) {
-      return Math.max(min, Math.min(value, max));
-    },
-
-    /**
-     * Finds the scale for the object source to fit inside the object destination,
-     * keeping aspect ratio intact.
-     * respect the total allowed area for the cache.
-     * @memberOf fabric.util
-     * @param {Object | fabric.Object} source
-     * @param {Number} source.height natural unscaled height of the object
-     * @param {Number} source.width natural unscaled width of the object
-     * @param {Object | fabric.Object} destination
-     * @param {Number} destination.height natural unscaled height of the object
-     * @param {Number} destination.width natural unscaled width of the object
-     * @return {Number} scale factor to apply to source to fit into destination
-     */
-    findScaleToFit: function(source, destination) {
-      return Math.min(destination.width / source.width, destination.height / source.height);
-    },
-
-    /**
-     * Finds the scale for the object source to cover entirely the object destination,
-     * keeping aspect ratio intact.
-     * respect the total allowed area for the cache.
-     * @memberOf fabric.util
-     * @param {Object | fabric.Object} source
-     * @param {Number} source.height natural unscaled height of the object
-     * @param {Number} source.width natural unscaled width of the object
-     * @param {Object | fabric.Object} destination
-     * @param {Number} destination.height natural unscaled height of the object
-     * @param {Number} destination.width natural unscaled width of the object
-     * @return {Number} scale factor to apply to source to cover destination
-     */
-    findScaleToCover: function(source, destination) {
-      return Math.max(destination.width / source.width, destination.height / source.height);
-    },
-
-
 
     /**
      * given an object and a transform, apply the inverse transform to the object,
