@@ -17,4 +17,25 @@ export const enum StrokeLineJoin {
   round = 'round',
 }
 
+export const enum ImageFormat {
+  jpeg = 'jpeg',
+  jpg = 'jpeg',
+  png = 'png',
+}
+
+export const enum SVGElementName {
+  linearGradient = 'linearGradient',
+  radialGradient = 'radialGradient',
+  stop = 'stop',
+}
+
+export const enum SupportedSVGUnit {
+  mm = 'mm',
+  cm = 'cm',
+  in = 'in',
+  pt = 'pt',
+  pc = 'pc',
+  em = 'em',
+}
+
 export type TMat2D = [number, number, number, number, number, number];

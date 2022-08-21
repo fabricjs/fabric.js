@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Point } from '../point.class';
+import { capValue } from '../util/misc/capValue';
 
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
@@ -692,7 +693,6 @@ import { Point } from '../point.class';
         return dims;
       }
       var ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal),
-          capValue = fabric.util.capValue,
           x = capValue(min, limitedDims.x, max),
           y = capValue(min, limitedDims.y, max);
       if (width > x) {
