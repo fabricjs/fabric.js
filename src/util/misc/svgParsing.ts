@@ -80,14 +80,14 @@ export const groupSVGElements = (elements: any[]) => {
 const enum MeetOrSlice {
   meet = 'meet',
   slice = 'slice',
-};
+}
 
 const enum MinMidMax {
   min = 'Min',
   mid = 'Mid',
   max = 'Max',
   none = 'none',
-};
+}
 
 type TPreserveArParsed = {
   meetOrSlice: MeetOrSlice;
@@ -95,40 +95,33 @@ type TPreserveArParsed = {
   alignY: MinMidMax;
 };
 
+// align can be either none or undefined or a combination of mid/max
+const parseAlign = (align: string): MinMidMax[] => {
+  //divide align in alignX and alignY
+  if (align) {
+    if (align !== MinMidMax.none) {
+      return [
+        align.slice(1, 4) as MinMidMax,
+        align.slice(5, 8) as MinMidMax,
+      ];
+    }
+    return [MinMidMax.none, MinMidMax.none];
+  } else {
+    return [MinMidMax.mid, MinMidMax.mid]
+  }
+};
+
 /**
  * Parse preserveAspectRatio attribute from element
+ * https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAspectRatio
  * @param {string} attribute to be parsed
  * @return {Object} an object containing align and meetOrSlice attribute
  */
 export const parsePreserveAspectRatioAttribute = (attribute: string): TPreserveArParsed => {
-  let meetOrSlice = MeetOrSlice.meet,
-      alignX = MinMidMax.mid,
-      alignY = MinMidMax.mid,
-      align: MinMidMax = MinMidMax.none;
-  const aspectRatioAttrs = attribute.split(' ');
-
-  if (aspectRatioAttrs && aspectRatioAttrs.length) {
-    const firstAttr = aspectRatioAttrs.pop() as MeetOrSlice | MinMidMax | undefined;
-    if (firstAttr !== MeetOrSlice.meet && firstAttr !== MeetOrSlice.slice) {
-      align = firstAttr as MinMidMax;
-      meetOrSlice = MeetOrSlice.meet;
-    }
-    // ok firstAttr was meet or slice, then if there is more on the array is an align
-    else if (aspectRatioAttrs.length) {
-      align = aspectRatioAttrs.pop() as MinMidMax;
-    }
-  }
-  //divide align in alignX and alignY
-  if (align !== MinMidMax.none) {
-    alignX = align.slice(1, 4) as MinMidMax;
-    alignY = align.slice(5, 8) as MinMidMax;
-  } else {
-    alignX = MinMidMax.none;
-    alignY = MinMidMax.none;
-  }
-
+  const [firstPart, secondPart] = attribute.trim().split(' ') as [MinMidMax, MeetOrSlice | undefined];
+  const [alignX, alignY] = parseAlign(firstPart);
   return {
-    meetOrSlice,
+    meetOrSlice: secondPart || MeetOrSlice.meet,
     alignX,
     alignY,
   };
@@ -137,9 +130,8 @@ export const parsePreserveAspectRatioAttribute = (attribute: string): TPreserveA
 /**
  * given an array of 6 number returns something like `"matrix(...numbers)"`
  * @memberOf fabric.util
- * @param {Array} transform an array with 6 numbers
+ * @param {TMat2D} transform an array with 6 numbers
  * @return {String} transform matrix for svg
- * @return {Object.y} Limited dimensions by Y
  */
 export const matrixToSVG = (transform: TMat2D) =>
   'matrix(' + transform.map((value) => toFixed(value, fabric.Object.NUM_FRACTION_DIGITS)).join(' ') + ')';

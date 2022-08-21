@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
-import { parseUnit } from '../util';
+import { parseUnit } from '../util/misc/svgParsing';
 import { cPath, fSize, svgValidParentsRegEx } from './constants';
 import { getGlobalStylesForElement } from "./getGlobalStylesForElement";
 import { normalizeAttr } from './normalizeAttr';
