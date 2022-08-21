@@ -30,6 +30,7 @@ import {
 } from '../../parser/svgParsing';
 import { findScaleToFit, findScaleToCover } from './findScaleTo';
 import { capValue } from './capValue';
+import { min, max } from '../lang_array';
 
   /**
    * @typedef {[number,number,number,number,number,number]} Matrix
@@ -68,6 +69,10 @@ import { capValue } from './capValue';
     object: {
       clone,
       extend,
+    },
+    array: {
+      min,
+      max,
     },
     createCanvasElement,
     createImage,

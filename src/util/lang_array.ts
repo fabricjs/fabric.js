@@ -3,21 +3,6 @@
   const slice = Array.prototype.slice;
 
   /**
-   * Invokes method on all items in a given array
-   * @memberOf fabric.util.array
-   * @param {Array} array Array to iterate over
-   * @param {String} method Name of a method to invoke
-   * @return {Array}
-   */
-  export function invoke(array, method) {
-    var args = slice.call(arguments, 2), result = [];
-    for (var i = 0, len = array.length; i < len; i++) {
-      result[i] = args.length ? array[i][method].apply(array[i], args) : array[i][method].call(array[i]);
-    }
-    return result;
-  }
-
-  /**
    * Finds maximum value in array (not necessarily "first" one)
    * @memberOf fabric.util.array
    * @param {Array} array Array to iterate over
@@ -41,17 +26,6 @@ export function min(array, byProperty) {
     return find(array, byProperty, function(value1, value2) {
       return value1 < value2;
     });
-  }
-
-  /**
-   * @private
-   */
-export function fill(array, value) {
-    var k = array.length;
-    while (k--) {
-      array[k] = value;
-    }
-    return array;
   }
 
   /**
