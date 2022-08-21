@@ -27,7 +27,7 @@ import {
   groupSVGElements,
   parseUnit,
   getSvgAttributes,
-} from './svgParsing';
+} from '../parser/svgParsing';
 import { findScaleToFit, findScaleToCover } from './findScaleTo';
 import { capValue } from './capValue';
 
