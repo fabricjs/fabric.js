@@ -1205,7 +1205,7 @@ kitchensink.controller('CanvasControls', ['$scope', function ($scope) {
   for (const key in images) {
     const button = document.createElement('button');
     button.innerHTML = key;
-    button.onclick = () => $scope.addImage(assets[key]);
+    button.onclick = () => $scope.addImage(images[key]);
     button.classList.add('btn', 'btn-outline-primary', 'm-1');
     imgButtons.push(button);
   }
