@@ -1,4 +1,4 @@
-
+import { fabric } from 'fabric';
 
 function renderVieportBorders(canvas) {
     var ctx = canvas.getContext();
@@ -24,7 +24,7 @@ function renderVieportBorders(canvas) {
     ctx.restore();
 }
 
-export function attach(canvas) {
+export function attach(canvas: fabric.Canvas) {
 
     canvas.on('object:selected', function (opt) {
         var target = opt.target;

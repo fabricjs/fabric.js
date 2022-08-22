@@ -1,3 +1,4 @@
+import { capitalize } from "./utils";
 const kitchensink = angular.module('kitchensink', []);
 
 kitchensink.config(function ($interpolateProvider) {
