@@ -275,12 +275,39 @@ function startBrowser(port) {
     cp.exec([start, url].join(' '));
 }
 
-async function safeKillPort(port) {
+async function runTestem(options, env) {
     try {
-        await killPort(port);
+        await killPort(options.port);
     } catch (error) {
         // 
     }
+
+    const args = [
+        'testem',
+        !options.dev ? 'ci' : '',
+        '-p', options.port,
+        '-f', options.configFile,
+        '-l', options.context.map(_.upperFirst).join(',')
+    ];
+
+    cp.spawn(args.join(' '), {
+        cwd: wd,
+        env: {
+            ...process.env,
+            ...env,
+            VERBOSE: Number(options.verbose),
+            QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
+            QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
+            QUNIT_FILTER: options.filter,
+            REPORT_FILE: options.out,
+            IGNORE_MISSING_LAUNCHERS: Number(options.ignoreMissingContext)
+        },
+        shell: true,
+        stdio: 'inherit',
+        detached: options.dev
+    });
+
+    options.launch && startBrowser(options.port);
 }
 
 /**
@@ -293,64 +320,27 @@ async function test(suite, tests, options = {}) {
     if (suite === 'benchmarks') {
         !options.dev && console.log(chalk.yellow('benchmarks are meant to run with `--dev` flag set'));
         _.forEach(tests || TEST_SUITES.benchmarks.tests.map(file => `test/benchmarks/${file}`), async (file, i) => {
-            const port = options.port || TEST_SUITES[suite].port + i;
-            await safeKillPort(port);
-
-            const args = [
-                'testem',
-                !options.dev ? 'ci' : '',
-                '-p', port,
-                '-f', `${file}/testem.js`,
-                '-l', options.context.map(_.upperFirst).join(',')
-            ];
-
-            cp.spawn(args.join(' '), {
-                cwd: wd,
-                env: {
-                    ...process.env,
-                    VERBOSE: Number(options.verbose),
-                    REPORT_FILE: options.out || `.fabric/test_results/benchmarks/${file}.txt`,
-                    IGNORE_MISSING_LAUNCHERS: Number(options.ignoreMissingContext)
-                },
-                shell: true,
-                stdio: 'inherit',
-                detached: true
+            runTestem({
+                ...options,
+                port: options.port || TEST_SUITES[suite].port + i,
+                configFile: `${file}/testem.js`,
+                out: options.out || `.fabric/test_results/benchmarks/${file}.txt`
             });
-
-            options.launch && startBrowser(port);
         });
     }
     else {
-        const port = options.port || TEST_SUITES[suite].port;
-        await safeKillPort(port);
-
-        const args = [
-            'testem',
-            !options.dev ? 'ci' : '',
-            '-p', port,
-            '-f', options.testemConfig || `test/testem.${suite}.js`,
-            '-l', options.context.map(_.upperFirst).join(',')
-        ];
-
-        cp.spawn(args.join(' '), {
-            cwd: wd,
-            env: {
-                ...process.env,
+        runTestem(
+            {
+                ...options,
+                port: options.port || TEST_SUITES[suite].port,
+                configFile: `test/testem.${suite}.js`,
+                out: options.out || `.fabric/test_results/${suite}.txt`
+            },
+            {
                 TEST_FILES: (tests || []).join(','),
                 NODE_CMD: ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' '),
-                VERBOSE: Number(options.verbose),
-                QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
-                QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
-                QUNIT_FILTER: options.filter,
-                REPORT_FILE: options.out || `.fabric/test_results/${suite}.txt`,
-                IGNORE_MISSING_LAUNCHERS: Number(options.ignoreMissingContext)
-            },
-            shell: true,
-            stdio: 'inherit',
-            detached: options.dev
-        });
-
-        options.launch && startBrowser(port);
+            }
+        );
     }
 }
 
