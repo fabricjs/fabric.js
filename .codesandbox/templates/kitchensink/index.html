@@ -46,8 +46,9 @@
                             aria-selected="false">Simple</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button id="tab-button-object" class="nav-link" data-bs-toggle="tab" data-bs-target="#object"
-                            type="button" role="tab" aria-controls="object" aria-selected="false">Object</button>
+                        <button id="tab-button-object" class="nav-link disabled" data-bs-toggle="tab"
+                            data-bs-target="#object" type="button" role="tab" aria-controls="object"
+                            aria-selected="false" aria-disabled="true">Object</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button id="tab-button-canvas" class="nav-link active" data-bs-toggle="tab"
@@ -85,7 +86,7 @@
             <div class="offcanvas-body">
                 <div class="tab-content">
                     <div class="tab-pane" id="object" role="tabpanel" aria-labelledby="tab-button-object">
-                        <div class="object-controls" object-buttons-enabled="getSelected()">
+                        <div class="object-controls">
                             <label for="color">Fill / Stroke / Background:</label>
                             <input type="color" style="width:40px" bind-value-to="fill"
                                 class="btn-object-action btn-outline-primary">

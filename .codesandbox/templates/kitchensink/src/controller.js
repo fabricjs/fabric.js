@@ -483,12 +483,23 @@ function addAccessors($scope) {
   }
 
   $scope.rasterize = function (multiplier) {
-    var data = canvas.toDataURL({ multiplier: multiplier, format: 'png' });
-    document.getElementById('canvasRasterizer').src = data;
+    const blobUrl = URL.createObjectURL(canvas.toBlob({ multiplier: multiplier, format: 'png' }));
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.setAttribute("download", "fabric.png");
+    link.click();
+    URL.revokeObjectURL(blobUrl);
   };
 
   $scope.rasterizeSVG = function () {
-    document.getElementById('SVGRasterizer').innerHTML = canvas.toSVG();
+    // const blob = await res.blob();
+    // const blobUrl = URL.createObjectURL(blob);
+    // const link = document.createElement("a");
+    // link.href = blobUrl;
+    // link.setAttribute("download", "fabric.svg");
+    // link.click();
+    // URL.revokeObjectURL(blobUrl);
+    // document.getElementById('SVGRasterizer').innerHTML = canvas.toSVG();
   };
 
   $scope.rasterizeJSON = function () {
@@ -1154,10 +1165,24 @@ function watchCanvas($scope) {
   function updateScope() {
     $scope.$$phase || $scope.$digest();
     canvas.renderAll();
+    const tabButton = document.getElementById('tab-button-object');
+    if (canvas.getActiveObject()) {
+      tabButton.classList.remove('disabled');
+      tabButton.removeAttribute('aria-disabled');
+    }
+    else {
+      tabButton.classList.add('disabled');
+      tabButton.classList.remove('active');
+      tabButton.setAttribute('aria-disabled', 'true');
+      tabButton.setAttribute('aria-selected', 'false');
+      document.querySelector(tabButton.getAttribute('data-bs-target')).classList.remove('active');
+    }
   }
 
   canvas.on('object:selected', updateScope)
   canvas.on('path:created', updateScope)
+  canvas.on('selection:created', updateScope);
+  canvas.on('selection:updated', updateScope);
   canvas.on('selection:cleared', updateScope);
 }
 
