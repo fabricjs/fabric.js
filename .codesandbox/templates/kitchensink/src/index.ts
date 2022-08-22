@@ -3,7 +3,7 @@ import "../styles/kitchensink.css";
 import "../styles/master.css";
 import "../styles/styles.scss";
 import './controller';
-import './init';
+import './font_definitions';
 // import './paster';
 
 // https://getbootstrap.com/docs/5.0/components/offcanvas/#via-javascript
