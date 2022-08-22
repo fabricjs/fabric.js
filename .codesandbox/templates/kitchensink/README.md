@@ -1,4 +1,4 @@
-# Fabric Vanilla.js Sandbox
+# Fabric Kitchen Sandbox
 
 A `Vanilla.js` app for reproducing `fabric` issues and creating examples.
 
