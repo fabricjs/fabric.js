@@ -42,7 +42,7 @@ export function attach(canvas) {
         var newZoom = canvas.getZoom() + e.deltaY / 300;
         canvas.zoomToPoint({ x: e.offsetX, y: e.offsetY }, newZoom);
 
-        renderVieportBorders();
+        renderVieportBorders(canvas);
         e.preventDefault();
         return false;
     });
@@ -65,7 +65,7 @@ export function attach(canvas) {
             mouseTop = options.e.y;
             _drawSelection = canvas._drawSelection;
             canvas._drawSelection = function () { };
-            renderVieportBorders();
+            renderVieportBorders(canvas);
         }
     });
 
@@ -81,7 +81,7 @@ export function attach(canvas) {
             canvas.viewportTransform[5] = viewportTop + deltaTop;
 
             canvas.renderAll();
-            renderVieportBorders();
+            renderVieportBorders(canvas);
         }
     });
 

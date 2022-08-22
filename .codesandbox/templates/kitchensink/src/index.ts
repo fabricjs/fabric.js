@@ -1,5 +1,7 @@
 import { fabric } from "fabric";
-import "./styles.css";
+import "../styles/kitchensink.css";
+import "../styles/master.css";
+import "../styles/prism.css";
 
 const el = document.getElementById("canvas");
 const canvas = new fabric.Canvas(el);

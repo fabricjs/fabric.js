@@ -1,28 +1,28 @@
-var kitchensink = angular.module('kitchensink', []);
+const kitchensink = angular.module('kitchensink', []);
 
-kitchensink.config(function($interpolateProvider) {
+kitchensink.config(function ($interpolateProvider) {
   $interpolateProvider
     .startSymbol('{[')
     .endSymbol(']}');
 });
 
-kitchensink.directive('bindValueTo', function() {
+kitchensink.directive('bindValueTo', function () {
   return {
     restrict: 'A',
 
     link: function ($scope, $element, $attrs) {
 
       var prop = capitalize($attrs.bindValueTo),
-          getter = 'get' + prop,
-          setter = 'set' + prop;
+        getter = 'get' + prop,
+        setter = 'set' + prop;
 
-      $element.on('change keyup select', function() {
+      $element.on('change keyup select', function () {
         if ($element[0].type !== 'checkbox') {
           $scope[setter] && $scope[setter](this.value);
         }
       });
 
-      $element.on('click', function() {
+      $element.on('click', function () {
         if ($element[0].type === 'checkbox') {
           if ($element[0].checked) {
             $scope[setter] && $scope[setter](true);
@@ -33,7 +33,7 @@ kitchensink.directive('bindValueTo', function() {
         }
       })
 
-      $scope.$watch($scope[getter], function(newVal) {
+      $scope.$watch($scope[getter], function (newVal) {
         if ($element[0].type === 'radio') {
           var radioGroup = document.getElementsByName($element[0].name);
           for (var i = 0, len = radioGroup.length; i < len; i++) {
@@ -51,12 +51,12 @@ kitchensink.directive('bindValueTo', function() {
   };
 });
 
-kitchensink.directive('objectButtonsEnabled', function() {
+kitchensink.directive('objectButtonsEnabled', function () {
   return {
     restrict: 'A',
 
     link: function ($scope, $element, $attrs) {
-      $scope.$watch($attrs.objectButtonsEnabled, function(newVal) {
+      $scope.$watch($attrs.objectButtonsEnabled, function (newVal) {
 
         $($element).find('.btn-object-action')
           .prop('disabled', !newVal);
@@ -64,3 +64,5 @@ kitchensink.directive('objectButtonsEnabled', function() {
     }
   };
 });
+
+export { kitchensink };
