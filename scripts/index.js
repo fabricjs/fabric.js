@@ -291,15 +291,17 @@ async function safeKillPort(port) {
  */
 async function test(suite, tests, options = {}) {
     if (suite === 'benchmarks') {
+        !options.dev && console.log(chalk.yellow('benchmarks are meant to run with `--dev` flag set'));
         _.forEach(tests || TEST_SUITES.benchmarks.tests.map(file => `test/benchmarks/${file}`), async (file, i) => {
             const port = options.port || TEST_SUITES[suite].port + i;
             await safeKillPort(port);
 
             const args = [
                 'testem',
+                !options.dev ? 'ci' : '',
                 '-p', port,
                 '-f', `${file}/testem.js`,
-                '-l', _.without(options.context, 'node').map(_.upperFirst).join(',')
+                '-l', options.context.map(_.upperFirst).join(',')
             ];
 
             cp.spawn(args.join(' '), {
@@ -307,7 +309,8 @@ async function test(suite, tests, options = {}) {
                 env: {
                     ...process.env,
                     VERBOSE: Number(options.verbose),
-                    REPORT_FILE: options.out || `.fabric/test_results/benchmarks/${file}.txt`
+                    REPORT_FILE: options.out || `.fabric/test_results/benchmarks/${file}.txt`,
+                    IGNORE_MISSING_LAUNCHERS: Number(options.ignoreMissingContext)
                 },
                 shell: true,
                 stdio: 'inherit',
@@ -339,7 +342,8 @@ async function test(suite, tests, options = {}) {
                 QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
                 QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
                 QUNIT_FILTER: options.filter,
-                REPORT_FILE: options.out || `.fabric/test_results/${suite}.txt`
+                REPORT_FILE: options.out || `.fabric/test_results/${suite}.txt`,
+                IGNORE_MISSING_LAUNCHERS: Number(options.ignoreMissingContext)
             },
             shell: true,
             stdio: 'inherit',
@@ -521,13 +525,17 @@ program
     .option('-v, --verbose', 'log passing tests', false)
     .option('-l, --launch', 'launch tests in the browser', false)
     .option('--dev', 'runs testem in `dev` mode, without a `ci` flag', false)
-    .addOption(new commander.Option('-c, --context <context...>', 'context to test in').choices(['chrome', 'firefox', 'node']).default(['chrome', 'node']))
+    .addOption(new commander.Option('-c, --context <context...>', 'context to test in').choices(['chrome', 'firefox', 'node']))
     .option('-p, --port')
     .option('-o, --out <out>', 'path to report test results to')
     .option('--clear-cache', 'clear CLI test cache', false)
     .action((options) => {
         if (options.clearCache) {
             fs.removeSync(CLI_CACHE);
+        }
+        if (!options.context) {
+            options.context = ['chrome', 'firefox', 'node'];
+            options.ignoreMissingContext = true;
         }
         if (options.all) {
             options.suite = _.keys(TEST_SUITES);

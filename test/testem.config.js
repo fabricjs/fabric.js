@@ -38,7 +38,7 @@ module.exports = {
     'Firefox'
   ],
   tap_failed_tests_only: !Number(process.env.VERBOSE) || false,
-  ignore_missing_launchers: false,
+  ignore_missing_launchers: Number(process.env.IGNORE_MISSING_LAUNCHERS) || false,
   qunit: {
     filter: process.env.QUNIT_FILTER || null,
   },
