@@ -412,34 +412,22 @@ function addAccessors($scope) {
     canvas.add(rect);
   };
 
-  async function addImage(asset, minScale, maxScale) {
+  $scope.addImage = async (asset, minScale = 0.1, maxScale = 3) => {
     var coord = getRandomLeftTop();
-    fabric.Image.fromURL(asset, (image) => {
-      image.set({
-        left: coord.left,
-        top: coord.top,
-        angle: getRandomInt(-10, 10)
-      });
-      image.scale(getRandomNum(minScale, maxScale));
-      image.setCoords();
-
-      canvas.add(image);
+    const image = await fabric.Image.fromURL(asset);
+    image.set({
+      left: coord.left,
+      top: coord.top,
+      angle: getRandomInt(-10, 10)
     });
+    image.scale(getRandomNum(minScale, maxScale));
+    image.setCoords();
+
+    canvas.add(image);
+
   };
 
-  $scope.addImage1 = function () {
-    addImage(images.pug, 0.1, 0.25);
-  };
-
-  $scope.addImage2 = function () {
-    addImage(images.logo, 0.1, 1);
-  };
-
-  $scope.addImage3 = function () {
-    addImage(images.printio, 0.5, 0.75);
-  };
-
-  $scope.addImage4 = function () {
+  $scope.addVideo = function () {
     var src = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
     var video1El = document.createElement('video');
     video1El.crossOrigin = 'anonymous';
@@ -1194,15 +1182,34 @@ kitchensink.controller('CanvasControls', ['$scope', function ($scope) {
     ...text
   };
 
-  const buttons = [];
+  const SVGButtons = [];
   for (const key in assets) {
     const button = document.createElement('button');
     button.innerHTML = key;
+    button.setAttribute('data-name', key);
     button.onclick = () => $scope.addShape(assets[key]);
     button.classList.add('btn', 'btn-outline-primary');
-    buttons.push(button);
+    SVGButtons.push(button);
   }
-  document.getElementById('svg-shapes').append(...buttons);
+
+  document.getElementById('svg-buttons').append(...SVGButtons.sort((a, b) => {
+    if (a.getAttribute('data-name').startsWith('asset_') && b.getAttribute('data-name').startsWith('asset_')) {
+      return Number(a.getAttribute('data-name').replace('asset_', '')) - Number(b.getAttribute('data-name').replace('asset_', ''))
+    }
+    else {
+      return 0;
+    }
+  }));
+
+  const imgButtons = [];
+  for (const key in images) {
+    const button = document.createElement('button');
+    button.innerHTML = key;
+    button.onclick = () => $scope.addImage(assets[key]);
+    button.classList.add('btn', 'btn-outline-primary');
+    imgButtons.push(button);
+  }
+  document.getElementById('img-buttons').append(...imgButtons);
 
   addAccessors($scope);
   watchCanvas($scope);
