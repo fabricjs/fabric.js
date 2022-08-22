@@ -843,10 +843,9 @@ function addAccessors($scope) {
     _loadJSON(consoleJSONValue);
   };
 
-  var _loadJSON = function (json) {
-    canvas.loadFromJSON(json, function () {
-      canvas.renderAll();
-    });
+  var _loadJSON = async function (json) {
+    await canvas.loadFromJSON(json);
+    canvas.renderAll();
   };
 
   function initCustomization() {
