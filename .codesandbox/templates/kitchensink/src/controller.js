@@ -1188,7 +1188,7 @@ kitchensink.controller('CanvasControls', ['$scope', function ($scope) {
     button.innerHTML = key;
     button.setAttribute('data-name', key);
     button.onclick = () => $scope.addShape(assets[key]);
-    button.classList.add('btn', 'btn-outline-primary');
+    button.classList.add('btn', 'btn-outline-primary', 'm-1');
     SVGButtons.push(button);
   }
 
@@ -1206,7 +1206,7 @@ kitchensink.controller('CanvasControls', ['$scope', function ($scope) {
     const button = document.createElement('button');
     button.innerHTML = key;
     button.onclick = () => $scope.addImage(assets[key]);
-    button.classList.add('btn', 'btn-outline-primary');
+    button.classList.add('btn', 'btn-outline-primary', 'm-1');
     imgButtons.push(button);
   }
   document.getElementById('img-buttons').append(...imgButtons);
