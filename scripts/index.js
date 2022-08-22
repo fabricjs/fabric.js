@@ -21,7 +21,7 @@ const { transform: transformFiles, listFiles } = require('./transform_files');
 
 
 const wd = path.resolve(__dirname, '..');
-const dumpsPath = path.resolve(wd, '.fabric');
+const dumpsPath = path.resolve(wd, 'cli_output');
 const CLI_CACHE = path.resolve(dumpsPath, 'cli_cache.json');
 const websiteDir = path.resolve(wd, '../fabricjs.com');
 if (!fs.existsSync(dumpsPath)) {
@@ -148,7 +148,7 @@ function startWebsite() {
     const args = ['run', 'start:dev'];
 
     //  WSL ubuntu
-    // https://github.com/microsoft/WSL/issues/216 
+    // https://github.com/microsoft/WSL/issues/216
     // os.platform() === 'win32' && args.push('--', '--force_polling', '--livereload');
     if (os.platform() === 'win32') {
         console.log(chalk.green('Consider using ubuntu on WSL to run jekyll with the following options:'));
