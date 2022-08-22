@@ -1,0 +1,11 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="200" version="1.1">
+<defs>
+<radialGradient id="grey_blue" cx="20%" cy="40%" r="50%" fx="50%" fy="50%">
+  <stop offset="0%" style="stop-color:rgb(200,200,200);stop-opacity:0"/>
+  <stop offset="100%" style="stop-color:rgba(0,120,120,0.2);stop-opacity:1"/>
+</radialGradient>
+</defs>
+<ellipse cx="110" cy="100" rx="110" ry="100" style="fill:url(#grey_blue)"/>
+</svg>

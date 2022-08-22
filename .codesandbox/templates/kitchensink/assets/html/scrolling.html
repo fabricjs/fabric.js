@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <script type="text/javascript" src="../../lib/fabric.js" ></script>
+    <style>
+      canvas#b {
+        border: 1px solid red;
+      }
+      .imp-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      #modal-body {
+        position: absolute;
+        height: 100%;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="imp-modal" >
+      <div id="modal-body">
+        <canvas id="b" width="200" height="400"></canvas>
+      </div>
+    </div>
+    <script type="text/javascript">
+      var canvasB = window._canvas = new fabric.Canvas('b', {
+            backgroundColor: '#FFF',
+            selection: false,
+            isDrawingMode: true
+          });
+
+      canvasB.canvas_h = 2000;
+      canvasB.canvas_w = 200;
+      canvasB.setHeight(canvasB.canvas_h).setWidth(canvasB.canvas_w);
+
+      document.getElementById('modal-body').onscroll = function() {
+        canvasB.calcOffset();
+      };
+    </script>
+  </body>
+</html>

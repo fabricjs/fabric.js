@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg id="svg2816" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+ <g id="layer1" stroke-linejoin="miter" stroke="#ce3762" stroke-linecap="butt">
+  <path id="path2828" style="stroke-dasharray:none;" d="M40,3,35,3,20,18,10,18 s-5,5,0,10 h10 l15,15 h5 v-40 z" transform="translate(-5,0)" stroke-miterlimit="4" stroke-width="0.5" fill="#42101e"/>
+  <path id="path2830" d="m37,13s2,7.5359,0,15" transform="translate(0,2)" stroke-width="1px" fill="none"/>
+  <path id="path2834" d="m40,11s3,10,0,19" transform="translate(0,2)" stroke-width="1px" fill="none"/>
+  <path id="path2836" d="m43,6s6,14,0,29" transform="translate(0,2)" stroke-width="1px" fill="none"/>
+ </g>
+</svg>
