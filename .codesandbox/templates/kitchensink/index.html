@@ -14,8 +14,6 @@
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js"></script>
-    <script src="src/jquery.js"></script>
-    <script src="src/bootstrap.js"></script>
     <!-- <script src="src/paster.js" type="module"></script> -->
 
 
@@ -29,10 +27,10 @@
 
     <div id="bd-wrapper" ng-controller="CanvasControls">
         <h2><span>Fabric.js demos</span> &middot; Kitchensink
-            <!-- <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"
+            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"
                 aria-controls="offcanvas">
                 Show Toolbar
-            </button> -->
+            </button>
         </h2>
         <div id="canvas-wrapper">
             <canvas id="canvas" width="800" height="600"></canvas>
@@ -41,17 +39,30 @@
 
         <div class="offcanvas show offcanvas-end" tabindex="-1" id="offcanvas">
             <div class="offcanvas-header">
-                <ul class="nav nav-tabs">
-                    <li class="nav-item"><a class="nav-link" href="#simple-shapes" data-toggle="tab">Simple</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#object" data-toggle="tab">Object</a></li>
-                    <li class="active"><a class="nav-link" href="#canvastab" data-toggle="tab">Canvas</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#load-svg-pane" data-toggle="tab">Load SVG</a>
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#simple-shapes" type="button"
+                            role="tab" aria-controls="simple-shapes" aria-selected="false">Simple</button>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="#execute-code" data-toggle="tab">Execute</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#json-inout" data-toggle="tab">JSON</a></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab"
+                            data-bs-target="#object" type="button" role="tab" aria-controls="object"
+                            aria-selected="false">Object</button></li>
+                    <li class="nav-item active" role="presentation"><button class="nav-link" data-bs-toggle="tab"
+                            data-bs-target="#canvastab" type="button" role="tab" aria-controls="canvastab"
+                            aria-selected="true">Canvas</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab"
+                            data-bs-target="#load-svg-pane" type="button" role="tab" aria-controls="load-svg-pane"
+                            aria-selected="false">Load SVG</button>
+                    </li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab"
+                            data-bs-target="#execute-code" type="button" role="tab" aria-controls="execute-code"
+                            aria-selected="false">Execute</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab"
+                            data-bs-target="#json-inout" type="button" role="tab" aria-controls="json-inout"
+                            aria-selected="false">JSON</button></li>
                 </ul>
-                <!-- <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
-                    aria-label="Close"></button> -->
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
                 <div class="tab-content">
