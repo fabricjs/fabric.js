@@ -20,7 +20,7 @@ module.exports = {
     '/asset': `${entry}/pug.jpg`
   },
   test_page: [
-    'benchmark',
+    ...config.test_page,
     ...STEPS.map(n => `benchmark?n=${n}`),
     ...STEPS.map(n => `benchmark?n=${n}&optimize_caching=1`)
   ],

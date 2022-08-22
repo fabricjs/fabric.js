@@ -5,6 +5,7 @@
  */
 module.exports = {
   framework: 'qunit',
+  report_file: process.env.REPORT_FILE,
   serve_files: [
     'dist/fabric.js'
   ],

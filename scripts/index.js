@@ -307,7 +307,7 @@ async function test(suite, tests, options = {}) {
                 env: {
                     ...process.env,
                     VERBOSE: Number(options.verbose),
-                    REPORT_FILE: options.out
+                    REPORT_FILE: options.out || `.fabric/test_results/benchmarks/${file}.txt`
                 },
                 shell: true,
                 stdio: 'inherit',
@@ -339,7 +339,7 @@ async function test(suite, tests, options = {}) {
                 QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
                 QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
                 QUNIT_FILTER: options.filter,
-                REPORT_FILE: options.out
+                REPORT_FILE: options.out || `.fabric/test_results/${suite}.txt`
             },
             shell: true,
             stdio: 'inherit',
