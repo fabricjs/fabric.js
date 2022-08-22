@@ -753,7 +753,9 @@ function addAccessors($scope) {
 
   $scope.execute = function () {
     if (!(/^\s+$/).test(consoleValue)) {
-      eval(consoleValue);
+      const res = function (canvas, str) {
+        return eval(str);
+      }.call(undefined, canvas, consoleValue);
     }
   };
 
