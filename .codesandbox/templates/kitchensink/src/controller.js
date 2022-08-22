@@ -428,25 +428,30 @@ function addAccessors($scope) {
   };
 
   $scope.addVideo = function () {
-    var src = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
-    var video1El = document.createElement('video');
-    video1El.crossOrigin = 'anonymous';
-    video1El.src = src;
+    const video1El = document.createElement('video');
     video1El.addEventListener('loadeddata', function () {
       // Video is loaded and can be played
       var coord = getRandomLeftTop();
       var video = new fabric.Image(video1El, {
         left: coord.left,
         top: coord.top,
-        angle: getRandomInt(-10, 10)
+        angle: getRandomInt(-10, 10),
+        objectCaching: false
       });
       canvas.add(video);
     }, false);
+    video1El.crossOrigin = 'anonymous';
+    video1El.src = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
     video1El.width = 384;
     video1El.height = 206;
-    //video1El.style.display = 'none';
+    video1El.style.visibility = 'hidden';
     document.body.appendChild(video1El);
-    video1El.load();
+    video1El.play();
+    video1El.addEventListener('ended', () => video1El.play());
+    fabric.util.requestAnimFrame(function render() {
+      canvas.renderAll();
+      fabric.util.requestAnimFrame(render);
+    });
   };
 
   $scope.confirmClear = function () {
