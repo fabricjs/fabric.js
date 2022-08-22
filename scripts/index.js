@@ -29,6 +29,27 @@ if (!fs.existsSync(dumpsPath)) {
 }
 const package = require(path.resolve(wd, 'package.json'));
 
+const TEST_SUITES = {
+    unit: {
+        port: 8080,
+        tests: listTestFiles('unit')
+    },
+    visual: {
+        port: 8081,
+        tests: listTestFiles('visual')
+    },
+    benchmarks: {
+        port: 8082,
+        tests: [
+            'animation',
+            'quantity',
+            'raphael/complex',
+            'raphael/image',
+            'raphael/simple',
+        ]
+    }
+};
+
 function execGitCommand(cmd) {
     return cp.execSync(cmd, { cwd: wd }).toString()
         .replace(/\n/g, ',')
@@ -244,51 +265,88 @@ function exportToWebsite(options) {
     })
 }
 
+/**
+ * start localhost
+ * @param {number} port 
+ */
+function startBrowser(port) {
+    const url = `http://localhost:${port}/`;
+    const start = (os.platform() === 'darwin' ? 'open' : os.platform() === 'win32' ? 'start' : 'xdg-open');
+    cp.exec([start, url].join(' '));
+}
+
+async function safeKillPort(port) {
+    try {
+        await killPort(port);
+    } catch (error) {
+        // 
+    }
+}
 
 /**
  *
- * @param {'unit' | 'visual'} suite
+ * @param {keyof typeof TEST_SUITES} suite
  * @param {string[] | null} tests file paths
  * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:string}} [options]
  */
 async function test(suite, tests, options = {}) {
-    const port = options.port || suite === 'visual' ? 8081 : 8080;
-    try {
-        await killPort(port);
-    } catch (error) {
+    if (suite === 'benchmarks') {
+        _.forEach(tests || TEST_SUITES.benchmarks.tests.map(file => `test/benchmarks/${file}`), async (file, i) => {
+            const port = options.port || TEST_SUITES[suite].port + i;
+            await safeKillPort(port);
 
+            const args = [
+                'testem',
+                '-p', port,
+                '-f', `${file}/testem.js`,
+                '-l', _.without(options.context, 'node').map(_.upperFirst).join(',')
+            ];
+
+            cp.spawn(args.join(' '), {
+                cwd: wd,
+                env: {
+                    ...process.env,
+                    VERBOSE: Number(options.verbose),
+                    REPORT_FILE: options.out
+                },
+                shell: true,
+                stdio: 'inherit',
+                detached: true
+            });
+
+            options.launch && startBrowser(port);
+        });
     }
+    else {
+        const port = options.port || TEST_SUITES[suite].port;
+        await safeKillPort(port);
 
-    const args = [
-        'testem',
-        !options.dev ? 'ci' : '',
-        '-p', port,
-        '-f', `test/testem.${suite}.js`,
-        '-l', options.context.map(_.upperFirst).join(',')
-    ];
+        const args = [
+            'testem',
+            !options.dev ? 'ci' : '',
+            '-p', port,
+            '-f', options.testemConfig || `test/testem.${suite}.js`,
+            '-l', options.context.map(_.upperFirst).join(',')
+        ];
 
-    cp.spawn(args.join(' '), {
-        cwd: wd,
-        env: {
-            ...process.env,
-            TEST_FILES: (tests || []).join(','),
-            NODE_CMD: ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' '),
-            VERBOSE: Number(options.verbose),
-            QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
-            QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
-            QUNIT_FILTER: options.filter,
-            REPORT_FILE: options.out
-        },
-        shell: true,
-        stdio: 'inherit',
-        detached: options.dev
-    });
+        cp.spawn(args.join(' '), {
+            cwd: wd,
+            env: {
+                ...process.env,
+                TEST_FILES: (tests || []).join(','),
+                NODE_CMD: ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' '),
+                VERBOSE: Number(options.verbose),
+                QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
+                QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
+                QUNIT_FILTER: options.filter,
+                REPORT_FILE: options.out
+            },
+            shell: true,
+            stdio: 'inherit',
+            detached: options.dev
+        });
 
-    if (options.launch) {
-        // open localhost
-        const url = `http://localhost:${port}/`;
-        const start = (os.platform() === 'darwin' ? 'open' : os.platform() === 'win32' ? 'start' : 'xdg-open');
-        cp.exec([start, url].join(' '));
+        options.launch && startBrowser(port);
     }
 }
 
@@ -350,8 +408,7 @@ async function selectFileToTransform() {
 
 async function selectTestFile() {
     const selected = readCLIFile();
-    const unitTests = listTestFiles('unit').map(file => createChoiceData('unit', file));
-    const visualTests = listTestFiles('visual').map(file => createChoiceData('visual', file));
+    const testMap = _.mapValues(TEST_SUITES, ({ tests }, suite) => tests.map(file => createChoiceData(suite, file)));
     const { tests: filteredTests } = await inquirer.prompt([
         {
             type: 'test-selection',
@@ -363,20 +420,19 @@ async function selectTestFile() {
             pageSize: Math.max(10, selected.length),
             source(answersSoFar, input = '') {
                 return new Promise(resolve => {
-                    const tests = _.concat(unitTests, visualTests);
+                    const tests = _.concat(..._.values(testMap));
                     const value = _.map(this.getCurrentValue(), value => createChoiceData(value.type, value.file));
                     if (value.length > 0) {
-                        if (value.find(v => v.value && v.value.type === 'unit' && !v.value.file)) {
-                            _.pullAll(tests, unitTests);
-                        }
-                        if (value.find(v => v.value && v.value.type === 'visual' && !v.value.file)) {
-                            _.pullAll(tests, visualTests);
-                        }
+                        _.forEach(TEST_SUITES, (__, suite) => {
+                            if (value.find(v => v.value && v.value.type === suite && !v.value.file)) {
+                                _.pullAll(tests, testMap[suite]);
+                            }
+                        });
                     }
-                    const unitChoice = createChoiceData('unit', '');
-                    const visualChoice = createChoiceData('visual', '');
-                    !value.find(v => _.isEqual(v, unitChoice)) && value.push(unitChoice);
-                    !value.find(v => _.isEqual(v, visualChoice)) && value.push(visualChoice);
+                    _.forEach(TEST_SUITES, (__, suite) => {
+                        const choice = createChoiceData(suite, '');
+                        !value.find(v => _.isEqual(v, choice)) && value.push(choice);
+                    });
                     if (value.length > 0) {
                         value.unshift(new inquirer.Separator());
                         value.push(new inquirer.Separator());
@@ -404,7 +460,7 @@ async function runIntreactiveTestSuite(options) {
             acc[curr.type].push(`test/${curr.type}/${curr.file}`);
         }
         return acc;
-    }, { unit: [], visual: [] });
+    }, { unit: [], visual: [], benchmarks: [] });
     _.reduce(tests, async (queue, files, suite) => {
         await queue;
         if (files === true) {
@@ -456,7 +512,7 @@ program
 program
     .command('test')
     .description('run test suite')
-    .addOption(new commander.Option('-s, --suite <suite...>', 'test suite to run').choices(['unit', 'visual']))
+    .addOption(new commander.Option('-s, --suite <suite...>', 'test suite to run').choices(_.keys(TEST_SUITES)))
     .option('-f, --file <file>', 'run a specific test file')
     .option('--filter <filter>', 'filter tests by name')
     .option('-a, --all', 'run all tests', false)
@@ -474,7 +530,7 @@ program
             fs.removeSync(CLI_CACHE);
         }
         if (options.all) {
-            options.suite = ['unit', 'visual'];
+            options.suite = _.keys(TEST_SUITES);
         }
         if (options.suite) {
             _.reduce(options.suite, async (queue, suite) => {
@@ -483,7 +539,9 @@ program
             }, Promise.resolve());
         }
         else if (options.file) {
-            test(options.file.startsWith('visual') ? 'visual' : 'unit', [`test/${options.file}`], options);
+            const suite = path.basename(path.dirname(options.file));
+            const testFile = path.basename(options.file);
+            test(suite, [`test/${suite}/${testFile}`], options);
         }
         else {
             runIntreactiveTestSuite(options);
