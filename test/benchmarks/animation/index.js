@@ -1,13 +1,12 @@
 
 function test() {
-    fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
+
     fabric.Object.prototype.transparentCorners = false;
 
     var canvas = new fabric.Canvas('test');
 
     var fpsEl = document.getElementById('fps'),
         complexityEl = document.getElementById('complexity'),
-        changeShapeEl = document.forms[0],
         shapePathEl = document.getElementById('shape-path'),
         scaleObjectEl = document.getElementById('scale-object'),
         scaleObjectOutputEl = document.getElementById('scale-object-output'),
@@ -16,7 +15,6 @@ function test() {
         canvasObjects,
         shapePath = '1.svg',
         coords = [{ x: 150, y: 150 }, { x: 450, y: 150 }, { x: 150, y: 450 }, { x: 450, y: 450 }],
-        interval,
         prevTime,
         fps,
         lastUpdate = new Date(),
@@ -98,7 +96,7 @@ function test() {
         for (var i = coords.length; i--;) {
             (function (i) {
                 fabric.loadSVGFromURL('/assets/' + shapePath, function (objects, options) {
-                    var pathGroup = new fabric.Group(objects, options);
+                    var pathGroup = new fabric.Group(objects);
 
                     pathGroup.set({
                         left: coords[i].x,
