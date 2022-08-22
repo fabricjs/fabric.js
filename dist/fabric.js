@@ -13729,7 +13729,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Event} e
      */
     _onDrop: function (e) {
-      var options = this._simpleEventHandler('drop:before', e, { dragSource: this._dragSource });
+      var options = this._simpleEventHandler('drop:before', e, {
+        dragSource: this._dragSource,
+        pointer: this.getPointer(e)
+      });
       //  will be set by the drop target
       options.didDrop = false;
       //  will be set by the drop target, used in case options.target refuses the drop
