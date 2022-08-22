@@ -26,5 +26,5 @@
     <circle r="40" cx="450" cy="300" />
   </clipPath>
 </defs>
-<image clip-path="url(#mask)" xlink:href="/assets/mononoke.jpg" width="600" height="400" />
+<image clip-path="url(#mask)" xlink:href="../images/mononoke.jpg" width="600" height="400" />
 </svg>

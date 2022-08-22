@@ -2,6 +2,7 @@ import { fabric } from 'fabric';
 import { kitchensink } from './app_config';
 import { capitalize, getRandomColor, getRandomLeftTop, getRandomNum, getRandomInt } from "./utils";
 import { canvas } from './init';
+import { images, clipPath, gradients, stroke, svg, text } from '../assets';
 
 function getActiveStyle(styleName, object) {
   object = object || canvas.getActiveObject();
@@ -47,7 +48,7 @@ function setActiveProp(name, value) {
 function addAccessors($scope) {
 
   var pattern = new fabric.Pattern({
-    source: '/assets/ladybug.png',
+    source: images.ladybug,
     repeat: 'repeat'
   });
 
@@ -377,13 +378,13 @@ function addAccessors($scope) {
     canvas.add(textSample);
   };
 
-  var addShape = function (shapeName) {
+  $scope.addShape = function (asset) {
 
-    console.log('adding shape', shapeName);
+    console.log('adding shape', asset);
 
     var coord = getRandomLeftTop();
 
-    fabric.loadSVGFromURL('../assets/' + shapeName + '.svg', function (objects, options) {
+    fabric.loadSVGFromURL(asset, function (objects, options) {
 
       var loadedObject = fabric.util.groupSVGElements(objects, options);
 
@@ -391,8 +392,8 @@ function addAccessors($scope) {
         left: coord.left,
         top: coord.top,
         angle: getRandomInt(-10, 10)
-      })
-        .setCoords();
+      });
+      loadedObject.setCoords();
 
       canvas.add(loadedObject);
     });
@@ -411,43 +412,31 @@ function addAccessors($scope) {
     canvas.add(rect);
   };
 
-  $scope.maybeLoadShape = function (e) {
-    var $el = $(e.target).closest('button.shape');
-    if (!$el[0]) return;
-
-    var id = $el.prop('id'), match;
-    if (match = /\d+$/.exec(id)) {
-      addShape(match[0]);
-    }
-  };
-
-  function addImage(imageName, minScale, maxScale) {
+  async function addImage(asset, minScale, maxScale) {
     var coord = getRandomLeftTop();
-
-    fabric.Image.fromURL('../assets/' + imageName, function (image) {
-
+    fabric.Image.fromURL(asset, (image) => {
       image.set({
         left: coord.left,
         top: coord.top,
         angle: getRandomInt(-10, 10)
-      })
-        .scale(getRandomNum(minScale, maxScale))
-        .setCoords();
+      });
+      image.scale(getRandomNum(minScale, maxScale));
+      image.setCoords();
 
       canvas.add(image);
     });
   };
 
   $scope.addImage1 = function () {
-    addImage('pug.jpg', 0.1, 0.25);
+    addImage(images.pug, 0.1, 0.25);
   };
 
   $scope.addImage2 = function () {
-    addImage('logo.png', 0.1, 1);
+    addImage(images.logo, 0.1, 1);
   };
 
   $scope.addImage3 = function () {
-    addImage('printio.png', 0.5, 0.75);
+    addImage(images.printio, 0.5, 0.75);
   };
 
   $scope.addImage4 = function () {
@@ -1078,7 +1067,7 @@ function addAccessors($scope) {
 
   function initImagePatternBrush() {
     var img = new Image();
-    img.src = '../assets/honey_im_subtle.png';
+    img.src = images.honey_im_subtle;
 
     $scope.texturePatternBrush = new fabric.PatternBrush(canvas);
     $scope.texturePatternBrush.source = img;
@@ -1193,11 +1182,32 @@ function watchCanvas($scope) {
   canvas.on('selection:cleared', updateScope);
 }
 
-kitchensink.controller('CanvasControls', function ($scope) {
+kitchensink.controller('CanvasControls', ['$scope', function ($scope) {
 
   $scope.canvas = canvas;
   $scope.getActiveStyle = getActiveStyle;
+  const assets = {
+    ...svg,
+    ...clipPath,
+    ...gradients,
+    ...stroke,
+    ...text
+  };
+
+  const buttons = [];
+  for (const key in assets) {
+    const button = document.createElement('button');
+    button.innerHTML = key;
+    button.onclick = () => $scope.addShape(assets[key]);
+    button.classList.add('btn', 'btn-outline-primary');
+    buttons.push(button);
+  }
+  document.getElementById('svg-shapes').append(...buttons);
 
   addAccessors($scope);
   watchCanvas($scope);
-});
+
+
+}]);
+
+
