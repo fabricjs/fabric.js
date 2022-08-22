@@ -839,12 +839,8 @@ function addAccessors($scope) {
     $scope.setConsoleJSON(json);
   };
 
-  $scope.loadJSON = function () {
-    _loadJSON(consoleJSONValue);
-  };
-
-  var _loadJSON = async function (json) {
-    await canvas.loadFromJSON(json);
+  $scope.loadJSON = async function () {
+    await canvas.loadFromJSON(consoleJSONValue);
     canvas.renderAll();
   };
 
