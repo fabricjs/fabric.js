@@ -1,0 +1,142 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:300,400,700);
+
+body { font-family: "Open Sans", sans-serif !important; margin: 0; font-size: 14px !important; line-height: 1.5 !important; color: #333; }
+
+a:hover, a:focus { text-decoration: none; }
+
+h3, h4 { margin-top: 1.5em !important; }
+
+#features { width: 800px; margin: 30px auto 0 auto; text-align: center; }
+#features p { line-height: 1.5; text-align: left; text-indent: 15px }
+#features .primary { text-align: center; text-indent: 0; font-size: 20px; }
+#features .next-steps { text-align: center; margin-top: 20px; margin-bottom: 50px; }
+#features .next-steps a { font-size: 20px; }
+#features .next-steps a:nth-child(1) { color: red; margin-right: 20px; }
+#features .next-steps a:nth-child(2) { color: green; margin-right: 20px; }
+#features .next-steps a:nth-child(3) { color: blue; }
+
+#features .canvas-container { margin: 30px auto; }
+#to-svg { position: absolute; top: 1800px; left: -100px; font-size: 18px; }
+#to-json { position: absolute; top: 1800px; left: -190px; font-size: 18px; }
+
+.tooltip { background: #666; color: #f0f0f0; border-radius: 5px; width: 200px; position: absolute; padding: 10px; border: 1px solid rgba(255,255,255,0.8); transition: all 0.2s; cursor: pointer; }
+.tooltip:hover { background: #444; }
+.tooltip b { color: #faa; font-weight: normal; }
+.tooltip.simple-shapes { top: 50px; left: -100px; }
+.tooltip.complex-shapes { right: -100px; top: 50px; }
+.tooltip.images { left: -50px; top: 300px; width: 150px; }
+.tooltip.text { left: -100px; top: 600px; }
+.tooltip.gradients { right: -50px; top: 300px; width: 150px; }
+.tooltip.filters { right: -70px; top: 600px; width: 170px; }
+.tooltip.animation { left: -100px; top: 800px; }
+.tooltip.groups { right: -100px; top: 900px; }
+.tooltip.shadows { left: -130px; top: 950px; width: 230px; }
+.tooltip.flipping { right: -130px; top: 1150px; width: 230px; }
+.tooltip.events { left: -100px; top: 1300px; }
+.tooltip.clipping { right: -50px; top: 1450px; width: 150px; }
+.tooltip.patterns { left: -50px; top: 1550px; width: 150px; }
+.tooltip.freedrawing { right: -100px; top: 1750px; }
+.tooltip.serialization { left: -100px; top: 1730px; }
+
+
+#features img:not(.badge) { box-shadow: rgba(0,0,0,0.3) 0 0 5px; margin-top: 20px; margin-bottom: 20px; width: 400px }
+#features img:hover { box-shadow: rgba(0,0,155,0.3) 0 0 5px; }
+
+#header { background: #333; margin: 0; padding: 0; color: #555; overflow: hidden; min-width: 900px; }
+#header li { display: inline-block; float: left; margin-bottom: 0; }
+#header li a { display: inline-block; padding: 10px; color: pink; text-decoration: none; }
+#header li a:hover, #header li a:focus { text-decoration: underline; }
+#header li.secondary { float: right; }
+#header li.github.secondary { float: right; margin-right: 10px; margin-top: 7px; }
+#header li.secondary a:last-child { padding-left: 0; }
+#demos { padding-left: 0; margin-top: 30px; }
+#demos li { list-style: none; text-align: center; width: 200px; display: inline-block; margin-right: 20px; margin-bottom: 25px !important; vertical-align: top; }
+#demos li img { box-shadow: rgba(0,0,0,0.2) 0 0 10px; margin-bottom: 5px; width: 150px; display: inline-block; }
+#demos li .caption { display: inline-block; }
+#demos li a { display: block; text-decoration: none; font-size: 16px; }
+#demos li a:hover img { box-shadow: rgba(0,0,255,0.2) 0 0 10px; }
+#demos li a:hover .caption { font-weight: bold; }
+
+.github iframe { margin-top: 8px; }
+.twitter iframe { margin-top: 8px; margin-right: 10px; margin-left: 10px; }
+.github span, .twitter span { color: pink }
+
+#bd-wrapper { padding: 15px; padding-right: 150px}
+#bd-wrapper > ul > li { margin-bottom: 5px }
+
+#articles li ul { margin-top: 5px; margin-bottom: 15px; padding-left: 15px; list-style-type: disc }
+#articles li ul li { margin-bottom: 5px; }
+
+pre { margin-top: 0; font-size: 12px; vertical-align: top; background: #F4F2E5; display: inline-block; padding: 15px; word-wrap: break-word; white-space: pre; }
+
+.canvas-container { border: 1px dotted #ccc; display: inline-block; vertical-align: top; -webkit-tap-highlight-color: rgba(0,0,0,0); }
+
+h2 span { font-weight: normal; }
+
+b.bench { font-family: monospace; font-size: 18px; background: #ffc; padding: 0 3px; border: 1px solid #eee; line-height: 1.5 }
+
+.quick-features { font-weight: 300; text-align: left; display: inline-block; vertical-align: top; margin-left: 20px;
+                  background: #ffc; box-shadow: 0 0 5px rgba(0,0,0,0.4);
+                  border-radius: 5px; padding: 10px 10px 5px 10px; font-size: 11px; margin-right: -300px; }
+
+.quick-features h3 { margin-top: 0; text-align: center; }
+.quick-features ul { padding-left: 0; margin-bottom: 0; }
+.quick-features li { margin-bottom: 5px; list-style-position: inside; list-style-type: circle; }
+.quick-features em { color: #777; }
+.kitchensink { display: inline-block; vertical-align: top; margin-top: 20px; }
+
+.note { font-size: 12px; margin-left: 10px; }
+.coming-soon { color: #f55; }
+
+.gsc-control-cse { padding: 4px 4px 0 4px !important; margin-top: 5px !important; }
+
+#printio-lab-project { position: absolute; top: 90px; left: 0; padding: 5px 10px;
+  background: #eee; border-radius: 3px; border-top-left-radius: 0; border-bottom-left-radius: 0;
+  background: linear-gradient(rgba(146, 189, 94, 0.5), rgba(136, 176, 88, 0.5));
+  transition: all 0.2s; }
+
+#printio-lab-project:hover { padding: 10px 15px; top: 85px; left: -5px; }
+
+#changelog { position: absolute; top: 130px; left: 0; padding: 5px 10px;
+  background: #eee; border-radius: 3px; border-top-left-radius: 0; border-bottom-left-radius: 0;
+  background: linear-gradient(rgba(45, 45, 233, 0.5), rgba(50, 50, 244, 0.5));
+  transition: all 0.2s; }
+
+#changelog:hover { padding: 10px 15px; top: 125px; left: -5px; }
+
+.column { width: 400px; display: inline-block; background: #fafafa; vertical-align: top; padding-left: 20px; margin-right: 10px; margin-top: 10px; margin-left: 10px; }
+.column > ul { padding-left: 0; list-style-position: inside; }
+
+.benchmarks { width: 300px; }
+
+.team { list-style-type: none }
+.team > li { margin-bottom: 30px; }
+.team .bio { width: 600px; display: inline-block; vertical-align: top; margin-left: 20px; }
+.team .bio p:first-child { margin-top: 0; }
+.team img { padding: 3px; border: 1px solid #ccc; }
+
+#gentle-reminder {
+  position: fixed;
+  right: 1px;
+  top: 45px;
+  width: 144px;
+}
+
+#gentle-reminder-docs {
+  position: fixed;
+  right: 16px;
+  top: 45px;
+  width: 144px;
+}
+
+.reminder {
+  font-size: 13px;
+  color: white;
+  text-align: center;
+  padding: 2px;
+  background-color: pink !important;
+}
+
+.cp_embed_wrapper {
+  margin-right: 150px;
+}
