@@ -483,27 +483,32 @@ function addAccessors($scope) {
   }
 
   $scope.rasterize = function (multiplier) {
-    const blobUrl = URL.createObjectURL(canvas.toBlob({ multiplier: multiplier, format: 'png' }));
     const link = document.createElement("a");
-    link.href = blobUrl;
+    link.href = canvas.toDataURL({ multiplier: multiplier, format: 'png' });
     link.setAttribute("download", "fabric.png");
     link.click();
-    URL.revokeObjectURL(blobUrl);
   };
 
   $scope.rasterizeSVG = function () {
-    // const blob = await res.blob();
-    // const blobUrl = URL.createObjectURL(blob);
-    // const link = document.createElement("a");
-    // link.href = blobUrl;
-    // link.setAttribute("download", "fabric.svg");
-    // link.click();
-    // URL.revokeObjectURL(blobUrl);
-    // document.getElementById('SVGRasterizer').innerHTML = canvas.toSVG();
+    const svg = canvas.toSVG();
+    const link = document.createElement("a");
+    const blob = new Blob([svg], { type: "image/svg+xml" });
+    const blobURL = URL.createObjectURL(blob);
+    link.href = blobURL;
+    link.setAttribute("download", "fabric.svg");
+    link.click();
+    URL.revokeObjectURL(blobURL);
   };
 
   $scope.rasterizeJSON = function () {
-    $scope.setConsoleJSON(JSON.stringify(canvas));
+    const json = JSON.stringify(canvas.toJSON(), null, '\t');
+    const link = document.createElement("a");
+    const blob = new Blob([json], { type: "application/json" });
+    const blobURL = URL.createObjectURL(blob);
+    link.href = blobURL;
+    link.setAttribute("download", "fabric.json");
+    link.click();
+    URL.revokeObjectURL(blobURL);
   };
 
   $scope.getSelected = function () {
@@ -1179,8 +1184,8 @@ function watchCanvas($scope) {
     }
   }
 
-  canvas.on('object:selected', updateScope)
-  canvas.on('path:created', updateScope)
+  canvas.on('object:selected', updateScope);
+  canvas.on('path:created', updateScope);
   canvas.on('selection:created', updateScope);
   canvas.on('selection:updated', updateScope);
   canvas.on('selection:cleared', updateScope);
