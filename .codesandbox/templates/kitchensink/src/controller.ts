@@ -2,8 +2,15 @@ import { fabric } from 'fabric';
 import { kitchensink } from './app_config';
 import { capitalize, getRandomColor, getRandomLeftTop, getRandomNum, getRandomInt } from "./utils";
 import { canvas } from './init';
-import { images, clipPath, gradients, stroke, svg, text } from '../assets';
+// https://parceljs.org/features/dependency-resolution/#glob-specifiers
+import SVGAssets from '../assets/*/*.svg';
+import imageAssets from '../assets/images/*.(png|jpg|jpeg)';
 import * as data from './data.json';
+
+const images = imageAssets.map(asset => {
+  const ext = Object.keys(asset)[0];
+  return asset[ext];
+});
 
 function getActiveStyle(styleName, object?) {
   object = object || canvas.getActiveObject();
@@ -1181,22 +1188,17 @@ kitchensink.controller('CanvasControls', ['$scope', function ($scope) {
 
   $scope.canvas = canvas;
   $scope.getActiveStyle = getActiveStyle;
-  const assets = {
-    ...svg,
-    ...clipPath,
-    ...gradients,
-    ...stroke,
-    ...text
-  };
 
   const SVGButtons: HTMLButtonElement[] = [];
-  for (const key in assets) {
-    const button = document.createElement('button');
-    button.innerHTML = key;
-    button.setAttribute('data-name', key);
-    button.onclick = () => $scope.addShape(assets[key]);
-    button.classList.add('btn', 'btn-outline-primary', 'm-1');
-    SVGButtons.push(button);
+  for (const folder in SVGAssets) {
+    for (const key in SVGAssets[folder]) {
+      const button = document.createElement('button');
+      button.innerHTML = key;
+      button.setAttribute('data-name', key);
+      button.onclick = () => $scope.addShape(SVGAssets[folder][key]);
+      button.classList.add('btn', 'btn-outline-primary', 'm-1');
+      SVGButtons.push(button);
+    }
   }
 
   document.getElementById('svg-buttons')!.append(...SVGButtons.sort((a, b) => {

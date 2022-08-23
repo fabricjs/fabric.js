@@ -13,6 +13,7 @@
     "fabric": "*"
   },
   "devDependencies": {
+    "@parcel/resolver-glob": "^2.7.0",
     "@parcel/transformer-sass": "^2.7.0",
     "@parcel/transformer-typescript-tsc": "^2.7.0",
     "parcel": "^2.7.0"
