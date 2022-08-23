@@ -138,27 +138,27 @@
                                             bind-value-to="charSpacing">
                                     </div>
                                     <button type="button" class="btn btn-object-action btn-outline-primary"
-                                        ng-click="toggleBold()" ng-class="{'btn-inverse': isBold()}">
+                                        ng-click="toggleBold()" ng-class="{'active': isBold()}">
                                         Bold
                                     </button>
                                     <button type="button" class="btn btn-object-action btn-outline-primary"
                                         id="text-cmd-italic" ng-click="toggleItalic()"
-                                        ng-class="{'btn-inverse': isItalic()}">
+                                        ng-class="{'active': isItalic()}">
                                         Italic
                                     </button>
                                     <button type="button" class="btn btn-object-action btn-outline-primary"
                                         id="text-cmd-underline" ng-click="toggleUnderline()"
-                                        ng-class="{'btn-inverse': isUnderline()}">
+                                        ng-class="{'active': isUnderline()}">
                                         Underline
                                     </button>
                                     <button type="button" class="btn btn-object-action btn-outline-primary"
                                         id="text-cmd-linethrough" ng-click="toggleLinethrough()"
-                                        ng-class="{'btn-inverse': isLinethrough()}">
+                                        ng-class="{'active': isLinethrough()}">
                                         Linethrough
                                     </button>
                                     <button type="button" class="btn btn-object-action btn-outline-primary"
                                         id="text-cmd-overline" ng-click="toggleOverline()"
-                                        ng-class="{'btn-inverse': isOverline()}">
+                                        ng-class="{'active': isOverline()}">
                                         Overline
                                     </button>
                                     <br />
@@ -181,35 +181,33 @@
                             <div style="margin-top:10px;">
                                 <button class="btn btn-lock btn-object-action btn-outline-primary"
                                     ng-click="setHorizontalLock(!getHorizontalLock())"
-                                    ng-class="{'btn-inverse': getHorizontalLock()}">
+                                    ng-class="{'active': getHorizontalLock()}">
                                     {[ getHorizontalLock() ? 'Unlock horizontal movement' : 'Lock horizontal
                                     movement' ]}
                                 </button>
                                 <button class="btn btn-lock btn-object-action btn-outline-primary"
                                     ng-click="setVerticalLock(!getVerticalLock())"
-                                    ng-class="{'btn-inverse': getVerticalLock()}">
+                                    ng-class="{'active': getVerticalLock()}">
                                     {[ getVerticalLock() ? 'Unlock vertical movement' : 'Lock vertical movement' ]}
                                 </button>
                                 <br>
                                 <button class="btn btn-lock btn-object-action btn-outline-primary"
-                                    ng-click="setScaleLockX(!getScaleLockX())"
-                                    ng-class="{'btn-inverse': getScaleLockX()}">
+                                    ng-click="setScaleLockX(!getScaleLockX())" ng-class="{'active': getScaleLockX()}">
                                     {[ getScaleLockX() ? 'Unlock horizontal scaling' : 'Lock horizontal scaling' ]}
                                 </button>
                                 <button class="btn btn-lock btn-object-action btn-outline-primary"
-                                    ng-click="setScaleLockY(!getScaleLockY())"
-                                    ng-class="{'btn-inverse': getScaleLockY()}">
+                                    ng-click="setScaleLockY(!getScaleLockY())" ng-class="{'active': getScaleLockY()}">
                                     {[ getScaleLockY() ? 'Unlock vertical scaling' : 'Lock vertical scaling' ]}
                                 </button>
                                 <button class="btn btn-lock btn-object-action btn-outline-primary"
                                     ng-click="setRotationLock(!getRotationLock())"
-                                    ng-class="{'btn-inverse': getRotationLock()}">
+                                    ng-class="{'active': getRotationLock()}">
                                     {[ getRotationLock() ? 'Unlock rotation' : 'Lock rotation' ]}
                                 </button>
                                 <br>
                                 <button class="btn btn-lock btn-object-action btn-outline-primary"
                                     ng-click="setLockScalingFlip(!getLockScalingFlip())"
-                                    ng-class="{'btn-inverse': getLockScalingFlip()}">
+                                    ng-class="{'active': getLockScalingFlip()}">
                                     {[ getLockScalingFlip() ? 'Unlock scaling flip' : 'Lock scaling flip' ]}
                                 </button>
                             </div>
@@ -525,7 +523,7 @@
 
                             <button id="drawing-mode" class="btn btn-outline-primary"
                                 ng-click="setFreeDrawingMode(!getFreeDrawingMode())"
-                                ng-class="{'btn-inverse': getFreeDrawingMode()}">
+                                ng-class="{'active': getFreeDrawingMode()}">
                                 {[ getFreeDrawingMode() ? 'Exit free drawing mode' : 'Enter free drawing mode' ]}
                             </button>
 
