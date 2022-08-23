@@ -7,9 +7,10 @@ import './font_definitions';
 // import './paster';
 
 // https://getbootstrap.com/docs/5.0/components/offcanvas/#via-javascript
-document.onload = () => {
-    const offcanvasElementList = [].slice.call(document.querySelectorAll('.offcanvas'))
-    offcanvasElementList.map(function (offcanvasEl) {
-        return new Offcanvas(offcanvasEl, { backdrop: false })
-    })
-}
+const offcanvasElementList = [].slice.call(document.querySelectorAll('.offcanvas'));
+offcanvasElementList.map(function (offcanvasEl) {
+    return new Offcanvas(offcanvasEl, { backdrop: false });
+});
+
+
+
