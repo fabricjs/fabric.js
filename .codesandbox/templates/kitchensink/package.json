@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "fabric on Vanilla.js",
   "scripts": {
-    "dev": "parcel index.html --open --no-cache",
+    "dev": "parcel index.html --open",
     "start": "parcel index.html",
     "build": "parcel build index.html"
   },
@@ -15,7 +15,8 @@
   "devDependencies": {
     "@parcel/transformer-sass": "^2.7.0",
     "@parcel/transformer-typescript-tsc": "^2.7.0",
-    "parcel": "^2.7.0"
+    "parcel": "^2.7.0",
+    "parcel-resolver-realpath": "^1.0.1"
   },
   "keywords": [
     "vanilla",
