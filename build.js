@@ -23,7 +23,7 @@ var noStrict = 'no-strict' in buildArgsAsObject;
 var noSVGExport = 'no-svg-export' in buildArgsAsObject;
 var requirejs = 'requirejs' in buildArgsAsObject ? 'requirejs' : false;
 var sourceMap = 'sourcemap' in buildArgsAsObject;
-
+var buildFast = 'fast' in buildArgsAsObject;
 // set amdLib var to encourage later support of other AMD systems
 var amdLib = requirejs;
 
@@ -89,6 +89,9 @@ function appendFileContents(fileNames, callback) {
     fs.readFile(__dirname + '/' + fileName, function (err, data) {
       if (err) throw err;
       var strData = String(data);
+      if (fileName === 'src/HEADER.js' && amdLib === false) {
+        strData = strData.replace(/\/\* _AMD_START_ \*\/[\s\S]*?\/\* _AMD_END_ \*\//g, '');
+      }
       if (noStrict) {
         strData = strData.replace(/"use strict";?\n?/, '');
       }
@@ -113,14 +116,6 @@ function ifSpecifiedInclude(moduleName, fileName) {
   return ((isInIncludedList || includeAllModules) && !isInExcludedList) ? fileName : '';
 }
 
-function ifSpecifiedAMDInclude(amdLib) {
-  var supportedLibraries = ['requirejs'];
-  if (supportedLibraries.indexOf(amdLib) > -1) {
-    return 'src/amd/' + amdLib + '.js';
-  }
-  return '';
-}
-
 var filesToInclude = [
   'HEADER.js',
   ifSpecifiedInclude('global', 'src/globalFabric.js'),
@@ -131,7 +126,7 @@ var filesToInclude = [
   'src/mixins/shared_methods.mixin.js',
   'src/util/misc.js',
   ifSpecifiedInclude('accessors', 'src/util/named_accessors.mixin.js'),
-  'src/util/arc.js',
+  'src/util/path.js',
   'src/util/lang_array.js',
   'src/util/lang_object.js',
   'src/util/lang_string.js',
@@ -154,6 +149,9 @@ var filesToInclude = [
   'src/point.class.js',
   'src/intersection.class.js',
   'src/color.class.js',
+  ifSpecifiedInclude('interaction', 'src/controls.actions.js'),
+  ifSpecifiedInclude('interaction', 'src/controls.render.js'),
+  ifSpecifiedInclude('interaction', 'src/control.class.js'),
 
   ifSpecifiedInclude('gradient', 'src/gradient.class.js'),
   ifSpecifiedInclude('pattern', 'src/pattern.class.js'),
@@ -180,6 +178,7 @@ var filesToInclude = [
   'src/shapes/object.class.js',
   'src/mixins/object_origin.mixin.js',
   'src/mixins/object_geometry.mixin.js',
+  'src/mixins/object_ancestry.mixin.js',
   'src/mixins/object_stacking.mixin.js',
   'src/mixins/object.svg_export.js',
   'src/mixins/stateful.mixin.js',
@@ -218,6 +217,7 @@ var filesToInclude = [
   ifSpecifiedInclude('image_filters', 'src/filters/resize_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/contrast_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/saturate_filter.class.js'),
+  ifSpecifiedInclude('image_filters', 'src/filters/vibrance_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/blur_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/gamma_filter.class.js'),
   ifSpecifiedInclude('image_filters', 'src/filters/composed_filter.class.js'),
@@ -233,11 +233,10 @@ var filesToInclude = [
   ifSpecifiedInclude('itext', 'src/mixins/itext.svg_export.js'),
 
   ifSpecifiedInclude('textbox', 'src/shapes/textbox.class.js'),
-  ifSpecifiedInclude('textbox', 'src/mixins/textbox_behavior.mixin.js'),
+  ifSpecifiedInclude('interaction', 'src/mixins/default_controls.js'),
 
-  ifSpecifiedInclude('node', 'src/node.js'),
-
-  ifSpecifiedAMDInclude(amdLib)
+  //  extends fabric.StaticCanvas, fabric.Canvas, fabric.Object, depends on fabric.PencilBrush and fabric.Rect
+  ifSpecifiedInclude('erasing', 'src/mixins/eraser_brush.mixin.js'),
 ];
 
 if (buildMinified) {
@@ -257,10 +256,8 @@ else {
         console.log(err);
         throw err;
       }
-
-      // add js wrapping in AMD closure for requirejs if necessary
-      if (amdLib !== false) {
-        exec('uglifyjs fabric.js ' + amdUglifyFlags + ' -b --output fabric.js');
+      if (buildFast) {
+        process.exit(0);
       }
 
       if (amdLib !== false) {
@@ -283,24 +280,6 @@ else {
 
         exec('gzip -c fabric.min.js > fabric.min.js.gz', function (error, output) {
           console.log('Gzipped to ' + distributionPath + 'fabric.min.js.gz');
-        });
-      });
-
-      // Always build requirejs AMD module in fabric.require.js
-      // add necessary requirejs footer code to filesToInclude if we haven't before
-      if (amdLib === false) {
-        amdLib = "requirejs";
-        filesToInclude[filesToInclude.length] = ifSpecifiedAMDInclude(amdLib);
-      }
-
-      appendFileContents(filesToInclude, function() {
-        fs.writeFile('fabric.require.js', distFileContents, function (err) {
-          if (err) {
-            console.log(err);
-            throw err;
-          }
-          exec('uglifyjs fabric.require.js ' + amdUglifyFlags + ' -b --output fabric.require.js');
-          console.log('Built distribution to ' + distributionPath + 'fabric.require.js (requirejs-compatible)');
         });
       });
 

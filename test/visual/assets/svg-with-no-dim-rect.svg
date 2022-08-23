@@ -1,0 +1,16 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>.cls-1{fill:none;stroke:#000;stroke-linecap:round;stroke-linejoin:round;stroke-width:2px;}</style>
+  </defs>
+  <g data-name="93-bin" id="_93-bin">
+    <rect class="cls-1" height="176" width="144" x="56" y="72"/>
+    <rect class="cls-1" height="32" width="176" x="40" y="40"/>
+    <polyline class="cls-1" points="96 40 96 8 160 8 160 40"/>
+    <line class="cls-1" x1="104" x2="104" y1="112" y2="248"/>
+    <rect class="cls-1" height="88" x="128" y="160" />
+    <rect class="cls-1" width="48" x="104" y="8" />
+    <line class="cls-1" x1="152" x2="152" y1="112" y2="248"/>
+  </g>
+</svg>

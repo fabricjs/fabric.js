@@ -1,0 +1,24 @@
+name: Node.js Package
+
+on:
+  release:
+    branches:
+      - master
+      - 5.x
+    types: [published]
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      - run: npm install
+      - run: npm run build
+      - run: node publish.js
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          PRE_RELEASE: ${{github.event.release.prerelease}}

@@ -1,112 +1,309 @@
 (function() {
-  QUnit.module('fabric.util.animate');
-
-  asyncTest('animateColor', function() {
-    function testing(val) {
-      notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
+  QUnit.module('fabric.util.animate', {
+    afterEach: function (assert) {
+      assert.equal(fabric.runningAnimations.length, 0, 'runningAnimations should be empty at the end of a test');
+      fabric.runningAnimations.cancelAll();
     }
-    ok(typeof fabric.util.animateColor === 'function', 'animateColor is a function');
+  });
+
+  QUnit.test('animateColor', function(assert) {
+    var done = assert.async();
+    function testing(val, complete) {
+      if (complete !== 1) {
+        assert.notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
+      }
+      else {
+        assert.equal(val, 'rgba(0,0,255,1)', 'color is blue');
+      }
+      assert.ok(typeof val === 'string', 'expected type is String');
+    }
+    assert.ok(typeof fabric.util.animateColor === 'function', 'animateColor is a function');
     fabric.util.animateColor('red', 'blue', 16, {
-      onComplete: function() {
+      onComplete: function(val, changePerc, timePerc) {
         // animate color need some fixing
-        // equal(val, 'rgba(0,0,255,1)', 'color is blue')
-        start();
+        assert.equal(val, 'rgba(0,0,255,1)', 'color is blue');
+        assert.equal(changePerc, 1, 'change percentage is 100%');
+        assert.equal(timePerc, 1, 'time percentage is 100%');
+        done();
       },
       onChange: testing,
     });
   });
 
-  asyncTest('animate', function() {
+  // QUnit.test('fabric.util.animate', function(assert) {
+  //   var done = assert.async();
+  //   function testing(val) {
+  //     assert.notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
+  //     assert.ok(typeof val === 'String');
+  //   }
+  //   assert.ok(typeof fabric.util.animate === 'function', 'fabric.util.animate is a function');
+  //   fabric.util.animate('red', 'blue', 16, {
+  //     onComplete: function() {
+  //       // animate color need some fixing
+  //       // assert.equal(val, 'rgba(0,0,255,1)', 'color is blue')
+  //       done();
+  //     },
+  //     onChange: testing,
+  //   });
+  // });
+
+  QUnit.test('animation context', function (assert) {
+    var done = assert.async();
+    var options = { foo: 'bar' };
+    fabric.util.animate(options);
+    assert.propEqual(options, { foo: 'bar' }, 'options were mutated');
+    setTimeout(function() {
+      assert.equal(fabric.runningAnimations.length, 0, 'animation should exist in registry');
+      done();
+    }, 1000);
+  });
+
+  QUnit.test('fabric.runningAnimations', function (assert) {
+    var done = assert.async();
+    assert.ok(fabric.runningAnimations instanceof Array);
+    assert.ok(typeof fabric.runningAnimations.cancelAll === 'function');
+    assert.ok(typeof fabric.runningAnimations.cancelByTarget === 'function');
+    assert.ok(typeof fabric.runningAnimations.findAnimationIndex === 'function');
+    assert.ok(typeof fabric.runningAnimations.findAnimation === 'function');
+    assert.ok(typeof fabric.runningAnimations.findAnimationsByTarget === 'function');
+    assert.equal(fabric.runningAnimations.length, 0, 'should have registered animation');
+    var abort, target = { foo: 'bar' };
+    var options = {
+      target,
+      onChange(currentValue, completionRate, durationRate) {
+        var context = fabric.runningAnimations.findAnimation(abort);
+        assert.equal(context.currentValue, currentValue, 'context.currentValue is wrong');
+        assert.equal(context.completionRate, completionRate, 'context.completionRate is wrong');
+        assert.equal(context.durationRate, durationRate, 'context.durationRate is wrong');
+        assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
+      },
+      onComplete() {
+        setTimeout(() => {
+          assert.equal(fabric.runningAnimations.length, 0, 'should have unregistered animation');
+          done();
+        }, 0);
+      }
+    };
+    abort = fabric.util.animate(options);
+    var context = fabric.runningAnimations.findAnimation(abort);
+    assert.equal(fabric.runningAnimations.length, 1, 'should have registered animation');
+    assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
+    assert.equal(context.cancel, abort, 'animation should exist in registry');
+    assert.equal(context.currentValue, 0, 'context.currentValue is wrong');
+    assert.equal(context.completionRate, 0, 'context.completionRate is wrong');
+    assert.equal(context.durationRate, 0, 'context.durationRate is wrong');
+    var byTarget = fabric.runningAnimations.findAnimationsByTarget(target);
+    assert.equal(byTarget.length, 1, 'should have found registered animation by target');
+    assert.deepEqual(byTarget[0], context, 'should have found registered animation by target');
+    delete byTarget[0].target;
+    assert.equal(fabric.runningAnimations.findAnimationsByTarget(target), 0, 'should not have found registered animation by target');
+  });
+
+  QUnit.test('fabric.runningAnimations with abort', function (assert) {
+    var done = assert.async();
+    var _abort = false;
+    var options = {
+      onStart() {
+        setTimeout(() => {
+          _abort = true;
+        }, 100);
+      },
+      abort() {
+        if (_abort) {
+          setTimeout(() => {
+            assert.equal(fabric.runningAnimations.length, 0, 'should have unregistered animation');
+            done();
+          }, 0);
+        }
+        assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
+        return _abort;
+      }
+    };
+    var abort = fabric.util.animate(options);
+    assert.equal(fabric.runningAnimations.length, 1, 'should have registered animation');
+    assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
+    assert.equal(fabric.runningAnimations.findAnimation(abort).cancel, abort, 'animation should exist in registry');
+  });
+
+  QUnit.test('fabric.runningAnimations with imperative abort', function (assert) {
+    var options = { foo: 'bar' };
+    var abort = fabric.util.animate(options);
+    assert.equal(fabric.runningAnimations.length, 1, 'should have registered animation');
+    assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
+    assert.equal(fabric.runningAnimations.findAnimation(abort).cancel, abort, 'animation should exist in registry');
+    var context = abort();
+    assert.equal(fabric.runningAnimations.length, 0, 'should have unregistered animation');
+    assert.equal(context.foo, 'bar', 'should return animation context');
+  });
+
+  QUnit.test('fabric.runningAnimations cancelAll', function (assert) {
+    var options = { foo: 'bar' };
+    fabric.util.animate(options);
+    fabric.util.animate(options);
+    fabric.util.animate(options);
+    fabric.util.animate(options);
+    assert.equal(fabric.runningAnimations.length, 4, 'should have registered animations');
+    var cancelledAnimations = fabric.runningAnimations.cancelAll();
+    assert.equal(cancelledAnimations.length, 4, 'should return cancelled animations');
+    assert.equal(fabric.runningAnimations.length, 0, 'should have registered animations');
+    //  make sure splice didn't destroy instance
+    assert.ok(fabric.runningAnimations instanceof Array);
+    assert.ok(typeof fabric.runningAnimations.cancelAll === 'function');
+    assert.ok(typeof fabric.runningAnimations.findAnimationIndex === 'function');
+    assert.ok(typeof fabric.runningAnimations.findAnimation === 'function');
+  });
+
+  QUnit.test('fabric.runningAnimations cancelByCanvas', function (assert) {
+    var done = assert.async();
+    var canvas = { pip: 'py' };
+    fabric.util.animate({ foo: 'bar', target: 'pip' });
+    fabric.util.animate({ foo: 'bar', target: { canvas: 'pip' } });
+    fabric.util.animate({ foo: 'bar' });
+    fabric.util.animate({ target: { canvas } });
+    assert.equal(fabric.runningAnimations.length, 4, 'should have registered animations');
+    var cancelledAnimations = fabric.runningAnimations.cancelByCanvas();
+    assert.equal(cancelledAnimations.length, 0, 'should return empty array');
+    assert.equal(fabric.runningAnimations.length, 4, 'should have registered animations');
+    cancelledAnimations = fabric.runningAnimations.cancelByCanvas(canvas);
+    assert.equal(cancelledAnimations.length, 1, 'should return cancelled animations');
+    assert.equal(cancelledAnimations[0].target.canvas, canvas, 'should return cancelled animations by canvas');
+    assert.equal(fabric.runningAnimations.length, 3, 'should have left registered animation');
+    setTimeout(() => {
+      done();
+    }, 1000);
+  });
+
+  QUnit.test('fabric.runningAnimations cancelByTarget', function (assert) {
+    var done = assert.async();
+    var options = { foo: 'bar', target: 'pip' }, opt2 = { bar: 'baz' };
+    fabric.util.animate(options);
+    fabric.util.animate(options);
+    fabric.util.animate(options);
+    fabric.util.animate(opt2);
+    assert.equal(fabric.runningAnimations.length, 4, 'should have registered animations');
+    var cancelledAnimations = fabric.runningAnimations.cancelByTarget();
+    assert.equal(cancelledAnimations.length, 0, 'should return empty array');
+    assert.equal(fabric.runningAnimations.length, 4, 'should have registered animations');
+    cancelledAnimations = fabric.runningAnimations.cancelByTarget('pip');
+    assert.equal(cancelledAnimations.length, 3, 'should return cancelled animations');
+    assert.equal(fabric.runningAnimations.length, 1, 'should have left 1 registered animation');
+    assert.equal(fabric.runningAnimations[0].bar, opt2.bar, 'should have left 1 registered animation');
+    setTimeout(() => {
+      done();
+    }, 1000);
+  });
+
+  QUnit.test('animate', function(assert) {
+    var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
 
-    ok(typeof object.animate == 'function');
+    assert.ok(typeof object.animate === 'function');
 
     object.animate('left', 40);
-    ok(true, 'animate without options does not crash');
+    assert.ok(true, 'animate without options does not crash');
+    assert.equal(fabric.runningAnimations.length, 1, 'should have 1 registered animation');
+    assert.equal(fabric.runningAnimations[0].target, object, 'animation.target should be set');
 
     setTimeout(function() {
 
-      equal(40, Math.round(object.left), 'left has been animated to 40');
-      start();
+      assert.equal(40, Math.round(object.left), 'left has been animated to 40');
+      done();
 
     }, 1000);
   });
 
-  asyncTest('animate with increment', function() {
+  QUnit.test('animate with increment', function(assert) {
+    var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
 
     object.animate('left', '+=40');
-    ok(true, 'animate without options does not crash');
+    assert.ok(true, 'animate without options does not crash');
 
     setTimeout(function() {
 
-      equal(Math.round(object.left), 60, 'left has been increased by 40');
-      start();
-
+      assert.equal(Math.round(object.left), 60, 'left has been increased by 40');
+      done();
     }, 1000);
   });
 
-  asyncTest('animate with keypath', function() {
+  QUnit.test('animate with keypath', function(assert) {
+    var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43, shadow: { offsetX: 20 } });
 
     object.animate('shadow.offsetX', 100);
-    ok(true, 'animate without options does not crash');
+    assert.ok(true, 'animate without options does not crash');
 
     setTimeout(function() {
-
-      equal(Math.round(object.shadow.offsetX), 100, 'property has been animated');
-      start();
-
+      assert.equal(Math.round(object.shadow.offsetX), 100, 'property has been animated');
+      done();
     }, 1000);
   });
 
-  asyncTest('animate with decrement', function() {
+  QUnit.test('animate with color', function(assert) {
+    var done = assert.async(), properties = fabric.Object.prototype.colorProperties,
+        object = new fabric.Object();
+
+    properties.forEach(function (prop, index) {
+      object.set(prop, 'red');
+      object.animate(prop, 'blue');
+      assert.ok(true, 'animate without options does not crash');
+      assert.equal(fabric.runningAnimations.length, index + 1, 'should have 1 registered animation');
+      assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, index + 1, 'animation.target should be set');
+
+      setTimeout(function () {
+        assert.equal(object[prop], new fabric.Color('blue').toRgba(), 'property [' + prop + '] has been animated');
+      }, 1000);
+    });
+
+    setTimeout(function () {
+      done();
+    }, 1000);
+  });
+
+  QUnit.test('animate with decrement', function(assert) {
+    var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
 
     object.animate('left', '-=40');
-    ok(true, 'animate without options does not crash');
+    assert.ok(true, 'animate without options does not crash');
 
     setTimeout(function() {
 
-      equal(Math.round(object.left), -20, 'left has been decreased by 40');
-      start();
-
+      assert.equal(Math.round(object.left), -20, 'left has been decreased by 40');
+      done();
     }, 1000);
   });
 
-  asyncTest('animate with object', function() {
+  QUnit.test('animate with object', function(assert) {
+    var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
 
-    ok(typeof object.animate == 'function');
+    assert.ok(typeof object.animate === 'function');
 
     object.animate({ left: 40});
-    ok(true, 'animate without options does not crash');
+    assert.ok(true, 'animate without options does not crash');
+    assert.equal(fabric.runningAnimations.length, 1, 'should have 1 registered animation');
+    assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, 1, 'animation.target should be set');
 
     setTimeout(function() {
-
-      equal(40, Math.round(object.left));
-      start();
-
+      assert.equal(40, Math.round(object.left));
+      done();
     }, 1000);
   });
 
-  asyncTest('animate multiple properties', function() {
+  QUnit.test('animate multiple properties', function(assert) {
+    var done = assert.async();
     var object = new fabric.Object({ left: 123, top: 124 });
-
     object.animate({ left: 223, top: 224 });
-
     setTimeout(function() {
-
-      equal(223, Math.round(object.get('left')));
-      equal(224, Math.round(object.get('top')));
-
-      start();
-
+      assert.equal(223, Math.round(object.get('left')));
+      assert.equal(224, Math.round(object.get('top')));
+      done();
     }, 1000);
   });
 
-  asyncTest('animate multiple properties with callback', function() {
-
+  QUnit.test('animate multiple properties with callback', function(assert) {
+    var done = assert.async();
     var object = new fabric.Object({ left: 0, top: 0 });
 
     var changedInvocations = 0;
@@ -124,18 +321,49 @@
 
     setTimeout(function() {
 
-      equal(Math.round(object.get('left')), 1);
-      equal(Math.round(object.get('top')), 1);
+      assert.equal(Math.round(object.get('left')), 1);
+      assert.equal(Math.round(object.get('top')), 1);
 
-      //equal(changedInvocations, 2);
-      equal(completeInvocations, 1);
+      assert.ok(changedInvocations > 0);
+      assert.equal(completeInvocations, 1);
 
-      start();
+      done();
 
     }, 1000);
   });
 
-  asyncTest('animate with abort', function() {
+  QUnit.test('animate with list of values', function(assert) {
+    var done = assert.async();
+    var run = false;
+
+    fabric.util.animate({
+      startValue: [1, 2, 3],
+      endValue: [2, 4, 6],
+      byValue: [1, 2, 3],
+      duration: 96,
+      onChange: function(currentValue) {
+        assert.equal(fabric.runningAnimations.length, 1, 'runningAnimations should not be empty');
+        assert.deepEqual(fabric.runningAnimations[0]['currentValue'], currentValue)
+        assert.equal(currentValue.length, 3);
+        currentValue.forEach(function(v) {
+          assert.ok(v > 0, 'confirm values are not invalid numbers');
+        })
+        // Make sure mutations are not kept
+        assert.ok(currentValue[0] <= 2, 'mutating callback values must not persist');
+        currentValue[0] = 200;
+        run = true;
+      },
+      onComplete: function(endValue) {
+        assert.equal(endValue.length, 3);
+        assert.deepEqual(endValue, [2, 4, 6]);
+        assert.equal(run, true, 'something run');
+        done();
+      }
+    })
+  });
+
+  QUnit.test('animate with abort', function(assert) {
+    var done = assert.async();
     var object = new fabric.Object({ left: 123, top: 124 });
 
     var context;
@@ -147,154 +375,200 @@
     });
 
     setTimeout(function() {
-
-      equal(123, Math.round(object.get('left')));
-      equal(124, Math.round(object.get('top')));
-
-      equal(context, object, 'abort should be called in context of an object');
-
-      start();
-
+      assert.equal(123, Math.round(object.get('left')));
+      assert.equal(124, Math.round(object.get('top')));
+      assert.equal(context, object, 'abort should be called in context of an object');
+      done();
     }, 100);
   });
 
-  asyncTest('animate easing easeInQuad', function() {
-    ok(typeof fabric.util.ease.easeInQuad === 'function');
+  QUnit.test('animate with imperative abort', function (assert) {
+    var done = assert.async();
+    var object = new fabric.Object({ left: 123, top: 124 });
+
+    var context;
+    var abort = object._animate('left', 223, {
+      abort: function () {
+        context = this;
+        return false;
+      }
+    });
+
+    assert.ok(typeof abort === 'function');
+    abort();
+
+    setTimeout(function () {
+      assert.equal(123, Math.round(object.get('left')));
+      assert.equal(context, undefined, 'declarative abort should not be called after imperative abort was called');
+      done();
+    }, 100);
+  });
+
+  QUnit.test('animate with delay', function (assert) {
+    var done = assert.async();
+    var object = new fabric.Object({ left: 123, top: 124 });
+    var started = false;
+    var t = new Date();
+    object._animate('left', 223, {
+      onStart: function () {
+        started = true;
+        assert.gte(new Date() - t, 500, 'animation delay');
+        return false;
+      },
+      onComplete: done,
+      delay: 500
+    });
+    assert.ok(started === false);
+  });
+
+  QUnit.test('animate easing easeInQuad', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInQuad === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInQuad
     });
   });
 
-  asyncTest('animate easing easeOutQuad', function() {
-    ok(typeof fabric.util.ease.easeOutQuad === 'function');
+  QUnit.test('animate easing easeOutQuad', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeOutQuad === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeOutQuad
     });
   });
 
-  asyncTest('animate easing easeInOutQuad', function() {
-    ok(typeof fabric.util.ease.easeInOutQuad === 'function');
+  QUnit.test('animate easing easeInOutQuad', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInOutQuad === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInOutQuad
     });
   });
 
-  asyncTest('animate easing easeInCubic', function() {
-    ok(typeof fabric.util.ease.easeInCubic === 'function');
+  QUnit.test('animate easing easeInCubic', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInCubic === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInCubic
     });
   });
 
-  asyncTest('animate easing easeOutCubic', function() {
-    ok(typeof fabric.util.ease.easeOutCubic === 'function');
+  QUnit.test('animate easing easeOutCubic', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeOutCubic === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeOutCubic
     });
   });
 
-  asyncTest('animate easing easeInOutCubic', function() {
-    ok(typeof fabric.util.ease.easeInOutCubic === 'function');
+  QUnit.test('animate easing easeInOutCubic', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInOutCubic === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInOutCubic
     });
   });
 
-  asyncTest('animate easing easeInQuart', function() {
-    ok(typeof fabric.util.ease.easeInQuart === 'function');
+  QUnit.test('animate easing easeInQuart', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInQuart === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInQuart
     });
   });
 
-  asyncTest('animate easing easeOutQuart', function() {
-    ok(typeof fabric.util.ease.easeOutQuart === 'function');
+  QUnit.test('animate easing easeOutQuart', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeOutQuart === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeOutQuart
     });
   });
 
-  asyncTest('animate easing easeInOutQuart', function() {
-    ok(typeof fabric.util.ease.easeInOutQuart === 'function');
+  QUnit.test('animate easing easeInOutQuart', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInOutQuart === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInOutQuart
     });
   });
 
-  asyncTest('animate easing easeInQuint', function() {
-    ok(typeof fabric.util.ease.easeInQuint === 'function');
+  QUnit.test('animate easing easeInQuint', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInQuint === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInQuint
     });
   });
 
-  asyncTest('animate easing easeOutQuint', function() {
-    ok(typeof fabric.util.ease.easeOutQuint === 'function');
+  QUnit.test('animate easing easeOutQuint', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeOutQuint === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeOutQuint
@@ -303,13 +577,14 @@
 
 
   // easeInOutQuint: easeInOutQuint,
-  asyncTest('animate easing easeInOutQuint', function() {
-    ok(typeof fabric.util.ease.easeInOutQuint === 'function');
+  QUnit.test('animate easing easeInOutQuint', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInOutQuint === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInOutQuint
@@ -317,13 +592,14 @@
   });
 
   // easeInSine: easeInSine,
-  asyncTest('animate easing easeInSine', function() {
-    ok(typeof fabric.util.ease.easeInSine === 'function');
+  QUnit.test('animate easing easeInSine', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInSine === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInSine
@@ -331,13 +607,14 @@
   });
 
   // easeOutSine: easeOutSine,
-  asyncTest('animate easing easeOutSine', function() {
-    ok(typeof fabric.util.ease.easeOutSine === 'function');
+  QUnit.test('animate easing easeOutSine', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeOutSine === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeOutSine
@@ -345,13 +622,14 @@
   });
 
   // easeInOutSine: easeInOutSine,
-  asyncTest('animate easing easeInOutSine', function() {
-    ok(typeof fabric.util.ease.easeInOutSine === 'function');
+  QUnit.test('animate easing easeInOutSine', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInOutSine === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInOutSine
@@ -359,13 +637,14 @@
   });
 
   // easeInExpo: easeInExpo,
-  asyncTest('animate easing easeInExpo', function() {
-    ok(typeof fabric.util.ease.easeInExpo === 'function');
+  QUnit.test('animate easing easeInExpo', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInExpo === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInExpo
@@ -373,13 +652,14 @@
   });
 
   // easeOutExpo: easeOutExpo,
-  asyncTest('animate easing easeOutExpo', function() {
-    ok(typeof fabric.util.ease.easeOutExpo === 'function');
+  QUnit.test('animate easing easeOutExpo', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeOutExpo === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeOutExpo
@@ -387,13 +667,14 @@
   });
 
   // easeInOutExpo: easeInOutExpo,
-  asyncTest('animate easing easeInOutExpo', function() {
-    ok(typeof fabric.util.ease.easeInOutExpo === 'function');
+  QUnit.test('animate easing easeInOutExpo', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInOutExpo === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInOutExpo
@@ -401,13 +682,14 @@
   });
 
   // easeInCirc: easeInCirc,
-  asyncTest('animate easing easeInCirc', function() {
-    ok(typeof fabric.util.ease.easeInCirc === 'function');
+  QUnit.test('animate easing easeInCirc', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInCirc === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInCirc
@@ -415,13 +697,14 @@
   });
 
   // easeOutCirc: easeOutCirc,
-  asyncTest('animate easing easeOutCirc', function() {
-    ok(typeof fabric.util.ease.easeOutCirc === 'function');
+  QUnit.test('animate easing easeOutCirc', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeOutCirc === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeOutCirc
@@ -429,13 +712,14 @@
   });
 
   // easeInOutCirc: easeInOutCirc,
-  asyncTest('animate easing easeInOutCirc', function() {
-    ok(typeof fabric.util.ease.easeInOutCirc === 'function');
+  QUnit.test('animate easing easeInOutCirc', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInOutCirc === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInOutCirc
@@ -443,13 +727,14 @@
   });
 
   // easeInElastic: easeInElastic,
-  asyncTest('animate easing easeInElastic', function() {
-    ok(typeof fabric.util.ease.easeInElastic === 'function');
+  QUnit.test('animate easing easeInElastic', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInElastic === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInElastic
@@ -457,13 +742,14 @@
   });
 
   // easeOutElastic: easeOutElastic,
-  asyncTest('animate easing easeOutElastic', function() {
-    ok(typeof fabric.util.ease.easeOutElastic === 'function');
+  QUnit.test('animate easing easeOutElastic', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeOutElastic === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeOutElastic
@@ -471,13 +757,14 @@
   });
 
   // easeInOutElastic: easeInOutElastic,
-  asyncTest('animate easing easeInOutElastic', function() {
-    ok(typeof fabric.util.ease.easeInOutElastic === 'function');
+  QUnit.test('animate easing easeInOutElastic', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInOutElastic === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInOutElastic
@@ -485,13 +772,14 @@
   });
 
   // easeInBack: easeInBack,
-  asyncTest('animate easing easeInBack', function() {
-    ok(typeof fabric.util.ease.easeInBack === 'function');
+  QUnit.test('animate easing easeInBack', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInBack === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInBack
@@ -499,13 +787,14 @@
   });
 
   // easeOutBack: easeOutBack,
-  asyncTest('animate easing easeOutBack', function() {
-    ok(typeof fabric.util.ease.easeOutBack === 'function');
+  QUnit.test('animate easing easeOutBack', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeOutBack === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeOutBack
@@ -513,13 +802,14 @@
   });
 
   // easeInOutBack: easeInOutBack,
-  asyncTest('animate easing easeInOutBack', function() {
-    ok(typeof fabric.util.ease.easeInOutBack === 'function');
+  QUnit.test('animate easing easeInOutBack', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInOutBack === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInOutBack
@@ -527,13 +817,14 @@
   });
 
   // easeInBounce: easeInBounce,
-  asyncTest('animate easing easeInBounce', function() {
-    ok(typeof fabric.util.ease.easeInBounce === 'function');
+  QUnit.test('animate easing easeInBounce', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInBounce === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInBounce
@@ -541,13 +832,14 @@
   });
 
   // easeOutBounce: easeOutBounce,
-  asyncTest('animate easing easeOutBounce', function() {
-    ok(typeof fabric.util.ease.easeOutBounce === 'function');
+  QUnit.test('animate easing easeOutBounce', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeOutBounce === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeOutBounce
@@ -555,13 +847,14 @@
   });
 
   // easeInOutBounce: easeInOutBounce
-  asyncTest('animate easing easeInOutBounce', function() {
-    ok(typeof fabric.util.ease.easeInOutBounce === 'function');
+  QUnit.test('animate easing easeInOutBounce', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.util.ease.easeInOutBounce === 'function');
     var object = new fabric.Object({ left: 0 });
     object.animate({ left: 100 }, {
       onComplete: function() {
-        equal(Math.round(object.left), 100, 'animation ended correctly');
-        start();
+        assert.equal(Math.round(object.left), 100, 'animation ended correctly');
+        done();
       },
       duration: 160,
       easing: fabric.util.ease.easeInOutBounce

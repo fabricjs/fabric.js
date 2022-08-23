@@ -1,0 +1,21 @@
+name: Node.js Package @next
+on:
+  pull_request:
+    branches:
+      - master
+    types: [closed]
+
+jobs:
+  publish-npm:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: node publish-next.js
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}

@@ -1,0 +1,17 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="226" height="90"
+     xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <desc>Example stroke01 - stroke-width</desc>
+
+  <g fill="none" stroke="black">
+    <path stroke-width="1" d="M5 5 l215 0" />
+    <path stroke-width="1" d="M5 9.5 l215 0" />
+    <path stroke-width="2" d="M5 20 l215 0" />
+    <path stroke-width="4" d="M5 40 l215 0" />
+    <path stroke-width="6" d="M5 60 l215 0" />
+    <path style="stroke: #000; stroke-width: 10;" d="M5 80 l215 0" />
+  </g>
+</svg>
