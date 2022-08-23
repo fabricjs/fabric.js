@@ -1041,6 +1041,14 @@ function addAccessors($scope) {
     }
   };
 
+  $scope.getControlsAboveOverlay = function () {
+    return canvas.controlsAboveOverlay;
+  };
+
+  $scope.setControlsAboveOverlay = function (value) {
+    canvas.controlsAboveOverlay = value;
+  };
+
   function initBrushes() {
     if (!fabric.PatternBrush) return;
 
