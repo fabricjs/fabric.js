@@ -33,7 +33,6 @@ export {
     escheresque_ste,
     greyfloral,
     honey_im_subtle,
-    index,
     jail_cell_bars,
     ladybug,
     logo,
