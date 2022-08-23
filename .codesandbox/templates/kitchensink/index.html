@@ -79,13 +79,14 @@
                                 class="btn-object-action btn-outline-primary"><br />
                             <label>
                                 Stroke Uniform:
-                                <input type="checkbox" name="stroke-uniform"
-                                    class="btn-object-action btn-outline-primary" bind-value-to="strokeUniform">
+                                <input type="checkbox" name="stroke-uniform" class="btn-object-action form-check-input"
+                                    bind-value-to="strokeUniform">
                             </label>
                             <div id="text-wrapper" ng-show="getText()">
                                 <div id="text-controls">
                                     <p>Text specific controls</p>
-                                    <textarea bind-value-to="text" rows="3" columns="80"></textarea><br />
+                                    <textarea class="form-control" bind-value-to="text" rows="3"
+                                        columns="80"></textarea><br />
                                     <label for="font-family" style="display:inline-block">Font family:</label>
                                     <select id="font-family" class="btn-object-action btn-outline-primary"
                                         bind-value-to="fontFamily">
@@ -173,8 +174,7 @@
                                     <label>
                                         GraphemeSplit:
                                         <input type="checkbox" name="grapheme-split"
-                                            class="btn-object-action btn-outline-primary"
-                                            bind-value-to="splitByGrapheme">
+                                            class="btn-object-action form-check-input" bind-value-to="splitByGrapheme">
                                     </label>
                                 </div>
                             </div>
@@ -307,109 +307,111 @@
                                     <label>
                                         Cache:
                                         <input type="checkbox" name="object-caching"
-                                            class="btn-object-action btn-outline-primary" bind-value-to="objectCaching">
+                                            class="btn-object-action form-check-input" bind-value-to="objectCaching">
                                     </label>
                                     <label>
                                         No scaling cache:
                                         <input type="checkbox" name="no-scale-cache"
-                                            class="btn-object-action btn-outline-primary" bind-value-to="noScaleCache">
+                                            class="btn-object-action form-check-input" bind-value-to="noScaleCache">
                                     </label><br />
                                     <label>
                                         Controls:
                                         <input type="checkbox" name="has-controls"
-                                            class="btn-object-action btn-outline-primary" bind-value-to="hasControls">
+                                            class="btn-object-action form-check-input" bind-value-to="hasControls">
                                     </label>
                                     <label>
                                         Transparent corners:
                                         <input type="checkbox" name="transparent-corners"
-                                            class="btn-object-action btn-outline-primary"
+                                            class="btn-object-action form-check-input"
                                             bind-value-to="transparentCorners">
                                     </label>
                                     <label>
                                         Borders:
                                         <input type="checkbox" name="has-borders"
-                                            class="btn-object-action btn-outline-primary" bind-value-to="hasBorders">
+                                            class="btn-object-action form-check-input" bind-value-to="hasBorders">
                                     </label>
                                     <label>
                                         Centered Rotation:
                                         <input type="checkbox" name="centered-rotation"
-                                            class="btn-object-action btn-outline-primary"
-                                            bind-value-to="centeredRotation">
+                                            class="btn-object-action form-check-input" bind-value-to="centeredRotation">
                                     </label>
 
                                 </p>
                             </div>
 
-                            <div style="margin-top:10px;">
-                                <button id="send-backwards" class="btn btn-object-action btn-outline-primary"
+                            <div class="m-1">
+                                <button id="send-backwards" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="sendBackwards()">Send
                                     backwards</button>
-                                <button id="send-to-back" class="btn btn-object-action btn-outline-primary"
+                                <button id="send-to-back" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="sendToBack()">Send
                                     to
                                     back</button>
                             </div>
 
-                            <div style="margin-top:4px;">
-                                <button id="bring-forward" class="btn btn-object-action btn-outline-primary"
+                            <div class="m-1">
+                                <button id="bring-forward" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="bringForward()">Bring
                                     forwards</button>
-                                <button id="bring-to-front" class="btn btn-object-action btn-outline-primary"
+                                <button id="bring-to-front" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="bringToFront()">Bring to
                                     front</button>
                             </div>
 
-                            <div style="margin-top:10px;">
-                                <button id="gradientify" class="btn btn-object-action btn-outline-primary"
+                            <div class="m-1">
+                                <button id="gradientify" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="gradientify()">
                                     Gradientify
                                 </button>
-                                <button id="shadowify" class="btn btn-object-action btn-outline-primary"
+                                <button id="shadowify" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="shadowify()">
                                     Shadowify
                                 </button>
-                                <button id="patternify" class="btn btn-object-action btn-outline-primary"
+                                <button id="patternify" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="patternify()">
                                     Patternify
                                 </button>
-                                <button id="clip" class="btn btn-object-action btn-outline-primary"
+                                <button id="clip" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="clip(false)">
                                     Clip
                                 </button>
-                                <button id="clip-inverted" class="btn btn-object-action btn-outline-primary"
+                                <button id="clip-inverted" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="clip(true)">
                                     Clip Inverted
                                 </button>
-                                <button id="play" class="btn btn-object-action btn-outline-primary" ng-click="play()">
+                                <button id="play" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="play()">
                                     Play
                                 </button>
-                                <br />
-                                <button id="patternfy-repeatX" class="btn btn-object-action btn-outline-primary"
+                            </div>
+                            <div class="m-1">
+                                <button id="patternfy-repeatX" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="setPatternStyle('repeat')">
                                     Pattern repeat
                                 </button>
-                                <button id="patternfy-repeatX" class="btn btn-object-action btn-outline-primary"
+                                <button id="patternfy-repeatX" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="setPatternStyle('repeat-x')">
                                     Pattern repeat-x
                                 </button>
-                                <button id="patternfy-repeatX" class="btn btn-object-action btn-outline-primary"
+                                <button id="patternfy-repeatX" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="setPatternStyle('repeat-y')">
                                     Pattern repeat-y
                                 </button>
-                                <button id="patternfy-repeatX" class="btn btn-object-action btn-outline-primary"
+                                <button id="patternfy-repeatX" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="setPatternStyle('no-repeat')">
                                     Pattern repeat-none
                                 </button>
-                                <br />
-                                <button id="resize-filter" class="btn btn-object-action btn-outline-primary"
+                            </div>
+                            <div class="m-1">
+                                <button id="resize-filter" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="addResizeFilter()">
                                     Add Resize filter
                                 </button>
-                                <button id="invert-filter" class="btn btn-object-action btn-outline-primary"
+                                <button id="invert-filter" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="addInvertFilter()">
                                     set Invert filter
                                 </button>
-                                <button id="invert-filter" class="btn btn-object-action btn-outline-primary"
+                                <button id="invert-filter" class="btn btn-object-action btn-outline-primary m-1"
                                     ng-click="addContrastFilter()">
                                     set Contrast filter
                                 </button>
@@ -555,7 +557,7 @@
                     </div>
 
                     <div class="tab-pane" id="load-svg-pane" role="tabpanel" aria-labelledby="tab-button-load-svg">
-                        <textarea id="svg-console" bind-value-to="consoleSVG">
+                        <textarea id="svg-console" class="form-control mb-4" bind-value-to="consoleSVG">
                           </textarea>
                         <button type="button" class="btn btn-outline-primary" ng-click="loadSVG()">
                             Load as Group
@@ -566,13 +568,13 @@
                     </div>
 
                     <div class="tab-pane" id="execute-code" role="tabpanel" aria-labelledby="tab-button-execute">
-                        <textarea id="canvas-console" bind-value-to="console">
+                        <textarea id="canvas-console" class="form-control mb-4" bind-value-to="console">
                             </textarea>
                         <button type="button" class="btn btn-outline-primary" ng-click="execute()">Execute</button>
                     </div>
 
                     <div class="tab-pane" id="json-inout" role="tabpanel" aria-labelledby="tab-button-json">
-                        <textarea id="json-console" bind-value-to="consoleJSON">
+                        <textarea id="json-console" class="form-control mb-4" bind-value-to="consoleJSON">
                           </textarea>
                         <button type="button" class="btn btn-outline-primary" ng-click="loadJSON()">
                             Load
