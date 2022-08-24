@@ -559,11 +559,16 @@ const sandbox = program
 const templates = fs.readdirSync(codesandboxTemplatesDir);
 
 sandbox
-    .command('deploy [path]')
+    .command('deploy')
+    .argument('[path]', 'directory to upload')
     .description('deploy a sandbox to codesandbox')
-    .addOption(new commander.Option('-t, --template <template>', 'template to use')
-        .choices(templates).default('next', '"next" template`'))
-    .action(async (deploy, { template }) => {
+    .addOption(new commander.Option('-t, --template <template>', 'template to use instead of a "path"').choices(templates))
+    .action(async (deploy, { template }, context) => {
+        if (!deploy && !template) {
+            console.log(chalk.red(`provide "path" or "--template"`));
+            context.help({ error: true });
+            return;
+        }
         const uri = await createCodeSandbox(deploy || path.resolve(codesandboxTemplatesDir, template));
         console.log(chalk.yellow(`> created codesandbox ${uri}`));
     });
