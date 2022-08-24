@@ -25,14 +25,14 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    * @type Number
    * @default 0
    */
-  offsetX
+  offsetX = 0
 
   /**
    * Vertical offset for aligning gradients coming from SVG when outside pathgroups
    * @type Number
    * @default 0
    */
-  offsetY
+  offsetY = 0
 
   /**
    * A transform matrix to apply to the gradient before painting.
