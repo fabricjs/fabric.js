@@ -75,6 +75,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.2",
+    "@rollup/plugin-json": "^4.1.0",
     "@types/fs-extra": "^9.0.13",
     "@types/lodash": "^4.14.180",
     "@types/node": "^17.0.21",

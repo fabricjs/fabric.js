@@ -1,4 +1,5 @@
 //@ts-nocheck
+import { VERSION } from './constants';
 import { Point } from './point.class';
 import { removeFromArray } from './util/internals';
 
@@ -1027,7 +1028,7 @@ import { removeFromArray } from './util/internals';
     _toObjectMethod: function (methodName, propertiesToInclude) {
 
       var clipPath = this.clipPath, data = {
-        version: fabric.version,
+        version: VERSION,
         objects: this._toObjects(methodName, propertiesToInclude),
       };
       if (clipPath && !clipPath.excludeFromExport) {
@@ -1224,7 +1225,7 @@ import { removeFromArray } from './util/internals';
         'height="', height, '" ',
         viewBox,
         'xml:space="preserve">\n',
-        '<desc>Created with Fabric.js ', fabric.version, '</desc>\n',
+        '<desc>Created with Fabric.js ', VERSION, '</desc>\n',
         '<defs>\n',
         this.createSVGFontFacesMarkup(),
         this.createSVGRefElementsMarkup(),
