@@ -4,7 +4,7 @@ export type GradientUnits = 'pixels' | 'percentage';
 
 export type GradientType = 'linear' | 'radial';
 
-export type GradientValue = number | Percent | string;
+export type GradientCoordValue = number | Percent | string;
 
 export type ColorStop = {
   color: string;
@@ -12,7 +12,7 @@ export type ColorStop = {
   opacity?: number;
 };
 
-export type LinearGradientCoords<T extends GradientValue> = {
+export type LinearGradientCoords<T extends GradientCoordValue> = {
   /**
    * X coordiante of the first point
    */
@@ -31,7 +31,7 @@ export type LinearGradientCoords<T extends GradientValue> = {
   y2: T;
 };
 
-export type RadialGradientCoords<T extends GradientValue> = {
+export type RadialGradientCoords<T extends GradientCoordValue> = {
   /**
    * X coordiante of the first focal point
    */
