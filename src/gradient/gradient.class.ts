@@ -5,6 +5,7 @@ import { Color } from "../color";
 import { iMatrix } from "../constants";
 import { parseTransformAttribute } from "../parser/parseTransformAttribute";
 import { matrixToSVG, populateWithProperties } from "../util";
+import { linearDefaultCoords, radialDefaultCoords } from "./constants";
 import { parseColorStops, parseCoords, parseGradientUnits, parseType } from "./parser";
 import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnits, SVGOptions } from "./typedefs";
 
@@ -86,18 +87,9 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.coords = {
-      x1: 0,
-      y1: 0,
-      x2: 0,
-      y2: 0,
-      ...(
-        this.type === 'radial' ?
-          {
-            r1: 0,
-            r2: 0,
-          } :
-          {}
-      ),
+      ...this.type === 'radial' ?
+        radialDefaultCoords :
+        linearDefaultCoords,
       ...coords
     } as GradientCoords<T>;
     this.colorStops = colorStops.slice();
