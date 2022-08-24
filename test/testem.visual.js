@@ -15,8 +15,6 @@ module.exports = {
     'test/lib/pixelmatch.js',
     'test/lib/visualTestLoop.js',
     'test/lib/visualCallbackQunit.js',
-    'test/visual/golden/*',
-    'test/visual/assets/*',
     ...(process.env.TEST_FILES ? process.env.TEST_FILES.split(',') : ['test/visual/*.js'])
   ],
   routes: {
