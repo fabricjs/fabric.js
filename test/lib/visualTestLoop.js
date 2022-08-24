@@ -29,16 +29,6 @@
       options.height = opts.height;
     }
     return new fabric[fabricClass](null, options);
-  };
-
-  function getAbsolutePath(path) {
-    var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) { return path; };
-    var imgEl = fabric.document.createElement('img');
-    imgEl.src = path;
-    var src = imgEl.src;
-    imgEl = null;
-    return src;
   }
 
   function localPath(path, filename) {
