@@ -1,8 +1,6 @@
 import { clamp } from "../util";
 import { ifNaN } from "../util/internals";
 
-// export const RE_PERCENT = /%$/;
-
 const RE_PERCENT = /^(\d+\.\d+)%|(\d+)%$/;
 
 export function isPercent(value: string | null) {
