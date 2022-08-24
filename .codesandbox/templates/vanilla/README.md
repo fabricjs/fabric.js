@@ -1,6 +1,6 @@
 # Fabric Vanilla.js Sandbox
 
-A `Vanilla.js` app for reproducing `fabric` issues and creating examples.
+A [`parcel`](https://parceljs.org/) app for reproducing `fabric` issues and creating examples.
 
 ## Reproducing
 
