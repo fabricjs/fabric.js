@@ -1,3 +1,4 @@
+import { ifNaN } from "../util/internals";
 import { capValue } from "../util/misc/capValue";
 
 const RE_PERCENT = /^(\d+\.\d+)%|(\d+)%$/;
@@ -12,11 +13,11 @@ export function isPercent(value: string | null) {
  * @param valueIfNaN 
  * @returns ∈ [0, 1]
  */
-export function parsePercent(value: string | number | null | undefined) {
+export function parsePercent(value: string | number | null | undefined, valueIfNaN?: number) {
     const parsed = typeof value === 'number' ?
         value :
         typeof value === 'string' ?
             parseFloat(value) / (isPercent(value) ? 100 : 1) :
             NaN;
-    return capValue(0, parsed, 1)
+    return capValue(0, ifNaN(parsed, valueIfNaN), 1)
 }
