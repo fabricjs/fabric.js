@@ -1,6 +1,6 @@
 # Fabric Next.js Sandbox
 
-A `Next.js` app for reproducing `fabric` issues and creating examples.
+A [`Next.js`](https://nextjs.org/) app for reproducing `fabric` issues and creating examples.
 `Next.js` is built with both client and server code so we can test `fabric` in the browser and on node in a single example.
 
 ## Reproducing

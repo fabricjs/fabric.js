@@ -26,4 +26,4 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm run build -- -f -x gestures,accessors
-    - run: npm run test -- --suite visual
+    - run: npm run test -- -s visual -p 8080 -c node
