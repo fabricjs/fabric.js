@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { degreesToRadians } from '../util';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 
 
 export function skewMatrix(matrix, args, pos) {

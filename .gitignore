@@ -10,4 +10,4 @@ before_commit
 .idea/
 /dist/fabric.require.js
 /dist/fabric.min.js.gz
-/scripts/cli_cache.json
+/cli_output/

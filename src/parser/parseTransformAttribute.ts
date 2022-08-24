@@ -1,7 +1,8 @@
 //@ts-nocheck
 import {  iMatrix } from '../constants';
 import { commaWsp,reNum } from './constants';
-import { degreesToRadians, multiplyTransformMatrices } from '../util';
+import { multiplyTransformMatrices } from '../util/misc/matrix';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { rotateMatrix } from './rotateMatrix';
 import { scaleMatrix } from './scaleMatrix';
 import { skewMatrix } from './skewMatrix';
