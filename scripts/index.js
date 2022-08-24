@@ -589,9 +589,8 @@ sandbox
     .command('build')
     .description('build and start a sandbox')
     .addArgument(new commander.Argument('<template>', 'template to use').choices(templates))
-    .argument('[destination]', 'build destination')
+    .argument('<destination>', 'build destination')
     .action((template, destination) => {
-        destination = destination || path.resolve(wd, '.fabric', template);
         fs.copySync(path.resolve(codesandboxTemplatesDir, template), destination);
         console.log(`${chalk.blue(`> building ${chalk.bold(template)} sandbox`)} at ${chalk.cyanBright(destination)}`);
         console.log(chalk.blue('\n> linking fabric'));
