@@ -147,7 +147,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
       transform = this.gradientTransform ? this.gradientTransform.concat() : iMatrix.concat(),
       gradientUnits = this.gradientUnits === 'pixels' ? 'userSpaceOnUse' : 'objectBoundingBox';
     // colorStops must be sorted ascending
-    let colorStops = this.colorStops.sort((a, b) => {
+    const colorStops = this.colorStops.concat().sort((a, b) => {
       return a.offset - b.offset;
     });
 
@@ -202,7 +202,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
       );
       if (needsSwap) {
         // svg goes from internal to external radius. if radius are inverted, swap color stops.
-        colorStops = colorStops.reverse();
+        colorStops.reverse(); //  mutates array
         colorStops.forEach(colorStop => {
           colorStop.offset = 1 - colorStop.offset;
         });
