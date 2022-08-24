@@ -33,7 +33,6 @@
   };
 
   visualCallback.prototype.testDone = function (details) {
-    console.log(details, this.currentArgs.enabled)
     if (window && document && this.currentArgs.enabled) {
       var fabricCanvasDataRef = this.currentArgs.fabric;
       var ouputImageDataRef = this.currentArgs.diff;
