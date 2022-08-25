@@ -12,8 +12,7 @@ import { BaseBrush } from "./base_brush.class";
  * @returns {boolean}
  */
 export function isEmptySVGPath(pathData) {
-  var pathString = joinPath(pathData);
-  return pathString === 'M 0 0 Q 0 0 0 0 L 0 0';
+  return joinPath(pathData) === 'M 0 0 Q 0 0 0 0 L 0 0';
 }
 
 /**
@@ -46,13 +45,15 @@ export class PencilBrush extends BaseBrush {
    */
   straightLineKey = 'shiftKey'
 
+  private _points: Point[]
+
   /**
    * Constructor
    * @param {Canvas} canvas
    * @return {PencilBrush} Instance of a pencil brush
    */
   constructor(canvas) {
-    this.canvas = canvas;
+    super(canvas);
     this._points = [];
   }
 
@@ -65,7 +66,7 @@ export class PencilBrush extends BaseBrush {
    * @param {Object} pointer
    */
   static _drawSegment(ctx, p1, p2) {
-    var midPoint = p1.midPointFrom(p2);
+    const midPoint = p1.midPointFrom(p2);
     ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
     return midPoint;
   }
@@ -106,7 +107,7 @@ export class PencilBrush extends BaseBrush {
         this._render();
       }
       else {
-        var points = this._points, length = points.length, ctx = this.canvas.contextTop;
+        const points = this._points, length = points.length, ctx = this.canvas.contextTop;
         // draw the curve update
         this._saveAndTransform(ctx);
         if (this.oldEnd) {
@@ -139,7 +140,7 @@ export class PencilBrush extends BaseBrush {
    */
   _prepareForDrawing(pointer) {
 
-    var p = Point.toPoint(pointer);
+    const p = new Point(pointer);
 
     this._reset();
     this._addPoint(p);
@@ -178,7 +179,7 @@ export class PencilBrush extends BaseBrush {
    * @param {Object} pointer Actual mouse position related to the canvas.
    */
   _captureDrawingPath(pointer) {
-    var pointerPoint = Point.toPoint(pointer);
+    const pointerPoint = new Point(pointer);
     return this._addPoint(pointerPoint);
   }
 
@@ -188,7 +189,7 @@ export class PencilBrush extends BaseBrush {
    * @param {CanvasRenderingContext2D} [ctx]
    */
   _render(ctx) {
-    var i, len,
+    let i, len,
       p1 = this._points[0],
       p2 = this._points[1];
     ctx = ctx || this.canvas.contextTop;
@@ -199,9 +200,9 @@ export class PencilBrush extends BaseBrush {
     //then we should be drawing a dot. A path isn't drawn between two identical dots
     //that's why we set them apart a bit
     if (this._points.length === 2 && p1.x === p2.x && p1.y === p2.y) {
-      var width = this.width / 1000;
-      p1 = Point.toPoint(p1);
-      p2 = Point.toPoint(p2);
+      const width = this.width / 1000;
+      p1 = new Point(p1);
+      p2 = new Point(p2);
       p1.x -= width;
       p2.x += width;
     }
@@ -228,7 +229,7 @@ export class PencilBrush extends BaseBrush {
    * @return {(string|number)[][]} SVG path commands
    */
   convertPointsToSVGPath(points) {
-    var correction = this.width / 1000;
+    const correction = this.width / 1000;
     return getSmoothPathFromPoints(points, correction);
   }
 
@@ -238,7 +239,7 @@ export class PencilBrush extends BaseBrush {
    * @return {Path} Path to add on canvas
    */
   createPath(pathData) {
-    var path = new Path(pathData, {
+    const path = new Path(pathData, {
       fill: null,
       stroke: this.color,
       strokeWidth: this.width,
@@ -262,7 +263,7 @@ export class PencilBrush extends BaseBrush {
     if (points.length <= 2) {
       return points;
     }
-    var zoom = this.canvas.getZoom(), adjustedDistance = Math.pow(distance / zoom, 2),
+    let zoom = this.canvas.getZoom(), adjustedDistance = Math.pow(distance / zoom, 2),
       i, l = points.length - 1, lastPoint = points[0], newPoints = [lastPoint],
       cDistance;
     for (i = 1; i < l - 1; i++) {
@@ -286,12 +287,12 @@ export class PencilBrush extends BaseBrush {
    * and add it to the fabric canvas.
    */
   _finalizeAndAddPath() {
-    var ctx = this.canvas.contextTop;
+    const ctx = this.canvas.contextTop;
     ctx.closePath();
     if (this.decimate) {
       this._points = this.decimatePoints(this._points, this.decimate);
     }
-    var pathData = this.convertPointsToSVGPath(this._points);
+    const pathData = this.convertPointsToSVGPath(this._points);
     if (isEmptySVGPath(pathData)) {
       // do not create 0 width/height paths, as they are
       // rendered inconsistently across browsers
@@ -301,7 +302,7 @@ export class PencilBrush extends BaseBrush {
       return;
     }
 
-    var path = this.createPath(pathData);
+    const path = this.createPath(pathData);
     this.canvas.clearContext(this.canvas.contextTop);
     this.canvas.fire('before:path:created', { path: path });
     this.canvas.add(path);
