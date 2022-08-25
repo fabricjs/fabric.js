@@ -10,4 +10,4 @@ dist/all.min.js.gz
 dist/fabric.require.js
 dist/fabric.min.js.gz
 .DS_Store
-.codesandbox
+.codesandbox/
