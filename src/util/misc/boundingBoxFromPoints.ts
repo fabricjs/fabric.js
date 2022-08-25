@@ -32,4 +32,4 @@ export const makeBoundingBoxFromPoints = (points: Point[], transform: TMat2D) =>
     width,
     height,
   };
-},
+};
