@@ -1,8 +1,8 @@
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-import { iMatrix } from './src/constants';
+import { iMatrix, VERSION } from './src/constants';
 
-var fabric = fabric || { version: '5.1.0' };
+var fabric = fabric || { version: VERSION };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
