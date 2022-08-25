@@ -267,7 +267,7 @@ async function test(suite, tests, options = {}) {
         '-l', options.context.map(_.upperFirst).join(',')
     ];
 
-    cp.spawn(args.join(' '), {
+    cp.execSync(args.join(' '), {
         cwd: wd,
         env: {
             ...process.env,
@@ -281,11 +281,8 @@ async function test(suite, tests, options = {}) {
         },
         shell: true,
         stdio: 'inherit',
-        // detached: options.dev
+        detached: options.dev
     })
-        .on('exit', function (code) {
-           process.exit(code)
-        });
 
     if (options.launch) {
         // open localhost
