@@ -26,7 +26,7 @@ export abstract class BaseBrush {
    * Shadow object representing shadow of this shape.
    * <b>Backwards incompatibility note:</b> This property replaces "shadowColor" (String), "shadowOffsetX" (Number),
    * "shadowOffsetY" (Number) and "shadowBlur" (Number) since v1.2.12
-   * @type fabric.Shadow
+   * @type Shadow
    * @default
    */
   shadow: Shadow | null = null

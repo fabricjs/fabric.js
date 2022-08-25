@@ -259,8 +259,8 @@ export class PencilBrush extends BaseBrush {
 
   /**
    * On mouseup after drawing the path on contextTop canvas
-   * we use the points captured to create an new fabric path object
-   * and add it to the fabric canvas.
+   * we use the points captured to create an new Path object
+   * and add it to the canvas.
    */
   _finalizeAndAddPath() {
     const ctx = this.canvas.contextTop;
