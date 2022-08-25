@@ -36,7 +36,6 @@ module.exports = {
     'Node',
     'Firefox'
   ],
-  fail_on_zero_tests: true,
   tap_failed_tests_only: !Number(process.env.VERBOSE) || false,
   ignore_missing_launchers: false,
   qunit: {
