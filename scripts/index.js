@@ -3,6 +3,10 @@ const fs = require('fs-extra');
 const os = require('os');
 const _ = require('lodash');
 const path = require('path');
+/**
+ * **IMPORTANT**
+ * use with caution, ci depends on the process' exit code to determine failure
+ */
 const cp = require('child_process');
 const inquirer = require('inquirer');
 const fuzzy = require('fuzzy');
