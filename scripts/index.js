@@ -127,7 +127,8 @@ function build(options = {}) {
         const { name, base, ...rest } = path.parse(path.resolve(options.output));
         minDest = path.format({ name: `${name}.min`, ...rest });
     }
-    return cp.spawn(args.join(' '), {
+    // use `execSync` so exit codes are propagated to the process and reported to ci
+    cp[options.watch ? 'spawn' : 'execSync'](args.join(' '), {
         stdio: 'inherit',
         shell: true,
         cwd: wd,
@@ -274,6 +275,7 @@ async function test(suite, tests, options = {}) {
         cp.exec([start, url].join(' '));
     }
 
+    // use `execSync` so exit codes are propagated to the process and reported to ci
     cp[options.dev ? 'spawn' : 'execSync'](args.join(' '), {
         cwd: wd,
         env: {
