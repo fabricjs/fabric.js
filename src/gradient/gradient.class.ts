@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { Color } from "./color";
+import { Color } from "../color";
 
 
 (function(global) {

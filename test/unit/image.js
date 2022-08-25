@@ -647,7 +647,7 @@
       y: '0',
       width: '70',
       height: '170',
-      preserveAspectRatio: 'meet xMidYMid',
+      preserveAspectRatio: 'xMidYMid meet',
       'xlink:href': IMAGE_DATA_URL
     });
 
@@ -676,7 +676,7 @@
       y: '0',
       width: '70',
       height: '170',
-      preserveAspectRatio: 'meet xMidYMax',
+      preserveAspectRatio: 'xMidYMax meet',
       'xlink:href': IMAGE_DATA_URL
     });
 
@@ -705,7 +705,7 @@
       y: '0',
       width: '70',
       height: '170',
-      preserveAspectRatio: 'meet xMidYMin',
+      preserveAspectRatio: 'xMidYMin meet',
       'xlink:href': IMAGE_DATA_URL
     });
 
@@ -734,7 +734,7 @@
       y: '0',
       width: '140',
       height: '85',
-      preserveAspectRatio: 'meet xMinYMin',
+      preserveAspectRatio: 'xMinYMin meet',
       'xlink:href': IMAGE_DATA_URL
     });
 
@@ -763,7 +763,7 @@
       y: '0',
       width: '140',
       height: '85',
-      preserveAspectRatio: 'meet xMidYMin',
+      preserveAspectRatio: 'xMidYMin meet',
       'xlink:href': IMAGE_DATA_URL
     });
 
@@ -792,7 +792,7 @@
       y: '0',
       width: '140',
       height: '85',
-      preserveAspectRatio: 'meet xMaxYMin',
+      preserveAspectRatio: 'xMaxYMin meet',
       'xlink:href': IMAGE_DATA_URL
     });
 
