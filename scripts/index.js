@@ -1,12 +1,22 @@
 #!/usr/bin/env node
+
+/**
+ * Dearest fabric maintainer,
+ * This file contains the cli logic, which governs most of the available commands fabric has to offer.
+ * 
+ * **IMPORTANT**
+ * CI uses these commands.
+ * In order for CI to correctly report the result of the command, the process must receive a correct exit code
+ * meaning that if you `spawn` a process makes sure to listen to the `exit` event and terminate the main process with the relevant code.
+ * Failing to do so will make CI report a false positive.
+ */
+
+
+
 const fs = require('fs-extra');
 const os = require('os');
 const _ = require('lodash');
 const path = require('path');
-/**
- * **IMPORTANT**
- * use with caution, ci depends on the process' exit code to determine failure
- */
 const cp = require('child_process');
 const inquirer = require('inquirer');
 const fuzzy = require('fuzzy');
