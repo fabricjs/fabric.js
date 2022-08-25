@@ -121,14 +121,13 @@ inquirer.registerPrompt('test-selection', ICheckbox);
 
 
 function build(options = {}) {
-    const args = ['rollup', '-c', options.watch ? '--watch' : ''];
+    const cmd = ['rollup', '-c', options.watch ? '--watch' : ''].join(' ');
     let minDest;
     if (options.output && !options.fast) {
         const { name, base, ...rest } = path.parse(path.resolve(options.output));
         minDest = path.format({ name: `${name}.min`, ...rest });
     }
-    // use `execSync` so exit codes are propagated to the process and reported to ci
-    cp[options.watch ? 'spawn' : 'execSync'](args.join(' '), {
+    const processOptions = {
         stdio: 'inherit',
         shell: true,
         cwd: wd,
@@ -139,7 +138,21 @@ function build(options = {}) {
             BUILD_OUTPUT: options.output,
             BUILD_MIN_OUTPUT: minDest
         },
-    });
+    }
+    if (options.watch) {
+        cp.spawn(cmd, processOptions);
+    }
+    else {
+        try {
+            cp.execSync(cmd, processOptions);
+        } catch (error) {
+            // minimal logging, no need for stack trace
+            console.error(error.message);
+            // inform ci
+            process.exit(1);
+        }
+    }
+    
 }
 
 function startWebsite() {
