@@ -260,14 +260,6 @@ async function test(suite, tests, options = {}) {
 
     }
 
-    const args = [
-        'testem',
-        !options.dev ? 'ci' : '',
-        '-p', port,
-        '-f', `test/testem.${suite}.js`,
-        '-l', options.context.map(_.upperFirst).join(',')
-    ];
-
     if (options.launch) {
         // open localhost
         const url = `http://localhost:${port}/`;
@@ -275,8 +267,13 @@ async function test(suite, tests, options = {}) {
         cp.exec([start, url].join(' '));
     }
 
-    // use `execSync` so exit codes are propagated to the process and reported to ci
-    cp[options.dev ? 'spawn' : 'execSync'](args.join(' '), {
+    const processCmdOptions = [
+        '-p', port,
+        '-f', `test/testem.${suite}.js`,
+        '-l', options.context.map(_.upperFirst).join(',')
+    ];
+
+    const processOptions = {
         cwd: wd,
         env: {
             ...process.env,
@@ -290,8 +287,23 @@ async function test(suite, tests, options = {}) {
         },
         shell: true,
         stdio: 'inherit',
-        detached: options.dev
-    });
+    }
+
+    if (options.dev) {
+        cp.spawn(['testem', ...processCmdOptions].join(' '), {
+            ...processOptions,
+            detached: true
+        });
+    }
+    else {
+        try {
+            cp.execSync(['testem', 'ci', ...processCmdOptions].join(' '), processOptions);
+        } catch (error) {
+            console.error(error.message);
+            // inform ci
+            process.exit(1);
+        }
+    }
 }
 
 /**
