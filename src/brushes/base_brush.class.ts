@@ -1,8 +1,12 @@
-//@ts-nocheck
-
 import { fabric } from "../../HEADER";
 import { Color } from "../color";
-import { type Point } from "../point.class";
+import { Point } from "../point.class";
+
+/**
+ * @todo remove transient
+ */
+type Shadow = any;
+type Canvas = any;
 
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
@@ -30,21 +34,21 @@ export abstract class BaseBrush {
    * @type fabric.Shadow
    * @default
    */
-  shadow = null
+  shadow: Shadow | null = null
 
   /**
    * Line endings style of a brush (one of "butt", "round", "square")
    * @type String
    * @default
    */
-  strokeLineCap = 'round'
+  strokeLineCap: CanvasLineCap = 'round'
 
   /**
    * Corner style of a brush (one of "bevel", "round", "miter")
    * @type String
    * @default
    */
-  strokeLineJoin = 'round'
+  strokeLineJoin: CanvasLineJoin = 'round'
 
   /**
    * Maximum miter length (used for strokeLineJoin = "miter") of a brush's
@@ -58,7 +62,7 @@ export abstract class BaseBrush {
    * @type Array
    * @default
    */
-  strokeDashArray = null
+  strokeDashArray: number[] | null = null
 
   /**
    * When `true`, the free drawing is limited to the whiteboard size. Default to false.
@@ -71,9 +75,9 @@ export abstract class BaseBrush {
   /**
    * @todo add type
    */
-  canvas
+  canvas: Canvas
 
-  constructor(canvas) {
+  constructor(canvas: Canvas) {
     this.canvas = canvas;
   }
 
