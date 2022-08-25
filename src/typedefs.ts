@@ -39,3 +39,12 @@ export const enum SupportedSVGUnit {
 }
 
 export type TMat2D = [number, number, number, number, number, number];
+
+export type Event<E extends Event = MouseEvent | TouchEvent> = {
+  e: E
+}
+export type TransformEvent<T> = Event & T & {
+  transform: {
+    target: any
+  }
+}
