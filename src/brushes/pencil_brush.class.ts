@@ -166,14 +166,6 @@ export class PencilBrush extends BaseBrush {
   }
 
   /**
-   * @private
-   * @param {Point} pointer Actual mouse position related to the canvas.
-   */
-  _captureDrawingPath(pointer: Point) {
-    return this._addPoint(pointer);
-  }
-
-  /**
    * Draw a smooth path on the topCanvas using quadraticCurveTo
    * @private
    * @param {CanvasRenderingContext2D} [ctx]
