@@ -2053,7 +2053,7 @@
       "x": 164.343,
       "y": 23.064
     }
-  ];
+  ].map(p => new fabric.Point(p));;
 
   var tests = [];
 
