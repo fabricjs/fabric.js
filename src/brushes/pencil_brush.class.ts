@@ -171,8 +171,7 @@ export class PencilBrush extends BaseBrush {
    * @param {CanvasRenderingContext2D} [ctx]
    */
   _render(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
-    let i, len,
-      p1 = this._points[0],
+    let p1 = this._points[0],
       p2 = this._points[1];
     this._saveAndTransform(ctx);
     ctx.beginPath();
@@ -187,7 +186,7 @@ export class PencilBrush extends BaseBrush {
     }
     ctx.moveTo(p1.x, p1.y);
 
-    for (i = 1, len = this._points.length; i < len; i++) {
+    for (let i = 1; i < this._points.length; i++) {
       // we pick the point between pi + 1 & pi + 2 as the
       // end point and p1 as our control point.
       PencilBrush.drawSegment(ctx, p1, p2);
