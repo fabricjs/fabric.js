@@ -55,7 +55,6 @@ async function createCodeSandbox(appPath) {
             };
         } else {
             const { name, base, ...rest } = path.parse(filePath);
-            console.log(base)
             const sandboxVersion = path.format({ ...rest, name: `${name}.codesandbox` });
             const finalVersion = fs.existsSync(sandboxVersion) ? sandboxVersion : filePath;
             files[fileName] = { content: fs.readFileSync(finalVersion).toString() };
