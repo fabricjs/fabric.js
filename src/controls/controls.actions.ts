@@ -1,5 +1,7 @@
 //@ts-nocheck
-import { Point } from './point.class';
+
+import { Point } from '../point.class';
+import { renderCircleControl, renderSquareControl } from './controls.render';
 
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
@@ -743,6 +745,8 @@ import { Point } from './point.class';
   controls.wrapWithFixedAnchor = wrapWithFixedAnchor;
   controls.wrapWithFireEvent = wrapWithFireEvent;
   controls.getLocalPoint = getLocalPoint;
+  controls.renderCircleControl = renderCircleControl;
+  controls.renderSquareControl = renderSquareControl;
   fabric.controlsUtils = controls;
 
 })(typeof exports !== 'undefined' ? exports : window);

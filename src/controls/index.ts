@@ -1,4 +1,4 @@
 import './control.class';
 import './controls.actions';
-import './controls.render';
+export * from  './controls.render';
 import './default_controls';
