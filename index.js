@@ -23,9 +23,6 @@ import './src/elements_parser'; // optional parser
 import './src/point.class';
 import './src/intersection.class';
 import './src/color';
-import './src/controls.actions'; // optional interaction
-import './src/controls.render'; // optional interaction
-import './src/control.class'; // optional interaction
 import './src/gradient'; // optional gradient
 import './src/pattern.class'; // optional pattern
 import './src/shadow.class'; // optional shadow
@@ -92,6 +89,6 @@ import './src/mixins/itext_click_behavior.mixin'; // optional itext
 import './src/mixins/itext_key_behavior.mixin'; // optional itext
 import './src/mixins/itext.svg_export'; // optional itext
 import './src/shapes/textbox.class'; // optional textbox
-import './src/mixins/default_controls'; // optional interaction
+import './src/controls'; // optional interaction
 //  extends fabric.StaticCanvas, fabric.Canvas, fabric.Object, depends on fabric.PencilBrush and fabric.Rect
 // import './src/mixins/eraser_brush.mixin'; // optional erasing
