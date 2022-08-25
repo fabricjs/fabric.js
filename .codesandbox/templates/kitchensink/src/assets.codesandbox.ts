@@ -2,7 +2,7 @@
 // 1. glob importing isn't supported since parcelrc is not read by codesandbox (at 08/2022)
 // 2. assets are too heavy
 
-const BASE_URL ='https://cdn.jsdelivr.net/gh/fabricjs/fabric.js@vkitchensink/.codesandbox/templates/kitchensink/assets/images';
+const BASE_URL ='https://cdn.jsdelivr.net/gh/fabricjs/fabric.js/.codesandbox/templates/kitchensink/assets/images';
 
 export const images = {
     ladybug: `${BASE_URL}/ladybug.png`,
