@@ -267,7 +267,7 @@ async function test(suite, tests, options = {}) {
         '-l', options.context.map(_.upperFirst).join(',')
     ];
 
-    cp.spawn(args.join(' '), {
+    cp.spawnSync(args.join(' '), {
         cwd: wd,
         env: {
             ...process.env,
@@ -282,7 +282,10 @@ async function test(suite, tests, options = {}) {
         shell: true,
         stdio: 'inherit',
         detached: options.dev
-    });
+    })
+        // .on('exit', function (code) {
+        //     console.log('Child process exited with exit code ' + code);
+        // });
 
     if (options.launch) {
         // open localhost
