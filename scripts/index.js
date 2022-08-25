@@ -299,6 +299,7 @@ async function test(suite, tests, options = {}) {
         try {
             cp.execSync(['testem', 'ci', ...processCmdOptions].join(' '), processOptions);
         } catch (error) {
+            // minimal logging, no need for stack trace
             console.error(error.message);
             // inform ci
             process.exit(1);
