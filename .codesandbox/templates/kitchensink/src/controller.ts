@@ -777,7 +777,7 @@ function addAccessors($scope) {
     '}));\n'
   );
 
-  var consoleJSONValue = localStorage.getItem(consoleJSONKey) || data;
+  var consoleJSONValue = localStorage.getItem(consoleJSONKey) || JSON.stringify(data, null, '  ');
 
   $scope.getConsoleJSON = function () {
     return consoleJSONValue;
