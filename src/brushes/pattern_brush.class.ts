@@ -1,8 +1,7 @@
-//@ts-nocheck
-
 import { fabric } from "../../HEADER";
 import { PathData } from "../typedefs";
 import { createCanvasElement } from "../util";
+import { Canvas } from "../__types__";
 import { PencilBrush } from "./pencil_brush.class";
 
 /**
@@ -12,6 +11,12 @@ const { Pattern } = fabric;
 
 
 export class PatternBrush extends PencilBrush {
+
+  source?: CanvasImageSource
+
+  constructor(canvas: Canvas) {
+    super(canvas);
+  }
 
   getPatternSrc() {
 
@@ -49,7 +54,8 @@ export class PatternBrush extends PencilBrush {
    */
   _setBrushStyles(ctx: CanvasRenderingContext2D) {
     super._setBrushStyles(ctx);
-    ctx.strokeStyle = this.getPattern(ctx);
+    const pattern = this.getPattern(ctx);
+    pattern && (ctx.strokeStyle = pattern);
   }
 
   /**

@@ -1,12 +1,7 @@
 import { fabric } from "../../HEADER";
 import { Color } from "../color";
 import { Point } from "../point.class";
-
-/**
- * @todo remove transient
- */
-type Shadow = any;
-type Canvas = any;
+import { Canvas, Shadow } from "../__types__";
 
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}

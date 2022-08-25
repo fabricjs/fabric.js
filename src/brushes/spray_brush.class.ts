@@ -1,8 +1,7 @@
-//@ts-nocheck
-
 import { fabric } from "../../HEADER";
-import { IPoint, Point } from "../point.class";
+import { Point } from "../point.class";
 import { getRandomInt } from "../util";
+import { Canvas, Rect } from "../__types__";
 import { BaseBrush } from "./base_brush.class";
 
 
@@ -12,9 +11,31 @@ import { BaseBrush } from "./base_brush.class";
 const { Group, Rect, Shadow } = fabric;
 
 
-type SprayPoint = IPoint & {
+export type SprayBrushPoint = {
+  x: number;
+  y: number;
   width: number;
   opacity: number;
+}
+
+/**
+ * 
+ * @param rects 
+ * @returns 
+ */
+function getUniqueRects(rects: Rect[]) {
+  const uniqueRects: Record<string, boolean> = {};
+  const uniqueRectsArray: Rect[] = [];
+
+  for (let i = 0, key: string; i < rects.length; i++) {
+    key = `${rects[i].left}${rects[i].top}`;
+    if (!uniqueRects[key]) {
+      uniqueRects[key] = true;
+      uniqueRectsArray.push(rects[i]);
+    }
+  }
+
+  return uniqueRectsArray;
 }
 
 export class SprayBrush extends BaseBrush {
@@ -61,16 +82,18 @@ export class SprayBrush extends BaseBrush {
    */
   optimizeOverlapping = true
 
-  private sprayChunks: SprayPoint[][]
+  private sprayChunks: SprayBrushPoint[][]
+  private sprayChunkPoints: SprayBrushPoint[];
 
   /**
    * Constructor
    * @param {Canvas} canvas
    * @return {SprayBrush} Instance of a spray brush
    */
-  constructor(canvas) {
+  constructor(canvas: Canvas) {
     super(canvas);
     this.sprayChunks = [];
+    this.sprayChunkPoints = [];
   }
 
   /**
@@ -124,7 +147,7 @@ export class SprayBrush extends BaseBrush {
       }
     }
 
-    const group = new Group(this.optimizeOverlapping ? this._getOptimizedRects(rects) : rects, {
+    const group = new Group(this.optimizeOverlapping ? getUniqueRects(rects) : rects, {
       objectCaching: true,
       layout: 'fixed',
       subTargetCheck: false,
@@ -141,31 +164,7 @@ export class SprayBrush extends BaseBrush {
     this.canvas.requestRenderAll();
   }
 
-  /**
-   * @private
-   * @param {Array} rects
-   */
-  private _getOptimizedRects(rects) {
-
-    // avoid creating duplicate rects at the same coordinates
-    const uniqueRects = {};
-    let key;
-
-    for (let i = 0; i < rects.length; i++) {
-      key = rects[i].left + '' + rects[i].top;
-      if (!uniqueRects[key]) {
-        uniqueRects[key] = rects[i];
-      }
-    }
-    const uniqueRectsArray = [];
-    for (key in uniqueRects) {
-      uniqueRectsArray.push(uniqueRects[key]);
-    }
-
-    return uniqueRectsArray;
-  }
-
-  renderChunck(sprayChunck: SprayPoint[]) {
+  renderChunck(sprayChunck: SprayBrushPoint[]) {
     const ctx = this.canvas.contextTop;
     ctx.fillStyle = this.color;
 

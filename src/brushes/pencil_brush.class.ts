@@ -1,9 +1,8 @@
-//@ts-nocheck
-
 import { fabric } from "../../HEADER";
 import { Point } from "../point.class";
 import { Event, ModifierKey, PathData } from "../typedefs";
 import { getSmoothPathFromPoints, joinPath } from "../util";
+import { Canvas } from "../__types__";
 import { BaseBrush } from "./base_brush.class";
 
 /**
@@ -47,22 +46,20 @@ export class PencilBrush extends BaseBrush {
   straightLineKey: ModifierKey | undefined | null = 'shiftKey'
 
   private _points: Point[]
+  private _hasStraightLine: boolean;
+  private oldEnd?: Point;
 
-  /**
-   * Constructor
-   * @param {Canvas} canvas
-   * @return {PencilBrush} Instance of a pencil brush
-   */
-  constructor(canvas): PencilBrush {
+  constructor(canvas: Canvas) {
     super(canvas);
     this._points = [];
+    this._hasStraightLine = false;
   }
 
   needsFullRender() {
     return super.needsFullRender() || this._hasStraightLine;
   }
 
-  static _drawSegment(ctx: CanvasRenderingContext2D, p1: Point, p2: Point) {
+  static drawSegment(ctx: CanvasRenderingContext2D, p1: Point, p2: Point) {
     const midPoint = p1.midPointFrom(p2);
     ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
     return midPoint;
@@ -76,7 +73,7 @@ export class PencilBrush extends BaseBrush {
     if (!this.canvas._isMainEvent(e)) {
       return;
     }
-    this.drawStraightLine = e[this.straightLineKey];
+    this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
     this._prepareForDrawing(pointer);
     // capture coordinates immediately
     // this allows to draw dots (when movement never occurs)
@@ -92,7 +89,7 @@ export class PencilBrush extends BaseBrush {
     if (!this.canvas._isMainEvent(e)) {
       return;
     }
-    this.drawStraightLine = e[this.straightLineKey];
+    this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
     if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
       return;
     }
@@ -111,7 +108,7 @@ export class PencilBrush extends BaseBrush {
           ctx.beginPath();
           ctx.moveTo(this.oldEnd.x, this.oldEnd.y);
         }
-        this.oldEnd = PencilBrush._drawSegment(ctx, points[length - 2], points[length - 1], true);
+        this.oldEnd = PencilBrush.drawSegment(ctx, points[length - 2], points[length - 1]);
         ctx.stroke();
         ctx.restore();
       }
@@ -136,12 +133,9 @@ export class PencilBrush extends BaseBrush {
    * @param {Point} pointer Actual mouse position related to the canvas.
    */
   _prepareForDrawing(pointer: Point) {
-
-    const p = new Point(pointer);
-
     this._reset();
-    this._addPoint(p);
-    this.canvas.contextTop.moveTo(p.x, p.y);
+    this._addPoint(pointer);
+    this.canvas.contextTop.moveTo(pointer.x, pointer.y);
   }
 
   /**
@@ -185,11 +179,10 @@ export class PencilBrush extends BaseBrush {
    * @private
    * @param {CanvasRenderingContext2D} [ctx]
    */
-  _render(ctx: CanvasRenderingContext2D) {
+  _render(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
     let i, len,
       p1 = this._points[0],
       p2 = this._points[1];
-    ctx = ctx || this.canvas.contextTop;
     this._saveAndTransform(ctx);
     ctx.beginPath();
     //if we only have 2 points in the path and they are the same
@@ -208,7 +201,7 @@ export class PencilBrush extends BaseBrush {
     for (i = 1, len = this._points.length; i < len; i++) {
       // we pick the point between pi + 1 & pi + 2 as the
       // end point and p1 as our control point.
-      PencilBrush._drawSegment(ctx, p1, p2);
+      PencilBrush.drawSegment(ctx, p1, p2);
       p1 = this._points[i];
       p2 = this._points[i + 1];
     }

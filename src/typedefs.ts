@@ -40,7 +40,7 @@ export const enum SupportedSVGUnit {
 
 export type TMat2D = [number, number, number, number, number, number];
 
-export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey' | 'none';
+export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
 
 /**
  * SVG path commands
