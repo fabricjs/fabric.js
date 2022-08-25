@@ -284,6 +284,7 @@ async function test(suite, tests, options = {}) {
         detached: options.dev
     })
         .on('exit', (code) => {
+            // propagate failed exit code to the process for ci to fail
             code && process.exit(code);
         });
 
