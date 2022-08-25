@@ -289,14 +289,7 @@ async function test(suite, tests, options = {}) {
         shell: true,
         stdio: 'inherit',
         detached: options.dev
-    })
-        .on('exit', (code) => {
-            // propagate failed exit code to the process for ci to fail
-            // don't exit if tests passed - this is for parallel local testing
-            code && process.exit(code);
-        });
-
-
+    });
 }
 
 /**
