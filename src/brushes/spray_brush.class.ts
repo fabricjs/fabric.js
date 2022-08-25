@@ -83,7 +83,8 @@ export class SprayBrush extends BaseBrush {
   optimizeOverlapping = true
 
   private sprayChunks: SprayBrushPoint[][]
-  private sprayChunkPoints: SprayBrushPoint[];
+
+  private sprayChunk: SprayBrushPoint[]
 
   /**
    * Constructor
@@ -93,7 +94,7 @@ export class SprayBrush extends BaseBrush {
   constructor(canvas: Canvas) {
     super(canvas);
     this.sprayChunks = [];
-    this.sprayChunkPoints = [];
+    this.sprayChunk = [];
   }
 
   /**
@@ -106,7 +107,7 @@ export class SprayBrush extends BaseBrush {
     this._setShadow();
 
     this.addSprayChunk(pointer);
-    this.renderChunck(this.sprayChunkPoints);
+    this.renderChunck(this.sprayChunk);
   }
 
   /**
@@ -118,7 +119,7 @@ export class SprayBrush extends BaseBrush {
       return;
     }
     this.addSprayChunk(pointer);
-    this.renderChunck(this.sprayChunkPoints);
+    this.renderChunck(this.sprayChunk);
   }
 
   /**
@@ -198,11 +199,11 @@ export class SprayBrush extends BaseBrush {
    * @param {Point} pointer
    */
   addSprayChunk(pointer: Point) {
-    this.sprayChunkPoints = [];
+    this.sprayChunk = [];
     const radius = this.width / 2;
 
     for (let i = 0; i < this.density; i++) {
-      this.sprayChunkPoints.push({
+      this.sprayChunk.push({
         x: getRandomInt(pointer.x - radius, pointer.x + radius),
         y: getRandomInt(pointer.y - radius, pointer.y + radius),
         width: this.dotWidthVariance ?
@@ -215,7 +216,7 @@ export class SprayBrush extends BaseBrush {
       });
     }
 
-    this.sprayChunks.push(this.sprayChunkPoints);
+    this.sprayChunks.push(this.sprayChunk);
   }
 }
 
