@@ -398,6 +398,9 @@ import { removeFromArray } from '../util/internals';
         return;
       }
 
+      // regain focus
+      document.activeElement !== this.hiddenTextarea && this.hiddenTextarea.focus();
+
       var newSelectionStart = this.getSelectionStartFromPointer(options.e),
           currentStart = this.selectionStart,
           currentEnd = this.selectionEnd;
