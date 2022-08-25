@@ -77,7 +77,7 @@ export class PencilBrush extends BaseBrush {
     this._prepareForDrawing(pointer);
     // capture coordinates immediately
     // this allows to draw dots (when movement never occurs)
-    this._captureDrawingPath(pointer);
+    this._addPoint(pointer);
     this._render();
   }
 
@@ -93,7 +93,7 @@ export class PencilBrush extends BaseBrush {
     if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
       return;
     }
-    if (this._captureDrawingPath(pointer) && this._points.length > 1) {
+    if (this._addPoint(pointer) && this._points.length > 1) {
       if (this.needsFullRender()) {
         // redraw curve
         // clear top canvas
@@ -170,8 +170,7 @@ export class PencilBrush extends BaseBrush {
    * @param {Point} pointer Actual mouse position related to the canvas.
    */
   _captureDrawingPath(pointer: Point) {
-    const pointerPoint = new Point(pointer);
-    return this._addPoint(pointerPoint);
+    return this._addPoint(pointer);
   }
 
   /**
@@ -191,8 +190,6 @@ export class PencilBrush extends BaseBrush {
     //that's why we set them apart a bit
     if (this._points.length === 2 && p1.x === p2.x && p1.y === p2.y) {
       const width = this.width / 1000;
-      p1 = new Point(p1);
-      p2 = new Point(p2);
       p1.x -= width;
       p2.x += width;
     }
