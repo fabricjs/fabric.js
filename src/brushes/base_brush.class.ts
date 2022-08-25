@@ -5,8 +5,6 @@ import { Color } from "../color";
 import { type Point } from "../point.class";
 
 /**
- * BaseBrush class
- * @class fabric.BaseBrush
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
  */
 export abstract class BaseBrush {
@@ -69,6 +67,11 @@ export abstract class BaseBrush {
   */
 
   limitedToCanvasSize = false
+
+  /**
+   * @todo add type
+   */
+  canvas
 
   constructor(canvas) {
     this.canvas = canvas;
