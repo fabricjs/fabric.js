@@ -267,7 +267,7 @@ async function test(suite, tests, options = {}) {
         '-l', options.context.map(_.upperFirst).join(',')
     ];
 
-    cp.execSync(args.join(' '), {
+    cp.exec(args.join(' '), {
         cwd: wd,
         env: {
             ...process.env,
