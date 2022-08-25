@@ -1,9 +1,9 @@
 {
-  "name": "fabric-vanillajs",
+  "name": "fabric-kitchensink",
   "version": "1.0.0",
-  "description": "fabric on Vanilla.js",
+  "description": "fabric kitchensink",
   "scripts": {
-    "dev": "parcel index.html --open --no-cache",
+    "dev": "parcel index.html --open ",
     "start": "parcel index.html",
     "build": "parcel build index.html"
   },
