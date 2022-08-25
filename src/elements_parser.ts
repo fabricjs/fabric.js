@@ -39,7 +39,7 @@
           klass.fromElement(el, this.createCallback(index, el), this.options);
         }
         catch (err) {
-          console.log(err);
+          fabric.log(err);
         }
       }
       else {
