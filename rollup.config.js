@@ -1,14 +1,15 @@
 import { terser } from 'rollup-plugin-terser';
 import ts from "rollup-plugin-ts";
+import json from '@rollup/plugin-json';
 
 // https://rollupjs.org/guide/en/#configuration-files
 export default {
   input: process.env.BUILD_INPUT?.split(',') || ['./index.js'],
   output: [
     {
-        file: process.env.BUILD_OUTPUT || './dist/fabric.js',
-        name: 'fabric',
-        format: 'cjs',
+      file: process.env.BUILD_OUTPUT || './dist/fabric.js',
+      name: 'fabric',
+      format: 'cjs',
     },
     Number(process.env.MINIFY) ?
       {
@@ -19,8 +20,9 @@ export default {
       } : null,
   ],
   plugins: [
-		ts({
-			/* Plugin options */
-		})
-	]
+    json(),
+    ts({
+      /* Plugin options */
+    })
+  ]
 };

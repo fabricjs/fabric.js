@@ -1,4 +1,5 @@
 //@ts-nocheck
+import { VERSION } from '../constants';
 import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
 
@@ -833,7 +834,7 @@ import { capValue } from '../util/misc/capValue';
 
           object = {
             type:                     this.type,
-            version:                  fabric.version,
+            version:                  VERSION,
             originX:                  this.originX,
             originY:                  this.originY,
             left:                     toFixed(this.left, NUM_FRACTION_DIGITS),
