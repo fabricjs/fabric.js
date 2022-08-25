@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { VERSION } from './constants';
+import { Observable } from './mixins/observable.mixin';
 import { Point } from './point.class';
 import { removeFromArray } from './util/internals';
 
@@ -1667,7 +1668,15 @@ import { removeFromArray } from './util/internals';
     }
   });
 
-  extend(fabric.StaticCanvas.prototype, fabric.Observable);
+  // hack - class methods are not enumrable
+  // TODO remove when migrating to es6
+  Object.getOwnPropertyNames(Observable.prototype).forEach(key => {
+    if (key === 'constructor') return;
+    Object.defineProperty(fabric.StaticCanvas.prototype, key, {
+      value: Observable.prototype[key]
+    });
+  });
+
   extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
 
   extend(fabric.StaticCanvas, /** @lends fabric.StaticCanvas */ {
