@@ -14,6 +14,7 @@ import './src/util/dom_event'; // optional interaction
 import './src/util/dom_style';
 import './src/util/dom_misc';
 import './src/util/dom_request';
+import './src/log1';
 import './src/log';
 import './src/util/animate'; // optional animation
 import './src/util/animate_color'; // optional animation
