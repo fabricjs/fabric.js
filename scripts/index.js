@@ -296,7 +296,12 @@ async function test(suite, tests, options = {}) {
     }
     else {
         // we use `execSync` to propagate failed exit code to the process for ci to fail
-        cp.execSync(['testem', 'ci', ...processCmdOptions].join(' '), processOptions);
+        try {
+            cp.execSync(['testem', 'ci', ...processCmdOptions].join(' '), processOptions);
+        } catch (error) {
+            console.error(error.message);
+            process.exit(1);
+        }
     }
 }
 
