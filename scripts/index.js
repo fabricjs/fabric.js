@@ -127,7 +127,8 @@ function build(options = {}) {
         const { name, base, ...rest } = path.parse(path.resolve(options.output));
         minDest = path.format({ name: `${name}.min`, ...rest });
     }
-    return cp.spawn(args.join(' '), {
+    // use `execSync` so exit codes are propagated to the process and reported to ci
+    cp[options.watch ? 'spawn' : 'execSync'](args.join(' '), {
         stdio: 'inherit',
         shell: true,
         cwd: wd,
@@ -295,11 +296,12 @@ async function test(suite, tests, options = {}) {
         });
     }
     else {
-        // we use `execSync` to propagate failed exit code to the process for ci to fail
         try {
             cp.execSync(['testem', 'ci', ...processCmdOptions].join(' '), processOptions);
         } catch (error) {
+            // minimal logging, no need for stack trace
             console.error(error.message);
+            // inform ci
             process.exit(1);
         }
     }
