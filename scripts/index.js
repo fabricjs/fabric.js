@@ -267,7 +267,14 @@ async function test(suite, tests, options = {}) {
         '-l', options.context.map(_.upperFirst).join(',')
     ];
 
-    cp.spawn(args.join(' '), {
+    if (options.launch) {
+        // open localhost
+        const url = `http://localhost:${port}/`;
+        const start = (os.platform() === 'darwin' ? 'open' : os.platform() === 'win32' ? 'start' : 'xdg-open');
+        cp.exec([start, url].join(' '));
+    }
+
+    cp[options.dev ? 'spawn' : 'execSync'](args.join(' '), {
         cwd: wd,
         env: {
             ...process.env,
@@ -289,12 +296,7 @@ async function test(suite, tests, options = {}) {
             code && process.exit(code);
         });
 
-    if (options.launch) {
-        // open localhost
-        const url = `http://localhost:${port}/`;
-        const start = (os.platform() === 'darwin' ? 'open' : os.platform() === 'win32' ? 'start' : 'xdg-open');
-        cp.exec([start, url].join(' '));
-    }
+
 }
 
 /**
