@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Dearest fabric maintainer,
+ * Dearest fabric maintainer 💗,
  * This file contains the cli logic, which governs most of the available commands fabric has to offer.
  * 
- * **IMPORTANT**
+ * 📢 **IMPORTANT**
  * CI uses these commands.
  * In order for CI to correctly report the result of the command, the process must receive a correct exit code
  * meaning that if you `spawn` a process makes sure to listen to the `exit` event and terminate the main process with the relevant code.
- * Failing to do so will make CI report a false positive.
+ * Failing to do so will make CI report a false positive 📉.
  */
 
 
