@@ -48,8 +48,10 @@ function setActiveProp(name, value) {
 
 function addAccessors($scope) {
 
-  var pattern = new fabric.Pattern({
-    source: images.ladybug,
+  const ladybug = new Image();
+  ladybug.src = images.ladybug;
+  const pattern = new fabric.Pattern({
+    source: ladybug,
     repeat: 'repeat'
   });
 
