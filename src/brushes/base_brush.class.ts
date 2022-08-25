@@ -1,6 +1,8 @@
 //@ts-nocheck
 
+import { fabric } from "../../HEADER";
 import { Color } from "../color";
+import { type Point } from "../point.class";
 
 /**
  * BaseBrush class
@@ -78,7 +80,7 @@ export abstract class BaseBrush {
    * @private
    * @param {CanvasRenderingContext2D} ctx
    */
-  _setBrushStyles(ctx) {
+  _setBrushStyles(ctx: CanvasRenderingContext2D) {
     ctx.strokeStyle = this.color;
     ctx.lineWidth = this.width;
     ctx.lineCap = this.strokeLineCap;
@@ -89,10 +91,10 @@ export abstract class BaseBrush {
 
   /**
    * Sets the transformation on given context
-   * @param {RenderingContext2d} ctx context to render on
+   * @param {CanvasRenderingContext2D} ctx context to render on
    * @private
    */
-  _saveAndTransform(ctx) {
+  protected _saveAndTransform(ctx: CanvasRenderingContext2D) {
     const v = this.canvas.viewportTransform;
     ctx.save();
     ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
@@ -102,7 +104,7 @@ export abstract class BaseBrush {
    * Sets brush shadow styles
    * @private
    */
-  _setShadow() {
+  protected _setShadow() {
     if (!this.shadow || !this.canvas) {
       return;
     }
@@ -118,7 +120,7 @@ export abstract class BaseBrush {
     ctx.shadowOffsetY = shadow.offsetY * zoom;
   }
 
-  needsFullRender() {
+  protected needsFullRender() {
     const color = new Color(this.color);
     return color.getAlpha() < 1 || !!this.shadow;
   }
@@ -127,7 +129,7 @@ export abstract class BaseBrush {
    * Removes brush shadow styles
    * @private
    */
-  _resetShadow() {
+  protected _resetShadow() {
     const ctx = this.canvas.contextTop;
 
     ctx.shadowColor = '';
@@ -139,8 +141,10 @@ export abstract class BaseBrush {
    * @param {Object} pointer
    * @private
   */
-  _isOutSideCanvas(pointer) {
+  protected _isOutSideCanvas(pointer: Point) {
     return pointer.x < 0 || pointer.x > this.canvas.getWidth() ||
       pointer.y < 0 || pointer.y > this.canvas.getHeight();
   }
 }
+
+fabric.BaseBrush = BaseBrush;

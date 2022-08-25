@@ -1,16 +1,18 @@
 //@ts-nocheck
 
+import { fabric } from "../../HEADER";
 import { Color } from "../color";
 import { Point } from "../point.class";
-import { Shadow } from "../shadow.class";
-import { Circle, Group } from "../shapes";
 import { getRandomInt } from "../util";
 import { BaseBrush } from "./base_brush.class";
 
+
 /**
- * CircleBrush class
- * @class CircleBrush
+ * @todo remove transient
  */
+const { Circle, Group, Shadow } = fabric;
+
+
 export class CircleBrush extends BaseBrush {
 
   /**
@@ -26,16 +28,16 @@ export class CircleBrush extends BaseBrush {
    * @return {CircleBrush} Instance of a circle brush
    */
   constructor(canvas) {
-    this.canvas = canvas;
+    super(canvas);
     this.points = [];
   }
 
   /**
    * Invoked inside on mouse down and mouse move
-   * @param {Object} pointer
+   * @param {Point} pointer
    */
-  drawDot(pointer) {
-    var point = this.addPoint(pointer),
+  drawDot(pointer: Point) {
+    const point = this.addPoint(pointer),
       ctx = this.canvas.contextTop;
     this._saveAndTransform(ctx);
     this.dot(ctx, point);
@@ -53,7 +55,7 @@ export class CircleBrush extends BaseBrush {
   /**
    * Invoked on mouse down
    */
-  onMouseDown(pointer) {
+  onMouseDown(pointer: Point) {
     this.points.length = 0;
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
@@ -65,10 +67,9 @@ export class CircleBrush extends BaseBrush {
    * @private
    */
   _render() {
-    var ctx = this.canvas.contextTop, i, len,
-      points = this.points;
+    const ctx = this.canvas.contextTop, points = this.points;
     this._saveAndTransform(ctx);
-    for (i = 0, len = points.length; i < len; i++) {
+    for (let i = 0; i < points.length; i++) {
       this.dot(ctx, points[i]);
     }
     ctx.restore();
@@ -76,9 +77,9 @@ export class CircleBrush extends BaseBrush {
 
   /**
    * Invoked on mouse move
-   * @param {Object} pointer
+   * @param {Point} pointer
    */
-  onMouseMove(pointer) {
+  onMouseMove(pointer: Point) {
     if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
       return;
     }
@@ -96,13 +97,13 @@ export class CircleBrush extends BaseBrush {
    * Invoked on mouse up
    */
   onMouseUp() {
-    var originalRenderOnAddRemove = this.canvas.renderOnAddRemove, i, len;
+    const originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
     this.canvas.renderOnAddRemove = false;
 
-    var circles = [];
+    const circles = [];
 
-    for (i = 0, len = this.points.length; i < len; i++) {
-      var point = this.points[i],
+    for (let i = 0; i < this.points.length; i++) {
+      const point = this.points[i],
         circle = new Circle({
           radius: point.radius,
           left: point.x,
@@ -116,8 +117,7 @@ export class CircleBrush extends BaseBrush {
 
       circles.push(circle);
     }
-    var group = new Group(circles);
-    group.canvas = this.canvas;
+    const group = new Group(circles, { canvas: this.canvas });
 
     this.canvas.fire('before:path:created', { path: group });
     this.canvas.add(group);
@@ -133,8 +133,8 @@ export class CircleBrush extends BaseBrush {
    * @param {Object} pointer
    * @return {Point} Just added pointer point
    */
-  addPoint(pointer) {
-    var pointerPoint = Point.toPoint(pointer),
+  addPoint(pointer: Point) {
+    const pointerPoint = new Point(pointer),
 
       circleRadius = getRandomInt(
         Math.max(0, this.width - 20), this.width + 20) / 2,
@@ -151,3 +151,5 @@ export class CircleBrush extends BaseBrush {
     return pointerPoint;
   }
 }
+
+fabric.CircleBrush = CircleBrush;

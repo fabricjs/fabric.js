@@ -1,25 +1,26 @@
 //@ts-nocheck
 
+import { fabric } from "../../HEADER";
 import { Point } from "../point.class";
-import { Shadow } from "../shadow.class";
-import { Path } from "../shapes";
+import { Event, ModifierKey, PathData } from "../typedefs";
 import { getSmoothPathFromPoints, joinPath } from "../util";
 import { BaseBrush } from "./base_brush.class";
 
 /**
+ * @todo remove transient
+ */
+const { Path, Shadow } = fabric;
+
+
+/**
  * @private
- * @param {(string|number)[][]} pathData SVG path commands
+ * @param {PathData} pathData SVG path commands
  * @returns {boolean}
  */
-export function isEmptySVGPath(pathData) {
+function isEmptySVGPath(pathData: PathData): boolean {
   return joinPath(pathData) === 'M 0 0 Q 0 0 0 0 L 0 0';
 }
 
-/**
- * PencilBrush class
- * @class PencilBrush
- * @extends BaseBrush
- */
 export class PencilBrush extends BaseBrush {
 
   /**
@@ -41,9 +42,9 @@ export class PencilBrush extends BaseBrush {
   /**
    * The event modifier key that makes the brush draw a straight line.
    * If `null` or 'none' or any other string that is not a modifier key the feature is disabled.
-   * @type {'altKey' | 'shiftKey' | 'ctrlKey' | 'none' | undefined | null}
+   * @type {ModifierKey | undefined | null}
    */
-  straightLineKey = 'shiftKey'
+  straightLineKey: ModifierKey | undefined | null = 'shiftKey'
 
   private _points: Point[]
 
@@ -52,7 +53,7 @@ export class PencilBrush extends BaseBrush {
    * @param {Canvas} canvas
    * @return {PencilBrush} Instance of a pencil brush
    */
-  constructor(canvas) {
+  constructor(canvas): PencilBrush {
     super(canvas);
     this._points = [];
   }
@@ -61,11 +62,7 @@ export class PencilBrush extends BaseBrush {
     return super.needsFullRender() || this._hasStraightLine;
   }
 
-  /**
-   * Invoked inside on mouse down and mouse move
-   * @param {Object} pointer
-   */
-  static _drawSegment(ctx, p1, p2) {
+  static _drawSegment(ctx: CanvasRenderingContext2D, p1: Point, p2: Point) {
     const midPoint = p1.midPointFrom(p2);
     ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
     return midPoint;
@@ -73,13 +70,13 @@ export class PencilBrush extends BaseBrush {
 
   /**
    * Invoked on mouse down
-   * @param {Object} pointer
+   * @param {Point} pointer
    */
-  onMouseDown(pointer, options) {
-    if (!this.canvas._isMainEvent(options.e)) {
+  onMouseDown(pointer: Point, { e }: Event) {
+    if (!this.canvas._isMainEvent(e)) {
       return;
     }
-    this.drawStraightLine = options.e[this.straightLineKey];
+    this.drawStraightLine = e[this.straightLineKey];
     this._prepareForDrawing(pointer);
     // capture coordinates immediately
     // this allows to draw dots (when movement never occurs)
@@ -89,13 +86,13 @@ export class PencilBrush extends BaseBrush {
 
   /**
    * Invoked on mouse move
-   * @param {Object} pointer
+   * @param {Point} pointer
    */
-  onMouseMove(pointer, options) {
-    if (!this.canvas._isMainEvent(options.e)) {
+  onMouseMove(pointer: Point, { e }: Event) {
+    if (!this.canvas._isMainEvent(e)) {
       return;
     }
-    this.drawStraightLine = options.e[this.straightLineKey];
+    this.drawStraightLine = e[this.straightLineKey];
     if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
       return;
     }
@@ -124,8 +121,8 @@ export class PencilBrush extends BaseBrush {
   /**
    * Invoked on mouse up
    */
-  onMouseUp(options) {
-    if (!this.canvas._isMainEvent(options.e)) {
+  onMouseUp({ e }: Event) {
+    if (!this.canvas._isMainEvent(e)) {
       return true;
     }
     this.drawStraightLine = false;
@@ -136,9 +133,9 @@ export class PencilBrush extends BaseBrush {
 
   /**
    * @private
-   * @param {Object} pointer Actual mouse position related to the canvas.
+   * @param {Point} pointer Actual mouse position related to the canvas.
    */
-  _prepareForDrawing(pointer) {
+  _prepareForDrawing(pointer: Point) {
 
     const p = new Point(pointer);
 
@@ -151,7 +148,7 @@ export class PencilBrush extends BaseBrush {
    * @private
    * @param {Point} point Point to be added to points array
    */
-  _addPoint(point) {
+  _addPoint(point: Point) {
     if (this._points.length > 1 && point.eq(this._points[this._points.length - 1])) {
       return false;
     }
@@ -176,9 +173,9 @@ export class PencilBrush extends BaseBrush {
 
   /**
    * @private
-   * @param {Object} pointer Actual mouse position related to the canvas.
+   * @param {Point} pointer Actual mouse position related to the canvas.
    */
-  _captureDrawingPath(pointer) {
+  _captureDrawingPath(pointer: Point) {
     const pointerPoint = new Point(pointer);
     return this._addPoint(pointerPoint);
   }
@@ -188,7 +185,7 @@ export class PencilBrush extends BaseBrush {
    * @private
    * @param {CanvasRenderingContext2D} [ctx]
    */
-  _render(ctx) {
+  _render(ctx: CanvasRenderingContext2D) {
     let i, len,
       p1 = this._points[0],
       p2 = this._points[1];
@@ -226,19 +223,19 @@ export class PencilBrush extends BaseBrush {
   /**
    * Converts points to SVG path
    * @param {Array} points Array of points
-   * @return {(string|number)[][]} SVG path commands
+   * @return {PathData} SVG path commands
    */
-  convertPointsToSVGPath(points) {
+  convertPointsToSVGPath(points: Point[]): PathData {
     const correction = this.width / 1000;
     return getSmoothPathFromPoints(points, correction);
   }
 
   /**
    * Creates a Path object to add on canvas
-   * @param {(string|number)[][]} pathData Path data
+   * @param {PathData} pathData Path data
    * @return {Path} Path to add on canvas
    */
-  createPath(pathData) {
+  createPath(pathData: PathData) {
     const path = new Path(pathData, {
       fill: null,
       stroke: this.color,
@@ -259,24 +256,22 @@ export class PencilBrush extends BaseBrush {
   /**
    * Decimate points array with the decimate value
    */
-  decimatePoints(points, distance) {
+  decimatePoints(points: Point[], distance: number) {
     if (points.length <= 2) {
       return points;
     }
-    let zoom = this.canvas.getZoom(), adjustedDistance = Math.pow(distance / zoom, 2),
-      i, l = points.length - 1, lastPoint = points[0], newPoints = [lastPoint],
-      cDistance;
-    for (i = 1; i < l - 1; i++) {
+    let lastPoint = points[0], cDistance;
+    const zoom = this.canvas.getZoom(), adjustedDistance = Math.pow(distance / zoom, 2),
+      l = points.length - 1, newPoints = [lastPoint];
+    for (let i = 1; i < l - 1; i++) {
       cDistance = Math.pow(lastPoint.x - points[i].x, 2) + Math.pow(lastPoint.y - points[i].y, 2);
       if (cDistance >= adjustedDistance) {
         lastPoint = points[i];
         newPoints.push(lastPoint);
       }
     }
-    /**
-     * Add the last point from the original line to the end of the array.
-     * This ensures decimate doesn't delete the last point on the line, and ensures the line is > 1 point.
-     */
+    // Add the last point from the original line to the end of the array.
+    // This ensures decimate doesn't delete the last point on the line, and ensures the line is > 1 point.
     newPoints.push(points[l]);
     return newPoints;
   }
@@ -315,3 +310,5 @@ export class PencilBrush extends BaseBrush {
     this.canvas.fire('path:created', { path: path });
   }
 }
+
+fabric.PencilBrush = PencilBrush;

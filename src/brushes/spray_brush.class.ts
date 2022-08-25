@@ -1,15 +1,22 @@
 //@ts-nocheck
 
-import { Point } from "../point.class";
-import { Shadow } from "../shadow.class";
-import { Group, Rect } from "../shapes";
+import { fabric } from "../../HEADER";
+import { IPoint, Point } from "../point.class";
 import { getRandomInt } from "../util";
 import { BaseBrush } from "./base_brush.class";
 
+
 /**
- * SprayBrush class
- * @class SprayBrush
+ * @todo remove transient
  */
+const { Group, Rect, Shadow } = fabric;
+
+
+type SprayPoint = IPoint & {
+  width: number;
+  opacity: number;
+}
+
 export class SprayBrush extends BaseBrush {
 
   /**
@@ -54,60 +61,61 @@ export class SprayBrush extends BaseBrush {
    */
   optimizeOverlapping = true
 
+  private sprayChunks: SprayPoint[][]
+
   /**
    * Constructor
    * @param {Canvas} canvas
    * @return {SprayBrush} Instance of a spray brush
    */
   constructor(canvas) {
-    this.canvas = canvas;
+    super(canvas);
     this.sprayChunks = [];
   }
 
   /**
    * Invoked on mouse down
-   * @param {Object} pointer
+   * @param {Point} pointer
    */
-  onMouseDown(pointer) {
-    this.sprayChunks.length = 0;
+  onMouseDown(pointer: Point) {
+    this.sprayChunks = [];
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
 
     this.addSprayChunk(pointer);
-    this.render(this.sprayChunkPoints);
+    this.renderChunck(this.sprayChunkPoints);
   }
 
   /**
    * Invoked on mouse move
-   * @param {Object} pointer
+   * @param {Point} pointer
    */
-  onMouseMove(pointer) {
+  onMouseMove(pointer: Point) {
     if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
       return;
     }
     this.addSprayChunk(pointer);
-    this.render(this.sprayChunkPoints);
+    this.renderChunck(this.sprayChunkPoints);
   }
 
   /**
    * Invoked on mouse up
    */
   onMouseUp() {
-    var originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
+    const originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
     this.canvas.renderOnAddRemove = false;
 
-    var rects = [];
+    const rects = [];
 
-    for (var i = 0, ilen = this.sprayChunks.length; i < ilen; i++) {
-      var sprayChunk = this.sprayChunks[i];
-
-      for (var j = 0, jlen = sprayChunk.length; j < jlen; j++) {
-
-        var rect = new Rect({
-          width: sprayChunk[j].width,
-          height: sprayChunk[j].width,
-          left: sprayChunk[j].x + 1,
-          top: sprayChunk[j].y + 1,
+    for (let i = 0; i < this.sprayChunks.length; i++) {
+      const sprayChunk = this.sprayChunks[i];
+      for (let j = 0; j < sprayChunk.length; j++) {
+        const chunck = sprayChunk[j];
+        const rect = new Rect({
+          width: chunck.width,
+          height: chunck.width,
+          left: chunck.x + 1,
+          top: chunck.y + 1,
           originX: 'center',
           originY: 'center',
           fill: this.color
@@ -116,11 +124,7 @@ export class SprayBrush extends BaseBrush {
       }
     }
 
-    if (this.optimizeOverlapping) {
-      rects = this._getOptimizedRects(rects);
-    }
-
-    var group = new Group(rects, {
+    const group = new Group(this.optimizeOverlapping ? this._getOptimizedRects(rects) : rects, {
       objectCaching: true,
       layout: 'fixed',
       subTargetCheck: false,
@@ -141,18 +145,19 @@ export class SprayBrush extends BaseBrush {
    * @private
    * @param {Array} rects
    */
-  _getOptimizedRects(rects) {
+  private _getOptimizedRects(rects) {
 
     // avoid creating duplicate rects at the same coordinates
-    var uniqueRects = {}, key, i, len;
+    const uniqueRects = {};
+    let key;
 
-    for (i = 0, len = rects.length; i < len; i++) {
+    for (let i = 0; i < rects.length; i++) {
       key = rects[i].left + '' + rects[i].top;
       if (!uniqueRects[key]) {
         uniqueRects[key] = rects[i];
       }
     }
-    var uniqueRectsArray = [];
+    const uniqueRectsArray = [];
     for (key in uniqueRects) {
       uniqueRectsArray.push(uniqueRects[key]);
     }
@@ -160,22 +165,18 @@ export class SprayBrush extends BaseBrush {
     return uniqueRectsArray;
   }
 
-  /**
-   * Render new chunk of spray brush
-   */
-  render(sprayChunk) {
-    var ctx = this.canvas.contextTop, i, len;
+  renderChunck(sprayChunck: SprayPoint[]) {
+    const ctx = this.canvas.contextTop;
     ctx.fillStyle = this.color;
 
     this._saveAndTransform(ctx);
 
-    for (i = 0, len = sprayChunk.length; i < len; i++) {
-      var point = sprayChunk[i];
-      if (typeof point.opacity !== 'undefined') {
-        ctx.globalAlpha = point.opacity;
-      }
+    for (let i = 0; i < sprayChunck.length; i++) {
+      const point = sprayChunck[i];
+      ctx.globalAlpha = point.opacity;
       ctx.fillRect(point.x, point.y, point.width, point.width);
     }
+
     ctx.restore();
   }
 
@@ -183,50 +184,40 @@ export class SprayBrush extends BaseBrush {
    * Render all spray chunks
    */
   _render() {
-    var ctx = this.canvas.contextTop, i, ilen;
+    const ctx = this.canvas.contextTop;
     ctx.fillStyle = this.color;
 
     this._saveAndTransform(ctx);
 
-    for (i = 0, ilen = this.sprayChunks.length; i < ilen; i++) {
-      this.render(this.sprayChunks[i]);
+    for (let i = 0; i < this.sprayChunks.length; i++) {
+      this.renderChunck(this.sprayChunks[i]);
     }
     ctx.restore();
   }
 
   /**
-   * @param {Object} pointer
+   * @param {Point} pointer
    */
-  addSprayChunk(pointer) {
+  addSprayChunk(pointer: Point) {
     this.sprayChunkPoints = [];
+    const radius = this.width / 2;
 
-    var x, y, width, radius = this.width / 2, i;
-
-    for (i = 0; i < this.density; i++) {
-
-      x = getRandomInt(pointer.x - radius, pointer.x + radius);
-      y = getRandomInt(pointer.y - radius, pointer.y + radius);
-
-      if (this.dotWidthVariance) {
-        width = getRandomInt(
-          // bottom clamp width to 1
-          Math.max(1, this.dotWidth - this.dotWidthVariance),
-          this.dotWidth + this.dotWidthVariance);
-      }
-      else {
-        width = this.dotWidth;
-      }
-
-      var point = new Point(x, y);
-      point.width = width;
-
-      if (this.randomOpacity) {
-        point.opacity = getRandomInt(0, 100) / 100;
-      }
-
-      this.sprayChunkPoints.push(point);
+    for (let i = 0; i < this.density; i++) {
+      this.sprayChunkPoints.push({
+        x: getRandomInt(pointer.x - radius, pointer.x + radius),
+        y: getRandomInt(pointer.y - radius, pointer.y + radius),
+        width: this.dotWidthVariance ?
+          getRandomInt(
+            // bottom clamp width to 1
+            Math.max(1, this.dotWidth - this.dotWidthVariance),
+            this.dotWidth + this.dotWidthVariance) :
+          this.dotWidth,
+        opacity: this.randomOpacity ? getRandomInt(0, 100) / 100 : 1
+      });
     }
 
     this.sprayChunks.push(this.sprayChunkPoints);
   }
 }
+
+fabric.SprayBrush = SprayBrush;
