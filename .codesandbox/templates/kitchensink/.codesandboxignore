@@ -1,0 +1,4 @@
+assets
+*.codesandbox.*
+*/*.codesandbox.*
+.codesandboxignore

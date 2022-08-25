@@ -4,6 +4,7 @@ const Axios = require('axios');
 const chalk = require('chalk');
 const path = require('path');
 const _ = require('lodash');
+const { makeRe } = require('micromatch');
 
 const BINARY_EXT = [
     'png',
@@ -13,6 +14,14 @@ const BINARY_EXT = [
 
 function bufferToBase64DataUrl(buffer, mimeType) {
     return 'data:' + mimeType + ';base64,' + buffer.toString('base64');
+}
+ 
+function globToRegex(glob, opts) {
+    return makeRe(glob, opts);
+}
+
+function parseIgnoreFile(file) {
+    return _.compact(fs.readFileSync(file).toString().split('\n')).map(p => globToRegex(p.trim()))
 }
 
 /**
@@ -27,7 +36,8 @@ async function createCodeSandbox(appPath) {
     const files = { 'package.json': JSON.stringify(package, null, '\t') };
 
     const gitignore = path.resolve(appPath, '.gitignore');
-    const ignore = fs.existsSync(gitignore) ? _.compact(fs.readFileSync(gitignore).toString().split('\n')).map(p => new RegExp(p.trim())) : [];
+    const codesandboxignore = path.resolve(appPath, '.codesandboxignore');
+    const ignore = _.flatten([gitignore, codesandboxignore].filter(fs.existsSync).map(parseIgnoreFile));
 
     const processFile = (fileName) => {
         const filePath = path.resolve(appPath, fileName);
@@ -38,13 +48,17 @@ async function createCodeSandbox(appPath) {
                 .forEach(file => {
                     processFile(path.join(fileName, file).replace(/\\/g, '/'));
                 });
-        } else if (BINARY_EXT.some(x => x === ext)) {
+        } else if (BINARY_EXT.includes(ext)) {
             files[fileName] = {
                 content: bufferToBase64DataUrl(fs.readFileSync(filePath), `image/${ext}`),
                 isBinary: true
             };
         } else {
-            files[fileName] = { content: fs.readFileSync(filePath).toString() };
+            const { name, base, ...rest } = path.parse(filePath);
+            console.log(base)
+            const sandboxVersion = path.format({ ...rest, name: `${name}.codesandbox` });
+            const finalVersion = fs.existsSync(sandboxVersion) ? sandboxVersion : filePath;
+            files[fileName] = { content: fs.readFileSync(finalVersion).toString() };
         }
     }
     fs.readdirSync(appPath).forEach(processFile);
