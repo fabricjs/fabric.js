@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Point } from '../point.class';
+import { extend } from './lang_object';
 
 (function (global) {
   /**
@@ -32,7 +32,7 @@ import { Point } from '../point.class';
    * @type {AnimationContext[]}
    */
   var fabric = global.fabric, RUNNING_ANIMATIONS = [];
-  fabric.util.object.extend(RUNNING_ANIMATIONS, {
+  extend(RUNNING_ANIMATIONS, {
 
     /**
      * cancel all running animations at the next requestAnimFrame

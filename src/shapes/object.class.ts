@@ -1,11 +1,14 @@
 //@ts-nocheck
 
-import { Point } from '../point.class';
+
 import { Observable } from "../mixins/observable.mixin";
+import { Point } from '../point.class';
+import { VERSION } from '../constants';
+import { capValue } from '../util/misc/capValue';
+
 
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
       capitalize = fabric.util.string.capitalize,
@@ -694,7 +697,6 @@ import { Observable } from "../mixins/observable.mixin";
         return dims;
       }
       var ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal),
-          capValue = fabric.util.capValue,
           x = capValue(min, limitedDims.x, max),
           y = capValue(min, limitedDims.y, max);
       if (width > x) {
@@ -835,7 +837,7 @@ import { Observable } from "../mixins/observable.mixin";
 
           object = {
             type:                     this.type,
-            version:                  fabric.version,
+            version:                  VERSION,
             originX:                  this.originX,
             originY:                  this.originY,
             left:                     toFixed(this.left, NUM_FRACTION_DIGITS),

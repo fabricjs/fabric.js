@@ -1,9 +1,10 @@
 //@ts-nocheck
-import { cos, sin } from '../util';
-
+import { cos } from '../util/misc/cos';
+import { sin } from '../util/misc/sin';
 
 export function rotateMatrix(matrix, args) {
-    let cosValue = cos(args[0]), sinValue = sin(args[0]), x = 0, y = 0;
+    const cosValue = cos(args[0]), sinValue = sin(args[0]);
+    let x = 0, y = 0;
     if (args.length === 3) {
         x = args[1];
         y = args[2];

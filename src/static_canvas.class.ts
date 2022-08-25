@@ -1,7 +1,6 @@
 //@ts-nocheck
-
+import { VERSION } from './constants';
 import { Point } from './point.class';
-import { Observable } from "./mixins/observable.mixin";
 import { removeFromArray } from './util/internals';
 
 (function (global) {
@@ -1029,7 +1028,7 @@ import { removeFromArray } from './util/internals';
     _toObjectMethod: function (methodName, propertiesToInclude) {
 
       var clipPath = this.clipPath, data = {
-        version: fabric.version,
+        version: VERSION,
         objects: this._toObjects(methodName, propertiesToInclude),
       };
       if (clipPath && !clipPath.excludeFromExport) {
@@ -1226,7 +1225,7 @@ import { removeFromArray } from './util/internals';
         'height="', height, '" ',
         viewBox,
         'xml:space="preserve">\n',
-        '<desc>Created with Fabric.js ', fabric.version, '</desc>\n',
+        '<desc>Created with Fabric.js ', VERSION, '</desc>\n',
         '<defs>\n',
         this.createSVGFontFacesMarkup(),
         this.createSVGRefElementsMarkup(),
@@ -1668,15 +1667,7 @@ import { removeFromArray } from './util/internals';
     }
   });
 
-  // hack - class methods are not enumrable
-  // TODO remove when migrating to es6
-  Object.getOwnPropertyNames(Observable.prototype).forEach(key => {
-    if (key === 'constructor') return;
-    Object.defineProperty(fabric.StaticCanvas.prototype, key, {
-      value: Observable.prototype[key]
-    });
-  });
-
+  extend(fabric.StaticCanvas.prototype, fabric.Observable);
   extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
 
   extend(fabric.StaticCanvas, /** @lends fabric.StaticCanvas */ {

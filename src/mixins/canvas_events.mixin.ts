@@ -158,14 +158,6 @@
         nestedTarget && nestedTarget.fire('mouseout', { e: e });
       }, this);
       this._hoveredTargets = [];
-
-      if (this._iTextInstances) {
-        this._iTextInstances.forEach(function(obj) {
-          if (obj.isEditing) {
-            obj.hiddenTextarea.focus();
-          }
-        });
-      }
     },
 
     /**
@@ -381,7 +373,10 @@
      * @param {Event} e
      */
     _onDrop: function (e) {
-      var options = this._simpleEventHandler('drop:before', e, { dragSource: this._dragSource });
+      var options = this._simpleEventHandler('drop:before', e, {
+        dragSource: this._dragSource,
+        pointer: this.getPointer(e)
+      });
       //  will be set by the drop target
       options.didDrop = false;
       //  will be set by the drop target, used in case options.target refuses the drop

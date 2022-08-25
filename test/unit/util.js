@@ -743,6 +743,10 @@
     assert.equal(parsed.meetOrSlice, 'meet');
     assert.equal(parsed.alignX, 'mid');
     assert.equal(parsed.alignY, 'max');
+    parsed = fabric.util.parsePreserveAspectRatioAttribute('XmidYmin');
+    assert.equal(parsed.meetOrSlice, 'meet');
+    assert.equal(parsed.alignX, 'mid');
+    assert.equal(parsed.alignY, 'min');
   });
 
   QUnit.test('multiplyTransformMatrices', function(assert) {
@@ -850,10 +854,10 @@
   });
 
   /**
-   * 
-   * @param {*} actual 
-   * @param {*} expected 
-   * @param {*} [message] 
+   *
+   * @param {*} actual
+   * @param {*} expected
+   * @param {*} [message]
    * @param {number} [error] floating point percision, defaults to 10
    */
   QUnit.assert.matrixIsEqualEnough = function (actual, expected, message, error) {
@@ -878,7 +882,7 @@
       invert = fabric.util.invertTransform,
       multiply = fabric.util.multiplyTransformMatrices,
       transformPoint = fabric.util.transformPoint;
-    
+
     function sendPointToPlane(point, from, to, relationFrom, relationTo) {
       return fabric.util.sendPointToPlane(
         point,
