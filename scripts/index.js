@@ -470,7 +470,7 @@ program
     .option('-v, --verbose', 'log passing tests', false)
     .option('-l, --launch', 'launch tests in the browser', false)
     .option('--dev', 'runs testem in `dev` mode, without a `ci` flag', false)
-    .addOption(new commander.Option('-c, --context <context...>', 'context to test in').choices(['chrome', 'firefox', 'node']).default(['chrome', 'node']))
+    .addOption(new commander.Option('-c, --context <context...>', 'context to test in').choices(['node', 'chrome', 'firefox']).default(['node']))
     .option('-p, --port')
     .option('-o, --out <out>', 'path to report test results to')
     .option('--clear-cache', 'clear CLI test cache', false)

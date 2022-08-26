@@ -6,9 +6,6 @@ import './src/mixins/shared_methods.mixin';
 import './src/util/misc/misc';
 // import './src/util/named_accessors.mixin'; i would imagine dead forever or proper setters/getters
 import './src/util/path';
-import './src/util/lang_array';
-import './src/util/lang_object';
-import './src/util/lang_string';
 import './src/util/lang_class';
 import './src/util/dom_event'; // optional interaction
 import './src/util/dom_style';
