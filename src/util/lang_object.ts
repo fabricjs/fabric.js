@@ -1,5 +1,7 @@
 //@ts-nocheck
 
+import { fabric } from "../../HEADER";
+
 /**
  * Copies all enumerable properties of one js object to another
  * this does not and cannot compete with generic utils.

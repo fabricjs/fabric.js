@@ -5,8 +5,8 @@ interface NominalTag<T> {
 
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
 
-const enum Degree {}
-const enum Radian {}
+const enum Degree { }
+const enum Radian { }
 
 export type TDegree = Nominal<number, Degree>;
 export type TRadian = Nominal<number, Radian>;
@@ -39,3 +39,14 @@ export const enum SupportedSVGUnit {
 }
 
 export type TMat2D = [number, number, number, number, number, number];
+
+export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
+
+/**
+ * SVG path commands
+ */
+export type PathData = (string | number)[][];
+
+export type Event<E extends Event = MouseEvent | TouchEvent> = {
+  e: E
+}
