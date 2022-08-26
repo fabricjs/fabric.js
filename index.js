@@ -14,7 +14,6 @@ import './src/util/dom_event'; // optional interaction
 import './src/util/dom_style';
 import './src/util/dom_misc';
 import './src/util/dom_request';
-import './src/log';
 import './src/util/animate'; // optional animation
 import './src/util/animate_color'; // optional animation
 import './src/util/anim_ease'; // optional easing
@@ -27,11 +26,6 @@ import './src/gradient'; // optional gradient
 import './src/pattern.class'; // optional pattern
 import './src/shadow.class'; // optional shadow
 import './src/static_canvas.class';
-import './src/brushes/base_brush.class'; // optional freedrawing
-import './src/brushes/pencil_brush.class'; // optional freedrawing
-import './src/brushes/circle_brush.class'; // optional freedrawing
-import './src/brushes/spray_brush.class'; // optional freedrawing
-import './src/brushes/pattern_brush.class'; // optional freedrawing
 import './src/canvas.class'; // optional interaction
 import './src/mixins/canvas_events.mixin'; // optional interaction
 import './src/mixins/canvas_grouping.mixin'; // optional interaction
@@ -90,5 +84,6 @@ import './src/mixins/itext_key_behavior.mixin'; // optional itext
 import './src/mixins/itext.svg_export'; // optional itext
 import './src/shapes/textbox.class'; // optional textbox
 import './src/controls'; // optional interaction
+import './src/brushes'; // optional freedrawing
 //  extends fabric.StaticCanvas, fabric.Canvas, fabric.Object, depends on fabric.PencilBrush and fabric.Rect
 // import './src/mixins/eraser_brush.mixin'; // optional erasing
