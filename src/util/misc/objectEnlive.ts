@@ -60,7 +60,7 @@ export const loadImage = (url: string, { signal, crossOrigin = null }: LoadImage
 
 type EnlivenObjectOptions = {
   signal: AbortSignal;
-  reviver: (arg: any) => void;
+  reviver: (arg: any, arg2: any) => void;
   namespace: any;
 }
 
