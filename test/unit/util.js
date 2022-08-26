@@ -689,6 +689,7 @@
 
   QUnit.test('getKlass', function(assert) {
     assert.equal(fabric.util.getKlass('circle'), fabric.Circle);
+    assert.equal(fabric.util.getKlass('i-text'), fabric.IText);
     assert.equal(fabric.util.getKlass('rect'), fabric.Rect);
     assert.equal(fabric.util.getKlass('RemoveWhite', 'fabric.Image.filters'), fabric.Image.filters.RemoveWhite);
     assert.equal(fabric.util.getKlass('Sepia2', 'fabric.Image.filters'), fabric.Image.filters.Sepia2);
