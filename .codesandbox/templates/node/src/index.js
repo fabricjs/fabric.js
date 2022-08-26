@@ -15,6 +15,9 @@ http
       res.setHeader('Content-Disposition', 'attachment; filename="fabric.png"');
       canvas.createPNGStream().pipe(res);
     }
+    else if (req.url === '/view') {
+      canvas.createPNGStream().pipe(res);
+    }
     else {
       const imageData = canvas.toDataURL();
       res.writeHead(200, '', { 'Content-Type': 'text/html' });
@@ -24,5 +27,5 @@ http
   })
   .listen(port, (err) => {
     if (err) throw err;
-    console.log(`> Ready on http://localhost:${port} http://localhost:${port}/download`);
+    console.log(`> Ready on http://localhost:${port}, http://localhost:${port}/view, http://localhost:${port}/download`);
   });
