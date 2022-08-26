@@ -95,11 +95,11 @@ export class Configuration {
 
     NUM_FRACTION_DIGITS = 2
 
-    constructor(config: Partial<Omit<Configuration, 'configure'>> = {}) {
+    constructor(config?: Partial<Omit<Configuration, 'configure'>>) {
         this.configure(config);
     }
 
-    configure(config: Partial<Omit<Configuration, 'configure'>>) {
+    configure(config: Partial<Omit<Configuration, 'configure'>> = {}) {
         Object.assign(this, config);
     }
 }
