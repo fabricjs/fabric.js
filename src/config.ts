@@ -1,6 +1,6 @@
 
 
-class Configuration {
+export class Configuration {
 
     /**
     * Browser-specific constant to adjust CanvasRenderingContext2D.shadowBlur value,
