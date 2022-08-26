@@ -1,15 +1,18 @@
 # Fabric.js
 
-<a href="http://fabricjs.com/kitchensink" target="_blank"><img align="right" src="https://github.com/kangax/fabric.js/raw/master/lib/screenshot.png" style="width:400px"></a>
+<a href="http://fabricjs.com/kitchensink" target="_blank"><img align="right" src="/lib/screenshot.png" style="width:400px"></a>
 
 
 
 A **simple and powerful Javascript HTML5 canvas library**.
 
+---
+
 <!-- build/coverage status, climate -->
 [![Build Status](https://secure.travis-ci.org/fabricjs/fabric.js.svg?branch=master)](http://travis-ci.org/#!/fabricjs/fabric.js)
 [![Code Climate](https://d3s6mut3hikguw.cloudfront.net/github/kangax/fabric.js/badges/gpa.svg)](https://codeclimate.com/github/kangax/fabric.js)
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/fabricjs/fabric.js)
+
 
 <!-- npm, bower, CDNJS versions, downloads -->
 [![CDNJS version](https://img.shields.io/cdnjs/v/fabric.js.svg)](https://cdnjs.com/libraries/fabric.js)
@@ -29,16 +32,14 @@ A **simple and powerful Javascript HTML5 canvas library**.
 -----
 
 ## Features 
-- Interactive
-  - drag-n-drop objects on canvas
-  - scale, move, rotate and group objects with mouse
-  - built in controls and animations
-- use predefined shapes or create custom objects
-- works super-fast with many objects
-- supports JPG, PNG, JSON and SVG formats
-- ready-to-use image filters
-- create animations
-- and much more!
+- Out of the box interactions - scale, move, rotate, skew, group and more
+- Built in shapes, controls, animations, image filters, gradients, patterns, brushes...
+- `JPG`, `PNG`, `JSON` and `SVG` i/o
+- [Fast](https://github.com/fabricjs/fabric.js/wiki/Focus-on-speed)
+- Typed and modular
+- Cross-browser, see [supported browsers](#supported-browsers)
+- Runs on [Node.js](http://nodejs.org/), see [Node.js installation](#nodejs) and [limitations](https://github.com/fabricjs/fabric.js/wiki/Fabric-limitations-in-node.js)
+- [Unit tested](/CONTRIBUTING.md#-testing)
 
 
 ## Installation
@@ -59,20 +60,24 @@ const fabric = require("fabric").fabric;
 
 ```
 
-### Node.js
+#### Node.js
 If you are using Fabric.js in a Node.js script, you will depend on [node-canvas](https://github.com/Automattic/node-canvas) for a canvas implementation (`HTMLCanvasElement` replacement) and [jsdom](https://github.com/jsdom/jsdom) for a `window` implementation.
+
 Follow these [instructions](https://github.com/Automattic/node-canvas#compiling) to get `node-canvas` up and running.
 
-### Browser es6
-see [browser modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) for using es6 imports in the browser or use a dedicated bundler.
+See [Node.js limitations](https://github.com/fabricjs/fabric.js/wiki/Fabric-limitations-in-node.js).
 
-### CDN
+#### Browser es6
+
+See [browser modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) for using es6 imports in the browser or use a dedicated bundler.
+
+#### CDN
 
 [cdnjs](https://cdnjs.com/libraries/fabric.js), [jsdelivr](https://www.jsdelivr.com/package/npm/fabric)
 
-## Qucik Start
+## Quick Start
 
-### Plain HTML
+#### Plain HTML
 
 ```html
 <canvas id="canvas" width="300" height="300"></canvas>
@@ -91,7 +96,7 @@ see [browser modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Gu
 </script>
 ```
 
-### ReactJS
+#### ReactJS
 
 ```tsx
 import React, { useEffect, useRef } from 'react';
@@ -115,47 +120,66 @@ export const FabricJSCanvas = () => {
 
 ```
 
-## Contributing
+#### Node.js
 
-See the [Contribution Guide](/CONTRIBUTING.md)
+```js
+const http = require('http');
+const { fabric } = require('fabric');
 
+const port = 8080;
 
-## Goals
+http
+  .createServer((req, res) => {
+    const canvas = new fabric.Canvas(null, { width: 100, height: 100 });
+    const rect = new fabric.Rect({ width: 20, height: 50, fill: '#ff0000' });
+    const text = new fabric.Text('fabric.js', { fill: 'blue', fontSize: 24 });
+    canvas.add(rect, text);
+    canvas.renderAll();
+    if (req.url === '/download') {
+      canvas.createPNGStream().pipe(res);
+    }
+    else {
+      const imageData = canvas.toDataURL();
+      res.writeHead(200, '', { 'Content-Type': 'text/html' });
+      res.write(`<img src="${imageData}" />`);
+      res.end();
+    }
+  })
+  .listen(port, (err) => {
+    if (err) throw err;
+    console.log(`> Ready on http://localhost:${port}`);
+  });
+```
 
-- Unit tested
-- Modular
-- Cross-browser
-- [Fast](https://github.com/kangax/fabric.js/wiki/Focus-on-speed)
-- No browser sniffing for critical functionality
-- Runs under es6 strict mode
-- Runs on a server under [Node.js](http://nodejs.org/) (active stable releases and latest of current) (see [Node.js limitations](https://github.com/fabricjs/fabric.js/wiki/Fabric-limitations-in-node.js))
-- Follows [Semantic Versioning](http://semver.org/)
-
-## Supported browsers
+## Supported Browsers
 
 - Firefox 4+
 - Safari 5+
 - Opera 9.64+
 - Chrome (all versions)
 - Edge (chromium based, all versions)
-- IE11 and Edge legacy, not supported
+
+IE11 and Edge legacy are **not** supported
 
 
-## More resources
+## Contributing, Developing and More
+
+Follow the [Contribution Guide](/CONTRIBUTING.md)
+
+
+## More Resources
 
 - [Fabric.js on Twitter](https://twitter.com/fabricjs)
 - [Fabric.js on CodeTriage](https://www.codetriage.com/kangax/fabric.js)
 - [Fabric.js on Stackoverflow](https://stackoverflow.com/questions/tagged/fabricjs)
 - [Fabric.js on jsfiddle](https://jsfiddle.net/user/fabricjs/fiddles/)
 - [Fabric.js on Codepen.io](https://codepen.io/tag/fabricjs)
-- [Presentation from BK.js](http://www.slideshare.net/kangax/fabricjs-building-acanvaslibrarybk)
-- [Presentation from Falsy Values](http://www.slideshare.net/kangax/fabric-falsy-values-8067834)
 
 
 ## Credits
 
 - [@kangax](https://twitter.com/kangax)
-- [Andrea Bogazzi](https://twitter.com/AndreaBogazzi)
+- [asturur](https://github.com/asturur), [Andrea Bogazzi](https://twitter.com/AndreaBogazzi)
 - [melchiar](https://github.com/melchiar)
 - [ShaMan123](https://github.com/ShaMan123)
 - Ernest Delgado for the original idea of [manipulating images on canvas](http://www.ernestdelgado.com/archive/canvas/)
@@ -163,5 +187,5 @@ See the [Contribution Guide](/CONTRIBUTING.md)
 - [Sergey Nisnevich](http://nisnya.com) for help with geometry logic
 - [Stefan Kienzle](https://twitter.com/kienzle_s) for help with bugs, features, documentation, GitHub issues
 - [Shutterstock](http://www.shutterstock.com/jobs) for the time and resources invested in using and improving Fabric.js
-- [and all the other GitHub contributors](https://github.com/fabricjs/fabric.js/graphs/contributors)
+- [and all the other contributors](https://github.com/fabricjs/fabric.js/graphs/contributors)
 
