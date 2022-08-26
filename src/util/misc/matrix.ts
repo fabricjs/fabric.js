@@ -23,7 +23,7 @@ type TScaleMatrixArgs = {
   skewY?: TDegree;
 }
 
-type TComposeMatrixArgs = TTranslateMatrixArgs & TRotateMatrixArgs & TScaleMatrixArgs;
+export type TComposeMatrixArgs = TTranslateMatrixArgs & TRotateMatrixArgs & TScaleMatrixArgs;
 /**
  * Apply transform t to point p
  * @static
@@ -33,7 +33,7 @@ type TComposeMatrixArgs = TTranslateMatrixArgs & TRotateMatrixArgs & TScaleMatri
  * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
  * @return {Point} The transformed point
  */
-export const transformPoint = (p: Point | IPoint, t: TMat2D, ignoreOffset: boolean): Point => new Point(p).transform(t, ignoreOffset);
+export const transformPoint = (p: Point | IPoint, t: TMat2D, ignoreOffset?: boolean): Point => new Point(p).transform(t, ignoreOffset);
 
 /**
  * Invert transformation t
@@ -76,7 +76,7 @@ export const multiplyTransformMatrices = (a: TMat2D, b: TMat2D, is2x2?: boolean)
  * @param  {TMat2D} a transformMatrix
  * @return {Object} Components of transform
  */
-export const qrDecompose = (a: TMat2D): TComposeMatrixArgs => {
+export const qrDecompose = (a: TMat2D): Required<Omit<TComposeMatrixArgs, 'flipX' | 'flipY'>> => {
   const angle = Math.atan2(a[1], a[0]),
         denom = Math.pow(a[0], 2) + Math.pow(a[1], 2),
         scaleX = Math.sqrt(denom),

@@ -370,7 +370,7 @@ export class Point {
    * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
    * @return {Point} The transformed point
    */
-  transform(t: TMat2D, ignoreOffset: boolean): Point {
+  transform(t: TMat2D, ignoreOffset = false): Point {
     return new Point(
       t[0] * this.x + t[2] * this.y + (ignoreOffset ? 0 : t[4]),
       t[1] * this.x + t[3] * this.y + (ignoreOffset ? 0 : t[5])
