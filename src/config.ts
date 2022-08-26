@@ -51,11 +51,14 @@ export class Configuration {
     /**
      * if webgl is enabled and available, textureSize will determine the size
      * of the canvas backend
+     * 
+     * In order to support old hardware set to `2048` to avoid OOM
+     * 
      * @since 2.0.0
      * @type Number
      * @default
      */
-    textureSize = 2048
+    textureSize = 4096
 
     /**
      * When 'true', style information is not retained when copy/pasting text, making
@@ -93,7 +96,11 @@ export class Configuration {
      */
     forceGLPutImageData = false
 
-    NUM_FRACTION_DIGITS = 2
+    /**
+     * Used in exporting methods (`toObject`, `toJSON`, `toSVG`)
+     * Controls the percision of exported values
+     */
+    NUM_FRACTION_DIGITS = 4
 
     constructor(config?: Partial<Omit<Configuration, 'configure'>>) {
         this.configure(config);
