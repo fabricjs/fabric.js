@@ -6,9 +6,7 @@ interface NominalTag<T> {
 
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
 
-// eslint-disable-next-line no-unused-vars
 const enum Degree { }
-// eslint-disable-next-line no-unused-vars
 const enum Radian { }
 
 export type TDegree = Nominal<number, Degree>;
@@ -20,6 +18,7 @@ export type TSize = {
 }
 
 export type Percent = `${number}%`;
+
 export const enum StrokeLineJoin {
   miter = 'miter',
   bevel = 'bevel',
@@ -48,3 +47,14 @@ export const enum SupportedSVGUnit {
 }
 
 export type TMat2D = [number, number, number, number, number, number];
+
+export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
+
+/**
+ * SVG path commands
+ */
+export type PathData = (string | number)[][];
+
+export type Event<E extends Event = MouseEvent | TouchEvent> = {
+  e: E
+}
