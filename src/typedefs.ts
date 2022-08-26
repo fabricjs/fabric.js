@@ -51,7 +51,7 @@ export type TEvent<E extends Event = MouseEvent | TouchEvent> = {
   e: E
 }
 
-export type TransformEvent<T> = Event & T & {
+export type TransformEvent<T> = TEvent & T & {
   transform: {
     target: any
   }
