@@ -243,8 +243,10 @@
   tests.push({
     test: 'Text percentage gradient',
     code: text7,
+    width: 200,
+    height: 75,
     golden: 'text7.png',
-    percentage: 0.01,
+    percentage: 0.04,
   });
 
   function text8(canvas, callback) {
