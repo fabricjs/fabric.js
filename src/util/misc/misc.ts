@@ -91,6 +91,7 @@ import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
     addTransformToObject,
     applyTransformToObject,
     removeTransformFromObject,
+    makeBoundingBoxFromPoints,
     /**
      * Sends a point from the source coordinate plane to the destination coordinate plane.\
      * From the canvas/viewer's perspective the point remains unchanged.
