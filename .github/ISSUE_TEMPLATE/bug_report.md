@@ -1,19 +1,21 @@
 ---
 name: Bug report
-about: Create a report with a reproducible test case in a JSFIDDLE, For anything else use the github DISCUSSIONS feature. Anything different than a bug report will be closed.
+about: Create a report with a reproducible test case. For anything else use the [DISCUSSIONS](https://github.com/fabricjs/fabric.js/discussions). Anything different than a detailed bug report will be closed.
 
 ---
-<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
 
-<!-- BUG TEMPLATE -->
+## Check List
 
-<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
+- [ ] I have read and followed the [Contributing Guide](/CONTRIBUTING.md)
+- [ ] I have read and followed the [Issue Tracker Guide](/CONTRIBUTING.md#%EF%B8%8F-issue-tracker)
+- [ ] I have searched existing issues and discussions
+- [ ] I have managed to reproduce the bug **after** upgrading to the **latest** version
+- [ ] I have created an accurate and minimal reproduction
 
 <!-- If you are working on a version below latest you should upgrade to latest before filing a bug report, your issue might have been resolved already -->
 ## Version
 5.0.0
 
-- [ ] I have read and followed the [Contributing Guide](/CONTRIBUTING.md)
 
 ## Test Case
 
