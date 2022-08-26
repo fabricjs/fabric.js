@@ -1,65 +1,77 @@
-//@ts-nocheck
-(function(global) {
-  var fabric = global.fabric;
+import { fabric } from "../../HEADER";
+import { PathData } from "../typedefs";
+import { createCanvasElement } from "../util";
+import { Canvas } from "../__types__";
+import { PencilBrush } from "./pencil_brush.class";
+
+/**
+ * @todo remove transient
+ */
+const { Pattern } = fabric;
+
+
+export class PatternBrush extends PencilBrush {
+
+  source?: CanvasImageSource
+
+  constructor(canvas: Canvas) {
+    super(canvas);
+  }
+
+  getPatternSrc() {
+
+    const dotWidth = 20,
+      dotDistance = 5,
+      patternCanvas = createCanvasElement(),
+      patternCtx = patternCanvas.getContext('2d');
+
+    patternCanvas.width = patternCanvas.height = dotWidth + dotDistance;
+
+    patternCtx.fillStyle = this.color;
+    patternCtx.beginPath();
+    patternCtx.arc(dotWidth / 2, dotWidth / 2, dotWidth / 2, 0, Math.PI * 2, false);
+    patternCtx.closePath();
+    patternCtx.fill();
+
+    return patternCanvas;
+  }
+
+  getPatternSrcFunction() {
+    return String(this.getPatternSrc).replace('this.color', '"' + this.color + '"');
+  }
+
   /**
-   * PatternBrush class
-   * @class fabric.PatternBrush
-   * @extends fabric.BaseBrush
+   * Creates "pattern" instance property
+   * @param {CanvasRenderingContext2D} ctx
    */
-  fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabric.PatternBrush.prototype */ {
+  getPattern(ctx: CanvasRenderingContext2D) {
+    return ctx.createPattern(this.source || this.getPatternSrc(), 'repeat');
+  }
 
-    getPatternSrc: function() {
+  /**
+   * Sets brush styles
+   * @param {CanvasRenderingContext2D} ctx
+   */
+  _setBrushStyles(ctx: CanvasRenderingContext2D) {
+    super._setBrushStyles(ctx);
+    const pattern = this.getPattern(ctx);
+    pattern && (ctx.strokeStyle = pattern);
+  }
 
-      var dotWidth = 20,
-          dotDistance = 5,
-          patternCanvas = fabric.util.createCanvasElement(),
-          patternCtx = patternCanvas.getContext('2d');
+  /**
+   * Creates path
+   */
+  createPath(pathData: PathData) {
+    const path = super.createPath(pathData),
+      topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2);
 
-      patternCanvas.width = patternCanvas.height = dotWidth + dotDistance;
+    path.stroke = new Pattern({
+      source: this.source || this.getPatternSrcFunction(),
+      offsetX: -topLeft.x,
+      offsetY: -topLeft.y
+    });
+    return path;
+  }
+}
 
-      patternCtx.fillStyle = this.color;
-      patternCtx.beginPath();
-      patternCtx.arc(dotWidth / 2, dotWidth / 2, dotWidth / 2, 0, Math.PI * 2, false);
-      patternCtx.closePath();
-      patternCtx.fill();
-
-      return patternCanvas;
-    },
-
-    getPatternSrcFunction: function() {
-      return String(this.getPatternSrc).replace('this.color', '"' + this.color + '"');
-    },
-
-    /**
-     * Creates "pattern" instance property
-     * @param {CanvasRenderingContext2D} ctx
-     */
-    getPattern: function(ctx) {
-      return ctx.createPattern(this.source || this.getPatternSrc(), 'repeat');
-    },
-
-    /**
-     * Sets brush styles
-     * @param {CanvasRenderingContext2D} ctx
-     */
-    _setBrushStyles: function(ctx) {
-      this.callSuper('_setBrushStyles', ctx);
-      ctx.strokeStyle = this.getPattern(ctx);
-    },
-
-    /**
-     * Creates path
-     */
-    createPath: function(pathData) {
-      var path = this.callSuper('createPath', pathData),
-          topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2);
-
-      path.stroke = new fabric.Pattern({
-        source: this.source || this.getPatternSrcFunction(),
-        offsetX: -topLeft.x,
-        offsetY: -topLeft.y
-      });
-      return path;
-    }
-  });
-})(typeof exports !== 'undefined' ? exports : window);
+fabric.PatternBrush = PatternBrush;
