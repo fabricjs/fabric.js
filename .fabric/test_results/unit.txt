@@ -1,7 +1,0 @@
-
-1..1372
-# tests 1372
-# pass  1209
-# skip  0
-# todo  0
-# fail  163
