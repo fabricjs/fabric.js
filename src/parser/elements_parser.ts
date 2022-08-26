@@ -1,8 +1,9 @@
 //@ts-nocheck
-(function(global) {
-  var fabric = global.fabric;
 
-  fabric.ElementsParser = function(elements, callback, options, reviver, parsingOptions, doc) {
+import { fabric } from "../../HEADER";
+import { capitalize, invertTransform, multiplyTransformMatrices, qrDecompose } from "../util";
+
+  const ElementsParser = function(elements, callback, options, reviver, parsingOptions, doc) {
     this.elements = elements;
     this.callback = callback;
     this.options = options;
@@ -21,25 +22,24 @@
     };
 
     proto.createObjects = function() {
-      var _this = this;
-      this.elements.forEach(function(element, i) {
-        element.setAttribute('svgUid', _this.svgUid);
-        _this.createObject(element, i);
+      this.elements.forEach((element, i) => {
+        element.setAttribute('svgUid', this.svgUid);
+        this.createObject(element, i);
       });
     };
 
     proto.findTag = function(el) {
-      return fabric[fabric.util.string.capitalize(el.tagName.replace('svg:', ''))];
+      return fabric[capitalize(el.tagName.replace('svg:', ''))];
     };
 
     proto.createObject = function(el, index) {
-      var klass = this.findTag(el);
+      const klass = this.findTag(el);
       if (klass && klass.fromElement) {
         try {
           klass.fromElement(el, this.createCallback(index, el), this.options);
         }
         catch (err) {
-          fabric.log(err);
+          console.log(err);
         }
       }
       else {
@@ -48,9 +48,9 @@
     };
 
     proto.createCallback = function(index, el) {
-      var _this = this;
+      const _this = this;
       return function(obj) {
-        var _options;
+        let _options;
         _this.resolveGradient(obj, el, 'fill');
         _this.resolveGradient(obj, el, 'stroke');
         if (obj instanceof fabric.Image && obj._originalElement) {
@@ -65,21 +65,21 @@
     };
 
     proto.extractPropertyDefinition = function(obj, property, storage) {
-      var value = obj[property], regex = this.regexUrl;
+      const value = obj[property], regex = this.regexUrl;
       if (!regex.test(value)) {
         return;
       }
       regex.lastIndex = 0;
-      var id = regex.exec(value)[1];
+      const id = regex.exec(value)[1];
       regex.lastIndex = 0;
       return fabric[storage][this.svgUid][id];
     };
 
     proto.resolveGradient = function(obj, el, property) {
-      var gradientDef = this.extractPropertyDefinition(obj, property, 'gradientDefs');
+      const gradientDef = this.extractPropertyDefinition(obj, property, 'gradientDefs');
       if (gradientDef) {
-        var opacityAttr = el.getAttribute(property + '-opacity');
-        var gradient = fabric.Gradient.fromElement(gradientDef, obj, opacityAttr, this.options);
+        const opacityAttr = el.getAttribute(property + '-opacity');
+        const gradient = fabric.Gradient.fromElement(gradientDef, obj, opacityAttr, this.options);
         obj.set(property, gradient);
       }
     };
@@ -97,15 +97,15 @@
           element, klass, objTransformInv, container, gTransform, options;
       if (clipPath) {
         container = [];
-        objTransformInv = fabric.util.invertTransform(obj.calcTransformMatrix());
+        objTransformInv = invertTransform(obj.calcTransformMatrix());
         // move the clipPath tag as sibling to the real element that is using it
-        var clipPathTag = clipPath[0].parentNode;
-        var clipPathOwner = usingElement;
+        const clipPathTag = clipPath[0].parentNode;
+        let clipPathOwner = usingElement;
         while (clipPathOwner.parentNode && clipPathOwner.getAttribute('clip-path') !== obj.clipPath) {
           clipPathOwner = clipPathOwner.parentNode;
         }
         clipPathOwner.parentNode.appendChild(clipPathTag);
-        for (var i = 0; i < clipPath.length; i++) {
+        for (let i = 0; i < clipPath.length; i++) {
           element = clipPath[i];
           klass = this.findTag(element);
           klass.fromElement(
@@ -120,14 +120,14 @@
         else {
           clipPath = new fabric.Group(container);
         }
-        gTransform = fabric.util.multiplyTransformMatrices(
+        gTransform = multiplyTransformMatrices(
           objTransformInv,
           clipPath.calcTransformMatrix()
         );
         if (clipPath.clipPath) {
           this.resolveClipPath(clipPath, clipPathOwner);
         }
-        var options = fabric.util.qrDecompose(gTransform);
+        const options = qrDecompose(gTransform);
         clipPath.flipX = false;
         clipPath.flipY = false;
         clipPath.set('scaleX', options.scaleX);
@@ -153,5 +153,6 @@
         this.callback(this.instances, this.elements);
       }
     };
-  })(fabric.ElementsParser.prototype);
-})(typeof exports !== 'undefined' ? exports : window);
+  })(ElementsParser.prototype);
+
+export { ElementsParser };

@@ -131,7 +131,7 @@ Before you PR, before even cloning or creating a branch, read this section throu
 
 First of all, take a look at [fabric-gotchas](http://fabricjs.com/fabric-gotchas). It might save you time, effort and frustration.
 
-Follow [Devleoping](#-developing-) **OR** [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/) and start coding!
+Follow [Developing](#-developing-) **OR** [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/) and start coding!
 
 
 ### ✅ Guidelines 

@@ -1,4 +1,8 @@
 //@ts-nocheck
+
+import { renderCircleControl, renderSquareControl } from "./controls.render";
+
+
 (function(global) {
 
   var fabric = global.fabric || (global.fabric = { });
@@ -327,10 +331,10 @@
       styleOverride = styleOverride || {};
       switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
         case 'circle':
-          fabric.controlsUtils.renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
           break;
         default:
-          fabric.controlsUtils.renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
       }
     },
   };
