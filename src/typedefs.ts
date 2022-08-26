@@ -55,6 +55,6 @@ export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
  */
 export type PathData = (string | number)[][];
 
-export type Event<E extends Event = MouseEvent | TouchEvent> = {
+export type TEvent<E extends Event = MouseEvent | TouchEvent> = {
   e: E
 }

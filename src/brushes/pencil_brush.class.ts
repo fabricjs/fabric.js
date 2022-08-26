@@ -1,6 +1,6 @@
 import { fabric } from "../../HEADER";
 import { Point } from "../point.class";
-import { Event, ModifierKey, PathData } from "../typedefs";
+import { TEvent, ModifierKey, PathData } from "../typedefs";
 import { getSmoothPathFromPoints, joinPath } from "../util";
 import { Canvas } from "../__types__";
 import { BaseBrush } from "./base_brush.class";
@@ -69,7 +69,7 @@ export class PencilBrush extends BaseBrush {
    * Invoked on mouse down
    * @param {Point} pointer
    */
-  onMouseDown(pointer: Point, { e }: Event) {
+  onMouseDown(pointer: Point, { e }: TEvent) {
     if (!this.canvas._isMainEvent(e)) {
       return;
     }
@@ -85,7 +85,7 @@ export class PencilBrush extends BaseBrush {
    * Invoked on mouse move
    * @param {Point} pointer
    */
-  onMouseMove(pointer: Point, { e }: Event) {
+  onMouseMove(pointer: Point, { e }: TEvent) {
     if (!this.canvas._isMainEvent(e)) {
       return;
     }
@@ -118,7 +118,7 @@ export class PencilBrush extends BaseBrush {
   /**
    * Invoked on mouse up
    */
-  onMouseUp({ e }: Event) {
+  onMouseUp({ e }: TEvent) {
     if (!this.canvas._isMainEvent(e)) {
       return true;
     }
