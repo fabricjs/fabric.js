@@ -25,7 +25,7 @@ type LoadImageOptions = {
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  * @param {Promise<fabric.Image>} img the loaded image.
  */
-export const loadImage = (url: string, { signal, crossOrigin = null }: LoadImageOptions) =>
+export const loadImage = (url: string, { signal, crossOrigin = null }: LoadImageOptions = {}) =>
   new Promise(function (resolve, reject) {
     if (signal && signal.aborted) {
       return reject(new Error('`options.signal` is in `aborted` state'));
@@ -59,12 +59,10 @@ export const loadImage = (url: string, { signal, crossOrigin = null }: LoadImage
 
 
 type EnlivenObjectOptions = {
-  signal: AbortSignal;
-  reviver: (arg: any, arg2: any) => void;
-  namespace: any;
+  signal?: AbortSignal;
+  reviver?: (arg: any, arg2: any) => void;
+  namespace?: any;
 }
-
-
 
 /**
  * Creates corresponding fabric instances from their object representations
@@ -84,7 +82,7 @@ export const enlivenObjects = (
     signal,
     reviver = noop,
     namespace = fabric,
-  }: EnlivenObjectOptions,
+  }: EnlivenObjectOptions = {},
 ) => new Promise((resolve, reject) => {
   const instances: any[] = [];
   signal && signal.addEventListener('abort', reject, { once: true });
@@ -121,7 +119,7 @@ export const enlivenObjects = (
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  * @returns {Promise<{[key:string]:fabric.Object|fabric.Pattern|fabric.Gradient|null}>} the input object with enlived values
  */
-export const enlivenObjectEnlivables = (serializedObject: any, { signal }: { signal: AbortSignal }) =>
+export const enlivenObjectEnlivables = (serializedObject: any, { signal }: { signal?: AbortSignal } = {}) =>
   new Promise((resolve, reject) => {
     const instances: any[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
