@@ -18,7 +18,6 @@ import './src/util/animate'; // optional animation
 import './src/util/animate_color'; // optional animation
 import './src/util/anim_ease'; // optional easing
 import './src/parser'; // optional parser
-import './src/elements_parser'; // optional parser
 import './src/point.class';
 import './src/intersection.class';
 import './src/color';
