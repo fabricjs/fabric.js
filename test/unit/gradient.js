@@ -690,7 +690,11 @@
     fabric.Object.__uid = 0;
     var gradient = createRadialGradientSwapped();
     var obj = new fabric.Object({ width: 100, height: 100 });
-    assert.equal(gradient.toSVG(obj), SVG_SWAPPED);
+    const gradientColorStops = JSON.stringify(gradient.colorStops);
+    assert.equal(gradient.toSVG(obj), SVG_SWAPPED, 'it exports as expected');
+    const gradientColorStopsAfterExport = JSON.stringify(gradient.colorStops);
+    assert.equal(gradient.toSVG(obj), SVG_SWAPPED, 'it exports as expected a second time');
+    assert.equal(gradientColorStops, gradientColorStopsAfterExport, 'colorstops do not change')
   });
 
   QUnit.test('toSVG linear objectBoundingBox', function(assert) {

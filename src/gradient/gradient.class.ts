@@ -146,8 +146,8 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     const markup = [],
       transform = this.gradientTransform ? this.gradientTransform.concat() : iMatrix.concat(),
       gradientUnits = this.gradientUnits === 'pixels' ? 'userSpaceOnUse' : 'objectBoundingBox';
-    // colorStops must be sorted ascending
-    const colorStops = this.colorStops.concat().sort((a, b) => {
+    // colorStops must be sorted ascending, and guarded against deep mutations
+    const colorStops = this.colorStops.map((colorStop) => ({ ...colorStop })).sort((a, b) => {
       return a.offset - b.offset;
     });
 
@@ -274,7 +274,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    * @return {Gradient} Gradient instance
    * @see http://www.w3.org/TR/SVG/pservers.html#LinearGradientElement
    * @see http://www.w3.org/TR/SVG/pservers.html#RadialGradientElement
-   * 
+   *
    *  @example
    *
    *  <linearGradient id="linearGrad1">
