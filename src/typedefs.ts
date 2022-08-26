@@ -39,7 +39,7 @@ export const enum SupportedSVGUnit {
 }
 
 export type TMat2D = [number, number, number, number, number, number];
-
+  
 export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
 
 /**
@@ -47,6 +47,12 @@ export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
  */
 export type PathData = (string | number)[][];
 
-export type Event<E extends Event = MouseEvent | TouchEvent> = {
+export type TEvent<E extends Event = MouseEvent | TouchEvent> = {
   e: E
+}
+
+export type TransformEvent<T> = TEvent & T & {
+  transform: {
+    target: any
+  }
 }
