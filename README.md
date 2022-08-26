@@ -55,13 +55,14 @@ $ yarn add fabric
 // es6 imports
 import { fabric } from "fabric";
 
-//  cjs
+//  or cjs
 const fabric = require("fabric").fabric;
 
 ```
 
 #### Node.js
-If you are using Fabric.js in a Node.js script, you will depend on [node-canvas](https://github.com/Automattic/node-canvas) for a canvas implementation (`HTMLCanvasElement` replacement) and [jsdom](https://github.com/jsdom/jsdom) for a `window` implementation.
+
+Fabric.js depends on [node-canvas](https://github.com/Automattic/node-canvas) for a canvas implementation (`HTMLCanvasElement` replacement) and [jsdom](https://github.com/jsdom/jsdom) for a `window` implementation on node.
 
 Follow these [instructions](https://github.com/Automattic/node-canvas#compiling) to get `node-canvas` up and running.
 
