@@ -1,21 +1,30 @@
 ---
 name: Bug report
-about: Create a report with a reproducible test case in a JSFIDDLE, For anything else use the github DISCUSSIONS feature. Anything different than a bug report will be closed automatically.
+about: Create a report with a reproducible test case in a JSFIDDLE, For anything else use the github DISCUSSIONS feature. Anything different than a bug report will be closed.
 
 ---
 <!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
 
 <!-- BUG TEMPLATE -->
 
+<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
+
 <!-- If you are working on a version below latest you should upgrade to latest before filing a bug report, your issue might have been resolved already -->
 ## Version
 5.0.0
 
-<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
-<!-- A good reproduction helps us understand better your issue, find the bug and fix it quickly so take the time to make it accurate and minimal -->
+- [ ] I have read and followed the [Contributing Guide](/CONTRIBUTING.md)
+
 ## Test Case
-- [ ] [Browser Issue Template](https://jsfiddle.net/Lcp2h3nv/)
-- [ ] [Node Issue Template](https://codesandbox.io/s/exciting-browser-ytb701)
+
+<!-- 
+
+A good reproduction helps us understand your issue, find the bug and fix it quickly so take the time and make the effort to make it accurate and minimal.
+Use the following reproduction templates to create one.
+-->
+
+- [ ] [Browser Reproduction](https://jsfiddle.net/Lcp2h3nv/)
+- [ ] [Node Reproduction](https://codesandbox.io/s/exciting-browser-ytb701)
 
 ## Information about environment
 Nodejs or browser?
