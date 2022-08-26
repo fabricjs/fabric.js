@@ -137,6 +137,8 @@ http
     canvas.add(rect, text);
     canvas.renderAll();
     if (req.url === '/download') {
+      res.setHeader('Content-Type', 'image/png');
+      res.setHeader('Content-Disposition', 'attachment; filename="fabric.png"');
       canvas.createPNGStream().pipe(res);
     }
     else {
@@ -148,7 +150,7 @@ http
   })
   .listen(port, (err) => {
     if (err) throw err;
-    console.log(`> Ready on http://localhost:${port}`);
+    console.log(`> Ready on http://localhost:${port} http://localhost:${port}/download`);
   });
 ```
 
