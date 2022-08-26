@@ -16,7 +16,7 @@
       eventListener[eventListener.indexOf(handler)] = false;
     }
     else {
-      eventListener.fill(eventListener, false);
+      eventListener.fill(false);
     }
   }
 
