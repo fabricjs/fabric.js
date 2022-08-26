@@ -1,5 +1,5 @@
 import { fabric } from '../../../HEADER';
-import { capitalize } from '../lang_string';
+import { capitalize, camelize } from '../lang_string';
 import { noop } from '../../constants';
 
 /**
@@ -9,7 +9,7 @@ import { noop } from '../../constants';
  * @param {object} namespace Namespace to get klass "Class" object from
  * @return {Object} klass "Class"
  */
-export const getKlass = (type: string, namespace = fabric): any => namespace[capitalize(type, true)];
+export const getKlass = (type: string, namespace = fabric): any => namespace[capitalize(camelize(type), true)];
 
 type LoadImageOptions = {
   signal?: AbortSignal;
