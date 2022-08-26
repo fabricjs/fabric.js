@@ -82,7 +82,7 @@ See [browser modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Gu
 ```html
 <canvas id="canvas" width="300" height="300"></canvas>
 
-<script src="https://cdn.jsdelivr.net/npm/fabric/dist/fabric.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fabric"></script>
 <script>
     const canvas = new fabric.Canvas('canvas');
     const rect = new fabric.Rect({
@@ -150,6 +150,10 @@ http
     console.log(`> Ready on http://localhost:${port}`);
   });
 ```
+
+## Docs
+
+See the [Website](http://fabricjs.com/)
 
 ## Supported Browsers
 
