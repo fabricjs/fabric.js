@@ -1,0 +1,37 @@
+diff --git a/scripts/index.js b/scripts/index.js
+index 546e5ec7..e9802a20 100644
+--- a/scripts/index.js
++++ b/scripts/index.js
+@@ -148,7 +148,7 @@ function startWebsite() {
+     const args = ['run', 'start:dev'];
+ 
+     //  WSL ubuntu
+-    // https://github.com/microsoft/WSL/issues/216 
++    // https://github.com/microsoft/WSL/issues/216
+     // os.platform() === 'win32' && args.push('--', '--force_polling', '--livereload');
+     if (os.platform() === 'win32') {
+         console.log(chalk.green('Consider using ubuntu on WSL to run jekyll with the following options:'));
+@@ -272,7 +272,7 @@ async function test(suite, tests, options = {}) {
+         env: {
+             ...process.env,
+             TEST_FILES: (tests || []).join(','),
+-            NODE_CMD: ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' '),
++            NODE_CMD: [...(options.coverage ? ['nyc --silent']: []), 'qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' '),
+             VERBOSE: Number(options.verbose),
+             QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
+             QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
+@@ -469,6 +469,7 @@ program
+     .option('-p, --port')
+     .option('-o, --out <out>', 'path to report test results to')
+     .option('--clear-cache', 'clear CLI test cache', false)
++    .option('-cov --coverage', 'Add coverage report with nyc', false)
+     .action((options) => {
+         if (options.clearCache) {
+             fs.removeSync(CLI_CACHE);
+@@ -538,4 +539,4 @@ program
+         });
+     });
+ 
+-program.parse(process.argv);
+\ No newline at end of file
++program.parse(process.argv);
