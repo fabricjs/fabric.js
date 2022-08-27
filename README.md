@@ -159,7 +159,7 @@ http
 
 ## Docs
 
-See the [Website](http://fabricjs.com/)
+See the [Website](http://fabricjs.com/) and beware of [**gotchas**](https://github.com/fabricjs/fabric.js/wiki/Fabric-gotchas)
 
 ## Supported Browsers
 
