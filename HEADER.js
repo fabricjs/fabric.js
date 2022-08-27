@@ -114,14 +114,6 @@ fabric.arcToSegmentsCache = { };
 fabric.boundsOfCurveCache = { };
 
 
-fabric.initFilterBackend = function() {
-  if (config.enableGLFiltering && fabric.isWebglSupported && fabric.isWebglSupported(config.textureSize)) {
-    console.log(`fabric: max texture size: ${config.maxTextureSize}`);
-    return (new fabric.WebglFilterBackend({ tileSize: config.textureSize }));
-  }
-  else if (fabric.Canvas2dFilterBackend) {
-    return (new fabric.Canvas2dFilterBackend());
-  }
-};
+
 
 export { fabric };
