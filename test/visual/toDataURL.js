@@ -25,8 +25,7 @@
     }
   }
   fabric.config.configure({
-    enableGLFiltering: false,
-    isWebglSupported: false
+    enableGLFiltering: false
   });
   var visualTestLoop;
   if (fabric.isLikelyNode) {

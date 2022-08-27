@@ -25,8 +25,7 @@
     }
   }
   fabric.config.configure({
-    enableGLFiltering: false,
-    isWebglSupported: false
+    enableGLFiltering: false
   });
   fabric.Object.prototype.objectCaching = true;
   var visualTestLoop;
