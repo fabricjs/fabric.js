@@ -62,6 +62,8 @@
     "test": "node ./scripts test",
     "test:unit-browser": "npm run test -- -s unit -p 8080 -l -c ",
     "test:visual-browser": "npm run test -- -s visual -p 8080 -l -c ",
+    "test:old_but_gold": "qunit --require ./test/node_test_setup.js test/lib test/unit",
+    "test:visual:old_but_gold": "qunit test/node_test_setup.js test/lib test/visual",
     "test:coverage": "nyc --silent qunit test/node_test_setup.js test/lib test/unit",
     "test:visual:coverage": "nyc --silent --no-clean qunit test/node_test_setup.js test/lib test/visual",
     "coverage:report": "nyc report --reporter=lcov --reporter=text",
