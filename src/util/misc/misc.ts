@@ -30,10 +30,14 @@ import {
 } from './svgParsing';
 import { findScaleToFit, findScaleToCover } from './findScaleTo';
 import { capValue } from './capValue';
-
-  /**
-   * @typedef {[number,number,number,number,number,number]} Matrix
-   */
+import {
+  saveObjectTransform,
+  resetObjectTransform,
+  addTransformToObject,
+  applyTransformToObject,
+  removeTransformFromObject,
+} from './objectTransforms';
+import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
 
   /**
    * @namespace fabric.util
@@ -82,6 +86,12 @@ import { capValue } from './capValue';
     findScaleToFit,
     findScaleToCover,
     capValue,
+    saveObjectTransform,
+    resetObjectTransform,
+    addTransformToObject,
+    applyTransformToObject,
+    removeTransformFromObject,
+    makeBoundingBoxFromPoints,
     /**
      * Sends a point from the source coordinate plane to the destination coordinate plane.\
      * From the canvas/viewer's perspective the point remains unchanged.
@@ -140,37 +150,6 @@ import { capValue } from './capValue';
       }
       var t = canvas.viewportTransform;
       return fabric.util.transformPoint(point, relationAfter === 'child' ? fabric.util.invertTransform(t) : t);
-    },
-
-    /**
-     * Returns coordinates of points's bounding rectangle (left, top, width, height)
-     * @static
-     * @memberOf fabric.util
-     * @param {Array} points 4 points array
-     * @param {Array} [transform] an array of 6 numbers representing a 2x3 transform matrix
-     * @return {Object} Object with left, top, width, height properties
-     */
-    makeBoundingBoxFromPoints: function(points, transform) {
-      if (transform) {
-        for (var i = 0; i < points.length; i++) {
-          points[i] = fabric.util.transformPoint(points[i], transform);
-        }
-      }
-      var xPoints = [points[0].x, points[1].x, points[2].x, points[3].x],
-          minX = fabric.util.array.min(xPoints),
-          maxX = fabric.util.array.max(xPoints),
-          width = maxX - minX,
-          yPoints = [points[0].y, points[1].y, points[2].y, points[3].y],
-          minY = fabric.util.array.min(yPoints),
-          maxY = fabric.util.array.max(yPoints),
-          height = maxY - minY;
-
-      return {
-        left: minX,
-        top: minY,
-        width: width,
-        height: height
-      };
     },
 
     /**
@@ -344,43 +323,6 @@ import { capValue } from './capValue';
     },
 
     /**
-     * reset an object transform state to neutral. Top and left are not accounted for
-     * @static
-     * @memberOf fabric.util
-     * @param  {fabric.Object} target object to transform
-     */
-    resetObjectTransform: function (target) {
-      target.scaleX = 1;
-      target.scaleY = 1;
-      target.skewX = 0;
-      target.skewY = 0;
-      target.flipX = false;
-      target.flipY = false;
-      target.rotate(0);
-    },
-
-    /**
-     * Extract Object transform values
-     * @static
-     * @memberOf fabric.util
-     * @param  {fabric.Object} target object to read from
-     * @return {Object} Components of transform
-     */
-    saveObjectTransform: function (target) {
-      return {
-        scaleX: target.scaleX,
-        scaleY: target.scaleY,
-        skewX: target.skewX,
-        skewY: target.skewY,
-        angle: target.angle,
-        left: target.left,
-        flipX: target.flipX,
-        flipY: target.flipY,
-        top: target.top
-      };
-    },
-
-    /**
      * Returns true if context has transparent pixel
      * at specified location (taking tolerance into account)
      * @param {CanvasRenderingContext2D} ctx context
@@ -460,59 +402,6 @@ import { capValue } from './capValue';
       var roughWidth = Math.sqrt(maximumArea * ar),
           perfLimitSizeY = Math.floor(maximumArea / roughWidth);
       return { x: Math.floor(roughWidth), y: perfLimitSizeY };
-    },
-
-    /**
-     * given an object and a transform, apply the inverse transform to the object,
-     * this is equivalent to remove from that object that transformation, so that
-     * added in a space with the removed transform, the object will be the same as before.
-     * Removing from an object a transform that scale by 2 is like scaling it by 1/2.
-     * Removing from an object a transform that rotate by 30deg is like rotating by 30deg
-     * in the opposite direction.
-     * This util is used to add objects inside transformed groups or nested groups.
-     * @memberOf fabric.util
-     * @param {fabric.Object} object the object you want to transform
-     * @param {Array} transform the destination transform
-     */
-    removeTransformFromObject: function(object, transform) {
-      var inverted = fabric.util.invertTransform(transform),
-          finalTransform = fabric.util.multiplyTransformMatrices(inverted, object.calcOwnMatrix());
-      fabric.util.applyTransformToObject(object, finalTransform);
-    },
-
-    /**
-     * given an object and a transform, apply the transform to the object.
-     * this is equivalent to change the space where the object is drawn.
-     * Adding to an object a transform that scale by 2 is like scaling it by 2.
-     * This is used when removing an object from an active selection for example.
-     * @memberOf fabric.util
-     * @param {fabric.Object} object the object you want to transform
-     * @param {Array} transform the destination transform
-     */
-    addTransformToObject: function(object, transform) {
-      fabric.util.applyTransformToObject(
-        object,
-        fabric.util.multiplyTransformMatrices(transform, object.calcOwnMatrix())
-      );
-    },
-
-    /**
-     * discard an object transform state and apply the one from the matrix.
-     * @memberOf fabric.util
-     * @param {fabric.Object} object the object you want to transform
-     * @param {Array} transform the destination transform
-     */
-    applyTransformToObject: function(object, transform) {
-      var options = fabric.util.qrDecompose(transform),
-          center = new Point(options.translateX, options.translateY);
-      object.flipX = false;
-      object.flipY = false;
-      object.set('scaleX', options.scaleX);
-      object.set('scaleY', options.scaleY);
-      object.skewX = options.skewX;
-      object.skewY = options.skewY;
-      object.angle = options.angle;
-      object.setPositionByOrigin(center, 'center', 'center');
     },
 
     /**

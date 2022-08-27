@@ -463,7 +463,7 @@
       assert.equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
     }
     catch (err) {
-      fabric.log('jpeg toDataURL not supported');
+      console.log('jpeg toDataURL not supported');
     }
   });
 
