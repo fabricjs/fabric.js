@@ -272,22 +272,19 @@ function exportToWebsite(options) {
     })
 }
 
-
 /**
- *
- * @param {'unit' | 'visual'} suite
- * @param {string[] | null} tests file paths
- * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:string}} [options]
+ * 
+ * @returns {Promise<boolean | undefined>} true if some tests failed
  */
-async function test(suite, tests, options = {}) {
-    const port = options.port || suite === 'visual' ? 8081 : 8080;
+async function runTestem({ suite, port, launch, dev, processOptions, context } = {}) {
+    port = port || suite === 'visual' ? 8081 : 8080;
     try {
         await killPort(port);
     } catch (error) {
 
     }
 
-    if (options.launch) {
+    if (launch) {
         // open localhost
         const url = `http://localhost:${port}/`;
         const start = (os.platform() === 'darwin' ? 'open' : os.platform() === 'win32' ? 'start' : 'xdg-open');
@@ -297,9 +294,32 @@ async function test(suite, tests, options = {}) {
     const processCmdOptions = [
         '-p', port,
         '-f', `test/testem.${suite}.js`,
-        '-l', options.context.map(_.upperFirst).join(',')
+        '-l', context.map(_.upperFirst).join(',')
     ];
 
+    if (dev) {
+        cp.spawn(['testem', ...processCmdOptions].join(' '), {
+            ...processOptions,
+            detached: true
+        });
+    }
+    else {
+        try {
+            cp.execSync(['testem', 'ci', ...processCmdOptions].join(' '), processOptions);
+        } catch (error) {
+            return true;
+        }
+    }
+}
+
+/**
+ *
+ * @param {'unit' | 'visual'} suite
+ * @param {string[] | null} tests file paths
+ * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:string}} [options]
+ * @returns {Promise<boolean | undefined>} true if some tests failed
+ */
+async function test(suite, tests, options = {}) {
     const processOptions = {
         cwd: wd,
         env: {
@@ -316,22 +336,29 @@ async function test(suite, tests, options = {}) {
         stdio: 'inherit',
     }
 
-    if (options.dev) {
-        cp.spawn(['testem', ...processCmdOptions].join(' '), {
-            ...processOptions,
-            detached: true
-        });
-    }
-    else {
+    let failed = false;
+
+    // temporary revert
+    // run node tests directly with qunit
+    if (options.context.includes('node')) {
         try {
-            cp.execSync(['testem', 'ci', ...processCmdOptions].join(' '), processOptions);
+            cp.execSync(processOptions.env.NODE_CMD, processOptions);            
         } catch (error) {
-            // minimal logging, no need for stack trace
-            console.error(error.message);
-            // inform ci
-            process.exit(1);
+            failed = true;
         }
     }
+
+    const browserContexts = options.context.filter(c => c !== 'node');
+    if (browserContexts.length > 0) {
+        failed = await runTestem({
+            ...options,
+            suite,
+            processOptions,
+            context: browserContexts
+        }) || failed;
+    }
+
+    return failed;
 }
 
 /**
@@ -447,15 +474,14 @@ async function runIntreactiveTestSuite(options) {
         }
         return acc;
     }, { unit: [], visual: [] });
-    _.reduce(tests, async (queue, files, suite) => {
-        await queue;
+    return Promise.all(_.map(tests, (files, suite) => {
         if (files === true) {
             return test(suite, null, options);
         }
         else if (Array.isArray(files) && files.length > 0) {
             return test(suite, files, options);
         }
-    }, Promise.resolve());
+    }));
 }
 
 program
@@ -507,28 +533,32 @@ program
     .option('-v, --verbose', 'log passing tests', false)
     .option('-l, --launch', 'launch tests in the browser', false)
     .option('--dev', 'runs testem in `dev` mode, without a `ci` flag', false)
-    .addOption(new commander.Option('-c, --context <context...>', 'context to test in').choices(['chrome', 'firefox', 'node']).default(['chrome', 'node']))
+    .addOption(new commander.Option('-c, --context <context...>', 'context to test in').choices(['chrome', 'firefox', 'node']).default(['node']))
     .option('-p, --port')
     .option('-o, --out <out>', 'path to report test results to')
     .option('--clear-cache', 'clear CLI test cache', false)
-    .action((options) => {
+    .action(async (options) => {
         if (options.clearCache) {
             fs.removeSync(CLI_CACHE);
         }
         if (options.all) {
             options.suite = ['unit', 'visual'];
         }
+        const results = [];
         if (options.suite) {
-            _.reduce(options.suite, async (queue, suite) => {
-                await queue;
+            results.push(...await Promise.all(_.map(options.suite, (suite) => {
                 return test(suite, null, options);
-            }, Promise.resolve());
+            })));
         }
         else if (options.file) {
-            test(options.file.startsWith('visual') ? 'visual' : 'unit', [`test/${options.file}`], options);
+            results.push(await test(options.file.startsWith('visual') ? 'visual' : 'unit', [`test/${options.file}`], options));
         }
         else {
-            runIntreactiveTestSuite(options);
+            results.push(...await runIntreactiveTestSuite(options));
+        }
+        if (_.some(results)) {
+            // inform ci that tests have failed
+            process.exit(1);
         }
     });
 
