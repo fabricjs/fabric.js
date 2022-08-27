@@ -113,6 +113,11 @@ export class Configuration {
     cachesBoundsOfCurve = true
 
     /**
+     * Map<fontFamily, pathToFile> of font files
+     */
+    fontPaths: Record<string, string> = {}
+
+    /**
      * Used in exporting methods (`toObject`, `toJSON`, `toSVG`)
      * Controls the percision of exported values
      */
@@ -124,6 +129,26 @@ export class Configuration {
 
     configure(config: Partial<Omit<Configuration, 'configure'>> = {}) {
         Object.assign(this, config);
+    }
+
+    /**
+     * Map<fontFamily, pathToFile> of font files
+     */
+    addFonts(paths: Record<string, string> = {}) {
+        this.fontPaths = {
+            ...this.fontPaths,
+            ...paths
+        };
+    }
+
+    removeFonts(...fontFamilys: string[]) {
+        fontFamilys.forEach(fontFamily => {
+            delete this.fontPaths[fontFamily];
+        });
+    }
+
+    clearFonts() {
+        this.fontPaths = {};
     }
 }
 

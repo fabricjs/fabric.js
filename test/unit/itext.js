@@ -58,6 +58,7 @@
     hooks.afterEach(function() {
       canvas.clear();
       canvas.cancelRequestedRender();
+      fabric.config.clearFonts();
     });
 
     QUnit.test('constructor', function(assert) {
@@ -696,10 +697,10 @@
         },
         fontFamily: 'Plaster'
       });
-      fabric.fontPaths = {
+      fabric.config.addFonts({
         Engagement: 'path-to-engagement-font-file',
         Plaster: 'path-to-plaster-font-file',
-      };
+      });
       canvas.add(iText);
       assert.equal(typeof iText.toSVG, 'function');
       var parser = new DOMParser(),
@@ -730,12 +731,12 @@
         },
         fontFamily: 'Poppins'
       });
-      fabric.fontPaths = {
+      fabric.config.addFonts({
         Engagement: 'path-to-engagement-font-file',
         Plaster: 'path-to-plaster-font-file',
         Poppins: 'path-to-poppins-font-file',
         Lacquer: 'path-to-lacquer-font-file'
-      };
+      });
       var subGroup = new fabric.Group([iText1]);
       var group = new fabric.Group([subGroup, iText2]);
       canvas.add(group);

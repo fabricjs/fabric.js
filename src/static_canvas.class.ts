@@ -1279,7 +1279,7 @@ import { removeFromArray } from './util/internals';
     createSVGFontFacesMarkup: function() {
       var markup = '', fontList = { }, obj, fontFamily,
           style, row, rowIndex, _char, charIndex, i, len,
-          fontPaths = fabric.fontPaths, objects = [];
+          fontPaths = config.fontPaths, objects = [];
 
       this._objects.forEach(function add(object) {
         objects.push(object);

@@ -78,7 +78,7 @@ fabric.SHARED_ATTRIBUTES = [
 
 
 fabric.reNonWord = /[ \n\.,;!\?\-]/;
-fabric.fontPaths = { };
+
 fabric.iMatrix = iMatrix;
 
 
@@ -91,7 +91,6 @@ config.configure({
     fabric.window.mozDevicePixelRatio ||
     1
 });
-
 
 /**
  * Cache Object for widths of chars in text rendering.
