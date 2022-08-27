@@ -231,7 +231,6 @@
 
       testedProperties.forEach(function(property) {
         cObj.set(property, fractionalValue);
-        console.log(cObj.toObject()[property])
         assert.equal(cObj.toObject()[property], expectedValue,
           'value of ' + property + ' should have ' + fractionDigits + ' fractional digits');
       }, this);
