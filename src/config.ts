@@ -114,9 +114,10 @@ class BaseConfiguration {
     cachesBoundsOfCurve = true
 
     /**
+     * Map of font files
      * Map<fontFamily, pathToFile> of font files
      */
-    fontPaths: Record<string, string> = {}
+    fontPaths: Record</** fontFamily */ string, /** pathToFile */ string> = {}
 
     /**
      * Defines the number of fraction digits to use when serializing object values.
@@ -140,7 +141,7 @@ export class Configuration extends BaseConfiguration {
     /**
      * Map<fontFamily, pathToFile> of font files
      */
-    addFonts(paths: Record<string, string> = {}) {
+    addFonts(paths: Record</** fontFamily */ string, /** pathToFile */ string> = {}) {
         this.fontPaths = {
             ...this.fontPaths,
             ...paths
