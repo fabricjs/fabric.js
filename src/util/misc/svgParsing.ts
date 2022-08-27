@@ -134,4 +134,4 @@ export const parsePreserveAspectRatioAttribute = (attribute: string): TPreserveA
  * @return {String} transform matrix for svg
  */
 export const matrixToSVG = (transform: TMat2D) =>
-  'matrix(' + transform.map((value) => toFixed(value, fabric.Object.NUM_FRACTION_DIGITS)).join(' ') + ')';
+  'matrix(' + transform.map((value) => toFixed(value, config.NUM_FRACTION_DIGITS)).join(' ') + ')';

@@ -831,7 +831,7 @@ import { capValue } from '../util/misc/capValue';
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+      var NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
 
           object = {
             type:                     this.type,
@@ -1912,16 +1912,6 @@ import { capValue } from '../util/misc/capValue';
   fabric.util.createAccessors && fabric.util.createAccessors(fabric.Object);
 
   extend(fabric.Object.prototype, fabric.Observable);
-
-  /**
-   * Defines the number of fraction digits to use when serializing object values.
-   * You can use it to increase/decrease precision of such values like left, top, scaleX, scaleY, etc.
-   * @static
-   * @memberOf fabric.Object
-   * @constant
-   * @type Number
-   */
-  fabric.Object.NUM_FRACTION_DIGITS = 2;
 
   /**
    *
