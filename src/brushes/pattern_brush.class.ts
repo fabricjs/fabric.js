@@ -1,6 +1,6 @@
 import { fabric } from "../../HEADER";
 import { PathData } from "../typedefs";
-import { createCanvasElement } from "../util";
+import { createCanvasElement } from "../util/misc/dom";
 import { Canvas } from "../__types__";
 import { PencilBrush } from "./pencil_brush.class";
 

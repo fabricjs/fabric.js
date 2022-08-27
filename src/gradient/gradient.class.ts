@@ -4,7 +4,8 @@ import { fabric } from "../../HEADER";
 import { Color } from "../color";
 import { iMatrix } from "../constants";
 import { parseTransformAttribute } from "../parser/parseTransformAttribute";
-import { matrixToSVG, populateWithProperties } from "../util";
+import { matrixToSVG } from "../util/misc/svgParsing";
+// import { populateWithProperties } from "../util/misc/misc";
 import { linearDefaultCoords, radialDefaultCoords } from "./constants";
 import { parseColorStops, parseCoords, parseGradientUnits, parseType } from "./parser";
 import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnits, SVGOptions } from "./typedefs";
@@ -131,7 +132,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
       gradientUnits: this.gradientUnits,
       gradientTransform: this.gradientTransform ? this.gradientTransform.concat() : this.gradientTransform
     };
-    populateWithProperties(this, object, propertiesToInclude);
+    fabric.util.populateWithProperties(this, object, propertiesToInclude);
 
     return object;
   }
