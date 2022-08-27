@@ -1,6 +1,5 @@
 //@ts-nocheck
 
-import { cache } from "../cache";
 import { config } from "../config";
 import { commaWsp, rePathCommand } from "../parser/constants";
 import { Point } from '../point.class';
@@ -132,8 +131,8 @@ import { Point } from '../point.class';
     var argsString;
     if (config.cachesBoundsOfCurve) {
       argsString = _join.call(arguments);
-      if (cache.boundsOfCurveCache[argsString]) {
-        return cache.boundsOfCurveCache[argsString];
+      if (fabric.boundsOfCurveCache[argsString]) {
+        return fabric.boundsOfCurveCache[argsString];
       }
     }
 
@@ -205,7 +204,7 @@ import { Point } from '../point.class';
       }
     ];
     if (config.cachesBoundsOfCurve) {
-      cache.boundsOfCurveCache[argsString] = result;
+      fabric.boundsOfCurveCache[argsString] = result;
     }
     return result;
   }
