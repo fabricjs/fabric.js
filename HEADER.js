@@ -6,6 +6,7 @@ import { iMatrix, VERSION } from './src/constants';
 var fabric = fabric || {
   version: VERSION,
   config,
+  iMatrix
 };
 
 if (typeof exports !== 'undefined') {
@@ -79,7 +80,6 @@ fabric.SHARED_ATTRIBUTES = [
 
 fabric.reNonWord = /[ \n\.,;!\?\-]/;
 
-fabric.iMatrix = iMatrix;
 
 
 /**
