@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { config } from "../config";
-import { WebGLPrecision } from "../typedefs";
+import { TWebGLPrecision, WebGLPrecision } from "../typedefs";
 
 
 (function(global) {
@@ -9,7 +9,7 @@ import { WebGLPrecision } from "../typedefs";
   /**
    * Tests if webgl supports certain precision
    * @param {WebGL} Canvas WebGL context to test on
-   * @param {String} Precision to test can be any of following: 'lowp', 'mediump', 'highp'
+   * @param {TWebGLPrecision} Precision to test can be any of following
    * @returns {Boolean} Whether the user's browser WebGL supports given precision.
    */
   function testPrecision(gl, precision){
@@ -36,18 +36,13 @@ import { WebGLPrecision } from "../typedefs";
     var canvas = document.createElement('canvas');
     var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
     var isSupported = false;
-    // eslint-disable-next-line
     if (gl) {
       config.configure({ maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE) });
-      isSupported = fabric.maxTextureSize >= tileSize;
-      for (const key in WebGLPrecision) {
-        if (testPrecision(gl, key)) {
-          config.configure({
-            webGLPrecision: key
-          });
-          break;
-        };
-      }
+      isSupported = config.maxTextureSize >= tileSize;
+      const percisionKey = WebGLPrecision.find(key => testPrecision(gl, key));
+      config.configure({
+        webGLPrecision: percisionKey
+      });
     }
     this.isSupported = isSupported;
     return isSupported;
