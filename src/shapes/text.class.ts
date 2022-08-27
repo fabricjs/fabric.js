@@ -1,5 +1,6 @@
 //@ts-nocheck
 
+import { cache } from "../cache";
 import { DEFAULT_SVG_FONT_SIZE } from "../constants";
 
 
@@ -705,10 +706,10 @@ import { DEFAULT_SVG_FONT_SIZE } from "../constants";
      */
     getFontCache: function(decl) {
       var fontFamily = decl.fontFamily.toLowerCase();
-      if (!fabric.charWidthsCache[fontFamily]) {
-        fabric.charWidthsCache[fontFamily] = { };
+      if (!cache.charWidthsCache[fontFamily]) {
+        cache.charWidthsCache[fontFamily] = { };
       }
-      var cache = fabric.charWidthsCache[fontFamily],
+      var cache = cache.charWidthsCache[fontFamily],
           cacheProp = decl.fontStyle.toLowerCase() + '_' + (decl.fontWeight + '').toLowerCase();
       if (!cache[cacheProp]) {
         cache[cacheProp] = { };
