@@ -1,3 +1,4 @@
+import { WebGLPrecision } from "./typedefs"
 
 
 export class Configuration {
@@ -25,6 +26,12 @@ export class Configuration {
     DPI = 96
 
     /**
+     * Device Pixel Ratio
+     * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
+     */
+    devicePixelRatio = 1
+
+    /**
      * Pixel limit for cache canvases. 1Mpx , 4Mpx should be fine.
      * @since 1.7.14
      * @type Number
@@ -49,18 +56,6 @@ export class Configuration {
     minCacheSideLimit = 256
 
     /**
-     * if webgl is enabled and available, textureSize will determine the size
-     * of the canvas backend
-     * 
-     * In order to support old hardware set to `2048` to avoid OOM
-     * 
-     * @since 2.0.0
-     * @type Number
-     * @default
-     */
-    textureSize = 4096
-
-    /**
      * When 'true', style information is not retained when copy/pasting text, making
      * pasted text use destination style.
      * Defaults to 'false'.
@@ -80,12 +75,17 @@ export class Configuration {
      */
     enableGLFiltering = true
 
-
     /**
-     * If disabled boundsOfCurveCache is not used. For apps that make heavy usage of pencil drawing probably disabling it is better
-     * @default true
+     * if webgl is enabled and available, textureSize will determine the size
+     * of the canvas backend
+     * 
+     * In order to support old hardware set to `2048` to avoid OOM
+     * 
+     * @since 2.0.0
+     * @type Number
+     * @default
      */
-    cachesBoundsOfCurve = true
+    textureSize = 4096
 
     /**
      * Skip performance testing of setupGLContext and force the use of putImageData that seems to be the one that works best on
@@ -95,6 +95,22 @@ export class Configuration {
      * @default false
      */
     forceGLPutImageData = false
+
+    /**
+     * WebGL
+     */
+    maxTextureSize?: number
+
+    /**
+     * WebGL
+     */
+    webGLPrecision?: WebGLPrecision
+
+    /**
+     * If disabled boundsOfCurveCache is not used. For apps that make heavy usage of pencil drawing probably disabling it is better
+     * @default true
+     */
+    cachesBoundsOfCurve = true
 
     /**
      * Used in exporting methods (`toObject`, `toJSON`, `toSVG`)

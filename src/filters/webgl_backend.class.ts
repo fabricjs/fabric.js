@@ -1,4 +1,9 @@
 //@ts-nocheck
+
+import { config } from "../config";
+import { WebGLPrecision } from "../typedefs";
+
+
 (function(global) {
   var fabric = global.fabric;
   /**
@@ -33,12 +38,13 @@
     var isSupported = false;
     // eslint-disable-next-line
     if (gl) {
-      fabric.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+      config.configure({ maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE) });
       isSupported = fabric.maxTextureSize >= tileSize;
-      var precisions = ['highp', 'mediump', 'lowp'];
-      for (var i = 0; i < 3; i++){
-        if (testPrecision(gl, precisions[i])){
-          fabric.webGlPrecision = precisions[i];
+      for (const key in WebGLPrecision) {
+        if (testPrecision(gl, key)) {
+          config.configure({
+            webGLPrecision: key
+          });
           break;
         };
       }
@@ -111,7 +117,7 @@
       var targetCanvas = fabric.util.createCanvasElement();
       // eslint-disable-next-line no-undef
       var imageBuffer = new ArrayBuffer(width * height * 4);
-      if (fabric.forceGLPutImageData) {
+      if (config.forceGLPutImageData) {
         this.imageBuffer = imageBuffer;
         this.copyGLTo2D = copyGLTo2DPutImageData;
         return;

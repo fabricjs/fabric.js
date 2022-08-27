@@ -56,3 +56,9 @@ export type TransformEvent<T> = TEvent & T & {
     target: any
   }
 }
+
+export const enum WebGLPrecision {
+  low = 'lowp',
+  mediump = 'mediump',
+  high = 'highp'
+}

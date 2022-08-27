@@ -2,6 +2,7 @@ import { fabric } from '../../../HEADER';
 import { SVGElementName, SupportedSVGUnit, TMat2D } from '../../typedefs';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
 import { toFixed } from './toFixed';
+import { config } from '../../config';
 /**
  * Returns array of attributes for given svg that fabric parses
  * @memberOf fabric.util
@@ -38,7 +39,7 @@ export const parseUnit = (value: string, fontSize: number) => {
   if (!fontSize) {
     fontSize = DEFAULT_SVG_FONT_SIZE;
   }
-  const dpi = fabric.DPI;
+  const dpi = config.DPI;
   switch (unit?.[0]) {
     case SupportedSVGUnit.mm:
       return number * dpi / 25.4;

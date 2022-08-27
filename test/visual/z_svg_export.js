@@ -1,6 +1,8 @@
 (function() {
-  fabric.enableGLFiltering = false;
-  fabric.isWebglSupported = false;
+  fabric.config.configure({
+    enableGLFiltering: false,
+    isWebglSupported: false
+  });
   var visualTestLoop;
   var getAssetName;
   if (fabric.isLikelyNode) {
