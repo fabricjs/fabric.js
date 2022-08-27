@@ -1,4 +1,4 @@
-import { WebGLPrecision } from "./typedefs";
+import { TWebGLPrecision } from "./typedefs";
 
 export type TConfiguration = Partial<BaseConfiguration>;
 
@@ -105,7 +105,7 @@ class BaseConfiguration {
     /**
      * WebGL
      */
-    webGLPrecision?: WebGLPrecision
+    webGLPrecision?: TWebGLPrecision
 
     /**
      * If disabled boundsOfCurveCache is not used. For apps that make heavy usage of pencil drawing probably disabling it is better
