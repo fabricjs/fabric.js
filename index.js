@@ -1,5 +1,6 @@
 import './HEADER';
 // import './lib/event'), // optional gestures
+import './___error___';
 import './src/mixins/observable.mixin';
 import './src/mixins/collection.mixin';
 import './src/mixins/shared_methods.mixin';
