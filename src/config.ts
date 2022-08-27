@@ -1,7 +1,8 @@
-import { WebGLPrecision } from "./typedefs"
+import { WebGLPrecision } from "./typedefs";
 
+export type TConfiguration = Partial<BaseConfiguration>;
 
-export class Configuration {
+class BaseConfiguration {
 
     /**
     * Browser-specific constant to adjust CanvasRenderingContext2D.shadowBlur value,
@@ -118,16 +119,21 @@ export class Configuration {
     fontPaths: Record<string, string> = {}
 
     /**
+     * Defines the number of fraction digits to use when serializing object values.
      * Used in exporting methods (`toObject`, `toJSON`, `toSVG`)
-     * Controls the percision of exported values
+     * You can use it to increase/decrease precision of such values like left, top, scaleX, scaleY, etc.
      */
     NUM_FRACTION_DIGITS = 4
+}
 
-    constructor(config?: Partial<Omit<Configuration, 'configure'>>) {
+export class Configuration extends BaseConfiguration {
+
+    constructor(config?: TConfiguration) {
+        super();
         this.configure(config);
     }
 
-    configure(config: Partial<Omit<Configuration, 'configure'>> = {}) {
+    configure(config: TConfiguration = {}) {
         Object.assign(this, config);
     }
 
@@ -141,7 +147,7 @@ export class Configuration {
         };
     }
 
-    removeFonts(...fontFamilys: string[]) {
+    removeFonts(fontFamilys: string[] = []) {
         fontFamilys.forEach(fontFamily => {
             delete this.fontPaths[fontFamily];
         });
@@ -149,6 +155,15 @@ export class Configuration {
 
     clearFonts() {
         this.fontPaths = {};
+    }
+
+    restoreDefaults<T extends BaseConfiguration>(keys?: (keyof T)[]) {
+        const defaults = new BaseConfiguration() as T;
+        const config = keys?.reduce((acc, key) => {
+            acc[key] = defaults[key];
+            return acc;
+        }, {} as T) || defaults;
+        this.configure(config);
     }
 }
 
