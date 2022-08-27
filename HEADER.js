@@ -1,11 +1,13 @@
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
+import { cache } from './src/cache';
 import { config } from './src/config';
 import { iMatrix, VERSION } from './src/constants';
 
 var fabric = fabric || {
   version: VERSION,
   config,
+  cache,
   iMatrix
 };
 
