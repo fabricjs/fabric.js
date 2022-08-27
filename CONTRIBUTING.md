@@ -18,7 +18,7 @@ Demos and examples 🤓 can be found on [fabricjs.com](http://fabricjs.com/demos
 ## 🏷️ Issue Tracker 
 
 - **Before You Begin** 🎬
-  - 📌 Make sure you didn't fall into a known [**GOTCHA**](http://fabricjs.com/fabric-gotchas)
+  - 📌 Make sure you didn't fall into a known [**GOTCHA**](https://github.com/fabricjs/fabric.js/wiki/Fabric-gotchas)
   - 🔎 [**Searching**](https://github.com/fabricjs/fabric.js/search?q=&ref=cmdform&type=Issues) for existing issues and discussions is
   🔋 **VITAL** in order to keep the community in a good state, prevent spamming 👎 and become a skilled fabric dev 🦉.
 - The **Title** must be informative, short and 🧿 to the point.
@@ -125,11 +125,11 @@ Fabric is an open source project 🦄 and as such depends on the community.
 
 Genuine effort has made this repository what it is 🌺 Join Us as we strive to make Fabric better. 
 
-Before you PR, before even cloning or creating a branch, read this section through and take a look at [fabric-gotchas](http://fabricjs.com/fabric-gotchas).
+Before you PR, before even cloning or creating a branch, read this section through and take a look at [fabric-gotchas](https://github.com/fabricjs/fabric.js/wiki/Fabric-gotchas).
 
 ### Getting Started
 
-First of all, take a look at [fabric-gotchas](http://fabricjs.com/fabric-gotchas). It might save you time, effort and frustration.
+First of all, take a look at [fabric-gotchas](https://github.com/fabricjs/fabric.js/wiki/Fabric-gotchas). It might save you time, effort and frustration.
 
 Follow [Developing](#-developing-) **OR** [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/) and start coding!
 
