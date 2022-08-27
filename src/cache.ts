@@ -1,25 +1,9 @@
 
 export class Cache {
     /**
-     * Cache of widths of chars in text rendering.
+     * Cache Object for widths of chars in text rendering.
      */
-    charWidthsCache: Record</** fontFamily */ string, Record</** fontStyleCacheKey */ string, Record</** char */ string, /** width */ number>>> = {}
-
-    /**
-     * @return {Object} reference to cache
-     */
-    getFontCache({ fontFamily, fontStyle, fontWeight }: { fontFamily: string, fontStyle: string, fontWeight: string | number }) {
-        fontFamily = fontFamily.toLowerCase();
-        if (!this.charWidthsCache[fontFamily]) {
-            this.charWidthsCache[fontFamily] = {};
-        }
-        const fontCache = this.charWidthsCache[fontFamily];
-        const cacheKey = `${fontStyle.toLowerCase()}_${(fontWeight + '').toLowerCase()}`;
-        if (!fontCache[cacheKey]) {
-            fontCache[cacheKey] = {};
-        }
-        return fontCache[cacheKey];
-    }
+    charWidthsCache = {}
 
 
     /**

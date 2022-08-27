@@ -400,8 +400,8 @@
     text.initDimensions();
     var text2 = new fabric.Text('xxx', { fontWeight: 'bOLd', fontStyle: 'nORMAl' });
     text2.initDimensions();
-    var cache = fabric.cache.getFontCache(text);
-    var cache2 = fabric.cache.getFontCache(text2);
+    var cache = text.getFontCache(text);
+    var cache2 = text2.getFontCache(text2);
     assert.equal(cache, cache2, 'you get the same cache');
   });
   // moved
