@@ -114,6 +114,13 @@ const calcVectorAngle = (ux, uy, vx, vy) => {
   }
 };
 
+// functions for the Cubic beizer
+// taken from: https://github.com/konvajs/konva/blob/7.0.5/src/shapes/Path.ts#L350
+const CB1 = (t) => ttt * 3;
+const CB2 = (t) => 3 * tt ** 2 * (1 - t);
+const CB3 = (t) => 3 * t * (1 - t) ** 2;
+const CB4 = (t) => (1 - t) ** 3;
+
 /**
  * Calculate bounding box of a beziercurve
  * @param {Number} x0 starting point
@@ -179,15 +186,11 @@ const getBoundsOfCurve = (x0, y0, x1, y1, x2, y2, x3, y3) => {
 
   let j = tvalues.length;
   const jlen = j;
+  const iterator = getPointOnCubicBezierIterator(x0, y0, x1, y1, x2, y2, x3, y3);
   while (j--) {
-    const t = tvalues[j];
-    const mt = 1 - t;
-    const t3 = t ** 3;
-    const t2 = t ** 2;
-    const mt3 = mt ** 3;
-    const mt2 = mt ** 2;
-    bounds[0][j] = (mt3 * x0) + (3 * mt2 * t * x1) + (3 * mt * t2 * x2) + (t3 * x3);
-    bounds[1][j] = (mt3 * y0) + (3 * mt2 * t * y1) + (3 * mt * t2 * y2) + (t3 * y3);
+    const { x, y } = iterator(tvalues[j]);
+    bounds[0][j] = x;
+    bounds[1][j] = y;
   }
 
   bounds[0][jlen] = x0;
@@ -404,453 +407,419 @@ const makePathSimpler = (path) => {
   return destinationPath;
 };
 
-  /**
-   * Calc length from point x1,y1 to x2,y2
-   * @param {Number} x1 starting point x
-   * @param {Number} y1 starting point y
-   * @param {Number} x2 starting point x
-   * @param {Number} y2 starting point y
-   * @return {Number} length of segment
-   */
-  function calcLineLength(x1, y1, x2, y2) {
-    return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-  }
-
-  // functions for the Cubic beizer
-  // taken from: https://github.com/konvajs/konva/blob/7.0.5/src/shapes/Path.ts#L350
-  function CB1(t) {
-    return t * t * t;
-  }
-  function CB2(t) {
-    return 3 * t * t * (1 - t);
-  }
-  function CB3(t) {
-    return 3 * t * (1 - t) * (1 - t);
-  }
-  function CB4(t) {
-    return (1 - t) * (1 - t) * (1 - t);
-  }
-
-  function getPointOnCubicBezierIterator(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) {
-    return function(pct) {
-      var c1 = CB1(pct), c2 = CB2(pct), c3 = CB3(pct), c4 = CB4(pct);
-      return {
-        x: p4x * c1 + p3x * c2 + p2x * c3 + p1x * c4,
-        y: p4y * c1 + p3y * c2 + p2y * c3 + p1y * c4
-      };
-    };
-  }
-
-  function getTangentCubicIterator(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) {
-    return function (pct) {
-      var invT = 1 - pct,
-          tangentX = (3 * invT * invT * (p2x - p1x)) + (6 * invT * pct * (p3x - p2x)) +
-          (3 * pct * pct * (p4x - p3x)),
-          tangentY = (3 * invT * invT * (p2y - p1y)) + (6 * invT * pct * (p3y - p2y)) +
-          (3 * pct * pct * (p4y - p3y));
-      return Math.atan2(tangentY, tangentX);
-    };
-  }
-
-  function QB1(t) {
-    return t * t;
-  }
-
-  function QB2(t) {
-    return 2 * t * (1 - t);
-  }
-
-  function QB3(t) {
-    return (1 - t) * (1 - t);
-  }
-
-  function getPointOnQuadraticBezierIterator(p1x, p1y, p2x, p2y, p3x, p3y) {
-    return function(pct) {
-      var c1 = QB1(pct), c2 = QB2(pct), c3 = QB3(pct);
-      return {
-        x: p3x * c1 + p2x * c2 + p1x * c3,
-        y: p3y * c1 + p2y * c2 + p1y * c3
-      };
-    };
-  }
-
-  function getTangentQuadraticIterator(p1x, p1y, p2x, p2y, p3x, p3y) {
-    return function (pct) {
-      var invT = 1 - pct,
-          tangentX = (2 * invT * (p2x - p1x)) + (2 * pct * (p3x - p2x)),
-          tangentY = (2 * invT * (p2y - p1y)) + (2 * pct * (p3y - p2y));
-      return Math.atan2(tangentY, tangentX);
-    };
-  }
+// todo verify if we can just use the point class here
+/**
+ * Calc length from point x1,y1 to x2,y2
+ * @param {Number} x1 starting point x
+ * @param {Number} y1 starting point y
+ * @param {Number} x2 starting point x
+ * @param {Number} y2 starting point y
+ * @return {Number} length of segment
+ */
+const calcLineLength = (x1, y1, x2, y2) => Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 
 
-  // this will run over a path segment ( a cubic or quadratic segment) and approximate it
-  // with 100 segemnts. This will good enough to calculate the length of the curve
-  function pathIterator(iterator, x1, y1) {
-    var tempP = { x: x1, y: y1 }, p, tmpLen = 0, perc;
-    for (perc = 1; perc <= 100; perc += 1) {
-      p = iterator(perc / 100);
-      tmpLen += calcLineLength(tempP.x, tempP.y, p.x, p.y);
+const getPointOnCubicBezierIterator = (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct) => {
+  const c1 = CB1(pct), c2 = CB2(pct), c3 = CB3(pct), c4 = CB4(pct);
+  return {
+    x: p4x * c1 + p3x * c2 + p2x * c3 + p1x * c4,
+    y: p4y * c1 + p3y * c2 + p2y * c3 + p1y * c4
+  };
+};
+
+const QB1 = (t) => t ** 2;
+const QB2 = (t) => 2 * t * (1 - t);
+const QB3 = (t) => (1 - t) ** 2;
+
+const getTangentCubicIterator = (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct) => {
+  const qb1 = QB1(pct), qb2 = QB2(pct), qb3 = QB3(pct),
+        tangentX = 3 * (qb3 * (p2x - p1x) + qb2 * (p3x - p2x) + qb1 * (p4x - p3x)),
+        tangentY = 3 * (qb3 * (p2y - p1y) + qb2 * (p3y - p2y) + qb1 * (p4y - p3y));
+  return Math.atan2(tangentY, tangentX);
+};
+
+const getPointOnQuadraticBezierIterator = (p1x, p1y, p2x, p2y, p3x, p3y) => (pct) => {
+  const c1 = QB1(pct), c2 = QB2(pct), c3 = QB3(pct);
+  return {
+    x: p3x * c1 + p2x * c2 + p1x * c3,
+    y: p3y * c1 + p2y * c2 + p1y * c3
+  };
+};
+
+const getTangentQuadraticIterator = (p1x, p1y, p2x, p2y, p3x, p3y) => (pct) => {
+  const invT = 1 - pct,
+       tangentX = 2 * (invT * (p2x - p1x) + pct * (p3x - p2x)),
+       tangentY = 2 * (invT * (p2y - p1y) + pct * (p3y - p2y));
+  return Math.atan2(tangentY, tangentX);
+};
+
+
+// this will run over a path segment ( a cubic or quadratic segment) and approximate it
+// with 100 segemnts. This will good enough to calculate the length of the curve
+const pathIterator = (iterator, x1, y1) => {
+  let tempP = { x: x1, y: y1 }, tmpLen = 0;
+  for (let perc = 1; perc <= 100; perc += 1) {
+    const p = iterator(perc / 100);
+    tmpLen += calcLineLength(tempP.x, tempP.y, p.x, p.y);
+    tempP = p;
+  }
+  return tmpLen;
+}
+
+/**
+ * Given a pathInfo, and a distance in pixels, find the percentage from 0 to 1
+ * that correspond to that pixels run over the path.
+ * The percentage will be then used to find the correct point on the canvas for the path.
+ * @param {Array} segInfo fabricJS collection of information on a parsed path
+ * @param {Number} distance from starting point, in pixels.
+ * @return {Object} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
+ */
+const findPercentageForDistance = (segInfo, distance) => {
+  let perc = 0, tmpLen = 0, tempP = { x: segInfo.x, y: segInfo.y },
+      p, nextLen, nextStep = 0.01, lastPerc;
+  // nextStep > 0.0001 covers 0.00015625 that 1/64th of 1/100
+  // the path
+  const iterator = segInfo.iterator, angleFinder = segInfo.angleFinder;
+  while (tmpLen < distance && nextStep > 0.0001) {
+    p = iterator(perc);
+    lastPerc = perc;
+    nextLen = calcLineLength(tempP.x, tempP.y, p.x, p.y);
+    // compare tmpLen each cycle with distance, decide next perc to test.
+    if ((nextLen + tmpLen) > distance) {
+      // we discard this step and we make smaller steps.
+      perc -= nextStep;
+      nextStep /= 2;
+    }
+    else {
       tempP = p;
+      perc += nextStep;
+      tmpLen += nextLen;
     }
-    return tmpLen;
   }
+  p.angle = angleFinder(lastPerc);
+  return p;
+}
 
-  /**
-   * Given a pathInfo, and a distance in pixels, find the percentage from 0 to 1
-   * that correspond to that pixels run over the path.
-   * The percentage will be then used to find the correct point on the canvas for the path.
-   * @param {Array} segInfo fabricJS collection of information on a parsed path
-   * @param {Number} distance from starting point, in pixels.
-   * @return {Object} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
-   */
-  function findPercentageForDistance(segInfo, distance) {
-    var perc = 0, tmpLen = 0, iterator = segInfo.iterator, tempP = { x: segInfo.x, y: segInfo.y },
-        p, nextLen, nextStep = 0.01, angleFinder = segInfo.angleFinder, lastPerc;
-    // nextStep > 0.0001 covers 0.00015625 that 1/64th of 1/100
-    // the path
-    while (tmpLen < distance && nextStep > 0.0001) {
-      p = iterator(perc);
-      lastPerc = perc;
-      nextLen = calcLineLength(tempP.x, tempP.y, p.x, p.y);
-      // compare tmpLen each cycle with distance, decide next perc to test.
-      if ((nextLen + tmpLen) > distance) {
-        // we discard this step and we make smaller steps.
-        perc -= nextStep;
-        nextStep /= 2;
-      }
-      else {
-        tempP = p;
-        perc += nextStep;
-        tmpLen += nextLen;
-      }
-    }
-    p.angle = angleFinder(lastPerc);
-    return p;
-  }
-
-  /**
-   * Run over a parsed and simplifed path and extract some informations.
-   * informations are length of each command and starting point
-   * @param {Array} path fabricJS parsed path commands
-   * @return {Array} path commands informations
-   */
-  function getPathSegmentsInfo(path) {
-    var totalLength = 0, len = path.length, current,
-        //x2 and y2 are the coords of segment start
-        //x1 and y1 are the coords of the current point
-        x1 = 0, y1 = 0, x2 = 0, y2 = 0, info = [], iterator, tempInfo, angleFinder;
-    for (var i = 0; i < len; i++) {
-      current = path[i];
-      tempInfo = {
-        x: x1,
-        y: y1,
-        command: current[0],
-      };
-      switch (current[0]) { //first letter
-        case 'M':
-          tempInfo.length = 0;
-          x2 = x1 = current[1];
-          y2 = y1 = current[2];
-          break;
-        case 'L':
-          tempInfo.length = calcLineLength(x1, y1, current[1], current[2]);
-          x1 = current[1];
-          y1 = current[2];
-          break;
-        case 'C':
-          iterator = getPointOnCubicBezierIterator(
-            x1,
-            y1,
-            current[1],
-            current[2],
-            current[3],
-            current[4],
-            current[5],
-            current[6]
-          );
-          angleFinder = getTangentCubicIterator(
-            x1,
-            y1,
-            current[1],
-            current[2],
-            current[3],
-            current[4],
-            current[5],
-            current[6]
-          );
-          tempInfo.iterator = iterator;
-          tempInfo.angleFinder = angleFinder;
-          tempInfo.length = pathIterator(iterator, x1, y1);
-          x1 = current[5];
-          y1 = current[6];
-          break;
-        case 'Q':
-          iterator = getPointOnQuadraticBezierIterator(
-            x1,
-            y1,
-            current[1],
-            current[2],
-            current[3],
-            current[4]
-          );
-          angleFinder = getTangentQuadraticIterator(
-            x1,
-            y1,
-            current[1],
-            current[2],
-            current[3],
-            current[4]
-          );
-          tempInfo.iterator = iterator;
-          tempInfo.angleFinder = angleFinder;
-          tempInfo.length = pathIterator(iterator, x1, y1);
-          x1 = current[3];
-          y1 = current[4];
-          break;
-        case 'Z':
-        case 'z':
-          // we add those in order to ease calculations later
-          tempInfo.destX = x2;
-          tempInfo.destY = y2;
-          tempInfo.length = calcLineLength(x1, y1, x2, y2);
-          x1 = x2;
-          y1 = y2;
-          break;
-      }
-      totalLength += tempInfo.length;
-      info.push(tempInfo);
-    }
-    info.push({ length: totalLength, x: x1, y: y1 });
-    return info;
-  }
-
-  function getPointOnPath(path, distance, infos) {
-    if (!infos) {
-      infos = getPathSegmentsInfo(path);
-    }
-    var i = 0;
-    while ((distance - infos[i].length > 0) && i < (infos.length - 2)) {
-      distance -= infos[i].length;
-      i++;
-    }
-    // var distance = infos[infos.length - 1] * perc;
-    var segInfo = infos[i], segPercent = distance / segInfo.length,
-        command = segInfo.command, segment = path[i], info;
-
-    switch (command) {
+/**
+ * Run over a parsed and simplifed path and extract some informations.
+ * informations are length of each command and starting point
+ * @param {Array} path fabricJS parsed path commands
+ * @return {Array} path commands informations
+ */
+const getPathSegmentsInfo = (path) => {
+  let totalLength = 0, current,
+      //x2 and y2 are the coords of segment start
+      //x1 and y1 are the coords of the current point
+      x1 = 0, y1 = 0, x2 = 0, y2 = 0, iterator, tempInfo, angleFinder;
+  const len = path.length, info = [];
+  for (let i = 0; i < len; i++) {
+    current = path[i];
+    tempInfo = {
+      x: x1,
+      y: y1,
+      command: current[0],
+    };
+    switch (current[0]) { //first letter
       case 'M':
-        return { x: segInfo.x, y: segInfo.y, angle: 0 };
+        tempInfo.length = 0;
+        x2 = x1 = current[1];
+        y2 = y1 = current[2];
+        break;
+      case 'L':
+        tempInfo.length = calcLineLength(x1, y1, current[1], current[2]);
+        x1 = current[1];
+        y1 = current[2];
+        break;
+      case 'C':
+        iterator = getPointOnCubicBezierIterator(
+          x1,
+          y1,
+          current[1],
+          current[2],
+          current[3],
+          current[4],
+          current[5],
+          current[6]
+        );
+        angleFinder = getTangentCubicIterator(
+          x1,
+          y1,
+          current[1],
+          current[2],
+          current[3],
+          current[4],
+          current[5],
+          current[6]
+        );
+        tempInfo.iterator = iterator;
+        tempInfo.angleFinder = angleFinder;
+        tempInfo.length = pathIterator(iterator, x1, y1);
+        x1 = current[5];
+        y1 = current[6];
+        break;
+      case 'Q':
+        iterator = getPointOnQuadraticBezierIterator(
+          x1,
+          y1,
+          current[1],
+          current[2],
+          current[3],
+          current[4]
+        );
+        angleFinder = getTangentQuadraticIterator(
+          x1,
+          y1,
+          current[1],
+          current[2],
+          current[3],
+          current[4]
+        );
+        tempInfo.iterator = iterator;
+        tempInfo.angleFinder = angleFinder;
+        tempInfo.length = pathIterator(iterator, x1, y1);
+        x1 = current[3];
+        y1 = current[4];
+        break;
       case 'Z':
       case 'z':
-        info = new Point(segInfo.x, segInfo.y).lerp(
-          new Point(segInfo.destX, segInfo.destY),
-          segPercent
-        );
-        info.angle = Math.atan2(segInfo.destY - segInfo.y, segInfo.destX - segInfo.x);
-        return info;
-      case 'L':
-        info = new Point(segInfo.x, segInfo.y).lerp(
-          new Point(segment[1], segment[2]),
-          segPercent
-        );
-        info.angle = Math.atan2(segment[2] - segInfo.y, segment[1] - segInfo.x);
-        return info;
-      case 'C':
-        return findPercentageForDistance(segInfo, distance);
-      case 'Q':
-        return findPercentageForDistance(segInfo, distance);
+        // we add those in order to ease calculations later
+        tempInfo.destX = x2;
+        tempInfo.destY = y2;
+        tempInfo.length = calcLineLength(x1, y1, x2, y2);
+        x1 = x2;
+        y1 = y2;
+        break;
     }
+    totalLength += tempInfo.length;
+    info.push(tempInfo);
   }
+  info.push({ length: totalLength, x: x1, y: y1 });
+  return info;
+}
 
-  /**
-   *
-   * @param {string} pathString
-   * @return {(string|number)[][]} An array of SVG path commands
-   * @example <caption>Usage</caption>
-   * parsePath('M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0') === [
-   *   ['M', 3, 4],
-   *   ['Q', 3, 5, 2, 1, 4, 0],
-   *   ['Q', 9, 12, 2, 1, 4, 0],
-   * ];
-   *
-   */
-  function parsePath(pathString) {
-    var result = [],
-        coords = [],
-        currentPath,
-        parsed,
+const getPointOnPath = (path, distance, infos) => {
+  if (!infos) {
+    infos = getPathSegmentsInfo(path);
+  }
+  let i = 0;
+  while ((distance - infos[i].length > 0) && i < (infos.length - 2)) {
+    distance -= infos[i].length;
+    i++;
+  }
+  // var distance = infos[infos.length - 1] * perc;
+  const segInfo = infos[i], segPercent = distance / segInfo.length,
+      command = segInfo.command, segment = path[i], info;
+
+  switch (command) {
+    case 'M':
+      return { x: segInfo.x, y: segInfo.y, angle: 0 };
+    case 'Z':
+    case 'z':
+      info = new Point(segInfo.x, segInfo.y).lerp(
+        new Point(segInfo.destX, segInfo.destY),
+        segPercent
+      );
+      info.angle = Math.atan2(segInfo.destY - segInfo.y, segInfo.destX - segInfo.x);
+      return info;
+    case 'L':
+      info = new Point(segInfo.x, segInfo.y).lerp(
+        new Point(segment[1], segment[2]),
+        segPercent
+      );
+      info.angle = Math.atan2(segment[2] - segInfo.y, segment[1] - segInfo.x);
+      return info;
+    case 'C':
+      return findPercentageForDistance(segInfo, distance);
+    case 'Q':
+      return findPercentageForDistance(segInfo, distance);
+  }
+}
+
+/**
+ *
+ * @param {string} pathString
+ * @return {(string|number)[][]} An array of SVG path commands
+ * @example <caption>Usage</caption>
+ * parsePath('M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0') === [
+ *   ['M', 3, 4],
+ *   ['Q', 3, 5, 2, 1, 4, 0],
+ *   ['Q', 9, 12, 2, 1, 4, 0],
+ * ];
+ *
+ */
+const parsePath = (pathString) => {
+  let currentPath,
+      parsed,
+      match,
+      coordsStr;
+      // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
+  const regArcArgumentSequence = new RegExp(rArcSeq, 'g'),
         re = rePathCommand,
         rNumber = '[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?\\s*',
         rNumberCommaWsp = '(' + rNumber + ')' + commaWsp,
         rFlagCommaWsp = '([01])' + commaWsp + '?',
-        rArcSeq = rNumberCommaWsp + '?' + rNumberCommaWsp + '?' + rNumberCommaWsp + rFlagCommaWsp + rFlagCommaWsp +
-          rNumberCommaWsp + '?(' + rNumber + ')',
-        regArcArgumentSequence = new RegExp(rArcSeq, 'g'),
-        match,
-        coordsStr,
-        // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
-        path;
-    if (!pathString || !pathString.match) {
-      return result;
+        rArcSeq = rNumberCommaWsp + '?' + rNumberCommaWsp + '?' + rNumberCommaWsp + rFlagCommaWsp + rFlagCommaWsp + rNumberCommaWsp + '?(' + rNumber + ')',
+        result = [],
+        coords = [];
+
+  if (!pathString || !pathString.match) {
+    return result;
+  }
+  const path = pathString.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
+
+  for (let i = 0, coordsParsed, len = path.length; i < len; i++) {
+    currentPath = path[i];
+
+    coordsStr = currentPath.slice(1).trim();
+    coords.length = 0;
+
+    const command = currentPath.charAt(0);
+    coordsParsed = [command];
+
+    if (command.toLowerCase() === 'a') {
+      // arcs have special flags that apparently don't require spaces so handle special
+      for (let args; (args = regArcArgumentSequence.exec(coordsStr));) {
+        for (let j = 1; j < args.length; j++) {
+          coords.push(args[j]);
+        }
+      }
     }
-    path = pathString.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
-
-    for (var i = 0, coordsParsed, len = path.length; i < len; i++) {
-      currentPath = path[i];
-
-      coordsStr = currentPath.slice(1).trim();
-      coords.length = 0;
-
-      var command = currentPath.charAt(0);
-      coordsParsed = [command];
-
-      if (command.toLowerCase() === 'a') {
-        // arcs have special flags that apparently don't require spaces so handle special
-        for (var args; (args = regArcArgumentSequence.exec(coordsStr));) {
-          for (var j = 1; j < args.length; j++) {
-            coords.push(args[j]);
-          }
-        }
+    else {
+      while ((match = re.exec(coordsStr))) {
+        coords.push(match[0]);
       }
-      else {
-        while ((match = re.exec(coordsStr))) {
-          coords.push(match[0]);
-        }
-      }
+    }
 
-      for (var j = 0, jlen = coords.length; j < jlen; j++) {
-        parsed = parseFloat(coords[j]);
-        if (!isNaN(parsed)) {
-          coordsParsed.push(parsed);
-        }
+    for (let j = 0, jlen = coords.length; j < jlen; j++) {
+      parsed = parseFloat(coords[j]);
+      if (!isNaN(parsed)) {
+        coordsParsed.push(parsed);
       }
+    }
 
-      var commandLength = commandLengths[command.toLowerCase()],
+    const commandLength = commandLengths[command.toLowerCase()],
           repeatedCommand = repeatedCommands[command] || command;
 
-      if (coordsParsed.length - 1 > commandLength) {
-        for (var k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
-          result.push([command].concat(coordsParsed.slice(k, k + commandLength)));
-          command = repeatedCommand;
-        }
-      }
-      else {
-        result.push(coordsParsed);
+    if (coordsParsed.length - 1 > commandLength) {
+      for (let k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
+        result.push([command].concat(coordsParsed.slice(k, k + commandLength)));
+        command = repeatedCommand;
       }
     }
-
-    return result;
-  };
-
-  /**
-   *
-   * Converts points to a smooth SVG path
-   * @param {{ x: number,y: number }[]} points Array of points
-   * @param {number} [correction] Apply a correction to the path (usually we use `width / 1000`). If value is undefined 0 is used as the correction value.
-   * @return {(string|number)[][]} An array of SVG path commands
-   */
-  function getSmoothPathFromPoints(points, correction) {
-    var path = [], i,
-        p1 = new Point(points[0].x, points[0].y),
-        p2 = new Point(points[1].x, points[1].y),
-        len = points.length, multSignX = 1, multSignY = 0, manyPoints = len > 2;
-    correction = correction || 0;
-
-    if (manyPoints) {
-      multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
-      multSignY = points[2].y < p2.y ? -1 : points[2].y === p2.y ? 0 : 1;
+    else {
+      result.push(coordsParsed);
     }
-    path.push(['M', p1.x - multSignX * correction, p1.y - multSignY * correction]);
-    for (i = 1; i < len; i++) {
-      if (!p1.eq(p2)) {
-        var midPoint = p1.midPointFrom(p2);
-        // p1 is our bezier control point
-        // midpoint is our endpoint
-        // start point is p(i-1) value.
-        path.push(['Q', p1.x, p1.y, midPoint.x, midPoint.y]);
-      }
-      p1 = points[i];
-      if ((i + 1) < points.length) {
-        p2 = points[i + 1];
-      }
-    }
-    if (manyPoints) {
-      multSignX = p1.x > points[i - 2].x ? 1 : p1.x === points[i - 2].x ? 0 : -1;
-      multSignY = p1.y > points[i - 2].y ? 1 : p1.y === points[i - 2].y ? 0 : -1;
-    }
-    path.push(['L', p1.x + multSignX * correction, p1.y + multSignY * correction]);
-    return path;
   }
-  /**
-   * Transform a path by transforming each segment.
-   * it has to be a simplified path or it won't work.
-   * WARNING: this depends from pathOffset for correct operation
-   * @param {Array} path fabricJS parsed and simplified path commands
-   * @param {Array} transform matrix that represent the transformation
-   * @param {Object} [pathOffset] the fabric.Path pathOffset
-   * @param {Number} pathOffset.x
-   * @param {Number} pathOffset.y
-   * @returns {Array} the transformed path
-   */
-  function transformPath(path, transform, pathOffset) {
-    if (pathOffset) {
-      transform = fabric.util.multiplyTransformMatrices(
-        transform,
-        [1, 0, 0, 1, -pathOffset.x, -pathOffset.y]
-      );
-    }
-    return path.map(function(pathSegment) {
-      var newSegment = pathSegment.slice(0), point = {};
-      for (var i = 1; i < pathSegment.length - 1; i += 2) {
-        point.x = pathSegment[i];
-        point.y = pathSegment[i + 1];
-        point = fabric.util.transformPoint(point, transform);
-        newSegment[i] = point.x;
-        newSegment[i + 1] = point.y;
-      }
-      return newSegment;
-    });
-  }
+  return result;
+};
 
-  /**
-   * Returns an array of path commands to create a regular polygon
-   * @param {number} radius
-   * @param {number} numVertexes
-   * @returns {(string|number)[][]} An array of SVG path commands
-   */
-  function getRegularPolygonPath(numVertexes, radius) {
-    var interiorAngle = Math.PI * 2 / numVertexes;
-    // rotationAdjustment rotates the path by 1/2 the interior angle so that the polygon always has a flat side on the bottom
-    // This isn't strictly necessary, but it's how we tend to think of and expect polygons to be drawn
-    var rotationAdjustment = -Math.PI / 2;
-    if (numVertexes % 2 === 0) {
-      rotationAdjustment += interiorAngle / 2;
-    }
-    var d = [];
-    for (var i = 0, rad, coord; i < numVertexes; i++) {
-      rad = i * interiorAngle + rotationAdjustment;
-      coord = new Point(Math.cos(rad), Math.sin(rad)).scalarMultiply(radius);
-      d.push([i === 0 ? 'M' : 'L', coord.x, coord.y]);
-    }
-    d.push(['Z']);
-    return d;
-  }
+/**
+ *
+ * Converts points to a smooth SVG path
+ * @param {{ x: number,y: number }[]} points Array of points
+ * @param {number} [correction] Apply a correction to the path (usually we use `width / 1000`). If value is undefined 0 is used as the correction value.
+ * @return {(string|number)[][]} An array of SVG path commands
+ */
+const getSmoothPathFromPoints = (points, correction = 0) => {
+  let p1 = new Point(points[0]),
+      p2 = new Point(points[1]),
+      multSignX = 1, multSignY = 0;
+  const path = [], len = points.length, manyPoints = len > 2;
 
-  /**
-   * Join path commands to go back to svg format
-   * @param {Array} pathData fabricJS parsed path commands
-   * @return {String} joined path 'M 0 0 L 20 30'
-   */
-  fabric.util.joinPath = function(pathData) {
-    return pathData.map(function (segment) { return segment.join(' '); }).join(' ');
-  };
-  fabric.util.parsePath = parsePath;
-  fabric.util.makePathSimpler = makePathSimpler;
-  fabric.util.getSmoothPathFromPoints = getSmoothPathFromPoints;
-  fabric.util.getPathSegmentsInfo = getPathSegmentsInfo;
-  fabric.util.getBoundsOfCurve = getBoundsOfCurve;
-  fabric.util.getPointOnPath = getPointOnPath;
-  fabric.util.transformPath = transformPath;
-  fabric.util.getRegularPolygonPath = getRegularPolygonPath;
-})(typeof exports !== 'undefined' ? exports : window);
+  if (manyPoints) {
+    multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
+    multSignY = points[2].y < p2.y ? -1 : points[2].y === p2.y ? 0 : 1;
+  }
+  path.push(['M', p1.x - multSignX * correction, p1.y - multSignY * correction]);
+  for (let i = 1; i < len; i++) {
+    if (!p1.eq(p2)) {
+      const midPoint = p1.midPointFrom(p2);
+      // p1 is our bezier control point
+      // midpoint is our endpoint
+      // start point is p(i-1) value.
+      path.push(['Q', p1.x, p1.y, midPoint.x, midPoint.y]);
+    }
+    p1 = points[i];
+    if ((i + 1) < points.length) {
+      p2 = points[i + 1];
+    }
+  }
+  if (manyPoints) {
+    multSignX = p1.x > points[i - 2].x ? 1 : p1.x === points[i - 2].x ? 0 : -1;
+    multSignY = p1.y > points[i - 2].y ? 1 : p1.y === points[i - 2].y ? 0 : -1;
+  }
+  path.push(['L', p1.x + multSignX * correction, p1.y + multSignY * correction]);
+  return path;
+}
+
+/**
+ * Transform a path by transforming each segment.
+ * it has to be a simplified path or it won't work.
+ * WARNING: this depends from pathOffset for correct operation
+ * @param {Array} path fabricJS parsed and simplified path commands
+ * @param {Array} transform matrix that represent the transformation
+ * @param {Object} [pathOffset] the fabric.Path pathOffset
+ * @param {Number} pathOffset.x
+ * @param {Number} pathOffset.y
+ * @returns {Array} the transformed path
+ */
+function transformPath(path, transform, pathOffset) {
+  if (pathOffset) {
+    transform = fabric.util.multiplyTransformMatrices(
+      transform,
+      [1, 0, 0, 1, -pathOffset.x, -pathOffset.y]
+    );
+  }
+  return path.map(function(pathSegment) {
+    var newSegment = pathSegment.slice(0), point = {};
+    for (var i = 1; i < pathSegment.length - 1; i += 2) {
+      point.x = pathSegment[i];
+      point.y = pathSegment[i + 1];
+      point = fabric.util.transformPoint(point, transform);
+      newSegment[i] = point.x;
+      newSegment[i + 1] = point.y;
+    }
+    return newSegment;
+  });
+}
+
+/**
+ * Returns an array of path commands to create a regular polygon
+ * @param {number} radius
+ * @param {number} numVertexes
+ * @returns {(string|number)[][]} An array of SVG path commands
+ */
+function getRegularPolygonPath(numVertexes, radius) {
+  var interiorAngle = Math.PI * 2 / numVertexes;
+  // rotationAdjustment rotates the path by 1/2 the interior angle so that the polygon always has a flat side on the bottom
+  // This isn't strictly necessary, but it's how we tend to think of and expect polygons to be drawn
+  var rotationAdjustment = -Math.PI / 2;
+  if (numVertexes % 2 === 0) {
+    rotationAdjustment += interiorAngle / 2;
+  }
+  var d = [];
+  for (var i = 0, rad, coord; i < numVertexes; i++) {
+    rad = i * interiorAngle + rotationAdjustment;
+    coord = new Point(Math.cos(rad), Math.sin(rad)).scalarMultiply(radius);
+    d.push([i === 0 ? 'M' : 'L', coord.x, coord.y]);
+  }
+  d.push(['Z']);
+  return d;
+}
+
+/**
+ * Join path commands to go back to svg format
+ * @param {Array} pathData fabricJS parsed path commands
+ * @return {String} joined path 'M 0 0 L 20 30'
+ */
+const joinPath = (pathData) => pathData.map((segment) => segment.join(' ')).join(' ');
+
+// fabric.util.joinPath = joinPath;
+// fabric.util.parsePath = parsePath;
+// fabric.util.makePathSimpler = makePathSimpler;
+// fabric.util.getSmoothPathFromPoints = getSmoothPathFromPoints;
+// fabric.util.getPathSegmentsInfo = getPathSegmentsInfo;
+// fabric.util.getBoundsOfCurve = getBoundsOfCurve;
+// fabric.util.getPointOnPath = getPointOnPath;
+// fabric.util.transformPath = transformPath;
+// fabric.util.getRegularPolygonPath = getRegularPolygonPath;
