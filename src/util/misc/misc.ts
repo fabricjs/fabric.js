@@ -59,6 +59,18 @@ import {
   min,
   max,
 } from '../lang_array';
+import {
+  joinPath,
+  parsePath,
+  makePathSimpler,
+  getSmoothPathFromPoints,
+  getPathSegmentsInfo,
+  getBoundsOfCurve,
+  getPointOnPath,
+  transformPath,
+  getRegularPolygonPath,
+} from '../path';
+
   /**
    * @namespace fabric.util
    */
@@ -129,6 +141,15 @@ import {
       min,
       max,
     },
+    joinPath,
+    parsePath,
+    makePathSimpler,
+    getSmoothPathFromPoints,
+    getPathSegmentsInfo,
+    getBoundsOfCurve,
+    getPointOnPath,
+    transformPath,
+    getRegularPolygonPath,
 
     /**
      * Populates an object with properties of another object

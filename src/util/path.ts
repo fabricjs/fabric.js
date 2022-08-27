@@ -1,10 +1,11 @@
 //@ts-nocheck
 import { fabric } from '../HEADER';
-import { PiBy180 } from "../constants";
+import { halfPI, PiBy180 } from "../constants";
 import { commaWsp, rePathCommand } from "../parser/constants";
 import { Point } from '../point.class';
 import { cos } from './misc/cos';
 import { sin } from './misc/sin';
+import { multiplyTransformMatrices, transformPoint } from './misc/matrix';
 
 const commandLengths = {
   m: 2,
@@ -763,21 +764,22 @@ const getSmoothPathFromPoints = (points, correction = 0) => {
  * @param {Number} pathOffset.y
  * @returns {Array} the transformed path
  */
-function transformPath(path, transform, pathOffset) {
+const transformPath = (path, transform, pathOffset) => {
   if (pathOffset) {
-    transform = fabric.util.multiplyTransformMatrices(
+    transform = multiplyTransformMatrices(
       transform,
       [1, 0, 0, 1, -pathOffset.x, -pathOffset.y]
     );
   }
-  return path.map(function(pathSegment) {
-    var newSegment = pathSegment.slice(0), point = {};
-    for (var i = 1; i < pathSegment.length - 1; i += 2) {
-      point.x = pathSegment[i];
-      point.y = pathSegment[i + 1];
-      point = fabric.util.transformPoint(point, transform);
-      newSegment[i] = point.x;
-      newSegment[i + 1] = point.y;
+  return path.map((pathSegment) => {
+    const newSegment = pathSegment.slice(0);
+    for (let i = 1; i < pathSegment.length - 1; i += 2) {
+      const { x, y } = transformPoint({
+        x: pathSegment[i],
+        y: pathSegment[i + 1],
+      }, transform);
+      newSegment[i] = x;
+      newSegment[i + 1] = y;
     }
     return newSegment;
   });
@@ -789,21 +791,21 @@ function transformPath(path, transform, pathOffset) {
  * @param {number} numVertexes
  * @returns {(string|number)[][]} An array of SVG path commands
  */
-function getRegularPolygonPath(numVertexes, radius) {
-  var interiorAngle = Math.PI * 2 / numVertexes;
+const getRegularPolygonPath = (numVertexes, radius) => {
+  const interiorAngle = Math.PI * 2 / numVertexes;
   // rotationAdjustment rotates the path by 1/2 the interior angle so that the polygon always has a flat side on the bottom
   // This isn't strictly necessary, but it's how we tend to think of and expect polygons to be drawn
-  var rotationAdjustment = -Math.PI / 2;
+  const rotationAdjustment = -halfPI;
   if (numVertexes % 2 === 0) {
     rotationAdjustment += interiorAngle / 2;
   }
-  var d = [];
-  for (var i = 0, rad, coord; i < numVertexes; i++) {
-    rad = i * interiorAngle + rotationAdjustment;
-    coord = new Point(Math.cos(rad), Math.sin(rad)).scalarMultiply(radius);
-    d.push([i === 0 ? 'M' : 'L', coord.x, coord.y]);
+  const d = new Array(numVertexes + 1);
+  for (let i = 0; i < numVertexes; i++) {
+    const rad = i * interiorAngle + rotationAdjustment;
+    const { x, y } = new Point(cos(rad), sin(rad)).scalarMultiply(radius);
+    d[i] = [i === 0 ? 'M' : 'L', x, y];
   }
-  d.push(['Z']);
+  d[numVertexes]= ['Z'];
   return d;
 }
 
@@ -813,13 +815,3 @@ function getRegularPolygonPath(numVertexes, radius) {
  * @return {String} joined path 'M 0 0 L 20 30'
  */
 const joinPath = (pathData) => pathData.map((segment) => segment.join(' ')).join(' ');
-
-// fabric.util.joinPath = joinPath;
-// fabric.util.parsePath = parsePath;
-// fabric.util.makePathSimpler = makePathSimpler;
-// fabric.util.getSmoothPathFromPoints = getSmoothPathFromPoints;
-// fabric.util.getPathSegmentsInfo = getPathSegmentsInfo;
-// fabric.util.getBoundsOfCurve = getBoundsOfCurve;
-// fabric.util.getPointOnPath = getPointOnPath;
-// fabric.util.transformPath = transformPath;
-// fabric.util.getRegularPolygonPath = getRegularPolygonPath;
