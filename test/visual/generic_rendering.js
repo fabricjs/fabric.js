@@ -13,6 +13,7 @@
     if (process.env.launcher === 'Edge') {
       fabric.config.configure({ browserShadowBlurConstant: 1.75 });
     }
+    getFixture = global.getFixture;
   }
   else {
     if (navigator.userAgent.indexOf('Firefox') !== -1) {
