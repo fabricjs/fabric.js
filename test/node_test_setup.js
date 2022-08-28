@@ -29,7 +29,6 @@ global.getAssetName = require('./lib/visualTestLoop').getAssetName;
 global.simulateEvent = require('./lib/event.simulate').simulateEvent;
 global.imageDataToChalk = function(imageData) {
   // actually this does not work on travis-ci, so commenting it out
-  return '';
   var block = String.fromCharCode(9608);
   var data = imageData.data;
   var width = imageData.width;

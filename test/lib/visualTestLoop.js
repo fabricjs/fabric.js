@@ -1,3 +1,5 @@
+const { diff } = require('deep-object-diff');
+
 (function(exports) {
 
   exports.getFixture = function(name, original, callback) {
@@ -106,6 +108,32 @@
     img.src = filename;
   }
 
+  function dumpFailedTest(testName, original, golden, difference) {
+    if (fabric.isLikelyNode && original && difference && golden) {
+      var largeCanvas = fabric.util.createCanvasElement();
+      largeCanvas.width = original.width + golden.width + difference.width;
+      largeCanvas.height = Math.max(original.height, golden.height, difference.height);
+      var ctx = largeCanvas.getContext('2d');
+      ctx.drawImage(original, 0, 0);
+      ctx.putImageData(difference, original.width, 0);
+      ctx.drawImage(golden, original.width + difference.width, 0);
+      var dataUrl = largeCanvas.toDataURL().split(',')[1];
+      console.log('dumping failed test', testName);
+      const fileName = localPath('../../cli_output', `${testName.replaceAll(' ', '_')}.png`);
+
+      fs.writeFileSync(fileName.replace('file://', ''), dataUrl, { encoding: 'base64' });
+    }
+    // else if (original) {
+    //   original.toBlob(blob => {
+    //     const formData = new FormData();
+    //     formData.append('file', blob, filename);
+    //     const request = new XMLHttpRequest();
+    //     request.open('POST', '/goldens', true);
+    //     request.send(formData);
+    //   }, 'image/png');
+    // }
+  }
+
   exports.visualTestLoop = function(QUnit) {
     var _pixelMatch;
     var visualCallback;
@@ -175,8 +203,9 @@
               testName + ' [' + golden + '] has too many different pixels ' + differentPixels + '(' + okDiff + ') representing ' + percDiff + '% (>' + (percentage * 100) + '%)'
             );
             if (!isOK) {
-              var stringa = imageDataToChalk(output);
-              console.log(stringa);
+              // var stringa = imageDataToChalk(output);
+              // console.log(stringa);
+              dumpFailedTest(testName, renderedCanvas, canvas, output);
             }
             if ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs) {
               generateGolden(getGoldeName(golden), renderedCanvas);
