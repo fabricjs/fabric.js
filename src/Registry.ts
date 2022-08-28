@@ -17,7 +17,7 @@ export type TClassIO<T = unknown, D = unknown, S extends SVGElement = SVGElement
 
 export class Registry {
     readonly registry: Map<string, TRegistry>
-    
+
     constructor(registry?: Map<string, TRegistry>) {
         this.registry = new Map(registry);
     }
@@ -33,12 +33,16 @@ export class Registry {
         });
     }
 
-    /**
-     * override for custom handling
-     */
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    resolve(type: string, data: object) {
-        return this.registry.get(type);
+    fromJSON<T extends { type: string }>(data: T) {
+        return this.registry.get(data.type)?.fromJSON(data);
+    }
+
+    resolveSVGType(el: SVGElement) {
+        return el.tagName.replace('svg:', '');
+    }
+
+    fromSVG<T extends SVGElement, S>(el: T, options: S) {
+        return this.registry.get(this.resolveSVGType(el))?.fromSVG(el, options);
     }
 }
 
