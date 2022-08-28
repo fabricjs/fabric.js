@@ -70,6 +70,7 @@ import {
   transformPath,
   getRegularPolygonPath,
 } from '../path';
+import { setStyle } from '../dom_style';
 import { request } from '../dom_request';
 
   /**
@@ -152,6 +153,7 @@ import { request } from '../dom_request';
     transformPath,
     getRegularPolygonPath,
     request,
+    setStyle,
 
     /**
      * Populates an object with properties of another object
