@@ -4,10 +4,13 @@ export type TRegistry<T = unknown, D = unknown, S extends SVGElement = SVGElemen
     fromSVG(svgEl: S, options: O): T | Promise<T>;
 }
 
-export type TClassIO<T = unknown, D = unknown, S extends SVGElement = SVGElement, O = unknown> = {
+type TClassIdentifier = {
     prototype: {
         type: string
-    };
+    }
+}
+
+export type TClassIO<T = unknown, D = unknown, S extends SVGElement = SVGElement, O = unknown> = TClassIdentifier & {
     fromObject(data: D): T | Promise<T>;
     fromElement(svgEl: S, options: O): T | Promise<T>;
 }
@@ -40,6 +43,3 @@ export class Registry {
 }
 
 export const registry = new Registry();
-
-
-
