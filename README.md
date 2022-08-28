@@ -32,13 +32,12 @@ A **simple and powerful Javascript HTML5 canvas library**.
 -----
 
 ## Features 
-- Out of the box interactions - scale, move, rotate, skew, group and more
+- Out of the box interactions such as scale, move, rotate, skew, group...
 - Built in shapes, controls, animations, image filters, gradients, patterns, brushes...
 - `JPG`, `PNG`, `JSON` and `SVG` i/o
-- [Fast](https://github.com/fabricjs/fabric.js/wiki/Focus-on-speed)
 - Typed and modular
 - Cross-browser, see [supported browsers](#supported-browsers)
-- Runs on [Node.js](http://nodejs.org/), see [Node.js installation](#nodejs) and [limitations](https://github.com/fabricjs/fabric.js/wiki/Fabric-limitations-in-node.js)
+- Runs on [Node.js](http://nodejs.org/), see [Node.js installation](#nodejs)
 - [Unit tested](/CONTRIBUTING.md#-testing)
 
 
@@ -63,10 +62,10 @@ const fabric = require("fabric").fabric;
 #### Node.js
 
 Fabric.js depends on [node-canvas](https://github.com/Automattic/node-canvas) for a canvas implementation (`HTMLCanvasElement` replacement) and [jsdom](https://github.com/jsdom/jsdom) for a `window` implementation on node.
+This means that you may encounter `node-canvas` limitations and [bugs](https://github.com/Automattic/node-canvas/issues).
 
 Follow these [instructions](https://github.com/Automattic/node-canvas#compiling) to get `node-canvas` up and running.
 
-See [Node.js limitations](https://github.com/fabricjs/fabric.js/wiki/Fabric-limitations-in-node.js).
 
 #### Browser es6
 
