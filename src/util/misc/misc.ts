@@ -72,6 +72,12 @@ import {
 } from '../path';
 import { setStyle } from '../dom_style';
 import { request } from '../dom_request';
+import {
+  isTouchEvent,
+  getPointer,
+  removeListener,
+  addListener,
+} from '../dom_event';
 
   /**
    * @namespace fabric.util
@@ -154,7 +160,10 @@ import { request } from '../dom_request';
     getRegularPolygonPath,
     request,
     setStyle,
-
+    isTouchEvent,
+    getPointer,
+    removeListener,
+    addListener,
     /**
      * Populates an object with properties of another object
      * @static
