@@ -6,7 +6,9 @@ See [[How fabric canvas layering works]].
 Make sure you are not sharing an object (such as a `clipPath` between render agents (`Canvas`/`Object`)
 
 - **Object is NOT selectable**: `setCoords()`\
-When the clickable area of an object and its controls doesn't match the object's position, you probably need to call `object.setCoords()`. This recalculates the object's coordinates that are used to detect its control positions. See [When to call setCoords](/fabricjs/fabric.js/wiki/When-to-call-setCoords).
+An object has a visual state and an coordinate state. Both can become stale.
+When the visual state is stale is is visible making it simple to catch. This is a bit different.
+When an object or its controls aren't interactive or don't match the object's visual position, it means the coordinate state is stale. Calling `object.setCoords()` should fix it.
 
 - **Visuals NOT updating**: [Object Caching](http://fabricjs.com/fabric-object-caching)\
 Consider marking the object as `dirty` before rendering.
