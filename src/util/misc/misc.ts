@@ -59,6 +59,10 @@ import {
   min,
   max,
 } from '../lang_array';
+
+
+import { pick } from './pick';
+
   /**
    * @namespace fabric.util
    */
@@ -130,23 +134,7 @@ import {
       max,
     },
 
-    /**
-     * Populates an object with properties of another object
-     * @static
-     * @memberOf fabric.util
-     * @param {Object} source Source object
-     * @param {Object} destination Destination object
-     * @return {Array} properties Properties names to include
-     */
-    populateWithProperties: function(source, destination, properties) {
-      if (properties && Array.isArray(properties)) {
-        for (var i = 0, len = properties.length; i < len; i++) {
-          if (properties[i] in source) {
-            destination[properties[i]] = source[properties[i]];
-          }
-        }
-      }
-    },
+    pick,
 
     /**
      * Returns true if context has transparent pixel
