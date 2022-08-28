@@ -32,25 +32,53 @@ import { TWebGLPrecision, WebGLPrecision } from "../typedefs";
     if (fabric.isLikelyNode) {
       return false;
     }
-    tileSize = tileSize || fabric.WebglFilterBackend.prototype.tileSize;
     var canvas = document.createElement('canvas');
     var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
     var isSupported = false;
     if (gl) {
-      config.configure({ maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE) });
-      isSupported = config.maxTextureSize >= tileSize;
+      const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+      isSupported = maxTextureSize >= tileSize;
       const percisionKey = WebGLPrecision.find(key => testPrecision(gl, key));
       config.configure({
+        maxTextureSize,
         webGLPrecision: percisionKey
       });
     }
     this.isSupported = isSupported;
     return isSupported;
-  };
+  }
+
+  /**
+   * query browser for WebGL
+   * @returns config object if true
+   */
+  function queryWebGL() {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (gl) {
+      const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+      const percisionKey = WebGLPrecision.find(key => testPrecision(gl, key));
+      return {
+        maxTextureSize,
+        webGLPrecision: percisionKey
+      };
+    }
+  }
 
   fabric.initFilterBackend = function () {
-    if (config.enableGLFiltering && isWebglSupported(config.textureSize)) {
-      console.log(`fabric: max texture size: ${config.maxTextureSize}`);
+    let isWebGLSupported = false;
+    if (config.enableGLFiltering && !fabric.isLikelyNode) {
+      const query = queryWebGL();
+      if (query) {
+        console.log(`fabric: max texture size ${config.maxTextureSize}`);
+        config.configure({
+          maxTextureSize: query.maxTextureSize,
+          webGLPrecision: query.webGLPrecision
+        });
+        isWebGLSupported = maxTextureSize >= config.textureSize;
+      }
+    }
+    if (isWebGLSupported) {
       return (new fabric.WebglFilterBackend({ tileSize: config.textureSize }));
     }
     else if (fabric.Canvas2dFilterBackend) {
@@ -73,7 +101,7 @@ import { TWebGLPrecision, WebGLPrecision } from "../typedefs";
 
   WebglFilterBackend.prototype = /** @lends fabric.WebglFilterBackend.prototype */ {
 
-    tileSize: 2048,
+    tileSize: config.textureSize,
 
     /**
      * Experimental. This object is a sort of repository of help layers used to avoid
