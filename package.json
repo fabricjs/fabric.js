@@ -53,7 +53,7 @@
   "scripts": {
     "changelog": "auto-changelog -o change-output.md --unreleased-only",
     "build": "node ./scripts build",
-    "build:fast": "npm run build -- --fast",
+    "build:fast": "npm run build -- -f",
     "fabric": "node ./scripts",
     "dev": "node ./scripts dev",
     "start": "node ./scripts start",
