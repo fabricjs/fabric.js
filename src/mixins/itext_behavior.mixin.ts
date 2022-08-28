@@ -2,6 +2,7 @@
 import { Point } from '../point.class';
 import { removeFromArray } from '../util/internals';
 
+// extend this regex to support non english languages
 const reNonWord = /[ \n\.,;!\?\-]/;
 
 (function(global) {
