@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { fabric } from '../HEADER';
+import { fabric } from '../../HEADER';
 import { halfPI, PiBy180 } from "../constants";
 import { commaWsp, rePathCommand } from "../parser/constants";
 import { Point } from '../point.class';
@@ -46,20 +46,16 @@ const segmentToBezier = (th2, th3, cosTh, sinTh, rx, ry, cx1, cy1, mT, fromX, fr
   * by Andrea Bogazzi code is under MPL. if you don't have a copy of the license you can take it here
   * http://mozilla.org/MPL/2.0/
   */
-const arcToSegments = (toX, toY, rx, ry, large, sweep, rotateX) => {
-  const PI = Math.PI, th = rotateX * PiBy180,
-        sinTh = sin(th),
-        cosTh = cos(th),
-        fromX = 0, fromY = 0;
+const arcToSegments = (toX, toY, _rx, _ry, large, sweep, rotateX) => {
+  let fromX = 0, fromY = 0, root = 0;
+  const PI = Math.PI, th = rotateX * PiBy180, sinTh = sin(th), cosTh = cos(th),
+        px = 0.5 * (-cosTh * toX  - sinTh * toY),
+        py = 0.5 * (-cosTh * toY + sinTh * toX),
+        rx2 = _rx ** 2, ry2 = _ry ** 2, py2 = py ** 2, px2 = px ** 2,
+        pl = rx2 * ry2 - rx2 * py2 - ry2 * px2;
+  let rx = Math.abs(_rx);
+  let ry = Math.abs(_ry);
 
-  rx = Math.abs(rx);
-  ry = Math.abs(ry);
-
-  var px = -cosTh * toX * 0.5 - sinTh * toY * 0.5,
-      py = -cosTh * toY * 0.5 + sinTh * toX * 0.5,
-      rx2 = rx * rx, ry2 = ry * ry, py2 = py * py, px2 = px * px,
-      pl = rx2 * ry2 - rx2 * py2 - ry2 * px2,
-      root = 0;
 
   if (pl < 0) {
     const s = Math.sqrt(1 - pl / (rx2 * ry2));
@@ -105,8 +101,8 @@ const arcToSegments = (toX, toY, rx, ry, large, sweep, rotateX) => {
   * Private
   */
 const calcVectorAngle = (ux, uy, vx, vy) => {
-  var ta = Math.atan2(uy, ux),
-      tb = Math.atan2(vy, vx);
+  const ta = Math.atan2(uy, ux),
+        tb = Math.atan2(vy, vx);
   if (tb >= ta) {
     return tb - ta;
   }
@@ -117,8 +113,8 @@ const calcVectorAngle = (ux, uy, vx, vy) => {
 
 // functions for the Cubic beizer
 // taken from: https://github.com/konvajs/konva/blob/7.0.5/src/shapes/Path.ts#L350
-const CB1 = (t) => ttt * 3;
-const CB2 = (t) => 3 * tt ** 2 * (1 - t);
+const CB1 = (t) => t ** 3;
+const CB2 = (t) => 3 * t ** 2 * (1 - t);
 const CB3 = (t) => 3 * t * (1 - t) ** 2;
 const CB4 = (t) => (1 - t) ** 3;
 
@@ -135,17 +131,16 @@ const CB4 = (t) => (1 - t) ** 3;
  */
 // taken from http://jsbin.com/ivomiq/56/edit  no credits available for that.
 // TODO: can we normalize this with the starting points set at 0 and then translated the bbox?
-const getBoundsOfCurve = (x0, y0, x1, y1, x2, y2, x3, y3) => {
-  var argsString;
+export const getBoundsOfCurve = (x0, y0, x1, y1, x2, y2, x3, y3) => {
+  let argsString;
   if (fabric.cachesBoundsOfCurve) {
-    argsString = Array.join.call(arguments);
+    argsString = [...arguments].join();
     if (fabric.boundsOfCurveCache[argsString]) {
       return fabric.boundsOfCurveCache[argsString];
     }
   }
 
   const sqrt = Math.sqrt,
-        min = Math.min, max = Math.max,
         abs = Math.abs, tvalues = [],
         bounds = [[], []];
 
@@ -198,7 +193,7 @@ const getBoundsOfCurve = (x0, y0, x1, y1, x2, y2, x3, y3) => {
   bounds[1][jlen] = y0;
   bounds[0][jlen + 1] = x3;
   bounds[1][jlen + 1] = y3;
-  var result = [
+  const result = [
     {
       x: Math.min(...bounds[0]),
       y: Math.min(...bounds[1])
@@ -241,7 +236,7 @@ export const fromArcToBeziers = (fx, fy, [_, rx, ry, rot, large, sweep, tx, ty] 
  * @param {Array} path the array of commands of a parsed svg path for fabric.Path
  * @return {Array} the simplified array of commands of a parsed svg path for fabric.Path
  */
-const makePathSimpler = (path) => {
+export const makePathSimpler = (path) => {
   // x and y represent the last point of the path. the previous command point.
   // we add them to each relative command to make it an absolute comment.
   // we also swap the v V h H with L, because are easier to transform.
@@ -507,7 +502,7 @@ const findPercentageForDistance = (segInfo, distance) => {
  * @param {Array} path fabricJS parsed path commands
  * @return {Array} path commands informations
  */
-const getPathSegmentsInfo = (path) => {
+export const getPathSegmentsInfo = (path) => {
   let totalLength = 0, current,
       //x2 and y2 are the coords of segment start
       //x1 and y1 are the coords of the current point
@@ -598,7 +593,7 @@ const getPathSegmentsInfo = (path) => {
   return info;
 }
 
-const getPointOnPath = (path, distance, infos) => {
+export const getPointOnPath = (path, distance, infos) => {
   if (!infos) {
     infos = getPathSegmentsInfo(path);
   }
@@ -609,7 +604,8 @@ const getPointOnPath = (path, distance, infos) => {
   }
   // var distance = infos[infos.length - 1] * perc;
   const segInfo = infos[i], segPercent = distance / segInfo.length,
-      command = segInfo.command, segment = path[i], info;
+        command = segInfo.command, segment = path[i];
+  let info;
 
   switch (command) {
     case 'M':
@@ -648,34 +644,27 @@ const getPointOnPath = (path, distance, infos) => {
  * ];
  *
  */
-const parsePath = (pathString) => {
-  let currentPath,
-      parsed,
-      match,
-      coordsStr;
+export const parsePath = (pathString) => {
       // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
-  const regArcArgumentSequence = new RegExp(rArcSeq, 'g'),
-        re = rePathCommand,
+  const re = rePathCommand,
         rNumber = '[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?\\s*',
-        rNumberCommaWsp = '(' + rNumber + ')' + commaWsp,
-        rFlagCommaWsp = '([01])' + commaWsp + '?',
-        rArcSeq = rNumberCommaWsp + '?' + rNumberCommaWsp + '?' + rNumberCommaWsp + rFlagCommaWsp + rFlagCommaWsp + rNumberCommaWsp + '?(' + rNumber + ')',
-        result = [],
-        coords = [];
+        rNumberCommaWsp = `(${rNumber})${commaWsp}`,
+        rFlagCommaWsp = `([01])${commaWsp}?`,
+        rArcSeq = `${rNumberCommaWsp}?${rNumberCommaWsp}?${rNumberCommaWsp}${rFlagCommaWsp}${rFlagCommaWsp}${rNumberCommaWsp}?(${rNumber})`,
+        regArcArgumentSequence = new RegExp(rArcSeq, 'g'),
+        result = [];
 
   if (!pathString || !pathString.match) {
     return result;
   }
   const path = pathString.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
 
-  for (let i = 0, coordsParsed, len = path.length; i < len; i++) {
-    currentPath = path[i];
-
-    coordsStr = currentPath.slice(1).trim();
-    coords.length = 0;
-
-    const command = currentPath.charAt(0);
-    coordsParsed = [command];
+  for (let i = 0, len = path.length; i < len; i++) {
+    const currentPath = path[i];
+    const coordsStr = currentPath.slice(1).trim();
+    const coords = [];
+    let command = currentPath.charAt(0);
+    const coordsParsed = [command];
 
     if (command.toLowerCase() === 'a') {
       // arcs have special flags that apparently don't require spaces so handle special
@@ -686,13 +675,14 @@ const parsePath = (pathString) => {
       }
     }
     else {
+      let match;
       while ((match = re.exec(coordsStr))) {
         coords.push(match[0]);
       }
     }
 
     for (let j = 0, jlen = coords.length; j < jlen; j++) {
-      parsed = parseFloat(coords[j]);
+      const parsed = parseFloat(coords[j]);
       if (!isNaN(parsed)) {
         coordsParsed.push(parsed);
       }
@@ -721,7 +711,7 @@ const parsePath = (pathString) => {
  * @param {number} [correction] Apply a correction to the path (usually we use `width / 1000`). If value is undefined 0 is used as the correction value.
  * @return {(string|number)[][]} An array of SVG path commands
  */
-const getSmoothPathFromPoints = (points, correction = 0) => {
+export const getSmoothPathFromPoints = (points, correction = 0) => {
   let p1 = new Point(points[0]),
       p2 = new Point(points[1]),
       multSignX = 1, multSignY = 0;
@@ -732,7 +722,8 @@ const getSmoothPathFromPoints = (points, correction = 0) => {
     multSignY = points[2].y < p2.y ? -1 : points[2].y === p2.y ? 0 : 1;
   }
   path.push(['M', p1.x - multSignX * correction, p1.y - multSignY * correction]);
-  for (let i = 1; i < len; i++) {
+  let i;
+  for (i = 1; i < len; i++) {
     if (!p1.eq(p2)) {
       const midPoint = p1.midPointFrom(p2);
       // p1 is our bezier control point
@@ -764,7 +755,7 @@ const getSmoothPathFromPoints = (points, correction = 0) => {
  * @param {Number} pathOffset.y
  * @returns {Array} the transformed path
  */
-const transformPath = (path, transform, pathOffset) => {
+export const transformPath = (path, transform, pathOffset) => {
   if (pathOffset) {
     transform = multiplyTransformMatrices(
       transform,
@@ -791,11 +782,11 @@ const transformPath = (path, transform, pathOffset) => {
  * @param {number} numVertexes
  * @returns {(string|number)[][]} An array of SVG path commands
  */
-const getRegularPolygonPath = (numVertexes, radius) => {
+export const getRegularPolygonPath = (numVertexes, radius) => {
   const interiorAngle = Math.PI * 2 / numVertexes;
   // rotationAdjustment rotates the path by 1/2 the interior angle so that the polygon always has a flat side on the bottom
   // This isn't strictly necessary, but it's how we tend to think of and expect polygons to be drawn
-  const rotationAdjustment = -halfPI;
+  let rotationAdjustment = -halfPI;
   if (numVertexes % 2 === 0) {
     rotationAdjustment += interiorAngle / 2;
   }
@@ -814,4 +805,4 @@ const getRegularPolygonPath = (numVertexes, radius) => {
  * @param {Array} pathData fabricJS parsed path commands
  * @return {String} joined path 'M 0 0 L 20 30'
  */
-const joinPath = (pathData) => pathData.map((segment) => segment.join(' ')).join(' ');
+export const joinPath = (pathData) => pathData.map((segment) => segment.join(' ')).join(' ');

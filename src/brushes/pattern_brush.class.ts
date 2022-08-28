@@ -21,18 +21,18 @@ export class PatternBrush extends PencilBrush {
   getPatternSrc() {
 
     const dotWidth = 20,
-      dotDistance = 5,
-      patternCanvas = createCanvasElement(),
-      patternCtx = patternCanvas.getContext('2d');
+          dotDistance = 5,
+          patternCanvas = createCanvasElement(),
+          patternCtx = patternCanvas.getContext('2d');
 
     patternCanvas.width = patternCanvas.height = dotWidth + dotDistance;
-
-    patternCtx.fillStyle = this.color;
-    patternCtx.beginPath();
-    patternCtx.arc(dotWidth / 2, dotWidth / 2, dotWidth / 2, 0, Math.PI * 2, false);
-    patternCtx.closePath();
-    patternCtx.fill();
-
+    if (patternCtx) {
+      patternCtx.fillStyle = this.color;
+      patternCtx.beginPath();
+      patternCtx.arc(dotWidth / 2, dotWidth / 2, dotWidth / 2, 0, Math.PI * 2, false);
+      patternCtx.closePath();
+      patternCtx.fill();
+    }
     return patternCanvas;
   }
 

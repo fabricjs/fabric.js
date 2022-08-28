@@ -4,6 +4,7 @@ import { fabric } from "../../HEADER";
 import { Color } from "../color";
 import { iMatrix } from "../constants";
 import { parseTransformAttribute } from "../parser/parseTransformAttribute";
+import { TMat2D } from "../typedefs";
 import { matrixToSVG } from "../util/misc/svgParsing";
 // import { populateWithProperties } from "../util/misc/misc";
 import { linearDefaultCoords, radialDefaultCoords } from "./constants";
@@ -44,7 +45,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    * @type Number[]
    * @default null
    */
-  gradientTransform: number[] | null = null
+  gradientTransform: TMat2D | null = null
 
   /**
    * coordinates units for coords.
@@ -145,7 +146,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    */
   toSVG(object: FabricObject, { additionalTransform: preTransform }: { additionalTransform?: string } = {}) {
     const markup = [],
-      transform = this.gradientTransform ? this.gradientTransform.concat() : iMatrix.concat(),
+      transform = (this.gradientTransform ? this.gradientTransform.concat() : iMatrix.concat()) as TMat2D,
       gradientUnits = this.gradientUnits === 'pixels' ? 'userSpaceOnUse' : 'objectBoundingBox';
     // colorStops must be sorted ascending, and guarded against deep mutations
     const colorStops = this.colorStops.map((colorStop) => ({ ...colorStop })).sort((a, b) => {

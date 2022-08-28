@@ -70,6 +70,7 @@ import {
   transformPath,
   getRegularPolygonPath,
 } from '../path';
+import { request } from '../dom_request';
 
   /**
    * @namespace fabric.util
@@ -150,6 +151,7 @@ import {
     getPointOnPath,
     transformPath,
     getRegularPolygonPath,
+    request,
 
     /**
      * Populates an object with properties of another object
