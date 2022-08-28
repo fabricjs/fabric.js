@@ -13,39 +13,11 @@ import { TWebGLPrecision, WebGLPrecision } from "../typedefs";
    * @returns {Boolean} Whether the user's browser WebGL supports given precision.
    */
   function testPrecision(gl, precision){
-    var fragmentSource = 'precision ' + precision + ' float;\nvoid main(){}';
-    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+    const fragmentSource = `precision ${precision} float;\nvoid main(){}`;
+    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
     gl.shaderSource(fragmentShader, fragmentSource);
     gl.compileShader(fragmentShader);
-    if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Indicate whether this filtering backend is supported by the user's browser.
-   * @param {Number} tileSize check if the tileSize is supported
-   * @returns {Boolean} Whether the user's browser supports WebGL.
-   */
-  function isWebglSupported(tileSize) {
-    if (fabric.isLikelyNode) {
-      return false;
-    }
-    var canvas = document.createElement('canvas');
-    var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    var isSupported = false;
-    if (gl) {
-      const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-      isSupported = maxTextureSize >= tileSize;
-      const percisionKey = WebGLPrecision.find(key => testPrecision(gl, key));
-      config.configure({
-        maxTextureSize,
-        webGLPrecision: percisionKey
-      });
-    }
-    this.isSupported = isSupported;
-    return isSupported;
+    return !!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS);
   }
 
   /**
