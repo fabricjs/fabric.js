@@ -40,7 +40,7 @@ Demos and examples 🤓 can be found on [fabricjs.com](http://fabricjs.com/demos
 
 If it's not a bug **OR** if you're unsure, start a 🤠 [discussion](https://github.com/fabricjs/fabric.js/discussions) or create a post ✉️ on [Fabric's google group](https://groups.google.com/g/fabricjs) where someone might clarify some of the things.
 
-Check out [**Helping Out**](#-helping-out)
+Check out [**Helping Out**](#%EF%B8%8F-helping-out).
 
 
 ## 🚧🎢 Developing 💡✨
