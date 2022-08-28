@@ -1,5 +1,3 @@
-const { diff } = require('deep-object-diff');
-
 (function(exports) {
 
   exports.getFixture = function(name, original, callback) {
@@ -120,7 +118,6 @@ const { diff } = require('deep-object-diff');
       var dataUrl = largeCanvas.toDataURL().split(',')[1];
       console.log('dumping failed test', testName);
       const fileName = localPath('../../cli_output', `${testName.replaceAll(' ', '_')}.png`);
-
       fs.writeFileSync(fileName.replace('file://', ''), dataUrl, { encoding: 'base64' });
     }
     // else if (original) {
@@ -205,7 +202,11 @@ const { diff } = require('deep-object-diff');
             if (!isOK) {
               // var stringa = imageDataToChalk(output);
               // console.log(stringa);
-              dumpFailedTest(testName, renderedCanvas, canvas, output);
+              try {
+                dumpFailedTest(testName, renderedCanvas, canvas, output);
+              } catch(e) {
+                console.log(e)
+              }
             }
             if ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs) {
               generateGolden(getGoldeName(golden), renderedCanvas);
