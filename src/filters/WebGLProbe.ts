@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import { fabric } from "../../HEADER";
 
 export const enum TWebGLPrecision {
