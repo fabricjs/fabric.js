@@ -615,6 +615,12 @@
 
       fabric.util.setStyle(el, 'color:red');
       assert.equal(el.style.color, 'red');
+      fabric.util.setStyle(el, 'color:blue;border-radius:3px');
+      assert.equal(el.style.color, 'blue');
+      assert.equal(el.style.borderRadius, '3px');
+      fabric.util.setStyle(el, { color: 'yellow', width: '45px' });
+      assert.equal(el.style.color, 'yellow');
+      assert.equal(el.style.width, '45px');
     });
   }
 

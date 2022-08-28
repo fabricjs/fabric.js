@@ -107,7 +107,6 @@ const calcVectorAngle = (ux, uy, vx, vy) => {
   if (tb >= ta) {
     return tb - ta;
   }
-<<<<<<< HEAD
   else {
     return 2 * Math.PI - (ta - tb);
   }
