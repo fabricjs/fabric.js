@@ -28,7 +28,7 @@ import { TWebGLPrecision, WebGLPrecision } from "../typedefs";
    * @param {Number} tileSize check if the tileSize is supported
    * @returns {Boolean} Whether the user's browser supports WebGL.
    */
-  fabric.isWebglSupported = function(tileSize) {
+  function isWebglSupported(tileSize) {
     if (fabric.isLikelyNode) {
       return false;
     }
@@ -49,7 +49,7 @@ import { TWebGLPrecision, WebGLPrecision } from "../typedefs";
   };
 
   fabric.initFilterBackend = function () {
-    if (config.enableGLFiltering && fabric.isWebglSupported && fabric.isWebglSupported(config.textureSize)) {
+    if (config.enableGLFiltering && isWebglSupported(config.textureSize)) {
       console.log(`fabric: max texture size: ${config.maxTextureSize}`);
       return (new fabric.WebglFilterBackend({ tileSize: config.textureSize }));
     }
