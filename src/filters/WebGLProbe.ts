@@ -18,6 +18,9 @@ const WebGLPrecision = [
   TWebGLPrecision.high
 ];
 
+/**
+ * Lazy initialize WebGL contants
+ */
 class WebGLProbe {
 
   private initialized = false;
