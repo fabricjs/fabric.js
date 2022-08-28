@@ -40,6 +40,7 @@ Demos and examples 🤓 can be found on [fabricjs.com](http://fabricjs.com/demos
 
 If it's not a bug **OR** if you're unsure, start a 🤠 [discussion](https://github.com/fabricjs/fabric.js/discussions) or create a post ✉️ on [Fabric's google group](https://groups.google.com/g/fabricjs) where someone might clarify some of the things.
 
+Check out [**Helping Out**](#-helping-out)
 
 
 ## 🚧🎢 Developing 💡✨
@@ -118,14 +119,24 @@ Take a look at an existing [demo file](https://github.com/fabricjs/fabricjs.com/
 Create a new file in the same directory (`posts/demos/_posts`) and you're good to go.
 
 
+## ❤️ Helping Out
+
+Answering questions and addressing issues is a great way to start contributing to fabric.
+
+- [Issues](../../issues)
+- [Discussions](../../discussions)
+- [Google group](https://groups.google.com/g/fabricjs)
+- [Stackoverflow](http://stackoverflow.com/questions/tagged/fabricjs)
+
 
 ## 🚀 Pull Requests 
 
-Fabric is an open source project 🦄 and as such depends on the community.
+Fabric is an open source project 🦄 and as such depends on the **genuine effort** of individuals and the community as a whole.
+**Join Us** to make Fabric better 🌺 . 
 
-Genuine effort has made this repository what it is 🌺 Join Us as we strive to make Fabric better. 
+### Before You Begin
 
-Before you PR, before even cloning or creating a branch, read this section through and take a look at [fabric-gotchas](https://github.com/fabricjs/fabric.js/wiki/Fabric-gotchas).
+Read this section through and take a look at [fabric-gotchas](https://github.com/fabricjs/fabric.js/wiki/Fabric-gotchas).
 
 ### Getting Started
 
