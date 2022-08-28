@@ -39,7 +39,7 @@ jobs:
     - run: npm run build -- -f
     - run: npm run test:coverage && npm run test:visual:coverage
     - run: npm run coverage:report
-    - uses: romeovs/lcov-reporter-action@v0.2.11
+    - uses: romeovs/lcov-reporter-action@v0.3.1
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         delete-old-comments: true
