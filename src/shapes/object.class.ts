@@ -1,4 +1,5 @@
 //@ts-nocheck
+import { config } from '../config';
 import { VERSION } from '../constants';
 import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
@@ -666,7 +667,7 @@ import { capValue } from '../util/misc/capValue';
     },
 
     /**
-     * Limit the cache dimensions so that X * Y do not cross fabric.perfLimitSizeTotal
+     * Limit the cache dimensions so that X * Y do not cross config.perfLimitSizeTotal
      * and each side do not cross fabric.cacheSideLimit
      * those numbers are configurable so that you can get as much detail as you want
      * making bargain with performances.
@@ -681,9 +682,9 @@ import { capValue } from '../util/misc/capValue';
      * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
      */
     _limitCacheSize: function(dims) {
-      var perfLimitSizeTotal = fabric.perfLimitSizeTotal,
+      var perfLimitSizeTotal = config.perfLimitSizeTotal,
           width = dims.width, height = dims.height,
-          max = fabric.maxCacheSideLimit, min = fabric.minCacheSideLimit;
+          max = config.maxCacheSideLimit, min = config.minCacheSideLimit;
       if (width <= max && height <= max && width * height <= perfLimitSizeTotal) {
         if (width < min) {
           dims.width = min;
@@ -756,7 +757,7 @@ import { capValue } from '../util/misc/capValue';
       }
       var canvas = this._cacheCanvas,
           dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-          minCacheSize = fabric.minCacheSideLimit,
+          minCacheSize = config.minCacheSideLimit,
           width = dims.width, height = dims.height, drawingWidth, drawingHeight,
           zoomX = dims.zoomX, zoomY = dims.zoomY,
           dimensionsChanged = width !== this.cacheWidth || height !== this.cacheHeight,
@@ -830,7 +831,7 @@ import { capValue } from '../util/misc/capValue';
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+      var NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
 
           object = {
             type:                     this.type,
@@ -1417,11 +1418,11 @@ import { capValue } from '../util/misc/capValue';
           multY = (canvas && canvas.viewportTransform[3]) || 1,
           scaling = shadow.nonScaling ? new Point(1, 1) : this.getObjectScaling();
       if (canvas && canvas._isRetinaScaling()) {
-        multX *= fabric.devicePixelRatio;
-        multY *= fabric.devicePixelRatio;
+        multX *= config.devicePixelRatio;
+        multY *= config.devicePixelRatio;
       }
       ctx.shadowColor = shadow.color;
-      ctx.shadowBlur = shadow.blur * fabric.browserShadowBlurConstant *
+      ctx.shadowBlur = shadow.blur * config.browserShadowBlurConstant *
         (multX + multY) * (scaling.x + scaling.y) / 4;
       ctx.shadowOffsetX = shadow.offsetX * multX * scaling.x;
       ctx.shadowOffsetY = shadow.offsetY * multY * scaling.y;
@@ -1682,7 +1683,7 @@ import { capValue } from '../util/misc/capValue';
       var utils = fabric.util, origParams = utils.saveObjectTransform(this),
           originalGroup = this.group,
           originalShadow = this.shadow, abs = Math.abs,
-          retinaScaling = options.enableRetinaScaling ? Math.max(fabric.devicePixelRatio, 1) : 1,
+          retinaScaling = options.enableRetinaScaling ? Math.max(config.devicePixelRatio, 1) : 1,
           multiplier = (options.multiplier || 1) * retinaScaling;
       delete this.group;
       if (options.withoutTransform) {
@@ -1911,16 +1912,6 @@ import { capValue } from '../util/misc/capValue';
   fabric.util.createAccessors && fabric.util.createAccessors(fabric.Object);
 
   extend(fabric.Object.prototype, fabric.Observable);
-
-  /**
-   * Defines the number of fraction digits to use when serializing object values.
-   * You can use it to increase/decrease precision of such values like left, top, scaleX, scaleY, etc.
-   * @static
-   * @memberOf fabric.Object
-   * @constant
-   * @type Number
-   */
-  fabric.Object.NUM_FRACTION_DIGITS = 2;
 
   /**
    *

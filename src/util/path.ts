@@ -1,4 +1,5 @@
 //@ts-nocheck
+import { config } from "../config";
 import { fabric } from '../../HEADER';
 import { halfPI, PiBy180 } from "../constants";
 import { commaWsp, rePathCommand } from "../parser/constants";
@@ -106,6 +107,7 @@ const calcVectorAngle = (ux, uy, vx, vy) => {
   if (tb >= ta) {
     return tb - ta;
   }
+<<<<<<< HEAD
   else {
     return 2 * Math.PI - (ta - tb);
   }
@@ -133,7 +135,7 @@ const CB4 = (t) => (1 - t) ** 3;
 // TODO: can we normalize this with the starting points set at 0 and then translated the bbox?
 export const getBoundsOfCurve = (x0, y0, x1, y1, x2, y2, x3, y3) => {
   let argsString;
-  if (fabric.cachesBoundsOfCurve) {
+  if (config.cachesBoundsOfCurve) {
     argsString = [...arguments].join();
     if (fabric.boundsOfCurveCache[argsString]) {
       return fabric.boundsOfCurveCache[argsString];
@@ -203,7 +205,7 @@ export const getBoundsOfCurve = (x0, y0, x1, y1, x2, y2, x3, y3) => {
       y: Math.max(...bounds[1])
     }
   ];
-  if (fabric.cachesBoundsOfCurve) {
+  if (config.cachesBoundsOfCurve) {
     fabric.boundsOfCurveCache[argsString] = result;
   }
   return result;

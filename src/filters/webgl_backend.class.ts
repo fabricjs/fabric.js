@@ -1,10 +1,15 @@
 //@ts-nocheck
+
+import { config } from "../config";
+import { TWebGLPrecision, WebGLPrecision } from "../typedefs";
+
+
 (function(global) {
   var fabric = global.fabric;
   /**
    * Tests if webgl supports certain precision
    * @param {WebGL} Canvas WebGL context to test on
-   * @param {String} Precision to test can be any of following: 'lowp', 'mediump', 'highp'
+   * @param {TWebGLPrecision} Precision to test can be any of following
    * @returns {Boolean} Whether the user's browser WebGL supports given precision.
    */
   function testPrecision(gl, precision){
@@ -31,17 +36,13 @@
     var canvas = document.createElement('canvas');
     var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
     var isSupported = false;
-    // eslint-disable-next-line
     if (gl) {
-      fabric.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-      isSupported = fabric.maxTextureSize >= tileSize;
-      var precisions = ['highp', 'mediump', 'lowp'];
-      for (var i = 0; i < 3; i++){
-        if (testPrecision(gl, precisions[i])){
-          fabric.webGlPrecision = precisions[i];
-          break;
-        };
-      }
+      config.configure({ maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE) });
+      isSupported = config.maxTextureSize >= tileSize;
+      const percisionKey = WebGLPrecision.find(key => testPrecision(gl, key));
+      config.configure({
+        webGLPrecision: percisionKey
+      });
     }
     this.isSupported = isSupported;
     return isSupported;
@@ -111,7 +112,7 @@
       var targetCanvas = fabric.util.createCanvasElement();
       // eslint-disable-next-line no-undef
       var imageBuffer = new ArrayBuffer(width * height * 4);
-      if (fabric.forceGLPutImageData) {
+      if (config.forceGLPutImageData) {
         this.imageBuffer = imageBuffer;
         this.copyGLTo2D = copyGLTo2DPutImageData;
         return;

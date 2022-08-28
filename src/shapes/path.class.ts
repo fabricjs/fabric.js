@@ -1,4 +1,8 @@
 //@ts-nocheck
+
+import { config } from "../config";
+
+
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
@@ -192,7 +196,7 @@
     },
 
     _getOffsetTransform: function() {
-      var digits = fabric.Object.NUM_FRACTION_DIGITS;
+      var digits = config.NUM_FRACTION_DIGITS;
       return ' translate(' + toFixed(-this.pathOffset.x, digits) + ', ' +
           toFixed(-this.pathOffset.y, digits) + ')';
     },

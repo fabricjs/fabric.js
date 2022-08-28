@@ -25,5 +25,5 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
-    - run: npm run build:fast
+    - run: npm run build -- -f
     - run: npm run test -- -s unit -p 8080 -c node

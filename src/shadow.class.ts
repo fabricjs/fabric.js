@@ -1,6 +1,7 @@
 //@ts-nocheck
 
 import { Color } from "./color";
+import { config } from "./config";
 
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
@@ -116,7 +117,7 @@ import { Color } from "./color";
      * @return {String} SVG representation of a shadow
      */
     toSVG: function(object) {
-      var fBoxX = 40, fBoxY = 40, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+      var fBoxX = 40, fBoxY = 40, NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
           offset = fabric.util.rotateVector(
             { x: this.offsetX, y: this.offsetY },
             fabric.util.degreesToRadians(-object.angle)),
