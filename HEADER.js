@@ -1,4 +1,3 @@
-/*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
 import { cache } from './src/cache';
 import { config } from './src/config';
