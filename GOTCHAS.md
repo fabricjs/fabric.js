@@ -3,7 +3,7 @@
 See [[How fabric canvas layering works]].
 
 - **Crazier fabric**\
-Make sure you are not sharing an object (such as a `clipPath`) between render agents (`Canvas`/`Object`)
+Make sure you are not sharing an object (such as a `clipPath`) between render agents. In other words, keep the object tree simple and strict.
 
 - **Object is NOT selectable**: `setCoords()`\
 An object has a visual state and an coordinate state. Both can become stale.\
