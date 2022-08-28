@@ -70,9 +70,9 @@ const arcToSegments = (toX, toY, _rx, _ry, large, sweep, rotateX) => {
   const cx = root * rx * py / ry,
         cy = -root * ry * px / rx,
         cx1 = cosTh * cx - sinTh * cy + toX * 0.5,
-        cy1 = sinTh * cx + cosTh * cy + toY * 0.5,
-        mTheta = calcVectorAngle(1, 0, (px - cx) / rx, (py - cy) / ry),
-        dtheta = calcVectorAngle((px - cx) / rx, (py - cy) / ry, (-px - cx) / rx, (-py - cy) / ry);
+        cy1 = sinTh * cx + cosTh * cy + toY * 0.5;
+  let mTheta = calcVectorAngle(1, 0, (px - cx) / rx, (py - cy) / ry);
+  let dtheta = calcVectorAngle((px - cx) / rx, (py - cy) / ry, (-px - cx) / rx, (-py - cy) / ry);
 
   if (sweep === 0 && dtheta > 0) {
     dtheta -= 2 * PI;
@@ -84,8 +84,8 @@ const arcToSegments = (toX, toY, _rx, _ry, large, sweep, rotateX) => {
   // Convert into cubic bezier segments <= 90deg
   const segments = Math.ceil(Math.abs(dtheta / PI * 2)),
         result = new Array(segments), mDelta = dtheta / segments,
-        mT = 8 / 3 * Math.sin(mDelta / 4) * Math.sin(mDelta / 4) / Math.sin(mDelta / 2),
-        th3 = mTheta + mDelta;
+        mT = 8 / 3 * Math.sin(mDelta / 4) * Math.sin(mDelta / 4) / Math.sin(mDelta / 2);
+  let th3 = mTheta + mDelta;
 
   for (let i = 0; i < segments; i++) {
     result[i] = segmentToBezier(mTheta, th3, cosTh, sinTh, rx, ry, cx1, cy1, mT, fromX, fromY);
