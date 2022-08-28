@@ -18,15 +18,14 @@ function addParamToUrl(url, param) {
  * @param {Function} options.onComplete Callback to invoke when request is completed
  * @return {XMLHttpRequest} request
  */
-export const request = (url, options) => {
-  options || (options = { });
+export function request(url, options = {}) {
 
   const method = options.method ? options.method.toUpperCase() : 'GET',
         onComplete = options.onComplete || noop,
         xhr = new fabric.window.XMLHttpRequest(),
         body = options.body || options.parameters,
         signal = options.signal,
-        abort = abort = function () {
+        abort = function () {
           xhr.abort();
         },
         removeListener = function () {
@@ -53,7 +52,6 @@ export const request = (url, options) => {
   xhr.onerror = xhr.ontimeout = removeListener;
 
   if (method === 'GET') {
-    body = null;
     if (typeof options.parameters === 'string') {
       url = addParamToUrl(url, options.parameters);
     }
@@ -65,6 +63,6 @@ export const request = (url, options) => {
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   }
 
-  xhr.send(body);
+  xhr.send(method === 'GET' ? null : body);
   return xhr;
 };
