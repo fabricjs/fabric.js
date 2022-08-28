@@ -114,6 +114,4 @@ fabric.arcToSegmentsCache = { };
 fabric.boundsOfCurveCache = { };
 
 
-
-
 export { fabric };

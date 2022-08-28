@@ -1,4 +1,5 @@
-//@ts-nocheck
+// https://www.typescriptlang.org/docs/handbook/utility-types.html
+
 interface NominalTag<T> {
   'nominalTag': T;
 }
@@ -10,6 +11,13 @@ const enum Radian { }
 
 export type TDegree = Nominal<number, Degree>;
 export type TRadian = Nominal<number, Radian>;
+
+export type TSize = {
+  width: number;
+  height: number;
+}
+
+export type Percent = `${number}%`;
 
 export const enum StrokeLineJoin {
   miter = 'miter',

@@ -230,10 +230,10 @@
         color: 'blue'
       }]
     });
-    var text = new fabric.Text('PERCENTAGE GRADIENT\nPERCENTAGE GRADIENT\nPERCENTAGE GRADIENT', {
+    var text = new fabric.Text('PERCENT GRADIENT\nPERCENT GRADIENT\nPERCENT GRADIENT', {
       left: 0,
       top: 0,
-      fontSize: 16,
+      fontSize: 32,
       fill: gradient,
     });
     canvas.add(text);
@@ -244,8 +244,10 @@
   tests.push({
     test: 'Text percentage gradient',
     code: text7,
+    width: 350,
+    height: 150,
     golden: 'text7.png',
-    percentage: 0.06,
+    percentage: 0.04,
   });
 
   function text8(canvas, callback) {
