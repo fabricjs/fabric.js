@@ -1,56 +1,13 @@
 //@ts-nocheck
 
 import { config } from "../config";
-import { TWebGLPrecision, WebGLPrecision } from "../typedefs";
-
+import { webGLProbe } from "./WebGLProbe";
 
 (function(global) {
   var fabric = global.fabric;
-  /**
-   * Tests if webgl supports certain precision
-   * @param {WebGL} Canvas WebGL context to test on
-   * @param {TWebGLPrecision} Precision to test can be any of following
-   * @returns {Boolean} Whether the user's browser WebGL supports given precision.
-   */
-  function testPrecision(gl, precision){
-    const fragmentSource = `precision ${precision} float;\nvoid main(){}`;
-    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fragmentShader, fragmentSource);
-    gl.compileShader(fragmentShader);
-    return !!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS);
-  }
-
-  /**
-   * query browser for WebGL
-   * @returns config object if true
-   */
-  function queryWebGL() {
-    const canvas = document.createElement('canvas');
-    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    if (gl) {
-      const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-      const percisionKey = WebGLPrecision.find(key => testPrecision(gl, key));
-      return {
-        maxTextureSize,
-        webGLPrecision: percisionKey
-      };
-    }
-  }
 
   fabric.initFilterBackend = function () {
-    let isWebGLSupported = false;
-    if (config.enableGLFiltering && !fabric.isLikelyNode) {
-      const query = queryWebGL();
-      if (query) {
-        console.log(`fabric: max texture size ${config.maxTextureSize}`);
-        config.configure({
-          maxTextureSize: query.maxTextureSize,
-          webGLPrecision: query.webGLPrecision
-        });
-        isWebGLSupported = maxTextureSize >= config.textureSize;
-      }
-    }
-    if (isWebGLSupported) {
+    if (webGLProbe.isSupported(config.textureSize)) {
       return (new fabric.WebglFilterBackend({ tileSize: config.textureSize }));
     }
     else if (fabric.Canvas2dFilterBackend) {
