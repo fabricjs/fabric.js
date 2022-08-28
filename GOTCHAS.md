@@ -3,11 +3,11 @@
 See [[How fabric canvas layering works]].
 
 - **Crazier fabric**\
-Make sure you are not sharing an object (such as a `clipPath` between render agents (`Canvas`/`Object`)
+Make sure you are not sharing an object (such as a `clipPath`) between render agents (`Canvas`/`Object`)
 
 - **Object is NOT selectable**: `setCoords()`\
-An object has a visual state and an coordinate state. Both can become stale.
-When the visual state is stale it is visible making it simple to catch. This is a bit different.
+An object has a visual state and an coordinate state. Both can become stale.\
+When the visual state is stale it is visible making it simple to catch. This is a bit different.\
 When an object or its controls aren't interactive or don't match their visual position, it means the coordinate state is stale. This happens after changing a property that affects position.
 Calling `object.setCoords()` should fix it.
 
