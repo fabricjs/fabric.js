@@ -1,4 +1,8 @@
 //@ts-nocheck
+
+import { config } from "../config";
+
+
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
@@ -153,7 +157,7 @@
      */
     _toSVG: function() {
       var points = [], diffX = this.pathOffset.x, diffY = this.pathOffset.y,
-          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+          NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
 
       for (var i = 0, len = this.points.length; i < len; i++) {
         points.push(

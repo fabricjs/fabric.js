@@ -115,13 +115,17 @@
     })
   }
 
+  let ORIGINAL_DPR;
+
   QUnit.module('fabric.Canvas', {
     beforeEach: function() {
       upperCanvasEl.style.display = '';
       canvas.controlsAboveOverlay = fabric.Canvas.prototype.controlsAboveOverlay;
       canvas.preserveObjectStacking = fabric.Canvas.prototype.preserveObjectStacking;
+      ORIGINAL_DPR = fabric.config.devicePixelRatio;
     },
-    afterEach: function() {
+    afterEach: function () {
+      fabric.config.configure({ devicePixelRatio: ORIGINAL_DPR });
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.clear();
       canvas.cancelRequestedRender();
@@ -2088,8 +2092,7 @@
     parentEl.className = 'rootNode';
     parentEl.appendChild(el);
 
-    var originalDevicePixelRatio = fabric.devicePixelRatio;
-    fabric.devicePixelRatio = 1.25;
+    fabric.config.configure({ devicePixelRatio: 1.25 });
 
     assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
     assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
@@ -2142,7 +2145,6 @@
     assert.equal(el.width, 200, 'restored width');
     assert.equal(el.height, 200, 'restored height');
 
-    fabric.devicePixelRatio = originalDevicePixelRatio;
   });
 
   QUnit.test('dispose + set dimensions', function (assert) {
@@ -2153,8 +2155,7 @@
     parentEl.className = 'rootNode';
     parentEl.appendChild(el);
 
-    var originalDevicePixelRatio = fabric.devicePixelRatio;
-    fabric.devicePixelRatio = 1.25;
+    fabric.config.configure({ devicePixelRatio: 1.25 });
 
     assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
     assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
@@ -2174,8 +2175,6 @@
     assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
     assert.equal(el.width, 500, 'restored width');
     assert.equal(el.height, 500, 'restored height');
-
-    fabric.devicePixelRatio = originalDevicePixelRatio;
 
   });
 

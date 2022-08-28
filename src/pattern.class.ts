@@ -2,6 +2,7 @@
 
 
 import { pick } from "./util/misc/pick";
+import { config } from "./config";
 
 
 (function(global) {
@@ -74,7 +75,7 @@ import { pick } from "./util/misc/pick";
      * @return {Object} Object representation of a pattern instance
      */
     toObject: function(propertiesToInclude) {
-      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+      var NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
           source, object;
 
       // <img> element

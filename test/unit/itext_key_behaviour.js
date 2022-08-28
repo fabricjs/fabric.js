@@ -276,16 +276,16 @@
     assert.equal(fabric.copiedTextStyle[1].fontSize, 25, 'style took fontSize from text element');
   });
 
-  QUnit.test('copy with fabric.disableStyleCopyPaste', function(assert) {
+  QUnit.test('copy with fabric.config.disableStyleCopyPaste', function(assert) {
     var event = { stopPropagation: function(){}, preventDefault: function(){} };
     var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
     iText.selectionStart = 0;
     iText.selectionEnd = 2;
-    fabric.disableStyleCopyPaste = true;
+    fabric.config.configure({ disableStyleCopyPaste: true });
     iText.copy(event);
     assert.equal(fabric.copiedText, 'te', 'it copied first 2 characters');
     assert.equal(fabric.copiedTextStyle, null, 'style is not cloned');
-    fabric.disableStyleCopyPaste = false;
+    fabric.config.configure({ disableStyleCopyPaste: false });
   });
 
   QUnit.test('removeChars', function(assert) {
