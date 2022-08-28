@@ -1,6 +1,6 @@
 # This workflow will install Uglify and verify that fabric can be build with it
 
-name: Pr quality check
+name: PR Quality Check
 
 on:
   pull_request:
@@ -31,14 +31,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Coverage report
+    - name: Code Coverage Report Updater
       uses: actions/setup-node@v1
       with:
         node-version: 16.x
     - run: npm ci
-    - run: npm run build:fast
+    - run: npm run build -- -f
     - run: npm run test:coverage && npm run test:visual:coverage
-    - uses: ChristiaanScheermeijer/jest-reporter-action@v0.4.0
+    - run: npm run coverage:report
+    - uses: ShaMan123/lcov-reporter-action@v1.0.6
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        test-command: "npm run coverage:report"
+        delete-old-comments: true
+        update-comment: true
+
