@@ -1,6 +1,7 @@
 (function() {
-  fabric.enableGLFiltering = false;
-  fabric.isWebglSupported = false;
+  fabric.config.configure({
+    enableGLFiltering: false
+  });
   var visualTestLoop;
   if (fabric.isLikelyNode) {
     fabric.nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Regular.ttf', {
