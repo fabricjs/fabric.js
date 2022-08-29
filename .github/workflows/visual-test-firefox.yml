@@ -27,5 +27,5 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v3
       with:
-        name: node-failing-visual-tests
+        name: firefox-failing-visual-tests
         path: cli_output/failed_visual_tests/firefox/*
