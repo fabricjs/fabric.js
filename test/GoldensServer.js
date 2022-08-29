@@ -56,7 +56,6 @@ function startGoldensServer() {
                 res.end();
             } else if (req.method.toUpperCase() === 'POST' && req.url === '/failed') {
                 const { files: [{ rawData, filename }] } = await parseRequest(req);
-                console.log('here', filename);
                 const filepath = path.resolve(wd, 'cli_output', 'failed_visual_tests', 'chrome', filename);
                 fs.writeFileSync(filepath, rawData, { encoding: 'binary' });
                 res.status(200).end();

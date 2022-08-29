@@ -125,7 +125,6 @@
         }
         fs.writeFileSync(fileName.replace('file://', ''), dataUrl, { encoding: 'base64' });
       } else {
-        console.log('running here', fileName)
         largeCanvas.toBlob(blob => {
           const formData = new FormData();
           formData.append('file', blob, fileName);
