@@ -30,4 +30,4 @@ jobs:
       uses: EndBug/add-and-commit@v9.1.0
       with:
         add: ./test/visual/golden
-        new_branch: ci-pr#${{ github.event.pull_request.number }}-visuals-chrome
+        new_branch: ci-pr#${{ github.event.pull_request.number }}-visuals-firefox
