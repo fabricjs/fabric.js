@@ -44,7 +44,7 @@ jobs:
         result-encoding: string
         script: |
             const pr = process.env.PR_NUMBER;
-            const contextNames = process.env.CONTEXT_NAMES.split(', ');
+            const contextNames = process.env.CONTEXT_NAMES.split(',').map(val => val.trim());
             const urls = contextNames.map(c => `[${c}](https://github.com/fabricjs/fabric.js/compare/master...ci-pr%23${pr}-visuals-${c})`);
             return `**Visual Test Result Diffs**: ${urls.join(', ')}`;
     - name: Code Coverage Report Updater
