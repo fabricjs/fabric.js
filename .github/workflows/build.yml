@@ -38,13 +38,13 @@ jobs:
       env:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         # pass test context
-        CONTEXT_NAMES: ${{ join(['chrome'], ', ') }}
+        CONTEXT_NAMES: 'node, chrome, firefox'
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         result-encoding: string
         script: |
             const pr = process.env.PR_NUMBER;
-            const contextNames = process.env.CONTEXT_NAMES.split(' ');
+            const contextNames = process.env.CONTEXT_NAMES.split(', ');
             const urls = contextNames.map(c => `[${c}](https://github.com/fabricjs/fabric.js/compare/master...ci-pr%23${pr}-visuals-${c})`);
             return `**Visual Test Result Diffs**: ${urls.join(', ')}`;
     - name: Code Coverage Report Updater
