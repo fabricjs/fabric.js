@@ -117,7 +117,7 @@
       ctx.drawImage(golden, original.width + difference.width, 0);
       var path = `../../cli_output/failed_visual_tests/${runner}`;
       const fileName = localPath(path, `${testName.replaceAll(' ', '_')}.png`);
-      console.log('dumping failed test', testName);
+      console.log('dumping failed test', testName, runner);
       if (fabric.isLikelyNode) {
         var dataUrl = largeCanvas.toDataURL().split(',')[1];
           if (!fs.existsSync(`${__dirname}/${path}`)) {
