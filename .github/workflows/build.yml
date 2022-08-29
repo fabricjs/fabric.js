@@ -29,10 +29,6 @@ jobs:
     - run: npm run lint
   coverage:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        base_url: ['[{0}](https://github.com/fabricjs/fabric.js/compare/master...ci-pr%23${{ github.event.pull_request.number }}-visuals-{0}']
     steps:
     - uses: actions/checkout@v2
     - name: Code Coverage Report Updater
@@ -45,10 +41,11 @@ jobs:
     - run: npm run coverage:report
     - uses: ShaMan123/lcov-reporter-action@v1.1.1
       env:
-        MIP: sdfgdfsgdsfg
+        COMPARE_BASE_URL: [{1}](https://github.com/fabricjs/fabric.js/compare/{0}...ci-pr%23${{ github.event.pull_request.number }}-visuals-{1}
+
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         delete-old-comments: true
         update-comment: true
-        comment_prepend: '**Visual Test Results**: format(${{ matrix.base_url }}, chrome) ${{env.MIP}}'
+        comment_prepend: '**Visual Test Results**: format(${{ matrix.base_url }}, chrome) ${{format(${{ env.COMPARE_BASE_URL }},master,chrome)}}'
 
