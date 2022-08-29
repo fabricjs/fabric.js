@@ -13,6 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      # with:
+      #   repository: ${{ github.event.pull_request.head.repo.full_name }}
+      #   ref: ${{ github.event.pull_request.head.ref }}
     - name: Visual unit tests on Chrome
       uses: actions/setup-node@v1
       with:
@@ -22,4 +25,9 @@ jobs:
     - name: Run headless test
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: npm run test -- -s visual -p 8080 -c chrome
+        run: npm run test -- -p 8080 -c chrome -r -f visual/clippath.js
+    - name: Commit Results
+      uses: EndBug/add-and-commit@v9.1.0
+      with:
+        add: ./test/visual/golden
+        new_branch: ci-pr#${{ github.event.pull_request.number }}-visuals-firefox
