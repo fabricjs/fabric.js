@@ -132,9 +132,10 @@ const CB4 = (t) => (1 - t) ** 3;
  */
 // taken from http://jsbin.com/ivomiq/56/edit  no credits available for that.
 // TODO: can we normalize this with the starting points set at 0 and then translated the bbox?
-export const getBoundsOfCurve = (x0, y0, x1, y1, x2, y2, x3, y3) => {
+export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
   let argsString;
   if (config.cachesBoundsOfCurve) {
+    // eslint-disable-next-line
     argsString = [...arguments].join();
     if (fabric.boundsOfCurveCache[argsString]) {
       return fabric.boundsOfCurveCache[argsString];
