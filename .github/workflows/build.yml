@@ -31,6 +31,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Create comment pre
+      if: ${{ github.event.action != 'closed' }}
+      id: create-comment-pre
+      uses: actions/github-script@v6
+      env:
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        CONTEXT_NAMES: [node, chrome, firefox]
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        result-encoding: string
+        script: |
+            const pr = process.env.PR_NUMBER;
+            const contextNames = process.env.CONTEXT_NAMES.split(',');
+            console.log(contextNames);
+            const urls = [node, chrome, firefox].map(c => `[${c}](https://github.com/fabricjs/fabric.js/compare/master...ci-pr%23${pr}-visuals-${c})`);
+            console.log(urls);
+            return `**Visual Test Result Diffs**: ${urls.join(', ')}`;
     - name: Code Coverage Report Updater
       uses: actions/setup-node@v1
       with:
@@ -40,11 +57,9 @@ jobs:
     - run: npm run test:coverage 
     - run: npm run coverage:report
     - uses: ShaMan123/lcov-reporter-action@v1.1.1
-      env:
-        COMPARE_BASE_URL: https://github.com/fabricjs/fabric.js/compare/master...ci-pr%23${{ github.event.pull_request.number }}-visuals
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         delete-old-comments: true
         update-comment: true
-        comment_prepend: "${{ github.event.action != 'closed' && **Visual Test Result Diffs**: [node](${{ env.COMPARE_BASE_URL }}-node), [chrome](${{ env.COMPARE_BASE_URL }}-chrome), [firefox](${{ env.COMPARE_BASE_URL }}-firefox) || '' }}"
+        comment_prepend: ${{ steps.create-comment-pre.outputs.result || '' }}
 
