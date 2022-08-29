@@ -22,4 +22,9 @@ jobs:
     - name: Run headless test
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: npm run test -- -s visual -p 8080 -c chrome
+        run: npm run test -- -p 8080 -c chrome -r -f visual/clippath.js
+    - name: Add & Commit
+      uses: EndBug/add-and-commit@v9.1.0
+      with:
+        add: './test/viusal/golden'
+        branch: ci-pr#${{ github.event.pull_request.number }}-visuals
