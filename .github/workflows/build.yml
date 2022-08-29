@@ -40,7 +40,7 @@ jobs:
         node-version: 16.x
     - run: npm ci
     - run: npm run build -- -f
-    - run: npx nyc --silent qunit test/node_test_setup.js test/lib test/unit/activeselection.js
+    - run: npm run test:coverage 
     - run: npm run coverage:report
     - uses: ShaMan123/lcov-reporter-action@v1.1.1
       with:
