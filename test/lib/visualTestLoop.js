@@ -106,7 +106,7 @@
     img.src = filename;
   }
 
-  function dumpFailedTest(testName, original, golden, difference) {
+  function dumpFailedTest(testName, original, golden, difference, runner) {
     if (original && difference && golden) {
       var largeCanvas = fabric.util.createCanvasElement();
       largeCanvas.width = original.width + golden.width + difference.width;
@@ -115,19 +115,19 @@
       ctx.drawImage(original, 0, 0);
       ctx.putImageData(difference, original.width, 0);
       ctx.drawImage(golden, original.width + difference.width, 0);
+      var path = `../../cli_output/failed_visual_tests/${runner}`;
+      const fileName = localPath(path, `${testName.replaceAll(' ', '_')}.png`);
+      console.log('dumping failed test', testName);
       if (fabric.isLikelyNode) {
         var dataUrl = largeCanvas.toDataURL().split(',')[1];
-        console.log('dumping failed test', testName);
-        var path = '../../cli_output/failed_visual_tests/node';
           if (!fs.existsSync(`${__dirname}/${path}`)) {
           fs.mkdirSync(`${__dirname}/${path}`, { recursive: true });
         }
-        const fileName = localPath(path, `${testName.replaceAll(' ', '_')}.png`);
         fs.writeFileSync(fileName.replace('file://', ''), dataUrl, { encoding: 'base64' });
       } else {
         largeCanvas.toBlob(blob => {
           const formData = new FormData();
-          formData.append('file', blob, filename);
+          formData.append('file', blob, fileName);
           const request = new XMLHttpRequest();
           request.open('POST', '/failed', true);
           request.send(formData);
@@ -209,7 +209,7 @@
               // var stringa = imageDataToChalk(output);
               // console.log(stringa);
               try {
-                dumpFailedTest(testName, renderedCanvas, canvas, output);
+                dumpFailedTest(testName, renderedCanvas, canvas, output, QUnit.runner);
               } catch(e) {
                 console.log(e)
               }

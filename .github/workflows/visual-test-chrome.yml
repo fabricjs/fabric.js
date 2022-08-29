@@ -24,7 +24,7 @@ jobs:
       with:
         run: npm run test -- -s visual -p 8080 -c chrome
         env:
-          browser: chrome
+          RUNNER: chrome
     - name: Archive artifacts
       if: always()
       uses: actions/upload-artifact@v3

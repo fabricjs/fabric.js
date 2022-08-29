@@ -36,8 +36,9 @@ var vendorName = winNav.vendor;
 var isOpera = typeof window.opr !== "undefined";
 var isIEedge = winNav.userAgent.indexOf("Edg") > -1;
 var isIOSChrome = winNav.userAgent.match("CriOS");
+QUnit.runner = {{qunit.runner}};
 if(
-  isIOSChrome || 
+  isIOSChrome ||
   (isChromium !== null &&
   //typeof isChromium !== "undefined" &&    //  fails on headless chrome
   vendorName === "Google Inc." &&

@@ -24,7 +24,7 @@ jobs:
       with:
         run: npm run test -- -s visual -p 8080 -c firefox
         env:
-          browser: firefox
+          RUNNER: firefox
     - name: Archive artifacts
       if: always()
       uses: actions/upload-artifact@v3

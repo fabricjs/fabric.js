@@ -38,5 +38,6 @@ module.exports = {
     ...config.qunit,
     recreate: Number(process.env.QUNIT_RECREATE_VISUAL_REFS) || false,
     debug: Number(process.env.QUNIT_DEBUG_VISUAL_TESTS) || false,
+    runner: process.env.RUNNER,
   },
 }
