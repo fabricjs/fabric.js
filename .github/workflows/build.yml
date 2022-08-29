@@ -38,16 +38,20 @@ jobs:
       env:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         BASE_BRANCH: master
+        GIT_SCOPE: fabricjs
+        REPO: fabric.js
         # pass test context
         CONTEXT_NAMES: 'node, chrome, firefox'
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         result-encoding: string
         script: |
-            const { PR_NUMBER, BASE_BRANCH } = process.env;
+            const { PR_NUMBER, BASE_BRANCH, GIT_SCOPE, REPO } = process.env;
             const contextNames = process.env.CONTEXT_NAMES.split(',').map(val => val.trim());
-            const testBranchName = `ci-pr%23${PR_NUMBER}-visuals-${c}`;
-            const urls = contextNames.map(c => `[${c}](https://github.com/fabricjs/fabric.js/compare/${BASE_BRANCH}...${testBranchName})`);
+            const urls = contextNames.map(c => {
+              const testBranchName = `ci-pr%23${PR_NUMBER}-visuals-${c}`;
+              return `[${c}](https://github.com/${GIT_SCOPE}/${REPO}/compare/${BASE_BRANCH}...${testBranchName})`
+            });
             return `**Visual Test Result Diffs**: ${urls.join(', ')}`;
     - name: Code Coverage Report Updater
       uses: actions/setup-node@v1
