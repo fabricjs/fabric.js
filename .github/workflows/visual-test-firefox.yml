@@ -23,3 +23,9 @@ jobs:
       uses: GabrielBB/xvfb-action@v1
       with:
         run: npm run test -- -s visual -p 8080 -c firefox
+        env:
+          browser: firefox
+    - uses: actions/upload-artifact@v3
+      with:
+        name: node-failing-visual-tests
+        path: cli_output/failed_visual_tests/firefox/*

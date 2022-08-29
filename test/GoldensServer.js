@@ -7,9 +7,9 @@ const busboy = require('busboy');
 const wd = path.resolve(__dirname, '..');
 
 /**
- * 
- * @param {http.IncomingMessage} req 
- * @returns 
+ *
+ * @param {http.IncomingMessage} req
+ * @returns
  */
 function parseRequest(req) {
     const bb = busboy({ headers: req.headers });
@@ -48,12 +48,17 @@ function startGoldensServer() {
                 const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
                 res.end(JSON.stringify({ exists: fs.existsSync(goldenPath) }));
             }
-            else if (req.method.toUpperCase() === 'POST') {
+            else if (req.method.toUpperCase() === 'POST' && req.url === '/goldens') {
                 const { files: [{ rawData, filename }] } = await parseRequest(req);
                 const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
                 console.log(chalk.gray('[info]'), `creating golden ${path.relative(wd, goldenPath)}`);
                 fs.writeFileSync(goldenPath, rawData, { encoding: 'binary' });
                 res.end();
+            } else if (req.method.toUpperCase() === 'POST' && req.url === '/failed') {
+                const { files: [{ rawData, filename }] } = await parseRequest(req);
+                const filepath = path.resolve(wd, 'cli_output', 'failed_visual_tests', 'chrome', filename);
+                fs.writeFileSync(filepath, rawData, { encoding: 'binary' });
+                res.status(200).end();
             }
         }).listen();
     const port = server.address().port;

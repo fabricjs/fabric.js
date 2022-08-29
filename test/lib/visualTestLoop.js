@@ -107,7 +107,7 @@
   }
 
   function dumpFailedTest(testName, original, golden, difference) {
-    if (fabric.isLikelyNode && original && difference && golden) {
+    if (original && difference && golden) {
       var largeCanvas = fabric.util.createCanvasElement();
       largeCanvas.width = original.width + golden.width + difference.width;
       largeCanvas.height = Math.max(original.height, golden.height, difference.height);
@@ -115,20 +115,26 @@
       ctx.drawImage(original, 0, 0);
       ctx.putImageData(difference, original.width, 0);
       ctx.drawImage(golden, original.width + difference.width, 0);
-      var dataUrl = largeCanvas.toDataURL().split(',')[1];
-      console.log('dumping failed test', testName);
-      const fileName = localPath('../../cli_output', `${testName.replaceAll(' ', '_')}.png`);
-      fs.writeFileSync(fileName.replace('file://', ''), dataUrl, { encoding: 'base64' });
+      if (fabric.isLikelyNode) {
+        var dataUrl = largeCanvas.toDataURL().split(',')[1];
+        console.log('dumping failed test', testName);
+        var path = '../../cli_output/failed_visual_tests/node';
+          if (!fs.existsSync(`${__dirname}/${path}`)) {
+          fs.mkdirSync(`${__dirname}/${path}`, { recursive: true });
+        }
+        const fileName = localPath(path, `${testName.replaceAll(' ', '_')}.png`);
+        fs.writeFileSync(fileName.replace('file://', ''), dataUrl, { encoding: 'base64' });
+      } else {
+        largeCanvas.toBlob(blob => {
+          const formData = new FormData();
+          formData.append('file', blob, filename);
+          const request = new XMLHttpRequest();
+          request.open('POST', '/failed', true);
+          request.send(formData);
+        }, 'image/png');
+      }
     }
-    // else if (original) {
-    //   original.toBlob(blob => {
-    //     const formData = new FormData();
-    //     formData.append('file', blob, filename);
-    //     const request = new XMLHttpRequest();
-    //     request.open('POST', '/goldens', true);
-    //     request.send(formData);
-    //   }, 'image/png');
-    // }
+
   }
 
   exports.visualTestLoop = function(QUnit) {
