@@ -27,8 +27,8 @@ jobs:
     - run: npm ci
     - run: npm run build -- -f -x gestures,accessors
     - run: npm run test -- -s visual -p 8080 -c node
-        env:
-          browser: node
+      env:
+        browser: node
     - uses: actions/upload-artifact@v3
       with:
         name: node-failing-visual-tests
