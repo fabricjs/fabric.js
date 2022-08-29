@@ -37,12 +37,12 @@ jobs:
         node-version: 16.x
     - run: npm ci
     - run: npm run build -- -f
-    - run: npm run test:coverage && npm run test:visual:coverage
+    - run: npm run test:coverage 
     - run: npm run coverage:report
     - uses: ShaMan123/lcov-reporter-action@v1.1.1
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         delete-old-comments: true
         update-comment: true
-        comment_append: format('**Visual Test Results**\n[{1}]({0}{1})\n[{2}]({0}{2})\n[{3}]({0}{3})', 'https://github.com/fabricjs/fabric.js/compare/master...pr%23{{ github.event.pull_request.number }}-visuals-', 'node', 'chrome', 'firefox')
+        comment_append: jkjhjgjhffhgghfhfhfg
 
