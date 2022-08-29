@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        base_url: '[{0}](https://github.com/fabricjs/fabric.js/compare/master...ci-pr%23${{ github.event.pull_request.number }}-visuals-{0}'
+        base_url: ['[{0}](https://github.com/fabricjs/fabric.js/compare/master...ci-pr%23${{ github.event.pull_request.number }}-visuals-{0}']
     steps:
     - uses: actions/checkout@v2
     - name: Code Coverage Report Updater
