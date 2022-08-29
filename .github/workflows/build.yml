@@ -43,8 +43,6 @@ jobs:
     - run: npx nyc --silent qunit test/node_test_setup.js test/lib test/unit/activeselection.js
     - run: npm run coverage:report
     - uses: ShaMan123/lcov-reporter-action@v1.1.1
-      defaults:
-        
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         delete-old-comments: true
