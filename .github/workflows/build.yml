@@ -31,23 +31,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    # - name: Create comment pre
-    #   if: ${{ github.event.action != 'closed' }}
-    #   id: create-comment-pre
-    #   uses: actions/github-script@v6
-    #   env:
-    #     PR_NUMBER: ${{ github.event.pull_request.number }}
-    #     CONTEXT_NAMES: [node, chrome, firefox]
-    #   with:
-    #     github-token: ${{ secrets.GITHUB_TOKEN }}
-    #     result-encoding: string
-    #     script: |
-    #         const pr = process.env.PR_NUMBER;
-    #         const contextNames = process.env.CONTEXT_NAMES.split(',');
-    #         console.log(contextNames);
-    #         const urls = [node, chrome, firefox].map(c => `[${c}](https://github.com/fabricjs/fabric.js/compare/master...ci-pr%23${pr}-visuals-${c})`);
-    #         console.log(urls);
-    #         return `**Visual Test Result Diffs**: ${urls.join(', ')}`;
+    - name: Create comment pre
+      if: ${{ github.event.action != 'closed' }}
+      id: create-comment-pre
+      uses: actions/github-script@v6
+      env:
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        CONTEXT_NAMES: join([node, chrome, firefox], ',')
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        result-encoding: string
+        script: |
+            const pr = process.env.PR_NUMBER;
+            const contextNames = process.env.CONTEXT_NAMES.split(',');
+            console.log(contextNames);
+            const urls = [node, chrome, firefox].map(c => `[${c}](https://github.com/fabricjs/fabric.js/compare/master...ci-pr%23${pr}-visuals-${c})`);
+            console.log(urls);
+            return `**Visual Test Result Diffs**: ${urls.join(', ')}`;
     - name: Code Coverage Report Updater
       uses: actions/setup-node@v1
       with:
