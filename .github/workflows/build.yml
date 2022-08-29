@@ -44,9 +44,11 @@ jobs:
     - run: npm run test:coverage 
     - run: npm run coverage:report
     - uses: ShaMan123/lcov-reporter-action@v1.1.1
+      env:
+        MIP: sdfgdfsgdsfg
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         delete-old-comments: true
         update-comment: true
-        comment_prepend: '**Visual Test Results**: format(${{ matrix.base_url }}, chrome)'
+        comment_prepend: '**Visual Test Results**: format(${{ matrix.base_url }}, chrome) ${{env.MIP}}'
 
