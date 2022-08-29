@@ -31,4 +31,4 @@ jobs:
       with:
         add: ./test/visual/golden
         new_branch: ci-pr#${{ github.event.pull_request.number }}-visuals-chrome
-        push: git push -u origin ci-pr#${{ github.event.pull_request.number }}-visuals-chrome
+        # push: git push -u origin ci-pr#${{ github.event.pull_request.number }}-visuals-chrome
