@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        ref: ci-pr#${{ github.event.pull_request.number }}-visuals-chrome
     - name: Visual unit tests on Chrome
       uses: actions/setup-node@v1
       with:
@@ -27,4 +29,4 @@ jobs:
       uses: EndBug/add-and-commit@v9.1.0
       with:
         add: './test/visual/golden'
-        branch: ci-pr#${{ github.event.pull_request.number }}-visuals
+        # branch: ci-pr#${{ github.event.pull_request.number }}-visuals
