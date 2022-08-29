@@ -37,13 +37,13 @@ jobs:
       uses: actions/github-script@v6
       env:
         PR_NUMBER: ${{ github.event.pull_request.number }}
-        CONTEXT_NAMES: ${{ join(['node', 'chrome', 'firefox'], ',') }}
+        CONTEXT_NAMES: 'node chrome firefox'
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         result-encoding: string
         script: |
             const pr = process.env.PR_NUMBER;
-            const contextNames = process.env.CONTEXT_NAMES.split(',');
+            const contextNames = process.env.CONTEXT_NAMES.split(' ');
             console.log(contextNames);
             const urls = contextNames.map(c => `[${c}](https://github.com/fabricjs/fabric.js/compare/master...ci-pr%23${pr}-visuals-${c})`);
             console.log(urls);
