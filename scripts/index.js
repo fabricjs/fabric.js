@@ -320,40 +320,53 @@ async function runTestem({ suite, port, launch, dev, processOptions, context } =
  * @returns {Promise<boolean | undefined>} true if some tests failed
  */
 async function test(suite, tests, options = {}) {
-    const processOptions = {
-        cwd: wd,
-        env: {
-            ...process.env,
-            TEST_FILES: (tests || []).join(','),
-            NODE_CMD: ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' '),
-            VERBOSE: Number(options.verbose),
-            QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
-            QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
-            QUNIT_FILTER: options.filter,
-            REPORT_FILE: options.out
-        },
-        shell: true,
-        stdio: 'inherit',
-    }
-
     let failed = false;
+    const qunitEnv = {
+        QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
+        QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
+        QUNIT_FILTER: options.filter,
+    };
+    const env = {
+        ...process.env,
+        TEST_FILES: (tests || []).join(','),
+        NODE_CMD: ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' '),
+        VERBOSE: Number(options.verbose),
+        REPORT_FILE: options.out
+    };
+    const browserContexts = options.context.filter(c => c !== 'node');
 
     // temporary revert
     // run node tests directly with qunit
     if (options.context.includes('node')) {
         try {
-            cp.execSync(processOptions.env.NODE_CMD, processOptions);            
+            cp.execSync(env.NODE_CMD, {
+                cwd: wd,
+                env: {
+                    ...env,
+                    // browser takes precendence in golden ref generation
+                    ...(browserContexts.length === 0 ? qunitEnv : {})
+                },
+                shell: true,
+                stdio: 'inherit',
+            });
         } catch (error) {
             failed = true;
         }
     }
 
-    const browserContexts = options.context.filter(c => c !== 'node');
     if (browserContexts.length > 0) {
         failed = await runTestem({
             ...options,
             suite,
-            processOptions,
+            processOptions: {
+                cwd: wd,
+                env: {
+                    ...env,
+                    ...qunitEnv
+                },
+                shell: true,
+                stdio: 'inherit',
+            },
             context: browserContexts
         }) || failed;
     }
