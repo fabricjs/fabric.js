@@ -38,7 +38,7 @@ jobs:
       env:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         # pass test context
-        CONTEXT_NAMES: join(['chrome'], ', ')
+        CONTEXT_NAMES: ${{ join(['chrome'], ', ') }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         result-encoding: string
