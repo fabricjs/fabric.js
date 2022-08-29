@@ -23,8 +23,6 @@ jobs:
       uses: GabrielBB/xvfb-action@v1
       with:
         run: npm run test -- -s visual -p 8080 -c firefox
-        env:
-          RUNNER: firefox
     - name: Archive artifacts
       if: always()
       uses: actions/upload-artifact@v3
