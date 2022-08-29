@@ -2,6 +2,7 @@ import { fabric } from '../../../HEADER';
 import { SVGElementName, SupportedSVGUnit, TMat2D } from '../../typedefs';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
 import { toFixed } from './toFixed';
+import { config } from '../../config';
 /**
  * Returns array of attributes for given svg that fabric parses
  * @memberOf fabric.util
@@ -38,7 +39,7 @@ export const parseUnit = (value: string, fontSize: number) => {
   if (!fontSize) {
     fontSize = DEFAULT_SVG_FONT_SIZE;
   }
-  const dpi = fabric.DPI;
+  const dpi = config.DPI;
   switch (unit?.[0]) {
     case SupportedSVGUnit.mm:
       return number * dpi / 25.4;
@@ -133,4 +134,4 @@ export const parsePreserveAspectRatioAttribute = (attribute: string): TPreserveA
  * @return {String} transform matrix for svg
  */
 export const matrixToSVG = (transform: TMat2D) =>
-  'matrix(' + transform.map((value) => toFixed(value, fabric.Object.NUM_FRACTION_DIGITS)).join(' ') + ')';
+  'matrix(' + transform.map((value) => toFixed(value, config.NUM_FRACTION_DIGITS)).join(' ') + ')';

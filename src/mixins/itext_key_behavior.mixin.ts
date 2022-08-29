@@ -1,4 +1,8 @@
 //@ts-nocheck
+
+import { config } from "../config";
+
+
 (function(global) {
   var fabric = global.fabric;
   fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
@@ -243,7 +247,7 @@
         this.removeStyleFromTo(removeFrom, removeTo);
       }
       if (insertedText.length) {
-        if (fromPaste && insertedText.join('') === fabric.copiedText && !fabric.disableStyleCopyPaste) {
+        if (fromPaste && insertedText.join('') === fabric.copiedText && !config.disableStyleCopyPaste) {
           copiedStyle = fabric.copiedTextStyle;
         }
         this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
@@ -289,7 +293,7 @@
       }
 
       fabric.copiedText = this.getSelectedText();
-      if (!fabric.disableStyleCopyPaste) {
+      if (!config.disableStyleCopyPaste) {
         fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd, true);
       }
       else {
