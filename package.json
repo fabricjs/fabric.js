@@ -7,11 +7,18 @@
   "contributors": [
     {
       "name": "Andrea Bogazzi",
-      "email": "andreabogazzi79@gmail.com"
+      "email": "andreabogazzi79@gmail.com",
+      "url": "https://github.com/asturur"
     },
     {
       "name": "Steve Eberhardt",
-      "email": "melchiar2@gmail.com"
+      "email": "melchiar2@gmail.com",
+      "url": "https://github.com/melchiar"
+    },
+    {
+      "name": "Shachar Nencel",
+      "email": "shacharnen@gmail.com",
+      "url": "https://github.com/ShaMan123"
     }
   ],
   "keywords": [
@@ -46,7 +53,7 @@
   "scripts": {
     "changelog": "auto-changelog -o change-output.md --unreleased-only",
     "build": "node ./scripts build",
-    "build:fast": "npm run build -- --fast",
+    "build:fast": "npm run build -- -f",
     "fabric": "node ./scripts",
     "dev": "node ./scripts dev",
     "start": "node ./scripts start",
@@ -55,6 +62,8 @@
     "test": "node ./scripts test",
     "test:unit-browser": "npm run test -- -s unit -p 8080 -l -c ",
     "test:visual-browser": "npm run test -- -s visual -p 8080 -l -c ",
+    "test:old_but_gold": "qunit --require ./test/node_test_setup.js test/lib test/unit",
+    "test:visual:old_but_gold": "qunit test/node_test_setup.js test/lib test/visual",
     "test:coverage": "nyc --silent qunit test/node_test_setup.js test/lib test/unit",
     "test:visual:coverage": "nyc --silent --no-clean qunit test/node_test_setup.js test/lib test/visual",
     "coverage:report": "nyc report --reporter=lcov --reporter=text",
@@ -68,6 +77,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.2",
+    "@rollup/plugin-json": "^4.1.0",
     "@types/fs-extra": "^9.0.13",
     "@types/lodash": "^4.14.180",
     "@types/node": "^17.0.21",

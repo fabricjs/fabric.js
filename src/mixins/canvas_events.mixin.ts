@@ -1,4 +1,8 @@
 //@ts-nocheck
+
+import { fireEvent } from "../util/fireEvent";
+
+
 (function(global) {
 
   var fabric = global.fabric,
@@ -158,14 +162,6 @@
         nestedTarget && nestedTarget.fire('mouseout', { e: e });
       }, this);
       this._hoveredTargets = [];
-
-      if (this._iTextInstances) {
-        this._iTextInstances.forEach(function(obj) {
-          if (obj.isEditing) {
-            obj.hiddenTextarea.focus();
-          }
-        });
-      }
     },
 
     /**
@@ -1134,7 +1130,9 @@
     /**
      * @private
      */
-    _fire: fabric.controlsUtils.fireEvent,
+    _fire: function (eventName, options) {
+      return fireEvent(eventName, options);
+    },
 
     /**
      * Sets the cursor depending on where the canvas is being hovered.

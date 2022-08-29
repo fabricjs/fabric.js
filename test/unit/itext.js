@@ -58,6 +58,7 @@
     hooks.afterEach(function() {
       canvas.clear();
       canvas.cancelRequestedRender();
+      fabric.config.clearFonts();
     });
 
     QUnit.test('constructor', function(assert) {
@@ -696,10 +697,10 @@
         },
         fontFamily: 'Plaster'
       });
-      fabric.fontPaths = {
+      fabric.config.addFonts({
         Engagement: 'path-to-engagement-font-file',
         Plaster: 'path-to-plaster-font-file',
-      };
+      });
       canvas.add(iText);
       assert.equal(typeof iText.toSVG, 'function');
       var parser = new DOMParser(),
@@ -730,12 +731,12 @@
         },
         fontFamily: 'Poppins'
       });
-      fabric.fontPaths = {
+      fabric.config.addFonts({
         Engagement: 'path-to-engagement-font-file',
         Plaster: 'path-to-plaster-font-file',
         Poppins: 'path-to-poppins-font-file',
         Lacquer: 'path-to-lacquer-font-file'
-      };
+      });
       var subGroup = new fabric.Group([iText1]);
       var group = new fabric.Group([subGroup, iText2]);
       canvas.add(group);
@@ -812,9 +813,16 @@
       });
     });
 
-    QUnit.module('fabric.IText with canvas.enableRetinaScaling = true', function() {
+    QUnit.module('fabric.IText with canvas.enableRetinaScaling = true', function (hooks) {
+      let DPR;
+      hooks.before(function () {
+        DPR = fabric.config.devicePixelRatio;
+        fabric.config.configure({ devicePixelRatio: 2 });
+      });
+      hooks.after(function () {
+        fabric.config.configure({ devicePixelRatio: DPR });
+      });
       QUnit.test('hiddenTextarea does not move DOM', function(assert) {
-        fabric.devicePixelRatio = 2;
         var iText = new fabric.IText('a', { fill: '#ffffff', fontSize: 50 });
         var canvas2 = new fabric.Canvas(null, { width: 800, height: 800, renderOnAddRemove: false, enableRetinaScaling: true });
         canvas2.setDimensions({ width: 100, height: 100 }, { cssOnly: true });
@@ -848,7 +856,6 @@
         assert.equal(Math.round(parseInt(iText.hiddenTextarea.style.left)), 100, 'left is scaled with CSS');
         iText.exitEditing();
         canvas2.cancelRequestedRender();
-        fabric.devicePixelRatio = 1;
       });
     });
   });
