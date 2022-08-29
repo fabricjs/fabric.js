@@ -143,6 +143,16 @@
     },
 
     /**
+     * After setting scale, recalculates dimensions when the stroke is uniform and stroke line join is bevel or round
+     * @private
+     */
+    _set(key, value) {
+      var output = this.callSuper('_set', key, value);
+      (key === 'scaleX' || key === 'scaleY') && this.strokeUniform && this.strokeLineJoin !== 'round' && this._setPositionDimensions();
+      return output; 
+    },
+
+    /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} Object representation of an instance
