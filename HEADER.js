@@ -79,10 +79,6 @@ fabric.SHARED_ATTRIBUTES = [
 /* _FROM_SVG_END_ */
 
 
-fabric.reNonWord = /[ \n\.,;!\?\-]/;
-
-
-
 /**
  * @todo move to config when window is exported
  */
