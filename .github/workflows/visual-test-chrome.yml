@@ -25,7 +25,9 @@ jobs:
         run: npm run test -- -s visual -p 8080 -c chrome
         env:
           browser: chrome
-    - uses: actions/upload-artifact@v3
+    - name: Archive artifacts
+      if: always()
+      uses: actions/upload-artifact@v3
       with:
         name: node-failing-visual-tests
         path: cli_output/failed_visual_tests/chrome/*
