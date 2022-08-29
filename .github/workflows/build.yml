@@ -46,5 +46,5 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         delete-old-comments: true
         update-comment: true
-        comment_prepend: ${{ github.event.action != 'closed' ? '**Visual Test Result Diffs**: [node](${{ env.COMPARE_BASE_URL }}-node), [chrome](${{ env.COMPARE_BASE_URL }}-chrome), [firefox](${{ env.COMPARE_BASE_URL }}-firefox)' : '' }}
+        comment_prepend: (${{ github.event.action != 'closed' && '**Visual Test Result Diffs**: [node](${{ env.COMPARE_BASE_URL }}-node), [chrome](${{ env.COMPARE_BASE_URL }}-chrome), [firefox](${{ env.COMPARE_BASE_URL }}-firefox)') || '' }}
 
