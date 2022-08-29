@@ -1,4 +1,6 @@
 //@ts-nocheck
+
+import { config } from "../config";
 import { commaWsp, rePathCommand } from "../parser/constants";
 import { Point } from '../point.class';
 
@@ -127,7 +129,7 @@ import { Point } from '../point.class';
   // TODO: can we normalize this with the starting points set at 0 and then translated the bbox?
   function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
     var argsString;
-    if (fabric.cachesBoundsOfCurve) {
+    if (config.cachesBoundsOfCurve) {
       argsString = _join.call(arguments);
       if (fabric.boundsOfCurveCache[argsString]) {
         return fabric.boundsOfCurveCache[argsString];
@@ -201,7 +203,7 @@ import { Point } from '../point.class';
         y: max.apply(null, bounds[1])
       }
     ];
-    if (fabric.cachesBoundsOfCurve) {
+    if (config.cachesBoundsOfCurve) {
       fabric.boundsOfCurveCache[argsString] = result;
     }
     return result;

@@ -1,8 +1,6 @@
 //@ts-nocheck
-(function(global) {
-  var fabric = global.fabric || (global.fabric = { }),
-      degreesToRadians = fabric.util.degreesToRadians,
-      controls = fabric.controlsUtils;
+
+import { degreesToRadians } from "../util";
 
   /**
    * Render a round control, as per fabric features.
@@ -15,7 +13,7 @@
    * @param {Object} styleOverride override for fabric.Object controls style
    * @param {fabric.Object} fabricObject the fabric object for which we are rendering controls
    */
-  function renderCircleControl (ctx, left, top, styleOverride, fabricObject) {
+  export function renderCircleControl (ctx, left, top, styleOverride, fabricObject) {
     styleOverride = styleOverride || {};
     var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
         ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
@@ -64,7 +62,7 @@
    * @param {Object} styleOverride override for fabric.Object controls style
    * @param {fabric.Object} fabricObject the fabric object for which we are rendering controls
    */
-  function renderSquareControl(ctx, left, top, styleOverride, fabricObject) {
+  export function renderSquareControl(ctx, left, top, styleOverride, fabricObject) {
     styleOverride = styleOverride || {};
     var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
         ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
@@ -93,7 +91,4 @@
     ctx.restore();
   }
 
-  controls.renderCircleControl = renderCircleControl;
-  controls.renderSquareControl = renderSquareControl;
 
-})(typeof exports !== 'undefined' ? exports : window);

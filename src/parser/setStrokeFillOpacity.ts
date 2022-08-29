@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
-import { toFixed } from '../util';
+import { toFixed } from '../util/misc/toFixed';
 import { colorAttributes } from './constants';
 
 /**

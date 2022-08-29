@@ -10,4 +10,5 @@ before_commit
 .idea/
 /dist/fabric.require.js
 /dist/fabric.min.js.gz
-/.fabric/
+/cli_output/
+/scripts/cli_cache.json
