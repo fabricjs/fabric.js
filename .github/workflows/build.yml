@@ -44,5 +44,5 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         delete-old-comments: true
         update-comment: true
-        comment_append: jkjhjgjhffhgghfhfhfg
+        comment_prepend: jkjhjgjhffhgghfhfhfg
 
