@@ -23,8 +23,8 @@ jobs:
       uses: GabrielBB/xvfb-action@v1
       with:
         run: npm run test -- -p 8080 -c chrome -r -f visual/clippath.js
-    - name: Add & Commit
+    - name: Commit Results
       uses: EndBug/add-and-commit@v9.1.0
       with:
-        add: './test/viusal/golden'
+        add: './test/visual/golden'
         branch: ci-pr#${{ github.event.pull_request.number }}-visuals
