@@ -400,7 +400,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
       }
 
       // regain focus
-      document.activeElement !== this.hiddenTextarea && this.hiddenTextarea.focus();
+      fabric.document.activeElement !== this.hiddenTextarea && this.hiddenTextarea.focus();
 
       var newSelectionStart = this.getSelectionStartFromPointer(options.e),
           currentStart = this.selectionStart,
