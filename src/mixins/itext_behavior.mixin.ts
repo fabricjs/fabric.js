@@ -2,6 +2,9 @@
 import { Point } from '../point.class';
 import { removeFromArray } from '../util/internals';
 
+// extend this regex to support non english languages
+const reNonWord = /[ \n\.,;!\?\-]/;
+
 (function(global) {
   var fabric = global.fabric;
   fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.prototype */ {
@@ -288,9 +291,7 @@ import { removeFromArray } from '../util/internals';
     searchWordBoundary: function(selectionStart, direction) {
       var text = this._text,
           index     = this._reSpace.test(text[selectionStart]) ? selectionStart - 1 : selectionStart,
-          _char     = text[index],
-          // wrong
-          reNonWord = fabric.reNonWord;
+          _char     = text[index];
 
       while (!reNonWord.test(_char) && index > 0 && index < text.length) {
         index += direction;
