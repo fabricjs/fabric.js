@@ -41,11 +41,15 @@ jobs:
     - run: npm run coverage:report
     - uses: ShaMan123/lcov-reporter-action@v1.1.1
       env:
-        # COMPARE_BASE_URL: https://github.com/fabricjs/fabric.js/compare/master...ci-pr%23${{ github.event.pull_request.number }}-visuals
-        COMPARE_BASE_URL: ${{ github.event.pull_request.base.compare_url }}
+        COMPARE_BASE_URL: https://github.com/fabricjs/fabric.js/compare/master...ci-pr%23${{ github.event.pull_request.number }}-visuals
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         delete-old-comments: true
         update-comment: true
-        comment_prepend: '**Visual Test Result Diffs**: [node](${{ env.COMPARE_BASE_URL }}-node), [chrome](${{ env.COMPARE_BASE_URL }}-chrome), [firefox](${{ env.COMPARE_BASE_URL }}-firefox)'
+        comment_prepend: '**Visual Test Result Diffs**: [node](${{ env.COMPARE_BASE_URL }}-node), [chrome](${{ env.COMPARE_BASE_URL }}-chrome), [firefox](${{ env.COMPARE_BASE_URL }}-firefox) ${{ format(
+            'Spam is short for {0} and is made from {1} by {2}',
+            'spiced ham',
+            'pork shoulder',
+            'Hormel'
+          ) }}'
 
