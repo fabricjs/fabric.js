@@ -44,5 +44,5 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         delete-old-comments: true
         update-comment: true
-        comment_prepend: format(**Visual Test Results**\\n[{1}]({0}{1})\\n[{2}]({0}{2})\\n[{3}]({0}{3}), https://github.com/fabricjs/fabric.js/compare/master...pr%23${{ github.event.pull_request.number }}-visuals-, node, chrome, firefox)
+        comment_prepend: '**Visual Test Results**\nhttps://github.com/fabricjs/fabric.js/compare/master...pr%23${{ github.event.pull_request.number }}-visuals-chrome'
 
