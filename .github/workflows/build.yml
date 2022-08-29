@@ -37,7 +37,7 @@ jobs:
       uses: actions/github-script@v6
       env:
         PR_NUMBER: ${{ github.event.pull_request.number }}
-        CONTEXT_NAMES: join([node, chrome, firefox], ',')
+        CONTEXT_NAMES: join(['node', 'chrome', 'firefox'], ',')
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         result-encoding: string
