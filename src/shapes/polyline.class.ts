@@ -93,9 +93,8 @@
       if (!options.fromSVG) {
         correctLeftTop = this.translateToGivenOrigin(
           {
-            // this looks bad, but is one way to keep it optional for now.
-            x: calcDim.left - this.strokeWidth / 2 + correctSizeX / 2,
-            y: calcDim.top - this.strokeWidth / 2 + correctSizeY / 2
+            x: this.left,
+            y: this.top
           },
           'left',
           'top',
