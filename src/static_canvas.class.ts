@@ -701,6 +701,7 @@ import { removeFromArray } from './util/internals';
       this.abortRendering();
       try {
         const controller = new AbortController();
+        console.log('sdfsdfsdf',controller.signal.throwIfAborted)
         controller.signal.throwIfAborted();
         this.__abortController = controller;
         this.render();
@@ -749,13 +750,13 @@ import { removeFromArray } from './util/internals';
         requested: false
       };
       // first clear request
-      if (this.isRendering && only?.requested ?? true) {
+      if (this.isRendering && (only?.requested ?? true)) {
         fabric.util.cancelAnimFrame(this.isRendering);
         this.isRendering = 0;
         state.requested = true;
       }
       // abort concurrent rendering
-      if (this.__abortController && !this.__abortController.signal.aborted && only?.current ?? true) {
+      if (this.__abortController && !this.__abortController.signal.aborted && (only?.current ?? true)) {
         this.__abortController.abort();
         state.current = true;
       }
