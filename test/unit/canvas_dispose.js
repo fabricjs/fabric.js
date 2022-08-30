@@ -30,7 +30,7 @@ function assertCanvasDisposing(klass) {
         assert.equal(canvas.contextContainer, null, 'dispose should clear contextContainer');
     });
 
-    QUnit.test('dispose edge cases: multiple calls', async function (assert) {
+    QUnit.test('dispose edge case: multiple calls', async function (assert) {
         const done = assert.async();
         const canvas = new klass(null, { renderOnAddRemove: false });
         assert.notOk(canvas.destroyed, 'should not have been destroyed yet');
@@ -45,7 +45,7 @@ function assertCanvasDisposing(klass) {
         done();
     });
 
-    QUnit.test('dispose edge cases: multiple calls after `requestRenderAll', async function (assert) {
+    QUnit.test('dispose edge case: multiple calls after `requestRenderAll', async function (assert) {
         const done = assert.async();
         const canvas = new klass(null, { renderOnAddRemove: false });
         assert.notOk(canvas.destroyed, 'should not have been destroyed yet');
@@ -65,7 +65,7 @@ function assertCanvasDisposing(klass) {
         done();
     });
 
-    QUnit.test('dispose edge cases: rendering after dispose', async function (assert) {
+    QUnit.test('dispose edge case: rendering after dispose', async function (assert) {
         const done = assert.async();
         const canvas = new klass(null, { renderOnAddRemove: false });
         let called = 0;
@@ -82,109 +82,140 @@ function assertCanvasDisposing(klass) {
         assert.equal(called, 1, 'should not have rendered');
         done();
     });
+
+    QUnit.test('dispose edge case: `toCanvasElement` interrupting `requestRenderAll`', function (assert) {
+        const done = assert.async();
+        const canvas = new klass(null, { renderOnAddRemove: false });
+        assert.equal(canvas.nextRenderHandle, undefined);
+        canvas.nextRenderHandle = 1;
+        canvas.toCanvasElement();
+        assert.equal(canvas.nextRenderHandle, 1, 'should request rendering');
+        done();
+    });
+
+    QUnit.test('dispose edge case: `toCanvasElement` after dispose', async function (assert) {
+        const done = assert.async();
+        const canvas = new klass(null, { renderOnAddRemove: false });
+        const testImageData = colorByteVal => {
+            return canvas
+                .toCanvasElement()
+                .getContext('2d')
+                .getImageData(0, 0, 20, 20)
+                .data
+                .filter((x, i) => i % 4 === 0)
+                .every(x => x === colorByteVal);
+        }
+        canvas.add(makeRect({ fill: 'red', width: 20, height: 20 }));
+        assert.ok(testImageData(255));
+        assert.ok(await canvas.dispose());
+        assert.ok(testImageData(0));
+        done();
+    });
 }
 
-QUnit.module('StaticCanvas dispose')
-assertCanvasDisposing(fabric.StaticCanvas);
+function testStaticCanvasDisposing() {
+    QUnit.module('Static Canvas disposing')
+    assertCanvasDisposing(fabric.StaticCanvas);
+}
 
+function testCanvasDisposing() {
+    QUnit.module('Canvas disposing')
+    assertCanvasDisposing(fabric.Canvas);
 
-QUnit.module('Canvas dispose')
-assertCanvasDisposing(fabric.StaticCanvas);
+    QUnit.test('dispose: clear refs', async function (assert) {
+        //made local vars to do not dispose the external canvas
+        var el = fabric.document.createElement('canvas'),
+            parentEl = fabric.document.createElement('div'),
+            wrapperEl, lowerCanvasEl, upperCanvasEl;
+        el.width = 200; el.height = 200;
+        parentEl.className = 'rootNode';
+        parentEl.appendChild(el);
 
-QUnit.test('dispose: clear refs', async function (assert) {
-    //made local vars to do not dispose the external canvas
-    var el = fabric.document.createElement('canvas'),
-        parentEl = fabric.document.createElement('div'),
-        wrapperEl, lowerCanvasEl, upperCanvasEl;
-    el.width = 200; el.height = 200;
-    parentEl.className = 'rootNode';
-    parentEl.appendChild(el);
+        fabric.config.configure({ devicePixelRatio: 1.25 });
 
-    fabric.config.configure({ devicePixelRatio: 1.25 });
+        assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
+        assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
 
-    assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
-    assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
+        el.style.position = 'relative';
+        var elStyle = el.style.cssText;
+        assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
 
-    el.style.position = 'relative';
-    var elStyle = el.style.cssText;
-    assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
+        var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
+        wrapperEl = canvas.wrapperEl;
+        lowerCanvasEl = canvas.lowerCanvasEl;
+        upperCanvasEl = canvas.upperCanvasEl;
+        assert.equal(parentEl.childNodes.length, 1, 'parentEl has still 1 child only');
+        assert.equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
+        assert.equal(wrapperEl.tagName, 'DIV', 'We wrapped canvas with DIV');
+        assert.equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
+        assert.equal(wrapperEl.childNodes[0], lowerCanvasEl, 'First child should be lowerCanvas');
+        assert.equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
+        assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+        assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
+        if (!fabric.isLikelyNode) {
+            assert.equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appendend to rootNode');
+        }
+        //looks like i cannot use parentNode
+        //equal(wrapperEl, lowerCanvasEl.parentNode, 'lowerCanvas is appended to wrapperEl');
+        //equal(wrapperEl, upperCanvasEl.parentNode, 'upperCanvas is appended to wrapperEl');
+        //equal(parentEl, wrapperEl.parentNode, 'wrapperEl is appendend to rootNode');
+        assert.equal(parentEl.childNodes.length, 1, 'parent div should have 1 child');
+        assert.notEqual(parentEl.firstChild, canvas.getElement(), 'canvas should not be parent div firstChild');
+        assert.ok(typeof canvas.dispose === 'function');
+        assert.ok(typeof canvas.destroy === 'function');
+        canvas.add(makeRect(), makeRect(), makeRect());
+        canvas.item(0).animate('scaleX', 10);
+        assert.equal(fabric.runningAnimations.length, 1, 'should have a running animation');
+        await canvas.dispose();
+        assert.equal(fabric.runningAnimations.length, 0, 'dispose should clear running animations');
+        assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
+        assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
+        if (!fabric.isLikelyNode) {
+            assert.equal(parentEl.childNodes[0], lowerCanvasEl, 'canvas should be back to its firstChild place');
+        }
+        assert.equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');
+        assert.equal(canvas.upperCanvasEl, null, 'upperCanvas should be deleted');
+        assert.equal(canvas.lowerCanvasEl, null, 'lowerCanvasEl should be deleted');
+        assert.equal(canvas.cacheCanvasEl, null, 'cacheCanvasEl should be deleted');
+        assert.equal(canvas.contextTop, null, 'contextTop should be deleted');
+        assert.equal(canvas.contextCache, null, 'contextCache should be deleted');
+        assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
+        assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
+        assert.equal(el.width, 200, 'restored width');
+        assert.equal(el.height, 200, 'restored height');
 
-    var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
-    wrapperEl = canvas.wrapperEl;
-    lowerCanvasEl = canvas.lowerCanvasEl;
-    upperCanvasEl = canvas.upperCanvasEl;
-    assert.equal(parentEl.childNodes.length, 1, 'parentEl has still 1 child only');
-    assert.equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
-    assert.equal(wrapperEl.tagName, 'DIV', 'We wrapped canvas with DIV');
-    assert.equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
-    assert.equal(wrapperEl.childNodes[0], lowerCanvasEl, 'First child should be lowerCanvas');
-    assert.equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
-    assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
-    assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
-    if (!fabric.isLikelyNode) {
-        assert.equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appendend to rootNode');
-    }
-    //looks like i cannot use parentNode
-    //equal(wrapperEl, lowerCanvasEl.parentNode, 'lowerCanvas is appended to wrapperEl');
-    //equal(wrapperEl, upperCanvasEl.parentNode, 'upperCanvas is appended to wrapperEl');
-    //equal(parentEl, wrapperEl.parentNode, 'wrapperEl is appendend to rootNode');
-    assert.equal(parentEl.childNodes.length, 1, 'parent div should have 1 child');
-    assert.notEqual(parentEl.firstChild, canvas.getElement(), 'canvas should not be parent div firstChild');
-    assert.ok(typeof canvas.dispose === 'function');
-    assert.ok(typeof canvas.destroy === 'function');
-    canvas.add(makeRect(), makeRect(), makeRect());
-    canvas.item(0).animate('scaleX', 10);
-    assert.equal(fabric.runningAnimations.length, 1, 'should have a running animation');
-    await canvas.dispose();
-    assert.equal(fabric.runningAnimations.length, 0, 'dispose should clear running animations');
-    assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
-    assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
-    if (!fabric.isLikelyNode) {
-        assert.equal(parentEl.childNodes[0], lowerCanvasEl, 'canvas should be back to its firstChild place');
-    }
-    assert.equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');
-    assert.equal(canvas.upperCanvasEl, null, 'upperCanvas should be deleted');
-    assert.equal(canvas.lowerCanvasEl, null, 'lowerCanvasEl should be deleted');
-    assert.equal(canvas.cacheCanvasEl, null, 'cacheCanvasEl should be deleted');
-    assert.equal(canvas.contextTop, null, 'contextTop should be deleted');
-    assert.equal(canvas.contextCache, null, 'contextCache should be deleted');
-    assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
-    assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
-    assert.equal(el.width, 200, 'restored width');
-    assert.equal(el.height, 200, 'restored height');
+    });
 
-});
+    QUnit.test('dispose edge case: `setDimensions` invoking `requestRenderAll`', async function (assert) {
+        //made local vars to do not dispose the external canvas
+        var el = fabric.document.createElement('canvas'),
+            parentEl = fabric.document.createElement('div');
+        el.width = 200; el.height = 200;
+        parentEl.className = 'rootNode';
+        parentEl.appendChild(el);
 
-QUnit.test('dispose edge case: `setDimensions` invoking `requestRenderAll`', async function (assert) {
-    //made local vars to do not dispose the external canvas
-    var el = fabric.document.createElement('canvas'),
-        parentEl = fabric.document.createElement('div');
-    el.width = 200; el.height = 200;
-    parentEl.className = 'rootNode';
-    parentEl.appendChild(el);
+        fabric.config.configure({ devicePixelRatio: 1.25 });
 
-    fabric.config.configure({ devicePixelRatio: 1.25 });
+        assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
+        assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
 
-    assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
-    assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
+        el.style.position = 'relative';
+        var elStyle = el.style.cssText;
+        assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
 
-    el.style.position = 'relative';
-    var elStyle = el.style.cssText;
-    assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
+        var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
 
-    var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
+        canvas.setDimensions({ width: 500, height: 500 });
+        assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+        assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
 
-    canvas.setDimensions({ width: 500, height: 500 });
-    assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
-    assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
+        await canvas.dispose();
+        assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
+        assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
+        assert.equal(el.width, 500, 'restored width');
+        assert.equal(el.height, 500, 'restored height');
 
-    await canvas.dispose();
-    assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
-    assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
-    assert.equal(el.width, 500, 'restored width');
-    assert.equal(el.height, 500, 'restored height');
-
-});
+    });
 
   // QUnit.test('dispose', async function(assert) {
   //   function invokeEventsOnCanvas() {
@@ -227,3 +258,7 @@ QUnit.test('dispose edge case: `setDimensions` invoking `requestRenderAll`', asy
   //   invokeEventsOnCanvas();
   //   assertInvocationsCount();
   // });
+}
+
+testStaticCanvasDisposing();
+testCanvasDisposing();
