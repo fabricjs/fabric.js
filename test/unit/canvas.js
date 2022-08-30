@@ -2236,7 +2236,6 @@
       assert.equal(canvas.getWidth(), clone.getWidth());
       assert.equal(canvas.getHeight(), clone.getHeight());
       clone.renderAll();
-      clone.dispose();
       done();
     });
   });
@@ -2256,7 +2255,6 @@
       assert.equal(canvas.getWidth(), clone.getWidth());
       assert.equal(canvas.getHeight(), clone.getHeight());
       clone.renderAll();
-      clone.dispose();
       done();
     });
   });
