@@ -2,6 +2,7 @@
 import { config } from './config';
 import { VERSION } from './constants';
 import { Point } from './point.class';
+import { cancelAnimFrame, requestAnimFrame } from './util';
 import { removeFromArray } from './util/internals';
 
 (function (global) {
@@ -38,9 +39,8 @@ import { removeFromArray } from './util/internals';
      * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
-    initialize: function(el, options) {
-      options || (options = { });
-      this.renderAndResetBound = this.renderAndReset.bind(this);
+    initialize: function (el, options) {
+      options || (options = {});
       this.requestRenderAllBound = this.requestRenderAll.bind(this);
       this._initStatic(el, options);
     },
@@ -171,7 +171,7 @@ import { removeFromArray } from './util/internals';
      * The coordinates get updated with @method calcViewportBoundaries.
      * @memberOf fabric.StaticCanvas.prototype
      */
-    vptCoords: { },
+    vptCoords: {},
 
     /**
      * Based on vptCoords and object.aCoords, skip rendering of objects that
@@ -199,8 +199,9 @@ import { removeFromArray } from './util/internals';
      * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
      * @param {Object} [options] Options object
      */
-    _initStatic: function(el, options) {
+    _initStatic: function (el, options) {
       this._objects = [];
+      this.__abortControllers = {};
       this._createLowerCanvas(el);
       this._initOptions(options);
       // only initialize retina scaling once
@@ -213,7 +214,7 @@ import { removeFromArray } from './util/internals';
     /**
      * @private
      */
-    _isRetinaScaling: function() {
+    _isRetinaScaling: function () {
       return (config.devicePixelRatio > 1 && this.enableRetinaScaling);
     },
 
@@ -221,14 +222,14 @@ import { removeFromArray } from './util/internals';
      * @private
      * @return {Number} retinaScaling if applied, otherwise 1;
      */
-    getRetinaScaling: function() {
+    getRetinaScaling: function () {
       return this._isRetinaScaling() ? Math.max(1, config.devicePixelRatio) : 1;
     },
 
     /**
      * @private
      */
-    _initRetinaScaling: function() {
+    _initRetinaScaling: function () {
       if (!this._isRetinaScaling()) {
         return;
       }
@@ -239,7 +240,7 @@ import { removeFromArray } from './util/internals';
       }
     },
 
-    __initRetinaScaling: function(scaleRatio, canvas, context) {
+    __initRetinaScaling: function (scaleRatio, canvas, context) {
       canvas.setAttribute('width', this.width * scaleRatio);
       canvas.setAttribute('height', this.height * scaleRatio);
       context.scale(scaleRatio, scaleRatio);
@@ -260,13 +261,13 @@ import { removeFromArray } from './util/internals';
     /**
      * @private
      */
-    _createCanvasElement: function() {
+    _createCanvasElement: function () {
       var element = createCanvasElement();
       if (!element) {
         throw CANVAS_INIT_ERROR;
       }
       if (!element.style) {
-        element.style = { };
+        element.style = {};
       }
       if (typeof element.getContext === 'undefined') {
         throw CANVAS_INIT_ERROR;
@@ -472,9 +473,9 @@ import { removeFromArray } from './util/internals';
      */
     setViewportTransform: function (vpt) {
       var activeObject = this._activeObject,
-          backgroundObject = this.backgroundImage,
-          overlayObject = this.overlayImage,
-          object, i, len;
+        backgroundObject = this.backgroundImage,
+        overlayObject = this.overlayImage,
+        object, i, len;
       this.viewportTransform = vpt;
       for (i = 0, len = this._objects.length; i < len; i++) {
         object = this._objects[i];
@@ -602,7 +603,7 @@ import { removeFromArray } from './util/internals';
      * @private
      * @param {fabric.Object} obj Object that was added
      */
-    _onObjectAdded: function(obj) {
+    _onObjectAdded: function (obj) {
       this.stateful && obj.setupState();
       if (obj.canvas && obj.canvas !== this) {
         /* _DEV_MODE_START_ */
@@ -621,7 +622,7 @@ import { removeFromArray } from './util/internals';
      * @private
      * @param {fabric.Object} obj Object that was removed
      */
-    _onObjectRemoved: function(obj) {
+    _onObjectRemoved: function (obj) {
       obj._set('canvas', undefined);
       this.fire('object:removed', { target: obj });
       obj.fire('removed', { target: this });
@@ -633,7 +634,7 @@ import { removeFromArray } from './util/internals';
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    clearContext: function(ctx) {
+    clearContext: function (ctx) {
       ctx.clearRect(0, 0, this.width, this.height);
       return this;
     },
@@ -674,24 +675,8 @@ import { removeFromArray } from './util/internals';
      * @chainable
      */
     renderAll: function () {
-      var canvasToDrawOn = this.contextContainer;
-      this.renderCanvas(canvasToDrawOn, this._objects);
+      this.renderCanvas(this.contextContainer, this._objects);
       return this;
-    },
-
-    /**
-     * Function created to be instance bound at initialization
-     * used in requestAnimationFrame rendering
-     * Let the fabricJS call it. If you call it manually you could have more
-     * animationFrame stacking on to of each other
-     * for an imperative rendering, use canvas.renderAll
-     * @private
-     * @return {fabric.Canvas} instance
-     * @chainable
-     */
-    renderAndReset: function() {
-      this.isRendering = 0;
-      this.renderAll();
     },
 
     /**
@@ -703,7 +688,28 @@ import { removeFromArray } from './util/internals';
      */
     requestRenderAll: function () {
       if (!this.isRendering) {
-        this.isRendering = fabric.util.requestAnimFrame(this.renderAndResetBound);
+        new Promise((resolve, reject) => {
+          const controller = new AbortController();
+          const handle = this.isRendering = requestAnimFrame(() => {
+            if (controller.signal.aborted) {
+              // even though the promise is rejected the function is invoked in some unknown case so we return
+              return;
+            }
+            this.isRendering = 0;
+            this.renderAll();
+            resolve();
+          });
+          controller.signal.addEventListener('abort', (e) => {
+            this.cancelRequestedRender();
+            delete this.__abortControllers[handle];
+            reject(e);
+          }, { once: true });
+          this.__abortControllers[handle] = controller;
+        }).catch(error => {
+          if (error.type !== 'abort') {
+            throw error;
+          }
+        });
       }
       return this;
     },
@@ -715,15 +721,15 @@ import { removeFromArray } from './util/internals';
      * @return {Object} points.tl
      * @chainable
      */
-    calcViewportBoundaries: function() {
+    calcViewportBoundaries: function () {
       var width = this.width, height = this.height,
-          iVpt = invertTransform(this.viewportTransform),
-          a = transformPoint({ x: 0, y: 0 }, iVpt),
-          b = transformPoint({ x: width, y: height }, iVpt),
-          // we don't support vpt flipping
-          // but the code is robust enough to mostly work with flipping
-          min = a.min(b),
-          max = a.max(b);
+        iVpt = invertTransform(this.viewportTransform),
+        a = transformPoint({ x: 0, y: 0 }, iVpt),
+        b = transformPoint({ x: width, y: height }, iVpt),
+        // we don't support vpt flipping
+        // but the code is robust enough to mostly work with flipping
+        min = a.min(b),
+        max = a.max(b);
       return this.vptCoords = {
         tl: min,
         tr: new Point(max.x, min.y),
@@ -732,11 +738,26 @@ import { removeFromArray } from './util/internals';
       };
     },
 
-    cancelRequestedRender: function() {
-      if (this.isRendering) {
-        fabric.util.cancelAnimFrame(this.isRendering);
-        this.isRendering = 0;
-      }
+    /**
+     * @param [handle] 
+     */
+    cancelRequestedRender: function () {
+      cancelAnimFrame(this.isRendering);
+      this.isRendering = 0;
+    },
+
+    /**
+     * abort concurrent rendering and requested rendering
+     * @param [handle] 
+     */
+    abortRendering: function () {
+      // first clear request
+      this.cancelRequestedRender();
+      Object.keys(this.__abortControllers).forEach(handle => {
+        const controller = this.__abortControllers[handle];
+        controller.abort();
+      });
+      this.__abortControllers = {};
     },
 
     /**
@@ -748,7 +769,6 @@ import { removeFromArray } from './util/internals';
      */
     renderCanvas: function(ctx, objects) {
       var v = this.viewportTransform, path = this.clipPath;
-      this.cancelRequestedRender();
       this.calcViewportBoundaries();
       this.clearContext(ctx);
       fabric.util.setImageSmoothing(ctx, this.imageSmoothingEnabled);
@@ -1624,11 +1644,7 @@ import { removeFromArray } from './util/internals';
      * @chainable
      */
     dispose: function () {
-      // cancel eventually ongoing renders
-      if (this.isRendering) {
-        fabric.util.cancelAnimFrame(this.isRendering);
-        this.isRendering = 0;
-      }
+      this.abortRendering();
       this.forEachObject(function(object) {
         object.dispose && object.dispose();
       });
