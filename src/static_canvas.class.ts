@@ -40,7 +40,6 @@ import { removeFromArray } from './util/internals';
      */
     initialize: function(el, options) {
       options || (options = { });
-      this.renderAndResetBound = this.renderAndReset.bind(this);
       this.requestRenderAllBound = this.requestRenderAll.bind(this);
       this._initStatic(el, options);
     },
@@ -680,21 +679,6 @@ import { removeFromArray } from './util/internals';
     },
 
     /**
-     * Function created to be instance bound at initialization
-     * used in requestAnimationFrame rendering
-     * Let the fabricJS call it. If you call it manually you could have more
-     * animationFrame stacking on to of each other
-     * for an imperative rendering, use canvas.renderAll
-     * @private
-     * @return {fabric.Canvas} instance
-     * @chainable
-     */
-    renderAndReset: function() {
-      this.isRendering = 0;
-      this.renderAll();
-    },
-
-    /**
      * Append a renderAll request to next animation frame.
      * unless one is already in progress, in that case nothing is done
      * a boolean flag will avoid appending more.
@@ -703,7 +687,10 @@ import { removeFromArray } from './util/internals';
      */
     requestRenderAll: function () {
       if (!this.isRendering) {
-        this.isRendering = fabric.util.requestAnimFrame(this.renderAndResetBound);
+        this.isRendering = fabric.util.requestAnimFrame(() => {
+          this.isRendering = 0;
+          this.renderAll();
+        });
       }
       return this;
     },
@@ -734,6 +721,7 @@ import { removeFromArray } from './util/internals';
 
     cancelRequestedRender: function() {
       if (this.isRendering) {
+        console.log('cancelRequestedRender', this.isRendering);
         fabric.util.cancelAnimFrame(this.isRendering);
         this.isRendering = 0;
       }
@@ -746,7 +734,8 @@ import { removeFromArray } from './util/internals';
      * @return {fabric.Canvas} instance
      * @chainable
      */
-    renderCanvas: function(ctx, objects) {
+    renderCanvas: function (ctx, objects) {
+      console.log('renderCanvas', ctx);
       var v = this.viewportTransform, path = this.clipPath;
       this.cancelRequestedRender();
       this.calcViewportBoundaries();
@@ -1625,10 +1614,7 @@ import { removeFromArray } from './util/internals';
      */
     dispose: function () {
       // cancel eventually ongoing renders
-      if (this.isRendering) {
-        fabric.util.cancelAnimFrame(this.isRendering);
-        this.isRendering = 0;
-      }
+      this.cancelRequestedRender();
       this.forEachObject(function(object) {
         object.dispose && object.dispose();
       });
