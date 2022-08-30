@@ -50,7 +50,7 @@ A **simple and powerful Javascript HTML5 canvas library**.
 | Edge | ✔️ | chromium based |
 | Edge Legacy | ❌ | 
 | IE11 | ❌ |  
-| [Node.js](http://nodejs.org/) | ✔️ |  [Node.js installation](#nodejs)
+| Node.js | ✔️ |  [Node.js installation](#nodejs)
 
 
 ## Installation
