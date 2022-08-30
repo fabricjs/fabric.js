@@ -47,11 +47,13 @@ export function request(url, options = {}) {
 
   xhr.onerror = xhr.ontimeout = removeListener;
   
+  const _url = new URL(url);
+
   xhr.open(
     method,
     method === 'GET' && options.parameters ?
-      `${url}?${new URLSearchParams([
-        ...Array.from(new URL(url).searchParams.entries()),
+      `${_url.origin}${_url.pathname}??${new URLSearchParams([
+        ...Array.from(_url.searchParams.entries()),
         ...Object.entries(options.parameters),
       ])}` :
       url,
