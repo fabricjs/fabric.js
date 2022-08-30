@@ -615,6 +615,12 @@
 
       fabric.util.setStyle(el, 'color:red');
       assert.equal(el.style.color, 'red');
+      fabric.util.setStyle(el, 'color:blue;border-radius:3px');
+      assert.equal(el.style.color, 'blue');
+      assert.equal(el.style.borderRadius, '3px');
+      fabric.util.setStyle(el, { color: 'yellow', width: '45px' });
+      assert.equal(el.style.color, 'yellow');
+      assert.equal(el.style.width, '45px');
     });
   }
 
@@ -660,27 +666,26 @@
     assert.equal(obj3, fabric.util.array.max([obj1, obj3, obj2]));
   });
 
-  QUnit.test('fabric.util.populateWithProperties', function(assert) {
-    assert.ok(typeof fabric.util.populateWithProperties === 'function');
+  QUnit.test('fabric.util.pick', function(assert) {
+    assert.ok(typeof fabric.util.pick === 'function');
 
     var source = {
-          foo: 'bar',
-          baz: 123,
-          qux: function() { }
-        },
-        destination = { };
+      foo: 'bar',
+      baz: 123,
+      qux: function () { }
+    };
 
-    fabric.util.populateWithProperties(source, destination);
+    let destination = fabric.util.pick(source);
     assert.ok(typeof destination.foo === 'undefined');
     assert.ok(typeof destination.baz === 'undefined');
     assert.ok(typeof destination.qux === 'undefined');
 
-    fabric.util.populateWithProperties(source, destination, ['foo']);
+    destination = fabric.util.pick(source, ['foo']);
     assert.equal(destination.foo, 'bar');
     assert.ok(typeof destination.baz === 'undefined');
     assert.ok(typeof destination.qux === 'undefined');
 
-    fabric.util.populateWithProperties(source, destination, ['foo', 'baz', 'ffffffffff']);
+    destination = fabric.util.pick(source, ['foo', 'baz', 'ffffffffff']);
     assert.equal(destination.foo, 'bar');
     assert.equal(destination.baz, 123);
     assert.ok(typeof destination.qux === 'undefined');
@@ -695,21 +700,21 @@
     assert.equal(fabric.util.getKlass('Sepia2', 'fabric.Image.filters'), fabric.Image.filters.Sepia2);
   });
 
-  QUnit.test('clearFabricFontCache', function(assert) {
-    assert.ok(typeof fabric.util.clearFabricFontCache === 'function');
-    fabric.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
-    fabric.util.clearFabricFontCache('arial');
-    assert.equal(fabric.charWidthsCache.arial,  undefined, 'arial cache is deleted');
-    assert.equal(fabric.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
-    fabric.util.clearFabricFontCache();
-    assert.deepEqual(fabric.charWidthsCache, { }, 'all cache is deleted');
+  QUnit.test('clearFontCache', function(assert) {
+    assert.ok(typeof fabric.cache.clearFontCache === 'function');
+    fabric.cache.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
+    fabric.cache.clearFontCache('arial');
+    assert.equal(fabric.cache.charWidthsCache.arial,  undefined, 'arial cache is deleted');
+    assert.equal(fabric.cache.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
+    fabric.cache.clearFontCache();
+    assert.deepEqual(fabric.cache.charWidthsCache, { }, 'all cache is deleted');
   });
 
-  QUnit.test('clearFabricFontCache wrong case', function(assert) {
-    fabric.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
-    fabric.util.clearFabricFontCache('ARIAL');
-    assert.equal(fabric.charWidthsCache.arial,  undefined, 'arial cache is deleted');
-    assert.equal(fabric.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
+  QUnit.test('clearFontCache wrong case', function(assert) {
+    fabric.cache.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
+    fabric.cache.clearFontCache('ARIAL');
+    assert.equal(fabric.cache.charWidthsCache.arial,  undefined, 'arial cache is deleted');
+    assert.equal(fabric.cache.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
   });
 
   QUnit.test('parsePreserveAspectRatioAttribute', function(assert) {

@@ -390,7 +390,7 @@
   QUnit.test('getFontCache works with fontWeight numbers', function(assert) {
     var text = new fabric.Text('xxx', { fontWeight: 400 });
     text.initDimensions();
-    var cache = fabric.charWidthsCache[text.fontFamily.toLowerCase()];
+    var cache = fabric.cache.charWidthsCache[text.fontFamily.toLowerCase()];
     var cacheProp = text.fontStyle + '_400';
     assert.equal(cacheProp in cache, true, '400 is converted to string');
   });
@@ -400,8 +400,8 @@
     text.initDimensions();
     var text2 = new fabric.Text('xxx', { fontWeight: 'bOLd', fontStyle: 'nORMAl' });
     text2.initDimensions();
-    var cache = text.getFontCache(text);
-    var cache2 = text2.getFontCache(text2);
+    var cache = fabric.cache.getFontCache(text);
+    var cache2 = fabric.cache.getFontCache(text2);
     assert.equal(cache, cache2, 'you get the same cache');
   });
   // moved
@@ -741,13 +741,13 @@
   });
 
   QUnit.test('_measureChar handles 0 width chars', function(assert) {
-    fabric.charWidthsCache = {};
+    fabric.cache.clearFontCache();
     var zwc =  '\u200b';
     var text = new fabric.Text('');
     var style = text.getCompleteStyleDeclaration(0, 0);
     var box = text._measureChar('a', style, zwc, style);
     var box2 = text._measureChar('a', style, zwc, style);
-    assert.equal(fabric.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal[zwc], 0, 'zwc is a 0 width char');
+    assert.equal(fabric.cache.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal[zwc], 0, 'zwc is a 0 width char');
     assert.equal(box.kernedWidth, box2.kernedWidth, '2 measurements of the same string return the same number');
   });
 

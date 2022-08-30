@@ -1364,9 +1364,9 @@
     assert.equal(JSON.stringify(canvas.toJSON()), EMPTY_JSON);
     canvas.backgroundColor = '#ff5555';
     canvas.overlayColor = 'rgba(0,0,0,0.2)';
-    assert.equal(JSON.stringify(canvas.toJSON()), '{"version":"' + fabric.version + '","objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlayColor` value should be reflected in json');
+    assert.deepEqual(canvas.toJSON(), { "version": fabric.version,"objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}, '`background` and `overlayColor` value should be reflected in json');
     canvas.add(makeRect());
-    assert.deepEqual(JSON.stringify(canvas.toJSON()), RECT_JSON);
+    assert.deepEqual(canvas.toJSON(), JSON.parse(RECT_JSON));
   });
 
   QUnit.test('toJSON with active group', function(assert) {
@@ -1386,7 +1386,7 @@
       sourcePath: 'http://example.com/'
     });
     canvas.add(path);
-    assert.equal(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
+    assert.deepEqual(canvas.toDatalessJSON(), JSON.parse(PATH_DATALESS_JSON));
   });
 
   QUnit.test('toObject', function(assert) {

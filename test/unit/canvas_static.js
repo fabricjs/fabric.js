@@ -1005,12 +1005,12 @@
 
   QUnit.test('toJSON', function(assert) {
     assert.ok(typeof canvas.toJSON === 'function');
-    assert.equal(JSON.stringify(canvas), '{"version":"' + fabric.version + '","objects":[]}');
+    assert.equal(JSON.stringify(canvas), JSON.stringify({ "version": fabric.version, "objects": [] }));
     canvas.backgroundColor = '#ff5555';
     canvas.overlayColor = 'rgba(0,0,0,0.2)';
-    assert.equal(JSON.stringify(canvas.toJSON()), '{"version":"' + fabric.version + '","objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlay` value should be reflected in json');
+    assert.deepEqual(canvas.toJSON(), { "version": fabric.version,"objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}, '`background` and `overlay` value should be reflected in json');
     canvas.add(makeRect());
-    assert.deepEqual(JSON.stringify(canvas.toJSON()), RECT_JSON);
+    assert.deepEqual(canvas.toJSON(), JSON.parse(RECT_JSON));
   });
 
   QUnit.test('toJSON custom properties non-existence check', function(assert) {
@@ -1094,7 +1094,7 @@
       sourcePath: 'http://example.com/'
     });
     canvas.add(path);
-    assert.equal(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
+    assert.deepEqual(canvas.toDatalessJSON(), JSON.parse(PATH_DATALESS_JSON));
   });
 
   QUnit.test('toObject', function(assert) {
@@ -1345,11 +1345,11 @@
 
     canvas.add(rect);
 
-    var jsonWithoutFoo = JSON.stringify(canvas.toObject(['padding']));
-    var jsonWithFoo = JSON.stringify(canvas.toObject(['padding', 'foo']));
+    var jsonWithoutFoo = canvas.toObject(['padding']);
+    var jsonWithFoo = canvas.toObject(['padding', 'foo']);
 
-    assert.equal(jsonWithFoo, RECT_JSON_WITH_PADDING);
-    assert.ok(jsonWithoutFoo !== RECT_JSON_WITH_PADDING);
+    assert.deepEqual(jsonWithFoo, JSON.parse(RECT_JSON_WITH_PADDING));
+    assert.notDeepEqual(jsonWithoutFoo, JSON.parse(RECT_JSON_WITH_PADDING));
 
     canvas.clear();
     canvas.loadFromJSON(jsonWithFoo).then(function() {
