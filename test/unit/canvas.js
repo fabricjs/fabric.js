@@ -2147,7 +2147,7 @@
 
   });
 
-  QUnit.test('dispose + set dimensions', function (assert) {
+  QUnit.test.only('dispose + set dimensions', function (assert) {
     //made local vars to do not dispose the external canvas
     var el = fabric.document.createElement('canvas'),
       parentEl = fabric.document.createElement('div');
@@ -2167,10 +2167,12 @@
     var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
 
     canvas.setDimensions({ width: 500, height: 500 });
+    assert.ok(canvas.isRendering > 0, 'should have requested rendering');
     assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
     assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
 
     canvas.dispose();
+    assert.equal(canvas.isRendering, 0, 'should have cancelled requested rendering');
     assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
     assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
     assert.equal(el.width, 500, 'restored width');
