@@ -106,9 +106,11 @@ function assertCanvasDisposing(klass) {
                 .every(x => x === colorByteVal);
         }
         canvas.add(makeRect({ fill: 'red', width: 20, height: 20 }));
-        assert.ok(testImageData(255));
-        assert.ok(await canvas.dispose());
-        assert.ok(testImageData(0));
+        assert.ok(testImageData(255), 'control');
+        canvas.disposed = true;
+        assert.ok(testImageData(255), 'should render canvas');
+        canvas.destroyed = true;
+        assert.ok(testImageData(0), 'should have disabled canvas rendering');
         done();
     });
 }
