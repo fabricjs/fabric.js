@@ -38,8 +38,8 @@ import { removeFromArray } from './util/internals';
      * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
-    initialize: function(el, options) {
-      options || (options = { });
+    initialize: function (el, options) {
+      options || (options = {});
       this.requestRenderAllBound = this.requestRenderAll.bind(this);
       this._initStatic(el, options);
     },
@@ -170,7 +170,7 @@ import { removeFromArray } from './util/internals';
      * The coordinates get updated with @method calcViewportBoundaries.
      * @memberOf fabric.StaticCanvas.prototype
      */
-    vptCoords: { },
+    vptCoords: {},
 
     /**
      * Based on vptCoords and object.aCoords, skip rendering of objects that
@@ -198,7 +198,7 @@ import { removeFromArray } from './util/internals';
      * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
      * @param {Object} [options] Options object
      */
-    _initStatic: function(el, options) {
+    _initStatic: function (el, options) {
       this._objects = [];
       this._createLowerCanvas(el);
       this._initOptions(options);
@@ -212,7 +212,7 @@ import { removeFromArray } from './util/internals';
     /**
      * @private
      */
-    _isRetinaScaling: function() {
+    _isRetinaScaling: function () {
       return (config.devicePixelRatio > 1 && this.enableRetinaScaling);
     },
 
@@ -220,14 +220,14 @@ import { removeFromArray } from './util/internals';
      * @private
      * @return {Number} retinaScaling if applied, otherwise 1;
      */
-    getRetinaScaling: function() {
+    getRetinaScaling: function () {
       return this._isRetinaScaling() ? Math.max(1, config.devicePixelRatio) : 1;
     },
 
     /**
      * @private
      */
-    _initRetinaScaling: function() {
+    _initRetinaScaling: function () {
       if (!this._isRetinaScaling()) {
         return;
       }
@@ -238,7 +238,7 @@ import { removeFromArray } from './util/internals';
       }
     },
 
-    __initRetinaScaling: function(scaleRatio, canvas, context) {
+    __initRetinaScaling: function (scaleRatio, canvas, context) {
       canvas.setAttribute('width', this.width * scaleRatio);
       canvas.setAttribute('height', this.height * scaleRatio);
       context.scale(scaleRatio, scaleRatio);
@@ -259,13 +259,13 @@ import { removeFromArray } from './util/internals';
     /**
      * @private
      */
-    _createCanvasElement: function() {
+    _createCanvasElement: function () {
       var element = createCanvasElement();
       if (!element) {
         throw CANVAS_INIT_ERROR;
       }
       if (!element.style) {
-        element.style = { };
+        element.style = {};
       }
       if (typeof element.getContext === 'undefined') {
         throw CANVAS_INIT_ERROR;
@@ -471,9 +471,9 @@ import { removeFromArray } from './util/internals';
      */
     setViewportTransform: function (vpt) {
       var activeObject = this._activeObject,
-          backgroundObject = this.backgroundImage,
-          overlayObject = this.overlayImage,
-          object, i, len;
+        backgroundObject = this.backgroundImage,
+        overlayObject = this.overlayImage,
+        object, i, len;
       this.viewportTransform = vpt;
       for (i = 0, len = this._objects.length; i < len; i++) {
         object = this._objects[i];
@@ -601,7 +601,7 @@ import { removeFromArray } from './util/internals';
      * @private
      * @param {fabric.Object} obj Object that was added
      */
-    _onObjectAdded: function(obj) {
+    _onObjectAdded: function (obj) {
       this.stateful && obj.setupState();
       if (obj.canvas && obj.canvas !== this) {
         /* _DEV_MODE_START_ */
@@ -620,7 +620,7 @@ import { removeFromArray } from './util/internals';
      * @private
      * @param {fabric.Object} obj Object that was removed
      */
-    _onObjectRemoved: function(obj) {
+    _onObjectRemoved: function (obj) {
       obj._set('canvas', undefined);
       this.fire('object:removed', { target: obj });
       obj.fire('removed', { target: this });
@@ -657,7 +657,7 @@ import { removeFromArray } from './util/internals';
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    clearContext: function(ctx) {
+    clearContext: function (ctx) {
       ctx.clearRect(0, 0, this.width, this.height);
       return this;
     },
@@ -743,16 +743,23 @@ import { removeFromArray } from './util/internals';
       }
     },
 
-    abortRendering: function () {
+    abortRendering: function (only?: { current?: boolean, requested?: boolean }) {
+      const state = {
+        current: false,
+        requested: false
+      };
       // first clear request
-      if (this.isRendering) {
+      if (this.isRendering && only?.requested ?? true) {
         fabric.util.cancelAnimFrame(this.isRendering);
         this.isRendering = 0;
+        state.requested = true;
       }
       // abort concurrent rendering
-      if (this.__abortController && !this.__abortController.signal.aborted) {
+      if (this.__abortController && !this.__abortController.signal.aborted && only?.current ?? true) {
         this.__abortController.abort();
+        state.current = true;
       }
+      return state;
     },
 
     render: function () {
