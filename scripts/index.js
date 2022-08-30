@@ -577,10 +577,18 @@ sandbox
         else if (!template && !fs.existsSync(deploy) && templates.includes(deploy)) {
             template = deploy;
             deploy = undefined;
-            console.log(chalk.blue(`Did you mean to use "--template"?`));
-            console.log(chalk.gray(`npm run sandbox deploy -- -t ${template}\n`));
-            context.help({ error: true });
-            return;
+            const { confirm } = await inquirer.prompt([
+                {
+                    type: 'confirm',
+                    name: 'confirm',
+                    message: `Did you mean to run ${chalk.blue(`npm run sandbox deploy -- -t ${template}\n`)}?`,
+                    default: true,
+                }
+            ]);
+            if (!confirm) {
+                context.help({ error: true });
+                return;
+            }            
         }
         const uri = await createCodeSandbox(deploy || path.resolve(codesandboxTemplatesDir, template));
         console.log(chalk.yellow(`> created codesandbox ${uri}`));
@@ -625,7 +633,7 @@ sandbox
     .command('start <path>')
     .description('start a sandbox')
     .action((pathToSandbox) => {
-        watchFabricAndTriggerSandbox(pathToSandbox)
+        watchFabricAndTriggerSandbox(pathToSandbox);
         console.log(chalk.blue('> starting'));
         cp.spawn('npm run dev', { cwd: pathToSandbox, stdio: 'inherit', shell: true });
     });
