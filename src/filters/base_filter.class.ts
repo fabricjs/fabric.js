@@ -1,4 +1,8 @@
 //@ts-nocheck
+
+import { TWebGLPrecision, webGLProbe } from "./WebGLProbe";
+
+
 (function(global) {
   var fabric = global.fabric;
   /**
@@ -72,10 +76,10 @@
     createProgram: function(gl, fragmentSource, vertexSource) {
       fragmentSource = fragmentSource || this.fragmentSource;
       vertexSource = vertexSource || this.vertexSource;
-      if (fabric.webGlPrecision !== 'highp'){
+      if (webGLProbe.webGLPrecision !== TWebGLPrecision.high) {
         fragmentSource = fragmentSource.replace(
-          /precision highp float/g,
-          'precision ' + fabric.webGlPrecision + ' float'
+          new RegExp(`precision ${TWebGLPrecision.high} float`,'g'),
+          `precision ${webGLProbe.webGLPrecision} float`
         );
       }
       var vertexShader = gl.createShader(gl.VERTEX_SHADER);

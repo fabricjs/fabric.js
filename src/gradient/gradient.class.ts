@@ -4,7 +4,9 @@ import { fabric } from "../../HEADER";
 import { Color } from "../color";
 import { iMatrix } from "../constants";
 import { parseTransformAttribute } from "../parser/parseTransformAttribute";
-import { matrixToSVG, populateWithProperties } from "../util";
+import { TMat2D } from "../typedefs";
+import { pick } from "../util/misc/pick";
+import { matrixToSVG } from "../util/misc/svgParsing";
 import { linearDefaultCoords, radialDefaultCoords } from "./constants";
 import { parseColorStops, parseCoords, parseGradientUnits, parseType } from "./parser";
 import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnits, SVGOptions } from "./typedefs";
@@ -43,7 +45,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    * @type Number[]
    * @default null
    */
-  gradientTransform: number[] | null = null
+  gradientTransform: TMat2D | null = null
 
   /**
    * coordinates units for coords.
@@ -121,8 +123,9 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object}
    */
-  toObject(propertiesToInclude?: string[]) {
-    const object = {
+  toObject(propertiesToInclude?: (keyof this)[]) {
+    return {
+      ...pick(this, propertiesToInclude),
       type: this.type,
       coords: this.coords,
       colorStops: this.colorStops,
@@ -131,9 +134,6 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
       gradientUnits: this.gradientUnits,
       gradientTransform: this.gradientTransform ? this.gradientTransform.concat() : this.gradientTransform
     };
-    populateWithProperties(this, object, propertiesToInclude);
-
-    return object;
   }
 
   /* _TO_SVG_START_ */
@@ -144,7 +144,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    */
   toSVG(object: FabricObject, { additionalTransform: preTransform }: { additionalTransform?: string } = {}) {
     const markup = [],
-      transform = this.gradientTransform ? this.gradientTransform.concat() : iMatrix.concat(),
+      transform = (this.gradientTransform ? this.gradientTransform.concat() : iMatrix.concat()) as TMat2D,
       gradientUnits = this.gradientUnits === 'pixels' ? 'userSpaceOnUse' : 'objectBoundingBox';
     // colorStops must be sorted ascending, and guarded against deep mutations
     const colorStops = this.colorStops.map((colorStop) => ({ ...colorStop })).sort((a, b) => {

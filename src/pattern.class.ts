@@ -1,4 +1,10 @@
 //@ts-nocheck
+
+
+import { pick } from "./util/misc/pick";
+import { config } from "./config";
+
+
 (function(global) {
   var fabric = global.fabric, toFixed = fabric.util.toFixed;
 
@@ -69,7 +75,7 @@
      * @return {Object} Object representation of a pattern instance
      */
     toObject: function(propertiesToInclude) {
-      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+      var NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
           source, object;
 
       // <img> element
@@ -81,7 +87,8 @@
         source = this.source.toDataURL();
       }
 
-      object = {
+      return {
+        ...pick(this, propertiesToInclude),
         type: 'pattern',
         source: source,
         repeat: this.repeat,
@@ -90,9 +97,6 @@
         offsetY: toFixed(this.offsetY, NUM_FRACTION_DIGITS),
         patternTransform: this.patternTransform ? this.patternTransform.concat() : null
       };
-      fabric.util.populateWithProperties(this, object, propertiesToInclude);
-
-      return object;
     },
 
     /* _TO_SVG_START_ */

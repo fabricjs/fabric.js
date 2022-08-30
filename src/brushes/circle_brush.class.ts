@@ -1,7 +1,7 @@
 import { fabric } from "../../HEADER";
 import { Color } from "../color";
 import { Point } from "../point.class";
-import { getRandomInt } from "../util";
+import { getRandomInt } from "../util/internals";
 import { Canvas } from "../__types__";
 import { BaseBrush } from "./base_brush.class";
 

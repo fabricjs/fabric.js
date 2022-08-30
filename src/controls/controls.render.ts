@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { degreesToRadians } from "../util";
+import { degreesToRadians } from "../util/misc/radiansDegreesConversion";
 
   /**
    * Render a round control, as per fabric features.
