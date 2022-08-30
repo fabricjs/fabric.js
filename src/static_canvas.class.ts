@@ -673,8 +673,11 @@ import { removeFromArray } from './util/internals';
      * @chainable
      */
     renderAll: function () {
-      var canvasToDrawOn = this.contextContainer;
-      this.renderCanvas(canvasToDrawOn, this._objects);
+      this.abortRendering();
+      const controller = new AbortController();
+      controller.signal.throwIfAborted();
+      this.__abortController = controller;
+      this.renderCanvas(this.contextContainer, this._objects);
       return this;
     },
 
@@ -687,11 +690,8 @@ import { removeFromArray } from './util/internals';
      */
     requestRenderAll: function () {
       if (!this.isRendering) {
-        const controller = new AbortController();
-        this.__abortController = controller;
         this.isRendering = fabric.util.requestAnimFrame(() => {
           this.isRendering = 0;
-          controller.signal.throwIfAborted();
           this.renderAll();
         });
       }
@@ -722,12 +722,23 @@ import { removeFromArray } from './util/internals';
       };
     },
 
+    /**
+     * @deprecated use {@link abortRendering}
+     */
     cancelRequestedRender: function () {
-      this.__abortController && this.__abortController.abort();
       if (this.isRendering) {
-        console.log('cancelRequestedRender', this.isRendering);
         fabric.util.cancelAnimFrame(this.isRendering);
         this.isRendering = 0;
+      }
+    },
+
+    abortRendering() {
+      if (this.isRendering) {
+        fabric.util.cancelAnimFrame(this.isRendering);
+        this.isRendering = 0;
+      }
+      if (this.__abortController && !this.__abortController.signal.aborted) {
+        this.__abortController.abort();
       }
     },
 
@@ -741,7 +752,6 @@ import { removeFromArray } from './util/internals';
     renderCanvas: function (ctx, objects) {
       console.log('renderCanvas', this.isRendering, !!ctx);
       var v = this.viewportTransform, path = this.clipPath;
-      this.cancelRequestedRender();
       this.calcViewportBoundaries();
       this.clearContext(ctx);
       fabric.util.setImageSmoothing(ctx, this.imageSmoothingEnabled);
@@ -1619,7 +1629,7 @@ import { removeFromArray } from './util/internals';
      */
     dispose: function () {
       // cancel eventually ongoing renders
-      this.cancelRequestedRender();
+      this.abortRendering();
       this.forEachObject(function(object) {
         object.dispose && object.dispose();
       });
