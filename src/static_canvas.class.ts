@@ -783,6 +783,7 @@ import { pick } from './util/misc/pick';
         this.drawControls(ctx);
       }
       this.fire('after:render', { ctx: ctx, });
+      
       if (this.__cleanupTask) {
         this.__cleanupTask();
         this.__cleanupTask = undefined;
@@ -1619,7 +1620,7 @@ import { pick } from './util/misc/pick';
 
     /**
      * Waits until rendering has settled to destroy the canvas
-     * @returns {Promise<boolean>} a promise resolving to true once the canvas has been destroyed or to `false` if the canvas has was already destroyed
+     * @returns {Promise<boolean>} a promise resolving to `true` once the canvas has been destroyed or to `false` if the canvas has was already destroyed
      * @throws if aborted by a successive call
      */
     dispose: function () {
