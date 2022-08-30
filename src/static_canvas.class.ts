@@ -735,7 +735,7 @@ import { removeFromArray } from './util/internals';
      * @chainable
      */
     renderCanvas: function (ctx, objects) {
-      console.log('renderCanvas', ctx);
+      console.log('renderCanvas', this.isRendering, !!ctx);
       var v = this.viewportTransform, path = this.clipPath;
       this.cancelRequestedRender();
       this.calcViewportBoundaries();
