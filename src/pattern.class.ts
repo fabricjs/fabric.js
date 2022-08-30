@@ -1,4 +1,8 @@
 //@ts-nocheck
+
+import { config } from "./config";
+
+
 (function(global) {
   var fabric = global.fabric, toFixed = fabric.util.toFixed;
 
@@ -69,7 +73,7 @@
      * @return {Object} Object representation of a pattern instance
      */
     toObject: function(propertiesToInclude) {
-      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+      var NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
           source, object;
 
       // <img> element
