@@ -114,12 +114,27 @@ function assertCanvasDisposing(klass) {
 }
 
 function testStaticCanvasDisposing() {
-    QUnit.module('Static Canvas disposing')
+    QUnit.module('Static Canvas disposing', {
+        beforeEach: function () {
+
+        },
+        afterEach: function () {
+            fabric.config.restoreDefaults();
+        }
+    })
     assertCanvasDisposing(fabric.StaticCanvas);
 }
 
 function testCanvasDisposing() {
-    QUnit.module('Canvas disposing')
+    QUnit.module('Canvas disposing', {
+        beforeEach: function () {
+
+        },
+        afterEach: function () {
+            fabric.config.restoreDefaults();
+        }
+    });
+
     assertCanvasDisposing(fabric.Canvas);
 
     QUnit.test('dispose: clear refs', async function (assert) {
@@ -217,47 +232,47 @@ function testCanvasDisposing() {
 
     });
 
-  // QUnit.test('dispose', async function(assert) {
-  //   function invokeEventsOnCanvas() {
-  //     // nextSibling because we need to invoke events on upper canvas
-  //     simulateEvent(canvas.getElement().nextSibling, 'mousedown');
-  //     simulateEvent(canvas.getElement().nextSibling, 'mouseup');
-  //     simulateEvent(canvas.getElement().nextSibling, 'mousemove');
-  //   }
-  //   var assertInvocationsCount = function() {
-  //     var message = 'event handler should not be invoked after `dispose`';
-  //     assert.equal(handlerInvocationCounts.__onMouseDown, 1);
-  //     assert.equal(handlerInvocationCounts.__onMouseUp, 1);
-  //     assert.equal(handlerInvocationCounts.__onMouseMove, 1);
-  //   };
+    // QUnit.test('dispose: events', async function(assert) {
+    //   function invokeEventsOnCanvas() {
+    //     // nextSibling because we need to invoke events on upper canvas
+    //     simulateEvent(canvas.getElement().nextSibling, 'mousedown');
+    //     simulateEvent(canvas.getElement().nextSibling, 'mouseup');
+    //     simulateEvent(canvas.getElement().nextSibling, 'mousemove');
+    //   }
+    //   var assertInvocationsCount = function() {
+    //     var message = 'event handler should not be invoked after `dispose`';
+    //     assert.equal(handlerInvocationCounts.__onMouseDown, 1);
+    //     assert.equal(handlerInvocationCounts.__onMouseUp, 1);
+    //     assert.equal(handlerInvocationCounts.__onMouseMove, 1);
+    //   };
 
-  //   assert.ok(typeof canvas.dispose === 'function');
-  //   canvas.add(makeRect(), makeRect(), makeRect());
+    //   assert.ok(typeof canvas.dispose === 'function');
+    //   canvas.add(makeRect(), makeRect(), makeRect());
 
-  //   var handlerInvocationCounts = {
-  //     __onMouseDown: 0, __onMouseUp: 0, __onMouseMove: 0
-  //   };
+    //   var handlerInvocationCounts = {
+    //     __onMouseDown: 0, __onMouseUp: 0, __onMouseMove: 0
+    //   };
 
-  //   // hijack event handlers
-  //   canvas.__onMouseDown = function() {
-  //     handlerInvocationCounts.__onMouseDown++;
-  //   };
-  //   canvas.__onMouseUp = function() {
-  //     handlerInvocationCounts.__onMouseUp++;
-  //   };
-  //   canvas.__onMouseMove = function() {
-  //     handlerInvocationCounts.__onMouseMove++;
-  //   };
+    //   // hijack event handlers
+    //   canvas.__onMouseDown = function() {
+    //     handlerInvocationCounts.__onMouseDown++;
+    //   };
+    //   canvas.__onMouseUp = function() {
+    //     handlerInvocationCounts.__onMouseUp++;
+    //   };
+    //   canvas.__onMouseMove = function() {
+    //     handlerInvocationCounts.__onMouseMove++;
+    //   };
 
-  //   invokeEventsOnCanvas();
-  //   assertInvocationsCount();
+    //   invokeEventsOnCanvas();
+    //   assertInvocationsCount();
 
-  //   await canvas.dispose();
-  //   assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
+    //   await canvas.dispose();
+    //   assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
 
-  //   invokeEventsOnCanvas();
-  //   assertInvocationsCount();
-  // });
+    //   invokeEventsOnCanvas();
+    //   assertInvocationsCount();
+    // });
 }
 
 testStaticCanvasDisposing();
