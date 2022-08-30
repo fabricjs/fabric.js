@@ -5,8 +5,8 @@ import { Color } from "../color";
 import { iMatrix } from "../constants";
 import { parseTransformAttribute } from "../parser/parseTransformAttribute";
 import { TMat2D } from "../typedefs";
+import { pick } from "../util/misc/pick";
 import { matrixToSVG } from "../util/misc/svgParsing";
-// import { populateWithProperties } from "../util/misc/misc";
 import { linearDefaultCoords, radialDefaultCoords } from "./constants";
 import { parseColorStops, parseCoords, parseGradientUnits, parseType } from "./parser";
 import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnits, SVGOptions } from "./typedefs";
@@ -123,8 +123,9 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object}
    */
-  toObject(propertiesToInclude?: string[]) {
-    const object = {
+  toObject(propertiesToInclude?: (keyof this)[]) {
+    return {
+      ...pick(this, propertiesToInclude),
       type: this.type,
       coords: this.coords,
       colorStops: this.colorStops,
@@ -133,9 +134,6 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
       gradientUnits: this.gradientUnits,
       gradientTransform: this.gradientTransform ? this.gradientTransform.concat() : this.gradientTransform
     };
-    fabric.util.populateWithProperties(this, object, propertiesToInclude);
-
-    return object;
   }
 
   /* _TO_SVG_START_ */

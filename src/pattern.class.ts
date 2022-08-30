@@ -1,5 +1,7 @@
 //@ts-nocheck
 
+
+import { pick } from "./util/misc/pick";
 import { config } from "./config";
 
 
@@ -85,7 +87,8 @@ import { config } from "./config";
         source = this.source.toDataURL();
       }
 
-      object = {
+      return {
+        ...pick(this, propertiesToInclude),
         type: 'pattern',
         source: source,
         repeat: this.repeat,
@@ -94,9 +97,6 @@ import { config } from "./config";
         offsetY: toFixed(this.offsetY, NUM_FRACTION_DIGITS),
         patternTransform: this.patternTransform ? this.patternTransform.concat() : null
       };
-      fabric.util.populateWithProperties(this, object, propertiesToInclude);
-
-      return object;
     },
 
     /* _TO_SVG_START_ */

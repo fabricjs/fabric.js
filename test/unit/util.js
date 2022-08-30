@@ -666,27 +666,26 @@
     assert.equal(obj3, fabric.util.array.max([obj1, obj3, obj2]));
   });
 
-  QUnit.test('fabric.util.populateWithProperties', function(assert) {
-    assert.ok(typeof fabric.util.populateWithProperties === 'function');
+  QUnit.test('fabric.util.pick', function(assert) {
+    assert.ok(typeof fabric.util.pick === 'function');
 
     var source = {
-          foo: 'bar',
-          baz: 123,
-          qux: function() { }
-        },
-        destination = { };
+      foo: 'bar',
+      baz: 123,
+      qux: function () { }
+    };
 
-    fabric.util.populateWithProperties(source, destination);
+    let destination = fabric.util.pick(source);
     assert.ok(typeof destination.foo === 'undefined');
     assert.ok(typeof destination.baz === 'undefined');
     assert.ok(typeof destination.qux === 'undefined');
 
-    fabric.util.populateWithProperties(source, destination, ['foo']);
+    destination = fabric.util.pick(source, ['foo']);
     assert.equal(destination.foo, 'bar');
     assert.ok(typeof destination.baz === 'undefined');
     assert.ok(typeof destination.qux === 'undefined');
 
-    fabric.util.populateWithProperties(source, destination, ['foo', 'baz', 'ffffffffff']);
+    destination = fabric.util.pick(source, ['foo', 'baz', 'ffffffffff']);
     assert.equal(destination.foo, 'bar');
     assert.equal(destination.baz, 123);
     assert.ok(typeof destination.qux === 'undefined');

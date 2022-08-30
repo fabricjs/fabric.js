@@ -1,8 +1,10 @@
 //@ts-nocheck
+
 import { config } from '../config';
 import { VERSION } from '../constants';
 import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
+import { pick } from '../util/misc/pick';
 
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
@@ -831,9 +833,16 @@ import { capValue } from '../util/misc/capValue';
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
-
+      const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
+        clipPathData = this.clipPath && !this.clipPath.excludeFromExport ?
+          {
+            ...this.clipPath.toObject(propertiesToInclude),
+            inverted: this.clipPath.inverted,
+            absolutePositioned: this.clipPath.absolutePositioned
+          } :
+          null,
           object = {
+            ...pick(this, propertiesToInclude),
             type:                     this.type,
             version:                  VERSION,
             originX:                  this.originX,
@@ -865,20 +874,12 @@ import { capValue } from '../util/misc/capValue';
             globalCompositeOperation: this.globalCompositeOperation,
             skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
             skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS),
+            ...clipPathData ? { clipPath: clipPathData } : null
           };
 
-      if (this.clipPath && !this.clipPath.excludeFromExport) {
-        object.clipPath = this.clipPath.toObject(propertiesToInclude);
-        object.clipPath.inverted = this.clipPath.inverted;
-        object.clipPath.absolutePositioned = this.clipPath.absolutePositioned;
-      }
-
-      fabric.util.populateWithProperties(this, object, propertiesToInclude);
-      if (!this.includeDefaultValues) {
-        object = this._removeDefaultValues(object);
-      }
-
-      return object;
+      return !this.includeDefaultValues ?
+        this._removeDefaultValues(object) :
+        object;
     },
 
     /**

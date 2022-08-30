@@ -59,6 +59,7 @@ import {
   min,
   max,
 } from '../lang_array';
+import { pick } from './pick';
 import {
   joinPath,
   parsePath,
@@ -149,6 +150,7 @@ import {
       min,
       max,
     },
+    pick,
     joinPath,
     parsePath,
     makePathSimpler,
@@ -164,23 +166,6 @@ import {
     getPointer,
     removeListener,
     addListener,
-    /**
-     * Populates an object with properties of another object
-     * @static
-     * @memberOf fabric.util
-     * @param {Object} source Source object
-     * @param {Object} destination Destination object
-     * @return {Array} properties Properties names to include
-     */
-    populateWithProperties: function(source, destination, properties) {
-      if (properties && Array.isArray(properties)) {
-        for (var i = 0, len = properties.length; i < len; i++) {
-          if (properties[i] in source) {
-            destination[properties[i]] = source[properties[i]];
-          }
-        }
-      }
-    },
 
     /**
      * Returns true if context has transparent pixel
