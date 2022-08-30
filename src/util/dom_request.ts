@@ -49,7 +49,7 @@ export function request(url, options = {}) {
 
   if (method === 'GET' && options.parameters) {
     const { origin, pathname, searchParams } = new URL(url);
-    url = `${origin}${pathname}??${new URLSearchParams([
+    url = `${origin}${pathname}?${new URLSearchParams([
       ...Array.from(searchParams.entries()),
       ...Object.entries(options.parameters),
     ])}`;
