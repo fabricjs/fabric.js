@@ -1619,14 +1619,15 @@ import { pick } from './util/misc/pick';
 
     /**
      * Waits until rendering has settled to destroy the canvas
-     * @returns {Promise} a promise resolving once the canvas has been destroyed
+     * @returns {Promise<boolean>} a promise resolving to true once the canvas has been destroyed or to `false` if the canvas has was already destroyed
+     * @throws if aborted by a successive call
      */
     dispose: function () {
       this.disposed = true;
-      return new Promise<void>((resolve, reject) => {
+      return new Promise<boolean>((resolve, reject) => {
         const task = () => {
           this.destroy();
-          resolve();
+          resolve(true);
         }
         task.kill = reject;
         if (this.__cleanupTask) {
@@ -1634,7 +1635,7 @@ import { pick } from './util/misc/pick';
         }
         
         if (this.destroyed) {
-          return;
+          resolve(false);
         }
         else if (this.nextRenderHandle) {
           this.__cleanupTask = task;
