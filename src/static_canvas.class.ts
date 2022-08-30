@@ -200,6 +200,7 @@ import { removeFromArray } from './util/internals';
      */
     _initStatic: function (el, options) {
       this._objects = [];
+      // holds refs to active abort controllers that control rendering
       this.__abortControllers = {};
       this._createLowerCanvas(el);
       this._initOptions(options);
@@ -692,7 +693,6 @@ import { removeFromArray } from './util/internals';
           const handle = this.isRendering = fabric.util.requestAnimFrame(resolve);
           controller.signal.addEventListener('abort', (e) => {
             this.cancelRequestedRender();
-            delete this.__abortControllers[handle];
             reject(e);
           }, { once: true });
           this.__abortControllers[handle] = controller;
@@ -703,7 +703,9 @@ import { removeFromArray } from './util/internals';
           if (error.type !== 'abort') {
             throw error;
           }
-        });
+        }).finally(() => {
+          delete this.__abortControllers[handle];
+        })
       }
       return this;
     },
