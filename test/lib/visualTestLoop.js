@@ -156,7 +156,7 @@
           canvas.height = height;
           var ctx = canvas.getContext('2d');
           var output = ctx.getImageData(0, 0, width, height);
-          getImage(getGoldeName(golden), renderedCanvas, function(goldenImage) {
+          getImage(getGoldeName(golden), renderedCanvas, async (goldenImage) => {
             ctx.drawImage(goldenImage, 0, 0);
             visualCallback.addArguments({
               enabled: true,
@@ -181,7 +181,7 @@
             if ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs) {
               generateGolden(getGoldeName(golden), renderedCanvas);
             }
-            fabricCanvas.dispose();
+            await fabricCanvas.dispose();
             done();
           });
         });

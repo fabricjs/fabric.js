@@ -2083,7 +2083,7 @@
     assert.equal(aGroup._objects[3], circle2);
   });
 
-  QUnit.test('dispose', function(assert) {
+  QUnit.test('dispose', async function(assert) {
     //made local vars to do not dispose the external canvas
     var el = fabric.document.createElement('canvas'),
         parentEl = fabric.document.createElement('div'),
@@ -2123,10 +2123,11 @@
     assert.equal(parentEl.childNodes.length, 1, 'parent div should have 1 child');
     assert.notEqual(parentEl.firstChild, canvas.getElement(), 'canvas should not be parent div firstChild');
     assert.ok(typeof canvas.dispose === 'function');
+    assert.ok(typeof canvas.destroy === 'function');
     canvas.add(makeRect(), makeRect(), makeRect());
     canvas.item(0).animate('scaleX', 10);
     assert.equal(fabric.runningAnimations.length, 1, 'should have a running animation');
-    canvas.dispose();
+    await canvas.dispose();
     canvas.cancelRequestedRender();
     assert.equal(fabric.runningAnimations.length, 0, 'dispose should clear running animations');
     assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
@@ -2147,7 +2148,7 @@
 
   });
 
-  QUnit.test('dispose + set dimensions', function (assert) {
+  QUnit.test('dispose + set dimensions', async function (assert) {
     //made local vars to do not dispose the external canvas
     var el = fabric.document.createElement('canvas'),
       parentEl = fabric.document.createElement('div');
@@ -2170,7 +2171,7 @@
     assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
     assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
 
-    canvas.dispose();
+    await canvas.dispose();
     assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
     assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
     assert.equal(el.width, 500, 'restored width');
@@ -2178,7 +2179,7 @@
 
   });
 
-  // QUnit.test('dispose', function(assert) {
+  // QUnit.test('dispose', async function(assert) {
   //   function invokeEventsOnCanvas() {
   //     // nextSibling because we need to invoke events on upper canvas
   //     simulateEvent(canvas.getElement().nextSibling, 'mousedown');
@@ -2213,7 +2214,7 @@
   //   invokeEventsOnCanvas();
   //   assertInvocationsCount();
 
-  //   canvas.dispose();
+  //   await canvas.dispose();
   //   assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
 
   //   invokeEventsOnCanvas();
