@@ -750,7 +750,7 @@
     assert.equal(targetOutArray[0], rect2, 'the only target out is rect2');
   });
 
-  QUnit.test('Fabric mouseover, mouseout events fire for subTargets when subTargetCheck is enabled', function(assert){
+  QUnit.test.skip('Fabric mouseover, mouseout events fire for subTargets when subTargetCheck is enabled', function(assert){
     var done = assert.async();
     var counterOver = 0, counterOut = 0, canvas = new fabric.Canvas();
     function setSubTargetCheckRecursive(obj) {
