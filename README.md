@@ -6,6 +6,9 @@
 
 A **simple and powerful Javascript HTML5 canvas library**.
 
+- [**Website**](http://fabricjs.com/) 
+- [**GOTCHAS**](./GOTCHAS.md)
+- [**Contributing, Developing and More**](/CONTRIBUTING.md)
 ---
 
 <!-- build/coverage status, climate -->
@@ -36,9 +39,18 @@ A **simple and powerful Javascript HTML5 canvas library**.
 - Built in shapes, controls, animations, image filters, gradients, patterns, brushes...
 - `JPG`, `PNG`, `JSON` and `SVG` i/o
 - Typed and modular
-- Cross-browser, see [supported browsers](#supported-browsers)
-- Runs on [Node.js](http://nodejs.org/), see [Node.js installation](#nodejs)
 - [Unit tested](/CONTRIBUTING.md#-testing)
+
+| Context  | Supported Version | Notes |
+| ------------- | :-------------: | ------------- |
+| Firefox | 4+ |  
+| Safari | 5+ |  
+| Opera | 9.64+ |  
+| Chrome | ✔️ |  
+| Edge | ✔️ | chromium based |
+| Edge Legacy | ❌ | 
+| IE11 | ❌ |  
+| [Node.js](http://nodejs.org/) | ✔️ |  [Node.js installation](#nodejs)
 
 
 ## Installation
@@ -156,37 +168,17 @@ http
   });
 ```
 
-## Docs
+---
 
-See the [Website](http://fabricjs.com/) and beware of [**GOTCHAS**](./GOTCHAS.md).
+## Other Solutions
 
-## What's Out There?
-
-#### Complementary Project
-
-- [Three.js](https://github.com/mrdoob/three.js/)
-- [PixiJS](https://github.com/pixijs/pixijs)
-- [Canvas2PDF](https://github.com/joshua-gould/canvas2pdf)
-- [html-to-image](https://github.com/bubkoo/html-to-image)
-
-#### Competition
-
-- [Konva](https://github.com/konvajs/konva)
-
-## Supported Browsers
-
-- Firefox 4+
-- Safari 5+
-- Opera 9.64+
-- Chrome (all versions)
-- Edge (chromium based, all versions)
-
-IE11 and Edge legacy are **not** supported
-
-
-## Contributing, Developing and More
-
-Follow the [Contribution Guide](/CONTRIBUTING.md)
+| Project  | Description | Demo |
+| ------------- | ------------- | :-------------: |
+| [Three.js](https://github.com/mrdoob/three.js/)  | 3D graphics |  
+| [PixiJS](https://github.com/pixijs/pixijs)  | WebGL renderer |  
+| [Konva](https://github.com/konvajs/konva)  | *Competition* | ❌ |
+| [Canvas2PDF](https://github.com/joshua-gould/canvas2pdf)  | PDF renderer |  
+| [html-to-image](https://github.com/bubkoo/html-to-image)  | HTML to image/canvas |
 
 
 ## More Resources
