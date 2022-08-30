@@ -51,9 +51,14 @@ QUnit.config.testTimeout = 15000;
 QUnit.config.noglobals = true;
 QUnit.config.hidepassed = true;
 
-process.on('unhandledRejection', QUnit.onUncaughtException);
+process.on('unhandledRejection', error => {
+  // Will print "unhandledRejection err is not defined"
+  console.log('unhandledRejection', error.message);
+});
 
-process.on('uncaughtException', QUnit.onUncaughtException);
+process.on('uncaughtException', error => {
+  console.log('uncaughtException', error.message);
+});
 
 var jsdom = require('jsdom');
 
