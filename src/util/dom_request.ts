@@ -1,10 +1,6 @@
 //@ts-nocheck
 import { noop } from '../constants';
 
-function addParamToUrl(url, param) {
-  return url + (/\?/.test(url) ? '&' : '?') + param;
-}
-
 /**
  * Cross-browser abstraction for sending XMLHttpRequest
  * @memberOf fabric.util
@@ -12,7 +8,7 @@ function addParamToUrl(url, param) {
  * @param {String} url URL to send XMLHttpRequest to
  * @param {Object} [options] Options object
  * @param {String} [options.method="GET"]
- * @param {String} [options.parameters] parameters to append to url in GET or in body
+ * @param {Record<string, string>} [options.parameters] parameters to append to url in GET or in body
  * @param {String} [options.body] body to send with POST or PUT request
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  * @param {Function} options.onComplete Callback to invoke when request is completed
@@ -50,14 +46,17 @@ export function request(url, options = {}) {
   };
 
   xhr.onerror = xhr.ontimeout = removeListener;
-
-  if (method === 'GET') {
-    if (typeof options.parameters === 'string') {
-      url = addParamToUrl(url, options.parameters);
-    }
-  }
-
-  xhr.open(method, url, true);
+  
+  xhr.open(
+    method,
+    method === 'GET' && options.parameters ?
+      `${url}?${new URLSearchParams([
+        ...Array.from(new URL(url).searchParams.entries()),
+        ...Object.entries(options.parameters),
+      ])}` :
+      url,
+    true
+  );
 
   if (method === 'POST' || method === 'PUT') {
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
