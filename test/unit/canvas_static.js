@@ -1618,10 +1618,23 @@
     var lowerCanvas = canvas2.lowerCanvasEl;
     assert.equal(lowerCanvas.getAttribute('data-fabric'), 'main', 'lowerCanvasEl should be marked by fabric');
     await canvas2.dispose();
+    assert.equal(canvas.destroyed, true, 'dispose should flag destroyed');
     assert.equal(canvas2.getObjects().length, 0, 'dispose should clear canvas');
     assert.equal(canvas2.lowerCanvasEl, null, 'dispose should clear lowerCanvasEl');
     assert.equal(lowerCanvas.hasAttribute('data-fabric'), false, 'dispose should clear lowerCanvasEl data-fabric attr');
     assert.equal(canvas2.contextContainer, null, 'dispose should clear contextContainer');
+  });
+
+  QUnit.test('dispose edge cases', async function (assert) {
+    const done = assert.async();
+    const canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
+    canvas2.requestRenderAll();
+    assert.rejects(canvas2.dispose());
+    assert.rejects(canvas2.dispose());
+    assert.notOk(canvas2.destroyed, 'should not have been destroyed yet');
+    await canvas2.dispose();
+    assert.ok(canvas2.destroyed, 'should not have been destroyed');
+    done();
   });
 
   QUnit.test('clone', function(assert) {
