@@ -703,7 +703,7 @@ import { pick } from './util/misc/pick';
      * @chainable
      */
     requestRenderAll: function () {
-      if (!this.nextRenderHandle) {
+      if (!this.nextRenderHandle && !this.destroyed) {
         this.nextRenderHandle = fabric.util.requestAnimFrame(this.renderAndResetBound);
       }
       return this;
