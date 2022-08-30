@@ -691,7 +691,7 @@ import { pick } from './util/misc/pick';
      * @chainable
      */
     renderAndReset: function() {
-      this.isRendering = 0;
+      this.nextRenderHandle = 0;
       this.renderAll();
     },
 
@@ -703,8 +703,8 @@ import { pick } from './util/misc/pick';
      * @chainable
      */
     requestRenderAll: function () {
-      if (!this.isRendering) {
-        this.isRendering = fabric.util.requestAnimFrame(this.renderAndResetBound);
+      if (!this.nextRenderHandle) {
+        this.nextRenderHandle = fabric.util.requestAnimFrame(this.renderAndResetBound);
       }
       return this;
     },
@@ -734,9 +734,9 @@ import { pick } from './util/misc/pick';
     },
 
     cancelRequestedRender: function() {
-      if (this.isRendering) {
-        fabric.util.cancelAnimFrame(this.isRendering);
-        this.isRendering = 0;
+      if (this.nextRenderHandle) {
+        fabric.util.cancelAnimFrame(this.nextRenderHandle);
+        this.nextRenderHandle = 0;
       }
     },
 
@@ -747,7 +747,12 @@ import { pick } from './util/misc/pick';
      * @return {fabric.Canvas} instance
      * @chainable
      */
-    renderCanvas: function(ctx, objects) {
+    renderCanvas: function (ctx, objects) {
+
+      if (this.destroyed) {
+        return;
+      }
+
       var v = this.viewportTransform, path = this.clipPath;
       this.cancelRequestedRender();
       this.calcViewportBoundaries();
@@ -778,6 +783,10 @@ import { pick } from './util/misc/pick';
         this.drawControls(ctx);
       }
       this.fire('after:render', { ctx: ctx, });
+      if (this.__cleanupTask) {
+        this.__cleanupTask();
+        this.__cleanupTask = undefined;
+      }
     },
 
     /**
@@ -1609,16 +1618,43 @@ import { pick } from './util/misc/pick';
     },
 
     /**
-     * Clears a canvas element and dispose objects
-     * @return {fabric.Canvas} thisArg
-     * @chainable
+     * Waits until rendering has settled to destroy the canvas
+     * @returns {Promise} a promise resolving once the canvas has been destroyed
      */
     dispose: function () {
-      // cancel eventually ongoing renders
-      if (this.isRendering) {
-        fabric.util.cancelAnimFrame(this.isRendering);
-        this.isRendering = 0;
-      }
+      return new Promise<void>((resolve, reject) => {
+        const task = () => {
+          this.destroy();
+          resolve();
+        }
+        task.kill = reject;
+        if (this.__cleanupTask) {
+          this.__cleanupTask.kill();
+        }
+        if (this.nextRenderHandle) {
+          this.__cleanupTask = task;
+        }
+        else {
+          task();
+        }
+      });
+    },
+
+    /**
+     * Clears the canvas element, disposes objects and frees resources
+     * 
+     * **CAUTION**:
+     * 
+     * This method is **UNSAFE**.
+     * You may encounter a race condition using it if there's a requested render.
+     * Call this method only if you are sure rendering has settled. 
+     * Consider using {@link dispose} as it is **SAFE** 
+     * 
+     * @private
+     */
+    destroy: function () {
+      this.destroyed = true;
+      this.cancelRequestedRender();
       this.forEachObject(function(object) {
         object.dispose && object.dispose();
       });
@@ -1645,7 +1681,6 @@ import { pick } from './util/misc/pick';
       this.lowerCanvasEl.setAttribute('height', this.height);
       fabric.util.cleanUpJsdomNode(this.lowerCanvasEl);
       this.lowerCanvasEl = undefined;
-      return this;
     },
 
     /**
