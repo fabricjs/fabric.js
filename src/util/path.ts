@@ -1,4 +1,6 @@
 //@ts-nocheck
+
+import { cache } from "../cache";
 import { config } from "../config";
 import { fabric } from '../../HEADER';
 import { halfPI, PiBy180 } from "../constants";
@@ -137,8 +139,8 @@ export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
   if (config.cachesBoundsOfCurve) {
     // eslint-disable-next-line
     argsString = [...arguments].join();
-    if (fabric.boundsOfCurveCache[argsString]) {
-      return fabric.boundsOfCurveCache[argsString];
+    if (cache.boundsOfCurveCache[argsString]) {
+      return cache.boundsOfCurveCache[argsString];
     }
   }
 
@@ -206,7 +208,7 @@ export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
   ];
   if (config.cachesBoundsOfCurve) {
-    fabric.boundsOfCurveCache[argsString] = result;
+    cache.boundsOfCurveCache[argsString] = result;
   }
   return result;
 }
