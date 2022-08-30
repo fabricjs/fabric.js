@@ -733,6 +733,9 @@ import { removeFromArray } from './util/internals';
       };
     },
 
+    /**
+     * consider using {@link abortRendering} to abort concurrent rendering
+     */
     cancelRequestedRender: function () {
       cancelAnimFrame(this.isRendering);
       this.isRendering = 0;
