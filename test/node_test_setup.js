@@ -3,17 +3,19 @@ var chalk = require('chalk');
 var diff = require('deep-object-diff').diff;
 var commander = require('commander');
 
-// commander.program
-//   .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
-//   .option('-r, --recreate', 'recreate visual refs (golden images)', false)
-//   .action(options => {
-//     QUnit.debug = QUnit.debugVisual = options.debug;
-//     QUnit.recreateVisualRefs = options.recreate;
-//   }).parse(process.argv);
-// //  for now accept an env variable because qunit doesn't allow passing unknown options
-// QUnit.debugVisual = Number(process.env.QUNIT_DEBUG_VISUAL_TESTS);
-// QUnit.recreateVisualRefs = Number(process.env.QUNIT_RECREATE_VISUAL_REFS);
-// QUnit.config.filter = process.env.QUNIT_FILTER;
+commander.program
+  .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
+  .option('-r, --recreate', 'recreate visual refs (golden images)', false)
+  .action(options => {
+    QUnit.debug = QUnit.debugVisual = options.debug;
+    QUnit.recreateVisualRefs = options.recreate;
+  }).parse(process.argv);
+//  for now accept an env variable because qunit doesn't allow passing unknown options
+QUnit.debugVisual = Number(process.env.QUNIT_DEBUG_VISUAL_TESTS);
+QUnit.recreateVisualRefs = Number(process.env.QUNIT_RECREATE_VISUAL_REFS);
+QUnit.config.filter = process.env.QUNIT_FILTER;
+
+process.on('uncaughtException', QUnit.onUncaughtException);
 
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
