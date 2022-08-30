@@ -2,7 +2,6 @@
 import { config } from './config';
 import { VERSION } from './constants';
 import { Point } from './point.class';
-import { cancelAnimFrame, requestAnimFrame } from './util';
 import { removeFromArray } from './util/internals';
 
 (function (global) {
@@ -690,7 +689,7 @@ import { removeFromArray } from './util/internals';
       if (!this.isRendering) {
         new Promise((resolve, reject) => {
           const controller = new AbortController();
-          const handle = this.isRendering = requestAnimFrame(resolve);
+          const handle = this.isRendering = fabric.util.requestAnimFrame(resolve);
           controller.signal.addEventListener('abort', (e) => {
             this.cancelRequestedRender();
             delete this.__abortControllers[handle];
@@ -737,7 +736,7 @@ import { removeFromArray } from './util/internals';
      * consider using {@link abortRendering} to abort concurrent rendering
      */
     cancelRequestedRender: function () {
-      cancelAnimFrame(this.isRendering);
+      fabric.util.cancelAnimFrame(this.isRendering);
       this.isRendering = 0;
     },
 
