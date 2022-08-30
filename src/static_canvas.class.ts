@@ -626,6 +626,31 @@ import { removeFromArray } from './util/internals';
       obj.fire('removed', { target: this });
     },
 
+
+    /**
+     * Calculate the position of the 4 corner of canvas with current viewportTransform.
+     * helps to determinate when an object is in the current rendering viewport using
+     * object absolute coordinates ( aCoords )
+     * @return {Object} points.tl
+     * @chainable
+     */
+    calcViewportBoundaries: function () {
+      var width = this.width, height = this.height,
+        iVpt = invertTransform(this.viewportTransform),
+        a = transformPoint({ x: 0, y: 0 }, iVpt),
+        b = transformPoint({ x: width, y: height }, iVpt),
+        // we don't support vpt flipping
+        // but the code is robust enough to mostly work with flipping
+        min = a.min(b),
+        max = a.max(b);
+      return this.vptCoords = {
+        tl: min,
+        tr: new Point(max.x, min.y),
+        bl: new Point(min.x, max.y),
+        br: max,
+      };
+    },
+
     /**
      * Clears specified context of canvas element
      * @param {CanvasRenderingContext2D} ctx Context to clear
@@ -678,7 +703,7 @@ import { removeFromArray } from './util/internals';
         const controller = new AbortController();
         controller.signal.throwIfAborted();
         this.__abortController = controller;
-        this.renderCanvas(this.contextContainer, this._objects);
+        this.render();
       } catch (error) {
         if (error.type === 'abort') {
           console.log('fabric.Canvas: aborted rendering');
@@ -709,30 +734,6 @@ import { removeFromArray } from './util/internals';
     },
 
     /**
-     * Calculate the position of the 4 corner of canvas with current viewportTransform.
-     * helps to determinate when an object is in the current rendering viewport using
-     * object absolute coordinates ( aCoords )
-     * @return {Object} points.tl
-     * @chainable
-     */
-    calcViewportBoundaries: function() {
-      var width = this.width, height = this.height,
-          iVpt = invertTransform(this.viewportTransform),
-          a = transformPoint({ x: 0, y: 0 }, iVpt),
-          b = transformPoint({ x: width, y: height }, iVpt),
-          // we don't support vpt flipping
-          // but the code is robust enough to mostly work with flipping
-          min = a.min(b),
-          max = a.max(b);
-      return this.vptCoords = {
-        tl: min,
-        tr: new Point(max.x, min.y),
-        bl: new Point(min.x, max.y),
-        br: max,
-      };
-    },
-
-    /**
      * @deprecated use {@link abortRendering}
      */
     cancelRequestedRender: function () {
@@ -742,8 +743,8 @@ import { removeFromArray } from './util/internals';
       }
     },
 
-    abortRendering() {
-      // first clear requests
+    abortRendering: function () {
+      // first clear request
       if (this.isRendering) {
         fabric.util.cancelAnimFrame(this.isRendering);
         this.isRendering = 0;
@@ -754,6 +755,10 @@ import { removeFromArray } from './util/internals';
       }
     },
 
+    render: function () {
+      this.renderCanvas(this.contextContainer, this._objects);
+    },
+
     /**
      * Renders background, objects, overlay and controls.
      * @param {CanvasRenderingContext2D} ctx
@@ -762,7 +767,6 @@ import { removeFromArray } from './util/internals';
      * @chainable
      */
     renderCanvas: function (ctx, objects) {
-      console.log('renderCanvas', this.isRendering, !!ctx);
       var v = this.viewportTransform, path = this.clipPath;
       this.calcViewportBoundaries();
       this.clearContext(ctx);

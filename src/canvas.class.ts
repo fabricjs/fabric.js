@@ -506,10 +506,8 @@ import { Point } from './point.class';
 
     /**
      * Renders both the top canvas and the secondary container canvas.
-     * @return {fabric.Canvas} instance
-     * @chainable
      */
-    renderAll: function () {
+    render: function () {
       if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
         this.clearContext(this.contextTop);
         this.contextTopDirty = false;
@@ -518,10 +516,8 @@ import { Point } from './point.class';
         this.renderTopLayer(this.contextTop);
         this.hasLostContext = false;
       }
-      var canvasToDrawOn = this.contextContainer;
       !this._objectsToRender && (this._objectsToRender = this._chooseObjectsToRender());
-      this.renderCanvas(canvasToDrawOn, this._objectsToRender);
-      return this;
+      this.renderCanvas(this.contextContainer, this._objectsToRender);
     },
 
     renderTopLayer: function(ctx) {
