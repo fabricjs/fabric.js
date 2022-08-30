@@ -687,8 +687,11 @@ import { removeFromArray } from './util/internals';
      */
     requestRenderAll: function () {
       if (!this.isRendering) {
+        const controller = new AbortController();
+        this.__abortController = controller;
         this.isRendering = fabric.util.requestAnimFrame(() => {
           this.isRendering = 0;
+          controller.signal.throwIfAborted();
           this.renderAll();
         });
       }
@@ -719,7 +722,8 @@ import { removeFromArray } from './util/internals';
       };
     },
 
-    cancelRequestedRender: function() {
+    cancelRequestedRender: function () {
+      this.__abortController && this.__abortController.abort();
       if (this.isRendering) {
         console.log('cancelRequestedRender', this.isRendering);
         fabric.util.cancelAnimFrame(this.isRendering);
