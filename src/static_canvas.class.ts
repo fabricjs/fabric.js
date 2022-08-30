@@ -690,21 +690,16 @@ import { removeFromArray } from './util/internals';
       if (!this.isRendering) {
         new Promise((resolve, reject) => {
           const controller = new AbortController();
-          const handle = this.isRendering = requestAnimFrame(() => {
-            if (controller.signal.aborted) {
-              // even though the promise is rejected the function is invoked in some unknown case so we return
-              return;
-            }
-            this.isRendering = 0;
-            this.renderAll();
-            resolve();
-          });
+          const handle = this.isRendering = requestAnimFrame(resolve);
           controller.signal.addEventListener('abort', (e) => {
             this.cancelRequestedRender();
             delete this.__abortControllers[handle];
             reject(e);
           }, { once: true });
           this.__abortControllers[handle] = controller;
+        }).then(() => {
+          this.isRendering = 0;
+          this.renderAll();
         }).catch(error => {
           if (error.type !== 'abort') {
             throw error;
