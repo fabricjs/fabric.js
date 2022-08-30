@@ -51,6 +51,10 @@ QUnit.config.testTimeout = 15000;
 QUnit.config.noglobals = true;
 QUnit.config.hidepassed = true;
 
+process.on('unhandledRejection', QUnit.onUncaughtException);
+
+process.on('uncaughtException', QUnit.onUncaughtException);
+
 var jsdom = require('jsdom');
 
 // make a jsdom version for tests that does not spam too much.
