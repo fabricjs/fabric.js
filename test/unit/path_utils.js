@@ -34,18 +34,18 @@
     assert.ok(typeof fabric.util.getPathSegmentsInfo === 'function');
     var parsed = fabric.util.makePathSimpler(fabric.util.parsePath(path));
     var infos = fabric.util.getPathSegmentsInfo(parsed);
-    assert.deepEqual(infos[0].length, 0, 'the command 0 a M has a length 0');
-    assert.deepEqual(infos[1].length, 2.8284271247461903, 'the command 1 a L has a length 2.82');
-    assert.deepEqual(infos[2].length, 1, 'the command 2 a L with one step on Y has a length 1');
-    assert.deepEqual(infos[3].length, 3, 'the command 3 a L with 3 step on X has a length 3');
-    assert.deepEqual(infos[4].length, 2, 'the command 4 a L with 2 step on X has a length 0');
-    assert.deepEqual(infos[5].length, 2.0624154987440195, 'the command 5 a C has a approximated length of 2.062');
-    assert.deepEqual(infos[6].length, 2.8283160519570405, 'the command 6 a C has a approximated length of 2.786');
-    assert.deepEqual(infos[7].length, 4.189704539256451, 'the command 7 a C has a approximated length of 4.123');
-    assert.deepEqual(infos[8].length, 1, 'the command 8 a L with 1 step on the Y has an exact length of 1');
-    assert.deepEqual(infos[9].length, 3.2272695880364677, 'the command 9 a C has a approximated length of 3.183');
-    assert.deepEqual(infos[10].length, 1.5402632710438555, 'the command 10 a Q has a approximated length of 1.512');
-    assert.deepEqual(infos[11].length, 2.295563578960362, 'the command 11 a Q has a approximated length of 2.267');
+    assert.equal(infos[0].length, 0, 'the command 0 a M has a length 0');
+    assert.equal(infos[1].length.toFixed(5), 2.82843, 'the command 1 a L has a length 2.828');
+    assert.equal(infos[2].length, 1, 'the command 2 a L with one step on Y has a length 1');
+    assert.equal(infos[3].length, 3, 'the command 3 a L with 3 step on X has a length 3');
+    assert.equal(infos[4].length, 2, 'the command 4 a L with 2 step on X has a length 0');
+    assert.equal(infos[5].length.toFixed(5), 2.06242, 'the command 5 a C has a approximated length of 2.062');
+    assert.equal(infos[6].length.toFixed(5), 2.82832, 'the command 6 a C has a approximated length of 2.828');
+    assert.equal(infos[7].length.toFixed(5), 4.18970, 'the command 7 a C has a approximated length of 4.189');
+    assert.equal(infos[8].length, 1, 'the command 8 a L with 1 step on the Y has an exact length of 1');
+    assert.equal(infos[9].length.toFixed(5), 3.22727, 'the command 9 a C has a approximated length of 3.227');
+    assert.equal(infos[10].length.toFixed(5), 1.54026, 'the command 10 a Q has a approximated length of 1.540');
+    assert.equal(infos[11].length.toFixed(5), 2.29556, 'the command 11 a Q has a approximated length of 2.295');
   });
 
   QUnit.test('fabric.util.getPathSegmentsInfo test Z command', function(assert) {
@@ -60,6 +60,14 @@
   });
 
   QUnit.test('fabric.util.getRegularPolygonPath', function (assert) {
+
+    const roundDecimals = (commands) => commands.map(([cmd, x, y]) => {
+      if (cmd !== 'Z') {
+        return [cmd, x.toFixed(4), y.toFixed(4)];
+      }
+      return ['Z'];
+    })
+
     assert.ok(typeof fabric.util.getRegularPolygonPath === 'function');
     var penta = fabric.util.getRegularPolygonPath(5, 50);
     var hexa = fabric.util.getRegularPolygonPath(6, 50);
@@ -83,7 +91,7 @@
       ["Z"]
     ];
 
-    assert.deepEqual(penta, expetedPenta, 'regualr pentagon should match');
-    assert.deepEqual(hexa, expetedHexa, 'regualr hexagon should match');
+    assert.deepEqual(roundDecimals(penta), roundDecimals(expetedPenta), 'regualr pentagon should match');
+    assert.deepEqual(roundDecimals(hexa), roundDecimals(expetedHexa), 'regualr hexagon should match');
   });
 })();

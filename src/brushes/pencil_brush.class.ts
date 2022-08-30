@@ -1,7 +1,7 @@
 import { fabric } from "../../HEADER";
 import { Point } from "../point.class";
 import { TEvent, ModifierKey, PathData } from "../typedefs";
-import { getSmoothPathFromPoints, joinPath } from "../util";
+import { getSmoothPathFromPoints, joinPath } from "../util/path";
 import { Canvas } from "../__types__";
 import { BaseBrush } from "./base_brush.class";
 

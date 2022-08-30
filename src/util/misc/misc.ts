@@ -59,6 +59,26 @@ import {
   min,
   max,
 } from '../lang_array';
+import {
+  joinPath,
+  parsePath,
+  makePathSimpler,
+  getSmoothPathFromPoints,
+  getPathSegmentsInfo,
+  getBoundsOfCurve,
+  getPointOnPath,
+  transformPath,
+  getRegularPolygonPath,
+} from '../path';
+import { setStyle } from '../dom_style';
+import { request } from '../dom_request';
+import {
+  isTouchEvent,
+  getPointer,
+  removeListener,
+  addListener,
+} from '../dom_event';
+
   /**
    * @namespace fabric.util
    */
@@ -129,7 +149,21 @@ import {
       min,
       max,
     },
-
+    joinPath,
+    parsePath,
+    makePathSimpler,
+    getSmoothPathFromPoints,
+    getPathSegmentsInfo,
+    getBoundsOfCurve,
+    getPointOnPath,
+    transformPath,
+    getRegularPolygonPath,
+    request,
+    setStyle,
+    isTouchEvent,
+    getPointer,
+    removeListener,
+    addListener,
     /**
      * Populates an object with properties of another object
      * @static
