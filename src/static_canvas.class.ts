@@ -703,7 +703,7 @@ import { pick } from './util/misc/pick';
      * @chainable
      */
     requestRenderAll: function () {
-      if (!this.nextRenderHandle && !this.destroyed) {
+      if (!this.nextRenderHandle && !this.disposed && !this.destroyed) {
         this.nextRenderHandle = fabric.util.requestAnimFrame(this.renderAndResetBound);
       }
       return this;
@@ -1622,6 +1622,7 @@ import { pick } from './util/misc/pick';
      * @returns {Promise} a promise resolving once the canvas has been destroyed
      */
     dispose: function () {
+      this.disposed = true;
       return new Promise<void>((resolve, reject) => {
         const task = () => {
           this.destroy();
@@ -1631,7 +1632,11 @@ import { pick } from './util/misc/pick';
         if (this.__cleanupTask) {
           this.__cleanupTask.kill();
         }
-        if (this.nextRenderHandle) {
+        
+        if (this.destroyed) {
+          return;
+        }
+        else if (this.nextRenderHandle) {
           this.__cleanupTask = task;
         }
         else {
