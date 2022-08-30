@@ -570,7 +570,15 @@ sandbox
     .addOption(new commander.Option('-t, --template <template>', 'template to use instead of a "path"').choices(templates))
     .action(async (deploy, { template }, context) => {
         if (!deploy && !template) {
-            console.log(chalk.red(`provide "path" or "--template"`));
+            console.log(chalk.red(`Provide "path" or "--template"`));
+            context.help({ error: true });
+            return;
+        }
+        else if (!template && !fs.existsSync(deploy) && templates.includes(deploy)) {
+            template = deploy;
+            deploy = undefined;
+            console.log(chalk.blue(`Did you mean to use "--template"?`));
+            console.log(chalk.gray(`npm run sandbox deploy -- -t ${template}\n`));
             context.help({ error: true });
             return;
         }
