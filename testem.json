@@ -25,7 +25,7 @@
   ],
   "launchers": {
     "Node": {
-      "command": "npm run test -- --suite unit",
+      "command": "npm run test",
       "protocol": "tap"
     }
   },
