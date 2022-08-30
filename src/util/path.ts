@@ -47,33 +47,33 @@ const segmentToBezier = (th2, th3, cosTh, sinTh, rx, ry, cx1, cy1, mT, fromX, fr
   * by Andrea Bogazzi code is under MPL. if you don't have a copy of the license you can take it here
   * http://mozilla.org/MPL/2.0/
   */
-const arcToSegments = (toX, toY, _rx, _ry, large, sweep, rotateX) => {
+const arcToSegments = (toX, toY, rx, ry, large, sweep, rotateX) => {
   let fromX = 0, fromY = 0, root = 0;
   const PI = Math.PI, th = rotateX * PiBy180, sinTh = sin(th), cosTh = cos(th),
         px = 0.5 * (-cosTh * toX  - sinTh * toY),
         py = 0.5 * (-cosTh * toY + sinTh * toX),
-        rx2 = _rx ** 2, ry2 = _ry ** 2, py2 = py ** 2, px2 = px ** 2,
+        rx2 = rx ** 2, ry2 = ry ** 2, py2 = py ** 2, px2 = px ** 2,
         pl = rx2 * ry2 - rx2 * py2 - ry2 * px2;
-  let rx = Math.abs(_rx);
-  let ry = Math.abs(_ry);
+  let _rx = Math.abs(rx);
+  let _ry = Math.abs(ry);
 
 
   if (pl < 0) {
     const s = Math.sqrt(1 - pl / (rx2 * ry2));
-    rx *= s;
-    ry *= s;
+    _rx *= s;
+    _ry *= s;
   }
   else {
     root = (large === sweep ? -1.0 : 1.0) *
             Math.sqrt( pl / (rx2 * py2 + ry2 * px2));
   }
 
-  const cx = root * rx * py / ry,
-        cy = -root * ry * px / rx,
+  const cx = root * _rx * py / _ry,
+        cy = -root * _ry * px / _rx,
         cx1 = cosTh * cx - sinTh * cy + toX * 0.5,
         cy1 = sinTh * cx + cosTh * cy + toY * 0.5;
-  let mTheta = calcVectorAngle(1, 0, (px - cx) / rx, (py - cy) / ry);
-  let dtheta = calcVectorAngle((px - cx) / rx, (py - cy) / ry, (-px - cx) / rx, (-py - cy) / ry);
+  let mTheta = calcVectorAngle(1, 0, (px - cx) / _rx, (py - cy) / _ry);
+  let dtheta = calcVectorAngle((px - cx) / _rx, (py - cy) / _ry, (-px - cx) / _rx, (-py - cy) / _ry);
 
   if (sweep === 0 && dtheta > 0) {
     dtheta -= 2 * PI;
@@ -89,7 +89,7 @@ const arcToSegments = (toX, toY, _rx, _ry, large, sweep, rotateX) => {
   let th3 = mTheta + mDelta;
 
   for (let i = 0; i < segments; i++) {
-    result[i] = segmentToBezier(mTheta, th3, cosTh, sinTh, rx, ry, cx1, cy1, mT, fromX, fromY);
+    result[i] = segmentToBezier(mTheta, th3, cosTh, sinTh, _rx, _ry, cx1, cy1, mT, fromX, fromY);
     fromX = result[i][5];
     fromY = result[i][6];
     mTheta = th3;
