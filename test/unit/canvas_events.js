@@ -22,6 +22,7 @@
     },
     afterEach: function() {
       canvas.clear();
+      canvas.cancelRequestedRender();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
       canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
@@ -29,7 +30,6 @@
       canvas.setDimensions({ width: 600, height: 600 });
       canvas.calcOffset();
       upperCanvasEl.style.display = 'none';
-      canvas.cancelRequestedRender();
     }
   });
 
