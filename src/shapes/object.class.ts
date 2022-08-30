@@ -833,7 +833,7 @@ import { pick } from '../util/misc/pick';
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      const NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+      const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
         clipPathData = this.clipPath && !this.clipPath.excludeFromExport ?
           {
             ...this.clipPath.toObject(propertiesToInclude),
