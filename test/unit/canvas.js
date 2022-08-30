@@ -2083,6 +2083,36 @@
     assert.equal(aGroup._objects[3], circle2);
   });
 
+  QUnit.test('set dimensions', async function (assert) {
+    var el = fabric.document.createElement('canvas'),
+      parentEl = fabric.document.createElement('div');
+    el.width = 200; el.height = 200;
+    parentEl.className = 'rootNode';
+    parentEl.appendChild(el);
+
+    fabric.config.configure({ devicePixelRatio: 1.25 });
+
+    assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
+    assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
+
+    el.style.position = 'relative';
+    var elStyle = el.style.cssText;
+    assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
+
+    var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
+
+    canvas.setDimensions({ width: 500, height: 500 });
+    assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+    assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
+
+    await canvas.dispose();
+    assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
+    assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
+    assert.equal(el.width, 500, 'restored width');
+    assert.equal(el.height, 500, 'restored height');
+
+  });
+
   QUnit.test('clone', function(assert) {
     var done = assert.async();
     assert.ok(typeof canvas.clone === 'function');
