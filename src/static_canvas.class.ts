@@ -766,6 +766,7 @@ import { removeFromArray } from './util/internals';
         this.drawControls(ctx);
       }
       this.fire('after:render', { ctx: ctx, });
+      console.log('renderCanvas end')
     },
 
     /**
