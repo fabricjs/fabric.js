@@ -62,10 +62,10 @@
   QUnit.test('fabric.util.getRegularPolygonPath', function (assert) {
 
     const roundDecimals = (commands) => commands.map(([cmd, x, y]) => {
-      if (cmd === 'L') {
+      if (cmd !== 'Z') {
         return [cmd, x.toFixed(4), y.toFixed(4)];
       }
-      return [cmd, x, y];
+      return ['Z'];
     })
 
     assert.ok(typeof fabric.util.getRegularPolygonPath === 'function');
