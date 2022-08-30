@@ -50,6 +50,7 @@ global.imageDataToChalk = function(imageData) {
 QUnit.config.testTimeout = 15000;
 QUnit.config.noglobals = true;
 QUnit.config.hidepassed = true;
+QUnit.config.notrycatch = true;
 
 process.on('unhandledRejection', error => {
   // Will print "unhandledRejection err is not defined"
