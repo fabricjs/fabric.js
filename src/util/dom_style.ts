@@ -1,5 +1,5 @@
 //@ts-nocheck
-// this file needs to go away, cross browser style support is not fabricjs domain.
+// TODO this file needs to go away, cross browser style support is not fabricjs domain.
 
 /**
  * wrapper for setting element's style
