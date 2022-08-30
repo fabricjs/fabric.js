@@ -14,7 +14,7 @@ commander.program
 QUnit.debugVisual = Number(process.env.QUNIT_DEBUG_VISUAL_TESTS);
 QUnit.recreateVisualRefs = Number(process.env.QUNIT_RECREATE_VISUAL_REFS);
 QUnit.config.filter = process.env.QUNIT_FILTER;
-
+QUnit.config.notrycatch = true;
 process.on('uncaughtException', QUnit.onUncaughtException);
 
 global.fabric = require('../dist/fabric').fabric;
