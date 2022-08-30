@@ -754,10 +754,10 @@ import { pick } from './util/misc/pick';
       }
 
       var v = this.viewportTransform, path = this.clipPath;
-      this.cancelRequestedRender();
       this.calcViewportBoundaries();
       this.clearContext(ctx);
       fabric.util.setImageSmoothing(ctx, this.imageSmoothingEnabled);
+      // node-canvas
       ctx.patternQuality = 'best';
       this.fire('before:render', { ctx: ctx, });
       this._renderBackground(ctx);
