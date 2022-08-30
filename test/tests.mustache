@@ -18,6 +18,10 @@ QUnit.config.reorder = false;
 <script>
 QUnit.testDone(visualCallback.testDone.bind(visualCallback));
 
+window.addEventListener('unhandledrejection', function (event) {
+  QUnit.onUncaughtException(event.reason);
+});
+
 function downloadGoldens() {
     const checkbox = document.getElementById('qunit-urlconfig-hidepassed');
     checkbox.checked && checkbox.click();

@@ -59,9 +59,26 @@ import {
   min,
   max,
 } from '../lang_array';
-
-
 import { pick } from './pick';
+import {
+  joinPath,
+  parsePath,
+  makePathSimpler,
+  getSmoothPathFromPoints,
+  getPathSegmentsInfo,
+  getBoundsOfCurve,
+  getPointOnPath,
+  transformPath,
+  getRegularPolygonPath,
+} from '../path';
+import { setStyle } from '../dom_style';
+import { request } from '../dom_request';
+import {
+  isTouchEvent,
+  getPointer,
+  removeListener,
+  addListener,
+} from '../dom_event';
 
   /**
    * @namespace fabric.util
@@ -133,8 +150,22 @@ import { pick } from './pick';
       min,
       max,
     },
-
     pick,
+    joinPath,
+    parsePath,
+    makePathSimpler,
+    getSmoothPathFromPoints,
+    getPathSegmentsInfo,
+    getBoundsOfCurve,
+    getPointOnPath,
+    transformPath,
+    getRegularPolygonPath,
+    request,
+    setStyle,
+    isTouchEvent,
+    getPointer,
+    removeListener,
+    addListener,
 
     /**
      * Returns true if context has transparent pixel
@@ -179,28 +210,6 @@ import { pick } from './pick';
       imageData = null;
 
       return _isTransparent;
-    },
-
-    /**
-     * Clear char widths cache for the given font family or all the cache if no
-     * fontFamily is specified.
-     * Use it if you know you are loading fonts in a lazy way and you are not waiting
-     * for custom fonts to load properly when adding text objects to the canvas.
-     * If a text object is added when its own font is not loaded yet, you will get wrong
-     * measurement and so wrong bounding boxes.
-     * After the font cache is cleared, either change the textObject text content or call
-     * initDimensions() to trigger a recalculation
-     * @memberOf fabric.util
-     * @param {String} [fontFamily] font family to clear
-     */
-    clearFabricFontCache: function(fontFamily) {
-      fontFamily = (fontFamily || '').toLowerCase();
-      if (!fontFamily) {
-        fabric.charWidthsCache = { };
-      }
-      else if (fabric.charWidthsCache[fontFamily]) {
-        delete fabric.charWidthsCache[fontFamily];
-      }
     },
 
     /**

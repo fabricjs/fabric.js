@@ -45,7 +45,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    * @type Number[]
    * @default null
    */
-  gradientTransform: number[] | null = null
+  gradientTransform: TMat2D | null = null
 
   /**
    * coordinates units for coords.
