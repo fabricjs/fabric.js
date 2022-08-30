@@ -1631,7 +1631,7 @@ import { pick } from './util/misc/pick';
         }
         task.kill = reject;
         if (this.__cleanupTask) {
-          this.__cleanupTask.kill();
+          this.__cleanupTask.kill('aborted');
         }
         
         if (this.destroyed) {
