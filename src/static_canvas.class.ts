@@ -733,25 +733,22 @@ import { removeFromArray } from './util/internals';
       };
     },
 
-    /**
-     * @param [handle] 
-     */
     cancelRequestedRender: function () {
       cancelAnimFrame(this.isRendering);
       this.isRendering = 0;
     },
 
     /**
-     * abort concurrent rendering and requested rendering
-     * @param [handle] 
+     * abort concurrent and requested rendering
      */
     abortRendering: function () {
       // first clear request
       this.cancelRequestedRender();
-      Object.keys(this.__abortControllers).forEach(handle => {
-        const controller = this.__abortControllers[handle];
-        controller.abort();
-      });
+      Object.keys(this.__abortControllers)
+        .forEach(handle => {
+          const controller = this.__abortControllers[handle];
+          controller.abort();
+        });
       this.__abortControllers = {};
     },
 
