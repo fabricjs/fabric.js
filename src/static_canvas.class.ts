@@ -688,9 +688,10 @@ import { removeFromArray } from './util/internals';
      */
     requestRenderAll: function () {
       if (!this.isRendering) {
+        let handle;
         new Promise((resolve, reject) => {
           const controller = new AbortController();
-          const handle = this.isRendering = fabric.util.requestAnimFrame(resolve);
+          handle = this.isRendering = fabric.util.requestAnimFrame(resolve);
           controller.signal.addEventListener('abort', (e) => {
             this.cancelRequestedRender();
             reject(e);
