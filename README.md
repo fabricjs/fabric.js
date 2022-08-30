@@ -160,6 +160,19 @@ http
 
 See the [Website](http://fabricjs.com/) and beware of [**GOTCHAS**](./GOTCHAS.md).
 
+## What's Out There?
+
+#### Complementary Project
+
+- [Three.js](https://github.com/mrdoob/three.js/)
+- [PixiJS](https://github.com/pixijs/pixijs)
+- [Canvas2PDF](https://github.com/joshua-gould/canvas2pdf)
+- [html-to-image](https://github.com/bubkoo/html-to-image)
+
+#### Competition
+
+- [Konva](https://github.com/konvajs/konva)
+
 ## Supported Browsers
 
 - Firefox 4+
