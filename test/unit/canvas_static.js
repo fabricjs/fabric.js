@@ -1611,29 +1611,79 @@
   });
 
   QUnit.test('dispose clear references', async function(assert) {
-    var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
-    assert.ok(typeof canvas2.dispose === 'function');
-    assert.ok(typeof canvas2.destroy === 'function');
-    canvas2.add(makeRect(), makeRect(), makeRect());
-    var lowerCanvas = canvas2.lowerCanvasEl;
+    const canvas = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
+    assert.ok(typeof canvas.dispose === 'function');
+    assert.ok(typeof canvas.destroy === 'function');
+    canvas.add(makeRect(), makeRect(), makeRect());
+    const lowerCanvas = canvas.lowerCanvasEl;
     assert.equal(lowerCanvas.getAttribute('data-fabric'), 'main', 'lowerCanvasEl should be marked by fabric');
-    await canvas2.dispose();
+    await canvas.dispose();
     assert.equal(canvas.destroyed, true, 'dispose should flag destroyed');
-    assert.equal(canvas2.getObjects().length, 0, 'dispose should clear canvas');
-    assert.equal(canvas2.lowerCanvasEl, null, 'dispose should clear lowerCanvasEl');
+    assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
+    assert.equal(canvas.lowerCanvasEl, null, 'dispose should clear lowerCanvasEl');
     assert.equal(lowerCanvas.hasAttribute('data-fabric'), false, 'dispose should clear lowerCanvasEl data-fabric attr');
-    assert.equal(canvas2.contextContainer, null, 'dispose should clear contextContainer');
+    assert.equal(canvas.contextContainer, null, 'dispose should clear contextContainer');
   });
 
-  QUnit.test('dispose edge cases', async function (assert) {
+  QUnit.test('dispose', async function (assert) {
     const done = assert.async();
-    const canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
-    canvas2.requestRenderAll();
-    assert.rejects(canvas2.dispose());
-    assert.rejects(canvas2.dispose());
-    assert.notOk(canvas2.destroyed, 'should not have been destroyed yet');
-    await canvas2.dispose();
-    assert.ok(canvas2.destroyed, 'should not have been destroyed');
+    const canvas = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
+    assert.notOk(canvas.destroyed, 'should not have been destroyed yet');
+    await canvas.dispose();
+    assert.ok(canvas.destroyed, 'should have flagged `destroyed`');
+    done();
+  });
+
+  QUnit.test('dispose edge cases: multiple calls', async function (assert) {
+    const done = assert.async();
+    const canvas = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
+    assert.notOk(canvas.destroyed, 'should not have been destroyed yet');
+    const res = await Promise.all([
+      canvas.dispose(),
+      canvas.dispose(),
+      canvas.dispose(),
+    ]);
+    assert.ok(canvas.disposed, 'should have flagged `disposed`');
+    assert.ok(canvas.destroyed, 'should have flagged `destroyed`');
+    assert.deepEqual(res, [true, false, false], 'should have disposed in the first call');
+    done();
+  });
+
+  QUnit.test('dispose edge cases: multiple calls after `requestRenderAll', async function (assert) {
+    const done = assert.async();
+    const canvas = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
+    assert.notOk(canvas.destroyed, 'should not have been destroyed yet');
+    canvas.requestRenderAll();
+    const res = await Promise.allSettled([
+      canvas.dispose(),
+      canvas.dispose(),
+      canvas.dispose(),
+    ]);
+    assert.ok(canvas.disposed, 'should have flagged `disposed`');
+    assert.ok(canvas.destroyed, 'should have flagged `destroyed`');
+    assert.deepEqual(res, [
+      { status: 'rejected', reason: 'aborted' },
+      { status: 'rejected', reason: 'aborted' },
+      { status: 'fulfilled', value: true }
+    ], 'should have disposed in the last call, aborting the other calls');
+    done();
+  });
+
+  QUnit.test.only('dispose edge cases: rendering after dispose', async function (assert) {
+    const done = assert.async();
+    const canvas = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
+    let called = 0;
+    assert.ok(await canvas.dispose(), 'should dispose');
+    canvas.on('after:render', () => {
+      called++;
+    })
+    canvas.fire('after:render');
+    assert.equal(canvas.nextRenderHandle, undefined);
+    canvas.requestRenderAll();
+    assert.equal(canvas.nextRenderHandle, undefined, '`requestRenderAll` should have no affect');
+    assert.equal(called, 1, 'should not have rendered');
+    canvas.renderAll();
+    assert.equal(called, 1, 'should not have rendered');
     done();
   });
 

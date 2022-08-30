@@ -2083,7 +2083,7 @@
     assert.equal(aGroup._objects[3], circle2);
   });
 
-  QUnit.test('dispose', async function(assert) {
+  QUnit.test('dispose: clear refs', async function(assert) {
     //made local vars to do not dispose the external canvas
     var el = fabric.document.createElement('canvas'),
         parentEl = fabric.document.createElement('div'),
@@ -2128,7 +2128,6 @@
     canvas.item(0).animate('scaleX', 10);
     assert.equal(fabric.runningAnimations.length, 1, 'should have a running animation');
     await canvas.dispose();
-    canvas.cancelRequestedRender();
     assert.equal(fabric.runningAnimations.length, 0, 'dispose should clear running animations');
     assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
     assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
@@ -2148,7 +2147,7 @@
 
   });
 
-  QUnit.test('dispose + set dimensions', async function (assert) {
+  QUnit.test('dispose edge case: `setDimensions` invoking `requestRenderAll`', async function (assert) {
     //made local vars to do not dispose the external canvas
     var el = fabric.document.createElement('canvas'),
       parentEl = fabric.document.createElement('div');
