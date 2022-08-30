@@ -2220,7 +2220,7 @@
   //   assertInvocationsCount();
   // });
 
-  QUnit.test('clone', function(assert) {
+  QUnit.test.skip('clone', function(assert) {
     var done = assert.async();
     assert.ok(typeof canvas.clone === 'function');
 
@@ -2241,7 +2241,7 @@
     });
   });
 
-  QUnit.test('cloneWithoutData', function(assert) {
+  QUnit.test.skip('cloneWithoutData', function(assert) {
     var done = assert.async();
     assert.ok(typeof canvas.cloneWithoutData === 'function');
 
