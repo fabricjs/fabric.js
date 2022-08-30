@@ -111,6 +111,8 @@ function assertCanvasDisposing(klass) {
         assert.ok(testImageData(255), 'should render canvas');
         canvas.destroyed = true;
         assert.ok(testImageData(0), 'should have disabled canvas rendering');
+        canvas.destroyed = false;
+        assert.ok(await canvas.dispose(), 'dispose');
         done();
     });
 }
