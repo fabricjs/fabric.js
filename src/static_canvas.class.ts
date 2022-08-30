@@ -736,8 +736,10 @@ import { removeFromArray } from './util/internals';
      * consider using {@link abortRendering} to abort concurrent rendering
      */
     cancelRequestedRender: function () {
-      fabric.util.cancelAnimFrame(this.isRendering);
-      this.isRendering = 0;
+      if (this.isRendering) {
+        fabric.util.cancelAnimFrame(this.isRendering);
+        this.isRendering = 0;
+      }
     },
 
     /**
