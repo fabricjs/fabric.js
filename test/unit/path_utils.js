@@ -60,6 +60,14 @@
   });
 
   QUnit.test('fabric.util.getRegularPolygonPath', function (assert) {
+
+    const roundDecimals = (commands) => commands.map(([cmd, x, y]) => {
+      if (cmd === 'L') {
+        return [cmd, x.toFixed(4), y.toFixed(4)];
+      }
+      return [cmd, x, y];
+    })
+
     assert.ok(typeof fabric.util.getRegularPolygonPath === 'function');
     var penta = fabric.util.getRegularPolygonPath(5, 50);
     var hexa = fabric.util.getRegularPolygonPath(6, 50);
@@ -83,7 +91,7 @@
       ["Z"]
     ];
 
-    assert.deepEqual(penta, expetedPenta, 'regualr pentagon should match');
-    assert.deepEqual(hexa, expetedHexa, 'regualr hexagon should match');
+    assert.deepEqual(roundDecimals(penta), roundDecimals(expetedPenta), 'regualr pentagon should match');
+    assert.deepEqual(roundDecimals(hexa), roundDecimals(expetedHexa), 'regualr hexagon should match');
   });
 })();
