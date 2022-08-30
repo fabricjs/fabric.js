@@ -746,11 +746,10 @@ import { removeFromArray } from './util/internals';
      * abort concurrent and requested rendering
      */
     abortRendering: function () {
-      // first clear request
+      // first cancel requested rendering
       this.cancelRequestedRender();
-      Object.keys(this.__abortControllers)
-        .forEach(handle => {
-          const controller = this.__abortControllers[handle];
+      Object.values(this.__abortControllers)
+        .forEach(controller => {
           controller.abort();
         });
       this.__abortControllers = {};
