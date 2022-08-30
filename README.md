@@ -85,7 +85,8 @@ See [browser modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Gu
 
 #### CDN
 
-[cdnjs](https://cdnjs.com/libraries/fabric.js), [jsdelivr](https://www.jsdelivr.com/package/npm/fabric)
+- [fabric on cdnjs](https://cdnjs.com/libraries/fabric.js)
+- [fabric on jsdelivr](https://www.jsdelivr.com/package/npm/fabric)
 
 ## Quick Start
 
