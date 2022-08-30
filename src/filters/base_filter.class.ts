@@ -1,7 +1,6 @@
 //@ts-nocheck
 
-import { config } from "../config";
-import { TWebGLPrecision } from "../typedefs";
+import { TWebGLPrecision, webGLProbe } from "./WebGLProbe";
 
 
 (function(global) {
@@ -77,10 +76,10 @@ import { TWebGLPrecision } from "../typedefs";
     createProgram: function(gl, fragmentSource, vertexSource) {
       fragmentSource = fragmentSource || this.fragmentSource;
       vertexSource = vertexSource || this.vertexSource;
-      if (config.webGLPrecision !== TWebGLPrecision.high) {
+      if (webGLProbe.webGLPrecision !== TWebGLPrecision.high) {
         fragmentSource = fragmentSource.replace(
           new RegExp(`precision ${TWebGLPrecision.high} float`,'g'),
-          `precision ${config.webGLPrecision} float`
+          `precision ${webGLProbe.webGLPrecision} float`
         );
       }
       var vertexShader = gl.createShader(gl.VERTEX_SHADER);

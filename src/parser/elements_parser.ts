@@ -1,7 +1,8 @@
 //@ts-nocheck
 
 import { fabric } from "../../HEADER";
-import { capitalize, invertTransform, multiplyTransformMatrices, qrDecompose } from "../util";
+import { capitalize } from "../util/lang_string";
+import { invertTransform, multiplyTransformMatrices, qrDecompose } from '../util/misc/matrix';
 
   const ElementsParser = function(elements, callback, options, reviver, parsingOptions, doc) {
     this.elements = elements;

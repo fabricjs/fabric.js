@@ -1,6 +1,6 @@
 import { fabric } from "../../HEADER";
 import { Point } from "../point.class";
-import { getRandomInt } from "../util";
+import { getRandomInt } from "../util/internals";
 import { Canvas, Rect } from "../__types__";
 import { BaseBrush } from "./base_brush.class";
 
@@ -19,9 +19,9 @@ export type SprayBrushPoint = {
 }
 
 /**
- * 
- * @param rects 
- * @returns 
+ *
+ * @param rects
+ * @returns
  */
 function getUniqueRects(rects: Rect[]) {
   const uniqueRects: Record<string, boolean> = {};

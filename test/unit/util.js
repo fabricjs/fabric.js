@@ -615,6 +615,12 @@
 
       fabric.util.setStyle(el, 'color:red');
       assert.equal(el.style.color, 'red');
+      fabric.util.setStyle(el, 'color:blue;border-radius:3px');
+      assert.equal(el.style.color, 'blue');
+      assert.equal(el.style.borderRadius, '3px');
+      fabric.util.setStyle(el, { color: 'yellow', width: '45px' });
+      assert.equal(el.style.color, 'yellow');
+      assert.equal(el.style.width, '45px');
     });
   }
 
@@ -695,21 +701,21 @@
     assert.equal(fabric.util.getKlass('Sepia2', 'fabric.Image.filters'), fabric.Image.filters.Sepia2);
   });
 
-  QUnit.test('clearFabricFontCache', function(assert) {
-    assert.ok(typeof fabric.util.clearFabricFontCache === 'function');
-    fabric.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
-    fabric.util.clearFabricFontCache('arial');
-    assert.equal(fabric.charWidthsCache.arial,  undefined, 'arial cache is deleted');
-    assert.equal(fabric.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
-    fabric.util.clearFabricFontCache();
-    assert.deepEqual(fabric.charWidthsCache, { }, 'all cache is deleted');
+  QUnit.test('clearFontCache', function(assert) {
+    assert.ok(typeof fabric.cache.clearFontCache === 'function');
+    fabric.cache.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
+    fabric.cache.clearFontCache('arial');
+    assert.equal(fabric.cache.charWidthsCache.arial,  undefined, 'arial cache is deleted');
+    assert.equal(fabric.cache.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
+    fabric.cache.clearFontCache();
+    assert.deepEqual(fabric.cache.charWidthsCache, { }, 'all cache is deleted');
   });
 
-  QUnit.test('clearFabricFontCache wrong case', function(assert) {
-    fabric.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
-    fabric.util.clearFabricFontCache('ARIAL');
-    assert.equal(fabric.charWidthsCache.arial,  undefined, 'arial cache is deleted');
-    assert.equal(fabric.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
+  QUnit.test('clearFontCache wrong case', function(assert) {
+    fabric.cache.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
+    fabric.cache.clearFontCache('ARIAL');
+    assert.equal(fabric.cache.charWidthsCache.arial,  undefined, 'arial cache is deleted');
+    assert.equal(fabric.cache.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
   });
 
   QUnit.test('parsePreserveAspectRatioAttribute', function(assert) {
