@@ -42,10 +42,10 @@ A **simple and powerful Javascript HTML5 canvas library**.
 - [Unit tested](/CONTRIBUTING.md#-testing)
 
 | Context  | Supported Version | Notes |
-| ------------- | :-------------: | ------------- |
-| Firefox | 4+ |  
-| Safari | 5+ |  
-| Opera | 9.64+ |  
+| :-------------: | :-------------: | :------------- |
+| Firefox | ✔️ | version >= 4 |  
+| Safari | ✔️ | version >= 5 |  
+| Opera | ✔️ | version >= 9.64 |  
 | Chrome | ✔️ |  
 | Edge | ✔️ | chromium based |
 | Edge Legacy | ❌ | 
