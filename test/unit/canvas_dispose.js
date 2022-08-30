@@ -201,8 +201,7 @@ function testCanvasDisposing() {
 
     });
 
-    QUnit.test('dispose edge case: `setDimensions` invoking `requestRenderAll`', async function (assert) {
-        //made local vars to do not dispose the external canvas
+    QUnit.test('dispose: `setDimensions`', async function (assert) {
         var el = fabric.document.createElement('canvas'),
             parentEl = fabric.document.createElement('div');
         el.width = 200; el.height = 200;
