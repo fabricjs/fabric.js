@@ -2083,7 +2083,7 @@
     assert.equal(aGroup._objects[3], circle2);
   });
 
-  QUnit.test.skip('dispose', function(assert) {
+  QUnit.test('dispose', function(assert) {
     //made local vars to do not dispose the external canvas
     var el = fabric.document.createElement('canvas'),
         parentEl = fabric.document.createElement('div'),
@@ -2147,7 +2147,7 @@
 
   });
 
-  QUnit.test.skip('dispose + set dimensions', function (assert) {
+  QUnit.test('dispose + set dimensions', function (assert) {
     //made local vars to do not dispose the external canvas
     var el = fabric.document.createElement('canvas'),
       parentEl = fabric.document.createElement('div');
@@ -2220,7 +2220,7 @@
   //   assertInvocationsCount();
   // });
 
-  QUnit.test.skip('clone', function(assert) {
+  QUnit.test('clone', function(assert) {
     var done = assert.async();
     assert.ok(typeof canvas.clone === 'function');
 
@@ -2236,12 +2236,11 @@
       assert.equal(canvas.getWidth(), clone.getWidth());
       assert.equal(canvas.getHeight(), clone.getHeight());
       clone.renderAll();
-      clone.dispose();
       done();
     });
   });
 
-  QUnit.test.skip('cloneWithoutData', function(assert) {
+  QUnit.test('cloneWithoutData', function(assert) {
     var done = assert.async();
     assert.ok(typeof canvas.cloneWithoutData === 'function');
 
@@ -2256,7 +2255,6 @@
       assert.equal(canvas.getWidth(), clone.getWidth());
       assert.equal(canvas.getHeight(), clone.getHeight());
       clone.renderAll();
-      clone.dispose();
       done();
     });
   });
@@ -2443,13 +2441,19 @@
     var rect = new fabric.Rect();
     canvas.add(rect);
 
+    var callbackFired = false;
     function onComplete() {
-      assert.equal(canvas.item(0), undefined);
-      done();
+      callbackFired = true;
     }
 
     assert.equal(canvas.item(0), rect);
     assert.ok(typeof canvas.fxRemove(rect, { onComplete: onComplete }) === 'function', 'should return animation abort function');
+
+    setTimeout(function() {
+      assert.equal(canvas.item(0), undefined);
+      assert.ok(callbackFired);
+      done();
+    }, 1000);
   });
 
   // QUnit.test('backgroundImage', function(assert) {
