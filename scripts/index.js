@@ -1,4 +1,18 @@
 #!/usr/bin/env node
+
+/**
+ * Dearest fabric maintainer 💗,
+ * This file contains the cli logic, which governs most of the available commands fabric has to offer.
+ * 
+ * 📢 **IMPORTANT**
+ * CI uses these commands.
+ * In order for CI to correctly report the result of the command, the process must receive a correct exit code
+ * meaning that if you `spawn` a process, make sure to listen to the `exit` event and terminate the main process with the relevant code.
+ * Failing to do so will make CI report a false positive 📉.
+ */
+
+
+
 const fs = require('fs-extra');
 const os = require('os');
 const _ = require('lodash');
@@ -121,13 +135,13 @@ inquirer.registerPrompt('test-selection', ICheckbox);
 
 
 function build(options = {}) {
-    const args = ['rollup', '-c', options.watch ? '--watch' : ''];
+    const cmd = ['rollup', '-c', options.watch ? '--watch' : ''].join(' ');
     let minDest;
     if (options.output && !options.fast) {
         const { name, base, ...rest } = path.parse(path.resolve(options.output));
         minDest = path.format({ name: `${name}.min`, ...rest });
     }
-    return cp.spawn(args.join(' '), {
+    const processOptions = {
         stdio: 'inherit',
         shell: true,
         cwd: wd,
@@ -138,7 +152,21 @@ function build(options = {}) {
             BUILD_OUTPUT: options.output,
             BUILD_MIN_OUTPUT: minDest
         },
-    });
+    }
+    if (options.watch) {
+        cp.spawn(cmd, processOptions);
+    }
+    else {
+        try {
+            cp.execSync(cmd, processOptions);
+        } catch (error) {
+            // minimal logging, no need for stack trace
+            console.error(error.message);
+            // inform ci
+            process.exit(1);
+        }
+    }
+    
 }
 
 function startWebsite() {
@@ -244,57 +272,106 @@ function exportToWebsite(options) {
     })
 }
 
-
 /**
- *
- * @param {'unit' | 'visual'} suite
- * @param {string[] | null} tests file paths
- * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:string}} [options]
+ * 
+ * @returns {Promise<boolean | undefined>} true if some tests failed
  */
-async function test(suite, tests, options = {}) {
-    const port = options.port || suite === 'visual' ? 8081 : 8080;
+async function runTestem({ suite, port, launch, dev, processOptions, context } = {}) {
+    port = port || suite === 'visual' ? 8081 : 8080;
     try {
         await killPort(port);
     } catch (error) {
 
     }
 
-    const args = [
-        'testem',
-        !options.dev ? 'ci' : '',
-        '-p', port,
-        '-f', `test/testem.${suite}.js`,
-        '-l', options.context.map(_.upperFirst).join(',')
-    ];
-
-    cp.spawn(args.join(' '), {
-        cwd: wd,
-        env: {
-            ...process.env,
-            TEST_FILES: (tests || []).join(','),
-            NODE_CMD: ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' '),
-            VERBOSE: Number(options.verbose),
-            QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
-            QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
-            QUNIT_FILTER: options.filter,
-            REPORT_FILE: options.out
-        },
-        shell: true,
-        stdio: 'inherit',
-        detached: options.dev
-    })
-        .on('exit', (code) => {
-            // propagate failed exit code to the process for ci to fail
-            // don't exit if tests passed - this is for parallel local testing
-            code && process.exit(code);
-        });
-
-    if (options.launch) {
+    if (launch) {
         // open localhost
         const url = `http://localhost:${port}/`;
         const start = (os.platform() === 'darwin' ? 'open' : os.platform() === 'win32' ? 'start' : 'xdg-open');
         cp.exec([start, url].join(' '));
     }
+
+    const processCmdOptions = [
+        '-p', port,
+        '-f', `test/testem.${suite}.js`,
+        '-l', context.map(_.upperFirst).join(',')
+    ];
+
+    if (dev) {
+        cp.spawn(['testem', ...processCmdOptions].join(' '), {
+            ...processOptions,
+            detached: true
+        });
+    }
+    else {
+        try {
+            cp.execSync(['testem', 'ci', ...processCmdOptions].join(' '), processOptions);
+        } catch (error) {
+            return true;
+        }
+    }
+}
+
+/**
+ *
+ * @param {'unit' | 'visual'} suite
+ * @param {string[] | null} tests file paths
+ * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:string}} [options]
+ * @returns {Promise<boolean | undefined>} true if some tests failed
+ */
+async function test(suite, tests, options = {}) {
+    let failed = false;
+    const qunitEnv = {
+        QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
+        QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
+        QUNIT_FILTER: options.filter,
+    };
+    const env = {
+        ...process.env,
+        TEST_FILES: (tests || []).join(','),
+        NODE_CMD: ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' '),
+        VERBOSE: Number(options.verbose),
+        REPORT_FILE: options.out
+    };
+    const browserContexts = options.context.filter(c => c !== 'node');
+
+    // temporary revert
+    // run node tests directly with qunit
+    if (options.context.includes('node')) {
+        try {
+            cp.execSync(env.NODE_CMD, {
+                cwd: wd,
+                env: {
+                    ...env,
+                    // browser takes precendence in golden ref generation
+                    ...(browserContexts.length === 0 ? qunitEnv : {})
+                },
+                shell: true,
+                stdio: 'inherit',
+            });
+        } catch (error) {
+            failed = true;
+        }
+    }
+
+    if (browserContexts.length > 0) {
+        failed = await runTestem({
+            ...options,
+            suite,
+            processOptions: {
+                cwd: wd,
+                env: {
+                    ...env,
+                    ...qunitEnv
+                },
+                shell: true,
+                stdio: 'inherit',
+            },
+            context: browserContexts
+        }) || failed;
+    }
+
+    return failed;
 }
 
 /**
@@ -410,15 +487,14 @@ async function runIntreactiveTestSuite(options) {
         }
         return acc;
     }, { unit: [], visual: [] });
-    _.reduce(tests, async (queue, files, suite) => {
-        await queue;
+    return Promise.all(_.map(tests, (files, suite) => {
         if (files === true) {
             return test(suite, null, options);
         }
         else if (Array.isArray(files) && files.length > 0) {
             return test(suite, files, options);
         }
-    }, Promise.resolve());
+    }));
 }
 
 program
@@ -467,31 +543,36 @@ program
     .option('-a, --all', 'run all tests', false)
     .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
     .option('-r, --recreate', 'recreate visual refs (golden images)', false)
-    .option('-v, --verbose', 'log passing tests', false)
+    .option('-v, --verbose', 'log passing tests', true)
+    .option('--no-verbose', 'disable verbose logging')
     .option('-l, --launch', 'launch tests in the browser', false)
     .option('--dev', 'runs testem in `dev` mode, without a `ci` flag', false)
     .addOption(new commander.Option('-c, --context <context...>', 'context to test in').choices(['node', 'chrome', 'firefox']).default(['node']))
     .option('-p, --port')
     .option('-o, --out <out>', 'path to report test results to')
     .option('--clear-cache', 'clear CLI test cache', false)
-    .action((options) => {
+    .action(async (options) => {
         if (options.clearCache) {
             fs.removeSync(CLI_CACHE);
         }
         if (options.all) {
             options.suite = ['unit', 'visual'];
         }
+        const results = [];
         if (options.suite) {
-            _.reduce(options.suite, async (queue, suite) => {
-                await queue;
+            results.push(...await Promise.all(_.map(options.suite, (suite) => {
                 return test(suite, null, options);
-            }, Promise.resolve());
+            })));
         }
         else if (options.file) {
-            test(options.file.startsWith('visual') ? 'visual' : 'unit', [`test/${options.file}`], options);
+            results.push(await test(options.file.startsWith('visual') ? 'visual' : 'unit', [`test/${options.file}`], options));
         }
         else {
-            runIntreactiveTestSuite(options);
+            results.push(...await runIntreactiveTestSuite(options));
+        }
+        if (_.some(results)) {
+            // inform ci that tests have failed
+            process.exit(1);
         }
     });
 
