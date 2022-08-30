@@ -10,14 +10,15 @@
 export function setStyle(element, styles) {
   const elementStyle = element.style;
   if (!elementStyle) {
-    return element;
+    return;
   }
-  if (typeof styles === 'string') {
+  else if (typeof styles === 'string') {
     element.style.cssText += ';' + styles;
-    return element;
   }
-  Object.entries(styles).forEach(
-    ([property, value]) => elementStyle.setProperty(property, value)
-  );
-  return element;
+  else {
+    Object.entries(styles).forEach(
+      ([property, value]) => elementStyle.setProperty(property, value)
+    );
+  }
+
 }
