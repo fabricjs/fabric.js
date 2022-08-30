@@ -46,19 +46,16 @@ export function request(url, options = {}) {
   };
 
   xhr.onerror = xhr.ontimeout = removeListener;
-  
-  const _url = new URL(url);
 
-  xhr.open(
-    method,
-    method === 'GET' && options.parameters ?
-      `${_url.origin}${_url.pathname}??${new URLSearchParams([
-        ...Array.from(_url.searchParams.entries()),
-        ...Object.entries(options.parameters),
-      ])}` :
-      url,
-    true
-  );
+  if (method === 'GET' && options.parameters) {
+    const { origin, pathname, searchParams } = new URL(url);
+    url = `${origin}${pathname}??${new URLSearchParams([
+      ...Array.from(searchParams.entries()),
+      ...Object.entries(options.parameters),
+    ])}`;
+  }
+  
+  xhr.open(method, url, true);
 
   if (method === 'POST' || method === 'PUT') {
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
