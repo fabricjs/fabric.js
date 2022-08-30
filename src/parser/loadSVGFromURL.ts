@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { request } from "../util";
+import { request } from "../util/dom_request";
 import { parseSVGDocument } from "./parseSVGDocument";
 
 /**
