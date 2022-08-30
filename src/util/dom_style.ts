@@ -1,11 +1,11 @@
 //@ts-nocheck
-/* this file needs to go away, cross browser style support is not fabricjs domain.
+// this file needs to go away, cross browser style support is not fabricjs domain.
+
 /**
  * wrapper for setting element's style
  * @memberOf fabric.util
  * @param {HTMLElement} element
  * @param {Object | string} styles
- * @return {HTMLElement} Element that was passed as a first argument
  */
 export function setStyle(element, styles) {
   const elementStyle = element.style;
