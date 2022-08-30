@@ -3,7 +3,7 @@
   var parsePath = fabric.util.parsePath;
   QUnit.module('fabric.BaseBrush', function(hooks) {
     hooks.afterEach(function() {
-      canvas.cancelRequestedRender();
+      canvas.abortRendering();
     });
 
     QUnit.test('fabric brush constructor', function(assert) {

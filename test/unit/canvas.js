@@ -128,13 +128,13 @@
       fabric.config.configure({ devicePixelRatio: ORIGINAL_DPR });
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.clear();
-      canvas.cancelRequestedRender();
+      canvas.abortRendering();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
       canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
       canvas.off();
       canvas.calcOffset();
-      canvas.cancelRequestedRender();
+      canvas.abortRendering();
       upperCanvasEl.style.display = 'none';
     }
   });
@@ -2127,7 +2127,7 @@
     canvas.item(0).animate('scaleX', 10);
     assert.equal(fabric.runningAnimations.length, 1, 'should have a running animation');
     canvas.dispose();
-    canvas.cancelRequestedRender();
+    canvas.abortRendering();
     assert.equal(fabric.runningAnimations.length, 0, 'dispose should clear running animations');
     assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
     assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');

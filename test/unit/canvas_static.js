@@ -189,14 +189,14 @@
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.calcOffset();
       canvas.requestRenderAll = fabric.StaticCanvas.prototype.requestRenderAll;
-      canvas.cancelRequestedRender();
-      canvas2.cancelRequestedRender();
+      canvas.abortRendering();
+      canvas2.abortRendering();
       canvas.renderOnAddRemove = false;
       canvas2.renderOnAddRemove = false;
     },
     afterEach: function() {
-      canvas.cancelRequestedRender();
-      canvas2.cancelRequestedRender();
+      canvas.abortRendering();
+      canvas2.abortRendering();
       fabric.config.configure({ devicePixelRatio: 1 });
     }
   });
@@ -594,7 +594,7 @@
     fabric.config.configure({ devicePixelRatio: 2 });
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: true });
-    c.cancelRequestedRender();
+    c.abortRendering();
     var img = fabric.document.createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width * fabric.config.devicePixelRatio, 'output width is bigger');
@@ -609,7 +609,7 @@
     fabric.config.configure({ devicePixelRatio: 2 });
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: true, multiplier: 1 });
-    c.cancelRequestedRender();
+    c.abortRendering();
     var img = fabric.document.createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width * fabric.config.devicePixelRatio, 'output width is bigger');
@@ -624,7 +624,7 @@
     fabric.config.configure({ devicePixelRatio: 2 });
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: true, multiplier: 3 });
-    c.cancelRequestedRender();
+    c.abortRendering();
     var img = fabric.document.createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width * fabric.config.devicePixelRatio * 3, 'output width is bigger by 6');
@@ -639,7 +639,7 @@
     fabric.config.configure({ devicePixelRatio: 2 });
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false });
-    c.cancelRequestedRender();
+    c.abortRendering();
     var img = fabric.document.createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width, 'output width is not bigger');
@@ -654,7 +654,7 @@
     fabric.config.configure({ devicePixelRatio: 2 });
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false, multiplier: 1 });
-    c.cancelRequestedRender();
+    c.abortRendering();
     var img = fabric.document.createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width, 'output width is not bigger');
@@ -669,7 +669,7 @@
     fabric.config.configure({ devicePixelRatio: 2 });
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false, multiplier: 3 });
-    c.cancelRequestedRender();
+    c.abortRendering();
     var img = fabric.document.createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width * 3, 'output width is bigger by 3');
@@ -684,7 +684,7 @@
     fabric.config.configure({ devicePixelRatio: 2 });
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false });
-    c.cancelRequestedRender();
+    c.abortRendering();
     var img = fabric.document.createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width, 'output width is bigger');
@@ -1720,7 +1720,7 @@
     assert.equal(canvas.lowerCanvasEl.style.height, 200 + 'px', 'Should be as none backstore only value + "px"');
     assert.equal(canvas.getWidth(), 250, 'Should be as the backstore only value');
     assert.equal(canvas.getHeight(), 350, 'Should be as the backstore only value');
-    canvas.cancelRequestedRender();
+    canvas.abortRendering();
   });
 
   QUnit.test('fxRemove', function(assert) {
@@ -1735,7 +1735,7 @@
       callbackFired = true;
       assert.equal(canvas.item(0), undefined);
       assert.ok(callbackFired);
-      canvas.cancelRequestedRender();
+      canvas.abortRendering();
       done();
     }
 
@@ -1760,7 +1760,7 @@
     var rectBg = new fabric.Rect({ width: 10, heigth: 10 });
     var rectOverlay = new fabric.Rect({ width: 10, heigth: 10 });
     canvas.add(rect);
-    canvas.cancelRequestedRender();
+    canvas.abortRendering();
     canvas.backgroundImage = rectBg;
     canvas.overlayImage = rectOverlay;
     assert.deepEqual(rect.lineCoords.tl, new fabric.Point(0,0), 'rect linecoords are set for normal viewport');
@@ -2006,7 +2006,7 @@
     assert.equal(canvas2.isRendering, undefined, 'no redering is in progress');
     canvas2.requestRenderAll();
     assert.notEqual(canvas2.isRendering, 0, 'a rendering is scehduled');
-    canvas2.cancelRequestedRender();
+    canvas2.abortRendering();
     assert.equal(canvas2.isRendering, 0, 'rendering cancelled');
   });
 

@@ -14,7 +14,7 @@
 
   QUnit.module('fabric.Canvas events mixin', {
     beforeEach: function() {
-      canvas.cancelRequestedRender();
+      canvas.abortRendering();
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       upperCanvasEl.style.display = '';
       canvas.controlsAboveOverlay = fabric.Canvas.prototype.controlsAboveOverlay;
@@ -29,7 +29,7 @@
       canvas.setDimensions({ width: 600, height: 600 });
       canvas.calcOffset();
       upperCanvasEl.style.display = 'none';
-      canvas.cancelRequestedRender();
+      canvas.abortRendering();
     }
   });
 
@@ -855,7 +855,7 @@
       fabric.document.dispatchEvent(event);
       assert.equal(counter, 1, 'listener executed once');
       fabric.Canvas.prototype._onMouseUp = originalMouseUp;
-      c.cancelRequestedRender();
+      c.abortRendering();
       done();
     }, 200);
   });

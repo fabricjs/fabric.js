@@ -8,7 +8,7 @@
     });
     hooks.afterEach(function() {
       canvas.clear();
-      canvas.cancelRequestedRender();
+      canvas.abortRendering();
     });
     QUnit.test('doubleClickHandler', function(assert) {
       var iText = new fabric.IText('test need some word\nsecond line');
