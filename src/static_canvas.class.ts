@@ -674,10 +674,20 @@ import { removeFromArray } from './util/internals';
      */
     renderAll: function () {
       this.abortRendering();
-      const controller = new AbortController();
-      controller.signal.throwIfAborted();
-      this.__abortController = controller;
-      this.renderCanvas(this.contextContainer, this._objects);
+      try {
+        const controller = new AbortController();
+        controller.signal.throwIfAborted();
+        this.__abortController = controller;
+        this.renderCanvas(this.contextContainer, this._objects);
+      } catch (error) {
+        if (error.type === 'abort') {
+          console.log('fabric.Canvas: aborted rendering');
+        }
+        else {
+          throw error;
+        }
+      }
+      
       return this;
     },
 
@@ -733,10 +743,12 @@ import { removeFromArray } from './util/internals';
     },
 
     abortRendering() {
+      // first clear requests
       if (this.isRendering) {
         fabric.util.cancelAnimFrame(this.isRendering);
         this.isRendering = 0;
       }
+      // abort concurrent rendering
       if (this.__abortController && !this.__abortController.signal.aborted) {
         this.__abortController.abort();
       }
