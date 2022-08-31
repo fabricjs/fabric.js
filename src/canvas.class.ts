@@ -1,5 +1,4 @@
 //@ts-nocheck
-import { divide } from 'lodash';
 import { Point } from './point.class';
 
 (function(global) {
