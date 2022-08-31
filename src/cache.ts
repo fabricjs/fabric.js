@@ -53,10 +53,10 @@ export class Cache {
      * @param {number} ar aspect ratio
      * @return {Point} Limited dimensions by X,Y
      */
-    static limitDimsByArea(ar: number) {
+    limitDimsByArea(ar: number) {
       const maximumArea = config.perfLimitSizeTotal;
-      const roughWidth = Math.sqrt(maximumArea * ar)
-      return new Point( Math.floor(roughWidth), Math.floor(maximumArea / roughWidth));
+      const roughWidth = Math.sqrt(maximumArea * ar);
+      return { x: Math.floor(roughWidth), y: Math.floor(maximumArea / roughWidth) };
     }
 
     /**
