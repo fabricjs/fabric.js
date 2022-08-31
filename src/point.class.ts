@@ -1,3 +1,4 @@
+import { fabric } from '../HEADER';
 import { TMat2D, TRadian } from './typedefs';
 import { sin } from './util/misc/sin';
 import { cos } from './util/misc/cos';
@@ -388,3 +389,5 @@ export class Point {
 }
 
 const originZero = new Point(0, 0);
+
+fabric.Point = Point;
