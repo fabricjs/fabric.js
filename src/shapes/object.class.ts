@@ -1,5 +1,6 @@
 //@ts-nocheck
 
+import { cache } from '../cache';
 import { config } from '../config';
 import { VERSION } from '../constants';
 import { Point } from '../point.class';
@@ -696,7 +697,7 @@ import { pick } from '../util/misc/pick';
         }
         return dims;
       }
-      var ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal),
+      var ar = width / height, limitedDims = cache.limitDimsByArea(ar, perfLimitSizeTotal),
           x = capValue(min, limitedDims.x, max),
           y = capValue(min, limitedDims.y, max);
       if (width > x) {

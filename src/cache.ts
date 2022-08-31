@@ -1,3 +1,4 @@
+import { Point } from "./point.class";
 
 export class Cache {
     /**
@@ -42,6 +43,19 @@ export class Cache {
         else if (this.charWidthsCache[fontFamily]) {
             delete this.charWidthsCache[fontFamily];
         }
+    }
+
+    /**
+     * Given current aspect ratio, determines the max width and height that can
+     * respect the total allowed area for the cache.
+     * @memberOf fabric.util
+     * @param {number} ar aspect ratio
+     * @param {Numnumberber} maximumArea Maximum area you want to achieve
+     * @return {Point} Limited dimensions by X,Y
+     */
+    static limitDimsByArea(ar: number, maximumArea: number) {
+      const roughWidth = Math.sqrt(maximumArea * ar)
+      return new Point( Math.floor(roughWidth), Math.floor(maximumArea / roughWidth));
     }
 
     /**
