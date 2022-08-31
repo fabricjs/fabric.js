@@ -1,4 +1,3 @@
-
 export type TConfiguration = Partial<BaseConfiguration>;
 
 class BaseConfiguration {
@@ -78,9 +77,9 @@ class BaseConfiguration {
     /**
      * if webgl is enabled and available, textureSize will determine the size
      * of the canvas backend
-     * 
+     *
      * In order to support old hardware set to `2048` to avoid OOM
-     * 
+     *
      * @since 2.0.0
      * @type Number
      * @default

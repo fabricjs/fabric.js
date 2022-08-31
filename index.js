@@ -1,4 +1,10 @@
-import './HEADER';
+import { fabric } from './HEADER';
+import { Point } from './src/point.class';
+import { cache } from './src/cache';
+
+fabric.Point = Point;
+fabric.cache = cache;
+
 // import './lib/event'), // optional gestures
 import './src/mixins/observable.mixin';
 import './src/mixins/collection.mixin';
@@ -11,7 +17,6 @@ import './src/util/animate'; // optional animation
 import './src/util/animate_color'; // optional animation
 import './src/util/anim_ease'; // optional easing
 import './src/parser'; // optional parser
-import './src/point.class';
 import './src/intersection.class';
 import './src/color';
 import './src/gradient'; // optional gradient

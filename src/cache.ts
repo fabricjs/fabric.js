@@ -54,9 +54,9 @@ export class Cache {
      * @return {Point} Limited dimensions by X,Y
      */
     limitDimsByArea(ar: number) {
-      const maximumArea = config.perfLimitSizeTotal;
-      const roughWidth = Math.sqrt(maximumArea * ar);
-      return { x: Math.floor(roughWidth), y: Math.floor(maximumArea / roughWidth) };
+      const { perfLimitSizeTotal } = config;
+      const roughWidth = Math.sqrt(perfLimitSizeTotal * ar);
+      return new Point(Math.floor(roughWidth), Math.floor(perfLimitSizeTotal / roughWidth));
     }
 
     /**
