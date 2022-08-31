@@ -11,7 +11,6 @@ import './src/mixins/collection.mixin';
 import './src/mixins/shared_methods.mixin';
 import './src/util/misc/misc';
 // import './src/util/named_accessors.mixin'; i would imagine dead forever or proper setters/getters
-import './src/util/lang_class';
 import './src/util/animate'; // optional animation
 import './src/util/animate_color'; // optional animation
 import './src/util/anim_ease'; // optional easing

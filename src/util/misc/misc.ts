@@ -89,6 +89,7 @@ import {
   makeElementUnselectable,
   makeElementSelectable,
 } from '../dom_misc';
+import { createClass } from '../lang_class';
   /**
    * @namespace fabric.util
    */
@@ -183,6 +184,7 @@ import {
     cleanUpJsdomNode,
     makeElementUnselectable,
     makeElementSelectable,
+    createClass,
 
     /**
      * given a width and height, return the size of the bounding box

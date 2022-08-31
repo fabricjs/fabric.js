@@ -110,9 +110,7 @@ export function makeElementUnselectable(element) {
   if (typeof element.onselectstart !== 'undefined') {
     element.onselectstart = () => false;
   }
-  if (selectProp) {
-    element.style.userSelect = 'none';
-  }
+  element.style.userSelect = 'none';
   return element;
 }
 
@@ -126,9 +124,7 @@ export function makeElementSelectable(element) {
   if (typeof element.onselectstart !== 'undefined') {
     element.onselectstart = null;
   }
-  if (selectProp) {
-    element.style.userSelect = '';
-  }
+  element.style.userSelect = '';
   return element;
 }
 
