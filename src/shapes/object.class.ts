@@ -686,8 +686,8 @@ import { pick } from '../util/misc/pick';
      */
     _limitCacheSize: function(dims) {
       var width = dims.width, height = dims.height,
-          max = config.maxCacheSideLimit, min = config.minCacheSideLimit;
-      if (width <= max && height <= max && width * height <= perfLimitSizeTotal) {
+          max = config.maxCacheSideLimit, min = config.minCacheSideLimit,
+      if (width <= max && height <= max && width * height <= config.perfLimitSizeTotal) {
         if (width < min) {
           dims.width = min;
         }

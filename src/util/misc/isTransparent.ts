@@ -27,12 +27,12 @@ export const isTransparent = (ctx: CanvasRenderingContext2D, x: number, y: numbe
   }
 
   let _isTransparent = true;
-  const imageData = ctx.getImageData(x, y, (tolerance * 2) || 1, (tolerance * 2) || 1);
-  const l = imageData.data.length;
+  const { data } = ctx.getImageData(x, y, (tolerance * 2) || 1, (tolerance * 2) || 1);
+  const l = data.length;
 
   // Split image data - for tolerance > 1, pixelDataSize = 4;
   for (let i = 3; i < l; i += 4) {
-    const alphaChannel = imageData.data[i];
+    const alphaChannel = data[i];
     if (alphaChannel > 0) {
       // Stop if colour found
       _isTransparent = false;
