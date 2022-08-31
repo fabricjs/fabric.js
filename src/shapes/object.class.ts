@@ -696,9 +696,9 @@ import { pick } from '../util/misc/pick';
         }
         return dims;
       }
-      var ar = width / height, limitedDims = cache.limitDimsByArea(ar),
-          x = capValue(min, limitedDims.x, max),
-          y = capValue(min, limitedDims.y, max);
+      var ar = width / height, [limX, limY] = cache.limitDimsByArea(ar),
+          x = capValue(min, limX, max),
+          y = capValue(min, limY, max);
       if (width > x) {
         dims.zoomX /= width / x;
         dims.width = x;

@@ -56,7 +56,7 @@ export class Cache {
     limitDimsByArea(ar: number) {
       const { perfLimitSizeTotal } = config;
       const roughWidth = Math.sqrt(perfLimitSizeTotal * ar);
-      return new Point(Math.floor(roughWidth), Math.floor(perfLimitSizeTotal / roughWidth));
+      return [Math.floor(roughWidth), Math.floor(perfLimitSizeTotal / roughWidth)];
     }
 
     /**
