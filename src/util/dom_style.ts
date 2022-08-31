@@ -20,5 +20,4 @@ export function setStyle(element, styles) {
       ([property, value]) => elementStyle.setProperty(property, value)
     );
   }
-
 }

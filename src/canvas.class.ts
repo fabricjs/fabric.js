@@ -1,4 +1,5 @@
 //@ts-nocheck
+import { divide } from 'lodash';
 import { Point } from './point.class';
 
 (function(global) {
@@ -1055,8 +1056,8 @@ import { Point } from './point.class';
         upperCanvasEl = this._createCanvasElement();
         this.upperCanvasEl = upperCanvasEl;
       }
-      fabric.util.addClass(upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
-      this.upperCanvasEl.setAttribute('data-fabric', 'top');
+      upperCanvasEl.classList.add('upper-canvas', lowerCanvasClass);
+      upperCanvasEl.setAttribute('data-fabric', 'top');
       this.wrapperEl.appendChild(upperCanvasEl);
 
       this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
@@ -1082,9 +1083,9 @@ import { Point } from './point.class';
       if (this.wrapperEl) {
         return;
       }
-      this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, 'div', {
-        'class': this.containerClass
-      });
+      var wrapper = fabric.document.createElement('div');
+      div.classList.add(this.containerClass);
+      this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, wrapper);
       this.wrapperEl.setAttribute('data-fabric', 'wrapper');
       fabric.util.setStyle(this.wrapperEl, {
         width: this.width + 'px',

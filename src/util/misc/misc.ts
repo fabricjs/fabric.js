@@ -80,7 +80,15 @@ import {
   addListener,
 } from '../dom_event';
 import { isTransparent } from './isTransparent';
-
+import {
+  wrapElement,
+  getScrollLeftTop,
+  getElementOffset,
+  getNodeCanvas,
+  cleanUpJsdomNode,
+  makeElementUnselectable,
+  makeElementSelectable,
+} from '../dom_misc';
   /**
    * @namespace fabric.util
    */
@@ -168,6 +176,13 @@ import { isTransparent } from './isTransparent';
     removeListener,
     addListener,
     isTransparent,
+    wrapElement,
+    getScrollLeftTop,
+    getElementOffset,
+    getNodeCanvas,
+    cleanUpJsdomNode,
+    makeElementUnselectable,
+    makeElementSelectable,
 
     /**
      * given a width and height, return the size of the bounding box
