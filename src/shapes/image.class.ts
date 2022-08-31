@@ -557,8 +557,9 @@
      * @param {Object} [options] Options object
      */
     _initElement: function(element, options) {
-      this.setElement(fabric.document.getElementById(element), options);
-      this.getElement().classList.add(fabric.Image.CSS_CANVAS);
+      this.setElement(fabric.document.getElementById(element) || element, options);
+      const newEl = this.getElement();
+      newEl && newEl.classList.add(fabric.Image.CSS_CANVAS);
     },
 
     /**

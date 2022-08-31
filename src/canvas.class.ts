@@ -1084,7 +1084,7 @@ import { Point } from './point.class';
         return;
       }
       var wrapper = fabric.document.createElement('div');
-      div.classList.add(this.containerClass);
+      wrapper.classList.add(this.containerClass);
       this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, wrapper);
       this.wrapperEl.setAttribute('data-fabric', 'wrapper');
       fabric.util.setStyle(this.wrapperEl, {

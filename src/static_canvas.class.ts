@@ -310,7 +310,7 @@ import { pick } from './util/misc/pick';
         this.lowerCanvasEl = canvasEl;
       }
       else {
-        this.lowerCanvasEl = fabric.document.getElementById(canvasEl) || this._createCanvasElement();
+        this.lowerCanvasEl = fabric.document.getElementById(canvasEl) || canvasEl || this._createCanvasElement();
       }
       if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
         /* _DEV_MODE_START_ */
