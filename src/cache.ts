@@ -1,4 +1,5 @@
 import { Point } from "./point.class";
+import { config } from './config';
 
 export class Cache {
     /**
@@ -50,10 +51,10 @@ export class Cache {
      * respect the total allowed area for the cache.
      * @memberOf fabric.util
      * @param {number} ar aspect ratio
-     * @param {Numnumberber} maximumArea Maximum area you want to achieve
      * @return {Point} Limited dimensions by X,Y
      */
-    static limitDimsByArea(ar: number, maximumArea: number) {
+    static limitDimsByArea(ar: number) {
+      const maximumArea = config.perfLimitSizeTotal;
       const roughWidth = Math.sqrt(maximumArea * ar)
       return new Point( Math.floor(roughWidth), Math.floor(maximumArea / roughWidth));
     }

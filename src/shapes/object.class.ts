@@ -685,8 +685,7 @@ import { pick } from '../util/misc/pick';
      * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
      */
     _limitCacheSize: function(dims) {
-      var perfLimitSizeTotal = config.perfLimitSizeTotal,
-          width = dims.width, height = dims.height,
+      var width = dims.width, height = dims.height,
           max = config.maxCacheSideLimit, min = config.minCacheSideLimit;
       if (width <= max && height <= max && width * height <= perfLimitSizeTotal) {
         if (width < min) {
@@ -697,7 +696,7 @@ import { pick } from '../util/misc/pick';
         }
         return dims;
       }
-      var ar = width / height, limitedDims = cache.limitDimsByArea(ar, perfLimitSizeTotal),
+      var ar = width / height, limitedDims = cache.limitDimsByArea(ar),
           x = capValue(min, limitedDims.x, max),
           y = capValue(min, limitedDims.y, max);
       if (width > x) {
