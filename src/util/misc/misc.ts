@@ -228,21 +228,6 @@ import {
     },
 
     /**
-     * Given current aspect ratio, determines the max width and height that can
-     * respect the total allowed area for the cache.
-     * @memberOf fabric.util
-     * @param {Number} ar aspect ratio
-     * @param {Number} maximumArea Maximum area you want to achieve
-     * @return {Object.x} Limited dimensions by X
-     * @return {Object.y} Limited dimensions by Y
-     */
-    limitDimsByArea: function(ar, maximumArea) {
-      var roughWidth = Math.sqrt(maximumArea * ar),
-          perfLimitSizeY = Math.floor(maximumArea / roughWidth);
-      return { x: Math.floor(roughWidth), y: perfLimitSizeY };
-    },
-
-    /**
      * given a width and height, return the size of the bounding box
      * that can contains the box with width/height with applied transform
      * described in options.

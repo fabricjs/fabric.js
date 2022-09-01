@@ -984,25 +984,6 @@
     assert.deepEqual(matrix, fabric.iMatrix, 'default is identity matrix');
   });
 
-  QUnit.test('fabric.util.limitDimsByArea', function(assert) {
-    assert.ok(typeof fabric.util.limitDimsByArea === 'function');
-    var dims = fabric.util.limitDimsByArea(1, 10000);
-    assert.equal(dims.x, 100);
-    assert.equal(dims.y, 100);
-  });
-
-  QUnit.test('fabric.util.limitDimsByArea ar > 1', function(assert) {
-    var dims = fabric.util.limitDimsByArea(3, 10000);
-    assert.equal(dims.x, 173);
-    assert.equal(dims.y, 57);
-  });
-
-  QUnit.test('fabric.util.limitDimsByArea ar < 1', function(assert) {
-    var dims = fabric.util.limitDimsByArea(1 / 3, 10000);
-    assert.equal(dims.x, 57);
-    assert.equal(dims.y, 173);
-  });
-
   QUnit.test('fabric.util.capValue ar < 1', function(assert) {
     assert.ok(typeof fabric.util.capValue === 'function');
     var val = fabric.util.capValue(3, 10, 70);
