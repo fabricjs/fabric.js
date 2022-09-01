@@ -297,8 +297,6 @@
     assert.equal(wrapper.tagName.toLowerCase(), 'div');
     assert.equal(wrapper.firstChild, el);
 
-
-
     var childEl = fabric.document.createElement('span');
     var parentEl = fabric.document.createElement('p');
 
