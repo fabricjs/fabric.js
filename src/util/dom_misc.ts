@@ -3,32 +3,6 @@
 
   var fabric = global.fabric, _slice = Array.prototype.slice;
 
-  var sliceCanConvertNodelists,
-      /**
-       * Converts an array-like object (e.g. arguments or NodeList) to an array
-       * @memberOf fabric.util
-       * @param {Object} arrayLike
-       * @return {Array}
-       */
-      toArray = function(arrayLike) {
-        return _slice.call(arrayLike, 0);
-      };
-
-  try {
-    sliceCanConvertNodelists = toArray(fabric.document.childNodes) instanceof Array;
-  }
-  catch (err) { }
-
-  if (!sliceCanConvertNodelists) {
-    toArray = function(arrayLike) {
-      var arr = new Array(arrayLike.length), i = arrayLike.length;
-      while (i--) {
-        arr[i] = arrayLike[i];
-      }
-      return arr;
-    };
-  }
-
   /**
    * Creates specified element with specified attributes
    * @memberOf fabric.util
@@ -278,7 +252,6 @@
    * @param {Boolean} value true or false
    */
   fabric.util.setImageSmoothing = setImageSmoothing;
-  fabric.util.toArray = toArray;
   fabric.util.addClass = addClass;
   fabric.util.makeElement = makeElement;
   fabric.util.wrapElement = wrapElement;

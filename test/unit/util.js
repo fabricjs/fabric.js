@@ -269,21 +269,6 @@
     // assert.ok(axisPoint instanceof YAxisPoint); <-- fails
   });
 
-  QUnit.test('fabric.util.toArray', function(assert) {
-    assert.ok(typeof fabric.util.toArray === 'function');
-
-    assert.deepEqual(['x', 'y'], fabric.util.toArray({ 0: 'x', 1: 'y', length: 2 }));
-    assert.deepEqual([1, 3], fabric.util.toArray((function(){ return arguments; })(1, 3)));
-
-    var nodelist = fabric.document.getElementsByTagName('div'),
-        converted = fabric.util.toArray(nodelist);
-
-    assert.ok(converted instanceof Array);
-    assert.equal(nodelist.length, converted.length);
-    assert.equal(nodelist[0], converted[0]);
-    assert.equal(nodelist[1], converted[1]);
-  });
-
   QUnit.test('fabric.util.makeElement', function(assert) {
     var makeElement = fabric.util.makeElement;
     assert.ok(typeof makeElement === 'function');
