@@ -3,16 +3,6 @@
 
   var fabric = global.fabric, _slice = Array.prototype.slice;
 
-  /**
-   * Takes id and returns an element with that id (if one exists in a document)
-   * @memberOf fabric.util
-   * @param {String|HTMLElement} id
-   * @return {HTMLElement|null}
-   */
-  function getById(id) {
-    return typeof id === 'string' ? fabric.document.getElementById(id) : id;
-  }
-
   var sliceCanConvertNodelists,
       /**
        * Converts an array-like object (e.g. arguments or NodeList) to an array
@@ -288,7 +278,6 @@
    * @param {Boolean} value true or false
    */
   fabric.util.setImageSmoothing = setImageSmoothing;
-  fabric.util.getById = getById;
   fabric.util.toArray = toArray;
   fabric.util.addClass = addClass;
   fabric.util.makeElement = makeElement;
