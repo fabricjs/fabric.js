@@ -9,13 +9,13 @@ on:
     branches: [ master ]
 
 jobs:
-  chrome-tests:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [16.x]
-        suite: [unit, visual]
         target: [chrome, firefox]
+        suite: [unit, visual]
     steps:
     - uses: actions/checkout@v2
     - name: Unit tests on Chrome
