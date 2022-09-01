@@ -92,6 +92,7 @@ import {
 import { isTransparent } from './isTransparent';
 import { mergeClipPaths } from './mergeClipPaths';
 import * as ease from '../anim_ease';
+import { animateColor } from '../animate_color';
 
 /**
  * @namespace fabric.util
@@ -190,4 +191,5 @@ fabric.util = {
   sizeAfterTransform,
   mergeClipPaths,
   ease,
+  animateColor,
 };

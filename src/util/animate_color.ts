@@ -1,22 +1,15 @@
 //@ts-nocheck
-
+import { fabric } from '../../HEADER';
 import { Color } from "../color";
 
-(function(global) {
-  var fabric = global.fabric;
-  // Calculate an in-between color. Returns a "rgba()" string.
-  // Credit: Edwin Martin <edwin@bitstorm.org>
-  //         http://www.bitstorm.org/jquery/color-animation/jquery.animate-colors.js
-  function calculateColor(begin, end, pos) {
-    var color = 'rgba('
-        + parseInt((begin[0] + pos * (end[0] - begin[0])), 10) + ','
-        + parseInt((begin[1] + pos * (end[1] - begin[1])), 10) + ','
-        + parseInt((begin[2] + pos * (end[2] - begin[2])), 10);
-
-    color += ',' + (begin && end ? parseFloat(begin[3] + pos * (end[3] - begin[3])) : 1);
-    color += ')';
-    return color;
-  }
+// Calculate an in-between color. Returns a "rgba()" string.
+// Credit: Edwin Martin <edwin@bitstorm.org>
+//         http://www.bitstorm.org/jquery/color-animation/jquery.animate-colors.js
+const calculateColor = (begin, end, pos) => {
+  const [r, g, b, _a] = begin.map((beg, index) => beg + pos * (end[index] - beg));
+  const a = begin && end ? parseFloat(_a) : 1;
+  return `rgba(${parseInt(r, 10)},${parseInt(g, 10)},${parseInt(b, 10)},${a})`;
+}
 
   /**
    * Changes the color from one to another within certain period of time, invoking callbacks as value is being changed.
@@ -31,49 +24,45 @@ import { Color } from "../color";
    * @param {Function} [options.abort] Additional function with logic. If returns true, onComplete is called.
    * @returns {Function} abort function
    */
-  function animateColor(fromColor, toColor, duration, options) {
-    var startColor = new Color(fromColor).getSource(),
+export function animateColor(fromColor, toColor, duration, options = {}) {
+  const startColor = new Color(fromColor).getSource(),
         endColor = new Color(toColor).getSource(),
         originalOnComplete = options.onComplete,
         originalOnChange = options.onChange;
-    options = options || {};
 
-    return fabric.util.animate(Object.assign(options, {
-      duration: duration || 500,
-      startValue: startColor,
-      endValue: endColor,
-      byValue: endColor,
-      easing: function (currentTime, startValue, byValue, duration) {
-        var posValue = options.colorEasing
-          ? options.colorEasing(currentTime, duration)
-          : 1 - Math.cos(currentTime / duration * (Math.PI / 2));
-        return calculateColor(startValue, byValue, posValue);
-      },
-      // has to take in account for color restoring;
-      onComplete: function(current, valuePerc, timePerc) {
-        if (originalOnComplete) {
-          return originalOnComplete(
-            calculateColor(endColor, endColor, 0),
+  return fabric.util.animate(Object.assign(options, {
+    duration: duration || 500,
+    startValue: startColor,
+    endValue: endColor,
+    byValue: endColor,
+    easing: function (currentTime, startValue, byValue, duration) {
+      const posValue = options.colorEasing
+        ? options.colorEasing(currentTime, duration)
+        : 1 - Math.cos(currentTime / duration * (Math.PI / 2));
+      return calculateColor(startValue, byValue, posValue);
+    },
+    // has to take in account for color restoring;
+    onComplete: function(current, valuePerc, timePerc) {
+      if (originalOnComplete) {
+        return originalOnComplete(
+          calculateColor(endColor, endColor, 0),
+          valuePerc,
+          timePerc
+        );
+      }
+    },
+    onChange: function(current, valuePerc, timePerc) {
+      if (originalOnChange) {
+        if (Array.isArray(current)) {
+          return originalOnChange(
+            calculateColor(current, current, 0),
             valuePerc,
             timePerc
           );
         }
-      },
-      onChange: function(current, valuePerc, timePerc) {
-        if (originalOnChange) {
-          if (Array.isArray(current)) {
-            return originalOnChange(
-              calculateColor(current, current, 0),
-              valuePerc,
-              timePerc
-            );
-          }
-          originalOnChange(current, valuePerc, timePerc);
-        }
+        originalOnChange(current, valuePerc, timePerc);
       }
-    }));
-  }
+    }
+  }));
+}
 
-  fabric.util.animateColor = animateColor;
-
-})(typeof exports !== 'undefined' ? exports : window);

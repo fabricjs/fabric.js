@@ -7,7 +7,6 @@ import './src/util/misc/misc';
 // import './src/util/named_accessors.mixin'; i would imagine dead forever or proper setters/getters
 import './src/util/lang_class';
 import './src/util/animate'; // optional animation
-import './src/util/animate_color'; // optional animation
 import './src/parser'; // optional parser
 import './src/point.class';
 import './src/intersection.class';
