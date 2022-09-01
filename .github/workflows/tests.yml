@@ -1,5 +1,5 @@
 
-name: Unit Testing
+name: Tests
 
 on:
   push:
@@ -9,6 +9,7 @@ on:
 
 jobs:
   browser:
+    name: ${{ matrix.suite }} ${{ matrix.target }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -30,13 +31,14 @@ jobs:
         run: npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
   node:
     runs-on: ubuntu-latest
+    name: ${{ matrix.suite }} ${{ matrix.node-version }}
     strategy:
       fail-fast: false
       matrix:
-        # For more information see: 
+        # For more information see:
         # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
         # supported Node.js release schedule: https://nodejs.org/en/about/releases/
-        node-version: [16.x] 
+        node-version: [16.x]
         suite: [unit, visual]
     steps:
     - uses: actions/checkout@v2
@@ -50,4 +52,4 @@ jobs:
     - name: Build
       run: npm run build -- -f
     - name: Run ${{ matrix.suite }} tests
-      run: npm run test -- -c node -s ${{ matrix.suite }} 
+      run: npm run test -- -c node -s ${{ matrix.suite }}
