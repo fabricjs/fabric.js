@@ -117,4 +117,4 @@ export const sizeAfterTransform = (width: number, height: number, options: TScal
      transformMatrix = calcDimensionsMatrix(options),
      bbox = makeBoundingBoxFromPoints(points, transformMatrix);
  return new Point(bbox.width, bbox.height);
-},
+};
