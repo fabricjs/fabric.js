@@ -558,7 +558,8 @@
      */
     _initElement: function(element, options) {
       this.setElement( fabric.document.getElementById(element) || element, options);
-      fabric.util.addClass(this.getElement(), fabric.Image.CSS_CANVAS);
+      const newEl = this.getElement()
+      newEl.classList.add(fabric.Image.CSS_CANVAS);
     },
 
     /**
