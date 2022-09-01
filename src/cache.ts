@@ -1,4 +1,3 @@
-import { Point } from "./point.class";
 import { config } from './config';
 
 export class Cache {
