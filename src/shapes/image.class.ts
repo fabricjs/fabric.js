@@ -478,7 +478,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _render: function(ctx) {
-      fabric.util.setImageSmoothing(ctx, this.imageSmoothing);
+      ctx.imageSmoothingEnabled = this.imageSmoothing;
       if (this.isMoving !== true && this.resizeFilter && this._needsResize()) {
         this.applyResizeFilters();
       }
@@ -492,7 +492,7 @@
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     drawCacheOnCanvas: function(ctx) {
-      fabric.util.setImageSmoothing(ctx, this.imageSmoothing);
+      ctx.imageSmoothingEnabled = this.imageSmoothing;
       fabric.Object.prototype.drawCacheOnCanvas.call(this, ctx);
     },
 

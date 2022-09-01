@@ -752,7 +752,7 @@ import { pick } from './util/misc/pick';
       this.cancelRequestedRender();
       this.calcViewportBoundaries();
       this.clearContext(ctx);
-      fabric.util.setImageSmoothing(ctx, this.imageSmoothingEnabled);
+      ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
       ctx.patternQuality = 'best';
       this.fire('before:render', { ctx: ctx, });
       this._renderBackground(ctx);

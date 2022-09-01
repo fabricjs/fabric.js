@@ -269,24 +269,6 @@
     // assert.ok(axisPoint instanceof YAxisPoint); <-- fails
   });
 
-  QUnit.test('fabric.util.makeElement', function(assert) {
-    var makeElement = fabric.util.makeElement;
-    assert.ok(typeof makeElement === 'function');
-
-    var el = makeElement('div');
-
-    assert.equal(el.tagName.toLowerCase(), 'div');
-    assert.equal(el.nodeType, 1);
-
-    el = makeElement('p', { 'class': 'blah', 'for': 'boo_hoo', 'some_random-attribute': 'woot' });
-
-    assert.equal(el.tagName.toLowerCase(), 'p');
-    assert.equal(el.nodeType, 1);
-    assert.equal(el.className, 'blah');
-    assert.equal(el.htmlFor, 'boo_hoo');
-    assert.equal(el.getAttribute('some_random-attribute'), 'woot');
-  });
-
   QUnit.test('fabric.util.wrapElement', function(assert) {
     var wrapElement = fabric.util.wrapElement;
     assert.ok(typeof wrapElement === 'function');

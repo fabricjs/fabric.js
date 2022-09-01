@@ -199,21 +199,6 @@
     }
   }
 
-  function setImageSmoothing(ctx, value) {
-    ctx.imageSmoothingEnabled = ctx.imageSmoothingEnabled || ctx.webkitImageSmoothingEnabled
-      || ctx.mozImageSmoothingEnabled || ctx.msImageSmoothingEnabled || ctx.oImageSmoothingEnabled;
-    ctx.imageSmoothingEnabled = value;
-  }
-
-  /**
-   * setImageSmoothing sets the context imageSmoothingEnabled property.
-   * Used by canvas and by ImageObject.
-   * @memberOf fabric.util
-   * @since 4.0.0
-   * @param {HTMLRenderingContext2D} ctx to set on
-   * @param {Boolean} value true or false
-   */
-  fabric.util.setImageSmoothing = setImageSmoothing;
   fabric.util.wrapElement = wrapElement;
   fabric.util.getScrollLeftTop = getScrollLeftTop;
   fabric.util.getElementOffset = getElementOffset;
