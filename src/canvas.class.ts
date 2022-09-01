@@ -1046,16 +1046,18 @@ import { Point } from './point.class';
     _createUpperCanvas: function () {
       var lowerCanvasEl = this.lowerCanvasEl, upperCanvasEl = this.upperCanvasEl;
 
-      // there is no need to create a new upperCanvas element if we have already one.
-      if (upperCanvasEl) {
-        upperCanvasEl.className = '';
-      }
-      else {
+      // if there is no upperCanvas (most common case) we create one.
+      if (!upperCanvasEl) {
         upperCanvasEl = this._createCanvasElement();
         this.upperCanvasEl = upperCanvasEl;
       }
-      upperCanvasEl.classList.add('upper-canvas', lowerCanvasEl.className);
-      this.upperCanvasEl.setAttribute('data-fabric', 'top');
+      // we assign the same classname of the lowerCanvas
+      upperCanvasEl.className = lowerCanvasEl.className;
+      // then we remove the lower-canvas className
+      upperCanvasEl.classList.remove('lower-canvas');
+      // we add the specific upper-canvas class
+      upperCanvasEl.classList.add('upper-canvas');
+      upperCanvasEl.setAttribute('data-fabric', 'top');
       this.wrapperEl.appendChild(upperCanvasEl);
 
       this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
