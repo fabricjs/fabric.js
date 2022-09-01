@@ -15,6 +15,7 @@ jobs:
         node-version: [16.x]
         target: [chrome, firefox]
         suite: [unit, visual]
+      fail-fast: false
     steps:
     - uses: actions/checkout@v2
     - name: Unit tests on Chrome
