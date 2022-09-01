@@ -1,4 +1,3 @@
-# This workflow will do a clean install of node dependencies, build the library, run testem for chrome
 
 name: Browser Unit Tests
 
@@ -24,7 +23,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm run build -- -f
-    - name: Run headless test
+    - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: npm run test -- -s ${{ matrix.suite }} -c ${{ matrix.target }}
+        run: npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
