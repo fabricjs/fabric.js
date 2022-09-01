@@ -269,18 +269,6 @@
     // assert.ok(axisPoint instanceof YAxisPoint); <-- fails
   });
 
-  QUnit.test('fabric.util.getById', function(assert) {
-    assert.ok(typeof fabric.util.getById === 'function');
-
-    var el = fabric.document.createElement('div');
-    el.id = 'foobarbaz';
-    fabric.document.body.appendChild(el);
-
-    assert.equal(el, fabric.util.getById(el));
-    assert.equal(el, fabric.util.getById('foobarbaz'));
-    assert.equal(null, fabric.util.getById('likely-non-existent-id'));
-  });
-
   QUnit.test('fabric.util.toArray', function(assert) {
     assert.ok(typeof fabric.util.toArray === 'function');
 
