@@ -13,15 +13,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16.x] # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [16.x]
         suite: [unit, visual]
         target: [chrome, firefox]
     steps:
     - uses: actions/checkout@v2
     - name: Unit tests on Chrome
       uses: actions/setup-node@v1
-      # with:
-      #   node-version: ${{ matrix.node-version }}
+      with:
+        node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm run build -- -f
     - name: Run headless test
