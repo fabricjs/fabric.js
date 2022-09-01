@@ -1,3 +1,4 @@
+name: ''
 on:
   push:
     branches: [ master ]
