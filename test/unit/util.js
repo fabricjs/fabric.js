@@ -287,6 +287,24 @@
     assert.equal(el.getAttribute('some_random-attribute'), 'woot');
   });
 
+  QUnit.test('fabric.util.addClass', function(assert) {
+    var addClass = fabric.util.addClass;
+    assert.ok(typeof addClass === 'function');
+
+    var el = fabric.document.createElement('div');
+    addClass(el, 'foo');
+    assert.equal(el.className, 'foo');
+
+    addClass(el, 'bar');
+    assert.equal(el.className, 'foo bar');
+
+    addClass(el, 'baz qux');
+    assert.equal(el.className, 'foo bar baz qux');
+
+    addClass(el, 'foo');
+    assert.equal(el.className, 'foo bar baz qux');
+  });
+
   QUnit.test('fabric.util.wrapElement', function(assert) {
     var wrapElement = fabric.util.wrapElement;
     assert.ok(typeof wrapElement === 'function');
