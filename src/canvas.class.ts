@@ -1055,7 +1055,7 @@ import { Point } from './point.class';
         upperCanvasEl = this._createCanvasElement();
         this.upperCanvasEl = upperCanvasEl;
       }
-      upperCanvasEl.classList.add('upper-canvas', lowerCanvasClass);
+      upperCanvasEl.classList.add('upper-canvas ' + lowerCanvasClass);
       this.upperCanvasEl.setAttribute('data-fabric', 'top');
       this.wrapperEl.appendChild(upperCanvasEl);
 
