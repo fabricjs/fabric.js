@@ -1,78 +1,72 @@
 //@ts-nocheck
-(function(global) {
-
-  var fabric = global.fabric;
-
-  /**
-   * Wraps element with another element
-   * @memberOf fabric.util
-   * @param {HTMLElement} element Element to wrap
-   * @param {HTMLElement|String} wrapper Element to wrap with
-   * @param {Object} [attributes] Attributes to set on a wrapper
-   * @return {HTMLElement} wrapper
-   */
-  function wrapElement(element, wrapper) {
-    if (element.parentNode) {
-      element.parentNode.replaceChild(wrapper, element);
-    }
-    wrapper.appendChild(element);
-    return wrapper;
+/**
+ * Wraps element with another element
+ * @memberOf fabric.util
+ * @param {HTMLElement} element Element to wrap
+ * @param {HTMLElement|String} wrapper Element to wrap with
+ * @param {Object} [attributes] Attributes to set on a wrapper
+ * @return {HTMLElement} wrapper
+ */
+export function wrapElement(element, wrapper) {
+  if (element.parentNode) {
+    element.parentNode.replaceChild(wrapper, element);
   }
+  wrapper.appendChild(element);
+  return wrapper;
+}
 
-  /**
-   * Returns element scroll offsets
-   * @memberOf fabric.util
-   * @param {HTMLElement} element Element to operate on
-   * @return {Object} Object with left/top values
-   */
-  function getScrollLeftTop(element) {
+/**
+ * Returns element scroll offsets
+ * @memberOf fabric.util
+ * @param {HTMLElement} element Element to operate on
+ * @return {Object} Object with left/top values
+ */
+export function getScrollLeftTop(element) {
 
-    var left = 0,
-        top = 0,
-        docElement = fabric.document.documentElement,
+  let left = 0,
+      top = 0;
+
+  const docElement = fabric.document.documentElement,
         body = fabric.document.body || {
           scrollLeft: 0, scrollTop: 0
         };
+  // While loop checks (and then sets element to) .parentNode OR .host
+  //  to account for ShadowDOM. We still want to traverse up out of ShadowDOM,
+  //  but the .parentNode of a root ShadowDOM node will always be null, instead
+  //  it should be accessed through .host. See http://stackoverflow.com/a/24765528/4383938
+  while (element && (element.parentNode || element.host)) {
 
-    // While loop checks (and then sets element to) .parentNode OR .host
-    //  to account for ShadowDOM. We still want to traverse up out of ShadowDOM,
-    //  but the .parentNode of a root ShadowDOM node will always be null, instead
-    //  it should be accessed through .host. See http://stackoverflow.com/a/24765528/4383938
-    while (element && (element.parentNode || element.host)) {
+    // Set element to element parent, or 'host' in case of ShadowDOM
+    element = element.parentNode || element.host;
 
-      // Set element to element parent, or 'host' in case of ShadowDOM
-      element = element.parentNode || element.host;
-
-      if (element === fabric.document) {
-        left = body.scrollLeft || docElement.scrollLeft || 0;
-        top = body.scrollTop ||  docElement.scrollTop || 0;
-      }
-      else {
-        left += element.scrollLeft || 0;
-        top += element.scrollTop || 0;
-      }
-
-      if (element.nodeType === 1 && element.style.position === 'fixed') {
-        break;
-      }
+    if (element === fabric.document) {
+      left = body.scrollLeft || docElement.scrollLeft || 0;
+      top = body.scrollTop ||  docElement.scrollTop || 0;
+    }
+    else {
+      left += element.scrollLeft || 0;
+      top += element.scrollTop || 0;
     }
 
-    return { left: left, top: top };
+    if (element.nodeType === 1 && element.style.position === 'fixed') {
+      break;
+    }
   }
 
-  /**
-   * Returns offset for a given element
-   * @function
-   * @memberOf fabric.util
-   * @param {HTMLElement} element Element to get offset for
-   * @return {Object} Object with "left" and "top" properties
-   */
-  function getElementOffset(element) {
-    var docElem,
-        doc = element && element.ownerDocument,
-        box = { left: 0, top: 0 },
+  return { left, top };
+}
+
+/**
+ * Returns offset for a given element
+ * @function
+ * @memberOf fabric.util
+ * @param {HTMLElement} element Element to get offset for
+ * @return {Object} Object with "left" and "top" properties
+ */
+export function getElementOffset(element) {
+  let box = { left: 0, top: 0 };
+  const doc = element && element.ownerDocument,
         offset = { left: 0, top: 0 },
-        scrollLeftTop,
         offsetAttributes = {
           borderLeftWidth: 'left',
           borderTopWidth:  'top',
@@ -80,129 +74,71 @@
           paddingTop:      'top'
         };
 
-    if (!doc) {
-      return offset;
-    }
-
-    for (var attr in offsetAttributes) {
-      offset[offsetAttributes[attr]] += parseInt(getElementStyle(element, attr), 10) || 0;
-    }
-
-    docElem = doc.documentElement;
-    if ( typeof element.getBoundingClientRect !== 'undefined' ) {
-      box = element.getBoundingClientRect();
-    }
-
-    scrollLeftTop = getScrollLeftTop(element);
-
-    return {
-      left: box.left + scrollLeftTop.left - (docElem.clientLeft || 0) + offset.left,
-      top: box.top + scrollLeftTop.top - (docElem.clientTop || 0)  + offset.top
-    };
+  if (!doc) {
+    return offset;
+  }
+  const elemStyle = fabric.document.defaultView.getComputedStyle(element, null)
+  for (const attr in offsetAttributes) {
+    offset[offsetAttributes[attr]] += parseInt(elemStyle[attr], 10) || 0;
   }
 
-  /**
-   * Returns style attribute value of a given element
-   * @memberOf fabric.util
-   * @param {HTMLElement} element Element to get style attribute for
-   * @param {String} attr Style attribute to get for element
-   * @return {String} Style attribute value of the given element.
-   */
-  var getElementStyle;
-  if (fabric.document.defaultView && fabric.document.defaultView.getComputedStyle) {
-    getElementStyle = function(element, attr) {
-      var style = fabric.document.defaultView.getComputedStyle(element, null);
-      return style ? style[attr] : undefined;
-    };
-  }
-  else {
-    getElementStyle = function(element, attr) {
-      var value = element.style[attr];
-      if (!value && element.currentStyle) {
-        value = element.currentStyle[attr];
-      }
-      return value;
-    };
+  const docElem = doc.documentElement;
+  if ( typeof element.getBoundingClientRect !== 'undefined' ) {
+    box = element.getBoundingClientRect();
   }
 
-  (function () {
-    var style = fabric.document.documentElement.style,
-        selectProp = 'userSelect' in style
-          ? 'userSelect'
-          : 'MozUserSelect' in style
-            ? 'MozUserSelect'
-            : 'WebkitUserSelect' in style
-              ? 'WebkitUserSelect'
-              : 'KhtmlUserSelect' in style
-                ? 'KhtmlUserSelect'
-                : '';
+  const scrollLeftTop = getScrollLeftTop(element);
 
-    /**
-     * Makes element unselectable
-     * @memberOf fabric.util
-     * @param {HTMLElement} element Element to make unselectable
-     * @return {HTMLElement} Element that was passed in
-     */
-    function makeElementUnselectable(element) {
-      if (typeof element.onselectstart !== 'undefined') {
-        element.onselectstart = () => false;
-      }
-      if (selectProp) {
-        element.style[selectProp] = 'none';
-      }
-      else if (typeof element.unselectable === 'string') {
-        element.unselectable = 'on';
-      }
-      return element;
-    }
-
-    /**
-     * Makes element selectable
-     * @memberOf fabric.util
-     * @param {HTMLElement} element Element to make selectable
-     * @return {HTMLElement} Element that was passed in
-     */
-    function makeElementSelectable(element) {
-      if (typeof element.onselectstart !== 'undefined') {
-        element.onselectstart = null;
-      }
-      if (selectProp) {
-        element.style[selectProp] = '';
-      }
-      else if (typeof element.unselectable === 'string') {
-        element.unselectable = '';
-      }
-      return element;
-    }
-
-    fabric.util.makeElementUnselectable = makeElementUnselectable;
-    fabric.util.makeElementSelectable = makeElementSelectable;
-  })(typeof exports !== 'undefined' ? exports : window);
-
-  function getNodeCanvas(element) {
-    var impl = fabric.jsdomImplForWrapper(element);
-    return impl._canvas || impl._image;
+  return {
+    left: box.left + scrollLeftTop.left - (docElem.clientLeft || 0) + offset.left,
+    top: box.top + scrollLeftTop.top - (docElem.clientTop || 0)  + offset.top
   };
+}
 
-  function cleanUpJsdomNode(element) {
-    if (!fabric.isLikelyNode) {
-      return;
-    }
-    var impl = fabric.jsdomImplForWrapper(element);
-    if (impl) {
-      impl._image = null;
-      impl._canvas = null;
-      // unsure if necessary
-      impl._currentSrc = null;
-      impl._attributes = null;
-      impl._classList = null;
-    }
+/**
+ * Makes element unselectable
+ * @memberOf fabric.util
+ * @param {HTMLElement} element Element to make unselectable
+ * @return {HTMLElement} Element that was passed in
+ */
+export function makeElementUnselectable(element) {
+  if (typeof element.onselectstart !== 'undefined') {
+    element.onselectstart = () => false;
   }
+  element.style.userSelect = 'none';
+  return element;
+}
 
-  fabric.util.wrapElement = wrapElement;
-  fabric.util.getScrollLeftTop = getScrollLeftTop;
-  fabric.util.getElementOffset = getElementOffset;
-  fabric.util.getNodeCanvas = getNodeCanvas;
-  fabric.util.cleanUpJsdomNode = cleanUpJsdomNode;
+/**
+ * Makes element selectable
+ * @memberOf fabric.util
+ * @param {HTMLElement} element Element to make selectable
+ * @return {HTMLElement} Element that was passed in
+ */
+export function makeElementSelectable(element) {
+  if (typeof element.onselectstart !== 'undefined') {
+    element.onselectstart = null;
+  }
+  element.style.userSelect = '';
+  return element;
+}
 
-})(typeof exports !== 'undefined' ? exports : window);
+export function getNodeCanvas(element) {
+  const impl = fabric.jsdomImplForWrapper(element);
+  return impl._canvas || impl._image;
+};
+
+export function cleanUpJsdomNode(element) {
+  if (!fabric.isLikelyNode) {
+    return;
+  }
+  const impl = fabric.jsdomImplForWrapper(element);
+  if (impl) {
+    impl._image = null;
+    impl._canvas = null;
+    // unsure if necessary
+    impl._currentSrc = null;
+    impl._attributes = null;
+    impl._classList = null;
+  }
+}

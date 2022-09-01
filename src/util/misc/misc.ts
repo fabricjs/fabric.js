@@ -79,7 +79,15 @@ import {
   removeListener,
   addListener,
 } from '../dom_event';
-
+import {
+  wrapElement,
+  getScrollLeftTop,
+  getElementOffset,
+  getNodeCanvas,
+  cleanUpJsdomNode,
+  makeElementUnselectable,
+  makeElementSelectable,
+} from '../dom_misc';
   /**
    * @namespace fabric.util
    */
@@ -166,6 +174,13 @@ import {
     getPointer,
     removeListener,
     addListener,
+    wrapElement,
+    getScrollLeftTop,
+    getElementOffset,
+    getNodeCanvas,
+    cleanUpJsdomNode,
+    makeElementUnselectable,
+    makeElementSelectable,
 
     /**
      * Returns true if context has transparent pixel
