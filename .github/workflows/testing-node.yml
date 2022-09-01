@@ -19,7 +19,7 @@ jobs:
         suites: [unit, visual]
     steps:
     - uses: actions/checkout@v2
-    - name: Install `node-canvas`
+    - name: Install node-canvas
     - run: sudo apt-get install libgif-dev libpng-dev libpango1.0-dev libjpeg8-dev librsvg2-dev libcairo2-dev
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
