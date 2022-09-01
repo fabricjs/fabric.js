@@ -31,7 +31,7 @@ jobs:
         run: npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
   node:
     runs-on: ubuntu-latest
-    name: ${{ matrix.suite }} ${{ matrix.node-version }}
+    name: ${{ matrix.suite }} Node ${{ matrix.node-version }}
     strategy:
       fail-fast: false
       matrix:
