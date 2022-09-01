@@ -36,6 +36,7 @@ import {
   addTransformToObject,
   applyTransformToObject,
   removeTransformFromObject,
+  sizeAfterTransform,
 } from './objectTransforms';
 import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
 import {
@@ -89,7 +90,7 @@ import {
   makeElementSelectable,
 } from '../dom_misc';
 import { isTransparent } from './isTransparent';
-
+import { mergeClipPaths } from './mergeClipPaths';
   /**
    * @namespace fabric.util
    */
@@ -184,86 +185,6 @@ import { isTransparent } from './isTransparent';
     makeElementUnselectable,
     makeElementSelectable,
     isTransparent,
-
-    /**
-     * given a width and height, return the size of the bounding box
-     * that can contains the box with width/height with applied transform
-     * described in options.
-     * Use to calculate the boxes around objects for controls.
-     * @memberOf fabric.util
-     * @param {Number} width
-     * @param {Number} height
-     * @param {Object} options
-     * @param {Number} options.scaleX
-     * @param {Number} options.scaleY
-     * @param {Number} options.skewX
-     * @param {Number} options.skewY
-     * @returns {Point} size
-     */
-    sizeAfterTransform: function(width, height, options) {
-      var dimX = width / 2, dimY = height / 2,
-          points = [
-            {
-              x: -dimX,
-              y: -dimY
-            },
-            {
-              x: dimX,
-              y: -dimY
-            },
-            {
-              x: -dimX,
-              y: dimY
-            },
-            {
-              x: dimX,
-              y: dimY
-            }],
-          transformMatrix = fabric.util.calcDimensionsMatrix(options),
-          bbox = fabric.util.makeBoundingBoxFromPoints(points, transformMatrix);
-      return new Point(bbox.width, bbox.height);
-    },
-
-    /**
-     * Merges 2 clip paths into one visually equal clip path
-     *
-     * **IMPORTANT**:\
-     * Does **NOT** clone the arguments, clone them proir if necessary.
-     *
-     * Creates a wrapper (group) that contains one clip path and is clipped by the other so content is kept where both overlap.
-     * Use this method if both the clip paths may have nested clip paths of their own, so assigning one to the other's clip path property is not possible.
-     *
-     * In order to handle the `inverted` property we follow logic described in the following cases:\
-     * **(1)** both clip paths are inverted - the clip paths pass the inverted prop to the wrapper and loose it themselves.\
-     * **(2)** one is inverted and the other isn't - the wrapper shouldn't become inverted and the inverted clip path must clip the non inverted one to produce an identical visual effect.\
-     * **(3)** both clip paths are not inverted - wrapper and clip paths remain unchanged.
-     *
-     * @memberOf fabric.util
-     * @param {fabric.Object} c1
-     * @param {fabric.Object} c2
-     * @returns {fabric.Object} merged clip path
-     */
-    mergeClipPaths: function (c1, c2) {
-      var a = c1, b = c2;
-      if (a.inverted && !b.inverted) {
-        //  case (2)
-        a = c2;
-        b = c1;
-      }
-      //  `b` becomes `a`'s clip path so we transform `b` to `a` coordinate plane
-      fabric.util.applyTransformToObject(
-        b,
-        fabric.util.multiplyTransformMatrices(
-          fabric.util.invertTransform(a.calcTransformMatrix()),
-          b.calcTransformMatrix()
-        )
-      );
-      //  assign the `inverted` prop to the wrapping group
-      var inverted = a.inverted && b.inverted;
-      if (inverted) {
-        //  case (1)
-        a.inverted = b.inverted = false;
-      }
-      return new fabric.Group([a], { clipPath: b, inverted: inverted });
-    },
+    sizeAfterTransform,
+    mergeClipPaths,
   };
