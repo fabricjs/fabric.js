@@ -269,69 +269,6 @@
     // assert.ok(axisPoint instanceof YAxisPoint); <-- fails
   });
 
-  QUnit.test('fabric.util.getById', function(assert) {
-    assert.ok(typeof fabric.util.getById === 'function');
-
-    var el = fabric.document.createElement('div');
-    el.id = 'foobarbaz';
-    fabric.document.body.appendChild(el);
-
-    assert.equal(el, fabric.util.getById(el));
-    assert.equal(el, fabric.util.getById('foobarbaz'));
-    assert.equal(null, fabric.util.getById('likely-non-existent-id'));
-  });
-
-  QUnit.test('fabric.util.toArray', function(assert) {
-    assert.ok(typeof fabric.util.toArray === 'function');
-
-    assert.deepEqual(['x', 'y'], fabric.util.toArray({ 0: 'x', 1: 'y', length: 2 }));
-    assert.deepEqual([1, 3], fabric.util.toArray((function(){ return arguments; })(1, 3)));
-
-    var nodelist = fabric.document.getElementsByTagName('div'),
-        converted = fabric.util.toArray(nodelist);
-
-    assert.ok(converted instanceof Array);
-    assert.equal(nodelist.length, converted.length);
-    assert.equal(nodelist[0], converted[0]);
-    assert.equal(nodelist[1], converted[1]);
-  });
-
-  QUnit.test('fabric.util.makeElement', function(assert) {
-    var makeElement = fabric.util.makeElement;
-    assert.ok(typeof makeElement === 'function');
-
-    var el = makeElement('div');
-
-    assert.equal(el.tagName.toLowerCase(), 'div');
-    assert.equal(el.nodeType, 1);
-
-    el = makeElement('p', { 'class': 'blah', 'for': 'boo_hoo', 'some_random-attribute': 'woot' });
-
-    assert.equal(el.tagName.toLowerCase(), 'p');
-    assert.equal(el.nodeType, 1);
-    assert.equal(el.className, 'blah');
-    assert.equal(el.htmlFor, 'boo_hoo');
-    assert.equal(el.getAttribute('some_random-attribute'), 'woot');
-  });
-
-  QUnit.test('fabric.util.addClass', function(assert) {
-    var addClass = fabric.util.addClass;
-    assert.ok(typeof addClass === 'function');
-
-    var el = fabric.document.createElement('div');
-    addClass(el, 'foo');
-    assert.equal(el.className, 'foo');
-
-    addClass(el, 'bar');
-    assert.equal(el.className, 'foo bar');
-
-    addClass(el, 'baz qux');
-    assert.equal(el.className, 'foo bar baz qux');
-
-    addClass(el, 'foo');
-    assert.equal(el.className, 'foo bar baz qux');
-  });
-
   QUnit.test('fabric.util.wrapElement', function(assert) {
     var wrapElement = fabric.util.wrapElement;
     assert.ok(typeof wrapElement === 'function');
@@ -343,11 +280,10 @@
     assert.equal(wrapper.firstChild, el);
 
     el = fabric.document.createElement('p');
-    wrapper = wrapElement(el, 'div', { 'class': 'foo' });
+    wrapper = wrapElement(el, 'div');
 
     assert.equal(wrapper.tagName.toLowerCase(), 'div');
     assert.equal(wrapper.firstChild, el);
-    assert.equal(wrapper.className, 'foo');
 
     var childEl = fabric.document.createElement('span');
     var parentEl = fabric.document.createElement('p');
@@ -374,12 +310,6 @@
     if (typeof el.onselectstart !== 'undefined') {
       assert.equal(el.onselectstart.toString(), (() => false).toString());
     }
-
-    // not sure if it's a good idea to test implementation details here
-    // functional test would probably make more sense
-    if (typeof el.unselectable === 'string') {
-      assert.equal('on', el.unselectable);
-    }
     else if (typeof el.userSelect !== 'undefined') {
       assert.equal('none', el.userSelect);
     }
@@ -399,9 +329,6 @@
 
     if (typeof el.onselectstart !== 'undefined') {
       assert.equal(el.onselectstart, null);
-    }
-    if (typeof el.unselectable === 'string') {
-      assert.equal('', el.unselectable);
     }
     else if (typeof el.userSelect !== 'undefined') {
       assert.equal('', el.userSelect);
