@@ -16,6 +16,12 @@ export function wrapElement(element, wrapper) {
   return wrapper;
 }
 
+export function addClass(element, className) {
+  if (element && (' ' + element.className + ' ').indexOf(' ' + className + ' ') === -1) {
+    element.className += (element.className ? ' ' : '') + className;
+  }
+}
+
 /**
  * Returns element scroll offsets
  * @memberOf fabric.util

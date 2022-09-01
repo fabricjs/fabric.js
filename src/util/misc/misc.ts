@@ -88,6 +88,7 @@ import {
   cleanUpJsdomNode,
   makeElementUnselectable,
   makeElementSelectable,
+  addClass,
 } from '../dom_misc';
 import { createClass } from '../lang_class';
   /**
@@ -185,7 +186,7 @@ import { createClass } from '../lang_class';
     makeElementUnselectable,
     makeElementSelectable,
     createClass,
-
+    addClass,
     /**
      * given a width and height, return the size of the bounding box
      * that can contains the box with width/height with applied transform
