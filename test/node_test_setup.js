@@ -3,6 +3,15 @@ var chalk = require('chalk');
 var diff = require('deep-object-diff').diff;
 var commander = require('commander');
 
+// TODO remove when node 14 fades out
+// node 14 test polyfill
+if (Number(process.versions.node.split('.')[0]) < 16 || true) {
+  // polyfill AbortController for node 14
+  // remove this dependency when node 14 fades out
+  require("abort-controller/polyfill");
+}
+
+
 commander.program
   .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
   .option('-r, --recreate', 'recreate visual refs (golden images)', false)
