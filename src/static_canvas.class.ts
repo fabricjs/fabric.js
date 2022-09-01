@@ -317,7 +317,7 @@ import { pick } from './util/misc/pick';
         throw new Error('fabric.js: trying to initialize a canvas that has already been initialized');
         /* _DEV_MODE_END_ */
       }
-      fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
+      this.lowerCanvasEl.classList.add('lower-canvas');
       this.lowerCanvasEl.setAttribute('data-fabric', 'main');
       if (this.interactive) {
         this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;

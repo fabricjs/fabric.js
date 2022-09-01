@@ -1044,8 +1044,7 @@ import { Point } from './point.class';
      * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
      */
     _createUpperCanvas: function () {
-      var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, ''),
-          lowerCanvasEl = this.lowerCanvasEl, upperCanvasEl = this.upperCanvasEl;
+      var lowerCanvasEl = this.lowerCanvasEl, upperCanvasEl = this.upperCanvasEl;
 
       // there is no need to create a new upperCanvas element if we have already one.
       if (upperCanvasEl) {
@@ -1055,7 +1054,7 @@ import { Point } from './point.class';
         upperCanvasEl = this._createCanvasElement();
         this.upperCanvasEl = upperCanvasEl;
       }
-      fabric.util.addClass(upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
+      upperCanvasEl.classList.add('upper-canvas', lowerCanvasEl.className);
       this.upperCanvasEl.setAttribute('data-fabric', 'top');
       this.wrapperEl.appendChild(upperCanvasEl);
 

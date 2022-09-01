@@ -163,6 +163,7 @@
       this._element = element;
       this._originalElement = element;
       this._initConfig(options);
+      element.classList.add(fabric.Image.CSS_CANVAS);
       if (this.filters.length !== 0) {
         this.applyFilters();
       }
@@ -557,8 +558,7 @@
      * @param {Object} [options] Options object
      */
     _initElement: function(element, options) {
-      this.setElement( fabric.document.getElementById(element) || element, options);
-      fabric.util.addClass(this.getElement(), fabric.Image.CSS_CANVAS);
+      this.setElement(fabric.document.getElementById(element) || element, options);
     },
 
     /**
