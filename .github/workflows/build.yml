@@ -39,7 +39,7 @@ jobs:
     - run: npm run build -- -f
     - run: npm run test:coverage && npm run test:visual:coverage
     - run: npm run coverage:report
-    - uses: ShaMan123/lcov-reporter-action@v1.0.6
+    - uses: ShaMan123/lcov-reporter-action@v1.1.1
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         delete-old-comments: true
