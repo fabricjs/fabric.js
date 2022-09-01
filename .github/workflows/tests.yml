@@ -1,6 +1,3 @@
-
-name: Tests
-
 on:
   push:
     branches: [ master ]
@@ -9,7 +6,7 @@ on:
 
 jobs:
   browser:
-    name: ${{ matrix.suite }} ${{ matrix.target }}
+    name: ${{ matrix.target }} ${{ matrix.suite }} tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -31,7 +28,7 @@ jobs:
         run: npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
   node:
     runs-on: ubuntu-latest
-    name: ${{ matrix.suite }} Node ${{ matrix.node-version }}
+    name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
     strategy:
       fail-fast: false
       matrix:
