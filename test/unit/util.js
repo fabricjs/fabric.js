@@ -290,26 +290,21 @@
   QUnit.test('fabric.util.wrapElement', function(assert) {
     var wrapElement = fabric.util.wrapElement;
     assert.ok(typeof wrapElement === 'function');
-
+    var wrapper = fabric.document.createElement('div');
     var el = fabric.document.createElement('p');
-    var wrapper = wrapElement(el, 'div');
+    var wrapper = wrapElement(el, wrapper);
 
     assert.equal(wrapper.tagName.toLowerCase(), 'div');
     assert.equal(wrapper.firstChild, el);
 
-    el = fabric.document.createElement('p');
-    wrapper = wrapElement(el, 'div', { 'class': 'foo' });
 
-    assert.equal(wrapper.tagName.toLowerCase(), 'div');
-    assert.equal(wrapper.firstChild, el);
-    assert.equal(wrapper.className, 'foo');
 
     var childEl = fabric.document.createElement('span');
     var parentEl = fabric.document.createElement('p');
 
     parentEl.appendChild(childEl);
 
-    wrapper = wrapElement(childEl, 'strong');
+    wrapper = wrapElement(childEl, fabric.document.createElement('strong'));
 
     // wrapper is now in between parent and child
     assert.equal(wrapper.parentNode, parentEl);

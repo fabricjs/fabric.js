@@ -1053,7 +1053,7 @@ import { Point } from './point.class';
       }
       // we assign the same classname of the lowerCanvas
       upperCanvasEl.className = lowerCanvasEl.className;
-      // then we remove the lower-canvas className
+      // but then we remove the lower-canvas specific className
       upperCanvasEl.classList.remove('lower-canvas');
       // we add the specific upper-canvas class
       upperCanvasEl.classList.add('upper-canvas');
@@ -1083,9 +1083,9 @@ import { Point } from './point.class';
       if (this.wrapperEl) {
         return;
       }
-      this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, 'div', {
-        'class': this.containerClass
-      });
+      const container = fabric.document.createElement('div');
+      container.classList.add(this.containerClass);
+      this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, container);
       this.wrapperEl.setAttribute('data-fabric', 'wrapper');
       fabric.util.setStyle(this.wrapperEl, {
         width: this.width + 'px',

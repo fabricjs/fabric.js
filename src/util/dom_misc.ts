@@ -1,42 +1,7 @@
 //@ts-nocheck
 (function(global) {
 
-  var fabric = global.fabric, _slice = Array.prototype.slice;
-
-  /**
-   * Creates specified element with specified attributes
-   * @memberOf fabric.util
-   * @param {String} tagName Type of an element to create
-   * @param {Object} [attributes] Attributes to set on an element
-   * @return {HTMLElement} Newly created element
-   */
-  function makeElement(tagName, attributes) {
-    var el = fabric.document.createElement(tagName);
-    for (var prop in attributes) {
-      if (prop === 'class') {
-        el.className = attributes[prop];
-      }
-      else if (prop === 'for') {
-        el.htmlFor = attributes[prop];
-      }
-      else {
-        el.setAttribute(prop, attributes[prop]);
-      }
-    }
-    return el;
-  }
-
-  /**
-   * Adds class to an element
-   * @memberOf fabric.util
-   * @param {HTMLElement} element Element to add class to
-   * @param {String} className Class to add to an element
-   */
-  function addClass(element, className) {
-    if (element && (' ' + element.className + ' ').indexOf(' ' + className + ' ') === -1) {
-      element.className += (element.className ? ' ' : '') + className;
-    }
-  }
+  var fabric = global.fabric;
 
   /**
    * Wraps element with another element
@@ -46,10 +11,7 @@
    * @param {Object} [attributes] Attributes to set on a wrapper
    * @return {HTMLElement} wrapper
    */
-  function wrapElement(element, wrapper, attributes) {
-    if (typeof wrapper === 'string') {
-      wrapper = makeElement(wrapper, attributes);
-    }
+  function wrapElement(element, wrapper) {
     if (element.parentNode) {
       element.parentNode.replaceChild(wrapper, element);
     }
@@ -252,8 +214,6 @@
    * @param {Boolean} value true or false
    */
   fabric.util.setImageSmoothing = setImageSmoothing;
-  fabric.util.addClass = addClass;
-  fabric.util.makeElement = makeElement;
   fabric.util.wrapElement = wrapElement;
   fabric.util.getScrollLeftTop = getScrollLeftTop;
   fabric.util.getElementOffset = getElementOffset;
