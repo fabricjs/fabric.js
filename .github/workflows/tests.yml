@@ -1,5 +1,5 @@
 
-name: Node Unit Tests
+name: Unit Testing
 
 on:
   push:
@@ -8,7 +8,26 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
+  browser:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+        target: [chrome, firefox]
+        suite: [unit, visual]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Unit tests on Chrome
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm ci
+    - run: npm run build -- -f
+    - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
+      uses: GabrielBB/xvfb-action@v1
+      with:
+        run: npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
+  node:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
