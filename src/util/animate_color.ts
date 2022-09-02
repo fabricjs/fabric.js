@@ -1,6 +1,6 @@
 //@ts-nocheck
-import { fabric } from '../../HEADER';
 import { Color } from "../color";
+import { animate } from './animate';
 
 // Calculate an in-between color. Returns a "rgba()" string.
 // Credit: Edwin Martin <edwin@bitstorm.org>
@@ -29,8 +29,7 @@ export function animateColor(fromColor, toColor, duration, options = {}) {
         endColor = new Color(toColor).getSource(),
         originalOnComplete = options.onComplete,
         originalOnChange = options.onChange;
-
-  return fabric.util.animate(Object.assign(options, {
+  return animate(Object.assign(options, {
     duration: duration || 500,
     startValue: startColor,
     endValue: endColor,

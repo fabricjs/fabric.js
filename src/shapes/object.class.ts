@@ -5,6 +5,7 @@ import { VERSION } from '../constants';
 import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
 import { pick } from '../util/misc/pick';
+import { runningAnimations } from '../util/animation_registry';
 
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
@@ -1903,8 +1904,10 @@ import { pick } from '../util/misc/pick';
      * override if necessary to dispose artifacts such as `clipPath`
      */
     dispose: function () {
-      if (fabric.runningAnimations) {
-        fabric.runningAnimations.cancelByTarget(this);
+      // todo verify this.
+      // runningAnimations is always truthy
+      if (runningAnimations) {
+        runningAnimations.cancelByTarget(this);
       }
     }
   });
