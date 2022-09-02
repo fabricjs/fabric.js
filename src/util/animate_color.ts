@@ -15,7 +15,7 @@ import { animate } from './animate';
 // but begin and end aren't array anymore since we improved animate function
 // to handler arrays internally.
 function calculateColor(begin, end, pos) {
-  var color = 'rgba('
+  let color = 'rgba('
       + parseInt((begin[0] + pos * (end[0] - begin[0])), 10) + ','
       + parseInt((begin[1] + pos * (end[1] - begin[1])), 10) + ','
       + parseInt((begin[2] + pos * (end[2] - begin[2])), 10);
