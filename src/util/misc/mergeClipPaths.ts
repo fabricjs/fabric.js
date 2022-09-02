@@ -41,5 +41,5 @@ export const mergeClipPaths = (c1: any, c2: any) => {
     //  case (1)
     a.inverted = b.inverted = false;
   }
-  return new fabric.Group([a], { clipPath: b, inverted: inverted });
+  return new fabric.Group([a], { clipPath: b, inverted });
 };
