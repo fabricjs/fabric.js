@@ -36,7 +36,7 @@ An object in a group will relate to the group's center as (0, 0).
 Read more about `Group`
 
 - **Vanishing Object**\
-It is likely you are misusing `Group` and the object tree because the vanished objects thinks it is not inside the visible canvas' viewport, indicating a severe **bug**. If you want to hack your way around it use `canvas.skipOffscreen` (recommended for triaging **ONLY**) with a significant performance hit.
+It is likely you are misusing `Group` and the object tree because the vanished object thinks it is not within the canvas' visible viewport, indicating a severe **bug** in coordinate calculation. If you want to hack your way around it use `canvas.skipOffscreen` (recommended for triaging **ONLY**) with a significant performance hit.
 
 - **Text BBOX is off**\
 Make sure fonts have loaded before you create the `Text` object. Fabric needs the font to calculate the position and bounding box of the characters. Doing so prior to loading the font will lead to a bad calculation using a fallback font.
