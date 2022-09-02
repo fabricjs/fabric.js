@@ -98,6 +98,7 @@ import {
   requestAnimFrame,
   cancelAnimFrame,
 } from '../animate';
+import { createClass } from '../lang_class';
 /**
  * @namespace fabric.util
  */
@@ -199,4 +200,5 @@ fabric.util = {
   animate,
   requestAnimFrame,
   cancelAnimFrame,
+  createClass,
 };
