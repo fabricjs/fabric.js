@@ -1,9 +1,7 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: [
-    '@typescript-eslint',
-  ],
+  plugins: ['@typescript-eslint'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -12,9 +10,9 @@ module.exports = {
   overrides: [
     {
       files: ['**/*.ts'],
-    }
+    },
   ],
   rules: {
     '@typescript-eslint/ban-ts-comment': 1,
-  }
+  },
 };
