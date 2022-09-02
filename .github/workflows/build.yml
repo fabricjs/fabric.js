@@ -1,6 +1,6 @@
 # This workflow will install Uglify and verify that fabric can be build with it
 
-name: PR Quality Check
+name: '🩺'
 
 on:
   pull_request:
