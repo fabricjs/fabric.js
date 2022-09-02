@@ -3,11 +3,9 @@ var chalk = require('chalk');
 var diff = require('deep-object-diff').diff;
 var commander = require('commander');
 
-// TODO remove when node 14 fades out
-// node 14 test polyfill
+// TODO remove block and dependency when node 14 fades out
+// node 14 AbortController polyfill for tests
 if (!global.AbortController) {
-  // polyfill AbortController for node 14
-  // remove this dependency when node 14 fades out
   require("abort-controller/polyfill");
 }
 
