@@ -1,4 +1,5 @@
 //@ts-nocheck
+import { fabric } from '../../HEADER';
 
 /**
  * Array holding all running animations
@@ -75,3 +76,6 @@ class RunningAnimations extends Array {
 }
 
 export const runningAnimations = new RunningAnimations();
+
+fabric.runningAnimations = runningAnimations;
+

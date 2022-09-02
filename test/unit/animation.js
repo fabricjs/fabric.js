@@ -9,7 +9,6 @@
   QUnit.test('animateColor', function(assert) {
     var done = assert.async();
     function testing(val, complete) {
-      console.log({ val })
       if (complete !== 1) {
         assert.notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
       }
