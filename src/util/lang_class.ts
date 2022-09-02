@@ -49,7 +49,7 @@ function callSuper(methodName, ...args) {
     return console.log('tried to callSuper ' + methodName + ', method not found in prototype chain', this);
   }
 
-  parentMethod.call(this, ...args);
+  return parentMethod.call(this, ...args);
 }
 
 /**
@@ -66,8 +66,8 @@ export function createClass(...args) {
   if (typeof args[0] === 'function') {
     parent = properties.shift();
   }
-  function klass(...args) {
-    this.initialize.call(this, ...args);
+  function klass(...klassArgs) {
+    this.initialize.call(this, ...klassArgs);
   }
 
   klass.superclass = parent;

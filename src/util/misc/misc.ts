@@ -1,6 +1,5 @@
 //@ts-nocheck
 import { fabric } from '../../../HEADER';
-import { Point } from '../../point.class';
 import { cos } from './cos';
 import { sin } from './sin';
 import { rotateVector, createVector, calcAngleBetweenVectors, getHatVector, getBisector } from './vectors';
