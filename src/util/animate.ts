@@ -27,9 +27,7 @@ import { noop } from '../constants';
  * @typedef {(AnimationOptions & AnimationCurrentState & { cancel: CancelFunction }} AnimationContext
  */
 
-function defaultEasing(t, b, c, d) {
-  return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
-}
+const defaultEasing = (t, b, c, d) => -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
 
 /**
  * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
@@ -58,56 +56,65 @@ function defaultEasing(t, b, c, d) {
  *
  * @returns {CancelFunction} cancel function
  */
-export function animate(options) {
-  options || (options = {});
-  var cancel = false,
-      context,
-      removeFromRegistry = function () {
-        var index = runningAnimations.indexOf(context);
-        return index > -1 && runningAnimations.splice(index, 1)[0];
-      };
+export function animate(options = {}) {
+  let cancel = false;
 
-  context = Object.assign({}, options, {
-    cancel: function () {
-      cancel = true;
-      return removeFromRegistry();
-    },
-    currentValue: 'startValue' in options ? options.startValue : 0,
+  const {
+    startValue = 0,
+    duration = 500,
+    easing = defaultEasing,
+    onChange = noop,
+    abort = noop,
+    onComplete = noop,
+    endValue = 100,
+    delay = 0,
+  } = options;
+
+  const context = {
+    ...options,
+    currentValue: startValue,
     completionRate: 0,
     durationRate: 0
-  });
+  };
+
+  const removeFromRegistry = () => {
+    const index = runningAnimations.indexOf(context);
+    return index > -1 && runningAnimations.splice(index, 1)[0];
+  };
+
+  context.cancel = function () {
+    cancel = true;
+    return removeFromRegistry();
+  };
   runningAnimations.push(context);
 
-  var runner = function (timestamp) {
-    var start = timestamp || +new Date(),
-        duration = options.duration || 500,
-        finish = start + duration, time,
-        onChange = options.onChange || noop,
-        abort = options.abort || noop,
-        onComplete = options.onComplete || noop,
-        easing = options.easing || defaultEasing,
-        isMany = 'startValue' in options ? options.startValue.length > 0 : false,
-        startValue = 'startValue' in options ? options.startValue : 0,
-        endValue = 'endValue' in options ? options.endValue : 100,
-        byValue = options.byValue || (isMany ? startValue.map(function(value, i) {
-          return endValue[i] - startValue[i];
-        }) : endValue - startValue);
+  const runner = function (timestamp) {
+    const start = timestamp || +new Date(),
+          finish = start + duration,
+          isMany = Array.isArray(startValue),
+          byValue = options.byValue || (
+            isMany ?
+            startValue.map((value, i) => endValue[i] - value)
+            : endValue - startValue
+          );
 
     options.onStart && options.onStart();
 
     (function tick(ticktime) {
-      time = ticktime || +new Date();
-      var currentTime = time > finish ? duration : (time - start),
+      const time = ticktime || +new Date();
+      const currentTime = time > finish ? duration : (time - start),
           timePerc = currentTime / duration,
-          current = isMany ? startValue.map(function(_value, i) {
-            return easing(currentTime, startValue[i], byValue[i], duration);
-          }) : easing(currentTime, startValue, byValue, duration),
+          current = isMany ?
+            startValue.map(
+              (_value, i) => easing(currentTime, _value, byValue[i], duration)
+            ) : easing(currentTime, startValue, byValue, duration),
           valuePerc = isMany ? Math.abs((current[0] - startValue[0]) / byValue[0])
             : Math.abs((current - startValue) / byValue);
       //  update context
       context.currentValue = isMany ? current.slice() : current;
       context.completionRate = valuePerc;
       context.durationRate = timePerc;
+
       if (cancel) {
         return;
       }
@@ -133,14 +140,7 @@ export function animate(options) {
     })(start);
   };
 
-  if (options.delay) {
-    setTimeout(function () {
-      requestAnimFrame(runner);
-    }, options.delay);
-  }
-  else {
-    requestAnimFrame(runner);
-  }
+  setTimeout(() => requestAnimFrame(runner), delay);
 
   return context.cancel;
 }

@@ -59,10 +59,8 @@ export function animateColor(
     startValue: startColor,
     endValue: endColor,
     byValue: endColor,
-    easing: (currentTime, startValue, byValue, duration) => {
-      const posValue = colorEasing(currentTime, duration);
-      return calculateColor(startValue, byValue, posValue);
-    },
+    easing: (currentTime, startValue, byValue, duration) =>
+      calculateColor(startValue, byValue, colorEasing(currentTime, duration)),
     // has to take in account for color restoring;
     onComplete: (current, valuePerc, timePerc) => onComplete?.(
       calculateColor(endColor, endColor, 0),
