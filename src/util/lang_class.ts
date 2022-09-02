@@ -9,11 +9,11 @@ function addMethods(klass, source, parent) {
         (source[property] + '').indexOf('callSuper') > -1) {
 
       klass.prototype[property] = (function(property) {
-        return function() {
+        return function(...args) {
 
           var superclass = this.constructor.superclass;
           this.constructor.superclass = parent;
-          var returnValue = source[property].apply(this, arguments);
+          var returnValue = source[property].call(this, ...args);
           this.constructor.superclass = superclass;
 
           if (property !== 'initialize') {
@@ -30,7 +30,7 @@ function addMethods(klass, source, parent) {
 
 function Subclass() { }
 
-function callSuper(methodName) {
+function callSuper(methodName, ...args) {
   var parentMethod = null,
       _this = this;
 
@@ -49,9 +49,7 @@ function callSuper(methodName) {
     return console.log('tried to callSuper ' + methodName + ', method not found in prototype chain', this);
   }
 
-  return (arguments.length > 1)
-    ? parentMethod.apply(this, slice.call(arguments, 1))
-    : parentMethod.call(this);
+  parentMethod.call(this, ...args);
 }
 
 /**
@@ -61,15 +59,15 @@ function callSuper(methodName) {
  * @param {Object} [properties] Properties shared by all instances of this class
  *                  (be careful modifying objects defined here as this would affect all instances)
  */
-export function createClass() {
+export function createClass(...args) {
   var parent = null,
-      properties = slice.call(arguments, 0);
+      properties = [...args];
 
-  if (typeof properties[0] === 'function') {
+  if (typeof args[0] === 'function') {
     parent = properties.shift();
   }
-  function klass() {
-    this.initialize.apply(this, arguments);
+  function klass(...args) {
+    this.initialize.call(this, ...args);
   }
 
   klass.superclass = parent;
