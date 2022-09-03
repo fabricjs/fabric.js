@@ -1,7 +1,6 @@
 import { fabric } from '../../../HEADER';
 import { applyTransformToObject } from './objectTransforms';
 import { multiplyTransformMatrices, invertTransform } from './matrix';
-import { sendObjectToPlane } from './planeChange';
 /**
  * Merges 2 clip paths into one visually equal clip path
  *
@@ -29,7 +28,13 @@ export const mergeClipPaths = (c1: any, c2: any) => {
     b = c1;
   }
   //  `b` becomes `a`'s clip path so we transform `b` to `a` coordinate plane
-  sendObjectToPlane(b, b.group?.calcTransformMatrix(), a.calcTransformMatrix());
+  applyTransformToObject(
+    b,
+    multiplyTransformMatrices(
+      invertTransform(a.calcTransformMatrix()),
+      b.calcTransformMatrix()
+    )
+  );
   //  assign the `inverted` prop to the wrapping group
   const inverted = a.inverted && b.inverted;
   if (inverted) {
