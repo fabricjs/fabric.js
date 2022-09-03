@@ -12,8 +12,8 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x]
-        target: ['chrome', 'firefox']
-        suite: ['unit', 'visual']
+        target: [chrome, firefox]
+        suite: [unit, visual]
       fail-fast: false
     steps:
     - uses: actions/checkout@v2
@@ -36,7 +36,7 @@ jobs:
         # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
         # supported Node.js release schedule: https://nodejs.org/en/about/releases/
         node-version: [14.x, 16.x]
-        suite: ['unit', 'visual']
+        suite: [unit, visual]
     steps:
     - uses: actions/checkout@v2
     - name: Install node-canvas
