@@ -3,6 +3,7 @@ import { config } from './config';
 import { VERSION } from './constants';
 import { Point } from './point.class';
 import { removeFromArray } from './util/internals';
+import { pick } from './util/misc/pick';
 
 (function (global) {
   // aliases for faster resolution
@@ -309,14 +310,14 @@ import { removeFromArray } from './util/internals';
         this.lowerCanvasEl = canvasEl;
       }
       else {
-        this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
+        this.lowerCanvasEl = fabric.document.getElementById(canvasEl) || canvasEl || this._createCanvasElement();
       }
       if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
         /* _DEV_MODE_START_ */
         throw new Error('fabric.js: trying to initialize a canvas that has already been initialized');
         /* _DEV_MODE_END_ */
       }
-      fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
+      this.lowerCanvasEl.classList.add('lower-canvas');
       this.lowerCanvasEl.setAttribute('data-fabric', 'main');
       if (this.interactive) {
         this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
@@ -751,7 +752,7 @@ import { removeFromArray } from './util/internals';
       this.cancelRequestedRender();
       this.calcViewportBoundaries();
       this.clearContext(ctx);
-      fabric.util.setImageSmoothing(ctx, this.imageSmoothingEnabled);
+      ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
       ctx.patternQuality = 'best';
       this.fire('before:render', { ctx: ctx, });
       this._renderBackground(ctx);
@@ -1027,30 +1028,19 @@ import { removeFromArray } from './util/internals';
      * @private
      */
     _toObjectMethod: function (methodName, propertiesToInclude) {
-
-      var clipPath = this.clipPath, data = {
+      const clipPath = this.clipPath;
+      const clipPathData = clipPath && !clipPath.excludeFromExport ?
+        this._toObject(clipPath, methodName, propertiesToInclude) :
+        null;
+      return {
         version: VERSION,
-        objects: this._toObjects(methodName, propertiesToInclude),
+        ...pick(this, propertiesToInclude),
+        objects: this._objects
+          .filter((object) => !object.excludeFromExport)
+          .map((instance) => this._toObject(instance, methodName, propertiesToInclude)),
+        ...this.__serializeBgOverlay(methodName, propertiesToInclude),
+        ...clipPathData ? { clipPath: clipPathData } : null
       };
-      if (clipPath && !clipPath.excludeFromExport) {
-        data.clipPath = this._toObject(this.clipPath, methodName, propertiesToInclude);
-      }
-      extend(data, this.__serializeBgOverlay(methodName, propertiesToInclude));
-
-      fabric.util.populateWithProperties(this, data, propertiesToInclude);
-
-      return data;
-    },
-
-    /**
-     * @private
-     */
-    _toObjects: function(methodName, propertiesToInclude) {
-      return this._objects.filter(function(object) {
-        return !object.excludeFromExport;
-      }).map(function(instance) {
-        return this._toObject(instance, methodName, propertiesToInclude);
-      }, this);
     },
 
     /**

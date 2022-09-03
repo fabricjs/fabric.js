@@ -1,8 +1,11 @@
 //@ts-nocheck
+import { cache } from '../cache';
 import { config } from '../config';
 import { VERSION } from '../constants';
 import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
+import { pick } from '../util/misc/pick';
+import { runningAnimations } from '../util/animation_registry';
 
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
@@ -682,10 +685,9 @@ import { capValue } from '../util/misc/capValue';
      * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
      */
     _limitCacheSize: function(dims) {
-      var perfLimitSizeTotal = config.perfLimitSizeTotal,
-          width = dims.width, height = dims.height,
+      var width = dims.width, height = dims.height,
           max = config.maxCacheSideLimit, min = config.minCacheSideLimit;
-      if (width <= max && height <= max && width * height <= perfLimitSizeTotal) {
+      if (width <= max && height <= max && width * height <= config.perfLimitSizeTotal) {
         if (width < min) {
           dims.width = min;
         }
@@ -694,9 +696,9 @@ import { capValue } from '../util/misc/capValue';
         }
         return dims;
       }
-      var ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal),
-          x = capValue(min, limitedDims.x, max),
-          y = capValue(min, limitedDims.y, max);
+      var ar = width / height, [limX, limY] = cache.limitDimsByArea(ar),
+          x = capValue(min, limX, max),
+          y = capValue(min, limY, max);
       if (width > x) {
         dims.zoomX /= width / x;
         dims.width = x;
@@ -831,9 +833,16 @@ import { capValue } from '../util/misc/capValue';
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
-
+      const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
+        clipPathData = this.clipPath && !this.clipPath.excludeFromExport ?
+          {
+            ...this.clipPath.toObject(propertiesToInclude),
+            inverted: this.clipPath.inverted,
+            absolutePositioned: this.clipPath.absolutePositioned
+          } :
+          null,
           object = {
+            ...pick(this, propertiesToInclude),
             type:                     this.type,
             version:                  VERSION,
             originX:                  this.originX,
@@ -865,20 +874,12 @@ import { capValue } from '../util/misc/capValue';
             globalCompositeOperation: this.globalCompositeOperation,
             skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
             skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS),
+            ...clipPathData ? { clipPath: clipPathData } : null
           };
 
-      if (this.clipPath && !this.clipPath.excludeFromExport) {
-        object.clipPath = this.clipPath.toObject(propertiesToInclude);
-        object.clipPath.inverted = this.clipPath.inverted;
-        object.clipPath.absolutePositioned = this.clipPath.absolutePositioned;
-      }
-
-      fabric.util.populateWithProperties(this, object, propertiesToInclude);
-      if (!this.includeDefaultValues) {
-        object = this._removeDefaultValues(object);
-      }
-
-      return object;
+      return !this.includeDefaultValues ?
+        this._removeDefaultValues(object) :
+        object;
     },
 
     /**
@@ -1903,8 +1904,10 @@ import { capValue } from '../util/misc/capValue';
      * override if necessary to dispose artifacts such as `clipPath`
      */
     dispose: function () {
-      if (fabric.runningAnimations) {
-        fabric.runningAnimations.cancelByTarget(this);
+      // todo verify this.
+      // runningAnimations is always truthy
+      if (runningAnimations) {
+        runningAnimations.cancelByTarget(this);
       }
     }
   });

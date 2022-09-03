@@ -64,19 +64,3 @@ export type TransformEvent<T> = TEvent & T & {
     target: any
   }
 }
-
-export const enum TWebGLPrecision {
-  low = 'lowp',
-  medium = 'mediump',
-  high = 'highp'
-}
-
-/**
- * @todo remove once rollup supports transforming enums... ANNOYING!
- * https://github.com/rollup/plugins/issues/463
- */
-export const WebGLPrecision = [
-  TWebGLPrecision.low,
-  TWebGLPrecision.medium,
-  TWebGLPrecision.high
-];

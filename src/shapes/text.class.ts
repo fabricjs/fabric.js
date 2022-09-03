@@ -1,5 +1,6 @@
 //@ts-nocheck
 
+import { cache } from "../cache";
 import { DEFAULT_SVG_FONT_SIZE } from "../constants";
 
 
@@ -696,27 +697,6 @@ import { DEFAULT_SVG_FONT_SIZE } from "../constants";
     },
 
     /**
-     * @private
-     * @param {Object} decl style declaration for cache
-     * @param {String} decl.fontFamily fontFamily
-     * @param {String} decl.fontStyle fontStyle
-     * @param {String} decl.fontWeight fontWeight
-     * @return {Object} reference to cache
-     */
-    getFontCache: function(decl) {
-      var fontFamily = decl.fontFamily.toLowerCase();
-      if (!fabric.charWidthsCache[fontFamily]) {
-        fabric.charWidthsCache[fontFamily] = { };
-      }
-      var cache = fabric.charWidthsCache[fontFamily],
-          cacheProp = decl.fontStyle.toLowerCase() + '_' + (decl.fontWeight + '').toLowerCase();
-      if (!cache[cacheProp]) {
-        cache[cacheProp] = { };
-      }
-      return cache[cacheProp];
-    },
-
-    /**
      * measure and return the width of a single character.
      * possibly overridden to accommodate different measure logic or
      * to hook some external lib for character measurement
@@ -728,7 +708,7 @@ import { DEFAULT_SVG_FONT_SIZE } from "../constants";
      */
     _measureChar: function(_char, charStyle, previousChar, prevCharStyle) {
       // first i try to return from cache
-      var fontCache = this.getFontCache(charStyle), fontDeclaration = this._getFontDeclaration(charStyle),
+      var fontCache = cache.getFontCache(charStyle), fontDeclaration = this._getFontDeclaration(charStyle),
           previousFontDeclaration = this._getFontDeclaration(prevCharStyle), couple = previousChar + _char,
           stylesAreEqual = fontDeclaration === previousFontDeclaration, width, coupleWidth, previousWidth,
           fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE, kernedWidth;

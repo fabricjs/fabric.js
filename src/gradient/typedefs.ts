@@ -1,4 +1,4 @@
-import { Percent } from "../typedefs";
+import { Percent, TMat2D } from "../typedefs";
 
 export type GradientUnits = 'pixels' | 'percentage';
 
@@ -70,7 +70,7 @@ export type GradientOptions<T extends GradientType> = {
   /**
    * @todo rename?
    */
-  gradientTransform?: number[];
+  gradientTransform?: TMat2D;
   id?: string;
   /**
    * SVG import compatibility
