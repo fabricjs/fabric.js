@@ -65,8 +65,17 @@
     if (fabric.isLikelyNode && original) {
       var plainFileName = filename.replace('file://', '');
       var dataUrl = original.toDataURL().split(',')[1];
-      console.log('creating original for ', filename);
+      console.log('creating golden for ', filename);
       fs.writeFileSync(plainFileName, dataUrl, { encoding: 'base64' });
+    }
+    else if (original) {
+      original.toBlob(blob => {
+        const formData = new FormData();
+        formData.append('file', blob, filename);
+        const request = new XMLHttpRequest();
+        request.open('POST', '/goldens', true);
+        request.send(formData);
+      }, 'image/png');
     }
   }
 
@@ -76,6 +85,13 @@
       if (!fs.existsSync(plainFileName)) {
         generateGolden(filename, original);
       }
+    }
+    else if (original) {
+      fetch(`/goldens/${filename}`, { method: 'GET' })
+        .then(res => res.json())
+        .then(res => {
+          !res.exists && generateGolden(filename, original);
+        });
     }
     var img = fabric.document.createElement('img');
     img.onload = function() {

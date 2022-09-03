@@ -357,7 +357,6 @@
     var rect = new fabric.Rect({ left: 0, top: 0, width: 50, height: 50 });
     canvas.add(rect);
     var count = 0;
-    var count2 = 0;
     var opt;
     canvas.on('object:modified', function(_opt) {
       count++;
@@ -548,21 +547,6 @@
     });
   });
 
-  ['DragEnter', 'DragLeave', 'DragOver'].forEach(function(eventType) {
-    QUnit.test('Fabric event fired - ' + eventType, function(assert) {
-      var eventName = eventType.toLowerCase();
-      var counter = 0;
-      var c = new fabric.Canvas();
-      c.on(eventName, function() {
-        counter++;
-      });
-      var event = fabric.document.createEvent('HTMLEvents');
-      event.initEvent(eventName, true, true);
-      c.upperCanvasEl.dispatchEvent(event);
-      assert.equal(counter, 1, eventName + ' fabric event fired');
-    });
-  });
-
   QUnit.test('Fabric event fired - Drop', function (assert) {
     var eventNames = ['drop:before', 'drop'];
     var c = new fabric.Canvas();
@@ -578,28 +562,47 @@
     assert.deepEqual(fired, eventNames, 'bad drop event fired');
   });
 
-  ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
-    QUnit.test('_simpleEventHandler fires on object and canvas - ' + eventType, function(assert) {
-      var eventName = eventType.toLowerCase();
-      var counter = 0;
-      var target;
+  QUnit.test('drag event cycle', function (assert) {
+    function testDragCycle(cycle, canDrop) {
       var c = new fabric.Canvas();
       var rect = new fabric.Rect({ width: 10, height: 10 });
+      rect.canDrop = function () {
+        return canDrop;
+      }
       c.add(rect);
-      rect.on(eventName, function() {
-        counter++;
+      var registery = [], canvasRegistry = [];
+      cycle.forEach(eventName => {
+        rect.once(eventName, function () {
+          registery.push(eventName);
+        });
+        c.once(eventName, function (opt) {
+          assert.equal(opt.target, rect, eventName + ' on canvas has rect as a target');
+          canvasRegistry.push(eventName);
+        });
+        var event = fabric.document.createEvent('HTMLEvents');
+        event.initEvent(eventName, true, true);
+        event.clientX = 5;
+        event.clientY = 5;
+        c.upperCanvasEl.dispatchEvent(event);
       });
-      c.on(eventName, function(opt) {
-        target = opt.target;
-      });
-      var event = fabric.document.createEvent('HTMLEvents');
-      event.initEvent(eventName, true, true);
-      event.clientX = 5;
-      event.clientY = 5;
-      c.upperCanvasEl.dispatchEvent(event);
-      assert.equal(counter, 1, eventName + ' fabric event fired on rect');
-      assert.equal(target, rect, eventName + ' on canvas has rect as a target');
-    });
+      c.dispose();
+      assert.equal(canvasRegistry.length, cycle.length, 'should fire cycle on canvas');
+      assert.deepEqual(canvasRegistry, cycle, 'should fire all events on canvas');
+      return registery
+    }
+    var cycle, res;
+    cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'drop'];
+    res = testDragCycle(cycle, true);
+    assert.deepEqual(res, cycle, 'should fire all events on rect');
+    cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'dragleave'];
+    res = testDragCycle(cycle, true);
+    assert.deepEqual(res, cycle, 'should fire all events on rect');
+    cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'drop'];
+    res = testDragCycle(cycle);
+    assert.deepEqual(res, cycle, 'should fire all events on rect');
+    cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'dragleave'];
+    res = testDragCycle(cycle);
+    assert.deepEqual(res, cycle, 'should fire all events on rect');
   });
 
   ['mousedown', 'mousemove', 'wheel', 'dblclick'].forEach(function(eventType) {
@@ -653,7 +656,7 @@
     var control = [];
     var targetControl = [];
     [o1, o2, o3].forEach(target => {
-      target.on(canvasEventName.replace(':', ''), (ev) => {
+      target.on(canvasEventName.replace(':', ''), () => {
         targetControl.push(target);
       });
     });

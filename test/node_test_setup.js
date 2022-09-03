@@ -11,15 +11,11 @@ commander.program
     QUnit.recreateVisualRefs = options.recreate;
   }).parse(process.argv);
 //  for now accept an env variable because qunit doesn't allow passing unknown options
-if (process.env.QUNIT_DEBUG_VISUAL_TESTS === 'true') {
-  QUnit.debugVisual = true;
-}
-if (process.env.QUNIT_RECREATE_VISUAL_REFS === 'true') {
-  QUnit.recreateVisualRefs = true;
-}
-if (process.env.QUNIT_FILTER) {
-  QUnit.config.filter = process.env.QUNIT_FILTER;
-}
+QUnit.debugVisual = Number(process.env.QUNIT_DEBUG_VISUAL_TESTS);
+QUnit.recreateVisualRefs = Number(process.env.QUNIT_RECREATE_VISUAL_REFS);
+QUnit.config.filter = process.env.QUNIT_FILTER;
+
+process.on('uncaughtException', QUnit.onUncaughtException);
 
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');

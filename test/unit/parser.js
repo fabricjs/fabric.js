@@ -125,6 +125,22 @@
     var done = assert.async();
     assert.ok(typeof fabric.parseElements === 'function');
 
+    function makeElement(tagName, attributes) {
+      var el = fabric.document.createElement(tagName);
+      for (var prop in attributes) {
+        if (prop === 'class') {
+          el.className = attributes[prop];
+        }
+        else if (prop === 'for') {
+          el.htmlFor = attributes[prop];
+        }
+        else {
+          el.setAttribute(prop, attributes[prop]);
+        }
+      }
+      return el;
+    }
+
     function getOptions(options) {
       return fabric.util.object.extend(fabric.util.object.clone({
         left: 10, top: 20, width: 30, height: 40
@@ -132,10 +148,10 @@
     }
 
     var elements = [
-      fabric.util.makeElement('rect', getOptions()),
-      fabric.util.makeElement('circle', getOptions({ r: 14 })),
-      fabric.util.makeElement('path', getOptions({ d: 'M 100 100 L 300 100 L 200 300 z' })),
-      fabric.util.makeElement('inexistent', getOptions())
+      makeElement('rect', getOptions()),
+      makeElement('circle', getOptions({ r: 14 })),
+      makeElement('path', getOptions({ d: 'M 100 100 L 300 100 L 200 300 z' })),
+      makeElement('inexistent', getOptions())
     ];
     fabric.parseElements(elements, function(parsedElements) {
       assert.ok(parsedElements[0] instanceof fabric.Rect);

@@ -1,22 +1,47 @@
 #!/usr/bin/env node
+
+/**
+ * Dearest fabric maintainer 💗,
+ * This file contains the cli logic, which governs most of the available commands fabric has to offer.
+ * 
+ * 📢 **IMPORTANT**
+ * CI uses these commands.
+ * In order for CI to correctly report the result of the command, the process must receive a correct exit code
+ * meaning that if you `spawn` a process, make sure to listen to the `exit` event and terminate the main process with the relevant code.
+ * Failing to do so will make CI report a false positive 📉.
+ */
+
+
+
 const fs = require('fs-extra');
+const os = require('os');
 const _ = require('lodash');
 const path = require('path');
 const cp = require('child_process');
 const inquirer = require('inquirer');
-const ansiEscapes = require('ansi-escapes');
 const fuzzy = require('fuzzy');
 const chalk = require('chalk');
 const moment = require('moment');
 const Checkbox = require('inquirer-checkbox-plus-prompt');
 const commander = require('commander');
+const killPort = require('kill-port');
+
+// const rollup = require('rollup');
+// const loadConfigFile = require('rollup/loadConfigFile');
+
 const program = new commander.Command();
 
 const { transform: transformFiles, listFiles } = require('./transform_files');
 
-const CLI_CACHE = path.resolve(__dirname, 'cli_cache.json');
+
 const wd = path.resolve(__dirname, '..');
+const dumpsPath = path.resolve(wd, 'cli_output');
+const CLI_CACHE = path.resolve(dumpsPath, 'cli_cache.json');
 const websiteDir = path.resolve(wd, '../fabricjs.com');
+if (!fs.existsSync(dumpsPath)) {
+    fs.mkdirSync(dumpsPath);
+}
+const package = require(path.resolve(wd, 'package.json'));
 
 function execGitCommand(cmd) {
     return cp.execSync(cmd, { cwd: wd }).toString()
@@ -80,24 +105,86 @@ class ICheckbox extends Checkbox {
 }
 inquirer.registerPrompt('test-selection', ICheckbox);
 
+// async function rollupBuild(options = {}, onComplete) {
+//     const { options: buildOptions, warnings } = await loadConfigFile(path.resolve(__dirname, '..', 'rollup.config.js'), { format: 'es' });
+//     warnings.flush();
+//     if (options.output) {
+//         buildOptions.output = [options.output];
+//     }
+//     if (options.watch) {
+//         const watcher = rollup.watch(buildOptions);
+//         watcher.on('END', () => {
+//             onComplete && onComplete();
+//         });
+//         watcher.on('event', ({ result }) => {
+//             if (result) {
+//                 result.close();
+//             }
+//         });
+//         process.on('beforeExit', () => watcher.close());
+//     }
+//     else {
+//         for (const optionsObj of buildOptions) {
+//             const bundle = await rollup.rollup(optionsObj);
+//             await Promise.all(optionsObj.output.map(bundle.write));
+//         }
+
+//         onComplete && onComplete();
+//     }
+// }
+
+
 function build(options = {}) {
-    _.defaults(options, { exclude: ['gestures', 'accessors', 'erasing'] });
-    const args = [
-        `node`,
-        `build.js`,
-        `modules=${options.modules && options.modules.length > 0 ? options.modules.join(',') : 'ALL'}`,
-        `requirejs`,
-        `${options.fast ? 'fast' : ''}`,
-        `exclude=${options.exclude.join(',')}`
-    ]
-    cp.execSync(args.join(' '), { stdio: 'inherit', cwd: wd });
+    const cmd = ['rollup', '-c', options.watch ? '--watch' : ''].join(' ');
+    let minDest;
+    if (options.output && !options.fast) {
+        const { name, base, ...rest } = path.parse(path.resolve(options.output));
+        minDest = path.format({ name: `${name}.min`, ...rest });
+    }
+    const processOptions = {
+        stdio: 'inherit',
+        shell: true,
+        cwd: wd,
+        env: {
+            ...process.env,
+            MINIFY: Number(!options.fast),
+            BUILD_INPUT: options.input,
+            BUILD_OUTPUT: options.output,
+            BUILD_MIN_OUTPUT: minDest
+        },
+    }
+    if (options.watch) {
+        cp.spawn(cmd, processOptions);
+    }
+    else {
+        try {
+            cp.execSync(cmd, processOptions);
+        } catch (error) {
+            // minimal logging, no need for stack trace
+            console.error(error.message);
+            // inform ci
+            process.exit(1);
+        }
+    }
+    
 }
 
 function startWebsite() {
     if (require(path.resolve(websiteDir, 'package.json')).name !== 'fabricjs.com') {
         console.log(chalk.red('Could not locate fabricjs.com directory'));
     }
-    cp.spawn('npm', ['run', 'start:dev'], {
+    const args = ['run', 'start:dev'];
+
+    //  WSL ubuntu
+    // https://github.com/microsoft/WSL/issues/216
+    // os.platform() === 'win32' && args.push('--', '--force_polling', '--livereload');
+    if (os.platform() === 'win32') {
+        console.log(chalk.green('Consider using ubuntu on WSL to run jekyll with the following options:'));
+        console.log(chalk.yellow('-- force_polling --livereload'));
+        console.log(chalk.gray('https://github.com/microsoft/WSL/issues/216'));
+    }
+
+    cp.spawn('npm', args, {
         stdio: 'inherit',
         cwd: websiteDir,
         shell: true,
@@ -114,7 +201,7 @@ function watch(path, callback, debounce = 500) {
     }, debounce, { trailing: true }));
 }
 
-function copy(from ,to) {
+function copy(from, to) {
     try {
         fs.copySync(from, to);
         const containingFolder = path.resolve(wd, '..');
@@ -128,102 +215,169 @@ const BUILD_SOURCE = ['src', 'lib', 'HEADER.js'];
 
 function exportBuildToWebsite(options = {}) {
     _.defaultsDeep(options, { gestures: true });
+    build({
+        output: path.resolve(websiteDir, './lib/fabric.js'),
+        fast: true,
+        watch: options.watch
+    });
     if (options.gestures) {
-        build({ exclude: ['accessors'] });
-        copy(path.resolve(wd, './dist/fabric.js'), path.resolve(websiteDir, './lib/fabric_with_gestures.js'));
+        build({
+            exclude: ['accessors'],
+            output: path.resolve(websiteDir, './lib/fabric_with_gestures.js'),
+            fast: true,
+            watch: options.watch
+        });
     }
-    build();
-    copy(path.resolve(wd, './dist/fabric.js'), path.resolve(websiteDir, './lib/fabric.js'));
-    copy(path.resolve(wd, './package.json'), path.resolve(websiteDir, './lib/package.json'));
-    BUILD_SOURCE.forEach(p => copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p)));
-    console.log(chalk.bold(`[${moment().format('HH:MM')}] exported build to fabricjs.com`));
 }
 
-function exportTestsToWebsite() {
-    const paths = [
-        './test/unit',
-        './test/visual',
-        './test/fixtures',
-        './test/lib',
-    ]
-    paths.forEach(location => copy(path.resolve(wd, location), path.resolve(websiteDir, location)));
-    console.log(chalk.bold(`[${moment().format('HH:MM')}] exported tests to fabricjs.com`));
+function exportAssetsToWebsite(options) {
+    copy(path.resolve(wd, './package.json'), path.resolve(websiteDir, './lib/package.json'));
+    BUILD_SOURCE.forEach(p => copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p)));
+    console.log(chalk.bold(`[${moment().format('HH:mm')}] exported assets to fabricjs.com`));
+    options.watch && BUILD_SOURCE.forEach(p => {
+        watch(path.resolve(wd, p), () => {
+            copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p));
+            console.log(chalk.bold(`[${moment().format('HH:mm')}] exported ${p} to fabricjs.com`));
+        });
+    });
+}
+
+function exportTestsToWebsite(options) {
+    const exportTests = () => {
+        const paths = [
+            './test/unit',
+            './test/visual',
+            './test/fixtures',
+            './test/lib',
+        ]
+        paths.forEach(location => copy(path.resolve(wd, location), path.resolve(websiteDir, location)));
+        console.log(chalk.bold(`[${moment().format('HH:mm')}] exported tests to fabricjs.com`));
+    }
+    exportTests();
+    options.watch && watch(path.resolve(wd, './test'), exportTests);
 }
 
 function exportToWebsite(options) {
-    if (!options.include  || options.include.length === 0) {
-        options.include  = ['build', 'tests'];
+    if (!options.include || options.include.length === 0) {
+        options.include = ['build', 'tests'];
     }
-    options.include .forEach(x => {
+    options.include.forEach(x => {
         if (x === 'build') {
-            exportBuildToWebsite();
-            options.watch && BUILD_SOURCE.forEach(p => {
-                watch(path.resolve(wd, p), exportBuildToWebsite);
-            });
+            exportBuildToWebsite(options);
+            exportAssetsToWebsite(options);
         }
         else if (x === 'tests') {
-            exportTestsToWebsite();
-            options.watch && watch(path.resolve(wd, './test'), exportTestsToWebsite);
+            exportTestsToWebsite(options);
         }
     })
 }
 
 /**
  * 
- * @param {string[]} tests file paths
- * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:boolean}} [options] 
+ * @returns {Promise<boolean | undefined>} true if some tests failed
  */
-function test(tests, options) {
-    options = options || {};
-    const args = ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests);
-    process.env.QUNIT_DEBUG_VISUAL_TESTS = options.debug;
-    process.env.QUNIT_RECREATE_VISUAL_REFS = options.recreate;
-    if (options.filter) {
-        process.env.QUNIT_FILTER = options.filter;
+async function runTestem({ suite, port, launch, dev, processOptions, context } = {}) {
+    port = port || suite === 'visual' ? 8081 : 8080;
+    try {
+        await killPort(port);
+    } catch (error) {
+
     }
-    return new Promise((resolve, reject) => {
+
+    if (launch) {
+        // open localhost
+        const url = `http://localhost:${port}/`;
+        const start = (os.platform() === 'darwin' ? 'open' : os.platform() === 'win32' ? 'start' : 'xdg-open');
+        cp.exec([start, url].join(' '));
+    }
+
+    const processCmdOptions = [
+        '-p', port,
+        '-f', `test/testem.${suite}.js`,
+        '-l', context.map(_.upperFirst).join(',')
+    ];
+
+    if (dev) {
+        cp.spawn(['testem', ...processCmdOptions].join(' '), {
+            ...processOptions,
+            detached: true
+        });
+    }
+    else {
         try {
-            var p = cp.spawn(args.join(' '), { cwd: wd, env: process.env, shell: true, stdio: 'pipe' });
-            let clearLines = 0;
-            process.stdout.write(ansiEscapes.cursorHide);
-            p.stdout.on('data', function (data) {
-                data = _.compact(data.toString().trim().split(/\n/));
-                data.forEach(line => {
-                    if (clearLines > 0 && !options.verbose) {
-                        process.stdout.write(ansiEscapes.cursorUp(1));
-                        process.stdout.write(ansiEscapes.eraseDown);
-                    }
-                    if (line.startsWith('ok')) {
-                        clearLines = 1;
-                        console.log(chalk.green(line));
-                    }
-                    else if (line.startsWith('not ok')) {
-                        clearLines = 0;
-                        console.log(chalk.bold(chalk.red('not ok') + line.slice(6)));
-                    }
-                    else {
-                        clearLines = 0;
-                        console.log(line);
-                    }
-                });
-            });
-            p.stdout.once('end', () => {
-                process.stdout.write(ansiEscapes.cursorDown());
-                process.stdout.write(ansiEscapes.cursorShow);
-                resolve();
-            });
+            cp.execSync(['testem', 'ci', ...processCmdOptions].join(' '), processOptions);
         } catch (error) {
-            process.stdout.write(ansiEscapes.cursorDown());
-            process.stdout.write(ansiEscapes.cursorShow);
-            reject(error);
+            return true;
         }
-    });
+    }
 }
 
 /**
- * 
+ *
+ * @param {'unit' | 'visual'} suite
+ * @param {string[] | null} tests file paths
+ * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:string}} [options]
+ * @returns {Promise<boolean | undefined>} true if some tests failed
+ */
+async function test(suite, tests, options = {}) {
+    let failed = false;
+    const qunitEnv = {
+        QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
+        QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
+        QUNIT_FILTER: options.filter,
+    };
+    const env = {
+        ...process.env,
+        TEST_FILES: (tests || []).join(','),
+        NODE_CMD: ['qunit', 'test/node_test_setup.js', 'test/lib'].concat(tests || `test/${suite}`).join(' '),
+        VERBOSE: Number(options.verbose),
+        REPORT_FILE: options.out
+    };
+    const browserContexts = options.context.filter(c => c !== 'node');
+
+    // temporary revert
+    // run node tests directly with qunit
+    if (options.context.includes('node')) {
+        try {
+            cp.execSync(env.NODE_CMD, {
+                cwd: wd,
+                env: {
+                    ...env,
+                    // browser takes precendence in golden ref generation
+                    ...(browserContexts.length === 0 ? qunitEnv : {})
+                },
+                shell: true,
+                stdio: 'inherit',
+            });
+        } catch (error) {
+            failed = true;
+        }
+    }
+
+    if (browserContexts.length > 0) {
+        failed = await runTestem({
+            ...options,
+            suite,
+            processOptions: {
+                cwd: wd,
+                env: {
+                    ...env,
+                    ...qunitEnv
+                },
+                shell: true,
+                stdio: 'inherit',
+            },
+            context: browserContexts
+        }) || failed;
+    }
+
+    return failed;
+}
+
+/**
+ *
  * @param {'unit'|'visual'} type correspondes to the test directories
- * @returns 
+ * @returns
  */
 function listTestFiles(type) {
     return fs.readdirSync(path.resolve(wd, './test', type)).filter(p => {
@@ -252,7 +406,7 @@ function createChoiceData(type, file) {
 }
 
 async function selectFileToTransform() {
-    const files = _.map(listFiles(), ({ dir, file }) => createChoiceData(path.relative(path.resolve(wd,'src'), dir).replaceAll('\\','/'), file));
+    const files = _.map(listFiles(), ({ dir, file }) => createChoiceData(path.relative(path.resolve(wd, 'src'), dir).replaceAll('\\', '/'), file));
     const { tests: filteredTests } = await inquirer.prompt([
         {
             type: 'test-selection',
@@ -325,21 +479,28 @@ async function runIntreactiveTestSuite(options) {
     //  some tests fail because of some pollution when run from the same context
     // test(_.map(await selectTestFile(), curr => `test/${curr.type}/${curr.file}`))
     const tests = _.reduce(await selectTestFile(), (acc, curr) => {
-        acc[curr.type].push(`test/${curr.type}/${curr.file}`);
+        if (!curr.file) {
+            acc[curr.type] = true;
+        }
+        else if (Array.isArray(acc[curr.type])) {
+            acc[curr.type].push(`test/${curr.type}/${curr.file}`);
+        }
         return acc;
     }, { unit: [], visual: [] });
-    _.reduce(tests, async (queue, files, suite) => {
-        await queue;
-        if (files.length > 0) {
-            console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
-            return test(files, options);
+    return Promise.all(_.map(tests, (files, suite) => {
+        if (files === true) {
+            return test(suite, null, options);
         }
-    }, Promise.resolve());
+        else if (Array.isArray(files) && files.length > 0) {
+            return test(suite, files, options);
+        }
+    }));
 }
 
 program
     .name('fabric.js')
     .description('fabric.js DEV CLI tools')
+    .version(package.version)
     .showSuggestionAfterError();
 
 program
@@ -353,48 +514,65 @@ program
     });
 
 program
+    .command('dev')
+    .description('watch for changes in `src` and `test` directories')
+    .action(() => {
+        cp.spawn('npm run build -- -f -w', { stdio: 'inherit', shell: true });
+        cp.spawn('npm run build-tests -- -w', { stdio: 'inherit', shell: true });
+    });
+
+program
     .command('build')
     .description('build dist')
-    .option('-f, --fast')
+    .option('-f, --fast', 'skip minifying')
     .option('-w, --watch')
-    .option('-x, --exclude [exclude...]')
-    .option('-m, --modules [modules...]')
+    .option('-i, --input <...path>', 'specify the build input paths')
+    .option('-o, --output <path>', 'specify the build output path')
+    .option('-x, --exclude <exclude...>')
+    .option('-m, --modules <modules...>')
     .action((options) => {
-        const { watch: w, ...rest } = options || {};
-        build(rest);
-        w && watch(path.resolve(wd, 'src'), () => build(rest));
+        build(options);
     });
 
 program
     .command('test')
     .description('run test suite')
-    .addOption(new commander.Option('-s, --suite [suite...]', 'test suite to run').choices(['unit', 'visual']))
-    .option('-f, --file [file]', 'run a specific test file')
-    .option('--filter [filter]', 'filter tests by name')
+    .addOption(new commander.Option('-s, --suite <suite...>', 'test suite to run').choices(['unit', 'visual']))
+    .option('-f, --file <file>', 'run a specific test file')
+    .option('--filter <filter>', 'filter tests by name')
     .option('-a, --all', 'run all tests', false)
     .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
     .option('-r, --recreate', 'recreate visual refs (golden images)', false)
-    .option('-v, --verbose', 'log passing tests', false)
-    .option('-cc, --clear-cache', 'clear CLI test cache', false)
-    .action((options) => {
+    .option('-v, --verbose', 'log passing tests', true)
+    .option('--no-verbose', 'disable verbose logging')
+    .option('-l, --launch', 'launch tests in the browser', false)
+    .option('--dev', 'runs testem in `dev` mode, without a `ci` flag', false)
+    .addOption(new commander.Option('-c, --context <context...>', 'context to test in').choices(['node', 'chrome', 'firefox']).default(['node']))
+    .option('-p, --port')
+    .option('-o, --out <out>', 'path to report test results to')
+    .option('--clear-cache', 'clear CLI test cache', false)
+    .action(async (options) => {
         if (options.clearCache) {
             fs.removeSync(CLI_CACHE);
         }
         if (options.all) {
             options.suite = ['unit', 'visual'];
         }
+        const results = [];
         if (options.suite) {
-            _.reduce(options.suite, async (queue, suite) => {
-                await queue;
-                console.log(chalk.bold(chalk.blue(`running ${suite} test suite`)));
-                return test(`test/${suite}`, options);
-            }, Promise.resolve());
+            results.push(...await Promise.all(_.map(options.suite, (suite) => {
+                return test(suite, null, options);
+            })));
         }
         else if (options.file) {
-            test(`test/${options.file}`, options);
+            results.push(await test(options.file.startsWith('visual') ? 'visual' : 'unit', [`test/${options.file}`], options));
         }
         else {
-            runIntreactiveTestSuite(options);
+            results.push(...await runIntreactiveTestSuite(options));
+        }
+        if (_.some(results)) {
+            // inform ci that tests have failed
+            process.exit(1);
         }
     });
 
@@ -412,7 +590,7 @@ website
 website
     .command('export')
     .description('export files to fabricjs.com directory')
-    .addOption(new commander.Option('-i, --include [what...]').choices(['build', 'tests']).default(['build', 'tests'], 'export all'))
+    .addOption(new commander.Option('-i, --include <what...>').choices(['build', 'tests']).default(['build', 'tests'], 'export all'))
     .option('-w, --watch')
     .action(exportToWebsite);
 
@@ -425,7 +603,7 @@ program
     .option('-ts, --typescript', 'transform into typescript', false)
     .option('-v, --verbose', 'verbose logging', true)
     .option('-a, --all', 'transform all files', false)
-    .option('-d, --diff [branch]', 'compare against given branch (default: master) and transform all files with diff')
+    .option('-d, --diff <branch>', 'compare against given branch (default: master) and transform all files with diff')
     .action(async ({ overwrite, exports, index, typescript, verbose, all, diff: gitRef } = {}) => {
         let files = [];
         if (gitRef) {

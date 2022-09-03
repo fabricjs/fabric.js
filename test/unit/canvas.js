@@ -105,7 +105,6 @@
    */
   QUnit.assert.sameImageObject = function (actual, expected) {
     var a = {}, b = {};
-    expected = expected || REFERENCE_IMG_OBJECT;
     Object.assign(a, actual, { src: basename(actual.src) });
     Object.assign(b, expected, { src: basename(expected.src) });
     this.pushResult({
@@ -116,13 +115,17 @@
     })
   }
 
+  let ORIGINAL_DPR;
+
   QUnit.module('fabric.Canvas', {
     beforeEach: function() {
       upperCanvasEl.style.display = '';
       canvas.controlsAboveOverlay = fabric.Canvas.prototype.controlsAboveOverlay;
       canvas.preserveObjectStacking = fabric.Canvas.prototype.preserveObjectStacking;
+      ORIGINAL_DPR = fabric.config.devicePixelRatio;
     },
-    afterEach: function() {
+    afterEach: function () {
+      fabric.config.configure({ devicePixelRatio: ORIGINAL_DPR });
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.clear();
       canvas.cancelRequestedRender();
@@ -1363,9 +1366,9 @@
     assert.equal(JSON.stringify(canvas.toJSON()), EMPTY_JSON);
     canvas.backgroundColor = '#ff5555';
     canvas.overlayColor = 'rgba(0,0,0,0.2)';
-    assert.equal(JSON.stringify(canvas.toJSON()), '{"version":"' + fabric.version + '","objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlayColor` value should be reflected in json');
+    assert.deepEqual(canvas.toJSON(), { "version": fabric.version,"objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}, '`background` and `overlayColor` value should be reflected in json');
     canvas.add(makeRect());
-    assert.deepEqual(JSON.stringify(canvas.toJSON()), RECT_JSON);
+    assert.deepEqual(canvas.toJSON(), JSON.parse(RECT_JSON));
   });
 
   QUnit.test('toJSON with active group', function(assert) {
@@ -1385,7 +1388,7 @@
       sourcePath: 'http://example.com/'
     });
     canvas.add(path);
-    assert.equal(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
+    assert.deepEqual(canvas.toDatalessJSON(), JSON.parse(PATH_DATALESS_JSON));
   });
 
   QUnit.test('toObject', function(assert) {
@@ -1979,7 +1982,20 @@
     canvas.setActiveObject(canvas.item(0));
 
     canvas._discardActiveObject();
-    assert.ok(!canvas.item(0).active);
+    assert.equal(canvas.getActiveObject(), null);
+  });
+
+  QUnit.test('_discardActiveObject - cleanup transform', function (assert) {
+    var e = { clientX: 5, clientY: 5, which: 1, target: canvas.upperCanvasEl };
+    var target = makeRect();
+    canvas.add(target);
+    canvas.setActiveObject(target);
+    canvas._setupCurrentTransform(e, target, true);
+    assert.ok(canvas._currentTransform, 'transform should be set');
+    target.isMoving = true;
+    canvas._discardActiveObject();
+    assert.ok(!canvas._currentTransform, 'transform should be cleared');
+    assert.ok(!target.isMoving, 'moving flag should have been negated');
     assert.equal(canvas.getActiveObject(), null);
   });
 
@@ -2005,7 +2021,6 @@
     });
 
     canvas.discardActiveObject();
-    assert.ok(!canvas.item(0).active);
     assert.equal(canvas.getActiveObject(), null);
     assert.equal(canvas.getActiveObject(), null);
 
@@ -2079,8 +2094,7 @@
     parentEl.className = 'rootNode';
     parentEl.appendChild(el);
 
-    var originalDevicePixelRatio = fabric.devicePixelRatio;
-    fabric.devicePixelRatio = 1.25;
+    fabric.config.configure({ devicePixelRatio: 1.25 });
 
     assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
     assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
@@ -2088,7 +2102,7 @@
     el.style.position = 'relative';
     var elStyle = el.style.cssText;
     assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
-    
+
     var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
     wrapperEl = canvas.wrapperEl;
     lowerCanvasEl = canvas.lowerCanvasEl;
@@ -2133,7 +2147,6 @@
     assert.equal(el.width, 200, 'restored width');
     assert.equal(el.height, 200, 'restored height');
 
-    fabric.devicePixelRatio = originalDevicePixelRatio;
   });
 
   QUnit.test('dispose + set dimensions', function (assert) {
@@ -2144,8 +2157,7 @@
     parentEl.className = 'rootNode';
     parentEl.appendChild(el);
 
-    var originalDevicePixelRatio = fabric.devicePixelRatio;
-    fabric.devicePixelRatio = 1.25;
+    fabric.config.configure({ devicePixelRatio: 1.25 });
 
     assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
     assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
@@ -2165,8 +2177,6 @@
     assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
     assert.equal(el.width, 500, 'restored width');
     assert.equal(el.height, 500, 'restored height');
-
-    fabric.devicePixelRatio = originalDevicePixelRatio;
 
   });
 

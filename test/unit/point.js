@@ -445,4 +445,18 @@
     assert.equal(returned.y, point.y, 'y coords should be same');
   });
 
+  QUnit.test('rotate', function(assert) {
+    var point = new fabric.Point(5, 1);
+    var rotated = point.rotate(Math.PI);
+    assert.equal(rotated.x, -5, 'rotated x');
+    assert.equal(rotated.y, -1, 'rotated y');
+  });
+
+  QUnit.test('rotate with origin point', function(assert) {
+    var point = new fabric.Point(5, 1);
+    var rotated = point.rotate(Math.PI, new fabric.Point(4, 1));
+    assert.equal(rotated.x, 3, 'rotated x around 4');
+    assert.equal(rotated.y, 1, 'rotated y around 1');
+  });
+
 })();
