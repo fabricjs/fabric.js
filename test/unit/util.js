@@ -273,92 +273,22 @@
     // assert.ok(axisPoint instanceof YAxisPoint); <-- fails
   });
 
-  QUnit.test('fabric.util.getById', function(assert) {
-    assert.ok(typeof fabric.util.getById === 'function');
-
-    var el = fabric.document.createElement('div');
-    el.id = 'foobarbaz';
-    fabric.document.body.appendChild(el);
-
-    assert.equal(el, fabric.util.getById(el));
-    assert.equal(el, fabric.util.getById('foobarbaz'));
-    assert.equal(null, fabric.util.getById('likely-non-existent-id'));
-  });
-
-  QUnit.test('fabric.util.toArray', function(assert) {
-    assert.ok(typeof fabric.util.toArray === 'function');
-
-    assert.deepEqual(['x', 'y'], fabric.util.toArray({ 0: 'x', 1: 'y', length: 2 }));
-    assert.deepEqual([1, 3], fabric.util.toArray((function(){ return arguments; })(1, 3)));
-
-    var nodelist = fabric.document.getElementsByTagName('div'),
-        converted = fabric.util.toArray(nodelist);
-
-    assert.ok(converted instanceof Array);
-    assert.equal(nodelist.length, converted.length);
-    assert.equal(nodelist[0], converted[0]);
-    assert.equal(nodelist[1], converted[1]);
-  });
-
-  QUnit.test('fabric.util.makeElement', function(assert) {
-    var makeElement = fabric.util.makeElement;
-    assert.ok(typeof makeElement === 'function');
-
-    var el = makeElement('div');
-
-    assert.equal(el.tagName.toLowerCase(), 'div');
-    assert.equal(el.nodeType, 1);
-
-    el = makeElement('p', { 'class': 'blah', 'for': 'boo_hoo', 'some_random-attribute': 'woot' });
-
-    assert.equal(el.tagName.toLowerCase(), 'p');
-    assert.equal(el.nodeType, 1);
-    assert.equal(el.className, 'blah');
-    assert.equal(el.htmlFor, 'boo_hoo');
-    assert.equal(el.getAttribute('some_random-attribute'), 'woot');
-  });
-
-  QUnit.test('fabric.util.addClass', function(assert) {
-    var addClass = fabric.util.addClass;
-    assert.ok(typeof addClass === 'function');
-
-    var el = fabric.document.createElement('div');
-    addClass(el, 'foo');
-    assert.equal(el.className, 'foo');
-
-    addClass(el, 'bar');
-    assert.equal(el.className, 'foo bar');
-
-    addClass(el, 'baz qux');
-    assert.equal(el.className, 'foo bar baz qux');
-
-    addClass(el, 'foo');
-    assert.equal(el.className, 'foo bar baz qux');
-  });
-
   QUnit.test('fabric.util.wrapElement', function(assert) {
     var wrapElement = fabric.util.wrapElement;
     assert.ok(typeof wrapElement === 'function');
-
+    var wrapper = fabric.document.createElement('div');
     var el = fabric.document.createElement('p');
-    var wrapper = wrapElement(el, 'div');
+    var wrapper = wrapElement(el, wrapper);
 
     assert.equal(wrapper.tagName.toLowerCase(), 'div');
     assert.equal(wrapper.firstChild, el);
-
-    el = fabric.document.createElement('p');
-    wrapper = wrapElement(el, 'div', { 'class': 'foo' });
-
-    assert.equal(wrapper.tagName.toLowerCase(), 'div');
-    assert.equal(wrapper.firstChild, el);
-    assert.equal(wrapper.className, 'foo');
 
     var childEl = fabric.document.createElement('span');
     var parentEl = fabric.document.createElement('p');
 
     parentEl.appendChild(childEl);
 
-    wrapper = wrapElement(childEl, 'strong');
+    wrapper = wrapElement(childEl, fabric.document.createElement('strong'));
 
     // wrapper is now in between parent and child
     assert.equal(wrapper.parentNode, parentEl);
@@ -1056,25 +986,6 @@
     assert.ok(typeof fabric.util.composeMatrix === 'function');
     var matrix = fabric.util.composeMatrix({});
     assert.deepEqual(matrix, fabric.iMatrix, 'default is identity matrix');
-  });
-
-  QUnit.test('fabric.util.limitDimsByArea', function(assert) {
-    assert.ok(typeof fabric.util.limitDimsByArea === 'function');
-    var dims = fabric.util.limitDimsByArea(1, 10000);
-    assert.equal(dims.x, 100);
-    assert.equal(dims.y, 100);
-  });
-
-  QUnit.test('fabric.util.limitDimsByArea ar > 1', function(assert) {
-    var dims = fabric.util.limitDimsByArea(3, 10000);
-    assert.equal(dims.x, 173);
-    assert.equal(dims.y, 57);
-  });
-
-  QUnit.test('fabric.util.limitDimsByArea ar < 1', function(assert) {
-    var dims = fabric.util.limitDimsByArea(1 / 3, 10000);
-    assert.equal(dims.x, 57);
-    assert.equal(dims.y, 173);
   });
 
   QUnit.test('fabric.util.capValue ar < 1', function(assert) {
