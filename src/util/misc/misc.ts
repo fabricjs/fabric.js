@@ -201,3 +201,81 @@ fabric.util = {
   cancelAnimFrame,
   createClass,
 };
+
+
+/* Putting some tests here so i m sure i m in this build environemnt */
+
+const myLib = {};
+
+class testObject {
+  constructor(opts) {
+    Object.assign(this, opts);
+  }
+	type = 'fobject'
+  prop = 'a string to log'
+  log() {
+    console.log(this.prop);
+  }
+}
+
+class testRect extends testObject {
+  constructor(opts = {}) {
+    super(opts);
+  }
+	type = 'fRect'
+  prop = 'a rect thing to log'
+  height = 100
+}
+
+class testCube extends testRect {
+  type = 'fCube'
+  prop = 'a cuve thing to log'
+  depth = 300
+
+}
+
+testCube.prototype.log = function() {
+  console.log('mine');
+}
+
+Object.assign(fabric, {
+	testObject,
+  testRect,
+  testCube,
+	rect: new testRect({ width: 150 }),
+  rect2: new testRect({ width: 100 })
+});
+
+function funcObject (props) {
+  Object.assign(this, props);
+}
+
+funcObject.prototype = {
+	type: 'fobject',
+  prop: 'a string to log',
+  log() {
+    console.log(this.prop);
+  },
+}
+
+function funcRect (props) {
+  Object.assign(this, props);
+}
+
+funcRect.prototype = {
+	type: 'fRect',
+  prop: 'a rect thing to log',
+  height: 100,
+}
+
+Object.setPrototypeOf(funcRect.prototype, funcObject.prototype)
+
+Object.assign(fabric, {
+	testObject,
+  testRect,
+  testCube,
+  funcObject,
+  funcRect,
+	rect: new testRect({ width: 150 }),
+  rect2: new testRect({ width: 100 })
+});
