@@ -140,7 +140,11 @@ export function animate(options = {}) {
     })(start);
   };
 
-  setTimeout(() => requestAnimFrame(runner), delay);
+  if (delay > 0 ) {
+    setTimeout(() => requestAnimFrame(runner), delay);
+  } else {
+    requestAnimFrame(runner);
+  }
 
   return context.cancel;
 }
