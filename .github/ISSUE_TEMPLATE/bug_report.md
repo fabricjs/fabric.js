@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report with a reproducible test case. For anything else use [DISCUSSIONS](https://github.com/fabricjs/fabric.js/discussions). Anything different than a detailed bug report will be closed.
+about: Create a detailed bug report with a reproducible test case. Anything else will be closed, consider using [DISCUSSIONS](https://github.com/fabricjs/fabric.js/discussions). 
 
 ---
 
