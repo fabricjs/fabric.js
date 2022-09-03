@@ -1044,19 +1044,20 @@ import { Point } from './point.class';
      * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
      */
     _createUpperCanvas: function () {
-      var lowerCanvasClass = this.lowerCanvasEl.className.replace(/\s*lower-canvas\s*/, ''),
-          lowerCanvasEl = this.lowerCanvasEl, upperCanvasEl = this.upperCanvasEl;
+      var lowerCanvasEl = this.lowerCanvasEl, upperCanvasEl = this.upperCanvasEl;
 
-      // there is no need to create a new upperCanvas element if we have already one.
-      if (upperCanvasEl) {
-        upperCanvasEl.className = '';
-      }
-      else {
+      // if there is no upperCanvas (most common case) we create one.
+      if (!upperCanvasEl) {
         upperCanvasEl = this._createCanvasElement();
         this.upperCanvasEl = upperCanvasEl;
       }
-      fabric.util.addClass(upperCanvasEl, 'upper-canvas ' + lowerCanvasClass);
-      this.upperCanvasEl.setAttribute('data-fabric', 'top');
+      // we assign the same classname of the lowerCanvas
+      upperCanvasEl.className = lowerCanvasEl.className;
+      // but then we remove the lower-canvas specific className
+      upperCanvasEl.classList.remove('lower-canvas');
+      // we add the specific upper-canvas class
+      upperCanvasEl.classList.add('upper-canvas');
+      upperCanvasEl.setAttribute('data-fabric', 'top');
       this.wrapperEl.appendChild(upperCanvasEl);
 
       this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
@@ -1082,9 +1083,9 @@ import { Point } from './point.class';
       if (this.wrapperEl) {
         return;
       }
-      this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, 'div', {
-        'class': this.containerClass
-      });
+      const container = fabric.document.createElement('div');
+      container.classList.add(this.containerClass);
+      this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, container);
       this.wrapperEl.setAttribute('data-fabric', 'wrapper');
       fabric.util.setStyle(this.wrapperEl, {
         width: this.width + 'px',

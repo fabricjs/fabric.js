@@ -1,7 +1,8 @@
 import { Point } from "../../point.class";
 import { TMat2D } from "../../typedefs";
-import { invertTransform, multiplyTransformMatrices, qrDecompose } from "./matrix";
-import type { TComposeMatrixArgs } from './matrix';
+import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
+import { invertTransform, multiplyTransformMatrices, qrDecompose, calcDimensionsMatrix } from "./matrix";
+import type { TComposeMatrixArgs, TScaleMatrixArgs } from './matrix';
 
 type FabricObject = any;
 
@@ -89,3 +90,31 @@ export const saveObjectTransform = (
   flipY: target.flipY,
   top: target.top
 });
+
+/**
+  * given a width and height, return the size of the bounding box
+  * that can contains the box with width/height with applied transform
+  * described in options.
+  * Use to calculate the boxes around objects for controls.
+  * @memberOf fabric.util
+  * @param {Number} width
+  * @param {Number} height
+  * @param {Object} options
+  * @param {Number} options.scaleX
+  * @param {Number} options.scaleY
+  * @param {Number} options.skewX
+  * @param {Number} options.skewY
+  * @returns {Point} size
+  */
+export const sizeAfterTransform = (width: number, height: number, options: TScaleMatrixArgs) => {
+ const dimX = width / 2, dimY = height / 2,
+     points = [
+       new Point(-dimX, -dimY),
+       new Point(dimX, -dimY),
+       new Point(-dimX, dimY),
+       new Point(dimX, dimY),
+     ],
+     transformMatrix = calcDimensionsMatrix(options),
+     bbox = makeBoundingBoxFromPoints(points, transformMatrix);
+ return new Point(bbox.width, bbox.height);
+};
