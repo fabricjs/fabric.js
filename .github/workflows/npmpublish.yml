@@ -22,3 +22,16 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
           PRE_RELEASE: ${{github.event.release.prerelease}}
+  update-bug-report:
+    runs-on: ubuntu-latest
+    name: Update bug report version
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 16
+    - run: npm ci
+    - run: node scripts/updateBugReportVersion.js
+    - run: git commit 
+    - run: pit push
+      
