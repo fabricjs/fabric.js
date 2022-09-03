@@ -20,6 +20,10 @@
     return path.slice(Math.max(path.lastIndexOf('\\'), path.lastIndexOf('/')) + 1);
   }
 
+  function roundArray(array) {
+    return array.map((val) => val.toFixed(4));
+  }
+
   var IMG_URL = fabric.isLikelyNode
     ? 'file://' + require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
     : getAbsolutePath('../fixtures/very_large_image.jpg');
@@ -1231,5 +1235,53 @@
       0
     ];
     assert.deepEqual(matrix, expected, 'dimensions matrix flipped is equal');
+  });
+  QUnit.test('mergeClipPaths', function(assert) {
+    var rectA = new fabric.Rect({ width: 100, height: 100, scaleX: 2, skewX: 3, angle: 10 });
+    var clipPathA = new fabric.Group([rectA], { scaleY: 3, angle: -18 });
+    var rectB = new fabric.Rect({ width: 100, height: 100, scaleY: 2.4, skewX: 3, skewY: 5, angle: 10 });
+    var clipPathB = new fabric.Group([rectB], { skewX: 34, angle: 36 });
+    var result = fabric.util.mergeClipPaths(clipPathA, clipPathB);
+    var resultingMatrix = result.clipPath.calcTransformMatrix();
+    var expectedMatrix = roundArray([
+      0.5877852522924731,
+      0.2696723314583158,
+      -0.41255083562929973,
+      0.37782470175621224,
+      -153.32445710769997,
+      1.7932869074173539,
+    ]);
+    assert.equal(result.inverted, false, 'the final clipPathB is not inverted')
+    assert.equal(result.clipPath, clipPathB, 'clipPathB is the final clipPath');
+    assert.deepEqual(roundArray(resultingMatrix), expectedMatrix, 'the clipPath has a new transform');
+  });
+  QUnit.test('mergeClipPaths with swapping', function(assert) {
+    var rectA = new fabric.Rect({ width: 100, height: 100, scaleX: 2, skewX: 3, angle: 10 });
+    var clipPathA = new fabric.Group([rectA], { scaleY: 3, angle: -18, inverted: true });
+    var rectB = new fabric.Rect({ width: 100, height: 100, scaleY: 2.4, skewX: 3, skewY: 5, angle: 10 });
+    var clipPathB = new fabric.Group([rectB], { skewX: 34, angle: 36 });
+    var result = fabric.util.mergeClipPaths(clipPathA, clipPathB);
+    var resultingMatrix = result.clipPath.calcTransformMatrix();
+    var expectedMatrix = roundArray([
+      1.1335,
+      -0.8090,
+      1.2377,
+      1.7634,
+      171.5698,
+      -127.2043,
+    ]);
+    assert.equal(result.inverted, false, 'the final clipPathA is not inverted')
+    assert.equal(result.clipPath, clipPathA, 'clipPathA is the final clipPath');
+    assert.deepEqual(roundArray(resultingMatrix), expectedMatrix, 'the clipPath has a new transform');
+  });
+  QUnit.test('mergeClipPaths with swapping', function(assert) {
+    var rectA = new fabric.Rect({ width: 100, height: 100, scaleX: 2, skewX: 3, angle: 10 });
+    var clipPathA = new fabric.Group([rectA], { scaleY: 3, angle: -18, inverted: true });
+    var rectB = new fabric.Rect({ width: 100, height: 100, scaleY: 2.4, skewX: 3, skewY: 5, angle: 10 });
+    var clipPathB = new fabric.Group([rectB], { skewX: 34, angle: 36, inverted: true });
+    var result = fabric.util.mergeClipPaths(clipPathA, clipPathB);
+    var resultingMatrix = result.clipPath.calcTransformMatrix();
+    assert.equal(result.inverted, true, 'the final clipPathB is inverted')
+    assert.equal(result.clipPath, clipPathB, 'clipPathB is the final clipPath');
   });
 })();
