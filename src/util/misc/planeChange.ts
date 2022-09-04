@@ -13,12 +13,12 @@ export const enum ObjectRelation {
 /**
  * We are actually looking for the transformation from the destination plane to the source plane (change of basis matrix)\
  * The object will exist on the destination plane and we want it to seem unchanged by it so we invert the destination matrix (`to`) and then apply the source matrix (`from`)
- * @param from 
- * @param to 
+ * @param [from]
+ * @param [to] 
  * @returns 
  */
-export const calcPlaneChangeMatrix = (from: TMat2D = iMatrix, to: TMat2D = iMatrix) =>
-  multiplyTransformMatrices(invertTransform(to), from);
+export const calcPlaneChangeMatrix = (from?: TMat2D | null, to?: TMat2D | null) =>
+  multiplyTransformMatrices(invertTransform(to || iMatrix), from || iMatrix);
 
 /**
  * Sends a point from the source coordinate plane to the destination coordinate plane.\
@@ -39,7 +39,7 @@ export const calcPlaneChangeMatrix = (from: TMat2D = iMatrix, to: TMat2D = iMatr
  * @param {TMat2D} [to] destination plane matrix to contain object. Passing `null` means `point` should be sent to the canvas coordinate plane.
  * @returns {Point} transformed point
  */
-export const sendPointToPlane = (point: IPoint, from: TMat2D = iMatrix, to: TMat2D = iMatrix): Point =>
+export const sendPointToPlane = (point: IPoint, from?: TMat2D | null, to?: TMat2D | null): Point =>
   transformPoint(point, calcPlaneChangeMatrix(from, to));
 
 /**
@@ -113,7 +113,7 @@ export const transformPointRelativeToCanvas = (
  * @param {Matrix} [to] destination plane matrix to contain object. Passing `null` means `object` should be sent to the canvas coordinate plane.
  * @returns {Matrix} the transform matrix that was applied to `object`
  */
-export const sendObjectToPlane = (object: TObject, from: TMat2D = iMatrix, to: TMat2D = iMatrix): TMat2D => {
+export const sendObjectToPlane = (object: TObject, from?: TMat2D | null, to?: TMat2D | null): TMat2D => {
   const t = calcPlaneChangeMatrix(from, to);
   applyTransformToObject(
     object,
