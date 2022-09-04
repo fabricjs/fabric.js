@@ -239,8 +239,8 @@ testCube.prototype.log = function() {
 }
 
 // FUNCTION CLASSES WITHOUT MAGIC CREATE CLASS
-// CALLSUPER IS NOT AVAILABLE
-
+// Callsuper is not available !!
+// Every constructor needs to have the basic code
 
 function funcObject (props) {
   Object.assign(this, props);
