@@ -511,6 +511,7 @@ import { Point } from './point.class';
      * @chainable
      */
     renderAll: function () {
+      this.cancelRequestedRender();
       if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
         this.clearContext(this.contextTop);
         this.contextTopDirty = false;
@@ -519,9 +520,8 @@ import { Point } from './point.class';
         this.renderTopLayer(this.contextTop);
         this.hasLostContext = false;
       }
-      var canvasToDrawOn = this.contextContainer;
       !this._objectsToRender && (this._objectsToRender = this._chooseObjectsToRender());
-      this.renderCanvas(canvasToDrawOn, this._objectsToRender);
+      this.renderCanvas(this.contextContainer, this._objectsToRender);
       return this;
     },
 

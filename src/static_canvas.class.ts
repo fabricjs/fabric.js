@@ -675,8 +675,8 @@ import { pick } from './util/misc/pick';
      * @chainable
      */
     renderAll: function () {
-      var canvasToDrawOn = this.contextContainer;
-      this.renderCanvas(canvasToDrawOn, this._objects);
+      this.cancelRequestedRender();
+      this.renderCanvas(this.contextContainer, this._objects);
       return this;
     },
 
