@@ -122,7 +122,7 @@ function assertCanvasDisposing(klass) {
         let called = 0;
         const animate = () => fabric.util.animate({
             onChange() {
-                if (called === 50) {
+                if (called === 1) {
                     canvas.dispose().then(() => {
                         fabric.runningAnimations.cancelAll();
                         done();
