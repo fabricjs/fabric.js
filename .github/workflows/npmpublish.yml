@@ -32,6 +32,8 @@ jobs:
         node-version: 16
     - run: npm ci
     - run: node scripts/updateBugReportVersion.js
+      env:
+        VERSION: ${{ github.event.release.tag_name }}
     - run: git commit 
     - run: pit push
       
