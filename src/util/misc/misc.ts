@@ -205,7 +205,7 @@ fabric.util = {
 
 /* Putting some tests here so i m sure i m in this build environemnt */
 
-const myLib = {};
+// NORMAL CLASSES
 
 class testObject {
   constructor(opts) {
@@ -238,13 +238,9 @@ testCube.prototype.log = function() {
   console.log('mine');
 }
 
-Object.assign(fabric, {
-	testObject,
-  testRect,
-  testCube,
-	rect: new testRect({ width: 150 }),
-  rect2: new testRect({ width: 100 })
-});
+// FUNCTION CLASSES WITHOUT MAGIC CREATE CLASS
+// CALLSUPER IS NOT AVAILABLE
+
 
 function funcObject (props) {
   Object.assign(this, props);
@@ -266,9 +262,22 @@ funcRect.prototype = {
 	type: 'fRect',
   prop: 'a rect thing to log',
   height: 100,
+  __proto__: funcObject.prototype,
 }
 
-Object.setPrototypeOf(funcRect.prototype, funcObject.prototype)
+function funcCube (props) {
+  Object.assign(this, props);
+}
+
+funcCube.prototype = {
+	type: 'fRect',
+  prop: 'a cube thing to log',
+  depth: 100,
+  log() {
+    console.log('a totally different log function')
+  },
+  __proto__: funcRect.prototype,
+}
 
 Object.assign(fabric, {
 	testObject,
@@ -276,6 +285,4 @@ Object.assign(fabric, {
   testCube,
   funcObject,
   funcRect,
-	rect: new testRect({ width: 150 }),
-  rect2: new testRect({ width: 100 })
 });
