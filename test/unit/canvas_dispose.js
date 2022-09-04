@@ -116,7 +116,7 @@ function assertCanvasDisposing(klass) {
         done();
     });
 
-    QUnit.test('dispose edge case: animate', function (assert) {
+    QUnit.test('dispose edge case: during animation', function (assert) {
         const done = assert.async();
         const canvas = new klass(null, { renderOnAddRemove: false });
         let called = 0;
