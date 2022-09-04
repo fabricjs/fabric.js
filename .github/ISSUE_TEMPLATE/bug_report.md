@@ -14,7 +14,7 @@ about: Create a detailed bug report with a reproducible test case. Anything else
 
 <!-- If you are working on a version below latest you should upgrade to latest before filing a bug report, your issue might have been resolved already -->
 ## Version
-<!-- CI_REPLACE_VERSION -->5.1.0<!-- CI_REPLACE_VERSION -->
+<!-- CI_REPLACE_VERSION -->5.2.4<!-- CI_REPLACE_VERSION -->
 
 
 ## Test Case
