@@ -81,6 +81,7 @@
     "@types/node": "^17.0.21",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
     "@typescript-eslint/parser": "^5.29.0",
+    "abort-controller": "^3.0.0",
     "auto-changelog": "^2.3.0",
     "busboy": "^1.6.0",
     "chalk": "^2.4.1",

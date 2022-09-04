@@ -2,6 +2,7 @@
 
 import { Color } from "./color";
 import { config } from "./config";
+import { Point } from "./point.class";
 
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
@@ -119,7 +120,7 @@ import { config } from "./config";
     toSVG: function(object) {
       var fBoxX = 40, fBoxY = 40, NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
           offset = fabric.util.rotateVector(
-            { x: this.offsetX, y: this.offsetY },
+            new Point(this.offsetX, this.offsetY),
             fabric.util.degreesToRadians(-object.angle)),
           BLUR_BOX = 20, color = new Color(this.color);
 
