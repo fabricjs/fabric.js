@@ -39,6 +39,7 @@ import {
 } from './objectTransforms';
 import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
 import {
+  calcPlaneChangeMatrix,
   sendPointToPlane,
   transformPointRelativeToCanvas,
   sendObjectToPlane,
@@ -151,6 +152,7 @@ fabric.util = {
   applyTransformToObject,
   removeTransformFromObject,
   makeBoundingBoxFromPoints,
+  calcPlaneChangeMatrix,
   sendPointToPlane,
   transformPointRelativeToCanvas,
   sendObjectToPlane,

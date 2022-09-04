@@ -17,7 +17,7 @@ export const enum ObjectRelation {
  * @param to 
  * @returns 
  */
-export const clacPlaneChangeMatrix = (from: TMat2D = iMatrix, to: TMat2D = iMatrix) =>
+export const calcPlaneChangeMatrix = (from: TMat2D = iMatrix, to: TMat2D = iMatrix) =>
   multiplyTransformMatrices(invertTransform(to), from);
 
 /**
@@ -40,7 +40,7 @@ export const clacPlaneChangeMatrix = (from: TMat2D = iMatrix, to: TMat2D = iMatr
  * @returns {Point} transformed point
  */
 export const sendPointToPlane = (point: IPoint, from: TMat2D = iMatrix, to: TMat2D = iMatrix): Point =>
-  transformPoint(point, clacPlaneChangeMatrix(from, to));
+  transformPoint(point, calcPlaneChangeMatrix(from, to));
 
 /**
  * Transform point relative to canvas.
@@ -114,7 +114,7 @@ export const transformPointRelativeToCanvas = (
  * @returns {Matrix} the transform matrix that was applied to `object`
  */
 export const sendObjectToPlane = (object: TObject, from: TMat2D = iMatrix, to: TMat2D = iMatrix): TMat2D => {
-  const t = clacPlaneChangeMatrix(from, to);
+  const t = calcPlaneChangeMatrix(from, to);
   applyTransformToObject(
     object,
     multiplyTransformMatrices(t, object.calcOwnMatrix())
