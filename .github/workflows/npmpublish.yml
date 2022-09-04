@@ -34,6 +34,6 @@ jobs:
     - run: node scripts/updateBugReportVersion.js
       env:
         VERSION: ${{ github.event.release.tag_name }}
-    - run: git commit 
-    - run: pit push
+    - run: git commit -m "ci(): update bug report version" -a
+    - run: git push
       
