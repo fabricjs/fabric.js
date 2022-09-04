@@ -74,12 +74,12 @@ function assertCanvasDisposing(klass) {
             called++;
         })
         canvas.fire('after:render');
+        assert.equal(called, 1, 'should have fired');
         assert.equal(canvas.nextRenderHandle, undefined);
         canvas.requestRenderAll();
         assert.equal(canvas.nextRenderHandle, undefined, '`requestRenderAll` should have no affect');
-        assert.equal(called, 1, 'should not have rendered');
         canvas.renderAll();
-        assert.equal(called, 1, 'should not have rendered');
+        assert.equal(called, 1, 'should not have rendered, should still equal 1');
         done();
     });
 
