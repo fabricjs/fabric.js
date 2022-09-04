@@ -3,11 +3,22 @@ import { invertTransform, multiplyTransformMatrices, transformPoint } from "./ma
 import { iMatrix } from "../../constants";
 import type { IPoint, Point } from "../../point.class";
 import { applyTransformToObject } from './objectTransforms';
+import { TObject } from "../../__types__";
 
 export const enum ObjectRelation {
   sibling = 'sibling',
   child = 'child',
 }
+
+/**
+ * We are actually looking for the transformation from the destination plane to the source plane (change of basis matrix)\
+ * The object will exist on the destination plane and we want it to seem unchanged by it so we invert the destination matrix (`to`) and then apply the source matrix (`from`)
+ * @param from 
+ * @param to 
+ * @returns 
+ */
+export const clacPlaneChangeMatrix = (from: TMat2D = iMatrix, to: TMat2D = iMatrix) =>
+  multiplyTransformMatrices(invertTransform(to), from);
 
 /**
  * Sends a point from the source coordinate plane to the destination coordinate plane.\
@@ -29,9 +40,7 @@ export const enum ObjectRelation {
  * @returns {Point} transformed point
  */
 export const sendPointToPlane = (point: IPoint, from: TMat2D = iMatrix, to: TMat2D = iMatrix): Point =>
-  //  we are actually looking for the transformation from the destination plane to the source plane (which is a linear mapping)
-  //  the object will exist on the destination plane and we want it to seem unchanged by it so we reverse the destination matrix (to) and then apply the source matrix (from)
-  transformPoint(point, multiplyTransformMatrices(invertTransform(to), from));
+  transformPoint(point, clacPlaneChangeMatrix(from, to));
 
 /**
  * Transform point relative to canvas.
@@ -104,10 +113,8 @@ export const transformPointRelativeToCanvas = (
  * @param {Matrix} [to] destination plane matrix to contain object. Passing `null` means `object` should be sent to the canvas coordinate plane.
  * @returns {Matrix} the transform matrix that was applied to `object`
  */
-export const sendObjectToPlane = (object: any, from: TMat2D = iMatrix, to: TMat2D = iMatrix): TMat2D => {
-  //  we are actually looking for the transformation from the destination plane to the source plane (which is a linear mapping)
-  //  the object will exist on the destination plane and we want it to seem unchanged by it so we reverse the destination matrix (to) and then apply the source matrix (from)
-  const t = multiplyTransformMatrices(invertTransform(to), from);
+export const sendObjectToPlane = (object: TObject, from: TMat2D = iMatrix, to: TMat2D = iMatrix): TMat2D => {
+  const t = clacPlaneChangeMatrix(from, to);
   applyTransformToObject(
     object,
     multiplyTransformMatrices(t, object.calcOwnMatrix())
