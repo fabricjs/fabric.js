@@ -2,6 +2,7 @@
 import { config } from './config';
 import { VERSION } from './constants';
 import { Point } from './point.class';
+import { requestAnimFrame } from './util/animate';
 import { removeFromArray } from './util/internals';
 import { pick } from './util/misc/pick';
 
@@ -707,7 +708,7 @@ import { pick } from './util/misc/pick';
      */
     requestRenderAll: function () {
       if (!this.nextRenderHandle && !this.disposed && !this.destroyed) {
-        this.nextRenderHandle = fabric.util.requestAnimFrame(this.renderAndResetBound);
+        this.nextRenderHandle = requestAnimFrame(this.renderAndResetBound);
       }
       return this;
     },
