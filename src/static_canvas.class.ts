@@ -676,6 +676,9 @@ import { pick } from './util/misc/pick';
      */
     renderAll: function () {
       this.cancelRequestedRender();
+      if (this.destroyed) {
+        return;
+      }
       this.renderCanvas(this.contextContainer, this._objects);
       return this;
     },

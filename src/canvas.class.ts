@@ -512,6 +512,9 @@ import { Point } from './point.class';
      */
     renderAll: function () {
       this.cancelRequestedRender();
+      if (this.destroyed) {
+        return;
+      }
       if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
         this.clearContext(this.contextTop);
         this.contextTopDirty = false;

@@ -115,6 +115,31 @@ function assertCanvasDisposing(klass) {
         assert.ok(await canvas.dispose(), 'dispose');
         done();
     });
+
+    QUnit.test('dispose edge case: animate', function (assert) {
+        const done = assert.async();
+        const canvas = new klass(null, { renderOnAddRemove: false });
+        let called = 0;
+        const animate = () => fabric.util.animate({
+            onChange() {
+                if (called === 50) {
+                    canvas.dispose().then(() => {
+                        fabric.runningAnimations.cancelAll();
+                        done();
+                    });
+                    assert.ok(canvas.disposed, 'should flag `disposed`');
+                }
+                called++;
+                canvas.contextTopDirty = true;
+                canvas.hasLostContext = true;
+                canvas.renderAll();
+            },
+            onComplete() {
+                animate();
+            }
+        });
+        animate();
+    });
 }
 
 function testStaticCanvasDisposing() {
