@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import { fabric } from "../HEADER";
 import { config } from "./config";
 import { TCrossOrigin, TMat2D } from "./typedefs";
