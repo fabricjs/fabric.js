@@ -3,10 +3,10 @@
 import { fabric } from "../HEADER";
 import { config } from "./config";
 import { TCrossOrigin, TMat2D, TSize } from "./typedefs";
+import { ifNaN } from "./util/internals";
 import { loadImage } from "./util/misc/objectEnlive";
 import { pick } from "./util/misc/pick";
 import { toFixed } from "./util/misc/toFixed";
-import { TObject } from "./__types__";
 
 export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
 
@@ -136,7 +136,7 @@ export class Pattern {
   /**
    * Returns object representation of a pattern
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {Object} Object representation of a pattern instance
+   * @return {object} Object representation of a pattern instance
    */
   toObject(propertiesToInclude: (keyof this)[]) {
     return {
@@ -154,15 +154,13 @@ export class Pattern {
   /* _TO_SVG_START_ */
   /**
    * Returns SVG representation of a pattern
-   * @param {fabric.Object} object
-   * @return {String} SVG representation of a pattern
    */
   toSVG({ width, height }: TSize) {
     const patternSource = this.sourceToString(),
-      patternOffsetX = this.offsetX / width,
-      patternOffsetY = this.offsetY / height;
-    let patternWidth = patternSource.width / width,
-      patternHeight = patternSource.height / height;
+      patternOffsetX = ifNaN(this.offsetX / width, 0),
+      patternOffsetY = ifNaN(this.offsetY / height, 0);
+    let patternWidth = ifNaN(patternSource.width / width, 0),
+      patternHeight = ifNaN(patternSource.height / height, 0);
     if (this.repeat === 'repeat-x' || this.repeat === 'no-repeat') {
       patternHeight = 1 + Math.abs(patternOffsetY || 0);
     }
