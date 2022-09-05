@@ -156,19 +156,19 @@ export class Pattern {
    * Returns SVG representation of a pattern
    */
   toSVG({ width, height }: TSize) {
-    const { width: patternWidth, height: patternHeight } = this.source,
+    const patternSource = this.source,
       patternOffsetX = ifNaN(this.offsetX / width, 0),
       patternOffsetY = ifNaN(this.offsetY / height, 0),
       patternWidth = this.repeat === 'repeat-y' || this.repeat === 'no-repeat' ?
-        1 + Math.abs(patternOffsetX) :
-        ifNaN(patternWidth / width, 0),
+        1 + Math.abs(patternOffsetX || 0) :
+        ifNaN(patternSource.width / width, 0),
       patternHeight = this.repeat === 'repeat-x' || this.repeat === 'no-repeat' ?
-        1 + Math.abs(patternOffsetY) :
-        ifNaN(patternHeight / height, 0);
+        1 + Math.abs(patternOffsetY || 0) :
+        ifNaN(patternSource.height / height, 0);
 
     return [
       `<pattern id="SVGID_${this.id}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`,
-      `<image x="0" y="0" width="${patternWidth}" height="${patternHeight}" xlink:href="${this.sourceToString()}"></image>`,
+      `<image x="0" y="0" width="${patternSource.width}" height="${patternSource.height}" xlink:href="${this.sourceToString()}"></image>`,
       `</pattern>`,
       ''
     ].join('\n');
