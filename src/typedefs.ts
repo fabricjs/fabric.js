@@ -69,4 +69,4 @@ export type TransformEvent<T> = TEvent & T & {
  * An invalid keyword and an empty string will be handled as the `anonymous` keyword.
  * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
  */
-export type TCrossOrigin = '' | 'anonymous' | 'use-credentials';
+export type TCrossOrigin = '' | 'anonymous' | 'use-credentials' | null;

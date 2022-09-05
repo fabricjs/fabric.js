@@ -4,8 +4,27 @@ import { TCrossOrigin, TMat2D } from "./typedefs";
 import { loadImage } from "./util/misc/objectEnlive";
 import { pick } from "./util/misc/pick";
 import { toFixed } from "./util/misc/toFixed";
+import { TObject } from "./__types__";
 
 export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
+
+type TExportedKeys = 'crossOrigin' | 'offsetX' | 'offsetY' | 'patternTransform' | 'repeat' | 'source';
+
+export type TPatternOptions = Partial<Pick<Pattern, TExportedKeys>>;
+
+export type TPatternSerialized = TPatternOptions & {
+  source: string;
+};
+
+export type TPatternHydrationOptions = {
+  /**
+   * handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   */
+  signal: AbortSignal
+}
+
+type TImageSource = { source: HTMLImageElement };
+type TCanvasSource = { source: HTMLCanvasElement };
 
 /**
  * Pattern class
@@ -50,7 +69,7 @@ export class Pattern {
 
   type = 'pattern'
 
-  source!: CanvasImageSource;
+  source!: CanvasImageSource// | (() => CanvasImageSource);
 
   readonly id: number;
 
@@ -60,19 +79,57 @@ export class Pattern {
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
    * @return {fabric.Pattern} thisArg
    */
-  constructor(options = {}) {
+  constructor(options: TPatternOptions = {}) {
     this.id = fabric.Object.__uid++;
     this.setOptions(options);
   }
 
+  setOptions<K extends TExportedKeys>(options: Record<K, this[K]>) {
+    for (const prop in options) {
+      this[prop] = options[prop];
+    }
+  }
+
+  /**
+   * @returns true if {@link source} is a <img> element
+   */
+  isImageSource(): this is TImageSource {
+    return typeof this.source.src === 'string';
+  }
+
+  /**
+   * @returns true if {@link source} is a <canvas> element
+   */
+  isCanvasSource(): this is TCanvasSource {
+    return typeof this.source === 'object' && this.source.toDataURL;
+  }
+
   sourceToString() {
-    return typeof this.source.src === 'string' ?
-      // <img> element
+    return this.isImageSource() ?
       this.source.src :
-      typeof this.source === 'object' && this.source.toDataURL ?
-        // <canvas> element
+      this.isCanvasSource() ?
         this.source.toDataURL() :
         '';
+  }
+
+
+  /**
+   * Returns an instance of CanvasPattern
+   * @param {CanvasRenderingContext2D} ctx Context to create pattern
+   * @return {CanvasPattern}
+   */
+  toLive(ctx: CanvasRenderingContext2D) {
+    if (
+      // if the image failed to load, return, and allow rest to continue loading
+      !this.source
+      // if an image
+      || (this.isImageSource()
+        && (!this.source.complete || this.source.naturalWidth === 0 || this.source.naturalHeight === 0))
+    ) {
+      return '';
+    }
+
+    return ctx.createPattern(this.source, this.repeat);
   }
 
   /**
@@ -99,7 +156,7 @@ export class Pattern {
    * @param {fabric.Object} object
    * @return {String} SVG representation of a pattern
    */
-  toSVG(object) {
+  toSVG(object: TObject) {
     const patternSource = typeof this.source === 'function' ? this.source() : this.source,
       patternOffsetX = this.offsetX / object.width,
       patternOffsetY = this.offsetY / object.height,
@@ -122,46 +179,12 @@ export class Pattern {
   }
   /* _TO_SVG_END_ */
 
-  setOptions<K extends keyof this>(options: Record<K, this[K]>) {
-    for (const prop in options) {
-      this[prop] = options[prop];
-    }
-  }
-
-  /**
-   * Returns an instance of CanvasPattern
-   * @param {CanvasRenderingContext2D} ctx Context to create pattern
-   * @return {CanvasPattern}
-   */
-  toLive(ctx: CanvasRenderingContext2D) {
-    const source = this.source;
-
-    if (
-      // if the image failed to load, return, and allow rest to continue loading
-      !source
-      // if an image
-      || (typeof source.src !== 'undefined'
-        && (!source.complete || source.naturalWidth === 0 || source.naturalHeight === 0))
-    ) {
-      return '';
-    }
-
-    return ctx.createPattern(source, this.repeat);
-  }
-
-  /**
-   *
-   * @param {object} object
-   * @param {object} [options]
-   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   * @returns
-   */
-  static async fromObject(object: any, options: { signal: AbortSignal }) {
-    const img = await loadImage(object.source, {
+  static async fromObject({ source, ...serialized }: TPatternSerialized, options: TPatternHydrationOptions) {
+    const img = await loadImage(source, {
       ...options,
-      crossOrigin: object.crossOrigin
+      crossOrigin: serialized.crossOrigin
     })
-    return new Pattern({ ...object, source: img });
+    return new Pattern({ ...serialized, source: img });
   }
 }
 

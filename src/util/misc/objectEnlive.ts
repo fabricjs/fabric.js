@@ -1,6 +1,9 @@
 import { fabric } from '../../../HEADER';
-import { capitalize, camelize } from '../lang_string';
 import { noop } from '../../constants';
+import { TCrossOrigin } from '../../typedefs';
+import { TObject } from '../../__types__';
+import { camelize, capitalize } from '../lang_string';
+import { createImage } from './dom';
 
 /**
  * Returns klass "Class" object of given namespace
@@ -13,7 +16,7 @@ export const getKlass = (type: string, namespace = fabric): any => namespace[cap
 
 type LoadImageOptions = {
   signal?: AbortSignal;
-  crossOrigin?: 'anonymous' | 'use-credentials' | null;
+  crossOrigin?: TCrossOrigin;
 }
 
 /**
@@ -26,11 +29,11 @@ type LoadImageOptions = {
  * @param {Promise<fabric.Image>} img the loaded image.
  */
 export const loadImage = (url: string, { signal, crossOrigin = null }: LoadImageOptions = {}) =>
-  new Promise(function (resolve, reject) {
+  new Promise<HTMLImageElement>(function (resolve, reject) {
     if (signal && signal.aborted) {
       return reject(new Error('`options.signal` is in `aborted` state'));
     }
-    const img = fabric.util.createImage();
+    const img = createImage();
     let abort: EventListenerOrEventListenerObject;
     if (signal) {
       abort = function (err: Event) {
@@ -39,7 +42,7 @@ export const loadImage = (url: string, { signal, crossOrigin = null }: LoadImage
       };
       signal.addEventListener('abort', abort, { once: true });
     }
-    const done = function() {
+    const done = function () {
       img.onload = img.onerror = null;
       abort && signal?.removeEventListener('abort', abort);
       resolve(img);
@@ -83,31 +86,31 @@ export const enlivenObjects = (
     reviver = noop,
     namespace = fabric,
   }: EnlivenObjectOptions = {},
-) => new Promise((resolve, reject) => {
-  const instances: any[] = [];
+) => new Promise<TObject[]>((resolve, reject) => {
+  const instances: TObject[] = [];
   signal && signal.addEventListener('abort', reject, { once: true });
   Promise.all(objects.map((obj) =>
     getKlass(obj.type, namespace).fromObject(obj, {
       signal,
       reviver,
       namespace,
-    }).then((fabricInstance: any) => {
+    }).then((fabricInstance: TObject) => {
       reviver(obj, fabricInstance);
       instances.push(fabricInstance);
       return fabricInstance;
     })
   ))
-  .then(resolve)
-  .catch((error) => {
-    // cleanup
-    instances.forEach(function (instance) {
-      instance.dispose && instance.dispose();
+    .then(resolve)
+    .catch((error) => {
+      // cleanup
+      instances.forEach(function (instance) {
+        instance.dispose && instance.dispose();
+      });
+      reject(error);
+    })
+    .finally(() => {
+      signal && signal.removeEventListener('abort', reject);
     });
-    reject(error);
-  })
-  .finally(() => {
-    signal && signal.removeEventListener('abort', reject);
-  });
 });
 
 /**
@@ -134,7 +137,7 @@ export const enlivenObjectEnlivables = (serializedObject: any, { signal }: { sig
       }
       // clipPath
       if (value.type) {
-        return fabric.util.enlivenObjects([value], { signal }).then(([enlived]: any[]) => {
+        return enlivenObjects([value], { signal }).then(([enlived]) => {
           instances.push(enlived);
           return enlived;
         });
@@ -155,15 +158,15 @@ export const enlivenObjectEnlivables = (serializedObject: any, { signal }: { sig
         return acc;
       }, {});
     })
-    .then(resolve)
-    .catch(function (error) {
-      // cleanup
-      instances.forEach((instance) => {
-        instance.dispose && instance.dispose();
+      .then(resolve)
+      .catch(function (error) {
+        // cleanup
+        instances.forEach((instance) => {
+          instance.dispose && instance.dispose();
+        });
+        reject(error);
+      })
+      .finally(function () {
+        signal && signal.removeEventListener('abort', reject);
       });
-      reject(error);
-    })
-    .finally(function () {
-      signal && signal.removeEventListener('abort', reject);
-    });
   });
