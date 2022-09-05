@@ -93,7 +93,7 @@ export class Pattern {
   }
 
   /**
-   * @returns true if {@link source} is a <img> element
+   * @returns true if {@link source} is an <img> element
    */
   isImageSource(): this is TImageSource {
     return typeof this.source.src === 'string';
