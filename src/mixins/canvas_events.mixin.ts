@@ -1,4 +1,8 @@
 //@ts-nocheck
+
+import { fireEvent } from "../util/fireEvent";
+
+
 (function(global) {
 
   var fabric = global.fabric,
@@ -1126,7 +1130,9 @@
     /**
      * @private
      */
-    _fire: fabric.controlsUtils.fireEvent,
+    _fire: function (eventName, options) {
+      return fireEvent(eventName, options);
+    },
 
     /**
      * Sets the cursor depending on where the canvas is being hovered.

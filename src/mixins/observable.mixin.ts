@@ -16,7 +16,7 @@
       eventListener[eventListener.indexOf(handler)] = false;
     }
     else {
-      fabric.util.array.fill(eventListener, false);
+      eventListener.fill(false);
     }
   }
 

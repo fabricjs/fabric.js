@@ -53,7 +53,7 @@
   "scripts": {
     "changelog": "auto-changelog -o change-output.md --unreleased-only",
     "build": "node ./scripts build",
-    "build:fast": "npm run build -- --fast",
+    "build:fast": "npm run build -- -f",
     "fabric": "node ./scripts",
     "dev": "node ./scripts dev",
     "start": "node ./scripts start",
@@ -82,6 +82,7 @@
     "@types/node": "^17.0.21",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
     "@typescript-eslint/parser": "^5.29.0",
+    "abort-controller": "^3.0.0",
     "auto-changelog": "^2.3.0",
     "axios": "^0.27.2",
     "busboy": "^1.6.0",
