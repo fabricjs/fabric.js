@@ -2,7 +2,7 @@
 
 import { fabric } from "../HEADER";
 import { config } from "./config";
-import { TCrossOrigin, TMat2D } from "./typedefs";
+import { TCrossOrigin, TMat2D, TSize } from "./typedefs";
 import { loadImage } from "./util/misc/objectEnlive";
 import { pick } from "./util/misc/pick";
 import { toFixed } from "./util/misc/toFixed";
@@ -20,7 +20,8 @@ export type TPatternSerialized = TPatternOptions & {
 
 export type TPatternHydrationOptions = {
   /**
-   * handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * handle aborting
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    */
   signal: AbortSignal
 }
@@ -29,9 +30,7 @@ type TImageSource = { source: HTMLImageElement };
 type TCanvasSource = { source: HTMLCanvasElement };
 
 /**
- * Pattern class
- * @class fabric.Pattern
- * @see {@link http://fabricjs.com/patterns|Pattern demo}
+ * @see {@link http://fabricjs.com/patterns demo}
  * @see {@link http://fabricjs.com/dynamic-patterns demo}
  */
 export class Pattern {
@@ -71,7 +70,7 @@ export class Pattern {
 
   type = 'pattern'
 
-  source!: CanvasImageSource// | (() => CanvasImageSource);
+  source!: CanvasImageSource
 
   readonly id: number;
 
@@ -158,12 +157,12 @@ export class Pattern {
    * @param {fabric.Object} object
    * @return {String} SVG representation of a pattern
    */
-  toSVG(object: TObject) {
+  toSVG({ width, height }: TSize) {
     const patternSource = this.sourceToString(),
-      patternOffsetX = this.offsetX / object.width,
-      patternOffsetY = this.offsetY / object.height;
-    let patternWidth = patternSource.width / object.width,
-      patternHeight = patternSource.height / object.height;
+      patternOffsetX = this.offsetX / width,
+      patternOffsetY = this.offsetY / height;
+    let patternWidth = patternSource.width / width,
+      patternHeight = patternSource.height / height;
     if (this.repeat === 'repeat-x' || this.repeat === 'no-repeat') {
       patternHeight = 1 + Math.abs(patternOffsetY || 0);
     }
