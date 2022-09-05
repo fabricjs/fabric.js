@@ -159,7 +159,7 @@ export class Pattern {
    * @return {String} SVG representation of a pattern
    */
   toSVG(object: TObject) {
-    const patternSource = typeof this.source === 'function' ? this.source() : this.source,
+    const patternSource = this.sourceToString(),
       patternOffsetX = this.offsetX / object.width,
       patternOffsetY = this.offsetY / object.height,
       patternImgSrc = this.sourceToString();
