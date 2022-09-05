@@ -161,8 +161,7 @@ export class Pattern {
   toSVG(object: TObject) {
     const patternSource = this.sourceToString(),
       patternOffsetX = this.offsetX / object.width,
-      patternOffsetY = this.offsetY / object.height,
-      patternImgSrc = this.sourceToString();
+      patternOffsetY = this.offsetY / object.height;
     let patternWidth = patternSource.width / object.width,
       patternHeight = patternSource.height / object.height;
     if (this.repeat === 'repeat-x' || this.repeat === 'no-repeat') {
@@ -174,7 +173,7 @@ export class Pattern {
 
     return [
       `<pattern id="SVGID_${this.id}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`,
-      `<image x="0" y="0" width="${patternSource.width}" height="${patternSource.height}" xlink:href="${patternImgSrc}"></image>`,
+      `<image x="0" y="0" width="${patternSource.width}" height="${patternSource.height}" xlink:href="${patternSource}"></image>`,
       `</pattern>`,
       ''
     ].join('\n');
