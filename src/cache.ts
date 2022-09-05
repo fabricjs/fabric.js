@@ -1,3 +1,4 @@
+import { config } from './config';
 
 export class Cache {
     /**
@@ -42,6 +43,21 @@ export class Cache {
         else if (this.charWidthsCache[fontFamily]) {
             delete this.charWidthsCache[fontFamily];
         }
+    }
+
+    /**
+     * Given current aspect ratio, determines the max width and height that can
+     * respect the total allowed area for the cache.
+     * @memberOf fabric.util
+     * @param {number} ar aspect ratio
+     * @return {number[]} Limited dimensions X and Y
+     */
+    limitDimsByArea(ar: number) {
+      const { perfLimitSizeTotal } = config;
+      const roughWidth = Math.sqrt(perfLimitSizeTotal * ar);
+      // we are not returning a point on purpose, to avoid circular dependencies
+      // this is an internal utility
+      return [Math.floor(roughWidth), Math.floor(perfLimitSizeTotal / roughWidth)];
     }
 
     /**

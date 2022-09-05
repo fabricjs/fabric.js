@@ -1,10 +1,11 @@
 //@ts-nocheck
-
+import { cache } from '../cache';
 import { config } from '../config';
 import { VERSION } from '../constants';
 import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
 import { pick } from '../util/misc/pick';
+import { runningAnimations } from '../util/animation_registry';
 
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
@@ -684,10 +685,9 @@ import { pick } from '../util/misc/pick';
      * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
      */
     _limitCacheSize: function(dims) {
-      var perfLimitSizeTotal = config.perfLimitSizeTotal,
-          width = dims.width, height = dims.height,
+      var width = dims.width, height = dims.height,
           max = config.maxCacheSideLimit, min = config.minCacheSideLimit;
-      if (width <= max && height <= max && width * height <= perfLimitSizeTotal) {
+      if (width <= max && height <= max && width * height <= config.perfLimitSizeTotal) {
         if (width < min) {
           dims.width = min;
         }
@@ -696,9 +696,9 @@ import { pick } from '../util/misc/pick';
         }
         return dims;
       }
-      var ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal),
-          x = capValue(min, limitedDims.x, max),
-          y = capValue(min, limitedDims.y, max);
+      var ar = width / height, [limX, limY] = cache.limitDimsByArea(ar),
+          x = capValue(min, limX, max),
+          y = capValue(min, limY, max);
       if (width > x) {
         dims.zoomX /= width / x;
         dims.width = x;
@@ -1904,8 +1904,10 @@ import { pick } from '../util/misc/pick';
      * override if necessary to dispose artifacts such as `clipPath`
      */
     dispose: function () {
-      if (fabric.runningAnimations) {
-        fabric.runningAnimations.cancelByTarget(this);
+      // todo verify this.
+      // runningAnimations is always truthy
+      if (runningAnimations) {
+        runningAnimations.cancelByTarget(this);
       }
     }
   });
