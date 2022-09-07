@@ -35,6 +35,8 @@ type TCanvasSource = { source: HTMLCanvasElement };
  */
 export class Pattern {
 
+  type = 'pattern'
+
   /**
    * @type TPatternRepeat
    * @defaults
@@ -67,8 +69,6 @@ export class Pattern {
    * @default
    */
   patternTransform: TMat2D | null = null
-
-  type = 'pattern'
 
   source!: CanvasImageSource
 
