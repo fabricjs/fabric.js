@@ -151,6 +151,10 @@ export class Pattern extends Filler<CanvasPattern> {
     };
   }
 
+  toJSON() {
+    return this.toObject();
+  }
+
   /* _TO_SVG_START_ */
   /**
    * Returns SVG representation of a pattern
