@@ -822,16 +822,21 @@ import { pick } from './util/misc/pick';
         return;
       }
       if (fill) {
-        Filler.buildPath(ctx, { width: this.width, height: this.height });
-        ctx.fillStyle = fill.toLive
-          ? fill.toLive(ctx, this)
-          : fill;
         if (needsVpt) {
           ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
         }
-        ctx.transform(1, 0, 0, 1, fill.offsetX || 0, fill.offsetY || 0);
-        var m = fill.gradientTransform;
-        m && ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        if (fill instanceof Filler) {
+          Filler.prepareCanvasFill(ctx, fill, { width: this.width, height: this.height });
+        }
+        else {
+          Filler.buildPath(ctx, { width: this.width, height: this.height });
+          ctx.fillStyle = fill.toLive
+            ? fill.toLive(ctx, this)
+            : fill;
+          ctx.transform(1, 0, 0, 1, fill.offsetX || 0, fill.offsetY || 0);
+          var m = fill.gradientTransform;
+          m && ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        }
         ctx.fill();
         ctx.restore();
       }

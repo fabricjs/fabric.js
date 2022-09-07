@@ -4,7 +4,7 @@ import { TObject } from "./__types__";
 
 export type FillerBBox = IPoint & Partial<TSize>;
 
-export type FillerRenderingOptions = { object: TObject, size?: TSize, dryRun?: boolean };
+export type FillerRenderingOptions = { object?: TObject, size?: TSize, dryRun?: boolean };
 
 export abstract class Filler<T extends CanvasPattern | CanvasGradient> {
 
@@ -101,4 +101,16 @@ export abstract class Filler<T extends CanvasPattern | CanvasGradient> {
         return Filler.prepare('stroke', ctx, object);
     }
 
+    static prepareCanvasFill<T extends CanvasPattern | CanvasGradient>(ctx: CanvasRenderingContext2D, filler: Filler<T> | string, size: TSize) {
+        Filler.buildPath(ctx, size);
+        if (filler instanceof Filler) {
+            filler.render('fill', ctx, {
+                dryRun: true
+            });
+        }
+        else if (filler) {
+            // is a color
+            ctx.fillStyle = filler;
+        }
+    }
 }
