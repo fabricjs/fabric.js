@@ -6,7 +6,9 @@ export type FillerBBox = IPoint & Partial<TSize>;
 
 export type FillerRenderingOptions = { object?: TObject, size?: TSize, dryRun?: boolean };
 
-export abstract class Filler<T extends CanvasPattern | CanvasGradient> {
+export type TCanvasFiller = CanvasPattern | CanvasGradient;
+
+export abstract class Filler<T extends TCanvasFiller> {
 
     /**
      * horizontal offset from object's left/top corner
@@ -101,8 +103,7 @@ export abstract class Filler<T extends CanvasPattern | CanvasGradient> {
         return Filler.prepare('stroke', ctx, object);
     }
 
-    static prepareCanvasFill<T extends CanvasPattern | CanvasGradient>(ctx: CanvasRenderingContext2D, filler: Filler<T> | string, size: TSize) {
-        Filler.buildPath(ctx, size);
+    static prepareCanvasFill<T extends TCanvasFiller>(ctx: CanvasRenderingContext2D, filler: Filler<T> | string) {
         if (filler instanceof Filler) {
             filler.render('fill', ctx, {
                 dryRun: true

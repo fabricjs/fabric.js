@@ -822,14 +822,16 @@ import { pick } from './util/misc/pick';
         return;
       }
       if (fill) {
+        ctx.save();
+        // mark area for fill
+        Filler.buildPath(ctx, { width: this.width, height: this.height });
         if (needsVpt) {
           ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
         }
         if (fill instanceof Filler) {
-          Filler.prepareCanvasFill(ctx, fill, { width: this.width, height: this.height });
+          Filler.prepareCanvasFill(ctx, fill);
         }
         else {
-          Filler.buildPath(ctx, { width: this.width, height: this.height });
           ctx.fillStyle = fill.toLive
             ? fill.toLive(ctx, this)
             : fill;
