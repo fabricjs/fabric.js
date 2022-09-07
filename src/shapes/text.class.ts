@@ -3,6 +3,7 @@
 import { cache } from "../cache";
 import { DEFAULT_SVG_FONT_SIZE } from "../constants";
 import { Filler } from "../Filler";
+import { Point } from "../point.class";
 
 
 (function(global) {
@@ -1116,19 +1117,24 @@ import { Filler } from "../Filler";
       return pCtx.createPattern(pCanvas, 'no-repeat');
     },
 
-    handleFiller: function(ctx, property, filler) {
-      var offsetX, offsetY;
-      if (filler.toLive) {
+    handleFiller: function(ctx, action, filler) {
+      const offsetX = -this.width / 2,
+        offsetY = -this.height / 2;
+      const property = `${action}Style`;
+      if (filler instanceof Filler) {
+        ctx.translate(offsetX, offsetY);
+        return Filler.prepare(action, ctx, this, filler);
+      }
+      else if (filler.toLive) {
         if (filler.gradientUnits === 'percentage' || filler.gradientTransform) {
           // need to transform gradient in a pattern.
           // this is a slow process. If you are hitting this codepath, and the object
           // is not using caching, you should consider switching it on.
           // we need a canvas as big as the current object caching canvas.
-          offsetX = -this.width / 2;
-          offsetY = -this.height / 2;
+         
           ctx.translate(offsetX, offsetY);
           ctx[property] = this._applyPatternGradientTransformText(filler);
-          return { offsetX: offsetX, offsetY: offsetY };
+          return new Point(offsetX, offsetY);
         }
         else {
           // is a simple gradient or pattern
@@ -1140,7 +1146,7 @@ import { Filler } from "../Filler";
         // is a color
         ctx[property] = filler;
       }
-      return { offsetX: 0, offsetY: 0 };
+      return new Point();
     },
 
     _setStrokeStyles: function(ctx, decl) {
@@ -1149,11 +1155,11 @@ import { Filler } from "../Filler";
       ctx.lineDashOffset = this.strokeDashOffset;
       ctx.lineJoin = this.strokeLineJoin;
       ctx.miterLimit = this.strokeMiterLimit;
-      return this.handleFiller(ctx, 'strokeStyle', decl.stroke);
+      return this.handleFiller(ctx, 'stroke', decl.stroke);
     },
 
     _setFillStyles: function(ctx, decl) {
-      return this.handleFiller(ctx, 'fillStyle', decl.fill);
+      return this.handleFiller(ctx, 'fill', decl.fill);
     },
 
     /**
@@ -1191,8 +1197,8 @@ import { Filler } from "../Filler";
       if (decl && decl.deltaY) {
         top += decl.deltaY;
       }
-      shouldFill && ctx.fillText(_char, left - fillOffsets.offsetX, top - fillOffsets.offsetY);
-      shouldStroke && ctx.strokeText(_char, left - strokeOffsets.offsetX, top - strokeOffsets.offsetY);
+      shouldFill && ctx.fillText(_char, left - fillOffsets.x, top - fillOffsets.y);
+      shouldStroke && ctx.strokeText(_char, left - strokeOffsets.x, top - strokeOffsets.y);
       ctx.restore();
     },
 
