@@ -1110,7 +1110,7 @@ import { DEFAULT_SVG_FONT_SIZE } from "../constants";
       pCtx.beginPath(); pCtx.moveTo(0, 0); pCtx.lineTo(width, 0); pCtx.lineTo(width, height);
       pCtx.lineTo(0, height); pCtx.closePath();
       pCtx.translate(width / 2, height / 2);
-      pCtx.fillStyle = filler.toLive(pCtx);
+      pCtx.fillStyle = filler.toLive(pCtx, { width, height });
       this._applyPatternGradientTransform(pCtx, filler);
       pCtx.fill();
       return pCtx.createPattern(pCanvas, 'no-repeat');
@@ -1119,7 +1119,7 @@ import { DEFAULT_SVG_FONT_SIZE } from "../constants";
     handleFiller: function(ctx, property, filler) {
       var offsetX, offsetY;
       if (filler.toLive) {
-        if (filler.gradientUnits === 'percentage' || filler.gradientTransform || filler.patternTransform) {
+        if (filler.gradientUnits === 'percentage' || filler.gradientTransform) {
           // need to transform gradient in a pattern.
           // this is a slow process. If you are hitting this codepath, and the object
           // is not using caching, you should consider switching it on.

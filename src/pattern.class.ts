@@ -113,13 +113,12 @@ export class Pattern {
         '';
   }
 
-
   /**
    * Returns an instance of CanvasPattern
    * @param {CanvasRenderingContext2D} ctx Context to create pattern
    * @return {CanvasPattern}
    */
-  toLive(ctx: CanvasRenderingContext2D) {
+  toLive(ctx: CanvasRenderingContext2D, { width, height }: TSize) {
     if (
       // if the image failed to load, return, and allow rest to continue loading
       !this.source
@@ -130,7 +129,19 @@ export class Pattern {
       return '';
     }
 
-    return ctx.createPattern(this.source, this.repeat);
+    const pattern = ctx.createPattern(this.source, this.repeat);
+    const offsetX = -width / 2 + (this.offsetX || 0),
+      offsetY = -height / 2 + (this.offsetY || 0);
+    // once https://bugs.chromium.org/p/chromium/issues/detail?id=289572#c31 is resolved we can pass an array
+    this.patternTransform && pattern?.setTransform({
+      a: this.patternTransform[0],
+      b: this.patternTransform[1],
+      c: this.patternTransform[2],
+      d: this.patternTransform[3],
+      e: this.patternTransform[4] + offsetX,
+      f: this.patternTransform[5] + offsetY,
+    });
+    return pattern;
   }
 
   /**

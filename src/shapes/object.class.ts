@@ -1319,7 +1319,7 @@ import { runningAnimations } from '../util/animation_registry';
         ctx.lineJoin = decl.strokeLineJoin;
         ctx.miterLimit = decl.strokeMiterLimit;
         if (stroke.toLive) {
-          if (stroke.gradientUnits === 'percentage' || stroke.gradientTransform || stroke.patternTransform) {
+          if (stroke.gradientUnits === 'percentage' || stroke.gradientTransform) {
             // need to transform gradient in a pattern.
             // this is a slow process. If you are hitting this codepath, and the object
             // is not using caching, you should consider switching it on.
@@ -1453,7 +1453,7 @@ import { runningAnimations } from '../util/animation_registry';
       if (!filler || !filler.toLive) {
         return { offsetX: 0, offsetY: 0 };
       }
-      var t = filler.gradientTransform || filler.patternTransform;
+      var t = filler.gradientTransform;
       var offsetX = -this.width / 2 + filler.offsetX || 0,
           offsetY = -this.height / 2 + filler.offsetY || 0;
 
@@ -1565,7 +1565,7 @@ import { runningAnimations } from '../util/animation_registry';
         dims.zoomY / this.scaleY / retinaScaling
       );
       this._applyPatternGradientTransform(pCtx, filler);
-      pCtx.fillStyle = filler.toLive(ctx);
+      pCtx.fillStyle = filler.toLive(ctx, this);
       pCtx.fill();
       ctx.translate(-this.width / 2 - this.strokeWidth / 2, -this.height / 2 - this.strokeWidth / 2);
       ctx.scale(
