@@ -70,7 +70,7 @@
     "all": "npm run build && npm run test -- --all && npm run lint && npm run lint_tests && npm run export"
   },
   "optionalDependencies": {
-    "canvas": "^2.10.0",
+    "canvas": "^2.10.1",
     "jsdom": "^19.0.0"
   },
   "devDependencies": {
@@ -101,6 +101,7 @@
     "rollup": "^2.75.6",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-ts": "^3.0.2",
+    "source-map-support": "^0.5.21",
     "testem": "^3.8.0",
     "typescript": "^4.7.4"
   },
