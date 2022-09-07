@@ -1454,8 +1454,8 @@ import { runningAnimations } from '../util/animation_registry';
         return { offsetX: 0, offsetY: 0 };
       }
       var t = filler.gradientTransform;
-      var offsetX = -this.width / 2 + filler.offsetX || 0,
-          offsetY = -this.height / 2 + filler.offsetY || 0;
+      var offsetX = -this.width / 2 + (filler.offsetX || 0),
+          offsetY = -this.height / 2 + (filler.offsetY || 0);
 
       if (filler.gradientUnits === 'percentage') {
         ctx.transform(this.width, 0, 0, this.height, offsetX, offsetY);
