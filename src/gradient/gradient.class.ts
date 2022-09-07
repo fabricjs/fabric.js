@@ -3,39 +3,24 @@
 import { fabric } from "../../HEADER";
 import { Color } from "../color";
 import { iMatrix } from "../constants";
+import { Filler, FillerBBox } from "../Filler";
 import { parseTransformAttribute } from "../parser/parseTransformAttribute";
-import { TMat2D } from "../typedefs";
+import { Point } from "../point.class";
+import { TMat2D, TSize } from "../typedefs";
+import { multiplyTransformMatrices, transformPoint } from "../util/misc/matrix";
 import { pick } from "../util/misc/pick";
 import { matrixToSVG } from "../util/misc/svgParsing";
+import { TObject } from "../__types__";
 import { linearDefaultCoords, radialDefaultCoords } from "./constants";
 import { parseColorStops, parseCoords, parseGradientUnits, parseType } from "./parser";
 import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnits, SVGOptions } from "./typedefs";
-
-/**
- * @todo remove this transient junk
- */
-type FabricObject = any;
 
 /**
  * Gradient class
  * @class Gradient
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#gradients}
  */
-export class Gradient<S, T extends GradientType = S extends GradientType ? S : 'linear'> {
-
-  /**
-   * Horizontal offset for aligning gradients coming from SVG when outside pathgroups
-   * @type Number
-   * @default 0
-   */
-  offsetX = 0
-
-  /**
-   * Vertical offset for aligning gradients coming from SVG when outside pathgroups
-   * @type Number
-   * @default 0
-   */
-  offsetY = 0
+export class Gradient<S, T extends GradientType = S extends GradientType ? S : 'linear'> extends Filler<CanvasGradient> {
 
   /**
    * A transform matrix to apply to the gradient before painting.
@@ -56,7 +41,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    * @type GradientUnits
    * @default 'pixels'
    */
-  gradientUnits: GradientUnits
+  gradientUnits: GradientUnits = 'pixels'
 
   /**
    * Gradient type linear or radial
@@ -82,6 +67,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     id
   }: GradientOptions<T>) {
     const uid = fabric.Object.__uid++;
+    super();
     this.id = id ? `${id}_${uid}` : uid;
     this.type = type;
     this.gradientUnits = gradientUnits;
@@ -142,7 +128,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    * @param {fabric.Object} object Object to create a gradient for
    * @return {String} SVG representation of an gradient (linear/radial)
    */
-  toSVG(object: FabricObject, { additionalTransform: preTransform }: { additionalTransform?: string } = {}) {
+  toSVG(object: TObject, { additionalTransform: preTransform }: { additionalTransform?: string } = {}) {
     const markup = [],
       transform = (this.gradientTransform ? this.gradientTransform.concat() : iMatrix.concat()) as TMat2D,
       gradientUnits = this.gradientUnits === 'pixels' ? 'userSpaceOnUse' : 'objectBoundingBox';
@@ -234,17 +220,32 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
   }
   /* _TO_SVG_END_ */
 
+  transform(ctx: CanvasRenderingContext2D, live: CanvasGradient, { x, y, width, height }: FillerBBox) {
+    const s = this.gradientUnits === 'percentage' ?
+      new Point(width, height) :
+      new Point();
+    const t = multiplyTransformMatrices([s.x || 1, 0, 0, s.y || 1, x, y], this.gradientTransform || iMatrix);
+    ctx.transform(...t);
+  }
+
   /**
    * Returns an instance of CanvasGradient
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @return {CanvasGradient}
    */
-  toLive(ctx: CanvasRenderingContext2D) {
-    if (!this.type) {
-      return;
-    }
-
+  private toGradient(ctx: CanvasRenderingContext2D, transform: TMat2D) {
+    
     const coords = this.coords as GradientCoords<'radial'>;
+    // let gradient: CanvasGradient;
+    // if (this.type === 'linear') {
+    //   const p1 = transformPoint(new Point(coords.x1, coords.y1), transform, true);
+    //   const p2 = transformPoint(new Point(coords.x2, coords.y2), transform, true);
+    //   console.log(p1.x, p1.y, p2.x, p2.y)
+    //   gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
+    // }
+    // else {
+    //   gradient = ctx.createRadialGradient(coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
+    // }
     const gradient = this.type === 'linear' ?
       ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2) :
       ctx.createRadialGradient(coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
@@ -261,13 +262,59 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     return gradient;
   }
 
+  /**
+   * This function try to patch the missing gradientTransform on canvas gradients.
+   * transforming a context to transform the gradient, is going to transform the stroke too.
+   * we want to transform the gradient but not the stroke operation, so we create
+   * a transformed gradient on a pattern and then we use the pattern instead of the gradient.
+   * this method has drwabacks: is slow, is in low resolution, needs a patch for when the size
+   * is limited.
+   * @private
+   * @param {CanvasRenderingContext2D} ctx Context to render on
+   * @param {fabric.Gradient} filler a fabric gradient instance
+   */
+  private toPattern(ctx: CanvasRenderingContext2D, object: TObject) {
+    const dims = object._limitCacheSize(object._getCacheCanvasDimensions()),
+      pCanvas = fabric.util.createCanvasElement(),
+      retinaScaling = object.canvas.getRetinaScaling(),
+      width = dims.x / object.scaleX / retinaScaling,
+      height = dims.y / object.scaleY / retinaScaling;
+    pCanvas.width = width;
+    pCanvas.height = height;
+    const pCtx = pCanvas.getContext('2d');
+    Filler.buildPath(pCtx, { width, height });
+    pCtx.translate(width / 2, height / 2);
+    pCtx.scale(
+      dims.zoomX / object.scaleX / retinaScaling,
+      dims.zoomY / object.scaleY / retinaScaling
+    );
+    ctx.fillStyle = this.toGradient(pCtx, this.gradientTransform||iMatrix) || '';
+    pCtx.fill();
+    ctx.translate(-object.width / 2 - object.strokeWidth / 2, -object.height / 2 - object.strokeWidth / 2);
+    ctx.scale(
+      retinaScaling * object.scaleX / dims.zoomX,
+      retinaScaling * object.scaleY / dims.zoomY
+    );
+    return pCtx.createPattern(pCanvas, 'no-repeat');
+  }
+
+  toLive(ctx: CanvasRenderingContext2D, size?: TSize) {
+    if (!this.type) {
+      return null;
+    }
+    const t = this.gradientUnits === 'percentage' ?
+      multiplyTransformMatrices([size?.width||1, 0, 0, size?.height||1, 0, 0], this.gradientTransform || iMatrix) :
+      this.gradientTransform || iMatrix;
+    return this.toGradient(ctx, t);
+  }
+
   /* _FROM_SVG_START_ */
   /**
    * Returns {@link Gradient} instance from an SVG element
    * @static
    * @memberOf Gradient
    * @param {SVGGradientElement} el SVG gradient element
-   * @param {FabricObject} instance
+   * @param {TObject} instance
    * @param {String} opacity A fill-opacity or stroke-opacity attribute to multiply to each stop's opacity.
    * @param {SVGOptions} svgOptions an object containing the size of the SVG in order to parse correctly gradients
    * that uses gradientUnits as 'userSpaceOnUse' and percentages.
@@ -306,7 +353,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    *  </radialGradient>
    *
    */
-  static fromElement(el: SVGGradientElement, instance: FabricObject, svgOptions: SVGOptions): Gradient<GradientType> {
+  static fromElement(el: SVGGradientElement, instance: TObject, svgOptions: SVGOptions): Gradient<GradientType> {
     const gradientUnits = parseGradientUnits(el);
     return new Gradient({
       id: el.getAttribute('id') || undefined,
