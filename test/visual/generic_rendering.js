@@ -488,6 +488,7 @@
     canvas.add(
       text
     );
+    canvas.setActiveObject(text);
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
 
@@ -501,6 +502,7 @@
     percentage: 0.04,
     width: 300,
     height: 100,
+    fabricClass: 'Canvas'
   });
 
   tests.forEach(visualTestLoop(QUnit));
