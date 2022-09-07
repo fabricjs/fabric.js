@@ -70,7 +70,7 @@
     "all": "npm run build && npm run test -- --all && npm run lint && npm run lint_tests && npm run export"
   },
   "optionalDependencies": {
-    "canvas": "^2.8.0",
+    "canvas": "^2.10.0",
     "jsdom": "^19.0.0"
   },
   "devDependencies": {

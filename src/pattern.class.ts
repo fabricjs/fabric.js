@@ -2,6 +2,7 @@
 
 import { fabric } from "../HEADER";
 import { config } from "./config";
+import { iMatrix } from "./constants";
 import { Filler, FillerBBox } from "./Filler";
 import { TCrossOrigin, TMat2D, TSize } from "./typedefs";
 import { ifNaN } from "./util/internals";
@@ -102,16 +103,8 @@ export class Pattern extends Filler<CanvasPattern> {
   }
 
   transform(ctx: CanvasRenderingContext2D, live: CanvasPattern, { x, y }: FillerBBox) {
-    const t = this.patternTransform;
-    // once https://bugs.chromium.org/p/chromium/issues/detail?id=289572#c31 is resolved we can pass an array
-    t && live.setTransform({
-      a: t[0],
-      b: t[1],
-      c: t[2],
-      d: t[3],
-      e: t[4] + x,
-      f: t[5] + y,
-    });
+    const t = new DOMMatrix().translate(x, y).multiplySelf(new DOMMatrix(this.patternTransform || undefined));
+    live.setTransform(t);
   }
 
   /**
