@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { config } from './config';
 import { VERSION } from './constants';
+import { Filler } from './Filler';
 import { Point } from './point.class';
 import { removeFromArray } from './util/internals';
 import { pick } from './util/misc/pick';
@@ -821,13 +822,7 @@ import { pick } from './util/misc/pick';
         return;
       }
       if (fill) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(this.width, 0);
-        ctx.lineTo(this.width, this.height);
-        ctx.lineTo(0, this.height);
-        ctx.closePath();
+        Filler.buildPath(ctx, { width: this.width, height: this.height });
         ctx.fillStyle = fill.toLive
           ? fill.toLive(ctx, this)
           : fill;

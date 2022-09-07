@@ -6,6 +6,7 @@ import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
 import { pick } from '../util/misc/pick';
 import { runningAnimations } from '../util/animation_registry';
+import { Filler } from '../Filler';
 
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
@@ -1557,8 +1558,7 @@ import { runningAnimations } from '../util/animation_registry';
       pCanvas.width = width;
       pCanvas.height = height;
       pCtx = pCanvas.getContext('2d');
-      pCtx.beginPath(); pCtx.moveTo(0, 0); pCtx.lineTo(width, 0); pCtx.lineTo(width, height);
-      pCtx.lineTo(0, height); pCtx.closePath();
+      Filler.buildPath(pCtx, { width, height });
       pCtx.translate(width / 2, height / 2);
       pCtx.scale(
         dims.zoomX / this.scaleX / retinaScaling,

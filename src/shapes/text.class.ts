@@ -2,6 +2,7 @@
 
 import { cache } from "../cache";
 import { DEFAULT_SVG_FONT_SIZE } from "../constants";
+import { Filler } from "../Filler";
 
 
 (function(global) {
@@ -1107,8 +1108,7 @@ import { DEFAULT_SVG_FONT_SIZE } from "../constants";
       pCanvas.width = width;
       pCanvas.height = height;
       pCtx = pCanvas.getContext('2d');
-      pCtx.beginPath(); pCtx.moveTo(0, 0); pCtx.lineTo(width, 0); pCtx.lineTo(width, height);
-      pCtx.lineTo(0, height); pCtx.closePath();
+      Filler.buildPath(pCtx, { width, height });
       pCtx.translate(width / 2, height / 2);
       pCtx.fillStyle = filler.toLive(pCtx, { width, height });
       this._applyPatternGradientTransform(pCtx, filler);
