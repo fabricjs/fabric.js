@@ -1319,7 +1319,10 @@ import { Filler } from '../Filler';
         ctx.lineDashOffset = decl.strokeDashOffset;
         ctx.lineJoin = decl.strokeLineJoin;
         ctx.miterLimit = decl.strokeMiterLimit;
-        if (stroke.toLive) {
+        if (stroke instanceof Filler) {
+          return Filler.prepareStroke(ctx, this);
+        }
+        else if (stroke.toLive) {
           if (stroke.gradientUnits === 'percentage' || stroke.gradientTransform) {
             // need to transform gradient in a pattern.
             // this is a slow process. If you are hitting this codepath, and the object
@@ -1343,7 +1346,10 @@ import { Filler } from '../Filler';
     _setFillStyles: function(ctx, decl) {
       var fill = decl.fill;
       if (fill) {
-        if (fill.toLive) {
+        if (fill instanceof Filler) {
+          return Filler.prepareFill(ctx, this);
+        }
+        else if (fill.toLive) {
           ctx.fillStyle = fill.toLive(ctx, this);
           this._applyPatternGradientTransform(ctx, decl.fill);
         }
