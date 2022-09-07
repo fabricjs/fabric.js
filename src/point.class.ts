@@ -17,10 +17,10 @@ export class Point {
 
   y: number
 
-  type = 'point'
+  // type = 'point'
 
   constructor()
-  constructor(x: number, y: number)
+  constructor(x?: number, y?: number)
   constructor(point: IPoint)
   constructor(arg0: number | IPoint = 0, y = 0) {
     if (typeof arg0 === 'object') {

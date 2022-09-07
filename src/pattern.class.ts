@@ -2,6 +2,7 @@
 
 import { fabric } from "../HEADER";
 import { config } from "./config";
+import { Filler, FillerBBox } from "./Filler";
 import { TCrossOrigin, TMat2D, TSize } from "./typedefs";
 import { ifNaN } from "./util/internals";
 import { loadImage } from "./util/misc/objectEnlive";
@@ -33,7 +34,7 @@ type TCanvasSource = { source: HTMLCanvasElement };
  * @see {@link http://fabricjs.com/patterns demo}
  * @see {@link http://fabricjs.com/dynamic-patterns demo}
  */
-export class Pattern {
+export class Pattern extends Filler<CanvasPattern> {
 
   type = 'pattern'
 
@@ -42,20 +43,6 @@ export class Pattern {
    * @defaults
    */
   repeat: TPatternRepeat = 'repeat'
-
-  /**
-   * Pattern horizontal offset from object's left/top corner
-   * @type Number
-   * @default
-   */
-  offsetX = 0
-
-  /**
-   * Pattern vertical offset from object's left/top corner
-   * @type Number
-   * @default
-   */
-  offsetY = 0
 
   /**
    * @type TCrossOrigin
@@ -81,6 +68,7 @@ export class Pattern {
    * @return {fabric.Pattern} thisArg
    */
   constructor(options: TPatternOptions = {}) {
+    super();
     this.id = fabric.Object.__uid++;
     this.setOptions(options);
   }
@@ -113,12 +101,25 @@ export class Pattern {
         '';
   }
 
+  transform(ctx: CanvasRenderingContext2D, live: CanvasPattern, { x, y }: FillerBBox) {
+    const t = this.patternTransform;
+    // once https://bugs.chromium.org/p/chromium/issues/detail?id=289572#c31 is resolved we can pass an array
+    t && live.setTransform({
+      a: t[0],
+      b: t[1],
+      c: t[2],
+      d: t[3],
+      e: t[4] + x,
+      f: t[5] + y,
+    });
+  }
+
   /**
    * Returns an instance of CanvasPattern
    * @param {CanvasRenderingContext2D} ctx Context to create pattern
    * @return {CanvasPattern}
    */
-  toLive(ctx: CanvasRenderingContext2D, { width, height }: TSize) {
+  toLive(ctx: CanvasRenderingContext2D) {
     if (
       // if the image failed to load, return, and allow rest to continue loading
       !this.source
@@ -126,22 +127,10 @@ export class Pattern {
       || (this.isImageSource()
         && (!this.source.complete || this.source.naturalWidth === 0 || this.source.naturalHeight === 0))
     ) {
-      return '';
+      return null;
     }
 
-    const pattern = ctx.createPattern(this.source, this.repeat);
-    const offsetX = -width / 2 + (this.offsetX || 0),
-      offsetY = -height / 2 + (this.offsetY || 0);
-    // once https://bugs.chromium.org/p/chromium/issues/detail?id=289572#c31 is resolved we can pass an array
-    this.patternTransform && pattern?.setTransform({
-      a: this.patternTransform[0],
-      b: this.patternTransform[1],
-      c: this.patternTransform[2],
-      d: this.patternTransform[3],
-      e: this.patternTransform[4] + offsetX,
-      f: this.patternTransform[5] + offsetY,
-    });
-    return pattern;
+    return ctx.createPattern(this.source, this.repeat);
   }
 
   /**
