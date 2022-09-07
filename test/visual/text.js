@@ -343,7 +343,7 @@
   });
 
   tests.push({
-    test: 'Text with pattern and gradient',
+    test: 'Text with pattern and gradient (scale = 2)',
     code: testGenerator(2),
     width: 480 * 2,
     height: 190 * 2,
@@ -352,7 +352,7 @@
   });
 
   tests.push({
-    test: 'Text with pattern and gradient',
+    test: 'Text with pattern and gradient (scale = 2, nonScaling = true)',
     code: testGenerator(2, true),
     width: 480 * 2,
     height: 190 * 2,
