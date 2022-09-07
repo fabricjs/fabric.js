@@ -51,7 +51,7 @@ export abstract class Filler<T extends TCanvasFiller> {
      * @returns calculated offset
      */
     protected render(action: 'stroke' | 'fill', ctx: CanvasRenderingContext2D, { object, size, dryRun }: FillerRenderingOptions) {
-        if (dryRun) {
+        if (!dryRun) {
             ctx.save();
         }
         const offset = this.calcOffset(size);
@@ -61,7 +61,7 @@ export abstract class Filler<T extends TCanvasFiller> {
             ...offset
         });
         ctx[`${action}Style`] = live || '';
-        if (dryRun) {
+        if (!dryRun) {
             ctx[action]();
             ctx.restore();
         }
@@ -105,7 +105,7 @@ export abstract class Filler<T extends TCanvasFiller> {
 
     static prepareCanvasFill<T extends TCanvasFiller>(ctx: CanvasRenderingContext2D, filler: Filler<T> | string) {
         if (filler instanceof Filler) {
-            filler.render('fill', ctx, {
+            filler.fill(ctx, {
                 dryRun: true
             });
         }
