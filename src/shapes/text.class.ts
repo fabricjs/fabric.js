@@ -1123,7 +1123,7 @@ import { Point } from "../point.class";
       const property = `${action}Style`;
       if (filler instanceof Filler) {
         ctx.translate(offsetX, offsetY);
-        return Filler.prepare(action, ctx, this, filler);
+        return Filler.prepare(action, ctx, { ...this, [action]: filler });
       }
       else if (filler.toLive) {
         if (filler.gradientUnits === 'percentage' || filler.gradientTransform) {
