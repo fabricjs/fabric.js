@@ -4,7 +4,7 @@ import { TObject } from "./__types__";
 
 export type FillerBBox = IPoint & Partial<TSize>;
 
-export type FillerRenderingOptions = { object?: TObject, size?: TSize, dryRun?: boolean };
+export type FillerRenderingOptions = { object?: TObject, size?: TSize };
 
 export type TCanvasFiller = CanvasPattern | CanvasGradient;
 
@@ -50,10 +50,7 @@ export abstract class Filler<T extends TCanvasFiller> {
      * @param size 
      * @returns calculated offset
      */
-    protected render(action: 'stroke' | 'fill', ctx: CanvasRenderingContext2D, { object, size, dryRun }: FillerRenderingOptions) {
-        if (!dryRun) {
-            ctx.save();
-        }
+    protected prepare(action: 'stroke' | 'fill', ctx: CanvasRenderingContext2D, { object, size }: FillerRenderingOptions = {}) {
         const offset = this.calcOffset(size);
         const live = this.toLive(ctx, object);
         live && this.transform(ctx, live, {
@@ -61,31 +58,34 @@ export abstract class Filler<T extends TCanvasFiller> {
             ...offset
         });
         ctx[`${action}Style`] = live || '';
-        if (!dryRun) {
-            ctx[action]();
-            ctx.restore();
-        }
         return offset;
     }
 
-    fill(ctx: CanvasRenderingContext2D, options: FillerRenderingOptions) {
-        return this.render('fill', ctx, options);
-    }
+    // protected render(action: 'stroke' | 'fill', ctx: CanvasRenderingContext2D, options: FillerRenderingOptions = {}) {
+    //     ctx.save();
+    //     const offset = this.prepare(action, ctx, options);
+    //     ctx[action]();
+    //     ctx.restore();
+    //     return offset;
+    // }
 
-    stroke(ctx: CanvasRenderingContext2D, options: FillerRenderingOptions) {
-        return this.render('stroke', ctx, options);
-    }
+    // fill(ctx: CanvasRenderingContext2D, options?: FillerRenderingOptions) {
+    //     return this.render('fill', ctx, options);
+    // }
+
+    // stroke(ctx: CanvasRenderingContext2D, options?: FillerRenderingOptions) {
+    //     return this.render('stroke', ctx, options);
+    // }
 
     static prepare(action: 'stroke' | 'fill', ctx: CanvasRenderingContext2D, object: TObject) {
         const filler = object[action];
         if (filler instanceof Filler) {
-            return filler.render(action, ctx, {
+            return filler.prepare(action, ctx, {
                 object,
                 size: {
                     width: object.width,
                     height: object.height
-                },
-                dryRun: true
+                }
             });
         }
         else if (filler) {
@@ -105,9 +105,7 @@ export abstract class Filler<T extends TCanvasFiller> {
 
     static prepareCanvasFill<T extends TCanvasFiller>(ctx: CanvasRenderingContext2D, filler: Filler<T> | string) {
         if (filler instanceof Filler) {
-            filler.fill(ctx, {
-                dryRun: true
-            });
+            filler.prepare('fill', ctx);
         }
         else if (filler) {
             // is a color
