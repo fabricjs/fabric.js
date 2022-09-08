@@ -823,7 +823,13 @@ import { pick } from './util/misc/pick';
       }
       if (fill) {
         ctx.save();
-        Filler.prepareCanvasFill(ctx, fill, { width: this.width, height: this.height });
+        Filler.prepareCanvasFill(ctx, {
+          filler: fill,
+          size: {
+            width: this.width,
+            height: this.height
+          }
+        });
         if (needsVpt) {
           ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
         }

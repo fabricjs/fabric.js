@@ -1117,51 +1117,6 @@ import { Point } from "../point.class";
       return pCtx.createPattern(pCanvas, 'no-repeat');
     },
 
-    handleFiller: function(ctx, action, filler) {
-      const offsetX = -this.width / 2,
-        offsetY = -this.height / 2;
-      const property = `${action}Style`;
-      if (filler instanceof Filler) {
-        ctx.translate(offsetX, offsetY);
-        return Filler.prepare(action, ctx, { ...this, [action]: filler });
-      }
-      else if (filler.toLive) {
-        if (filler.gradientUnits === 'percentage' || filler.gradientTransform) {
-          // need to transform gradient in a pattern.
-          // this is a slow process. If you are hitting this codepath, and the object
-          // is not using caching, you should consider switching it on.
-          // we need a canvas as big as the current object caching canvas.
-         
-          ctx.translate(offsetX, offsetY);
-          ctx[property] = this._applyPatternGradientTransformText(filler);
-          return new Point(offsetX, offsetY);
-        }
-        else {
-          // is a simple gradient or pattern
-          ctx[property] = filler.toLive(ctx, this);
-          return this._applyPatternGradientTransform(ctx, filler);
-        }
-      }
-      else {
-        // is a color
-        ctx[property] = filler;
-      }
-      return new Point();
-    },
-
-    _setStrokeStyles: function(ctx, decl) {
-      ctx.lineWidth = decl.strokeWidth;
-      ctx.lineCap = this.strokeLineCap;
-      ctx.lineDashOffset = this.strokeDashOffset;
-      ctx.lineJoin = this.strokeLineJoin;
-      ctx.miterLimit = this.strokeMiterLimit;
-      return this.handleFiller(ctx, 'stroke', decl.stroke);
-    },
-
-    _setFillStyles: function(ctx, decl) {
-      return this.handleFiller(ctx, 'fill', decl.fill);
-    },
-
     /**
      * @private
      * @param {String} method
@@ -1177,19 +1132,39 @@ import { Point } from "../point.class";
       var decl = this._getStyleDeclaration(lineIndex, charIndex),
           fullDecl = this.getCompleteStyleDeclaration(lineIndex, charIndex),
           shouldFill = method === 'fillText' && fullDecl.fill,
-          shouldStroke = method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth,
-          fillOffsets, strokeOffsets;
-
+          shouldStroke = method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth;
       if (!shouldStroke && !shouldFill) {
         return;
       }
       ctx.save();
 
-      shouldFill && (fillOffsets = this._setFillStyles(ctx, fullDecl));
-      shouldStroke && (strokeOffsets = this._setStrokeStyles(ctx, fullDecl));
+      if (shouldFill) {
+        Filler.prepare(ctx, {
+          action: 'fill',
+          filler: fullDecl.fill,
+          size: {
+            width: this.width,
+            height: this.height
+          }
+        });
+      }
+      if (shouldStroke) {
+        ctx.lineWidth = fullDecl.strokeWidth;
+        ctx.lineCap = this.strokeLineCap;
+        ctx.lineDashOffset = this.strokeDashOffset;
+        ctx.lineJoin = this.strokeLineJoin;
+        ctx.miterLimit = this.strokeMiterLimit;
+        Filler.prepare(ctx, {
+          action: 'stroke',
+          filler: fullDecl.stroke,
+          size: {
+            width: this.width,
+            height: this.height
+          }
+        });
+      }
 
       ctx.font = this._getFontDeclaration(fullDecl);
-
 
       if (decl && decl.textBackgroundColor) {
         this._removeShadow(ctx);
@@ -1197,8 +1172,10 @@ import { Point } from "../point.class";
       if (decl && decl.deltaY) {
         top += decl.deltaY;
       }
-      shouldFill && ctx.fillText(_char, left - fillOffsets.x, top - fillOffsets.y);
-      shouldStroke && ctx.strokeText(_char, left - strokeOffsets.x, top - strokeOffsets.y);
+      ctx.save();
+      shouldFill && ctx.fillText(_char, left, top);
+      ctx.restore();
+      shouldStroke && ctx.strokeText(_char, left, top);
       ctx.restore();
     },
 

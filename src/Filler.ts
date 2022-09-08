@@ -1,10 +1,15 @@
 import { IPoint, Point } from "./point.class";
 import { TSize } from "./typedefs";
-import { TObject } from "./__types__";
 
 export type FillerBBox = IPoint & Partial<TSize>;
 
-export type FillerRenderingOptions = { object?: TObject, size?: TSize, offset?: Point };
+export type TFillerAction = 'stroke' | 'fill';
+
+export type FillerRenderingOptions = {
+    action: TFillerAction,
+    size: TSize,
+    offset: Point
+};
 
 export type TCanvasFiller = CanvasPattern | CanvasGradient;
 
@@ -26,8 +31,6 @@ export abstract class Filler<T extends TCanvasFiller> {
 
     protected abstract toLive(ctx: CanvasRenderingContext2D, options: FillerRenderingOptions): T | null;
 
-    protected abstract transform(ctx: CanvasRenderingContext2D, live: T, bbox: FillerBBox): void;
-
     static buildPath(ctx: CanvasRenderingContext2D, { width, height }: TSize) {
         ctx.save();
         ctx.beginPath();
@@ -38,77 +41,45 @@ export abstract class Filler<T extends TCanvasFiller> {
         ctx.closePath();
     }
 
-    /**
-     * 
-     * @param action 
-     * @param ctx 
-     * @param size 
-     * @returns calculated offset
-     */
-    protected prepare(action: 'stroke' | 'fill', ctx: CanvasRenderingContext2D, { object, size, offset }: FillerRenderingOptions = {}) {
-        offset = (offset || new Point()).add(new Point(this.offsetX, this.offsetY));
-        const live = this.toLive(ctx, { object, size, offset });
-        live && this.transform(ctx, live, {
-            ...size,
-            ...offset
-        });
-        ctx[`${action}Style`] = live || '';
-        return offset;
-    }
-
-    // protected render(action: 'stroke' | 'fill', ctx: CanvasRenderingContext2D, options: FillerRenderingOptions = {}) {
-    //     ctx.save();
-    //     const offset = this.prepare(action, ctx, options);
-    //     ctx[action]();
-    //     ctx.restore();
-    //     return offset;
-    // }
-
-    // fill(ctx: CanvasRenderingContext2D, options?: FillerRenderingOptions) {
-    //     return this.render('fill', ctx, options);
-    // }
-
-    // stroke(ctx: CanvasRenderingContext2D, options?: FillerRenderingOptions) {
-    //     return this.render('stroke', ctx, options);
-    // }
-
-    static prepare(action: 'stroke' | 'fill', ctx: CanvasRenderingContext2D, object: TObject) {
-        const filler = object[action];
+    static prepare<T extends TCanvasFiller>(
+        ctx: CanvasRenderingContext2D,
+        { action, filler, size }: { action: TFillerAction, filler: Filler<T> | string, size: TSize }
+    ) {
+        let live: T | string | null = null;
         if (filler instanceof Filler) {
-            const { width, height } = object;
-            return filler.prepare(action, ctx, {
-                object,
-                size: {
-                    width,
-                    height
-                },
-                offset: new Point(width, height).scalarDivide(-2)
+            live = filler.toLive(ctx, {
+                action,
+                size,
+                offset: new Point(size.width, size.height)
+                    .scalarDivide(-2)
+                    .add(new Point(filler.offsetX, filler.offsetY))
             });
         }
         else if (filler) {
             // is a color
-            ctx[`${action}Style`] = filler;
-            return new Point();
+            live = filler;
         }
+        ctx[`${action}Style`] = live || '';
     }
 
-    static prepareFill(ctx: CanvasRenderingContext2D, object: TObject) {
-        return Filler.prepare('fill', ctx, object);
-    }
-
-    static prepareStroke(ctx: CanvasRenderingContext2D, object: TObject) {
-        return Filler.prepare('stroke', ctx, object);
-    }
-
-    static prepareCanvasFill<T extends TCanvasFiller>(ctx: CanvasRenderingContext2D, filler: Filler<T> | string, size: TSize) {
+    static prepareCanvasFill<T extends TCanvasFiller>(
+        ctx: CanvasRenderingContext2D,
+        { filler, size }: { filler: Filler<T> | string, size: TSize }
+    ) {
+        let live: T | string | null = null;
         // mark area for fill
         Filler.buildPath(ctx, size);
         if (filler instanceof Filler) {
-            filler.prepare('fill', ctx, { size, offset: new Point() });
+            live = filler.toLive(ctx, {
+                action: 'fill',
+                size,
+                offset: new Point(filler.offsetX, filler.offsetY)
+            });
         }
         else if (filler) {
             // is a color
-            ctx.fillStyle = filler;
+            live = filler;
         }
+        ctx.fillStyle = live || '';
     }
 }

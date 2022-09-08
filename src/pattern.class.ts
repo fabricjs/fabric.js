@@ -2,8 +2,7 @@
 
 import { fabric } from "../HEADER";
 import { config } from "./config";
-import { iMatrix } from "./constants";
-import { Filler, FillerBBox } from "./Filler";
+import { Filler, FillerRenderingOptions } from "./Filler";
 import { TCrossOrigin, TMat2D, TSize } from "./typedefs";
 import { ifNaN } from "./util/internals";
 import { loadImage } from "./util/misc/objectEnlive";
@@ -102,17 +101,12 @@ export class Pattern extends Filler<CanvasPattern> {
         '';
   }
 
-  transform(ctx: CanvasRenderingContext2D, live: CanvasPattern, { x, y }: FillerBBox) {
-    const t = new DOMMatrix().translate(x, y).multiplySelf(new DOMMatrix(this.patternTransform || undefined));
-    live.setTransform(t);
-  }
-
   /**
    * Returns an instance of CanvasPattern
    * @param {CanvasRenderingContext2D} ctx Context to create pattern
    * @return {CanvasPattern}
    */
-  toLive(ctx: CanvasRenderingContext2D) {
+  toLive(ctx: CanvasRenderingContext2D, { offset }: FillerRenderingOptions) {
     if (
       // if the image failed to load, return, and allow rest to continue loading
       !this.source
@@ -123,7 +117,10 @@ export class Pattern extends Filler<CanvasPattern> {
       return null;
     }
 
-    return ctx.createPattern(this.source, this.repeat);
+    const live = ctx.createPattern(this.source, this.repeat);
+    const t = new DOMMatrix().translate(offset.x, offset.y).multiplySelf(new DOMMatrix(this.patternTransform || undefined));
+    live.setTransform(t);
+    return live;
   }
 
   /**

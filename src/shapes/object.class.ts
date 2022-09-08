@@ -1311,22 +1311,6 @@ import { Filler } from '../Filler';
       }
     },
 
-    _setStrokeStyles: function(ctx, decl) {
-      var stroke = decl.stroke;
-      if (stroke) {
-        ctx.lineWidth = decl.strokeWidth;
-        ctx.lineCap = decl.strokeLineCap;
-        ctx.lineDashOffset = decl.strokeDashOffset;
-        ctx.lineJoin = decl.strokeLineJoin;
-        ctx.miterLimit = decl.strokeMiterLimit;
-        return Filler.prepareStroke(ctx, this);
-      }
-    },
-
-    _setFillStyles: function(ctx, decl) {
-      return Filler.prepareFill(ctx, decl);
-    },
-
     _setClippingProperties: function(ctx) {
       ctx.globalAlpha = 1;
       ctx.strokeStyle = 'transparent';
@@ -1480,7 +1464,14 @@ import { Filler } from '../Filler';
       }
 
       ctx.save();
-      this._setFillStyles(ctx, this);
+      Filler.prepare(ctx, {
+        action: 'fill',
+        filler: this.fill,
+        size: {
+          width: this.width,
+          height: this.height
+        }
+      });
       if (this.fillRule === 'evenodd') {
         ctx.fill('evenodd');
       }
@@ -1505,11 +1496,23 @@ import { Filler } from '../Filler';
 
       ctx.save();
       if (this.strokeUniform) {
-        var scaling = this.getObjectScaling();
+        const scaling = this.getObjectScaling();
         ctx.scale(1 / scaling.x, 1 / scaling.y);
       }
       this._setLineDash(ctx, this.strokeDashArray);
-      this._setStrokeStyles(ctx, this);
+      ctx.lineWidth = this.strokeWidth;
+      ctx.lineCap = this.strokeLineCap;
+      ctx.lineDashOffset = this.strokeDashOffset;
+      ctx.lineJoin = this.strokeLineJoin;
+      ctx.miterLimit = this.strokeMiterLimit;
+      Filler.prepare(ctx, {
+        action: 'stroke',
+        filler: this.stroke,
+        size: {
+          width: this.width,
+          height: this.height
+        }
+      });
       ctx.stroke();
       ctx.restore();
     },
