@@ -178,22 +178,58 @@
     assert.equal(object.colorStops, gradient.colorStops);
   });
 
-  QUnit.test('toLive linearGradient', function(assert) {
-    var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
-    var gradient = createLinearGradient();
-    var gradientHTML = canvas.contextContainer.createLinearGradient(0, 0, 1, 1);
-    assert.ok(typeof gradient.toLive === 'function');
-    var gradientCtx = gradient.toLive(canvas.contextContainer);
-    assert.equal(gradientCtx.toString(), gradientHTML.toString(), 'is a gradient for canvas radial');
-  });
+  QUnit.test('prepare', function(assert) {
+    const canvas = new fabric.StaticCanvas(null, { enableRetinaScaling: false });
+    const ctx = canvas.contextContainer;
+    const linear = createLinearGradient();
+    const cLinear = ctx.createLinearGradient(0, 0, 1, 1);
+    var radial = createRadialGradient();
+    var cRadial = ctx.createRadialGradient(0, 0, 1, 1, 2, 2);
 
-  QUnit.test('toLive radialGradient', function(assert) {
-    var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false });
-    var gradient = createRadialGradient();
-    var gradientHTML = canvas.contextContainer.createRadialGradient(0, 0, 1, 1, 2, 2);
-    assert.ok(typeof gradient.toLive === 'function');
-    var gradientCtx = gradient.toLive(canvas.contextContainer);
-    assert.equal(gradientCtx.toString(), gradientHTML.toString(), 'is a gradient for canvas radial');
+    const ctxMock = {
+      set fillStyle(value) {
+        this.fill = value;
+      },
+      createLinearGradient(...args) {
+        return ctx.createLinearGradient(...args);
+      },
+      createRadialGradient(...args) {
+        return ctx.createRadialGradient(...args);
+      },
+      transform() {
+        
+      }
+    };
+    const { set: fillStyleSpy } = sinon.spy(ctxMock, 'fillStyle', ['set']);
+    const linearSpy = sinon.spy(ctxMock, 'createLinearGradient');
+    const radialSpy = sinon.spy(ctxMock, 'createRadialGradient');
+    const transformSpy = sinon.stub(ctxMock, 'transform');
+
+    assert.ok(typeof linear.prepare === 'function');
+    
+    ctxMock.fillStyle = '#000000';
+    assert.ok(fillStyleSpy.calledOnce, 'fillStyle should be called');
+    linear.prepare(ctxMock, {
+      action: 'fill',
+      size: new fabric.Point(),
+      offset: new fabric.Point()
+    });
+    assert.ok(fillStyleSpy.calledTwice, 'fillStyle should be called by Gradient#prepare');
+    assert.ok(transformSpy.notCalled, 'should not have called ctx#transform');
+    radial.prepare(ctxMock, {
+      action: 'fill',
+      size: new fabric.Point(),
+      offset: new fabric.Point()
+    });
+    assert.ok(fillStyleSpy.calledThrice, 'fillStyle should be called by Gradient#prepare');
+    assert.ok(linearSpy.calledOnce, 'should be called by Gradient#toLive');
+    assert.ok(radialSpy.calledOnce, 'should be called by Gradient#toLive');
+    assert.ok(transformSpy.calledOnce, 'should be called by Gradient#toLive');
+    assert.deepEqual(linearSpy.args[0], [0, 10, 100, 200], 'args should match');
+    assert.deepEqual(radialSpy.args[0], [0, 10, 0, 100, 200, 50], 'args should match');
+    assert.deepEqual(fillStyleSpy.args[0], ['#000000'], 'first fillStyle set args should match');
+    assert.equal(Object.getPrototypeOf(fillStyleSpy.args[1][0]), Object.getPrototypeOf(cLinear), 'fillStyle should be a CanvasGradient');
+    assert.equal(Object.getPrototypeOf(fillStyleSpy.args[2][0]), Object.getPrototypeOf(cRadial), 'fillStyle should be a CanvasGradient');
   });
 
   QUnit.test('fromElement linearGradient', function(assert) {
