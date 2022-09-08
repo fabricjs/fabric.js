@@ -27,6 +27,7 @@ process.on('uncaughtException', QUnit.onUncaughtException);
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
 global.fs = require('fs');
+global.sinon = require('sinon');
 global.visualCallback = {
   addArguments: function() {},
 };
