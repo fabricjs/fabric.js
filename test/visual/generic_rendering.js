@@ -494,10 +494,10 @@
     canvas.add(
       text
     );
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 30]);
     canvas.setActiveObject(text);
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
-
   }
 
   tests.push({
@@ -506,8 +506,8 @@
     golden: 'textGradientFill.png',
     newModule: 'Text gradient fill',
     percentage: 0.04,
-    width: 300,
-    height: 100,
+    width: 220,
+    height: 60,
     fabricClass: 'Canvas'
   });
 
