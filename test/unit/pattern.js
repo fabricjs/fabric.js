@@ -88,7 +88,7 @@
     });
   });
 
-  QUnit.test('toLive', function(assert) {
+  QUnit.test('prepare', function(assert) {
     const canvas = new fabric.StaticCanvas(null, { enableRetinaScaling: false });
     const ctx = canvas.contextContainer;
     const pattern = createPattern();
