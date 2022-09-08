@@ -1,5 +1,5 @@
 import { Point } from "./point.class";
-import { TSize } from "./typedefs";
+import { TMat2D, TSize } from "./typedefs";
 
 export type TFillerAction = 'stroke' | 'fill';
 
@@ -72,11 +72,12 @@ export abstract class Filler<T extends TCanvasFiller> {
 
     static prepareCanvasFill<T extends TCanvasFiller>(
         ctx: CanvasRenderingContext2D,
-        { filler, size }: Omit<TFillerOptions<T>, 'action'>
+        { filler, size, preTransform }: Omit<TFillerOptions<T>, 'action'> & { preTransform?: TMat2D }
     ) {
         // mark area for fill
         Filler.buildPath(ctx, size);
         if (filler instanceof Filler) {
+            preTransform && ctx.transform(...preTransform);
             return filler.prepare(ctx, {
                 action: 'fill',
                 size,

@@ -829,11 +829,9 @@ import { pick } from './util/misc/pick';
           size: {
             width: this.width,
             height: this.height
-          }
+          },
+          preTransform: needsVpt && v
         });
-        if (needsVpt) {
-          ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-        }
         ctx.fill();
         ctx.restore();
       }
