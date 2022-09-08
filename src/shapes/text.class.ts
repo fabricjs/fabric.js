@@ -1137,14 +1137,15 @@ import { Point } from "../point.class";
         return;
       }
       ctx.save();
-
+      const offset = new Point(left, top);
+      let fillOffset, strokeOffset;
       if (shouldFill) {
-        Filler.prepare(ctx, {
+        fillOffset = Filler.prepare(ctx, {
           action: 'fill',
           filler: fullDecl.fill,
           size: {
-            width: this.width,
-            height: this.height
+            width: this.width + this.strokeWidth * 2,
+            height: this.height + this.strokeWidth * 2
           }
         });
       }
@@ -1154,12 +1155,12 @@ import { Point } from "../point.class";
         ctx.lineDashOffset = this.strokeDashOffset;
         ctx.lineJoin = this.strokeLineJoin;
         ctx.miterLimit = this.strokeMiterLimit;
-        Filler.prepare(ctx, {
+        strokeOffset = Filler.prepare(ctx, {
           action: 'stroke',
           filler: fullDecl.stroke,
           size: {
-            width: this.width,
-            height: this.height
+            width: this.width + this.strokeWidth * 2,
+            height: this.height + this.strokeWidth * 2
           }
         });
       }
@@ -1173,9 +1174,13 @@ import { Point } from "../point.class";
         top += decl.deltaY;
       }
       ctx.save();
-      shouldFill && ctx.fillText(_char, left, top);
+      const fillFinalOffset = offset.add(new Point(fillOffset));
+      const strokeFinalOffset = offset.add(new Point(strokeOffset));
+      console.log(strokeFinalOffset, strokeOffset)
+      console.log(fillFinalOffset, fillOffset)
+      shouldFill && ctx.fillText(_char, fillFinalOffset.x, fillFinalOffset.y);
       ctx.restore();
-      shouldStroke && ctx.strokeText(_char, left, top);
+      shouldStroke && ctx.strokeText(_char, strokeFinalOffset.x, strokeFinalOffset.y);
       ctx.restore();
     },
 

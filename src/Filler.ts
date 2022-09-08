@@ -1,17 +1,22 @@
-import { IPoint, Point } from "./point.class";
+import { Point } from "./point.class";
 import { TSize } from "./typedefs";
-
-export type FillerBBox = IPoint & Partial<TSize>;
 
 export type TFillerAction = 'stroke' | 'fill';
 
-export type FillerRenderingOptions = {
+export type TFillerRenderingOptions = {
     action: TFillerAction,
     size: TSize,
     offset: Point
 };
 
 export type TCanvasFiller = CanvasPattern | CanvasGradient;
+
+export type TFillerOptions<T extends TCanvasFiller> = {
+    action: TFillerAction,
+    filler: Filler<T> | string,
+    size: TSize
+}
+
 
 export abstract class Filler<T extends TCanvasFiller> {
 
@@ -29,7 +34,11 @@ export abstract class Filler<T extends TCanvasFiller> {
      */
     offsetY = 0
 
-    protected abstract toLive(ctx: CanvasRenderingContext2D, options: FillerRenderingOptions): T | null;
+    protected abstract toLive(ctx: CanvasRenderingContext2D, options: TFillerRenderingOptions): T | null;
+
+    protected prepare(ctx: CanvasRenderingContext2D, options: TFillerRenderingOptions): Point | void {
+        ctx[`${options.action}Style`] = this.toLive(ctx, options) || '';
+    }
 
     static buildPath(ctx: CanvasRenderingContext2D, { width, height }: TSize) {
         ctx.save();
@@ -43,11 +52,10 @@ export abstract class Filler<T extends TCanvasFiller> {
 
     static prepare<T extends TCanvasFiller>(
         ctx: CanvasRenderingContext2D,
-        { action, filler, size }: { action: TFillerAction, filler: Filler<T> | string, size: TSize }
+        { action, filler, size }: TFillerOptions<T>
     ) {
-        let live: T | string | null = null;
         if (filler instanceof Filler) {
-            live = filler.toLive(ctx, {
+            return filler.prepare(ctx, {
                 action,
                 size,
                 offset: new Point(size.width, size.height)
@@ -57,20 +65,18 @@ export abstract class Filler<T extends TCanvasFiller> {
         }
         else if (filler) {
             // is a color
-            live = filler;
-        }
-        ctx[`${action}Style`] = live || '';
+            ctx[`${action}Style`] = filler;
+        }        
     }
 
     static prepareCanvasFill<T extends TCanvasFiller>(
         ctx: CanvasRenderingContext2D,
-        { filler, size }: { filler: Filler<T> | string, size: TSize }
+        { filler, size }: Omit<TFillerOptions<T>, 'action'>
     ) {
-        let live: T | string | null = null;
         // mark area for fill
         Filler.buildPath(ctx, size);
         if (filler instanceof Filler) {
-            live = filler.toLive(ctx, {
+            return filler.prepare(ctx, {
                 action: 'fill',
                 size,
                 offset: new Point(filler.offsetX, filler.offsetY)
@@ -78,8 +84,7 @@ export abstract class Filler<T extends TCanvasFiller> {
         }
         else if (filler) {
             // is a color
-            live = filler;
+            ctx.fillStyle = filler;
         }
-        ctx.fillStyle = live || '';
     }
 }

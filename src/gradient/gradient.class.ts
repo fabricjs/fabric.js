@@ -3,10 +3,10 @@
 import { fabric } from "../../HEADER";
 import { Color } from "../color";
 import { iMatrix } from "../constants";
-import { Filler, FillerBBox, FillerRenderingOptions } from "../Filler";
+import { Filler, TFillerRenderingOptions } from "../Filler";
 import { parseTransformAttribute } from "../parser/parseTransformAttribute";
 import { Point } from "../point.class";
-import { TMat2D, TSize } from "../typedefs";
+import { TMat2D } from "../typedefs";
 import { multiplyTransformMatrices, transformPoint } from "../util/misc/matrix";
 import { pick } from "../util/misc/pick";
 import { matrixToSVG } from "../util/misc/svgParsing";
@@ -83,9 +83,9 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     this.colorStops = colorStops.slice();
   }
 
-  // isType<S extends GradientType>(type: S): this is Gradient<S> {
-  //   return (this.type as GradientType) === type;
-  // }
+  isType<S extends GradientType>(type: S): this is Gradient<S> {
+    return (this.type as GradientType) === type;
+  }
 
   /**
    * Adds another colorStop
@@ -104,6 +104,57 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     return this;
   }
 
+  private calcTransform({ size, offset }: TFillerRenderingOptions) {
+    const m = this.gradientTransform || iMatrix;
+    const t = this.gradientUnits === 'percentage' ?
+      multiplyTransformMatrices([size.width || 1, 0, 0, size.height || 1, 0, 0], m) :
+      m;
+    return multiplyTransformMatrices([1, 0, 0, 1, offset.x, offset.y], t);
+  }
+
+  protected toLive(ctx: CanvasRenderingContext2D, { transform }: TFillerRenderingOptions & { transform: TMat2D }) {
+    if (!this.type) {
+      return null;
+    }
+    const coords = this.coords as GradientCoords<'radial'>;
+    let gradient: CanvasGradient;
+    if (this.type === 'linear') {
+      const p1 = transformPoint(new Point(coords.x1, coords.y1), transform);
+      const p2 = transformPoint(new Point(coords.x2, coords.y2), transform);
+      gradient = ctx.createLinearGradient(
+        p1.x, p1.y,
+        p2.x, p2.y
+      );
+    }
+    else {
+      gradient = ctx.createRadialGradient(
+        coords.x1, coords.y1, coords.r1,
+        coords.x2, coords.y2, coords.r2
+      );
+      ctx.transform(...transform);
+    }
+    // const gradient = this.type === 'linear' ?
+    //   ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2) :
+    //   ctx.createRadialGradient(coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
+
+    this.colorStops.forEach(({ color, opacity, offset }) => {
+      gradient.addColorStop(
+        offset,
+        typeof opacity !== 'undefined' ?
+          new Color(color).setAlpha(opacity).toRgba() :
+          color
+      );
+    });
+
+    return gradient;
+  }
+
+  protected prepare(ctx: CanvasRenderingContext2D, options: TFillerRenderingOptions) {
+    const transform = this.calcTransform(options);
+    ctx[`${options.action}Style`] = this.toLive(ctx, { ...options, transform }) || '';
+    return new Point().transform(transform).scalarMultiply(-1);
+  }
+
   /**
    * Returns object representation of a gradient
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
@@ -120,6 +171,10 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
       gradientUnits: this.gradientUnits,
       gradientTransform: this.gradientTransform ? this.gradientTransform.concat() : this.gradientTransform
     };
+  }
+
+  toJSON() {
+    return this.toObject();
   }
 
   /* _TO_SVG_START_ */
@@ -219,86 +274,6 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     return markup.join('');
   }
   /* _TO_SVG_END_ */
-
-  /**
-   * Returns an instance of CanvasGradient
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @return {CanvasGradient}
-   */
-  private toGradient(ctx: CanvasRenderingContext2D, transform: TMat2D) {
-    
-    const coords = this.coords as GradientCoords<'radial'>;
-    let gradient: CanvasGradient;
-    if (this.type === 'linear') {
-      const p1 = transformPoint(new Point(coords.x1, coords.y1), transform);
-      const p2 = transformPoint(new Point(coords.x2, coords.y2), transform);
-      console.log(p1.x, p1.y, p2.x, p2.y)
-      gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
-    }
-    else {
-      gradient = ctx.createRadialGradient(coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
-    }
-    // const gradient = this.type === 'linear' ?
-    //   ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2) :
-    //   ctx.createRadialGradient(coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
-
-    this.colorStops.forEach(({ color, opacity, offset }) => {
-      gradient.addColorStop(
-        offset,
-        typeof opacity !== 'undefined' ?
-          new Color(color).setAlpha(opacity).toRgba() :
-          color
-      );
-    });
-
-    return gradient;
-  }
-
-  /**
-   * This function try to patch the missing gradientTransform on canvas gradients.
-   * transforming a context to transform the gradient, is going to transform the stroke too.
-   * we want to transform the gradient but not the stroke operation, so we create
-   * a transformed gradient on a pattern and then we use the pattern instead of the gradient.
-   * this method has drwabacks: is slow, is in low resolution, needs a patch for when the size
-   * is limited.
-   * @private
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {fabric.Gradient} filler a fabric gradient instance
-   */
-  private toPattern(ctx: CanvasRenderingContext2D, object: TObject) {
-    const dims = object._limitCacheSize(object._getCacheCanvasDimensions()),
-      pCanvas = fabric.util.createCanvasElement(),
-      retinaScaling = object.canvas.getRetinaScaling(),
-      width = dims.x / object.scaleX / retinaScaling,
-      height = dims.y / object.scaleY / retinaScaling;
-    pCanvas.width = width;
-    pCanvas.height = height;
-    const pCtx = pCanvas.getContext('2d');
-    Filler.buildPath(pCtx, { width, height });
-    pCtx.translate(width / 2, height / 2);
-    pCtx.scale(
-      dims.zoomX / object.scaleX / retinaScaling,
-      dims.zoomY / object.scaleY / retinaScaling
-    );
-    ctx.fillStyle = this.toGradient(pCtx, this.gradientTransform||iMatrix) || '';
-    pCtx.fill();
-    ctx.translate(-object.width / 2 - object.strokeWidth / 2, -object.height / 2 - object.strokeWidth / 2);
-    ctx.scale(
-      retinaScaling * object.scaleX / dims.zoomX,
-      retinaScaling * object.scaleY / dims.zoomY
-    );
-    return pCtx.createPattern(pCanvas, 'no-repeat');
-  }
-
-  toLive(ctx: CanvasRenderingContext2D, { size, offset }: FillerRenderingOptions) {
-    if (!this.type) {
-      return null;
-    }
-    const t = this.gradientUnits === 'percentage' ?
-      multiplyTransformMatrices([size?.width || 1, 0, 0, size?.height || 1, 0, 0], this.gradientTransform || iMatrix) :
-      this.gradientTransform || iMatrix;
-    return this.toGradient(ctx, multiplyTransformMatrices([1, 0, 0, 1, offset.x, offset.y], t));
-  }
 
   /* _FROM_SVG_START_ */
   /**

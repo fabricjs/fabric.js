@@ -2,7 +2,7 @@
 
 import { fabric } from "../HEADER";
 import { config } from "./config";
-import { Filler, FillerRenderingOptions } from "./Filler";
+import { Filler, TFillerRenderingOptions } from "./Filler";
 import { TCrossOrigin, TMat2D, TSize } from "./typedefs";
 import { ifNaN } from "./util/internals";
 import { loadImage } from "./util/misc/objectEnlive";
@@ -106,7 +106,7 @@ export class Pattern extends Filler<CanvasPattern> {
    * @param {CanvasRenderingContext2D} ctx Context to create pattern
    * @return {CanvasPattern}
    */
-  toLive(ctx: CanvasRenderingContext2D, { offset }: FillerRenderingOptions) {
+  toLive(ctx: CanvasRenderingContext2D, { offset }: TFillerRenderingOptions) {
     if (
       // if the image failed to load, return, and allow rest to continue loading
       !this.source
