@@ -339,7 +339,7 @@
     width: 480,
     height: 190,
     golden: 'text9.png',
-    percentage: 0.09,
+    percentage: 0.095,
   });
 
   tests.push({
@@ -348,7 +348,7 @@
     width: 480 * 2,
     height: 190 * 2,
     golden: 'text9b.png',
-    percentage: 0.09,
+    percentage: 0.095,
   });
 
   tests.push({
@@ -357,7 +357,7 @@
     width: 480 * 2,
     height: 190 * 2,
     golden: 'text9b-non-scaling.png',
-    percentage: 0.09,
+    percentage: 0.095,
   });
 
   function text10(canvas, callback) {
