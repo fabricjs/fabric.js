@@ -1239,7 +1239,7 @@ import { pick } from './util/misc/pick';
       var _this = this,
           markup = ['background', 'overlay'].map(function(prop) {
             var fill = _this[prop + 'Color'];
-            if (fill && fill.toLive) {
+            if (fill && fill instanceof Filler) {
               var shouldTransform = _this[prop + 'Vpt'], vpt = _this.viewportTransform,
                   object = {
                     width: _this.width / (shouldTransform ? vpt[0] : 1),
@@ -1357,7 +1357,7 @@ import { pick } from './util/misc/pick';
       if (!filler) {
         return;
       }
-      if (filler.toLive) {
+      if (filler instanceof Filler) {
         var repeat = filler.repeat, iVpt = fabric.util.invertTransform(vpt), shouldInvert = this[property + 'Vpt'],
             additionalTransform = shouldInvert ? fabric.util.matrixToSVG(iVpt) : '';
         markup.push(
