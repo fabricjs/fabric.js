@@ -3,7 +3,7 @@
 import { fabric } from "../../HEADER";
 import { Color } from "../color";
 import { iMatrix } from "../constants";
-import { Filler, FillerBBox } from "../Filler";
+import { Filler, FillerBBox, FillerRenderingOptions } from "../Filler";
 import { parseTransformAttribute } from "../parser/parseTransformAttribute";
 import { Point } from "../point.class";
 import { TMat2D, TSize } from "../typedefs";
@@ -225,7 +225,8 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
       new Point(width, height) :
       new Point();
     const t = multiplyTransformMatrices([s.x || 1, 0, 0, s.y || 1, x, y], this.gradientTransform || iMatrix);
-    ctx.transform(...t);
+    // ctx.transform(...t);
+    ctx.translate(x, y);
   }
 
   /**
@@ -236,19 +237,19 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
   private toGradient(ctx: CanvasRenderingContext2D, transform: TMat2D) {
     
     const coords = this.coords as GradientCoords<'radial'>;
-    // let gradient: CanvasGradient;
-    // if (this.type === 'linear') {
-    //   const p1 = transformPoint(new Point(coords.x1, coords.y1), transform, true);
-    //   const p2 = transformPoint(new Point(coords.x2, coords.y2), transform, true);
-    //   console.log(p1.x, p1.y, p2.x, p2.y)
-    //   gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
-    // }
-    // else {
-    //   gradient = ctx.createRadialGradient(coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
-    // }
-    const gradient = this.type === 'linear' ?
-      ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2) :
-      ctx.createRadialGradient(coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
+    let gradient: CanvasGradient;
+    if (this.type === 'linear') {
+      const p1 = transformPoint(new Point(coords.x1, coords.y1), transform);
+      const p2 = transformPoint(new Point(coords.x2, coords.y2), transform);
+      console.log(p1.x, p1.y, p2.x, p2.y)
+      gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
+    }
+    else {
+      gradient = ctx.createRadialGradient(coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
+    }
+    // const gradient = this.type === 'linear' ?
+    //   ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2) :
+    //   ctx.createRadialGradient(coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
 
     this.colorStops.forEach(({ color, opacity, offset }) => {
       gradient.addColorStop(
@@ -298,12 +299,12 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     return pCtx.createPattern(pCanvas, 'no-repeat');
   }
 
-  toLive(ctx: CanvasRenderingContext2D, size?: TSize) {
+  toLive(ctx: CanvasRenderingContext2D, { size }: FillerRenderingOptions) {
     if (!this.type) {
       return null;
     }
     const t = this.gradientUnits === 'percentage' ?
-      multiplyTransformMatrices([size?.width||1, 0, 0, size?.height||1, 0, 0], this.gradientTransform || iMatrix) :
+      multiplyTransformMatrices([size?.width || 1, 0, 0, size?.height || 1, 0, 0], this.gradientTransform || iMatrix) :
       this.gradientTransform || iMatrix;
     return this.toGradient(ctx, t);
   }
