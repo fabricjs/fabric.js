@@ -4,7 +4,7 @@ import { TObject } from "./__types__";
 
 export type FillerBBox = IPoint & Partial<TSize>;
 
-export type FillerRenderingOptions = { object?: TObject, size?: TSize };
+export type FillerRenderingOptions = { object?: TObject, size?: TSize, offset?: Point };
 
 export type TCanvasFiller = CanvasPattern | CanvasGradient;
 
@@ -24,14 +24,9 @@ export abstract class Filler<T extends TCanvasFiller> {
      */
     offsetY = 0
 
-    protected abstract toLive(ctx: CanvasRenderingContext2D, object: TObject): T | null;
+    protected abstract toLive(ctx: CanvasRenderingContext2D, options: FillerRenderingOptions): T | null;
 
     protected abstract transform(ctx: CanvasRenderingContext2D, live: T, bbox: FillerBBox): void;
-
-    protected calcOffset(size?: TSize) {
-        return new Point(size?.width, size?.height).scalarDivide(-2)
-            .add(new Point(this.offsetX, this.offsetY));
-    }
 
     static buildPath(ctx: CanvasRenderingContext2D, { width, height }: TSize) {
         ctx.save();
@@ -50,9 +45,9 @@ export abstract class Filler<T extends TCanvasFiller> {
      * @param size 
      * @returns calculated offset
      */
-    protected prepare(action: 'stroke' | 'fill', ctx: CanvasRenderingContext2D, { object, size }: FillerRenderingOptions = {}) {
-        const offset = this.calcOffset(size);
-        const live = this.toLive(ctx, object);
+    protected prepare(action: 'stroke' | 'fill', ctx: CanvasRenderingContext2D, { object, size, offset }: FillerRenderingOptions = {}) {
+        offset = (offset || new Point()).add(new Point(this.offsetX, this.offsetY));
+        const live = this.toLive(ctx, { object, size, offset });
         live && this.transform(ctx, live, {
             ...size,
             ...offset
@@ -80,12 +75,14 @@ export abstract class Filler<T extends TCanvasFiller> {
     static prepare(action: 'stroke' | 'fill', ctx: CanvasRenderingContext2D, object: TObject) {
         const filler = object[action];
         if (filler instanceof Filler) {
+            const { width, height } = object;
             return filler.prepare(action, ctx, {
                 object,
                 size: {
-                    width: object.width,
-                    height: object.height
-                }
+                    width,
+                    height
+                },
+                offset: new Point(width, height).scalarDivide(-2)
             });
         }
         else if (filler) {
@@ -103,9 +100,11 @@ export abstract class Filler<T extends TCanvasFiller> {
         return Filler.prepare('stroke', ctx, object);
     }
 
-    static prepareCanvasFill<T extends TCanvasFiller>(ctx: CanvasRenderingContext2D, filler: Filler<T> | string) {
+    static prepareCanvasFill<T extends TCanvasFiller>(ctx: CanvasRenderingContext2D, filler: Filler<T> | string, size: TSize) {
+        // mark area for fill
+        Filler.buildPath(ctx, size);
         if (filler instanceof Filler) {
-            filler.prepare('fill', ctx);
+            filler.prepare('fill', ctx, { size, offset: new Point() });
         }
         else if (filler) {
             // is a color
