@@ -1148,13 +1148,15 @@ import { Point } from "../point.class";
         top += decl.deltaY;
       }
       ctx.save();
-      const fillFinalOffset = offset.add(new Point(fillOffset));
-      const strokeFinalOffset = offset.add(new Point(strokeOffset));
-      console.log(strokeFinalOffset, strokeOffset)
-      console.log(fillFinalOffset, fillOffset)
-      shouldFill && ctx.fillText(_char, fillFinalOffset.x, fillFinalOffset.y);
+      if (shouldFill) {
+        const fillFinalOffset = offset.add(new Point(fillOffset));
+        ctx.fillText(_char, fillFinalOffset.x, fillFinalOffset.y);
+      }
       ctx.restore();
-      shouldStroke && ctx.strokeText(_char, strokeFinalOffset.x, strokeFinalOffset.y);
+      if (shouldStroke) {
+        const strokeFinalOffset = offset.add(new Point(strokeOffset));
+        ctx.strokeText(_char, strokeFinalOffset.x, strokeFinalOffset.y);
+      }
       ctx.restore();
     },
 
