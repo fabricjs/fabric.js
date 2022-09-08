@@ -162,8 +162,6 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
       type: this.type,
       coords: this.coords,
       colorStops: this.colorStops,
-      offsetX: this.offsetX,
-      offsetY: this.offsetY,
       gradientUnits: this.gradientUnits,
       gradientTransform: this.gradientTransform ? this.gradientTransform.concat() : this.gradientTransform
     };
