@@ -152,7 +152,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
   protected prepare(ctx: CanvasRenderingContext2D, options: TFillerRenderingOptions) {
     const transform = this.calcTransform(options);
     ctx[`${options.action}Style`] = this.toLive(ctx, { ...options, transform }) || '';
-    return new Point().transform(transform).scalarMultiply(-1);
+    return this.type === 'radial' ? new Point().transform(transform).scalarMultiply(-1): undefined;
   }
 
   /**
