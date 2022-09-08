@@ -150,7 +150,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
   }
 
   protected prepare(ctx: CanvasRenderingContext2D, options: TFillerRenderingOptions) {
-    const transform = this.calcTransform(options);
+    const transform = options.noTransform ? iMatrix : this.calcTransform(options);
     ctx[`${options.action}Style`] = this.toLive(ctx, { ...options, transform }) || '';
     return this.type === 'radial' ? new Point().transform(transform).scalarMultiply(-1): undefined;
   }

@@ -6,7 +6,8 @@ export type TFillerAction = 'stroke' | 'fill';
 export type TFillerRenderingOptions = {
     action: TFillerAction,
     size: TSize,
-    offset: Point
+    offset: Point,
+    noTransform?: boolean
 };
 
 export type TCanvasFiller = CanvasPattern | CanvasGradient;
@@ -79,7 +80,8 @@ export abstract class Filler<T extends TCanvasFiller> {
             return filler.prepare(ctx, {
                 action: 'fill',
                 size,
-                offset: new Point(filler.offsetX, filler.offsetY)
+                offset: new Point(filler.offsetX, filler.offsetY),
+                noTransform: true
             });
         }
         else if (filler) {

@@ -1,7 +1,8 @@
 //@ts-nocheck
 import { config } from './config';
-import { VERSION } from './constants';
+import { iMatrix, VERSION } from './constants';
 import { Filler } from './Filler';
+import { Gradient } from './gradient';
 import { Point } from './point.class';
 import { removeFromArray } from './util/internals';
 import { pick } from './util/misc/pick';
@@ -833,6 +834,7 @@ import { pick } from './util/misc/pick';
         if (needsVpt) {
           ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
         }
+        fill instanceof Gradient && ctx.transform(...fill.gradientTransform || iMatrix);
         ctx.fill();
         ctx.restore();
       }
