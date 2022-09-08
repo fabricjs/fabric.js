@@ -251,7 +251,7 @@
         y2: 0
       }
     }),
-    golden: 'backgroundWithpGradient.png',
+    golden: 'backgroundWithGradient.png',
     percentage: 0.09,
     width: 300,
     height: 300,
@@ -270,7 +270,7 @@
         y2: 0
       }
     }),
-    golden: 'backgroundWithpGradientZoom.png',
+    golden: 'backgroundWithGradientZoom.png',
     percentage: 0.09,
     width: 300,
     height: 300,
@@ -290,7 +290,7 @@
         y2: 0
       }
     }),
-    golden: 'backgroundWithpGradient.png',
+    golden: 'backgroundWithGradient.png',
     percentage: 0.09,
     width: 300,
     height: 300,

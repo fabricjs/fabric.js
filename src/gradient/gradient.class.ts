@@ -104,15 +104,15 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     return this;
   }
 
-  private calcTransform({ size, offset }: TFillerRenderingOptions) {
-    const m = this.gradientTransform || iMatrix;
+  private calcTransform({ size, offset, noTransform }: TFillerRenderingOptions) {
+    const m = (!noTransform && this.gradientTransform) || iMatrix;
     const t = this.gradientUnits === 'percentage' ?
       multiplyTransformMatrices([size.width || 1, 0, 0, size.height || 1, 0, 0], m) :
       m;
     return multiplyTransformMatrices([1, 0, 0, 1, offset.x, offset.y], t);
   }
 
-  protected toLive(ctx: CanvasRenderingContext2D, { transform }: TFillerRenderingOptions & { transform: TMat2D }) {
+  protected toLive(ctx: CanvasRenderingContext2D, { transform, noTransform }: TFillerRenderingOptions & { transform: TMat2D }) {
     if (!this.type) {
       return null;
     }
@@ -125,6 +125,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
         p1.x, p1.y,
         p2.x, p2.y
       );
+      noTransform && ctx.transform(...this.gradientTransform || iMatrix);
     }
     else {
       gradient = ctx.createRadialGradient(
@@ -150,7 +151,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
   }
 
   protected prepare(ctx: CanvasRenderingContext2D, options: TFillerRenderingOptions) {
-    const transform = options.noTransform ? iMatrix : this.calcTransform(options);
+    const transform = this.calcTransform(options);
     ctx[`${options.action}Style`] = this.toLive(ctx, { ...options, transform }) || '';
     return this.type === 'radial' ? new Point().transform(transform).scalarMultiply(-1): undefined;
   }
