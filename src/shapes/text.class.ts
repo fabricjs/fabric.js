@@ -1112,15 +1112,16 @@ import { Point } from "../point.class";
       }
       ctx.save();
       const offset = new Point(left, top);
+      const sizeForFiller = {
+        width: this.width + this.strokeWidth * 2,
+        height: this.height + this.strokeWidth * 2
+      };
       let fillOffset, strokeOffset;
       if (shouldFill) {
         fillOffset = Filler.prepare(ctx, {
           action: 'fill',
           filler: fullDecl.fill,
-          size: {
-            width: this.width + this.strokeWidth * 2,
-            height: this.height + this.strokeWidth * 2
-          }
+          size: sizeForFiller
         });
       }
       if (shouldStroke) {
@@ -1132,10 +1133,7 @@ import { Point } from "../point.class";
         strokeOffset = Filler.prepare(ctx, {
           action: 'stroke',
           filler: fullDecl.stroke,
-          size: {
-            width: this.width + this.strokeWidth * 2,
-            height: this.height + this.strokeWidth * 2
-          }
+          size: sizeForFiller
         });
       }
 
