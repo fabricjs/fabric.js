@@ -240,6 +240,62 @@
     height: 300,
   });
 
+  tests.push({
+    test: 'canvas can have a percentage gradient background',
+    code: createBackgroundGradientTest(null, {
+      gradientUnits: 'percentage',
+      coords: {
+        x1: 0,
+        y1: 0,
+        x2: 2 / 3,
+        y2: 0
+      }
+    }),
+    golden: 'backgroundWithpGradient.png',
+    percentage: 0.09,
+    width: 300,
+    height: 300,
+  });
+
+  tests.push({
+    test: 'canvas can have a percentage gradient background and being zoomed',
+    code: createBackgroundGradientTest(canvas => {
+      canvas.setZoom(0.1);
+    }, {
+      gradientUnits: 'percentage',
+      coords: {
+        x1: 0,
+        y1: 0,
+        x2: 2 / 3,
+        y2: 0
+      }
+    }),
+    golden: 'backgroundWithpGradientZoom.png',
+    percentage: 0.09,
+    width: 300,
+    height: 300,
+  });
+
+  tests.push({
+    test: 'canvas can have a percentage gradient background with zoom but being unaffected',
+    code: createBackgroundGradientTest(canvas => {
+      canvas.setZoom(0.1);
+      canvas.backgroundVpt = false;
+    }, {
+      gradientUnits: 'percentage',
+      coords: {
+        x1: 0,
+        y1: 0,
+        x2: 2 / 3,
+        y2: 0
+      }
+    }),
+    golden: 'backgroundWithpGradient.png',
+    percentage: 0.09,
+    width: 300,
+    height: 300,
+  });
+
   function objectsInActiveSelections(canvas, callback) {
     canvas.setZoom(0.1);
     var rect1 = new fabric.Rect({ fill: 'purple', top: 30, left: 50, width: 30, height: 100, angle: 10 });
