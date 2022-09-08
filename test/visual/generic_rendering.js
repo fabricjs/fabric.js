@@ -176,37 +176,40 @@
     height: 210,
   });
 
-  function backgroundWithGradient(canvas, callback) {
-    var g = new fabric.Gradient({
-      type: 'linear',
-      gradientTransform: [0.4 , -0.4, 0.2, 0.1, 3, 5],
-      coords: {
-        x1: 0,
-        y1: 0,
-        x2: 200,
-        y2: 0
-      },
-      colorStops: [{
-        offset: 0,
-        color: 'green'
-      },
-      {
-        offset: 0.5,
-        color: 'white'
-      },
-      {
-        offset: 1,
-        color: 'blue'
-      }]
-    });
-    canvas.set({ backgroundColor: g });
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
+  function createBackgroundGradientTest(gradientOptions = {}) {
+    return (canvas, callback) => {
+      var g = new fabric.Gradient({
+        type: 'linear',
+        gradientTransform: [0.4, -0.4, 0.2, 0.1, 3, 5],
+        coords: {
+          x1: 0,
+          y1: 0,
+          x2: 200,
+          y2: 0
+        },
+        colorStops: [{
+          offset: 0,
+          color: 'green'
+        },
+        {
+          offset: 0.5,
+          color: 'white'
+        },
+        {
+          offset: 1,
+          color: 'blue'
+        }],
+        ...gradientOptions
+      });
+      canvas.set({ backgroundColor: g });
+      canvas.renderAll();
+      callback(canvas.lowerCanvasEl);
+    }
   }
 
   tests.push({
     test: 'canvas can have a gradient background',
-    code: backgroundWithGradient,
+    code: createBackgroundGradientTest(),
     golden: 'backgroundWithGradient.png',
     percentage: 0.09,
     width: 300,
