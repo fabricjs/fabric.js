@@ -134,9 +134,6 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
       );
       ctx.transform(...transform);
     }
-    // const gradient = this.type === 'linear' ?
-    //   ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2) :
-    //   ctx.createRadialGradient(coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
 
     this.colorStops.forEach(({ color, opacity, offset }) => {
       gradient.addColorStop(
