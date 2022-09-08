@@ -17,8 +17,6 @@ export class Point {
 
   y: number
 
-  // type = 'point'
-
   constructor()
   constructor(x?: number, y?: number)
   constructor(point: IPoint)
