@@ -293,7 +293,7 @@
         patternTransform: fabric.util.multiplyTransformMatrices(
           [1, 0.3, 0.6, 0.8, 0, 0],
           nonScaling ?
-            [1 / scale, 0, 0, 1 / scale] :
+            [1 / scale, 0, 0, 1 / scale, -canvas.width / 2, -canvas.height / 2] :
             fabric.iMatrix
         )
       });
