@@ -220,15 +220,6 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
   }
   /* _TO_SVG_END_ */
 
-  transform(ctx: CanvasRenderingContext2D, live: CanvasGradient, { x, y, width, height }: FillerBBox) {
-    const s = this.gradientUnits === 'percentage' ?
-      new Point(width, height) :
-      new Point();
-    const t = multiplyTransformMatrices([s.x || 1, 0, 0, s.y || 1, x, y], this.gradientTransform || iMatrix);
-    // ctx.transform(...t);
-    ctx.translate(x, y);
-  }
-
   /**
    * Returns an instance of CanvasGradient
    * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -299,14 +290,14 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     return pCtx.createPattern(pCanvas, 'no-repeat');
   }
 
-  toLive(ctx: CanvasRenderingContext2D, { size }: FillerRenderingOptions) {
+  toLive(ctx: CanvasRenderingContext2D, { size, offset }: FillerRenderingOptions) {
     if (!this.type) {
       return null;
     }
     const t = this.gradientUnits === 'percentage' ?
       multiplyTransformMatrices([size?.width || 1, 0, 0, size?.height || 1, 0, 0], this.gradientTransform || iMatrix) :
       this.gradientTransform || iMatrix;
-    return this.toGradient(ctx, t);
+    return this.toGradient(ctx, multiplyTransformMatrices([1, 0, 0, 1, offset.x, offset.y], t));
   }
 
   /* _FROM_SVG_START_ */
