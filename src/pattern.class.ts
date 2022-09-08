@@ -1,19 +1,17 @@
 //@ts-nocheck
 
 import { fabric } from "../HEADER";
-import { config } from "./config";
-import { Filler, TFillerRenderingOptions } from "./Filler";
+import { Filler, TFillerExportedKeys, TFillerRenderingOptions } from "./Filler";
 import { TCrossOrigin, TMat2D, TSize } from "./typedefs";
 import { ifNaN } from "./util/internals";
 import { loadImage } from "./util/misc/objectEnlive";
 import { pick } from "./util/misc/pick";
-import { toFixed } from "./util/misc/toFixed";
 
 export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
 
-type TExportedKeys = 'crossOrigin' | 'offsetX' | 'offsetY' | 'patternTransform' | 'repeat' | 'source';
+type TPatternExportedKeys = TFillerExportedKeys | 'crossOrigin' | 'patternTransform' | 'repeat' | 'source';
 
-export type TPatternOptions = Partial<Pick<Pattern, TExportedKeys>>;
+export type TPatternOptions = Partial<Pick<Pattern, TPatternExportedKeys>>;
 
 export type TPatternSerialized = TPatternOptions & {
   source: string;
@@ -73,7 +71,7 @@ export class Pattern extends Filler<CanvasPattern> {
     this.setOptions(options);
   }
 
-  setOptions<K extends TExportedKeys>(options: Record<K, this[K]>) {
+  setOptions<K extends TPatternExportedKeys>(options: Record<K, this[K]>) {
     for (const prop in options) {
       this[prop] = options[prop];
     }
@@ -123,26 +121,16 @@ export class Pattern extends Filler<CanvasPattern> {
     return live;
   }
 
-  /**
-   * Returns object representation of a pattern
-   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {object} Object representation of a pattern instance
-   */
-  toObject(propertiesToInclude: (keyof this)[]) {
+  toObject(propertiesToInclude?: (keyof this)[]) {
     return {
       ...pick(this, propertiesToInclude),
+      ...super.toObject(propertiesToInclude),
       type: 'pattern',
       source: this.sourceToString(),
       repeat: this.repeat,
       crossOrigin: this.crossOrigin,
-      offsetX: toFixed(this.offsetX, config.NUM_FRACTION_DIGITS),
-      offsetY: toFixed(this.offsetY, config.NUM_FRACTION_DIGITS),
       patternTransform: this.patternTransform ? this.patternTransform.concat() : null
     };
-  }
-
-  toJSON() {
-    return this.toObject();
   }
 
   /* _TO_SVG_START_ */

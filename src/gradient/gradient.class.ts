@@ -15,6 +15,8 @@ import { linearDefaultCoords, radialDefaultCoords } from "./constants";
 import { parseColorStops, parseCoords, parseGradientUnits, parseType } from "./parser";
 import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnits, SVGOptions } from "./typedefs";
 
+// type TGradientExportedKeys = TFillerExportedKeys | 'type' | 'coords' | 'colorStops' | 'gradientUnits' | 'gradientTransform';
+
 /**
  * Gradient class
  * @class Gradient
@@ -153,14 +155,10 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     return this.type === 'radial' ? new Point().transform(transform).scalarMultiply(-1): undefined;
   }
 
-  /**
-   * Returns object representation of a gradient
-   * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {object}
-   */
   toObject(propertiesToInclude?: (keyof this)[]) {
     return {
       ...pick(this, propertiesToInclude),
+      ...super.toObject(propertiesToInclude),
       type: this.type,
       coords: this.coords,
       colorStops: this.colorStops,
@@ -169,10 +167,6 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
       gradientUnits: this.gradientUnits,
       gradientTransform: this.gradientTransform ? this.gradientTransform.concat() : this.gradientTransform
     };
-  }
-
-  toJSON() {
-    return this.toObject();
   }
 
   /* _TO_SVG_START_ */

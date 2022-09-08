@@ -1,5 +1,7 @@
+import { config } from "./config";
 import { Point } from "./point.class";
 import { TMat2D, TSize } from "./typedefs";
+import { toFixed } from "./util/misc/toFixed";
 
 export type TFillerAction = 'stroke' | 'fill';
 
@@ -12,12 +14,15 @@ export type TFillerRenderingOptions = {
 
 export type TCanvasFiller = CanvasPattern | CanvasGradient;
 
-export type TFillerOptions<T extends TCanvasFiller> = {
+export type TFillerExportedKeys = 'offsetX' | 'offsetY';
+
+export type TFillerOptions = {
     action: TFillerAction,
-    filler: Filler<T> | string,
+    filler: Filler<TCanvasFiller> | string,
     size: TSize
 }
 
+export type TCanvasFillerOptions = Omit<TFillerOptions, 'action'> & { preTransform?: TMat2D };
 
 export abstract class Filler<T extends TCanvasFiller> {
 
@@ -35,10 +40,21 @@ export abstract class Filler<T extends TCanvasFiller> {
      */
     offsetY = 0
 
-    protected abstract toLive(ctx: CanvasRenderingContext2D, options: TFillerRenderingOptions): T | null;
+    protected abstract toLive(ctx: CanvasRenderingContext2D, options: TFillerRenderingOptions): T | null
 
     protected prepare(ctx: CanvasRenderingContext2D, options: TFillerRenderingOptions): Point | void {
         ctx[`${options.action}Style`] = this.toLive(ctx, options) || '';
+    }
+
+    toObject(propertiesToInclude?: (keyof this)[]): object {
+        return {
+            offsetX: toFixed(this.offsetX, config.NUM_FRACTION_DIGITS),
+            offsetY: toFixed(this.offsetY, config.NUM_FRACTION_DIGITS),
+        };
+    }
+
+    toJSON() {
+        return this.toObject();
     }
 
     static buildPath(ctx: CanvasRenderingContext2D, { width, height }: TSize) {
@@ -51,9 +67,9 @@ export abstract class Filler<T extends TCanvasFiller> {
         ctx.closePath();
     }
 
-    static prepare<T extends TCanvasFiller>(
+    static prepare(
         ctx: CanvasRenderingContext2D,
-        { action, filler, size }: TFillerOptions<T>
+        { action, filler, size }: TFillerOptions
     ) {
         if (filler instanceof Filler) {
             return filler.prepare(ctx, {
@@ -70,9 +86,9 @@ export abstract class Filler<T extends TCanvasFiller> {
         }        
     }
 
-    static prepareCanvasFill<T extends TCanvasFiller>(
+    static prepareCanvasFill(
         ctx: CanvasRenderingContext2D,
-        { filler, size, preTransform }: Omit<TFillerOptions<T>, 'action'> & { preTransform?: TMat2D }
+        { filler, size, preTransform }: TCanvasFillerOptions
     ) {
         // mark area for fill
         Filler.buildPath(ctx, size);
