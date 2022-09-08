@@ -1404,33 +1404,6 @@ import { Filler } from '../Filler';
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Object} filler fabric.Pattern or fabric.Gradient
-     * @return {Object} offset.offsetX offset for text rendering
-     * @return {Object} offset.offsetY offset for text rendering
-     */
-    _applyPatternGradientTransform: function(ctx, filler) {
-      if (!filler || !filler.toLive) {
-        return { offsetX: 0, offsetY: 0 };
-      }
-      var t = filler.gradientTransform;
-      var offsetX = -this.width / 2 + (filler.offsetX || 0),
-          offsetY = -this.height / 2 + (filler.offsetY || 0);
-
-      if (filler.gradientUnits === 'percentage') {
-        ctx.transform(this.width, 0, 0, this.height, offsetX, offsetY);
-      }
-      else {
-        ctx.transform(1, 0, 0, 1, offsetX, offsetY);
-      }
-      if (t) {
-        ctx.transform(t[0], t[1], t[2], t[3], t[4], t[5]);
-      }
-      return { offsetX: offsetX, offsetY: offsetY };
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
      */
     _renderPaintInOrder: function(ctx) {
       if (this.paintFirst === 'stroke') {
@@ -1515,41 +1488,6 @@ import { Filler } from '../Filler';
       });
       ctx.stroke();
       ctx.restore();
-    },
-
-    /**
-     * This function try to patch the missing gradientTransform on canvas gradients.
-     * transforming a context to transform the gradient, is going to transform the stroke too.
-     * we want to transform the gradient but not the stroke operation, so we create
-     * a transformed gradient on a pattern and then we use the pattern instead of the gradient.
-     * this method has drwabacks: is slow, is in low resolution, needs a patch for when the size
-     * is limited.
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {fabric.Gradient} filler a fabric gradient instance
-     */
-    _applyPatternForTransformedGradient: function(ctx, filler) {
-      var dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-          pCanvas = fabric.util.createCanvasElement(), pCtx, retinaScaling = this.canvas.getRetinaScaling(),
-          width = dims.x / this.scaleX / retinaScaling, height = dims.y / this.scaleY / retinaScaling;
-      pCanvas.width = width;
-      pCanvas.height = height;
-      pCtx = pCanvas.getContext('2d');
-      Filler.buildPath(pCtx, { width, height });
-      pCtx.translate(width / 2, height / 2);
-      pCtx.scale(
-        dims.zoomX / this.scaleX / retinaScaling,
-        dims.zoomY / this.scaleY / retinaScaling
-      );
-      this._applyPatternGradientTransform(pCtx, filler);
-      pCtx.fillStyle = filler.toLive(ctx, this);
-      pCtx.fill();
-      ctx.translate(-this.width / 2 - this.strokeWidth / 2, -this.height / 2 - this.strokeWidth / 2);
-      ctx.scale(
-        retinaScaling * this.scaleX / dims.zoomX,
-        retinaScaling * this.scaleY / dims.zoomY
-      );
-      ctx.strokeStyle = pCtx.createPattern(pCanvas, 'no-repeat');
     },
 
     /**

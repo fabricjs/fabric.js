@@ -1092,32 +1092,6 @@ import { Point } from "../point.class";
     },
 
     /**
-     * This function try to patch the missing gradientTransform on canvas gradients.
-     * transforming a context to transform the gradient, is going to transform the stroke too.
-     * we want to transform the gradient but not the stroke operation, so we create
-     * a transformed gradient on a pattern and then we use the pattern instead of the gradient.
-     * this method has drawbacks: is slow, is in low resolution, needs a patch for when the size
-     * is limited.
-     * @private
-     * @param {fabric.Gradient} filler a fabric gradient instance
-     * @return {CanvasPattern} a pattern to use as fill/stroke style
-     */
-    _applyPatternGradientTransformText: function(filler) {
-      var pCanvas = fabric.util.createCanvasElement(), pCtx,
-          // TODO: verify compatibility with strokeUniform
-          width = this.width + this.strokeWidth, height = this.height + this.strokeWidth;
-      pCanvas.width = width;
-      pCanvas.height = height;
-      pCtx = pCanvas.getContext('2d');
-      Filler.buildPath(pCtx, { width, height });
-      pCtx.translate(width / 2, height / 2);
-      pCtx.fillStyle = filler.toLive(pCtx, { width, height });
-      this._applyPatternGradientTransform(pCtx, filler);
-      pCtx.fill();
-      return pCtx.createPattern(pCanvas, 'no-repeat');
-    },
-
-    /**
      * @private
      * @param {String} method
      * @param {CanvasRenderingContext2D} ctx Context to render on
