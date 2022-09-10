@@ -1,40 +1,4 @@
 
-// const MAT_CONFIG = {
-//     scale: {
-//         start: -1,
-//         end: 1,
-//         step: 1
-//     },
-//     skew: {
-//         start: -1,
-//         end: 1,
-//         step: 0.25
-//     },
-//     translate: {
-//         start: -100,
-//         end: 100,
-//         step: 50
-//     },
-// }
-
-// function generateMatrices({ scale, skew, translate }) {
-//     const arr = [];
-//     for (let a = MAT_CONFIG.scale.start; a <= MAT_CONFIG.scale.end; a += MAT_CONFIG.scale.step) {
-//         for (let d = MAT_CONFIG.scale.start; d <= MAT_CONFIG.scale.end; d += MAT_CONFIG.scale.step) {
-//             for (let b = MAT_CONFIG.skew.start; b <= MAT_CONFIG.skew.end; b += MAT_CONFIG.skew.step) {
-//                 for (let c = MAT_CONFIG.skew.start; c <= MAT_CONFIG.skew.end; c += MAT_CONFIG.skew.step) {
-//                     for (let e = MAT_CONFIG.translate.start; e <= MAT_CONFIG.translate.end; e += MAT_CONFIG.translate.step) {
-//                         for (let f = MAT_CONFIG.translate.start; f <= MAT_CONFIG.translate.end; f += MAT_CONFIG.translate.step) {
-//                             arr.push([a, b, c, d, e, f]);
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//     return arr;
-// }
-
 const matrices = [
     [0, 0, 0, 0, 0, 0],
     [1, 0, 0, 1, 0, 0],
