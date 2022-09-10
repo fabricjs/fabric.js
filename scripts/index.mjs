@@ -24,6 +24,7 @@ import killPort from 'kill-port';
 import _ from 'lodash';
 import moment from 'moment';
 import path from 'node:path';
+import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import os from 'os';
 import { listFiles, transform as transformFiles } from './transform_files.mjs';
