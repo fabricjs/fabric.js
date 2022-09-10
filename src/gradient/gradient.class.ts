@@ -10,7 +10,7 @@ import { TMat2D } from "../typedefs";
 import { multiplyTransformMatrices, transformPoint } from "../util/misc/matrix";
 import { pick } from "../util/misc/pick";
 import { matrixToSVG } from "../util/misc/svgParsing";
-import { TObject } from "../__types__";
+import { type TObject } from "../__types__";
 import { linearDefaultCoords, radialDefaultCoords } from "./constants";
 import { parseColorStops, parseCoords, parseGradientUnits, parseType } from "./parser";
 import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnits, SVGOptions } from "./typedefs";
@@ -123,6 +123,9 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     if (this.type === 'linear') {
       const p1 = transformPoint(new Point(coords.x1, coords.y1), transform);
       const p2 = transformPoint(new Point(coords.x2, coords.y2), transform);
+      if (p1.eq(p2)) {
+        return null;
+      }
       gradient = ctx.createLinearGradient(
         p1.x, p1.y,
         p2.x, p2.y
