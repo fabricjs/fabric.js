@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { fabric } from '../../HEADER';
 import { runningAnimations } from './animation_registry';
 import { noop } from '../constants';
@@ -26,8 +25,55 @@ import { noop } from '../constants';
  *
  * @typedef {(AnimationOptions & AnimationCurrentState & { cancel: CancelFunction }} AnimationContext
  */
+export type EasingFunction = (t: number, b: number, c: number, d: number) => number;
+export type AbortFunction = (current: number | number[], valuePercent: number, timePercent: number) => boolean;
 
-const defaultEasing = (t, b, c, d) => -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+export type OnChangeCallback = (x: number | number[], y: number, z: number) => void;
+
+export interface AnimationOptions {
+  onStart: VoidFunction;
+  onChange: OnChangeCallback;
+  onComplete: OnChangeCallback;
+  startValue: number | number[];
+  endValue: number | number[];
+  byValue: number | number[];
+  easing: EasingFunction;
+  duration: number;
+  abort: AbortFunction;
+  delay: number;
+}
+
+export interface AnimationCurrentState {
+  currentValue: number | number[];
+  completionRate: number;
+  durationRate: number;
+}
+
+export interface AnimationContext extends AnimationOptions, AnimationCurrentState {
+  cancel: VoidFunction;
+}
+
+/**
+ * Default easing
+ * @param t current time
+ * @param b
+ * @param c
+ * @param d duration
+ */
+const defaultEasing: EasingFunction = (t, b, c, d) => -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+
+export const DefaultAnimationOptions: AnimationOptions = {
+  onStart: noop,
+  onChange: noop,
+  onComplete: noop,
+  startValue: 0,
+  endValue: 100,
+  byValue: 100,
+  easing: defaultEasing,
+  duration: 500,
+  abort: noop,
+  delay: 0
+};
 
 /**
  * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
@@ -56,25 +102,26 @@ const defaultEasing = (t, b, c, d) => -c * Math.cos(t / d * (Math.PI / 2)) + c +
  *
  * @returns {CancelFunction} cancel function
  */
-export function animate(options = {}) {
+export function animate(options: AnimationOptions = DefaultAnimationOptions) {
   let cancel = false;
 
   const {
-    startValue = 0,
-    duration = 500,
-    easing = defaultEasing,
-    onChange = noop,
-    abort = noop,
-    onComplete = noop,
-    endValue = 100,
-    delay = 0,
+    startValue,
+    duration,
+    easing,
+    onChange,
+    abort,
+    onComplete,
+    endValue,
+    delay,
   } = options;
 
-  const context = {
+  const context: AnimationContext = {
     ...options,
+    cancel: noop,
     currentValue: startValue,
     completionRate: 0,
-    durationRate: 0
+    durationRate: 0,
   };
 
   const removeFromRegistry = () => {
@@ -88,14 +135,14 @@ export function animate(options = {}) {
   };
   runningAnimations.push(context);
 
-  const runner = function (timestamp) {
+  const runner = function (timestamp: number) {
     const start = timestamp || +new Date(),
           finish = start + duration,
           isMany = Array.isArray(startValue),
           byValue = options.byValue || (
             isMany ?
-            startValue.map((value, i) => endValue[i] - value)
-            : endValue - startValue
+            startValue.map((value, i) => (endValue as number[])[i] - value)
+            : (endValue as number) - startValue
           );
 
     options.onStart && options.onStart();
@@ -106,12 +153,12 @@ export function animate(options = {}) {
           timePerc = currentTime / duration,
           current = isMany ?
             startValue.map(
-              (_value, i) => easing(currentTime, _value, byValue[i], duration)
-            ) : easing(currentTime, startValue, byValue, duration),
-          valuePerc = isMany ? Math.abs((current[0] - startValue[0]) / byValue[0])
-            : Math.abs((current - startValue) / byValue);
+              (_value, i) => easing(currentTime, _value, (byValue as number[])[i], duration)
+            ) : easing(currentTime, startValue, byValue as number, duration),
+          valuePerc = isMany ? Math.abs(((current as number[])[0] - startValue[0]) / (byValue as number[])[0])
+            : Math.abs(((current as number) - startValue) / (byValue as number));
       //  update context
-      context.currentValue = isMany ? current.slice() : current;
+      context.currentValue = isMany ? (current as number[]).slice() : current;
       context.completionRate = valuePerc;
       context.durationRate = timePerc;
 
@@ -124,12 +171,12 @@ export function animate(options = {}) {
       }
       if (time > finish) {
         //  update context
-        context.currentValue = isMany ? endValue.slice() : endValue;
+        context.currentValue = isMany ? (endValue as number[]).slice() : endValue;
         context.completionRate = 1;
         context.durationRate = 1;
         //  execute callbacks
-        onChange(isMany ? endValue.slice() : endValue, 1, 1);
-        onComplete(endValue, 1, 1);
+        onChange(isMany ? (endValue as number[]).slice() : endValue, 1, 1);
+        onComplete(endValue as number, 1, 1);
         removeFromRegistry();
         return;
       }
@@ -151,7 +198,7 @@ export function animate(options = {}) {
 
 const _requestAnimFrame =
   fabric.window.requestAnimationFrame ||
-  function(callback) {
+  function(callback: FrameRequestCallback) {
     return fabric.window.setTimeout(callback, 1000 / 60);
   };
 
@@ -165,10 +212,10 @@ const _cancelAnimFrame =
  * @param {Function} callback Callback to invoke
  * @param {DOMElement} element optional Element to associate with animation
  */
-export function requestAnimFrame(...args) {
-  return _requestAnimFrame.apply(fabric.window, args);
+export function requestAnimFrame(callback: FrameRequestCallback) {
+  return _requestAnimFrame.apply(fabric.window, [callback]);
 }
 
-export function cancelAnimFrame(...args) {
-  return _cancelAnimFrame.apply(fabric.window, args);
+export function cancelAnimFrame(handle: number) {
+  return _cancelAnimFrame.apply(fabric.window, [handle]);
 }
