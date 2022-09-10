@@ -97,8 +97,7 @@ export abstract class Filler<T extends TCanvasFiller> {
             return filler.prepare(ctx, {
                 action: 'fill',
                 size,
-                offset: new Point(filler.offsetX, filler.offsetY),
-                noTransform: true
+                offset: new Point(filler.offsetX, filler.offsetY)
             });
         }
         else if (filler) {
