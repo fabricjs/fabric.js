@@ -180,7 +180,7 @@
     return (canvas, callback) => {
       var g = new fabric.Gradient({
         type: 'linear',
-        gradientTransform: [0.4, -0.4, 0.2, 0.1, 3, 5],
+        gradientTransform: [0.2, -0.4, 0.2, 0.1, -3, -5],
         coords: {
           x1: 0,
           y1: 0,
