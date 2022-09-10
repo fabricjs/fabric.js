@@ -109,7 +109,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
   private calcTransform({ size, offset, noTransform }: TFillerRenderingOptions) {
     const m = (!noTransform && this.gradientTransform) || iMatrix;
     const t = this.gradientUnits === 'percentage' ?
-      multiplyTransformMatrices([size.width || 1, 0, 0, size.height || 1, 0, 0], m) :
+      multiplyTransformMatrices(m, [size.width || 1, 0, 0, size.height || 1, 0, 0]) :
       m;
     return multiplyTransformMatrices([1, 0, 0, 1, offset.x, offset.y], t);
   }
