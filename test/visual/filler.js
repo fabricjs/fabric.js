@@ -66,22 +66,22 @@ QUnit.module('Pattern transform', {
 
 const runner = visualTestLoop(QUnit);
 
-function createPattern([a, b, c, d, e, f], offset = new fabric.Point()) {
+function createPattern([a, b, c, d, e, f], offset = new fabric.Point(), fakeOffset = new fabric.Point()) {
     return new fabric.Pattern({
         source: patternSource,
         repeat: 'repeat',
-        offsetX: offset.x,
-        offsetY: offset.y,
-        patternTransform: [a, b * Math.PI, c * Math.PI, d, e - offset.x, f - offset.y]
+        offsetX: offset.x + fakeOffset.x,
+        offsetY: offset.y + fakeOffset.y,
+        patternTransform: [a, b * Math.PI, c * Math.PI, d, e - fakeOffset.x, f - fakeOffset.y]
     });
 }
 
-function createGradient([a, b, c, d, e, f], offset = new fabric.Point()) {
+function createGradient([a, b, c, d, e, f], offset = new fabric.Point(), fakeOffset = new fabric.Point()) {
     return new fabric.Gradient({
         type: 'linear',
-        offsetX: offset.x,
-        offsetY: offset.y,
-        gradientTransform: [a, b * Math.PI, c * Math.PI, d, e - offset.x, f - offset.y],
+        offsetX: offset.x + fakeOffset.x,
+        offsetY: offset.y + fakeOffset.y,
+        gradientTransform: [a, b * Math.PI, c * Math.PI, d, e - fakeOffset.x, f - fakeOffset.y],
         coords: {
             x1: 0,
             y1: 0,
@@ -112,7 +112,7 @@ matrices.forEach((m) => {
                     const rect = new fabric.Rect({
                         width: canvas.width,
                         height: canvas.height,
-                        fill: createPattern(m, offset),
+                        fill: createPattern(m, new fabric.Point(), offset),
                         strokeWidth: 0
                     });
                     canvas.add(rect);
@@ -127,7 +127,7 @@ matrices.forEach((m) => {
             runner({
                 test: `canvas bg pattern transform matrix(${m}), offset(${offset})`,
                 code: (canvas, callback) => {
-                    canvas.backgroundColor = createPattern(m, offset);
+                    canvas.backgroundColor = createPattern(m, new fabric.Point(), offset);
                     canvas.renderAll();
                     callback(canvas.lowerCanvasEl);
                 },
@@ -150,7 +150,7 @@ matrices.forEach((m) => {
                     const rect = new fabric.Rect({
                         width: canvas.width,
                         height: canvas.height,
-                        fill: createGradient(m, offset),
+                        fill: createGradient(m, new fabric.Point(), offset),
                         strokeWidth: 0
                     });
                     canvas.add(rect);
@@ -165,7 +165,7 @@ matrices.forEach((m) => {
             runner({
                 test: `canvas bg gradient transform matrix(${m}), offset(${offset})`,
                 code: (canvas, callback) => {
-                    canvas.backgroundColor = createGradient(m, offset);
+                    canvas.backgroundColor = createGradient(m, new fabric.Point(canvas.width / 2, canvas.height / 2), offset);
                     canvas.renderAll();
                     callback(canvas.lowerCanvasEl);
                 },
