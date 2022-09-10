@@ -20,10 +20,15 @@ QUnit.testDone(visualCallback.testDone.bind(visualCallback));
 
 // global error handling
 window.addEventListener('unhandledrejection', (event) => {
+  // prevent logging to console
+  event.preventDefault();
   QUnit.onUncaughtException(event.reason);
 });
+
 window.addEventListener('error', (event) => {
-  QUnit.onUncaughtException(event);
+  // prevent logging to console
+  event.preventDefault();
+  QUnit.onUncaughtException(event.error);
 });
 
 function downloadGoldens() {

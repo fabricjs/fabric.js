@@ -99,11 +99,15 @@ process.on('unhandledRejection', (reason, promise) => {
 // JSDOM catches errors and throws them to the window
 
 fabric.window.addEventListener('unhandledrejection', (event) => {
+  // prevent logging to console
+  event.preventDefault();
   QUnit.onUncaughtException(event.reason);
 });
 
 fabric.window.addEventListener('error', (event) => {
-  QUnit.onUncaughtException(event);
+  // prevent logging to console
+  event.preventDefault();
+  QUnit.onUncaughtException(event.error);
 });
 
 //  testID
