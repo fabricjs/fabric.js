@@ -136,8 +136,7 @@ function findClassBase(raw, regex) {
             index: result.index,
             value: match
         },
-        ...rawObject,
-        klass
+        ...rawObject
     };
 }
 
