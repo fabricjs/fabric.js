@@ -11,14 +11,11 @@ export function setStyle(element, styles) {
   const elementStyle = element.style;
   if (!elementStyle) {
     return;
-  }
-  else if (typeof styles === 'string') {
+  } else if (typeof styles === 'string') {
     element.style.cssText += ';' + styles;
-  }
-  else {
-    Object.entries(styles).forEach(
-      ([property, value]) => elementStyle.setProperty(property, value)
+  } else {
+    Object.entries(styles).forEach(([property, value]) =>
+      elementStyle.setProperty(property, value)
     );
   }
-
 }

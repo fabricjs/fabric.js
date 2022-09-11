@@ -1,4 +1,4 @@
-import { Percent, TMat2D } from "../typedefs";
+import { Percent, TMat2D } from '../typedefs';
 
 export type GradientUnits = 'pixels' | 'percentage';
 
@@ -58,9 +58,9 @@ export type RadialGradientCoords<T extends GradientCoordValue> = {
   r2: T;
 };
 
-export type GradientCoords<T extends GradientType> = T extends 'linear' ?
-  LinearGradientCoords<number> :
-  RadialGradientCoords<number>;
+export type GradientCoords<T extends GradientType> = T extends 'linear'
+  ? LinearGradientCoords<number>
+  : RadialGradientCoords<number>;
 
 export type GradientOptions<T extends GradientType> = {
   type?: T;

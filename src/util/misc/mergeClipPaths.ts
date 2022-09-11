@@ -21,7 +21,8 @@ import { multiplyTransformMatrices, invertTransform } from './matrix';
  * @returns {fabric.Object} merged clip path
  */
 export const mergeClipPaths = (c1: any, c2: any) => {
-  let a = c1, b = c2;
+  let a = c1,
+    b = c2;
   if (a.inverted && !b.inverted) {
     //  case (2)
     a = c2;

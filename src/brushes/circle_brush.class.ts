@@ -1,35 +1,31 @@
-import { fabric } from "../../HEADER";
-import { Color } from "../color";
-import { Point } from "../point.class";
-import { getRandomInt } from "../util/internals";
-import { Canvas } from "../__types__";
-import { BaseBrush } from "./base_brush.class";
-
+import { fabric } from '../../HEADER';
+import { Color } from '../color';
+import { Point } from '../point.class';
+import { getRandomInt } from '../util/internals';
+import { Canvas } from '../__types__';
+import { BaseBrush } from './base_brush.class';
 
 /**
  * @todo remove transient
  */
 const { Circle, Group, Shadow } = fabric;
 
-
 export type CircleBrushPoint = {
   x: number;
   y: number;
   radius: number;
   fill: string;
-}
-
+};
 
 export class CircleBrush extends BaseBrush {
-
   /**
    * Width of a brush
    * @type Number
    * @default
    */
-  width = 10
+  width = 10;
 
-  points: CircleBrushPoint[]
+  points: CircleBrushPoint[];
 
   constructor(canvas: Canvas) {
     super(canvas);
@@ -71,7 +67,8 @@ export class CircleBrush extends BaseBrush {
    * @private
    */
   _render() {
-    const ctx = this.canvas.contextTop, points = this.points;
+    const ctx = this.canvas.contextTop,
+      points = this.points;
     this._saveAndTransform(ctx);
     for (let i = 0; i < points.length; i++) {
       this.dot(ctx, points[i]);
@@ -91,8 +88,7 @@ export class CircleBrush extends BaseBrush {
       this.canvas.clearContext(this.canvas.contextTop);
       this.addPoint(pointer);
       this._render();
-    }
-    else {
+    } else {
       this.drawDot(pointer);
     }
   }
@@ -114,7 +110,7 @@ export class CircleBrush extends BaseBrush {
           top: point.y,
           originX: 'center',
           originY: 'center',
-          fill: point.fill
+          fill: point.fill,
         });
 
       this.shadow && (circle.shadow = new Shadow(this.shadow));
@@ -142,10 +138,8 @@ export class CircleBrush extends BaseBrush {
       x,
       y,
       radius: getRandomInt(Math.max(0, this.width - 20), this.width + 20) / 2,
-      fill: new Color(this.color)
-        .setAlpha(getRandomInt(0, 100) / 100)
-        .toRgba()
-    }
+      fill: new Color(this.color).setAlpha(getRandomInt(0, 100) / 100).toRgba(),
+    };
 
     this.points.push(pointerPoint);
 

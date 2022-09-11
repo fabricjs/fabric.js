@@ -1,26 +1,25 @@
-import { fabric } from "../../HEADER";
-import { Color } from "../color";
-import { Point } from "../point.class";
-import { Canvas, Shadow } from "../__types__";
+import { fabric } from '../../HEADER';
+import { Color } from '../color';
+import { Point } from '../point.class';
+import { Canvas, Shadow } from '../__types__';
 
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
  */
 export abstract class BaseBrush {
-
   /**
    * Color of a brush
    * @type String
    * @default
    */
-  color = 'rgb(0, 0, 0)'
+  color = 'rgb(0, 0, 0)';
 
   /**
    * Width of a brush, has to be a Number, no string literals
    * @type Number
    * @default
    */
-  width = 1
+  width = 1;
 
   /**
    * Shadow object representing shadow of this shape.
@@ -29,53 +28,52 @@ export abstract class BaseBrush {
    * @type Shadow
    * @default
    */
-  shadow: Shadow | null = null
+  shadow: Shadow | null = null;
 
   /**
    * Line endings style of a brush (one of "butt", "round", "square")
    * @type String
    * @default
    */
-  strokeLineCap: CanvasLineCap = 'round'
+  strokeLineCap: CanvasLineCap = 'round';
 
   /**
    * Corner style of a brush (one of "bevel", "round", "miter")
    * @type String
    * @default
    */
-  strokeLineJoin: CanvasLineJoin = 'round'
+  strokeLineJoin: CanvasLineJoin = 'round';
 
   /**
    * Maximum miter length (used for strokeLineJoin = "miter") of a brush's
    * @type Number
    * @default
    */
-  strokeMiterLimit = 10
+  strokeMiterLimit = 10;
 
   /**
    * Stroke Dash Array.
    * @type Array
    * @default
    */
-  strokeDashArray: number[] | null = null
+  strokeDashArray: number[] | null = null;
 
   /**
    * When `true`, the free drawing is limited to the whiteboard size. Default to false.
    * @type Boolean
    * @default false
-  */
+   */
 
-  limitedToCanvasSize = false
+  limitedToCanvasSize = false;
 
   /**
    * @todo add type
    */
-  canvas: Canvas
+  canvas: Canvas;
 
   constructor(canvas: Canvas) {
     this.canvas = canvas;
   }
-
 
   /**
    * Sets brush styles
@@ -142,10 +140,14 @@ export abstract class BaseBrush {
    * Check is pointer is outside canvas boundaries
    * @param {Object} pointer
    * @private
-  */
+   */
   protected _isOutSideCanvas(pointer: Point) {
-    return pointer.x < 0 || pointer.x > this.canvas.getWidth() ||
-      pointer.y < 0 || pointer.y > this.canvas.getHeight();
+    return (
+      pointer.x < 0 ||
+      pointer.x > this.canvas.getWidth() ||
+      pointer.y < 0 ||
+      pointer.y > this.canvas.getHeight()
+    );
   }
 }
 
