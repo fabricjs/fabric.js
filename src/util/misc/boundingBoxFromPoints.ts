@@ -14,6 +14,7 @@ export const makeBoundingBoxFromPoints = (points: Point[]) => {
       max: max.max(curr)
     }
   }, { min: points[0], max: points[0] });
+  
   const size = max.subtract(min);
 
   return {
