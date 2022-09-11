@@ -18,8 +18,17 @@ QUnit.config.reorder = false;
 <script>
 QUnit.testDone(visualCallback.testDone.bind(visualCallback));
 
-window.addEventListener('unhandledrejection', function (event) {
+// global error handling
+window.addEventListener('unhandledrejection', (event) => {
+  // prevent logging to console
+  event.preventDefault();
   QUnit.onUncaughtException(event.reason);
+});
+
+window.addEventListener('error', (event) => {
+  // prevent logging to console
+  event.preventDefault();
+  QUnit.onUncaughtException(event.error);
 });
 
 function downloadGoldens() {
