@@ -1738,7 +1738,8 @@ import { runningAnimations } from '../util/animation_registry';
       // since this canvas is a simple element for the process, we remove references
       // to objects in this way in order to avoid object trashing.
       canvas._objects = [];
-      canvas.dispose();
+      // since render has settled it is safe to destroy canvas
+      canvas.destroy();
       canvas = null;
 
       return canvasEl;

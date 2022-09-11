@@ -196,7 +196,7 @@
           if ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs) {
             generateGolden(getGoldeName(golden), renderedCanvas);
           }
-          fabricCanvas.dispose();
+          await fabricCanvas.dispose();
           done();          
         });
       });

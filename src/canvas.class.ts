@@ -511,6 +511,10 @@ import { Point } from './point.class';
      * @chainable
      */
     renderAll: function () {
+      this.cancelRequestedRender();
+      if (this.destroyed) {
+        return;
+      }
       if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
         this.clearContext(this.contextTop);
         this.contextTopDirty = false;
@@ -519,9 +523,8 @@ import { Point } from './point.class';
         this.renderTopLayer(this.contextTop);
         this.hasLostContext = false;
       }
-      var canvasToDrawOn = this.contextContainer;
       !this._objectsToRender && (this._objectsToRender = this._chooseObjectsToRender());
-      this.renderCanvas(canvasToDrawOn, this._objectsToRender);
+      this.renderCanvas(this.contextContainer, this._objectsToRender);
       return this;
     },
 
@@ -1313,17 +1316,24 @@ import { Point } from './point.class';
     },
 
     /**
-     * Clears a canvas element and removes all event listeners
-     * @return {fabric.Canvas} thisArg
-     * @chainable
+     * Clears the canvas element, disposes objects, removes all event listeners and frees resources
+     * 
+     * **CAUTION**:
+     * 
+     * This method is **UNSAFE**.
+     * You may encounter a race condition using it if there's a requested render.
+     * Call this method only if you are sure rendering has settled. 
+     * Consider using {@link dispose} as it is **SAFE** 
+     * 
+     * @private
      */
-    dispose: function () {
+    destroy: function () {
       var wrapperEl = this.wrapperEl,
           lowerCanvasEl = this.lowerCanvasEl,
           upperCanvasEl = this.upperCanvasEl,
           cacheCanvasEl = this.cacheCanvasEl;
       this.removeListeners();
-      this.callSuper('dispose');
+      this.callSuper('destroy');
       wrapperEl.removeChild(upperCanvasEl);
       wrapperEl.removeChild(lowerCanvasEl);
       this.contextCache = null;
