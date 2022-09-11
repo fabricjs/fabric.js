@@ -915,6 +915,20 @@
 
   QUnit.test('makeBoundingBoxFromPoints', function(assert) {
     assert.ok(typeof fabric.util.makeBoundingBoxFromPoints === 'function');
+    assert.deepEqual(fabric.util.makeBoundingBoxFromPoints([
+      new fabric.Point(50, 50),
+      new fabric.Point(-50, 50),
+      new fabric.Point(50, -50),
+      new fabric.Point(-50, -50),
+      new fabric.Point(50, 50),
+      new fabric.Point(80, -30),
+      new fabric.Point(100, 50),
+    ]), {
+      left: -50,
+      top: -50,
+      width: 150,
+      height: 100
+    }, 'bbox should match');
   });
 
   QUnit.test('parseUnit', function(assert) {
