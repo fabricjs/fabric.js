@@ -110,7 +110,7 @@ function createNew(operation, center = new fabric.Point(size.width, size.height)
         originX: 'center',
         originY: 'center',
         globalCompositeOperation: operation,
-        // objectCaching: true,
+        objectCaching: true,
     });
 }
 
@@ -142,7 +142,6 @@ OPERATIONS.map(operation => {
         },
         golden: `gco/${operation}.png`,
         percentage: 0.04,
-        ...size,
-        disabled: fabric.isLikelyNode
+        ...size
     }
 }).forEach(visualTestLoop(QUnit));
