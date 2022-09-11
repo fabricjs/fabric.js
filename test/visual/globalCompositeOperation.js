@@ -70,7 +70,7 @@ const colorSphere = (r) => {
     return c;
 };
 
-function createExisting(center = new fabric.Point(size.width,size.height).scalarDivide(2)) {
+function createExisting(center = new fabric.Point(size.width, size.height).scalarDivide(2)) {
     return new fabric.Image(colorSphere(radius * 2), {
         left: center.x,
         top: center.y,
@@ -131,19 +131,27 @@ function createPreview(operation) {
     return new fabric.Group([r1, r2]);
 }
 
-QUnit.module('globalCompositeOperation');
 
-OPERATIONS.map(operation => {
-    return {
-        test: operation,
-        code: (canvas, callback) => {
-            canvas.backgroundImage = createExisting();
-            canvas.add(createNew(operation), createPreview(operation));
-            canvas.renderAll();
-            callback(canvas.lowerCanvasEl);
-        },
-        golden: `gco/${operation}.png`,
-        percentage: 0.04,
-        ...size
-    }
-}).forEach(visualTestLoop(QUnit));
+QUnit.module('globalCompositeOperation', hooks => {
+    let bg = createExisting();
+    hooks.beforeEach(async () => {
+        // clone to avoid using a disposed image
+        bg = await bg.clone();
+        // inform test to wait
+        return;
+    });
+    OPERATIONS.map(operation => {
+        return {
+            test: operation,
+            code: async (canvas, callback) => {
+                canvas.backgroundImage = bg;
+                canvas.add(createNew(operation), createPreview(operation));
+                canvas.renderAll();
+                callback(canvas.lowerCanvasEl);
+            },
+            golden: `gco/${operation}.png`,
+            percentage: 0.04,
+            ...size
+        }
+    }).forEach(visualTestLoop(QUnit));
+});
