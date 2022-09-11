@@ -56,10 +56,6 @@ import {
   enlivenObjects,
   enlivenObjectEnlivables,
 } from './objectEnlive';
-import {
-  min,
-  max,
-} from '../lang_array';
 import { pick } from './pick';
 import {
   joinPath,
@@ -166,10 +162,6 @@ fabric.util = {
   loadImage,
   enlivenObjects,
   enlivenObjectEnlivables,
-  array: {
-    min,
-    max,
-  },
   pick,
   joinPath,
   parsePath,

@@ -2083,72 +2083,7 @@
     assert.equal(aGroup._objects[3], circle2);
   });
 
-  QUnit.test('dispose', function(assert) {
-    //made local vars to do not dispose the external canvas
-    var el = fabric.document.createElement('canvas'),
-        parentEl = fabric.document.createElement('div'),
-        wrapperEl, lowerCanvasEl, upperCanvasEl;
-    el.width = 200; el.height = 200;
-    parentEl.className = 'rootNode';
-    parentEl.appendChild(el);
-
-    fabric.config.configure({ devicePixelRatio: 1.25 });
-
-    assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
-    assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
-
-    el.style.position = 'relative';
-    var elStyle = el.style.cssText;
-    assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
-
-    var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
-    wrapperEl = canvas.wrapperEl;
-    lowerCanvasEl = canvas.lowerCanvasEl;
-    upperCanvasEl = canvas.upperCanvasEl;
-    assert.equal(parentEl.childNodes.length, 1, 'parentEl has still 1 child only');
-    assert.equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
-    assert.equal(wrapperEl.tagName, 'DIV', 'We wrapped canvas with DIV');
-    assert.equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
-    assert.equal(wrapperEl.childNodes[0], lowerCanvasEl, 'First child should be lowerCanvas');
-    assert.equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
-    assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
-    assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
-    if (!fabric.isLikelyNode) {
-      assert.equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appendend to rootNode');
-    }
-    //looks like i cannot use parentNode
-    //equal(wrapperEl, lowerCanvasEl.parentNode, 'lowerCanvas is appended to wrapperEl');
-    //equal(wrapperEl, upperCanvasEl.parentNode, 'upperCanvas is appended to wrapperEl');
-    //equal(parentEl, wrapperEl.parentNode, 'wrapperEl is appendend to rootNode');
-    assert.equal(parentEl.childNodes.length, 1, 'parent div should have 1 child');
-    assert.notEqual(parentEl.firstChild, canvas.getElement(), 'canvas should not be parent div firstChild');
-    assert.ok(typeof canvas.dispose === 'function');
-    canvas.add(makeRect(), makeRect(), makeRect());
-    canvas.item(0).animate('scaleX', 10);
-    assert.equal(fabric.runningAnimations.length, 1, 'should have a running animation');
-    canvas.dispose();
-    canvas.cancelRequestedRender();
-    assert.equal(fabric.runningAnimations.length, 0, 'dispose should clear running animations');
-    assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
-    assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
-    if (!fabric.isLikelyNode) {
-      assert.equal(parentEl.childNodes[0], lowerCanvasEl, 'canvas should be back to its firstChild place');
-    }
-    assert.equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');
-    assert.equal(canvas.upperCanvasEl, null, 'upperCanvas should be deleted');
-    assert.equal(canvas.lowerCanvasEl, null, 'lowerCanvasEl should be deleted');
-    assert.equal(canvas.cacheCanvasEl, null, 'cacheCanvasEl should be deleted');
-    assert.equal(canvas.contextTop, null, 'contextTop should be deleted');
-    assert.equal(canvas.contextCache, null, 'contextCache should be deleted');
-    assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
-    assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
-    assert.equal(el.width, 200, 'restored width');
-    assert.equal(el.height, 200, 'restored height');
-
-  });
-
-  QUnit.test('dispose + set dimensions', function (assert) {
-    //made local vars to do not dispose the external canvas
+  QUnit.test('set dimensions', async function (assert) {
     var el = fabric.document.createElement('canvas'),
       parentEl = fabric.document.createElement('div');
     el.width = 200; el.height = 200;
@@ -2170,55 +2105,13 @@
     assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
     assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
 
-    canvas.dispose();
+    await canvas.dispose();
     assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
     assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
     assert.equal(el.width, 500, 'restored width');
     assert.equal(el.height, 500, 'restored height');
 
   });
-
-  // QUnit.test('dispose', function(assert) {
-  //   function invokeEventsOnCanvas() {
-  //     // nextSibling because we need to invoke events on upper canvas
-  //     simulateEvent(canvas.getElement().nextSibling, 'mousedown');
-  //     simulateEvent(canvas.getElement().nextSibling, 'mouseup');
-  //     simulateEvent(canvas.getElement().nextSibling, 'mousemove');
-  //   }
-  //   var assertInvocationsCount = function() {
-  //     var message = 'event handler should not be invoked after `dispose`';
-  //     assert.equal(handlerInvocationCounts.__onMouseDown, 1);
-  //     assert.equal(handlerInvocationCounts.__onMouseUp, 1);
-  //     assert.equal(handlerInvocationCounts.__onMouseMove, 1);
-  //   };
-
-  //   assert.ok(typeof canvas.dispose === 'function');
-  //   canvas.add(makeRect(), makeRect(), makeRect());
-
-  //   var handlerInvocationCounts = {
-  //     __onMouseDown: 0, __onMouseUp: 0, __onMouseMove: 0
-  //   };
-
-  //   // hijack event handlers
-  //   canvas.__onMouseDown = function() {
-  //     handlerInvocationCounts.__onMouseDown++;
-  //   };
-  //   canvas.__onMouseUp = function() {
-  //     handlerInvocationCounts.__onMouseUp++;
-  //   };
-  //   canvas.__onMouseMove = function() {
-  //     handlerInvocationCounts.__onMouseMove++;
-  //   };
-
-  //   invokeEventsOnCanvas();
-  //   assertInvocationsCount();
-
-  //   canvas.dispose();
-  //   assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
-
-  //   invokeEventsOnCanvas();
-  //   assertInvocationsCount();
-  // });
 
   QUnit.test('clone', function(assert) {
     var done = assert.async();
