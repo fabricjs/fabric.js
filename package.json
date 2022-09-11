@@ -67,7 +67,9 @@
     "coverage:report": "nyc report --reporter=lcov --reporter=text",
     "lint": "eslint --config .eslintrc.js src/**/*.ts",
     "lint_tests": "eslint test/unit --config .eslintrc_tests && eslint test/visual --config .eslintrc_tests",
-    "all": "npm run build && npm run test -- --all && npm run lint && npm run lint_tests && npm run export"
+    "all": "npm run build && npm run test -- --all && npm run lint && npm run lint_tests && npm run export",
+    "prettier:check": "prettier --check",
+    "prettier:write": "prettier --write ."
   },
   "optionalDependencies": {
     "canvas": "^2.8.0",
@@ -88,6 +90,7 @@
     "commander": "^9.1.0",
     "deep-object-diff": "^1.1.7",
     "eslint": "^8.21.0",
+    "eslint-config-prettier": "^8.5.0",
     "fireworm": "^0.7.2",
     "fs-extra": "^10.0.1",
     "fuzzy": "^0.1.3",
@@ -97,6 +100,7 @@
     "moment": "^2.29.1",
     "nyc": "^15.1.0",
     "pixelmatch": "^4.0.2",
+    "prettier": "2.7.1",
     "qunit": "^2.17.2",
     "rollup": "^2.75.6",
     "rollup-plugin-terser": "^7.0.2",
