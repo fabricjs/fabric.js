@@ -122,6 +122,9 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
      */
     _calcDimensions: function() {
       const points = this.exactBoundingBox ? this._projectStrokeOnPoints() : this.points.map(p => new Point(p));
+      if (points.length === 0) {
+        return makeBoundingBoxFromPoints([new Point(0, 0)]);
+      }
       return makeBoundingBoxFromPoints(points);
     },
 
