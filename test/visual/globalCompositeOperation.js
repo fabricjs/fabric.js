@@ -131,6 +131,8 @@ function createPreview(operation) {
     return new fabric.Group([r1, r2]);
 }
 
+QUnit.module('globalCompositeOperation');
+
 OPERATIONS.map(operation => {
     return {
         test: operation,
