@@ -3,7 +3,7 @@ function createBackgroundGradientTest(configureCanvas, gradientOptions = {}) {
   return (canvas, callback) => {
     var g = new fabric.Gradient({
       type: 'linear',
-      gradientTransform: [0.2, -0.4, 0.2, 0.1, -3, -5],
+      gradientTransform: [0.2, -0.4, -0.2, 0.1, -3, -5],
       coords: {
         x1: 0,
         y1: 0,
@@ -33,8 +33,39 @@ function createBackgroundGradientTest(configureCanvas, gradientOptions = {}) {
 
 [
   {
-    test: 'canvas can have a gradient background',
+    test: 'canvas gradient background x axis',
     code: createBackgroundGradientTest(),
+    golden: 'backgroundWithXGradient.png',
+    percentage: 0.09,
+    width: 300,
+    height: 300,
+  },
+  {
+    test: 'canvas gradient background y axis',
+    code: createBackgroundGradientTest(null, {
+      coords: {
+        x1: 0,
+        y1: 0,
+        x2: 0,
+        y2: 200
+      }
+    }),
+    golden: 'backgroundWithYGradient.png',
+    percentage: 0.09,
+    width: 300,
+    height: 300,
+  },
+  {
+    test: 'canvas gradient background',
+    code: createBackgroundGradientTest(null, {
+      coords: {
+        x1: 100,
+        y1: 50,
+        x2: 30,
+        y2: 200
+      },
+      gradientTransform: null
+    }),
     golden: 'backgroundWithGradient.png',
     percentage: 0.09,
     width: 300,
@@ -56,7 +87,7 @@ function createBackgroundGradientTest(configureCanvas, gradientOptions = {}) {
       canvas.setZoom(0.1);
       canvas.backgroundVpt = false;
     }),
-    golden: 'backgroundWithGradient.png',
+    golden: 'backgroundWithXGradient.png',
     percentage: 0.09,
     width: 300,
     height: 300,
@@ -72,7 +103,7 @@ function createBackgroundGradientTest(configureCanvas, gradientOptions = {}) {
         y2: 0
       }
     }),
-    golden: 'backgroundWithGradient.png',
+    golden: 'backgroundWithXGradient.png',
     percentage: 0.09,
     width: 300,
     height: 300,
@@ -109,7 +140,7 @@ function createBackgroundGradientTest(configureCanvas, gradientOptions = {}) {
         y2: 0
       }
     }),
-    golden: 'backgroundWithGradient.png',
+    golden: 'backgroundWithXGradient.png',
     percentage: 0.09,
     width: 300,
     height: 300,
