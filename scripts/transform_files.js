@@ -121,7 +121,7 @@ function findClassBase(raw, regex) {
     const rawObject = findObject(raw, '{', '}', result.index);
     const NS = namespace.slice(0, namespace.lastIndexOf('.'));
     const { fabric } = require(wd);
-    const klass = fabric.util.resolveNamespace(NS === 'fabric' ? null : NS)[name];
+    // const klass = fabric.util.resolveNamespace(NS === 'fabric' ? null : NS)[name];
     return {
         name,
         namespace,
@@ -133,7 +133,7 @@ function findClassBase(raw, regex) {
             value: match
         },
         ...rawObject,
-        klass
+        // klass
     };
 }
 
