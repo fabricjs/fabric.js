@@ -40,10 +40,7 @@ export class Color {
         ? [255, 255, 255, 0]
         : Color.sourceFromHex(color) ||
           Color.sourceFromRgb(color) ||
-          Color.sourceFromHsl(
-            color
-          ) || // color is not recognize let's default to black as canvas does
-          [0, 0, 0, 1];
+          Color.sourceFromHsl(color) || [0, 0, 0, 1]; // color is not recognize let's default to black as canvas does
 
     if (source) {
       this.setSource(source);

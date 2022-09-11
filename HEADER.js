@@ -12,7 +12,7 @@ var fabric = fabric || {
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 } else if (typeof define === 'function' && define.amd) {
-/* _AMD_START_ */
+  /* _AMD_START_ */
   define([], function () {
     return fabric;
   });
