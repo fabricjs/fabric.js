@@ -1,6 +1,7 @@
 //@ts-nocheck
 
 import { config } from "../config";
+import { Point } from "../point.class";
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 
 
@@ -120,7 +121,7 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
      * @private
      */
     _calcDimensions: function() {
-      const points = this.exactBoundingBox ? this._projectStrokeOnPoints() : this.points;
+      const points = this.exactBoundingBox ? this._projectStrokeOnPoints() : this.points.map(p => new Point(p));
       return makeBoundingBoxFromPoints(points);
     },
 
