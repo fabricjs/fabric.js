@@ -68,7 +68,7 @@
     "lint": "eslint --config .eslintrc.js src/**/*.ts",
     "lint_tests": "eslint test/unit --config .eslintrc_tests && eslint test/visual --config .eslintrc_tests",
     "all": "npm run build && npm run test -- --all && npm run lint && npm run lint_tests && npm run export",
-    "prettier:check": "prettier --check",
+    "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write ."
   },
   "optionalDependencies": {
