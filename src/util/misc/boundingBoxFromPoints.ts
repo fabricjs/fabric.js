@@ -22,4 +22,4 @@ export const makeBoundingBoxFromPoints = (points: Point[]) => {
     width: size.x,
     height: size.y,
   };
-};
+}
