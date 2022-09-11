@@ -1094,7 +1094,7 @@ import { fireEvent } from "../util/fireEvent";
           //  transform pointer to target's containing coordinate plane
           //  both pointer and object should agree on every point
           localPointer = target.group ?
-            fabric.util.sendPointToPlane(pointer, null, target.group.calcTransformMatrix()) :
+            fabric.util.sendPointToPlane(pointer, undefined, target.group.calcTransformMatrix()) :
             pointer;
 
       transform.reset = false;
