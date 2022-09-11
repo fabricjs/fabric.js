@@ -14,7 +14,7 @@ export const createCanvasElement = (): HTMLCanvasElement => fabric.document.crea
  * @memberOf fabric.util
  * @return {HTMLImageElement} HTML image element
  */
-export const createImage = () =>fabric.document.createElement('img');
+export const createImage = (): HTMLImageElement => fabric.document.createElement('img');
 
 /**
  * Creates a canvas element that is a copy of another and is also painted
