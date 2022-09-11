@@ -70,8 +70,9 @@
     }
     else if (original) {
       original.toBlob(blob => {
-        const formData = new FormData();
+        const formData = new FormData();        
         formData.append('file', blob, filename);
+        formData.append('filename', filename);
         const request = new XMLHttpRequest();
         request.open('POST', '/goldens', true);
         request.send(formData);
@@ -79,7 +80,7 @@
     }
   }
 
-  function getImage(filename, original, callback) {
+  async function getImage(filename, original, callback) {
     if (fabric.isLikelyNode && original) {
       var plainFileName = filename.replace('file://', '');
       if (!fs.existsSync(plainFileName)) {
@@ -87,7 +88,7 @@
       }
     }
     else if (original) {
-      fetch(`/goldens/${filename}`, { method: 'GET' })
+      await fetch(`/goldens/${filename}`, { method: 'GET' })
         .then(res => res.json())
         .then(res => {
           !res.exists && generateGolden(filename, original);
@@ -156,7 +157,7 @@
           canvas.height = height;
           var ctx = canvas.getContext('2d');
           var output = ctx.getImageData(0, 0, width, height);
-          getImage(getGoldeName(golden), renderedCanvas, function(goldenImage) {
+          getImage(getGoldeName(golden), renderedCanvas, function (goldenImage) {
             ctx.drawImage(goldenImage, 0, 0);
             visualCallback.addArguments({
               enabled: true,
