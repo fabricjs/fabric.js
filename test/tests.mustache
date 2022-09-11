@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="/node_modules/qunit/qunit/qunit.css"/>
 
 <script src="./node_modules/sinon/pkg/sinon.js"></script>
+<script src="/node_modules/source-map-support/browser-source-map-support.js"></script>
+<script>sourceMapSupport.install();</script>
 
 <script src="/testem.js"></script>
 {{#serve_files}}<script src="{{{src}}}"{{#attrs}} {{&.}}{{/attrs}}></script>{{/serve_files}}
@@ -23,8 +25,17 @@ QUnit.testDone(() => {
 <script>
 QUnit.testDone(visualCallback.testDone.bind(visualCallback));
 
-window.addEventListener('unhandledrejection', function (event) {
+// global error handling
+window.addEventListener('unhandledrejection', (event) => {
+  // prevent logging to console
+  event.preventDefault();
   QUnit.onUncaughtException(event.reason);
+});
+
+window.addEventListener('error', (event) => {
+  // prevent logging to console
+  event.preventDefault();
+  QUnit.onUncaughtException(event.error);
 });
 
 function downloadGoldens() {

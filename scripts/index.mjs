@@ -13,25 +13,31 @@
 
 
 
-const fs = require('fs-extra');
-const os = require('os');
-const _ = require('lodash');
-const path = require('path');
-const cp = require('child_process');
-const inquirer = require('inquirer');
-const fuzzy = require('fuzzy');
-const chalk = require('chalk');
-const moment = require('moment');
-const Checkbox = require('inquirer-checkbox-plus-prompt');
-const commander = require('commander');
-const killPort = require('kill-port');
+import chalk from 'chalk';
+import cp from 'child_process';
+import * as commander from 'commander';
+import fs from 'fs-extra';
+import fuzzy from 'fuzzy';
+import inquirer from 'inquirer';
+import Checkbox from 'inquirer-checkbox-plus-prompt';
+import killPort from 'kill-port';
+import _ from 'lodash';
+import moment from 'moment';
+import path from 'node:path';
+import process from 'node:process';
+import { fileURLToPath } from 'node:url';
+import os from 'os';
+import { listFiles, transform as transformFiles } from './transform_files.mjs';
 
-// const rollup = require('rollup');
-// const loadConfigFile = require('rollup/loadConfigFile');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// import rollup from 'rollup';
+// import loadConfigFile from 'rollup/loadConfigFile';
 
 const program = new commander.Command();
 
-const { transform: transformFiles, listFiles } = require('./transform_files');
+
 
 
 const wd = path.resolve(__dirname, '..');
@@ -41,7 +47,7 @@ const websiteDir = path.resolve(wd, '../fabricjs.com');
 if (!fs.existsSync(dumpsPath)) {
     fs.mkdirSync(dumpsPath);
 }
-const package = require(path.resolve(wd, 'package.json'));
+
 
 function execGitCommand(cmd) {
     return cp.execSync(cmd, { cwd: wd }).toString()
@@ -170,7 +176,7 @@ function build(options = {}) {
 }
 
 function startWebsite() {
-    if (require(path.resolve(websiteDir, 'package.json')).name !== 'fabricjs.com') {
+    if (JSON.parse(fs.readFileSync(path.resolve(websiteDir, 'package.json'))).name !== 'fabricjs.com') {
         console.log(chalk.red('Could not locate fabricjs.com directory'));
     }
     const args = ['run', 'start:dev'];
@@ -391,7 +397,7 @@ function writeCLIFile(tests) {
 }
 
 function readCLIFile() {
-    return fs.existsSync(CLI_CACHE) ? require(CLI_CACHE) : [];
+    return fs.existsSync(CLI_CACHE) ? JSON.parse(fs.readFileSync(CLI_CACHE)) : [];
 }
 
 function createChoiceData(type, file) {
@@ -500,7 +506,7 @@ async function runIntreactiveTestSuite(options) {
 program
     .name('fabric.js')
     .description('fabric.js DEV CLI tools')
-    .version(package.version)
+    .version(process.env.npm_package_version)
     .showSuggestionAfterError();
 
 program

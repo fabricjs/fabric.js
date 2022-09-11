@@ -4,6 +4,7 @@ import { iMatrix, VERSION } from './constants';
 import { Filler } from './Filler';
 import { Gradient } from './gradient';
 import { Point } from './point.class';
+import { requestAnimFrame } from './util/animate';
 import { removeFromArray } from './util/internals';
 import { pick } from './util/misc/pick';
 
@@ -677,8 +678,11 @@ import { pick } from './util/misc/pick';
      * @chainable
      */
     renderAll: function () {
-      var canvasToDrawOn = this.contextContainer;
-      this.renderCanvas(canvasToDrawOn, this._objects);
+      this.cancelRequestedRender();
+      if (this.destroyed) {
+        return;
+      }
+      this.renderCanvas(this.contextContainer, this._objects);
       return this;
     },
 
@@ -693,7 +697,7 @@ import { pick } from './util/misc/pick';
      * @chainable
      */
     renderAndReset: function() {
-      this.isRendering = 0;
+      this.nextRenderHandle = 0;
       this.renderAll();
     },
 
@@ -705,8 +709,8 @@ import { pick } from './util/misc/pick';
      * @chainable
      */
     requestRenderAll: function () {
-      if (!this.isRendering) {
-        this.isRendering = fabric.util.requestAnimFrame(this.renderAndResetBound);
+      if (!this.nextRenderHandle && !this.disposed && !this.destroyed) {
+        this.nextRenderHandle = requestAnimFrame(this.renderAndResetBound);
       }
       return this;
     },
@@ -736,9 +740,9 @@ import { pick } from './util/misc/pick';
     },
 
     cancelRequestedRender: function() {
-      if (this.isRendering) {
-        fabric.util.cancelAnimFrame(this.isRendering);
-        this.isRendering = 0;
+      if (this.nextRenderHandle) {
+        fabric.util.cancelAnimFrame(this.nextRenderHandle);
+        this.nextRenderHandle = 0;
       }
     },
 
@@ -749,12 +753,17 @@ import { pick } from './util/misc/pick';
      * @return {fabric.Canvas} instance
      * @chainable
      */
-    renderCanvas: function(ctx, objects) {
+    renderCanvas: function (ctx, objects) {
+
+      if (this.destroyed) {
+        return;
+      }
+
       var v = this.viewportTransform, path = this.clipPath;
-      this.cancelRequestedRender();
       this.calcViewportBoundaries();
       this.clearContext(ctx);
       ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
+      // node-canvas
       ctx.patternQuality = 'best';
       this.fire('before:render', { ctx: ctx, });
       this._renderBackground(ctx);
@@ -780,6 +789,11 @@ import { pick } from './util/misc/pick';
         this.drawControls(ctx);
       }
       this.fire('after:render', { ctx: ctx, });
+
+      if (this.__cleanupTask) {
+        this.__cleanupTask();
+        this.__cleanupTask = undefined;
+      }
     },
 
     /**
@@ -1604,16 +1618,49 @@ import { pick } from './util/misc/pick';
     },
 
     /**
-     * Clears a canvas element and dispose objects
-     * @return {fabric.Canvas} thisArg
-     * @chainable
+     * Waits until rendering has settled to destroy the canvas
+     * @returns {Promise<boolean>} a promise resolving to `true` once the canvas has been destroyed or to `false` if the canvas has was already destroyed
+     * @throws if aborted by a consequent call
      */
     dispose: function () {
-      // cancel eventually ongoing renders
-      if (this.isRendering) {
-        fabric.util.cancelAnimFrame(this.isRendering);
-        this.isRendering = 0;
-      }
+      this.disposed = true;
+      return new Promise<boolean>((resolve, reject) => {
+        const task = () => {
+          this.destroy();
+          resolve(true);
+        }
+        task.kill = reject;
+        if (this.__cleanupTask) {
+          this.__cleanupTask.kill('aborted');
+        }
+        
+        if (this.destroyed) {
+          resolve(false);
+        }
+        else if (this.nextRenderHandle) {
+          this.__cleanupTask = task;
+        }
+        else {
+          task();
+        }
+      });
+    },
+
+    /**
+     * Clears the canvas element, disposes objects and frees resources
+     * 
+     * **CAUTION**:
+     * 
+     * This method is **UNSAFE**.
+     * You may encounter a race condition using it if there's a requested render.
+     * Call this method only if you are sure rendering has settled. 
+     * Consider using {@link dispose} as it is **SAFE** 
+     * 
+     * @private
+     */
+    destroy: function () {
+      this.destroyed = true;
+      this.cancelRequestedRender();
       this.forEachObject(function(object) {
         object.dispose && object.dispose();
       });
@@ -1640,7 +1687,6 @@ import { pick } from './util/misc/pick';
       this.lowerCanvasEl.setAttribute('height', this.height);
       fabric.util.cleanUpJsdomNode(this.lowerCanvasEl);
       this.lowerCanvasEl = undefined;
-      return this;
     },
 
     /**
