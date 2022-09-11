@@ -25,7 +25,7 @@ jobs:
         node-version: 18.x
     - run: npm ci
     - run: npm run lint
-  lint:
+  prettier:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -34,7 +34,7 @@ jobs:
       with:
         node-version: 18.x
     - run: npm ci
-    - run: prettier:check
+    - run: npm run prettier:check
   coverage:
     if: ${{ always() }}
     runs-on: ubuntu-latest
