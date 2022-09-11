@@ -1,6 +1,5 @@
 
 //@ts-nocheck
-import { max, min } from '../util/lang_array';
 import { ColorNameMap } from './color_map';
 import { reHSLa, reHex, reRGBa } from './constants';
 import { hue2rgb, hexify } from './util';
@@ -18,8 +17,8 @@ export class Color {
   private _source: TColorAlphaSource;
 
   /**
-   * 
-   * @param {string} [color] optional in hex or rgb(a) or hsl format or from known color list 
+   *
+   * @param {string} [color] optional in hex or rgb(a) or hsl format or from known color list
    */
   constructor(color?: string) {
     if (!color) {
@@ -63,8 +62,8 @@ export class Color {
    */
   _rgbToHsl(r: number, g: number, b: number): TColorSource {
     r /= 255; g /= 255; b /= 255;
-    const maxValue = max([r, g, b]),
-      minValue = min([r, g, b]);
+    const maxValue = Math.max(r, g, b),
+      minValue = Math.min(r, g, b);
 
     let h, s;
     const l = (maxValue + minValue) / 2;
@@ -400,8 +399,6 @@ export class Color {
     oColor.setSource(source);
     return oColor;
   }
-
-
 }
 
 
