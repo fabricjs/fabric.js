@@ -142,6 +142,7 @@ OPERATIONS.map(operation => {
         },
         golden: `gco/${operation}.png`,
         percentage: 0.04,
-        ...size
+        ...size,
+        disabled: fabric.isLikelyNode
     }
 }).forEach(visualTestLoop(QUnit));
