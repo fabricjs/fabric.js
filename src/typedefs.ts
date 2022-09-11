@@ -47,7 +47,7 @@ export const enum SupportedSVGUnit {
 }
 
 export type TMat2D = [number, number, number, number, number, number];
-  
+
 export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
 
 /**
@@ -64,3 +64,9 @@ export type TransformEvent<T> = TEvent & T & {
     target: any
   }
 }
+
+/**
+ * An invalid keyword and an empty string will be handled as the `anonymous` keyword.
+ * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
+ */
+export type TCrossOrigin = '' | 'anonymous' | 'use-credentials' | null;
