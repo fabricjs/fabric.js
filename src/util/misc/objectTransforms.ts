@@ -107,14 +107,14 @@ export const saveObjectTransform = (
   * @returns {Point} size
   */
 export const sizeAfterTransform = (width: number, height: number, options: TScaleMatrixArgs) => {
- const dimX = width / 2, dimY = height / 2,
-     points = [
-       new Point(-dimX, -dimY),
-       new Point(dimX, -dimY),
-       new Point(-dimX, dimY),
-       new Point(dimX, dimY),
-     ],
-     transformMatrix = calcDimensionsMatrix(options),
-     bbox = makeBoundingBoxFromPoints(points, transformMatrix);
+  const dimX = width / 2, dimY = height / 2,
+      transformMatrix = calcDimensionsMatrix(options),
+      points = [
+        new Point(-dimX, -dimY),
+        new Point(dimX, -dimY),
+        new Point(-dimX, dimY),
+        new Point(dimX, dimY),
+      ].map(p => p.transform(transformMatrix)),
+      bbox = makeBoundingBoxFromPoints(points);
  return new Point(bbox.width, bbox.height);
 };
