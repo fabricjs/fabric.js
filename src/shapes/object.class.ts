@@ -1,7 +1,11 @@
 //@ts-nocheck
+import { cache } from '../cache';
+import { config } from '../config';
 import { VERSION } from '../constants';
 import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
+import { pick } from '../util/misc/pick';
+import { runningAnimations } from '../util/animation_registry';
 
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
@@ -666,7 +670,7 @@ import { capValue } from '../util/misc/capValue';
     },
 
     /**
-     * Limit the cache dimensions so that X * Y do not cross fabric.perfLimitSizeTotal
+     * Limit the cache dimensions so that X * Y do not cross config.perfLimitSizeTotal
      * and each side do not cross fabric.cacheSideLimit
      * those numbers are configurable so that you can get as much detail as you want
      * making bargain with performances.
@@ -681,10 +685,9 @@ import { capValue } from '../util/misc/capValue';
      * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
      */
     _limitCacheSize: function(dims) {
-      var perfLimitSizeTotal = fabric.perfLimitSizeTotal,
-          width = dims.width, height = dims.height,
-          max = fabric.maxCacheSideLimit, min = fabric.minCacheSideLimit;
-      if (width <= max && height <= max && width * height <= perfLimitSizeTotal) {
+      var width = dims.width, height = dims.height,
+          max = config.maxCacheSideLimit, min = config.minCacheSideLimit;
+      if (width <= max && height <= max && width * height <= config.perfLimitSizeTotal) {
         if (width < min) {
           dims.width = min;
         }
@@ -693,9 +696,9 @@ import { capValue } from '../util/misc/capValue';
         }
         return dims;
       }
-      var ar = width / height, limitedDims = fabric.util.limitDimsByArea(ar, perfLimitSizeTotal),
-          x = capValue(min, limitedDims.x, max),
-          y = capValue(min, limitedDims.y, max);
+      var ar = width / height, [limX, limY] = cache.limitDimsByArea(ar),
+          x = capValue(min, limX, max),
+          y = capValue(min, limY, max);
       if (width > x) {
         dims.zoomX /= width / x;
         dims.width = x;
@@ -756,7 +759,7 @@ import { capValue } from '../util/misc/capValue';
       }
       var canvas = this._cacheCanvas,
           dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-          minCacheSize = fabric.minCacheSideLimit,
+          minCacheSize = config.minCacheSideLimit,
           width = dims.width, height = dims.height, drawingWidth, drawingHeight,
           zoomX = dims.zoomX, zoomY = dims.zoomY,
           dimensionsChanged = width !== this.cacheWidth || height !== this.cacheHeight,
@@ -830,9 +833,16 @@ import { capValue } from '../util/misc/capValue';
      * @return {Object} Object representation of an instance
      */
     toObject: function(propertiesToInclude) {
-      var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
-
+      const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
+        clipPathData = this.clipPath && !this.clipPath.excludeFromExport ?
+          {
+            ...this.clipPath.toObject(propertiesToInclude),
+            inverted: this.clipPath.inverted,
+            absolutePositioned: this.clipPath.absolutePositioned
+          } :
+          null,
           object = {
+            ...pick(this, propertiesToInclude),
             type:                     this.type,
             version:                  VERSION,
             originX:                  this.originX,
@@ -864,20 +874,12 @@ import { capValue } from '../util/misc/capValue';
             globalCompositeOperation: this.globalCompositeOperation,
             skewX:                    toFixed(this.skewX, NUM_FRACTION_DIGITS),
             skewY:                    toFixed(this.skewY, NUM_FRACTION_DIGITS),
+            ...clipPathData ? { clipPath: clipPathData } : null
           };
 
-      if (this.clipPath && !this.clipPath.excludeFromExport) {
-        object.clipPath = this.clipPath.toObject(propertiesToInclude);
-        object.clipPath.inverted = this.clipPath.inverted;
-        object.clipPath.absolutePositioned = this.clipPath.absolutePositioned;
-      }
-
-      fabric.util.populateWithProperties(this, object, propertiesToInclude);
-      if (!this.includeDefaultValues) {
-        object = this._removeDefaultValues(object);
-      }
-
-      return object;
+      return !this.includeDefaultValues ?
+        this._removeDefaultValues(object) :
+        object;
     },
 
     /**
@@ -1417,11 +1419,11 @@ import { capValue } from '../util/misc/capValue';
           multY = (canvas && canvas.viewportTransform[3]) || 1,
           scaling = shadow.nonScaling ? new Point(1, 1) : this.getObjectScaling();
       if (canvas && canvas._isRetinaScaling()) {
-        multX *= fabric.devicePixelRatio;
-        multY *= fabric.devicePixelRatio;
+        multX *= config.devicePixelRatio;
+        multY *= config.devicePixelRatio;
       }
       ctx.shadowColor = shadow.color;
-      ctx.shadowBlur = shadow.blur * fabric.browserShadowBlurConstant *
+      ctx.shadowBlur = shadow.blur * config.browserShadowBlurConstant *
         (multX + multY) * (scaling.x + scaling.y) / 4;
       ctx.shadowOffsetX = shadow.offsetX * multX * scaling.x;
       ctx.shadowOffsetY = shadow.offsetY * multY * scaling.y;
@@ -1682,7 +1684,7 @@ import { capValue } from '../util/misc/capValue';
       var utils = fabric.util, origParams = utils.saveObjectTransform(this),
           originalGroup = this.group,
           originalShadow = this.shadow, abs = Math.abs,
-          retinaScaling = options.enableRetinaScaling ? Math.max(fabric.devicePixelRatio, 1) : 1,
+          retinaScaling = options.enableRetinaScaling ? Math.max(config.devicePixelRatio, 1) : 1,
           multiplier = (options.multiplier || 1) * retinaScaling;
       delete this.group;
       if (options.withoutTransform) {
@@ -1736,7 +1738,8 @@ import { capValue } from '../util/misc/capValue';
       // since this canvas is a simple element for the process, we remove references
       // to objects in this way in order to avoid object trashing.
       canvas._objects = [];
-      canvas.dispose();
+      // since render has settled it is safe to destroy canvas
+      canvas.destroy();
       canvas = null;
 
       return canvasEl;
@@ -1902,8 +1905,10 @@ import { capValue } from '../util/misc/capValue';
      * override if necessary to dispose artifacts such as `clipPath`
      */
     dispose: function () {
-      if (fabric.runningAnimations) {
-        fabric.runningAnimations.cancelByTarget(this);
+      // todo verify this.
+      // runningAnimations is always truthy
+      if (runningAnimations) {
+        runningAnimations.cancelByTarget(this);
       }
     }
   });
@@ -1911,16 +1916,6 @@ import { capValue } from '../util/misc/capValue';
   fabric.util.createAccessors && fabric.util.createAccessors(fabric.Object);
 
   extend(fabric.Object.prototype, fabric.Observable);
-
-  /**
-   * Defines the number of fraction digits to use when serializing object values.
-   * You can use it to increase/decrease precision of such values like left, top, scaleX, scaleY, etc.
-   * @static
-   * @memberOf fabric.Object
-   * @constant
-   * @type Number
-   */
-  fabric.Object.NUM_FRACTION_DIGITS = 2;
 
   /**
    *

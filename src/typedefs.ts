@@ -1,4 +1,5 @@
-//@ts-nocheck
+// https://www.typescriptlang.org/docs/handbook/utility-types.html
+
 interface NominalTag<T> {
   'nominalTag': T;
 }
@@ -10,6 +11,13 @@ const enum Radian { }
 
 export type TDegree = Nominal<number, Degree>;
 export type TRadian = Nominal<number, Radian>;
+
+export type TSize = {
+  width: number;
+  height: number;
+}
+
+export type Percent = `${number}%`;
 
 export const enum StrokeLineJoin {
   miter = 'miter',
@@ -47,6 +55,18 @@ export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
  */
 export type PathData = (string | number)[][];
 
-export type Event<E extends Event = MouseEvent | TouchEvent> = {
+export type TEvent<E extends Event = MouseEvent | TouchEvent> = {
   e: E
 }
+
+export type TransformEvent<T> = TEvent & T & {
+  transform: {
+    target: any
+  }
+}
+
+/**
+ * An invalid keyword and an empty string will be handled as the `anonymous` keyword.
+ * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
+ */
+export type TCrossOrigin = '' | 'anonymous' | 'use-credentials' | null;

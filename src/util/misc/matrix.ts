@@ -14,7 +14,7 @@ type TTranslateMatrixArgs = {
   translateY?: number;
 }
 
-type TScaleMatrixArgs = {
+export type TScaleMatrixArgs = {
   scaleX?: number;
   scaleY?: number;
   flipX?: boolean;

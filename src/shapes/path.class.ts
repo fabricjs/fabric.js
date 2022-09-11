@@ -1,8 +1,10 @@
 //@ts-nocheck
+
+import { config } from "../config";
+
+
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
-      min = fabric.util.array.min,
-      max = fabric.util.array.max,
       extend = fabric.util.object.extend,
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed;
@@ -194,7 +196,7 @@
     },
 
     _getOffsetTransform: function() {
-      var digits = fabric.Object.NUM_FRACTION_DIGITS;
+      var digits = config.NUM_FRACTION_DIGITS;
       return ' translate(' + toFixed(-this.pathOffset.x, digits) + ', ' +
           toFixed(-this.pathOffset.y, digits) + ')';
     },
@@ -304,10 +306,10 @@
         aY.push(y);
       }
 
-      var minX = min(aX) || 0,
-          minY = min(aY) || 0,
-          maxX = max(aX) || 0,
-          maxY = max(aY) || 0,
+      var minX = Math.min(...aX) || 0,
+          minY = Math.min(...aY) || 0,
+          maxX = Math.max(...aX) || 0,
+          maxY = Math.max(...aY) || 0,
           deltaX = maxX - minX,
           deltaY = maxY - minY;
 

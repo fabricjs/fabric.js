@@ -1,5 +1,7 @@
 import { fabric } from '../HEADER';
 import { TMat2D, TRadian } from './typedefs';
+import { sin } from './util/misc/sin';
+import { cos } from './util/misc/cos';
 
 export interface IPoint {
   x: number
@@ -350,16 +352,22 @@ export class Point {
 
   /**
    * Rotates `point` around `origin` with `radians`
-   * WARNING: this is probably a source of circular dependency.
-   * evaluate what to do when importing rotateVector directly from the file
    * @static
    * @memberOf fabric.util
    * @param {Point} origin The origin of the rotation
    * @param {TRadian} radians The radians of the angle for the rotation
    * @return {Point} The new rotated point
    */
-  rotate(origin: Point, radians: TRadian): Point {
-    return fabric.util.rotateVector(this.subtract(origin), radians).add(origin);
+   rotate(radians: TRadian, origin: Point = originZero): Point {
+    // TODO benchmark and verify the add and subtract how much cost
+    // and then in case early return if no origin is passed
+    const sinus = sin(radians), cosinus = cos(radians);
+    const p = this.subtract(origin);
+    const rotated = new Point(
+      p.x * cosinus - p.y * sinus,
+      p.x * sinus + p.y * cosinus,
+    );
+    return rotated.add(origin);
   }
 
   /**
@@ -377,5 +385,7 @@ export class Point {
     );
   }
 }
+
+const originZero = new Point(0, 0);
 
 fabric.Point = Point;

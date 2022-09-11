@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { fabric } from '../../HEADER';
+import { ElementsParser } from './elements_parser';
 
 /**
  * Transforms an array of svg elements to corresponding fabric.* instances
@@ -12,5 +12,5 @@ import { fabric } from '../../HEADER';
  * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
  */
 export function parseElements(elements, callback, options, reviver, parsingOptions) {
-  new fabric.ElementsParser(elements, callback, options, reviver, parsingOptions).parse();
+  new ElementsParser(elements, callback, options, reviver, parsingOptions).parse();
 }

@@ -177,7 +177,7 @@ Circle.fromElement = function(element, callback) {
     left = 0,
     top = 0,
     radius,
-    ...otherParsedAttributes,
+    ...otherParsedAttributes
   } = fabric.parseAttributes(element, Circle.ATTRIBUTE_NAMES);
 
   if (!radius || radius < 0) {

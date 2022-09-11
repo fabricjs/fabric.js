@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { fabric } from '../../HEADER';
 import { clipPaths, cssRules, gradientDefs } from "./constants";
+import { ElementsParser } from './elements_parser';
 import { getCSSRules } from './getCSSRules';
 import { getGradientDefs } from './getGradientDefs';
 import { loadSVGFromString } from './loadSVGFromString';
@@ -28,6 +29,7 @@ Object.assign(fabric, {
   parsePointsAttribute,
   getCSSRules,
   loadSVGFromURL,
-  loadSVGFromString
+  loadSVGFromString,
+  ElementsParser
 });
 

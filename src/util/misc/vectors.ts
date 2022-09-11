@@ -1,5 +1,3 @@
-import { sin } from './sin';
-import { cos } from './cos';
 import { IPoint, Point } from '../../point.class';
 import { TRadian } from '../../typedefs';
 
@@ -11,14 +9,7 @@ import { TRadian } from '../../typedefs';
  * @param {Number} radians The radians of the angle for the rotation
  * @return {Point} The new rotated point
  */
-export const rotateVector = (vector: Point, radians: TRadian) => {
-  const sinus = sin(radians),
-        cosinus = cos(radians);
-  return new Point(
-    vector.x * cosinus - vector.y * sinus,
-    vector.x * sinus + vector.y * cosinus,
-  );
-};
+export const rotateVector = (vector: Point, radians: TRadian) => vector.rotate(radians);
 
 /**
  * Creates a vetor from points represented as a point

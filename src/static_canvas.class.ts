@@ -1,7 +1,10 @@
 //@ts-nocheck
+import { config } from './config';
 import { VERSION } from './constants';
 import { Point } from './point.class';
+import { requestAnimFrame } from './util/animate';
 import { removeFromArray } from './util/internals';
+import { pick } from './util/misc/pick';
 
 (function (global) {
   // aliases for faster resolution
@@ -213,7 +216,7 @@ import { removeFromArray } from './util/internals';
      * @private
      */
     _isRetinaScaling: function() {
-      return (fabric.devicePixelRatio > 1 && this.enableRetinaScaling);
+      return (config.devicePixelRatio > 1 && this.enableRetinaScaling);
     },
 
     /**
@@ -221,7 +224,7 @@ import { removeFromArray } from './util/internals';
      * @return {Number} retinaScaling if applied, otherwise 1;
      */
     getRetinaScaling: function() {
-      return this._isRetinaScaling() ? Math.max(1, fabric.devicePixelRatio) : 1;
+      return this._isRetinaScaling() ? Math.max(1, config.devicePixelRatio) : 1;
     },
 
     /**
@@ -231,7 +234,7 @@ import { removeFromArray } from './util/internals';
       if (!this._isRetinaScaling()) {
         return;
       }
-      var scaleRatio = fabric.devicePixelRatio;
+      var scaleRatio = config.devicePixelRatio;
       this.__initRetinaScaling(scaleRatio, this.lowerCanvasEl, this.contextContainer);
       if (this.upperCanvasEl) {
         this.__initRetinaScaling(scaleRatio, this.upperCanvasEl, this.contextTop);
@@ -308,14 +311,14 @@ import { removeFromArray } from './util/internals';
         this.lowerCanvasEl = canvasEl;
       }
       else {
-        this.lowerCanvasEl = fabric.util.getById(canvasEl) || this._createCanvasElement();
+        this.lowerCanvasEl = fabric.document.getElementById(canvasEl) || canvasEl || this._createCanvasElement();
       }
       if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
         /* _DEV_MODE_START_ */
         throw new Error('fabric.js: trying to initialize a canvas that has already been initialized');
         /* _DEV_MODE_END_ */
       }
-      fabric.util.addClass(this.lowerCanvasEl, 'lower-canvas');
+      this.lowerCanvasEl.classList.add('lower-canvas');
       this.lowerCanvasEl.setAttribute('data-fabric', 'main');
       if (this.interactive) {
         this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
@@ -673,8 +676,11 @@ import { removeFromArray } from './util/internals';
      * @chainable
      */
     renderAll: function () {
-      var canvasToDrawOn = this.contextContainer;
-      this.renderCanvas(canvasToDrawOn, this._objects);
+      this.cancelRequestedRender();
+      if (this.destroyed) {
+        return;
+      }
+      this.renderCanvas(this.contextContainer, this._objects);
       return this;
     },
 
@@ -689,7 +695,7 @@ import { removeFromArray } from './util/internals';
      * @chainable
      */
     renderAndReset: function() {
-      this.isRendering = 0;
+      this.nextRenderHandle = 0;
       this.renderAll();
     },
 
@@ -701,8 +707,8 @@ import { removeFromArray } from './util/internals';
      * @chainable
      */
     requestRenderAll: function () {
-      if (!this.isRendering) {
-        this.isRendering = fabric.util.requestAnimFrame(this.renderAndResetBound);
+      if (!this.nextRenderHandle && !this.disposed && !this.destroyed) {
+        this.nextRenderHandle = requestAnimFrame(this.renderAndResetBound);
       }
       return this;
     },
@@ -732,9 +738,9 @@ import { removeFromArray } from './util/internals';
     },
 
     cancelRequestedRender: function() {
-      if (this.isRendering) {
-        fabric.util.cancelAnimFrame(this.isRendering);
-        this.isRendering = 0;
+      if (this.nextRenderHandle) {
+        fabric.util.cancelAnimFrame(this.nextRenderHandle);
+        this.nextRenderHandle = 0;
       }
     },
 
@@ -745,12 +751,17 @@ import { removeFromArray } from './util/internals';
      * @return {fabric.Canvas} instance
      * @chainable
      */
-    renderCanvas: function(ctx, objects) {
+    renderCanvas: function (ctx, objects) {
+
+      if (this.destroyed) {
+        return;
+      }
+
       var v = this.viewportTransform, path = this.clipPath;
-      this.cancelRequestedRender();
       this.calcViewportBoundaries();
       this.clearContext(ctx);
-      fabric.util.setImageSmoothing(ctx, this.imageSmoothingEnabled);
+      ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
+      // node-canvas
       ctx.patternQuality = 'best';
       this.fire('before:render', { ctx: ctx, });
       this._renderBackground(ctx);
@@ -776,6 +787,11 @@ import { removeFromArray } from './util/internals';
         this.drawControls(ctx);
       }
       this.fire('after:render', { ctx: ctx, });
+
+      if (this.__cleanupTask) {
+        this.__cleanupTask();
+        this.__cleanupTask = undefined;
+      }
     },
 
     /**
@@ -1026,30 +1042,19 @@ import { removeFromArray } from './util/internals';
      * @private
      */
     _toObjectMethod: function (methodName, propertiesToInclude) {
-
-      var clipPath = this.clipPath, data = {
+      const clipPath = this.clipPath;
+      const clipPathData = clipPath && !clipPath.excludeFromExport ?
+        this._toObject(clipPath, methodName, propertiesToInclude) :
+        null;
+      return {
         version: VERSION,
-        objects: this._toObjects(methodName, propertiesToInclude),
+        ...pick(this, propertiesToInclude),
+        objects: this._objects
+          .filter((object) => !object.excludeFromExport)
+          .map((instance) => this._toObject(instance, methodName, propertiesToInclude)),
+        ...this.__serializeBgOverlay(methodName, propertiesToInclude),
+        ...clipPathData ? { clipPath: clipPathData } : null
       };
-      if (clipPath && !clipPath.excludeFromExport) {
-        data.clipPath = this._toObject(this.clipPath, methodName, propertiesToInclude);
-      }
-      extend(data, this.__serializeBgOverlay(methodName, propertiesToInclude));
-
-      fabric.util.populateWithProperties(this, data, propertiesToInclude);
-
-      return data;
-    },
-
-    /**
-     * @private
-     */
-    _toObjects: function(methodName, propertiesToInclude) {
-      return this._objects.filter(function(object) {
-        return !object.excludeFromExport;
-      }).map(function(instance) {
-        return this._toObject(instance, methodName, propertiesToInclude);
-      }, this);
     },
 
     /**
@@ -1196,7 +1201,7 @@ import { removeFromArray } from './util/internals';
       var width = options.width || this.width,
           height = options.height || this.height,
           vpt, viewBox = 'viewBox="0 0 ' + this.width + ' ' + this.height + '" ',
-          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+          NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
 
       if (options.viewBox) {
         viewBox = 'viewBox="' +
@@ -1278,7 +1283,7 @@ import { removeFromArray } from './util/internals';
     createSVGFontFacesMarkup: function() {
       var markup = '', fontList = { }, obj, fontFamily,
           style, row, rowIndex, _char, charIndex, i, len,
-          fontPaths = fabric.fontPaths, objects = [];
+          fontPaths = config.fontPaths, objects = [];
 
       this._objects.forEach(function add(object) {
         objects.push(object);
@@ -1618,16 +1623,49 @@ import { removeFromArray } from './util/internals';
     },
 
     /**
-     * Clears a canvas element and dispose objects
-     * @return {fabric.Canvas} thisArg
-     * @chainable
+     * Waits until rendering has settled to destroy the canvas
+     * @returns {Promise<boolean>} a promise resolving to `true` once the canvas has been destroyed or to `false` if the canvas has was already destroyed
+     * @throws if aborted by a consequent call
      */
     dispose: function () {
-      // cancel eventually ongoing renders
-      if (this.isRendering) {
-        fabric.util.cancelAnimFrame(this.isRendering);
-        this.isRendering = 0;
-      }
+      this.disposed = true;
+      return new Promise<boolean>((resolve, reject) => {
+        const task = () => {
+          this.destroy();
+          resolve(true);
+        }
+        task.kill = reject;
+        if (this.__cleanupTask) {
+          this.__cleanupTask.kill('aborted');
+        }
+        
+        if (this.destroyed) {
+          resolve(false);
+        }
+        else if (this.nextRenderHandle) {
+          this.__cleanupTask = task;
+        }
+        else {
+          task();
+        }
+      });
+    },
+
+    /**
+     * Clears the canvas element, disposes objects and frees resources
+     * 
+     * **CAUTION**:
+     * 
+     * This method is **UNSAFE**.
+     * You may encounter a race condition using it if there's a requested render.
+     * Call this method only if you are sure rendering has settled. 
+     * Consider using {@link dispose} as it is **SAFE** 
+     * 
+     * @private
+     */
+    destroy: function () {
+      this.destroyed = true;
+      this.cancelRequestedRender();
       this.forEachObject(function(object) {
         object.dispose && object.dispose();
       });
@@ -1654,7 +1692,6 @@ import { removeFromArray } from './util/internals';
       this.lowerCanvasEl.setAttribute('height', this.height);
       fabric.util.cleanUpJsdomNode(this.lowerCanvasEl);
       this.lowerCanvasEl = undefined;
-      return this;
     },
 
     /**

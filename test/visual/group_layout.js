@@ -77,7 +77,7 @@
     });
 
     function fitContentLayoutRelative(canvas, callback) {
-        var g = createGroupForLayoutTests('fit-content layout', {
+        var g = createGroupForLayoutTests('fit-content layout relative', {
             backgroundColor: 'blue'
         });
         g.clone().then(function (clone) {
@@ -88,7 +88,7 @@
     }
 
     tests.push({
-        test: 'fit-content layout',
+        test: 'fit-content layout relative',
         code: fitContentLayoutRelative,
         golden: 'group-layout/fit-content.png',
         percentage: 0.06,

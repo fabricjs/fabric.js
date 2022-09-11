@@ -1,267 +1,174 @@
 //@ts-nocheck
-import { extend } from './lang_object';
+import { fabric } from '../../HEADER';
+import { runningAnimations } from './animation_registry';
+import { noop } from '../constants';
 
-(function (global) {
-  /**
-   *
-   * @typedef {Object} AnimationOptions
-   * Animation of a value or list of values.
-   * @property {Function} [onChange] Callback; invoked on every value change
-   * @property {Function} [onComplete] Callback; invoked when value change is completed
-   * @property {number | number[]} [startValue=0] Starting value
-   * @property {number | number[]} [endValue=100] Ending value
-   * @property {number | number[]} [byValue=100] Value to modify the property by
-   * @property {Function} [easing] Easing function
-   * @property {number} [duration=500] Duration of change (in ms)
-   * @property {Function} [abort] Additional function with logic. If returns true, animation aborts.
-   * @property {number} [delay] Delay of animation start (in ms)
-   *
-   * @typedef {() => void} CancelFunction
-   *
-   * @typedef {Object} AnimationCurrentState
-   * @property {number | number[]} currentValue value in range [`startValue`, `endValue`]
-   * @property {number} completionRate value in range [0, 1]
-   * @property {number} durationRate value in range [0, 1]
-   *
-   * @typedef {(AnimationOptions & AnimationCurrentState & { cancel: CancelFunction }} AnimationContext
-   */
+/**
+ *
+ * @typedef {Object} AnimationOptions
+ * Animation of a value or list of values.
+ * @property {Function} [onChange] Callback; invoked on every value change
+ * @property {Function} [onComplete] Callback; invoked when value change is completed
+ * @property {number | number[]} [startValue=0] Starting value
+ * @property {number | number[]} [endValue=100] Ending value
+ * @property {number | number[]} [byValue=100] Value to modify the property by
+ * @property {Function} [easing] Easing function
+ * @property {number} [duration=500] Duration of change (in ms)
+ * @property {Function} [abort] Additional function with logic. If returns true, animation aborts.
+ * @property {number} [delay] Delay of animation start (in ms)
+ *
+ * @typedef {() => void} CancelFunction
+ *
+ * @typedef {Object} AnimationCurrentState
+ * @property {number | number[]} currentValue value in range [`startValue`, `endValue`]
+ * @property {number} completionRate value in range [0, 1]
+ * @property {number} durationRate value in range [0, 1]
+ *
+ * @typedef {(AnimationOptions & AnimationCurrentState & { cancel: CancelFunction }} AnimationContext
+ */
 
-  /**
-   * Array holding all running animations
-   * @memberof fabric
-   * @type {AnimationContext[]}
-   */
-  var fabric = global.fabric, RUNNING_ANIMATIONS = [];
-  extend(RUNNING_ANIMATIONS, {
+const defaultEasing = (t, b, c, d) => -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
 
-    /**
-     * cancel all running animations at the next requestAnimFrame
-     * @returns {AnimationContext[]}
-     */
-    cancelAll: function () {
-      var animations = this.splice(0);
-      animations.forEach(function (animation) {
-        animation.cancel();
-      });
-      return animations;
-    },
+/**
+ * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
+ * @memberOf fabric.util
+ * @param {AnimationOptions} [options] Animation options
+ *  When using lists, think of something like this:
+ * @example
+ * fabric.util.animate({
+ *   startValue: [1, 2, 3],
+ *   endValue: [2, 4, 6],
+ *   onChange: function([x, y, zoom]) {
+ *     canvas.zoomToPoint(new Point(x, y), zoom);
+ *     canvas.requestRenderAll();
+ *   }
+ * });
+ *
+ * @example
+ * fabric.util.animate({
+ *   startValue: 1,
+ *   endValue: 0,
+ *   onChange: function(v) {
+ *     obj.set('opacity', v);
+ *     canvas.requestRenderAll();
+ *   }
+ * });
+ *
+ * @returns {CancelFunction} cancel function
+ */
+export function animate(options = {}) {
+  let cancel = false;
 
-    /**
-     * cancel all running animations attached to canvas at the next requestAnimFrame
-     * @param {fabric.Canvas} canvas
-     * @returns {AnimationContext[]}
-     */
-    cancelByCanvas: function (canvas) {
-      if (!canvas) {
-        return [];
+  const {
+    startValue = 0,
+    duration = 500,
+    easing = defaultEasing,
+    onChange = noop,
+    abort = noop,
+    onComplete = noop,
+    endValue = 100,
+    delay = 0,
+  } = options;
+
+  const context = {
+    ...options,
+    currentValue: startValue,
+    completionRate: 0,
+    durationRate: 0
+  };
+
+  const removeFromRegistry = () => {
+    const index = runningAnimations.indexOf(context);
+    return index > -1 && runningAnimations.splice(index, 1)[0];
+  };
+
+  context.cancel = function () {
+    cancel = true;
+    return removeFromRegistry();
+  };
+  runningAnimations.push(context);
+
+  const runner = function (timestamp) {
+    const start = timestamp || +new Date(),
+          finish = start + duration,
+          isMany = Array.isArray(startValue),
+          byValue = options.byValue || (
+            isMany ?
+            startValue.map((value, i) => endValue[i] - value)
+            : endValue - startValue
+          );
+
+    options.onStart && options.onStart();
+
+    (function tick(ticktime) {
+      const time = ticktime || +new Date();
+      const currentTime = time > finish ? duration : (time - start),
+          timePerc = currentTime / duration,
+          current = isMany ?
+            startValue.map(
+              (_value, i) => easing(currentTime, _value, byValue[i], duration)
+            ) : easing(currentTime, startValue, byValue, duration),
+          valuePerc = isMany ? Math.abs((current[0] - startValue[0]) / byValue[0])
+            : Math.abs((current - startValue) / byValue);
+      //  update context
+      context.currentValue = isMany ? current.slice() : current;
+      context.completionRate = valuePerc;
+      context.durationRate = timePerc;
+
+      if (cancel) {
+        return;
       }
-      var cancelled = this.filter(function (animation) {
-        return typeof animation.target === 'object' && animation.target.canvas === canvas;
-      });
-      cancelled.forEach(function (animation) {
-        animation.cancel();
-      });
-      return cancelled;
-    },
-
-    /**
-     * cancel all running animations for target at the next requestAnimFrame
-     * @param {*} target
-     * @returns {AnimationContext[]}
-     */
-    cancelByTarget: function (target) {
-      var cancelled = this.findAnimationsByTarget(target);
-      cancelled.forEach(function (animation) {
-        animation.cancel();
-      });
-      return cancelled;
-    },
-
-    /**
-     *
-     * @param {CancelFunction} cancelFunc the function returned by animate
-     * @returns {number}
-     */
-    findAnimationIndex: function (cancelFunc) {
-      return this.indexOf(this.findAnimation(cancelFunc));
-    },
-
-    /**
-     *
-     * @param {CancelFunction} cancelFunc the function returned by animate
-     * @returns {AnimationContext | undefined} animation's options object
-     */
-    findAnimation: function (cancelFunc) {
-      return this.find(function (animation) {
-        return animation.cancel === cancelFunc;
-      });
-    },
-
-    /**
-     *
-     * @param {*} target the object that is assigned to the target property of the animation context
-     * @returns {AnimationContext[]} array of animation options object associated with target
-     */
-    findAnimationsByTarget: function (target) {
-      if (!target) {
-        return [];
+      if (abort(current, valuePerc, timePerc)) {
+        removeFromRegistry();
+        return;
       }
-      return this.filter(function (animation) {
-        return animation.target === target;
-      });
-    }
-  });
-
-  function noop() {
-    return false;
-  }
-
-  function defaultEasing(t, b, c, d) {
-    return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
-  }
-
-  /**
-   * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
-   * @memberOf fabric.util
-   * @param {AnimationOptions} [options] Animation options
-   *  When using lists, think of something like this:
-   * @example
-   * fabric.util.animate({
-   *   startValue: [1, 2, 3],
-   *   endValue: [2, 4, 6],
-   *   onChange: function([x, y, zoom]) {
-   *     canvas.zoomToPoint(new Point(x, y), zoom);
-   *     canvas.requestRenderAll();
-   *   }
-   * });
-   *
-   * @example
-   * fabric.util.animate({
-   *   startValue: 1,
-   *   endValue: 0,
-   *   onChange: function(v) {
-   *     obj.set('opacity', v);
-   *     canvas.requestRenderAll();
-   *   }
-   * });
-   *
-   * @returns {CancelFunction} cancel function
-   */
-  function animate(options) {
-    options || (options = {});
-    var cancel = false,
-        context,
-        removeFromRegistry = function () {
-          var index = fabric.runningAnimations.indexOf(context);
-          return index > -1 && fabric.runningAnimations.splice(index, 1)[0];
-        };
-
-    context = Object.assign({}, options, {
-      cancel: function () {
-        cancel = true;
-        return removeFromRegistry();
-      },
-      currentValue: 'startValue' in options ? options.startValue : 0,
-      completionRate: 0,
-      durationRate: 0
-    });
-    fabric.runningAnimations.push(context);
-
-    var runner = function (timestamp) {
-      var start = timestamp || +new Date(),
-          duration = options.duration || 500,
-          finish = start + duration, time,
-          onChange = options.onChange || noop,
-          abort = options.abort || noop,
-          onComplete = options.onComplete || noop,
-          easing = options.easing || defaultEasing,
-          isMany = 'startValue' in options ? options.startValue.length > 0 : false,
-          startValue = 'startValue' in options ? options.startValue : 0,
-          endValue = 'endValue' in options ? options.endValue : 100,
-          byValue = options.byValue || (isMany ? startValue.map(function(value, i) {
-            return endValue[i] - startValue[i];
-          }) : endValue - startValue);
-
-      options.onStart && options.onStart();
-
-      (function tick(ticktime) {
-        time = ticktime || +new Date();
-        var currentTime = time > finish ? duration : (time - start),
-            timePerc = currentTime / duration,
-            current = isMany ? startValue.map(function(_value, i) {
-              return easing(currentTime, startValue[i], byValue[i], duration);
-            }) : easing(currentTime, startValue, byValue, duration),
-            valuePerc = isMany ? Math.abs((current[0] - startValue[0]) / byValue[0])
-              : Math.abs((current - startValue) / byValue);
+      if (time > finish) {
         //  update context
-        context.currentValue = isMany ? current.slice() : current;
-        context.completionRate = valuePerc;
-        context.durationRate = timePerc;
-        if (cancel) {
-          return;
-        }
-        if (abort(current, valuePerc, timePerc)) {
-          removeFromRegistry();
-          return;
-        }
-        if (time > finish) {
-          //  update context
-          context.currentValue = isMany ? endValue.slice() : endValue;
-          context.completionRate = 1;
-          context.durationRate = 1;
-          //  execute callbacks
-          onChange(isMany ? endValue.slice() : endValue, 1, 1);
-          onComplete(endValue, 1, 1);
-          removeFromRegistry();
-          return;
-        }
-        else {
-          onChange(current, valuePerc, timePerc);
-          requestAnimFrame(tick);
-        }
-      })(start);
-    };
+        context.currentValue = isMany ? endValue.slice() : endValue;
+        context.completionRate = 1;
+        context.durationRate = 1;
+        //  execute callbacks
+        onChange(isMany ? endValue.slice() : endValue, 1, 1);
+        onComplete(endValue, 1, 1);
+        removeFromRegistry();
+        return;
+      }
+      else {
+        onChange(current, valuePerc, timePerc);
+        requestAnimFrame(tick);
+      }
+    })(start);
+  };
 
-    if (options.delay) {
-      setTimeout(function () {
-        requestAnimFrame(runner);
-      }, options.delay);
-    }
-    else {
-      requestAnimFrame(runner);
-    }
-
-    return context.cancel;
+  if (delay > 0 ) {
+    setTimeout(() => requestAnimFrame(runner), delay);
+  } else {
+    requestAnimFrame(runner);
   }
 
-  var _requestAnimFrame = fabric.window.requestAnimationFrame       ||
-                          fabric.window.webkitRequestAnimationFrame ||
-                          fabric.window.mozRequestAnimationFrame    ||
-                          fabric.window.oRequestAnimationFrame      ||
-                          fabric.window.msRequestAnimationFrame     ||
-                          function(callback) {
-                            return fabric.window.setTimeout(callback, 1000 / 60);
-                          };
+  return context.cancel;
+}
 
-  var _cancelAnimFrame = fabric.window.cancelAnimationFrame || fabric.window.clearTimeout;
+const _requestAnimFrame =
+  fabric.window.requestAnimationFrame ||
+  function(callback) {
+    return fabric.window.setTimeout(callback, 1000 / 60);
+  };
 
-  /**
-   * requestAnimationFrame polyfill based on http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-   * In order to get a precise start time, `requestAnimFrame` should be called as an entry into the method
-   * @memberOf fabric.util
-   * @param {Function} callback Callback to invoke
-   * @param {DOMElement} element optional Element to associate with animation
-   */
-  function requestAnimFrame() {
-    return _requestAnimFrame.apply(fabric.window, arguments);
-  }
+const _cancelAnimFrame =
+  fabric.window.cancelAnimationFrame || fabric.window.clearTimeout;
 
-  function cancelAnimFrame() {
-    return _cancelAnimFrame.apply(fabric.window, arguments);
-  }
+/**
+ * requestAnimationFrame polyfill based on http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+ * In order to get a precise start time, `requestAnimFrame` should be called as an entry into the method
+ * @memberOf fabric.util
+ * @param {Function} callback Callback to invoke
+ * @param {DOMElement} element optional Element to associate with animation
+ */
+export function requestAnimFrame(...args) {
+  return _requestAnimFrame.apply(fabric.window, args);
+}
 
-  fabric.util.animate = animate;
-  fabric.util.requestAnimFrame = requestAnimFrame;
-  fabric.util.cancelAnimFrame = cancelAnimFrame;
-  fabric.runningAnimations = RUNNING_ANIMATIONS;
-})(typeof exports !== 'undefined' ? exports : window);
+export function cancelAnimFrame(...args) {
+  return _cancelAnimFrame.apply(fabric.window, args);
+}

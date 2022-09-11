@@ -1,6 +1,7 @@
 //@ts-nocheck
 
 import { Color } from "../color";
+import { config } from "../config";
 
 /* _TO_SVG_START_ */
 (function(global) {
@@ -145,7 +146,7 @@ import { Color } from "../color";
 
     _setSVGBg: function(textBgRects) {
       if (this.backgroundColor) {
-        var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+        var NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
         textBgRects.push(
           '\t\t<rect ',
           this._getFillAttributes(this.backgroundColor),

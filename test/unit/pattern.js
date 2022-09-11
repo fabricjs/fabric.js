@@ -11,10 +11,10 @@
   var img = fabric.document.createElement('img');
   setSrc(img, IMG_SRC);
 
-  function createPattern(callback) {
+  function createPattern() {
     return new fabric.Pattern({
       source: img
-    }, callback);
+    });
   }
 
   QUnit.test('constructor', function(assert) {

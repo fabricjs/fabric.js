@@ -1,9 +1,13 @@
 //@ts-nocheck
+
+import { config } from "../config";
+import { Point } from "../point.class";
+import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
+
+
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
       extend = fabric.util.object.extend,
-      min = fabric.util.array.min,
-      max = fabric.util.array.max,
       toFixed = fabric.util.toFixed,
       projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
 
@@ -117,21 +121,11 @@
      * @private
      */
     _calcDimensions: function() {
-
-      var points = this.exactBoundingBox ? this._projectStrokeOnPoints() : this.points,
-          minX = min(points, 'x') || 0,
-          minY = min(points, 'y') || 0,
-          maxX = max(points, 'x') || 0,
-          maxY = max(points, 'y') || 0,
-          width = (maxX - minX),
-          height = (maxY - minY);
-
-      return {
-        left: minX,
-        top: minY,
-        width: width,
-        height: height,
-      };
+      const points = this.exactBoundingBox ? this._projectStrokeOnPoints() : this.points.map(p => new Point(p));
+      if (points.length === 0) {
+        return makeBoundingBoxFromPoints([new Point(0, 0)]);
+      }
+      return makeBoundingBoxFromPoints(points);
     },
 
     /**
@@ -153,7 +147,7 @@
      */
     _toSVG: function() {
       var points = [], diffX = this.pathOffset.x, diffY = this.pathOffset.y,
-          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+          NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
 
       for (var i = 0, len = this.points.length; i < len; i++) {
         points.push(

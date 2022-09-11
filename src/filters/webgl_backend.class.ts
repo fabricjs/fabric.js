@@ -1,50 +1,18 @@
 //@ts-nocheck
+
+import { config } from "../config";
+import { webGLProbe } from "./WebGLProbe";
+
 (function(global) {
   var fabric = global.fabric;
-  /**
-   * Tests if webgl supports certain precision
-   * @param {WebGL} Canvas WebGL context to test on
-   * @param {String} Precision to test can be any of following: 'lowp', 'mediump', 'highp'
-   * @returns {Boolean} Whether the user's browser WebGL supports given precision.
-   */
-  function testPrecision(gl, precision){
-    var fragmentSource = 'precision ' + precision + ' float;\nvoid main(){}';
-    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fragmentShader, fragmentSource);
-    gl.compileShader(fragmentShader);
-    if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
-      return false;
-    }
-    return true;
-  }
 
-  /**
-   * Indicate whether this filtering backend is supported by the user's browser.
-   * @param {Number} tileSize check if the tileSize is supported
-   * @returns {Boolean} Whether the user's browser supports WebGL.
-   */
-  fabric.isWebglSupported = function(tileSize) {
-    if (fabric.isLikelyNode) {
-      return false;
+  fabric.initFilterBackend = function () {
+    if (webGLProbe.isSupported(config.textureSize)) {
+      return (new fabric.WebglFilterBackend({ tileSize: config.textureSize }));
     }
-    tileSize = tileSize || fabric.WebglFilterBackend.prototype.tileSize;
-    var canvas = document.createElement('canvas');
-    var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    var isSupported = false;
-    // eslint-disable-next-line
-    if (gl) {
-      fabric.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-      isSupported = fabric.maxTextureSize >= tileSize;
-      var precisions = ['highp', 'mediump', 'lowp'];
-      for (var i = 0; i < 3; i++){
-        if (testPrecision(gl, precisions[i])){
-          fabric.webGlPrecision = precisions[i];
-          break;
-        };
-      }
+    else if (fabric.Canvas2dFilterBackend) {
+      return (new fabric.Canvas2dFilterBackend());
     }
-    this.isSupported = isSupported;
-    return isSupported;
   };
 
   fabric.WebglFilterBackend = WebglFilterBackend;
@@ -62,7 +30,7 @@
 
   WebglFilterBackend.prototype = /** @lends fabric.WebglFilterBackend.prototype */ {
 
-    tileSize: 2048,
+    tileSize: config.textureSize,
 
     /**
      * Experimental. This object is a sort of repository of help layers used to avoid
@@ -111,7 +79,7 @@
       var targetCanvas = fabric.util.createCanvasElement();
       // eslint-disable-next-line no-undef
       var imageBuffer = new ArrayBuffer(width * height * 4);
-      if (fabric.forceGLPutImageData) {
+      if (config.forceGLPutImageData) {
         this.imageBuffer = imageBuffer;
         this.copyGLTo2D = copyGLTo2DPutImageData;
         return;

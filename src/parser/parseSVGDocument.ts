@@ -31,7 +31,7 @@ export function parseSVGDocument(doc, callback, reviver, parsingOptions) {
   }
   parseUseDirectives(doc);
 
-  let svgUid = fabric.Object.__uid++, i, len, options = applyViewboxTransform(doc), descendants = fabric.util.toArray(doc.getElementsByTagName('*'));
+  let svgUid = fabric.Object.__uid++, i, len, options = applyViewboxTransform(doc), descendants = Array.from(doc.getElementsByTagName('*'));
   options.crossOrigin = parsingOptions && parsingOptions.crossOrigin;
   options.svgUid = svgUid;
   options.signal = parsingOptions && parsingOptions.signal;
@@ -61,7 +61,7 @@ export function parseSVGDocument(doc, callback, reviver, parsingOptions) {
     return el.nodeName.replace('svg:', '') === 'clipPath';
   }).forEach(function (el) {
     const id = el.getAttribute('id');
-    localClipPaths[id] = fabric.util.toArray(el.getElementsByTagName('*')).filter(function (el) {
+    localClipPaths[id] = Array.from(el.getElementsByTagName('*')).filter(function (el) {
       return svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''));
     });
   });

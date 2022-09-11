@@ -5,26 +5,10 @@ import './src/mixins/collection.mixin';
 import './src/mixins/shared_methods.mixin';
 import './src/util/misc/misc';
 // import './src/util/named_accessors.mixin'; i would imagine dead forever or proper setters/getters
-import './src/util/path';
-import './src/util/lang_array';
-import './src/util/lang_object';
-import './src/util/lang_string';
-import './src/util/lang_class';
-import './src/util/dom_event'; // optional interaction
-import './src/util/dom_style';
-import './src/util/dom_misc';
-import './src/util/dom_request';
-import './src/util/animate'; // optional animation
-import './src/util/animate_color'; // optional animation
-import './src/util/anim_ease'; // optional easing
 import './src/parser'; // optional parser
-import './src/elements_parser'; // optional parser
 import './src/point.class';
 import './src/intersection.class';
 import './src/color';
-import './src/controls.actions'; // optional interaction
-import './src/controls.render'; // optional interaction
-import './src/control.class'; // optional interaction
 import './src/gradient'; // optional gradient
 import './src/pattern.class'; // optional pattern
 import './src/shadow.class'; // optional shadow
@@ -86,8 +70,7 @@ import './src/mixins/itext_click_behavior.mixin'; // optional itext
 import './src/mixins/itext_key_behavior.mixin'; // optional itext
 import './src/mixins/itext.svg_export'; // optional itext
 import './src/shapes/textbox.class'; // optional textbox
-import './src/mixins/default_controls'; // optional interaction
-
+import './src/controls'; // optional interaction
 import './src/brushes'; // optional freedrawing
 //  extends fabric.StaticCanvas, fabric.Canvas, fabric.Object, depends on fabric.PencilBrush and fabric.Rect
 // import './src/mixins/eraser_brush.mixin'; // optional erasing

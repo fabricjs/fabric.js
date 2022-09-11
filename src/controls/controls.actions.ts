@@ -1,5 +1,8 @@
 //@ts-nocheck
-import { Point } from './point.class';
+
+import { Point } from '../point.class';
+import { fireEvent } from '../util/fireEvent';
+import { renderCircleControl, renderSquareControl } from './controls.render';
 
 (function(global) {
   var fabric = global.fabric || (global.fabric = { }),
@@ -28,13 +31,6 @@ import { Point } from './point.class';
     var angle = fabricObject.getTotalAngle();
     var cornerAngle = angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
     return Math.round((cornerAngle % 360) / 45);
-  }
-
-  function fireEvent(eventName, options) {
-    var target = options.transform.target,
-        canvas = target.canvas;
-    canvas && canvas.fire('object:' + eventName, Object.assign({}, options, { target: target }));
-    target.fire(eventName, options);
   }
 
   /**
@@ -743,6 +739,8 @@ import { Point } from './point.class';
   controls.wrapWithFixedAnchor = wrapWithFixedAnchor;
   controls.wrapWithFireEvent = wrapWithFireEvent;
   controls.getLocalPoint = getLocalPoint;
+  controls.renderCircleControl = renderCircleControl;
+  controls.renderSquareControl = renderSquareControl;
   fabric.controlsUtils = controls;
 
 })(typeof exports !== 'undefined' ? exports : window);
