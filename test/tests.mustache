@@ -7,6 +7,9 @@
 <script src="/node_modules/qunit/qunit/qunit.js"></script>
 <link rel="stylesheet" href="/node_modules/qunit/qunit/qunit.css"/>
 
+<script src="/node_modules/source-map-support/browser-source-map-support.js"></script>
+<script>sourceMapSupport.install();</script>
+
 <script src="/testem.js"></script>
 {{#serve_files}}<script src="{{{src}}}"{{#attrs}} {{&.}}{{/attrs}}></script>{{/serve_files}}
 

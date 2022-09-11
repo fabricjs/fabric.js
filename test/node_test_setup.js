@@ -1,3 +1,4 @@
+require('source-map-support/register');
 // set the fabric framework as a global for tests
 var chalk = require('chalk');
 var diff = require('deep-object-diff').diff;
