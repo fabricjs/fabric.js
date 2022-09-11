@@ -65,3 +65,12 @@ export const extend = (destination, source, deep) => {
 
 //TODO: this function return an empty object if you try to clone null
 export const clone = (object: any, deep: boolean) => deep ? extend({ }, object, deep) : { ...object };
+
+export function mergeWithDefaults<T>(target: Partial<T>, defaults: T): T {
+  for(const k in defaults) {
+    if(target[k] === undefined || target[k] === null) {
+      target[k] = defaults[k]
+    }
+  }
+  return target;
+}

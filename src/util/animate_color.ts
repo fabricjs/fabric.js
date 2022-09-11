@@ -52,7 +52,7 @@ export function animateColor(
   } = {}
 ) {
   const startColor = new Color(fromColor).getSource(),
-        endColor = new Color(toColor).getSource(),
+        endColor = new Color(toColor).getSource();
   return animate({
     ...restOfOptions,
     duration,

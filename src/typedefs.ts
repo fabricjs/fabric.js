@@ -47,7 +47,7 @@ export const enum SupportedSVGUnit {
 }
 
 export type TMat2D = [number, number, number, number, number, number];
-  
+
 export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
 
 /**
@@ -64,3 +64,5 @@ export type TransformEvent<T> = TEvent & T & {
     target: any
   }
 }
+
+export type WithReturnType<T extends (...a: any) => any, TNewReturn> = (...a: Parameters<T>) => TNewReturn;

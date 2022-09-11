@@ -1,66 +1,109 @@
 import { fabric } from '../../HEADER';
 import { runningAnimations } from './animation_registry';
 import { noop } from '../constants';
+import { WithReturnType } from "../typedefs";
+import { defaultEasing, EasingFunction } from "./anim_ease";
+import {mergeWithDefaults} from "./lang_object";
 
 /**
- *
- * @typedef {Object} AnimationOptions
- * Animation of a value or list of values.
- * @property {Function} [onChange] Callback; invoked on every value change
- * @property {Function} [onComplete] Callback; invoked when value change is completed
- * @property {number | number[]} [startValue=0] Starting value
- * @property {number | number[]} [endValue=100] Ending value
- * @property {number | number[]} [byValue=100] Value to modify the property by
- * @property {Function} [easing] Easing function
- * @property {number} [duration=500] Duration of change (in ms)
- * @property {Function} [abort] Additional function with logic. If returns true, animation aborts.
- * @property {number} [delay] Delay of animation start (in ms)
- *
- * @typedef {() => void} CancelFunction
- *
- * @typedef {Object} AnimationCurrentState
- * @property {number | number[]} currentValue value in range [`startValue`, `endValue`]
- * @property {number} completionRate value in range [0, 1]
- * @property {number} durationRate value in range [0, 1]
- *
- * @typedef {(AnimationOptions & AnimationCurrentState & { cancel: CancelFunction }} AnimationContext
+ * Callback called every frame
+ * @param t current "time"/ms elapsed. multivalue
+ * @param valueRatio ratio of current value to animation max value. [0, 1]
+ * @param timeRatio ratio of current ms to animation duration. [0, 1]
  */
-export type EasingFunction = (t: number, b: number, c: number, d: number) => number;
-export type AbortFunction = (current: number | number[], valuePercent: number, timePercent: number) => boolean;
+export type OnChangeCallback = (t: number | number[], valueRatio: number, timeRatio: number) => void;
 
-export type OnChangeCallback = (x: number | number[], y: number, z: number) => void;
+/**
+ * Called to determine if animation should abort
+ * @returns truthy if animation should abort
+ */
+export type AbortCallback = WithReturnType<OnChangeCallback, boolean>;
 
+/**
+ * Function used for canceling an animation
+ */
+export type CancelFunction = VoidFunction;
+
+/**
+ * Animation of a value or list of values
+ */
 export interface AnimationOptions {
+  /**
+   * Called when the animation starts
+   */
   onStart: VoidFunction;
+
+  /**
+   * Called at each frame of the animation
+   */
   onChange: OnChangeCallback;
+
+  /**
+   * Called after the last frame of the animation
+   */
   onComplete: OnChangeCallback;
-  startValue: number | number[];
-  endValue: number | number[];
-  byValue: number | number[];
+
+  /**
+   * Easing function
+   */
   easing: EasingFunction;
+
+  /**
+   * Function called at each frame.
+   * If it returns true, abort
+   */
+  abort: AbortCallback;
+
+  /**
+   * Starting value(s)
+   */
+  startValue: number | number[];
+
+  /**
+   * Ending value(s)
+   */
+  endValue: number | number[];
+
+  /**
+   * Value(s) to increment/decrement the value(s) by
+   */
+  byValue: number | number[];
+
+  /**
+   * Duration of the animation in ms
+   */
   duration: number;
-  abort: AbortFunction;
+
+  /**
+   * Delay to start the animation in ms
+   */
   delay: number;
 }
 
 export interface AnimationCurrentState {
+  /**
+   * Current values
+   */
   currentValue: number | number[];
+  /**
+   * Same as valueRatio from @see OnChangeCallback
+   */
   completionRate: number;
+  /**
+   * Same as completionRatio from @see OnChangeCallback
+   */
   durationRate: number;
 }
 
-export interface AnimationContext extends AnimationOptions, AnimationCurrentState {
-  cancel: VoidFunction;
-}
-
 /**
- * Default easing
- * @param t current time
- * @param b
- * @param c
- * @param d duration
+ * Animation context
  */
-const defaultEasing: EasingFunction = (t, b, c, d) => -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+export interface AnimationContext extends AnimationOptions, AnimationCurrentState {
+  /**
+   * Current function used to cancel the animation
+   */
+  cancel: CancelFunction;
+}
 
 export const DefaultAnimationOptions: AnimationOptions = {
   onStart: noop,
@@ -102,7 +145,7 @@ export const DefaultAnimationOptions: AnimationOptions = {
  *
  * @returns {CancelFunction} cancel function
  */
-export function animate(options: AnimationOptions = DefaultAnimationOptions) {
+export function animate(options: Partial<AnimationOptions> = {}): CancelFunction {
   let cancel = false;
 
   const {
@@ -114,11 +157,11 @@ export function animate(options: AnimationOptions = DefaultAnimationOptions) {
     onComplete,
     endValue,
     delay,
-  } = options;
+  } = mergeWithDefaults({ ...options }, DefaultAnimationOptions);
 
-  const context: AnimationContext = {
-    ...options,
-    cancel: noop,
+  const context: Partial<AnimationContext> = {
+    ...mergeWithDefaults({ ...options }, DefaultAnimationOptions),
+    cancel: noop, // placeholder
     currentValue: startValue,
     completionRate: 0,
     durationRate: 0,
@@ -196,13 +239,13 @@ export function animate(options: AnimationOptions = DefaultAnimationOptions) {
   return context.cancel;
 }
 
-const _requestAnimFrame =
+const _requestAnimFrame: AnimationFrameProvider["requestAnimationFrame"] =
   fabric.window.requestAnimationFrame ||
   function(callback: FrameRequestCallback) {
     return fabric.window.setTimeout(callback, 1000 / 60);
   };
 
-const _cancelAnimFrame =
+const _cancelAnimFrame: AnimationFrameProvider["cancelAnimationFrame"] =
   fabric.window.cancelAnimationFrame || fabric.window.clearTimeout;
 
 /**
@@ -210,12 +253,11 @@ const _cancelAnimFrame =
  * In order to get a precise start time, `requestAnimFrame` should be called as an entry into the method
  * @memberOf fabric.util
  * @param {Function} callback Callback to invoke
- * @param {DOMElement} element optional Element to associate with animation
  */
-export function requestAnimFrame(callback: FrameRequestCallback) {
-  return _requestAnimFrame.apply(fabric.window, [callback]);
+export function requestAnimFrame(callback: FrameRequestCallback): number {
+  return _requestAnimFrame.bind(fabric.window)(callback);
 }
 
-export function cancelAnimFrame(handle: number) {
-  return _cancelAnimFrame.apply(fabric.window, [handle]);
+export function cancelAnimFrame(handle: number): void {
+  return _cancelAnimFrame.bind(fabric.window)(handle);
 }
