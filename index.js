@@ -1,5 +1,5 @@
 import { fabric } from './HEADER';
-import { registerClass, registry } from './src/Registry';
+import { registerClass } from './src/Registry';
 // import './lib/event'), // optional gestures
 import './src/mixins/observable.mixin';
 import './src/mixins/collection.mixin';
@@ -62,7 +62,7 @@ import './src/filters/blur_filter.class'; // optional image_filters
 import './src/filters/gamma_filter.class'; // optional image_filters
 import './src/filters/composed_filter.class'; // optional image_filters
 import './src/filters/hue_rotation.class'; // optional image_filters
-// filter are a mess, once migrated move logic to files
+// filters are a mess, once migrated move logic to files
 for (const key in fabric.Image.filters) {
   const filter = fabric.Image.filters[key];
   registerClass(filter.prototype.type, filter);
@@ -78,8 +78,6 @@ import './src/mixins/itext.svg_export'; // optional itext
 import './src/shapes/textbox.class'; // optional textbox
 import './src/controls'; // optional interaction
 import './src/brushes'; // optional freedrawing
-
-// export { fabric };
 
 //  extends fabric.StaticCanvas, fabric.Canvas, fabric.Object, depends on fabric.PencilBrush and fabric.Rect
 // import './src/mixins/eraser_brush.mixin'; // optional erasing
