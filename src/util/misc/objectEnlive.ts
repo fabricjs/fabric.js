@@ -1,19 +1,9 @@
 import { fabric } from '../../../HEADER';
 import { noop } from '../../constants';
+import { registry } from '../../Registry';
 import { TCrossOrigin } from '../../typedefs';
 import { TObject } from '../../__types__';
-import { camelize, capitalize } from '../lang_string';
 import { createImage } from './dom';
-
-/**
- * Returns klass "Class" object of given namespace
- * @memberOf fabric.util
- * @param {String} type Type of object (eg. 'circle')
- * @param {object} namespace Namespace to get klass "Class" object from
- * @return {Object} klass "Class"
- */
-export const getKlass = (type: string, namespace = fabric): any =>
-  namespace[capitalize(camelize(type), true)];
 
 type LoadImageOptions = {
   signal?: AbortSignal;
@@ -83,26 +73,24 @@ type EnlivenObjectOptions = {
  * @returns {Promise<fabric.Object[]>}
  */
 export const enlivenObjects = (
-  objects: any[],
+  objects: TObject[],
   { signal, reviver = noop, namespace = fabric }: EnlivenObjectOptions = {}
 ) =>
   new Promise<TObject[]>((resolve, reject) => {
     const instances: TObject[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     Promise.all(
-      objects.map((obj) =>
-        getKlass(obj.type, namespace)
-          .fromObject(obj, {
-            signal,
-            reviver,
-            namespace,
-          })
-          .then((fabricInstance: TObject) => {
-            reviver(obj, fabricInstance);
-            instances.push(fabricInstance);
-            return fabricInstance;
-          })
-      )
+      objects.map(async (obj) => {
+        const handler = registry.getJSONHandler(obj);
+        const fabricInstance = (await handler(obj, {
+          signal,
+          reviver,
+          namespace,
+        })) as TObject;
+        reviver(obj, fabricInstance);
+        instances.push(fabricInstance);
+        return fabricInstance;
+      })
     )
       .then(resolve)
       .catch((error) => {
@@ -126,57 +114,43 @@ export const enlivenObjects = (
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  * @returns {Promise<{[key:string]:fabric.Object|fabric.Pattern|fabric.Gradient|null}>} the input object with enlived values
  */
-export const enlivenObjectEnlivables = (
-  serializedObject: any,
+export const enlivenObjectEnlivables = <
+  D extends Record<string, Record<string, unknown>>,
+  T extends FunctionConstructor & { dispose?(): unknown },
+  R extends Record<keyof D, T>
+>(
+  serializedObject: D,
   { signal }: { signal?: AbortSignal } = {}
 ) =>
-  new Promise((resolve, reject) => {
-    const instances: any[] = [];
+  new Promise<R>((resolve, reject) => {
+    const instances: T[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
-    // enlive every possible property
-    const promises = Object.values(serializedObject).map((value: any) => {
-      if (!value) {
-        return value;
+    const promises = Object.values(serializedObject).map(async (value) => {
+      const handler = !!value && registry.getJSONHandler(value);
+      if (!handler) {
+        return;
       }
-      // gradient
-      if (value.colorStops) {
-        return new fabric.Gradient(value);
-      }
-      // clipPath
-      if (value.type) {
-        return enlivenObjects([value], { signal }).then(([enlived]) => {
-          instances.push(enlived);
-          return enlived;
-        });
-      }
-      // pattern
-      if (value.source) {
-        return fabric.Pattern.fromObject(value, { signal }).then(
-          (pattern: any) => {
-            instances.push(pattern);
-            return pattern;
-          }
-        );
-      }
-      return value;
+      const instance = (await handler(value, { signal })) as T;
+      instances.push(instance);
+      return instance;
     });
-    const keys = Object.keys(serializedObject);
+    const keys = Object.keys(serializedObject) as (keyof D)[];
     Promise.all(promises)
       .then((enlived) => {
-        return enlived.reduce(function (acc, instance, index) {
-          acc[keys[index]] = instance;
+        return enlived.reduce((acc, instance, index) => {
+          instance && (acc[keys[index]] = instance);
           return acc;
-        }, {});
+        }, {} as R);
       })
       .then(resolve)
-      .catch(function (error) {
+      .catch((error) => {
         // cleanup
         instances.forEach((instance) => {
           instance.dispose && instance.dispose();
         });
         reject(error);
       })
-      .finally(function () {
+      .finally(() => {
         signal && signal.removeEventListener('abort', reject);
       });
   });
