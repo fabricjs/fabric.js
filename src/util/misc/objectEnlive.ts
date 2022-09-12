@@ -81,7 +81,7 @@ export const enlivenObjects = (
     signal && signal.addEventListener('abort', reject, { once: true });
     Promise.all(
       objects.map(async (obj) => {
-        const handler = registry.getJSONHandler(obj) as TRegistry['json'];
+        const handler = registry.assertJSONHandler(obj);
         const fabricInstance = (await handler(obj, {
           signal,
           reviver,
@@ -126,10 +126,11 @@ export const enlivenObjectEnlivables = <
     const instances: T[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     const promises = Object.values(serializedObject).map(async (value) => {
-      const handler =
-        !!value &&
-        typeof value === 'object' &&
-        registry.getJSONHandler(value, false);
+      const { handler } =
+        (!!value &&
+          typeof value === 'object' &&
+          registry.getJSONHandler(value)) ||
+        {};
       if (!handler) {
         return;
       }
