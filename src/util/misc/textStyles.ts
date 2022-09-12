@@ -83,10 +83,13 @@ export const stylesToArray = (styles: any, text: string) => {
  */
 export const stylesFromArray = (styles: any, text: string) => {
   if (!Array.isArray(styles)) {
-    return styles;
+    return clone(styles, true);
   }
   const textLines = text.split('\n'),
-    stylesObject = {} as any;
+    stylesObject = {} as Record<
+      string | number,
+      Record<string | number, Record<string, string>>
+    >;
   let charIndex = -1,
     styleIndex = 0;
   //loop through each textLine
