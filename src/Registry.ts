@@ -19,9 +19,31 @@ export type TClassIO<T extends FunctionConstructor = FunctionConstructor> =
 
 export class Registry {
   readonly registry: Map<string, TRegistry>;
+  readonly resolver: {
+    json?: (data: Record<string, unknown>) => {
+      key: string;
+      handler?: TRegistry['json'];
+    };
+    svg?: (data: { element: SVGElement; key?: string }) => {
+      key: string;
+      handler?: TRegistry['svg'];
+    };
+  };
 
   constructor(registry?: Map<string, TRegistry>) {
     this.registry = new Map(registry);
+    this.resolver = {};
+  }
+
+  registerResolver<T extends 'json' | 'svg'>(
+    type: T,
+    resolver?: Registry['resolver'][T]
+  ) {
+    this.resolver[type] = resolver;
+  }
+
+  unregisterResolver<T extends 'json' | 'svg'>(type: T) {
+    this.resolver[type] = undefined;
   }
 
   register(type: string, value: TRegistry) {
@@ -35,7 +57,7 @@ export class Registry {
     });
   }
 
-  resolveJSONKey(data: Record<string, unknown>) {
+  private resolveJSONKey(data: Record<string, unknown>) {
     // backward compatibility
     if (data.colorStops) {
       return 'gradient';
@@ -43,18 +65,19 @@ export class Registry {
     return data.type as string | undefined;
   }
 
-  resolveSVGKey(el: SVGElement) {
-    return el.tagName.replace('svg:', '').toLowerCase();
-  }
-
   getJSONHandler(data: Record<string, unknown>) {
+    if (this.resolver.json) {
+      return this.resolver.json(data);
+    }
     const key = this.resolveJSONKey(data);
     const handler = !!key && this.registry.get(key)?.json;
     return { key, handler };
   }
 
-  getSVGHandler(el: SVGElement, keyOverride?: string) {
-    const key = keyOverride || this.resolveSVGKey(el);
+  getSVGHandler({ key, element }: { key: string; element: SVGElement }) {
+    if (this.resolver.svg) {
+      return this.resolver.svg({ key, element });
+    }
     const handler = this.registry.get(key)?.svg;
     return { key, handler };
   }
@@ -67,8 +90,17 @@ export class Registry {
     return handler;
   }
 
-  assertSVGHandler(el: SVGElement, keyOverride?: string) {
-    const { key, handler } = this.getSVGHandler(el, keyOverride);
+  assertSVGHandler({
+    key: _key,
+    element,
+  }: {
+    key: string;
+    element: SVGElement;
+  }) {
+    const { key, handler } = this.getSVGHandler({
+      key: _key,
+      element,
+    });
     if (!handler) {
       throw new Error(`fabric: failed to get SVG handler for key "${key}"`);
     }

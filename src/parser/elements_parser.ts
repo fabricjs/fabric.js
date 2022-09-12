@@ -26,6 +26,10 @@ const ElementsParser = function (
   this.doc = doc;
 };
 
+function resolveSVGKey(el: SVGElement) {
+  return el.tagName.replace('svg:', '').toLowerCase();
+}
+
 (function (proto) {
   proto.parse = function () {
     this.instances = new Array(this.elements.length);
@@ -40,10 +44,13 @@ const ElementsParser = function (
     });
   };
 
-  proto.createObject = function (el, index) {
+  proto.createObject = function (element, index) {
     try {
-      const handler = registry.assertSVGHandler(el);
-      handler(el, this.createCallback(index, el), this.options);
+      const handler = registry.assertSVGHandler({
+        key: resolveSVGKey(element),
+        element,
+      });
+      handler(element, this.createCallback(index, element), this.options);
     } catch (err) {
       console.log(err);
       this.checkIfDone();
@@ -87,7 +94,10 @@ const ElementsParser = function (
     );
     if (gradientDef) {
       const opacityAttr = el.getAttribute(property + '-opacity');
-      const handler = registry.assertSVGHandler(gradientDef, 'gradient');
+      const handler = registry.assertSVGHandler({
+        key: 'gradient',
+        element: gradientDef,
+      });
       const gradient = handler(gradientDef, obj, {
         ...this.options,
         opacity: opacityAttr,
@@ -126,7 +136,10 @@ const ElementsParser = function (
       clipPathOwner.parentNode.appendChild(clipPathTag);
       for (let i = 0; i < clipPath.length; i++) {
         element = clipPath[i];
-        const handler = registry.assertSVGHandler(element);
+        const handler = registry.assertSVGHandler({
+          key: resolveSVGKey(element),
+          element,
+        });
         handler(
           element,
           this.createClipPathCallback(obj, container),
