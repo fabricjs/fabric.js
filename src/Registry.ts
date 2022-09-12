@@ -44,26 +44,31 @@ export class Registry {
   }
 
   resolveSVGKey(el: SVGElement) {
-    return el.tagName.replace('svg:', '');
+    return el.tagName.replace('svg:', '').toLowerCase();
   }
 
-  // unsafe_getJSONHandler(data: Record<string, unknown>) {
-  //   const key = this.resolveJSONKey(data);
-  //   return !!key && this.registry.get(key)?.json;
-  // }
-
-  getJSONHandler(data: Record<string, unknown>, strict = true) {
+  getJSONHandler(data: Record<string, unknown>) {
     const key = this.resolveJSONKey(data);
     const handler = !!key && this.registry.get(key)?.json;
-    if (!handler && strict) {
+    return { key, handler };
+  }
+
+  getSVGHandler(el: SVGElement, keyOverride?: string) {
+    const key = keyOverride || this.resolveSVGKey(el);
+    const handler = this.registry.get(key)?.svg;
+    return { key, handler };
+  }
+
+  assertJSONHandler(data: Record<string, unknown>) {
+    const { key, handler } = this.getJSONHandler(data);
+    if (!handler) {
       throw new Error(`fabric: failed to get JSON handler for key "${key}"`);
     }
     return handler;
   }
 
-  getSVGHandler(el: SVGElement) {
-    const key = this.resolveSVGKey(el);
-    const handler = this.registry.get(key)?.svg;
+  assertSVGHandler(el: SVGElement, keyOverride?: string) {
+    const { key, handler } = this.getSVGHandler(el, keyOverride);
     if (!handler) {
       throw new Error(`fabric: failed to get SVG handler for key "${key}"`);
     }
