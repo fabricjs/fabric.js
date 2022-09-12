@@ -1,6 +1,6 @@
 import { fabric } from '../../../HEADER';
 import { noop } from '../../constants';
-import { registry, TRegistry } from '../../Registry';
+import { registry } from '../../Registry';
 import { TCrossOrigin } from '../../typedefs';
 import { TObject } from '../../__types__';
 import { createImage } from './dom';
