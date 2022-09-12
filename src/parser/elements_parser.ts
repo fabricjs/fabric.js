@@ -52,7 +52,7 @@ function resolveSVGKey(el: SVGElement) {
       });
       handler(element, this.createCallback(index, element), this.options);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       this.checkIfDone();
     }
   };
@@ -94,15 +94,19 @@ function resolveSVGKey(el: SVGElement) {
     );
     if (gradientDef) {
       const opacityAttr = el.getAttribute(property + '-opacity');
-      const handler = registry.assertSVGHandler({
-        key: 'gradient',
-        element: gradientDef,
-      });
-      const gradient = handler(gradientDef, obj, {
-        ...this.options,
-        opacity: opacityAttr,
-      });
-      obj.set(property, gradient);
+      try {
+        const handler = registry.assertSVGHandler({
+          key: 'gradient',
+          element: gradientDef,
+        });
+        const gradient = handler(gradientDef, obj, {
+          ...this.options,
+          opacity: opacityAttr,
+        });
+        obj.set(property, gradient);
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
@@ -135,16 +139,20 @@ function resolveSVGKey(el: SVGElement) {
       }
       clipPathOwner.parentNode.appendChild(clipPathTag);
       for (let i = 0; i < clipPath.length; i++) {
-        element = clipPath[i];
-        const handler = registry.assertSVGHandler({
-          key: resolveSVGKey(element),
-          element,
-        });
-        handler(
-          element,
-          this.createClipPathCallback(obj, container),
-          this.options
-        );
+        try {
+          element = clipPath[i];
+          const handler = registry.assertSVGHandler({
+            key: resolveSVGKey(element),
+            element,
+          });
+          handler(
+            element,
+            this.createClipPathCallback(obj, container),
+            this.options
+          );
+        } catch (error) {
+          console.error(error);
+        }
       }
       if (container.length === 1) {
         clipPath = container[0];
