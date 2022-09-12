@@ -1250,7 +1250,7 @@ import { fireEvent } from '../util/fireEvent';
           localPointer = target.group
             ? fabric.util.sendPointToPlane(
                 pointer,
-                null,
+                undefined,
                 target.group.calcTransformMatrix()
               )
             : pointer;
