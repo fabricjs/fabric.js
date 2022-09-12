@@ -3,7 +3,7 @@
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { registerClass } from '../Registry';
-import { stylesFromArray } from '../util/misc/textStyles';
+import { stylesFromArray, stylesToArray } from '../util/misc/textStyles';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {});
@@ -1728,13 +1728,14 @@ import { stylesFromArray } from '../util/misc/textStyles';
        * @return {Object} Object representation of an instance
        */
       toObject: function (propertiesToInclude) {
-        var allProperties = additionalProps.concat(propertiesToInclude);
-        var obj = this.callSuper('toObject', allProperties);
-        obj.styles = fabric.util.stylesToArray(this.styles, this.text);
-        if (obj.path) {
-          obj.path = this.path.toObject();
-        }
-        return obj;
+        return {
+          ...this.callSuper('toObject', [
+            ...additionalProps,
+            ...propertiesToInclude,
+          ]),
+          styles: stylesToArray(this.styles, this.text),
+          ...(this.path ? { path: this.path.toObject() } : {}),
+        };
       },
 
       /**

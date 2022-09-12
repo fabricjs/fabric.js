@@ -175,6 +175,7 @@
       assert.deepEqual(obj.styles[2][1], textbox.styles[2][1], 'styles match at index 1');
       fabric.Textbox.fromObject(obj).then(function(obj2) {
         assert.notEqual(obj.styles, obj2.styles, 'styles copy is a different object after initialization');
+        assert.deepEqual(obj.styles, obj2.styles, 'styles copy is a different object after initialization');
         done();
       });
     });
