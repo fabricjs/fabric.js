@@ -971,7 +971,8 @@ import { runningAnimations } from '../util/animation_registry';
        */
       toString: function () {
         const name = Object.getPrototypeOf(this).type;
-        return `#<fabric.${name[0].toUpperCase()}${name.slice(1)}>`;
+        return `#<fabric.${name[0].toUpperCase()}
+        ${name.slice(1).toLowerCase()}>`;
       },
 
       /**
