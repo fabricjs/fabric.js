@@ -4,7 +4,7 @@ import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
-import { registry } from '../Registry';
+import { registerClass } from '../Registry';
 import { TMat2D } from '../typedefs';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
@@ -74,7 +74,7 @@ export class Gradient<
    * @type GradientType
    * @default 'linear'
    */
-  type: T;
+  gradientType: T;
 
   coords: GradientCoords<T>;
 
@@ -83,7 +83,7 @@ export class Gradient<
   private id: string | number;
 
   constructor({
-    type = 'linear' as T,
+    gradientType = 'linear' as T,
     gradientUnits = 'pixels',
     coords,
     colorStops = [],
@@ -91,16 +91,24 @@ export class Gradient<
     offsetY = 0,
     gradientTransform,
     id,
+    type,
   }: GradientOptions<T>) {
+    if (type) {
+      throw new Error(
+        'fabric.Gradient: `type` has been renamed to `gradientType`'
+      );
+    }
     const uid = fabric.Object.__uid++;
     this.id = id ? `${id}_${uid}` : uid;
-    this.type = type;
+    this.gradientType = gradientType;
     this.gradientUnits = gradientUnits;
     this.gradientTransform = gradientTransform || null;
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.coords = {
-      ...(this.type === 'radial' ? radialDefaultCoords : linearDefaultCoords),
+      ...(this.gradientType === 'radial'
+        ? radialDefaultCoords
+        : linearDefaultCoords),
       ...coords,
     } as GradientCoords<T>;
     this.colorStops = colorStops.slice();
@@ -136,7 +144,7 @@ export class Gradient<
     return {
       ...pick(this, propertiesToInclude),
       type: 'gradient',
-      gradientType: this.type,
+      gradientType: this.gradientType,
       coords: this.coords,
       colorStops: this.colorStops,
       offsetX: this.offsetX,
@@ -148,8 +156,8 @@ export class Gradient<
     };
   }
 
-  static fromObject({ type: __, gradientType: type, ...rest }: any) {
-    return Promise.resolve(new Gradient({ ...rest, type }));
+  static fromObject({ type: __, ...rest }: any) {
+    return Promise.resolve(new Gradient(rest));
   }
 
   /* _TO_SVG_START_ */
@@ -204,7 +212,7 @@ export class Gradient<
       '',
     ].join(' ');
 
-    if (this.type === 'linear') {
+    if (this.gradientType === 'linear') {
       const { x1, y1, x2, y2 } = this.coords;
       markup.push(
         '<linearGradient ',
@@ -219,7 +227,7 @@ export class Gradient<
         y2,
         '">\n'
       );
-    } else if (this.type === 'radial') {
+    } else if (this.gradientType === 'radial') {
       const { x1, y1, x2, y2, r1, r2 } = this
         .coords as GradientCoords<'radial'>;
       const needsSwap = r1 > r2;
@@ -270,7 +278,9 @@ export class Gradient<
     });
 
     markup.push(
-      this.type === 'linear' ? '</linearGradient>' : '</radialGradient>',
+      this.gradientType === 'linear'
+        ? '</linearGradient>'
+        : '</radialGradient>',
       '\n'
     );
 
@@ -284,13 +294,13 @@ export class Gradient<
    * @return {CanvasGradient}
    */
   toLive(ctx: CanvasRenderingContext2D) {
-    if (!this.type) {
+    if (!this.gradientType) {
       return;
     }
 
     const coords = this.coords as GradientCoords<'radial'>;
     const gradient =
-      this.type === 'linear'
+      this.gradientType === 'linear'
         ? ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2)
         : ctx.createRadialGradient(
             coords.x1,
@@ -366,7 +376,7 @@ export class Gradient<
     const gradientUnits = parseGradientUnits(el);
     return new Gradient({
       id: el.getAttribute('id') || undefined,
-      type: parseType(el),
+      gradientType: parseType(el),
       coords: parseCoords(el, {
         width: svgOptions.viewBoxWidth || svgOptions.width,
         height: svgOptions.viewBoxHeight || svgOptions.height,
@@ -392,17 +402,4 @@ export class Gradient<
 
 fabric.Gradient = Gradient;
 
-registry.register('gradient', {
-  json: Gradient.fromObject,
-  svg: Gradient.fromElement,
-});
-
-registry.register('linearGradient', {
-  json: Gradient.fromObject,
-  svg: Gradient.fromElement,
-});
-
-registry.register('radialGradient', {
-  json: Gradient.fromObject,
-  svg: Gradient.fromElement,
-});
+registerClass('gradient', Gradient);

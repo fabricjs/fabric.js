@@ -4,7 +4,7 @@
 
   function createLinearGradient(units) {
     return new fabric.Gradient({
-      type: 'linear',
+      gradientType: 'linear',
       gradientUnits: units || 'pixels',
       coords: {
         x1: 0,
@@ -21,7 +21,7 @@
 
   function createRadialGradient(units) {
     return new fabric.Gradient({
-      type: 'radial',
+      gradientType: 'radial',
       gradientUnits: units || 'pixels',
       coords: {
         x1: 0,
@@ -40,7 +40,7 @@
 
   function createRadialGradientWithInternalRadius() {
     return new fabric.Gradient({
-      type: 'radial',
+      gradientType: 'radial',
       coords: {
         x1: 0,
         y1: 10,
@@ -58,7 +58,7 @@
 
   function createRadialGradientSwapped() {
     return new fabric.Gradient({
-      type: 'radial',
+      gradientType: 'radial',
       coords: {
         x1: 0,
         y1: 10,
@@ -103,7 +103,7 @@
     assert.equal(gradient.coords.x2, 100);
     assert.equal(gradient.coords.y2, 200);
 
-    assert.equal(gradient.type, 'linear');
+    assert.equal(gradient.gradientType, 'linear');
 
     assert.equal(gradient.colorStops[0].offset, 0);
     assert.equal(gradient.colorStops[0].color, 'red');
@@ -124,7 +124,7 @@
     assert.equal(gradient.coords.r1, 0);
     assert.equal(gradient.coords.r2, 50);
 
-    assert.equal(gradient.type, 'radial');
+    assert.equal(gradient.gradientType, 'radial');
 
     assert.equal(gradient.colorStops[0].offset, 0);
     assert.equal(gradient.colorStops[0].color, 'red');
@@ -147,7 +147,8 @@
     assert.equal(object.coords.y1, gradient.coords.y1);
     assert.equal(object.coords.y2, gradient.coords.y2);
     assert.equal(object.gradientUnits, gradient.gradientUnits);
-    assert.equal(object.type, gradient.type);
+    assert.equal(object.type, 'gradient');
+    assert.equal(object.gradientType, gradient.gradientType);
     assert.deepEqual(object.gradientTransform, gradient.gradientTransform);
     assert.equal(object.colorStops, gradient.colorStops);
   });
@@ -173,7 +174,8 @@
     assert.equal(object.coords.r1, gradient.coords.r1);
     assert.equal(object.coords.r2, gradient.coords.r2);
 
-    assert.equal(object.type, gradient.type);
+    assert.equal(object.type, 'gradient');
+    assert.equal(object.gradientType, gradient.gradientType);
 
     assert.equal(object.colorStops, gradient.colorStops);
   });
@@ -218,7 +220,7 @@
     var gradient = fabric.Gradient.fromElement(element, object, { opacity: '' });
 
     assert.ok(gradient instanceof fabric.Gradient);
-    assert.equal(gradient.type, 'linear');
+    assert.equal(gradient.gradientType, 'linear');
     assert.equal(gradient.coords.x1, 0);
     assert.equal(gradient.coords.y1, 0);
     assert.equal(gradient.coords.x2, 1);

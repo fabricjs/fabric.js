@@ -63,7 +63,7 @@ export type GradientCoords<T extends GradientType> = T extends 'linear'
   : RadialGradientCoords<number>;
 
 export type GradientOptions<T extends GradientType> = {
-  type?: T;
+  gradientType?: T;
   gradientUnits?: GradientUnits;
   colorStops?: ColorStop[];
   coords: Partial<GradientCoords<T>>;

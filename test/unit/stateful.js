@@ -69,7 +69,7 @@
   QUnit.test('saveState with fabric class gradient', function(assert) {
     var cObj = new fabric.Object();
     var gradient = new fabric.Gradient({
-      type: 'linear',
+      gradientType: 'linear',
       coords: {
         x1: 0,
         y1: 10,
@@ -87,7 +87,7 @@
     cObj.set('fill', gradient);
     assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props');
     cObj.saveState();
-    gradient.type = 'radial';
+    gradient.gradientType = 'radial';
     assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props on first level of nesting');
     cObj.saveState();
     gradient.coords.x1 = 3;
@@ -100,7 +100,7 @@
   QUnit.test('saveState with fabric class gradient to other types', function(assert) {
     var cObj = new fabric.Object();
     var gradient = new fabric.Gradient({
-      type: 'linear',
+      gradientType: 'linear',
       coords: {
         x1: 0,
         y1: 10,
