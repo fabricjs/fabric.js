@@ -289,13 +289,6 @@
     assert.deepEqual(cObj.toObject(), cObj.toDatalessObject());
   });
 
-  QUnit.test('toString', function(assert) {
-    var cObj = new fabric.Object();
-    assert.equal(cObj.toString(), '#<fabric.Object>');
-    cObj.type = 'moo';
-    assert.equal(cObj.toString(), '#<fabric.Moo>');
-  });
-
   QUnit.test('render', function(assert) {
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.render === 'function');

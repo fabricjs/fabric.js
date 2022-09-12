@@ -970,7 +970,8 @@ import { runningAnimations } from '../util/animation_registry';
        * @return {String}
        */
       toString: function () {
-        return `#<fabric.${this.constructor.name}>`;
+        const name = Object.getPrototypeOf(this).type;
+        return `#<fabric.${name[0].toUpperCase()}${name.slice(1)}>`;
       },
 
       /**
