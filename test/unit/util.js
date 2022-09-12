@@ -570,36 +570,6 @@
     assert.ok(true, 'test did not throw on null element removeListener');
   });
 
-  QUnit.test('fabric.util.array.min', function(assert) {
-    assert.ok(typeof fabric.util.array.min === 'function');
-
-    assert.equal(1, fabric.util.array.min([1, 3, 2]));
-    assert.equal(-1, fabric.util.array.min([3, 1, 'f', 3, -1, 3]));
-    assert.equal(-3, fabric.util.array.min([-1, -2, -3]));
-    assert.equal('a', fabric.util.array.min(['a', 'c', 'b']));
-
-    var obj1 = { valueOf: function(){ return 1; } };
-    var obj2 = { valueOf: function(){ return 2; } };
-    var obj3 = { valueOf: function(){ return 3; } };
-
-    assert.equal(obj1, fabric.util.array.min([obj1, obj3, obj2]));
-  });
-
-  QUnit.test('fabric.util.array.max', function(assert) {
-    assert.ok(typeof fabric.util.array.max === 'function');
-
-    assert.equal(3, fabric.util.array.max([1, 3, 2]));
-    assert.equal(3, fabric.util.array.max([3, 1, 'f', 3, -1, 3]));
-    assert.equal(-1, fabric.util.array.max([-1, -2, -3]));
-    assert.equal('c', fabric.util.array.max(['a', 'c', 'b']));
-
-    var obj1 = { valueOf: function(){ return 1; } };
-    var obj2 = { valueOf: function(){ return 2; } };
-    var obj3 = { valueOf: function(){ return 3; } };
-
-    assert.equal(obj3, fabric.util.array.max([obj1, obj3, obj2]));
-  });
-
   QUnit.test('fabric.util.pick', function(assert) {
     assert.ok(typeof fabric.util.pick === 'function');
 

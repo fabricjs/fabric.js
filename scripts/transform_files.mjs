@@ -1,8 +1,12 @@
 #!/usr/bin/env node
-const fs = require('fs-extra');
-const _ = require('lodash');
-const path = require('path');
-const chalk = require('chalk');
+import chalk from 'chalk';
+import fs from 'fs-extra';
+import _ from 'lodash';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const wd = path.resolve(__dirname, '..');
 
@@ -119,8 +123,8 @@ function findClassBase(raw, regex) {
             return [getNSFromVariableName(raw, first), ...rest].join('.');
         }) || [];
     const rawObject = findObject(raw, '{', '}', result.index);
-    const NS = namespace.slice(0, namespace.lastIndexOf('.'));
-    const { fabric } = require(wd);
+    // const NS = namespace.slice(0, namespace.lastIndexOf('.'));
+    // const { fabric } = require(wd);
     // const klass = fabric.util.resolveNamespace(NS === 'fabric' ? null : NS)[name];
     return {
         name,
@@ -132,8 +136,7 @@ function findClassBase(raw, regex) {
             index: result.index,
             value: match
         },
-        ...rawObject,
-        // klass
+        ...rawObject
     };
 }
 
@@ -342,7 +345,7 @@ function resolveDest(dir, file, { type, overwriteExisitingFiles, ext }) {
             name => path.resolve(dir, `${name}.${ext}`);
 }
 
-function listFiles() {
+export function listFiles() {
     const paths = [];
     classDirs.forEach(klsDir => {
         const dir = path.resolve(srcDir, klsDir);
@@ -375,7 +378,7 @@ function listFiles() {
     return paths;
 }
 
-function transform(options = {}) {
+export function transform(options = {}) {
     options = _.defaults(options, { overwriteExisitingFiles: true, ext: 'js', createIndex: true, useExports: true });
 
     const result = listFiles()
@@ -404,5 +407,3 @@ function transform(options = {}) {
         errors.map(console.error);
     }
 }
-
-module.exports = { transform, listFiles };

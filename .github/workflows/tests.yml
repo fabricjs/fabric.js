@@ -36,7 +36,7 @@ jobs:
         # For more information see:
         # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
         # supported Node.js release schedule: https://nodejs.org/en/about/releases/
-        node-version: [14.x, 16.x] 
+        node-version: [14.x, 16.x, 18.x]
         suite: [unit, visual]
     steps:
     - uses: actions/checkout@v2
