@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { fabric } from '../../HEADER';
-import { capitalize } from '../util/lang_string';
+import { registry } from '../Registry';
 import {
   invertTransform,
   multiplyTransformMatrices,
@@ -40,19 +40,12 @@ const ElementsParser = function (
     });
   };
 
-  proto.findTag = function (el) {
-    return fabric[capitalize(el.tagName.replace('svg:', ''))];
-  };
-
   proto.createObject = function (el, index) {
-    const klass = this.findTag(el);
-    if (klass && klass.fromElement) {
-      try {
-        klass.fromElement(el, this.createCallback(index, el), this.options);
-      } catch (err) {
-        console.log(err);
-      }
-    } else {
+    try {
+      const hadler = registry.getSVGHandler(el);
+      hadler(el, this.createCallback(index, el), this.options);
+    } catch (err) {
+      console.log(err);
       this.checkIfDone();
     }
   };
@@ -94,7 +87,8 @@ const ElementsParser = function (
     );
     if (gradientDef) {
       const opacityAttr = el.getAttribute(property + '-opacity');
-      const gradient = fabric.Gradient.fromElement(gradientDef, obj, {
+      const handler = registry.getSVGHandler(gradientDef);
+      const gradient = handler(gradientDef, obj, {
         ...this.options,
         opacity: opacityAttr,
       });
@@ -113,7 +107,6 @@ const ElementsParser = function (
   proto.resolveClipPath = function (obj, usingElement) {
     var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
       element,
-      klass,
       objTransformInv,
       container,
       gTransform,
@@ -133,8 +126,8 @@ const ElementsParser = function (
       clipPathOwner.parentNode.appendChild(clipPathTag);
       for (let i = 0; i < clipPath.length; i++) {
         element = clipPath[i];
-        klass = this.findTag(element);
-        klass.fromElement(
+        const handler = registry.getSVGHandler(element);
+        handler(
           element,
           this.createClipPathCallback(obj, container),
           this.options
