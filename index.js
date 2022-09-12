@@ -4,7 +4,6 @@ import './src/mixins/observable.mixin';
 import './src/mixins/collection.mixin';
 import './src/mixins/shared_methods.mixin';
 import './src/util/misc/misc';
-// import './src/util/named_accessors.mixin'; i would imagine dead forever or proper setters/getters
 import './src/parser'; // optional parser
 import './src/point.class';
 import './src/intersection.class';
