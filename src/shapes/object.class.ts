@@ -943,7 +943,7 @@ import { runningAnimations } from '../util/animation_registry';
        * @param {Object} object
        */
       _removeDefaultValues: function (object) {
-        var prototype = this.prototype;
+        var prototype = Object.getPrototypeOf(this);
         Object.keys(object).forEach(function (prop) {
           if (prop === 'left' || prop === 'top' || prop === 'type') {
             return;

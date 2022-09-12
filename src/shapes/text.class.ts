@@ -1914,5 +1914,5 @@ import { registerClass } from '../Registry';
     'monospace',
   ];
 
-  registerClass(fabric.Text);
+  registerClass('text', fabric.Text);
 })(typeof exports !== 'undefined' ? exports : window);

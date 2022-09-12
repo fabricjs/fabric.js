@@ -202,4 +202,4 @@ export class Pattern {
 
 fabric.Pattern = Pattern;
 
-registerClass(Pattern);
+registerClass('pattern', Pattern);

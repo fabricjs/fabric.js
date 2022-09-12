@@ -1,4 +1,8 @@
 //@ts-nocheck
+
+import { registerClass } from '../Registry';
+
+
 (function (global) {
   var fabric = global.fabric || (global.fabric = {});
 
@@ -188,4 +192,8 @@
         return new fabric.ActiveSelection(enlivenedObjects, options, true);
       });
   };
+
+  registerClass('activeSelection', fabric.ActiveSelection);
+  registerClass('active-selection', fabric.ActiveSelection);
+  registerClass('activeselection', fabric.ActiveSelection);
 })(typeof exports !== 'undefined' ? exports : window);

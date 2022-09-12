@@ -516,5 +516,5 @@ import { registerClass } from '../Registry';
     });
   };
 
-  registerClass(fabric.Textbox);
+  registerClass('textbox', fabric.Textbox);
 })(typeof exports !== 'undefined' ? exports : window);

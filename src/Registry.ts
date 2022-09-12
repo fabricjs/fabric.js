@@ -36,6 +36,10 @@ export class Registry {
   }
 
   resolveJSONKey(data: Record<string, unknown>) {
+    // backward compatibility
+    if (data.colorStops) {
+      return 'gradient';
+    }
     return data.type as string | undefined;
   }
 
@@ -43,10 +47,15 @@ export class Registry {
     return el.tagName.replace('svg:', '');
   }
 
-  getJSONHandler(data: Record<string, unknown>) {
+  // unsafe_getJSONHandler(data: Record<string, unknown>) {
+  //   const key = this.resolveJSONKey(data);
+  //   return !!key && this.registry.get(key)?.json;
+  // }
+
+  getJSONHandler(data: Record<string, unknown>, strict = true) {
     const key = this.resolveJSONKey(data);
     const handler = !!key && this.registry.get(key)?.json;
-    if (!handler) {
+    if (!handler && strict) {
       throw new Error(`fabric: failed to get JSON handler for key "${key}"`);
     }
     return handler;
@@ -64,12 +73,5 @@ export class Registry {
 
 export const registry = new Registry();
 
-export function registerClass<T extends TClassIO>(klass: T): void;
-export function registerClass<T extends TClassIO>(key: string, klass: T): void;
-export function registerClass<T extends TClassIO>(arg0: string | T, arg1?: T) {
-  if (typeof arg0 === 'string') {
-    registry.registerClass(arg0, arg1 as T);
-  } else {
-    registry.registerClass(arg0.name.toLowerCase(), arg0);
-  }
-}
+export const registerClass = <T extends TClassIO>(key: string, klass: T) =>
+  registry.registerClass(key, klass);

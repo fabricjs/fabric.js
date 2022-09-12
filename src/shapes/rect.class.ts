@@ -224,4 +224,4 @@ Rect.fromObject = (object) => fabric.Object._fromObject(Rect, object);
 fabric.Rect = Rect;
 export { Rect };
 
-registerClass(Rect);
+registerClass('rect', Rect);

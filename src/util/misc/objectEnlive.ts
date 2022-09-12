@@ -1,6 +1,6 @@
 import { fabric } from '../../../HEADER';
 import { noop } from '../../constants';
-import { registry } from '../../Registry';
+import { registry, TRegistry } from '../../Registry';
 import { TCrossOrigin } from '../../typedefs';
 import { TObject } from '../../__types__';
 import { createImage } from './dom';
@@ -81,7 +81,7 @@ export const enlivenObjects = (
     signal && signal.addEventListener('abort', reject, { once: true });
     Promise.all(
       objects.map(async (obj) => {
-        const handler = registry.getJSONHandler(obj);
+        const handler = registry.getJSONHandler(obj) as TRegistry['json'];
         const fabricInstance = (await handler(obj, {
           signal,
           reviver,
@@ -126,7 +126,10 @@ export const enlivenObjectEnlivables = <
     const instances: T[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     const promises = Object.values(serializedObject).map(async (value) => {
-      const handler = !!value && registry.getJSONHandler(value);
+      const handler =
+        !!value &&
+        typeof value === 'object' &&
+        registry.getJSONHandler(value, false);
       if (!handler) {
         return;
       }
@@ -138,6 +141,7 @@ export const enlivenObjectEnlivables = <
     Promise.all(promises)
       .then((enlived) => {
         return enlived.reduce((acc, instance, index) => {
+          // @ts-expect-error can't get it to work
           instance && (acc[keys[index]] = instance);
           return acc;
         }, {} as R);

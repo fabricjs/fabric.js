@@ -636,5 +636,6 @@ import { registerClass } from '../Registry';
     });
   };
 
-  registerClass(fabric.IText);
+  registerClass('itext', fabric.IText);
+  registerClass('i-text', fabric.IText);
 })(typeof exports !== 'undefined' ? exports : window);

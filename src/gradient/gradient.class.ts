@@ -1,8 +1,10 @@
+// @ts-nocheck
+
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
-import { registerClass } from '../Registry';
+import { registry } from '../Registry';
 import { TMat2D } from '../typedefs';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
@@ -133,7 +135,8 @@ export class Gradient<
   toObject(propertiesToInclude?: (keyof this)[]) {
     return {
       ...pick(this, propertiesToInclude),
-      type: this.type,
+      type: 'gradient',
+      gradientType: this.type,
       coords: this.coords,
       colorStops: this.colorStops,
       offsetX: this.offsetX,
@@ -143,6 +146,10 @@ export class Gradient<
         ? this.gradientTransform.concat()
         : this.gradientTransform,
     };
+  }
+
+  static fromObject({ type: __, gradientType: type, ...rest }: any) {
+    return Promise.resolve(new Gradient({ ...rest, type }));
   }
 
   /* _TO_SVG_START_ */
@@ -385,4 +392,17 @@ export class Gradient<
 
 fabric.Gradient = Gradient;
 
-registerClass(Gradient);
+registry.register('gradient', {
+  json: Gradient.fromObject,
+  svg: Gradient.fromElement,
+});
+
+registry.register('linearGradient', {
+  json: Gradient.fromObject,
+  svg: Gradient.fromElement,
+});
+
+registry.register('radialGradient', {
+  json: Gradient.fromObject,
+  svg: Gradient.fromElement,
+});

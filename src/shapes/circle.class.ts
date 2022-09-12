@@ -232,4 +232,4 @@ Circle.fromObject = (object) =>
 fabric.Circle = Circle;
 export { Circle };
 
-registerClass(Circle);
+registerClass('circle', Circle);

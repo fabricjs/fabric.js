@@ -399,5 +399,5 @@ import { registerClass } from '../Registry';
   };
   /* _FROM_SVG_END_ */
 
-  registerClass(fabric.Path);
+  registerClass('path', fabric.Path);
 })(typeof exports !== 'undefined' ? exports : window);

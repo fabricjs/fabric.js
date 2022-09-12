@@ -238,5 +238,5 @@ import { registerClass } from './Registry';
   fabric.Shadow.reOffsetsAndBlur =
     /(?:\s|^)(-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?(-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?(\d+(?:\.\d*)?(?:px)?)?(?:\s?|$)(?:$|\s)/;
 
-  registerClass(fabric.Shadow);
+  registerClass('shadow', fabric.Shadow);
 })(typeof exports !== 'undefined' ? exports : window);

@@ -34,63 +34,50 @@
           return Promise.reject(new Error('fabric.js: `json` is undefined'));
         }
 
-        // serialize if it wasn't already
-        var serialized =
-          typeof json === 'string' ? JSON.parse(json) : Object.assign({}, json);
-
-        var _this = this,
-          renderOnAddRemove = this.renderOnAddRemove;
+        const renderOnAddRemove = this.renderOnAddRemove;
         this.renderOnAddRemove = false;
 
+        const {
+          backgroundImage,
+          background: backgroundColor,
+          overlayImage,
+          overlay: overlayColor,
+          clipPath,
+          objects = [],
+          ...props
+        } = typeof json === 'string' ? JSON.parse(json) : json;
+
         return Promise.all([
-          fabric.util.enlivenObjects(serialized.objects || [], {
+          fabric.util.enlivenObjects(objects, {
             reviver: reviver,
             signal: options && options.signal,
           }),
           fabric.util.enlivenObjectEnlivables(
             {
-              backgroundImage: serialized.backgroundImage,
-              backgroundColor: serialized.background,
-              overlayImage: serialized.overlayImage,
-              overlayColor: serialized.overlay,
-              clipPath: serialized.clipPath,
+              backgroundImage,
+              backgroundColor,
+              overlayImage,
+              overlayColor,
+              clipPath,
             },
             { signal: options && options.signal }
           ),
-        ]).then(function (res) {
-          var enlived = res[0],
-            enlivedMap = res[1];
-          _this.clear();
-          _this.__setupCanvas(serialized, enlived);
-          _this.renderOnAddRemove = renderOnAddRemove;
-          _this.set(enlivedMap);
-          return _this;
+        ]).then(([enlivenedObjects, enlivedMap]) => {
+          this.clear();
+          enlivenedObjects.forEach((obj, index) => {
+            // we splice the array just in case some custom classes restored from JSON
+            // will add more object to canvas at canvas init.
+            this.insertAt(obj, index);
+          });
+          this.renderOnAddRemove = renderOnAddRemove;
+          this.set({
+            ...props,
+            backgroundColor,
+            overlayColor,
+            ...enlivedMap,
+          });
+          return this;
         });
-      },
-
-      /**
-       * @private
-       * @param {Object} serialized Object with background and overlay information
-       * @param {Array} enlivenedObjects canvas objects
-       */
-      __setupCanvas: function (serialized, enlivenedObjects) {
-        var _this = this;
-        enlivenedObjects.forEach(function (obj, index) {
-          // we splice the array just in case some custom classes restored from JSON
-          // will add more object to canvas at canvas init.
-          _this.insertAt(obj, index);
-        });
-        // remove parts i cannot set as options
-        delete serialized.objects;
-        delete serialized.backgroundImage;
-        delete serialized.overlayImage;
-        delete serialized.background;
-        delete serialized.overlay;
-        // this._initOptions does too many things to just
-        // call it. Normally loading an Object from JSON
-        // create the Object instance. Here the Canvas is
-        // already an instance and we are just loading things over it
-        this._setOptions(serialized);
       },
 
       /**

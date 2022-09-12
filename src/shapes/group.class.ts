@@ -1072,5 +1072,5 @@ import { registerClass } from '../Registry';
     });
   };
 
-  registerClass(fabric.Group);
+  registerClass('group', fabric.Group);
 })(typeof exports !== 'undefined' ? exports : window);

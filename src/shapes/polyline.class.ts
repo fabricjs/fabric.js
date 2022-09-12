@@ -270,5 +270,5 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
     });
   };
 
-  registerClass(fabric.Polyline);
+  registerClass('polyline', fabric.Polyline);
 })(typeof exports !== 'undefined' ? exports : window);

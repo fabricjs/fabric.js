@@ -179,5 +179,5 @@ import { registerClass } from '../Registry';
     return fabric.Object._fromObject(fabric.Ellipse, object);
   };
 
-  registerClass(fabric.Ellipse);
+  registerClass('ellipse', fabric.Ellipse);
 })(typeof exports !== 'undefined' ? exports : window);

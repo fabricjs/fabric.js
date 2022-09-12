@@ -83,5 +83,5 @@ import { registerClass } from '../Registry';
     return fabric.Object._fromObject(fabric.Triangle, object);
   };
 
-  registerClass(fabric.Triangle);
+  registerClass('triangle', fabric.Triangle);
 })(typeof exports !== 'undefined' ? exports : window);

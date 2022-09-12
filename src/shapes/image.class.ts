@@ -867,5 +867,5 @@ import { registerClass } from '../Registry';
   };
   /* _FROM_SVG_END_ */
 
-  registerClass(fabric.Image);
+  registerClass('image', fabric.Image);
 })(typeof exports !== 'undefined' ? exports : window);

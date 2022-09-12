@@ -339,5 +339,5 @@ import { registerClass } from '../Registry';
     };
   }
 
-  registerClass(fabric.Line);
+  registerClass('line', fabric.Line);
 })(typeof exports !== 'undefined' ? exports : window);

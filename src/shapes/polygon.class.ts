@@ -75,5 +75,5 @@ import { registerClass } from '../Registry';
     });
   };
 
-  registerClass(fabric.Polygon);
+  registerClass('polygon', fabric.Polygon);
 })(typeof exports !== 'undefined' ? exports : window);
