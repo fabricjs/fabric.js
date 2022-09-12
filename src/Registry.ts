@@ -3,23 +3,15 @@ export type TRegistry<T extends FunctionConstructor = FunctionConstructor> = {
   svg?(svgEl: SVGElement, instance: T, options: unknown): T | Promise<T>;
 };
 
-type TJSONData = {
-  type: string;
-};
-
 export type TClassIO<T extends FunctionConstructor = FunctionConstructor> =
   T & {
-    fromObject(data: TJSONData, options?: unknown): T | Promise<T>;
-    fromElement?(
-      svgEl: SVGElement,
-      instance: T,
-      options: unknown
-    ): T | Promise<T>;
+    fromObject: TRegistry<T>['json'];
+    fromElement: TRegistry<T>['svg'];
   };
 
 export class Registry {
   readonly registry: Map<string, TRegistry>;
-  readonly resolver: {
+  private readonly resolver: {
     json?: (data: Record<string, unknown>) => {
       key: string;
       handler?: TRegistry['json'];
