@@ -1,8 +1,8 @@
-import { iMatrix } from "../../constants";
-import type { Point } from "../../point.class";
-import type { TMat2D } from "../../typedefs";
-import { TObject } from "../../__types__";
-import { invertTransform, multiplyTransformMatrices } from "./matrix";
+import { iMatrix } from '../../constants';
+import type { Point } from '../../point.class';
+import type { TMat2D } from '../../typedefs';
+import { TObject } from '../../__types__';
+import { invertTransform, multiplyTransformMatrices } from './matrix';
 import { applyTransformToObject } from './objectTransforms';
 
 export const enum ObjectRelation {
@@ -17,8 +17,10 @@ export const enum ObjectRelation {
  * @param [to]
  * @returns
  */
-export const calcPlaneChangeMatrix = (from: TMat2D = iMatrix, to: TMat2D = iMatrix) =>
-  multiplyTransformMatrices(invertTransform(to), from);
+export const calcPlaneChangeMatrix = (
+  from: TMat2D = iMatrix,
+  to: TMat2D = iMatrix
+) => multiplyTransformMatrices(invertTransform(to), from);
 
 /**
  * Sends a point from the source coordinate plane to the destination coordinate plane.\
@@ -125,7 +127,11 @@ export const transformPointRelativeToCanvas = (
  * @param {Matrix} [to] destination plane matrix to contain object. Passing `undefined` means `object` should be sent to the canvas coordinate plane.
  * @returns {Matrix} the transform matrix that was applied to `object`
  */
-export const sendObjectToPlane = (object: TObject, from?: TMat2D, to?: TMat2D): TMat2D => {
+export const sendObjectToPlane = (
+  object: TObject,
+  from?: TMat2D,
+  to?: TMat2D
+): TMat2D => {
   const t = calcPlaneChangeMatrix(from, to);
   applyTransformToObject(
     object,
