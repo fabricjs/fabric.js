@@ -1,28 +1,30 @@
-export type TRegistry<T extends FunctionConstructor = FunctionConstructor> = {
+export type TRegistryResolver<
+  T extends FunctionConstructor = FunctionConstructor
+> = {
   json(data: unknown, options?: unknown): T | Promise<T>;
   svg?(svgEl: SVGElement, instance: T, options: unknown): T | Promise<T>;
 };
 
 export type TClassIO<T extends FunctionConstructor = FunctionConstructor> =
   T & {
-    fromObject: TRegistry<T>['json'];
-    fromElement: TRegistry<T>['svg'];
+    fromObject: TRegistryResolver<T>['json'];
+    fromElement: TRegistryResolver<T>['svg'];
   };
 
 export class Registry {
-  readonly registry: Map<string, TRegistry>;
+  readonly registry: Map<string, TRegistryResolver>;
   private readonly resolver: {
     json?: (data: Record<string, unknown>) => {
       key: string;
-      handler?: TRegistry['json'];
+      handler?: TRegistryResolver['json'];
     };
     svg?: (data: { element: SVGElement; key?: string }) => {
       key: string;
-      handler?: TRegistry['svg'];
+      handler?: TRegistryResolver['svg'];
     };
   };
 
-  constructor(registry?: Map<string, TRegistry>) {
+  constructor(registry?: Map<string, TRegistryResolver>) {
     this.registry = new Map(registry);
     this.resolver = {};
   }
@@ -38,7 +40,7 @@ export class Registry {
     this.resolver[type] = undefined;
   }
 
-  register(type: string, value: TRegistry) {
+  register(type: string, value: TRegistryResolver) {
     return this.registry.set(type, value);
   }
 
