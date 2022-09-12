@@ -71,7 +71,7 @@ type EnlivenObjectOptions = {
  * @returns {Promise<fabric.Object[]>}
  */
 export const enlivenObjects = (
-  objects: TObject[],
+  objects: unknown[],
   { signal, reviver = noop }: EnlivenObjectOptions = {}
 ) =>
   new Promise<TObject[]>((resolve, reject) => {
