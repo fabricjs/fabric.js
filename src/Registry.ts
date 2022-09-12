@@ -24,35 +24,35 @@ export class Registry {
         return this.registry.set(type, value);
     }
 
-    registerClass<T extends TClassIO>(key: string, klass: T) {
+    registerClass(key: string, klass: TClassIO) {
         this.register(key, {
             json: klass.fromObject,
             svg: klass.fromElement
         });
     }
 
-    resolveJSONKey<T extends TJSONData>(data: T) {
-        return data.type;
+    resolveJSONKey(data: Record<string, unknown>) {
+        return data.type as string | undefined;
     }
 
     resolveSVGKey(el: SVGElement) {
         return el.tagName.replace('svg:', '');
     }
 
-    getJSONHandler<T extends TJSONData>(data: T) {
+    getJSONHandler(data: Record<string, unknown>) {
         const key = this.resolveJSONKey(data);
-        const handler = this.registry.get(key)?.json;
+        const handler = !!key && this.registry.get(key)?.json;
         if (!handler) {
-            throw new Error(`fabric: failed to get JSON handler for ${key}`);
+            throw new Error(`fabric: failed to get JSON handler for key "${key}"`);
         }
         return handler;
     }
 
-    getSVGHandler<T extends SVGElement>(el: T) {
+    getSVGHandler(el: SVGElement) {
         const key = this.resolveSVGKey(el);
         const handler = this.registry.get(key)?.svg;
         if (!handler) {
-            throw new Error(`fabric: failed to get SVG handler for ${key}`);
+            throw new Error(`fabric: failed to get SVG handler for key "${key}"`);
         }
         return handler;
     }
