@@ -133,7 +133,7 @@
     var clipPath = new fabric.Circle({ radius: 20, strokeWidth: 0, top: -10, left: -10, scaleX: 2, skewY: 45 });
     var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 200, height: 200, fill: 'rgba(0,255,0,0.5)'});
     obj.fill = new fabric.Gradient({
-      type: 'linear',
+      gradientType: 'linear',
       coords: {
         x1: 0,
         y1: 0,
@@ -171,7 +171,7 @@
     var group = new fabric.Group([clipPath, clipPath1, clipPath2]);
     var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 200, height: 200, fill: 'rgba(0,255,0,0.5)'});
     obj.fill = new fabric.Gradient({
-      type: 'linear',
+      gradientType: 'linear',
       coords: {
         x1: 0,
         y1: 0,
@@ -209,7 +209,7 @@
     var group = new fabric.Group([clipPath, clipPath1, clipPath2]);
     var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 200, height: 200, fill: 'rgba(0,255,0,0.5)'});
     obj.fill = new fabric.Gradient({
-      type: 'linear',
+      gradientType: 'linear',
       coords: {
         x1: 0,
         y1: 0,
