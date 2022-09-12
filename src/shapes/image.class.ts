@@ -789,31 +789,20 @@ import { registerClass } from '../Registry';
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Image>}
    */
-  fabric.Image.fromObject = function (object, options) {
-    var _object = Object.assign({}, object),
-      filters = _object.filters,
-      resizeFilter = _object.resizeFilter;
-    // the generic enliving will fail on filters for now
-    delete _object.resizeFilter;
-    delete _object.filters;
-    var imageOptions = Object.assign({}, options, {
-        crossOrigin: _object.crossOrigin,
-      }),
-      filterOptions = Object.assign({}, options, {
-        namespace: fabric.Image.filters,
-      });
+  fabric.Image.fromObject = function ({ filters, ...rest }, options) {
     return Promise.all([
-      fabric.util.loadImage(_object.src, imageOptions),
-      filters && fabric.util.enlivenObjects(filters, filterOptions),
-      resizeFilter && fabric.util.enlivenObjects([resizeFilter], filterOptions),
-      fabric.util.enlivenObjectEnlivables(_object, options),
-    ]).then(function (imgAndFilters) {
-      _object.filters = imgAndFilters[1] || [];
-      _object.resizeFilter = imgAndFilters[2] && imgAndFilters[2][0];
-      return new fabric.Image(
-        imgAndFilters[0],
-        Object.assign(_object, imgAndFilters[3])
-      );
+      fabric.util.loadImage(rest.src, {
+        ...options,
+        crossOrigin: rest.crossOrigin,
+      }),
+      fabric.util.enlivenObjectEnlivables(rest, options),
+      filters && fabric.util.enlivenObjects(filters, options),
+    ]).then(function ([img, enlivenedMap, filters]) {
+      return new fabric.Image(img, {
+        ...rest,
+        ...enlivenedMap,
+        filters,
+      });
     });
   };
 
