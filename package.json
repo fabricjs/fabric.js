@@ -89,7 +89,7 @@
     "chalk": "^2.4.1",
     "commander": "^9.1.0",
     "deep-object-diff": "^1.1.7",
-    "eslint": "^8.21.0",
+    "eslint": "^8.23.1",
     "eslint-config-prettier": "^8.5.0",
     "fireworm": "^0.7.2",
     "fs-extra": "^10.0.1",
