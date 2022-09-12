@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { registerClass } from '../Registry';
+
 (function (global) {
   var fabric = global.fabric || (global.fabric = {});
 
@@ -512,4 +515,6 @@
       extraParam: 'text',
     });
   };
+
+  registerClass(fabric.Textbox);
 })(typeof exports !== 'undefined' ? exports : window);

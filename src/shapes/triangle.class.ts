@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { registerClass } from '../Registry';
+
 (function (global) {
   var fabric = global.fabric || (global.fabric = {});
   /**
@@ -79,4 +82,6 @@
   fabric.Triangle.fromObject = function (object) {
     return fabric.Object._fromObject(fabric.Triangle, object);
   };
+
+  registerClass(fabric.Triangle);
 })(typeof exports !== 'undefined' ? exports : window);

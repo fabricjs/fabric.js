@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { fabric } from '../../HEADER';
+import { registerClass } from '../Registry';
 
 const degreesToRadians = fabric.util.degreesToRadians;
 
@@ -230,3 +231,5 @@ Circle.fromObject = (object) =>
 
 fabric.Circle = Circle;
 export { Circle };
+
+registerClass(Circle);

@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { registerClass } from '../Registry';
+
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
     projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
@@ -71,4 +74,6 @@
       extraParam: 'points',
     });
   };
+
+  registerClass(fabric.Polygon);
 })(typeof exports !== 'undefined' ? exports : window);

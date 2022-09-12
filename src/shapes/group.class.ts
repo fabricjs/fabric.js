@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Point } from '../point.class';
+import { registerClass } from '../Registry';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -1070,4 +1071,6 @@ import { Point } from '../point.class';
       );
     });
   };
+
+  registerClass(fabric.Group);
 })(typeof exports !== 'undefined' ? exports : window);

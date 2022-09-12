@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { fabric } from '../../HEADER';
 import { kRect } from '../constants';
+import { registerClass } from '../Registry';
 /**
  * Rectangle class
  * @class Rect
@@ -222,3 +223,5 @@ Rect.fromObject = (object) => fabric.Object._fromObject(Rect, object);
 
 fabric.Rect = Rect;
 export { Rect };
+
+registerClass(Rect);

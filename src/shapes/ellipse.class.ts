@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { registerClass } from '../Registry';
+
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
     piBy2 = Math.PI * 2;
@@ -175,4 +178,6 @@
   fabric.Ellipse.fromObject = function (object) {
     return fabric.Object._fromObject(fabric.Ellipse, object);
   };
+
+  registerClass(fabric.Ellipse);
 })(typeof exports !== 'undefined' ? exports : window);

@@ -1,6 +1,7 @@
 //@ts-nocheck
 
 import { config } from '../config';
+import { registerClass } from '../Registry';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -397,4 +398,6 @@ import { config } from '../config';
     );
   };
   /* _FROM_SVG_END_ */
+
+  registerClass(fabric.Path);
 })(typeof exports !== 'undefined' ? exports : window);

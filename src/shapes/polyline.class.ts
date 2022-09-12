@@ -2,6 +2,7 @@
 
 import { config } from '../config';
 import { Point } from '../point.class';
+import { registerClass } from '../Registry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 
 (function (global) {
@@ -268,4 +269,6 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
       extraParam: 'points',
     });
   };
+
+  registerClass(fabric.Polyline);
 })(typeof exports !== 'undefined' ? exports : window);

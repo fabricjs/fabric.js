@@ -2,6 +2,7 @@
 
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
+import { registerClass } from '../Registry';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {});
@@ -1913,5 +1914,5 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
     'monospace',
   ];
 
-  fabric.util.createAccessors && fabric.util.createAccessors(fabric.Text);
+  registerClass(fabric.Text);
 })(typeof exports !== 'undefined' ? exports : window);

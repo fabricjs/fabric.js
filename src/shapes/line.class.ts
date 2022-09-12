@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { registerClass } from '../Registry';
+
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
     extend = fabric.util.object.extend,
@@ -335,4 +338,6 @@
       }
     };
   }
+
+  registerClass(fabric.Line);
 })(typeof exports !== 'undefined' ? exports : window);

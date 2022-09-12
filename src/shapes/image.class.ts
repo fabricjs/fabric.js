@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { registerClass } from '../Registry';
+
 (function (global) {
   var fabric = global.fabric,
     extend = fabric.util.object.extend;
@@ -863,4 +866,6 @@
     });
   };
   /* _FROM_SVG_END_ */
+
+  registerClass(fabric.Image);
 })(typeof exports !== 'undefined' ? exports : window);

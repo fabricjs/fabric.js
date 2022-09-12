@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { registerClass } from '../Registry';
+
 (function (global) {
   var fabric = global.fabric;
   /**
@@ -632,4 +635,6 @@
       extraParam: 'text',
     });
   };
+
+  registerClass(fabric.IText);
 })(typeof exports !== 'undefined' ? exports : window);
