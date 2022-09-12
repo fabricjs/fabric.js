@@ -144,8 +144,7 @@ export const enlivenObjectEnlivables = <
     Promise.all(promises)
       .then((enlived) => {
         return enlived.reduce((acc, instance, index) => {
-          // @ts-expect-error can't get it to work
-          instance && (acc[keys[index]] = instance);
+          instance && (acc[keys[index]] = instance as R[keyof D]);
           return acc;
         }, {} as R);
       })
