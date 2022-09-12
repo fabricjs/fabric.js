@@ -1,15 +1,15 @@
 
-export type TRegistry<T = unknown, D = unknown, S extends SVGElement = SVGElement, O = unknown> = {
-    json(data: D): T | Promise<T>;
-    svg?(svgEl: S, instance: T, options: O): T | Promise<T>;
+export type TRegistry<T extends FunctionConstructor = FunctionConstructor> = {
+    json(data: unknown, options?: unknown): T | Promise<T>;
+    svg?(svgEl: SVGElement, instance: T, options: unknown): T | Promise<T>;
 }
 
 type TJSONData = {
     type: string
 }
 
-export type TClassIO<T = unknown> = FunctionConstructor & {
-    fromObject(data: TJSONData): T | Promise<T>;
+export type TClassIO<T extends FunctionConstructor = FunctionConstructor> = T & {
+    fromObject(data: TJSONData, options?: unknown): T | Promise<T>;
     fromElement?(svgEl: SVGElement, instance: T, options: unknown): T | Promise<T>;
 }
 
@@ -40,11 +40,21 @@ export class Registry {
     }
 
     getJSONHandler<T extends TJSONData>(data: T) {
-        return this.registry.get(this.resolveJSONKey(data))?.json;
+        const key = this.resolveJSONKey(data);
+        const handler = this.registry.get(key)?.json;
+        if (!handler) {
+            throw new Error(`fabric: failed to get JSON handler for ${key}`);
+        }
+        return handler;
     }
 
     getSVGHandler<T extends SVGElement>(el: T) {
-        return this.registry.get(this.resolveSVGKey(el))?.svg;
+        const key = this.resolveSVGKey(el);
+        const handler = this.registry.get(key)?.svg;
+        if (!handler) {
+            throw new Error(`fabric: failed to get SVG handler for ${key}`);
+        }
+        return handler;
     }
 }
 
