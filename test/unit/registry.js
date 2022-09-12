@@ -1,7 +1,9 @@
-const registry = fabric.registry;
+
 
 QUnit.module('IO Registry', hook => {
 
+    const registry = fabric.registry;
+    
     QUnit.test('existing', assert => {
         assert.ok(registry, 'should exist');
     });
