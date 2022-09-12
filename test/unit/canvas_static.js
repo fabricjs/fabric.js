@@ -1618,7 +1618,8 @@
     var rect = new fabric.Rect();
     canvas2.add(rect);
     canvas2.clone().then(function(cloned) {
-      assert.ok(cloned instanceof fabric.Canvas, 'is cloned in a Canvas, sad but true');
+      assert.ok(cloned instanceof fabric.StaticCanvas, 'clone should be instance of `StaticCanvas`');
+      assert.notOk(cloned instanceof fabric.Canvas, 'clone should be instance of `StaticCanvas`');
       var clonedRect = cloned.getObjects()[0];
       assert.equal(clonedRect.type, 'rect', 'the rect has been cloned too');
       assert.equal(clonedRect.width, rect.width, 'the rect has been cloned too with properties');
@@ -1635,7 +1636,8 @@
     canvas2.add(rect);
     canvas2.backgroundColor = 'red';
     canvas2.cloneWithoutData().then(function(cloned) {
-      assert.ok(cloned instanceof fabric.Canvas, 'is cloned in a Canvas, sad but true');
+      assert.ok(cloned instanceof fabric.StaticCanvas, 'clone should be instance of `StaticCanvas`');
+      assert.notOk(cloned instanceof fabric.Canvas, 'clone should be instance of `StaticCanvas`');
       var clonedObjects = cloned.getObjects();
       assert.equal(clonedObjects.length, 0, 'no cloend objects');
       assert.equal(cloned.width, canvas2.width, 'the canvas has been cloned with properties');
