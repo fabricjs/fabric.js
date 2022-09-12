@@ -1727,7 +1727,7 @@ import { stylesFromArray, stylesToArray } from '../util/misc/textStyles';
        * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
        * @return {Object} Object representation of an instance
        */
-      toObject: function (propertiesToInclude) {
+      toObject: function (propertiesToInclude = []) {
         return {
           ...this.callSuper('toObject', [
             ...additionalProps,
