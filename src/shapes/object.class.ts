@@ -12,7 +12,6 @@ import { runningAnimations } from '../util/animation_registry';
     extend = fabric.util.object.extend,
     clone = fabric.util.object.clone,
     toFixed = fabric.util.toFixed,
-    capitalize = fabric.util.string.capitalize,
     degreesToRadians = fabric.util.degreesToRadians,
     objectCaching = !fabric.isLikelyNode,
     ALIASING_LIMIT = 2;
