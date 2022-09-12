@@ -1,7 +1,7 @@
 //@ts-nocheck
 
-import { request } from "../util/dom_request";
-import { parseSVGDocument } from "./parseSVGDocument";
+import { request } from '../util/dom_request';
+import { parseSVGDocument } from './parseSVGDocument';
 
 /**
  * Takes url corresponding to an SVG document, and parses it into a set of fabric objects.
@@ -15,23 +15,26 @@ import { parseSVGDocument } from "./parseSVGDocument";
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  */
 export function loadSVGFromURL(url, callback, reviver, options) {
-
   new request(url.replace(/^\n\s*/, '').trim(), {
     method: 'get',
     onComplete: onComplete,
-    signal: options && options.signal
+    signal: options && options.signal,
   });
 
   function onComplete(r) {
-
     const xml = r.responseXML;
     if (!xml || !xml.documentElement) {
       callback && callback(null);
       return false;
     }
 
-    parseSVGDocument(xml.documentElement, function (results, _options, elements, allElements) {
-      callback && callback(results, _options, elements, allElements);
-    }, reviver, options);
+    parseSVGDocument(
+      xml.documentElement,
+      function (results, _options, elements, allElements) {
+        callback && callback(results, _options, elements, allElements);
+      },
+      reviver,
+      options
+    );
   }
 }

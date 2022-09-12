@@ -1,11 +1,11 @@
 //@ts-nocheck
 
-import { fabric } from "../../HEADER";
+import { fabric } from '../../HEADER';
 
 export const enum TWebGLPrecision {
   low = 'lowp',
   medium = 'mediump',
-  high = 'highp'
+  high = 'highp',
 }
 
 /**
@@ -15,14 +15,13 @@ export const enum TWebGLPrecision {
 const WebGLPrecision = [
   TWebGLPrecision.low,
   TWebGLPrecision.medium,
-  TWebGLPrecision.high
+  TWebGLPrecision.high,
 ];
 
 /**
  * Lazy initialize WebGL contants
  */
 class WebGLProbe {
-
   private initialized = false;
 
   private _maxTextureSize?: number;
@@ -45,7 +44,7 @@ class WebGLProbe {
    * @param {TWebGLPrecision} Precision to test can be any of following
    * @returns {Boolean} Whether the user's browser WebGL supports given precision.
    */
-  private testPrecision(gl: WebGLRenderingContext, precision:TWebGLPrecision) {
+  private testPrecision(gl: WebGLRenderingContext, precision: TWebGLPrecision) {
     const fragmentSource = `precision ${precision} float;\nvoid main(){}`;
     const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
     gl.shaderSource(fragmentShader, fragmentSource);
@@ -62,10 +61,13 @@ class WebGLProbe {
       return;
     }
     const canvas = fabric.document.createElement('canvas');
-    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    const gl =
+      canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
     if (gl) {
       this._maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-      this._webGLPrecision = WebGLPrecision.find(key => this.testPrecision(gl, key));
+      this._webGLPrecision = WebGLPrecision.find((key) =>
+        this.testPrecision(gl, key)
+      );
       console.log(`fabric: max texture size ${this._maxTextureSize}`);
     }
     this.initialized = true;
@@ -74,7 +76,6 @@ class WebGLProbe {
   isSupported(textureSize: number) {
     return this.maxTextureSize && this.maxTextureSize >= textureSize;
   }
-
 }
 
 export const webGLProbe = new WebGLProbe();

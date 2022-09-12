@@ -1,5 +1,5 @@
 //@ts-nocheck
-(function(global) {
+(function (global) {
   var fabric = global.fabric;
 
   /**
@@ -14,8 +14,7 @@
     var eventListener = this.__eventListeners[eventName];
     if (handler) {
       eventListener[eventListener.indexOf(handler)] = false;
-    }
-    else {
+    } else {
       eventListener.fill(false);
     }
   }
@@ -30,15 +29,14 @@
    */
   function on(eventName, handler) {
     if (!this.__eventListeners) {
-      this.__eventListeners = { };
+      this.__eventListeners = {};
     }
     // one object with key/value pairs was passed
     if (arguments.length === 1) {
       for (var prop in eventName) {
         this.on(prop, eventName[prop]);
       }
-    }
-    else {
+    } else {
       if (!this.__eventListeners[eventName]) {
         this.__eventListeners[eventName] = [];
       }
@@ -72,8 +70,7 @@
         handlers[prop] = _once.call(this, prop, eventName[prop]);
       }
       return off.bind(this, handlers);
-    }
-    else {
+    } else {
       var _handler = _once.call(this, eventName, handler);
       return off.bind(this, eventName, _handler);
     }
@@ -103,8 +100,7 @@
       for (var prop in eventName) {
         _removeEventListener.call(this, prop, eventName[prop]);
       }
-    }
-    else {
+    } else {
       _removeEventListener.call(this, eventName, handler);
     }
   }
@@ -126,9 +122,11 @@
     }
 
     for (var i = 0, len = listenersForEvent.length; i < len; i++) {
-      listenersForEvent[i] && listenersForEvent[i].call(this, options || { });
+      listenersForEvent[i] && listenersForEvent[i].call(this, options || {});
     }
-    this.__eventListeners[eventName] = listenersForEvent.filter(function(value) {
+    this.__eventListeners[eventName] = listenersForEvent.filter(function (
+      value
+    ) {
       return value !== false;
     });
   }

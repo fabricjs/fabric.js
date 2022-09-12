@@ -1,11 +1,10 @@
 //@ts-nocheck
-(function(global) {
-
+(function (global) {
   'use strict';
 
-  var fabric  = global.fabric || (global.fabric = { }),
-      filters = fabric.Image.filters,
-      createClass = fabric.util.createClass;
+  var fabric = global.fabric || (global.fabric = {}),
+    filters = fabric.Image.filters,
+    createClass = fabric.util.createClass;
 
   /**
    * Color Matrix filter class
@@ -28,126 +27,143 @@
    * object.filters.push(filter);
    * object.applyFilters();
    */
-  filters.ColorMatrix = createClass(filters.BaseFilter, /** @lends fabric.Image.filters.ColorMatrix.prototype */ {
+  filters.ColorMatrix = createClass(
+    filters.BaseFilter,
+    /** @lends fabric.Image.filters.ColorMatrix.prototype */ {
+      /**
+       * Filter type
+       * @param {String} type
+       * @default
+       */
+      type: 'ColorMatrix',
 
-    /**
-     * Filter type
-     * @param {String} type
-     * @default
-     */
-    type: 'ColorMatrix',
-
-    fragmentSource: 'precision highp float;\n' +
-      'uniform sampler2D uTexture;\n' +
-      'varying vec2 vTexCoord;\n' +
-      'uniform mat4 uColorMatrix;\n' +
-      'uniform vec4 uConstants;\n' +
-      'void main() {\n' +
+      fragmentSource:
+        'precision highp float;\n' +
+        'uniform sampler2D uTexture;\n' +
+        'varying vec2 vTexCoord;\n' +
+        'uniform mat4 uColorMatrix;\n' +
+        'uniform vec4 uConstants;\n' +
+        'void main() {\n' +
         'vec4 color = texture2D(uTexture, vTexCoord);\n' +
         'color *= uColorMatrix;\n' +
         'color += uConstants;\n' +
         'gl_FragColor = color;\n' +
-      '}',
+        '}',
 
-    /**
-     * Colormatrix for pixels.
-     * array of 20 floats. Numbers in positions 4, 9, 14, 19 loose meaning
-     * outside the -1, 1 range.
-     * 0.0039215686 is the part of 1 that get translated to 1 in 2d
-     * @param {Array} matrix array of 20 numbers.
-     * @default
-     */
-    matrix: [
-      1, 0, 0, 0, 0,
-      0, 1, 0, 0, 0,
-      0, 0, 1, 0, 0,
-      0, 0, 0, 1, 0
-    ],
+      /**
+       * Colormatrix for pixels.
+       * array of 20 floats. Numbers in positions 4, 9, 14, 19 loose meaning
+       * outside the -1, 1 range.
+       * 0.0039215686 is the part of 1 that get translated to 1 in 2d
+       * @param {Array} matrix array of 20 numbers.
+       * @default
+       */
+      matrix: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
 
-    mainParameter: 'matrix',
+      mainParameter: 'matrix',
 
-    /**
-     * Lock the colormatrix on the color part, skipping alpha, mainly for non webgl scenario
-     * to save some calculation
-     * @type Boolean
-     * @default true
-     */
-    colorsOnly: true,
+      /**
+       * Lock the colormatrix on the color part, skipping alpha, mainly for non webgl scenario
+       * to save some calculation
+       * @type Boolean
+       * @default true
+       */
+      colorsOnly: true,
 
-    /**
-     * Constructor
-     * @param {Object} [options] Options object
-     */
-    initialize: function(options) {
-      this.callSuper('initialize', options);
-      // create a new array instead mutating the prototype with push
-      this.matrix = this.matrix.slice(0);
-    },
+      /**
+       * Constructor
+       * @param {Object} [options] Options object
+       */
+      initialize: function (options) {
+        this.callSuper('initialize', options);
+        // create a new array instead mutating the prototype with push
+        this.matrix = this.matrix.slice(0);
+      },
 
-    /**
-     * Apply the ColorMatrix operation to a Uint8Array representing the pixels of an image.
-     *
-     * @param {Object} options
-     * @param {ImageData} options.imageData The Uint8Array to be filtered.
-     */
-    applyTo2d: function(options) {
-      var imageData = options.imageData,
+      /**
+       * Apply the ColorMatrix operation to a Uint8Array representing the pixels of an image.
+       *
+       * @param {Object} options
+       * @param {ImageData} options.imageData The Uint8Array to be filtered.
+       */
+      applyTo2d: function (options) {
+        var imageData = options.imageData,
           data = imageData.data,
           iLen = data.length,
           m = this.matrix,
-          r, g, b, a, i, colorsOnly = this.colorsOnly;
+          r,
+          g,
+          b,
+          a,
+          i,
+          colorsOnly = this.colorsOnly;
 
-      for (i = 0; i < iLen; i += 4) {
-        r = data[i];
-        g = data[i + 1];
-        b = data[i + 2];
-        if (colorsOnly) {
-          data[i] = r * m[0] + g * m[1] + b * m[2] + m[4] * 255;
-          data[i + 1] = r * m[5] + g * m[6] + b * m[7] + m[9] * 255;
-          data[i + 2] = r * m[10] + g * m[11] + b * m[12] + m[14] * 255;
+        for (i = 0; i < iLen; i += 4) {
+          r = data[i];
+          g = data[i + 1];
+          b = data[i + 2];
+          if (colorsOnly) {
+            data[i] = r * m[0] + g * m[1] + b * m[2] + m[4] * 255;
+            data[i + 1] = r * m[5] + g * m[6] + b * m[7] + m[9] * 255;
+            data[i + 2] = r * m[10] + g * m[11] + b * m[12] + m[14] * 255;
+          } else {
+            a = data[i + 3];
+            data[i] = r * m[0] + g * m[1] + b * m[2] + a * m[3] + m[4] * 255;
+            data[i + 1] =
+              r * m[5] + g * m[6] + b * m[7] + a * m[8] + m[9] * 255;
+            data[i + 2] =
+              r * m[10] + g * m[11] + b * m[12] + a * m[13] + m[14] * 255;
+            data[i + 3] =
+              r * m[15] + g * m[16] + b * m[17] + a * m[18] + m[19] * 255;
+          }
         }
-        else {
-          a = data[i + 3];
-          data[i] = r * m[0] + g * m[1] + b * m[2] + a * m[3] + m[4] * 255;
-          data[i + 1] = r * m[5] + g * m[6] + b * m[7] + a * m[8] + m[9] * 255;
-          data[i + 2] = r * m[10] + g * m[11] + b * m[12] + a * m[13] + m[14] * 255;
-          data[i + 3] = r * m[15] + g * m[16] + b * m[17] + a * m[18] + m[19] * 255;
-        }
-      }
-    },
+      },
 
-    /**
-     * Return WebGL uniform locations for this filter's shader.
-     *
-     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-     * @param {WebGLShaderProgram} program This filter's compiled shader program.
-     */
-    getUniformLocations: function(gl, program) {
-      return {
-        uColorMatrix: gl.getUniformLocation(program, 'uColorMatrix'),
-        uConstants: gl.getUniformLocation(program, 'uConstants'),
-      };
-    },
+      /**
+       * Return WebGL uniform locations for this filter's shader.
+       *
+       * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+       * @param {WebGLShaderProgram} program This filter's compiled shader program.
+       */
+      getUniformLocations: function (gl, program) {
+        return {
+          uColorMatrix: gl.getUniformLocation(program, 'uColorMatrix'),
+          uConstants: gl.getUniformLocation(program, 'uConstants'),
+        };
+      },
 
-    /**
-     * Send data from this filter to its shader program's uniforms.
-     *
-     * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-     * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
-     */
-    sendUniformData: function(gl, uniformLocations) {
-      var m = this.matrix,
+      /**
+       * Send data from this filter to its shader program's uniforms.
+       *
+       * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
+       * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
+       */
+      sendUniformData: function (gl, uniformLocations) {
+        var m = this.matrix,
           matrix = [
-            m[0], m[1], m[2], m[3],
-            m[5], m[6], m[7], m[8],
-            m[10], m[11], m[12], m[13],
-            m[15], m[16], m[17], m[18]
+            m[0],
+            m[1],
+            m[2],
+            m[3],
+            m[5],
+            m[6],
+            m[7],
+            m[8],
+            m[10],
+            m[11],
+            m[12],
+            m[13],
+            m[15],
+            m[16],
+            m[17],
+            m[18],
           ],
           constants = [m[4], m[9], m[14], m[19]];
-      gl.uniformMatrix4fv(uniformLocations.uColorMatrix, false, matrix);
-      gl.uniform4fv(uniformLocations.uConstants, constants);
-    },
-  });
+        gl.uniformMatrix4fv(uniformLocations.uColorMatrix, false, matrix);
+        gl.uniform4fv(uniformLocations.uConstants, constants);
+      },
+    }
+  );
 
   /**
    * Create filter instance from an object representation
@@ -155,5 +171,6 @@
    * @param {Object} object Object to create an instance from
    * @returns {Promise<fabric.Image.filters.ColorMatrix>}
    */
-  fabric.Image.filters.ColorMatrix.fromObject = fabric.Image.filters.BaseFilter.fromObject;
+  fabric.Image.filters.ColorMatrix.fromObject =
+    fabric.Image.filters.BaseFilter.fromObject;
 })(typeof exports !== 'undefined' ? exports : window);

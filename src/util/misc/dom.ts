@@ -6,7 +6,8 @@ import { ImageFormat } from '../../typedefs';
  * @memberOf fabric.util
  * @return {CanvasElement} initialized canvas element
  */
-export const createCanvasElement = (): HTMLCanvasElement => fabric.document.createElement('canvas');
+export const createCanvasElement = (): HTMLCanvasElement =>
+  fabric.document.createElement('canvas');
 
 /**
  * Creates image element (works on client and node)
@@ -14,7 +15,8 @@ export const createCanvasElement = (): HTMLCanvasElement => fabric.document.crea
  * @memberOf fabric.util
  * @return {HTMLImageElement} HTML image element
  */
-export const createImage = (): HTMLImageElement => fabric.document.createElement('img');
+export const createImage = (): HTMLImageElement =>
+  fabric.document.createElement('img');
 
 /**
  * Creates a canvas element that is a copy of another and is also painted
@@ -23,7 +25,9 @@ export const createImage = (): HTMLImageElement => fabric.document.createElement
  * @memberOf fabric.util
  * @return {CanvasElement} initialized canvas element
  */
-export const copyCanvasElement = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
+export const copyCanvasElement = (
+  canvas: HTMLCanvasElement
+): HTMLCanvasElement => {
   const newCanvas = createCanvasElement();
   newCanvas.width = canvas.width;
   newCanvas.height = canvas.height;
@@ -41,4 +45,8 @@ export const copyCanvasElement = (canvas: HTMLCanvasElement): HTMLCanvasElement 
  * @memberOf fabric.util
  * @return {String} data url
  */
-export const toDataURL = (canvasEl: HTMLCanvasElement, format: ImageFormat, quality: number) => canvasEl.toDataURL(`image/${format}`, quality);
+export const toDataURL = (
+  canvasEl: HTMLCanvasElement,
+  format: ImageFormat,
+  quality: number
+) => canvasEl.toDataURL(`image/${format}`, quality);

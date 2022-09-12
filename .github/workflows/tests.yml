@@ -1,9 +1,9 @@
 name: '🧪'
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   browser:
@@ -16,17 +16,17 @@ jobs:
         suite: [unit, visual]
       fail-fast: false
     steps:
-    - uses: actions/checkout@v2
-    - name: Unit tests on Chrome
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: npm run build -- -f
-    - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
-      uses: GabrielBB/xvfb-action@v1
-      with:
-        run: npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
+      - uses: actions/checkout@v2
+      - name: Unit tests on Chrome
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm run build -- -f
+      - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
   node:
     runs-on: ubuntu-latest
     name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
@@ -39,15 +39,15 @@ jobs:
         node-version: [14.x, 16.x, 18.x]
         suite: [unit, visual]
     steps:
-    - uses: actions/checkout@v2
-    - name: Install node-canvas
-      run: sudo apt-get install libgif-dev libpng-dev libpango1.0-dev libjpeg8-dev librsvg2-dev libcairo2-dev
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - name: Build
-      run: npm run build -- -f
-    - name: Run ${{ matrix.suite }} tests
-      run: npm run test -- -c node -s ${{ matrix.suite }}
+      - uses: actions/checkout@v2
+      - name: Install node-canvas
+        run: sudo apt-get install libgif-dev libpng-dev libpango1.0-dev libjpeg8-dev librsvg2-dev libcairo2-dev
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - name: Build
+        run: npm run build -- -f
+      - name: Run ${{ matrix.suite }} tests
+        run: npm run test -- -c node -s ${{ matrix.suite }}

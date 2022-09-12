@@ -39,8 +39,14 @@ export const calcPlaneChangeMatrix = (from: TMat2D = iMatrix, to: TMat2D = iMatr
  * @param {TMat2D} [to] destination plane matrix to contain object. Passing `undefined` means `point` should be sent to the canvas coordinate plane.
  * @returns {Point} transformed point
  */
-export const sendPointToPlane = (point: Point, from?: TMat2D, to?: TMat2D): Point =>
-  point.transform(calcPlaneChangeMatrix(from, to));
+export const sendPointToPlane = (
+  point: IPoint,
+  from: TMat2D = iMatrix,
+  to: TMat2D = iMatrix
+): Point =>
+  //  we are actually looking for the transformation from the destination plane to the source plane (which is a linear mapping)
+  //  the object will exist on the destination plane and we want it to seem unchanged by it so we reverse the destination matrix (to) and then apply the source matrix (from)
+  transformPoint(point, calcPlaneChangeMatrix(from, to));
 
 /**
  * Transform point relative to canvas.
@@ -68,10 +74,16 @@ export const transformPointRelativeToCanvas = (
   relationAfter: ObjectRelation
 ): Point => {
   // is this still needed with TS?
-  if (relationBefore !== ObjectRelation.child && relationBefore !== ObjectRelation.sibling) {
+  if (
+    relationBefore !== ObjectRelation.child &&
+    relationBefore !== ObjectRelation.sibling
+  ) {
     throw new Error('fabric.js: received bad argument ' + relationBefore);
   }
-  if (relationAfter !== ObjectRelation.child && relationAfter !== ObjectRelation.sibling) {
+  if (
+    relationAfter !== ObjectRelation.child &&
+    relationAfter !== ObjectRelation.sibling
+  ) {
     throw new Error('fabric.js: received bad argument ' + relationAfter);
   }
   if (relationBefore === relationAfter) {

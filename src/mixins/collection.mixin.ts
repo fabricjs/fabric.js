@@ -1,11 +1,10 @@
 //@ts-nocheck
-(function(global){
+(function (global) {
   var fabric = global.fabric;
   /**
    * @namespace fabric.Collection
    */
   fabric.Collection = {
-
     /**
      * @type {fabric.Object[]}
      */
@@ -57,8 +56,9 @@
      * @param {(object:fabric.Object) => any} [callback] function to call for each object removed
      * @returns {fabric.Object[]} removed objects
      */
-    remove: function(objectsToRemove, callback) {
-      var objects = this._objects, removed = [];
+    remove: function (objectsToRemove, callback) {
+      var objects = this._objects,
+        removed = [];
       for (var i = 0, object, index; i < objectsToRemove.length; i++) {
         object = objectsToRemove[i];
         index = objects.indexOf(object);
@@ -84,7 +84,7 @@
      * @return {Self} thisArg
      * @chainable
      */
-    forEachObject: function(callback, context) {
+    forEachObject: function (callback, context) {
       var objects = this.getObjects();
       for (var i = 0; i < objects.length; i++) {
         callback.call(context, objects[i], i, objects);
@@ -97,7 +97,7 @@
      * @param {...String} [types] When specified, only objects of these types are returned
      * @return {Array}
      */
-    getObjects: function() {
+    getObjects: function () {
       if (arguments.length === 0) {
         return this._objects.concat();
       }
@@ -128,7 +128,7 @@
      * Returns a size of a collection (i.e: length of an array containing its objects)
      * @return {Number} Collection size
      */
-    size: function() {
+    size: function () {
       return this._objects.length;
     },
 
@@ -143,10 +143,11 @@
     contains: function (object, deep) {
       if (this._objects.indexOf(object) > -1) {
         return true;
-      }
-      else if (deep) {
+      } else if (deep) {
         return this._objects.some(function (obj) {
-          return typeof obj.contains === 'function' && obj.contains(object, true);
+          return (
+            typeof obj.contains === 'function' && obj.contains(object, true)
+          );
         });
       }
       return false;
@@ -161,6 +162,6 @@
         memo += current.complexity ? current.complexity() : 0;
         return memo;
       }, 0);
-    }
+    },
   };
 })(typeof exports !== 'undefined' ? exports : window);

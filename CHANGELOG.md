@@ -51,7 +51,7 @@
 - feat(fabric.EraserBrush): support `inverted` option to undo erasing [#7470](https://github.com/fabricjs/fabric.js/pull/7470)
 - fix(fabric.EraserBrush): fix doubling opaic objects while erasing [#7445](https://github.com/fabricjs/fabric.js/issues/7445) [#7470](https://github.com/fabricjs/fabric.js/pull/7470)
 - **BREAKING**: fabric.EraserBrush: The Eraser object is now a subclass of Group. This means that loading from JSON will break between versions.
-Use this [code](https://gist.github.com/ShaMan123/6c5c4ca2cc720a2700848a2deb6addcd) to transform your json payload to the new version.
+  Use this [code](https://gist.github.com/ShaMan123/6c5c4ca2cc720a2700848a2deb6addcd) to transform your json payload to the new version.
 - feat(fabric.Canvas): fire an extra mouse up for the original control of the initial target [`#7612`](https://github.com/fabricjs/fabric.js/pull/7612)
 - fix(fabric.Object) bounding box display with skewY when outside group [`#7611`](https://github.com/fabricjs/fabric.js/pull/7611)
 - fix(fabric.text) fix rtl/ltr performance issues [`#7610`](https://github.com/fabricjs/fabric.js/pull/7610)
@@ -64,7 +64,7 @@ Use this [code](https://gist.github.com/ShaMan123/6c5c4ca2cc720a2700848a2deb6add
 - **BREAKING**: Deps(): MAJOR update to jsdom 19 node 14 [`#7587`](https://github.com/fabricjs/fabric.js/pull/7587)
 - Fix(): JSDOM transative vulnerability [`#7510`](https://github.com/fabricjs/fabric.js/pull/7510)
 - fix(fabric.parser): attempt to resolve some issues with regexp [`#7520`](https://github.com/fabricjs/fabric.js/pull/7520)
-- fix(fabric.IText)  fix for possible error on copy paste [`#7526`](https://github.com/fabricjs/fabric.js/pull/7526)
+- fix(fabric.IText) fix for possible error on copy paste [`#7526`](https://github.com/fabricjs/fabric.js/pull/7526)
 - fix(fabric.Path): Path Distance Measurement Inconsistency [`#7511`](https://github.com/fabricjs/fabric.js/pull/7511)
 - Fix(fabric.Text): Avoid reiterating measurements when width is 0 and measure also empty lines for consistency. [`#7497`](https://github.com/fabricjs/fabric.js/pull/7497)
 - fix(fabric.Object): stroke bounding box [`#7478`](https://github.com/fabricjs/fabric.js/pull/7478)
@@ -78,7 +78,6 @@ Use this [code](https://gist.github.com/ShaMan123/6c5c4ca2cc720a2700848a2deb6add
 - docs(): Clarify viewport transformations doc [`#7401`](https://github.com/fabricjs/fabric.js/pull/7401)
 - docs(): specify default value and docs for enablePointerEvents [`#7386`](https://github.com/fabricjs/fabric.js/pull/7386)
 - feat(fabric.PencilBrush): add an option to draw a straight line while pressing a key [`#7034`](https://github.com/fabricjs/fabric.js/pull/7034)
-
 
 ## [4.6.0]
 
@@ -98,7 +97,7 @@ Use this [code](https://gist.github.com/ShaMan123/6c5c4ca2cc720a2700848a2deb6add
 - fix(EraserBrush) force fill value [#7269](https://github.com/fabricjs/fabric.js/pull/7269)
 - fix(fabric.StaticCanvas) properly remove objects on canvas.clear [#6937](https://github.com/fabricjs/fabric.js/pull/6937)
 - feat(fabric.EraserBrush): improved erasing:end event [#7258](https://github.com/fabricjs/fabric.js/pull/7258)
-- fix(shapes): fabric.Object._fromObject never should return [#7201](https://github.com/fabricjs/fabric.js/pull/7201)
+- fix(shapes): fabric.Object.\_fromObject never should return [#7201](https://github.com/fabricjs/fabric.js/pull/7201)
 - feat(fabric.filters) Added vibrance filter (for increasing saturation of muted colors) [#7189](https://github.com/fabricjs/fabric.js/pull/7189)
 - fix(fabric.StaticCanvas): restore canvas size when disposing [#7181](https://github.com/fabricjs/fabric.js/pull/7181)
 - feat(fabric.util): added `convertPointsToSVGPath` that will convert from a list of points to a smooth curve. [#7140](https://github.com/fabricjs/fabric.js/pull/7140)
@@ -141,7 +140,7 @@ Use this [code](https://gist.github.com/ShaMan123/6c5c4ca2cc720a2700848a2deb6add
 - fix(fabric.Image): Cache CropX and CropY cache properties [#6924](https://github.com/fabricjs/fabric.js/pull/6924)
 - fix(fabric.Canvas): Add target to each selection event [#6858](https://github.com/fabricjs/fabric.js/pull/6858)
 - fix(fabric.Image): fix wrong scaling value for the y axis in renderFill [#6778](https://github.com/fabricjs/fabric.js/pull/6778)
-- fix(fabric.Canvas): set isMoving on real movement only  [#6856](https://github.com/fabricjs/fabric.js/pull/6856)
+- fix(fabric.Canvas): set isMoving on real movement only [#6856](https://github.com/fabricjs/fabric.js/pull/6856)
 - fix(fabric.Group) make addWithUpdate compatible with nested groups [#6774](https://github.com/fabricjs/fabric.js/pull/6774)
 - fix(Fabric.Text): Add path to text export and import [#6844](https://github.com/fabricjs/fabric.js/pull/6844)
 - fix(fabric.Canvas) Remove controls check in the pixel accuracy target [#6798](https://github.com/fabricjs/fabric.js/pull/6798)
@@ -165,7 +164,7 @@ Use this [code](https://gist.github.com/ShaMan123/6c5c4ca2cc720a2700848a2deb6add
 - fix(fabric.Text): improve compatibility with transformed gradients [#6669](https://github.com/fabricjs/fabric.js/pull/6669)
 - feat(fabric.Text): Add ability to put text on paths BETA [#6543](https://github.com/fabricjs/fabric.js/pull/6543)
 - fix(fabric.Canvas): rotation handle should take origin into account [#6686](https://github.com/fabricjs/fabric.js/pull/6686)
-- fix(fabric.Text): Text on path, fix non linear distance of chars over path  [#6671](https://github.com/fabricjs/fabric.js/pull/6671)
+- fix(fabric.Text): Text on path, fix non linear distance of chars over path [#6671](https://github.com/fabricjs/fabric.js/pull/6671)
 
 ## [4.2.0]
 
@@ -174,6 +173,7 @@ Use this [code](https://gist.github.com/ShaMan123/6c5c4ca2cc720a2700848a2deb6add
 - added: feat(fabric.controlsUtils): Fire resizing event for textbox width [#6545](https://github.com/fabricjs/fabric.js/pull/6545)
 
 ## [4.1.0]
+
 - feat(Brushes): add beforePathCreated event [#6492](https://github.com/fabricjs/fabric.js/pull/6492);
 - feat(fabric.Path): Change the way path is parsed and drawn. simplify path at parsing time [#6504](https://github.com/fabricjs/fabric.js/pull/6504);
 - feat(fabric.Path): Simplify S and T command in C and Q. [#6507](https://github.com/fabricjs/fabric.js/pull/6507);
@@ -185,12 +185,14 @@ Use this [code](https://gist.github.com/ShaMan123/6c5c4ca2cc720a2700848a2deb6add
 - fix(fabric.Object): when in groups or active groups, fix the ability to shift deselect [#6541](https://github.com/fabricjs/fabric.js/pull/6541);
 
 ## [4.0.0]
+
 - fixed the gesture module to not break with 4.0 [#6491](https://github.com/fabricjs/fabric.js/pull/6491);
 - fix(fabric.IText): copy style in non full mode when typing text [#6454](https://github.com/fabricjs/fabric.js/pull/6454);
 - feat(fabric.Controls) expose the extra utils for control handling.
-Breaking: rename fabric.controlHandlers and fabric.controlRenderers to fabric.controlsUtils.
+  Breaking: rename fabric.controlHandlers and fabric.controlRenderers to fabric.controlsUtils.
 
 ## [4.0.0-rc.1]
+
 - fix(fabric.Canvas): ISSUE-6314 rerender in case of drag selection that select a single oobject. [#6421](https://github.com/fabricjs/fabric.js/pull/6421);
 - feat(text): allow correct cursor/selection position if text is edited inside a group. [#6256](https://github.com/fabricjs/fabric.js/pull/6256);
 - feat(fabric.Control): remove position option in favor of x and y [#6415](https://github.com/fabricjs/fabric.js/pull/6415);
@@ -201,11 +203,13 @@ Breaking: rename fabric.controlHandlers and fabric.controlRenderers to fabric.co
 - Breaking: fabric.Control constructor does not accept anymore a position object, but 2 properties, x and y.
 
 ## [4.0.0-beta.12]
+
 - fix(fabric.IText): respect value of `cursorColor` [#6300](https://github.com/fabricjs/fabric.js/pull/6300);
 - fix(fabric.Textbox): Improve splitByGrapheme and charSpacing [#6298](https://github.com/fabricjs/fabric.js/pull/6298);
 - feat(controls): Reintroduce flip by scaling and lockScalingFlip [#6313](https://github.com/fabricjs/fabric.js/pull/6313);
 
 ## [4.0.0-beta.11]
+
 - fix(itext): improved style handling for new lines [#6268](https://github.com/fabricjs/fabric.js/pull/6268)
 - fix(controls): Fix flip and controls and skewY and controls. [#6278](https://github.com/fabricjs/fabric.js/pull/6278)
 - fix(controls): Current position with handlers is wrong if using skew [#6267](https://github.com/fabricjs/fabric.js/pull/6267)
@@ -219,21 +223,24 @@ Breaking: rename fabric.controlHandlers and fabric.controlRenderers to fabric.co
 - fix(fabric.Image): do not crash if image has no element [#6285](https://github.com/fabricjs/fabric.js/pull/6285)
 
 BREAKING:
-- removed 2 utils member that was not used anywhere: fabric.util.getScript, fabric.util.getElementStyle
-- remove private member _setImageSmoothing in the canvas: use fabric.util.setImageSmoothing(ctx, value);
 
+- removed 2 utils member that was not used anywhere: fabric.util.getScript, fabric.util.getElementStyle
+- remove private member \_setImageSmoothing in the canvas: use fabric.util.setImageSmoothing(ctx, value);
 
 ## [4.0.0-beta.10]
+
 - fix(controls): fix missing target in canvas event options [#6251](https://github.com/fabricjs/fabric.js/pull/6251)
 - fix(controls): correct position for offsets [#6250](https://github.com/fabricjs/fabric.js/pull/6250)
 - feat(utils): Added more error flag passing throughout functions [#6238](https://github.com/fabricjs/fabric.js/pull/6238)
 
 ## [4.0.0-beta.9]
+
 - fix(controls) show offsetX/offsetY correctly. [#6236](https://github.com/fabricjs/fabric.js/pull/6236)
 - fix(controls) ISSUE-6201 Restore per object setting of controls visibility [#6226](https://github.com/fabricjs/fabric.js/pull/6226)
 - fix(svg_parser): ISSUE-6220 Allow to parse font declaration that start with a number [#6222](https://github.com/fabricjs/fabric.js/pull/6222)
 
 ## [4.0.0-beta.8]
+
 - fix(IText) Stop composition events on mousedown to enable cursor position on android keyboards [#6224](https://github.com/fabricjs/fabric.js/pull/6224)
 - fix(controls): Handle textbox width change properly [#6219](https://github.com/fabricjs/fabric.js/pull/6219)
 - fix(controls): correctly handling the uniform scaling option [#6218](https://github.com/fabricjs/fabric.js/pull/6218)
@@ -249,9 +256,10 @@ BREAKING:
 
 feat(controls): Added controls mouseUpHandler and mouseDownHandler [#6158](https://github.com/fabricjs/fabric.js/pull/6158)
 Removal of deprecated methods / patterns. [#6111](https://github.com/fabricjs/fabric.js/pull/6111)
+
 - removed Object.setShadow, and BaseBrush.setShadow. change `rect.setShadow(options)` to `rect.set('shadow', new fabric.Shadow(options))`
 - removed Object.transformMatrix.
-- removed `object:selected` event. use `selection:created`. In the callback you will still find  `target` in the options, but also you will find `selected` with all the objects selected during that single event.
+- removed `object:selected` event. use `selection:created`. In the callback you will still find `target` in the options, but also you will find `selected` with all the objects selected during that single event.
 - removed Gradient.forObject. No alternative available.
 - removed Object and canvas `clipTo`. Use Object.clipPath;
 - removed Canvas.loadFromDatalessJSON, it was just an alias for `loadFromJSON`
@@ -285,34 +293,39 @@ fix(controls): Control.getVisibility will always receive the fabric.Object argum
 ## [4.0.0-beta.1]
 
 breaking: All your old control code override will not work
-breaking: `uniScaleTransform` has been renamed in `uniformScaling`, meaning changed and  the default  value swapped. The behaviour is unchanged, but now the description and the name match.
+breaking: `uniScaleTransform` has been renamed in `uniformScaling`, meaning changed and the default value swapped. The behaviour is unchanged, but now the description and the name match.
 breaking: Object.lockUniScaling is removed. Alternatives to get the same identical functionality with less code are being evaluated.
 breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to the event `before:transform’
 
 ## [3.6.2]
+
 - fix fabric.Object.toDataURL blurriness on images with odd pixel number [#6131](https://github.com/fabricjs/fabric.js/pull/6131)
 
 ## [3.6.1]
+
 - fix(gradient, text): ISSUE-6014 ISSUE-6077 support percentage gradient in text [#6090](https://github.com/fabricjs/fabric.js/pull/6090)
 - fix(filters): ISSUE-6072 convolution filter is off by one [#6088](https://github.com/fabricjs/fabric.js/pull/6088)
 - fix(transform): Fix a bug in the skewing logic [#6082](https://github.com/fabricjs/fabric.js/pull/6088)
 
 ## [3.6.0]
+
 - fix: ISSUE-5512 better Clippath transform parsing in SVG [#5983](https://github.com/fabricjs/fabric.js/pull/5983)
 - fix: ISSUE-5984 Avoid enter editing in non selectable object [#5989](https://github.com/fabricjs/fabric.js/pull/5989)
-- Tweak to object._setLineDash to avoid cycles when nothing in array [#6000](https://github.com/fabricjs/fabric.js/pull/6000)
+- Tweak to object.\_setLineDash to avoid cycles when nothing in array [#6000](https://github.com/fabricjs/fabric.js/pull/6000)
 - fix: ISSUE-5867 Fix the extra new line selection with empty line [#6011](https://github.com/fabricjs/fabric.js/pull/6011)
 - Improvement: Use SVG Namespace for SVG Elements [#5957](https://github.com/fabricjs/fabric.js/pull/5957)
 - Improvement: ISSUE-4115 - triggers in/out events for sub targets [#6013](https://github.com/fabricjs/fabric.js/pull/6013)
 - Improvement: Upper canvas retina scaling [#5938](https://github.com/fabricjs/fabric.js/pull/5938)
 
 ## [3.5.1]
+
 - Fix for textbox non defined in scaleObject [#5896](https://github.com/fabricjs/fabric.js/pull/5896)
 - Fix canvas pattern as background and exports [#5973](https://github.com/fabricjs/fabric.js/pull/5973)
 - Fix for type error if style is null when checking if is empty [#5971](https://github.com/fabricjs/fabric.js/pull/5971)
 - Fix for load from datalessJSON for svg groups with sourcePath [#5970](https://github.com/fabricjs/fabric.js/pull/5970)
 
 ## [3.5.0]
+
 - Deprecation: deprecated 3 method of the api that will disappear in fabric 4: setPatternFill, setColor, setShadow.
 - Fix: remove line dash modification for strokeUniform [#5953](https://github.com/fabricjs/fabric.js/pull/5953)
 - Improvement: ISSUE-5955 parse svg clip-path recursively [#5960](https://github.com/fabricjs/fabric.js/pull/5960)
@@ -320,18 +333,21 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - change pencil brush finalize to be in line with other brushes [#5866](https://github.com/fabricjs/fabric.js/pull/5866)
 
 ## [3.4.0]
+
 - Support fill-opacity on gradient parsing from SVG. [#5812](https://github.com/fabricjs/fabric.js/pull/5812)
 - Rewrite gradient parsing from SVG to work with more transformation and combinations of attributes. [#5836](https://github.com/fabricjs/fabric.js/pull/5836)
 - Added Gradient.gradientUnits property to support percent based gradients on shapes.[#5836](https://github.com/fabricjs/fabric.js/pull/5836)
 - Changed animation logic so that onComplete gets always called with the final values of the animation.[#5813](https://github.com/fabricjs/fabric.js/pull/5813)
 
 ## [3.3.0]
+
 - Differently support multi mouse events, fix multi touch on various browser [#5785](https://github.com/fabricjs/fabric.js/pull/5785)
 - Word boundary search update on grapheme clusters [#5788](https://github.com/fabricjs/fabric.js/pull/5788)
 - Enable deps free version [#5786](https://github.com/fabricjs/fabric.js/pull/5786)
 - Remove variables named as reserved words [#5782](https://github.com/fabricjs/fabric.js/pull/5782)
 
 ## [3.2.0]
+
 - Fix: Better handling of upperCanvas in toCanvasElement. [#5736](https://github.com/fabricjs/fabric.js/pull/5736)
 - Add: Pass raw event information to brushes [#5687](https://github.com/fabricjs/fabric.js/pull/5687)
 - Deprecation: officially deprecated Object.transformMatrix [#5747](https://github.com/fabricjs/fabric.js/pull/5747)
@@ -339,11 +355,13 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Fix: PencilBrush regression on simple points. [#5771](https://github.com/fabricjs/fabric.js/pull/5771)
 
 ## [3.1.0]
+
 - Fix: unbreak IE10. [#5678](https://github.com/fabricjs/fabric.js/pull/5678)
 - Improvement: Support scientific notation with uppercase E. [#5731](https://github.com/fabricjs/fabric.js/pull/5731)
 - Add: PencilBrush brush now support `decimate` property to remove dots that are too near to each other. [#5718](https://github.com/fabricjs/fabric.js/pull/5718)
 
 ## [3.0.0]
+
 - Breaking: removed support for node 4 and 6. [#5356](https://github.com/fabricjs/fabric.js/pull/5356)
 - Breaking: changed objectCaching meaning to disable caching only if possible. [#5566](https://github.com/fabricjs/fabric.js/pull/5566)
 - Breaking: private method `_setLineStyle` can set only empty object now [#5588](https://github.com/fabricjs/fabric.js/pull/5588)
@@ -370,6 +388,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Fix: respect chainable attribute in observable mixin [#5606](https://github.com/fabricjs/fabric.js/pull/5606)
 
 ## [2.7.0]
+
 - Add: strokeUniform property, avoid stroke scaling with paths [#5473](https://github.com/fabricjs/fabric.js/pull/5473)
 - Fix: fix bug in image setSrc [#5502](https://github.com/fabricjs/fabric.js/pull/5502)
 - Add: strokeUniform import/export svg [#5527](https://github.com/fabricjs/fabric.js/pull/5527)
@@ -377,6 +396,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Improvement: support running in a XML document [#5530](https://github.com/fabricjs/fabric.js/pull/5530)
 
 ## [2.6.0]
+
 - Fix: avoid ie11 to throw on weird draw images [#5428](https://github.com/fabricjs/fabric.js/pull/5428)
 - Fix: a rare case of invisible clipPath [#5477](https://github.com/fabricjs/fabric.js/pull/5477)
 - Fix: testability of code under node when webgl is involved [#5478](https://github.com/fabricjs/fabric.js/pull/5478)
@@ -384,19 +404,23 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Add: fabric.Object.toCanvasElement [#5481](https://github.com/fabricjs/fabric.js/pull/5481)
 
 ## [2.5.0]
+
 - Fix: textbox transform report newScaleX and newScaleY values [#5464](https://github.com/fabricjs/fabric.js/pull/5464)
 - Fix: export of svg and gradient with transforms [#5456](https://github.com/fabricjs/fabric.js/pull/5456)
 - Fix: detection of controls in perPixelTargetFind + cache [#5455](https://github.com/fabricjs/fabric.js/pull/5455)
 - Add: added canvas.toCanvasElement method [#5452](https://github.com/fabricjs/fabric.js/pull/5452)
 
 ## [2.4.6]
+
 - Fix: unbreak the svg export broken in 2.4.5 [#5438](https://github.com/fabricjs/fabric.js/pull/5438)
 
 ## [2.4.5]
+
 - Fix: svg import/export for canvas+clipPath and letterspacing. [#5424](https://github.com/fabricjs/fabric.js/pull/5424)
 - Fix: avoid stroke dash from group selection to leak on upper canvas [#5392](https://github.com/fabricjs/fabric.js/pull/5392)
 
 ## [2.4.4]
+
 - Fix: add clipPath to stateful cache check. [#5384](https://github.com/fabricjs/fabric.js/pull/5384)
 - Fix: restore draggability of small objects [#5379](https://github.com/fabricjs/fabric.js/pull/5379)
 - Improvement: Added strokeDashOffset to objects and from SVG import. [#5398](https://github.com/fabricjs/fabric.js/pull/5398)
@@ -404,6 +428,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Improvement: Better gradients parsing with xlink:href [#5357](https://github.com/fabricjs/fabric.js/pull/5357)
 
 ## [2.4.3]
+
 - Fix: Shift click and onSelect function [#5348](https://github.com/fabricjs/fabric.js/pull/5348)
 - Fix: Load from Json from images with filters and resize filters [#5346](https://github.com/fabricjs/fabric.js/pull/5346)
 - Fix: Remove special case of 1x1 rect [#5345](https://github.com/fabricjs/fabric.js/pull/5345)
@@ -411,12 +436,14 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Fix: Fix shift + click interaction with unselectable objects [#5324](https://github.com/fabricjs/fabric.js/pull/5324)
 
 ## [2.4.2]
+
 - Fix: Better toSVG support to enable clipPath [#5284](https://github.com/fabricjs/fabric.js/pull/5284)
 - Fix: Per pixel target find and groups and sub targets [#5287](https://github.com/fabricjs/fabric.js/pull/5287)
 - Fix: Object clone as Image and shadow clipping [#5308](https://github.com/fabricjs/fabric.js/pull/5308)
 - Fix: IE11 loading SVG [#5307](https://github.com/fabricjs/fabric.js/pull/5307)
 
 ## [2.4.1]
+
 - Fix: Avoid enterEditing if another object is the activeObject [#5261](https://github.com/fabricjs/fabric.js/pull/5261)
 - Fix: clipPath enliving for Image fromObject [#5279](https://github.com/fabricjs/fabric.js/pull/5279)
 - Fix: toDataURL and canvas clipPath [#5278](https://github.com/fabricjs/fabric.js/pull/5278)
@@ -427,209 +454,227 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Fix: Avoid extra renders on mouseUp/Down [#5256](https://github.com/fabricjs/fabric.js/pull/5256)
 
 ## [2.4.0]
+
 - Add: Add clipPath support to canvas and svg import/export. Low compatibility yet.
 
 ## [2.3.6]
+
 - Fix: Make image.class aware of naturalWidth and naturalHeight. [#5178](https://github.com/fabricjs/fabric.js/pull/5178)
 - Fix: Make 2 finger events works again [#5177](https://github.com/fabricjs/fabric.js/pull/5177)
 - Fix: Make Groups respect origin and correct position ( fix spray/circle brushes ) [#5176](https://github.com/fabricjs/fabric.js/pull/5176)
 
 ## [2.3.5]
- - Change: make canvas.getObjects() always return a shallow copy of the array [#5162](https://github.com/fabricjs/fabric.js/pull/5162)
- - Fix: Improve fabric.Pattern.toSVG to look correct on offsets and no-repeat [#5164](https://github.com/fabricjs/fabric.js/pull/5164)
- - Fix: Do not enter edit in Itext if the mouseUp is relative to a group selector [#5153](https://github.com/fabricjs/fabric.js/pull/5153)
- - Improvement: Do not require xlink namespace in front of href attribut for svgs ( is a SVG2 new spec, unsupported ) [#5156](https://github.com/fabricjs/fabric.js/pull/5156)
- - Fix: fix resizeFilter having the wrong cached texture, also improved interaction between filters [#5165](https://github.com/fabricjs/fabric.js/pull/5165)
+
+- Change: make canvas.getObjects() always return a shallow copy of the array [#5162](https://github.com/fabricjs/fabric.js/pull/5162)
+- Fix: Improve fabric.Pattern.toSVG to look correct on offsets and no-repeat [#5164](https://github.com/fabricjs/fabric.js/pull/5164)
+- Fix: Do not enter edit in Itext if the mouseUp is relative to a group selector [#5153](https://github.com/fabricjs/fabric.js/pull/5153)
+- Improvement: Do not require xlink namespace in front of href attribut for svgs ( is a SVG2 new spec, unsupported ) [#5156](https://github.com/fabricjs/fabric.js/pull/5156)
+- Fix: fix resizeFilter having the wrong cached texture, also improved interaction between filters [#5165](https://github.com/fabricjs/fabric.js/pull/5165)
 
 ## [2.3.4]
- - Fix: ToSVG was ignoring excludeFromExport for backgroundImage and OverlayImage. [#5075](https://github.com/fabricjs/fabric.js/pull/5075)
- - Fix: ToSVG for circle with start and end angles. [#5085](https://github.com/fabricjs/fabric.js/pull/5085)
- - Fix: Added callback for setPatternFill. [#5101](https://github.com/fabricjs/fabric.js/pull/5101)
- - Fix: Resize filter taking in account multiple scale sources. [#5117](https://github.com/fabricjs/fabric.js/pull/5117)
- - Fix: Blend image filter clean after refilter. [#5121](https://github.com/fabricjs/fabric.js/pull/5121)
- - Fix: Object.toDataURL should not be influenced by zoom. [#5139](https://github.com/fabricjs/fabric.js/pull/5139)
- - Improvement: requestRenderAllBound add to Canvas instance. [#5138](https://github.com/fabricjs/fabric.js/pull/5138)
- - Improvement: Make path bounding cache optional and also reacheable/cleanable [#5140](https://github.com/fabricjs/fabric.js/pull/5140)
- - Improvement: Make the logic of isNeutralState filters work before filtering start. [#5129](https://github.com/fabricjs/fabric.js/pull/5129)
- - Improvement: Added some code to clean up some memory when canvas is disposed in nodejs. [#5142](https://github.com/fabricjs/fabric.js/pull/5142)
- - Fix: Make numeric origins work with group creation. [#5143](https://github.com/fabricjs/fabric.js/pull/5143)
+
+- Fix: ToSVG was ignoring excludeFromExport for backgroundImage and OverlayImage. [#5075](https://github.com/fabricjs/fabric.js/pull/5075)
+- Fix: ToSVG for circle with start and end angles. [#5085](https://github.com/fabricjs/fabric.js/pull/5085)
+- Fix: Added callback for setPatternFill. [#5101](https://github.com/fabricjs/fabric.js/pull/5101)
+- Fix: Resize filter taking in account multiple scale sources. [#5117](https://github.com/fabricjs/fabric.js/pull/5117)
+- Fix: Blend image filter clean after refilter. [#5121](https://github.com/fabricjs/fabric.js/pull/5121)
+- Fix: Object.toDataURL should not be influenced by zoom. [#5139](https://github.com/fabricjs/fabric.js/pull/5139)
+- Improvement: requestRenderAllBound add to Canvas instance. [#5138](https://github.com/fabricjs/fabric.js/pull/5138)
+- Improvement: Make path bounding cache optional and also reacheable/cleanable [#5140](https://github.com/fabricjs/fabric.js/pull/5140)
+- Improvement: Make the logic of isNeutralState filters work before filtering start. [#5129](https://github.com/fabricjs/fabric.js/pull/5129)
+- Improvement: Added some code to clean up some memory when canvas is disposed in nodejs. [#5142](https://github.com/fabricjs/fabric.js/pull/5142)
+- Fix: Make numeric origins work with group creation. [#5143](https://github.com/fabricjs/fabric.js/pull/5143)
 
 ## [2.3.3]
- - Fix: Fixed font generic names for text, measurement of zero width related characters and also trailing of cursor when zooming. [#5048](https://github.com/fabricjs/fabric.js/pull/5048)
+
+- Fix: Fixed font generic names for text, measurement of zero width related characters and also trailing of cursor when zooming. [#5048](https://github.com/fabricjs/fabric.js/pull/5048)
 
 ## [2.3.2]
- - Fix: justify + charspacing + textDecoration Add and improve more events for transformations and mouse interaction. [#5007](https://github.com/fabricjs/fabric.js/pull/5007) [#5009](https://github.com/fabricjs/fabric.js/pull/5009)
- - Fix: Enter edit on object selected programmatically. [#5010](https://github.com/fabricjs/fabric.js/pull/5010)
- - Fix: Canvas.dispose was not removing all events properly. [#5020](https://github.com/fabricjs/fabric.js/pull/5020)
- - Fix: Make rgba and hsla regex work case insensitive. [#5017](https://github.com/fabricjs/fabric.js/pull/5017)
- - Fix: Make group transitioning from not cached to cached work. [#5021](https://github.com/fabricjs/fabric.js/pull/5021)
+
+- Fix: justify + charspacing + textDecoration Add and improve more events for transformations and mouse interaction. [#5007](https://github.com/fabricjs/fabric.js/pull/5007) [#5009](https://github.com/fabricjs/fabric.js/pull/5009)
+- Fix: Enter edit on object selected programmatically. [#5010](https://github.com/fabricjs/fabric.js/pull/5010)
+- Fix: Canvas.dispose was not removing all events properly. [#5020](https://github.com/fabricjs/fabric.js/pull/5020)
+- Fix: Make rgba and hsla regex work case insensitive. [#5017](https://github.com/fabricjs/fabric.js/pull/5017)
+- Fix: Make group transitioning from not cached to cached work. [#5021](https://github.com/fabricjs/fabric.js/pull/5021)
 
 ## [2.3.1]
- - Improve nested svg import and text positioning, spikes. [#4984](https://github.com/kangax/fabric.js/pull/4984)
+
+- Improve nested svg import and text positioning, spikes. [#4984](https://github.com/kangax/fabric.js/pull/4984)
 
 ## [2.3.0]
- - Add and improve more events for transformations and mouse interaction [#4979](https://github.com/kangax/fabric.js/pull/4979)
- - Improvement: whenever possible use cache for target transparency sampling [#4955](https://github.com/kangax/fabric.js/pull/4955)
+
+- Add and improve more events for transformations and mouse interaction [#4979](https://github.com/kangax/fabric.js/pull/4979)
+- Improvement: whenever possible use cache for target transparency sampling [#4955](https://github.com/kangax/fabric.js/pull/4955)
 
 ## [2.2.4]
- - Fix getPointer on touch devices [#4866](https://github.com/kangax/fabric.js/pull/4866)
- - Fix issues with selectionDashArray bleeding into free drawing [#4894](https://github.com/kangax/fabric.js/pull/4894)
- - Fix blur filter for nodejs [#4905](https://github.com/kangax/fabric.js/pull/4905)
- - Fix Register mousemove as non passive to help touch devices [#4933](https://github.com/kangax/fabric.js/pull/4933)
- - Fix modified shadow tosvg for safari compatibility [#4934](https://github.com/kangax/fabric.js/pull/4934)
- - Fix shader to avoid premultiplied alpha pixel getting dirty in blend filter [#4936](https://github.com/kangax/fabric.js/pull/4936)
- - Add isPartiallyOnScreen method [#4856](https://github.com/kangax/fabric.js/pull/4856)
- - Fix isEqual failing on array/null or objects/null/string compare [#4949](https://github.com/kangax/fabric.js/pull/4949)
- - Fix pencilBrush with alpha and with rerendering canvas [#4938](https://github.com/kangax/fabric.js/pull/4938)
+
+- Fix getPointer on touch devices [#4866](https://github.com/kangax/fabric.js/pull/4866)
+- Fix issues with selectionDashArray bleeding into free drawing [#4894](https://github.com/kangax/fabric.js/pull/4894)
+- Fix blur filter for nodejs [#4905](https://github.com/kangax/fabric.js/pull/4905)
+- Fix Register mousemove as non passive to help touch devices [#4933](https://github.com/kangax/fabric.js/pull/4933)
+- Fix modified shadow tosvg for safari compatibility [#4934](https://github.com/kangax/fabric.js/pull/4934)
+- Fix shader to avoid premultiplied alpha pixel getting dirty in blend filter [#4936](https://github.com/kangax/fabric.js/pull/4936)
+- Add isPartiallyOnScreen method [#4856](https://github.com/kangax/fabric.js/pull/4856)
+- Fix isEqual failing on array/null or objects/null/string compare [#4949](https://github.com/kangax/fabric.js/pull/4949)
+- Fix pencilBrush with alpha and with rerendering canvas [#4938](https://github.com/kangax/fabric.js/pull/4938)
 
 ## [2.2.3]
- - improvement: Allow to parse quoted url string. url('#myid') [#4881](https://github.com/kangax/fabric.js/pull/4881)
- - improvement: text fromSVG import char-spacing attribute [#3718](https://github.com/kangax/fabric.js/pull/3718)
- - fix: text toSVG export with multiple spaces in safari [#4880](https://github.com/kangax/fabric.js/pull/4880)
- - fix: setSrc reset width and height on images [#4877](https://github.com/kangax/fabric.js/pull/4877)
- - improvements: Removed forced origin swap when rotating [#4878](https://github.com/kangax/fabric.js/pull/4878)
- - fix: Make the background of canvas cover all SVG in toSVG export [#4852](https://github.com/kangax/fabric.js/pull/4852)
- - fix: Added startAngle to cacheProperties for fabric.Circle [#4875](https://github.com/kangax/fabric.js/pull/4875)
- - fix: Rerender all the content of upperCanvas if canvas gets resized [#4850](https://github.com/kangax/fabric.js/pull/4850)
- - fix: Remove references to context when disposing [#4846](https://github.com/kangax/fabric.js/pull/4846)
- - improvements: Added single quoting to font names in toSVG [#4840](https://github.com/kangax/fabric.js/pull/4840)
- - improvements: Added reserved space to wrapLine functionality [#4841](https://github.com/kangax/fabric.js/pull/4841)
+
+- improvement: Allow to parse quoted url string. url('#myid') [#4881](https://github.com/kangax/fabric.js/pull/4881)
+- improvement: text fromSVG import char-spacing attribute [#3718](https://github.com/kangax/fabric.js/pull/3718)
+- fix: text toSVG export with multiple spaces in safari [#4880](https://github.com/kangax/fabric.js/pull/4880)
+- fix: setSrc reset width and height on images [#4877](https://github.com/kangax/fabric.js/pull/4877)
+- improvements: Removed forced origin swap when rotating [#4878](https://github.com/kangax/fabric.js/pull/4878)
+- fix: Make the background of canvas cover all SVG in toSVG export [#4852](https://github.com/kangax/fabric.js/pull/4852)
+- fix: Added startAngle to cacheProperties for fabric.Circle [#4875](https://github.com/kangax/fabric.js/pull/4875)
+- fix: Rerender all the content of upperCanvas if canvas gets resized [#4850](https://github.com/kangax/fabric.js/pull/4850)
+- fix: Remove references to context when disposing [#4846](https://github.com/kangax/fabric.js/pull/4846)
+- improvements: Added single quoting to font names in toSVG [#4840](https://github.com/kangax/fabric.js/pull/4840)
+- improvements: Added reserved space to wrapLine functionality [#4841](https://github.com/kangax/fabric.js/pull/4841)
 
 ## [2.2.2]
-  - Fixed: Applying filters to an image will invalidate its cache [#4828](https://github.com/kangax/fabric.js/pull/4828)
-  - Fixed: Attempt at fix font families that requires quoting [#4831](https://github.com/kangax/fabric.js/pull/4831)
-  - Improvement: check upperCanvas client size for textarea position [#4827](https://github.com/kangax/fabric.js/pull/4827)
-  - Fixed: Attempt to fix multiple touchends [#4804](https://github.com/kangax/fabric.js/pull/4804)
-  - Fixed: Wrapping of textbox with charspacing [#4803](https://github.com/kangax/fabric.js/pull/4803)
-  - Fixed: bad calculation of empty line in text (regression from 2.2.0) [#4802](https://github.com/kangax/fabric.js/pull/4802)
+
+- Fixed: Applying filters to an image will invalidate its cache [#4828](https://github.com/kangax/fabric.js/pull/4828)
+- Fixed: Attempt at fix font families that requires quoting [#4831](https://github.com/kangax/fabric.js/pull/4831)
+- Improvement: check upperCanvas client size for textarea position [#4827](https://github.com/kangax/fabric.js/pull/4827)
+- Fixed: Attempt to fix multiple touchends [#4804](https://github.com/kangax/fabric.js/pull/4804)
+- Fixed: Wrapping of textbox with charspacing [#4803](https://github.com/kangax/fabric.js/pull/4803)
+- Fixed: bad calculation of empty line in text (regression from 2.2.0) [#4802](https://github.com/kangax/fabric.js/pull/4802)
 
 ## [2.2.1]
-  - Reworked how amd and commonJS are together in the same file.
+
+- Reworked how amd and commonJS are together in the same file.
 
 ## [2.2.0]
-  - Fixed: super/sub script svg export [#4780](https://github.com/kangax/fabric.js/pull/4780)
-  - Added: Text superScript and subScript support [#4765](https://github.com/kangax/fabric.js/pull/4765)
-  - Fixed: negative kerning support (Pacifico font) [#4772](https://github.com/kangax/fabric.js/pull/4772)
-  - Fixed: removing text on mousedown should be safe now [#4774](https://github.com/kangax/fabric.js/pull/4774)
-  - Improved: pass to inner functions the parameter calculate coords in isOnscreen [#4763](https://github.com/kangax/fabric.js/pull/4763)
+
+- Fixed: super/sub script svg export [#4780](https://github.com/kangax/fabric.js/pull/4780)
+- Added: Text superScript and subScript support [#4765](https://github.com/kangax/fabric.js/pull/4765)
+- Fixed: negative kerning support (Pacifico font) [#4772](https://github.com/kangax/fabric.js/pull/4772)
+- Fixed: removing text on mousedown should be safe now [#4774](https://github.com/kangax/fabric.js/pull/4774)
+- Improved: pass to inner functions the parameter calculate coords in isOnscreen [#4763](https://github.com/kangax/fabric.js/pull/4763)
 
 ## [2.1.0]
-  - Added: Added: Drag and drop event binding [#4421](https://github.com/kangax/fabric.js/pull/4421)
-  - Fixed: isEmptyStyle implementation for TextBox [#4762](https://github.com/kangax/fabric.js/pull/4762)
+
+- Added: Added: Drag and drop event binding [#4421](https://github.com/kangax/fabric.js/pull/4421)
+- Fixed: isEmptyStyle implementation for TextBox [#4762](https://github.com/kangax/fabric.js/pull/4762)
 
 ## [2.0.3]
-  - Fix: now sub target check can work with subclasses of fabric.Group [#4753](https://github.com/kangax/fabric.js/pull/4753)
-  - Improvement: PencilBrush is now compexity 1 instead of complexity N during draw [#4743](https://github.com/kangax/fabric.js/pull/4743)
-  - Fix the cleanStyle was not checking for the right property to exist [#4751](https://github.com/kangax/fabric.js/pull/4751)
-  - Fix onBeforeScaleRotate with canvas zoom [#4748](https://github.com/kangax/fabric.js/pull/4748)
+
+- Fix: now sub target check can work with subclasses of fabric.Group [#4753](https://github.com/kangax/fabric.js/pull/4753)
+- Improvement: PencilBrush is now compexity 1 instead of complexity N during draw [#4743](https://github.com/kangax/fabric.js/pull/4743)
+- Fix the cleanStyle was not checking for the right property to exist [#4751](https://github.com/kangax/fabric.js/pull/4751)
+- Fix onBeforeScaleRotate with canvas zoom [#4748](https://github.com/kangax/fabric.js/pull/4748)
 
 ## [2.0.2]
-  - fixed image toSVG support for crop [#4738](https://github.com/kangax/fabric.js/pull/4738)
-  - changed math for better rounded results [#4734](https://github.com/kangax/fabric.js/pull/4734)
+
+- fixed image toSVG support for crop [#4738](https://github.com/kangax/fabric.js/pull/4738)
+- changed math for better rounded results [#4734](https://github.com/kangax/fabric.js/pull/4734)
 
 ## [2.0.1]
-  - fixed filter for blend image in WEBGL [#4706](https://github.com/kangax/fabric.js/pull/4706)
-  - fixed interactions between canvas toDataURL and multiplier + retina [#4705](https://github.com/kangax/fabric.js/pull/4705)
-  - fixed bug with originX and originY not invalidating the transform [#4703](https://github.com/kangax/fabric.js/pull/4703)
-  - fixed unwanted mutation on object enliving in fabric.Image [#4699](https://github.com/kangax/fabric.js/pull/4699)
+
+- fixed filter for blend image in WEBGL [#4706](https://github.com/kangax/fabric.js/pull/4706)
+- fixed interactions between canvas toDataURL and multiplier + retina [#4705](https://github.com/kangax/fabric.js/pull/4705)
+- fixed bug with originX and originY not invalidating the transform [#4703](https://github.com/kangax/fabric.js/pull/4703)
+- fixed unwanted mutation on object enliving in fabric.Image [#4699](https://github.com/kangax/fabric.js/pull/4699)
+
 ## [2.0.0]
-  - final
-    - fix dataurl and svg export on retina and rounding [#4674](https://github.com/kangax/fabric.js/pull/4674)
-    - avoid error if iText is removed on mousedown [#4650](https://github.com/kangax/fabric.js/pull/4650)
-    - fix calcOffset when text enter editing [#4649](https://github.com/kangax/fabric.js/pull/4649)
-    - Gradient fix parsing floats [#4637](https://github.com/kangax/fabric.js/pull/4637)
-    - Add CrossOrigin managment to fabric.Pattern [#4618](https://github.com/kangax/fabric.js/pull/4618)
-    - Add patternTransform toObject saving [#4626](https://github.com/kangax/fabric.js/pull/4626)
-    - normalize brushes render [#4613](https://github.com/kangax/fabric.js/pull/4613)
-    - avoid charspacing shortcut [#4594](https://github.com/kangax/fabric.js/pull/4594)
-    - Fix color toHexa() [#4579](https://github.com/kangax/fabric.js/pull/4579)
- - rc3 and rc4
-    - more fixes to transformMatrix memoization
-    - Canvas.selectionFullyContained allows you to select objects just when full grabbed by the selections. [#4508](https://github.com/kangax/fabric.js/pull/4508)
-    - Remove some ouput of blank spaces from svg in order to avoid extra colored areas [#4524](https://github.com/kangax/fabric.js/pull/4524)
-    - Reinserted a performance shortcut for when there is no style at all [#4519](https://github.com/kangax/fabric.js/pull/4519)
-    - Manage canvas resize during a freedrawing brush without wiping the brush [#4527](https://github.com/kangax/fabric.js/pull/4527)
-    - Removed an extra closePath that was creating wrong visual on IntelIntegrated cards [#4549](https://github.com/kangax/fabric.js/pull/4549)
-    - Added a method to insert and remove text from command line [#4541](https://github.com/kangax/fabric.js/pull/4541)
-    - Some fixes around text styles management
-    - nodejs support changes: removed specific node code in order to use standard fabricjs code in nodejs.
-    - added fabric.util.getNodeCanvas that passed a JSDOM element allows you to get the node-canvas instance behind it and do what you need.
- - rc2
-    - Fixed a transform matrix memoize missing width/height [#4491](https://github.com/kangax/fabric.js/pull/4491)
-    - Fix pattern drawing a point [#4492](https://github.com/kangax/fabric.js/pull/4492)
-    - Fixed Text.removeChars [#4495](https://github.com/kangax/fabric.js/pull/4495)
-    - Added back 2 node-canvas methods [#4497](https://github.com/kangax/fabric.js/pull/4497)
-    - Fix a typo not restoring hoverCursor correctly.
- - rc1
-    - Remove node specific code [#4470](https://github.com/kangax/fabric.js/pull/4470)
-    - Improved Canvas.dispose code to leak less memory [#4471](https://github.com/kangax/fabric.js/pull/4471)
-    - Remove extra padding of cache when upper limited [#4467](https://github.com/kangax/fabric.js/pull/4467)
-    - Solved 2 perfomances problems with textbox [#4466](https://github.com/kangax/fabric.js/pull/4466) [#4465](https://github.com/kangax/fabric.js/pull/4465)
-    - Added justify-left justify-right and justify-center [#4437](https://github.com/kangax/fabric.js/pull/4437)
-    - Fix Group fromObject and subTargetCheck [#4454](https://github.com/kangax/fabric.js/pull/4454)
-    - Fix regression on IMG from SVG [#4450](https://github.com/kangax/fabric.js/pull/4450)
-    - Remove cache dimensions together with canvas [#4453](https://github.com/kangax/fabric.js/pull/4453)
-    - Fixed some fuzzyness cases for cache [#4452](https://github.com/kangax/fabric.js/pull/4452)
-    - Fixed resize filter for webgl [#4426](https://github.com/kangax/fabric.js/pull/4426)
-    - Stop searching target during a mouse move with a transform [#4442](https://github.com/kangax/fabric.js/pull/4442)
-    - safeguard shaders for non supported precisions [#4433](https://github.com/kangax/fabric.js/pull/4433)
-    - fix insert and remove style for edge cases [#4420](https://github.com/kangax/fabric.js/pull/4420)
-    - Fix object.move when in active selection [#4394](https://github.com/kangax/fabric.js/pull/4394)
-    - Memoize calcTransformMatrix function [#4418](https://github.com/kangax/fabric.js/pull/4418)
-    - Make _set flag object as dirty just when a real change happen[#4415](https://github.com/kangax/fabric.js/pull/4415)
-    - Add browserShadowBlurConstant to adjust shadowBlur value [#4413](https://github.com/kangax/fabric.js/pull/4413)
-    - Fix set element not clearing the cacheTexture. [#4410](https://github.com/kangax/fabric.js/pull/4410)
-    - Multi selection key can be configured with an array of keys. [#4363](https://github.com/kangax/fabric.js/pull/4363)
-    - fix fast type in text loosing some style. [#4339](https://github.com/kangax/fabric.js/pull/4339)
-    - fixed division by zero with lockscaling flip.
-    - added paintFirst ( paint-order with svg support ) [#4303](https://github.com/kangax/fabric.js/pull/4303)
-  - beta7
-    - added a build flag for not attaching fabric to window [#4199](https://github.com/kangax/fabric.js/pull/4199)
-    - removed .active property from objects [#4200](https://github.com/kangax/fabric.js/pull/4200)
-    - Normalize Api for getSelectionStyles, setSelectionStyles [#4202](https://github.com/kangax/fabric.js/pull/4202)
-    - Fix shader for convolute filter [#4207](https://github.com/kangax/fabric.js/pull/4207)
-    - Better mouse support for lockscaling flip [#4225](https://github.com/kangax/fabric.js/pull/4225)
-    - Fix toDataUrl getting a blank canvas [#4229](https://github.com/kangax/fabric.js/pull/4229)
-    - Ouput version to json Objects [#4251](https://github.com/kangax/fabric.js/pull/4251)
-    - Use backstoreOnly for toDataUrl resize [#4254](https://github.com/kangax/fabric.js/pull/4254)
-    - Fix safari svg whitespace [#4294](https://github.com/kangax/fabric.js/pull/4294)
-    - Fix Gradient export for paths [#4274](https://github.com/kangax/fabric.js/pull/4274)
-    - Move mouseout/over in mousemove events [#4283](https://github.com/kangax/fabric.js/pull/4283)
-    - Fix detection of click at the end of line [#4295](https://github.com/kangax/fabric.js/pull/4295)
-    - added new event selection:updated [#4311](https://github.com/kangax/fabric.js/pull/4311)
-    - Fixed free drawing path displacement [#4311](https://github.com/kangax/fabric.js/pull/4311)
-    - Fixed scale equally and flipping not happening [#4313](https://github.com/kangax/fabric.js/pull/4313)
-    - Select by drag makes the object fires 'selected' [#4314](https://github.com/kangax/fabric.js/pull/4314)
-  - beta6
-    - incompat: New filter system with WEBGL.
-    - incompat: New Text/IText/Textbox code. Multibyte compatible, more accurate.
-    - incompat: RequestAnimationFrame is used for the automatic render calls.
-    - incompat: Named setter/getter are optional now.
-    - incompat: Removed PathGroup class
-    - incompat: Paths cannot be restored anymore from strings [#3713](https://github.com/kangax/fabric.js/pull/3713)
-    - incompat: bumped node version to 4+ and jsdom to 9. [#3717](https://github.com/kangax/fabric.js/pull/3717)
-    - incompat: removed the es5 / JSON shim support [#3722](https://github.com/kangax/fabric.js/pull/3722)
-    - fix/incompat: IText setSelectionStyles does not change anymore style if no selection is present [#3765](https://github.com/kangax/fabric.js/pull/3765)
-    - skipOffscreen default to true
-    - Text.setSelectionStyle does not change anything if there is no selection [#3765](https://github.com/kangax/fabric.js/pull/3765)
-    - Switch to canvas-prebuilt as dependency. Added parameter to choose the canvas package [#3757](https://github.com/kangax/fabric.js/pull/3757)
-    - improvement: renderControls can now be called on its own. Added parameter styleOverride to allow for overriding current properties [#3887](https://github.com/kangax/fabric.js/pull/3887)
-    - removed hasMoved and saveCoords from Group class [#3910](https://github.com/kangax/fabric.js/pull/3910)
-    - forced all fromObject and fromElement to be async, normalized api. [#3996](https://github.com/kangax/fabric.js/pull/3996)
-    - improvement: added support for request animation frame in mouse events [#3997](https://github.com/kangax/fabric.js/pull/3997)
-    - added dblclick support for all objects [#3998](https://github.com/kangax/fabric.js/pull/3997)
-    - textbox scale as a normal object [#4052](https://github.com/kangax/fabric.js/pull/4052)
-    - Removed image meetOrSlice, alignX, alignY, introduced cropX, cropY [#4055](https://github.com/kangax/fabric.js/pull/4055)
-    - Added Text.cleanStyle, Text.removeStyle [#4060](https://github.com/kangax/fabric.js/pull/4060)
-    - change: lockRotation will not hide the mtr control anymore. introduced notAllowedCursor for canvas. [#4064](https://github.com/kangax/fabric.js/pull/4064)
-    - improvement: added 2 percentage values to fabric.util.animate. [#4068](https://github.com/kangax/fabric.js/pull/4068)
-    - change: pathOffset does not get exported anymore in path.toObject, toDatalessObject export sourcePath instead of modifying path. [#4108](https://github.com/kangax/fabric.js/pull/4108)
+
+- final
+  - fix dataurl and svg export on retina and rounding [#4674](https://github.com/kangax/fabric.js/pull/4674)
+  - avoid error if iText is removed on mousedown [#4650](https://github.com/kangax/fabric.js/pull/4650)
+  - fix calcOffset when text enter editing [#4649](https://github.com/kangax/fabric.js/pull/4649)
+  - Gradient fix parsing floats [#4637](https://github.com/kangax/fabric.js/pull/4637)
+  - Add CrossOrigin managment to fabric.Pattern [#4618](https://github.com/kangax/fabric.js/pull/4618)
+  - Add patternTransform toObject saving [#4626](https://github.com/kangax/fabric.js/pull/4626)
+  - normalize brushes render [#4613](https://github.com/kangax/fabric.js/pull/4613)
+  - avoid charspacing shortcut [#4594](https://github.com/kangax/fabric.js/pull/4594)
+  - Fix color toHexa() [#4579](https://github.com/kangax/fabric.js/pull/4579)
+- rc3 and rc4
+  - more fixes to transformMatrix memoization
+  - Canvas.selectionFullyContained allows you to select objects just when full grabbed by the selections. [#4508](https://github.com/kangax/fabric.js/pull/4508)
+  - Remove some ouput of blank spaces from svg in order to avoid extra colored areas [#4524](https://github.com/kangax/fabric.js/pull/4524)
+  - Reinserted a performance shortcut for when there is no style at all [#4519](https://github.com/kangax/fabric.js/pull/4519)
+  - Manage canvas resize during a freedrawing brush without wiping the brush [#4527](https://github.com/kangax/fabric.js/pull/4527)
+  - Removed an extra closePath that was creating wrong visual on IntelIntegrated cards [#4549](https://github.com/kangax/fabric.js/pull/4549)
+  - Added a method to insert and remove text from command line [#4541](https://github.com/kangax/fabric.js/pull/4541)
+  - Some fixes around text styles management
+  - nodejs support changes: removed specific node code in order to use standard fabricjs code in nodejs.
+  - added fabric.util.getNodeCanvas that passed a JSDOM element allows you to get the node-canvas instance behind it and do what you need.
+- rc2
+  - Fixed a transform matrix memoize missing width/height [#4491](https://github.com/kangax/fabric.js/pull/4491)
+  - Fix pattern drawing a point [#4492](https://github.com/kangax/fabric.js/pull/4492)
+  - Fixed Text.removeChars [#4495](https://github.com/kangax/fabric.js/pull/4495)
+  - Added back 2 node-canvas methods [#4497](https://github.com/kangax/fabric.js/pull/4497)
+  - Fix a typo not restoring hoverCursor correctly.
+- rc1
+  - Remove node specific code [#4470](https://github.com/kangax/fabric.js/pull/4470)
+  - Improved Canvas.dispose code to leak less memory [#4471](https://github.com/kangax/fabric.js/pull/4471)
+  - Remove extra padding of cache when upper limited [#4467](https://github.com/kangax/fabric.js/pull/4467)
+  - Solved 2 perfomances problems with textbox [#4466](https://github.com/kangax/fabric.js/pull/4466) [#4465](https://github.com/kangax/fabric.js/pull/4465)
+  - Added justify-left justify-right and justify-center [#4437](https://github.com/kangax/fabric.js/pull/4437)
+  - Fix Group fromObject and subTargetCheck [#4454](https://github.com/kangax/fabric.js/pull/4454)
+  - Fix regression on IMG from SVG [#4450](https://github.com/kangax/fabric.js/pull/4450)
+  - Remove cache dimensions together with canvas [#4453](https://github.com/kangax/fabric.js/pull/4453)
+  - Fixed some fuzzyness cases for cache [#4452](https://github.com/kangax/fabric.js/pull/4452)
+  - Fixed resize filter for webgl [#4426](https://github.com/kangax/fabric.js/pull/4426)
+  - Stop searching target during a mouse move with a transform [#4442](https://github.com/kangax/fabric.js/pull/4442)
+  - safeguard shaders for non supported precisions [#4433](https://github.com/kangax/fabric.js/pull/4433)
+  - fix insert and remove style for edge cases [#4420](https://github.com/kangax/fabric.js/pull/4420)
+  - Fix object.move when in active selection [#4394](https://github.com/kangax/fabric.js/pull/4394)
+  - Memoize calcTransformMatrix function [#4418](https://github.com/kangax/fabric.js/pull/4418)
+  - Make \_set flag object as dirty just when a real change happen[#4415](https://github.com/kangax/fabric.js/pull/4415)
+  - Add browserShadowBlurConstant to adjust shadowBlur value [#4413](https://github.com/kangax/fabric.js/pull/4413)
+  - Fix set element not clearing the cacheTexture. [#4410](https://github.com/kangax/fabric.js/pull/4410)
+  - Multi selection key can be configured with an array of keys. [#4363](https://github.com/kangax/fabric.js/pull/4363)
+  - fix fast type in text loosing some style. [#4339](https://github.com/kangax/fabric.js/pull/4339)
+  - fixed division by zero with lockscaling flip.
+  - added paintFirst ( paint-order with svg support ) [#4303](https://github.com/kangax/fabric.js/pull/4303)
+- beta7
+  - added a build flag for not attaching fabric to window [#4199](https://github.com/kangax/fabric.js/pull/4199)
+  - removed .active property from objects [#4200](https://github.com/kangax/fabric.js/pull/4200)
+  - Normalize Api for getSelectionStyles, setSelectionStyles [#4202](https://github.com/kangax/fabric.js/pull/4202)
+  - Fix shader for convolute filter [#4207](https://github.com/kangax/fabric.js/pull/4207)
+  - Better mouse support for lockscaling flip [#4225](https://github.com/kangax/fabric.js/pull/4225)
+  - Fix toDataUrl getting a blank canvas [#4229](https://github.com/kangax/fabric.js/pull/4229)
+  - Ouput version to json Objects [#4251](https://github.com/kangax/fabric.js/pull/4251)
+  - Use backstoreOnly for toDataUrl resize [#4254](https://github.com/kangax/fabric.js/pull/4254)
+  - Fix safari svg whitespace [#4294](https://github.com/kangax/fabric.js/pull/4294)
+  - Fix Gradient export for paths [#4274](https://github.com/kangax/fabric.js/pull/4274)
+  - Move mouseout/over in mousemove events [#4283](https://github.com/kangax/fabric.js/pull/4283)
+  - Fix detection of click at the end of line [#4295](https://github.com/kangax/fabric.js/pull/4295)
+  - added new event selection:updated [#4311](https://github.com/kangax/fabric.js/pull/4311)
+  - Fixed free drawing path displacement [#4311](https://github.com/kangax/fabric.js/pull/4311)
+  - Fixed scale equally and flipping not happening [#4313](https://github.com/kangax/fabric.js/pull/4313)
+  - Select by drag makes the object fires 'selected' [#4314](https://github.com/kangax/fabric.js/pull/4314)
+- beta6
+  - incompat: New filter system with WEBGL.
+  - incompat: New Text/IText/Textbox code. Multibyte compatible, more accurate.
+  - incompat: RequestAnimationFrame is used for the automatic render calls.
+  - incompat: Named setter/getter are optional now.
+  - incompat: Removed PathGroup class
+  - incompat: Paths cannot be restored anymore from strings [#3713](https://github.com/kangax/fabric.js/pull/3713)
+  - incompat: bumped node version to 4+ and jsdom to 9. [#3717](https://github.com/kangax/fabric.js/pull/3717)
+  - incompat: removed the es5 / JSON shim support [#3722](https://github.com/kangax/fabric.js/pull/3722)
+  - fix/incompat: IText setSelectionStyles does not change anymore style if no selection is present [#3765](https://github.com/kangax/fabric.js/pull/3765)
+  - skipOffscreen default to true
+  - Text.setSelectionStyle does not change anything if there is no selection [#3765](https://github.com/kangax/fabric.js/pull/3765)
+  - Switch to canvas-prebuilt as dependency. Added parameter to choose the canvas package [#3757](https://github.com/kangax/fabric.js/pull/3757)
+  - improvement: renderControls can now be called on its own. Added parameter styleOverride to allow for overriding current properties [#3887](https://github.com/kangax/fabric.js/pull/3887)
+  - removed hasMoved and saveCoords from Group class [#3910](https://github.com/kangax/fabric.js/pull/3910)
+  - forced all fromObject and fromElement to be async, normalized api. [#3996](https://github.com/kangax/fabric.js/pull/3996)
+  - improvement: added support for request animation frame in mouse events [#3997](https://github.com/kangax/fabric.js/pull/3997)
+  - added dblclick support for all objects [#3998](https://github.com/kangax/fabric.js/pull/3997)
+  - textbox scale as a normal object [#4052](https://github.com/kangax/fabric.js/pull/4052)
+  - Removed image meetOrSlice, alignX, alignY, introduced cropX, cropY [#4055](https://github.com/kangax/fabric.js/pull/4055)
+  - Added Text.cleanStyle, Text.removeStyle [#4060](https://github.com/kangax/fabric.js/pull/4060)
+  - change: lockRotation will not hide the mtr control anymore. introduced notAllowedCursor for canvas. [#4064](https://github.com/kangax/fabric.js/pull/4064)
+  - improvement: added 2 percentage values to fabric.util.animate. [#4068](https://github.com/kangax/fabric.js/pull/4068)
+  - change: pathOffset does not get exported anymore in path.toObject, toDatalessObject export sourcePath instead of modifying path. [#4108](https://github.com/kangax/fabric.js/pull/4108)
 
 ## [1.7.19]
 
 - Fixed the flip of images with scale equally [#4313](https://github.com/kangax/fabric.js/pull/4313)
 - Improved touch detection [#4302](https://github.com/kangax/fabric.js/pull/4302)
-
 
 ## [1.7.18]
 
@@ -653,7 +698,6 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Fix: activeGroup did not destroy correctly if a toObject was happening
 - Improvement: Pass the event to object:modified when available. [#4061](https://github.com/kangax/fabric.js/pull/4061)
 
-
 ## [1.7.15]
 
 - Improvement: Made iText keymap public. [#4053](https://github.com/kangax/fabric.js/pull/4053)
@@ -674,7 +718,6 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Fix: properly set options from path fromDatalessObjects [#3995](https://github.com/kangax/fabric.js/pull/3995)
 - Check for slice before action.slice. Avoid conflicts with heavy customized code. [#3992](https://github.com/kangax/fabric.js/pull/3992)
 
-
 ## [1.7.12]
 
 - Fix: removed possible memleaks from window resize event. [#3984](https://github.com/kangax/fabric.js/pull/3984)
@@ -686,7 +729,6 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Improvement: better management of right/middle click [#3888](https://github.com/kangax/fabric.js/pull/3888)
 - Fix: subTargetCheck on activeObject/activeGroup was firing too many events [#3909](https://github.com/kangax/fabric.js/pull/3909)
 - Fix: After addWithUpdate or removeWithUpdate object coords must be updated. [#3911](https://github.com/kangax/fabric.js/pull/3911)
-
 
 ## [1.7.11]
 
@@ -760,7 +802,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 
 ## [1.7.3]
 
-- Improvement: mousewheel event is handled with target and fired also from objects.  [#3612](https://github.com/kangax/fabric.js/pull/3612)
+- Improvement: mousewheel event is handled with target and fired also from objects. [#3612](https://github.com/kangax/fabric.js/pull/3612)
 - Improvement: Pattern loads for canvas background and overlay, corrected svg pattern export [#3601](https://github.com/kangax/fabric.js/pull/3601)
 - Fix: Wait for pattern loading before calling callback [#3598](https://github.com/kangax/fabric.js/pull/3598)
 - Fix: add 2 extra pixels to cache canvases to avoid aliasing cut [#3596](https://github.com/kangax/fabric.js/pull/3596)
@@ -875,12 +917,12 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Fix: iText mousemove event removal, clear the correct area for Itext, stopped redrawing selection if not necessary [#3016](https://github.com/kangax/fabric.js/pull/3016)
 - Fix: background image and overlay image scale and move with canvas viewportTransform, parameter available [#3019](https://github.com/kangax/fabric.js/pull/3019)
 - Added: support sub targeting in groups in events [#2997](https://github.com/kangax/fabric.js/pull/2997)
-- Fix: Select transparent object on mouse up because of _maybeGroupObject [#2997](https://github.com/kangax/fabric.js/pull/2997)
+- Fix: Select transparent object on mouse up because of \_maybeGroupObject [#2997](https://github.com/kangax/fabric.js/pull/2997)
 - Fix: Remove reference to lastRenderedObject on canvas.remove [#3023](https://github.com/kangax/fabric.js/pull/3023)
 - Fix: Wait for all objects to be loaded before deleting the properties and setting options. [#3029](https://github.com/kangax/fabric.js/pull/3029)
 - Fix: Object Padding is unaffected by object transform. [#3057](https://github.com/kangax/fabric.js/pull/3057)
 - Fix: Restore lastRenderedObject usage. Introduced Canvas.lastRenderedKey to retrieve the lastRendered object from down the stack [#3057](https://github.com/kangax/fabric.js/pull/3057)
-- Fix: _calcTextareaPosition correctly calculate the position considering the viewportTransform. [#3057](https://github.com/kangax/fabric.js/pull/3057)
+- Fix: \_calcTextareaPosition correctly calculate the position considering the viewportTransform. [#3057](https://github.com/kangax/fabric.js/pull/3057)
 - Fix: Fixed selectionBacgroundColor with viewport transform. [#3057](https://github.com/kangax/fabric.js/pull/3057)
 - Improvement: Correctly render the cursor with viewport scaling, improved the cursor centering. [#3057](https://github.com/kangax/fabric.js/pull/3057)
 - Fix: Use canvas zoom and pan when using is target transparent. [#2980](https://github.com/kangax/fabric.js/pull/2980)
@@ -889,7 +931,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 
 - Fix: restore canvas properties on loadFromJSON with includeProperties. [#2921](https://github.com/kangax/fabric.js/pull/2921)
 - Fix: Allow hoverCursor on non selectable objects, moveCursor does not appear if the object is not moveable.
-Added object.moveCursor to specify a cursor for moving per object. [#2924](https://github.com/kangax/fabric.js/pull/2924)
+  Added object.moveCursor to specify a cursor for moving per object. [#2924](https://github.com/kangax/fabric.js/pull/2924)
 - Fix: Add missing stroke.live translation, allow gradientTransform for dashed line. [#2926](https://github.com/kangax/fabric.js/pull/2926)
 - Improvement: Allow customization of keys that iteract with mouse action ( multiselect key, free transform key, alternative action key, centered transform key ) [#2925](https://github.com/kangax/fabric.js/pull/2925)
 - Added: Make iText fires object:modified on text change on exit editing [#2927](https://github.com/kangax/fabric.js/pull/2927)
@@ -905,7 +947,6 @@ Added object.moveCursor to specify a cursor for moving per object. [#2924](https
 - Fix: minScaleLimit rounding bug [#2964](https://github.com/kangax/fabric.js/pull/2964)
 - Fix: Itext spacing in justify mode bug [#2971](https://github.com/kangax/fabric.js/pull/2971)
 - Fix: Object.toDataUrl export when some window.devicepixelRatio is present (retina or browser zoom) [#2972](https://github.com/kangax/fabric.js/pull/2972)
-
 
 ## [1.6.1]
 
@@ -930,7 +971,7 @@ Added object.moveCursor to specify a cursor for moving per object. [#2924](https
 - Fix `fabric.Path` initialize with user options [#2117](https://github.com/kangax/fabric.js/pull/2117)
 - Fix sorting of objects in activeGroup during rendering [#2130](https://github.com/kangax/fabric.js/pull/2130).
 - Make sure that 'object.canvas' property is always set if the object is directly or indirectly on canvas [#2141](https://github.com/kangax/fabric.js/pull/2141)
-- Fix _getTopLeftCoords function that was returning TopCenter [#2127](https://github.com/kangax/fabric.js/pull/2127)
+- Fix \_getTopLeftCoords function that was returning TopCenter [#2127](https://github.com/kangax/fabric.js/pull/2127)
 - Fix events not being fired after resize with pinch zoom [#510](https://github.com/kangax/fabric.js/pull/510)
 - Fix mouse:over, mouse:out events not receiving event object [#2146](https://github.com/kangax/fabric.js/pull/2146)
 - Don't include elements from `<metadata>` during SVG parsing [#2160](https://github.com/kangax/fabric.js/pull/2160)
@@ -942,7 +983,7 @@ Added object.moveCursor to specify a cursor for moving per object. [#2924](https
 - Fix image.filter.Resize toObject and fromObject [#2164](https://github.com/kangax/fabric.js/pull/2164)
 - Fix strokeWidth calculation during resize operations [#2178](https://github.com/kangax/fabric.js/pull/2178)
 - Fix iText selection on upperCanvas to support transformMatrix [#2173](https://github.com/kangax/fabric.js/pull/2173)
-- Removed unnecessary calls to removeShadow and restoreGlobalCompositeOperation  [#2175](https://github.com/kangax/fabric.js/pull/2175)
+- Removed unnecessary calls to removeShadow and restoreGlobalCompositeOperation [#2175](https://github.com/kangax/fabric.js/pull/2175)
 - Fix the offset for pattern and gradients filling and stroking in text [#2183](https://github.com/kangax/fabric.js/pull/2183)
 - Fix loading of stroke gradients from Object [#2182](https://github.com/kangax/fabric.js/pull/2182)
 - Fix segmentation fault on node.js when image doesn't exist [#2193](https://github.com/kangax/fabric.js/pull/2193)
@@ -967,14 +1008,14 @@ Added object.moveCursor to specify a cursor for moving per object. [#2924](https
 - Fix BoundingBox calculation for pathGroups that have inner transformMatrix [#2348](https://github.com/kangax/fabric.js/pull/2348)
 - Fix export toObject to include transformMatrix property [#2350](https://github.com/kangax/fabric.js/pull/2350)
 - Fix textbox class to supporto toSVG() and newest style fixes [#2347]
-(https://github.com/kangax/fabric.js/pull/2347)
+  (https://github.com/kangax/fabric.js/pull/2347)
 - Fix regression on text ( textDecoration and textlinebackground ) [#2354](https://github.com/kangax/fabric.js/pull/2354)
 - Add support for multi keys chars using onInput event [#2352](https://github.com/kangax/fabric.js/pull/2352)
 - Fix iText and textbox entering in edit mode if clicked on a corner [#2393](https://github.com/kangax/fabric.js/pull/2393)
 - Fix iText styles error when in justify align [#2370](https://github.com/kangax/fabric.js/pull/2370)
 - Add support for shadow export in svg for groups, pathgroups and images. [#2364]
 - Add rendering shadows for groups [#2364](https://github.com/kangax/fabric.js/pull/2364)
-- Add support for parsing nested SVGs  x and y attributes [#2399](https://github.com/kangax/fabric.js/pull/2399)
+- Add support for parsing nested SVGs x and y attributes [#2399](https://github.com/kangax/fabric.js/pull/2399)
 - Add support for gradientTransform in setGradient(fill or stroke) [#2401](https://github.com/kangax/fabric.js/pull/2401)
 - Fix Error in svg parsed that was stopping on gradient color-stop missing stop attribute [#2414](https://github.com/kangax/fabric.js/pull/2414)
 - toObject method return copied arrays for array like properties [#2407](https://github.com/kangax/fabric.js/pull/2407)
@@ -986,7 +1027,7 @@ Added object.moveCursor to specify a cursor for moving per object. [#2924](https
 - Add support for skewing objects using shift and m-controls in interactive mode, and using object.skewX/Y [#2482](https://github.com/kangax/fabric.js/pull/2482)
 - Fix gradientTransform not exported in gradient toObject [#2486](https://github.com/kangax/fabric.js/pull/2486)
 - Fix object.toDataUrl with multiplier [#2487](https://github.com/kangax/fabric.js/pull/2487)
-BACK INCOMPATIBILITY: removed 'allOnTop' parameter from fabric.StaticCanvas.renderAll.
+  BACK INCOMPATIBILITY: removed 'allOnTop' parameter from fabric.StaticCanvas.renderAll.
 - Fix mask filter, mask image is now streched on all image [#2543](https://github.com/kangax/fabric.js/pull/2543)
 - Fix text onInput event to behave correctly if some text is selected [#2501](https://github.com/kangax/fabric.js/pull/2502)
 - Fix object with selectable = false could be selected with shift click [#2503](https://github.com/kangax/fabric.js/pull/2503)
@@ -1028,6 +1069,7 @@ BACK INCOMPATIBILITY: removed 'allOnTop' parameter from fabric.StaticCanvas.rend
 ## [1.5.0]
 
 **Edge**
+
 - Added image preserve aspect ratio attributes and functionality (fabric.Image.alignY, fabric.Image.alignY, fabric.Image.meetOrSlic )
 - Added ImageResizeFilters , option to resize dynamically or statically the images using a set of resize filter alghoritms.
 - [BACK_INCOMPAT] `fabric.Collection#remove` doesn't return removed object -> returns `this` (chainable)
@@ -1083,7 +1125,7 @@ BACK INCOMPATIBILITY: removed 'allOnTop' parameter from fabric.StaticCanvas.rend
 - [BACK_INCOMPAT] `fabric.Text#strokeStyle` -> `fabric.Text#stroke`, for consistency with other objects.
 
 - [BACK_INCOMPAT] `fabric.Object.setActive(…)` -> `fabric.Object.set('active', …)`.
-                `fabric.Object.isActive` is gone (use `fabric.Object.active` instead)
+  `fabric.Object.isActive` is gone (use `fabric.Object.active` instead)
 
 - [BACK_INCOMPAT] `fabric.Group#objects` -> `fabric.Group._objects`.
 
@@ -1092,7 +1134,7 @@ BACK INCOMPATIBILITY: removed 'allOnTop' parameter from fabric.StaticCanvas.rend
 - [BACK_INCOMPAT] `fabric.Text#setFontsize` becomes `fabric.Object#setFontSize`.
 
 - [BACK_INCOMPAT] `fabric.Canvas.toDataURL` now accepts options object instead linear arguments.
-                `fabric.Canvas.toDataURLWithMultiplier` is deprecated;
-                use `fabric.Canvas.toDataURL({ multiplier: … })` instead
+  `fabric.Canvas.toDataURLWithMultiplier` is deprecated;
+  use `fabric.Canvas.toDataURL({ multiplier: … })` instead
 
 ## [1.0.0]
