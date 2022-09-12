@@ -55,20 +55,25 @@ export const loadImage = (
   });
 
 type EnlivenObjectOptions = {
+  /**
+   * handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   */
   signal?: AbortSignal;
-  reviver?: (arg: any, arg2: TObject) => void;
+
+  /**
+   * Method for further parsing of object elements,
+   * called after each fabric object created.
+   */
+  reviver?: (serializedObj: Record<string, unknown>, instance: TObject) => void;
 };
 
 /**
  * Creates corresponding fabric instances from their object representations
  * @static
  * @memberOf fabric.util
- * @param {Object[]} objects Objects to enliven
- * @param {object} [options]
- * @param {(serializedObj: object, instance: fabric.Object) => any} [options.reviver] Method for further parsing of object elements,
- * called after each fabric object created.
- * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
- * @returns {Promise<fabric.Object[]>}
+ * @param {object[]} objects Objects to enliven
+ * @param {EnlivenObjectOptions} [options]
+ * @returns {Promise<TObject[]>}
  */
 export const enlivenObjects = (
   objects: Record<string, unknown>[],
