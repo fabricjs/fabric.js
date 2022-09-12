@@ -56,8 +56,7 @@ export const loadImage = (
 
 type EnlivenObjectOptions = {
   signal?: AbortSignal;
-  reviver?: (arg: any, arg2: any) => void;
-  namespace?: any;
+  reviver?: (arg: any, arg2: TObject) => void;
 };
 
 /**
@@ -66,7 +65,6 @@ type EnlivenObjectOptions = {
  * @memberOf fabric.util
  * @param {Object[]} objects Objects to enliven
  * @param {object} [options]
- * @param {object} [options.namespace] Namespace to get klass "Class" object from
  * @param {(serializedObj: object, instance: fabric.Object) => any} [options.reviver] Method for further parsing of object elements,
  * called after each fabric object created.
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
@@ -74,7 +72,7 @@ type EnlivenObjectOptions = {
  */
 export const enlivenObjects = (
   objects: TObject[],
-  { signal, reviver = noop, namespace = fabric }: EnlivenObjectOptions = {}
+  { signal, reviver = noop }: EnlivenObjectOptions = {}
 ) =>
   new Promise<TObject[]>((resolve, reject) => {
     const instances: TObject[] = [];
@@ -85,7 +83,6 @@ export const enlivenObjects = (
         const fabricInstance = (await handler(obj, {
           signal,
           reviver,
-          namespace,
         })) as TObject;
         reviver(obj, fabricInstance);
         instances.push(fabricInstance);
