@@ -29,16 +29,6 @@
       options.height = opts.height;
     }
     return new fabric[fabricClass](null, options);
-  };
-
-  function getAbsolutePath(path) {
-    var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) { return path; };
-    var imgEl = fabric.document.createElement('img');
-    imgEl.src = path;
-    var src = imgEl.src;
-    imgEl = null;
-    return src;
   }
 
   function localPath(path, filename) {
@@ -47,18 +37,18 @@
 
   function getAssetName(filename) {
     var finalName = '/assets/' + filename + '.svg';
-    return fabric.isLikelyNode ? localPath('/../visual', finalName) : getAbsolutePath('/test/visual' + finalName);
+    return fabric.isLikelyNode ? localPath('/../visual', finalName) : finalName;
   }
   exports.getAssetName = getAssetName;
 
   function getGoldeName(filename) {
     var finalName = '/golden/' + filename;
-    return fabric.isLikelyNode ? localPath('/../visual', finalName) : getAbsolutePath('/test/visual' + finalName);
+    return fabric.isLikelyNode ? localPath('/../visual', finalName) : finalName;
   }
 
   function getFixtureName(filename) {
     var finalName = '/fixtures/' + filename;
-    return fabric.isLikelyNode ? localPath('/..', finalName) : getAbsolutePath('/test' + finalName);
+    return fabric.isLikelyNode ? localPath('/..', finalName) : finalName;
   }
 
   function generateGolden(filename, original) {

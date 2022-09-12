@@ -21,6 +21,8 @@ module.exports = {
     ...config.routes,
     '/golden_maker': 'test/lib/goldenMaker.html',
     '/golden_maker.html': 'test/lib/goldenMaker.html',
+    '/golden': 'test/visual/golden',
+    '/assets': 'test/visual/assets',
   },
   launchers: {
     Node: {

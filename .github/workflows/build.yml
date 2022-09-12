@@ -1,5 +1,3 @@
-# This workflow will install Uglify and verify that fabric can be build with it
-
 name: '🩺'
 
 on:
@@ -27,7 +25,18 @@ jobs:
         node-version: 16.x
     - run: npm ci
     - run: npm run lint
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Prettier check
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+    - run: npm ci
+    - run: npm run prettier:check
   coverage:
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
