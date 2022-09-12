@@ -1,6 +1,7 @@
 //@ts-nocheck
 
 import { registerClass } from '../Registry';
+import { stylesFromArray } from '../util/misc/textStyles';
 
 (function (global) {
   var fabric = global.fabric;
@@ -628,12 +629,16 @@ import { registerClass } from '../Registry';
    * @returns {Promise<fabric.IText>}
    */
   fabric.IText.fromObject = function (object) {
-    var styles = fabric.util.stylesFromArray(object.styles, object.text);
-    //copy object to prevent mutation
-    var objCopy = Object.assign({}, object, { styles: styles });
-    return fabric.Object._fromObject(fabric.IText, objCopy, {
-      extraParam: 'text',
-    });
+    return fabric.Object._fromObject(
+      fabric.IText,
+      {
+        ...object,
+        styles: stylesFromArray(object.styles, object.text),
+      },
+      {
+        extraParam: 'text',
+      }
+    );
   };
 
   registerClass('itext', fabric.IText);

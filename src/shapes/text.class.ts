@@ -3,6 +3,7 @@
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { registerClass } from '../Registry';
+import { stylesFromArray } from '../util/misc/textStyles';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {});
@@ -1898,12 +1899,16 @@ import { registerClass } from '../Registry';
    * @returns {Promise<fabric.Text>}
    */
   fabric.Text.fromObject = function (object) {
-    var styles = fabric.util.stylesFromArray(object.styles, object.text);
-    //copy object to prevent mutation
-    var objCopy = Object.assign({}, object, { styles: styles });
-    return fabric.Object._fromObject(fabric.Text, objCopy, {
-      extraParam: 'text',
-    });
+    return fabric.Object._fromObject(
+      fabric.Text,
+      {
+        ...object,
+        styles: stylesFromArray(object.styles, object.text),
+      },
+      {
+        extraParam: 'text',
+      }
+    );
   };
 
   fabric.Text.genericFonts = [
