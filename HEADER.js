@@ -1,11 +1,13 @@
 import { cache } from './src/cache';
 import { config } from './src/config';
 import { iMatrix, VERSION } from './src/constants';
+import { registry } from './src/Registry';
 
 var fabric = fabric || {
   version: VERSION,
   config,
   cache,
+  registry,
   iMatrix,
 };
 
