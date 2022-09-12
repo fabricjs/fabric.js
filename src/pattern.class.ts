@@ -1,16 +1,22 @@
 //@ts-nocheck
 
-import { fabric } from "../HEADER";
-import { config } from "./config";
-import { TCrossOrigin, TMat2D, TSize } from "./typedefs";
-import { ifNaN } from "./util/internals";
-import { loadImage } from "./util/misc/objectEnlive";
-import { pick } from "./util/misc/pick";
-import { toFixed } from "./util/misc/toFixed";
+import { fabric } from '../HEADER';
+import { config } from './config';
+import { TCrossOrigin, TMat2D, TSize } from './typedefs';
+import { ifNaN } from './util/internals';
+import { loadImage } from './util/misc/objectEnlive';
+import { pick } from './util/misc/pick';
+import { toFixed } from './util/misc/toFixed';
 
 export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
 
-type TExportedKeys = 'crossOrigin' | 'offsetX' | 'offsetY' | 'patternTransform' | 'repeat' | 'source';
+type TExportedKeys =
+  | 'crossOrigin'
+  | 'offsetX'
+  | 'offsetY'
+  | 'patternTransform'
+  | 'repeat'
+  | 'source';
 
 export type TPatternOptions = Partial<Pick<Pattern, TExportedKeys>>;
 
@@ -23,8 +29,8 @@ export type TPatternHydrationOptions = {
    * handle aborting
    * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    */
-  signal: AbortSignal
-}
+  signal: AbortSignal;
+};
 
 type TImageSource = { source: HTMLImageElement };
 type TCanvasSource = { source: HTMLCanvasElement };
@@ -34,43 +40,42 @@ type TCanvasSource = { source: HTMLCanvasElement };
  * @see {@link http://fabricjs.com/dynamic-patterns demo}
  */
 export class Pattern {
-
-  type = 'pattern'
+  type = 'pattern';
 
   /**
    * @type TPatternRepeat
    * @defaults
    */
-  repeat: TPatternRepeat = 'repeat'
+  repeat: TPatternRepeat = 'repeat';
 
   /**
    * Pattern horizontal offset from object's left/top corner
    * @type Number
    * @default
    */
-  offsetX = 0
+  offsetX = 0;
 
   /**
    * Pattern vertical offset from object's left/top corner
    * @type Number
    * @default
    */
-  offsetY = 0
+  offsetY = 0;
 
   /**
    * @type TCrossOrigin
    * @default
    */
-  crossOrigin: TCrossOrigin = ''
+  crossOrigin: TCrossOrigin = '';
 
   /**
    * transform matrix to change the pattern, imported from svgs.
    * @type Array
    * @default
    */
-  patternTransform: TMat2D | null = null
+  patternTransform: TMat2D | null = null;
 
-  source!: CanvasImageSource
+  source!: CanvasImageSource;
 
   readonly id: number;
 
@@ -106,13 +111,12 @@ export class Pattern {
   }
 
   sourceToString() {
-    return this.isImageSource() ?
-      this.source.src :
-      this.isCanvasSource() ?
-        this.source.toDataURL() :
-        '';
+    return this.isImageSource()
+      ? this.source.src
+      : this.isCanvasSource()
+      ? this.source.toDataURL()
+      : '';
   }
-
 
   /**
    * Returns an instance of CanvasPattern
@@ -122,10 +126,12 @@ export class Pattern {
   toLive(ctx: CanvasRenderingContext2D) {
     if (
       // if the image failed to load, return, and allow rest to continue loading
-      !this.source
+      !this.source ||
       // if an image
-      || (this.isImageSource()
-        && (!this.source.complete || this.source.naturalWidth === 0 || this.source.naturalHeight === 0))
+      (this.isImageSource() &&
+        (!this.source.complete ||
+          this.source.naturalWidth === 0 ||
+          this.source.naturalHeight === 0))
     ) {
       return '';
     }
@@ -147,7 +153,9 @@ export class Pattern {
       crossOrigin: this.crossOrigin,
       offsetX: toFixed(this.offsetX, config.NUM_FRACTION_DIGITS),
       offsetY: toFixed(this.offsetY, config.NUM_FRACTION_DIGITS),
-      patternTransform: this.patternTransform ? this.patternTransform.concat() : null
+      patternTransform: this.patternTransform
+        ? this.patternTransform.concat()
+        : null,
     };
   }
 
@@ -159,30 +167,36 @@ export class Pattern {
     const patternSource = this.source,
       patternOffsetX = ifNaN(this.offsetX / width, 0),
       patternOffsetY = ifNaN(this.offsetY / height, 0),
-      patternWidth = this.repeat === 'repeat-y' || this.repeat === 'no-repeat' ?
-        1 + Math.abs(patternOffsetX || 0) :
-        ifNaN(patternSource.width / width, 0),
-      patternHeight = this.repeat === 'repeat-x' || this.repeat === 'no-repeat' ?
-        1 + Math.abs(patternOffsetY || 0) :
-        ifNaN(patternSource.height / height, 0);
+      patternWidth =
+        this.repeat === 'repeat-y' || this.repeat === 'no-repeat'
+          ? 1 + Math.abs(patternOffsetX || 0)
+          : ifNaN(patternSource.width / width, 0),
+      patternHeight =
+        this.repeat === 'repeat-x' || this.repeat === 'no-repeat'
+          ? 1 + Math.abs(patternOffsetY || 0)
+          : ifNaN(patternSource.height / height, 0);
 
     return [
       `<pattern id="SVGID_${this.id}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`,
-      `<image x="0" y="0" width="${patternSource.width}" height="${patternSource.height}" xlink:href="${this.sourceToString()}"></image>`,
+      `<image x="0" y="0" width="${patternSource.width}" height="${
+        patternSource.height
+      }" xlink:href="${this.sourceToString()}"></image>`,
       `</pattern>`,
-      ''
+      '',
     ].join('\n');
   }
   /* _TO_SVG_END_ */
 
-  static async fromObject({ source, ...serialized }: TPatternSerialized, options: TPatternHydrationOptions) {
+  static async fromObject(
+    { source, ...serialized }: TPatternSerialized,
+    options: TPatternHydrationOptions
+  ) {
     const img = await loadImage(source, {
       ...options,
-      crossOrigin: serialized.crossOrigin
-    })
+      crossOrigin: serialized.crossOrigin,
+    });
     return new Pattern({ ...serialized, source: img });
   }
 }
-
 
 fabric.Pattern = Pattern;

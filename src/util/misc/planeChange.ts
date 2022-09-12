@@ -1,7 +1,11 @@
-import type { TMat2D } from "../../typedefs";
-import { invertTransform, multiplyTransformMatrices, transformPoint } from "./matrix";
-import { iMatrix } from "../../constants";
-import type { IPoint, Point } from "../../point.class";
+import type { TMat2D } from '../../typedefs';
+import {
+  invertTransform,
+  multiplyTransformMatrices,
+  transformPoint,
+} from './matrix';
+import { iMatrix } from '../../constants';
+import type { IPoint, Point } from '../../point.class';
 import { applyTransformToObject } from './objectTransforms';
 
 export const enum ObjectRelation {
@@ -28,7 +32,11 @@ export const enum ObjectRelation {
  * @param {TMat2D} [to] destination plane matrix to contain object. Passing `null` means `point` should be sent to the canvas coordinate plane.
  * @returns {Point} transformed point
  */
-export const sendPointToPlane = (point: IPoint, from: TMat2D = iMatrix, to: TMat2D = iMatrix): Point =>
+export const sendPointToPlane = (
+  point: IPoint,
+  from: TMat2D = iMatrix,
+  to: TMat2D = iMatrix
+): Point =>
   //  we are actually looking for the transformation from the destination plane to the source plane (which is a linear mapping)
   //  the object will exist on the destination plane and we want it to seem unchanged by it so we reverse the destination matrix (to) and then apply the source matrix (from)
   transformPoint(point, multiplyTransformMatrices(invertTransform(to), from));
@@ -59,17 +67,26 @@ export const transformPointRelativeToCanvas = (
   relationAfter: ObjectRelation
 ): Point => {
   // is this still needed with TS?
-  if (relationBefore !== ObjectRelation.child && relationBefore !== ObjectRelation.sibling) {
+  if (
+    relationBefore !== ObjectRelation.child &&
+    relationBefore !== ObjectRelation.sibling
+  ) {
     throw new Error('fabric.js: received bad argument ' + relationBefore);
   }
-  if (relationAfter !== ObjectRelation.child && relationAfter !== ObjectRelation.sibling) {
+  if (
+    relationAfter !== ObjectRelation.child &&
+    relationAfter !== ObjectRelation.sibling
+  ) {
     throw new Error('fabric.js: received bad argument ' + relationAfter);
   }
   if (relationBefore === relationAfter) {
     return point;
   }
   const t = canvas.viewportTransform;
-  return transformPoint(point, relationAfter === 'child' ? invertTransform(t) : t);
+  return transformPoint(
+    point,
+    relationAfter === 'child' ? invertTransform(t) : t
+  );
 };
 
 /**
@@ -104,7 +121,11 @@ export const transformPointRelativeToCanvas = (
  * @param {Matrix} [to] destination plane matrix to contain object. Passing `null` means `object` should be sent to the canvas coordinate plane.
  * @returns {Matrix} the transform matrix that was applied to `object`
  */
-export const sendObjectToPlane = (object: any, from: TMat2D = iMatrix, to: TMat2D = iMatrix): TMat2D => {
+export const sendObjectToPlane = (
+  object: any,
+  from: TMat2D = iMatrix,
+  to: TMat2D = iMatrix
+): TMat2D => {
   //  we are actually looking for the transformation from the destination plane to the source plane (which is a linear mapping)
   //  the object will exist on the destination plane and we want it to seem unchanged by it so we reverse the destination matrix (to) and then apply the source matrix (from)
   const t = multiplyTransformMatrices(invertTransform(to), from);

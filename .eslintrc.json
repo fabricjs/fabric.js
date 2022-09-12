@@ -40,14 +40,8 @@
       }
     ],
     "guard-for-in": 0,
-    "wrap-iife": [
-      2,
-      "inside"
-    ],
-    "linebreak-style": [
-      2,
-      "unix"
-    ],
+    "wrap-iife": [2, "inside"],
+    "linebreak-style": [2, "unix"],
     "no-loop-func": 2,
     "no-multi-str": 2,
     "no-caller": 2,
@@ -63,31 +57,13 @@
     "dot-notation": 2,
     "no-undef": 2,
     "no-unused-vars": 2,
-    "max-depth": [
-      2,
-      4
-    ],
-    "max-statements": [
-      2,
-      150
-    ],
-    "curly": [
-      2,
-      "all"
-    ],
-    "keyword-spacing": [
-      2,
-      {}
-    ],
+    "max-depth": [2, 4],
+    "max-statements": [2, 150],
+    "curly": [2, "all"],
+    "keyword-spacing": [2, {}],
     "space-infix-ops": 2,
-    "array-bracket-spacing": [
-      2,
-      "never"
-    ],
-    "comma-style": [
-      2,
-      "last"
-    ],
+    "array-bracket-spacing": [2, "never"],
+    "comma-style": [2, "last"],
     "camelcase": [
       2,
       {
@@ -102,10 +78,7 @@
       }
     ],
     "eol-last": 2,
-    "one-var": [
-      0,
-      "always"
-    ],
+    "one-var": [0, "always"],
     "quote-props": [
       2,
       "as-needed",
@@ -132,10 +105,7 @@
     "no-multiple-empty-lines": 2,
     "no-mixed-spaces-and-tabs": 2,
     "no-trailing-spaces": 2,
-    "quotes": [
-      2,
-      "single"
-    ],
+    "quotes": [2, "single"],
     "indent": [
       2,
       2,
@@ -144,10 +114,7 @@
         "VariableDeclarator": 2
       }
     ],
-    "consistent-this": [
-      2,
-      "_this"
-    ],
+    "consistent-this": [2, "_this"],
     "valid-jsdoc": [
       0,
       {

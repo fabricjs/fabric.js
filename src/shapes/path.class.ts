@@ -1,13 +1,12 @@
 //@ts-nocheck
 
-import { config } from "../config";
+import { config } from '../config';
 
-
-(function(global) {
-  var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend,
-      clone = fabric.util.object.clone,
-      toFixed = fabric.util.toFixed;
+(function (global) {
+  var fabric = global.fabric || (global.fabric = {}),
+    extend = fabric.util.object.extend,
+    clone = fabric.util.object.clone,
+    toFixed = fabric.util.toFixed;
 
   /**
    * Path class
@@ -16,58 +15,65 @@ import { config } from "../config";
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#path_and_pathgroup}
    * @see {@link fabric.Path#initialize} for constructor definition
    */
-  fabric.Path = fabric.util.createClass(fabric.Object, /** @lends fabric.Path.prototype */ {
+  fabric.Path = fabric.util.createClass(
+    fabric.Object,
+    /** @lends fabric.Path.prototype */ {
+      /**
+       * Type of an object
+       * @type String
+       * @default
+       */
+      type: 'path',
 
-    /**
-     * Type of an object
-     * @type String
-     * @default
-     */
-    type: 'path',
+      /**
+       * Array of path points
+       * @type Array
+       * @default
+       */
+      path: null,
 
-    /**
-     * Array of path points
-     * @type Array
-     * @default
-     */
-    path: null,
+      cacheProperties: fabric.Object.prototype.cacheProperties.concat(
+        'path',
+        'fillRule'
+      ),
 
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat('path', 'fillRule'),
+      stateProperties: fabric.Object.prototype.stateProperties.concat('path'),
 
-    stateProperties: fabric.Object.prototype.stateProperties.concat('path'),
+      /**
+       * Constructor
+       * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
+       * @param {Object} [options] Options object
+       * @return {fabric.Path} thisArg
+       */
+      initialize: function (path, options) {
+        options = clone(options || {});
+        delete options.path;
+        this.callSuper('initialize', options);
+        this._setPath(path || [], options);
+      },
 
-    /**
-     * Constructor
-     * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
-     * @param {Object} [options] Options object
-     * @return {fabric.Path} thisArg
-     */
-    initialize: function (path, options) {
-      options = clone(options || {});
-      delete options.path;
-      this.callSuper('initialize', options);
-      this._setPath(path || [], options);
-    },
+      /**
+       * @private
+       * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
+       * @param {Object} [options] Options object
+       */
+      _setPath: function (path, options) {
+        this.path = fabric.util.makePathSimpler(
+          Array.isArray(path) ? path : fabric.util.parsePath(path)
+        );
 
-    /**
-    * @private
-    * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
-    * @param {Object} [options] Options object
-    */
-    _setPath: function (path, options) {
-      this.path = fabric.util.makePathSimpler(
-        Array.isArray(path) ? path : fabric.util.parsePath(path)
-      );
+        fabric.Polyline.prototype._setPositionDimensions.call(
+          this,
+          options || {}
+        );
+      },
 
-      fabric.Polyline.prototype._setPositionDimensions.call(this, options || {});
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx context to render path on
-     */
-    _renderPathCommands: function(ctx) {
-      var current, // current instruction
+      /**
+       * @private
+       * @param {CanvasRenderingContext2D} ctx context to render path on
+       */
+      _renderPathCommands: function (ctx) {
+        var current, // current instruction
           subpathStartX = 0,
           subpathStartY = 0,
           x = 0, // current x
@@ -77,167 +83,189 @@ import { config } from "../config";
           l = -this.pathOffset.x,
           t = -this.pathOffset.y;
 
-      ctx.beginPath();
+        ctx.beginPath();
 
-      for (var i = 0, len = this.path.length; i < len; ++i) {
+        for (var i = 0, len = this.path.length; i < len; ++i) {
+          current = this.path[i];
 
-        current = this.path[i];
+          switch (
+            current[0] // first letter
+          ) {
+            case 'L': // lineto, absolute
+              x = current[1];
+              y = current[2];
+              ctx.lineTo(x + l, y + t);
+              break;
 
-        switch (current[0]) { // first letter
+            case 'M': // moveTo, absolute
+              x = current[1];
+              y = current[2];
+              subpathStartX = x;
+              subpathStartY = y;
+              ctx.moveTo(x + l, y + t);
+              break;
 
-          case 'L': // lineto, absolute
-            x = current[1];
-            y = current[2];
-            ctx.lineTo(x + l, y + t);
-            break;
+            case 'C': // bezierCurveTo, absolute
+              x = current[5];
+              y = current[6];
+              controlX = current[3];
+              controlY = current[4];
+              ctx.bezierCurveTo(
+                current[1] + l,
+                current[2] + t,
+                controlX + l,
+                controlY + t,
+                x + l,
+                y + t
+              );
+              break;
 
-          case 'M': // moveTo, absolute
-            x = current[1];
-            y = current[2];
-            subpathStartX = x;
-            subpathStartY = y;
-            ctx.moveTo(x + l, y + t);
-            break;
+            case 'Q': // quadraticCurveTo, absolute
+              ctx.quadraticCurveTo(
+                current[1] + l,
+                current[2] + t,
+                current[3] + l,
+                current[4] + t
+              );
+              x = current[3];
+              y = current[4];
+              controlX = current[1];
+              controlY = current[2];
+              break;
 
-          case 'C': // bezierCurveTo, absolute
-            x = current[5];
-            y = current[6];
-            controlX = current[3];
-            controlY = current[4];
-            ctx.bezierCurveTo(
-              current[1] + l,
-              current[2] + t,
-              controlX + l,
-              controlY + t,
-              x + l,
-              y + t
-            );
-            break;
-
-          case 'Q': // quadraticCurveTo, absolute
-            ctx.quadraticCurveTo(
-              current[1] + l,
-              current[2] + t,
-              current[3] + l,
-              current[4] + t
-            );
-            x = current[3];
-            y = current[4];
-            controlX = current[1];
-            controlY = current[2];
-            break;
-
-          case 'z':
-          case 'Z':
-            x = subpathStartX;
-            y = subpathStartY;
-            ctx.closePath();
-            break;
+            case 'z':
+            case 'Z':
+              x = subpathStartX;
+              y = subpathStartY;
+              ctx.closePath();
+              break;
+          }
         }
-      }
-    },
+      },
 
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx context to render path on
-     */
-    _render: function(ctx) {
-      this._renderPathCommands(ctx);
-      this._renderPaintInOrder(ctx);
-    },
+      /**
+       * @private
+       * @param {CanvasRenderingContext2D} ctx context to render path on
+       */
+      _render: function (ctx) {
+        this._renderPathCommands(ctx);
+        this._renderPaintInOrder(ctx);
+      },
 
-    /**
-     * Returns string representation of an instance
-     * @return {String} string representation of an instance
-     */
-    toString: function() {
-      return '#<fabric.Path (' + this.complexity() +
-        '): { "top": ' + this.top + ', "left": ' + this.left + ' }>';
-    },
+      /**
+       * Returns string representation of an instance
+       * @return {String} string representation of an instance
+       */
+      toString: function () {
+        return (
+          '#<fabric.Path (' +
+          this.complexity() +
+          '): { "top": ' +
+          this.top +
+          ', "left": ' +
+          this.left +
+          ' }>'
+        );
+      },
 
-    /**
-     * Returns object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} object representation of an instance
-     */
-    toObject: function(propertiesToInclude) {
-      return extend(this.callSuper('toObject', propertiesToInclude), {
-        path: this.path.map(function(item) { return item.slice(); }),
-      });
-    },
+      /**
+       * Returns object representation of an instance
+       * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+       * @return {Object} object representation of an instance
+       */
+      toObject: function (propertiesToInclude) {
+        return extend(this.callSuper('toObject', propertiesToInclude), {
+          path: this.path.map(function (item) {
+            return item.slice();
+          }),
+        });
+      },
 
-    /**
-     * Returns dataless object representation of an instance
-     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-     * @return {Object} object representation of an instance
-     */
-    toDatalessObject: function(propertiesToInclude) {
-      var o = this.toObject(['sourcePath'].concat(propertiesToInclude));
-      if (o.sourcePath) {
-        delete o.path;
-      }
-      return o;
-    },
+      /**
+       * Returns dataless object representation of an instance
+       * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+       * @return {Object} object representation of an instance
+       */
+      toDatalessObject: function (propertiesToInclude) {
+        var o = this.toObject(['sourcePath'].concat(propertiesToInclude));
+        if (o.sourcePath) {
+          delete o.path;
+        }
+        return o;
+      },
 
-    /* _TO_SVG_START_ */
-    /**
-     * Returns svg representation of an instance
-     * @return {Array} an array of strings with the specific svg representation
-     * of the instance
-     */
-    _toSVG: function() {
-      var path = fabric.util.joinPath(this.path);
-      return [
-        '<path ', 'COMMON_PARTS',
-        'd="', path,
-        '" stroke-linecap="round" ',
-        '/>\n'
-      ];
-    },
+      /* _TO_SVG_START_ */
+      /**
+       * Returns svg representation of an instance
+       * @return {Array} an array of strings with the specific svg representation
+       * of the instance
+       */
+      _toSVG: function () {
+        var path = fabric.util.joinPath(this.path);
+        return [
+          '<path ',
+          'COMMON_PARTS',
+          'd="',
+          path,
+          '" stroke-linecap="round" ',
+          '/>\n',
+        ];
+      },
 
-    _getOffsetTransform: function() {
-      var digits = config.NUM_FRACTION_DIGITS;
-      return ' translate(' + toFixed(-this.pathOffset.x, digits) + ', ' +
-          toFixed(-this.pathOffset.y, digits) + ')';
-    },
+      _getOffsetTransform: function () {
+        var digits = config.NUM_FRACTION_DIGITS;
+        return (
+          ' translate(' +
+          toFixed(-this.pathOffset.x, digits) +
+          ', ' +
+          toFixed(-this.pathOffset.y, digits) +
+          ')'
+        );
+      },
 
-    /**
-     * Returns svg clipPath representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
-     */
-    toClipPathSVG: function(reviver) {
-      var additionalTransform = this._getOffsetTransform();
-      return '\t' + this._createBaseClipPathSVGMarkup(
-        this._toSVG(), { reviver: reviver, additionalTransform: additionalTransform }
-      );
-    },
+      /**
+       * Returns svg clipPath representation of an instance
+       * @param {Function} [reviver] Method for further parsing of svg representation.
+       * @return {String} svg representation of an instance
+       */
+      toClipPathSVG: function (reviver) {
+        var additionalTransform = this._getOffsetTransform();
+        return (
+          '\t' +
+          this._createBaseClipPathSVGMarkup(this._toSVG(), {
+            reviver: reviver,
+            additionalTransform: additionalTransform,
+          })
+        );
+      },
 
-    /**
-     * Returns svg representation of an instance
-     * @param {Function} [reviver] Method for further parsing of svg representation.
-     * @return {String} svg representation of an instance
-     */
-    toSVG: function(reviver) {
-      var additionalTransform = this._getOffsetTransform();
-      return this._createBaseSVGMarkup(this._toSVG(), { reviver: reviver, additionalTransform: additionalTransform  });
-    },
-    /* _TO_SVG_END_ */
+      /**
+       * Returns svg representation of an instance
+       * @param {Function} [reviver] Method for further parsing of svg representation.
+       * @return {String} svg representation of an instance
+       */
+      toSVG: function (reviver) {
+        var additionalTransform = this._getOffsetTransform();
+        return this._createBaseSVGMarkup(this._toSVG(), {
+          reviver: reviver,
+          additionalTransform: additionalTransform,
+        });
+      },
+      /* _TO_SVG_END_ */
 
-    /**
-     * Returns number representation of an instance complexity
-     * @return {Number} complexity of this instance
-     */
-    complexity: function() {
-      return this.path.length;
-    },
+      /**
+       * Returns number representation of an instance complexity
+       * @return {Number} complexity of this instance
+       */
+      complexity: function () {
+        return this.path.length;
+      },
 
-    /**
-     * @private
-     */
-    _calcDimensions: function() {
-
-      var aX = [],
+      /**
+       * @private
+       */
+      _calcDimensions: function () {
+        var aX = [],
           aY = [],
           current, // current instruction
           subpathStartX = 0,
@@ -246,81 +274,86 @@ import { config } from "../config";
           y = 0, // current y
           bounds;
 
-      for (var i = 0, len = this.path.length; i < len; ++i) {
+        for (var i = 0, len = this.path.length; i < len; ++i) {
+          current = this.path[i];
 
-        current = this.path[i];
+          switch (
+            current[0] // first letter
+          ) {
+            case 'L': // lineto, absolute
+              x = current[1];
+              y = current[2];
+              bounds = [];
+              break;
 
-        switch (current[0]) { // first letter
+            case 'M': // moveTo, absolute
+              x = current[1];
+              y = current[2];
+              subpathStartX = x;
+              subpathStartY = y;
+              bounds = [];
+              break;
 
-          case 'L': // lineto, absolute
-            x = current[1];
-            y = current[2];
-            bounds = [];
-            break;
+            case 'C': // bezierCurveTo, absolute
+              bounds = fabric.util.getBoundsOfCurve(
+                x,
+                y,
+                current[1],
+                current[2],
+                current[3],
+                current[4],
+                current[5],
+                current[6]
+              );
+              x = current[5];
+              y = current[6];
+              break;
 
-          case 'M': // moveTo, absolute
-            x = current[1];
-            y = current[2];
-            subpathStartX = x;
-            subpathStartY = y;
-            bounds = [];
-            break;
+            case 'Q': // quadraticCurveTo, absolute
+              bounds = fabric.util.getBoundsOfCurve(
+                x,
+                y,
+                current[1],
+                current[2],
+                current[1],
+                current[2],
+                current[3],
+                current[4]
+              );
+              x = current[3];
+              y = current[4];
+              break;
 
-          case 'C': // bezierCurveTo, absolute
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6]
-            );
-            x = current[5];
-            y = current[6];
-            break;
-
-          case 'Q': // quadraticCurveTo, absolute
-            bounds = fabric.util.getBoundsOfCurve(x, y,
-              current[1],
-              current[2],
-              current[1],
-              current[2],
-              current[3],
-              current[4]
-            );
-            x = current[3];
-            y = current[4];
-            break;
-
-          case 'z':
-          case 'Z':
-            x = subpathStartX;
-            y = subpathStartY;
-            break;
+            case 'z':
+            case 'Z':
+              x = subpathStartX;
+              y = subpathStartY;
+              break;
+          }
+          bounds.forEach(function (point) {
+            aX.push(point.x);
+            aY.push(point.y);
+          });
+          aX.push(x);
+          aY.push(y);
         }
-        bounds.forEach(function (point) {
-          aX.push(point.x);
-          aY.push(point.y);
-        });
-        aX.push(x);
-        aY.push(y);
-      }
 
-      var minX = Math.min(...aX) || 0,
+        var minX = Math.min(...aX) || 0,
           minY = Math.min(...aY) || 0,
           maxX = Math.max(...aX) || 0,
           maxY = Math.max(...aY) || 0,
           deltaX = maxX - minX,
           deltaY = maxY - minY;
 
-      return {
-        left: minX,
-        top: minY,
-        width: deltaX,
-        height: deltaY
-      };
+        return {
+          left: minX,
+          top: minY,
+          width: deltaX,
+          height: deltaY,
+        };
+      },
     }
-  });
+  );
 
   /**
    * Creates an instance of fabric.Path from an object
@@ -329,8 +362,10 @@ import { config } from "../config";
    * @param {Object} object
    * @returns {Promise<fabric.Path>}
    */
-  fabric.Path.fromObject = function(object) {
-    return fabric.Object._fromObject(fabric.Path, object, { extraParam: 'path' });
+  fabric.Path.fromObject = function (object) {
+    return fabric.Object._fromObject(fabric.Path, object, {
+      extraParam: 'path',
+    });
   };
 
   /* _FROM_SVG_START_ */
@@ -351,11 +386,15 @@ import { config } from "../config";
    * @param {Object} [options] Options object
    * @param {Function} [callback] Options callback invoked after parsing is finished
    */
-  fabric.Path.fromElement = function(element, callback, options) {
-    var parsedAttributes = fabric.parseAttributes(element, fabric.Path.ATTRIBUTE_NAMES);
+  fabric.Path.fromElement = function (element, callback, options) {
+    var parsedAttributes = fabric.parseAttributes(
+      element,
+      fabric.Path.ATTRIBUTE_NAMES
+    );
     parsedAttributes.fromSVG = true;
-    callback(new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options)));
+    callback(
+      new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options))
+    );
   };
   /* _FROM_SVG_END_ */
-
 })(typeof exports !== 'undefined' ? exports : window);

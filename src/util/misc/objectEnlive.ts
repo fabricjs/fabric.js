@@ -12,12 +12,13 @@ import { createImage } from './dom';
  * @param {object} namespace Namespace to get klass "Class" object from
  * @return {Object} klass "Class"
  */
-export const getKlass = (type: string, namespace = fabric): any => namespace[capitalize(camelize(type), true)];
+export const getKlass = (type: string, namespace = fabric): any =>
+  namespace[capitalize(camelize(type), true)];
 
 type LoadImageOptions = {
   signal?: AbortSignal;
   crossOrigin?: TCrossOrigin;
-}
+};
 
 /**
  * Loads image element from given url and resolve it, or catch.
@@ -28,7 +29,10 @@ type LoadImageOptions = {
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  * @param {Promise<fabric.Image>} img the loaded image.
  */
-export const loadImage = (url: string, { signal, crossOrigin = null }: LoadImageOptions = {}) =>
+export const loadImage = (
+  url: string,
+  { signal, crossOrigin = null }: LoadImageOptions = {}
+) =>
   new Promise<HTMLImageElement>(function (resolve, reject) {
     if (signal && signal.aborted) {
       return reject(new Error('`options.signal` is in `aborted` state'));
@@ -60,12 +64,11 @@ export const loadImage = (url: string, { signal, crossOrigin = null }: LoadImage
     img.src = url;
   });
 
-
 type EnlivenObjectOptions = {
   signal?: AbortSignal;
   reviver?: (arg: any, arg2: any) => void;
   namespace?: any;
-}
+};
 
 /**
  * Creates corresponding fabric instances from their object representations
@@ -81,37 +84,38 @@ type EnlivenObjectOptions = {
  */
 export const enlivenObjects = (
   objects: any[],
-  {
-    signal,
-    reviver = noop,
-    namespace = fabric,
-  }: EnlivenObjectOptions = {},
-) => new Promise<TObject[]>((resolve, reject) => {
-  const instances: TObject[] = [];
-  signal && signal.addEventListener('abort', reject, { once: true });
-  Promise.all(objects.map((obj) =>
-    getKlass(obj.type, namespace).fromObject(obj, {
-      signal,
-      reviver,
-      namespace,
-    }).then((fabricInstance: TObject) => {
-      reviver(obj, fabricInstance);
-      instances.push(fabricInstance);
-      return fabricInstance;
-    })
-  ))
-    .then(resolve)
-    .catch((error) => {
-      // cleanup
-      instances.forEach(function (instance) {
-        instance.dispose && instance.dispose();
+  { signal, reviver = noop, namespace = fabric }: EnlivenObjectOptions = {}
+) =>
+  new Promise<TObject[]>((resolve, reject) => {
+    const instances: TObject[] = [];
+    signal && signal.addEventListener('abort', reject, { once: true });
+    Promise.all(
+      objects.map((obj) =>
+        getKlass(obj.type, namespace)
+          .fromObject(obj, {
+            signal,
+            reviver,
+            namespace,
+          })
+          .then((fabricInstance: TObject) => {
+            reviver(obj, fabricInstance);
+            instances.push(fabricInstance);
+            return fabricInstance;
+          })
+      )
+    )
+      .then(resolve)
+      .catch((error) => {
+        // cleanup
+        instances.forEach(function (instance) {
+          instance.dispose && instance.dispose();
+        });
+        reject(error);
+      })
+      .finally(() => {
+        signal && signal.removeEventListener('abort', reject);
       });
-      reject(error);
-    })
-    .finally(() => {
-      signal && signal.removeEventListener('abort', reject);
-    });
-});
+  });
 
 /**
  * Creates corresponding fabric instances residing in an object, e.g. `clipPath`
@@ -122,7 +126,10 @@ export const enlivenObjects = (
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  * @returns {Promise<{[key:string]:fabric.Object|fabric.Pattern|fabric.Gradient|null}>} the input object with enlived values
  */
-export const enlivenObjectEnlivables = (serializedObject: any, { signal }: { signal?: AbortSignal } = {}) =>
+export const enlivenObjectEnlivables = (
+  serializedObject: any,
+  { signal }: { signal?: AbortSignal } = {}
+) =>
   new Promise((resolve, reject) => {
     const instances: any[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
@@ -144,20 +151,23 @@ export const enlivenObjectEnlivables = (serializedObject: any, { signal }: { sig
       }
       // pattern
       if (value.source) {
-        return fabric.Pattern.fromObject(value, { signal }).then((pattern: any) => {
-          instances.push(pattern);
-          return pattern;
-        });
+        return fabric.Pattern.fromObject(value, { signal }).then(
+          (pattern: any) => {
+            instances.push(pattern);
+            return pattern;
+          }
+        );
       }
       return value;
     });
     const keys = Object.keys(serializedObject);
-    Promise.all(promises).then((enlived) => {
-      return enlived.reduce(function (acc, instance, index) {
-        acc[keys[index]] = instance;
-        return acc;
-      }, {});
-    })
+    Promise.all(promises)
+      .then((enlived) => {
+        return enlived.reduce(function (acc, instance, index) {
+          acc[keys[index]] = instance;
+          return acc;
+        }, {});
+      })
       .then(resolve)
       .catch(function (error) {
         // cleanup

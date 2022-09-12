@@ -10,4 +10,8 @@ import type { TRadian } from '../../typedefs';
  * @param {TRadian} radians The radians of the angle for the rotation
  * @return {Point} The new rotated point
  */
-export const rotatePoint = (point: Point, origin: Point, radians: TRadian): Point => point.rotate(radians, origin);
+export const rotatePoint = (
+  point: Point,
+  origin: Point,
+  radians: TRadian
+): Point => point.rotate(radians, origin);

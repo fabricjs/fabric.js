@@ -1,13 +1,13 @@
 //@ts-nocheck
 
-import { getMultipleNodes } from "./getMultipleNodes";
+import { getMultipleNodes } from './getMultipleNodes';
 import { recursivelyParseGradientsXlink } from './recursivelyParseGradientsXlink';
 
 const tagArray = [
   'linearGradient',
   'radialGradient',
   'svg:linearGradient',
-  'svg:radialGradient'
+  'svg:radialGradient',
 ];
 
 /**
@@ -16,7 +16,10 @@ const tagArray = [
  * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition element
  */
 export function getGradientDefs(doc) {
-  let elList = getMultipleNodes(doc, tagArray), el, j = 0, gradientDefs = {};
+  let elList = getMultipleNodes(doc, tagArray),
+    el,
+    j = 0,
+    gradientDefs = {};
   j = elList.length;
   while (j--) {
     el = elList[j];
