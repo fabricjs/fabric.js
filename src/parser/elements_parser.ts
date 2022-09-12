@@ -42,8 +42,8 @@ const ElementsParser = function (
 
   proto.createObject = function (el, index) {
     try {
-      const hadler = registry.getSVGHandler(el);
-      hadler(el, this.createCallback(index, el), this.options);
+      const handler = registry.assertSVGHandler(el);
+      handler(el, this.createCallback(index, el), this.options);
     } catch (err) {
       console.log(err);
       this.checkIfDone();
@@ -87,7 +87,7 @@ const ElementsParser = function (
     );
     if (gradientDef) {
       const opacityAttr = el.getAttribute(property + '-opacity');
-      const handler = registry.getSVGHandler(gradientDef);
+      const handler = registry.assertSVGHandler(gradientDef, 'gradient');
       const gradient = handler(gradientDef, obj, {
         ...this.options,
         opacity: opacityAttr,
@@ -126,7 +126,7 @@ const ElementsParser = function (
       clipPathOwner.parentNode.appendChild(clipPathTag);
       for (let i = 0; i < clipPath.length; i++) {
         element = clipPath[i];
-        const handler = registry.getSVGHandler(element);
+        const handler = registry.assertSVGHandler(element);
         handler(
           element,
           this.createClipPathCallback(obj, container),
