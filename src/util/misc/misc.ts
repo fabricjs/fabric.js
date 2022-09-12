@@ -57,7 +57,6 @@ import {
 } from './planeChange';
 import { camelize, capitalize, escapeXml, graphemeSplit } from '../lang_string';
 import {
-  getKlass,
   loadImage,
   enlivenObjects,
   enlivenObjectEnlivables,
@@ -160,7 +159,6 @@ fabric.util = {
     escapeXml,
     graphemeSplit,
   },
-  getKlass,
   loadImage,
   enlivenObjects,
   enlivenObjectEnlivables,

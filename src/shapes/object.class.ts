@@ -944,7 +944,7 @@ import { runningAnimations } from '../util/animation_registry';
        * @param {Object} object
        */
       _removeDefaultValues: function (object) {
-        var prototype = fabric.util.getKlass(object.type).prototype;
+        var prototype = this.prototype;
         Object.keys(object).forEach(function (prop) {
           if (prop === 'left' || prop === 'top' || prop === 'type') {
             return;
@@ -971,7 +971,7 @@ import { runningAnimations } from '../util/animation_registry';
        * @return {String}
        */
       toString: function () {
-        return '#<fabric.' + capitalize(this.type) + '>';
+        return `#<fabric.${this.constructor.name}>`;
       },
 
       /**

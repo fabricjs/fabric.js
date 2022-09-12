@@ -173,20 +173,6 @@
     assert.equal('1\n2', escapeXml('1\n2'));
   });
 
-  QUnit.test('fabric.util.string.capitalize', function(assert) {
-    var capitalize = fabric.util.string.capitalize;
-
-    assert.ok(typeof capitalize === 'function');
-
-    assert.equal(capitalize('foo'), 'Foo');
-    assert.equal(capitalize(''), '');
-    assert.equal(capitalize('Foo'), 'Foo');
-    assert.equal(capitalize('foo-bar-baz'), 'Foo-bar-baz');
-    assert.equal(capitalize('FOO'), 'Foo');
-    assert.equal(capitalize('FoobaR'), 'Foobar');
-    assert.equal(capitalize('2foo'), '2foo');
-  });
-
   QUnit.test('fabric.util.object.extend', function(assert) {
     var extend = fabric.util.object.extend;
 
