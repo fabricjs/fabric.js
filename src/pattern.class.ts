@@ -2,6 +2,7 @@
 
 import { fabric } from '../HEADER';
 import { config } from './config';
+import { registerClass } from './Registry';
 import { TCrossOrigin, TMat2D, TSize } from './typedefs';
 import { ifNaN } from './util/internals';
 import { loadImage } from './util/misc/objectEnlive';
@@ -200,3 +201,5 @@ export class Pattern {
 }
 
 fabric.Pattern = Pattern;
+
+registerClass(Pattern);

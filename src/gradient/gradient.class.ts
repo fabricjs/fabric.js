@@ -2,9 +2,11 @@ import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
+import { registerClass } from '../Registry';
 import { TMat2D } from '../typedefs';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
+import { TObject } from '../__types__';
 import { linearDefaultCoords, radialDefaultCoords } from './constants';
 import {
   parseColorStops,
@@ -20,11 +22,6 @@ import {
   GradientUnits,
   SVGOptions,
 } from './typedefs';
-
-/**
- * @todo remove this transient junk
- */
-type FabricObject = any;
 
 /**
  * Gradient class
@@ -155,7 +152,7 @@ export class Gradient<
    * @return {String} SVG representation of an gradient (linear/radial)
    */
   toSVG(
-    object: FabricObject,
+    object: TObject,
     { additionalTransform: preTransform }: { additionalTransform?: string } = {}
   ) {
     const markup = [],
@@ -315,7 +312,7 @@ export class Gradient<
    * @static
    * @memberOf Gradient
    * @param {SVGGradientElement} el SVG gradient element
-   * @param {FabricObject} instance
+   * @param {TObject} instance
    * @param {String} opacity A fill-opacity or stroke-opacity attribute to multiply to each stop's opacity.
    * @param {SVGOptions} svgOptions an object containing the size of the SVG in order to parse correctly gradients
    * that uses gradientUnits as 'userSpaceOnUse' and percentages.
@@ -356,7 +353,7 @@ export class Gradient<
    */
   static fromElement(
     el: SVGGradientElement,
-    instance: FabricObject,
+    instance: TObject,
     svgOptions: SVGOptions
   ): Gradient<GradientType> {
     const gradientUnits = parseGradientUnits(el);
@@ -387,3 +384,5 @@ export class Gradient<
 }
 
 fabric.Gradient = Gradient;
+
+registerClass(Gradient);

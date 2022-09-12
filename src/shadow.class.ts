@@ -3,6 +3,7 @@
 import { Color } from './color';
 import { config } from './config';
 import { Point } from './point.class';
+import { registerClass } from './Registry';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -236,4 +237,6 @@ import { Point } from './point.class';
   // eslint-disable-next-line max-len
   fabric.Shadow.reOffsetsAndBlur =
     /(?:\s|^)(-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?(-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?(\d+(?:\.\d*)?(?:px)?)?(?:\s?|$)(?:$|\s)/;
+
+  registerClass(fabric.Shadow);
 })(typeof exports !== 'undefined' ? exports : window);
