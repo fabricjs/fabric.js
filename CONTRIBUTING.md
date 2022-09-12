@@ -143,15 +143,12 @@ Follow [Developing](#-developing-) **OR** [![Open in Gitpod](https://gitpod.io/b
 
 ### ✅ Guidelines 
 
-- **Code style & notes:**
-  - explicit blocks
-  - camelCase
-  - `fabric.document`/`fabric.window` (not just `document`/`window`)
-  - run `npm run lint -- --fix` to comply with code styling
+- **Code style:** Fabric uses [`prettier`](https://prettier.io/) to format files and [`eslint`](https://eslint.org/) for linting (`npm run lint -- --fix`).\
+To enjoy a seamless dev experience add the [`Prettier - Code formatter`](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) extension via the extensions toolbar in VSCode.
 - **⛔ Distribution files:** Do your changes only in the [source files](https://github.com/fabricjs/fabric.js/tree/master/src). Don't include the [distribution files](https://github.com/fabricjs/fabric.js/tree/master/dist) in your commit.
 - **Add tests**: Tests are vital, invest time to extend the them, see [TESTING](#🧪-testing).
-- **Add documentation:** Fabric uses [JSDoc 3] for documentation. The generated documentation can be found at [fabricjs.com](http://fabricjs.com/docs), see [DOCS](#🔎-improving-docs).
-- **One pull request per feature/bug**. Create a new branch for every pull request. If you want to do more than one thing, send multiple pull requests.
+- **Add documentation:** Fabric uses [JSDoc 3](https://jsdoc.app/) for documentation. Add relevant comments in necessary. The generated documentation can be found at [fabricjs.com](http://fabricjs.com/docs), see [DOCS](#🔎-improving-docs).
+- **One PR per feature/bug**. Create a new branch for every pull request. If you want to do more than one thing, send multiple pull requests.
 - **And there you go!** If you still have questions we're always happy to help.
 
 
