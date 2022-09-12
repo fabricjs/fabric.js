@@ -1,18 +1,16 @@
 
 export type TRegistry<T = unknown, D = unknown, S extends SVGElement = SVGElement, O = unknown> = {
-    fromJSON(data: D): T | Promise<T>;
-    fromSVG(svgEl: S, options: O): T | Promise<T>;
+    json(data: D): T | Promise<T>;
+    svg?(svgEl: S, instance: T, options: O): T | Promise<T>;
 }
 
-type TClassIdentifier = {
-    prototype: {
-        type: string
-    }
+type TJSONData = {
+    type: string
 }
 
-export type TClassIO<T = unknown, D = unknown, S extends SVGElement = SVGElement, O = unknown> = TClassIdentifier & {
-    fromObject(data: D): T | Promise<T>;
-    fromElement(svgEl: S, options: O): T | Promise<T>;
+export type TClassIO<T = unknown> = Function & {
+    fromObject(data: TJSONData): T | Promise<T>;
+    fromElement?(svgEl: SVGElement, instance: T, options: unknown): T | Promise<T>;
 }
 
 export class Registry {
@@ -26,24 +24,39 @@ export class Registry {
         return this.registry.set(type, value);
     }
 
-    registerClass<T extends TClassIO>(klass: T) {
-        this.register(klass.prototype.type, {
-            fromJSON: klass.fromObject,
-            fromSVG: klass.fromElement
+    registerClass<T extends TClassIO>(key: string, klass: T) {
+        this.register(key, {
+            json: klass.fromObject,
+            svg: klass.fromElement
         });
     }
 
-    fromJSON<T extends { type: string }>(data: T) {
-        return this.registry.get(data.type)?.fromJSON(data);
+    resolveJSONKey<T extends TJSONData>(data: T) {
+        return data.type;
     }
 
-    resolveSVGType(el: SVGElement) {
+    resolveSVGKey(el: SVGElement) {
         return el.tagName.replace('svg:', '');
     }
 
-    fromSVG<T extends SVGElement, S>(el: T, options: S) {
-        return this.registry.get(this.resolveSVGType(el))?.fromSVG(el, options);
+    getJSONHandler<T extends TJSONData>(data: T) {
+        return this.registry.get(this.resolveJSONKey(data))?.json;
+    }
+
+    getSVGHandler<T extends SVGElement>(el: T) {
+        return this.registry.get(this.resolveSVGKey(el))?.svg;
     }
 }
 
 export const registry = new Registry();
+
+export function registerClass<T extends TClassIO>(klass: T): void
+export function registerClass<T extends TClassIO>(key: string, klass: T): void
+export function registerClass<T extends TClassIO>(arg0: string | T, arg1?: T) {
+    if (typeof arg0 === 'string') {
+        registry.registerClass(arg0, arg1 as T);
+    }
+    else {
+        registry.registerClass(arg0.name.toLowerCase(), arg0);
+    }
+}
