@@ -143,12 +143,19 @@ Follow [Developing](#-developing-) **OR** [![Open in Gitpod](https://gitpod.io/b
 
 ### ✅ Guidelines 
 
-- **Code style:** Fabric uses [`prettier`](https://prettier.io/) to format files and [`eslint`](https://eslint.org/) for linting (`npm run lint -- --fix`).\
+- **Code Style** \
+Fabric uses [`prettier`](https://prettier.io/) to format files and [`eslint`](https://eslint.org/) for linting (`npm run lint -- --fix`).\
 To enjoy a seamless dev experience add the [`Prettier - Code formatter`](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) extension via the extensions toolbar in VSCode.
-- **⛔ Distribution files:** Do your changes only in the [source files](https://github.com/fabricjs/fabric.js/tree/master/src). Don't include the [distribution files](https://github.com/fabricjs/fabric.js/tree/master/dist) in your commit.
-- **Add tests**: Tests are vital, invest time to extend the them, see [TESTING](#🧪-testing).
-- **Add documentation:** Fabric uses [JSDoc 3](https://jsdoc.app/) for documentation. Add relevant comments in necessary. The generated documentation can be found at [fabricjs.com](http://fabricjs.com/docs), see [DOCS](#🔎-improving-docs).
-- **One PR per feature/bug**. Create a new branch for every pull request. If you want to do more than one thing, send multiple pull requests.
+- **⛔ `dist`** \
+Commit changes to [source files](https://github.com/fabricjs/fabric.js/tree/master/src). Don't commit the generated [distribution files](https://github.com/fabricjs/fabric.js/tree/master/dist).
+- **Tests** \
+Tests are vital, invest time to extend them, see [TESTING](#-testing).
+- **Docs** \
+Add relevant comments to your code if necessary using [JSDoc 3](https://jsdoc.app/).\
+The generated documentation can be found at [fabricjs.com](http://fabricjs.com/docs), see [DOCS](#🔎-improving-docs).
+- **One PR per feature/bug** \
+Create a new branch for every pull request.\
+If you want to do more than one thing, send multiple pull requests.
 - **And there you go!** If you still have questions we're always happy to help.
 
 
