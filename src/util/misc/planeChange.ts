@@ -14,8 +14,8 @@ export const enum ObjectRelation {
  * We are actually looking for the transformation from the destination plane to the source plane (change of basis matrix)\
  * The object will exist on the destination plane and we want it to seem unchanged by it so we invert the destination matrix (`to`) and then apply the source matrix (`from`)
  * @param [from]
- * @param [to] 
- * @returns 
+ * @param [to]
+ * @returns
  */
 export const calcPlaneChangeMatrix = (from: TMat2D = iMatrix, to: TMat2D = iMatrix) =>
   multiplyTransformMatrices(invertTransform(to), from);
@@ -40,13 +40,13 @@ export const calcPlaneChangeMatrix = (from: TMat2D = iMatrix, to: TMat2D = iMatr
  * @returns {Point} transformed point
  */
 export const sendPointToPlane = (
-  point: IPoint,
+  point: Point,
   from: TMat2D = iMatrix,
   to: TMat2D = iMatrix
 ): Point =>
   //  we are actually looking for the transformation from the destination plane to the source plane (which is a linear mapping)
   //  the object will exist on the destination plane and we want it to seem unchanged by it so we reverse the destination matrix (to) and then apply the source matrix (from)
-  transformPoint(point, calcPlaneChangeMatrix(from, to));
+  point.transform(calcPlaneChangeMatrix(from, to));
 
 /**
  * Transform point relative to canvas.
