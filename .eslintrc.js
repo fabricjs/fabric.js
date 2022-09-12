@@ -14,6 +14,17 @@ module.exports = {
   ],
   rules: {
     '@typescript-eslint/ban-ts-comment': 1,
+    'no-restricted-globals': [
+      'error',
+      {
+        name: 'window',
+        message: 'Use fabric window or other utils instead'
+      },
+      {
+        name: 'document',
+        message: 'Use fabric document or other utils instead'
+      }
+    ],
     'no-restricted-syntax': [
       'error',
       {
