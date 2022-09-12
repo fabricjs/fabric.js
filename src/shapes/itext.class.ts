@@ -638,4 +638,5 @@ import { registerClass } from '../Registry';
 
   registerClass('itext', fabric.IText);
   registerClass('i-text', fabric.IText);
+  registerClass('iText', fabric.IText);
 })(typeof exports !== 'undefined' ? exports : window);
