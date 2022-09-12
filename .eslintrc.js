@@ -14,5 +14,15 @@ module.exports = {
   ],
   rules: {
     '@typescript-eslint/ban-ts-comment': 1,
+    'operator-linebreak': [
+      'error',
+      'after',
+      {
+        'overrides': {
+          '||': 'before',
+          '&&': 'before'
+        }
+      }
+    ],
   },
 };
