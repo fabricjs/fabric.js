@@ -8,7 +8,7 @@ type TJSONData = {
     type: string
 }
 
-export type TClassIO<T = unknown> = Function & {
+export type TClassIO<T = unknown> = FunctionConstructor & {
     fromObject(data: TJSONData): T | Promise<T>;
     fromElement?(svgEl: SVGElement, instance: T, options: unknown): T | Promise<T>;
 }
