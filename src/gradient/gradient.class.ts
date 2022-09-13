@@ -154,7 +154,7 @@ export class Gradient<
           rotate,
           // scale to size
           this.gradientUnits === 'percentage'
-            ? [size.width || 1, 0, 0, size.height || 1, 0, 0]
+            ? [size.width, 0, 0, size.height, 0, 0]
             : iMatrix,
         ],
         true
@@ -175,7 +175,6 @@ export class Gradient<
     if (this.type === 'linear') {
       const p1 = transformPoint(new Point(coords.x1, coords.y1), transform);
       const p2 = transformPoint(new Point(coords.x2, coords.y2), transform);
-      console.log(p1, p2);
       if (p1.eq(p2) || t[0] === 0 || t[3] === 0) {
         return null;
       }
