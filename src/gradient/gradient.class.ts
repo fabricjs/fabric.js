@@ -135,37 +135,22 @@ export class Gradient<
     noTransform,
   }: TFillerRenderingOptions) {
     const t = (!noTransform && this.gradientTransform) || iMatrix;
-    const scale: TMat2D = [t[0], 0, 0, t[3], 0, 0];
-    const shear: TMat2D = [1, t[1], t[2], 1, 0, 0];
-    // affine translation rotated by 90deg
-    const translate: TMat2D = [1, 0, 0, 1, -t[5], t[4]];
-
-    // const rotate = multiplyTransformMatrices2([
-    //   [1, 0, 0, 1, -this.coords.x1, -this.coords.y1],
-    //   [0, -1, 1, 0, 0, 0],
-    //   [1, 0, 0, 1, this.coords.x1, this.coords.y1],
-    // ]);
-    const vCenter = new Point(this.coords.x1, this.coords.y1).midPointFrom(
-      new Point(this.coords.x2, this.coords.y2)
-    );
+    const gradientCenter = new Point(
+      this.coords.x1,
+      this.coords.y1
+    ).midPointFrom(new Point(this.coords.x2, this.coords.y2));
+    // rotate 90deg from center of gradient
     const rotate = multiplyTransformMatrices2([
-      [1, 0, 0, 1, vCenter.x / 2, vCenter.y / 2],
+      [1, 0, 0, 1, gradientCenter.x / 2, gradientCenter.y / 2],
       [0, -1, 1, 0, 0, 0],
-      [1, 0, 0, 1, -vCenter.x / 2, -vCenter.y / 2],
+      [1, 0, 0, 1, -gradientCenter.x / 2, -gradientCenter.y / 2],
     ]);
-    console.log(offset);
     return multiplyTransformMatrices(
       [1, 0, 0, 1, offset.x, offset.y],
       multiplyTransformMatrices2(
         [
-          // gradient offset
-          [1, 0, 0, 1, offset.x, offset.y],
-          // translate,
-
-          // rotate back 90deg
           invertTransform(rotate),
           t,
-          // rotate 90deg
           rotate,
           // scale to size
           this.gradientUnits === 'percentage'
@@ -190,6 +175,7 @@ export class Gradient<
     if (this.type === 'linear') {
       const p1 = transformPoint(new Point(coords.x1, coords.y1), transform);
       const p2 = transformPoint(new Point(coords.x2, coords.y2), transform);
+      console.log(p1, p2);
       if (p1.eq(p2) || t[0] === 0 || t[3] === 0) {
         return null;
       }
