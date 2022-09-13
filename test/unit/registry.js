@@ -46,6 +46,6 @@ QUnit.module('IO Registry', hook => {
             foo: 'bar',
             type: 'unicorn'
         }), 'no resolver');
-        assert.throws(() => registry.assertSVGHandler({key:'NON_EXISTING',element:null}), 'no resolver');
+        assert.throws(() => registry.assertSVGHandler({ key: 'NON_EXISTING', element: null }), 'no resolver');
     });
 });
