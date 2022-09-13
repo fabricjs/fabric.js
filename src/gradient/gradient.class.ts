@@ -121,6 +121,14 @@ export class Gradient<
     return this;
   }
 
+  /**
+   * A linear gradient is created along the line connecting the two given coordinates.
+   * e.g. if we have a linear gradient denfined by a vector along the x axis a line of color will be drawn on the y axis.
+   *
+   * This means that in order to transform a linear gradient by it's coordinates we need to apply a rotation matrix on the given transform.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/createLinearGradient
+   */
   private calcTransform({
     size,
     offset,
