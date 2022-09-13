@@ -126,18 +126,24 @@ export class Gradient<
     offset,
     noTransform,
   }: TFillerRenderingOptions) {
-    return multiplyTransformMatrices2([
-      // offset
-      [1, 0, 0, 1, offset.x, offset.y],
+    const t = (!noTransform && this.gradientTransform) || iMatrix;
+    const scale: TMat2D = [t[0], 0, 0, t[3], 0, 0];
+    const shear: TMat2D = multiplyTransformMatrices2([
       // rotate back 90deg
       [0, 1, -1, 0, 0, 0],
-      // [0, 1, -1, 0, size.width / 2, size.height / 2],
-      // flipX
-      // [-1, 0, 0, 1, 0, 0],
-      (!noTransform && this.gradientTransform) || iMatrix,
+      // shear
+      [1, t[1], t[2], 1, 0, 0],
       // rotate 90deg
       [0, -1, 1, 0, 0, 0],
-      // [0, -1, 1, 0, -size.width / 2, -size.height / 2],
+    ]);
+    const translate: TMat2D = [1, 0, 0, 1, -t[5], t[4]];
+    return multiplyTransformMatrices2([
+      // gradient offset
+      [1, 0, 0, 1, offset.x, offset.y],
+      // affine translation rotated by 90deg
+      translate,
+      shear,
+      scale,
       // scale to size
       this.gradientUnits === 'percentage'
         ? [size.width || 1, 0, 0, size.height || 1, 0, 0]
