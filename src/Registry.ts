@@ -18,7 +18,7 @@ export class Registry {
       key: string;
       handler?: TRegistryResolver['json'];
     };
-    svg?: (data: { element: SVGElement; key?: string }) => {
+    svg?: (data: { element: SVGElement; key: string }) => {
       key: string;
       handler?: TRegistryResolver['svg'];
     };
