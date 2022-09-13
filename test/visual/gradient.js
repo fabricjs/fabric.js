@@ -54,8 +54,12 @@ QUnit.module('Gradient', hooks => {
         });
     });
 
+    function buildMatrix([a, b, c, d, e, f], additionalOffset = new fabric.Point()) {
+        return [a, b * Math.PI, c * Math.PI, d, e + additionalOffset.x, f + additionalOffset.y];
+    }
+
     function createGradient({
-        transform: [a, b, c, d, e, f] = fabric.iMatrix,
+        transform = fabric.iMatrix,
         offsetX = 0,
         offsetY = 0,
         fakeOffset = new fabric.Point(),
@@ -78,7 +82,7 @@ QUnit.module('Gradient', hooks => {
             type: 'linear',
             offsetX: offsetX + fakeOffset.x,
             offsetY: offsetY + fakeOffset.y,
-            gradientTransform: [a, b * Math.PI, c * Math.PI, d, e - fakeOffset.x, f - fakeOffset.y],
+            gradientTransform: buildMatrix(transform, fakeOffset.scalarMultiply(-1)),
         });
     }
 
@@ -143,14 +147,14 @@ QUnit.module('Gradient', hooks => {
                 const gradient = makeGradient();
                 gradient.gradientTransform = null;
                 canvas.backgroundColor = gradient;
-                canvas.setViewportTransform(transform);
+                canvas.setViewportTransform(buildMatrix(transform));
                 canvas.renderAll();
                 callback(canvas.lowerCanvasEl);
             },
             golden: goldenName,
             percentage: 0.09,
             ...size,
-            testOnly: true
+            // testOnly: true
         });
 
         // transform[0] && transform[3] && runner({
