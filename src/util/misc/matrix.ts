@@ -84,8 +84,8 @@ export const multiplyTransformMatrices2 = (
   matrices: TMat2D[],
   is2x2?: boolean
 ) => {
-  let m = iMatrix.concat() as TMat2D;
-  for (let index = matrices.length - 1; index >= 0; index--) {
+  let m = matrices[matrices.length - 1];
+  for (let index = matrices.length - 2; index >= 0; index--) {
     m = multiplyTransformMatrices(matrices[index], m, is2x2);
   }
   return m;
