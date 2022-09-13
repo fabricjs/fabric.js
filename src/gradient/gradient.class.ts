@@ -5,7 +5,12 @@ import { Filler, TFillerRenderingOptions } from '../Filler';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import { Point } from '../point.class';
 import { TMat2D } from '../typedefs';
-import { multiplyTransformMatrices, transformPoint } from '../util/misc/matrix';
+import {
+  invertTransform,
+  multiplyTransformMatrices,
+  multiplyTransformMatrices2,
+  transformPoint,
+} from '../util/misc/matrix';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { type TObject } from '../__types__';
@@ -121,22 +126,23 @@ export class Gradient<
     offset,
     noTransform,
   }: TFillerRenderingOptions) {
-    const m = multiplyTransformMatrices(
+    return multiplyTransformMatrices2([
+      // offset
+      [1, 0, 0, 1, offset.x, offset.y],
+      // rotate back 90deg
+      [0, 1, -1, 0, 0, 0],
+      // [0, 1, -1, 0, size.width / 2, size.height / 2],
+      // flipX
+      // [-1, 0, 0, 1, 0, 0],
       (!noTransform && this.gradientTransform) || iMatrix,
-      [0, 1, -1, 0, 0, 0]
-    );
-    const t =
+      // rotate 90deg
+      [0, -1, 1, 0, 0, 0],
+      // [0, -1, 1, 0, -size.width / 2, -size.height / 2],
+      // scale to size
       this.gradientUnits === 'percentage'
-        ? multiplyTransformMatrices(m, [
-            size.width || 1,
-            0,
-            0,
-            size.height || 1,
-            0,
-            0,
-          ])
-        : m;
-    return multiplyTransformMatrices([1, 0, 0, 1, offset.x, offset.y], t);
+        ? [size.width || 1, 0, 0, size.height || 1, 0, 0]
+        : iMatrix,
+    ]);
   }
 
   protected toLive(
