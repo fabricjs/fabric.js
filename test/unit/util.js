@@ -763,6 +763,19 @@
     })
   }
 
+  QUnit.test('calcPlaneChangeMatrix', function (assert) {
+    assert.ok(typeof fabric.util.calcPlaneChangeMatrix === 'function');
+    const m1 = [1, 2, 3, 4, 5, 6];
+    const s = [2, 0, 0, 0.5, 0, 0];
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(), fabric.iMatrix);
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(undefined, m1), fabric.util.invertTransform(m1));
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(fabric.iMatrix, m1), fabric.util.invertTransform(m1));
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, undefined), m1);
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, fabric.iMatrix), m1);
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, m1), fabric.iMatrix);
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, s), fabric.util.multiplyTransformMatrices(fabric.util.invertTransform(s), m1));
+  })
+
   QUnit.test('sendPointToPlane', function (assert) {
     assert.ok(typeof fabric.util.sendPointToPlane === 'function');
     var m1 = [3, 0, 0, 2, 10, 4],

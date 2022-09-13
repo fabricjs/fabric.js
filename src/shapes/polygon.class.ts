@@ -1,42 +1,43 @@
 //@ts-nocheck
-(function(global) {
+(function (global) {
   var fabric = global.fabric || (global.fabric = {}),
-      projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
+    projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
   /**
    * Polygon class
    * @class fabric.Polygon
    * @extends fabric.Polyline
    * @see {@link fabric.Polygon#initialize} for constructor definition
    */
-  fabric.Polygon = fabric.util.createClass(fabric.Polyline, /** @lends fabric.Polygon.prototype */ {
+  fabric.Polygon = fabric.util.createClass(
+    fabric.Polyline,
+    /** @lends fabric.Polygon.prototype */ {
+      /**
+       * Type of an object
+       * @type String
+       * @default
+       */
+      type: 'polygon',
 
-    /**
-     * Type of an object
-     * @type String
-     * @default
-     */
-    type: 'polygon',
+      /**
+       * @private
+       */
+      _projectStrokeOnPoints: function () {
+        return projectStrokeOnPoints(this.points, this);
+      },
 
-    /**
-     * @private
-     */
-    _projectStrokeOnPoints: function () {
-      return projectStrokeOnPoints(this.points, this);
-    },
-
-    /**
-     * @private
-     * @param {CanvasRenderingContext2D} ctx Context to render on
-     */
-    _render: function(ctx) {
-      if (!this.commonRender(ctx)) {
-        return;
-      }
-      ctx.closePath();
-      this._renderPaintInOrder(ctx);
-    },
-
-  });
+      /**
+       * @private
+       * @param {CanvasRenderingContext2D} ctx Context to render on
+       */
+      _render: function (ctx) {
+        if (!this.commonRender(ctx)) {
+          return;
+        }
+        ctx.closePath();
+        this._renderPaintInOrder(ctx);
+      },
+    }
+  );
 
   /* _FROM_SVG_START_ */
   /**
@@ -65,8 +66,9 @@
    * @param {Object} object Object to create an instance from
    * @returns {Promise<fabric.Polygon>}
    */
-  fabric.Polygon.fromObject = function(object) {
-    return fabric.Object._fromObject(fabric.Polygon, object, { extraParam: 'points' });
+  fabric.Polygon.fromObject = function (object) {
+    return fabric.Object._fromObject(fabric.Polygon, object, {
+      extraParam: 'points',
+    });
   };
-
 })(typeof exports !== 'undefined' ? exports : window);

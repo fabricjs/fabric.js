@@ -1,15 +1,14 @@
-import { fabric } from "../../HEADER";
-import { Point } from "../point.class";
-import { TEvent, ModifierKey, PathData } from "../typedefs";
-import { getSmoothPathFromPoints, joinPath } from "../util/path";
-import { Canvas } from "../__types__";
-import { BaseBrush } from "./base_brush.class";
+import { fabric } from '../../HEADER';
+import { Point } from '../point.class';
+import { TEvent, ModifierKey, PathData } from '../typedefs';
+import { getSmoothPathFromPoints, joinPath } from '../util/path';
+import { Canvas } from '../__types__';
+import { BaseBrush } from './base_brush.class';
 
 /**
  * @todo remove transient
  */
 const { Path, Shadow } = fabric;
-
 
 /**
  * @private
@@ -21,13 +20,12 @@ function isEmptySVGPath(pathData: PathData): boolean {
 }
 
 export class PencilBrush extends BaseBrush {
-
   /**
    * Discard points that are less than `decimate` pixel distant from each other
    * @type Number
    * @default 0.4
    */
-  decimate = 0.4
+  decimate = 0.4;
 
   /**
    * Draws a straight line between last recorded point to current pointer
@@ -36,16 +34,16 @@ export class PencilBrush extends BaseBrush {
    * @type boolean
    * @default false
    */
-  drawStraightLine = false
+  drawStraightLine = false;
 
   /**
    * The event modifier key that makes the brush draw a straight line.
    * If `null` or 'none' or any other string that is not a modifier key the feature is disabled.
    * @type {ModifierKey | undefined | null}
    */
-  straightLineKey: ModifierKey | undefined | null = 'shiftKey'
+  straightLineKey: ModifierKey | undefined | null = 'shiftKey';
 
-  private _points: Point[]
+  private _points: Point[];
   private _hasStraightLine: boolean;
   private oldEnd?: Point;
 
@@ -99,16 +97,21 @@ export class PencilBrush extends BaseBrush {
         // clear top canvas
         this.canvas.clearContext(this.canvas.contextTop);
         this._render();
-      }
-      else {
-        const points = this._points, length = points.length, ctx = this.canvas.contextTop;
+      } else {
+        const points = this._points,
+          length = points.length,
+          ctx = this.canvas.contextTop;
         // draw the curve update
         this._saveAndTransform(ctx);
         if (this.oldEnd) {
           ctx.beginPath();
           ctx.moveTo(this.oldEnd.x, this.oldEnd.y);
         }
-        this.oldEnd = PencilBrush.drawSegment(ctx, points[length - 2], points[length - 1]);
+        this.oldEnd = PencilBrush.drawSegment(
+          ctx,
+          points[length - 2],
+          points[length - 1]
+        );
         ctx.stroke();
         ctx.restore();
       }
@@ -143,7 +146,10 @@ export class PencilBrush extends BaseBrush {
    * @param {Point} point Point to be added to points array
    */
   _addPoint(point: Point) {
-    if (this._points.length > 1 && point.eq(this._points[this._points.length - 1])) {
+    if (
+      this._points.length > 1 &&
+      point.eq(this._points[this._points.length - 1])
+    ) {
       return false;
     }
     if (this.drawStraightLine && this._points.length > 1) {
@@ -241,11 +247,16 @@ export class PencilBrush extends BaseBrush {
     if (points.length <= 2) {
       return points;
     }
-    let lastPoint = points[0], cDistance;
-    const zoom = this.canvas.getZoom(), adjustedDistance = Math.pow(distance / zoom, 2),
-      l = points.length - 1, newPoints = [lastPoint];
+    let lastPoint = points[0],
+      cDistance;
+    const zoom = this.canvas.getZoom(),
+      adjustedDistance = Math.pow(distance / zoom, 2),
+      l = points.length - 1,
+      newPoints = [lastPoint];
     for (let i = 1; i < l - 1; i++) {
-      cDistance = Math.pow(lastPoint.x - points[i].x, 2) + Math.pow(lastPoint.y - points[i].y, 2);
+      cDistance =
+        Math.pow(lastPoint.x - points[i].x, 2) +
+        Math.pow(lastPoint.y - points[i].y, 2);
       if (cDistance >= adjustedDistance) {
         lastPoint = points[i];
         newPoints.push(lastPoint);
@@ -285,7 +296,6 @@ export class PencilBrush extends BaseBrush {
     this.canvas.requestRenderAll();
     path.setCoords();
     this._resetShadow();
-
 
     // fire event 'path' created
     this.canvas.fire('path:created', { path: path });

@@ -1,4 +1,3 @@
-
 //@ts-nocheck
 import { ColorNameMap } from './color_map';
 import { reHSLa, reHex, reRGBa } from './constants';
@@ -13,7 +12,6 @@ type TColorAlphaSource = [number, number, number, number];
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#colors colors}
  */
 export class Color {
-
   private _source: TColorAlphaSource;
 
   /**
@@ -23,8 +21,7 @@ export class Color {
   constructor(color?: string) {
     if (!color) {
       this.setSource([0, 0, 0, 1]);
-    }
-    else {
+    } else {
       this._tryParsingColor(color);
     }
   }
@@ -34,18 +31,16 @@ export class Color {
    * @param {string} [color] Color value to parse
    */
   _tryParsingColor(color?: string) {
-
     if (color in ColorNameMap) {
       color = ColorNameMap[color];
     }
 
-    const source = color === 'transparent' ?
-      [255, 255, 255, 0] :
-      Color.sourceFromHex(color)
-      || Color.sourceFromRgb(color)
-      || Color.sourceFromHsl(color)
-      // color is not recognize let's default to black as canvas does
-      || [0, 0, 0, 1]
+    const source =
+      color === 'transparent'
+        ? [255, 255, 255, 0]
+        : Color.sourceFromHex(color) ||
+          Color.sourceFromRgb(color) ||
+          Color.sourceFromHsl(color) || [0, 0, 0, 1]; // color is not recognize let's default to black as canvas does
 
     if (source) {
       this.setSource(source);
@@ -61,7 +56,9 @@ export class Color {
    * @return {TColorSource} Hsl color
    */
   _rgbToHsl(r: number, g: number, b: number): TColorSource {
-    r /= 255; g /= 255; b /= 255;
+    r /= 255;
+    g /= 255;
+    b /= 255;
     const maxValue = Math.max(r, g, b),
       minValue = Math.min(r, g, b);
 
@@ -70,8 +67,7 @@ export class Color {
 
     if (maxValue === minValue) {
       h = s = 0; // achromatic
-    }
-    else {
+    } else {
       const d = maxValue - minValue;
       s = l > 0.5 ? d / (2 - maxValue - minValue) : d / (maxValue + minValue);
       switch (maxValue) {
@@ -88,11 +84,7 @@ export class Color {
       h /= 6;
     }
 
-    return [
-      Math.round(h * 360),
-      Math.round(s * 100),
-      Math.round(l * 100)
-    ];
+    return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
   }
 
   /**
@@ -195,7 +187,10 @@ export class Color {
    */
   toGrayscale() {
     const source = this.getSource(),
-      average = parseInt((source[0] * 0.3 + source[1] * 0.59 + source[2] * 0.11).toFixed(0), 10),
+      average = parseInt(
+        (source[0] * 0.3 + source[1] * 0.59 + source[2] * 0.11).toFixed(0),
+        10
+      ),
       currentAlpha = source[3];
     this.setSource([average, average, average, currentAlpha]);
     return this;
@@ -209,7 +204,9 @@ export class Color {
   toBlackWhite(threshold: number) {
     const source = this.getSource(),
       currentAlpha = source[3];
-    let average = Math.round(source[0] * 0.3 + source[1] * 0.59 + source[2] * 0.11);
+    let average = Math.round(
+      source[0] * 0.3 + source[1] * 0.59 + source[2] * 0.11
+    );
 
     average = average < (threshold || 127) ? 0 : 255;
     this.setSource([average, average, average, currentAlpha]);
@@ -233,15 +230,15 @@ export class Color {
       otherSource = otherColor.getSource();
 
     for (let i = 0; i < 3; i++) {
-      result.push(Math.round((source[i] * (1 - otherAlpha)) + (otherSource[i] * otherAlpha)));
+      result.push(
+        Math.round(source[i] * (1 - otherAlpha) + otherSource[i] * otherAlpha)
+      );
     }
 
     result[3] = alpha;
     this.setSource(result);
     return this;
   }
-
-
 
   /**
    * Returns new color object, when given a color in RGB format
@@ -252,7 +249,6 @@ export class Color {
   static fromRgb(color: string): Color {
     return Color.fromRgba(color);
   }
-
 
   /**
    * Returns new color object, when given a color in RGBA format
@@ -275,15 +271,21 @@ export class Color {
   static sourceFromRgb(color: string): TColorAlphaSource | undefined {
     const match = color.match(reRGBa);
     if (match) {
-      const r = parseInt(match[1], 10) / (/%$/.test(match[1]) ? 100 : 1) * (/%$/.test(match[1]) ? 255 : 1),
-        g = parseInt(match[2], 10) / (/%$/.test(match[2]) ? 100 : 1) * (/%$/.test(match[2]) ? 255 : 1),
-        b = parseInt(match[3], 10) / (/%$/.test(match[3]) ? 100 : 1) * (/%$/.test(match[3]) ? 255 : 1);
+      const r =
+          (parseInt(match[1], 10) / (/%$/.test(match[1]) ? 100 : 1)) *
+          (/%$/.test(match[1]) ? 255 : 1),
+        g =
+          (parseInt(match[2], 10) / (/%$/.test(match[2]) ? 100 : 1)) *
+          (/%$/.test(match[2]) ? 255 : 1),
+        b =
+          (parseInt(match[3], 10) / (/%$/.test(match[3]) ? 100 : 1)) *
+          (/%$/.test(match[3]) ? 255 : 1);
 
       return [
         parseInt(r, 10),
         parseInt(g, 10),
         parseInt(b, 10),
-        match[4] ? parseFloat(match[4]) : 1
+        match[4] ? parseFloat(match[4]) : 1,
       ];
     }
   }
@@ -297,7 +299,6 @@ export class Color {
   static fromHsl(color: string): Color {
     return Color.fromHsla(color);
   }
-
 
   /**
    * Returns new color object, when given a color in HSLA format
@@ -332,8 +333,7 @@ export class Color {
 
     if (s === 0) {
       r = g = b = l;
-    }
-    else {
+    } else {
       const q = l <= 0.5 ? l * (s + 1) : l + s - l * s,
         p = l * 2 - q;
 
@@ -346,7 +346,7 @@ export class Color {
       Math.round(r * 255),
       Math.round(g * 255),
       Math.round(b * 255),
-      match[4] ? parseFloat(match[4]) : 1
+      match[4] ? parseFloat(match[4]) : 1,
     ];
   }
 
@@ -371,18 +371,28 @@ export class Color {
   static sourceFromHex(color: string): TColorAlphaSource | undefined {
     if (color.match(reHex)) {
       const value = color.slice(color.indexOf('#') + 1),
-        isShortNotation = (value.length === 3 || value.length === 4),
-        isRGBa = (value.length === 8 || value.length === 4),
-        r = isShortNotation ? (value.charAt(0) + value.charAt(0)) : value.substring(0, 2),
-        g = isShortNotation ? (value.charAt(1) + value.charAt(1)) : value.substring(2, 4),
-        b = isShortNotation ? (value.charAt(2) + value.charAt(2)) : value.substring(4, 6),
-        a = isRGBa ? (isShortNotation ? (value.charAt(3) + value.charAt(3)) : value.substring(6, 8)) : 'FF';
+        isShortNotation = value.length === 3 || value.length === 4,
+        isRGBa = value.length === 8 || value.length === 4,
+        r = isShortNotation
+          ? value.charAt(0) + value.charAt(0)
+          : value.substring(0, 2),
+        g = isShortNotation
+          ? value.charAt(1) + value.charAt(1)
+          : value.substring(2, 4),
+        b = isShortNotation
+          ? value.charAt(2) + value.charAt(2)
+          : value.substring(4, 6),
+        a = isRGBa
+          ? isShortNotation
+            ? value.charAt(3) + value.charAt(3)
+            : value.substring(6, 8)
+          : 'FF';
 
       return [
         parseInt(r, 16),
         parseInt(g, 16),
         parseInt(b, 16),
-        parseFloat((parseInt(a, 16) / 255).toFixed(2))
+        parseFloat((parseInt(a, 16) / 255).toFixed(2)),
       ];
     }
   }
@@ -400,6 +410,3 @@ export class Color {
     return oColor;
   }
 }
-
-
-

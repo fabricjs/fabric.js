@@ -6,4 +6,5 @@
  * @param {number} fractionDigits number of fraction digits to "leave"
  * @return {number}
  */
- export const toFixed = (number: number | string, fractionDigits: number) => parseFloat(Number(number).toFixed(fractionDigits));
+export const toFixed = (number: number | string, fractionDigits: number) =>
+  parseFloat(Number(number).toFixed(fractionDigits));

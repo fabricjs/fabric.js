@@ -27,7 +27,9 @@ class RunningAnimations extends Array {
       return [];
     }
     const cancelled = this.filter(
-      (animation) => typeof animation.target === 'object' && animation.target.canvas === canvas
+      (animation) =>
+        typeof animation.target === 'object' &&
+        animation.target.canvas === canvas
     );
     cancelled.forEach((animation) => animation.cancel());
     return cancelled;
@@ -78,4 +80,3 @@ class RunningAnimations extends Array {
 export const runningAnimations = new RunningAnimations();
 
 fabric.runningAnimations = runningAnimations;
-
