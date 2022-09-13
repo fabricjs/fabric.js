@@ -19,14 +19,14 @@ QUnit.module('Gradient', hooks => {
         // [0.5, 0, 0, 0.5, 0, 0],
         // [2, 0, 0, 0.5, 0, 0],
         // [0.5, 0, 0, 2, 0, 0],
-        [1, 0.25, 0, 1, 0, 0],
+        // [1, 0.25, 0, 1, 0, 0],
         // [1, -0.25, 0, 1, 0, 0],
         // [1, 0, 0.25, 1, 0, 0],
-        // [1, 0, -0.25, 1, 0, 0],
+        // // [1, 0, -0.25, 1, 0, 0],
         // [1, 0.25, 0.25, 1, 0, 0],
         // [1, 0.25, -0.25, 1, 0, 0],
         // [1, -0.25, -0.25, 1, 0, 0],
-        // [1, -0.25, 0.25, 1, 0, 0],
+        [1, -0.25, 0.25,1, 0, 0],
     ];
     const start = 0;
     const end = 0.75;
@@ -38,7 +38,7 @@ QUnit.module('Gradient', hooks => {
                         if (x1 === x2 && y1 === y2) return;
                         options.push({
                             coords: { x1, y1, x2, y2 },
-                            // percentage,
+                             percentage:true,
                             // fakeOffset,
                             transform
                         });
@@ -106,7 +106,7 @@ QUnit.module('Gradient', hooks => {
                 coords,
             transform,
             fakeOffset,
-            gradientUnit: units
+            gradientUnits: units
         });
         const goldenName = `gradient/coords(${Object.values(coords)})-(${transform}).png`;
         const iGoldenName = `gradient/coords(${Object.values(coords)})-(${fabric.iMatrix}).png`;
@@ -129,17 +129,17 @@ QUnit.module('Gradient', hooks => {
             ...size
         });
 
-        runner({
-            test: `canvas bg: ${testName}`,
-            code: (canvas, callback) => {
-                canvas.backgroundColor = makeGradient();
-                canvas.renderAll();
-                callback(canvas.lowerCanvasEl);
-            },
-            golden: goldenName,
-            percentage: 0.09,
-            ...size
-        });
+        // runner({
+        //     test: `canvas bg: ${testName}`,
+        //     code: (canvas, callback) => {
+        //         canvas.backgroundColor = makeGradient();
+        //         canvas.renderAll();
+        //         callback(canvas.lowerCanvasEl);
+        //     },
+        //     golden: goldenName,
+        //     percentage: 0.09,
+        //     ...size
+        // });
 
         runner({
             test: `transform check: ${testName}`,
@@ -154,7 +154,7 @@ QUnit.module('Gradient', hooks => {
             golden: goldenName,
             percentage: 0.09,
             ...size,
-            // testOnly: true
+            testOnly: true
         });
 
         // transform[0] && transform[3] && runner({
