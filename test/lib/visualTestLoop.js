@@ -184,7 +184,7 @@
             console.log(stringa);
           }
           if ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs) {
-            generateGolden(getGoldeName(golden), renderedCanvas);
+            await generateGolden(getGoldeName(golden), renderedCanvas);
           }
           await fabricCanvas.dispose();
           done();          
