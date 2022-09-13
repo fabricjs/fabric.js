@@ -139,21 +139,42 @@ export class Gradient<
     const shear: TMat2D = [1, t[1], t[2], 1, 0, 0];
     // affine translation rotated by 90deg
     const translate: TMat2D = [1, 0, 0, 1, -t[5], t[4]];
-    return multiplyTransformMatrices2([
-      // gradient offset
-      [1, 0, 0, 1, offset.x, offset.y],
-      translate,
-      // rotate back 90deg
-      [0, 1, -1, 0, 0, 0],
-      scale,
-      shear,
-      // rotate 90deg
+
+    // const rotate = multiplyTransformMatrices2([
+    //   [1, 0, 0, 1, -this.coords.x1, -this.coords.y1],
+    //   [0, -1, 1, 0, 0, 0],
+    //   [1, 0, 0, 1, this.coords.x1, this.coords.y1],
+    // ]);
+    const vCenter = new Point(this.coords.x1, this.coords.y1).midPointFrom(
+      new Point(this.coords.x2, this.coords.y2)
+    );
+    const rotate = multiplyTransformMatrices2([
+      [1, 0, 0, 1, vCenter.x / 2, vCenter.y / 2],
       [0, -1, 1, 0, 0, 0],
-      // scale to size
-      this.gradientUnits === 'percentage'
-        ? [size.width || 1, 0, 0, size.height || 1, 0, 0]
-        : iMatrix,
+      [1, 0, 0, 1, -vCenter.x / 2, -vCenter.y / 2],
     ]);
+    console.log(offset);
+    return multiplyTransformMatrices(
+      [1, 0, 0, 1, offset.x, offset.y],
+      multiplyTransformMatrices2(
+        [
+          // gradient offset
+          [1, 0, 0, 1, offset.x, offset.y],
+          // translate,
+
+          // rotate back 90deg
+          invertTransform(rotate),
+          t,
+          // rotate 90deg
+          rotate,
+          // scale to size
+          this.gradientUnits === 'percentage'
+            ? [size.width || 1, 0, 0, size.height || 1, 0, 0]
+            : iMatrix,
+        ],
+        true
+      )
+    );
   }
 
   protected toLive(
