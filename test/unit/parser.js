@@ -408,9 +408,9 @@
     '</svg>';
 
     fabric.loadSVGFromString(string, function(objects) {
-      assert.equal(objects[0].fill.gradientType, 'linear', 'first path has gradient');
-      assert.equal(objects[1].fill.gradientType, 'linear', 'second path has gradient');
-      assert.equal(objects[2].fill.gradientType, 'linear', 'second path has gradient');
+      assert.equal(objects[0].fill.type, 'linear', 'first path has gradient');
+      assert.equal(objects[1].fill.type, 'linear', 'second path has gradient');
+      assert.equal(objects[2].fill.type, 'linear', 'second path has gradient');
       done();
     });
   });

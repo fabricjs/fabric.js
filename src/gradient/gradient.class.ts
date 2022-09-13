@@ -74,7 +74,7 @@ export class Gradient<
    * @type GradientType
    * @default 'linear'
    */
-  gradientType: T;
+  type: T;
 
   coords: GradientCoords<T>;
 
@@ -83,7 +83,7 @@ export class Gradient<
   private id: string | number;
 
   constructor({
-    gradientType = 'linear' as T,
+    type = 'linear' as T,
     gradientUnits = 'pixels',
     coords,
     colorStops = [],
@@ -91,24 +91,16 @@ export class Gradient<
     offsetY = 0,
     gradientTransform,
     id,
-    type,
   }: GradientOptions<T>) {
-    if (type) {
-      throw new Error(
-        'fabric.Gradient: `type` has been renamed to `gradientType`'
-      );
-    }
     const uid = fabric.Object.__uid++;
     this.id = id ? `${id}_${uid}` : uid;
-    this.gradientType = gradientType;
+    this.type = type;
     this.gradientUnits = gradientUnits;
     this.gradientTransform = gradientTransform || null;
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.coords = {
-      ...(this.gradientType === 'radial'
-        ? radialDefaultCoords
-        : linearDefaultCoords),
+      ...(this.type === 'radial' ? radialDefaultCoords : linearDefaultCoords),
       ...coords,
     } as GradientCoords<T>;
     this.colorStops = colorStops.slice();
@@ -143,8 +135,7 @@ export class Gradient<
   toObject(propertiesToInclude?: (keyof this)[]) {
     return {
       ...pick(this, propertiesToInclude),
-      type: 'gradient',
-      gradientType: this.gradientType,
+      type: this.type,
       coords: this.coords,
       colorStops: this.colorStops,
       offsetX: this.offsetX,
@@ -156,7 +147,7 @@ export class Gradient<
     };
   }
 
-  static fromObject({ type: __, ...rest }: any) {
+  static fromObject({ ...rest }: any) {
     return Promise.resolve(new Gradient(rest));
   }
 
@@ -212,7 +203,7 @@ export class Gradient<
       '',
     ].join(' ');
 
-    if (this.gradientType === 'linear') {
+    if (this.type === 'linear') {
       const { x1, y1, x2, y2 } = this.coords;
       markup.push(
         '<linearGradient ',
@@ -227,7 +218,7 @@ export class Gradient<
         y2,
         '">\n'
       );
-    } else if (this.gradientType === 'radial') {
+    } else if (this.type === 'radial') {
       const { x1, y1, x2, y2, r1, r2 } = this
         .coords as GradientCoords<'radial'>;
       const needsSwap = r1 > r2;
@@ -278,9 +269,7 @@ export class Gradient<
     });
 
     markup.push(
-      this.gradientType === 'linear'
-        ? '</linearGradient>'
-        : '</radialGradient>',
+      this.type === 'linear' ? '</linearGradient>' : '</radialGradient>',
       '\n'
     );
 
@@ -294,13 +283,13 @@ export class Gradient<
    * @return {CanvasGradient}
    */
   toLive(ctx: CanvasRenderingContext2D) {
-    if (!this.gradientType) {
+    if (!this.type) {
       return;
     }
 
     const coords = this.coords as GradientCoords<'radial'>;
     const gradient =
-      this.gradientType === 'linear'
+      this.type === 'linear'
         ? ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2)
         : ctx.createRadialGradient(
             coords.x1,
@@ -376,7 +365,7 @@ export class Gradient<
     const gradientUnits = parseGradientUnits(el);
     return new Gradient({
       id: el.getAttribute('id') || undefined,
-      gradientType: parseType(el),
+      type: parseType(el),
       coords: parseCoords(el, {
         width: svgOptions.viewBoxWidth || svgOptions.width,
         height: svgOptions.viewBoxHeight || svgOptions.height,

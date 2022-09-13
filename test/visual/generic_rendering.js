@@ -178,7 +178,7 @@
 
   function backgroundWithGradient(canvas, callback) {
     var g = new fabric.Gradient({
-      gradientType: 'linear',
+      type: 'linear',
       gradientTransform: [0.4 , -0.4, 0.2, 0.1, 3, 5],
       coords: {
         x1: 0,
@@ -216,7 +216,7 @@
   function backgroundWithGradientZoom(canvas, callback) {
     canvas.setZoom(0.1);
     var g = new fabric.Gradient({
-      gradientType: 'linear',
+      type: 'linear',
       gradientTransform: [0.4 , -0.4, 0.2, 0.1, 3, 5],
       coords: {
         x1: 0,
@@ -255,7 +255,7 @@
     canvas.setZoom(0.1);
     canvas.backgroundVpt = false;
     var g = new fabric.Gradient({
-      gradientType: 'linear',
+      type: 'linear',
       gradientTransform: [0.4 , -0.4, 0.2, 0.1, 3, 5],
       coords: {
         x1: 0,
@@ -409,7 +409,7 @@
   function gradientStroke(canvas, callback) {
     var line = new fabric.Line([10, 10, 200, 200], {
       stroke: new fabric.Gradient({
-        gradientType: 'linear',
+        type: 'linear',
         coords: {
           x1: 20,
           y1: 0,
@@ -459,7 +459,7 @@
       top: -25,
       fontWeight: 'bold',
       fill: new fabric.Gradient({
-        gradientType: 'radial',
+        type: 'radial',
         coords: {
           x1: 0,
           y1: 0,

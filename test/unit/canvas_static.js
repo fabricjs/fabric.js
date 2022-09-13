@@ -1141,7 +1141,7 @@
   QUnit.test('toObject excludeFromExport bg overlay', function(assert) {
     var rect = makeRect(), rect2 = makeRect(), rect3 = makeRect();
     var bgColor = new fabric.Gradient({
-      gradientType: 'linear',
+      type: 'linear',
       colorStops: [
         { offset: 0, color: 'black' },
         { offset: 1, color: 'white' },
@@ -1936,7 +1936,7 @@
     fabric.Object.__uid = 0;
     var canvas2 = new fabric.StaticCanvas();
     canvas2.backgroundColor = new fabric.Gradient({
-      gradientType: 'linear',
+      type: 'linear',
       colorStops: [
         { offset: 0, color: 'black' },
         { offset: 1, color: 'white' },
@@ -1958,7 +1958,7 @@
     var canvas2 = new fabric.StaticCanvas();
     canvas2.viewportTransform = [1, 2, 3, 4, 5, 6];
     canvas2.backgroundColor = new fabric.Gradient({
-      gradientType: 'linear',
+      type: 'linear',
       gradientTransform: [0.2, 0.3, 0.4, 0.5, -3, -5],
       colorStops: [
         { offset: 0, color: 'black' },
