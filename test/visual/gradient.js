@@ -12,21 +12,21 @@ QUnit.module('Gradient', hooks => {
         }
     ];
     const gradientMatrices = [
-        [1, 0, 0, 1, 0, 0],
-        [2, 0, 0, 2, 0, 0],
-        [1, 0, 0, 2, 0, 0],
-        [2, 0, 0, 1, 0, 0],
-        [0.5, 0, 0, 0.5, 0, 0],
-        [2, 0, 0, 0.5, 0, 0],
-        [0.5, 0, 0, 2, 0, 0],
+        // [1, 0, 0, 1, 0, 0],
+        // [2, 0, 0, 2, 0, 0],
+        // [1, 0, 0, 2, 0, 0],
+        // [2, 0, 0, 1, 0, 0],
+        // [0.5, 0, 0, 0.5, 0, 0],
+        // [2, 0, 0, 0.5, 0, 0],
+        // [0.5, 0, 0, 2, 0, 0],
         [1, 0.25, 0, 1, 0, 0],
-        [1, -0.25, 0, 1, 0, 0],
-        [1, 0, 0.25, 1, 0, 0],
-        [1, 0, -0.25, 1, 0, 0],
-        [1, 0.25, 0.25, 1, 0, 0],
-        [1, 0.25, -0.25, 1, 0, 0],
-        [1, -0.25, -0.25, 1, 0, 0],
-        [1, -0.25, 0.25, 1, 0, 0],
+        // [1, -0.25, 0, 1, 0, 0],
+        // [1, 0, 0.25, 1, 0, 0],
+        // [1, 0, -0.25, 1, 0, 0],
+        // [1, 0.25, 0.25, 1, 0, 0],
+        // [1, 0.25, -0.25, 1, 0, 0],
+        // [1, -0.25, -0.25, 1, 0, 0],
+        // [1, -0.25, 0.25, 1, 0, 0],
     ];
     const start = 0;
     const end = 0.75;
@@ -34,19 +34,21 @@ QUnit.module('Gradient', hooks => {
         [start, end].forEach(y1 => {
             [start, end].forEach(x2 => {
                 [start, end].forEach(y2 => {
-                    [true, false].forEach(percentage => {
-                        [new fabric.Point(), new fabric.Point(-120, 50)].forEach(fakeOffset => {
-                            gradientMatrices.forEach(transform => {
-                                if (x1 === x2 && y1 === y2) return;
-                                options.push({
-                                    coords: { x1, y1, x2, y2 },
-                                    // percentage,
-                                    // fakeOffset,
-                                    transform
-                                });
-                            });
+                    gradientMatrices.forEach(transform => {
+                        if (x1 === x2 && y1 === y2) return;
+                        options.push({
+                            coords: { x1, y1, x2, y2 },
+                            // percentage,
+                            // fakeOffset,
+                            transform
                         });
                     });
+
+                    // [true, false].forEach(percentage => {
+                    //     [new fabric.Point(), new fabric.Point(-120, 50)].forEach(fakeOffset => {
+                    //        
+                    //     });
+                    // });
                 });
             });
         });
@@ -94,7 +96,7 @@ QUnit.module('Gradient', hooks => {
             y2: y2 * size.height
         };
         const units = percentage ? 'percentage' : 'pixels';
-        const gradient = createGradient({
+        const makeGradient = () => createGradient({
             coords: percentage ?
                 { x1, y1, x2, y2 } :
                 coords,
@@ -102,7 +104,8 @@ QUnit.module('Gradient', hooks => {
             fakeOffset,
             gradientUnit: units
         });
-        const goldenName = `gradient/coords(${Object.values(coords)})_transform(${transform}).png`;
+        const goldenName = `gradient/coords(${Object.values(coords)})-(${transform}).png`;
+        const iGoldenName = `gradient/coords(${Object.values(coords)})-(${fabric.iMatrix}).png`;
         const testName = `gradient coords(${Object.values(coords)}), transform(${transform}), units(${units}), fake offset(${fakeOffset})`;
         runner({
             test: testName,
@@ -110,7 +113,7 @@ QUnit.module('Gradient', hooks => {
                 const rect = new fabric.Rect({
                     width: canvas.width,
                     height: canvas.height,
-                    fill: gradient,
+                    fill: makeGradient(),
                     strokeWidth: 0
                 });
                 canvas.add(rect);
@@ -123,9 +126,9 @@ QUnit.module('Gradient', hooks => {
         });
 
         runner({
-            test: `canvas bg ${testName}`,
+            test: `canvas bg: ${testName}`,
             code: (canvas, callback) => {
-                canvas.backgroundColor = gradient;
+                canvas.backgroundColor = makeGradient();
                 canvas.renderAll();
                 callback(canvas.lowerCanvasEl);
             },
@@ -133,5 +136,34 @@ QUnit.module('Gradient', hooks => {
             percentage: 0.09,
             ...size
         });
+
+        runner({
+            test: `transform check: ${testName}`,
+            code: (canvas, callback) => {
+                const gradient = makeGradient();
+                gradient.gradientTransform = null;
+                canvas.backgroundColor = gradient;
+                canvas.setViewportTransform(transform);
+                canvas.renderAll();
+                callback(canvas.lowerCanvasEl);
+            },
+            golden: goldenName,
+            percentage: 0.09,
+            ...size,
+            testOnly: true
+        });
+
+        // transform[0] && transform[3] && runner({
+        //     test: `inverted transform check: ${testName}`,
+        //     code: (canvas, callback) => {
+        //         canvas.backgroundColor = makeGradient();
+        //         canvas.setViewportTransform(fabric.util.invertTransform(transform));
+        //         canvas.renderAll();
+        //         callback(canvas.lowerCanvasEl);
+        //     },
+        //     golden: iGoldenName,
+        //     percentage: 0.09,
+        //     ...size,
+        // });
     });
 });
