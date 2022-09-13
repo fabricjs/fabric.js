@@ -161,7 +161,7 @@ QUnit.module('Gradient', hooks => {
         //     test: `inverted transform check: ${testName}`,
         //     code: (canvas, callback) => {
         //         canvas.backgroundColor = makeGradient();
-        //         canvas.setViewportTransform(fabric.util.invertTransform(transform));
+        //         canvas.setViewportTransform(fabric.util.invertTransform(buildMatrix(transform)));
         //         canvas.renderAll();
         //         callback(canvas.lowerCanvasEl);
         //     },
