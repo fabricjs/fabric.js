@@ -4,28 +4,26 @@ import { sin } from './util/misc/sin';
 import { cos } from './util/misc/cos';
 
 export interface IPoint {
-  x: number
-  y: number
+  x: number;
+  y: number;
 }
 
 /**
  * Adaptation of work of Kevin Lindsey(kevin@kevlindev.com)
  */
 export class Point {
+  x: number;
 
-  x: number
+  y: number;
 
-  y: number
-
-  constructor()
-  constructor(x?: number, y?: number)
-  constructor(point: IPoint)
+  constructor();
+  constructor(x?: number, y?: number);
+  constructor(point: IPoint);
   constructor(arg0: number | IPoint = 0, y = 0) {
     if (typeof arg0 === 'object') {
       this.x = arg0.x;
       this.y = arg0.y;
-    }
-    else {
+    } else {
       this.x = arg0;
       this.y = y;
     }
@@ -187,7 +185,7 @@ export class Point {
    * @return {Boolean}
    */
   eq(that: IPoint): boolean {
-    return (this.x === that.x && this.y === that.y);
+    return this.x === that.x && this.y === that.y;
   }
 
   /**
@@ -196,7 +194,7 @@ export class Point {
    * @return {Boolean}
    */
   lt(that: IPoint): boolean {
-    return (this.x < that.x && this.y < that.y);
+    return this.x < that.x && this.y < that.y;
   }
 
   /**
@@ -205,7 +203,7 @@ export class Point {
    * @return {Boolean}
    */
   lte(that: IPoint): boolean {
-    return (this.x <= that.x && this.y <= that.y);
+    return this.x <= that.x && this.y <= that.y;
   }
 
   /**
@@ -215,7 +213,7 @@ export class Point {
    * @return {Boolean}
    */
   gt(that: IPoint): boolean {
-    return (this.x > that.x && this.y > that.y);
+    return this.x > that.x && this.y > that.y;
   }
 
   /**
@@ -224,7 +222,7 @@ export class Point {
    * @return {Boolean}
    */
   gte(that: IPoint): boolean {
-    return (this.x >= that.x && this.y >= that.y);
+    return this.x >= that.x && this.y >= that.y;
   }
 
   /**
@@ -235,7 +233,10 @@ export class Point {
    */
   lerp(that: IPoint, t = 0.5): Point {
     t = Math.max(Math.min(1, t), 0);
-    return new Point(this.x + (that.x - this.x) * t, this.y + (that.y - this.y) * t);
+    return new Point(
+      this.x + (that.x - this.x) * t,
+      this.y + (that.y - this.y) * t
+    );
   }
 
   /**
@@ -356,14 +357,15 @@ export class Point {
    * @param {TRadian} radians The radians of the angle for the rotation
    * @return {Point} The new rotated point
    */
-   rotate(radians: TRadian, origin: Point = originZero): Point {
+  rotate(radians: TRadian, origin: Point = originZero): Point {
     // TODO benchmark and verify the add and subtract how much cost
     // and then in case early return if no origin is passed
-    const sinus = sin(radians), cosinus = cos(radians);
+    const sinus = sin(radians),
+      cosinus = cos(radians);
     const p = this.subtract(origin);
     const rotated = new Point(
       p.x * cosinus - p.y * sinus,
-      p.x * sinus + p.y * cosinus,
+      p.x * sinus + p.y * cosinus
     );
     return rotated.add(origin);
   }
