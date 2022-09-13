@@ -60,8 +60,9 @@ export class Registry {
   }
 
   getJSONHandler(data: Record<string, unknown>) {
-    if (this.resolver.json) {
-      return this.resolver.json(data);
+    const resolved = this.resolver.json && this.resolver.json(data);
+    if (resolved) {
+      return resolved;
     }
     const key = this.resolveJSONKey(data);
     const handler = !!key && this.registry.get(key)?.json;
@@ -69,8 +70,9 @@ export class Registry {
   }
 
   getSVGHandler({ key, element }: { key: string; element: SVGElement }) {
-    if (this.resolver.svg) {
-      return this.resolver.svg({ key, element });
+    const resolved = this.resolver.svg && this.resolver.svg({ key, element });
+    if (resolved) {
+      return resolved;
     }
     const handler = this.registry.get(key)?.svg;
     return { key, handler };
