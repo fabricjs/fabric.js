@@ -1,5 +1,5 @@
-import { Point } from "../../point.class";
-import { createVector, getBisector } from "./vectors";
+import { Point } from '../../point.class';
+import { createVector, getBisector } from './vectors';
 import { StrokeLineJoin } from '../../typedefs';
 /**
  * Project stroke width on points returning 2 projections for each point as follows:
@@ -28,7 +28,7 @@ type projectStrokeOnPointsOptions = {
   strokeUniform: boolean;
   scaleX: number;
   scaleY: number;
-}
+};
 
 export const projectStrokeOnPoints = (
   points: Point[],
@@ -40,34 +40,41 @@ export const projectStrokeOnPoints = (
     scaleX,
     scaleY,
   }: projectStrokeOnPointsOptions,
-  openPath: boolean,
+  openPath: boolean
 ): Point[] => {
-  const coords: Point[] = [], s = strokeWidth / 2,
-        strokeUniformScalar = strokeUniform ?
-        new Point(1 / scaleX, 1 / scaleY) : new Point(1, 1),
-        getStrokeHatVector = (v: Point) => {
-          const scalar = s / (Math.hypot(v.x, v.y));
-          return new Point(v.x * scalar * strokeUniformScalar.x, v.y * scalar * strokeUniformScalar.y);
-        };
-  if (points.length <= 1) {return coords;}
+  const coords: Point[] = [],
+    s = strokeWidth / 2,
+    strokeUniformScalar = strokeUniform
+      ? new Point(1 / scaleX, 1 / scaleY)
+      : new Point(1, 1),
+    getStrokeHatVector = (v: Point) => {
+      const scalar = s / Math.hypot(v.x, v.y);
+      return new Point(
+        v.x * scalar * strokeUniformScalar.x,
+        v.y * scalar * strokeUniformScalar.y
+      );
+    };
+  if (points.length <= 1) {
+    return coords;
+  }
   points.forEach(function (p, index) {
     const A = new Point(p.x, p.y);
     let B, C;
     if (index === 0) {
       C = points[index + 1];
-      B = openPath ? getStrokeHatVector(createVector(C, A)).add(A) : points[points.length - 1];
-    }
-    else if (index === points.length - 1) {
+      B = openPath
+        ? getStrokeHatVector(createVector(C, A)).add(A)
+        : points[points.length - 1];
+    } else if (index === points.length - 1) {
       B = points[index - 1];
       C = openPath ? getStrokeHatVector(createVector(B, A)).add(A) : points[0];
-    }
-    else {
+    } else {
       B = points[index - 1];
       C = points[index + 1];
     }
     const bisector = getBisector(A, B, C),
-          bisectorVector = bisector.vector,
-          alpha = bisector.angle;
+      bisectorVector = bisector.vector,
+      alpha = bisector.angle;
     let scalar, miterVector;
     if (strokeLineJoin === StrokeLineJoin.miter) {
       scalar = -s / Math.sin(alpha / 2);

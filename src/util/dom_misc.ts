@@ -22,28 +22,26 @@ export function wrapElement(element, wrapper) {
  * @return {Object} Object with left/top values
  */
 export function getScrollLeftTop(element) {
-
   let left = 0,
-      top = 0;
+    top = 0;
 
   const docElement = fabric.document.documentElement,
-        body = fabric.document.body || {
-          scrollLeft: 0, scrollTop: 0
-        };
+    body = fabric.document.body || {
+      scrollLeft: 0,
+      scrollTop: 0,
+    };
   // While loop checks (and then sets element to) .parentNode OR .host
   //  to account for ShadowDOM. We still want to traverse up out of ShadowDOM,
   //  but the .parentNode of a root ShadowDOM node will always be null, instead
   //  it should be accessed through .host. See http://stackoverflow.com/a/24765528/4383938
   while (element && (element.parentNode || element.host)) {
-
     // Set element to element parent, or 'host' in case of ShadowDOM
     element = element.parentNode || element.host;
 
     if (element === fabric.document) {
       left = body.scrollLeft || docElement.scrollLeft || 0;
-      top = body.scrollTop ||  docElement.scrollTop || 0;
-    }
-    else {
+      top = body.scrollTop || docElement.scrollTop || 0;
+    } else {
       left += element.scrollLeft || 0;
       top += element.scrollTop || 0;
     }
@@ -66,32 +64,33 @@ export function getScrollLeftTop(element) {
 export function getElementOffset(element) {
   let box = { left: 0, top: 0 };
   const doc = element && element.ownerDocument,
-        offset = { left: 0, top: 0 },
-        offsetAttributes = {
-          borderLeftWidth: 'left',
-          borderTopWidth:  'top',
-          paddingLeft:     'left',
-          paddingTop:      'top'
-        };
+    offset = { left: 0, top: 0 },
+    offsetAttributes = {
+      borderLeftWidth: 'left',
+      borderTopWidth: 'top',
+      paddingLeft: 'left',
+      paddingTop: 'top',
+    };
 
   if (!doc) {
     return offset;
   }
-  const elemStyle = fabric.document.defaultView.getComputedStyle(element, null)
+  const elemStyle = fabric.document.defaultView.getComputedStyle(element, null);
   for (const attr in offsetAttributes) {
     offset[offsetAttributes[attr]] += parseInt(elemStyle[attr], 10) || 0;
   }
 
   const docElem = doc.documentElement;
-  if ( typeof element.getBoundingClientRect !== 'undefined' ) {
+  if (typeof element.getBoundingClientRect !== 'undefined') {
     box = element.getBoundingClientRect();
   }
 
   const scrollLeftTop = getScrollLeftTop(element);
 
   return {
-    left: box.left + scrollLeftTop.left - (docElem.clientLeft || 0) + offset.left,
-    top: box.top + scrollLeftTop.top - (docElem.clientTop || 0)  + offset.top
+    left:
+      box.left + scrollLeftTop.left - (docElem.clientLeft || 0) + offset.left,
+    top: box.top + scrollLeftTop.top - (docElem.clientTop || 0) + offset.top,
   };
 }
 
@@ -126,7 +125,7 @@ export function makeElementSelectable(element) {
 export function getNodeCanvas(element) {
   const impl = fabric.jsdomImplForWrapper(element);
   return impl._canvas || impl._image;
-};
+}
 
 export function cleanUpJsdomNode(element) {
   if (!fabric.isLikelyNode) {

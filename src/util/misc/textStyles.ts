@@ -7,23 +7,23 @@ import { clone } from '../lang_object';
  * @param {boolean} forTextSpans whether to check overline, underline, and line-through properties
  * @return {boolean} true if the style changed
  */
-export const hasStyleChanged = (prevStyle: any, thisStyle: any, forTextSpans = false) => (
-  (
-    prevStyle.fill !== thisStyle.fill ||
-    prevStyle.stroke !== thisStyle.stroke ||
-    prevStyle.strokeWidth !== thisStyle.strokeWidth ||
-    prevStyle.fontSize !== thisStyle.fontSize ||
-    prevStyle.fontFamily !== thisStyle.fontFamily ||
-    prevStyle.fontWeight !== thisStyle.fontWeight ||
-    prevStyle.fontStyle !== thisStyle.fontStyle ||
-    prevStyle.deltaY !== thisStyle.deltaY
-  ) ||
+export const hasStyleChanged = (
+  prevStyle: any,
+  thisStyle: any,
+  forTextSpans = false
+) =>
+  prevStyle.fill !== thisStyle.fill ||
+  prevStyle.stroke !== thisStyle.stroke ||
+  prevStyle.strokeWidth !== thisStyle.strokeWidth ||
+  prevStyle.fontSize !== thisStyle.fontSize ||
+  prevStyle.fontFamily !== thisStyle.fontFamily ||
+  prevStyle.fontWeight !== thisStyle.fontWeight ||
+  prevStyle.fontStyle !== thisStyle.fontStyle ||
+  prevStyle.deltaY !== thisStyle.deltaY ||
   (forTextSpans &&
     (prevStyle.overline !== thisStyle.overline ||
-    prevStyle.underline !== thisStyle.underline ||
-    prevStyle.linethrough !== thisStyle.linethrough)
-  )
-);
+      prevStyle.underline !== thisStyle.underline ||
+      prevStyle.linethrough !== thisStyle.linethrough));
 
 /**
  * Returns the array form of a text object's inline styles property with styles grouped in ranges
@@ -36,8 +36,9 @@ export const hasStyleChanged = (prevStyle: any, thisStyle: any, forTextSpans = f
  */
 export const stylesToArray = (styles: any, text: string) => {
   const textLines = text.split('\n'),
-        stylesArray = [];
-  let charIndex = -1,  prevStyle = {};
+    stylesArray = [];
+  let charIndex = -1,
+    prevStyle = {};
   // clone style structure to prevent mutation
   styles = clone(styles, true);
 
@@ -58,10 +59,9 @@ export const stylesToArray = (styles: any, text: string) => {
           stylesArray.push({
             start: charIndex,
             end: charIndex + 1,
-            style: thisStyle
+            style: thisStyle,
           });
-        }
-        else {
+        } else {
           //if style is the same as previous character, increase end index
           stylesArray[stylesArray.length - 1].end++;
         }
@@ -85,17 +85,21 @@ export const stylesFromArray = (styles: any, text: string) => {
   if (!Array.isArray(styles)) {
     return styles;
   }
-  const textLines = text.split('\n'), stylesObject = {} as any;
-  let charIndex = -1, styleIndex = 0;
+  const textLines = text.split('\n'),
+    stylesObject = {} as any;
+  let charIndex = -1,
+    styleIndex = 0;
   //loop through each textLine
   for (let i = 0; i < textLines.length; i++) {
     //loop through each character of the current line
     for (let c = 0; c < textLines[i].length; c++) {
       charIndex++;
       //check if there's a style collection that includes the current character
-      if (styles[styleIndex]
-        && styles[styleIndex].start <= charIndex
-        && charIndex < styles[styleIndex].end) {
+      if (
+        styles[styleIndex] &&
+        styles[styleIndex].start <= charIndex &&
+        charIndex < styles[styleIndex].end
+      ) {
         //create object for line index if it doesn't exist
         stylesObject[i] = stylesObject[i] || {};
         //assign a style at this character's index
@@ -108,4 +112,4 @@ export const stylesFromArray = (styles: any, text: string) => {
     }
   }
   return stylesObject;
-}
+};

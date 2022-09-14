@@ -21,10 +21,14 @@ if (preRelease === 'true') {
 // override package.json with updated fields
 fs.writeFileSync(
   pkgPath,
-  JSON.stringify(Object.assign(pkgObject, {
-    optionalDependencies: {},
-    version: pkgObject.version + '-browser',
-  }), null, '\t')
+  JSON.stringify(
+    Object.assign(pkgObject, {
+      optionalDependencies: {},
+      version: pkgObject.version + '-browser',
+    }),
+    null,
+    '\t'
+  )
 );
 
 console.log('npm publish ' + args);

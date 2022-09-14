@@ -1,35 +1,39 @@
-import { fabric } from "../../HEADER";
-import { PathData } from "../typedefs";
-import { createCanvasElement } from "../util/misc/dom";
-import { Canvas } from "../__types__";
-import { PencilBrush } from "./pencil_brush.class";
+import { fabric } from '../../HEADER';
+import { PathData } from '../typedefs';
+import { createCanvasElement } from '../util/misc/dom';
+import { Canvas } from '../__types__';
+import { PencilBrush } from './pencil_brush.class';
 
 /**
  * @todo remove transient
  */
 const { Pattern } = fabric;
 
-
 export class PatternBrush extends PencilBrush {
-
-  source?: CanvasImageSource
+  source?: CanvasImageSource;
 
   constructor(canvas: Canvas) {
     super(canvas);
   }
 
   getPatternSrc() {
-
     const dotWidth = 20,
-          dotDistance = 5,
-          patternCanvas = createCanvasElement(),
-          patternCtx = patternCanvas.getContext('2d');
+      dotDistance = 5,
+      patternCanvas = createCanvasElement(),
+      patternCtx = patternCanvas.getContext('2d');
 
     patternCanvas.width = patternCanvas.height = dotWidth + dotDistance;
     if (patternCtx) {
       patternCtx.fillStyle = this.color;
       patternCtx.beginPath();
-      patternCtx.arc(dotWidth / 2, dotWidth / 2, dotWidth / 2, 0, Math.PI * 2, false);
+      patternCtx.arc(
+        dotWidth / 2,
+        dotWidth / 2,
+        dotWidth / 2,
+        0,
+        Math.PI * 2,
+        false
+      );
       patternCtx.closePath();
       patternCtx.fill();
     }
@@ -37,7 +41,10 @@ export class PatternBrush extends PencilBrush {
   }
 
   getPatternSrcFunction() {
-    return String(this.getPatternSrc).replace('this.color', '"' + this.color + '"');
+    return String(this.getPatternSrc).replace(
+      'this.color',
+      '"' + this.color + '"'
+    );
   }
 
   /**
@@ -68,7 +75,7 @@ export class PatternBrush extends PencilBrush {
     path.stroke = new Pattern({
       source: this.source || this.getPatternSrcFunction(),
       offsetX: -topLeft.x,
-      offsetY: -topLeft.y
+      offsetY: -topLeft.y,
     });
     return path;
   }

@@ -4,19 +4,21 @@
 
 <a href="http://fabricjs.com">FabricJS.com</a> is a **simple and powerful Javascript HTML5 canvas library**. It is also an **SVG-to-canvas parser**.
 
-
 <!-- build/coverage status, climate -->
+
 [![Build Status](https://secure.travis-ci.org/fabricjs/fabric.js.svg?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
 [![Code Climate](https://d3s6mut3hikguw.cloudfront.net/github/kangax/fabric.js/badges/gpa.svg)](https://codeclimate.com/github/kangax/fabric.js)
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/fabricjs/fabric.js)
 
 <!-- npm, bower, CDNJS versions, downloads -->
+
 [![CDNJS version](https://img.shields.io/cdnjs/v/fabric.js.svg)](https://cdnjs.com/libraries/fabric.js)
 [![NPM version](https://badge.fury.io/js/fabric.svg)](http://badge.fury.io/js/fabric)
 [![Downloads per month](https://img.shields.io/npm/dm/fabric.svg)](https://www.npmjs.org/package/fabric)
 [![Bower version](https://badge.fury.io/bo/fabric.svg)](http://badge.fury.io/bo/fabric)
 
-## Features 
+## Features
+
 - drag-n-drop objects on canvas,
 - scale, move, rotate and group objects with mouse,
 - use predefined shapes or create custom objects,
@@ -73,18 +75,18 @@ NOTE: es6 imports won't work in browser or with bundlers which expect es6 module
 <canvas id="canvas" width="300" height="300"></canvas>
 
 <!-- Get latest version: https://cdnjs.com/libraries/fabric.js -->
-<script src="lib/fabric.js"></script> 
+<script src="lib/fabric.js"></script>
 <script>
-    var canvas = new fabric.Canvas('canvas');
+  var canvas = new fabric.Canvas('canvas');
 
-    var rect = new fabric.Rect({
-        top : 100,
-        left : 100,
-        width : 60,
-        height : 70,
-        fill : 'red'
-    });
-    canvas.add(rect);
+  var rect = new fabric.Rect({
+    top: 100,
+    left: 100,
+    width: 60,
+    height: 70,
+    fill: 'red',
+  });
+  canvas.add(rect);
 </script>
 ```
 
@@ -106,7 +108,7 @@ const FabricJSCanvas = () => {
       canvas.dispose()
     }
   }, []);
-  
+
   return (<canvas width="300" height="300" ref={canvasEl}/>)
 });
 export default FabricJSCanvas;
@@ -114,10 +116,9 @@ export default FabricJSCanvas;
 
 NOTE: Fabric.js requires a `window` object.
 
-
 ## Building
 
-1. Build distribution file  **[~77K minified, ~20K gzipped]**
+1.  Build distribution file **[~77K minified, ~20K gzipped]**
 
          $ node build.js
 
@@ -130,11 +131,11 @@ NOTE: Fabric.js requires a `window` object.
           $ node build.js modules=parser,text
           // etc.
 
-      By default (when none of the modules are specified) only basic functionality is included.
-      See the list of modules below for more information on each one of them.
-      Note that default distribution has support for **static canvases** only.
+    By default (when none of the modules are specified) only basic functionality is included.
+    See the list of modules below for more information on each one of them.
+    Note that default distribution has support for **static canvases** only.
 
-      To get minimal distribution with interactivity, make sure to include corresponding module:
+    To get minimal distribution with interactivity, make sure to include corresponding module:
 
           $ node build.js modules=interaction
 
@@ -146,7 +147,7 @@ NOTE: Fabric.js requires a `window` object.
 
           $ node build.js modules=ALL exclude=gestures,image_filters
 
-2. Create a minified distribution file
+2.  Create a minified distribution file
 
         # Using YUICompressor (default option)
         $ node build.js modules=... minifier=yui
@@ -154,11 +155,11 @@ NOTE: Fabric.js requires a `window` object.
         # or Google Closure Compiler
         $ node build.js modules=... minifier=closure
 
-3. Enable AMD support via require.js (requires uglify)
+3.  Enable AMD support via require.js (requires uglify)
 
         $ node build.js requirejs modules=...
 
-4. Create source map file for better productive debugging (requires uglify or google closure compiler).<br>More information about [source maps](http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/).
+4.  Create source map file for better productive debugging (requires uglify or google closure compiler).<br>More information about [source maps](http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/).
 
         $ node build.js sourcemap modules=...
 
@@ -166,7 +167,7 @@ NOTE: Fabric.js requires a `window` object.
 
         //# sourceMappingURL=fabric.min.js.map
 
-5. Ensure code guidelines are met (prerequisite: `npm -g install eslint`)
+5.  Ensure code guidelines are met (prerequisite: `npm -g install eslint`)
 
         $ npm run lint && npm run lint_tests
 
@@ -206,7 +207,7 @@ These are the optional modules that could be specified for inclusion, when build
 
 Additional flags for build script are:
 
-- **requirejs** — Makes fabric requirejs AMD-compatible in `dist/fabric.js`. *Note:* an unminified, requirejs-compatible version is always created in `dist/fabric.require.js`
+- **requirejs** — Makes fabric requirejs AMD-compatible in `dist/fabric.js`. _Note:_ an unminified, requirejs-compatible version is always created in `dist/fabric.require.js`
 - **no-strict** — Strips "use strict" directives from source
 - **no-svg-export** — Removes svg exporting functionality
 - **sourcemap** - Generates a sourceMap file and adds the `sourceMappingURL` (only if uglifyjs is used) to `dist/fabric.min.js`
@@ -214,7 +215,6 @@ Additional flags for build script are:
 For example:
 
     node build.js modules=ALL exclude=json no-strict no-svg-export
-
 
 ## Goals
 
@@ -239,7 +239,6 @@ For example:
 
 You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the browser.
 
-
 ## More resources
 
 - [Fabric.js on Twitter](https://twitter.com/fabricjs)
@@ -249,7 +248,6 @@ You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the 
 - [Fabric.js on Codepen.io](https://codepen.io/tag/fabricjs)
 - [Presentation from BK.js](http://www.slideshare.net/kangax/fabricjs-building-acanvaslibrarybk)
 - [Presentation from Falsy Values](http://www.slideshare.net/kangax/fabric-falsy-values-8067834)
-
 
 ## Credits
 
@@ -263,7 +261,6 @@ You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the 
 - [Stefan Kienzle](https://twitter.com/kienzle_s) for help with bugs, features, documentation, GitHub issues
 - [Shutterstock](http://www.shutterstock.com/jobs) for the time and resources invested in using and improving Fabric.js
 - [and all the other GitHub contributors](https://github.com/kangax/fabric.js/graphs/contributors)
-
 
 ## Sponsor authors
 

@@ -4,11 +4,13 @@ import { Point } from '../point.class';
 (function (global) {
   /** ERASER_START */
 
-  var fabric = global.fabric, __drawClipPath = fabric.Object.prototype._drawClipPath;
+  var fabric = global.fabric,
+    __drawClipPath = fabric.Object.prototype._drawClipPath;
   var _needsItsOwnCache = fabric.Object.prototype.needsItsOwnCache;
   var _toObject = fabric.Object.prototype.toObject;
   var _getSvgCommons = fabric.Object.prototype.getSvgCommons;
-  var __createBaseClipPathSVGMarkup = fabric.Object.prototype._createBaseClipPathSVGMarkup;
+  var __createBaseClipPathSVGMarkup =
+    fabric.Object.prototype._createBaseClipPathSVGMarkup;
   var __createBaseSVGMarkup = fabric.Object.prototype._createBaseSVGMarkup;
 
   fabric.Object.prototype.cacheProperties.push('eraser');
@@ -56,10 +58,11 @@ import { Point } from '../point.class';
       if (this.eraser) {
         //  update eraser size to match instance
         var size = this._getNonTransformedDimensions();
-        this.eraser.isType('eraser') && this.eraser.set({
-          width: size.x,
-          height: size.y
-        });
+        this.eraser.isType('eraser') &&
+          this.eraser.set({
+            width: size.x,
+            height: size.y,
+          });
         __drawClipPath.call(this, ctx, this.eraser);
       }
     },
@@ -70,7 +73,10 @@ import { Point } from '../point.class';
      * @return {Object} Object representation of an instance
      */
     toObject: function (propertiesToInclude) {
-      var object = _toObject.call(this, ['erasable'].concat(propertiesToInclude));
+      var object = _toObject.call(
+        this,
+        ['erasable'].concat(propertiesToInclude)
+      );
       if (this.eraser && !this.eraser.excludeFromExport) {
         object.eraser = this.eraser.toObject(propertiesToInclude);
       }
@@ -84,7 +90,10 @@ import { Point } from '../point.class';
      * @return {String}
      */
     getSvgCommons: function () {
-      return _getSvgCommons.call(this) + (this.eraser ? 'mask="url(#' + this.eraser.clipPathId + ')" ' : '');
+      return (
+        _getSvgCommons.call(this) +
+        (this.eraser ? 'mask="url(#' + this.eraser.clipPathId + ')" ' : '')
+      );
     },
 
     /**
@@ -98,9 +107,12 @@ import { Point } from '../point.class';
       if (this.eraser) {
         this.eraser.clipPathId = 'MASK_' + fabric.Object.__uid++;
         return [
-          '<mask id="', this.eraser.clipPathId, '" >',
+          '<mask id="',
+          this.eraser.clipPathId,
+          '" >',
           this.eraser.toSVG(reviver),
-          '</mask>', '\n'
+          '</mask>',
+          '\n',
         ].join('');
       }
       return '';
@@ -112,7 +124,7 @@ import { Point } from '../point.class';
     _createBaseClipPathSVGMarkup: function (objectMarkup, options) {
       return [
         this._createEraserSVGMarkup(options && options.reviver),
-        __createBaseClipPathSVGMarkup.call(this, objectMarkup, options)
+        __createBaseClipPathSVGMarkup.call(this, objectMarkup, options),
       ].join('');
     },
 
@@ -122,9 +134,9 @@ import { Point } from '../point.class';
     _createBaseSVGMarkup: function (objectMarkup, options) {
       return [
         this._createEraserSVGMarkup(options && options.reviver),
-        __createBaseSVGMarkup.call(this, objectMarkup, options)
+        __createBaseSVGMarkup.call(this, objectMarkup, options),
       ].join('');
-    }
+    },
     /* _TO_SVG_END_ */
   });
 
@@ -135,13 +147,15 @@ import { Point } from '../point.class';
      * @returns {Promise<fabric.Path[]>}
      */
     _addEraserPathToObjects: function (path) {
-      return Promise.all(this._objects.map(function (object) {
-        return fabric.EraserBrush.prototype._addPathToObjectEraser.call(
-          fabric.EraserBrush.prototype,
-          object,
-          path
-        );
-      }));
+      return Promise.all(
+        this._objects.map(function (object) {
+          return fabric.EraserBrush.prototype._addPathToObjectEraser.call(
+            fabric.EraserBrush.prototype,
+            object,
+            path
+          );
+        })
+      );
     },
 
     /**
@@ -150,40 +164,43 @@ import { Point } from '../point.class';
      * @returns {Promise<fabric.Path[]|fabric.Path[][]|void>}
      */
     applyEraserToObjects: function () {
-      var _this = this, eraser = this.eraser;
-      return Promise.resolve()
-        .then(function () {
-          if (eraser) {
-            delete _this.eraser;
-            var transform = _this.calcTransformMatrix();
-            return eraser.clone()
-              .then(function (eraser) {
-                var clipPath = _this.clipPath;
-                return Promise.all(eraser.getObjects('path')
-                  .map(function (path) {
-                    //  first we transform the path from the group's coordinate system to the canvas'
-                    var originalTransform = fabric.util.multiplyTransformMatrices(
-                      transform,
-                      path.calcTransformMatrix()
-                    );
-                    fabric.util.applyTransformToObject(path, originalTransform);
-                    return clipPath ?
-                      clipPath.clone()
-                        .then(function (_clipPath) {
-                          var eraserPath = fabric.EraserBrush.prototype.applyClipPathToPath.call(
+      var _this = this,
+        eraser = this.eraser;
+      return Promise.resolve().then(function () {
+        if (eraser) {
+          delete _this.eraser;
+          var transform = _this.calcTransformMatrix();
+          return eraser.clone().then(function (eraser) {
+            var clipPath = _this.clipPath;
+            return Promise.all(
+              eraser.getObjects('path').map(function (path) {
+                //  first we transform the path from the group's coordinate system to the canvas'
+                var originalTransform = fabric.util.multiplyTransformMatrices(
+                  transform,
+                  path.calcTransformMatrix()
+                );
+                fabric.util.applyTransformToObject(path, originalTransform);
+                return clipPath
+                  ? clipPath.clone().then(
+                      function (_clipPath) {
+                        var eraserPath =
+                          fabric.EraserBrush.prototype.applyClipPathToPath.call(
                             fabric.EraserBrush.prototype,
                             path,
                             _clipPath,
                             transform
                           );
-                          return _this._addEraserPathToObjects(eraserPath);
-                        }, ['absolutePositioned', 'inverted']) :
-                      _this._addEraserPathToObjects(path);
-                  }));
-              });
-          }
-        });
-    }
+                        return _this._addEraserPathToObjects(eraserPath);
+                      },
+                      ['absolutePositioned', 'inverted']
+                    )
+                  : _this._addEraserPathToObjects(path);
+              })
+            );
+          });
+        }
+      });
+    },
   });
 
   /**
@@ -238,12 +255,20 @@ import { Point } from '../point.class';
      */
     _toSVG: function (reviver) {
       var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-      var x = -this.width / 2, y = -this.height / 2;
+      var x = -this.width / 2,
+        y = -this.height / 2;
       var rectSvg = [
-        '<rect ', 'fill="white" ',
-        'x="', x, '" y="', y,
-        '" width="', this.width, '" height="', this.height,
-        '" />\n'
+        '<rect ',
+        'fill="white" ',
+        'x="',
+        x,
+        '" y="',
+        y,
+        '" width="',
+        this.width,
+        '" height="',
+        this.height,
+        '" />\n',
       ].join('');
       svgString.push('\t\t', rectSvg);
       for (var i = 0, len = this._objects.length; i < len; i++) {
@@ -264,13 +289,17 @@ import { Point } from '../point.class';
    */
   fabric.Eraser.fromObject = function (object) {
     var objects = object.objects || [],
-        options = fabric.util.object.clone(object, true);
+      options = fabric.util.object.clone(object, true);
     delete options.objects;
     return Promise.all([
       fabric.util.enlivenObjects(objects),
-      fabric.util.enlivenObjectEnlivables(options)
+      fabric.util.enlivenObjectEnlivables(options),
     ]).then(function (enlivedProps) {
-      return new fabric.Eraser(enlivedProps[0], Object.assign(options, enlivedProps[1]), true);
+      return new fabric.Eraser(
+        enlivedProps[0],
+        Object.assign(options, enlivedProps[1]),
+        true
+      );
     });
   };
 
@@ -301,7 +330,7 @@ import { Point } from '../point.class';
     _renderOverlay: function (ctx) {
       __renderOverlay.call(this, ctx);
       this.isErasing() && this.freeDrawingBrush._render();
-    }
+    },
   });
 
   /**
@@ -370,20 +399,33 @@ import { Point } from '../point.class';
        * @param {CanvasRenderingContext2D} ctx
        * @param {{ visibility: fabric.Object[], eraser: fabric.Object[], collection: fabric.Object[] }} restorationContext
        */
-      _prepareCollectionTraversal: function (collection, objects, ctx, restorationContext) {
+      _prepareCollectionTraversal: function (
+        collection,
+        objects,
+        ctx,
+        restorationContext
+      ) {
         objects.forEach(function (obj) {
           var dirty = false;
           if (obj.forEachObject && obj.erasable === 'deep') {
             //  traverse
-            this._prepareCollectionTraversal(obj, obj._objects, ctx, restorationContext);
-          }
-          else if (!this.inverted && obj.erasable && obj.visible) {
+            this._prepareCollectionTraversal(
+              obj,
+              obj._objects,
+              ctx,
+              restorationContext
+            );
+          } else if (!this.inverted && obj.erasable && obj.visible) {
             //  render only non-erasable objects
             obj.visible = false;
             restorationContext.visibility.push(obj);
             dirty = true;
-          }
-          else if (this.inverted && obj.erasable && obj.eraser && obj.visible) {
+          } else if (
+            this.inverted &&
+            obj.erasable &&
+            obj.eraser &&
+            obj.visible
+          ) {
             //  render all objects without eraser
             var eraser = obj.eraser;
             obj.eraser = undefined;
@@ -410,7 +452,8 @@ import { Point } from '../point.class';
           this._patternCanvas = fabric.util.createCanvasElement();
         }
         var canvas = this._patternCanvas;
-        objects = objects || this.canvas._objectsToRender || this.canvas._objects;
+        objects =
+          objects || this.canvas._objectsToRender || this.canvas._objects;
         canvas.width = this.canvas.width;
         canvas.height = this.canvas.height;
         var patternCtx = canvas.getContext('2d');
@@ -419,15 +462,21 @@ import { Point } from '../point.class';
           this.canvas.__initRetinaScaling(retinaScaling, canvas, patternCtx);
         }
         var backgroundImage = this.canvas.backgroundImage,
-            bgErasable = backgroundImage && this._isErasable(backgroundImage),
-            overlayImage = this.canvas.overlayImage,
-            overlayErasable = overlayImage && this._isErasable(overlayImage);
-        if (!this.inverted && ((backgroundImage && !bgErasable) || !!this.canvas.backgroundColor)) {
-          if (bgErasable) { this.canvas.backgroundImage = undefined; }
+          bgErasable = backgroundImage && this._isErasable(backgroundImage),
+          overlayImage = this.canvas.overlayImage,
+          overlayErasable = overlayImage && this._isErasable(overlayImage);
+        if (
+          !this.inverted &&
+          ((backgroundImage && !bgErasable) || !!this.canvas.backgroundColor)
+        ) {
+          if (bgErasable) {
+            this.canvas.backgroundImage = undefined;
+          }
           this.canvas._renderBackground(patternCtx);
-          if (bgErasable) { this.canvas.backgroundImage = backgroundImage; }
-        }
-        else if (this.inverted) {
+          if (bgErasable) {
+            this.canvas.backgroundImage = backgroundImage;
+          }
+        } else if (this.inverted) {
           var eraser = backgroundImage && backgroundImage.eraser;
           if (eraser) {
             backgroundImage.eraser = undefined;
@@ -442,22 +491,38 @@ import { Point } from '../point.class';
         patternCtx.save();
         patternCtx.transform.apply(patternCtx, this.canvas.viewportTransform);
         var restorationContext = { visibility: [], eraser: [], collection: [] };
-        this._prepareCollectionTraversal(this.canvas, objects, patternCtx, restorationContext);
+        this._prepareCollectionTraversal(
+          this.canvas,
+          objects,
+          patternCtx,
+          restorationContext
+        );
         this.canvas._renderObjects(patternCtx, objects);
-        restorationContext.visibility.forEach(function (obj) { obj.visible = true; });
+        restorationContext.visibility.forEach(function (obj) {
+          obj.visible = true;
+        });
         restorationContext.eraser.forEach(function (entry) {
-          var obj = entry[0], eraser = entry[1];
+          var obj = entry[0],
+            eraser = entry[1];
           obj.eraser = eraser;
           obj.dirty = true;
         });
-        restorationContext.collection.forEach(function (obj) { obj.dirty = true; });
+        restorationContext.collection.forEach(function (obj) {
+          obj.dirty = true;
+        });
         patternCtx.restore();
-        if (!this.inverted && ((overlayImage && !overlayErasable) || !!this.canvas.overlayColor)) {
-          if (overlayErasable) { this.canvas.overlayImage = undefined; }
+        if (
+          !this.inverted &&
+          ((overlayImage && !overlayErasable) || !!this.canvas.overlayColor)
+        ) {
+          if (overlayErasable) {
+            this.canvas.overlayImage = undefined;
+          }
           __renderOverlay.call(this.canvas, patternCtx);
-          if (overlayErasable) { this.canvas.overlayImage = overlayImage; }
-        }
-        else if (this.inverted) {
+          if (overlayErasable) {
+            this.canvas.overlayImage = overlayImage;
+          }
+        } else if (this.inverted) {
           var eraser = overlayImage && overlayImage.eraser;
           if (eraser) {
             overlayImage.eraser = undefined;
@@ -498,7 +563,10 @@ import { Point } from '../point.class';
       _saveAndTransform: function (ctx) {
         this.callSuper('_saveAndTransform', ctx);
         this._setBrushStyles(ctx);
-        ctx.globalCompositeOperation = ctx === this.canvas.getContext() ? 'destination-out' : 'destination-in';
+        ctx.globalCompositeOperation =
+          ctx === this.canvas.getContext()
+            ? 'destination-out'
+            : 'destination-in';
       },
 
       /**
@@ -539,8 +607,10 @@ import { Point } from '../point.class';
        * @todo provide a better solution to https://github.com/fabricjs/fabric.js/issues/7984
        */
       _render: function () {
-        var ctx, lineWidth = this.width;
-        var t = this.canvas.getRetinaScaling(), s = 1 / t;
+        var ctx,
+          lineWidth = this.width;
+        var t = this.canvas.getRetinaScaling(),
+          s = 1 / t;
         //  clip canvas
         ctx = this.canvas.getContext();
         //  a hack that fixes https://github.com/fabricjs/fabric.js/issues/7984 by reducing path width
@@ -570,7 +640,9 @@ import { Point } from '../point.class';
        */
       createPath: function (pathData) {
         var path = this.callSuper('createPath', pathData);
-        path.globalCompositeOperation = this.inverted ? 'source-over' : 'destination-out';
+        path.globalCompositeOperation = this.inverted
+          ? 'source-over'
+          : 'destination-out';
         path.stroke = this.inverted ? 'white' : 'black';
         return path;
       },
@@ -584,12 +656,18 @@ import { Point } from '../point.class';
        * @param {number[]} clipPathContainerTransformMatrix The transform matrix of the object that the clip path belongs to
        * @returns {fabric.Path} path with clip path
        */
-      applyClipPathToPath: function (path, clipPath, clipPathContainerTransformMatrix) {
-        var pathInvTransform = fabric.util.invertTransform(path.calcTransformMatrix()),
-            clipPathTransform = clipPath.calcTransformMatrix(),
-            transform = clipPath.absolutePositioned ?
-              pathInvTransform :
-              fabric.util.multiplyTransformMatrices(
+      applyClipPathToPath: function (
+        path,
+        clipPath,
+        clipPathContainerTransformMatrix
+      ) {
+        var pathInvTransform = fabric.util.invertTransform(
+            path.calcTransformMatrix()
+          ),
+          clipPathTransform = clipPath.calcTransformMatrix(),
+          transform = clipPath.absolutePositioned
+            ? pathInvTransform
+            : fabric.util.multiplyTransformMatrices(
                 pathInvTransform,
                 clipPathContainerTransformMatrix
               );
@@ -598,16 +676,15 @@ import { Point } from '../point.class';
         clipPath.absolutePositioned = false;
         fabric.util.applyTransformToObject(
           clipPath,
-          fabric.util.multiplyTransformMatrices(
-            transform,
-            clipPathTransform
-          )
+          fabric.util.multiplyTransformMatrices(transform, clipPathTransform)
         );
         //  We need to clip `path` with both `clipPath` and it's own clip path if existing (`path.clipPath`)
         //  so in turn `path` erases an object only where it overlaps with all it's clip paths, regardless of how many there are.
         //  this is done because both clip paths may have nested clip paths of their own (this method walks down a collection => this may reccur),
         //  so we can't assign one to the other's clip path property.
-        path.clipPath = path.clipPath ? fabric.util.mergeClipPaths(clipPath, path.clipPath) : clipPath;
+        path.clipPath = path.clipPath
+          ? fabric.util.mergeClipPaths(clipPath, path.clipPath)
+          : clipPath;
         return path;
       },
 
@@ -625,7 +702,7 @@ import { Point } from '../point.class';
         var _this = this;
         return Promise.all([
           path.clone(),
-          clipPath.clone(['absolutePositioned', 'inverted'])
+          clipPath.clone(['absolutePositioned', 'inverted']),
         ]).then(function (clones) {
           return _this.applyClipPathToPath(clones[0], clones[1], objTransform);
         });
@@ -649,17 +726,19 @@ import { Point } from '../point.class';
             return _obj.erasable;
           });
           if (targets.length > 0 && obj.clipPath) {
-            return this.clonePathWithClipPath(path, obj)
-              .then(function (_path) {
-                return Promise.all(targets.map(function (_obj) {
+            return this.clonePathWithClipPath(path, obj).then(function (_path) {
+              return Promise.all(
+                targets.map(function (_obj) {
                   return _this._addPathToObjectEraser(_obj, _path, context);
-                }));
-              });
-          }
-          else if (targets.length > 0) {
-            return Promise.all(targets.map(function (_obj) {
-              return _this._addPathToObjectEraser(_obj, path, context);
-            }));
+                })
+              );
+            });
+          } else if (targets.length > 0) {
+            return Promise.all(
+              targets.map(function (_obj) {
+                return _this._addPathToObjectEraser(_obj, path, context);
+              })
+            );
           }
           return;
         }
@@ -670,27 +749,24 @@ import { Point } from '../point.class';
           obj.eraser = eraser;
         }
         //  clone and add path
-        return path.clone()
-          .then(function (path) {
-            // http://fabricjs.com/using-transformations
-            var desiredTransform = fabric.util.multiplyTransformMatrices(
-              fabric.util.invertTransform(
-                obj.calcTransformMatrix()
-              ),
-              path.calcTransformMatrix()
-            );
-            fabric.util.applyTransformToObject(path, desiredTransform);
-            eraser.add(path);
-            obj.set('dirty', true);
-            obj.fire('erasing:end', {
-              path: path
-            });
-            if (context) {
-              (obj.group ? context.subTargets : context.targets).push(obj);
-              //context.paths.set(obj, path);
-            }
-            return path;
+        return path.clone().then(function (path) {
+          // http://fabricjs.com/using-transformations
+          var desiredTransform = fabric.util.multiplyTransformMatrices(
+            fabric.util.invertTransform(obj.calcTransformMatrix()),
+            path.calcTransformMatrix()
+          );
+          fabric.util.applyTransformToObject(path, desiredTransform);
+          eraser.add(path);
+          obj.set('dirty', true);
+          obj.fire('erasing:end', {
+            path: path,
           });
+          if (context) {
+            (obj.group ? context.subTargets : context.targets).push(obj);
+            //context.paths.set(obj, path);
+          }
+          return path;
+        });
       },
 
       /**
@@ -703,21 +779,22 @@ import { Point } from '../point.class';
        */
       applyEraserToCanvas: function (path, context) {
         var canvas = this.canvas;
-        return Promise.all([
-          'backgroundImage',
-          'overlayImage',
-        ].map(function (prop) {
-          var drawable = canvas[prop];
-          return drawable && drawable.erasable &&
-            this._addPathToObjectEraser(drawable, path)
-              .then(function (path) {
+        return Promise.all(
+          ['backgroundImage', 'overlayImage'].map(function (prop) {
+            var drawable = canvas[prop];
+            return (
+              drawable &&
+              drawable.erasable &&
+              this._addPathToObjectEraser(drawable, path).then(function (path) {
                 if (context) {
                   context.drawables[prop] = drawable;
                   //context.paths.set(drawable, path);
                 }
                 return path;
-              });
-        }, this));
+              })
+            );
+          }, this)
+        );
       },
 
       /**
@@ -726,7 +803,8 @@ import { Point } from '../point.class';
        * and add it to every intersected erasable object.
        */
       _finalizeAndAddPath: function () {
-        var ctx = this.canvas.contextTop, canvas = this.canvas;
+        var ctx = this.canvas.contextTop,
+          canvas = this.canvas;
         ctx.closePath();
         if (this.decimate) {
           this._points = this.decimatePoints(this._points, this.decimate);
@@ -736,9 +814,10 @@ import { Point } from '../point.class';
         canvas.clearContext(canvas.contextTop);
         this._isErasing = false;
 
-        var pathData = this._points && this._points.length > 1 ?
-          this.convertPointsToSVGPath(this._points) :
-          null;
+        var pathData =
+          this._points && this._points.length > 1
+            ? this.convertPointsToSVGPath(this._points)
+            : null;
         if (!pathData || this._isEmptySVGPath(pathData)) {
           canvas.fire('erasing:end');
           // do not create 0 width/height paths, as they are
@@ -761,27 +840,32 @@ import { Point } from '../point.class';
           targets: [],
           subTargets: [],
           //paths: new Map(),
-          drawables: {}
+          drawables: {},
         };
         var tasks = canvas._objects.map(function (obj) {
-          return obj.erasable && obj.intersectsWithObject(path, true, true) &&
-            _this._addPathToObjectEraser(obj, path, context);
+          return (
+            obj.erasable &&
+            obj.intersectsWithObject(path, true, true) &&
+            _this._addPathToObjectEraser(obj, path, context)
+          );
         });
         tasks.push(_this.applyEraserToCanvas(path, context));
-        return Promise.all(tasks)
-          .then(function () {
-            //  fire erasing:end
-            canvas.fire('erasing:end', Object.assign(context, {
-              path: path
-            }));
+        return Promise.all(tasks).then(function () {
+          //  fire erasing:end
+          canvas.fire(
+            'erasing:end',
+            Object.assign(context, {
+              path: path,
+            })
+          );
 
-            canvas.requestRenderAll();
-            _this._resetShadow();
+          canvas.requestRenderAll();
+          _this._resetShadow();
 
-            // fire event 'path' created
-            canvas.fire('path:created', { path: path });
-          });
-      }
+          // fire event 'path' created
+          canvas.fire('path:created', { path: path });
+        });
+      },
     }
   );
 

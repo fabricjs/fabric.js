@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Point } from "./point.class";
+import { Point } from './point.class';
 import { fabric } from '../HEADER';
 
 /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
@@ -9,22 +9,23 @@ type IntersectionType = 'Intersection' | 'Coincident' | 'Parallel';
 /**
  * **Assuming `T`, `A`, `B` are points on the same line**,
  * check if `T` is contained in `[A, B]` by comparing the direction of the vectors from `T` to `A` and `B`
- * @param T 
- * @param A 
- * @param B 
+ * @param T
+ * @param A
+ * @param B
  * @returns true if `T` is contained
  */
 const isContainedInInterval = (T: Point, A: Point, B: Point) => {
   const TA = new Point(T).subtract(A);
   const TB = new Point(T).subtract(B);
-  return Math.sign(TA.x) !== Math.sign(TB.x) || Math.sign(TA.y) !== Math.sign(TB.y);
-}
+  return (
+    Math.sign(TA.x) !== Math.sign(TB.x) || Math.sign(TA.y) !== Math.sign(TB.y)
+  );
+};
 
 export class Intersection {
+  points: Point[];
 
-  points: Point[]
-
-  status?: IntersectionType
+  status?: IntersectionType;
 
   constructor(status?: IntersectionType) {
     this.status = status;
@@ -32,12 +33,12 @@ export class Intersection {
   }
 
   /**
-   * 
-   * @param {Point} point 
-   * @returns 
+   *
+   * @param {Point} point
+   * @returns
    */
   contains(point) {
-    return this.points.some(p => p.eq(point));
+    return this.points.some((p) => p.eq(point));
   }
 
   /**
@@ -47,9 +48,11 @@ export class Intersection {
    * @chainable
    */
   private append(...points) {
-    this.points = this.points.concat(points.filter(point => {
-      return !this.contains(point);
-    }));
+    this.points = this.points.concat(
+      points.filter((point) => {
+        return !this.contains(point);
+      })
+    );
     return this;
   }
 
@@ -64,7 +67,14 @@ export class Intersection {
    * @param {boolean} [bIinfinite=true] check segment intersection by passing `false`
    * @return {Intersection}
    */
-  static intersectLineLine(a1, a2, b1, b2, aIinfinite = true, bIinfinite = true) {
+  static intersectLineLine(
+    a1,
+    a2,
+    b1,
+    b2,
+    aIinfinite = true,
+    bIinfinite = true
+  ) {
     let result;
     const uaT = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x),
       ubT = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x),
@@ -72,22 +82,28 @@ export class Intersection {
     if (uB !== 0) {
       const ua = uaT / uB,
         ub = ubT / uB;
-      if ((aIinfinite || (0 <= ua && ua <= 1)) && (bIinfinite || (0 <= ub && ub <= 1))) {
+      if (
+        (aIinfinite || (0 <= ua && ua <= 1)) &&
+        (bIinfinite || (0 <= ub && ub <= 1))
+      ) {
         result = new Intersection('Intersection');
-        result.append(new Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y)));
-      }
-      else {
+        result.append(
+          new Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y))
+        );
+      } else {
         result = new Intersection();
       }
-    }
-    else {
+    } else {
       if (uaT === 0 || ubT === 0) {
-        const segmentsCoincide = aIinfinite || bIinfinite
-          || isContainedInInterval(a1, b1, b2) || isContainedInInterval(a2, b1, b2)
-          || isContainedInInterval(b1, a1, a2) || isContainedInInterval(b2, a1, a2);
+        const segmentsCoincide =
+          aIinfinite ||
+          bIinfinite ||
+          isContainedInInterval(a1, b1, b2) ||
+          isContainedInInterval(a2, b1, b2) ||
+          isContainedInInterval(b1, a1, a2) ||
+          isContainedInInterval(b2, a1, a2);
         result = new Intersection(segmentsCoincide ? 'Coincident' : undefined);
-      }
-      else {
+      } else {
         result = new Intersection('Parallel');
       }
     }
@@ -124,9 +140,9 @@ export class Intersection {
 
   /**
    * Checks if line intersects polygon
-   * 
+   *
    * @todo account for stroke
-   * 
+   *
    * @static
    * @see {@link intersectSegmentPolygon} for segment intersection
    * @param {Point} a1 point on line
@@ -171,9 +187,9 @@ export class Intersection {
 
   /**
    * Checks if polygon intersects another polygon
-   * 
+   *
    * @todo account for stroke
-   * 
+   *
    * @static
    * @param {Point[]} points1
    * @param {Point[]} points2
@@ -191,16 +207,14 @@ export class Intersection {
       if (inter.status === 'Coincident') {
         coincidents.push(inter);
         result.append(a1, a2);
-      }
-      else {
+      } else {
         result.append(...inter.points);
       }
     }
 
     if (coincidents.length > 0 && coincidents.length === points1.length) {
       return new Intersection('Coincident');
-    }
-    else if (result.points.length > 0) {
+    } else if (result.points.length > 0) {
       result.status = 'Intersection';
     }
 
@@ -226,10 +240,9 @@ export class Intersection {
       min,
       topRight,
       max,
-      bottomLeft
+      bottomLeft,
     ]);
   }
-
 }
 
 fabric.Intersection = Intersection;
