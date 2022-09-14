@@ -143,6 +143,26 @@ function build(options = {}) {
   }
 }
 
+function awaitBuild() {
+  const lockFile = path.resolve(wd, 'build.lock');
+  return new Promise((resolve) => {
+    console.log(chalk.cyanBright('> waiting for build to finish...'));
+    if (fs.existsSync(lockFile)) {
+      const watcher = fs.watch(
+        lockFile,
+        _.debounce(() => {
+          if (!fs.existsSync(lockFile)) {
+            watcher.close();
+            resolve();
+          }
+        }, 500)
+      );
+    } else {
+      resolve();
+    }
+  });
+}
+
 function startWebsite() {
   if (
     JSON.parse(fs.readFileSync(path.resolve(websiteDir, 'package.json')))
@@ -345,6 +365,7 @@ async function runTestem({
  */
 async function test(suite, tests, options = {}) {
   let failed = false;
+  await awaitBuild();
   const qunitEnv = {
     QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
     QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
