@@ -23,19 +23,13 @@ import _ from 'lodash';
 import moment from 'moment';
 import path from 'node:path';
 import process from 'node:process';
-import { fileURLToPath } from 'node:url';
 import os from 'os';
+import { build, awaitBuild } from './build';
 import { listFiles, transform as transformFiles } from './transform_files.mjs';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// import rollup from 'rollup';
-// import loadConfigFile from 'rollup/loadConfigFile';
+import { wd } from './__dirname';
 
 const program = new commander.Command();
 
-const wd = path.resolve(__dirname, '..');
 const dumpsPath = path.resolve(wd, 'cli_output');
 const CLI_CACHE = path.resolve(dumpsPath, 'cli_cache.json');
 const websiteDir = path.resolve(wd, '../fabricjs.com');
@@ -108,60 +102,6 @@ class ICheckbox extends Checkbox {
   }
 }
 inquirer.registerPrompt('test-selection', ICheckbox);
-
-function build(options = {}) {
-  const cmd = ['rollup', '-c', options.watch ? '--watch' : ''].join(' ');
-  const processOptions = {
-    stdio: 'inherit',
-    shell: true,
-    cwd: wd,
-    env: {
-      ...process.env,
-      MINIFY: Number(!options.fast),
-      BUILD_INPUT: options.input,
-      BUILD_OUTPUT: options.output,
-      BUILD_MIN_OUTPUT:
-        options.output && !options.fast
-          ? path.resolve(
-              path.dirname(options.output),
-              `${path.basename(options.output, '.js')}.min.js`
-            )
-          : undefined,
-    },
-  };
-  if (options.watch) {
-    cp.spawn(cmd, processOptions);
-  } else {
-    try {
-      cp.execSync(cmd, processOptions);
-    } catch (error) {
-      // minimal logging, no need for stack trace
-      console.error(error.message);
-      // inform ci
-      process.exit(1);
-    }
-  }
-}
-
-function awaitBuild() {
-  const lockFile = path.resolve(wd, 'build.lock');
-  return new Promise((resolve) => {
-    console.log(chalk.cyanBright('> waiting for build to finish...'));
-    if (fs.existsSync(lockFile)) {
-      const watcher = fs.watch(
-        lockFile,
-        _.debounce(() => {
-          if (!fs.existsSync(lockFile)) {
-            watcher.close();
-            resolve();
-          }
-        }, 500)
-      );
-    } else {
-      resolve();
-    }
-  });
-}
 
 function startWebsite() {
   if (
