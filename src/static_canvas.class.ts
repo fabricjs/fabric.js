@@ -425,6 +425,8 @@ import { pick } from './util/misc/pick';
           this.requestRenderAll();
         }
 
+        this.fire('resize', dimensions);
+
         return this;
       },
 
