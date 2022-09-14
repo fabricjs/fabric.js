@@ -36,8 +36,8 @@ export function isLocked() {
 
 export function awaitBuild() {
   return new Promise((resolve) => {
-    console.log(chalk.cyanBright('> waiting for build to finish...'));
     if (isLocked()) {
+      console.log(chalk.cyanBright('> waiting for build to finish...'));
       const watcher = fs.watch(
         lockFile,
         _.debounce(() => {
