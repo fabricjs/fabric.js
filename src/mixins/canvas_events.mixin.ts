@@ -646,9 +646,10 @@ import { fireEvent } from '../util/fireEvent';
       /**
        * @private
        */
-      _onResize: function () {
+      _onResize: function (e) {
         this.calcOffset();
         this._resetTransformEventData();
+        this.fire('window:resize', { e });
       },
 
       /**
