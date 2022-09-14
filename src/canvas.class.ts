@@ -45,6 +45,10 @@ import { Point } from './point.class';
    * @fires drop:before before drop event. Prepare for the drop event (same native event).
    * @fires drop
    * @fires drop:after after drop event. Run logic on canvas after event has been accepted/declined (same native event).
+   *
+   * @fires resize
+   * @fires window:resize
+   *
    * @example
    * let a: fabric.Object, b: fabric.Object;
    * let flag = false;
