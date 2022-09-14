@@ -3,6 +3,7 @@ import { terser } from 'rollup-plugin-terser';
 import ts from 'rollup-plugin-ts';
 import * as fs from 'fs';
 import moment from 'moment';
+import psList from 'ps-list';
 
 const lockFile = 'build.lock';
 
@@ -12,10 +13,23 @@ const logToLockFile = (...logs) =>
     `[${moment().format('YYYY-MM-DD HH:mm:ss')}] ${logs.join('\n')}\n`
   );
 
+const unlock = async () => {
+  const lockPID = Number(
+    /<pid>(.*)<\/pid>/gm.exec(fs.readFileSync(lockFile).toString())[1]
+  );
+  // the process that locked last is allowed to unlock for concurrency reasons
+  const hasPermissionToUnlock =
+    process.pid === lockPID ||
+    !(await psList()).find(({ pid }) => pid === lockPID);
+  try {
+    hasPermissionToUnlock && fs.unlinkSync(lockFile);
+  } catch (error) {}
+};
+
 const lockFilePlugin = {
   name: 'rollup-lock-file',
   buildStart() {
-    logToLockFile('build start');
+    logToLockFile(`build start <pid>${process.pid}</pid>`);
   },
   buildEnd(error) {
     error && logToLockFile('build error', error);
@@ -24,9 +38,7 @@ const lockFilePlugin = {
     logToLockFile('build error', error);
   },
   writeBundle() {
-    try {
-      fs.unlinkSync(lockFile);
-    } catch (error) {}
+    return unlock();
   },
 };
 
