@@ -29,7 +29,7 @@ export default {
       /* Plugin options */
       hook: {
         diagnostics(diagnostics) {
-          logToLockFile('ts error');
+          diagnostics.length > 0 && logToLockFile('ts error');
           return diagnostics;
         },
       },
