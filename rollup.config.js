@@ -5,9 +5,30 @@ import * as fs from 'fs';
 import moment from 'moment';
 
 const lockFile = 'build.lock';
-function log(...logs) {
-  return `[${moment().format('YYYY-MM-DD HH:mm:ss')}] ${logs.join('\n')}\n`;
-}
+
+const logToLockFile = (...logs) =>
+  fs.appendFileSync(
+    lockFile,
+    `[${moment().format('YYYY-MM-DD HH:mm:ss')}] ${logs.join('\n')}\n`
+  );
+
+const lockFilePlugin = {
+  name: 'rollup-lock-file',
+  buildStart() {
+    logToLockFile('build start');
+  },
+  buildEnd(error) {
+    error && logToLockFile('build error', error);
+  },
+  renderError(error) {
+    logToLockFile('build error', error);
+  },
+  writeBundle() {
+    try {
+      fs.unlinkSync(lockFile);
+    } catch (error) {}
+  },
+};
 
 // https://rollupjs.org/guide/en/#configuration-files
 export default {
@@ -29,29 +50,13 @@ export default {
       : null,
   ],
   plugins: [
-    {
-      name: 'rollup-lock-file',
-      buildStart() {
-        fs.writeFileSync(lockFile, log('build start'));
-      },
-      buildEnd(error) {
-        error && fs.appendFileSync(lockFile, log('build error', error));
-      },
-      renderError(error) {
-        fs.appendFileSync(lockFile, log('build error', error));
-      },
-      writeBundle() {
-        try {
-          fs.unlinkSync(lockFile);
-        } catch (error) {}
-      },
-    },
+    lockFilePlugin,
     json(),
     ts({
       /* Plugin options */
       hook: {
         diagnostics(diagnostics) {
-          fs.appendFileSync(lockFile, log('ts error'));
+          logToLockFile('ts error');
           return diagnostics;
         },
       },
