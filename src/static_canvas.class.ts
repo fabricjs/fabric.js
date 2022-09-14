@@ -683,7 +683,6 @@ import { pick } from './util/misc/pick';
             object.canvas,
             this
           );
-          /* _DEV_MODE_END_ */
           object.canvas.remove(object);
         }
         object._set('canvas', this);
