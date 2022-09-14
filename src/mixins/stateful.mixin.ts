@@ -1,14 +1,16 @@
 //@ts-nocheck
-(function(global) {
-  var fabric = global.fabric, extend = fabric.util.object.extend,
-      originalSet = 'stateProperties';
+(function (global) {
+  var fabric = global.fabric,
+    extend = fabric.util.object.extend,
+    originalSet = 'stateProperties';
 
   /*
     Depends on `stateProperties`
   */
   function saveProps(origin, destination, props) {
-    var tmpObj = { }, deep = true;
-    props.forEach(function(prop) {
+    var tmpObj = {},
+      deep = true;
+    props.forEach(function (prop) {
       tmpObj[prop] = origin[prop];
     });
 
@@ -19,9 +21,11 @@
     if (origValue === currentValue) {
       // if the objects are identical, return
       return true;
-    }
-    else if (Array.isArray(origValue)) {
-      if (!Array.isArray(currentValue) || origValue.length !== currentValue.length) {
+    } else if (Array.isArray(origValue)) {
+      if (
+        !Array.isArray(currentValue) ||
+        origValue.length !== currentValue.length
+      ) {
         return false;
       }
       for (var i = 0, len = origValue.length; i < len; i++) {
@@ -30,12 +34,13 @@
         }
       }
       return true;
-    }
-    else if (origValue && typeof origValue === 'object') {
-      var keys = Object.keys(origValue), key;
-      if (!currentValue ||
-          typeof currentValue !== 'object' ||
-          (!firstPass && keys.length !== Object.keys(currentValue).length)
+    } else if (origValue && typeof origValue === 'object') {
+      var keys = Object.keys(origValue),
+        key;
+      if (
+        !currentValue ||
+        typeof currentValue !== 'object' ||
+        (!firstPass && keys.length !== Object.keys(currentValue).length)
       ) {
         return false;
       }
@@ -55,53 +60,56 @@
     }
   }
 
+  fabric.util.object.extend(
+    fabric.Object.prototype,
+    /** @lends fabric.Object.prototype */ {
+      /**
+       * Returns true if object state (one of its state properties) was changed
+       * @param {String} [propertySet] optional name for the set of property we want to save
+       * @return {Boolean} true if instance' state has changed since `{@link fabric.Object#saveState}` was called
+       */
+      hasStateChanged: function (propertySet) {
+        propertySet = propertySet || originalSet;
+        var dashedPropertySet = '_' + propertySet;
+        if (
+          Object.keys(this[dashedPropertySet]).length < this[propertySet].length
+        ) {
+          return true;
+        }
+        return !_isEqual(this[dashedPropertySet], this, true);
+      },
 
-  fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
-
-    /**
-     * Returns true if object state (one of its state properties) was changed
-     * @param {String} [propertySet] optional name for the set of property we want to save
-     * @return {Boolean} true if instance' state has changed since `{@link fabric.Object#saveState}` was called
-     */
-    hasStateChanged: function(propertySet) {
-      propertySet = propertySet || originalSet;
-      var dashedPropertySet = '_' + propertySet;
-      if (Object.keys(this[dashedPropertySet]).length < this[propertySet].length) {
-        return true;
-      }
-      return !_isEqual(this[dashedPropertySet], this, true);
-    },
-
-    /**
-     * Saves state of an object
-     * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
-     * @return {fabric.Object} thisArg
-     */
-    saveState: function(options) {
-      var propertySet = options && options.propertySet || originalSet,
+      /**
+       * Saves state of an object
+       * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
+       * @return {fabric.Object} thisArg
+       */
+      saveState: function (options) {
+        var propertySet = (options && options.propertySet) || originalSet,
           destination = '_' + propertySet;
-      if (!this[destination]) {
-        return this.setupState(options);
-      }
-      saveProps(this, destination, this[propertySet]);
-      if (options && options.stateProperties) {
-        saveProps(this, destination, options.stateProperties);
-      }
-      return this;
-    },
+        if (!this[destination]) {
+          return this.setupState(options);
+        }
+        saveProps(this, destination, this[propertySet]);
+        if (options && options.stateProperties) {
+          saveProps(this, destination, options.stateProperties);
+        }
+        return this;
+      },
 
-    /**
-     * Setups state of an object
-     * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
-     * @return {fabric.Object} thisArg
-     */
-    setupState: function(options) {
-      options = options || { };
-      var propertySet = options.propertySet || originalSet;
-      options.propertySet = propertySet;
-      this['_' + propertySet] = { };
-      this.saveState(options);
-      return this;
+      /**
+       * Setups state of an object
+       * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
+       * @return {fabric.Object} thisArg
+       */
+      setupState: function (options) {
+        options = options || {};
+        var propertySet = options.propertySet || originalSet;
+        options.propertySet = propertySet;
+        this['_' + propertySet] = {};
+        this.saveState(options);
+        return this;
+      },
     }
-  });
+  );
 })(typeof exports !== 'undefined' ? exports : window);

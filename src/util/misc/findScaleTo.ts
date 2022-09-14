@@ -16,8 +16,14 @@ interface IWithDimensions {
  * @param {Number} destination.width natural unscaled width of the object
  * @return {Number} scale factor to apply to source to fit into destination
  */
-export const findScaleToFit = (source: IWithDimensions, destination: IWithDimensions) =>
-  Math.min(destination.width / source.width, destination.height / source.height);
+export const findScaleToFit = (
+  source: IWithDimensions,
+  destination: IWithDimensions
+) =>
+  Math.min(
+    destination.width / source.width,
+    destination.height / source.height
+  );
 
 /**
  * Finds the scale for the object source to cover entirely the object destination,
@@ -32,5 +38,11 @@ export const findScaleToFit = (source: IWithDimensions, destination: IWithDimens
  * @param {Number} destination.width natural unscaled width of the object
  * @return {Number} scale factor to apply to source to cover destination
  */
-export const findScaleToCover = (source: IWithDimensions, destination: IWithDimensions) =>
-  Math.max(destination.width / source.width, destination.height / source.height);
+export const findScaleToCover = (
+  source: IWithDimensions,
+  destination: IWithDimensions
+) =>
+  Math.max(
+    destination.width / source.width,
+    destination.height / source.height
+  );

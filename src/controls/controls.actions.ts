@@ -4,20 +4,29 @@ import { Point } from '../point.class';
 import { fireEvent } from '../util/fireEvent';
 import { renderCircleControl, renderSquareControl } from './controls.render';
 
-(function(global) {
-  var fabric = global.fabric || (global.fabric = { }),
-      scaleMap = ['e', 'se', 's', 'sw', 'w', 'nw', 'n', 'ne', 'e'],
-      skewMap = ['ns', 'nesw', 'ew', 'nwse'],
-      controls = {},
-      LEFT = 'left', TOP = 'top', RIGHT = 'right', BOTTOM = 'bottom', CENTER = 'center',
-      opposite = {
-        top: BOTTOM,
-        bottom: TOP,
-        left: RIGHT,
-        right: LEFT,
-        center: CENTER,
-      }, radiansToDegrees = fabric.util.radiansToDegrees,
-      sign = (Math.sign || function(x) { return ((x > 0) - (x < 0)) || +x; });
+(function (global) {
+  var fabric = global.fabric || (global.fabric = {}),
+    scaleMap = ['e', 'se', 's', 'sw', 'w', 'nw', 'n', 'ne', 'e'],
+    skewMap = ['ns', 'nesw', 'ew', 'nwse'],
+    controls = {},
+    LEFT = 'left',
+    TOP = 'top',
+    RIGHT = 'right',
+    BOTTOM = 'bottom',
+    CENTER = 'center',
+    opposite = {
+      top: BOTTOM,
+      bottom: TOP,
+      left: RIGHT,
+      right: LEFT,
+      center: CENTER,
+    },
+    radiansToDegrees = fabric.util.radiansToDegrees,
+    sign =
+      Math.sign ||
+      function (x) {
+        return (x > 0) - (x < 0) || +x;
+      };
 
   /**
    * Combine control position and object angle to find the control direction compared
@@ -29,7 +38,8 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
   function findCornerQuadrant(fabricObject, control) {
     //  angle is relative to canvas plane
     var angle = fabricObject.getTotalAngle();
-    var cornerAngle = angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
+    var cornerAngle =
+      angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
     return Math.round((cornerAngle % 360) / 45);
   }
 
@@ -40,10 +50,13 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * @return {Boolean} true if scale is proportional
    */
   function scaleIsProportional(eventData, fabricObject) {
-    var canvas = fabricObject.canvas, uniScaleKey = canvas.uniScaleKey,
-        uniformIsToggled = eventData[uniScaleKey];
-    return (canvas.uniformScaling && !uniformIsToggled) ||
-    (!canvas.uniformScaling && uniformIsToggled);
+    var canvas = fabricObject.canvas,
+      uniScaleKey = canvas.uniScaleKey,
+      uniformIsToggled = eventData[uniScaleKey];
+    return (
+      (canvas.uniformScaling && !uniformIsToggled) ||
+      (!canvas.uniformScaling && uniformIsToggled)
+    );
   }
 
   /**
@@ -63,7 +76,8 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * @return {Boolean} true if scaling is not allowed at current conditions
    */
   function scalingIsForbidden(fabricObject, by, scaleProportionally) {
-    var lockX = fabricObject.lockScalingX, lockY = fabricObject.lockScalingY;
+    var lockX = fabricObject.lockScalingX,
+      lockY = fabricObject.lockScalingY;
     if (lockX && lockY) {
       return true;
     }
@@ -88,12 +102,11 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    */
   function scaleCursorStyleHandler(eventData, control, fabricObject) {
     var notAllowed = 'not-allowed',
-        scaleProportionally = scaleIsProportional(eventData, fabricObject),
-        by = '';
+      scaleProportionally = scaleIsProportional(eventData, fabricObject),
+      by = '';
     if (control.x !== 0 && control.y === 0) {
       by = 'x';
-    }
-    else if (control.x === 0 && control.y !== 0) {
+    } else if (control.x === 0 && control.y !== 0) {
       by = 'y';
     }
     if (scalingIsForbidden(fabricObject, by, scaleProportionally)) {
@@ -177,7 +190,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       pointer: {
         x: x,
         y: y,
-      }
+      },
     };
   }
 
@@ -188,11 +201,20 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * @return {Function} a function with an action handler signature
    */
   function wrapWithFixedAnchor(actionHandler) {
-    return function(eventData, transform, x, y) {
-      var target = transform.target, centerPoint = target.getRelativeCenterPoint(),
-          constraint = target.translateToOriginPoint(centerPoint, transform.originX, transform.originY),
-          actionPerformed = actionHandler(eventData, transform, x, y);
-      target.setPositionByOrigin(constraint, transform.originX, transform.originY);
+    return function (eventData, transform, x, y) {
+      var target = transform.target,
+        centerPoint = target.getRelativeCenterPoint(),
+        constraint = target.translateToOriginPoint(
+          centerPoint,
+          transform.originX,
+          transform.originY
+        ),
+        actionPerformed = actionHandler(eventData, transform, x, y);
+      target.setPositionByOrigin(
+        constraint,
+        transform.originX,
+        transform.originY
+      );
       return actionPerformed;
     };
   }
@@ -203,7 +225,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * @return {Function} a function with an action handler signature
    */
   function wrapWithFireEvent(eventName, actionHandler) {
-    return function(eventData, transform, x, y) {
+    return function (eventData, transform, x, y) {
       var actionPerformed = actionHandler(eventData, transform, x, y);
       if (actionPerformed) {
         fireEvent(eventName, commonEventInfo(eventData, transform, x, y));
@@ -224,10 +246,10 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    */
   function getLocalPoint(transform, originX, originY, x, y) {
     var target = transform.target,
-        control = target.controls[transform.corner],
-        zoom = target.canvas.getZoom(),
-        padding = target.padding / zoom,
-        localPoint = target.normalizePoint(new Point(x, y), originX, originY);
+      control = target.controls[transform.corner],
+      zoom = target.canvas.getZoom(),
+      padding = target.padding / zoom,
+      localPoint = target.normalizePoint(new Point(x, y), originX, originY);
     if (localPoint.x >= padding) {
       localPoint.x -= padding;
     }
@@ -258,10 +280,16 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * Utility function to compensate the scale factor when skew is applied on both axes
    * @private
    */
-  function compensateScaleForSkew(target, oppositeSkew, scaleToCompensate, axis, reference) {
+  function compensateScaleForSkew(
+    target,
+    oppositeSkew,
+    scaleToCompensate,
+    axis,
+    reference
+  ) {
     if (target[oppositeSkew] !== 0) {
       var newDim = target._getTransformedDimensions()[axis];
-      var newValue = reference / newDim * target[scaleToCompensate];
+      var newValue = (reference / newDim) * target[scaleToCompensate];
       target.set(scaleToCompensate, newValue);
     }
   }
@@ -272,21 +300,30 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    */
   function skewObjectX(eventData, transform, x, y) {
     var target = transform.target,
-        // find how big the object would be, if there was no skewX. takes in account scaling
-        dimNoSkew = target._getTransformedDimensions({ skewX: 0, skewY: target.skewY }),
-        localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
-        // the mouse is in the center of the object, and we want it to stay there.
-        // so the object will grow twice as much as the mouse.
-        // this makes the skew growth to localPoint * 2 - dimNoSkew.
-        totalSkewSize = Math.abs(localPoint.x * 2) - dimNoSkew.x,
-        currentSkew = target.skewX, newSkew;
+      // find how big the object would be, if there was no skewX. takes in account scaling
+      dimNoSkew = target._getTransformedDimensions({
+        skewX: 0,
+        skewY: target.skewY,
+      }),
+      localPoint = getLocalPoint(
+        transform,
+        transform.originX,
+        transform.originY,
+        x,
+        y
+      ),
+      // the mouse is in the center of the object, and we want it to stay there.
+      // so the object will grow twice as much as the mouse.
+      // this makes the skew growth to localPoint * 2 - dimNoSkew.
+      totalSkewSize = Math.abs(localPoint.x * 2) - dimNoSkew.x,
+      currentSkew = target.skewX,
+      newSkew;
     if (totalSkewSize < 2) {
       // let's make it easy to go back to position 0.
       newSkew = 0;
-    }
-    else {
+    } else {
       newSkew = radiansToDegrees(
-        Math.atan2((totalSkewSize / target.scaleX), (dimNoSkew.y / target.scaleY))
+        Math.atan2(totalSkewSize / target.scaleX, dimNoSkew.y / target.scaleY)
       );
       // now we have to find the sign of the skew.
       // it mostly depend on the origin of transformation.
@@ -315,21 +352,30 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    */
   function skewObjectY(eventData, transform, x, y) {
     var target = transform.target,
-        // find how big the object would be, if there was no skewX. takes in account scaling
-        dimNoSkew = target._getTransformedDimensions({ skewX: target.skewX, skewY: 0 }),
-        localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y),
-        // the mouse is in the center of the object, and we want it to stay there.
-        // so the object will grow twice as much as the mouse.
-        // this makes the skew growth to localPoint * 2 - dimNoSkew.
-        totalSkewSize = Math.abs(localPoint.y * 2) - dimNoSkew.y,
-        currentSkew = target.skewY, newSkew;
+      // find how big the object would be, if there was no skewX. takes in account scaling
+      dimNoSkew = target._getTransformedDimensions({
+        skewX: target.skewX,
+        skewY: 0,
+      }),
+      localPoint = getLocalPoint(
+        transform,
+        transform.originX,
+        transform.originY,
+        x,
+        y
+      ),
+      // the mouse is in the center of the object, and we want it to stay there.
+      // so the object will grow twice as much as the mouse.
+      // this makes the skew growth to localPoint * 2 - dimNoSkew.
+      totalSkewSize = Math.abs(localPoint.y * 2) - dimNoSkew.y,
+      currentSkew = target.skewY,
+      newSkew;
     if (totalSkewSize < 2) {
       // let's make it easy to go back to position 0.
       newSkew = 0;
-    }
-    else {
+    } else {
       newSkew = radiansToDegrees(
-        Math.atan2((totalSkewSize / target.scaleY), (dimNoSkew.x / target.scaleX))
+        Math.atan2(totalSkewSize / target.scaleY, dimNoSkew.x / target.scaleX)
       );
       // now we have to find the sign of the skew.
       // it mostly depend on the origin of transformation.
@@ -368,7 +414,10 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     // if skewX < 0 and originY bottom we anchor on left
     // if skewX < 0 and originY top we anchor on right
     // if skewX is 0, we look for mouse position to understand where are we going.
-    var target = transform.target, currentSkew = target.skewX, originX, originY = transform.originY;
+    var target = transform.target,
+      currentSkew = target.skewX,
+      originX,
+      originY = transform.originY;
     if (target.lockSkewingX) {
       return false;
     }
@@ -377,13 +426,11 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       if (localPointFromCenter.x > 0) {
         // we are pulling right, anchor left;
         originX = LEFT;
-      }
-      else {
+      } else {
         // we are pulling right, anchor right
         originX = RIGHT;
       }
-    }
-    else {
+    } else {
       if (currentSkew > 0) {
         originX = originY === TOP ? LEFT : RIGHT;
       }
@@ -398,7 +445,10 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
 
     // once we have the origin, we find the anchor point
     transform.originX = originX;
-    var finalHandler = wrapWithFireEvent('skewing', wrapWithFixedAnchor(skewObjectX));
+    var finalHandler = wrapWithFireEvent(
+      'skewing',
+      wrapWithFixedAnchor(skewObjectX)
+    );
     return finalHandler(eventData, transform, x, y);
   }
 
@@ -418,7 +468,10 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     // if skewY < 0 and originX left we anchor on bottom
     // if skewY < 0 and originX right we anchor on top
     // if skewY is 0, we look for mouse position to understand where are we going.
-    var target = transform.target, currentSkew = target.skewY, originY, originX = transform.originX;
+    var target = transform.target,
+      currentSkew = target.skewY,
+      originY,
+      originX = transform.originX;
     if (target.lockSkewingY) {
       return false;
     }
@@ -427,13 +480,11 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       if (localPointFromCenter.y > 0) {
         // we are pulling down, anchor up;
         originY = TOP;
-      }
-      else {
+      } else {
         // we are pulling up, anchor down
         originY = BOTTOM;
       }
-    }
-    else {
+    } else {
       if (currentSkew > 0) {
         originY = originX === LEFT ? TOP : BOTTOM;
       }
@@ -448,7 +499,10 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
 
     // once we have the origin, we find the anchor point
     transform.originY = originY;
-    var finalHandler = wrapWithFireEvent('skewing', wrapWithFixedAnchor(skewObjectY));
+    var finalHandler = wrapWithFireEvent(
+      'skewing',
+      wrapWithFixedAnchor(skewObjectY)
+    );
     return finalHandler(eventData, transform, x, y);
   }
 
@@ -464,28 +518,31 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    */
   function rotationWithSnapping(eventData, transform, x, y) {
     var t = transform,
-        target = t.target,
-        pivotPoint = target.translateToOriginPoint(target.getRelativeCenterPoint(), t.originX, t.originY);
+      target = t.target,
+      pivotPoint = target.translateToOriginPoint(
+        target.getRelativeCenterPoint(),
+        t.originX,
+        t.originY
+      );
 
     if (target.lockRotation) {
       return false;
     }
 
     var lastAngle = Math.atan2(t.ey - pivotPoint.y, t.ex - pivotPoint.x),
-        curAngle = Math.atan2(y - pivotPoint.y, x - pivotPoint.x),
-        angle = radiansToDegrees(curAngle - lastAngle + t.theta),
-        hasRotated = true;
+      curAngle = Math.atan2(y - pivotPoint.y, x - pivotPoint.x),
+      angle = radiansToDegrees(curAngle - lastAngle + t.theta),
+      hasRotated = true;
 
     if (target.snapAngle > 0) {
-      var snapAngle  = target.snapAngle,
-          snapThreshold  = target.snapThreshold || snapAngle,
-          rightAngleLocked = Math.ceil(angle / snapAngle) * snapAngle,
-          leftAngleLocked = Math.floor(angle / snapAngle) * snapAngle;
+      var snapAngle = target.snapAngle,
+        snapThreshold = target.snapThreshold || snapAngle,
+        rightAngleLocked = Math.ceil(angle / snapAngle) * snapAngle,
+        leftAngleLocked = Math.floor(angle / snapAngle) * snapAngle;
 
       if (Math.abs(angle - leftAngleLocked) < snapThreshold) {
         angle = leftAngleLocked;
-      }
-      else if (Math.abs(angle - rightAngleLocked) < snapThreshold) {
+      } else if (Math.abs(angle - rightAngleLocked) < snapThreshold) {
         angle = rightAngleLocked;
       }
     }
@@ -516,11 +573,18 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
   function scaleObject(eventData, transform, x, y, options) {
     options = options || {};
     var target = transform.target,
-        lockScalingX = target.lockScalingX, lockScalingY = target.lockScalingY,
-        by = options.by, newPoint, scaleX, scaleY, dim,
-        scaleProportionally = scaleIsProportional(eventData, target),
-        forbidScaling = scalingIsForbidden(target, by, scaleProportionally),
-        signX, signY, gestureScale = transform.gestureScale;
+      lockScalingX = target.lockScalingX,
+      lockScalingY = target.lockScalingY,
+      by = options.by,
+      newPoint,
+      scaleX,
+      scaleY,
+      dim,
+      scaleProportionally = scaleIsProportional(eventData, target),
+      forbidScaling = scalingIsForbidden(target, by, scaleProportionally),
+      signX,
+      signY,
+      gestureScale = transform.gestureScale;
 
     if (forbidScaling) {
       return false;
@@ -528,9 +592,14 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     if (gestureScale) {
       scaleX = transform.scaleX * gestureScale;
       scaleY = transform.scaleY * gestureScale;
-    }
-    else {
-      newPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
+    } else {
+      newPoint = getLocalPoint(
+        transform,
+        transform.originX,
+        transform.originY,
+        x,
+        y
+      );
       // use of sign: We use sign to detect change of direction of an action. sign usually change when
       // we cross the origin point with the mouse. So a scale flip for example. There is an issue when scaling
       // by center and scaling using one middle control ( default: mr, mt, ml, mb), the mouse movement can easily
@@ -545,7 +614,8 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
         transform.signY = signY;
       }
 
-      if (target.lockScalingFlip &&
+      if (
+        target.lockScalingFlip &&
         (transform.signX !== signX || transform.signY !== signY)
       ) {
         return false;
@@ -556,16 +626,16 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       if (scaleProportionally && !by) {
         // uniform scaling
         var distance = Math.abs(newPoint.x) + Math.abs(newPoint.y),
-            original = transform.original,
-            originalDistance = Math.abs(dim.x * original.scaleX / target.scaleX) +
-              Math.abs(dim.y * original.scaleY / target.scaleY),
-            scale = distance / originalDistance;
+          original = transform.original,
+          originalDistance =
+            Math.abs((dim.x * original.scaleX) / target.scaleX) +
+            Math.abs((dim.y * original.scaleY) / target.scaleY),
+          scale = distance / originalDistance;
         scaleX = original.scaleX * scale;
         scaleY = original.scaleY * scale;
-      }
-      else {
-        scaleX = Math.abs(newPoint.x * target.scaleX / dim.x);
-        scaleY = Math.abs(newPoint.y * target.scaleY / dim.y);
+      } else {
+        scaleX = Math.abs((newPoint.x * target.scaleX) / dim.x);
+        scaleY = Math.abs((newPoint.y * target.scaleY) / dim.y);
       }
       // if we are scaling by center, we need to double the scale
       if (isTransformCentered(transform)) {
@@ -584,12 +654,12 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       }
     }
     // minScale is taken are in the setter.
-    var oldScaleX = target.scaleX, oldScaleY = target.scaleY;
+    var oldScaleX = target.scaleX,
+      oldScaleY = target.scaleY;
     if (!by) {
       !lockScalingX && target.set('scaleX', scaleX);
       !lockScalingY && target.set('scaleY', scaleY);
-    }
-    else {
+    } else {
       // forbidden cases already handled on top here.
       by === 'x' && target.set('scaleX', scaleX);
       by === 'y' && target.set('scaleY', scaleY);
@@ -620,7 +690,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * @return {Boolean} true if some change happened
    */
   function scaleObjectX(eventData, transform, x, y) {
-    return scaleObject(eventData, transform, x, y , { by: 'x' });
+    return scaleObject(eventData, transform, x, y, { by: 'x' });
   }
 
   /**
@@ -633,7 +703,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * @return {Boolean} true if some change happened
    */
   function scaleObjectY(eventData, transform, x, y) {
-    return scaleObject(eventData, transform, x, y , { by: 'y' });
+    return scaleObject(eventData, transform, x, y, { by: 'y' });
   }
 
   /**
@@ -680,16 +750,27 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * @return {Boolean} true if some change happened
    */
   function changeWidth(eventData, transform, x, y) {
-    var localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
+    var localPoint = getLocalPoint(
+      transform,
+      transform.originX,
+      transform.originY,
+      x,
+      y
+    );
     //  make sure the control changes width ONLY from it's side of target
-    if (transform.originX === 'center' ||
+    if (
+      transform.originX === 'center' ||
       (transform.originX === 'right' && localPoint.x < 0) ||
-      (transform.originX === 'left' && localPoint.x > 0)) {
+      (transform.originX === 'left' && localPoint.x > 0)
+    ) {
       var target = transform.target,
-          strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
-          multiplier = isTransformCentered(transform) ? 2 : 1,
-          oldWidth = target.width,
-          newWidth = Math.ceil(Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding);
+        strokePadding =
+          target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
+        multiplier = isTransformCentered(transform) ? 2 : 1,
+        oldWidth = target.width,
+        newWidth = Math.ceil(
+          Math.abs((localPoint.x * multiplier) / target.scaleX) - strokePadding
+        );
       target.set('width', Math.max(newWidth, 0));
       //  check against actual target width in case `newWidth` was rejected
       return oldWidth !== target.width;
@@ -708,10 +789,10 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    */
   function dragHandler(eventData, transform, x, y) {
     var target = transform.target,
-        newLeft = x - transform.offsetX,
-        newTop = y - transform.offsetY,
-        moveX = !target.get('lockMovementX') && target.left !== newLeft,
-        moveY = !target.get('lockMovementY') && target.top !== newTop;
+      newLeft = x - transform.offsetX,
+      newTop = y - transform.offsetY,
+      moveX = !target.get('lockMovementX') && target.left !== newLeft,
+      moveY = !target.get('lockMovementY') && target.top !== newTop;
     moveX && target.set('left', newLeft);
     moveY && target.set('top', newTop);
     if (moveX || moveY) {
@@ -723,13 +804,28 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
   controls.scaleCursorStyleHandler = scaleCursorStyleHandler;
   controls.skewCursorStyleHandler = skewCursorStyleHandler;
   controls.scaleSkewCursorStyleHandler = scaleSkewCursorStyleHandler;
-  controls.rotationWithSnapping = wrapWithFireEvent('rotating', wrapWithFixedAnchor(rotationWithSnapping));
-  controls.scalingEqually = wrapWithFireEvent('scaling', wrapWithFixedAnchor( scaleObjectFromCorner));
-  controls.scalingX = wrapWithFireEvent('scaling', wrapWithFixedAnchor(scaleObjectX));
-  controls.scalingY = wrapWithFireEvent('scaling', wrapWithFixedAnchor(scaleObjectY));
+  controls.rotationWithSnapping = wrapWithFireEvent(
+    'rotating',
+    wrapWithFixedAnchor(rotationWithSnapping)
+  );
+  controls.scalingEqually = wrapWithFireEvent(
+    'scaling',
+    wrapWithFixedAnchor(scaleObjectFromCorner)
+  );
+  controls.scalingX = wrapWithFireEvent(
+    'scaling',
+    wrapWithFixedAnchor(scaleObjectX)
+  );
+  controls.scalingY = wrapWithFireEvent(
+    'scaling',
+    wrapWithFixedAnchor(scaleObjectY)
+  );
   controls.scalingYOrSkewingX = scalingYOrSkewingX;
   controls.scalingXOrSkewingY = scalingXOrSkewingY;
-  controls.changeWidth = wrapWithFireEvent('resizing', wrapWithFixedAnchor(changeWidth));
+  controls.changeWidth = wrapWithFireEvent(
+    'resizing',
+    wrapWithFixedAnchor(changeWidth)
+  );
   controls.skewHandlerX = skewHandlerX;
   controls.skewHandlerY = skewHandlerY;
   controls.dragHandler = dragHandler;
@@ -742,5 +838,4 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
   controls.renderCircleControl = renderCircleControl;
   controls.renderSquareControl = renderSquareControl;
   fabric.controlsUtils = controls;
-
 })(typeof exports !== 'undefined' ? exports : window);

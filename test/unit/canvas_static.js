@@ -1611,19 +1611,6 @@
     assert.equal(canvas.toString(), '#<fabric.Canvas (1): { objects: 1 }>');
   });
 
-  QUnit.test('dispose clear references', function(assert) {
-    var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
-    assert.ok(typeof canvas2.dispose === 'function');
-    canvas2.add(makeRect(), makeRect(), makeRect());
-    var lowerCanvas = canvas2.lowerCanvasEl;
-    assert.equal(lowerCanvas.getAttribute('data-fabric'), 'main', 'lowerCanvasEl should be marked by fabric');
-    canvas2.dispose();
-    assert.equal(canvas2.getObjects().length, 0, 'dispose should clear canvas');
-    assert.equal(canvas2.lowerCanvasEl, null, 'dispose should clear lowerCanvasEl');
-    assert.equal(lowerCanvas.hasAttribute('data-fabric'), false, 'dispose should clear lowerCanvasEl data-fabric attr');
-    assert.equal(canvas2.contextContainer, null, 'dispose should clear contextContainer');
-  });
-
   QUnit.test('clone', function(assert) {
     var done = assert.async();
     var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false, width: 10, height: 10 });
@@ -2004,11 +1991,11 @@
 
   QUnit.test('requestRenderAll and cancelRequestedRender', function(assert) {
     var canvas2 = new fabric.StaticCanvas();
-    assert.equal(canvas2.isRendering, undefined, 'no redering is in progress');
+    assert.equal(canvas2.nextRenderHandle, undefined, 'no redering is in progress');
     canvas2.requestRenderAll();
-    assert.notEqual(canvas2.isRendering, 0, 'a rendering is scehduled');
+    assert.notEqual(canvas2.nextRenderHandle, 0, 'a rendering is scehduled');
     canvas2.cancelRequestedRender();
-    assert.equal(canvas2.isRendering, 0, 'rendering cancelled');
+    assert.equal(canvas2.nextRenderHandle, 0, 'rendering cancelled');
   });
 
   // QUnit.test('backgroundImage', function(assert) {
