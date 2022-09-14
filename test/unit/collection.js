@@ -14,7 +14,7 @@
     var obj = { prop: 4 }, fired = 0;
     assert.ok(typeof collection.add === 'function', 'has add method');
     assert.deepEqual(collection._objects, [], 'start with empty array of items');
-    var returned = collection.add([obj], cb);
+    collection.add([obj], cb);
     assert.equal(collection._objects[0], obj, 'add object in the array');
     assert.equal(fired, 0, 'fired is 0');
     var cb = function () {
@@ -33,16 +33,16 @@
 
   QUnit.test('insertAt', function (assert) {
     var rect1 = new fabric.Rect({ id: 1 }),
-      rect2 = new fabric.Rect({ id: 2 }),
-      rect3 = new fabric.Rect({ id: 3 }),
-      rect4 = new fabric.Rect({ id: 4 }),
-      rect5 = new fabric.Rect({ id: 5 }),
-      rect6 = new fabric.Rect({ id: 6 }),
-      rect7 = new fabric.Rect({ id: 7 }),
-      rect8 = new fabric.Rect({ id: 8 }),
-      control = [],
-      fired = [],
-      firingControl = [];
+        rect2 = new fabric.Rect({ id: 2 }),
+        rect3 = new fabric.Rect({ id: 3 }),
+        rect4 = new fabric.Rect({ id: 4 }),
+        rect5 = new fabric.Rect({ id: 5 }),
+        rect6 = new fabric.Rect({ id: 6 }),
+        rect7 = new fabric.Rect({ id: 7 }),
+        rect8 = new fabric.Rect({ id: 8 }),
+        control = [],
+        fired = [],
+        firingControl = [];
 
     collection.add([rect1, rect2]);
     control.push(rect1, rect2);
@@ -129,7 +129,7 @@
       _obj.prop = true;
       fired++;
     };
-    var returned = collection.forEachObject(callback);
+    collection.forEachObject(callback);
     assert.equal(fired, collection._objects.length, 'fired once for every object');
     assert.equal(obj.prop, true, 'fired for obj');
     assert.equal(obj2.prop, true, 'fired for obj2');

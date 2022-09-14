@@ -11,10 +11,10 @@
   var img = fabric.document.createElement('img');
   setSrc(img, IMG_SRC);
 
-  function createPattern(callback) {
+  function createPattern() {
     return new fabric.Pattern({
       source: img
-    }, callback);
+    });
   }
 
   QUnit.test('constructor', function(assert) {
@@ -166,10 +166,10 @@
     var rectObj = {
       fill: {
         type: 'pattern',
-        source: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=='
-      }
-    }
-    var obj = fabric.Rect.fromObject(rectObj).then(function(obj){
+        source: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg==',
+      },
+    };
+    fabric.Rect.fromObject(rectObj).then(function(obj){
       assert.ok(obj.fill instanceof fabric.Pattern, 'the pattern is enlived');
       done();
     });

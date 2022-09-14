@@ -1,5 +1,9 @@
-(function () {
-  var getPointer = fabric.util.getPointer,
+//@ts-nocheck
+import { Point } from './point.class';
+
+(function (global) {
+  var fabric = global.fabric,
+    getPointer = fabric.util.getPointer,
     degreesToRadians = fabric.util.degreesToRadians,
     isTouchEvent = fabric.util.isTouchEvent;
 
@@ -9,9 +13,6 @@
    * @extends fabric.StaticCanvas
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
    * @see {@link fabric.Canvas#initialize} for constructor definition
-   *
-   * @fires resize
-   * @fires window:resize
    *
    * @fires object:modified at the end of a transform or any change when statefull is true
    * @fires object:rotating while an object is being rotated from the control
@@ -39,8 +40,42 @@
    * @fires dragover
    * @fires dragenter
    * @fires dragleave
-   * @fires drop:before before drop event. same native event. This is added to handle edge cases
+   * @fires drag:enter object drag enter
+   * @fires drag:leave object drag leave
+   * @fires drop:before before drop event. Prepare for the drop event (same native event).
    * @fires drop
+   * @fires drop:after after drop event. Run logic on canvas after event has been accepted/declined (same native event).
+   * @example
+   * let a: fabric.Object, b: fabric.Object;
+   * let flag = false;
+   * canvas.add(a, b);
+   * a.on('drop:before', opt => {
+   *  //  we want a to accept the drop even though it's below b in the stack
+   *  flag = this.canDrop(opt.e);
+   * });
+   * b.canDrop = function(e) {
+   *  !flag && this.callSuper('canDrop', e);
+   * }
+   * b.on('dragover', opt => b.set('fill', opt.dropTarget === b ? 'pink' : 'black'));
+   * a.on('drop', opt => {
+   *  opt.e.defaultPrevented  //  drop occured
+   *  opt.didDrop             //  drop occured on canvas
+   *  opt.target              //  drop target
+   *  opt.target !== a && a.set('text', 'I lost');
+   * });
+   * canvas.on('drop:after', opt => {
+   *  //  inform user who won
+   *  if(!opt.e.defaultPrevented) {
+   *    // no winners
+   *  }
+   *  else if(!opt.didDrop) {
+   *    //  my objects didn't win, some other lucky object
+   *  }
+   *  else {
+   *    //  we have a winner it's opt.target!!
+   *  }
+   * })
+   *
    * @fires after:render at the end of the render process, receives the context in the callback
    * @fires before:render at start the render process, receives the context in the callback
    *
@@ -106,7 +141,7 @@
        * @type String
        * @default
        */
-      uniScaleKey: "shiftKey",
+      uniScaleKey: 'shiftKey',
 
       /**
        * When true, objects use center point as the origin of scale transformation.
@@ -135,7 +170,7 @@
        * @type String
        * @default
        */
-      centeredKey: "altKey",
+      centeredKey: 'altKey',
 
       /**
        * Indicates which key enable alternate action on corner
@@ -146,7 +181,7 @@
        * @type String
        * @default
        */
-      altActionKey: "shiftKey",
+      altActionKey: 'shiftKey',
 
       /**
        * Indicates that canvas is interactive. This property should not be changed.
@@ -172,7 +207,7 @@
        * @type String|Array
        * @default
        */
-      selectionKey: "shiftKey",
+      selectionKey: 'shiftKey',
 
       /**
        * Indicates which key enable alternative selection
@@ -193,7 +228,7 @@
        * @type String
        * @default
        */
-      selectionColor: "rgba(100, 100, 255, 0.3)", // blue
+      selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
 
       /**
        * Default dash array pattern
@@ -207,7 +242,7 @@
        * @type String
        * @default
        */
-      selectionBorderColor: "rgba(255, 255, 255, 0.3)",
+      selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
 
       /**
        * Width of a line used in object/group selection
@@ -228,28 +263,28 @@
        * @type String
        * @default
        */
-      hoverCursor: "move",
+      hoverCursor: 'move',
 
       /**
        * Default cursor value used when moving an object on canvas
        * @type String
        * @default
        */
-      moveCursor: "move",
+      moveCursor: 'move',
 
       /**
        * Default cursor value used for the entire canvas
        * @type String
        * @default
        */
-      defaultCursor: "default",
+      defaultCursor: 'default',
 
       /**
        * Cursor value used during free drawing
        * @type String
        * @default
        */
-      freeDrawingCursor: "crosshair",
+      freeDrawingCursor: 'crosshair',
 
       /**
        * Cursor value used for disabled elements ( corners with disabled action )
@@ -257,14 +292,14 @@
        * @since 2.0.0
        * @default
        */
-      notAllowedCursor: "not-allowed",
+      notAllowedCursor: 'not-allowed',
 
       /**
        * Default element class that's given to wrapper (div) element of canvas
        * @type String
        * @default
        */
-      containerClass: "canvas-container",
+      containerClass: 'canvas-container',
 
       /**
        * When true, object detection happens on per-pixel basis rather than on per-bounding-box
@@ -408,7 +443,7 @@
        */
       _onObjectAdded: function (obj) {
         this._objectsToRender = undefined;
-        this.callSuper("_onObjectAdded", obj);
+        this.callSuper('_onObjectAdded', obj);
       },
 
       /**
@@ -419,16 +454,16 @@
         this._objectsToRender = undefined;
         // removing active object should fire "selection:cleared" events
         if (obj === this._activeObject) {
-          this.fire("before:selection:cleared", { target: obj });
+          this.fire('before:selection:cleared', { target: obj });
           this._discardActiveObject();
-          this.fire("selection:cleared", { target: obj });
-          obj.fire("deselected");
+          this.fire('selection:cleared', { target: obj });
+          obj.fire('deselected');
         }
         if (obj === this._hoveredTarget) {
           this._hoveredTarget = null;
           this._hoveredTargets = [];
         }
-        this.callSuper("_onObjectRemoved", obj);
+        this.callSuper('_onObjectRemoved', obj);
       },
 
       /**
@@ -480,6 +515,10 @@
        * @chainable
        */
       renderAll: function () {
+        this.cancelRequestedRender();
+        if (this.destroyed) {
+          return;
+        }
         if (
           this.contextTopDirty &&
           !this._groupSelector &&
@@ -492,10 +531,9 @@
           this.renderTopLayer(this.contextTop);
           this.hasLostContext = false;
         }
-        var canvasToDrawOn = this.contextContainer;
         !this._objectsToRender &&
           (this._objectsToRender = this._chooseObjectsToRender());
-        this.renderCanvas(canvasToDrawOn, this._objectsToRender);
+        this.renderCanvas(this.contextContainer, this._objectsToRender);
         return this;
       },
 
@@ -523,7 +561,7 @@
         var ctx = this.contextTop;
         this.clearContext(ctx);
         this.renderTopLayer(ctx);
-        this.fire("after:render");
+        this.fire('after:render');
         return this;
       },
 
@@ -579,7 +617,7 @@
           originalColor = target.selectionBackgroundColor,
           v = this.viewportTransform;
 
-        target.selectionBackgroundColor = "";
+        target.selectionBackgroundColor = '';
 
         this.clearContext(ctx);
 
@@ -662,13 +700,13 @@
         var centerTransform;
 
         if (
-          action === "scale" ||
-          action === "scaleX" ||
-          action === "scaleY" ||
-          action === "resizing"
+          action === 'scale' ||
+          action === 'scaleX' ||
+          action === 'scaleY' ||
+          action === 'resizing'
         ) {
           centerTransform = this.centeredScaling || target.centeredScaling;
-        } else if (action === "rotate") {
+        } else if (action === 'rotate') {
           centerTransform = this.centeredRotation || target.centeredRotation;
         }
 
@@ -685,16 +723,16 @@
           y: target.originY,
         };
 
-        if (corner === "ml" || corner === "tl" || corner === "bl") {
-          origin.x = "right";
-        } else if (corner === "mr" || corner === "tr" || corner === "br") {
-          origin.x = "left";
+        if (corner === 'ml' || corner === 'tl' || corner === 'bl') {
+          origin.x = 'right';
+        } else if (corner === 'mr' || corner === 'tr' || corner === 'br') {
+          origin.x = 'left';
         }
 
-        if (corner === "tl" || corner === "mt" || corner === "tr") {
-          origin.y = "bottom";
-        } else if (corner === "bl" || corner === "mb" || corner === "br") {
-          origin.y = "top";
+        if (corner === 'tl' || corner === 'mt' || corner === 'tr') {
+          origin.y = 'bottom';
+        } else if (corner === 'bl' || corner === 'mb' || corner === 'br') {
+          origin.y = 'top';
         }
         return origin;
       },
@@ -708,7 +746,7 @@
        */
       _getActionFromCorner: function (alreadySelected, corner, e, target) {
         if (!corner || !alreadySelected) {
-          return "drag";
+          return 'drag';
         }
         var control = target.controls[corner];
         return control.getActionName(e, control, target);
@@ -774,8 +812,8 @@
           };
 
         if (this._shouldCenterTransform(target, action, altKey)) {
-          transform.originX = "center";
-          transform.originY = "center";
+          transform.originX = 'center';
+          transform.originY = 'center';
         }
         transform.original.originX = origin.x;
         transform.original.originY = origin.y;
@@ -798,12 +836,12 @@
        */
       _drawSelection: function (ctx) {
         var selector = this._groupSelector,
-          viewportStart = new fabric.Point(selector.ex, selector.ey),
+          viewportStart = new Point(selector.ex, selector.ey),
           start = fabric.util.transformPoint(
             viewportStart,
             this.viewportTransform
           ),
-          viewportExtent = new fabric.Point(
+          viewportExtent = new Point(
             selector.ex + selector.left,
             selector.ey + selector.top
           ),
@@ -879,7 +917,7 @@
         }
         if (
           aObjects.length > 1 &&
-          activeObject.type === "activeSelection" &&
+          activeObject.type === 'activeSelection' &&
           !skipGroup &&
           this.searchPossibleTargets([activeObject], pointer)
         ) {
@@ -1018,7 +1056,7 @@
        * of the time.
        * @param {Event} e
        * @param {Boolean} ignoreVpt
-       * @return {Object} object with "x" and "y" number values
+       * @return {Point}
        */
       getPointer: function (e, ignoreVpt) {
         // return cached values if we are in the event processing chain
@@ -1037,10 +1075,10 @@
           cssScale;
 
         if (!boundsWidth || !boundsHeight) {
-          if ("top" in bounds && "bottom" in bounds) {
+          if ('top' in bounds && 'bottom' in bounds) {
             boundsHeight = Math.abs(bounds.top - bounds.bottom);
           }
-          if ("right" in bounds && "left" in bounds) {
+          if ('right' in bounds && 'left' in bounds) {
             boundsWidth = Math.abs(bounds.right - bounds.left);
           }
         }
@@ -1058,20 +1096,32 @@
           pointer.y /= retinaScaling;
         }
 
-        if (boundsWidth === 0 || boundsHeight === 0) {
-          // If bounds are not available (i.e. not visible), do not apply scale.
-          cssScale = { width: 1, height: 1 };
-        } else {
-          cssScale = {
-            width: upperCanvasEl.width / boundsWidth,
-            height: upperCanvasEl.height / boundsHeight,
-          };
-        }
+        // If bounds are not available (i.e. not visible), do not apply scale.
+        cssScale =
+          boundsWidth === 0 || boundsHeight === 0
+            ? new Point(1, 1)
+            : new Point(
+                upperCanvasEl.width / boundsWidth,
+                upperCanvasEl.height / boundsHeight
+              );
 
-        return {
-          x: pointer.x * cssScale.width,
-          y: pointer.y * cssScale.height,
-        };
+        return new Point(pointer.x * cssScale.x, pointer.y * cssScale.y);
+      },
+
+      /**
+       * Sets dimensions (width, height) of this canvas instance. when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
+       * @param {Object}        dimensions                    Object with width/height properties
+       * @param {Number|String} [dimensions.width]            Width of canvas element
+       * @param {Number|String} [dimensions.height]           Height of canvas element
+       * @param {Object}        [options]                     Options object
+       * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
+       * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
+       * @return {fabric.Canvas} thisArg
+       * @chainable
+       */
+      setDimensions: function (dimensions, options) {
+        this._resetTransformEventData();
+        return this.callSuper('setDimensions', dimensions, options);
       },
 
       /**
@@ -1079,27 +1129,27 @@
        * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
        */
       _createUpperCanvas: function () {
-        var lowerCanvasClass = this.lowerCanvasEl.className.replace(
-            /\s*lower-canvas\s*/,
-            ""
-          ),
-          lowerCanvasEl = this.lowerCanvasEl,
+        var lowerCanvasEl = this.lowerCanvasEl,
           upperCanvasEl = this.upperCanvasEl;
 
-        // there is no need to create a new upperCanvas element if we have already one.
-        if (upperCanvasEl) {
-          upperCanvasEl.className = "";
-        } else {
+        // if there is no upperCanvas (most common case) we create one.
+        if (!upperCanvasEl) {
           upperCanvasEl = this._createCanvasElement();
           this.upperCanvasEl = upperCanvasEl;
         }
-        fabric.util.addClass(upperCanvasEl, "upper-canvas " + lowerCanvasClass);
-        this.upperCanvasEl.setAttribute("data-fabric", "top");
+        // we assign the same classname of the lowerCanvas
+        upperCanvasEl.className = lowerCanvasEl.className;
+        // but then we remove the lower-canvas specific className
+        upperCanvasEl.classList.remove('lower-canvas');
+        // we add the specific upper-canvas class
+        upperCanvasEl.classList.add('upper-canvas');
+        upperCanvasEl.setAttribute('data-fabric', 'top');
         this.wrapperEl.appendChild(upperCanvasEl);
 
         this._copyCanvasStyle(lowerCanvasEl, upperCanvasEl);
         this._applyCanvasStyle(upperCanvasEl);
-        this.contextTop = upperCanvasEl.getContext("2d");
+        upperCanvasEl.setAttribute('draggable', 'true');
+        this.contextTop = upperCanvasEl.getContext('2d');
       },
 
       /**
@@ -1107,9 +1157,9 @@
        */
       _createCacheCanvas: function () {
         this.cacheCanvasEl = this._createCanvasElement();
-        this.cacheCanvasEl.setAttribute("width", this.width);
-        this.cacheCanvasEl.setAttribute("height", this.height);
-        this.contextCache = this.cacheCanvasEl.getContext("2d");
+        this.cacheCanvasEl.setAttribute('width', this.width);
+        this.cacheCanvasEl.setAttribute('height', this.height);
+        this.contextCache = this.cacheCanvasEl.getContext('2d');
       },
 
       /**
@@ -1119,14 +1169,14 @@
         if (this.wrapperEl) {
           return;
         }
-        this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, "div", {
-          class: this.containerClass,
-        });
-        this.wrapperEl.setAttribute("data-fabric", "wrapper");
+        const container = fabric.document.createElement('div');
+        container.classList.add(this.containerClass);
+        this.wrapperEl = fabric.util.wrapElement(this.lowerCanvasEl, container);
+        this.wrapperEl.setAttribute('data-fabric', 'wrapper');
         fabric.util.setStyle(this.wrapperEl, {
-          width: this.width + "px",
-          height: this.height + "px",
-          position: "relative",
+          width: this.width + 'px',
+          height: this.height + 'px',
+          position: 'relative',
         });
         fabric.util.makeElementUnselectable(this.wrapperEl);
       },
@@ -1140,15 +1190,15 @@
           height = this.height || element.height;
 
         fabric.util.setStyle(element, {
-          position: "absolute",
-          width: width + "px",
-          height: height + "px",
+          position: 'absolute',
+          width: width + 'px',
+          height: height + 'px',
           left: 0,
           top: 0,
-          "touch-action": this.allowTouchScrolling ? "manipulation" : "none",
-          "-ms-touch-action": this.allowTouchScrolling
-            ? "manipulation"
-            : "none",
+          'touch-action': this.allowTouchScrolling ? 'manipulation' : 'none',
+          '-ms-touch-action': this.allowTouchScrolling
+            ? 'manipulation'
+            : 'none',
         });
         element.width = width;
         element.height = height;
@@ -1205,7 +1255,7 @@
       getActiveObjects: function () {
         var active = this._activeObject;
         if (active) {
-          if (active.type === "activeSelection" && active._objects) {
+          if (active.type === 'activeSelection' && active._objects) {
             return active._objects.slice(0);
           } else {
             return [active];
@@ -1228,7 +1278,7 @@
         oldObjects.forEach(function (oldObject) {
           if (objects.indexOf(oldObject) === -1) {
             somethingChanged = true;
-            oldObject.fire("deselected", {
+            oldObject.fire('deselected', {
               e: e,
               target: oldObject,
             });
@@ -1238,7 +1288,7 @@
         objects.forEach(function (object) {
           if (oldObjects.indexOf(object) === -1) {
             somethingChanged = true;
-            object.fire("selected", {
+            object.fire('selected', {
               e: e,
               target: object,
             });
@@ -1248,20 +1298,20 @@
         if (oldObjects.length > 0 && objects.length > 0) {
           invalidate = true;
           somethingChanged &&
-            this.fire("selection:updated", {
+            this.fire('selection:updated', {
               e: e,
               selected: added,
               deselected: removed,
             });
         } else if (objects.length > 0) {
           invalidate = true;
-          this.fire("selection:created", {
+          this.fire('selection:created', {
             e: e,
             selected: added,
           });
         } else if (oldObjects.length > 0) {
           invalidate = true;
-          this.fire("selection:cleared", {
+          this.fire('selection:cleared', {
             e: e,
             deselected: removed,
           });
@@ -1310,7 +1360,7 @@
       /**
        * This is a private method for now.
        * This is supposed to be equivalent to discardActiveObject but without firing
-       * any events. There is commitment to have this stay this way.
+       * any selection events ( can still fire object transformation events ). There is commitment to have this stay this way.
        * This is the functional part of discardActiveObject.
        * @param {Event} [e] Event (passed along when firing "object:deselected")
        * @param {Object} object to set as active
@@ -1323,6 +1373,9 @@
           // onDeselect return TRUE to cancel selection;
           if (obj.onDeselect({ e: e, object: object })) {
             return false;
+          }
+          if (this._currentTransform && this._currentTransform.target === obj) {
+            this.endCurrentTransform(e);
           }
           this._activeObject = null;
         }
@@ -1342,7 +1395,7 @@
         var currentActives = this.getActiveObjects(),
           activeObject = this.getActiveObject();
         if (currentActives.length) {
-          this.fire("before:selection:cleared", { target: activeObject, e: e });
+          this.fire('before:selection:cleared', { target: activeObject, e: e });
         }
         this._discardActiveObject(e);
         this._fireSelectionEvents(currentActives, e);
@@ -1350,17 +1403,24 @@
       },
 
       /**
-       * Clears a canvas element and removes all event listeners
-       * @return {fabric.Canvas} thisArg
-       * @chainable
+       * Clears the canvas element, disposes objects, removes all event listeners and frees resources
+       *
+       * **CAUTION**:
+       *
+       * This method is **UNSAFE**.
+       * You may encounter a race condition using it if there's a requested render.
+       * Call this method only if you are sure rendering has settled.
+       * Consider using {@link dispose} as it is **SAFE**
+       *
+       * @private
        */
-      dispose: function () {
+      destroy: function () {
         var wrapperEl = this.wrapperEl,
           lowerCanvasEl = this.lowerCanvasEl,
           upperCanvasEl = this.upperCanvasEl,
           cacheCanvasEl = this.cacheCanvasEl;
         this.removeListeners();
-        this.callSuper("dispose");
+        this.callSuper('destroy');
         wrapperEl.removeChild(upperCanvasEl);
         wrapperEl.removeChild(lowerCanvasEl);
         this.contextCache = null;
@@ -1385,7 +1445,7 @@
         // this.discardActiveGroup();
         this.discardActiveObject();
         this.clearContext(this.contextTop);
-        return this.callSuper("clear");
+        return this.callSuper('clear');
       },
 
       /**
@@ -1410,7 +1470,7 @@
         //were to be destroyed.
         var originalProperties = this._realizeGroupTransformOnObject(instance),
           object = this.callSuper(
-            "_toObject",
+            '_toObject',
             instance,
             methodName,
             propertiesToInclude
@@ -1429,19 +1489,19 @@
       _realizeGroupTransformOnObject: function (instance) {
         if (
           instance.group &&
-          instance.group.type === "activeSelection" &&
+          instance.group.type === 'activeSelection' &&
           this._activeObject === instance.group
         ) {
           var layoutProps = [
-            "angle",
-            "flipX",
-            "flipY",
-            "left",
-            "scaleX",
-            "scaleY",
-            "skewX",
-            "skewY",
-            "top",
+            'angle',
+            'flipX',
+            'flipY',
+            'left',
+            'scaleX',
+            'scaleY',
+            'skewX',
+            'skewY',
+            'top',
           ];
           //Copy all the positionally relevant properties across now
           var originalValues = {};
@@ -1465,7 +1525,7 @@
         //If the object is in a selection group, simulate what would happen to that
         //object when the group is deselected
         var originalProperties = this._realizeGroupTransformOnObject(instance);
-        this.callSuper("_setSVGObject", markup, instance, reviver);
+        this.callSuper('_setSVGObject', markup, instance, reviver);
         originalProperties && instance.set(originalProperties);
       },
 
@@ -1485,8 +1545,8 @@
   // copying static properties manually to work around Opera's bug,
   // where "prototype" property is enumerable and overrides existing prototype
   for (var prop in fabric.StaticCanvas) {
-    if (prop !== "prototype") {
+    if (prop !== 'prototype') {
       fabric.Canvas[prop] = fabric.StaticCanvas[prop];
     }
   }
-})();
+})(typeof exports !== 'undefined' ? exports : window);

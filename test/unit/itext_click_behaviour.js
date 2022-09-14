@@ -264,9 +264,17 @@
       });
     });
 
-    QUnit.module('iText click interaction with canvas.enableRetinaScaling = true', function(hooks) {
-      hooks.beforeEach(function() {
-        fabric.devicePixelRatio = 2;
+    QUnit.module('iText click interaction with canvas.enableRetinaScaling = true', function (hooks) {
+      let DPR;
+      hooks.beforeEach(function () {
+        DPR = fabric.config.devicePixelRatio;
+        fabric.config.configure({ devicePixelRatio: 2 });
+        canvas = new fabric.Canvas(null, {
+          enableRetinaScaling: true,
+        });
+      });
+      hooks.afterEach(function () {
+        fabric.config.configure({ devicePixelRatio: DPR });
         canvas = new fabric.Canvas(null, {
           enableRetinaScaling: true,
         });

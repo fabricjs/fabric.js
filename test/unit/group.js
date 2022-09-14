@@ -889,7 +889,7 @@
 
     group1.addRelativeToGroup(rect5);
     var t = group1.calcTransformMatrix();
-    var pos = fabric.util.transformPoint(new fabric.Point(rect5.left, rect5.top), t);
+    fabric.util.transformPoint(new fabric.Point(rect5.left, rect5.top), t);
     assert.equal(rect5.top, -5.5, 'top has been moved');
     assert.equal(rect5.left, -19.5, 'left has been moved');
     assert.equal(rect5.scaleX, 2, 'scaleX has been scaled');
