@@ -174,7 +174,7 @@ export class Gradient<
     if (this.type === 'linear') {
       const p1 = transformPoint(new Point(coords.x1, coords.y1), transform);
       const p2 = transformPoint(new Point(coords.x2, coords.y2), transform);
-      if (p1.eq(p2) || t[0] === 0 || t[3] === 0) {
+      if (t[0] === 0 || t[3] === 0) {
         return null;
       }
       gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
