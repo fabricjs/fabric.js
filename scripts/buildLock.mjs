@@ -17,6 +17,7 @@ export function logToLockFile(...logs) {
 }
 
 export async function unlock() {
+  if (!fs.existsSync(lockFile)) return;
   const lockPID = Number(
     /<pid>(.*)<\/pid>/gm.exec(fs.readFileSync(lockFile).toString())[1]
   );
@@ -54,7 +55,10 @@ export function awaitBuild() {
 
 export const lockFilePlugin = {
   name: 'rollup-lock-file',
+  sequential: true,
+  order: 'post',
   buildStart() {
+    fs.writeFileSync(lockFile, '');
     logToLockFile(`build start <pid>${process.pid}</pid>`);
   },
   buildEnd(error) {
