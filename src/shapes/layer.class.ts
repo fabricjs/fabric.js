@@ -253,7 +253,7 @@ import { clone } from '../util/lang_object';
         this.off('added', this.__onAdded);
         this.off('removed', this.__onRemoved);
         this._watchParent(false);
-        this.callSuper('dispose');
+        return this.callSuper('dispose');
       },
     }
   );
@@ -275,4 +275,4 @@ import { clone } from '../util/lang_object';
         new fabric.Layer(objects, { ...options, ...enlivedMap }, true)
     );
   };
-})(typeof exports !== 'undefined' ? exports : this);
+})(typeof exports !== 'undefined' ? exports : window);
