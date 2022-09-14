@@ -131,7 +131,6 @@ export class Pattern extends Filler<CanvasPattern> {
 
   toObject(propertiesToInclude?: (keyof this)[]) {
     return {
-      ...pick(this, propertiesToInclude),
       ...super.toObject(propertiesToInclude),
       type: 'pattern',
       source: this.sourceToString(),

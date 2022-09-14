@@ -11,7 +11,6 @@ import {
   multiplyTransformMatrices2,
   transformPoint,
 } from '../util/misc/matrix';
-import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { type TObject } from '../__types__';
 import { linearDefaultCoords, radialDefaultCoords } from './constants';
@@ -218,7 +217,6 @@ export class Gradient<
 
   toObject(propertiesToInclude?: (keyof this)[]) {
     return {
-      ...pick(this, propertiesToInclude),
       ...super.toObject(propertiesToInclude),
       type: this.type,
       coords: this.coords,
