@@ -24,9 +24,10 @@ import moment from 'moment';
 import path from 'node:path';
 import process from 'node:process';
 import os from 'os';
-import { build, awaitBuild } from './build';
+import { build } from './build.mjs';
+import { awaitBuild } from './buildLock.mjs';
+import { wd } from './dirname.mjs';
 import { listFiles, transform as transformFiles } from './transform_files.mjs';
-import { wd } from './__dirname';
 
 const program = new commander.Command();
 

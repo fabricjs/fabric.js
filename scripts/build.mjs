@@ -1,12 +1,7 @@
-import chalk from 'chalk';
 import cp from 'child_process';
-import fs from 'fs-extra';
-import _ from 'lodash';
 import path from 'node:path';
 import process from 'node:process';
 import { wd } from './dirname.mjs';
-
-const lockFile = path.resolve(wd, 'build.lock');
 
 export function build(options = {}) {
   const cmd = ['rollup', '-c', options.watch ? '--watch' : ''].join(' ');
@@ -40,27 +35,4 @@ export function build(options = {}) {
       process.exit(1);
     }
   }
-}
-
-export function isLocked() {
-  return fs.existsSync(lockFile);
-}
-
-export function awaitBuild() {
-  return new Promise((resolve) => {
-    console.log(chalk.cyanBright('> waiting for build to finish...'));
-    if (isLocked()) {
-      const watcher = fs.watch(
-        lockFile,
-        _.debounce(() => {
-          if (!isLocked()) {
-            watcher.close();
-            resolve();
-          }
-        }, 500)
-      );
-    } else {
-      resolve();
-    }
-  });
 }
