@@ -586,13 +586,11 @@ import { pick } from './util/misc/pick';
 
       canEnterCanvas: function (object) {
         if (object.canvas && object.canvas === this) {
-          /* _DEV_MODE_START_ */
           console.warn(
             'fabric.Canvas: duplicate objects are not supported inside canvas, this call has no effect',
             object,
             this
           );
-          /* _DEV_MODE_END_ */
           return false;
         }
         return true;
@@ -671,17 +669,14 @@ import { pick } from './util/misc/pick';
           object.group &&
           object.group instanceof fabric.ActiveSelection === false
         ) {
-          /* _DEV_MODE_START_ */
           console.warn(
             'fabric.Canvas: removing object from group before entering canvas',
             object,
             object.group,
             this
           );
-          /* _DEV_MODE_END_ */
           object.group.remove(object);
         } else if (object.canvas) {
-          /* _DEV_MODE_START_ */
           console.warn(
             'fabric.Canvas: removing object from canvas before entering another',
             object,

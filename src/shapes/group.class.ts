@@ -266,19 +266,15 @@ import { Point } from '../point.class';
       canEnterGroup: function (object) {
         if (object === this || this.isDescendantOf(object)) {
           //  prevent circular object tree
-          /* _DEV_MODE_START_ */
           console.error(
             'fabric.Group: circular object trees are not supported, this call has no effect'
           );
-          /* _DEV_MODE_END_ */
           return false;
         } else if (this._objects.indexOf(object) !== -1) {
           // is already in the objects array
-          /* _DEV_MODE_START_ */
           console.error(
             'fabric.Group: duplicate objects are not supported inside group, this call has no effect'
           );
-          /* _DEV_MODE_END_ */
           return false;
         }
         return true;
