@@ -109,41 +109,8 @@ class ICheckbox extends Checkbox {
 }
 inquirer.registerPrompt('test-selection', ICheckbox);
 
-// async function rollupBuild(options = {}, onComplete) {
-//     const { options: buildOptions, warnings } = await loadConfigFile(path.resolve(__dirname, '..', 'rollup.config.js'), { format: 'es' });
-//     warnings.flush();
-//     if (options.output) {
-//         buildOptions.output = [options.output];
-//     }
-//     if (options.watch) {
-//         const watcher = rollup.watch(buildOptions);
-//         watcher.on('END', () => {
-//             onComplete && onComplete();
-//         });
-//         watcher.on('event', ({ result }) => {
-//             if (result) {
-//                 result.close();
-//             }
-//         });
-//         process.on('beforeExit', () => watcher.close());
-//     }
-//     else {
-//         for (const optionsObj of buildOptions) {
-//             const bundle = await rollup.rollup(optionsObj);
-//             await Promise.all(optionsObj.output.map(bundle.write));
-//         }
-
-//         onComplete && onComplete();
-//     }
-// }
-
 function build(options = {}) {
   const cmd = ['rollup', '-c', options.watch ? '--watch' : ''].join(' ');
-  let minDest;
-  if (options.output && !options.fast) {
-    const { name, base, ...rest } = path.parse(path.resolve(options.output));
-    minDest = path.format({ name: `${name}.min`, ...rest });
-  }
   const processOptions = {
     stdio: 'inherit',
     shell: true,
@@ -153,7 +120,13 @@ function build(options = {}) {
       MINIFY: Number(!options.fast),
       BUILD_INPUT: options.input,
       BUILD_OUTPUT: options.output,
-      BUILD_MIN_OUTPUT: minDest,
+      BUILD_MIN_OUTPUT:
+        options.output && !options.fast
+          ? path.resolve(
+              path.dirname(options.output),
+              `${path.basename(options.output, '.js')}.min.js`
+            )
+          : undefined,
     },
   };
   if (options.watch) {
