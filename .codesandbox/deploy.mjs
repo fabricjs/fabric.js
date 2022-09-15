@@ -14,15 +14,15 @@ function bufferToBase64DataUrl(buffer, mimeType) {
  * https://codesandbox.io/docs/api/#define-api
  */
 export async function createCodeSandbox(appPath) {
-  const { trigger: __, ...package } = fs.readFileSync(path.resolve(
+  const { trigger: __, ...packageJSON } = fs.readFileSync(path.resolve(
     appPath,
     'package.json'
   )).toJSON();
   // omit linked package
-  if (package.dependencies.fabric.startsWith('file:')) {
-    package.dependencies.fabric = '*';
+  if (packageJSON.dependencies.fabric.startsWith('file:')) {
+    packageJSON.dependencies.fabric = '*';
   }
-  const files = { 'package.json': JSON.stringify(package, null, '\t') };
+  const files = { 'package.json': JSON.stringify(packageJSON, null, '\t') };
 
   const gitignore = path.resolve(appPath, '.gitignore');
   const ignore = fs.existsSync(gitignore)
