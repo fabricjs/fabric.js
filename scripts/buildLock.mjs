@@ -15,7 +15,7 @@ export const lockFile = path.resolve(dumpsPath, 'build-lock.json');
  */
 function readLockFile() {
   return fs.existsSync(lockFile) ?
-    JSON.parse(fs.readFileSync(lockFile).toString()) :
+    JSON.parse(fs.readFileSync(lockFile)) :
     null;
 }
 
