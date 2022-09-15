@@ -5,17 +5,23 @@ import { wd } from './dirname.mjs';
 
 /**
  * Handles rollup build
- * 
+ *
  * Hooks to build events to create `cli_output/build-lock.json`
  * @see https://rollupjs.org/guide/en/#--watchonstart-cmd---watchonbundlestart-cmd---watchonbundleend-cmd---watchonend-cmd---watchonerror-cmd
- * @param {*} options 
+ * @param {*} options
  */
 export function build({ watch, fast, input, output } = {}) {
   const cmd = [
     'rollup',
-    '-c', watch ? '--watch' : '',
+    '-c',
+    watch ? '--watch' : '',
     '--no-watch.clearScreen',
-    ...['onStart', 'onError', 'onEnd'].map(type => `--watch.${type} "node ./scripts/buildReporter.mjs ${type.toLowerCase().slice(2)}"`)
+    ...['onStart', 'onError', 'onEnd'].map(
+      (type) =>
+        `--watch.${type} "node ./scripts/buildReporter.mjs ${type
+          .toLowerCase()
+          .slice(2)}"`
+    ),
   ].join(' ');
   const processOptions = {
     stdio: 'inherit',

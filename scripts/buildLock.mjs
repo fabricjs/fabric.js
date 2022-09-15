@@ -10,13 +10,11 @@ import { dumpsPath } from './dirname.mjs';
 export const lockFile = path.resolve(dumpsPath, 'build-lock.json');
 
 /**
- * 
- * @returns {{start:{pid:number,timestamp:string},error?:{pid:number,timestamp:string}} | null} 
+ *
+ * @returns {{start:{pid:number,timestamp:string},error?:{pid:number,timestamp:string}} | null}
  */
 function readLockFile() {
-  return fs.existsSync(lockFile) ?
-    JSON.parse(fs.readFileSync(lockFile)) :
-    null;
+  return fs.existsSync(lockFile) ? JSON.parse(fs.readFileSync(lockFile)) : null;
 }
 
 /**
@@ -57,7 +55,7 @@ export function awaitBuild() {
 
 /**
  * Subscribe to build start/error/completion.
- * 
+ *
  * @param {(locked: boolean, error: boolean) => any} cb
  * @param {number} [debounce]
  * @returns
@@ -73,29 +71,43 @@ export function subscribe(cb, debounce) {
 }
 
 /**
- * 
- * @param {'start'|'error'|'end'} type 
- * @param {*} [data] 
+ *
+ * @param {'start'|'error'|'end'} type
+ * @param {*} [data]
  */
 export function report(type, data) {
   switch (type) {
     case 'start':
-      fs.writeFileSync(lockFile, JSON.stringify({
-        start: {
-          timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
-          pid: process.pid,
-        }
-      }, null, '\t'));
+      fs.writeFileSync(
+        lockFile,
+        JSON.stringify(
+          {
+            start: {
+              timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
+              pid: process.pid,
+            },
+          },
+          null,
+          '\t'
+        )
+      );
       break;
     case 'error':
-      fs.writeFileSync(lockFile, JSON.stringify({
-        ...readLockFile(),
-        error: {
-          timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
-          pid: process.pid,
-          data
-        },
-      }, null, '\t'));
+      fs.writeFileSync(
+        lockFile,
+        JSON.stringify(
+          {
+            ...readLockFile(),
+            error: {
+              timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
+              pid: process.pid,
+              data,
+            },
+          },
+          null,
+          '\t'
+        )
+      );
       break;
     case 'end':
       !readLockFile().error && unlock();
