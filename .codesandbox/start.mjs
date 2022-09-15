@@ -21,7 +21,7 @@ export function startSandbox(destination) {
     cwd: destination,
     stdio: 'inherit',
   });
-  console.log(chalk.blue('> installing deps'));
+  console.log(chalk.blue('\n> installing deps'));
   cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
   build({ watch: true, fast: true });
   
@@ -41,7 +41,7 @@ export function startSandbox(destination) {
       );
   }, 500);
 
-  console.log(chalk.blue('> starting'));
+  console.log(chalk.blue('\n> starting'));
     cp.spawn('npm run dev', {
       cwd: destination,
       stdio: 'inherit',
