@@ -38,19 +38,33 @@ export function awaitBuild() {
   return new Promise((resolve) => {
     if (isLocked()) {
       console.log(chalk.cyanBright('> waiting for build to finish...'));
-      const watcher = fs.watch(
-        lockFile,
-        _.debounce(() => {
-          if (!isLocked()) {
-            watcher.close();
-            resolve();
-          }
-        }, 500)
-      );
+      const watcher = hook((locked) => {
+        if (!locked) {
+          watcher.close();
+          resolve();
+        }
+      }, 500);
     } else {
       resolve();
     }
   });
+}
+
+/**
+ *
+ * @param {(locked: boolean) => any} cb
+ * @param {number} [debounce]
+ * @returns
+ */
+export function hook(cb, debounce) {
+  return fs.watch(
+    path.dirname(lockFile),
+    _.debounce((type, file) => {
+      if (type === 'rename' && file === path.basename(lockFile)) {
+        cb(isLocked());
+      }
+    }, debounce)
+  );
 }
 
 export const lockFilePlugin = {
