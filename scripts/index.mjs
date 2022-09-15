@@ -26,17 +26,12 @@ import process from 'node:process';
 import os from 'os';
 import { build } from './build.mjs';
 import { awaitBuild } from './buildLock.mjs';
-import { wd } from './dirname.mjs';
+import { CLI_CACHE, wd } from './dirname.mjs';
 import { listFiles, transform as transformFiles } from './transform_files.mjs';
 
 const program = new commander.Command();
 
-const dumpsPath = path.resolve(wd, 'cli_output');
-const CLI_CACHE = path.resolve(dumpsPath, 'cli_cache.json');
 const websiteDir = path.resolve(wd, '../fabricjs.com');
-if (!fs.existsSync(dumpsPath)) {
-  fs.mkdirSync(dumpsPath);
-}
 
 function execGitCommand(cmd) {
   return cp

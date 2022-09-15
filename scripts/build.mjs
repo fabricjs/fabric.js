@@ -4,7 +4,13 @@ import process from 'node:process';
 import { wd } from './dirname.mjs';
 
 export function build(options = {}) {
-  const cmd = ['rollup', '-c', options.watch ? '--watch' : '', '--no-watch.clearScreen'].join(' ');
+  const cmd = [
+    'rollup',
+    '-c', options.watch ? '--watch' : '',
+    '--no-watch.clearScreen',
+    // report build phase
+    ...['onStart', 'onError', 'onEnd'].map(type => `--watch.${type} "node ./scripts/buildReporter.mjs ${type.toLowerCase().slice(2)}"`)
+  ].join(' ');
   const processOptions = {
     stdio: 'inherit',
     shell: true,

@@ -5,22 +5,24 @@ import moment from 'moment';
 import path from 'node:path';
 import process from 'node:process';
 import psList from 'ps-list';
-import { wd } from './dirname.mjs';
+import { dumpsPath } from './dirname.mjs';
 
-export const lockFile = path.resolve(wd, 'build.lock');
+export const lockFile = path.resolve(dumpsPath, 'build-lock.json');
 
-export function logToLockFile(...logs) {
-  fs.appendFileSync(
-    lockFile,
-    `[${moment().format('YYYY-MM-DD HH:mm:ss')}] ${logs.join('\n')}\n`
-  );
+/**
+ * 
+ * @returns {{start:{pid:number,timestamp:string},error?:{pid:number,timestamp:string}} | null} 
+ */
+function readLockFile() {
+  return fs.existsSync(lockFile) ?
+    JSON.parse(fs.readFileSync(lockFile).toString()) :
+    null;
 }
 
 export async function unlock() {
-  if (!fs.existsSync(lockFile)) return;
-  const lockPID = Number(
-    /<pid>(.*)<\/pid>/gm.exec(fs.readFileSync(lockFile).toString())[1]
-  );
+  const lock = readLockFile();
+  if (!lock) return;
+  const lockPID = lock.start.pid;
   // the process that locked last is allowed to unlock for concurrency reasons
   const hasPermissionToUnlock =
     process.pid === lockPID ||
@@ -67,21 +69,32 @@ export function hook(cb, debounce) {
   );
 }
 
-export const lockFilePlugin = {
-  name: 'rollup-lock-file',
-  sequential: true,
-  order: 'post',
-  buildStart() {
-    fs.writeFileSync(lockFile, '');
-    logToLockFile(`build start <pid>${process.pid}</pid>`);
-  },
-  buildEnd(error) {
-    error && logToLockFile('build error', error);
-  },
-  renderError(error) {
-    logToLockFile('build error', error);
-  },
-  writeBundle() {
-    return unlock();
-  },
-};
+/**
+ * 
+ * @param {'start'|'error'|'end'} type 
+ * @param {*} [data] 
+ */
+export function report(type, data) {
+  switch (type) {
+    case 'start':
+      fs.writeFileSync(lockFile, JSON.stringify({
+        start: {
+          timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
+          pid: process.pid,
+        }
+      }, null, '\t'));
+      break;
+    case 'error':
+      fs.writeFileSync(lockFile, JSON.stringify({
+        ...readLockFile(),
+        error: {
+          timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
+          pid: process.pid,
+          data
+        },
+      }, null, '\t'));
+      break;
+    case 'end':
+      !readLockFile().error && unlock();
+  }
+}
