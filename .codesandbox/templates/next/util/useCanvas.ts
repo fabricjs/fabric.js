@@ -1,7 +1,7 @@
-import { fabric } from "fabric";
-import { useCallback, useEffect, useRef } from "react";
+import { fabric } from 'fabric';
+import { useCallback, useEffect, useRef } from 'react';
 
-const DEV_MODE = process.env.NODE_ENV === "development";
+const DEV_MODE = process.env.NODE_ENV === 'development';
 
 export function useCanvas(
   init?: (canvas: fabric.Canvas) => any,
@@ -27,7 +27,7 @@ export function useCanvas(
         fc.current = null;
         return;
       }
-      const canvas = new fabric.Canvas(ref, { backgroundColor: "white" });
+      const canvas = new fabric.Canvas(ref, { backgroundColor: 'white' });
       fc.current = canvas;
       // invoke callback
       init && init(canvas);
