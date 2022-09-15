@@ -26,18 +26,13 @@ import process from 'node:process';
 import os from 'os';
 import { createCodeSandbox } from '../.codesandbox/deploy.mjs';
 import { build } from './build.mjs';
-import { awaitBuild, hook } from './buildLock.mjs';
-import { wd } from './dirname.mjs';
+import { awaitBuild,subscribe } from './buildLock.mjs';
+import { CLI_CACHE, wd } from './dirname.mjs';
 import { listFiles, transform as transformFiles } from './transform_files.mjs';
 
 const program = new commander.Command();
 
-const dumpsPath = path.resolve(wd, 'cli_output');
-const CLI_CACHE = path.resolve(dumpsPath, 'cli_cache.json');
 const websiteDir = path.resolve(wd, '../fabricjs.com');
-if (!fs.existsSync(dumpsPath)) {
-  fs.mkdirSync(dumpsPath);
-}
 
 function execGitCommand(cmd) {
   return cp
@@ -699,7 +694,7 @@ const templates = fs.readdirSync(codesandboxTemplatesDir);
 function watchFabricAndTriggerSandbox(dest) {
   const pathToTrigger = path.resolve(dest, 'package.json');
   build({ watch: true });
-  return hook((locked) => {
+  return subscribe((locked) => {
     !locked && fs.writeFileSync(pathToTrigger, JSON.stringify({
       ...fs.readFileSync(pathToTrigger).toJSON(),
       trigger: moment().format('YYYY-MM-DD HH:mm:ss')
