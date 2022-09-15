@@ -9,7 +9,6 @@ import {
   invertTransform,
   multiplyTransformMatrices,
   multiplyTransformMatrices2,
-  transformPoint,
 } from '../util/misc/matrix';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { type TObject } from '../__types__';
@@ -172,8 +171,8 @@ export class Gradient<
     const t = this.gradientTransform || iMatrix;
     let gradient: CanvasGradient;
     if (this.type === 'linear') {
-      const p1 = transformPoint(new Point(coords.x1, coords.y1), transform);
-      const p2 = transformPoint(new Point(coords.x2, coords.y2), transform);
+      const p1 = new Point(coords.x1, coords.y1).transform(transform);
+      const p2 = new Point(coords.x2, coords.y2).transform(transform);
       if (t[0] === 0 || t[3] === 0) {
         return null;
       }
