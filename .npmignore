@@ -1,5 +1,6 @@
 .github/
 .nyc_output/
+cli_output/
 lib/*.jar
 lib/*.png
 coverage/

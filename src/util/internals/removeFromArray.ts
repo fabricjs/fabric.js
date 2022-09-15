@@ -7,8 +7,7 @@
  * @param {*} value
  * @return {Array} original array
  */
-
-export const removeFromArray = <T,>(array: T[], value: T): T[] => {
+export const removeFromArray = <T>(array: T[], value: T): T[] => {
   const idx = array.indexOf(value);
   if (idx !== -1) {
     array.splice(idx, 1);

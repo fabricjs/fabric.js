@@ -1,31 +1,31 @@
 import { fabric } from '../HEADER';
 import { TMat2D, TRadian } from './typedefs';
+import { sin } from './util/misc/sin';
+import { cos } from './util/misc/cos';
 
 export interface IPoint {
-  x: number
-  y: number
+  x: number;
+  y: number;
 }
 
 /**
  * Adaptation of work of Kevin Lindsey(kevin@kevlindev.com)
  */
 export class Point {
+  x: number;
 
-  x: number
+  y: number;
 
-  y: number
+  type = 'point';
 
-  type = 'point'
-
-  constructor()
-  constructor(x: number, y: number)
-  constructor(point: IPoint)
+  constructor();
+  constructor(x: number, y: number);
+  constructor(point: IPoint);
   constructor(arg0: number | IPoint = 0, y = 0) {
     if (typeof arg0 === 'object') {
       this.x = arg0.x;
       this.y = arg0.y;
-    }
-    else {
+    } else {
       this.x = arg0;
       this.y = y;
     }
@@ -187,7 +187,7 @@ export class Point {
    * @return {Boolean}
    */
   eq(that: IPoint): boolean {
-    return (this.x === that.x && this.y === that.y);
+    return this.x === that.x && this.y === that.y;
   }
 
   /**
@@ -196,7 +196,7 @@ export class Point {
    * @return {Boolean}
    */
   lt(that: IPoint): boolean {
-    return (this.x < that.x && this.y < that.y);
+    return this.x < that.x && this.y < that.y;
   }
 
   /**
@@ -205,7 +205,7 @@ export class Point {
    * @return {Boolean}
    */
   lte(that: IPoint): boolean {
-    return (this.x <= that.x && this.y <= that.y);
+    return this.x <= that.x && this.y <= that.y;
   }
 
   /**
@@ -215,7 +215,7 @@ export class Point {
    * @return {Boolean}
    */
   gt(that: IPoint): boolean {
-    return (this.x > that.x && this.y > that.y);
+    return this.x > that.x && this.y > that.y;
   }
 
   /**
@@ -224,7 +224,7 @@ export class Point {
    * @return {Boolean}
    */
   gte(that: IPoint): boolean {
-    return (this.x >= that.x && this.y >= that.y);
+    return this.x >= that.x && this.y >= that.y;
   }
 
   /**
@@ -235,7 +235,10 @@ export class Point {
    */
   lerp(that: IPoint, t = 0.5): Point {
     t = Math.max(Math.min(1, t), 0);
-    return new Point(this.x + (that.x - this.x) * t, this.y + (that.y - this.y) * t);
+    return new Point(
+      this.x + (that.x - this.x) * t,
+      this.y + (that.y - this.y) * t
+    );
   }
 
   /**
@@ -350,16 +353,23 @@ export class Point {
 
   /**
    * Rotates `point` around `origin` with `radians`
-   * WARNING: this is probably a source of circular dependency.
-   * evaluate what to do when importing rotateVector directly from the file
    * @static
    * @memberOf fabric.util
    * @param {Point} origin The origin of the rotation
    * @param {TRadian} radians The radians of the angle for the rotation
    * @return {Point} The new rotated point
    */
-  rotate(origin: Point, radians: TRadian): Point {
-    return fabric.util.rotateVector(this.subtract(origin), radians).add(origin);
+  rotate(radians: TRadian, origin: Point = originZero): Point {
+    // TODO benchmark and verify the add and subtract how much cost
+    // and then in case early return if no origin is passed
+    const sinus = sin(radians),
+      cosinus = cos(radians);
+    const p = this.subtract(origin);
+    const rotated = new Point(
+      p.x * cosinus - p.y * sinus,
+      p.x * sinus + p.y * cosinus
+    );
+    return rotated.add(origin);
   }
 
   /**
@@ -370,12 +380,14 @@ export class Point {
    * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
    * @return {Point} The transformed point
    */
-  transform(t: TMat2D, ignoreOffset: boolean): Point {
+  transform(t: TMat2D, ignoreOffset = false): Point {
     return new Point(
       t[0] * this.x + t[2] * this.y + (ignoreOffset ? 0 : t[4]),
       t[1] * this.x + t[3] * this.y + (ignoreOffset ? 0 : t[5])
     );
   }
 }
+
+const originZero = new Point(0, 0);
 
 fabric.Point = Point;

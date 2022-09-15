@@ -1,7 +1,7 @@
-import { NextPage } from "next";
-import Link from "next/link";
-import React from "react";
-import { Button, ButtonGroup } from "react-bootstrap";
+import { NextPage } from 'next';
+import Link from 'next/link';
+import React from 'react';
+import { Button, ButtonGroup } from 'react-bootstrap';
 
 const NodePage: NextPage = () => {
   return (
@@ -17,12 +17,12 @@ const NodePage: NextPage = () => {
         </Button>
         <Button
           onClick={async () => {
-            const res = await fetch("/api/fabric");
+            const res = await fetch('/api/fabric');
             const blob = await res.blob();
             const blobUrl = URL.createObjectURL(blob);
-            const link = document.createElement("a");
+            const link = document.createElement('a');
             link.href = blobUrl;
-            link.setAttribute("download", "fabric.png");
+            link.setAttribute('download', 'fabric.png');
             link.click();
             URL.revokeObjectURL(blobUrl);
           }}

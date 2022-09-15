@@ -1,19 +1,28 @@
+require('source-map-support/register');
 // set the fabric framework as a global for tests
 var chalk = require('chalk');
 var diff = require('deep-object-diff').diff;
 var commander = require('commander');
 
-// commander.program
-//   .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
-//   .option('-r, --recreate', 'recreate visual refs (golden images)', false)
-//   .action(options => {
-//     QUnit.debug = QUnit.debugVisual = options.debug;
-//     QUnit.recreateVisualRefs = options.recreate;
-//   }).parse(process.argv);
-// //  for now accept an env variable because qunit doesn't allow passing unknown options
-// QUnit.debugVisual = Number(process.env.QUNIT_DEBUG_VISUAL_TESTS);
-// QUnit.recreateVisualRefs = Number(process.env.QUNIT_RECREATE_VISUAL_REFS);
-// QUnit.config.filter = process.env.QUNIT_FILTER;
+// TODO remove block and dependency when node 14 fades out
+// node 14 AbortController polyfill for tests
+if (!global.AbortController) {
+  require("abort-controller/polyfill");
+}
+
+
+commander.program
+  .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
+  .option('-r, --recreate', 'recreate visual refs (golden images)', false)
+  .action(options => {
+    QUnit.debug = QUnit.debugVisual = options.debug;
+    QUnit.recreateVisualRefs = options.recreate;
+  }).parse(process.argv);
+//  for now accept an env variable because qunit doesn't allow passing unknown options
+QUnit.debugVisual = Number(process.env.QUNIT_DEBUG_VISUAL_TESTS);
+QUnit.recreateVisualRefs = Number(process.env.QUNIT_RECREATE_VISUAL_REFS);
+QUnit.config.filter = process.env.QUNIT_FILTER;
+
 
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
@@ -61,7 +70,6 @@ class CustomResourceLoader extends jsdom.ResourceLoader {
   }
 }
 
-var jsdom = require('jsdom');
 var virtualWindow = new jsdom.JSDOM(
   decodeURIComponent('%3C!DOCTYPE%20html%3E%3Chtml%3E%3Chead%3E%3C%2Fhead%3E%3Cbody%3E%3C%2Fbody%3E%3C%2Fhtml%3E'),
   {
@@ -78,6 +86,30 @@ DOMParser = fabric.window.DOMParser;
 
 
 //  QUnit Logging
+
+//  global error handling
+
+process.on('uncaughtExceptionMonitor', (err, origin) => {
+  QUnit.onUncaughtException(err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  QUnit.onUncaughtException(reason);
+});
+
+// JSDOM catches errors and throws them to the window
+
+fabric.window.addEventListener('unhandledrejection', (event) => {
+  // prevent logging to console
+  event.preventDefault();
+  QUnit.onUncaughtException(event.reason);
+});
+
+fabric.window.addEventListener('error', (event) => {
+  // prevent logging to console
+  event.preventDefault();
+  QUnit.onUncaughtException(event.error);
+});
 
 //  testID
 var objectInit = fabric.Object.prototype.initialize;

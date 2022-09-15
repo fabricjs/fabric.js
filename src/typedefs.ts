@@ -1,6 +1,7 @@
-//@ts-nocheck
+// https://www.typescriptlang.org/docs/handbook/utility-types.html
+
 interface NominalTag<T> {
-  'nominalTag': T;
+  nominalTag: T;
 }
 
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
@@ -10,6 +11,13 @@ const enum Radian {}
 
 export type TDegree = Nominal<number, Degree>;
 export type TRadian = Nominal<number, Radian>;
+
+export type TSize = {
+  width: number;
+  height: number;
+};
+
+export type Percent = `${number}%`;
 
 export const enum StrokeLineJoin {
   miter = 'miter',
@@ -39,3 +47,27 @@ export const enum SupportedSVGUnit {
 }
 
 export type TMat2D = [number, number, number, number, number, number];
+
+export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
+
+/**
+ * SVG path commands
+ */
+export type PathData = (string | number)[][];
+
+export type TEvent<E extends Event = MouseEvent | TouchEvent> = {
+  e: E;
+};
+
+export type TransformEvent<T> = TEvent &
+  T & {
+    transform: {
+      target: any;
+    };
+  };
+
+/**
+ * An invalid keyword and an empty string will be handled as the `anonymous` keyword.
+ * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
+ */
+export type TCrossOrigin = '' | 'anonymous' | 'use-credentials' | null;

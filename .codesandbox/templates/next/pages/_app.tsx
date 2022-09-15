@@ -1,10 +1,10 @@
-import "bootstrap/dist/css/bootstrap.min.css";
-import "../index.css";
-import Head from "next/head";
-import Link from "next/link";
-import React from "react";
-import { Container, Nav, Navbar, SSRProvider } from "react-bootstrap";
-import { useRouter } from "next/router";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../index.css';
+import Head from 'next/head';
+import Link from 'next/link';
+import React from 'react';
+import { Container, Nav, Navbar, SSRProvider } from 'react-bootstrap';
+import { useRouter } from 'next/router';
 
 export default function MyApp({ Component, pageProps }) {
   const { route } = useRouter();
@@ -25,7 +25,7 @@ export default function MyApp({ Component, pageProps }) {
                 as={Link}
                 href="/"
                 legacyBehavior={false}
-                active={route === "/"}
+                active={route === '/'}
               >
                 Browser
               </Nav.Link>
@@ -33,7 +33,7 @@ export default function MyApp({ Component, pageProps }) {
                 as={Link}
                 href="/node"
                 legacyBehavior={false}
-                active={route === "/node"}
+                active={route === '/node'}
               >
                 Node
               </Nav.Link>
