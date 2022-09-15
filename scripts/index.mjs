@@ -25,8 +25,9 @@ import path from 'node:path';
 import process from 'node:process';
 import os from 'os';
 import { createCodeSandbox } from '../.codesandbox/deploy.mjs';
+import { startSandbox } from '../.codesandbox/start.mjs';
 import { build } from './build.mjs';
-import { awaitBuild, subscribe } from './buildLock.mjs';
+import { awaitBuild } from './buildLock.mjs';
 import { CLI_CACHE, wd } from './dirname.mjs';
 import { listFiles, transform as transformFiles } from './transform_files.mjs';
 
@@ -681,47 +682,6 @@ const codesandboxTemplatesDir = path.resolve(wd, '.codesandbox', 'templates');
 const sandbox = program.command('sandbox').description('sandbox commands');
 
 const templates = fs.readdirSync(codesandboxTemplatesDir);
-
-/**
- * Writes a timestamp in `package.json` file of `dest` dir
- * This is done to invoke the watcher watching `dest` and serving the app from it
- * I looked for other ways to tell the watcher to watch changes in fabric but I came out with this options only (symlinking and other stuff).
- * @param {string} dest
- */
-function startSandbox(dest) {
-  console.log(chalk.blue('\n> linking fabric'));
-  cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
-  cp.execSync('npm link fabric --save', {
-    cwd: dest,
-    stdio: 'inherit',
-  });
-  console.log(chalk.blue('> installing deps'));
-  cp.execSync('npm i --include=dev', { cwd: dest, stdio: 'inherit' });
-  build({ watch: true, fast: true });
-  
-  const pathToTrigger = path.resolve(dest, 'package.json');
-  subscribe((locked) => {
-    !locked &&
-      fs.writeFileSync(
-        pathToTrigger,
-        JSON.stringify(
-          {
-            ...JSON.parse(fs.readFileSync(pathToTrigger)),
-            trigger: moment().format('YYYY-MM-DD HH:mm:ss'),
-          },
-          null,
-          '\t'
-        )
-      );
-  }, 500);
-
-  console.log(chalk.blue('> starting'));
-    cp.spawn('npm run dev', {
-      cwd: dest,
-      stdio: 'inherit',
-      shell: true,
-    });
-}
 
 sandbox
   .command('deploy')
