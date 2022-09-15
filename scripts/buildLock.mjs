@@ -19,6 +19,10 @@ function readLockFile() {
     null;
 }
 
+/**
+ * For concurrency reasons, the last process to lock is granted permission to unlock.
+ * If the process died the next process to try to unlock will be granted permission.
+ */
 export async function unlock() {
   const lock = readLockFile();
   if (!lock) return;
@@ -53,7 +57,8 @@ export function awaitBuild() {
 }
 
 /**
- *
+ * Subscribe to build start/completion
+ * 
  * @param {(locked: boolean) => any} cb
  * @param {number} [debounce]
  * @returns
