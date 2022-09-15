@@ -736,7 +736,7 @@ function watchFabricAndTriggerSandbox(dest) {
       ...fs.readFileSync(pathToTrigger).toJSON(),
       trigger: moment().format('YYYY-MM-DD HH:mm:ss')
     }, null, '\t'));
-  });
+  }, 500);
 }
 
 sandbox
