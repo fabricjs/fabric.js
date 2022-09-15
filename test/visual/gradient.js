@@ -12,7 +12,7 @@ QUnit.module('Gradient', hooks => {
         }
     ];
     const gradientMatrices = [
-        // [1, 0, 0, 1, 0, 0],
+        [1, 0, 0, 1, 0, 0],
         // [2, 0, 0, 2, 0, 0],
         // [1, 0, 0, 2, 0, 0],
         // [2, 0, 0, 1, 0, 0],
@@ -38,7 +38,7 @@ QUnit.module('Gradient', hooks => {
                         if (x1 === x2 && y1 === y2) return;
                         options.push({
                             coords: { x1, y1, x2, y2 },
-                             percentage:true,
+                            //  percentage:true,
                             // fakeOffset,
                             transform
                         });
@@ -111,64 +111,97 @@ QUnit.module('Gradient', hooks => {
         const goldenName = `gradient/coords(${Object.values(coords)})-(${transform}).png`;
         const iGoldenName = `gradient/coords(${Object.values(coords)})-(${fabric.iMatrix}).png`;
         const testName = `gradient coords(${Object.values(coords)}), transform(${transform}), units(${units}), fake offset(${fakeOffset})`;
-        runner({
-            test: testName,
-            code: (canvas, callback) => {
-                const rect = new fabric.Rect({
-                    width: canvas.width,
-                    height: canvas.height,
-                    fill: makeGradient(),
-                    strokeWidth: 0
-                });
-                canvas.add(rect);
-                canvas.renderAll();
-                callback(canvas.lowerCanvasEl);
-            },
-            golden: goldenName,
-            percentage: 0.09,
-            ...size,
+
+        QUnit.module(testName, hooks => {
+            runner({
+                test: `bare canvas gradient reference`,
+                code: (canvas, callback) => {
+                    const gradient = makeGradient();
+                    sinon.replace(gradient, 'toLive', function (ctx) {
+                        const g = ctx.createLinearGradient(...Object.values(coords));
+                        this.colorStops.forEach(({ color, opacity, offset }) => {
+                            g.addColorStop(
+                                offset,
+                                typeof opacity !== 'undefined'
+                                    ? new fabric.Color(color).setAlpha(opacity).toRgba()
+                                    : color
+                            );
+                        });
+                        return g;
+                    });
+                    canvas.setViewportTransform(buildMatrix(transform));
+                    canvas.backgroundColor = gradient;
+                    canvas.renderAll();
+                    callback(canvas.lowerCanvasEl);
+                },
+                golden: goldenName,
+                percentage: 0.09,
+                ...size,
+            });
+        
+            runner({
+                test: testName,
+                code: (canvas, callback) => {
+                    const rect = new fabric.Rect({
+                        width: canvas.width,
+                        height: canvas.height,
+                        fill: makeGradient(),
+                        strokeWidth: 0
+                    });
+                    canvas.add(rect);
+                    canvas.renderAll();
+                    callback(canvas.lowerCanvasEl);
+                },
+                golden: goldenName,
+                percentage: 0.09,
+                ...size,
+                testOnly: true
+            });
+
+            runner({
+                test: `canvas bg: ${testName}`,
+                code: (canvas, callback) => {
+                    canvas.backgroundColor = makeGradient();
+                    canvas.renderAll();
+                    callback(canvas.lowerCanvasEl);
+                },
+                golden: goldenName,
+                percentage: 0.09,
+                ...size,
+            });
+
+            runner({
+                test: `transform check`,
+                code: (canvas, callback) => {
+                    const gradient = makeGradient();
+                    gradient.gradientTransform = null;
+                    canvas.backgroundColor = gradient;
+                    canvas.setViewportTransform(buildMatrix(transform));
+                    canvas.renderAll();
+                    callback(canvas.lowerCanvasEl);
+                },
+                golden: goldenName,
+                percentage: 0.09,
+                ...size,
+                testOnly: true
+            });
+
+
+
+            // transform[0] && transform[3] && runner({
+            //     test: `inverted transform check`,
+            //     code: (canvas, callback) => {
+            //         canvas.backgroundColor = makeGradient();
+            //         canvas.setViewportTransform(fabric.util.invertTransform(buildMatrix(transform)));
+            //         canvas.renderAll();
+            //         callback(canvas.lowerCanvasEl);
+            //     },
+            //     golden: iGoldenName,
+            //     percentage: 0.09,
+            //     ...size,
+            //     testOnly: true
+            // }); 
         });
 
-        runner({
-            test: `canvas bg: ${testName}`,
-            code: (canvas, callback) => {
-                canvas.backgroundColor = makeGradient();
-                canvas.renderAll();
-                callback(canvas.lowerCanvasEl);
-            },
-            golden: goldenName,
-            percentage: 0.09,
-            ...size,
-        });
-
-        runner({
-            test: `transform check: ${testName}`,
-            code: (canvas, callback) => {
-                const gradient = makeGradient();
-                gradient.gradientTransform = null;
-                canvas.backgroundColor = gradient;
-                canvas.setViewportTransform(buildMatrix(transform));
-                canvas.renderAll();
-                callback(canvas.lowerCanvasEl);
-            },
-            golden: goldenName,
-            percentage: 0.09,
-            ...size,
-            testOnly: true
-        });
-
-        transform[0] && transform[3] && runner({
-            test: `inverted transform check: ${testName}`,
-            code: (canvas, callback) => {
-                canvas.backgroundColor = makeGradient();
-                canvas.setViewportTransform(fabric.util.invertTransform(buildMatrix(transform)));
-                canvas.renderAll();
-                callback(canvas.lowerCanvasEl);
-            },
-            golden: iGoldenName,
-            percentage: 0.09,
-            ...size,
-            testOnly: true
-        });
     });
 });
