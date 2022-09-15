@@ -4,7 +4,7 @@ import process from 'node:process';
 import { wd } from './dirname.mjs';
 
 export function build(options = {}) {
-  const cmd = ['rollup', '-c', options.watch ? '--watch' : ''].join(' ');
+  const cmd = ['rollup', '-c', options.watch ? '--watch' : '', '--no-watch.clearScreen'].join(' ');
   const processOptions = {
     stdio: 'inherit',
     shell: true,
