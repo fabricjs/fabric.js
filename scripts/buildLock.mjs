@@ -27,7 +27,6 @@ export async function unlock() {
   const lock = readLockFile();
   if (!lock) return;
   const lockPID = lock.start.pid;
-  // the process that locked last is allowed to unlock for concurrency reasons
   const hasPermissionToUnlock =
     process.pid === lockPID ||
     !(await psList()).find(({ pid }) => pid === lockPID);
