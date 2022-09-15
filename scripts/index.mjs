@@ -690,6 +690,24 @@ const sandbox = program
 
 const templates = fs.readdirSync(codesandboxTemplatesDir);
 
+/**
+ * Writes a timestamp in `package.json` file of `dest` dir
+ * This is done to invoke the watcher watching `dest` and serving the app from it
+ * I looked for other ways to tell the watcher to watch changes in fabric but I came out with this options only (symlinking and other stuff).
+ * @param {string} dest 
+ */
+function watchFabricAndTriggerSandbox(dest) {
+  const pathToTrigger = path.resolve(dest, 'package.json');
+  build({ watch: true });
+  return hook((locked) => {
+    !locked && fs.writeFileSync(pathToTrigger, JSON.stringify({
+      ...fs.readFileSync(pathToTrigger).toJSON(),
+      trigger: moment().format('YYYY-MM-DD HH:mm:ss')
+    }, null, '\t'));
+  }, 500);
+}
+
+
 sandbox
     .command('deploy')
     .argument('[path]', 'directory to upload')
@@ -720,24 +738,6 @@ sandbox
         const uri = await createCodeSandbox(deploy || path.resolve(codesandboxTemplatesDir, template));
         console.log(chalk.yellow(`> created codesandbox ${uri}`));
     });
-
-
-/**
- * Writes a timestamp in `package.json` file of `dest` dir
- * This is done to invoke the watcher watching `dest` and serving the app from it
- * I looked for other ways to tell the watcher to watch changes in fabric but I came out with this options only (symlinking and other stuff).
- * @param {string} dest 
- */
-function watchFabricAndTriggerSandbox(dest) {
-  const pathToTrigger = path.resolve(dest, 'package.json');
-  build({ watch: true });
-  return hook((locked) => {
-    !locked && fs.writeFileSync(pathToTrigger, JSON.stringify({
-      ...fs.readFileSync(pathToTrigger).toJSON(),
-      trigger: moment().format('YYYY-MM-DD HH:mm:ss')
-    }, null, '\t'));
-  }, 500);
-}
 
 sandbox
     .command('build')
