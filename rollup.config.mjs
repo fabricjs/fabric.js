@@ -1,6 +1,7 @@
+import json from '@rollup/plugin-json';
 import { terser } from 'rollup-plugin-terser';
 import ts from 'rollup-plugin-ts';
-import json from '@rollup/plugin-json';
+import { lockFilePlugin, logToLockFile } from './scripts/buildLock.mjs';
 
 // https://rollupjs.org/guide/en/#configuration-files
 export default {
@@ -22,9 +23,16 @@ export default {
       : null,
   ],
   plugins: [
+    lockFilePlugin,
     json(),
     ts({
       /* Plugin options */
+      hook: {
+        diagnostics(diagnostics) {
+          diagnostics.length > 0 && logToLockFile('ts error');
+          return diagnostics;
+        },
+      },
     }),
   ],
 };
