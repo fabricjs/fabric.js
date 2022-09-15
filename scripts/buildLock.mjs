@@ -65,7 +65,7 @@ export function subscribe(cb, debounce) {
     path.dirname(lockFile),
     _.debounce((type, file) => {
       if (file !== path.basename(lockFile)) return;
-      cb(isLocked(), !!readLockFile()?.error);
+      cb(isLocked(), !!readLockFile().error);
     }, debounce)
   );
 }
