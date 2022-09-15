@@ -3,9 +3,9 @@ import cp from 'child_process';
 import fs from 'fs-extra';
 import moment from 'moment';
 import path from 'node:path';
-import { build } from './build.mjs';
-import { subscribe } from './buildLock.mjs';
-import { wd } from './dirname.mjs';
+import { build } from '../scripts/build.mjs';
+import { subscribe } from '../scripts/buildLock.mjs';
+import { wd } from '../scripts/dirname.mjs';
 
 
 /**
