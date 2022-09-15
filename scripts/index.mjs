@@ -25,6 +25,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import os from 'os';
+import { createCodeSandbox } from '../.codesandbox/deploy.mjs';
 import { listFiles, transform as transformFiles } from './transform_files.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -744,5 +745,90 @@ program
       });
     }
   );
+
+  
+const codesandboxTemplatesDir = path.resolve(wd, '.codesandbox', 'templates');
+
+const sandbox = program
+    .command('sandbox')
+    .description('sandbox commands');
+
+const templates = fs.readdirSync(codesandboxTemplatesDir);
+
+sandbox
+    .command('deploy')
+    .argument('[path]', 'directory to upload')
+    .description('deploy a sandbox to codesandbox')
+    .addOption(new commander.Option('-t, --template <template>', 'template to use instead of a "path"').choices(templates))
+    .action(async (deploy, { template }, context) => {
+        if (!deploy && !template) {
+            console.log(chalk.red(`Provide "path" or "--template"`));
+            context.help({ error: true });
+            return;
+        }
+        else if (!template && !fs.existsSync(deploy) && templates.includes(deploy)) {
+            template = deploy;
+            deploy = undefined;
+            const { confirm } = await inquirer.prompt([
+                {
+                    type: 'confirm',
+                    name: 'confirm',
+                    message: `Did you mean to run ${chalk.blue(`npm run sandbox deploy -- -t ${template}\n`)}?`,
+                    default: true,
+                }
+            ]);
+            if (!confirm) {
+                context.help({ error: true });
+                return;
+            }            
+        }
+        const uri = await createCodeSandbox(deploy || path.resolve(codesandboxTemplatesDir, template));
+        console.log(chalk.yellow(`> created codesandbox ${uri}`));
+    });
+
+
+/**
+ * Writes a timestamp in `package.json` file of `dest` dir
+ * This is done to invoke the watcher watching `dest` and serving the app from it
+ * I looked for other ways to tell the watcher to watch changes in fabric but I came out with this options only (symlinking and other stuff).
+ * @param {string} dest 
+ */
+function watchFabricAndTriggerSandbox(dest) {
+    const pathToTrigger = path.resolve(dest, 'package.json');
+    rollupBuild({ watch: true }, (code) => {
+        code === 'END' && fs.writeFileSync(pathToTrigger, JSON.stringify({
+            ...fs.readFileSync(pathToTrigger).toJSON(),
+            trigger: moment().format('YYYY-MM-DD HH:mm:ss')
+        }, null, '\t'));
+    });
+}
+
+sandbox
+    .command('build')
+    .description('build and start a sandbox')
+    .addArgument(new commander.Argument('<template>', 'template to use').choices(templates))
+    .argument('<destination>', 'build destination')
+    .action((template, destination) => {
+        fs.copySync(path.resolve(codesandboxTemplatesDir, template), destination);
+        console.log(`${chalk.blue(`> building ${chalk.bold(template)} sandbox`)} at ${chalk.cyanBright(destination)}`);
+        console.log(chalk.blue('\n> linking fabric'));
+        cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
+        cp.execSync('npm link fabric --save', { cwd: destination, stdio: 'inherit' });
+        watchFabricAndTriggerSandbox(destination);
+        console.log(chalk.blue('> installing deps'));
+        cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
+        console.log(chalk.blue('> starting'));
+        cp.spawn('npm run dev', { cwd: destination, stdio: 'inherit', shell: true });
+    });
+
+sandbox
+    .command('start <path>')
+    .description('start a sandbox')
+    .action((pathToSandbox) => {
+        watchFabricAndTriggerSandbox(pathToSandbox);
+        console.log(chalk.blue('> starting'));
+        cp.spawn('npm run dev', { cwd: pathToSandbox, stdio: 'inherit', shell: true });
+    });
+
 
 program.parse(process.argv);
