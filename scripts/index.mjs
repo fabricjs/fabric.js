@@ -688,10 +688,19 @@ const templates = fs.readdirSync(codesandboxTemplatesDir);
  * I looked for other ways to tell the watcher to watch changes in fabric but I came out with this options only (symlinking and other stuff).
  * @param {string} dest
  */
-function watchFabricAndTriggerSandbox(dest) {
-  const pathToTrigger = path.resolve(dest, 'package.json');
+function startSandbox(dest) {
+  console.log(chalk.blue('\n> linking fabric'));
+  cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
+  cp.execSync('npm link fabric --save', {
+    cwd: dest,
+    stdio: 'inherit',
+  });
+  console.log(chalk.blue('> installing deps'));
+  cp.execSync('npm i --include=dev', { cwd: dest, stdio: 'inherit' });
   build({ watch: true, fast: true });
-  return subscribe((locked) => {
+  
+  const pathToTrigger = path.resolve(dest, 'package.json');
+  subscribe((locked) => {
     !locked &&
       fs.writeFileSync(
         pathToTrigger,
@@ -705,6 +714,13 @@ function watchFabricAndTriggerSandbox(dest) {
         )
       );
   }, 500);
+
+  console.log(chalk.blue('> starting'));
+    cp.spawn('npm run dev', {
+      cwd: dest,
+      stdio: 'inherit',
+      shell: true,
+    });
 }
 
 sandbox
@@ -764,34 +780,14 @@ sandbox
         `> building ${chalk.bold(template)} sandbox`
       )} at ${chalk.cyanBright(destination)}`
     );
-    console.log(chalk.blue('\n> linking fabric'));
-    cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
-    cp.execSync('npm link fabric --save', {
-      cwd: destination,
-      stdio: 'inherit',
-    });
-    watchFabricAndTriggerSandbox(destination);
-    console.log(chalk.blue('> installing deps'));
-    cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
-    console.log(chalk.blue('> starting'));
-    cp.spawn('npm run dev', {
-      cwd: destination,
-      stdio: 'inherit',
-      shell: true,
-    });
+    startSandbox(destination);
   });
 
 sandbox
   .command('start <path>')
   .description('start a sandbox')
   .action((pathToSandbox) => {
-    watchFabricAndTriggerSandbox(pathToSandbox);
-    console.log(chalk.blue('> starting'));
-    cp.spawn('npm run dev', {
-      cwd: pathToSandbox,
-      stdio: 'inherit',
-      shell: true,
-    });
+    startSandbox(pathToSandbox);
   });
 
 program.parse(process.argv);
