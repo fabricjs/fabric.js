@@ -2,6 +2,8 @@
 
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
+import { Filler } from '../Filler';
+import { Point } from '../point.class';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {});
@@ -1227,81 +1229,6 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
       },
 
       /**
-       * This function try to patch the missing gradientTransform on canvas gradients.
-       * transforming a context to transform the gradient, is going to transform the stroke too.
-       * we want to transform the gradient but not the stroke operation, so we create
-       * a transformed gradient on a pattern and then we use the pattern instead of the gradient.
-       * this method has drawbacks: is slow, is in low resolution, needs a patch for when the size
-       * is limited.
-       * @private
-       * @param {fabric.Gradient} filler a fabric gradient instance
-       * @return {CanvasPattern} a pattern to use as fill/stroke style
-       */
-      _applyPatternGradientTransformText: function (filler) {
-        var pCanvas = fabric.util.createCanvasElement(),
-          pCtx,
-          // TODO: verify compatibility with strokeUniform
-          width = this.width + this.strokeWidth,
-          height = this.height + this.strokeWidth;
-        pCanvas.width = width;
-        pCanvas.height = height;
-        pCtx = pCanvas.getContext('2d');
-        pCtx.beginPath();
-        pCtx.moveTo(0, 0);
-        pCtx.lineTo(width, 0);
-        pCtx.lineTo(width, height);
-        pCtx.lineTo(0, height);
-        pCtx.closePath();
-        pCtx.translate(width / 2, height / 2);
-        pCtx.fillStyle = filler.toLive(pCtx);
-        this._applyPatternGradientTransform(pCtx, filler);
-        pCtx.fill();
-        return pCtx.createPattern(pCanvas, 'no-repeat');
-      },
-
-      handleFiller: function (ctx, property, filler) {
-        var offsetX, offsetY;
-        if (filler.toLive) {
-          if (
-            filler.gradientUnits === 'percentage' ||
-            filler.gradientTransform ||
-            filler.patternTransform
-          ) {
-            // need to transform gradient in a pattern.
-            // this is a slow process. If you are hitting this codepath, and the object
-            // is not using caching, you should consider switching it on.
-            // we need a canvas as big as the current object caching canvas.
-            offsetX = -this.width / 2;
-            offsetY = -this.height / 2;
-            ctx.translate(offsetX, offsetY);
-            ctx[property] = this._applyPatternGradientTransformText(filler);
-            return { offsetX: offsetX, offsetY: offsetY };
-          } else {
-            // is a simple gradient or pattern
-            ctx[property] = filler.toLive(ctx, this);
-            return this._applyPatternGradientTransform(ctx, filler);
-          }
-        } else {
-          // is a color
-          ctx[property] = filler;
-        }
-        return { offsetX: 0, offsetY: 0 };
-      },
-
-      _setStrokeStyles: function (ctx, decl) {
-        ctx.lineWidth = decl.strokeWidth;
-        ctx.lineCap = this.strokeLineCap;
-        ctx.lineDashOffset = this.strokeDashOffset;
-        ctx.lineJoin = this.strokeLineJoin;
-        ctx.miterLimit = this.strokeMiterLimit;
-        return this.handleFiller(ctx, 'strokeStyle', decl.stroke);
-      },
-
-      _setFillStyles: function (ctx, decl) {
-        return this.handleFiller(ctx, 'fillStyle', decl.fill);
-      },
-
-      /**
        * @private
        * @param {String} method
        * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -1325,17 +1252,36 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
           fullDecl = this.getCompleteStyleDeclaration(lineIndex, charIndex),
           shouldFill = method === 'fillText' && fullDecl.fill,
           shouldStroke =
-            method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth,
-          fillOffsets,
-          strokeOffsets;
-
+            method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth;
         if (!shouldStroke && !shouldFill) {
           return;
         }
         ctx.save();
-
-        shouldFill && (fillOffsets = this._setFillStyles(ctx, fullDecl));
-        shouldStroke && (strokeOffsets = this._setStrokeStyles(ctx, fullDecl));
+        const offset = new Point(left, top);
+        const sizeForFiller = {
+          width: this.width + this.strokeWidth * 2,
+          height: this.height + this.strokeWidth * 2,
+        };
+        let fillOffset, strokeOffset;
+        if (shouldFill) {
+          fillOffset = Filler.prepare(ctx, {
+            action: 'fill',
+            filler: fullDecl.fill,
+            size: sizeForFiller,
+          });
+        }
+        if (shouldStroke) {
+          ctx.lineWidth = fullDecl.strokeWidth;
+          ctx.lineCap = this.strokeLineCap;
+          ctx.lineDashOffset = this.strokeDashOffset;
+          ctx.lineJoin = this.strokeLineJoin;
+          ctx.miterLimit = this.strokeMiterLimit;
+          strokeOffset = Filler.prepare(ctx, {
+            action: 'stroke',
+            filler: fullDecl.stroke,
+            size: sizeForFiller,
+          });
+        }
 
         ctx.font = this._getFontDeclaration(fullDecl);
 
@@ -1345,18 +1291,16 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
         if (decl && decl.deltaY) {
           top += decl.deltaY;
         }
-        shouldFill &&
-          ctx.fillText(
-            _char,
-            left - fillOffsets.offsetX,
-            top - fillOffsets.offsetY
-          );
-        shouldStroke &&
-          ctx.strokeText(
-            _char,
-            left - strokeOffsets.offsetX,
-            top - strokeOffsets.offsetY
-          );
+        ctx.save();
+        if (shouldFill) {
+          const fillFinalOffset = offset.add(new Point(fillOffset));
+          ctx.fillText(_char, fillFinalOffset.x, fillFinalOffset.y);
+        }
+        ctx.restore();
+        if (shouldStroke) {
+          const strokeFinalOffset = offset.add(new Point(strokeOffset));
+          ctx.strokeText(_char, strokeFinalOffset.x, strokeFinalOffset.y);
+        }
         ctx.restore();
       },
 

@@ -1,6 +1,8 @@
 //@ts-nocheck
 import { config } from './config';
-import { VERSION } from './constants';
+import { iMatrix, VERSION } from './constants';
+import { Filler } from './Filler';
+import { Gradient } from './gradient';
 import { Point } from './point.class';
 import { requestAnimFrame } from './util/animate';
 import { removeFromArray } from './util/internals';
@@ -880,19 +882,14 @@ import { pick } from './util/misc/pick';
         }
         if (fill) {
           ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.lineTo(this.width, 0);
-          ctx.lineTo(this.width, this.height);
-          ctx.lineTo(0, this.height);
-          ctx.closePath();
-          ctx.fillStyle = fill.toLive ? fill.toLive(ctx, this) : fill;
-          if (needsVpt) {
-            ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-          }
-          ctx.transform(1, 0, 0, 1, fill.offsetX || 0, fill.offsetY || 0);
-          var m = fill.gradientTransform || fill.patternTransform;
-          m && ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+          Filler.prepareCanvasFill(ctx, {
+            filler: fill,
+            size: {
+              width: this.width,
+              height: this.height,
+            },
+            preTransform: needsVpt && v,
+          });
           ctx.fill();
           ctx.restore();
         }
@@ -1347,7 +1344,7 @@ import { pick } from './util/misc/pick';
         var _this = this,
           markup = ['background', 'overlay'].map(function (prop) {
             var fill = _this[prop + 'Color'];
-            if (fill && fill.toLive) {
+            if (fill && fill instanceof Filler) {
               var shouldTransform = _this[prop + 'Vpt'],
                 vpt = _this.viewportTransform,
                 object = {
@@ -1494,7 +1491,7 @@ import { pick } from './util/misc/pick';
         if (!filler) {
           return;
         }
-        if (filler.toLive) {
+        if (filler instanceof Filler) {
           var repeat = filler.repeat,
             iVpt = fabric.util.invertTransform(vpt),
             shouldInvert = this[property + 'Vpt'],

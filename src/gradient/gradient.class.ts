@@ -1,10 +1,17 @@
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import { iMatrix } from '../constants';
+import { Filler, TFillerRenderingOptions } from '../Filler';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
+import { Point } from '../point.class';
 import { TMat2D } from '../typedefs';
-import { pick } from '../util/misc/pick';
+import {
+  invertTransform,
+  multiplyTransformMatrices,
+  multiplyTransformMatrices2,
+} from '../util/misc/matrix';
 import { matrixToSVG } from '../util/misc/svgParsing';
+import { type TObject } from '../__types__';
 import { linearDefaultCoords, radialDefaultCoords } from './constants';
 import {
   parseColorStops,
@@ -21,10 +28,7 @@ import {
   SVGOptions,
 } from './typedefs';
 
-/**
- * @todo remove this transient junk
- */
-type FabricObject = any;
+// type TGradientExportedKeys = TFillerExportedKeys | 'type' | 'coords' | 'colorStops' | 'gradientUnits' | 'gradientTransform';
 
 /**
  * Gradient class
@@ -34,21 +38,7 @@ type FabricObject = any;
 export class Gradient<
   S,
   T extends GradientType = S extends GradientType ? S : 'linear'
-> {
-  /**
-   * Horizontal offset for aligning gradients coming from SVG when outside pathgroups
-   * @type Number
-   * @default 0
-   */
-  offsetX = 0;
-
-  /**
-   * Vertical offset for aligning gradients coming from SVG when outside pathgroups
-   * @type Number
-   * @default 0
-   */
-  offsetY = 0;
-
+> extends Filler<CanvasGradient> {
   /**
    * A transform matrix to apply to the gradient before painting.
    * Imported from svg gradients, is not applied with the current transform in the center.
@@ -68,7 +58,7 @@ export class Gradient<
    * @type GradientUnits
    * @default 'pixels'
    */
-  gradientUnits: GradientUnits;
+  gradientUnits: GradientUnits = 'pixels';
 
   /**
    * Gradient type linear or radial
@@ -94,6 +84,7 @@ export class Gradient<
     id,
   }: GradientOptions<T>) {
     const uid = fabric.Object.__uid++;
+    super();
     this.id = id ? `${id}_${uid}` : uid;
     this.type = type;
     this.gradientUnits = gradientUnits;
@@ -107,9 +98,9 @@ export class Gradient<
     this.colorStops = colorStops.slice();
   }
 
-  // isType<S extends GradientType>(type: S): this is Gradient<S> {
-  //   return (this.type as GradientType) === type;
-  // }
+  isType<S extends GradientType>(type: S): this is Gradient<S> {
+    return (this.type as GradientType) === type;
+  }
 
   /**
    * Adds another colorStop
@@ -129,18 +120,106 @@ export class Gradient<
   }
 
   /**
-   * Returns object representation of a gradient
-   * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {object}
+   * A linear gradient is created along the line connecting the two given coordinates.
+   * e.g. if we have a linear gradient denfined by a vector along the x axis a line of color will be drawn on the y axis.
+   *
+   * This means that in order to transform a linear gradient by it's coordinates we need to apply a rotation matrix on the given transform.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/createLinearGradient
    */
+  private calcTransform({
+    size,
+    offset,
+    noTransform,
+  }: TFillerRenderingOptions) {
+    const t = (!noTransform && this.gradientTransform) || iMatrix;
+    const gradientCenter = new Point(
+      this.coords.x1,
+      this.coords.y1
+    ).midPointFrom(new Point(this.coords.x2, this.coords.y2));
+    // rotate 90deg from center of gradient
+    const rotate = multiplyTransformMatrices2([
+      [1, 0, 0, 1, gradientCenter.x / 2, gradientCenter.y / 2],
+      [0, -1, 1, 0, 0, 0],
+      [1, 0, 0, 1, -gradientCenter.x / 2, -gradientCenter.y / 2],
+    ]);
+    return multiplyTransformMatrices(
+      [1, 0, 0, 1, offset.x, offset.y],
+      multiplyTransformMatrices2(
+        [
+          invertTransform(rotate),
+          t,
+          rotate,
+          // scale to size
+          this.gradientUnits === 'percentage'
+            ? [size.width, 0, 0, size.height, 0, 0]
+            : iMatrix,
+        ],
+        true
+      )
+    );
+  }
+
+  protected toLive(
+    ctx: CanvasRenderingContext2D,
+    { transform, noTransform }: TFillerRenderingOptions & { transform: TMat2D }
+  ) {
+    if (!this.type) {
+      return null;
+    }
+    const coords = this.coords as GradientCoords<'radial'>;
+    const t = this.gradientTransform || iMatrix;
+    let gradient: CanvasGradient;
+    if (this.type === 'linear') {
+      const p1 = new Point(coords.x1, coords.y1).transform(transform);
+      const p2 = new Point(coords.x2, coords.y2).transform(transform);
+      if (t[0] === 0 || t[3] === 0) {
+        return null;
+      }
+      gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
+      noTransform && ctx.transform(...(this.gradientTransform || iMatrix));
+    } else {
+      gradient = ctx.createRadialGradient(
+        coords.x1,
+        coords.y1,
+        coords.r1,
+        coords.x2,
+        coords.y2,
+        coords.r2
+      );
+      ctx.transform(...transform);
+    }
+
+    this.colorStops.forEach(({ color, opacity, offset }) => {
+      gradient.addColorStop(
+        offset,
+        typeof opacity !== 'undefined'
+          ? new Color(color).setAlpha(opacity).toRgba()
+          : color
+      );
+    });
+
+    return gradient;
+  }
+
+  protected prepare(
+    ctx: CanvasRenderingContext2D,
+    options: TFillerRenderingOptions
+  ) {
+    const transform = this.calcTransform(options);
+    ctx[`${options.action}Style`] =
+      this.toLive(ctx, { ...options, transform }) || 'transparent';
+    return this.type === 'radial'
+      ? new Point().transform(transform).scalarMultiply(-1)
+      : undefined;
+  }
+
   toObject(propertiesToInclude?: (keyof this)[]) {
     return {
-      ...pick(this, propertiesToInclude),
+      ...super.toObject(propertiesToInclude),
       type: this.type,
       coords: this.coords,
       colorStops: this.colorStops,
-      offsetX: this.offsetX,
-      offsetY: this.offsetY,
       gradientUnits: this.gradientUnits,
       gradientTransform: this.gradientTransform
         ? this.gradientTransform.concat()
@@ -155,7 +234,7 @@ export class Gradient<
    * @return {String} SVG representation of an gradient (linear/radial)
    */
   toSVG(
-    object: FabricObject,
+    object: TObject,
     { additionalTransform: preTransform }: { additionalTransform?: string } = {}
   ) {
     const markup = [],
@@ -274,48 +353,13 @@ export class Gradient<
   }
   /* _TO_SVG_END_ */
 
-  /**
-   * Returns an instance of CanvasGradient
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @return {CanvasGradient}
-   */
-  toLive(ctx: CanvasRenderingContext2D) {
-    if (!this.type) {
-      return;
-    }
-
-    const coords = this.coords as GradientCoords<'radial'>;
-    const gradient =
-      this.type === 'linear'
-        ? ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2)
-        : ctx.createRadialGradient(
-            coords.x1,
-            coords.y1,
-            coords.r1,
-            coords.x2,
-            coords.y2,
-            coords.r2
-          );
-
-    this.colorStops.forEach(({ color, opacity, offset }) => {
-      gradient.addColorStop(
-        offset,
-        typeof opacity !== 'undefined'
-          ? new Color(color).setAlpha(opacity).toRgba()
-          : color
-      );
-    });
-
-    return gradient;
-  }
-
   /* _FROM_SVG_START_ */
   /**
    * Returns {@link Gradient} instance from an SVG element
    * @static
    * @memberOf Gradient
    * @param {SVGGradientElement} el SVG gradient element
-   * @param {FabricObject} instance
+   * @param {TObject} instance
    * @param {String} opacity A fill-opacity or stroke-opacity attribute to multiply to each stop's opacity.
    * @param {SVGOptions} svgOptions an object containing the size of the SVG in order to parse correctly gradients
    * that uses gradientUnits as 'userSpaceOnUse' and percentages.
@@ -356,7 +400,7 @@ export class Gradient<
    */
   static fromElement(
     el: SVGGradientElement,
-    instance: FabricObject,
+    instance: TObject,
     svgOptions: SVGOptions
   ): Gradient<GradientType> {
     const gradientUnits = parseGradientUnits(el);

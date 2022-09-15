@@ -1,15 +1,15 @@
 (function() {
   var IMG_SRC = fabric.isLikelyNode ? ('file://' + __dirname + '/../fixtures/greyfloral.png') : '../fixtures/greyfloral.png';
-
-  function setSrc(img, src, callback) {
-    img.onload = callback;
-    img.src = src;
-  }
-
-  QUnit.module('fabric.Pattern');
-
-  var img = fabric.document.createElement('img');
-  setSrc(img, IMG_SRC);
+  var img;
+  QUnit.module('fabric.Pattern', {
+    before() {
+      img = fabric.document.createElement('img');
+      return new Promise(resolve => {
+        img.onload = resolve;
+        img.src = IMG_SRC;
+      });
+    }
+  });
 
   function createPattern() {
     return new fabric.Pattern({
@@ -88,13 +88,37 @@
     });
   });
 
-  QUnit.test('toLive', function(assert) {
-    var pattern = createPattern();
-    var canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
-    var patternHTML = canvas.contextContainer.createPattern(img, 'repeat');
-    assert.ok(typeof pattern.toLive === 'function');
-    var created = pattern.toLive(canvas.contextContainer);
-    assert.equal(created.toString(), patternHTML.toString(), 'is a pattern');
+  QUnit.test('prepare', function(assert) {
+    const canvas = new fabric.StaticCanvas(null, { enableRetinaScaling: false });
+    const ctx = canvas.contextContainer;
+    const pattern = createPattern();
+    const cPattern = ctx.createPattern(img, 'repeat');
+
+    const ctxMock = {
+      set fillStyle(value) {
+        this.fill = value;
+      },
+      createPattern(...args) {
+        return ctx.createPattern(...args);
+      },
+    };
+    const { set: fillStyleSpy } = sinon.spy(ctxMock, 'fillStyle', ['set']);
+    const patternSpy = sinon.spy(ctxMock, 'createPattern');
+
+    assert.ok(typeof pattern.prepare === 'function');
+
+    ctxMock.fillStyle = '#000000';
+    assert.ok(fillStyleSpy.calledOnce, 'fillStyle should be called');
+    pattern.prepare(ctxMock, {
+      action: 'fill',
+      size: new fabric.Point(),
+      offset: new fabric.Point()
+    });
+    assert.ok(fillStyleSpy.calledTwice, 'fillStyle should be called by Pattern#prepare');
+    assert.ok(patternSpy.calledOnce, 'should be called by Pattern#toLive');
+    assert.deepEqual(patternSpy.args[0], [img, 'repeat'], 'args should match');
+    assert.deepEqual(fillStyleSpy.args[0], ['#000000'], 'first fillStyle set args should match');
+    assert.equal(Object.getPrototypeOf(fillStyleSpy.args[1][0]), Object.getPrototypeOf(cPattern), 'fillStyle should be a CanvasPattern');
   });
 
   QUnit.test('pattern serialization / deserialization (image source)', function(assert) {

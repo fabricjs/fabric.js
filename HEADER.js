@@ -49,6 +49,7 @@ if (typeof document !== 'undefined' && typeof window !== 'undefined') {
   fabric.nodeCanvas = require('jsdom/lib/jsdom/utils').Canvas;
   fabric.window = virtualWindow;
   global.DOMParser = fabric.window.DOMParser;
+  global.DOMMatrix = require('canvas').DOMMatrix;
 }
 
 /**

@@ -27,6 +27,7 @@ QUnit.config.filter = process.env.QUNIT_FILTER;
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
 global.fs = require('fs');
+const sinon = global.sinon = require('sinon');
 global.visualCallback = {
   addArguments: function() {},
 };
@@ -57,6 +58,10 @@ global.imageDataToChalk = function(imageData) {
 QUnit.config.testTimeout = 15000;
 QUnit.config.noglobals = true;
 QUnit.config.hidepassed = true;
+
+QUnit.testDone(() => {
+  sinon.restore();
+});
 
 var jsdom = require('jsdom');
 

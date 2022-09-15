@@ -274,60 +274,90 @@
     percentage: 0.06,
   });
 
-  function text9(canvas, callback) {
-    var canvasP = fabric.util.createCanvasElement();
-    canvasP.width = 10;
-    canvasP.height = 10;
-    var ctx = canvasP.getContext('2d');
-    ctx.fillStyle = 'blue';
-    ctx.fillRect(0, 0, 5, 5);
-    ctx.fillStyle = 'red';
-    ctx.fillRect(5, 5, 5, 5);
-    ctx.fillStyle = 'yellow';
-    ctx.fillRect(5, 0, 5, 5);
-    ctx.fillStyle = 'purple';
-    ctx.fillRect(0, 5, 5, 5);
-    var pattern = new fabric.Pattern({ source: canvasP, patternTransform: [1, 0.3, 0.6, 0.8, 0, 0] });
-    var relGradient = new fabric.Gradient({
-      coords: {
-        x1: 0,
-        y1: 0,
-        x2: 1,
-        y2: 0
-      },
-      gradientUnits: 'percentage',
-      colorStops: [{
-        offset: 0,
-        color: 'red',
-      }, {
-        offset: 1,
-        color: 'blue'
-      }]
-    });
-    var text = new fabric.Text('TEST', {
-      left: 5,
-      top: 5,
-      fontSize: 180,
-      fontFamily: 'Arial',
-      paintFirst: 'stroke',
-      strokeWidth: 12,
-      strokeLineJoin: 'round',
-      strokeLineCap: 'round',
-      stroke: relGradient,
-      fill: pattern,
-    });
-    canvas.add(text);
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
+  function testGenerator(scale, nonScaling) {
+    return (canvas, callback) => {
+      var canvasP = fabric.util.createCanvasElement();
+      canvasP.width = 10;
+      canvasP.height = 10;
+      var ctx = canvasP.getContext('2d');
+      ctx.fillStyle = 'blue';
+      ctx.fillRect(0, 0, 5, 5);
+      ctx.fillStyle = 'red';
+      ctx.fillRect(5, 5, 5, 5);
+      ctx.fillStyle = 'yellow';
+      ctx.fillRect(5, 0, 5, 5);
+      ctx.fillStyle = 'purple';
+      ctx.fillRect(0, 5, 5, 5);
+      var pattern = new fabric.Pattern({
+        source: canvasP,
+        patternTransform: fabric.util.multiplyTransformMatrices(
+          [1, 0.3, 0.6, 0.8, 0, 0],
+          nonScaling ?
+            [1 / scale, 0, 0, 1 / scale, -canvas.width / 2, -canvas.height / 2] :
+            fabric.iMatrix
+        )
+      });
+      var relGradient = new fabric.Gradient({
+        coords: {
+          x1: 0,
+          y1: 0,
+          x2: 1,
+          y2: 0
+        },
+        gradientUnits: 'percentage',
+        colorStops: [{
+          offset: 0,
+          color: 'red',
+        }, {
+          offset: 1,
+          color: 'blue'
+        }]
+      });
+      var text = new fabric.Text('TEST', {
+        left: 5,
+        top: 5,
+        fontSize: 180,
+        fontFamily: 'Arial',
+        paintFirst: 'stroke',
+        strokeWidth: 12,
+        strokeLineJoin: 'round',
+        strokeLineCap: 'round',
+        stroke: relGradient,
+        fill: pattern,
+        scaleX: scale,
+        scaleY: scale,
+      });
+      canvas.add(text);
+      canvas.renderAll();
+      callback(canvas.lowerCanvasEl);
+    }
   }
-
+  
   tests.push({
     test: 'Text with pattern and gradient',
-    code: text9,
+    code: testGenerator(1),
     width: 480,
     height: 190,
     golden: 'text9.png',
-    percentage: 0.09,
+    percentage: 0.095,
+  });
+
+  tests.push({
+    test: 'Text with pattern and gradient (scale = 2)',
+    code: testGenerator(2),
+    width: 480 * 2,
+    height: 190 * 2,
+    golden: 'text9b.png',
+    percentage: 0.095,
+  });
+
+  tests.push({
+    test: 'Text with pattern and gradient (scale = 2, nonScaling = true)',
+    code: testGenerator(2, true),
+    width: 480 * 2,
+    height: 190 * 2,
+    golden: 'text9b-non-scaling.png',
+    percentage: 0.095,
   });
 
   function text10(canvas, callback) {

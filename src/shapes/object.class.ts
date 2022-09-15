@@ -6,6 +6,7 @@ import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
 import { pick } from '../util/misc/pick';
 import { runningAnimations } from '../util/animation_registry';
+import { Filler } from '../Filler';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -1393,49 +1394,6 @@ import { runningAnimations } from '../util/animation_registry';
         }
       },
 
-      _setStrokeStyles: function (ctx, decl) {
-        var stroke = decl.stroke;
-        if (stroke) {
-          ctx.lineWidth = decl.strokeWidth;
-          ctx.lineCap = decl.strokeLineCap;
-          ctx.lineDashOffset = decl.strokeDashOffset;
-          ctx.lineJoin = decl.strokeLineJoin;
-          ctx.miterLimit = decl.strokeMiterLimit;
-          if (stroke.toLive) {
-            if (
-              stroke.gradientUnits === 'percentage' ||
-              stroke.gradientTransform ||
-              stroke.patternTransform
-            ) {
-              // need to transform gradient in a pattern.
-              // this is a slow process. If you are hitting this codepath, and the object
-              // is not using caching, you should consider switching it on.
-              // we need a canvas as big as the current object caching canvas.
-              this._applyPatternForTransformedGradient(ctx, stroke);
-            } else {
-              // is a simple gradient or pattern
-              ctx.strokeStyle = stroke.toLive(ctx, this);
-              this._applyPatternGradientTransform(ctx, stroke);
-            }
-          } else {
-            // is a color
-            ctx.strokeStyle = decl.stroke;
-          }
-        }
-      },
-
-      _setFillStyles: function (ctx, decl) {
-        var fill = decl.fill;
-        if (fill) {
-          if (fill.toLive) {
-            ctx.fillStyle = fill.toLive(ctx, this);
-            this._applyPatternGradientTransform(ctx, decl.fill);
-          } else {
-            ctx.fillStyle = fill;
-          }
-        }
-      },
-
       _setClippingProperties: function (ctx) {
         ctx.globalAlpha = 1;
         ctx.strokeStyle = 'transparent';
@@ -1544,32 +1502,6 @@ import { runningAnimations } from '../util/animation_registry';
       /**
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
-       * @param {Object} filler fabric.Pattern or fabric.Gradient
-       * @return {Object} offset.offsetX offset for text rendering
-       * @return {Object} offset.offsetY offset for text rendering
-       */
-      _applyPatternGradientTransform: function (ctx, filler) {
-        if (!filler || !filler.toLive) {
-          return { offsetX: 0, offsetY: 0 };
-        }
-        var t = filler.gradientTransform || filler.patternTransform;
-        var offsetX = -this.width / 2 + filler.offsetX || 0,
-          offsetY = -this.height / 2 + filler.offsetY || 0;
-
-        if (filler.gradientUnits === 'percentage') {
-          ctx.transform(this.width, 0, 0, this.height, offsetX, offsetY);
-        } else {
-          ctx.transform(1, 0, 0, 1, offsetX, offsetY);
-        }
-        if (t) {
-          ctx.transform(t[0], t[1], t[2], t[3], t[4], t[5]);
-        }
-        return { offsetX: offsetX, offsetY: offsetY };
-      },
-
-      /**
-       * @private
-       * @param {CanvasRenderingContext2D} ctx Context to render on
        */
       _renderPaintInOrder: function (ctx) {
         if (this.paintFirst === 'stroke') {
@@ -1600,7 +1532,14 @@ import { runningAnimations } from '../util/animation_registry';
         }
 
         ctx.save();
-        this._setFillStyles(ctx, this);
+        Filler.prepare(ctx, {
+          action: 'fill',
+          filler: this.fill,
+          size: {
+            width: this.width,
+            height: this.height,
+          },
+        });
         if (this.fillRule === 'evenodd') {
           ctx.fill('evenodd');
         } else {
@@ -1624,59 +1563,25 @@ import { runningAnimations } from '../util/animation_registry';
 
         ctx.save();
         if (this.strokeUniform) {
-          var scaling = this.getObjectScaling();
+          const scaling = this.getObjectScaling();
           ctx.scale(1 / scaling.x, 1 / scaling.y);
         }
         this._setLineDash(ctx, this.strokeDashArray);
-        this._setStrokeStyles(ctx, this);
+        ctx.lineWidth = this.strokeWidth;
+        ctx.lineCap = this.strokeLineCap;
+        ctx.lineDashOffset = this.strokeDashOffset;
+        ctx.lineJoin = this.strokeLineJoin;
+        ctx.miterLimit = this.strokeMiterLimit;
+        Filler.prepare(ctx, {
+          action: 'stroke',
+          filler: this.stroke,
+          size: {
+            width: this.width,
+            height: this.height,
+          },
+        });
         ctx.stroke();
         ctx.restore();
-      },
-
-      /**
-       * This function try to patch the missing gradientTransform on canvas gradients.
-       * transforming a context to transform the gradient, is going to transform the stroke too.
-       * we want to transform the gradient but not the stroke operation, so we create
-       * a transformed gradient on a pattern and then we use the pattern instead of the gradient.
-       * this method has drwabacks: is slow, is in low resolution, needs a patch for when the size
-       * is limited.
-       * @private
-       * @param {CanvasRenderingContext2D} ctx Context to render on
-       * @param {fabric.Gradient} filler a fabric gradient instance
-       */
-      _applyPatternForTransformedGradient: function (ctx, filler) {
-        var dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-          pCanvas = fabric.util.createCanvasElement(),
-          pCtx,
-          retinaScaling = this.canvas.getRetinaScaling(),
-          width = dims.x / this.scaleX / retinaScaling,
-          height = dims.y / this.scaleY / retinaScaling;
-        pCanvas.width = width;
-        pCanvas.height = height;
-        pCtx = pCanvas.getContext('2d');
-        pCtx.beginPath();
-        pCtx.moveTo(0, 0);
-        pCtx.lineTo(width, 0);
-        pCtx.lineTo(width, height);
-        pCtx.lineTo(0, height);
-        pCtx.closePath();
-        pCtx.translate(width / 2, height / 2);
-        pCtx.scale(
-          dims.zoomX / this.scaleX / retinaScaling,
-          dims.zoomY / this.scaleY / retinaScaling
-        );
-        this._applyPatternGradientTransform(pCtx, filler);
-        pCtx.fillStyle = filler.toLive(ctx);
-        pCtx.fill();
-        ctx.translate(
-          -this.width / 2 - this.strokeWidth / 2,
-          -this.height / 2 - this.strokeWidth / 2
-        );
-        ctx.scale(
-          (retinaScaling * this.scaleX) / dims.zoomX,
-          (retinaScaling * this.scaleY) / dims.zoomY
-        );
-        ctx.strokeStyle = pCtx.createPattern(pCanvas, 'no-repeat');
       },
 
       /**

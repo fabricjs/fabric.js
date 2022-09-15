@@ -1,24 +1,22 @@
 //@ts-nocheck
 
 import { fabric } from '../HEADER';
-import { config } from './config';
+import { Filler, TFillerExportedKeys, TFillerRenderingOptions } from './Filler';
 import { TCrossOrigin, TMat2D, TSize } from './typedefs';
 import { ifNaN } from './util/internals';
 import { loadImage } from './util/misc/objectEnlive';
 import { pick } from './util/misc/pick';
-import { toFixed } from './util/misc/toFixed';
 
 export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
 
-type TExportedKeys =
+type TPatternExportedKeys =
+  | TFillerExportedKeys
   | 'crossOrigin'
-  | 'offsetX'
-  | 'offsetY'
   | 'patternTransform'
   | 'repeat'
   | 'source';
 
-export type TPatternOptions = Partial<Pick<Pattern, TExportedKeys>>;
+export type TPatternOptions = Partial<Pick<Pattern, TPatternExportedKeys>>;
 
 export type TPatternSerialized = TPatternOptions & {
   source: string;
@@ -39,7 +37,7 @@ type TCanvasSource = { source: HTMLCanvasElement };
  * @see {@link http://fabricjs.com/patterns demo}
  * @see {@link http://fabricjs.com/dynamic-patterns demo}
  */
-export class Pattern {
+export class Pattern extends Filler<CanvasPattern> {
   type = 'pattern';
 
   /**
@@ -47,20 +45,6 @@ export class Pattern {
    * @defaults
    */
   repeat: TPatternRepeat = 'repeat';
-
-  /**
-   * Pattern horizontal offset from object's left/top corner
-   * @type Number
-   * @default
-   */
-  offsetX = 0;
-
-  /**
-   * Pattern vertical offset from object's left/top corner
-   * @type Number
-   * @default
-   */
-  offsetY = 0;
 
   /**
    * @type TCrossOrigin
@@ -86,11 +70,12 @@ export class Pattern {
    * @return {fabric.Pattern} thisArg
    */
   constructor(options: TPatternOptions = {}) {
+    super();
     this.id = fabric.Object.__uid++;
     this.setOptions(options);
   }
 
-  setOptions<K extends TExportedKeys>(options: Record<K, this[K]>) {
+  setOptions<K extends TPatternExportedKeys>(options: Record<K, this[K]>) {
     for (const prop in options) {
       this[prop] = options[prop];
     }
@@ -123,7 +108,7 @@ export class Pattern {
    * @param {CanvasRenderingContext2D} ctx Context to create pattern
    * @return {CanvasPattern}
    */
-  toLive(ctx: CanvasRenderingContext2D) {
+  toLive(ctx: CanvasRenderingContext2D, { offset }: TFillerRenderingOptions) {
     if (
       // if the image failed to load, return, and allow rest to continue loading
       !this.source ||
@@ -133,26 +118,24 @@ export class Pattern {
           this.source.naturalWidth === 0 ||
           this.source.naturalHeight === 0))
     ) {
-      return '';
+      return null;
     }
 
-    return ctx.createPattern(this.source, this.repeat);
+    const live = ctx.createPattern(this.source, this.repeat);
+    const t = new DOMMatrix()
+      .translate(offset.x, offset.y)
+      .multiplySelf(new DOMMatrix(this.patternTransform || undefined));
+    live.setTransform(t);
+    return live;
   }
 
-  /**
-   * Returns object representation of a pattern
-   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {object} Object representation of a pattern instance
-   */
-  toObject(propertiesToInclude: (keyof this)[]) {
+  toObject(propertiesToInclude?: (keyof this)[]) {
     return {
-      ...pick(this, propertiesToInclude),
+      ...super.toObject(propertiesToInclude),
       type: 'pattern',
       source: this.sourceToString(),
       repeat: this.repeat,
       crossOrigin: this.crossOrigin,
-      offsetX: toFixed(this.offsetX, config.NUM_FRACTION_DIGITS),
-      offsetY: toFixed(this.offsetY, config.NUM_FRACTION_DIGITS),
       patternTransform: this.patternTransform
         ? this.patternTransform.concat()
         : null,

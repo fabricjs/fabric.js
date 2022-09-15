@@ -2,6 +2,7 @@
 
 import { Color } from '../color';
 import { config } from '../config';
+import { Filler } from '../Filler';
 
 /* _TO_SVG_START_ */
 (function (global) {
@@ -9,7 +10,7 @@ import { config } from '../config';
   function getSvgColorString(prop, value) {
     if (!value) {
       return prop + ': none; ';
-    } else if (value.toLive) {
+    } else if (value instanceof Filler) {
       return prop + ': url(#SVGID_' + value.id + '); ';
     } else {
       var color = new Color(value),
@@ -300,10 +301,10 @@ import { config } from '../config';
           additionalTransform ? 'transform="' + additionalTransform + '" ' : '',
         ].join('');
         objectMarkup[index] = commonPieces;
-        if (fill && fill.toLive) {
+        if (fill && fill instanceof Filler) {
           markup.push(fill.toSVG(this));
         }
-        if (stroke && stroke.toLive) {
+        if (stroke && stroke instanceof Filler) {
           markup.push(stroke.toSVG(this));
         }
         if (shadow) {
