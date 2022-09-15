@@ -26,7 +26,7 @@ import process from 'node:process';
 import os from 'os';
 import { createCodeSandbox } from '../.codesandbox/deploy.mjs';
 import { build } from './build.mjs';
-import { awaitBuild } from './buildLock.mjs';
+import { awaitBuild, hook } from './buildLock.mjs';
 import { wd } from './dirname.mjs';
 import { listFiles, transform as transformFiles } from './transform_files.mjs';
 
@@ -729,13 +729,14 @@ sandbox
  * @param {string} dest 
  */
 function watchFabricAndTriggerSandbox(dest) {
-    const pathToTrigger = path.resolve(dest, 'package.json');
-    rollupBuild({ watch: true }, (code) => {
-        code === 'END' && fs.writeFileSync(pathToTrigger, JSON.stringify({
-            ...fs.readFileSync(pathToTrigger).toJSON(),
-            trigger: moment().format('YYYY-MM-DD HH:mm:ss')
-        }, null, '\t'));
-    });
+  const pathToTrigger = path.resolve(dest, 'package.json');
+  build({ watch: true });
+  return hook((locked) => {
+    !locked && fs.writeFileSync(pathToTrigger, JSON.stringify({
+      ...fs.readFileSync(pathToTrigger).toJSON(),
+      trigger: moment().format('YYYY-MM-DD HH:mm:ss')
+    }, null, '\t'));
+  });
 }
 
 sandbox
