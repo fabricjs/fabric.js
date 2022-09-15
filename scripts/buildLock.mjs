@@ -44,7 +44,7 @@ export function awaitBuild() {
   return new Promise((resolve) => {
     if (isLocked()) {
       console.log(chalk.cyanBright('> waiting for build to finish...'));
-      const watcher = hook((locked) => {
+      const watcher = subscribe((locked) => {
         if (!locked) {
           watcher.close();
           resolve();
@@ -57,19 +57,18 @@ export function awaitBuild() {
 }
 
 /**
- * Subscribe to build start/completion
+ * Subscribe to build start/error/completion.
  * 
- * @param {(locked: boolean) => any} cb
+ * @param {(locked: boolean, error: boolean) => any} cb
  * @param {number} [debounce]
  * @returns
  */
-export function hook(cb, debounce) {
+export function subscribe(cb, debounce) {
   return fs.watch(
     path.dirname(lockFile),
     _.debounce((type, file) => {
-      if (type === 'rename' && file === path.basename(lockFile)) {
-        cb(isLocked());
-      }
+      if (file !== path.basename(lockFile)) return;
+      cb(isLocked(), !!readLockFile().error);
     }, debounce)
   );
 }
