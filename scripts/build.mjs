@@ -10,10 +10,10 @@ import { wd } from './dirname.mjs';
  * @see https://rollupjs.org/guide/en/#--watchonstart-cmd---watchonbundlestart-cmd---watchonbundleend-cmd---watchonend-cmd---watchonerror-cmd
  * @param {*} options 
  */
-export function build(options = {}) {
+export function build({ watch, fast, input, output } = {}) {
   const cmd = [
     'rollup',
-    '-c', options.watch ? '--watch' : '',
+    '-c', watch ? '--watch' : '',
     '--no-watch.clearScreen',
     ...['onStart', 'onError', 'onEnd'].map(type => `--watch.${type} "node ./scripts/buildReporter.mjs ${type.toLowerCase().slice(2)}"`)
   ].join(' ');
@@ -23,19 +23,19 @@ export function build(options = {}) {
     cwd: wd,
     env: {
       ...process.env,
-      MINIFY: Number(!options.fast),
-      BUILD_INPUT: options.input,
-      BUILD_OUTPUT: options.output,
+      MINIFY: Number(!fast),
+      BUILD_INPUT: input,
+      BUILD_OUTPUT: output,
       BUILD_MIN_OUTPUT:
-        options.output && !options.fast
+        output && !fast
           ? path.resolve(
-              path.dirname(options.output),
-              `${path.basename(options.output, '.js')}.min.js`
+              path.dirname(output),
+              `${path.basename(output, '.js')}.min.js`
             )
           : undefined,
     },
   };
-  if (options.watch) {
+  if (watch) {
     cp.spawn(cmd, processOptions);
   } else {
     try {
