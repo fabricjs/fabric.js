@@ -570,36 +570,6 @@
     assert.ok(true, 'test did not throw on null element removeListener');
   });
 
-  QUnit.test('fabric.util.array.min', function(assert) {
-    assert.ok(typeof fabric.util.array.min === 'function');
-
-    assert.equal(1, fabric.util.array.min([1, 3, 2]));
-    assert.equal(-1, fabric.util.array.min([3, 1, 'f', 3, -1, 3]));
-    assert.equal(-3, fabric.util.array.min([-1, -2, -3]));
-    assert.equal('a', fabric.util.array.min(['a', 'c', 'b']));
-
-    var obj1 = { valueOf: function(){ return 1; } };
-    var obj2 = { valueOf: function(){ return 2; } };
-    var obj3 = { valueOf: function(){ return 3; } };
-
-    assert.equal(obj1, fabric.util.array.min([obj1, obj3, obj2]));
-  });
-
-  QUnit.test('fabric.util.array.max', function(assert) {
-    assert.ok(typeof fabric.util.array.max === 'function');
-
-    assert.equal(3, fabric.util.array.max([1, 3, 2]));
-    assert.equal(3, fabric.util.array.max([3, 1, 'f', 3, -1, 3]));
-    assert.equal(-1, fabric.util.array.max([-1, -2, -3]));
-    assert.equal('c', fabric.util.array.max(['a', 'c', 'b']));
-
-    var obj1 = { valueOf: function(){ return 1; } };
-    var obj2 = { valueOf: function(){ return 2; } };
-    var obj3 = { valueOf: function(){ return 3; } };
-
-    assert.equal(obj3, fabric.util.array.max([obj1, obj3, obj2]));
-  });
-
   QUnit.test('fabric.util.pick', function(assert) {
     assert.ok(typeof fabric.util.pick === 'function');
 
@@ -793,6 +763,19 @@
     })
   }
 
+  QUnit.test('calcPlaneChangeMatrix', function (assert) {
+    assert.ok(typeof fabric.util.calcPlaneChangeMatrix === 'function');
+    const m1 = [1, 2, 3, 4, 5, 6];
+    const s = [2, 0, 0, 0.5, 0, 0];
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(), fabric.iMatrix);
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(undefined, m1), fabric.util.invertTransform(m1));
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(fabric.iMatrix, m1), fabric.util.invertTransform(m1));
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, undefined), m1);
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, fabric.iMatrix), m1);
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, m1), fabric.iMatrix);
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, s), fabric.util.multiplyTransformMatrices(fabric.util.invertTransform(s), m1));
+  })
+
   QUnit.test('sendPointToPlane', function (assert) {
     assert.ok(typeof fabric.util.sendPointToPlane === 'function');
     var m1 = [3, 0, 0, 2, 10, 4],
@@ -915,6 +898,20 @@
 
   QUnit.test('makeBoundingBoxFromPoints', function(assert) {
     assert.ok(typeof fabric.util.makeBoundingBoxFromPoints === 'function');
+    assert.deepEqual(fabric.util.makeBoundingBoxFromPoints([
+      new fabric.Point(50, 50),
+      new fabric.Point(-50, 50),
+      new fabric.Point(50, -50),
+      new fabric.Point(-50, -50),
+      new fabric.Point(50, 50),
+      new fabric.Point(80, -30),
+      new fabric.Point(100, 50),
+    ]), {
+      left: -50,
+      top: -50,
+      width: 150,
+      height: 100
+    }, 'bbox should match');
   });
 
   QUnit.test('parseUnit', function(assert) {

@@ -11,6 +11,18 @@ import { ElementsParser } from './elements_parser';
  * @param {Object} [options] Options object
  * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
  */
-export function parseElements(elements, callback, options, reviver, parsingOptions) {
-  new ElementsParser(elements, callback, options, reviver, parsingOptions).parse();
+export function parseElements(
+  elements,
+  callback,
+  options,
+  reviver,
+  parsingOptions
+) {
+  new ElementsParser(
+    elements,
+    callback,
+    options,
+    reviver,
+    parsingOptions
+  ).parse();
 }

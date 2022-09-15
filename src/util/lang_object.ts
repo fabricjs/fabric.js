@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { fabric } from "../../HEADER";
+import { fabric } from '../../HEADER';
 
 /**
  * Copies all enumerable properties of one js object to another
@@ -22,37 +22,32 @@ export const extend = (destination, source, deep) => {
     if (!fabric.isLikelyNode && source instanceof Element) {
       // avoid cloning deep images, canvases,
       destination = source;
-    }
-    else if (Array.isArray(source)) {
+    } else if (Array.isArray(source)) {
       destination = [];
       for (let i = 0, len = source.length; i < len; i++) {
-        destination[i] = extend({ }, source[i], deep);
+        destination[i] = extend({}, source[i], deep);
       }
-    }
-    else if (source && typeof source === 'object') {
+    } else if (source && typeof source === 'object') {
       for (const property in source) {
         if (property === 'canvas' || property === 'group') {
           // we do not want to clone this props at all.
           // we want to keep the keys in the copy
           destination[property] = null;
-        }
-        else if (Object.prototype.hasOwnProperty.call(source, property)) {
-          destination[property] = extend({ }, source[property], deep);
+        } else if (Object.prototype.hasOwnProperty.call(source, property)) {
+          destination[property] = extend({}, source[property], deep);
         }
       }
-    }
-    else {
+    } else {
       // this sounds odd for an extend but is ok for recursive use
       destination = source;
     }
-  }
-  else {
+  } else {
     for (const property in source) {
       destination[property] = source[property];
     }
   }
   return destination;
-}
+};
 
 /**
  * Creates an empty object and copies all enumerable properties of another object to it
@@ -64,4 +59,5 @@ export const extend = (destination, source, deep) => {
  */
 
 //TODO: this function return an empty object if you try to clone null
-export const clone = (object: any, deep: boolean) => deep ? extend({ }, object, deep) : { ...object };
+export const clone = (object: any, deep: boolean) =>
+  deep ? extend({}, object, deep) : { ...object };
