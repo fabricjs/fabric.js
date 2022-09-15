@@ -3,7 +3,7 @@ import Axios from 'axios';
 import fs from 'fs-extra';
 import _ from 'lodash';
 import path from 'path';
-import { makeRe } from 'micromatch';
+import match from 'micromatch';
 
 const BINARY_EXT = ['png', 'jpg', 'jpeg'];
 
@@ -12,7 +12,7 @@ function bufferToBase64DataUrl(buffer, mimeType) {
 }
 
 function globToRegex(glob, opts) {
-  return makeRe(glob, opts);
+  return match.makeRe(glob, opts);
 }
 
 function parseIgnoreFile(file) {
