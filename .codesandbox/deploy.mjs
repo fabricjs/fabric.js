@@ -14,9 +14,9 @@ function bufferToBase64DataUrl(buffer, mimeType) {
  * https://codesandbox.io/docs/api/#define-api
  */
 export async function createCodeSandbox(appPath) {
-  const { trigger: __, ...packageJSON } = fs
-    .readFileSync(path.resolve(appPath, 'package.json'))
-    .toJSON();
+  const { trigger: __, ...packageJSON } = JSON.parse(
+    fs.readFileSync(path.resolve(appPath, 'package.json'))
+  );
   // omit linked package
   if (packageJSON.dependencies.fabric.startsWith('file:')) {
     packageJSON.dependencies.fabric = '*';
