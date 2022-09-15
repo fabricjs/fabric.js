@@ -21,7 +21,7 @@ export function startSandbox(destination) {
     cwd: destination,
     stdio: 'inherit',
   });
-  console.log(chalk.blue('\n> installing deps'));
+  console.log(chalk.blue('\n> installing dependencies'));
   cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
   build({ watch: true, fast: true });
   
