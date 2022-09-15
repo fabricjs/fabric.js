@@ -8,7 +8,7 @@ import { report } from './buildLock.mjs';
 const program = new Command();
 
 program
-  .command('<type>')
+  .command('report <type>', { isDefault: true })
   .action((type) => {
     report(type);
   })
