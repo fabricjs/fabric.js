@@ -696,7 +696,7 @@ function watchFabricAndTriggerSandbox(dest) {
   build({ watch: true });
   return subscribe((locked) => {
     !locked && fs.writeFileSync(pathToTrigger, JSON.stringify({
-      ...fs.readFileSync(pathToTrigger).toJSON(),
+      ...JSON.parse(fs.readFileSync(pathToTrigger)),
       trigger: moment().format('YYYY-MM-DD HH:mm:ss')
     }, null, '\t'));
   }, 500);
