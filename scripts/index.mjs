@@ -690,7 +690,7 @@ const templates = fs.readdirSync(codesandboxTemplatesDir);
  */
 function watchFabricAndTriggerSandbox(dest) {
   const pathToTrigger = path.resolve(dest, 'package.json');
-  build({ watch: true });
+  build({ watch: true, fast: true });
   return subscribe((locked) => {
     !locked &&
       fs.writeFileSync(
