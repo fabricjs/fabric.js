@@ -879,8 +879,6 @@
       applyTransformToObject = fabric.util.applyTransformToObject,
       invert = fabric.util.invertTransform,
       multiply = fabric.util.multiplyTransformMatrices;
-    //  silence group check
-    obj1.isOnACache = () => false;
 
     applyTransformToObject(obj, m);
     applyTransformToObject(obj1, m1);

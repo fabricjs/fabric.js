@@ -1063,7 +1063,7 @@ import { TObject } from '../__types__';
         this[key] = value;
 
         if (isChanged) {
-          groupNeedsUpdate = this.group && this.group.isOnACache();
+          groupNeedsUpdate = this.group && this.group.shouldCache();
           if (this.cacheProperties.indexOf(key) > -1) {
             this.dirty = true;
             groupNeedsUpdate && this.group.set('dirty', true);

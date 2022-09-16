@@ -143,14 +143,6 @@
       },
 
       /**
-       * Check if this group or its parent group are caching, recursively up
-       * @return {Boolean}
-       */
-      isOnACache: function () {
-        return false;
-      },
-
-      /**
        * Renders controls and borders for the object
        * @param {CanvasRenderingContext2D} ctx Context to render on
        * @param {Object} [styleOverride] properties to override the object style
