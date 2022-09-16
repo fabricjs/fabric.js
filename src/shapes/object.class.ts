@@ -1215,6 +1215,32 @@ import { TObject } from '../__types__';
       },
 
       /**
+       * @private
+       */
+      prepareCache: function () {
+        let saveState = false;
+        if (this.shouldCache()) {
+          if (!this._cacheCanvas || !this._cacheContext) {
+            this._createCacheCanvas();
+          }
+          if (this.isCacheDirty()) {
+            this.drawObject(this._cacheContext, !!forClipping);
+            saveState = true;
+          }
+        } else {
+          // remove cache canvas
+          this._cacheCanvas = null;
+          this._cacheContext = null;
+          this.cacheWidth = 0;
+          this.cacheHeight = 0;
+          saveState = true;
+        }
+        if (saveState && this.objectCaching && this.statefullCache) {
+          this.saveState({ propertySet: 'cacheProperties' });
+        }
+      },
+
+      /**
        * Renders an object on a specified context
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
@@ -1251,32 +1277,6 @@ import { TObject } from '../__types__';
         }
         this.dirty = false;
         ctx.restore();
-      },
-
-      /**
-       * @private
-       */
-      prepareCache: function () {
-        let saveState = false;
-        if (this.shouldCache()) {
-          if (!this._cacheCanvas || !this._cacheContext) {
-            this._createCacheCanvas();
-          }
-          if (this.isCacheDirty()) {
-            this.drawObject(this._cacheContext, !!forClipping);
-            saveState = true;
-          }
-        } else {
-          // remove cache canvas
-          this._cacheCanvas = null;
-          this._cacheContext = null;
-          this.cacheWidth = 0;
-          this.cacheHeight = 0;
-          saveState = true;
-        }
-        if (saveState && this.objectCaching && this.statefullCache) {
-          this.saveState({ propertySet: 'cacheProperties' });
-        }
       },
 
       renderObject: function (ctx: CanvasRenderingContext2D, forClipping?: { parent: TObject; }) {
