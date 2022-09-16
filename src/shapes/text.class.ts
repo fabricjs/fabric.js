@@ -1669,12 +1669,20 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
        * Renders text instance on a specified context
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      render: function (ctx) {
+      render: function (
+        ctx: CanvasRenderingContext2D,
+        { forClipping }: { forClipping?: { parent: TObject } } = {}
+      ) {
         // do not render if object is not visible
         if (!this.visible) {
           return;
         }
-        if (this.canvas && this.canvas.skipOffscreen && !this.isOnScreen()) {
+        if (
+          this.canvas &&
+          this.canvas.skipOffscreen &&
+          !forClipping &&
+          !this.isOnScreen()
+        ) {
           return;
         }
         if (this._shouldClearDimensionCache()) {
