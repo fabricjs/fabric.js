@@ -1674,12 +1674,7 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
         if (!this.visible) {
           return;
         }
-        if (
-          this.canvas &&
-          this.canvas.skipOffscreen &&
-          !this.group &&
-          !this.isOnScreen()
-        ) {
+        if (this.canvas && this.canvas.skipOffscreen && !this.isOnScreen()) {
           return;
         }
         if (this._shouldClearDimensionCache()) {
