@@ -1,6 +1,6 @@
 //@ts-nocheck
-import { fabric } from "../../HEADER";
-import { parseSVGDocument } from "./parseSVGDocument";
+import { fabric } from '../../HEADER';
+import { parseSVGDocument } from './parseSVGDocument';
 
 /**
  * Takes string corresponding to an SVG document, and parses it into a set of fabric objects
@@ -13,8 +13,14 @@ import { parseSVGDocument } from "./parseSVGDocument";
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  */
 export function loadSVGFromString(string, callback, reviver, options) {
-  const parser = new fabric.window.DOMParser(), doc = parser.parseFromString(string.trim(), 'text/xml');
-  parseSVGDocument(doc.documentElement, function (results, _options, elements, allElements) {
-    callback(results, _options, elements, allElements);
-  }, reviver, options);
+  const parser = new fabric.window.DOMParser(),
+    doc = parser.parseFromString(string.trim(), 'text/xml');
+  parseSVGDocument(
+    doc.documentElement,
+    function (results, _options, elements, allElements) {
+      callback(results, _options, elements, allElements);
+    },
+    reviver,
+    options
+  );
 }

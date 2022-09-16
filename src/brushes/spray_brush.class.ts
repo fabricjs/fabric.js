@@ -1,22 +1,20 @@
-import { fabric } from "../../HEADER";
-import { Point } from "../point.class";
-import { getRandomInt } from "../util/internals";
-import { Canvas, Rect } from "../__types__";
-import { BaseBrush } from "./base_brush.class";
-
+import { fabric } from '../../HEADER';
+import { Point } from '../point.class';
+import { getRandomInt } from '../util/internals';
+import { Canvas, Rect } from '../__types__';
+import { BaseBrush } from './base_brush.class';
 
 /**
  * @todo remove transient
  */
 const { Group, Rect, Shadow } = fabric;
 
-
 export type SprayBrushPoint = {
   x: number;
   y: number;
   width: number;
   opacity: number;
-}
+};
 
 /**
  *
@@ -39,52 +37,51 @@ function getUniqueRects(rects: Rect[]) {
 }
 
 export class SprayBrush extends BaseBrush {
-
   /**
    * Width of a spray
    * @type Number
    * @default
    */
-  width = 10
+  width = 10;
 
   /**
    * Density of a spray (number of dots per chunk)
    * @type Number
    * @default
    */
-  density = 20
+  density = 20;
 
   /**
    * Width of spray dots
    * @type Number
    * @default
    */
-  dotWidth = 1
+  dotWidth = 1;
 
   /**
    * Width variance of spray dots
    * @type Number
    * @default
    */
-  dotWidthVariance = 1
+  dotWidthVariance = 1;
 
   /**
    * Whether opacity of a dot should be random
    * @type Boolean
    * @default
    */
-  randomOpacity = false
+  randomOpacity = false;
 
   /**
    * Whether overlapping dots (rectangles) should be removed (for performance reasons)
    * @type Boolean
    * @default
    */
-  optimizeOverlapping = true
+  optimizeOverlapping = true;
 
-  private sprayChunks: SprayBrushPoint[][]
+  private sprayChunks: SprayBrushPoint[][];
 
-  private sprayChunk: SprayBrushPoint[]
+  private sprayChunk: SprayBrushPoint[];
 
   /**
    * Constructor
@@ -142,18 +139,21 @@ export class SprayBrush extends BaseBrush {
           top: chunck.y + 1,
           originX: 'center',
           originY: 'center',
-          fill: this.color
+          fill: this.color,
         });
         rects.push(rect);
       }
     }
 
-    const group = new Group(this.optimizeOverlapping ? getUniqueRects(rects) : rects, {
-      objectCaching: true,
-      layout: 'fixed',
-      subTargetCheck: false,
-      interactive: false
-    });
+    const group = new Group(
+      this.optimizeOverlapping ? getUniqueRects(rects) : rects,
+      {
+        objectCaching: true,
+        layout: 'fixed',
+        subTargetCheck: false,
+        interactive: false,
+      }
+    );
     this.shadow && group.set('shadow', new Shadow(this.shadow));
     this.canvas.fire('before:path:created', { path: group });
     this.canvas.add(group);
@@ -206,13 +206,14 @@ export class SprayBrush extends BaseBrush {
       this.sprayChunk.push({
         x: getRandomInt(pointer.x - radius, pointer.x + radius),
         y: getRandomInt(pointer.y - radius, pointer.y + radius),
-        width: this.dotWidthVariance ?
-          getRandomInt(
-            // bottom clamp width to 1
-            Math.max(1, this.dotWidth - this.dotWidthVariance),
-            this.dotWidth + this.dotWidthVariance) :
-          this.dotWidth,
-        opacity: this.randomOpacity ? getRandomInt(0, 100) / 100 : 1
+        width: this.dotWidthVariance
+          ? getRandomInt(
+              // bottom clamp width to 1
+              Math.max(1, this.dotWidth - this.dotWidthVariance),
+              this.dotWidth + this.dotWidthVariance
+            )
+          : this.dotWidth,
+        opacity: this.randomOpacity ? getRandomInt(0, 100) / 100 : 1,
       });
     }
 

@@ -1,16 +1,15 @@
 //@ts-nocheck
-(function(global){
+(function (global) {
   var fabric = global.fabric;
   /**
    * @namespace fabric.CommonMethods
    */
   fabric.CommonMethods = {
-
     /**
      * Sets object's properties from options
      * @param {Object} [options] Options object
      */
-    _setOptions: function(options) {
+    _setOptions: function (options) {
       for (var prop in options) {
         this.set(prop, options[prop]);
       }
@@ -19,7 +18,7 @@
     /**
      * @private
      */
-    _setObject: function(obj) {
+    _setObject: function (obj) {
       for (var prop in obj) {
         this._set(prop, obj[prop]);
       }
@@ -32,17 +31,16 @@
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    set: function(key, value) {
+    set: function (key, value) {
       if (typeof key === 'object') {
         this._setObject(key);
-      }
-      else {
+      } else {
         this._set(key, value);
       }
       return this;
     },
 
-    _set: function(key, value) {
+    _set: function (key, value) {
       this[key] = value;
     },
 
@@ -52,7 +50,7 @@
      * @return {fabric.Object} thisArg
      * @chainable
      */
-    toggle: function(property) {
+    toggle: function (property) {
       var value = this.get(property);
       if (typeof value === 'boolean') {
         this.set(property, !value);
@@ -65,8 +63,8 @@
      * @param {String} property Property name
      * @return {*} value of a property
      */
-    get: function(property) {
+    get: function (property) {
       return this[property];
-    }
+    },
   };
 })(typeof exports !== 'undefined' ? exports : window);

@@ -1,10 +1,10 @@
 //@ts-nocheck
 
-import { cache } from "../cache";
-import { config } from "../config";
+import { cache } from '../cache';
+import { config } from '../config';
 import { fabric } from '../../HEADER';
-import { halfPI, PiBy180 } from "../constants";
-import { commaWsp, rePathCommand } from "../parser/constants";
+import { halfPI, PiBy180 } from '../constants';
+import { commaWsp, rePathCommand } from '../parser/constants';
 import { Point } from '../point.class';
 import { cos } from './misc/cos';
 import { sin } from './misc/sin';
@@ -19,97 +19,129 @@ const commandLengths = {
   s: 4,
   q: 4,
   t: 2,
-  a: 7
+  a: 7,
 };
 const repeatedCommands = {
   m: 'l',
-  M: 'L'
+  M: 'L',
 };
 
-const segmentToBezier = (th2, th3, cosTh, sinTh, rx, ry, cx1, cy1, mT, fromX, fromY) => {
+const segmentToBezier = (
+  th2,
+  th3,
+  cosTh,
+  sinTh,
+  rx,
+  ry,
+  cx1,
+  cy1,
+  mT,
+  fromX,
+  fromY
+) => {
   const costh2 = cos(th2),
-        sinth2 = sin(th2),
-        costh3 = cos(th3),
-        sinth3 = sin(th3),
-        toX = cosTh * rx * costh3 - sinTh * ry * sinth3 + cx1,
-        toY = sinTh * rx * costh3 + cosTh * ry * sinth3 + cy1,
-        cp1X = fromX + mT * ( -cosTh * rx * sinth2 - sinTh * ry * costh2),
-        cp1Y = fromY + mT * ( -sinTh * rx * sinth2 + cosTh * ry * costh2),
-        cp2X = toX + mT * ( cosTh * rx * sinth3 + sinTh * ry * costh3),
-        cp2Y = toY + mT * ( sinTh * rx * sinth3 - cosTh * ry * costh3);
+    sinth2 = sin(th2),
+    costh3 = cos(th3),
+    sinth3 = sin(th3),
+    toX = cosTh * rx * costh3 - sinTh * ry * sinth3 + cx1,
+    toY = sinTh * rx * costh3 + cosTh * ry * sinth3 + cy1,
+    cp1X = fromX + mT * (-cosTh * rx * sinth2 - sinTh * ry * costh2),
+    cp1Y = fromY + mT * (-sinTh * rx * sinth2 + cosTh * ry * costh2),
+    cp2X = toX + mT * (cosTh * rx * sinth3 + sinTh * ry * costh3),
+    cp2Y = toY + mT * (sinTh * rx * sinth3 - cosTh * ry * costh3);
 
-  return ['C',
-    cp1X, cp1Y,
-    cp2X, cp2Y,
-    toX, toY
-  ];
+  return ['C', cp1X, cp1Y, cp2X, cp2Y, toX, toY];
 };
 
 /* Adapted from http://dxr.mozilla.org/mozilla-central/source/content/svg/content/src/nsSVGPathDataParser.cpp
-  * by Andrea Bogazzi code is under MPL. if you don't have a copy of the license you can take it here
-  * http://mozilla.org/MPL/2.0/
-  */
+ * by Andrea Bogazzi code is under MPL. if you don't have a copy of the license you can take it here
+ * http://mozilla.org/MPL/2.0/
+ */
 const arcToSegments = (toX, toY, rx, ry, large, sweep, rotateX) => {
-  let fromX = 0, fromY = 0, root = 0;
-  const PI = Math.PI, th = rotateX * PiBy180, sinTh = sin(th), cosTh = cos(th),
-        px = 0.5 * (-cosTh * toX  - sinTh * toY),
-        py = 0.5 * (-cosTh * toY + sinTh * toX),
-        rx2 = rx ** 2, ry2 = ry ** 2, py2 = py ** 2, px2 = px ** 2,
-        pl = rx2 * ry2 - rx2 * py2 - ry2 * px2;
+  let fromX = 0,
+    fromY = 0,
+    root = 0;
+  const PI = Math.PI,
+    th = rotateX * PiBy180,
+    sinTh = sin(th),
+    cosTh = cos(th),
+    px = 0.5 * (-cosTh * toX - sinTh * toY),
+    py = 0.5 * (-cosTh * toY + sinTh * toX),
+    rx2 = rx ** 2,
+    ry2 = ry ** 2,
+    py2 = py ** 2,
+    px2 = px ** 2,
+    pl = rx2 * ry2 - rx2 * py2 - ry2 * px2;
   let _rx = Math.abs(rx);
   let _ry = Math.abs(ry);
-
 
   if (pl < 0) {
     const s = Math.sqrt(1 - pl / (rx2 * ry2));
     _rx *= s;
     _ry *= s;
-  }
-  else {
-    root = (large === sweep ? -1.0 : 1.0) *
-            Math.sqrt( pl / (rx2 * py2 + ry2 * px2));
+  } else {
+    root =
+      (large === sweep ? -1.0 : 1.0) * Math.sqrt(pl / (rx2 * py2 + ry2 * px2));
   }
 
-  const cx = root * _rx * py / _ry,
-        cy = -root * _ry * px / _rx,
-        cx1 = cosTh * cx - sinTh * cy + toX * 0.5,
-        cy1 = sinTh * cx + cosTh * cy + toY * 0.5;
+  const cx = (root * _rx * py) / _ry,
+    cy = (-root * _ry * px) / _rx,
+    cx1 = cosTh * cx - sinTh * cy + toX * 0.5,
+    cy1 = sinTh * cx + cosTh * cy + toY * 0.5;
   let mTheta = calcVectorAngle(1, 0, (px - cx) / _rx, (py - cy) / _ry);
-  let dtheta = calcVectorAngle((px - cx) / _rx, (py - cy) / _ry, (-px - cx) / _rx, (-py - cy) / _ry);
+  let dtheta = calcVectorAngle(
+    (px - cx) / _rx,
+    (py - cy) / _ry,
+    (-px - cx) / _rx,
+    (-py - cy) / _ry
+  );
 
   if (sweep === 0 && dtheta > 0) {
     dtheta -= 2 * PI;
-  }
-  else if (sweep === 1 && dtheta < 0) {
+  } else if (sweep === 1 && dtheta < 0) {
     dtheta += 2 * PI;
   }
 
   // Convert into cubic bezier segments <= 90deg
-  const segments = Math.ceil(Math.abs(dtheta / PI * 2)),
-        result = new Array(segments), mDelta = dtheta / segments,
-        mT = 8 / 3 * Math.sin(mDelta / 4) * Math.sin(mDelta / 4) / Math.sin(mDelta / 2);
+  const segments = Math.ceil(Math.abs((dtheta / PI) * 2)),
+    result = new Array(segments),
+    mDelta = dtheta / segments,
+    mT =
+      ((8 / 3) * Math.sin(mDelta / 4) * Math.sin(mDelta / 4)) /
+      Math.sin(mDelta / 2);
   let th3 = mTheta + mDelta;
 
   for (let i = 0; i < segments; i++) {
-    result[i] = segmentToBezier(mTheta, th3, cosTh, sinTh, _rx, _ry, cx1, cy1, mT, fromX, fromY);
+    result[i] = segmentToBezier(
+      mTheta,
+      th3,
+      cosTh,
+      sinTh,
+      _rx,
+      _ry,
+      cx1,
+      cy1,
+      mT,
+      fromX,
+      fromY
+    );
     fromX = result[i][5];
     fromY = result[i][6];
     mTheta = th3;
     th3 += mDelta;
   }
   return result;
-}
+};
 
 /*
-  * Private
-  */
+ * Private
+ */
 const calcVectorAngle = (ux, uy, vx, vy) => {
   const ta = Math.atan2(uy, ux),
-        tb = Math.atan2(vy, vx);
+    tb = Math.atan2(vy, vx);
   if (tb >= ta) {
     return tb - ta;
-  }
-  else {
+  } else {
     return 2 * Math.PI - (ta - tb);
   }
 };
@@ -145,8 +177,9 @@ export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
   }
 
   const sqrt = Math.sqrt,
-        abs = Math.abs, tvalues = [],
-        bounds = [[], []];
+    abs = Math.abs,
+    tvalues = [],
+    bounds = [[], []];
 
   let b = 6 * x0 - 12 * x1 + 6 * x2;
   let a = -3 * x0 + 9 * x1 - 9 * x2 + 3 * x3;
@@ -186,7 +219,16 @@ export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
 
   let j = tvalues.length;
   const jlen = j;
-  const iterator = getPointOnCubicBezierIterator(x0, y0, x1, y1, x2, y2, x3, y3);
+  const iterator = getPointOnCubicBezierIterator(
+    x0,
+    y0,
+    x1,
+    y1,
+    x2,
+    y2,
+    x3,
+    y3
+  );
   while (j--) {
     const { x, y } = iterator(tvalues[j]);
     bounds[0][j] = x;
@@ -200,12 +242,12 @@ export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
   const result = [
     {
       x: Math.min(...bounds[0]),
-      y: Math.min(...bounds[1])
+      y: Math.min(...bounds[1]),
     },
     {
       x: Math.max(...bounds[0]),
-      y: Math.max(...bounds[1])
-    }
+      y: Math.max(...bounds[1]),
+    },
   ];
   if (config.cachesBoundsOfCurve) {
     cache.boundsOfCurveCache[argsString] = result;
@@ -219,7 +261,11 @@ export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
  * @param {Number} fy starting point y
  * @param {Array} coords Arc command
  */
-export const fromArcToBeziers = (fx, fy, [_, rx, ry, rot, large, sweep, tx, ty] = []) => {
+export const fromArcToBeziers = (
+  fx,
+  fy,
+  [_, rx, ry, rot, large, sweep, tx, ty] = []
+) => {
   const segsNorm = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
 
   for (let i = 0, len = segsNorm.length; i < len; i++) {
@@ -244,31 +290,38 @@ export const makePathSimpler = (path) => {
   // x and y represent the last point of the path. the previous command point.
   // we add them to each relative command to make it an absolute comment.
   // we also swap the v V h H with L, because are easier to transform.
-  let x = 0, y = 0;
+  let x = 0,
+    y = 0;
   const len = path.length;
   // x1 and y1 represent the last point of the subpath. the subpath is started with
   // m or M command. When a z or Z command is drawn, x and y need to be resetted to
   // the last x1 and y1.
-  let x1 = 0, y1 = 0;
+  let x1 = 0,
+    y1 = 0;
   // previous will host the letter of the previous command, to handle S and T.
   // controlX and controlY will host the previous reflected control point
-  let destinationPath = [], previous, controlX, controlY;
+  let destinationPath = [],
+    previous,
+    controlX,
+    controlY;
   for (let i = 0; i < len; ++i) {
     let converted = false;
     const current = path[i].slice(0);
-    switch (current[0]) { // first letter
+    switch (
+      current[0] // first letter
+    ) {
       case 'l': // lineto, relative
         current[0] = 'L';
         current[1] += x;
         current[2] += y;
-        // falls through
+      // falls through
       case 'L':
         x = current[1];
         y = current[2];
         break;
       case 'h': // horizontal lineto, relative
         current[1] += x;
-        // falls through
+      // falls through
       case 'H':
         current[0] = 'L';
         current[2] = y;
@@ -276,7 +329,7 @@ export const makePathSimpler = (path) => {
         break;
       case 'v': // vertical lineto, relative
         current[1] += y;
-        // falls through
+      // falls through
       case 'V':
         current[0] = 'L';
         y = current[1];
@@ -287,7 +340,7 @@ export const makePathSimpler = (path) => {
         current[0] = 'M';
         current[1] += x;
         current[2] += y;
-        // falls through
+      // falls through
       case 'M':
         x = current[1];
         y = current[2];
@@ -302,7 +355,7 @@ export const makePathSimpler = (path) => {
         current[4] += y;
         current[5] += x;
         current[6] += y;
-        // falls through
+      // falls through
       case 'C':
         controlX = current[3];
         controlY = current[4];
@@ -315,15 +368,14 @@ export const makePathSimpler = (path) => {
         current[2] += y;
         current[3] += x;
         current[4] += y;
-        // falls through
+      // falls through
       case 'S':
         // would be sScC but since we are swapping sSc for C, we check just that.
         if (previous === 'C') {
           // calculate reflection of previous control points
           controlX = 2 * x - controlX;
           controlY = 2 * y - controlY;
-        }
-        else {
+        } else {
           // If there is no previous command or if the previous command was not a C, c, S, or s,
           // the control point is coincident with the current point
           controlX = x;
@@ -349,7 +401,7 @@ export const makePathSimpler = (path) => {
         current[2] += y;
         current[3] += x;
         current[4] += y;
-        // falls through
+      // falls through
       case 'Q':
         controlX = current[1];
         controlY = current[2];
@@ -360,14 +412,13 @@ export const makePathSimpler = (path) => {
         current[0] = 'T';
         current[1] += x;
         current[2] += y;
-        // falls through
+      // falls through
       case 'T':
         if (previous === 'Q') {
           // calculate reflection of previous control point
           controlX = 2 * x - controlX;
           controlY = 2 * y - controlY;
-        }
-        else {
+        } else {
           // If there is no previous command or if the previous command was not a Q, q, T or t,
           // assume the control point is coincident with the current point
           controlX = x;
@@ -385,10 +436,12 @@ export const makePathSimpler = (path) => {
         current[0] = 'A';
         current[6] += x;
         current[7] += y;
-        // falls through
+      // falls through
       case 'A':
         converted = true;
-        destinationPath = destinationPath.concat(fromArcToBeziers(x, y, current));
+        destinationPath = destinationPath.concat(
+          fromArcToBeziers(x, y, current)
+        );
         x = current[6];
         y = current[7];
         break;
@@ -416,55 +469,67 @@ export const makePathSimpler = (path) => {
  * @param {Number} y2 starting point y
  * @return {Number} length of segment
  */
-const calcLineLength = (x1, y1, x2, y2) => Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+const calcLineLength = (x1, y1, x2, y2) =>
+  Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 
-
-const getPointOnCubicBezierIterator = (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct) => {
-  const c1 = CB1(pct), c2 = CB2(pct), c3 = CB3(pct), c4 = CB4(pct);
-  return {
-    x: p4x * c1 + p3x * c2 + p2x * c3 + p1x * c4,
-    y: p4y * c1 + p3y * c2 + p2y * c3 + p1y * c4
+const getPointOnCubicBezierIterator =
+  (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct) => {
+    const c1 = CB1(pct),
+      c2 = CB2(pct),
+      c3 = CB3(pct),
+      c4 = CB4(pct);
+    return {
+      x: p4x * c1 + p3x * c2 + p2x * c3 + p1x * c4,
+      y: p4y * c1 + p3y * c2 + p2y * c3 + p1y * c4,
+    };
   };
-};
 
 const QB1 = (t) => t ** 2;
 const QB2 = (t) => 2 * t * (1 - t);
 const QB3 = (t) => (1 - t) ** 2;
 
-const getTangentCubicIterator = (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct) => {
-  const qb1 = QB1(pct), qb2 = QB2(pct), qb3 = QB3(pct),
-        tangentX = 3 * (qb3 * (p2x - p1x) + qb2 * (p3x - p2x) + qb1 * (p4x - p3x)),
-        tangentY = 3 * (qb3 * (p2y - p1y) + qb2 * (p3y - p2y) + qb1 * (p4y - p3y));
-  return Math.atan2(tangentY, tangentX);
-};
-
-const getPointOnQuadraticBezierIterator = (p1x, p1y, p2x, p2y, p3x, p3y) => (pct) => {
-  const c1 = QB1(pct), c2 = QB2(pct), c3 = QB3(pct);
-  return {
-    x: p3x * c1 + p2x * c2 + p1x * c3,
-    y: p3y * c1 + p2y * c2 + p1y * c3
+const getTangentCubicIterator =
+  (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct) => {
+    const qb1 = QB1(pct),
+      qb2 = QB2(pct),
+      qb3 = QB3(pct),
+      tangentX =
+        3 * (qb3 * (p2x - p1x) + qb2 * (p3x - p2x) + qb1 * (p4x - p3x)),
+      tangentY =
+        3 * (qb3 * (p2y - p1y) + qb2 * (p3y - p2y) + qb1 * (p4y - p3y));
+    return Math.atan2(tangentY, tangentX);
   };
-};
+
+const getPointOnQuadraticBezierIterator =
+  (p1x, p1y, p2x, p2y, p3x, p3y) => (pct) => {
+    const c1 = QB1(pct),
+      c2 = QB2(pct),
+      c3 = QB3(pct);
+    return {
+      x: p3x * c1 + p2x * c2 + p1x * c3,
+      y: p3y * c1 + p2y * c2 + p1y * c3,
+    };
+  };
 
 const getTangentQuadraticIterator = (p1x, p1y, p2x, p2y, p3x, p3y) => (pct) => {
   const invT = 1 - pct,
-       tangentX = 2 * (invT * (p2x - p1x) + pct * (p3x - p2x)),
-       tangentY = 2 * (invT * (p2y - p1y) + pct * (p3y - p2y));
+    tangentX = 2 * (invT * (p2x - p1x) + pct * (p3x - p2x)),
+    tangentY = 2 * (invT * (p2y - p1y) + pct * (p3y - p2y));
   return Math.atan2(tangentY, tangentX);
 };
-
 
 // this will run over a path segment ( a cubic or quadratic segment) and approximate it
 // with 100 segemnts. This will good enough to calculate the length of the curve
 const pathIterator = (iterator, x1, y1) => {
-  let tempP = { x: x1, y: y1 }, tmpLen = 0;
+  let tempP = { x: x1, y: y1 },
+    tmpLen = 0;
   for (let perc = 1; perc <= 100; perc += 1) {
     const p = iterator(perc / 100);
     tmpLen += calcLineLength(tempP.x, tempP.y, p.x, p.y);
     tempP = p;
   }
   return tmpLen;
-}
+};
 
 /**
  * Given a pathInfo, and a distance in pixels, find the percentage from 0 to 1
@@ -475,22 +540,27 @@ const pathIterator = (iterator, x1, y1) => {
  * @return {Object} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
  */
 const findPercentageForDistance = (segInfo, distance) => {
-  let perc = 0, tmpLen = 0, tempP = { x: segInfo.x, y: segInfo.y },
-      p, nextLen, nextStep = 0.01, lastPerc;
+  let perc = 0,
+    tmpLen = 0,
+    tempP = { x: segInfo.x, y: segInfo.y },
+    p,
+    nextLen,
+    nextStep = 0.01,
+    lastPerc;
   // nextStep > 0.0001 covers 0.00015625 that 1/64th of 1/100
   // the path
-  const iterator = segInfo.iterator, angleFinder = segInfo.angleFinder;
+  const iterator = segInfo.iterator,
+    angleFinder = segInfo.angleFinder;
   while (tmpLen < distance && nextStep > 0.0001) {
     p = iterator(perc);
     lastPerc = perc;
     nextLen = calcLineLength(tempP.x, tempP.y, p.x, p.y);
     // compare tmpLen each cycle with distance, decide next perc to test.
-    if ((nextLen + tmpLen) > distance) {
+    if (nextLen + tmpLen > distance) {
       // we discard this step and we make smaller steps.
       perc -= nextStep;
       nextStep /= 2;
-    }
-    else {
+    } else {
       tempP = p;
       perc += nextStep;
       tmpLen += nextLen;
@@ -498,7 +568,7 @@ const findPercentageForDistance = (segInfo, distance) => {
   }
   p.angle = angleFinder(lastPerc);
   return p;
-}
+};
 
 /**
  * Run over a parsed and simplifed path and extract some informations.
@@ -507,11 +577,19 @@ const findPercentageForDistance = (segInfo, distance) => {
  * @return {Array} path commands informations
  */
 export const getPathSegmentsInfo = (path) => {
-  let totalLength = 0, current,
-      //x2 and y2 are the coords of segment start
-      //x1 and y1 are the coords of the current point
-      x1 = 0, y1 = 0, x2 = 0, y2 = 0, iterator, tempInfo, angleFinder;
-  const len = path.length, info = [];
+  let totalLength = 0,
+    current,
+    //x2 and y2 are the coords of segment start
+    //x1 and y1 are the coords of the current point
+    x1 = 0,
+    y1 = 0,
+    x2 = 0,
+    y2 = 0,
+    iterator,
+    tempInfo,
+    angleFinder;
+  const len = path.length,
+    info = [];
   for (let i = 0; i < len; i++) {
     current = path[i];
     tempInfo = {
@@ -519,7 +597,9 @@ export const getPathSegmentsInfo = (path) => {
       y: y1,
       command: current[0],
     };
-    switch (current[0]) { //first letter
+    switch (
+      current[0] //first letter
+    ) {
       case 'M':
         tempInfo.length = 0;
         x2 = x1 = current[1];
@@ -595,20 +675,22 @@ export const getPathSegmentsInfo = (path) => {
   }
   info.push({ length: totalLength, x: x1, y: y1 });
   return info;
-}
+};
 
 export const getPointOnPath = (path, distance, infos) => {
   if (!infos) {
     infos = getPathSegmentsInfo(path);
   }
   let i = 0;
-  while ((distance - infos[i].length > 0) && i < (infos.length - 2)) {
+  while (distance - infos[i].length > 0 && i < infos.length - 2) {
     distance -= infos[i].length;
     i++;
   }
   // var distance = infos[infos.length - 1] * perc;
-  const segInfo = infos[i], segPercent = distance / segInfo.length,
-        command = segInfo.command, segment = path[i];
+  const segInfo = infos[i],
+    segPercent = distance / segInfo.length,
+    command = segInfo.command,
+    segment = path[i];
   let info;
 
   switch (command) {
@@ -620,7 +702,10 @@ export const getPointOnPath = (path, distance, infos) => {
         new Point(segInfo.destX, segInfo.destY),
         segPercent
       );
-      info.angle = Math.atan2(segInfo.destY - segInfo.y, segInfo.destX - segInfo.x);
+      info.angle = Math.atan2(
+        segInfo.destY - segInfo.y,
+        segInfo.destX - segInfo.x
+      );
       return info;
     case 'L':
       info = new Point(segInfo.x, segInfo.y).lerp(
@@ -634,7 +719,7 @@ export const getPointOnPath = (path, distance, infos) => {
     case 'Q':
       return findPercentageForDistance(segInfo, distance);
   }
-}
+};
 
 /**
  *
@@ -649,14 +734,14 @@ export const getPointOnPath = (path, distance, infos) => {
  *
  */
 export const parsePath = (pathString) => {
-      // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
+  // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
   const re = rePathCommand,
-        rNumber = '[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?\\s*',
-        rNumberCommaWsp = `(${rNumber})${commaWsp}`,
-        rFlagCommaWsp = `([01])${commaWsp}?`,
-        rArcSeq = `${rNumberCommaWsp}?${rNumberCommaWsp}?${rNumberCommaWsp}${rFlagCommaWsp}${rFlagCommaWsp}${rNumberCommaWsp}?(${rNumber})`,
-        regArcArgumentSequence = new RegExp(rArcSeq, 'g'),
-        result = [];
+    rNumber = '[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?\\s*',
+    rNumberCommaWsp = `(${rNumber})${commaWsp}`,
+    rFlagCommaWsp = `([01])${commaWsp}?`,
+    rArcSeq = `${rNumberCommaWsp}?${rNumberCommaWsp}?${rNumberCommaWsp}${rFlagCommaWsp}${rFlagCommaWsp}${rNumberCommaWsp}?(${rNumber})`,
+    regArcArgumentSequence = new RegExp(rArcSeq, 'g'),
+    result = [];
 
   if (!pathString || !pathString.match) {
     return result;
@@ -672,13 +757,12 @@ export const parsePath = (pathString) => {
 
     if (command.toLowerCase() === 'a') {
       // arcs have special flags that apparently don't require spaces so handle special
-      for (let args; (args = regArcArgumentSequence.exec(coordsStr));) {
+      for (let args; (args = regArcArgumentSequence.exec(coordsStr)); ) {
         for (let j = 1; j < args.length; j++) {
           coords.push(args[j]);
         }
       }
-    }
-    else {
+    } else {
       let match;
       while ((match = re.exec(coordsStr))) {
         coords.push(match[0]);
@@ -693,15 +777,18 @@ export const parsePath = (pathString) => {
     }
 
     const commandLength = commandLengths[command.toLowerCase()],
-          repeatedCommand = repeatedCommands[command] || command;
+      repeatedCommand = repeatedCommands[command] || command;
 
     if (coordsParsed.length - 1 > commandLength) {
-      for (let k = 1, klen = coordsParsed.length; k < klen; k += commandLength) {
+      for (
+        let k = 1, klen = coordsParsed.length;
+        k < klen;
+        k += commandLength
+      ) {
         result.push([command].concat(coordsParsed.slice(k, k + commandLength)));
         command = repeatedCommand;
       }
-    }
-    else {
+    } else {
       result.push(coordsParsed);
     }
   }
@@ -717,15 +804,22 @@ export const parsePath = (pathString) => {
  */
 export const getSmoothPathFromPoints = (points, correction = 0) => {
   let p1 = new Point(points[0]),
-      p2 = new Point(points[1]),
-      multSignX = 1, multSignY = 0;
-  const path = [], len = points.length, manyPoints = len > 2;
+    p2 = new Point(points[1]),
+    multSignX = 1,
+    multSignY = 0;
+  const path = [],
+    len = points.length,
+    manyPoints = len > 2;
 
   if (manyPoints) {
     multSignX = points[2].x < p2.x ? -1 : points[2].x === p2.x ? 0 : 1;
     multSignY = points[2].y < p2.y ? -1 : points[2].y === p2.y ? 0 : 1;
   }
-  path.push(['M', p1.x - multSignX * correction, p1.y - multSignY * correction]);
+  path.push([
+    'M',
+    p1.x - multSignX * correction,
+    p1.y - multSignY * correction,
+  ]);
   let i;
   for (i = 1; i < len; i++) {
     if (!p1.eq(p2)) {
@@ -736,7 +830,7 @@ export const getSmoothPathFromPoints = (points, correction = 0) => {
       path.push(['Q', p1.x, p1.y, midPoint.x, midPoint.y]);
     }
     p1 = points[i];
-    if ((i + 1) < points.length) {
+    if (i + 1 < points.length) {
       p2 = points[i + 1];
     }
   }
@@ -744,9 +838,13 @@ export const getSmoothPathFromPoints = (points, correction = 0) => {
     multSignX = p1.x > points[i - 2].x ? 1 : p1.x === points[i - 2].x ? 0 : -1;
     multSignY = p1.y > points[i - 2].y ? 1 : p1.y === points[i - 2].y ? 0 : -1;
   }
-  path.push(['L', p1.x + multSignX * correction, p1.y + multSignY * correction]);
+  path.push([
+    'L',
+    p1.x + multSignX * correction,
+    p1.y + multSignY * correction,
+  ]);
   return path;
-}
+};
 
 /**
  * Transform a path by transforming each segment.
@@ -761,24 +859,31 @@ export const getSmoothPathFromPoints = (points, correction = 0) => {
  */
 export const transformPath = (path, transform, pathOffset) => {
   if (pathOffset) {
-    transform = multiplyTransformMatrices(
-      transform,
-      [1, 0, 0, 1, -pathOffset.x, -pathOffset.y]
-    );
+    transform = multiplyTransformMatrices(transform, [
+      1,
+      0,
+      0,
+      1,
+      -pathOffset.x,
+      -pathOffset.y,
+    ]);
   }
   return path.map((pathSegment) => {
     const newSegment = pathSegment.slice(0);
     for (let i = 1; i < pathSegment.length - 1; i += 2) {
-      const { x, y } = transformPoint({
-        x: pathSegment[i],
-        y: pathSegment[i + 1],
-      }, transform);
+      const { x, y } = transformPoint(
+        {
+          x: pathSegment[i],
+          y: pathSegment[i + 1],
+        },
+        transform
+      );
       newSegment[i] = x;
       newSegment[i + 1] = y;
     }
     return newSegment;
   });
-}
+};
 
 /**
  * Returns an array of path commands to create a regular polygon
@@ -787,7 +892,7 @@ export const transformPath = (path, transform, pathOffset) => {
  * @returns {(string|number)[][]} An array of SVG path commands
  */
 export const getRegularPolygonPath = (numVertexes, radius) => {
-  const interiorAngle = Math.PI * 2 / numVertexes;
+  const interiorAngle = (Math.PI * 2) / numVertexes;
   // rotationAdjustment rotates the path by 1/2 the interior angle so that the polygon always has a flat side on the bottom
   // This isn't strictly necessary, but it's how we tend to think of and expect polygons to be drawn
   let rotationAdjustment = -halfPI;
@@ -800,13 +905,14 @@ export const getRegularPolygonPath = (numVertexes, radius) => {
     const { x, y } = new Point(cos(rad), sin(rad)).scalarMultiply(radius);
     d[i] = [i === 0 ? 'M' : 'L', x, y];
   }
-  d[numVertexes]= ['Z'];
+  d[numVertexes] = ['Z'];
   return d;
-}
+};
 
 /**
  * Join path commands to go back to svg format
  * @param {Array} pathData fabricJS parsed path commands
  * @return {String} joined path 'M 0 0 L 20 30'
  */
-export const joinPath = (pathData) => pathData.map((segment) => segment.join(' ')).join(' ');
+export const joinPath = (pathData) =>
+  pathData.map((segment) => segment.join(' ')).join(' ');

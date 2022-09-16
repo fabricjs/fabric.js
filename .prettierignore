@@ -1,0 +1,17 @@
+.DS_Store
+*.iml
+change-output.md
+/.nyc_output/
+/.vscode/
+/node_modules/
+/npm-debug.log
+before_commit
+/coverage/
+.idea/
+/dist/fabric.require.js
+/dist/fabric.min.js.gz
+/cli_output/
+/scripts/cli_cache.json
+/dist/
+/lib/
+/test/
