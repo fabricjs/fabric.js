@@ -2054,14 +2054,17 @@ import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Object>}
    */
-  fabric.Object._fromObject = function (klass, object, { extraParam, ...options } = {}) {
-    return enlivenObjectEnlivables(clone(object, true), options)
-      .then((enlivedMap) => {
+  fabric.Object._fromObject = function (
+    klass,
+    object,
+    { extraParam, ...options } = {}
+  ) {
+    return enlivenObjectEnlivables(clone(object, true), options).then(
+      (enlivedMap) => {
         const { [extraParam]: arg0, ...rest } = { ...options, ...enlivedMap };
-        return extraParam
-          ? new klass(arg0, rest)
-          : new klass(rest);
-      });
+        return extraParam ? new klass(arg0, rest) : new klass(rest);
+      }
+    );
   };
 
   /**
