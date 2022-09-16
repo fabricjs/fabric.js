@@ -206,12 +206,23 @@ import { pick } from './util/misc/pick';
       _initStatic: function (el, options) {
         this._objects = [];
         this._createLowerCanvas(el);
+        this._createCacheCanvas();
         this._initOptions(options);
         // only initialize retina scaling once
         if (!this.interactive) {
           this._initRetinaScaling();
         }
         this.calcOffset();
+      },
+
+      /**
+       * @private
+       */
+      _createCacheCanvas: function () {
+        this.cacheCanvasEl = this._createCanvasElement();
+        this.cacheCanvasEl.setAttribute('width', this.width);
+        this.cacheCanvasEl.setAttribute('height', this.height);
+        this.contextCache = this.cacheCanvasEl.getContext('2d');
       },
 
       /**
@@ -813,11 +824,8 @@ import { pick } from './util/misc/pick';
         }
         if (path) {
           path._set('canvas', this);
-          // needed to setup a couple of variables
-          path.shouldCache();
           path._transformDone = true;
-          path.renderCache({ forClipping: true });
-          this.drawClipPathOnCanvas(ctx);
+          path.render(ctx, { forClipping: true });
         }
         this._renderOverlay(ctx);
         if (this.controlsAboveOverlay && this.interactive) {

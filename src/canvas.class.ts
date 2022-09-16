@@ -117,7 +117,6 @@ import { Point } from './point.class';
         this.requestRenderAllBound = this.requestRenderAll.bind(this);
         this._initStatic(el, options);
         this._initInteractive();
-        this._createCacheCanvas();
       },
 
       /**
@@ -1150,16 +1149,6 @@ import { Point } from './point.class';
         this._applyCanvasStyle(upperCanvasEl);
         upperCanvasEl.setAttribute('draggable', 'true');
         this.contextTop = upperCanvasEl.getContext('2d');
-      },
-
-      /**
-       * @private
-       */
-      _createCacheCanvas: function () {
-        this.cacheCanvasEl = this._createCanvasElement();
-        this.cacheCanvasEl.setAttribute('width', this.width);
-        this.cacheCanvasEl.setAttribute('height', this.height);
-        this.contextCache = this.cacheCanvasEl.getContext('2d');
       },
 
       /**
