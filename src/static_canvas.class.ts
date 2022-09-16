@@ -1824,6 +1824,10 @@ import { pick } from './util/misc/pick';
         this.overlayImage = null;
         this._iTextInstances = null;
         this.contextContainer = null;
+        // cache canvas
+        this.contextCache = null;
+        fabric.util.cleanUpJsdomNode(this.cacheCanvasEl);
+        this.cacheCanvasEl = undefined;
         // restore canvas style and attributes
         this.lowerCanvasEl.classList.remove('lower-canvas');
         this.lowerCanvasEl.removeAttribute('data-fabric');

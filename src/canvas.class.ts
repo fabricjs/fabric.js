@@ -1406,18 +1406,14 @@ import { Point } from './point.class';
       destroy: function () {
         var wrapperEl = this.wrapperEl,
           lowerCanvasEl = this.lowerCanvasEl,
-          upperCanvasEl = this.upperCanvasEl,
-          cacheCanvasEl = this.cacheCanvasEl;
+          upperCanvasEl = this.upperCanvasEl;
         this.removeListeners();
         this.callSuper('destroy');
         wrapperEl.removeChild(upperCanvasEl);
         wrapperEl.removeChild(lowerCanvasEl);
-        this.contextCache = null;
         this.contextTop = null;
         fabric.util.cleanUpJsdomNode(upperCanvasEl);
         this.upperCanvasEl = undefined;
-        fabric.util.cleanUpJsdomNode(cacheCanvasEl);
-        this.cacheCanvasEl = undefined;
         if (wrapperEl.parentNode) {
           wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
         }
