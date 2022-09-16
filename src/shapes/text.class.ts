@@ -366,9 +366,8 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
        */
       initialize: function (text, options) {
         this.styles = options ? options.styles || {} : {};
-        this.text = text;
         this.__skipDimension = true;
-        this.callSuper('initialize', options);
+        this.callSuper('initialize', { text, ...options });
         if (this.path) {
           this.setPathInfo();
         }
