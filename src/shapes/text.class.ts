@@ -364,10 +364,9 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
        * @param {Object} [options] Options object
        * @return {fabric.Text} thisArg
        */
-      initialize: function (text, options) {
-        this.styles = options ? options.styles || {} : {};
+      initialize: function (text, { styles = {}, text: _, ...options } = {}) {
         this.__skipDimension = true;
-        this.callSuper('initialize', { text, ...options });
+        this.callSuper('initialize', { text, styles, ...options });
         if (this.path) {
           this.setPathInfo();
         }
