@@ -2,8 +2,8 @@
 import Axios from 'axios';
 import fs from 'fs-extra';
 import _ from 'lodash';
+import match from 'micromatch';
 import path from 'path';
-import { makeRe } from 'micromatch';
 
 const BINARY_EXT = ['png', 'jpg', 'jpeg'];
 
@@ -12,7 +12,7 @@ function bufferToBase64DataUrl(buffer, mimeType) {
 }
 
 function globToRegex(glob, opts) {
-  return makeRe(glob, opts);
+  return match.makeRe(glob, opts);
 }
 
 function parseIgnoreFile(file) {
@@ -25,15 +25,20 @@ function parseIgnoreFile(file) {
  * https://codesandbox.io/docs/api/#define-api
  */
 export async function createCodeSandbox(appPath) {
-  const { trigger: __, ...packageJSON } = require(path.resolve(
+  const { trigger: __, ...packageJSON } = JSON.parse(fs.readFileSync(path.resolve(
     appPath,
     'package.json'
-  ));
+  )));
   // omit linked package
+  console.log(packageJSON.dependencies.fabric.startsWith('file:'))
   if (packageJSON.dependencies.fabric.startsWith('file:')) {
     packageJSON.dependencies.fabric = '*';
   }
-  const files = { 'package.json': JSON.stringify(packageJSON, null, '\t') };
+  const files = {
+    'package.json': {
+      content: JSON.stringify(packageJSON, null, '\t')
+    }
+  };
 
   const gitignore = path.resolve(appPath, '.gitignore');
   const codesandboxignore = path.resolve(appPath, '.codesandboxignore');
@@ -43,7 +48,7 @@ export async function createCodeSandbox(appPath) {
 
   const processFile = (fileName) => {
     const filePath = path.resolve(appPath, fileName);
-    if (ignore.some((r) => r === 'package.json' || r.test(fileName))) return;
+    if (fileName === 'package.json' || ignore.some((r) => r.test(fileName))) return;
     const ext = path.extname(fileName).slice(1);
     if (fs.lstatSync(filePath).isDirectory()) {
       fs.readdirSync(filePath).forEach((file) => {
@@ -84,6 +89,7 @@ export async function createCodeSandbox(appPath) {
     );
     return `https://codesandbox.io/s/${sandbox_id}`;
   } catch (error) {
-    throw error.toJSON();
+  console.log(error.response.data)
+    throw new Error(error.response.data);
   }
 }
