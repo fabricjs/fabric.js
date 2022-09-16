@@ -401,6 +401,7 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
        */
       getMeasuringContext: function () {
         // if we did not return we have to measure something.
+        // TODO - referncing canvas on global context will error once canvas is disposed
         if (!fabric._measuringContext) {
           fabric._measuringContext =
             (this.canvas && this.canvas.contextCache) ||
