@@ -2061,6 +2061,8 @@ import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
   ) {
     return enlivenObjectEnlivables(clone(object, true), options).then(
       (enlivedMap) => {
+        // from the resulting enlived options, extract options.extraParam in arg0
+        // to avoid accidental ovverrides later
         const { [extraParam]: arg0, ...rest } = { ...options, ...enlivedMap };
         return extraParam ? new klass(arg0, rest) : new klass(rest);
       }
