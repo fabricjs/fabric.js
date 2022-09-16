@@ -66,8 +66,7 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
        * });
        */
       initialize: function (points, { points: _, ...options } = {}) {
-        this.points = points || [];
-        this.callSuper('initialize', options);
+        this.callSuper('initialize', { points: points || [], ...options });
         this._setPositionDimensions(options);
       },
 
@@ -79,7 +78,6 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
       },
 
       _setPositionDimensions: function (options) {
-        options || (options = {});
         var calcDim = this._calcDimensions(options),
           correctLeftTop,
           correctSize = this.exactBoundingBox ? this.strokeWidth : 0;
