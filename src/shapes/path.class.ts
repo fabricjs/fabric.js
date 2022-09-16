@@ -45,9 +45,7 @@ import { config } from '../config';
        * @param {Object} [options] Options object
        * @return {fabric.Path} thisArg
        */
-      initialize: function (path, options) {
-        options = clone(options || {});
-        delete options.path;
+      initialize: function (path, { path: _, ...options } = {}) {
         this.callSuper('initialize', options);
         this._setPath(path || [], options);
       },

@@ -95,10 +95,11 @@
 
   QUnit.test('initialize', function(assert) {
     var done = assert.async();
-    var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', { top: 0, strokeWidth: 0 });
+    var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', { top: 0, strokeWidth: 0, path: 'M 0 0' });
 
     assert.equal(path.left, 100);
     assert.equal(path.top, 0);
+    assert.deepEqual(path.path, fabric.util.parsePath('M 100 100 L 200 100 L 170 200 z'), 'path arg should be safeguraded');
     done();
   });
 

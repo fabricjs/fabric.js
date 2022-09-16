@@ -71,7 +71,7 @@
     assert.equal(text.get('type'), 'text');
     assert.equal(text.get('text'), 'x');
 
-    assert.ok(new fabric.Text('a', { text: 'b' }).text, 'a', 'text arg is safeguraded');
+    assert.ok(new fabric.Text('a', { text: 'b' }).text, 'a', 'text arg should be safeguraded');
   });
 
   QUnit.test('toString', function(assert) {

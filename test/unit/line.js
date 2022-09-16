@@ -60,6 +60,9 @@
     assert.equal(lineWithoutPoints.get('y1'), 0);
     assert.equal(lineWithoutPoints.get('x2'), 0);
     assert.equal(lineWithoutPoints.get('y2'), 0);
+
+    const safeguradedLine = new fabric.Line(undefined, { x1: 1 });
+    assert.equal(safeguradedLine.get('x1'), 0, 'points should be safeguraded');
   });
 
   QUnit.test('complexity', function(assert) {

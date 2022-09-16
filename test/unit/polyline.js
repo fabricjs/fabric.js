@@ -62,6 +62,8 @@
 
     assert.equal(polyline.type, 'polyline');
     assert.deepEqual(polyline.get('points'), [{ x: 10, y: 12 }, { x: 20, y: 22 }]);
+
+    assert.deepEqual(new fabric.Polyline(getPoints(), { points: [] }).points, getPoints(), 'points arg should be safeguraded');
   });
 
   QUnit.test('complexity', function(assert) {

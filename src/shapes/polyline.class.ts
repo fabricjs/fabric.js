@@ -65,8 +65,7 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
        *   top: 100
        * });
        */
-      initialize: function (points, options) {
-        options = options || {};
+      initialize: function (points, { points: _, ...options } = {}) {
         this.points = points || [];
         this.callSuper('initialize', options);
         this._setPositionDimensions(options);
