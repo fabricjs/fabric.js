@@ -31,7 +31,7 @@ export interface AnimationOptions {
   /**
    * Called when the animation starts
    */
-  onStart: VoidFunction;
+  onStart?: VoidFunction;
 
   /**
    * Called at each frame of the animation
@@ -45,6 +45,7 @@ export interface AnimationOptions {
 
   /**
    * Easing function
+   * @default [defaultEasing]
    */
   easing: EasingFunction;
 
@@ -61,21 +62,25 @@ export interface AnimationOptions {
 
   /**
    * Ending value(s)
+   * @default 100
    */
   endValue: number | number[];
 
   /**
    * Value(s) to increment/decrement the value(s) by
+   * @default [endValue - startValue]
    */
   byValue: number | number[];
 
   /**
    * Duration of the animation in ms
+   * @default 500
    */
   duration: number;
 
   /**
    * Delay to start the animation in ms
+   * @default 0
    */
   delay: number;
 }
@@ -104,19 +109,6 @@ export interface AnimationContext extends AnimationOptions, AnimationCurrentStat
    */
   cancel: CancelFunction;
 }
-
-export const DefaultAnimationOptions: AnimationOptions = {
-  onStart: noop,
-  onChange: noop,
-  onComplete: noop,
-  startValue: 0,
-  endValue: 100,
-  byValue: 100,
-  easing: defaultEasing,
-  duration: 500,
-  abort: noop,
-  delay: 0
-};
 
 /**
  * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
@@ -149,18 +141,18 @@ export function animate(options: Partial<AnimationOptions> = {}): CancelFunction
   let cancel = false;
 
   const {
-    startValue,
-    duration,
-    easing,
-    onChange,
-    abort,
-    onComplete,
-    endValue,
-    delay,
-  } = mergeWithDefaults({ ...options }, DefaultAnimationOptions);
+    startValue = 0,
+    duration = 500,
+    easing = defaultEasing,
+    onChange = noop,
+    abort = noop,
+    onComplete = noop,
+    endValue = 0,
+    delay = 0,
+  } = options;
 
   const context: Partial<AnimationContext> = {
-    ...mergeWithDefaults({ ...options }, DefaultAnimationOptions),
+    ...options,
     cancel: noop, // placeholder
     currentValue: startValue,
     completionRate: 0,
