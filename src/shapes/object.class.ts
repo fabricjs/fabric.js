@@ -7,6 +7,8 @@ import { capValue } from '../util/misc/capValue';
 import { pick } from '../util/misc/pick';
 import { runningAnimations } from '../util/animation_registry';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
+import { invertTransform } from '../util/misc/matrix';
+import { TObject } from '../__types__';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -1103,66 +1105,6 @@ import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
       },
 
       /**
-       * Renders an object on a specified context
-       * @param {CanvasRenderingContext2D} ctx Context to render on
-       */
-      render: function (ctx) {
-        // do not render if width/height are zeros or object is not visible
-        if (this.isNotVisible()) {
-          return;
-        }
-        if (
-          this.canvas &&
-          this.canvas.skipOffscreen &&
-          !this.group &&
-          !this.isOnScreen()
-        ) {
-          return;
-        }
-        ctx.save();
-        this._setupCompositeOperation(ctx);
-        this.drawSelectionBackground(ctx);
-        this.transform(ctx);
-        this._setOpacity(ctx);
-        this._setShadow(ctx, this);
-        if (this.shouldCache()) {
-          this.renderCache();
-          this.drawCacheOnCanvas(ctx);
-        } else {
-          this._removeCacheCanvas();
-          this.dirty = false;
-          this.drawObject(ctx);
-          if (this.objectCaching && this.statefullCache) {
-            this.saveState({ propertySet: 'cacheProperties' });
-          }
-        }
-        ctx.restore();
-      },
-
-      renderCache: function (options) {
-        options = options || {};
-        if (!this._cacheCanvas || !this._cacheContext) {
-          this._createCacheCanvas();
-        }
-        if (this.isCacheDirty()) {
-          this.statefullCache &&
-            this.saveState({ propertySet: 'cacheProperties' });
-          this.drawObject(this._cacheContext, options.forClipping);
-          this.dirty = false;
-        }
-      },
-
-      /**
-       * Remove cacheCanvas and its dimensions from the objects
-       */
-      _removeCacheCanvas: function () {
-        this._cacheCanvas = null;
-        this._cacheContext = null;
-        this.cacheWidth = 0;
-        this.cacheHeight = 0;
-      },
-
-      /**
        * return true if the object will draw a stroke
        * Does not consider text styles. This is just a shortcut used at rendering time
        * We want it to be an approximation and be fast.
@@ -1193,6 +1135,18 @@ import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
       },
 
       /**
+       * Check if this object or a child object will cast a shadow
+       * @return {Boolean}
+       * @deprecated
+       */
+      willDrawShadow: function () {
+        return (
+          !!this.shadow &&
+          (this.shadow.offsetX !== 0 || this.shadow.offsetY !== 0)
+        );
+      },
+
+      /**
        * When set to `true`, force the object to have its own cache, even if it is inside a group
        * it may be needed when your object behave in a particular way on the cache and always needs
        * its own isolated canvas to render correctly.
@@ -1216,69 +1170,131 @@ import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
       },
 
       /**
-       * Decide if the object should cache or not. Create its own cache level
-       * objectCaching is a global flag, wins over everything
-       * needsItsOwnCache should be used when the object drawing method requires
-       * a cache step. None of the fabric classes requires it.
-       * Generally you do not cache objects in groups because the group outside is cached.
-       * Read as: cache if is needed, or if the feature is enabled but we are not already caching.
+       * Override this method to customize caching behavior
        * @return {Boolean}
        */
       shouldCache: function () {
-        this.ownCaching =
-          this.needsItsOwnCache() ||
-          (this.objectCaching && (!this.group || !this.group.isOnACache()));
-        return this.ownCaching;
+        return this.objectCaching;
       },
 
       /**
-       * Check if this object or a child object will cast a shadow
-       * used by Group.shouldCache to know if child has a shadow recursively
-       * @return {Boolean}
-       * @deprecated
+       * Check if cache is dirty
+       * @param {Boolean} skipCanvas skip canvas checks because this object is painted
+       * on parent canvas.
        */
-      willDrawShadow: function () {
-        return (
-          !!this.shadow &&
-          (this.shadow.offsetX !== 0 || this.shadow.offsetY !== 0)
-        );
+      isCacheDirty: function (skipCanvas) {
+        if (this.isNotVisible()) {
+          return false;
+        }
+        if (
+          this._cacheCanvas &&
+          this._cacheContext &&
+          !skipCanvas &&
+          this._updateCacheCanvas()
+        ) {
+          // context was cleared by `_updateCacheCanvas`
+          return true;
+        } else if (
+          this.dirty ||
+          (this.clipPath && this.clipPath.absolutePositioned) ||
+          (this.statefullCache && this.hasStateChanged('cacheProperties'))
+        ) {
+          if (this._cacheCanvas && this._cacheContext && !skipCanvas) {
+            const width = this.cacheWidth / this.zoomX;
+            const height = this.cacheHeight / this.zoomY;
+            this._cacheContext.clearRect(
+              -width / 2,
+              -height / 2,
+              width,
+              height
+            );
+          }
+          return true;
+        }
+        return false;
       },
 
       /**
-       * Execute the drawing operation for an object clipPath
+       * Renders an object on a specified context
        * @param {CanvasRenderingContext2D} ctx Context to render on
-       * @param {fabric.Object} clipPath
        */
-      drawClipPathOnCache: function (ctx, clipPath) {
+      render: function (ctx: CanvasRenderingContext2D, { forClipping }: { forClipping?: { parent: TObject; }} = {}) {
+        if (
+          // do not render if width/height are zeros or object is not visible
+          this.isNotVisible() ||
+          (this.canvas &&
+            this.canvas.skipOffscreen &&
+            !forClipping &&
+            !this.isOnScreen())
+        ) {
+          return;
+        }
         ctx.save();
-        // DEBUG: uncomment this line, comment the following
-        // ctx.globalAlpha = 0.4
-        if (clipPath.inverted) {
-          ctx.globalCompositeOperation = 'destination-out';
+        this._setupCompositeOperation(ctx, !!forClipping);
+        this.drawSelectionBackground(ctx);
+        this._setOpacity(ctx);
+        this._setShadow(ctx);
+
+        // render
+        if (this.needsItsOwnCache()) {
+          // 2 step rendering
+          const firstStep = this.canvas.contextCache;
+          this.canvas.clearContext(firstStep);
+          firstStep.save();
+          firstStep.translate(this.width / 2, this.height / 2);
+          this.renderObject(firstStep, forClipping);
+          firstStep.restore();
+          // render first step on main ctx
+          ctx.drawImage(firstStep.canvas, -this.width / 2, -this.height / 2);
         } else {
-          ctx.globalCompositeOperation = 'destination-in';
+          this.renderObject(firstStep, forClipping);
         }
-        //ctx.scale(1 / 2, 1 / 2);
-        if (clipPath.absolutePositioned) {
-          var m = fabric.util.invertTransform(this.calcTransformMatrix());
-          ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-        }
-        clipPath.transform(ctx);
-        ctx.scale(1 / clipPath.zoomX, 1 / clipPath.zoomY);
-        ctx.drawImage(
-          clipPath._cacheCanvas,
-          -clipPath.cacheTranslationX,
-          -clipPath.cacheTranslationY
-        );
+        this.dirty = false;
         ctx.restore();
+      },
+
+      /**
+       * @private
+       */
+      prepareCache: function () {
+        let saveState = false;
+        if (this.shouldCache()) {
+          if (!this._cacheCanvas || !this._cacheContext) {
+            this._createCacheCanvas();
+          }
+          if (this.isCacheDirty()) {
+            this.drawObject(this._cacheContext, !!forClipping);
+            saveState = true;
+          }
+        } else {
+          // remove cache canvas
+          this._cacheCanvas = null;
+          this._cacheContext = null;
+          this.cacheWidth = 0;
+          this.cacheHeight = 0;
+          saveState = true;
+        }
+        if (saveState && this.objectCaching && this.statefullCache) {
+          this.saveState({ propertySet: 'cacheProperties' });
+        }
+      },
+
+      renderObject: function (ctx: CanvasRenderingContext2D, forClipping?: { parent: TObject; }) {
+        if (this.absolutePositioned && forClipping?.parent) {
+          ctx.transform(
+            ...invertTransform(forClipping.parent.calcTransformMatrix())
+          );
+        }
+        this.transform(ctx);
+        this.shouldCache() ? this.drawCacheOnCanvas(ctx) : this.drawObject(ctx);
       },
 
       /**
        * Execute the drawing operation for an object on a specified context
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      drawObject: function (ctx, forClipping) {
-        var originalFill = this.fill,
+      drawObject: function (ctx: CanvasRenderingContext2D, forClipping?: boolean) {
+        const originalFill = this.fill,
           originalStroke = this.stroke;
         if (forClipping) {
           this.fill = 'black';
@@ -1298,70 +1314,31 @@ import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
        * @param {CanvasRenderingContext2D} ctx
        * @param {fabric.Object} clipPath
        */
-      _drawClipPath: function (ctx, clipPath) {
+      _drawClipPath: function (ctx: CanvasRenderingContext2D, clipPath: TObject) {
         if (!clipPath) {
           return;
         }
-        // needed to setup a couple of variables
-        // path canvas gets overridden with this one.
         // TODO find a better solution?
         clipPath._set('canvas', this.canvas);
-        clipPath.shouldCache();
         clipPath._transformDone = true;
-        clipPath.renderCache({ forClipping: true });
-        this.drawClipPathOnCache(ctx, clipPath);
+        clipPath.render(ctx, {
+          forClipping: {
+            parent: this,
+          },
+        });
       },
 
       /**
        * Paint the cached copy of the object on the target context.
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      drawCacheOnCanvas: function (ctx) {
+      drawCacheOnCanvas: function (ctx: CanvasRenderingContext2D) {
         ctx.scale(1 / this.zoomX, 1 / this.zoomY);
         ctx.drawImage(
           this._cacheCanvas,
           -this.cacheTranslationX,
           -this.cacheTranslationY
         );
-      },
-
-      /**
-       * Check if cache is dirty
-       * @param {Boolean} skipCanvas skip canvas checks because this object is painted
-       * on parent canvas.
-       */
-      isCacheDirty: function (skipCanvas) {
-        if (this.isNotVisible()) {
-          return false;
-        }
-        if (
-          this._cacheCanvas &&
-          this._cacheContext &&
-          !skipCanvas &&
-          this._updateCacheCanvas()
-        ) {
-          // in this case the context is already cleared.
-          return true;
-        } else {
-          if (
-            this.dirty ||
-            (this.clipPath && this.clipPath.absolutePositioned) ||
-            (this.statefullCache && this.hasStateChanged('cacheProperties'))
-          ) {
-            if (this._cacheCanvas && this._cacheContext && !skipCanvas) {
-              var width = this.cacheWidth / this.zoomX;
-              var height = this.cacheHeight / this.zoomY;
-              this._cacheContext.clearRect(
-                -width / 2,
-                -height / 2,
-                width,
-                height
-              );
-            }
-            return true;
-          }
-        }
-        return false;
       },
 
       /**
@@ -1380,6 +1357,22 @@ import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
         // if there is background color no other shadows
         // should be casted
         this._removeShadow(ctx);
+      },
+
+      /**
+       * Sets canvas globalCompositeOperation for specific object
+       * custom composition operation for the particular object can be specified using globalCompositeOperation property
+       * @param {CanvasRenderingContext2D} ctx Rendering canvas context
+       */
+      _setupCompositeOperation: function (ctx, forClipping) {
+        const value = forClipping
+          ? this.inverted
+            ? 'destination-out'
+            : 'destination-in'
+          : this.globalCompositeOperation;
+        if (value) {
+          ctx.globalCompositeOperation = value;
+        }
       },
 
       /**
@@ -2014,17 +2007,6 @@ import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
        */
       setOnGroup: function () {
         // implemented by sub-classes, as needed.
-      },
-
-      /**
-       * Sets canvas globalCompositeOperation for specific object
-       * custom composition operation for the particular object can be specified using globalCompositeOperation property
-       * @param {CanvasRenderingContext2D} ctx Rendering canvas context
-       */
-      _setupCompositeOperation: function (ctx) {
-        if (this.globalCompositeOperation) {
-          ctx.globalCompositeOperation = this.globalCompositeOperation;
-        }
       },
 
       /**
