@@ -30,7 +30,6 @@ export async function createCodeSandbox(appPath) {
     'package.json'
   )));
   // omit linked package
-  console.log(packageJSON.dependencies.fabric.startsWith('file:'))
   if (packageJSON.dependencies.fabric.startsWith('file:')) {
     packageJSON.dependencies.fabric = '*';
   }
