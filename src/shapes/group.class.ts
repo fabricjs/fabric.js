@@ -412,7 +412,8 @@ import { Point } from '../point.class';
       },
 
       shouldCache: function () {
-        return this.callSuper('shouldCache') && !this.interactive;
+        // return this.callSuper('shouldCache') && !this.interactive;
+        return false;
       },
 
       /**
