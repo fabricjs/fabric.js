@@ -68,6 +68,8 @@ import { Point } from '../point.class';
        */
       interactive: false,
 
+      objectCaching: false,
+
       /**
        * Used internally to optimize performance
        * Once an object is selected, instance is rendered without the selected object.
@@ -409,48 +411,8 @@ import { Point } from '../point.class';
         object.fire('removed', { target: this });
       },
 
-      /**
-       * Decide if the object should cache or not. Create its own cache level
-       * needsItsOwnCache should be used when the object drawing method requires
-       * a cache step. None of the fabric classes requires it.
-       * Generally you do not cache objects in groups because the group is already cached.
-       * @return {Boolean}
-       */
       shouldCache: function () {
-        var ownCache = fabric.Object.prototype.shouldCache.call(this);
-        if (ownCache) {
-          for (var i = 0; i < this._objects.length; i++) {
-            if (this._objects[i].willDrawShadow()) {
-              this.ownCaching = false;
-              return false;
-            }
-          }
-        }
-        return ownCache;
-      },
-
-      /**
-       * Check if this object or a child object will cast a shadow
-       * @return {Boolean}
-       */
-      willDrawShadow: function () {
-        if (fabric.Object.prototype.willDrawShadow.call(this)) {
-          return true;
-        }
-        for (var i = 0; i < this._objects.length; i++) {
-          if (this._objects[i].willDrawShadow()) {
-            return true;
-          }
-        }
-        return false;
-      },
-
-      /**
-       * Check if instance or its group are caching, recursively up
-       * @return {Boolean}
-       */
-      isOnACache: function () {
-        return this.ownCaching || (!!this.group && this.group.isOnACache());
+        return this.callSuper('shouldCache') && !this.interactive;
       },
 
       /**
@@ -463,30 +425,6 @@ import { Point } from '../point.class';
           this._objects[i].render(ctx);
         }
         this._drawClipPath(ctx, this.clipPath);
-      },
-
-      /**
-       * Check if cache is dirty
-       */
-      isCacheDirty: function (skipCanvas) {
-        if (this.callSuper('isCacheDirty', skipCanvas)) {
-          return true;
-        }
-        if (!this.statefullCache) {
-          return false;
-        }
-        for (var i = 0; i < this._objects.length; i++) {
-          if (this._objects[i].isCacheDirty(true)) {
-            if (this._cacheCanvas) {
-              // if this group has not a cache canvas there is nothing to clean
-              var x = this.cacheWidth / this.zoomX,
-                y = this.cacheHeight / this.zoomY;
-              this._cacheContext.clearRect(-x / 2, -y / 2, x, y);
-            }
-            return true;
-          }
-        }
-        return false;
       },
 
       /**
