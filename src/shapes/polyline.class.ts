@@ -77,7 +77,7 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
         return projectStrokeOnPoints(this.points, this, true);
       },
 
-      _setPositionDimensions: function (options) {
+      _setPositionDimensions: function (options = {}) {
         var calcDim = this._calcDimensions(options),
           correctLeftTop,
           correctSize = this.exactBoundingBox ? this.strokeWidth : 0;
