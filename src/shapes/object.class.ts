@@ -5,6 +5,7 @@ import { VERSION } from '../constants';
 import { Point } from '../point.class';
 import { runningAnimations } from '../util/animation_registry';
 import { capValue } from '../util/misc/capValue';
+import { createCanvasElement } from '../util/misc/dom';
 import { invertTransform } from '../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
@@ -1197,11 +1198,7 @@ export type TRenderingContext = {
        */
       prepareCache: function (renderingContext: TRenderingContext) {
         let flag = false;
-        if (
-          this.shouldCache() ||
-          this.needsItsOwnCache() ||
-          renderingContext.clipping?.source === this
-        ) {
+        if (this.shouldCache() || renderingContext.clipping?.source === this) {
           if (!this._cacheCanvas || !this._cacheContext) {
             this._createCacheCanvas();
           }
@@ -1271,38 +1268,28 @@ export type TRenderingContext = {
         this._setOpacity(ctx);
         this._setShadow(ctx);
         this.prepareCache(renderingContext);
-        this.transform(ctx);
-        this._cacheCanvas
-          ? this.drawCacheOnCanvas(ctx)
-          : this.drawObject(ctx, renderingContext);
-        // render
-        // if (this.needsItsOwnCache()) {
-        //   // 2 step rendering
-        //   const firstStep = this.canvas.contextCache;
-        //   firstStep.save();
-        //   firstStep.resetTransform();
-        //   this.canvas.clearContext(firstStep);
-        //   // firstStep.translate(this.cacheTranslationX, this.cacheTranslationY);
-        //   // firstStep.scale(this.zoomX, this.zoomY);
-        //   // this.drawObject(firstStep, !!forClipping);
-        //   // this.drawCacheOnCanvas(ctx, firstStep.canvas);
-        //   const t = ctx.getTransform();
-        //   firstStep.setTransform(t.a, t.b, t.c, t.d, t.e, t.f);
-        //   // this.renderObject(firstStep, forClipping);
-        //   this.transform(firstStep);
-        //   firstStep.translate(this.width / 2, this.height / 2);
-        //   firstStep.fillRect(
-        //     -this.width / 2,
-        //     -this.height / 2,
-        //     this.width,
-        //     this.height
-        //   );
-        //   firstStep.restore();
-        //   ctx.resetTransform();
-        //   ctx.drawImage(firstStep.canvas, 0, 0);
-        // } else {
 
-        // }
+        this.transform(ctx);
+        if (this._cacheCanvas) {
+          this.drawCacheOnCanvas(ctx);
+        } else if (this.needsItsOwnCache()) {
+          const firstStepCanvas = createCanvasElement();
+          firstStepCanvas.width = this.canvas.width;
+          firstStepCanvas.height = this.canvas.height;
+          const firstStep = firstStepCanvas.getContext('2d')!;
+          firstStep.save();
+          firstStep.setTransform(ctx.getTransform());
+          this.drawObject(firstStep, {
+            ...renderingContext,
+            caching: this,
+          });
+          ctx.resetTransform();
+          ctx.drawImage(firstStep.canvas, 0, 0);
+          firstStep.restore();
+          // firstStepCanvas.dispose();
+        } else {
+          this.drawObject(ctx, renderingContext);
+        }
 
         this.dirty = false;
         ctx.restore();
