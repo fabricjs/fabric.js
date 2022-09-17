@@ -823,7 +823,12 @@ import { pick } from './util/misc/pick';
         if (path) {
           path._set('canvas', this);
           path._transformDone = true;
-          path.render(ctx, { clipping: this });
+          path.render(ctx, {
+            clipping: {
+              source: path,
+              destination: this,
+            },
+          });
         }
         this._renderOverlay(ctx);
         if (this.controlsAboveOverlay && this.interactive) {

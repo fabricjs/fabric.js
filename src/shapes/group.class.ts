@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Point } from '../point.class';
+import { TRenderingContext } from './object.class';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -424,10 +425,13 @@ import { Point } from '../point.class';
        * Execute the drawing operation for an object on a specified context
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      drawObject: function (ctx) {
+      drawObject: function (
+        ctx: CanvasRenderingContext2D,
+        renderingContext: TRenderingContext
+      ) {
         this._renderBackground(ctx);
         for (let i = 0; i < this._objects.length; i++) {
-          this._objects[i].render(ctx);
+          this._objects[i].render(ctx, renderingContext);
         }
         this._drawClipPath(ctx, this.clipPath);
       },
@@ -437,9 +441,12 @@ import { Point } from '../point.class';
       //   this.fill = '';
       // },
 
-      // _render: function (ctx: CanvasRenderingContext2D) {
+      // _render: function (
+      //   ctx: CanvasRenderingContext2D,
+      //   renderingContext: TRenderingContext
+      // ) {
       //   this.forEachObject((object) => {
-      //     object.render(ctx);
+      //     object.render(ctx, renderingContext);
       //   });
       // },
 
@@ -459,7 +466,10 @@ import { Point } from '../point.class';
        * Renders instance on a given context
        * @param {CanvasRenderingContext2D} ctx context to render instance on
        */
-      render: function (ctx, renderingContext) {
+      render: function (
+        ctx: CanvasRenderingContext2D,
+        renderingContext: TRenderingContext
+      ) {
         //  used to inform objects not to double opacity
         this._transformDone = true;
         this.callSuper('render', ctx, renderingContext);

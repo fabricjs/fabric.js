@@ -1,14 +1,33 @@
 //@ts-nocheck
 import { cache } from '../cache';
 import { config } from '../config';
-import { iMatrix, VERSION } from '../constants';
+import { VERSION } from '../constants';
 import { Point } from '../point.class';
-import { capValue } from '../util/misc/capValue';
-import { pick } from '../util/misc/pick';
 import { runningAnimations } from '../util/animation_registry';
-import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
+import { capValue } from '../util/misc/capValue';
 import { invertTransform } from '../util/misc/matrix';
-import { TObject } from '../__types__';
+import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
+import { pick } from '../util/misc/pick';
+import { Canvas, TObject } from '../__types__';
+
+export type TRenderingContext = {
+  /**
+   * object/canvas being clipped by the rendering process
+   */
+  clipping?: {
+    source: TObject;
+    destination: TObject | Canvas;
+  };
+  /**
+   * object being cached by the rendering process
+   */
+  caching?: TObject;
+  /**
+   * By default fabric checks if an object is included in the viewport before rendering.
+   * This flag overrides the check and forces rendering to occur.
+   */
+  force?: boolean;
+};
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -1176,9 +1195,13 @@ import { TObject } from '../__types__';
       /**
        * @private
        */
-      prepareCache: function (forClipping: boolean) {
+      prepareCache: function (renderingContext: TRenderingContext) {
         let flag = false;
-        if (this.shouldCache() || this.needsItsOwnCache() || forClipping) {
+        if (
+          this.shouldCache() ||
+          this.needsItsOwnCache() ||
+          renderingContext.clipping?.source === this
+        ) {
           if (!this._cacheCanvas || !this._cacheContext) {
             this._createCacheCanvas();
           }
@@ -1201,7 +1224,10 @@ import { TObject } from '../__types__';
             flag = true;
           }
           if (flag) {
-            this.drawObject(this._cacheContext, forClipping);
+            this.drawObject(this._cacheContext, {
+              ...renderingContext,
+              caching: this,
+            });
           }
         } else {
           // remove cache canvas
@@ -1222,29 +1248,33 @@ import { TObject } from '../__types__';
        */
       render: function (
         ctx: CanvasRenderingContext2D,
-        { clipping }: { clipping?: TObject | TCanvas } = {}
+        renderingContext: TRenderingContext = {}
       ) {
         if (
           // do not render if width/height are zeros or object is not visible
           this.isNotVisible() ||
           (this.canvas &&
             this.canvas.skipOffscreen &&
-            !clipping &&
-            !this.group &&
+            !renderingContext.clipping &&
+            !renderingContext.caching &&
+            !renderingContext.force &&
             !this.isOnScreen())
         ) {
           return;
         }
         ctx.save();
-        this._setupCompositeOperation(ctx, !!clipping);
+        this._setupCompositeOperation(
+          ctx,
+          renderingContext.clipping?.source === this
+        );
         this.drawSelectionBackground(ctx);
         this._setOpacity(ctx);
         this._setShadow(ctx);
-        this.prepareCache(!!clipping);
+        this.prepareCache(renderingContext);
         this.transform(ctx);
         this._cacheCanvas
           ? this.drawCacheOnCanvas(ctx)
-          : this.drawObject(ctx, !!clipping);
+          : this.drawObject(ctx, renderingContext);
         // render
         // if (this.needsItsOwnCache()) {
         //   // 2 step rendering
@@ -1284,18 +1314,18 @@ import { TObject } from '../__types__';
        */
       drawObject: function (
         ctx: CanvasRenderingContext2D,
-        forClipping?: boolean
+        renderingContext: TRenderingContext
       ) {
         const originalFill = this.fill,
           originalStroke = this.stroke;
-        if (forClipping) {
+        if (renderingContext.clipping?.source === this) {
           this.fill = 'black';
           this.stroke = '';
           this._setClippingProperties(ctx);
         } else {
           this._renderBackground(ctx);
         }
-        this._render(ctx);
+        this._render(ctx, renderingContext);
         this._drawClipPath(ctx, this.clipPath);
         this.fill = originalFill;
         this.stroke = originalStroke;
@@ -1322,7 +1352,10 @@ import { TObject } from '../__types__';
           ctx.transform(...invertTransform(this.calcTransformMatrix()));
         }
         clipPath.render(ctx, {
-          clipping: this,
+          clipping: {
+            source: clipPath,
+            destination: this,
+          },
         });
         ctx.restore();
       },

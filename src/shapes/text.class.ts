@@ -2,6 +2,7 @@
 
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
+import { TRenderingContext } from './object.class';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {});
@@ -1672,7 +1673,7 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
        */
       render: function (
         ctx: CanvasRenderingContext2D,
-        { clipping }: { clipping?: TObject | TCanvas } = {}
+        renderingContext: TRenderingContext = {}
       ) {
         // do not render if object is not visible
         if (!this.visible) {
@@ -1681,8 +1682,9 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
         if (
           this.canvas &&
           this.canvas.skipOffscreen &&
-          !clipping &&
-          !this.group &&
+          !renderingContext.clipping &&
+          !renderingContext.caching &&
+          !renderingContext.force &&
           !this.isOnScreen()
         ) {
           return;
@@ -1690,7 +1692,7 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
         if (this._shouldClearDimensionCache()) {
           this.initDimensions();
         }
-        this.callSuper('render', ctx);
+        this.callSuper('render', ctx, renderingContext);
       },
 
       /**
