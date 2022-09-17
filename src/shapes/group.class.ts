@@ -411,10 +411,10 @@ import { Point } from '../point.class';
         object.fire('removed', { target: this });
       },
 
-      // shouldCache: function () {
-      //   // return this.callSuper('shouldCache') && !this.interactive;
-      //   return false;
-      // },
+      shouldCache: function () {
+        // return this.callSuper('shouldCache') && !this.interactive;
+        return false;
+      },
 
       needsItsOwnCache: function () {
         return true;
