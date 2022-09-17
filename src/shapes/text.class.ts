@@ -1682,6 +1682,7 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
           this.canvas &&
           this.canvas.skipOffscreen &&
           !forClipping &&
+          !this.group &&
           !this.isOnScreen()
         ) {
           return;

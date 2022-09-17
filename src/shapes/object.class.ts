@@ -1230,6 +1230,7 @@ import { TObject } from '../__types__';
           (this.canvas &&
             this.canvas.skipOffscreen &&
             !forClipping &&
+            !this.group &&
             !this.isOnScreen())
         ) {
           return;
@@ -1240,11 +1241,6 @@ import { TObject } from '../__types__';
         this._setOpacity(ctx);
         this._setShadow(ctx);
         this.prepareCache(!!forClipping);
-        if (this.absolutePositioned && forClipping?.parent) {
-          ctx.transform(
-            ...invertTransform(forClipping.parent.calcTransformMatrix())
-          );
-        }
         this.transform(ctx);
         this._cacheCanvas
           ? this.drawCacheOnCanvas(ctx)
@@ -1322,6 +1318,9 @@ import { TObject } from '../__types__';
         // TODO find a better solution?
         clipPath._set('canvas', this.canvas);
         clipPath._transformDone = true;
+        if (clipPath.absolutePositioned) {
+          ctx.transform(...invertTransform(this.calcTransformMatrix()));
+        }
         clipPath.render(ctx, {
           forClipping: {
             parent: this,
