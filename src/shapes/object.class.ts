@@ -1222,29 +1222,29 @@ import { TObject } from '../__types__';
        */
       render: function (
         ctx: CanvasRenderingContext2D,
-        { forClipping }: { forClipping?: { parent: TObject } } = {}
+        { clipping }: { clipping?: TObject | TCanvas } = {}
       ) {
         if (
           // do not render if width/height are zeros or object is not visible
           this.isNotVisible() ||
           (this.canvas &&
             this.canvas.skipOffscreen &&
-            !forClipping &&
+            !clipping &&
             !this.group &&
             !this.isOnScreen())
         ) {
           return;
         }
         ctx.save();
-        this._setupCompositeOperation(ctx, !!forClipping);
+        this._setupCompositeOperation(ctx, !!clipping);
         this.drawSelectionBackground(ctx);
         this._setOpacity(ctx);
         this._setShadow(ctx);
-        this.prepareCache(!!forClipping);
+        this.prepareCache(!!clipping);
         this.transform(ctx);
         this._cacheCanvas
           ? this.drawCacheOnCanvas(ctx)
-          : this.drawObject(ctx, !!forClipping);
+          : this.drawObject(ctx, !!clipping);
         // render
         // if (this.needsItsOwnCache()) {
         //   // 2 step rendering
@@ -1322,27 +1322,8 @@ import { TObject } from '../__types__';
           ctx.transform(...invertTransform(this.calcTransformMatrix()));
         }
         clipPath.render(ctx, {
-          forClipping: {
-            parent: this,
-          },
+          clipping: this,
         });
-        // clipPath.prepareCache(true);
-        // ctx.save();
-        // // DEBUG: uncomment this line, comment the following
-        // // ctx.globalAlpha = 0.4
-        // if (clipPath.inverted) {
-        //   ctx.globalCompositeOperation = 'destination-out';
-        // } else {
-        //   ctx.globalCompositeOperation = 'destination-in';
-        // }
-        // //ctx.scale(1 / 2, 1 / 2);
-        // if (clipPath.absolutePositioned) {
-        //   const m = fabric.util.invertTransform(this.calcTransformMatrix());
-        //   ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-        // }
-        // clipPath.transform(ctx);
-        // console.log(clipPath._cacheCanvas);
-        // clipPath.drawCacheOnCanvas(ctx, clipPath._cacheCanvas);
         ctx.restore();
       },
 

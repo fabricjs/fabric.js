@@ -1672,7 +1672,7 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
        */
       render: function (
         ctx: CanvasRenderingContext2D,
-        { forClipping }: { forClipping?: { parent: TObject } } = {}
+        { clipping }: { clipping?: TObject | TCanvas } = {}
       ) {
         // do not render if object is not visible
         if (!this.visible) {
@@ -1681,7 +1681,7 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
         if (
           this.canvas &&
           this.canvas.skipOffscreen &&
-          !forClipping &&
+          !clipping &&
           !this.group &&
           !this.isOnScreen()
         ) {
