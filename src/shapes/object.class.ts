@@ -1063,15 +1063,11 @@ import { TObject } from '../__types__';
         this[key] = value;
 
         if (isChanged) {
-          groupNeedsUpdate = this.group && this.group.shouldCache();
           if (this.cacheProperties.indexOf(key) > -1) {
             this.dirty = true;
-            groupNeedsUpdate && this.group.set('dirty', true);
-          } else if (
-            groupNeedsUpdate &&
-            this.stateProperties.indexOf(key) > -1
-          ) {
-            this.group.set('dirty', true);
+            this.group?.set('dirty', true);
+          } else if (this.stateProperties.indexOf(key) > -1) {
+            this.group?.set('dirty', true);
           }
         }
         return this;
@@ -1182,7 +1178,7 @@ import { TObject } from '../__types__';
        */
       prepareCache: function (forClipping: boolean) {
         let flag = false;
-        if (this.shouldCache()) {
+        if (this.shouldCache() || forClipping) {
           if (!this._cacheCanvas || !this._cacheContext) {
             this._createCacheCanvas();
           }
@@ -1244,39 +1240,46 @@ import { TObject } from '../__types__';
         this._setOpacity(ctx);
         this._setShadow(ctx);
         this.prepareCache(!!forClipping);
-        // render
-        if (this.needsItsOwnCache()) {
-          // 2 step rendering
-          const firstStep = this.canvas.contextCache;
-          firstStep.save();
-          firstStep.resetTransform();
-          this.canvas.clearContext(firstStep);
-          firstStep.translate(this.cacheTranslationX, this.cacheTranslationY);
-          firstStep.scale(this.zoomX, this.zoomY);
-          this.drawObject(firstStep, !!forClipping);
-          this.drawCacheOnCanvas(ctx, firstStep.canvas);
-          firstStep.restore();
-        } else {
-          this.renderObject(ctx, forClipping);
-        }
-
-        this.dirty = false;
-        ctx.restore();
-      },
-
-      renderObject: function (
-        ctx: CanvasRenderingContext2D,
-        forClipping?: { parent: TObject }
-      ) {
         if (this.absolutePositioned && forClipping?.parent) {
           ctx.transform(
             ...invertTransform(forClipping.parent.calcTransformMatrix())
           );
         }
         this.transform(ctx);
-        this.shouldCache()
-          ? this.drawCacheOnCanvas(ctx, this._cacheCanvas)
-          : this.drawObject(ctx, forClipping);
+        this._cacheCanvas
+          ? this.drawCacheOnCanvas(ctx)
+          : this.drawObject(ctx, !!forClipping);
+        // render
+        // if (this.needsItsOwnCache()) {
+        //   // 2 step rendering
+        //   const firstStep = this.canvas.contextCache;
+        //   firstStep.save();
+        //   firstStep.resetTransform();
+        //   this.canvas.clearContext(firstStep);
+        //   // firstStep.translate(this.cacheTranslationX, this.cacheTranslationY);
+        //   // firstStep.scale(this.zoomX, this.zoomY);
+        //   // this.drawObject(firstStep, !!forClipping);
+        //   // this.drawCacheOnCanvas(ctx, firstStep.canvas);
+        //   const t = ctx.getTransform();
+        //   firstStep.setTransform(t.a, t.b, t.c, t.d, t.e, t.f);
+        //   // this.renderObject(firstStep, forClipping);
+        //   this.transform(firstStep);
+        //   firstStep.translate(this.width / 2, this.height / 2);
+        //   firstStep.fillRect(
+        //     -this.width / 2,
+        //     -this.height / 2,
+        //     this.width,
+        //     this.height
+        //   );
+        //   firstStep.restore();
+        //   ctx.resetTransform();
+        //   ctx.drawImage(firstStep.canvas, 0, 0);
+        // } else {
+
+        // }
+
+        this.dirty = false;
+        ctx.restore();
       },
 
       /**
@@ -1314,6 +1317,8 @@ import { TObject } from '../__types__';
         if (!clipPath) {
           return;
         }
+        // needed to setup a couple of variables
+        // path canvas gets overridden with this one.
         // TODO find a better solution?
         clipPath._set('canvas', this.canvas);
         clipPath._transformDone = true;
@@ -1322,6 +1327,24 @@ import { TObject } from '../__types__';
             parent: this,
           },
         });
+        // clipPath.prepareCache(true);
+        // ctx.save();
+        // // DEBUG: uncomment this line, comment the following
+        // // ctx.globalAlpha = 0.4
+        // if (clipPath.inverted) {
+        //   ctx.globalCompositeOperation = 'destination-out';
+        // } else {
+        //   ctx.globalCompositeOperation = 'destination-in';
+        // }
+        // //ctx.scale(1 / 2, 1 / 2);
+        // if (clipPath.absolutePositioned) {
+        //   const m = fabric.util.invertTransform(this.calcTransformMatrix());
+        //   ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        // }
+        // clipPath.transform(ctx);
+        // console.log(clipPath._cacheCanvas);
+        // clipPath.drawCacheOnCanvas(ctx, clipPath._cacheCanvas);
+        ctx.restore();
       },
 
       /**
@@ -1330,7 +1353,7 @@ import { TObject } from '../__types__';
        */
       drawCacheOnCanvas: function (
         ctx: CanvasRenderingContext2D,
-        source: HTMLCanvasElement
+        source: HTMLCanvasElement = this._cacheCanvas
       ) {
         ctx.scale(1 / this.zoomX, 1 / this.zoomY);
         ctx.drawImage(source, -this.cacheTranslationX, -this.cacheTranslationY);
