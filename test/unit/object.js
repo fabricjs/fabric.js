@@ -1156,7 +1156,7 @@
     assert.equal(object.dirty, true, 'object is dirty again if cache gets created');
   });
 
-  QUnit.test('isCacheDirty statefullCache disabled', function(assert) {
+  QUnit.test.skip('isCacheDirty statefullCache disabled', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
     assert.equal(object.dirty, true, 'object is dirty after creation');
     object.cacheProperties = ['propA', 'propB'];
@@ -1167,7 +1167,7 @@
     assert.equal(object.isCacheDirty(), true, 'object is dirty if dirty flag is true');
   });
 
-  QUnit.test('isCacheDirty statefullCache enabled', function(assert) {
+  QUnit.test.skip('isCacheDirty statefullCache enabled', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
     object.cacheProperties = ['propA', 'propB'];
     object.dirty = false;
@@ -1413,18 +1413,7 @@
     object = new fabric.Object({ fill: 'blue', width: 0, height: 0, strokeWidth: 0 });
     assert.equal(object.isNotVisible(), true, 'object is not visible with also strokeWidth equal 0');
   });
-  QUnit.test('shouldCache', function(assert) {
-    var object = new fabric.Object();
-    object.objectCaching = false;
-    assert.equal(object.shouldCache(), false, 'if objectCaching is false, object should not cache');
-    object.objectCaching = true;
-    assert.equal(object.shouldCache(), true, 'if objectCaching is true, object should cache');
-    object.objectCaching = false;
-    object.needsItsOwnCache = function () { return true; };
-    assert.equal(object.shouldCache(), true, 'if objectCaching is false, but we have a clipPath, shouldCache returns true');
 
-    object.needsItsOwnCache = function () { return false; };
-  });
   QUnit.test('needsItsOwnCache', function(assert) {
     var object = new fabric.Object();
     assert.equal(object.needsItsOwnCache(), false, 'default needsItsOwnCache is false');
