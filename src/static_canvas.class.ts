@@ -454,9 +454,7 @@ import { pick } from './util/misc/pick';
           this.upperCanvasEl[prop] = value;
         }
 
-        if (this.cacheCanvasEl) {
-          this.cacheCanvasEl[prop] = value;
-        }
+        this.cacheCanvasEl[prop] = value;
 
         this[prop] = value;
 
