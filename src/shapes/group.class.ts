@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Point } from '../point.class';
-import { TRenderingContext } from './object.class';
+import { TRenderingContext } from './RenderingContext';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
