@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { cache } from '../cache';
 import { config } from '../config';
-import { VERSION } from '../constants';
+import { iMatrix, VERSION } from '../constants';
 import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
 import { pick } from '../util/misc/pick';
@@ -1174,32 +1174,26 @@ import { TObject } from '../__types__';
        * @return {Boolean}
        */
       shouldCache: function () {
-        return this.objectCaching;
+        return this.objectCaching && !this.isNotVisible();
       },
 
       /**
-       * Check if cache is dirty
-       * @param {Boolean} skipCanvas skip canvas checks because this object is painted
-       * on parent canvas.
+       * @private
        */
-      isCacheDirty: function (skipCanvas) {
-        if (this.isNotVisible()) {
-          return false;
-        }
-        if (
-          this._cacheCanvas &&
-          this._cacheContext &&
-          !skipCanvas &&
-          this._updateCacheCanvas()
-        ) {
-          // context was cleared by `_updateCacheCanvas`
-          return true;
-        } else if (
-          this.dirty ||
-          (this.clipPath && this.clipPath.absolutePositioned) ||
-          (this.statefullCache && this.hasStateChanged('cacheProperties'))
-        ) {
-          if (this._cacheCanvas && this._cacheContext && !skipCanvas) {
+      prepareCache: function (forClipping: boolean) {
+        let flag = false;
+        if (this.shouldCache()) {
+          if (!this._cacheCanvas || !this._cacheContext) {
+            this._createCacheCanvas();
+          }
+          if (this._updateCacheCanvas()) {
+            // context was cleared by `_updateCacheCanvas`
+            flag = true;
+          } else if (
+            this.dirty ||
+            (this.clipPath && this.clipPath.absolutePositioned) ||
+            (this.statefullCache && this.hasStateChanged('cacheProperties'))
+          ) {
             const width = this.cacheWidth / this.zoomX;
             const height = this.cacheHeight / this.zoomY;
             this._cacheContext.clearRect(
@@ -1208,24 +1202,10 @@ import { TObject } from '../__types__';
               width,
               height
             );
+            flag = true;
           }
-          return true;
-        }
-        return false;
-      },
-
-      /**
-       * @private
-       */
-      prepareCache: function () {
-        let saveState = false;
-        if (this.shouldCache()) {
-          if (!this._cacheCanvas || !this._cacheContext) {
-            this._createCacheCanvas();
-          }
-          if (this.isCacheDirty()) {
-            this.drawObject(this._cacheContext, !!forClipping);
-            saveState = true;
+          if (flag) {
+            this.drawObject(this._cacheContext, forClipping);
           }
         } else {
           // remove cache canvas
@@ -1233,9 +1213,9 @@ import { TObject } from '../__types__';
           this._cacheContext = null;
           this.cacheWidth = 0;
           this.cacheHeight = 0;
-          saveState = true;
+          flag = true;
         }
-        if (saveState && this.objectCaching && this.statefullCache) {
+        if (flag && this.objectCaching && this.statefullCache) {
           this.saveState({ propertySet: 'cacheProperties' });
         }
       },
@@ -1244,7 +1224,10 @@ import { TObject } from '../__types__';
        * Renders an object on a specified context
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      render: function (ctx: CanvasRenderingContext2D, { forClipping }: { forClipping?: { parent: TObject; }} = {}) {
+      render: function (
+        ctx: CanvasRenderingContext2D,
+        { forClipping }: { forClipping?: { parent: TObject } } = {}
+      ) {
         if (
           // do not render if width/height are zeros or object is not visible
           this.isNotVisible() ||
@@ -1260,40 +1243,49 @@ import { TObject } from '../__types__';
         this.drawSelectionBackground(ctx);
         this._setOpacity(ctx);
         this._setShadow(ctx);
-
+        this.prepareCache(!!forClipping);
         // render
         if (this.needsItsOwnCache()) {
           // 2 step rendering
           const firstStep = this.canvas.contextCache;
-          this.canvas.clearContext(firstStep);
           firstStep.save();
-          firstStep.translate(this.width / 2, this.height / 2);
-          this.renderObject(firstStep, forClipping);
+          firstStep.resetTransform();
+          this.canvas.clearContext(firstStep);
+          firstStep.translate(this.cacheTranslationX, this.cacheTranslationY);
+          firstStep.scale(this.zoomX, this.zoomY);
+          this.drawCacheOnCanvas(ctx, firstStep.canvas);
           firstStep.restore();
-          // render first step on main ctx
-          ctx.drawImage(firstStep.canvas, -this.width / 2, -this.height / 2);
         } else {
-          this.renderObject(firstStep, forClipping);
+          this.renderObject(ctx, forClipping);
         }
+
         this.dirty = false;
         ctx.restore();
       },
 
-      renderObject: function (ctx: CanvasRenderingContext2D, forClipping?: { parent: TObject; }) {
+      renderObject: function (
+        ctx: CanvasRenderingContext2D,
+        forClipping?: { parent: TObject }
+      ) {
         if (this.absolutePositioned && forClipping?.parent) {
           ctx.transform(
             ...invertTransform(forClipping.parent.calcTransformMatrix())
           );
         }
         this.transform(ctx);
-        this.shouldCache() ? this.drawCacheOnCanvas(ctx) : this.drawObject(ctx);
+        this.shouldCache()
+          ? this.drawCacheOnCanvas(ctx, this._cacheCanvas)
+          : this.drawObject(ctx, forClipping);
       },
 
       /**
        * Execute the drawing operation for an object on a specified context
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      drawObject: function (ctx: CanvasRenderingContext2D, forClipping?: boolean) {
+      drawObject: function (
+        ctx: CanvasRenderingContext2D,
+        forClipping?: boolean
+      ) {
         const originalFill = this.fill,
           originalStroke = this.stroke;
         if (forClipping) {
@@ -1314,7 +1306,10 @@ import { TObject } from '../__types__';
        * @param {CanvasRenderingContext2D} ctx
        * @param {fabric.Object} clipPath
        */
-      _drawClipPath: function (ctx: CanvasRenderingContext2D, clipPath: TObject) {
+      _drawClipPath: function (
+        ctx: CanvasRenderingContext2D,
+        clipPath: TObject
+      ) {
         if (!clipPath) {
           return;
         }
@@ -1332,13 +1327,12 @@ import { TObject } from '../__types__';
        * Paint the cached copy of the object on the target context.
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      drawCacheOnCanvas: function (ctx: CanvasRenderingContext2D) {
+      drawCacheOnCanvas: function (
+        ctx: CanvasRenderingContext2D,
+        source: HTMLCanvasElement
+      ) {
         ctx.scale(1 / this.zoomX, 1 / this.zoomY);
-        ctx.drawImage(
-          this._cacheCanvas,
-          -this.cacheTranslationX,
-          -this.cacheTranslationY
-        );
+        ctx.drawImage(source, -this.cacheTranslationX, -this.cacheTranslationY);
       },
 
       /**

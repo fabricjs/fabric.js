@@ -568,9 +568,9 @@
        * it will set the imageSmoothing for the draw operation
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      drawCacheOnCanvas: function (ctx) {
+      drawCacheOnCanvas: function (ctx, source: HTMLCanvasElement) {
         ctx.imageSmoothingEnabled = this.imageSmoothing;
-        this.callSuper('drawCacheOnCanvas', ctx);
+        this.callSuper('drawCacheOnCanvas', ctx, source);
       },
 
       _renderFill: function (ctx) {
