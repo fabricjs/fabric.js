@@ -345,5 +345,53 @@
     height: 400,
   });
 
+  tests.push({
+    test: 'clipped group with nested shadow',
+    code: (canvas, callback) => {
+      const group = new fabric.Group(
+        [
+          new fabric.Rect({ width: 100, height: 100, fill: "magenta" }),
+          new fabric.Rect({ width: 100, height: 100, fill: "yellow", left: 100 }),
+          new fabric.Rect({ width: 100, height: 100, fill: "blue", top: 100 }),
+          new fabric.Rect({
+            width: 100,
+            height: 100,
+            fill: "green",
+            left: 100,
+            top: 100
+          }),
+          new fabric.Text("Text\nShadow Test", {
+            fontSize: 48,
+            top: 24,
+            textAlign: 'center',
+            // originX: 'center',
+            // originY: 'center',
+            shadow: new fabric.Shadow({
+              color: "red",
+              blur: 5,
+              offsetX: 20,
+              offsetY: 20
+            })
+          })
+        ],
+        {
+          clipPath: new fabric.Circle({
+            radius: 100,
+            originX: 'center',
+            originY: 'center',
+          }),
+        }
+      );
+      group.rotate(180);
+      canvas.add(group);
+      canvas.renderAll();
+      callback(canvas.lowerCanvasEl);
+    },
+    golden: 'cachingGroupWithNestedShadow.png',
+    percentage: 0.06,
+    width: 400,
+    height: 400,
+  });
+
   tests.forEach(visualTestLoop(QUnit));
 })();
