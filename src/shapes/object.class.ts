@@ -1180,7 +1180,7 @@ import { canvasProvider, TRenderingContext } from './RenderingContext';
        */
       prepareCache: function (renderingContext: TRenderingContext) {
         let flag = false;
-        if (this.shouldCache() || renderingContext.clipping?.source === this) {
+        if (this.shouldCache()) {
           if (!this._cacheCanvas || !this._cacheContext) {
             this._createCacheCanvas();
           }
@@ -1252,21 +1252,25 @@ import { canvasProvider, TRenderingContext } from './RenderingContext';
         this.prepareCache(renderingContext);
 
         this.transform(ctx);
-        if (this._cacheCanvas) {
-          this.drawCacheOnCanvas(ctx);
-        } else if (this.needsItsOwnCache()) {
+        if (
+          this.needsItsOwnCache() ||
+          renderingContext.clipping?.source === this
+        ) {
+          const target = renderingContext.clipping?.destination || this.canvas;
           const { ctx: firstStep, release } = canvasProvider.request({
-            width: this.canvas.width,
-            height: this.canvas.height,
+            width: target.width,
+            height: target.height,
           });
           firstStep.save();
           firstStep.setTransform(ctx.getTransform());
+          // firstStep?.translate(this.width / 2, this.height / 2);
           this.drawObject(firstStep, {
             ...renderingContext,
             caching: this,
           });
           ctx.resetTransform();
           ctx.drawImage(firstStep.canvas, 0, 0);
+          // ctx.drawImage(firstStep.canvas, -this.width / 2, -this.height / 2);
           firstStep.restore();
           release();
         } else {
