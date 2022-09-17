@@ -1551,7 +1551,8 @@ export type TRenderingContext = {
 
         const offset = new Point(shadow.offsetX, shadow.offsetY)
           .multiply(scaling)
-          .multiply(mult);
+          .multiply(mult)
+          .rotate(degreesToRadians(this.getTotalAngle()));
         ctx.shadowOffsetX = offset.x;
         ctx.shadowOffsetY = offset.y;
       },
