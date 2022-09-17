@@ -1253,6 +1253,7 @@ import { TObject } from '../__types__';
           this.canvas.clearContext(firstStep);
           firstStep.translate(this.cacheTranslationX, this.cacheTranslationY);
           firstStep.scale(this.zoomX, this.zoomY);
+          this.drawObject(firstStep, !!forClipping);
           this.drawCacheOnCanvas(ctx, firstStep.canvas);
           firstStep.restore();
         } else {
