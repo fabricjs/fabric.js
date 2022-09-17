@@ -424,24 +424,24 @@ import { Point } from '../point.class';
        * Execute the drawing operation for an object on a specified context
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      // drawObject: function (ctx) {
-      //   this._renderBackground(ctx);
-      //   for (var i = 0; i < this._objects.length; i++) {
-      //     this._objects[i].render(ctx);
-      //   }
-      //   this._drawClipPath(ctx, this.clipPath);
-      // },
+      drawObject: function (ctx) {
+        this._renderBackground(ctx);
+        for (let i = 0; i < this._objects.length; i++) {
+          this._objects[i].render(ctx);
+        }
+        this._drawClipPath(ctx, this.clipPath);
+      },
 
       // _setClippingProperties: function (ctx) {
       //   this.callSuper('_setClippingProperties', ctx);
       //   this.fill = '';
       // },
 
-      _render: function (ctx: CanvasRenderingContext2D) {
-        this.forEachObject((object) => {
-          object.render(ctx);
-        });
-      },
+      // _render: function (ctx: CanvasRenderingContext2D) {
+      //   this.forEachObject((object) => {
+      //     object.render(ctx);
+      //   });
+      // },
 
       /**
        * @override
