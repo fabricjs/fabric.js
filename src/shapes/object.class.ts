@@ -1178,7 +1178,7 @@ import { TObject } from '../__types__';
        */
       prepareCache: function (forClipping: boolean) {
         let flag = false;
-        if (this.shouldCache() || forClipping) {
+        if (this.shouldCache() || this.needsItsOwnCache() || forClipping) {
           if (!this._cacheCanvas || !this._cacheContext) {
             this._createCacheCanvas();
           }
