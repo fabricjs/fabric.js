@@ -796,6 +796,31 @@
 
   });
 
+  QUnit.test('group shouldCache', function(assert) {
+    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
+        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
+        rect3 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
+        rect4 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
+        group = new fabric.Group([rect1, rect2], { objectCaching: true}),
+        group2 = new fabric.Group([rect3, rect4], { objectCaching: true}),
+        group3 = new fabric.Group([group, group2], { objectCaching: true});
+
+    assert.equal(group3.shouldCache(), true, 'group3 will cache because no child has shadow');
+    assert.equal(group2.shouldCache(), false, 'group2 will not cache because is drawing on parent group3 cache');
+    assert.equal(rect3.shouldCache(), false, 'rect3 will not cache because is drawing on parent2 group cache');
+
+    group2.shadow = { offsetX: 2, offsetY: 0 };
+    rect1.shadow = { offsetX: 0, offsetY: 2 };
+
+    assert.equal(group3.shouldCache(), false, 'group3 will cache because children have shadow');
+    assert.equal(group2.shouldCache(), true, 'group2 will cache because is not drawing on parent group3 cache and no children have shadow');
+    assert.equal(group.shouldCache(), false, 'group will not cache because even if is not drawing on parent group3 cache children have shadow');
+
+    assert.equal(rect1.shouldCache(), true, 'rect1 will cache because none of its parent is caching');
+    assert.equal(rect3.shouldCache(), false, 'rect3 will not cache because group2 is caching');
+
+  });
+
   QUnit.test('canvas prop propagation with set', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
