@@ -411,21 +411,36 @@ import { Point } from '../point.class';
         object.fire('removed', { target: this });
       },
 
-      shouldCache: function () {
-        // return this.callSuper('shouldCache') && !this.interactive;
-        return false;
+      // shouldCache: function () {
+      //   // return this.callSuper('shouldCache') && !this.interactive;
+      //   return false;
+      // },
+
+      needsItsOwnCache: function () {
+        return true;
       },
 
       /**
        * Execute the drawing operation for an object on a specified context
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      drawObject: function (ctx) {
-        this._renderBackground(ctx);
-        for (var i = 0; i < this._objects.length; i++) {
-          this._objects[i].render(ctx);
-        }
-        this._drawClipPath(ctx, this.clipPath);
+      // drawObject: function (ctx) {
+      //   this._renderBackground(ctx);
+      //   for (var i = 0; i < this._objects.length; i++) {
+      //     this._objects[i].render(ctx);
+      //   }
+      //   this._drawClipPath(ctx, this.clipPath);
+      // },
+
+      // _setClippingProperties: function (ctx) {
+      //   this.callSuper('_setClippingProperties', ctx);
+      //   this.fill = '';
+      // },
+
+      _render: function (ctx: CanvasRenderingContext2D) {
+        this.forEachObject((object) => {
+          object.render(ctx);
+        });
       },
 
       /**
@@ -444,10 +459,10 @@ import { Point } from '../point.class';
        * Renders instance on a given context
        * @param {CanvasRenderingContext2D} ctx context to render instance on
        */
-      render: function (ctx) {
+      render: function (ctx, renderingContext) {
         //  used to inform objects not to double opacity
         this._transformDone = true;
-        this.callSuper('render', ctx);
+        this.callSuper('render', ctx, renderingContext);
         this._transformDone = false;
       },
 

@@ -258,9 +258,9 @@
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      render: function (ctx) {
+      render: function (ctx, renderingContext) {
         this.clearContextTop();
-        this.callSuper('render', ctx);
+        this.callSuper('render', ctx, renderingContext);
         // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
         // the correct position but not at every cursor animation.
         this.cursorOffsetCache = {};
