@@ -350,21 +350,23 @@
     code: (canvas, callback) => {
       const group = new fabric.Group(
         [
-          // new fabric.Rect({ width: 200, height: 200, left: 100, fill: "green" }),
           new fabric.Rect({ width: 300, height: 200, fill: "yellow" }),
+          new fabric.Rect({ width: 150, height: 100, fill: "green" }),
+          new fabric.Rect({ width: 150, height: 100, left: 150, fill: "blue" }),
+          new fabric.Rect({ width: 150, height: 100, left: 150, top: 100, fill: "magenta" }),
           new fabric.Text("Clipped Text\nShadow Test", {
             fontSize: 48,
+            fontWeight: 'bold',
             top: 24,
             textAlign: 'center',
-            // originX: 'center',
-            // originY: 'center',
             shadow: new fabric.Shadow({
               color: "red",
               blur: 5,
               offsetX: 20,
               offsetY: 20
             })
-          })
+          }),
+
         ],
         {
           clipPath: new fabric.Circle({
