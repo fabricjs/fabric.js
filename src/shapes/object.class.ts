@@ -5,7 +5,6 @@ import { VERSION } from '../constants';
 import { Point } from '../point.class';
 import { runningAnimations } from '../util/animation_registry';
 import { capValue } from '../util/misc/capValue';
-import { createCanvasElement } from '../util/misc/dom';
 import { invertTransform } from '../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
@@ -1504,26 +1503,28 @@ import { canvasProvider, TRenderingContext } from './RenderingContext';
           return;
         }
 
-        var shadow = this.shadow,
-          canvas = this.canvas,
-          multX = (canvas && canvas.viewportTransform[0]) || 1,
-          multY = (canvas && canvas.viewportTransform[3]) || 1,
+        const shadow = this.shadow,
           scaling = shadow.nonScaling
             ? new Point(1, 1)
-            : this.getObjectScaling();
-        if (canvas && canvas._isRetinaScaling()) {
-          multX *= config.devicePixelRatio;
-          multY *= config.devicePixelRatio;
-        }
+            : this.getObjectScaling(),
+          mult = new Point(
+            this.canvas?.viewportTransform[0] || 1,
+            this.canvas?.viewportTransform[3] || 1
+          ).scalarMultiply(this.canvas?.getRetinaScaling() || 1);
+
         ctx.shadowColor = shadow.color;
         ctx.shadowBlur =
           (shadow.blur *
             config.browserShadowBlurConstant *
-            (multX + multY) *
+            (mult.x + mult.y) *
             (scaling.x + scaling.y)) /
           4;
-        ctx.shadowOffsetX = shadow.offsetX * multX * scaling.x;
-        ctx.shadowOffsetY = shadow.offsetY * multY * scaling.y;
+
+        const offset = new Point(shadow.offsetX, shadow.offsetY)
+          .multiply(scaling)
+          .multiply(mult);
+        ctx.shadowOffsetX = offset.x;
+        ctx.shadowOffsetY = offset.y;
       },
 
       /**
