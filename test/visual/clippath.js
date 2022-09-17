@@ -387,7 +387,7 @@
     tests.push({
       test: 'clipped group with nested shadow',
       code: createClippedNestedShadowedTextTest(deg),
-      golden: `clipped-nested-shadow-${deg}deg.png`,
+      golden: `clipping/nested-shadow ${deg}deg.png`,
       percentage: 0.06,
       width: 250,
       height: 200,
