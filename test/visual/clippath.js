@@ -350,17 +350,9 @@
     code: (canvas, callback) => {
       const group = new fabric.Group(
         [
-          new fabric.Rect({ width: 100, height: 100, fill: "magenta" }),
-          new fabric.Rect({ width: 100, height: 100, fill: "yellow", left: 100 }),
-          new fabric.Rect({ width: 100, height: 100, fill: "blue", top: 100 }),
-          new fabric.Rect({
-            width: 100,
-            height: 100,
-            fill: "green",
-            left: 100,
-            top: 100
-          }),
-          new fabric.Text("Text\nShadow Test", {
+          // new fabric.Rect({ width: 200, height: 200, left: 100, fill: "green" }),
+          new fabric.Rect({ width: 300, height: 200, fill: "yellow" }),
+          new fabric.Text("Clipped Text\nShadow Test", {
             fontSize: 48,
             top: 24,
             textAlign: 'center',
@@ -376,21 +368,22 @@
         ],
         {
           clipPath: new fabric.Circle({
-            radius: 100,
+            radius: 125,
             originX: 'center',
             originY: 'center',
           }),
         }
       );
-      group.rotate(180);
       canvas.add(group);
+      group.rotate(180);
+      group.center();
       canvas.renderAll();
       callback(canvas.lowerCanvasEl);
     },
     golden: 'cachingGroupWithNestedShadow.png',
     percentage: 0.06,
-    width: 400,
-    height: 400,
+    width: 250,
+    height: 200,
   });
 
   tests.forEach(visualTestLoop(QUnit));
