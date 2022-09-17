@@ -345,9 +345,8 @@
     height: 400,
   });
 
-  tests.push({
-    test: 'clipped group with nested shadow',
-    code: (canvas, callback) => {
+  function createClippedNestedShadowedTextTest(deg) {
+    return (canvas, callback) => {
       const group = new fabric.Group(
         [
           new fabric.Rect({ width: 300, height: 200, fill: "yellow" }),
@@ -377,16 +376,23 @@
         }
       );
       canvas.add(group);
-      group.rotate(180);
+      group.rotate(deg);
       group.center();
       canvas.renderAll();
       callback(canvas.lowerCanvasEl);
-    },
-    golden: 'cachingGroupWithNestedShadow.png',
-    percentage: 0.06,
-    width: 250,
-    height: 200,
-  });
+    }
+  }
+
+  for (let deg = -180; deg <= 180; deg = deg + 45) {
+    tests.push({
+      test: 'clipped group with nested shadow',
+      code: createClippedNestedShadowedTextTest(deg),
+      golden: `clipped-nested-shadow-${deg}deg.png`,
+      percentage: 0.06,
+      width: 250,
+      height: 200,
+    });  
+  }
 
   tests.forEach(visualTestLoop(QUnit));
 })();
