@@ -206,23 +206,12 @@ import { pick } from './util/misc/pick';
       _initStatic: function (el, options) {
         this._objects = [];
         this._createLowerCanvas(el);
-        this._createCacheCanvas();
         this._initOptions(options);
         // only initialize retina scaling once
         if (!this.interactive) {
           this._initRetinaScaling();
         }
         this.calcOffset();
-      },
-
-      /**
-       * @private
-       */
-      _createCacheCanvas: function () {
-        this.cacheCanvasEl = this._createCanvasElement();
-        this.cacheCanvasEl.setAttribute('width', this.width);
-        this.cacheCanvasEl.setAttribute('height', this.height);
-        this.contextCache = this.cacheCanvasEl.getContext('2d');
       },
 
       /**
@@ -454,7 +443,9 @@ import { pick } from './util/misc/pick';
           this.upperCanvasEl[prop] = value;
         }
 
-        this.cacheCanvasEl[prop] = value;
+        if (this.cacheCanvasEl) {
+          this.cacheCanvasEl[prop] = value;
+        }
 
         this[prop] = value;
 
@@ -822,7 +813,6 @@ import { pick } from './util/misc/pick';
         }
         if (path) {
           path._set('canvas', this);
-          path._transformDone = true;
           path.render(ctx, {
             clipping: {
               source: path,
@@ -1827,10 +1817,6 @@ import { pick } from './util/misc/pick';
         this.overlayImage = null;
         this._iTextInstances = null;
         this.contextContainer = null;
-        // cache canvas
-        this.contextCache = null;
-        fabric.util.cleanUpJsdomNode(this.cacheCanvasEl);
-        this.cacheCanvasEl = undefined;
         // restore canvas style and attributes
         this.lowerCanvasEl.classList.remove('lower-canvas');
         this.lowerCanvasEl.removeAttribute('data-fabric');
