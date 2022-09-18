@@ -107,14 +107,29 @@ export class RenderingContext implements TRenderingOptions {
     return this.tree[this.findIndex(target)];
   }
 
+  private slice(from?: TObject, to?: TObject, inclusive = false) {
+    const start = from ? this.findIndex(from) : -1;
+    const end = to ? this.findIndex(to) : -1;
+    return this.tree
+      .slice(
+        start > -1 ? start : undefined,
+        end > -1 ? end + Number(inclusive) : undefined
+      )
+      .reverse();
+  }
+
+  private getTreeUpTo(target: TObject) {
+    return this.slice(undefined, target, true);
+  }
+
   shouldPerformOffscreenValidation(target: TObject) {
-    const found = this.find(target);
     return (
       this.offscreenValidation &&
-      !found?.clipping &&
-      !found?.caching &&
       this.action !== 'hit-test' &&
-      this.action !== 'object-export'
+      this.action !== 'object-export' &&
+      !this.getTreeUpTo(target).some(
+        ({ caching, clipping }) => !!caching || !!clipping
+      )
     );
   }
 
@@ -134,31 +149,12 @@ export class RenderingContext implements TRenderingOptions {
     return !!this.find(target)?.caching;
   }
 
-  findCacheTarget(target: TObject) {
-    for (let index = this.findIndex(target); index >= 0; index--) {
-      const listing = this.tree[index];
-      if (listing.caching) {
-        return listing.target;
-      }
-    }
-  }
-
-  isOnCache(target: TObject) {
-    return !!this.findCacheTarget(target);
-  }
-
   calcTransformMatrix(target: TObject) {
-    const index = this.findIndex(target);
-    return index > -1
-      ? this.tree
-          .slice(0, index)
-          .reverse()
-          .reduce(
-            (mat, { target }) =>
-              multiplyTransformMatrices(target.calcOwnMatrix(), mat),
-            iMatrix
-          )
-      : iMatrix;
+    return this.getTreeUpTo(target).reduce(
+      (mat, { target }) =>
+        multiplyTransformMatrices(target.calcOwnMatrix(), mat),
+      iMatrix
+    );
   }
 
   fork(listing?: TRenderingListing) {
