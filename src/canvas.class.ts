@@ -593,7 +593,6 @@ import { RenderingContext } from './RenderingContext';
         // in case the target is the activeObject, we cannot execute this optimization
         // because we need to draw controls too.
         if (
-          target.shouldCache() &&
           !target.isNotVisible() &&
           target._cacheCanvas &&
           target !== this._activeObject
