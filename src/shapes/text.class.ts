@@ -2,7 +2,7 @@
 
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
-import { RenderingContext, TRenderingContext } from '../RenderingContext';
+import { RenderingContext } from '../RenderingContext';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {});

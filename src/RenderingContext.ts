@@ -14,26 +14,6 @@ export type TRenderingListing = {
   caching?: boolean;
 };
 
-export type TRenderingContext = {
-  /**
-   * object/canvas being clipped by the rendering process
-   */
-  clipping?: {
-    source: TObject;
-    destination: TObject | Canvas;
-  };
-  /**
-   * object being cached by the rendering process
-   */
-  caching?: TObject;
-  tree: TRenderingListing[];
-  /**
-   * By default fabric checks if an object is included in the viewport before rendering.
-   * This flag overrides the check and forces rendering to occur.
-   */
-  force?: boolean;
-};
-
 type TRenderingAction =
   | 'requested'
   | 'canvas-export'
