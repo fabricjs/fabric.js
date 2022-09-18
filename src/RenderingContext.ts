@@ -98,7 +98,7 @@ export class RenderingContext implements TRenderingOptions {
       .reverse();
   }
 
-  private getTreeUpTo(target: TObject) {
+  private getTreeUpTo(target?: TObject) {
     return this.slice(undefined, target, true);
   }
 
@@ -130,11 +130,20 @@ export class RenderingContext implements TRenderingOptions {
   }
 
   calcTransformMatrix(target: TObject) {
-    return this.getTreeUpTo(target).reduce(
-      (mat, { target }) =>
-        multiplyTransformMatrices(target.calcOwnMatrix(), mat),
-      iMatrix
-    );
+    return this.getTreeUpTo(target)
+      .reverse()
+      .reduce(
+        (mat, { target }) =>
+          multiplyTransformMatrices(target.calcOwnMatrix(), mat),
+        iMatrix
+      );
+  }
+
+  calcCacheMatrix(target: TObject) {
+    const caching = this.getTreeUpTo(target)
+      .reverse()
+      .find(({ caching }) => caching);
+    return this.calcTransformMatrix(caching?.target);
   }
 
   fork(listing?: TRenderingListing) {
