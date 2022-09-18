@@ -3,9 +3,9 @@ import { ColorNameMap } from './color_map';
 import { reHSLa, reHex, reRGBa } from './constants';
 import { hue2rgb, hexify } from './util';
 
-type TColorSource = [number, number, number];
+export type TColorSource = [number, number, number];
 
-type TColorAlphaSource = [number, number, number, number];
+export type TColorAlphaSource = [number, number, number, number];
 
 /**
  * @class Color common color operations

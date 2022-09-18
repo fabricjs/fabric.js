@@ -32,6 +32,11 @@ export type CancelFunction = VoidFunction;
  */
 export interface AnimationOptions {
   /**
+   * The object this animation is being performed on
+   */
+  target?: unknown;
+
+  /**
    * Called when the animation starts
    */
   onStart?: VoidFunction;
@@ -154,7 +159,7 @@ export function animate(
     onChange = noop,
     abort = noop,
     onComplete = noop,
-    endValue = 0,
+    endValue = 100,
     delay = 0,
   } = options;
 
