@@ -95,11 +95,7 @@ export function animateColor(
       onComplete?.(calculateColor(endColor, endColor, 0), valuePerc, timePerc),
     onChange: (current, valuePerc, timePerc) =>
       onChange?.(
-        calculateColor(
-          startColor,
-          endColor,
-          valuePerc
-        ),
+        calculateColor(startColor, endColor, valuePerc),
         valuePerc,
         timePerc
       ),

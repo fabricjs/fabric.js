@@ -2,7 +2,7 @@ import { fabric } from '../../HEADER';
 import { runningAnimations } from './animation_registry';
 import { noop } from '../constants';
 import { WithReturnType } from '../typedefs';
-import { defaultEasing, EasingFunction } from './anim_ease';
+import { defaultEasing, TEasingFunction } from './anim_ease';
 
 /**
  * Callback called every frame
@@ -55,7 +55,7 @@ export interface AnimationOptions {
    * Easing function
    * @default [defaultEasing]
    */
-  easing: EasingFunction;
+  easing: TEasingFunction;
 
   /**
    * Function called at each frame.
@@ -112,7 +112,7 @@ export interface AnimationCurrentState {
  * Animation context
  */
 export interface AnimationContext
-  extends AnimationOptions,
+  extends Partial<AnimationOptions>,
     AnimationCurrentState {
   /**
    * Current function used to cancel the animation
@@ -163,9 +163,12 @@ export function animate(
     delay = 0,
   } = options;
 
-  const context: Partial<AnimationContext> = {
+  const context: AnimationContext = {
     ...options,
-    cancel: noop, // placeholder
+    cancel: function () {
+      cancel = true;
+      return removeFromRegistry();
+    },
     currentValue: startValue,
     completionRate: 0,
     durationRate: 0,
@@ -176,10 +179,6 @@ export function animate(
     return index > -1 && runningAnimations.splice(index, 1)[0];
   };
 
-  context.cancel = function () {
-    cancel = true;
-    return removeFromRegistry();
-  };
   runningAnimations.push(context);
 
   const runner = function (timestamp: number) {
@@ -194,7 +193,7 @@ export function animate(
 
     options.onStart && options.onStart();
 
-    (function tick(ticktime) {
+    (function tick(ticktime: number) {
       const time = ticktime || +new Date();
       const currentTime = time > finish ? duration : time - start,
         timePerc = currentTime / duration,
@@ -265,9 +264,9 @@ const _cancelAnimFrame: AnimationFrameProvider['cancelAnimationFrame'] =
  * @param {Function} callback Callback to invoke
  */
 export function requestAnimFrame(callback: FrameRequestCallback): number {
-  return _requestAnimFrame.bind(fabric.window)(callback);
+  return _requestAnimFrame.call(fabric.window, callback);
 }
 
 export function cancelAnimFrame(handle: number): void {
-  return _cancelAnimFrame.bind(fabric.window)(handle);
+  return _cancelAnimFrame.call(fabric.window, handle);
 }

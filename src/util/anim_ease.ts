@@ -2,17 +2,17 @@ import { twoMathPi, halfPI } from '../constants';
 
 /**
  * An easing function
- * @param t current "time"/ms elapsed
- * @param b start/"base" value
- * @param c increment/"change"/"completion rate"/magnitude
- * @param d "duration"
+ * @param currentTime ms elapsed
+ * @param startValue
+ * @param byValue increment/change/"completion rate"/magnitude
+ * @param duration in ms
  * @returns next value
  */
-export type EasingFunction = (
-  t: number,
-  b: number,
-  c: number,
-  d: number
+export type TEasingFunction = (
+  currentTime: number,
+  startValue: number,
+  byValue: number,
+  duration: number
 ) => number;
 
 /**
@@ -55,21 +55,21 @@ const elastic = (
 /**
  * Default sinusoidal easing
  */
-export const defaultEasing: EasingFunction = (t, b, c, d) =>
-  -c * Math.cos((t / d) * (Math.PI / 2)) + c + b;
+export const defaultEasing: TEasingFunction = (t, b, c, d) =>
+  -c * Math.cos((t / d) * halfPI) + c + b;
 
 /**
  * Cubic easing out
  * @memberOf fabric.util.ease
  */
-export const easeOutCubic: EasingFunction = (t, b, c, d) =>
+export const easeOutCubic: TEasingFunction = (t, b, c, d) =>
   c * ((t /= d - 1) * t ** 2 + 1) + b;
 
 /**
  * Cubic easing in and out
  * @memberOf fabric.util.ease
  */
-export const easeInOutCubic: EasingFunction = (t, b, c, d) => {
+export const easeInOutCubic: TEasingFunction = (t, b, c, d) => {
   t /= d / 2;
   if (t < 1) {
     return (c / 2) * t ** 3 + b;
@@ -81,21 +81,21 @@ export const easeInOutCubic: EasingFunction = (t, b, c, d) => {
  * Quartic easing in
  * @memberOf fabric.util.ease
  */
-export const easeInQuart: EasingFunction = (t, b, c, d) =>
+export const easeInQuart: TEasingFunction = (t, b, c, d) =>
   c * (t /= d) * t ** 3 + b;
 
 /**
  * Quartic easing out
  * @memberOf fabric.util.ease
  */
-export const easeOutQuart: EasingFunction = (t, b, c, d) =>
+export const easeOutQuart: TEasingFunction = (t, b, c, d) =>
   -c * ((t = t / d - 1) * t ** 3 - 1) + b;
 
 /**
  * Quartic easing in and out
  * @memberOf fabric.util.ease
  */
-export const easeInOutQuart: EasingFunction = (t, b, c, d) => {
+export const easeInOutQuart: TEasingFunction = (t, b, c, d) => {
   t /= d / 2;
   if (t < 1) {
     return (c / 2) * t ** 4 + b;
@@ -107,21 +107,21 @@ export const easeInOutQuart: EasingFunction = (t, b, c, d) => {
  * Quintic easing in
  * @memberOf fabric.util.ease
  */
-export const easeInQuint: EasingFunction = (t, b, c, d) =>
+export const easeInQuint: TEasingFunction = (t, b, c, d) =>
   c * (t /= d) * t ** 4 + b;
 
 /**
  * Quintic easing out
  * @memberOf fabric.util.ease
  */
-export const easeOutQuint: EasingFunction = (t, b, c, d) =>
+export const easeOutQuint: TEasingFunction = (t, b, c, d) =>
   c * ((t /= d - 1) * t ** 4 + 1) + b;
 
 /**
  * Quintic easing in and out
  * @memberOf fabric.util.ease
  */
-export const easeInOutQuint: EasingFunction = (t, b, c, d) => {
+export const easeInOutQuint: TEasingFunction = (t, b, c, d) => {
   t /= d / 2;
   if (t < 1) {
     return (c / 2) * t ** 5 + b;
@@ -133,42 +133,42 @@ export const easeInOutQuint: EasingFunction = (t, b, c, d) => {
  * Sinusoidal easing in
  * @memberOf fabric.util.ease
  */
-export const easeInSine: EasingFunction = (t, b, c, d) =>
+export const easeInSine: TEasingFunction = (t, b, c, d) =>
   -c * Math.cos((t / d) * halfPI) + c + b;
 
 /**
  * Sinusoidal easing out
  * @memberOf fabric.util.ease
  */
-export const easeOutSine: EasingFunction = (t, b, c, d) =>
+export const easeOutSine: TEasingFunction = (t, b, c, d) =>
   c * Math.sin((t / d) * halfPI) + b;
 
 /**
  * Sinusoidal easing in and out
  * @memberOf fabric.util.ease
  */
-export const easeInOutSine: EasingFunction = (t, b, c, d) =>
+export const easeInOutSine: TEasingFunction = (t, b, c, d) =>
   (-c / 2) * (Math.cos((Math.PI * t) / d) - 1) + b;
 
 /**
  * Exponential easing in
  * @memberOf fabric.util.ease
  */
-export const easeInExpo: EasingFunction = (t, b, c, d) =>
+export const easeInExpo: TEasingFunction = (t, b, c, d) =>
   t === 0 ? b : c * 2 ** (10 * (t / d - 1)) + b;
 
 /**
  * Exponential easing out
  * @memberOf fabric.util.ease
  */
-export const easeOutExpo: EasingFunction = (t, b, c, d) =>
+export const easeOutExpo: TEasingFunction = (t, b, c, d) =>
   t === d ? b + c : c * -(2 ** ((-10 * t) / d) + 1) + b;
 
 /**
  * Exponential easing in and out
  * @memberOf fabric.util.ease
  */
-export const easeInOutExpo: EasingFunction = (t, b, c, d) => {
+export const easeInOutExpo: TEasingFunction = (t, b, c, d) => {
   if (t === 0) {
     return b;
   }
@@ -186,21 +186,21 @@ export const easeInOutExpo: EasingFunction = (t, b, c, d) => {
  * Circular easing in
  * @memberOf fabric.util.ease
  */
-export const easeInCirc: EasingFunction = (t, b, c, d) =>
+export const easeInCirc: TEasingFunction = (t, b, c, d) =>
   -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
 
 /**
  * Circular easing out
  * @memberOf fabric.util.ease
  */
-export const easeOutCirc: EasingFunction = (t, b, c, d) =>
+export const easeOutCirc: TEasingFunction = (t, b, c, d) =>
   c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
 
 /**
  * Circular easing in and out
  * @memberOf fabric.util.ease
  */
-export const easeInOutCirc: EasingFunction = (t, b, c, d) => {
+export const easeInOutCirc: TEasingFunction = (t, b, c, d) => {
   t /= d / 2;
   if (t < 1) {
     return (-c / 2) * (Math.sqrt(1 - t ** 2) - 1) + b;
@@ -212,7 +212,7 @@ export const easeInOutCirc: EasingFunction = (t, b, c, d) => {
  * Elastic easing in
  * @memberOf fabric.util.ease
  */
-export const easeInElastic: EasingFunction = (t, b, c, d) => {
+export const easeInElastic: TEasingFunction = (t, b, c, d) => {
   const s = 1.70158,
     a = c;
   let p = 0;
@@ -234,7 +234,7 @@ export const easeInElastic: EasingFunction = (t, b, c, d) => {
  * Elastic easing out
  * @memberOf fabric.util.ease
  */
-export const easeOutElastic: EasingFunction = (t, b, c, d) => {
+export const easeOutElastic: TEasingFunction = (t, b, c, d) => {
   const s = 1.70158,
     a = c;
   let p = 0;
@@ -260,7 +260,7 @@ export const easeOutElastic: EasingFunction = (t, b, c, d) => {
  * Elastic easing in and out
  * @memberOf fabric.util.ease
  */
-export const easeInOutElastic: EasingFunction = (t, b, c, d) => {
+export const easeInOutElastic: TEasingFunction = (t, b, c, d) => {
   const s = 1.70158,
     a = c;
   let p = 0;
@@ -292,21 +292,21 @@ export const easeInOutElastic: EasingFunction = (t, b, c, d) => {
  * Backwards easing in
  * @memberOf fabric.util.ease
  */
-export const easeInBack: EasingFunction = (t, b, c, d, s = 1.70158) =>
+export const easeInBack: TEasingFunction = (t, b, c, d, s = 1.70158) =>
   c * (t /= d) * t * ((s + 1) * t - s) + b;
 
 /**
  * Backwards easing out
  * @memberOf fabric.util.ease
  */
-export const easeOutBack: EasingFunction = (t, b, c, d, s = 1.70158) =>
+export const easeOutBack: TEasingFunction = (t, b, c, d, s = 1.70158) =>
   c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
 
 /**
  * Backwards easing in and out
  * @memberOf fabric.util.ease
  */
-export const easeInOutBack: EasingFunction = (t, b, c, d, s = 1.70158) => {
+export const easeInOutBack: TEasingFunction = (t, b, c, d, s = 1.70158) => {
   t /= d / 2;
   if (t < 1) {
     return (c / 2) * (t * t * (((s *= 1.525) + 1) * t - s)) + b;
@@ -318,7 +318,7 @@ export const easeInOutBack: EasingFunction = (t, b, c, d, s = 1.70158) => {
  * Bouncing easing out
  * @memberOf fabric.util.ease
  */
-export const easeOutBounce: EasingFunction = (t, b, c, d) => {
+export const easeOutBounce: TEasingFunction = (t, b, c, d) => {
   if ((t /= d) < 1 / 2.75) {
     return c * (7.5625 * t * t) + b;
   } else if (t < 2 / 2.75) {
@@ -334,14 +334,14 @@ export const easeOutBounce: EasingFunction = (t, b, c, d) => {
  * Bouncing easing in
  * @memberOf fabric.util.ease
  */
-export const easeInBounce: EasingFunction = (t, b, c, d) =>
+export const easeInBounce: TEasingFunction = (t, b, c, d) =>
   c - easeOutBounce(d - t, 0, c, d) + b;
 
 /**
  * Bouncing easing in and out
  * @memberOf fabric.util.ease
  */
-export const easeInOutBounce: EasingFunction = (t, b, c, d) =>
+export const easeInOutBounce: TEasingFunction = (t, b, c, d) =>
   t < d / 2
     ? easeInBounce(t * 2, 0, c, d) * 0.5 + b
     : easeOutBounce(t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
@@ -350,20 +350,20 @@ export const easeInOutBounce: EasingFunction = (t, b, c, d) =>
  * Quadratic easing in
  * @memberOf fabric.util.ease
  */
-export const easeInQuad: EasingFunction = (t, b, c, d) => c * (t /= d) * t + b;
+export const easeInQuad: TEasingFunction = (t, b, c, d) => c * (t /= d) * t + b;
 
 /**
  * Quadratic easing out
  * @memberOf fabric.util.ease
  */
-export const easeOutQuad: EasingFunction = (t, b, c, d) =>
+export const easeOutQuad: TEasingFunction = (t, b, c, d) =>
   -c * (t /= d) * (t - 2) + b;
 
 /**
  * Quadratic easing in and out
  * @memberOf fabric.util.ease
  */
-export const easeInOutQuad: EasingFunction = (t, b, c, d) => {
+export const easeInOutQuad: TEasingFunction = (t, b, c, d) => {
   t /= d / 2;
   if (t < 1) {
     return (c / 2) * t ** 2 + b;
@@ -375,5 +375,5 @@ export const easeInOutQuad: EasingFunction = (t, b, c, d) => {
  * Cubic easing in
  * @memberOf fabric.util.ease
  */
-export const easeInCubic: EasingFunction = (t, b, c, d) =>
+export const easeInCubic: TEasingFunction = (t, b, c, d) =>
   c * (t /= d) * t * t + b;
