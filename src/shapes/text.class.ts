@@ -2,7 +2,7 @@
 
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
-import { TRenderingContext } from './object.class';
+import { RenderingContext, TRenderingContext } from '../RenderingContext';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {});
@@ -1673,19 +1673,16 @@ import { TRenderingContext } from './object.class';
        */
       render: function (
         ctx: CanvasRenderingContext2D,
-        renderingContext: TRenderingContext = {}
+        renderingContext: RenderingContext = new RenderingContext()
       ) {
+        renderingContext.validateAtBottomOfTree(this);
         // do not render if object is not visible
-        if (!this.visible) {
-          return;
-        }
         if (
-          this.canvas &&
-          this.canvas.skipOffscreen &&
-          !renderingContext.clipping &&
-          !renderingContext.caching &&
-          !renderingContext.force &&
-          !this.isOnScreen()
+          !this.visible ||
+          (this.canvas &&
+            this.canvas.skipOffscreen &&
+            renderingContext.shouldPerformOffscreenValidation(this) &&
+            !this.isOnScreen())
         ) {
           return;
         }

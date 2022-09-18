@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Point } from '../point.class';
+import { RenderingContext } from '../RenderingContext';
 
 (function (global) {
   /** ERASER_START */
@@ -53,8 +54,8 @@ import { Point } from '../point.class';
      * @param {CanvasRenderingContext2D} ctx
      * @param {fabric.Object} clipPath
      */
-    _drawClipPath: function (ctx, clipPath) {
-      __drawClipPath.call(this, ctx, clipPath);
+    _drawClipPath: function (ctx, clipPath, renderingContext) {
+      __drawClipPath.call(this, ctx, clipPath, renderingContext);
       if (this.eraser) {
         //  update eraser size to match instance
         var size = this._getNonTransformedDimensions();
@@ -63,7 +64,7 @@ import { Point } from '../point.class';
             width: size.x,
             height: size.y,
           });
-        __drawClipPath.call(this, ctx, this.eraser);
+        __drawClipPath.call(this, ctx, this.eraser, renderingContext);
       }
     },
 
@@ -236,12 +237,12 @@ import { Point } from '../point.class';
      */
     layout: 'fixed',
 
-    drawObject: function (ctx) {
+    drawObject: function (ctx, renderingContext: RenderingContext) {
       ctx.save();
       ctx.fillStyle = 'black';
       ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
       ctx.restore();
-      this.callSuper('drawObject', ctx);
+      this.callSuper('drawObject', ctx, renderingContext);
     },
 
     /* _TO_SVG_START_ */
@@ -327,8 +328,8 @@ import { Point } from '../point.class';
      * so we need to render it on top of canvas every render
      * @param {CanvasRenderingContext2D} ctx
      */
-    _renderOverlay: function (ctx) {
-      __renderOverlay.call(this, ctx);
+    _renderOverlay: function (ctx, renderingContext: RenderingContext) {
+      __renderOverlay.call(this, ctx, renderingContext);
       this.isErasing() && this.freeDrawingBrush._render();
     },
   });
@@ -452,6 +453,9 @@ import { Point } from '../point.class';
           this._patternCanvas = fabric.util.createCanvasElement();
         }
         var canvas = this._patternCanvas;
+        const renderingContext = new RenderingContext({
+          action: 'canvas-export',
+        });
         objects =
           objects || this.canvas._objectsToRender || this.canvas._objects;
         canvas.width = this.canvas.width;
@@ -472,7 +476,7 @@ import { Point } from '../point.class';
           if (bgErasable) {
             this.canvas.backgroundImage = undefined;
           }
-          this.canvas._renderBackground(patternCtx);
+          this.canvas._renderBackground(patternCtx, renderingContext);
           if (bgErasable) {
             this.canvas.backgroundImage = backgroundImage;
           }
@@ -482,7 +486,7 @@ import { Point } from '../point.class';
             backgroundImage.eraser = undefined;
             backgroundImage.dirty = true;
           }
-          this.canvas._renderBackground(patternCtx);
+          this.canvas._renderBackground(patternCtx, renderingContext);
           if (eraser) {
             backgroundImage.eraser = eraser;
             backgroundImage.dirty = true;
@@ -497,7 +501,7 @@ import { Point } from '../point.class';
           patternCtx,
           restorationContext
         );
-        this.canvas._renderObjects(patternCtx, objects);
+        this.canvas._renderObjects(patternCtx, objects, renderingContext);
         restorationContext.visibility.forEach(function (obj) {
           obj.visible = true;
         });
@@ -518,7 +522,7 @@ import { Point } from '../point.class';
           if (overlayErasable) {
             this.canvas.overlayImage = undefined;
           }
-          __renderOverlay.call(this.canvas, patternCtx);
+          __renderOverlay.call(this.canvas, patternCtx, renderingContext);
           if (overlayErasable) {
             this.canvas.overlayImage = overlayImage;
           }
@@ -528,7 +532,7 @@ import { Point } from '../point.class';
             overlayImage.eraser = undefined;
             overlayImage.dirty = true;
           }
-          __renderOverlay.call(this.canvas, patternCtx);
+          __renderOverlay.call(this.canvas, patternCtx, renderingContext);
           if (eraser) {
             overlayImage.eraser = eraser;
             overlayImage.dirty = true;
