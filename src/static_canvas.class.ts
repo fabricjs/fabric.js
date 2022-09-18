@@ -878,7 +878,7 @@ import { pick } from './util/misc/pick';
         objects,
         renderingContext: RenderingContext
       ) {
-        for (let index = 0; index < objects.length; index++) {
+        for (let i = 0; i < objects.length; i++) {
           objects[i]?.render(ctx, renderingContext.fork());
         }
       },
