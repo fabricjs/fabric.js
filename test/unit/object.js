@@ -1205,7 +1205,7 @@
     assert.deepEqual(dims, { width: 24, height: 34, zoomX: 2, zoomY: 3, x: 22, y: 32 }, 'cache is as big as the scaled object');
   });
 
-  QUnit.test('_updateCacheCanvas check if cache canvas should be updated', function(assert) {
+  QUnit.skip('_updateCacheCanvas check if cache canvas should be updated', function(assert) {
     fabric.config.configure({
       perfLimitSizeTotal: 10000,
       maxCacheSideLimit: 4096,
