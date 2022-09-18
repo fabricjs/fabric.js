@@ -6,7 +6,7 @@ import { Point } from '../point.class';
 import { RenderingContext } from '../RenderingContext';
 import { runningAnimations } from '../util/animation_registry';
 import { capValue } from '../util/misc/capValue';
-import { invertTransform, qrDecompose } from '../util/misc/matrix';
+import { invertTransform } from '../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { TObject } from '../__types__';
@@ -1496,13 +1496,9 @@ import { TObject } from '../__types__';
             (mult.x + mult.y) *
             (scaling.x + scaling.y)) /
           4;
-        // const { angle } = qrDecompose(
-        //   renderingContext.calcTransformMatrix(this)
-        // );
         const offset = new Point(shadow.offsetX, shadow.offsetY)
           .multiply(scaling)
           .multiply(mult);
-        // .rotate(degreesToRadians(-angle));
         ctx.shadowOffsetX = offset.x;
         ctx.shadowOffsetY = offset.y;
       },
