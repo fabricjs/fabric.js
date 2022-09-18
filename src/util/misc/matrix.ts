@@ -106,6 +106,8 @@ export const qrDecompose = (
   };
 };
 
+export const getMatrixScale = (t: TMat2D) => new Point(t[0], t[3]);
+
 export const getMatrixRotation = (t: TMat2D) =>
   Math.atan2(t[1], t[0]) as TRadian;
 
