@@ -1,26 +1,7 @@
 import { TSize } from '../typedefs';
-import { cleanUpJsdomNode } from '../util/dom_misc';
-import { createCanvasElement } from '../util/misc/dom';
-import { Canvas, TObject } from '../__types__';
-
-export type TRenderingContext = {
-  /**
-   * object/canvas being clipped by the rendering process
-   */
-  clipping?: {
-    source: TObject;
-    destination: TObject | Canvas;
-  };
-  /**
-   * object being cached by the rendering process
-   */
-  caching?: TObject;
-  /**
-   * By default fabric checks if an object is included in the viewport before rendering.
-   * This flag overrides the check and forces rendering to occur.
-   */
-  force?: boolean;
-};
+import { cleanUpJsdomNode } from './dom_misc';
+import { createCanvasElement } from './misc/dom';
+import { Canvas } from '../__types__';
 
 class CanvasProviderListing {
   canvas: HTMLCanvasElement;
@@ -45,7 +26,7 @@ export class CanvasProvider {
     this.stack.push(value);
     return value;
   }
-  request({ width, height }: TSize) {
+  request({ width = 0, height = 0 }: Partial<TSize> = {}) {
     const { canvas, lock } =
       this.stack.find(({ locked }) => !locked) || this.create();
     lock();

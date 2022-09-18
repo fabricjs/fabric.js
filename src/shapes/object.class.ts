@@ -9,7 +9,8 @@ import { invertTransform } from '../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { TObject } from '../__types__';
-import { canvasProvider, TRenderingContext } from './RenderingContext';
+import { TRenderingContext } from '../RenderingContext';
+import { canvasProvider } from '../util/CanvasProvider';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),

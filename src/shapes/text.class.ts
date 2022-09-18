@@ -2,12 +2,10 @@
 
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
-import { canvasProvider, TRenderingContext } from './RenderingContext';
+import { TRenderingContext } from '../RenderingContext';
+import { canvasProvider } from '../util/CanvasProvider';
 
-const measuringContext = canvasProvider.request({
-  width: 0,
-  height: 0,
-});
+const measuringContext = canvasProvider.request();
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {});
