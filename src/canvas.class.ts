@@ -117,6 +117,7 @@ import { Point } from './point.class';
         this.requestRenderAllBound = this.requestRenderAll.bind(this);
         this._initStatic(el, options);
         this._initInteractive();
+        this._createCacheCanvas();
       },
 
       /**
@@ -1154,6 +1155,16 @@ import { Point } from './point.class';
       /**
        * @private
        */
+      _createCacheCanvas: function () {
+        this.cacheCanvasEl = this._createCanvasElement();
+        this.cacheCanvasEl.setAttribute('width', this.width);
+        this.cacheCanvasEl.setAttribute('height', this.height);
+        this.contextCache = this.cacheCanvasEl.getContext('2d');
+      },
+
+      /**
+       * @private
+       */
       _initWrapperElement: function () {
         if (this.wrapperEl) {
           return;
@@ -1406,14 +1417,18 @@ import { Point } from './point.class';
       destroy: function () {
         var wrapperEl = this.wrapperEl,
           lowerCanvasEl = this.lowerCanvasEl,
-          upperCanvasEl = this.upperCanvasEl;
+          upperCanvasEl = this.upperCanvasEl,
+          cacheCanvasEl = this.cacheCanvasEl;
         this.removeListeners();
         this.callSuper('destroy');
         wrapperEl.removeChild(upperCanvasEl);
         wrapperEl.removeChild(lowerCanvasEl);
+        this.contextCache = null;
         this.contextTop = null;
         fabric.util.cleanUpJsdomNode(upperCanvasEl);
         this.upperCanvasEl = undefined;
+        fabric.util.cleanUpJsdomNode(cacheCanvasEl);
+        this.cacheCanvasEl = undefined;
         if (wrapperEl.parentNode) {
           wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
         }
