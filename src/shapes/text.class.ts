@@ -385,7 +385,7 @@ const measuringContext = canvasProvider.request();
       },
 
       /**
-       * for internal use, do not use it
+       * **for internal use**, do not use it
        * @private
        * @param {String} text Text string
        * @param {Object} [options] Options object
