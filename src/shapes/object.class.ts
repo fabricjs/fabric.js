@@ -6,9 +6,10 @@ import { Point } from '../point.class';
 import { RenderingContext } from '../RenderingContext';
 import { runningAnimations } from '../util/animation_registry';
 import { capValue } from '../util/misc/capValue';
-import { invertTransform } from '../util/misc/matrix';
+import { getMatrixRotation, invertTransform } from '../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
+import { calcPlaneChangeMatrix } from '../util/misc/planeChange';
 import { TObject } from '../__types__';
 
 (function (global) {
@@ -667,7 +668,6 @@ import { TObject } from '../__types__';
         this._cacheProperties = {};
         this._cacheCanvas = fabric.util.createCanvasElement();
         this._cacheContext = this._cacheCanvas.getContext('2d');
-        this._updateCacheCanvas();
         // if canvas gets created, is empty, so dirty.
         this.dirty = true;
       },
@@ -758,7 +758,7 @@ import { TObject } from '../__types__';
        * @private
        * @return {Boolean} true if the canvas has been resized
        */
-      _updateCacheCanvas: function () {
+      _updateCacheCanvas: function (renderingContext: RenderingContext) {
         var targetCanvas = this.canvas;
         if (
           this.noScaleCache &&
@@ -812,8 +812,8 @@ import { TObject } from '../__types__';
         if (this instanceof fabric.Text && this.path) {
           shouldRedraw = true;
           shouldResizeCanvas = true;
-          additionalWidth += this.getHeightOfLine(0) * this.zoomX;
-          additionalHeight += this.getHeightOfLine(0) * this.zoomY;
+          additionalWidth += this.getHeightOfLine(0) * zoomX;
+          additionalHeight += this.getHeightOfLine(0) * zoomY;
         }
         if (shouldRedraw) {
           if (shouldResizeCanvas) {
@@ -831,10 +831,19 @@ import { TObject } from '../__types__';
             Math.round(canvas.height / 2 - drawingHeight) + drawingHeight;
           this.cacheWidth = width;
           this.cacheHeight = height;
-          this._cacheContext.translate(
+          // we need to rotate the cache so that shadow is projected in the right direction
+          this.cacheRotation = -getMatrixRotation(
+            calcPlaneChangeMatrix(
+              renderingContext.calcCacheMatrix(this),
+              renderingContext.calcTransformMatrix(this)
+            )
+          );
+          this._cacheContext.rotate(this.cacheRotation);
+          const t = new Point(
             this.cacheTranslationX,
             this.cacheTranslationY
-          );
+          ).rotate(-this.cacheRotation);
+          this._cacheContext.translate(t.x, t.y);
           this._cacheContext.scale(zoomX, zoomY);
           this.zoomX = zoomX;
           this.zoomY = zoomY;
@@ -1185,7 +1194,7 @@ import { TObject } from '../__types__';
           if (!this._cacheCanvas || !this._cacheContext) {
             this._createCacheCanvas();
           }
-          if (this._updateCacheCanvas()) {
+          if (this._updateCacheCanvas(renderingContext)) {
             // context was cleared by `_updateCacheCanvas`
             flag = true;
           } else if (
@@ -1317,6 +1326,7 @@ import { TObject } from '../__types__';
         source: HTMLCanvasElement = this._cacheCanvas
       ) {
         ctx.scale(1 / this.zoomX, 1 / this.zoomY);
+        ctx.rotate(-this.cacheRotation);
         ctx.drawImage(source, -this.cacheTranslationX, -this.cacheTranslationY);
       },
 
