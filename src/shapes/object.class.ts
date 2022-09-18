@@ -1282,7 +1282,7 @@ import { TObject } from '../__types__';
           this._renderBackground(ctx);
         }
         this._render(ctx, renderingContext);
-        this._drawClipPath(ctx, this.clipPath, renderingContext);
+        this.drawClipPath(ctx, this.clipPath, renderingContext);
         this.fill = originalFill;
         this.stroke = originalStroke;
       },
@@ -1292,7 +1292,7 @@ import { TObject } from '../__types__';
        * @param {CanvasRenderingContext2D} ctx
        * @param {fabric.Object} clipPath
        */
-      _drawClipPath: function (
+      drawClipPath: function (
         ctx: CanvasRenderingContext2D,
         clipPath: TObject,
         renderingContext: RenderingContext

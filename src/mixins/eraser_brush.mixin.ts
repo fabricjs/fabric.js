@@ -6,7 +6,7 @@ import { RenderingContext } from '../RenderingContext';
   /** ERASER_START */
 
   var fabric = global.fabric,
-    __drawClipPath = fabric.Object.prototype._drawClipPath;
+    _drawClipPath = fabric.Object.prototype.drawClipPath;
   var _shouldRenderInIsolation =
     fabric.Object.prototype.shouldRenderInIsolation;
   var _toObject = fabric.Object.prototype.toObject;
@@ -55,8 +55,8 @@ import { RenderingContext } from '../RenderingContext';
      * @param {CanvasRenderingContext2D} ctx
      * @param {fabric.Object} clipPath
      */
-    _drawClipPath: function (ctx, clipPath, renderingContext) {
-      __drawClipPath.call(this, ctx, clipPath, renderingContext);
+    drawClipPath: function (ctx, clipPath, renderingContext) {
+      _drawClipPath.call(this, ctx, clipPath, renderingContext);
       if (this.eraser) {
         //  update eraser size to match instance
         var size = this._getNonTransformedDimensions();
@@ -65,7 +65,7 @@ import { RenderingContext } from '../RenderingContext';
             width: size.x,
             height: size.y,
           });
-        __drawClipPath.call(this, ctx, this.eraser, renderingContext);
+        _drawClipPath.call(this, ctx, this.eraser, renderingContext);
       }
     },
 
@@ -232,7 +232,7 @@ import { RenderingContext } from '../RenderingContext';
     /**
      * eraser should retain size
      * dimensions should not change when paths are added or removed
-     * handled by {@link fabric.Object#_drawClipPath}
+     * handled by {@link fabric.Object#drawClipPath}
      * @override
      * @private
      */

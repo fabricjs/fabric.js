@@ -433,7 +433,7 @@ import { RenderingContext } from '../RenderingContext';
         for (let i = 0; i < this._objects.length; i++) {
           this._objects[i].render(ctx, renderingContext.fork());
         }
-        this._drawClipPath(ctx, this.clipPath, renderingContext);
+        this.drawClipPath(ctx, this.clipPath, renderingContext);
       },
 
       // _setClippingProperties: function (ctx) {
