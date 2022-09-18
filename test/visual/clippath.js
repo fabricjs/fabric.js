@@ -393,20 +393,20 @@
     angles.push(deg);
   }
 
-  angles.forEach(a => {
-    angles.forEach(b => {
-      angles.forEach(c => {
-        tests.push({
-          test: `clipped group ${b}° with nested shadow ${c}° rotated by ${a}°`,
-          code: createClippedNestedShadowedTextTest(a, b, c),
-          golden: `clipping/nested-shadow/${a + b},${c}.png`,
-          percentage: 0.06,
-          width: 250,
-          height: 200,
-        });
-      });
-    });
-  });
+  // angles.forEach(a => {
+  //   angles.forEach(b => {
+  //     angles.forEach(c => {
+  //       tests.push({
+  //         test: `clipped group ${b}° with nested shadow ${c}° rotated by ${a}°`,
+  //         code: createClippedNestedShadowedTextTest(a, b, c),
+  //         golden: `clipping/nested-shadow/${a + b},${c}.png`,
+  //         percentage: 0.06,
+  //         width: 250,
+  //         height: 200,
+  //       });
+  //     });
+  //   });
+  // });
 
   tests.forEach(visualTestLoop(QUnit));
 })();

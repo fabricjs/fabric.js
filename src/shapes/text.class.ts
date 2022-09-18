@@ -2,7 +2,7 @@
 
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
-import { TRenderingContext } from '../RenderingContext';
+import { RenderingContext } from '../RenderingContext';
 import { canvasProvider } from '../util/CanvasProvider';
 
 const measuringContext = canvasProvider.request();
@@ -1657,19 +1657,16 @@ const measuringContext = canvasProvider.request();
        */
       render: function (
         ctx: CanvasRenderingContext2D,
-        renderingContext: TRenderingContext = {}
+        renderingContext: RenderingContext = new RenderingContext()
       ) {
+        renderingContext.validateAtBottomOfTree(this);
         // do not render if object is not visible
-        if (!this.visible) {
-          return;
-        }
         if (
-          this.canvas &&
-          this.canvas.skipOffscreen &&
-          !renderingContext.clipping &&
-          !renderingContext.caching &&
-          !renderingContext.force &&
-          !this.isOnScreen()
+          !this.visible ||
+          (this.canvas &&
+            this.canvas.skipOffscreen &&
+            renderingContext.shouldPerformOffscreenValidation(this) &&
+            !this.isOnScreen())
         ) {
           return;
         }

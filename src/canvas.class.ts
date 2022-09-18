@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Point } from './point.class';
+import { RenderingContext } from './RenderingContext';
 
 (function (global) {
   var fabric = global.fabric,
@@ -514,7 +515,7 @@ import { Point } from './point.class';
        * @return {fabric.Canvas} instance
        * @chainable
        */
-      renderAll: function () {
+      renderAll: function (isRequested = false) {
         this.cancelRequestedRender();
         if (this.destroyed) {
           return;
@@ -533,7 +534,13 @@ import { Point } from './point.class';
         }
         !this._objectsToRender &&
           (this._objectsToRender = this._chooseObjectsToRender());
-        this.renderCanvas(this.contextContainer, this._objectsToRender);
+        this.renderCanvas(
+          this.contextContainer,
+          this._objectsToRender,
+          new RenderingContext({
+            action: isRequested ? 'requested' : undefined,
+          })
+        );
         return this;
       },
 
@@ -586,7 +593,7 @@ import { Point } from './point.class';
         // in case the target is the activeObject, we cannot execute this optimization
         // because we need to draw controls too.
         if (
-          target.shouldCache() &&
+          !target.isNotVisible() &&
           target._cacheCanvas &&
           target !== this._activeObject
         ) {
@@ -623,7 +630,7 @@ import { Point } from './point.class';
 
         ctx.save();
         ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-        target.render(ctx);
+        target.render(ctx, new RenderingContext({ action: 'hit-test' }));
         ctx.restore();
 
         target.selectionBackgroundColor = originalColor;

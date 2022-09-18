@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { RenderingContext } from '../RenderingContext';
+
 (function (global) {
   var fabric = global.fabric;
   fabric.util.object.extend(
@@ -66,7 +69,9 @@
        * @param {Number} [options.top] Cropping top offset.
        * @param {Number} [options.width] Cropping width.
        * @param {Number} [options.height] Cropping height.
+       * @param {fabric.Object[]} [options.objects] Objects to render, overrides the `filter` option.
        * @param {(object: fabric.Object) => boolean} [options.filter] Function to filter objects.
+       * @param {boolean} [options.objectExport] flag indicating exporting an object.
        */
       toCanvasElement: function (multiplier, options) {
         multiplier = multiplier || 1;
@@ -85,9 +90,11 @@
           originalRetina = this.enableRetinaScaling,
           canvasEl = fabric.util.createCanvasElement(),
           originalContextTop = this.contextTop,
-          objectsToRender = options.filter
-            ? this._objects.filter(options.filter)
-            : this._objects;
+          objectsToRender =
+            options.objects ||
+            (options.filter
+              ? this._objects.filter(options.filter)
+              : this._objects);
         canvasEl.width = scaledWidth;
         canvasEl.height = scaledHeight;
         this.contextTop = null;
@@ -97,7 +104,13 @@
         this.width = scaledWidth;
         this.height = scaledHeight;
         this.calcViewportBoundaries();
-        this.renderCanvas(canvasEl.getContext('2d'), objectsToRender);
+        this.renderCanvas(
+          canvasEl.getContext('2d'),
+          objectsToRender,
+          new RenderingContext({
+            action: options.objectExport ? 'object-export' : 'canvas-export',
+          })
+        );
         this.viewportTransform = vp;
         this.width = originalWidth;
         this.height = originalHeight;

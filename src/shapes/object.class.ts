@@ -3,14 +3,13 @@ import { cache } from '../cache';
 import { config } from '../config';
 import { VERSION } from '../constants';
 import { Point } from '../point.class';
+import { RenderingContext } from '../RenderingContext';
 import { runningAnimations } from '../util/animation_registry';
 import { capValue } from '../util/misc/capValue';
 import { invertTransform } from '../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { TObject } from '../__types__';
-import { TRenderingContext } from '../RenderingContext';
-import { canvasProvider } from '../util/CanvasProvider';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -856,11 +855,11 @@ import { canvasProvider } from '../util/CanvasProvider';
        * Transforms context when rendering an object
        * @param {CanvasRenderingContext2D} ctx Context
        */
-      transform: function (ctx) {
-        var needFullTransform =
-          (this.group && !this.group._transformDone) ||
-          (this.group && this.canvas && ctx === this.canvas.contextTop);
-        var m = this.calcTransformMatrix(!needFullTransform);
+      transform: function (
+        ctx: CanvasRenderingContext2D,
+        needFullTransform?: boolean
+      ) {
+        const m = this.calcTransformMatrix(!needFullTransform);
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       },
 
@@ -1040,8 +1039,7 @@ import { canvasProvider } from '../util/CanvasProvider';
        */
       _set: function (key, value) {
         var shouldConstrainValue = key === 'scaleX' || key === 'scaleY',
-          isChanged = this[key] !== value,
-          groupNeedsUpdate = false;
+          isChanged = this[key] !== value;
 
         if (shouldConstrainValue) {
           value = this._constrainScale(value);
@@ -1058,19 +1056,18 @@ import { canvasProvider } from '../util/CanvasProvider';
           !(value instanceof fabric.Shadow)
         ) {
           value = new fabric.Shadow(value);
-        } else if (key === 'dirty' && this.group) {
-          this.group.set('dirty', value);
         }
 
         this[key] = value;
 
-        if (isChanged) {
-          if (this.cacheProperties.indexOf(key) > -1) {
-            this.dirty = true;
-            this.group?.set('dirty', true);
-          } else if (this.stateProperties.indexOf(key) > -1) {
-            this.group?.set('dirty', true);
-          }
+        if (isChanged && this.cacheProperties.indexOf(key) > -1) {
+          this.dirty = true;
+        }
+        if (
+          this.dirty ||
+          (isChanged && this.stateProperties.indexOf(key) > -1)
+        ) {
+          this.group?.set('dirty', true);
         }
         return this;
       },
@@ -1172,13 +1169,13 @@ import { canvasProvider } from '../util/CanvasProvider';
        * @return {Boolean}
        */
       shouldCache: function () {
-        return this.objectCaching && !this.isNotVisible();
+        return this.objectCaching;
       },
 
       /**
        * @private
        */
-      prepareCache: function (renderingContext: TRenderingContext) {
+      prepareCache: function (renderingContext: RenderingContext) {
         let flag = false;
         if (this.shouldCache()) {
           if (!this._cacheCanvas || !this._cacheContext) {
@@ -1203,10 +1200,8 @@ import { canvasProvider } from '../util/CanvasProvider';
             flag = true;
           }
           if (flag) {
-            this.drawObject(this._cacheContext, {
-              ...renderingContext,
-              caching: this,
-            });
+            renderingContext.update(this, { caching: true });
+            this.drawObject(this._cacheContext, renderingContext);
           }
         } else {
           // remove cache canvas
@@ -1227,36 +1222,32 @@ import { canvasProvider } from '../util/CanvasProvider';
        */
       render: function (
         ctx: CanvasRenderingContext2D,
-        renderingContext: TRenderingContext = {}
+        renderingContext: RenderingContext = new RenderingContext()
       ) {
+        const { clipping } = renderingContext.validateAtBottomOfTree(this);
         if (
           // do not render if width/height are zeros or object is not visible
           this.isNotVisible() ||
           (this.canvas &&
             this.canvas.skipOffscreen &&
-            !renderingContext.clipping &&
-            !renderingContext.caching &&
-            !renderingContext.force &&
+            renderingContext.shouldPerformOffscreenValidation(this) &&
             !this.isOnScreen())
         ) {
           return;
         }
+        const isNested = renderingContext.isNested(this);
         ctx.save();
-        this._setupCompositeOperation(
-          ctx,
-          renderingContext.clipping?.source === this
-        );
+        this._setupCompositeOperation(ctx, !!clipping);
         this.drawSelectionBackground(ctx);
-        this._setOpacity(ctx);
-        this._setShadow(ctx);
+        this._setOpacity(ctx, isNested);
+        this._setShadow(ctx, renderingContext);
         this.prepareCache(renderingContext);
+        this.transform(ctx, !isNested);
 
-        this.transform(ctx);
-        if (
-          this.needsItsOwnCache() ||
-          renderingContext.clipping?.source === this
-        ) {
-          const target = renderingContext.clipping?.destination || this.canvas;
+        if (this._cacheCanvas) {
+          this.drawCacheOnCanvas(ctx);
+        } else if (this.needsItsOwnCache() || clipping) {
+          const target = clipping || this.canvas;
           const { ctx: firstStep, release } = canvasProvider.request({
             width: target.width,
             height: target.height,
@@ -1264,10 +1255,8 @@ import { canvasProvider } from '../util/CanvasProvider';
           firstStep.save();
           firstStep.setTransform(ctx.getTransform());
           // firstStep?.translate(this.width / 2, this.height / 2);
-          this.drawObject(firstStep, {
-            ...renderingContext,
-            caching: this,
-          });
+          renderingContext.update(this, { caching: true });
+          this.drawObject(firstStep, renderingContext);
           ctx.resetTransform();
           ctx.drawImage(firstStep.canvas, 0, 0);
           // ctx.drawImage(firstStep.canvas, -this.width / 2, -this.height / 2);
@@ -1287,11 +1276,11 @@ import { canvasProvider } from '../util/CanvasProvider';
        */
       drawObject: function (
         ctx: CanvasRenderingContext2D,
-        renderingContext: TRenderingContext
+        renderingContext: RenderingContext
       ) {
         const originalFill = this.fill,
           originalStroke = this.stroke;
-        if (renderingContext.clipping?.source === this) {
+        if (renderingContext.isClipping(this)) {
           this.fill = 'black';
           this.stroke = '';
           this._setClippingProperties(ctx);
@@ -1299,7 +1288,7 @@ import { canvasProvider } from '../util/CanvasProvider';
           this._renderBackground(ctx);
         }
         this._render(ctx, renderingContext);
-        this._drawClipPath(ctx, this.clipPath);
+        this._drawClipPath(ctx, this.clipPath, renderingContext);
         this.fill = originalFill;
         this.stroke = originalStroke;
       },
@@ -1311,7 +1300,8 @@ import { canvasProvider } from '../util/CanvasProvider';
        */
       _drawClipPath: function (
         ctx: CanvasRenderingContext2D,
-        clipPath: TObject
+        clipPath: TObject,
+        renderingContext: RenderingContext
       ) {
         if (!clipPath) {
           return;
@@ -1320,16 +1310,16 @@ import { canvasProvider } from '../util/CanvasProvider';
         // path canvas gets overridden with this one.
         // TODO find a better solution?
         clipPath._set('canvas', this.canvas);
-        clipPath._transformDone = true;
         if (clipPath.absolutePositioned) {
           ctx.transform(...invertTransform(this.calcTransformMatrix()));
         }
-        clipPath.render(ctx, {
-          clipping: {
-            source: clipPath,
-            destination: this,
-          },
-        });
+        clipPath.render(
+          ctx,
+          renderingContext.fork({
+            target: clipPath,
+            clipping: this,
+          })
+        );
         ctx.restore();
       },
 
@@ -1381,10 +1371,9 @@ import { canvasProvider } from '../util/CanvasProvider';
 
       /**
        * @private
-       * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      _setOpacity: function (ctx) {
-        if (this.group && !this.group._transformDone) {
+      _setOpacity: function (ctx: CanvasRenderingContext2D, full?: boolean) {
+        if (full) {
           ctx.globalAlpha = this.getObjectOpacity();
         } else {
           ctx.globalAlpha *= this.opacity;
@@ -1499,7 +1488,7 @@ import { canvasProvider } from '../util/CanvasProvider';
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      _setShadow: function (ctx) {
+      _setShadow: function (ctx, renderingContext: RenderingContext) {
         if (!this.shadow) {
           return;
         }
@@ -1520,7 +1509,6 @@ import { canvasProvider } from '../util/CanvasProvider';
             (mult.x + mult.y) *
             (scaling.x + scaling.y)) /
           4;
-
         const offset = new Point(shadow.offsetX, shadow.offsetY)
           .multiply(scaling)
           .multiply(mult);
@@ -1830,7 +1818,6 @@ import { canvasProvider } from '../util/CanvasProvider';
         var canvas = new fabric.StaticCanvas(el, {
           enableRetinaScaling: false,
           renderOnAddRemove: false,
-          skipOffscreen: false,
         });
         if (options.format === 'jpeg') {
           canvas.backgroundColor = '#fff';
@@ -1841,10 +1828,13 @@ import { canvasProvider } from '../util/CanvasProvider';
           'center'
         );
         var originalCanvas = this.canvas;
-        canvas._objects = [this];
         this.set('canvas', canvas);
         this.setCoords();
-        var canvasEl = canvas.toCanvasElement(multiplier || 1, options);
+        var canvasEl = canvas.toCanvasElement(multiplier || 1, {
+          ...options,
+          objects: [this],
+          objectExport: true,
+        });
         this.set('canvas', originalCanvas);
         this.shadow = originalShadow;
         if (originalGroup) {
@@ -1852,10 +1842,6 @@ import { canvasProvider } from '../util/CanvasProvider';
         }
         this.set(origParams);
         this.setCoords();
-        // canvas.dispose will call image.dispose that will nullify the elements
-        // since this canvas is a simple element for the process, we remove references
-        // to objects in this way in order to avoid object trashing.
-        canvas._objects = [];
         // since render has settled it is safe to destroy canvas
         canvas.destroy();
         canvas = null;

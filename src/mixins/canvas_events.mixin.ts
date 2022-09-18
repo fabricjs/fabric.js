@@ -902,7 +902,8 @@ import { fireEvent } from '../util/fireEvent';
       _onMouseDownInDrawingMode: function (e) {
         this._isCurrentlyDrawing = true;
         if (this.getActiveObject()) {
-          this.discardActiveObject(e).requestRenderAll();
+          this.discardActiveObject(e);
+          this.requestRenderAll();
         }
         var pointer = this.getPointer(e);
         this.freeDrawingBrush.onMouseDown(pointer, { e: e, pointer: pointer });

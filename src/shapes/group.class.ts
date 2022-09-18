@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Point } from '../point.class';
-import { TRenderingContext } from '../RenderingContext';
+import { RenderingContext } from '../RenderingContext';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -427,13 +427,13 @@ import { TRenderingContext } from '../RenderingContext';
        */
       drawObject: function (
         ctx: CanvasRenderingContext2D,
-        renderingContext: TRenderingContext
+        renderingContext: RenderingContext
       ) {
         this._renderBackground(ctx);
         for (let i = 0; i < this._objects.length; i++) {
-          this._objects[i].render(ctx, renderingContext);
+          this._objects[i].render(ctx, renderingContext.fork());
         }
-        this._drawClipPath(ctx, this.clipPath);
+        this._drawClipPath(ctx, this.clipPath, renderingContext);
       },
 
       // _setClippingProperties: function (ctx) {
@@ -443,10 +443,10 @@ import { TRenderingContext } from '../RenderingContext';
 
       // _render: function (
       //   ctx: CanvasRenderingContext2D,
-      //   renderingContext: TRenderingContext
+      //   renderingContext: RenderingContext
       // ) {
       //   this.forEachObject((object) => {
-      //     object.render(ctx, renderingContext);
+      //     object.render(ctx, renderingContext.fork());
       //   });
       // },
 
@@ -468,7 +468,7 @@ import { TRenderingContext } from '../RenderingContext';
        */
       render: function (
         ctx: CanvasRenderingContext2D,
-        renderingContext: TRenderingContext
+        renderingContext: RenderingContext = new RenderingContext()
       ) {
         //  used to inform objects not to double opacity
         this._transformDone = true;
