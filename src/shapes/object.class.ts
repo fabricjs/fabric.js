@@ -1253,7 +1253,7 @@ import { TObject } from '../__types__';
         this._setupCompositeOperation(ctx, renderingContext.isClipping(this));
         this.drawSelectionBackground(ctx);
         this._setOpacity(ctx, isNested);
-        this._setShadow(ctx, renderingContext);
+        this._setShadow(ctx);
         this.prepareCache(renderingContext);
         this.transform(ctx, !isNested);
         this._cacheCanvas
@@ -1483,7 +1483,7 @@ import { TObject } from '../__types__';
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      _setShadow: function (ctx, renderingContext: RenderingContext) {
+      _setShadow: function (ctx) {
         if (!this.shadow) {
           return;
         }
