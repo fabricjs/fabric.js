@@ -1496,13 +1496,13 @@ import { TObject } from '../__types__';
             (mult.x + mult.y) *
             (scaling.x + scaling.y)) /
           4;
-        const { angle } = qrDecompose(
-          renderingContext.calcTransformMatrix(this)
-        );
+        // const { angle } = qrDecompose(
+        //   renderingContext.calcTransformMatrix(this)
+        // );
         const offset = new Point(shadow.offsetX, shadow.offsetY)
           .multiply(scaling)
-          .multiply(mult)
-          .rotate(degreesToRadians(-angle));
+          .multiply(mult);
+        // .rotate(degreesToRadians(-angle));
         ctx.shadowOffsetX = offset.x;
         ctx.shadowOffsetY = offset.y;
       },
