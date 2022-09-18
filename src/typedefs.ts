@@ -71,7 +71,3 @@ export type TransformEvent<T> = TEvent &
  * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
  */
 export type TCrossOrigin = '' | 'anonymous' | 'use-credentials' | null;
-
-export type WithReturnType<T extends (...a: any) => any, TNewReturn> = (
-  ...a: Parameters<T>
-) => TNewReturn;

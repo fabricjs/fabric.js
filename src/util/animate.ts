@@ -1,7 +1,6 @@
 import { fabric } from '../../HEADER';
 import { runningAnimations } from './animation_registry';
 import { noop } from '../constants';
-import { WithReturnType } from '../typedefs';
 import { defaultEasing, TEasingFunction } from './anim_ease';
 
 /**
@@ -10,17 +9,17 @@ import { defaultEasing, TEasingFunction } from './anim_ease';
  * @param valueRatio ratio of current value to animation max value. [0, 1]
  * @param timeRatio ratio of current ms to animation duration. [0, 1]
  */
-export type OnChangeCallback = (
+export type OnChangeCallback<T = void> = (
   t: number | number[],
   valueRatio: number,
   timeRatio: number
-) => void;
+) => T;
 
 /**
  * Called to determine if animation should abort
  * @returns truthy if animation should abort
  */
-export type AbortCallback = WithReturnType<OnChangeCallback, boolean>;
+export type AbortCallback = OnChangeCallback<boolean>;
 
 /**
  * Function used for canceling an animation
