@@ -3,13 +3,13 @@ import { cache } from '../cache';
 import { config } from '../config';
 import { VERSION } from '../constants';
 import { Point } from '../point.class';
+import { RenderingContext } from '../RenderingContext';
 import { runningAnimations } from '../util/animation_registry';
 import { capValue } from '../util/misc/capValue';
-import { invertTransform } from '../util/misc/matrix';
+import { invertTransform, qrDecompose } from '../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { TObject } from '../__types__';
-import { RenderingContext, TRenderingContext } from '../RenderingContext';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -1475,7 +1475,7 @@ import { RenderingContext, TRenderingContext } from '../RenderingContext';
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      _setShadow: function (ctx, renderContext: RenderingContext) {
+      _setShadow: function (ctx, renderingContext: RenderingContext) {
         if (!this.shadow) {
           return;
         }
@@ -1496,14 +1496,13 @@ import { RenderingContext, TRenderingContext } from '../RenderingContext';
             (mult.x + mult.y) *
             (scaling.x + scaling.y)) /
           4;
-
+        const { angle } = qrDecompose(
+          renderingContext.calcTransformMatrix(this)
+        );
         const offset = new Point(shadow.offsetX, shadow.offsetY)
           .multiply(scaling)
           .multiply(mult)
-          .rotate(
-            (renderContext.findCacheTarget(this)?.getTotalAngle() ?? 0) -
-              this.getTotalAngle()
-          );
+          .rotate(degreesToRadians(-angle));
         ctx.shadowOffsetX = offset.x;
         ctx.shadowOffsetY = offset.y;
       },
