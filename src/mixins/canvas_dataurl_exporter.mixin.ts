@@ -91,9 +91,10 @@ import { RenderingContext } from '../RenderingContext';
           canvasEl = fabric.util.createCanvasElement(),
           originalContextTop = this.contextTop,
           objectsToRender =
-            options.objects || options.filter
+            options.objects ||
+            (options.filter
               ? this._objects.filter(options.filter)
-              : this._objects;
+              : this._objects);
         canvasEl.width = scaledWidth;
         canvasEl.height = scaledHeight;
         this.contextTop = null;
