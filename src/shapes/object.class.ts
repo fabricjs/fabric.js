@@ -1276,34 +1276,6 @@ export type TRenderingContext = {
         this._cacheCanvas
           ? this.drawCacheOnCanvas(ctx)
           : this.drawObject(ctx, renderingContext);
-        // render
-        // if (this.needsItsOwnCache()) {
-        //   // 2 step rendering
-        //   const firstStep = this.canvas.contextCache;
-        //   firstStep.save();
-        //   firstStep.resetTransform();
-        //   this.canvas.clearContext(firstStep);
-        //   // firstStep.translate(this.cacheTranslationX, this.cacheTranslationY);
-        //   // firstStep.scale(this.zoomX, this.zoomY);
-        //   // this.drawObject(firstStep, !!forClipping);
-        //   // this.drawCacheOnCanvas(ctx, firstStep.canvas);
-        //   const t = ctx.getTransform();
-        //   firstStep.setTransform(t.a, t.b, t.c, t.d, t.e, t.f);
-        //   // this.renderObject(firstStep, forClipping);
-        //   this.transform(firstStep);
-        //   firstStep.translate(this.width / 2, this.height / 2);
-        //   firstStep.fillRect(
-        //     -this.width / 2,
-        //     -this.height / 2,
-        //     this.width,
-        //     this.height
-        //   );
-        //   firstStep.restore();
-        //   ctx.resetTransform();
-        //   ctx.drawImage(firstStep.canvas, 0, 0);
-        // } else {
-
-        // }
 
         this.dirty = false;
         ctx.restore();
