@@ -1039,8 +1039,7 @@ import { TObject } from '../__types__';
        */
       _set: function (key, value) {
         var shouldConstrainValue = key === 'scaleX' || key === 'scaleY',
-          isChanged = this[key] !== value,
-          groupNeedsUpdate = false;
+          isChanged = this[key] !== value;
 
         if (shouldConstrainValue) {
           value = this._constrainScale(value);
@@ -1057,19 +1056,18 @@ import { TObject } from '../__types__';
           !(value instanceof fabric.Shadow)
         ) {
           value = new fabric.Shadow(value);
-        } else if (key === 'dirty' && this.group) {
-          this.group.set('dirty', value);
         }
 
         this[key] = value;
 
-        if (isChanged) {
-          if (this.cacheProperties.indexOf(key) > -1) {
-            this.dirty = true;
-            this.group?.set('dirty', true);
-          } else if (this.stateProperties.indexOf(key) > -1) {
-            this.group?.set('dirty', true);
-          }
+        if (isChanged && this.cacheProperties.indexOf(key) > -1) {
+          this.dirty = true;
+        }
+        if (
+          this.dirty ||
+          (isChanged && this.stateProperties.indexOf(key) > -1)
+        ) {
+          this.group?.set('dirty', true);
         }
         return this;
       },
