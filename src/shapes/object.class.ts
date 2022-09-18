@@ -5,6 +5,7 @@ import { VERSION } from '../constants';
 import { Point } from '../point.class';
 import { RenderingContext } from '../RenderingContext';
 import { runningAnimations } from '../util/animation_registry';
+import { canvasProvider } from '../util/CanvasProvider';
 import { capValue } from '../util/misc/capValue';
 import { invertTransform } from '../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
