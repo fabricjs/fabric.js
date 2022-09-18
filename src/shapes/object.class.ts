@@ -5,6 +5,7 @@ import { VERSION } from '../constants';
 import { Point } from '../point.class';
 import { RenderingContext } from '../RenderingContext';
 import { runningAnimations } from '../util/animation_registry';
+import { cleanUpJsdomNode } from '../util/dom_misc';
 import { capValue } from '../util/misc/capValue';
 import { getMatrixRotation, invertTransform } from '../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
@@ -776,6 +777,7 @@ import { TObject } from '../__types__';
           }
         }
         var canvas = this._cacheCanvas,
+          ctx = this._cacheContext,
           dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
           minCacheSize = config.minCacheSideLimit,
           width = dims.width,
@@ -792,8 +794,8 @@ import { TObject } from '../__types__';
           additionalHeight = 0,
           shouldResizeCanvas = false;
         if (dimensionsChanged) {
-          var canvasWidth = this._cacheCanvas.width,
-            canvasHeight = this._cacheCanvas.height,
+          var canvasWidth = canvas.width,
+            canvasHeight = canvas.height,
             sizeGrowing = width > canvasWidth || height > canvasHeight,
             sizeShrinking =
               (width < canvasWidth * 0.9 || height < canvasHeight * 0.9) &&
@@ -820,8 +822,8 @@ import { TObject } from '../__types__';
             canvas.width = Math.ceil(width + additionalWidth);
             canvas.height = Math.ceil(height + additionalHeight);
           } else {
-            this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
-            this._cacheContext.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
           }
           drawingWidth = dims.x / 2;
           drawingHeight = dims.y / 2;
@@ -838,13 +840,13 @@ import { TObject } from '../__types__';
               renderingContext.calcTransformMatrix(this)
             )
           );
-          this._cacheContext.rotate(this.cacheRotation);
+          ctx.rotate(this.cacheRotation);
           const t = new Point(
             this.cacheTranslationX,
             this.cacheTranslationY
           ).rotate(-this.cacheRotation);
-          this._cacheContext.translate(t.x, t.y);
-          this._cacheContext.scale(zoomX, zoomY);
+          ctx.translate(t.x, t.y);
+          ctx.scale(zoomX, zoomY);
           this.zoomX = zoomX;
           this.zoomY = zoomY;
           return true;
@@ -1151,11 +1153,7 @@ import { TObject } from '../__types__';
       },
 
       /**
-       * When set to `true`, force the object to have its own cache, even if it is inside a group
-       * it may be needed when your object behave in a particular way on the cache and always needs
-       * its own isolated canvas to render correctly.
-       * Created to be overridden
-       * since 1.7.12
+       * require an isolated canvas to render correctly.
        * @returns Boolean
        */
       shouldRenderInIsolation: function () {
@@ -1218,6 +1216,7 @@ import { TObject } from '../__types__';
           }
         } else {
           // remove cache canvas
+          cleanUpJsdomNode(this._cacheCanvas);
           this._cacheCanvas = null;
           this._cacheContext = null;
           this.cacheWidth = 0;
@@ -1256,6 +1255,7 @@ import { TObject } from '../__types__';
         this._setShadow(ctx);
         this.prepareCache(renderingContext);
         this.transform(ctx, !isNested);
+
         this._cacheCanvas
           ? this.drawCacheOnCanvas(ctx)
           : this.drawObject(ctx, renderingContext);
