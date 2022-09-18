@@ -1,6 +1,7 @@
+//@ts-nocheck
+
 import { RenderingContext } from '../RenderingContext';
 
-//@ts-nocheck
 (function (global) {
   var fabric = global.fabric;
   fabric.util.object.extend(
