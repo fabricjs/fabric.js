@@ -7,7 +7,8 @@ import { RenderingContext } from '../RenderingContext';
 
   var fabric = global.fabric,
     __drawClipPath = fabric.Object.prototype._drawClipPath;
-  var _needsItsOwnCache = fabric.Object.prototype.needsItsOwnCache;
+  var _shouldRenderInIsolation =
+    fabric.Object.prototype.shouldRenderInIsolation;
   var _toObject = fabric.Object.prototype.toObject;
   var _getSvgCommons = fabric.Object.prototype.getSvgCommons;
   var __createBaseClipPathSVGMarkup =
@@ -43,8 +44,8 @@ import { RenderingContext } from '../RenderingContext';
      * @override
      * @returns Boolean
      */
-    needsItsOwnCache: function () {
-      return _needsItsOwnCache.call(this) || !!this.eraser;
+    shouldRenderInIsolation: function () {
+      return _shouldRenderInIsolation.call(this) || !!this.eraser;
     },
 
     /**

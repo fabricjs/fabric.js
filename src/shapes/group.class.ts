@@ -417,7 +417,7 @@ import { RenderingContext } from '../RenderingContext';
         return false;
       },
 
-      needsItsOwnCache: function () {
+      shouldRenderInIsolation: function () {
         return true;
       },
 

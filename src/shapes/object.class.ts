@@ -1158,7 +1158,7 @@ import { TObject } from '../__types__';
        * since 1.7.12
        * @returns Boolean
        */
-      needsItsOwnCache: function () {
+      shouldRenderInIsolation: function () {
         if (
           this.paintFirst === 'stroke' &&
           this.hasFill() &&
@@ -1188,7 +1188,7 @@ import { TObject } from '../__types__';
         let flag = false;
         if (
           this.shouldCache() ||
-          this.needsItsOwnCache() ||
+          this.shouldRenderInIsolation() ||
           renderingContext.isClipping(this)
         ) {
           if (!this._cacheCanvas || !this._cacheContext) {
