@@ -3,7 +3,7 @@ import { sin } from './sin';
 import { degreesToRadians } from './radiansDegreesConversion';
 import { iMatrix, PiBy180 } from '../../constants';
 import { IPoint, Point } from '../../point.class';
-import { TDegree, TMat2D } from '../../typedefs';
+import { TDegree, TMat2D, TRadian } from '../../typedefs';
 
 type TRotateMatrixArgs = {
   angle?: TDegree;
@@ -90,7 +90,7 @@ export const multiplyTransformMatrices = (
 export const qrDecompose = (
   a: TMat2D
 ): Required<Omit<TComposeMatrixArgs, 'flipX' | 'flipY'>> => {
-  const angle = Math.atan2(a[1], a[0]),
+  const angle = getMatrixRotation(a),
     denom = Math.pow(a[0], 2) + Math.pow(a[1], 2),
     scaleX = Math.sqrt(denom),
     scaleY = (a[0] * a[3] - a[2] * a[1]) / scaleX,
@@ -105,6 +105,9 @@ export const qrDecompose = (
     translateY: a[5],
   };
 };
+
+export const getMatrixRotation = (t: TMat2D) =>
+  Math.atan2(t[1], t[0]) as TRadian;
 
 /**
  * Returns a transform matrix starting from an object of the same kind of
