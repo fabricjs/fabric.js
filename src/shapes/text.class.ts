@@ -2,7 +2,12 @@
 
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
-import { TRenderingContext } from './RenderingContext';
+import { canvasProvider, TRenderingContext } from './RenderingContext';
+
+const measuringContext = canvasProvider.request({
+  width: 0,
+  height: 0,
+});
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {});
@@ -289,16 +294,6 @@ import { TRenderingContext } from './RenderingContext';
       styles: null,
 
       /**
-       * Reference to a context to measure text char or couple of chars
-       * the cacheContext of the canvas will be used or a freshly created one if the object is not on canvas
-       * once created it will be referenced on fabric._measuringContext to avoid creating a canvas for every
-       * text object created.
-       * @type {CanvasRenderingContext2D}
-       * @default
-       */
-      _measuringContext: null,
-
-      /**
        * Baseline shift, styles only, keep at 0 for the main text object
        * @type {Number}
        * @default
@@ -401,14 +396,7 @@ import { TRenderingContext } from './RenderingContext';
        * @return {fabric.Text} thisArg
        */
       getMeasuringContext: function () {
-        // if we did not return we have to measure something.
-        // TODO - referncing canvas on global context will error once canvas is disposed
-        if (!fabric._measuringContext) {
-          fabric._measuringContext =
-            (this.canvas && this.canvas.contextCache) ||
-            fabric.util.createCanvasElement().getContext('2d');
-        }
-        return fabric._measuringContext;
+        return measuringContext.ctx;
       },
 
       /**
