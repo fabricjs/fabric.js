@@ -385,9 +385,7 @@ const measuringContext = canvasProvider.request();
       },
 
       /**
-       * Return a context for measurement of text string.
-       * if created it gets stored for reuse
-       * this is for internal use, please do not use it
+       * for internal use, do not use it
        * @private
        * @param {String} text Text string
        * @param {Object} [options] Options object
