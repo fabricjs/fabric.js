@@ -1,3 +1,5 @@
+import { iMatrix } from './constants';
+import { multiplyTransformMatrices } from './util/misc/matrix';
 import { Canvas, TObject } from './__types__';
 
 export type TRenderingListing = {
@@ -143,6 +145,20 @@ export class RenderingContext implements TRenderingOptions {
 
   isOnCache(target: TObject) {
     return !!this.findCacheTarget(target);
+  }
+
+  calcTransformMatrix(target: TObject) {
+    const index = this.findIndex(target);
+    return index > -1
+      ? this.tree
+          .slice(0, index)
+          .reverse()
+          .reduce(
+            (mat, { target }) =>
+              multiplyTransformMatrices(target.calcOwnMatrix(), mat),
+            iMatrix
+          )
+      : iMatrix;
   }
 
   fork(listing?: TRenderingListing) {
