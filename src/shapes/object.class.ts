@@ -836,14 +836,13 @@ import { TObject } from '../__types__';
           this.cacheRotation = getMatrixRotation(
             renderingContext.calcTransformMatrix(this)
           );
-          ctx.scale(zoomX, zoomY);
           ctx.rotate(this.cacheRotation);
           const t = new Point(
             this.cacheTranslationX,
             this.cacheTranslationY
           ).rotate(-this.cacheRotation);
           ctx.translate(t.x, t.y);
-
+          ctx.scale(zoomX, zoomY);
           this.zoomX = zoomX;
           this.zoomY = zoomY;
           return true;
