@@ -6,7 +6,7 @@ function createClippedNestedShadowedTextTest(a, b, c, stroke) {
         fontWeight: 'bold',
         top: 24,
         textAlign: 'center',
-        strokeWidth: stroke ? 5 : 1,
+        strokeWidth: stroke ? 5 : 0,
         stroke: 'rgba(0,0,0,0.5)',
         shadow: new fabric.Shadow({
           color: "red",
@@ -72,12 +72,12 @@ QUnit.module('Shadow Casting', hooks => {
             golden: `clipping/nested-shadow/${containerDeg},${c}.png`,
             ...config
           });
-          runner({
-            test: 'stroke',
-            code: createClippedNestedShadowedTextTest(a, b, c, true),
-            golden: `clipping/nested-shadow/${containerDeg},${c},stroke.png`,
-            ...config
-          });
+          // runner({
+          //   test: 'stroke',
+          //   code: createClippedNestedShadowedTextTest(a, b, c, true),
+          //   golden: `clipping/nested-shadow/${containerDeg},${c},stroke.png`,
+          //   ...config
+          // });
         });
       });
     });
