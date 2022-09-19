@@ -1,6 +1,7 @@
 import { fabric } from '../../HEADER';
-import { runningAnimations } from './animation_registry';
 import { noop } from '../constants';
+import { TObject } from '../__types__';
+import { runningAnimations } from './animation_registry';
 import { defaultEasing, TEasingFunction } from './anim_ease';
 
 /**
@@ -33,7 +34,7 @@ export interface AnimationOptions {
   /**
    * The object this animation is being performed on
    */
-  target?: unknown;
+  target?: TObject | unknown;
 
   /**
    * Called when the animation starts
