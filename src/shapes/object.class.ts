@@ -1241,7 +1241,14 @@ import { TObject } from '../__types__';
       },
 
       /**
+       * The main entry point of the object's rendering cycle:
+       * - `render`
+       * - `prepareCache`
+       * - `drawCacheOnCanvas` **OR** `drawObject`
+       * - `drawClipPath`: calls `render` on `clipPath`
+       *
        * Renders an object on a specified context
+       *
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
       render: function (
