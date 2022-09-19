@@ -8,7 +8,7 @@ about: Create a detailed bug report with a reproducible test case. Anything else
 
 - [ ] I have read and followed the [Contributing Guide](/CONTRIBUTING.md)
 - [ ] I have read and followed the [Issue Tracker Guide](/CONTRIBUTING.md#%EF%B8%8F-issue-tracker)
-- [ ] I have searched existing issues and discussions
+- [ ] I have searched and referenced existing issues and discussions
 - [ ] I have managed to reproduce the bug **after** upgrading to the **latest** version
 - [ ] I have created an accurate and minimal reproduction
 
@@ -18,19 +18,24 @@ about: Create a detailed bug report with a reproducible test case. Anything else
 
 
 ## Test Case
+<!-- 🛑
 
-<!-- 
+A good reproduction helps us UNDERSTAND your issue, find the bug and fix it quickly.
+Take the time and put effort into making your reproduction accurate and minimal.
+Use the following reproduction templates.
 
-A good reproduction helps us understand your issue, find the bug and fix it quickly so take the time and make the effort to make it accurate and minimal.
-Use the following reproduction templates to create one.
+- [Browser Reproduction](https://jsfiddle.net/Lcp2h3nv/)
+- [Node Reproduction](https://codesandbox.io/s/exciting-browser-ytb701)
+
+⛔ No reproduction === closed issue ⛔
+
 -->
 
-- [ ] [Browser Reproduction](https://jsfiddle.net/Lcp2h3nv/)
-- [ ] [Node Reproduction](https://codesandbox.io/s/exciting-browser-ytb701)
 
-## Information about environment
-Nodejs or browser?
-Which browsers?
+
+## Environment
+- [ ] node <!-- add version -->
+- [ ] browser <!-- add on which browsers the bug occurs -->
 
 ## Steps To Reproduce
 
