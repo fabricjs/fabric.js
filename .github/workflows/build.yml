@@ -68,3 +68,4 @@ jobs:
           fileName: CHANGELOG.md
           noChangelogLabel: Missing update to CHANGELOG.md
           checkNotification: Simple # default `Detailed`
+        env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
