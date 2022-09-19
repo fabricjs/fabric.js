@@ -55,9 +55,16 @@ jobs:
           update-comment: true
   changelog:
     if: ${{ always() }}
-    - name: Changelog check
-      uses: Zomzog/changelog-checker@v1.2.0
-      with:
-        fileName: CHANGELOG.md
-        noChangelogLabel: Missing update to CHANGELOG.md
-        checkNotification: Simple # default `Detailed`
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Code Coverage Report Updater
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - name: Changelog check
+        uses: Zomzog/changelog-checker@v1.2.0
+        with:
+          fileName: CHANGELOG.md
+          noChangelogLabel: Missing update to CHANGELOG.md
+          checkNotification: Simple # default `Detailed`
