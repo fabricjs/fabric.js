@@ -58,7 +58,7 @@ class WebGLProbe {
    * @returns config object if true
    */
   private queryWebGL() {
-    if (this.initialized || !fabric.isLikelyNode) {
+    if (this.initialized || fabric.isLikelyNode) {
       return;
     }
     const canvas = createCanvasElement();
