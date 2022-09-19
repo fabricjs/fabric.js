@@ -153,6 +153,8 @@ PRs must be backed with relevant tests, follow [TESTING](#-testing).
 - **Docs** \
 Add relevant comments to your code if necessary using [JSDoc 3](https://jsdoc.app/) and update relevant guides.\
 The generated documentation can be found at [fabricjs.com](http://fabricjs.com/docs), see [DOCS](#🔎-improving-docs).
+- **Changelog**\
+Add a consice listing to the [**CHANGELOG**](./CHANGELOG.md) describing what has changed.
 - **1️⃣ PR per feature/bug** \
 Create a new branch for every pull request.\
 If you want to do more than one thing, create multiple pull requests 💪.
