@@ -10,7 +10,6 @@ import { capValue } from '../util/misc/capValue';
 import { getMatrixRotation, invertTransform } from '../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
-import { calcPlaneChangeMatrix } from '../util/misc/planeChange';
 import { TObject } from '../__types__';
 
 (function (global) {
@@ -834,11 +833,8 @@ import { TObject } from '../__types__';
           this.cacheWidth = width;
           this.cacheHeight = height;
           // we need to rotate the cache so that shadow is projected in the right direction
-          this.cacheRotation = -getMatrixRotation(
-            calcPlaneChangeMatrix(
-              renderingContext.calcCacheMatrix(this),
-              renderingContext.calcTransformMatrix(this)
-            )
+          this.cacheRotation = getMatrixRotation(
+            renderingContext.calcTransformMatrix(this)
           );
           ctx.rotate(this.cacheRotation);
           const t = new Point(
