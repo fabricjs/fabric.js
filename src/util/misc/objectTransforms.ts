@@ -1,7 +1,12 @@
-import { Point } from "../../point.class";
-import { TMat2D } from "../../typedefs";
+import { Point } from '../../point.class';
+import { TMat2D } from '../../typedefs';
 import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
-import { invertTransform, multiplyTransformMatrices, qrDecompose, calcDimensionsMatrix } from "./matrix";
+import {
+  invertTransform,
+  multiplyTransformMatrices,
+  qrDecompose,
+  calcDimensionsMatrix,
+} from './matrix';
 import type { TComposeMatrixArgs, TScaleMatrixArgs } from './matrix';
 
 type FabricObject = any;
@@ -18,9 +23,15 @@ type FabricObject = any;
  * @param {fabric.Object} object the object you want to transform
  * @param {Array} transform the destination transform
  */
-export const removeTransformFromObject = (object: FabricObject, transform: TMat2D) => {
+export const removeTransformFromObject = (
+  object: FabricObject,
+  transform: TMat2D
+) => {
   const inverted = invertTransform(transform),
-      finalTransform = multiplyTransformMatrices(inverted, object.calcOwnMatrix());
+    finalTransform = multiplyTransformMatrices(
+      inverted,
+      object.calcOwnMatrix()
+    );
   applyTransformToObject(object, finalTransform);
 };
 
@@ -45,9 +56,13 @@ export const addTransformToObject = (object: FabricObject, transform: TMat2D) =>
  * @param {fabric.Object} object the object you want to transform
  * @param {Array} transform the destination transform
  */
-export const applyTransformToObject = (object: FabricObject, transform: TMat2D) => {
-  const { translateX, translateY, scaleX, scaleY, ...otherOptions } = qrDecompose(transform),
-        center = new Point(translateX, translateY);
+export const applyTransformToObject = (
+  object: FabricObject,
+  transform: TMat2D
+) => {
+  const { translateX, translateY, scaleX, scaleY, ...otherOptions } =
+      qrDecompose(transform),
+    center = new Point(translateX, translateY);
   object.flipX = false;
   object.flipY = false;
   Object.assign(object, otherOptions);
@@ -79,7 +94,7 @@ export const resetObjectTransform = (target: FabricObject) => {
  */
 export const saveObjectTransform = (
   target: FabricObject
-): TComposeMatrixArgs & { left: number, top: number } =>({
+): TComposeMatrixArgs & { left: number; top: number } => ({
   scaleX: target.scaleX,
   scaleY: target.scaleY,
   skewX: target.skewX,
@@ -88,33 +103,38 @@ export const saveObjectTransform = (
   left: target.left,
   flipX: target.flipX,
   flipY: target.flipY,
-  top: target.top
+  top: target.top,
 });
 
 /**
-  * given a width and height, return the size of the bounding box
-  * that can contains the box with width/height with applied transform
-  * described in options.
-  * Use to calculate the boxes around objects for controls.
-  * @memberOf fabric.util
-  * @param {Number} width
-  * @param {Number} height
-  * @param {Object} options
-  * @param {Number} options.scaleX
-  * @param {Number} options.scaleY
-  * @param {Number} options.skewX
-  * @param {Number} options.skewY
-  * @returns {Point} size
-  */
-export const sizeAfterTransform = (width: number, height: number, options: TScaleMatrixArgs) => {
-  const dimX = width / 2, dimY = height / 2,
-      transformMatrix = calcDimensionsMatrix(options),
-      points = [
-        new Point(-dimX, -dimY),
-        new Point(dimX, -dimY),
-        new Point(-dimX, dimY),
-        new Point(dimX, dimY),
-      ].map(p => p.transform(transformMatrix)),
-      bbox = makeBoundingBoxFromPoints(points);
- return new Point(bbox.width, bbox.height);
+ * given a width and height, return the size of the bounding box
+ * that can contains the box with width/height with applied transform
+ * described in options.
+ * Use to calculate the boxes around objects for controls.
+ * @memberOf fabric.util
+ * @param {Number} width
+ * @param {Number} height
+ * @param {Object} options
+ * @param {Number} options.scaleX
+ * @param {Number} options.scaleY
+ * @param {Number} options.skewX
+ * @param {Number} options.skewY
+ * @returns {Point} size
+ */
+export const sizeAfterTransform = (
+  width: number,
+  height: number,
+  options: TScaleMatrixArgs
+) => {
+  const dimX = width / 2,
+    dimY = height / 2,
+    transformMatrix = calcDimensionsMatrix(options),
+    points = [
+      new Point(-dimX, -dimY),
+      new Point(dimX, -dimY),
+      new Point(-dimX, dimY),
+      new Point(dimX, dimY),
+    ].map((p) => p.transform(transformMatrix)),
+    bbox = makeBoundingBoxFromPoints(points);
+  return new Point(bbox.width, bbox.height);
 };

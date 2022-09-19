@@ -3,14 +3,13 @@ import { noop } from '../constants';
 
 function addMethods(klass, source, parent) {
   for (var property in source) {
-
-    if (property in klass.prototype &&
-        typeof klass.prototype[property] === 'function' &&
-        (source[property] + '').indexOf('callSuper') > -1) {
-
-      klass.prototype[property] = (function(property) {
-        return function(...args) {
-
+    if (
+      property in klass.prototype &&
+      typeof klass.prototype[property] === 'function' &&
+      (source[property] + '').indexOf('callSuper') > -1
+    ) {
+      klass.prototype[property] = (function (property) {
+        return function (...args) {
           var superclass = this.constructor.superclass;
           this.constructor.superclass = parent;
           var returnValue = source[property].call(this, ...args);
@@ -21,18 +20,17 @@ function addMethods(klass, source, parent) {
           }
         };
       })(property);
-    }
-    else {
+    } else {
       klass.prototype[property] = source[property];
     }
   }
-};
+}
 
-function Subclass() { }
+function Subclass() {}
 
 function callSuper(methodName, ...args) {
   var parentMethod = null,
-      _this = this;
+    _this = this;
 
   // climb prototype chain to find method not equal to callee's method
   while (_this.constructor.superclass) {
@@ -46,7 +44,12 @@ function callSuper(methodName, ...args) {
   }
 
   if (!parentMethod) {
-    return console.log('tried to callSuper ' + methodName + ', method not found in prototype chain', this);
+    return console.log(
+      'tried to callSuper ' +
+        methodName +
+        ', method not found in prototype chain',
+      this
+    );
   }
 
   return parentMethod.call(this, ...args);
@@ -61,7 +64,7 @@ function callSuper(methodName, ...args) {
  */
 export function createClass(...args) {
   var parent = null,
-      properties = [...args];
+    properties = [...args];
 
   if (typeof args[0] === 'function') {
     parent = properties.shift();

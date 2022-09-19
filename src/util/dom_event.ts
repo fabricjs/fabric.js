@@ -24,7 +24,7 @@ export const addListener = (element, eventName, handler, options) =>
  * @param {String} eventName
  * @param {Function} handler
  */
- export const removeListener = (element, eventName, handler, options) =>
+export const removeListener = (element, eventName, handler, options) =>
   element && element.removeEventListener(eventName, handler, options);
 
 function getTouchInfo(event) {
@@ -37,8 +37,8 @@ function getTouchInfo(event) {
 
 export const getPointer = (event) => {
   const element = event.target,
-        scroll = fabric.util.getScrollLeftTop(element),
-        _evt = getTouchInfo(event);
+    scroll = fabric.util.getScrollLeftTop(element),
+    _evt = getTouchInfo(event);
   return new Point(_evt.clientX + scroll.left, _evt.clientY + scroll.top);
 };
 

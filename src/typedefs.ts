@@ -1,13 +1,13 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
 
 interface NominalTag<T> {
-  'nominalTag': T;
+  nominalTag: T;
 }
 
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
 
-const enum Degree { }
-const enum Radian { }
+const enum Degree {}
+const enum Radian {}
 
 export type TDegree = Nominal<number, Degree>;
 export type TRadian = Nominal<number, Radian>;
@@ -15,7 +15,7 @@ export type TRadian = Nominal<number, Radian>;
 export type TSize = {
   width: number;
   height: number;
-}
+};
 
 export type Percent = `${number}%`;
 
@@ -56,14 +56,15 @@ export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
 export type PathData = (string | number)[][];
 
 export type TEvent<E extends Event = MouseEvent | TouchEvent> = {
-  e: E
-}
+  e: E;
+};
 
-export type TransformEvent<T> = TEvent & T & {
-  transform: {
-    target: any
-  }
-}
+export type TransformEvent<T> = TEvent &
+  T & {
+    transform: {
+      target: any;
+    };
+  };
 
 /**
  * An invalid keyword and an empty string will be handled as the `anonymous` keyword.

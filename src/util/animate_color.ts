@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Color } from "../color";
+import { Color } from '../color';
 import { animate } from './animate';
 
 // Calculate an in-between color. Returns a "rgba()" string.
@@ -15,17 +15,22 @@ import { animate } from './animate';
 // but begin and end aren't array anymore since we improved animate function
 // to handler arrays internally.
 function calculateColor(begin, end, pos) {
-  let color = 'rgba('
-      + parseInt((begin[0] + pos * (end[0] - begin[0])), 10) + ','
-      + parseInt((begin[1] + pos * (end[1] - begin[1])), 10) + ','
-      + parseInt((begin[2] + pos * (end[2] - begin[2])), 10);
+  let color =
+    'rgba(' +
+    parseInt(begin[0] + pos * (end[0] - begin[0]), 10) +
+    ',' +
+    parseInt(begin[1] + pos * (end[1] - begin[1]), 10) +
+    ',' +
+    parseInt(begin[2] + pos * (end[2] - begin[2]), 10);
 
-  color += ',' + (begin && end ? parseFloat(begin[3] + pos * (end[3] - begin[3])) : 1);
+  color +=
+    ',' + (begin && end ? parseFloat(begin[3] + pos * (end[3] - begin[3])) : 1);
   color += ')';
   return color;
 }
 
-const defaultColorEasing = (currentTime, duration) => 1 - Math.cos(currentTime / duration * (Math.PI / 2));
+const defaultColorEasing = (currentTime, duration) =>
+  1 - Math.cos((currentTime / duration) * (Math.PI / 2));
 
 /**
  * Changes the color from one to another within certain period of time, invoking callbacks as value is being changed.
@@ -52,7 +57,7 @@ export function animateColor(
   } = {}
 ) {
   const startColor = new Color(fromColor).getSource(),
-        endColor = new Color(toColor).getSource(),
+    endColor = new Color(toColor).getSource();
   return animate({
     ...restOfOptions,
     duration,
@@ -62,11 +67,8 @@ export function animateColor(
     easing: (currentTime, startValue, byValue, duration) =>
       calculateColor(startValue, byValue, colorEasing(currentTime, duration)),
     // has to take in account for color restoring;
-    onComplete: (current, valuePerc, timePerc) => onComplete?.(
-      calculateColor(endColor, endColor, 0),
-      valuePerc,
-      timePerc
-    ),
+    onComplete: (current, valuePerc, timePerc) =>
+      onComplete?.(calculateColor(endColor, endColor, 0), valuePerc, timePerc),
     onChange: (current, valuePerc, timePerc) => {
       if (onChange) {
         if (Array.isArray(current)) {
@@ -78,7 +80,6 @@ export function animateColor(
         }
         onChange(current, valuePerc, timePerc);
       }
-    }
+    },
   });
 }
-

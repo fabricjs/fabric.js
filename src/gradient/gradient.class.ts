@@ -1,15 +1,25 @@
-
-
-import { fabric } from "../../HEADER";
-import { Color } from "../color";
-import { iMatrix } from "../constants";
-import { parseTransformAttribute } from "../parser/parseTransformAttribute";
-import { TMat2D } from "../typedefs";
-import { pick } from "../util/misc/pick";
-import { matrixToSVG } from "../util/misc/svgParsing";
-import { linearDefaultCoords, radialDefaultCoords } from "./constants";
-import { parseColorStops, parseCoords, parseGradientUnits, parseType } from "./parser";
-import { ColorStop, GradientCoords, GradientOptions, GradientType, GradientUnits, SVGOptions } from "./typedefs";
+import { fabric } from '../../HEADER';
+import { Color } from '../color';
+import { iMatrix } from '../constants';
+import { parseTransformAttribute } from '../parser/parseTransformAttribute';
+import { TMat2D } from '../typedefs';
+import { pick } from '../util/misc/pick';
+import { matrixToSVG } from '../util/misc/svgParsing';
+import { linearDefaultCoords, radialDefaultCoords } from './constants';
+import {
+  parseColorStops,
+  parseCoords,
+  parseGradientUnits,
+  parseType,
+} from './parser';
+import {
+  ColorStop,
+  GradientCoords,
+  GradientOptions,
+  GradientType,
+  GradientUnits,
+  SVGOptions,
+} from './typedefs';
 
 /**
  * @todo remove this transient junk
@@ -21,21 +31,23 @@ type FabricObject = any;
  * @class Gradient
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#gradients}
  */
-export class Gradient<S, T extends GradientType = S extends GradientType ? S : 'linear'> {
-
+export class Gradient<
+  S,
+  T extends GradientType = S extends GradientType ? S : 'linear'
+> {
   /**
    * Horizontal offset for aligning gradients coming from SVG when outside pathgroups
    * @type Number
    * @default 0
    */
-  offsetX = 0
+  offsetX = 0;
 
   /**
    * Vertical offset for aligning gradients coming from SVG when outside pathgroups
    * @type Number
    * @default 0
    */
-  offsetY = 0
+  offsetY = 0;
 
   /**
    * A transform matrix to apply to the gradient before painting.
@@ -45,7 +57,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    * @type Number[]
    * @default null
    */
-  gradientTransform: TMat2D | null = null
+  gradientTransform: TMat2D | null = null;
 
   /**
    * coordinates units for coords.
@@ -56,20 +68,20 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    * @type GradientUnits
    * @default 'pixels'
    */
-  gradientUnits: GradientUnits
+  gradientUnits: GradientUnits;
 
   /**
    * Gradient type linear or radial
    * @type GradientType
    * @default 'linear'
    */
-  type: T
+  type: T;
 
-  coords: GradientCoords<T>
+  coords: GradientCoords<T>;
 
-  colorStops: ColorStop[]
+  colorStops: ColorStop[];
 
-  private id: string | number
+  private id: string | number;
 
   constructor({
     type = 'linear' as T,
@@ -79,7 +91,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     offsetX = 0,
     offsetY = 0,
     gradientTransform,
-    id
+    id,
   }: GradientOptions<T>) {
     const uid = fabric.Object.__uid++;
     this.id = id ? `${id}_${uid}` : uid;
@@ -89,10 +101,8 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.coords = {
-      ...this.type === 'radial' ?
-        radialDefaultCoords :
-        linearDefaultCoords,
-      ...coords
+      ...(this.type === 'radial' ? radialDefaultCoords : linearDefaultCoords),
+      ...coords,
     } as GradientCoords<T>;
     this.colorStops = colorStops.slice();
   }
@@ -112,7 +122,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
       this.colorStops.push({
         offset: parseFloat(position),
         color: color.toRgb(),
-        opacity: color.getAlpha()
+        opacity: color.getAlpha(),
       });
     }
     return this;
@@ -132,7 +142,9 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
       offsetX: this.offsetX,
       offsetY: this.offsetY,
       gradientUnits: this.gradientUnits,
-      gradientTransform: this.gradientTransform ? this.gradientTransform.concat() : this.gradientTransform
+      gradientTransform: this.gradientTransform
+        ? this.gradientTransform.concat()
+        : this.gradientTransform,
     };
   }
 
@@ -142,21 +154,33 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    * @param {fabric.Object} object Object to create a gradient for
    * @return {String} SVG representation of an gradient (linear/radial)
    */
-  toSVG(object: FabricObject, { additionalTransform: preTransform }: { additionalTransform?: string } = {}) {
+  toSVG(
+    object: FabricObject,
+    { additionalTransform: preTransform }: { additionalTransform?: string } = {}
+  ) {
     const markup = [],
-      transform = (this.gradientTransform ? this.gradientTransform.concat() : iMatrix.concat()) as TMat2D,
-      gradientUnits = this.gradientUnits === 'pixels' ? 'userSpaceOnUse' : 'objectBoundingBox';
+      transform = (
+        this.gradientTransform
+          ? this.gradientTransform.concat()
+          : iMatrix.concat()
+      ) as TMat2D,
+      gradientUnits =
+        this.gradientUnits === 'pixels'
+          ? 'userSpaceOnUse'
+          : 'objectBoundingBox';
     // colorStops must be sorted ascending, and guarded against deep mutations
-    const colorStops = this.colorStops.map((colorStop) => ({ ...colorStop })).sort((a, b) => {
-      return a.offset - b.offset;
-    });
+    const colorStops = this.colorStops
+      .map((colorStop) => ({ ...colorStop }))
+      .sort((a, b) => {
+        return a.offset - b.offset;
+      });
 
-    let offsetX = -this.offsetX, offsetY = -this.offsetY;
+    let offsetX = -this.offsetX,
+      offsetY = -this.offsetY;
     if (gradientUnits === 'objectBoundingBox') {
       offsetX /= object.width;
       offsetY /= object.height;
-    }
-    else {
+    } else {
       offsetX += object.width / 2;
       offsetY += object.height / 2;
     }
@@ -170,8 +194,10 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     const commonAttributes = [
       `id="SVGID_${this.id}"`,
       `gradientUnits="${gradientUnits}"`,
-      `gradientTransform="${preTransform ? preTransform + ' ' : ''}${matrixToSVG(transform)}"`,
-      ''
+      `gradientTransform="${
+        preTransform ? preTransform + ' ' : ''
+      }${matrixToSVG(transform)}"`,
+      '',
     ].join(' ');
 
     if (this.type === 'linear') {
@@ -179,31 +205,40 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
       markup.push(
         '<linearGradient ',
         commonAttributes,
-        ' x1="', x1,
-        '" y1="', y1,
-        '" x2="', x2,
-        '" y2="', y2,
+        ' x1="',
+        x1,
+        '" y1="',
+        y1,
+        '" x2="',
+        x2,
+        '" y2="',
+        y2,
         '">\n'
       );
-    }
-    else if (this.type === 'radial') {
-      const { x1, y1, x2, y2, r1, r2 } = this.coords as GradientCoords<'radial'>;
+    } else if (this.type === 'radial') {
+      const { x1, y1, x2, y2, r1, r2 } = this
+        .coords as GradientCoords<'radial'>;
       const needsSwap = r1 > r2;
       // svg radial gradient has just 1 radius. the biggest.
       markup.push(
         '<radialGradient ',
         commonAttributes,
-        ' cx="', needsSwap ? x1 : x2,
-        '" cy="', needsSwap ? y1 : y2,
-        '" r="', needsSwap ? r1 : r2,
-        '" fx="', needsSwap ? x2 : x1,
-        '" fy="', needsSwap ? y2 : y1,
+        ' cx="',
+        needsSwap ? x1 : x2,
+        '" cy="',
+        needsSwap ? y1 : y2,
+        '" r="',
+        needsSwap ? r1 : r2,
+        '" fx="',
+        needsSwap ? x2 : x1,
+        '" fy="',
+        needsSwap ? y2 : y1,
         '">\n'
       );
       if (needsSwap) {
         // svg goes from internal to external radius. if radius are inverted, swap color stops.
         colorStops.reverse(); //  mutates array
-        colorStops.forEach(colorStop => {
+        colorStops.forEach((colorStop) => {
           colorStop.offset = 1 - colorStop.offset;
         });
       }
@@ -212,7 +247,7 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
         // i have to shift all colorStops and add new one in 0.
         const maxRadius = Math.max(r1, r2),
           percentageShift = minRadius / maxRadius;
-        colorStops.forEach(colorStop => {
+        colorStops.forEach((colorStop) => {
           colorStop.offset += percentageShift * (1 - colorStop.offset);
         });
       }
@@ -221,14 +256,19 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     colorStops.forEach(({ color, offset, opacity }) => {
       markup.push(
         '<stop ',
-        'offset="', (offset * 100) + '%',
-        '" style="stop-color:', color,
-        (typeof opacity !== 'undefined' ? ';stop-opacity: ' + opacity : ';'),
+        'offset="',
+        offset * 100 + '%',
+        '" style="stop-color:',
+        color,
+        typeof opacity !== 'undefined' ? ';stop-opacity: ' + opacity : ';',
         '"/>\n'
       );
     });
 
-    markup.push(this.type === 'linear' ? '</linearGradient>' : '</radialGradient>', '\n');
+    markup.push(
+      this.type === 'linear' ? '</linearGradient>' : '</radialGradient>',
+      '\n'
+    );
 
     return markup.join('');
   }
@@ -245,16 +285,24 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
     }
 
     const coords = this.coords as GradientCoords<'radial'>;
-    const gradient = this.type === 'linear' ?
-      ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2) :
-      ctx.createRadialGradient(coords.x1, coords.y1, coords.r1, coords.x2, coords.y2, coords.r2);
+    const gradient =
+      this.type === 'linear'
+        ? ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2)
+        : ctx.createRadialGradient(
+            coords.x1,
+            coords.y1,
+            coords.r1,
+            coords.x2,
+            coords.y2,
+            coords.r2
+          );
 
     this.colorStops.forEach(({ color, opacity, offset }) => {
       gradient.addColorStop(
         offset,
-        typeof opacity !== 'undefined' ?
-          new Color(color).setAlpha(opacity).toRgba() :
-          color
+        typeof opacity !== 'undefined'
+          ? new Color(color).setAlpha(opacity).toRgba()
+          : color
       );
     });
 
@@ -306,7 +354,11 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
    *  </radialGradient>
    *
    */
-  static fromElement(el: SVGGradientElement, instance: FabricObject, svgOptions: SVGOptions): Gradient<GradientType> {
+  static fromElement(
+    el: SVGGradientElement,
+    instance: FabricObject,
+    svgOptions: SVGOptions
+  ): Gradient<GradientType> {
     const gradientUnits = parseGradientUnits(el);
     return new Gradient({
       id: el.getAttribute('id') || undefined,
@@ -317,15 +369,18 @@ export class Gradient<S, T extends GradientType = S extends GradientType ? S : '
       }),
       colorStops: parseColorStops(el, svgOptions.opacity),
       gradientUnits,
-      gradientTransform: parseTransformAttribute(el.getAttribute('gradientTransform') || ''),
-      ...(gradientUnits === 'pixels' ?
-        {
-          offsetX: -instance.left,
-          offsetY: -instance.top
-        } : {
-          offsetX: 0,
-          offsetY: 0
-        })
+      gradientTransform: parseTransformAttribute(
+        el.getAttribute('gradientTransform') || ''
+      ),
+      ...(gradientUnits === 'pixels'
+        ? {
+            offsetX: -instance.left,
+            offsetY: -instance.top,
+          }
+        : {
+            offsetX: 0,
+            offsetY: 0,
+          }),
     });
   }
   /* _FROM_SVG_END_ */

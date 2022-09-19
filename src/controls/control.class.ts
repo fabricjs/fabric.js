@@ -1,11 +1,9 @@
 //@ts-nocheck
 
-import { renderCircleControl, renderSquareControl } from "./controls.render";
+import { renderCircleControl, renderSquareControl } from './controls.render';
 
-
-(function(global) {
-
-  var fabric = global.fabric || (global.fabric = { });
+(function (global) {
+  var fabric = global.fabric || (global.fabric = {});
 
   function Control(options) {
     for (var i in options) {
@@ -16,7 +14,6 @@ import { renderCircleControl, renderSquareControl } from "./controls.render";
   fabric.Control = Control;
 
   fabric.Control.prototype = /** @lends fabric.Control.prototype */ {
-
     /**
      * keep track of control visibility.
      * mainly for backward compatibility.
@@ -145,7 +142,7 @@ import { renderCircleControl, renderSquareControl } from "./controls.render";
      * @param {Number} y y position of the cursor
      * @return {Boolean} true if the action/event modified the object
      */
-    actionHandler: function(/* eventData, transformData, x, y */) { },
+    actionHandler: function (/* eventData, transformData, x, y */) {},
 
     /**
      * The control handler for mouse down, provide one to handle mouse down on control
@@ -155,7 +152,7 @@ import { renderCircleControl, renderSquareControl } from "./controls.render";
      * @param {Number} y y position of the cursor
      * @return {Boolean} true if the action/event modified the object
      */
-    mouseDownHandler: function(/* eventData, transformData, x, y */) { },
+    mouseDownHandler: function (/* eventData, transformData, x, y */) {},
 
     /**
      * The control mouseUpHandler, provide one to handle an effect on mouse up.
@@ -165,7 +162,7 @@ import { renderCircleControl, renderSquareControl } from "./controls.render";
      * @param {Number} y y position of the cursor
      * @return {Boolean} true if the action/event modified the object
      */
-    mouseUpHandler: function(/* eventData, transformData, x, y */) { },
+    mouseUpHandler: function (/* eventData, transformData, x, y */) {},
 
     /**
      * Returns control actionHandler
@@ -174,7 +171,7 @@ import { renderCircleControl, renderSquareControl } from "./controls.render";
      * @param {fabric.Control} control control for which the action handler is being asked
      * @return {Function} the action handler
      */
-    getActionHandler: function(/* eventData, fabricObject, control */) {
+    getActionHandler: function (/* eventData, fabricObject, control */) {
       return this.actionHandler;
     },
 
@@ -185,7 +182,7 @@ import { renderCircleControl, renderSquareControl } from "./controls.render";
      * @param {fabric.Control} control control for which the action handler is being asked
      * @return {Function} the action handler
      */
-    getMouseDownHandler: function(/* eventData, fabricObject, control */) {
+    getMouseDownHandler: function (/* eventData, fabricObject, control */) {
       return this.mouseDownHandler;
     },
 
@@ -196,7 +193,7 @@ import { renderCircleControl, renderSquareControl } from "./controls.render";
      * @param {fabric.Control} control control for which the action handler is being asked
      * @return {Function} the action handler
      */
-    getMouseUpHandler: function(/* eventData, fabricObject, control */) {
+    getMouseUpHandler: function (/* eventData, fabricObject, control */) {
       return this.mouseUpHandler;
     },
 
@@ -209,7 +206,7 @@ import { renderCircleControl, renderSquareControl } from "./controls.render";
      * @param {fabric.Object} object on which the control is displayed
      * @return {String}
      */
-    cursorStyleHandler: function(eventData, control /* fabricObject */) {
+    cursorStyleHandler: function (eventData, control /* fabricObject */) {
       return control.cursorStyle;
     },
 
@@ -220,7 +217,7 @@ import { renderCircleControl, renderSquareControl } from "./controls.render";
      * @param {fabric.Object} object on which the control is displayed
      * @return {String}
      */
-    getActionName: function(eventData, control /* fabricObject */) {
+    getActionName: function (eventData, control /* fabricObject */) {
       return control.actionName;
     },
 
@@ -230,9 +227,12 @@ import { renderCircleControl, renderSquareControl } from "./controls.render";
      * @param {String} controlKey key where the control is memorized on the
      * @return {Boolean}
      */
-    getVisibility: function(fabricObject, controlKey) {
+    getVisibility: function (fabricObject, controlKey) {
       var objectVisibility = fabricObject._controlsVisibility;
-      if (objectVisibility && typeof objectVisibility[controlKey] !== 'undefined') {
+      if (
+        objectVisibility &&
+        typeof objectVisibility[controlKey] !== 'undefined'
+      ) {
         return objectVisibility[controlKey];
       }
       return this.visible;
@@ -243,15 +243,21 @@ import { renderCircleControl, renderSquareControl } from "./controls.render";
      * @param {Boolean} visibility for the object
      * @return {Void}
      */
-    setVisibility: function(visibility /* name, fabricObject */) {
+    setVisibility: function (visibility /* name, fabricObject */) {
       this.visible = visibility;
     },
 
-
-    positionHandler: function(dim, finalMatrix /*, fabricObject, currentControl */) {
-      var point = fabric.util.transformPoint({
-        x: this.x * dim.x + this.offsetX,
-        y: this.y * dim.y + this.offsetY }, finalMatrix);
+    positionHandler: function (
+      dim,
+      finalMatrix /*, fabricObject, currentControl */
+    ) {
+      var point = fabric.util.transformPoint(
+        {
+          x: this.x * dim.x + this.offsetX,
+          y: this.y * dim.y + this.offsetY,
+        },
+        finalMatrix
+      );
       return point;
     },
 
@@ -264,35 +270,46 @@ import { renderCircleControl, renderSquareControl } from "./controls.render";
      * @param {Number} centerY y coordinate where the control center should be
      * @param {boolean} isTouch true if touch corner, false if normal corner
      */
-    calcCornerCoords: function(objectAngle, objectCornerSize, centerX, centerY, isTouch) {
+    calcCornerCoords: function (
+      objectAngle,
+      objectCornerSize,
+      centerX,
+      centerY,
+      isTouch
+    ) {
       var cosHalfOffset,
-          sinHalfOffset,
-          cosHalfOffsetComp,
-          sinHalfOffsetComp,
-          xSize = (isTouch) ? this.touchSizeX : this.sizeX,
-          ySize = (isTouch) ? this.touchSizeY : this.sizeY;
+        sinHalfOffset,
+        cosHalfOffsetComp,
+        sinHalfOffsetComp,
+        xSize = isTouch ? this.touchSizeX : this.sizeX,
+        ySize = isTouch ? this.touchSizeY : this.sizeY;
       if (xSize && ySize && xSize !== ySize) {
         // handle rectangular corners
         var controlTriangleAngle = Math.atan2(ySize, xSize);
         var cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
-        var newTheta = controlTriangleAngle - fabric.util.degreesToRadians(objectAngle);
-        var newThetaComp = Math.PI / 2 - controlTriangleAngle - fabric.util.degreesToRadians(objectAngle);
+        var newTheta =
+          controlTriangleAngle - fabric.util.degreesToRadians(objectAngle);
+        var newThetaComp =
+          Math.PI / 2 -
+          controlTriangleAngle -
+          fabric.util.degreesToRadians(objectAngle);
         cosHalfOffset = cornerHypotenuse * fabric.util.cos(newTheta);
         sinHalfOffset = cornerHypotenuse * fabric.util.sin(newTheta);
         // use complementary angle for two corners
         cosHalfOffsetComp = cornerHypotenuse * fabric.util.cos(newThetaComp);
         sinHalfOffsetComp = cornerHypotenuse * fabric.util.sin(newThetaComp);
-      }
-      else {
+      } else {
         // handle square corners
         // use default object corner size unless size is defined
-        var cornerSize = (xSize && ySize) ? xSize : objectCornerSize;
+        var cornerSize = xSize && ySize ? xSize : objectCornerSize;
         /* 0.7071067812 stands for sqrt(2)/2 */
         cornerHypotenuse = cornerSize * 0.7071067812;
         // complementary angles are equal since they're both 45 degrees
         var newTheta = fabric.util.degreesToRadians(45 - objectAngle);
-        cosHalfOffset = cosHalfOffsetComp = cornerHypotenuse * fabric.util.cos(newTheta);
-        sinHalfOffset = sinHalfOffsetComp = cornerHypotenuse * fabric.util.sin(newTheta);
+        cosHalfOffset = cosHalfOffsetComp =
+          cornerHypotenuse * fabric.util.cos(newTheta);
+        sinHalfOffset = sinHalfOffsetComp =
+          cornerHypotenuse * fabric.util.sin(newTheta);
       }
 
       return {
@@ -316,27 +333,40 @@ import { renderCircleControl, renderSquareControl } from "./controls.render";
     },
 
     /**
-    * Render function for the control.
-    * When this function runs the context is unscaled. unrotate. Just retina scaled.
-    * all the functions will have to translate to the point left,top before starting Drawing
-    * if they want to draw a control where the position is detected.
-    * left and top are the result of the positionHandler function
-    * @param {RenderingContext2D} ctx the context where the control will be drawn
-    * @param {Number} left position of the canvas where we are about to render the control.
-    * @param {Number} top position of the canvas where we are about to render the control.
-    * @param {Object} styleOverride
-    * @param {fabric.Object} fabricObject the object where the control is about to be rendered
-    */
-    render: function(ctx, left, top, styleOverride, fabricObject) {
+     * Render function for the control.
+     * When this function runs the context is unscaled. unrotate. Just retina scaled.
+     * all the functions will have to translate to the point left,top before starting Drawing
+     * if they want to draw a control where the position is detected.
+     * left and top are the result of the positionHandler function
+     * @param {RenderingContext2D} ctx the context where the control will be drawn
+     * @param {Number} left position of the canvas where we are about to render the control.
+     * @param {Number} top position of the canvas where we are about to render the control.
+     * @param {Object} styleOverride
+     * @param {fabric.Object} fabricObject the object where the control is about to be rendered
+     */
+    render: function (ctx, left, top, styleOverride, fabricObject) {
       styleOverride = styleOverride || {};
       switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
         case 'circle':
-          renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          renderCircleControl.call(
+            this,
+            ctx,
+            left,
+            top,
+            styleOverride,
+            fabricObject
+          );
           break;
         default:
-          renderSquareControl.call(this, ctx, left, top, styleOverride, fabricObject);
+          renderSquareControl.call(
+            this,
+            ctx,
+            left,
+            top,
+            styleOverride,
+            fabricObject
+          );
       }
     },
   };
-
 })(typeof exports !== 'undefined' ? exports : window);

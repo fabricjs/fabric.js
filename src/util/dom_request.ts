@@ -15,29 +15,27 @@ import { noop } from '../constants';
  * @return {XMLHttpRequest} request
  */
 export function request(url, options = {}) {
-
   const method = options.method ? options.method.toUpperCase() : 'GET',
-        onComplete = options.onComplete || noop,
-        xhr = new fabric.window.XMLHttpRequest(),
-        body = options.body || options.parameters,
-        signal = options.signal,
-        abort = function () {
-          xhr.abort();
-        },
-        removeListener = function () {
-          signal && signal.removeEventListener('abort', abort);
-          xhr.onerror = xhr.ontimeout = noop;
-        };
+    onComplete = options.onComplete || noop,
+    xhr = new fabric.window.XMLHttpRequest(),
+    body = options.body || options.parameters,
+    signal = options.signal,
+    abort = function () {
+      xhr.abort();
+    },
+    removeListener = function () {
+      signal && signal.removeEventListener('abort', abort);
+      xhr.onerror = xhr.ontimeout = noop;
+    };
 
   if (signal && signal.aborted) {
     throw new Error('`options.signal` is in `aborted` state');
-  }
-  else if (signal) {
+  } else if (signal) {
     signal.addEventListener('abort', abort, { once: true });
   }
 
   /** @ignore */
-  xhr.onreadystatechange = function() {
+  xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
       removeListener();
       onComplete(xhr);
@@ -54,7 +52,7 @@ export function request(url, options = {}) {
       ...Object.entries(options.parameters),
     ])}`;
   }
-  
+
   xhr.open(method, url, true);
 
   if (method === 'POST' || method === 'PUT') {
@@ -63,4 +61,4 @@ export function request(url, options = {}) {
 
   xhr.send(method === 'GET' ? null : body);
   return xhr;
-};
+}

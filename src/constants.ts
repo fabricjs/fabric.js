@@ -1,7 +1,7 @@
-import { TMat2D } from "./typedefs";
+import { TMat2D } from './typedefs';
 
 export { version as VERSION } from '../package.json';
-export function noop() {};
+export function noop() {}
 export const halfPI = Math.PI / 2;
 export const twoMathPi = Math.PI * 2;
 export const PiBy180 = Math.PI / 180;

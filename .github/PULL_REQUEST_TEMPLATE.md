@@ -1,7 +1,6 @@
 ---
 name: Pull Request
 about: Creating a PR
-
 ---
 
 <!--
@@ -17,8 +16,7 @@ about: Creating a PR
         A strong community means a strong and better product for everyone.
 -->
 
-
-<!--        
+<!--
         📣 IMPORTANT NOTICE - PR LOCKDOWN 🔒    04/2022
         We are excited to announce that fabric is migrating to modern typescript/javascript 🤩.
         This means we will ⛔ not be accepting any PRs out of scope with the migration.
@@ -32,21 +30,24 @@ about: Creating a PR
         During the migration we will port these changes to master
 -->
 
-
-
 ## Motivation
+
 <!-- Why you are proposing -->
 <!-- You can use the @closes notation to mark issues that will be resolved by this PR -->
 
 ## Description
+
 <!-- What you are proposing -->
 
 ## Changes
+
 <!-- before the fix vs. after -->
 
 ## Gist
+
 <!-- Technical stuff if necessary -->
 
 ## In Action
+
 <!-- Show case your accomplishment -->
 <!-- Upload screenshots, screencasts and live examples showing your fix in contrast to the current state -->

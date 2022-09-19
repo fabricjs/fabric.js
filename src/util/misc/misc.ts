@@ -2,7 +2,13 @@
 import { fabric } from '../../../HEADER';
 import { cos } from './cos';
 import { sin } from './sin';
-import { rotateVector, createVector, calcAngleBetweenVectors, getHatVector, getBisector } from './vectors';
+import {
+  rotateVector,
+  createVector,
+  calcAngleBetweenVectors,
+  getHatVector,
+  getBisector,
+} from './vectors';
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
 import { rotatePoint } from './rotatePoint';
 import { getRandomInt, removeFromArray } from '../internals';
@@ -18,7 +24,12 @@ import {
 } from './matrix';
 import { stylesFromArray, stylesToArray, hasStyleChanged } from './textStyles';
 import { clone, extend } from '../lang_object';
-import { createCanvasElement, createImage, copyCanvasElement, toDataURL } from './dom';
+import {
+  createCanvasElement,
+  createImage,
+  copyCanvasElement,
+  toDataURL,
+} from './dom';
 import { toFixed } from './toFixed';
 import {
   matrixToSVG,
@@ -39,16 +50,12 @@ import {
 } from './objectTransforms';
 import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
 import {
+  calcPlaneChangeMatrix,
   sendPointToPlane,
   transformPointRelativeToCanvas,
   sendObjectToPlane,
 } from './planeChange';
-import {
-  camelize,
-  capitalize,
-  escapeXml,
-  graphemeSplit,
-} from '../lang_string';
+import { camelize, capitalize, escapeXml, graphemeSplit } from '../lang_string';
 import {
   getKlass,
   loadImage,
@@ -88,11 +95,7 @@ import { isTransparent } from './isTransparent';
 import { mergeClipPaths } from './mergeClipPaths';
 import * as ease from '../anim_ease';
 import { animateColor } from '../animate_color';
-import {
-  animate,
-  requestAnimFrame,
-  cancelAnimFrame,
-} from '../animate';
+import { animate, requestAnimFrame, cancelAnimFrame } from '../animate';
 import { createClass } from '../lang_class';
 /**
  * @namespace fabric.util
@@ -147,6 +150,7 @@ fabric.util = {
   applyTransformToObject,
   removeTransformFromObject,
   makeBoundingBoxFromPoints,
+  calcPlaneChangeMatrix,
   sendPointToPlane,
   transformPointRelativeToCanvas,
   sendObjectToPlane,
