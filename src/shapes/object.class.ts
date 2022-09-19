@@ -1063,6 +1063,22 @@ import { TObject } from '../__types__';
           !(value instanceof fabric.Shadow)
         ) {
           value = new fabric.Shadow(value);
+        } else if (key === 'clipPath') {
+          // svg parser sets `clipPath` to the link url as part of the parsing process
+          // hopefully that will die out and then we can just check for positivity
+          if (value instanceof fabric.Object) {
+            value._set('group', this);
+            // mark the object as a clip path
+            value._set('clipping', this);
+            value._set('canvas', this.canvas);
+          } else if (this.clipPath) {
+            this.clipPath._set('group', undefined);
+            this.clipPath._set('clipping', undefined);
+            this.clipPath._set('canvas', undefined);
+          }
+        } else if (key === 'canvas') {
+          // ref/unref canvas
+          this.clipPath?._set('canvas', value);
         }
 
         this[key] = value;
@@ -1299,6 +1315,10 @@ import { TObject } from '../__types__';
         // needed to setup a couple of variables
         // path canvas gets overridden with this one.
         // TODO find a better solution?
+        // we can use `set` but we need to provide a solution for the eraser that uses this logic as well
+        clipPath._set('group', this);
+        // mark the object as a clip path
+        clipPath._set('clipping', this);
         clipPath._set('canvas', this.canvas);
         if (clipPath.absolutePositioned) {
           ctx.transform(...invertTransform(this.calcTransformMatrix()));

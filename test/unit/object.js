@@ -76,6 +76,27 @@
     assert.equal(88, cObj.get('height'));
   });
 
+  QUnit.test('set clipPath', function(assert) {
+    const cObj = new fabric.Object({});
+    cObj.set('canvas', canvas);
+    const clipPath = new fabric.Object({});
+    cObj.set('clipPath', clipPath);
+    assert.strictEqual(clipPath.group, cObj);
+    assert.strictEqual(clipPath.clipping, cObj);
+    assert.strictEqual(clipPath.canvas, canvas);
+    cObj.set('canvas', undefined);
+    assert.strictEqual(cObj.canvas, undefined, 'should dereference canvas');
+    assert.strictEqual(clipPath.canvas, undefined, 'should dereference canvas once object does');
+    cObj.set('canvas', canvas);
+    assert.strictEqual(cObj.canvas, canvas, 'should reference canvas');
+    assert.strictEqual(clipPath.canvas, canvas, 'should reference canvas once object does');
+    cObj.set('clipPath', undefined);
+    assert.strictEqual(cObj.clipPath, undefined, 'should dereference clipPath');
+    assert.strictEqual(clipPath.group, undefined, 'should dereference clipped object');
+    assert.strictEqual(clipPath.clipping, undefined, 'should dereference clipped object');
+    assert.strictEqual(clipPath.canvas, undefined, 'should dereference canvas');
+  });
+
   // QUnit.test('Dynamically generated accessors', function(assert) {
   //   var cObj = new fabric.Object({ });
   //

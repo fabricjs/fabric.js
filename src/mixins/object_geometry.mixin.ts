@@ -753,6 +753,14 @@ import { Point } from '../point.class';
           return cache.value;
         }
         if (this.group) {
+          if (this.group === this.clipping) {
+            console.warn(
+              'fabric: v6 BREAKING change\n',
+              "Calling `calcTransformMatrix` on a clipPath or it's descendants now returns the full transform matrix relative to the canvas/viewer as opposed to the transform matrix relative to the clipped object.\n",
+              "If that wasn't your intention and you need the legacy behavior use `calcPlaneChangeMatrix(object.calcTransformMatrix(), clippedObject.calcTransformMatrix())`\n",
+              'see https://github.com/fabricjs/fabric.js/pull/8298#issuecomment-1250891515'
+            );
+          }
           matrix = multiplyMatrices(
             this.group.calcTransformMatrix(false),
             matrix

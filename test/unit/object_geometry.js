@@ -432,6 +432,32 @@
     assert.deepEqual(cObj.calcTransformMatrix(), cObj.calcOwnMatrix(), 'without group matrix is same');
   });
 
+  QUnit.test('calcTransformMatrix', function (assert) {
+    const a = new fabric.Object({ scaleX: 0.5, scaleY: 2/3, angle: -60 });
+    const b = new fabric.Object({ scaleX: 2, scaleY: 3, angle: 15 });
+    const c = new fabric.Object({ width: 10, height: 15, strokeWidth: 0, angle: 45 });
+    const d = new fabric.Object({ width: 10, height: 15, strokeWidth: 0, skewY: 30 });
+    c.set({ clipPath: d });
+    c.group = b;
+    b.group = a;
+    assert.deepEqual(c.calcTransformMatrix(true), c.calcOwnMatrix(), 'without group matrix is same');
+    assert.deepEqual(
+      b.calcTransformMatrix(),
+      fabric.util.multiplyTransformMatrices(a.calcTransformMatrix(), b.calcOwnMatrix()),
+      'nested object matrix should match'
+    );
+    assert.deepEqual(
+      c.calcTransformMatrix(),
+      fabric.util.multiplyTransformMatrices(b.calcTransformMatrix(), c.calcOwnMatrix()),
+      'nested object matrix should match'
+    );
+    assert.deepEqual(
+      d.calcTransformMatrix(),
+      fabric.util.multiplyTransformMatrices(c.calcTransformMatrix(), d.calcOwnMatrix()),
+      'clip path matrix should match'
+    );
+  });
+
   QUnit.test('calcOwnMatrix', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 });
     assert.ok(typeof cObj.calcOwnMatrix === 'function', 'calcTransformMatrix should exist');
