@@ -847,28 +847,6 @@ import { pick } from './util/misc/pick';
       },
 
       /**
-       * Paint the cached clipPath on the lowerCanvasEl
-       * @param {CanvasRenderingContext2D} ctx Context to render on
-       */
-      drawClipPathOnCanvas: function (ctx) {
-        var v = this.viewportTransform,
-          path = this.clipPath;
-        ctx.save();
-        ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-        // DEBUG: uncomment this line, comment the following
-        // ctx.globalAlpha = 0.4;
-        ctx.globalCompositeOperation = 'destination-in';
-        path.transform(ctx);
-        ctx.scale(1 / path.zoomX, 1 / path.zoomY);
-        ctx.drawImage(
-          path._cacheCanvas,
-          -path.cacheTranslationX,
-          -path.cacheTranslationY
-        );
-        ctx.restore();
-      },
-
-      /**
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
        * @param {Array} objects to render
