@@ -129,6 +129,11 @@ export class RenderingContext implements TRenderingOptions {
     return !!this.find(target)?.caching;
   }
 
+  /**
+   *
+   * @param target
+   * @returns the transform from the viewer to `target`
+   */
   calcTransformMatrix(target: TObject) {
     return this.getTreeUpTo(target)
       .reverse()
@@ -137,13 +142,6 @@ export class RenderingContext implements TRenderingOptions {
           multiplyTransformMatrices(target.calcOwnMatrix(), mat),
         iMatrix
       );
-  }
-
-  calcCacheMatrix(target: TObject) {
-    const caching = this.getTreeUpTo(target)
-      .reverse()
-      .find(({ caching }) => caching);
-    return this.calcTransformMatrix(caching?.target);
   }
 
   fork(listing?: TRenderingListing) {
