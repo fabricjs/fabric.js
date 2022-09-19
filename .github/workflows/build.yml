@@ -53,3 +53,11 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           delete-old-comments: true
           update-comment: true
+  changelog:
+    if: ${{ always() }}
+    - name: Changelog check
+      uses: Zomzog/changelog-checker@v1.2.0
+      with:
+        fileName: CHANGELOG.md
+        noChangelogLabel: Missing update to CHANGELOG.md
+        checkNotification: Simple # default `Detailed`
