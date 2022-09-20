@@ -1017,12 +1017,11 @@ import { Point } from '../point.class';
       _contentToSVG: function (reviver, forClipping) {
         const svgOutput = [];
         const bg = this._createSVGBgRect(reviver);
-        bg && svgOutput.push('\t\t', bg);
+        const ws = forClipping ? '\t' : '\t\t';
+        const method = forClipping ? 'toClipPathSVG' : 'toSVG';
+        bg && svgOutput.push(ws, bg);
         for (let i = 0; i < this._objects.length; i++) {
-          svgOutput.push(
-            '\t\t',
-            this._objects[i][forClipping ? 'toClipPathSVG' : 'toSVG'](reviver)
-          );
+          svgOutput.push(ws, this._objects[i][method](reviver));
         }
         return svgOutput;
       },
