@@ -1,9 +1,8 @@
 # Changelog
 
-# Changelog
-
 ## [next]
 
+- ci(): adds a lock file to the repo when build is in progress, makes local testing wait for the build to complete [#8290](https://github.com/fabricjs/fabric.js/pull/8290)
 - fix(`WebGLProbe`): regression caused by [#8199](https://github.com/fabricjs/fabric.js/pull/8199), [#8301](https://github.com/fabricjs/fabric.js/pull/8301)
 - fix(fabric.utils) added missing import in dom_misc [#8293](https://github.com/fabricjs/fabric.js/pull/8293)
 - fix(Object): `extraParam` should not be passed to options [#8295](https://github.com/fabricjs/fabric.js/pull/8295)
