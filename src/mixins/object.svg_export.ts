@@ -239,14 +239,14 @@ import { matrixToSVG } from '../util/misc/svgParsing';
        */
       toClipPathSVGDef: function (
         reviver,
-        { transform }: { transform: TMat2D }
+        { transform }: { transform: TMat2D } = {}
       ) {
         const id = `CLIPPATH_${fabric.Object.__uid++}`;
         this.clipPathId = id;
         return [
           `<clipPath id="${id}" ${
             transform ? `transform="${matrixToSVG(transform)}"` : ''
-          }  >`,
+          } >`,
           this.toClipPathSVG(reviver),
           '</clipPath>',
           '',
