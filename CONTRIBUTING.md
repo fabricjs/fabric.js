@@ -44,10 +44,15 @@ Check out [**Helping Out**](#%EF%B8%8F-helping-out).
 
 ### Getting Started
 
+#### Setting up locally
+
 1. 🍴 Fork the repository
 1. 💾 Clone your 🍴 to your 💻
 1. Install dependencies 🕹️ `npm i --include=dev`
 1. Next Up [Prototyping](#-prototyping) & [Testing](#-testing)
+
+#### Online
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
 
 ### 🧭 Prototyping
 
@@ -133,9 +138,9 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 
 ### Getting Started
 
-Read this section through and take a look at [**GOTCHAS**](./GOTCHAS.md).
-
-Follow [Developing](#-developing-) **OR** [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/) and start coding!
+- Read this section through
+- Take a look at [**GOTCHAS**](./GOTCHAS.md)
+- Follow [Developing](#-developing-).
 
 ### ✅ Guidelines
 
