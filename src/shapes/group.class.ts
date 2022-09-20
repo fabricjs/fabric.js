@@ -1014,7 +1014,7 @@ import { Point } from '../point.class';
       /**
        * @private
        */
-      createSVGContentMarkup: function (reviver, forClipping) {
+      _contentToSVG: function (reviver, forClipping) {
         const svgOutput = [];
         const bg = this._createSVGBgRect(reviver);
         bg && svgOutput.push('\t\t', bg);
@@ -1037,7 +1037,7 @@ import { Point } from '../point.class';
           '<g ',
           'COMMON_PARTS',
           ' >\n',
-          ...this.createSVGContentMarkup(reviver),
+          ...this._contentToSVG(reviver),
           '</g>\n',
         ];
       },
@@ -1048,12 +1048,9 @@ import { Point } from '../point.class';
        * @return {String} svg representation of an instance
        */
       toClipPathSVG: function (reviver) {
-        return (
-          '\t' +
-          this._createBaseClipPathSVGMarkup(
-            this.createSVGContentMarkup(reviver, true),
-            { reviver }
-          )
+        return this._createBaseClipPathSVGMarkup(
+          this._contentToSVG(reviver, true),
+          { reviver }
         );
       },
 
