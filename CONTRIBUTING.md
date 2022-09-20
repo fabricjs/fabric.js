@@ -138,9 +138,9 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 
 ### Getting Started
 
-- Read this section through
+- Read this section through.
 - Take a look at [**GOTCHAS**](./GOTCHAS.md)
-- Follow [Developing](#-developing-).
+- Follow [Developing](#-developing-) and read [Testing](#-testing).
 
 ### ✅ Guidelines
 
