@@ -180,12 +180,10 @@ import { config } from '../config';
        * @param {Boolean} use the full transform or the single object one.
        * @return {String}
        */
-      getSvgTransform: function (full, additionalTransform) {
-        var transform = full
-            ? this.calcTransformMatrix()
-            : this.calcOwnMatrix(),
-          svgTransform = 'transform="' + fabric.util.matrixToSVG(transform);
-        return svgTransform + (additionalTransform || '') + '" ';
+      getSvgTransform: function (additionalTransform) {
+        return `transform="${fabric.util.matrixToSVG(this.calcOwnMatrix())}${
+          additionalTransform || ''
+        }" `;
       },
 
       _setSVGBg: function (textBgRects) {
@@ -240,7 +238,7 @@ import { config } from '../config';
         var reviver = options.reviver,
           additionalTransform = options.additionalTransform || '',
           commonPieces = [
-            this.getSvgTransform(false, additionalTransform),
+            this.getSvgTransform(additionalTransform),
             this.getSvgCommons(),
           ].join(''),
           // insert commons in the markup, style and svgCommons
@@ -288,7 +286,7 @@ import { config } from '../config';
         }
         markup.push(
           '<g ',
-          this.getSvgTransform(false),
+          this.getSvgTransform(),
           !absoluteClipPath ? shadowInfo + this.getSvgCommons() : '',
           ' >\n'
         );
