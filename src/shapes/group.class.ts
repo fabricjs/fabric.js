@@ -1,6 +1,5 @@
 //@ts-nocheck
 import { Point } from '../point.class';
-import { matrixToSVG } from '../util/misc/svgParsing';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),

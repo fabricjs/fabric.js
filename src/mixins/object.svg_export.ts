@@ -3,6 +3,7 @@
 import { Color } from '../color';
 import { config } from '../config';
 import { TMat2D } from '../typedefs';
+import { matrixToSVG } from '../util/misc/svgParsing';
 
 /* _TO_SVG_START_ */
 (function (global) {
