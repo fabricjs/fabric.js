@@ -198,7 +198,7 @@ Options:
   -v, --verbose               log passing tests (default: false)
   -l, --launch                launch tests in the browser (default: false)
   --dev                       runs testem in `dev` mode, without a `ci` flag (default: false)
-  -c, --context <context...>  context to test in (choices: "chrome", "firefox", "node", default: ["chrome","node"])
+  -c, --context <context...>  context to test in (choices: "chrome", "firefox", "node", default: "node")
   -p, --port
   -o, --out <out>             path to report test results to
   --clear-cache               clear CLI test cache (default: false)
