@@ -1319,9 +1319,24 @@ import { pick } from './util/misc/pick';
           '<defs>\n',
           this.createSVGFontFacesMarkup(),
           this.createSVGRefElementsMarkup(),
-          this.clipPath?.createClipPathSVGMarkup(options.reviver) ?? '',
+          this.createSVGClipPathMarkup(options),
           '</defs>\n'
         );
+      },
+
+      createSVGClipPathMarkup: function (options) {
+        var clipPath = this.clipPath;
+        if (clipPath) {
+          clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+          return (
+            '<clipPath id="' +
+            clipPath.clipPathId +
+            '" >\n' +
+            this.clipPath.toClipPathSVG(options.reviver) +
+            '</clipPath>\n'
+          );
+        }
+        return '';
       },
 
       /**
