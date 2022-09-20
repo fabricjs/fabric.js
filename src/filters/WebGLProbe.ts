@@ -1,7 +1,6 @@
 //@ts-nocheck
 
 import { fabric } from '../../HEADER';
-import { createCanvasElement } from '../util/misc/dom';
 
 export const enum TWebGLPrecision {
   low = 'lowp',
@@ -58,10 +57,10 @@ class WebGLProbe {
    * @returns config object if true
    */
   private queryWebGL() {
-    if (this.initialized || fabric.isLikelyNode) {
+    if (this.initialized || !fabric.isLikelyNode) {
       return;
     }
-    const canvas = createCanvasElement();
+    const canvas = fabric.document.createElement('canvas');
     const gl =
       canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
     if (gl) {

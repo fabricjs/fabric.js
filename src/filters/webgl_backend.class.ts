@@ -7,10 +7,7 @@ import { webGLProbe } from './WebGLProbe';
   var fabric = global.fabric;
 
   fabric.initFilterBackend = function () {
-    if (
-      config.enableGLFiltering &&
-      webGLProbe.isSupported(config.textureSize)
-    ) {
+    if (webGLProbe.isSupported(config.textureSize)) {
       return new fabric.WebglFilterBackend({ tileSize: config.textureSize });
     } else if (fabric.Canvas2dFilterBackend) {
       return new fabric.Canvas2dFilterBackend();

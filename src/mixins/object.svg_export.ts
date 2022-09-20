@@ -2,8 +2,6 @@
 
 import { Color } from '../color';
 import { config } from '../config';
-import { TMat2D } from '../typedefs';
-import { matrixToSVG } from '../util/misc/svgParsing';
 
 /* _TO_SVG_START_ */
 (function (global) {
@@ -182,10 +180,12 @@ import { matrixToSVG } from '../util/misc/svgParsing';
        * @param {Boolean} use the full transform or the single object one.
        * @return {String}
        */
-      getSvgTransform: function (additionalTransform) {
-        return `transform="${fabric.util.matrixToSVG(this.calcOwnMatrix())}${
-          additionalTransform || ''
-        }" `;
+      getSvgTransform: function (full, additionalTransform) {
+        var transform = full
+            ? this.calcTransformMatrix()
+            : this.calcOwnMatrix(),
+          svgTransform = 'transform="' + fabric.util.matrixToSVG(transform);
+        return svgTransform + (additionalTransform || '') + '" ';
       },
 
       _setSVGBg: function (textBgRects) {
@@ -233,28 +233,6 @@ import { matrixToSVG } from '../util/misc/svgParsing';
       },
 
       /**
-       * Returns the clip path markup wrapped by a `clipPath` tag
-       *
-       * Used by `Group` to override
-       */
-      toClipPathSVGDef: function (
-        reviver,
-        { transform }: { transform: TMat2D } = {}
-      ) {
-        const id = `CLIPPATH_${fabric.Object.__uid++}`;
-        this.clipPathId = id;
-        return [
-          `<clipPath id="${id}" ${
-            transform ? `transform="${matrixToSVG(transform)}" ` : ''
-          }>`,
-          '\n',
-          this.toClipPathSVG(reviver),
-          '</clipPath>',
-          '\n',
-        ].join('');
-      },
-
-      /**
        * @private
        */
       _createBaseClipPathSVGMarkup: function (objectMarkup, options) {
@@ -262,7 +240,7 @@ import { matrixToSVG } from '../util/misc/svgParsing';
         var reviver = options.reviver,
           additionalTransform = options.additionalTransform || '',
           commonPieces = [
-            this.getSvgTransform(additionalTransform),
+            this.getSvgTransform(true, additionalTransform),
             this.getSvgCommons(),
           ].join(''),
           // insert commons in the markup, style and svgCommons
@@ -292,17 +270,25 @@ import { matrixToSVG } from '../util/misc/svgParsing';
           shadow = this.shadow,
           commonPieces,
           markup = [],
-          clipPathMarkup = this.clipPath?.toClipPathSVGDef(reviver) ?? '',
+          clipPathMarkup,
           // insert commons in the markup, style and svgCommons
           index = objectMarkup.indexOf('COMMON_PARTS'),
           additionalTransform = options.additionalTransform;
-
+        if (clipPath) {
+          clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+          clipPathMarkup =
+            '<clipPath id="' +
+            clipPath.clipPathId +
+            '" >\n' +
+            clipPath.toClipPathSVG(reviver) +
+            '</clipPath>\n';
+        }
         if (absoluteClipPath) {
           markup.push('<g ', shadowInfo, this.getSvgCommons(), ' >\n');
         }
         markup.push(
           '<g ',
-          this.getSvgTransform(),
+          this.getSvgTransform(false),
           !absoluteClipPath ? shadowInfo + this.getSvgCommons() : '',
           ' >\n'
         );

@@ -1,7 +1,4 @@
 //@ts-nocheck
-
-import { fabric } from '../../HEADER';
-
 /**
  * Wraps element with another element
  * @memberOf fabric.util
