@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { Point } from '../point.class';
 import { RenderingContext } from '../RenderingContext';
+import { matrixToSVG } from '../util/misc/svgParsing';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -963,22 +964,6 @@ import { RenderingContext } from '../RenderingContext';
       },
 
       /**
-       * Returns svg representation of an instance
-       * @param {Function} [reviver] Method for further parsing of svg representation.
-       * @return {String} svg representation of an instance
-       */
-      _toSVG: function (reviver) {
-        var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-        var bg = this._createSVGBgRect(reviver);
-        bg && svgString.push('\t\t', bg);
-        for (var i = 0; i < this._objects.length; i++) {
-          svgString.push('\t\t', this._objects[i].toSVG(reviver));
-        }
-        svgString.push('</g>\n');
-        return svgString;
-      },
-
-      /**
        * Returns styles-string for svg-export, specific version for group
        * @return {String}
        */
@@ -992,20 +977,66 @@ import { RenderingContext } from '../RenderingContext';
       },
 
       /**
+       * @private
+       */
+      createSVGMarkup: function (reviver, forClipping) {
+        const svgOutput = [];
+        const bg = this._createSVGBgRect(reviver);
+        bg && svgOutput.push('\t\t', bg);
+        for (let i = 0; i < this._objects.length; i++) {
+          svgOutput.push(
+            '\t\t',
+            this._objects[i][forClipping ? 'toClipPathSVG' : 'toSVG'](reviver)
+          );
+        }
+        return svgOutput;
+      },
+
+      /**
+       * Returns svg representation of an instance
+       * @param {Function} [reviver] Method for further parsing of svg representation.
+       * @return {String} svg representation of an instance
+       */
+      _toSVG: function (reviver) {
+        return [
+          '<g ',
+          'COMMON_PARTS',
+          ' >\n',
+          ...this.createSVGMarkup(reviver),
+          '</g>\n',
+        ];
+      },
+
+      /**
        * Returns svg clipPath representation of an instance
        * @param {Function} [reviver] Method for further parsing of svg representation.
        * @return {String} svg representation of an instance
        */
       toClipPathSVG: function (reviver) {
-        var svgString = [];
-        var bg = this._createSVGBgRect(reviver);
-        bg && svgString.push('\t', bg);
-        for (var i = 0; i < this._objects.length; i++) {
-          svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
-        }
-        return this._createBaseClipPathSVGMarkup(svgString, {
-          reviver: reviver,
-        });
+        return (
+          '\t' +
+          this._createBaseClipPathSVGMarkup(
+            this.createSVGMarkup(reviver, true),
+            { reviver }
+          )
+        );
+      },
+
+      /**
+       * @override SVG clipPath doesn't accept a `g` element so we apply the group's transform matrix to the clip path
+       * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath#usage_notes
+       */
+      createClipPathSVGMarkup: function (reviver) {
+        const id = `CLIPPATH_${fabric.Object.__uid++}`;
+        this.clipPathId = id;
+        return [
+          `<clipPath id="${id}" transform="${matrixToSVG(
+            this.calcOwnMatrix()
+          )}" >`,
+          this.toClipPathSVG(reviver),
+          '</clipPath>',
+          '',
+        ].join('\n');
       },
       /* _TO_SVG_END_ */
     }

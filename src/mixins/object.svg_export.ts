@@ -180,12 +180,10 @@ import { config } from '../config';
        * @param {Boolean} use the full transform or the single object one.
        * @return {String}
        */
-      getSvgTransform: function (full, additionalTransform) {
-        var transform = full
-            ? this.calcTransformMatrix()
-            : this.calcOwnMatrix(),
-          svgTransform = 'transform="' + fabric.util.matrixToSVG(transform);
-        return svgTransform + (additionalTransform || '') + '" ';
+      getSvgTransform: function (additionalTransform) {
+        return `transform="${fabric.util.matrixToSVG(this.calcOwnMatrix())}${
+          additionalTransform || ''
+        }" `;
       },
 
       _setSVGBg: function (textBgRects) {
@@ -240,13 +238,24 @@ import { config } from '../config';
         var reviver = options.reviver,
           additionalTransform = options.additionalTransform || '',
           commonPieces = [
-            this.getSvgTransform(true, additionalTransform),
+            this.getSvgTransform(additionalTransform),
             this.getSvgCommons(),
           ].join(''),
           // insert commons in the markup, style and svgCommons
           index = objectMarkup.indexOf('COMMON_PARTS');
         objectMarkup[index] = commonPieces;
         return reviver ? reviver(objectMarkup.join('')) : objectMarkup.join('');
+      },
+
+      createClipPathSVGMarkup: function (reviver) {
+        const id = `CLIPPATH_${fabric.Object.__uid++}`;
+        this.clipPathId = id;
+        return [
+          `<clipPath id="${id}" >`,
+          this.toClipPathSVG(reviver),
+          '</clipPath>',
+          '',
+        ].join('\n');
       },
 
       /**
@@ -270,25 +279,18 @@ import { config } from '../config';
           shadow = this.shadow,
           commonPieces,
           markup = [],
-          clipPathMarkup,
+          clipPathMarkup =
+            this.clipPath?.createClipPathSVGMarkup(reviver) ?? '',
           // insert commons in the markup, style and svgCommons
           index = objectMarkup.indexOf('COMMON_PARTS'),
           additionalTransform = options.additionalTransform;
-        if (clipPath) {
-          clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
-          clipPathMarkup =
-            '<clipPath id="' +
-            clipPath.clipPathId +
-            '" >\n' +
-            clipPath.toClipPathSVG(reviver) +
-            '</clipPath>\n';
-        }
+
         if (absoluteClipPath) {
           markup.push('<g ', shadowInfo, this.getSvgCommons(), ' >\n');
         }
         markup.push(
           '<g ',
-          this.getSvgTransform(false),
+          this.getSvgTransform(),
           !absoluteClipPath ? shadowInfo + this.getSvgCommons() : '',
           ' >\n'
         );
