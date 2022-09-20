@@ -240,7 +240,7 @@ import { config } from '../config';
         var reviver = options.reviver,
           additionalTransform = options.additionalTransform || '',
           commonPieces = [
-            this.getSvgTransform(true, additionalTransform),
+            this.getSvgTransform(false, additionalTransform),
             this.getSvgCommons(),
           ].join(''),
           // insert commons in the markup, style and svgCommons
