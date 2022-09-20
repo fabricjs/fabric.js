@@ -16,7 +16,7 @@ import { config } from '../config';
         this.hiddenTextarea.setAttribute('autocorrect', 'off');
         this.hiddenTextarea.setAttribute('autocomplete', 'off');
         this.hiddenTextarea.setAttribute('spellcheck', 'false');
-        this.hiddenTextarea.setAttribute('data-fabric-hiddentextarea', '');
+        this.hiddenTextarea.setAttribute('data-fabric', 'textarea');
         this.hiddenTextarea.setAttribute('wrap', 'off');
         var style = this._calcTextareaPosition();
         // line-height: 1px; was removed from the style to fix this:
