@@ -245,12 +245,13 @@ import { matrixToSVG } from '../util/misc/svgParsing';
         this.clipPathId = id;
         return [
           `<clipPath id="${id}" ${
-            transform ? `transform="${matrixToSVG(transform)}"` : ' '
+            transform ? `transform="${matrixToSVG(transform)}"` : ''
           }>`,
+          '\n',
           this.toClipPathSVG(reviver),
           '</clipPath>',
-          '',
-        ].join('\n');
+          '\n',
+        ].join('');
       },
 
       /**
