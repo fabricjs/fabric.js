@@ -744,7 +744,7 @@ import { Point } from '../point.class';
        */
       calcTransformMatrix: function (skipGroup) {
         var matrix = this.calcOwnMatrix();
-        if (skipGroup || !this.group) {
+        if (skipGroup || !this.group || this.absolutePositioned) {
           return matrix;
         }
         var key = this.transformMatrixKey(skipGroup),
