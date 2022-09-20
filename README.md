@@ -12,9 +12,9 @@ A **simple and powerful Javascript HTML5 canvas library**.
 ---
 
 <!-- build/coverage status, climate -->
-![Build Status](../../workflows/%F0%9F%A9%BA/badge.svg)
-![Test Status](../../workflows/%F0%9F%A7%AA/badge.svg)
-![CodeQL Status](../../workflows/CodeQL/badge.svg)
+[![🩺](../../actions/workflows/build.yml/badge.svg)](../../actions/workflows/build.yml)
+[![🧪](../../actions/workflows/tests.yml/badge.svg)](../../actions/workflows/tests.yml)
+[![CodeQL](../../actions/workflows/codeql-analysis.yml/badge.svg)](../../actions/workflows/codeql-analysis.yml)
 
 ---
 
