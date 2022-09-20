@@ -1014,7 +1014,7 @@ import { Point } from '../point.class';
       /**
        * @private
        */
-      createSVGMarkup: function (reviver, forClipping) {
+      createSVGContentMarkup: function (reviver, forClipping) {
         const svgOutput = [];
         const bg = this._createSVGBgRect(reviver);
         bg && svgOutput.push('\t\t', bg);
@@ -1037,7 +1037,7 @@ import { Point } from '../point.class';
           '<g ',
           'COMMON_PARTS',
           ' >\n',
-          ...this.createSVGMarkup(reviver),
+          ...this.createSVGContentMarkup(reviver),
           '</g>\n',
         ];
       },
@@ -1051,7 +1051,7 @@ import { Point } from '../point.class';
         return (
           '\t' +
           this._createBaseClipPathSVGMarkup(
-            this.createSVGMarkup(reviver, true),
+            this.createSVGContentMarkup(reviver, true),
             { reviver }
           )
         );
