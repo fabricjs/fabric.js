@@ -247,6 +247,17 @@ import { config } from '../config';
         return reviver ? reviver(objectMarkup.join('')) : objectMarkup.join('');
       },
 
+      createClipPathSVGMarkup: function (reviver) {
+        const id = `CLIPPATH_${fabric.Object.__uid++}`;
+        this.clipPathId = id;
+        return [
+          `<clipPath id="${id}" >`,
+          this.toClipPathSVG(reviver),
+          '</clipPath>',
+          '',
+        ].join('\n');
+      },
+
       /**
        * @private
        */
@@ -268,19 +279,12 @@ import { config } from '../config';
           shadow = this.shadow,
           commonPieces,
           markup = [],
-          clipPathMarkup,
+          clipPathMarkup =
+            this.clipPath?.createClipPathSVGMarkup(reviver) ?? '',
           // insert commons in the markup, style and svgCommons
           index = objectMarkup.indexOf('COMMON_PARTS'),
           additionalTransform = options.additionalTransform;
-        if (clipPath) {
-          clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
-          clipPathMarkup =
-            '<clipPath id="' +
-            clipPath.clipPathId +
-            '" >\n' +
-            clipPath.toClipPathSVG(reviver) +
-            '</clipPath>\n';
-        }
+
         if (absoluteClipPath) {
           markup.push('<g ', shadowInfo, this.getSvgCommons(), ' >\n');
         }

@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Point } from '../point.class';
+import { matrixToSVG } from '../util/misc/svgParsing';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -1015,17 +1016,16 @@ import { Point } from '../point.class';
        * @private
        */
       createSVGMarkup: function (reviver, forClipping) {
-        const svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
+        const svgOutput = [];
         const bg = this._createSVGBgRect(reviver);
-        bg && svgString.push('\t\t', bg);
+        bg && svgOutput.push('\t\t', bg);
         for (let i = 0; i < this._objects.length; i++) {
-          svgString.push(
+          svgOutput.push(
             '\t\t',
             this._objects[i][forClipping ? 'toClipPathSVG' : 'toSVG'](reviver)
           );
         }
-        svgString.push('</g>\n');
-        return svgString;
+        return svgOutput;
       },
 
       /**
@@ -1034,7 +1034,13 @@ import { Point } from '../point.class';
        * @return {String} svg representation of an instance
        */
       _toSVG: function (reviver) {
-        return this.createSVGMarkup(reviver);
+        return [
+          '<g ',
+          'COMMON_PARTS',
+          ' >\n',
+          ...this.createSVGMarkup(reviver),
+          '</g>\n',
+        ];
       },
 
       /**
@@ -1050,6 +1056,23 @@ import { Point } from '../point.class';
             { reviver }
           )
         );
+      },
+
+      /**
+       * @override SVG clipPath doesn't accept a `g` element so we apply the group's transform matrix to the clip path
+       * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath#usage_notes
+       */
+      createClipPathSVGMarkup: function (reviver) {
+        const id = `CLIPPATH_${fabric.Object.__uid++}`;
+        this.clipPathId = id;
+        return [
+          `<clipPath id="${id}" transform="${matrixToSVG(
+            this.calcOwnMatrix()
+          )}" >`,
+          this.toClipPathSVG(reviver),
+          '</clipPath>',
+          '',
+        ].join('\n');
       },
       /* _TO_SVG_END_ */
     }
