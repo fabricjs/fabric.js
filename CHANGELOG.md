@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(): svg export logic to use `calcOwnMatrix` as a prerequisite for a fix to `calcTransformMatrix` based on [#8298](https://github.com/fabricjs/fabric.js/pull/8298), [#8305](https://github.com/fabricjs/fabric.js/pull/8305)
 - BREAKING feat(fabric.IText) rename data-fabric-hiddentextarea to data-fabric with value textarea
 - ci(): adds a lock file to the repo when build is in progress, makes local testing wait for the build to complete [#8290](https://github.com/fabricjs/fabric.js/pull/8290)
 - fix(`WebGLProbe`): regression caused by [#8199](https://github.com/fabricjs/fabric.js/pull/8199), [#8301](https://github.com/fabricjs/fabric.js/pull/8301)
