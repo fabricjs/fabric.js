@@ -2,6 +2,7 @@
 
 import { Color } from '../color';
 import { config } from '../config';
+import { TMat2D } from '../typedefs';
 
 /* _TO_SVG_START_ */
 (function (global) {
@@ -231,6 +232,27 @@ import { config } from '../config';
       },
 
       /**
+       * Returns the clip path markup wrapped by a `clipPath` tag
+       *
+       * Used by `Group` to override
+       */
+      toClipPathSVGDef: function (
+        reviver,
+        { transform }: { transform: TMat2D }
+      ) {
+        const id = `CLIPPATH_${fabric.Object.__uid++}`;
+        this.clipPathId = id;
+        return [
+          `<clipPath id="${id}" ${
+            transform ? `transform="${matrixToSVG(transform)}"` : ''
+          }  >`,
+          this.toClipPathSVG(reviver),
+          '</clipPath>',
+          '',
+        ].join('\n');
+      },
+
+      /**
        * @private
        */
       _createBaseClipPathSVGMarkup: function (objectMarkup, options) {
@@ -245,17 +267,6 @@ import { config } from '../config';
           index = objectMarkup.indexOf('COMMON_PARTS');
         objectMarkup[index] = commonPieces;
         return reviver ? reviver(objectMarkup.join('')) : objectMarkup.join('');
-      },
-
-      createClipPathSVGMarkup: function (reviver) {
-        const id = `CLIPPATH_${fabric.Object.__uid++}`;
-        this.clipPathId = id;
-        return [
-          `<clipPath id="${id}" >`,
-          this.toClipPathSVG(reviver),
-          '</clipPath>',
-          '',
-        ].join('\n');
       },
 
       /**
@@ -279,8 +290,7 @@ import { config } from '../config';
           shadow = this.shadow,
           commonPieces,
           markup = [],
-          clipPathMarkup =
-            this.clipPath?.createClipPathSVGMarkup(reviver) ?? '',
+          clipPathMarkup = this.clipPath?.toClipPathSVGDef(reviver) ?? '',
           // insert commons in the markup, style and svgCommons
           index = objectMarkup.indexOf('COMMON_PARTS'),
           additionalTransform = options.additionalTransform;

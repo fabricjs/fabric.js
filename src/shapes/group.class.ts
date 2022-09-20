@@ -1062,17 +1062,10 @@ import { matrixToSVG } from '../util/misc/svgParsing';
        * @override SVG clipPath doesn't accept a `g` element so we apply the group's transform matrix to the clip path
        * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath#usage_notes
        */
-      createClipPathSVGMarkup: function (reviver) {
-        const id = `CLIPPATH_${fabric.Object.__uid++}`;
-        this.clipPathId = id;
-        return [
-          `<clipPath id="${id}" transform="${matrixToSVG(
-            this.calcOwnMatrix()
-          )}" >`,
-          this.toClipPathSVG(reviver),
-          '</clipPath>',
-          '',
-        ].join('\n');
+      toClipPathSVGDef: function (reviver) {
+        return this.callSuper('toClipPathSVGDef', reviver, {
+          transform: this.calcOwnMatrix(),
+        });
       },
       /* _TO_SVG_END_ */
     }
