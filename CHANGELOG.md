@@ -4,7 +4,7 @@
 
 ## [next]
 
-- ci(): Add a git hub action check for adding changes to CHANGELOG.md [#8302](https://github.com/fabricjs/fabric.js/pull/8302)
+- ci(): Add a pipeline check for verifying that CHANGELOG.md has been updated [#8302](https://github.com/fabricjs/fabric.js/pull/8302)
 - fix(`WebGLProbe`): regression caused by [#8199](https://github.com/fabricjs/fabric.js/pull/8199), [#8301](https://github.com/fabricjs/fabric.js/pull/8301)
 - fix(fabric.utils) added missing import in dom_misc [#8293](https://github.com/fabricjs/fabric.js/pull/8293)
 - fix(Object): `extraParam` should not be passed to options [#8295](https://github.com/fabricjs/fabric.js/pull/8295)
