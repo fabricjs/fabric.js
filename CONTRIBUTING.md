@@ -159,6 +159,10 @@ Follow [Developing](#-developing-) **OR** [![Open in Gitpod](https://gitpod.io/b
 
 ## 🧪 Testing
 
+![Build Status](../../workflows/%F0%9F%A9%BA/badge.svg)
+![Test Status](../../workflows/%F0%9F%A7%AA/badge.svg)
+![CodeQL Status](../../workflows/CodeQL/badge.svg)
+
 Test suites use [`QUnit`](https://qunitjs.com/) for assertions and [`testem`](https://github.com/testem/testem) for serving
 
 - `unit` tests: test logic and state
