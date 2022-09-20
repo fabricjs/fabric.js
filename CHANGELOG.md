@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): Add a pipeline check for verifying that CHANGELOG.md has been updated [#8302](https://github.com/fabricjs/fabric.js/pull/8302)
 - BREAKING feat(fabric.IText) rename data-fabric-hiddentextarea to data-fabric with value textarea
 - ci(): adds a lock file to the repo when build is in progress, makes local testing wait for the build to complete [#8290](https://github.com/fabricjs/fabric.js/pull/8290)
 - fix(`WebGLProbe`): regression caused by [#8199](https://github.com/fabricjs/fabric.js/pull/8199), [#8301](https://github.com/fabricjs/fabric.js/pull/8301)
