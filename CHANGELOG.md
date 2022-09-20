@@ -1,7 +1,5 @@
 # Changelog
 
-# Changelog
-
 ## [next]
 
 - ci(): adds a lock file to the repo when build is in progress, makes local testing wait for the build to complete [#8290](https://github.com/fabricjs/fabric.js/pull/8290)
