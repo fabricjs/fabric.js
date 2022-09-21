@@ -22,6 +22,7 @@ exemptLabels:
   - task
   - help wanted
   - CI/CD
+  - experimental
 # Label to use when marking an issue as stale
 staleLabel: stale
 # Set to true to ignore issues with an assignee (defaults to false)
