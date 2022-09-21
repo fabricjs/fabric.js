@@ -22,7 +22,11 @@ export function startSandbox(destination, buildAndWatch) {
   });
   console.log(chalk.blue('\n> installing dependencies'));
   cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
-  buildAndWatch && build({ watch: true, fast: true });
+
+  if (buildAndWatch) {
+    console.log(chalk.blue('\n> building and watching for changes'));
+    build({ watch: true, fast: true });
+  }
 
   const pathToTrigger = path.resolve(destination, 'package.json');
   subscribe((locked) => {
