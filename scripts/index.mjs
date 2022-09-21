@@ -362,7 +362,7 @@ async function test(suite, tests, options = {}) {
 
 /**
  *
- * @param {'unit'|'visual'} type correspondes to the test directories
+ * @param {'unit'|'visual'} type corresponds to the test directories
  * @returns
  */
 function listTestFiles(type) {
@@ -490,7 +490,7 @@ async function selectTestFile() {
   return filteredTests;
 }
 
-async function runIntreactiveTestSuite(options) {
+async function runInteractiveTestSuite(options) {
   //  some tests fail because of some pollution when run from the same context
   // test(_.map(await selectTestFile(), curr => `test/${curr.type}/${curr.file}`))
   const tests = _.reduce(
@@ -607,7 +607,7 @@ program
         )
       );
     } else {
-      results.push(...(await runIntreactiveTestSuite(options)));
+      results.push(...(await runInteractiveTestSuite(options)));
     }
     if (_.some(results)) {
       // inform ci that tests have failed
@@ -638,7 +638,7 @@ website
 program
   .command('transform')
   .description('transforms files into es6')
-  .option('-o, --overwrite', 'overwrite exisitng files', false)
+  .option('-o, --overwrite', 'overwrite existing files', false)
   .option('-x, --no-exports', 'do not use exports')
   .option('-i, --index', 'create index files', false)
   .option('-ts, --typescript', 'transform into typescript', false)
@@ -667,7 +667,7 @@ program
         files = await selectFileToTransform();
       }
       transformFiles({
-        overwriteExisitingFiles: overwrite,
+        overwriteExistingFiles: overwrite,
         useExports: exports,
         createIndex: index,
         ext: typescript ? 'ts' : 'js',

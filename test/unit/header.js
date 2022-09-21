@@ -9,9 +9,4 @@
     assert.equal(fabric.SHARED_ATTRIBUTES.length, 19, 'SHARED_ATTRIBUTES is set');
   });
 
-  QUnit.test('initFilterBackend', function(assert) {
-    assert.ok(typeof fabric.initFilterBackend === 'function', 'initFilterBackend is a function');
-    assert.ok(typeof fabric.maxTextureSize === 'undefined', 'maxTextureSize is not set yet');
-    fabric.initFilterBackend();
-  });
 })();
