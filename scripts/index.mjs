@@ -678,7 +678,7 @@ program
   .command('start')
   .description('start a sandbox app')
   .addArgument(
-    new commander.Argument('[template]', 'template to use').choices(templates)
+    new commander.Argument('<template>', 'template to use').choices(templates)
   )
   .option('-w, --watch', 'build and watch fabric', true)
   .option(
@@ -686,26 +686,8 @@ program
     'use this option if you have another process watching fabric'
   )
   .action(async (template, { watch }) => {
-    const run = template
-      ? [template]
-      : (
-          await inquirer.prompt([
-            {
-              name: 'templates',
-              type: 'checkbox',
-              message: 'Select the templates you wish to start',
-              choices: templates,
-            },
-          ])
-        ).templates;
-    if (watch) {
-      console.log(chalk.blue('\n> building and watching for changes'));
-      build({ watch: true, fast: true });
-    }
-    run.forEach((template) => {
-      const pathToSandbox = path.resolve(codesandboxTemplatesDir, template);
-      startSandbox(pathToSandbox, false);
-    });
+    const pathToSandbox = path.resolve(codesandboxTemplatesDir, template);
+    startSandbox(pathToSandbox, watch);
   });
 
 sandbox
