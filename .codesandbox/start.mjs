@@ -7,7 +7,6 @@ import { build } from '../scripts/build.mjs';
 import { subscribe } from '../scripts/buildLock.mjs';
 import { wd } from '../scripts/dirname.mjs';
 
-
 /**
  * Writes a timestamp in `package.json` file of `dest` dir
  * This is done to invoke the watcher watching `dest` and serving the app from it
@@ -24,7 +23,7 @@ export function startSandbox(destination) {
   console.log(chalk.blue('\n> installing dependencies'));
   cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
   build({ watch: true, fast: true });
-  
+
   const pathToTrigger = path.resolve(destination, 'package.json');
   subscribe((locked) => {
     !locked &&
@@ -36,15 +35,15 @@ export function startSandbox(destination) {
             trigger: moment().format('YYYY-MM-DD HH:mm:ss'),
           },
           null,
-          '\t'
+          '  '
         )
       );
   }, 500);
 
   console.log(chalk.blue('\n> starting'));
-    cp.spawn('npm run dev', {
-      cwd: destination,
-      stdio: 'inherit',
-      shell: true,
-    });
+  cp.spawn('npm run dev', {
+    cwd: destination,
+    stdio: 'inherit',
+    shell: true,
+  });
 }
