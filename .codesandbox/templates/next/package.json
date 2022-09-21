@@ -2,7 +2,7 @@
   "name": "fabric-nextjs-sandbox",
   "version": "1.0.0",
   "scripts": {
-    "dev": "npx open-cli http://localhost:3000/ && node dev.js 3000",
+    "dev": "open-cli http://localhost:3000/ && node dev.js 3000",
     "build": "next build",
     "start": "next start",
     "type-check": "tsc"
@@ -20,6 +20,7 @@
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "nodemon": "^2.0.19",
+    "open-cli": "^7.0.1",
     "typescript": "^4.7.4"
   },
   "license": "ISC",
