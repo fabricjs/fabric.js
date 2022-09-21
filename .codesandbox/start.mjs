@@ -51,7 +51,8 @@ export function startSandbox(destination, buildAndWatch) {
       )}`
     )
   );
-  cp.spawn('npm run dev', {
+
+  return cp.spawn('npm run dev', {
     cwd: destination,
     stdio: 'inherit',
     shell: true,
