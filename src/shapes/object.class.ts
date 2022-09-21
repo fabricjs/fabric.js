@@ -6,6 +6,7 @@ import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
 import { pick } from '../util/misc/pick';
 import { runningAnimations } from '../util/animation_registry';
+import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -2053,16 +2054,19 @@ import { runningAnimations } from '../util/animation_registry';
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Object>}
    */
-  fabric.Object._fromObject = function (klass, object, options) {
-    var serializedObject = clone(object, true);
-    return fabric.util
-      .enlivenObjectEnlivables(serializedObject, options)
-      .then(function (enlivedMap) {
-        var newObject = Object.assign(object, enlivedMap);
-        return options && options.extraParam
-          ? new klass(object[options.extraParam], newObject)
-          : new klass(newObject);
-      });
+  fabric.Object._fromObject = function (
+    klass,
+    object,
+    { extraParam, ...options } = {}
+  ) {
+    return enlivenObjectEnlivables(clone(object, true), options).then(
+      (enlivedMap) => {
+        // from the resulting enlived options, extract options.extraParam to arg0
+        // to avoid accidental overrides later
+        const { [extraParam]: arg0, ...rest } = { ...options, ...enlivedMap };
+        return extraParam ? new klass(arg0, rest) : new klass(rest);
+      }
+    );
   };
 
   /**

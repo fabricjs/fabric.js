@@ -413,8 +413,8 @@ function generateIndexFile(dir, files, ext) {
   console.log(chalk.bold(`created ${path.relative(wd, file)}`));
 }
 
-function resolveDest(dir, file, { type, overwriteExisitingFiles, ext }) {
-  return overwriteExisitingFiles
+function resolveDest(dir, file, { type, overwriteExistingFiles, ext }) {
+  return overwriteExistingFiles
     ? ext === 'ts'
       ? path.resolve(dir, file.replace('.js', '.ts'))
       : false
@@ -460,7 +460,7 @@ export function listFiles() {
 
 export function transform(options = {}) {
   options = _.defaults(options, {
-    overwriteExisitingFiles: true,
+    overwriteExistingFiles: true,
     ext: 'js',
     createIndex: true,
     useExports: true,
@@ -491,7 +491,7 @@ export function transform(options = {}) {
   }, {});
   options.createIndex &&
     _.map(dirs, (files, dir) => generateIndexFile(dir, files, options.ext));
-  options.overwriteExisitingFiles &&
+  options.overwriteExistingFiles &&
     options.ext === 'ts' &&
     files.forEach(({ dir, file }) =>
       fs.removeSync(path.resolve(dir, file.replace('.ts', '.js')))

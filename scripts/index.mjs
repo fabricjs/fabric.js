@@ -258,6 +258,7 @@ async function runTestem({
 
   if (launch) {
     // open localhost
+    // consider using open instead https://github.com/sindresorhus/open
     const url = `http://localhost:${port}/`;
     const start =
       os.platform() === 'darwin'
@@ -362,7 +363,7 @@ async function test(suite, tests, options = {}) {
 
 /**
  *
- * @param {'unit'|'visual'} type correspondes to the test directories
+ * @param {'unit'|'visual'} type corresponds to the test directories
  * @returns
  */
 function listTestFiles(type) {
@@ -490,7 +491,7 @@ async function selectTestFile() {
   return filteredTests;
 }
 
-async function runIntreactiveTestSuite(options) {
+async function runInteractiveTestSuite(options) {
   //  some tests fail because of some pollution when run from the same context
   // test(_.map(await selectTestFile(), curr => `test/${curr.type}/${curr.file}`))
   const tests = _.reduce(
@@ -521,16 +522,6 @@ program
   .description('fabric.js DEV CLI tools')
   .version(process.env.npm_package_version)
   .showSuggestionAfterError();
-
-program
-  .command('start')
-  .description('start fabricjs.com dev server and watch for changes')
-  .action((options) => {
-    exportToWebsite({
-      watch: true,
-    });
-    startWebsite();
-  });
 
 program
   .command('dev')
@@ -607,7 +598,7 @@ program
         )
       );
     } else {
-      results.push(...(await runIntreactiveTestSuite(options)));
+      results.push(...(await runInteractiveTestSuite(options)));
     }
     if (_.some(results)) {
       // inform ci that tests have failed
@@ -638,7 +629,7 @@ website
 program
   .command('transform')
   .description('transforms files into es6')
-  .option('-o, --overwrite', 'overwrite exisitng files', false)
+  .option('-o, --overwrite', 'overwrite existing files', false)
   .option('-x, --no-exports', 'do not use exports')
   .option('-i, --index', 'create index files', false)
   .option('-ts, --typescript', 'transform into typescript', false)
@@ -667,7 +658,7 @@ program
         files = await selectFileToTransform();
       }
       transformFiles({
-        overwriteExisitingFiles: overwrite,
+        overwriteExistingFiles: overwrite,
         useExports: exports,
         createIndex: index,
         ext: typescript ? 'ts' : 'js',
@@ -682,6 +673,40 @@ const codesandboxTemplatesDir = path.resolve(wd, '.codesandbox', 'templates');
 const sandbox = program.command('sandbox').description('sandbox commands');
 
 const templates = fs.readdirSync(codesandboxTemplatesDir);
+
+program
+  .command('start')
+  .description('start a sandbox app')
+  .addArgument(
+    new commander.Argument('[template]', 'template to use').choices(templates)
+  )
+  .option('-w, --watch', 'build and watch fabric', true)
+  .option(
+    '--no-watch',
+    'use this option if you have another process watching fabric'
+  )
+  .action(async (template, { watch }) => {
+    const run = template
+      ? [template]
+      : (
+          await inquirer.prompt([
+            {
+              name: 'templates',
+              type: 'checkbox',
+              message: 'Select the templates you wish to start',
+              choices: templates,
+            },
+          ])
+        ).templates;
+    if (watch) {
+      console.log(chalk.blue('\n> building and watching for changes'));
+      build({ watch: true, fast: true });
+    }
+    run.forEach((template) => {
+      const pathToSandbox = path.resolve(codesandboxTemplatesDir, template);
+      startSandbox(pathToSandbox, false);
+    });
+  });
 
 sandbox
   .command('deploy')
@@ -733,21 +758,31 @@ sandbox
     new commander.Argument('<template>', 'template to use').choices(templates)
   )
   .argument('<destination>', 'build destination')
-  .action((template, destination) => {
+  .option('-w, --watch', 'build and watch fabric', true)
+  .option(
+    '--no-watch',
+    'use this option if you have another process watching fabric'
+  )
+  .action((template, destination, { watch }) => {
     fs.copySync(path.resolve(codesandboxTemplatesDir, template), destination);
     console.log(
       `${chalk.blue(
         `> building ${chalk.bold(template)} sandbox`
       )} at ${chalk.cyanBright(destination)}`
     );
-    startSandbox(destination);
+    startSandbox(destination, watch);
   });
 
 sandbox
   .command('start <path>')
   .description('start a sandbox')
-  .action((pathToSandbox) => {
-    startSandbox(pathToSandbox);
+  .option('-w, --watch', 'build and watch fabric', true)
+  .option(
+    '--no-watch',
+    'use this option if you have another process watching fabric'
+  )
+  .action((pathToSandbox, { watch }) => {
+    startSandbox(pathToSandbox, watch);
   });
 
 program.parse(process.argv);
