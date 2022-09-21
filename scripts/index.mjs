@@ -677,11 +677,20 @@ program
   .command('start')
   .description('start a sandbox app')
   .addArgument(
-    new commander.Argument('<template>', 'template to use').choices(templates)
+    new commander.Argument('[template]', 'template to use').choices(templates)
   )
-  .action((template) => {
-    const pathToSandbox = path.resolve(codesandboxTemplatesDir, template);
-    startSandbox(pathToSandbox);
+  .option('-w, --watch', 'build and watch fabric', true)
+  .option(
+    '--no-watch',
+    'use this option if you have another process watching fabric'
+  )
+  .action((template, { watch }) => {
+    const run = template ? [template] : templates;
+    watch && build({ watch: true, fast: true });
+    run.forEach((template) => {
+      const pathToSandbox = path.resolve(codesandboxTemplatesDir, template);
+      startSandbox(pathToSandbox, false);
+    });
   });
 
 sandbox
@@ -734,21 +743,31 @@ sandbox
     new commander.Argument('<template>', 'template to use').choices(templates)
   )
   .argument('<destination>', 'build destination')
-  .action((template, destination) => {
+  .option('-w, --watch', 'build and watch fabric', true)
+  .option(
+    '--no-watch',
+    'use this option if you have another process watching fabric'
+  )
+  .action((template, destination, { watch }) => {
     fs.copySync(path.resolve(codesandboxTemplatesDir, template), destination);
     console.log(
       `${chalk.blue(
         `> building ${chalk.bold(template)} sandbox`
       )} at ${chalk.cyanBright(destination)}`
     );
-    startSandbox(destination);
+    startSandbox(destination, watch);
   });
 
 sandbox
   .command('start <path>')
   .description('start a sandbox')
-  .action((pathToSandbox) => {
-    startSandbox(pathToSandbox);
+  .option('-w, --watch', 'build and watch fabric', true)
+  .option(
+    '--no-watch',
+    'use this option if you have another process watching fabric'
+  )
+  .action((pathToSandbox, { watch }) => {
+    startSandbox(pathToSandbox, watch);
   });
 
 program.parse(process.argv);
