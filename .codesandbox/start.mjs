@@ -13,7 +13,7 @@ import { wd } from '../scripts/dirname.mjs';
  * I looked for other ways to tell the watcher to watch changes in fabric but I came out with this options only (symlinking and other stuff).
  * @param {string} destination
  */
-export function startSandbox(destination) {
+export function startSandbox(destination, buildAndWatch) {
   console.log(chalk.blue('\n> linking fabric'));
   cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
   cp.execSync('npm link fabric --save', {
@@ -22,7 +22,7 @@ export function startSandbox(destination) {
   });
   console.log(chalk.blue('\n> installing dependencies'));
   cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
-  build({ watch: true, fast: true });
+  buildAndWatch && build({ watch: true, fast: true });
 
   const pathToTrigger = path.resolve(destination, 'package.json');
   subscribe((locked) => {
