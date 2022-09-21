@@ -684,9 +684,23 @@ program
     '--no-watch',
     'use this option if you have another process watching fabric'
   )
-  .action((template, { watch }) => {
-    const run = template ? [template] : templates;
-    watch && build({ watch: true, fast: true });
+  .action(async (template, { watch }) => {
+    const run = template
+      ? [template]
+      : (
+          await inquirer.prompt([
+            {
+              name: 'templates',
+              type: 'checkbox',
+              message: 'Select the templates you wish to start',
+              choices: templates,
+            },
+          ])
+        ).templates;
+    if (watch) {
+      console.log(chalk.blue('\n> building and watching for changes'));
+      build({ watch: true, fast: true });
+    }
     run.forEach((template) => {
       const pathToSandbox = path.resolve(codesandboxTemplatesDir, template);
       startSandbox(pathToSandbox, false);
