@@ -26,6 +26,8 @@ A sandbox app is started (locally) by our cli as follows:
 - install dependencies
 - run the `dev` cmd
 
+The app will reload once fabric builds, see [Hot Reload](#hot-reload).
+
 ### Adding a Template
 
 First make sure codesandbox supports the framework you would like to create the sandbox with.
@@ -37,6 +39,7 @@ First make sure codesandbox supports the framework you would like to create the 
 
 ### Hot Reload
 
-Unfortunately, hot reload is a pain when trying to watch a linked dependency (though it is an absolute MUST).
-To workaround that, the cli informs the framework to perform a hot reload by modifying the sandbox's `package.json` file.
+Unfortunately, hot reload is a pain when trying to watch a linked dependency (though it is an absolute MUST for CI).
+To workaround that, the cli informs the framework to perform a hot reload when fabric builds by modifying the sandbox's `package.json` file.
+
 A better solution will be appreciated.
