@@ -1,9 +1,11 @@
 import { fabric } from 'fabric';
+import React from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 
 const DEV_MODE = process.env.NODE_ENV === 'development';
 
 export function useCanvas(
+  ref?: React.ForwardedRef<HTMLCanvasElement>,
   init?: (canvas: fabric.Canvas) => any,
   saveState = false,
   deps: any[] = []
@@ -13,9 +15,10 @@ export function useCanvas(
   const data = useRef<any>(null);
 
   const setRef = useCallback(
-    (ref: HTMLCanvasElement | null) => {
+    (el: HTMLCanvasElement | null) => {
       //@ts-ignore
-      elementRef.current = ref;
+      elementRef.current = el;
+      ref && (ref.current = elementRef.current);
       // save state
       if (DEV_MODE && saveState && fc.current) {
         data.current = fc.current.toJSON();
@@ -23,11 +26,11 @@ export function useCanvas(
       // dispose canvas
       fc.current?.dispose();
       // set/clear ref
-      if (!ref) {
+      if (!el) {
         fc.current = null;
         return;
       }
-      const canvas = new fabric.Canvas(ref, { backgroundColor: 'white' });
+      const canvas = new fabric.Canvas(el, { backgroundColor: 'white' });
       fc.current = canvas;
       // invoke callback
       init && init(canvas);
@@ -54,3 +57,11 @@ export function useCanvas(
   }, [saveState]);
   return [fc, setRef] as [typeof fc, typeof setRef];
 }
+
+export const Canvas = React.forwardRef<
+  HTMLCanvasElement,
+  { onLoad?: (canvas: fabric.Canvas) => any; saveState?: boolean }
+>(({ onLoad, saveState }, ref) => {
+  const [canvasRef, setCanvasElRef] = useCanvas(ref, onLoad, saveState);
+  return <canvas ref={setCanvasElRef} />;
+});

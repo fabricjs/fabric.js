@@ -1,10 +1,20 @@
 import { NextPage } from 'next';
-import React from 'react';
-import { fabric } from 'fabric';
-import { useCanvas } from '../util/useCanvas';
+import dynamic from 'next/dynamic';
+import React, { useCallback } from 'react';
+
+// https://nextjs.org/docs/advanced-features/dynamic-import#with-no-ssr
+const Canvas = dynamic(
+  () => import('../components/Canvas').then(({ Canvas }) => Canvas),
+  {
+    ssr: false,
+  }
+);
 
 const IndexPage: NextPage = () => {
-  const [canvasRef, setCanvasElRef] = useCanvas((canvas) => {
+  const onLoad = useCallback(async (canvas) => {
+    // load fabric dynamically for it to load with a browser context
+    // regular importing will fail with SSR
+    const { fabric } = await import('fabric');
     canvas.setDimensions({
       width: 500,
       height: 500,
@@ -15,10 +25,10 @@ const IndexPage: NextPage = () => {
     });
     canvas.add(text);
     text.centerH();
-    function animate(toState) {
+    function animate(toState: 0 | 1) {
       text.animate('scaleX', Math.max(toState, 0.1) * 2, {
         onChange: () => canvas.renderAll(),
-        onComplete: () => animate(!toState),
+        onComplete: () => animate(Number(!toState)),
         duration: 1000,
         easing: toState
           ? fabric.util.ease.easeInOutQuad
@@ -26,11 +36,11 @@ const IndexPage: NextPage = () => {
       });
     }
     animate(1);
-  });
+  }, []);
 
   return (
     <div className="position-relative">
-      <canvas ref={setCanvasElRef} />
+      <Canvas onLoad={onLoad} />
     </div>
   );
 };
