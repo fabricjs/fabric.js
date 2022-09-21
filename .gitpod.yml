@@ -1,6 +1,18 @@
 # https://www.gitpod.io/docs/config-gitpod-file
 
 tasks:
-  - name: Start apps
+  - name: Sandbox
     init: npm install
     command: npm start
+
+  - name: Node
+    init: npm install
+    command: npm start node
+
+  - name: Next.js
+    init: npm install
+    command: npm start next
+
+  - name: Vanilla
+    init: npm install
+    command: npm start vanilla
