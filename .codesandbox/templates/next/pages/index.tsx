@@ -28,7 +28,7 @@ const IndexPage: NextPage = () => {
     function animate(toState: 0 | 1) {
       text.animate('scaleX', Math.max(toState, 0.1) * 2, {
         onChange: () => canvas.renderAll(),
-        onComplete: () => animate(Number(!toState)),
+        onComplete: () => animate(Number(!toState) as 0 | 1),
         duration: 1000,
         easing: toState
           ? fabric.util.ease.easeInOutQuad
