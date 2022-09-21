@@ -16,3 +16,7 @@ tasks:
   - name: Vanilla
     init: npm install
     command: npm start vanilla
+
+  - name: Kitchensink
+    init: npm install
+    command: npm start kitchensink
