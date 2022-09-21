@@ -42,6 +42,8 @@ First make sure codesandbox supports the framework you would like to create the 
 - Creating a `.codesandboxignore` file tells the deploy script what to ignore. Deploying is restricted in size so be vigilant with deployed assets.
 - Adding the `.codesandbox` suffix to a file tells the deploy script to deploy the suffixed file instead of it's counterpart that will be used only locally. e.g. `index.ts` will be used locally whereas `index.codesandbox.ts` will be used by the deployed codesandbox.
 
+Once the template is initialized run `npm start <template>` and start developing.
+
 ### Hot Reload
 
 Unfortunately, hot reload is a pain when trying to watch a linked dependency (though it is an absolute MUST for CI).
