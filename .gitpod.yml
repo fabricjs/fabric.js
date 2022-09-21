@@ -1,2 +1,6 @@
+# https://www.gitpod.io/docs/config-gitpod-file
+
 tasks:
-  - init: npm install
+  - name: Start apps
+    init: npm install
+    command: npm start
