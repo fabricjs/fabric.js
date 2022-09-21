@@ -258,6 +258,7 @@ async function runTestem({
 
   if (launch) {
     // open localhost
+    // consider using open instead https://github.com/sindresorhus/open
     const url = `http://localhost:${port}/`;
     const start =
       os.platform() === 'darwin'
