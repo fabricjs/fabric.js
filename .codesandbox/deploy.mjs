@@ -25,18 +25,17 @@ function parseIgnoreFile(file) {
  * https://codesandbox.io/docs/api/#define-api
  */
 export async function createCodeSandbox(appPath) {
-  const { trigger: __, ...packageJSON } = JSON.parse(fs.readFileSync(path.resolve(
-    appPath,
-    'package.json'
-  )));
+  const { trigger: __, ...packageJSON } = JSON.parse(
+    fs.readFileSync(path.resolve(appPath, 'package.json'))
+  );
   // omit linked package
   if (packageJSON.dependencies.fabric.startsWith('file:')) {
     packageJSON.dependencies.fabric = '*';
   }
   const files = {
     'package.json': {
-      content: JSON.stringify(packageJSON, null, '\t')
-    }
+      content: JSON.stringify(packageJSON, null, '\t'),
+    },
   };
 
   const gitignore = path.resolve(appPath, '.gitignore');
@@ -47,7 +46,8 @@ export async function createCodeSandbox(appPath) {
 
   const processFile = (fileName) => {
     const filePath = path.resolve(appPath, fileName);
-    if (fileName === 'package.json' || ignore.some((r) => r.test(fileName))) return;
+    if (fileName === 'package.json' || ignore.some((r) => r.test(fileName)))
+      return;
     const ext = path.extname(fileName).slice(1);
     if (fs.lstatSync(filePath).isDirectory()) {
       fs.readdirSync(filePath).forEach((file) => {
@@ -88,7 +88,7 @@ export async function createCodeSandbox(appPath) {
     );
     return `https://codesandbox.io/s/${sandbox_id}`;
   } catch (error) {
-  console.log(error.response.data)
+    // console.log(error.response.data);
     throw new Error(error.response.data);
   }
 }
