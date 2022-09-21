@@ -40,7 +40,13 @@ export function startSandbox(destination, buildAndWatch) {
       );
   }, 500);
 
-  console.log(chalk.blue('\n> starting'));
+  console.log(
+    chalk.blue(
+      `\n> starting ${chalk.bold(
+        JSON.parse(fs.readFileSync(pathToTrigger)).name
+      )}`
+    )
+  );
   cp.spawn('npm run dev', {
     cwd: destination,
     stdio: 'inherit',
