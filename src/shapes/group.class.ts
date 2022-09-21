@@ -1057,8 +1057,8 @@ import { Point } from '../point.class';
        * @override SVG clipPath doesn't accept a `g` element so we apply the group's transform matrix to the clip path
        * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath#usage_notes
        */
-      toClipPathSVGDef: function (reviver) {
-        return this.callSuper('toClipPathSVGDef', reviver, {
+      toClipPathSVGMarkup: function (reviver) {
+        return this.callSuper('toClipPathSVGMarkup', reviver, {
           transform: this.calcOwnMatrix(),
         });
       },

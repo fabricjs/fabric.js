@@ -1319,7 +1319,7 @@ import { pick } from './util/misc/pick';
           '<defs>\n',
           this.createSVGFontFacesMarkup(),
           this.createSVGRefElementsMarkup(),
-          this.clipPath?.toClipPathSVGDef(options.reviver) ?? '',
+          this.clipPath?.toClipPathSVGMarkup(options.reviver) ?? '',
           '</defs>\n'
         );
       },

@@ -237,7 +237,7 @@ import { matrixToSVG } from '../util/misc/svgParsing';
        *
        * Used by `Group` to override
        */
-      toClipPathSVGDef: function (
+      toClipPathSVGMarkup: function (
         reviver,
         { transform }: { transform: TMat2D } = {}
       ) {
@@ -292,7 +292,7 @@ import { matrixToSVG } from '../util/misc/svgParsing';
           shadow = this.shadow,
           commonPieces,
           markup = [],
-          clipPathMarkup = this.clipPath?.toClipPathSVGDef(reviver) ?? '',
+          clipPathMarkup = this.clipPath?.toClipPathSVGMarkup(reviver) ?? '',
           // insert commons in the markup, style and svgCommons
           index = objectMarkup.indexOf('COMMON_PARTS'),
           additionalTransform = options.additionalTransform;
