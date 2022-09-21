@@ -18,6 +18,10 @@ npm run sandbox
 
 ## Developing
 
+```bash
+npm start <template>
+```
+
 ### Start Flow
 
 A sandbox app is started (locally) by our cli as follows:

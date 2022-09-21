@@ -523,16 +523,6 @@ program
   .showSuggestionAfterError();
 
 program
-  .command('start')
-  .description('start fabricjs.com dev server and watch for changes')
-  .action((options) => {
-    exportToWebsite({
-      watch: true,
-    });
-    startWebsite();
-  });
-
-program
   .command('dev')
   .description('watch for changes in `src` and `test` directories')
   .action(() => {
@@ -682,6 +672,17 @@ const codesandboxTemplatesDir = path.resolve(wd, '.codesandbox', 'templates');
 const sandbox = program.command('sandbox').description('sandbox commands');
 
 const templates = fs.readdirSync(codesandboxTemplatesDir);
+
+program
+  .command('start')
+  .description('start a sandbox app')
+  .addArgument(
+    new commander.Argument('<template>', 'template to use').choices(templates)
+  )
+  .action((template) => {
+    const pathToSandbox = path.resolve(codesandboxTemplatesDir, template);
+    startSandbox(pathToSandbox);
+  });
 
 sandbox
   .command('deploy')
