@@ -30,10 +30,11 @@ The app will reload once fabric builds, see [Hot Reload](#hot-reload).
 
 ### Adding a Template
 
-First make sure codesandbox supports the framework you would like to create the sandbox with.
+First make sure codesandbox supports the framework you would like to create the sandbox with, see the `template` section in [sandbox configuration](https://codesandbox.io/docs/configuration#sandbox-configuration).
 
 - Give a meaningful name to the template's folder, it is used by our cli.
 - A template **MUST** expose a `dev` script in `package.json` starting the app locally for our cli.
+- Configuring the sandbox is done by adding a `sandbox.config.json` file, see [sandbox configuration](https://codesandbox.io/docs/configuration#sandbox-configuration)
 - Creating a `.codesandboxignore` file tells the deploy script what to ignore. Deploying is restricted in size so be vigilant with deployed assets.
 - Adding the `.codesandbox` suffix to a file tells the deploy script to deploy the suffixed file instead of it's counterpart that will be used only locally. e.g. `index.ts` will be used locally whereas `index.codesandbox.ts` will be used by the deployed codesandbox.
 
