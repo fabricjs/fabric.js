@@ -2,7 +2,7 @@
   "name": "fabric-nextjs-sandbox",
   "version": "1.0.0",
   "scripts": {
-    "dev": "node dev.js 3000",
+    "dev": "npx open-cli http://localhost:3000/ && node dev.js 3000",
     "build": "next build",
     "start": "next start",
     "type-check": "tsc"
