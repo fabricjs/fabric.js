@@ -31,7 +31,10 @@ import { awaitBuild } from './buildLock.mjs';
 import { CLI_CACHE, wd } from './dirname.mjs';
 import { listFiles, transform as transformFiles } from './transform_files.mjs';
 
-const program = new commander.Command();
+const program = new commander.Command()
+  .showHelpAfterError()
+  .allowUnknownOption(false)
+  .allowExcessArguments(false);
 
 const websiteDir = path.resolve(wd, '../fabricjs.com');
 
