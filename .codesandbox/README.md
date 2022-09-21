@@ -1,0 +1,42 @@
+# CodeSandbox CI
+
+Configuration, scripts and templates used by [CodeSandbox CI](https://codesandbox.io/docs/ci)
+
+## Contents
+
+- `ci.json`: configuration for ci
+- `.mjs`: script files used by our cli
+- `templates`: ready to start fabric templates (`next`, `node`, `vanilla`)
+
+## Running Locally
+
+To run a template locally use the cli.
+
+```bash
+npm run sandbox
+```
+
+## Developing
+
+### Start Flow
+
+A sandbox app is started (locally) by our cli as follows:
+
+- [`link`](https://docs.npmjs.com/cli/v8/commands/npm-link) fabric
+- install dependencies
+- run the `dev` cmd
+
+### Adding a Template
+
+First make sure codesandbox supports the framework you would like to create the sandbox with.
+
+- Give a meaningful name to the template's folder, it is used by our cli.
+- A template **MUST** expose a `dev` script in `package.json` starting the app locally for our cli.
+- Creating a `.codesandboxignore` file tells the deploy script what to ignore. Deploying is restricted in size so be vigilant with deployed assets.
+- Adding the `.codesandbox` suffix to a file tells the deploy script to deploy the suffixed file instead of it's counterpart that will be used only locally. e.g. `index.ts` will be used locally whereas `index.codesandbox.ts` will be used by the deployed codesandbox.
+
+### Hot Reload
+
+Unfortunately, hot reload is a pain when trying to watch a linked dependency (though it is an absolute MUST).
+To workaround that, the cli informs the framework to perform a hot reload by modifying the sandbox's `package.json` file.
+A better solution will be appreciated.
