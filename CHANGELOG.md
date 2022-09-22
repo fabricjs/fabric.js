@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(build): safeguard concurrent unlocking [#8309](https://github.com/fabricjs/fabric.js/pull/8309)
 - ci(): update stale bot [#8307](https://github.com/fabricjs/fabric.js/pull/8307)
 - ci(test): await golden generation in visual tests [#8284](https://github.com/fabricjs/fabric.js/pull/8284)
 - ci(): Add a pipeline check for verifying that CHANGELOG.md has been updated [#8302](https://github.com/fabricjs/fabric.js/pull/8302)
