@@ -121,12 +121,12 @@
     callback(canvas.lowerCanvasEl);
   }
 
-  // tests.push({
-  //   test: 'Isolation of clipPath of group and inner objects',
-  //   code: clipping3,
-  //   golden: 'clipping3.png',
-  //   percentage: 0.06,
-  // });
+  tests.push({
+    test: 'Isolation of clipPath of group and inner objects',
+    code: clipping3,
+    golden: 'clipping3.png',
+    percentage: 0.06,
+  });
 
   const defaultCallback = (canvas, callback) => {
     canvas.renderAll();
