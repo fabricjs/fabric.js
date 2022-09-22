@@ -2,7 +2,7 @@
 
 ## [next]
 
-- ci(): fixed visual tests not to create a missing golden when running from CI [#8305](https://github.com/fabricjs/fabric.js/pull/8305)
+- ci(): fixed visual tests not to create a missing golden when running from CI and to fail instead [#8305](https://github.com/fabricjs/fabric.js/pull/8305)
 - refactor(): svg export logic to use `calcOwnMatrix` as a prerequisite for a fix to `calcTransformMatrix` based on [#8298](https://github.com/fabricjs/fabric.js/pull/8298), [#8305](https://github.com/fabricjs/fabric.js/pull/8305)
 - ci(test): await golden generation in visual tests [#8284](https://github.com/fabricjs/fabric.js/pull/8284)
 - ci(): Add a pipeline check for verifying that CHANGELOG.md has been updated [#8302](https://github.com/fabricjs/fabric.js/pull/8302)
