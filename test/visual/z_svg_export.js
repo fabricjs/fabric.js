@@ -211,7 +211,7 @@
     golden: 'clipping/transformed-grouped.png',
     percentage: 0.06,
   });
-  
+
   // TODO fix inverted clip path svg import/export by migrating to `<mask>`
   tests.push({
     test: 'ClipPath can be inverted, it will clip what is outside the clipPath',
@@ -224,7 +224,7 @@
     ),
     golden: 'clipping/inverted.png',
     percentage: 0.06,
-    disabled: true,
+    action: 'todo',
   });
 
   tests.push({

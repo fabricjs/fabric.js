@@ -133,24 +133,35 @@
       threshold: 0.095
     };
 
-    return function testCallback(testObj) {
-      if (testObj.disabled) {
+    return function testCallback({
+      disabled,
+      action = 'test',
+      test: testName,
+      code,
+      percentage,
+      golden,
+      newModule,
+      beforeEachHandler,
+      /**
+       * do not generate a golden
+       */
+      testOnly,
+      fabricClass = 'StaticCanvas',
+      width,
+      height
+    }) {
+      if (disabled) {
         return;
       }
       fabric.StaticCanvas.prototype.requestRenderAll = fabric.StaticCanvas.prototype.renderAll;
-      var testName = testObj.test;
-      var code = testObj.code;
-      var percentage = testObj.percentage;
-      var golden = testObj.golden;
-      var newModule = testObj.newModule;
       if (newModule) {
         QUnit.module(newModule, {
-          beforeEach: testObj.beforeEachHandler,
+          beforeEach: beforeEachHandler,
         });
       }
-      QUnit.test(testName, function(assert) {
+      QUnit[action](testName, function(assert) {
         var done = assert.async();
-        var fabricCanvas = createCanvasForTest(testObj);
+        var fabricCanvas = createCanvasForTest({ fabricClass, width, height });
         code(fabricCanvas, async function (renderedCanvas) {
           var width = renderedCanvas.width;
           var height = renderedCanvas.height;
@@ -183,7 +194,7 @@
             var stringa = imageDataToChalk(output);
             console.log(stringa);
           }
-          if (!testObj.testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)) {
+          if (action === 'test' && !testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)) {
             await generateGolden(getGoldeName(golden), renderedCanvas);
           }
           await fabricCanvas.dispose();
