@@ -40,6 +40,8 @@
     }
   }
 
+  // TODO clipping code is duplicate - remove from here and use `clippath.js`
+
   var tests = [];
 
   function clipping0(canvas, callback) {
