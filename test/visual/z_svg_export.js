@@ -331,7 +331,7 @@
   tests.push({
     test: 'clipPath made of polygons and paths',
     code: clipping11,
-    golden: 'clippath-9.png',
+    golden: 'clipping/handbag.png',
     percentage: 0.06,
     width: 400,
     height: 400,
