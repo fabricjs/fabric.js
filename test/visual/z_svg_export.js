@@ -195,7 +195,7 @@
     test: 'ClipPath can be transformed',
     code: createGradientClippingTest(() =>
       new fabric.Circle({ radius: 20, strokeWidth: 0, top: -10, left: -10, scaleX: 2, skewY: 45 })),
-    golden: 'clipping4.png',
+    golden: 'clipping/transformed.png',
     percentage: 0.06,
   });
 
@@ -208,10 +208,10 @@
         new fabric.Circle({ radius: 10, strokeWidth: 0, top: -20, left: -20, scaleY: 2, skewX: 45 })
       ])
     ),
-    golden: 'clipping5.png',
+    golden: 'clipping/transformed-grouped.png',
     percentage: 0.06,
   });
-
+  
   // TODO fix inverted clip path svg import/export by migrating to `<mask>`
   tests.push({
     test: 'ClipPath can be inverted, it will clip what is outside the clipPath',
@@ -222,7 +222,7 @@
         new fabric.Circle({ radius: 10, strokeWidth: 0, top: -20, left: -20, scaleY: 2, skewX: 45 })
       ], { inverted: true })
     ),
-    golden: 'clipping6.png',
+    golden: 'clipping/inverted.png',
     percentage: 0.06,
     disabled: true,
   });
@@ -233,7 +233,7 @@
       object.set({
         clipPath: new fabric.Circle({ radius: 30, strokeWidth: 0, top: -30, left: -30, skewY: 45 })
       })),
-    golden: 'clipping7.png',
+    golden: 'clipping/transformed-many.png',
     percentage: 0.06,
   });
 
@@ -248,7 +248,7 @@
         })
       })
     ),
-    golden: 'clipping7.png',
+    golden: 'clipping/transformed-many.png',
     percentage: 0.06,
   });
 
@@ -259,7 +259,7 @@
         clipPath: new fabric.Circle({ radius: 60, strokeWidth: 0, top: 40, left: 40, absolutePositioned: true })
       })
     ),
-    golden: 'clipping8.png',
+    golden: 'clipping/abs.png',
     percentage: 0.06,
   });
 
@@ -272,7 +272,7 @@
         })
       })
     ),
-    golden: 'clipping8.png',
+    golden: 'clipping/abs.png',
     percentage: 0.06
   });
 
@@ -291,7 +291,7 @@
         })
       })
     ),
-    golden: 'clipping866.png',
+    golden: 'clipping/transformed-abs-group.png',
     percentage: 0.06
   });
 
@@ -303,7 +303,7 @@
       });
       toSVGCanvas(canvas, callback);
     }),
-    golden: 'clipping9.png',
+    golden: 'clipping/canvas.png',
     percentage: 0.06,
   });
 
