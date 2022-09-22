@@ -54,9 +54,13 @@ Check out [**Helping Out**](#%EF%B8%8F-helping-out).
 #### Online
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
 
+Gitpod will start the [prototyping](#-prototyping) apps and expose them as endpoints.
+`A service is available on port ...` popups will show up.
+
+
 ### 🧭 Prototyping
 
-`.codesandbox/templates` contains templates for **INSTANT** out-of-the-box prototyping **👍 Try it out**
+[`.codesandbox/templates`](.codesandbox/templates) contains templates for **INSTANT** out-of-the-box prototyping **👍 Try it out**
 
 ```bash
 
@@ -148,7 +152,7 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
   Fabric uses [`prettier`](https://prettier.io/) to format files and [`eslint`](https://eslint.org/) for linting (`npm run lint -- --fix`).\
   To enjoy a seamless dev experience add the [`Prettier - Code formatter`](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) extension via the extensions toolbar in VSCode.
 - **⛔ `dist`** \
-  Commit changes to [source files](https://github.com/fabricjs/fabric.js/tree/master/src). Don't commit the generated [distribution files](https://github.com/fabricjs/fabric.js/tree/master/dist).
+  Commit changes to [source files](src). Don't commit the generated [distribution files](dist).
 - **Tests** \
   PRs must be backed with relevant tests, follow [TESTING](#-testing).
 - **Docs** \
