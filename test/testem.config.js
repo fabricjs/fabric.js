@@ -42,7 +42,5 @@ module.exports = {
     filter: process.env.QUNIT_FILTER || null,
   },
   timeout: 540,
-  parallel: 4,
-  // https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
-  CI: process.env.CI || false
+  parallel: 4
 }

@@ -14,12 +14,7 @@
 {{#serve_files}}<script src="{{{src}}}"{{#attrs}} {{&.}}{{/attrs}}></script>{{/serve_files}}
 
 <script>
-// QUnit config
 QUnit.config.reorder = false;
-{{#qunit.filter}}QUnit.config.filter = {{qunit.filter}};{{/qunit.filter}}
-
-// runs from github action
-window.CI = {{CI}};
 </script>
 
 {{#visual}}
@@ -68,6 +63,7 @@ if(
    // is Google Chrome
     QUnit.recreateVisualRefs = {{qunit.recreate}};
     QUnit.debugVisual = {{qunit.debug}};
+    {{#qunit.filter}}QUnit.config.filter = {{qunit.filter}};{{/qunit.filter}}
 }
 </script>
 {{/visual}}
