@@ -76,7 +76,7 @@
     'clippath-5',
     'clippath-6',
     'clippath-7',
-    'clippath-9',
+    'handbag',
     'vector-effect',
     'svg-with-no-dim-rect',
     'notoemoji-person',
