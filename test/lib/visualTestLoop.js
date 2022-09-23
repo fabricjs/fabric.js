@@ -41,7 +41,7 @@
   }
   exports.getAssetName = getAssetName;
 
-  function getGoldeName(filename) {
+  function getGoldenName(filename) {
     var finalName = '/golden/' + filename;
     return fabric.isLikelyNode ? localPath('/../visual', finalName) : finalName;
   }
@@ -82,18 +82,7 @@
     }
   }
 
-  async function getImage(filename, original) {
-    if (fabric.isLikelyNode && original) {
-      var plainFileName = filename.replace('file://', '');
-      if (!fs.existsSync(plainFileName)) {
-        generateGolden(filename, original);
-      }
-    }
-    else if (original) {
-      await fetch(`/goldens/${filename}`, { method: 'GET' })
-        .then(res => res.json())
-        .then(res => !res.exists && generateGolden(filename, original));
-    }
+  async function getImage(filename) {
     return new Promise((resolve, reject) => {
       const img = fabric.document.createElement('img');
       img.onload = function () {
@@ -108,7 +97,18 @@
       };
       img.src = filename;
     });
-   
+  }
+  
+  function goldenExists(fileName) {
+    if (fabric.isLikelyNode) {
+      var plainFileName = fileName.replace('file://', '');
+      return fs.existsSync(plainFileName);
+    }
+    else {
+      return fetch(`/goldens/${fileName}`, { method: 'GET' })
+        .then(res => res.json())
+        .then(res => res.exists);
+    }
   }
 
   exports.visualTestLoop = function(QUnit) {
@@ -133,25 +133,51 @@
       threshold: 0.095
     };
 
-    return function testCallback(testObj) {
-      if (testObj.disabled) {
+    return function testCallback({
+      disabled,
+      action = 'test',
+      test: testName,
+      code,
+      percentage,
+      golden,
+      newModule,
+      beforeEachHandler,
+      /**
+       * do not generate a golden
+       */
+      testOnly,
+      fabricClass = 'StaticCanvas',
+      width,
+      height
+    }) {
+      if (disabled) {
         return;
       }
       fabric.StaticCanvas.prototype.requestRenderAll = fabric.StaticCanvas.prototype.renderAll;
-      var testName = testObj.test;
-      var code = testObj.code;
-      var percentage = testObj.percentage;
-      var golden = testObj.golden;
-      var newModule = testObj.newModule;
       if (newModule) {
         QUnit.module(newModule, {
-          beforeEach: testObj.beforeEachHandler,
+          beforeEach: beforeEachHandler,
         });
       }
-      QUnit.test(testName, function(assert) {
+      QUnit[action](testName, async function(assert) {
         var done = assert.async();
-        var fabricCanvas = createCanvasForTest(testObj);
+        var fabricCanvas = createCanvasForTest({ fabricClass, width, height });
+        const fileName = getGoldenName(golden);
+        const exists = await goldenExists(fileName);
+
+        if (CI && !exists) {
+          // this means that the golden wasn't committed to the repo
+          // we do not want the test to create the missing golden thus reporting a false positive
+          throw new Error(`golden ${golden} not found`);
+        };
+        
         code(fabricCanvas, async function (renderedCanvas) {
+          // retrieve golden
+          if (!exists) {
+            await generateGolden(fileName, renderedCanvas);
+          }
+          const goldenImage = await getImage(fileName, renderedCanvas);
+
           var width = renderedCanvas.width;
           var height = renderedCanvas.height;
           var totalPixels = width * height;
@@ -161,7 +187,6 @@
           canvas.height = height;
           var ctx = canvas.getContext('2d');
           var output = ctx.getImageData(0, 0, width, height);
-          const goldenImage = await getImage(getGoldeName(golden), renderedCanvas);
           ctx.drawImage(goldenImage, 0, 0);
           visualCallback.addArguments({
             enabled: true,
@@ -183,8 +208,8 @@
             var stringa = imageDataToChalk(output);
             console.log(stringa);
           }
-          if (!testObj.testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)) {
-            await generateGolden(getGoldeName(golden), renderedCanvas);
+          if (action === 'test' && !testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)) {
+            await generateGolden(fileName, renderedCanvas);
           }
           await fabricCanvas.dispose();
           done();          
