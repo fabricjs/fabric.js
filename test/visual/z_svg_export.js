@@ -227,6 +227,7 @@
     golden: 'clipping/inverted.png',
     percentage: 0.06,
     action: 'todo',
+    disabled: true
   });
 
   tests.push({
