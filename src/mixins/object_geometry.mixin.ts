@@ -561,9 +561,14 @@ import { Point } from '../point.class';
        * @chainable
        */
       scaleToWidth: function (value, absolute) {
+        var scaledWidth = this.getScaledWidth();
+        if (!this.width || !scaledWidth) {
+          return this;
+        }
+
         // adjust to bounding rect factor so that rotated shapes would fit as well
         var boundingRectFactor =
-          this.getBoundingRect(absolute).width / this.getScaledWidth();
+          this.getBoundingRect(absolute).width / scaledWidth;
         return this.scale(value / this.width / boundingRectFactor);
       },
 
@@ -575,9 +580,14 @@ import { Point } from '../point.class';
        * @chainable
        */
       scaleToHeight: function (value, absolute) {
+        var scaledHeight = this.getScaledHeight();
+        if (!this.height || !scaledHeight) {
+          return this;
+        }
+
         // adjust to bounding rect factor so that rotated shapes would fit as well
         var boundingRectFactor =
-          this.getBoundingRect(absolute).height / this.getScaledHeight();
+          this.getBoundingRect(absolute).height / scaledHeight;
         return this.scale(value / this.height / boundingRectFactor);
       },
 
