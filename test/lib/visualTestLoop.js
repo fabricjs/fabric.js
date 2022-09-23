@@ -173,7 +173,7 @@
     const fileName = getGoldenName(ref);
     const exists = await goldenExists(fileName);
 
-    if (true) {
+    if (CI && !exists) {
       // this means that the golden wasn't committed to the repo
       // we do not want the test to create the missing golden thus reporting a false positive
       done();
