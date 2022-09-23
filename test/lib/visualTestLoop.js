@@ -146,12 +146,12 @@
           beforeEach: beforeEachHandler,
         });
       }
-      QUnit[action](testName,  function(assert) {
+      QUnit[action](testName, function (assert) {
         assert.visualEqual(code, golden, {
           fabricClass,
           width,
           height,
-          percentage,
+          percentageThreshold: percentage,
           testOnly,
         });
       });
@@ -162,9 +162,12 @@
     fabricClass,
     width,
     height,
-    percentage,
     /**
-     * do not generate a golden
+     * [0, 1]
+     */
+    percentageThreshold,
+    /**
+     * do not generate a golden if test fails, overriding all cli flags
      */
     testOnly,
   }) {
@@ -208,12 +211,12 @@
 
       const imageDataGolden = ctx.getImageData(0, 0, width, height).data;
       const differentPixels = pixelmatch(imageDataCanvas.data, imageDataGolden, output.data, width, height, pixelmatchOptions);
-      const okDiff = totalPixels * percentage;
+      const okDiff = totalPixels * percentageThreshold;
       const isOK = differentPixels <= okDiff;
       this.pushResult({
         result: isOK,
         actual: `${differentPixels} pixels, ${(differentPixels / totalPixels * 100).toFixed(2)}%`,
-        expected: `<= ${okDiff} pixels, ${(percentage * 100).toFixed(2)}%`,
+        expected: `<= ${okDiff} pixels, ${(percentageThreshold * 100).toFixed(2)}%`,
         message: ` [${ref}] has too many different pixels`
       });
 
