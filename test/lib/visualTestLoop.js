@@ -179,8 +179,9 @@
     if (CI && !exists) {
       // this means that the golden wasn't committed to the repo
       // we do not want the test to create the missing golden thus reporting a false positive
-      this.ok(false, `golden ${ref} not found`);
+      this.ok(false, `golden [${ref}] not found`);
       done();
+      return;
     };
         
     callback(fabricCanvas, async (renderedCanvas) => {
@@ -201,6 +202,7 @@
       const ctx = canvas.getContext('2d');
       const output = ctx.getImageData(0, 0, width, height);
       ctx.drawImage(goldenImage, 0, 0);
+
       visualCallback.addArguments({
         enabled: true,
         golden: canvas,
