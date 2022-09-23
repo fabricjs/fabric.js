@@ -215,8 +215,8 @@
       const isOK = differentPixels <= okDiff;
       this.pushResult({
         result: isOK,
-        actual: `${differentPixels} pixels, ${(differentPixels / totalPixels * 100).toFixed(2)}%`,
-        expected: `<= ${okDiff} pixels, ${(percentageThreshold * 100).toFixed(2)}%`,
+        actual: `${differentPixels} different pixels (${(differentPixels / totalPixels * 100).toFixed(2)}%)`,
+        expected: `different pixels <= ${okDiff} (${(percentageThreshold * 100).toFixed(2)}%)`,
         message: ` [${ref}] has too many different pixels`
       });
 
