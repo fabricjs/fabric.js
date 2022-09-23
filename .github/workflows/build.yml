@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Uglyfied build
+      - name: Uglified build
         uses: actions/setup-node@v1
         with:
           node-version: 16.x
@@ -53,3 +53,18 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           delete-old-comments: true
           update-comment: true
+  changelog:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - name: Changelog check
+        uses: Zomzog/changelog-checker@v1.2.0
+        with:
+          fileName: CHANGELOG.md
+          checkNotification: Simple # default `Detailed`
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
