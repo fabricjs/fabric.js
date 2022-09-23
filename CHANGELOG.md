@@ -2,7 +2,7 @@
 
 ## [next]
 
-- ci(): fixed visual tests not to create a missing golden when running from CI and to fail instead [#8305](https://github.com/fabricjs/fabric.js/pull/8305)
+- ci(): fixed visual tests not to create a missing golden when running from CI and to fail instead [#8311](https://github.com/fabricjs/fabric.js/pull/8311)
 - ci(build): safeguard concurrent unlocking [#8309](https://github.com/fabricjs/fabric.js/pull/8309)
 - ci(): update stale bot [#8307](https://github.com/fabricjs/fabric.js/pull/8307)
 - ci(test): await golden generation in visual tests [#8284](https://github.com/fabricjs/fabric.js/pull/8284)
