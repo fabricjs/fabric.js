@@ -179,8 +179,8 @@
     if (CI && !exists) {
       // this means that the golden wasn't committed to the repo
       // we do not want the test to create the missing golden thus reporting a false positive
+      this.ok(false, `golden ${ref} not found`);
       done();
-      throw new Error(`golden ${ref} not found`);
     };
         
     callback(fabricCanvas, async (renderedCanvas) => {
