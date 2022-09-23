@@ -12,7 +12,7 @@ class RunningAnimations extends Array<AnimationContext> {
    * cancel all running animations at the next requestAnimFrame
    * @returns {AnimationContext[]}
    */
-  cancelAll() {
+  cancelAll(): AnimationContext[] {
     const animations = this.splice(0);
     animations.forEach((animation) => animation.cancel());
     return animations;
@@ -23,7 +23,7 @@ class RunningAnimations extends Array<AnimationContext> {
    * @param {fabric.Canvas} canvas
    * @returns {AnimationContext[]}
    */
-  cancelByCanvas(canvas: Canvas) {
+  cancelByCanvas(canvas: Canvas): AnimationContext[] {
     if (!canvas) {
       return [];
     }
@@ -41,7 +41,7 @@ class RunningAnimations extends Array<AnimationContext> {
    * @param {*} target
    * @returns {AnimationContext[]}
    */
-  cancelByTarget(target: AnimationContext['target']) {
+  cancelByTarget(target: AnimationContext['target']): AnimationContext[] {
     const cancelled = this.findAnimationsByTarget(target);
     cancelled.forEach((animation) => animation.cancel());
     return cancelled;
@@ -52,7 +52,7 @@ class RunningAnimations extends Array<AnimationContext> {
    * @param {CancelFunction} cancelFunc the function returned by animate
    * @returns {number}
    */
-  findAnimationIndex(cancelFunc: CancelFunction) {
+  findAnimationIndex(cancelFunc: CancelFunction): number {
     return this.findIndex((animation) => animation.cancel === cancelFunc);
   }
 
@@ -61,7 +61,7 @@ class RunningAnimations extends Array<AnimationContext> {
    * @param {CancelFunction} cancelFunc the function returned by animate
    * @returns {AnimationContext | undefined} animation's options object
    */
-  findAnimation(cancelFunc: CancelFunction) {
+  findAnimation(cancelFunc: CancelFunction): AnimationContext | undefined {
     return this.find((animation) => animation.cancel === cancelFunc);
   }
 
@@ -70,7 +70,9 @@ class RunningAnimations extends Array<AnimationContext> {
    * @param {*} target the object that is assigned to the target property of the animation context
    * @returns {AnimationContext[]} array of animation options object associated with target
    */
-  findAnimationsByTarget(target: AnimationContext['target']) {
+  findAnimationsByTarget(
+    target: AnimationContext['target']
+  ): AnimationContext[] {
     if (!target) {
       return [];
     }
