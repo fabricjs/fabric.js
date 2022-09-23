@@ -29,7 +29,7 @@
       options.height = opts.height;
     }
     const canvas = new fabric[fabricClass](null, options);
-    // stub TODO use sinon
+    // stub
     canvas.requestRenderAll = canvas.renderAll;
     return canvas;
   }
@@ -216,7 +216,7 @@
       this.pushResult({
         result: isOK,
         actual: `${differentPixels} different pixels (${(differentPixels / totalPixels * 100).toFixed(2)}%)`,
-        expected: `different pixels <= ${okDiff} (${(percentageThreshold * 100).toFixed(2)}%)`,
+        expected: `${okDiff} >= different pixels (${(percentageThreshold * 100).toFixed(2)}%)`,
         message: ` [${ref}] has too many different pixels`
       });
 
