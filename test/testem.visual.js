@@ -12,10 +12,10 @@ module.exports = {
   report_file: reportPath,
   serve_files: [
     ...config.serve_files,
-    'test/lib/pixelmatch.js',
-    'test/lib/visualTestLoop.js',
-    'test/lib/visualCallbackQunit.js',
-    ...(process.env.TEST_FILES ? process.env.TEST_FILES.split(',') : ['test/visual/*.js'])
+    'test/lib/visualTestLoop.mjs',
+    'test/lib/visualCallbackQunit.mjs',
+    'test/data.json',
+    ...(process.env.TEST_FILES ? process.env.TEST_FILES.split(',') : ['test/visual/*.js', 'test/visual/*.mjs'])//.map(file=>`cli_output/${file}`)
   ],
   routes: {
     ...config.routes,

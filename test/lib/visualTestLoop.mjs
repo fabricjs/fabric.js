@@ -1,10 +1,11 @@
-(function(exports) {
+import { visualCallback } from './visualCallbackQunit.mjs';
+// import pixelmatch from 'pixelmatch';
 
-  exports.getFixture = async function(name, original, callback) {
+  export const getFixture = async function(name, original, callback) {
     callback(await getImage(getFixtureName(name), original));
   };
 
-  exports.getAsset = function(name, callback) {
+  export const getAsset = function(name, callback) {
     var finalName = getAssetName(name);
     if (fabric.isLikelyNode) {
       var plainFileName = finalName.replace('file://', '');
@@ -35,11 +36,10 @@
     return 'file://' + require('path').join(__dirname, path, filename)
   }
 
-  function getAssetName(filename) {
+  export function getAssetName(filename) {
     var finalName = '/assets/' + filename + '.svg';
     return fabric.isLikelyNode ? localPath('/../visual', finalName) : finalName;
   }
-  exports.getAssetName = getAssetName;
 
   function getGoldeName(filename) {
     var finalName = '/golden/' + filename;
@@ -109,24 +109,10 @@
       img.src = filename;
     });
    
-  }
+}
+  
 
-  exports.visualTestLoop = function(QUnit) {
-    var _pixelMatch;
-    var visualCallback;
-    var imageDataToChalk;
-    if (fabric.isLikelyNode) {
-      _pixelMatch = global.pixelmatch;
-      visualCallback = global.visualCallback;
-      imageDataToChalk = global.imageDataToChalk;
-    }
-    else {
-      if (window) {
-        _pixelMatch = window.pixelmatch;
-        visualCallback = window.visualCallback;
-      }
-      imageDataToChalk = function() { return ''; };
-    }
+  export const visualTestLoop = function(QUnit) {
 
     var pixelmatchOptions = {
       includeAA: false,
@@ -171,7 +157,7 @@
             goldenName: golden
           });
           var imageDataGolden = ctx.getImageData(0, 0, width, height).data;
-          var differentPixels = _pixelMatch(imageDataCanvas.data, imageDataGolden, output.data, width, height, pixelmatchOptions);
+          var differentPixels = pixelmatch(imageDataCanvas.data, imageDataGolden, output.data, width, height, pixelmatchOptions);
           var percDiff = differentPixels / totalPixels * 100;
           var okDiff = totalPixels * percentage;
           var isOK = differentPixels <= okDiff;
@@ -179,10 +165,6 @@
             isOK,
             testName + ' [' + golden + '] has too many different pixels ' + differentPixels + '(' + okDiff + ') representing ' + percDiff + '% (>' + (percentage * 100) + '%)'
           );
-          if (!isOK) {
-            var stringa = imageDataToChalk(output);
-            console.log(stringa);
-          }
           if (!testObj.testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)) {
             await generateGolden(getGoldeName(golden), renderedCanvas);
           }
@@ -192,4 +174,3 @@
       });
     }
   }
-})(typeof window === 'undefined' ? exports : this);

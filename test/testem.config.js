@@ -1,3 +1,15 @@
+const path = require('path');
+
+function getScriptType(file) {
+  switch (path.parse(file).ext) {
+    case '.mjs':
+      return 'module';
+    case '.json':
+      return 'application/json';
+    default:
+      return 'application/javascript';
+  }
+}
 
 /**
  * common config 
@@ -8,6 +20,12 @@ module.exports = {
   serve_files: [
     'dist/fabric.js'
   ],
+  renderScriptTag() {
+    return (text, render) => {
+      const src = render(text);
+      return `<script src="${src}" type="${getScriptType(src)}"></script>`;
+    }
+  },
   styles: [
     'test/lib/tests.css'
   ],

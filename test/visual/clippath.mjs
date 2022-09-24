@@ -1,17 +1,24 @@
-(function () {
-  fabric.config.configure({
-    enableGLFiltering: false
-  });
-  fabric.Object.prototype.objectCaching = true;
-  var visualTestLoop;
-  if (fabric.isLikelyNode) {
-    visualTestLoop = global.visualTestLoop;
-  }
-  else {
-    visualTestLoop = window.visualTestLoop;
-  }
 
-  var tests = [];
+import { visualTestLoop } from '../lib/visualTestLoop.mjs';
+import * as data from '../data.json' assert {type: 'json'};
+
+console.log(data)
+
+QUnit.module('Clipping', hooks => {
+
+  hooks.before(() => {
+    fabric.config.configure({
+      enableGLFiltering: false
+    });
+    fabric.Object.prototype.objectCaching = true;
+  });
+
+  hooks.after(() => {
+    fabric.config.restoreDefaults();
+    // fabric.Object.prototype.objectCaching = true;
+  });
+
+  const tests = [];
 
   function clipping0(canvas, callback) {
     var clipPath = new fabric.Circle({ radius: 100, strokeWidth: 0, top: -10, left: -10 });
@@ -26,7 +33,6 @@
     test: 'Clip a rect with a circle, no zoom',
     code: clipping0,
     golden: 'clipping0.png',
-    newModule: 'Clipping shapes',
     percentage: 0.06,
   });
 
@@ -346,4 +352,5 @@
   });
 
   tests.forEach(visualTestLoop(QUnit));
-})();
+  
+})

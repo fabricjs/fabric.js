@@ -1,4 +1,4 @@
-(function (window) {
+
 
   function appendResults(node, output, { goldenName }) {
       var template = document.getElementById('error_output');
@@ -24,15 +24,15 @@
 
 
   // https://api.qunitjs.com/callbacks/QUnit.testDone/
-  function visualCallback() {
+  function VisualCallback() {
     this.currentArgs = {};
   }
 
-  visualCallback.prototype.addArguments = function(argumentObj) {
+  VisualCallback.prototype.addArguments = function(argumentObj) {
     this.currentArgs = Object.assign({}, argumentObj);
   };
 
-  visualCallback.prototype.testDone = function (details) {
+  VisualCallback.prototype.testDone = function (details) {
     if (window && document && this.currentArgs.enabled) {
       var fabricCanvasDataRef = this.currentArgs.fabric;
       var ouputImageDataRef = this.currentArgs.diff;
@@ -76,7 +76,6 @@
     }
   };
 
-  if (window) {
-    window.visualCallback = new visualCallback();
-  }
-})(this);
+export const visualCallback = new VisualCallback();
+
+QUnit.testDone(visualCallback.testDone.bind(visualCallback));

@@ -364,10 +364,13 @@ async function test(suite, tests, options = {}) {
  * @returns
  */
 function listTestFiles(type) {
-  return fs.readdirSync(path.resolve(wd, './test', type)).filter((p) => {
-    const ext = path.parse(p).ext.slice(1);
-    return ext === 'js' || ext === 'ts';
-  });
+  const EXT = [
+    '.js',
+    '.mjs',
+    '.ts'
+  ]
+  return fs.readdirSync(path.resolve(wd, './test', type))
+    .filter((p) => EXT.includes(path.parse(p).ext));
 }
 
 function writeCLIFile(tests) {
