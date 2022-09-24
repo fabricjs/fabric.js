@@ -3,12 +3,12 @@ import ts from 'rollup-plugin-ts';
 
 // https://rollupjs.org/guide/en/#configuration-files
 export default {
-  external: ['qunit', 'fabric'],
-  input: ['test/unit/index.ts', 'test/visual/index.ts'],
+  external: ['qunit', 'fabric', 'pixelmatch'],
+  input: ['test/unit/index.ts', 'test/visual/index.ts', 'test/lib/index.js'],
   output: [
     {
       dir: 'cli_output/test',
-      format: 'cjs',
+      format: 'es',
       exports: 'named',
       preserveModules: true, // Keep directory structure and files
     },
