@@ -99,11 +99,11 @@ export interface AnimationCurrentState {
    */
   currentValue: number | number[];
   /**
-   * Same as valueRatio from @see OnChangeCallback
+   * Same as valueRatio from @see TOnAnimationChangeCallback
    */
   completionRate: number;
   /**
-   * Same as completionRatio from @see OnChangeCallback
+   * Same as completionRatio from @see TOnAnimationChangeCallback
    */
   durationRate: number;
 }
