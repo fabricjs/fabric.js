@@ -1,6 +1,6 @@
 import { fabric } from '../../HEADER';
 import { Canvas, TObject } from '../__types__';
-import { AnimationContext, CancelFunction } from './animate';
+import { AnimationContext, TCancelFunction } from './animate';
 
 /**
  * Array holding all running animations
@@ -49,19 +49,19 @@ class RunningAnimations extends Array<AnimationContext> {
 
   /**
    *
-   * @param {CancelFunction} cancelFunc the function returned by animate
+   * @param {TCancelFunction} cancelFunc the function returned by animate
    * @returns {number}
    */
-  findAnimationIndex(cancelFunc: CancelFunction): number {
+  findAnimationIndex(cancelFunc: TCancelFunction): number {
     return this.findIndex((animation) => animation.cancel === cancelFunc);
   }
 
   /**
    *
-   * @param {CancelFunction} cancelFunc the function returned by animate
+   * @param {TCancelFunction} cancelFunc the function returned by animate
    * @returns {AnimationContext | undefined} animation's options object
    */
-  findAnimation(cancelFunc: CancelFunction): AnimationContext | undefined {
+  findAnimation(cancelFunc: TCancelFunction): AnimationContext | undefined {
     return this.find((animation) => animation.cancel === cancelFunc);
   }
 

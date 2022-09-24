@@ -10,22 +10,22 @@ import { defaultEasing, TEasingFunction } from './anim_ease';
  * @param valueRatio ratio of current value to animation max value. [0, 1]
  * @param timeRatio ratio of current ms to animation duration. [0, 1]
  */
-export type OnChangeCallback<T = void> = (
-  t: number | number[],
+export type TOnAnimationChangeCallback<Return = void, State = number | number[]> = (
+  t: State,
   valueRatio: number,
   timeRatio: number
-) => T;
+) => Return;
 
 /**
  * Called to determine if animation should abort
  * @returns truthy if animation should abort
  */
-export type AbortCallback = OnChangeCallback<boolean>;
+export type TAbortCallback = TOnAnimationChangeCallback<boolean>;
 
 /**
  * Function used for canceling an animation
  */
-export type CancelFunction = VoidFunction;
+export type TCancelFunction = VoidFunction;
 
 /**
  * Animation of a value or list of values
@@ -44,12 +44,12 @@ export interface AnimationOptions {
   /**
    * Called at each frame of the animation
    */
-  onChange: OnChangeCallback;
+  onChange: TOnAnimationChangeCallback;
 
   /**
    * Called after the last frame of the animation
    */
-  onComplete: OnChangeCallback;
+  onComplete: TOnAnimationChangeCallback;
 
   /**
    * Easing function
@@ -61,7 +61,7 @@ export interface AnimationOptions {
    * Function called at each frame.
    * If it returns true, abort
    */
-  abort: AbortCallback;
+  abort: TAbortCallback;
 
   /**
    * Starting value(s)
@@ -117,7 +117,7 @@ export interface AnimationContext
   /**
    * Current function used to cancel the animation
    */
-  cancel: CancelFunction;
+  cancel: TCancelFunction;
 }
 
 /**
@@ -145,11 +145,11 @@ export interface AnimationContext
  *   }
  * });
  *
- * @returns {CancelFunction} cancel function
+ * @returns {TCancelFunction} cancel function
  */
 export function animate(
   options: Partial<AnimationOptions> = {}
-): CancelFunction {
+): TCancelFunction {
   let cancel = false;
 
   const {
