@@ -14,8 +14,7 @@ module.exports = {
     ...config.serve_files,
     'test/lib/visualTestLoop.mjs',
     'test/lib/visualCallbackQunit.mjs',
-    'test/data.json',
-    ...(process.env.TEST_FILES ? process.env.TEST_FILES.split(',') : ['test/visual/*.js', 'test/visual/*.mjs'])//.map(file=>`cli_output/${file}`)
+    ...(process.env.TEST_FILES ? process.env.TEST_FILES.split(',') : ['test/visual/*.js', 'test/visual/*.mjs'])
   ],
   routes: {
     ...config.routes,
