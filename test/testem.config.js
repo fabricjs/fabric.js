@@ -6,9 +6,12 @@ const path = require('path');
  */
 module.exports = {
   framework: 'qunit',
-  serve_files: [
-    'dist/fabric.js',
-  ],
+  get serve_files() {
+    return [
+      'dist/fabric.js',
+      ...(this.src_files || []).map(file => path.join('build', file).replace(new RegExp(`\\${path.extname(file)}$`), '.js'))
+    ];
+  },
   renderScriptTag() {
     return (text, render) => {
       const src = render(text);
@@ -23,6 +26,7 @@ module.exports = {
   renderTestScriptTag() {
     return (text, render) => {
       const src = render(text);
+      console.log( path.join('build', src),src)
       const dist = path.join('build', src).replace(new RegExp(`\\${path.extname(src)}$`), '.js');
       return `<script src="${dist}" type="module"></script>`;
     }
@@ -32,7 +36,8 @@ module.exports = {
   ],
   routes: {
     '/fixtures': 'test/fixtures',
-    '/main': 'test/tests.mustache'
+    '/main': 'test/tests.mustache',
+    '/*': 'build/*'
   },
   test_page: 'main?hidepassed&hideskipped&timeout=60000',
   browser_args: {
