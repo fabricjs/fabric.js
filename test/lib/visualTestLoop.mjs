@@ -90,12 +90,9 @@ function localPath(_path, filename) {
   }
 
 async function getImage(filename, original) {
-    console.log('poiuyf')
     if (fabric.isLikelyNode && original) {
       var plainFileName = filename.replace('file://', '');
-      console.log('poiuyf',fs.existsSync,plainFileName,fs.existsSync(plainFileName))
       if (!fs.existsSync(plainFileName)) {
-         console.log('poiuyf')
         generateGolden(filename, original);
       }
     }
@@ -159,7 +156,6 @@ async function getImage(filename, original) {
           var output = ctx.getImageData(0, 0, width, height);
           const goldenImage = await getImage(getGoldeName(golden), renderedCanvas);
           ctx.drawImage(goldenImage, 0, 0);
-          console.log('sdflsdflksdf')
           !fabric.isLikelyNode && visualCallback.addArguments({
             enabled: true,
             golden: canvas,
@@ -180,8 +176,7 @@ async function getImage(filename, original) {
             await generateGolden(getGoldeName(golden), renderedCanvas);
           }
           await fabricCanvas.dispose();
-          done();          
-          console.log('dfglkm')
+          done();
         });
       });
     }
