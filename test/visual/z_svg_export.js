@@ -1,16 +1,10 @@
 import { util } from '../lib';
+import { visualTestLoop } from '../lib/visualTestLoop.mjs';
 
 (function () {
   fabric.config.configure({
     enableGLFiltering: false
   });
-  var visualTestLoop;
-  if (fabric.isLikelyNode) {
-    visualTestLoop = global.visualTestLoop;
-  }
-  else {
-    visualTestLoop = window.visualTestLoop;
-  }
 
   function svgToDataURL(svgStr) {
     var encoded = encodeURIComponent(svgStr)
