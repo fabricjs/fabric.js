@@ -22,7 +22,10 @@
   }
 
 
-  // https://api.qunitjs.com/callbacks/QUnit.testDone/
+  /**
+   * adds visual results to browser test logs
+   * https://api.qunitjs.com/callbacks/QUnit.testDone/
+   */
   function VisualCallback() {
     this.currentArgs = {};
   }

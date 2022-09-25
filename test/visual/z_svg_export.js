@@ -1,16 +1,15 @@
-(function() {
+import { util } from '../lib';
+
+(function () {
   fabric.config.configure({
     enableGLFiltering: false
   });
   var visualTestLoop;
-  var getAssetName;
   if (fabric.isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
-    getAssetName = global.getAssetName;
   }
   else {
     visualTestLoop = window.visualTestLoop;
-    getAssetName = window.getAssetName;
   }
 
   function svgToDataURL(svgStr) {
@@ -402,7 +401,7 @@
   });
 
   function multipleGradients(canvas, callback) {
-    fabric.loadSVGFromURL(getAssetName('svg_linear_9'), function(objects) {
+    fabric.loadSVGFromURL(util.getAssetName('svg_linear_9'), function(objects) {
       var group = fabric.util.groupSVGElements(objects);
       canvas.add(group);
       toSVGCanvas(canvas, callback);

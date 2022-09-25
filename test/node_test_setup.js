@@ -28,9 +28,7 @@ global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
 global.fs = require('fs');
 global.path = require('path');
-global.visualCallback = {
-  addArguments: function() {},
-};
+
 // global.visualTestLoop = require('./lib/visualTestLoop').visualTestLoop;
 // global.compareGoldensTest = require('./lib/visualTestLoop').compareGoldensTest;
 // global.getFixture = require('./lib/visualTestLoop').getFixture;

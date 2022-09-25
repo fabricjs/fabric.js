@@ -310,7 +310,7 @@ async function test(suite, tests, options = {}) {
   const env = {
     ...process.env,
     TEST_FILES: (tests || []).join(','),
-    NODE_CMD: ['qunit', 'test/node_test_setup.js', 'test/lib']
+    NODE_CMD: ['qunit', 'test/node_test_setup.js', 'test/lib/index.mjs']
       .concat(tests || `test/${suite}`)
       .join(' '),
     VERBOSE: Number(options.verbose),

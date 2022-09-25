@@ -1,5 +1,7 @@
-(function() {
-  var getFixture;
+import { util } from '../lib';
+const { getFixture } = util;
+
+(function () {
   if (fabric.isLikelyNode) {
     if (process.env.launcher === 'Firefox') {
       fabric.config.configure({ browserShadowBlurConstant: 0.9 });
@@ -13,7 +15,6 @@
     if (process.env.launcher === 'Edge') {
       fabric.config.configure({ browserShadowBlurConstant: 1.75 });
     }
-    getFixture = global.getFixture;
   }
   else {
     if (navigator.userAgent.indexOf('Firefox') !== -1) {
@@ -25,7 +26,6 @@
     if (navigator.userAgent.indexOf('Edge') !== -1) {
       fabric.config.configure({ browserShadowBlurConstant: 1.75 });
     }
-    getFixture = window.getFixture;
   }
   fabric.config.configure({
     enableGLFiltering: false

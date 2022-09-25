@@ -1,17 +1,19 @@
-(function() {
+
+
+import { util } from '../lib';
+const { getFixture } = util;
+
+(function () {
   fabric.config.configure({
     enableGLFiltering: false
   });
   var visualTestLoop;
-  var getFixture;
   var isFirefox = false;
   if (fabric.isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
-    getFixture = global.getFixture;
   }
   else {
     visualTestLoop = window.visualTestLoop;
-    getFixture = window.getFixture;
     isFirefox = window.navigator.userAgent.includes('Firefox/')
   }
 

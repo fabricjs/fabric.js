@@ -1,17 +1,17 @@
-(function() {
+import { util } from '../lib';
+const { getAsset } = util;
+
+(function () {
   fabric.config.configure({
     enableGLFiltering: false
   });
   fabric.Object.prototype.objectCaching = true;
   var visualTestLoop;
-  var getAsset;
   if (fabric.isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
-    getAsset = global.getAsset;
   }
   else {
     visualTestLoop = window.visualTestLoop;
-    getAsset = window.getAsset;
   }
 
   function createTestFromSVG(svgName) {

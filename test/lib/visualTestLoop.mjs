@@ -1,122 +1,9 @@
-// import { fileURLToPath } from 'url';
 // import path from 'path';
 // import fs from 'fs';
 import pixelmatch from 'pixelmatch';
+import { createCanvasForTest, getImage } from './common.mjs';
 // import { fabric } from '../../dist/fabric';
-
-
-  export const getFixture = async function(name, original, callback) {
-    callback(await getImage(getFixtureName(name), original));
-  };
-
-  export const getAsset = function(name, callback) {
-    var finalName = getAssetName(name);
-    if (fabric.isLikelyNode) {
-      var plainFileName = finalName.replace('file://', '');
-      return fs.readFile(plainFileName, { encoding: 'utf8' }, callback);
-    }
-    else {
-      fabric.util.request(finalName, {
-        onComplete: function(xhr) {
-          callback(null, xhr.responseText);
-        }
-      });
-    }
-  };
-
-  function createCanvasForTest(opts) {
-    var fabricClass = opts.fabricClass || 'StaticCanvas';
-    var options = { enableRetinaScaling: false, renderOnAddRemove: false, width: 200, height: 200 };
-    if (opts.width) {
-      options.width = opts.width;
-    }
-    if (opts.height) {
-      options.height = opts.height;
-    }
-    return new fabric[fabricClass](null, options);
-  }
-
-function localPath(_path, filename) {
-    const __filename = fileURLToPath(import.meta.url);
- const __dirname = path.dirname(__filename);
-    return 'file://' + path.join(__dirname, _path, filename)
-  }
-
-  export function getAssetName(filename) {
-    var finalName = '/assets/' + filename + '.svg';
-    return fabric.isLikelyNode ? localPath('/../visual', finalName) : finalName;
-  }
-
-  function getGoldeName(filename) {
-    var finalName = '/golden/' + filename;
-    return fabric.isLikelyNode ? localPath('/../visual', finalName) : finalName;
-  }
-
-  function getFixtureName(filename) {
-    var finalName = '/fixtures/' + filename;
-    return fabric.isLikelyNode ? localPath('/..', finalName) : finalName;
-  }
-
-  function generateGolden(filename, original) {
-    if (fabric.isLikelyNode && original) {
-      var plainFileName = filename.replace('file://', '');
-      var dataUrl = original.toDataURL().split(',')[1];
-      console.log('creating golden for ', filename);
-      fs.writeFileSync(plainFileName, dataUrl, { encoding: 'base64' });
-    }
-    else if (original) {
-      return new Promise((resolve, reject) => {
-        return original.toBlob(blob => {
-          const formData = new FormData();
-          formData.append('file', blob, filename);
-          formData.append('filename', filename);
-          const request = new XMLHttpRequest();
-          request.open('POST', '/goldens', true);
-          request.onreadystatechange = () => {
-            if (request.readyState === XMLHttpRequest.DONE) {
-              const status = request.status;
-              if (status === 0 || (status >= 200 && status < 400)) {
-                resolve();
-              } else {
-                reject();
-              }
-            }
-          };
-          request.send(formData);
-        });     
-      }, 'image/png');
-    }
-  }
-
-async function getImage(filename, original) {
-    if (fabric.isLikelyNode && original) {
-      var plainFileName = filename.replace('file://', '');
-      if (!fs.existsSync(plainFileName)) {
-        generateGolden(filename, original);
-      }
-    }
-    else if (original) {
-      await fetch(`/goldens/${filename}`, { method: 'GET' })
-        .then(res => res.json())
-        .then(res => !res.exists && generateGolden(filename, original));
-    }
-    return new Promise((resolve, reject) => {
-      const img = fabric.document.createElement('img');
-      img.onload = function () {
-        img.onerror = null;
-        img.onload = null;
-        resolve(img);
-      };
-      img.onerror = function (err) {
-        img.onerror = null;
-        img.onload = null;
-        reject(err);
-      };
-      img.src = filename;
-    });
-   
-}
-  
+import util from './util.mjs';
 
   export const visualTestLoop = function(QUnit) {
 
@@ -153,7 +40,7 @@ async function getImage(filename, original) {
           canvas.height = height;
           var ctx = canvas.getContext('2d');
           var output = ctx.getImageData(0, 0, width, height);
-          const goldenImage = await getImage(getGoldeName(golden), renderedCanvas);
+          const goldenImage = await getImage(util.getGoldenName(golden), renderedCanvas);
           ctx.drawImage(goldenImage, 0, 0);
           QUnit.visualCallback?.addArguments({
             enabled: true,
@@ -172,7 +59,7 @@ async function getImage(filename, original) {
             testName + ' [' + golden + '] has too many different pixels ' + differentPixels + '(' + okDiff + ') representing ' + percDiff + '% (>' + (percentage * 100) + '%)'
           );
           if (!testObj.testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)) {
-            await generateGolden(getGoldeName(golden), renderedCanvas);
+            await util.generateGolden(util.getGoldenName(golden), renderedCanvas);
           }
           await fabricCanvas.dispose();
           done();
