@@ -11,7 +11,7 @@ module.exports = {
   serve_files: [
     ...config.serve_files,
     'test/lib/event.simulate.js',
-    ...(process.env.TEST_FILES ? process.env.TEST_FILES.split(',') : ['test/unit/*.js'])
+    ...(process.env.TEST_FILES ? process.env.TEST_FILES.split(',') : ['test/unit/*.js', 'test/unit/*.mjs'])
   ],
   launchers: {
     Node: {
