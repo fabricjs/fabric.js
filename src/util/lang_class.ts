@@ -6,8 +6,10 @@ function addMethods(klass, source, parent) {
     if (
       property in klass.prototype &&
       typeof klass.prototype[property] === 'function' &&
+      // if the function contains callSuper in the source
       (source[property] + '').indexOf('callSuper') > -1
     ) {
+      console.log('wtf', { property, string: (source[property] + '') })
       klass.prototype[property] = (function (property) {
         return function (...args) {
           var superclass = this.constructor.superclass;

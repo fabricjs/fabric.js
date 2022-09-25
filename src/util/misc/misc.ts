@@ -97,7 +97,6 @@ import * as ease from '../anim_ease';
 import { animateColor } from '../animate_color';
 import { animate, requestAnimFrame, cancelAnimFrame } from '../animate';
 import { createClass } from '../lang_class';
-import { sum } from 'lodash';
 /**
  * @namespace fabric.util
  */
@@ -217,127 +216,57 @@ class testObject {
   constructor(opts) {
     Object.assign(this, opts);
   }
-	type = 'fobject'
-  prop = 'a string to log'
   log() {
     console.log(this.prop);
   }
 }
 
+Object.assign(testObject.prototype, {
+  type: 'objectClass',
+  color: 'blue',
+  stroke: 'red',
+  prop: 'logging base clas',
+});
 Object.assign(testObject.prototype, sumMixin);
+
 
 class testRect extends testObject {
   constructor(opts = {}) {
     super(opts);
   }
-	type = 'fRect'
-  prop = 'a rect thing to log'
-  height = 100
-}
-
-class testCube extends testRect {
-  type = 'fCube'
-  prop = 'a cuve thing to log'
-  depth = 300
-}
-
-testCube.prototype.log = function() {
-  console.log('mine');
-}
-
-// FUNCTION CLASSES
-
-function standardSubclassMixin(superClassProto) {
-  const _this = this;
-  console.log({superClassProto})
-  function callSuper(methodName, ...args) {
-    const currentMethod = this[methodName];
-    const superMethod = superClassProto[methodName];
-    if (superMethod && superMethod !== currentMethod) {
-      return superMethod.call(_this, methodName, ...args);
-    } else {
-      return superClassProto.callSuper.call(_this, methodName, ...args);
-    }
+  test() {
+    console.log('break?')
   }
-  return {
-    callSuper,
-    __proto__: superClassProto,
-  }
-}
-
-function newCallSuper(methodName, ...args) {
-  const currentMethod = this[methodName];
-  let _this = this;
-  let parentMethod;
-
-  // climb prototype chain to find method not equal to callee's method
-  while (_this.__proto__.__proto__) {
-    console.log(_this.type)
-    const superClassMethod = _this.__proto__.__proto__[methodName];
-    if (superClassMethod && currentMethod !== superClassMethod) {
-      parentMethod = superClassMethod;
-      break;
-    }
-    // eslint-disable-next-line
-    _this = _this.__proto__;
-  }
-
-  if (!parentMethod) {
-    return console.log('tried to callSuper ' + methodName + ', method not found in prototype chain', this);
-  }
-
-  return parentMethod.call(this, ...args);
-}
-
-function funcObject (props) {
-  Object.assign(this, props);
-}
-
-funcObject.prototype = {
-	type: 'fobject',
-  prop: 'a string to log',
   log() {
-    console.warn(this.prop);
-  },
-  ...sumMixin,
+    super.log();
+  }
 }
 
-function funcRect (props) {
-  Object.assign(this, props);
-}
-
-funcRect.prototype = {
-	type: 'fRect',
+Object.assign(testRect.prototype, {
+  type: 'fRect',
+  color: 'yellow',
   prop: 'a rect thing to log',
   height: 100,
+});
+
+class testCube extends testRect {
   log() {
-    this.callSuper('log');
-  },
-  __proto__: funcObject.prototype,
-  ...standardSubclassMixin(funcObject.prototype)
+    console.log('pre');
+    super.test();
+    super.log();
+    console.log('post');
+  }
 }
 
-function funcCube (props) {
-  funcRect.call(this, props)
-}
-
-funcCube.prototype = {
-	type: 'fCube',
+Object.assign(testCube.prototype, {
+  type: 'fCube',
+  color: 'yellow',
   prop: 'a cube thing to log',
-  depth: 100,
-  log() {
-    this.callSuper('log');
-    console.log('a totally different log function')
-  },
-  ...standardSubclassMixin(funcRect.prototype)
-}
-
+  depth: 300,
+});
 
 Object.assign(fabric, {
 	testObject,
   testRect,
   testCube,
-  funcObject,
-  funcRect,
-  funcCube,
 });
