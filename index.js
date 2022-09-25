@@ -1,4 +1,4 @@
-import { fabric } from './HEADER';
+import './HEADER';
 // import './lib/event'), // optional gestures
 import './src/mixins/observable.mixin';
 import './src/mixins/collection.mixin';
@@ -74,5 +74,3 @@ import './src/controls'; // optional interaction
 import './src/brushes'; // optional freedrawing
 //  extends fabric.StaticCanvas, fabric.Canvas, fabric.Object, depends on fabric.PencilBrush and fabric.Rect
 // import './src/mixins/eraser_brush.mixin'; // optional erasing
-
-export {fabric}
