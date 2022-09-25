@@ -11,6 +11,5 @@ const id = 'version';
 const content = YAML.parse(fs.readFileSync(file).toString());
 const found = content.body.find(entry => entry.id === id && entry.type === 'dropdown');
 const tags = JSON.parse(cp.execSync('npm view fabric versions --json').toString()).reverse();
-found.attributes.options = tags
-found.attributes.placeholder = tags[0];
+found.attributes.options = tags;
 fs.writeFileSync(file, YAML.stringify(content));
