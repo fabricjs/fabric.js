@@ -1,10 +1,11 @@
 name: 🐛 Bug Report
-description: Create a detailed bug report with a reproducible test case. Anything else will be closed, consider using [DISCUSSIONS](https://github.com/fabricjs/fabric.js/discussions).
+description: File a bug report
+title: '[Bug]: '
 body:
   - type: markdown
     attributes:
       value: |
-        ...
+        Before you be
   - type: checkboxes
     id: terms
     attributes:
@@ -18,6 +19,8 @@ body:
         - label: I have read and followed the [Issue Tracker Guide](/CONTRIBUTING.md#%EF%B8%8F-issue-tracker)
           required: true
         - label: I have searched and referenced existing issues and discussions
+          required: true
+        - label: I am filing a **BUG** report. Q&A etc. are filed under [DISCUSSIONS](https://github.com/fabricjs/fabric.js/discussions).
           required: true
         - label: I have managed to reproduce the bug **after** upgrading to the **latest** version
           required: true
