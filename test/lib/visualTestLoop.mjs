@@ -1,8 +1,9 @@
 // import { fileURLToPath } from 'url';
 // import path from 'path';
 // import fs from 'fs';
-import { visualCallback } from './visualCallbackQunit.mjs';
 import pixelmatch from 'pixelmatch';
+// import { fabric } from '../../dist/fabric';
+import { visualCallback } from './visualCallbackQunit.mjs';
 
 
   export const getFixture = async function(name, original, callback) {
@@ -123,7 +124,7 @@ async function getImage(filename, original) {
 
   export const visualTestLoop = function(QUnit) {
 
-    var pixelmatchOptions = {
+    const pixelmatchOptions = {
       includeAA: false,
       threshold: 0.095
     };

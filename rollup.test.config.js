@@ -10,7 +10,7 @@ export default {
   input: ['test/lib/index.mjs', 'test/visual/index.ts'],
   output: [
     {
-      dir: 'cli_output',
+      dir: 'build',
       format: 'es',
       exports: 'named',
       preserveModules: true, // Keep directory structure and files

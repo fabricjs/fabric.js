@@ -23,7 +23,7 @@ module.exports = {
   renderTestScriptTag() {
     return (text, render) => {
       const src = render(text);
-      const dist = path.join('cli_output', src).replace(new RegExp(`\\${path.extname(src)}$`), '.js');
+      const dist = path.join('build', src).replace(new RegExp(`\\${path.extname(src)}$`), '.js');
       return `<script src="${dist}" type="module"></script>`;
     }
   },

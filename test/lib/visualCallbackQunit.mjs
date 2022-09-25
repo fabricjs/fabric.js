@@ -1,5 +1,4 @@
 
-
   function appendResults(node, output, { goldenName }) {
       var template = document.getElementById('error_output');
       var errorOutput = template.content.cloneNode(true);

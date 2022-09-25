@@ -22,7 +22,7 @@ QUnit.config.reorder = false;
 
 {{#visual}}
 <script type="module">
-import { visualCallback } from './cli_output/test/lib/index.js';
+import { visualCallback } from './build/test/lib/index.js';
 QUnit.testDone(visualCallback.testDone.bind(visualCallback));
 
 // global error handling

@@ -1,3 +1,5 @@
+import { visualTestLoop } from "../lib";
+
 (function() {
   if (fabric.isLikelyNode) {
     if (process.env.launcher === 'Firefox') {
@@ -28,13 +30,6 @@
     enableGLFiltering: false
   });
   fabric.Object.prototype.objectCaching = true;
-  var visualTestLoop;
-  if (fabric.isLikelyNode) {
-    visualTestLoop = global.visualTestLoop;
-  }
-  else {
-    visualTestLoop = window.visualTestLoop;
-  }
 
   var tests = [];
 
