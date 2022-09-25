@@ -1,8 +1,9 @@
 
 import { visualTestLoop } from '../lib/visualTestLoop.mjs';
-import * as data from '../data.json' assert {type: 'json'};
+// import QUnit from 'qunit';s
+// import data from '../data.json' assert {type: 'json'};
 
-console.log(data)
+// console.log(data)
 
 QUnit.module('Clipping', hooks => {
 

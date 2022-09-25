@@ -7,10 +7,10 @@ import ts from 'rollup-plugin-ts';
 // https://rollupjs.org/guide/en/#configuration-files
 export default {
   external: ['qunit', 'fabric'],
-  input: ['test/lib/index.js', 'test/visual/index.ts'],
+  input: ['test/lib/index.mjs', 'test/visual/index.ts'],
   output: [
     {
-      dir: 'cli_output/test',
+      dir: 'cli_output',
       format: 'es',
       exports: 'named',
       preserveModules: true, // Keep directory structure and files
@@ -22,7 +22,7 @@ export default {
     json(),
     ts(),
     nodePolyfills({sourceMap:true}),
-    nodeResolve({preferBuiltins: false,browser:true}),
-    commonjs(),
+    nodeResolve({browser:true}),
+    commonjs({sourceMap:true}),
   ],
 };

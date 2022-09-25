@@ -14,13 +14,17 @@
 
 <script src="/testem.js"></script>
 {{#serve_files}}{{#renderScriptTag}}{{src}}{{/renderScriptTag}}{{/serve_files}}
+{{#src_files}}{{#renderTestScriptTag}}{{.}}{{/renderTestScriptTag}}{{/src_files}}
 
 <script>
 QUnit.config.reorder = false;
 </script>
 
 {{#visual}}
-<script>
+<script type="module">
+import { visualCallback } from './cli_output/test/lib/index.js';
+QUnit.testDone(visualCallback.testDone.bind(visualCallback));
+
 // global error handling
 window.addEventListener('unhandledrejection', (event) => {
   // prevent logging to console

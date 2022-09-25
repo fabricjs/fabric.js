@@ -11,20 +11,19 @@ module.exports = {
   visual: true,
   report_file: reportPath,
   src_files: [
-    // ...config.src_files,
-    // 'cli_output/test/**/*.mjs',
     'test/lib/visualTestLoop.mjs',
     'test/lib/visualCallbackQunit.mjs',
     ...(process.env.TEST_FILES ? process.env.TEST_FILES.split(',') : ['test/visual/*.js', 'test/visual/*.mjs'])
   ],
-    "before_tests": "webpack --config webpack.testem.config.js",
-    // "on_exit": "rm browserified.js",
+  // "before_tests": "webpack --config webpack.testem.config.js",
+  // "on_exit": "rm browserified.js",
   routes: {
     ...config.routes,
     '/golden_maker': 'test/lib/goldenMaker.html',
     '/golden_maker.html': 'test/lib/goldenMaker.html',
     '/golden': 'test/visual/golden',
     '/assets': 'test/visual/assets',
+    '/visualCallback': 'cli_output/test/lib/visualCallbackQunit.js'
   },
   launchers: {
     Node: {

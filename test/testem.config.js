@@ -1,16 +1,5 @@
 const path = require('path');
 
-function getScriptType(file) {
-  switch (path.parse(file).ext) {
-    case '.mjs':
-      return 'module';
-    case '.json':
-      return 'application/json';
-    default:
-      return 'application/javascript';
-  }
-}
-
 /**
  * common config 
  * @see https://github.com/testem/testem/blob/master/docs/config_file.md
@@ -18,12 +7,24 @@ function getScriptType(file) {
 module.exports = {
   framework: 'qunit',
   serve_files: [
-    'dist/fabric.js'
+    'dist/fabric.js',
   ],
   renderScriptTag() {
     return (text, render) => {
       const src = render(text);
-      return `<script src="${src}" type="${getScriptType(src)}"></script>`;
+      switch (path.parse(src).ext) {
+        case '.json':
+          return `<script src="${src}" type="application/json"></script>`;
+        default:
+          return `<script src="${src}" type="module"></script>`;
+      }
+    }
+  },
+  renderTestScriptTag() {
+    return (text, render) => {
+      const src = render(text);
+      const dist = path.join('cli_output', src).replace(new RegExp(`\\${path.extname(src)}$`), '.js');
+      return `<script src="${dist}" type="module"></script>`;
     }
   },
   styles: [

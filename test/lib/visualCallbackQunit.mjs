@@ -77,5 +77,3 @@
   };
 
 export const visualCallback = new VisualCallback();
-
-QUnit.testDone(visualCallback.testDone.bind(visualCallback));

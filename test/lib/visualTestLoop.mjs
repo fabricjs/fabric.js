@@ -1,5 +1,9 @@
+// import { fileURLToPath } from 'url';
+// import path from 'path';
+// import fs from 'fs';
 import { visualCallback } from './visualCallbackQunit.mjs';
-// import pixelmatch from 'pixelmatch';
+import pixelmatch from 'pixelmatch';
+
 
   export const getFixture = async function(name, original, callback) {
     callback(await getImage(getFixtureName(name), original));
@@ -32,8 +36,10 @@ import { visualCallback } from './visualCallbackQunit.mjs';
     return new fabric[fabricClass](null, options);
   }
 
-  function localPath(path, filename) {
-    return 'file://' + require('path').join(__dirname, path, filename)
+function localPath(_path, filename) {
+    const __filename = fileURLToPath(import.meta.url);
+ const __dirname = path.dirname(__filename);
+    return 'file://' + path.join(__dirname, _path, filename)
   }
 
   export function getAssetName(filename) {
@@ -82,10 +88,13 @@ import { visualCallback } from './visualCallbackQunit.mjs';
     }
   }
 
-  async function getImage(filename, original) {
+async function getImage(filename, original) {
+    console.log('poiuyf')
     if (fabric.isLikelyNode && original) {
       var plainFileName = filename.replace('file://', '');
+      console.log('poiuyf',fs.existsSync,plainFileName,fs.existsSync(plainFileName))
       if (!fs.existsSync(plainFileName)) {
+         console.log('poiuyf')
         generateGolden(filename, original);
       }
     }
@@ -149,7 +158,8 @@ import { visualCallback } from './visualCallbackQunit.mjs';
           var output = ctx.getImageData(0, 0, width, height);
           const goldenImage = await getImage(getGoldeName(golden), renderedCanvas);
           ctx.drawImage(goldenImage, 0, 0);
-          visualCallback.addArguments({
+          console.log('sdflsdflksdf')
+          !fabric.isLikelyNode && visualCallback.addArguments({
             enabled: true,
             golden: canvas,
             fabric: imageDataCanvas,
@@ -170,6 +180,7 @@ import { visualCallback } from './visualCallbackQunit.mjs';
           }
           await fabricCanvas.dispose();
           done();          
+          console.log('dfglkm')
         });
       });
     }
