@@ -10,8 +10,6 @@
 <script src="/node_modules/source-map-support/browser-source-map-support.js"></script>
 <script>sourceMapSupport.install();</script>
 
-<script src="https://bundle.run/pixelmatch@5.2.0" type="module"></script>
-
 <script src="/testem.js"></script>
 {{#serve_files}}{{#renderScriptTag}}{{src}}{{/renderScriptTag}}{{/serve_files}}
 {{#src_files}}{{#renderTestScriptTag}}{{.}}{{/renderTestScriptTag}}{{/src_files}}
@@ -21,7 +19,7 @@ QUnit.config.reorder = false;
 </script>
 
 {{#visual}}
-<script type="module">
+<script>
 // global error handling
 window.addEventListener('unhandledrejection', (event) => {
   // prevent logging to console
