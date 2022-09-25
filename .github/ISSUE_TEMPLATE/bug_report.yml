@@ -1,0 +1,89 @@
+name: 🐛 Bug Report
+description: Create a detailed bug report with a reproducible test case. Anything else will be closed, consider using [DISCUSSIONS](https://github.com/fabricjs/fabric.js/discussions).
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ...
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: CheckList
+      description: By submitting this issue, you agree to follow our [Code of Conduct](./CODE_OF_CONDUCT.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
+        - label: I have read and followed the [Contributing Guide](/CONTRIBUTING.md)
+          required: true
+        - label: I have read and followed the [Issue Tracker Guide](/CONTRIBUTING.md#%EF%B8%8F-issue-tracker)
+          required: true
+        - label: I have searched and referenced existing issues and discussions
+          required: true
+        - label: I have managed to reproduce the bug **after** upgrading to the **latest** version
+          required: true
+        - label: I have created an accurate and minimal reproduction
+          required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: version
+      placeholder: e.g. vM.m.p
+      description: If you are working on a version below latest you should upgrade to latest before filing a bug report, your issue might have been resolved already.
+    validations:
+      required: true
+  - type: dropdown
+    id: environments
+    attributes:
+      label: In What environments are you seeing the problem on?
+      multiple: true
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Microsoft Edge
+        - Node.js
+  - type: input
+    id: node_version
+    attributes:
+      label: Node Version (if applicable)
+    validations:
+      required: false
+  - type: input
+    id: reproduction_link
+    attributes:
+      label: Link To Reproduction
+      description: |
+        A good reproduction helps us UNDERSTAND your issue, find the bug and fix it quickly.
+        Take the time and put effort into making your reproduction accurate and minimal.
+        Use the following reproduction templates.
+
+        - [Browser Reproduction](https://jsfiddle.net/Lcp2h3nv/)
+        - [Node Reproduction](https://codesandbox.io/s/exciting-browser-ytb701)
+
+        ⛔ No reproduction === closed issue ⛔
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps To Reproduce
+      value: |
+        1. 
+        2. 
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: Provide screenshots/screencasts if relevant
+    validations:
+      required: true
