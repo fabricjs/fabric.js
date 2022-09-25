@@ -35,8 +35,9 @@ function stripFilePrefix(filename) {
 return filename.replace('file://', '');
 }
 
-export function generateGolden(filename, original) {
-const dataUrl = original.toDataURL().split(',')[1];
+export function generateGolden(file, original) {
+    const dataUrl = original.toDataURL().split(',')[1];
+    const filename = stripFilePrefix(file);
 console.log('creating golden for ', filename);
 fs.writeFileSync(stripFilePrefix(filename), dataUrl, { encoding: 'base64' });
 }
