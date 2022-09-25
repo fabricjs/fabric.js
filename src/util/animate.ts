@@ -27,7 +27,8 @@ import { noop } from '../constants';
  * @typedef {(AnimationOptions & AnimationCurrentState & { cancel: CancelFunction }} AnimationContext
  */
 
-const defaultEasing = (t, b, c, d) => -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+const defaultEasing = (t, b, c, d) =>
+  -c * Math.cos((t / d) * (Math.PI / 2)) + c + b;
 
 /**
  * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
@@ -74,7 +75,7 @@ export function animate(options = {}) {
     ...options,
     currentValue: startValue,
     completionRate: 0,
-    durationRate: 0
+    durationRate: 0,
   };
 
   const removeFromRegistry = () => {
@@ -90,26 +91,28 @@ export function animate(options = {}) {
 
   const runner = function (timestamp) {
     const start = timestamp || +new Date(),
-          finish = start + duration,
-          isMany = Array.isArray(startValue),
-          byValue = options.byValue || (
-            isMany ?
-            startValue.map((value, i) => endValue[i] - value)
-            : endValue - startValue
-          );
+      finish = start + duration,
+      isMany = Array.isArray(startValue),
+      byValue =
+        options.byValue ||
+        (isMany
+          ? startValue.map((value, i) => endValue[i] - value)
+          : endValue - startValue);
 
     options.onStart && options.onStart();
 
     (function tick(ticktime) {
       const time = ticktime || +new Date();
-      const currentTime = time > finish ? duration : (time - start),
-          timePerc = currentTime / duration,
-          current = isMany ?
-            startValue.map(
-              (_value, i) => easing(currentTime, _value, byValue[i], duration)
-            ) : easing(currentTime, startValue, byValue, duration),
-          valuePerc = isMany ? Math.abs((current[0] - startValue[0]) / byValue[0])
-            : Math.abs((current - startValue) / byValue);
+      const currentTime = time > finish ? duration : time - start,
+        timePerc = currentTime / duration,
+        current = isMany
+          ? startValue.map((_value, i) =>
+              easing(currentTime, _value, byValue[i], duration)
+            )
+          : easing(currentTime, startValue, byValue, duration),
+        valuePerc = isMany
+          ? Math.abs((current[0] - startValue[0]) / byValue[0])
+          : Math.abs((current - startValue) / byValue);
       //  update context
       context.currentValue = isMany ? current.slice() : current;
       context.completionRate = valuePerc;
@@ -132,15 +135,14 @@ export function animate(options = {}) {
         onComplete(endValue, 1, 1);
         removeFromRegistry();
         return;
-      }
-      else {
+      } else {
         onChange(current, valuePerc, timePerc);
         requestAnimFrame(tick);
       }
     })(start);
   };
 
-  if (delay > 0 ) {
+  if (delay > 0) {
     setTimeout(() => requestAnimFrame(runner), delay);
   } else {
     requestAnimFrame(runner);
@@ -151,7 +153,7 @@ export function animate(options = {}) {
 
 const _requestAnimFrame =
   fabric.window.requestAnimationFrame ||
-  function(callback) {
+  function (callback) {
     return fabric.window.setTimeout(callback, 1000 / 60);
   };
 
