@@ -10,12 +10,15 @@ module.exports = {
   ...config,
   visual: true,
   report_file: reportPath,
-  serve_files: [
-    ...config.serve_files,
+  src_files: [
+    // ...config.src_files,
+    // 'cli_output/test/**/*.mjs',
     'test/lib/visualTestLoop.mjs',
     'test/lib/visualCallbackQunit.mjs',
     ...(process.env.TEST_FILES ? process.env.TEST_FILES.split(',') : ['test/visual/*.js', 'test/visual/*.mjs'])
   ],
+    "before_tests": "webpack --config webpack.testem.config.js",
+    // "on_exit": "rm browserified.js",
   routes: {
     ...config.routes,
     '/golden_maker': 'test/lib/goldenMaker.html',
