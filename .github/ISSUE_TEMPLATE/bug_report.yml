@@ -10,38 +10,304 @@ body:
     id: terms
     attributes:
       label: CheckList
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/fabricjs/fabric.js/CODE_OF_CONDUCT.md)
+      description: By submitting this issue, you agree to follow our [Code of
+        Conduct](https://github.com/fabricjs/fabric.js/CODE_OF_CONDUCT.md)
       options:
         - label: I agree to follow this project's Code of Conduct
           required: true
-        - label: I have read and followed the [Contributing Guide](https://github.com/fabricjs/fabric.js/CONTRIBUTING.md)
+        - label: I have read and followed the [Contributing
+            Guide](https://github.com/fabricjs/fabric.js/CONTRIBUTING.md)
           required: true
-        - label: I have read and followed the [Issue Tracker Guide](https://github.com/fabricjs/fabric.js/CONTRIBUTING.md#%EF%B8%8F-issue-tracker)
+        - label: I have read and followed the [Issue Tracker
+            Guide](https://github.com/fabricjs/fabric.js/CONTRIBUTING.md#%EF%B8%8F-issue-tracker)
           required: true
         - label: I have searched and referenced existing issues and discussions
           required: true
-        - label: I am filing a **BUG** report. Q&A etc. are filed under [Discussions](https://github.com/fabricjs/fabric.js/discussions).
+        - label: I am filing a **BUG** report. Q&A etc. are filed under
+            [Discussions](https://github.com/fabricjs/fabric.js/discussions).
           required: true
-        - label: I have managed to reproduce the bug **after** upgrading to the **latest** version
+        - label:
+            I have managed to reproduce the bug **after** upgrading to the **latest**
+            version
           required: true
         - label: I have created an accurate and minimal reproduction
           required: true
-
   - type: dropdown
     id: version
     attributes:
       label: version
-      placeholder: 1.2.3
-      description: If you are working on a version below latest you should upgrade to latest before filing a bug report, your issue might have been resolved already.
+      placeholder: 5.2.4
+      description:
+        If you are working on a version below latest you should upgrade to
+        latest before filing a bug report, your issue might have been resolved
+        already.
       options:
-        - latest
+        - 5.2.4
+        - 5.2.4-browser
+        - 5.2.2
+        - 5.2.2-browser
+        - 5.2.1
+        - 5.2.1-browser
+        - 5.1.0
+        - 5.1.0-browser
+        - 5.0.0
+        - 5.0.0-browser
+        - 4.6.0
+        - 4.6.0-browser
+        - 4.5.1
+        - 4.5.1-browser
+        - 4.5.0
+        - 4.5.0-browser
+        - 4.4.0
+        - 4.4.0-browser
+        - 4.3.1
+        - 4.3.1-browser
+        - 4.3.0
+        - 4.3.0-browser
+        - 4.2.0
+        - 4.2.0-browser
+        - 4.1.0
+        - 4.1.0-browser
+        - 4.0.0
+        - 4.0.0-rc.1-browser
+        - 4.0.0-rc.1
+        - 4.0.0-browser
+        - 4.0.0-beta1
+        - 4.0.0-beta.9-browser
+        - 4.0.0-beta.8-browser
+        - 4.0.0-beta.7-browser
+        - 4.0.0-beta.6-browser
+        - 4.0.0-beta.5-browser
+        - 4.0.0-beta.4-browser
+        - 4.0.0-beta.12-browser
+        - 4.0.0-beta.11-browser
+        - 4.0.0-beta.10-browser
+        - 4.0.0-beta.12
+        - 4.0.0-beta.11
+        - 4.0.0-beta.10
+        - 4.0.0-beta.9
+        - 4.0.0-beta.8
+        - 4.0.0-beta.7
+        - 4.0.0-beta.6
+        - 4.0.0-beta.5
+        - 4.0.0-beta.4
+        - 4.0.0-beta.3
+        - 4.0.0-beta.2
+        - 3.6.6
+        - 3.6.6-browser
+        - 3.6.5
+        - 3.6.5-browser
+        - 3.6.4
+        - 3.6.4-browser
+        - 3.6.3
+        - 3.6.3-browser
+        - 3.6.2
+        - 3.6.2-browser
+        - 3.6.1
+        - 3.6.1-browser
+        - 3.6.0
+        - 3.6.0-browser
+        - 3.5.1
+        - 3.5.1-browser
+        - 3.5.0
+        - 3.5.0-browser
+        - 3.4.0
+        - 3.4.0-browser
+        - 3.3.2
+        - 3.3.2-browser
+        - 3.3.1
+        - 3.3.1-browser
+        - 3.3.0
+        - 3.3.0-browser
+        - 3.2.0
+        - 3.1.0
+        - 3.0.0
+        - 2.7.0
+        - 2.6.0
+        - 2.5.0
+        - 2.4.6
+        - 2.4.5
+        - 2.4.4
+        - 2.4.3
+        - 2.4.2
+        - 2.4.2-b
+        - 2.4.1
+        - 2.4.0
+        - 2.3.6
+        - 2.3.5
+        - 2.3.4
+        - 2.3.3
+        - 2.3.2
+        - 2.3.1
+        - 2.3.0
+        - 2.2.4
+        - 2.2.3
+        - 2.2.2
+        - 2.2.1
+        - 2.2.0
+        - 2.1.0
+        - 2.0.3
+        - 2.0.2
+        - 2.0.1
+        - 2.0.0
+        - 2.0.0-rc.4
+        - 2.0.0-rc.3
+        - 2.0.0-rc.2
+        - 2.0.0-rc.1
+        - 2.0.0-beta0
+        - 2.0.0-beta.7
+        - 2.0.0-beta.6
+        - 2.0.0-beta.5
+        - 2.0.0-beta.4
+        - 2.0.0-beta.3
+        - 2.0.0-beta.2
+        - 2.0.0-beta.1
+        - 1.7.22
+        - 1.7.21
+        - 1.7.20
+        - 1.7.19
+        - 1.7.18
+        - 1.7.17
+        - 1.7.16
+        - 1.7.15
+        - 1.7.14
+        - 1.7.13
+        - 1.7.12
+        - 1.7.11
+        - 1.7.10
+        - 1.7.9
+        - 1.7.8
+        - 1.7.7
+        - 1.7.6
+        - 1.7.4
+        - 1.7.3
+        - 1.7.2
+        - 1.7.1
+        - 1.7.0
+        - 1.6.7
+        - 1.6.6
+        - 1.6.5
+        - 1.6.4
+        - 1.6.3
+        - 1.6.2
+        - 1.6.1
+        - 1.6.0
+        - 1.6.0-rc.1
+        - 1.5.0
+        - 1.4.13
+        - 1.4.12
+        - 1.4.11
+        - 1.4.9
+        - 1.4.7
+        - 1.4.6
+        - 1.4.3
+        - 1.4.2
+        - 1.4.1
+        - 1.4.0
+        - 1.3.12
+        - 1.3.9
+        - 1.3.8
+        - 1.3.7
+        - 1.3.6
+        - 1.3.5
+        - 1.3.4
+        - 1.3.3
+        - 1.3.2
+        - 1.3.1
+        - 1.2.11
+        - 1.2.10
+        - 1.2.9
+        - 1.2.6
+        - 1.2.5
+        - 1.2.4
+        - 1.2.3
+        - 1.2.2
+        - 1.2.1
+        - 1.2.0
+        - 1.1.21
+        - 1.1.20
+        - 1.1.19
+        - 1.1.18
+        - 1.1.16
+        - 1.1.14
+        - 1.1.13
+        - 1.1.11
+        - 1.1.9
+        - 1.1.6
+        - 1.1.4
+        - 1.1.3
+        - 1.0.9
+        - 1.0.8
+        - 1.0.7
+        - 1.0.6
+        - 1.0.1
+        - 1.0.0
+        - 0.9.21
+        - 0.9.19
+        - 0.9.17
+        - 0.9.14
+        - 0.9.10
+        - 0.9.9
+        - 0.9.8
+        - 0.9.7
+        - 0.9.5
+        - 0.9.3
+        - 0.9.2
+        - 0.9.1
+        - 0.9.0
+        - 0.8.52
+        - 0.8.51
+        - 0.8.50
+        - 0.8.47
+        - 0.8.46
+        - 0.8.44
+        - 0.8.42
+        - 0.8.35
+        - 0.8.34
+        - 0.8.26
+        - 0.8.20
+        - 0.8.19
+        - 0.8.13
+        - 0.8.12
+        - 0.8.11
+        - 0.8.10
+        - 0.8.7
+        - 0.8.4
+        - 0.8.0
+        - 0.7.24
+        - 0.7.23
+        - 0.7.22
+        - 0.7.18
+        - 0.7.17
+        - 0.7.16
+        - 0.7.15
+        - 0.7.14
+        - 0.7.13
+        - 0.7.11
+        - 0.7.9
+        - 0.7.4
+        - 0.7.3
+        - 0.7.1
+        - 0.6.12
+        - 0.6.8
+        - 0.6.7
+        - 0.6.6
+        - 0.6.4
+        - 0.5.13
+        - 0.5.10
+        - 0.5.7
+        - 0.5.6
+        - 0.5.5
+        - 0.5.3
+        - 0.5.2
     validations:
       required: true
   - type: dropdown
     id: environments
     attributes:
       label: In What environments are you seeing the problem on?
-      description: checkout the [supported browsers](https://github.com/fabricjs/fabric.js/README.md#supported-browsersenvironments)
+      description: checkout the [supported
+        browsers](https://github.com/fabricjs/fabric.js/README.md#supported-browsersenvironments)
       multiple: true
       options:
         - Firefox
@@ -60,13 +326,19 @@ body:
     id: reproduction_link
     attributes:
       label: Link To Reproduction
-      description: |
-        A good reproduction helps us UNDERSTAND your issue, find the bug and fix it quickly.
+      description: >
+        A good reproduction helps us UNDERSTAND your issue, find the bug
+        and fix it quickly.
+
         Take the time and put effort into making your reproduction accurate and minimal.
+
         Use the following reproduction templates.
 
+
         - [Browser reproduction template](https://jsfiddle.net/Lcp2h3nv/)
+
         - [Node reproduction template](https://codesandbox.io/s/exciting-browser-ytb701)
+
 
         ⛔ No reproduction === closed issue ⛔
     validations:
