@@ -1,7 +1,5 @@
-// import path from 'path';
-// import fs from 'fs';
+
 import { getImage } from './common.mjs';
-// import { fabric } from '../../dist/fabric';
 
 
   export const getFixture = async function(name, original, callback) {
