@@ -27,12 +27,14 @@ body:
         - label: I have created an accurate and minimal reproduction
           required: true
 
-  - type: input
+  - type: dropdown
     id: version
     attributes:
       label: version
       placeholder: vM.m.p
       description: If you are working on a version below latest you should upgrade to latest before filing a bug report, your issue might have been resolved already.
+      options:
+        - latest
     validations:
       required: true
   - type: dropdown
