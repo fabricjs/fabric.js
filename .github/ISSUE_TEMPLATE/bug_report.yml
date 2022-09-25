@@ -39,7 +39,7 @@ body:
     id: environments
     attributes:
       label: In What environments are you seeing the problem on?
-      description:
+      description: checkout the [supported browsers](https://github.com/fabricjs/fabric.js/README.md#supported-browsersenvironments)
       multiple: true
       options:
         - Firefox
