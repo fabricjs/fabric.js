@@ -12,20 +12,12 @@ module.exports = {
   renderScriptTag() {
     return (text, render) => {
       const src = render(text);
-      const dist = src.replace(new RegExp(`\\${path.extname(src)}$`), '.js');
-      switch (path.parse(src).ext) {
+      switch (path.extname(src)) {
         case '.json':
           return `<script src="${src}" type="application/json"></script>`;
         default:
-          return `<script src="build/${dist}" type="module"></script>`;
+          return `<script src="build/${src.replace(new RegExp(`\\${path.extname(src)}$`), '.js')}" type="module"></script>`;
       }
-    }
-  },
-  renderTestScriptTag() {
-    return (text, render) => {
-      const src = render(text);
-      const dist = path.join('build', src).replace(new RegExp(`\\${path.extname(src)}$`), '.js');
-      return `<script src="${dist}" type="module"></script>`;
     }
   },
   styles: [
