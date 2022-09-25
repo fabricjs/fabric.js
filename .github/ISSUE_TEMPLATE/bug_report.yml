@@ -40,7 +40,6 @@ body:
     id: version
     attributes:
       label: version
-      placeholder: 1.2.3
       description: >-
         If you are working on a version below latest you should upgrade to
         latest before filing a bug report, your issue might have been resolved
