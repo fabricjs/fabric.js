@@ -20,7 +20,7 @@ body:
           required: true
         - label: I have searched and referenced existing issues and discussions
           required: true
-        - label: I am filing a **BUG** report. Q&A etc. are filed under [DISCUSSIONS](https://github.com/fabricjs/fabric.js/discussions).
+        - label: I am filing a **BUG** report. Q&A etc. are filed under [Discussions](https://github.com/fabricjs/fabric.js/discussions).
           required: true
         - label: I have managed to reproduce the bug **after** upgrading to the **latest** version
           required: true
@@ -39,11 +39,13 @@ body:
     id: environments
     attributes:
       label: In What environments are you seeing the problem on?
+      description:
       multiple: true
       options:
         - Firefox
         - Chrome
         - Safari
+        - Opera
         - Microsoft Edge
         - Node.js
   - type: input
