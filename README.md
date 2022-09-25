@@ -43,6 +43,7 @@ A **simple and powerful Javascript HTML5 canvas library**.
 - Typed and modular
 - [Unit tested](/CONTRIBUTING.md#-testing)
 
+#### Supported Browsers/Environments
 | Context  | Supported Version | Notes |
 | :-------------: | :-------------: | ------------- |
 | Firefox | ✔️ | version >= 4 |  
