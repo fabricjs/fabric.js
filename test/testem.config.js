@@ -16,7 +16,7 @@ module.exports = {
         case '.json':
           return `<script src="${src}" type="application/json"></script>`;
         default:
-          return `<script src="${src}" type="module"></script>`;
+          return `<script src="${src}"></script>`;
       }
     }
   },
