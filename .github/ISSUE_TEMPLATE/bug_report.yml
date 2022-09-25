@@ -10,13 +10,13 @@ body:
     id: terms
     attributes:
       label: CheckList
-      description: By submitting this issue, you agree to follow our [Code of Conduct](./CODE_OF_CONDUCT.md)
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/fabricjs/fabric.js/CODE_OF_CONDUCT.md)
       options:
         - label: I agree to follow this project's Code of Conduct
           required: true
-        - label: I have read and followed the [Contributing Guide](/CONTRIBUTING.md)
+        - label: I have read and followed the [Contributing Guide](https://github.com/fabricjs/fabric.js/CONTRIBUTING.md)
           required: true
-        - label: I have read and followed the [Issue Tracker Guide](/CONTRIBUTING.md#%EF%B8%8F-issue-tracker)
+        - label: I have read and followed the [Issue Tracker Guide](https://github.com/fabricjs/fabric.js/CONTRIBUTING.md#%EF%B8%8F-issue-tracker)
           required: true
         - label: I have searched and referenced existing issues and discussions
           required: true
