@@ -7,7 +7,7 @@ import ts from 'rollup-plugin-ts';
 // https://rollupjs.org/guide/en/#configuration-files
 export default {
   external: ['qunit', 'fabric'],
-  input: ['test/lib/index.mjs', 'test/visual/index.ts'],
+  input: ['test/lib/index.mjs', 'test/lib/visualCallbackQUnit.js', 'test/visual/index.ts'],
   output: [
     {
       dir: 'build',
