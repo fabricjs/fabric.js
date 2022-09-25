@@ -75,4 +75,6 @@
     }
   };
 
-export const visualCallback = new VisualCallback();
+const visualCallback = new VisualCallback();
+QUnit.visualCallback = visualCallback;
+QUnit.testDone(visualCallback.testDone.bind(visualCallback));

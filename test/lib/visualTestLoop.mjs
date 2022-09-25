@@ -3,7 +3,6 @@
 // import fs from 'fs';
 import pixelmatch from 'pixelmatch';
 // import { fabric } from '../../dist/fabric';
-import { visualCallback } from './visualCallbackQunit.mjs';
 
 
   export const getFixture = async function(name, original, callback) {
@@ -156,7 +155,7 @@ async function getImage(filename, original) {
           var output = ctx.getImageData(0, 0, width, height);
           const goldenImage = await getImage(getGoldeName(golden), renderedCanvas);
           ctx.drawImage(goldenImage, 0, 0);
-          !fabric.isLikelyNode && visualCallback.addArguments({
+          QUnit.visualCallback?.addArguments({
             enabled: true,
             golden: canvas,
             fabric: imageDataCanvas,

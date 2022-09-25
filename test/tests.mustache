@@ -22,9 +22,6 @@ QUnit.config.reorder = false;
 
 {{#visual}}
 <script type="module">
-import { visualCallback } from './build/test/lib/index.js';
-QUnit.testDone(visualCallback.testDone.bind(visualCallback));
-
 // global error handling
 window.addEventListener('unhandledrejection', (event) => {
   // prevent logging to console

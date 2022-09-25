@@ -12,7 +12,7 @@ module.exports = {
   report_file: reportPath,
   src_files: [
     'test/lib/visualTestLoop.mjs',
-    'test/lib/visualCallbackQunit.mjs',
+    'test/lib/visualCallbackQUnit.js',
     ...(process.env.TEST_FILES ? process.env.TEST_FILES.split(',') : ['test/visual/*.js', 'test/visual/*.mjs'])
   ],
   // "before_tests": "webpack --config webpack.testem.config.js",
