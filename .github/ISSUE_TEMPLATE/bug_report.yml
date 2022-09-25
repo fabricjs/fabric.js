@@ -58,8 +58,8 @@ body:
         Take the time and put effort into making your reproduction accurate and minimal.
         Use the following reproduction templates.
 
-        - [Browser Reproduction](https://jsfiddle.net/Lcp2h3nv/)
-        - [Node Reproduction](https://codesandbox.io/s/exciting-browser-ytb701)
+        - [Browser reproduction template](https://jsfiddle.net/Lcp2h3nv/)
+        - [Node reproduction template](https://codesandbox.io/s/exciting-browser-ytb701)
 
         ⛔ No reproduction === closed issue ⛔
     validations:
@@ -87,3 +87,10 @@ body:
       description: Provide screenshots/screencasts if relevant
     validations:
       required: true
+  - type: textarea
+    id: error
+    attributes:
+      label: Error Message & Stack Trace
+      description: Provide logging outputs/errors if relevant
+    validations:
+      required: false
