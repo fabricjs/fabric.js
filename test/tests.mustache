@@ -12,7 +12,9 @@
 
 <script src="/testem.js"></script>
 {{#serve_files}}{{#renderScriptTag}}{{src}}{{/renderScriptTag}}{{/serve_files}}
-//{{#src_files}}{{#renderTestScriptTag}}{{.}}{{/renderTestScriptTag}}{{/src_files}}
+<!-- {{#serve_files}}{{#renderScriptTag}}{{src}}{{/renderScriptTag}}{{/serve_files}} 
+{{#serve_files}}{{#renderScriptTag}}{{src}}{{/renderScriptTag}}{{/serve_files}}
+{{#src_files}}{{#renderTestScriptTag}}{{.}}{{/renderTestScriptTag}}{{/src_files}} -->
 
 <script>
 QUnit.config.reorder = false;

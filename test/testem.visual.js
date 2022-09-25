@@ -10,10 +10,15 @@ module.exports = {
   ...config,
   visual: true,
   report_file: reportPath,
-  src_files: [
-    'test/lib/visualTestLoop.mjs',
+  serve_files: [
+    ...config.serve_files,
     'test/lib/visualCallbackQUnit.js',
+    {
+      src: 'test/lib/visualTestLoop.mjs',
+      attrs: ['type="module"']
+    },
     ...(process.env.TEST_FILES ? process.env.TEST_FILES.split(',') : ['test/visual/*.js', 'test/visual/*.mjs'])
+      .map(file => ({ src: file, attrs: ['type="module"'] }))
   ],
   // "before_tests": "webpack --config webpack.testem.config.js",
   // "on_exit": "rm browserified.js",

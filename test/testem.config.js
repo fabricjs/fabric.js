@@ -6,27 +6,24 @@ const path = require('path');
  */
 module.exports = {
   framework: 'qunit',
-  get serve_files() {
-    return [
-      'dist/fabric.js',
-      ...(this.src_files || []).map(file => path.join('build', file).replace(new RegExp(`\\${path.extname(file)}$`), '.js'))
-    ];
-  },
+  serve_files: [
+    'dist/fabric.js',
+  ],
   renderScriptTag() {
     return (text, render) => {
       const src = render(text);
+      const dist = src.replace(new RegExp(`\\${path.extname(src)}$`), '.js');
       switch (path.parse(src).ext) {
         case '.json':
           return `<script src="${src}" type="application/json"></script>`;
         default:
-          return `<script src="${src}"></script>`;
+          return `<script src="build/${dist}" type="module"></script>`;
       }
     }
   },
   renderTestScriptTag() {
     return (text, render) => {
       const src = render(text);
-      console.log( path.join('build', src),src)
       const dist = path.join('build', src).replace(new RegExp(`\\${path.extname(src)}$`), '.js');
       return `<script src="${dist}" type="module"></script>`;
     }
@@ -37,7 +34,7 @@ module.exports = {
   routes: {
     '/fixtures': 'test/fixtures',
     '/main': 'test/tests.mustache',
-    '/*': 'build/*'
+    '/build/dist': 'dist'
   },
   test_page: 'main?hidepassed&hideskipped&timeout=60000',
   browser_args: {
