@@ -23,7 +23,6 @@ module.exports = {
     '/golden_maker.html': 'test/lib/goldenMaker.html',
     '/golden': 'test/visual/golden',
     '/assets': 'test/visual/assets',
-    '/visualCallback': 'cli_output/test/lib/visualCallbackQunit.js'
   },
   launchers: {
     Node: {
