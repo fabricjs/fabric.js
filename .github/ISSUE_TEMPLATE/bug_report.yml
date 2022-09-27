@@ -123,5 +123,6 @@ body:
     attributes:
       label: Error Message & Stack Trace
       description: Provide logging outputs/errors if relevant
+      render: bash
     validations:
       required: false
