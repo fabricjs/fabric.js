@@ -57,7 +57,7 @@ body:
       label: In What environments are you experiencing the problem?
       description: >-
         checkout the [supported
-        browsers](https://github.com/fabricjs/fabric.js/README.md#supported-browsersenvironments)
+        browsers](./README.md#supported-browsersenvironments)
       multiple: true
       options:
         - Firefox
