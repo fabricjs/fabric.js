@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { fabric as fabricHeader } from '../../HEADER';
+
 (function (global) {
   var fabric = global.fabric;
 
@@ -142,4 +144,10 @@
     once: once,
     off: off,
   };
+  fabricHeader.Observable = {
+    fire: fire,
+    on: on,
+    once: once,
+    off: off,
+  }
 })(typeof exports !== 'undefined' ? exports : window);

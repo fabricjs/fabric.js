@@ -51,11 +51,30 @@ const ALIASING_LIMIT = 2;
  * @fires drop
  */
 export class FabricObject {
+
+  /**
+   * Unique id used internally when creating SVG elements
+   * @static
+   * @memberOf fabric.Object
+   * @type Number
+   */
+ static __uid = 0
+
   /**
    * Constructor
    * @param {Object} [options] Options object
    */
   constructor(options) {
+    if (options) {
+      this.setOptions(options);
+    }
+  }
+
+  /**
+   * Temporary compatibility issue with old classes
+   * @param {Object} [options] Options object
+   */
+  initialize(options) {
     if (options) {
       this.setOptions(options);
     }
@@ -483,7 +502,7 @@ export class FabricObject {
   /**
    * Retrieves viewportTransform from Object's canvas if possible
    * @method getViewportTransform
-   * @memberOf fabric.Object.prototype
+   * @memberOf FabricObject.prototype
    * @return {Array}
    */
   getViewportTransform() {
@@ -496,7 +515,7 @@ export class FabricObject {
   /*
     * @private
     * return if the object would be visible in rendering
-    * @memberOf fabric.Object.prototype
+    * @memberOf FabricObject.prototype
     * @return {Boolean}
     */
   isNotVisible() {
@@ -1481,11 +1500,11 @@ export class FabricObject {
     return FabricObject._fromObject(FabricObject, object, options);
   }
 }
-
+console.log({fabric})
 Object.assign(
   FabricObject.prototype,
   fabric.Observable,
-  fabric.commonMethods, {
+  fabric.CommonMethods, {
   /**
    * Type of an object (rect, circle, path, etc.).
    * Note that this property is meant to be read-only and not meant to be modified.
@@ -2079,14 +2098,6 @@ Object.assign(
 })
 
 fabric.util.createAccessors && fabric.util.createAccessors(FabricObject);
-
-/**
- * Unique id used internally when creating SVG elements
- * @static
- * @memberOf fabric.Object
- * @type Number
- */
-FabricObject.__uid = 0;
 
 (function (global) {
   var fabric = global.fabric;

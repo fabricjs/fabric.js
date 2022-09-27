@@ -5,6 +5,7 @@ import { Point } from './point.class';
 import { requestAnimFrame } from './util/animate';
 import { removeFromArray } from './util/internals';
 import { pick } from './util/misc/pick';
+import { FabricObject } from './shapes/object.class';
 
 (function (global) {
   // aliases for faster resolution
@@ -1327,7 +1328,7 @@ import { pick } from './util/misc/pick';
       createSVGClipPathMarkup: function (options) {
         var clipPath = this.clipPath;
         if (clipPath) {
-          clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+          clipPath.clipPathId = 'CLIPPATH_' + FabricObject.__uid++;
           return (
             '<clipPath id="' +
             clipPath.clipPathId +

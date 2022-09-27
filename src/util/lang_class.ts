@@ -74,12 +74,10 @@ export function createClass(...args) {
   }
 
   klass.superclass = parent;
-  klass.subclasses = [];
 
   if (parent) {
     Subclass.prototype = parent.prototype;
     klass.prototype = new Subclass();
-    parent.subclasses.push(klass);
   }
   for (var i = 0, length = properties.length; i < length; i++) {
     addMethods(klass, properties[i], parent);

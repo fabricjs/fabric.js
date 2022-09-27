@@ -7,7 +7,7 @@ import { ifNaN } from './util/internals';
 import { loadImage } from './util/misc/objectEnlive';
 import { pick } from './util/misc/pick';
 import { toFixed } from './util/misc/toFixed';
-
+import { FabricObject } from './shapes/object.class';
 export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
 
 type TExportedKeys =
@@ -86,7 +86,7 @@ export class Pattern {
    * @return {fabric.Pattern} thisArg
    */
   constructor(options: TPatternOptions = {}) {
-    this.id = fabric.Object.__uid++;
+    this.id = FabricObject.__uid++;
     this.setOptions(options);
   }
 
