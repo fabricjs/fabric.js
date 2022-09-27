@@ -22,17 +22,3 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
           PRE_RELEASE: ${{github.event.release.prerelease}}
-  update-bug-report:
-    runs-on: ubuntu-latest
-    name: Update bug report version to ${{ github.event.release.tag_name }}
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 16
-    - run: npm ci
-    - run: node scripts/updateBugReportVersion.mjs
-      env:
-        VERSION: ${{ github.event.release.tag_name }}
-    - run: git commit -m "ci(): update bug report version" -a
-    - run: git push

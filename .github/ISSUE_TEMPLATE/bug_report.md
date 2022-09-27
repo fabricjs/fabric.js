@@ -1,51 +1,41 @@
 ---
 name: Bug report
-about: Create a detailed bug report with a reproducible test case. Anything else will be closed, consider using [DISCUSSIONS](https://github.com/fabricjs/fabric.js/discussions). 
-
+about: Create a report with a reproducible test case in a JSFIDDLE, For anything else use the github DISCUSSIONS feature. Anything different than a bug report will be closed automatically.
 ---
 
-## Check List
+<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
 
-- [ ] I have read and followed the [Contributing Guide](/CONTRIBUTING.md)
-- [ ] I have read and followed the [Issue Tracker Guide](/CONTRIBUTING.md#%EF%B8%8F-issue-tracker)
-- [ ] I have searched and referenced existing issues and discussions
-- [ ] I have managed to reproduce the bug **after** upgrading to the **latest** version
-- [ ] I have created an accurate and minimal reproduction
+<!-- BUG TEMPLATE -->
 
 <!-- If you are working on a version below latest you should upgrade to latest before filing a bug report, your issue might have been resolved already -->
+
 ## Version
+
 5.0.0
 
+<!-- ISSUES THAT ARE NOT BUGS OR LACK A TEST CASE WILL BE CLOSED. -->
+<!-- A good reproduction helps us understand better your issue, find the bug and fix it quickly so take the time to make it accurate and minimal -->
 
 ## Test Case
-<!-- 🛑
 
-A good reproduction helps us UNDERSTAND your issue, find the bug and fix it quickly.
-Take the time and put effort into making your reproduction accurate and minimal.
-Use the following reproduction templates.
+- [ ] [Browser Issue Template](https://jsfiddle.net/Lcp2h3nv/)
+- [ ] [Node Issue Template](https://codesandbox.io/s/exciting-browser-ytb701)
 
-- [Browser Reproduction](https://jsfiddle.net/Lcp2h3nv/)
-- [Node Reproduction](https://codesandbox.io/s/exciting-browser-ytb701)
+## Information about environment
 
-⛔ No reproduction === closed issue ⛔
-
--->
-
-
-
-## Environment
-- [ ] node <!-- add version -->
-- [ ] browser <!-- add on which browsers the bug occurs -->
+Nodejs or browser?
+Which browsers?
 
 ## Steps To Reproduce
 
-1. 
+1.
 
 <details><summary>Error Message & Stack Trace</summary><p>
 
 ```txt
 <!-- Provide a log message if relevant -->
 ```
+
 </p></details>
 
 ## Expected Behavior
@@ -53,4 +43,3 @@ Use the following reproduction templates.
 ## Actual Behavior
 
 <!-- Provide screenshots/screencasts if relevant -->
-
