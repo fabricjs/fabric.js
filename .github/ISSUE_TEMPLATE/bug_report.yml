@@ -5,7 +5,11 @@ body:
   - type: markdown
     attributes:
       value: |
-        Before you be
+        Thank you for wanting to create an issue in this repository. 
+        Before you do, please ensure you are filing the issue in the right place. 
+
+        * If you have a question or if an issue is not right for what you mean to file use [Discussions](https://github.com/fabricjs/fabric.js/discussions).
+
   - type: checkboxes
     id: terms
     attributes:
@@ -27,8 +31,7 @@ body:
         - label: I have searched and referenced existing issues and discussions
           required: true
         - label: >-
-            I am filing a **BUG** report. Q&A etc. are filed under
-            [Discussions](https://github.com/fabricjs/fabric.js/discussions).
+            I am filing a **BUG** report.
           required: true
         - label: >-
             I have managed to reproduce the bug **after** upgrading to the
