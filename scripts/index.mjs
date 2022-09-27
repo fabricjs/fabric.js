@@ -23,25 +23,15 @@ import _ from 'lodash';
 import moment from 'moment';
 import path from 'node:path';
 import process from 'node:process';
-import { fileURLToPath } from 'node:url';
 import os from 'os';
+import { build } from './build.mjs';
+import { awaitBuild } from './buildLock.mjs';
+import { CLI_CACHE, wd } from './dirname.mjs';
 import { listFiles, transform as transformFiles } from './transform_files.mjs';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// import rollup from 'rollup';
-// import loadConfigFile from 'rollup/loadConfigFile';
 
 const program = new commander.Command();
 
-const wd = path.resolve(__dirname, '..');
-const dumpsPath = path.resolve(wd, 'cli_output');
-const CLI_CACHE = path.resolve(dumpsPath, 'cli_cache.json');
 const websiteDir = path.resolve(wd, '../fabricjs.com');
-if (!fs.existsSync(dumpsPath)) {
-  fs.mkdirSync(dumpsPath);
-}
 
 function execGitCommand(cmd) {
   return cp
@@ -108,67 +98,6 @@ class ICheckbox extends Checkbox {
   }
 }
 inquirer.registerPrompt('test-selection', ICheckbox);
-
-// async function rollupBuild(options = {}, onComplete) {
-//     const { options: buildOptions, warnings } = await loadConfigFile(path.resolve(__dirname, '..', 'rollup.config.js'), { format: 'es' });
-//     warnings.flush();
-//     if (options.output) {
-//         buildOptions.output = [options.output];
-//     }
-//     if (options.watch) {
-//         const watcher = rollup.watch(buildOptions);
-//         watcher.on('END', () => {
-//             onComplete && onComplete();
-//         });
-//         watcher.on('event', ({ result }) => {
-//             if (result) {
-//                 result.close();
-//             }
-//         });
-//         process.on('beforeExit', () => watcher.close());
-//     }
-//     else {
-//         for (const optionsObj of buildOptions) {
-//             const bundle = await rollup.rollup(optionsObj);
-//             await Promise.all(optionsObj.output.map(bundle.write));
-//         }
-
-//         onComplete && onComplete();
-//     }
-// }
-
-function build(options = {}) {
-  const cmd = ['rollup', '-c', options.watch ? '--watch' : ''].join(' ');
-  let minDest;
-  if (options.output && !options.fast) {
-    const { name, base, ...rest } = path.parse(path.resolve(options.output));
-    minDest = path.format({ name: `${name}.min`, ...rest });
-  }
-  const processOptions = {
-    stdio: 'inherit',
-    shell: true,
-    cwd: wd,
-    env: {
-      ...process.env,
-      MINIFY: Number(!options.fast),
-      BUILD_INPUT: options.input,
-      BUILD_OUTPUT: options.output,
-      BUILD_MIN_OUTPUT: minDest,
-    },
-  };
-  if (options.watch) {
-    cp.spawn(cmd, processOptions);
-  } else {
-    try {
-      cp.execSync(cmd, processOptions);
-    } catch (error) {
-      // minimal logging, no need for stack trace
-      console.error(error.message);
-      // inform ci
-      process.exit(1);
-    }
-  }
-}
 
 function startWebsite() {
   if (
@@ -372,6 +301,7 @@ async function runTestem({
  */
 async function test(suite, tests, options = {}) {
   let failed = false;
+  await awaitBuild();
   const qunitEnv = {
     QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
     QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
