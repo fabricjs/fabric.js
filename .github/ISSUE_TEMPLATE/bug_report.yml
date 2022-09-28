@@ -4,12 +4,16 @@ title: '[Bug]: '
 body:
   - type: markdown
     attributes:
-      value: |
+      value: >
         Thank you for wanting to create an issue in this repository. 
-        Before you do, please ensure you are filing the issue in the right place. 
 
-        * If you have a question or if an issue is not right for what you mean to file use [Discussions](https://github.com/fabricjs/fabric.js/discussions).
+        Before you do, please ensure you are filing the issue in the right
+        place. 
 
+
+        * If you have a question or if an issue is not right for what you mean
+        to file use
+        [Discussions](https://github.com/fabricjs/fabric.js/discussions).
   - type: checkboxes
     id: terms
     attributes:
@@ -30,8 +34,7 @@ body:
           required: true
         - label: I have searched and referenced existing issues and discussions
           required: true
-        - label: >-
-            I am filing a **BUG** report.
+        - label: I am filing a **BUG** report.
           required: true
         - label: >-
             I have managed to reproduce the bug **after** upgrading to the
@@ -49,6 +52,35 @@ body:
         already.
       options:
         - 5.2.4
+        - 5.2.2
+        - 5.2.1
+        - 5.1.0
+        - 5.0.0
+        - 4.6.0
+        - 4.5.1
+        - 4.5.0
+        - 4.4.0
+        - 4.3.1
+        - 4.3.0
+        - 4.2.0
+        - 4.1.0
+        - 4.0.0
+        - 3.6.6
+        - 3.6.5
+        - 3.6.4
+        - 3.6.3
+        - 3.6.2
+        - 3.6.1
+        - 3.6.0
+        - 3.5.1
+        - 3.5.0
+        - 3.4.0
+        - 3.3.2
+        - 3.3.1
+        - 3.3.0
+        - 3.2.0
+        - 3.1.0
+        - 3.0.0
     validations:
       required: true
   - type: dropdown
