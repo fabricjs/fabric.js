@@ -6,26 +6,26 @@ on:
       - master
       - 5.x
     types: [published]
-  push:
 
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v1
         with:
           ref: readme
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v1
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      # - run: npm install
-      # - run: npm run build
-      # - run: node publish.js
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-      #     PRE_RELEASE: ${{github.event.release.prerelease}}
+      - run: npm install
+      - run: npm run build
+      - run: node publish.js
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          PRE_RELEASE: ${{github.event.release.prerelease}}
       - name: Update bug report version
+        if: ${{ always() }}
         uses: ShaMan123/gha-populate-form-version@v1.2.0
         with:
           package: fabric
