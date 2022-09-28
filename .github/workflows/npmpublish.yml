@@ -26,5 +26,5 @@ jobs:
         uses: ShaMan123/gha-populate-form-version@v1.2.0
         with:
           package: fabric
-          semver: '>=3.0.0'
+          semver: '>=3.0.0 || >=6.0.0-rc'
 
