@@ -22,3 +22,9 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
           PRE_RELEASE: ${{github.event.release.prerelease}}
+      - name: Update bug report version
+        uses: ShaMan123/gha-populate-form-version@v1.2.0
+        with:
+          package: fabric
+          semver: '>=3.0.0'
+
