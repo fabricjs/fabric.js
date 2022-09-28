@@ -45,7 +45,7 @@ body:
   - type: dropdown
     id: version
     attributes:
-      label: version
+      label: Version
       description: >-
         If you are working on a version below latest you should upgrade to
         latest before filing a bug report, your issue might have been resolved
@@ -98,10 +98,12 @@ body:
         - Opera
         - Microsoft Edge
         - Node.js
-  - type: input
+  - type: dropdown
     id: node_version
     attributes:
       label: Node Version (if applicable)
+      description: Provide the version if the bug occurs in Node.js
+      options: 
     validations:
       required: false
   - type: input
