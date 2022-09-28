@@ -30,7 +30,7 @@ jobs:
       - name: Update bug report version (node)
         uses: ShaMan123/gha-populate-form-version@v1.2.0
         with:
-          form: node_version
+          dropdown: node_version
           package: node
           semver: '>=14.0.0'
 
