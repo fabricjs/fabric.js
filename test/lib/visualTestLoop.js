@@ -183,8 +183,8 @@
             var stringa = imageDataToChalk(output);
             console.log(stringa);
           }
-          if ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs) {
-            generateGolden(getGoldeName(golden), renderedCanvas);
+          if (!testObj.testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)) {
+            await generateGolden(getGoldeName(golden), renderedCanvas);
           }
           await fabricCanvas.dispose();
           done();          

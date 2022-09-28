@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { fabric } from "../../HEADER";
+import { fabric } from '../../HEADER';
 
 /**
  * Wraps element with another element
