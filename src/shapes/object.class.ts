@@ -51,7 +51,7 @@ const ALIASING_LIMIT = 2;
  * @fires dragleave
  * @fires drop
  */
-export class FabricObject {
+export class FabricObject extends Observable {
 
   /**
    * Unique id used internally when creating SVG elements
@@ -1504,7 +1504,6 @@ export class FabricObject {
 
 Object.assign(
   FabricObject.prototype,
-  fabric.Observable,
   fabric.CommonMethods, {
   /**
    * Type of an object (rect, circle, path, etc.).
