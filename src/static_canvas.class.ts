@@ -1856,10 +1856,10 @@ import { FabricObject } from './shapes/object.class';
 
   // hack - class methods are not enumrable
   // TODO remove when migrating to es6
-  Object.getOwnPropertyNames(Observable.prototype).forEach(key => {
+  Object.getOwnPropertyNames(Observable.prototype).forEach((key) => {
     if (key === 'constructor') return;
     Object.defineProperty(fabric.StaticCanvas.prototype, key, {
-      value: Observable.prototype[key]
+      value: Observable.prototype[key],
     });
   });
 
