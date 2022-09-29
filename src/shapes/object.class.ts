@@ -66,6 +66,7 @@ export class FabricObject extends Observable {
    * @param {Object} [options] Options object
    */
   constructor(options) {
+    super();
     if (options) {
       this.setOptions(options);
     }
