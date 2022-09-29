@@ -8,7 +8,6 @@ import { FabricObject } from './object.class';
    * prefix when observing canvas.
    * @class fabric.IText
    * @extends fabric.Text
-   * @mixes fabric.Observable
    *
    * @fires changed
    * @fires selection:changed
@@ -57,15 +56,7 @@ import { FabricObject } from './object.class';
    */
   fabric.IText = fabric.util.createClass(
     fabric.Text,
-    fabric.Observable,
     /** @lends fabric.IText.prototype */ {
-      /**
-       * Type of an object
-       * @type String
-       * @default
-       */
-      type: 'i-text',
-
       /**
        * Index where text selection starts (or where cursor is when there is no selection)
        * @type Number

@@ -9,11 +9,10 @@
    * wrapping of lines.
    * @class fabric.Textbox
    * @extends fabric.IText
-   * @mixes fabric.Observable
    * @return {fabric.Textbox} thisArg
    * @see {@link fabric.Textbox#initialize} for constructor definition
    */
-  fabric.Textbox = fabric.util.createClass(fabric.IText, fabric.Observable, {
+  fabric.Textbox = fabric.util.createClass(fabric.IText, {
     /**
      * Type of an object
      * @type String
