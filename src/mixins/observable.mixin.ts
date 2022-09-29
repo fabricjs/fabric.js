@@ -141,5 +141,3 @@ export class Observable {
     }
   }
 }
-
-fabric.Observable = Observable;
