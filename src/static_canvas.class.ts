@@ -50,6 +50,11 @@ import { FabricObject } from './shapes/object.class';
         this._initStatic(el, options);
       },
 
+      // temporary test fix
+      _set: function (key, value) {
+        this[key] = value;
+      },
+
       /**
        * Background color of canvas instance.
        * @type {(String|fabric.Pattern)}

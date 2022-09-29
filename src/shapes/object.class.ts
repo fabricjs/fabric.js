@@ -1500,7 +1500,7 @@ export class FabricObject {
     return FabricObject._fromObject(FabricObject, object, options);
   }
 }
-console.log({fabric})
+
 Object.assign(
   FabricObject.prototype,
   fabric.Observable,
