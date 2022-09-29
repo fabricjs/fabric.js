@@ -40,10 +40,6 @@
       return this;
     },
 
-    _set: function (key, value) {
-      this[key] = value;
-    },
-
     /**
      * Toggles specified property from `true` to `false` or from `false` to `true`
      * @param {String} property Property to toggle

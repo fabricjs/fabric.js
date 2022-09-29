@@ -2,6 +2,7 @@
 
 import { Color } from '../color';
 import { config } from '../config';
+import { FabricObject } from '../shapes/object.class';
 
 /* _TO_SVG_START_ */
 (function (global) {
@@ -323,7 +324,7 @@ import { config } from '../config';
        * @return {String}
        */
       getSvgStyles: function (skipShadow) {
-        var svgStyle = fabric.Object.prototype.getSvgStyles.call(
+        var svgStyle = FabricObject.prototype.getSvgStyles.call(
           this,
           skipShadow
         );

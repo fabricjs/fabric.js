@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { FabricObject } from './object.class';
+
 (function (global) {
   var fabric = global.fabric;
   /**
@@ -619,7 +621,7 @@
     var styles = fabric.util.stylesFromArray(object.styles, object.text);
     //copy object to prevent mutation
     var objCopy = Object.assign({}, object, { styles: styles });
-    return fabric.Object._fromObject(fabric.IText, objCopy, {
+    return FabricObject._fromObject(fabric.IText, objCopy, {
       extraParam: 'text',
     });
   };
