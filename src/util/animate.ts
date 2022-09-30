@@ -127,12 +127,12 @@ export function animate(options = {}) {
       }
       if (time > finish) {
         //  update context
-        context.currentValue = isMany ? endValue.slice() : endValue;
+        //context.currentValue = isMany ? endValue.slice() : endValue;
         context.completionRate = 1;
         context.durationRate = 1;
         //  execute callbacks
-        onChange(isMany ? endValue.slice() : endValue, 1, 1);
-        onComplete(endValue, 1, 1);
+        onChange(current, 1, 1);
+        onComplete(current, 1, 1);
         removeFromRegistry();
         return;
       } else {
