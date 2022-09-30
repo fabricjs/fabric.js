@@ -2,8 +2,8 @@ name: Node.js Package
 
 on:
   push:
-    # branches:
-    #   - readme
+    branches:
+      - readme
   release:
     branches:
       - master
@@ -29,19 +29,18 @@ jobs:
   update-bug-report:
     runs-on: ubuntu-latest
     # wait for publishing to complete
-    needs: publish-npm
+    # needs: publish-npm
     steps:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.release.target_commitish }}
       - name: Update bug report version
-        uses: ShaMan123/gha-populate-form-version@v2.0.0
+        uses: ShaMan123/gha-populate-form-version@v2.0.1
         with:
-          package: fabric
           semver: '>=3.0.0 || >=6.0.0-rc'
           dry_run: no-push
       - name: Update bug report node version
-        uses: ShaMan123/gha-populate-form-version@v2.0.0
+        uses: ShaMan123/gha-populate-form-version@v2.0.1
         with:
           dropdown: _node_version
           package: node
