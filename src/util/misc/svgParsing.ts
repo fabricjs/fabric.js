@@ -9,7 +9,7 @@ import { config } from '../../config';
  * @param {SVGElementName} type Type of svg element (eg. 'circle')
  * @return {Array} string names of supported attributes
  */
-export const getSvgAttributes = (type: SVGElementName) => {
+export const getSvgAttributes = (type: SVGElementName): Array<string> => {
   const commonAttributes = ['instantiated_by_use', 'style', 'id', 'class'];
   switch (type) {
     case SVGElementName.linearGradient:
@@ -45,7 +45,8 @@ export const getSvgAttributes = (type: SVGElementName) => {
  * @param {number} fontSize
  * @return {number}
  */
-export const parseUnit = (value: string, fontSize: number) => {
+export const parseUnit = (value?: string | null, fontSize?: number): number => {
+  if (!value) return NaN;
   const unit = /\D{0,2}$/.exec(value),
     number = parseFloat(value);
   if (!fontSize) {
@@ -83,7 +84,9 @@ export const parseUnit = (value: string, fontSize: number) => {
  * @param {Array} elements fabric.Object(s) parsed from svg, to group
  * @return {fabric.Object|fabric.Group}
  */
-export const groupSVGElements = (elements: any[]) => {
+export const groupSVGElements = (
+  elements: Array<typeof fabric.Object>
+): typeof fabric.Object | typeof fabric.Group => {
   if (elements && elements.length === 1) {
     return elements[0];
   }
@@ -146,7 +149,7 @@ export const parsePreserveAspectRatioAttribute = (
  * @param {TMat2D} transform an array with 6 numbers
  * @return {String} transform matrix for svg
  */
-export const matrixToSVG = (transform: TMat2D) =>
+export const matrixToSVG = (transform: TMat2D): string =>
   'matrix(' +
   transform
     .map((value) => toFixed(value, config.NUM_FRACTION_DIGITS))
