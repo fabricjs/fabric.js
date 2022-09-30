@@ -1,6 +1,9 @@
 name: Node.js Package
 
 on:
+  push:
+    branches:
+      - readme
   release:
     branches:
       - master
