@@ -10,6 +10,7 @@ on:
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
+    id: publish
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
@@ -22,15 +23,35 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
           PRE_RELEASE: ${{github.event.release.prerelease}}
+  update-bug-report:
+    runs-on: ubuntu-latest
+    # wait for publishing to complete
+    needs: publish
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.release.target_commitish }}
       - name: Update bug report version
-        uses: ShaMan123/gha-populate-form-version@v1.2.0
+        uses: ShaMan123/gha-populate-form-version@v2.0.0
         with:
           package: fabric
           semver: '>=3.0.0 || >=6.0.0-rc'
-      - name: Update bug report version (node)
-        uses: ShaMan123/gha-populate-form-version@v1.2.0
+          dry_run: no-push
+      - name: Update bug report node version
+        uses: ShaMan123/gha-populate-form-version@v2.0.0
         with:
-          dropdown: node_version
+          dropdown: _node_version
           package: node
           semver: '>=14.0.0'
-
+          dry_run: no-push
+      - name: Commit & PR
+        uses: peter-evans/create-pull-request@v4.1.3
+        with:
+          add-paths: .github/ISSUE_TEMPLATE/bug_report.yml
+          branch: ci-update-bug-report
+          base: ${{ needs.pre.outputs.branch }}
+          delete-branch: true
+          labels: ci, bot
+          title: 'chore(): Update bug report'
+          body: |
+            Automated update to `.github/ISSUE_TEMPLATE/bug_report.yml` triggered by job `${{ github.job }}/${{ github.run_id }}`

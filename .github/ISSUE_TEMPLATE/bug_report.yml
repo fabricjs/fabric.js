@@ -99,7 +99,7 @@ body:
         - Microsoft Edge
         - Node.js
   - type: dropdown
-    id: node_version
+    id: _node_version
     attributes:
       label: Node Version (if applicable)
       description: Provide the version if the bug occurs in Node.js
