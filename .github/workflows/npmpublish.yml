@@ -13,7 +13,7 @@ on:
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
-    id: publish
+    if: github.event_name == 'release'
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
@@ -29,7 +29,7 @@ jobs:
   update-bug-report:
     runs-on: ubuntu-latest
     # wait for publishing to complete
-    needs: publish
+    needs: publish-npm
     steps:
       - uses: actions/checkout@v3
         with:
