@@ -2,8 +2,8 @@ name: Node.js Package
 
 on:
   push:
-    # branches:
-    #   - readme
+    branches:
+      - readme
   release:
     branches:
       - master
@@ -29,7 +29,7 @@ jobs:
   update-bug-report:
     runs-on: ubuntu-latest
     # wait for publishing to complete
-    needs: publish-npm
+    # needs: publish-npm
     steps:
       - uses: actions/checkout@v3
         with:
