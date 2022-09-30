@@ -10,7 +10,6 @@ body:
         Before you do, please ensure you are filing the issue in the right
         place. 
 
-
         * If you have a question or if an issue is not right for what you mean
         to file use
         [Discussions](https://github.com/fabricjs/fabric.js/discussions).
@@ -43,7 +42,7 @@ body:
         - label: I have created an accurate and minimal reproduction
           required: true
   - type: dropdown
-    id: version
+    id: _version
     attributes:
       label: Version
       description: >-
@@ -103,7 +102,7 @@ body:
     attributes:
       label: Node Version (if applicable)
       description: Provide the version if the bug occurs in Node.js
-      options: 
+      options:
     validations:
       required: false
   - type: input
