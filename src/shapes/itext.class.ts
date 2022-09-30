@@ -58,6 +58,13 @@ import { FabricObject } from './object.class';
     fabric.Text,
     /** @lends fabric.IText.prototype */ {
       /**
+       * Type of an object
+       * @type String
+       * @default
+       */
+      type: 'i-text',
+
+      /**
        * Index where text selection starts (or where cursor is when there is no selection)
        * @type Number
        * @default
