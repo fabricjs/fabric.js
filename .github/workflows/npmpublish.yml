@@ -56,4 +56,5 @@ jobs:
           labels: CI/CD, bot, task
           title: 'chore(): Update bug report'
           body: |
-            Automated update to `.github/ISSUE_TEMPLATE/bug_report.yml` triggered by job `${{ github.job }}/${{ github.run_number }}/${{ github.run_id }}`
+            Automated update to `.github/ISSUE_TEMPLATE/bug_report.yml`
+            Triggered by job [`${{ github.job }}`](../actions/runs/${{ github.run_id }})
