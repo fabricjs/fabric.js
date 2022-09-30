@@ -54,7 +54,7 @@ jobs:
           branch: ci-update-bug-report
           base: ${{ needs.pre.outputs.branch }}
           delete-branch: true
-          labels: ci, bot
+          labels: CI/CD, bot
           title: 'chore(): Update bug report'
           body: |
             Automated update to `.github/ISSUE_TEMPLATE/bug_report.yml` triggered by job `${{ github.job }}/${{ github.run_id }}`
