@@ -52,6 +52,12 @@ export function startSandbox(destination, buildAndWatch) {
     )
   );
 
+  try {
+    cp.exec('code .', { cwd: destination });
+  } catch (error) {
+    console.log('> failed to open VSCode');
+  }
+
   return cp.spawn('npm run dev', {
     cwd: destination,
     stdio: 'inherit',
