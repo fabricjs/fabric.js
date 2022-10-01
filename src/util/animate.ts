@@ -10,11 +10,10 @@ import { defaultEasing, TEasingFunction } from './anim_ease';
  * @param valueRatio ratio of current value to animation max value. [0, 1]
  * @param timeRatio ratio of current ms to animation duration. [0, 1]
  */
-export type TOnAnimationChangeCallback<Return = void, State = number | number[]> = (
-  t: State,
-  valueRatio: number,
-  timeRatio: number
-) => Return;
+export type TOnAnimationChangeCallback<
+  Return = void,
+  State = number | number[]
+> = (t: State, valueRatio: number, timeRatio: number) => Return;
 
 /**
  * Called to determine if animation should abort
