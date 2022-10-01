@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import { fabric } from '../../../HEADER';
 import { SVGElementName, SupportedSVGUnit, TMat2D } from '../../typedefs';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
@@ -38,6 +40,8 @@ export const getSvgAttributes = (type: SVGElementName): Array<string> => {
   return commonAttributes;
 };
 
+let tracker = 0;
+
 /**
  * Converts from attribute value to pixel value if applicable.
  * Returns converted pixels or original value not converted.
@@ -46,7 +50,7 @@ export const getSvgAttributes = (type: SVGElementName): Array<string> => {
  * @return {number}
  */
 export const parseUnit = (value?: string | null, fontSize?: number): number => {
-  if (!value) return NaN;
+  // if (!value) return NaN;
   const unit = /\D{0,2}$/.exec(value),
     number = parseFloat(value);
   if (!fontSize) {

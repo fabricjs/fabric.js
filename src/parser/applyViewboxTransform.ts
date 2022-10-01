@@ -35,9 +35,7 @@ function __applyViewboxTransform(element: Element): TViewBoxDims {
   const preserveAspectRatioAttr =
       element.getAttribute('preserveAspectRatio') || '',
     viewBoxAttributeFull = element.getAttribute('viewBox'),
-    viewBoxAttr = viewBoxAttributeFull
-      ? viewBoxAttributeFull.match(reViewBoxAttrValue)
-      : null,
+    viewBoxAttr = viewBoxAttributeFull?.match(reViewBoxAttrValue),
     widthAttr = element.getAttribute('width'),
     heightAttr = element.getAttribute('height'),
     xAttr = element.getAttribute('x'),
@@ -327,11 +325,13 @@ function applyViewboxTransform2(element) {
 
 let i = 0;
 
+// TODO: EXAMINE ALL RELEVANT ATTRIBUTES BY LOOKING AT SET ATTRIBUTE CALLS
+
 export function applyViewboxTransform(element: Element): TViewBoxDims {
   const id = i++;
-  console.log(id, "BEFORE", JSON.stringify(element));
-  // const res = __applyViewboxTransform(element);
-  const res2 = applyViewboxTransform2(element);
-  console.log(id, "AFTER", JSON.stringify(res2));
+  // console.log(id, "BEFORE", JSON.stringify(element));
+  const res2 = __applyViewboxTransform(element);
+  // const res2 = applyViewboxTransform2(element);
+  console.log(id, "AFTER", JSON.stringify(res2), { transform: element.getAttribute('transform')});
   return res2;
 }
