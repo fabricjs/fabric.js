@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(): svg export logic to use `calcOwnMatrix` as a prerequisite for a fix to `calcTransformMatrix` based on [#8298](https://github.com/fabricjs/fabric.js/pull/8298), [#8305](https://github.com/fabricjs/fabric.js/pull/8305)
 - ci(build): safeguard concurrent unlocking [#8309](https://github.com/fabricjs/fabric.js/pull/8309)
 - ci(): update stale bot [#8307](https://github.com/fabricjs/fabric.js/pull/8307)
 - ci(test): await golden generation in visual tests [#8284](https://github.com/fabricjs/fabric.js/pull/8284)

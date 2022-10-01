@@ -963,22 +963,6 @@ import { RenderingContext } from '../RenderingContext';
       },
 
       /**
-       * Returns svg representation of an instance
-       * @param {Function} [reviver] Method for further parsing of svg representation.
-       * @return {String} svg representation of an instance
-       */
-      _toSVG: function (reviver) {
-        var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-        var bg = this._createSVGBgRect(reviver);
-        bg && svgString.push('\t\t', bg);
-        for (var i = 0; i < this._objects.length; i++) {
-          svgString.push('\t\t', this._objects[i].toSVG(reviver));
-        }
-        svgString.push('</g>\n');
-        return svgString;
-      },
-
-      /**
        * Returns styles-string for svg-export, specific version for group
        * @return {String}
        */
@@ -992,19 +976,54 @@ import { RenderingContext } from '../RenderingContext';
       },
 
       /**
+       * @private
+       */
+      _contentToSVG: function (reviver, forClipping) {
+        const svgOutput = [];
+        const bg = this._createSVGBgRect(reviver);
+        const ws = forClipping ? '\t' : '\t\t';
+        const method = forClipping ? 'toClipPathSVG' : 'toSVG';
+        bg && svgOutput.push(ws, bg);
+        for (let i = 0; i < this._objects.length; i++) {
+          svgOutput.push(ws, this._objects[i][method](reviver));
+        }
+        return svgOutput;
+      },
+
+      /**
+       * Returns svg representation of an instance
+       * @param {Function} [reviver] Method for further parsing of svg representation.
+       * @return {String} svg representation of an instance
+       */
+      _toSVG: function (reviver) {
+        return [
+          '<g ',
+          'COMMON_PARTS',
+          ' >\n',
+          ...this._contentToSVG(reviver),
+          '</g>\n',
+        ];
+      },
+
+      /**
        * Returns svg clipPath representation of an instance
        * @param {Function} [reviver] Method for further parsing of svg representation.
        * @return {String} svg representation of an instance
        */
       toClipPathSVG: function (reviver) {
-        var svgString = [];
-        var bg = this._createSVGBgRect(reviver);
-        bg && svgString.push('\t', bg);
-        for (var i = 0; i < this._objects.length; i++) {
-          svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
-        }
-        return this._createBaseClipPathSVGMarkup(svgString, {
-          reviver: reviver,
+        return this._createBaseClipPathSVGMarkup(
+          this._contentToSVG(reviver, true),
+          { reviver }
+        );
+      },
+
+      /**
+       * @override SVG clipPath doesn't accept a `g` element so we apply the group's transform matrix to the clip path
+       * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath#usage_notes
+       */
+      toClipPathSVGMarkup: function (reviver) {
+        return this.callSuper('toClipPathSVGMarkup', reviver, {
+          transform: this.calcOwnMatrix(),
         });
       },
       /* _TO_SVG_END_ */
