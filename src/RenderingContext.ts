@@ -102,6 +102,10 @@ export class RenderingContext implements TRenderingOptions {
     return this.slice(undefined, target, true);
   }
 
+  private getAncestors(target?: TObject) {
+    return this.slice(undefined, target, false);
+  }
+
   shouldPerformOffscreenValidation(target: TObject) {
     return (
       this.offscreenValidation &&
@@ -125,8 +129,16 @@ export class RenderingContext implements TRenderingOptions {
     return !!this.find(target)?.clipping;
   }
 
+  isOnClipPath(target: TObject) {
+    return this.getAncestors(target).some(({ clipping }) => clipping);
+  }
+
   isCaching(target: TObject) {
     return !!this.find(target)?.caching;
+  }
+
+  isOnCache(target: TObject) {
+    return this.getAncestors(target).some(({ caching }) => caching);
   }
 
   /**

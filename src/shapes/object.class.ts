@@ -5,6 +5,7 @@ import { VERSION } from '../constants';
 import { Point } from '../point.class';
 import { RenderingContext } from '../RenderingContext';
 import { runningAnimations } from '../util/animation_registry';
+import { canvasProvider } from '../util/CanvasProvider';
 import { cleanUpJsdomNode } from '../util/dom_misc';
 import { capValue } from '../util/misc/capValue';
 import { getMatrixRotation, invertTransform } from '../util/misc/matrix';
@@ -1196,11 +1197,7 @@ import { TObject } from '../__types__';
        */
       prepareCache: function (renderingContext: RenderingContext) {
         let flag = false;
-        if (
-          this.shouldCache() ||
-          this.shouldRenderInIsolation() ||
-          renderingContext.isClipping(this)
-        ) {
+        if (this.shouldCache() || renderingContext.isOnCache(this)) {
           if (!this._cacheCanvas || !this._cacheContext) {
             this._createCacheCanvas();
           }
@@ -1275,9 +1272,26 @@ import { TObject } from '../__types__';
         this.prepareCache(renderingContext);
         this.transform(ctx, !isNested);
 
-        this._cacheCanvas
-          ? this.drawCacheOnCanvas(ctx)
-          : this.drawObject(ctx, renderingContext);
+        if (this._cacheCanvas) {
+          this.drawCacheOnCanvas(ctx);
+        } else if (this.canvas && this.shouldRenderInIsolation()) {
+          // perform an isolated rendering in the canvas plane
+          // frees the need for an object to have its own cache
+          const { ctx: firstStep, release } = canvasProvider.request({
+            width: this.canvas.width,
+            height: this.canvas.height,
+          });
+          firstStep.save();
+          firstStep.setTransform(ctx.getTransform());
+          this.drawObject(firstStep, renderingContext);
+          firstStep.restore();
+          // render first step on main ctx
+          ctx.resetTransform();
+          ctx.drawImage(firstStep.canvas, 0, 0);
+          release();
+        } else {
+          this.drawObject(ctx, renderingContext);
+        }
 
         this.dirty = false;
         ctx.restore();
