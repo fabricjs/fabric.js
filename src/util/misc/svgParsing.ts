@@ -40,8 +40,6 @@ export const getSvgAttributes = (type: SVGElementName): Array<string> => {
   return commonAttributes;
 };
 
-let tracker = 0;
-
 /**
  * Converts from attribute value to pixel value if applicable.
  * Returns converted pixels or original value not converted.
@@ -50,7 +48,9 @@ let tracker = 0;
  * @return {number}
  */
 export const parseUnit = (value?: string | null, fontSize?: number): number => {
-  // if (!value) return NaN;
+  // we can fail early if our input is an empty string, null, or undefined
+  // since parseFloat returns NaN for these values
+  if (!value) return NaN;
   const unit = /\D{0,2}$/.exec(value),
     number = parseFloat(value);
   if (!fontSize) {
