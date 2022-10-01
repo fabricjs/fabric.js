@@ -865,6 +865,7 @@ import { fireEvent } from '../util/fireEvent';
           transform.target.isMoving = false;
         }
         this._currentTransform = null;
+        this._target = null;
       },
 
       /**
@@ -1059,6 +1060,14 @@ import { fireEvent } from '../util/fireEvent';
         this._target = this._currentTransform
           ? this._currentTransform.target
           : this.findTarget(e) || null;
+      },
+
+      /**
+       * Use in `before` events to override the event target
+       * @param target
+       */
+      setTransformEventTarget: function (target) {
+        this._target = target;
       },
 
       /**
