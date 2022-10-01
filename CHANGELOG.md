@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(canvas interactivity): stop moving object after discarding, expose `setTransformEventTarget` to hijack transform event from target (continues [#7954](https://github.com/fabricjs/fabric.js/pull/7954)) [#8335](https://github.com/fabricjs/fabric.js/pull/8335s)
 - ci(build): safeguard concurrent unlocking [#8309](https://github.com/fabricjs/fabric.js/pull/8309)
 - ci(): update stale bot [#8307](https://github.com/fabricjs/fabric.js/pull/8307)
 - ci(test): await golden generation in visual tests [#8284](https://github.com/fabricjs/fabric.js/pull/8284)
