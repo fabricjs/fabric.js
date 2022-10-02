@@ -81,28 +81,46 @@ export const multiplyTransformMatrices = (
   ] as TMat2D;
 
 /**
- * Decomposes standard 2x3 matrix into transform components
+ * Decomposes standard 2x2 affine matrix into transform components
+ *
  * @static
  * @memberOf fabric.util
  * @param  {TMat2D} a transformMatrix
  * @return {Object} Components of transform
  */
-export const qrDecompose = (
-  a: TMat2D
-): Required<Omit<TComposeMatrixArgs, 'flipX' | 'flipY'>> => {
-  const angle = Math.atan2(a[1], a[0]),
-    denom = Math.pow(a[0], 2) + Math.pow(a[1], 2),
+export const qrDecompose = ([a, b, c, d, e, f]: TMat2D): Required<
+  Omit<TComposeMatrixArgs, 'flipX' | 'flipY'>
+> => {
+  // definitions:
+  // let v1 = (a, b)
+  // let v2 = (c, d)
+  // let A be the 2x2 transform matrix (v1, v2):
+  // | a  c |
+  // | b  d |
+
+  // rotation of v1 relative to (1, 0)
+  const rotation = Math.atan2(b, a),
+    denom = Math.pow(a, 2) + Math.pow(b, 2),
+    // dot(A)
+    dot = a * c + b * d,
+    // det(A)
+    det = a * d - b * c,
+    // || v1 || = the size of (a, b)
     scaleX = Math.sqrt(denom),
-    scaleY = (a[0] * a[3] - a[2] * a[1]) / scaleX,
-    skewX = Math.atan2(a[0] * a[2] + a[1] * a[3], denom);
+    // the area scale factor of A equals to |det(A)|
+    // scaleY is the area scale factor of A normalized by || v1 ||
+    scaleY = det / scaleX,
+    // skewX is the scalar factoring v1 into the projection of v2 onto v1
+    // see https://www.khanacademy.org/math/linear-algebra/alternate-bases/orthonormal-basis/v/linear-algebra-the-gram-schmidt-process
+    skewX = Math.atan2(dot, denom);
   return {
-    angle: (angle / PiBy180) as TDegree,
+    angle: (rotation / PiBy180) as TDegree,
     scaleX,
     scaleY,
     skewX: (skewX / PiBy180) as TDegree,
     skewY: 0 as TDegree,
-    translateX: a[4],
-    translateY: a[5],
+    translateX: e,
+    translateY: f,
   };
 };
 
