@@ -166,6 +166,20 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
         return finalDimensions.scalarAdd(postScalingStrokeValue);
       },
 
+      /**
+       * Recalculates dimensions when changing skew and scale
+       * @private
+       */
+      _set(key, value) {
+        const output = this.callSuper('_set', key, value);
+        if (key === 'scaleX' || key === 'scaleY' ) {
+          this.strokeUniform && this.strokeLineJoin !== 'round' && this._setPositionDimensions();
+        } else if (key === 'skewX' || key === 'skewY') { // TODO: check if you really need to recalculate for all cases
+          this._setPositionDimensions();
+        };
+        return output 
+      },
+
       /* _TO_SVG_START_ */
       /**
        * Returns svg representation of an instance
