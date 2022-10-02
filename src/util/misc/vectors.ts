@@ -43,7 +43,7 @@ export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian => {
  * @static
  * @memberOf fabric.util
  * @param {Point} v
- * @returns {Point} vector representing the unit vector of pointing to the direction of `v`
+ * @returns {Point} vector representing the unit vector pointing to the direction of `v`
  */
 export const getHatVector = (v: Point): Point =>
   v.scalarMultiply(1 / hypot(v.x, v.y));
