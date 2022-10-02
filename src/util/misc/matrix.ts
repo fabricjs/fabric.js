@@ -97,6 +97,9 @@ export const qrDecompose = ([a, b, c, d, e, f]: TMat2D): Required<
   // let A be the 2x2 transform matrix (v1, v2):
   // | a  c |
   // | b  d |
+  // let A' be the affine matrix of A:
+  // | a  c  e |
+  // | b  d  f |
 
   // rotation of v1 relative to (1, 0)
   const rotation = Math.atan2(b, a),
