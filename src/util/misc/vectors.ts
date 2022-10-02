@@ -1,5 +1,6 @@
 import { IPoint, Point } from '../../point.class';
 import { TRadian } from '../../typedefs';
+import { hypot } from './hypot';
 
 /**
  * Rotates `vector` with `radians`
@@ -45,7 +46,7 @@ export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian => {
  * @returns {Point} vector representing the unit vector of pointing to the direction of `v`
  */
 export const getHatVector = (v: Point): Point =>
-  v.scalarMultiply(1 / Math.hypot(v.x, v.y));
+  v.scalarMultiply(1 / hypot(v.x, v.y));
 
 /**
  * @static
