@@ -25,17 +25,18 @@ export const createVector = (from: Point | IPoint, to: Point): Point =>
   new Point(to).subtract(from);
 
 /**
- * Calculates angle between 2 vectors using dot product
+ * Calculates angle between 2 vectors
  * @static
  * @memberOf fabric.util
  * @param {Point} a
  * @param {Point} b
- * @returns the angle in radian between the vectors
+ * @returns the angle in radians from `a` to `b`
  */
-export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian =>
-  Math.acos(
-    (a.x * b.x + a.y * b.y) / (Math.hypot(a.x, a.y) * Math.hypot(b.x, b.y))
-  ) as TRadian;
+export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian => {
+  var dot = a.x * b.x + a.y * b.y, 
+    det = a.x * b.y - a.y * b.x;
+  return Math.atan2(det, dot) as TRadian;
+}
 
 /**
  * @static
