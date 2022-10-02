@@ -111,9 +111,10 @@ export const qrDecompose = ([a, b, c, d, e, f]: TMat2D): Required<
     // || v1 || = the size of (a, b)
     scaleX = Math.sqrt(denom),
     // the area scale factor of A equals to |det(A)|
-    // scaleY is the area scale factor of A normalized by || v1 ||
+    // scaleY is the area scale factor of A (keeping its sign), normalized by || v1 ||
     scaleY = det / scaleX,
-    // skewX is the scalar factoring v1 into the projection of v2 onto v1
+    // skewX is the scalar such that:
+    // skewX * v1 = the projection of v2 onto v1
     // see https://www.khanacademy.org/math/linear-algebra/alternate-bases/orthonormal-basis/v/linear-algebra-the-gram-schmidt-process
     skewX = Math.atan2(dot, denom);
   return {
