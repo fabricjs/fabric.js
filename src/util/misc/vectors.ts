@@ -53,18 +53,15 @@ export const getHatVector = (v: Point): Point =>
  * @param {Point} A
  * @param {Point} B
  * @param {Point} C
- * @returns {{ vector: Point, angle: number }} vector representing the bisector of A and A's angle
+ * @returns {{ vector: Point, angle: TRadian}} vector representing the bisector of A and A's angle
  */
-export const getBisector = (a: Point, b: Point, c: Point) => {
-  const ab = createVector(a, b),
-    ac = createVector(a, c);
-  const alpha = calcAngleBetweenVectors(ab, ac);
-  //  check if alpha is relative to AB->BC
-  const ro = calcAngleBetweenVectors(rotateVector(ab, alpha), ac);
-  const phi = ((alpha * (ro === 0 ? 1 : -1)) / 2) as TRadian;
+export const getBisector = (A: Point, B: Point, C: Point) => {
+  let AB = createVector(A, B), 
+    AC = createVector(A, C),
+    alpha = calcAngleBetweenVectors(AB, AC);
   return {
-    vector: getHatVector(rotateVector(ab, phi)),
-    angle: alpha,
+      vector: getHatVector(rotateVector(AB, alpha / 2 as TRadian)),
+      angle: alpha as TRadian
   };
 };
 
