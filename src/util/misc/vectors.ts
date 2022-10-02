@@ -66,3 +66,13 @@ export const getBisector = (a: Point, b: Point, c: Point) => {
     angle: alpha,
   };
 };
+
+/**
+ * @static
+ * @memberOf fabric.util
+ * @param {Point} v         
+ * @param {Boolean} [counterClockwise] the direction of the orthogonal vector, defaults to `true`
+ * @returns {Point} the unit orthogonal vector
+ */
+export const getOrthogonalUnitVector = (v: Point, counterClockwise: boolean = true): Point =>
+  getHatVector(new Point(counterClockwise ? -v.y : v.y, counterClockwise ? v.x : -v.x));
