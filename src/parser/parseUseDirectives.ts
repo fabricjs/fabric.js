@@ -1,10 +1,9 @@
-//@ts-nocheck
 import { svgNS } from './constants';
 import { elementById } from './elementById';
 import { getMultipleNodes } from './getMultipleNodes';
 import { applyViewboxTransform } from './applyViewboxTransform';
 
-export function parseUseDirectives(doc) {
+export function parseUseDirectives(doc: Document) {
   let nodelist = getMultipleNodes(doc, ['use', 'svg:use']),
     i = 0;
   while (nodelist.length && i < nodelist.length) {
@@ -15,12 +14,12 @@ export function parseUseDirectives(doc) {
       return;
     }
 
-    var xlink = xlinkAttribute.slice(1),
-      x = el.getAttribute('x') || 0,
-      y = el.getAttribute('y') || 0,
-      el2 = elementById(doc, xlink).cloneNode(true),
+    let xlink = xlinkAttribute.slice(1),
+      x = el.getAttribute('x') ?? '0',
+      y = el.getAttribute('y') ?? '0',
+      el2 = elementById(doc, xlink)?.cloneNode(true) as Element,
       currentTrans =
-        (el2.getAttribute('transform') || '') +
+        (el2?.getAttribute('transform') ?? '') +
         ' translate(' +
         x +
         ', ' +
@@ -29,7 +28,6 @@ export function parseUseDirectives(doc) {
       parentNode,
       oldLength = nodelist.length,
       attr,
-      j,
       attrs,
       len,
       namespace = svgNS;
@@ -37,10 +35,8 @@ export function parseUseDirectives(doc) {
     applyViewboxTransform(el2);
     if (/^svg$/i.test(el2.nodeName)) {
       const el3 = el2.ownerDocument.createElementNS(namespace, 'g');
-      for (j = 0, attrs = el2.attributes, len = attrs.length; j < len; j++) {
-        attr = attrs.item(j);
-        el3.setAttributeNS(namespace, attr.nodeName, attr.nodeValue);
-      }
+      el2.attributes.forEach((attr) =>
+        el3.setAttributeNS(namespace, attr.nodeName, attr.nodeValue));
       // el2.firstChild != null
       while (el2.firstChild) {
         el3.appendChild(el2.firstChild);
@@ -48,7 +44,7 @@ export function parseUseDirectives(doc) {
       el2 = el3;
     }
 
-    for (j = 0, attrs = el.attributes, len = attrs.length; j < len; j++) {
+    for (let j = 0, attrs = el.attributes, len = attrs.length; j < len; j++) {
       attr = attrs.item(j);
       if (
         attr.nodeName === 'x' ||
