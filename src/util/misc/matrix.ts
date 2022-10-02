@@ -81,7 +81,7 @@ export const multiplyTransformMatrices = (
   ] as TMat2D;
 
 /**
- * Decomposes standard 2x2 affine matrix into transform components
+ * Decomposes a 2x2 affine matrix into transform components
  *
  * @static
  * @memberOf fabric.util
