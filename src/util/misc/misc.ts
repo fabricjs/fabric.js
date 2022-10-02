@@ -2,6 +2,7 @@
 import { fabric } from '../../../HEADER';
 import { cos } from './cos';
 import { sin } from './sin';
+import { hypot } from './hypot'
 import {
   rotateVector,
   createVector,
@@ -103,6 +104,7 @@ import { createClass } from '../lang_class';
 fabric.util = {
   cos,
   sin,
+  hypot,
   rotateVector,
   createVector,
   calcAngleBetweenVectors,
