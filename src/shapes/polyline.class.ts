@@ -81,33 +81,33 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 
       _setPositionDimensions: function (options) {
         options || (options = {});
-        var calcDim = this._calcDimensions(options),
-          correctLeftTop,
-          correctSize = this.exactBoundingBox ? this.strokeWidth : 0;
-        this.width = calcDim.width - correctSize;
-        this.height = calcDim.height - correctSize;
-        if (!options.fromSVG) {
-          correctLeftTop = this.translateToGivenOrigin(
-            {
-              // this looks bad, but is one way to keep it optional for now.
-              x: calcDim.left - this.strokeWidth / 2 + correctSize / 2,
-              y: calcDim.top - this.strokeWidth / 2 + correctSize / 2,
-            },
-            'left',
-            'top',
-            this.originX,
-            this.originY
+        const calcDim = this._calcDimensions(options), 
+          correctSize = new Point(
+            this.strokeUniform ? this.strokeWidth / this.scaleX : this.strokeWidth,
+            this.strokeUniform ? this.strokeWidth / this.scaleY : this.strokeWidth
           );
+        let correctLeftTop;
+        this.width = calcDim.width - correctSize.x;
+        this.height = calcDim.height - correctSize.y;
+        if (!options.fromSVG) {
+            correctLeftTop = this.translateToGivenOrigin({
+                x: this.left,
+                y: this.top
+            }, 'left', 'top', this.originX, this.originY);
         }
         if (typeof options.left === 'undefined') {
-          this.left = options.fromSVG ? calcDim.left : correctLeftTop.x;
+            this.left = options.fromSVG ? calcDim.left : correctLeftTop.x;
         }
         if (typeof options.top === 'undefined') {
-          this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
+            this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
         }
+        var offsetX = calcDim.left + calcDim.width/2,
+            offsetY = calcDim.top + calcDim.height/2;
+        var pathOffsetX = offsetX - offsetY * Math.tan(degreesToRadians(this.skewX))
+        var pathOffsetY = offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY))
         this.pathOffset = {
-          x: calcDim.left + this.width / 2 + correctSize / 2,
-          y: calcDim.top + this.height / 2 + correctSize / 2,
+            x: pathOffsetX,
+            y: pathOffsetY
         };
       },
 
