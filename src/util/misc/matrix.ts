@@ -101,6 +101,8 @@ export const qrDecompose = ([a, b, c, d, e, f]: TMat2D): Required<
   // | a  c  e |
   // | b  d  f |
 
+  // assuming v1 is the first vector of our base then:
+
   // rotation of v1 relative to (1, 0)
   const rotation = Math.atan2(b, a),
     denom = Math.pow(a, 2) + Math.pow(b, 2),
