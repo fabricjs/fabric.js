@@ -1192,7 +1192,7 @@
     assert.equal(result.inverted, true, 'the final clipPathB is inverted')
     assert.equal(result.clipPath, clipPathB, 'clipPathB is the final clipPath');
   });
-  QUnit.test.only('fabric.util.hypot', function (assert) {
+  QUnit.test('fabric.util.hypot', function (assert) {
     assert.ok(typeof fabric.util.hypot === 'function');
     assert.equal(fabric.util.hypot(3, 4), 5);
     assert.equal(fabric.util.hypot(3, 4, 12), 13);
