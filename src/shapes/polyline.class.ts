@@ -140,6 +140,32 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
         });
       },
 
+      /**
+       * Changes dimensioning logic when it has skew
+       * @private
+       */
+      _getTransformedDimensions(...args) {
+        const noSkew = this.skewX === 0 && this.skewY === 0;
+        if (noSkew) {
+          return this.callSuper('_getTransformedDimensions', ...args);
+        }
+
+        let preScalingStrokeValue, postScalingStrokeValue; 
+        const strokeWidth = this.strokeWidth;
+        if (this.strokeUniform) {
+            preScalingStrokeValue = 0;
+            postScalingStrokeValue = strokeWidth;
+        }
+        else {
+            preScalingStrokeValue = strokeWidth;
+            postScalingStrokeValue = 0;
+        }
+        const dimX = this.width + preScalingStrokeValue, 
+          dimY = this.height + preScalingStrokeValue, 
+          finalDimensions = new Point(dimX * options.scaleX, dimY * options.scaleY);
+        return finalDimensions.scalarAdd(postScalingStrokeValue);
+      },
+
       /* _TO_SVG_START_ */
       /**
        * Returns svg representation of an instance
