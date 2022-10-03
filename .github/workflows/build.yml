@@ -54,6 +54,7 @@ jobs:
           delete-old-comments: true
           update-comment: true
   changelog:
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     env:
       file: CHANGELOG.md
