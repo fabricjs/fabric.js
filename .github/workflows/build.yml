@@ -54,11 +54,11 @@ jobs:
           delete-old-comments: true
           update-comment: true
   changelog:
-    if: ${{ always() }}
     runs-on: ubuntu-latest
     env:
       file: CHANGELOG.md
-    run: |
-      if [[ $(git diff --name-only master . | grep '^${{ env.file }}$' -c) -eq 0 ]]; then
-        exit 1
-      fi
+    steps:
+      - run: |
+          if [[ $(git diff --name-only master . | grep '^${{ env.file }}$' -c) -eq 0 ]]; then
+            exit 1
+          fi
