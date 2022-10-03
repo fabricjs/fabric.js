@@ -62,7 +62,7 @@ jobs:
       - uses: actions/checkout@v1
       - name: Checking ${{ env.file }}
         run: |
-          if [[ $(git diff --name-only origin/master . | grep '^${{ env.file }}$' -c) -eq 0 ]]; then
+          if [[ $(git diff --name-only origin/master HEAD -- ${{ env.file }} | grep '^${{ env.file }}$' -c) -eq 0 ]]; then
             echo "Expected '${{ env.file }}' to be modified"
             exit 1
           fi
