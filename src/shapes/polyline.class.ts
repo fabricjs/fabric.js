@@ -4,6 +4,8 @@ import { config } from '../config';
 import { Point } from '../point.class';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 
+const degreesToRadians = fabric.util.degreesToRadians;
+
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
     extend = fabric.util.object.extend,
@@ -162,7 +164,7 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
         }
         const dimX = this.width + preScalingStrokeValue, 
           dimY = this.height + preScalingStrokeValue, 
-          finalDimensions = new Point(dimX * options.scaleX, dimY * options.scaleY);
+          finalDimensions = new Point(dimX * this.scaleX, dimY * this.scaleY);
         return finalDimensions.scalarAdd(postScalingStrokeValue);
       },
 
