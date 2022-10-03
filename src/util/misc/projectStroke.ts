@@ -3,6 +3,9 @@ import { calcAngleBetweenVectors, createVector, getBisector, getOrthogonalUnitVe
 import { StrokeLineJoin, TDegree } from '../../typedefs';
 import { degreesToRadians } from './radiansDegreesConversion';
 import { hypot } from './hypot'
+
+const PiBy2 = Math.PI / 2
+
 /**
  * Project stroke width on points returning projections for each point as follows:
  * - `miter`: 1 point corresponding to the outer boundary and the inner boundary of stroke.
@@ -87,6 +90,10 @@ export const projectStrokeOnPoints = (
       C = points[index + 1];
     }
 
+    //  safeguard in case `points` are not `Point`
+    B = new Point(B.x, B.y);
+    C = new Point(C.x, C.y);
+
     /* OPEN PATH
       If open path, no matter the type of the line join, the line is always the same
       Calculation: to find the projections, just find the points orthogonal to that stroke 
@@ -129,6 +136,38 @@ export const projectStrokeOnPoints = (
       bisectorVector = bisector.vector,
       alpha = Math.abs(bisector.angle); //TODO: check if ABS is really needed. I don't remember why I implemented it this way
 
+    /* MITER 
+      Calculation: the corner is formed by extending the outer edges of the stroke at the tangents of the path segments until they intersect
+      Visually detailed here: https://github.com/fabricjs/fabric.js/issues/8025
+    */
+    if (strokeLineJoin === 'miter') {
+      const scalar = -s / Math.sin(alpha / 2),
+        miterVector = scaleHatVector(bisectorVector, scalar);
+
+      // When two line segments meet at a sharp angle, it is possible for the join to extend,
+      // it is possible for the join to extend far beyond the thickness of the line stroking
+      // the path. The stroke-miterlimit imposes a limit on the extent of the line join.
+      // MDN: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
+      // When the stroke is uniform, scaling changes the arrangement of points, this changes the miter-limit
+      let adjustedStrokeMiterLimit;
+      if (strokeUniform) {
+        // TODO: As it is in the MDN, the miterLimit can also be calculated as 1/sin(alpha/2) , I believe it is more performant than the current implementation.
+        const miterLimitVector = scaleHatVector(bisectorVector, strokeMiterLimit * s);
+        adjustedStrokeMiterLimit = hypot(miterLimitVector.x, miterLimitVector.y) / s;
+      } else {
+        adjustedStrokeMiterLimit = strokeMiterLimit
+      }
+
+      if (hypot(miterVector.x, miterVector.y) / s <= adjustedStrokeMiterLimit) {
+        const proj1 = applySkew(A.add(miterVector));
+        coords.push({
+          "projectedPoint": proj1,
+          "originPoint": A,
+          "bisector": bisector
+        });
+        return;
+      }
+    }
     /* ROUND (without skew)
       Calculation: the projections are the two vectors parallel to X and Y axes
       Visually detailed here: https://github.com/fabricjs/fabric.js/pull/8083
@@ -136,8 +175,8 @@ export const projectStrokeOnPoints = (
     if (strokeLineJoin === 'round' && skewX === 0 && skewY === 0) {
       // correctSide is used to only consider projecting for the outer side 
       const correctSide = new Point(
-          Math.abs(Math.atan2(bisectorVector.y, bisectorVector.x)) >= Math.PI * 2 ? 1 : -1, 
-          Math.abs(Math.atan2(bisectorVector.x, bisectorVector.y)) >= Math.PI * 2 ? 1 : -1
+          Math.abs(Math.atan2(bisectorVector.y, bisectorVector.x)) >= PiBy2 ? 1 : -1, 
+          Math.abs(Math.atan2(bisectorVector.x, bisectorVector.y)) >= PiBy2 ? 1 : -1
         ),
         radiusOnAxisX = new Point(s * strokeUniformScalar.x, 0).multiply(correctSide), 
         radiusOnAxisY = new Point(0, s * strokeUniformScalar.y).multiply(correctSide),
@@ -162,7 +201,7 @@ export const projectStrokeOnPoints = (
 
       [AB, AC].forEach(function (vector) {
         const hatOrthogonal = getOrthogonalUnitVector(vector), 
-          correctSide = Math.abs(calcAngleBetweenVectors(hatOrthogonal, bisectorVector)) >= Math.PI * 2 ? 1 : -1, 
+          correctSide = Math.abs(calcAngleBetweenVectors(hatOrthogonal, bisectorVector)) >= PiBy2 ? 1 : -1, 
           orthogonal = scaleHatVector(hatOrthogonal, s * correctSide),
           proj1 = applySkew(A.add(orthogonal));
         coords.push({
@@ -174,6 +213,7 @@ export const projectStrokeOnPoints = (
 
       // The points furthest from the vertex in the direction of the X and Y axes after distortion
       // TODO: consider only projections that are inside the beginning and end of the circle segment
+      // TODO: still buggy when skewX and skewY are applied at the same time
       const circleRadius = new Point(s, s).multiply(strokeUniformScalar),
         newY = circleRadius.y / Math.sqrt(1 + Math.tan(degreesToRadians(skewY))**2),
         furthestY= new Point(
@@ -199,35 +239,6 @@ export const projectStrokeOnPoints = (
         });
       })
     }
-    /* MITER 
-      Calculation: the corner is formed by extending the outer edges of the stroke at the tangents of the path segments until they intersect
-      Visually detailed here: https://github.com/fabricjs/fabric.js/issues/8025
-    */
-    else if (strokeLineJoin === 'miter') {
-      const scalar = -s / Math.sin(alpha / 2),
-        miterVector = scaleHatVector(bisectorVector, scalar);
-
-      // When two line segments meet at a sharp angle, it is possible for the join to extend,
-      // it is possible for the join to extend far beyond the thickness of the line stroking
-      // the path. The stroke-miterlimit imposes a limit on the extent of the line join.
-      // MDN: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
-      // When the stroke is uniform, scaling changes the arrangement of points, this changes the miter-limit
-      if (strokeUniform) {
-        // TODO: As it is in the MDN, the miterLimit can also be calculated as 1/sin(alpha/2) , I believe it is more performant than the current implementation.
-        const miterLimitVector = scaleHatVector(bisectorVector, strokeMiterLimit * s);
-        strokeMiterLimit = hypot(miterLimitVector.x, miterLimitVector.y) / s;
-      }
-
-      if (hypot(miterVector.x, miterVector.y) / s <= strokeMiterLimit) {
-        const proj1 = applySkew(A.add(miterVector));
-        coords.push({
-          "projectedPoint": proj1,
-          "originPoint": A,
-          "bisector": bisector
-        });
-        return;
-      }
-    }
     else {
       /* BEVEL OR MITER GREATER THAN STROKE MITER LIMIT
         Calculation: the projection points are formed by the orthogonal to the vertex.
@@ -238,7 +249,7 @@ export const projectStrokeOnPoints = (
         AC = createVector(strokeUniform ? A.multiply(scale) : A, strokeUniform ? C.multiply(scale) : C);
       [AB, AC].forEach(function (vector) {
         const hatOrthogonal = getOrthogonalUnitVector(vector), 
-          correctSide = Math.abs(calcAngleBetweenVectors(hatOrthogonal, bisectorVector)) >= Math.PI * 2 ? 1 : -1, 
+          correctSide = Math.abs(calcAngleBetweenVectors(hatOrthogonal, bisectorVector)) >= PiBy2 ? 1 : -1, 
           orthogonal = scaleHatVector(hatOrthogonal, s * correctSide),
           proj1 = applySkew(A.add(orthogonal));
         coords.push({
