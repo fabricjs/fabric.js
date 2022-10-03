@@ -56,15 +56,9 @@ jobs:
   changelog:
     if: ${{ always() }}
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 16.x
-      - name: Changelog check
-        uses: Zomzog/changelog-checker@v1.2.0
-        with:
-          fileName: CHANGELOG.md
-          checkNotification: Simple # default `Detailed`
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    env:
+      file: CHANGELOG.md
+    run: |
+      if [[ $(git diff --name-only master . | grep '^${{ env.file }}$' -c) -eq 0 ]]; then
+        exit 1
+      fi
