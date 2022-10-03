@@ -59,8 +59,8 @@ jobs:
     env:
       file: CHANGELOG.md
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v1
       - run: |
-          if [[ $(git diff --name-only ${{ github.base_ref }} . | grep '^${{ env.file }}$' -c) -eq 0 ]]; then
+          if [[ $(git diff --name-only master . | grep '^${{ env.file }}$' -c) -eq 0 ]]; then
             exit 1
           fi
