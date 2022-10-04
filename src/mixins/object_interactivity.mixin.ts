@@ -341,7 +341,7 @@ import { Point } from '../point.class';
         }
         ctx.save();
         ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-        this.transform(ctx);
+        this.transform(ctx, true);
         // we add 4 pixel, to be sure to do not leave any pixel out
         var width = this.width + 4,
           height = this.height + 4;

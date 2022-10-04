@@ -116,8 +116,7 @@ export const transformPointRelativeToCanvas = (
  * let obj, existingObj;
  * let clipPath = new fabric.Circle({ radius: 50 });
  * obj.clipPath = clipPath;
- * let transformTo = fabric.util.multiplyTransformMatrices(obj.calcTransformMatrix(), clipPath.calcTransformMatrix());
- * fabric.util.sendObjectToPlane(existingObj, existingObj.group?.calcTransformMatrix(), transformTo);
+ * fabric.util.sendObjectToPlane(existingObj, existingObj.group?.calcTransformMatrix(), clipPath.calcTransformMatrix());
  * clipPath.clipPath = existingObj;
  *
  * @static

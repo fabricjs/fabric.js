@@ -879,8 +879,6 @@
       applyTransformToObject = fabric.util.applyTransformToObject,
       invert = fabric.util.invertTransform,
       multiply = fabric.util.multiplyTransformMatrices;
-    //  silence group check
-    obj1.isOnACache = () => false;
 
     applyTransformToObject(obj, m);
     applyTransformToObject(obj1, m1);
@@ -1156,8 +1154,8 @@
       0.2696723314583158,
       -0.41255083562929973,
       0.37782470175621224,
-      -153.32445710769997,
-      1.7932869074173539,
+      0.2481,
+      161.2949
     ]);
     assert.equal(result.inverted, false, 'the final clipPathB is not inverted')
     assert.equal(result.clipPath, clipPathB, 'clipPathB is the final clipPath');
@@ -1175,8 +1173,8 @@
       -0.8090,
       1.2377,
       1.7634,
-      171.5698,
-      -127.2043,
+      180.9847,
+      84.7937
     ]);
     assert.equal(result.inverted, false, 'the final clipPathA is not inverted')
     assert.equal(result.clipPath, clipPathA, 'clipPathA is the final clipPath');

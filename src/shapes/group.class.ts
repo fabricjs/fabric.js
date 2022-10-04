@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Point } from '../point.class';
+import { RenderingContext } from '../RenderingContext';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -67,6 +68,8 @@ import { Point } from '../point.class';
        * @type boolean
        */
       interactive: false,
+
+      objectCaching: false,
 
       /**
        * Used internally to optimize performance
@@ -409,85 +412,43 @@ import { Point } from '../point.class';
         object.fire('removed', { target: this });
       },
 
-      /**
-       * Decide if the object should cache or not. Create its own cache level
-       * needsItsOwnCache should be used when the object drawing method requires
-       * a cache step. None of the fabric classes requires it.
-       * Generally you do not cache objects in groups because the group is already cached.
-       * @return {Boolean}
-       */
       shouldCache: function () {
-        var ownCache = fabric.Object.prototype.shouldCache.call(this);
-        if (ownCache) {
-          for (var i = 0; i < this._objects.length; i++) {
-            if (this._objects[i].willDrawShadow()) {
-              this.ownCaching = false;
-              return false;
-            }
-          }
-        }
-        return ownCache;
-      },
-
-      /**
-       * Check if this object or a child object will cast a shadow
-       * @return {Boolean}
-       */
-      willDrawShadow: function () {
-        if (fabric.Object.prototype.willDrawShadow.call(this)) {
-          return true;
-        }
-        for (var i = 0; i < this._objects.length; i++) {
-          if (this._objects[i].willDrawShadow()) {
-            return true;
-          }
-        }
+        // return this.callSuper('shouldCache') && !this.interactive;
         return false;
       },
 
-      /**
-       * Check if instance or its group are caching, recursively up
-       * @return {Boolean}
-       */
-      isOnACache: function () {
-        return this.ownCaching || (!!this.group && this.group.isOnACache());
+      shouldRenderInIsolation: function () {
+        return true;
       },
 
       /**
        * Execute the drawing operation for an object on a specified context
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      drawObject: function (ctx) {
+      drawObject: function (
+        ctx: CanvasRenderingContext2D,
+        renderingContext: RenderingContext
+      ) {
         this._renderBackground(ctx);
-        for (var i = 0; i < this._objects.length; i++) {
-          this._objects[i].render(ctx);
+        for (let i = 0; i < this._objects.length; i++) {
+          this._objects[i].render(ctx, renderingContext.fork());
         }
-        this._drawClipPath(ctx, this.clipPath);
+        this.drawClipPath(ctx, this.clipPath, renderingContext);
       },
 
-      /**
-       * Check if cache is dirty
-       */
-      isCacheDirty: function (skipCanvas) {
-        if (this.callSuper('isCacheDirty', skipCanvas)) {
-          return true;
-        }
-        if (!this.statefullCache) {
-          return false;
-        }
-        for (var i = 0; i < this._objects.length; i++) {
-          if (this._objects[i].isCacheDirty(true)) {
-            if (this._cacheCanvas) {
-              // if this group has not a cache canvas there is nothing to clean
-              var x = this.cacheWidth / this.zoomX,
-                y = this.cacheHeight / this.zoomY;
-              this._cacheContext.clearRect(-x / 2, -y / 2, x, y);
-            }
-            return true;
-          }
-        }
-        return false;
-      },
+      // _setClippingProperties: function (ctx) {
+      //   this.callSuper('_setClippingProperties', ctx);
+      //   this.fill = '';
+      // },
+
+      // _render: function (
+      //   ctx: CanvasRenderingContext2D,
+      //   renderingContext: RenderingContext
+      // ) {
+      //   this.forEachObject((object) => {
+      //     object.render(ctx, renderingContext.fork());
+      //   });
+      // },
 
       /**
        * @override
@@ -505,10 +466,13 @@ import { Point } from '../point.class';
        * Renders instance on a given context
        * @param {CanvasRenderingContext2D} ctx context to render instance on
        */
-      render: function (ctx) {
+      render: function (
+        ctx: CanvasRenderingContext2D,
+        renderingContext: RenderingContext = new RenderingContext()
+      ) {
         //  used to inform objects not to double opacity
         this._transformDone = true;
-        this.callSuper('render', ctx);
+        this.callSuper('render', ctx, renderingContext);
         this._transformDone = false;
       },
 
@@ -999,22 +963,6 @@ import { Point } from '../point.class';
       },
 
       /**
-       * Returns svg representation of an instance
-       * @param {Function} [reviver] Method for further parsing of svg representation.
-       * @return {String} svg representation of an instance
-       */
-      _toSVG: function (reviver) {
-        var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-        var bg = this._createSVGBgRect(reviver);
-        bg && svgString.push('\t\t', bg);
-        for (var i = 0; i < this._objects.length; i++) {
-          svgString.push('\t\t', this._objects[i].toSVG(reviver));
-        }
-        svgString.push('</g>\n');
-        return svgString;
-      },
-
-      /**
        * Returns styles-string for svg-export, specific version for group
        * @return {String}
        */
@@ -1028,19 +976,54 @@ import { Point } from '../point.class';
       },
 
       /**
+       * @private
+       */
+      _contentToSVG: function (reviver, forClipping) {
+        const svgOutput = [];
+        const bg = this._createSVGBgRect(reviver);
+        const ws = forClipping ? '\t' : '\t\t';
+        const method = forClipping ? 'toClipPathSVG' : 'toSVG';
+        bg && svgOutput.push(ws, bg);
+        for (let i = 0; i < this._objects.length; i++) {
+          svgOutput.push(ws, this._objects[i][method](reviver));
+        }
+        return svgOutput;
+      },
+
+      /**
+       * Returns svg representation of an instance
+       * @param {Function} [reviver] Method for further parsing of svg representation.
+       * @return {String} svg representation of an instance
+       */
+      _toSVG: function (reviver) {
+        return [
+          '<g ',
+          'COMMON_PARTS',
+          ' >\n',
+          ...this._contentToSVG(reviver),
+          '</g>\n',
+        ];
+      },
+
+      /**
        * Returns svg clipPath representation of an instance
        * @param {Function} [reviver] Method for further parsing of svg representation.
        * @return {String} svg representation of an instance
        */
       toClipPathSVG: function (reviver) {
-        var svgString = [];
-        var bg = this._createSVGBgRect(reviver);
-        bg && svgString.push('\t', bg);
-        for (var i = 0; i < this._objects.length; i++) {
-          svgString.push('\t', this._objects[i].toClipPathSVG(reviver));
-        }
-        return this._createBaseClipPathSVGMarkup(svgString, {
-          reviver: reviver,
+        return this._createBaseClipPathSVGMarkup(
+          this._contentToSVG(reviver, true),
+          { reviver }
+        );
+      },
+
+      /**
+       * @override SVG clipPath doesn't accept a `g` element so we apply the group's transform matrix to the clip path
+       * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath#usage_notes
+       */
+      toClipPathSVGMarkup: function (reviver) {
+        return this.callSuper('toClipPathSVGMarkup', reviver, {
+          transform: this.calcOwnMatrix(),
         });
       },
       /* _TO_SVG_END_ */

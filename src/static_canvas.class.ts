@@ -2,6 +2,7 @@
 import { config } from './config';
 import { VERSION } from './constants';
 import { Point } from './point.class';
+import { RenderingContext } from './RenderingContext';
 import { requestAnimFrame } from './util/animate';
 import { removeFromArray } from './util/internals';
 import { pick } from './util/misc/pick';
@@ -711,12 +712,18 @@ import { pick } from './util/misc/pick';
        * @return {fabric.Canvas} instance
        * @chainable
        */
-      renderAll: function () {
+      renderAll: function (isRequested = false) {
         this.cancelRequestedRender();
         if (this.destroyed) {
           return;
         }
-        this.renderCanvas(this.contextContainer, this._objects);
+        this.renderCanvas(
+          this.contextContainer,
+          this._objects,
+          new RenderingContext({
+            action: isRequested ? 'requested' : undefined,
+          })
+        );
         return this;
       },
 
@@ -732,7 +739,7 @@ import { pick } from './util/misc/pick';
        */
       renderAndReset: function () {
         this.nextRenderHandle = 0;
-        this.renderAll();
+        this.renderAll(true);
       },
 
       /**
@@ -788,7 +795,11 @@ import { pick } from './util/misc/pick';
        * @return {fabric.Canvas} instance
        * @chainable
        */
-      renderCanvas: function (ctx, objects) {
+      renderCanvas: function (
+        ctx,
+        objects,
+        renderingContext: RenderingContext = new RenderingContext()
+      ) {
         if (this.destroyed) {
           return;
         }
@@ -800,30 +811,34 @@ import { pick } from './util/misc/pick';
         ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
         // node-canvas
         ctx.patternQuality = 'best';
-        this.fire('before:render', { ctx: ctx });
-        this._renderBackground(ctx);
+        renderingContext.shouldFireRenderingEvent() &&
+          this.fire('before:render', { ctx, renderingContext });
+        this._renderBackground(ctx, renderingContext);
 
         ctx.save();
         //apply viewport transform once for all rendering process
         ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-        this._renderObjects(ctx, objects);
+        this._renderObjects(ctx, objects, renderingContext);
         ctx.restore();
         if (!this.controlsAboveOverlay && this.interactive) {
           this.drawControls(ctx);
         }
         if (path) {
           path._set('canvas', this);
-          // needed to setup a couple of variables
-          path.shouldCache();
-          path._transformDone = true;
-          path.renderCache({ forClipping: true });
-          this.drawClipPathOnCanvas(ctx);
+          path.render(
+            ctx,
+            renderingContext.fork({
+              target: path,
+              clipping: this,
+            })
+          );
         }
-        this._renderOverlay(ctx);
+        this._renderOverlay(ctx, renderingContext);
         if (this.controlsAboveOverlay && this.interactive) {
           this.drawControls(ctx);
         }
-        this.fire('after:render', { ctx: ctx });
+        renderingContext.shouldFireRenderingEvent() &&
+          this.fire('after:render', { ctx, renderingContext });
 
         if (this.__cleanupTask) {
           this.__cleanupTask();
@@ -832,36 +847,17 @@ import { pick } from './util/misc/pick';
       },
 
       /**
-       * Paint the cached clipPath on the lowerCanvasEl
-       * @param {CanvasRenderingContext2D} ctx Context to render on
-       */
-      drawClipPathOnCanvas: function (ctx) {
-        var v = this.viewportTransform,
-          path = this.clipPath;
-        ctx.save();
-        ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-        // DEBUG: uncomment this line, comment the following
-        // ctx.globalAlpha = 0.4;
-        ctx.globalCompositeOperation = 'destination-in';
-        path.transform(ctx);
-        ctx.scale(1 / path.zoomX, 1 / path.zoomY);
-        ctx.drawImage(
-          path._cacheCanvas,
-          -path.cacheTranslationX,
-          -path.cacheTranslationY
-        );
-        ctx.restore();
-      },
-
-      /**
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
        * @param {Array} objects to render
        */
-      _renderObjects: function (ctx, objects) {
-        var i, len;
-        for (i = 0, len = objects.length; i < len; ++i) {
-          objects[i] && objects[i].render(ctx);
+      _renderObjects: function (
+        ctx,
+        objects,
+        renderingContext: RenderingContext
+      ) {
+        for (let i = 0; i < objects.length; i++) {
+          objects[i]?.render(ctx, renderingContext.fork());
         }
       },
 
@@ -870,7 +866,11 @@ import { pick } from './util/misc/pick';
        * @param {CanvasRenderingContext2D} ctx Context to render on
        * @param {string} property 'background' or 'overlay'
        */
-      _renderBackgroundOrOverlay: function (ctx, property) {
+      _renderBackgroundOrOverlay: function (
+        ctx,
+        property,
+        renderingContext: RenderingContext
+      ) {
         var fill = this[property + 'Color'],
           object = this[property + 'Image'],
           v = this.viewportTransform,
@@ -901,7 +901,7 @@ import { pick } from './util/misc/pick';
           if (needsVpt) {
             ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
           }
-          object.render(ctx);
+          object.render(ctx, renderingContext.fork());
           ctx.restore();
         }
       },
@@ -910,16 +910,16 @@ import { pick } from './util/misc/pick';
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      _renderBackground: function (ctx) {
-        this._renderBackgroundOrOverlay(ctx, 'background');
+      _renderBackground: function (ctx, renderingContext: RenderingContext) {
+        this._renderBackgroundOrOverlay(ctx, 'background', renderingContext);
       },
 
       /**
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      _renderOverlay: function (ctx) {
-        this._renderBackgroundOrOverlay(ctx, 'overlay');
+      _renderOverlay: function (ctx, renderingContext: RenderingContext) {
+        this._renderBackgroundOrOverlay(ctx, 'overlay', renderingContext);
       },
 
       /**
@@ -1319,24 +1319,9 @@ import { pick } from './util/misc/pick';
           '<defs>\n',
           this.createSVGFontFacesMarkup(),
           this.createSVGRefElementsMarkup(),
-          this.createSVGClipPathMarkup(options),
+          this.clipPath?.toClipPathSVGMarkup(options.reviver) ?? '',
           '</defs>\n'
         );
-      },
-
-      createSVGClipPathMarkup: function (options) {
-        var clipPath = this.clipPath;
-        if (clipPath) {
-          clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
-          return (
-            '<clipPath id="' +
-            clipPath.clipPathId +
-            '" >\n' +
-            this.clipPath.toClipPathSVG(options.reviver) +
-            '</clipPath>\n'
-          );
-        }
-        return '';
       },
 
       /**

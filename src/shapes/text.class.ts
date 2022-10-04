@@ -2,6 +2,10 @@
 
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
+import { RenderingContext } from '../RenderingContext';
+import { canvasProvider } from '../util/CanvasProvider';
+
+const measuringContext = canvasProvider.request();
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {});
@@ -288,16 +292,6 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
       styles: null,
 
       /**
-       * Reference to a context to measure text char or couple of chars
-       * the cacheContext of the canvas will be used or a freshly created one if the object is not on canvas
-       * once created it will be referenced on fabric._measuringContext to avoid creating a canvas for every
-       * text object created.
-       * @type {CanvasRenderingContext2D}
-       * @default
-       */
-      _measuringContext: null,
-
-      /**
        * Baseline shift, styles only, keep at 0 for the main text object
        * @type {Number}
        * @default
@@ -391,22 +385,14 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
       },
 
       /**
-       * Return a context for measurement of text string.
-       * if created it gets stored for reuse
-       * this is for internal use, please do not use it
+       * **for internal use**, do not use it
        * @private
        * @param {String} text Text string
        * @param {Object} [options] Options object
        * @return {fabric.Text} thisArg
        */
       getMeasuringContext: function () {
-        // if we did not return we have to measure something.
-        if (!fabric._measuringContext) {
-          fabric._measuringContext =
-            (this.canvas && this.canvas.contextCache) ||
-            fabric.util.createCanvasElement().getContext('2d');
-        }
-        return fabric._measuringContext;
+        return measuringContext.ctx;
       },
 
       /**
@@ -1669,23 +1655,25 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
        * Renders text instance on a specified context
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      render: function (ctx) {
+      render: function (
+        ctx: CanvasRenderingContext2D,
+        renderingContext: RenderingContext = new RenderingContext()
+      ) {
+        renderingContext.validateAtBottomOfTree(this);
         // do not render if object is not visible
-        if (!this.visible) {
-          return;
-        }
         if (
-          this.canvas &&
-          this.canvas.skipOffscreen &&
-          !this.group &&
-          !this.isOnScreen()
+          !this.visible ||
+          (this.canvas &&
+            this.canvas.skipOffscreen &&
+            renderingContext.shouldPerformOffscreenValidation(this) &&
+            !this.isOnScreen())
         ) {
           return;
         }
         if (this._shouldClearDimensionCache()) {
           this.initDimensions();
         }
-        this.callSuper('render', ctx);
+        this.callSuper('render', ctx, renderingContext);
       },
 
       /**

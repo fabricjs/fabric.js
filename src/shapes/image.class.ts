@@ -568,24 +568,9 @@
        * it will set the imageSmoothing for the draw operation
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      drawCacheOnCanvas: function (ctx) {
+      drawCacheOnCanvas: function (ctx, source?: HTMLCanvasElement) {
         ctx.imageSmoothingEnabled = this.imageSmoothing;
-        fabric.Object.prototype.drawCacheOnCanvas.call(this, ctx);
-      },
-
-      /**
-       * Decide if the object should cache or not. Create its own cache level
-       * needsItsOwnCache should be used when the object drawing method requires
-       * a cache step. None of the fabric classes requires it.
-       * Generally you do not cache objects in groups because the group outside is cached.
-       * This is the special image version where we would like to avoid caching where possible.
-       * Essentially images do not benefit from caching. They may require caching, and in that
-       * case we do it. Also caching an image usually ends in a loss of details.
-       * A full performance audit should be done.
-       * @return {Boolean}
-       */
-      shouldCache: function () {
-        return this.needsItsOwnCache();
+        this.callSuper('drawCacheOnCanvas', ctx, source);
       },
 
       _renderFill: function (ctx) {

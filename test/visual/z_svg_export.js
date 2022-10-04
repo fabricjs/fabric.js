@@ -40,6 +40,8 @@
     }
   }
 
+  // TODO clipping code is duplicate - remove from here and use `clippath.js`
+
   var tests = [];
 
   function clipping0(canvas, callback) {
@@ -138,189 +140,174 @@
     code: clipping3,
     golden: 'clipping3.png',
     percentage: 0.06,
-    disabled: false,
   });
 
-  function clipping4(canvas, callback) {
-    var clipPath = new fabric.Circle({ radius: 20, strokeWidth: 0, top: -10, left: -10, scaleX: 2, skewY: 45 });
-    var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 200, height: 200, fill: 'rgba(0,255,0,0.5)'});
-    obj.fill = new fabric.Gradient({
-      type: 'linear',
-      coords: {
-        x1: 0,
-        y1: 0,
-        x2: 200,
-        y2: 200,
-      },
-      colorStops: [
-        {
-          offset: 0,
-          color: 'red',
-        },
-        {
-          offset: 1,
-          color: 'blue',
-        }
-      ]
-    });
-    obj.clipPath = clipPath;
-    canvas.add(obj);
-    toSVGCanvas(canvas, callback);
+  function createGradientClippingTest(clipPathBuilder, cb = toSVGCanvas) {
+    return (canvas, callback) => {
+      const obj = new fabric.Rect({
+        top: 0,
+        left: 0,
+        strokeWidth: 0,
+        width: 200,
+        height: 200,
+        fill: new fabric.Gradient({
+          type: 'linear',
+          coords: {
+            x1: 0,
+            y1: 0,
+            x2: 200,
+            y2: 200,
+          },
+          colorStops: [
+            {
+              offset: 0,
+              color: 'red',
+            },
+            {
+              offset: 1,
+              color: 'blue',
+            }
+          ]
+        }),
+        clipPath: clipPathBuilder()
+      });
+      canvas.add(obj);
+      cb(canvas, callback);
+    }
+  }
+
+  function createClippingTest(
+    clipPathCallback,
+    cb = toSVGCanvas
+  ) {
+    return (canvas, callback) => {
+      const objects = [
+        new fabric.Rect({ top: 0, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,0,0.8)' }),
+        new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,255,0,0.8)' }),
+        new fabric.Rect({ top: 100, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,255,0.8)' }),
+        new fabric.Rect({ top: 100, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,0,0,0.8)' }),
+      ];
+      clipPathCallback && objects.forEach(clipPathCallback);
+      canvas.add(...objects);
+      cb(canvas, callback);
+    }
   }
 
   tests.push({
     test: 'ClipPath can be transformed',
-    code: clipping4,
-    golden: 'clipping4.png',
+    code: createGradientClippingTest(() =>
+      new fabric.Circle({ radius: 20, strokeWidth: 0, top: -10, left: -10, scaleX: 2, skewY: 45 })),
+    golden: 'clipping/transformed.png',
     percentage: 0.06,
   });
-
-  function clipping5(canvas, callback) {
-    var clipPath = new fabric.Circle({ radius: 20, strokeWidth: 0, top: -10, left: -10, scaleX: 2, skewY: 45 });
-    var clipPath1 = new fabric.Circle({ radius: 15, rotate: 45, strokeWidth: 0, top: -100, left: -50, scaleX: 2, skewY: 45 });
-    var clipPath2 = new fabric.Circle({ radius: 10, strokeWidth: 0, top: -20, left: -20, scaleY: 2, skewX: 45 });
-    var group = new fabric.Group([clipPath, clipPath1, clipPath2]);
-    var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 200, height: 200, fill: 'rgba(0,255,0,0.5)'});
-    obj.fill = new fabric.Gradient({
-      type: 'linear',
-      coords: {
-        x1: 0,
-        y1: 0,
-        x2: 200,
-        y2: 200,
-      },
-      colorStops: [
-        {
-          offset: 0,
-          color: 'red',
-        },
-        {
-          offset: 1,
-          color: 'blue',
-        }
-      ]
-    });
-    obj.clipPath = group;
-    canvas.add(obj);
-    toSVGCanvas(canvas, callback);
-  }
 
   tests.push({
     test: 'ClipPath can be a group with many objects',
-    code: clipping5,
-    golden: 'clipping5.png',
+    code: createGradientClippingTest(() =>
+      new fabric.Group([
+        new fabric.Circle({ radius: 20, strokeWidth: 0, top: -10, left: -10, scaleX: 2, skewY: 45 }),
+        new fabric.Circle({ radius: 15, rotate: 45, strokeWidth: 0, top: -100, left: -50, scaleX: 2, skewY: 45 }),
+        new fabric.Circle({ radius: 10, strokeWidth: 0, top: -20, left: -20, scaleY: 2, skewX: 45 })
+      ])
+    ),
+    golden: 'clipping/transformed-grouped.png',
     percentage: 0.06,
-    disabled: false,
   });
 
-  function clipping6(canvas, callback) {
-    var clipPath = new fabric.Circle({ radius: 20, strokeWidth: 0, top: -10, left: -10, scaleX: 2, skewY: 45 });
-    var clipPath1 = new fabric.Circle({ radius: 15, rotate: 45, strokeWidth: 0, top: -100, left: -50, scaleX: 2, skewY: 45 });
-    var clipPath2 = new fabric.Circle({ radius: 10, strokeWidth: 0, top: -20, left: -20, scaleY: 2, skewX: 45 });
-    var group = new fabric.Group([clipPath, clipPath1, clipPath2]);
-    var obj = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 200, height: 200, fill: 'rgba(0,255,0,0.5)'});
-    obj.fill = new fabric.Gradient({
-      type: 'linear',
-      coords: {
-        x1: 0,
-        y1: 0,
-        x2: 200,
-        y2: 200,
-      },
-      colorStops: [
-        {
-          offset: 0,
-          color: 'red',
-        },
-        {
-          offset: 1,
-          color: 'blue',
-        }
-      ]
-    });
-    obj.clipPath = group;
-    group.inverted = true;
-    canvas.add(obj);
-    toSVGCanvas(canvas, callback);
-  }
-
+  // TODO fix inverted clip path svg import/export by migrating to `<mask>`
   tests.push({
     test: 'ClipPath can be inverted, it will clip what is outside the clipPath',
-    code: clipping6,
-    golden: 'clipping6.png',
+    code: createGradientClippingTest(() =>
+      new fabric.Group([
+        new fabric.Circle({ radius: 20, strokeWidth: 0, top: -10, left: -10, scaleX: 2, skewY: 45 }),
+        new fabric.Circle({ radius: 15, rotate: 45, strokeWidth: 0, top: -100, left: -50, scaleX: 2, skewY: 45 }),
+        new fabric.Circle({ radius: 10, strokeWidth: 0, top: -20, left: -20, scaleY: 2, skewX: 45 })
+      ], { inverted: true })
+    ),
+    golden: 'clipping/inverted.png',
     percentage: 0.06,
-    disabled: true,
+    action: 'todo',
+    disabled: true
   });
 
-  function clipping7(canvas, callback) {
-    var clipPath = new fabric.Circle({ radius: 30, strokeWidth: 0, top: -30, left: -30, skewY: 45 });
-    var obj1 = new fabric.Rect({ top: 0, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,0,0.8)'});
-    var obj2 = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,255,0,0.8)'});
-    var obj3 = new fabric.Rect({ top: 100, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,255,0.8)'});
-    var obj4 = new fabric.Rect({ top: 100, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,0,0,0.8)'});
-    obj1.clipPath = clipPath;
-    obj2.clipPath = clipPath;
-    obj3.clipPath = clipPath;
-    obj4.clipPath = clipPath;
-    canvas.add(obj1);
-    canvas.add(obj2);
-    canvas.add(obj3);
-    canvas.add(obj4);
-    toSVGCanvas(canvas, callback);
-  }
-
   tests.push({
-    test: 'Many Objects can share the same clipPath',
-    code: clipping7,
-    golden: 'clipping7.png',
+    test: 'clipping objects',
+    code: createClippingTest(object =>
+      object.set({
+        clipPath: new fabric.Circle({ radius: 30, strokeWidth: 0, top: -30, left: -30, skewY: 45 })
+      })),
+    golden: 'clipping/transformed-many.png',
     percentage: 0.06,
-    disabled: false,
   });
 
-  function clipping8(canvas, callback) {
-    var clipPath = new fabric.Circle({ radius: 60, strokeWidth: 0, top: 40, left: 40, absolutePositioned: true });
-    var obj1 = new fabric.Rect({ top: 0, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,0,0.8)'});
-    var obj2 = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,255,0,0.8)'});
-    var obj3 = new fabric.Rect({ top: 100, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,255,0.8)'});
-    var obj4 = new fabric.Rect({ top: 100, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,0,0,0.8)'});
-    obj1.clipPath = clipPath;
-    obj2.clipPath = clipPath;
-    obj3.clipPath = clipPath;
-    canvas.add(obj1);
-    canvas.add(obj2);
-    canvas.add(obj3);
-    canvas.add(obj4);
-    toSVGCanvas(canvas, callback);
-  }
-
   tests.push({
-    test: 'an absolute positioned clipPath, shared',
-    code: clipping8,
-    golden: 'clipping8.png',
+    test: 'transformed group clip path',
+    code: createClippingTest(object =>
+      object.set({
+        clipPath: new fabric.Group([new fabric.Circle({ radius: 30, strokeWidth: 0 })], {
+          left: -30,
+          top: -30,
+          skewY: 45
+        })
+      })
+    ),
+    golden: 'clipping/transformed-many.png',
     percentage: 0.06,
-    disabled: false,
   });
 
-  function clipping9(canvas, callback) {
-    var clipPath = new fabric.Circle({ radius: 60, strokeWidth: 0, top: 10, left: 10 });
-    var obj1 = new fabric.Rect({ top: 0, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,0,0.8)'});
-    var obj2 = new fabric.Rect({ top: 0, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,255,0,0.8)'});
-    var obj3 = new fabric.Rect({ top: 100, left: 0, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(0,255,255,0.8)'});
-    var obj4 = new fabric.Rect({ top: 100, left: 100, strokeWidth: 0, width: 100, height: 100, fill: 'rgba(255,0,0,0.8)'});
-    canvas.add(obj1);
-    canvas.add(obj2);
-    canvas.add(obj3);
-    canvas.add(obj4);
-    canvas.clipPath = clipPath;
-    toSVGCanvas(canvas, callback);
-  }
+  tests.push({
+    test: 'absolute positioned clip path',
+    code: createClippingTest((object, index, objects) =>
+      index !== objects.length - 1 && object.set({
+        clipPath: new fabric.Circle({ radius: 60, strokeWidth: 0, top: 40, left: 40, absolutePositioned: true })
+      })
+    ),
+    golden: 'clipping/abs.png',
+    percentage: 0.06,
+  });
 
   tests.push({
-    test: 'a clipPath on the canvas',
-    code: clipping9,
-    golden: 'clipping9.png',
+    test: 'group clip path with absolute positioned child',
+    code: createClippingTest((object, index, objects) =>
+      index !== objects.length - 1 && object.set({
+        clipPath: new fabric.Group([new fabric.Circle({ radius: 60, strokeWidth: 0, top: 40, left: 40 })], {
+          absolutePositioned: true
+        })
+      })
+    ),
+    golden: 'clipping/abs.png',
+    percentage: 0.06
+  });
+
+  tests.push({
+    test: 'transformed group clip path with absolute positioned child',
+    code: createClippingTest(object =>
+      object.set({
+        clipPath: new fabric.Group([new fabric.Circle({ radius: 60, strokeWidth: 0, top: 40, left: 40 })], {
+          left: -60,
+          top: -60,
+          scaleX: 2,
+          scaleY: 2,
+          skewX: 30,
+          skewY: 30,
+          absolutePositioned: true
+        })
+      })
+    ),
+    golden: 'clipping/transformed-abs-group.png',
+    percentage: 0.06
+  });
+
+  tests.push({
+    test: 'clipping canvas',
+    code: createClippingTest(null, (canvas, callback) => {
+      canvas.set({
+        clipPath: new fabric.Circle({ radius: 60, strokeWidth: 0, top: 10, left: 10 })
+      });
+      toSVGCanvas(canvas, callback);
+    }),
+    golden: 'clipping/canvas.png',
     percentage: 0.06,
-    disabled: false,
   });
 
   function clipping10(canvas, callback) {
@@ -347,7 +334,7 @@
   tests.push({
     test: 'clipPath made of polygons and paths',
     code: clipping11,
-    golden: 'clippath-9.png',
+    golden: 'handbag.png',
     percentage: 0.06,
     width: 400,
     height: 400,

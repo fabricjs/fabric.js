@@ -1,12 +1,14 @@
 //@ts-nocheck
 import { Point } from '../point.class';
+import { RenderingContext } from '../RenderingContext';
 
 (function (global) {
   /** ERASER_START */
 
   var fabric = global.fabric,
-    __drawClipPath = fabric.Object.prototype._drawClipPath;
-  var _needsItsOwnCache = fabric.Object.prototype.needsItsOwnCache;
+    _drawClipPath = fabric.Object.prototype.drawClipPath;
+  var _shouldRenderInIsolation =
+    fabric.Object.prototype.shouldRenderInIsolation;
   var _toObject = fabric.Object.prototype.toObject;
   var _getSvgCommons = fabric.Object.prototype.getSvgCommons;
   var __createBaseClipPathSVGMarkup =
@@ -42,8 +44,8 @@ import { Point } from '../point.class';
      * @override
      * @returns Boolean
      */
-    needsItsOwnCache: function () {
-      return _needsItsOwnCache.call(this) || !!this.eraser;
+    shouldRenderInIsolation: function () {
+      return _shouldRenderInIsolation.call(this) || !!this.eraser;
     },
 
     /**
@@ -53,8 +55,8 @@ import { Point } from '../point.class';
      * @param {CanvasRenderingContext2D} ctx
      * @param {fabric.Object} clipPath
      */
-    _drawClipPath: function (ctx, clipPath) {
-      __drawClipPath.call(this, ctx, clipPath);
+    drawClipPath: function (ctx, clipPath, renderingContext) {
+      _drawClipPath.call(this, ctx, clipPath, renderingContext);
       if (this.eraser) {
         //  update eraser size to match instance
         var size = this._getNonTransformedDimensions();
@@ -63,7 +65,7 @@ import { Point } from '../point.class';
             width: size.x,
             height: size.y,
           });
-        __drawClipPath.call(this, ctx, this.eraser);
+        _drawClipPath.call(this, ctx, this.eraser, renderingContext);
       }
     },
 
@@ -230,18 +232,18 @@ import { Point } from '../point.class';
     /**
      * eraser should retain size
      * dimensions should not change when paths are added or removed
-     * handled by {@link fabric.Object#_drawClipPath}
+     * handled by {@link fabric.Object#drawClipPath}
      * @override
      * @private
      */
     layout: 'fixed',
 
-    drawObject: function (ctx) {
+    drawObject: function (ctx, renderingContext: RenderingContext) {
       ctx.save();
       ctx.fillStyle = 'black';
       ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
       ctx.restore();
-      this.callSuper('drawObject', ctx);
+      this.callSuper('drawObject', ctx, renderingContext);
     },
 
     /* _TO_SVG_START_ */
@@ -327,8 +329,8 @@ import { Point } from '../point.class';
      * so we need to render it on top of canvas every render
      * @param {CanvasRenderingContext2D} ctx
      */
-    _renderOverlay: function (ctx) {
-      __renderOverlay.call(this, ctx);
+    _renderOverlay: function (ctx, renderingContext: RenderingContext) {
+      __renderOverlay.call(this, ctx, renderingContext);
       this.isErasing() && this.freeDrawingBrush._render();
     },
   });
@@ -452,6 +454,9 @@ import { Point } from '../point.class';
           this._patternCanvas = fabric.util.createCanvasElement();
         }
         var canvas = this._patternCanvas;
+        const renderingContext = new RenderingContext({
+          action: 'canvas-export',
+        });
         objects =
           objects || this.canvas._objectsToRender || this.canvas._objects;
         canvas.width = this.canvas.width;
@@ -472,7 +477,7 @@ import { Point } from '../point.class';
           if (bgErasable) {
             this.canvas.backgroundImage = undefined;
           }
-          this.canvas._renderBackground(patternCtx);
+          this.canvas._renderBackground(patternCtx, renderingContext);
           if (bgErasable) {
             this.canvas.backgroundImage = backgroundImage;
           }
@@ -482,7 +487,7 @@ import { Point } from '../point.class';
             backgroundImage.eraser = undefined;
             backgroundImage.dirty = true;
           }
-          this.canvas._renderBackground(patternCtx);
+          this.canvas._renderBackground(patternCtx, renderingContext);
           if (eraser) {
             backgroundImage.eraser = eraser;
             backgroundImage.dirty = true;
@@ -497,7 +502,7 @@ import { Point } from '../point.class';
           patternCtx,
           restorationContext
         );
-        this.canvas._renderObjects(patternCtx, objects);
+        this.canvas._renderObjects(patternCtx, objects, renderingContext);
         restorationContext.visibility.forEach(function (obj) {
           obj.visible = true;
         });
@@ -518,7 +523,7 @@ import { Point } from '../point.class';
           if (overlayErasable) {
             this.canvas.overlayImage = undefined;
           }
-          __renderOverlay.call(this.canvas, patternCtx);
+          __renderOverlay.call(this.canvas, patternCtx, renderingContext);
           if (overlayErasable) {
             this.canvas.overlayImage = overlayImage;
           }
@@ -528,7 +533,7 @@ import { Point } from '../point.class';
             overlayImage.eraser = undefined;
             overlayImage.dirty = true;
           }
-          __renderOverlay.call(this.canvas, patternCtx);
+          __renderOverlay.call(this.canvas, patternCtx, renderingContext);
           if (eraser) {
             overlayImage.eraser = eraser;
             overlayImage.dirty = true;
