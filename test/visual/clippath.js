@@ -345,5 +345,70 @@
     height: 400,
   });
 
+  tests.push({
+    test: 'merge clip paths',
+    code: (canvas, callback) => {
+      const a = new fabric.Circle({ radius: 200, originX: 'center', originY: 'center', left: 50, top: -50 });
+      const b = new fabric.Circle({ radius: 200, originX: 'center', originY: 'center', left: -50, top: 50 });
+      const c = new fabric.Circle({ radius: 50, originX: 'center', originY: 'center',  inverted: true });
+      const d = new fabric.Circle({ radius: 50, originX: 'center', originY: 'center', left: 50, top: -75, inverted: true });
+      const circle = new fabric.Circle({
+        radius: 200,
+        left: -50,
+        top: -50,
+        clipPath: fabric.util.mergeClipPaths(a, b, c, d)
+      });
+      canvas.add(circle);
+      canvas.renderAll()
+      callback(canvas.lowerCanvasEl)
+    },
+    golden: 'merged-clippath.png',
+    percentage: 0.01,
+    width: 300,
+    height: 300,
+  });
+
+  tests.push({
+    test: 'merge clip paths: order doesn\'t matter',
+    code: (canvas, callback) => {
+      const a = new fabric.Circle({ radius: 200, originX: 'center', originY: 'center', left: 50, top: -50 });
+      const b = new fabric.Circle({ radius: 200, originX: 'center', originY: 'center', left: -50, top: 50 });
+      const c = new fabric.Circle({ radius: 50, originX: 'center', originY: 'center', inverted: true });
+      const d = new fabric.Circle({ radius: 50, originX: 'center', originY: 'center', left: 50, top: -75, inverted: true });
+      const circle = new fabric.Circle({
+        radius: 200,
+        left: -50,
+        top: -50,
+        clipPath: fabric.util.mergeClipPaths(a, c, b, d)
+      });
+      canvas.add(circle);
+      canvas.renderAll()
+      callback(canvas.lowerCanvasEl)
+    },
+    golden: 'merged-clippath.png',
+    percentage: 0.01,
+    width: 300,
+    height: 300,
+  });
+
+  tests.push({
+    test: 'merge clip paths: single',
+    code: (canvas, callback) => {
+      const a = new fabric.Circle({ radius: 200, originX: 'center', originY: 'center', left: 50, top: -50 });
+      const circle = new fabric.Circle({
+        radius: 200,
+        left: -50,
+        clipPath: fabric.util.mergeClipPaths(a)
+      });
+      canvas.add(circle);
+      canvas.renderAll()
+      callback(canvas.lowerCanvasEl)
+    },
+    golden: 'merged-clippath-single.png',
+    percentage: 0.01,
+    width: 350,
+    height: 350,
+  });
+
   tests.forEach(visualTestLoop(QUnit));
 })();
