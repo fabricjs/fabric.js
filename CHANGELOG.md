@@ -2,7 +2,7 @@
 
 ## [next]
 
-- test(): add visual tests for `mergeClipPaths`
+- test(): `mergeClipPaths` now accepts an number of clip paths, added visual tests for `mergeClipPaths` [#8347](https://github.com/fabricjs/fabric.js/pull/8347)
 - ci(build): safeguard concurrent unlocking [#8309](https://github.com/fabricjs/fabric.js/pull/8309)
 - ci(): update stale bot [#8307](https://github.com/fabricjs/fabric.js/pull/8307)
 - ci(test): await golden generation in visual tests [#8284](https://github.com/fabricjs/fabric.js/pull/8284)
