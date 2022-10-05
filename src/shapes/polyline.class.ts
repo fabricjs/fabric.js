@@ -106,10 +106,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
             offsetY = calcDim.top + calcDim.height/2;
         var pathOffsetX = offsetX - offsetY * Math.tan(degreesToRadians(this.skewX))
         var pathOffsetY = offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY))
-        this.pathOffset = {
-            x: pathOffsetX,
-            y: pathOffsetY
-        };
+        this.pathOffset = new Point(pathOffsetX, pathOffsetY);
       },
 
       /**
