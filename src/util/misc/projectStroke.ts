@@ -8,7 +8,7 @@ const PiBy2 = Math.PI / 2
 
 /**
  * Project stroke width on points returning projections for each point as follows:
- * - `miter`: 1 point corresponding to the outer boundary and the inner boundary of stroke.
+ * - `miter`: 1 point corresponding to the outer boundary. If the miter limit is exceeded, it will be 2 points (becomes bevel)
  * - `bevel`: 2 points corresponding to the bevel possible boundaries, orthogonal to the stroke.
  * - `round`: same as `bevel` when it has no skew, with skew are 4 points.
  * Used to calculate object's bounding box
@@ -26,7 +26,7 @@ const PiBy2 = Math.PI / 2
  * @param {number} options.scaleX
  * @param {number} options.scaleY
  * @param {boolean} [openPath] whether the shape is open or not, affects the calculations of the first and last points
- * @returns {returnedProjections} array of size n (for miter stroke) or 2n (for bevel or round) of all suspected points. Each element is an object with projectedPoint, originPoint and bisector?.
+ * @returns {returnedProjections} array of all suspected points.
  */
 
 type projectStrokeOnPointsOptions = {
@@ -72,9 +72,9 @@ export const projectStrokeOnPoints = (
     },
     applySkew = (v: Point) => {
       let vector = new Point(v);
-      vector.y += vector.x * Math.tan(degreesToRadians(skewY)) // skewY must be applied before skewX as this distortion affects skewX calculation
-      vector.x += vector.y * Math.tan(degreesToRadians(skewX))
-      return vector
+      vector.y += vector.x * Math.tan(degreesToRadians(skewY)); // skewY must be applied before skewX as this distortion affects skewX calculation
+      vector.x += vector.y * Math.tan(degreesToRadians(skewX));
+      return vector;
     };
 
   if (points.length <= 1) {
@@ -93,8 +93,6 @@ export const projectStrokeOnPoints = (
    * OPEN PATH START/END
    * If open path, no matter the type of the line join, the line is always the same
    * Calculation: to find the projections, just find the points orthogonal to that stroke 
-   * 
-   * TODO: take into account line-cap (I believe that should change the projections)
    * 
    * @see https://github.com/fabricjs/fabric.js/pull/8083
    */
@@ -122,7 +120,7 @@ export const projectStrokeOnPoints = (
 
   /**
    * BEVEL
-   * Calculation: the projection points are formed by the orthogonal to the vertex.
+   * Calculation: the projection points are formed by the vector orthogonal to the vertex.
    * 
    * @see https://github.com/fabricjs/fabric.js/pull/8083
    */
@@ -170,10 +168,10 @@ export const projectStrokeOnPoints = (
       scalar = -s / Math.sin(alpha / 2),
       miterVector = scaleHatVector(bisectorVector, scalar);
 
-    // When two line segments meet at a sharp angle, it is possible for the join to extend,
-    // it is possible for the join to extend far beyond the thickness of the line stroking
-    // the path. The stroke-miterlimit imposes a limit on the extent of the line join.
-    // MDN: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
+    /* When two line segments meet at a sharp angle, it is possible for the join to extend,
+      far beyond the thickness of the line stroking the path. The stroke-miterlimit imposes 
+      a limit on the extent of the line join.
+      MDN: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit */
     let adjustedStrokeMiterLimit;
     // When the stroke is uniform, scaling changes the arrangement of points, this changes the miter-limit
     if (strokeUniform) {
@@ -313,14 +311,10 @@ export const projectStrokeOnPoints = (
     C = new Point(C.x, C.y);
 
     if (openPath && (index === 0 || index === points.length - 1)) {
+      //TODO: take into account line-cap (I believe that should change the projections)
       coords.push(...projectionsOpenPath(index, A, B, C));
       return;
     }
-
-    /* CLOSED PATH
-      From here on, we will deal with closed path cases, which have different projections 
-      according to the line join type.
-    */
 
     // First we calculate the bisector between the points. Used in `round` and `miter` cases
     // When the stroke is uniform, scaling changes the arrangement of the points, so we have to take it into account
