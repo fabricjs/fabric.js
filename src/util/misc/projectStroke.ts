@@ -2,7 +2,6 @@ import { Point } from '../../point.class';
 import { calcAngleBetweenVectors, createVector, getBisector, getOrthogonalUnitVector } from './vectors';
 import { StrokeLineJoin, TDegree } from '../../typedefs';
 import { degreesToRadians } from './radiansDegreesConversion';
-import { hypot } from './hypot'
 
 const PiBy2 = Math.PI / 2
 
@@ -177,12 +176,12 @@ export const projectStrokeOnPoints = (
     if (strokeUniform) {
       // TODO: As it is in the MDN, the miterLimit can also be calculated as 1/sin(alpha/2) , I believe it is more performant than the current implementation.
       const miterLimitVector = scaleHatVector(bisectorVector, strokeMiterLimit * s);
-      adjustedStrokeMiterLimit = hypot(miterLimitVector.x, miterLimitVector.y) / s;
+      adjustedStrokeMiterLimit = miterLimitVector.magnitude() / s;
     } else {
       adjustedStrokeMiterLimit = strokeMiterLimit
     }
 
-    if (hypot(miterVector.x, miterVector.y) / s <= adjustedStrokeMiterLimit) {
+    if (miterVector.magnitude() / s <= adjustedStrokeMiterLimit) {
       const proj1 = applySkew(A.add(miterVector));
       return [{
         "projectedPoint": proj1,
