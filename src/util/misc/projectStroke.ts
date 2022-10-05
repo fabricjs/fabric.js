@@ -307,8 +307,8 @@ export const projectStrokeOnPoints = (
     }
 
     //  safeguard in case `points` are not `Point`
-    B = new Point(B.x, B.y);
-    C = new Point(C.x, C.y);
+    B = new Point(B);
+    C = new Point(C);
 
     if (openPath && (index === 0 || index === points.length - 1)) {
       //TODO: take into account line-cap (I believe that should change the projections)
