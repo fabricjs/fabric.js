@@ -102,10 +102,10 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
         if (typeof options.top === 'undefined') {
             this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
         }
-        var offsetX = calcDim.left + calcDim.width/2,
+        const offsetX = calcDim.left + calcDim.width/2,
             offsetY = calcDim.top + calcDim.height/2;
-        var pathOffsetX = offsetX - offsetY * Math.tan(degreesToRadians(this.skewX))
-        var pathOffsetY = offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY))
+        const pathOffsetX = offsetX - offsetY * Math.tan(degreesToRadians(this.skewX))
+        const pathOffsetY = offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY))
         this.pathOffset = new Point(pathOffsetX, pathOffsetY);
       },
 
