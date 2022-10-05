@@ -170,8 +170,8 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        */
       _set(key, value) {
         const output = this.callSuper('_set', key, value);
-        if (key === 'scaleX' || key === 'scaleY' ) {
-          this.strokeUniform && this.strokeLineJoin !== 'round' && this._setPositionDimensions();
+        if ((key === 'scaleX' || key === 'scaleY') && this.strokeUniform && this.strokeLineJoin !== 'round') {
+          this._setPositionDimensions();
         } else if (key === 'skewX' || key === 'skewY') { // TODO: check if you really need to recalculate for all cases
           this._setPositionDimensions();
         };
