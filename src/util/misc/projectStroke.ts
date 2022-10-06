@@ -209,8 +209,8 @@ export const projectStrokeOnPoints = (
     // correctSide is used to only consider projecting for the outer side 
     const bisectorVector = bisector.vector,
       correctSide = new Point(
-        Math.abs(Math.atan2(bisectorVector.y, bisectorVector.x)) >= PiBy2 ? 1 : -1, 
-        Math.abs(Math.atan2(bisectorVector.x, bisectorVector.y)) >= PiBy2 ? 1 : -1
+        Math.abs(calcAngleBetweenVectors(new Point(1, 0), bisectorVector)) >= PiBy2 ? 1 : -1, 
+        Math.abs(calcAngleBetweenVectors(new Point(1, 0), new Point(bisectorVector.y, bisectorVector.x))) >= PiBy2 ? 1 : -1
       ),
       radiusOnAxisX = new Point(s * strokeUniformScalar.x, 0).multiply(correctSide), 
       radiusOnAxisY = new Point(0, s * strokeUniformScalar.y).multiply(correctSide),
