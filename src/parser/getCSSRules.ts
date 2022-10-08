@@ -5,16 +5,16 @@
  * @param {SVGDocument} doc SVG document to parse
  * @return {Object} CSS rules of this document
  */
-export function getCSSRules(doc) {
-  let styles = doc.getElementsByTagName('style'),
-    i,
-    len,
-    allRules = {},
-    rules;
+export function getCSSRules(doc: Document) {
+  const styles = doc.getElementsByTagName('style'),
+    allRules = {};
+  let rules;
+  console.log("IN", styles);
 
   // very crude parsing of style contents
-  for (i = 0, len = styles.length; i < len; i++) {
-    let styleContents = styles[i].textContent;
+  for (const style of styles) {
+    let styleContents = style.textContent;
+    if(!styleContents) continue;
 
     // remove comments
     styleContents = styleContents.replace(/\/\*[\s\S]*?\*\//g, '');
@@ -38,8 +38,8 @@ export function getCSSRules(doc) {
           return pair.trim();
         });
 
-      for (i = 0, len = propertyValuePairs.length; i < len; i++) {
-        const pair = propertyValuePairs[i].split(':'),
+      for (const propertyValuePair of propertyValuePairs) {
+        const pair = propertyValuePair.split(':'),
           property = pair[0].trim(),
           value = pair[1].trim();
         ruleObj[property] = value;
@@ -58,5 +58,6 @@ export function getCSSRules(doc) {
       });
     });
   }
+  console.log("OUT", allRules);
   return allRules;
 }

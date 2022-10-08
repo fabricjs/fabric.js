@@ -1,5 +1,3 @@
-//@ts-nocheck
-
 import { elementById } from './elementById';
 
 const gradientsAttrs = [
@@ -17,9 +15,20 @@ const gradientsAttrs = [
 ];
 const xlinkAttr = 'xlink:href';
 
-export function recursivelyParseGradientsXlink(doc, gradient) {
-  const xLink = gradient.getAttribute(xlinkAttr).slice(1),
+/**
+ * Cannot parse if gradient is null
+ * @param doc
+ * @param gradient
+ */
+export function recursivelyParseGradientsXlink(
+  doc: Document,
+  gradient: Element
+): void {
+  const xLinkFull = gradient.getAttribute(xlinkAttr);
+  if (!xLinkFull) return;
+  const xLink = xLinkFull.slice(1),
     referencedGradient = elementById(doc, xLink);
+  if (!referencedGradient) return;
   if (referencedGradient && referencedGradient.getAttribute(xlinkAttr)) {
     recursivelyParseGradientsXlink(doc, referencedGradient);
   }
@@ -29,7 +38,7 @@ export function recursivelyParseGradientsXlink(doc, gradient) {
       !gradient.hasAttribute(attr) &&
       referencedGradient.hasAttribute(attr)
     ) {
-      gradient.setAttribute(attr, referencedGradient.getAttribute(attr));
+      gradient.setAttribute(attr, referencedGradient.getAttribute(attr) ?? '');
     }
   });
   if (!gradient.children.length) {

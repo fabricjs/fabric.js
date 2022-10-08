@@ -1,7 +1,11 @@
-//@ts-nocheck
-
-export function hasAncestorWithNodeName(element, nodeName) {
-  while (element && (element = element.parentNode)) {
+/**
+ * Helper function
+ * @param element
+ * @param nodeName
+ */
+export function hasAncestorWithNodeName(element: Element | null, nodeName: string | RegExp) {
+  nodeName = new RegExp(nodeName);
+  while (element) {
     if (
       element.nodeName &&
       nodeName.test(element.nodeName.replace('svg:', '')) &&
@@ -9,6 +13,7 @@ export function hasAncestorWithNodeName(element, nodeName) {
     ) {
       return true;
     }
+    element = element.parentNode as Element;
   }
   return false;
 }
