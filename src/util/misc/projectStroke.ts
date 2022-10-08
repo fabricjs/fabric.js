@@ -12,7 +12,7 @@ const PiBy2 = Math.PI / 2
  * - `round`: same as `bevel` when it has no skew, with skew are 4 points.
  * Used to calculate object's bounding box
  * 
- * @see https://github.com/fabricjs/fabric.js/pull/8083
+ * @see https://github.com/fabricjs/fabric.js/pull/8344
  * 
  * @static
  * @memberOf fabric.util
@@ -85,17 +85,17 @@ export const projectStrokeOnPoints = (
     MDN: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-linejoin
     Spec: https://svgwg.org/svg2-draft/painting.html#StrokeLinejoinProperty
     Playground to understand how the line joins works: https://hypertolosana.github.io/efficient-webgl-stroking/index.html
-    View the calculated projections here for each of the control points: https://codesandbox.io/s/project-stroke-points-with-context-to-trace-b8jc4j?file=/src/index.js
+    View the calculated projections for each of the control points: https://codesandbox.io/s/project-stroke-points-with-context-to-trace-b8jc4j?file=/src/index.js
   */
 
   /**
-   * OPEN PATH START/END
+   * OPEN PATH START/END - Line cap: Butt
    * If open path, no matter the type of the line join, the line is always the same
    * Calculation: to find the projections, just find the points orthogonal to that stroke 
    * 
-   * @see https://github.com/fabricjs/fabric.js/pull/8083
+   * @see https://github.com/fabricjs/fabric.js/pull/8344#1-1-butt
    */
-  const projectionsOpenPath = (
+  const projectionsOpenPathButt = (
     index: number, 
     A: Point, 
     B: Point, 
@@ -121,7 +121,7 @@ export const projectStrokeOnPoints = (
    * BEVEL
    * Calculation: the projection points are formed by the vector orthogonal to the vertex.
    * 
-   * @see https://github.com/fabricjs/fabric.js/pull/8083
+   * @see https://github.com/fabricjs/fabric.js/pull/8344#2-2-bevel
    */
   const projectionsBevel = (
     A: Point,
@@ -154,7 +154,7 @@ export const projectStrokeOnPoints = (
    * 
    * TODO: check if Math#abs is really needed at alpha angle
    * 
-   * @see https://github.com/fabricjs/fabric.js/pull/8083
+   * @see https://github.com/fabricjs/fabric.js/pull/8344#2-1-miter
    */
   const projectionsMiter = (
     A: Point,
@@ -198,7 +198,7 @@ export const projectStrokeOnPoints = (
    * ROUND (without skew)
    * Calculation: the projections are the two vectors parallel to X and Y axes
    * 
-   * @see https://github.com/fabricjs/fabric.js/pull/8083
+   * @see https://github.com/fabricjs/fabric.js/pull/8344#2-3-1-round-without-skew
    */
   const projectionsRoundNoSkew = (
     A: Point,
@@ -235,7 +235,7 @@ export const projectStrokeOnPoints = (
    *  - Consider only projections that are inside the beginning and end of the circle segment
    *  - Still buggy when skewX and skewY are applied at the same time
    * 
-   * @see https://github.com/fabricjs/fabric.js/pull/8083
+   * @see https://github.com/fabricjs/fabric.js/pull/8344#2-3-2-round-skew
    */
   const projectionsRoundWithSkew = (
     A: Point,
@@ -312,7 +312,7 @@ export const projectStrokeOnPoints = (
 
     if (openPath && (index === 0 || index === points.length - 1)) {
       //TODO: take into account line-cap (I believe that should change the projections)
-      coords.push(...projectionsOpenPath(index, A, B, C));
+      coords.push(...projectionsOpenPathButt(index, A, B, C));
       return;
     }
 
