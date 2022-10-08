@@ -152,8 +152,6 @@ export const projectStrokeOnPoints = (
    * Calculation: the corner is formed by extending the outer edges of the stroke 
    * at the tangents of the path segments until they intersect.
    * 
-   * TODO: check if Math#abs is really needed at alpha angle
-   * 
    * @see https://github.com/fabricjs/fabric.js/pull/8344#2-1-miter
    */
   const projectionsMiter = (
