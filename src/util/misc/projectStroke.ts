@@ -174,11 +174,9 @@ export const projectStrokeOnPoints = (
     let adjustedStrokeMiterLimit;
     // When the stroke is uniform, scaling changes the arrangement of points, this changes the miter-limit
     if (strokeUniform) {
-      // TODO: As it is in the MDN, the miterLimit can also be calculated as 1/sin(alpha/2) , I believe it is more performant than the current implementation.
-      const miterLimitVector = scaleHatVector(bisectorVector, strokeMiterLimit * s);
-      adjustedStrokeMiterLimit = miterLimitVector.magnitude() / s;
+      adjustedStrokeMiterLimit = 1 / Math.sin(alpha/2);
     } else {
-      adjustedStrokeMiterLimit = strokeMiterLimit
+      adjustedStrokeMiterLimit = strokeMiterLimit;
     }
 
     if (miterVector.magnitude() / s <= adjustedStrokeMiterLimit) {
