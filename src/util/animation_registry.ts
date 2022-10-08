@@ -2,17 +2,19 @@ import { fabric } from '../../HEADER';
 import { Canvas, TObject } from '../__types__';
 import { AnimationContext, TCancelFunction } from './animate';
 
+type TAnimation = AnimationContext<number> | AnimationContext<number[]>;
+
 /**
  * Array holding all running animations
  * @memberof fabric
  * @type {AnimationContext[]}
  */
-class RunningAnimations extends Array<AnimationContext> {
+class RunningAnimations extends Array<TAnimation> {
   /**
    * cancel all running animations at the next requestAnimFrame
    * @returns {AnimationContext[]}
    */
-  cancelAll(): AnimationContext[] {
+  cancelAll(): TAnimation[] {
     const animations = this.splice(0);
     animations.forEach((animation) => animation.cancel());
     return animations;
@@ -23,7 +25,7 @@ class RunningAnimations extends Array<AnimationContext> {
    * @param {fabric.Canvas} canvas
    * @returns {AnimationContext[]}
    */
-  cancelByCanvas(canvas: Canvas): AnimationContext[] {
+  cancelByCanvas(canvas: Canvas): TAnimation[] {
     if (!canvas) {
       return [];
     }
@@ -41,7 +43,7 @@ class RunningAnimations extends Array<AnimationContext> {
    * @param {*} target
    * @returns {AnimationContext[]}
    */
-  cancelByTarget(target: AnimationContext['target']): AnimationContext[] {
+  cancelByTarget(target: TAnimation['target']): TAnimation[] {
     const cancelled = this.findAnimationsByTarget(target);
     cancelled.forEach((animation) => animation.cancel());
     return cancelled;
@@ -61,7 +63,7 @@ class RunningAnimations extends Array<AnimationContext> {
    * @param {TCancelFunction} cancelFunc the function returned by animate
    * @returns {AnimationContext | undefined} animation's options object
    */
-  findAnimation(cancelFunc: TCancelFunction): AnimationContext | undefined {
+  findAnimation(cancelFunc: TCancelFunction): TAnimation | undefined {
     return this.find((animation) => animation.cancel === cancelFunc);
   }
 
@@ -70,9 +72,7 @@ class RunningAnimations extends Array<AnimationContext> {
    * @param {*} target the object that is assigned to the target property of the animation context
    * @returns {AnimationContext[]} array of animation options object associated with target
    */
-  findAnimationsByTarget(
-    target: AnimationContext['target']
-  ): AnimationContext[] {
+  findAnimationsByTarget(target: TAnimation['target']): TAnimation[] {
     if (!target) {
       return [];
     }
