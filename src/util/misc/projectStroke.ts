@@ -211,8 +211,8 @@ export const projectStrokeOnPoints = (
       ),
       radiusOnAxisX = new Point(s * strokeUniformScalar.x, 0).multiply(correctSide), 
       radiusOnAxisY = new Point(0, s * strokeUniformScalar.y).multiply(correctSide),
-      proj1 = applySkew(A.add(radiusOnAxisX)), 
-      proj2 = applySkew(A.add(radiusOnAxisY));
+      proj1 = A.add(radiusOnAxisX), 
+      proj2 = A.add(radiusOnAxisY);
 
     return [proj1, proj2].map(proj => ({
       "projectedPoint": proj,
