@@ -1,15 +1,15 @@
-//@ts-nocheck
+export type TCSSRules = Record<string, string>;
+export type TCSSRulesCollection = Record<string, TCSSRules>;
 
 /**
  * Returns CSS rules for a given SVG document
  * @param {SVGDocument} doc SVG document to parse
  * @return {Object} CSS rules of this document
  */
-export function getCSSRules(doc: Document) {
+export function getCSSRules(doc: Document): TCSSRulesCollection {
   const styles = doc.getElementsByTagName('style'),
-    allRules = {};
-  let rules;
-  console.log("IN", styles);
+    allRules: TCSSRulesCollection = {};
+  let rules: Array<string>;
 
   // very crude parsing of style contents
   for (const style of styles) {
@@ -32,7 +32,7 @@ export function getCSSRules(doc: Document) {
     // eslint-disable-next-line no-loop-func
     rules.forEach(function (rule) {
       const match = rule.split('{'),
-        ruleObj = {},
+        ruleObj: TCSSRules = {},
         declaration = match[1].trim(),
         propertyValuePairs = declaration.split(';').filter(function (pair) {
           return pair.trim();
@@ -53,11 +53,10 @@ export function getCSSRules(doc: Document) {
         if (allRules[_rule]) {
           Object.assign(allRules[_rule], ruleObj);
         } else {
-          allRules[_rule] = Object.assign({}, ruleObj);
+          allRules[_rule] = Object.assign<TCSSRules, TCSSRules>({}, ruleObj);
         }
       });
     });
   }
-  console.log("OUT", allRules);
   return allRules;
 }
