@@ -78,11 +78,19 @@
     var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 }], {
       exactBoundingBox: true,
       strokeWidth: 60,
+      stroke: 'blue'
     });
 
     var dimensions = polygon._getNonTransformedDimensions();
     assert.equal(Math.round(dimensions.x), 74);
-    assert.equal(Math.round(dimensions.y), 162);
+    assert.equal(Math.round(dimensions.y), 123);
+
+    polygon.set('strokeMiterLimit', 999);
+    polygon._setPositionDimensions();
+    dimensions = polygon._getNonTransformedDimensions();
+    assert.equal(Math.round(dimensions.x), 74);
+    //  TODO this is WRONG
+    assert.equal(Math.round(dimensions.y), 1083);
   });
 
   QUnit.test('complexity', function(assert) {
