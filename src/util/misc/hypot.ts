@@ -1,6 +1,6 @@
 /**
  * Returns the square root of the sum of squares of its arguments\
- * Chrome implements `Math#hypot` with a calculation that affects percision so we hard code it as a util
+ * Chrome implements `Math#hypot` with a calculation that affects precision so we hard code it as a util
  * @see https://stackoverflow.com/questions/62931950/different-results-of-math-hypot-on-chrome-and-firefox
  * @static
  * @memberOf fabric.util
