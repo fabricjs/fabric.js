@@ -1268,7 +1268,7 @@
           charIndex++;
           var thisStyle = styles[i][c];
           //check if style exists for this character
-          if (thisStyle) {
+          if (thisStyle && Object.keys(thisStyle).length > 0) {
             var styleChanged = fabric.util.hasStyleChanged(prevStyle, thisStyle, true);
             if (styleChanged) {
               stylesArray.push({
