@@ -1,13 +1,14 @@
-import { Point } from '../../point.class';
+import { halfPI } from '../../constants';
+import { IPoint, Point } from '../../point.class';
+import { StrokeLineJoin, TDegree } from '../../typedefs';
+import { degreesToRadians } from './radiansDegreesConversion';
 import {
   calcAngleBetweenVectors,
+  calcVectorRotation,
   createVector,
   getBisector,
   getOrthogonalUnitVector,
 } from './vectors';
-import { StrokeLineJoin, TDegree } from '../../typedefs';
-import { degreesToRadians } from './radiansDegreesConversion';
-import { halfPI } from '../../constants';
 
 type TProjectStrokeOnPointsOptions = {
   strokeWidth: number;
@@ -87,10 +88,8 @@ export const projectStrokeOnPoints = (
       //TODO: take into account line-cap (I believe that should change the projections)
       coords.push(
         ...projectionsOpenPathButt(
-          index,
           A,
-          B,
-          C,
+          index === 0 ? C : B,
           strokeUniformScalar,
           scale,
           strokeProjectionMagnitude,
@@ -173,8 +172,23 @@ export const projectStrokeOnPoints = (
   return coords;
 };
 
-const isAcute = (vector1: Point, vector2: Point): boolean =>
+const isAngleAcute = (vector1: Point, vector2: Point): boolean =>
   Math.abs(calcAngleBetweenVectors(vector1, vector2)) < halfPI;
+
+const isVectorAcute = (vector: Point): boolean =>
+  Math.abs(calcVectorRotation(vector)) < halfPI;
+
+/**
+ * When the stroke is uniform, scaling affects the arrangement of points. So we must take it into account.
+ */
+const createSideVector = (
+  from: IPoint,
+  to: IPoint,
+  { strokeUniform, scale }: { strokeUniform: boolean; scale: Point }
+) => {
+  const v = createVector(from, to);
+  return strokeUniform ? v.multiply(scale) : v;
+};
 
 const scaleHatVector = (
   hatVector: Point,
@@ -211,10 +225,8 @@ const applySkew = (
  * @see https://github.com/fabricjs/fabric.js/pull/8344#1-1-butt
  */
 const projectionsOpenPathButt = (
-  index: number,
   A: Point,
-  B: Point,
-  C: Point,
+  to: Point,
   strokeUniformScalar: Point,
   scale: Point,
   s: number,
@@ -222,12 +234,7 @@ const projectionsOpenPathButt = (
   skewX: TProjectStrokeOnPointsOptions['skewX'],
   skewY: TProjectStrokeOnPointsOptions['skewY']
 ): TReturnedProjection[] => {
-  const D = index === 0 ? C : B,
-    // When the stroke is uniform, scaling affects the arrangement of points. So we must take it into account.
-    vector = createVector(
-      strokeUniform ? A.multiply(scale) : A,
-      strokeUniform ? D.multiply(scale) : D
-    ),
+  const vector = createSideVector(A, to, { scale, strokeUniform }),
     hatOrthogonalVector = getOrthogonalUnitVector(vector),
     orthogonalVector = scaleHatVector(
       hatOrthogonalVector,
@@ -261,19 +268,11 @@ const projectionsBevel = (
   skewX: TProjectStrokeOnPointsOptions['skewX'],
   skewY: TProjectStrokeOnPointsOptions['skewY']
 ): TReturnedProjection[] => {
-  const AB = createVector(
-      strokeUniform ? A.multiply(scale) : A,
-      strokeUniform ? B.multiply(scale) : B
-    ),
-    AC = createVector(
-      strokeUniform ? A.multiply(scale) : A,
-      strokeUniform ? C.multiply(scale) : C
-    ),
-    bisectorVector = bisector.vector;
-
-  return [AB, AC].map((vector) => {
-    const hatOrthogonal = getOrthogonalUnitVector(vector),
-      correctSide = isAcute(hatOrthogonal, bisectorVector) ? -1 : 1,
+  const { vector: bisectorVector } = bisector;
+  return [B, C].map((to) => {
+    const sideVector = createSideVector(A, to, { strokeUniform, scale });
+    const hatOrthogonal = getOrthogonalUnitVector(sideVector),
+      correctSide = isAngleAcute(hatOrthogonal, bisectorVector) ? -1 : 1,
       orthogonal = scaleHatVector(
         hatOrthogonal,
         s * correctSide,
@@ -284,7 +283,7 @@ const projectionsBevel = (
     return {
       projectedPoint: proj1,
       originPoint: A,
-      bisector: bisector,
+      bisector,
     };
   });
 };
@@ -309,22 +308,25 @@ const projectionsMiter = (
   skewY: TProjectStrokeOnPointsOptions['skewY'],
   strokeMiterLimit: TProjectStrokeOnPointsOptions['strokeMiterLimit']
 ): TReturnedProjection[] => {
-  const bisectorVector = bisector.vector,
+  const { vector: bisectorVector } = bisector,
     alpha = Math.abs(bisector.angle),
-    scalar = -s / Math.sin(alpha / 2),
-    miterVector = scaleHatVector(bisectorVector, scalar, strokeUniformScalar);
+    hypotUnitScalar = 1 / Math.sin(alpha / 2),
+    miterVector = scaleHatVector(
+      bisectorVector,
+      -s * hypotUnitScalar,
+      strokeUniformScalar
+    );
 
-  /* When two line segments meet at a sharp angle, it is possible for the join to extend,
+  /*
+    When two line segments meet at a sharp angle, it is possible for the join to extend,
     far beyond the thickness of the line stroking the path. The stroke-miterlimit imposes 
     a limit on the extent of the line join.
-    MDN: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit */
-  let adjustedStrokeMiterLimit;
-  // When the stroke is uniform, scaling changes the arrangement of points, this changes the miter-limit
-  if (strokeUniform) {
-    adjustedStrokeMiterLimit = 1 / Math.sin(alpha / 2);
-  } else {
-    adjustedStrokeMiterLimit = strokeMiterLimit;
-  }
+    MDN: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit 
+    When the stroke is uniform, scaling changes the arrangement of points, this changes the miter-limit
+    */
+  const adjustedStrokeMiterLimit = strokeUniform
+    ? hypotUnitScalar
+    : strokeMiterLimit;
 
   if (miterVector.magnitude() / s <= adjustedStrokeMiterLimit) {
     const proj1 = applySkew(A.add(miterVector), skewX, skewY);
@@ -332,7 +334,7 @@ const projectionsMiter = (
       {
         projectedPoint: proj1,
         originPoint: A,
-        bisector: bisector,
+        bisector,
       },
     ];
   } else {
@@ -365,13 +367,10 @@ const projectionsRoundNoSkew = (
   strokeUniformScalar: Point
 ): TReturnedProjection[] => {
   // correctSide is used to only consider projecting for the outer side
-  const bisectorVector = bisector.vector,
-    hatVectorAxisX = new Point(1, 0),
+  const { vector: bisectorVector } = bisector,
     correctSide = new Point(
-      isAcute(hatVectorAxisX, bisectorVector) ? -1 : 1,
-      isAcute(hatVectorAxisX, new Point(bisectorVector.y, bisectorVector.x))
-        ? -1
-        : 1
+      isVectorAcute(bisectorVector) ? -1 : 1,
+      isVectorAcute(new Point(bisectorVector.y, bisectorVector.x)) ? -1 : 1
     ),
     radiusOnAxisX = new Point(s * strokeUniformScalar.x, 0).multiply(
       correctSide
@@ -385,7 +384,7 @@ const projectionsRoundNoSkew = (
   return [proj1, proj2].map((proj) => ({
     projectedPoint: proj,
     originPoint: A,
-    bisector: bisector,
+    bisector,
   }));
 };
 
@@ -412,22 +411,14 @@ const projectionsRoundWithSkew = (
   skewX: TProjectStrokeOnPointsOptions['skewX'],
   skewY: TProjectStrokeOnPointsOptions['skewY']
 ): TReturnedProjection[] => {
-  const bisectorVector = bisector.vector,
-    AB = createVector(
-      strokeUniform ? A.multiply(scale) : A,
-      strokeUniform ? B.multiply(scale) : B
-    ),
-    AC = createVector(
-      strokeUniform ? A.multiply(scale) : A,
-      strokeUniform ? C.multiply(scale) : C
-    );
-
+  const { vector: bisectorVector } = bisector;
   const finalProjs: TReturnedProjection[] = [];
 
   // The start and end points of the circle segment
-  [AB, AC].forEach((vector) => {
-    const hatOrthogonal = getOrthogonalUnitVector(vector),
-      correctSide = isAcute(hatOrthogonal, bisectorVector) ? -1 : 1,
+  [B, C].forEach((to) => {
+    const sideVector = createSideVector(A, to, { strokeUniform, scale });
+    const hatOrthogonal = getOrthogonalUnitVector(sideVector),
+      correctSide = isAngleAcute(hatOrthogonal, bisectorVector) ? -1 : 1,
       orthogonal = scaleHatVector(
         hatOrthogonal,
         s * correctSide,
@@ -437,7 +428,7 @@ const projectionsRoundWithSkew = (
     finalProjs.push({
       projectedPoint: proj1,
       originPoint: A,
-      bisector: bisector,
+      bisector,
     });
   });
 
@@ -464,12 +455,12 @@ const projectionsRoundWithSkew = (
     finalProjs.push({
       projectedPoint: applySkew(A.add(vector), skewX, skewY),
       originPoint: A,
-      bisector: bisector,
+      bisector,
     });
     finalProjs.push({
       projectedPoint: applySkew(A.subtract(vector), skewX, skewY),
       originPoint: A,
-      bisector: bisector,
+      bisector,
     });
   });
 

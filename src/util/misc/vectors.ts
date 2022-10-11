@@ -1,6 +1,8 @@
 import { IPoint, Point } from '../../point.class';
 import { TRadian } from '../../typedefs';
 
+const unitVectorX = new Point(1, 0);
+
 /**
  * Rotates `vector` with `radians`
  * @static
@@ -25,9 +27,7 @@ export const createVector = (from: Point | IPoint, to: Point | IPoint): Point =>
   new Point(to).subtract(from);
 
 /**
- * Calculates angle between 2 vectors
- * @static
- * @memberOf fabric.util
+ * Calculates the angle between 2 vectors
  * @param {Point} a
  * @param {Point} b
  * @returns the angle in radians from `a` to `b`
@@ -39,16 +39,20 @@ export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian => {
 };
 
 /**
- * @static
- * @memberOf fabric.util
+ * Calculates the angle between the x axis and the vector
+ * @param {Point} v
+ * @returns the angle in radians of `v`
+ */
+export const calcVectorRotation = (v: Point) =>
+  calcAngleBetweenVectors(unitVectorX, v);
+
+/**
  * @param {Point} v
  * @returns {Point} vector representing the unit vector pointing to the direction of `v`
  */
 export const getHatVector = (v: Point): Point => v.scalarDivide(v.magnitude());
 
 /**
- * @static
- * @memberOf fabric.util
  * @param {Point} A
  * @param {Point} B
  * @param {Point} C
@@ -65,8 +69,6 @@ export const getBisector = (A: Point, B: Point, C: Point) => {
 };
 
 /**
- * @static
- * @memberOf fabric.util
  * @param {Point} v
  * @param {Boolean} [counterClockwise] the direction of the orthogonal vector, defaults to `true`
  * @returns {Point} the unit orthogonal vector
