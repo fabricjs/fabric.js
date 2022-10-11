@@ -421,7 +421,7 @@ const projectionsRoundWithSkew = (
   const finalProjs: TReturnedProjection[] = [];
 
   // The start and end points of the circle segment
-  [AB, AC].forEach(function (vector) {
+  [AB, AC].forEach((vector) => {
     const hatOrthogonal = getOrthogonalUnitVector(vector),
       correctSide = isAcute(hatOrthogonal, bisectorVector) ? -1 : 1,
       orthogonal = scaleHatVector(
@@ -456,7 +456,7 @@ const projectionsRoundWithSkew = (
       )
     );
 
-  [furthestX, furthestY].forEach(function (vector) {
+  [furthestX, furthestY].forEach((vector) => {
     finalProjs.push({
       projectedPoint: applySkew(A.add(vector), skewX, skewY),
       originPoint: A,
