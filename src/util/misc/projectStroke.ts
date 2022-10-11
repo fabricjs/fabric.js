@@ -53,16 +53,17 @@ export const projectStrokeOnPoints = (
   }: TProjectStrokeOnPointsOptions,
   openPath: boolean
 ): TReturnedProjection[] => {
-  const coords: TReturnedProjection[] = [],
-    s = strokeWidth / 2,
-    scale = new Point(scaleX, scaleY),
-    strokeUniformScalar = strokeUniform
-      ? new Point(1 / scaleX, 1 / scaleY)
-      : new Point(1, 1);
+  const coords: TReturnedProjection[] = [];
 
   if (points.length <= 1) {
     return coords;
   }
+
+  const strokeProjectionMagnitude = strokeWidth / 2,
+    scale = new Point(scaleX, scaleY),
+    strokeUniformScalar = strokeUniform
+      ? new Point(1 / scaleX, 1 / scaleY)
+      : new Point(1, 1);
 
   points.forEach((p, index) => {
     const A = new Point(p);
@@ -92,7 +93,7 @@ export const projectStrokeOnPoints = (
           C,
           strokeUniformScalar,
           scale,
-          s,
+          strokeProjectionMagnitude,
           strokeUniform,
           skewX,
           skewY
@@ -116,7 +117,7 @@ export const projectStrokeOnPoints = (
           bisector,
           strokeUniformScalar,
           scale,
-          s,
+          strokeProjectionMagnitude,
           strokeUniform,
           skewX,
           skewY,
@@ -126,7 +127,12 @@ export const projectStrokeOnPoints = (
       return;
     } else if (strokeLineJoin === 'round' && skewX === 0 && skewY === 0) {
       coords.push(
-        ...projectionsRoundNoSkew(A, bisector, s, strokeUniformScalar)
+        ...projectionsRoundNoSkew(
+          A,
+          bisector,
+          strokeProjectionMagnitude,
+          strokeUniformScalar
+        )
       );
       return;
     } else if (strokeLineJoin === 'round' && (skewX !== 0 || skewY !== 0)) {
@@ -138,7 +144,7 @@ export const projectStrokeOnPoints = (
           bisector,
           strokeUniformScalar,
           scale,
-          s,
+          strokeProjectionMagnitude,
           strokeUniform,
           skewX,
           skewY
@@ -154,7 +160,7 @@ export const projectStrokeOnPoints = (
           bisector,
           strokeUniformScalar,
           scale,
-          s,
+          strokeProjectionMagnitude,
           strokeUniform,
           skewX,
           skewY
