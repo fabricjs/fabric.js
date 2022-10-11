@@ -9,10 +9,13 @@ import { StrokeLineJoin, TDegree } from '../../typedefs';
 import { degreesToRadians } from './radiansDegreesConversion';
 import { halfPI } from '../../constants';
 
-type projectStrokeOnPointsOptions = {
+type TProjectStrokeOnPointsOptions = {
   strokeWidth: number;
   strokeLineJoin: StrokeLineJoin;
-  strokeMiterLimit: number; // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
+  /**
+   * https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
+   */
+  strokeMiterLimit: number;
   strokeUniform: boolean;
   scaleX: number;
   scaleY: number;
@@ -20,11 +23,11 @@ type projectStrokeOnPointsOptions = {
   skewY: TDegree;
 };
 
-type returnedProjections = {
+type TReturnedProjection = {
   projectedPoint: Point;
   originPoint: Point;
   bisector?: ReturnType<typeof getBisector>;
-}[];
+};
 
 /**
  * Project stroke width on points returning projections for each point as follows:
@@ -35,24 +38,22 @@ type returnedProjections = {
  *
  * @see https://github.com/fabricjs/fabric.js/pull/8344
  *
- * @static
- * @memberOf fabric.util
  */
 export const projectStrokeOnPoints = (
   points: Point[],
   {
     strokeWidth,
     strokeLineJoin,
-    strokeMiterLimit, // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
+    strokeMiterLimit,
     strokeUniform,
     scaleX,
     scaleY,
     skewX,
     skewY,
-  }: projectStrokeOnPointsOptions,
+  }: TProjectStrokeOnPointsOptions,
   openPath: boolean
-): returnedProjections => {
-  const coords: returnedProjections = [],
+): TReturnedProjection[] => {
+  const coords: TReturnedProjection[] = [],
     s = strokeWidth / 2,
     scale = new Point(scaleX, scaleY),
     strokeUniformScalar = strokeUniform
@@ -63,10 +64,9 @@ export const projectStrokeOnPoints = (
     return coords;
   }
 
-  points.forEach(function (p, index) {
-    let A = new Point(p.x, p.y),
-      B,
-      C;
+  points.forEach((p, index) => {
+    const A = new Point(p);
+    let B, C;
     if (index === 0) {
       C = points[index + 1];
       B = openPath ? A : points[points.length - 1];
@@ -180,10 +180,10 @@ const scaleHatVector = (
 
 const applySkew = (
   v: Point,
-  skewX: projectStrokeOnPointsOptions['skewX'],
-  skewY: projectStrokeOnPointsOptions['skewY']
+  skewX: TProjectStrokeOnPointsOptions['skewX'],
+  skewY: TProjectStrokeOnPointsOptions['skewY']
 ): Point => {
-  let vector = new Point(v);
+  const vector = new Point(v);
   vector.y += vector.x * Math.tan(degreesToRadians(skewY)); // skewY must be applied before skewX as this distortion affects skewX calculation
   vector.x += vector.y * Math.tan(degreesToRadians(skewX));
   return vector;
@@ -212,10 +212,10 @@ const projectionsOpenPathButt = (
   strokeUniformScalar: Point,
   scale: Point,
   s: number,
-  strokeUniform: projectStrokeOnPointsOptions['strokeUniform'],
-  skewX: projectStrokeOnPointsOptions['skewX'],
-  skewY: projectStrokeOnPointsOptions['skewY']
-): returnedProjections => {
+  strokeUniform: TProjectStrokeOnPointsOptions['strokeUniform'],
+  skewX: TProjectStrokeOnPointsOptions['skewX'],
+  skewY: TProjectStrokeOnPointsOptions['skewY']
+): TReturnedProjection[] => {
   const D = index === 0 ? C : B,
     // When the stroke is uniform, scaling affects the arrangement of points. So we must take it into account.
     vector = createVector(
@@ -253,10 +253,10 @@ const projectionsBevel = (
   strokeUniformScalar: Point,
   scale: Point,
   s: number,
-  strokeUniform: projectStrokeOnPointsOptions['strokeUniform'],
-  skewX: projectStrokeOnPointsOptions['skewX'],
-  skewY: projectStrokeOnPointsOptions['skewY']
-): returnedProjections => {
+  strokeUniform: TProjectStrokeOnPointsOptions['strokeUniform'],
+  skewX: TProjectStrokeOnPointsOptions['skewX'],
+  skewY: TProjectStrokeOnPointsOptions['skewY']
+): TReturnedProjection[] => {
   const AB = createVector(
       strokeUniform ? A.multiply(scale) : A,
       strokeUniform ? B.multiply(scale) : B
@@ -300,11 +300,11 @@ const projectionsMiter = (
   strokeUniformScalar: Point,
   scale: Point,
   s: number,
-  strokeUniform: projectStrokeOnPointsOptions['strokeUniform'],
-  skewX: projectStrokeOnPointsOptions['skewX'],
-  skewY: projectStrokeOnPointsOptions['skewY'],
-  strokeMiterLimit: projectStrokeOnPointsOptions['strokeMiterLimit']
-): returnedProjections => {
+  strokeUniform: TProjectStrokeOnPointsOptions['strokeUniform'],
+  skewX: TProjectStrokeOnPointsOptions['skewX'],
+  skewY: TProjectStrokeOnPointsOptions['skewY'],
+  strokeMiterLimit: TProjectStrokeOnPointsOptions['strokeMiterLimit']
+): TReturnedProjection[] => {
   const bisectorVector = bisector.vector,
     alpha = Math.abs(bisector.angle),
     scalar = -s / Math.sin(alpha / 2),
@@ -359,7 +359,7 @@ const projectionsRoundNoSkew = (
   bisector: ReturnType<typeof getBisector>,
   s: number,
   strokeUniformScalar: Point
-): returnedProjections => {
+): TReturnedProjection[] => {
   // correctSide is used to only consider projecting for the outer side
   const bisectorVector = bisector.vector,
     hatVectorAxisX = new Point(1, 0),
@@ -404,10 +404,10 @@ const projectionsRoundWithSkew = (
   strokeUniformScalar: Point,
   scale: Point,
   s: number,
-  strokeUniform: projectStrokeOnPointsOptions['strokeUniform'],
-  skewX: projectStrokeOnPointsOptions['skewX'],
-  skewY: projectStrokeOnPointsOptions['skewY']
-): returnedProjections => {
+  strokeUniform: TProjectStrokeOnPointsOptions['strokeUniform'],
+  skewX: TProjectStrokeOnPointsOptions['skewX'],
+  skewY: TProjectStrokeOnPointsOptions['skewY']
+): TReturnedProjection[] => {
   const bisectorVector = bisector.vector,
     AB = createVector(
       strokeUniform ? A.multiply(scale) : A,
@@ -418,7 +418,7 @@ const projectionsRoundWithSkew = (
       strokeUniform ? C.multiply(scale) : C
     );
 
-  let finalProjs: returnedProjections = [];
+  const finalProjs: TReturnedProjection[] = [];
 
   // The start and end points of the circle segment
   [AB, AC].forEach(function (vector) {
