@@ -1,6 +1,7 @@
+//@ts-nocheck
+
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 
-//@ts-nocheck
 (function (global) {
   var fabric = global.fabric || (global.fabric = {});
 
