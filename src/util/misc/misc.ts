@@ -2,7 +2,7 @@
 import { fabric } from '../../../HEADER';
 import { cos } from './cos';
 import { sin } from './sin';
-import { hypot } from './hypot'
+import { hypot } from './hypot';
 import {
   rotateVector,
   createVector,

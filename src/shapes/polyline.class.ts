@@ -82,30 +82,42 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 
       _setPositionDimensions: function (options) {
         options || (options = {});
-        const calcDim = this._calcDimensions(options), 
+        const calcDim = this._calcDimensions(options),
           correctSize = new Point(
-            this.strokeUniform ? this.strokeWidth / this.scaleX : this.strokeWidth,
-            this.strokeUniform ? this.strokeWidth / this.scaleY : this.strokeWidth
+            this.strokeUniform
+              ? this.strokeWidth / this.scaleX
+              : this.strokeWidth,
+            this.strokeUniform
+              ? this.strokeWidth / this.scaleY
+              : this.strokeWidth
           );
         let correctLeftTop;
         this.width = calcDim.width - correctSize.x;
         this.height = calcDim.height - correctSize.y;
         if (!options.fromSVG) {
-            correctLeftTop = this.translateToGivenOrigin({
-                x: this.left,
-                y: this.top
-            }, 'left', 'top', this.originX, this.originY);
+          correctLeftTop = this.translateToGivenOrigin(
+            {
+              x: this.left,
+              y: this.top,
+            },
+            'left',
+            'top',
+            this.originX,
+            this.originY
+          );
         }
         if (typeof options.left === 'undefined') {
-            this.left = options.fromSVG ? calcDim.left : correctLeftTop.x;
+          this.left = options.fromSVG ? calcDim.left : correctLeftTop.x;
         }
         if (typeof options.top === 'undefined') {
-            this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
+          this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
         }
-        const offsetX = calcDim.left + calcDim.width/2,
-            offsetY = calcDim.top + calcDim.height/2;
-        const pathOffsetX = offsetX - offsetY * Math.tan(degreesToRadians(this.skewX))
-        const pathOffsetY = offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY))
+        const offsetX = calcDim.left + calcDim.width / 2,
+          offsetY = calcDim.top + calcDim.height / 2;
+        const pathOffsetX =
+          offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
+        const pathOffsetY =
+          offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY));
         this.pathOffset = new Point(pathOffsetX, pathOffsetY);
       },
 
@@ -120,7 +132,9 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        * @private
        */
       _calcDimensions: function () {
-        const points = this._projectStrokeOnPoints().map(elem => elem.projectedPoint);
+        const points = this._projectStrokeOnPoints().map(
+          (elem) => elem.projectedPoint
+        );
         if (points.length === 0) {
           return makeBoundingBoxFromPoints([new Point(0, 0)]);
         }
@@ -148,18 +162,17 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
           return this.callSuper('_getTransformedDimensions', ...args);
         }
 
-        let preScalingStrokeValue, postScalingStrokeValue; 
+        let preScalingStrokeValue, postScalingStrokeValue;
         const strokeWidth = this.strokeWidth;
         if (this.strokeUniform) {
-            preScalingStrokeValue = 0;
-            postScalingStrokeValue = strokeWidth;
+          preScalingStrokeValue = 0;
+          postScalingStrokeValue = strokeWidth;
+        } else {
+          preScalingStrokeValue = strokeWidth;
+          postScalingStrokeValue = 0;
         }
-        else {
-            preScalingStrokeValue = strokeWidth;
-            postScalingStrokeValue = 0;
-        }
-        const dimX = this.width + preScalingStrokeValue, 
-          dimY = this.height + preScalingStrokeValue, 
+        const dimX = this.width + preScalingStrokeValue,
+          dimY = this.height + preScalingStrokeValue,
           finalDimensions = new Point(dimX * this.scaleX, dimY * this.scaleY);
         return finalDimensions.scalarAdd(postScalingStrokeValue);
       },
@@ -170,12 +183,17 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        */
       _set(key, value) {
         const output = this.callSuper('_set', key, value);
-        if ((key === 'scaleX' || key === 'scaleY') && this.strokeUniform && this.strokeLineJoin !== 'round') {
+        if (
+          (key === 'scaleX' || key === 'scaleY') &&
+          this.strokeUniform &&
+          this.strokeLineJoin !== 'round'
+        ) {
           this._setPositionDimensions();
-        } else if (key === 'skewX' || key === 'skewY') { // TODO: check if you really need to recalculate for all cases
+        } else if (key === 'skewX' || key === 'skewY') {
+          // TODO: check if you really need to recalculate for all cases
           this._setPositionDimensions();
-        };
-        return output 
+        }
+        return output;
       },
 
       /* _TO_SVG_START_ */

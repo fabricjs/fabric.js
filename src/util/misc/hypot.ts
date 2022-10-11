@@ -8,9 +8,9 @@
  * @return {number}
  */
 export const hypot = (...values: number[]): number => {
-    let sumOfSquares = 0;
-    for (let i = 0; i < values.length; i++) {
-        sumOfSquares += values[i] * values[i];
-    }
-    return Math.sqrt(sumOfSquares);
-}
+  let sumOfSquares = 0;
+  for (let i = 0; i < values.length; i++) {
+    sumOfSquares += values[i] * values[i];
+  }
+  return Math.sqrt(sumOfSquares);
+};

@@ -34,10 +34,10 @@ export const createVector = (from: Point | IPoint, to: Point): Point =>
  * @returns the angle in radians from `a` to `b`
  */
 export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian => {
-  var dot = a.x * b.x + a.y * b.y, 
+  var dot = a.x * b.x + a.y * b.y,
     det = a.x * b.y - a.y * b.x;
   return Math.atan2(det, dot) as TRadian;
-}
+};
 
 /**
  * @static
@@ -57,21 +57,26 @@ export const getHatVector = (v: Point): Point =>
  * @returns {{ vector: Point, angle: TRadian}} vector representing the bisector of A and A's angle
  */
 export const getBisector = (A: Point, B: Point, C: Point) => {
-  let AB = createVector(A, B), 
+  let AB = createVector(A, B),
     AC = createVector(A, C),
     alpha = calcAngleBetweenVectors(AB, AC);
   return {
-      vector: getHatVector(rotateVector(AB, alpha / 2 as TRadian)),
-      angle: alpha as TRadian
+    vector: getHatVector(rotateVector(AB, (alpha / 2) as TRadian)),
+    angle: alpha as TRadian,
   };
 };
 
 /**
  * @static
  * @memberOf fabric.util
- * @param {Point} v         
+ * @param {Point} v
  * @param {Boolean} [counterClockwise] the direction of the orthogonal vector, defaults to `true`
  * @returns {Point} the unit orthogonal vector
  */
-export const getOrthogonalUnitVector = (v: Point, counterClockwise: boolean = true): Point =>
-  getHatVector(new Point(counterClockwise ? -v.y : v.y, counterClockwise ? v.x : -v.x));
+export const getOrthogonalUnitVector = (
+  v: Point,
+  counterClockwise: boolean = true
+): Point =>
+  getHatVector(
+    new Point(counterClockwise ? -v.y : v.y, counterClockwise ? v.x : -v.x)
+  );
