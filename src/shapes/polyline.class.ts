@@ -154,7 +154,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        *
        * @private
        */
-      _getTransformedDimensions(options) {
+      _getTransformedDimensions: function (options) {
         return this.callSuper('_getTransformedDimensions', {
           ...(options || {}),
           // disable skewing bbox calculations
@@ -167,7 +167,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        * Recalculates dimensions when changing skew and scale
        * @private
        */
-      _set(key, value) {
+      _set: function (key, value) {
         const output = this.callSuper('_set', key, value);
         if (
           (key === 'scaleX' || key === 'scaleY') &&
