@@ -87,7 +87,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
             .divide(
               this.strokeUniform
                 ? new Point(this.scaleX, this.scaleY)
-                : new Point().scalarAdd(1)
+                : new Point(1, 1)
             );
         this.width = bbox.width - strokeCorrection.x;
         this.height = bbox.height - strokeCorrection.y;
