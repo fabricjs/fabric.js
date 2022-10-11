@@ -52,7 +52,7 @@ export const projectStrokeOnPoints = (
     skewX,
     skewY,
   }: TProjectStrokeOnPointsOptions,
-  openPath: boolean
+  openPath = false
 ): TReturnedProjection[] => {
   const coords: TReturnedProjection[] = [];
 
