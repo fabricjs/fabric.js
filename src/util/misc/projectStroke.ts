@@ -2,8 +2,7 @@ import { Point } from '../../point.class';
 import { calcAngleBetweenVectors, createVector, getBisector, getOrthogonalUnitVector } from './vectors';
 import { StrokeLineJoin, TDegree } from '../../typedefs';
 import { degreesToRadians } from './radiansDegreesConversion';
-
-const PiBy2 = Math.PI / 2
+import { halfPI } from '../../constants';
 
 /**
  * Project stroke width on points returning projections for each point as follows:
@@ -135,7 +134,7 @@ export const projectStrokeOnPoints = (
 
     return [AB, AC].map(vector => {
       const hatOrthogonal = getOrthogonalUnitVector(vector), 
-        correctSide = Math.abs(calcAngleBetweenVectors(hatOrthogonal, bisectorVector)) >= PiBy2 ? 1 : -1, 
+        correctSide = isAcute(hatOrthogonal, bisectorVector) ? -1 : 1, 
         orthogonal = scaleHatVector(hatOrthogonal, s * correctSide),
         proj1 = applySkew(A.add(orthogonal));
 
@@ -206,8 +205,8 @@ export const projectStrokeOnPoints = (
     const bisectorVector = bisector.vector,
       hatVectorAxisX = new Point(1, 0),
       correctSide = new Point(
-        Math.abs(calcAngleBetweenVectors(hatVectorAxisX, bisectorVector)) >= PiBy2 ? 1 : -1, 
-        Math.abs(calcAngleBetweenVectors(hatVectorAxisX, new Point(bisectorVector.y, bisectorVector.x))) >= PiBy2 ? 1 : -1
+        isAcute(hatVectorAxisX, bisectorVector) ? -1 : 1, 
+        isAcute(hatVectorAxisX, new Point(bisectorVector.y, bisectorVector.x)) ? -1 : 1
       ),
       radiusOnAxisX = new Point(s * strokeUniformScalar.x, 0).multiply(correctSide), 
       radiusOnAxisY = new Point(0, s * strokeUniformScalar.y).multiply(correctSide),
@@ -248,7 +247,7 @@ export const projectStrokeOnPoints = (
     // The start and end points of the circle segment
     [AB, AC].forEach(function (vector) {
       const hatOrthogonal = getOrthogonalUnitVector(vector), 
-        correctSide = Math.abs(calcAngleBetweenVectors(hatOrthogonal, bisectorVector)) >= PiBy2 ? 1 : -1, 
+        correctSide = isAcute(hatOrthogonal, bisectorVector) ? -1 : 1, 
         orthogonal = scaleHatVector(hatOrthogonal, s * correctSide),
         proj1 = applySkew(A.add(orthogonal));
       finalProjs.push({
@@ -338,3 +337,6 @@ export const projectStrokeOnPoints = (
 
   return coords;
 };
+
+const isAcute = (vector1: Point, vector2: Point): boolean => 
+  Math.abs(calcAngleBetweenVectors(vector1, vector2)) < halfPI;
