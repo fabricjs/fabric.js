@@ -80,40 +80,36 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
         return projectStrokeOnPoints(this.points, this, true);
       },
 
-      _setPositionDimensions: function (options) {
-        options || (options = {});
-        const calcDim = this._calcDimensions(options),
-          correctSize = new Point(
-            this.strokeUniform
-              ? this.strokeWidth / this.scaleX
-              : this.strokeWidth,
-            this.strokeUniform
-              ? this.strokeWidth / this.scaleY
-              : this.strokeWidth
-          );
-        let correctLeftTop;
-        this.width = calcDim.width - correctSize.x;
-        this.height = calcDim.height - correctSize.y;
-        if (!options.fromSVG) {
-          correctLeftTop = this.translateToGivenOrigin(
-            {
-              x: this.left,
-              y: this.top,
-            },
+      _setPositionDimensions: function ({ left, top, fromSVG } = {}) {
+        const bbox = this._calcDimensions(),
+          strokeCorrection = new Point()
+            .scalarAdd(this.strokeWidth)
+            .divide(
+              this.strokeUniform
+                ? new Point(this.scaleX, this.scaleY)
+                : new Point().scalarAdd(1)
+            );
+        this.width = bbox.width - strokeCorrection.x;
+        this.height = bbox.height - strokeCorrection.y;
+        if (typeof left === 'undefined' || typeof top === 'undefined') {
+          const origin = this.translateToGivenOrigin(
+            fromSVG
+              ? new Point(bbox.left, bbox.top)
+              : new Point(this.left, this.top),
             'left',
             'top',
             this.originX,
             this.originY
           );
+          if (typeof left === 'undefined') {
+            this.left = origin.x;
+          }
+          if (typeof top === 'undefined') {
+            this.top = origin.y;
+          }
         }
-        if (typeof options.left === 'undefined') {
-          this.left = options.fromSVG ? calcDim.left : correctLeftTop.x;
-        }
-        if (typeof options.top === 'undefined') {
-          this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
-        }
-        const offsetX = calcDim.left + calcDim.width / 2,
-          offsetY = calcDim.top + calcDim.height / 2;
+        const offsetX = bbox.left + bbox.width / 2,
+          offsetY = bbox.top + bbox.height / 2;
         const pathOffsetX =
           offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
         const pathOffsetY =
