@@ -149,28 +149,18 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
       },
 
       /**
-       * Changes dimensioning logic when it has skew
+       * @override skewing is taken into account when projecting stroke on points,
+       * therefore we don't want the default calculation to account for skewing as well
+       *
        * @private
        */
-      _getTransformedDimensions(...args) {
-        const noSkew = this.skewX === 0 && this.skewY === 0;
-        if (noSkew) {
-          return this.callSuper('_getTransformedDimensions', ...args);
-        }
-
-        let preScalingStrokeValue, postScalingStrokeValue;
-        const strokeWidth = this.strokeWidth;
-        if (this.strokeUniform) {
-          preScalingStrokeValue = 0;
-          postScalingStrokeValue = strokeWidth;
-        } else {
-          preScalingStrokeValue = strokeWidth;
-          postScalingStrokeValue = 0;
-        }
-        const dimX = this.width + preScalingStrokeValue,
-          dimY = this.height + preScalingStrokeValue,
-          finalDimensions = new Point(dimX * this.scaleX, dimY * this.scaleY);
-        return finalDimensions.scalarAdd(postScalingStrokeValue);
+      _getTransformedDimensions(options) {
+        return this.callSuper('_getTransformedDimensions', {
+          ...(options || {}),
+          // disable skewing bbox calculations
+          skewX: 0,
+          skewY: 0,
+        });
       },
 
       /**
