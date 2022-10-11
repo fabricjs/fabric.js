@@ -4,29 +4,6 @@ import { StrokeLineJoin, TDegree } from '../../typedefs';
 import { degreesToRadians } from './radiansDegreesConversion';
 import { halfPI } from '../../constants';
 
-/**
- * Project stroke width on points returning projections for each point as follows:
- * - `miter`: 1 point corresponding to the outer boundary. If the miter limit is exceeded, it will be 2 points (becomes bevel)
- * - `bevel`: 2 points corresponding to the bevel possible boundaries, orthogonal to the stroke.
- * - `round`: same as `bevel` when it has no skew, with skew are 4 points.
- * Used to calculate object's bounding box
- * 
- * @see https://github.com/fabricjs/fabric.js/pull/8344
- * 
- * @static
- * @memberOf fabric.util
- * @param {Point[]} points
- * @param {Object} options
- * @param {number} options.strokeWidth
- * @param {'miter'|'bevel'|'round'} options.strokeLineJoin
- * @param {number} options.strokeMiterLimit https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
- * @param {boolean} options.strokeUniform
- * @param {number} options.scaleX
- * @param {number} options.scaleY
- * @param {boolean} [openPath] whether the shape is open or not, affects the calculations of the first and last points
- * @returns {returnedProjections} array of all suspected points.
- */
-
 type projectStrokeOnPointsOptions = {
   strokeWidth: number;
   strokeLineJoin: StrokeLineJoin;
@@ -44,6 +21,18 @@ type returnedProjections = {
   bisector?: ReturnType<typeof getBisector>
 }[]
 
+/**
+ * Project stroke width on points returning projections for each point as follows:
+ * - `miter`: 1 point corresponding to the outer boundary. If the miter limit is exceeded, it will be 2 points (becomes bevel)
+ * - `bevel`: 2 points corresponding to the bevel possible boundaries, orthogonal to the stroke.
+ * - `round`: same as `bevel` when it has no skew, with skew are 4 points.
+ * Used to calculate object's bounding box
+ * 
+ * @see https://github.com/fabricjs/fabric.js/pull/8344
+ * 
+ * @static
+ * @memberOf fabric.util
+ */
 export const projectStrokeOnPoints = (
   points: Point[],
   {
