@@ -229,14 +229,12 @@ const projectionsOpenPathButt = (
       strokeUniformScalar
     );
 
-  // We must bounce the projection to both sides, since we don't know which one is the outer edge
-  const proj1 = applySkew(A.add(orthogonalVector), skewX, skewY),
-    proj2 = applySkew(A.subtract(orthogonalVector), skewX, skewY);
-
-  return [proj1, proj2].map((proj) => ({
-    projectedPoint: proj,
-    originPoint: A,
-  }));
+  return [
+    {
+      projectedPoint: applySkew(A.subtract(orthogonalVector), skewX, skewY),
+      originPoint: A,
+    },
+  ];
 };
 
 /**
