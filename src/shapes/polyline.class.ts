@@ -3,13 +3,13 @@
 import { config } from '../config';
 import { Point } from '../point.class';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
+import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
     extend = fabric.util.object.extend,
-    toFixed = fabric.util.toFixed,
-    projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
+    toFixed = fabric.util.toFixed;
 
   /**
    * Polyline class

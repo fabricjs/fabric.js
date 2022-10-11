@@ -1,7 +1,9 @@
+import { projectStrokeOnPoints } from '../util/misc/projectStroke';
+
 //@ts-nocheck
 (function (global) {
-  var fabric = global.fabric || (global.fabric = {}),
-    projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
+  var fabric = global.fabric || (global.fabric = {});
+
   /**
    * Polygon class
    * @class fabric.Polygon
