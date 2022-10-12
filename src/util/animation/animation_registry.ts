@@ -1,6 +1,6 @@
-import { fabric } from '../../HEADER';
-import { Canvas, TObject } from '../__types__';
-import { AnimationContext, TCancelFunction } from './animate';
+import { fabric } from '../../../HEADER';
+import { Canvas, TObject } from '../../__types__';
+import { AnimationContext, TCancelFunction } from './types';
 
 type TAnimation = AnimationContext<number> | AnimationContext<number[]>;
 

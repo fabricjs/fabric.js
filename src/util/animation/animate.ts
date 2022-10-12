@@ -1,166 +1,47 @@
-import { fabric } from '../../HEADER';
-import { noop } from '../constants';
+import { fabric } from '../../../HEADER';
+import { noop } from '../../constants';
 import { runningAnimations } from './animation_registry';
-import { defaultEasing, TEasingFunction } from './anim_ease';
-
-/**
- * Callback called every frame
- * @param t current "time"/ms elapsed. multivalue
- * @param valueRatio ratio of current value to animation max value. [0, 1]
- * @param timeRatio ratio of current ms to animation duration. [0, 1]
- */
-export type TOnAnimationChangeCallback<
-  Return = void,
-  State = number | number[]
-> = (t: State, valueRatio: number, timeRatio: number) => Return;
-
-/**
- * Called to determine if animation should abort
- * @returns truthy if animation should abort
- */
-export type TAbortCallback<State = number | number[]> =
-  TOnAnimationChangeCallback<boolean, State>;
-
-/**
- * Function used for canceling an animation
- */
-export type TCancelFunction = VoidFunction;
-
-export interface AnimationBounds<State> {
-  /**
-   * Starting value(s)
-   */
-  startValue: State;
-
-  /**
-   * Ending value(s)
-   * @default 100
-   */
-  endValue: State;
-
-  /**
-   * Value(s) to increment/decrement the value(s) by
-   * @default [endValue - startValue]
-   */
-  byValue: State;
-}
-
-/**
- * Animation of a value or list of values
- */
-export interface AnimationOptions<State> extends AnimationBounds<State> {
-  /**
-   * The object this animation is being performed on
-   */
-  target?: unknown;
-
-  /**
-   * Called when the animation starts
-   */
-  onStart?: VoidFunction;
-
-  /**
-   * Called at each frame of the animation
-   */
-  onChange: TOnAnimationChangeCallback<void, State>;
-
-  /**
-   * Called after the last frame of the animation
-   */
-  onComplete: TOnAnimationChangeCallback<void, State>;
-
-  /**
-   * Easing function
-   * @default [defaultEasing]
-   */
-  easing: TEasingFunction;
-
-  /**
-   * Function called at each frame.
-   * If it returns true, abort
-   */
-  abort: TAbortCallback<State>;
-
-  /**
-   * Duration of the animation in ms
-   * @default 500
-   */
-  duration: number;
-
-  /**
-   * Delay to start the animation in ms
-   * @default 0
-   */
-  delay: number;
-}
-
-export interface AnimationCurrentState<State> {
-  /**
-   * Current values
-   */
-  currentValue: State;
-  /**
-   * Same as valueRatio from @see TOnAnimationChangeCallback
-   */
-  completionRate: number;
-  /**
-   * Same as completionRatio from @see TOnAnimationChangeCallback
-   */
-  durationRate: number;
-}
-
-/**
- * Animation context
- */
-export interface AnimationContext<State>
-  extends Partial<AnimationOptions<State>>,
-    AnimationCurrentState<State> {
-  /**
-   * Current function used to cancel the animation
-   */
-  cancel: TCancelFunction;
-}
+import { defaultEasing } from './easing';
+import {
+  AnimationBounds,
+  AnimationContext,
+  AnimationOptions,
+  isMulti,
+  TCancelFunction,
+} from './types';
 
 /**
  * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
- * @memberOf fabric.util
+ *
  * @param {AnimationOptions} [options] Animation options
- *  When using lists, think of something like this:
- * @example
- * fabric.util.animate({
- *   startValue: [1, 2, 3],
- *   endValue: [2, 4, 6],
- *   onChange: function([x, y, zoom]) {
- *     canvas.zoomToPoint(new Point(x, y), zoom);
- *     canvas.requestRenderAll();
- *   }
- * });
+ * @returns {TCancelFunction} cancel function
  *
  * @example
- * fabric.util.animate({
+ * animate({
  *   startValue: 1,
  *   endValue: 0,
- *   onChange: function(v) {
+ *   onChange: (v) => {
  *     obj.set('opacity', v);
- *     canvas.requestRenderAll();
+ *     canvas.renderAll();
  *   }
  * });
  *
- * @returns {TCancelFunction} cancel function
+ * @example When using lists, think of something like this:
+ * animate({
+ *   startValue: [1, 2, 3],
+ *   endValue: [2, 4, 6],
+ *   onChange: ([x, y, zoom]) => {
+ *     canvas.zoomToPoint(new Point(x, y), zoom);
+ *     canvas.renderAll();
+ *   }
+ * });
+ *
  */
-export function animate(
-  options: Partial<AnimationOptions<number> | AnimationOptions<number[]>> = {}
-): TCancelFunction {
+export function animate<
+  T extends number | number[],
+  S extends AnimationOptions<T>
+>(options: Partial<S> = {}): TCancelFunction {
   let cancel = false;
-
-  const isMulti = function isMulti<
-    Single extends Partial<AnimationBounds<number>>,
-    Multi extends Partial<AnimationBounds<number[]>>
-  >(x: Single | Multi): x is Multi {
-    return Array.isArray(x.startValue);
-  };
-
-  const isMany = isMulti(options);
 
   const { duration = 500, easing = defaultEasing, delay = 0 } = options;
 
@@ -173,19 +54,11 @@ export function animate(
         Pick<AnimationOptions<number[]>, 'abort' | 'onChange' | 'onComplete'>);
 
   let context: AnimationContext<number> | AnimationContext<number[]>;
-  if (isMany) {
-    let byValue = options.byValue;
+  if (isMulti(options)) {
     const startValue = options.startValue ?? [0],
-      endValue = options.endValue ?? [100];
-
-    if (!byValue) {
-      byValue = new Array<number>(startValue.length);
-      // using map here means that we need to use a closure, but TS isn't smart enough to realize
-      // that bounds is still a AnimationBounds<number[]> inside the closure
-      for (let i = 0; i < startValue.length; i++) {
-        byValue[i] = endValue[i] - startValue[i];
-      }
-    }
+      endValue = options.endValue ?? [100],
+      byValue =
+        options.byValue ?? startValue.map((value, i) => endValue[i] - value);
 
     bounds = {
       startValue,

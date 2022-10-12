@@ -1,19 +1,5 @@
-import { twoMathPi, halfPI } from '../constants';
-
-/**
- * An easing function
- * @param currentTime ms elapsed
- * @param startValue
- * @param byValue increment/change/"completion rate"/magnitude
- * @param duration in ms
- * @returns next value
- */
-export type TEasingFunction = (
-  currentTime: number,
-  startValue: number,
-  byValue: number,
-  duration: number
-) => number;
+import { twoMathPi, halfPI } from '../../constants';
+import { TEasingFunction } from './types';
 
 /**
  * Easing functions

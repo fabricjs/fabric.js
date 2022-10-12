@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Color } from '../color';
+import { Color } from '../../color';
 import { animate } from './animate';
 
 // Calculate an in-between color. Returns a "rgba()" string.
