@@ -1,6 +1,7 @@
 //@ts-nocheck
 
 import { config } from '../config';
+import { calcPathBBox } from '../util/misc/PathUtils';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -49,7 +50,11 @@ import { config } from '../config';
         options = clone(options || {});
         delete options.path;
         this.callSuper('initialize', options);
-        this._setPath(path || [], options);
+        this.set(this._setPath(path || [], options));
+      },
+
+      calcBBox: function (options?: { left?: number; top?: number }) {
+        return calcPathBBox(this, options);
       },
 
       /**
@@ -57,15 +62,13 @@ import { config } from '../config';
        * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
        * @param {Object} [options] Options object
        */
-      _setPath: function (path, options) {
+      _setPath: function (path, options?: { left?: number; top?: number }) {
         this.path = fabric.util.makePathSimpler(
           Array.isArray(path) ? path : fabric.util.parsePath(path)
         );
-
-        fabric.Polyline.prototype._setPositionDimensions.call(
-          this,
-          options || {}
-        );
+        const { left, top, width, height, pathOffset } = this.calcBBox(options);
+        this.set({ width, height, pathOffset });
+        return { left, top };
       },
 
       /**

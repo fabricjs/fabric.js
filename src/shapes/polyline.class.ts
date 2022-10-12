@@ -3,8 +3,8 @@
 import { config } from '../config';
 import { Point } from '../point.class';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
+import { calcPathBBox } from '../util/misc/PathUtils';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -70,7 +70,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
         options = options || {};
         this.points = points || [];
         this.callSuper('initialize', options);
-        this._setPositionDimensions(options);
+        this.set(this.calcBBox(options));
       },
 
       /**
@@ -78,41 +78,6 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        */
       _projectStrokeOnPoints: function () {
         return projectStrokeOnPoints(this.points, this, true);
-      },
-
-      _setPositionDimensions: function ({ left, top } = {}) {
-        const bbox = this._calcDimensions(),
-          strokeCorrection = new Point()
-            .scalarAdd(this.strokeWidth)
-            .divide(
-              this.strokeUniform
-                ? new Point(this.scaleX, this.scaleY)
-                : new Point(1, 1)
-            );
-        this.width = bbox.width - strokeCorrection.x;
-        this.height = bbox.height - strokeCorrection.y;
-        if (typeof left === 'undefined' || typeof top === 'undefined') {
-          const origin = this.translateToGivenOrigin(
-            new Point(bbox.left, bbox.top),
-            'left',
-            'top',
-            this.originX,
-            this.originY
-          );
-          if (typeof left === 'undefined') {
-            this.left = origin.x;
-          }
-          if (typeof top === 'undefined') {
-            this.top = origin.y;
-          }
-        }
-        const offsetX = bbox.left + bbox.width / 2,
-          offsetY = bbox.top + bbox.height / 2;
-        const pathOffsetX =
-          offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
-        const pathOffsetY =
-          offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY));
-        this.pathOffset = new Point(pathOffsetX, pathOffsetY);
       },
 
       /**
@@ -135,6 +100,10 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
           return makeBoundingBoxFromPoints([new Point(0, 0)]);
         }
         return makeBoundingBoxFromPoints(points);
+      },
+
+      calcBBox: function (options?: { left?: number; top?: number }) {
+        return calcPathBBox(this, options);
       },
 
       /**
@@ -168,16 +137,25 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        * @private
        */
       _set: function (key, value) {
+        const changed = this[key] !== value;
         const output = this.callSuper('_set', key, value);
         if (
-          (key === 'scaleX' || key === 'scaleY') &&
-          this.strokeUniform &&
-          this.strokeLineJoin !== 'round'
+          changed &&
+          (((key === 'scaleX' || key === 'scaleY') &&
+            this.strokeUniform &&
+            this.strokeLineJoin !== 'round') ||
+            // TODO: check if you really need to recalculate for all cases
+            key === 'skewX' ||
+            key === 'skewY' ||
+            key === 'strokeMiterLimit' ||
+            key === 'strokeLineCap' ||
+            key === 'strokeLineJoin' ||
+            key === 'strokeLineWidth' ||
+            key === 'strokeUniform' ||
+            key === 'points')
         ) {
-          this._setPositionDimensions();
-        } else if (key === 'skewX' || key === 'skewY') {
-          // TODO: check if you really need to recalculate for all cases
-          this._setPositionDimensions();
+          const { width, height, pathOffset } = this.calcBBox();
+          this.set({ width, height, pathOffset });
         }
         return output;
       },
