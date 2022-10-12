@@ -1,6 +1,7 @@
 # Changelog
 
 ## [next]
+
 - chore(TS): convert object to es6 class [#8322](https://github.com/fabricjs/fabric.js/pull/8322)
 - fix(textStyles): Handle empty style object in stylesToArray [#8357](https://github.com/fabricjs/fabric.js/pull/8357)
 - ci(build): safeguard concurrent unlocking [#8309](https://github.com/fabricjs/fabric.js/pull/8309)
