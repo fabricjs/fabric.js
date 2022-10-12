@@ -70,7 +70,7 @@ import { projectStrokeOnPoints } from '../util/misc/projectStroke';
         options = options || {};
         this.points = points || [];
         this.callSuper('initialize', options);
-        this.set(this.calcBBox(options));
+        this.set(this._calcBBox(options));
       },
 
       /**
@@ -102,8 +102,16 @@ import { projectStrokeOnPoints } from '../util/misc/projectStroke';
         return makeBoundingBoxFromPoints(points);
       },
 
-      calcBBox: function (options?: { left?: number; top?: number }) {
+      /**
+       * @private
+       */
+      _calcBBox: function (options?: { left?: number; top?: number }) {
         return calcPathBBox(this, options);
+      },
+
+      setDimensions: function () {
+        const { width, height, pathOffset } = this._calcBBox();
+        this.set({ width, height, pathOffset });
       },
 
       /**
@@ -154,8 +162,7 @@ import { projectStrokeOnPoints } from '../util/misc/projectStroke';
             key === 'strokeUniform' ||
             key === 'points')
         ) {
-          const { width, height, pathOffset } = this.calcBBox();
-          this.set({ width, height, pathOffset });
+          this.setDimensions();
         }
         return output;
       },

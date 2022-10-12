@@ -53,8 +53,16 @@ import { calcPathBBox } from '../util/misc/PathUtils';
         this.set(this._setPath(path || [], options));
       },
 
-      calcBBox: function (options?: { left?: number; top?: number }) {
+      /**
+       * @private
+       */
+      _calcBBox: function (options?: { left?: number; top?: number }) {
         return calcPathBBox(this, options);
+      },
+
+      setDimensions: function () {
+        const { width, height, pathOffset } = this._calcBBox();
+        this.set({ width, height, pathOffset });
       },
 
       /**
@@ -66,7 +74,8 @@ import { calcPathBBox } from '../util/misc/PathUtils';
         this.path = fabric.util.makePathSimpler(
           Array.isArray(path) ? path : fabric.util.parsePath(path)
         );
-        const { left, top, width, height, pathOffset } = this.calcBBox(options);
+        const { left, top, width, height, pathOffset } =
+          this._calcBBox(options);
         this.set({ width, height, pathOffset });
         return { left, top };
       },
