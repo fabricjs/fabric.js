@@ -86,7 +86,6 @@
     assert.equal(Math.round(dimensions.y), 123);
 
     polygon.set('strokeMiterLimit', 999);
-    polygon._setPositionDimensions();
     dimensions = polygon._getNonTransformedDimensions();
     assert.equal(Math.round(dimensions.x), 74);
     //  TODO this is WRONG
