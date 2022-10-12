@@ -17,10 +17,22 @@ import { TProjection, TProjectStrokeOnPointsOptions } from './types';
  *
  */
 export class StrokeLineJoinProjections extends StrokeProjectionsBase {
-  bisector: ReturnType<typeof getBisector>;
+  /**
+   * The point being projected (the angle ∠BAC)
+   */
   A: Point;
+  /**
+   * The point before A
+   */
   B: Point;
+  /**
+   * The point after A
+   */
   C: Point;
+  /**
+   * The bisector of A (∠BAC)
+   */
+  bisector: ReturnType<typeof getBisector>;
 
   constructor(
     A: IPoint,
