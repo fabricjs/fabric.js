@@ -345,9 +345,9 @@
     var text = new fabric.Text('xxxxxx\nx y');
     text.styles = { 1: { 0: { }, 1: { }}, 2: { }, 3: { 4: { }}};
     text.cleanStyle('any');
-    assert.equal(text.styles[1], undefined, 'the style has been cleaned since there were no usefull informations');
-    assert.equal(text.styles[2], undefined, 'the style has been cleaned since there were no usefull informations');
-    assert.equal(text.styles[3], undefined, 'the style has been cleaned since there were no usefull informations');
+    assert.equal(text.styles[1], undefined, 'the style has been cleaned since there was no useful information');
+    assert.equal(text.styles[2], undefined, 'the style has been cleaned since there was no useful information');
+    assert.equal(text.styles[3], undefined, 'the style has been cleaned since there was no useful information');
   });
 
   QUnit.test('text cleanStyle with full style', function(assert) {
@@ -385,6 +385,13 @@
     text.styles = { 0: { 0: { fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fill: 'blue' }}};
     text.removeStyle('fill');
     assert.equal(text.styles[0], undefined, 'the styles got empty and has been removed');
+  });
+
+  QUnit.test('text toObject removes empty style object', function(assert) {
+    var text = new fabric.Text('xxx');
+    text.styles = { 0: { 0: {} } };
+    var obj = text.toObject();
+    assert.deepEqual(obj.styles, [], 'empty style object has been removed');
   });
 
   QUnit.test('getFontCache works with fontWeight numbers', function(assert) {
