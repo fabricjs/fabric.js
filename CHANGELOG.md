@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(textStyles): Handle empty style object in stylesToArray [#8357](https://github.com/fabricjs/fabric.js/pull/8357)
 - ci(build): safeguard concurrent unlocking [#8309](https://github.com/fabricjs/fabric.js/pull/8309)
 - ci(): update stale bot [#8307](https://github.com/fabricjs/fabric.js/pull/8307)
 - ci(test): await golden generation in visual tests [#8284](https://github.com/fabricjs/fabric.js/pull/8284)
