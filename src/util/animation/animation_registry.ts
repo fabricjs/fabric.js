@@ -1,8 +1,14 @@
 import { fabric } from '../../../HEADER';
 import { Canvas, TObject } from '../../__types__';
-import { AnimationContext, TCancelFunction } from './types';
+import {
+  AnimationContext,
+  AnimationOptions,
+  TAnimationArgument,
+  TCancelFunction,
+} from './types';
 
-type TAnimation = AnimationContext<number> | AnimationContext<number[]>;
+type TAnimation<T extends TAnimationArgument = TAnimationArgument> =
+  AnimationContext<T>;
 
 /**
  * Array holding all running animations
@@ -10,6 +16,33 @@ type TAnimation = AnimationContext<number> | AnimationContext<number[]>;
  * @type {AnimationContext[]}
  */
 class RunningAnimations extends Array<TAnimation> {
+  register(
+    options: Partial<AnimationOptions>,
+    startValue: TAnimationArgument,
+    cancel: VoidFunction
+  ) {
+    const context = {
+      ...options,
+      currentValue: startValue,
+      completionRate: 0,
+      durationRate: 0,
+      cancel: () => {
+        cancel();
+        this.remove(context);
+      },
+    };
+    this.push(context);
+    return {
+      context,
+      remove: () => this.remove(context),
+    };
+  }
+
+  private remove(context: TAnimation) {
+    const index = this.indexOf(context);
+    index > -1 && this.splice(index, 1);
+  }
+
   /**
    * cancel all running animations at the next requestAnimFrame
    * @returns {AnimationContext[]}

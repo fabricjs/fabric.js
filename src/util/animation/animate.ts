@@ -1,14 +1,8 @@
 import { noop } from '../../constants';
+import { requestAnimFrame } from './AnimationFrame';
 import { runningAnimations } from './animation_registry';
 import { defaultEasing } from './Easing';
-import { requestAnimFrame } from './AnimationFrame';
-import {
-  AnimationBounds,
-  AnimationContext,
-  AnimationOptions,
-  isMulti,
-  TCancelFunction,
-} from './types';
+import { AnimationOptions, TCancelFunction } from './types';
 
 /**
  * Changes value from one to another within certain period of time, invoking callbacks as value is being changed.
@@ -38,8 +32,6 @@ import {
  *
  */
 export function animate<T>(options: Partial<AnimationOptions<T>> = {}) {
-  let cancel = false;
-
   const {
     startValue = 0,
     duration = 500,
@@ -51,23 +43,14 @@ export function animate<T>(options: Partial<AnimationOptions<T>> = {}) {
     delay = 0,
   } = options;
 
-  const context = {
-    ...options,
-    currentValue: startValue,
-    completionRate: 0,
-    durationRate: 0,
-  };
-
-  const removeFromRegistry = () => {
-    const index = runningAnimations.indexOf(context);
-    return index > -1 && runningAnimations.splice(index, 1)[0];
-  };
-
-  context.cancel = function () {
-    cancel = true;
-    return removeFromRegistry();
-  };
-  runningAnimations.push(context);
+  let cancelled = false;
+  const { context, remove: removeFromRegistry } = runningAnimations.register(
+    options,
+    startValue,
+    () => {
+      cancelled = true;
+    }
+  );
 
   const runner = function (timestamp) {
     const start = timestamp || +new Date(),
@@ -98,7 +81,7 @@ export function animate<T>(options: Partial<AnimationOptions<T>> = {}) {
       context.completionRate = valuePerc;
       context.durationRate = timePerc;
 
-      if (cancel) {
+      if (cancelled) {
         return;
       }
       if (abort(current, valuePerc, timePerc)) {
