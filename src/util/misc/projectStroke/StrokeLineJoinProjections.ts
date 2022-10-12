@@ -184,7 +184,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       furthestX = new Point(
         newX,
         Math.sqrt(
-          newY ** 2 - ((newX * circleRadius.y) / circleRadius.x) ** 2
+          newY ** 2 - ((newX * newY) / circleRadius.x) ** 2
         )
       );
 
