@@ -80,7 +80,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
         return projectStrokeOnPoints(this.points, this, true);
       },
 
-      _setPositionDimensions: function ({ left, top, fromSVG } = {}) {
+      _setPositionDimensions: function ({ left, top } = {}) {
         const bbox = this._calcDimensions(),
           strokeCorrection = new Point()
             .scalarAdd(this.strokeWidth)
@@ -93,9 +93,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
         this.height = bbox.height - strokeCorrection.y;
         if (typeof left === 'undefined' || typeof top === 'undefined') {
           const origin = this.translateToGivenOrigin(
-            fromSVG
-              ? new Point(bbox.left, bbox.top)
-              : new Point(this.left, this.top),
+            new Point(bbox.left, bbox.top),
             'left',
             'top',
             this.originX,
