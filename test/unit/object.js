@@ -1,3 +1,5 @@
+import { fabric } from "fabric";
+
 (function(){
 
   var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
@@ -1506,5 +1508,18 @@
     assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, 1, 'runningAnimations should include the animation');
     object.dispose();
     assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, 0, 'runningAnimations should be empty after dispose');
+  });
+  QUnit.test('prototype changes', function (assert) {
+    var object = new fabric.Object();
+    var object2 = new fabric.Object();
+    object.fill = 'red'
+    assert.equal(object.fill, '', 'by default objects have no fill');
+    assert.equal(object2.fill, 'red', 'once assigned object is red');
+    fabric.Object.prototype.fill = 'green';
+    assert.equal(object.fill, 'green', 'object with no value assigned read from prototype');
+    assert.equal(object2.fill, 'red', 'once assigned object is red, it stays red');
+    var object3 = new fabric.Object();
+    assert.equal(object3.fill, 'green', 'newly created object have now green by default');
+    fabric.Object.prototype.fill = '';
   });
 })();
