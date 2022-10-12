@@ -23,7 +23,7 @@ export const rotateVector = (vector: Point, radians: TRadian) =>
  * @param {Point} to
  * @returns {Point} vector
  */
-export const createVector = (from: Point | IPoint, to: Point | IPoint): Point =>
+export const createVector = (from: IPoint, to: IPoint): Point =>
   new Point(to).subtract(from);
 
 /**
@@ -50,7 +50,7 @@ export const calcVectorRotation = (v: Point) =>
  * @param {Point} v
  * @returns {Point} vector representing the unit vector pointing to the direction of `v`
  */
-export const getHatVector = (v: Point): Point => v.scalarDivide(v.magnitude());
+export const getUnitVector = (v: Point): Point => v.scalarDivide(v.magnitude());
 
 /**
  * @param {Point} A
@@ -63,7 +63,7 @@ export const getBisector = (A: Point, B: Point, C: Point) => {
     AC = createVector(A, C),
     alpha = calcAngleBetweenVectors(AB, AC);
   return {
-    vector: getHatVector(rotateVector(AB, alpha / 2)),
+    vector: getUnitVector(rotateVector(AB, alpha / 2)),
     angle: alpha,
   };
 };
@@ -77,4 +77,4 @@ export const getOrthogonalUnitVector = (
   v: Point,
   counterClockwise = true
 ): Point =>
-  getHatVector(new Point(-v.y, v.x).scalarMultiply(counterClockwise ? 1 : -1));
+  getUnitVector(new Point(-v.y, v.x).scalarMultiply(counterClockwise ? 1 : -1));

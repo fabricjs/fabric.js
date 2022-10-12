@@ -128,9 +128,11 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        * @private
        */
       _calcDimensions: function () {
-        const points = this._projectStrokeOnPoints().map(
-          (elem) => elem.projectedPoint
-        );
+        const points = this.exactBoundingBox
+          ? this._projectStrokeOnPoints().map(
+              (projection) => projection.projectedPoint
+            )
+          : this.points.map((p) => new Point(p));
         if (points.length === 0) {
           return makeBoundingBoxFromPoints([new Point(0, 0)]);
         }
