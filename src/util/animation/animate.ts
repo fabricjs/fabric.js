@@ -37,157 +37,87 @@ import {
  * });
  *
  */
-export function animate<
-  T extends number | number[],
-  S extends AnimationOptions<T>
->(options: Partial<S> = {}): TCancelFunction {
+export function animate<T>(options: Partial<AnimationOptions<T>> = {}) {
   let cancel = false;
 
-  const { duration = 500, easing = defaultEasing, delay = 0 } = options;
+  const {
+    startValue = 0,
+    duration = 500,
+    easing = defaultEasing,
+    onChange = noop,
+    abort = noop,
+    onComplete = noop,
+    endValue = 100,
+    delay = 0,
+  } = options;
 
-  // let startValue: number | number[], endValue: number | number[];
-
-  let bounds:
-    | (AnimationBounds<number> &
-        Pick<AnimationOptions<number>, 'abort' | 'onChange' | 'onComplete'>)
-    | (AnimationBounds<number[]> &
-        Pick<AnimationOptions<number[]>, 'abort' | 'onChange' | 'onComplete'>);
-
-  let context: AnimationContext<number> | AnimationContext<number[]>;
-  if (isMulti(options)) {
-    const startValue = options.startValue ?? [0],
-      endValue = options.endValue ?? [100],
-      byValue =
-        options.byValue ?? startValue.map((value, i) => endValue[i] - value);
-
-    bounds = {
-      startValue,
-      endValue,
-      byValue,
-      onChange: options.onChange ?? noop,
-      onComplete: options.onComplete ?? noop,
-      abort: options.abort ?? noop,
-    };
-
-    context = {
-      ...options,
-      cancel: function () {
-        cancel = true;
-        return removeFromRegistry();
-      },
-      completionRate: 0,
-      durationRate: 0,
-      currentValue: bounds.startValue,
-    };
-  } else {
-    const startValue = options.startValue ?? 0,
-      endValue = options.endValue ?? 100,
-      byValue = options.byValue || endValue - startValue;
-    bounds = {
-      startValue,
-      endValue,
-      byValue,
-      onChange: options.onChange ?? noop,
-      onComplete: options.onComplete ?? noop,
-      abort: options.abort ?? noop,
-    };
-    context = {
-      ...options,
-      cancel: function () {
-        cancel = true;
-        return removeFromRegistry();
-      },
-      completionRate: 0,
-      durationRate: 0,
-      currentValue: bounds.startValue,
-    };
-  }
+  const context = {
+    ...options,
+    currentValue: startValue,
+    completionRate: 0,
+    durationRate: 0,
+  };
 
   const removeFromRegistry = () => {
     const index = runningAnimations.indexOf(context);
     return index > -1 && runningAnimations.splice(index, 1)[0];
   };
 
+  context.cancel = function () {
+    cancel = true;
+    return removeFromRegistry();
+  };
   runningAnimations.push(context);
 
-  const runner = function (timestamp: number) {
+  const runner = function (timestamp) {
     const start = timestamp || +new Date(),
-      finish = start + duration;
+      finish = start + duration,
+      isMany = Array.isArray(startValue),
+      byValue =
+        options.byValue ||
+        (isMany
+          ? startValue.map((value, i) => endValue[i] - value)
+          : endValue - startValue);
 
     options.onStart && options.onStart();
 
-    (function tick(ticktime: number) {
+    (function tick(ticktime) {
       const time = ticktime || +new Date();
       const currentTime = time > finish ? duration : time - start,
-        timePerc = currentTime / duration;
-      let current: number | number[], valuePerc: number;
-
+        timePerc = currentTime / duration,
+        current = isMany
+          ? startValue.map((_value, i) =>
+              easing(currentTime, _value, byValue[i], duration)
+            )
+          : easing(currentTime, startValue, byValue, duration),
+        valuePerc = isMany
+          ? Math.abs((current[0] - startValue[0]) / byValue[0])
+          : Math.abs((current - startValue) / byValue);
       //  update context
+      context.currentValue = isMany ? current.slice() : current;
+      context.completionRate = valuePerc;
       context.durationRate = timePerc;
-      if (isMulti(bounds)) {
-        current = new Array<number>(bounds.startValue.length);
-        for (let i = 0; i < current.length; i++) {
-          current[i] = easing(
-            currentTime,
-            bounds.startValue[i],
-            bounds.byValue[i],
-            duration
-          );
-        }
-        context.currentValue = current.slice();
-        valuePerc = Math.abs(
-          (current[0] - bounds.startValue[0]) / bounds.byValue[0]
-        );
-        if (cancel) {
-          return;
-        }
-        if (bounds.abort(current, valuePerc, timePerc)) {
-          removeFromRegistry();
-          return;
-        }
-        if (time > finish) {
-          context.currentValue = bounds.endValue.slice();
-          bounds.onChange(bounds.endValue.slice(), 1, 1);
-          bounds.onComplete(bounds.endValue, 1, 1);
-          context.completionRate = 1;
-          context.durationRate = 1;
-          //  execute callbacks
-          removeFromRegistry();
-        } else {
-          bounds.onChange(current, valuePerc, timePerc);
-          requestAnimFrame(tick);
-        }
+
+      if (cancel) {
+        return;
+      }
+      if (abort(current, valuePerc, timePerc)) {
+        removeFromRegistry();
+        return;
+      }
+      if (time > finish) {
+        //  update context
+        context.currentValue = isMany ? endValue.slice() : endValue;
+        context.completionRate = 1;
+        context.durationRate = 1;
+        //  execute callbacks
+        onChange(isMany ? endValue.slice() : endValue, 1, 1);
+        onComplete(endValue, 1, 1);
+        removeFromRegistry();
+        return;
       } else {
-        current = easing(
-          currentTime,
-          bounds.startValue,
-          bounds.byValue,
-          duration
-        );
-        context.currentValue = current;
-        valuePerc = Math.abs(
-          ((current as number) - bounds.startValue) / bounds.byValue
-        );
-        context.completionRate = valuePerc;
-        if (cancel) {
-          return;
-        }
-        if (bounds.abort(current, valuePerc, timePerc)) {
-          removeFromRegistry();
-          return;
-        }
-        if (time > finish) {
-          context.currentValue = bounds.endValue;
-          bounds.onChange(bounds.endValue, 1, 1);
-          bounds.onComplete(bounds.endValue, 1, 1);
-          context.completionRate = 1;
-          context.durationRate = 1;
-          //  execute callbacks
-          removeFromRegistry();
-        } else {
-          bounds.onChange(current, valuePerc, timePerc);
-          requestAnimFrame(tick);
-        }
+        onChange(current, valuePerc, timePerc);
+        requestAnimFrame(tick);
       }
     })(start);
   };
