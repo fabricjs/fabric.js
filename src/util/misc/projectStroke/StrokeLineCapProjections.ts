@@ -40,7 +40,6 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
     magnitude: number = this.strokeProjectionMagnitude
   ) {
     const vector = this.createSideVector(from, to);
-    // we are looking for the vector in the opposite direction of AT, hence we negate magnitude
     return this.scaleUnitVector(getOrthonormalVector(vector), -magnitude);
   }
 
@@ -52,7 +51,7 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
    * @see https://github.com/fabricjs/fabric.js/pull/8344#1-1-butt
    */
   private projectButt() {
-    return [this.projectOrthogonally(this.A, this.T)];
+    return [this.projectOrthogonally(this.A, this.T, this.strokeProjectionMagnitude), this.projectOrthogonally(this.A, this.T, -this.strokeProjectionMagnitude)];
   }
 
   protected projectPoints() {
