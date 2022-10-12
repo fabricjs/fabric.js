@@ -73,7 +73,7 @@ export const getBisector = (A: Point, B: Point, C: Point) => {
  * @param {Boolean} [counterClockwise] the direction of the orthogonal vector, defaults to `true`
  * @returns {Point} the unit orthogonal vector
  */
-export const getOrthogonalUnitVector = (
+export const getOrthonormalVector = (
   v: Point,
   counterClockwise = true
 ): Point =>

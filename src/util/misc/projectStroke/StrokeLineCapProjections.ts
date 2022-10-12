@@ -1,5 +1,5 @@
 import { IPoint, Point } from '../../../point.class';
-import { getOrthogonalUnitVector } from '../vectors';
+import { getOrthonormalVector } from '../vectors';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
 import { TProjectStrokeOnPointsOptions, TProjection } from './types';
 
@@ -41,7 +41,7 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
   ) {
     const vector = this.createSideVector(from, to);
     // we are looking for the vector in the opposite direction of AT, hence we negate magnitude
-    return this.scaleUnitVector(getOrthogonalUnitVector(vector), -magnitude);
+    return this.scaleUnitVector(getOrthonormalVector(vector), -magnitude);
   }
 
   /**

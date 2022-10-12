@@ -1,6 +1,6 @@
 import { IPoint, Point } from '../../../point.class';
 import { degreesToRadians } from '../radiansDegreesConversion';
-import { getBisector, getOrthogonalUnitVector } from '../vectors';
+import { getBisector, getOrthonormalVector } from '../vectors';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
 import { TProjection, TProjectStrokeOnPointsOptions } from './types';
 
@@ -57,7 +57,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     magnitude: number = this.strokeProjectionMagnitude
   ) {
     const vector = this.createSideVector(from, to);
-    const orthogonalProjection = getOrthogonalUnitVector(vector);
+    const orthogonalProjection = getOrthonormalVector(vector);
     const correctSide = StrokeProjectionsBase.getAcuteAngleFactor(
       orthogonalProjection,
       this.bisectorVector
