@@ -1,6 +1,6 @@
 import { noop } from '../../constants';
 import { runningAnimations } from './animation_registry';
-import { defaultEasing } from './easing';
+import { defaultEasing } from './Easing';
 import { requestAnimFrame } from './AnimationFrame';
 import {
   AnimationBounds,
