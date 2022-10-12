@@ -1,4 +1,4 @@
-type TAnimationArgument = number | number[];
+export type TAnimationArgument = number | number[];
 
 /**
  * Callback called every frame
@@ -7,8 +7,8 @@ type TAnimationArgument = number | number[];
  * @param timeRatio ratio of current ms to animation duration. [0, 1]
  */
 export type TOnAnimationChangeCallback<
-  R = void,
-  T extends TAnimationArgument = TAnimationArgument
+  T extends TAnimationArgument,
+  R = void
 > = (t: T, valueRatio: number, timeRatio: number) => R;
 
 /**
@@ -16,7 +16,7 @@ export type TOnAnimationChangeCallback<
  * @returns truthy if animation should abort
  */
 export type TAbortCallback<T extends TAnimationArgument> =
-  TOnAnimationChangeCallback<boolean, T>;
+  TOnAnimationChangeCallback<T, boolean>;
 
 /**
  * Function used for canceling an animation
@@ -60,8 +60,9 @@ export type TEasingFunction = (
   duration: number
 ) => number;
 
-export interface AnimationOptions<T extends TAnimationArgument>
-  extends AnimationBounds<T> {
+export interface AnimationOptions<
+  T extends TAnimationArgument = TAnimationArgument
+> extends AnimationBounds<T> {
   /**
    * The object this animation is being performed on
    */
@@ -75,12 +76,12 @@ export interface AnimationOptions<T extends TAnimationArgument>
   /**
    * Called at each frame of the animation
    */
-  onChange: TOnAnimationChangeCallback<void, T>;
+  onChange: TOnAnimationChangeCallback<T>;
 
   /**
    * Called after the last frame of the animation
    */
-  onComplete: TOnAnimationChangeCallback<void, T>;
+  onComplete: TOnAnimationChangeCallback<T>;
 
   /**
    * Easing function
