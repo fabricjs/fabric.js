@@ -17,7 +17,7 @@ export const calcPathBBox = (
   const position: { left?: number; top?: number } = {};
   if (typeof left === 'undefined' || typeof top === 'undefined') {
     const origin = object.translateToGivenOrigin(
-      new Point(left || 0, top || 0),
+      new Point(bbox.left, bbox.top),
       'left',
       'top',
       object.originX,
