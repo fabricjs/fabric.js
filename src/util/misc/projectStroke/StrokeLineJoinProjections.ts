@@ -143,7 +143,6 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    *
    * @todo TODO:
    *  - Consider only projections that are inside the beginning and end of the circle segment
-   *  - Still buggy when skewX and skewY are applied at the same time
    *
    * @see https://github.com/fabricjs/fabric.js/pull/8344#2-3-2-round-skew
    */
@@ -173,7 +172,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       furthestX = new Point(
         newX,
         Math.sqrt(
-          circleRadius.y ** 2 - ((newX * circleRadius.y) / circleRadius.x) ** 2
+          newY ** 2 - ((newX * circleRadius.y) / circleRadius.x) ** 2
         )
       );
 
