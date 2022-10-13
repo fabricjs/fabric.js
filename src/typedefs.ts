@@ -17,6 +17,11 @@ export type TSize = {
   height: number;
 };
 
+export type TBBox = {
+  left: number;
+  top: number;
+} & TSize;
+
 export type Percent = `${number}%`;
 
 export const enum StrokeLineJoin {

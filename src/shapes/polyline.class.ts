@@ -1,9 +1,10 @@
 //@ts-nocheck
 
 import { config } from '../config';
+import { parseAttributes } from '../parser/parseAttributes';
+import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import { Point } from '../point.class';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
-import { calcPathBBox } from '../util/misc/PathUtils';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 
 (function (global) {
@@ -45,6 +46,8 @@ import { projectStrokeOnPoints } from '../util/misc/projectStroke';
        */
       exactBoundingBox: false,
 
+      initialized: false,
+
       cacheProperties: fabric.Object.prototype.cacheProperties.concat('points'),
 
       /**
@@ -66,11 +69,19 @@ import { projectStrokeOnPoints } from '../util/misc/projectStroke';
        *   top: 100
        * });
        */
-      initialize: function (points, options) {
-        options = options || {};
+      initialize: function (points, options = {}) {
         this.points = points || [];
         this.callSuper('initialize', options);
-        this.set(this._calcBBox(options));
+        this.initialized = true;
+        const bboxTL = this.setDimensions();
+        const origin = this.translateToGivenOrigin(
+          new Point(options.left ?? bboxTL.x, options.top ?? bboxTL.y),
+          typeof options.left === 'number' ? this.originX : 'left',
+          typeof options.top === 'number' ? this.originY : 'top',
+          this.originX,
+          this.originY
+        );
+        this.setPositionByOrigin(origin, this.originX, this.originY);
       },
 
       /**
@@ -81,13 +92,7 @@ import { projectStrokeOnPoints } from '../util/misc/projectStroke';
       },
 
       /**
-       * Calculate the polygon min and max point from points array,
-       * returning an object with left, top, width, height to measure the
-       * polygon size
-       * @return {Object} object.left X coordinate of the polygon leftmost point
-       * @return {Object} object.top Y coordinate of the polygon topmost point
-       * @return {Object} object.width distance between X coordinates of the polygon leftmost and rightmost point
-       * @return {Object} object.height distance between Y coordinates of the polygon topmost and bottommost point
+       * Calculate the polygon bounding box
        * @private
        */
       _calcDimensions: function () {
@@ -97,21 +102,43 @@ import { projectStrokeOnPoints } from '../util/misc/projectStroke';
             )
           : this.points.map((p) => new Point(p));
         if (points.length === 0) {
-          return makeBoundingBoxFromPoints([new Point(0, 0)]);
+          return {
+            left: 0,
+            top: 0,
+            width: 0,
+            height: 0,
+            pathOffset: new Point(),
+          };
         }
-        return makeBoundingBoxFromPoints(points);
+        const bbox = makeBoundingBoxFromPoints(points);
+        const strokeCorrection = new Point()
+          .scalarAdd(this.strokeWidth)
+          .divide(
+            this.strokeUniform
+              ? new Point(this.scaleX, this.scaleY)
+              : new Point(1, 1)
+          );
+        const offsetX = bbox.left + bbox.width / 2,
+          offsetY = bbox.top + bbox.height / 2;
+        const pathOffsetX =
+          offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
+        const pathOffsetY =
+          offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY));
+        return {
+          ...bbox,
+          width: bbox.width - strokeCorrection.x,
+          height: bbox.height - strokeCorrection.y,
+          pathOffset: new Point(pathOffsetX, pathOffsetY),
+        };
       },
 
       /**
-       * @private
+       * @returns {Point} top left position of the bounding box, useful for complementary positioning
        */
-      _calcBBox: function (options?: { left?: number; top?: number }) {
-        return calcPathBBox(this, options);
-      },
-
       setDimensions: function () {
-        const { width, height, pathOffset } = this._calcBBox();
+        const { left, top, width, height, pathOffset } = this._calcDimensions();
         this.set({ width, height, pathOffset });
+        return new Point(left, top);
       },
 
       /**
@@ -145,7 +172,7 @@ import { projectStrokeOnPoints } from '../util/misc/projectStroke';
        * @private
        */
       _set: function (key, value) {
-        const changed = this[key] !== value;
+        const changed = this.initialized && this[key] !== value;
         const output = this.callSuper('_set', key, value);
         if (
           changed &&
@@ -260,19 +287,24 @@ import { projectStrokeOnPoints } from '../util/misc/projectStroke';
    * @param {Object} [options] Options object
    */
   fabric.Polyline.fromElementGenerator = function (_class) {
-    return function (element, callback, options) {
+    return function (element, callback, options = {}) {
       if (!element) {
         return callback(null);
       }
-      options || (options = {});
-
-      var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(
+      const points = parsePointsAttribute(element.getAttribute('points')),
+        parsedAttributes = parseAttributes(
           element,
           fabric[_class].ATTRIBUTE_NAMES
         );
-      parsedAttributes.fromSVG = true;
-      callback(new fabric[_class](points, extend(parsedAttributes, options)));
+      callback(
+        new fabric[_class](points, {
+          ...parsedAttributes,
+          ...options,
+          // we pass undefined to instruct the constructor to position the object using the bbox
+          left: undefined,
+          top: undefined,
+        })
+      );
     };
   };
 

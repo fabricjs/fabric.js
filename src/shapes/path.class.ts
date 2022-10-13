@@ -1,7 +1,11 @@
 //@ts-nocheck
 
 import { config } from '../config';
-import { calcPathBBox } from '../util/misc/PathUtils';
+import { parseAttributes } from '../parser/parseAttributes';
+import { Point } from '../point.class';
+import { PathData } from '../typedefs';
+import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
+import { getBoundsOfCurve, makePathSimpler, parsePath } from '../util/path';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -50,34 +54,27 @@ import { calcPathBBox } from '../util/misc/PathUtils';
         options = clone(options || {});
         delete options.path;
         this.callSuper('initialize', options);
-        this.set(this._setPath(path || [], options));
-      },
-
-      /**
-       * @private
-       */
-      _calcBBox: function (options?: { left?: number; top?: number }) {
-        return calcPathBBox(this, options);
-      },
-
-      setDimensions: function () {
-        const { width, height, pathOffset } = this._calcBBox();
-        this.set({ width, height, pathOffset });
-      },
-
-      /**
-       * @private
-       * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
-       * @param {Object} [options] Options object
-       */
-      _setPath: function (path, options?: { left?: number; top?: number }) {
-        this.path = fabric.util.makePathSimpler(
-          Array.isArray(path) ? path : fabric.util.parsePath(path)
+        const pathTL = this._setPath(path || []);
+        const origin = this.translateToGivenOrigin(
+          new Point(options.left ?? pathTL.x, options.top ?? pathTL.y),
+          typeof options.left === 'number' ? this.originX : 'left',
+          typeof options.top === 'number' ? this.originY : 'top',
+          this.originX,
+          this.originY
         );
-        const { left, top, width, height, pathOffset } =
-          this._calcBBox(options);
-        this.set({ width, height, pathOffset });
-        return { left, top };
+        this.setPositionByOrigin(origin, this.originX, this.originY);
+      },
+
+      /**
+       * @private
+       * @param {PathData | string} path Path data (sequence of coordinates and corresponding "command" tokens)
+       * @returns {Point} top left position of the bounding box, useful for complementary positioning
+       */
+      _setPath: function (path: PathData | string) {
+        this.path = makePathSimpler(
+          Array.isArray(path) ? path : parsePath(path)
+        );
+        return this.setDimensions();
       },
 
       /**
@@ -274,28 +271,32 @@ import { calcPathBBox } from '../util/misc/PathUtils';
       },
 
       /**
+       * @returns {Point} top left position of the bounding box, useful for complementary positioning
+       */
+      setDimensions: function () {
+        const { left, top, width, height, pathOffset } = this._calcDimensions();
+        this.set({ width, height, pathOffset });
+        return new Point(left, top);
+      },
+
+      /**
        * @private
        */
       _calcDimensions: function () {
-        var aX = [],
-          aY = [],
-          current, // current instruction
-          subpathStartX = 0,
+        const bounds: Point[] = [];
+        let subpathStartX = 0,
           subpathStartY = 0,
           x = 0, // current x
-          y = 0, // current y
-          bounds;
+          y = 0; // current y
 
-        for (var i = 0, len = this.path.length; i < len; ++i) {
-          current = this.path[i];
-
+        for (let i = 0; i < this.path.length; ++i) {
+          const current = this.path[i]; // current instruction
           switch (
             current[0] // first letter
           ) {
             case 'L': // lineto, absolute
               x = current[1];
               y = current[2];
-              bounds = [];
               break;
 
             case 'M': // moveTo, absolute
@@ -303,34 +304,37 @@ import { calcPathBBox } from '../util/misc/PathUtils';
               y = current[2];
               subpathStartX = x;
               subpathStartY = y;
-              bounds = [];
               break;
 
             case 'C': // bezierCurveTo, absolute
-              bounds = fabric.util.getBoundsOfCurve(
-                x,
-                y,
-                current[1],
-                current[2],
-                current[3],
-                current[4],
-                current[5],
-                current[6]
+              bounds.push(
+                ...getBoundsOfCurve(
+                  x,
+                  y,
+                  current[1],
+                  current[2],
+                  current[3],
+                  current[4],
+                  current[5],
+                  current[6]
+                )
               );
               x = current[5];
               y = current[6];
               break;
 
             case 'Q': // quadraticCurveTo, absolute
-              bounds = fabric.util.getBoundsOfCurve(
-                x,
-                y,
-                current[1],
-                current[2],
-                current[1],
-                current[2],
-                current[3],
-                current[4]
+              bounds.push(
+                ...getBoundsOfCurve(
+                  x,
+                  y,
+                  current[1],
+                  current[2],
+                  current[1],
+                  current[2],
+                  current[3],
+                  current[4]
+                )
               );
               x = current[3];
               y = current[4];
@@ -342,26 +346,16 @@ import { calcPathBBox } from '../util/misc/PathUtils';
               y = subpathStartY;
               break;
           }
-          bounds.forEach(function (point) {
-            aX.push(point.x);
-            aY.push(point.y);
-          });
-          aX.push(x);
-          aY.push(y);
         }
 
-        var minX = Math.min(...aX) || 0,
-          minY = Math.min(...aY) || 0,
-          maxX = Math.max(...aX) || 0,
-          maxY = Math.max(...aY) || 0,
-          deltaX = maxX - minX,
-          deltaY = maxY - minY;
+        const bbox = makeBoundingBoxFromPoints(bounds);
 
         return {
-          left: minX,
-          top: minY,
-          width: deltaX,
-          height: deltaY,
+          ...bbox,
+          pathOffset: new Point(
+            bbox.left + bbox.width / 2,
+            bbox.top + bbox.height / 2
+          ),
         };
       },
     }
@@ -399,13 +393,18 @@ import { calcPathBBox } from '../util/misc/PathUtils';
    * @param {Function} [callback] Options callback invoked after parsing is finished
    */
   fabric.Path.fromElement = function (element, callback, options) {
-    var parsedAttributes = fabric.parseAttributes(
+    const parsedAttributes = parseAttributes(
       element,
       fabric.Path.ATTRIBUTE_NAMES
     );
-    parsedAttributes.fromSVG = true;
     callback(
-      new fabric.Path(parsedAttributes.d, extend(parsedAttributes, options))
+      new fabric.Path(parsedAttributes.d, {
+        ...parsedAttributes,
+        ...options,
+        // we pass undefined to instruct the constructor to position the object using the bbox
+        left: undefined,
+        top: undefined,
+      })
     );
   };
   /* _FROM_SVG_END_ */
