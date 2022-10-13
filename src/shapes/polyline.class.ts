@@ -44,6 +44,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        * @deprecated
        * @type Boolean
        * @default false
+       * @todo set default to true and remove flag and related logic
        */
       exactBoundingBox: false,
 
@@ -118,8 +119,13 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
           offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
         const pathOffsetY =
           offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY));
+        // TODO: remove next line
+        const legacyCorrection =
+          !this.fromSVG && !this.exactBoundingBox ? this.strokeWidth / 2 : 0;
         return {
           ...bbox,
+          left: bbox.left - legacyCorrection,
+          top: bbox.top - legacyCorrection,
           pathOffset: new Point(pathOffsetX, pathOffsetY),
         };
       },
@@ -137,7 +143,9 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        * @override stroke is taken in account in size
        */
       _getNonTransformedDimensions: function () {
-        return new Point(this.width, this.height);
+        return this.exactBoundingBox
+          ? new Point(this.width, this.height)
+          : this.callSuper('_getNonTransformedDimensions');
       },
 
       /**
@@ -147,14 +155,16 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        * @private
        */
       _getTransformedDimensions: function (options) {
-        return this.callSuper('_getTransformedDimensions', {
-          ...(options || {}),
-          // disable stroke bbox calculations
-          strokeWidth: 0,
-          // disable skewing bbox calculations
-          skewX: 0,
-          skewY: 0,
-        });
+        return this.exactBoundingBox
+          ? this.callSuper('_getTransformedDimensions', {
+              ...(options || {}),
+              // disable stroke bbox calculations
+              strokeWidth: 0,
+              // disable skewing bbox calculations
+              skewX: 0,
+              skewY: 0,
+            })
+          : this.callSuper('_getTransformedDimensions', options);
       },
 
       /**
