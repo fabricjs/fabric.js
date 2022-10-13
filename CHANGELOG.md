@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(polyline/polygon): stroke bounding box for all line join/cap cases [#8344](https://github.com/fabricjs/fabric.js/pull/8344)
+- chore(): fix typos in intersection file [#8345](https://github.com/fabricjs/fabric.js/pull/8345)
 - fix(textStyles): Handle empty style object in stylesToArray [#8357](https://github.com/fabricjs/fabric.js/pull/8357)
 - ci(build): safeguard concurrent unlocking [#8309](https://github.com/fabricjs/fabric.js/pull/8309)
 - ci(): update stale bot [#8307](https://github.com/fabricjs/fabric.js/pull/8307)
