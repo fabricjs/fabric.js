@@ -5,8 +5,7 @@
 Questions are legit but that doesn't make them bug reports...\
 Please refer to available resources (read below) and refrain from opening an issue in such a case.
 
-To find an answer first [search the repository](https://github.com/fabricjs/fabric.js/search?q=&type=Issues), it contains a lot of useful threads.\
-Refer to `Fabric's google group`, `StackOverflow` and [`Fabric's IRC channel`](irc://irc.freenode.net/#fabric.js) as well.\
+To find an answer, first [search the repository](https://github.com/fabricjs/fabric.js/search?q=&type=Issues). It contains a lot of useful threads.\
 See [Links](#-links).
 
 Questions might inspire you to [improve the docs](#-improving-docs) 🌈 Please do 🌟.
@@ -36,7 +35,7 @@ Demos and examples 🤓 can be found on [fabricjs.com](http://fabricjs.com/demos
 
 **These are minimal requirements. Without them issues shall be ⛔.**
 
-If it's not a bug **OR** if you're unsure, start a 🤠 [discussion](https://github.com/fabricjs/fabric.js/discussions) or create a post ✉️ on [Fabric's google group](https://groups.google.com/g/fabricjs) where someone might clarify some of the things.
+If it's not a bug **OR** if you're unsure, start a 🤠 [discussion](https://github.com/fabricjs/fabric.js/discussions).
 
 Check out [**Helping Out**](#%EF%B8%8F-helping-out).
 
@@ -132,8 +131,7 @@ Answering questions and addressing issues is a great way to start contributing t
 
 - [Issues](../../issues)
 - [Discussions](../../discussions)
-- [Google group](https://groups.google.com/g/fabricjs)
-- [Stackoverflow](http://stackoverflow.com/questions/tagged/fabricjs)
+- [StackOverflow](http://stackoverflow.com/questions/tagged/fabricjs)
 
 ## 🚀 Pull Requests
 
@@ -214,7 +212,6 @@ Options:
 
 For news about Fabric you can follow [@fabric.js], [@AndreaBogazzi], [@kangax], or [@kienzle_s] on Twitter.
 
-- [Fabric's google group](https://groups.google.com/forum/#!forum/fabricjs)
 - [stackoverflow](http://stackoverflow.com/questions/tagged/fabricjs)
 - [@fabric.js](https://twitter.com/fabricjs)
 - [@AndreaBogazzi](https://twitter.com/AndreaBogazzi)
@@ -223,6 +220,4 @@ For news about Fabric you can follow [@fabric.js], [@AndreaBogazzi], [@kangax], 
 - [jsfiddle](http://jsfiddle.net/user/fabricjs/fiddles)
 - [codepen.io](http://codepen.io/tag/fabricjs)
 - [fabricjs.com](http://fabricjs.com/demos)
-- [fabricjs.com/docs](http://fabricjs.com/docs)
-- [JSDoc 3](http://usejsdoc.org/)
 - [issue](https://github.com/fabric/fabric.js/issues)
