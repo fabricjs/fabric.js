@@ -1,4 +1,5 @@
 //@ts-nocheck
+import type { TClassProperties, TDegree } from '../typedefs';
 import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { config } from '../config';
@@ -13,7 +14,6 @@ import { clone } from '../util/lang_object';
 import { toFixed } from '../util/misc/toFixed';
 import { capitalize } from '../util/lang_string';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import type { TClassProperties, TDegree } from '../typedefs';
 
 type StaticCanvas = any;
 type Canvas = any;
@@ -2052,12 +2052,6 @@ export class FabricObject extends Observable {
     return FabricObject._fromObject(FabricObject, object, options);
   }
 }
-
-
-
-type FabricObjectDefaultValues = typeof fabricObjectDefaultValues;
-
-type FabricObjectDefaultValues2 = TClassProperties<FabricObject>;
 
 const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
   type: 'object',
