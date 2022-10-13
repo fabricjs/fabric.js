@@ -185,16 +185,17 @@ http
 
 ## More Resources
 
-- [Fabric.js on Twitter](https://twitter.com/fabricjs)
-- [Fabric.js on CodeTriage](https://www.codetriage.com/kangax/fabric.js)
-- [Fabric.js on Stackoverflow](https://stackoverflow.com/questions/tagged/fabricjs)
-- [Fabric.js on jsfiddle](https://jsfiddle.net/user/fabricjs/fiddles/)
-- [Fabric.js on Codepen.io](https://codepen.io/tag/fabricjs)
+- [Demos on `fabricjs.com`](http://fabricjs.com/demos)
+- [Fabric.js on `Twitter`](https://twitter.com/fabricjs)
+- [Fabric.js on `CodeTriage`](https://www.codetriage.com/kangax/fabric.js)
+- [Fabric.js on `Stack Overflow`](https://stackoverflow.com/questions/tagged/fabricjs)
+- [Fabric.js on `jsfiddle`](https://jsfiddle.net/user/fabricjs/fiddles/)
+- [Fabric.js on `Codepen.io`](https://codepen.io/tag/fabricjs)
 
 ## Credits [![Patreon](https://img.shields.io/static/v1?label=Patreon&message=%F0%9F%91%8D&logo=Patreon&color=blueviolet)](https://www.patreon.com/fabricJS)
 
 - [@kangax](https://twitter.com/kangax)
-- [asturur](https://github.com/asturur), [Andrea Bogazzi](https://twitter.com/AndreaBogazzi)
+- [asturur](https://github.com/asturur), follow Andrea Bogazzi on [`Twitter`](https://twitter.com/AndreaBogazzi)
   [![Sponsor asturur](https://img.shields.io/static/v1?label=Sponsor%20asturur&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/asturur)
 - [melchiar](https://github.com/melchiar) [![Sponsor melchiar](https://img.shields.io/static/v1?label=Sponsor%20melchiar&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/melchiar)
 - [ShaMan123](https://github.com/ShaMan123) [![Sponsor ShaMan123](https://img.shields.io/static/v1?label=Sponsor%20ShaMan123&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/ShaMan123)

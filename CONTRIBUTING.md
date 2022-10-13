@@ -1,12 +1,15 @@
 # 🎉 Contributing to Fabric 🥳
 
+This guide covers all you need to know from the start up.
+
+---
+
 ## 🧐 Questions?!?
 
 Questions are legit but that doesn't make them bug reports...\
 Please refer to available resources (read below) and refrain from opening an issue in such a case.
 
-To find an answer, first [search the repository](https://github.com/fabricjs/fabric.js/search?q=&type=Issues). It contains a lot of useful threads.\
-See [Links](#-links).
+To find an answer, first [search the repository](https://github.com/fabricjs/fabric.js/search?q=&type=Issues). It contains a lot of useful threads.
 
 Questions might inspire you to [improve the docs](#-improving-docs) 🌈 Please do 🌟.
 
@@ -38,6 +41,136 @@ Demos and examples 🤓 can be found on [fabricjs.com](http://fabricjs.com/demos
 If it's not a bug **OR** if you're unsure, start a 🤠 [discussion](https://github.com/fabricjs/fabric.js/discussions).
 
 Check out [**Helping Out**](#%EF%B8%8F-helping-out).
+
+---
+
+## 🔦 Fixing typos
+
+Simple as it seems, it makes things better.\
+A good way to start contributing.
+
+## 🔎 Improving Docs
+
+Improving **DOCS** is **SUPER** important for everyone.\
+Even if it's a small fix it is valuable 💎... **don't hesitate**!\
+
+Fixing and adding types is a great way to improve fabric.
+
+We plan on building a brand new website, stay tuned.
+
+## ❤️ Helping Out
+
+Answering questions and addressing issues is a great way to start contributing to fabric.
+
+- [Issues](../../issues)
+- [Discussions](../../discussions)
+
+### Adding a DEMO
+
+Take a look at an existing [demo file](https://github.com/fabricjs/fabricjs.com/blob/gh-pages/posts/demos/_posts/2020-2-15-custom-control-render.md).
+Create a new file in the same directory (`posts/demos/_posts`) and follow [**developing the website**](#fabricjscom-deprecated).
+
+### ~~`fabricjs.com`~~ (_deprecated_)
+
+To develop fabric's site you need to clone [`fabricjs.com`](https://github.com/fabricjs/fabricjs.com) in the same parent folder of [`fabric.js`](https://github.com/fabricjs/fabric.js), so that `fabric.js` and `fabricjs.com` are siblings.
+
+To start the dev server run `npm start:dev` inside the `fabricjs.com` directory (after installing dependencies).
+
+If you are working on windows, check out [`jekyll` docs](https://jekyllrb.com/docs/installation/) for further instructions or use [WSL](https://learn.microsoft.com/en-us/windows/wsl/).
+
+## Fixing 🐛
+
+The flow:
+
+- open an [issue](#🏷️-issue-tracker), if there isn't any, addressing the bug
+- fix the bug, see [Developing](#🚧🎢-developing-💡✨)
+- add [tests](#🧪-testing)
+- [PR](#🚀-pull-requests)
+
+## 🚀 Pull Requests
+
+Fabric is an open source project 🦄 and as such depends on the **genuine effort** of individuals and the community as a whole.
+**Join Us** to make Fabric better 🌺 .
+
+### Getting Started
+
+- Read this section through.
+- Take a look at [**GOTCHAS**](http://fabricjs.com/fabric-gotchas)
+- Follow [Developing](#-developing-) and read [Testing](#-testing).
+
+### ✅ Guidelines
+
+- **Code Style** \
+  Fabric uses [`prettier`](https://prettier.io/) to format files and [`eslint`](https://eslint.org/) for linting (`npm run lint -- --fix`).\
+  To enjoy a seamless dev experience add the [`Prettier - Code formatter`](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) extension via the extensions toolbar in VSCode.
+- **⛔ `dist`** \
+  Commit changes to [source files](src). Don't commit the generated [distribution files](dist).
+- **Tests** \
+  PRs must be backed with relevant tests, follow [TESTING](#-testing).
+- **Docs** \
+  Add relevant comments to your code if necessary using [JSDoc 3](https://jsdoc.app/) and update relevant guides.\
+  The generated documentation can be found at [fabricjs.com](http://fabricjs.com/docs), see [DOCS](#🔎-improving-docs).
+- **Changelog**\
+  Add a concise listing to the [**CHANGELOG**](./CHANGELOG.md) describing what has changed.
+- **1️⃣ PR per feature/bug** \
+  Create a new branch for every pull request.\
+  If you want to do more than one thing, create multiple pull requests 💪.
+- **And there you go!** \
+  If you still have questions we're always happy to help.
+
+After you open a PR a maintainer will review it.
+It is more than likely you will be requested to change stuff and refine your work before it is merged into the repo.
+
+## 🧪 Testing
+
+[![🩺](../../actions/workflows/build.yml/badge.svg)](../../actions/workflows/build.yml)
+[![🧪](../../actions/workflows/tests.yml/badge.svg)](../../actions/workflows/tests.yml)
+[![CodeQL](../../actions/workflows/codeql-analysis.yml/badge.svg)](../../actions/workflows/codeql-analysis.yml)
+
+Test suites use [`QUnit`](https://qunitjs.com/) for assertions and [`testem`](https://github.com/testem/testem) for serving
+
+- `unit` tests: test logic and state
+- `visual` tests: test visual outcome against image refs located at `/test/visual/golden`
+
+Flow:
+
+- `npm run build -- -f -w`: build and watch for changes
+- run tests:
+
+```bash
+
+npm test -- -a -d
+> Running all tests in debug mode (read more in the help section)
+
+npm test -- -s visual --dev -l -c chrome
+> Running live visual tests on chrome (navigate to see)
+
+npm test -- --help
+
+> Usage: fabric.js test [options]
+
+> run test suite
+
+Options:
+  -s, --suite <suite...>      test suite to run (choices: "unit", "visual")
+  -f, --file <file>           run a specific test file
+  --filter <filter>           filter tests by name
+  -a, --all                   run all tests (default: false)
+  -d, --debug                 debug visual tests by overriding refs (golden images) in case of visual changes (default:
+                              false)
+  -r, --recreate              recreate visual refs (golden images) (default: false)
+  -v, --verbose               log passing tests (default: false)
+  -l, --launch                launch tests in the browser (default: false)
+  --dev                       runs testem in `dev` mode, without a `ci` flag (default: false)
+  -c, --context <context...>  context to test in (choices: "chrome", "firefox", "node", default: "node")
+  -p, --port
+  -o, --out <out>             path to report test results to
+  --clear-cache               clear CLI test cache (default: false)
+  -h, --help                  display help for command
+
+```
+
+---
 
 ## 🚧🎢 Developing 💡✨
 
@@ -101,124 +234,3 @@ Establish symlinking to work with a local version on separate projects.
 
 See [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link) **OR** [yarn link](https://yarnpkg.com/cli/link).\
 Don't forget to unlink the package once you're done.
-
----
-
-**Developing easily becomes a [PR](#-pull-requests) 😉**
-
----
-
-## 🔎 Improving Docs
-
-Improving **DOCS** is **SUPER** important for everyone.\
-Even if it's a small fix it is valuable 💎... **don't hestitate**!\
-We plan on building a brand new website, stay tuned.
-
-## ❤️ Helping Out
-
-Answering questions and addressing issues is a great way to start contributing to fabric.
-
-- [Issues](../../issues)
-- [Discussions](../../discussions)
-
-### Adding a DEMO
-
-Take a look at an existing [demo file](https://github.com/fabricjs/fabricjs.com/blob/gh-pages/posts/demos/_posts/2020-2-15-custom-control-render.md).
-Create a new file in the same directory (`posts/demos/_posts`) and follow [**developing the website**](#fabricjscom-deprecated).
-
-### ~~`fabricjs.com`~~ (_deprecated_)
-
-To develop fabric's site you need to clone [`fabricjs.com`](https://github.com/fabricjs/fabricjs.com) in the same parent folder of [`fabric.js`](https://github.com/fabricjs/fabric.js), so that `fabric.js` and `fabricjs.com` are siblings.
-
-To start the dev server run `npm start:dev` inside the `fabricjs.com` directory (after installing dependencies).
-
-If you are working on windows, check out [`jekyll` docs](https://jekyllrb.com/docs/installation/) for further instructions or use [WSL](https://learn.microsoft.com/en-us/windows/wsl/).
-
-## 🚀 Pull Requests
-
-Fabric is an open source project 🦄 and as such depends on the **genuine effort** of individuals and the community as a whole.
-**Join Us** to make Fabric better 🌺 .
-
-### Getting Started
-
-- Read this section through.
-- Take a look at [**GOTCHAS**](http://fabricjs.com/fabric-gotchas)
-- Follow [Developing](#-developing-) and read [Testing](#-testing).
-
-### ✅ Guidelines
-
-- **Code Style** \
-  Fabric uses [`prettier`](https://prettier.io/) to format files and [`eslint`](https://eslint.org/) for linting (`npm run lint -- --fix`).\
-  To enjoy a seamless dev experience add the [`Prettier - Code formatter`](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) extension via the extensions toolbar in VSCode.
-- **⛔ `dist`** \
-  Commit changes to [source files](src). Don't commit the generated [distribution files](dist).
-- **Tests** \
-  PRs must be backed with relevant tests, follow [TESTING](#-testing).
-- **Docs** \
-  Add relevant comments to your code if necessary using [JSDoc 3](https://jsdoc.app/) and update relevant guides.\
-  The generated documentation can be found at [fabricjs.com](http://fabricjs.com/docs), see [DOCS](#🔎-improving-docs).
-- **Changelog**\
-  Add a concise listing to the [**CHANGELOG**](./CHANGELOG.md) describing what has changed.
-- **1️⃣ PR per feature/bug** \
-  Create a new branch for every pull request.\
-  If you want to do more than one thing, create multiple pull requests 💪.
-- **And there you go!** \
-  If you still have questions we're always happy to help.
-
-## 🧪 Testing
-
-[![🩺](../../actions/workflows/build.yml/badge.svg)](../../actions/workflows/build.yml)
-[![🧪](../../actions/workflows/tests.yml/badge.svg)](../../actions/workflows/tests.yml)
-[![CodeQL](../../actions/workflows/codeql-analysis.yml/badge.svg)](../../actions/workflows/codeql-analysis.yml)
-
-Test suites use [`QUnit`](https://qunitjs.com/) for assertions and [`testem`](https://github.com/testem/testem) for serving
-
-- `unit` tests: test logic and state
-- `visual` tests: test visual outcome against image refs located at `/test/visual/golden`
-
-```bash
-
-npm test -- -a -d
-> Running all tests in debug mode (read more in the help section)
-
-npm test -- -s visual --dev -l -c chrome
-> Running live visual tests on chrome (navigate to see)
-
-npm test -- --help
-
-> Usage: fabric.js test [options]
-
-> run test suite
-
-Options:
-  -s, --suite <suite...>      test suite to run (choices: "unit", "visual")
-  -f, --file <file>           run a specific test file
-  --filter <filter>           filter tests by name
-  -a, --all                   run all tests (default: false)
-  -d, --debug                 debug visual tests by overriding refs (golden images) in case of visual changes (default:
-                              false)
-  -r, --recreate              recreate visual refs (golden images) (default: false)
-  -v, --verbose               log passing tests (default: false)
-  -l, --launch                launch tests in the browser (default: false)
-  --dev                       runs testem in `dev` mode, without a `ci` flag (default: false)
-  -c, --context <context...>  context to test in (choices: "chrome", "firefox", "node", default: "node")
-  -p, --port
-  -o, --out <out>             path to report test results to
-  --clear-cache               clear CLI test cache (default: false)
-  -h, --help                  display help for command
-
-```
-
-## 🚩 Links
-
-For news about Fabric you can follow [@fabric.js], [@AndreaBogazzi], [@kangax], or [@kienzle_s] on Twitter.
-
-- [stackoverflow](http://stackoverflow.com/questions/tagged/fabricjs)
-- [@fabric.js](https://twitter.com/fabricjs)
-- [@AndreaBogazzi](https://twitter.com/AndreaBogazzi)
-- [@kangax](https://twitter.com/kangax)
-- [@kienzle_s](https://twitter.com/kienzle_s)
-- [jsfiddle](http://jsfiddle.net/user/fabricjs/fiddles)
-- [codepen.io](http://codepen.io/tag/fabricjs)
-- [fabricjs.com](http://fabricjs.com/demos)
-- [issue](https://github.com/fabric/fabric.js/issues)
