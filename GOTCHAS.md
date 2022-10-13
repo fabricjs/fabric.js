@@ -24,7 +24,7 @@ This usually happens once the canvas' position in the `document` is changed **af
 Most objects have a transparent stroke with a strokeWidth of 1 by default. This causes the object to shift by 0.5 pixel horizontally and vertically.
 Take this under consideration when positioning objects at an exact position.
 This is to comply with SVG behavior.
-You can always set `strokeWidth` to `0`.
+To remove this invisible border, you can set the object's `strokeWidth` to `0`.
 
 - **Blurry visuals**: retina scaling\
 Objects need a reference to `Canvas` for proper rendering. 
