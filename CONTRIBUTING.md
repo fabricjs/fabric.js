@@ -1,8 +1,6 @@
 # 🎉 Contributing to Fabric 🥳
 
-This guide covers all you need to know from the start up.
-
----
+This guide covers all you need to know from the start, for a first time contributor, advancing to the more advanced topics as you continue reading.
 
 ## 🧐 Questions?!?
 
@@ -65,9 +63,9 @@ Answering questions and addressing issues is a great way to start contributing t
 - [Issues](../../issues)
 - [Discussions](../../discussions)
 
-### Adding a DEMO
+### 🎮 Adding a DEMO
 
-Take a look at an existing [demo file](https://github.com/fabricjs/fabricjs.com/blob/gh-pages/posts/demos/_posts/2020-2-15-custom-control-render.md).
+Take a look at an existing [demo file](https://github.com/fabricjs/fabricjs.com/blob/gh-pages/posts/demos/_posts/2020-2-15-custom-control-render.md).\
 Create a new file in the same directory (`posts/demos/_posts`) and follow [**developing the website**](#fabricjscom-deprecated).
 
 ### ~~`fabricjs.com`~~ (_deprecated_)
@@ -78,7 +76,7 @@ To start the dev server run `npm start:dev` inside the `fabricjs.com` directory 
 
 If you are working on windows, check out [`jekyll` docs](https://jekyllrb.com/docs/installation/) for further instructions or use [WSL](https://learn.microsoft.com/en-us/windows/wsl/).
 
-## Fixing Bugs 🐛
+## 🐛 Fixing Bugs
 
 The flow:
 
