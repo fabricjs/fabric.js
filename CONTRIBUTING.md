@@ -134,7 +134,14 @@ Test suites use [`QUnit`](https://qunitjs.com/) for assertions and [`testem`](ht
 
 Flow:
 
-- `npm run build -- -f -w`: build and watch for changes
+- build and watch for changes:
+
+```bash
+
+npm run build -- -f -w
+
+```
+
 - run tests:
 
 ```bash
