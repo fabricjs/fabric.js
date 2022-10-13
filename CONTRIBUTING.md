@@ -131,7 +131,6 @@ Answering questions and addressing issues is a great way to start contributing t
 
 - [Issues](../../issues)
 - [Discussions](../../discussions)
-- [StackOverflow](http://stackoverflow.com/questions/tagged/fabricjs)
 
 ## 🚀 Pull Requests
 
