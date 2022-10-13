@@ -112,15 +112,6 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
           };
         }
         const bbox = makeBoundingBoxFromPoints(points);
-        const strokeCorrection = this.fromSVG
-          ? new Point()
-          : new Point()
-              .scalarAdd(this.strokeWidth)
-              .divide(
-                this.strokeUniform
-                  ? new Point(this.scaleX, this.scaleY)
-                  : new Point(1, 1)
-              );
         const offsetX = bbox.left + bbox.width / 2,
           offsetY = bbox.top + bbox.height / 2;
         const pathOffsetX =
@@ -129,8 +120,6 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
           offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY));
         return {
           ...bbox,
-          width: bbox.width - strokeCorrection.x,
-          height: bbox.height - strokeCorrection.y,
           pathOffset: new Point(pathOffsetX, pathOffsetY),
         };
       },
@@ -145,7 +134,14 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
       },
 
       /**
-       * @override skewing is taken into account when projecting stroke on points,
+       * @override stroke is taken in account in size
+       */
+      _getNonTransformedDimensions: function () {
+        return new Point(this.width, this.height);
+      },
+
+      /**
+       * @override stroke and skewing are taken into account when projecting stroke on points,
        * therefore we don't want the default calculation to account for skewing as well
        *
        * @private
@@ -153,6 +149,8 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
       _getTransformedDimensions: function (options) {
         return this.callSuper('_getTransformedDimensions', {
           ...(options || {}),
+          // disable stroke bbox calculations
+          strokeWidth: 0,
           // disable skewing bbox calculations
           skewX: 0,
           skewY: 0,
