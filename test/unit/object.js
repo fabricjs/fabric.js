@@ -1510,14 +1510,14 @@
   QUnit.test('prototype changes', function (assert) {
     var object = new fabric.Object();
     var object2 = new fabric.Object();
-    object.fill = 'red'
-    assert.equal(object.fill, '', 'by default objects have no fill');
+    object2.fill = 'red'
+    assert.equal(object.fill, 'rgb(0,0,0)', 'by default objects have a rgb(0,0,0) fill');
     assert.equal(object2.fill, 'red', 'once assigned object is red');
     fabric.Object.prototype.fill = 'green';
     assert.equal(object.fill, 'green', 'object with no value assigned read from prototype');
     assert.equal(object2.fill, 'red', 'once assigned object is red, it stays red');
     var object3 = new fabric.Object();
     assert.equal(object3.fill, 'green', 'newly created object have now green by default');
-    fabric.Object.prototype.fill = '';
+    fabric.Object.prototype.fill = 'rgb(0,0,0)';
   });
 })();
