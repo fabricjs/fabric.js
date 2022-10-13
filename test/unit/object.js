@@ -1,5 +1,3 @@
-import { fabric } from "fabric";
-
 (function(){
 
   var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
