@@ -1,7 +1,7 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
 
 interface NominalTag<T> {
-  nominalTag?: T;
+  nominalTag: T;
 }
 
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
