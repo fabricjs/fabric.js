@@ -6,6 +6,7 @@ import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import { Point } from '../point.class';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
