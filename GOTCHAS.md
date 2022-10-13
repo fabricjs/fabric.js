@@ -36,7 +36,11 @@
   Read more about `Group`
 
 - **Vanishing Object**\
-  It is likely you are misusing `Group` and the object tree because the vanished object thinks it is not within the canvas' visible viewport, indicating a severe **bug** in coordinate calculation. If you want to hack your way around it use `canvas.skipOffscreen` (recommended for triaging **ONLY**) with a significant performance hit.
+  It is likely you are misusing `Group` and the object tree.
+  The rendering cycle has a performance optimization skipping rendering objects that aren't visible on screen.
+  If an object disappears it is probably caused by this optimization, indicating a severe **bug** in coordinate calculation.
+  If you want to hack your way around it use `canvas.skipOffscreen` which disables this optimization (recommended for trialing **ONLY** as it will cause a significant performance hit).
+  Fix this problem by referencing `group` on the rouge object.
 
 - **Text Bounding Box is incorrect**\
   Make sure fonts have loaded before you create the `Text` object. Fabric needs the font to calculate the position and bounding box of the characters. Doing so prior to loading the font will lead to a bad calculation using a fallback font.
