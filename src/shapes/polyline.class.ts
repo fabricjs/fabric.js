@@ -143,14 +143,11 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
       },
 
       /**
-       * Returns object representation of an instance
-       * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-       * @return {Object} Object representation of an instance
+       * @override stroke is already accounted for in size
+       * @returns {fabric.Point} dimensions
        */
-      toObject: function (propertiesToInclude) {
-        return extend(this.callSuper('toObject', propertiesToInclude), {
-          points: this.points.concat(),
-        });
+      _getNonTransformedDimensions: function () {
+        return new fabric.Point(this.width, this.height);
       },
 
       /**
@@ -193,6 +190,17 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
           this.setDimensions();
         }
         return output;
+      },
+
+      /**
+       * Returns object representation of an instance
+       * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+       * @return {Object} Object representation of an instance
+       */
+      toObject: function (propertiesToInclude) {
+        return extend(this.callSuper('toObject', propertiesToInclude), {
+          points: this.points.concat(),
+        });
       },
 
       /* _TO_SVG_START_ */
