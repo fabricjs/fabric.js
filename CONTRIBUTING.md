@@ -114,23 +114,25 @@ Improving **DOCS** is **SUPER** important for everyone.\
 Even if it's a small fix it is valuable 💎... **don't hestitate**!\
 We plan on building a brand new website, stay tuned.
 
-### ~~`fabricjs.com`~~ (_deprecated_)
-
-To develop fabric's site you need to clone [`fabricjs.com`](https://github.com/fabricjs/fabricjs.com) in the same parent folder of [`fabric.js`](https://github.com/fabricjs/fabric.js), so that `fabric.js` and `fabricjs.com` are siblings.
-To start the dev server run `npm start:dev` inside the `fabricjs.com` directory (after installing dependecies).
-If you are working on windows, check out [`jekyll` docs](https://jekyllrb.com/docs/installation/) for futher instructions.
-
-### ~~Adding a DEMO~~ (_deprecated_)
-
-Take a look at an existing [demo file](https://github.com/fabricjs/fabricjs.com/blob/gh-pages/posts/demos/_posts/2020-2-15-custom-control-render.md).
-Create a new file in the same directory (`posts/demos/_posts`) and you're good to go.
-
 ## ❤️ Helping Out
 
 Answering questions and addressing issues is a great way to start contributing to fabric.
 
 - [Issues](../../issues)
 - [Discussions](../../discussions)
+
+### Adding a DEMO
+
+Take a look at an existing [demo file](https://github.com/fabricjs/fabricjs.com/blob/gh-pages/posts/demos/_posts/2020-2-15-custom-control-render.md).
+Create a new file in the same directory (`posts/demos/_posts`) and follow [**developing the website**](#fabricjscom-deprecated).
+
+### ~~`fabricjs.com`~~ (_deprecated_)
+
+To develop fabric's site you need to clone [`fabricjs.com`](https://github.com/fabricjs/fabricjs.com) in the same parent folder of [`fabric.js`](https://github.com/fabricjs/fabric.js), so that `fabric.js` and `fabricjs.com` are siblings.
+
+To start the dev server run `npm start:dev` inside the `fabricjs.com` directory (after installing dependencies).
+
+If you are working on windows, check out [`jekyll` docs](https://jekyllrb.com/docs/installation/) for further instructions or use [WSL](https://learn.microsoft.com/en-us/windows/wsl/).
 
 ## 🚀 Pull Requests
 
