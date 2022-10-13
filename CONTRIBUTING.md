@@ -16,7 +16,7 @@ Demos and examples 🤓 can be found on [fabricjs.com](http://fabricjs.com/demos
 ## 🏷️ Issue Tracker
 
 - **Before You Begin** 🎬
-  - 📌 Make sure you didn't fall into a known [**GOTCHA**](./GOTCHAS.md)
+  - 📌 Make sure you didn't fall into a known [**GOTCHA**](http://fabricjs.com/fabric-gotchas)
   - 🔎 [**Searching**](https://github.com/fabricjs/fabric.js/search?q=&ref=cmdform&type=Issues) for existing issues and discussions is
     🔋 **VITAL** in order to keep the community in a good state, prevent spamming 👎 and become a skilled fabric dev 🦉.
 - The **Title** must be informative, short and 🧿 to the point.
@@ -52,11 +52,11 @@ Check out [**Helping Out**](#%EF%B8%8F-helping-out).
 1. Next Up [Prototyping](#-prototyping) & [Testing](#-testing)
 
 #### Online
+
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
 
 Gitpod will start the [prototyping](#-prototyping) apps and expose them as endpoints.
 `A service is available on port ...` popups will show up.
-
 
 ### 🧭 Prototyping
 
@@ -143,7 +143,7 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 ### Getting Started
 
 - Read this section through.
-- Take a look at [**GOTCHAS**](./GOTCHAS.md)
+- Take a look at [**GOTCHAS**](http://fabricjs.com/fabric-gotchas)
 - Follow [Developing](#-developing-) and read [Testing](#-testing).
 
 ### ✅ Guidelines

@@ -2,16 +2,16 @@
 
 <a href="http://fabricjs.com/kitchensink" target="_blank"><img align="right" src="/lib/screenshot.png" style="width:400px"></a>
 
-
-
 A **simple and powerful Javascript HTML5 canvas library**.
 
-- [**Website**](http://fabricjs.com/) 
-- [**GOTCHAS**](./GOTCHAS.md)
+- [**Website**](http://fabricjs.com/)
+- [**GOTCHAS**](http://fabricjs.com/fabric-gotchas)
 - [**Contributing, Developing and More**](/CONTRIBUTING.md)
+
 ---
 
 <!-- build/coverage status, climate -->
+
 [![🩺](../../actions/workflows/build.yml/badge.svg)](../../actions/workflows/build.yml)
 [![🧪](../../actions/workflows/tests.yml/badge.svg)](../../actions/workflows/tests.yml)
 [![CodeQL](../../actions/workflows/codeql-analysis.yml/badge.svg)](../../actions/workflows/codeql-analysis.yml)
@@ -19,6 +19,7 @@ A **simple and powerful Javascript HTML5 canvas library**.
 ---
 
 <!-- npm, bower, CDNJS versions, downloads -->
+
 [![CDNJS version](https://img.shields.io/cdnjs/v/fabric.js.svg)](https://cdnjs.com/libraries/fabric.js)
 [![CDNJS](https://data.jsdelivr.com/v1/package/npm/fabric/badge)](https://www.jsdelivr.com/package/npm/fabric)
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/fabricjs/fabric.js)
@@ -34,9 +35,10 @@ A **simple and powerful Javascript HTML5 canvas library**.
 [![Sponsor ShaMan123](https://img.shields.io/static/v1?label=Sponsor%20ShaMan123&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/ShaMan123)
 [![Patreon](https://img.shields.io/static/v1?label=Patreon&message=%F0%9F%91%8D&logo=Patreon&color=blueviolet)](https://www.patreon.com/fabricJS)
 
------
+---
 
-## Features 
+## Features
+
 - Out of the box interactions such as scale, move, rotate, skew, group...
 - Built in shapes, controls, animations, image filters, gradients, patterns, brushes...
 - `JPG`, `PNG`, `JSON` and `SVG` i/o
@@ -44,17 +46,17 @@ A **simple and powerful Javascript HTML5 canvas library**.
 - [Unit tested](/CONTRIBUTING.md#-testing)
 
 #### Supported Browsers/Environments
-| Context  | Supported Version | Notes |
-| :-------------: | :-------------: | ------------- |
-| Firefox | ✔️ | version >= 4 |  
-| Safari | ✔️ | version >= 5 |  
-| Opera | ✔️ | version >= 9.64 |  
-| Chrome | ✔️ |  
-| Edge | ✔️ | chromium based |
-| Edge Legacy | ❌ | 
-| IE11 | ❌ |  
-| Node.js | ✔️ |  [Node.js installation](#nodejs)
 
+|   Context   | Supported Version | Notes                           |
+| :---------: | :---------------: | ------------------------------- |
+|   Firefox   |        ✔️         | version >= 4                    |
+|   Safari    |        ✔️         | version >= 5                    |
+|    Opera    |        ✔️         | version >= 9.64                 |
+|   Chrome    |        ✔️         |
+|    Edge     |        ✔️         | chromium based                  |
+| Edge Legacy |        ❌         |
+|    IE11     |        ❌         |
+|   Node.js   |        ✔️         | [Node.js installation](#nodejs) |
 
 ## Installation
 
@@ -65,13 +67,11 @@ $ yarn add fabric
 ```
 
 ```js
-
 // es6 imports
-import { fabric } from "fabric";
+import { fabric } from 'fabric';
 
 //  or cjs
-const fabric = require("fabric").fabric;
-
+const fabric = require('fabric').fabric;
 ```
 
 #### Node.js
@@ -80,7 +80,6 @@ Fabric.js depends on [node-canvas](https://github.com/Automattic/node-canvas) fo
 This means that you may encounter `node-canvas` limitations and [bugs](https://github.com/Automattic/node-canvas/issues).
 
 Follow these [instructions](https://github.com/Automattic/node-canvas#compiling) to get `node-canvas` up and running.
-
 
 #### Browser es6
 
@@ -100,15 +99,15 @@ See [browser modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Gu
 
 <script src="https://cdn.jsdelivr.net/npm/fabric"></script>
 <script>
-    const canvas = new fabric.Canvas('canvas');
-    const rect = new fabric.Rect({
-        top : 100,
-        left : 100,
-        width : 60,
-        height : 70,
-        fill : 'red'
-    });
-    canvas.add(rect);
+  const canvas = new fabric.Canvas('canvas');
+  const rect = new fabric.Rect({
+    top: 100,
+    left: 100,
+    width: 60,
+    height: 70,
+    fill: 'red',
+  });
+  canvas.add(rect);
 </script>
 ```
 
@@ -130,7 +129,7 @@ export const FabricJSCanvas = () => {
       canvas.dispose();
     }
   }, []);
-  
+
   return (<canvas width="300" height="300" ref={canvasEl}/>)
 });
 
@@ -155,11 +154,9 @@ http
       res.setHeader('Content-Type', 'image/png');
       res.setHeader('Content-Disposition', 'attachment; filename="fabric.png"');
       canvas.createPNGStream().pipe(res);
-    }
-    else if (req.url === '/view') {
+    } else if (req.url === '/view') {
       canvas.createPNGStream().pipe(res);
-    }
-    else {
+    } else {
       const imageData = canvas.toDataURL();
       res.writeHead(200, '', { 'Content-Type': 'text/html' });
       res.write(`<img src="${imageData}" />`);
@@ -168,7 +165,9 @@ http
   })
   .listen(port, (err) => {
     if (err) throw err;
-    console.log(`> Ready on http://localhost:${port}, http://localhost:${port}/view, http://localhost:${port}/download`);
+    console.log(
+      `> Ready on http://localhost:${port}, http://localhost:${port}/view, http://localhost:${port}/download`
+    );
   });
 ```
 
@@ -176,14 +175,13 @@ http
 
 ## Other Solutions
 
-| Project  | Description | Demo |
-| ------------- | ------------- | :-------------: |
-| [Three.js](https://github.com/mrdoob/three.js/)  | 3D graphics |  
-| [PixiJS](https://github.com/pixijs/pixijs)  | WebGL renderer |  
-| [Konva](https://github.com/konvajs/konva)  | *Competition* | ❌ |
-| [Canvas2PDF](https://github.com/joshua-gould/canvas2pdf)  | PDF renderer |  
-| [html-to-image](https://github.com/bubkoo/html-to-image)  | HTML to image/canvas |
-
+| Project                                                  | Description          | Demo |
+| -------------------------------------------------------- | -------------------- | :--: |
+| [Three.js](https://github.com/mrdoob/three.js/)          | 3D graphics          |
+| [PixiJS](https://github.com/pixijs/pixijs)               | WebGL renderer       |
+| [Konva](https://github.com/konvajs/konva)                | _Competition_        |  ❌  |
+| [Canvas2PDF](https://github.com/joshua-gould/canvas2pdf) | PDF renderer         |
+| [html-to-image](https://github.com/bubkoo/html-to-image) | HTML to image/canvas |
 
 ## More Resources
 
@@ -193,12 +191,11 @@ http
 - [Fabric.js on jsfiddle](https://jsfiddle.net/user/fabricjs/fiddles/)
 - [Fabric.js on Codepen.io](https://codepen.io/tag/fabricjs)
 
-
 ## Credits [![Patreon](https://img.shields.io/static/v1?label=Patreon&message=%F0%9F%91%8D&logo=Patreon&color=blueviolet)](https://www.patreon.com/fabricJS)
 
 - [@kangax](https://twitter.com/kangax)
-- [asturur](https://github.com/asturur), [Andrea Bogazzi](https://twitter.com/AndreaBogazzi) 
-[![Sponsor asturur](https://img.shields.io/static/v1?label=Sponsor%20asturur&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/asturur)
+- [asturur](https://github.com/asturur), [Andrea Bogazzi](https://twitter.com/AndreaBogazzi)
+  [![Sponsor asturur](https://img.shields.io/static/v1?label=Sponsor%20asturur&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/asturur)
 - [melchiar](https://github.com/melchiar) [![Sponsor melchiar](https://img.shields.io/static/v1?label=Sponsor%20melchiar&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/melchiar)
 - [ShaMan123](https://github.com/ShaMan123) [![Sponsor ShaMan123](https://img.shields.io/static/v1?label=Sponsor%20ShaMan123&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/ShaMan123)
 - Ernest Delgado for the original idea of [manipulating images on canvas](http://www.ernestdelgado.com/archive/canvas/)
@@ -207,4 +204,3 @@ http
 - [Stefan Kienzle](https://twitter.com/kienzle_s) for help with bugs, features, documentation, GitHub issues
 - [Shutterstock](http://www.shutterstock.com/jobs) for the time and resources invested in using and improving Fabric.js
 - [and all the other contributors](https://github.com/fabricjs/fabric.js/graphs/contributors)
-
