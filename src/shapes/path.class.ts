@@ -297,6 +297,10 @@ import { getBoundsOfCurve, makePathSimpler, parsePath } from '../util/path';
             case 'L': // lineto, absolute
               x = current[1];
               y = current[2];
+              bounds.push(
+                new Point(subpathStartX, subpathStartY),
+                new Point(x, y)
+              );
               break;
 
             case 'M': // moveTo, absolute
