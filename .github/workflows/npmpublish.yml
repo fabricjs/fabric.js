@@ -10,7 +10,6 @@ on:
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
-    if: github.event_name == 'release'
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
