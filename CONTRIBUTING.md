@@ -78,7 +78,7 @@ To start the dev server run `npm start:dev` inside the `fabricjs.com` directory 
 
 If you are working on windows, check out [`jekyll` docs](https://jekyllrb.com/docs/installation/) for further instructions or use [WSL](https://learn.microsoft.com/en-us/windows/wsl/).
 
-## Fixing 🐛
+## Fixing Bugs 🐛
 
 The flow:
 
