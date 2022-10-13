@@ -17,6 +17,10 @@ export type TSize = {
   height: number;
 };
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+type TNonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
+export type TClassProperties<T> = Pick<T, TNonFunctionPropertyNames<T>>;
+
 export type Percent = `${number}%`;
 
 export const enum StrokeLineJoin {
