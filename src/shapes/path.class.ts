@@ -353,9 +353,12 @@ import { getBoundsOfCurve, makePathSimpler, parsePath } from '../util/path';
         }
 
         const bbox = makeBoundingBoxFromPoints(bounds);
+        const strokeCorrection = this.fromSVG ? 0 : this.strokeWidth / 2;
 
         return {
           ...bbox,
+          left: bbox.left - strokeCorrection,
+          top: bbox.top - strokeCorrection,
           pathOffset: new Point(
             bbox.left + bbox.width / 2,
             bbox.top + bbox.height / 2
@@ -408,6 +411,7 @@ import { getBoundsOfCurve, makePathSimpler, parsePath } from '../util/path';
         // we pass undefined to instruct the constructor to position the object using the bbox
         left: undefined,
         top: undefined,
+        fromSVG: true,
       })
     );
   };

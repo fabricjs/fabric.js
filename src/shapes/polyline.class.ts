@@ -112,13 +112,15 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
           };
         }
         const bbox = makeBoundingBoxFromPoints(points);
-        const strokeCorrection = new Point()
-          .scalarAdd(this.strokeWidth)
-          .divide(
-            this.strokeUniform
-              ? new Point(this.scaleX, this.scaleY)
-              : new Point(1, 1)
-          );
+        const strokeCorrection = this.fromSVG
+          ? new Point()
+          : new Point()
+              .scalarAdd(this.strokeWidth)
+              .divide(
+                this.strokeUniform
+                  ? new Point(this.scaleX, this.scaleY)
+                  : new Point(1, 1)
+              );
         const offsetX = bbox.left + bbox.width / 2,
           offsetY = bbox.top + bbox.height / 2;
         const pathOffsetX =
@@ -140,14 +142,6 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
         const { left, top, width, height, pathOffset } = this._calcDimensions();
         this.set({ width, height, pathOffset });
         return new Point(left, top);
-      },
-
-      /**
-       * @override stroke is already accounted for in size
-       * @returns {fabric.Point} dimensions
-       */
-      _getNonTransformedDimensions: function () {
-        return new fabric.Point(this.width, this.height);
       },
 
       /**
@@ -312,6 +306,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
           // we pass undefined to instruct the constructor to position the object using the bbox
           left: undefined,
           top: undefined,
+          fromSVG: true,
         })
       );
     };
