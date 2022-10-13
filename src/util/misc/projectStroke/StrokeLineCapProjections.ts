@@ -51,7 +51,10 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
    * @see https://github.com/fabricjs/fabric.js/pull/8344#1-1-butt
    */
   private projectButt() {
-    return [this.projectOrthogonally(this.A, this.T, this.strokeProjectionMagnitude), this.projectOrthogonally(this.A, this.T, -this.strokeProjectionMagnitude)];
+    return [
+      this.projectOrthogonally(this.A, this.T, this.strokeProjectionMagnitude),
+      this.projectOrthogonally(this.A, this.T, -this.strokeProjectionMagnitude),
+    ];
   }
 
   protected projectPoints() {

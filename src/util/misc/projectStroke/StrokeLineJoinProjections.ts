@@ -183,9 +183,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
         circleRadius.x / Math.sqrt(1 + Math.tan(degreesToRadians(skewX)) ** 2),
       furthestX = new Point(
         newX,
-        Math.sqrt(
-          newY ** 2 - ((newX * newY) / circleRadius.x) ** 2
-        )
+        Math.sqrt(newY ** 2 - ((newX * newY) / circleRadius.x) ** 2)
       );
 
     [furthestX, furthestY].forEach((vector) => {
