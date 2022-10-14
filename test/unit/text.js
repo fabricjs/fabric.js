@@ -398,7 +398,11 @@
     var text = new fabric.Text('xxx');
     text.styles = { 0: { 0: { textBackgroundColor: 'blue' } } };
     var obj = text.toObject();
-    assert.deepEqual(obj.styles, [{ start: 0, end: 1, style: { textBackgroundColor: 'blue' }}], 'empty style object has been removed');
+    assert.deepEqual(
+      obj.styles,
+      [{ start: 0, end: 1, style: { textBackgroundColor: 'blue' }}],
+      'styles with only a textBackgroundColor property do not throw an error'
+    );
   });
 
   QUnit.test('getFontCache works with fontWeight numbers', function(assert) {
