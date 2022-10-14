@@ -15,7 +15,7 @@ module.exports = {
     '/fixtures': 'test/fixtures',
     '/main': 'test/tests.mustache'
   },
-  test_page: 'main?hidepassed&hideskipped&timeout=60000',
+  test_page: 'main',
   browser_args: {
     Chrome: [
       '--headless',
