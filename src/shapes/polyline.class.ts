@@ -102,7 +102,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
           ? this._projectStrokeOnPoints().map(
               (projection) => projection.projectedPoint
             )
-          : this.points.map((p) => new Point(p));
+          : this.points;
         if (points.length === 0) {
           return {
             left: 0,
@@ -113,6 +113,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
           };
         }
         const bbox = makeBoundingBoxFromPoints(points);
+        const bboxNoStroke = makeBoundingBoxFromPoints(this.points);
         const offsetX = bbox.left + bbox.width / 2,
           offsetY = bbox.top + bbox.height / 2;
         const pathOffsetX =
@@ -127,6 +128,10 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
           left: bbox.left - legacyCorrection,
           top: bbox.top - legacyCorrection,
           pathOffset: new Point(pathOffsetX, pathOffsetY),
+          strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top).subtract(
+            bbox.left,
+            bbox.top
+          ),
         };
       },
 
@@ -134,8 +139,9 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        * @returns {Point} top left position of the bounding box, useful for complementary positioning
        */
       setDimensions: function () {
-        const { left, top, width, height, pathOffset } = this._calcDimensions();
-        this.set({ width, height, pathOffset });
+        const { left, top, width, height, pathOffset, strokeOffset } =
+          this._calcDimensions();
+        this.set({ width, height, pathOffset, strokeOffset });
         return new Point(left, top);
       },
 
