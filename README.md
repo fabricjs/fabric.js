@@ -30,10 +30,10 @@ A **simple and powerful Javascript HTML5 canvas library**.
 
 ---
 
-[![Sponsor asturur][sponsors_badge_asturur]][sponsors_asturur]
-[![Sponsor melchiar][sponsors_badge_melchiar]][sponsors_melchiar]
-[![Sponsor ShaMan123][sponsors_badge_shaman123]][sponsors_shaman123]
-[![Patreon][patreon_badge]][patreon]
+[![Sponsor asturur](https://img.shields.io/static/v1?label=Sponsor%20asturur&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/asturur)
+[![Sponsor melchiar](https://img.shields.io/static/v1?label=Sponsor%20melchiar&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/melchiar)
+[![Sponsor ShaMan123](https://img.shields.io/static/v1?label=Sponsor%20ShaMan123&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/ShaMan123)
+[![Patreon](https://img.shields.io/static/v1?label=Patreon&message=%F0%9F%91%8D&logo=Patreon&color=blueviolet)](https://www.patreon.com/fabricJS)
 
 ---
 
@@ -43,7 +43,7 @@ A **simple and powerful Javascript HTML5 canvas library**.
 - Built in shapes, controls, animations, image filters, gradients, patterns, brushes...
 - `JPG`, `PNG`, `JSON` and `SVG` i/o
 - Typed and modular
-- [Unit tested](CONTRIBUTING.md#🧪-testing)
+- [Unit tested](CONTRIBUTING.md#%F0%9F%A7%AA%20testing)
 
 #### Supported Browsers/Environments
 
@@ -196,9 +196,9 @@ http
 
 - [kangax][kagnax]
 - [asturur][asturur], follow Andrea Bogazzi on [`Twitter`][asturur_twitter]
-  [![Sponsor asturur][sponsors_badge_asturur]][sponsors_asturur]
-- [melchiar][melchiar] [![Sponsor melchiar][sponsors_badge_melchiar]][sponsors_melchiar]
-- [ShaMan123][shaman123] [![Sponsor ShaMan123][sponsors_badge_shaman123]][sponsors_shaman123]
+  [![Sponsor asturur](https://img.shields.io/static/v1?label=Sponsor%20asturur&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/asturur)
+- [melchiar][melchiar] [![Sponsor melchiar](https://img.shields.io/static/v1?label=Sponsor%20melchiar&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/melchiar)
+- [ShaMan123][shaman123] [![Sponsor ShaMan123](https://img.shields.io/static/v1?label=Sponsor%20ShaMan123&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/ShaMan123)
 - Ernest Delgado for the original idea of [manipulating images on canvas](http://www.ernestdelgado.com/archive/canvas/)
 - [Maxim "hakunin" Chernyak](http://twitter.com/hakunin) for ideas, and help with various parts of the library throughout its life
 - [Sergey Nisnevich](http://nisnya.com) for help with geometry logic
@@ -229,9 +229,6 @@ http
 [pixijs]: https://github.com/pixijs/pixijs
 [shaman123]: https://github.com/ShaMan123
 [so]: https://stackoverflow.com/questions/tagged/fabricjs
-[sponsors_badge_asturur]: https://img.shields.io/static/v1?label=Sponsor%20asturur&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86
-[sponsors_badge_melchiar]: https://img.shields.io/static/v1?label=Sponsor%20melchiar&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86
-[sponsors_badge_shaman123]: https://img.shields.io/static/v1?label=Sponsor%20ShaMan123&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86
 [three.js]: https://github.com/mrdoob/three.js/
 [twitter]: https://twitter.com/fabricjs
 [website]: http://fabricjs.com/
