@@ -27,6 +27,12 @@ export const createVector = (from: IPoint, to: IPoint): Point =>
   new Point(to).subtract(from);
 
 /**
+ * return the magnitude of a vector
+ * @return {number}
+ */
+export const magnitude = (point: Point) => point.distanceFrom(new Point());
+
+/**
  * Calculates the angle between 2 vectors
  * @param {Point} a
  * @param {Point} b
@@ -50,7 +56,7 @@ export const calcVectorRotation = (v: Point) =>
  * @param {Point} v
  * @returns {Point} vector representing the unit vector pointing to the direction of `v`
  */
-export const getUnitVector = (v: Point): Point => v.scalarDivide(v.magnitude());
+export const getUnitVector = (v: Point): Point => v.scalarDivide(magnitude(v));
 
 /**
  * @param {Point} A

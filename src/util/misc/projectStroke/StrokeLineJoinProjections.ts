@@ -1,6 +1,6 @@
 import { IPoint, Point } from '../../../point.class';
 import { degreesToRadians } from '../radiansDegreesConversion';
-import { getBisector, getOrthonormalVector } from '../vectors';
+import { getBisector, getOrthonormalVector, magnitude } from '../vectors';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
 import { TProjection, TProjectStrokeOnPointsOptions } from './types';
 
@@ -112,7 +112,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       : this.options.strokeMiterLimit;
 
     if (
-      miterVector.magnitude() / this.strokeProjectionMagnitude <=
+      magnitude(miterVector) / this.strokeProjectionMagnitude <=
       strokeMiterLimit
     ) {
       return [this.applySkew(this.A.add(miterVector))];

@@ -1,8 +1,7 @@
 import { fabric } from '../HEADER';
 import { TMat2D, TRadian } from './typedefs';
-import { sin } from './util/misc/sin';
 import { cos } from './util/misc/cos';
-import { hypot } from './util/misc/hypot';
+import { sin } from './util/misc/sin';
 
 export interface IPoint {
   x: number;
@@ -350,14 +349,6 @@ export class Point {
    */
   clone(): Point {
     return new Point(this.x, this.y);
-  }
-
-  /**
-   * return the magnitude of a vector
-   * @return {number}
-   */
-  magnitude(): number {
-    return hypot(this.x, this.y);
   }
 
   /**
