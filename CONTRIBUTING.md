@@ -44,8 +44,9 @@ Check out [**Helping Out**](#%EF%B8%8F-helping-out).
 
 ## 🔦 Fixing typos
 
-Simple as it seems, it makes things better.\
-A good way to start contributing.
+Typos are a nasty thing.\
+Though it may seem an insignificant fix it is appreciated.\
+It's a good and simple way to start contributing.
 
 ## 🔎 Improving Docs
 
