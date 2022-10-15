@@ -317,7 +317,9 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
         return callback(null);
       }
       const points = parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = parseAttributes(
+        // we omit left and top to instruct the constructor to position the object using the bbox
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        { left, top, ...parsedAttributes } = parseAttributes(
           element,
           fabric[_class].ATTRIBUTE_NAMES
         );
@@ -325,9 +327,6 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
         new fabric[_class](points, {
           ...parsedAttributes,
           ...options,
-          // we pass undefined to instruct the constructor to position the object using the bbox
-          left: undefined,
-          top: undefined,
           fromSVG: true,
         })
       );
