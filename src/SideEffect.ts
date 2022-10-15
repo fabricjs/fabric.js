@@ -1,14 +1,23 @@
-export abstract class SideEffect<T, K extends keyof T> {
-  abstract name: string;
-  abstract keys: K[] | '*';
+export class SideEffect<
+  T,
+  K extends keyof T,
+  C extends (key: K, value: T[K], prevValue: T[K]) => void
+> {
+  id: string;
+  private keys: K[] | '*';
+  private callback: C;
   enable = true;
 
-  abstract onChange(key: K, value: T[K], prevValue: T[K]): void;
+  constructor(id: string, keys: K[] | '*', callback: C) {
+    this.id = id;
+    this.keys = keys;
+    this.callback = callback;
+  }
 
   invoke(key: K, value: T[K], prevValue: T[K]) {
     this.enable &&
       (this.keys === '*' || this.keys.includes(key)) &&
       value !== prevValue &&
-      this.onChange(key, value, prevValue);
+      this.callback(key, value, prevValue);
   }
 }
