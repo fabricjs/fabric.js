@@ -40,7 +40,7 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
     magnitude: number = this.strokeProjectionMagnitude
   ) {
     const vector = this.createSideVector(from, to);
-    return this.scaleUnitVector(getOrthonormalVector(vector), -magnitude);
+    return this.scaleUnitVector(getOrthonormalVector(vector), magnitude);
   }
 
   /**
