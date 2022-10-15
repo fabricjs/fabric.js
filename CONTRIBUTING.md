@@ -38,7 +38,7 @@ Demos and examples 🤓 can be found on [fabricjs.com][website], `jsfiddle`, `co
 
 If it's not a bug **OR** if you're unsure, start a 🤠 [discussion][discussions].
 
-Check out [**Helping Out**](#❤️-helping-out).
+Check out [**Helping Out**](#%EF%B8%8F-helping-out).
 
 ---
 
@@ -80,9 +80,9 @@ If you are working on windows, check out [`jekyll` docs][jekyll] for further ins
 
 The flow:
 
-- open an [issue](#🏷️-issue-tracker), if there isn't any, addressing the bug
-- fix the bug, see [Developing](#🚧🎢-developing-💡✨)
-- add [tests](#🧪-testing)
+- Open an [issue](#🏷️-issue-tracker), if there isn't any, addressing the bug
+- Fix the bug, see [Developing](#-developing-)
+- Add [tests](#🧪-testing)
 - [PR](#🚀-pull-requests)
 
 ## 🚀 Pull Requests
@@ -94,7 +94,7 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 
 - Read this section through.
 - Take a look at [**GOTCHAS**][gotchas]
-- Follow [Developing](#🚧🎢-developing-💡✨) and read [Testing](#🧪-testing).
+- Follow [Developing](#-developing-) and read [Testing](#-testing).
 
 ### ✅ Guidelines
 
@@ -104,10 +104,10 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 - **⛔ `dist`** \
   Commit changes to [source files](src). Don't commit the generated [distribution files](dist).
 - **Tests** \
-  PRs must be backed with relevant tests, follow [TESTING](#🧪-testing).
+  PRs must be backed with relevant tests, follow [TESTING](#-testing).
 - **Docs** \
   Add relevant comments to your code if necessary using [JSDoc 3][jsdoc] and update relevant guides.\
-  The generated documentation can be found at [fabricjs.com][docs], see [DOCS](#🔎-improving-docs).
+  The generated documentation can be found at [fabricjs.com][docs], see [DOCS](#-improving-docs).
 - **Changelog**\
   Add a concise listing to the [**CHANGELOG**](CHANGELOG.md) describing what has changed.
 - **1️⃣ PR per feature/bug** \
@@ -179,20 +179,18 @@ Options:
 
 ## 🚧🎢 Developing 💡✨
 
-### Getting Started
-
-#### Setting up locally
+### Setting Up Locally
 
 1. 🍴 Fork the repository
 1. 💾 Clone your 🍴 to your 💻
 1. Install dependencies 🕹️ `npm i --include=dev`
-1. Next Up [Prototyping](#🧭-prototyping) & [Testing](#🧪-testing)
+1. Next Up [Prototyping](#-prototyping) & [Testing](#-testing)
 
 #### Online
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
 
-Gitpod will start the [prototyping](#🧭-prototyping) apps and expose them as endpoints.
+Gitpod will start the [prototyping](#-prototyping) apps and expose them as endpoints.
 `A service is available on port ...` popups will show up.
 
 ### 🧭 Prototyping
