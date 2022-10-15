@@ -56,7 +56,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        * A list of properties that if changed trigger a recalculation of dimensions
        * @todo check if you really need to recalculate for all cases
        */
-      strokeBBoxAffectingProperties = [
+      strokeBBoxAffectingProperties: [
         'skewX',
         'skewY',
         'strokeLineCap',
