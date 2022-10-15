@@ -38,7 +38,7 @@ Demos and examples 🤓 can be found on [fabricjs.com][website], [`jsfiddle`][js
 
 If it's not a bug **OR** if you're unsure, start a 🤠 [discussion][discussions].
 
-Check out [**Helping Out**](#%EF%B8%8F-helping-out).
+Check out [**Helping Out**](#-helping-out).
 
 ---
 
@@ -57,7 +57,7 @@ We plan on building a brand new website, stay tuned.
 
 ## ❤️ Helping Out
 
-Answering questions and addressing issues as well as fixing and adding types are great ways to start contributing to fabric.
+Answering questions and addressing issues, as well as fixing and adding types (see [Pull Requests](#-pull-requests)), are great ways to start contributing to fabric.
 
 - [Issues][issues]
 - [Discussions][discussions]
