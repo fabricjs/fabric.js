@@ -86,8 +86,6 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
       -this.strokeProjectionMagnitude
     );
     return [
-      this.A.add(orthogonalProjection),
-      this.A.subtract(orthogonalProjection),
       this.A.add(strokePointingOut).add(orthogonalProjection),
       this.A.add(strokePointingOut).subtract(orthogonalProjection),
     ].map((p) => this.applySkew(p));
@@ -95,13 +93,12 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
 
   protected projectPoints() {
     switch (this.options.strokeLineCap) {
-      default:
-      case 'butt':
-        return this.projectButt();
       case 'round':
         return this.projectRound();
       case 'square':
         return this.projectSquare();
+      default:
+        return this.projectButt();
     }
   }
 

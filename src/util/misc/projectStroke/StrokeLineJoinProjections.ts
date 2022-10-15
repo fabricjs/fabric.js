@@ -217,7 +217,6 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       case 'round':
         return this.projectRound();
       default:
-      case 'bevel':
         return this.projectBevel();
     }
   }
