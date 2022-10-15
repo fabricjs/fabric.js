@@ -74,6 +74,13 @@ import { fabric } from 'fabric';
 const fabric = require('fabric').fabric;
 ```
 
+#### Browser
+
+[![cdnjs](https://img.shields.io/cdnjs/v/fabric.js.svg)][cdnjs]
+[![jsdelivr](https://data.jsdelivr.com/v1/package/npm/fabric/badge)][jsdelivr]
+
+See [browser modules][mdn_es6] for using es6 imports in the browser or use a dedicated bundler.
+
 #### Node.js
 
 Fabric.js depends on [node-canvas][node_canvas] for a canvas implementation (`HTMLCanvasElement` replacement) and [jsdom][jsdom] for a `window` implementation on node.
@@ -81,18 +88,9 @@ This means that you may encounter `node-canvas` limitations and [bugs][node_canv
 
 Follow these [instructions][node_canvas_install] to get `node-canvas` up and running.
 
-#### Browser es6
-
-See [browser modules][mdn_es6] for using es6 imports in the browser or use a dedicated bundler.
-
-#### CDN
-
-[![cdnjs](https://img.shields.io/cdnjs/v/fabric.js.svg)][cdnjs]
-[![jsdelivr](https://data.jsdelivr.com/v1/package/npm/fabric/badge)][jsdelivr]
-
 ## Quick Start
 
-<details><summary>**Plain HTML**</summary>
+<details><summary><b>Plain HTML</b></summary>
 
 ```html
 <canvas id="canvas" width="300" height="300"></canvas>
@@ -113,7 +111,7 @@ See [browser modules][mdn_es6] for using es6 imports in the browser or use a ded
 
 </details>
 
-<details><summary>**ReactJS**</summary>
+<details><summary><b>ReactJS</b></summary>
 
 ```tsx
 import React, { useEffect, useRef } from 'react';
@@ -139,7 +137,7 @@ export const FabricJSCanvas = () => {
 
 </details>
 
-<details><summary>**Node.js**</summary>
+<details><summary><b>Node.js</b></summary>
 
 ```js
 const http = require('http');
