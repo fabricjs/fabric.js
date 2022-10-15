@@ -20,13 +20,13 @@ A **simple and powerful Javascript HTML5 canvas library**.
 
 <!-- npm, bower, CDNJS versions, downloads -->
 
-[![CDNJS version](https://img.shields.io/cdnjs/v/fabric.js.svg)][cdnjs]
-[![CDNJS](https://data.jsdelivr.com/v1/package/npm/fabric/badge)][jsdelivr]
+[![cdnjs](https://img.shields.io/cdnjs/v/fabric.js.svg)][cdnjs]
+[![jsdelivr](https://data.jsdelivr.com/v1/package/npm/fabric/badge)][jsdelivr]
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/fabricjs/fabric.js)
 
-[![NPM version](https://badge.fury.io/js/fabric.svg)](http://badge.fury.io/js/fabric)
+[![NPM](https://badge.fury.io/js/fabric.svg)](http://badge.fury.io/js/fabric)
 [![Downloads per month](https://img.shields.io/npm/dm/fabric.svg)](https://www.npmjs.org/package/fabric)
-[![Bower version](https://badge.fury.io/bo/fabric.svg)](http://badge.fury.io/bo/fabric)
+[![Bower](https://badge.fury.io/bo/fabric.svg)](http://badge.fury.io/bo/fabric)
 
 ---
 
@@ -87,8 +87,8 @@ See [browser modules][mdn_es6] for using es6 imports in the browser or use a ded
 
 #### CDN
 
-- [fabric on cdnjs][cdnjs]
-- [fabric on jsdelivr][jsdelivr]
+[![cdnjs](https://img.shields.io/cdnjs/v/fabric.js.svg)][cdnjs]
+[![jsdelivr](https://data.jsdelivr.com/v1/package/npm/fabric/badge)][jsdelivr]
 
 ## Quick Start
 
@@ -195,7 +195,7 @@ http
 ## Credits [![Patreon](https://img.shields.io/static/v1?label=Patreon&message=%F0%9F%91%8D&logo=Patreon&color=blueviolet)](https://www.patreon.com/fabricJS)
 
 - [kangax][kagnax]
-- [asturur][asturur], follow Andrea Bogazzi on [`Twitter`][asturur_twitter]
+- [asturur][asturur] on [`Twitter`][asturur_twitter]
   [![Sponsor asturur](https://img.shields.io/static/v1?label=Sponsor%20asturur&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/asturur)
 - [melchiar][melchiar] [![Sponsor melchiar](https://img.shields.io/static/v1?label=Sponsor%20melchiar&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/melchiar)
 - [ShaMan123][shaman123] [![Sponsor ShaMan123](https://img.shields.io/static/v1?label=Sponsor%20ShaMan123&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/ShaMan123)
