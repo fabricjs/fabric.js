@@ -49,14 +49,16 @@ A **simple and powerful Javascript HTML5 canvas library**.
 
 |   Context   | Supported Version | Notes                           |
 | :---------: | :---------------: | ------------------------------- |
-|   Firefox   |        ✔️         | version >= 4                    |
-|   Safari    |        ✔️         | version >= 5                    |
-|    Opera    |        ✔️         | version >= 9.64                 |
-|   Chrome    |        ✔️         |
+|   Firefox   |        ✔️         | modern version (tbd)                    |
+|   Safari    |        ✔️         | version >= 10.1                    |
+|    Opera    |        ✔️         | chromium based                 |
+|   Chrome    |        ✔️         | modern version (tbd)
 |    Edge     |        ✔️         | chromium based                  |
 | Edge Legacy |        ❌         |
 |    IE11     |        ❌         |
 |   Node.js   |        ✔️         | [Node.js installation](#nodejs) |
+
+Fabric.js Does not use transpilation by default, the browser version we support is determined by the level of canvas api we want to use and some js syntax. While JS can be easily transpiled, canvas API can't.
 
 ## Installation
 
@@ -183,7 +185,7 @@ http
 | ------------------------------ | -------------------- | :--: |
 | [Three.js][three.js]           | 3D graphics          |
 | [PixiJS][pixijs]               | WebGL renderer       |
-| [Konva][konva]                 | _Competition_        |  ❌  |
+| [Konva][konva]                 | Similar features     |  ❌  |
 | [Canvas2PDF][canvas2pdf]       | PDF renderer         |
 | [html-to-image][html-to-image] | HTML to image/canvas |
 
