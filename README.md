@@ -92,7 +92,7 @@ See [browser modules][mdn_es6] for using es6 imports in the browser or use a ded
 
 ## Quick Start
 
-#### Plain HTML
+<details><summary>**Plain HTML**</summary>
 
 ```html
 <canvas id="canvas" width="300" height="300"></canvas>
@@ -111,7 +111,9 @@ See [browser modules][mdn_es6] for using es6 imports in the browser or use a ded
 </script>
 ```
 
-#### ReactJS
+</details>
+
+<details><summary>**ReactJS**</summary>
 
 ```tsx
 import React, { useEffect, useRef } from 'react';
@@ -135,7 +137,9 @@ export const FabricJSCanvas = () => {
 
 ```
 
-#### Node.js
+</details>
+
+<details><summary>**Node.js**</summary>
 
 ```js
 const http = require('http');
@@ -170,6 +174,8 @@ http
     );
   });
 ```
+
+</details>
 
 ---
 
