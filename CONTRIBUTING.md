@@ -9,7 +9,7 @@ Please refer to available resources (read below) and refrain from opening an iss
 
 To find an answer, first [search the repository][search_issues]. It contains a lot of useful threads.
 
-Questions might inspire you to [improve the docs](#-improving-docs) 🌈 Please do 🌟.
+Questions might inspire you to [improve the docs](#🔎-improving-docs) 🌈 Please do 🌟.
 
 Demos and examples 🤓 can be found on [fabricjs.com][website], `jsfiddle`, `codepen.io` and more.
 
