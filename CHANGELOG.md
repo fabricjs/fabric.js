@@ -4,6 +4,7 @@
 
 - BREAKING fix(polyline/polygon): stroke bounding box for all line join/cap cases [#8344](https://github.com/fabricjs/fabric.js/pull/8344)
   BREAKING: `_setPositionDimensions` was removed in favor of `setDimensions`
+- fix(textStyles): Handle style objects with only a textBackgroundColor property in stylesToArray [#8365](https://github.com/fabricjs/fabric.js/pull/8365)
 - chore(): fix typos in intersection file [#8345](https://github.com/fabricjs/fabric.js/pull/8345)
 - fix(textStyles): Handle empty style object in stylesToArray [#8357](https://github.com/fabricjs/fabric.js/pull/8357)
 - ci(build): safeguard concurrent unlocking [#8309](https://github.com/fabricjs/fabric.js/pull/8309)
