@@ -11,26 +11,26 @@ To find an answer, first [search the repository][search_issues]. It contains a l
 
 Questions might inspire you to [improve the docs](#-improving-docs) 🌈 Please do 🌟.
 
-Demos and examples 🤓 can be found on [fabricjs.com][website], `jsfiddle`, `codepen.io` and more.
+Demos and examples 🤓 can be found on [fabricjs.com][website], [`jsfiddle`][jsfiddles], [`codepen.io`][codepens] and more.
 
 ## 🏷️ Issue Tracker
 
 - **Before You Begin** 🎬
-  - 📌 Make sure you didn't fall into a known [**GOTCHA**][gotchas]
+  - 📌 Make sure you didn't fall into a known [**GOTCHA**][gotchas].
   - 🔎 [**Searching**][search_issues] for existing issues and discussions is
     🔋 **VITAL** in order to keep the community in a good state, prevent spamming 👎 and become a skilled fabric dev 🦉.
+- **Fill out the [🐛 report][bug_report] with care**, it is there for a reason.
 - The **Title** must be informative, short and 🧿 to the point.
-- **Fill out the 🐛 report with care**, it is there for a reason.
 - **Description**
   - Describe the issue making sure you are very clear.
   - Add (📎) logs, screenshots or videos if that makes sense.
-  - Make an effort explaining yourself
-  - A good description has been read at least 3 times before submitting.
+  - Make an effort explaining yourself!
+  - A good description has been read at least **3** times **before submitting**.
 - **Test Case**
   - Create a minimal and immediate test case, reproducing the bug.
   - Add relevant explanations.
   - It should be extremely **easy** for someone to understand your bug and **fast** to reproduce it. **Don't leave it to us to do your part**.
-  - Bug templates can be found within a [bug report][bug_report]
+  - Bug templates can be found within a bug report.
 - Specify which **version** of Fabric.js you are using.
 - **Upgrade** to the latest version before proceeding, your 🐛 may have turned into a 🦋.
 
@@ -247,6 +247,8 @@ Don't forget to unlink the package once you're done.
 [demos]: http://fabricjs.com/demos/
 [gotchas]: http://fabricjs.com/fabric-gotchas
 [demo_file]: https://github.com/fabricjs/fabricjs.com/blob/gh-pages/posts/demos/_posts/2020-2-15-custom-control-render.md
+[jsfiddles]: https://jsfiddle.net/user/fabricjs/fiddles/
+[codepens]: https://codepen.io/tag/fabricjs
 [jekyll]: https://jekyllrb.com/docs/installation/
 [wsl]: https://learn.microsoft.com/en-us/windows/wsl/
 [prettier]: https://prettier.io/
