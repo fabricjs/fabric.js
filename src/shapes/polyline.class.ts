@@ -53,6 +53,21 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
       cacheProperties: fabric.Object.prototype.cacheProperties.concat('points'),
 
       /**
+       * A list of properties that if changed trigger a recalculation of dimensions
+       * @todo check if you really need to recalculate for all cases
+       */
+      strokeBBoxAffectingProperties = [
+        'skewX',
+        'skewY',
+        'strokeLineCap',
+        'strokeLineJoin',
+        'strokeMiterLimit',
+        'strokeWidth',
+        'strokeUniform',
+        'points',
+      ],
+
+      /**
        * Constructor
        * @param {Array} points Array of points (where each point is an object with x and y)
        * @param {Object} [options] Options object
@@ -184,16 +199,9 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
           changed &&
           (((key === 'scaleX' || key === 'scaleY') &&
             this.strokeUniform &&
+            this.strokeBBoxAffectingProperties.includes('strokeUniform') &&
             this.strokeLineJoin !== 'round') ||
-            // TODO: check if you really need to recalculate for all cases
-            key === 'skewX' ||
-            key === 'skewY' ||
-            key === 'strokeMiterLimit' ||
-            key === 'strokeLineCap' ||
-            key === 'strokeLineJoin' ||
-            key === 'strokeLineWidth' ||
-            key === 'strokeUniform' ||
-            key === 'points')
+            this.strokeBBoxAffectingProperties.includes(key))
         ) {
           this.setDimensions();
         }
