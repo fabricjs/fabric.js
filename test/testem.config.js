@@ -42,5 +42,6 @@ module.exports = {
     filter: process.env.QUNIT_FILTER || null,
   },
   timeout: 540,
+  browser_start_timeout: 60,
   parallel: 4
 }
