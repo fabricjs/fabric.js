@@ -49,10 +49,10 @@ A **simple and powerful Javascript HTML5 canvas library**.
 
 |   Context   | Supported Version | Notes                           |
 | :---------: | :---------------: | ------------------------------- |
-|   Firefox   |        ✔️         | modern version (tbd)                    |
-|   Safari    |        ✔️         | version >= 10.1                    |
-|    Opera    |        ✔️         | chromium based                 |
-|   Chrome    |        ✔️         | modern version (tbd)
+|   Firefox   |        ✔️         | modern version (tbd)            |
+|   Safari    |        ✔️         | version >= 10.1                 |
+|    Opera    |        ✔️         | chromium based                  |
+|   Chrome    |        ✔️         | modern version (tbd)            |
 |    Edge     |        ✔️         | chromium based                  |
 | Edge Legacy |        ❌         |
 |    IE11     |        ❌         |
