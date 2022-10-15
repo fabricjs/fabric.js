@@ -77,10 +77,10 @@ If you are working on windows, check out [`jekyll` docs][jekyll] for further ins
 
 ## 🐛 Fixing Bugs
 
-- Open an [issue](#🏷️-issue-tracker), if there isn't any, addressing the bug
-- Fix the bug, see [Developing](#-developing-)
-- Add [tests](#🧪-testing)
-- [PR](#🚀-pull-requests)
+- Open an [issue](#-issue-tracker), if there isn't any, addressing the bug.
+- Fix the bug, see [Developing](#-developing-).
+- Add [tests](#-testing).
+- [PR](#-pull-requests)
 
 ## 🚀 Pull Requests
 
