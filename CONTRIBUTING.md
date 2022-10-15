@@ -76,8 +76,6 @@ If you are working on windows, check out [`jekyll` docs][jekyll] for further ins
 
 ## 🐛 Fixing Bugs
 
-The flow:
-
 - Open an [issue](#🏷️-issue-tracker), if there isn't any, addressing the bug
 - Fix the bug, see [Developing](#-developing-)
 - Add [tests](#🧪-testing)
@@ -128,7 +126,7 @@ Test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for servi
 - `unit` tests: test logic and state
 - `visual` tests: test visual outcome against image refs located at `/test/visual/golden`
 
-Flow:
+### Getting Started
 
 - build and watch for changes:
 
