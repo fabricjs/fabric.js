@@ -38,7 +38,7 @@ Demos and examples 🤓 can be found on [fabricjs.com][website], [`jsfiddle`][js
 
 If it's not a bug **OR** if you're unsure, start a 🤠 [discussion][discussions].
 
-Check out [**Helping Out**](#-helping-out).
+Check out [**Helping Out**](#%EF%B8%8F-helping-out).
 
 ---
 
