@@ -1,7 +1,7 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
 
 interface NominalTag<T> {
-  nominalTag: T;
+  nominalTag?: T;
 }
 
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
@@ -16,6 +16,11 @@ export type TSize = {
   width: number;
   height: number;
 };
+
+export type TBBox = {
+  left: number;
+  top: number;
+} & TSize;
 
 export type Percent = `${number}%`;
 
