@@ -46,8 +46,7 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
 
   /**
    * OPEN PATH START/END - Line cap: Butt
-   * If open path, no matter the type of the line join, the line is always the same
-   * Calculation: to find the projections, just find the points orthogonal to that stroke
+   * Calculation: to find the projections, just find the points orthogonal to the stroke
    *
    * @see https://github.com/fabricjs/fabric.js/pull/8344#1-1-butt
    */
@@ -58,6 +57,12 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
     ];
   }
 
+  /**
+   * OPEN PATH START/END - Line cap: Round
+   * Calculation: same as stroke line join `round`
+   *
+   * @see https://github.com/fabricjs/fabric.js/pull/8344#1-2-round
+   */
   projectRound() {
     return new StrokeLineJoinProjections(
       this.A,
@@ -67,6 +72,12 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
     ).projectRound();
   }
 
+  /**
+   * OPEN PATH START/END - Line cap: Square
+   * Calculation: project a rectangle of points orthogonal to `A` (same as `butt`) in the opposite direction of the vector `AT`
+   *
+   * @see https://github.com/fabricjs/fabric.js/pull/8344#1-3-square
+   */
   projectSquare() {
     const orthogonalProjection = this.calcOrthogonalProjection(
       this.A,
