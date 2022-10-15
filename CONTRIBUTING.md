@@ -9,7 +9,7 @@ Please refer to available resources (read below) and refrain from opening an iss
 
 To find an answer, first [search the repository][search_issues]. It contains a lot of useful threads.
 
-Questions might inspire you to [improve the docs](#🔎-improving-docs) 🌈 Please do 🌟.
+Questions might inspire you to [improve the docs](#-improving-docs) 🌈 Please do 🌟.
 
 Demos and examples 🤓 can be found on [fabricjs.com][website], `jsfiddle`, `codepen.io` and more.
 
@@ -50,15 +50,13 @@ A good way to start contributing.
 ## 🔎 Improving Docs
 
 Improving **DOCS** is **SUPER** important for everyone.\
-Even if it's a small fix it is valuable 💎... **don't hesitate**!\
-
-Fixing and adding types is a great way to improve fabric.
+Even if it's a small fix it is valuable 💎... **don't hesitate**!
 
 We plan on building a brand new website, stay tuned.
 
 ## ❤️ Helping Out
 
-Answering questions and addressing issues is a great way to start contributing to fabric.
+Answering questions and addressing issues as well as fixing and adding types are great ways to start contributing to fabric.
 
 - [Issues][issues]
 - [Discussions][discussions]
