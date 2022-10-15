@@ -85,9 +85,10 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
       getUnitVector(createVector(this.A, this.T)),
       -this.strokeProjectionMagnitude
     );
+    const projectedA = this.A.add(strokePointingOut);
     return [
-      this.A.add(strokePointingOut).add(orthogonalProjection),
-      this.A.add(strokePointingOut).subtract(orthogonalProjection),
+      projectedA.add(orthogonalProjection),
+      projectedA.subtract(orthogonalProjection),
     ].map((p) => this.applySkew(p));
   }
 
