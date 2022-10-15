@@ -192,7 +192,7 @@ http
 - [Fabric.js on `jsfiddle`][jsfiddles]
 - [Fabric.js on `Codepen.io`][codepens]
 
-## Credits [![Patreon][patreon_badge]][patreon]
+## Credits [![Patreon](https://img.shields.io/static/v1?label=Patreon&message=%F0%9F%91%8D&logo=Patreon&color=blueviolet)](https://www.patreon.com/fabricJS)
 
 - [kangax][kagnax]
 - [asturur][asturur], follow Andrea Bogazzi on [`Twitter`][asturur_twitter]
@@ -207,6 +207,7 @@ http
 - [and all the other contributors][contributors]
 
 [asturur]: https://github.com/asturur
+[asturur_twitter]: https://twitter.com/AndreaBogazzi
 [canvas2pdf]: https://github.com/joshua-gould/canvas2pdf
 [cdnjs]: https://cdnjs.com/libraries/fabric.js
 [code_triage]: https://www.codetriage.com/kangax/fabric.js
