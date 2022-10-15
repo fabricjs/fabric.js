@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test(): Added 2 tests for polygon shapes and transforms with translations [#8370](https://github.com/fabricjs/fabric.js/pull/8370)
 - fix(textStyles): Handle style objects with only a textBackgroundColor property in stylesToArray [#8365](https://github.com/fabricjs/fabric.js/pull/8365)
 - chore(): fix typos in intersection file [#8345](https://github.com/fabricjs/fabric.js/pull/8345)
 - fix(textStyles): Handle empty style object in stylesToArray [#8357](https://github.com/fabricjs/fabric.js/pull/8357)
