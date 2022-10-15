@@ -1,7 +1,8 @@
 import { IPoint, Point } from '../../../point.class';
-import { getOrthonormalVector } from '../vectors';
+import { createVector, getOrthonormalVector, getUnitVector } from '../vectors';
+import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
-import { TProjectStrokeOnPointsOptions, TProjection } from './types';
+import { TProjection, TProjectStrokeOnPointsOptions } from './types';
 
 /**
  * class in charge of finding projections for each type of line cap for start/end of an open path
@@ -50,15 +51,50 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
    *
    * @see https://github.com/fabricjs/fabric.js/pull/8344#1-1-butt
    */
-  private projectButt() {
+  projectButt() {
     return [
       this.projectOrthogonally(this.A, this.T, this.strokeProjectionMagnitude),
       this.projectOrthogonally(this.A, this.T, -this.strokeProjectionMagnitude),
     ];
   }
 
+  projectRound() {
+    return new StrokeLineJoinProjections(
+      this.A,
+      this.T,
+      this.T,
+      this.options
+    ).projectRound();
+  }
+
+  projectSquare() {
+    const orthogonalProjection = this.calcOrthogonalProjection(
+      this.A,
+      this.T,
+      this.strokeProjectionMagnitude
+    );
+    const strokePointingOut = this.scaleUnitVector(
+      getUnitVector(createVector(this.A, this.T)),
+      -this.strokeProjectionMagnitude
+    );
+    return [
+      this.A.add(orthogonalProjection),
+      this.A.subtract(orthogonalProjection),
+      this.A.add(strokePointingOut).add(orthogonalProjection),
+      this.A.add(strokePointingOut).subtract(orthogonalProjection),
+    ].map((p) => this.applySkew(p));
+  }
+
   protected projectPoints() {
-    return this.projectButt();
+    switch (this.options.strokeLineCap) {
+      default:
+      case 'butt':
+        return this.projectButt();
+      case 'round':
+        return this.projectRound();
+      case 'square':
+        return this.projectSquare();
+    }
   }
 
   public project(): TProjection[] {

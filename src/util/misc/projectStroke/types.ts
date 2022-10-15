@@ -1,10 +1,11 @@
 import { Point } from '../../../point.class';
-import { StrokeLineJoin, TDegree } from '../../../typedefs';
+import { TDegree } from '../../../typedefs';
 import { getBisector } from '../vectors';
 
 export type TProjectStrokeOnPointsOptions = {
   strokeWidth: number;
-  strokeLineJoin: StrokeLineJoin;
+  strokeLineCap: CanvasLineCap;
+  strokeLineJoin: CanvasLineJoin;
   /**
    * https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
    */

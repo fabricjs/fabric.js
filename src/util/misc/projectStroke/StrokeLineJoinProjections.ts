@@ -128,7 +128,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    *
    * @see https://github.com/fabricjs/fabric.js/pull/8344#2-3-1-round-without-skew
    */
-  projectRoundNoSkew() {
+  private projectRoundNoSkew() {
     // correctSide is used to only consider projecting for the outer side
     const correctSide = new Point(
         StrokeProjectionsBase.getAcuteAngleFactor(this.bisectorVector),
@@ -158,7 +158,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    *
    * @see https://github.com/fabricjs/fabric.js/pull/8344#2-3-2-round-skew
    */
-  projectRoundWithSkew() {
+  private projectRoundWithSkew() {
     const projections: Point[] = [];
 
     // The start and end points of the circle segment
@@ -196,6 +196,14 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     return projections;
   }
 
+  projectRound() {
+    if (!this.isSkewed()) {
+      return this.projectRoundNoSkew();
+    } else {
+      return this.projectRoundWithSkew();
+    }
+  }
+
   /**
    * Project stroke width on points returning projections for each point as follows:
    * - `miter`: 1 point corresponding to the outer boundary. If the miter limit is exceeded, it will be 2 points (becomes bevel)
@@ -203,15 +211,14 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    * - `round`: same as `bevel` when it has no skew, with skew are 4 points.
    */
   protected projectPoints() {
-    const { strokeLineJoin } = this.options;
-    if (strokeLineJoin === 'miter') {
-      return this.projectMiter();
-    } else if (strokeLineJoin === 'round' && !this.isSkewed()) {
-      return this.projectRoundNoSkew();
-    } else if (strokeLineJoin === 'round') {
-      return this.projectRoundWithSkew();
-    } else {
-      return this.projectBevel();
+    switch (this.options.strokeLineJoin) {
+      case 'miter':
+        return this.projectMiter();
+      case 'round':
+        return this.projectRound();
+      default:
+      case 'bevel':
+        return this.projectBevel();
     }
   }
 
