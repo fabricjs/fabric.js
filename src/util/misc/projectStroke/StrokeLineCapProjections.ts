@@ -15,9 +15,6 @@ import { TProjection, TProjectStrokeOnPointsOptions } from './types';
  * - Spec: https://html.spec.whatwg.org/multipage/canvas.html#dom-context-2d-linecap-dev
  * - Playground to understand how the line joins works: https://hypertolosana.github.io/efficient-webgl-stroking/index.html
  * - View the calculated projections for each of the control points: https://codesandbox.io/s/project-stroke-points-with-context-to-trace-b8jc4j?file=/src/index.js
- *
- * @todo TODO: take into account line-cap (I believe that should change the projections)
- *
  */
 export class StrokeLineCapProjections extends StrokeProjectionsBase {
   /**
