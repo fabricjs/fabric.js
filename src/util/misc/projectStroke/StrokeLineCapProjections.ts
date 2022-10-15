@@ -74,7 +74,7 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
 
   /**
    * OPEN PATH START/END - Line cap: Square
-   * Calculation: project a rectangle of points orthogonal to `A` (same as `butt`) in the opposite direction of the vector `AT`
+   * Calculation: project a rectangle of points on the stroke in the opposite direction of the vector `AT`
    *
    * @see https://github.com/fabricjs/fabric.js/pull/8344#1-3-square
    */
