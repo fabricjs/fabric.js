@@ -78,13 +78,67 @@
     var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 }], {
       exactBoundingBox: true,
       strokeWidth: 60,
+      stroke: 'blue'
     });
 
-    var dimensions = polygon._getNonTransformedDimensions();
-    assert.equal(Math.round(dimensions.x), 74);
-    assert.equal(Math.round(dimensions.y), 162);
+    const limitedMiter = polygon._getNonTransformedDimensions();
+    assert.equal(Math.round(limitedMiter.x), 74, 'limited miter x');
+    assert.equal(Math.round(limitedMiter.y), 123, 'limited miter y');
+    assert.deepEqual(polygon._getTransformedDimensions(), limitedMiter, 'dims should match');
+
+    polygon.set('strokeMiterLimit', 999);
+    const miter = polygon._getNonTransformedDimensions();
+    assert.equal(Math.round(miter.x), 74, 'miter x');
+    assert.equal(Math.round(miter.y), 662, 'miter y');
+    assert.deepEqual(polygon._getTransformedDimensions(), miter, 'dims should match');
+
+    polygon.set('strokeLineJoin', 'bevel');
+    const bevel = polygon._getNonTransformedDimensions();
+    assert.equal(Math.round(limitedMiter.x), 74, 'bevel x');
+    assert.equal(Math.round(limitedMiter.y), 123, 'bevel y');
+    assert.deepEqual(polygon._getTransformedDimensions(), bevel, 'dims should match');
+
+    polygon.set('strokeLineJoin', 'round');
+    const round = polygon._getNonTransformedDimensions();
+    assert.equal(Math.round(round.x), 70, 'round x');
+    assert.equal(Math.round(round.y), 150, 'round y');
+    assert.deepEqual(polygon._getTransformedDimensions(), round, 'dims should match');
   });
 
+  QUnit.todo('polygon with exactBoundingBox true and skew', function (assert) {
+    var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 }], {
+      exactBoundingBox: true,
+      strokeWidth: 60,
+      stroke: 'blue',
+      skewX: 30,
+      skewY: 45
+    });
+
+    const limitedMiter = polygon._getNonTransformedDimensions();
+    assert.equal(Math.round(limitedMiter.x), 185, 'limited miter x');
+    assert.equal(Math.round(limitedMiter.y), 194, 'limited miter y');
+    assert.deepEqual(polygon._getTransformedDimensions(), limitedMiter, 'dims should match');
+
+    polygon.set('strokeMiterLimit', 999);
+    const miter = polygon._getNonTransformedDimensions();
+    assert.equal(Math.round(miter.x), 498, 'miter x');
+    assert.equal(Math.round(miter.y), 735, 'miter y');
+    assert.deepEqual(polygon._getTransformedDimensions(), miter, 'dims should match');
+
+    polygon.set('strokeLineJoin', 'bevel');
+    const bevel = polygon._getNonTransformedDimensions();
+    assert.equal(Math.round(limitedMiter.x), 185, 'bevel x');
+    assert.equal(Math.round(limitedMiter.y), 194, 'bevel y');
+    assert.deepEqual(polygon._getTransformedDimensions(), bevel, 'dims should match');
+
+    polygon.set('strokeLineJoin', 'round');
+    const round = polygon._getNonTransformedDimensions();
+    // WRONG value! was buggy when writing test
+    assert.equal(Math.round(round.x), 170, 'round x');
+    assert.equal(Math.round(round.y), 185, 'round y');
+    assert.deepEqual(polygon._getTransformedDimensions(), round, 'dims should match');
+  });
+  
   QUnit.test('complexity', function(assert) {
     var polygon = new fabric.Polygon(getPoints());
     assert.ok(typeof polygon.complexity === 'function');

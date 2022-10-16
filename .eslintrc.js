@@ -30,7 +30,7 @@ module.exports = {
       {
         selector: '[callee.object.name="Math"][callee.property.name="hypot"]',
         message:
-          '`Math.hypot` is not accurate on chrome, import `hypot` from `util` instead.',
+          '`Math.hypot` is not accurate on chrome, use `Math.sqrt` instead.\nSee https://stackoverflow.com/questions/62931950/different-results-of-math-hypot-on-chrome-and-firefox',
       },
       {
         selector: 'VariableDeclarator[init.name="Math"]',
