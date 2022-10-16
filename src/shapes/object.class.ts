@@ -5,7 +5,7 @@ import { VERSION } from '../constants';
 import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
 import { pick } from '../util/misc/pick';
-import { runningAnimations } from '../util/animation_registry';
+import { runningAnimations } from '../util/animation';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
 
 (function (global) {

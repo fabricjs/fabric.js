@@ -2,7 +2,7 @@
 import { config } from './config';
 import { VERSION } from './constants';
 import { Point } from './point.class';
-import { requestAnimFrame } from './util/animate';
+import { requestAnimFrame } from './util/animation';
 import { removeFromArray } from './util/internals';
 import { pick } from './util/misc/pick';
 
