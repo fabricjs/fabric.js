@@ -2,7 +2,7 @@
 
 ## [next]
 
-- ci(): remove buggy changelog action in favor of `git diff` [#8309](https://github.com/fabricjs/fabric.js/pull/8346)
+- ci(): remove buggy changelog action in favor of `git diff` bash script + direct git how to merge `CHANGELOG.md` [#8309](https://github.com/fabricjs/fabric.js/pull/8346)
 - BREAKING fix(polyline/polygon): stroke bounding box for all line join/cap cases [#8344](https://github.com/fabricjs/fabric.js/pull/8344)
   BREAKING: `_setPositionDimensions` was removed in favor of `setDimensions`
 - test(): Added 2 tests for polygon shapes and transforms with translations [#8370](https://github.com/fabricjs/fabric.js/pull/8370)
