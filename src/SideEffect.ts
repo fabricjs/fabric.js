@@ -6,7 +6,7 @@ export class SideEffect<
   id: string;
   private keys: K[] | '*';
   private callback: C;
-  enable = true;
+  private enabled = true;
 
   constructor(id: string, keys: K[] | '*', callback: C) {
     this.id = id;
@@ -15,9 +15,21 @@ export class SideEffect<
   }
 
   invoke(key: K, value: T[K], prevValue: T[K]) {
-    this.enable &&
+    this.enabled &&
       (this.keys === '*' || this.keys.includes(key)) &&
       value !== prevValue &&
       this.callback(key, value, prevValue);
+  }
+
+  isEnabled() {
+    return this.enabled;
+  }
+
+  enable() {
+    this.enabled = true;
+  }
+
+  disable() {
+    this.enabled = false;
   }
 }
