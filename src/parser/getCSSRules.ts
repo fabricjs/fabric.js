@@ -6,7 +6,7 @@ export type TCSSRulesCollection = Record<string, TCSSRules>;
  * @param {SVGDocument} doc SVG document to parse
  * @return {Object} CSS rules of this document
  */
-export function getCSSRules(doc: Document): TCSSRulesCollection {
+export function getCSSRules(doc: Document | HTMLElement): TCSSRulesCollection {
   const styles = doc.getElementsByTagName('style'),
     allRules: TCSSRulesCollection = {};
   let rules: Array<string>;

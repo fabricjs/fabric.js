@@ -15,7 +15,7 @@ export type TGradientDefs = Record<string, Element>;
  * @param {SVGDocument} doc SVG document to parse
  * @return {TGradientDefs} Gradient definitions; key corresponds to element id, value -- to gradient definition element
  */
-export function getGradientDefs(doc: Document): TGradientDefs {
+export function getGradientDefs(doc: Document | HTMLElement): TGradientDefs {
   const gradientDefs: TGradientDefs = {};
   for (const el of getMultipleNodes(doc, tagArray)) {
     if (el.getAttribute('xlink:href')) {

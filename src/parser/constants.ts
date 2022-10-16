@@ -1,8 +1,12 @@
 import { getSvgRegex } from './getSvgRegex';
+import { TGradientDefs } from './getGradientDefs';
+import { TCSSRulesCollection } from './getCSSRules';
 
-export const cssRules = {};
-export const gradientDefs = {};
-export const clipPaths = {};
+export type TClipPathCollection = Record<string, Element[]>;
+
+export const cssRules: Record<string, TCSSRulesCollection> = {};
+export const gradientDefs: Record<string, TGradientDefs> = {};
+export const clipPaths: Record<string, TClipPathCollection> = {};
 
 export const reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:[eE][-+]?\\d+)?)';
 

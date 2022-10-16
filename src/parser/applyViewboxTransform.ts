@@ -5,21 +5,36 @@ import {
 } from '../util/misc/svgParsing';
 import { svgViewBoxElementsRegEx, reViewBoxAttrValue } from './constants';
 
-export type TViewBoxDims = {
-  width?: number;
-  height?: number;
+export type TParsedViewBoxDims = {
+  /**
+   * If the viewbox is not parsed
+   */
   toBeParsed?: boolean;
+  /**
+   * Viewbox left x bound
+   */
   minX?: number;
+  /**
+   * Viewbox top y bound
+   */
   minY?: number;
+  /**
+   * Width/height as defined by the VB
+   */
   viewBoxWidth?: number;
   viewBoxHeight?: number;
+  /**
+   * Element width/height
+   */
+  width?: number;
+  height?: number;
 };
 
 /**
  * Add a <g> element that envelop all child elements and makes the viewbox transformMatrix descend on all elements
+ * @param element
  */
-
-export function applyViewboxTransform(element: Element): TViewBoxDims {
+export function applyViewboxTransform(element: Element): TParsedViewBoxDims {
   if (!svgViewBoxElementsRegEx.test(element.nodeName)) {
     return {};
   }
@@ -45,7 +60,7 @@ export function applyViewboxTransform(element: Element): TViewBoxDims {
       widthAttr === '100%' ||
       heightAttr === '100%',
     toBeParsed = missingViewBox && missingDimAttr,
-    parsedDim: TViewBoxDims = {};
+    parsedDim: TParsedViewBoxDims = {};
 
   parsedDim.width = 0;
   parsedDim.height = 0;

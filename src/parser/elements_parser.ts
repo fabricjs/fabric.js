@@ -1,5 +1,3 @@
-//@ts-nocheck
-
 import { fabric } from '../../HEADER';
 import { capitalize } from '../util/lang_string';
 import {
@@ -7,44 +5,81 @@ import {
   multiplyTransformMatrices,
   qrDecompose,
 } from '../util/misc/matrix';
+import { TParsedViewBoxDims } from './applyViewboxTransform';
 
-const ElementsParser = function (
-  elements,
-  callback,
-  options,
-  reviver,
-  parsingOptions,
-  doc
-) {
-  this.elements = elements;
-  this.callback = callback;
-  this.options = options;
-  this.reviver = reviver;
-  this.svgUid = (options && options.svgUid) || 0;
-  this.parsingOptions = parsingOptions;
-  this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
-  this.doc = doc;
-};
+export interface ElementsParserOptions extends TParsedViewBoxDims {
+  svgUid?: number;
+}
 
-(function (proto) {
-  proto.parse = function () {
+export interface ElementsParserParsingOptions extends ElementsParserOptions {
+  /**
+   * see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   */
+  signal?: AbortSignal;
+  /**
+   * crossOrigin settings
+   */
+  crossOrigin?: string;
+}
+
+export type TElementsParserCallback = (
+  obj: typeof fabric.Object,
+  container?: Array<typeof fabric.Object>
+) => void;
+export type TReviver = (el: Element, obj: typeof fabric.Object) => void;
+
+class ElementsParser {
+  /**
+   * The elements of the SVG
+   */
+  elements: Element[];
+  callback: TElementsParserCallback;
+  options: ElementsParserOptions;
+  reviver: TReviver;
+  svgUid: number;
+  parsingOptions: ElementsParserParsingOptions;
+  regexUrl: RegExp;
+  doc?: Document;
+
+  instances?: Array<typeof fabric.Object>;
+  numElements?: number;
+
+  constructor(
+    elements: Element[],
+    callback: TElementsParserCallback,
+    options: ElementsParserOptions,
+    reviver: TReviver,
+    parsingOptions: ElementsParserParsingOptions,
+    doc?: Document
+  ) {
+    this.elements = elements;
+    this.callback = callback;
+    this.options = options;
+    this.reviver = reviver;
+    this.svgUid = (options && options.svgUid) || 0;
+    this.parsingOptions = parsingOptions;
+    this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
+    this.doc = doc;
+  }
+
+  parse() {
     this.instances = new Array(this.elements.length);
     this.numElements = this.elements.length;
     this.createObjects();
-  };
+  }
 
-  proto.createObjects = function () {
+  createObjects() {
     this.elements.forEach((element, i) => {
-      element.setAttribute('svgUid', this.svgUid);
+      element.setAttribute('svgUid', this.svgUid.toString());
       this.createObject(element, i);
     });
-  };
+  }
 
-  proto.findTag = function (el) {
+  findTag(el: Element): typeof fabric.Object {
     return fabric[capitalize(el.tagName.replace('svg:', ''))];
-  };
+  }
 
-  proto.createObject = function (el, index) {
+  createObject(el: Element, index: number) {
     const klass = this.findTag(el);
     if (klass && klass.fromElement) {
       try {
@@ -55,38 +90,44 @@ const ElementsParser = function (
     } else {
       this.checkIfDone();
     }
-  };
+  }
 
-  proto.createCallback = function (index, el) {
-    const _this = this;
-    return function (obj) {
+  createCallback(index: number, el: Element): TElementsParserCallback {
+    return (obj: typeof fabric.Object) => {
+      // TODO: type this once obj is fabric.Image is typed
       let _options;
-      _this.resolveGradient(obj, el, 'fill');
-      _this.resolveGradient(obj, el, 'stroke');
+      this.resolveGradient(obj, el, 'fill');
+      this.resolveGradient(obj, el, 'stroke');
       if (obj instanceof fabric.Image && obj._originalElement) {
         _options = obj.parsePreserveAspectRatioAttribute(el);
       }
       obj._removeTransformMatrix(_options);
-      _this.resolveClipPath(obj, el);
-      _this.reviver && _this.reviver(el, obj);
-      _this.instances[index] = obj;
-      _this.checkIfDone();
+      this.resolveClipPath(obj, el);
+      this.reviver && this.reviver(el, obj);
+      this.instances && (this.instances[index] = obj);
+      this.checkIfDone();
     };
-  };
+  }
 
-  proto.extractPropertyDefinition = function (obj, property, storage) {
+  extractPropertyDefinition(
+    obj: typeof fabric.Object,
+    property: string,
+    storage: string
+  ) {
     const value = obj[property],
       regex = this.regexUrl;
     if (!regex.test(value)) {
       return;
     }
     regex.lastIndex = 0;
-    const id = regex.exec(value)[1];
+    const res = regex.exec(value);
+    if (!res) return;
+    const id = res[1];
     regex.lastIndex = 0;
     return fabric[storage][this.svgUid][id];
-  };
+  }
 
-  proto.resolveGradient = function (obj, el, property) {
+  resolveGradient(obj: typeof fabric.Object, el: Element, property: string) {
     const gradientDef = this.extractPropertyDefinition(
       obj,
       property,
@@ -100,26 +141,28 @@ const ElementsParser = function (
       });
       obj.set(property, gradient);
     }
-  };
+  }
 
-  proto.createClipPathCallback = function (obj, container) {
-    return function (_newObj) {
+  createClipPathCallback(
+    obj: typeof fabric.Object,
+    container: Array<typeof fabric.Object>
+  ) {
+    return (_newObj: typeof fabric.Object) => {
       _newObj._removeTransformMatrix();
       _newObj.fillRule = _newObj.clipRule;
       container.push(_newObj);
     };
-  };
+  }
 
-  proto.resolveClipPath = function (obj, usingElement) {
-    var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
-      element,
+  resolveClipPath(obj: typeof fabric.Object, usingElement: Element) {
+    let clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
+      element: Element,
       klass,
       objTransformInv,
       container,
-      gTransform,
-      options;
+      gTransform;
     if (clipPath) {
-      container = [];
+      container = Array<typeof fabric.Object>();
       objTransformInv = invertTransform(obj.calcTransformMatrix());
       // move the clipPath tag as sibling to the real element that is using it
       const clipPathTag = clipPath[0].parentNode;
@@ -128,51 +171,55 @@ const ElementsParser = function (
         clipPathOwner.parentNode &&
         clipPathOwner.getAttribute('clip-path') !== obj.clipPath
       ) {
-        clipPathOwner = clipPathOwner.parentNode;
+        clipPathOwner = clipPathOwner.parentNode as Element;
       }
-      clipPathOwner.parentNode.appendChild(clipPathTag);
-      for (let i = 0; i < clipPath.length; i++) {
-        element = clipPath[i];
-        klass = this.findTag(element);
-        klass.fromElement(
-          element,
-          this.createClipPathCallback(obj, container),
-          this.options
+      if (clipPathOwner.parentNode) {
+        clipPathOwner.parentNode.appendChild(clipPathTag);
+        for (let i = 0; i < clipPath.length; i++) {
+          element = clipPath[i];
+          klass = this.findTag(element);
+          klass.fromElement(
+            element,
+            this.createClipPathCallback(obj, container),
+            this.options
+          );
+        }
+        if (container.length === 1) {
+          clipPath = container[0];
+        } else {
+          clipPath = new fabric.Group(container);
+        }
+        gTransform = multiplyTransformMatrices(
+          objTransformInv,
+          clipPath.calcTransformMatrix()
         );
+        if (clipPath.clipPath) {
+          this.resolveClipPath(clipPath, clipPathOwner);
+        }
+        const options = qrDecompose(gTransform);
+        clipPath.flipX = false;
+        clipPath.flipY = false;
+        clipPath.set('scaleX', options.scaleX);
+        clipPath.set('scaleY', options.scaleY);
+        clipPath.angle = options.angle;
+        clipPath.skewX = options.skewX;
+        clipPath.skewY = 0;
+        clipPath.setPositionByOrigin(
+          { x: options.translateX, y: options.translateY },
+          'center',
+          'center'
+        );
+        obj.clipPath = clipPath;
       }
-      if (container.length === 1) {
-        clipPath = container[0];
-      } else {
-        clipPath = new fabric.Group(container);
-      }
-      gTransform = multiplyTransformMatrices(
-        objTransformInv,
-        clipPath.calcTransformMatrix()
-      );
-      if (clipPath.clipPath) {
-        this.resolveClipPath(clipPath, clipPathOwner);
-      }
-      const options = qrDecompose(gTransform);
-      clipPath.flipX = false;
-      clipPath.flipY = false;
-      clipPath.set('scaleX', options.scaleX);
-      clipPath.set('scaleY', options.scaleY);
-      clipPath.angle = options.angle;
-      clipPath.skewX = options.skewX;
-      clipPath.skewY = 0;
-      clipPath.setPositionByOrigin(
-        { x: options.translateX, y: options.translateY },
-        'center',
-        'center'
-      );
-      obj.clipPath = clipPath;
     } else {
       // if clip-path does not resolve to any element, delete the property.
       delete obj.clipPath;
     }
-  };
+  }
 
-  proto.checkIfDone = function () {
+  checkIfDone() {
+    // TODO: verify validity
+    if (!this.numElements || !this.instances) return;
     if (--this.numElements === 0) {
       this.instances = this.instances.filter(function (el) {
         // eslint-disable-next-line no-eq-null, eqeqeq
@@ -180,7 +227,7 @@ const ElementsParser = function (
       });
       this.callback(this.instances, this.elements);
     }
-  };
-})(ElementsParser.prototype);
+  }
+}
 
 export { ElementsParser };

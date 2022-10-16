@@ -1,5 +1,3 @@
-//@ts-nocheck
-
 import { fabric } from '../../HEADER';
 import { applyViewboxTransform } from './applyViewboxTransform';
 import {
@@ -8,12 +6,25 @@ import {
   gradientDefs,
   svgInvalidAncestorsRegEx,
   svgValidTagNamesRegEx,
+  TClipPathCollection,
 } from './constants';
 import { getCSSRules } from './getCSSRules';
 import { getGradientDefs } from './getGradientDefs';
 import { hasAncestorWithNodeName } from './hasAncestorWithNodeName';
 import { parseElements } from './parseElements';
 import { parseUseDirectives } from './parseUseDirectives';
+import {
+  ElementsParserOptions,
+  ElementsParserParsingOptions,
+  TReviver,
+} from './elements_parser';
+
+export type TParseSVGDocumentCallback = (
+  instances: typeof fabric.Object,
+  options: ElementsParserOptions,
+  elements?: Element[],
+  descendants?: Element[]
+) => void;
 
 /**
  * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
@@ -28,7 +39,12 @@ import { parseUseDirectives } from './parseUseDirectives';
  * @param {String} [parsingOptions.crossOrigin] crossOrigin settings
  * @param {AbortSignal} [parsingOptions.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  */
-export function parseSVGDocument(doc, callback, reviver, parsingOptions) {
+export function parseSVGDocument(
+  doc: HTMLElement,
+  callback: TParseSVGDocumentCallback,
+  reviver: TReviver,
+  parsingOptions: ElementsParserParsingOptions
+) {
   if (!doc) {
     return;
   }
@@ -41,24 +57,20 @@ export function parseSVGDocument(doc, callback, reviver, parsingOptions) {
   }
   parseUseDirectives(doc);
 
-  let svgUid = fabric.Object.__uid++,
-    i,
-    len,
-    options = applyViewboxTransform(doc),
-    descendants = Array.from(doc.getElementsByTagName('*'));
+  const svgUid = fabric.Object.__uid++,
+    options: ElementsParserParsingOptions = applyViewboxTransform(doc);
+  let descendants = Array.from(doc.getElementsByTagName('*'));
   options.crossOrigin = parsingOptions && parsingOptions.crossOrigin;
   options.svgUid = svgUid;
   options.signal = parsingOptions && parsingOptions.signal;
 
+  // TODO: see about typing isLikelyNode???
+  // @ts-ignore
   if (descendants.length === 0 && isLikelyNode) {
     // we're likely in node, where "o3-xml" library fails to gEBTN("*")
     // https://github.com/ajaxorg/node-o3-xml/issues/21
-    descendants = doc.selectNodes('//*[name(.)!="svg"]');
-    const arr = [];
-    for (i = 0, len = descendants.length; i < len; i++) {
-      arr[i] = descendants[i];
-    }
-    descendants = arr;
+    // TODO: aparently selectNodes is a .NET thing. see about replacing?
+    descendants = (doc as any).selectNodes('//*[name(.)!="svg"]').slice();
   }
 
   const elements = descendants.filter(function (el) {
@@ -72,13 +84,14 @@ export function parseSVGDocument(doc, callback, reviver, parsingOptions) {
     callback && callback([], {});
     return;
   }
-  const localClipPaths = {};
+  const localClipPaths: TClipPathCollection = {};
   descendants
     .filter(function (el) {
       return el.nodeName.replace('svg:', '') === 'clipPath';
     })
     .forEach(function (el) {
       const id = el.getAttribute('id');
+      if (id == null) return;
       localClipPaths[id] = Array.from(el.getElementsByTagName('*')).filter(
         function (el) {
           return svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''));

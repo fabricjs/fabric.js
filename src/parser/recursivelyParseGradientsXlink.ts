@@ -21,7 +21,7 @@ const xlinkAttr = 'xlink:href';
  * @param gradient
  */
 export function recursivelyParseGradientsXlink(
-  doc: Document,
+  doc: Document | HTMLElement,
   gradient: Element
 ): void {
   const xLinkFull = gradient.getAttribute(xlinkAttr);

@@ -7,7 +7,7 @@ import { applyViewboxTransform } from './applyViewboxTransform';
  * TODO: real docs, not sure what this is actually doing
  * @param doc
  */
-export function parseUseDirectives(doc: Document) {
+export function parseUseDirectives(doc: Document | HTMLElement) {
   const nodeList = getMultipleNodes(doc, ['use', 'svg:use']);
   for (const el of nodeList) {
     const xlinkAttribute =
