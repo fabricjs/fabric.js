@@ -419,20 +419,6 @@
     assert.equal(returned.y, point2.y, 'it changed x property');
   });
 
-  QUnit.test('swap', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 8,
-        point = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
-
-    assert.ok(typeof point.swap === 'function');
-    var returned = point.swap(point2);
-    assert.equal(returned, undefined, 'it does not return anything');
-    assert.equal(point.x, x2, 'swapped x');
-    assert.equal(point.y, y2, 'swapped y');
-    assert.equal(point2.x, x1, 'swapped x');
-    assert.equal(point2.y, y1, 'swapped y');
-  });
-
   QUnit.test('clone', function(assert) {
     var x1 = 2, y1 = 3,
         point = new fabric.Point(x1, y1);

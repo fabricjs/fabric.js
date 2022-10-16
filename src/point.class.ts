@@ -331,19 +331,6 @@ export class Point {
   }
 
   /**
-   * Swaps x/y of this point and another point
-   * @param {Point} that
-   */
-  swap(that: Point) {
-    const x = this.x,
-      y = this.y;
-    this.x = that.x;
-    this.y = that.y;
-    that.x = x;
-    that.y = y;
-  }
-
-  /**
    * return a cloned instance of the point
    * @return {Point}
    */
