@@ -19,7 +19,13 @@ export class SideEffect<
 
   isEqual(incoming: P) {
     const keys = this.keys === '*' ? (Object.keys(incoming) as K[]) : this.keys;
-    return !keys.some((key) => this.persistance[key] !== incoming[key]);
+    return !keys.some((key) =>
+      this.compare(key, this.persistance[key], incoming[key])
+    );
+  }
+
+  compare(key: K, a: P[K], b: P[K]) {
+    return a === b;
   }
 
   invoke(key: K, value: P[K]) {
