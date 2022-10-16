@@ -16,10 +16,11 @@ export type TOnAnimationChangeCallback<State, R = void> = (
  */
 export type TAbortCallback<T> = TOnAnimationChangeCallback<T, boolean>;
 
+// TODO: this isn't that bad but still a little iffy. animation registry gets angry if I give this a type param, because then stuff like findAnimationIndex requires a type param too. Not sure which is better
 /**
  * Function used for canceling an animation
  */
-export type TCancelFunction = VoidFunction;
+export type TCancelFunction = () => AnimationContext<number> | AnimationContext<number[]>;
 
 /**
  * Animation of a value or list of values

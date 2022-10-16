@@ -6,6 +6,7 @@ import {
   isMulti,
   TCancelFunction,
 } from './types';
+import { noop } from '../../constants';
 
 type TAnimation = AnimationContext<number> | AnimationContext<number[]>;
 
@@ -17,35 +18,44 @@ type TAnimation = AnimationContext<number> | AnimationContext<number[]>;
 class RunningAnimations extends Array<TAnimation> {
   register(
     options: Partial<AnimationOptions<number> | AnimationOptions<number[]>>,
-    cancel: VoidFunction
+    canceler: VoidFunction
   ) {
-    cancel = () => {
-      cancel();
-      this.remove(context);
-    };
-    let context: AnimationContext<number> | AnimationContext<number[]>;
+    //TODO: remove this extreme code duplication. IDK how without doing stuff like `as number` or `as number[]`
     if (isMulti(options)) {
-      context = {
+      const context: AnimationContext<number[]> = {
         ...options,
         currentValue: options.startValue ?? [0],
         completionRate: 0,
         durationRate: 0,
-        cancel,
+        cancel: () => {
+          canceler();
+          this.remove(context);
+          return context;
+        },
+      };
+      this.push(context);
+      return {
+        context,
+        remove: () => this.remove(context),
       };
     } else {
-      context = {
+      const context: AnimationContext<number> = {
         ...options,
         currentValue: options.startValue ?? 0,
         completionRate: 0,
         durationRate: 0,
-        cancel,
+        cancel: () => {
+          canceler();
+          this.remove(context);
+          return context;
+        },
+      };
+      this.push(context);
+      return {
+        context,
+        remove: () => this.remove(context),
       };
     }
-    this.push(context);
-    return {
-      context,
-      remove: () => this.remove(context),
-    };
   }
 
   private remove(context: TAnimation) {
