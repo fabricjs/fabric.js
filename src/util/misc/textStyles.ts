@@ -19,6 +19,7 @@ export const hasStyleChanged = (
   prevStyle.fontFamily !== thisStyle.fontFamily ||
   prevStyle.fontWeight !== thisStyle.fontWeight ||
   prevStyle.fontStyle !== thisStyle.fontStyle ||
+  prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
   prevStyle.deltaY !== thisStyle.deltaY ||
   (forTextSpans &&
     (prevStyle.overline !== thisStyle.overline ||
@@ -54,7 +55,7 @@ export const stylesToArray = (styles: any, text: string) => {
       charIndex++;
       const thisStyle = styles[i][c];
       //check if style exists for this character
-      if (thisStyle) {
+      if (thisStyle && Object.keys(thisStyle).length > 0) {
         if (hasStyleChanged(prevStyle, thisStyle, true)) {
           stylesArray.push({
             start: charIndex,

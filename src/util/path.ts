@@ -240,14 +240,8 @@ export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
   bounds[0][jlen + 1] = x3;
   bounds[1][jlen + 1] = y3;
   const result = [
-    {
-      x: Math.min(...bounds[0]),
-      y: Math.min(...bounds[1]),
-    },
-    {
-      x: Math.max(...bounds[0]),
-      y: Math.max(...bounds[1]),
-    },
+    new Point(Math.min(...bounds[0]), Math.min(...bounds[1])),
+    new Point(Math.max(...bounds[0]), Math.max(...bounds[1])),
   ];
   if (config.cachesBoundsOfCurve) {
     cache.boundsOfCurveCache[argsString] = result;
