@@ -4,8 +4,8 @@ export class SideEffect<
   P extends Partial<Record<K, T[K]>>,
   C extends (key: K, value: P[K], prevValue?: P[K]) => void
 > {
-  id: string;
-  private keys: K[] | '*';
+  readonly id: string;
+  keys: K[] | '*';
   private callback: C;
   private enabled = true;
   private persistance: P;
