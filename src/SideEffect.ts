@@ -18,12 +18,8 @@ export class SideEffect<
   }
 
   isEqual(incoming: P) {
-    for (const key in incoming) {
-      if (this.persistance[key] !== incoming[key]) {
-        return false;
-      }
-    }
-    return true;
+    const keys = this.keys === '*' ? (Object.keys(incoming) as K[]) : this.keys;
+    return !keys.some((key) => this.persistance[key] !== incoming[key]);
   }
 
   invoke(key: K, value: P[K]) {
