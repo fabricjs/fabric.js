@@ -1,105 +1,102 @@
 import { fabric } from '../../../HEADER';
-import {
-  animate,
-  animateColor,
-  cancelAnimFrame,
-  ease,
-  requestAnimFrame,
-} from '../animation';
-import {
-  addListener,
-  getPointer,
-  isTouchEvent,
-  removeListener,
-} from '../dom_event';
-import {
-  cleanUpJsdomNode,
-  getElementOffset,
-  getNodeCanvas,
-  getScrollLeftTop,
-  makeElementSelectable,
-  makeElementUnselectable,
-  wrapElement,
-} from '../dom_misc';
-import { request } from '../dom_request';
-import { setStyle } from '../dom_style';
-import { getRandomInt, removeFromArray } from '../internals';
-import { createClass } from '../lang_class';
-import { clone, extend } from '../lang_object';
-import { camelize, capitalize, escapeXml, graphemeSplit } from '../lang_string';
-import {
-  getBoundsOfCurve,
-  getPathSegmentsInfo,
-  getPointOnPath,
-  getRegularPolygonPath,
-  getSmoothPathFromPoints,
-  joinPath,
-  makePathSimpler,
-  parsePath,
-  transformPath,
-} from '../path';
-import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
-import { capValue } from './capValue';
 import { cos } from './cos';
+import { sin } from './sin';
 import {
-  copyCanvasElement,
-  createCanvasElement,
-  createImage,
-  toDataURL,
-} from './dom';
-import { findScaleToCover, findScaleToFit } from './findScaleTo';
-import { isTransparent } from './isTransparent';
+  rotateVector,
+  createVector,
+  calcAngleBetweenVectors,
+  getUnitVector,
+  getBisector,
+} from './vectors';
+import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
+import { rotatePoint } from './rotatePoint';
+import { getRandomInt, removeFromArray } from '../internals';
+import { projectStrokeOnPoints } from './projectStroke';
 import {
+  transformPoint,
+  invertTransform,
+  composeMatrix,
+  qrDecompose,
   calcDimensionsMatrix,
   calcRotateMatrix,
-  composeMatrix,
-  invertTransform,
   multiplyTransformMatrices,
-  qrDecompose,
-  transformPoint,
 } from './matrix';
-import { mergeClipPaths } from './mergeClipPaths';
+import { stylesFromArray, stylesToArray, hasStyleChanged } from './textStyles';
+import { clone, extend } from '../lang_object';
 import {
-  enlivenObjectEnlivables,
-  enlivenObjects,
-  getKlass,
-  loadImage,
-} from './objectEnlive';
+  createCanvasElement,
+  createImage,
+  copyCanvasElement,
+  toDataURL,
+} from './dom';
+import { toFixed } from './toFixed';
 import {
+  matrixToSVG,
+  parsePreserveAspectRatioAttribute,
+  groupSVGElements,
+  parseUnit,
+  getSvgAttributes,
+} from './svgParsing';
+import { findScaleToFit, findScaleToCover } from './findScaleTo';
+import { capValue } from './capValue';
+import {
+  saveObjectTransform,
+  resetObjectTransform,
   addTransformToObject,
   applyTransformToObject,
   removeTransformFromObject,
-  resetObjectTransform,
-  saveObjectTransform,
   sizeAfterTransform,
 } from './objectTransforms';
-import { pick } from './pick';
+import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
 import {
   calcPlaneChangeMatrix,
-  sendObjectToPlane,
   sendPointToPlane,
   transformPointRelativeToCanvas,
+  sendObjectToPlane,
 } from './planeChange';
-import { projectStrokeOnPoints } from './projectStroke';
-import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
-import { rotatePoint } from './rotatePoint';
-import { sin } from './sin';
+import { camelize, capitalize, escapeXml, graphemeSplit } from '../lang_string';
 import {
-  getSvgAttributes,
-  groupSVGElements,
-  matrixToSVG,
-  parsePreserveAspectRatioAttribute,
-  parseUnit,
-} from './svgParsing';
-import { hasStyleChanged, stylesFromArray, stylesToArray } from './textStyles';
-import { toFixed } from './toFixed';
+  getKlass,
+  loadImage,
+  enlivenObjects,
+  enlivenObjectEnlivables,
+} from './objectEnlive';
+import { pick } from './pick';
 import {
-  calcAngleBetweenVectors,
-  createVector,
-  getBisector,
-  getHatVector,
-  rotateVector,
-} from './vectors';
+  joinPath,
+  parsePath,
+  makePathSimpler,
+  getSmoothPathFromPoints,
+  getPathSegmentsInfo,
+  getBoundsOfCurve,
+  getPointOnPath,
+  transformPath,
+  getRegularPolygonPath,
+} from '../path';
+import { setStyle } from '../dom_style';
+import { request } from '../dom_request';
+import {
+  isTouchEvent,
+  getPointer,
+  removeListener,
+  addListener,
+} from '../dom_event';
+import {
+  wrapElement,
+  getScrollLeftTop,
+  getElementOffset,
+  getNodeCanvas,
+  cleanUpJsdomNode,
+  makeElementUnselectable,
+  makeElementSelectable,
+} from '../dom_misc';
+import { isTransparent } from './isTransparent';
+import { mergeClipPaths } from './mergeClipPaths';
+import * as ease from '../animation/easing';
+import { animateColor } from '../animation';
+import { animate } from '../animation';
+import { requestAnimFrame, cancelAnimFrame } from "../animation";
+import { createClass } from '../lang_class';
 /**
  * @namespace fabric.util
  */
@@ -109,7 +106,7 @@ fabric.util = {
   rotateVector,
   createVector,
   calcAngleBetweenVectors,
-  getHatVector,
+  getUnitVector,
   getBisector,
   degreesToRadians,
   radiansToDegrees,

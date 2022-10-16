@@ -3,12 +3,11 @@ import { Canvas, TObject } from '../../__types__';
 import {
   AnimationContext,
   AnimationOptions,
-  TAnimationArgument,
+  isMulti,
   TCancelFunction,
 } from './types';
 
-type TAnimation<T extends TAnimationArgument = TAnimationArgument> =
-  AnimationContext<T>;
+type TAnimation = AnimationContext<number> | AnimationContext<number[]>;
 
 /**
  * Array holding all running animations
@@ -17,20 +16,31 @@ type TAnimation<T extends TAnimationArgument = TAnimationArgument> =
  */
 class RunningAnimations extends Array<TAnimation> {
   register(
-    options: Partial<AnimationOptions>,
-    startValue: TAnimationArgument,
+    options: Partial<AnimationOptions<number> | AnimationOptions<number[]>>,
     cancel: VoidFunction
   ) {
-    const context = {
-      ...options,
-      currentValue: startValue,
-      completionRate: 0,
-      durationRate: 0,
-      cancel: () => {
-        cancel();
-        this.remove(context);
-      },
+    cancel = () => {
+      cancel();
+      this.remove(context);
     };
+    let context: AnimationContext<number> | AnimationContext<number[]>;
+    if (isMulti(options)) {
+      context = {
+        ...options,
+        currentValue: options.startValue ?? [0],
+        completionRate: 0,
+        durationRate: 0,
+        cancel,
+      };
+    } else {
+      context = {
+        ...options,
+        currentValue: options.startValue ?? 0,
+        completionRate: 0,
+        durationRate: 0,
+        cancel,
+      };
+    }
     this.push(context);
     return {
       context,
