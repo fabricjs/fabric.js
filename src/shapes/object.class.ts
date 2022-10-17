@@ -953,8 +953,8 @@ export class FabricObject extends CommonMethods {
    * Sets object's properties from options
    * @param {Object} [options] Options object
    */
-  setOptions(options: Record<string, any>) {
-    this.set(options);
+  setOptions(options: Record<string, any> = {}) {
+    this._setOptions(options);
   }
 
   /**

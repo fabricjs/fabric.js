@@ -50,11 +50,6 @@ import { CommonMethods } from './mixins/shared_methods.mixin';
         this._initStatic(el, options);
       },
 
-      // temporary test fix
-      _set: function (key, value) {
-        this[key] = value;
-      },
-
       /**
        * Background color of canvas instance.
        * @type {(String|fabric.Pattern)}
