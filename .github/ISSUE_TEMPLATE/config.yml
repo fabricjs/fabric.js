@@ -2,6 +2,12 @@
 
 blank_issues_enabled: false
 contact_links:
+  - name: Website
+    url: http://fabricjs.com/
+    about: Checkout the website.
+  - name: Docs
+    url: http://fabricjs.com/docs/
+    about: Checkout the docs.
   - name: Discussions
     url: https://github.com/fabricjs/fabric.js/discussions
     about: Please ask and answer questions here.
