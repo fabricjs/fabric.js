@@ -12,24 +12,24 @@ body:
 
         If you have a question or if an issue is not right for what you mean
         to file use
-        [Discussions](../discussions).
+        [Discussions](https://github.com/fabricjs/fabric.js/discussions).
   - type: checkboxes
     id: terms
     attributes:
       label: CheckList
       description: >-
         By submitting this issue, you agree to follow our [Code of
-        Conduct](../blob/master/CODE_OF_CONDUCT.md)
+        Conduct](https://github.com/fabricjs/fabric.js/blob/master/CODE_OF_CONDUCT.md)
       options:
         - label: I agree to follow this project's Code of Conduct
           required: true
         - label: >-
             I have read and followed the [Contributing
-            Guide](../blob/master/CONTRIBUTING.md)
+            Guide](https://github.com/fabricjs/fabric.js/blob/master/CONTRIBUTING.md)
           required: true
         - label: >-
             I have read and followed the [Issue Tracker
-            Guide](../blob/master/CONTRIBUTING.md#%EF%B8%8F-issue-tracker)
+            Guide](https://github.com/fabricjs/fabric.js/blob/master/CONTRIBUTING.md#%EF%B8%8F-issue-tracker)
           required: true
         - label: I have searched and referenced existing issues and discussions
           required: true
@@ -58,7 +58,7 @@ body:
       label: In What environments are you experiencing the problem?
       description: >-
         checkout the [supported
-        browsers](../blob/master/README.md#supported-browsersenvironments)
+        browsers](https://github.com/fabricjs/fabric.js/blob/master/README.md#supported-browsersenvironments)
       multiple: true
       options:
         - Firefox
