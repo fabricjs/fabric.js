@@ -1,10 +1,16 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
+import type { Gradient } from './gradient/gradient.class';
+import type { Pattern } from './pattern.class';
 
-interface NominalTag<T> {
-  nominalTag: T;
+interface NominalTag < T > {
+  nominalTag?: T;
 }
 
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+type TNonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
+export type TClassProperties<T> = Pick<T, TNonFunctionPropertyNames<T>>;
 
 const enum Degree {}
 const enum Radian {}
@@ -12,14 +18,17 @@ const enum Radian {}
 export type TDegree = Nominal<number, Degree>;
 export type TRadian = Nominal<number, Radian>;
 
+export type TFiller = Gradient<'linear'> | Gradient<'radial'> | Pattern;
+
 export type TSize = {
   width: number;
   height: number;
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-type TNonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
-export type TClassProperties<T> = Pick<T, TNonFunctionPropertyNames<T>>;
+export type TBBox = {
+  left: number;
+  top: number;
+} & TSize;
 
 export type Percent = `${number}%`;
 
