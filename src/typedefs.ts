@@ -2,14 +2,16 @@
 import type { Gradient } from './gradient/gradient.class';
 import type { Pattern } from './pattern.class';
 
-interface NominalTag < T > {
+interface NominalTag<T> {
   nominalTag?: T;
 }
 
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type TNonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
+type TNonFunctionPropertyNames<T> = {
+  [K in keyof T]: T[K] extends Function ? never : K;
+}[keyof T];
 export type TClassProperties<T> = Pick<T, TNonFunctionPropertyNames<T>>;
 
 const enum Degree {}

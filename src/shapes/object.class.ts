@@ -734,7 +734,7 @@ export class FabricObject extends CommonMethods {
    * @default undefined
    * @private
    */
-  ownCaching?: boolean
+  ownCaching?: boolean;
 
   /**
    * translation of the cacheCanvas away from the center, for subpixel accuracy and crispness
@@ -792,7 +792,9 @@ export class FabricObject extends CommonMethods {
    * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
-  _limitCacheSize(dims: TSize & { zoomX: number, zoomY: number, capped: boolean } & any) {
+  _limitCacheSize(
+    dims: TSize & { zoomX: number; zoomY: number; capped: boolean } & any
+  ) {
     const width = dims.width,
       height = dims.height,
       max = config.maxCacheSideLimit,
@@ -888,8 +890,7 @@ export class FabricObject extends CommonMethods {
       return false;
     }
 
-    let
-      drawingWidth,
+    let drawingWidth,
       drawingHeight,
       shouldRedraw = dimensionsChanged || zoomChanged,
       additionalWidth = 0,
@@ -937,10 +938,7 @@ export class FabricObject extends CommonMethods {
         Math.round(canvas.height / 2 - drawingHeight) + drawingHeight;
       this.cacheWidth = width;
       this.cacheHeight = height;
-      context.translate(
-        this.cacheTranslationX,
-        this.cacheTranslationY
-      );
+      context.translate(this.cacheTranslationX, this.cacheTranslationY);
       context.scale(zoomX, zoomY);
       this.zoomX = zoomX;
       this.zoomY = zoomY;
@@ -1639,7 +1637,10 @@ export class FabricObject extends CommonMethods {
    * @return {Object} offset.offsetX offset for text rendering
    * @return {Object} offset.offsetY offset for text rendering
    */
-  _applyPatternGradientTransform(ctx: CanvasRenderingContext2D, filler: TFiller) {
+  _applyPatternGradientTransform(
+    ctx: CanvasRenderingContext2D,
+    filler: TFiller
+  ) {
     if (!filler || !filler.toLive) {
       return { offsetX: 0, offsetY: 0 };
     }
@@ -1737,7 +1738,10 @@ export class FabricObject extends CommonMethods {
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {fabric.Gradient} filler a fabric gradient instance
    */
-  _applyPatternForTransformedGradient(ctx: CanvasRenderingContext2D, filler: TFiller) {
+  _applyPatternForTransformedGradient(
+    ctx: CanvasRenderingContext2D,
+    filler: TFiller
+  ) {
     const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
       pCanvas = fabric.util.createCanvasElement(),
       retinaScaling = this.canvas.getRetinaScaling(),
@@ -2248,10 +2252,7 @@ const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
   absolutePositioned: false,
 };
 
-Object.assign(
-  FabricObject.prototype,
-  fabricObjectDefaultValues
-);
+Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
 
 (function (global) {
   const fabric = global.fabric;

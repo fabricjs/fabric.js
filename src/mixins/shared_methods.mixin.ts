@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Observable } from "./observable.mixin";
+import { Observable } from './observable.mixin';
 
 export class CommonMethods extends Observable {
   /**
