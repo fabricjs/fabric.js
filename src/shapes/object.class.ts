@@ -842,7 +842,7 @@ export class FabricObject extends CommonMethods {
    */
   _getCacheCanvasDimensions() {
     const objectScale = this.getTotalObjectScaling(),
-      // caculate dimensions without skewing
+      // calculate dimensions without skewing
       dim = this._getTransformedDimensions({ skewX: 0, skewY: 0 }),
       neededX = (dim.x * objectScale.x) / this.scaleX,
       neededY = (dim.y * objectScale.y) / this.scaleY;
