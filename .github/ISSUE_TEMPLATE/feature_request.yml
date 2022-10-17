@@ -14,7 +14,7 @@ body:
         [Discussions](https://github.com/fabricjs/fabric.js/discussions).
 
         If you are up for PRing see [Pull Requests](https://github.com/fabricjs/fabric.js/blob/master/CONTRIBUTING.md#-pull-requests). 
-        It is advised to wait for a green light before beginning.
+        It is advised to wait for a green light before you start coding.
   - type: checkboxes
     id: terms
     attributes:
