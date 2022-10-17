@@ -1,6 +1,8 @@
 import { IPoint, Point } from '../../point.class';
 import { TRadian } from '../../typedefs';
 
+const unitVectorX = new Point(1, 0);
+
 /**
  * Rotates `vector` with `radians`
  * @static
@@ -13,7 +15,7 @@ export const rotateVector = (vector: Point, radians: TRadian) =>
   vector.rotate(radians);
 
 /**
- * Creates a vetor from points represented as a point
+ * Creates a vector from points represented as a point
  * @static
  * @memberOf fabric.util
  *
@@ -21,48 +23,64 @@ export const rotateVector = (vector: Point, radians: TRadian) =>
  * @param {Point} to
  * @returns {Point} vector
  */
-export const createVector = (from: Point | IPoint, to: Point): Point =>
+export const createVector = (from: IPoint, to: IPoint): Point =>
   new Point(to).subtract(from);
 
 /**
- * Calculates angle between 2 vectors using dot product
- * @static
- * @memberOf fabric.util
+ * return the magnitude of a vector
+ * @return {number}
+ */
+export const magnitude = (point: Point) => point.distanceFrom(new Point());
+
+/**
+ * Calculates the angle between 2 vectors
  * @param {Point} a
  * @param {Point} b
- * @returns the angle in radian between the vectors
+ * @returns the angle in radians from `a` to `b`
  */
-export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian =>
-  Math.acos(
-    (a.x * b.x + a.y * b.y) / (Math.hypot(a.x, a.y) * Math.hypot(b.x, b.y))
-  ) as TRadian;
+export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian => {
+  const dot = a.x * b.x + a.y * b.y,
+    det = a.x * b.y - a.y * b.x;
+  return Math.atan2(det, dot) as TRadian;
+};
 
 /**
- * @static
- * @memberOf fabric.util
+ * Calculates the angle between the x axis and the vector
  * @param {Point} v
- * @returns {Point} vector representing the unit vector of pointing to the direction of `v`
+ * @returns the angle in radians of `v`
  */
-export const getHatVector = (v: Point): Point =>
-  v.scalarMultiply(1 / Math.hypot(v.x, v.y));
+export const calcVectorRotation = (v: Point) =>
+  calcAngleBetweenVectors(unitVectorX, v);
 
 /**
- * @static
- * @memberOf fabric.util
+ * @param {Point} v
+ * @returns {Point} vector representing the unit vector pointing to the direction of `v`
+ */
+export const getUnitVector = (v: Point): Point => v.scalarDivide(magnitude(v));
+
+/**
  * @param {Point} A
  * @param {Point} B
  * @param {Point} C
- * @returns {{ vector: Point, angle: number }} vector representing the bisector of A and A's angle
+ * @returns {{ vector: Point, angle: TRadian}} vector representing the bisector of A and A's angle
  */
-export const getBisector = (a: Point, b: Point, c: Point) => {
-  const ab = createVector(a, b),
-    ac = createVector(a, c);
-  const alpha = calcAngleBetweenVectors(ab, ac);
-  //  check if alpha is relative to AB->BC
-  const ro = calcAngleBetweenVectors(rotateVector(ab, alpha), ac);
-  const phi = ((alpha * (ro === 0 ? 1 : -1)) / 2) as TRadian;
+export const getBisector = (A: Point, B: Point, C: Point) => {
+  const AB = createVector(A, B),
+    AC = createVector(A, C),
+    alpha = calcAngleBetweenVectors(AB, AC);
   return {
-    vector: getHatVector(rotateVector(ab, phi)),
+    vector: getUnitVector(rotateVector(AB, alpha / 2)),
     angle: alpha,
   };
 };
+
+/**
+ * @param {Point} v
+ * @param {Boolean} [counterClockwise] the direction of the orthogonal vector, defaults to `true`
+ * @returns {Point} the unit orthogonal vector
+ */
+export const getOrthonormalVector = (
+  v: Point,
+  counterClockwise = true
+): Point =>
+  getUnitVector(new Point(-v.y, v.x).scalarMultiply(counterClockwise ? 1 : -1));

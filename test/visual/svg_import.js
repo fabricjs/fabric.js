@@ -94,7 +94,9 @@
     'cs',
     'qt',
     'generic-path',
-    '177'
+    '177',
+    'polygons',
+    'polygons-rounded',
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
