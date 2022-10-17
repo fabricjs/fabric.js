@@ -1,13 +1,22 @@
-import { Point } from '../../point.class';
+import { IPoint, Point } from '../../point.class';
 
 /**
  * Calculates bounding box (left, top, width, height) from given `points`
  * @static
  * @memberOf fabric.util
- * @param {Point[]} points
+ * @param {IPoint[]} points
  * @return {Object} Object with left, top, width, height properties
  */
-export const makeBoundingBoxFromPoints = (points: Point[]) => {
+export const makeBoundingBoxFromPoints = (points: IPoint[]) => {
+  if (points.length === 0) {
+    return {
+      left: 0,
+      top: 0,
+      width: 0,
+      height: 0,
+    };
+  }
+
   const { min, max } = points.reduce(
     ({ min, max }, curr) => {
       return {
@@ -15,7 +24,7 @@ export const makeBoundingBoxFromPoints = (points: Point[]) => {
         max: max.max(curr),
       };
     },
-    { min: points[0], max: points[0] }
+    { min: new Point(points[0]), max: new Point(points[0]) }
   );
 
   const size = max.subtract(min);

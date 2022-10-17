@@ -1,10 +1,10 @@
-//@ts-nocheck
-import type { TClassProperties, TDegree } from '../typedefs';
+// @ts-nocheck
+import type { TClassProperties, TDegree, TSize, TFiller } from '../typedefs';
 import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { config } from '../config';
 import { VERSION } from '../constants';
-import { Observable } from '../mixins/observable.mixin';
+import { CommonMethods } from '../mixins/shared_methods.mixin';
 import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
 import { pick } from '../util/misc/pick';
@@ -14,6 +14,7 @@ import { clone } from '../util/lang_object';
 import { toFixed } from '../util/misc/toFixed';
 import { capitalize } from '../util/lang_string';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { createCanvasElement } from '../util/misc/dom';
 
 type StaticCanvas = any;
 type Canvas = any;
@@ -55,7 +56,7 @@ const ALIASING_LIMIT = 2;
  * @fires dragleave
  * @fires drop
  */
-export class FabricObject extends Observable {
+export class FabricObject extends CommonMethods {
   type: string;
 
   /**
@@ -311,7 +312,7 @@ export class FabricObject extends Observable {
    * @type String
    * @default null
    */
-  stroke: string | null;
+  stroke: string | TFiller | null;
 
   /**
    * Width of a stroke used to render this object
@@ -612,7 +613,7 @@ export class FabricObject extends Observable {
    * If you want 0,0 of a clipPath to align with an object center, use clipPath.originX/Y to 'center'
    * @type fabric.Object
    */
-  clipPath: FabricObject | undefined;
+  clipPath?: FabricObject;
 
   /**
    * Meaningful ONLY when the object is used as clipPath.
@@ -635,9 +636,108 @@ export class FabricObject extends Observable {
    */
   absolutePositioned: boolean;
 
-  canvas?: StaticCanvas | Canvas;
   /**
-   * Unique id used internally when creating SVG elements
+   * A Reference of the Canvas where the object is actually added
+   * @type StaticCanvas | Canvas;
+   * @default undefined
+   * @private
+   */
+  canvas?: StaticCanvas | Canvas;
+
+  /**
+   * Quick access for the _cacheCanvas rendering context
+   * This is part of the objectCaching feature
+   * since 1.7.0
+   * @type boolean
+   * @default undefined
+   * @private
+   */
+  _cacheContext: CanvasRenderingContext2D | null = null;
+
+  /**
+   * A reference to the HTMLCanvasElement that is used to contain the cache of the object
+   * this canvas element is resized and cleared as needed
+   * Is marked private, you can read it, don't use it since it is handled by fabric
+   * since 1.7.0
+   * @type HTMLCanvasElement
+   * @default undefined
+   * @private
+   */
+  _cacheCanvas?: HTMLCanvasElement;
+
+  /**
+   * Size of the cache canvas, width
+   * since 1.7.0
+   * @type number
+   * @default undefined
+   * @private
+   */
+  cacheWidth?: number;
+
+  /**
+   * Size of the cache canvas, height
+   * since 1.7.0
+   * @type number
+   * @default undefined
+   * @private
+   */
+  cacheHeight?: number;
+
+  /**
+   * zoom level used on the cacheCanvas to draw the cache, X axe
+   * since 1.7.0
+   * @type number
+   * @default undefined
+   * @private
+   */
+  zoomX?: number;
+
+  /**
+   * zoom level used on the cacheCanvas to draw the cache, Y axe
+   * since 1.7.0
+   * @type number
+   * @default undefined
+   * @private
+   */
+  zoomY?: number;
+
+  /**
+   * zoom level used on the cacheCanvas to draw the cache, Y axe
+   * since 1.7.0
+   * @type number
+   * @default undefined
+   * @private
+   */
+  cacheTranslationX?: number;
+
+  /**
+   * translation of the cacheCanvas away from the center, for subpixel accuracy and crispness
+   * since 1.7.0
+   * @type number
+   * @default undefined
+   * @private
+   */
+  cacheTranslationY?: number;
+
+  /**
+   * A reference to the parent of the object, usually a FabricGroup
+   * @type number
+   * @default undefined
+   * @private
+   */
+  group?: FabricObject;
+
+  /**
+   * Indicate if the object is sitting on a cache dedicated to it
+   * or is part of a larger cache for many object ( a group for example)
+   * @type number
+   * @default undefined
+   * @private
+   */
+  ownCaching?: boolean;
+
+  /**
+   * translation of the cacheCanvas away from the center, for subpixel accuracy and crispness
    * @static
    * @memberOf fabric.Object
    * @type Number
@@ -648,7 +748,7 @@ export class FabricObject extends Observable {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: FabricObjectDefaultValues & Record<string, unknown>) {
+  constructor(options: Record<string, unknown>) {
     super();
     if (options) {
       this.setOptions(options);
@@ -659,7 +759,7 @@ export class FabricObject extends Observable {
    * Temporary compatibility issue with old classes
    * @param {Object} [options] Options object
    */
-  initialize(options: FabricObjectDefaultValues & Record<string, unknown>) {
+  initialize(options: Record<string, unknown>) {
     if (options) {
       this.setOptions(options);
     }
@@ -670,8 +770,7 @@ export class FabricObject extends Observable {
    * @private
    */
   _createCacheCanvas() {
-    this._cacheProperties = {};
-    this._cacheCanvas = fabric.util.createCanvasElement();
+    this._cacheCanvas = createCanvasElement();
     this._cacheContext = this._cacheCanvas.getContext('2d');
     this._updateCacheCanvas();
     // if canvas gets created, is empty, so dirty.
@@ -693,7 +792,9 @@ export class FabricObject extends Observable {
    * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
-  _limitCacheSize(dims) {
+  _limitCacheSize(
+    dims: TSize & { zoomX: number; zoomY: number; capped: boolean } & any
+  ) {
     const width = dims.width,
       height = dims.height,
       max = config.maxCacheSideLimit,
@@ -773,25 +874,32 @@ export class FabricObject extends Observable {
         return false;
       }
     }
-    let canvas = this._cacheCanvas,
+    const canvas = this._cacheCanvas,
+      context = this._cacheContext,
       dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
       minCacheSize = config.minCacheSideLimit,
       width = dims.width,
       height = dims.height,
-      drawingWidth,
-      drawingHeight,
       zoomX = dims.zoomX,
       zoomY = dims.zoomY,
       dimensionsChanged =
         width !== this.cacheWidth || height !== this.cacheHeight,
-      zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY,
+      zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY;
+
+    if (!canvas || !context) {
+      return false;
+    }
+
+    let drawingWidth,
+      drawingHeight,
       shouldRedraw = dimensionsChanged || zoomChanged,
       additionalWidth = 0,
       additionalHeight = 0,
       shouldResizeCanvas = false;
+
     if (dimensionsChanged) {
-      const canvasWidth = this._cacheCanvas.width,
-        canvasHeight = this._cacheCanvas.height,
+      const canvasWidth = (this._cacheCanvas as HTMLCanvasElement).width,
+        canvasHeight = (this._cacheCanvas as HTMLCanvasElement).height,
         sizeGrowing = width > canvasWidth || height > canvasHeight,
         sizeShrinking =
           (width < canvasWidth * 0.9 || height < canvasHeight * 0.9) &&
@@ -810,6 +918,7 @@ export class FabricObject extends Observable {
     if (this instanceof fabric.Text && this.path) {
       shouldRedraw = true;
       shouldResizeCanvas = true;
+      // IMHO in those lines we are using zoomX and zoomY not the this version.
       additionalWidth += this.getHeightOfLine(0) * this.zoomX;
       additionalHeight += this.getHeightOfLine(0) * this.zoomY;
     }
@@ -818,8 +927,8 @@ export class FabricObject extends Observable {
         canvas.width = Math.ceil(width + additionalWidth);
         canvas.height = Math.ceil(height + additionalHeight);
       } else {
-        this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
-        this._cacheContext.clearRect(0, 0, canvas.width, canvas.height);
+        context.setTransform(1, 0, 0, 1, 0, 0);
+        context.clearRect(0, 0, canvas.width, canvas.height);
       }
       drawingWidth = dims.x / 2;
       drawingHeight = dims.y / 2;
@@ -829,11 +938,8 @@ export class FabricObject extends Observable {
         Math.round(canvas.height / 2 - drawingHeight) + drawingHeight;
       this.cacheWidth = width;
       this.cacheHeight = height;
-      this._cacheContext.translate(
-        this.cacheTranslationX,
-        this.cacheTranslationY
-      );
-      this._cacheContext.scale(zoomX, zoomY);
+      context.translate(this.cacheTranslationX, this.cacheTranslationY);
+      context.scale(zoomX, zoomY);
       this.zoomX = zoomX;
       this.zoomY = zoomY;
       return true;
@@ -845,7 +951,7 @@ export class FabricObject extends Observable {
    * Sets object's properties from options
    * @param {Object} [options] Options object
    */
-  setOptions(options) {
+  setOptions(options: Record<string, any> = {}) {
     this._setOptions(options);
   }
 
@@ -853,7 +959,7 @@ export class FabricObject extends Observable {
    * Transforms context when rendering an object
    * @param {CanvasRenderingContext2D} ctx Context
    */
-  transform(ctx) {
+  transform(ctx: CanvasRenderingContext2D) {
     const needFullTransform =
       (this.group && !this.group._transformDone) ||
       (this.group && this.canvas && ctx === this.canvas.contextTop);
@@ -866,7 +972,7 @@ export class FabricObject extends Observable {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude) {
+  toObject(propertiesToInclude: (keyof this)[]): Record<string, any> {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -931,7 +1037,7 @@ export class FabricObject extends Observable {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toDatalessObject(propertiesToInclude) {
+  toDatalessObject(propertiesToInclude: (keyof this)[]) {
     // will be overwritten by subclasses
     return this.toObject(propertiesToInclude);
   }
@@ -940,7 +1046,7 @@ export class FabricObject extends Observable {
    * @private
    * @param {Object} object
    */
-  _removeDefaultValues(object) {
+  _removeDefaultValues(object: Record<string, any>) {
     const prototype = fabric.util.getKlass(object.type).prototype;
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
@@ -1030,10 +1136,9 @@ export class FabricObject extends Observable {
    * @param {*} value
    * @return {fabric.Object} thisArg
    */
-  _set(key, value) {
-    let shouldConstrainValue = key === 'scaleX' || key === 'scaleY',
-      isChanged = this[key] !== value,
-      groupNeedsUpdate = false;
+  _set(key: string, value: any) {
+    const shouldConstrainValue = key === 'scaleX' || key === 'scaleY',
+      isChanged = this[key] !== value;
 
     if (shouldConstrainValue) {
       value = this._constrainScale(value);
@@ -1053,7 +1158,7 @@ export class FabricObject extends Observable {
     this[key] = value;
 
     if (isChanged) {
-      groupNeedsUpdate = this.group && this.group.isOnACache();
+      const groupNeedsUpdate = this.group && this.group.isOnACache();
       if (this.cacheProperties.indexOf(key) > -1) {
         this.dirty = true;
         groupNeedsUpdate && this.group.set('dirty', true);
@@ -1095,7 +1200,7 @@ export class FabricObject extends Observable {
    * Renders an object on a specified context
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  render(ctx) {
+  render(ctx: CanvasRenderingContext2D) {
     // do not render if width/height are zeros or object is not visible
     if (this.isNotVisible()) {
       return;
@@ -1113,7 +1218,7 @@ export class FabricObject extends Observable {
     this.drawSelectionBackground(ctx);
     this.transform(ctx);
     this._setOpacity(ctx);
-    this._setShadow(ctx, this);
+    this._setShadow(ctx);
     if (this.shouldCache()) {
       this.renderCache();
       this.drawCacheOnCanvas(ctx);
@@ -1128,12 +1233,12 @@ export class FabricObject extends Observable {
     ctx.restore();
   }
 
-  renderCache(options) {
+  renderCache(options?: any) {
     options = options || {};
     if (!this._cacheCanvas || !this._cacheContext) {
       this._createCacheCanvas();
     }
-    if (this.isCacheDirty()) {
+    if (this.isCacheDirty() && this._cacheContext) {
       this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
       this.drawObject(this._cacheContext, options.forClipping);
       this.dirty = false;
@@ -1144,7 +1249,7 @@ export class FabricObject extends Observable {
    * Remove cacheCanvas and its dimensions from the objects
    */
   _removeCacheCanvas() {
-    this._cacheCanvas = null;
+    this._cacheCanvas = undefined;
     this._cacheContext = null;
     this.cacheWidth = 0;
     this.cacheHeight = 0;
@@ -1235,8 +1340,10 @@ export class FabricObject extends Observable {
    * Execute the drawing operation for an object clipPath
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {fabric.Object} clipPath
+   * todo while converting things, we need a type that is a union of classes that
+   * represent the fabricObjects. Rect, Circle...
    */
-  drawClipPathOnCache(ctx, clipPath) {
+  drawClipPathOnCache(ctx: CanvasRenderingContext2D, clipPath: FabricObject) {
     ctx.save();
     // DEBUG: uncomment this line, comment the following
     // ctx.globalAlpha = 0.4
@@ -1251,11 +1358,11 @@ export class FabricObject extends Observable {
       ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
     }
     clipPath.transform(ctx);
-    ctx.scale(1 / clipPath.zoomX, 1 / clipPath.zoomY);
+    ctx.scale(1 / clipPath.zoomX!, 1 / clipPath.zoomY!);
     ctx.drawImage(
-      clipPath._cacheCanvas,
-      -clipPath.cacheTranslationX,
-      -clipPath.cacheTranslationY
+      clipPath._cacheCanvas!,
+      -clipPath.cacheTranslationX!,
+      -clipPath.cacheTranslationY!
     );
     ctx.restore();
   }
@@ -1263,8 +1370,9 @@ export class FabricObject extends Observable {
   /**
    * Execute the drawing operation for an object on a specified context
    * @param {CanvasRenderingContext2D} ctx Context to render on
+   * @param {boolean} forClipping apply clipping styles
    */
-  drawObject(ctx, forClipping) {
+  drawObject(ctx: CanvasRenderingContext2D, forClipping?: boolean) {
     const originalFill = this.fill,
       originalStroke = this.stroke;
     if (forClipping) {
@@ -1317,7 +1425,7 @@ export class FabricObject extends Observable {
    * @param {Boolean} skipCanvas skip canvas checks because this object is painted
    * on parent canvas.
    */
-  isCacheDirty(skipCanvas) {
+  isCacheDirty(skipCanvas = false) {
     if (this.isNotVisible()) {
       return false;
     }
@@ -1484,7 +1592,7 @@ export class FabricObject extends Observable {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _setShadow(ctx) {
+  _setShadow(ctx: CanvasRenderingContext2D) {
     if (!this.shadow) {
       return;
     }
@@ -1529,7 +1637,10 @@ export class FabricObject extends Observable {
    * @return {Object} offset.offsetX offset for text rendering
    * @return {Object} offset.offsetY offset for text rendering
    */
-  _applyPatternGradientTransform(ctx, filler) {
+  _applyPatternGradientTransform(
+    ctx: CanvasRenderingContext2D,
+    filler: TFiller
+  ) {
     if (!filler || !filler.toLive) {
       return { offsetX: 0, offsetY: 0 };
     }
@@ -1552,7 +1663,7 @@ export class FabricObject extends Observable {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _renderPaintInOrder(ctx) {
+  _renderPaintInOrder(ctx: CanvasRenderingContext2D) {
     if (this.paintFirst === 'stroke') {
       this._renderStroke(ctx);
       this._renderFill(ctx);
@@ -1569,13 +1680,15 @@ export class FabricObject extends Observable {
    * not related to rendering
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _render(/* ctx */) {}
+  _render(ctx: CanvasRenderingContext2D) {
+    // placeholder to be overridden
+  }
 
   /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _renderFill(ctx) {
+  _renderFill(ctx: CanvasRenderingContext2D) {
     if (!this.fill) {
       return;
     }
@@ -1594,7 +1707,7 @@ export class FabricObject extends Observable {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _renderStroke(ctx) {
+  _renderStroke(ctx: CanvasRenderingContext2D) {
     if (!this.stroke || this.strokeWidth === 0) {
       return;
     }
@@ -1625,16 +1738,18 @@ export class FabricObject extends Observable {
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {fabric.Gradient} filler a fabric gradient instance
    */
-  _applyPatternForTransformedGradient(ctx, filler) {
-    let dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
+  _applyPatternForTransformedGradient(
+    ctx: CanvasRenderingContext2D,
+    filler: TFiller
+  ) {
+    const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
       pCanvas = fabric.util.createCanvasElement(),
-      pCtx,
       retinaScaling = this.canvas.getRetinaScaling(),
       width = dims.x / this.scaleX / retinaScaling,
       height = dims.y / this.scaleY / retinaScaling;
     pCanvas.width = width;
     pCanvas.height = height;
-    pCtx = pCanvas.getContext('2d');
+    const pCtx = pCanvas.getContext('2d');
     pCtx.beginPath();
     pCtx.moveTo(0, 0);
     pCtx.lineTo(width, 0);
@@ -1674,8 +1789,8 @@ export class FabricObject extends Observable {
    * This function is an helper for svg import. it decompose the transformMatrix
    * and assign properties to object.
    * untransformed coordinates
+   * @todo move away in the svg import stuff.
    * @private
-   * @chainable
    */
   _assignTransformMatrixProps() {
     if (this.transformMatrix) {
@@ -1693,9 +1808,9 @@ export class FabricObject extends Observable {
   /**
    * This function is an helper for svg import. it removes the transform matrix
    * and set to object properties that fabricjs can handle
+   * @todo move away in the svg import stuff.
    * @private
    * @param {Object} preserveAspectRatioOptions
-   * @return {thisArg}
    */
   _removeTransformMatrix(preserveAspectRatioOptions) {
     let center = this._findCenterFromElement();
@@ -1722,8 +1837,9 @@ export class FabricObject extends Observable {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @returns {Promise<fabric.Object>}
    */
-  clone(propertiesToInclude) {
+  clone(propertiesToInclude: (keyof this)[]) {
     const objectForm = this.toObject(propertiesToInclude);
+    // todo ok understand this. is static or it isn't?
     return this.constructor.fromObject(objectForm);
   }
 
@@ -1745,7 +1861,7 @@ export class FabricObject extends Observable {
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {fabric.Image} Object cloned as image.
    */
-  cloneAsImage(options) {
+  cloneAsImage(options: any) {
     const canvasEl = this.toCanvasElement(options);
     return new fabric.Image(canvasEl);
   }
@@ -1763,7 +1879,7 @@ export class FabricObject extends Observable {
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {HTMLCanvasElement} Returns DOM element <canvas> with the fabric.Object
    */
-  toCanvasElement(options) {
+  toCanvasElement(options: any) {
     options || (options = {});
 
     const utils = fabric.util,
@@ -1859,8 +1975,7 @@ export class FabricObject extends Observable {
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
    */
-  toDataURL(options) {
-    options || (options = {});
+  toDataURL(options: any = {}) {
     return fabric.util.toDataURL(
       this.toCanvasElement(options),
       options.format || 'png',
@@ -1873,10 +1988,8 @@ export class FabricObject extends Observable {
    * @param {String} type Type to check against
    * @return {Boolean}
    */
-  isType(type) {
-    return arguments.length > 1
-      ? Array.from(arguments).includes(this.type)
-      : this.type === type;
+  isType(...types: string[]) {
+    return types.includes(this.type);
   }
 
   /**
@@ -1902,7 +2015,7 @@ export class FabricObject extends Observable {
    * @return {fabric.Object} thisArg
    * @chainable
    */
-  rotate(angle) {
+  rotate(angle: TDegree) {
     const shouldCenterOrigin =
       (this.originX !== 'center' || this.originY !== 'center') &&
       this.centeredRotation;
@@ -2061,7 +2174,6 @@ const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
   left: 0,
   width: 0,
   height: 0,
-  asd: 4,
   scaleX: 1,
   scaleY: 1,
   flipX: false,
@@ -2140,11 +2252,7 @@ const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
   absolutePositioned: false,
 };
 
-Object.assign(
-  FabricObject.prototype,
-  fabric.CommonMethods,
-  fabricObjectDefaultValues
-);
+Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
 
 (function (global) {
   const fabric = global.fabric;

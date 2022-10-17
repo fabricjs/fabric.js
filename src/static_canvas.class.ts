@@ -7,7 +7,7 @@ import { requestAnimFrame } from './util/animate';
 import { removeFromArray } from './util/internals';
 import { pick } from './util/misc/pick';
 import { FabricObject } from './shapes/object.class';
-
+import { CommonMethods } from './mixins/shared_methods.mixin';
 (function (global) {
   // aliases for faster resolution
   var fabric = global.fabric,
@@ -35,7 +35,6 @@ import { FabricObject } from './shapes/object.class';
    */
   // eslint-disable-next-line max-len
   fabric.StaticCanvas = fabric.util.createClass(
-    fabric.CommonMethods,
     fabric.Collection,
     /** @lends fabric.StaticCanvas.prototype */ {
       /**
@@ -49,11 +48,6 @@ import { FabricObject } from './shapes/object.class';
         this.renderAndResetBound = this.renderAndReset.bind(this);
         this.requestRenderAllBound = this.requestRenderAll.bind(this);
         this._initStatic(el, options);
-      },
-
-      // temporary test fix
-      _set: function (key, value) {
-        this[key] = value;
       },
 
       /**
@@ -300,7 +294,7 @@ import { FabricObject } from './shapes/object.class';
        */
       _initOptions: function (options) {
         var lowerCanvasEl = this.lowerCanvasEl;
-        this._setOptions(options);
+        this.set(options);
 
         this.width = this.width || parseInt(lowerCanvasEl.width, 10) || 0;
         this.height = this.height || parseInt(lowerCanvasEl.height, 10) || 0;
@@ -1860,6 +1854,12 @@ import { FabricObject } from './shapes/object.class';
     if (key === 'constructor') return;
     Object.defineProperty(fabric.StaticCanvas.prototype, key, {
       value: Observable.prototype[key],
+    });
+  });
+  Object.getOwnPropertyNames(CommonMethods.prototype).forEach((key) => {
+    if (key === 'constructor') return;
+    Object.defineProperty(fabric.StaticCanvas.prototype, key, {
+      value: CommonMethods.prototype[key],
     });
   });
 
