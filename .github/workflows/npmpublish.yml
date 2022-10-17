@@ -6,10 +6,25 @@ on:
       - master
       - 5.x
     types: [published]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Target branch to publish
+        required: true
+        default: master
+        type: choice
+        options:
+          - master
+          - 5.x
+      dry_run:
+        description: Pass true to run side effects without publishing
+        default: false
+        type: boolean
 
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_dispatch' || !inputs.dry_run
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
@@ -26,10 +41,11 @@ jobs:
     runs-on: ubuntu-latest
     # wait for publishing to complete
     needs: publish-npm
+    if: always()
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.release.target_commitish }}
+          ref: ${{ (github.event_name == 'workflow_dispatch' && inputs.branch) || github.event.release.target_commitish }}
       - name: Update bug report version
         uses: ShaMan123/gha-populate-form-version@v2.0.1
         with:
