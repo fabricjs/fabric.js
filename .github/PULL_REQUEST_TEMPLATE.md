@@ -6,7 +6,7 @@ about: Creating a PR
 <!--
         Hi there!
         Thanks for taking the time and putting the effort into making fabric better! 💖
-        Take a look at ./CONTRIBUTING.md for crucial instructions regarding local setup, testing etc.
+        Take a look at /CONTRIBUTING.md for crucial instructions regarding local setup, testing etc.
         https://github.com/fabricjs/fabric.js/blob/master/CONTRIBUTING.md
 
         Adding tests that verify your fix and safegurad it from unwanted loss and changes is a MUST.
