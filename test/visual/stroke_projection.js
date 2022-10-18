@@ -98,6 +98,8 @@ QUnit.module('stroke projection', (hooks) => {
     ],
   };
 
+  fabric.Object.prototype.noScaleCache = false;
+
   function renderStrokeTest(canvas, testOptions, polyOptions) {
     const scale = new fabric.Point(2, 3),
       poly = new testOptions.builder(testOptions.points, {
@@ -124,7 +126,7 @@ QUnit.module('stroke projection', (hooks) => {
       });
     canvas.add(bg, poly);
     canvas.setActiveObject(poly);
-    canvas.setViewportTransform([0.8, 0, 0, 1.2, 0, 0]);
+    canvas.setViewportTransform([canvas.width/size.x*0.9, 0, 0, canvas.height/size.y*0.9, 0, 0]);
     bg.viewportCenter();
     poly.viewportCenter();
     canvas.backgroundColor = 'white';
@@ -133,24 +135,23 @@ QUnit.module('stroke projection', (hooks) => {
 
   for (let [caseName, casePoints] of Object.entries(casesToTest)) {
     [fabric.Polyline, fabric.Polygon].forEach((builder) => {
-      const type = builder.prototype.type,
-        isPolygon = type === 'polygon',
+      const builderType = builder.prototype.type,
+        isPolygon = builderType === 'polygon',
         strokes = isPolygon
           ? ['miter', 'round', 'bevel']
-          : ['butt', 'square', 'round'];
-      strokes.forEach((strokeLineType) => {
+          : ['butt', 'square', 'round'],
+        strokeLineType = isPolygon ? 'strokeLineJoin' : 'strokeLineCap';
+      strokes.forEach((strokeLineTypeCase) => {
         [true, false].forEach((strokeUniform) => {
           [
             [0, 30],
             [20, 0],
             [25, 35],
           ].forEach(([skewX, skewY]) => {
-            if (strokeLineType === 'round' && (skewX !== 0) & (skewY !== 0))
+            if (strokeLineTypeCase === 'round' && (skewX !== 0) & (skewY !== 0))
               return; // TODO: remove this line when fix strokeLineJoins equals `round` with `skewX`and `skewY` applied at sametime
             tests.push({
-              test: `${caseName} of type ${type} with ${
-                isPolygon ? 'strokeLineJoin' : 'strokeLineCap'
-              }=${strokeLineType}, strokeUniform=${strokeUniform}, skewX=${skewX} and skewY=${skewY} values`,
+              test: `${caseName} of type ${builderType} with ${strokeLineType}=${strokeLineTypeCase}, strokeUniform=${strokeUniform}, skewX=${skewX} and skewY=${skewY} values`,
               code: function (canvas, callback) {
                 renderStrokeTest(
                   canvas,
@@ -159,7 +160,7 @@ QUnit.module('stroke projection', (hooks) => {
                     points: casePoints,
                   },
                   {
-                    strokeLineJoin: strokeLineType,
+                    [strokeLineType]: strokeLineTypeCase,
                     strokeUniform,
                     skewX,
                     skewY,
@@ -167,11 +168,9 @@ QUnit.module('stroke projection', (hooks) => {
                 );
                 callback(canvas.lowerCanvasEl);
               },
-              golden: `stroke-projection/${
-                isPolygon ? 'strokeLineJoin' : 'strokeLineCap'
-              }/${strokeLineType}/${caseName}-${
+              golden: `stroke-projection/${strokeLineType}/${strokeLineTypeCase}/${caseName}-${
                 strokeUniform ? 'uniform-' : ''
-              }${type}-${skewX}skewX-${skewY}skewY.png`,
+              }${builderType}-${skewX}skewX-${skewY}skewY.png`,
               percentage: 0.001,
               width: 600,
               height: 900,
@@ -185,7 +184,7 @@ QUnit.module('stroke projection', (hooks) => {
 
   // Test only miter limit
   for (let [caseName, casePoints] of Object.entries(casesToTest)) {
-    const builder = fabric.Polyline;
+    const builder = fabric.Polygon;
     [5, 20, 120].forEach((strokeMiterLimit) => {
       [true, false].forEach((strokeUniform) => {
         [
