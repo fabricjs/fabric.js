@@ -2,6 +2,7 @@
 
 import { Point } from '../point.class';
 import { fireEvent } from '../util/fireEvent';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { renderCircleControl, renderSquareControl } from './controls.render';
 
 (function (global) {
@@ -235,8 +236,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
   }
 
   /**
-   * Transforms a point described by x and y in a distance from the top left corner of the object
-   * bounding box.
+   * Transforms a point described by x and y in to the distance from the given origin
    * @param {Object} transform
    * @param {String} originX
    * @param {String} originY
@@ -267,31 +267,24 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     return localPoint;
   }
 
-  /**
-   * Detect if the fabric object is flipped on one side.
-   * @param {fabric.Object} target
-   * @return {Boolean} true if one flip, but not two.
-   */
-  function targetHasOneFlip(target) {
-    return target.flipX !== target.flipY;
-  }
-
-  /**
-   * Utility function to compensate the scale factor when skew is applied on both axes
-   * @private
-   */
-  function compensateScaleForSkew(
-    target,
-    oppositeSkew,
-    scaleToCompensate,
-    axis,
-    reference
+  function calcShearingValue(
+    axis: 'x' | 'y',
+    { target, ex, ey, originX, originY, skewX, skewY, flipX, flipY },
+    pointer
   ) {
-    if (target[oppositeSkew] !== 0) {
-      var newDim = target._getTransformedDimensions()[axis];
-      var newValue = (reference / newDim) * target[scaleToCompensate];
-      target.set(scaleToCompensate, newValue);
-    }
+    const otherAxis = axis === 'y' ? 'x' : 'y',
+      dim = target._getTransformedDimensions()[otherAxis],
+      offset = pointer.subtract(new Point(ex, ey))[axis],
+      counterOrigin =
+        axis === 'y'
+          ? target.resolveOriginX(originX)
+          : target.resolveOriginY(originY),
+      flip = new Point(flipX ? -1 : 1, flipY ? -1 : 1)[axis],
+      shearingBefore = Math.tan(
+        degreesToRadians(new Point(skewX, skewY)[axis])
+      ),
+      originFactor = -Math.sign(counterOrigin) * 2 * flip;
+    return (offset * originFactor) / Math.max(dim, 1) + shearingBefore;
   }
 
   /**
@@ -299,51 +292,23 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * @private
    */
   function skewObjectX(eventData, transform, x, y) {
-    var target = transform.target,
-      // find how big the object would be, if there was no skewX. takes in account scaling
-      dimNoSkew = target._getTransformedDimensions({
-        skewX: 0,
-        skewY: target.skewY,
-      }),
-      localPoint = getLocalPoint(
-        transform,
-        transform.originX,
-        transform.originY,
-        x,
-        y
-      ),
-      // the mouse is in the center of the object, and we want it to stay there.
-      // so the object will grow twice as much as the mouse.
-      // this makes the skew growth to localPoint * 2 - dimNoSkew.
-      totalSkewSize = Math.abs(localPoint.x * 2) - dimNoSkew.x,
-      currentSkew = target.skewX,
-      newSkew;
-    if (totalSkewSize < 2) {
-      // let's make it easy to go back to position 0.
-      newSkew = 0;
-    } else {
-      newSkew = radiansToDegrees(
-        Math.atan2(totalSkewSize / target.scaleX, dimNoSkew.y / target.scaleY)
-      );
-      // now we have to find the sign of the skew.
-      // it mostly depend on the origin of transformation.
-      if (transform.originX === LEFT && transform.originY === BOTTOM) {
-        newSkew = -newSkew;
-      }
-      if (transform.originX === RIGHT && transform.originY === TOP) {
-        newSkew = -newSkew;
-      }
-      if (targetHasOneFlip(target)) {
-        newSkew = -newSkew;
-      }
-    }
-    var hasSkewed = currentSkew !== newSkew;
-    if (hasSkewed) {
-      var dimBeforeSkewing = target._getTransformedDimensions().y;
-      target.set('skewX', newSkew);
-      compensateScaleForSkew(target, 'skewY', 'scaleY', 'y', dimBeforeSkewing);
-    }
-    return hasSkewed;
+    const { target, skewX } = transform;
+    const shearing = calcShearingValue('x', transform, new Point(x, y));
+
+    // calculate the transform matrix after applying the new value
+    // const [a, b, c, d] = target.calcOwnMatrix();
+    // const t = [
+    //   a + (shearing - c / d) * b,
+    //   b,
+    //   d * shearing,
+    //   d,
+    // ]);
+
+    target.set({
+      skewX: radiansToDegrees(Math.atan(shearing)),
+    });
+
+    return skewX !== target.skewX;
   }
 
   /**
@@ -351,43 +316,23 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * @private
    */
   function skewObjectY(eventData, transform, x, y) {
-    const target = transform.target,
-      // find how big the object would be, if there was no skewX. takes in account scaling
-      dimNoSkew = target._getTransformedDimensions({
-        skewX: target.skewX,
-        skewY: transform.skewY,
-      }),
-      diff = getLocalPoint(
-        transform,
-        target.originX,
-        target.originY,
-        x,
-        y
-      ).subtract(new Point(transform.offsetX, transform.offsetY)),
-      // the mouse is in the center of the object, and we want it to stay there.
-      // so the object will grow twice as much as the mouse.
-      // this makes the skew growth to localPoint * 2 - dimNoSkew.
-      totalSkewSize = diff.y * 2,
-      currentSkew = target.skewY;
-    const skewSign =
-      (transform.originX === LEFT && transform.originY === BOTTOM) ||
-      (transform.originX === RIGHT && transform.originY === TOP) ||
-      targetHasOneFlip(target)
-        ? -1
-        : 1;
-    const newSkew =
-      transform.skewY +
-      radiansToDegrees(
-        Math.atan2(totalSkewSize / target.scaleY, dimNoSkew.x / target.scaleX)
-      ) *
-        1;
-    if (currentSkew !== newSkew) {
-      const dimBeforeSkewing = target._getTransformedDimensions().x;
-      target.set('skewY', newSkew);
-      compensateScaleForSkew(target, 'skewX', 'scaleX', 'x', dimBeforeSkewing);
-      return true;
-    }
-    return false;
+    const { target, skewY } = transform;
+    const shearing = calcShearingValue('y', transform, new Point(x, y));
+
+    // calculate the transform matrix after applying the new value
+    // const [a, b, c, d] = target.calcOwnMatrix();
+    // const t = [
+    //   a,
+    //   a * shearing,
+    //   c,
+    //   d + (shearing - b / a) * c,
+    // ];
+
+    target.set({
+      skewY: radiansToDegrees(Math.atan(shearing)),
+    });
+
+    return skewY !== target.skewY;
   }
 
   /**
@@ -400,48 +345,38 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * @return {Boolean} true if some change happened
    */
   function skewHandlerX(eventData, transform, x, y) {
+    const target = transform.target;
+    if (target.lockSkewingX) {
+      return false;
+    }
+
     // step1 figure out and change transform origin.
     // if skewX > 0 and originY bottom we anchor on right
     // if skewX > 0 and originY top we anchor on left
     // if skewX < 0 and originY bottom we anchor on left
     // if skewX < 0 and originY top we anchor on right
     // if skewX is 0, we look for mouse position to understand where are we going.
-    var target = transform.target,
-      currentSkew = target.skewX,
-      originX,
-      originY = transform.originY;
-    if (target.lockSkewingX) {
-      return false;
-    }
-    if (currentSkew === 0) {
-      var localPointFromCenter = getLocalPoint(transform, CENTER, CENTER, x, y);
-      if (localPointFromCenter.x > 0) {
-        // we are pulling right, anchor left;
-        originX = LEFT;
-      } else {
-        // we are pulling right, anchor right
-        originX = RIGHT;
-      }
-    } else {
-      if (currentSkew > 0) {
-        originX = originY === TOP ? LEFT : RIGHT;
-      }
-      if (currentSkew < 0) {
-        originX = originY === TOP ? RIGHT : LEFT;
-      }
-      // is the object flipped on one side only? swap the origin.
-      if (targetHasOneFlip(target)) {
-        originX = originX === LEFT ? RIGHT : LEFT;
-      }
-    }
 
-    // once we have the origin, we find the anchor point
-    transform.originX = originX;
-    var finalHandler = wrapWithFireEvent(
+    const offset = x - transform.ex;
+    const finalHandler = wrapWithFireEvent(
       'skewing',
       wrapWithFixedAnchor(skewObjectX)
     );
-    return finalHandler(eventData, transform, x, y);
+    return finalHandler(
+      eventData,
+      {
+        ...transform,
+        // we are pulling left/right so we anchor to right/left respectively
+        originX:
+          (offset === 0 &&
+            getLocalPoint(transform, CENTER, CENTER, x, y).x > 0) ||
+          offset > 0
+            ? LEFT
+            : RIGHT,
+      },
+      x,
+      y
+    );
   }
 
   /**
@@ -454,49 +389,37 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * @return {Boolean} true if some change happened
    */
   function skewHandlerY(eventData, transform, x, y) {
+    const target = transform.target;
+    if (target.lockSkewingY) {
+      return false;
+    }
     // step1 figure out and change transform origin.
     // if skewY > 0 and originX left we anchor on top
     // if skewY > 0 and originX right we anchor on bottom
     // if skewY < 0 and originX left we anchor on bottom
     // if skewY < 0 and originX right we anchor on top
     // if skewY is 0, we look for mouse position to understand where are we going.
-    var target = transform.target,
-      currentSkew = target.skewY,
-      originY,
-      originX = transform.originX;
-    if (target.lockSkewingY) {
-      return false;
-    }
-    if (currentSkew === 0) {
-      var localPointFromCenter = getLocalPoint(transform, CENTER, CENTER, x, y);
-      if (localPointFromCenter.y > 0) {
-        // we are pulling down, anchor up;
-        originY = TOP;
-      } else {
-        // we are pulling up, anchor down
-        originY = BOTTOM;
-      }
-    } else {
-      if (currentSkew > 0) {
-        originY = originX === LEFT ? TOP : BOTTOM;
-      }
-      if (currentSkew < 0) {
-        originY = originX === LEFT ? BOTTOM : TOP;
-      }
-      // is the object flipped on one side only? swap the origin.
-      if (targetHasOneFlip(target)) {
-        originY = originY === TOP ? BOTTOM : TOP;
-      }
-    }
 
-    // once we have the origin, we find the anchor point
-    transform.originY = originY;
-    console.log(currentSkew, originY);
-    var finalHandler = wrapWithFireEvent(
+    const offset = y - transform.ey;
+    const finalHandler = wrapWithFireEvent(
       'skewing',
       wrapWithFixedAnchor(skewObjectY)
     );
-    return finalHandler(eventData, transform, x, y);
+    return finalHandler(
+      eventData,
+      {
+        ...transform,
+        // we are pulling up/down so we anchor to bottom/top respectively
+        originY:
+          (offset === 0 &&
+            getLocalPoint(transform, CENTER, CENTER, x, y).y > 0) ||
+          offset > 0
+            ? TOP
+            : BOTTOM,
+      },
+      x,
+      y
+    );
   }
 
   /**

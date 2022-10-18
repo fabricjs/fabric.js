@@ -60,13 +60,9 @@ export const applyTransformToObject = (
   object: FabricObject,
   transform: TMat2D
 ) => {
-  const { translateX, translateY, scaleX, scaleY, ...otherOptions } =
-      qrDecompose(transform),
+  const { translateX, translateY, ...otherOptions } = qrDecompose(transform),
     center = new Point(translateX, translateY);
-  object.flipX = false;
-  object.flipY = false;
-  Object.assign(object, otherOptions);
-  object.set({ scaleX, scaleY });
+  object.set({ ...otherOptions, flipX: false, flipY: false });
   object.setPositionByOrigin(center, 'center', 'center');
 };
 /**
