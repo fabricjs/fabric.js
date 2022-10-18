@@ -292,16 +292,16 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
               key: 'skewX',
               valueBefore: skewX,
             },
-      dim = target._getTransformedDimensions(),
+      dimBefore = target._getTransformedDimensions(),
       offset = pointer.subtract(new Point(ex, ey))[axis],
       flip = new Point(flipX ? -1 : 1, flipY ? -1 : 1)[axis],
-      scale = new Point(target.scaleX, target.scaleY)[otherAxis],
       shearingBefore = Math.tan(
         degreesToRadians(new Point(skewX, skewY)[axis])
       ),
       originFactor = -Math.sign(counterOrigin) * flip * 2;
     const shearing =
-      (offset * originFactor) / Math.max(dim[otherAxis], 1) + shearingBefore;
+      (offset * originFactor) / Math.max(dimBefore[otherAxis], 1) +
+      shearingBefore;
 
     // calculate the transform matrix after applying the new value
     // const [a, b, c, d] = target.calcOwnMatrix();
@@ -315,11 +315,11 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     const changed = valueBefore !== target[key];
 
     if (changed) {
-      const otherSkew = new Point(target.skewX, target.skewY)[otherAxis];
-      const compensationFactor =
-        otherSkew !== 0
-          ? dim[otherAxis] / target._getTransformedDimensions()[otherAxis]
-          : 1;
+      const otherSkew = new Point(target.skewX, target.skewY)[otherAxis],
+        scale = new Point(target.scaleX, target.scaleY)[otherAxis],
+        dim = target._getTransformedDimensions(),
+        compensationFactor =
+          otherSkew !== 0 ? dimBefore[otherAxis] / dim[otherAxis] : 1;
       compensationFactor !== 1 &&
         target.set(otherScaleKey, compensationFactor * scale);
     }
