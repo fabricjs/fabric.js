@@ -1,7 +1,5 @@
 //@ts-nocheck
 
-import { projectStrokeOnPoints } from '../util/misc/projectStroke';
-
 (function (global) {
   var fabric = global.fabric || (global.fabric = {});
 
@@ -21,23 +19,8 @@ import { projectStrokeOnPoints } from '../util/misc/projectStroke';
        */
       type: 'polygon',
 
-      /**
-       * @private
-       */
-      _projectStrokeOnPoints: function () {
-        return projectStrokeOnPoints(this.points, this);
-      },
-
-      /**
-       * @private
-       * @param {CanvasRenderingContext2D} ctx Context to render on
-       */
-      _render: function (ctx) {
-        if (!this.commonRender(ctx)) {
-          return;
-        }
-        ctx.closePath();
-        this._renderPaintInOrder(ctx);
+      isOpen: function () {
+        return this.points.length <= 2;
       },
     }
   );

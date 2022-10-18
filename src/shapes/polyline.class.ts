@@ -101,11 +101,15 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
         this.setPositionByOrigin(origin, this.originX, this.originY);
       },
 
+      isOpen: function () {
+        return true;
+      },
+
       /**
        * @private
        */
       _projectStrokeOnPoints: function () {
-        return projectStrokeOnPoints(this.points, this, true);
+        return projectStrokeOnPoints(this.points, this, this.isOpen());
       },
 
       /**
@@ -253,7 +257,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        * @private
        * @param {CanvasRenderingContext2D} ctx Context to render on
        */
-      commonRender: function (ctx) {
+      _render: function (ctx) {
         var point,
           len = this.points.length,
           x = this.pathOffset.x,
@@ -270,17 +274,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
           point = this.points[i];
           ctx.lineTo(point.x - x, point.y - y);
         }
-        return true;
-      },
-
-      /**
-       * @private
-       * @param {CanvasRenderingContext2D} ctx Context to render on
-       */
-      _render: function (ctx) {
-        if (!this.commonRender(ctx)) {
-          return;
-        }
+        !this.isOpen() && ctx.closePath();
         this._renderPaintInOrder(ctx);
       },
 
