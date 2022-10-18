@@ -3,11 +3,15 @@ import { cache } from '../cache';
 import { config } from '../config';
 import { VERSION } from '../constants';
 import { Point } from '../point.class';
-import { capValue } from '../util/misc/capValue';
-import { pick } from '../util/misc/pick';
 import { runningAnimations } from '../util/animation_registry';
+import { capValue } from '../util/misc/capValue';
+import { qrDecompose } from '../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
-import { applyTransformToObject } from '../util/misc/objectTransforms';
+import {
+  applyTransformToObject,
+  saveObjectTransform,
+} from '../util/misc/objectTransforms';
+import { pick } from '../util/misc/pick';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -1688,33 +1692,62 @@ import { applyTransformToObject } from '../util/misc/objectTransforms';
        * @return {Object} center point from element coordinates
        */
       _findCenterFromElement: function () {
-        return { x: this.left + this.width / 2, y: this.top + this.height / 2 };
+        return new Point(
+          this.left + this.width / 2,
+          this.top + this.height / 2
+        );
       },
 
       /**
        * This function is an helper for svg import. it removes the transform matrix
-       * and set to object properties that fabricjs can handle
+       * and set to object properties that fabric can handle
        * @private
        * @param {Object} preserveAspectRatioOptions
        * @return {thisArg}
        */
       _removeTransformMatrix: function (preserveAspectRatioOptions) {
-        var center = this._findCenterFromElement();
-        if (this.transformMatrix) {
-          applyTransformToObject(this, this.transformMatrix);
-          center = fabric.util.transformPoint(center, this.transformMatrix);
+        let center = this._findCenterFromElement();
+        const t = this.transformMatrix;
+        if (t) {
+          const { scaleX, scaleY, angle, skewX } = qrDecompose(t);
+          this.flipX = false;
+          this.flipY = false;
+          this.set('scaleX', scaleX);
+          this.set('scaleY', scaleY);
+          this.angle = angle;
+          this.skewX = skewX;
+          this.skewY = 0;
+          center = center.transform(t);
         }
         this.transformMatrix = null;
         if (preserveAspectRatioOptions) {
-          // TODO should use set
-          this.scaleX *= preserveAspectRatioOptions.scaleX;
-          this.scaleY *= preserveAspectRatioOptions.scaleY;
-          this.cropX = preserveAspectRatioOptions.cropX;
-          this.cropY = preserveAspectRatioOptions.cropY;
-          center.x += preserveAspectRatioOptions.offsetLeft;
-          center.y += preserveAspectRatioOptions.offsetTop;
-          this.width = preserveAspectRatioOptions.width;
-          this.height = preserveAspectRatioOptions.height;
+          const {
+            scaleX,
+            scaleY,
+            cropX,
+            cropY,
+            width,
+            height,
+            offsetLeft,
+            offsetTop,
+          } = preserveAspectRatioOptions;
+          console.log(this.scaleX, this.scaleY, {
+            scaleX: this.scaleX * scaleX,
+            scaleY: this.scaleY * scaleY,
+            cropX,
+            cropY,
+            width,
+            height,
+          });
+          this.set({
+            scaleX: this.scaleX * scaleX,
+            scaleY: this.scaleY * scaleY,
+            cropX,
+            cropY,
+            width,
+            height,
+          });
+          center = center.add(new Point(offsetLeft, offsetTop));
         }
         this.setPositionByOrigin(center, 'center', 'center');
       },
