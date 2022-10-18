@@ -1706,7 +1706,7 @@ import { applyTransformToObject } from '../util/misc/objectTransforms';
         }
         this.transformMatrix = null;
         if (preserveAspectRatioOptions) {
-          // should use set
+          // TODO should use set
           this.scaleX *= preserveAspectRatioOptions.scaleX;
           this.scaleY *= preserveAspectRatioOptions.scaleY;
           this.cropX = preserveAspectRatioOptions.cropX;
