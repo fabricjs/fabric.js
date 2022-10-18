@@ -272,26 +272,17 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * Utility function to compensate the scale factor when skew is applied on both axes
    * @private
    */
-  function compensateScaleForSkew(
+  function getScaleForSkewCompensation(
     target: TObject,
     axis: 'x' | 'y',
-    size: Point
+    dim: Point
   ) {
-    const { key, otherAxis } =
-      axis === 'y'
-        ? {
-            otherAxis: 'x',
-            key: 'scaleX',
-          }
-        : {
-            otherAxis: 'y',
-            key: 'scaleY',
-          };
+    const otherAxis = axis === 'y' ? 'x' : 'y';
     const skew = new Point(target.skewX, target.skewY)[otherAxis];
     if (skew !== 0) {
       const newDim = target._getTransformedDimensions()[otherAxis],
         scale = new Point(target.scaleX, target.scaleY)[otherAxis];
-      target.set(key, (size[otherAxis] / newDim) * scale);
+      return (dim[otherAxis] / newDim) * scale;
     }
   }
 
@@ -303,16 +294,18 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     { target, ex, ey, originX, originY, skewX, skewY, flipX, flipY },
     pointer: Point
   ) {
-    const { otherAxis, counterOrigin, key, value } =
+    const { otherAxis, otherScaleKey, counterOrigin, key, value } =
         axis === 'y'
           ? {
               otherAxis: 'x',
+              otherScaleKey: 'scaleX',
               counterOrigin: target.resolveOriginX(originX),
               key: 'skewY',
               value: skewY,
             }
           : {
               otherAxis: 'y',
+              otherScaleKey: 'scaleY',
               counterOrigin: target.resolveOriginY(originY),
               key: 'skewX',
               value: skewX,
@@ -338,7 +331,8 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     target.set(key, radiansToDegrees(Math.atan(shearing)));
 
     if (value !== target[key]) {
-      compensateScaleForSkew(target, axis, dim);
+      const compensation = getScaleForSkewCompensation(target, axis, dim);
+      compensation && target.set(otherScaleKey, compensation);
       return true;
     }
     return false;
