@@ -1731,14 +1731,6 @@ import { pick } from '../util/misc/pick';
             offsetLeft,
             offsetTop,
           } = preserveAspectRatioOptions;
-          console.log(this.scaleX, this.scaleY, {
-            scaleX: this.scaleX * scaleX,
-            scaleY: this.scaleY * scaleY,
-            cropX,
-            cropY,
-            width,
-            height,
-          });
           this.set({
             scaleX: this.scaleX * scaleX,
             scaleY: this.scaleY * scaleY,
