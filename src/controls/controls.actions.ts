@@ -267,6 +267,9 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     return localPoint;
   }
 
+  /**
+   * @see https://github.com/fabricjs/fabric.js/pull/8380
+   */
   function calcShearingValue(
     axis: 'x' | 'y',
     { target, ex, ey, originX, originY, skewX, skewY, flipX, flipY },
@@ -289,6 +292,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
 
   /**
    * Action handler for skewing on the X axis
+   * @see https://github.com/fabricjs/fabric.js/pull/8380
    * @private
    */
   function skewObjectX(eventData, transform, x, y) {
@@ -313,6 +317,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
 
   /**
    * Action handler for skewing on the Y axis
+   * @see https://github.com/fabricjs/fabric.js/pull/8380
    * @private
    */
   function skewObjectY(eventData, transform, x, y) {
