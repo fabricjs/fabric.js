@@ -328,25 +328,12 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     const shearing =
       (offset * originFactor) / Math.max(dim[otherAxis], 1) + shearingBefore;
 
-    // x
     // calculate the transform matrix after applying the new value
     // const [a, b, c, d] = target.calcOwnMatrix();
-    // const t = [
-    //   a + (shearing - c / d) * b,
-    //   b,
-    //   d * shearing,
-    //   d,
-    // ]);
-
-    // y
-    // calculate the transform matrix after applying the new value
-    // const [a, b, c, d] = target.calcOwnMatrix();
-    // const t = [
-    //   a,
-    //   a * shearing,
-    //   c,
-    //   d + (shearing - b / a) * c,
-    // ];
+    // const t =
+    //   axis === 'y'
+    //     ? [a, a * shearing, c, d + (shearing - b / a) * c]
+    //     : [a + (shearing - c / d) * b, b, d * shearing, d];
 
     target.set(key, radiansToDegrees(Math.atan(shearing)));
 
