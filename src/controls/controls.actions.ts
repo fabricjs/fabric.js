@@ -291,19 +291,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    */
   function skewObject(
     axis: 'x' | 'y',
-    {
-      target,
-      ex,
-      ey,
-      originX,
-      originY,
-      skewX,
-      skewY,
-      flipX,
-      flipY,
-      width,
-      height,
-    },
+    { target, ex, ey, originX, originY, skewX, skewY, flipX, flipY },
     pointer: Point
   ) {
     const { otherAxis, otherScaleKey, counterOrigin, key, valueBefore } =
@@ -329,12 +317,9 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
         degreesToRadians(new Point(skewX, skewY)[axis])
       ),
       originFactor = -Math.sign(counterOrigin) * flip * 2;
-    const dimBefore = new Point(width, height)[axis],
-      compensation =
-        offset < 0 ? Math.max(offset / dimBefore, -1) * dimBefore : 0;
+
     const shearing =
-      ((offset + compensation) * originFactor) / Math.max(dim[otherAxis], 1) +
-      shearingBefore;
+      (offset * originFactor) / Math.max(dim[otherAxis], 1) + shearingBefore;
 
     // calculate the transform matrix after applying the new value
     // const [a, b, c, d] = target.calcOwnMatrix();
