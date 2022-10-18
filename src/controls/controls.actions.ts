@@ -301,8 +301,8 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       skewY,
       flipX,
       flipY,
-      // width,
-      // height,
+      width,
+      height,
     },
     pointer: Point
   ) {
@@ -328,15 +328,12 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       shearingBefore = Math.tan(
         degreesToRadians(new Point(skewX, skewY)[axis])
       ),
-      originFactor = -Math.sign(counterOrigin) * flip;
-    // const dimBefore = new Point(width, height)[axis],
-    //   progress = Math.abs(offset / dimBefore),
-    //   compensation =
-    //     offset < 0 && 0 < progress && progress <= 1
-    //       ? -(-2 * progress ** 3 + 3 * progress ** 2) * dimBefore
-    //       : 0;
+      originFactor = -Math.sign(counterOrigin) * flip * 2;
+    const dimBefore = new Point(width, height)[axis],
+      compensation =
+        offset < 0 ? Math.max(offset / dimBefore, -1) * dimBefore : 0;
     const shearing =
-      (offset * 2 * originFactor) / Math.max(dim[otherAxis], 1) +
+      ((offset + compensation) * originFactor) / Math.max(dim[otherAxis], 1) +
       shearingBefore;
 
     // calculate the transform matrix after applying the new value
