@@ -62,7 +62,11 @@ export const applyTransformToObject = (
 ) => {
   const { translateX, translateY, ...otherOptions } = qrDecompose(transform),
     center = new Point(translateX, translateY);
-  object.set({ ...otherOptions, flipX: false, flipY: false });
+  object.set({
+    flipX: false,
+    flipY: false,
+    ...otherOptions,
+  });
   object.setPositionByOrigin(center, 'center', 'center');
 };
 /**
@@ -73,12 +77,12 @@ export const applyTransformToObject = (
  */
 export const resetObjectTransform = (target: FabricObject) => {
   target.set({
+    flipX: false,
+    flipY: false,
     scaleX: 1,
     scaleY: 1,
     skewX: 0,
     skewY: 0,
-    flipX: false,
-    flipY: false,
   });
   target.rotate(0);
 };
