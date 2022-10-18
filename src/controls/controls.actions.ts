@@ -3,6 +3,7 @@
 import { Point } from '../point.class';
 import { fireEvent } from '../util/fireEvent';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { TObject } from '../__types__';
 import { renderCircleControl, renderSquareControl } from './controls.render';
 
 (function (global) {
@@ -268,37 +269,66 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
   }
 
   /**
+   * Utility function to compensate the scale factor when skew is applied on both axes
+   * @private
+   */
+  function compensateScaleForSkew(
+    target: TObject,
+    axis: 'x' | 'y',
+    size: Point
+  ) {
+    const { key, otherAxis } =
+      axis === 'y'
+        ? {
+            otherAxis: 'x',
+            key: 'scaleX',
+          }
+        : {
+            otherAxis: 'y',
+            key: 'scaleY',
+          };
+    const skew = new Point(target.skewX, target.skewY)[otherAxis];
+    if (skew !== 0) {
+      const newDim = target._getTransformedDimensions()[otherAxis],
+        scale = new Point(target.scaleX, target.scaleY)[otherAxis];
+      target.set(key, (size[otherAxis] / newDim) * scale);
+    }
+  }
+
+  /**
    * @see https://github.com/fabricjs/fabric.js/pull/8380
    */
-  function calcShearingValue(
+  function skewObject(
     axis: 'x' | 'y',
     { target, ex, ey, originX, originY, skewX, skewY, flipX, flipY },
-    pointer
+    pointer: Point
   ) {
-    const otherAxis = axis === 'y' ? 'x' : 'y',
-      dim = target._getTransformedDimensions()[otherAxis],
-      offset = pointer.subtract(new Point(ex, ey))[axis],
-      counterOrigin =
+    const { otherAxis, counterOrigin, key, value } =
         axis === 'y'
-          ? target.resolveOriginX(originX)
-          : target.resolveOriginY(originY),
+          ? {
+              otherAxis: 'x',
+              counterOrigin: target.resolveOriginX(originX),
+              key: 'skewY',
+              value: skewY,
+            }
+          : {
+              otherAxis: 'y',
+              counterOrigin: target.resolveOriginY(originY),
+              key: 'skewX',
+              value: skewX,
+            },
+      dim = target._getTransformedDimensions(),
+      offset = pointer.subtract(new Point(ex, ey))[axis],
       flip = new Point(flipX ? -1 : 1, flipY ? -1 : 1)[axis],
       shearingBefore = Math.tan(
         degreesToRadians(new Point(skewX, skewY)[axis])
       ),
       originFactor = -Math.sign(counterOrigin) * 2 * flip;
-    return (offset * originFactor) / Math.max(dim, 1) + shearingBefore;
-  }
 
-  /**
-   * Action handler for skewing on the X axis
-   * @see https://github.com/fabricjs/fabric.js/pull/8380
-   * @private
-   */
-  function skewObjectX(eventData, transform, x, y) {
-    const { target, skewX } = transform;
-    const shearing = calcShearingValue('x', transform, new Point(x, y));
+    const shearing =
+      (offset * originFactor) / Math.max(dim[otherAxis], 1) + shearingBefore;
 
+    // x
     // calculate the transform matrix after applying the new value
     // const [a, b, c, d] = target.calcOwnMatrix();
     // const t = [
@@ -308,22 +338,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     //   d,
     // ]);
 
-    target.set({
-      skewX: radiansToDegrees(Math.atan(shearing)),
-    });
-
-    return skewX !== target.skewX;
-  }
-
-  /**
-   * Action handler for skewing on the Y axis
-   * @see https://github.com/fabricjs/fabric.js/pull/8380
-   * @private
-   */
-  function skewObjectY(eventData, transform, x, y) {
-    const { target, skewY } = transform;
-    const shearing = calcShearingValue('y', transform, new Point(x, y));
-
+    // y
     // calculate the transform matrix after applying the new value
     // const [a, b, c, d] = target.calcOwnMatrix();
     // const t = [
@@ -333,11 +348,31 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     //   d + (shearing - b / a) * c,
     // ];
 
-    target.set({
-      skewY: radiansToDegrees(Math.atan(shearing)),
-    });
+    target.set(key, radiansToDegrees(Math.atan(shearing)));
 
-    return skewY !== target.skewY;
+    if (value !== target[key]) {
+      compensateScaleForSkew(target, axis, dim);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Action handler for skewing on the X axis
+   * @see https://github.com/fabricjs/fabric.js/pull/8380
+   * @private
+   */
+  function skewObjectX(eventData, transform, x, y) {
+    return skewObject('x', transform, new Point(x, y));
+  }
+
+  /**
+   * Action handler for skewing on the Y axis
+   * @see https://github.com/fabricjs/fabric.js/pull/8380
+   * @private
+   */
+  function skewObjectY(eventData, transform, x, y) {
+    return skewObject('y', transform, new Point(x, y));
   }
 
   /**
