@@ -1,6 +1,13 @@
+import { halfPI } from '../../../constants';
 import { IPoint, Point } from '../../../point.class';
 import { degreesToRadians } from '../radiansDegreesConversion';
-import { getBisector, getOrthonormalVector, magnitude } from '../vectors';
+import {
+  calcAngleBetweenVectors,
+  calcVectorRotation,
+  getBisector,
+  getOrthonormalVector,
+  magnitude,
+} from '../vectors';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
 import { TProjection, TProjectStrokeOnPointsOptions } from './types';
 
@@ -33,6 +40,13 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    * The bisector of A (∠BAC)
    */
   bisector: ReturnType<typeof getBisector>;
+
+  static getOrthogonalRotationFactor(vector1: Point, vector2?: Point) {
+    const angle = vector2
+      ? calcAngleBetweenVectors(vector1, vector2)
+      : calcVectorRotation(vector1);
+    return Math.abs(angle) < halfPI ? -1 : 1;
+  }
 
   constructor(
     A: IPoint,
@@ -70,7 +84,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
   ) {
     const vector = this.createSideVector(from, to);
     const orthogonalProjection = getOrthonormalVector(vector);
-    const correctSide = StrokeProjectionsBase.getAcuteAngleFactor(
+    const correctSide = StrokeLineJoinProjections.getOrthogonalRotationFactor(
       orthogonalProjection,
       this.bisectorVector
     );
@@ -131,8 +145,10 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
   private projectRoundNoSkew() {
     // correctSide is used to only consider projecting for the outer side
     const correctSide = new Point(
-        StrokeProjectionsBase.getAcuteAngleFactor(this.bisectorVector),
-        StrokeProjectionsBase.getAcuteAngleFactor(
+        StrokeLineJoinProjections.getOrthogonalRotationFactor(
+          this.bisectorVector
+        ),
+        StrokeLineJoinProjections.getOrthogonalRotationFactor(
           new Point(this.bisectorVector.y, this.bisectorVector.x)
         )
       ),

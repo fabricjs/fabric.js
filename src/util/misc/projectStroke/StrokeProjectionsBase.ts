@@ -1,12 +1,7 @@
-import { halfPI } from '../../../constants';
 import { IPoint, Point } from '../../../point.class';
 import { degreesToRadians } from '../radiansDegreesConversion';
-import {
-  calcAngleBetweenVectors,
-  calcVectorRotation,
-  createVector,
-} from '../vectors';
-import { TProjectStrokeOnPointsOptions, TProjection } from './types';
+import { createVector } from '../vectors';
+import { TProjection, TProjectStrokeOnPointsOptions } from './types';
 
 /**
  * @see https://github.com/fabricjs/fabric.js/pull/8344
@@ -16,13 +11,6 @@ export abstract class StrokeProjectionsBase {
   scale: Point;
   strokeUniformScalar: Point;
   strokeProjectionMagnitude: number;
-
-  static getAcuteAngleFactor(vector1: Point, vector2?: Point) {
-    const angle = vector2
-      ? calcAngleBetweenVectors(vector1, vector2)
-      : calcVectorRotation(vector1);
-    return Math.abs(angle) < halfPI ? -1 : 1;
-  }
 
   constructor(options: TProjectStrokeOnPointsOptions) {
     this.options = options;
