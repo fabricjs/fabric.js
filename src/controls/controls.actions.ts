@@ -398,6 +398,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     if (target.lockSkewingY) {
       return false;
     }
+
     // step1 figure out and change transform origin.
     // if skewY > 0 and originX left we anchor on top
     // if skewY > 0 and originX right we anchor on bottom
