@@ -7,10 +7,6 @@ import { runningAnimations } from '../util/animation_registry';
 import { capValue } from '../util/misc/capValue';
 import { qrDecompose } from '../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
-import {
-  applyTransformToObject,
-  saveObjectTransform,
-} from '../util/misc/objectTransforms';
 import { pick } from '../util/misc/pick';
 
 (function (global) {
