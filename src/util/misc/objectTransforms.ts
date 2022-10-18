@@ -72,12 +72,14 @@ export const applyTransformToObject = (
  * @param  {fabric.Object} target object to transform
  */
 export const resetObjectTransform = (target: FabricObject) => {
-  target.scaleX = 1;
-  target.scaleY = 1;
-  target.skewX = 0;
-  target.skewY = 0;
-  target.flipX = false;
-  target.flipY = false;
+  target.set({
+    scaleX: 1,
+    scaleY: 1,
+    skewX: 0,
+    skewY: 0,
+    flipX: false,
+    flipY: false,
+  });
   target.rotate(0);
 };
 

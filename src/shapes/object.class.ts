@@ -7,6 +7,7 @@ import { capValue } from '../util/misc/capValue';
 import { pick } from '../util/misc/pick';
 import { runningAnimations } from '../util/animation_registry';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
+import { applyTransformToObject } from '../util/misc/objectTransforms';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -1691,26 +1692,6 @@ import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
       },
 
       /**
-       * This function is an helper for svg import. it decompose the transformMatrix
-       * and assign properties to object.
-       * untransformed coordinates
-       * @private
-       * @chainable
-       */
-      _assignTransformMatrixProps: function () {
-        if (this.transformMatrix) {
-          var options = fabric.util.qrDecompose(this.transformMatrix);
-          this.flipX = false;
-          this.flipY = false;
-          this.set('scaleX', options.scaleX);
-          this.set('scaleY', options.scaleY);
-          this.angle = options.angle;
-          this.skewX = options.skewX;
-          this.skewY = 0;
-        }
-      },
-
-      /**
        * This function is an helper for svg import. it removes the transform matrix
        * and set to object properties that fabricjs can handle
        * @private
@@ -1720,11 +1701,12 @@ import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
       _removeTransformMatrix: function (preserveAspectRatioOptions) {
         var center = this._findCenterFromElement();
         if (this.transformMatrix) {
-          this._assignTransformMatrixProps();
+          applyTransformToObject(this, this.transformMatrix);
           center = fabric.util.transformPoint(center, this.transformMatrix);
         }
         this.transformMatrix = null;
         if (preserveAspectRatioOptions) {
+          // should use set
           this.scaleX *= preserveAspectRatioOptions.scaleX;
           this.scaleY *= preserveAspectRatioOptions.scaleY;
           this.cropX = preserveAspectRatioOptions.cropX;
