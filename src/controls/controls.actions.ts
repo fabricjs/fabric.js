@@ -294,21 +294,21 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     { target, ex, ey, originX, originY, skewX, skewY, flipX, flipY },
     pointer: Point
   ) {
-    const { otherAxis, otherScaleKey, counterOrigin, key, value } =
+    const { otherAxis, otherScaleKey, counterOrigin, key, valueBefore } =
         axis === 'y'
           ? {
               otherAxis: 'x',
               otherScaleKey: 'scaleX',
               counterOrigin: target.resolveOriginX(originX),
               key: 'skewY',
-              value: skewY,
+              valueBefore: skewY,
             }
           : {
               otherAxis: 'y',
               otherScaleKey: 'scaleY',
               counterOrigin: target.resolveOriginY(originY),
               key: 'skewX',
-              value: skewX,
+              valueBefore: skewX,
             },
       dim = target._getTransformedDimensions(),
       offset = pointer.subtract(new Point(ex, ey))[axis],
@@ -330,7 +330,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
 
     target.set(key, radiansToDegrees(Math.atan(shearing)));
 
-    if (value !== target[key]) {
+    if (valueBefore !== target[key]) {
       const compensation = getScaleForSkewCompensation(target, axis, dim);
       compensation && target.set(otherScaleKey, compensation);
       return true;
