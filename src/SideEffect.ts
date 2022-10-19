@@ -9,12 +9,23 @@ export class SideEffect<
   private callback: C;
   private enabled = true;
   private persistance: P;
+  /**
+   * Flags if this effect should be dismissed by preceding effects with the same id
+   */
+  private dismissible: boolean;
 
-  constructor(id: string, keys: K[] | '*', callback: C, initialValue?: P) {
+  constructor(
+    id: string,
+    keys: K[] | '*',
+    callback: C,
+    initialValue?: P,
+    { dismissible }: { dismissible?: boolean } = {}
+  ) {
     this.id = id;
     this.keys = keys;
     this.callback = callback;
     this.persistance = initialValue || ({} as P);
+    this.dismissible = typeof dismissible === 'boolean' ? dismissible : true;
   }
 
   isEqual(incoming: P) {
@@ -54,5 +65,9 @@ export class SideEffect<
 
   disable() {
     this.enabled = false;
+  }
+
+  isDismissible() {
+    return this.dismissible;
   }
 }
