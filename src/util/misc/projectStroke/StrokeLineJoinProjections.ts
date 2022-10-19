@@ -1,15 +1,19 @@
 import { halfPI } from '../../../constants';
 import { IPoint, Point } from '../../../point.class';
+import { TRadian } from '../../../typedefs';
 import { degreesToRadians } from '../radiansDegreesConversion';
 import {
   calcAngleBetweenVectors,
   calcVectorRotation,
-  getBisector,
   getOrthonormalVector,
+  getUnitVector,
   magnitude,
+  rotateVector,
 } from '../vectors';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
 import { TProjection, TProjectStrokeOnPointsOptions } from './types';
+
+const zeroVector = new Point();
 
 /**
  * class in charge of finding projections for each type of line join
@@ -37,9 +41,13 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    */
   C: Point;
   /**
+   * The angle of A (∠BAC)
+   */
+  alpha: TRadian;
+  /**
    * The bisector of A (∠BAC)
    */
-  bisector: ReturnType<typeof getBisector>;
+  bisector: Point;
 
   static getOrthogonalRotationFactor(vector1: Point, vector2?: Point) {
     const angle = vector2
@@ -58,23 +66,14 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     this.A = new Point(A);
     this.B = new Point(B);
     this.C = new Point(C);
-    // First we calculate the bisector between the points. Used in `round` and `miter` cases
-    // When the stroke is uniform, scaling changes the arrangement of the points, so we have to take it into account
-    this.bisector = this.options.strokeUniform
-      ? getBisector(
-          this.A.multiply(this.scale),
-          this.B.multiply(this.scale),
-          this.C.multiply(this.scale)
-        )
-      : getBisector(this.A, this.B, this.C);
-  }
-
-  get bisectorVector() {
-    return this.bisector.vector;
-  }
-
-  get bisectorAngle() {
-    return this.bisector.angle;
+    const AB = this.createSideVector(this.A, this.B),
+      AC = this.createSideVector(this.A, this.C);
+    this.alpha = calcAngleBetweenVectors(AB, AC);
+    this.bisector = getUnitVector(
+      // if AC is also the zero vector nothing will be projected
+      // in that case the next point will handle the projection
+      rotateVector(AB.eq(zeroVector) ? AC : AB, this.alpha / 2)
+    );
   }
 
   calcOrthogonalProjection(
@@ -86,7 +85,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     const orthogonalProjection = getOrthonormalVector(vector);
     const correctSide = StrokeLineJoinProjections.getOrthogonalRotationFactor(
       orthogonalProjection,
-      this.bisectorVector
+      this.bisector
     );
     return this.scaleUnitVector(orthogonalProjection, magnitude * correctSide);
   }
@@ -109,10 +108,10 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    * @see https://github.com/fabricjs/fabric.js/pull/8344#2-1-miter
    */
   projectMiter() {
-    const alpha = Math.abs(this.bisectorAngle),
+    const alpha = Math.abs(this.alpha),
       hypotUnitScalar = 1 / Math.sin(alpha / 2),
       miterVector = this.scaleUnitVector(
-        this.bisectorVector,
+        this.bisector,
         -this.strokeProjectionMagnitude * hypotUnitScalar
       );
 
@@ -145,11 +144,9 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
   private projectRoundNoSkew() {
     // correctSide is used to only consider projecting for the outer side
     const correctSide = new Point(
+        StrokeLineJoinProjections.getOrthogonalRotationFactor(this.bisector),
         StrokeLineJoinProjections.getOrthogonalRotationFactor(
-          this.bisectorVector
-        ),
-        StrokeLineJoinProjections.getOrthogonalRotationFactor(
-          new Point(this.bisectorVector.y, this.bisectorVector.x)
+          new Point(this.bisector.y, this.bisector.x)
         )
       ),
       radiusOnAxisX = new Point(1, 0)
@@ -241,6 +238,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     return this.projectPoints().map((point) => ({
       originPoint: this.A,
       projectedPoint: point,
+      angle: this.alpha,
       bisector: this.bisector,
     }));
   }

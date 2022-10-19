@@ -59,22 +59,6 @@ export const calcVectorRotation = (v: Point) =>
 export const getUnitVector = (v: Point): Point => v.scalarDivide(magnitude(v));
 
 /**
- * @param {Point} A
- * @param {Point} B
- * @param {Point} C
- * @returns {{ vector: Point, angle: TRadian}} vector representing the bisector of A and A's angle
- */
-export const getBisector = (A: Point, B: Point, C: Point) => {
-  const AB = createVector(A, B),
-    AC = createVector(A, C),
-    alpha = calcAngleBetweenVectors(AB, AC);
-  return {
-    vector: getUnitVector(rotateVector(AB, alpha / 2)),
-    angle: alpha,
-  };
-};
-
-/**
  * @param {Point} v
  * @param {Boolean} [counterClockwise] the direction of the orthogonal vector, defaults to `true`
  * @returns {Point} the unit orthogonal vector
