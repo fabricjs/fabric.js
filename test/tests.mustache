@@ -14,12 +14,15 @@
 {{#serve_files}}<script src="{{{src}}}"{{#attrs}} {{&.}}{{/attrs}}></script>{{/serve_files}}
 
 <script>
+// runs from github action
+window.CI = {{CI}};
+
 // QUnit config
 QUnit.config.reorder = false;
 {{#qunit.filter}}QUnit.config.filter = {{qunit.filter}};{{/qunit.filter}}
-
-// runs from github action
-window.CI = {{CI}};
+QUnit.config.noglobals = true;
+QUnit.config.hidepassed = true;
+QUnit.config.testTimeout = 15000;
 </script>
 
 {{#visual}}
