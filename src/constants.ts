@@ -1,4 +1,4 @@
-import { TAxis, TMat2D } from './typedefs';
+import { TAxis, TAxisKey, TMat2D } from './typedefs';
 
 export { version as VERSION } from '../package.json';
 export function noop() {}
@@ -15,18 +15,24 @@ export const AXIS_KEYS: Record<
   TAxis,
   {
     counterAxis: TAxis;
-    scale: `scale${Capitalize<TAxis>}`;
-    skew: `skew${Capitalize<TAxis>}`;
+    scale: TAxisKey<'scale'>;
+    skew: TAxisKey<'skew'>;
+    lockSkewing: TAxisKey<'lockSkewing'>;
+    origin: TAxisKey<'origin'>;
   }
 > = {
   x: {
     counterAxis: 'y',
     scale: 'scaleX',
     skew: 'skewX',
+    lockSkewing: 'lockSkewingX',
+    origin: 'originX',
   },
   y: {
     counterAxis: 'x',
     scale: 'scaleY',
     skew: 'skewY',
+    lockSkewing: 'lockSkewingY',
+    origin: 'originY',
   },
 };

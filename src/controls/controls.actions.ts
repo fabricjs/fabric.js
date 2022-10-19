@@ -2,6 +2,7 @@
 
 import { AXIS_KEYS } from '../constants';
 import { Point } from '../point.class';
+import { TAxis } from '../typedefs';
 import { fireEvent } from '../util/fireEvent';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { renderCircleControl, renderSquareControl } from './controls.render';
@@ -272,7 +273,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * @see https://github.com/fabricjs/fabric.js/pull/8380
    */
   function skewObject(
-    axis: 'x' | 'y',
+    axis: TAxis,
     { target, ex, ey, originX, originY, skewX, skewY, flipX, flipY },
     pointer: Point
   ) {
@@ -318,25 +319,65 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
   }
 
   /**
-   * Action handler for skewing on the X axis
-   * @see https://github.com/fabricjs/fabric.js/pull/8380
-   * @private
+   * Wrapped Action handler for skewing on a given axis, takes care of the
+   * skew direction and determine the correct transform origin for the anchor point
+   * @param {Event} eventData javascript event that is doing the transform
+   * @param {Object} transform javascript object containing a series of information around the current transform
+   * @param {number} x current mouse x position, canvas normalized
+   * @param {number} y current mouse y position, canvas normalized
+   * @return {Boolean} true if some change happened
    */
-  function skewObjectX(eventData, transform, x, y) {
-    return skewObject('x', transform, new Point(x, y));
+  function skewHandler(axis: TAxis, eventData, transform, x, y) {
+    const target = transform.target,
+      { origin: originKey, lockSkewing: lockSkewingKey } = AXIS_KEYS[axis];
+    if (target[lockSkewingKey]) {
+      return false;
+    }
+
+    // step1 figure out and change transform origin.
+
+    // skewing X
+    // if skewX > 0 and originY bottom we anchor on right
+    // if skewX > 0 and originY top we anchor on left
+    // if skewX < 0 and originY bottom we anchor on left
+    // if skewX < 0 and originY top we anchor on right
+    // if skewX is 0, we look for mouse position to understand where are we going.
+
+    // skewing Y
+    // if skewY > 0 and originX left we anchor on top
+    // if skewY > 0 and originX right we anchor on bottom
+    // if skewY < 0 and originX left we anchor on bottom
+    // if skewY < 0 and originX right we anchor on top
+    // if skewY is 0, we look for mouse position to understand where are we going.
+
+    const offset = new Point(x, y).subtract(
+      new Point(transform.ex, transform.ey)
+    )[axis];
+    const finalHandler = wrapWithFireEvent(
+      'skewing',
+      wrapWithFixedAnchor((eventData, transform, x, y) =>
+        skewObject(axis, transform, new Point(x, y))
+      )
+    );
+    return finalHandler(
+      eventData,
+      {
+        ...transform,
+        // we are pulling (left|top) || (right|bottom) so we anchor to the opposite side
+        [originKey]:
+          (offset === 0 &&
+            getLocalPoint(transform, CENTER, CENTER, x, y)[axis] > 0) ||
+          offset > 0
+            ? 0
+            : 1,
+      },
+      x,
+      y
+    );
   }
 
   /**
-   * Action handler for skewing on the Y axis
-   * @see https://github.com/fabricjs/fabric.js/pull/8380
-   * @private
-   */
-  function skewObjectY(eventData, transform, x, y) {
-    return skewObject('y', transform, new Point(x, y));
-  }
-
-  /**
-   * Wrapped Action handler for skewing on the Y axis, takes care of the
+   * Wrapped Action handler for skewing on the X axis, takes care of the
    * skew direction and determine the correct transform origin for the anchor point
    * @param {Event} eventData javascript event that is doing the transform
    * @param {Object} transform javascript object containing a series of information around the current transform
@@ -345,38 +386,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * @return {Boolean} true if some change happened
    */
   function skewHandlerX(eventData, transform, x, y) {
-    const target = transform.target;
-    if (target.lockSkewingX) {
-      return false;
-    }
-
-    // step1 figure out and change transform origin.
-    // if skewX > 0 and originY bottom we anchor on right
-    // if skewX > 0 and originY top we anchor on left
-    // if skewX < 0 and originY bottom we anchor on left
-    // if skewX < 0 and originY top we anchor on right
-    // if skewX is 0, we look for mouse position to understand where are we going.
-
-    const offset = x - transform.ex;
-    const finalHandler = wrapWithFireEvent(
-      'skewing',
-      wrapWithFixedAnchor(skewObjectX)
-    );
-    return finalHandler(
-      eventData,
-      {
-        ...transform,
-        // we are pulling left/right so we anchor to right/left respectively
-        originX:
-          (offset === 0 &&
-            getLocalPoint(transform, CENTER, CENTER, x, y).x > 0) ||
-          offset > 0
-            ? LEFT
-            : RIGHT,
-      },
-      x,
-      y
-    );
+    return skewHandler('x', eventData, transform, x, y);
   }
 
   /**
@@ -389,38 +399,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * @return {Boolean} true if some change happened
    */
   function skewHandlerY(eventData, transform, x, y) {
-    const target = transform.target;
-    if (target.lockSkewingY) {
-      return false;
-    }
-
-    // step1 figure out and change transform origin.
-    // if skewY > 0 and originX left we anchor on top
-    // if skewY > 0 and originX right we anchor on bottom
-    // if skewY < 0 and originX left we anchor on bottom
-    // if skewY < 0 and originX right we anchor on top
-    // if skewY is 0, we look for mouse position to understand where are we going.
-
-    const offset = y - transform.ey;
-    const finalHandler = wrapWithFireEvent(
-      'skewing',
-      wrapWithFixedAnchor(skewObjectY)
-    );
-    return finalHandler(
-      eventData,
-      {
-        ...transform,
-        // we are pulling up/down so we anchor to bottom/top respectively
-        originY:
-          (offset === 0 &&
-            getLocalPoint(transform, CENTER, CENTER, x, y).y > 0) ||
-          offset > 0
-            ? TOP
-            : BOTTOM,
-      },
-      x,
-      y
-    );
+    return skewHandler('y', eventData, transform, x, y);
   }
 
   /**
