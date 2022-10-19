@@ -12,6 +12,8 @@ const enum Radian {}
 export type TDegree = Nominal<number, Degree>;
 export type TRadian = Nominal<number, Radian>;
 
+export type TAxis = 'x' | 'y';
+
 export type TSize = {
   width: number;
   height: number;
