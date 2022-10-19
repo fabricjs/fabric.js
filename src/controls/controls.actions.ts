@@ -278,7 +278,6 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     pointer: Point
   ) {
     const { counterAxis, skew: skewKey } = AXIS_KEYS[axis],
-      { scale: counterScaleKey } = AXIS_KEYS[counterAxis],
       dimBefore = target._getTransformedDimensions(),
       offset = pointer.subtract(new Point(ex, ey))[axis],
       flip = new Point(flipX ? -1 : 1, flipY ? -1 : 1)[axis],
@@ -290,6 +289,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
         target.resolveOriginY(originY)
       )[counterAxis],
       offsetFactor = -Math.sign(counterOriginFactor) * flip * 2;
+
     const shearing =
       (offset * offsetFactor) / Math.max(dimBefore[counterAxis], 1) +
       shearingBefore;
@@ -305,14 +305,13 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
 
     const changed = valueBefore !== target[skewKey];
 
-    if (changed) {
-      const counterSkew = new Point(target.skewX, target.skewY)[counterAxis],
-        counterScale = new Point(target.scaleX, target.scaleY)[counterAxis],
+    if (changed && axis === 'y') {
+      // we don't want skewing to affect scaleX so we factor it by the inverse skewing diff to make it seem unchanged to the viewer
+      const { skewX, scaleX } = target,
         dim = target._getTransformedDimensions(),
-        compensationFactor =
-          counterSkew !== 0 ? dimBefore[counterAxis] / dim[counterAxis] : 1;
+        compensationFactor = skewX !== 0 ? dimBefore.x / dim.x : 1;
       compensationFactor !== 1 &&
-        target.set(counterScaleKey, compensationFactor * counterScale);
+        target.set('scaleX', compensationFactor * scaleX);
     }
 
     return changed;
