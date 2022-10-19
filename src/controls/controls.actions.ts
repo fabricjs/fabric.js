@@ -289,7 +289,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
         target.resolveOriginX(originX),
         target.resolveOriginY(originY)
       )[counterAxis],
-      offsetFactor = -Math.sign(counterOriginFactor[counterAxis]) * flip * 2;
+      offsetFactor = -Math.sign(counterOriginFactor) * flip * 2;
     const shearing =
       (offset * offsetFactor) / Math.max(dimBefore[counterAxis], 1) +
       shearingBefore;
@@ -306,13 +306,13 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     const changed = valueBefore !== target[skewKey];
 
     if (changed) {
-      const otherSkew = new Point(target.skewX, target.skewY)[counterAxis],
-        scale = new Point(target.scaleX, target.scaleY)[counterAxis],
+      const counterSkew = new Point(target.skewX, target.skewY)[counterAxis],
+        counterScale = new Point(target.scaleX, target.scaleY)[counterAxis],
         dim = target._getTransformedDimensions(),
         compensationFactor =
-          otherSkew !== 0 ? dimBefore[counterAxis] / dim[counterAxis] : 1;
+          counterSkew !== 0 ? dimBefore[counterAxis] / dim[counterAxis] : 1;
       compensationFactor !== 1 &&
-        target.set(counterScaleKey, compensationFactor * scale);
+        target.set(counterScaleKey, compensationFactor * counterScale);
     }
 
     return changed;
