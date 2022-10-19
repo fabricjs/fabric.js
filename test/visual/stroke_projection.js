@@ -100,9 +100,9 @@ QUnit.module('stroke projection', (hooks) => {
 
   fabric.Object.prototype.noScaleCache = false;
 
-  function renderStrokeTest(canvas, testOptions, polyOptions) {
+  function renderStrokeTest(canvas, { builder, points, group }, polyOptions) {
     const scale = new fabric.Point(2, 3),
-      poly = new testOptions.builder(testOptions.points, {
+      poly = new builder(points, {
         fill: `rgb(255, 0, 0)`,
         strokeWidth: 10,
         stroke: 'rgb(120, 0, 0)',
@@ -111,10 +111,11 @@ QUnit.module('stroke projection', (hooks) => {
         exactBoundingBox: true,
         ...polyOptions,
       });
-    poly.scaleX = scale.x;
-    poly.scaleY = scale.y;
+    const target = group ? new fabric.Group([poly]) : poly;
+    target.scaleX = scale.x;
+    target.scaleY = scale.y;
     poly.setDimensions();
-    const size = poly._getTransformedDimensions(),
+    const size = target._getTransformedDimensions(),
       bg = new fabric.Rect({
         width: size.x,
         height: size.y,
@@ -124,11 +125,11 @@ QUnit.module('stroke projection', (hooks) => {
         originY: poly.originY,
         fill: 'blue',
       });
-    canvas.add(bg, poly);
-    canvas.setActiveObject(poly);
-    canvas.setViewportTransform([canvas.width/size.x*0.9, 0, 0, canvas.height/size.y*0.9, 0, 0]);
+    canvas.add(bg, target);
+    canvas.setActiveObject(target);
+    canvas.setViewportTransform([canvas.width / size.x * 0.9, 0, 0, canvas.height / size.y * 0.9, 0, 0]);
     bg.viewportCenter();
-    poly.viewportCenter();
+    target.viewportCenter();
     canvas.backgroundColor = 'white';
     canvas.renderAll();
   }
@@ -143,38 +144,40 @@ QUnit.module('stroke projection', (hooks) => {
         strokeLineType = isPolygon ? 'strokeLineJoin' : 'strokeLineCap';
       strokes.forEach((strokeLineTypeCase) => {
         [true, false].forEach((strokeUniform) => {
-          [
-            [0, 30],
-            [20, 0],
-            [25, 35],
-          ].forEach(([skewX, skewY]) => {
-            if (strokeLineTypeCase === 'round' && (skewX !== 0) & (skewY !== 0))
-              return; // TODO: remove this line when fix strokeLineJoins equals `round` with `skewX`and `skewY` applied at sametime
-            tests.push({
-              test: `${caseName} of type ${builderType} with ${strokeLineType}=${strokeLineTypeCase}, strokeUniform=${strokeUniform}, skewX=${skewX} and skewY=${skewY} values`,
-              code: function (canvas, callback) {
-                renderStrokeTest(
-                  canvas,
-                  {
-                    builder,
-                    points: casePoints,
-                  },
-                  {
-                    [strokeLineType]: strokeLineTypeCase,
-                    strokeUniform,
-                    skewX,
-                    skewY,
-                  }
-                );
-                callback(canvas.lowerCanvasEl);
-              },
-              golden: `stroke-projection/${strokeLineType}/${strokeLineTypeCase}/${caseName}-${
-                strokeUniform ? 'uniform-' : ''
-              }${builderType}-${skewX}skewX-${skewY}skewY.png`,
-              percentage: 0.001,
-              width: 600,
-              height: 900,
-              fabricClass: 'Canvas',
+          [false, true].forEach((group) => {
+            [
+              [0, 30],
+              [20, 0],
+              [25, 35],
+            ].forEach(([skewX, skewY]) => {
+              if (strokeLineTypeCase === 'round' && (skewX !== 0) & (skewY !== 0))
+                return; // TODO: remove this line when fix strokeLineJoins equals `round` with `skewX`and `skewY` applied at sametime
+              tests.push({
+                test: `${caseName} of type ${builderType} with ${strokeLineType}=${strokeLineTypeCase}, strokeUniform=${strokeUniform}, skewX=${skewX}, skewY=${skewY}, grouped=${group}`,
+                code: function (canvas, callback) {
+                  renderStrokeTest(
+                    canvas,
+                    {
+                      builder,
+                      points: casePoints,
+                      group
+                    },
+                    {
+                      [strokeLineType]: strokeLineTypeCase,
+                      strokeUniform,
+                      skewX,
+                      skewY,
+                    }
+                  );
+                  callback(canvas.lowerCanvasEl);
+                },
+                golden: `stroke-projection/${strokeLineType}/${strokeLineTypeCase}/${caseName}-${strokeUniform ? 'uniform-' : ''
+                  }${builderType}-${skewX}skewX-${skewY}skewY.png`,
+                percentage: 0.001,
+                width: 600,
+                height: 900,
+                fabricClass: 'Canvas',
+              });
             });
           });
         });
