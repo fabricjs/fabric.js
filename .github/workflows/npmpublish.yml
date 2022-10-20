@@ -26,10 +26,11 @@ jobs:
     runs-on: ubuntu-latest
     # wait for publishing to complete
     needs: publish-npm
+    if: always()
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.release.target_commitish }}
+          ref: master
       - name: Update bug report version
         uses: ShaMan123/gha-populate-form-version@v2.0.1
         with:
@@ -47,7 +48,7 @@ jobs:
         with:
           add-paths: .github/ISSUE_TEMPLATE/bug_report.yml
           branch: ci-update-bug-report
-          base: ${{ needs.pre.outputs.branch }}
+          base: master
           delete-branch: true
           labels: CI/CD, bot, task
           title: 'chore(): Update bug report'
