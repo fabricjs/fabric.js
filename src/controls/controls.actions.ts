@@ -281,9 +281,9 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       dimBefore = target._getTransformedDimensions(),
       offset = pointer.subtract(new Point(ex, ey))[axis],
       flip = new Point(flipX ? -1 : 1, flipY ? -1 : 1)[axis],
-      skewingBefore = new Point(skewX, skewY),
-      valueBefore = skewingBefore[axis],
-      shearingBefore = Math.tan(degreesToRadians(valueBefore)),
+      skewingStart = new Point(skewX, skewY)[axis],
+      skewingBefore = new Point(target.skewX, target.skewY)[axis],
+      shearingStart = Math.tan(degreesToRadians(skewingStart)),
       counterOriginFactor = new Point(
         target.resolveOriginX(originX),
         target.resolveOriginY(originY)
@@ -292,18 +292,18 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
 
     const shearing =
       (offset * offsetFactor) / Math.max(dimBefore[counterAxis], 1) +
-      shearingBefore;
+      shearingStart;
 
     // calculate the transform matrix after applying the new value
     // const [a, b, c, d] = target.calcOwnMatrix();
     // const t =
     //   axis === 'y'
-    //     ? [a, a * shearing, c, d + (shearing - b / a) * c]
+    //     ? [a, a * shearing, c, d + (shearing - b / a) * c] // incorrect since it should account somehow for skewX
     //     : [a + (shearing - c / d) * b, b, d * shearing, d];
 
     target.set(skewKey, radiansToDegrees(Math.atan(shearing)));
 
-    const changed = valueBefore !== target[skewKey];
+    const changed = skewingBefore !== target[skewKey];
 
     if (changed && axis === 'y') {
       // we don't want skewing to affect scaleX so we factor it by the inverse skewing diff to make it seem unchanged to the viewer
