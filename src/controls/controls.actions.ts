@@ -327,31 +327,32 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    * @return {Boolean} true if some change happened
    */
   function skewHandler(axis: TAxis, eventData, transform, x, y) {
-    const target = transform.target,
-      { origin: originKey, lockSkewing: lockSkewingKey } = AXIS_KEYS[axis];
+    const { target } = transform,
+      {
+        counterAxis,
+        origin: originKey,
+        lockSkewing: lockSkewingKey,
+        skew: skewKey,
+      } = AXIS_KEYS[axis];
     if (target[lockSkewingKey]) {
       return false;
     }
 
-    // step1 figure out and change transform origin.
-
-    // skewing X
-    // if skewX > 0 and originY bottom we anchor on right
-    // if skewX > 0 and originY top we anchor on left
-    // if skewX < 0 and originY bottom we anchor on left
-    // if skewX < 0 and originY top we anchor on right
-    // if skewX is 0, we look for mouse position to understand where are we going.
-
-    // skewing Y
-    // if skewY > 0 and originX left we anchor on top
-    // if skewY > 0 and originX right we anchor on bottom
-    // if skewY < 0 and originX left we anchor on bottom
-    // if skewY < 0 and originX right we anchor on top
-    // if skewY is 0, we look for mouse position to understand where are we going.
-
-    const offset = new Point(x, y).subtract(
-      new Point(transform.ex, transform.ey)
-    )[axis];
+    const counterOriginFactor = new Point(
+        target.resolveOriginX(transform.originX),
+        target.resolveOriginY(transform.originY)
+      )[counterAxis],
+      // anchor to the opposite side of the skewing direction
+      // in case skewing = 0 use the offset to determine anchoring
+      origin =
+        ((target[skewKey] === 0 &&
+          getLocalPoint(transform, CENTER, CENTER, x, y)[axis] > 0) ||
+        target[skewKey] > 0
+          ? -1
+          : 1) *
+          -Math.sign(counterOriginFactor) *
+          0.5 +
+        0.5;
     const finalHandler = wrapWithFireEvent(
       'skewing',
       wrapWithFixedAnchor((eventData, transform, x, y) =>
@@ -362,13 +363,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       eventData,
       {
         ...transform,
-        // we are pulling (left|top) || (right|bottom) so we anchor to the opposite side
-        [originKey]:
-          (offset === 0 &&
-            getLocalPoint(transform, CENTER, CENTER, x, y)[axis] > 0) ||
-          offset > 0
-            ? 0
-            : 1,
+        [originKey]: origin,
       },
       x,
       y
