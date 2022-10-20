@@ -1,4 +1,4 @@
-import { IPoint } from '../../../point.class';
+import { IPoint, Point } from '../../../point.class';
 import { StrokeLineCapProjections } from './StrokeLineCapProjections';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import { TProjection, TProjectStrokeOnPointsOptions } from './types';
@@ -21,33 +21,43 @@ export const projectStrokeOnPoints = (
     return projections;
   }
 
-  points.forEach((A, index) => {
-    let B: IPoint, C: IPoint;
-    if (index === 0) {
-      C = points[1];
-      B = openPath ? A : points[points.length - 1];
-    } else if (index === points.length - 1) {
-      B = points[index - 1];
-      C = openPath ? A : points[0];
-    } else {
-      B = points[index - 1];
-      C = points[index + 1];
-    }
+  points
+    .reduce(
+      (reduced, point) => {
+        if (!reduced[reduced.length - 1].eq(point)) {
+          reduced.push(new Point(point));
+        }
+        return reduced;
+      },
+      [new Point(points[0])]
+    )
+    .forEach((A, index, points) => {
+      let B: IPoint, C: IPoint;
+      if (index === 0) {
+        C = points[1];
+        B = openPath ? A : points[points.length - 1];
+      } else if (index === points.length - 1) {
+        B = points[index - 1];
+        C = openPath ? A : points[0];
+      } else {
+        B = points[index - 1];
+        C = points[index + 1];
+      }
 
-    if (openPath && (index === 0 || index === points.length - 1)) {
-      projections.push(
-        ...new StrokeLineCapProjections(
-          A,
-          index === 0 ? C : B,
-          options
-        ).project()
-      );
-    } else {
-      projections.push(
-        ...new StrokeLineJoinProjections(A, B, C, options).project()
-      );
-    }
-  });
+      if (openPath && (index === 0 || index === points.length - 1)) {
+        projections.push(
+          ...new StrokeLineCapProjections(
+            A,
+            index === 0 ? C : B,
+            options
+          ).project()
+        );
+      } else {
+        projections.push(
+          ...new StrokeLineJoinProjections(A, B, C, options).project()
+        );
+      }
+    });
 
   return projections;
 };
