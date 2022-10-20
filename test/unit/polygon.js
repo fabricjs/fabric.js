@@ -75,7 +75,7 @@
   });
 
   QUnit.test('polygon with exactBoundingBox true', function(assert) {
-    var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 }], {
+    var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 }], {
       exactBoundingBox: true,
       strokeWidth: 60,
       stroke: 'blue'
