@@ -343,7 +343,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
         target.resolveOriginY(transform.originY)
       )[counterAxis],
       // anchor to the opposite side of the skewing direction
-      // in case skewing = 0 use the offset to determine anchoring
+      // if skewing = 0 use the offset to determine anchoring
       origin =
         ((target[skewKey] === 0 &&
           getLocalPoint(transform, CENTER, CENTER, x, y)[axis] > 0) ||
