@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { FabricObject } from './object.class';
+
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
     piBy2 = Math.PI * 2;
@@ -33,7 +35,7 @@
        */
       ry: 0,
 
-      cacheProperties: fabric.Object.prototype.cacheProperties.concat(
+      cacheProperties: FabricObject.prototype.cacheProperties.concat(
         'rx',
         'ry'
       ),
@@ -173,6 +175,6 @@
    * @returns {Promise<fabric.Ellipse>}
    */
   fabric.Ellipse.fromObject = function (object) {
-    return fabric.Object._fromObject(fabric.Ellipse, object);
+    return FabricObject._fromObject(fabric.Ellipse, object);
   };
 })(typeof exports !== 'undefined' ? exports : window);

@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Point } from './point.class';
+import { FabricObject } from './shapes/object.class';
 
 (function (global) {
   var fabric = global.fabric,
@@ -871,7 +872,7 @@ import { Point } from './point.class';
         maxX -= strokeOffset;
         maxY -= strokeOffset;
         // selection border
-        fabric.Object.prototype._setLineDash.call(
+        FabricObject.prototype._setLineDash.call(
           this,
           ctx,
           this.selectionDashArray
