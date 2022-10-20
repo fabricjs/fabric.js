@@ -76,20 +76,31 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
    * @see https://github.com/fabricjs/fabric.js/pull/8344#1-3-square
    */
   projectSquare() {
-    const orthogonalProjection = this.calcOrthogonalProjection(
-      this.A,
-      this.T,
-      this.strokeProjectionMagnitude
-    );
-    const strokePointingOut = this.scaleUnitVector(
-      getUnitVector(createVector(this.A, this.T)),
-      -this.strokeProjectionMagnitude
-    );
-    const projectedA = this.A.add(strokePointingOut);
-    return [
-      projectedA.add(orthogonalProjection),
-      projectedA.subtract(orthogonalProjection),
-    ].map((p) => this.applySkew(p));
+    const projections: Point[] = [];
+
+    if (this.A.eq(this.T)) {
+      const projection = new Point(1, 1).scalarMultiply(
+        this.strokeProjectionMagnitude
+      );
+      projections.push(this.A.add(projection), this.A.subtract(projection));
+    } else {
+      const orthogonalProjection = this.calcOrthogonalProjection(
+        this.A,
+        this.T,
+        this.strokeProjectionMagnitude
+      );
+      const strokePointingOut = this.scaleUnitVector(
+        getUnitVector(createVector(this.A, this.T)),
+        -this.strokeProjectionMagnitude
+      );
+      const projectedA = this.A.add(strokePointingOut);
+      projections.push(
+        projectedA.add(orthogonalProjection),
+        projectedA.subtract(orthogonalProjection)
+      );
+    }
+
+    return projections.map((p) => this.applySkew(p));
   }
 
   protected projectPoints() {
