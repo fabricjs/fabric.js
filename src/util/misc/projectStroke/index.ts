@@ -1,5 +1,5 @@
 import { IPoint, Point } from '../../../point.class';
-import { findRight } from '../../internals/findRight';
+import { findIndexRight, findRight } from '../../internals/findRight';
 import { StrokeLineCapProjections } from './StrokeLineCapProjections';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import { TProjection, TProjectStrokeOnPointsOptions } from './types';
@@ -34,17 +34,17 @@ export const projectStrokeOnPoints = (
 
   if (reduced.length === 1) {
     openPath = true;
+  } else if (!openPath) {
+    const start = reduced[0];
+    const index = findIndexRight(reduced, (point) => !point.eq(start));
+    reduced.splice(index + 1);
   }
 
   reduced.forEach((A, index, points) => {
     let B: IPoint, C: IPoint;
     if (index === 0) {
       C = points[1];
-      B = openPath
-        ? A
-        : // we search for the last point that affects the projection
-          // this is important in case there are points at the end that are equal to the first point
-          findRight(points, (point) => !point.eq(A)) || A;
+      B = openPath ? A : points[points.length - 1];
     } else if (index === points.length - 1) {
       B = points[index - 1];
       C = openPath ? A : points[0];
