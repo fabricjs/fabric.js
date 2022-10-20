@@ -97,7 +97,18 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    * @see https://github.com/fabricjs/fabric.js/pull/8344#2-2-bevel
    */
   projectBevel() {
-    return [this.B, this.C].map((to) => this.projectOrthogonally(this.A, to));
+    const projections: Point[] = [];
+    [this.B, this.C].map((to) => {
+      projections.push(
+          this.projectOrthogonally(this.A, to)
+      );
+      // if `alpha` equals 0, we need to project for both sides.
+      this.alpha === 0 &&
+      projections.push(
+      this.projectOrthogonally(this.A, to, -this.strokeProjectionMagnitude)
+      );
+    });
+    return projections
   }
 
   /**
