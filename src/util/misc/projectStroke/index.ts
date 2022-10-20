@@ -1,4 +1,5 @@
 import { IPoint, Point } from '../../../point.class';
+import { findRight } from '../../internals/findRight';
 import { StrokeLineCapProjections } from './StrokeLineCapProjections';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import { TProjection, TProjectStrokeOnPointsOptions } from './types';
@@ -35,7 +36,7 @@ export const projectStrokeOnPoints = (
       let B: IPoint, C: IPoint;
       if (index === 0) {
         C = points[1];
-        B = openPath ? A : points[points.length - 1];
+        B = openPath ? A : findRight(points, (point) => !point.eq(A)) || A;
       } else if (index === points.length - 1) {
         B = points[index - 1];
         C = openPath ? A : points[0];
