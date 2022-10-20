@@ -35,6 +35,8 @@ export const projectStrokeOnPoints = (
   if (reduced.length === 1) {
     openPath = true;
   } else if (!openPath) {
+    // remove points from end in case they equal the first point
+    // in order to correctly project the first point
     const start = reduced[0];
     const index = findIndexRight(reduced, (point) => !point.eq(start));
     reduced.splice(index + 1);
