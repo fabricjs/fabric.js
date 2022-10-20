@@ -30,15 +30,31 @@ QUnit.module('stroke projection', (hooks) => {
     singlePoint: [
       { x: 100, y: 100 },
     ],
+    twoPoints: [
+      { x: 10, y: 10 },
+      { x: 100, y: 100 },
+    ],
     twoPointsClose: [
       { x: 0, y: 0 },
       { x: 2, y: -0.98 },
       { x: 100, y: 0 },
     ],
-    twoEqualPoints: [
-      { x: 0, y: 0 },
-      { x: 0, y: 0 },
+    twoEqualPointsLine: [
+      { x: 10, y: 10 },
+      { x: 10, y: 10 },
       { x: 100, y: 0 },
+    ],
+    twoEqualPointsTriangle: [
+      { x: 100, y: 100 },
+      { x: 100, y: 120 },
+      { x: 100, y: 120 },
+      { x: 210, y: 110 },
+    ],
+    multipleEqualPoints: [
+      { x: 100, y: 110 },
+      { x: 120, y: 120 },
+      { x: 120, y: 120 },
+      { x: 100, y: 110 },
     ],
     equalStartEnd: [
       { x: 0, y: 0 },
@@ -73,7 +89,7 @@ QUnit.module('stroke projection', (hooks) => {
       { x: 0, y: 36 },
       { x: 72, y: 0 },
     ],
-    plus: [
+    lambdaLetter: [
       { x: 0, y: 0 },
       { x: 0, y: 20 },
       { x: 20, y: 20 },
