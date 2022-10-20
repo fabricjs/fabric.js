@@ -28,9 +28,7 @@ QUnit.module('stroke projection', (hooks) => {
       { x: 36, y: 36 },
     ],
     singlePoint: [
-      { x: 0, y: 0 },
-      { x: 100, y: 0 },
-      { x: 0, y: 0 },
+      { x: 100, y: 100 },
     ],
     twoPointsClose: [
       { x: 0, y: 0 },
