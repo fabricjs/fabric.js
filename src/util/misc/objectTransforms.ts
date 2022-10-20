@@ -60,13 +60,13 @@ export const applyTransformToObject = (
   object: FabricObject,
   transform: TMat2D
 ) => {
-  const { translateX, translateY, ...otherOptions } = qrDecompose(transform),
+  const { translateX, translateY, scaleX, scaleY, ...otherOptions } =
+      qrDecompose(transform),
     center = new Point(translateX, translateY);
-  object.set({
-    flipX: false,
-    flipY: false,
-    ...otherOptions,
-  });
+  object.flipX = false;
+  object.flipY = false;
+  Object.assign(object, otherOptions);
+  object.set({ scaleX, scaleY });
   object.setPositionByOrigin(center, 'center', 'center');
 };
 /**
@@ -76,14 +76,12 @@ export const applyTransformToObject = (
  * @param  {fabric.Object} target object to transform
  */
 export const resetObjectTransform = (target: FabricObject) => {
-  target.set({
-    flipX: false,
-    flipY: false,
-    scaleX: 1,
-    scaleY: 1,
-    skewX: 0,
-    skewY: 0,
-  });
+  target.scaleX = 1;
+  target.scaleY = 1;
+  target.skewX = 0;
+  target.skewY = 0;
+  target.flipX = false;
+  target.flipY = false;
   target.rotate(0);
 };
 

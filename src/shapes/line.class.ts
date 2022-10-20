@@ -1,7 +1,4 @@
 //@ts-nocheck
-
-import { Point } from '../point.class';
-
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
     extend = fabric.util.object.extend,
@@ -177,7 +174,10 @@ import { Point } from '../point.class';
        * @return {Object} center point from element coordinates
        */
       _findCenterFromElement: function () {
-        return new Point((this.x1 + this.x2) / 2, (this.y1 + this.y2) / 2);
+        return {
+          x: (this.x1 + this.x2) / 2,
+          y: (this.y1 + this.y2) / 2,
+        };
       },
 
       /**
