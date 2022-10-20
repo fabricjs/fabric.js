@@ -13,8 +13,8 @@ body:
         If you have a question use
         [Discussions](https://github.com/fabricjs/fabric.js/discussions).
 
-        If you are up for PRing see [Pull Requests](https://github.com/fabricjs/fabric.js/blob/master/CONTRIBUTING.md#-pull-requests). 
-        It is advised to wait for a green light before you start coding.
+        If you are interested in submitted a PR see [Pull Requests](https://github.com/fabricjs/fabric.js/blob/master/CONTRIBUTING.md#-pull-requests).         
+        While bug fixes are always welcome, we recommend submitting a feature request and waiting for approval before you begin coding new features.
   - type: checkboxes
     id: terms
     attributes:
