@@ -27,6 +27,11 @@ QUnit.module('stroke projection', (hooks) => {
       { x: 6, y: 6 },
       { x: 36, y: 36 },
     ],
+    singlePoint: [
+      { x: 0, y: 0 },
+      { x: 100, y: 0 },
+      { x: 0, y: 0 },
+    ],
     twoPointsClose: [
       { x: 0, y: 0 },
       { x: 2, y: -0.98 },
@@ -36,6 +41,11 @@ QUnit.module('stroke projection', (hooks) => {
       { x: 0, y: 0 },
       { x: 0, y: 0 },
       { x: 100, y: 0 },
+    ],
+    equalStartEnd: [
+      { x: 0, y: 0 },
+      { x: 100, y: 0 },
+      { x: 0, y: 0 },
     ],
     convex: [
       { x: 20, y: 4 },
