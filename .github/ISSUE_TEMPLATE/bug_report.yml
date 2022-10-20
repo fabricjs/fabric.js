@@ -9,10 +9,7 @@ body:
 
         Before you do, please ensure you are filing the issue in the right
         place. 
-
-        If you have a question or if an issue is not right for what you mean
-        to file use
-        [Discussions](https://github.com/fabricjs/fabric.js/discussions).
+        For anything else (such as questions) use [Discussions](https://github.com/fabricjs/fabric.js/discussions).
   - type: checkboxes
     id: terms
     attributes:
