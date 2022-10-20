@@ -2,6 +2,7 @@ import { IPoint, Point } from '../../point.class';
 import { TRadian } from '../../typedefs';
 
 const unitVectorX = new Point(1, 0);
+const zero = new Point();
 
 /**
  * Rotates `vector` with `radians`
@@ -30,7 +31,7 @@ export const createVector = (from: IPoint, to: IPoint): Point =>
  * return the magnitude of a vector
  * @return {number}
  */
-export const magnitude = (point: Point) => point.distanceFrom(new Point());
+export const magnitude = (point: Point) => point.distanceFrom(zero);
 
 /**
  * Calculates the angle between 2 vectors
@@ -56,7 +57,8 @@ export const calcVectorRotation = (v: Point) =>
  * @param {Point} v
  * @returns {Point} vector representing the unit vector pointing to the direction of `v`
  */
-export const getUnitVector = (v: Point): Point => v.scalarDivide(magnitude(v));
+export const getUnitVector = (v: Point): Point =>
+  v.eq(zero) ? v : v.scalarDivide(magnitude(v));
 
 /**
  * @param {Point} v
