@@ -154,7 +154,7 @@
       transform.target.strokeWidth = 0;
       eventData.shiftKey = true;
       fabric.controlsUtils.scalingXOrSkewingY(eventData, transform, 200, 300);
-      assert.equal(Math.round(transform.target.skewY), 79);
+      assert.equal(Math.round(transform.target.skewY), 81);
       assert.equal(Math.round(transform.target.scaleX), 1);
     });
     QUnit.test('scalingYOrSkewingX changes skewX if shift pressed', function(assert) {
@@ -163,7 +163,7 @@
       transform.target.strokeWidth = 0;
       eventData.shiftKey = true;
       fabric.controlsUtils.scalingYOrSkewingX(eventData, transform, 200, 300);
-      assert.equal(Math.round(transform.target.skewX), 72);
+      assert.equal(Math.round(transform.target.skewX), 76);
       assert.equal(Math.round(transform.target.scaleY), 1);
     });
     QUnit.test('scalingXOrSkewingY will fire events on canvas and target', function(assert) {

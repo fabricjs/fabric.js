@@ -1,4 +1,4 @@
-import { TMat2D } from './typedefs';
+import { TAxis, TAxisKey, TMat2D } from './typedefs';
 
 export { version as VERSION } from '../package.json';
 export function noop() {}
@@ -10,3 +10,29 @@ export const DEFAULT_SVG_FONT_SIZE = 16;
 
 /* "magic number" for bezier approximations of arcs (http://itc.ktu.lt/itc354/Riskus354.pdf) */
 export const kRect = 1 - 0.5522847498;
+
+export const AXIS_KEYS: Record<
+  TAxis,
+  {
+    counterAxis: TAxis;
+    scale: TAxisKey<'scale'>;
+    skew: TAxisKey<'skew'>;
+    lockSkewing: TAxisKey<'lockSkewing'>;
+    origin: TAxisKey<'origin'>;
+  }
+> = {
+  x: {
+    counterAxis: 'y',
+    scale: 'scaleX',
+    skew: 'skewX',
+    lockSkewing: 'lockSkewingX',
+    origin: 'originX',
+  },
+  y: {
+    counterAxis: 'x',
+    scale: 'scaleY',
+    skew: 'skewY',
+    lockSkewing: 'lockSkewingY',
+    origin: 'originY',
+  },
+};
