@@ -1,3 +1,4 @@
-export { getRandomInt } from './getRandomInt';
-export { ifNaN } from './ifNaN';
-export { removeFromArray } from './removeFromArray';
+export * from './findRight';
+export * from './getRandomInt';
+export * from './ifNaN';
+export * from './removeFromArray';

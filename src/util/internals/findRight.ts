@@ -9,11 +9,3 @@ export const findIndexRight = <T>(
   }
   return -1;
 };
-
-export const findRight = <T>(
-  array: T[],
-  predicate: (value: T, index: number, array: T[]) => boolean
-) => {
-  const index = findIndexRight(array, predicate);
-  return index > -1 ? array[index] : undefined;
-};
