@@ -54,6 +54,14 @@ const Circle = fabric.util.createClass(
      */
     endAngle: 360,
 
+    /**
+     * Specify whether the drawing should be counterclockwise or clockwise
+     * probably will change to degrees in next major version
+     * @type Boolean
+     * @default false
+     */
+    counterClockwise: false,
+
     cacheProperties: FabricObject.prototype.cacheProperties.concat(
       'radius',
       'startAngle',
@@ -88,7 +96,7 @@ const Circle = fabric.util.createClass(
         this.radius,
         degreesToRadians(this.startAngle),
         degreesToRadians(this.endAngle),
-        false
+        this.counterClockwise
       );
       this._renderPaintInOrder(ctx);
     },
