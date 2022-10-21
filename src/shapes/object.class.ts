@@ -1794,7 +1794,7 @@ export class FabricObject extends CommonMethods {
    */
   _assignTransformMatrixProps() {
     if (this.transformMatrix) {
-      const options = fabric.util.qrDecompose(this.transformMatrix);
+      const options = qrDecompose(this.transformMatrix);
       this.flipX = false;
       this.flipY = false;
       this.set('scaleX', options.scaleX);
@@ -1816,7 +1816,7 @@ export class FabricObject extends CommonMethods {
     let center = this._findCenterFromElement();
     if (this.transformMatrix) {
       this._assignTransformMatrixProps();
-      center = fabric.util.transformPoint(center, this.transformMatrix);
+      center = transformPoint(center, this.transformMatrix);
     }
     this.transformMatrix = null;
     if (preserveAspectRatioOptions) {
