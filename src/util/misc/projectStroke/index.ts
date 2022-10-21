@@ -1,5 +1,5 @@
 import { IPoint, Point } from '../../../point.class';
-import { findIndexRight, findRight } from '../../internals/findRight';
+import { findIndexRight } from '../../internals';
 import { StrokeLineCapProjections } from './StrokeLineCapProjections';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import { TProjection, TProjectStrokeOnPointsOptions } from './types';
