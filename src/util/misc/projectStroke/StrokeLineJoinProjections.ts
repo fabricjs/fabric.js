@@ -102,12 +102,13 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       projections.push(
           this.projectOrthogonally(this.A, to)
       );
-      // if `alpha` equals 0, we need to project for both sides.
-      this.alpha === 0 &&
-      projections.push(
-      this.projectOrthogonally(this.A, to, -this.strokeProjectionMagnitude)
-      );
     });
+    // if `alpha` equals 0, we need to project for both sides.
+    if (this.alpha === 0) {
+      projections.push(
+      this.projectOrthogonally(this.A, this.B, -this.strokeProjectionMagnitude)
+      );
+    }
     return projections
   }
 
