@@ -1,7 +1,7 @@
 QUnit.module('stroke projection', (hooks) => {
   const tests = [];
 
-  const casesToTest = {
+  const generalCasesToTest = {
     noMiterAfterMiterLimit2: [
       { x: 0, y: 0 },
       { x: 10, y: 30 },
@@ -26,9 +26,6 @@ QUnit.module('stroke projection', (hooks) => {
       { x: 1, y: 1 },
       { x: 6, y: 6 },
       { x: 36, y: 36 },
-    ],
-    singlePoint: [
-      { x: 100, y: 100 },
     ],
     twoPoints: [
       { x: 10, y: 10 },
@@ -163,7 +160,7 @@ QUnit.module('stroke projection', (hooks) => {
     canvas.renderAll();
   }
 
-  for (let [caseName, casePoints] of Object.entries(casesToTest)) {
+  for (let [caseName, casePoints] of Object.entries(generalCasesToTest)) {
     [fabric.Polyline, fabric.Polygon].forEach((builder) => {
       const builderType = builder.prototype.type,
         isPolygon = builderType === 'polygon',
@@ -175,6 +172,7 @@ QUnit.module('stroke projection', (hooks) => {
         [true, false].forEach((strokeUniform) => {
           [false, true].forEach((group) => {
             [
+              [0, 0],
               [0, 30],
               [20, 0],
               [25, 35],
@@ -201,7 +199,7 @@ QUnit.module('stroke projection', (hooks) => {
                   callback(canvas.lowerCanvasEl);
                 },
                 golden: `stroke-projection/${strokeLineType}/${strokeLineTypeCase}/${caseName}-${strokeUniform ? 'uniform-' : ''
-                  }${builderType}-${skewX}skewX-${skewY}skewY.png`,
+                  }-${skewX}skewX-${skewY}skewY-${group ? 'grouped' : ''}.png`,
                 percentage: 0.001,
                 width: 600,
                 height: 900,
@@ -215,11 +213,12 @@ QUnit.module('stroke projection', (hooks) => {
   }
 
   // Test only miter limit
-  for (let [caseName, casePoints] of Object.entries(casesToTest)) {
+  for (let [caseName, casePoints] of Object.entries(generalCasesToTest)) {
     const builder = fabric.Polygon;
     [5, 20, 120].forEach((strokeMiterLimit) => {
       [true, false].forEach((strokeUniform) => {
         [
+          [0, 0],
           [0, 30],
           [20, 0],
           [25, 35],
@@ -253,6 +252,59 @@ QUnit.module('stroke projection', (hooks) => {
       });
     });
   }
+
+  // Single point
+  (function() {
+    const testCase = {
+      name: 'singlePoint',
+      points: [
+        { x: 100, y: 100 },
+      ],
+    };
+
+    [fabric.Polyline, fabric.Polygon].forEach((builder) => {
+      const builderType = builder.prototype.type,
+        isPolygon = builderType === 'polygon';
+      ['square', 'round'].forEach((strokeLineCap) => {
+        [true, false].forEach((strokeUniform) => {
+          [
+            [0, 0],
+            [0, 30],
+            [20, 0],
+            [25, 35],
+          ].forEach(([skewX, skewY]) => {
+            if (strokeLineCap === 'round' && (skewX !== 0) & (skewY !== 0))
+              return; // TODO: remove this line when fix strokeLineJoins equals `round` with `skewX`and `skewY` applied at sametime
+            tests.push({
+              test: `${testCase.name} of type ${builderType} with strokeLineCap=${strokeLineCap}, strokeUniform=${strokeUniform}, skewX=${skewX}, skewY=${skewY}`,
+              code: function (canvas, callback) {
+                renderStrokeTest(
+                  canvas,
+                  {
+                    builder,
+                    points: testCase.points,
+                  },
+                  {
+                    strokeLineCap,
+                    strokeUniform,
+                    skewX,
+                    skewY,
+                  }
+                );
+                callback(canvas.lowerCanvasEl);
+              },
+              golden: `stroke-projection/${isPolygon ? 'strokeLineJoin' : 'strokeLineCap'}/${testCase.name}/${strokeLineCap}${strokeUniform ? '-uniform-' : ''
+                }-${skewX}skewX-${skewY}skewY.png`,
+              percentage: 0.001,
+              width: 600,
+              height: 900,
+              fabricClass: 'Canvas',
+            });
+          });
+        });
+      });
+    });
+  })()
 
   tests.forEach(visualTestLoop(QUnit));
 });
