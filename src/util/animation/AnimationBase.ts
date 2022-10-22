@@ -31,11 +31,11 @@ export abstract class AnimationBase<T extends number | number[]> {
   /**
    * time %
    */
-  xRate = 0;
+  durationRate = 0;
   /**
    * value %
    */
-  yRate = 0;
+  valueRate = 0;
   /**
    * current value
    */
@@ -100,33 +100,33 @@ export abstract class AnimationBase<T extends number | number[]> {
   private tick: FrameRequestCallback = (t: number) => {
     const durationMs = t - this.startTime;
     const boundDurationMs = Math.min(durationMs, this.duration);
-    this.xRate = boundDurationMs / this.duration;
+    this.durationRate = boundDurationMs / this.duration;
     const { value, changeRate } = this.calculate(boundDurationMs);
     this.value = Array.isArray(value) ? (value.slice() as T) : value;
-    this.yRate = changeRate;
+    this.valueRate = changeRate;
 
     if (this.state === 'aborted') {
       return;
     }
-    if (this._abort(value, this.yRate, this.xRate)) {
+    if (this._abort(value, this.valueRate, this.durationRate)) {
       this.state = 'aborted';
       this.unregister();
     }
     if (durationMs > boundDurationMs) {
       // TODO this line seems redundant
-      this.xRate = this.yRate = 1;
+      this.durationRate = this.valueRate = 1;
       this._onChange(
         (Array.isArray(this.endValue)
           ? this.endValue.slice()
           : this.endValue) as T,
-        this.yRate,
-        this.xRate
+        this.valueRate,
+        this.durationRate
       );
       this.state = 'completed';
-      this._onComplete(this.endValue, this.yRate, this.xRate);
+      this._onComplete(this.endValue, this.valueRate, this.durationRate);
       this.unregister();
     } else {
-      this._onChange(value, this.yRate, this.xRate);
+      this._onChange(value, this.valueRate, this.durationRate);
       requestAnimFrame(this.tick);
     }
   };

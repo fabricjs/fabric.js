@@ -10,8 +10,8 @@ import {
 
 const wrapColorCallback =
   <R>(callback: TOnAnimationChangeCallback<string, R>) =>
-  (rgba: TColorAlphaSource, valueRatio: number, timeRatio: number) =>
-    callback(new Color(rgba).toRgba(), valueRatio, timeRatio);
+  (rgba: TColorAlphaSource, valueRate: number, durationRate: number) =>
+    callback(new Color(rgba).toRgba(), valueRate, durationRate);
 
 const defaultColorEasingRate: TColorEasingRateFunction = (
   currentTime,

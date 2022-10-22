@@ -1,15 +1,15 @@
-import { TColorAlphaSource, TColorArg } from '../../color/color.class';
+import { TColorArg } from '../../color/color.class';
 
 /**
  * Callback called every frame
  * @param {number | number[]} value current value of the animation.
- * @param valueRatio ratio of current value to animation max value. [0, 1]
- * @param timeRatio ratio of current ms to animation duration. [0, 1]
+ * @param valueRate ∈ [0, 1], current value / end value.
+ * @param durationRate ∈ [0, 1], time passed / duration.
  */
 export type TOnAnimationChangeCallback<T, R = void> = (
   value: T,
-  valueRatio: number,
-  timeRatio: number
+  valueRate: number,
+  durationRate: number
 ) => R;
 
 /**
@@ -45,7 +45,7 @@ export type TEasingFunction<T = unknown> = T extends any[]
  * A color easing function
  * @param currentTime ms elapsed
  * @param duration in ms
- * @returns timeRate ∈ [0, 1]
+ * @returns durationRate ∈ [0, 1]
  */
 export type TColorEasingRateFunction = (
   currentTime: number,
