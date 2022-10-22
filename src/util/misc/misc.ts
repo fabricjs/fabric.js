@@ -92,10 +92,13 @@ import {
 } from '../dom_misc';
 import { isTransparent } from './isTransparent';
 import { mergeClipPaths } from './mergeClipPaths';
-import * as ease from '../animation/easing';
-import { animateColor } from '../animation';
-import { animate } from '../animation';
-import { requestAnimFrame, cancelAnimFrame } from "../animation";
+import {
+  animate,
+  animateColor,
+  ease,
+  requestAnimFrame,
+  cancelAnimFrame,
+} from '../animation';
 import { createClass } from '../lang_class';
 /**
  * @namespace fabric.util
