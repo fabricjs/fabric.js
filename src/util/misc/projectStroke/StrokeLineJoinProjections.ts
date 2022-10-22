@@ -135,13 +135,9 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     // MDN: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
     // When the stroke is uniform, scaling changes the arrangement of points, this changes the miter-limit
     const strokeMiterLimit = this.options.strokeUniform
-      ? Math.round(
-          magnitude(
-            this.scaleUnitVector(this.bisector, this.options.strokeMiterLimit)
-          ) *
-            10 ** 6
-        ) /
-        10 ** 6
+      ? magnitude(
+          this.scaleUnitVector(this.bisector, this.options.strokeMiterLimit)
+        )
       : this.options.strokeMiterLimit;
 
     if (
