@@ -55,7 +55,11 @@ export const projectStrokeOnPoints = (
       C = points[index + 1];
     }
 
-    if (openPath && (index === 0 || index === points.length - 1)) {
+    if (openPath && points.length === 1) {
+      projections.push(
+        ...new StrokeLineCapProjections(A, A, options).project()
+      );
+    } else if (openPath && (index === 0 || index === points.length - 1)) {
       projections.push(
         ...new StrokeLineCapProjections(
           A,

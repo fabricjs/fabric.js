@@ -61,12 +61,28 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
    * @see https://github.com/fabricjs/fabric.js/pull/8344#1-2-round
    */
   projectRound() {
-    return new StrokeLineJoinProjections(
-      this.A,
-      this.T,
-      this.T,
-      this.options
-    ).projectRound();
+    const projections: Point[] = [];
+
+    if (!this.isSkewed() && this.A.eq(this.T)) {
+      const projection = new Point(1, 1).scalarMultiply(
+        this.strokeProjectionMagnitude
+      );
+      projections.push(
+        this.applySkew(this.A.add(projection)),
+        this.applySkew(this.A.subtract(projection))
+      );
+    } else {
+      projections.push(
+        ...new StrokeLineJoinProjections(
+          this.A,
+          this.T,
+          this.T,
+          this.options
+        ).projectRound()
+      );
+    }
+
+    return projections;
   }
 
   /**
