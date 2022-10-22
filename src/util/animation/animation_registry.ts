@@ -1,6 +1,6 @@
 import { fabric } from '../../../HEADER';
 import { Canvas, TObject } from '../../__types__';
-import { AnimationBase } from './Animation';
+import { AnimationBase } from './AnimationBase';
 
 /**
  * Array holding all running animations

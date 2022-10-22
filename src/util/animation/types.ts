@@ -26,7 +26,7 @@ export type TAbortCallback<T> = TOnAnimationChangeCallback<T, boolean>;
  * @param duration in ms
  * @returns next value
  */
-export type TEasingFunction<T> = T extends any[]
+export type TEasingFunction<T = unknown> = T extends any[]
   ? (
       currentTime: number,
       startValue: number,

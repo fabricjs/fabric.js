@@ -1,7 +1,7 @@
 import { Color } from '../../color';
 import { TColorAlphaSource } from '../../color/color.class';
 import { noop } from '../../constants';
-import { AnimationBase } from './Animation';
+import { AnimationBase } from './AnimationBase';
 import {
   ColorAnimationOptions,
   TColorEasingRateFunction,
