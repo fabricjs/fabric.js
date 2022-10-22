@@ -1,6 +1,6 @@
 import { noop } from '../../constants';
 import { requestAnimFrame } from './AnimationFrameProvider';
-import { runningAnimations } from './animation_registry';
+import { runningAnimations } from './AnimationRegistry';
 import { defaultEasing } from './easing';
 import {
   TAnimationBaseOptions,
