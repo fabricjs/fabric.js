@@ -24,9 +24,6 @@ class AnimationRegistry<T extends AnimationBase<any>> extends Array<T> {
    * cancel all running animations attached to canvas at the next requestAnimFrame
    */
   cancelByCanvas(canvas: Canvas) {
-    if (!canvas) {
-      return [];
-    }
     const animations = this.filter(
       (animation) =>
         typeof animation.target === 'object' &&
