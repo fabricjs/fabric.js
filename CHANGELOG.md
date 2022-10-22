@@ -3,6 +3,7 @@
 ## [next]
 
 - refactor(TS): `animate` and `AnimationRegistry` to classes [#8297](https://github.com/fabricjs/fabric.js/pull/8297)
+  BREAKING: return animation instance from animate instead of a cancel function and remove `findAnimationByXXX` from `AnimationRegistry`
 - chore(TS): convert object to es6 class [#8322](https://github.com/fabricjs/fabric.js/pull/8322)
 - docs(): guides follow up, feature request template [#8379](https://github.com/fabricjs/fabric.js/pull/8379)
 - docs(): refactor guides, bug report template [#8189](https://github.com/fabricjs/fabric.js/pull/8189)
