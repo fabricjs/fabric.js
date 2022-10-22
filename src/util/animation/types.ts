@@ -22,29 +22,37 @@ export type TAbortCallback<T> = TOnAnimationChangeCallback<T, boolean>;
  * An easing function
  * @param currentTime ms elapsed
  * @param startValue
- * @param byValue increment/change/"completion rate"/magnitude
+ * @param byValue
  * @param duration in ms
  * @returns next value
  */
-export type TEasingFunction = (
-  currentTime: number,
-  startValue: number,
-  byValue: number,
-  duration: number
-) => number;
+export type TEasingFunction<T> = T extends any[]
+  ? (
+      currentTime: number,
+      startValue: number,
+      byValue: number,
+      duration: number,
+      index: number
+    ) => number
+  : (
+      currentTime: number,
+      startValue: number,
+      byValue: number,
+      duration: number
+    ) => number;
 
 /**
  * A color easing function
  * @param currentTime ms elapsed
  * @param duration in ms
- * @returns next value
+ * @returns timeRate ∈ [0, 1]
  */
 export type TColorEasingRateFunction = (
   currentTime: number,
   duration: number
 ) => number;
 
-export type TAnimationBaseOptions = {
+export type TAnimationBaseOptions<T> = {
   /**
    * Duration of the animation in ms
    * @default 500
@@ -58,15 +66,10 @@ export type TAnimationBaseOptions = {
   delay: number;
 
   /**
-   * Called when the animation starts
-   */
-  onStart: VoidFunction;
-
-  /**
    * Easing function
    * @default {defaultEasing}
    */
-  easing: TEasingFunction;
+  easing: TEasingFunction<T>;
 
   /**
    * The object this animation is being performed on
@@ -75,6 +78,11 @@ export type TAnimationBaseOptions = {
 };
 
 export type TAnimationCallbacks<T> = {
+  /**
+   * Called when the animation starts
+   */
+  onStart: VoidFunction;
+
   /**
    * Called at each frame of the animation
    */
@@ -112,14 +120,18 @@ export type TAnimationValues<T> = {
   byValue: T;
 };
 
-export type TAnimationOptions<T extends number | number[], C = T> = Partial<
-  TAnimationBaseOptions & TAnimationValues<T> & TAnimationCallbacks<C>
+export type TAnimationOptions<T, C = T, E = T> = Partial<
+  TAnimationBaseOptions<E> & TAnimationValues<T> & TAnimationCallbacks<C>
 >;
 
 export type AnimationOptions = TAnimationOptions<number>;
 
 export type ArrayAnimationOptions = TAnimationOptions<number[]>;
 
-export type ColorAnimationOptions = TAnimationOptions<number[], TColorArg> & {
-  colorEasing: TColorEasingRateFunction;
+export type ColorAnimationOptions = TAnimationOptions<
+  TColorArg,
+  string,
+  number[]
+> & {
+  colorEasing?: TColorEasingRateFunction;
 };

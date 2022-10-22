@@ -19,7 +19,7 @@ export abstract class AnimationBase<T extends number | number[]> {
   readonly byValue: T;
   readonly duration: number;
   readonly delay: number;
-  protected readonly easing: TEasingFunction;
+  protected readonly easing: TEasingFunction<T>;
   private readonly _onStart: VoidFunction;
   private readonly _onChange: TOnAnimationChangeCallback<T, void>;
   private readonly _onComplete: TOnAnimationChangeCallback<T, void>;
@@ -59,7 +59,7 @@ export abstract class AnimationBase<T extends number | number[]> {
     onComplete = noop,
     abort = noop,
     target,
-  }: Partial<TAnimationBaseOptions & TAnimationCallbacks<T>> &
+  }: Partial<TAnimationBaseOptions<T> & TAnimationCallbacks<T>> &
     TAnimationValues<T>) {
     this.startValue = startValue;
     this.endValue = endValue;
@@ -191,7 +191,7 @@ export class ArrayAnimation extends AnimationBase<number[]> {
   }
   protected calculate(currentTime: number) {
     const values = this.startValue.map((value, i) =>
-      this.easing(currentTime, value, this.byValue[i], this.duration)
+      this.easing(currentTime, value, this.byValue[i], this.duration, i)
     );
     return {
       value: values,
