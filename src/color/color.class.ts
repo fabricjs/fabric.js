@@ -7,6 +7,8 @@ export type TColorSource = [number, number, number];
 
 export type TColorAlphaSource = [number, number, number, number];
 
+export type TColorArg = string | TColorSource | TColorAlphaSource;
+
 /**
  * @class Color common color operations
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#colors colors}
@@ -18,9 +20,12 @@ export class Color {
    *
    * @param {string} [color] optional in hex or rgb(a) or hsl format or from known color list
    */
-  constructor(color?: string) {
+  constructor(color?: TColorArg) {
     if (!color) {
       this.setSource([0, 0, 0, 1]);
+    } else if (Array.isArray(color)) {
+      const [r, g, b, a = 1] = color;
+      this.setSource([r, g, b, a]);
     } else {
       this._tryParsingColor(color);
     }
