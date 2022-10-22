@@ -112,17 +112,13 @@ export abstract class AnimationBase<T extends number | number[]> {
       this.state = 'aborted';
       this.unregister();
     } else if (durationMs >= this.duration) {
-      // TODO this line seems redundant
-      this.durationRate = this.valueRate = 1;
       this._onChange(
-        (Array.isArray(this.endValue)
-          ? this.endValue.slice()
-          : this.endValue) as T,
+        Array.isArray(value) ? (value.slice() as T) : value,
         this.valueRate,
         this.durationRate
       );
       this.state = 'completed';
-      this._onComplete(this.endValue, this.valueRate, this.durationRate);
+      this._onComplete(value, this.valueRate, this.durationRate);
       this.unregister();
     } else {
       this._onChange(value, this.valueRate, this.durationRate);

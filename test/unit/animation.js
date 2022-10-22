@@ -191,6 +191,23 @@
     }, 1000);
   });
 
+  QUnit.test('byValue takes precedence over endValue', function (assert) {
+    const done = assert.async();
+    const context = fabric.util.animate({
+      startValue: 0,
+      endValue: 5,
+      byValue: 10,
+      duration: 96,
+      onComplete: function (endValue, v, t) {
+        assert.equal(endValue, 10);
+        assert.equal(v, 1);
+        assert.equal(t, 1);
+        assert.equal(context.value, 10);
+        done();
+      }
+    });
+  });
+
   QUnit.test('animate', function(assert) {
     var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
