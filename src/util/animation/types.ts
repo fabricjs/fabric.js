@@ -114,7 +114,7 @@ export type TAnimationValues<T> = {
   endValue: T;
 
   /**
-   * Value(s) to increment/decrement the value(s) by
+   * Difference between the start value(s) to the end value(s)
    * @default [endValue - startValue]
    */
   byValue: T;
