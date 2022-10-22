@@ -13,7 +13,6 @@ export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
   constructor({
     startValue,
     endValue,
-    byValue,
     easing = (currentTime, startValue, byValue, duration) => {
       const durationRate =
         1 - Math.cos((currentTime / duration) * (Math.PI / 2));
@@ -30,11 +29,9 @@ export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
       ...options,
       startValue: startColor,
       endValue: endColor,
-      byValue: byValue
-        ? new Color(byValue).getSource()
-        : (endColor.map(
-            (value, i) => value - startColor[i]
-          ) as TColorAlphaSource),
+      byValue: endColor.map(
+        (value, i) => value - startColor[i]
+      ) as TColorAlphaSource,
       easing,
       onChange: wrapColorCallback(onChange),
       onComplete: wrapColorCallback(onComplete),
