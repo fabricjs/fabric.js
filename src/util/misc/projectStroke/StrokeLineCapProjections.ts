@@ -64,6 +64,7 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
     const projections: Point[] = [];
 
     if (!this.isSkewed() && this.A.eq(this.T)) {
+      // 1 point case without `skew`
       const projection = new Point(1, 1).scalarMultiply(
         this.strokeProjectionMagnitude
       );
@@ -95,6 +96,7 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
     const projections: Point[] = [];
 
     if (this.A.eq(this.T)) {
+      // 1 point case
       const projection = new Point(1, 1).scalarMultiply(
         this.strokeProjectionMagnitude
       );
