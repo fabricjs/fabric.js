@@ -5,9 +5,7 @@ import { AnimationBase } from './Animation';
 /**
  * Array holding all running animations
  */
-class AnimationRegistry<
-  T extends AnimationBase<number> | AnimationBase<number[]>
-> extends Array<T> {
+class AnimationRegistry<T extends AnimationBase<any>> extends Array<T> {
   remove(context: T) {
     const index = this.indexOf(context);
     index > -1 && this.splice(index, 1);

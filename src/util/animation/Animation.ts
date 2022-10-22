@@ -10,6 +10,7 @@ import {
   TAbortCallback,
   TEasingFunction,
   TOnAnimationChangeCallback,
+  TAnimationCallbacks,
 } from './types';
 
 export abstract class AnimationBase<T extends number | number[]> {
@@ -58,7 +59,8 @@ export abstract class AnimationBase<T extends number | number[]> {
     onComplete = noop,
     abort = noop,
     target,
-  }: Partial<TAnimationBaseOptions<T>> & TAnimationValues<T>) {
+  }: Partial<TAnimationBaseOptions & TAnimationCallbacks<T>> &
+    TAnimationValues<T>) {
     this.startValue = startValue;
     this.endValue = endValue;
     this.byValue = byValue;
@@ -132,11 +134,11 @@ export abstract class AnimationBase<T extends number | number[]> {
   };
 
   private register() {
-    runningAnimations.push(this as any);
+    runningAnimations.push(this);
   }
 
   private unregister() {
-    runningAnimations.remove(this as any);
+    runningAnimations.remove(this);
   }
 
   abort() {
