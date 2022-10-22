@@ -44,21 +44,26 @@ const isArrayAnimation = (
  * });
  *
  */
-export const animate = (options: AnimationOptions | ArrayAnimationOptions) =>
-  (isArrayAnimation(options)
+export const animate = (options: AnimationOptions | ArrayAnimationOptions) => {
+  const animation = isArrayAnimation(options)
     ? new ArrayAnimation(options)
-    : new Animation(options)
-  ).start();
+    : new Animation(options);
+  animation.start();
+  return animation;
+};
 
 export const animateColor = (
   startValue: TColorArg,
   endValue: TColorArg,
   duration?: number,
   options?: ColorAnimationOptions
-) =>
-  new ColorAnimation({
+) => {
+  const animation = new ColorAnimation({
     ...options,
     startValue,
     endValue,
     duration,
-  }).start();
+  });
+  animation.start();
+  return animation;
+};
