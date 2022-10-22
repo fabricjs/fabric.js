@@ -79,11 +79,12 @@ export abstract class AnimationBase<T extends number | number[]> {
   };
 
   start() {
-    const firstTick: FrameRequestCallback = (timestamp = +new Date()) => {
-      this.startTime = timestamp;
+    const firstTick: FrameRequestCallback = (timestamp) => {
+      if (this.state !== 'pending') return;
+      this.startTime = timestamp || +new Date();
       this.state = 'running';
       this._onStart();
-      this.tick(timestamp);
+      this.tick(this.startTime);
     };
 
     this.register();
@@ -97,8 +98,8 @@ export abstract class AnimationBase<T extends number | number[]> {
     }
   }
 
-  private tick: FrameRequestCallback = (t: number = +new Date()) => {
-    const durationMs = t - this.startTime;
+  private tick: FrameRequestCallback = (t) => {
+    const durationMs = (t || +new Date()) - this.startTime;
     const boundDurationMs = Math.min(durationMs, this.duration);
     this.durationRate = boundDurationMs / this.duration;
     const { value, changeRate } = this.calculate(boundDurationMs);
