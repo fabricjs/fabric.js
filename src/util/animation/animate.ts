@@ -1,5 +1,11 @@
+import { TColorArg } from '../../color/color.class';
 import { ArrayAnimation, ValueAnimation } from './Animation';
-import { AnimationOptions, ArrayAnimationOptions } from './types';
+import { ColorAnimation } from './ColorAnimation';
+import {
+  AnimationOptions,
+  ArrayAnimationOptions,
+  ColorAnimationOptions,
+} from './types';
 
 const isArrayAnimation = (
   options: ArrayAnimationOptions | AnimationOptions
@@ -42,3 +48,16 @@ export const animate = (options: AnimationOptions | ArrayAnimationOptions) =>
     ? new ArrayAnimation(options)
     : new ValueAnimation(options)
   ).start();
+
+export const animateColor = (
+  startValue: TColorArg,
+  endValue: TColorArg,
+  duration?: number,
+  options?: ColorAnimationOptions
+) =>
+  new ColorAnimation({
+    ...options,
+    startValue,
+    endValue,
+    duration,
+  }).start();
