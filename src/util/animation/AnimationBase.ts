@@ -79,7 +79,7 @@ export abstract class AnimationBase<T extends number | number[]> {
   };
 
   start() {
-    const runner: FrameRequestCallback = (timestamp) => {
+    const firstTick: FrameRequestCallback = (timestamp) => {
       this.startTime = timestamp;
       this.state = 'running';
       this._onStart();
@@ -91,9 +91,9 @@ export abstract class AnimationBase<T extends number | number[]> {
     // setTimeout(cb, 0) will run cb on the next frame, causing a delay
     // we don't want that
     if (this.delay > 0) {
-      setTimeout(() => requestAnimFrame(runner), this.delay);
+      setTimeout(() => requestAnimFrame(firstTick), this.delay);
     } else {
-      requestAnimFrame(runner);
+      requestAnimFrame(firstTick);
     }
   }
 
