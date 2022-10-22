@@ -79,7 +79,7 @@ export abstract class AnimationBase<T extends number | number[]> {
   };
 
   start() {
-    const firstTick: FrameRequestCallback = (timestamp) => {
+    const firstTick: FrameRequestCallback = (timestamp = +new Date()) => {
       this.startTime = timestamp;
       this.state = 'running';
       this._onStart();
@@ -97,7 +97,7 @@ export abstract class AnimationBase<T extends number | number[]> {
     }
   }
 
-  private tick: FrameRequestCallback = (t: number) => {
+  private tick: FrameRequestCallback = (t: number = +new Date()) => {
     const durationMs = t - this.startTime;
     const boundDurationMs = Math.min(durationMs, this.duration);
     this.durationRate = boundDurationMs / this.duration;
@@ -107,12 +107,10 @@ export abstract class AnimationBase<T extends number | number[]> {
 
     if (this.state === 'aborted') {
       return;
-    }
-    if (this._abort(value, this.valueRate, this.durationRate)) {
+    } else if (this._abort(value, this.valueRate, this.durationRate)) {
       this.state = 'aborted';
       this.unregister();
-    }
-    if (durationMs > boundDurationMs) {
+    } else if (durationMs >= this.duration) {
       // TODO this line seems redundant
       this.durationRate = this.valueRate = 1;
       this._onChange(
