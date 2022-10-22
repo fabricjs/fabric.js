@@ -41,17 +41,6 @@ export type TEasingFunction<T = unknown> = T extends any[]
       duration: number
     ) => number;
 
-/**
- * A color easing function
- * @param currentTime ms elapsed
- * @param duration in ms
- * @returns durationRate ∈ [0, 1]
- */
-export type TColorEasingRateFunction = (
-  currentTime: number,
-  duration: number
-) => number;
-
 export type TAnimationBaseOptions<T> = {
   /**
    * Duration of the animation in ms
@@ -132,6 +121,4 @@ export type ColorAnimationOptions = TAnimationOptions<
   TColorArg,
   string,
   number[]
-> & {
-  colorEasing?: TColorEasingRateFunction;
-};
+>;
