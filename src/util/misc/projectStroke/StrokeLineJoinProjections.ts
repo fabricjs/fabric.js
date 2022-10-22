@@ -99,17 +99,19 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
   projectBevel() {
     const projections: Point[] = [];
     [this.B, this.C].map((to) => {
-      projections.push(
-          this.projectOrthogonally(this.A, to)
-      );
+      projections.push(this.projectOrthogonally(this.A, to));
     });
     // if `alpha` equals 0, we need to project for both sides.
     if (this.alpha === 0) {
       projections.push(
-      this.projectOrthogonally(this.A, this.B, -this.strokeProjectionMagnitude)
+        this.projectOrthogonally(
+          this.A,
+          this.B,
+          -this.strokeProjectionMagnitude
+        )
       );
     }
-    return projections
+    return projections;
   }
 
   /**
@@ -133,11 +135,17 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     // MDN: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
     // When the stroke is uniform, scaling changes the arrangement of points, this changes the miter-limit
     const strokeMiterLimit = this.options.strokeUniform
-      ? hypotUnitScalar
+      ? Math.round(
+          magnitude(
+            this.scaleUnitVector(this.bisector, this.options.strokeMiterLimit)
+          ) *
+            10 ** 6
+        ) /
+        10 ** 6
       : this.options.strokeMiterLimit;
 
     if (
-      magnitude(miterVector) / this.strokeProjectionMagnitude <=
+      magnitude(miterVector) / this.strokeProjectionMagnitude <
       strokeMiterLimit
     ) {
       return [this.applySkew(this.A.add(miterVector))];
