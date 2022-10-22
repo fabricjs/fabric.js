@@ -21,8 +21,11 @@
       assert.ok(typeof val === 'string', 'expected type is String');
     }
     assert.ok(typeof fabric.util.animateColor === 'function', 'animateColor is a function');
-    fabric.util.animateColor('red', 'blue', 16, {
-      onComplete: function(val, changePerc, timePerc) {
+    fabric.util.animateColor({
+      startValue: 'red',
+      endValue: 'blue',
+      duration: 16,
+      onComplete: function (val, changePerc, timePerc) {
         // animate color need some fixing
         assert.equal(val, 'rgba(0,0,255,1)', 'color is blue');
         assert.equal(changePerc, 1, 'change percentage is 100%');

@@ -243,12 +243,7 @@ import { FabricObject } from '../shapes/object.class';
         };
 
         if (propIsColor) {
-          return fabric.util.animateColor(
-            _options.startValue,
-            _options.endValue,
-            _options.duration,
-            _options
-          );
+          return fabric.util.animateColor(_options);
         } else {
           return fabric.util.animate(_options);
         }

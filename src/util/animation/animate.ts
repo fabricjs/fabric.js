@@ -1,4 +1,3 @@
-import { TColorArg } from '../../color/color.class';
 import { Animation } from './Animation';
 import { ArrayAnimation } from './ArrayAnimation';
 import { ColorAnimation } from './ColorAnimation';
@@ -52,18 +51,8 @@ export const animate = (options: AnimationOptions | ArrayAnimationOptions) => {
   return animation;
 };
 
-export const animateColor = (
-  startValue: TColorArg,
-  endValue: TColorArg,
-  duration?: number,
-  options?: ColorAnimationOptions
-) => {
-  const animation = new ColorAnimation({
-    ...options,
-    startValue,
-    endValue,
-    duration,
-  });
+export const animateColor = (options: ColorAnimationOptions) => {
+  const animation = new ColorAnimation(options);
   animation.start();
   return animation;
 };
