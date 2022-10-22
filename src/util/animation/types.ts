@@ -1,48 +1,20 @@
 /**
  * Callback called every frame
- * @param current current value of the state. potentially multivalue
+ * @param {number | number[]} value current value of the animation.
  * @param valueRatio ratio of current value to animation max value. [0, 1]
  * @param timeRatio ratio of current ms to animation duration. [0, 1]
  */
-export type TOnAnimationChangeCallback<State, R = void> = (
-  current: State,
+export type TOnAnimationChangeCallback<T, R = void> = (
+  value: T,
   valueRatio: number,
   timeRatio: number
 ) => R;
 
 /**
- * Called to determine if animation should abort
+ * Called on each step to determine if animation should abort
  * @returns truthy if animation should abort
  */
 export type TAbortCallback<T> = TOnAnimationChangeCallback<T, boolean>;
-
-// TODO: this isn't that bad but still a little iffy. animation registry gets angry if I give this a type param, because then stuff like findAnimationIndex requires a type param too. Not sure which is better
-/**
- * Function used for canceling an animation
- */
-export type TCancelFunction = () => AnimationContext<number> | AnimationContext<number[]>;
-
-/**
- * Animation of a value or list of values
- */
-export interface AnimationBounds<State> {
-  /**
-   * Starting value(s)
-   */
-  startValue: State;
-
-  /**
-   * Ending value(s)
-   * @default 100
-   */
-  endValue: State;
-
-  /**
-   * Value(s) to increment/decrement the value(s) by
-   * @default [endValue - startValue]
-   */
-  byValue: State;
-}
 
 /**
  * An easing function
@@ -59,39 +31,7 @@ export type TEasingFunction = (
   duration: number
 ) => number;
 
-export interface AnimationOptions<State> extends AnimationBounds<State> {
-  /**
-   * The object this animation is being performed on
-   */
-  target?: unknown;
-
-  /**
-   * Called when the animation starts
-   */
-  onStart?: VoidFunction;
-
-  /**
-   * Called at each frame of the animation
-   */
-  onChange: TOnAnimationChangeCallback<State>;
-
-  /**
-   * Called after the last frame of the animation
-   */
-  onComplete: TOnAnimationChangeCallback<State>;
-
-  /**
-   * Easing function
-   * @default [defaultEasing]
-   */
-  easing: TEasingFunction;
-
-  /**
-   * Function called at each frame.
-   * If it returns true, abort
-   */
-  abort: TAbortCallback<State>;
-
+export type TAnimationBaseOptions<T> = {
   /**
    * Duration of the animation in ms
    * @default 500
@@ -103,38 +43,64 @@ export interface AnimationOptions<State> extends AnimationBounds<State> {
    * @default 0
    */
   delay: number;
-}
 
-export interface AnimationCurrentState<State> {
   /**
-   * Current values
+   * Called when the animation starts
    */
-  currentValue: State;
-  /**
-   * Same as valueRatio from @see TOnAnimationChangeCallback
-   */
-  completionRate: number;
-  /**
-   * Same as completionRatio from @see TOnAnimationChangeCallback
-   */
-  durationRate: number;
-}
+  onStart: VoidFunction;
 
-/**
- * Animation context
- */
-export interface AnimationContext<State>
-  extends Partial<AnimationOptions<State>>,
-    AnimationCurrentState<State> {
   /**
-   * Current function used to cancel the animation
+   * Easing function
+   * @default {defaultEasing}
    */
-  cancel: TCancelFunction;
-}
+  easing: TEasingFunction;
 
-export const isMulti = function isMulti<
-  Single extends Partial<AnimationBounds<number>>,
-  Multi extends Partial<AnimationBounds<number[]>>
->(x: Single | Multi): x is Multi {
-  return Array.isArray(x.startValue);
+  /**
+   * Called at each frame of the animation
+   */
+  onChange: TOnAnimationChangeCallback<T>;
+
+  /**
+   * Called after the last frame of the animation
+   */
+  onComplete: TOnAnimationChangeCallback<T>;
+
+  /**
+   * Function called at each frame.
+   * If it returns true, abort
+   */
+  abort: TAbortCallback<T>;
+
+  /**
+   * The object this animation is being performed on
+   */
+  target: unknown;
 };
+
+export type TAnimationValues<T> = {
+  /**
+   * Starting value(s)
+   * @default 0
+   */
+  startValue: T;
+
+  /**
+   * Ending value(s)
+   * @default 100
+   */
+  endValue: T;
+
+  /**
+   * Value(s) to increment/decrement the value(s) by
+   * @default [endValue - startValue]
+   */
+  byValue: T;
+};
+
+export type TAnimationOptions<T extends number | number[]> = Partial<
+  TAnimationValues<T> & TAnimationBaseOptions<T>
+>;
+
+export type AnimationOptions = TAnimationOptions<number>;
+
+export type ArrayAnimationOptions = TAnimationOptions<number[]>;
