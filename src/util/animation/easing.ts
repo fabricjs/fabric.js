@@ -44,10 +44,16 @@ export const defaultEasing: TEasingFunction = (t, b, c, d) =>
   -c * Math.cos((t / d) * halfPI) + c + b;
 
 /**
+ * Cubic easing in
+ */
+export const easeInCubic: TEasingFunction = (t, b, c, d) =>
+  c * (t / d) ** 3 + b;
+
+/**
  * Cubic easing out
  */
 export const easeOutCubic: TEasingFunction = (t, b, c, d) =>
-  c * ((t /= d - 1) * t ** 2 + 1) + b;
+  c * ((t / d - 1) ** 3 + 1) + b;
 
 /**
  * Cubic easing in and out
@@ -57,7 +63,7 @@ export const easeInOutCubic: TEasingFunction = (t, b, c, d) => {
   if (t < 1) {
     return (c / 2) * t ** 3 + b;
   }
-  return (c / 2) * ((t -= 2) * t ** 2 + 2) + b;
+  return (c / 2) * ((t - 2) ** 3 + 2) + b;
 };
 
 /**
@@ -87,13 +93,13 @@ export const easeInOutQuart: TEasingFunction = (t, b, c, d) => {
  * Quintic easing in
  */
 export const easeInQuint: TEasingFunction = (t, b, c, d) =>
-  c * (t /= d) * t ** 4 + b;
+  c * (t / d) ** 5 + b;
 
 /**
  * Quintic easing out
  */
 export const easeOutQuint: TEasingFunction = (t, b, c, d) =>
-  c * ((t /= d - 1) * t ** 4 + 1) + b;
+  c * ((t / d - 1) ** 5 + 1) + b;
 
 /**
  * Quintic easing in and out
@@ -103,7 +109,7 @@ export const easeInOutQuint: TEasingFunction = (t, b, c, d) => {
   if (t < 1) {
     return (c / 2) * t ** 5 + b;
   }
-  return (c / 2) * ((t -= 2) * t ** 4 + 2) + b;
+  return (c / 2) * ((t - 2) ** 5 + 2) + b;
 };
 
 /**
@@ -326,9 +332,3 @@ export const easeInOutQuad: TEasingFunction = (t, b, c, d) => {
   }
   return (-c / 2) * (--t * (t - 2) - 1) + b;
 };
-
-/**
- * Cubic easing in
- */
-export const easeInCubic: TEasingFunction = (t, b, c, d) =>
-  c * (t /= d) * t * t + b;

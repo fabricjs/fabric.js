@@ -113,6 +113,22 @@
     });
   });
 
+  QUnit.test('byValue', function (assert) {
+    var done = assert.async();
+    fabric.util.animate({
+      startValue: 0,
+      byValue: 10,
+      endValue: 5,
+      duration: 16,
+      onComplete: function (val, changePerc, timePerc) {
+        assert.equal(val, 10, 'endValue is ignored');
+        assert.equal(changePerc, 1, 'change percentage is 100%');
+        assert.equal(timePerc, 1, 'time percentage is 100%');
+        done();
+      }
+    });
+  });
+
   QUnit.test('animation context', function (assert) {
     var done = assert.async();
     var options = { foo: 'bar' };
