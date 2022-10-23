@@ -1,6 +1,7 @@
 import { Color } from '../../color';
 import { TColorAlphaSource } from '../../color/color.class';
 import { noop } from '../../constants';
+import { capValue } from '../misc/capValue';
 import { AnimationBase } from './AnimationBase';
 import { ColorAnimationOptions, TOnAnimationChangeCallback } from './types';
 
@@ -13,6 +14,7 @@ export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
   constructor({
     startValue,
     endValue,
+    byValue,
     easing = (currentTime, startValue, byValue, duration) => {
       const durationRate =
         1 - Math.cos((currentTime / duration) * (Math.PI / 2));
@@ -29,9 +31,13 @@ export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
       ...options,
       startValue: startColor,
       endValue: endColor,
-      byValue: endColor.map(
-        (value, i) => value - startColor[i]
-      ) as TColorAlphaSource,
+      byValue: byValue
+        ? new Color(byValue)
+            .setAlpha(Array.isArray(byValue) && byValue[3] ? byValue[3] : 0)
+            .getSource()
+        : (endColor.map(
+            (value, i) => value - startColor[i]
+          ) as TColorAlphaSource),
       easing,
       onChange: wrapColorCallback(onChange),
       onComplete: wrapColorCallback(onComplete),
@@ -43,7 +49,7 @@ export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
       this.easing(currentTime, value, this.byValue[i], this.duration, i)
     ) as TColorAlphaSource;
     return {
-      value: [r, g, b, a] as TColorAlphaSource,
+      value: [r, g, b, capValue(0, a, 1)] as TColorAlphaSource,
       changeRate:
         // to correctly calculate the change rate we must find a changed value
         [r, g, b]

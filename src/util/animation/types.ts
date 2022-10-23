@@ -117,7 +117,8 @@ export type AnimationOptions = TAnimationOptions<number>;
 
 export type ArrayAnimationOptions = TAnimationOptions<number[]>;
 
-export type ColorAnimationOptions = Omit<
-  TAnimationOptions<TColorArg, string, number[]>,
-  'byValue'
+export type ColorAnimationOptions = TAnimationOptions<
+  TColorArg,
+  string,
+  number[]
 >;

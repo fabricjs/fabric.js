@@ -49,6 +49,69 @@
     });
   });
   
+  QUnit.test.only('animateColor byValue', function (assert) {
+    var done = assert.async();
+    fabric.util.animateColor({
+      startValue: 'red',
+      byValue: 'blue',
+      duration: 16,
+      onComplete: function (val, changePerc, timePerc) {
+        assert.equal(val, 'rgba(255,0,255,1)', 'color is magenta');
+        assert.equal(changePerc, 1, 'change percentage is 100%');
+        assert.equal(timePerc, 1, 'time percentage is 100%');
+        done();
+      }
+    });
+  });
+
+  QUnit.test.only('animateColor byValue with ignored opacity', function (assert) {
+    var done = assert.async();
+    fabric.util.animateColor({
+      startValue: 'rgba(255,0,0,0.5)',
+      byValue: 'rgba(0,0,255,0.5)',
+      duration: 16,
+      onComplete: function (val, changePerc, timePerc) {
+        assert.equal(val, 'rgba(255,0,255,1)', 'color is magenta');
+        assert.equal(changePerc, 1, 'change percentage is 100%');
+        assert.equal(timePerc, 1, 'time percentage is 100%');
+        done();
+      }
+    });
+  });
+
+  QUnit.test.only('animateColor byValue with opacity', function (assert) {
+    var done = assert.async();
+    fabric.util.animateColor({
+      startValue: 'red',
+      byValue: [0, 0, 255, -0.5],
+      duration: 16,
+      onComplete: function (val, changePerc, timePerc) {
+        assert.equal(val, 'rgba(255,0,255,0.5)', 'color is magenta');
+        assert.equal(changePerc, 1, 'change percentage is 100%');
+        assert.equal(timePerc, 1, 'time percentage is 100%');
+        done();
+      }
+    });
+  });
+
+  QUnit.test.only('animateColor byValue with wrong opacity is ignored', function (assert) {
+    var done = assert.async();
+    fabric.util.animateColor({
+      startValue: 'red',
+      byValue: [0, 0, 255, 0.5],
+      duration: 16,
+      onChange: val => {
+        assert.equal(new fabric.Color(val).getAlpha(), 1, 'alpha diff should be ignored')
+      },
+      onComplete: function (val, changePerc, timePerc) {
+        assert.equal(val, 'rgba(255,0,255,1)', 'color is magenta');
+        assert.equal(changePerc, 1, 'change percentage is 100%');
+        assert.equal(timePerc, 1, 'time percentage is 100%');
+        done();
+      }
+    });
+  });
+
   // QUnit.test('fabric.util.animate', function(assert) {
   //   var done = assert.async();
   //   function testing(val) {
