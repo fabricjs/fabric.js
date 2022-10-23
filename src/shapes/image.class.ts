@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { FabricObject } from './object.class';
+
 (function (global) {
   var fabric = global.fabric,
     extend = fabric.util.object.extend;
@@ -10,7 +12,7 @@
    * @see {@link fabric.Image#initialize} for constructor definition
    */
   fabric.Image = fabric.util.createClass(
-    fabric.Object,
+    FabricObject,
     /** @lends fabric.Image.prototype */ {
       /**
        * Type of an object
@@ -80,7 +82,7 @@
        * as well as for history (undo/redo) purposes
        * @type Array
        */
-      stateProperties: fabric.Object.prototype.stateProperties.concat(
+      stateProperties: FabricObject.prototype.stateProperties.concat(
         'cropX',
         'cropY'
       ),
@@ -92,7 +94,7 @@
        * and refreshed at the next render
        * @type Array
        */
-      cacheProperties: fabric.Object.prototype.cacheProperties.concat(
+      cacheProperties: FabricObject.prototype.cacheProperties.concat(
         'cropX',
         'cropY'
       ),
@@ -143,7 +145,7 @@
       initialize: function (element, options) {
         options || (options = {});
         this.filters = [];
-        this.cacheKey = 'texture' + fabric.Object.__uid++;
+        this.cacheKey = 'texture' + FabricObject.__uid++;
         this.callSuper('initialize', options);
         this._initElement(element, options);
       },
@@ -313,7 +315,7 @@
           return [];
         }
         if (this.hasCrop()) {
-          var clipPathId = fabric.Object.__uid++;
+          var clipPathId = FabricObject.__uid++;
           svgString.push(
             '<clipPath id="imageCrop_' + clipPathId + '">\n',
             '\t<rect x="' +
@@ -570,7 +572,7 @@
        */
       drawCacheOnCanvas: function (ctx) {
         ctx.imageSmoothingEnabled = this.imageSmoothing;
-        fabric.Object.prototype.drawCacheOnCanvas.call(this, ctx);
+        FabricObject.prototype.drawCacheOnCanvas.call(this, ctx);
       },
 
       /**

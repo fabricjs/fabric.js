@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { fabric } from '../../HEADER';
+import { FabricObject } from './object.class';
 
 const degreesToRadians = fabric.util.degreesToRadians;
 
@@ -10,14 +11,14 @@ const degreesToRadians = fabric.util.degreesToRadians;
  * @see {@link Circle#initialize} for constructor definition
  */
 const Circle = fabric.util.createClass(
-  fabric.Object,
+  FabricObject,
   /** @lends Circle.prototype */ {
     /**
      * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
      * as well as for history (undo/redo) purposes
      * @type Array
      */
-    stateProperties: fabric.Object.prototype.stateProperties.concat(
+    stateProperties: FabricObject.prototype.stateProperties.concat(
       'radius',
       'startAngle',
       'endAngle'
@@ -53,7 +54,7 @@ const Circle = fabric.util.createClass(
      */
     endAngle: 360,
 
-    cacheProperties: fabric.Object.prototype.cacheProperties.concat(
+    cacheProperties: FabricObject.prototype.cacheProperties.concat(
       'radius',
       'startAngle',
       'endAngle'
@@ -225,8 +226,7 @@ Circle.fromElement = function (element, callback) {
  * @param {Object} object Object to create an instance from
  * @returns {Promise<Circle>}
  */
-Circle.fromObject = (object) =>
-  fabric.Object._fromObject(fabric.Circle, object);
+Circle.fromObject = (object) => FabricObject._fromObject(fabric.Circle, object);
 
 fabric.Circle = Circle;
 export { Circle };

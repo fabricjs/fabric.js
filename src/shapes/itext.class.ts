@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { FabricObject } from './object.class';
+
 (function (global) {
   var fabric = global.fabric;
   /**
@@ -6,7 +8,6 @@
    * prefix when observing canvas.
    * @class fabric.IText
    * @extends fabric.Text
-   * @mixes fabric.Observable
    *
    * @fires changed
    * @fires selection:changed
@@ -55,7 +56,6 @@
    */
   fabric.IText = fabric.util.createClass(
     fabric.Text,
-    fabric.Observable,
     /** @lends fabric.IText.prototype */ {
       /**
        * Type of an object
@@ -628,7 +628,7 @@
     var styles = fabric.util.stylesFromArray(object.styles, object.text);
     //copy object to prevent mutation
     var objCopy = Object.assign({}, object, { styles: styles });
-    return fabric.Object._fromObject(fabric.IText, objCopy, {
+    return FabricObject._fromObject(fabric.IText, objCopy, {
       extraParam: 'text',
     });
   };

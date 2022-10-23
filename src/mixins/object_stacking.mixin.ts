@@ -1,9 +1,11 @@
 //@ts-nocheck
+import { FabricObject } from '../shapes/object.class';
+
 (function (global) {
   var fabric = global.fabric;
   fabric.util.object.extend(
-    fabric.Object.prototype,
-    /** @lends fabric.Object.prototype */ {
+    FabricObject.prototype,
+    /** @lends FabricObject.prototype */ {
       /**
        * Moves an object to the bottom of the stack of drawn objects
        * @return {fabric.Object} thisArg
