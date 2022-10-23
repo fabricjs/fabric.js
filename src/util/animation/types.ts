@@ -98,12 +98,14 @@ export type TAnimationValues<T> = {
 
   /**
    * Ending value(s)
+   * Ignored if `byValue` exists
    * @default 100
    */
   endValue: T;
 
   /**
    * Difference between the start value(s) to the end value(s)
+   * Overrides `endValue`
    * @default [endValue - startValue]
    */
   byValue: T;
