@@ -48,11 +48,12 @@ export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
     const [r, g, b, a] = this.startValue.map((value, i) =>
       this.easing(currentTime, value, this.byValue[i], this.duration, i)
     ) as TColorAlphaSource;
+    const rgb = [r, g, b].map(Math.round);
     return {
-      value: [r, g, b, capValue(0, a, 1)] as TColorAlphaSource,
+      value: [...rgb, capValue(0, a, 1)] as TColorAlphaSource,
       changeRate:
         // to correctly calculate the change rate we must find a changed value
-        [r, g, b]
+        rgb
           .map((p, i) =>
             this.byValue[i] !== 0
               ? Math.abs((p - this.startValue[i]) / this.byValue[i])
