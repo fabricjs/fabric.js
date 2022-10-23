@@ -60,7 +60,7 @@ export abstract class AnimationBase<T extends number | number[]> {
     abort = noop,
     target,
   }: Partial<TAnimationBaseOptions<T> & TAnimationCallbacks<T>> &
-    Omit<TAnimationValues<T>, 'endValue'>) {
+    Required<Omit<TAnimationValues<T>, 'endValue'>>) {
     this.startValue = startValue;
     this.byValue = byValue;
     this.duration = duration;
