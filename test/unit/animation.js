@@ -37,19 +37,20 @@
 
   QUnit.test('animateColor change percentage is calculated from a changed value', function (assert) {
     const done = assert.async();
+    let called = false;
     fabric.util.animateColor({
       startValue: 'red',
       endValue: 'magenta',
       duration: 96,
-      onChange: function (val, changePerc, timePerc) {
-        const durationRate = 1 - Math.cos(timePerc * (Math.PI / 2));
-        changePerc !== 1 && assert.equal(changePerc, durationRate, 'change percentage should equal time percentage');
+      onChange: function (val, changePerc) {
+        called && assert.ok(changePerc !== 0, 'change percentage');
+        called = true;
       },
       onComplete: done,
     });
   });
   
-  QUnit.test.only('animateColor byValue', function (assert) {
+  QUnit.test('animateColor byValue', function (assert) {
     var done = assert.async();
     fabric.util.animateColor({
       startValue: 'red',
@@ -64,14 +65,14 @@
     });
   });
 
-  QUnit.test.only('animateColor byValue with ignored opacity', function (assert) {
+  QUnit.test('animateColor byValue with ignored opacity', function (assert) {
     var done = assert.async();
     fabric.util.animateColor({
       startValue: 'rgba(255,0,0,0.5)',
       byValue: 'rgba(0,0,255,0.5)',
       duration: 16,
       onComplete: function (val, changePerc, timePerc) {
-        assert.equal(val, 'rgba(255,0,255,1)', 'color is magenta');
+        assert.equal(val, 'rgba(255,0,255,0.5)', 'color is magenta');
         assert.equal(changePerc, 1, 'change percentage is 100%');
         assert.equal(timePerc, 1, 'time percentage is 100%');
         done();
@@ -79,7 +80,7 @@
     });
   });
 
-  QUnit.test.only('animateColor byValue with opacity', function (assert) {
+  QUnit.test('animateColor byValue with opacity', function (assert) {
     var done = assert.async();
     fabric.util.animateColor({
       startValue: 'red',
@@ -94,7 +95,7 @@
     });
   });
 
-  QUnit.test.only('animateColor byValue with wrong opacity is ignored', function (assert) {
+  QUnit.test('animateColor byValue with wrong opacity is ignored', function (assert) {
     var done = assert.async();
     fabric.util.animateColor({
       startValue: 'red',
@@ -111,23 +112,6 @@
       }
     });
   });
-
-  // QUnit.test('fabric.util.animate', function(assert) {
-  //   var done = assert.async();
-  //   function testing(val) {
-  //     assert.notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
-  //     assert.ok(typeof val === 'String');
-  //   }
-  //   assert.ok(typeof fabric.util.animate === 'function', 'fabric.util.animate is a function');
-  //   fabric.util.animate('red', 'blue', 16, {
-  //     onComplete: function() {
-  //       // animate color need some fixing
-  //       // assert.equal(val, 'rgba(0,0,255,1)', 'color is blue')
-  //       done();
-  //     },
-  //     onChange: testing,
-  //   });
-  // });
 
   QUnit.test('animation context', function (assert) {
     var done = assert.async();
