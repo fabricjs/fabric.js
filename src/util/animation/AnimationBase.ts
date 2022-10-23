@@ -9,6 +9,7 @@ import {
   TEasingFunction,
   TOnAnimationChangeCallback,
   TAnimationCallbacks,
+  AnimationState,
 } from './types';
 
 export abstract class AnimationBase<T extends number | number[]> {
@@ -26,7 +27,7 @@ export abstract class AnimationBase<T extends number | number[]> {
    */
   readonly target?: unknown;
 
-  private _state: 'pending' | 'running' | 'completed' | 'aborted' = 'pending';
+  private _state: AnimationState = 'pending';
   /**
    * time %
    */

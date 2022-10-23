@@ -1,5 +1,7 @@
 import { TColorArg } from '../../color/color.class';
 
+export type AnimationState = 'pending' | 'running' | 'completed' | 'aborted';
+
 /**
  * Callback called every frame
  * @param {number | number[]} value current value of the animation.
