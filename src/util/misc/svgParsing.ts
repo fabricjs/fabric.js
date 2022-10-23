@@ -89,8 +89,8 @@ export const parseUnit = (value?: string | null, fontSize?: number): number => {
  * @return {fabric.Object|fabric.Group}
  */
 export const groupSVGElements = (
-  elements: Array<typeof fabric.Object>
-): typeof fabric.Object | typeof fabric.Group => {
+  elements: Array<FabricObject>
+): FabricObject | typeof fabric.Group => {
   if (elements && elements.length === 1) {
     return elements[0];
   }

@@ -20,7 +20,7 @@ import {
 } from './elements_parser';
 
 export type TParseSVGDocumentCallback = (
-  instances: typeof fabric.Object,
+  instances: FabricObject[],
   options: ElementsParserOptions,
   elements?: Element[],
   descendants?: Element[]

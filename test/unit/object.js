@@ -19,7 +19,7 @@
   });
 
   QUnit.test('constructor & properties', function(assert) {
-    assert.ok(typeof fabric.Object === 'function');
+    assert.ok(FabricObject === 'function');
 
     var cObj = new fabric.Object();
 
