@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { FabricObject } from './object.class';
+
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
     extend = fabric.util.object.extend,
@@ -49,7 +51,7 @@
        */
       y2: 0,
 
-      cacheProperties: fabric.Object.prototype.cacheProperties.concat(
+      cacheProperties: FabricObject.prototype.cacheProperties.concat(
         'x1',
         'x2',
         'y1',
@@ -301,7 +303,7 @@
   fabric.Line.fromObject = function (object) {
     var options = clone(object, true);
     options.points = [object.x1, object.y1, object.x2, object.y2];
-    return fabric.Object._fromObject(fabric.Line, options, {
+    return FabricObject._fromObject(fabric.Line, options, {
       extraParam: 'points',
     }).then(function (fabricLine) {
       delete fabricLine.points;

@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { fabric } from '../../../HEADER';
 import { cos } from './cos';
 import { sin } from './sin';
@@ -6,7 +5,7 @@ import {
   rotateVector,
   createVector,
   calcAngleBetweenVectors,
-  getHatVector,
+  getUnitVector,
   getBisector,
 } from './vectors';
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
@@ -106,7 +105,7 @@ fabric.util = {
   rotateVector,
   createVector,
   calcAngleBetweenVectors,
-  getHatVector,
+  getUnitVector,
   getBisector,
   degreesToRadians,
   radiansToDegrees,

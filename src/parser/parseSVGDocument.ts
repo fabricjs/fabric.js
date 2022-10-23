@@ -25,6 +25,7 @@ export type TParseSVGDocumentCallback = (
   elements?: Element[],
   descendants?: Element[]
 ) => void;
+import { FabricObject } from '../shapes/object.class';
 
 /**
  * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
@@ -57,7 +58,7 @@ export function parseSVGDocument(
   }
   parseUseDirectives(doc);
 
-  const svgUid = fabric.Object.__uid++,
+  const svgUid = FabricObject.__uid++,
     options: ElementsParserParsingOptions = applyViewboxTransform(doc);
   let descendants = Array.from(doc.getElementsByTagName('*'));
   options.crossOrigin = parsingOptions && parsingOptions.crossOrigin;
