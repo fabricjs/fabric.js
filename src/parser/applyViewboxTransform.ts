@@ -5,6 +5,7 @@ import {
 } from '../util/misc/svgParsing';
 import { svgViewBoxElementsRegEx, reViewBoxAttrValue } from './constants';
 
+// TODO: get a better name
 export type TParsedViewBoxDims = {
   /**
    * If the viewbox is not parsed
