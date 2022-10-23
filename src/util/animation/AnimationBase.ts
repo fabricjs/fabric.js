@@ -112,7 +112,8 @@ export abstract class AnimationBase<T extends number | number[]> {
       this.state = 'aborted';
       this.unregister();
     } else if (durationMs >= this.duration) {
-      // calculate end value in since both byValue and endValue are populated with defaults if missing
+      // since both byValue and endValue are populated with defaults if missing,
+      //  we must calculate end value
       // this means that if both byValue and endValue are passed in options endValue will be ignored
       const { value: endValue } = this.calculate(this.duration);
       this.durationRate = this.valueRate = 1;
