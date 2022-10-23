@@ -13,7 +13,6 @@ import {
 
 export abstract class AnimationBase<T extends number | number[]> {
   readonly startValue: T;
-  readonly endValue: T;
   readonly byValue: T;
   readonly duration: number;
   readonly delay: number;
@@ -45,9 +44,12 @@ export abstract class AnimationBase<T extends number | number[]> {
    */
   private startTime!: number;
 
+  /**
+   * since both `byValue` and `endValue` are accepted in subclass options and are populated with defaults if missing,
+   * we defer to `byValue` and ignore `endValue` to avoid conflict
+   */
   constructor({
     startValue,
-    endValue,
     byValue,
     duration = 500,
     delay = 0,
@@ -58,9 +60,8 @@ export abstract class AnimationBase<T extends number | number[]> {
     abort = noop,
     target,
   }: Partial<TAnimationBaseOptions<T> & TAnimationCallbacks<T>> &
-    TAnimationValues<T>) {
+    Omit<TAnimationValues<T>, 'endValue'>) {
     this.startValue = startValue;
-    this.endValue = endValue;
     this.byValue = byValue;
     this.duration = duration;
     this.delay = delay;
@@ -75,6 +76,10 @@ export abstract class AnimationBase<T extends number | number[]> {
 
   get state() {
     return this._state;
+  }
+
+  get endValue() {
+    return this.calculate(this.duration).value;
   }
 
   protected abstract calculate(currentTime: number): {
@@ -116,10 +121,7 @@ export abstract class AnimationBase<T extends number | number[]> {
       this._state = 'aborted';
       this.unregister();
     } else if (durationMs >= this.duration) {
-      // since both byValue and endValue are populated with defaults if missing,
-      //  we must calculate end value
-      // this means that if both byValue and endValue are passed in options endValue will be ignored
-      const { value: endValue } = this.calculate(this.duration);
+      const endValue = this.endValue;
       this.durationRate = this.valueRate = 1;
       this._onChange(
         (Array.isArray(endValue) ? endValue.slice() : endValue) as T,

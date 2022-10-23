@@ -30,7 +30,6 @@ export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
     super({
       ...options,
       startValue: startColor,
-      endValue: endColor,
       byValue: byValue
         ? new Color(byValue)
             .setAlpha(Array.isArray(byValue) && byValue[3] ? byValue[3] : 0)

@@ -11,7 +11,6 @@ export class ArrayAnimation extends AnimationBase<number[]> {
     super({
       ...options,
       startValue,
-      endValue,
       byValue,
     });
   }

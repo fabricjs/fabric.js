@@ -11,7 +11,6 @@ export class Animation extends AnimationBase<number> {
     super({
       ...options,
       startValue,
-      endValue,
       byValue,
     });
   }
