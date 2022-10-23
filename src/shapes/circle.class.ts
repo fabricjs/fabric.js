@@ -56,7 +56,6 @@ const Circle = fabric.util.createClass(
 
     /**
      * Specify whether the drawing should be counterclockwise or clockwise
-     * probably will change to degrees in next major version
      * @type Boolean
      * @default false
      */
