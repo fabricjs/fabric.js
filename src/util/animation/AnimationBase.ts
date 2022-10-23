@@ -27,7 +27,7 @@ export abstract class AnimationBase<T extends number | number[]> {
    */
   readonly target?: unknown;
 
-  state: 'pending' | 'running' | 'completed' | 'aborted' = 'pending';
+  private _state: 'pending' | 'running' | 'completed' | 'aborted' = 'pending';
   /**
    * time %
    */
@@ -73,6 +73,10 @@ export abstract class AnimationBase<T extends number | number[]> {
     this.target = target;
   }
 
+  get state() {
+    return this._state;
+  }
+
   protected abstract calculate(currentTime: number): {
     value: T;
     changeRate: number;
@@ -80,9 +84,9 @@ export abstract class AnimationBase<T extends number | number[]> {
 
   start() {
     const firstTick: FrameRequestCallback = (timestamp) => {
-      if (this.state !== 'pending') return;
+      if (this._state !== 'pending') return;
       this.startTime = timestamp || +new Date();
-      this.state = 'running';
+      this._state = 'running';
       this._onStart();
       this.tick(this.startTime);
     };
@@ -106,10 +110,10 @@ export abstract class AnimationBase<T extends number | number[]> {
     this.value = Array.isArray(value) ? (value.slice() as T) : value;
     this.valueRate = changeRate;
 
-    if (this.state === 'aborted') {
+    if (this._state === 'aborted') {
       return;
     } else if (this._abort(value, this.valueRate, this.durationRate)) {
-      this.state = 'aborted';
+      this._state = 'aborted';
       this.unregister();
     } else if (durationMs >= this.duration) {
       // since both byValue and endValue are populated with defaults if missing,
@@ -122,7 +126,7 @@ export abstract class AnimationBase<T extends number | number[]> {
         this.valueRate,
         this.durationRate
       );
-      this.state = 'completed';
+      this._state = 'completed';
       this._onComplete(endValue, this.valueRate, this.durationRate);
       this.unregister();
     } else {
@@ -140,7 +144,7 @@ export abstract class AnimationBase<T extends number | number[]> {
   }
 
   abort() {
-    this.state = 'aborted';
+    this._state = 'aborted';
     this.unregister();
   }
 }
