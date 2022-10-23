@@ -31,11 +31,11 @@ export abstract class AnimationBase<T extends number | number[]> {
   /**
    * time %
    */
-  durationRate = 0;
+  durationRatio = 0;
   /**
    * value %
    */
-  valueRate = 0;
+  valueRatio = 0;
   /**
    * current value
    */
@@ -111,29 +111,29 @@ export abstract class AnimationBase<T extends number | number[]> {
   private tick: FrameRequestCallback = (t) => {
     const durationMs = (t || +new Date()) - this.startTime;
     const boundDurationMs = Math.min(durationMs, this.duration);
-    this.durationRate = boundDurationMs / this.duration;
+    this.durationRatio = boundDurationMs / this.duration;
     const { value, changeRate } = this.calculate(boundDurationMs);
     this.value = Array.isArray(value) ? (value.slice() as T) : value;
-    this.valueRate = changeRate;
+    this.valueRatio = changeRate;
 
     if (this._state === 'aborted') {
       return;
-    } else if (this._abort(value, this.valueRate, this.durationRate)) {
+    } else if (this._abort(value, this.valueRatio, this.durationRatio)) {
       this._state = 'aborted';
       this.unregister();
     } else if (durationMs >= this.duration) {
       const endValue = this.endValue;
-      this.durationRate = this.valueRate = 1;
+      this.durationRatio = this.valueRatio = 1;
       this._onChange(
         (Array.isArray(endValue) ? endValue.slice() : endValue) as T,
-        this.valueRate,
-        this.durationRate
+        this.valueRatio,
+        this.durationRatio
       );
       this._state = 'completed';
-      this._onComplete(endValue, this.valueRate, this.durationRate);
+      this._onComplete(endValue, this.valueRatio, this.durationRatio);
       this.unregister();
     } else {
-      this._onChange(value, this.valueRate, this.durationRate);
+      this._onChange(value, this.valueRatio, this.durationRatio);
       requestAnimFrame(this.tick);
     }
   };
