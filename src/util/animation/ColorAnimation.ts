@@ -39,12 +39,20 @@ export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
     });
   }
   protected calculate(currentTime: number) {
-    const rgba = this.startValue.map((value, i) =>
+    const [r, g, b, a] = this.startValue.map((value, i) =>
       this.easing(currentTime, value, this.byValue[i], this.duration, i)
     ) as TColorAlphaSource;
     return {
-      value: rgba,
-      changeRate: Math.abs((rgba[0] - this.startValue[0]) / this.byValue[0]),
+      value: [r, g, b, a] as TColorAlphaSource,
+      changeRate:
+        // to correctly calculate the change rate we must find a changed value
+        [r, g, b]
+          .map((p, i) =>
+            this.byValue[i] !== 0
+              ? Math.abs((p - this.startValue[i]) / this.byValue[i])
+              : 0
+          )
+          .find((p) => p !== 0) || 0,
     };
   }
 }

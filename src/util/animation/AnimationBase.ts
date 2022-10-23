@@ -112,6 +112,7 @@ export abstract class AnimationBase<T extends number | number[]> {
       this.state = 'aborted';
       this.unregister();
     } else if (durationMs >= this.duration) {
+      // eliminate rounding issues
       this.durationRate = this.valueRate = 1;
       this._onChange(
         (Array.isArray(this.endValue)
