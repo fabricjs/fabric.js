@@ -89,27 +89,33 @@ export type TAnimationCallbacks<T> = {
   abort: TAbortCallback<T>;
 };
 
-export type TAnimationValues<T> = {
-  /**
-   * Starting value(s)
-   * @default 0
-   */
-  startValue: T;
-
-  /**
-   * Ending value(s)
-   * Ignored if `byValue` exists
-   * @default 100
-   */
-  endValue: T;
-
-  /**
-   * Difference between the start value(s) to the end value(s)
-   * Overrides `endValue`
-   * @default [endValue - startValue]
-   */
-  byValue: T;
-};
+export type TAnimationValues<T> =
+  | {
+      /**
+       * Starting value(s)
+       * @default 0
+       */
+      startValue: T;
+    } & (
+      | {
+          /**
+           * Ending value(s)
+           * Ignored if `byValue` exists
+           * @default 100
+           */
+          endValue: T;
+          byValue?: never;
+        }
+      | {
+          /**
+           * Difference between the start value(s) to the end value(s)
+           * Overrides `endValue`
+           * @default [endValue - startValue]
+           */
+          byValue: T;
+          endValue?: never;
+        }
+    );
 
 export type TAnimationOptions<T, C = T, E = T> = Partial<
   TAnimationBaseOptions<E> & TAnimationValues<T> & TAnimationCallbacks<C>
