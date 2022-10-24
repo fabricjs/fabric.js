@@ -45,15 +45,17 @@ const isArrayAnimation = (
  */
 export const animate = <
   T extends AnimationOptions | ArrayAnimationOptions,
-  R = T extends ArrayAnimationOptions ? ArrayAnimation : Animation
+  R extends T extends ArrayAnimationOptions ? ArrayAnimation : Animation
 >(
   options: T
 ): R => {
-  const animation = isArrayAnimation(options)
-    ? new ArrayAnimation(options)
-    : new Animation(options);
+  const animation = (
+    isArrayAnimation(options)
+      ? new ArrayAnimation(options)
+      : new Animation(options)
+  ) as R;
   animation.start();
-  return animation as R;
+  return animation;
 };
 
 export const animateColor = (options: ColorAnimationOptions) => {
