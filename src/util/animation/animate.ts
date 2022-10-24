@@ -43,12 +43,18 @@ const isArrayAnimation = (
  * });
  *
  */
-export const animate = (options: AnimationOptions | ArrayAnimationOptions) => {
-  const animation = isArrayAnimation(options)
-    ? new ArrayAnimation(options)
-    : new Animation(options);
+export const animate = <
+  T extends AnimationOptions | ArrayAnimationOptions,
+  R = T extends ArrayAnimationOptions ? ArrayAnimation : Animation
+>(
+  options?: T
+): R => {
+  const opt = options || {};
+  const animation = isArrayAnimation(opt)
+    ? new ArrayAnimation(opt)
+    : new Animation(opt);
   animation.start();
-  return animation;
+  return animation as R;
 };
 
 export const animateColor = (options: ColorAnimationOptions) => {
