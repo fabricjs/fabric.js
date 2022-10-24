@@ -26,12 +26,14 @@ import process from 'node:process';
 import os from 'os';
 import { build } from './build.mjs';
 import { awaitBuild } from './buildLock.mjs';
-import { CLI_CACHE, wd } from './dirname.mjs';
+import { CLI_CACHE, dumpsPath, wd } from './dirname.mjs';
 import { listFiles, transform as transformFiles } from './transform_files.mjs';
 
 const program = new commander.Command();
 
 const websiteDir = path.resolve(wd, '../fabricjs.com');
+
+const TEST_SUITES = ['unit', 'visual', 'ts'];
 
 function execGitCommand(cmd) {
   return cp
@@ -294,7 +296,7 @@ async function runTestem({
 
 /**
  *
- * @param {'unit' | 'visual'} suite
+ * @param {'unit' | 'visual' | 'ts'} suite
  * @param {string[] | null} tests file paths
  * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:string}} [options]
  * @returns {Promise<boolean | undefined>} true if some tests failed
@@ -302,6 +304,19 @@ async function runTestem({
 async function test(suite, tests, options = {}) {
   let failed = false;
   await awaitBuild();
+
+  if (suite === 'ts') {
+    console.log(chalk.bold(chalk.blue(`running TS test suite`)));
+    build({
+      fast: true,
+      input: tests || listTestFiles('ts').map((file) => `test/ts/${file}`),
+      output: path.resolve(dumpsPath, 'ts_tests'),
+      report: false,
+      emit: false,
+    });
+    return false;
+  }
+
   const qunitEnv = {
     QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
     QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
@@ -326,7 +341,7 @@ async function test(suite, tests, options = {}) {
         cwd: wd,
         env: {
           ...env,
-          // browser takes precendence in golden ref generation
+          // browser takes precedence in golden ref generation
           ...(browserContexts.length === 0 ? qunitEnv : {}),
         },
         shell: true,
@@ -360,7 +375,7 @@ async function test(suite, tests, options = {}) {
 
 /**
  *
- * @param {'unit'|'visual'} type correspondes to the test directories
+ * @param {'unit'|'visual'|'ts'} type corresponds to the test directories
  * @returns
  */
 function listTestFiles(type) {
@@ -427,11 +442,8 @@ async function selectFileToTransform() {
 
 async function selectTestFile() {
   const selected = readCLIFile();
-  const unitTests = listTestFiles('unit').map((file) =>
-    createChoiceData('unit', file)
-  );
-  const visualTests = listTestFiles('visual').map((file) =>
-    createChoiceData('visual', file)
+  const testChoices = TEST_SUITES.map((suite) =>
+    listTestFiles(suite).map((file) => createChoiceData(suite, file))
   );
   const { tests: filteredTests } = await inquirer.prompt([
     {
@@ -444,32 +456,24 @@ async function selectTestFile() {
       pageSize: Math.max(10, selected.length),
       source(answersSoFar, input = '') {
         return new Promise((resolve) => {
-          const tests = _.concat(unitTests, visualTests);
+          const tests = _.concat(...Object.values(testChoices));
           const value = _.map(this.getCurrentValue(), (value) =>
             createChoiceData(value.type, value.file)
           );
-          if (value.length > 0) {
-            if (
-              value.find(
-                (v) => v.value && v.value.type === 'unit' && !v.value.file
-              )
-            ) {
-              _.pullAll(tests, unitTests);
-            }
-            if (
-              value.find(
-                (v) => v.value && v.value.type === 'visual' && !v.value.file
-              )
-            ) {
-              _.pullAll(tests, visualTests);
-            }
-          }
-          const unitChoice = createChoiceData('unit', '');
-          const visualChoice = createChoiceData('visual', '');
-          !value.find((v) => _.isEqual(v, unitChoice)) &&
-            value.push(unitChoice);
-          !value.find((v) => _.isEqual(v, visualChoice)) &&
-            value.push(visualChoice);
+          value.length > 0 &&
+            TEST_SUITES.forEach((suite) => {
+              if (
+                value.find(
+                  (v) => v.value && v.value.type === suite && !v.value.file
+                )
+              ) {
+                _.pullAll(tests, testChoices[suite]);
+              }
+            });
+          TEST_SUITES.forEach((suite) => {
+            const choice = createChoiceData(suite, '');
+            !value.find((v) => _.isEqual(v, choice)) && value.push(choice);
+          });
           if (value.length > 0) {
             value.unshift(new inquirer.Separator());
             value.push(new inquirer.Separator());
@@ -488,7 +492,7 @@ async function selectTestFile() {
   return filteredTests;
 }
 
-async function runIntreactiveTestSuite(options) {
+async function runInteractiveTestSuite(options) {
   //  some tests fail because of some pollution when run from the same context
   // test(_.map(await selectTestFile(), curr => `test/${curr.type}/${curr.file}`))
   const tests = _.reduce(
@@ -501,7 +505,10 @@ async function runIntreactiveTestSuite(options) {
       }
       return acc;
     },
-    { unit: [], visual: [] }
+    _.zipObject(
+      TEST_SUITES,
+      TEST_SUITES.map(() => [])
+    )
   );
   return Promise.all(
     _.map(tests, (files, suite) => {
@@ -556,7 +563,7 @@ program
   .description('run test suite')
   .addOption(
     new commander.Option('-s, --suite <suite...>', 'test suite to run').choices(
-      ['unit', 'visual']
+      TEST_SUITES
     )
   )
   .option('-f, --file <file>', 'run a specific test file')
@@ -585,7 +592,7 @@ program
       fs.removeSync(CLI_CACHE);
     }
     if (options.all) {
-      options.suite = ['unit', 'visual'];
+      options.suite = TEST_SUITES;
     }
     const results = [];
     if (options.suite) {
@@ -599,13 +606,13 @@ program
     } else if (options.file) {
       results.push(
         await test(
-          options.file.startsWith('visual') ? 'visual' : 'unit',
+          options.file.split(/\\|\//)[0],
           [`test/${options.file}`],
           options
         )
       );
     } else {
-      results.push(...(await runIntreactiveTestSuite(options)));
+      results.push(...(await runInteractiveTestSuite(options)));
     }
     if (_.some(results)) {
       // inform ci that tests have failed

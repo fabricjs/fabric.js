@@ -10,18 +10,27 @@ import { wd } from './dirname.mjs';
  * @see https://rollupjs.org/guide/en/#--watchonstart-cmd---watchonbundlestart-cmd---watchonbundleend-cmd---watchonend-cmd---watchonerror-cmd
  * @param {*} options
  */
-export function build({ watch, fast, input, output } = {}) {
+export function build({
+  watch,
+  fast,
+  input,
+  output,
+  report = true,
+  emit = true,
+} = {}) {
   const cmd = [
     'rollup',
     '-c',
     watch ? '--watch' : '',
     '--no-watch.clearScreen',
-    ...['onStart', 'onError', 'onEnd'].map(
-      (type) =>
-        `--watch.${type} "node ./scripts/buildReporter.mjs ${type
-          .toLowerCase()
-          .slice(2)}"`
-    ),
+    ...(report
+      ? [('onStart', 'onError', 'onEnd')].map(
+          (type) =>
+            `--watch.${type} "node ./scripts/buildReporter.mjs ${type
+              .toLowerCase()
+              .slice(2)}"`
+        )
+      : []),
   ].join(' ');
   const processOptions = {
     stdio: 'inherit',
@@ -30,15 +39,16 @@ export function build({ watch, fast, input, output } = {}) {
     env: {
       ...process.env,
       MINIFY: Number(!fast),
-      BUILD_INPUT: input,
+      BUILD_INPUT: Array.isArray(input) ? input.join(',') : input,
       BUILD_OUTPUT: output,
       BUILD_MIN_OUTPUT:
-        output && !fast
+        output && !Array.isArray(input) && !fast
           ? path.resolve(
               path.dirname(output),
               `${path.basename(output, '.js')}.min.js`
             )
           : undefined,
+      NO_EMIT: Number(!emit),
     },
   };
   if (watch) {
