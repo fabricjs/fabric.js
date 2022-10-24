@@ -51,3 +51,22 @@ jobs:
         run: npm run build -- -f
       - name: Run ${{ matrix.suite }} tests
         run: npm run test -- -c node -s ${{ matrix.suite }}
+  ts:
+    runs-on: ubuntu-latest
+    name: TS tests
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [18.x]
+        ts: [4.0, 4.9]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - name: Build
+        run: npm run build -- -f
+      - name: Run tests
+        run: npm run test -- -s ts
