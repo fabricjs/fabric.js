@@ -34,8 +34,8 @@ const arrayContext = animate({
   byValue: [1],
   onChange(a, b, c) {
     assertStrict<typeof a, number[]>(true);
-    assertStrict<typeof b, number[]>(true);
-    assertStrict<typeof c, number[]>(true);
+    assertStrict<typeof b, number>(true);
+    assertStrict<typeof c, number>(true);
   },
 });
 
