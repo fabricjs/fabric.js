@@ -47,12 +47,11 @@ export const animate = <
   T extends AnimationOptions | ArrayAnimationOptions,
   R = T extends ArrayAnimationOptions ? ArrayAnimation : Animation
 >(
-  options?: T
+  options: T
 ): R => {
-  const opt = options || {};
-  const animation = isArrayAnimation(opt)
-    ? new ArrayAnimation(opt)
-    : new Animation(opt);
+  const animation = isArrayAnimation(options)
+    ? new ArrayAnimation(options)
+    : new Animation(options);
   animation.start();
   return animation as R;
 };
