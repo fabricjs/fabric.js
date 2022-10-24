@@ -17,6 +17,7 @@ export abstract class AnimationBase<
 > {
   readonly startValue: T;
   readonly byValue: T;
+  readonly endValue: T;
   readonly duration: number;
   readonly delay: number;
   protected readonly easing: TEasingFunction<T>;
@@ -64,8 +65,6 @@ export abstract class AnimationBase<
     target,
   }: Partial<TAnimationBaseOptions<T> & TAnimationCallbacks<T>> &
     Required<Omit<TAnimationValues<T>, 'endValue'>>) {
-    this.startValue = startValue;
-    this.byValue = byValue;
     this.duration = duration;
     this.delay = delay;
     this.easing = easing;
@@ -73,16 +72,16 @@ export abstract class AnimationBase<
     this._onChange = onChange;
     this._onComplete = onComplete;
     this._abort = abort;
-    this.value = this.startValue;
     this.target = target;
+
+    this.startValue = startValue;
+    this.byValue = byValue;
+    this.value = this.startValue;
+    this.endValue = this.calculate(this.duration).value;
   }
 
   get state() {
     return this._state;
-  }
-
-  get endValue() {
-    return this.calculate(this.duration).value;
   }
 
   protected abstract calculate(timeElapsed: number): {
