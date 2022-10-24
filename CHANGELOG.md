@@ -2,6 +2,7 @@
 
 ## [next]
 
+- docs(): add link to contributing guide [#8393](https://github.com/fabricjs/fabric.js/pull/8393)
 - chore(TS): convert object to es6 class [#8322](https://github.com/fabricjs/fabric.js/pull/8322)
 - docs(): guides follow up, feature request template [#8379](https://github.com/fabricjs/fabric.js/pull/8379)
 - docs(): refactor guides, bug report template [#8189](https://github.com/fabricjs/fabric.js/pull/8189)
