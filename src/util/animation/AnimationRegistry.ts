@@ -5,8 +5,8 @@ import { AnimationBase } from './AnimationBase';
 /**
  * Array holding all running animations
  */
-class AnimationRegistry<T extends AnimationBase<any>> extends Array<T> {
-  remove(context: T) {
+class AnimationRegistry extends Array<AnimationBase> {
+  remove(context: AnimationBase) {
     const index = this.indexOf(context);
     index > -1 && this.splice(index, 1);
   }
@@ -39,7 +39,7 @@ class AnimationRegistry<T extends AnimationBase<any>> extends Array<T> {
   /**
    * cancel all running animations for target at the next requestAnimFrame
    */
-  cancelByTarget(target: T['target']) {
+  cancelByTarget(target: AnimationBase['target']) {
     if (!target) {
       return [];
     }

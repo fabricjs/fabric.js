@@ -12,7 +12,9 @@ import {
   AnimationState,
 } from './types';
 
-export abstract class AnimationBase<T extends number | number[]> {
+export abstract class AnimationBase<
+  T extends number | number[] = number | number[]
+> {
   readonly startValue: T;
   readonly byValue: T;
   readonly duration: number;
@@ -139,11 +141,11 @@ export abstract class AnimationBase<T extends number | number[]> {
   };
 
   private register() {
-    runningAnimations.push(this);
+    runningAnimations.push(this as unknown as AnimationBase);
   }
 
   private unregister() {
-    runningAnimations.remove(this);
+    runningAnimations.remove(this as unknown as AnimationBase);
   }
 
   abort() {
