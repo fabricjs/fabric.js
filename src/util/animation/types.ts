@@ -21,7 +21,9 @@ export type TOnAnimationChangeCallback<T, R = void> = (
 export type TAbortCallback<T> = TOnAnimationChangeCallback<T, boolean>;
 
 /**
- * An easing function
+ * An easing function used to calculate the current value
+ * @see {@link AnimationBase['calculate']}
+ *
  * @param timeElapsed ms elapsed since start
  * @param startValue
  * @param byValue
