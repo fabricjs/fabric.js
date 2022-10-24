@@ -28,7 +28,7 @@ export type TAbortCallback<T> = TOnAnimationChangeCallback<T, boolean>;
  * @param duration in ms
  * @returns next value
  */
-export type TEasingFunction<T = unknown> = T extends any[]
+export type TEasingFunction<T = unknown> = T extends number[]
   ? (
       timeElapsed: number,
       startValue: number,
@@ -119,8 +119,10 @@ export type TAnimationValues<T> =
         }
     );
 
-export type TAnimationOptions<T, C = T, E = T> = Partial<
-  TAnimationBaseOptions<E> & TAnimationValues<T> & TAnimationCallbacks<C>
+export type TAnimationOptions<T, TCallback = T, TEasing = T> = Partial<
+  TAnimationBaseOptions<TEasing> &
+    TAnimationValues<T> &
+    TAnimationCallbacks<TCallback>
 >;
 
 export type AnimationOptions = TAnimationOptions<number>;
