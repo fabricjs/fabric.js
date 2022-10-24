@@ -14,9 +14,9 @@ export class Animation extends AnimationBase<number> {
       byValue,
     });
   }
-  protected calculate(currentTime: number) {
+  protected calculate(timeElapsed: number) {
     const value = this.easing(
-      currentTime,
+      timeElapsed,
       this.startValue,
       this.byValue,
       this.duration

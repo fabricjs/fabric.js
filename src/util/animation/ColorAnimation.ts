@@ -15,9 +15,9 @@ export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
     startValue,
     endValue,
     byValue,
-    easing = (currentTime, startValue, byValue, duration) => {
+    easing = (timeElapsed, startValue, byValue, duration) => {
       const durationRatio =
-        1 - Math.cos((currentTime / duration) * (Math.PI / 2));
+        1 - Math.cos((timeElapsed / duration) * (Math.PI / 2));
       return startValue + byValue * durationRatio;
     },
     onChange = noop,
@@ -43,9 +43,9 @@ export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
       abort: wrapColorCallback(abort),
     });
   }
-  protected calculate(currentTime: number) {
+  protected calculate(timeElapsed: number) {
     const [r, g, b, a] = this.startValue.map((value, i) =>
-      this.easing(currentTime, value, this.byValue[i], this.duration, i)
+      this.easing(timeElapsed, value, this.byValue[i], this.duration, i)
     ) as TColorAlphaSource;
     const rgb = [r, g, b].map(Math.round);
     return {

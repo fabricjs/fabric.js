@@ -22,7 +22,7 @@ export type TAbortCallback<T> = TOnAnimationChangeCallback<T, boolean>;
 
 /**
  * An easing function
- * @param currentTime ms elapsed
+ * @param timeElapsed ms elapsed since start
  * @param startValue
  * @param byValue
  * @param duration in ms
@@ -30,14 +30,14 @@ export type TAbortCallback<T> = TOnAnimationChangeCallback<T, boolean>;
  */
 export type TEasingFunction<T = unknown> = T extends any[]
   ? (
-      currentTime: number,
+      timeElapsed: number,
       startValue: number,
       byValue: number,
       duration: number,
       index: number
     ) => number
   : (
-      currentTime: number,
+      timeElapsed: number,
       startValue: number,
       byValue: number,
       duration: number

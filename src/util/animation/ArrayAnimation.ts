@@ -14,9 +14,9 @@ export class ArrayAnimation extends AnimationBase<number[]> {
       byValue,
     });
   }
-  protected calculate(currentTime: number) {
+  protected calculate(timeElapsed: number) {
     const values = this.startValue.map((value, i) =>
-      this.easing(currentTime, value, this.byValue[i], this.duration, i)
+      this.easing(timeElapsed, value, this.byValue[i], this.duration, i)
     );
     return {
       value: values,

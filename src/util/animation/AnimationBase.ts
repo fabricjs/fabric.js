@@ -83,7 +83,7 @@ export abstract class AnimationBase<T extends number | number[]> {
     return this.calculate(this.duration).value;
   }
 
-  protected abstract calculate(currentTime: number): {
+  protected abstract calculate(timeElapsed: number): {
     value: T;
     changeRatio: number;
   };
