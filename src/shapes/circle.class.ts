@@ -226,8 +226,7 @@ Circle.fromElement = function (element, callback) {
  * @param {Object} object Object to create an instance from
  * @returns {Promise<Circle>}
  */
-Circle.fromObject = (object) =>
-  FabricObject._fromObject(fabric.Circle, object);
+Circle.fromObject = (object) => FabricObject._fromObject(fabric.Circle, object);
 
 fabric.Circle = Circle;
 export { Circle };

@@ -1,9 +1,10 @@
-//@ts-nocheck
+// @ts-nocheck
+import type { TClassProperties, TDegree, TSize, TFiller } from '../typedefs';
 import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { config } from '../config';
 import { VERSION } from '../constants';
-import { Observable } from '../mixins/observable.mixin';
+import { CommonMethods } from '../mixins/shared_methods.mixin';
 import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
 import { pick } from '../util/misc/pick';
@@ -13,6 +14,10 @@ import { clone } from '../util/lang_object';
 import { toFixed } from '../util/misc/toFixed';
 import { capitalize } from '../util/lang_string';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { createCanvasElement } from '../util/misc/dom';
+
+type StaticCanvas = any;
+type Canvas = any;
 
 const ALIASING_LIMIT = 2;
 
@@ -51,21 +56,700 @@ const ALIASING_LIMIT = 2;
  * @fires dragleave
  * @fires drop
  */
-export class FabricObject {
+export class FabricObject extends CommonMethods {
+  type: string;
 
   /**
-   * Unique id used internally when creating SVG elements
+   * Horizontal origin of transformation of an object (one of "left", "right", "center")
+   * See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
+   * @type String
+   * @default 'left'
+   */
+  originX: string;
+
+  /**
+   * Vertical origin of transformation of an object (one of "top", "bottom", "center")
+   * See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
+   * @type String
+   * @default 'top'
+   */
+  originY: string;
+
+  /**
+   * Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
+   * @type Number
+   * @default 0
+   */
+  top: number;
+
+  /**
+   * Left position of an object. Note that by default it's relative to object left. You can change this by setting originX={left/center/right}
+   * @type Number
+   * @default 0
+   */
+  left: number;
+
+  /**
+   * Object width
+   * @type Number
+   * @default
+   */
+  width: number;
+
+  /**
+   * Object height
+   * @type Number
+   * @default
+   */
+  height: number;
+
+  /**
+   * Object scale factor (horizontal)
+   * @type Number
+   * @default 1
+   */
+  scaleX: number;
+
+  /**
+   * Object scale factor (vertical)
+   * @type Number
+   * @default 1
+   */
+  scaleY: number;
+
+  /**
+   * When true, an object is rendered as flipped horizontally
+   * @type Boolean
+   * @default false
+   */
+  flipX: boolean;
+
+  /**
+   * When true, an object is rendered as flipped vertically
+   * @type Boolean
+   * @default false
+   */
+  flipY: boolean;
+
+  /**
+   * Opacity of an object
+   * @type Number
+   * @default 1
+   */
+  opacity: number;
+
+  /**
+   * Angle of rotation of an object (in degrees)
+   * @type Number
+   * @default 0
+   */
+  angle: TDegree;
+
+  /**
+   * Angle of skew on x axes of an object (in degrees)
+   * @type Number
+   * @default 0
+   */
+  skewX: number;
+
+  /**
+   * Angle of skew on y axes of an object (in degrees)
+   * @type Number
+   * @default 0
+   */
+  skewY: number;
+
+  /**
+   * Size of object's controlling corners (in pixels)
+   * @type Number
+   * @default 13
+   */
+  cornerSize: number;
+
+  /**
+   * Size of object's controlling corners when touch interaction is detected
+   * @type Number
+   * @default 24
+   */
+  touchCornerSize: number;
+
+  /**
+   * When true, object's controlling corners are rendered as transparent inside (i.e. stroke instead of fill)
+   * @type Boolean
+   * @default true
+   */
+  transparentCorners: boolean;
+
+  /**
+   * Default cursor value used when hovering over this object on canvas
+   * @type String
+   * @default null
+   */
+  hoverCursor: null;
+
+  /**
+   * Default cursor value used when moving this object on canvas
+   * @type String
+   * @default null
+   */
+  moveCursor: null;
+
+  /**
+   * Padding between object and its controlling borders (in pixels)
+   * @type Number
+   * @default 0
+   */
+  padding: number;
+
+  /**
+   * Color of controlling borders of an object (when it's active)
+   * @type String
+   * @default rgb(178,204,255)
+   */
+  borderColor: string;
+
+  /**
+   * Array specifying dash pattern of an object's borders (hasBorder must be true)
+   * @since 1.6.2
+   * @type Array | null
+   * default null;
+   */
+  borderDashArray: number[] | null;
+
+  /**
+   * Color of controlling corners of an object (when it's active)
+   * @type String
+   * @default rgb(178,204,255)
+   */
+  cornerColor: string | null;
+
+  /**
+   * Color of controlling corners of an object (when it's active and transparentCorners false)
+   * @since 1.6.2
+   * @type String
+   * @default null
+   */
+  cornerStrokeColor: string | null;
+
+  /**
+   * Specify style of control, 'rect' or 'circle'
+   * @since 1.6.2
+   * @type 'rect' | 'circle'
+   * @default rect
+   */
+  cornerStyle: 'rect' | 'circle';
+
+  /**
+   * Array specifying dash pattern of an object's control (hasBorder must be true)
+   * @since 1.6.2
+   * @type Array | null
+   */
+  cornerDashArray: number[] | null;
+
+  /**
+   * When true, this object will use center point as the origin of transformation
+   * when being scaled via the controls.
+   * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
+   * @since 1.3.4
+   * @type Boolean
+   * @default
+   */
+  centeredScaling: false;
+
+  /**
+   * When true, this object will use center point as the origin of transformation
+   * when being rotated via the controls.
+   * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
+   * @since 1.3.4
+   * @type Boolean
+   * @default
+   */
+  centeredRotation: true;
+
+  /**
+   * Color of object's fill
+   * takes css colors https://www.w3.org/TR/css-color-3/
+   * @type String
+   * @default rgb(0,0,0)
+   */
+  fill: string | null;
+
+  /**
+   * Fill rule used to fill an object
+   * accepted values are nonzero, evenodd
+   * <b>Backwards incompatibility note:</b> This property was used for setting globalCompositeOperation until v1.4.12 (use `fabric.Object#globalCompositeOperation` instead)
+   * @type String
+   * @default nonzero
+   */
+  fillRule: 'nonzero' | 'evenodd';
+
+  /**
+   * Composite rule used for canvas globalCompositeOperation
+   * @type String
+   * @default
+   */
+  globalCompositeOperation: GlobalCompositeOperation;
+
+  /**
+   * Background color of an object.
+   * takes css colors https://www.w3.org/TR/css-color-3/
+   * @type String
+   * @default
+   */
+  backgroundColor: string;
+
+  /**
+   * Selection Background color of an object. colored layer behind the object when it is active.
+   * does not mix good with globalCompositeOperation methods.
+   * @type String
+   * @default
+   */
+  selectionBackgroundColor: string;
+
+  /**
+   * When defined, an object is rendered via stroke and this property specifies its color
+   * takes css colors https://www.w3.org/TR/css-color-3/
+   * @type String
+   * @default null
+   */
+  stroke: string | TFiller | null;
+
+  /**
+   * Width of a stroke used to render this object
+   * @type Number
+   * @default 1
+   */
+  strokeWidth: number;
+
+  /**
+   * Array specifying dash pattern of an object's stroke (stroke must be defined)
+   * @type Array
+   * @default null;
+   */
+  strokeDashArray: number[] | null;
+
+  /**
+   * Line offset of an object's stroke
+   * @type Number
+   * @default 0
+   */
+  strokeDashOffset: number;
+
+  /**
+   * Line endings style of an object's stroke (one of "butt", "round", "square")
+   * @type String
+   * @default butt
+   */
+  strokeLineCap: string;
+
+  /**
+   * Corner style of an object's stroke (one of "bevel", "round", "miter")
+   * @type String
+   * @default
+   */
+  strokeLineJoin: string;
+
+  /**
+   * Maximum miter length (used for strokeLineJoin = "miter") of an object's stroke
+   * @type Number
+   * @default 4
+   */
+  strokeMiterLimit: number;
+
+  /**
+   * Shadow object representing shadow of this shape
+   * @type fabric.Shadow
+   * @default null
+   */
+  shadow: any | null;
+
+  /**
+   * Opacity of object's controlling borders when object is active and moving
+   * @type Number
+   * @default 0.4
+   */
+  borderOpacityWhenMoving: number;
+
+  /**
+   * Scale factor of object's controlling borders
+   * bigger number will make a thicker border
+   * border is 1, so this is basically a border thickness
+   * since there is no way to change the border itself.
+   * @type Number
+   * @default 1
+   */
+  borderScaleFactor: number;
+
+  /**
+   * Minimum allowed scale value of an object
+   * @type Number
+   * @default 0
+   */
+  minScaleLimit: number;
+
+  /**
+   * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection).
+   * But events still fire on it.
+   * @type Boolean
+   * @default
+   */
+  selectable: boolean;
+
+  /**
+   * When set to `false`, an object can not be a target of events. All events propagate through it. Introduced in v1.3.4
+   * @type Boolean
+   * @default
+   */
+  evented: boolean;
+
+  /**
+   * When set to `false`, an object is not rendered on canvas
+   * @type Boolean
+   * @default
+   */
+  visible: boolean;
+
+  /**
+   * When set to `false`, object's controls are not displayed and can not be used to manipulate object
+   * @type Boolean
+   * @default
+   */
+  hasControls: boolean;
+
+  /**
+   * When set to `false`, object's controlling borders are not rendered
+   * @type Boolean
+   * @default
+   */
+  hasBorders: boolean;
+
+  /**
+   * When set to `true`, objects are "found" on canvas on per-pixel basis rather than according to bounding box
+   * @type Boolean
+   * @default
+   */
+  perPixelTargetFind: boolean;
+
+  /**
+   * When `false`, default object's values are not included in its serialization
+   * @type Boolean
+   * @default
+   */
+  includeDefaultValues: boolean;
+
+  /**
+   * When `true`, object horizontal movement is locked
+   * @type Boolean
+   * @default
+   */
+  lockMovementX: boolean;
+
+  /**
+   * When `true`, object vertical movement is locked
+   * @type Boolean
+   * @default
+   */
+  lockMovementY: boolean;
+
+  /**
+   * When `true`, object rotation is locked
+   * @type Boolean
+   * @default
+   */
+  lockRotation: boolean;
+
+  /**
+   * When `true`, object horizontal scaling is locked
+   * @type Boolean
+   * @default
+   */
+  lockScalingX: boolean;
+
+  /**
+   * When `true`, object vertical scaling is locked
+   * @type Boolean
+   * @default
+   */
+  lockScalingY: boolean;
+
+  /**
+   * When `true`, object horizontal skewing is locked
+   * @type Boolean
+   * @default
+   */
+  lockSkewingX: boolean;
+
+  /**
+   * When `true`, object vertical skewing is locked
+   * @type Boolean
+   * @default
+   */
+  lockSkewingY: boolean;
+
+  /**
+   * When `true`, object cannot be flipped by scaling into negative values
+   * @type Boolean
+   * @default
+   */
+  lockScalingFlip: boolean;
+
+  /**
+   * When `true`, object is not exported in OBJECT/JSON
+   * @since 1.6.3
+   * @type Boolean
+   * @default
+   */
+  excludeFromExport: boolean;
+
+  /**
+   * When `true`, object is cached on an additional canvas.
+   * When `false`, object is not cached unless necessary ( clipPath )
+   * default to true
+   * @since 1.7.0
+   * @type Boolean
+   * @default true
+   */
+  objectCaching: boolean;
+
+  /**
+   * When `true`, object properties are checked for cache invalidation. In some particular
+   * situation you may want this to be disabled ( spray brush, very big, groups)
+   * or if your application does not allow you to modify properties for groups child you want
+   * to disable it for groups.
+   * default to false
+   * since 1.7.0
+   * @type Boolean
+   * @default false
+   */
+  statefullCache: boolean;
+
+  /**
+   * When `true`, cache does not get updated during scaling. The picture will get blocky if scaled
+   * too much and will be redrawn with correct details at the end of scaling.
+   * this setting is performance and application dependant.
+   * default to true
+   * since 1.7.0
+   * @type Boolean
+   * @default true
+   */
+  noScaleCache: boolean;
+
+  /**
+   * When `false`, the stoke width will scale with the object.
+   * When `true`, the stroke will always match the exact pixel size entered for stroke width.
+   * this Property does not work on Text classes or drawing call that uses strokeText,fillText methods
+   * default to false
+   * @since 2.6.0
+   * @type Boolean
+   * @default false
+   * @type Boolean
+   * @default false
+   */
+  strokeUniform: boolean;
+
+  /**
+   * When set to `true`, object's cache will be rerendered next render call.
+   * since 1.7.0
+   * @type Boolean
+   * @default true
+   */
+  dirty: boolean;
+
+  /**
+   * keeps the value of the last hovered corner during mouse move.
+   * 0 is no corner, or 'mt', 'ml', 'mtr' etc..
+   * It should be private, but there is no harm in using it as
+   * a read-only property.
+   * @type number|string|any
+   * @default 0
+   */
+  __corner: number | string;
+
+  /**
+   * Determines if the fill or the stroke is drawn first (one of "fill" or "stroke")
+   * @type String
+   * @default
+   */
+  paintFirst: 'fill' | 'stroke';
+
+  /**
+   * When 'down', object is set to active on mousedown/touchstart
+   * When 'up', object is set to active on mouseup/touchend
+   * Experimental. Let's see if this breaks anything before supporting officially
+   * @private
+   * since 4.4.0
+   * @type String
+   * @default 'down'
+   */
+  activeOn: 'down' | 'up';
+
+  /**
+   * List of properties to consider when checking if state
+   * of an object is changed (fabric.Object#hasStateChanged)
+   * as well as for history (undo/redo) purposes
+   * @type Array
+   */
+  stateProperties: string[];
+
+  /**
+   * List of properties to consider when checking if cache needs refresh
+   * Those properties are checked by statefullCache ON ( or lazy mode if we want ) or from single
+   * calls to Object.set(key, value). If the key is in this list, the object is marked as dirty
+   * and refreshed at the next render
+   * @type Array
+   */
+  cacheProperties: string[];
+
+  /**
+   * List of properties to consider for animating colors.
+   * @type String[]
+   */
+  colorProperties: string[];
+
+  /**
+   * a fabricObject that, without stroke define a clipping area with their shape. filled in black
+   * the clipPath object gets used when the object has rendered, and the context is placed in the center
+   * of the object cacheCanvas.
+   * If you want 0,0 of a clipPath to align with an object center, use clipPath.originX/Y to 'center'
+   * @type fabric.Object
+   */
+  clipPath?: FabricObject;
+
+  /**
+   * Meaningful ONLY when the object is used as clipPath.
+   * if true, the clipPath will make the object clip to the outside of the clipPath
+   * since 2.4.0
+   * @type boolean
+   * @default false
+   */
+  inverted: boolean;
+
+  /**
+   * Meaningful ONLY when the object is used as clipPath.
+   * if true, the clipPath will have its top and left relative to canvas, and will
+   * not be influenced by the object transform. This will make the clipPath relative
+   * to the canvas, but clipping just a particular object.
+   * WARNING this is beta, this feature may change or be renamed.
+   * since 2.4.0
+   * @type boolean
+   * @default false
+   */
+  absolutePositioned: boolean;
+
+  /**
+   * A Reference of the Canvas where the object is actually added
+   * @type StaticCanvas | Canvas;
+   * @default undefined
+   * @private
+   */
+  canvas?: StaticCanvas | Canvas;
+
+  /**
+   * Quick access for the _cacheCanvas rendering context
+   * This is part of the objectCaching feature
+   * since 1.7.0
+   * @type boolean
+   * @default undefined
+   * @private
+   */
+  _cacheContext: CanvasRenderingContext2D | null = null;
+
+  /**
+   * A reference to the HTMLCanvasElement that is used to contain the cache of the object
+   * this canvas element is resized and cleared as needed
+   * Is marked private, you can read it, don't use it since it is handled by fabric
+   * since 1.7.0
+   * @type HTMLCanvasElement
+   * @default undefined
+   * @private
+   */
+  _cacheCanvas?: HTMLCanvasElement;
+
+  /**
+   * Size of the cache canvas, width
+   * since 1.7.0
+   * @type number
+   * @default undefined
+   * @private
+   */
+  cacheWidth?: number;
+
+  /**
+   * Size of the cache canvas, height
+   * since 1.7.0
+   * @type number
+   * @default undefined
+   * @private
+   */
+  cacheHeight?: number;
+
+  /**
+   * zoom level used on the cacheCanvas to draw the cache, X axe
+   * since 1.7.0
+   * @type number
+   * @default undefined
+   * @private
+   */
+  zoomX?: number;
+
+  /**
+   * zoom level used on the cacheCanvas to draw the cache, Y axe
+   * since 1.7.0
+   * @type number
+   * @default undefined
+   * @private
+   */
+  zoomY?: number;
+
+  /**
+   * zoom level used on the cacheCanvas to draw the cache, Y axe
+   * since 1.7.0
+   * @type number
+   * @default undefined
+   * @private
+   */
+  cacheTranslationX?: number;
+
+  /**
+   * translation of the cacheCanvas away from the center, for subpixel accuracy and crispness
+   * since 1.7.0
+   * @type number
+   * @default undefined
+   * @private
+   */
+  cacheTranslationY?: number;
+
+  /**
+   * A reference to the parent of the object, usually a FabricGroup
+   * @type number
+   * @default undefined
+   * @private
+   */
+  group?: FabricObject;
+
+  /**
+   * Indicate if the object is sitting on a cache dedicated to it
+   * or is part of a larger cache for many object ( a group for example)
+   * @type number
+   * @default undefined
+   * @private
+   */
+  ownCaching?: boolean;
+
+  /**
+   * translation of the cacheCanvas away from the center, for subpixel accuracy and crispness
    * @static
    * @memberOf fabric.Object
    * @type Number
    */
- static __uid = 0
+  static __uid = 0;
 
   /**
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options) {
+  constructor(options: Record<string, unknown>) {
+    super();
     if (options) {
       this.setOptions(options);
     }
@@ -75,7 +759,7 @@ export class FabricObject {
    * Temporary compatibility issue with old classes
    * @param {Object} [options] Options object
    */
-  initialize(options) {
+  initialize(options: Record<string, unknown>) {
     if (options) {
       this.setOptions(options);
     }
@@ -86,8 +770,7 @@ export class FabricObject {
    * @private
    */
   _createCacheCanvas() {
-    this._cacheProperties = {};
-    this._cacheCanvas = fabric.util.createCanvasElement();
+    this._cacheCanvas = createCanvasElement();
     this._cacheContext = this._cacheCanvas.getContext('2d');
     this._updateCacheCanvas();
     // if canvas gets created, is empty, so dirty.
@@ -109,8 +792,10 @@ export class FabricObject {
    * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
-  _limitCacheSize(dims) {
-    var width = dims.width,
+  _limitCacheSize(
+    dims: TSize & { zoomX: number; zoomY: number; capped: boolean } & any
+  ) {
+    const width = dims.width,
       height = dims.height,
       max = config.maxCacheSideLimit,
       min = config.minCacheSideLimit;
@@ -127,7 +812,7 @@ export class FabricObject {
       }
       return dims;
     }
-    var ar = width / height,
+    const ar = width / height,
       [limX, limY] = cache.limitDimsByArea(ar),
       x = capValue(min, limX, max),
       y = capValue(min, limY, max);
@@ -156,8 +841,8 @@ export class FabricObject {
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
   _getCacheCanvasDimensions() {
-    var objectScale = this.getTotalObjectScaling(),
-      // caculate dimensions without skewing
+    const objectScale = this.getTotalObjectScaling(),
+      // calculate dimensions without skewing
       dim = this._getTransformedDimensions({ skewX: 0, skewY: 0 }),
       neededX = (dim.x * objectScale.x) / this.scaleX,
       neededY = (dim.y * objectScale.y) / this.scaleY;
@@ -181,41 +866,40 @@ export class FabricObject {
    * @return {Boolean} true if the canvas has been resized
    */
   _updateCacheCanvas() {
-    var targetCanvas = this.canvas;
-    if (
-      this.noScaleCache &&
-      targetCanvas &&
-      targetCanvas._currentTransform
-    ) {
-      var target = targetCanvas._currentTransform.target,
+    const targetCanvas = this.canvas;
+    if (this.noScaleCache && targetCanvas && targetCanvas._currentTransform) {
+      const target = targetCanvas._currentTransform.target,
         action = targetCanvas._currentTransform.action;
-      if (
-        this === target &&
-        action.slice &&
-        action.slice(0, 5) === 'scale'
-      ) {
+      if (this === target && action.slice && action.slice(0, 5) === 'scale') {
         return false;
       }
     }
-    var canvas = this._cacheCanvas,
+    const canvas = this._cacheCanvas,
+      context = this._cacheContext,
       dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
       minCacheSize = config.minCacheSideLimit,
       width = dims.width,
       height = dims.height,
-      drawingWidth,
-      drawingHeight,
       zoomX = dims.zoomX,
       zoomY = dims.zoomY,
       dimensionsChanged =
         width !== this.cacheWidth || height !== this.cacheHeight,
-      zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY,
+      zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY;
+
+    if (!canvas || !context) {
+      return false;
+    }
+
+    let drawingWidth,
+      drawingHeight,
       shouldRedraw = dimensionsChanged || zoomChanged,
       additionalWidth = 0,
       additionalHeight = 0,
       shouldResizeCanvas = false;
+
     if (dimensionsChanged) {
-      var canvasWidth = this._cacheCanvas.width,
-        canvasHeight = this._cacheCanvas.height,
+      const canvasWidth = (this._cacheCanvas as HTMLCanvasElement).width,
+        canvasHeight = (this._cacheCanvas as HTMLCanvasElement).height,
         sizeGrowing = width > canvasWidth || height > canvasHeight,
         sizeShrinking =
           (width < canvasWidth * 0.9 || height < canvasHeight * 0.9) &&
@@ -234,6 +918,7 @@ export class FabricObject {
     if (this instanceof fabric.Text && this.path) {
       shouldRedraw = true;
       shouldResizeCanvas = true;
+      // IMHO in those lines we are using zoomX and zoomY not the this version.
       additionalWidth += this.getHeightOfLine(0) * this.zoomX;
       additionalHeight += this.getHeightOfLine(0) * this.zoomY;
     }
@@ -242,8 +927,8 @@ export class FabricObject {
         canvas.width = Math.ceil(width + additionalWidth);
         canvas.height = Math.ceil(height + additionalHeight);
       } else {
-        this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);
-        this._cacheContext.clearRect(0, 0, canvas.width, canvas.height);
+        context.setTransform(1, 0, 0, 1, 0, 0);
+        context.clearRect(0, 0, canvas.width, canvas.height);
       }
       drawingWidth = dims.x / 2;
       drawingHeight = dims.y / 2;
@@ -253,11 +938,8 @@ export class FabricObject {
         Math.round(canvas.height / 2 - drawingHeight) + drawingHeight;
       this.cacheWidth = width;
       this.cacheHeight = height;
-      this._cacheContext.translate(
-        this.cacheTranslationX,
-        this.cacheTranslationY
-      );
-      this._cacheContext.scale(zoomX, zoomY);
+      context.translate(this.cacheTranslationX, this.cacheTranslationY);
+      context.scale(zoomX, zoomY);
       this.zoomX = zoomX;
       this.zoomY = zoomY;
       return true;
@@ -269,7 +951,7 @@ export class FabricObject {
    * Sets object's properties from options
    * @param {Object} [options] Options object
    */
-  setOptions(options) {
+  setOptions(options: Record<string, any> = {}) {
     this._setOptions(options);
   }
 
@@ -277,11 +959,11 @@ export class FabricObject {
    * Transforms context when rendering an object
    * @param {CanvasRenderingContext2D} ctx Context
    */
-  transform(ctx) {
-    var needFullTransform =
+  transform(ctx: CanvasRenderingContext2D) {
+    const needFullTransform =
       (this.group && !this.group._transformDone) ||
       (this.group && this.canvas && ctx === this.canvas.contextTop);
-    var m = this.calcTransformMatrix(!needFullTransform);
+    const m = this.calcTransformMatrix(!needFullTransform);
     ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
   }
 
@@ -290,7 +972,7 @@ export class FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude) {
+  toObject(propertiesToInclude: (keyof this)[]): Record<string, any> {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -311,9 +993,7 @@ export class FabricObject {
         width: toFixed(this.width, NUM_FRACTION_DIGITS),
         height: toFixed(this.height, NUM_FRACTION_DIGITS),
         fill:
-          this.fill && this.fill.toObject
-            ? this.fill.toObject()
-            : this.fill,
+          this.fill && this.fill.toObject ? this.fill.toObject() : this.fill,
         stroke:
           this.stroke && this.stroke.toObject
             ? this.stroke.toObject()
@@ -326,10 +1006,7 @@ export class FabricObject {
         strokeDashOffset: this.strokeDashOffset,
         strokeLineJoin: this.strokeLineJoin,
         strokeUniform: this.strokeUniform,
-        strokeMiterLimit: toFixed(
-          this.strokeMiterLimit,
-          NUM_FRACTION_DIGITS
-        ),
+        strokeMiterLimit: toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
         scaleX: toFixed(this.scaleX, NUM_FRACTION_DIGITS),
         scaleY: toFixed(this.scaleY, NUM_FRACTION_DIGITS),
         angle: toFixed(this.angle, NUM_FRACTION_DIGITS),
@@ -360,7 +1037,7 @@ export class FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toDatalessObject(propertiesToInclude) {
+  toDatalessObject(propertiesToInclude: (keyof this)[]) {
     // will be overwritten by subclasses
     return this.toObject(propertiesToInclude);
   }
@@ -369,8 +1046,8 @@ export class FabricObject {
    * @private
    * @param {Object} object
    */
-  _removeDefaultValues(object) {
-    var prototype = fabric.util.getKlass(object.type).prototype;
+  _removeDefaultValues(object: Record<string, any>) {
+    const prototype = fabric.util.getKlass(object.type).prototype;
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
         return;
@@ -413,7 +1090,7 @@ export class FabricObject {
       return new Point(Math.abs(this.scaleX), Math.abs(this.scaleY));
     }
     // if we are inside a group total zoom calculation is complex, we defer to generic matrices
-    var options = fabric.util.qrDecompose(this.calcTransformMatrix());
+    const options = fabric.util.qrDecompose(this.calcTransformMatrix());
     return new Point(Math.abs(options.scaleX), Math.abs(options.scaleY));
   }
 
@@ -422,10 +1099,10 @@ export class FabricObject {
    * @return {Object} object with scaleX and scaleY properties
    */
   getTotalObjectScaling() {
-    var scale = this.getObjectScaling();
+    const scale = this.getObjectScaling();
     if (this.canvas) {
-      var zoom = this.canvas.getZoom();
-      var retina = this.canvas.getRetinaScaling();
+      const zoom = this.canvas.getZoom();
+      const retina = this.canvas.getRetinaScaling();
       return scale.scalarMultiply(zoom * retina);
     }
     return scale;
@@ -436,7 +1113,7 @@ export class FabricObject {
    * @return {Number}
    */
   getObjectOpacity() {
-    var opacity = this.opacity;
+    let opacity = this.opacity;
     if (this.group) {
       opacity *= this.group.getObjectOpacity();
     }
@@ -459,10 +1136,9 @@ export class FabricObject {
    * @param {*} value
    * @return {fabric.Object} thisArg
    */
-  _set(key, value) {
-    var shouldConstrainValue = key === 'scaleX' || key === 'scaleY',
-      isChanged = this[key] !== value,
-      groupNeedsUpdate = false;
+  _set(key: string, value: any) {
+    const shouldConstrainValue = key === 'scaleX' || key === 'scaleY',
+      isChanged = this[key] !== value;
 
     if (shouldConstrainValue) {
       value = this._constrainScale(value);
@@ -473,11 +1149,7 @@ export class FabricObject {
     } else if (key === 'scaleY' && value < 0) {
       this.flipY = !this.flipY;
       value *= -1;
-    } else if (
-      key === 'shadow' &&
-      value &&
-      !(value instanceof fabric.Shadow)
-    ) {
+    } else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
       value = new fabric.Shadow(value);
     } else if (key === 'dirty' && this.group) {
       this.group.set('dirty', value);
@@ -486,14 +1158,11 @@ export class FabricObject {
     this[key] = value;
 
     if (isChanged) {
-      groupNeedsUpdate = this.group && this.group.isOnACache();
+      const groupNeedsUpdate = this.group && this.group.isOnACache();
       if (this.cacheProperties.indexOf(key) > -1) {
         this.dirty = true;
         groupNeedsUpdate && this.group.set('dirty', true);
-      } else if (
-        groupNeedsUpdate &&
-        this.stateProperties.indexOf(key) > -1
-      ) {
+      } else if (groupNeedsUpdate && this.stateProperties.indexOf(key) > -1) {
         this.group.set('dirty', true);
       }
     }
@@ -514,11 +1183,11 @@ export class FabricObject {
   }
 
   /*
-    * @private
-    * return if the object would be visible in rendering
-    * @memberOf FabricObject.prototype
-    * @return {Boolean}
-    */
+   * @private
+   * return if the object would be visible in rendering
+   * @memberOf FabricObject.prototype
+   * @return {Boolean}
+   */
   isNotVisible() {
     return (
       this.opacity === 0 ||
@@ -531,7 +1200,7 @@ export class FabricObject {
    * Renders an object on a specified context
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  render(ctx) {
+  render(ctx: CanvasRenderingContext2D) {
     // do not render if width/height are zeros or object is not visible
     if (this.isNotVisible()) {
       return;
@@ -549,7 +1218,7 @@ export class FabricObject {
     this.drawSelectionBackground(ctx);
     this.transform(ctx);
     this._setOpacity(ctx);
-    this._setShadow(ctx, this);
+    this._setShadow(ctx);
     if (this.shouldCache()) {
       this.renderCache();
       this.drawCacheOnCanvas(ctx);
@@ -564,14 +1233,13 @@ export class FabricObject {
     ctx.restore();
   }
 
-  renderCache(options) {
+  renderCache(options?: any) {
     options = options || {};
     if (!this._cacheCanvas || !this._cacheContext) {
       this._createCacheCanvas();
     }
-    if (this.isCacheDirty()) {
-      this.statefullCache &&
-        this.saveState({ propertySet: 'cacheProperties' });
+    if (this.isCacheDirty() && this._cacheContext) {
+      this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
       this.drawObject(this._cacheContext, options.forClipping);
       this.dirty = false;
     }
@@ -581,7 +1249,7 @@ export class FabricObject {
    * Remove cacheCanvas and its dimensions from the objects
    */
   _removeCacheCanvas() {
-    this._cacheCanvas = null;
+    this._cacheCanvas = undefined;
     this._cacheContext = null;
     this.cacheWidth = 0;
     this.cacheHeight = 0;
@@ -664,8 +1332,7 @@ export class FabricObject {
    */
   willDrawShadow() {
     return (
-      !!this.shadow &&
-      (this.shadow.offsetX !== 0 || this.shadow.offsetY !== 0)
+      !!this.shadow && (this.shadow.offsetX !== 0 || this.shadow.offsetY !== 0)
     );
   }
 
@@ -673,8 +1340,10 @@ export class FabricObject {
    * Execute the drawing operation for an object clipPath
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {fabric.Object} clipPath
+   * todo while converting things, we need a type that is a union of classes that
+   * represent the fabricObjects. Rect, Circle...
    */
-  drawClipPathOnCache(ctx, clipPath) {
+  drawClipPathOnCache(ctx: CanvasRenderingContext2D, clipPath: FabricObject) {
     ctx.save();
     // DEBUG: uncomment this line, comment the following
     // ctx.globalAlpha = 0.4
@@ -685,15 +1354,15 @@ export class FabricObject {
     }
     //ctx.scale(1 / 2, 1 / 2);
     if (clipPath.absolutePositioned) {
-      var m = fabric.util.invertTransform(this.calcTransformMatrix());
+      const m = fabric.util.invertTransform(this.calcTransformMatrix());
       ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
     }
     clipPath.transform(ctx);
-    ctx.scale(1 / clipPath.zoomX, 1 / clipPath.zoomY);
+    ctx.scale(1 / clipPath.zoomX!, 1 / clipPath.zoomY!);
     ctx.drawImage(
-      clipPath._cacheCanvas,
-      -clipPath.cacheTranslationX,
-      -clipPath.cacheTranslationY
+      clipPath._cacheCanvas!,
+      -clipPath.cacheTranslationX!,
+      -clipPath.cacheTranslationY!
     );
     ctx.restore();
   }
@@ -701,9 +1370,10 @@ export class FabricObject {
   /**
    * Execute the drawing operation for an object on a specified context
    * @param {CanvasRenderingContext2D} ctx Context to render on
+   * @param {boolean} forClipping apply clipping styles
    */
-  drawObject(ctx, forClipping) {
-    var originalFill = this.fill,
+  drawObject(ctx: CanvasRenderingContext2D, forClipping?: boolean) {
+    const originalFill = this.fill,
       originalStroke = this.stroke;
     if (forClipping) {
       this.fill = 'black';
@@ -755,7 +1425,7 @@ export class FabricObject {
    * @param {Boolean} skipCanvas skip canvas checks because this object is painted
    * on parent canvas.
    */
-  isCacheDirty(skipCanvas) {
+  isCacheDirty(skipCanvas = false) {
     if (this.isNotVisible()) {
       return false;
     }
@@ -774,14 +1444,9 @@ export class FabricObject {
         (this.statefullCache && this.hasStateChanged('cacheProperties'))
       ) {
         if (this._cacheCanvas && this._cacheContext && !skipCanvas) {
-          var width = this.cacheWidth / this.zoomX;
-          var height = this.cacheHeight / this.zoomY;
-          this._cacheContext.clearRect(
-            -width / 2,
-            -height / 2,
-            width,
-            height
-          );
+          const width = this.cacheWidth / this.zoomX;
+          const height = this.cacheHeight / this.zoomY;
+          this._cacheContext.clearRect(-width / 2, -height / 2, width, height);
         }
         return true;
       }
@@ -798,7 +1463,7 @@ export class FabricObject {
     if (!this.backgroundColor) {
       return;
     }
-    var dim = this._getNonTransformedDimensions();
+    const dim = this._getNonTransformedDimensions();
     ctx.fillStyle = this.backgroundColor;
 
     ctx.fillRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
@@ -820,7 +1485,7 @@ export class FabricObject {
   }
 
   _setStrokeStyles(ctx, decl) {
-    var stroke = decl.stroke;
+    const stroke = decl.stroke;
     if (stroke) {
       ctx.lineWidth = decl.strokeWidth;
       ctx.lineCap = decl.strokeLineCap;
@@ -851,7 +1516,7 @@ export class FabricObject {
   }
 
   _setFillStyles(ctx, decl) {
-    var fill = decl.fill;
+    const fill = decl.fill;
     if (fill) {
       if (fill.toLive) {
         ctx.fillStyle = fill.toLive(ctx, this);
@@ -892,7 +1557,7 @@ export class FabricObject {
    * @param {Object} [styleOverride] properties to override the object style
    */
   _renderControls(ctx, styleOverride) {
-    var vpt = this.getViewportTransform(),
+    let vpt = this.getViewportTransform(),
       matrix = this.calcTransformMatrix(),
       options,
       drawBorders,
@@ -927,18 +1592,16 @@ export class FabricObject {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _setShadow(ctx) {
+  _setShadow(ctx: CanvasRenderingContext2D) {
     if (!this.shadow) {
       return;
     }
 
-    var shadow = this.shadow,
+    let shadow = this.shadow,
       canvas = this.canvas,
       multX = (canvas && canvas.viewportTransform[0]) || 1,
       multY = (canvas && canvas.viewportTransform[3]) || 1,
-      scaling = shadow.nonScaling
-        ? new Point(1, 1)
-        : this.getObjectScaling();
+      scaling = shadow.nonScaling ? new Point(1, 1) : this.getObjectScaling();
     if (canvas && canvas._isRetinaScaling()) {
       multX *= config.devicePixelRatio;
       multY *= config.devicePixelRatio;
@@ -974,12 +1637,15 @@ export class FabricObject {
    * @return {Object} offset.offsetX offset for text rendering
    * @return {Object} offset.offsetY offset for text rendering
    */
-  _applyPatternGradientTransform(ctx, filler) {
+  _applyPatternGradientTransform(
+    ctx: CanvasRenderingContext2D,
+    filler: TFiller
+  ) {
     if (!filler || !filler.toLive) {
       return { offsetX: 0, offsetY: 0 };
     }
-    var t = filler.gradientTransform || filler.patternTransform;
-    var offsetX = -this.width / 2 + filler.offsetX || 0,
+    const t = filler.gradientTransform || filler.patternTransform;
+    const offsetX = -this.width / 2 + filler.offsetX || 0,
       offsetY = -this.height / 2 + filler.offsetY || 0;
 
     if (filler.gradientUnits === 'percentage') {
@@ -997,7 +1663,7 @@ export class FabricObject {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _renderPaintInOrder(ctx) {
+  _renderPaintInOrder(ctx: CanvasRenderingContext2D) {
     if (this.paintFirst === 'stroke') {
       this._renderStroke(ctx);
       this._renderFill(ctx);
@@ -1014,13 +1680,15 @@ export class FabricObject {
    * not related to rendering
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _render(/* ctx */) {}
+  _render(ctx: CanvasRenderingContext2D) {
+    // placeholder to be overridden
+  }
 
   /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _renderFill(ctx) {
+  _renderFill(ctx: CanvasRenderingContext2D) {
     if (!this.fill) {
       return;
     }
@@ -1039,7 +1707,7 @@ export class FabricObject {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _renderStroke(ctx) {
+  _renderStroke(ctx: CanvasRenderingContext2D) {
     if (!this.stroke || this.strokeWidth === 0) {
       return;
     }
@@ -1050,7 +1718,7 @@ export class FabricObject {
 
     ctx.save();
     if (this.strokeUniform) {
-      var scaling = this.getObjectScaling();
+      const scaling = this.getObjectScaling();
       ctx.scale(1 / scaling.x, 1 / scaling.y);
     }
     this._setLineDash(ctx, this.strokeDashArray);
@@ -1070,16 +1738,18 @@ export class FabricObject {
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {fabric.Gradient} filler a fabric gradient instance
    */
-  _applyPatternForTransformedGradient(ctx, filler) {
-    var dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
+  _applyPatternForTransformedGradient(
+    ctx: CanvasRenderingContext2D,
+    filler: TFiller
+  ) {
+    const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
       pCanvas = fabric.util.createCanvasElement(),
-      pCtx,
       retinaScaling = this.canvas.getRetinaScaling(),
       width = dims.x / this.scaleX / retinaScaling,
       height = dims.y / this.scaleY / retinaScaling;
     pCanvas.width = width;
     pCanvas.height = height;
-    pCtx = pCanvas.getContext('2d');
+    const pCtx = pCanvas.getContext('2d');
     pCtx.beginPath();
     pCtx.moveTo(0, 0);
     pCtx.lineTo(width, 0);
@@ -1119,12 +1789,12 @@ export class FabricObject {
    * This function is an helper for svg import. it decompose the transformMatrix
    * and assign properties to object.
    * untransformed coordinates
+   * @todo move away in the svg import stuff.
    * @private
-   * @chainable
    */
   _assignTransformMatrixProps() {
     if (this.transformMatrix) {
-      var options = fabric.util.qrDecompose(this.transformMatrix);
+      const options = fabric.util.qrDecompose(this.transformMatrix);
       this.flipX = false;
       this.flipY = false;
       this.set('scaleX', options.scaleX);
@@ -1138,12 +1808,12 @@ export class FabricObject {
   /**
    * This function is an helper for svg import. it removes the transform matrix
    * and set to object properties that fabricjs can handle
+   * @todo move away in the svg import stuff.
    * @private
    * @param {Object} preserveAspectRatioOptions
-   * @return {thisArg}
    */
   _removeTransformMatrix(preserveAspectRatioOptions) {
-    var center = this._findCenterFromElement();
+    let center = this._findCenterFromElement();
     if (this.transformMatrix) {
       this._assignTransformMatrixProps();
       center = fabric.util.transformPoint(center, this.transformMatrix);
@@ -1167,8 +1837,9 @@ export class FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @returns {Promise<fabric.Object>}
    */
-  clone(propertiesToInclude) {
-    var objectForm = this.toObject(propertiesToInclude);
+  clone(propertiesToInclude: (keyof this)[]) {
+    const objectForm = this.toObject(propertiesToInclude);
+    // todo ok understand this. is static or it isn't?
     return this.constructor.fromObject(objectForm);
   }
 
@@ -1190,8 +1861,8 @@ export class FabricObject {
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {fabric.Image} Object cloned as image.
    */
-  cloneAsImage(options) {
-    var canvasEl = this.toCanvasElement(options);
+  cloneAsImage(options: any) {
+    const canvasEl = this.toCanvasElement(options);
     return new fabric.Image(canvasEl);
   }
 
@@ -1208,10 +1879,10 @@ export class FabricObject {
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {HTMLCanvasElement} Returns DOM element <canvas> with the fabric.Object
    */
-  toCanvasElement(options) {
+  toCanvasElement(options: any) {
     options || (options = {});
 
-    var utils = fabric.util,
+    const utils = fabric.util,
       origParams = utils.saveObjectTransform(this),
       originalGroup = this.group,
       originalShadow = this.shadow,
@@ -1228,7 +1899,7 @@ export class FabricObject {
       this.shadow = null;
     }
 
-    var el = fabric.util.createCanvasElement(),
+    let el = fabric.util.createCanvasElement(),
       // skip canvas zoom and calculate with setCoords now.
       boundingRect = this.getBoundingRect(true, true),
       shadow = this.shadow,
@@ -1237,8 +1908,8 @@ export class FabricObject {
       height;
 
     if (shadow) {
-      var shadowBlur = shadow.blur;
-      var scaling = shadow.nonScaling
+      const shadowBlur = shadow.blur;
+      const scaling = shadow.nonScaling
         ? new Point(1, 1)
         : this.getObjectScaling();
       // consider non scaling shadow.
@@ -1253,7 +1924,7 @@ export class FabricObject {
     // we need to make it so.
     el.width = Math.ceil(width);
     el.height = Math.ceil(height);
-    var canvas = new fabric.StaticCanvas(el, {
+    let canvas = new fabric.StaticCanvas(el, {
       enableRetinaScaling: false,
       renderOnAddRemove: false,
       skipOffscreen: false,
@@ -1266,11 +1937,11 @@ export class FabricObject {
       'center',
       'center'
     );
-    var originalCanvas = this.canvas;
+    const originalCanvas = this.canvas;
     canvas._objects = [this];
     this.set('canvas', canvas);
     this.setCoords();
-    var canvasEl = canvas.toCanvasElement(multiplier || 1, options);
+    const canvasEl = canvas.toCanvasElement(multiplier || 1, options);
     this.set('canvas', originalCanvas);
     this.shadow = originalShadow;
     if (originalGroup) {
@@ -1304,8 +1975,7 @@ export class FabricObject {
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
    */
-  toDataURL(options) {
-    options || (options = {});
+  toDataURL(options: any = {}) {
     return fabric.util.toDataURL(
       this.toCanvasElement(options),
       options.format || 'png',
@@ -1318,10 +1988,8 @@ export class FabricObject {
    * @param {String} type Type to check against
    * @return {Boolean}
    */
-  isType(type) {
-    return arguments.length > 1
-      ? Array.from(arguments).includes(this.type)
-      : this.type === type;
+  isType(...types: string[]) {
+    return types.includes(this.type);
   }
 
   /**
@@ -1347,8 +2015,8 @@ export class FabricObject {
    * @return {fabric.Object} thisArg
    * @chainable
    */
-  rotate(angle) {
-    var shouldCenterOrigin =
+  rotate(angle: TDegree) {
+    const shouldCenterOrigin =
       (this.originX !== 'center' || this.originY !== 'center') &&
       this.centeredRotation;
 
@@ -1446,7 +2114,7 @@ export class FabricObject {
    * custom composition operation for the particular object can be specified using globalCompositeOperation property
    * @param {CanvasRenderingContext2D} ctx Rendering canvas context
    */
-  _setupCompositeOperation(ctx) {
+  _setupCompositeOperation(ctx: CanvasRenderingContext2D) {
     if (this.globalCompositeOperation) {
       ctx.globalCompositeOperation = this.globalCompositeOperation;
     }
@@ -1473,11 +2141,7 @@ export class FabricObject {
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Object>}
    */
-  static _fromObject(
-    klass,
-    object,
-    { extraParam, ...options } = {}
-  ) {
+  static _fromObject(klass, object, { extraParam, ...options } = {}) {
     return enlivenObjectEnlivables(clone(object, true), options).then(
       (enlivedMap) => {
         // from the resulting enlived options, extract options.extraParam to arg0
@@ -1486,7 +2150,7 @@ export class FabricObject {
         return extraParam ? new klass(arg0, rest) : new klass(rest);
       }
     );
-  };
+  }
 
   /**
    *
@@ -1502,605 +2166,95 @@ export class FabricObject {
   }
 }
 
-Object.assign(
-  FabricObject.prototype,
-  fabric.Observable,
-  fabric.CommonMethods, {
-  /**
-   * Type of an object (rect, circle, path, etc.).
-   * Note that this property is meant to be read-only and not meant to be modified.
-   * If you modify, certain parts of Fabric (such as JSON loading) won't work correctly.
-   * @type String
-   * @default
-   */
+const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
   type: 'object',
-
-  /**
-  * Horizontal origin of transformation of an object (one of "left", "right", "center")
-  * See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
-  * @type String
-  * @default
-  */
   originX: 'left',
-
-  /**
-  * Vertical origin of transformation of an object (one of "top", "bottom", "center")
-  * See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
-  * @type String
-  * @default
-  */
   originY: 'top',
-
-  /**
-  * Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
-  * @type Number
-  * @default
-  */
   top: 0,
-
-  /**
-  * Left position of an object. Note that by default it's relative to object left. You can change this by setting originX={left/center/right}
-  * @type Number
-  * @default
-  */
   left: 0,
-
-  /**
-  * Object width
-  * @type Number
-  * @default
-  */
   width: 0,
-
-  /**
-  * Object height
-  * @type Number
-  * @default
-  */
   height: 0,
-
-  /**
-  * Object scale factor (horizontal)
-  * @type Number
-  * @default
-  */
   scaleX: 1,
-
-  /**
-  * Object scale factor (vertical)
-  * @type Number
-  * @default
-  */
   scaleY: 1,
-
-  /**
-  * When true, an object is rendered as flipped horizontally
-  * @type Boolean
-  * @default
-  */
   flipX: false,
-
-  /**
-  * When true, an object is rendered as flipped vertically
-  * @type Boolean
-  * @default
-  */
   flipY: false,
-
-  /**
-  * Opacity of an object
-  * @type Number
-  * @default
-  */
   opacity: 1,
-
-  /**
-  * Angle of rotation of an object (in degrees)
-  * @type Number
-  * @default
-  */
   angle: 0,
-
-  /**
-  * Angle of skew on x axes of an object (in degrees)
-  * @type Number
-  * @default
-  */
   skewX: 0,
-
-  /**
-  * Angle of skew on y axes of an object (in degrees)
-  * @type Number
-  * @default
-  */
   skewY: 0,
-
-  /**
-  * Size of object's controlling corners (in pixels)
-  * @type Number
-  * @default
-  */
   cornerSize: 13,
-
-  /**
-  * Size of object's controlling corners when touch interaction is detected
-  * @type Number
-  * @default
-  */
   touchCornerSize: 24,
-
-  /**
-  * When true, object's controlling corners are rendered as transparent inside (i.e. stroke instead of fill)
-  * @type Boolean
-  * @default
-  */
   transparentCorners: true,
-
-  /**
-  * Default cursor value used when hovering over this object on canvas
-  * @type String
-  * @default
-  */
   hoverCursor: null,
-
-  /**
-  * Default cursor value used when moving this object on canvas
-  * @type String
-  * @default
-  */
   moveCursor: null,
-
-  /**
-  * Padding between object and its controlling borders (in pixels)
-  * @type Number
-  * @default
-  */
   padding: 0,
-
-  /**
-  * Color of controlling borders of an object (when it's active)
-  * @type String
-  * @default
-  */
   borderColor: 'rgb(178,204,255)',
-
-  /**
-  * Array specifying dash pattern of an object's borders (hasBorder must be true)
-  * @since 1.6.2
-  * @type Array
-  */
   borderDashArray: null,
-
-  /**
-  * Color of controlling corners of an object (when it's active)
-  * @type String
-  * @default
-  */
   cornerColor: 'rgb(178,204,255)',
-
-  /**
-  * Color of controlling corners of an object (when it's active and transparentCorners false)
-  * @since 1.6.2
-  * @type String
-  * @default
-  */
   cornerStrokeColor: null,
-
-  /**
-  * Specify style of control, 'rect' or 'circle'
-  * @since 1.6.2
-  * @type String
-  */
   cornerStyle: 'rect',
-
-  /**
-  * Array specifying dash pattern of an object's control (hasBorder must be true)
-  * @since 1.6.2
-  * @type Array
-  */
   cornerDashArray: null,
-
-  /**
-  * When true, this object will use center point as the origin of transformation
-  * when being scaled via the controls.
-  * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
-  * @since 1.3.4
-  * @type Boolean
-  * @default
-  */
   centeredScaling: false,
-
-  /**
-  * When true, this object will use center point as the origin of transformation
-  * when being rotated via the controls.
-  * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
-  * @since 1.3.4
-  * @type Boolean
-  * @default
-  */
   centeredRotation: true,
-
-  /**
-  * Color of object's fill
-  * takes css colors https://www.w3.org/TR/css-color-3/
-  * @type String
-  * @default
-  */
   fill: 'rgb(0,0,0)',
-
-  /**
-  * Fill rule used to fill an object
-  * accepted values are nonzero, evenodd
-  * <b>Backwards incompatibility note:</b> This property was used for setting globalCompositeOperation until v1.4.12 (use `fabric.Object#globalCompositeOperation` instead)
-  * @type String
-  * @default
-  */
   fillRule: 'nonzero',
-
-  /**
-  * Composite rule used for canvas globalCompositeOperation
-  * @type String
-  * @default
-  */
   globalCompositeOperation: 'source-over',
-
-  /**
-  * Background color of an object.
-  * takes css colors https://www.w3.org/TR/css-color-3/
-  * @type String
-  * @default
-  */
   backgroundColor: '',
-
-  /**
-  * Selection Background color of an object. colored layer behind the object when it is active.
-  * does not mix good with globalCompositeOperation methods.
-  * @type String
-  * @default
-  */
   selectionBackgroundColor: '',
-
-  /**
-  * When defined, an object is rendered via stroke and this property specifies its color
-  * takes css colors https://www.w3.org/TR/css-color-3/
-  * @type String
-  * @default
-  */
   stroke: null,
-
-  /**
-  * Width of a stroke used to render this object
-  * @type Number
-  * @default
-  */
   strokeWidth: 1,
-
-  /**
-  * Array specifying dash pattern of an object's stroke (stroke must be defined)
-  * @type Array
-  */
   strokeDashArray: null,
-
-  /**
-  * Line offset of an object's stroke
-  * @type Number
-  * @default
-  */
   strokeDashOffset: 0,
-
-  /**
-  * Line endings style of an object's stroke (one of "butt", "round", "square")
-  * @type String
-  * @default
-  */
   strokeLineCap: 'butt',
-
-  /**
-  * Corner style of an object's stroke (one of "bevel", "round", "miter")
-  * @type String
-  * @default
-  */
   strokeLineJoin: 'miter',
-
-  /**
-  * Maximum miter length (used for strokeLineJoin = "miter") of an object's stroke
-  * @type Number
-  * @default
-  */
   strokeMiterLimit: 4,
-
-  /**
-  * Shadow object representing shadow of this shape
-  * @type fabric.Shadow
-  * @default
-  */
   shadow: null,
-
-  /**
-  * Opacity of object's controlling borders when object is active and moving
-  * @type Number
-  * @default
-  */
   borderOpacityWhenMoving: 0.4,
-
-  /**
-  * Scale factor of object's controlling borders
-  * bigger number will make a thicker border
-  * border is 1, so this is basically a border thickness
-  * since there is no way to change the border itself.
-  * @type Number
-  * @default
-  */
   borderScaleFactor: 1,
-
-  /**
-  * Minimum allowed scale value of an object
-  * @type Number
-  * @default
-  */
   minScaleLimit: 0,
-
-  /**
-  * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection).
-  * But events still fire on it.
-  * @type Boolean
-  * @default
-  */
   selectable: true,
-
-  /**
-  * When set to `false`, an object can not be a target of events. All events propagate through it. Introduced in v1.3.4
-  * @type Boolean
-  * @default
-  */
   evented: true,
-
-  /**
-  * When set to `false`, an object is not rendered on canvas
-  * @type Boolean
-  * @default
-  */
   visible: true,
-
-  /**
-  * When set to `false`, object's controls are not displayed and can not be used to manipulate object
-  * @type Boolean
-  * @default
-  */
   hasControls: true,
-
-  /**
-  * When set to `false`, object's controlling borders are not rendered
-  * @type Boolean
-  * @default
-  */
   hasBorders: true,
-
-  /**
-  * When set to `true`, objects are "found" on canvas on per-pixel basis rather than according to bounding box
-  * @type Boolean
-  * @default
-  */
   perPixelTargetFind: false,
-
-  /**
-  * When `false`, default object's values are not included in its serialization
-  * @type Boolean
-  * @default
-  */
   includeDefaultValues: true,
-
-  /**
-  * When `true`, object horizontal movement is locked
-  * @type Boolean
-  * @default
-  */
   lockMovementX: false,
-
-  /**
-  * When `true`, object vertical movement is locked
-  * @type Boolean
-  * @default
-  */
   lockMovementY: false,
-
-  /**
-  * When `true`, object rotation is locked
-  * @type Boolean
-  * @default
-  */
   lockRotation: false,
-
-  /**
-  * When `true`, object horizontal scaling is locked
-  * @type Boolean
-  * @default
-  */
   lockScalingX: false,
-
-  /**
-  * When `true`, object vertical scaling is locked
-  * @type Boolean
-  * @default
-  */
   lockScalingY: false,
-
-  /**
-  * When `true`, object horizontal skewing is locked
-  * @type Boolean
-  * @default
-  */
   lockSkewingX: false,
-
-  /**
-  * When `true`, object vertical skewing is locked
-  * @type Boolean
-  * @default
-  */
   lockSkewingY: false,
-
-  /**
-  * When `true`, object cannot be flipped by scaling into negative values
-  * @type Boolean
-  * @default
-  */
   lockScalingFlip: false,
-
-  /**
-  * When `true`, object is not exported in OBJECT/JSON
-  * @since 1.6.3
-  * @type Boolean
-  * @default
-  */
   excludeFromExport: false,
-
-  /**
-  * When `true`, object is cached on an additional canvas.
-  * When `false`, object is not cached unless necessary ( clipPath )
-  * default to true
-  * @since 1.7.0
-  * @type Boolean
-  * @default true
-  */
   objectCaching: !fabric.isLikelyNode,
-
-  /**
-  * When `true`, object properties are checked for cache invalidation. In some particular
-  * situation you may want this to be disabled ( spray brush, very big, groups)
-  * or if your application does not allow you to modify properties for groups child you want
-  * to disable it for groups.
-  * default to false
-  * since 1.7.0
-  * @type Boolean
-  * @default false
-  */
   statefullCache: false,
-
-  /**
-  * When `true`, cache does not get updated during scaling. The picture will get blocky if scaled
-  * too much and will be redrawn with correct details at the end of scaling.
-  * this setting is performance and application dependant.
-  * default to true
-  * since 1.7.0
-  * @type Boolean
-  * @default true
-  */
   noScaleCache: true,
-
-  /**
-  * When `false`, the stoke width will scale with the object.
-  * When `true`, the stroke will always match the exact pixel size entered for stroke width.
-  * this Property does not work on Text classes or drawing call that uses strokeText,fillText methods
-  * default to false
-  * @since 2.6.0
-  * @type Boolean
-  * @default false
-  * @type Boolean
-  * @default false
-  */
   strokeUniform: false,
-
-  /**
-  * When set to `true`, object's cache will be rerendered next render call.
-  * since 1.7.0
-  * @type Boolean
-  * @default true
-  */
   dirty: true,
-
-  /**
-  * keeps the value of the last hovered corner during mouse move.
-  * 0 is no corner, or 'mt', 'ml', 'mtr' etc..
-  * It should be private, but there is no harm in using it as
-  * a read-only property.
-  * @type number|string|any
-  * @default 0
-  */
   __corner: 0,
-
-  /**
-  * Determines if the fill or the stroke is drawn first (one of "fill" or "stroke")
-  * @type String
-  * @default
-  */
   paintFirst: 'fill',
-
-  /**
-  * When 'down', object is set to active on mousedown/touchstart
-  * When 'up', object is set to active on mouseup/touchend
-  * Experimental. Let's see if this breaks anything before supporting officially
-  * @private
-  * since 4.4.0
-  * @type String
-  * @default 'down'
-  */
   activeOn: 'down',
-
-  /**
-  * List of properties to consider when checking if state
-  * of an object is changed (fabric.Object#hasStateChanged)
-  * as well as for history (undo/redo) purposes
-  * @type Array
-  */
   stateProperties: (
     'top left width height scaleX scaleY flipX flipY originX originY transformMatrix ' +
     'stroke strokeWidth strokeDashArray strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit ' +
     'angle opacity fill globalCompositeOperation shadow visible backgroundColor ' +
     'skewX skewY fillRule paintFirst clipPath strokeUniform'
   ).split(' '),
-
-  /**
-  * List of properties to consider when checking if cache needs refresh
-  * Those properties are checked by statefullCache ON ( or lazy mode if we want ) or from single
-  * calls to Object.set(key, value). If the key is in this list, the object is marked as dirty
-  * and refreshed at the next render
-  * @type Array
-  */
   cacheProperties: (
     'fill stroke strokeWidth strokeDashArray width height paintFirst strokeUniform' +
     ' strokeLineCap strokeDashOffset strokeLineJoin strokeMiterLimit backgroundColor clipPath'
   ).split(' '),
-
-  /**
-  * List of properties to consider for animating colors.
-  * @type Array
-  */
   colorProperties: 'fill stroke backgroundColor'.split(' '),
-
-  /**
-  * a fabricObject that, without stroke define a clipping area with their shape. filled in black
-  * the clipPath object gets used when the object has rendered, and the context is placed in the center
-  * of the object cacheCanvas.
-  * If you want 0,0 of a clipPath to align with an object center, use clipPath.originX/Y to 'center'
-  * @type fabric.Object
-  */
   clipPath: undefined,
-
-  /**
-  * Meaningful ONLY when the object is used as clipPath.
-  * if true, the clipPath will make the object clip to the outside of the clipPath
-  * since 2.4.0
-  * @type boolean
-  * @default false
-  */
   inverted: false,
-
-  /**
-  * Meaningful ONLY when the object is used as clipPath.
-  * if true, the clipPath will have its top and left relative to canvas, and will
-  * not be influenced by the object transform. This will make the clipPath relative
-  * to the canvas, but clipping just a particular object.
-  * WARNING this is beta, this feature may change or be renamed.
-  * since 2.4.0
-  * @type boolean
-  * @default false
-  */
   absolutePositioned: false,
-})
+};
 
-fabric.util.createAccessors && fabric.util.createAccessors(FabricObject);
+Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
 
 (function (global) {
-  var fabric = global.fabric;
+  const fabric = global.fabric;
   fabric.Object = FabricObject;
-})(typeof exports !== 'undefined' ? exports : window)
+})(typeof exports !== 'undefined' ? exports : window);

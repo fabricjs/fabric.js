@@ -15,7 +15,7 @@ module.exports = {
     '/fixtures': 'test/fixtures',
     '/main': 'test/tests.mustache'
   },
-  test_page: 'main?hidepassed&hideskipped&timeout=60000',
+  test_page: 'main',
   browser_args: {
     Chrome: [
       '--headless',
@@ -42,5 +42,6 @@ module.exports = {
     filter: process.env.QUNIT_FILTER || null,
   },
   timeout: 540,
+  browser_start_timeout: 60,
   parallel: 4
 }

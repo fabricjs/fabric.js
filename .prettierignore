@@ -2,7 +2,6 @@
 *.iml
 change-output.md
 /.nyc_output/
-/.vscode/
 /node_modules/
 /npm-debug.log
 before_commit
