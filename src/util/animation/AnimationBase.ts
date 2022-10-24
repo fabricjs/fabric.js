@@ -85,7 +85,7 @@ export abstract class AnimationBase<T extends number | number[]> {
 
   protected abstract calculate(currentTime: number): {
     value: T;
-    changeRate: number;
+    changeRatio: number;
   };
 
   start() {
@@ -112,9 +112,9 @@ export abstract class AnimationBase<T extends number | number[]> {
     const durationMs = (t || +new Date()) - this.startTime;
     const boundDurationMs = Math.min(durationMs, this.duration);
     this.durationRatio = boundDurationMs / this.duration;
-    const { value, changeRate } = this.calculate(boundDurationMs);
+    const { value, changeRatio } = this.calculate(boundDurationMs);
     this.value = Array.isArray(value) ? (value.slice() as T) : value;
-    this.valueRatio = changeRate;
+    this.valueRatio = changeRatio;
 
     if (this._state === 'aborted') {
       return;

@@ -20,7 +20,7 @@ export class ArrayAnimation extends AnimationBase<number[]> {
     );
     return {
       value: values,
-      changeRate: Math.abs((values[0] - this.startValue[0]) / this.byValue[0]),
+      changeRatio: Math.abs((values[0] - this.startValue[0]) / this.byValue[0]),
     };
   }
 }

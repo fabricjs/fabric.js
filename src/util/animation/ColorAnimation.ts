@@ -7,8 +7,8 @@ import { ColorAnimationOptions, TOnAnimationChangeCallback } from './types';
 
 const wrapColorCallback =
   <R>(callback: TOnAnimationChangeCallback<string, R>) =>
-  (rgba: TColorAlphaSource, valueRate: number, durationRate: number) =>
-    callback(new Color(rgba).toRgba(), valueRate, durationRate);
+  (rgba: TColorAlphaSource, valueRatio: number, durationRatio: number) =>
+    callback(new Color(rgba).toRgba(), valueRatio, durationRatio);
 
 export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
   constructor({
@@ -16,9 +16,9 @@ export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
     endValue,
     byValue,
     easing = (currentTime, startValue, byValue, duration) => {
-      const durationRate =
+      const durationRatio =
         1 - Math.cos((currentTime / duration) * (Math.PI / 2));
-      return startValue + byValue * durationRate;
+      return startValue + byValue * durationRatio;
     },
     onChange = noop,
     onComplete = noop,
@@ -50,8 +50,8 @@ export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
     const rgb = [r, g, b].map(Math.round);
     return {
       value: [...rgb, capValue(0, a, 1)] as TColorAlphaSource,
-      changeRate:
-        // to correctly calculate the change rate we must find a changed value
+      changeRatio:
+        // to correctly calculate the change ratio we must find a changed value
         rgb
           .map((p, i) =>
             this.byValue[i] !== 0
