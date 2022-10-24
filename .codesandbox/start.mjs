@@ -39,7 +39,7 @@ export function startSandbox(destination, buildAndWatch) {
             trigger: moment().format('YYYY-MM-DD HH:mm:ss'),
           },
           null,
-          '  '
+          2
         )
       );
   }, 500);
