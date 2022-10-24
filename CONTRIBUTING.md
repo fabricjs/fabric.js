@@ -103,7 +103,8 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 - **Tests** \
   PRs must be backed with relevant tests, follow [TESTING](#-testing).
 - **Docs** \
-  Add relevant comments to your code if necessary using [JSDoc 3][jsdoc] and update relevant guides.\
+  Update guides if necessary.\
+  Add relevant comments to your code using [JSDoc3][jsdoc], [JSDoc reference supported by TS][tsjsdoc].\
   The generated documentation can be found at [fabricjs.com][docs], see [DOCS](#-improving-docs).
 - **Changelog**\
   Add a concise listing to the [**CHANGELOG**](CHANGELOG.md) describing what has changed.
@@ -254,6 +255,7 @@ Don't forget to unlink the package once you're done.
 [prettier_extension]: https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode
 [eslint]: https://eslint.org/
 [jsdoc]: https://jsdoc.app/
+[tsjsdoc]: https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html
 [qunit]: https://qunitjs.com/
 [testem]: https://github.com/testem/testem
 [npm_link]: https://docs.npmjs.com/cli/v8/commands/npm-link
