@@ -53,7 +53,7 @@ jobs:
         run: npm run test -- -c node -s ${{ matrix.suite }}
   ts:
     runs-on: ubuntu-latest
-    name: TS v${{ matrix.ts }} tests
+    name: TS ${{ matrix.ts }} tests
     strategy:
       fail-fast: false
       matrix:
