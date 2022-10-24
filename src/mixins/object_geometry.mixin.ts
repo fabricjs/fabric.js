@@ -1,10 +1,14 @@
-//@ts-nocheck
+import type { TBoundingBox } from '../util/misc/boundingBoxFromPoints';
 import { Intersection, IntersectionType } from '../intersection.class';
 import { IPoint, Point } from '../point.class';
 import { TMat2D, TOriginX, TOriginY } from '../typedefs';
 import { CommonMethods } from './shared_methods.mixin';
-import { transformPoint } from '../util/misc/matrix';
+import { calcRotateMatrix, invertTransform, multiplyTransformMatrices, qrDecompose, transformPoint } from '../util/misc/matrix';
+import { cos } from '../util/misc/cos';
+import { sin } from '../util/misc/sin';
 import { FabricObject } from '../shapes/object.class';
+import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 
 type TCornerPoint = {
   tl: Point,
@@ -17,11 +21,23 @@ type TOCoord = IPoint & {
   corner: TCornerPoint
 };
 
+type TLineDescriptor = {
+  o: Point;
+  d: Point;
+};
+
+type TBBoxLines = {
+  topline: TLineDescriptor;
+  leftline: TLineDescriptor;
+  bottomline: TLineDescriptor;
+  rightline: TLineDescriptor;
+};
+
 type TControlSet = Record<string, Control>
 
 type TACoords = TCornerPoint;
 
-class ObjectGeometry extends CommonMethods {
+export class ObjectGeometry extends CommonMethods {
   /**
    * Describe object's corner position in canvas element coordinates.
    * properties are depending on control keys and padding the main controls.
@@ -46,7 +62,7 @@ class ObjectGeometry extends CommonMethods {
    * You can calculate them without updating with @method calcACoords();
    * @memberOf fabric.Object.prototype
    */
-  aCoords: TACoords = {}
+  aCoords: TACoords
 
   /**
    * Describe object's corner position in canvas element coordinates.
@@ -56,7 +72,7 @@ class ObjectGeometry extends CommonMethods {
    * @todo investigate how to get rid of those
    * @memberOf fabric.Object.prototype
    */
-  lineCoords: TCornerPoint = {}
+  lineCoords: TCornerPoint
 
   /**
    * storage for object transform matrix
@@ -191,10 +207,12 @@ class ObjectGeometry extends CommonMethods {
   /**
    * return correct set of coordinates for intersection
    * this will return either aCoords or lineCoords.
-   * @param {Boolean} absolute will return aCoords if true or lineCoords
+   * @param {boolean} absolute will return aCoords if true or lineCoords
+   * @param {boolean} calculate will calculate the coords or use the one
+   * that are attached to the object instance
    * @return {Object} {tl, tr, br, bl} points
    */
-  _getCoords(absolute: boolean, calculate: boolean): TCornerPoint {
+  _getCoords(absolute = false, calculate = false): TCornerPoint {
     if (calculate) {
       return absolute ? this.calcACoords() : this.calcLineCoords();
     }
@@ -208,13 +226,15 @@ class ObjectGeometry extends CommonMethods {
    * return correct set of coordinates for intersection
    * this will return either aCoords or lineCoords.
    * The coords are returned in an array.
+   * @param {boolean} absolute will return aCoords if true or lineCoords
+   * @param {boolean} calculate will return aCoords if true or lineCoords
    * @return {Array} [tl, tr, br, bl] of points
    */
-  getCoords(absolute: boolean, calculate: boolean): Point[] {
+  getCoords(absolute = false, calculate = false): Point[] {
     const { tl, tr, br, bl } = this._getCoords(absolute, calculate);
     const coords = [tl, tr, br, bl];
     if (this.group) {
-      var t = this.group.calcTransformMatrix();
+      const t = this.group.calcTransformMatrix();
       return coords.map((p) => transformPoint(p, t));
     }
     return coords;
@@ -230,7 +250,7 @@ class ObjectGeometry extends CommonMethods {
    */
   intersectsWithRect(pointTL: Point, pointBR: Point, absolute: boolean, calculate: boolean): boolean {
     const coords = this.getCoords(absolute, calculate),
-      intersection = fabric.Intersection.intersectPolygonRectangle(
+      intersection = Intersection.intersectPolygonRectangle(
         coords,
         pointTL,
         pointBR
@@ -304,10 +324,10 @@ class ObjectGeometry extends CommonMethods {
    * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
    * @return {Boolean} true if point is inside the object
    */
-  containsPoint(point: Point, lines, absolute: boolean, calculate: boolean): boolean {
+  containsPoint(point: Point, lines: TBBoxLines | undefined, absolute: boolean, calculate: boolean): boolean {
     const coords = this._getCoords(absolute, calculate),
-      lines = lines || this._getImageLines(coords),
-      xPoints = this._findCrossPoints(point, lines);
+      imageLines = lines || this._getImageLines(coords),
+      xPoints = this._findCrossPoints(point, imageLines);
     // if xPoints is odd then point is inside the object
     return xPoints !== 0 && xPoints % 2 === 1;
   }
@@ -353,8 +373,8 @@ class ObjectGeometry extends CommonMethods {
    */
   _containsCenterOfCanvas(pointTL: Point, pointBR: Point, calculate: boolean): boolean {
     // worst case scenario the object is so big that contains the screen
-    var centerPoint = pointTL.midPointFrom(pointBR);
-    return this.containsPoint(centerPoint, null, true, calculate);
+    const centerPoint = pointTL.midPointFrom(pointBR);
+    return this.containsPoint(centerPoint, undefined, true, calculate);
   }
 
   /**
@@ -377,7 +397,7 @@ class ObjectGeometry extends CommonMethods {
     );
     return (
       allPointsAreOutside &&
-      this._containsCenterOfCanvas(pointTL, pointBR, calculate)
+      this._containsCenterOfCanvas(tl, br, calculate)
     );
   }
 
@@ -386,23 +406,23 @@ class ObjectGeometry extends CommonMethods {
    * @private
    * @param {Object} oCoords Coordinates of the object corners
    */
-  _getImageLines(oCoords: TCornerPoint) {
+  _getImageLines({ tl, tr, bl, br}: TCornerPoint): TBBoxLines {
     const lines = {
       topline: {
-        o: oCoords.tl,
-        d: oCoords.tr,
+        o: tl,
+        d: tr,
       },
       rightline: {
-        o: oCoords.tr,
-        d: oCoords.br,
+        o: tr,
+        d: br,
       },
       bottomline: {
-        o: oCoords.br,
-        d: oCoords.bl,
+        o: br,
+        d: bl,
       },
       leftline: {
-        o: oCoords.bl,
-        d: oCoords.tl,
+        o: bl,
+        d: tl,
       },
     };
 
@@ -430,19 +450,14 @@ class ObjectGeometry extends CommonMethods {
    * @private
    * @param {Point} point Point to check
    * @param {Object} lines Coordinates of the object being evaluated
+   * @return {number} number of crossPoint
    */
-  // remove yi, not used but left code here just in case.
-  _findCrossPoints: function (point, lines) {
-    var b1,
-      b2,
-      a1,
-      a2,
-      xi, // yi,
-      xcount = 0,
-      iLine;
+  _findCrossPoints(point: Point, lines: TBBoxLines): number {
+    let xcount = 0;
 
-    for (var lineKey in lines) {
-      iLine = lines[lineKey];
+    for (const lineKey in lines) {
+      let xi;
+      const iLine = lines[(lineKey as keyof TBBoxLines)];
       // optimisation 1: line below point. no cross
       if (iLine.o.y < point.y && iLine.d.y < point.y) {
         continue;
@@ -454,17 +469,15 @@ class ObjectGeometry extends CommonMethods {
       // optimisation 3: vertical line case
       if (iLine.o.x === iLine.d.x && iLine.o.x >= point.x) {
         xi = iLine.o.x;
-        // yi = point.y;
       }
       // calculate the intersection point
       else {
-        b1 = 0;
-        b2 = (iLine.d.y - iLine.o.y) / (iLine.d.x - iLine.o.x);
-        a1 = point.y - b1 * point.x;
-        a2 = iLine.o.y - b2 * iLine.o.x;
+        const b1 = 0;
+        const b2 = (iLine.d.y - iLine.o.y) / (iLine.d.x - iLine.o.x);
+        const a1 = point.y - b1 * point.x;
+        const a2 = iLine.o.y - b2 * iLine.o.x;
 
         xi = -(a1 - a2) / (b1 - b2);
-        // yi = a1 + b1 * xi;
       }
       // dont count xi < point.x cases
       if (xi >= point.x) {
@@ -476,7 +489,7 @@ class ObjectGeometry extends CommonMethods {
       }
     }
     return xcount;
-  },
+  }
 
   /**
    * Returns coordinates of object's bounding rectangle (left, top, width, height)
@@ -485,36 +498,38 @@ class ObjectGeometry extends CommonMethods {
    * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords / .aCoords
    * @return {Object} Object with left, top, width, height properties
    */
-  getBoundingRect: function (absolute, calculate) {
-    var coords = this.getCoords(absolute, calculate);
-    return util.makeBoundingBoxFromPoints(coords);
-  },
+  getBoundingRect(absolute?: boolean, calculate?: boolean): TBoundingBox {
+    return makeBoundingBoxFromPoints(this.getCoords(absolute, calculate));
+  }
 
   /**
    * Returns width of an object's bounding box counting transformations
    * before 2.0 it was named getWidth();
+   * consider calling this._getTransformedDimensions if you need both width and height
    * @return {Number} width value
    */
-  getScaledWidth: function () {
+  getScaledWidth(): number {
     return this._getTransformedDimensions().x;
-  },
+  }
 
   /**
    * Returns height of an object bounding box counting transformations
    * before 2.0 it was named getHeight();
+   * consider calling this._getTransformedDimensions if you need both width and height
    * @return {Number} height value
    */
-  getScaledHeight: function () {
+  getScaledHeight(): number {
     return this._getTransformedDimensions().y;
-  },
+  }
 
   /**
    * Makes sure the scale is valid and modifies it if necessary
+   * todo: this is a control action issue, not a geometry one
    * @private
-   * @param {Number} value
-   * @return {Number}
+   * @param {Number} value, unconstrained
+   * @return {Number} constrained value;
    */
-  _constrainScale: function (value) {
+  _constrainScale(value: number): number {
     if (Math.abs(value) < this.minScaleLimit) {
       if (value < 0) {
         return -this.minScaleLimit;
@@ -525,65 +540,60 @@ class ObjectGeometry extends CommonMethods {
       return 0.0001;
     }
     return value;
-  },
+  }
 
   /**
    * Scales an object (equally by x and y)
    * @param {Number} value Scale factor
-   * @return {fabric.Object} thisArg
-   * @chainable
+   * @return {void}
    */
-  scale: function (value) {
+  scale(value: number): void {
     this._set('scaleX', value);
     this._set('scaleY', value);
-    return this.setCoords();
-  },
+    this.setCoords();
+  }
 
   /**
    * Scales an object to a given width, with respect to bounding box (scaling by x/y equally)
    * @param {Number} value New width value
    * @param {Boolean} absolute ignore viewport
-   * @return {fabric.Object} thisArg
-   * @chainable
+   * @return {void}
    */
-  scaleToWidth: function (value, absolute) {
+  scaleToWidth(value: number, absolute: boolean) {
     // adjust to bounding rect factor so that rotated shapes would fit as well
-    var boundingRectFactor =
+    const boundingRectFactor =
       this.getBoundingRect(absolute).width / this.getScaledWidth();
     return this.scale(value / this.width / boundingRectFactor);
-  },
+  }
 
   /**
    * Scales an object to a given height, with respect to bounding box (scaling by x/y equally)
    * @param {Number} value New height value
    * @param {Boolean} absolute ignore viewport
-   * @return {fabric.Object} thisArg
-   * @chainable
+   * @return {void}
    */
-  scaleToHeight: function (value, absolute) {
+  scaleToHeight(value: number, absolute = false) {
     // adjust to bounding rect factor so that rotated shapes would fit as well
-    var boundingRectFactor =
+    const boundingRectFactor =
       this.getBoundingRect(absolute).height / this.getScaledHeight();
     return this.scale(value / this.height / boundingRectFactor);
-  },
+  }
 
-  calcLineCoords: function () {
-    var vpt = this.getViewportTransform(),
+  calcLineCoords(): TCornerPoint {
+    const vpt = this.getViewportTransform(),
       padding = this.padding,
       angle = degreesToRadians(this.getTotalAngle()),
-      cos = util.cos(angle),
-      sin = util.sin(angle),
-      cosP = cos * padding,
-      sinP = sin * padding,
+      cosP = cos(angle) * padding,
+      sinP = sin(angle) * padding,
       cosPSinP = cosP + sinP,
       cosPMinusSinP = cosP - sinP,
-      aCoords = this.calcACoords();
+      { tl, tr, bl, br } = this.calcACoords();
 
-    var lineCoords = {
-      tl: transformPoint(aCoords.tl, vpt),
-      tr: transformPoint(aCoords.tr, vpt),
-      bl: transformPoint(aCoords.bl, vpt),
-      br: transformPoint(aCoords.br, vpt),
+    const lineCoords: TCornerPoint = {
+      tl: transformPoint(tl, vpt),
+      tr: transformPoint(tr, vpt),
+      bl: transformPoint(bl, vpt),
+      br: transformPoint(br, vpt),
     };
 
     if (padding) {
@@ -598,19 +608,25 @@ class ObjectGeometry extends CommonMethods {
     }
 
     return lineCoords;
-  },
+  }
 
-  calcOCoords: function () {
-    var vpt = this.getViewportTransform(),
+  /**
+   * Scales an object to a given height, with respect to bounding box (scaling by x/y equally)
+   * @param {Number} value New height value
+   * @param {Boolean} absolute ignore viewport
+   * @return {Record<string, TCornerPoint>}
+   */
+  calcOCoords(): TOCoord {
+    let vpt = this.getViewportTransform(),
       center = this.getCenterPoint(),
       tMatrix = [1, 0, 0, 1, center.x, center.y],
-      rMatrix = util.calcRotateMatrix({
+      rMatrix = calcRotateMatrix({
         angle:
           this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
       }),
-      positionMatrix = multiplyMatrices(tMatrix, rMatrix),
-      startMatrix = multiplyMatrices(vpt, positionMatrix),
-      finalMatrix = multiplyMatrices(startMatrix, [
+      positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),
+      startMatrix = multiplyTransformMatrices(vpt, positionMatrix),
+      finalMatrix = multiplyTransformMatrices(startMatrix, [
         1 / vpt[0],
         0,
         0,
@@ -619,7 +635,7 @@ class ObjectGeometry extends CommonMethods {
         0,
       ]),
       transformOptions = this.group
-        ? fabric.util.qrDecompose(this.calcTransformMatrix())
+        ? qrDecompose(this.calcTransformMatrix())
         : undefined,
       dim = this._calculateCurrentDimensions(transformOptions),
       coords = {};
@@ -638,12 +654,12 @@ class ObjectGeometry extends CommonMethods {
         var control = coords[key];
         canvas.contextTop.fillRect(control.x, control.y, 3, 3);
       });
-    }, 50);
+    } 50);
   */
     return coords;
-  },
+  }
 
-  calcACoords: function () {
+  calcACoords() {
     var rotateMatrix = util.calcRotateMatrix({ angle: this.angle }),
       center = this.getRelativeCenterPoint(),
       translateMatrix = [1, 0, 0, 1, center.x, center.y],
@@ -658,7 +674,7 @@ class ObjectGeometry extends CommonMethods {
       bl: transformPoint({ x: -w, y: h }, finalMatrix),
       br: transformPoint({ x: w, y: h }, finalMatrix),
     };
-  },
+  }
 
   /**
    * Sets corner and controls position coordinates based on current angle, width and height, left and top.
@@ -671,7 +687,7 @@ class ObjectGeometry extends CommonMethods {
    * @return {fabric.Object} thisArg
    * @chainable
    */
-  setCoords: function (skipCorners) {
+  setCoords(skipCorners = false) {
     this.aCoords = this.calcACoords();
     // in case we are in a group, for how the inner group target check works,
     // lineCoords are exactly aCoords. Since the vpt gets absorbed by the normalized pointer.
@@ -683,9 +699,9 @@ class ObjectGeometry extends CommonMethods {
     this.oCoords = this.calcOCoords();
     this._setCornerCoords && this._setCornerCoords();
     return this;
-  },
+  }
 
-  transformMatrixKey: function (skipGroup) {
+  transformMatrixKey(skipGroup) {
     var sep = '_',
       prefix = '';
     if (!skipGroup && this.group) {
@@ -719,7 +735,7 @@ class ObjectGeometry extends CommonMethods {
       this.flipX +
       this.flipY
     );
-  },
+  }
 
   /**
    * calculate transform matrix that represents the current transformations from the
@@ -728,7 +744,7 @@ class ObjectGeometry extends CommonMethods {
    * There are some situation in which this is useful to avoid the fake rotation.
    * @return {Array} transform matrix for the object
    */
-  calcTransformMatrix: function (skipGroup) {
+  calcTransformMatrix(skipGroup) {
     var matrix = this.calcOwnMatrix();
     if (skipGroup || !this.group) {
       return matrix;
@@ -747,14 +763,14 @@ class ObjectGeometry extends CommonMethods {
     cache.key = key;
     cache.value = matrix;
     return matrix;
-  },
+  }
 
   /**
    * calculate transform matrix that represents the current transformations from the
    * object's properties, this matrix does not include the group transformation
    * @return {Array} transform matrix for the object
    */
-  calcOwnMatrix: function () {
+  calcOwnMatrix() {
     var key = this.transformMatrixKey(true),
       cache = this.ownMatrixCache || (this.ownMatrixCache = {});
     if (cache.key === key) {
@@ -775,16 +791,16 @@ class ObjectGeometry extends CommonMethods {
     cache.key = key;
     cache.value = util.composeMatrix(options);
     return cache.value;
-  },
+  }
 
   /**
    * Calculate object dimensions from its properties
    * @private
    * @returns {Point} dimensions
    */
-  _getNonTransformedDimensions: function () {
+  _getNonTransformedDimensions() {
     return new Point(this.width, this.height).scalarAdd(this.strokeWidth);
-  },
+  }
 
   /**
    * Calculate object bounding box dimensions from its properties scale, skew.
@@ -796,7 +812,7 @@ class ObjectGeometry extends CommonMethods {
    * @private
    * @returns {Point} dimensions
    */
-  _getTransformedDimensions: function (options) {
+  _getTransformedDimensions(options) {
     options = Object.assign(
       {
         scaleX: this.scaleX,
@@ -835,7 +851,7 @@ class ObjectGeometry extends CommonMethods {
     }
 
     return finalDimensions.scalarAdd(postScalingStrokeValue);
-  },
+  }
 
   /**
    * Calculate object dimensions for controls box, including padding and canvas zoom.
@@ -844,10 +860,10 @@ class ObjectGeometry extends CommonMethods {
    * @param {object} [options] transform options
    * @returns {Point} dimensions
    */
-  _calculateCurrentDimensions: function (options) {
+  _calculateCurrentDimensions(options) {
     var vpt = this.getViewportTransform(),
       dim = this._getTransformedDimensions(options),
       p = transformPoint(dim, vpt, true);
     return p.scalarAdd(2 * this.padding);
-  },
+  }
 }
