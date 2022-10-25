@@ -1,14 +1,16 @@
 import type { TBoundingBox } from '../util/misc/boundingBoxFromPoints';
 import { Intersection, IntersectionType } from '../intersection.class';
 import { IPoint, Point } from '../point.class';
-import { TMat2D, TOriginX, TOriginY } from '../typedefs';
+import { TDegree, TMat2D, TOriginX, TOriginY } from '../typedefs';
 import { CommonMethods } from './shared_methods.mixin';
-import { calcRotateMatrix, invertTransform, multiplyTransformMatrices, qrDecompose, transformPoint } from '../util/misc/matrix';
+import { calcRotateMatrix, composeMatrix, invertTransform, multiplyTransformMatrices, qrDecompose, transformPoint } from '../util/misc/matrix';
 import { cos } from '../util/misc/cos';
 import { sin } from '../util/misc/sin';
 import { FabricObject } from '../shapes/object.class';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { iMatrix } from '../constants';
+import { sizeAfterTransform } from '../util/misc/objectTransforms';
 
 type TCornerPoint = {
   tl: Point,
@@ -32,6 +34,11 @@ type TBBoxLines = {
   bottomline: TLineDescriptor;
   rightline: TLineDescriptor;
 };
+
+type TMatrixCache = {
+  key: string;
+  value: TMat2D;
+}
 
 type TControlSet = Record<string, Control>
 
@@ -75,14 +82,14 @@ export class ObjectGeometry extends CommonMethods {
   lineCoords: TCornerPoint
 
   /**
-   * storage for object transform matrix
+   * storage cache for object transform matrix
    */
-  ownMatrixCache?: TMat2D
+  ownMatrixCache?: TMatrixCache
 
   /**
-   * storage for object full transform matrix
+   * storage cache for object full transform matrix
    */
-  matrixCache?: TMat2D
+  matrixCache?: TMatrixCache
 
   /**
    * custom controls interface
@@ -579,6 +586,21 @@ export class ObjectGeometry extends CommonMethods {
     return this.scale(value / this.height / boundingRectFactor);
   }
 
+  /**
+   * Returns the object angle relative to canvas counting also the group property
+   * @returns {TDegree}
+   */
+  getTotalAngle(): TDegree {
+    return this.group
+      ? qrDecompose(this.calcTransformMatrix()).angle
+      : this.angle;
+  }
+
+  /**
+   * return the coordinate of the 4 corners of the bounding box in HTMLCanvasElement coordinates
+   * used for bounding box interactivity with the mouse
+   * @returns {TCornerPoint}
+   */
   calcLineCoords(): TCornerPoint {
     const vpt = this.getViewportTransform(),
       padding = this.padding,
@@ -611,13 +633,28 @@ export class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * Scales an object to a given height, with respect to bounding box (scaling by x/y equally)
-   * @param {Number} value New height value
-   * @param {Boolean} absolute ignore viewport
-   * @return {Record<string, TCornerPoint>}
+   * Retrieves viewportTransform from Object's canvas if possible
+   * @method getViewportTransform
+   * @memberOf FabricObject.prototype
+   * @return {TMat2D}
    */
-  calcOCoords(): TOCoord {
-    let vpt = this.getViewportTransform(),
+  getViewportTransform(): TMat2D {
+    if (this.canvas && this.canvas.viewportTransform) {
+      return this.canvas.viewportTransform;
+    }
+    return iMatrix.concat() as TMat2D;
+  }
+
+  /**
+   * Calculates the coordnates of the center of each control plus the corners of the control itself
+   * This basically just delegates to each control positionHandler
+   * WARNING: changing what is passed to positionHandler is a breaking change, since position handler
+   * is a public api and should be done just if extremely necessary
+   * @todo needs to be moved to interactivity mixin
+   * @return {Record<string, TOCoord>}
+   */
+  calcOCoords(): Record<string, TOCoord> {
+    const vpt = this.getViewportTransform(),
       center = this.getCenterPoint(),
       tMatrix = [1, 0, 0, 1, center.x, center.y],
       rMatrix = calcRotateMatrix({
@@ -645,13 +682,13 @@ export class ObjectGeometry extends CommonMethods {
 
     // debug code
     /*
-    var canvas = this.canvas;
-  setTimeout(function () {
+    const canvas = this.canvas;
+    setTimeout(function () {
     if (!canvas) return;
       canvas.contextTop.clearRect(0, 0, 700, 700);
       canvas.contextTop.fillStyle = 'green';
       Object.keys(coords).forEach(function(key) {
-        var control = coords[key];
+        const control = coords[key];
         canvas.contextTop.fillRect(control.x, control.y, 3, 3);
       });
     } 50);
@@ -659,11 +696,11 @@ export class ObjectGeometry extends CommonMethods {
     return coords;
   }
 
-  calcACoords() {
-    var rotateMatrix = util.calcRotateMatrix({ angle: this.angle }),
+  calcACoords(): TCornerPoint {
+    const rotateMatrix = calcRotateMatrix({ angle: this.angle }),
       center = this.getRelativeCenterPoint(),
       translateMatrix = [1, 0, 0, 1, center.x, center.y],
-      finalMatrix = multiplyMatrices(translateMatrix, rotateMatrix),
+      finalMatrix = multiplyTransformMatrices(translateMatrix, rotateMatrix),
       dim = this._getTransformedDimensions(),
       w = dim.x / 2,
       h = dim.y / 2;
@@ -684,26 +721,22 @@ export class ObjectGeometry extends CommonMethods {
    * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
    *
    * @param {Boolean} [skipCorners] skip calculation of oCoords.
-   * @return {fabric.Object} thisArg
-   * @chainable
+   * @return {void}
    */
-  setCoords(skipCorners = false) {
+  setCoords(skipCorners = false): void {
     this.aCoords = this.calcACoords();
     // in case we are in a group, for how the inner group target check works,
     // lineCoords are exactly aCoords. Since the vpt gets absorbed by the normalized pointer.
     this.lineCoords = this.group ? this.aCoords : this.calcLineCoords();
-    if (skipCorners) {
-      return this;
+    if (!skipCorners) {
+      // set coordinates of the draggable boxes in the corners used to scale/rotate the image
+      this.oCoords = this.calcOCoords();
+      this._setCornerCoords && this._setCornerCoords();
     }
-    // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-    this.oCoords = this.calcOCoords();
-    this._setCornerCoords && this._setCornerCoords();
-    return this;
   }
 
-  transformMatrixKey(skipGroup) {
-    var sep = '_',
-      prefix = '';
+  transformMatrixKey(skipGroup = false): string {
+    const sep = '_', prefix = '';
     if (!skipGroup && this.group) {
       prefix = this.group.transformMatrixKey(skipGroup) + sep;
     }
@@ -742,41 +775,43 @@ export class ObjectGeometry extends CommonMethods {
    * object's properties.
    * @param {Boolean} [skipGroup] return transform matrix for object not counting parent transformations
    * There are some situation in which this is useful to avoid the fake rotation.
-   * @return {Array} transform matrix for the object
+   * @return {TMat2D} transform matrix for the object
    */
-  calcTransformMatrix(skipGroup) {
-    var matrix = this.calcOwnMatrix();
+  calcTransformMatrix(skipGroup = false): TMat2D {
+    let matrix = this.calcOwnMatrix();
     if (skipGroup || !this.group) {
       return matrix;
     }
-    var key = this.transformMatrixKey(skipGroup),
-      cache = this.matrixCache || (this.matrixCache = {});
-    if (cache.key === key) {
+    const key = this.transformMatrixKey(skipGroup),
+      cache = this.matrixCache;
+    if (cache && cache.key === key) {
       return cache.value;
     }
     if (this.group) {
-      matrix = multiplyMatrices(
+      matrix = multiplyTransformMatrices(
         this.group.calcTransformMatrix(false),
         matrix
       );
     }
-    cache.key = key;
-    cache.value = matrix;
+    this.matrixCache = {
+      key,
+      value: matrix,
+    };
     return matrix;
   }
 
   /**
    * calculate transform matrix that represents the current transformations from the
    * object's properties, this matrix does not include the group transformation
-   * @return {Array} transform matrix for the object
+   * @return {TMat2D} transform matrix for the object
    */
-  calcOwnMatrix() {
-    var key = this.transformMatrixKey(true),
-      cache = this.ownMatrixCache || (this.ownMatrixCache = {});
-    if (cache.key === key) {
+  calcOwnMatrix(): TMat2D {
+    const key = this.transformMatrixKey(true),
+      cache = this.ownMatrixCache;
+    if (cache && cache.key === key) {
       return cache.value;
     }
-    var center = this.getRelativeCenterPoint(),
+    const center = this.getRelativeCenterPoint(),
       options = {
         angle: this.angle,
         translateX: center.x,
@@ -787,10 +822,13 @@ export class ObjectGeometry extends CommonMethods {
         skewY: this.skewY,
         flipX: this.flipX,
         flipY: this.flipY,
-      };
-    cache.key = key;
-    cache.value = util.composeMatrix(options);
-    return cache.value;
+      },
+      value = composeMatrix(options);
+    this.ownMatrixCache = {
+      key,
+      value,
+    }
+    return value;
   }
 
   /**
@@ -798,7 +836,7 @@ export class ObjectGeometry extends CommonMethods {
    * @private
    * @returns {Point} dimensions
    */
-  _getNonTransformedDimensions() {
+  _getNonTransformedDimensions(): Point {
     return new Point(this.width, this.height).scalarAdd(this.strokeWidth);
   }
 
@@ -812,42 +850,37 @@ export class ObjectGeometry extends CommonMethods {
    * @private
    * @returns {Point} dimensions
    */
-  _getTransformedDimensions(options) {
-    options = Object.assign(
-      {
-        scaleX: this.scaleX,
-        scaleY: this.scaleY,
-        skewX: this.skewX,
-        skewY: this.skewY,
-        width: this.width,
-        height: this.height,
-        strokeWidth: this.strokeWidth,
-      },
-      options || {}
-    );
-    //  stroke is applied before/after transformations are applied according to `strokeUniform`
-    var preScalingStrokeValue,
-      postScalingStrokeValue,
-      strokeWidth = options.strokeWidth;
+  _getTransformedDimensions(options?: any = {}): Point {
+    const dimOptions = {
+      scaleX: this.scaleX,
+      scaleY: this.scaleY,
+      skewX: this.skewX,
+      skewY: this.skewY,
+      width: this.width,
+      height: this.height,
+      strokeWidth: this.strokeWidth,
+      ...options,
+    }
+    // stroke is applied before/after transformations are applied according to `strokeUniform`
+    const strokeWidth = dimOptions.strokeWidth;
+    let preScalingStrokeValue = strokeWidth,
+      postScalingStrokeValue = 0;
+
     if (this.strokeUniform) {
       preScalingStrokeValue = 0;
       postScalingStrokeValue = strokeWidth;
-    } else {
-      preScalingStrokeValue = strokeWidth;
-      postScalingStrokeValue = 0;
     }
-    var dimX = options.width + preScalingStrokeValue,
-      dimY = options.height + preScalingStrokeValue,
-      finalDimensions,
-      noSkew = options.skewX === 0 && options.skewY === 0;
+    const dimX = dimOptions.width + preScalingStrokeValue,
+      dimY = dimOptions.height + preScalingStrokeValue,
+      noSkew = dimOptions.skewX === 0 && dimOptions.skewY === 0;
+    let finalDimensions;
     if (noSkew) {
       finalDimensions = new Point(
-        dimX * options.scaleX,
-        dimY * options.scaleY
+        dimX * dimOptions.scaleX,
+        dimY * dimOptions.scaleY
       );
     } else {
-      var bbox = util.sizeAfterTransform(dimX, dimY, options);
-      finalDimensions = new Point(bbox.x, bbox.y);
+      finalDimensions = sizeAfterTransform(dimX, dimY, dimOptions);
     }
 
     return finalDimensions.scalarAdd(postScalingStrokeValue);
@@ -860,8 +893,8 @@ export class ObjectGeometry extends CommonMethods {
    * @param {object} [options] transform options
    * @returns {Point} dimensions
    */
-  _calculateCurrentDimensions(options) {
-    var vpt = this.getViewportTransform(),
+  _calculateCurrentDimensions(options?: any): Point {
+    const vpt = this.getViewportTransform(),
       dim = this._getTransformedDimensions(options),
       p = transformPoint(dim, vpt, true);
     return p.scalarAdd(2 * this.padding);

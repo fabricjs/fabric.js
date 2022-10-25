@@ -1121,16 +1121,6 @@ export class FabricObject extends CommonMethods {
   }
 
   /**
-   * Returns the object angle relative to canvas counting also the group property
-   * @returns {number}
-   */
-  getTotalAngle() {
-    return this.group
-      ? fabric.util.qrDecompose(this.calcTransformMatrix()).angle
-      : this.angle;
-  }
-
-  /**
    * @private
    * @param {String} key
    * @param {*} value
@@ -1167,19 +1157,6 @@ export class FabricObject extends CommonMethods {
       }
     }
     return this;
-  }
-
-  /**
-   * Retrieves viewportTransform from Object's canvas if possible
-   * @method getViewportTransform
-   * @memberOf FabricObject.prototype
-   * @return {Array}
-   */
-  getViewportTransform() {
-    if (this.canvas && this.canvas.viewportTransform) {
-      return this.canvas.viewportTransform;
-    }
-    return fabric.iMatrix.concat();
   }
 
   /*
@@ -1553,6 +1530,7 @@ export class FabricObject extends CommonMethods {
   /**
    * Renders controls and borders for the object
    * the context here is not transformed
+   * @todo move to interactivity
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {Object} [styleOverride] properties to override the object style
    */
