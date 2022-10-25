@@ -35,16 +35,20 @@ jobs:
       - run: npm ci
       - name: process
         uses: actions/github-script@v6
+        env:
+          a: ${{ needs.stats-upstream.outputs.result }}
+          b: ${{ needs.stats.outputs.result }}
         with:
           result-encoding: string
           script: |
             const { run } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
+            console.log(process.env.a, process.env.b);
             const res = await run({
               github,
               context,
               core,
-              a: JSON.parse(${{ needs.stats-upstream.outputs.result }}),
-              b: JSON.parse(${{ needs.stats.outputs.result }}),
+              a: JSON.parse(process.env.a),
+              b: JSON.parse(process.env.b),
             });
   lint:
     runs-on: ubuntu-latest
