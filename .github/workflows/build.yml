@@ -34,10 +34,10 @@ jobs:
           result-encoding: string
           script: |
             const fs = require('fs');
-            return {
+            return JSON.stringify({
               size: JSON.parse(fs.readFileSync('cli_output/build_size.json')),
               stats: JSON.parse(fs.readFileSync('cli_output/build_stats.json')),
-            };
+            });
       - name: checkout src files
         run: git checkout origin/master -- src
       - name: upstream build stats
@@ -49,10 +49,10 @@ jobs:
           result-encoding: string
           script: |
             const fs = require('fs');
-            return {
+            return JSON.stringify({
               size: JSON.parse(fs.readFileSync('cli_output/build_size.json')),
               stats: JSON.parse(fs.readFileSync('cli_output/build_stats.json')),
-            };
+            });
       - name: process
         uses: actions/github-script@v6
         with:
