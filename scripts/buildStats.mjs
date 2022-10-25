@@ -126,9 +126,9 @@ export async function run({ github, context, a, b }) {
   const body = `${COMMENT_MARKER}\n**Build Stats**\n${table
     .map((row) => ['', ...row, ''].join(' | '))
     .join('\n')}`.slice(0, MAX_COMMENT_CHARS + 1);
-  const commentId = findCommentId(github, context);
+  const commentId = await findCommentId(github, context);
   console.log({ commentId });
-  commentId
+  await (commentId
     ? github.rest.issues.updateComment({
         repo,
         owner,
@@ -140,12 +140,10 @@ export async function run({ github, context, a, b }) {
         owner,
         issue_number: context.payload.pull_request.number,
         body,
-      });
+      }));
   return {
     size,
     files,
-    changedFiles,
-    stats,
     table,
     body,
   };
