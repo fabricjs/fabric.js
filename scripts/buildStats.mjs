@@ -35,7 +35,6 @@ export async function run({ github, context, core, a, b }) {
   const filesDiff = {};
   stats.b.modules.forEach((b) => {
     const file = b.id.replace(/\\|\//g, '');
-    console.log(file, changedFiles.includes(file));
     if (!changedFiles.includes(file)) {
       return;
     }
@@ -52,5 +51,5 @@ export async function run({ github, context, core, a, b }) {
       ),
     };
   });
-  return { size, files: filesDiff };
+  return { size, files: filesDiff, changedFiles };
 }
