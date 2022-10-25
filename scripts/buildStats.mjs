@@ -1,8 +1,21 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import _ from 'lodash';
 const minFile = 'fabric.min.js';
+
 function parseJSONFile(file) {
   return JSON.parse(fs.readFileSync(file));
+}
+
+function getSign(n) {
+  switch (Math.sign(n)) {
+    case 0:
+      return '';
+    case 1:
+      return '+';
+    case -1:
+      return '-';
+  }
 }
 
 export async function run({ github, context, core, a, b }) {
@@ -32,7 +45,7 @@ export async function run({ github, context, core, a, b }) {
   for (const key in size.a) {
     size.diff[key] = size.b[key] - size.a[key];
   }
-  const filesDiff = {};
+  const files = {};
   stats.b.modules.forEach((b) => {
     const file = b.id.replace(/^(\\|\/)/, '');
     console.log(file);
@@ -40,17 +53,52 @@ export async function run({ github, context, core, a, b }) {
       return;
     }
     const a = stats.a.modules.find((a) => a.id === b.id);
-    filesDiff[file] = {
-      a,
-      b,
-      diff: ['size', 'origSize' /*'percent', 'reduction'*/].reduce(
-        (diff, key) => {
-          diff[key] = b[key] - (a[key] || 0);
-          return diff;
-        },
-        {}
-      ),
+    const aOut = { sizeBefore: a?.origSize || 0, sizeAfter: a?.size || 0 };
+    const bOut = { sizeBefore: b.origSize, sizeAfter: b.size };
+    files[file] = {
+      a: aOut,
+      b: bOut,
+      diff: {
+        sizeBefore: bOut.sizeBefore - aOut.sizeBefore,
+        sizeAfter: bOut.sizeAfter - aOut.sizeAfter,
+      },
     };
   });
-  return { size, files: filesDiff, changedFiles, stats };
+
+  /**
+   *
+   * @param {'bundled' | 'minified' | 'gzipped'} key
+   * @returns
+   */
+  function printSize(key) {
+    return `${size.b[key] / 1024} (${getSign(size.diff[key])}${
+      size.diff[key]
+    })`;
+  }
+
+  const table = [
+    ['file', 'bundled', 'minified', 'gzipped'],
+    ['---', '---', '---', '---'],
+    [
+      'build',
+      printSize('bundled'),
+      printSize('minified'),
+      printSize('gzipped'),
+    ],
+    ..._.map(files, ({ b, diff }, key) => {
+      return [
+        key,
+        `${b.sizeBefore} (${getSign(diff.sizeBefore)}${diff.sizeBefore})`,
+        `${b.sizeAfter} (${getSign(diff.sizeAfter)}${diff.sizeAfter})`,
+      ];
+    }),
+  ];
+  return {
+    size,
+    files,
+    changedFiles,
+    stats,
+    table,
+    md: table.map((row) => ['', ...row, ''].join(' | ')).join('\n'),
+  };
 }
