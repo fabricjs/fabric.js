@@ -1,8 +1,7 @@
 import type { TBoundingBox } from '../util/misc/boundingBoxFromPoints';
 import { Intersection } from '../intersection.class';
 import { IPoint, Point } from '../point.class';
-import { TDegree, TFiller, TMat2D, TOriginX, TOriginY } from '../typedefs';
-import { CommonMethods } from './shared_methods.mixin';
+import { TDegree, TMat2D, TOriginX, TOriginY } from '../typedefs';
 import { calcRotateMatrix, composeMatrix, invertTransform, multiplyTransformMatrices, qrDecompose, transformPoint } from '../util/misc/matrix';
 import { cos } from '../util/misc/cos';
 import { sin } from '../util/misc/sin';
@@ -10,8 +9,7 @@ import { FabricObject } from '../shapes/object.class';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { iMatrix } from '../constants';
-import { sizeAfterTransform } from '../util/misc/objectTransforms';
-import { Group } from '../shapes/group.class';
+import { ObjectOrigin } from './object_origin.mixin';
 
 type TCornerPoint = {
   tl: Point,
@@ -41,53 +39,11 @@ type TMatrixCache = {
   value: TMat2D;
 }
 
-type TControlSet = Record<string, Control>
+type TControlSet = Record<string, any>
 
 type TACoords = TCornerPoint;
 
-export class ObjectGeometry extends CommonMethods {
-
-  /**
-   * Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
-   * @type Number
-   * @default 0
-   */
-  top: number;
-
-  /**
-   * Left position of an object. Note that by default it's relative to object left. You can change this by setting originX={left/center/right}
-   * @type Number
-   * @default 0
-   */
-  left: number;
-
-  /**
-  * Object width
-  * @type Number
-  * @default
-  */
-  width: number;
-
-  /**
-  * Object height
-  * @type Number
-  * @default
-  */
-  height: number;
-
-  /**
-  * Object scale factor (horizontal)
-  * @type Number
-  * @default 1
-  */
-  scaleX: number;
-
-  /**
-  * Object scale factor (vertical)
-  * @type Number
-  * @default 1
-  */
-  scaleY: number;
+export class ObjectGeometry extends ObjectOrigin {
 
   /**
   * When true, an object is rendered as flipped horizontally
@@ -104,60 +60,11 @@ export class ObjectGeometry extends CommonMethods {
   flipY: boolean;
 
   /**
-   * Angle of rotation of an object (in degrees)
-   * @type Number
-   * @default 0
-   */
-  angle: TDegree;
-
-  /**
-  * Angle of skew on x axes of an object (in degrees)
-  * @type Number
-  * @default 0
-  */
-  skewX: number;
-
-  /**
-  * Angle of skew on y axes of an object (in degrees)
-  * @type Number
-  * @default 0
-  */
-  skewY: number;
-
-  /**
    * Padding between object and its controlling borders (in pixels)
    * @type Number
    * @default 0
    */
   padding: number;
-
-  /**
-   * When defined, an object is rendered via stroke and this property specifies its color
-   * takes css colors https://www.w3.org/TR/css-color-3/
-   * @type String
-   * @default null
-   */
-  stroke: string | TFiller | null;
-
-  /**
-   * Width of a stroke used to render this object
-   * @type Number
-   * @default 1
-   */
-  strokeWidth: number;
-
-  /**
-   * When `false`, the stoke width will scale with the object.
-   * When `true`, the stroke will always match the exact pixel size entered for stroke width.
-   * this Property does not work on Text classes or drawing call that uses strokeText,fillText methods
-   * default to false
-   * @since 2.6.0
-   * @type Boolean
-   * @default false
-   * @type Boolean
-   * @default false
-   */
-  strokeUniform: boolean;
 
   /**
    * Describe object's corner position in canvas element coordinates.
@@ -210,12 +117,6 @@ export class ObjectGeometry extends CommonMethods {
    * controls are added by default_controls.js
    */
   controls: TControlSet = {}
-
-  /**
-   * Object containing this object.
-   * can influence its size and position
-   */
-  group?: Group;
 
   /**
    * Object containing this object.
@@ -471,7 +372,7 @@ export class ObjectGeometry extends CommonMethods {
    * @param {Boolean} [calculate] use coordinates of current position instead of .aCoords
    * @return {Boolean} true if object is fully or partially contained within canvas
    */
-  isOnScreen(calculate: boolean): boolean {
+  isOnScreen(calculate = false): boolean {
     if (!this.canvas) {
       return false;
     }
@@ -653,26 +554,6 @@ export class ObjectGeometry extends CommonMethods {
    */
   getScaledHeight(): number {
     return this._getTransformedDimensions().y;
-  }
-
-  /**
-   * Makes sure the scale is valid and modifies it if necessary
-   * @todo: this is a control action issue, not a geometry one
-   * @private
-   * @param {Number} value, unconstrained
-   * @return {Number} constrained value;
-   */
-  _constrainScale(value: number): number {
-    if (Math.abs(value) < this.minScaleLimit) {
-      if (value < 0) {
-        return -this.minScaleLimit;
-      } else {
-        return this.minScaleLimit;
-      }
-    } else if (value === 0) {
-      return 0.0001;
-    }
-    return value;
   }
 
   /**
@@ -867,7 +748,8 @@ export class ObjectGeometry extends CommonMethods {
   }
 
   transformMatrixKey(skipGroup = false): string {
-    const sep = '_', prefix = '';
+    const sep = '_';
+    let prefix = '';
     if (!skipGroup && this.group) {
       prefix = this.group.transformMatrixKey(skipGroup) + sep;
     }
@@ -969,52 +851,6 @@ export class ObjectGeometry extends CommonMethods {
    */
   _getNonTransformedDimensions(): Point {
     return new Point(this.width, this.height).scalarAdd(this.strokeWidth);
-  }
-
-  /**
-   * Calculate object bounding box dimensions from its properties scale, skew.
-   * @param {Object} [options]
-   * @param {Number} [options.scaleX]
-   * @param {Number} [options.scaleY]
-   * @param {Number} [options.skewX]
-   * @param {Number} [options.skewY]
-   * @private
-   * @returns {Point} dimensions
-   */
-  _getTransformedDimensions(options: any = {}): Point {
-    const dimOptions = {
-      scaleX: this.scaleX,
-      scaleY: this.scaleY,
-      skewX: this.skewX,
-      skewY: this.skewY,
-      width: this.width,
-      height: this.height,
-      strokeWidth: this.strokeWidth,
-      ...options,
-    }
-    // stroke is applied before/after transformations are applied according to `strokeUniform`
-    const strokeWidth = dimOptions.strokeWidth;
-    let preScalingStrokeValue = strokeWidth,
-      postScalingStrokeValue = 0;
-
-    if (this.strokeUniform) {
-      preScalingStrokeValue = 0;
-      postScalingStrokeValue = strokeWidth;
-    }
-    const dimX = dimOptions.width + preScalingStrokeValue,
-      dimY = dimOptions.height + preScalingStrokeValue,
-      noSkew = dimOptions.skewX === 0 && dimOptions.skewY === 0;
-    let finalDimensions;
-    if (noSkew) {
-      finalDimensions = new Point(
-        dimX * dimOptions.scaleX,
-        dimY * dimOptions.scaleY
-      );
-    } else {
-      finalDimensions = sizeAfterTransform(dimX, dimY, dimOptions);
-    }
-
-    return finalDimensions.scalarAdd(postScalingStrokeValue);
   }
 
   /**

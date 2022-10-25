@@ -227,6 +227,21 @@
       },
 
       /**
+       * Returns coordinates of a pointer relative to object's top left corner in object's plane
+       * @param {Event} e Event to operate upon
+       * @param {Object} [pointer] Pointer to operate upon (instead of event)
+       * @return {Point} Coordinates of a pointer (x, y)
+       */
+      getLocalPointer: function (e: Event, pointer?: IPoint): Point {
+        const thePointer = pointer || this.canvas.getPointer(e);
+        return transformPoint(
+            thePointer,
+            invertTransform(this.calcTransformMatrix())
+          )
+          .add(new Point(this.width / 2, this.height / 2));
+      },
+
+      /**
        * Returns index of a character corresponding to where an object was clicked
        * @param {Event} e Event object
        * @return {Number} Index of a character

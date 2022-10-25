@@ -60,22 +60,6 @@ export class FabricObject extends ObjectGeometry {
   type: string;
 
   /**
-   * Horizontal origin of transformation of an object (one of "left", "right", "center")
-   * See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
-   * @type String
-   * @default 'left'
-   */
-  originX: string;
-
-  /**
-   * Vertical origin of transformation of an object (one of "top", "bottom", "center")
-   * See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
-   * @type String
-   * @default 'top'
-   */
-  originY: string;
-
-  /**
    * Opacity of an object
    * @type Number
    * @default 1
@@ -181,6 +165,14 @@ export class FabricObject extends ObjectGeometry {
    * @default
    */
   centeredRotation: true;
+
+  /**
+   * When defined, an object is rendered via stroke and this property specifies its color
+   * takes css colors https://www.w3.org/TR/css-color-3/
+   * @type String
+   * @default null
+   */
+   stroke: string | TFiller | null;
 
   /**
    * Color of object's fill
@@ -1006,6 +998,26 @@ export class FabricObject extends ObjectGeometry {
       opacity *= this.group.getObjectOpacity();
     }
     return opacity;
+  }
+
+  /**
+   * Makes sure the scale is valid and modifies it if necessary
+   * @todo: this is a control action issue, not a geometry one
+   * @private
+   * @param {Number} value, unconstrained
+   * @return {Number} constrained value;
+   */
+   _constrainScale(value: number): number {
+    if (Math.abs(value) < this.minScaleLimit) {
+      if (value < 0) {
+        return -this.minScaleLimit;
+      } else {
+        return this.minScaleLimit;
+      }
+    } else if (value === 0) {
+      return 0.0001;
+    }
+    return value;
   }
 
   /**
