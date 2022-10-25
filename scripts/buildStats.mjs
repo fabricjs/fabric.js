@@ -92,7 +92,7 @@ export async function run({ github, context, a, b }) {
 
   const table = [
     ['file / KB', 'bundled', 'reduced*', 'minified', 'gzipped'],
-    ['---', '---', '---', '---'],
+    ['---', '---', '---', '---', '---'],
     ..._.map(b.size, (_b, file) => {
       const _a = {
         bundled: 0,
@@ -120,7 +120,7 @@ export async function run({ github, context, a, b }) {
   const body = [
     COMMENT_MARKER,
     '**Build Stats**',
-    '* inaccurate, see [link](https://github.com/doesdev/rollup-plugin-analyzer#why-is-the-reported-size-not-the-same-as-the-file-on-disk)',
+    '*inaccurate, see [link](https://github.com/doesdev/rollup-plugin-analyzer#why-is-the-reported-size-not-the-same-as-the-file-on-disk)',
     ...table.map((row) => ['', ...row, ''].join(' | ')),
   ]
     .join('\n')
