@@ -69,7 +69,7 @@ jobs:
                 }, {})
               }
             });
-            console.log(out);
+            console.log(out, diff);
   lint:
     runs-on: ubuntu-latest
     steps:
