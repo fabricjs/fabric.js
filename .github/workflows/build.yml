@@ -24,12 +24,12 @@ jobs:
         with:
           script: |
             const { base, head } = context.payload.pull_request;
-            const changedFiles = await github.rest.repos.compareCommits({
+            const changedFiles = (await github.rest.repos.compareCommits({
               base: base.sha,
               head: head.sha,
               owner: context.repo.owner,
               repo: context.repo.repo,
-            })
+            }))
             .map(({ filename }) => filename)
             .filter(file => file.startsWith('src'));
             console.log(changedFiles);
