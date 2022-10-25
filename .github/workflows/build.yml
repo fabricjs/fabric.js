@@ -38,7 +38,7 @@ jobs:
               size: JSON.parse(fs.readFileSync('cli_output/build_size.json')),
               stats: JSON.parse(fs.readFileSync('cli_output/build_stats.json')),
             };
-      - name: checkout
+      - name: checkout src files
         run: git checkout origin/master -- src
       - name: upstream build stats
         run: npm run build -- -s
@@ -63,8 +63,8 @@ jobs:
               github,
               context,
               core,
-              a: JSON.parse('${{ steps.a.outputs.result }}'),
-              b: JSON.parse('${{ steps.b.outputs.result }}'),
+              a: ${{ steps.a.outputs.result }},
+              b: ${{ steps.b.outputs.result }},
             });
   lint:
     runs-on: ubuntu-latest
