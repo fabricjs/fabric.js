@@ -1,5 +1,3 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import _ from 'lodash';
 
 const REQUESTED_COMMENTS_PER_PAGE = 20;
