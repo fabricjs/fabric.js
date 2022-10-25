@@ -31,7 +31,7 @@ jobs:
           npm run build -- -s
           mv cli_output/build_stats.json cli_output/b_build_stats.json
           mv cli_output/build_stats_size.json cli_output/b_build_stats_size.json
-      - run: git checkout origin/master -- src
+      - run: git checkout ${{ github.base_ref }} -- src
       - name: Upstream build stats
         run: npm run build -- -s
       - name: process
