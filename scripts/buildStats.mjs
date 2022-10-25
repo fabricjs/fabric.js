@@ -88,7 +88,7 @@ export async function run({ github, context, a, b }) {
   });
 
   const table = [
-    ['file / KB', 'bundled', 'reduced*', 'minified', 'gzipped'],
+    ['file / KB (diff)', 'bundled', 'reduced*', 'minified', 'gzipped'],
     ['---', '---', '---', '---', '---'],
     ..._.map(b.size, (_b, file) => {
       const _a = {
