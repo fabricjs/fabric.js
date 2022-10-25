@@ -1,5 +1,6 @@
 import { TMat2D } from './typedefs';
 
+// TODO: consider using https://github.com/swiing/rollup-plugin-import-assertions so we can import json in node and have rollup build pass
 export { version as VERSION } from '../package.json';
 export function noop() {}
 export const halfPI = Math.PI / 2;
