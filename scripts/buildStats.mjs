@@ -110,7 +110,7 @@ export async function run({ github, context, a, b }) {
     ['file / KB', 'bundled', 'minified', 'gzipped'],
     ['---', '---', '---', '---'],
     [
-      'build',
+      minFile,
       printSize('bundled'),
       printSize('minified'),
       printSize('gzipped'),

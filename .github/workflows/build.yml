@@ -47,7 +47,6 @@ jobs:
               a: 'build_stats',
               b: 'b_build_stats',
             });
-            console.log(res)
   lint:
     runs-on: ubuntu-latest
     steps:

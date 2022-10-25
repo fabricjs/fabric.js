@@ -1,6 +1,5 @@
 import json from '@rollup/plugin-json';
 import { writeFileSync } from 'fs';
-import { compact } from 'lodash';
 import analyze from 'rollup-plugin-analyzer';
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
 import { terser } from 'rollup-plugin-terser';
@@ -54,9 +53,6 @@ export default {
             JSON.stringify(analysis, null, 2)
           );
           analyzed = true;
-        },
-        writeTo(output) {
-          writeFileSync('cli_output/build_stats.txt', output);
         },
       }),
   ],
