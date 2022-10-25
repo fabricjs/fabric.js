@@ -16,11 +16,11 @@ jobs:
       - run: npm ci
       - run: npm run build
   stats-a:
-    uses: ./.github/workflows/build-stats.yml
+    uses: .github/workflows/build-stats.yml
     with:
       ref: origin/master
   stats-b:
-    uses: ./.github/workflows/build-stats.yml
+    uses: .github/workflows/build-stats.yml
   stats:
     name: Build stats
     runs-on: ubuntu-latest
