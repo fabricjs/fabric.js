@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 1
+          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
@@ -31,7 +31,7 @@ jobs:
           npm run build -- -s
           mv cli_output/build_stats.json cli_output/b_build_stats.json
           mv cli_output/build_stats_size.json cli_output/b_build_stats_size.json
-      - run: git checkout ${{ github.event.pull_request.base.sha }} -- src
+      - run: git checkout origin/master -- src
       - name: Upstream build stats
         run: npm run build -- -s
       - name: process
