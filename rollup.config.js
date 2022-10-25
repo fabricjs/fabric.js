@@ -1,17 +1,19 @@
+import json from '@rollup/plugin-json';
+import { writeFileSync } from 'fs';
+import { compact } from 'lodash';
+import analyze from 'rollup-plugin-analyzer';
+import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
 import { terser } from 'rollup-plugin-terser';
 import ts from 'rollup-plugin-ts';
-import json from '@rollup/plugin-json';
-import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
-import analyze from 'rollup-plugin-analyzer';
-import { execSync } from 'child_process';
-import _ from 'lodash';
 
-const runAnalysis = true;
-let analysisIterations = 0;
+const runStats = process.env.BUILD_STATS;
+let analyzed = false;
+
+const splitter = /\n|\s|,/g;
 
 // https://rollupjs.org/guide/en/#configuration-files
 export default {
-  input: process.env.BUILD_INPUT?.split(',') || ['./index.js'],
+  input: process.env.BUILD_INPUT?.split(splitter) || ['./index.js'],
   output: [
     Number(process.env.MINIFY)
       ? {
@@ -19,8 +21,10 @@ export default {
           name: 'fabric',
           format: 'cjs',
           plugins: [
-            runAnalysis &&
-              sizeSnapshot({ snapshotPath: 'cli_output/.size_snapshot.json' }),
+            runStats &&
+              sizeSnapshot({
+                snapshotPath: 'cli_output/build_stats_size.json',
+              }),
             terser(),
           ],
         }
@@ -38,20 +42,23 @@ export default {
     ts({
       /* Plugin options */
     }),
-    runAnalysis &&
+    runStats &&
       analyze({
-        filter: _.compact(
-          execSync('git diff --name-only origin/master HEAD')
-            .toString()
-            .split(/\n/g)
-        ),
-        hideDeps: true,
-        onAnalysis() {
-          if (analysisIterations > 0) {
+        filter:
+          compact(process.env.BUILD_STATS_FILES?.split(splitter)) || undefined,
+        onAnalysis(analysis) {
+          if (analyzed) {
             // We only want reports on the minified output
             throw '';
           }
-          analysisIterations++;
+          writeFileSync(
+            'cli_output/build_stats.json',
+            JSON.stringify(analysis, null, 2)
+          );
+          analyzed = true;
+        },
+        writeTo(output) {
+          writeFileSync('cli_output/build_stats.txt', output);
         },
       }),
   ],

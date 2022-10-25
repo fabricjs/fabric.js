@@ -547,6 +547,7 @@ program
   .option('-o, --output <path>', 'specify the build output path')
   .option('-x, --exclude <exclude...>')
   .option('-m, --modules <modules...>')
+  .option('-s, --stats [modules...]')
   .action((options) => {
     build(options);
   });

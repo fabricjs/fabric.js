@@ -9,14 +9,61 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - name: Uglified build
         uses: actions/setup-node@v1
         with:
           node-version: 16.x
       - run: npm ci
       - run: npm run build
+  stats:
+    runs-on: ubuntu-latest
+    name: Build stats
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - name: Get changed files
+        run: echo "CHANGED_FILES=$(git diff --name-only origin/master HEAD | grep ^src | tr '\n' ' ')" >> $GITHUB_ENV
+      - name: Build stats
+        run: npm run build -- -s $CHANGED_FILES
+      - name: save stats
+        run: |
+          echo "BUILD_STATS=$(cat cli_output/build_stats.json)" >> $GITHUB_ENV
+          echo "BUILD_SIZE=$(cat cli_output/build_stats_size.json)" >> $GITHUB_ENV
+      - run: git checkout origin/master -- src
+      - name: Build stats from master
+        run: npm run build -- -s $CHANGED_FILES
+      - name: save stats
+        run: |
+          echo "BUILD_STATS_UPSTREAM=$(cat cli_output/build_stats.json)" >> $GITHUB_ENV
+          echo "BUILD_SIZE_UPSTREAM=$(cat cli_output/build_stats_size.json)" >> $GITHUB_ENV
+      - name: process
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { CHANGED_FILES, BUILD_STATS, BUILD_SIZE, BUILD_STATS_UPSTREAM, BUILD_SIZE_UPSTREAM } = process.env;
+            const files = JSON.parse(CHANGED_FILES);
+            const upstream = {
+              ...JSON.parse(BUILD_STATS),
+              size: JSON.parse(BUILD_SIZE)
+            };
+            const local = {
+              ...JSON.parse(BUILD_STATS_UPSTREAM),
+              size: JSON.parse(BUILD_SIZE_UPSTREAM)
+            };
+            const out = {};
+            local.modules.forEach((b) => {
+              const found = upstream.modules.find((a) => a.id === b.id);
+              out[id] = {
+                a, 
+                b
+              }
+            });
+            console.log(out);
   lint:
     runs-on: ubuntu-latest
     steps:
