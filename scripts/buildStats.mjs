@@ -28,8 +28,8 @@ function printSize(a, b) {
   return `${b} (${getSign(diff)}${diff})`;
 }
 
-function printByteSize(a, b) {
-  return printSize(a / 1024, b / 1024);
+function printSizeByte(a, b) {
+  return printSize(Math.round(a / 1024), Math.round(b / 1024));
 }
 
 export async function findCommentId(github, context) {
@@ -110,9 +110,9 @@ export async function run({ github, context, a, b }) {
       };
       return [
         file,
-        printByteSize(a.bundled, b.bundled),
-        printByteSize(a.minified, b.minified),
-        printByteSize(a.gzipped, b.gzipped),
+        printSizeByte(a.bundled, b.bundled),
+        printSizeByte(a.minified, b.minified),
+        printSizeByte(a.gzipped, b.gzipped),
       ];
     }),
     ..._.map(files, ({ a, b }, key) => {
