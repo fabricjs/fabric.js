@@ -19,82 +19,33 @@ jobs:
     runs-on: ubuntu-latest
     name: Build stats
     steps:
-      - name: preprocess
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { base, head } = context.payload.pull_request;
-            const changedFiles = (await github.rest.repos.compareCommits({
-              base: base.sha,
-              head: head.sha,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            }))
-            .data
-            .files
-            .map(({ filename }) => filename)
-            .filter(file => file.startsWith('src'));
-            console.log(changedFiles);
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
       - run: npm ci
-      - name: Get changed src files
-        run: echo "CHANGED_FILES=$(git diff --name-only origin/master HEAD | grep ^src | tr '\n' ' ')" >> $GITHUB_ENV
       - name: Build stats
         run: |
-          npm run build -- -s $CHANGED_FILES
+          npm run build -- -s
           mv cli_output/build_stats.json cli_output/b_build_stats.json
           mv cli_output/build_stats_size.json cli_output/b_build_stats_size.json
       - run: git checkout origin/master -- src
       - name: Upstream build stats
-        run: npm run build -- -s $CHANGED_FILES
+        run: npm run build -- -s
       - name: process
         uses: actions/github-script@v6
         with:
+          result-encoding: string
           script: |
-            const fs = require('fs');
-            const minFile = 'fabric.min.js';
-            function parseJSONFile(file) {
-              return JSON.parse(fs.readFileSync(file));
-            }
-            const stats = {
-              a: parseJSONFile('cli_output/build_stats.json'),
-              b: parseJSONFile('cli_output/b_build_stats.json'),
-            };
-            const size = {
-              a: parseJSONFile('cli_output/build_stats_size.json')[minFile],
-              b: parseJSONFile('cli_output/b_build_stats_size.json')[minFile],
-              diff: {}
-            };
-            for (const key in size.a) {
-              size.diff[key] = size.b[key] - size.a[key];
-            }
-            const out = {};
-            stats.b.modules.forEach((b) => {
-              const a = stats.a.modules.find((a) => a.id === b.id);
-              out[b.id] = {
-                a, 
-                b,
-                diff: ['size', 'origSize', 'percent', 'reduction'].reduce((diff, key) => {
-                  diff[key] = b[key] - (a[key] || 0);
-                  return diff;
-                }, {})
-              }
+            const { run } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
+            const res = await run({
+              github,
+              context,
+              core,
+              a: 'build_stats',
+              b: 'b_build_stats',
             });
-            const { base, head } = context.payload.pull_request;
-            const changedFiles = await github.repos.compareCommits({
-              base: base.sha,
-              head: head.sha,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            })
-            .map(({ filename }) => filename)
-            .filter(file => file.startsWith('src'));
-            console.log(out, diff, changedFiles);
+            console.log(res)
   lint:
     runs-on: ubuntu-latest
     steps:
