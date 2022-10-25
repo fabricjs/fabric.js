@@ -18,16 +18,48 @@ function getSign(n) {
   }
 }
 
-export async function run({ github, context, core, a, b }) {
+const REQUESTED_COMMENTS_PER_PAGE = 20;
+
+const COMMENT_MARKER = '<!-- BUILD STATS COMMENT -->';
+
+export async function findCommentId(github, context) {
+  let page = 0;
+  let response;
+  do {
+    response = await github.issues.listComments({
+      issue_number: context.issue.number,
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      per_page: REQUESTED_COMMENTS_PER_PAGE,
+      page: page,
+      sort: 'updated',
+      direction: 'desc',
+    });
+    const found = response.data.find(
+      (comment) => !!comment.user && comment.body.startsWith(COMMENT_MARKER)
+    )?.id;
+    if (found) {
+      return found;
+    }
+    page++;
+  } while (response.data.length === REQUESTED_COMMENTS_PER_PAGE);
+}
+
+export async function run({ github, context, a, b }) {
   a = path.basename(a, '.json');
   b = path.basename(b, '.json');
-  const { base, head } = context.payload.pull_request;
+  const {
+    repo: { owner, repo },
+    payload: {
+      pull_request: { base, head },
+    },
+  } = context;
   const changedFiles = (
     await github.rest.repos.compareCommits({
       base: base.sha,
       head: head.sha,
-      owner: context.repo.owner,
-      repo: context.repo.repo,
+      owner,
+      repo,
     })
   ).data.files
     .map(({ filename }) => filename)
@@ -48,7 +80,6 @@ export async function run({ github, context, core, a, b }) {
   const files = {};
   stats.b.modules.forEach((b) => {
     const file = b.id.replace(/^(\\|\/)/, '');
-    console.log(file);
     if (!changedFiles.includes(file)) {
       return;
     }
@@ -65,11 +96,6 @@ export async function run({ github, context, core, a, b }) {
     };
   });
 
-  /**
-   *
-   * @param {'bundled' | 'minified' | 'gzipped'} key
-   * @returns
-   */
   function printSize(key) {
     return `${size.b[key] / 1024} (${getSign(size.diff[key])}${
       size.diff[key]
@@ -93,12 +119,29 @@ export async function run({ github, context, core, a, b }) {
       ];
     }),
   ];
+  const body = `${COMMENT_MARKER}\n**Build Stats**\n${table
+    .map((row) => ['', ...row, ''].join(' | '))
+    .join('\n')}`;
+  const commentId = findCommentId(github, context);
+  commentId
+    ? github.rest.issues.updateComment({
+        repo,
+        owner,
+        comment_id: commentId,
+        body,
+      })
+    : github.rest.issues.createComment({
+        repo,
+        owner,
+        issue_number: context.payload.pull_request.number,
+        body,
+      });
   return {
     size,
     files,
     changedFiles,
     stats,
     table,
-    md: table.map((row) => ['', ...row, ''].join(' | ')).join('\n'),
+    body,
   };
 }
