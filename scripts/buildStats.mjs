@@ -127,7 +127,6 @@ export async function run({ github, context, a, b }) {
     .map((row) => ['', ...row, ''].join(' | '))
     .join('\n')}`.slice(0, MAX_COMMENT_CHARS + 1);
   const commentId = await findCommentId(github, context);
-  console.log({ commentId });
   await (commentId
     ? github.rest.issues.updateComment({
         repo,
@@ -144,7 +143,5 @@ export async function run({ github, context, a, b }) {
   return {
     size,
     files,
-    table,
-    body,
   };
 }
