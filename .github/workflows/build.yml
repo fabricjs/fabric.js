@@ -63,8 +63,8 @@ jobs:
               github,
               context,
               core,
-              a: ${{ steps.a.outputs.result }},
-              b: ${{ steps.b.outputs.result }},
+              a: JSON.parse('${{ steps.a.outputs.result }}'),
+              b: JSON.parse('${{ steps.b.outputs.result }}'),
             });
   lint:
     runs-on: ubuntu-latest
