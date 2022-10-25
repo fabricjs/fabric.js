@@ -41,24 +41,23 @@ jobs:
         with:
           script: |
             const fs = require('fs');
+            const minFile = 'fabric.min.js';
             function parseJSONFile(file) {
               return JSON.parse(fs.readFileSync(file));
             }
             const upstream = {
               ...parseJSONFile('cli_output/build_stats.json'),
-              size: parseJSONFile('cli_output/build_stats_size.json')
+              size: parseJSONFile('cli_output/build_stats_size.json')[minFile]
             };
             const local = {
               ...parseJSONFile('cli_output/b_build_stats.json'),
-              size: parseJSONFile('cli_output/b_build_stats_size.json')
+              size: parseJSONFile('cli_output/b_build_stats_size.json')[minFile]
             };
             const diff = {};
             for (const key in local.size) {
               diff[key] = local.size[key] - upstream.size[key];
             }
-            const out = {
-              diff
-            };
+            const out = {};
             local.modules.forEach((b) => {
               const a = upstream.modules.find((a) => a.id === b.id);
               out[b.id] = {
