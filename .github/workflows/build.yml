@@ -45,20 +45,20 @@ jobs:
             function parseJSONFile(file) {
               return JSON.parse(fs.readFileSync(file));
             }
-            const upstream = {
-              ...parseJSONFile('cli_output/build_stats.json'),
-              size: parseJSONFile('cli_output/build_stats_size.json')[minFile]
+            const stats = {
+              a: parseJSONFile('cli_output/build_stats.json'),
+              b: parseJSONFile('cli_output/b_build_stats.json'),
             };
-            const local = {
-              ...parseJSONFile('cli_output/b_build_stats.json'),
-              size: parseJSONFile('cli_output/b_build_stats_size.json')[minFile]
+            const size = {
+              a: parseJSONFile('cli_output/build_stats_size.json')[minFile],
+              b: parseJSONFile('cli_output/b_build_stats_size.json')[minFile],
+              diff: {}
             };
-            const diff = {};
-            for (const key in local.size) {
-              diff[key] = local.size[key] - upstream.size[key];
+            for (const key in size.a) {
+              size.diff[key] = size.b[key] - size.a[key];
             }
             const out = {};
-            local.modules.forEach((b) => {
+            stats.b.modules.forEach((b) => {
               const a = upstream.modules.find((a) => a.id === b.id);
               out[b.id] = {
                 a, 
