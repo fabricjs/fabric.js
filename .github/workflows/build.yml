@@ -59,7 +59,7 @@ jobs:
             }
             const out = {};
             stats.b.modules.forEach((b) => {
-              const a = upstream.modules.find((a) => a.id === b.id);
+              const a = stats.a.modules.find((a) => a.id === b.id);
               out[b.id] = {
                 a, 
                 b,
@@ -69,7 +69,13 @@ jobs:
                 }, {})
               }
             });
-            console.log(out, diff);
+            const changedFiles = await githubClient.repos.compareCommits({
+              base: context.payload.pull_request.base.sha,
+              head: context.payload.pull_request.head.sha,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            }).map(({ filename }) => filename);
+            console.log(out, diff, changedFiles);
   lint:
     runs-on: ubuntu-latest
     steps:
