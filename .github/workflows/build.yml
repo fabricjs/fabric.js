@@ -19,6 +19,20 @@ jobs:
     runs-on: ubuntu-latest
     name: Build stats
     steps:
+      - name: preprocess
+        uses: actions/github-script@v6
+        with:
+          script: |
+            console.log(github)
+            const changedFiles = await github.repos.compareCommits({
+              base: base.sha,
+              head: head.sha,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            })
+            .map(({ filename }) => filename)
+            .filter(file => file.startsWith('src'));
+            console.log(changedFiles);
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
