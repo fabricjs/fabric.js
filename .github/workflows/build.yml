@@ -16,42 +16,44 @@ jobs:
       - run: npm ci
       - run: npm run build
   stats:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 16.x
-    - run: npm ci
-    - name: build stats
-      run: npm run build -- -s
-    - name: persist
-      id: b
-      uses: actions/github-script@v6
-      with:
-        result-encoding: string
-        script: |
-          const fs = require('fs');
-          return {
-            size: JSON.parse(fs.readFileSync('cli_output/build_size.json')),
-            stats: JSON.parse(fs.readFileSync('cli_output/build_stats.json')),
-          };
-    - name: checkout
-      run: git checkout origin/master -- src
-    - name: upstream build stats
-      run: npm run build -- -s
-    - name: persist
-      id: a
-      uses: actions/github-script@v6
-      with:
-        result-encoding: string
-        script: |
-          const fs = require('fs');
-          return {
-            size: JSON.parse(fs.readFileSync('cli_output/build_size.json')),
-            stats: JSON.parse(fs.readFileSync('cli_output/build_stats.json')),
-          };
-    - name: process
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - name: build stats
+        run: npm run build -- -s
+      - name: persist
+        id: b
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+            return {
+              size: JSON.parse(fs.readFileSync('cli_output/build_size.json')),
+              stats: JSON.parse(fs.readFileSync('cli_output/build_stats.json')),
+            };
+      - name: checkout
+        run: git checkout origin/master -- src
+      - name: upstream build stats
+        run: npm run build -- -s
+      - name: persist
+        id: a
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+            return {
+              size: JSON.parse(fs.readFileSync('cli_output/build_size.json')),
+              stats: JSON.parse(fs.readFileSync('cli_output/build_stats.json')),
+            };
+      - name: process
         uses: actions/github-script@v6
         with:
           result-encoding: string
