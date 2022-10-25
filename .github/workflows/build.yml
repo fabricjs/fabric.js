@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
           node-version: 16.x
       - run: npm ci
@@ -69,12 +69,15 @@ jobs:
                 }, {})
               }
             });
-            const changedFiles = await githubClient.repos.compareCommits({
-              base: context.payload.pull_request.base.sha,
-              head: context.payload.pull_request.head.sha,
+            const { base, head } = context.payload.pull_request;
+            const changedFiles = await github.repos.compareCommits({
+              base: base.sha,
+              head: head.sha,
               owner: context.repo.owner,
               repo: context.repo.repo,
-            }).map(({ filename }) => filename);
+            })
+            .map(({ filename }) => filename)
+            .filter(file => file.startsWith('src'));
             console.log(out, diff, changedFiles);
   lint:
     runs-on: ubuntu-latest
