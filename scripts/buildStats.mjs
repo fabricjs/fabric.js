@@ -79,14 +79,14 @@ export async function run({ github, context, a, b }) {
     if (!changedFiles.includes(file)) {
       return;
     }
-    const a = {
-      ...(a.stats.modules.find((a) => a.id === b.id) || {}),
+    const aOut = {
+      origSize: 0,
+      size: 0,
+      ...(a.stats.modules.find(({ id }) => id === b.id) || {}),
     };
-    const aOut = { sizeBefore: a?.origSize || 0, sizeAfter: a?.size || 0 };
-    const bOut = { sizeBefore: b.origSize, sizeAfter: b.size };
     files[file] = {
-      a: aOut,
-      b: bOut,
+      a: { sizeBefore: aOut.origSize, sizeAfter: aOut.size },
+      b: { sizeBefore: b.origSize, sizeAfter: b.size },
     };
   });
 
