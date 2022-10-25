@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: 16.x
       - run: npm ci
-      - name: Get changed files
+      - name: Get changed src files
         run: echo "CHANGED_FILES=$(git diff --name-only origin/master HEAD | grep ^src | tr '\n' ' ')" >> $GITHUB_ENV
       - name: Build stats
         run: npm run build -- -s $CHANGED_FILES
@@ -62,7 +62,7 @@ jobs:
             };
             local.modules.forEach((b) => {
               const found = upstream.modules.find((a) => a.id === b.id);
-              out[id] = {
+              out[a.id] = {
                 a, 
                 b,
                 diff: ['size', 'origSize', 'percent', 'reduction'].reduce((diff, key) => {
