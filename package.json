@@ -104,6 +104,8 @@
     "ps-list": "^8.1.0",
     "qunit": "^2.17.2",
     "rollup": "^2.75.6",
+    "rollup-plugin-analyzer": "^4.0.0",
+    "rollup-plugin-size-snapshot": "^0.12.0",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-ts": "^3.0.2",
     "source-map-support": "^0.5.21",
