@@ -34,7 +34,7 @@ export async function run({ github, context, core, a, b }) {
   }
   const filesDiff = {};
   stats.b.modules.forEach((b) => {
-    const file = path.relative('.', path.resolve(b.id));
+    const file = b.id.replace(/\\|\//g);
     if (!changedFiles.includes(file)) {
       return;
     }
