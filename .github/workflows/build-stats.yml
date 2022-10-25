@@ -18,12 +18,12 @@ jobs:
     outputs:
       stats: ${{ steps.stats.outputs.result }}
     steps:
-      # - uses: actions/checkout@v3
-      #   if: ${{ !inputs.ref }}
       - uses: actions/checkout@v3
-        # if: ${{ inputs.ref }}
+        if: ${{ !inputs.ref }}
+      - uses: actions/checkout@v3
+        if: ${{ inputs.ref }}
         with:
-          fetch-depth: ${{ (inputs.ref && 1) || 0 }}
+          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
