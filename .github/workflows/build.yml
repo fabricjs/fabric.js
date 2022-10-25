@@ -17,10 +17,12 @@ jobs:
       - run: npm run build
   stats-upstream:
     uses: ./.github/workflows/build-stats.yml
+    secrets: inherit
     with:
       ref: origin/master
   stats:
     uses: ./.github/workflows/build-stats.yml
+    secrets: inherit
   stats-reporter:
     runs-on: ubuntu-latest
     name: Report build stats

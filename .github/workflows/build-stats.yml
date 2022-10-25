@@ -10,7 +10,9 @@ on:
       token:
         required: true
     outputs:
-      result: ${{ jobs.stats.outputs.result }}
+      result:
+        description: stats output
+        value: ${{ jobs.stats.outputs.result }}
 
 jobs:
   stats:
