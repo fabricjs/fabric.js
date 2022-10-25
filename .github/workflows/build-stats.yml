@@ -17,7 +17,7 @@ on:
 jobs:
   stats:
     runs-on: ubuntu-latest
-    name: Upstream build stats
+    name: build stats
     outputs:
       stats: ${{ steps.stats.outputs.result }}
     steps:
