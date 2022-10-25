@@ -26,7 +26,7 @@ export async function findCommentId(github, context) {
   let page = 0;
   let response;
   do {
-    response = await github.issues.listComments({
+    response = await github.rest.issues.listComments({
       issue_number: context.issue.number,
       owner: context.repo.owner,
       repo: context.repo.repo,
@@ -70,8 +70,12 @@ export async function run({ github, context, a, b }) {
     b: parseJSONFile(`cli_output/${b}.json`),
   };
   const size = {
-    a: parseJSONFile(`cli_output/${a}_size.json`)[minFile],
-    b: parseJSONFile(`cli_output/${b}_size.json`)[minFile],
+    a: _.mapValues(parseJSONFile(`cli_output/${a}_size.json`)[minFile], (n) =>
+      Math.round(n / 1024)
+    ),
+    b: _.mapValues(parseJSONFile(`cli_output/${b}_size.json`)[minFile], (n) =>
+      Math.round(n / 1024)
+    ),
     diff: {},
   };
   for (const key in size.a) {
@@ -97,9 +101,7 @@ export async function run({ github, context, a, b }) {
   });
 
   function printSize(key) {
-    return `${size.b[key] / 1024} (${getSign(size.diff[key])}${
-      size.diff[key]
-    })`;
+    return `${size.b[key]} (${getSign(size.diff[key])}${size.diff[key]})`;
   }
 
   const table = [
