@@ -23,8 +23,8 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            console.log(github)
-            const changedFiles = await github.repos.compareCommits({
+            console.log(github.rest)
+            const changedFiles = await github.rest.repos.compareCommits({
               base: base.sha,
               head: head.sha,
               owner: context.repo.owner,
