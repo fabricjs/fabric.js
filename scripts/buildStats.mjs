@@ -22,6 +22,8 @@ const REQUESTED_COMMENTS_PER_PAGE = 20;
 
 const COMMENT_MARKER = '<!-- BUILD STATS COMMENT -->';
 
+const MAX_COMMENT_CHARS = 65536;
+
 export async function findCommentId(github, context) {
   let page = 0;
   let response;
@@ -105,7 +107,7 @@ export async function run({ github, context, a, b }) {
   }
 
   const table = [
-    ['file', 'bundled', 'minified', 'gzipped'],
+    ['file / KB', 'bundled', 'minified', 'gzipped'],
     ['---', '---', '---', '---'],
     [
       'build',
@@ -123,8 +125,9 @@ export async function run({ github, context, a, b }) {
   ];
   const body = `${COMMENT_MARKER}\n**Build Stats**\n${table
     .map((row) => ['', ...row, ''].join(' | '))
-    .join('\n')}`;
+    .join('\n')}`.slice(0, MAX_COMMENT_CHARS + 1);
   const commentId = findCommentId(github, context);
+  console.log({ commentId });
   commentId
     ? github.rest.issues.updateComment({
         repo,
