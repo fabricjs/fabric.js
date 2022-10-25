@@ -16,7 +16,6 @@ on:
 
 jobs:
   stats:
-    id: stats
     runs-on: ubuntu-latest
     name: Upstream build stats
     outputs:
