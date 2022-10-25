@@ -1,7 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import _ from 'lodash';
-const minFile = 'fabric.min.js';
+
+const REQUESTED_COMMENTS_PER_PAGE = 20;
+
+const COMMENT_MARKER = '<!-- BUILD STATS COMMENT -->';
+
+const MAX_COMMENT_CHARS = 65536;
 
 function parseJSONFile(file) {
   return JSON.parse(fs.readFileSync(file));
@@ -18,11 +23,14 @@ function getSign(n) {
   }
 }
 
-const REQUESTED_COMMENTS_PER_PAGE = 20;
+function printSize(a, b) {
+  const diff = b - a;
+  return `${b} (${getSign(diff)}${diff})`;
+}
 
-const COMMENT_MARKER = '<!-- BUILD STATS COMMENT -->';
-
-const MAX_COMMENT_CHARS = 65536;
+function printByteSize(a, b) {
+  return printSize(a / 1024, b / 1024);
+}
 
 export async function findCommentId(github, context) {
   let page = 0;
@@ -72,17 +80,9 @@ export async function run({ github, context, a, b }) {
     b: parseJSONFile(`cli_output/${b}.json`),
   };
   const size = {
-    a: _.mapValues(parseJSONFile(`cli_output/${a}_size.json`)[minFile], (n) =>
-      Math.round(n / 1024)
-    ),
-    b: _.mapValues(parseJSONFile(`cli_output/${b}_size.json`)[minFile], (n) =>
-      Math.round(n / 1024)
-    ),
-    diff: {},
+    a: parseJSONFile(`cli_output/${a}_size.json`),
+    b: parseJSONFile(`cli_output/${b}_size.json`),
   };
-  for (const key in size.a) {
-    size.diff[key] = size.b[key] - size.a[key];
-  }
   const files = {};
   stats.b.modules.forEach((b) => {
     const file = b.id.replace(/^(\\|\/)/, '');
@@ -95,38 +95,41 @@ export async function run({ github, context, a, b }) {
     files[file] = {
       a: aOut,
       b: bOut,
-      diff: {
-        sizeBefore: bOut.sizeBefore - aOut.sizeBefore,
-        sizeAfter: bOut.sizeAfter - aOut.sizeAfter,
-      },
     };
   });
-
-  function printSize(key) {
-    return `${size.b[key]} (${getSign(size.diff[key])}${size.diff[key]})`;
-  }
 
   const table = [
     ['file / KB', 'bundled', 'minified', 'gzipped'],
     ['---', '---', '---', '---'],
-    [
-      minFile,
-      printSize('bundled'),
-      printSize('minified'),
-      printSize('gzipped'),
-    ],
-    ..._.map(files, ({ b, diff }, key) => {
+    ..._.map(size.b, (b, file) => {
+      const a = {
+        bundled: 0,
+        minified: 0,
+        gzipped: 0,
+        ...(size.a[file] || {}),
+      };
+      return [
+        file,
+        printByteSize(a.bundled, b.bundled),
+        printByteSize(a.minified, b.minified),
+        printByteSize(a.gzipped, b.gzipped),
+      ];
+    }),
+    ..._.map(files, ({ a, b }, key) => {
       return [
         key,
-        `${b.sizeBefore} (${getSign(diff.sizeBefore)}${diff.sizeBefore})`,
-        `${b.sizeAfter} (${getSign(diff.sizeAfter)}${diff.sizeAfter})`,
+        printSize(a.sizeBefore, b.sizeBefore),
+        printSize(a.sizeAfter, b.sizeAfter),
       ];
     }),
   ];
+
   const body = `${COMMENT_MARKER}\n**Build Stats**\n${table
     .map((row) => ['', ...row, ''].join(' | '))
     .join('\n')}`.slice(0, MAX_COMMENT_CHARS + 1);
+
   const commentId = await findCommentId(github, context);
+
   await (commentId
     ? github.rest.issues.updateComment({
         repo,
@@ -140,8 +143,4 @@ export async function run({ github, context, a, b }) {
         issue_number: context.payload.pull_request.number,
         body,
       }));
-  return {
-    size,
-    files,
-  };
 }
