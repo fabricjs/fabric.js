@@ -15,13 +15,15 @@ jobs:
           node-version: 16.x
       - run: npm ci
       - run: npm run build
-  stats:
+  stats-upstream:
     runs-on: ubuntu-latest
-    name: Build stats
+    name: Upstream build stats
+    outputs:
+      stats: ${{ steps.stats.outputs.result }}
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          ref: ${{ github.base_ref }}
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
@@ -29,11 +31,50 @@ jobs:
       - name: Build stats
         run: |
           npm run build -- -s
-          mv cli_output/build_stats.json cli_output/b_build_stats.json
-          mv cli_output/build_stats_size.json cli_output/b_build_stats_size.json
-      - run: git checkout origin/master -- src
-      - name: Upstream build stats
-        run: npm run build -- -s
+      - name: read stats
+        id: stats
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            return {
+              size: JSON.parse(fs.readFileSync('cli_output/build_size.json')),
+              stats: JSON.parse(fs.readFileSync('cli_output/build_stats.json')),
+            }
+  stats:
+    runs-on: ubuntu-latest
+    name: Upstream build stats
+    outputs:
+      stats: ${{ steps.stats.outputs.result }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - name: Build stats
+        run: |
+          npm run build -- -s
+      - name: read stats
+        id: stats
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            return {
+              size: JSON.parse(fs.readFileSync('cli_output/build_size.json')),
+              stats: JSON.parse(fs.readFileSync('cli_output/build_stats.json')),
+            }
+  stats-reporter:
+    runs-on: ubuntu-latest
+    name: Report build stats
+    needs: [stats-upstream, stats]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - run: npm ci
       - name: process
         uses: actions/github-script@v6
         with:
@@ -44,8 +85,8 @@ jobs:
               github,
               context,
               core,
-              a: 'build_stats',
-              b: 'b_build_stats',
+              a: JSON.parse(${{ needs.stats-upstream.outputs.stats }}),
+              b: JSON.parse(${{ needs.stats.outputs.stats }}),
             });
   lint:
     runs-on: ubuntu-latest

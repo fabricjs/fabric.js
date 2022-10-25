@@ -22,7 +22,7 @@ export default {
           plugins: [
             runStats &&
               sizeSnapshot({
-                snapshotPath: 'cli_output/build_stats_size.json',
+                snapshotPath: 'cli_output/build_size.json',
               }),
             terser(),
           ],
