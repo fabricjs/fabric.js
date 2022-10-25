@@ -93,8 +93,8 @@ export async function run({ github, context, a, b }) {
   const table = [
     ['file / KB', 'bundled', 'reduced*', 'minified', 'gzipped'],
     ['---', '---', '---', '---'],
-    ..._.map(b.size, (b, file) => {
-      const a = {
+    ..._.map(b.size, (_b, file) => {
+      const _a = {
         bundled: 0,
         minified: 0,
         gzipped: 0,
@@ -102,10 +102,10 @@ export async function run({ github, context, a, b }) {
       };
       return [
         file,
-        printSizeByte(a.bundled, b.bundled),
+        printSizeByte(_a.bundled, _b.bundled),
         '',
-        printSizeByte(a.minified, b.minified),
-        printSizeByte(a.gzipped, b.gzipped),
+        printSizeByte(_a.minified, _b.minified),
+        printSizeByte(_a.gzipped, _b.gzipped),
       ];
     }),
     ..._.map(files, ({ a, b }, key) => {
