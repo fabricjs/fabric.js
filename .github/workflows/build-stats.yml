@@ -1,0 +1,45 @@
+name: Reusable workflow example
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: false
+        type: string
+    secrets:
+      token:
+        required: true
+    outputs:
+      result: ${{ jobs.stats.outputs.result }}
+
+jobs:
+  stats:
+    id: stats
+    runs-on: ubuntu-latest
+    name: Upstream build stats
+    outputs:
+      stats: ${{ steps.stats.outputs.result }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ (!!inputs.ref && 1) || 0 }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - name: checkout
+        run: git checkout ${{ inputs.ref }} -- src
+        if: ${{ !!inputs.ref }}
+      - name: build stats
+        run: npm run build -- -s
+      - name: persist
+        id: stats
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+            return {
+              size: JSON.parse(fs.readFileSync('cli_output/build_size.json')),
+              stats: JSON.parse(fs.readFileSync('cli_output/build_stats.json')),
+            }

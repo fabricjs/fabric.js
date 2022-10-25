@@ -16,58 +16,11 @@ jobs:
       - run: npm ci
       - run: npm run build
   stats-upstream:
-    runs-on: ubuntu-latest
-    name: Upstream build stats
-    outputs:
-      stats: ${{ steps.stats.outputs.result }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-      - run: npm ci
-      - name: Build stats
-        run: |
-          git checkout origin/master -- src
-          npm run build -- -s
-      - name: read stats
-        id: stats
-        uses: actions/github-script@v6
-        with:
-          result-encoding: string
-          script: |
-            const fs = require('fs');
-            return {
-              size: JSON.parse(fs.readFileSync('cli_output/build_size.json')),
-              stats: JSON.parse(fs.readFileSync('cli_output/build_stats.json')),
-            }
+    uses: ./.github/workflows/build-stats.yml
+    with:
+      ref: origin/master
   stats:
-    runs-on: ubuntu-latest
-    name: Upstream build stats
-    outputs:
-      stats: ${{ steps.stats.outputs.result }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-      - run: npm ci
-      - name: Build stats
-        run: |
-          npm run build -- -s
-      - name: read stats
-        id: stats
-        uses: actions/github-script@v6
-        with:
-          result-encoding: string
-          script: |
-            const fs = require('fs');
-            return {
-              size: JSON.parse(fs.readFileSync('cli_output/build_size.json')),
-              stats: JSON.parse(fs.readFileSync('cli_output/build_stats.json')),
-            }
+    uses: ./.github/workflows/build-stats.yml
   stats-reporter:
     runs-on: ubuntu-latest
     name: Report build stats
@@ -88,8 +41,8 @@ jobs:
               github,
               context,
               core,
-              a: JSON.parse(${{ needs.stats-upstream.outputs.stats }}),
-              b: JSON.parse(${{ needs.stats.outputs.stats }}),
+              a: JSON.parse(${{ needs.stats-upstream.outputs.result }}),
+              b: JSON.parse(${{ needs.stats.outputs.result }}),
             });
   lint:
     runs-on: ubuntu-latest
