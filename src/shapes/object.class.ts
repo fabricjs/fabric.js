@@ -4,7 +4,6 @@ import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { config } from '../config';
 import { VERSION } from '../constants';
-import { CommonMethods } from '../mixins/shared_methods.mixin';
 import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
 import { pick } from '../util/misc/pick';
@@ -15,6 +14,7 @@ import { toFixed } from '../util/misc/toFixed';
 import { capitalize } from '../util/lang_string';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { createCanvasElement } from '../util/misc/dom';
+import { ObjectGeometry } from '../mixins/object_geometry.mixin';
 
 type StaticCanvas = any;
 type Canvas = any;
@@ -56,7 +56,7 @@ const ALIASING_LIMIT = 2;
  * @fires dragleave
  * @fires drop
  */
-export class FabricObject extends CommonMethods {
+export class FabricObject extends ObjectGeometry {
   type: string;
 
   /**
@@ -76,88 +76,11 @@ export class FabricObject extends CommonMethods {
   originY: string;
 
   /**
-   * Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
-   * @type Number
-   * @default 0
-   */
-  top: number;
-
-  /**
-   * Left position of an object. Note that by default it's relative to object left. You can change this by setting originX={left/center/right}
-   * @type Number
-   * @default 0
-   */
-  left: number;
-
-  /**
-   * Object width
-   * @type Number
-   * @default
-   */
-  width: number;
-
-  /**
-   * Object height
-   * @type Number
-   * @default
-   */
-  height: number;
-
-  /**
-   * Object scale factor (horizontal)
-   * @type Number
-   * @default 1
-   */
-  scaleX: number;
-
-  /**
-   * Object scale factor (vertical)
-   * @type Number
-   * @default 1
-   */
-  scaleY: number;
-
-  /**
-   * When true, an object is rendered as flipped horizontally
-   * @type Boolean
-   * @default false
-   */
-  flipX: boolean;
-
-  /**
-   * When true, an object is rendered as flipped vertically
-   * @type Boolean
-   * @default false
-   */
-  flipY: boolean;
-
-  /**
    * Opacity of an object
    * @type Number
    * @default 1
    */
   opacity: number;
-
-  /**
-   * Angle of rotation of an object (in degrees)
-   * @type Number
-   * @default 0
-   */
-  angle: TDegree;
-
-  /**
-   * Angle of skew on x axes of an object (in degrees)
-   * @type Number
-   * @default 0
-   */
-  skewX: number;
-
-  /**
-   * Angle of skew on y axes of an object (in degrees)
-   * @type Number
-   * @default 0
-   */
-  skewY: number;
 
   /**
    * Size of object's controlling corners (in pixels)
@@ -193,13 +116,6 @@ export class FabricObject extends CommonMethods {
    * @default null
    */
   moveCursor: null;
-
-  /**
-   * Padding between object and its controlling borders (in pixels)
-   * @type Number
-   * @default 0
-   */
-  padding: number;
 
   /**
    * Color of controlling borders of an object (when it's active)
@@ -305,21 +221,6 @@ export class FabricObject extends CommonMethods {
    * @default
    */
   selectionBackgroundColor: string;
-
-  /**
-   * When defined, an object is rendered via stroke and this property specifies its color
-   * takes css colors https://www.w3.org/TR/css-color-3/
-   * @type String
-   * @default null
-   */
-  stroke: string | TFiller | null;
-
-  /**
-   * Width of a stroke used to render this object
-   * @type Number
-   * @default 1
-   */
-  strokeWidth: number;
 
   /**
    * Array specifying dash pattern of an object's stroke (stroke must be defined)
@@ -533,19 +434,6 @@ export class FabricObject extends CommonMethods {
    * @default true
    */
   noScaleCache: boolean;
-
-  /**
-   * When `false`, the stoke width will scale with the object.
-   * When `true`, the stroke will always match the exact pixel size entered for stroke width.
-   * this Property does not work on Text classes or drawing call that uses strokeText,fillText methods
-   * default to false
-   * @since 2.6.0
-   * @type Boolean
-   * @default false
-   * @type Boolean
-   * @default false
-   */
-  strokeUniform: boolean;
 
   /**
    * When set to `true`, object's cache will be rerendered next render call.

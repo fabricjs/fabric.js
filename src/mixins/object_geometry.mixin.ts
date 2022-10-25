@@ -1,7 +1,7 @@
 import type { TBoundingBox } from '../util/misc/boundingBoxFromPoints';
-import { Intersection, IntersectionType } from '../intersection.class';
+import { Intersection } from '../intersection.class';
 import { IPoint, Point } from '../point.class';
-import { TDegree, TMat2D, TOriginX, TOriginY } from '../typedefs';
+import { TDegree, TFiller, TMat2D, TOriginX, TOriginY } from '../typedefs';
 import { CommonMethods } from './shared_methods.mixin';
 import { calcRotateMatrix, composeMatrix, invertTransform, multiplyTransformMatrices, qrDecompose, transformPoint } from '../util/misc/matrix';
 import { cos } from '../util/misc/cos';
@@ -11,6 +11,7 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { iMatrix } from '../constants';
 import { sizeAfterTransform } from '../util/misc/objectTransforms';
+import { Group } from '../shapes/group.class';
 
 type TCornerPoint = {
   tl: Point,
@@ -45,6 +46,119 @@ type TControlSet = Record<string, Control>
 type TACoords = TCornerPoint;
 
 export class ObjectGeometry extends CommonMethods {
+
+  /**
+   * Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
+   * @type Number
+   * @default 0
+   */
+  top: number;
+
+  /**
+   * Left position of an object. Note that by default it's relative to object left. You can change this by setting originX={left/center/right}
+   * @type Number
+   * @default 0
+   */
+  left: number;
+
+  /**
+  * Object width
+  * @type Number
+  * @default
+  */
+  width: number;
+
+  /**
+  * Object height
+  * @type Number
+  * @default
+  */
+  height: number;
+
+  /**
+  * Object scale factor (horizontal)
+  * @type Number
+  * @default 1
+  */
+  scaleX: number;
+
+  /**
+  * Object scale factor (vertical)
+  * @type Number
+  * @default 1
+  */
+  scaleY: number;
+
+  /**
+  * When true, an object is rendered as flipped horizontally
+  * @type Boolean
+  * @default false
+  */
+  flipX: boolean;
+
+  /**
+  * When true, an object is rendered as flipped vertically
+  * @type Boolean
+  * @default false
+  */
+  flipY: boolean;
+
+  /**
+   * Angle of rotation of an object (in degrees)
+   * @type Number
+   * @default 0
+   */
+  angle: TDegree;
+
+  /**
+  * Angle of skew on x axes of an object (in degrees)
+  * @type Number
+  * @default 0
+  */
+  skewX: number;
+
+  /**
+  * Angle of skew on y axes of an object (in degrees)
+  * @type Number
+  * @default 0
+  */
+  skewY: number;
+
+  /**
+   * Padding between object and its controlling borders (in pixels)
+   * @type Number
+   * @default 0
+   */
+  padding: number;
+
+  /**
+   * When defined, an object is rendered via stroke and this property specifies its color
+   * takes css colors https://www.w3.org/TR/css-color-3/
+   * @type String
+   * @default null
+   */
+  stroke: string | TFiller | null;
+
+  /**
+   * Width of a stroke used to render this object
+   * @type Number
+   * @default 1
+   */
+  strokeWidth: number;
+
+  /**
+   * When `false`, the stoke width will scale with the object.
+   * When `true`, the stroke will always match the exact pixel size entered for stroke width.
+   * this Property does not work on Text classes or drawing call that uses strokeText,fillText methods
+   * default to false
+   * @since 2.6.0
+   * @type Boolean
+   * @default false
+   * @type Boolean
+   * @default false
+   */
+  strokeUniform: boolean;
+
   /**
    * Describe object's corner position in canvas element coordinates.
    * properties are depending on control keys and padding the main controls.
@@ -96,6 +210,18 @@ export class ObjectGeometry extends CommonMethods {
    * controls are added by default_controls.js
    */
   controls: TControlSet = {}
+
+  /**
+   * Object containing this object.
+   * can influence its size and position
+   */
+  group?: Group;
+
+  /**
+   * Object containing this object.
+   * can influence its size and position
+   */
+  canvas?: any;
 
   /**
    * @returns {number} x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
@@ -180,7 +306,7 @@ export class ObjectGeometry extends CommonMethods {
    * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
    * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
    */
-  setXY(point: Point, originX: TOriginX, originY: TOriginY) {
+  setXY(point: Point, originX?: TOriginX, originY?: TOriginY) {
     if (this.group) {
       point = transformPoint(
         point,
@@ -203,7 +329,7 @@ export class ObjectGeometry extends CommonMethods {
    * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
    * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
    */
-  setRelativeXY(point: Point, originX: TOriginX, originY: TOriginY) {
+  setRelativeXY(point: Point, originX?: TOriginX, originY?: TOriginY) {
     this.setPositionByOrigin(
       point,
       originX || this.originX,
@@ -293,7 +419,7 @@ export class ObjectGeometry extends CommonMethods {
    * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
    * @return {Boolean} true if object is fully contained within area of another object
    */
-  isContainedWithinObject(other: FabricObject, absolute: boolean, calculate: boolean): boolean {
+  isContainedWithinObject(other: ObjectGeometry, absolute: boolean, calculate: boolean): boolean {
     const points = this.getCoords(absolute, calculate),
       otherCoords = absolute ? other.aCoords : other.lineCoords,
       lines = other._getImageLines(otherCoords);
@@ -331,7 +457,7 @@ export class ObjectGeometry extends CommonMethods {
    * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
    * @return {Boolean} true if point is inside the object
    */
-  containsPoint(point: Point, lines: TBBoxLines | undefined, absolute: boolean, calculate: boolean): boolean {
+  containsPoint(point: Point, lines: TBBoxLines | undefined, absolute = false, calculate = false): boolean {
     const coords = this._getCoords(absolute, calculate),
       imageLines = lines || this._getImageLines(coords),
       xPoints = this._findCrossPoints(point, imageLines);
@@ -531,7 +657,7 @@ export class ObjectGeometry extends CommonMethods {
 
   /**
    * Makes sure the scale is valid and modifies it if necessary
-   * todo: this is a control action issue, not a geometry one
+   * @todo: this is a control action issue, not a geometry one
    * @private
    * @param {Number} value, unconstrained
    * @return {Number} constrained value;
@@ -656,7 +782,7 @@ export class ObjectGeometry extends CommonMethods {
   calcOCoords(): Record<string, TOCoord> {
     const vpt = this.getViewportTransform(),
       center = this.getCenterPoint(),
-      tMatrix = [1, 0, 0, 1, center.x, center.y],
+      tMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
       rMatrix = calcRotateMatrix({
         angle:
           this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
@@ -676,7 +802,7 @@ export class ObjectGeometry extends CommonMethods {
         : undefined,
       dim = this._calculateCurrentDimensions(transformOptions),
       coords = {};
-    this.forEachControl(function (control, key, fabricObject) {
+    this.forEachControl((control, key, fabricObject) => {
       coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
     });
 
@@ -696,10 +822,15 @@ export class ObjectGeometry extends CommonMethods {
     return coords;
   }
 
+  /**
+   * Calculates the coordnates of the 4 corner of the bbox, in absolute coordinates.
+   * those never change with zoom or viewport changes.
+   * @return {TCornerPoint}
+   */
   calcACoords(): TCornerPoint {
     const rotateMatrix = calcRotateMatrix({ angle: this.angle }),
       center = this.getRelativeCenterPoint(),
-      translateMatrix = [1, 0, 0, 1, center.x, center.y],
+      translateMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
       finalMatrix = multiplyTransformMatrices(translateMatrix, rotateMatrix),
       dim = this._getTransformedDimensions(),
       w = dim.x / 2,
@@ -850,7 +981,7 @@ export class ObjectGeometry extends CommonMethods {
    * @private
    * @returns {Point} dimensions
    */
-  _getTransformedDimensions(options?: any = {}): Point {
+  _getTransformedDimensions(options: any = {}): Point {
     const dimOptions = {
       scaleX: this.scaleX,
       scaleY: this.scaleY,

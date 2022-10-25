@@ -2,6 +2,10 @@
 import { Point } from '../point.class';
 import { FabricObject } from './object.class';
 
+export class Group extends FabricObject {
+
+}
+
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
     multiplyTransformMatrices = fabric.util.multiplyTransformMatrices,
