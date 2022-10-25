@@ -60,12 +60,12 @@ jobs:
               diff
             };
             local.modules.forEach((b) => {
-              const found = upstream.modules.find((a) => a.id === b.id);
-              out[a.id] = {
+              const a = upstream.modules.find((a) => a.id === b.id);
+              out[b.id] = {
                 a, 
                 b,
                 diff: ['size', 'origSize', 'percent', 'reduction'].reduce((diff, key) => {
-                  diff[key] = b[key] - a[key];
+                  diff[key] = b[key] - (a[key] || 0);
                   return diff;
                 }, {})
               }
