@@ -55,12 +55,22 @@ jobs:
               ...JSON.parse(BUILD_STATS_UPSTREAM),
               size: JSON.parse(BUILD_SIZE_UPSTREAM)
             };
-            const out = {};
+            const diff = {};
+            for (const key in local.size) {
+              diff[key] = local.size[key] - upstream.size[key];
+            }
+            const out = {
+              diff
+            };
             local.modules.forEach((b) => {
               const found = upstream.modules.find((a) => a.id === b.id);
               out[id] = {
                 a, 
-                b
+                b,
+                diff: ['size', 'origSize', 'percent', 'reduction'].reduce((diff, key) => {
+                  diff[key] = b[key] - a[key];
+                  return diff;
+                }, {})
               }
             });
             console.log(out);
