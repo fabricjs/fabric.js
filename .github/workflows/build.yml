@@ -23,7 +23,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            console.log(github.rest)
+            const { base, head } = context.payload.pull_request;
             const changedFiles = await github.rest.repos.compareCommits({
               base: base.sha,
               head: head.sha,
