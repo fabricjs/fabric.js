@@ -682,7 +682,8 @@ export class ObjectGeometry extends ObjectOrigin {
         ? qrDecompose(this.calcTransformMatrix())
         : undefined,
       dim = this._calculateCurrentDimensions(transformOptions),
-      coords = {};
+      coords: Record<string, TOCoord> = {};
+    // @ts-ignore
     this.forEachControl((control, key, fabricObject) => {
       coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
     });
@@ -743,6 +744,7 @@ export class ObjectGeometry extends ObjectOrigin {
     if (!skipCorners) {
       // set coordinates of the draggable boxes in the corners used to scale/rotate the image
       this.oCoords = this.calcOCoords();
+      // @ts-ignore
       this._setCornerCoords && this._setCornerCoords();
     }
   }
