@@ -22,14 +22,13 @@ jobs:
       stats: ${{ steps.stats.outputs.result }}
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.base_ref }}
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
       - run: npm ci
       - name: Build stats
         run: |
+          git checkout ${{ github.base_ref }} -- src
           npm run build -- -s
       - name: read stats
         id: stats
