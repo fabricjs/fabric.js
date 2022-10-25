@@ -8,9 +8,8 @@ const COMMENT_MARKER = '<!-- BUILD STATS COMMENT -->';
 
 const MAX_COMMENT_CHARS = 65536;
 
-function parseJSONFile(file) {
-  return JSON.parse(fs.readFileSync(file));
-}
+const INACCURATE_COMMENT =
+  '*inaccurate, see [link](https://github.com/doesdev/rollup-plugin-analyzer#why-is-the-reported-size-not-the-same-as-the-file-on-disk)';
 
 function getSign(n) {
   switch (Math.sign(n)) {
@@ -117,15 +116,18 @@ export async function run({ github, context, a, b }) {
     }),
   ];
 
-  const body = [
-    COMMENT_MARKER,
-    '**Build Stats**',
-    '',
-    '*inaccurate, see [link](https://github.com/doesdev/rollup-plugin-analyzer#why-is-the-reported-size-not-the-same-as-the-file-on-disk)',
-    ...table.map((row) => ['', ...row, ''].join(' | ')),
-  ]
-    .join('\n')
-    .slice(0, MAX_COMMENT_CHARS + 1);
+  const body = `
+    ${[
+      COMMENT_MARKER,
+      '**Build Stats**',
+      '',
+      ...table.map((row) => ['', ...row, ''].join(' | ')),
+      '',
+    ]
+      .join('\n')
+      .slice(0, MAX_COMMENT_CHARS - INACCURATE_COMMENT.length)}
+      \n
+    ${INACCURATE_COMMENT}`;
 
   const commentId = await findCommentId(github, context);
 
