@@ -30,8 +30,8 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             }))
-            .map(({ filename }) => filename)
-            .filter(file => file.startsWith('src'));
+            //.map(({ filename }) => filename)
+            //.filter(file => file.startsWith('src'));
             console.log(changedFiles);
       - uses: actions/checkout@v3
         with:
