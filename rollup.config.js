@@ -1,6 +1,11 @@
 import { terser } from 'rollup-plugin-terser';
 import ts from 'rollup-plugin-ts';
 import json from '@rollup/plugin-json';
+import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
+import analyze from 'rollup-plugin-analyzer';
+import { execSync } from 'child_process';
+
+const CI = process.env.CI;
 
 // https://rollupjs.org/guide/en/#configuration-files
 export default {
@@ -17,7 +22,16 @@ export default {
           file: process.env.BUILD_MIN_OUTPUT || './dist/fabric.min.js',
           name: 'fabric',
           format: 'cjs',
-          plugins: [terser()],
+          plugins: [
+            terser(),
+            CI && sizeSnapshot(),
+            CI &&
+              analyze({
+                filter: execSync(
+                  'git diff --name-only origin/master HEAD'
+                ).split('\n'),
+              }),
+          ],
         }
       : null,
   ],
