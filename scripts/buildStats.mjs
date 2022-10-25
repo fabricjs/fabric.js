@@ -114,18 +114,18 @@ export async function run({ github, context, a, b }) {
     }),
   ];
 
-  const body = `
-    ${[
-      COMMENT_MARKER,
-      '**Build Stats**',
-      '',
-      ...table.map((row) => ['', ...row, ''].join(' | ')),
-      '',
-    ]
-      .join('\n')
-      .slice(0, MAX_COMMENT_CHARS - INACCURATE_COMMENT.length)}
-      \n
-    ${INACCURATE_COMMENT}`;
+  const body = `${[
+    COMMENT_MARKER,
+    '**Build Stats**',
+    '',
+    ...table.map((row) => ['', ...row, ''].join(' | ')),
+    '',
+  ]
+    .join('\n')
+    .slice(
+      0,
+      MAX_COMMENT_CHARS - INACCURATE_COMMENT.length
+    )}\n${INACCURATE_COMMENT}`;
 
   const commentId = await findCommentId(github, context);
 
