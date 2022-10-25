@@ -40,7 +40,6 @@ export function build({ watch, fast, input, output, stats = false } = {}) {
             )
           : undefined,
       BUILD_STATS: Number(stats),
-      BUILD_STATS_FILES: Array.isArray(stats) ? stats.join(' ') : stats || '',
     },
   };
   if (watch) {

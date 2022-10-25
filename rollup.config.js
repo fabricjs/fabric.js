@@ -44,8 +44,6 @@ export default {
     }),
     runStats &&
       analyze({
-        filter:
-          compact(process.env.BUILD_STATS_FILES?.split(splitter)) || undefined,
         onAnalysis(analysis) {
           if (analyzed) {
             // We only want reports on the minified output
