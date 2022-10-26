@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { Point } from '../point.class';
 
 (function (global) {
   var fabric = global.fabric;
