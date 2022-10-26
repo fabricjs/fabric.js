@@ -286,7 +286,9 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
           )
         )
       ),
-      offset = pointer.subtract(new Point(ex, ey))[axis],
+      offset = pointer
+        .subtract(new Point(ex, ey))
+        .divide(new Point(target.scaleX, target.scaleY))[axis],
       flip = new Point(flipX ? -1 : 1, flipY ? -1 : 1)[axis],
       skewingStart = new Point(skewX, skewY)[axis],
       skewingBefore = new Point(target.skewX, target.skewY)[axis],
