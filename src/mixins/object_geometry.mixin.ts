@@ -2,7 +2,14 @@ import type { TBoundingBox } from '../util/misc/boundingBoxFromPoints';
 import { Intersection } from '../intersection.class';
 import { IPoint, Point } from '../point.class';
 import { TDegree, TMat2D, TOriginX, TOriginY } from '../typedefs';
-import { calcRotateMatrix, composeMatrix, invertTransform, multiplyTransformMatrices, qrDecompose, transformPoint } from '../util/misc/matrix';
+import {
+  calcRotateMatrix,
+  composeMatrix,
+  invertTransform,
+  multiplyTransformMatrices,
+  qrDecompose,
+  transformPoint,
+} from '../util/misc/matrix';
 import { cos } from '../util/misc/cos';
 import { sin } from '../util/misc/sin';
 import { FabricObject } from '../shapes/object.class';
@@ -12,14 +19,14 @@ import { iMatrix } from '../constants';
 import { ObjectOrigin } from './object_origin.mixin';
 
 type TCornerPoint = {
-  tl: Point,
-  tr: Point,
-  bl: Point,
-  br: Point,
-}
+  tl: Point;
+  tr: Point;
+  bl: Point;
+  br: Point;
+};
 
 type TOCoord = IPoint & {
-  corner: TCornerPoint
+  corner: TCornerPoint;
 };
 
 type TLineDescriptor = {
@@ -37,26 +44,25 @@ type TBBoxLines = {
 type TMatrixCache = {
   key: string;
   value: TMat2D;
-}
+};
 
-type TControlSet = Record<string, any>
+type TControlSet = Record<string, any>;
 
 type TACoords = TCornerPoint;
 
 export class ObjectGeometry extends ObjectOrigin {
-
   /**
-  * When true, an object is rendered as flipped horizontally
-  * @type Boolean
-  * @default false
-  */
+   * When true, an object is rendered as flipped horizontally
+   * @type Boolean
+   * @default false
+   */
   flipX: boolean;
 
   /**
-  * When true, an object is rendered as flipped vertically
-  * @type Boolean
-  * @default false
-  */
+   * When true, an object is rendered as flipped vertically
+   * @type Boolean
+   * @default false
+   */
   flipY: boolean;
 
   /**
@@ -76,7 +82,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * to draw and locate controls
    * @memberOf fabric.Object.prototype
    */
-  oCoords: Record<string, TOCoord> = {}
+  oCoords: Record<string, TOCoord> = {};
 
   /**
    * Describe object's corner position in canvas object absolute coordinates
@@ -90,7 +96,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * You can calculate them without updating with @method calcACoords();
    * @memberOf fabric.Object.prototype
    */
-  aCoords: TACoords
+  aCoords: TACoords;
 
   /**
    * Describe object's corner position in canvas element coordinates.
@@ -100,23 +106,23 @@ export class ObjectGeometry extends ObjectOrigin {
    * @todo investigate how to get rid of those
    * @memberOf fabric.Object.prototype
    */
-  lineCoords: TCornerPoint
+  lineCoords: TCornerPoint;
 
   /**
    * storage cache for object transform matrix
    */
-  ownMatrixCache?: TMatrixCache
+  ownMatrixCache?: TMatrixCache;
 
   /**
    * storage cache for object full transform matrix
    */
-  matrixCache?: TMatrixCache
+  matrixCache?: TMatrixCache;
 
   /**
    * custom controls interface
    * controls are added by default_controls.js
    */
-  controls: TControlSet = {}
+  controls: TControlSet = {};
 
   /**
    * Object containing this object.
@@ -190,10 +196,7 @@ export class ObjectGeometry extends ObjectOrigin {
   getXY(): Point {
     const relativePosition = this.getRelativeXY();
     return this.group
-      ? transformPoint(
-          relativePosition,
-          this.group.calcTransformMatrix()
-        )
+      ? transformPoint(relativePosition, this.group.calcTransformMatrix())
       : relativePosition;
   }
 
@@ -282,7 +285,12 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
    * @return {Boolean} true if object intersects with an area formed by 2 points
    */
-  intersectsWithRect(pointTL: Point, pointBR: Point, absolute: boolean, calculate: boolean): boolean {
+  intersectsWithRect(
+    pointTL: Point,
+    pointBR: Point,
+    absolute: boolean,
+    calculate: boolean
+  ): boolean {
     const coords = this.getCoords(absolute, calculate),
       intersection = Intersection.intersectPolygonRectangle(
         coords,
@@ -299,7 +307,11 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
    * @return {Boolean} true if object intersects with another object
    */
-  intersectsWithObject(other: FabricObject, absolute: boolean, calculate: boolean): boolean {
+  intersectsWithObject(
+    other: FabricObject,
+    absolute: boolean,
+    calculate: boolean
+  ): boolean {
     const intersection = Intersection.intersectPolygonPolygon(
       this.getCoords(absolute, calculate),
       other.getCoords(absolute, calculate)
@@ -320,7 +332,11 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
    * @return {Boolean} true if object is fully contained within area of another object
    */
-  isContainedWithinObject(other: ObjectGeometry, absolute: boolean, calculate: boolean): boolean {
+  isContainedWithinObject(
+    other: ObjectGeometry,
+    absolute: boolean,
+    calculate: boolean
+  ): boolean {
     const points = this.getCoords(absolute, calculate),
       otherCoords = absolute ? other.aCoords : other.lineCoords,
       lines = other._getImageLines(otherCoords);
@@ -340,7 +356,12 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
    * @return {Boolean} true if object is fully contained within area formed by 2 points
    */
-  isContainedWithinRect(pointTL: Point, pointBR: Point, absolute: boolean, calculate: boolean): boolean {
+  isContainedWithinRect(
+    pointTL: Point,
+    pointBR: Point,
+    absolute: boolean,
+    calculate: boolean
+  ): boolean {
     const boundingRect = this.getBoundingRect(absolute, calculate);
     return (
       boundingRect.left >= pointTL.x &&
@@ -358,7 +379,12 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
    * @return {Boolean} true if point is inside the object
    */
-  containsPoint(point: Point, lines: TBBoxLines | undefined, absolute = false, calculate = false): boolean {
+  containsPoint(
+    point: Point,
+    lines: TBBoxLines | undefined,
+    absolute = false,
+    calculate = false
+  ): boolean {
     const coords = this._getCoords(absolute, calculate),
       imageLines = lines || this._getImageLines(coords),
       xPoints = this._findCrossPoints(point, imageLines);
@@ -380,12 +406,13 @@ export class ObjectGeometry extends ObjectOrigin {
     const points = this.getCoords(true, calculate);
     // if some point is on screen, the object is on screen.
     if (
-      points.some((point) => (
+      points.some(
+        (point) =>
           point.x <= br.x &&
           point.x >= tl.x &&
           point.y <= br.y &&
           point.y >= tl.y
-        ))
+      )
     ) {
       return true;
     }
@@ -405,7 +432,11 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Boolean} calculate use coordinates of current position instead of .oCoords
    * @return {Boolean} true if the object contains the point
    */
-  _containsCenterOfCanvas(pointTL: Point, pointBR: Point, calculate: boolean): boolean {
+  _containsCenterOfCanvas(
+    pointTL: Point,
+    pointBR: Point,
+    calculate: boolean
+  ): boolean {
     // worst case scenario the object is so big that contains the screen
     const centerPoint = pointTL.midPointFrom(pointBR);
     return this.containsPoint(centerPoint, undefined, true, calculate);
@@ -426,12 +457,11 @@ export class ObjectGeometry extends ObjectOrigin {
     }
     const allPointsAreOutside = this.getCoords(true, calculate).every(
       (point) =>
-          (point.x >= br.x || point.x <= tl.x) &&
-          (point.y >= br.y || point.y <= tl.y)
+        (point.x >= br.x || point.x <= tl.x) &&
+        (point.y >= br.y || point.y <= tl.y)
     );
     return (
-      allPointsAreOutside &&
-      this._containsCenterOfCanvas(tl, br, calculate)
+      allPointsAreOutside && this._containsCenterOfCanvas(tl, br, calculate)
     );
   }
 
@@ -440,7 +470,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * @private
    * @param {Object} oCoords Coordinates of the object corners
    */
-  _getImageLines({ tl, tr, bl, br}: TCornerPoint): TBBoxLines {
+  _getImageLines({ tl, tr, bl, br }: TCornerPoint): TBBoxLines {
     const lines = {
       topline: {
         o: tl,
@@ -491,7 +521,7 @@ export class ObjectGeometry extends ObjectOrigin {
 
     for (const lineKey in lines) {
       let xi;
-      const iLine = lines[(lineKey as keyof TBBoxLines)];
+      const iLine = lines[lineKey as keyof TBBoxLines];
       // optimisation 1: line below point. no cross
       if (iLine.o.y < point.y && iLine.d.y < point.y) {
         continue;
@@ -665,8 +695,7 @@ export class ObjectGeometry extends ObjectOrigin {
       center = this.getCenterPoint(),
       tMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
       rMatrix = calcRotateMatrix({
-        angle:
-          this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
+        angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
       }),
       positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),
       startMatrix = multiplyTransformMatrices(vpt, positionMatrix),
@@ -842,7 +871,7 @@ export class ObjectGeometry extends ObjectOrigin {
     this.ownMatrixCache = {
       key,
       value,
-    }
+    };
     return value;
   }
 

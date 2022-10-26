@@ -173,7 +173,7 @@ export class FabricObject extends ObjectGeometry {
    * @type String
    * @default null
    */
-   stroke: string | TFiller | null;
+  stroke: string | TFiller | null;
 
   /**
    * Color of object's fill
@@ -1008,7 +1008,7 @@ export class FabricObject extends ObjectGeometry {
    * @param {Number} value, unconstrained
    * @return {Number} constrained value;
    */
-   _constrainScale(value: number): number {
+  _constrainScale(value: number): number {
     if (Math.abs(value) < this.minScaleLimit) {
       if (value < 0) {
         return -this.minScaleLimit;

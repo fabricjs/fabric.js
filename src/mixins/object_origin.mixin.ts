@@ -20,11 +20,14 @@ const originOffset = {
  * @param {TOriginX | TOriginY} originValue originX / originY
  * @returns number
  */
-export const resolveOrigin = (originValue: TOriginX | TOriginY | number): number => (typeof originValue === 'string') ? originOffset[originValue] : originValue - 0.5;
-
+export const resolveOrigin = (
+  originValue: TOriginX | TOriginY | number
+): number =>
+  typeof originValue === 'string'
+    ? originOffset[originValue]
+    : originValue - 0.5;
 
 export class ObjectOrigin extends CommonMethods {
-
   /**
    * Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
    * @type Number
@@ -154,7 +157,7 @@ export class ObjectOrigin extends CommonMethods {
       height: this.height,
       strokeWidth: this.strokeWidth,
       ...options,
-    }
+    };
     // stroke is applied before/after transformations are applied according to `strokeUniform`
     const strokeWidth = dimOptions.strokeWidth;
     let preScalingStrokeValue = strokeWidth,
@@ -198,7 +201,7 @@ export class ObjectOrigin extends CommonMethods {
   ): Point {
     let x = point.x,
       y = point.y;
-    const  offsetX = resolveOrigin(toOriginX) - resolveOrigin(fromOriginX),
+    const offsetX = resolveOrigin(toOriginX) - resolveOrigin(fromOriginX),
       offsetY = resolveOrigin(toOriginY) - resolveOrigin(fromOriginY);
 
     if (offsetX || offsetY) {
@@ -217,7 +220,11 @@ export class ObjectOrigin extends CommonMethods {
    * @param {TOriginY} originY Vertical origin: 'top', 'center' or 'bottom'
    * @return {Point}
    */
-  translateToCenterPoint(point: Point, originX: TOriginX, originY: TOriginY) :Point {
+  translateToCenterPoint(
+    point: Point,
+    originX: TOriginX,
+    originY: TOriginY
+  ): Point {
     const p = this.translateToGivenOrigin(
       point,
       originX,
@@ -238,7 +245,11 @@ export class ObjectOrigin extends CommonMethods {
    * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
    * @return {Point}
    */
-  translateToOriginPoint(center: Point, originX: TOriginX, originY: TOriginY): Point {
+  translateToOriginPoint(
+    center: Point,
+    originX: TOriginX,
+    originY: TOriginY
+  ): Point {
     const p = this.translateToGivenOrigin(
       center,
       'center',
@@ -259,10 +270,7 @@ export class ObjectOrigin extends CommonMethods {
   getCenterPoint(): Point {
     const relCenter = this.getRelativeCenterPoint();
     return this.group
-      ? transformPoint(
-          relCenter,
-          this.group.calcTransformMatrix()
-        )
+      ? transformPoint(relCenter, this.group.calcTransformMatrix())
       : relCenter;
   }
 
@@ -285,7 +293,11 @@ export class ObjectOrigin extends CommonMethods {
    * @return {Point}
    */
   getPointByOrigin(originX: TOriginX, originY: TOriginY): Point {
-    return this.translateToOriginPoint(this.getRelativeCenterPoint(), originX, originY);
+    return this.translateToOriginPoint(
+      this.getRelativeCenterPoint(),
+      originX,
+      originY
+    );
   }
 
   /**
@@ -311,7 +323,7 @@ export class ObjectOrigin extends CommonMethods {
     }
 
     if (this.angle) {
-      p2 = point.rotate(-degreesToRadians(this.angle), center)
+      p2 = point.rotate(-degreesToRadians(this.angle), center);
     } else {
       p2 = point;
     }
@@ -359,7 +371,10 @@ export class ObjectOrigin extends CommonMethods {
    * @return {void}
    */
   _resetOrigin() {
-    if (this._originalOriginX !== undefined && this._originalOriginY !== undefined) {
+    if (
+      this._originalOriginX !== undefined &&
+      this._originalOriginY !== undefined
+    ) {
       const originPoint = this.translateToOriginPoint(
         this.getRelativeCenterPoint(),
         this._originalOriginX,
