@@ -122,7 +122,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * custom controls interface
    * controls are added by default_controls.js
    */
-  controls: TControlSet = {};
+  controls: TControlSet;
 
   /**
    * Object containing this object.
