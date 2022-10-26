@@ -6,6 +6,7 @@ import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import { Point } from '../point.class';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
+import { TProjectStrokeOnPointsOptions } from '../util/misc/projectStroke/types';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 
 (function (global) {
@@ -102,19 +103,45 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
       },
 
       /**
+       * @todo make this method protected when migrating
+       */
+      isOpen: function () {
+        return true;
+      },
+
+      /**
        * @private
        */
-      _projectStrokeOnPoints: function () {
-        return projectStrokeOnPoints(this.points, this, true);
+      _projectStrokeOnPoints: function (
+        options?: Partial<TProjectStrokeOnPointsOptions>
+      ) {
+        return projectStrokeOnPoints(
+          this.points,
+          {
+            scaleX: this.scaleX,
+            scaleY: this.scaleY,
+            skewX: this.skewX,
+            skewY: this.skewY,
+            strokeLineCap: this.strokeLineCap,
+            strokeLineJoin: this.strokeLineJoin,
+            strokeMiterLimit: this.strokeMiterLimit,
+            strokeUniform: this.strokeUniform,
+            strokeWidth: this.strokeWidth,
+            ...(options || {}),
+          },
+          this.isOpen()
+        );
       },
 
       /**
        * Calculate the polygon bounding box
        * @private
        */
-      _calcDimensions: function () {
+      _calcDimensions: function (
+        options?: Partial<TProjectStrokeOnPointsOptions>
+      ) {
         const points = this.exactBoundingBox
-          ? this._projectStrokeOnPoints().map(
+          ? this._projectStrokeOnPoints(options).map(
               (projection) => projection.projectedPoint
             )
           : this.points;
@@ -144,8 +171,10 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
           top: bbox.top - legacyCorrection,
           pathOffset: new Point(pathOffsetX, pathOffsetY),
           strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top).subtract(
-            bbox.left,
-            bbox.top
+            new Point(bbox.left, bbox.top)
+          ),
+          strokeDiff: new Point(bbox.width, bbox.height).subtract(
+            new Point(bboxNoStroke.width, bboxNoStroke.height)
           ),
         };
       },
@@ -154,9 +183,16 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        * @returns {Point} top left position of the bounding box, useful for complementary positioning
        */
       setDimensions: function () {
-        const { left, top, width, height, pathOffset, strokeOffset } =
-          this._calcDimensions();
-        this.set({ width, height, pathOffset, strokeOffset });
+        const {
+          left,
+          top,
+          width,
+          height,
+          pathOffset,
+          strokeOffset,
+          strokeDiff,
+        } = this._calcDimensions();
+        this.set({ width, height, pathOffset, strokeOffset, strokeDiff });
         return new Point(left, top);
       },
 
@@ -176,16 +212,25 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        * @private
        */
       _getTransformedDimensions: function (options) {
-        return this.exactBoundingBox
-          ? this.callSuper('_getTransformedDimensions', {
-              ...(options || {}),
-              // disable stroke bbox calculations
-              strokeWidth: 0,
-              // disable skewing bbox calculations
-              skewX: 0,
-              skewY: 0,
-            })
-          : this.callSuper('_getTransformedDimensions', options);
+        if (this.exactBoundingBox) {
+          // calculate size
+          const { width, height } =
+            options && !(options.width && options.height)
+              ? this._calcDimensions(options)
+              : { width: this.width, height: this.height };
+          return this.callSuper('_getTransformedDimensions', {
+            width,
+            height,
+            ...(options || {}),
+            // disable stroke bbox calculations
+            strokeWidth: 0,
+            // disable skewing bbox calculations
+            skewX: 0,
+            skewY: 0,
+          });
+        } else {
+          return this.callSuper('_getTransformedDimensions', options);
+        }
       },
 
       /**
@@ -281,6 +326,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
         if (!this.commonRender(ctx)) {
           return;
         }
+        !this.isOpen() && ctx.closePath();
         this._renderPaintInOrder(ctx);
       },
 
