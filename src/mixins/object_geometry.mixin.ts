@@ -1,7 +1,10 @@
-import type { TBoundingBox } from '../util/misc/boundingBoxFromPoints';
+import { iMatrix } from '../constants';
 import { Intersection } from '../intersection.class';
 import { IPoint, Point } from '../point.class';
-import { TDegree, TMat2D, TOriginX, TOriginY } from '../typedefs';
+import { FabricObject } from '../shapes/object.class';
+import { TBBox, TDegree, TMat2D, TOriginX, TOriginY } from '../typedefs';
+import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
+import { cos } from '../util/misc/cos';
 import {
   calcRotateMatrix,
   composeMatrix,
@@ -10,14 +13,10 @@ import {
   qrDecompose,
   transformPoint,
 } from '../util/misc/matrix';
-import { cos } from '../util/misc/cos';
-import { sin } from '../util/misc/sin';
-import { FabricObject } from '../shapes/object.class';
-import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { iMatrix } from '../constants';
-import { ObjectOrigin } from './object_origin.mixin';
+import { sin } from '../util/misc/sin';
 import { Canvas } from '../__types__';
+import { ObjectOrigin } from './object_origin.mixin';
 
 type TCornerPoint = {
   tl: Point;
@@ -563,7 +562,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords / .aCoords
    * @return {Object} Object with left, top, width, height properties
    */
-  getBoundingRect(absolute?: boolean, calculate?: boolean): TBoundingBox {
+  getBoundingRect(absolute?: boolean, calculate?: boolean): TBBox {
     return makeBoundingBoxFromPoints(this.getCoords(absolute, calculate));
   }
 
