@@ -17,6 +17,7 @@ export function build({
   output,
   report = true,
   emit = true,
+  stats = false,
 } = {}) {
   const cmd = [
     'rollup',
@@ -39,7 +40,7 @@ export function build({
     env: {
       ...process.env,
       MINIFY: Number(!fast),
-      BUILD_INPUT: Array.isArray(input) ? input.join(',') : input,
+      BUILD_INPUT: Array.isArray(input) ? input.join(' ') : input,
       BUILD_OUTPUT: output,
       BUILD_MIN_OUTPUT:
         output && !Array.isArray(input) && !fast
@@ -49,6 +50,7 @@ export function build({
             )
           : undefined,
       NO_EMIT: Number(!emit),
+      BUILD_STATS: Number(stats),
     },
   };
   if (watch) {
