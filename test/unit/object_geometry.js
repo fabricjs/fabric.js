@@ -246,7 +246,6 @@
   QUnit.test('setCoords', function(assert) {
     var cObj = new fabric.Object({ left: 150, top: 150, width: 100, height: 100, strokeWidth: 0});
     assert.ok(typeof cObj.setCoords === 'function');
-    assert.equal(cObj.setCoords(), cObj, 'chainable');
 
     assert.equal(cObj.oCoords.tl.x, 150);
     assert.equal(cObj.oCoords.tl.y, 150);
