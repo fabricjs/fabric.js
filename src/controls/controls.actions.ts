@@ -294,13 +294,6 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       (offset * offsetFactor) / Math.max(dimBefore[counterAxis], 1) +
       shearingStart;
 
-    // calculate the transform matrix after applying the new value
-    // const [a, b, c, d] = target.calcOwnMatrix();
-    // const t =
-    //   axis === 'y'
-    //     ? [a, a * shearing, c, d + (shearing - b / a) * c] // incorrect since it should account somehow for skewX
-    //     : [a + (shearing - c / d) * b, b, d * shearing, d];
-
     target.set(skewKey, radiansToDegrees(Math.atan(shearing)));
 
     const changed = skewingBefore !== target[skewKey];
