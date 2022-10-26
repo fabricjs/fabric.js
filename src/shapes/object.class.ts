@@ -15,6 +15,7 @@ import { capitalize } from '../util/lang_string';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { createCanvasElement } from '../util/misc/dom';
 import { ObjectGeometry } from '../mixins/object_geometry.mixin';
+import { qrDecompose, transformPoint } from '../util/misc/matrix';
 
 type StaticCanvas = any;
 type Canvas = any;
@@ -970,7 +971,7 @@ export class FabricObject extends ObjectGeometry {
       return new Point(Math.abs(this.scaleX), Math.abs(this.scaleY));
     }
     // if we are inside a group total zoom calculation is complex, we defer to generic matrices
-    const options = fabric.util.qrDecompose(this.calcTransformMatrix());
+    const options = qrDecompose(this.calcTransformMatrix());
     return new Point(Math.abs(options.scaleX), Math.abs(options.scaleY));
   }
 

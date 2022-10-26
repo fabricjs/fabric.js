@@ -10,7 +10,7 @@ import { FabricObject } from '../shapes/object.class';
     scalingYOrSkewingX = controlsUtils.scalingYOrSkewingX,
     scalingXOrSkewingY = controlsUtils.scalingXOrSkewingY,
     scaleOrSkewActionName = controlsUtils.scaleOrSkewActionName,
-    objectControls = FabricObject.prototype.controls;
+    objectControls = FabricObject.prototype.controls = {};
 
   objectControls.ml = new fabric.Control({
     x: -0.5,
