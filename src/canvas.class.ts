@@ -807,6 +807,7 @@ import { FabricObject } from './shapes/object.class';
             lastY: pointer.y,
             theta: degreesToRadians(target.angle),
             width: target.width * target.scaleX,
+            height: target.height * target.scaleY,
             shiftKey: e.shiftKey,
             altKey: altKey,
             original: fabric.util.saveObjectTransform(target),
