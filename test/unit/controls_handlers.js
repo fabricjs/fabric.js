@@ -179,7 +179,7 @@
       transform.skewY = 15;
       eventData.shiftKey = true;
       fabric.controlsUtils.scalingXOrSkewingY(eventData, transform, 200, 300);
-      assert.equal(Math.round(transform.target.skewY), 90);
+      assert.equal(Math.round(transform.target.skewY), 81);
       assert.equal(Math.round(transform.target.scaleX), 1);
     });
     QUnit.test('skewing X with existing skewing', function(assert) {
@@ -191,7 +191,7 @@
       transform.skewY = 15;
       eventData.shiftKey = true;
       fabric.controlsUtils.scalingYOrSkewingX(eventData, transform, 200, 300);
-      assert.equal(Math.round(transform.target.skewX), 74);
+      assert.equal(Math.round(transform.target.skewX), 72);
       assert.equal(Math.round(transform.target.scaleY), 1);
     });
     QUnit.test('scalingXOrSkewingY will fire events on canvas and target', function(assert) {
