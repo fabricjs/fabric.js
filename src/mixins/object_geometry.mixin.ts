@@ -17,6 +17,7 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { iMatrix } from '../constants';
 import { ObjectOrigin } from './object_origin.mixin';
+import { Canvas } from '../__types__';
 
 type TCornerPoint = {
   tl: Point;
@@ -128,7 +129,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * Object containing this object.
    * can influence its size and position
    */
-  canvas?: any;
+  canvas?: Canvas;
 
   /**
    * @returns {number} x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
