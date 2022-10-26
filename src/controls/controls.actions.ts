@@ -300,7 +300,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
           ? target._getTransformedDimensions({
               scaleX: 1,
               scaleY: 1,
-              // since skewY is applied before skewX b is not affected by skewX as well
+              // since skewY is applied before skewX b (=width) is not affected by skewX in this case
               skewX: 0,
             }).x
           : target._getTransformedDimensions({
