@@ -9,13 +9,9 @@ const MAX_COMMENT_CHARS = 65536;
 const INACCURATE_COMMENT =
   '\n*inaccurate, see [link](https://github.com/doesdev/rollup-plugin-analyzer#why-is-the-reported-size-not-the-same-as-the-file-on-disk)';
 
-function getSign(n) {
-  return Math.sign(n) > 0 ? '+' : '';
-}
-
 function printSize(a, b) {
   const diff = b - a;
-  return `${b} (${getSign(diff)}${diff})`;
+  return `${b} (${Math.sign(diff) > 0 ? '+' : ''}${diff})`;
 }
 
 function printSizeByte(a, b) {
