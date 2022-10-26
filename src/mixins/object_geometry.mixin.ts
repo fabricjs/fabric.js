@@ -522,15 +522,15 @@ export class ObjectGeometry extends ObjectOrigin {
     for (const lineKey in lines) {
       let xi;
       const iLine = lines[lineKey as keyof TBBoxLines];
-      // optimisation 1: line below point. no cross
+      // optimization 1: line below point. no cross
       if (iLine.o.y < point.y && iLine.d.y < point.y) {
         continue;
       }
-      // optimisation 2: line above point. no cross
+      // optimization 2: line above point. no cross
       if (iLine.o.y >= point.y && iLine.d.y >= point.y) {
         continue;
       }
-      // optimisation 3: vertical line case
+      // optimization 3: vertical line case
       if (iLine.o.x === iLine.d.x && iLine.o.x >= point.x) {
         xi = iLine.o.x;
       }
@@ -543,11 +543,11 @@ export class ObjectGeometry extends ObjectOrigin {
 
         xi = -(a1 - a2) / (b1 - b2);
       }
-      // dont count xi < point.x cases
+      // don't count xi < point.x cases
       if (xi >= point.x) {
         xcount += 1;
       }
-      // optimisation 4: specific for square images
+      // optimization 4: specific for square images
       if (xcount === 2) {
         break;
       }
@@ -683,7 +683,7 @@ export class ObjectGeometry extends ObjectOrigin {
   }
 
   /**
-   * Calculates the coordnates of the center of each control plus the corners of the control itself
+   * Calculates the coordinates of the center of each control plus the corners of the control itself
    * This basically just delegates to each control positionHandler
    * WARNING: changing what is passed to positionHandler is a breaking change, since position handler
    * is a public api and should be done just if extremely necessary
@@ -734,7 +734,7 @@ export class ObjectGeometry extends ObjectOrigin {
   }
 
   /**
-   * Calculates the coordnates of the 4 corner of the bbox, in absolute coordinates.
+   * Calculates the coordinates of the 4 corner of the bbox, in absolute coordinates.
    * those never change with zoom or viewport changes.
    * @return {TCornerPoint}
    */
