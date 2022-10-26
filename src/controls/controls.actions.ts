@@ -274,30 +274,10 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    */
   function skewObject(
     axis: TAxis,
-    {
-      target,
-      ex,
-      ey,
-      originX,
-      originY,
-      skewX,
-      skewY,
-      flipX,
-      flipY,
-      width,
-      height,
-    },
+    { target, ex, ey, originX, originY, skewX, skewY, flipX, flipY },
     pointer: Point
   ) {
     const { counterAxis, skew: skewKey } = AXIS_KEYS[axis],
-      dimDiff = new Point(width, height).add(
-        new Point(height, width).multiply(
-          new Point(
-            Math.tan(degreesToRadians(target.skewX - skewX)),
-            Math.tan(degreesToRadians(target.skewY - skewY))
-          )
-        )
-      ),
       offset = pointer
         .subtract(new Point(ex, ey))
         .divide(new Point(target.scaleX, target.scaleY))[axis],
@@ -309,14 +289,27 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
         target.resolveOriginX(originX),
         target.resolveOriginY(originY)
       )[counterAxis],
-      offsetFactor = -Math.sign(counterOriginFactor) * flip * 2;
+      offsetFactor = -Math.sign(counterOriginFactor) * flip * 2,
+      // let a, b be the size of target
+      // let a' be the value of a after applying skewing
+      // then:
+      // a' = a + b * skewA => skewA = (a' - a) / b
+      // the value b is tricky since skewY is applied before skewX
+      b =
+        axis === 'y'
+          ? target._getTransformedDimensions({
+              scaleX: 1,
+              scaleY: 1,
+              // since skewY is applied before skewX b is not affected by skewX as well
+              skewX: 0,
+            }).x
+          : target._getTransformedDimensions({
+              scaleX: 1,
+              scaleY: 1,
+            }).y;
 
-    const shearing =
-      (offset * offsetFactor) / Math.max(dimDiff[counterAxis], 1) +
-      shearingStart;
-
+    const shearing = (offset * offsetFactor) / Math.max(b, 1) + shearingStart;
     target.set(skewKey, radiansToDegrees(Math.atan(shearing)));
-
     const changed = skewingBefore !== target[skewKey];
 
     if (changed && axis === 'y') {
