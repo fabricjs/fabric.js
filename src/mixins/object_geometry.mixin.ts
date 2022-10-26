@@ -1,8 +1,8 @@
+import type { TBBox, TDegree, TMat2D, TOriginX, TOriginY } from '../typedefs';
 import { iMatrix } from '../constants';
 import { Intersection } from '../intersection.class';
 import { IPoint, Point } from '../point.class';
 import { FabricObject } from '../shapes/object.class';
-import { TBBox, TDegree, TMat2D, TOriginX, TOriginY } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { cos } from '../util/misc/cos';
 import {

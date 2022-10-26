@@ -470,7 +470,6 @@
   QUnit.test('scaleToWidth', function(assert) {
     var cObj = new fabric.Object({ width: 560, strokeWidth: 0 });
     assert.ok(typeof cObj.scaleToWidth === 'function',  'scaleToWidth should exist');
-    assert.equal(cObj.scaleToWidth(100), cObj, 'chainable');
     assert.equal(cObj.getScaledWidth(), 100);
     assert.equal(cObj.get('scaleX'), 100 / 560);
   });
@@ -480,10 +479,8 @@
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 0, 0]
     };
-    assert.equal(cObj.scaleToWidth(100, true), cObj, 'chainable');
     assert.equal(cObj.getScaledWidth(), 100, 'is not influenced by zoom - width');
     assert.equal(cObj.get('scaleX'), 100 / 560);
-    assert.equal(cObj.scaleToWidth(100), cObj, 'chainable');
     assert.equal(cObj.getScaledWidth(), 50, 'is influenced by zoom - width');
     assert.equal(cObj.get('scaleX'), 100 / 560 / 2);
   });
@@ -492,7 +489,6 @@
   QUnit.test('scaleToHeight', function(assert) {
     var cObj = new fabric.Object({ height: 560, strokeWidth: 0 });
     assert.ok(typeof cObj.scaleToHeight === 'function', 'scaleToHeight should exist');
-    assert.equal(cObj.scaleToHeight(100), cObj, 'chainable');
     assert.equal(cObj.getScaledHeight(), 100);
     assert.equal(cObj.get('scaleY'), 100 / 560);
   });
@@ -502,10 +498,8 @@
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 0, 0]
     };
-    assert.equal(cObj.scaleToHeight(100, true), cObj, 'chainable');
     assert.equal(cObj.getScaledHeight(), 100, 'is not influenced by zoom - height');
     assert.equal(cObj.get('scaleY'), 100 / 560);
-    assert.equal(cObj.scaleToHeight(100), cObj, 'chainable');
     assert.equal(cObj.getScaledHeight(), 50, 'is influenced by zoom - height');
     assert.equal(cObj.get('scaleY'), 100 / 560 / 2);
   });
