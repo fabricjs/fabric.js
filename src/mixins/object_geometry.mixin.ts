@@ -568,8 +568,7 @@ export class ObjectGeometry extends ObjectOrigin {
 
   /**
    * Returns width of an object's bounding box counting transformations
-   * before 2.0 it was named getWidth();
-   * consider calling this._getTransformedDimensions if you need both width and height
+   * @todo shouldn't this account for group transform and return the actual size in canvas coordinate plane?
    * @return {Number} width value
    */
   getScaledWidth(): number {
@@ -578,8 +577,7 @@ export class ObjectGeometry extends ObjectOrigin {
 
   /**
    * Returns height of an object bounding box counting transformations
-   * before 2.0 it was named getHeight();
-   * consider calling this._getTransformedDimensions if you need both width and height
+   * @todo shouldn't this account for group transform and return the actual size in canvas coordinate plane?
    * @return {Number} height value
    */
   getScaledHeight(): number {
