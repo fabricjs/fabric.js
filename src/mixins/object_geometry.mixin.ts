@@ -2,6 +2,7 @@
 
 import { Intersection } from '../intersection.class';
 import { Point } from '../point.class';
+import { FabricObject } from '../shapes/object.class';
 
 (function (global) {
   function arrayFromCoords(coords) {
@@ -20,8 +21,8 @@ import { Point } from '../point.class';
     transformPoint = util.transformPoint;
 
   util.object.extend(
-    fabric.Object.prototype,
-    /** @lends fabric.Object.prototype */ {
+    FabricObject.prototype,
+    /** @lends FabricObject.prototype */ {
       /**
        * Describe object's corner position in canvas element coordinates.
        * properties are depending on control keys and padding the main controls.

@@ -96,7 +96,7 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 ### ✅ Guidelines
 
 - **Code Style** \
-  Fabric uses [`prettier`][prettier] to format files and [`eslint`][eslint]) for linting (`npm run lint -- --fix`).\
+  Fabric uses [`prettier`][prettier] to format files and [`eslint`][eslint] for linting (`npm run lint -- --fix`).\
   To enjoy a seamless dev experience add the [`Prettier - Code formatter`][prettier_extension] extension via the extensions toolbar in VSCode.
 - **⛔ `dist`** \
   Commit changes to [source files](src). Don't commit the generated [distribution files](dist).

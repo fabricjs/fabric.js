@@ -3,6 +3,7 @@
 import { Color } from './color';
 import { config } from './config';
 import { Point } from './point.class';
+import { FabricObject } from './shapes/object.class';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -80,7 +81,7 @@ import { Point } from './point.class';
           this[prop] = options[prop];
         }
 
-        this.id = fabric.Object.__uid++;
+        this.id = FabricObject.__uid++;
       },
 
       /**

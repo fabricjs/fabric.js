@@ -1,23 +1,18 @@
----
-name: Pull Request
-about: Creating a PR
----
-
 <!--
         Hi there!
         Thanks for taking the time and putting the effort into making fabric better! 💖
         Take a look at /CONTRIBUTING.md for crucial instructions regarding local setup, testing etc.
         https://github.com/fabricjs/fabric.js/blob/master/CONTRIBUTING.md
 
-        Adding tests that verify your fix and safegurad it from unwanted loss and changes is a MUST.
+        Adding tests that verify your fix and safeguard it from unwanted loss and changes is a MUST.
 
-        PRing is not always simple, don't hestitate to ask for help (beware of 'em gotchas 😓).
+        Pull Requests are not always simple. Don't hesitate to ask for help (beware of [gotchas](http://fabricjs.com/fabric-gotchas) 😓).
         We appreciate your effort and would like the process to be productive and enjoyable.
         A strong community means a strong and better product for everyone.
 -->
 
 <!--
-        📣 IMPORTANT NOTICE - PR LOCKDOWN 🔒    04/2022
+        📣 IMPORTANT NOTICE - PR LOCK DOWN 🔒    04/2022
         We are excited to announce that fabric is migrating to modern typescript/javascript 🤩.
         This means we will ⛔ not be accepting any PRs out of scope with the migration.
         We understand this might be annoying but wasted work is ever more so.
