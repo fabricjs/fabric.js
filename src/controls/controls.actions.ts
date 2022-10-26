@@ -274,12 +274,24 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    */
   function skewObject(
     axis: TAxis,
-    { target, ex, ey, originX, originY, skewX, skewY, flipX, flipY },
+    {
+      target,
+      ex,
+      ey,
+      originX,
+      originY,
+      skewX,
+      skewY,
+      flipX,
+      flipY,
+      width,
+      height,
+    },
     pointer: Point
   ) {
     const { counterAxis, skew: skewKey } = AXIS_KEYS[axis],
-      dimDiff = new Point(target.width, target.height).add(
-        new Point(target.height, target.width).multiply(
+      dimDiff = new Point(width, height).add(
+        new Point(height, width).multiply(
           new Point(
             Math.tan(degreesToRadians(target.skewX - skewX)),
             Math.tan(degreesToRadians(target.skewY - skewY))
