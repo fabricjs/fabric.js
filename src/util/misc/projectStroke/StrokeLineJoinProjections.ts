@@ -109,15 +109,14 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
   projectBevel() {
     const projections: Point[] = [];
     // if `alpha` equals 0 or 2*PI, the projections are the same for `B` and `C`
-    (this.alpha === 0 || this.alpha === twoMathPi
-      ? [this.B]
-      : [this.B, this.C]
-    ).forEach((to) => {
-      projections.push(this.projectOrthogonally(this.A, to));
-      projections.push(
-        this.projectOrthogonally(this.A, to, -this.strokeProjectionMagnitude)
-      );
-    });
+    (this.alpha % twoMathPi === 0 ? [this.B] : [this.B, this.C]).forEach(
+      (to) => {
+        projections.push(this.projectOrthogonally(this.A, to));
+        projections.push(
+          this.projectOrthogonally(this.A, to, -this.strokeProjectionMagnitude)
+        );
+      }
+    );
     return projections;
   }
 
@@ -252,7 +251,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     projections.push(...this.projectBevel());
     // let's determines which one of the orthogonal projection is the beginning and end of the circle segment.
     // when `alpha` equals 0 or 2*PI, we have a straight line, so the way to find the start/end is different.
-    const isStraightLine = this.alpha === 0 || this.alpha === twoMathPi,
+    const isStraightLine = this.alpha % twoMathPi === 0,
       // change the origin of the projections to point A
       // so that the cross product calculation is correct
       newOrigin = this.applySkew(this.A),
