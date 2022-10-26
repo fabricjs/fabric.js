@@ -10,14 +10,7 @@ const INACCURATE_COMMENT =
   '\n*inaccurate, see [link](https://github.com/doesdev/rollup-plugin-analyzer#why-is-the-reported-size-not-the-same-as-the-file-on-disk)';
 
 function getSign(n) {
-  switch (Math.sign(n)) {
-    case 0:
-      return '';
-    case 1:
-      return '+';
-    case -1:
-      return '-';
-  }
+  return Math.sign(n) > 0 ? '+' : '';
 }
 
 function printSize(a, b) {
