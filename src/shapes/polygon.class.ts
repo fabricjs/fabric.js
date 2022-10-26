@@ -22,22 +22,10 @@ import { projectStrokeOnPoints } from '../util/misc/projectStroke';
       type: 'polygon',
 
       /**
-       * @private
+       * @todo make this method protected when migrating
        */
-      _projectStrokeOnPoints: function () {
-        return projectStrokeOnPoints(this.points, this);
-      },
-
-      /**
-       * @private
-       * @param {CanvasRenderingContext2D} ctx Context to render on
-       */
-      _render: function (ctx) {
-        if (!this.commonRender(ctx)) {
-          return;
-        }
-        ctx.closePath();
-        this._renderPaintInOrder(ctx);
+      isOpen: function () {
+        return false;
       },
     }
   );
