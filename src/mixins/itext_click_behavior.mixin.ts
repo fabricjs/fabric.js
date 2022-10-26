@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { invertTransform, transformPoint } from '../util/misc/matrix';
+
 (function (global) {
   var fabric = global.fabric;
   fabric.util.object.extend(

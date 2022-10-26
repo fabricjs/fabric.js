@@ -2129,6 +2129,7 @@ const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
   clipPath: undefined,
   inverted: false,
   absolutePositioned: false,
+  controls: {},
 };
 
 Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
