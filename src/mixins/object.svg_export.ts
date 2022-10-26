@@ -2,6 +2,7 @@
 
 import { Color } from '../color';
 import { config } from '../config';
+import { FabricObject } from '../shapes/object.class';
 
 /* _TO_SVG_START_ */
 (function (global) {
@@ -27,8 +28,8 @@ import { config } from '../config';
     toFixed = fabric.util.toFixed;
 
   fabric.util.object.extend(
-    fabric.Object.prototype,
-    /** @lends fabric.Object.prototype */ {
+    FabricObject.prototype,
+    /** @lends FabricObject.prototype */ {
       /**
        * Returns styles-string for svg-export
        * @param {Boolean} skipShadow a boolean to skip shadow filter output
@@ -275,7 +276,7 @@ import { config } from '../config';
           index = objectMarkup.indexOf('COMMON_PARTS'),
           additionalTransform = options.additionalTransform;
         if (clipPath) {
-          clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+          clipPath.clipPathId = 'CLIPPATH_' + FabricObject.__uid++;
           clipPathMarkup =
             '<clipPath id="' +
             clipPath.clipPathId +

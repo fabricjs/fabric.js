@@ -1,4 +1,6 @@
 //@ts-nocheck
+import { FabricObject } from '../shapes/object.class';
+
 (function (global) {
   var fabric = global.fabric,
     controlsUtils = fabric.controlsUtils,
@@ -8,7 +10,7 @@
     scalingYOrSkewingX = controlsUtils.scalingYOrSkewingX,
     scalingXOrSkewingY = controlsUtils.scalingXOrSkewingY,
     scaleOrSkewActionName = controlsUtils.scaleOrSkewActionName,
-    objectControls = fabric.Object.prototype.controls;
+    objectControls = FabricObject.prototype.controls;
 
   objectControls.ml = new fabric.Control({
     x: -0.5,

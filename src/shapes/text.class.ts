@@ -1912,6 +1912,4 @@ import { DEFAULT_SVG_FONT_SIZE } from '../constants';
     'fantasy',
     'monospace',
   ];
-
-  fabric.util.createAccessors && fabric.util.createAccessors(fabric.Text);
 })(typeof exports !== 'undefined' ? exports : window);

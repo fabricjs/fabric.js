@@ -1,13 +1,14 @@
 //@ts-nocheck
 import { Point } from '../point.class';
+import { FabricObject } from '../shapes/object.class';
 
 (function (global) {
   var fabric = global.fabric,
     degreesToRadians = fabric.util.degreesToRadians;
 
   fabric.util.object.extend(
-    fabric.Object.prototype,
-    /** @lends fabric.Object.prototype */ {
+    FabricObject.prototype,
+    /** @lends FabricObject.prototype */ {
       /**
        * Determines which corner has been clicked
        * @private

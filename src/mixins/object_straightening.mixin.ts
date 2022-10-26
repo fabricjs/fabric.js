@@ -1,9 +1,11 @@
 //@ts-nocheck
+import { FabricObject } from '../shapes/object.class';
+
 (function (global) {
   var fabric = global.fabric;
   fabric.util.object.extend(
-    fabric.Object.prototype,
-    /** @lends fabric.Object.prototype */ {
+    FabricObject.prototype,
+    /** @lends FabricObject.prototype */ {
       /**
        * @private
        * @return {Number} angle value
@@ -26,7 +28,7 @@
       },
 
       /**
-       * Same as {@link fabric.Object.prototype.straighten} but with animation
+       * Same as {@link FabricObject.prototype.straighten} but with animation
        * @param {Object} callbacks Object with callback functions
        * @param {Function} [callbacks.onComplete] Invoked on completion
        * @param {Function} [callbacks.onChange] Invoked on every step of animation

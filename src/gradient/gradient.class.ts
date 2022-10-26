@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import { iMatrix } from '../constants';
@@ -20,11 +21,7 @@ import {
   GradientUnits,
   SVGOptions,
 } from './typedefs';
-
-/**
- * @todo remove this transient junk
- */
-type FabricObject = any;
+import { FabricObject } from '../shapes/object.class';
 
 /**
  * Gradient class
@@ -93,7 +90,7 @@ export class Gradient<
     gradientTransform,
     id,
   }: GradientOptions<T>) {
-    const uid = fabric.Object.__uid++;
+    const uid = FabricObject.__uid++;
     this.id = id ? `${id}_${uid}` : uid;
     this.type = type;
     this.gradientUnits = gradientUnits;
