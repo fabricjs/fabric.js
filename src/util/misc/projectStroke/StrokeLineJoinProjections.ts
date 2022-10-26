@@ -1,12 +1,14 @@
-import { halfPI } from '../../../constants';
+import { halfPI, twoMathPi } from '../../../constants';
 import { IPoint, Point } from '../../../point.class';
 import { TRadian } from '../../../typedefs';
 import { degreesToRadians } from '../radiansDegreesConversion';
 import {
   calcAngleBetweenVectors,
   calcVectorRotation,
+  crossProduct,
   getOrthonormalVector,
   getUnitVector,
+  isBetweenVectors,
   magnitude,
   rotateVector,
 } from '../vectors';
@@ -41,6 +43,14 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    */
   C: Point;
   /**
+   * The AB vector
+   */
+  AB: Point;
+  /**
+   * The AC vector
+   */
+  AC: Point;
+  /**
    * The angle of A (∠BAC)
    */
   alpha: TRadian;
@@ -66,13 +76,13 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     this.A = new Point(A);
     this.B = new Point(B);
     this.C = new Point(C);
-    const AB = this.createSideVector(this.A, this.B),
-      AC = this.createSideVector(this.A, this.C);
-    this.alpha = calcAngleBetweenVectors(AB, AC);
+    this.AB = this.createSideVector(this.A, this.B);
+    this.AC = this.createSideVector(this.A, this.C);
+    this.alpha = calcAngleBetweenVectors(this.AB, this.AC);
     this.bisector = getUnitVector(
       // if AC is also the zero vector nothing will be projected
       // in that case the next point will handle the projection
-      rotateVector(AB.eq(zeroVector) ? AC : AB, this.alpha / 2)
+      rotateVector(this.AB.eq(zeroVector) ? this.AC : this.AB, this.alpha / 2)
     );
   }
 
@@ -98,19 +108,16 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    */
   projectBevel() {
     const projections: Point[] = [];
-    [this.B, this.C].map((to) => {
+    // if `alpha` equals 0 or 2*PI, the projections are the same for `B` and `C`
+    (this.alpha === 0 || this.alpha === twoMathPi
+      ? [this.B]
+      : [this.B, this.C]
+    ).forEach((to) => {
       projections.push(this.projectOrthogonally(this.A, to));
-    });
-    // if `alpha` equals 0, we need to project for both sides.
-    if (this.alpha === 0) {
       projections.push(
-        this.projectOrthogonally(
-          this.A,
-          this.B,
-          -this.strokeProjectionMagnitude
-        )
+        this.projectOrthogonally(this.A, to, -this.strokeProjectionMagnitude)
       );
-    }
+    });
     return projections;
   }
 
@@ -122,7 +129,8 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    * @see https://github.com/fabricjs/fabric.js/pull/8344#2-1-miter
    */
   projectMiter() {
-    const alpha = Math.abs(this.alpha),
+    const projections: Point[] = [],
+      alpha = Math.abs(this.alpha),
       hypotUnitScalar = 1 / Math.sin(alpha / 2),
       miterVector = this.scaleUnitVector(
         this.bisector,
@@ -144,11 +152,15 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       magnitude(miterVector) / this.strokeProjectionMagnitude <=
       strokeMiterLimit
     ) {
-      return [this.applySkew(this.A.add(miterVector))];
-    } else {
-      // when the miter-limit is reached, the stroke line join becomes of type bevel
-      return this.projectBevel();
+      projections.push(this.applySkew(this.A.add(miterVector)));
     }
+    /* when the miter-limit is reached, the stroke line join becomes of type bevel.
+      We always need two orthogonal projections which are basically bevel-type projections,
+      so regardless of whether the miter-limit was reached or not, we include these projections.
+    */
+    projections.push(...this.projectBevel());
+
+    return projections;
   }
 
   /**
@@ -157,9 +169,10 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    *
    * @see https://github.com/fabricjs/fabric.js/pull/8344#2-3-1-round-without-skew
    */
-  private projectRoundNoSkew() {
-    // correctSide is used to only consider projecting for the outer side
-    const correctSide = new Point(
+  private projectRoundNoSkew(startCircle: Point, endCircle: Point) {
+    const projections: Point[] = [],
+      // correctSide is used to only consider projecting for the outer side
+      correctSide = new Point(
         StrokeLineJoinProjections.getOrthogonalRotationFactor(this.bisector),
         StrokeLineJoinProjections.getOrthogonalRotationFactor(
           new Point(this.bisector.y, this.bisector.x)
@@ -174,7 +187,12 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
         .multiply(this.strokeUniformScalar)
         .multiply(correctSide);
 
-    return [this.A.add(radiusOnAxisX), this.A.add(radiusOnAxisY)];
+    [radiusOnAxisX, radiusOnAxisY].forEach((vector) => {
+      if (isBetweenVectors(vector, startCircle, endCircle)) {
+        projections.push(this.A.add(vector));
+      }
+    });
+    return projections;
   }
 
   /**
@@ -187,13 +205,8 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    *
    * @see https://github.com/fabricjs/fabric.js/pull/8344#2-3-2-round-skew
    */
-  private projectRoundWithSkew() {
+  private projectRoundWithSkew(startCircle: Point, endCircle: Point) {
     const projections: Point[] = [];
-
-    // The start and end points of the circle segment
-    [this.B, this.C].forEach((to) =>
-      projections.push(this.projectOrthogonally(this.A, to))
-    );
 
     const { skewX, skewY } = this.options;
     // The points furthest from the vertex in the direction of the X and Y axes after distortion
@@ -215,22 +228,53 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
         Math.sqrt(newY ** 2 - ((newX * newY) / circleRadius.x) ** 2)
       );
 
-    [furthestX, furthestY].forEach((vector) => {
-      projections.push(
-        this.applySkew(this.A.add(vector)),
-        this.applySkew(this.A.subtract(vector))
-      );
-    });
+    [
+      furthestX,
+      furthestX.scalarMultiply(-1),
+      furthestY,
+      furthestY.scalarMultiply(-1),
+    ]
+      .map((vector) => this.applySkew(vector))
+      .forEach((vector) => {
+        if (isBetweenVectors(vector, startCircle, endCircle)) {
+          projections.push(this.applySkew(this.A).add(vector));
+        }
+      });
 
     return projections;
   }
 
   projectRound() {
+    const projections: Point[] = [];
+    /* Include the start and end points of the circle segment, so that only
+      the projections contained within it are included */
+    // add the orthogonal projections (start and end points of circle segment)
+    projections.push(...this.projectBevel());
+    // let's determines which one of the orthogonal projection is the beginning and end of the circle segment.
+    // when `alpha` equals 0 or 2*PI, we have a straight line, so the way to find the start/end is different.
+    const isStraightLine = this.alpha === 0 || this.alpha === twoMathPi,
+      // change the origin of the projections to point A
+      // so that the cross product calculation is correct
+      newOrigin = this.applySkew(this.A),
+      proj0 = projections[isStraightLine ? 0 : 2].subtract(newOrigin),
+      proj1 = projections[isStraightLine ? 1 : 0].subtract(newOrigin),
+      // when `isStraightLine` === true, we compare with the vector opposite AB, otherwise we compare with the bisector.
+      comparsionVector = isStraightLine
+        ? this.applySkew(this.AB.scalarMultiply(-1))
+        : this.applySkew(this.bisector),
+      // the beginning of the circle segment is always to the right of the comparsion vector (cross product > 0)
+      // if `isStraightLine` === true, otherwise is always to the left ot the comparsion vector (cross product < 0).
+      isProj0Start = isStraightLine
+        ? crossProduct(proj0, comparsionVector) > 0
+        : crossProduct(proj0, comparsionVector) < 0,
+      startCircle = isProj0Start ? proj0 : proj1,
+      endCircle = isProj0Start ? proj1 : proj0;
     if (!this.isSkewed()) {
-      return this.projectRoundNoSkew();
+      projections.push(...this.projectRoundNoSkew(startCircle, endCircle));
     } else {
-      return this.projectRoundWithSkew();
+      projections.push(...this.projectRoundWithSkew(startCircle, endCircle));
     }
+    return projections;
   }
 
   /**

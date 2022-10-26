@@ -6,6 +6,7 @@ import {
   createVector,
   calcAngleBetweenVectors,
   getUnitVector,
+  isBetweenVectors,
 } from './vectors';
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
 import { rotatePoint } from './rotatePoint';
@@ -105,6 +106,7 @@ fabric.util = {
   createVector,
   calcAngleBetweenVectors,
   getUnitVector,
+  isBetweenVectors,
   degreesToRadians,
   radiansToDegrees,
   rotatePoint,

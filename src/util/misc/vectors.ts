@@ -39,11 +39,8 @@ export const magnitude = (point: Point) => point.distanceFrom(zero);
  * @param {Point} b
  * @returns the angle in radians from `a` to `b`
  */
-export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian => {
-  const dot = a.x * b.x + a.y * b.y,
-    det = a.x * b.y - a.y * b.x;
-  return Math.atan2(det, dot) as TRadian;
-};
+export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian =>
+  Math.atan2(crossProduct(a, b), dotProduct(a, b)) as TRadian;
 
 /**
  * Calculates the angle between the x axis and the vector
@@ -70,3 +67,37 @@ export const getOrthonormalVector = (
   counterClockwise = true
 ): Point =>
   getUnitVector(new Point(-v.y, v.x).scalarMultiply(counterClockwise ? 1 : -1));
+
+/**
+ * Cross product of two vectors in 2D
+ * @param {Point} a
+ * @param {Point} b
+ * @returns {number} the magnitude of Z vector
+ */
+export const crossProduct = (a: Point, b: Point): number =>
+  a.x * b.y - a.y * b.x;
+
+/**
+ * Dot product of two vectors in 2D
+ * @param {Point} a
+ * @param {Point} b
+ * @returns {number}
+ */
+export const dotProduct = (a: Point, b: Point): number => a.x * b.x + a.y * b.y;
+
+/**
+ * Checks if the vector is between two others. It is considered
+ * to be inside when the vector to be tested is between the
+ * initial vector and the final vector (included) in a counterclockwise direction.
+ * @param {Point} t vector to be tested
+ * @param {Point} a initial vector
+ * @param {Point} b final vector
+ * @returns {boolean} true if the vector is among the others
+ */
+export const isBetweenVectors = (t: Point, a: Point, b: Point): boolean => {
+  if (t.eq(a) || t.eq(b)) return true;
+  const AxB = crossProduct(a, b),
+    AxT = crossProduct(a, t),
+    BxT = crossProduct(b, t);
+  return AxB >= 0 ? AxT >= 0 && BxT <= 0 : !(AxT <= 0 && BxT >= 0);
+};
