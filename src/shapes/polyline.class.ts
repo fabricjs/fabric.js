@@ -144,8 +144,10 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
           top: bbox.top - legacyCorrection,
           pathOffset: new Point(pathOffsetX, pathOffsetY),
           strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top).subtract(
-            bbox.left,
-            bbox.top
+            new Point(bbox.left, bbox.top)
+          ),
+          strokeDiff: new Point(bbox.width, bbox.height).subtract(
+            new Point(bboxNoStroke.width, bboxNoStroke.height)
           ),
         };
       },
@@ -154,9 +156,16 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        * @returns {Point} top left position of the bounding box, useful for complementary positioning
        */
       setDimensions: function () {
-        const { left, top, width, height, pathOffset, strokeOffset } =
-          this._calcDimensions();
-        this.set({ width, height, pathOffset, strokeOffset });
+        const {
+          left,
+          top,
+          width,
+          height,
+          pathOffset,
+          strokeOffset,
+          strokeDiff,
+        } = this._calcDimensions();
+        this.set({ width, height, pathOffset, strokeOffset, strokeDiff });
         return new Point(left, top);
       },
 
