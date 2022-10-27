@@ -237,7 +237,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
   }
 
   /**
-   * Transforms a point described by x and y in to the distance from the given origin
+   * Transforms a point described by x and y to the distance from the given origin
    * @param {Object} transform
    * @param {String} originX
    * @param {String} originY
