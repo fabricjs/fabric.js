@@ -354,7 +354,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
 
   /**
    * Wrapped Action handler for skewing on a given axis, takes care of the
-   * skew direction and determine the correct transform origin for the anchor point
+   * skew direction and determines the correct transform origin for the anchor point
    * @param {Event} eventData javascript event that is doing the transform
    * @param {Object} transform javascript object containing a series of information around the current transform
    * @param {number} x current mouse x position, canvas normalized
@@ -410,7 +410,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
 
   /**
    * Wrapped Action handler for skewing on the X axis, takes care of the
-   * skew direction and determine the correct transform origin for the anchor point
+   * skew direction and determines the correct transform origin for the anchor point
    * @param {Event} eventData javascript event that is doing the transform
    * @param {Object} transform javascript object containing a series of information around the current transform
    * @param {number} x current mouse x position, canvas normalized
@@ -423,7 +423,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
 
   /**
    * Wrapped Action handler for skewing on the Y axis, takes care of the
-   * skew direction and determine the correct transform origin for the anchor point
+   * skew direction and determines the correct transform origin for the anchor point
    * @param {Event} eventData javascript event that is doing the transform
    * @param {Object} transform javascript object containing a series of information around the current transform
    * @param {number} x current mouse x position, canvas normalized
