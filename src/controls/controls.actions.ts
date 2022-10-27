@@ -2,7 +2,7 @@
 
 import { AXIS_KEYS } from '../constants';
 import { Point } from '../point.class';
-import { TAxis } from '../typedefs';
+import { TAxis, TAxisKey } from '../typedefs';
 import { fireEvent } from '../util/fireEvent';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { renderCircleControl, renderSquareControl } from './controls.render';
@@ -269,21 +269,50 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     return localPoint;
   }
 
+  export const AXIS_KEYS: Record<
+    TAxis,
+    {
+      counterAxis: TAxis;
+      scale: TAxisKey<'scale'>;
+      skew: TAxisKey<'skew'>;
+      lockSkewing: TAxisKey<'lockSkewing'>;
+      origin: TAxisKey<'origin'>;
+      flip: TAxisKey<'flip'>;
+    }
+  > = {
+    x: {
+      counterAxis: 'y',
+      scale: 'scaleX',
+      skew: 'skewX',
+      lockSkewing: 'lockSkewingX',
+      origin: 'originX',
+      flip: 'flipX',
+    },
+    y: {
+      counterAxis: 'x',
+      scale: 'scaleY',
+      skew: 'skewY',
+      lockSkewing: 'lockSkewingY',
+      origin: 'originY',
+      flip: 'flipY',
+    },
+  };
+
   /**
    * @see https://github.com/fabricjs/fabric.js/pull/8380
    */
   function skewObject(
     axis: TAxis,
-    { target, ex, ey, originX, originY, skewX, skewY, flipX, flipY },
+    { target, ex, ey, originX, originY, ...transform },
     pointer: Point
   ) {
-    const { counterAxis, skew: skewKey } = AXIS_KEYS[axis],
+    const { counterAxis, skew: skewKey, flip: flipKey } = AXIS_KEYS[axis],
       offset = pointer
         .subtract(new Point(ex, ey))
         .divide(new Point(target.scaleX, target.scaleY))[axis],
-      flip = new Point(flipX ? -1 : 1, flipY ? -1 : 1)[axis],
-      skewingStart = new Point(skewX, skewY)[axis],
-      skewingBefore = new Point(target.skewX, target.skewY)[axis],
+      flip = transform[flipKey] ? -1 : 1,
+      skewingBefore = target[skewKey],
+      skewingStart = transform[skewKey],
       shearingStart = Math.tan(degreesToRadians(skewingStart)),
       counterOriginFactor = new Point(
         target.resolveOriginX(originX),
