@@ -316,7 +316,6 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       shearingStart = Math.tan(degreesToRadians(skewingStart)),
       flipFactor = transform[flipKey] ? -1 : 1,
       offsetFactor = skewingSide * flipFactor,
-      distanceFromOrigin = offset * offsetFactor * 2,
       // let a, b be the size of target
       // let a' be the value of a after applying skewing
       // then:
@@ -336,7 +335,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
             }).y;
 
     const shearing =
-      distanceFromOrigin /
+      (2 * offset * offsetFactor) /
         // we max out fractions to safeguard from asymptotic behavior
         Math.max(b, 1) +
       // add starting state
