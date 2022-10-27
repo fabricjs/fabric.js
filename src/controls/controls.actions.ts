@@ -238,7 +238,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
   }
 
   /**
-   * Transforms a point described by x and y to the distance from the given origin
+   * Transforms a point described by x and y to the offset from the given origin
    * @param {Object} transform
    * @param {String} originX
    * @param {String} originY
@@ -377,7 +377,8 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       counterOriginFactor = transform[counterOriginKey],
       // if the counter origin is top/left (= -0.5) then we are skewing x/y values on the bottom/right side of target respectively.
       // if the counter origin is bottom/right (= 0.5) then we are skewing x/y values on the top/left side of target respectively.
-      // skewing direction on the top/left side of target is OPPOSITE to the direction of the movement of the pointer.
+      // skewing direction on the top/left side of target is OPPOSITE to the direction of the movement of the pointer,
+      // so we factor skewing direction by this value.
       skewingSide = -Math.sign(counterOriginFactor),
       skewingDirection =
         ((target[skewKey] === 0 &&
