@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(): skewing controls accuracy + successive interactions [#8380](https://github.com/fabricjs/fabric.js/pull/8380)
+- chore(TS): Convert Geometry and Origin to classes/e6/ts [#8390](https://github.com/fabricjs/fabric.js/pull/8390)
 - ci(): build stats report [#8395](https://github.com/fabricjs/fabric.js/pull/8395)
 - chore(TS): convert object to es6 class [#8322](https://github.com/fabricjs/fabric.js/pull/8322)
 - docs(): guides follow up, feature request template [#8379](https://github.com/fabricjs/fabric.js/pull/8379)
