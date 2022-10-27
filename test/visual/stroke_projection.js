@@ -79,26 +79,16 @@ QUnit.module('stroke projection', (hooks) => {
       { x: 70, y: 4 },
       { x: 40, y: 37 },
     ],
-    star: [
-      { x: 0, y: 0 },
-      { x: 72, y: 36 },
-      { x: 36, y: -18 },
-      { x: 0, y: 36 },
-      { x: 72, y: 0 },
-    ],
     lambdaLetter: [
-      { x: 0, y: 0 },
-      { x: 0, y: 20 },
-      { x: 20, y: 20 },
-      { x: 20, y: 0 },
-      { x: 40, y: 0 },
-      { x: 40, y: -20 },
-      { x: 20, y: -20 },
-      { x: 20, y: -40 },
-      { x: 0, y: -40 },
-      { x: 0, y: -20 },
-      { x: -20, y: -20 },
-      { x: -20, y: 0 },
+      {x:6, y:6},
+      {x:1, y:1},
+      {x:6, y:6},
+      {x:38.77601986838591, y:27.967786748661318},
+      {x:15.760060710778454, y:75.5007458785029},
+      {x:27.26804028958214, y:59.48964385581943},
+      {x:56.78850964390483, y:59.489643855819416},
+      {x:66.02231772645243, y:71.09250552411001},
+      {x:10.289783513792408, y:10.149937092784299}
     ],
     spikes: [
       { x: 97.39086147549884, y: 204.072360524695 },
@@ -122,6 +112,26 @@ QUnit.module('stroke projection', (hooks) => {
       { x: 42.68471500040471, y: 189.3715898860134 },
       { x: 88, y: 257 },
     ],
+    orthogonalProjection1: [
+      { x: 4.1139063087281045, y: 6.008805382999107 },
+      { x: 3.661690750974974, y: 6.067776795471968 },
+      { x: 3.205180554242954, y: 5.878987418072784 }
+    ],
+    orthogonalProjection2: [
+      { x: 76.58215114247255, y: -48.214288917214105 },
+      { x: 76.95213430503364, y: -54.68899426204861 },
+      { x: 82.704500475429, y: -49.91128595590783 }
+    ],
+    orthogonalProjection3: [
+      {x:79.76446629479383, y:-43.30180101207208},
+      {x:84.9774418788902, y:-48.28812548381641},
+      {x:82.704500475429, y:-49.91128595590783}
+    ],
+    orthogonalProjection4: [
+      {x:79.63237629347668, y:-41.260831452943876},
+      {x:84.9774418788902, y:-48.28812548381641},
+      {x:85.52113122175491, y:-50.718528761996765}
+    ]
   };
 
   fabric.Object.prototype.noScaleCache = false;
@@ -240,9 +250,9 @@ QUnit.module('stroke projection', (hooks) => {
               );
               callback(canvas.lowerCanvasEl);
             },
-            golden: `stroke-projection/strokeLineJoin/miter-limit/${
+            golden: `stroke-projection/strokeLineJoin/miter-limit/${caseName}-${
               strokeUniform ? 'uniform-' : ''
-            }${caseName}-${strokeMiterLimit}miterLimit-${skewX}skewX-${skewY}skewY.png`,
+            }-${strokeMiterLimit}miterLimit-${skewX}skewX-${skewY}skewY.png`,
             percentage: 0.001,
             width: 600,
             height: 900,
