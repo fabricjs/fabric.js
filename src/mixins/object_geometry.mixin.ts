@@ -890,9 +890,8 @@ export class ObjectGeometry extends ObjectOrigin {
    * @returns {Point} dimensions
    */
   _calculateCurrentDimensions(options?: any): Point {
-    const vpt = this.getViewportTransform(),
-      dim = this._getTransformedDimensions(options),
-      p = transformPoint(dim, vpt, true);
-    return p.scalarAdd(2 * this.padding);
+    return this._getTransformedDimensions(options)
+      .transform(this.getViewportTransform(), true)
+      .scalarAdd(2 * this.padding);
   }
 }
