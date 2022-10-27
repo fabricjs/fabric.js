@@ -375,10 +375,9 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
 
     const { origin: counterOriginKey } = AXIS_KEYS[counterAxis],
       counterOriginFactor = transform[counterOriginKey],
-      // if the counter origin is top/left (= -0.5) then we are skewing x/y values on the bottom/right side of target respectively =>
-      // skewing direction is the same as the direction of the movement of the pointer.
-      // if the counter origin is bottom/right (= 0.5) then we are skewing x/y values on the top/left side of target respectively =>
-      // skewing direction is the OPPOSITE of the direction of the movement of the pointer.
+      // if the counter origin is top/left (= -0.5) then we are skewing x/y values on the bottom/right side of target respectively.
+      // if the counter origin is bottom/right (= 0.5) then we are skewing x/y values on the top/left side of target respectively.
+      // skewing direction on the top/left side of target is OPPOSITE to the direction of the movement of the pointer.
       skewingSide = -Math.sign(counterOriginFactor),
       skewingDirection =
         ((target[skewKey] === 0 &&
