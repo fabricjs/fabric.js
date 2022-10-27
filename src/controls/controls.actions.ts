@@ -303,20 +303,18 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    */
   function skewObject(
     axis: TAxis,
-    { target, ex, ey, ...transform },
+    { target, ex, ey, skewingSide, ...transform },
     pointer: Point
   ) {
-    const { counterAxis, skew: skewKey, flip: flipKey } = AXIS_KEYS[axis],
-      { origin: counterOriginKey } = AXIS_KEYS[counterAxis],
+    const { skew: skewKey, flip: flipKey } = AXIS_KEYS[axis],
       offset = pointer
         .subtract(new Point(ex, ey))
         .divide(new Point(target.scaleX, target.scaleY))[axis],
       skewingBefore = target[skewKey],
       skewingStart = transform[skewKey],
       shearingStart = Math.tan(degreesToRadians(skewingStart)),
-      counterOriginFactor = resolveOrigin(transform[counterOriginKey]),
       flipFactor = transform[flipKey] ? -1 : 1,
-      offsetFactor = -Math.sign(counterOriginFactor) * flipFactor * 2,
+      offsetFactor = skewingSide * flipFactor * 2,
       // let a, b be the size of target
       // let a' be the value of a after applying skewing
       // then:
@@ -402,6 +400,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       {
         ...transform,
         [originKey]: origin,
+        skewingSide,
       },
       x,
       y
