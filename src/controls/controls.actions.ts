@@ -350,17 +350,20 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
         target.resolveOriginX(transform.originX),
         target.resolveOriginY(transform.originY)
       )[counterAxis],
-      // anchor to the opposite side of the skewing direction
-      // if skewing = 0 use the offset to determine anchoring
-      origin =
+      skewingDirection =
         ((target[skewKey] === 0 &&
+          // in case skewing equals 0 we use the pointer offset from target center to determine the direction of skewing
           getLocalPoint(transform, CENTER, CENTER, x, y)[axis] > 0) ||
+        // in case target has skewing we use that as the direction
         target[skewKey] > 0
-          ? -1
-          : 1) *
-          -Math.sign(counterOriginFactor) *
-          0.5 +
-        0.5;
+          ? 1
+          : -1) *
+        // if the counter origin is top/left the skewing direction is opposite to the pointer direction
+        // so we take that into account by using the sign of the origin
+        Math.sign(counterOriginFactor),
+      // anchor to the opposite side of the skewing direction
+      // normalize value from [-1, 1] to origin value [0, 1]
+      origin = -skewingDirection * 0.5 + 0.5;
     const finalHandler = wrapWithFireEvent(
       'skewing',
       wrapWithFixedAnchor((eventData, transform, x, y) =>
