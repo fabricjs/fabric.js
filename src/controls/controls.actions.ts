@@ -381,13 +381,15 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       return false;
     }
 
-    const { origin: counterOriginKey } = AXIS_KEYS[counterAxis],
+    const { origin: counterOriginKey, flip: counterFlipKey } =
+        AXIS_KEYS[counterAxis],
       counterOriginFactor = transform[counterOriginKey],
       // if the counter origin is top/left (= -0.5) then we are skewing x/y values on the bottom/right side of target respectively.
       // if the counter origin is bottom/right (= 0.5) then we are skewing x/y values on the top/left side of target respectively.
       // skewing direction on the top/left side of target is OPPOSITE to the direction of the movement of the pointer,
       // so we factor skewing direction by this value.
-      skewingSide = -Math.sign(counterOriginFactor),
+      skewingSide =
+        -Math.sign(counterOriginFactor) * (transform[counterFlipKey] ? -1 : 1),
       skewingDirection =
         ((target[skewKey] === 0 &&
           // in case skewing equals 0 we use the pointer offset from target center to determine the direction of skewing
@@ -399,12 +401,14 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       // anchor to the opposite side of the skewing direction
       // normalize value from [-1, 1] to origin value [0, 1]
       origin = -skewingDirection * 0.5 + 0.5;
+
     const finalHandler = wrapWithFireEvent(
       'skewing',
       wrapWithFixedAnchor((eventData, transform, x, y) =>
         skewObject(axis, transform, new Point(x, y))
       )
     );
+
     return finalHandler(
       eventData,
       {
