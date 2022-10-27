@@ -1,6 +1,9 @@
 //@ts-nocheck
 import { Point } from '../point.class';
 import { FabricObject } from './object.class';
+import { resolveOrigin } from '../mixins/object_origin.mixin';
+
+export class Group extends FabricObject {}
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -803,8 +806,8 @@ import { FabricObject } from './object.class';
           height = hasHeight ? this.height : bbox.height || 0,
           calculatedCenter = new Point(bbox.centerX || 0, bbox.centerY || 0),
           origin = new Point(
-            this.resolveOriginX(this.originX),
-            this.resolveOriginY(this.originY)
+            resolveOrigin(this.originX),
+            resolveOrigin(this.originY)
           ),
           size = new Point(width, height),
           strokeWidthVector = this._getTransformedDimensions({
