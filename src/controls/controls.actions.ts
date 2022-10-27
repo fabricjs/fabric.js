@@ -325,7 +325,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
           ? target._getTransformedDimensions({
               scaleX: 1,
               scaleY: 1,
-              // since skewY is applied before skewX b (=width) is not affected by skewX in this case
+              // since skewY is applied before skewX, b (=width) is not affected by skewX
               skewX: 0,
             }).x
           : target._getTransformedDimensions({
@@ -338,7 +338,8 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     const changed = skewingBefore !== target[skewKey];
 
     if (changed && axis === 'y') {
-      // we don't want skewing to affect scaleX so we factor it by the inverse skewing diff to make it seem unchanged to the viewer
+      // we don't want skewing to affect scaleX
+      // so we factor it by the inverse skewing diff to make it seem unchanged to the viewer
       const { skewX, scaleX } = target,
         dimBefore = target._getTransformedDimensions({ skewY: skewingBefore }),
         dimAfter = target._getTransformedDimensions(),
