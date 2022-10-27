@@ -299,6 +299,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
   };
 
   /**
+   * Since skewing is applied before scaling, calculations are done in a scaleless plane
    * @see https://github.com/fabricjs/fabric.js/pull/8380
    */
   function skewObject(
