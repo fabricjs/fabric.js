@@ -1,5 +1,6 @@
 //@ts-nocheck
 
+import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { Point } from '../point.class';
 import { TAxis, TAxisKey } from '../typedefs';
 import { fireEvent } from '../util/fireEvent';
@@ -302,22 +303,20 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
    */
   function skewObject(
     axis: TAxis,
-    { target, ex, ey, originX, originY, ...transform },
+    { target, ex, ey, ...transform },
     pointer: Point
   ) {
     const { counterAxis, skew: skewKey, flip: flipKey } = AXIS_KEYS[axis],
+      { origin: counterOriginKey } = AXIS_KEYS[counterAxis],
       offset = pointer
         .subtract(new Point(ex, ey))
         .divide(new Point(target.scaleX, target.scaleY))[axis],
-      flip = transform[flipKey] ? -1 : 1,
       skewingBefore = target[skewKey],
       skewingStart = transform[skewKey],
       shearingStart = Math.tan(degreesToRadians(skewingStart)),
-      counterOriginFactor = new Point(
-        target.resolveOriginX(originX),
-        target.resolveOriginY(originY)
-      )[counterAxis],
-      offsetFactor = -Math.sign(counterOriginFactor) * flip * 2,
+      counterOriginFactor = resolveOrigin(transform[counterOriginKey]),
+      flipFactor = transform[flipKey] ? -1 : 1,
+      offsetFactor = -Math.sign(counterOriginFactor) * flipFactor * 2,
       // let a, b be the size of target
       // let a' be the value of a after applying skewing
       // then:
@@ -374,10 +373,8 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       return false;
     }
 
-    const counterOriginFactor = new Point(
-        target.resolveOriginX(transform.originX),
-        target.resolveOriginY(transform.originY)
-      )[counterAxis],
+    const { origin: counterOriginKey } = AXIS_KEYS[counterAxis],
+      counterOriginFactor = transform[counterOriginKey],
       skewingDirection =
         ((target[skewKey] === 0 &&
           // in case skewing equals 0 we use the pointer offset from target center to determine the direction of skewing
