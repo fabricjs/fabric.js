@@ -1,6 +1,5 @@
 //@ts-nocheck
 
-import { AXIS_KEYS } from '../constants';
 import { Point } from '../point.class';
 import { TAxis, TAxisKey } from '../typedefs';
 import { fireEvent } from '../util/fireEvent';
@@ -269,7 +268,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     return localPoint;
   }
 
-  export const AXIS_KEYS: Record<
+  const AXIS_KEYS: Record<
     TAxis,
     {
       counterAxis: TAxis;
@@ -387,9 +386,10 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
         target[skewKey] > 0
           ? 1
           : -1) *
-        // if the counter origin is top/left the skewing direction is opposite to the pointer direction
-        // so we take that into account by using the sign of the origin
-        Math.sign(counterOriginFactor),
+        // if the counter origin is top/left then we are skewing x/y values on the bottom/right side of target respectively.
+        // if the counter origin is bottom/right then we are skewing x/y values on the top/left side of target respectively,
+        // meaning that the skewing direction in this case is opposite to the pointer movement direction
+        -Math.sign(counterOriginFactor),
       // anchor to the opposite side of the skewing direction
       // normalize value from [-1, 1] to origin value [0, 1]
       origin = -skewingDirection * 0.5 + 0.5;
