@@ -254,4 +254,45 @@
       assert.equal(polygon, null);
     });
   });
+  QUnit.test('_calcDimensions', function(assert) {
+    const polygon = new fabric.Polygon(
+      getPoints(), 
+      { 
+        scaleX: 2, 
+        scaleY: 3,
+        skewX: 20,
+        skewY: 30,
+        strokeWidth: 20,
+        strokeMiterLimit: 10,
+        strokeUniform: false,
+        strokeLineJoin: 'miter',
+        exactBoundingBox: true
+      }
+    ),
+    {
+      left,
+      top,
+      width,
+      height,
+      pathOffset,
+      strokeOffset
+    } = polygon._calcDimensions();
+
+    // Types
+    assert.equal(typeof left, 'number');
+    assert.equal(typeof top, 'number');
+    assert.equal(typeof width, 'number');
+    assert.equal(typeof height, 'number');
+    assert.ok(pathOffset instanceof fabric.Point);
+    assert.ok(strokeOffset instanceof fabric.Point);
+
+    // Values
+    assert.equal(left, 10.485714075442775);
+    assert.equal(top, 14.784917784669414);
+    assert.equal(width, 27.707709196083425);
+    assert.equal(height, 21.750672506349947);
+    assert.deepEqual(pathOffset, new fabric.Point(14.999999999999998, 17.000000000000004));
+    assert.deepEqual(strokeOffset, new fabric.Point(-0.48571407544277534, -2.784917784669414));
+    
+  });
 })();
