@@ -386,9 +386,10 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
         target[skewKey] > 0
           ? 1
           : -1) *
-        // if the counter origin is top/left then we are skewing x/y values on the bottom/right side of target respectively.
-        // if the counter origin is bottom/right then we are skewing x/y values on the top/left side of target respectively,
-        // meaning that the skewing direction in this case is opposite to the pointer movement direction
+        // if the counter origin is top/left then we are skewing x/y values on the bottom/right side of target respectively =>
+        // skewing direction is the same as the direction of the movement of the pointer.
+        // if the counter origin is bottom/right then we are skewing x/y values on the top/left side of target respectively =>
+        // skewing direction is the OPPOSITE of the direction of the movement of the pointer.
         -Math.sign(counterOriginFactor),
       // anchor to the opposite side of the skewing direction
       // normalize value from [-1, 1] to origin value [0, 1]
