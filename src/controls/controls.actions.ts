@@ -342,7 +342,9 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       // add starting state
       shearingStart;
 
-    target.set(skewKey, radiansToDegrees(Math.atan(shearing)));
+    const skewing = radiansToDegrees(Math.atan(shearing));
+
+    target.set(skewKey, skewing);
     const changed = skewingBefore !== target[skewKey];
 
     if (changed && axis === 'y') {
