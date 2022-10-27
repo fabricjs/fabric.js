@@ -264,7 +264,6 @@ QUnit.module('stroke projection', (hooks) => {
   }
 
   // Single point
-  (function() {
     const testCase = {
       name: 'singlePoint',
       points: [
@@ -272,49 +271,49 @@ QUnit.module('stroke projection', (hooks) => {
       ],
     };
 
-    [fabric.Polyline, fabric.Polygon].forEach((builder) => {
-      const builderType = builder.prototype.type,
-        isPolygon = builderType === 'polygon';
-      ['square', 'round'].forEach((strokeLineCap) => {
-        [true, false].forEach((strokeUniform) => {
-          [
-            [0, 0],
-            [0, 30],
-            [20, 0],
-            [25, 35],
-          ].forEach(([skewX, skewY]) => {
-            if (strokeLineCap === 'round' && (skewX !== 0) & (skewY !== 0))
-              return; // TODO: remove this line when fix strokeLineJoins equals `round` with `skewX`and `skewY` applied at sametime
-            tests.push({
-              test: `${testCase.name} of type ${builderType} with strokeLineCap=${strokeLineCap}, strokeUniform=${strokeUniform}, skewX=${skewX}, skewY=${skewY}`,
-              code: function (canvas, callback) {
-                renderStrokeTest(
-                  canvas,
-                  {
-                    builder,
-                    points: testCase.points,
-                  },
-                  {
-                    strokeLineCap,
-                    strokeUniform,
-                    skewX,
-                    skewY,
-                  }
-                );
-                callback(canvas.lowerCanvasEl);
-              },
-              golden: `stroke-projection/${isPolygon ? 'strokeLineJoin' : 'strokeLineCap'}/${testCase.name}/${strokeLineCap}${strokeUniform ? '-uniform-' : ''
-                }-${skewX}skewX-${skewY}skewY.png`,
-              percentage: 0.001,
-              width: 600,
-              height: 900,
-              fabricClass: 'Canvas',
-            });
+  [fabric.Polyline, fabric.Polygon].forEach((builder) => {
+    const builderType = builder.prototype.type,
+      isPolygon = builderType === 'polygon';
+    ['square', 'round'].forEach((strokeLineCap) => {
+      [true, false].forEach((strokeUniform) => {
+        [
+          [0, 0],
+          [0, 30],
+          [20, 0],
+          [25, 35],
+        ].forEach(([skewX, skewY]) => {
+          if (strokeLineCap === 'round' && (skewX !== 0) & (skewY !== 0))
+            return; // TODO: remove this line when fix strokeLineJoins equals `round` with `skewX`and `skewY` applied at sametime
+          tests.push({
+            test: `${testCase.name} of type ${builderType} with strokeLineCap=${strokeLineCap}, strokeUniform=${strokeUniform}, skewX=${skewX}, skewY=${skewY}`,
+            code: function (canvas, callback) {
+              renderStrokeTest(
+                canvas,
+                {
+                  builder,
+                  points: testCase.points,
+                },
+                {
+                  strokeLineCap,
+                  strokeUniform,
+                  skewX,
+                  skewY,
+                }
+              );
+              callback(canvas.lowerCanvasEl);
+            },
+            golden: `stroke-projection/${isPolygon ? 'strokeLineJoin' : 'strokeLineCap'}/${testCase.name}/${strokeLineCap}${strokeUniform ? '-uniform-' : ''
+              }-${skewX}skewX-${skewY}skewY.png`,
+            percentage: 0.001,
+            width: 600,
+            height: 900,
+            fabricClass: 'Canvas',
           });
         });
       });
     });
-  })()
+  });
+ 
 
   tests.forEach(visualTestLoop(QUnit));
 });
