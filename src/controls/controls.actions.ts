@@ -300,19 +300,23 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
 
   /**
    * Since skewing is applied before scaling, calculations are done in a scaleless plane
+   * Skew an obejct on axis given a transform and a pointer.
+   * to get the correct behaviour ( or a different one ... ) the transform origin is modified in
+   * the skewHandler function
    * @see https://github.com/fabricjs/fabric.js/pull/8380
    */
   function skewObject(
     axis: TAxis,
-    { target, ex, ey, skewingSide, ...transform },
+    skewingSide,
+    { target, ex, ey, ...restOfTransform },
     pointer: Point
-  ) {
+  ): boolean {
     const { skew: skewKey } = AXIS_KEYS[axis],
       offset = pointer
         .subtract(new Point(ex, ey))
         .divide(new Point(target.scaleX, target.scaleY))[axis],
       skewingBefore = target[skewKey],
-      skewingStart = transform[skewKey],
+      skewingStart = restOfTransform[skewKey],
       shearingStart = Math.tan(degreesToRadians(skewingStart)),
       // let a, b be the size of target
       // let a' be the value of a after applying skewing
@@ -403,20 +407,21 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       // normalize value from [-1, 1] to origin value [0, 1]
       origin = -skewingDirection * 0.5 + 0.5;
 
+    const correctedTransform = {
+      ...transform,
+      [originKey]: origin,
+    };
+
     const finalHandler = wrapWithFireEvent(
       'skewing',
       wrapWithFixedAnchor((eventData, transform, x, y) =>
-        skewObject(axis, transform, new Point(x, y))
+        skewObject(axis, skewingSide, transform, new Point(x, y))
       )
     );
 
     return finalHandler(
       eventData,
-      {
-        ...transform,
-        [originKey]: origin,
-        skewingSide,
-      },
+      correctedTransform,
       x,
       y
     );
