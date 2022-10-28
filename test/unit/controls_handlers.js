@@ -140,7 +140,7 @@
       assert.equal(returned, true, 'action was permitted Y');
     });
     QUnit.test('scalingYOrSkewingX blocks scaleX to flip', function(assert) {
-      transform.target.scaley = 1;
+      transform.target.scaleY = 1;
       transform.target.strokeWidth = 0;
       transform.target.lockScalingFlip = true;
       var returned = fabric.controlsUtils.scalingYOrSkewingX(eventData, transform, 200, -80);
@@ -152,15 +152,43 @@
       transform.target.scaleX = 1;
       transform.target.skewY = 0;
       transform.target.strokeWidth = 0;
+      transform.skewX = 0;
+      transform.skewY = 0;
       eventData.shiftKey = true;
       fabric.controlsUtils.scalingXOrSkewingY(eventData, transform, 200, 300);
-      assert.equal(Math.round(transform.target.skewY), 79);
+      assert.equal(Math.round(transform.target.skewY), 81);
       assert.equal(Math.round(transform.target.scaleX), 1);
     });
     QUnit.test('scalingYOrSkewingX changes skewX if shift pressed', function(assert) {
       transform.target.scaleY = 1;
       transform.target.skewX = 0;
       transform.target.strokeWidth = 0;
+      transform.skewX = 0;
+      transform.skewY = 0;
+      eventData.shiftKey = true;
+      fabric.controlsUtils.scalingYOrSkewingX(eventData, transform, 200, 300);
+      assert.equal(Math.round(transform.target.skewX), 76);
+      assert.equal(Math.round(transform.target.scaleY), 1);
+    });
+    QUnit.test('skewing Y with existing skewing', function (assert) {
+      transform.target.scaleX = 1;
+      transform.target.skewY = 30;
+      transform.target.skewY = 45;
+      transform.target.strokeWidth = 0;
+      transform.skewX = 45;
+      transform.skewY = 15;
+      eventData.shiftKey = true;
+      fabric.controlsUtils.scalingXOrSkewingY(eventData, transform, 200, 300);
+      assert.equal(Math.round(transform.target.skewY), 81);
+      assert.equal(Math.round(transform.target.scaleX), 1);
+    });
+    QUnit.test('skewing X with existing skewing', function(assert) {
+      transform.target.scaleY = 1;
+      transform.target.skewX = 30;
+      transform.target.skewY = 45;
+      transform.target.strokeWidth = 0;
+      transform.skewX = 45;
+      transform.skewY = 15;
       eventData.shiftKey = true;
       fabric.controlsUtils.scalingYOrSkewingX(eventData, transform, 200, 300);
       assert.equal(Math.round(transform.target.skewX), 72);

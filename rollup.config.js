@@ -5,7 +5,7 @@ import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
 import { terser } from 'rollup-plugin-terser';
 import ts from 'rollup-plugin-ts';
 
-const runStats = process.env.BUILD_STATS;
+const runStats = Number(process.env.BUILD_STATS);
 let analyzed = false;
 
 const splitter = /\n|\s|,/g;
