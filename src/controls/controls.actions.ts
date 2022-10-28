@@ -307,7 +307,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
     { target, ex, ey, skewingSide, ...transform },
     pointer: Point
   ) {
-    const { skew: skewKey, flip: flipKey } = AXIS_KEYS[axis],
+    const { skew: skewKey } = AXIS_KEYS[axis],
       offset = pointer
         .subtract(new Point(ex, ey))
         .divide(new Point(target.scaleX, target.scaleY))[axis],
@@ -374,6 +374,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
         origin: originKey,
         lockSkewing: lockSkewingKey,
         skew: skewKey,
+        flip: flipKey,
       } = AXIS_KEYS[axis];
     if (target[lockSkewingKey]) {
       return false;
@@ -385,9 +386,12 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       // if the counter origin is top/left (= -0.5) then we are skewing x/y values on the bottom/right side of target respectively.
       // if the counter origin is bottom/right (= 0.5) then we are skewing x/y values on the top/left side of target respectively.
       // skewing direction on the top/left side of target is OPPOSITE to the direction of the movement of the pointer,
+      // flipping affects direction as well,
       // so we factor skewing direction by this value.
       skewingSide =
-        -Math.sign(counterOriginFactor) * (target[counterFlipKey] ? -1 : 1),
+        -Math.sign(counterOriginFactor) *
+        (target[flipKey] ? -1 : 1) *
+        (target[counterFlipKey] ? -1 : 1),
       skewingDirection =
         ((target[skewKey] === 0 &&
           // in case skewing equals 0 we use the pointer offset from target center to determine the direction of skewing
