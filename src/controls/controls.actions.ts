@@ -314,8 +314,6 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       skewingBefore = target[skewKey],
       skewingStart = transform[skewKey],
       shearingStart = Math.tan(degreesToRadians(skewingStart)),
-      flipFactor = transform[flipKey] ? -1 : 1,
-      offsetFactor = skewingSide * flipFactor,
       // let a, b be the size of target
       // let a' be the value of a after applying skewing
       // then:
@@ -335,7 +333,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
             }).y;
 
     const shearing =
-      (2 * offset * offsetFactor) /
+      (2 * offset * skewingSide) /
         // we max out fractions to safeguard from asymptotic behavior
         Math.max(b, 1) +
       // add starting state
@@ -389,7 +387,7 @@ import { renderCircleControl, renderSquareControl } from './controls.render';
       // skewing direction on the top/left side of target is OPPOSITE to the direction of the movement of the pointer,
       // so we factor skewing direction by this value.
       skewingSide =
-        -Math.sign(counterOriginFactor) * (transform[counterFlipKey] ? -1 : 1),
+        -Math.sign(counterOriginFactor) * (target[counterFlipKey] ? -1 : 1),
       skewingDirection =
         ((target[skewKey] === 0 &&
           // in case skewing equals 0 we use the pointer offset from target center to determine the direction of skewing
