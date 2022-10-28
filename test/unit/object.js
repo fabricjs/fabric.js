@@ -317,7 +317,6 @@
     cObj.scale(1.5);
     assert.equal(cObj.get('scaleX'), 1.5);
     assert.equal(cObj.get('scaleY'), 1.5);
-    assert.equal(cObj.scale(2), cObj, 'chainable');
   });
 
   QUnit.test('setOpacity', function(assert) {
