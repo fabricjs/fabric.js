@@ -1,4 +1,7 @@
 //@ts-nocheck
+import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { Point } from '../point.class';
+
 (function (global) {
   var fabric = global.fabric;
   fabric.util.object.extend(
@@ -224,6 +227,20 @@
           this._fireSelectionChanged();
           this._updateTextarea();
         }
+      },
+
+      /**
+       * Returns coordinates of a pointer relative to object's top left corner in object's plane
+       * @param {Event} e Event to operate upon
+       * @param {Object} [pointer] Pointer to operate upon (instead of event)
+       * @return {Point} Coordinates of a pointer (x, y)
+       */
+      getLocalPointer: function (e: Event, pointer?: IPoint): Point {
+        const thePointer = pointer || this.canvas.getPointer(e);
+        return transformPoint(
+          thePointer,
+          invertTransform(this.calcTransformMatrix())
+        ).add(new Point(this.width / 2, this.height / 2));
       },
 
       /**

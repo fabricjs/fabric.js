@@ -1,345 +1,404 @@
-//@ts-nocheck
 import { Point } from '../point.class';
-import { FabricObject } from '../shapes/object.class';
+import { transformPoint } from '../util/misc/matrix';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { CommonMethods } from './shared_methods.mixin';
+import { TDegree, TOriginX, TOriginY } from '../typedefs';
+import { Group } from '../shapes/group.class';
+import { sizeAfterTransform } from '../util/misc/objectTransforms';
 
-(function (global) {
-  var fabric = global.fabric,
-    degreesToRadians = fabric.util.degreesToRadians,
-    originXOffset = {
-      left: -0.5,
-      center: 0,
-      right: 0.5,
-    },
-    originYOffset = {
-      top: -0.5,
-      center: 0,
-      bottom: 0.5,
-    };
+const originOffset = {
+  left: -0.5,
+  top: -0.5,
+  center: 0,
+  bottom: 0.5,
+  right: 0.5,
+};
+
+/**
+ * Resolves origin value relative to center
+ * @private
+ * @param {TOriginX | TOriginY} originValue originX / originY
+ * @returns number
+ */
+export const resolveOrigin = (
+  originValue: TOriginX | TOriginY | number
+): number =>
+  typeof originValue === 'string'
+    ? originOffset[originValue]
+    : originValue - 0.5;
+
+export class ObjectOrigin extends CommonMethods {
+  /**
+   * Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
+   * @type Number
+   * @default 0
+   */
+  top: number;
 
   /**
-   * @typedef {number | 'left' | 'center' | 'right'} OriginX
-   * @typedef {number | 'top' | 'center' | 'bottom'} OriginY
+   * Left position of an object. Note that by default it's relative to object left. You can change this by setting originX={left/center/right}
+   * @type Number
+   * @default 0
    */
+  left: number;
 
-  fabric.util.object.extend(
-    FabricObject.prototype,
-    /** @lends FabricObject.prototype */ {
-      /**
-       * Resolves origin value relative to center
-       * @private
-       * @param {OriginX} originX
-       * @returns number
-       */
-      resolveOriginX: function (originX) {
-        return typeof originX === 'string'
-          ? originXOffset[originX]
-          : originX - 0.5;
-      },
+  /**
+   * Object width
+   * @type Number
+   * @default
+   */
+  width: number;
 
-      /**
-       * Resolves origin value relative to center
-       * @private
-       * @param {OriginY} originY
-       * @returns number
-       */
-      resolveOriginY: function (originY) {
-        return typeof originY === 'string'
-          ? originYOffset[originY]
-          : originY - 0.5;
-      },
+  /**
+   * Object height
+   * @type Number
+   * @default
+   */
+  height: number;
 
-      /**
-       * Translates the coordinates from a set of origin to another (based on the object's dimensions)
-       * @param {Point} point The point which corresponds to the originX and originY params
-       * @param {OriginX} fromOriginX Horizontal origin: 'left', 'center' or 'right'
-       * @param {OriginY} fromOriginY Vertical origin: 'top', 'center' or 'bottom'
-       * @param {OriginX} toOriginX Horizontal origin: 'left', 'center' or 'right'
-       * @param {OriginY} toOriginY Vertical origin: 'top', 'center' or 'bottom'
-       * @return {Point}
-       */
-      translateToGivenOrigin: function (
-        point,
-        fromOriginX,
-        fromOriginY,
-        toOriginX,
-        toOriginY
-      ) {
-        var x = point.x,
-          y = point.y,
-          dim,
-          offsetX =
-            this.resolveOriginX(toOriginX) - this.resolveOriginX(fromOriginX),
-          offsetY =
-            this.resolveOriginY(toOriginY) - this.resolveOriginY(fromOriginY);
+  /**
+   * Object scale factor (horizontal)
+   * @type Number
+   * @default 1
+   */
+  scaleX: number;
 
-        if (offsetX || offsetY) {
-          dim = this._getTransformedDimensions();
-          x = point.x + offsetX * dim.x;
-          y = point.y + offsetY * dim.y;
-        }
+  /**
+   * Object scale factor (vertical)
+   * @type Number
+   * @default 1
+   */
+  scaleY: number;
 
-        return new Point(x, y);
-      },
+  /**
+   * Angle of skew on x axes of an object (in degrees)
+   * @type Number
+   * @default 0
+   */
+  skewX: number;
 
-      /**
-       * Translates the coordinates from origin to center coordinates (based on the object's dimensions)
-       * @param {Point} point The point which corresponds to the originX and originY params
-       * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
-       * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
-       * @return {Point}
-       */
-      translateToCenterPoint: function (point, originX, originY) {
-        var p = this.translateToGivenOrigin(
-          point,
-          originX,
-          originY,
-          'center',
-          'center'
-        );
-        if (this.angle) {
-          return fabric.util.rotatePoint(
-            p,
-            point,
-            degreesToRadians(this.angle)
-          );
-        }
-        return p;
-      },
+  /**
+   * Angle of skew on y axes of an object (in degrees)
+   * @type Number
+   * @default 0
+   */
+  skewY: number;
 
-      /**
-       * Translates the coordinates from center to origin coordinates (based on the object's dimensions)
-       * @param {Point} center The point which corresponds to center of the object
-       * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
-       * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
-       * @return {Point}
-       */
-      translateToOriginPoint: function (center, originX, originY) {
-        var p = this.translateToGivenOrigin(
-          center,
-          'center',
-          'center',
-          originX,
-          originY
-        );
-        if (this.angle) {
-          return fabric.util.rotatePoint(
-            p,
-            center,
-            degreesToRadians(this.angle)
-          );
-        }
-        return p;
-      },
+  /**
+   * Horizontal origin of transformation of an object (one of "left", "right", "center")
+   * See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
+   * @type String
+   * @default 'left'
+   */
+  originX: TOriginX;
 
-      /**
-       * Returns the center coordinates of the object relative to canvas
-       * @return {Point}
-       */
-      getCenterPoint: function () {
-        var relCenter = this.getRelativeCenterPoint();
-        return this.group
-          ? fabric.util.transformPoint(
-              relCenter,
-              this.group.calcTransformMatrix()
-            )
-          : relCenter;
-      },
+  /**
+   * Vertical origin of transformation of an object (one of "top", "bottom", "center")
+   * See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
+   * @type String
+   * @default 'top'
+   */
+  originY: TOriginY;
 
-      /**
-       * Returns the center coordinates of the object relative to it's containing group or null
-       * @return {Point|null} point or null of object has no parent group
-       */
-      getCenterPointRelativeToParent: function () {
-        return this.group ? this.getRelativeCenterPoint() : null;
-      },
+  /**
+   * Angle of rotation of an object (in degrees)
+   * @type Number
+   * @default 0
+   */
+  angle: TDegree;
 
-      /**
-       * Returns the center coordinates of the object relative to it's parent
-       * @return {Point}
-       */
-      getRelativeCenterPoint: function () {
-        return this.translateToCenterPoint(
-          new Point(this.left, this.top),
-          this.originX,
-          this.originY
-        );
-      },
+  /**
+   * Width of a stroke used to render this object
+   * @type Number
+   * @default 1
+   */
+  strokeWidth: number;
 
-      /**
-       * Returns the coordinates of the object based on center coordinates
-       * @param {Point} point The point which corresponds to the originX and originY params
-       * @return {Point}
-       */
-      // getOriginPoint: function(center) {
-      //   return this.translateToOriginPoint(center, this.originX, this.originY);
-      // },
+  /**
+   * When `false`, the stoke width will scale with the object.
+   * When `true`, the stroke will always match the exact pixel size entered for stroke width.
+   * this Property does not work on Text classes or drawing call that uses strokeText,fillText methods
+   * default to false
+   * @since 2.6.0
+   * @type Boolean
+   * @default false
+   * @type Boolean
+   * @default false
+   */
+  strokeUniform: boolean;
 
-      /**
-       * Returns the coordinates of the object as if it has a different origin
-       * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
-       * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
-       * @return {Point}
-       */
-      getPointByOrigin: function (originX, originY) {
-        var center = this.getRelativeCenterPoint();
-        return this.translateToOriginPoint(center, originX, originY);
-      },
+  /**
+   * Object containing this object.
+   * can influence its size and position
+   */
+  group?: Group;
 
-      /**
-       * Returns the normalized point (rotated relative to center) in local coordinates
-       * @param {Point} point The point relative to instance coordinate system
-       * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
-       * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
-       * @return {Point}
-       */
-      normalizePoint: function (point, originX, originY) {
-        var center = this.getRelativeCenterPoint(),
-          p,
-          p2;
-        if (typeof originX !== 'undefined' && typeof originY !== 'undefined') {
-          p = this.translateToGivenOrigin(
-            center,
-            'center',
-            'center',
-            originX,
-            originY
-          );
-        } else {
-          p = new Point(this.left, this.top);
-        }
+  _originalOriginX?: TOriginX;
 
-        p2 = new Point(point.x, point.y);
-        if (this.angle) {
-          p2 = fabric.util.rotatePoint(
-            p2,
-            center,
-            -degreesToRadians(this.angle)
-          );
-        }
-        return p2.subtract(p);
-      },
+  _originalOriginY?: TOriginY;
 
-      /**
-       * Returns coordinates of a pointer relative to object's top left corner in object's plane
-       * @param {Event} e Event to operate upon
-       * @param {Object} [pointer] Pointer to operate upon (instead of event)
-       * @return {Object} Coordinates of a pointer (x, y)
-       */
-      getLocalPointer: function (e, pointer) {
-        pointer = pointer || this.canvas.getPointer(e);
-        return fabric.util
-          .transformPoint(
-            new Point(pointer.x, pointer.y),
-            fabric.util.invertTransform(this.calcTransformMatrix())
-          )
-          .add(new Point(this.width / 2, this.height / 2));
-      },
+  /**
+   * Calculate object bounding box dimensions from its properties scale, skew.
+   * @param {Object} [options]
+   * @param {Number} [options.scaleX]
+   * @param {Number} [options.scaleY]
+   * @param {Number} [options.skewX]
+   * @param {Number} [options.skewY]
+   * @private
+   * @returns {Point} dimensions
+   */
+  _getTransformedDimensions(options: any = {}): Point {
+    const dimOptions = {
+      scaleX: this.scaleX,
+      scaleY: this.scaleY,
+      skewX: this.skewX,
+      skewY: this.skewY,
+      width: this.width,
+      height: this.height,
+      strokeWidth: this.strokeWidth,
+      ...options,
+    };
+    // stroke is applied before/after transformations are applied according to `strokeUniform`
+    const strokeWidth = dimOptions.strokeWidth;
+    let preScalingStrokeValue = strokeWidth,
+      postScalingStrokeValue = 0;
 
-      /**
-       * Returns the point in global coordinates
-       * @param {Point} The point relative to the local coordinate system
-       * @return {Point}
-       */
-      // toGlobalPoint: function(point) {
-      //   return fabric.util.rotatePoint(point, this.getCenterPoint(), degreesToRadians(this.angle)).add(new Point(this.left, this.top));
-      // },
-
-      /**
-       * Sets the position of the object taking into consideration the object's origin
-       * @param {Point} pos The new position of the object
-       * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
-       * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
-       * @return {void}
-       */
-      setPositionByOrigin: function (pos, originX, originY) {
-        var center = this.translateToCenterPoint(pos, originX, originY),
-          position = this.translateToOriginPoint(
-            center,
-            this.originX,
-            this.originY
-          );
-        this.set('left', position.x);
-        this.set('top', position.y);
-      },
-
-      /**
-       * @param {String} to One of 'left', 'center', 'right'
-       */
-      adjustPosition: function (to) {
-        var angle = degreesToRadians(this.angle),
-          hypotFull = this.getScaledWidth(),
-          xFull = fabric.util.cos(angle) * hypotFull,
-          yFull = fabric.util.sin(angle) * hypotFull,
-          offsetFrom,
-          offsetTo;
-
-        //TODO: this function does not consider mixed situation like top, center.
-        if (typeof this.originX === 'string') {
-          offsetFrom = originXOffset[this.originX];
-        } else {
-          offsetFrom = this.originX - 0.5;
-        }
-        if (typeof to === 'string') {
-          offsetTo = originXOffset[to];
-        } else {
-          offsetTo = to - 0.5;
-        }
-        this.left += xFull * (offsetTo - offsetFrom);
-        this.top += yFull * (offsetTo - offsetFrom);
-        this.setCoords();
-        this.originX = to;
-      },
-
-      /**
-       * Sets the origin/position of the object to it's center point
-       * @private
-       * @return {void}
-       */
-      _setOriginToCenter: function () {
-        this._originalOriginX = this.originX;
-        this._originalOriginY = this.originY;
-
-        var center = this.getRelativeCenterPoint();
-
-        this.originX = 'center';
-        this.originY = 'center';
-
-        this.left = center.x;
-        this.top = center.y;
-      },
-
-      /**
-       * Resets the origin/position of the object to it's original origin
-       * @private
-       * @return {void}
-       */
-      _resetOrigin: function () {
-        var originPoint = this.translateToOriginPoint(
-          this.getRelativeCenterPoint(),
-          this._originalOriginX,
-          this._originalOriginY
-        );
-
-        this.originX = this._originalOriginX;
-        this.originY = this._originalOriginY;
-
-        this.left = originPoint.x;
-        this.top = originPoint.y;
-
-        this._originalOriginX = null;
-        this._originalOriginY = null;
-      },
-
-      /**
-       * @private
-       */
-      _getLeftTopCoords: function () {
-        return this.translateToOriginPoint(
-          this.getRelativeCenterPoint(),
-          'left',
-          'top'
-        );
-      },
+    if (this.strokeUniform) {
+      preScalingStrokeValue = 0;
+      postScalingStrokeValue = strokeWidth;
     }
-  );
-})(typeof exports !== 'undefined' ? exports : window);
+    const dimX = dimOptions.width + preScalingStrokeValue,
+      dimY = dimOptions.height + preScalingStrokeValue,
+      noSkew = dimOptions.skewX === 0 && dimOptions.skewY === 0;
+    let finalDimensions;
+    if (noSkew) {
+      finalDimensions = new Point(
+        dimX * dimOptions.scaleX,
+        dimY * dimOptions.scaleY
+      );
+    } else {
+      finalDimensions = sizeAfterTransform(dimX, dimY, dimOptions);
+    }
+
+    return finalDimensions.scalarAdd(postScalingStrokeValue);
+  }
+
+  /**
+   * Translates the coordinates from a set of origin to another (based on the object's dimensions)
+   * @param {Point} point The point which corresponds to the originX and originY params
+   * @param {TOriginX} fromOriginX Horizontal origin: 'left', 'center' or 'right'
+   * @param {TOriginY} fromOriginY Vertical origin: 'top', 'center' or 'bottom'
+   * @param {TOriginX} toOriginX Horizontal origin: 'left', 'center' or 'right'
+   * @param {TOriginY} toOriginY Vertical origin: 'top', 'center' or 'bottom'
+   * @return {Point}
+   */
+  translateToGivenOrigin(
+    point: Point,
+    fromOriginX: TOriginX,
+    fromOriginY: TOriginY,
+    toOriginX: TOriginX,
+    toOriginY: TOriginY
+  ): Point {
+    let x = point.x,
+      y = point.y;
+    const offsetX = resolveOrigin(toOriginX) - resolveOrigin(fromOriginX),
+      offsetY = resolveOrigin(toOriginY) - resolveOrigin(fromOriginY);
+
+    if (offsetX || offsetY) {
+      const dim = this._getTransformedDimensions();
+      x += offsetX * dim.x;
+      y += offsetY * dim.y;
+    }
+
+    return new Point(x, y);
+  }
+
+  /**
+   * Translates the coordinates from origin to center coordinates (based on the object's dimensions)
+   * @param {Point} point The point which corresponds to the originX and originY params
+   * @param {TOriginX} originX Horizontal origin: 'left', 'center' or 'right'
+   * @param {TOriginY} originY Vertical origin: 'top', 'center' or 'bottom'
+   * @return {Point}
+   */
+  translateToCenterPoint(
+    point: Point,
+    originX: TOriginX,
+    originY: TOriginY
+  ): Point {
+    const p = this.translateToGivenOrigin(
+      point,
+      originX,
+      originY,
+      'center',
+      'center'
+    );
+    if (this.angle) {
+      return p.rotate(degreesToRadians(this.angle), point);
+    }
+    return p;
+  }
+
+  /**
+   * Translates the coordinates from center to origin coordinates (based on the object's dimensions)
+   * @param {Point} center The point which corresponds to center of the object
+   * @param {OriginX} originX Horizontal origin: 'left', 'center' or 'right'
+   * @param {OriginY} originY Vertical origin: 'top', 'center' or 'bottom'
+   * @return {Point}
+   */
+  translateToOriginPoint(
+    center: Point,
+    originX: TOriginX,
+    originY: TOriginY
+  ): Point {
+    const p = this.translateToGivenOrigin(
+      center,
+      'center',
+      'center',
+      originX,
+      originY
+    );
+    if (this.angle) {
+      return p.rotate(degreesToRadians(this.angle), center);
+    }
+    return p;
+  }
+
+  /**
+   * Returns the center coordinates of the object relative to canvas
+   * @return {Point}
+   */
+  getCenterPoint(): Point {
+    const relCenter = this.getRelativeCenterPoint();
+    return this.group
+      ? transformPoint(relCenter, this.group.calcTransformMatrix())
+      : relCenter;
+  }
+
+  /**
+   * Returns the center coordinates of the object relative to it's parent
+   * @return {Point}
+   */
+  getRelativeCenterPoint(): Point {
+    return this.translateToCenterPoint(
+      new Point(this.left, this.top),
+      this.originX,
+      this.originY
+    );
+  }
+
+  /**
+   * Returns the coordinates of the object as if it has a different origin
+   * @param {TOriginX} originX Horizontal origin: 'left', 'center' or 'right'
+   * @param {TOriginY} originY Vertical origin: 'top', 'center' or 'bottom'
+   * @return {Point}
+   */
+  getPointByOrigin(originX: TOriginX, originY: TOriginY): Point {
+    return this.translateToOriginPoint(
+      this.getRelativeCenterPoint(),
+      originX,
+      originY
+    );
+  }
+
+  /**
+   * Returns the normalized point (rotated relative to center) in local coordinates
+   * @param {Point} point The point relative to instance coordinate system
+   * @param {TOriginX} originX Horizontal origin: 'left', 'center' or 'right'
+   * @param {TOriginY} originY Vertical origin: 'top', 'center' or 'bottom'
+   * @return {Point}
+   */
+  normalizePoint(point: Point, originX: TOriginX, originY: TOriginY): Point {
+    const center = this.getRelativeCenterPoint();
+    let p, p2;
+    if (typeof originX !== 'undefined' && typeof originY !== 'undefined') {
+      p = this.translateToGivenOrigin(
+        center,
+        'center',
+        'center',
+        originX,
+        originY
+      );
+    } else {
+      p = new Point(this.left, this.top);
+    }
+
+    if (this.angle) {
+      p2 = point.rotate(-degreesToRadians(this.angle), center);
+    } else {
+      p2 = point;
+    }
+    return p2.subtract(p);
+  }
+
+  /**
+   * Sets the position of the object taking into consideration the object's origin
+   * @param {Point} pos The new position of the object
+   * @param {TOriginX} originX Horizontal origin: 'left', 'center' or 'right'
+   * @param {TOriginY} originY Vertical origin: 'top', 'center' or 'bottom'
+   * @return {void}
+   */
+  setPositionByOrigin(pos: Point, originX: TOriginX, originY: TOriginY) {
+    const center = this.translateToCenterPoint(pos, originX, originY),
+      position = this.translateToOriginPoint(
+        center,
+        this.originX,
+        this.originY
+      );
+    this.set({ left: position.x, top: position.y });
+  }
+
+  /**
+   * Sets the origin/position of the object to it's center point
+   * @private
+   * @return {void}
+   */
+  _setOriginToCenter() {
+    this._originalOriginX = this.originX;
+    this._originalOriginY = this.originY;
+
+    const center = this.getRelativeCenterPoint();
+
+    this.originX = 'center';
+    this.originY = 'center';
+
+    this.left = center.x;
+    this.top = center.y;
+  }
+
+  /**
+   * Resets the origin/position of the object to it's original origin
+   * @private
+   * @return {void}
+   */
+  _resetOrigin() {
+    if (
+      this._originalOriginX !== undefined &&
+      this._originalOriginY !== undefined
+    ) {
+      const originPoint = this.translateToOriginPoint(
+        this.getRelativeCenterPoint(),
+        this._originalOriginX,
+        this._originalOriginY
+      );
+
+      this.left = originPoint.x;
+      this.top = originPoint.y;
+
+      this.originX = this._originalOriginX;
+      this.originY = this._originalOriginY;
+      this._originalOriginX = undefined;
+      this._originalOriginY = undefined;
+    }
+  }
+
+  /**
+   * @private
+   */
+  _getLeftTopCoords() {
+    return this.translateToOriginPoint(
+      this.getRelativeCenterPoint(),
+      'left',
+      'top'
+    );
+  }
+}
