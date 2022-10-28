@@ -1,9 +1,9 @@
-import { cos } from './cos';
-import { sin } from './sin';
-import { degreesToRadians } from './radiansDegreesConversion';
-import { iMatrix, PiBy180 } from '../../constants';
+import { iMatrix } from '../../constants';
 import { IPoint, Point } from '../../point.class';
 import { TDegree, TMat2D } from '../../typedefs';
+import { cos } from './cos';
+import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
+import { sin } from './sin';
 
 type TRotateMatrixArgs = {
   angle?: TDegree;
@@ -96,13 +96,13 @@ export const qrDecompose = (
     scaleY = (a[0] * a[3] - a[2] * a[1]) / scaleX,
     skewX = Math.atan2(a[0] * a[2] + a[1] * a[3], denom);
   return {
-    angle: (angle / PiBy180) as TDegree,
+    angle: radiansToDegrees(angle),
     scaleX,
     scaleY,
-    skewX: (skewX / PiBy180) as TDegree,
+    skewX: radiansToDegrees(skewX),
     skewY: 0 as TDegree,
-    translateX: a[4],
-    translateY: a[5],
+    translateX: a[4] || 0,
+    translateY: a[5] || 0,
   };
 };
 

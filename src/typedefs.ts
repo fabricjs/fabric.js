@@ -20,6 +20,10 @@ const enum Radian {}
 export type TDegree = Nominal<number, Degree>;
 export type TRadian = Nominal<number, Radian>;
 
+export type TAxis = 'x' | 'y';
+
+export type TAxisKey<T extends string> = `${T}${Capitalize<TAxis>}`;
+
 export type TFiller = Gradient<'linear'> | Gradient<'radial'> | Pattern;
 
 export type TSize = {

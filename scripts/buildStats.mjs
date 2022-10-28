@@ -97,8 +97,8 @@ export async function run({ github, context, a, b }) {
     ..._.map(files, ({ a, b }, key) => {
       return [
         key,
-        printSize(a.sizeBefore, b.sizeBefore),
-        printSize(a.sizeAfter, b.sizeAfter),
+        printSizeByte(a.sizeBefore, b.sizeBefore),
+        printSizeByte(a.sizeAfter, b.sizeAfter),
       ];
     }),
   ];
