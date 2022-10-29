@@ -3,6 +3,7 @@ import { dragHandler, getActionFromCorner } from './controls';
 import { Point } from './point.class';
 import { FabricObject } from './shapes/object.class';
 import { ModifierKey, Transform } from './typedefs';
+import { saveObjectTransform } from './util/misc/objectTransforms';
 
 (function (global) {
   var fabric = global.fabric,
@@ -792,7 +793,7 @@ import { ModifierKey, Transform } from './typedefs';
             height: target.height,
             shiftKey: e.shiftKey,
             altKey: altKey,
-            original: fabric.util.saveObjectTransform(target),
+            original: saveObjectTransform(target),
           };
 
         if (this._shouldCenterTransform(target, action, altKey)) {
