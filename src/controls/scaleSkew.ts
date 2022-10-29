@@ -17,8 +17,8 @@ function isAltAction(eventData: TPointerEvent, target: FabricObject) {
 /**
  * Inspect event, control and fabricObject to return the correct action name
  * @param {Event} eventData the javascript event that is causing the scale
- * @param {fabric.Control} control the control that is interested in the action
- * @param {fabric.Object} fabricObject the fabric object that is interested in the action
+ * @param {Control} control the control that is interested in the action
+ * @param {FabricObject} fabricObject the fabric object that is interested in the action
  * @return {String} an action name
  */
 export const scaleOrSkewActionName: ControlCallback<
@@ -38,8 +38,8 @@ export const scaleOrSkewActionName: ControlCallback<
 /**
  * Combine skew and scale style handlers to cover fabric standard use case
  * @param {Event} eventData the javascript event that is causing the scale
- * @param {fabric.Control} control the control that is interested in the action
- * @param {fabric.Object} fabricObject the fabric object that is interested in the action
+ * @param {Control} control the control that is interested in the action
+ * @param {FabricObject} fabricObject the fabric object that is interested in the action
  * @return {String} a valid css string for the cursor
  */
 export const scaleSkewCursorStyleHandler: ControlCursorCallback = (

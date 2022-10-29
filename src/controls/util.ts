@@ -21,7 +21,7 @@ export const NOT_ALLOWED_CURSOR = 'not-allowed';
  * @param {Boolean} alreadySelected true if target is already selected
  * @param {String} corner a string representing the corner ml, mr, tl ...
  * @param {Event} e Event object
- * @param {fabric.Object} [target] inserted back to help overriding. Unused
+ * @param {FabricObject} [target] inserted back to help overriding. Unused
  */
 export const getActionFromCorner = (
   alreadySelected: boolean,
@@ -65,8 +65,8 @@ export const commonEventInfo: TransformAction<Transform, TransformEvent> = (
 /**
  * Combine control position and object angle to find the control direction compared
  * to the object center.
- * @param {fabric.Object} fabricObject the fabric object for which we are rendering controls
- * @param {fabric.Control} control the control class
+ * @param {FabricObject} fabricObject the fabric object for which we are rendering controls
+ * @param {Control} control the control class
  * @return {Number} 0 - 7 a quadrant number
  */
 export function findCornerQuadrant(

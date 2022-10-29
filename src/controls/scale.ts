@@ -28,7 +28,7 @@ type ScaleBy = TAxis | 'equally' | '' | undefined;
 /**
  * Inspect event and fabricObject properties to understand if the scaling action
  * @param {Event} eventData from the user action
- * @param {fabric.Object} fabricObject the fabric object about to scale
+ * @param {FabricObject} fabricObject the fabric object about to scale
  * @return {Boolean} true if scale is proportional
  */
 export function scaleIsProportional(
@@ -45,7 +45,7 @@ export function scaleIsProportional(
 
 /**
  * Inspect fabricObject to understand if the current scaling action is allowed
- * @param {fabric.Object} fabricObject the fabric object about to scale
+ * @param {FabricObject} fabricObject the fabric object about to scale
  * @param {String} by 'x' or 'y' or ''
  * @param {Boolean} scaleProportionally true if we are trying to scale proportionally
  * @return {Boolean} true if scaling is not allowed at current conditions
@@ -77,8 +77,8 @@ const scaleMap = ['e', 'se', 's', 'sw', 'w', 'nw', 'n', 'ne', 'e'];
 /**
  * return the correct cursor style for the scale action
  * @param {Event} eventData the javascript event that is causing the scale
- * @param {fabric.Control} control the control that is interested in the action
- * @param {fabric.Object} fabricObject the fabric object that is interested in the action
+ * @param {Control} control the control that is interested in the action
+ * @param {FabricObject} fabricObject the fabric object that is interested in the action
  * @return {String} a valid css string for the cursor
  */
 export const scaleCursorStyleHandler: ControlCursorCallback = (

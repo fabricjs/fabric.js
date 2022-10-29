@@ -52,8 +52,8 @@ const skewMap = ['ns', 'nesw', 'ew', 'nwse'];
 /**
  * return the correct cursor style for the skew action
  * @param {Event} eventData the javascript event that is causing the scale
- * @param {fabric.Control} control the control that is interested in the action
- * @param {fabric.Object} fabricObject the fabric object that is interested in the action
+ * @param {Control} control the control that is interested in the action
+ * @param {FabricObject} fabricObject the fabric object that is interested in the action
  * @return {String} a valid css string for the cursor
  */
 export const skewCursorStyleHandler: ControlCursorCallback = (

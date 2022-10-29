@@ -30,8 +30,8 @@ export type ControlRenderer = (
  * @param {CanvasRenderingContext2D} ctx context to render on
  * @param {Number} left x coordinate where the control center should be
  * @param {Number} top y coordinate where the control center should be
- * @param {Object} styleOverride override for fabric.Object controls style
- * @param {fabric.Object} fabricObject the fabric object for which we are rendering controls
+ * @param {Object} styleOverride override for FabricObject controls style
+ * @param {FabricObject} fabricObject the fabric object for which we are rendering controls
  */
 export function renderCircleControl(
   this: Control,
@@ -91,8 +91,8 @@ export function renderCircleControl(
  * @param {CanvasRenderingContext2D} ctx context to render on
  * @param {Number} left x coordinate where the control center should be
  * @param {Number} top y coordinate where the control center should be
- * @param {Object} styleOverride override for fabric.Object controls style
- * @param {fabric.Object} fabricObject the fabric object for which we are rendering controls
+ * @param {Object} styleOverride override for FabricObject controls style
+ * @param {FabricObject} fabricObject the fabric object for which we are rendering controls
  */
 export function renderSquareControl(
   this: Control,
