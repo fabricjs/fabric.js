@@ -170,7 +170,7 @@
     return fabric.controlsUtils.getLocalPoint({ target, corner: 'test' }, originX, originY, point.x, point.y);
   }
 
-  QUnit.test('normalizePoint', function(assert) {
+  QUnit.test('getLocalPoint', function(assert) {
     var rect = new fabric.Rect(rectOptions),
         p,
         point = new fabric.Point(15, 20);
@@ -206,7 +206,7 @@
     assert.deepEqual(p, new fabric.Point(-20, -25));
   });
 
-  QUnit.test('toLocalPointRotated', function(assert) {
+  QUnit.test('getLocalPoint rotated', function(assert) {
     var rect = new fabric.Rect(rectOptions),
         p,
         point = new fabric.Point(15, 20);
