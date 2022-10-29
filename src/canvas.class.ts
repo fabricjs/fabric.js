@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { dragHandler, getActionFromCorner } from './controls';
+import { dragHandler, getActionFromCorner } from './controls/actions';
 import { Point } from './point.class';
 import { FabricObject } from './shapes/object.class';
 import { ModifierKey, Transform } from './typedefs';

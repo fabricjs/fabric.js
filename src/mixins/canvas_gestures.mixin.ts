@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { scalingEqually } from '../controls';
+import { scalingEqually } from '../controls/actions';
 
 (function (global) {
   var fabric = global.fabric,

@@ -1,8 +1,9 @@
-import type { TBBox, TDegree, TMat2D, TOriginX, TOriginY } from '../typedefs';
 import { iMatrix } from '../constants';
+import type { Control } from '../controls/control.class';
 import { Intersection } from '../intersection.class';
 import { IPoint, Point } from '../point.class';
 import { FabricObject } from '../shapes/object.class';
+import type { TBBox, TDegree, TMat2D, TOriginX, TOriginY } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { cos } from '../util/misc/cos';
 import {
@@ -15,9 +16,8 @@ import {
 } from '../util/misc/matrix';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { StaticCanvas, Canvas } from '../__types__';
+import { Canvas, StaticCanvas } from '../__types__';
 import { ObjectOrigin } from './object_origin.mixin';
-import type { Control } from '../controls';
 
 type TCornerPoint = {
   tl: Point;
