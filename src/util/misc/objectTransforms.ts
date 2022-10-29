@@ -1,15 +1,14 @@
 import { Point } from '../../point.class';
+import type { FabricObject } from '../../shapes/object.class';
 import { TMat2D } from '../../typedefs';
 import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
+import type { TComposeMatrixArgs, TScaleMatrixArgs } from './matrix';
 import {
+  calcDimensionsMatrix,
   invertTransform,
   multiplyTransformMatrices,
   qrDecompose,
-  calcDimensionsMatrix,
 } from './matrix';
-import type { TComposeMatrixArgs, TScaleMatrixArgs } from './matrix';
-
-type FabricObject = any;
 
 /**
  * given an object and a transform, apply the inverse transform to the object,
@@ -92,9 +91,7 @@ export const resetObjectTransform = (target: FabricObject) => {
  * @param  {fabric.Object} target object to read from
  * @return {Object} Components of transform
  */
-export const saveObjectTransform = (
-  target: FabricObject
-): TComposeMatrixArgs & { left: number; top: number } => ({
+export const saveObjectTransform = (target: FabricObject) => ({
   scaleX: target.scaleX,
   scaleY: target.scaleY,
   skewX: target.skewX,
