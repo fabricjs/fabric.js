@@ -84,15 +84,13 @@ function skewObject(
   }: Transform & { skewingSide: 1 | -1 },
   pointer: Point
 ) {
-  const { skew: skewKey, flip: flipKey } = AXIS_KEYS[axis],
+  const { skew: skewKey } = AXIS_KEYS[axis],
     offset = pointer
       .subtract(new Point(ex, ey))
       .divide(new Point(target.scaleX, target.scaleY))[axis],
     skewingBefore = target[skewKey],
     skewingStart = transform[skewKey],
     shearingStart = Math.tan(degreesToRadians(skewingStart)),
-    flipFactor = target[flipKey] ? -1 : 1,
-    offsetFactor = skewingSide * flipFactor,
     // let a, b be the size of target
     // let a' be the value of a after applying skewing
     // then:
@@ -112,7 +110,7 @@ function skewObject(
           }).y;
 
   const shearing =
-    (2 * offset * offsetFactor) /
+    (2 * offset * skewingSide) /
       // we max out fractions to safeguard from asymptotic behavior
       Math.max(b, 1) +
     // add starting state
@@ -159,6 +157,7 @@ function skewHandler(
       origin: originKey,
       lockSkewing: lockSkewingKey,
       skew: skewKey,
+      flip: flipKey,
     } = AXIS_KEYS[axis];
   if (target[lockSkewingKey]) {
     return false;
@@ -166,13 +165,14 @@ function skewHandler(
 
   const { origin: counterOriginKey, flip: counterFlipKey } =
       AXIS_KEYS[counterAxis],
-    counterOriginFactor = resolveOrigin(transform[counterOriginKey]),
+    counterOriginFactor =
+      resolveOrigin(transform[counterOriginKey]) *
+      (target[counterFlipKey] ? -1 : 1),
     // if the counter origin is top/left (= -0.5) then we are skewing x/y values on the bottom/right side of target respectively.
     // if the counter origin is bottom/right (= 0.5) then we are skewing x/y values on the top/left side of target respectively.
     // skewing direction on the top/left side of target is OPPOSITE to the direction of the movement of the pointer,
     // so we factor skewing direction by this value.
-    skewingSide =
-      -Math.sign(counterOriginFactor) * (target[counterFlipKey] ? -1 : 1),
+    skewingSide = -Math.sign(counterOriginFactor) * (target[flipKey] ? -1 : 1),
     skewingDirection =
       ((target[skewKey] === 0 &&
         // in case skewing equals 0 we use the pointer offset from target center to determine the direction of skewing
