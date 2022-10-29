@@ -289,13 +289,10 @@ export class Control {
     fabricObject: FabricObject,
     currentControl: Control
   ) {
-    return (
-      new Point(this.x, this.y)
-        .multiply(dim)
-        .add(new Point(this.offsetX, this.offsetY))
-        .transform(finalMatrix),
-      finalMatrix
-    );
+    return new Point(this.x, this.y)
+      .multiply(dim)
+      .add(new Point(this.offsetX, this.offsetY))
+      .transform(finalMatrix);
   }
 
   /**
