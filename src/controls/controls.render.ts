@@ -61,7 +61,7 @@ export function renderCircleControl(
   ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor || '';
   ctx.strokeStyle =
     styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || '';
-  // TODO: as soon as fabric react v5, remove ie11, use proper ellipse code.
+  // TODO: use proper ellipse code.
   if (xSize > ySize) {
     size = xSize;
     ctx.scale(1.0, ySize / xSize);
