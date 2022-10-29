@@ -111,12 +111,14 @@ FabricObject.prototype.controls = {
   ...defaultControls,
 };
 
-// this is breaking the prototype inheritance, no time / ideas to fix it.
-// is important to document that if you want to have all objects to have a
-// specific custom control, you have to add it to Object prototype and to Textbox
-// prototype. The controls are shared as references. So changes to control `tr`
-// can still apply to all objects if needed.
-fabric.Textbox.prototype.controls = {
-  ...(fabric.Textbox.prototype.controls || {}),
-  ...textboxDefaultControls,
-};
+if (fabric.Textbox) {
+  // this is breaking the prototype inheritance, no time / ideas to fix it.
+  // is important to document that if you want to have all objects to have a
+  // specific custom control, you have to add it to Object prototype and to Textbox
+  // prototype. The controls are shared as references. So changes to control `tr`
+  // can still apply to all objects if needed.
+  fabric.Textbox.prototype.controls = {
+    ...(fabric.Textbox.prototype.controls || {}),
+    ...textboxDefaultControls,
+  };
+}
