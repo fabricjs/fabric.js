@@ -81,6 +81,32 @@ export function findCornerQuadrant(
 }
 
 /**
+ * @returns the normalized point (rotated relative to center) in local coordinates
+ */
+function normalizePoint(
+  target: FabricObject,
+  point: Point,
+  originX: TOriginX,
+  originY: TOriginY
+): Point {
+  const center = target.getRelativeCenterPoint(),
+    p =
+      typeof originX !== 'undefined' && typeof originY !== 'undefined'
+        ? target.translateToGivenOrigin(
+            center,
+            'center',
+            'center',
+            originX,
+            originY
+          )
+        : new Point(target.left, target.top),
+    p2 = target.angle
+      ? point.rotate(-degreesToRadians(target.angle), center)
+      : point;
+  return p2.subtract(p);
+}
+
+/**
  * Transforms a point to the offset from the given origin
  * @param {Object} transform
  * @param {String} originX
@@ -99,22 +125,7 @@ export function getLocalPoint(
   const control = target.controls[corner],
     zoom = target.canvas?.getZoom() || 1,
     padding = target.padding / zoom,
-    center = target.getRelativeCenterPoint(),
-    point = new Point(x, y),
-    p =
-      typeof originX !== 'undefined' && typeof originY !== 'undefined'
-        ? target.translateToGivenOrigin(
-            center,
-            'center',
-            'center',
-            originX,
-            originY
-          )
-        : new Point(target.left, target.top),
-    p2 = target.angle
-      ? point.rotate(-degreesToRadians(target.angle), center)
-      : point,
-    localPoint = p2.subtract(p);
+    localPoint = normalizePoint(target, new Point(x, y), originX, originY);
   if (localPoint.x >= padding) {
     localPoint.x -= padding;
   }
