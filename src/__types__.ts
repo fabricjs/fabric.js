@@ -6,6 +6,8 @@ import { ModifierKey } from './typedefs';
 export type Shadow = any;
 export type Canvas = StaticCanvas & {
   altActionKey: ModifierKey;
+  uniScaleKey: ModifierKey;
+  uniformScaling: boolean;
 } & Record<string, unknown>;
 export type StaticCanvas = Record<string, unknown>;
 export type Rect = any;

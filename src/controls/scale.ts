@@ -6,6 +6,7 @@ import {
   Transform,
   TransformActionHandler,
 } from '../typedefs';
+import { Canvas } from '../__types__';
 import {
   findCornerQuadrant,
   getLocalPoint,
@@ -16,25 +17,32 @@ import {
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 
+type ScaleTransform = Transform & {
+  gestureScale?: number;
+  signX?: number;
+  signY?: number;
+};
+
+type ScaleBy = TAxis | 'equally' | '' | undefined;
+
 /**
  * Inspect event and fabricObject properties to understand if the scaling action
  * @param {Event} eventData from the user action
  * @param {fabric.Object} fabricObject the fabric object about to scale
  * @return {Boolean} true if scale is proportional
  */
-
 export function scaleIsProportional(
   eventData: TPointerEvent,
   fabricObject: FabricObject
-) {
-  const { canvas } = fabricObject,
-    { uniScaleKey } = canvas,
-    uniformIsToggled = eventData[uniScaleKey];
+): boolean {
+  const canvas = fabricObject.canvas as Canvas,
+    uniformIsToggled = eventData[canvas.uniScaleKey];
   return (
     (canvas.uniformScaling && !uniformIsToggled) ||
     (!canvas.uniformScaling && uniformIsToggled)
   );
 }
+
 /**
  * Inspect fabricObject to understand if the current scaling action is allowed
  * @param {fabric.Object} fabricObject the fabric object about to scale
@@ -42,10 +50,9 @@ export function scaleIsProportional(
  * @param {Boolean} scaleProportionally true if we are trying to scale proportionally
  * @return {Boolean} true if scaling is not allowed at current conditions
  */
-
 export function scalingIsForbidden(
   fabricObject: FabricObject,
-  by: TAxis | '',
+  by: ScaleBy,
   scaleProportionally: boolean
 ) {
   const lockX = fabricObject.lockScalingX,
@@ -107,26 +114,25 @@ export const scaleCursorStyleHandler: ControlCursorCallback = (
  */
 function scaleObject(
   eventData: TPointerEvent,
-  transform: Transform,
+  transform: ScaleTransform,
   x: number,
   y: number,
-  options: { by?: TAxis | 'equally' | '' } = {}
+  options: { by?: ScaleBy } = {}
 ) {
   const target = transform.target,
     lockScalingX = target.lockScalingX,
     lockScalingY = target.lockScalingY,
     by = options.by,
     scaleProportionally = scaleIsProportional(eventData, target),
-    forbidScaling = scalingIsForbidden(target, by, scaleProportionally),
-    gestureScale = transform.gestureScale;
+    forbidScaling = scalingIsForbidden(target, by, scaleProportionally);
   let newPoint, scaleX, scaleY, dim, signX, signY;
 
   if (forbidScaling) {
     return false;
   }
-  if (gestureScale) {
-    scaleX = transform.scaleX * gestureScale;
-    scaleY = transform.scaleY * gestureScale;
+  if (transform.gestureScale) {
+    scaleX = transform.scaleX * transform.gestureScale;
+    scaleY = transform.scaleY * transform.gestureScale;
   } else {
     newPoint = getLocalPoint(
       transform,
@@ -161,7 +167,7 @@ function scaleObject(
     if (scaleProportionally && !by) {
       // uniform scaling
       const distance = Math.abs(newPoint.x) + Math.abs(newPoint.y),
-        original = transform.original,
+        { original } = transform,
         originalDistance =
           Math.abs((dim.x * original.scaleX) / target.scaleX) +
           Math.abs((dim.y * original.scaleY) / target.scaleY),
@@ -211,7 +217,7 @@ function scaleObject(
  * @param {number} y current mouse y position, canvas normalized
  * @return {Boolean} true if some change happened
  */
-export const scaleObjectFromCorner: TransformActionHandler = (
+export const scaleObjectFromCorner: TransformActionHandler<ScaleTransform> = (
   eventData,
   transform,
   x,
@@ -229,7 +235,12 @@ export const scaleObjectFromCorner: TransformActionHandler = (
  * @param {number} y current mouse y position, canvas normalized
  * @return {Boolean} true if some change happened
  */
-const scaleObjectX: TransformActionHandler = (eventData, transform, x, y) => {
+const scaleObjectX: TransformActionHandler<ScaleTransform> = (
+  eventData,
+  transform,
+  x,
+  y
+) => {
   return scaleObject(eventData, transform, x, y, { by: 'x' });
 };
 
@@ -242,7 +253,12 @@ const scaleObjectX: TransformActionHandler = (eventData, transform, x, y) => {
  * @param {number} y current mouse y position, canvas normalized
  * @return {Boolean} true if some change happened
  */
-const scaleObjectY: TransformActionHandler = (eventData, transform, x, y) => {
+const scaleObjectY: TransformActionHandler<ScaleTransform> = (
+  eventData,
+  transform,
+  x,
+  y
+) => {
   return scaleObject(eventData, transform, x, y, { by: 'y' });
 };
 
