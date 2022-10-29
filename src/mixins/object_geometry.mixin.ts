@@ -1,4 +1,11 @@
-import type { TBBox, TCornerPoint, TDegree, TMat2D, TOriginX, TOriginY } from '../typedefs';
+import type {
+  TBBox,
+  TCornerPoint,
+  TDegree,
+  TMat2D,
+  TOriginX,
+  TOriginY,
+} from '../typedefs';
 import { iMatrix } from '../constants';
 import { Intersection } from '../intersection.class';
 import { Point } from '../point.class';

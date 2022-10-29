@@ -2,7 +2,11 @@ import { IPoint, Point } from '../point.class';
 import type { TCornerPoint, TMat2D } from '../typedefs';
 import { FabricObject } from '../shapes/object.class';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { calcRotateMatrix, multiplyTransformMatrices, qrDecompose } from '../util/misc/matrix';
+import {
+  calcRotateMatrix,
+  multiplyTransformMatrices,
+  qrDecompose,
+} from '../util/misc/matrix';
 import { fabric } from '../../HEADER';
 import { ObjectGeometry } from './object_geometry.mixin';
 
@@ -12,8 +16,6 @@ type TOCoord = IPoint & {
 };
 
 export class InteractiveFabricObject extends FabricObject {
-
-
   /**
    * Describe object's corner position in canvas element coordinates.
    * properties are depending on control keys and padding the main controls.
@@ -42,7 +44,7 @@ export class InteractiveFabricObject extends FabricObject {
    * this was left when controls were introduced to do not brea the api too much
    * this takes priority over the generic control visibility
    */
-  _controlsVisibility: Record<string, boolean>
+  _controlsVisibility: Record<string, boolean>;
 
   /**
    * Constructor
@@ -61,7 +63,6 @@ export class InteractiveFabricObject extends FabricObject {
       this.setOptions(options);
     }
   }
-
 
   /**
    * Determines which corner has been clicked
@@ -142,9 +143,11 @@ export class InteractiveFabricObject extends FabricObject {
       dim = this._calculateCurrentDimensions(transformOptions),
       coords: Record<string, TOCoord> = {};
 
-    this.forEachControl((control: any, key: string, fabricObject: InteractiveFabricObject) => {
-      coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
-    });
+    this.forEachControl(
+      (control: any, key: string, fabricObject: InteractiveFabricObject) => {
+        coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
+      }
+    );
 
     // debug code
     /*
@@ -186,7 +189,9 @@ export class InteractiveFabricObject extends FabricObject {
    * with the control, the control's key and the object that is calling the iterator
    * @param {Function} fn function to iterate over the controls over
    */
-  forEachControl(fn: (arg0: any, arg1: string, arg2: InteractiveFabricObject) => any) {
+  forEachControl(
+    fn: (arg0: any, arg1: string, arg2: InteractiveFabricObject) => any
+  ) {
     for (const i in this.controls) {
       fn(this.controls[i], i, this);
     }
@@ -264,12 +269,16 @@ export class InteractiveFabricObject extends FabricObject {
    * @param {Point} size
    * @param {Object} styleOverride object to override the object style
    */
-  _drawBorders(ctx: CanvasRenderingContext2D, size: Point, styleOverride: Record<string, any> = {}): void {
+  _drawBorders(
+    ctx: CanvasRenderingContext2D,
+    size: Point,
+    styleOverride: Record<string, any> = {}
+  ): void {
     const options = {
       hasControls: this.hasControls,
       borderColor: this.borderColor,
       borderDashArray: this.borderDashArray,
-      ...styleOverride
+      ...styleOverride,
     };
     ctx.save();
     ctx.strokeStyle = options.borderColor;
@@ -287,7 +296,11 @@ export class InteractiveFabricObject extends FabricObject {
    * @param {object} options object representing current object parameters
    * @param {Object} [styleOverride] object to override the object style
    */
-  drawBorders(ctx: CanvasRenderingContext2D, options: any, styleOverride: any): void {
+  drawBorders(
+    ctx: CanvasRenderingContext2D,
+    options: any,
+    styleOverride: any
+  ): void {
     let size;
     if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
       const bbox = fabric.util.sizeAfterTransform(
@@ -316,17 +329,17 @@ export class InteractiveFabricObject extends FabricObject {
    * @param {CanvasRenderingContext2D} ctx Context to draw on
    * @param {Point} size object size x = width, y = height
    */
-  drawControlsConnectingLines(ctx: CanvasRenderingContext2D, size: Point): void {
+  drawControlsConnectingLines(
+    ctx: CanvasRenderingContext2D,
+    size: Point
+  ): void {
     let shouldStroke = false;
 
     ctx.beginPath();
     this.forEachControl(function (control, key, fabricObject) {
       // in this moment, the ctx is centered on the object.
       // width and height of the above function are the size of the bbox.
-      if (
-        control.withConnection &&
-        control.getVisibility(fabricObject, key)
-      ) {
+      if (control.withConnection && control.getVisibility(fabricObject, key)) {
         // reset movement for each control
         shouldStroke = true;
         ctx.moveTo(control.x * size.x, control.y * size.y);
@@ -355,7 +368,7 @@ export class InteractiveFabricObject extends FabricObject {
       cornerDashArray,
       cornerColor,
       ...styleOverride,
-    }
+    };
     ctx.setTransform(retinaScaling, 0, 0, retinaScaling, 0, 0);
     ctx.strokeStyle = ctx.fillStyle = options.cornerColor;
     if (!this.transparentCorners) {
@@ -406,7 +419,9 @@ export class InteractiveFabricObject extends FabricObject {
    * example: {Boolean} [options.bl] true to enable the bottom-left control, false to disable it
    */
   setControlsVisibility(options: Record<string, boolean> = {}) {
-    Object.entries(options).forEach(([controlKey, visibility]) => this.setControlVisible(controlKey, visibility));
+    Object.entries(options).forEach(([controlKey, visibility]) =>
+      this.setControlVisible(controlKey, visibility)
+    );
   }
 
   /**
@@ -419,7 +434,9 @@ export class InteractiveFabricObject extends FabricObject {
    * @return {CanvasRenderingContext2D|undefined} canvas.contextTop that is either still transformed
    * with the object transformMatrix, or restored to neutral transform
    */
-  clearContextTop(restoreManually: boolean): CanvasRenderingContext2D | undefined {
+  clearContextTop(
+    restoreManually: boolean
+  ): CanvasRenderingContext2D | undefined {
     if (!this.canvas) {
       return;
     }
@@ -432,7 +449,8 @@ export class InteractiveFabricObject extends FabricObject {
     ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
     this.transform(ctx);
     // we add 4 pixel, to be sure to do not leave any pixel out
-    const width = this.width + 4, height = this.height + 4;
+    const width = this.width + 4,
+      height = this.height + 4;
     ctx.clearRect(-width / 2, -height / 2, width, height);
 
     restoreManually || ctx.restore();
