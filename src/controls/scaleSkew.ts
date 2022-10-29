@@ -6,11 +6,12 @@ import {
   TPointerEvent,
   TransformAction,
 } from '../typedefs';
+import { Canvas } from '../__types__';
 import { scaleCursorStyleHandler, scalingX, scalingY } from './scale';
 import { skewCursorStyleHandler, skewHandlerX, skewHandlerY } from './skew';
 
 function isAltAction(eventData: TPointerEvent, target: FabricObject) {
-  return eventData[target.canvas?.altActionKey];
+  return eventData[(target.canvas as Canvas)?.altActionKey];
 }
 
 /**
@@ -46,10 +47,9 @@ export const scaleSkewCursorStyleHandler: ControlCursorCallback = (
   control,
   fabricObject
 ) => {
-  if (isAltAction(eventData, fabricObject)) {
-    return skewCursorStyleHandler(eventData, control, fabricObject);
-  }
-  return scaleCursorStyleHandler(eventData, control, fabricObject);
+  return isAltAction(eventData, fabricObject)
+    ? skewCursorStyleHandler(eventData, control, fabricObject)
+    : scaleCursorStyleHandler(eventData, control, fabricObject);
 };
 /**
  * Composed action handler to either scale X or skew Y
@@ -66,10 +66,9 @@ export const scalingXOrSkewingY: TransformAction = (
   x,
   y
 ) => {
-  if (isAltAction(eventData, transform.target)) {
-    return skewHandlerY(eventData, transform, x, y);
-  }
-  return scalingX(eventData, transform, x, y);
+  return isAltAction(eventData, transform.target)
+    ? skewHandlerY(eventData, transform, x, y)
+    : scalingX(eventData, transform, x, y);
 };
 
 /**
@@ -87,8 +86,7 @@ export const scalingYOrSkewingX: TransformAction = (
   x,
   y
 ) => {
-  if (isAltAction(eventData, transform.target)) {
-    return skewHandlerX(eventData, transform, x, y);
-  }
-  return scalingY(eventData, transform, x, y);
+  return isAltAction(eventData, transform.target)
+    ? skewHandlerX(eventData, transform, x, y)
+    : scalingY(eventData, transform, x, y);
 };

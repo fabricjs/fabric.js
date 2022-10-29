@@ -170,7 +170,7 @@ import { Transform } from './typedefs';
        * If `null` or 'none' or any other string that is not a modifier key
        * feature is disabled feature disabled.
        * @since 1.6.2
-       * @type String
+       * @type ModifierKey
        * @default
        */
       centeredKey: 'altKey',
@@ -181,7 +181,7 @@ import { Transform } from './typedefs';
        * If `null` or 'none' or any other string that is not a modifier key
        * feature is disabled feature disabled.
        * @since 1.6.2
-       * @type String
+       * @type ModifierKey
        * @default
        */
       altActionKey: 'shiftKey',
@@ -207,7 +207,7 @@ import { Transform } from './typedefs';
        * If `null` or empty or containing any other string that is not a modifier key
        * feature is disabled.
        * @since 1.6.2
-       * @type String|Array
+       * @type ModifierKey|ModifierKey[]
        * @default
        */
       selectionKey: 'shiftKey',
@@ -221,7 +221,7 @@ import { Transform } from './typedefs';
        * If `null` or 'none' or any other string that is not a modifier key
        * feature is disabled.
        * @since 1.6.5
-       * @type null|String
+       * @type null|ModifierKey
        * @default
        */
       altSelectionKey: null,
