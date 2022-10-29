@@ -9,6 +9,7 @@ import {
   scalingEqually,
   scalingXOrSkewingY,
   scalingYOrSkewingX,
+  scaleSkewCursorStyleHandler,
 } from './actions';
 import { Control } from './control.class';
 
@@ -19,7 +20,7 @@ import { Control } from './control.class';
   objectControls.ml = new Control({
     x: -0.5,
     y: 0,
-    cursorStyleHandler: scaleSkewStyleHandler,
+    cursorStyleHandler: scaleSkewCursorStyleHandler,
     actionHandler: scalingXOrSkewingY,
     getActionName: scaleOrSkewActionName,
   });
@@ -27,7 +28,7 @@ import { Control } from './control.class';
   objectControls.mr = new Control({
     x: 0.5,
     y: 0,
-    cursorStyleHandler: scaleSkewStyleHandler,
+    cursorStyleHandler: scaleSkewCursorStyleHandler,
     actionHandler: scalingXOrSkewingY,
     getActionName: scaleOrSkewActionName,
   });
@@ -35,7 +36,7 @@ import { Control } from './control.class';
   objectControls.mb = new Control({
     x: 0,
     y: 0.5,
-    cursorStyleHandler: scaleSkewStyleHandler,
+    cursorStyleHandler: scaleSkewCursorStyleHandler,
     actionHandler: scalingYOrSkewingX,
     getActionName: scaleOrSkewActionName,
   });
@@ -43,7 +44,7 @@ import { Control } from './control.class';
   objectControls.mt = new Control({
     x: 0,
     y: -0.5,
-    cursorStyleHandler: scaleSkewStyleHandler,
+    cursorStyleHandler: scaleSkewCursorStyleHandler,
     actionHandler: scalingYOrSkewingX,
     getActionName: scaleOrSkewActionName,
   });
@@ -106,7 +107,7 @@ import { Control } from './control.class';
       x: 0.5,
       y: 0,
       actionHandler: changeWidth,
-      cursorStyleHandler: scaleSkewStyleHandler,
+      cursorStyleHandler: scaleSkewCursorStyleHandler,
       actionName: 'resizing',
     });
 
@@ -114,7 +115,7 @@ import { Control } from './control.class';
       x: -0.5,
       y: 0,
       actionHandler: changeWidth,
-      cursorStyleHandler: scaleSkewStyleHandler,
+      cursorStyleHandler: scaleSkewCursorStyleHandler,
       actionName: 'resizing',
     });
   }
