@@ -14,8 +14,13 @@ function printSize(a, b) {
   return `${b} (${Math.sign(diff) > 0 ? '+' : ''}${diff})`;
 }
 
+function round(value, fractionDigits) {
+  const pow = Math.pow(fractionDigits);
+  return Math.round((value + Number.EPSILON) * pow) / pow;
+}
+
 function printSizeByte(a, b) {
-  return printSize(Math.round(a / 1024), Math.round(b / 1024));
+  return printSize(round(a / 1024, 3), round(b / 1024, 3));
 }
 
 export async function findCommentId(github, context) {
