@@ -1,18 +1,22 @@
 //@ts-nocheck
+
 import { FabricObject } from '../shapes/object.class';
+import {
+  changeWidth,
+  rotationStyleHandler,
+  rotationWithSnapping,
+  scaleOrSkewActionName,
+  scalingEqually,
+  scalingXOrSkewingY,
+  scalingYOrSkewingX,
+} from './actions';
+import { Control } from './control.class';
 
 (function (global) {
   var fabric = global.fabric,
-    controlsUtils = fabric.controlsUtils,
-    scaleSkewStyleHandler = controlsUtils.scaleSkewCursorStyleHandler,
-    scaleStyleHandler = controlsUtils.scaleCursorStyleHandler,
-    scalingEqually = controlsUtils.scalingEqually,
-    scalingYOrSkewingX = controlsUtils.scalingYOrSkewingX,
-    scalingXOrSkewingY = controlsUtils.scalingXOrSkewingY,
-    scaleOrSkewActionName = controlsUtils.scaleOrSkewActionName,
     objectControls = FabricObject.prototype.controls;
 
-  objectControls.ml = new fabric.Control({
+  objectControls.ml = new Control({
     x: -0.5,
     y: 0,
     cursorStyleHandler: scaleSkewStyleHandler,
@@ -20,7 +24,7 @@ import { FabricObject } from '../shapes/object.class';
     getActionName: scaleOrSkewActionName,
   });
 
-  objectControls.mr = new fabric.Control({
+  objectControls.mr = new Control({
     x: 0.5,
     y: 0,
     cursorStyleHandler: scaleSkewStyleHandler,
@@ -28,7 +32,7 @@ import { FabricObject } from '../shapes/object.class';
     getActionName: scaleOrSkewActionName,
   });
 
-  objectControls.mb = new fabric.Control({
+  objectControls.mb = new Control({
     x: 0,
     y: 0.5,
     cursorStyleHandler: scaleSkewStyleHandler,
@@ -36,7 +40,7 @@ import { FabricObject } from '../shapes/object.class';
     getActionName: scaleOrSkewActionName,
   });
 
-  objectControls.mt = new fabric.Control({
+  objectControls.mt = new Control({
     x: 0,
     y: -0.5,
     cursorStyleHandler: scaleSkewStyleHandler,
@@ -44,39 +48,39 @@ import { FabricObject } from '../shapes/object.class';
     getActionName: scaleOrSkewActionName,
   });
 
-  objectControls.tl = new fabric.Control({
+  objectControls.tl = new Control({
     x: -0.5,
     y: -0.5,
     cursorStyleHandler: scaleStyleHandler,
     actionHandler: scalingEqually,
   });
 
-  objectControls.tr = new fabric.Control({
+  objectControls.tr = new Control({
     x: 0.5,
     y: -0.5,
     cursorStyleHandler: scaleStyleHandler,
     actionHandler: scalingEqually,
   });
 
-  objectControls.bl = new fabric.Control({
+  objectControls.bl = new Control({
     x: -0.5,
     y: 0.5,
     cursorStyleHandler: scaleStyleHandler,
     actionHandler: scalingEqually,
   });
 
-  objectControls.br = new fabric.Control({
+  objectControls.br = new Control({
     x: 0.5,
     y: 0.5,
     cursorStyleHandler: scaleStyleHandler,
     actionHandler: scalingEqually,
   });
 
-  objectControls.mtr = new fabric.Control({
+  objectControls.mtr = new Control({
     x: 0,
     y: -0.5,
-    actionHandler: controlsUtils.rotationWithSnapping,
-    cursorStyleHandler: controlsUtils.rotationStyleHandler,
+    actionHandler: rotationWithSnapping,
+    cursorStyleHandler: rotationStyleHandler,
     offsetY: -40,
     withConnection: true,
     actionName: 'rotate',
@@ -98,18 +102,18 @@ import { FabricObject } from '../shapes/object.class';
     textBoxControls.mt = objectControls.mt;
     textBoxControls.mb = objectControls.mb;
 
-    textBoxControls.mr = new fabric.Control({
+    textBoxControls.mr = new Control({
       x: 0.5,
       y: 0,
-      actionHandler: controlsUtils.changeWidth,
+      actionHandler: changeWidth,
       cursorStyleHandler: scaleSkewStyleHandler,
       actionName: 'resizing',
     });
 
-    textBoxControls.ml = new fabric.Control({
+    textBoxControls.ml = new Control({
       x: -0.5,
       y: 0,
-      actionHandler: controlsUtils.changeWidth,
+      actionHandler: changeWidth,
       cursorStyleHandler: scaleSkewStyleHandler,
       actionName: 'resizing',
     });

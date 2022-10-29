@@ -45,7 +45,10 @@ export {
   renderSquareControl,
 };
 
-fabric.controlUtils = {
+/**
+ * @todo remove as unused
+ */
+fabric.controlsUtils = {
   scaleCursorStyleHandler,
   skewCursorStyleHandler,
   scaleSkewCursorStyleHandler,

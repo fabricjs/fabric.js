@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { getActionFromCorner } from './controls/util';
+import { dragHandler, getActionFromCorner } from './controls';
 import { Point } from './point.class';
 import { FabricObject } from './shapes/object.class';
 import { ModifierKey, Transform } from './typedefs';
@@ -762,7 +762,7 @@ import { ModifierKey, Transform } from './typedefs';
           actionHandler =
             alreadySelected && corner
               ? control.getActionHandler(e, target, control)
-              : fabric.controlsUtils.dragHandler,
+              : dragHandler,
           action = getActionFromCorner(alreadySelected, corner, e, target),
           origin = this._getOriginFromCorner(target, corner),
           altKey = e[this.centeredKey],
