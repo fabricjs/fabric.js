@@ -1,3 +1,4 @@
+import type { Observable } from './mixins/observable.mixin';
 import { ModifierKey } from './typedefs';
 
 /**
@@ -11,6 +12,6 @@ export type Canvas = StaticCanvas & {
 } & Record<string, unknown>;
 export type StaticCanvas = Record<string, unknown> & {
   getZoom(): number;
-};
+} & Observable;
 export type Rect = any;
 export type TObject = any;
