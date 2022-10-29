@@ -1,4 +1,4 @@
-import type { TBBox, TDegree, TMat2D, TOriginX, TOriginY } from '../typedefs';
+import type { TBBox, TCornerPoint, TDegree, TMat2D, TOriginX, TOriginY } from '../typedefs';
 import { iMatrix } from '../constants';
 import { Intersection } from '../intersection.class';
 import { IPoint, Point } from '../point.class';
@@ -17,17 +17,6 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { Canvas } from '../__types__';
 import { ObjectOrigin } from './object_origin.mixin';
-
-type TCornerPoint = {
-  tl: Point;
-  tr: Point;
-  bl: Point;
-  br: Point;
-};
-
-type TOCoord = IPoint & {
-  corner: TCornerPoint;
-};
 
 type TLineDescriptor = {
   o: Point;
@@ -681,57 +670,6 @@ export class ObjectGeometry extends ObjectOrigin {
   }
 
   /**
-   * Calculates the coordinates of the center of each control plus the corners of the control itself
-   * This basically just delegates to each control positionHandler
-   * WARNING: changing what is passed to positionHandler is a breaking change, since position handler
-   * is a public api and should be done just if extremely necessary
-   * @todo needs to be moved to interactivity mixin
-   * @return {Record<string, TOCoord>}
-   */
-  calcOCoords(): Record<string, TOCoord> {
-    const vpt = this.getViewportTransform(),
-      center = this.getCenterPoint(),
-      tMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
-      rMatrix = calcRotateMatrix({
-        angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
-      }),
-      positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),
-      startMatrix = multiplyTransformMatrices(vpt, positionMatrix),
-      finalMatrix = multiplyTransformMatrices(startMatrix, [
-        1 / vpt[0],
-        0,
-        0,
-        1 / vpt[3],
-        0,
-        0,
-      ]),
-      transformOptions = this.group
-        ? qrDecompose(this.calcTransformMatrix())
-        : undefined,
-      dim = this._calculateCurrentDimensions(transformOptions),
-      coords: Record<string, TOCoord> = {};
-    // @ts-ignore
-    this.forEachControl((control, key, fabricObject) => {
-      coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
-    });
-
-    // debug code
-    /*
-    const canvas = this.canvas;
-    setTimeout(function () {
-    if (!canvas) return;
-      canvas.contextTop.clearRect(0, 0, 700, 700);
-      canvas.contextTop.fillStyle = 'green';
-      Object.keys(coords).forEach(function(key) {
-        const control = coords[key];
-        canvas.contextTop.fillRect(control.x, control.y, 3, 3);
-      });
-    } 50);
-  */
-    return coords;
-  }
-
-  /**
    * Calculates the coordinates of the 4 corner of the bbox, in absolute coordinates.
    * those never change with zoom or viewport changes.
    * @return {TCornerPoint}
@@ -763,17 +701,11 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Boolean} [skipCorners] skip calculation of oCoords.
    * @return {void}
    */
-  setCoords(skipCorners = false): void {
+  setCoords(): void {
     this.aCoords = this.calcACoords();
     // in case we are in a group, for how the inner group target check works,
     // lineCoords are exactly aCoords. Since the vpt gets absorbed by the normalized pointer.
     this.lineCoords = this.group ? this.aCoords : this.calcLineCoords();
-    if (!skipCorners) {
-      // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-      this.oCoords = this.calcOCoords();
-      // @ts-ignore
-      this._setCornerCoords && this._setCornerCoords();
-    }
   }
 
   transformMatrixKey(skipGroup = false): string {

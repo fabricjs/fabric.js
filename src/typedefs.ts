@@ -1,6 +1,7 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
 import type { Gradient } from './gradient/gradient.class';
 import type { Pattern } from './pattern.class';
+import type { Point } from './point.class';
 
 interface NominalTag<T> {
   nominalTag?: T;
@@ -93,3 +94,10 @@ export type TCrossOrigin = '' | 'anonymous' | 'use-credentials' | null;
 
 export type TOriginX = 'center' | 'left' | 'right' | number;
 export type TOriginY = 'center' | 'top' | 'bottom' | number;
+
+export type TCornerPoint = {
+  tl: Point;
+  tr: Point;
+  bl: Point;
+  br: Point;
+};
