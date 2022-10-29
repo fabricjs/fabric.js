@@ -79,14 +79,15 @@ export type PathData = (string | number)[][];
 
 export type TPointerEvent = MouseEvent | TouchEvent;
 
-export type TransformAction<R = void> = (
+export type TransformAction<T extends Transform = Transform, R = void> = (
   eventData: TPointerEvent,
-  transform: Transform,
+  transform: T,
   x: number,
   y: number
 ) => R;
 
-export type TransformActionHandler = TransformAction<boolean>;
+export type TransformActionHandler<T extends Transform = Transform> =
+  TransformAction<T, boolean>;
 
 /**
  * relative to target's containing coordinate plane

@@ -1,4 +1,4 @@
-import { TransformActionHandler } from '../typedefs';
+import { Transform, TransformActionHandler } from '../typedefs';
 
 /**
  * Wrap an action handler with saving/restoring object position on the transform.
@@ -6,7 +6,9 @@ import { TransformActionHandler } from '../typedefs';
  * @param {Function} actionHandler the function to wrap
  * @return {Function} a function with an action handler signature
  */
-export function wrapWithFixedAnchor(actionHandler: TransformActionHandler) {
+export function wrapWithFixedAnchor<T extends Transform>(
+  actionHandler: TransformActionHandler<T>
+) {
   return ((eventData, transform, x, y) => {
     const { target, originX, originY } = transform,
       centerPoint = target.getRelativeCenterPoint(),
@@ -14,5 +16,5 @@ export function wrapWithFixedAnchor(actionHandler: TransformActionHandler) {
       actionPerformed = actionHandler(eventData, transform, x, y);
     target.setPositionByOrigin(constraint, originX, originY);
     return actionPerformed;
-  }) as TransformActionHandler;
+  }) as TransformActionHandler<T>;
 }

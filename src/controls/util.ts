@@ -49,7 +49,7 @@ export function invertOrigin(origin: TOriginX | TOriginY) {
   return -resolveOrigin(origin) + 0.5;
 }
 
-export const commonEventInfo: TransformAction<TransformEvent> = (
+export const commonEventInfo: TransformAction<Transform, TransformEvent> = (
   eventData,
   transform,
   x,

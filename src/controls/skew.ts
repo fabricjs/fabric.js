@@ -16,6 +16,8 @@ import { NOT_ALLOWED_CURSOR, findCornerQuadrant, getLocalPoint } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 
+export type SkewTransform = Transform & { skewingSide: -1 | 1 };
+
 const AXIS_KEYS: Record<
   TAxis,
   {
@@ -75,13 +77,7 @@ export function skewCursorStyleHandler(
  */
 function skewObject(
   axis: TAxis,
-  {
-    target,
-    ex,
-    ey,
-    skewingSide,
-    ...transform
-  }: Transform & { skewingSide: 1 | -1 },
+  { target, ex, ey, skewingSide, ...transform }: SkewTransform,
   pointer: Point
 ) {
   const { skew: skewKey } = AXIS_KEYS[axis],
@@ -172,7 +168,8 @@ function skewHandler(
     // if the counter origin is bottom/right (= 0.5) then we are skewing x/y values on the top/left side of target respectively.
     // skewing direction on the top/left side of target is OPPOSITE to the direction of the movement of the pointer,
     // so we factor skewing direction by this value.
-    skewingSide = -Math.sign(counterOriginFactor) * (target[flipKey] ? -1 : 1),
+    skewingSide = (-Math.sign(counterOriginFactor) *
+      (target[flipKey] ? -1 : 1)) as 1 | -1,
     skewingDirection =
       ((target[skewKey] === 0 &&
         // in case skewing equals 0 we use the pointer offset from target center to determine the direction of skewing
@@ -185,7 +182,7 @@ function skewHandler(
     // normalize value from [-1, 1] to origin value [0, 1]
     origin = -skewingDirection * 0.5 + 0.5;
 
-  const finalHandler = wrapWithFireEvent(
+  const finalHandler = wrapWithFireEvent<SkewTransform>(
     'skewing',
     wrapWithFixedAnchor((eventData, transform, x, y) =>
       skewObject(axis, transform, new Point(x, y))
