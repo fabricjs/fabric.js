@@ -1,7 +1,7 @@
 import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { Point } from '../point.class';
-import { type FabricObject } from '../shapes/object.class';
 import {
+  ControlCursorCallback,
   TAxis,
   TAxisKey,
   TPointerEvent,
@@ -12,7 +12,7 @@ import {
   degreesToRadians,
   radiansToDegrees,
 } from '../util/misc/radiansDegreesConversion';
-import { NOT_ALLOWED_CURSOR, findCornerQuadrant, getLocalPoint } from './util';
+import { findCornerQuadrant, getLocalPoint, NOT_ALLOWED_CURSOR } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 
@@ -56,11 +56,11 @@ const skewMap = ['ns', 'nesw', 'ew', 'nwse'];
  * @param {fabric.Object} fabricObject the fabric object that is interested in the action
  * @return {String} a valid css string for the cursor
  */
-export function skewCursorStyleHandler(
+export const skewCursorStyleHandler: ControlCursorCallback = (
   eventData,
   control,
-  fabricObject: FabricObject
-) {
+  fabricObject
+) => {
   if (control.x !== 0 && fabricObject.lockSkewingY) {
     return NOT_ALLOWED_CURSOR;
   }
@@ -68,8 +68,8 @@ export function skewCursorStyleHandler(
     return NOT_ALLOWED_CURSOR;
   }
   const n = findCornerQuadrant(fabricObject, control) % 4;
-  return skewMap[n] + '-resize';
-}
+  return `${skewMap[n]}-resize`;
+};
 
 /**
  * Since skewing is applied before scaling, calculations are done in a scaleless plane

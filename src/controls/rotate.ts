@@ -1,4 +1,4 @@
-import { TransformActionHandler } from '../typedefs';
+import { ControlCursorCallback, TransformActionHandler } from '../typedefs';
 import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
 import { NOT_ALLOWED_CURSOR } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
@@ -12,12 +12,16 @@ import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
  * @param {fabric.Object} fabricObject the fabric object that is interested in the action
  * @return {String} a valid css string for the cursor
  */
-export function rotationStyleHandler(eventData, control, fabricObject) {
+export const rotationStyleHandler: ControlCursorCallback = (
+  eventData,
+  control,
+  fabricObject
+) => {
   if (fabricObject.lockRotation) {
     return NOT_ALLOWED_CURSOR;
   }
   return control.cursorStyle;
-}
+};
 
 /**
  * Action handler for rotation and snapping, without anchor point.

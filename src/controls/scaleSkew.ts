@@ -1,7 +1,15 @@
+import type { FabricObject } from '../shapes/object.class';
+import {
+  ControlCallback,
+  ControlCursorCallback,
+  TAxisKey,
+  TPointerEvent,
+  TransformAction,
+} from '../typedefs';
 import { scaleCursorStyleHandler, scalingX, scalingY } from './scale';
 import { skewCursorStyleHandler, skewHandlerX, skewHandlerY } from './skew';
 
-function isAltAction(eventData, target) {
+function isAltAction(eventData: TPointerEvent, target: FabricObject) {
   return eventData[target.canvas?.altActionKey];
 }
 
@@ -12,8 +20,10 @@ function isAltAction(eventData, target) {
  * @param {fabric.Object} fabricObject the fabric object that is interested in the action
  * @return {String} an action name
  */
-export function scaleOrSkewActionName(eventData, control, fabricObject) {
-  const isAlternative = eventData[fabricObject.canvas.altActionKey];
+export const scaleOrSkewActionName: ControlCallback<
+  TAxisKey<'skew' | 'scale'> | undefined
+> = (eventData, control, fabricObject) => {
+  const isAlternative = isAltAction(eventData, fabricObject);
   if (control.x === 0) {
     // then is scaleY or skewX
     return isAlternative ? 'skewX' : 'scaleY';
@@ -22,7 +32,7 @@ export function scaleOrSkewActionName(eventData, control, fabricObject) {
     // then is scaleY or skewX
     return isAlternative ? 'skewY' : 'scaleX';
   }
-}
+};
 
 /**
  * Combine skew and scale style handlers to cover fabric standard use case
@@ -31,12 +41,16 @@ export function scaleOrSkewActionName(eventData, control, fabricObject) {
  * @param {fabric.Object} fabricObject the fabric object that is interested in the action
  * @return {String} a valid css string for the cursor
  */
-export function scaleSkewCursorStyleHandler(eventData, control, fabricObject) {
-  if (eventData[fabricObject.canvas.altActionKey]) {
+export const scaleSkewCursorStyleHandler: ControlCursorCallback = (
+  eventData,
+  control,
+  fabricObject
+) => {
+  if (isAltAction(eventData, fabricObject)) {
     return skewCursorStyleHandler(eventData, control, fabricObject);
   }
   return scaleCursorStyleHandler(eventData, control, fabricObject);
-}
+};
 /**
  * Composed action handler to either scale X or skew Y
  * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
@@ -46,12 +60,17 @@ export function scaleSkewCursorStyleHandler(eventData, control, fabricObject) {
  * @param {number} y current mouse y position, canvas normalized
  * @return {Boolean} true if some change happened
  */
-export function scalingXOrSkewingY(eventData, transform, x, y) {
+export const scalingXOrSkewingY: TransformAction = (
+  eventData,
+  transform,
+  x,
+  y
+) => {
   if (isAltAction(eventData, transform.target)) {
     return skewHandlerY(eventData, transform, x, y);
   }
   return scalingX(eventData, transform, x, y);
-}
+};
 
 /**
  * Composed action handler to either scale Y or skew X
@@ -62,9 +81,14 @@ export function scalingXOrSkewingY(eventData, transform, x, y) {
  * @param {number} y current mouse y position, canvas normalized
  * @return {Boolean} true if some change happened
  */
-export function scalingYOrSkewingX(eventData, transform, x, y) {
+export const scalingYOrSkewingX: TransformAction = (
+  eventData,
+  transform,
+  x,
+  y
+) => {
   if (isAltAction(eventData, transform.target)) {
     return skewHandlerX(eventData, transform, x, y);
   }
   return scalingY(eventData, transform, x, y);
-}
+};

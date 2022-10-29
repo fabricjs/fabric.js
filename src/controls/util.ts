@@ -13,6 +13,7 @@ import {
   degreesToRadians,
   radiansToDegrees,
 } from '../util/misc/radiansDegreesConversion';
+import type { Control } from './control.class';
 
 export const NOT_ALLOWED_CURSOR = 'not-allowed';
 
@@ -69,7 +70,10 @@ export const commonEventInfo: TransformAction<Transform, TransformEvent> = (
  * @param {fabric.Control} control the control class
  * @return {Number} 0 - 7 a quadrant number
  */
-export function findCornerQuadrant(fabricObject: FabricObject, control) {
+export function findCornerQuadrant(
+  fabricObject: FabricObject,
+  control: Control
+) {
   //  angle is relative to canvas plane
   const angle = fabricObject.getTotalAngle(),
     cornerAngle =

@@ -1,4 +1,5 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
+import type { Control } from './controls/control.class';
 import type { Gradient } from './gradient/gradient.class';
 import type { Pattern } from './pattern.class';
 import type { Point } from './point.class';
@@ -88,6 +89,14 @@ export type TransformAction<T extends Transform = Transform, R = void> = (
 
 export type TransformActionHandler<T extends Transform = Transform> =
   TransformAction<T, boolean>;
+
+export type ControlCallback<R = void> = (
+  eventData: TPointerEvent,
+  control: Control,
+  fabricObject: FabricObject
+) => R;
+
+export type ControlCursorCallback = ControlCallback<string>;
 
 /**
  * relative to target's containing coordinate plane

@@ -1,5 +1,6 @@
 import type { FabricObject } from '../shapes/object.class';
 import {
+  ControlCursorCallback,
   TAxis,
   TPointerEvent,
   Transform,
@@ -73,11 +74,11 @@ const scaleMap = ['e', 'se', 's', 'sw', 'w', 'nw', 'n', 'ne', 'e'];
  * @param {fabric.Object} fabricObject the fabric object that is interested in the action
  * @return {String} a valid css string for the cursor
  */
-export function scaleCursorStyleHandler(
+export const scaleCursorStyleHandler: ControlCursorCallback = (
   eventData,
   control,
-  fabricObject: FabricObject
-) {
+  fabricObject
+) => {
   const scaleProportionally = scaleIsProportional(eventData, fabricObject),
     by =
       control.x !== 0 && control.y === 0
@@ -89,8 +90,8 @@ export function scaleCursorStyleHandler(
     return NOT_ALLOWED_CURSOR;
   }
   const n = findCornerQuadrant(fabricObject, control);
-  return scaleMap[n] + '-resize';
-}
+  return `${scaleMap[n]}-resize`;
+};
 
 /**
  * Basic scaling logic, reused with different constrain for scaling X,Y, freely or equally.
