@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): remove buggy changelog action in favor of `git diff` bash script + direct git how to merge `CHANGELOG.md` [#8309](https://github.com/fabricjs/fabric.js/pull/8346)
 - fix(): skewing controls accuracy + successive interactions [#8380](https://github.com/fabricjs/fabric.js/pull/8380)
 - chore(TS): Convert Geometry and Origin to classes/e6/ts [#8390](https://github.com/fabricjs/fabric.js/pull/8390)
 - ci(): build stats report [#8395](https://github.com/fabricjs/fabric.js/pull/8395)
