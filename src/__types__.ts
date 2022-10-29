@@ -9,6 +9,8 @@ export type Canvas = StaticCanvas & {
   uniScaleKey: ModifierKey;
   uniformScaling: boolean;
 } & Record<string, unknown>;
-export type StaticCanvas = Record<string, unknown>;
+export type StaticCanvas = Record<string, unknown> & {
+  getZoom(): number;
+};
 export type Rect = any;
 export type TObject = any;

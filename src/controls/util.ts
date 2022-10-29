@@ -98,7 +98,7 @@ export function getLocalPoint(
   y: number
 ) {
   const control = target.controls[corner],
-    zoom = target.canvas.getZoom(),
+    zoom = target.canvas!.getZoom(),
     padding = target.padding / zoom,
     center = target.getRelativeCenterPoint(),
     point = new Point(x, y),
