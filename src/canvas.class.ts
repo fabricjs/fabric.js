@@ -2,7 +2,7 @@
 import { getActionFromCorner } from './controls/util';
 import { Point } from './point.class';
 import { FabricObject } from './shapes/object.class';
-import { Transform } from './typedefs';
+import { ModifierKey, Transform } from './typedefs';
 
 (function (global) {
   var fabric = global.fabric,
@@ -141,7 +141,7 @@ import { Transform } from './typedefs';
        * if Canvas.uniformScaling is true, pressing this will set it to false
        * and viceversa.
        * @since 1.6.2
-       * @type String
+       * @type ModifierKey
        * @default
        */
       uniScaleKey: 'shiftKey',
