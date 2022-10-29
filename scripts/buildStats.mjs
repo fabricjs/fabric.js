@@ -11,16 +11,13 @@ const INACCURATE_COMMENT =
 
 function printSize(a, b) {
   const diff = b - a;
-  return `${b} (${Math.sign(diff) > 0 ? '+' : ''}${diff})`;
-}
-
-function round(value, fractionDigits) {
-  const pow = Math.pow(10, fractionDigits);
-  return Math.round((value + Number.EPSILON) * pow) / pow;
+  return `${b.toFixed(3)} (${Math.sign(diff) > 0 ? '+' : ''}${diff.toFixed(
+    3
+  )})`;
 }
 
 function printSizeByte(a, b) {
-  return printSize(round(a / 1024, 3), round(b / 1024, 3));
+  return printSize(a / 1024, b / 1024);
 }
 
 export async function findCommentId(github, context) {
