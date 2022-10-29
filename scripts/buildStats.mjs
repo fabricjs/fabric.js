@@ -96,13 +96,17 @@ export async function run({ github, context, a, b }) {
         printSizeByte(_a.gzipped, _b.gzipped),
       ];
     }),
-    ..._.map(files, ({ a, b }, key) => {
-      return [
-        key,
-        printSizeByte(a.sizeBefore, b.sizeBefore),
-        printSizeByte(a.sizeAfter, b.sizeAfter),
-      ];
-    }),
+    ..._.orderBy(
+      _.map(files, ({ a, b }, key) => {
+        return [
+          key,
+          printSizeByte(a.sizeBefore, b.sizeBefore),
+          printSizeByte(a.sizeAfter, b.sizeAfter),
+        ];
+      }),
+      'key',
+      'asc'
+    ),
   ];
 
   const body =
