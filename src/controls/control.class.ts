@@ -263,6 +263,7 @@ export class Control {
    * @return {Boolean}
    */
   getVisibility(fabricObject: FabricObject, controlKey: string) {
+    // @ts-expect-error TODO remove directive once fixed
     const objectVisibility = fabricObject._controlsVisibility;
     if (
       objectVisibility &&
