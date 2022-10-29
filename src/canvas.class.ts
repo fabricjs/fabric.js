@@ -1,6 +1,8 @@
 //@ts-nocheck
+import { getActionFromCorner } from './controls/util';
 import { Point } from './point.class';
 import { FabricObject } from './shapes/object.class';
+import { Transform } from './typedefs';
 
 (function (global) {
   var fabric = global.fabric,
@@ -740,21 +742,6 @@ import { FabricObject } from './shapes/object.class';
 
       /**
        * @private
-       * @param {Boolean} alreadySelected true if target is already selected
-       * @param {String} corner a string representing the corner ml, mr, tl ...
-       * @param {Event} e Event object
-       * @param {fabric.Object} [target] inserted back to help overriding. Unused
-       */
-      _getActionFromCorner: function (alreadySelected, corner, e, target) {
-        if (!corner || !alreadySelected) {
-          return 'drag';
-        }
-        var control = target.controls[corner];
-        return control.getActionName(e, control, target);
-      },
-
-      /**
-       * @private
        * @param {Event} e Event object
        * @param {fabric.Object} target
        */
@@ -776,19 +763,14 @@ import { FabricObject } from './shapes/object.class';
             alreadySelected && corner
               ? control.getActionHandler(e, target, control)
               : fabric.controlsUtils.dragHandler,
-          action = this._getActionFromCorner(
-            alreadySelected,
-            corner,
-            e,
-            target
-          ),
+          action = getActionFromCorner(alreadySelected, corner, e, target),
           origin = this._getOriginFromCorner(target, corner),
           altKey = e[this.centeredKey],
           /**
            * relative to target's containing coordinate plane
            * both agree on every point
            **/
-          transform = {
+          transform: Transform = {
             target: target,
             action: action,
             actionHandler: actionHandler,

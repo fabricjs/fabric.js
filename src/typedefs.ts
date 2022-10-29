@@ -1,6 +1,9 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
 import type { Gradient } from './gradient/gradient.class';
 import type { Pattern } from './pattern.class';
+import type { Point } from './point.class';
+import type { FabricObject } from './shapes/object.class';
+import type { saveObjectTransform } from './util/misc/objectTransforms';
 
 interface NominalTag<T> {
   nominalTag?: T;
@@ -74,16 +77,54 @@ export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
  */
 export type PathData = (string | number)[][];
 
-export type TEvent<E extends Event = MouseEvent | TouchEvent> = {
+export type TPointerEvent = MouseEvent | TouchEvent;
+
+export type TransformAction<R = void> = (
+  eventData: TPointerEvent,
+  transform: Transform,
+  x: number,
+  y: number
+) => R;
+
+export type TransformActionHandler = TransformAction<boolean>;
+
+/**
+ * relative to target's containing coordinate plane
+ * both agree on every point
+ */
+export type Transform = {
+  target: FabricObject;
+  action: string;
+  actionHandler: TransformActionHandler;
+  corner: string;
+  scaleX: number;
+  scaleY: number;
+  skewX: number;
+  skewY: number;
+  offsetX: number;
+  offsetY: number;
+  originX: TOriginX;
+  originY: TOriginY;
+  ex: number;
+  ey: number;
+  lastX: number;
+  lastY: number;
+  theta: TRadian;
+  width: number;
+  height: number;
+  shiftKey: boolean;
+  altKey: boolean;
+  original: ReturnType<typeof saveObjectTransform>;
+};
+
+export type TEvent<E extends Event = TPointerEvent> = {
   e: E;
 };
 
-export type TransformEvent<T> = TEvent &
-  T & {
-    transform: {
-      target: any;
-    };
-  };
+export type TransformEvent = TEvent & {
+  transform: Transform;
+  pointer: Point;
+};
 
 /**
  * An invalid keyword and an empty string will be handled as the `anonymous` keyword.
