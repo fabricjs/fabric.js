@@ -57,9 +57,9 @@ export function renderCircleControl(
     myTop = top,
     size;
   ctx.save();
-  ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
+  ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor || '';
   ctx.strokeStyle =
-    styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
+    styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || '';
   // TODO: as soon as fabric react v5, remove ie11, use proper ellipse code.
   if (xSize > ySize) {
     size = xSize;
@@ -117,9 +117,9 @@ export function renderSquareControl(
     xSizeBy2 = xSize / 2,
     ySizeBy2 = ySize / 2;
   ctx.save();
-  ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
+  ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor || '';
   ctx.strokeStyle =
-    styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
+    styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || '';
   // this is still wrong
   ctx.lineWidth = 1;
   ctx.translate(left, top);
