@@ -346,23 +346,6 @@ import { FabricObject } from './shapes/fabricObject.class';
       preserveObjectStacking: false,
 
       /**
-       * Indicates the angle that an object will lock to while rotating.
-       * @type Number
-       * @since 1.6.7
-       * @default
-       */
-      snapAngle: 0,
-
-      /**
-       * Indicates the distance from the snapAngle the rotation will lock to the snapAngle.
-       * When `null`, the snapThreshold will default to the snapAngle.
-       * @type null|Number
-       * @since 1.6.7
-       * @default
-       */
-      snapThreshold: null,
-
-      /**
        * Indicates if the right click on canvas can output the context menu or not
        * @type Boolean
        * @since 1.6.5

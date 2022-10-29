@@ -1,5 +1,5 @@
 import { IPoint, Point } from '../point.class';
-import type { TCornerPoint, TMat2D } from '../typedefs';
+import type { TCornerPoint, TDegree, TMat2D } from '../typedefs';
 import { FabricObject } from '../shapes/object.class';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import {
@@ -45,6 +45,21 @@ export class InteractiveFabricObject extends FabricObject {
    * this takes priority over the generic control visibility
    */
   _controlsVisibility: Record<string, boolean>;
+
+  /**
+   * Indicates the angle that an object will lock to while rotating.
+   * @type TDegree
+   * @default
+   */
+  snapAngle: TDegree = 0;
+
+  /**
+   * Indicates the distance from the snapAngle the rotation will lock to the snapAngle.
+   * When `null`, the snapThreshold will default to the snapAngle.
+   * @type TDegree | null
+   * @default
+   */
+  snapThreshold: TDegree | null = null;
 
   /**
    * Constructor
