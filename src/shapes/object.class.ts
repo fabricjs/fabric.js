@@ -627,7 +627,7 @@ export class FabricObject extends ObjectGeometry {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: Record<string, unknown>) {
+  constructor(options?: Partial<TClassProperties<FabricObject>>) {
     super();
     if (options) {
       this.setOptions(options);
@@ -638,7 +638,7 @@ export class FabricObject extends ObjectGeometry {
    * Temporary compatibility issue with old classes
    * @param {Object} [options] Options object
    */
-  initialize(options: Record<string, unknown>) {
+  initialize(options?: Partial<TClassProperties<FabricObject>>) {
     if (options) {
       this.setOptions(options);
     }
