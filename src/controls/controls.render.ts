@@ -1,3 +1,4 @@
+import { PiBy180, twoMathPi } from '../constants';
 import type { FabricObject } from '../shapes/object.class';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './control.class';
@@ -75,7 +76,7 @@ export function renderCircleControl(
   // this is still wrong
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.arc(myLeft, myTop, size / 2, 0, 2 * Math.PI, false);
+  ctx.arc(myLeft, myTop, size / 2, 0, twoMathPi, false);
   ctx[methodName]();
   if (stroke) {
     ctx.stroke();
