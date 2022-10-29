@@ -11,9 +11,9 @@ const INACCURATE_COMMENT =
 
 function printSize(a, b) {
   const diff = b - a;
-  return `${b.toFixed(3)} (${Math.sign(diff) > 0 ? '+' : ''}${diff.toFixed(
+  return `${b.toFixed(3)} (**${Math.sign(diff) > 0 ? '+' : ''}${diff.toFixed(
     3
-  )})`;
+  )}**)`;
 }
 
 function printSizeByte(a, b) {
