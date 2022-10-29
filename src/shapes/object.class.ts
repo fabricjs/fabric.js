@@ -20,6 +20,9 @@ import { qrDecompose, transformPoint } from '../util/misc/matrix';
 type StaticCanvas = any;
 type Canvas = any;
 
+// temporary hack for unfinished migration
+type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
+
 const ALIASING_LIMIT = 2;
 
 /**
@@ -122,7 +125,7 @@ export class FabricObject extends ObjectGeometry {
    * @type String
    * @default rgb(178,204,255)
    */
-  cornerColor: string | null;
+  cornerColor: string;
 
   /**
    * Color of controlling corners of an object (when it's active and transparentCorners false)
@@ -130,7 +133,7 @@ export class FabricObject extends ObjectGeometry {
    * @type String
    * @default null
    */
-  cornerStrokeColor: string | null;
+  cornerStrokeColor: string;
 
   /**
    * Specify style of control, 'rect' or 'circle'
@@ -437,16 +440,6 @@ export class FabricObject extends ObjectGeometry {
   dirty: boolean;
 
   /**
-   * keeps the value of the last hovered corner during mouse move.
-   * 0 is no corner, or 'mt', 'ml', 'mtr' etc..
-   * It should be private, but there is no harm in using it as
-   * a read-only property.
-   * @type number|string|any
-   * @default 0
-   */
-  __corner: number | string;
-
-  /**
    * Determines if the fill or the stroke is drawn first (one of "fill" or "stroke")
    * @type String
    * @default
@@ -624,6 +617,8 @@ export class FabricObject extends ObjectGeometry {
    * @type Number
    */
   static __uid = 0;
+
+  callSuper?: TCallSuper;
 
   /**
    * Constructor
@@ -2070,7 +2065,7 @@ const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
   borderColor: 'rgb(178,204,255)',
   borderDashArray: null,
   cornerColor: 'rgb(178,204,255)',
-  cornerStrokeColor: null,
+  cornerStrokeColor: '',
   cornerStyle: 'rect',
   cornerDashArray: null,
   centeredScaling: false,
@@ -2133,8 +2128,3 @@ const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
 };
 
 Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
-
-(function (global) {
-  const fabric = global.fabric;
-  fabric.Object = FabricObject;
-})(typeof exports !== 'undefined' ? exports : window);

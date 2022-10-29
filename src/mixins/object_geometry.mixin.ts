@@ -1,8 +1,8 @@
 import type { TBBox, TCornerPoint, TDegree, TMat2D, TOriginX, TOriginY } from '../typedefs';
 import { iMatrix } from '../constants';
 import { Intersection } from '../intersection.class';
-import { IPoint, Point } from '../point.class';
-import { FabricObject } from '../shapes/object.class';
+import { Point } from '../point.class';
+import { FabricObject } from '../shapes/fabricObject.class';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { cos } from '../util/misc/cos';
 import {
@@ -62,25 +62,13 @@ export class ObjectGeometry extends ObjectOrigin {
   padding: number;
 
   /**
-   * Describe object's corner position in canvas element coordinates.
-   * properties are depending on control keys and padding the main controls.
-   * each property is an object with x, y and corner.
-   * The `corner` property contains in a similar manner the 4 points of the
-   * interactive area of the corner.
-   * The coordinates depends from the controls positionHandler and are used
-   * to draw and locate controls
-   * @memberOf fabric.Object.prototype
-   */
-  oCoords: Record<string, TOCoord> = {};
-
-  /**
    * Describe object's corner position in canvas object absolute coordinates
    * properties are tl,tr,bl,br and describe the four main corner.
    * each property is an object with x, y, instance of Fabric.Point.
    * The coordinates depends from this properties: width, height, scaleX, scaleY
    * skewX, skewY, angle, strokeWidth, top, left.
    * Those coordinates are useful to understand where an object is. They get updated
-   * with oCoords but they do not need to be updated when zoom or panning change.
+   * with lineCoords or oCoords in interactive cases but they do not need to be updated when zoom or panning change.
    * The coordinates get updated with @method setCoords.
    * You can calculate them without updating with @method calcACoords();
    * @memberOf fabric.Object.prototype
@@ -242,8 +230,12 @@ export class ObjectGeometry extends ObjectOrigin {
     if (calculate) {
       return absolute ? this.calcACoords() : this.calcLineCoords();
     }
-    if (!this.aCoords || !this.lineCoords) {
-      this.setCoords(true);
+    // swapped this double if in place of setCoords();
+    if (!this.aCoords) {
+      this.aCoords = this.calcACoords();
+    }
+    if (!this.lineCoords) {
+      this.lineCoords = this.calcLineCoords();
     }
     return absolute ? this.aCoords : this.lineCoords;
   }
@@ -271,7 +263,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Object} pointTL top-left point of area
    * @param {Object} pointBR bottom-right point of area
    * @param {Boolean} [absolute] use coordinates without viewportTransform
-   * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
+   * @param {Boolean} [calculate] use coordinates of current position instead of stored one
    * @return {Boolean} true if object intersects with an area formed by 2 points
    */
   intersectsWithRect(
@@ -293,11 +285,11 @@ export class ObjectGeometry extends ObjectOrigin {
    * Checks if object intersects with another object
    * @param {Object} other Object to test
    * @param {Boolean} [absolute] use coordinates without viewportTransform
-   * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
+   * @param {Boolean} [calculate] use coordinates of current position instead of calculating them
    * @return {Boolean} true if object intersects with another object
    */
   intersectsWithObject(
-    other: FabricObject,
+    other: ObjectGeometry,
     absolute: boolean,
     calculate: boolean
   ): boolean {
@@ -318,7 +310,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * Checks if object is fully contained within area of another object
    * @param {Object} other Object to test
    * @param {Boolean} [absolute] use coordinates without viewportTransform
-   * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
+   * @param {Boolean} [calculate] use coordinates of current position instead of store ones
    * @return {Boolean} true if object is fully contained within area of another object
    */
   isContainedWithinObject(
@@ -342,7 +334,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Object} pointTL top-left point of area
    * @param {Object} pointBR bottom-right point of area
    * @param {Boolean} [absolute] use coordinates without viewportTransform
-   * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
+   * @param {Boolean} [calculate] use coordinates of current position instead of stored one
    * @return {Boolean} true if object is fully contained within area formed by 2 points
    */
   isContainedWithinRect(
@@ -365,7 +357,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Point} point Point to check against
    * @param {Object} [lines] object returned from @method _getImageLines
    * @param {Boolean} [absolute] use coordinates without viewportTransform
-   * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
+   * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
    * @return {Boolean} true if point is inside the object
    */
   containsPoint(
@@ -418,7 +410,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * @private
    * @param {Point} pointTL Top Left point
    * @param {Point} pointBR Top Right point
-   * @param {Boolean} calculate use coordinates of current position instead of .oCoords
+   * @param {Boolean} calculate use coordinates of current position instead of stored ones
    * @return {Boolean} true if the object contains the point
    */
   _containsCenterOfCanvas(
@@ -433,7 +425,7 @@ export class ObjectGeometry extends ObjectOrigin {
 
   /**
    * Checks if object is partially contained within the canvas with current viewportTransform
-   * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords
+   * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
    * @return {Boolean} true if object is partially contained within canvas
    */
   isPartiallyOnScreen(calculate: boolean): boolean {
@@ -457,7 +449,7 @@ export class ObjectGeometry extends ObjectOrigin {
   /**
    * Method that returns an object with the object edges in it, given the coordinates of the corners
    * @private
-   * @param {Object} oCoords Coordinates of the object corners
+   * @param {Object} lineCoords or aCoords Coordinates of the object corners
    */
   _getImageLines({ tl, tr, bl, br }: TCornerPoint): TBBoxLines {
     const lines = {
@@ -548,7 +540,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * Returns coordinates of object's bounding rectangle (left, top, width, height)
    * the box is intended as aligned to axis of canvas.
    * @param {Boolean} [absolute] use coordinates without viewportTransform
-   * @param {Boolean} [calculate] use coordinates of current position instead of .oCoords / .aCoords
+   * @param {Boolean} [calculate] use coordinates of current position instead of .lineCoords / .aCoords
    * @return {Object} Object with left, top, width, height properties
    */
   getBoundingRect(absolute?: boolean, calculate?: boolean): TBBox {
@@ -693,12 +685,10 @@ export class ObjectGeometry extends ObjectOrigin {
 
   /**
    * Sets corner and controls position coordinates based on current angle, width and height, left and top.
-   * oCoords are used to find the corners
    * aCoords are used to quickly find an object on the canvas
    * lineCoords are used to quickly find object during pointer events.
    * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
-   *
-   * @param {Boolean} [skipCorners] skip calculation of oCoords.
+   * @param {Boolean} [skipCorners] skip calculation of aCoord, lineCoords.
    * @return {void}
    */
   setCoords(): void {

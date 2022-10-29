@@ -1,8 +1,10 @@
-//@ts-nocheck
 import { IPoint, Point } from '../point.class';
-import type { TCornerPoint } from '../typedefs';
+import type { TCornerPoint, TMat2D } from '../typedefs';
 import { FabricObject } from '../shapes/object.class';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { calcRotateMatrix, multiplyTransformMatrices, qrDecompose } from '../util/misc/matrix';
+import { fabric } from '../../HEADER';
+import { ObjectGeometry } from './object_geometry.mixin';
 
 type TOCoord = IPoint & {
   corner: TCornerPoint;
@@ -11,9 +13,27 @@ type TOCoord = IPoint & {
 
 export class InteractiveFabricObject extends FabricObject {
 
+
   /**
-   * Keep a reference on the object of the last hovered control
+   * Describe object's corner position in canvas element coordinates.
+   * properties are depending on control keys and padding the main controls.
+   * each property is an object with x, y and corner.
+   * The `corner` property contains in a similar manner the 4 points of the
+   * interactive area of the corner.
+   * The coordinates depends from the controls positionHandler and are used
+   * to draw and locate controls
+   * @memberOf fabric.Object.prototype
+   */
+  oCoords: Record<string, TOCoord> = {};
+
+  /**
+   * keeps the value of the last hovered corner during mouse move.
+   * 0 is no corner, or 'mt', 'ml', 'mtr' etc..
+   * It should be private, but there is no harm in using it as
+   * a read-only property.
    * this isn't cleaned automatically. Non selected objects may have wrong values
+   * @type number|string|any
+   * @default 0
    */
   __corner: number | string;
 
@@ -25,13 +45,32 @@ export class InteractiveFabricObject extends FabricObject {
   _controlsVisibility: Record<string, boolean>
 
   /**
+   * Constructor
+   * @param {Object} [options] Options object
+   */
+  constructor(options: Record<string, unknown>) {
+    super(options);
+  }
+
+  /**
+   * Temporary compatibility issue with old classes
+   * @param {Object} [options] Options object
+   */
+  initialize(options: Record<string, unknown>) {
+    if (options) {
+      this.setOptions(options);
+    }
+  }
+
+
+  /**
    * Determines which corner has been clicked
    * @private
    * @param {Object} pointer The pointer indicating the mouse position
    * @param {boolean} forTouch indicates if we are looking for interactin area with a touch action
    * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
    */
-  _findTargetCorner(pointer: IPoint, forTouch: boolean): false | string {
+  _findTargetCorner(pointer: Point, forTouch: boolean): false | string {
     if (
       !this.hasControls ||
       !this.canvas ||
@@ -40,22 +79,20 @@ export class InteractiveFabricObject extends FabricObject {
       return false;
     }
 
-    const cornerKeys = Object.keys(this.oCoords);
     this.__corner = 0;
 
-    // cycle in reverse order so we pick first the one on top
-    // that is basically bullshit because controls are all on the same plane logically
-    // controls are not stacked
-    for (let j = cornerKeys.length - 1; j >= 0; j--) {
-      const cornerKey = cornerKeys[j];
-      if (!this.isControlVisible(i)) {
-        continue;
+    const targetCorner = Object.entries(this.oCoords).find(([cornerKey, corner]) => {
+      if (!this.isControlVisible(cornerKey)) {
+        return false;
       }
-
       const lines = this._getImageLines(
-        forTouch ? this.oCoords[cornerKey].touchCorner : this.oCoords[cornerKey].corner
+        forTouch ? corner.touchCorner : corner.corner
       );
-
+      const xPoints = this._findCrossPoints(pointer, lines);
+      if (xPoints !== 0 && xPoints % 2 === 1) {
+        this.__corner = cornerKey;
+        return true;
+      }
       // // debugging
       //
       // this.canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
@@ -69,14 +106,8 @@ export class InteractiveFabricObject extends FabricObject {
       //
       // this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
       // this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
-
-      const xPoints = this._findCrossPoints(pointer, lines);
-      if (xPoints !== 0 && xPoints % 2 === 1) {
-        this.__corner = i;
-        return i;
-      }
-    }
-    return false;
+    });
+    return targetCorner && targetCorner[0] || false;
   }
 
   /**
@@ -109,7 +140,7 @@ export class InteractiveFabricObject extends FabricObject {
       dim = this._calculateCurrentDimensions(transformOptions),
       coords: Record<string, TOCoord> = {};
 
-    this.forEachControl((control, key, fabricObject) => {
+    this.forEachControl((control: any, key: string, fabricObject: InteractiveFabricObject) => {
       coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
     });
 
@@ -135,25 +166,25 @@ export class InteractiveFabricObject extends FabricObject {
    * aCoords are used to quickly find an object on the canvas
    * lineCoords are used to quickly find object during pointer events.
    * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
-   *
-   * @param {Boolean} [skipCorners] skip calculation of oCoords.
    * @return {void}
    */
-  setCoords(skipCorners = false): void {
-    super.setCoords();
-    if (!skipCorners) {
-      // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-      this.oCoords = this.calcOCoords();
-      this._setCornerCoords && this._setCornerCoords();
+  setCoords(): void {
+    if (this.callSuper) {
+      ObjectGeometry.prototype.setCoords.call(this);
+    } else {
+      super.setCoords();
     }
+    // set coordinates of the draggable boxes in the corners used to scale/rotate the image
+    this.oCoords = this.calcOCoords();
+    this._setCornerCoords();
   }
 
   /**
    * Calls a function for each control. The function gets called,
-   * with the control, the object that is calling the iterator and the control's key
+   * with the control, the control's key and the object that is calling the iterator
    * @param {Function} fn function to iterate over the controls over
    */
-  forEachControl(fn) {
+  forEachControl(fn: (arg0: any, arg1: string, arg2: InteractiveFabricObject) => any) {
     for (const i in this.controls) {
       fn(this.controls[i], i, this);
     }
@@ -254,7 +285,7 @@ export class InteractiveFabricObject extends FabricObject {
    * @param {object} options object representing current object parameters
    * @param {Object} [styleOverride] object to override the object style
    */
-  drawBorders(ctx: CanvasRenderingContext2D, options, styleOverride): void {
+  drawBorders(ctx: CanvasRenderingContext2D, options: any, styleOverride: any): void {
     let size;
     if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
       const bbox = fabric.util.sizeAfterTransform(
@@ -274,7 +305,6 @@ export class InteractiveFabricObject extends FabricObject {
       );
     }
     this._drawBorders(ctx, size, styleOverride);
-    return this;
   }
 
   /**
@@ -373,8 +403,8 @@ export class InteractiveFabricObject extends FabricObject {
    * @param {Record<string, boolean>} [options] with an optional key per control
    * example: {Boolean} [options.bl] true to enable the bottom-left control, false to disable it
    */
-  setControlsVisibility(options = {}) {
-    Object.entries(options).forEach((controlKey, visibility) => this.setControlVisible(controlKey, visibility));
+  setControlsVisibility(options: Record<string, boolean> = {}) {
+    Object.entries(options).forEach(([controlKey, visibility]) => this.setControlVisible(controlKey, visibility));
   }
 
   /**
@@ -413,7 +443,7 @@ export class InteractiveFabricObject extends FabricObject {
    * @param {Object} [options] options sent from the upper functions
    * @param {Event} [options.e] event if the process is generated by an event
    */
-  onDeselect(options) {
+  onDeselect(options: any) {
     // implemented by sub-classes, as needed.
   }
 
@@ -463,5 +493,3 @@ export class InteractiveFabricObject extends FabricObject {
     // for subclasses
   }
 }
-
-

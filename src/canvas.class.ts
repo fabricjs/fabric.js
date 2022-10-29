@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Point } from './point.class';
-import { FabricObject } from './shapes/object.class';
+import { FabricObject } from './shapes/fabricObject.class';
 
 (function (global) {
   var fabric = global.fabric,

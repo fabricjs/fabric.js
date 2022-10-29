@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { fabric } from '../../HEADER';
-import { FabricObject } from './object.class';
+import { FabricObject } from './fabricObject.class';
 
 const degreesToRadians = fabric.util.degreesToRadians;
 

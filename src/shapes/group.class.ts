@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Point } from '../point.class';
-import { FabricObject } from './object.class';
+import { FabricObject } from './fabricObject.class';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
 
 export class Group extends FabricObject {}
