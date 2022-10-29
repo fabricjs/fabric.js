@@ -80,10 +80,12 @@ export class InteractiveFabricObject extends FabricObject {
     }
 
     this.__corner = 0;
-
-    const targetCorner = Object.entries(this.oCoords).find(([cornerKey, corner]) => {
+    // had to keep the reverse loop because was breaking tests
+    const cornerEntries = Object.entries(this.oCoords);
+    for (let i = cornerEntries.length - 1; i >= 0; i--) {
+      const [cornerKey, corner] = cornerEntries[i];
       if (!this.isControlVisible(cornerKey)) {
-        return false;
+        continue;
       }
       const lines = this._getImageLines(
         forTouch ? corner.touchCorner : corner.corner
@@ -91,7 +93,7 @@ export class InteractiveFabricObject extends FabricObject {
       const xPoints = this._findCrossPoints(pointer, lines);
       if (xPoints !== 0 && xPoints % 2 === 1) {
         this.__corner = cornerKey;
-        return true;
+        return cornerKey;
       }
       // // debugging
       //
@@ -106,8 +108,8 @@ export class InteractiveFabricObject extends FabricObject {
       //
       // this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
       // this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
-    });
-    return targetCorner && targetCorner[0] || false;
+    }
+    return false;
   }
 
   /**
