@@ -18,7 +18,6 @@ import type { Control } from './control.class';
 export const NOT_ALLOWED_CURSOR = 'not-allowed';
 
 /**
- * @private
  * @param {Boolean} alreadySelected true if target is already selected
  * @param {String} corner a string representing the corner ml, mr, tl ...
  * @param {Event} e Event object
