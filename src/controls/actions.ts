@@ -16,7 +16,7 @@ import {
   scalingYOrSkewingX,
 } from './scaleSkew';
 import { skewCursorStyleHandler, skewHandlerX, skewHandlerY } from './skew';
-import { getLocalPoint } from './util';
+import { getLocalPoint, getActionFromCorner } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 
@@ -39,6 +39,7 @@ export {
   wrapWithFixedAnchor,
   wrapWithFireEvent,
   getLocalPoint,
+  getActionFromCorner,
   renderCircleControl,
   renderSquareControl,
 };
