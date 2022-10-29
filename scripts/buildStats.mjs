@@ -104,8 +104,8 @@ export async function run({ github, context, a, b }) {
           printSizeByte(a.sizeAfter, b.sizeAfter),
         ];
       }),
-      'key',
-      'asc'
+      ['key'],
+      ['asc']
     ),
   ];
 
