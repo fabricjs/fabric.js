@@ -141,10 +141,7 @@ export class Control {
   withConnection = false;
 
   constructor(options: Partial<Control>) {
-    for (const key in options) {
-      // @ts-expect-error TS fails to understand the assignment
-      this[key] = options[key];
-    }
+    Object.assign(this, options);
   }
 
   /**
@@ -165,8 +162,7 @@ export class Control {
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  mouseDownHandler: TransformAction = () => {};
+  mouseDownHandler?: TransformAction;
 
   /**
    * The control mouseUpHandler, provide one to handle an effect on mouse up.
@@ -176,8 +172,7 @@ export class Control {
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  mouseUpHandler: TransformAction = () => {};
+  mouseUpHandler?: TransformAction;
 
   /**
    * Returns control actionHandler
@@ -264,14 +259,7 @@ export class Control {
    */
   getVisibility(fabricObject: FabricObject, controlKey: string) {
     // @ts-expect-error TODO remove directive once fixed
-    const objectVisibility = fabricObject._controlsVisibility;
-    if (
-      objectVisibility &&
-      typeof objectVisibility[controlKey] !== 'undefined'
-    ) {
-      return objectVisibility[controlKey];
-    }
-    return this.visible;
+    return fabricObject._controlsVisibility?.[controlKey] ?? this.visible;
   }
 
   /**
@@ -289,10 +277,10 @@ export class Control {
     fabricObject: FabricObject,
     currentControl: Control
   ) {
-    return new Point(this.x, this.y)
-      .multiply(dim)
-      .add(new Point(this.offsetX, this.offsetY))
-      .transform(finalMatrix);
+    return new Point(
+      this.x * dim.x + this.offsetX,
+      this.y * dim.y + this.offsetY
+    ).transform(finalMatrix);
   }
 
   /**
