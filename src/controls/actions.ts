@@ -1,5 +1,4 @@
 import { fabric } from '../../HEADER';
-import { fireEvent } from '../util/fireEvent';
 import { changeWidth } from './changeWidth';
 import { renderCircleControl, renderSquareControl } from './controls.render';
 import { dragHandler } from './drag';
@@ -37,7 +36,6 @@ export {
   dragHandler,
   scaleOrSkewActionName,
   rotationStyleHandler,
-  fireEvent,
   wrapWithFixedAnchor,
   wrapWithFireEvent,
   getLocalPoint,
@@ -64,7 +62,6 @@ fabric.controlsUtils = {
   dragHandler,
   scaleOrSkewActionName,
   rotationStyleHandler,
-  fireEvent,
   wrapWithFixedAnchor,
   wrapWithFireEvent,
   getLocalPoint,
