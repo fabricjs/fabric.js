@@ -5,6 +5,7 @@ import {
   TAxisKey,
   TPointerEvent,
   TransformAction,
+  TransformActionHandler,
 } from '../typedefs';
 import { Canvas } from '../__types__';
 import { scaleCursorStyleHandler, scalingX, scalingY } from './scale';
@@ -60,7 +61,7 @@ export const scaleSkewCursorStyleHandler: ControlCursorCallback = (
  * @param {number} y current mouse y position, canvas normalized
  * @return {Boolean} true if some change happened
  */
-export const scalingXOrSkewingY: TransformAction = (
+export const scalingXOrSkewingY: TransformActionHandler = (
   eventData,
   transform,
   x,
@@ -80,7 +81,7 @@ export const scalingXOrSkewingY: TransformAction = (
  * @param {number} y current mouse y position, canvas normalized
  * @return {Boolean} true if some change happened
  */
-export const scalingYOrSkewingX: TransformAction = (
+export const scalingYOrSkewingX: TransformActionHandler = (
   eventData,
   transform,
   x,

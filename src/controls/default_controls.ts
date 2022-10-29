@@ -1,4 +1,4 @@
-//@ts-nocheck
+// @ts-nocheck
 
 import { FabricObject } from '../shapes/object.class';
 import {
@@ -10,6 +10,7 @@ import {
   scalingXOrSkewingY,
   scalingYOrSkewingX,
   scaleSkewCursorStyleHandler,
+  scaleCursorStyleHandler,
 } from './actions';
 import { Control } from './control.class';
 
@@ -52,28 +53,28 @@ import { Control } from './control.class';
   objectControls.tl = new Control({
     x: -0.5,
     y: -0.5,
-    cursorStyleHandler: scaleStyleHandler,
+    cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: scalingEqually,
   });
 
   objectControls.tr = new Control({
     x: 0.5,
     y: -0.5,
-    cursorStyleHandler: scaleStyleHandler,
+    cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: scalingEqually,
   });
 
   objectControls.bl = new Control({
     x: -0.5,
     y: 0.5,
-    cursorStyleHandler: scaleStyleHandler,
+    cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: scalingEqually,
   });
 
   objectControls.br = new Control({
     x: 0.5,
     y: 0.5,
-    cursorStyleHandler: scaleStyleHandler,
+    cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: scalingEqually,
   });
 
