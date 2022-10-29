@@ -15,8 +15,9 @@ import {
 } from '../util/misc/matrix';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { Canvas } from '../__types__';
+import { StaticCanvas, Canvas } from '../__types__';
 import { ObjectOrigin } from './object_origin.mixin';
+import type { Control } from '../controls';
 
 type TCornerPoint = {
   tl: Point;
@@ -46,7 +47,7 @@ type TMatrixCache = {
   value: TMat2D;
 };
 
-type TControlSet = Record<string, any>;
+type TControlSet = Record<string, Control>;
 
 type TACoords = TCornerPoint;
 
@@ -128,7 +129,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * Object containing this object.
    * can influence its size and position
    */
-  canvas?: Canvas;
+  canvas?: StaticCanvas | Canvas;
 
   /**
    * @returns {number} x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
@@ -432,7 +433,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Boolean} calculate use coordinates of current position instead of .oCoords
    * @return {Boolean} true if the object contains the point
    */
-  _containsCenterOfCanvas(
+  private _containsCenterOfCanvas(
     pointTL: Point,
     pointBR: Point,
     calculate: boolean
@@ -674,10 +675,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * @return {TMat2D}
    */
   getViewportTransform(): TMat2D {
-    if (this.canvas && this.canvas.viewportTransform) {
-      return this.canvas.viewportTransform;
-    }
-    return iMatrix.concat() as TMat2D;
+    return this.canvas?.viewportTransform || (iMatrix.concat() as TMat2D);
   }
 
   /**

@@ -2,12 +2,17 @@ import type { FabricObject } from '../shapes/object.class';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './control.class';
 
-export type ControlRenderingStyleOverride = {
-  cornerSize: number;
-  transparentCorners: boolean;
-  cornerColor: string;
-  cornerStrokeColor: string;
-};
+export type ControlRenderingStyleOverride = Partial<
+  Pick<
+    FabricObject,
+    | 'cornerStyle'
+    | 'cornerSize'
+    | 'cornerColor'
+    | 'cornerStrokeColor'
+    | 'cornerDashArray'
+    | 'transparentCorners'
+  >
+>;
 
 export type ControlRenderer = (
   ctx: CanvasRenderingContext2D,
