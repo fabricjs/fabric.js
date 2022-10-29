@@ -1,4 +1,23 @@
-import { renderCircleControl, renderSquareControl } from './controls.render';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { fabric } from '../../HEADER';
+import { halfPI } from '../constants';
+import { Point } from '../point.class';
+import type { FabricObject } from '../shapes/object.class';
+import {
+  TDegree,
+  TMat2D,
+  TPointerEvent,
+  TransformAction,
+  TransformActionHandler,
+} from '../typedefs';
+import { cos } from '../util/misc/cos';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { sin } from '../util/misc/sin';
+import {
+  ControlRenderingStyleOverride,
+  renderCircleControl,
+  renderSquareControl,
+} from './controls.render';
 
 export class Control {
   /**
@@ -56,7 +75,7 @@ export class Control {
    * Positive offset moves the control to the right, negative to the left.
    * It used when you want to have position of control that does not scale with
    * the bounding box. Example: rotation control is placed at x:0, y: 0.5 on
-   * the boundindbox, with an offset of 30 pixels vertically. Those 30 pixels will
+   * the boundind box, with an offset of 30 pixels vertically. Those 30 pixels will
    * stay 30 pixels no matter how the object is big. Another example is having 2
    * controls in the corner, that stay in the same position when the object scale.
    * of the bounding box.
@@ -136,7 +155,7 @@ export class Control {
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  actionHandler(/* eventData, transformData, x, y */) {}
+  actionHandler: TransformActionHandler;
 
   /**
    * The control handler for mouse down, provide one to handle mouse down on control
@@ -146,7 +165,8 @@ export class Control {
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  mouseDownHandler(/* eventData, transformData, x, y */) {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  mouseDownHandler: TransformAction = () => {};
 
   /**
    * The control mouseUpHandler, provide one to handle an effect on mouse up.
@@ -156,38 +176,51 @@ export class Control {
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  mouseUpHandler(/* eventData, transformData, x, y */) {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  mouseUpHandler: TransformAction = () => {};
 
   /**
    * Returns control actionHandler
    * @param {Event} eventData the native mouse event
-   * @param {fabric.Object} fabricObject on which the control is displayed
-   * @param {fabric.Control} control control for which the action handler is being asked
+   * @param {FabricObject} fabricObject on which the control is displayed
+   * @param {Control} control control for which the action handler is being asked
    * @return {Function} the action handler
    */
-  getActionHandler(/* eventData, fabricObject, control */) {
+  getActionHandler(
+    eventData: TPointerEvent,
+    fabricObject: FabricObject,
+    control: Control
+  ) {
     return this.actionHandler;
   }
 
   /**
    * Returns control mouseDown handler
    * @param {Event} eventData the native mouse event
-   * @param {fabric.Object} fabricObject on which the control is displayed
-   * @param {fabric.Control} control control for which the action handler is being asked
+   * @param {FabricObject} fabricObject on which the control is displayed
+   * @param {Control} control control for which the action handler is being asked
    * @return {Function} the action handler
    */
-  getMouseDownHandler(/* eventData, fabricObject, control */) {
+  getMouseDownHandler(
+    eventData: TPointerEvent,
+    fabricObject: FabricObject,
+    control: Control
+  ) {
     return this.mouseDownHandler;
   }
 
   /**
    * Returns control mouseUp handler
    * @param {Event} eventData the native mouse event
-   * @param {fabric.Object} fabricObject on which the control is displayed
-   * @param {fabric.Control} control control for which the action handler is being asked
+   * @param {FabricObject} fabricObject on which the control is displayed
+   * @param {Control} control control for which the action handler is being asked
    * @return {Function} the action handler
    */
-  getMouseUpHandler(/* eventData, fabricObject, control */) {
+  getMouseUpHandler(
+    eventData: TPointerEvent,
+    fabricObject: FabricObject,
+    control: Control
+  ) {
     return this.mouseUpHandler;
   }
 
@@ -196,33 +229,41 @@ export class Control {
    * function you can pass one in the constructor
    * the cursorStyle property
    * @param {Event} eventData the native mouse event
-   * @param {fabric.Control} control the current control ( likely this)
-   * @param {fabric.Object} object on which the control is displayed
+   * @param {Control} control the current control ( likely this)
+   * @param {FabricObject} object on which the control is displayed
    * @return {String}
    */
-  cursorStyleHandler(eventData, control /* ,fabricObject */) {
+  cursorStyleHandler(
+    eventData: TPointerEvent,
+    control: Control,
+    fabricObject: FabricObject
+  ) {
     return control.cursorStyle;
   }
 
   /**
    * Returns the action name. The basic implementation just return the actionName property.
    * @param {Event} eventData the native mouse event
-   * @param {fabric.Control} control the current control ( likely this)
-   * @param {fabric.Object} object on which the control is displayed
+   * @param {Control} control the current control ( likely this)
+   * @param {FabricObject} object on which the control is displayed
    * @return {String}
    */
-  getActionName(eventData, control /* ,fabricObject */) {
+  getActionName(
+    eventData: TPointerEvent,
+    control: Control,
+    fabricObject: FabricObject
+  ) {
     return control.actionName;
   }
 
   /**
    * Returns controls visibility
-   * @param {fabric.Object} object on which the control is displayed
+   * @param {FabricObject} object on which the control is displayed
    * @param {String} controlKey key where the control is memorized on the
    * @return {Boolean}
    */
-  getVisibility(fabricObject, controlKey) {
-    var objectVisibility = fabricObject._controlsVisibility;
+  getVisibility(fabricObject: FabricObject, controlKey: string) {
+    const objectVisibility = fabricObject._controlsVisibility;
     if (
       objectVisibility &&
       typeof objectVisibility[controlKey] !== 'undefined'
@@ -237,19 +278,23 @@ export class Control {
    * @param {Boolean} visibility for the object
    * @return {Void}
    */
-  setVisibility(visibility /* ,name, fabricObject */) {
+  setVisibility(visibility: boolean, name: string, fabricObject: FabricObject) {
     this.visible = visibility;
   }
 
-  positionHandler(dim, finalMatrix /*, fabricObject, currentControl */) {
-    var point = fabric.util.transformPoint(
-      {
-        x: this.x * dim.x + this.offsetX,
-        y: this.y * dim.y + this.offsetY,
-      },
+  positionHandler(
+    dim: Point,
+    finalMatrix: TMat2D,
+    fabricObject: FabricObject,
+    currentControl: Control
+  ) {
+    return (
+      new Point(this.x, this.y)
+        .multiply(dim)
+        .add(new Point(this.offsetX, this.offsetY))
+        .transform(finalMatrix),
       finalMatrix
     );
-    return point;
   }
 
   /**
@@ -261,59 +306,44 @@ export class Control {
    * @param {Number} centerY y coordinate where the control center should be
    * @param {boolean} isTouch true if touch corner, false if normal corner
    */
-  calcCornerCoords(objectAngle, objectCornerSize, centerX, centerY, isTouch) {
-    var cosHalfOffset,
-      sinHalfOffset,
-      cosHalfOffsetComp,
-      sinHalfOffsetComp,
-      xSize = isTouch ? this.touchSizeX : this.sizeX,
+  calcCornerCoords(
+    objectAngle: TDegree,
+    objectCornerSize: number,
+    centerX: number,
+    centerY: number,
+    isTouch: boolean
+  ) {
+    let cosHalfOffset, sinHalfOffset, cosHalfOffsetComp, sinHalfOffsetComp;
+    const xSize = isTouch ? this.touchSizeX : this.sizeX,
       ySize = isTouch ? this.touchSizeY : this.sizeY;
     if (xSize && ySize && xSize !== ySize) {
       // handle rectangular corners
-      var controlTriangleAngle = Math.atan2(ySize, xSize);
-      var cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
-      var newTheta =
-        controlTriangleAngle - fabric.util.degreesToRadians(objectAngle);
-      var newThetaComp =
-        Math.PI / 2 -
-        controlTriangleAngle -
-        fabric.util.degreesToRadians(objectAngle);
-      cosHalfOffset = cornerHypotenuse * fabric.util.cos(newTheta);
-      sinHalfOffset = cornerHypotenuse * fabric.util.sin(newTheta);
+      const controlTriangleAngle = Math.atan2(ySize, xSize);
+      const cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
+      const newTheta = controlTriangleAngle - degreesToRadians(objectAngle);
+      const newThetaComp =
+        halfPI - controlTriangleAngle - degreesToRadians(objectAngle);
+      cosHalfOffset = cornerHypotenuse * cos(newTheta);
+      sinHalfOffset = cornerHypotenuse * sin(newTheta);
       // use complementary angle for two corners
-      cosHalfOffsetComp = cornerHypotenuse * fabric.util.cos(newThetaComp);
-      sinHalfOffsetComp = cornerHypotenuse * fabric.util.sin(newThetaComp);
+      cosHalfOffsetComp = cornerHypotenuse * cos(newThetaComp);
+      sinHalfOffsetComp = cornerHypotenuse * sin(newThetaComp);
     } else {
       // handle square corners
       // use default object corner size unless size is defined
-      var cornerSize = xSize && ySize ? xSize : objectCornerSize;
-      /* 0.7071067812 stands for sqrt(2)/2 */
-      cornerHypotenuse = cornerSize * 0.7071067812;
+      const cornerSize = xSize && ySize ? xSize : objectCornerSize;
+      const cornerHypotenuse = cornerSize * Math.SQRT1_2;
       // complementary angles are equal since they're both 45 degrees
-      var newTheta = fabric.util.degreesToRadians(45 - objectAngle);
-      cosHalfOffset = cosHalfOffsetComp =
-        cornerHypotenuse * fabric.util.cos(newTheta);
-      sinHalfOffset = sinHalfOffsetComp =
-        cornerHypotenuse * fabric.util.sin(newTheta);
+      const newTheta = degreesToRadians(45 - objectAngle);
+      cosHalfOffset = cosHalfOffsetComp = cornerHypotenuse * cos(newTheta);
+      sinHalfOffset = sinHalfOffsetComp = cornerHypotenuse * sin(newTheta);
     }
 
     return {
-      tl: {
-        x: centerX - sinHalfOffsetComp,
-        y: centerY - cosHalfOffsetComp,
-      },
-      tr: {
-        x: centerX + cosHalfOffset,
-        y: centerY - sinHalfOffset,
-      },
-      bl: {
-        x: centerX - cosHalfOffset,
-        y: centerY + sinHalfOffset,
-      },
-      br: {
-        x: centerX + sinHalfOffsetComp,
-        y: centerY + cosHalfOffsetComp,
-      },
+      tl: new Point(centerX - sinHalfOffsetComp, centerY - cosHalfOffsetComp),
+      tr: new Point(centerX + cosHalfOffset, centerY - sinHalfOffset),
+      bl: new Point(centerX - cosHalfOffset, centerY + sinHalfOffset),
+      br: new Point(centerX + sinHalfOffsetComp, centerY + cosHalfOffsetComp),
     };
   }
 
@@ -327,9 +357,15 @@ export class Control {
    * @param {Number} left position of the canvas where we are about to render the control.
    * @param {Number} top position of the canvas where we are about to render the control.
    * @param {Object} styleOverride
-   * @param {fabric.Object} fabricObject the object where the control is about to be rendered
+   * @param {FabricObject} fabricObject the object where the control is about to be rendered
    */
-  render(ctx, left, top, styleOverride, fabricObject) {
+  render(
+    ctx: CanvasRenderingContext2D,
+    left: number,
+    top: number,
+    styleOverride: ControlRenderingStyleOverride | undefined,
+    fabricObject: FabricObject
+  ) {
     styleOverride = styleOverride || {};
     switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
       case 'circle':
@@ -354,3 +390,5 @@ export class Control {
     }
   }
 }
+
+fabric.Control = Control;
