@@ -15,7 +15,7 @@ function printSize(a, b) {
 }
 
 function round(value, fractionDigits) {
-  const pow = Math.pow(fractionDigits);
+  const pow = Math.pow(10, fractionDigits);
   return Math.round((value + Number.EPSILON) * pow) / pow;
 }
 
