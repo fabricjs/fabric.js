@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     name: Upload build artifact
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
