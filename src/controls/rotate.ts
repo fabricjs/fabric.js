@@ -2,7 +2,7 @@
 
 import { ControlCursorCallback, TransformActionHandler } from '../typedefs';
 import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
-import { NOT_ALLOWED_CURSOR } from './util';
+import { isLocked, NOT_ALLOWED_CURSOR } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 
@@ -47,7 +47,7 @@ const rotateObjectWithSnapping: TransformActionHandler = (
     originY
   );
 
-  if (target.lockRotation) {
+  if (isLocked(target, 'lockRotation')) {
     return false;
   }
 

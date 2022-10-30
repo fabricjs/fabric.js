@@ -1,6 +1,6 @@
 import { TransformActionHandler } from '../typedefs';
 import { fireEvent } from '../util/fireEvent';
-import { commonEventInfo } from './util';
+import { commonEventInfo, isLocked } from './util';
 
 /**
  * Action handler
@@ -20,8 +20,8 @@ export const dragHandler: TransformActionHandler = (
   const { target, offsetX, offsetY } = transform,
     newLeft = x - offsetX,
     newTop = y - offsetY,
-    moveX = !target.get('lockMovementX') && target.left !== newLeft,
-    moveY = !target.get('lockMovementY') && target.top !== newTop;
+    moveX = !isLocked(target, 'lockMovementX') && target.left !== newLeft,
+    moveY = !isLocked(target, 'lockMovementY') && target.top !== newTop;
   moveX && target.set('left', newLeft);
   moveY && target.set('top', newTop);
   if (moveX || moveY) {

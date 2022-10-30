@@ -11,6 +11,7 @@ import {
   findCornerQuadrant,
   getLocalPoint,
   invertOrigin,
+  isLocked,
   isTransformCentered,
   NOT_ALLOWED_CURSOR,
 } from './util';
@@ -55,8 +56,8 @@ export function scalingIsForbidden(
   by: ScaleBy,
   scaleProportionally: boolean
 ) {
-  const lockX = fabricObject.lockScalingX,
-    lockY = fabricObject.lockScalingY;
+  const lockX = isLocked(fabricObject, 'lockScalingX'),
+    lockY = isLocked(fabricObject, 'lockScalingY');
   if (lockX && lockY) {
     return true;
   }
@@ -120,8 +121,6 @@ function scaleObject(
   options: { by?: ScaleBy } = {}
 ) {
   const target = transform.target,
-    lockScalingX = target.lockScalingX,
-    lockScalingY = target.lockScalingY,
     by = options.by,
     scaleProportionally = scaleIsProportional(eventData, target),
     forbidScaling = scalingIsForbidden(target, by, scaleProportionally);
@@ -156,7 +155,7 @@ function scaleObject(
     }
 
     if (
-      target.lockScalingFlip &&
+      isLocked(target, 'lockScalingFlip') &&
       (transform.signX !== signX || transform.signY !== signY)
     ) {
       return false;
@@ -198,8 +197,8 @@ function scaleObject(
   const oldScaleX = target.scaleX,
     oldScaleY = target.scaleY;
   if (!by) {
-    !lockScalingX && target.set('scaleX', scaleX);
-    !lockScalingY && target.set('scaleY', scaleY);
+    !isLocked(target, 'lockScalingX') && target.set('scaleX', scaleX);
+    !isLocked(target, 'lockScalingY') && target.set('scaleY', scaleY);
   } else {
     // forbidden cases already handled on top here.
     by === 'x' && target.set('scaleX', scaleX);

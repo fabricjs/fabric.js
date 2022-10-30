@@ -12,7 +12,12 @@ import {
   degreesToRadians,
   radiansToDegrees,
 } from '../util/misc/radiansDegreesConversion';
-import { findCornerQuadrant, getLocalPoint, NOT_ALLOWED_CURSOR } from './util';
+import {
+  findCornerQuadrant,
+  getLocalPoint,
+  isLocked,
+  NOT_ALLOWED_CURSOR,
+} from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 
@@ -61,10 +66,10 @@ export const skewCursorStyleHandler: ControlCursorCallback = (
   control,
   fabricObject
 ) => {
-  if (control.x !== 0 && fabricObject.lockSkewingY) {
+  if (control.x !== 0 && isLocked(fabricObject, 'lockSkewingY')) {
     return NOT_ALLOWED_CURSOR;
   }
-  if (control.y !== 0 && fabricObject.lockSkewingX) {
+  if (control.y !== 0 && isLocked(fabricObject, 'lockSkewingX')) {
     return NOT_ALLOWED_CURSOR;
   }
   const n = findCornerQuadrant(fabricObject, control) % 4;
@@ -155,7 +160,7 @@ function skewHandler(
       skew: skewKey,
       flip: flipKey,
     } = AXIS_KEYS[axis];
-  if (target[lockSkewingKey]) {
+  if (isLocked(target, lockSkewingKey)) {
     return false;
   }
 
