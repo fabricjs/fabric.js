@@ -4,7 +4,6 @@ import {
   ControlCursorCallback,
   TAxisKey,
   TPointerEvent,
-  TransformAction,
   TransformActionHandler,
 } from '../typedefs';
 import { Canvas } from '../__types__';
