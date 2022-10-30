@@ -17,8 +17,7 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
-      - name: Unit tests on Chrome
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
@@ -51,3 +50,9 @@ jobs:
         run: npm run build -- -f
       - name: Run ${{ matrix.suite }} tests
         run: npm run test -- -c node -s ${{ matrix.suite }}
+      - name: Archive visual test results
+        if: always() && matrix.suite == 'visual' && matrix.node-version == '16.x'
+        uses: actions/upload-artifact@v3
+        with:
+          name: node-failing-visual-tests
+          path: cli_output/tests_results/*
