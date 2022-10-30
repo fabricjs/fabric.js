@@ -48,18 +48,16 @@ export class InteractiveFabricObject extends FabricObject {
 
   /**
    * Indicates the angle that an object will lock to while rotating.
-   * @type TDegree
-   * @default
+   * @type [TDegree]
    */
-  snapAngle: TDegree = 0;
+  snapAngle?: TDegree;
 
   /**
    * Indicates the distance from the snapAngle the rotation will lock to the snapAngle.
-   * When `null`, the snapThreshold will default to the snapAngle.
-   * @type TDegree | null
-   * @default
+   * When undefined, the snapThreshold will default to the snapAngle.
+   * @type [TDegree]
    */
-  snapThreshold: TDegree | null = null;
+  snapThreshold?: TDegree;
 
   /**
    * Constructor
