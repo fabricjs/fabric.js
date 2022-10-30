@@ -27,7 +27,7 @@ function appendResultsToNode(node, testId) {
 /**
  * Called from testem.mustache file
  */
-function appendResults({ testId }) {
+function appendTestResults({ testId }) {
   const id = `qunit-test-output-${testId}`;
   const node = document.getElementById(id);
   if (node) {

@@ -14,7 +14,7 @@ module.exports = {
     ...config.serve_files,
     'test/lib/pixelmatch.js',
     'test/lib/visualTestLoop.js',
-    'test/lib/visualCallbackQunit.js',
+    'test/lib/appendTestResults.js',
     ...(process.env.TEST_FILES ? process.env.TEST_FILES.split(',') : ['test/visual/*.js'])
   ],
   routes: {

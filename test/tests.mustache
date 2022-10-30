@@ -27,7 +27,7 @@ QUnit.config.testTimeout = 15000;
 
 {{#visual}}
 <script>
-{{qunit.launch}} && QUnit.testDone(appendResults);
+{{qunit.launch}} && QUnit.testDone(appendTestResults);
 
 // global error handling
 window.addEventListener('unhandledrejection', (event) => {
