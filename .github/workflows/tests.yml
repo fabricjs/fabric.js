@@ -94,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Delete build artifacts
     needs: [build, browser, node]
-    step:
+    steps:
       - uses: geekyeggo/delete-artifact@v2
         with:
           name: tests-build
