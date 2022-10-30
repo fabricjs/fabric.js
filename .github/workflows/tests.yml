@@ -56,6 +56,7 @@ jobs:
   node:
     runs-on: ubuntu-latest
     name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
+    needs: build
     strategy:
       fail-fast: false
       matrix:
