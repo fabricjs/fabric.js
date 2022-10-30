@@ -41,6 +41,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: build
+          path: dist
       - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
         uses: GabrielBB/xvfb-action@v1
         with:
