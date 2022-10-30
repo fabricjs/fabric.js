@@ -509,14 +509,6 @@ export class FabricObject extends ObjectGeometry {
   absolutePositioned: boolean;
 
   /**
-   * A Reference of the Canvas where the object is actually added
-   * @type StaticCanvas | Canvas;
-   * @default undefined
-   * @private
-   */
-  canvas?: StaticCanvas | Canvas;
-
-  /**
    * Quick access for the _cacheCanvas rendering context
    * This is part of the objectCaching feature
    * since 1.7.0
@@ -1419,45 +1411,6 @@ export class FabricObject extends ObjectGeometry {
       dashArray.push.apply(dashArray, dashArray);
     }
     ctx.setLineDash(dashArray);
-  }
-
-  /**
-   * Renders controls and borders for the object
-   * the context here is not transformed
-   * @todo move to interactivity
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {Object} [styleOverride] properties to override the object style
-   */
-  _renderControls(ctx, styleOverride) {
-    let vpt = this.getViewportTransform(),
-      matrix = this.calcTransformMatrix(),
-      options,
-      drawBorders,
-      drawControls;
-    styleOverride = styleOverride || {};
-    drawBorders =
-      typeof styleOverride.hasBorders !== 'undefined'
-        ? styleOverride.hasBorders
-        : this.hasBorders;
-    drawControls =
-      typeof styleOverride.hasControls !== 'undefined'
-        ? styleOverride.hasControls
-        : this.hasControls;
-    matrix = fabric.util.multiplyTransformMatrices(vpt, matrix);
-    options = fabric.util.qrDecompose(matrix);
-    ctx.save();
-    ctx.translate(options.translateX, options.translateY);
-    ctx.lineWidth = 1 * this.borderScaleFactor;
-    if (!this.group) {
-      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-    }
-    if (this.flipX) {
-      options.angle -= 180;
-    }
-    ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
-    drawBorders && this.drawBorders(ctx, options, styleOverride);
-    drawControls && this.drawControls(ctx, styleOverride);
-    ctx.restore();
   }
 
   /**

@@ -3,7 +3,7 @@ import type { Control } from './controls/control.class';
 import type { Gradient } from './gradient/gradient.class';
 import type { Pattern } from './pattern.class';
 import type { Point } from './point.class';
-import type { FabricObject } from './shapes/object.class';
+import type { FabricObject } from './shapes/fabricObject.class';
 import type { saveObjectTransform } from './util/misc/objectTransforms';
 
 interface NominalTag<T> {

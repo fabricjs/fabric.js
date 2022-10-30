@@ -6,7 +6,6 @@ import type {
   TOriginX,
   TOriginY,
 } from '../typedefs';
-import type { Control } from '../controls/control.class';
 import { iMatrix } from '../constants';
 import { Intersection } from '../intersection.class';
 import { Point } from '../point.class';
@@ -41,8 +40,6 @@ type TMatrixCache = {
   key: string;
   value: TMat2D;
 };
-
-type TControlSet = Record<string, Control>;
 
 type TACoords = TCornerPoint;
 
@@ -103,14 +100,10 @@ export class ObjectGeometry extends ObjectOrigin {
   matrixCache?: TMatrixCache;
 
   /**
-   * custom controls interface
-   * controls are added by default_controls.js
-   */
-  controls: TControlSet;
-
-  /**
-   * Object containing this object.
-   * can influence its size and position
+   * A Reference of the Canvas where the object is actually added
+   * @type StaticCanvas | Canvas;
+   * @default undefined
+   * @private
    */
   canvas?: StaticCanvas | Canvas;
 

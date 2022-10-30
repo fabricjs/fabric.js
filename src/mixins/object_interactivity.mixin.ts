@@ -6,14 +6,18 @@ import {
   calcRotateMatrix,
   multiplyTransformMatrices,
   qrDecompose,
+  TQrDecomposeOut,
 } from '../util/misc/matrix';
-import { fabric } from '../../HEADER';
 import { ObjectGeometry } from './object_geometry.mixin';
+import type { Control } from '../controls/control.class';
+import { sizeAfterTransform } from '../util/misc/objectTransforms';
 
 type TOCoord = IPoint & {
   corner: TCornerPoint;
   touchCorner: TCornerPoint;
 };
+
+type TControlSet = Record<string, Control>;
 
 export class InteractiveFabricObject extends FabricObject {
   /**
@@ -58,6 +62,18 @@ export class InteractiveFabricObject extends FabricObject {
    * @type [TDegree]
    */
   snapThreshold?: TDegree;
+
+  /**
+   * holds the controls for the object.
+   * controls are added by default_controls.js
+   */
+  controls: TControlSet;
+
+  /**
+   * internal boolean to signal the code that the object is
+   * part of the drag action.
+   */
+  isMoving?: boolean;
 
   /**
    * Constructor
@@ -258,7 +274,7 @@ export class InteractiveFabricObject extends FabricObject {
     ctx.save();
     const center = this.getRelativeCenterPoint(),
       wh = this._calculateCurrentDimensions(),
-      vpt = this.canvas.viewportTransform;
+      vpt = this.getViewportTransform();
     ctx.translate(center.x, center.y);
     ctx.scale(1 / vpt[0], 1 / vpt[3]);
     ctx.rotate(degreesToRadians(this.angle));
@@ -302,6 +318,40 @@ export class InteractiveFabricObject extends FabricObject {
   }
 
   /**
+   * Renders controls and borders for the object
+   * the context here is not transformed
+   * @todo move to interactivity
+   * @param {CanvasRenderingContext2D} ctx Context to render on
+   * @param {Object} [styleOverride] properties to override the object style
+   */
+  _renderControls(ctx: CanvasRenderingContext2D, styleOverride: any = {}) {
+    const { hasBorders, hasControls } = this;
+    const styleOptions = {
+      hasBorders,
+      hasControls,
+      ...styleOverride,
+    };
+    const vpt = this.getViewportTransform(),
+      shouldDrawBorders = styleOptions.hasBorders,
+      shouldDrawControls = styleOptions.hasControls;
+    const matrix = multiplyTransformMatrices(vpt, this.calcTransformMatrix());
+    const options = qrDecompose(matrix);
+    ctx.save();
+    ctx.translate(options.translateX, options.translateY);
+    ctx.lineWidth = 1 * this.borderScaleFactor;
+    if (!this.group) {
+      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+    }
+    if (this.flipX) {
+      options.angle -= 180;
+    }
+    ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
+    shouldDrawBorders && this.drawBorders(ctx, options, styleOverride);
+    shouldDrawControls && this.drawControls(ctx, styleOverride);
+    ctx.restore();
+  }
+
+  /**
    * Draws borders of an object's bounding box.
    * Requires public properties: width, height
    * Requires public options: padding, borderColor
@@ -311,19 +361,21 @@ export class InteractiveFabricObject extends FabricObject {
    */
   drawBorders(
     ctx: CanvasRenderingContext2D,
-    options: any,
+    options: TQrDecomposeOut,
     styleOverride: any
   ): void {
     let size;
     if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
-      const bbox = fabric.util.sizeAfterTransform(
+      const bbox = sizeAfterTransform(
           this.width,
           this.height,
           options
         ),
         stroke = (
           this.strokeUniform
-            ? new Point().scalarAdd(this.canvas.getZoom())
+            ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1)
+            // this is extremely confusing. options comes from the upper function
+            // and is the qrDecompose of a matrix that takes in account zoom too
             : new Point(options.scaleX, options.scaleY)
         ).scalarMultiply(this.strokeWidth);
       size = bbox.add(stroke).scalarAdd(this.borderScaleFactor);
@@ -374,7 +426,7 @@ export class InteractiveFabricObject extends FabricObject {
    */
   drawControls(ctx: CanvasRenderingContext2D, styleOverride = {}) {
     ctx.save();
-    const retinaScaling = this.canvas.getRetinaScaling();
+    const retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : 1;
     const { cornerStrokeColor, cornerDashArray, cornerColor } = this;
     const options = {
       cornerStrokeColor,

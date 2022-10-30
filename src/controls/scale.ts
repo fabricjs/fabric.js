@@ -1,4 +1,4 @@
-import type { FabricObject } from '../shapes/object.class';
+import type { FabricObject } from '../shapes/fabricObject.class';
 import {
   ControlCursorCallback,
   TAxis,
