@@ -203,7 +203,7 @@ export class InteractiveFabricObject extends FabricObject {
    * @param {Function} fn function to iterate over the controls over
    */
   forEachControl(
-    fn: (arg0: any, arg1: string, arg2: InteractiveFabricObject) => any
+    fn: (control: any, key: string, fabricObject: InteractiveFabricObject) => any
   ) {
     for (const i in this.controls) {
       fn(this.controls[i], i, this);
