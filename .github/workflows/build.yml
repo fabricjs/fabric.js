@@ -10,9 +10,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Uglified build
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16.x
+          cache: npm
       - run: npm ci
       - run: npm run build
   stats:
@@ -25,6 +26,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
+          cache: npm
       - run: npm ci
       - name: build stats
         run: npm run build -- -s
@@ -72,9 +74,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Linting
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16.x
+          cache: npm
       - run: npm ci
       - run: npm run lint
   prettier:
@@ -82,9 +85,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Prettier check
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16.x
+          cache: npm
       - run: npm ci
       - run: npm run prettier:check
   coverage:
@@ -93,9 +97,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Code Coverage Report Updater
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16.x
+          cache: npm
       - run: npm ci
       - run: npm run build -- -f
       - run: npm run test:coverage && npm run test:visual:coverage
