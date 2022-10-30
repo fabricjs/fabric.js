@@ -47,13 +47,13 @@ export class InteractiveFabricObject extends FabricObject {
   _controlsVisibility: Record<string, boolean>;
 
   /**
-   * Indicates the angle that an object will lock to while rotating.
+   * The angle that an object will lock to while rotating.
    * @type [TDegree]
    */
   snapAngle?: TDegree;
 
   /**
-   * Indicates the distance from the snapAngle the rotation will lock to the snapAngle.
+   * The angle difference from the current snapped angle in which snapping should occur.
    * When undefined, the snapThreshold will default to the snapAngle.
    * @type [TDegree]
    */
