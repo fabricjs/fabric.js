@@ -43,4 +43,6 @@ module.exports = {
     debug: Number(process.env.QUNIT_DEBUG_VISUAL_TESTS) || false,
     launch: Number(process.env.QUNIT_LAUNCH) || false,
   },
+  // since we are storing test results we don't want them to get messed up by concurrent runs
+  parallel: 1,
 }
