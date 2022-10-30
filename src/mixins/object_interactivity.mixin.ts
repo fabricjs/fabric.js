@@ -219,7 +219,11 @@ export class InteractiveFabricObject extends FabricObject {
    * @param {Function} fn function to iterate over the controls over
    */
   forEachControl(
-    fn: (control: any, key: string, fabricObject: InteractiveFabricObject) => any
+    fn: (
+      control: any,
+      key: string,
+      fabricObject: InteractiveFabricObject
+    ) => any
   ) {
     for (const i in this.controls) {
       fn(this.controls[i], i, this);
@@ -366,17 +370,13 @@ export class InteractiveFabricObject extends FabricObject {
   ): void {
     let size;
     if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
-      const bbox = sizeAfterTransform(
-          this.width,
-          this.height,
-          options
-        ),
+      const bbox = sizeAfterTransform(this.width, this.height, options),
         stroke = (
           this.strokeUniform
             ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1)
-            // this is extremely confusing. options comes from the upper function
-            // and is the qrDecompose of a matrix that takes in account zoom too
-            : new Point(options.scaleX, options.scaleY)
+            : // this is extremely confusing. options comes from the upper function
+              // and is the qrDecompose of a matrix that takes in account zoom too
+              new Point(options.scaleX, options.scaleY)
         ).scalarMultiply(this.strokeWidth);
       size = bbox.add(stroke).scalarAdd(this.borderScaleFactor);
     } else {
