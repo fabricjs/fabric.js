@@ -23,6 +23,7 @@ module.exports = {
     '/golden_maker.html': 'test/lib/goldenMaker.html',
     '/golden': 'test/visual/golden',
     '/assets': 'test/visual/assets',
+    '/results': 'cli_output/test_results/visuals'
   },
   launchers: {
     Node: {
@@ -33,12 +34,13 @@ module.exports = {
   proxies: {
     '/goldens': {
       target: startGoldensServer().url,
-      secure: false
+      secure: false,
     }
   },
   qunit: {
     ...config.qunit,
     recreate: Number(process.env.QUNIT_RECREATE_VISUAL_REFS) || false,
     debug: Number(process.env.QUNIT_DEBUG_VISUAL_TESTS) || false,
+    launch: Number(process.env.QUNIT_LAUNCH) || false,
   },
 }

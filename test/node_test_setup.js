@@ -30,6 +30,7 @@ global.CI = process.env.CI;
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
 global.fs = require('fs');
+global.path = require('path');
 global.visualCallback = {
   addArguments: function() {},
 };

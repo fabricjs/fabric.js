@@ -27,7 +27,7 @@ QUnit.config.testTimeout = 15000;
 
 {{#visual}}
 <script>
-QUnit.testDone(visualCallback.testDone.bind(visualCallback));
+{{qunit.launch}} && QUnit.testDone(appendResults);
 
 // global error handling
 window.addEventListener('unhandledrejection', (event) => {
@@ -71,6 +71,7 @@ if(
    // is Google Chrome
     QUnit.recreateVisualRefs = {{qunit.recreate}};
     QUnit.debugVisual = {{qunit.debug}};
+    QUnit.launch = {{qunit.launch}};
 }
 </script>
 {{/visual}}
