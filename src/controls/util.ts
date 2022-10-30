@@ -1,6 +1,6 @@
 import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { Point } from '../point.class';
-import type { FabricObject } from '../shapes/object.class';
+import type { FabricObject } from '../shapes/fabricObject.class';
 import {
   TOriginX,
   TOriginY,

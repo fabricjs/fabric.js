@@ -3,7 +3,7 @@ import type { Control } from './controls/control.class';
 import type { Gradient } from './gradient/gradient.class';
 import type { Pattern } from './pattern.class';
 import type { Point } from './point.class';
-import type { FabricObject } from './shapes/object.class';
+import type { FabricObject } from './shapes/fabricObject.class';
 import type { saveObjectTransform } from './util/misc/objectTransforms';
 
 interface NominalTag<T> {
@@ -144,3 +144,10 @@ export type TCrossOrigin = '' | 'anonymous' | 'use-credentials' | null;
 
 export type TOriginX = 'center' | 'left' | 'right' | number;
 export type TOriginY = 'center' | 'top' | 'bottom' | number;
+
+export type TCornerPoint = {
+  tl: Point;
+  tr: Point;
+  bl: Point;
+  br: Point;
+};

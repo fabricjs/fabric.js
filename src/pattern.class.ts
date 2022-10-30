@@ -7,7 +7,7 @@ import { ifNaN } from './util/internals';
 import { loadImage } from './util/misc/objectEnlive';
 import { pick } from './util/misc/pick';
 import { toFixed } from './util/misc/toFixed';
-import { FabricObject } from './shapes/object.class';
+import { FabricObject } from './shapes/fabricObject.class';
 export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
 
 type TExportedKeys =

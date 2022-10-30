@@ -21,7 +21,7 @@ import {
   GradientUnits,
   SVGOptions,
 } from './typedefs';
-import { FabricObject } from '../shapes/object.class';
+import { FabricObject } from '../shapes/fabricObject.class';
 
 /**
  * Gradient class
