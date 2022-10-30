@@ -1,8 +1,6 @@
 import './HEADER';
-// import './lib/event'), // optional gestures
-import './src/mixins/observable.mixin';
+// import './lib/event', // optional gestures
 import './src/mixins/collection.mixin';
-import './src/mixins/shared_methods.mixin';
 import './src/util/misc/misc';
 // import './src/util/named_accessors.mixin'; i would imagine dead forever or proper setters/getters
 import './src/parser'; // optional parser
@@ -20,8 +18,6 @@ import './src/mixins/canvas_dataurl_exporter.mixin';
 import './src/mixins/canvas_serialization.mixin'; // optiona serialization
 import './src/mixins/canvas_gestures.mixin'; // optional gestures
 import './src/shapes/object.class';
-import './src/mixins/object_origin.mixin';
-import './src/mixins/object_geometry.mixin';
 import './src/mixins/object_ancestry.mixin';
 import './src/mixins/object_stacking.mixin';
 import './src/mixins/object.svg_export';

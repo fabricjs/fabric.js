@@ -1,5 +1,9 @@
 //@ts-nocheck
 import { Point } from '../point.class';
+import { FabricObject } from './object.class';
+import { resolveOrigin } from '../mixins/object_origin.mixin';
+
+export class Group extends FabricObject {}
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -18,7 +22,7 @@ import { Point } from '../point.class';
    * @see {@link fabric.Group#initialize} for constructor definition
    */
   fabric.Group = fabric.util.createClass(
-    fabric.Object,
+    FabricObject,
     fabric.Collection,
     /** @lends fabric.Group.prototype */ {
       /**
@@ -49,7 +53,7 @@ import { Point } from '../point.class';
        * as well as for history (undo/redo) purposes
        * @type string[]
        */
-      stateProperties: fabric.Object.prototype.stateProperties.concat('layout'),
+      stateProperties: FabricObject.prototype.stateProperties.concat('layout'),
 
       /**
        * Used to optimize performance
@@ -417,7 +421,7 @@ import { Point } from '../point.class';
        * @return {Boolean}
        */
       shouldCache: function () {
-        var ownCache = fabric.Object.prototype.shouldCache.call(this);
+        var ownCache = FabricObject.prototype.shouldCache.call(this);
         if (ownCache) {
           for (var i = 0; i < this._objects.length; i++) {
             if (this._objects[i].willDrawShadow()) {
@@ -434,7 +438,7 @@ import { Point } from '../point.class';
        * @return {Boolean}
        */
       willDrawShadow: function () {
-        if (fabric.Object.prototype.willDrawShadow.call(this)) {
+        if (FabricObject.prototype.willDrawShadow.call(this)) {
           return true;
         }
         for (var i = 0; i < this._objects.length; i++) {
@@ -802,8 +806,8 @@ import { Point } from '../point.class';
           height = hasHeight ? this.height : bbox.height || 0,
           calculatedCenter = new Point(bbox.centerX || 0, bbox.centerY || 0),
           origin = new Point(
-            this.resolveOriginX(this.originX),
-            this.resolveOriginY(this.originY)
+            resolveOrigin(this.originX),
+            resolveOrigin(this.originY)
           ),
           size = new Point(width, height),
           strokeWidthVector = this._getTransformedDimensions({

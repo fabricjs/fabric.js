@@ -1,4 +1,6 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
+import type { Gradient } from './gradient/gradient.class';
+import type { Pattern } from './pattern.class';
 
 interface NominalTag<T> {
   nominalTag?: T;
@@ -6,11 +8,23 @@ interface NominalTag<T> {
 
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+type TNonFunctionPropertyNames<T> = {
+  [K in keyof T]: T[K] extends Function ? never : K;
+}[keyof T];
+export type TClassProperties<T> = Pick<T, TNonFunctionPropertyNames<T>>;
+
 const enum Degree {}
 const enum Radian {}
 
 export type TDegree = Nominal<number, Degree>;
 export type TRadian = Nominal<number, Radian>;
+
+export type TAxis = 'x' | 'y';
+
+export type TAxisKey<T extends string> = `${T}${Capitalize<TAxis>}`;
+
+export type TFiller = Gradient<'linear'> | Gradient<'radial'> | Pattern;
 
 export type TSize = {
   width: number;
@@ -76,3 +90,6 @@ export type TransformEvent<T> = TEvent &
  * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
  */
 export type TCrossOrigin = '' | 'anonymous' | 'use-credentials' | null;
+
+export type TOriginX = 'center' | 'left' | 'right' | number;
+export type TOriginY = 'center' | 'top' | 'bottom' | number;

@@ -3,6 +3,12 @@
 ## [next]
 
 - ci(): fixed visual tests not to create a missing golden when running from CI and to fail instead [#8311](https://github.com/fabricjs/fabric.js/pull/8311)
+- ci(): remove buggy changelog action in favor of `git diff` bash script + direct git how to merge `CHANGELOG.md` [#8309](https://github.com/fabricjs/fabric.js/pull/8346)
+- fix(): skewing controls accuracy + successive interactions [#8380](https://github.com/fabricjs/fabric.js/pull/8380)
+- chore(TS): Convert Geometry and Origin to classes/e6/ts [#8390](https://github.com/fabricjs/fabric.js/pull/8390)
+- ci(): build stats report [#8395](https://github.com/fabricjs/fabric.js/pull/8395)
+- chore(TS): convert object to es6 class [#8322](https://github.com/fabricjs/fabric.js/pull/8322)
+- docs(): guides follow up, feature request template [#8379](https://github.com/fabricjs/fabric.js/pull/8379)
 - docs(): refactor guides, bug report template [#8189](https://github.com/fabricjs/fabric.js/pull/8189)
 - BREAKING fix(polyline/polygon): stroke bounding box for all line join/cap cases [#8344](https://github.com/fabricjs/fabric.js/pull/8344)
   BREAKING: `_setPositionDimensions` was removed in favor of `setDimensions`

@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Point } from './point.class';
+import { FabricObject } from './shapes/object.class';
 
 (function (global) {
   var fabric = global.fabric,
@@ -805,7 +806,8 @@ import { Point } from './point.class';
             lastX: pointer.x,
             lastY: pointer.y,
             theta: degreesToRadians(target.angle),
-            width: target.width * target.scaleX,
+            width: target.width,
+            height: target.height,
             shiftKey: e.shiftKey,
             altKey: altKey,
             original: fabric.util.saveObjectTransform(target),
@@ -871,7 +873,7 @@ import { Point } from './point.class';
         maxX -= strokeOffset;
         maxY -= strokeOffset;
         // selection border
-        fabric.Object.prototype._setLineDash.call(
+        FabricObject.prototype._setLineDash.call(
           this,
           ctx,
           this.selectionDashArray
