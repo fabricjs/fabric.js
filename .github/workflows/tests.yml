@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.target }}-failing-visual-tests
-          path: cli_output/tests_results/visuals
+          path: cli_output/test_results/visuals
   node:
     runs-on: ubuntu-latest
     name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
@@ -61,4 +61,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: node-failing-visual-tests
-          path: cli_output/tests_results/visuals
+          path: cli_output/test_results/visuals
