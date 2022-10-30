@@ -150,7 +150,7 @@ QUnit.module('globalCompositeOperation', hooks => {
                 callback(canvas.lowerCanvasEl);
             },
             golden: `gco/${operation}.png`,
-            percentage: 0.0001,
+            percentage: 0.04,
             ...size
         }
     }).forEach(visualTestLoop(QUnit));
