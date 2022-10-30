@@ -1,117 +1,124 @@
-//@ts-nocheck
+// @ts-nocheck
+
+import { fabric } from '../../HEADER';
 import { FabricObject } from '../shapes/object.class';
+import {
+  changeWidth,
+  rotationStyleHandler,
+  rotationWithSnapping,
+  scaleCursorStyleHandler,
+  scaleOrSkewActionName,
+  scaleSkewCursorStyleHandler,
+  scalingEqually,
+  scalingXOrSkewingY,
+  scalingYOrSkewingX,
+} from './actions';
+import { Control } from './control.class';
 
-(function (global) {
-  var fabric = global.fabric,
-    controlsUtils = fabric.controlsUtils,
-    scaleSkewStyleHandler = controlsUtils.scaleSkewCursorStyleHandler,
-    scaleStyleHandler = controlsUtils.scaleCursorStyleHandler,
-    scalingEqually = controlsUtils.scalingEqually,
-    scalingYOrSkewingX = controlsUtils.scalingYOrSkewingX,
-    scalingXOrSkewingY = controlsUtils.scalingXOrSkewingY,
-    scaleOrSkewActionName = controlsUtils.scaleOrSkewActionName,
-    objectControls = FabricObject.prototype.controls;
-
-  objectControls.ml = new fabric.Control({
+export const defaultControls = {
+  ml: new Control({
     x: -0.5,
     y: 0,
-    cursorStyleHandler: scaleSkewStyleHandler,
+    cursorStyleHandler: scaleSkewCursorStyleHandler,
     actionHandler: scalingXOrSkewingY,
     getActionName: scaleOrSkewActionName,
-  });
+  }),
 
-  objectControls.mr = new fabric.Control({
+  mr: new Control({
     x: 0.5,
     y: 0,
-    cursorStyleHandler: scaleSkewStyleHandler,
+    cursorStyleHandler: scaleSkewCursorStyleHandler,
     actionHandler: scalingXOrSkewingY,
     getActionName: scaleOrSkewActionName,
-  });
+  }),
 
-  objectControls.mb = new fabric.Control({
+  mb: new Control({
     x: 0,
     y: 0.5,
-    cursorStyleHandler: scaleSkewStyleHandler,
+    cursorStyleHandler: scaleSkewCursorStyleHandler,
     actionHandler: scalingYOrSkewingX,
     getActionName: scaleOrSkewActionName,
-  });
+  }),
 
-  objectControls.mt = new fabric.Control({
+  mt: new Control({
     x: 0,
     y: -0.5,
-    cursorStyleHandler: scaleSkewStyleHandler,
+    cursorStyleHandler: scaleSkewCursorStyleHandler,
     actionHandler: scalingYOrSkewingX,
     getActionName: scaleOrSkewActionName,
-  });
+  }),
 
-  objectControls.tl = new fabric.Control({
+  tl: new Control({
     x: -0.5,
     y: -0.5,
-    cursorStyleHandler: scaleStyleHandler,
+    cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: scalingEqually,
-  });
+  }),
 
-  objectControls.tr = new fabric.Control({
+  tr: new Control({
     x: 0.5,
     y: -0.5,
-    cursorStyleHandler: scaleStyleHandler,
+    cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: scalingEqually,
-  });
+  }),
 
-  objectControls.bl = new fabric.Control({
+  bl: new Control({
     x: -0.5,
     y: 0.5,
-    cursorStyleHandler: scaleStyleHandler,
+    cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: scalingEqually,
-  });
+  }),
 
-  objectControls.br = new fabric.Control({
+  br: new Control({
     x: 0.5,
     y: 0.5,
-    cursorStyleHandler: scaleStyleHandler,
+    cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: scalingEqually,
-  });
+  }),
 
-  objectControls.mtr = new fabric.Control({
+  mtr: new Control({
     x: 0,
     y: -0.5,
-    actionHandler: controlsUtils.rotationWithSnapping,
-    cursorStyleHandler: controlsUtils.rotationStyleHandler,
+    actionHandler: rotationWithSnapping,
+    cursorStyleHandler: rotationStyleHandler,
     offsetY: -40,
     withConnection: true,
     actionName: 'rotate',
-  });
+  }),
+};
 
-  if (fabric.Textbox) {
-    // this is breaking the prototype inheritance, no time / ideas to fix it.
-    // is important to document that if you want to have all objects to have a
-    // specific custom control, you have to add it to Object prototype and to Textbox
-    // prototype. The controls are shared as references. So changes to control `tr`
-    // can still apply to all objects if needed.
-    var textBoxControls = (fabric.Textbox.prototype.controls = {});
+export const textboxDefaultControls = {
+  ...defaultControls,
+  mr: new Control({
+    x: 0.5,
+    y: 0,
+    actionHandler: changeWidth,
+    cursorStyleHandler: scaleSkewCursorStyleHandler,
+    actionName: 'resizing',
+  }),
 
-    textBoxControls.mtr = objectControls.mtr;
-    textBoxControls.tr = objectControls.tr;
-    textBoxControls.br = objectControls.br;
-    textBoxControls.tl = objectControls.tl;
-    textBoxControls.bl = objectControls.bl;
-    textBoxControls.mt = objectControls.mt;
-    textBoxControls.mb = objectControls.mb;
+  ml: new Control({
+    x: -0.5,
+    y: 0,
+    actionHandler: changeWidth,
+    cursorStyleHandler: scaleSkewCursorStyleHandler,
+    actionName: 'resizing',
+  }),
+};
 
-    textBoxControls.mr = new fabric.Control({
-      x: 0.5,
-      y: 0,
-      actionHandler: controlsUtils.changeWidth,
-      cursorStyleHandler: scaleSkewStyleHandler,
-      actionName: 'resizing',
-    });
+FabricObject.prototype.controls = {
+  ...(FabricObject.prototype.controls || {}),
+  ...defaultControls,
+};
 
-    textBoxControls.ml = new fabric.Control({
-      x: -0.5,
-      y: 0,
-      actionHandler: controlsUtils.changeWidth,
-      cursorStyleHandler: scaleSkewStyleHandler,
-      actionName: 'resizing',
-    });
-  }
-})(typeof exports !== 'undefined' ? exports : window);
+if (fabric.Textbox) {
+  // this is breaking the prototype inheritance, no time / ideas to fix it.
+  // is important to document that if you want to have all objects to have a
+  // specific custom control, you have to add it to Object prototype and to Textbox
+  // prototype. The controls are shared as references. So changes to control `tr`
+  // can still apply to all objects if needed.
+  fabric.Textbox.prototype.controls = {
+    ...(fabric.Textbox.prototype.controls || {}),
+    ...textboxDefaultControls,
+  };
+}

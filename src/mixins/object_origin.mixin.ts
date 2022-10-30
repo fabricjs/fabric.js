@@ -301,36 +301,6 @@ export class ObjectOrigin extends CommonMethods {
   }
 
   /**
-   * Returns the normalized point (rotated relative to center) in local coordinates
-   * @param {Point} point The point relative to instance coordinate system
-   * @param {TOriginX} originX Horizontal origin: 'left', 'center' or 'right'
-   * @param {TOriginY} originY Vertical origin: 'top', 'center' or 'bottom'
-   * @return {Point}
-   */
-  normalizePoint(point: Point, originX: TOriginX, originY: TOriginY): Point {
-    const center = this.getRelativeCenterPoint();
-    let p, p2;
-    if (typeof originX !== 'undefined' && typeof originY !== 'undefined') {
-      p = this.translateToGivenOrigin(
-        center,
-        'center',
-        'center',
-        originX,
-        originY
-      );
-    } else {
-      p = new Point(this.left, this.top);
-    }
-
-    if (this.angle) {
-      p2 = point.rotate(-degreesToRadians(this.angle), center);
-    } else {
-      p2 = point;
-    }
-    return p2.subtract(p);
-  }
-
-  /**
    * Sets the position of the object taking into consideration the object's origin
    * @param {Point} pos The new position of the object
    * @param {TOriginX} originX Horizontal origin: 'left', 'center' or 'right'

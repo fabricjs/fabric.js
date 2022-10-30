@@ -16,9 +16,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { createCanvasElement } from '../util/misc/dom';
 import { ObjectGeometry } from '../mixins/object_geometry.mixin';
 import { qrDecompose, transformPoint } from '../util/misc/matrix';
-
-type StaticCanvas = any;
-type Canvas = any;
+import { Canvas, Shadow, StaticCanvas } from '../__types__';
 
 const ALIASING_LIMIT = 2;
 
@@ -255,7 +253,7 @@ export class FabricObject extends ObjectGeometry {
    * @type fabric.Shadow
    * @default null
    */
-  shadow: any | null;
+  shadow: Shadow | null;
 
   /**
    * Opacity of object's controlling borders when object is active and moving
@@ -629,7 +627,7 @@ export class FabricObject extends ObjectGeometry {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: Record<string, unknown>) {
+  constructor(options?: Partial<TClassProperties<FabricObject>>) {
     super();
     if (options) {
       this.setOptions(options);
@@ -640,7 +638,7 @@ export class FabricObject extends ObjectGeometry {
    * Temporary compatibility issue with old classes
    * @param {Object} [options] Options object
    */
-  initialize(options: Record<string, unknown>) {
+  initialize(options?: Partial<TClassProperties<FabricObject>>) {
     if (options) {
       this.setOptions(options);
     }
