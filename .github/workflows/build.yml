@@ -8,11 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      stats: ${{ steps.b.outputs.results }}
+      stats: ${{ steps.b.outputs.result }}
     steps:
       - uses: actions/checkout@v3
-      - name: Uglified build
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16.x
           cache: npm
