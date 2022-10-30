@@ -6,9 +6,25 @@ on:
     branches: [master]
 
 jobs:
+  build:
+    name: Upload build artifact
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - run: npm run build -- -f
+      - name: Upload artifact
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: dist
   browser:
     name: ${{ matrix.target }} ${{ matrix.suite }} tests
     runs-on: ubuntu-latest
+    needs: build
     strategy:
       matrix:
         node-version: [16.x]
@@ -21,7 +37,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
-      - run: npm run build -- -f
+      - uses: actions/download-artifact@v3
+        with:
+          name: build
       - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
         uses: GabrielBB/xvfb-action@v1
         with:
