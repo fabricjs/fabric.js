@@ -38,7 +38,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
-      - uses: actions/download-artifact@v3
+      - name: Download build
+        uses: actions/download-artifact@v3
         with:
           name: build
           path: dist
@@ -72,8 +73,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
-      - name: Build
-        run: npm run build -- -f
+      - name: Download build
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: dist
       - name: Run ${{ matrix.suite }} tests
         run: npm run test -- -c node -s ${{ matrix.suite }}
       - name: Archive visual test results
