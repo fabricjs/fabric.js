@@ -1406,7 +1406,7 @@ export class FabricObject extends ObjectGeometry {
     if (!dashArray || dashArray.length === 0) {
       return;
     }
-    // Spec requires the concatenation of two copies the dash list when the number of elements is odd
+    // Spec requires the concatenation of two copies of the dash array when the number of elements is odd
     if (1 & dashArray.length) {
       dashArray.push(...dashArray);
     }
