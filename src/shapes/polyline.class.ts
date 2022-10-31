@@ -1,5 +1,6 @@
 import { fabric } from '../../HEADER';
 import { config } from '../config';
+import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import { Point } from '../point.class';
@@ -269,7 +270,7 @@ export class Polyline extends FabricObject {
    */
   static ATTRIBUTE_NAMES = [...SHARED_ATTRIBUTES];
 
-  static fromElement = Polyline.fromElementGenerator('Polyline');
+  static fromElement = Polyline.fromElementGenerator(Polyline);
 
   /**
    * Returns Polyline instance from an SVG element

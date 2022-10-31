@@ -1,10 +1,18 @@
-export class Polygon extends fabric.Polyline {
+import { fabric } from '../../HEADER';
+import { SHARED_ATTRIBUTES } from '../parser/attributes';
+import { TClassProperties } from '../typedefs';
+import { FabricObject } from './object.class';
+import { Polyline } from './polyline.class';
+
+export class Polygon extends Polyline {
   /**
    * @todo make this method protected when migrating
    */
   isOpen() {
     return false;
   }
+
+  /* _FROM_SVG_START_ */
 
   /**
    * List of attribute names to account for when parsing SVG element (used by `Polygon.fromElement`)
@@ -22,7 +30,9 @@ export class Polygon extends fabric.Polyline {
    * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  static fromElement = fabric.Polyline.fromElementGenerator('Polygon');
+  static fromElement = Polyline.fromElementGenerator(Polygon);
+
+  /* _FROM_SVG_END_ */
 
   /**
    * Returns Polygon instance from an object representation
@@ -45,7 +55,3 @@ export const polygonDefaultValues: Partial<TClassProperties<Polygon>> = {
 Object.assign(Polygon.prototype, polygonDefaultValues);
 /** @todo TODO_JS_MIGRATION remove next line after refactoring build */
 fabric.Polygon = Polygon;
-
-/* _FROM_SVG_START_ */
-
-/* _FROM_SVG_END_ */
