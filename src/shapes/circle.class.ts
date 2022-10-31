@@ -162,10 +162,7 @@ export class Circle extends FabricObject {
    * @param {Object} [options] Partial Circle object to default missing properties on the element.
    * @throws {Error} If value of `r` attribute is missing or invalid
    */
-  static fromElement = function (
-    element: SVGElement,
-    callback: (circle: Circle) => any
-  ) {
+  static fromElement(element: SVGElement, callback: (circle: Circle) => any) {
     const {
       left = 0,
       top = 0,
@@ -188,7 +185,7 @@ export class Circle extends FabricObject {
         top: top - radius,
       })
     );
-  };
+  }
 
   /* _FROM_SVG_END_ */
 
@@ -199,8 +196,9 @@ export class Circle extends FabricObject {
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Circle>}
    */
-  static fromObject = (object: object): Promise<Circle> =>
-    FabricObject._fromObject(Circle, object);
+  static fromObject(object: object): Promise<Circle> {
+    return FabricObject._fromObject(Circle, object);
+  }
 }
 
 export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
