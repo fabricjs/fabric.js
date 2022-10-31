@@ -269,12 +269,12 @@ function transformClass(type, raw, options = {}) {
   const duplicateMethods = _.differenceWith(
     methods,
     _.uniqBy(methods, 'node.key.name'),
-    (a, b) => a !== b
+    (a, b) => a === b
   );
   if (duplicateMethods.length > 0) {
     throw new Error(
       `${name}: duplicate methods found: ${_.map(
-        duplicateProps,
+        duplicateMethods,
         'node.key.name'
       )}`
     );
