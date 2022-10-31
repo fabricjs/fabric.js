@@ -283,8 +283,6 @@ function transformClass(type, raw, options = {}) {
     }
   } while (transformed !== body);
 
-  body = body.replace(/fabric\.Object/gm, 'FabricObject');
-
   const finalName =
     type === 'mixin'
       ? `${_.upperFirst(name)}${className.replace(
@@ -321,6 +319,10 @@ function transformClass(type, raw, options = {}) {
       .slice(end + 1)
       .replace(/\s*\)\s*;?/, '')}`;
   }
+
+  rawFile = rawFile
+    .replace(new RegExp(namespace.replace(/\./g, '\\.'), 'g'), name)
+    .replace(/fabric\.Object/g, 'FabricObject');
 
   if (_.size(defaultValues) > 0) {
     const defaultsKey = `${_.lowerFirst(name)}DefaultValues`;
