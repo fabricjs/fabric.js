@@ -311,7 +311,7 @@ function transformClass(type, raw, options = {}) {
   methods.forEach(({ node, comment }) => {
     const key = node.key.name;
     const value = printNode(node.value.body.body);
-    console.log(value);
+    console.log('fff', value);
     const methodAST = acorn.parse(value, {
       ecmaVersion: 2022,
       allowReturnOutsideFunction: true,
@@ -329,15 +329,10 @@ function transformClass(type, raw, options = {}) {
               ? 'super'
               : `super.${methodNameArg.value}`
           }(${printASTNode(value, args)})`;
-          console.log(printNode(node));
           superTransforms.push({
             node,
             methodName: methodNameArg.value,
-            value:
-              out.split('(').length < out.split(')').length &&
-              out[out.length - 1] === ')'
-                ? out.slice(0, -1)
-                : out,
+            value: out,
           });
         }
       },
@@ -351,7 +346,8 @@ function transformClass(type, raw, options = {}) {
         (key === 'initialize' ? 'constructor' : key) +
         `(${printNode(node.value.params).slice(0, -1)}) {\n` +
         superTransforms.reduceRight((value, { node, value: out }) => {
-          return value.slice(0, node.start) + out + value.slice(node.end + 1);
+          return value.replace(printASTNode(value, node), out);
+          // return value.slice(0, node.start) + out + value.slice(node.end + 1);
         }, value) +
         '\n}'
     );
