@@ -412,10 +412,6 @@ function transformClass(type, raw, options = {}) {
       `Object.assign(${finalName}.prototype, ${defaultsKey})`;
   }
 
-  if (type === 'class' /*&& !useExports*/) {
-    classDirective += `\n/** @todo TODO_JS_MIGRATION remove next line after refactoring build */\n${namespace} = ${name};\n`;
-  }
-
   let rawFile;
 
   const lastNode = ast.body[ast.body.length - 1];
@@ -456,6 +452,10 @@ function transformClass(type, raw, options = {}) {
 
   rawFile.indexOf('//@ts-nocheck') === -1 &&
     (rawFile = `//@ts-nocheck\n${rawFile}`);
+
+  if (type === 'class' /*&& !useExports*/) {
+    classDirective += `\n\n/** @todo TODO_JS_MIGRATION remove next line after refactoring build */\n${namespace} = ${name};\n`;
+  }
 
   return {
     name,
