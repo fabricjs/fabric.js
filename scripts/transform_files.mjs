@@ -113,7 +113,10 @@ function parseClassBase(raw, find) {
 
   const statics = [];
   walk.simple(ast, {
-    ExpressionStatement({ expression: { left, right } }) {
+    ExpressionStatement(node) {
+      const {
+        expression: { left, right },
+      } = node;
       if (
         left?.type === 'MemberExpression' &&
         printNode(left.object).slice(0, -1) === variableName
@@ -121,8 +124,8 @@ function parseClassBase(raw, find) {
         statics.push({
           type: right.type === 'FunctionExpression' ? 'method' : 'property',
           key: printNode(left.property),
-          value: printNode(right),
-          node: right,
+          value: right,
+          node,
           comment: findNodeComment(left),
         });
       }
@@ -316,21 +319,26 @@ function transformClass(type, raw, options = {}) {
     );
   });
 
-  staticProperties.forEach(({ key, node, comment }) => {
-    classBody.push(
-      (comment ? printNode(comment) : '') + '\n' + key + '=' + printNode(node)
-    );
-  });
-
-  staticMethods.forEach(({ key, node, comment }) => {
+  staticProperties.forEach(({ key, value, comment }) => {
     classBody.push(
       (comment ? printNode(comment) : '') +
         '\n' +
         'static ' +
-        (node.async ? 'async ' : '') +
         key +
-        `(${printNode(node.params).slice(0, -1)}) {\n` +
-        printNode(node.body.body) +
+        '=' +
+        printNode(value)
+    );
+  });
+
+  staticMethods.forEach(({ key, value, comment }) => {
+    classBody.push(
+      (comment ? printNode(comment) : '') +
+        '\n' +
+        'static ' +
+        (value.async ? 'async ' : '') +
+        key +
+        `(${printNode(value.params).slice(0, -1)}) {\n` +
+        printNode(value.body.body) +
         '\n}'
     );
   });
@@ -367,8 +375,9 @@ function transformClass(type, raw, options = {}) {
     const defaultsKey = `${_.lowerFirst(finalName)}DefaultValues`;
     classDirective +=
       '\n\n' +
-      `export const ${defaultsKey} = {\n${_.map(defaultValues, (value, key) =>
-        [key, value].join(':')
+      `export const ${defaultsKey}: TClassProperties<${finalName}> = {\n${_.map(
+        defaultValues,
+        (value, key) => [key, value].join(':')
       ).join(',\n')}\n};` +
       '\n\n' +
       `Object.assign(${finalName}.prototype, ${defaultsKey})`;
@@ -398,6 +407,19 @@ function transformClass(type, raw, options = {}) {
       .slice(end + 1)
       .replace(/\s*\)\s*;?/, '')}`;
   }
+
+  [...staticMethods, ...staticProperties].forEach(({ node, comment }) => {
+    if (comment) {
+      rawFile = rawFile.replace(
+        new RegExp(
+          _.escapeRegExp(printNode(comment, false)).replace(' ', '\\s'),
+          'gm'
+        ),
+        ''
+      );
+    }
+    rawFile = rawFile.replace(printNode(node, false), '');
+  });
 
   rawFile = rawFile
     .replace(new RegExp(namespace.replace(/\./g, '\\.'), 'g'), name)
