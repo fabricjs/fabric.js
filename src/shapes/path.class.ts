@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
@@ -24,7 +26,9 @@ export class Path extends FabricObject {
 
   pathOffset: Point;
 
-  fromSVG: boolean;
+  fromSVG?: boolean;
+
+  sourcePath?: string;
 
   /**
    * Constructor
@@ -59,7 +63,7 @@ export class Path extends FabricObject {
    * @private
    * @param {CanvasRenderingContext2D} ctx context to render path on
    */
-  _renderPathCommands(ctx) {
+  _renderPathCommands(ctx: CanvasRenderingContext2D) {
     let current, // current instruction
       subpathStartX = 0,
       subpathStartY = 0,
@@ -134,7 +138,7 @@ export class Path extends FabricObject {
    * @private
    * @param {CanvasRenderingContext2D} ctx context to render path on
    */
-  _render(ctx) {
+  _render(ctx: CanvasRenderingContext2D) {
     this._renderPathCommands(ctx);
     this._renderPaintInOrder(ctx);
   }
@@ -160,7 +164,7 @@ export class Path extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude) {
+  toObject(propertiesToInclude: (keyof this)[] = []) {
     return {
       ...super.toObject(propertiesToInclude),
       path: this.path.map((item) => {
@@ -174,8 +178,8 @@ export class Path extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toDatalessObject(propertiesToInclude) {
-    const o = this.toObject(['sourcePath'].concat(propertiesToInclude));
+  toDatalessObject(propertiesToInclude: (keyof this)[] = []) {
+    const o = this.toObject(['sourcePath', ...propertiesToInclude]);
     if (o.sourcePath) {
       delete o.path;
     }
@@ -225,12 +229,6 @@ export class Path extends FabricObject {
       })
     );
   }
-  _createBaseClipPathSVGMarkup(
-    arg0: any[],
-    arg1: { reviver: any; additionalTransform: string }
-  ) {
-    throw new Error('Method not implemented.');
-  }
 
   /**
    * Returns svg representation of an instance
@@ -243,12 +241,6 @@ export class Path extends FabricObject {
       reviver: reviver,
       additionalTransform: additionalTransform,
     });
-  }
-  _createBaseSVGMarkup(
-    arg0: any[],
-    arg1: { reviver: any; additionalTransform: string }
-  ) {
-    throw new Error('Method not implemented.');
   }
 
   /**
