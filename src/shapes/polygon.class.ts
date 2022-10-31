@@ -1,77 +1,51 @@
-//@ts-nocheck
-
-import { projectStrokeOnPoints } from '../util/misc/projectStroke';
-
-(function (global) {
-  var fabric = global.fabric || (global.fabric = {});
-
+export class Polygon extends fabric.Polyline {
   /**
-   * Polygon class
-   * @class fabric.Polygon
-   * @extends fabric.Polyline
-   * @see {@link fabric.Polygon#initialize} for constructor definition
+   * @todo make this method protected when migrating
    */
-  fabric.Polygon = fabric.util.createClass(
-    fabric.Polyline,
-    /** @lends fabric.Polygon.prototype */ {
-      /**
-       * Type of an object
-       * @type String
-       * @default
-       */
-      type: 'polygon',
+  isOpen() {
+    return false;
+  }
 
-      /**
-       * @private
-       */
-      _projectStrokeOnPoints: function () {
-        return projectStrokeOnPoints(this.points, this);
-      },
-
-      /**
-       * @private
-       * @param {CanvasRenderingContext2D} ctx Context to render on
-       */
-      _render: function (ctx) {
-        if (!this.commonRender(ctx)) {
-          return;
-        }
-        ctx.closePath();
-        this._renderPaintInOrder(ctx);
-      },
-    }
-  );
-
-  /* _FROM_SVG_START_ */
   /**
-   * List of attribute names to account for when parsing SVG element (used by `fabric.Polygon.fromElement`)
+   * List of attribute names to account for when parsing SVG element (used by `Polygon.fromElement`)
    * @static
-   * @memberOf fabric.Polygon
+   * @memberOf Polygon
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolygonElement
    */
-  fabric.Polygon.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat();
+  static ATTRIBUTE_NAMES = SHARED_ATTRIBUTES.concat();
 
   /**
-   * Returns {@link fabric.Polygon} instance from an SVG element
+   * Returns {@link Polygon} instance from an SVG element
    * @static
-   * @memberOf fabric.Polygon
+   * @memberOf Polygon
    * @param {SVGElement} element Element to parse
    * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  fabric.Polygon.fromElement = fabric.Polyline.fromElementGenerator('Polygon');
-  /* _FROM_SVG_END_ */
+  static fromElement = fabric.Polyline.fromElementGenerator('Polygon');
 
   /**
-   * Returns fabric.Polygon instance from an object representation
+   * Returns Polygon instance from an object representation
    * @static
-   * @memberOf fabric.Polygon
+   * @memberOf Polygon
    * @param {Object} object Object to create an instance from
-   * @returns {Promise<fabric.Polygon>}
+   * @returns {Promise<Polygon>}
    */
-  fabric.Polygon.fromObject = function (object) {
-    return fabric.Object._fromObject(fabric.Polygon, object, {
+  static fromObject(object) {
+    return FabricObject._fromObject(Polygon, object, {
       extraParam: 'points',
     });
-  };
-})(typeof exports !== 'undefined' ? exports : window);
+  }
+}
+
+export const polygonDefaultValues: Partial<TClassProperties<Polygon>> = {
+  type: 'polygon',
+};
+
+Object.assign(Polygon.prototype, polygonDefaultValues);
+/** @todo TODO_JS_MIGRATION remove next line after refactoring build */
+fabric.Polygon = Polygon;
+
+/* _FROM_SVG_START_ */
+
+/* _FROM_SVG_END_ */
