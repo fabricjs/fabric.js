@@ -16,22 +16,6 @@ function readFile(file) {
   return fs.readFileSync(path.resolve(wd, file)).toString('utf-8');
 }
 
-function getVariableNameOfNS(raw, namespace) {
-  const regex = new RegExp(
-    `\\s*(.+)=\\s*${namespace.replaceAll('.', '\\.')}[^(]+`,
-    'm'
-  );
-  const result = regex.exec(raw);
-  return result ? result[1].trim() : namespace;
-}
-
-function getNSFromVariableName(raw, varname) {
-  if (varname === 'fabric') return 'fabric';
-  const regex = new RegExp(`\\s*${varname}\\s*=\\s*(.*)\\s*?,\\s*`, 'gm');
-  const result = regex.exec(raw);
-  return result ? result[1].trim() : null;
-}
-
 function findObject(raw, charStart, charEnd, startFrom = 0) {
   const start = raw.indexOf(charStart, startFrom);
   let index = start;
@@ -72,7 +56,7 @@ function printASTNode(raw, node, removeTrailingComma = true) {
  */
 function parseClassBase(raw, find) {
   const ast = acorn.parse(raw, { ecmaVersion: 2022, sourceType: 'module' });
-  // fs.writeFileSync('./ast.json', JSON.stringify(ast, null, 2));
+  fs.writeFileSync('./ast.json', JSON.stringify(ast, null, 2));
 
   const { node: found } = walk.findNodeAt(ast, undefined, undefined, find);
   // console.log(JSON.stringify(found, null, 2));
@@ -131,6 +115,7 @@ function parseClassBase(raw, find) {
     },
     start: declaration.start,
     end: declaration.end,
+    variableNode,
     declaration,
     methods,
     properties,
@@ -213,24 +198,6 @@ function getMixinName(file) {
   return name.replace('Itext', 'IText') + 'Mixin';
 }
 
-function transformFile(raw, { namespace } = {}) {
-  if (raw.replace(/\/\*.*\*\\s*/).startsWith('(function')) {
-    const wrapper = findObject(raw, '{', '}');
-    raw = wrapper.raw.slice(1, wrapper.raw.length - 1);
-  }
-
-  const annoyingCheck = new RegExp(
-    `if\\s*\\(\\s*(global.)?${namespace.replace(/\./g, '\\.')}\\s*\\)\\s*{`
-  );
-  const result = annoyingCheck.exec(raw);
-  if (result) {
-    const found = findObject(raw, '{', '}', result.index);
-    raw = raw.slice(0, result.index) + raw.slice(found.end + 1);
-  }
-  raw.indexOf('//@ts-nocheck') === -1 && (raw = `//@ts-nocheck\n${raw}`);
-  return raw;
-}
-
 /**
  *
  * @param {string} file
@@ -241,6 +208,7 @@ function transformClass(type, raw, options = {}) {
   const { className, useExports } = options;
   if (!type) throw new Error(`INVALID_ARGUMENT type`);
   const {
+    ast,
     match,
     name,
     namespace,
@@ -254,6 +222,7 @@ function transformClass(type, raw, options = {}) {
     properties,
     defaultValues,
     declaration,
+    variableNode,
   } = type === 'mixin' ? parseMixin(raw) : parseClass(raw);
   let body = rawBody;
   let offset = start;
@@ -301,7 +270,6 @@ function transformClass(type, raw, options = {}) {
     const typeable =
       node.value.type === 'Literal' &&
       ['boolean', 'number', 'string'].includes(typeof node.value.value);
-    console.log(printASTNode(raw, node));
     replaceNode(node, typeable ? `${key}: ${typeof node.value.value}` : key);
   });
 
@@ -315,46 +283,71 @@ function transformClass(type, raw, options = {}) {
     }
   } while (transformed !== body);
 
+  body = body.replace(/fabric\.Object/gm, 'FabricObject');
+
+  const finalName =
+    type === 'mixin'
+      ? `${_.upperFirst(name)}${className.replace(
+          new RegExp(
+            name.toLowerCase() === 'staticcanvas' ? 'canvas' : name,
+            'i'
+          ),
+          ''
+        )}` || name
+      : className || name;
+
   const classDirective =
     type === 'mixin'
-      ? generateMixin(
-          body,
-          `${_.upperFirst(name)}${className.replace(
-            new RegExp(
-              name.toLowerCase() === 'staticcanvas' ? 'canvas' : name,
-              'i'
-            ),
-            ''
-          )}` || name,
-          namespace,
-          useExports
-        )
-      : generateClass(body, className || name, superClass, useExports);
+      ? generateMixin(body, finalName, namespace, useExports)
+      : generateClass(body, finalName, superClass, useExports);
 
-  let rawFile = `${raw.slice(0, match.index)}${classDirective}${raw
-    .slice(end + 1)
-    .replace(/\s*\)\s*;?/, '')}`;
+  let rawFile;
 
-  //  in case of multiple declaration in one file
-  try {
-    return transformClass('class', rawFile, options);
-  } catch (error) {}
-  try {
-    return transformClass('mixin', rawFile, options);
-  } catch (error) {}
+  const lastNode = ast.body[ast.body.length - 1];
+  if (
+    lastNode.type === 'ExpressionStatement' &&
+    lastNode.expression.callee.params[0].name === 'global'
+  ) {
+    const bodyNodes = lastNode.expression.callee.body.body;
+    rawFile =
+      raw.slice(0, lastNode.start) +
+      printASTNode(raw, {
+        start: bodyNodes[0].start,
+        end: bodyNodes[bodyNodes.length - 1].end,
+      }).replace(printASTNode(raw, variableNode, false), classDirective) +
+      raw.slice(lastNode.end + 1);
+  } else {
+    rawFile = `${raw.slice(0, variableNode.start)}${classDirective}${raw
+      .slice(end + 1)
+      .replace(/\s*\)\s*;?/, '')}`;
+  }
 
   if (_.size(defaultValues) > 0) {
+    const defaultsKey = `${_.lowerFirst(name)}DefaultValues`;
     rawFile +=
       '\n' +
-      `Object.assign(${className || name}.prototype, {${_.map(
-        defaultValues,
-        (value, key) => [key, value].join(':')
-      ).join(',\n')}})`;
+      `export const ${defaultsKey} = {\n${_.map(defaultValues, (value, key) =>
+        [key, value].join(':')
+      ).join(',\n')}\n};` +
+      '\n' +
+      `Object.assign(${finalName}.prototype, ${defaultsKey})`;
   }
+
   if (type === 'class' && !useExports) {
     rawFile += `\n/** @todo TODO_JS_MIGRATION remove next line after refactoring build */\n${namespace} = ${name};\n`;
   }
-  rawFile = transformFile(rawFile, { namespace, name });
+
+  //  in case of multiple declaration in one file
+  // try {
+  //   rawFile = transformClass('class', rawFile, options);
+  // } catch (error) {}
+  // try {
+  //   rawFile = transformClass('mixin', rawFile, options);
+  // } catch (error) {}
+
+  rawFile.indexOf('//@ts-nocheck') === -1 &&
+    (rawFile = `//@ts-nocheck\n${rawFile}`);
+
   return {
     name,
     raw: rawFile,
@@ -508,7 +501,7 @@ export function transform(options = {}) {
       fs.removeSync(path.resolve(dir, file.replace('.ts', '.js')))
     );
 
-  if (!options.verbose) {
+  if (!options.verbose && errors.length > 0) {
     console.error(`failed files:`);
     errors.map(console.error);
   }
