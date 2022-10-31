@@ -26,4 +26,4 @@ applyMixins(InteractiveFabricObject, [
 
 export { InteractiveFabricObject as FabricObject };
 
-fabric.Object = FabricObject;
+fabric.Object = InteractiveFabricObject;
