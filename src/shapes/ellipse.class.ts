@@ -1,5 +1,5 @@
 import { fabric } from '../../HEADER';
-import { halfPI } from '../constants';
+import { twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
@@ -105,7 +105,7 @@ export class Ellipse extends FabricObject {
     ctx.beginPath();
     ctx.save();
     ctx.transform(1, 0, 0, this.ry / this.rx, 0, 0);
-    ctx.arc(0, 0, this.rx, 0, halfPI, false);
+    ctx.arc(0, 0, this.rx, 0, twoMathPi, false);
     ctx.restore();
     this._renderPaintInOrder(ctx);
   }
