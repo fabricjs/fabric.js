@@ -330,8 +330,8 @@ function transformClass(type, raw, options = {}) {
           }(${args
             .map((arg) => {
               const out = printASTNode(value, arg);
-              out.replace(/[^\(|\)]/gm, '').length % 2 === 1
-                ? out.splice(0, -1)
+              return out.replace(/[^\(|\)]/gm, '').length % 2 === 1
+                ? out.slice(0, -1)
                 : out;
             })
             .join(', ')})`;
