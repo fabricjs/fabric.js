@@ -35,9 +35,11 @@ function printASTNode(raw, node, removeTrailingComma = true) {
  *
  * @param {string} raw
  * @param {walk.FindPredicate} find
+ * @param {(type: string, node: acorn.Node, found: acorn.Node) => boolean} findVariable
+ * @param {(node: acorn.Node) => boolean} extractVariable
  * @returns
  */
-function parseClassBase(raw, find) {
+function parseClassBase(raw, find, findVariable, extractVariable) {
   const comments = [];
   const ast = acorn.parse(raw, {
     ecmaVersion: 2022,
@@ -74,26 +76,9 @@ function parseClassBase(raw, find) {
     ast,
     undefined,
     undefined,
-    (nodeType, node) => {
-      return (
-        (nodeType === 'VariableDeclaration' ||
-          nodeType === 'ExpressionStatement') &&
-        node.start < found.start &&
-        node.end > found.end &&
-        !!walk.findNodeAt(
-          node,
-          undefined,
-          undefined,
-          (nodeType, node) => node === found
-        )
-      );
-    }
+    (nodeType, node) => findVariable(nodeType, node, found)
   );
-  const variableName = printNode(
-    variableNode.type === 'ExpressionStatement'
-      ? variableNode.expression.left
-      : variableNode.declarations[0].id
-  );
+  const variableName = printNode(extractVariable(variableNode));
 
   const declaration = found.arguments.pop();
   const superClasses = found.arguments.map((node) => printNode(node, true));
@@ -164,20 +149,43 @@ function parseClassBase(raw, find) {
 }
 
 function parseClass(raw) {
-  return parseClassBase(raw, (nodeType, node) => {
-    return (
-      nodeType === 'CallExpression' &&
-      printASTNode(raw, node.callee).replaceAll('(', '').endsWith('createClass')
-    );
-  });
+  return parseClassBase(
+    raw,
+    (nodeType, node) => {
+      return (
+        nodeType === 'CallExpression' &&
+        printASTNode(raw, node.callee)
+          .replaceAll('(', '')
+          .endsWith('createClass')
+      );
+    },
+    (nodeType, node, found) => {
+      return (
+        (nodeType === 'VariableDeclaration' ||
+          nodeType === 'ExpressionStatement') &&
+        node.start < found.start &&
+        node.end > found.end &&
+        !!walk.findNodeAt(
+          node,
+          undefined,
+          undefined,
+          (nodeType, node) => node === found
+        )
+      );
+    },
+    (variableNode) =>
+      variableNode.type === 'ExpressionStatement'
+        ? variableNode.expression.left
+        : variableNode.declarations[0].id
+  );
 }
 
 function parseMixin(raw) {
-  'fabric.util.object.extend';
+  // 'fabric.util.object.extend';
   return parseClassBase(raw, (nodeType, node) => {
     return (
       nodeType === 'CallExpression' &&
-      printASTNode(raw, node.callee).replaceAll('(', '').endsWith('createClass')
+      printASTNode(raw, node.callee).replaceAll('(', '').endsWith('extend')
     );
   });
 }
