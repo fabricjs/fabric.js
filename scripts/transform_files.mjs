@@ -311,6 +311,7 @@ function transformClass(type, raw, options = {}) {
   methods.forEach(({ node, comment }) => {
     const key = node.key.name;
     const value = printNode(node.value.body.body);
+    console.log(value);
     const methodAST = acorn.parse(value, {
       ecmaVersion: 2022,
       allowReturnOutsideFunction: true,
