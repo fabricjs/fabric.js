@@ -14,7 +14,7 @@ import {
   makePathSimpler,
   parsePath,
 } from '../util/path';
-import { FabricObject, fabricObjectDefaultValues } from './object.class';
+import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
 
 export class Path extends FabricObject {
   /**
