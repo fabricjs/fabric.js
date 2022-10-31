@@ -2,7 +2,8 @@
 
 ## [next]
 
-- chore(TS): migrate Circle [#8406](https://github.com/fabricjs/fabric.js/pull/8406)
+- chore(TS): migrate Triangle to TS [#8410](https://github.com/fabricjs/fabric.js/pull/8410)
+- chore(TS): migrate Circle to TS [#8406](https://github.com/fabricjs/fabric.js/pull/8406)
 - chore(TS): convert Object interactivity mixin to its own class [#8401](https://github.com/fabricjs/fabric.js/pull/8401)
 - chore(TS): Convert controls e6/ts [#8400](https://github.com/fabricjs/fabric.js/pull/8400)
 - ci(): remove buggy changelog action in favor of `git diff` bash script + direct git how to merge `CHANGELOG.md` [#8309](https://github.com/fabricjs/fabric.js/pull/8346)
