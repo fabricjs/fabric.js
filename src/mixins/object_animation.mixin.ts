@@ -1,5 +1,6 @@
-//@ts-nocheck
-import { FabricObject } from '../shapes/fabricObject.class';
+import type { FabricObject } from '../shapes/fabricObject.class';
+import { animate } from '../util/animate';
+import { animateColor } from '../util/animate_color';
 
 export class FabricObjectObjectAnimationMixin {
   /**
