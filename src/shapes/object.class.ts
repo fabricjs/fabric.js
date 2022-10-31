@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { config } from '../config';
@@ -187,7 +188,7 @@ export class FabricObject extends ObjectGeometry {
    * @type String
    * @default nonzero
    */
-  fillRule: 'nonzero' | 'evenodd';
+  fillRule: CanvasFillRule;
 
   /**
    * Composite rule used for canvas globalCompositeOperation
