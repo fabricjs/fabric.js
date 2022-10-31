@@ -14,6 +14,14 @@ function initFilterBackend() {
   }
 };
 
+export type TPipelineState = {
+
+}
+
+export type TApplyFilterArgs = {
+
+}
+
 class WebglFilterBackend {
 
   tileSize: number = config.textureSize;
@@ -29,12 +37,27 @@ class WebglFilterBackend {
    **/
   imageBuffer?: ArrayBuffer
 
-  canvas?: HTMLCanvasElement;
+  canvas: HTMLCanvasElement | null;
 
   /**
    * The Webgl context that will execute the operations for filtering
    **/
-  gl?: WebGLRenderingContext;
+  gl: WebGLRenderingContext | null;
+
+  /**
+   * Keyed map for shader cache
+   **/
+  programCache: any;
+
+  /**
+   * Keyed map for texture cache
+   **/
+  textureCache: any;
+
+  /**
+   * Contains GPU info for debug
+   **/
+  gpuInfo: any
 
   /**
    * Experimental. This object is a sort of repository of help layers used to avoid
@@ -65,6 +88,8 @@ class WebglFilterBackend {
 
   /**
    * Pick a method to copy data from GL context to 2d canvas.  In some browsers using
+   * drawImage should be faster, but is also bugged for a small combination of old hardware
+   * and drivers.
    * putImageData is faster than drawImage for that specific operation.
    */
   chooseFastestCopyGLTo2DMethod(width: number, height: number): void {
@@ -89,7 +114,7 @@ class WebglFilterBackend {
     targetCanvas.height = height;
 
     startTime = window.performance.now();
-    copyGLTo2DDrawImage.call(testContext, this.gl, testContext);
+    this.copyGLTo2D.call(testContext, this.gl, testContext);
     const drawImageTime = window.performance.now() - startTime;
 
     startTime = window.performance.now();
@@ -99,8 +124,6 @@ class WebglFilterBackend {
     if (drawImageTime > putImageDataTime) {
       this.imageBuffer = imageBuffer;
       this.copyGLTo2D = copyGLTo2DPutImageData;
-    } else {
-      this.copyGLTo2D = copyGLTo2DDrawImage;
     }
   }
 
@@ -149,13 +172,16 @@ class WebglFilterBackend {
     height,
     targetCanvas,
     cacheKey
-  ): TPipelieState {
-    var gl = this.gl;
-    var cachedTexture;
+  ): TPipelineState | undefined {
+    const gl = this.gl;
+    if (!gl) {
+      return;
+    }
+    let cachedTexture;
     if (cacheKey) {
       cachedTexture = this.getCachedTexture(cacheKey, source);
     }
-    var pipelineState = {
+    const pipelineState = {
       originalWidth: source.width || source.originalWidth,
       originalHeight: source.height || source.originalHeight,
       sourceWidth: width,
@@ -181,9 +207,9 @@ class WebglFilterBackend {
       filterBackend: this,
       targetCanvas: targetCanvas,
     };
-    var tempFbo = gl.createFramebuffer();
+    const tempFbo = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, tempFbo);
-    filters.forEach(function (filter) {
+    filters.forEach((filter: any) => {
       filter && filter.applyTo(pipelineState);
     });
     resizeCanvasIfNeeded(pipelineState);
@@ -226,7 +252,7 @@ class WebglFilterBackend {
    * @param {HTMLImageElement|HTMLCanvasElement} textureImageSource A source for the texture data.
    * @returns {WebGLTexture}
    */
-  createTexture(gl, width, height, textureImageSource) {
+  createTexture(gl: WebGLRenderingContext, width: number, height: number, textureImageSource?: TexImageSource) {
     var texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -267,7 +293,7 @@ class WebglFilterBackend {
    * @param {HTMLImageElement|HTMLCanvasElement} textureImageSource A source to use to create the
    * texture cache entry if one does not already exist.
    */
-  getCachedTexture(uniqueId, textureImageSource) {
+  getCachedTexture(uniqueId: string, textureImageSource: TexImageSource) {
     if (this.textureCache[uniqueId]) {
       return this.textureCache[uniqueId];
     } else {
@@ -288,14 +314,42 @@ class WebglFilterBackend {
    *
    * @param {String} cacheKey The cache key provided when the source image was filtered.
    */
-  evictCachesForKey(cacheKey) {
+  evictCachesForKey(cacheKey: string) {
     if (this.textureCache[cacheKey]) {
       this.gl.deleteTexture(this.textureCache[cacheKey]);
       delete this.textureCache[cacheKey];
     }
   }
 
-  copyGLTo2D: copyGLTo2DDrawImage,
+  /**
+   * Copy an input WebGL canvas on to an output 2D canvas.
+   *
+   * The WebGL canvas is assumed to be upside down, with the top-left pixel of the
+   * desired output image appearing in the bottom-left corner of the WebGL canvas.
+   *
+   * @param {WebGLRenderingContext} sourceContext The WebGL context to copy from.
+   * @param {Object} pipelineState The 2D target canvas to copy on to.
+   */
+  copyGLTo2D(gl: WebGLRenderingContext, pipelineState: TPipelineState) {
+    const glCanvas = gl.canvas,
+    targetCanvas = pipelineState.targetCanvas,
+    ctx = targetCanvas.getContext('2d');
+    ctx.translate(0, targetCanvas.height); // move it down again
+    ctx.scale(1, -1); // vertical flip
+    // where is my image on the big glcanvas?
+    const sourceY = glCanvas.height - targetCanvas.height;
+    ctx.drawImage(
+      glCanvas,
+      0,
+      sourceY,
+      targetCanvas.width,
+      targetCanvas.height,
+      0,
+      0,
+      targetCanvas.width,
+      targetCanvas.height
+    );
+  }
 
   /**
    * Attempt to extract GPU information strings from a WebGL context.
@@ -313,10 +367,10 @@ class WebglFilterBackend {
     if (!gl) {
       return gpuInfo;
     }
-    var ext = gl.getExtension('WEBGL_debug_renderer_info');
+    const ext = gl.getExtension('WEBGL_debug_renderer_info');
     if (ext) {
-      var renderer = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
-      var vendor = gl.getParameter(ext.UNMASKED_VENDOR_WEBGL);
+      const renderer = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
+      const vendor = gl.getParameter(ext.UNMASKED_VENDOR_WEBGL);
       if (renderer) {
         gpuInfo.renderer = renderer.toLowerCase();
       }
@@ -329,12 +383,7 @@ class WebglFilterBackend {
   }
 }
 
-
-
-
-
-
-function resizeCanvasIfNeeded(pipelineState) {
+function resizeCanvasIfNeeded(pipelineState: TPipelineState) {
   var targetCanvas = pipelineState.targetCanvas,
     width = targetCanvas.width,
     height = targetCanvas.height,
@@ -348,37 +397,6 @@ function resizeCanvasIfNeeded(pipelineState) {
 }
 
 /**
- * Copy an input WebGL canvas on to an output 2D canvas.
- *
- * The WebGL canvas is assumed to be upside down, with the top-left pixel of the
- * desired output image appearing in the bottom-left corner of the WebGL canvas.
- *
- * @param {WebGLRenderingContext} sourceContext The WebGL context to copy from.
- * @param {HTMLCanvasElement} targetCanvas The 2D target canvas to copy on to.
- * @param {Object} pipelineState The 2D target canvas to copy on to.
- */
-function copyGLTo2DDrawImage(gl, pipelineState) {
-  var glCanvas = gl.canvas,
-    targetCanvas = pipelineState.targetCanvas,
-    ctx = targetCanvas.getContext('2d');
-  ctx.translate(0, targetCanvas.height); // move it down again
-  ctx.scale(1, -1); // vertical flip
-  // where is my image on the big glcanvas?
-  var sourceY = glCanvas.height - targetCanvas.height;
-  ctx.drawImage(
-    glCanvas,
-    0,
-    sourceY,
-    targetCanvas.width,
-    targetCanvas.height,
-    0,
-    0,
-    targetCanvas.width,
-    targetCanvas.height
-  );
-}
-
-/**
  * Copy an input WebGL canvas on to an output 2D canvas using 2d canvas' putImageData
  * API. Measurably faster than using ctx.drawImage in Firefox (version 54 on OSX Sierra).
  *
@@ -386,7 +404,7 @@ function copyGLTo2DDrawImage(gl, pipelineState) {
  * @param {HTMLCanvasElement} targetCanvas The 2D target canvas to copy on to.
  * @param {Object} pipelineState The 2D target canvas to copy on to.
  */
-function copyGLTo2DPutImageData(gl, pipelineState) {
+function copyGLTo2DPutImageData(gl: WebGLRenderingContext, pipelineState: TPipelineState) {
   var targetCanvas = pipelineState.targetCanvas,
     ctx = targetCanvas.getContext('2d'),
     dWidth = pipelineState.destinationWidth,
