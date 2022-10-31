@@ -139,7 +139,7 @@ function parseClassBase(raw, find) {
   };
 }
 
-function findClass(raw) {
+function parseClass(raw) {
   return parseClassBase(raw, (nodeType, node) => {
     return (
       nodeType === 'CallExpression' &&
@@ -148,13 +148,14 @@ function findClass(raw) {
   });
 }
 
-function findMixin(raw) {
-  const keyWord = getVariableNameOfNS(raw, 'fabric.util.object.extend');
-  const regex = new RegExp(
-    `${keyWord.replaceAll('.', '\\.')}\\((.+)\\.prototype,\.*\\{`,
-    'gm'
-  );
-  return parseClassBase(raw, regex);
+function parseMixin(raw) {
+  'fabric.util.object.extend';
+  return parseClassBase(raw, (nodeType, node) => {
+    return (
+      nodeType === 'CallExpression' &&
+      printASTNode(raw, node.callee).replaceAll('(', '').endsWith('createClass')
+    );
+  });
 }
 
 function transformSuperCall(raw) {
@@ -253,7 +254,7 @@ function transformClass(type, raw, options = {}) {
     properties,
     defaultValues,
     declaration,
-  } = type === 'mixin' ? findMixin(raw) : findClass(raw);
+  } = type === 'mixin' ? parseMixin(raw) : parseClass(raw);
   let body = rawBody;
   let offset = start;
   const staticCandidates = [];
