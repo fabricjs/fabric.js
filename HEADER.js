@@ -69,34 +69,6 @@ fabric.isTouchSupported =
 fabric.isLikelyNode =
   typeof Buffer !== 'undefined' && typeof window === 'undefined';
 
-/* _FROM_SVG_START_ */
-/**
- * Attributes parsed from all SVG elements
- * @type array
- */
-fabric.SHARED_ATTRIBUTES = [
-  'display',
-  'transform',
-  'fill',
-  'fill-opacity',
-  'fill-rule',
-  'opacity',
-  'stroke',
-  'stroke-dasharray',
-  'stroke-linecap',
-  'stroke-dashoffset',
-  'stroke-linejoin',
-  'stroke-miterlimit',
-  'stroke-opacity',
-  'stroke-width',
-  'id',
-  'paint-order',
-  'vector-effect',
-  'instantiated_by_use',
-  'clip-path',
-];
-/* _FROM_SVG_END_ */
-
 /**
  * @todo move to config when window is exported
  */

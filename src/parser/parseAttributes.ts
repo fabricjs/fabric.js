@@ -16,7 +16,7 @@ import { setStrokeFillOpacity } from './setStrokeFillOpacity';
  * @param {Array} attributes Array of attributes to parse
  * @return {Object} object containing parsed attributes' names/values
  */
-export function parseAttributes(element, attributes, svgUid) {
+export function parseAttributes(element, attributes, svgUid?: string) {
   if (!element) {
     return;
   }
