@@ -1,6 +1,6 @@
 # Changelog
 
-## [next]
+## [6.0.0]
 
 - chore(TS): finalize interactivity/controls [#8404](https://github.com/fabricjs/fabric.js/pull/8404)
 - chore(TS): convert Object interactivity mixin to its own class [#8401](https://github.com/fabricjs/fabric.js/pull/8401)
