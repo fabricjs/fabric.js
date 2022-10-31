@@ -257,6 +257,8 @@ export class Line extends FabricObject {
     ];
   }
 
+  /* _FROM_SVG_START_ */
+
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link Line.fromElement})
    * @static
@@ -284,6 +286,8 @@ export class Line extends FabricObject {
       ];
     callback(new Line(points, { ...parsedAttributes, ...options }));
   }
+
+  /* _FROM_SVG_END_ */
 
   /**
    * Returns Line instance from an object representation
@@ -321,7 +325,3 @@ export const lineDefaultValues: Partial<TClassProperties<Line>> = {
 Object.assign(Line.prototype, lineDefaultValues);
 /** @todo TODO_JS_MIGRATION remove next line after refactoring build */
 fabric.Line = Line;
-
-/* _FROM_SVG_START_ */
-
-/* _FROM_SVG_END_ */
