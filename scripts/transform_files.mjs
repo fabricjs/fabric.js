@@ -318,7 +318,6 @@ function transformClass(type, raw, options = {}) {
     const superTransforms = [];
     walk.simple(methodAST, {
       CallExpression(node) {
-        console.log(node);
         if (
           node.callee.object?.type === 'ThisExpression' &&
           node.callee.property?.name === 'callSuper'
@@ -370,7 +369,6 @@ function transformClass(type, raw, options = {}) {
   });
 
   staticMethods.forEach(({ key, value, comment }) => {
-    // console.log(printNode(comment));
     classBody.push(
       (comment ? printNode(comment) : '') +
         '\n' +
