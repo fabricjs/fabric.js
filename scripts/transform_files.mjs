@@ -56,74 +56,12 @@ function findObject(raw, charStart, charEnd, startFrom = 0) {
     : null;
 }
 
-function printASTNode(raw, node) {
-  return raw.slice(node.start, node.end + 1);
-}
-
-function parseRawClass(raw) {
-  let index = 0;
-  const pairs = [
-    {
-      opening: '{',
-      closing: '}',
-      test(key, index, input) {
-        return input[index] === this[key];
-      },
-    },
-    {
-      opening: '[',
-      closing: ']',
-      test(key, index, input) {
-        return input[index] === this[key];
-      },
-    },
-    {
-      opening: '(',
-      closing: ')',
-      test(key, index, input) {
-        return input[index] === this[key];
-      },
-    },
-    {
-      blocking: true,
-      opening: '/*',
-      closing: '*/',
-      test(key, index, input) {
-        return key === 'closing'
-          ? input[index - 1] === this[key][0] && input[index] === this[key][1]
-          : input[index] === this[key][0] && input[index + 1] === this[key][1];
-      },
-    },
-  ];
-  const stack = [];
-  const commas = [];
-  const fields = [];
-  while (index < raw.length) {
-    const top = stack[stack.length - 1];
-    //console.log(raw[index],top)
-    if (top && top.test('closing', index, raw)) {
-      stack.pop();
-    } else if (!top || !top.blocking) {
-      const found = pairs.find((t) => t.test('opening', index, raw));
-      if (found) {
-        stack.push(found);
-      } else if (pairs.some((t) => t.test('closing', index, raw))) {
-        stack.pop();
-      } else if (raw[index] === ',' && stack.length === 1) {
-        commas.push(index);
-      } else if (raw[index] === ':' && stack.length === 1) {
-        const trim = raw.slice(0, index).trim();
-        const result = /\s*(.+)$/.exec(trim);
-        result && fields.push(result[1]);
-      }
-    }
-
-    index++;
-  }
-  commas.reverse().forEach((pos) => {
-    raw = raw.slice(0, pos) + raw.slice(pos + 1);
-  });
-  return { raw, fields };
+function printASTNode(raw, node, removeTrailingComma = true) {
+  if (node.type === 'Literal') return node.value;
+  const out = raw.slice(node.start, node.end + 1).trim();
+  return removeTrailingComma && out.endsWith(',')
+    ? out.slice(0, out.length - 1)
+    : out;
 }
 
 /**
@@ -134,7 +72,7 @@ function parseRawClass(raw) {
  */
 function parseClassBase(raw, find) {
   const ast = acorn.parse(raw, { ecmaVersion: 2022, sourceType: 'module' });
-  fs.writeFileSync('./ast.json', JSON.stringify(ast, null, 2));
+  // fs.writeFileSync('./ast.json', JSON.stringify(ast, null, 2));
 
   const { node: found } = walk.findNodeAt(ast, undefined, undefined, find);
   // console.log(JSON.stringify(found, null, 2));
@@ -162,18 +100,22 @@ function parseClassBase(raw, find) {
     variableNode.type === 'ExpressionStatement'
       ? variableNode.expression.left
       : variableNode.declarations[0].id
-  ).trim();
+  );
 
   const declaration = found.arguments.pop();
-  const superClasses = found.arguments.map((node) =>
-    printASTNode(raw, node).replaceAll(',', '').trim()
-  );
+  const superClasses = found.arguments.map((node) => printASTNode(raw, node));
   const [methods, properties] = _.partition(
-    found.properties,
+    declaration.properties,
     (node) =>
       node.type === 'Property' && node.value.type === 'FunctionExpression'
   );
   const name = variableName.slice(variableName.lastIndexOf('.') + 1);
+  const defaultValues = _.fromPairs(
+    properties.map((node) => {
+      return [node.key.name, printASTNode(raw, node.value)];
+    })
+  );
+
   return {
     ast,
     name,
@@ -192,6 +134,7 @@ function parseClassBase(raw, find) {
     declaration,
     methods,
     properties,
+    defaultValues,
     raw: raw.slice(declaration.start, declaration.end + 1),
   };
 }
@@ -269,7 +212,7 @@ function getMixinName(file) {
   return name.replace('Itext', 'IText') + 'Mixin';
 }
 
-function transformFile(raw, { namespace, name } = {}) {
+function transformFile(raw, { namespace } = {}) {
   if (raw.replace(/\/\*.*\*\\s*/).startsWith('(function')) {
     const wrapper = findObject(raw, '{', '}');
     raw = wrapper.raw.slice(1, wrapper.raw.length - 1);
@@ -301,58 +244,80 @@ function transformClass(type, raw, options = {}) {
     name,
     namespace,
     superClass,
-    raw: _rawClass,
+    raw: rawBody,
+    start,
     end,
     requiresSuperClassResolution,
     superClasses,
+    methods,
+    properties,
+    defaultValues,
+    declaration,
   } = type === 'mixin' ? findMixin(raw) : findClass(raw);
-  let { raw: rawClass, fields } = parseRawClass(_rawClass);
-  const getPropStart = (key, raw) => {
-    const searchPhrase = `^(\\s*)${key}\\s*:\\s*`;
-    const regex = new RegExp(searchPhrase, 'm');
-    const result = regex.exec(raw);
-    const whitespace = result[1];
-    return {
-      start: result?.index + whitespace.length || -1,
-      regex,
-      value: `${whitespace}${key} = `,
-    };
-  };
-  const staticCandidantes = [];
-  fields.forEach((key) => {
-    const searchPhrase = `^(\\s*)${key}\\s*:\\s*function\\s*\\(`;
-    const regex = new RegExp(searchPhrase, 'm');
-    const result = regex.exec(rawClass);
-    if (result) {
-      const whitespace = result[1];
-      const start = result.index + whitespace.length;
-      const func = findObject(rawClass, '{', '}', start);
-      start && func.raw.indexOf('this') === -1 && staticCandidantes.push(key);
-      rawClass = rawClass.replace(
-        regex,
-        `${whitespace}${key === 'initialize' ? 'constructor' : key}(`
-      );
-      if (regex.exec(rawClass)) {
-        throw new Error(`dupliate method found ${name}#${key}`);
-      }
-    } else {
-      const start = getPropStart(key, rawClass);
-      rawClass = rawClass.replace(start.regex, start.value);
-    }
+  let body = rawBody;
+  let offset = start;
+  const staticCandidates = [];
+
+  function replaceNode(node, value) {
+    // const diff = node.end - node.start - value.length;
+    // body =
+    //   body.slice(0, node.start - offset) +
+    //   value +
+    //   body.slice(node.end + 1 - offset);
+    // offset -= diff;
+    body = body.replace(printASTNode(raw, node, false), value);
+  }
+
+  // safety
+  const duplicateMethods = _.differenceWith(
+    methods,
+    _.uniqBy(methods, 'key.name'),
+    (a, b) => a !== b
+  );
+  if (duplicateMethods.length > 0) {
+    throw new Error(`${name}: duplicate methods found: ${duplicateMethods}`);
+  }
+  const duplicateProps = _.differenceWith(
+    properties,
+    _.uniqBy(properties, 'key.name'),
+    (a, b) => a !== b
+  );
+  if (duplicateProps.length > 0) {
+    throw new Error(`${name}: duplicate properties found: ${duplicateProps}`);
+  }
+
+  methods.forEach((node) => {
+    const key = node.key.name;
+    const value = printASTNode(raw, node.value)
+      .replace(/^function/, '')
+      .trim();
+    replaceNode(node, `${key === 'initialize' ? 'constructor' : key}${value}`);
+    value.indexOf('this') === -1 && staticCandidates.push(key);
   });
-  let transformed = rawClass;
+
+  properties.forEach((node) => {
+    const key = node.key.name;
+    const typeable =
+      node.value.type === 'Literal' &&
+      ['boolean', 'number', 'string'].includes(typeof node.value.value);
+    console.log(printASTNode(raw, node));
+    replaceNode(node, typeable ? `${key}: ${typeof node.value.value}` : key);
+  });
+
+  let transformed = body;
   do {
-    rawClass = transformed;
+    body = transformed;
     try {
-      transformed = transformSuperCall(rawClass);
+      transformed = transformSuperCall(body);
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
-  } while (transformed !== rawClass);
+  } while (transformed !== body);
+
   const classDirective =
     type === 'mixin'
       ? generateMixin(
-          rawClass,
+          body,
           `${_.upperFirst(name)}${className.replace(
             new RegExp(
               name.toLowerCase() === 'staticcanvas' ? 'canvas' : name,
@@ -363,27 +328,36 @@ function transformClass(type, raw, options = {}) {
           namespace,
           useExports
         )
-      : generateClass(rawClass, className || name, superClass, useExports);
-  raw = `${raw.slice(0, match.index)}${classDirective}${raw
+      : generateClass(body, className || name, superClass, useExports);
+
+  let rawFile = `${raw.slice(0, match.index)}${classDirective}${raw
     .slice(end + 1)
     .replace(/\s*\)\s*;?/, '')}`;
 
   //  in case of multiple declaration in one file
   try {
-    return transformClass('class', raw, options);
+    return transformClass('class', rawFile, options);
   } catch (error) {}
   try {
-    return transformClass('mixin', raw, options);
+    return transformClass('mixin', rawFile, options);
   } catch (error) {}
 
-  if (type === 'class' && !useExports) {
-    raw = `${raw}\n/** @todo TODO_JS_MIGRATION remove next line after refactoring build */\n${namespace} = ${name};\n`;
+  if (_.size(defaultValues) > 0) {
+    rawFile +=
+      '\n' +
+      `Object.assign(${className || name}.prototype, {${_.map(
+        defaultValues,
+        (value, key) => [key, value].join(':')
+      ).join(',\n')}})`;
   }
-  raw = transformFile(raw, { namespace, name });
+  if (type === 'class' && !useExports) {
+    rawFile += `\n/** @todo TODO_JS_MIGRATION remove next line after refactoring build */\n${namespace} = ${name};\n`;
+  }
+  rawFile = transformFile(rawFile, { namespace, name });
   return {
     name,
-    raw,
-    staticCandidantes,
+    raw: rawFile,
+    staticCandidates,
     requiresSuperClassResolution,
     superClasses,
   };
@@ -394,7 +368,7 @@ function convertFile(type, source, dest, options) {
     const {
       name,
       raw,
-      staticCandidantes,
+      staticCandidates,
       requiresSuperClassResolution,
       superClasses,
     } = transformClass(type, readFile(source), {
@@ -413,8 +387,8 @@ function convertFile(type, source, dest, options) {
         requiresSuperClassResolution: requiresSuperClassResolution
           ? superClasses
           : false,
-        staticCandidantes:
-          staticCandidantes.length > 0 ? staticCandidantes : 'none',
+        staticCandidates:
+          staticCandidates.length > 0 ? staticCandidates : 'none',
       });
     return dest;
   } catch (error) {
