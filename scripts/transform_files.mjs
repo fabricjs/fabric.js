@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as acorn from 'acorn';
 import * as walk from 'acorn-walk';
+import * as cp from 'node:child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,33 +17,14 @@ function readFile(file) {
   return fs.readFileSync(path.resolve(wd, file)).toString('utf-8');
 }
 
-function findObject(raw, charStart, charEnd, startFrom = 0) {
-  const start = raw.indexOf(charStart, startFrom);
-  let index = start;
-  let counter = 0;
-  while (index < raw.length) {
-    if (raw[index] === charStart) {
-      counter++;
-    } else if (raw[index] === charEnd) {
-      counter--;
-      if (counter === 0) {
-        break;
-      }
-    }
-    index++;
-  }
-  return start > -1
-    ? {
-        start,
-        end: index,
-        raw: raw.slice(start, index + charEnd.length),
-      }
-    : null;
-}
-
 function printASTNode(raw, node, removeTrailingComma = true) {
   if (node.type === 'Literal') return node.value;
-  const out = raw.slice(node.start, node.end + 1).trim();
+  if (Array.isArray(node) && node.length === 0) return '';
+  const out = (
+    Array.isArray(node)
+      ? raw.slice(node[0].start, node[node.length - 1].end + 1)
+      : raw.slice(node.start, node.end + 1)
+  ).trim();
   return removeTrailingComma && out.endsWith(',')
     ? out.slice(0, out.length - 1)
     : out;
@@ -55,8 +37,35 @@ function printASTNode(raw, node, removeTrailingComma = true) {
  * @returns
  */
 function parseClassBase(raw, find) {
-  const ast = acorn.parse(raw, { ecmaVersion: 2022, sourceType: 'module' });
+  const comments = [];
+  const ast = acorn.parse(raw, {
+    ecmaVersion: 2022,
+    sourceType: 'module',
+    locations: true,
+    onComment(block, value, start, end, locStart, locEnd) {
+      comments.push({
+        block,
+        value,
+        start,
+        end,
+        loc: {
+          start: locStart,
+          end: locEnd,
+        },
+      });
+    },
+  });
   fs.writeFileSync('./ast.json', JSON.stringify(ast, null, 2));
+
+  function printNode(node, removeTrailingComma) {
+    return printASTNode(raw, node, removeTrailingComma);
+  }
+
+  function findNodeComment(node) {
+    return comments.find(
+      (comment) => comment.loc.end.line === node.loc.start.line - 1
+    );
+  }
 
   const { node: found } = walk.findNodeAt(ast, undefined, undefined, find);
   // console.log(JSON.stringify(found, null, 2));
@@ -79,25 +88,50 @@ function parseClassBase(raw, find) {
       );
     }
   );
-  const variableName = printASTNode(
-    raw,
+  const variableName = printNode(
     variableNode.type === 'ExpressionStatement'
       ? variableNode.expression.left
       : variableNode.declarations[0].id
   );
 
   const declaration = found.arguments.pop();
-  const superClasses = found.arguments.map((node) => printASTNode(raw, node));
+  const superClasses = found.arguments.map((node) => printNode(node, true));
   const [methods, properties] = _.partition(
-    declaration.properties,
-    (node) =>
+    declaration.properties.map((node) => ({
+      node,
+      comment: findNodeComment(node),
+    })),
+    ({ node }) =>
       node.type === 'Property' && node.value.type === 'FunctionExpression'
   );
   const name = variableName.slice(variableName.lastIndexOf('.') + 1);
   const defaultValues = _.fromPairs(
-    properties.map((node) => {
-      return [node.key.name, printASTNode(raw, node.value)];
+    properties.map(({ node }) => {
+      return [node.key.name, printNode(node.value)];
     })
+  );
+
+  const statics = [];
+  walk.simple(ast, {
+    ExpressionStatement({ expression: { left, right } }) {
+      if (
+        left?.type === 'MemberExpression' &&
+        printNode(left.object).slice(0, -1) === variableName
+      ) {
+        statics.push({
+          type: right.type === 'FunctionExpression' ? 'method' : 'property',
+          key: printNode(left.property),
+          value: printNode(right),
+          node: right,
+          comment: findNodeComment(left),
+        });
+      }
+    },
+  });
+
+  const [staticMethods, staticProperties] = _.partition(
+    statics,
+    ({ type }) => type === 'method'
   );
 
   return {
@@ -110,9 +144,6 @@ function parseClassBase(raw, find) {
         ? superClasses[superClasses.length - 1]
         : undefined,
     requiresSuperClassResolution: superClasses.length > 0,
-    match: {
-      index: variableNode.start,
-    },
     start: declaration.start,
     end: declaration.end,
     variableNode,
@@ -120,7 +151,11 @@ function parseClassBase(raw, find) {
     methods,
     properties,
     defaultValues,
+    staticMethods,
+    staticProperties,
+    comments,
     raw: raw.slice(declaration.start, declaration.end + 1),
+    printNode,
   };
 }
 
@@ -171,7 +206,7 @@ function transformSuperCall(raw) {
 function generateClass(rawClass, className, superClass, useExports) {
   return `${useExports ? 'export ' : ''}class ${className}${
     superClass ? ` extends ${superClass}` : ''
-  } ${rawClass}`;
+  } {\n${rawClass}\n}`;
 }
 
 /**
@@ -181,7 +216,7 @@ function generateMixin(rawClass, mixinName, baseClassNS, useExports) {
   const funcName = `${mixinName}Generator`;
   return `
 ${useExports ? 'export ' : ''}function ${funcName}(Klass) {
-  return class ${mixinName || ''} extends Klass ${rawClass}
+  return class ${mixinName || ''} extends Klass {\n${rawClass}\n}\n
 }
 
 ${baseClassNS ? `${baseClassNS} = ${funcName}(${baseClassNS});` : ''}
@@ -209,7 +244,6 @@ function transformClass(type, raw, options = {}) {
   if (!type) throw new Error(`INVALID_ARGUMENT type`);
   const {
     ast,
-    match,
     name,
     namespace,
     superClass,
@@ -223,6 +257,7 @@ function transformClass(type, raw, options = {}) {
     defaultValues,
     declaration,
     variableNode,
+    printNode,
   } = type === 'mixin' ? parseMixin(raw) : parseClass(raw);
   let body = rawBody;
   let offset = start;
@@ -235,43 +270,67 @@ function transformClass(type, raw, options = {}) {
     //   value +
     //   body.slice(node.end + 1 - offset);
     // offset -= diff;
-    body = body.replace(printASTNode(raw, node, false), value);
+    body = body.replace(printNode(node, false), value);
   }
 
   // safety
   const duplicateMethods = _.differenceWith(
     methods,
-    _.uniqBy(methods, 'key.name'),
+    _.uniqBy(methods, 'node.key.name'),
     (a, b) => a !== b
   );
   if (duplicateMethods.length > 0) {
-    throw new Error(`${name}: duplicate methods found: ${duplicateMethods}`);
+    throw new Error(
+      `${name}: duplicate methods found: ${duplicateMethods.map(
+        'node.key.name'
+      )}`
+    );
   }
   const duplicateProps = _.differenceWith(
     properties,
-    _.uniqBy(properties, 'key.name'),
+    _.uniqBy(properties, 'node.key.name'),
     (a, b) => a !== b
   );
   if (duplicateProps.length > 0) {
-    throw new Error(`${name}: duplicate properties found: ${duplicateProps}`);
+    throw new Error(
+      `${name}: duplicate properties found: ${duplicateProps.map(
+        'node.key.name'
+      )}`
+    );
   }
 
-  methods.forEach((node) => {
-    const key = node.key.name;
-    const value = printASTNode(raw, node.value)
-      .replace(/^function/, '')
-      .trim();
-    replaceNode(node, `${key === 'initialize' ? 'constructor' : key}${value}`);
-    value.indexOf('this') === -1 && staticCandidates.push(key);
-  });
-
-  properties.forEach((node) => {
+  const classBody = [];
+  console.log(methods);
+  properties.forEach(({ node, comment }) => {
     const key = node.key.name;
     const typeable =
       node.value.type === 'Literal' &&
       ['boolean', 'number', 'string'].includes(typeof node.value.value);
-    replaceNode(node, typeable ? `${key}: ${typeof node.value.value}` : key);
+    const typed = typeable ? `${key}: ${typeof node.value.value}` : key;
+    classBody.push((comment ? printNode(comment) : '') + '\n' + typed);
+    // replaceNode(node, typeable ? `${key}: ${typeof node.value.value}` : key);
   });
+
+  methods.forEach(({ node, comment }) => {
+    const key = node.key.name;
+    const value = printNode(node.value)
+      .replace(/^function/, '')
+      .trim();
+    // replaceNode(node, `${key === 'initialize' ? 'constructor' : key}${value}`);
+    value.indexOf('this') === -1 && staticCandidates.push(key);
+    console.log(node.value.params);
+    classBody.push(
+      (comment ? printNode(comment) : '') +
+        '\n' +
+        (node.value.async ? 'async ' : '') +
+        (key === 'initialize' ? 'constructor' : key) +
+        `(${printNode(node.value.params).slice(0, -1)}) {\n` +
+        printNode(node.value.body.body) +
+        '\n}'
+    );
+  });
+
+  body = classBody.join('\n\n');
 
   let transformed = body;
   do {
@@ -324,10 +383,10 @@ function transformClass(type, raw, options = {}) {
     const bodyNodes = lastNode.expression.callee.body.body;
     rawFile =
       raw.slice(0, lastNode.start) +
-      printASTNode(raw, {
-        start: bodyNodes[0].start,
-        end: bodyNodes[bodyNodes.length - 1].end,
-      }).replace(printASTNode(raw, variableNode, false), classDirective) +
+      printNode(bodyNodes).replace(
+        printNode(variableNode, false),
+        classDirective
+      ) +
       raw.slice(lastNode.end + 1);
   } else {
     rawFile = `${raw.slice(0, variableNode.start)}${classDirective}${raw
@@ -373,6 +432,7 @@ function convertFile(type, source, dest, options) {
     });
     dest = (typeof dest === 'function' ? dest(name) : dest) || source;
     fs.writeFileSync(dest, raw);
+    cp.execSync(`prettier --write ${source}`);
     options.verbose &&
       console.log({
         state: 'success',
