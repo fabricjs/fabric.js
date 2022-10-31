@@ -271,7 +271,12 @@ export class Control {
     this.visible = visibility;
   }
 
-  positionHandler(dim: Point, finalMatrix: TMat2D, fabricObject: FabricObject) {
+  positionHandler(
+    dim: Point,
+    finalMatrix: TMat2D,
+    fabricObject: FabricObject,
+    currentControl: Control
+  ) {
     return new Point(
       this.x * dim.x + this.offsetX,
       this.y * dim.y + this.offsetY
