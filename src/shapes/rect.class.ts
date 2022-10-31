@@ -1,6 +1,7 @@
 import { fabric } from '../../HEADER';
 import { kRect } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
+import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { FabricObject } from './fabricObject.class';
 
@@ -158,7 +159,9 @@ export class Rect extends FabricObject {
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Rect>}
    */
-  static fromObject = (object: any) => FabricObject._fromObject(Rect, object);
+  static fromObject(object: any) {
+    return FabricObject._fromObject(Rect, object);
+  }
 
   /* _FROM_SVG_START_ */
 
