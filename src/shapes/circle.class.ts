@@ -1,6 +1,7 @@
 import { fabric } from '../../HEADER';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
+import { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
@@ -201,7 +202,7 @@ export class Circle extends FabricObject {
     FabricObject._fromObject(Circle, object);
 }
 
-Object.assign(Circle.prototype, {
+export const defaultValues: Partial<TClassProperties<Circle>> = {
   type: 'circle',
   radius: 0,
   startAngle: 0,
@@ -216,6 +217,8 @@ Object.assign(Circle.prototype, {
     'startAngle',
     'endAngle'
   ),
-});
+};
+
+Object.assign(Circle.prototype, defaultValues);
 
 fabric.Circle = Circle;
