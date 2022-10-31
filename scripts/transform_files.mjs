@@ -334,10 +334,7 @@ function transformClass(type, raw, options = {}) {
           superTransforms.push({
             node,
             methodName: methodNameArg.value,
-            value:
-              removeParen && out[out.length - 1] === ')'
-                ? out.slice(0, -1)
-                : out,
+            value: out,
           });
         }
       },
