@@ -1,7 +1,12 @@
-/**
+type TClass = { new (...args: any[]): any };
+
+/***
  * https://www.typescriptlang.org/docs/handbook/mixins.html#alternative-pattern
  */
-export function applyMixins(derivedCtor: any, constructors: any[]) {
+export function applyMixins<T extends TClass, S extends TClass>(
+  derivedCtor: T,
+  constructors: S[]
+) {
   constructors.forEach((baseCtor) => {
     Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
       Object.defineProperty(
@@ -12,4 +17,5 @@ export function applyMixins(derivedCtor: any, constructors: any[]) {
       );
     });
   });
+  return derivedCtor as T & S;
 }
