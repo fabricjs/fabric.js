@@ -4,6 +4,8 @@ import fs from 'fs-extra';
 import _ from 'lodash';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import * as acorn from 'acorn';
+import * as walk from 'acorn-walk';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,6 +54,10 @@ function findObject(raw, charStart, charEnd, startFrom = 0) {
         raw: raw.slice(start, index + charEnd.length),
       }
     : null;
+}
+
+function printASTNode(raw, node) {
+  return raw.slice(node.start, node.end + 1);
 }
 
 function parseRawClass(raw) {
@@ -122,33 +128,54 @@ function parseRawClass(raw) {
 
 /**
  *
- * @param {RegExpExecArray | null} regex
+ * @param {string} raw
+ * @param {walk.FindPredicate} find
  * @returns
  */
-function findClassBase(raw, regex) {
-  const result = regex.exec(raw);
-  if (!result) throw new Error('FAILED TO PARSE');
-  const [match, classNSRaw, superClassRaw] = result;
-  const [first, ...rest] = classNSRaw.trim().split('.');
-  const namespace = [getNSFromVariableName(raw, first), ...rest].join('.');
-  const name = namespace.slice(namespace.lastIndexOf('.') + 1);
-  const superClasses =
-    superClassRaw
-      ?.trim()
-      .split(',')
-      .filter((raw) => !raw.match(/\/\*+/) && raw)
-      .map((key) => key.trim())
-      .map((val) => {
-        const [first, ...rest] = val.split('.');
-        return [getNSFromVariableName(raw, first), ...rest].join('.');
-      }) || [];
-  const rawObject = findObject(raw, '{', '}', result.index);
-  // const NS = namespace.slice(0, namespace.lastIndexOf('.'));
-  // const { fabric } = require(wd);
-  // const klass = fabric.util.resolveNamespace(NS === 'fabric' ? null : NS)[name];
+function parseClassBase(raw, find) {
+  const ast = acorn.parse(raw, { ecmaVersion: 2022, sourceType: 'module' });
+  fs.writeFileSync('./ast.json', JSON.stringify(ast, null, 2));
+
+  const { node: found } = walk.findNodeAt(ast, undefined, undefined, find);
+  // console.log(JSON.stringify(found, null, 2));
+  const { node: variableNode } = walk.findNodeAt(
+    ast,
+    undefined,
+    undefined,
+    (nodeType, node) => {
+      return (
+        (nodeType === 'VariableDeclaration' ||
+          nodeType === 'ExpressionStatement') &&
+        node.start < found.start &&
+        node.end > found.end &&
+        !!walk.findNodeAt(
+          node,
+          undefined,
+          undefined,
+          (nodeType, node) => node === found
+        )
+      );
+    }
+  );
+  const variableName = printASTNode(
+    raw,
+    variableNode.type === 'ExpressionStatement'
+      ? variableNode.expression.left
+      : variableNode.declarations[0].id
+  );
+
+  const declaration = found.arguments.pop();
+  const superClasses = found.arguments.map((node) => printASTNode(raw, node));
+  const [methods, properties] = _.partition(
+    found.properties,
+    (node) =>
+      node.type === 'Property' && node.value.type === 'FunctionExpression'
+  );
+  const name = variableName.slice(variableName.lastIndexOf('.') + 1);
   return {
+    ast,
     name,
-    namespace,
+    namespace: variableName,
     superClasses,
     superClass:
       superClasses.length > 0
@@ -156,29 +183,33 @@ function findClassBase(raw, regex) {
         : undefined,
     requiresSuperClassResolution: superClasses.length > 0,
     match: {
-      index: result.index,
-      value: match,
+      index: variableNode.start,
     },
-    ...rawObject,
+    start: declaration.start,
+    end: declaration.end,
+    declaration,
+    methods,
+    properties,
+    raw: raw.slice(declaration.start, declaration.end + 1),
   };
 }
 
 function findClass(raw) {
-  const keyWord = getVariableNameOfNS(raw, 'fabric.util.createClass');
-  const regex = new RegExp(
-    `(.+)=\\s*${keyWord.replaceAll('.', '\\.')}\\((\.*)\\{`,
-    'm'
-  );
-  return findClassBase(raw, regex);
+  return parseClassBase(raw, (nodeType, node) => {
+    return (
+      nodeType === 'CallExpression' &&
+      printASTNode(raw, node.callee).replaceAll('(', '').endsWith('createClass')
+    );
+  });
 }
 
 function findMixin(raw) {
   const keyWord = getVariableNameOfNS(raw, 'fabric.util.object.extend');
   const regex = new RegExp(
     `${keyWord.replaceAll('.', '\\.')}\\((.+)\\.prototype,\.*\\{`,
-    'm'
+    'gm'
   );
-  return findClassBase(raw, regex);
+  return parseClassBase(raw, regex);
 }
 
 function transformSuperCall(raw) {
@@ -250,7 +281,7 @@ function transformFile(raw, { namespace, name } = {}) {
     const found = findObject(raw, '{', '}', result.index);
     raw = raw.slice(0, result.index) + raw.slice(found.end + 1);
   }
-  raw = `//@ts-nocheck\n${raw}`;
+  raw.indexOf('//@ts-nocheck') === -1 && (raw = `//@ts-nocheck\n${raw}`);
   return raw;
 }
 
