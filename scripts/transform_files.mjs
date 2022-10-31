@@ -34,12 +34,10 @@ function printASTNode(raw, node, removeTrailingComma = true) {
 /**
  *
  * @param {string} raw
- * @param {walk.FindPredicate} find
- * @param {(type: string, node: acorn.Node, found: acorn.Node) => boolean} findVariable
- * @param {(node: acorn.Node) => boolean} extractVariable
+ * @param {(tree: acorn.Node) => {found:acorn.Node, parent:acorn.Node,variableNode:string}} find
  * @returns
  */
-function parseClassBase(raw, find, findVariable, extractVariable) {
+function parseClassBase(raw, find) {
   const comments = [];
   const ast = acorn.parse(raw, {
     ecmaVersion: 2022,
@@ -70,15 +68,8 @@ function parseClassBase(raw, find, findVariable, extractVariable) {
     );
   }
 
-  const { node: found } = walk.findNodeAt(ast, undefined, undefined, find);
-  // console.log(JSON.stringify(found, null, 2));
-  const { node: variableNode } = walk.findNodeAt(
-    ast,
-    undefined,
-    undefined,
-    (nodeType, node) => findVariable(nodeType, node, found)
-  );
-  const variableName = printNode(extractVariable(variableNode));
+  const { found, parent, variableNode } = find(ast);
+  const variableName = printNode(variableNode);
 
   const declaration = found.arguments.pop();
   const superClasses = found.arguments.map((node) => printNode(node, true));
@@ -135,7 +126,7 @@ function parseClassBase(raw, find, findVariable, extractVariable) {
     requiresSuperClassResolution: superClasses.length > 0,
     start: declaration.start,
     end: declaration.end,
-    variableNode,
+    variableNode: parent,
     declaration,
     methods,
     properties,
@@ -149,44 +140,91 @@ function parseClassBase(raw, find, findVariable, extractVariable) {
 }
 
 function parseClass(raw) {
-  return parseClassBase(
-    raw,
-    (nodeType, node) => {
-      return (
-        nodeType === 'CallExpression' &&
-        printASTNode(raw, node.callee)
-          .replaceAll('(', '')
-          .endsWith('createClass')
-      );
-    },
-    (nodeType, node, found) => {
-      return (
-        (nodeType === 'VariableDeclaration' ||
-          nodeType === 'ExpressionStatement') &&
-        node.start < found.start &&
-        node.end > found.end &&
-        !!walk.findNodeAt(
-          node,
-          undefined,
-          undefined,
-          (nodeType, node) => node === found
-        )
-      );
-    },
-    (variableNode) =>
-      variableNode.type === 'ExpressionStatement'
-        ? variableNode.expression.left
-        : variableNode.declarations[0].id
-  );
+  return parseClassBase(raw, (ast) => {
+    const { node: found } = walk.findNodeAt(
+      ast,
+      undefined,
+      undefined,
+      (nodeType, node) => {
+        return (
+          nodeType === 'CallExpression' &&
+          printASTNode(raw, node.callee).endsWith('createClass(')
+        );
+      }
+    );
+    const { node: parent } = walk.findNodeAt(
+      ast,
+      undefined,
+      undefined,
+      (nodeType, node) => {
+        return (
+          (nodeType === 'VariableDeclaration' ||
+            nodeType === 'ExpressionStatement') &&
+          node.start < found.start &&
+          node.end > found.end &&
+          !!walk.findNodeAt(
+            node,
+            undefined,
+            undefined,
+            (nodeType, node) => node === found
+          )
+        );
+      }
+    );
+
+    return {
+      found,
+      parent,
+      variableNode:
+        parent.type === 'ExpressionStatement'
+          ? parent.expression.left
+          : parent.declarations[0].id,
+    };
+  });
 }
 
 function parseMixin(raw) {
-  // 'fabric.util.object.extend';
-  return parseClassBase(raw, (nodeType, node) => {
-    return (
-      nodeType === 'CallExpression' &&
-      printASTNode(raw, node.callee).replaceAll('(', '').endsWith('extend')
+  return parseClassBase(raw, (ast) => {
+    const { node: found } = walk.findNodeAt(
+      ast,
+      undefined,
+      undefined,
+      (nodeType, node) => {
+        return (
+          nodeType === 'CallExpression' &&
+          printASTNode(raw, node.callee).endsWith('extend(')
+        );
+      }
     );
+    console.log(JSON.stringify(found, null, 2));
+    throw 'dfdf';
+    const { node: variableNode } = walk.findNodeAt(
+      ast,
+      undefined,
+      undefined,
+      (nodeType, node) => {
+        return (
+          (nodeType === 'VariableDeclaration' ||
+            nodeType === 'ExpressionStatement') &&
+          node.start < found.start &&
+          node.end > found.end &&
+          !!walk.findNodeAt(
+            node,
+            undefined,
+            undefined,
+            (nodeType, node) => node === found
+          )
+        );
+      }
+    );
+    return {
+      found,
+      parent: variableNode,
+      variableNode:
+        variableNode.type === 'ExpressionStatement'
+          ? variableNode.expression.left
+          : variableNode.declarations[0].id,
+    };
   });
 }
 
