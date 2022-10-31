@@ -1402,13 +1402,13 @@ export class FabricObject extends ObjectGeometry {
    * @param {CanvasRenderingContext2D} ctx Context to set the dash line on
    * @param {Array} dashArray array representing dashes
    */
-  _setLineDash(ctx: CanvasRenderingContext2D, dashArray?: number[] | null) {
+  _setLineDash(ctx, dashArray) {
     if (!dashArray || dashArray.length === 0) {
       return;
     }
-    // Spec requires the concatenation of two copies of the dash array when the number of elements is odd
+    // Spec requires the concatenation of two copies the dash list when the number of elements is odd
     if (1 & dashArray.length) {
-      dashArray.push(...dashArray);
+      dashArray.push.apply(dashArray, dashArray);
     }
     ctx.setLineDash(dashArray);
   }
