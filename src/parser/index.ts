@@ -1,5 +1,5 @@
-//@ts-nocheck
 import { fabric } from '../../HEADER';
+import { SHARED_ATTRIBUTES } from './attributes';
 import { clipPaths, cssRules, gradientDefs } from './constants';
 import { ElementsParser } from './elements_parser';
 import { getCSSRules } from './getCSSRules';
@@ -15,6 +15,7 @@ import { parseSVGDocument } from './parseSVGDocument';
 import { parseTransformAttribute } from './parseTransformAttribute';
 
 Object.assign(fabric, {
+  SHARED_ATTRIBUTES,
   cssRules,
   gradientDefs,
   clipPaths,
