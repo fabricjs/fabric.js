@@ -294,8 +294,8 @@
     assert.equal(width, 27.707709196083425);
     assert.equal(height, 21.750672506349947);
     assert.deepEqual(pathOffset, new fabric.Point(14.999999999999998, 17.000000000000004));
-    assert.deepEqual(strokeOffset, new fabric.Point(-0.48571407544277534, -2.784917784669414));
-    assert.deepEqual(strokeDiff, new fabric.Point(17.707709196083425, 11.750672506349947));
+    assert.deepEqual(strokeOffset, new fabric.Point(11.966623726115365, 8.965754721680533));
+    assert.deepEqual(strokeDiff, new fabric.Point(23.933247452230738, 17.931509443361065));
   });
   QUnit.test('_calcDimensions with custom options', function(assert) {
     const polygon = new fabric.Polygon(
@@ -348,7 +348,7 @@
     assert.equal(width, 11.118033988749893);
     assert.equal(height, 17.704907204858728);
     assert.deepEqual(pathOffset, new fabric.Point(6.825391045997646, 18.518912156261834));
-    assert.deepEqual(strokeOffset, new fabric.Point(0.5590169943749466, -1.6070999115636706));
-    assert.deepEqual(strokeDiff, new fabric.Point(1.1180339887498931, 7.704907204858728));
+    assert.deepEqual(strokeOffset, new fabric.Point(1.1180339887498931, 6.097807293295057));
+    assert.deepEqual(strokeDiff, new fabric.Point(2.2360679774997863, 12.195614586590114));
   });
 })();
