@@ -18,7 +18,7 @@ import './src/mixins/canvas_dataurl_exporter.mixin';
 import './src/mixins/canvas_serialization.mixin'; // optiona serialization
 import './src/mixins/canvas_gestures.mixin'; // optional gesturesv
 import './src/mixins/CanvasStraighteningMixin'; // optional gesturesv
-import './src/mixins/object.svg_export';
+
 import './src/mixins/stateful.mixin';
 import './src/mixins/animation.mixin'; // optional animation
 import './src/shapes/line.class';
