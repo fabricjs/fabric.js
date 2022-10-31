@@ -19,7 +19,7 @@ function readFile(file) {
 
 function printASTNode(raw, node, removeTrailingComma = true) {
   if (node.type === 'Literal')
-    return typeof node.value === 'string' ? `'${node.value}'` : node.value;
+    return typeof node.value === 'string' ? `'${node.value}'` : `${node.value}`;
   if (Array.isArray(node) && node.length === 0) return '';
   const out = (
     Array.isArray(node)
@@ -34,7 +34,7 @@ function printASTNode(raw, node, removeTrailingComma = true) {
 /**
  *
  * @param {string} raw
- * @param {(tree: acorn.Node) => {found:acorn.Node, parent:acorn.Node,variableNode:string}} find
+ * @param {(tree: acorn.Node) => {found:acorn.Node, parent:acorn.Node,variableName:string}} find
  * @returns
  */
 function parseClassBase(raw, find) {
@@ -68,8 +68,7 @@ function parseClassBase(raw, find) {
     );
   }
 
-  const { found, parent, variableNode } = find(ast);
-  const variableName = printNode(variableNode);
+  const { found, parent, variableName } = find(ast);
 
   const declaration = found.arguments.pop();
   const superClasses = found.arguments.map((node) => printNode(node, true));
@@ -172,13 +171,15 @@ function parseClass(raw) {
       }
     );
 
+    const variableNode =
+      parent.type === 'ExpressionStatement'
+        ? parent.expression.left
+        : parent.declarations[0].id;
+
     return {
       found,
       parent,
-      variableNode:
-        parent.type === 'ExpressionStatement'
-          ? parent.expression.left
-          : parent.declarations[0].id,
+      variableName: printASTNode(raw, variableNode),
     };
   });
 }
@@ -196,34 +197,13 @@ function parseMixin(raw) {
         );
       }
     );
-    console.log(JSON.stringify(found, null, 2));
-    throw 'dfdf';
-    const { node: variableNode } = walk.findNodeAt(
-      ast,
-      undefined,
-      undefined,
-      (nodeType, node) => {
-        return (
-          (nodeType === 'VariableDeclaration' ||
-            nodeType === 'ExpressionStatement') &&
-          node.start < found.start &&
-          node.end > found.end &&
-          !!walk.findNodeAt(
-            node,
-            undefined,
-            undefined,
-            (nodeType, node) => node === found
-          )
-        );
-      }
-    );
     return {
       found,
-      parent: variableNode,
-      variableNode:
-        variableNode.type === 'ExpressionStatement'
-          ? variableNode.expression.left
-          : variableNode.declarations[0].id,
+      parent: found,
+      variableName: printASTNode(raw, found.arguments[0]).replace(
+        '.prototype',
+        ''
+      ),
     };
   });
 }
@@ -293,7 +273,8 @@ function transformClass(type, raw, options = {}) {
   );
   if (duplicateMethods.length > 0) {
     throw new Error(
-      `${name}: duplicate methods found: ${duplicateMethods.map(
+      `${name}: duplicate methods found: ${_.map(
+        duplicateProps,
         'node.key.name'
       )}`
     );
@@ -301,11 +282,13 @@ function transformClass(type, raw, options = {}) {
   const duplicateProps = _.differenceWith(
     properties,
     _.uniqBy(properties, 'node.key.name'),
-    (a, b) => a !== b
+    (a, b) => a === b
   );
+
   if (duplicateProps.length > 0) {
     throw new Error(
-      `${name}: duplicate properties found: ${duplicateProps.map(
+      `${name}: duplicate properties found: ${_.map(
+        duplicateProps,
         'node.key.name'
       )}`
     );
@@ -335,14 +318,15 @@ function transformClass(type, raw, options = {}) {
     const superTransforms = [];
     walk.simple(methodAST, {
       CallExpression(node) {
+        console.log(node);
         if (
-          node.callee.object.type === 'ThisExpression' &&
-          node.callee.property.name === 'callSuper'
+          node.callee.object?.type === 'ThisExpression' &&
+          node.callee.property?.name === 'callSuper'
         ) {
           const [methodNameArg, ...args] = node.arguments;
           const lastArg = args[args.length - 1];
           const removeParen =
-            lastArg.type === 'Identifier' || lastArg.type === 'Literal';
+            lastArg?.type === 'Identifier' || lastArg?.type === 'Literal';
           const out = `${
             methodNameArg.value === 'initialize'
               ? 'super'
