@@ -247,31 +247,18 @@ function transformClass(type, raw, options = {}) {
     name,
     namespace,
     superClass,
-    raw: rawBody,
-    start,
     end,
     requiresSuperClassResolution,
     superClasses,
     methods,
     properties,
     defaultValues,
+    staticMethods,
+    staticProperties,
     declaration,
     variableNode,
     printNode,
   } = type === 'mixin' ? parseMixin(raw) : parseClass(raw);
-  let body = rawBody;
-  let offset = start;
-  const staticCandidates = [];
-
-  function replaceNode(node, value) {
-    // const diff = node.end - node.start - value.length;
-    // body =
-    //   body.slice(0, node.start - offset) +
-    //   value +
-    //   body.slice(node.end + 1 - offset);
-    // offset -= diff;
-    body = body.replace(printNode(node, false), value);
-  }
 
   // safety
   const duplicateMethods = _.differenceWith(
@@ -300,7 +287,7 @@ function transformClass(type, raw, options = {}) {
   }
 
   const classBody = [];
-  console.log(methods);
+
   properties.forEach(({ node, comment }) => {
     const key = node.key.name;
     const typeable =
@@ -311,26 +298,44 @@ function transformClass(type, raw, options = {}) {
     // replaceNode(node, typeable ? `${key}: ${typeof node.value.value}` : key);
   });
 
+  const staticCandidates = [];
+
   methods.forEach(({ node, comment }) => {
     const key = node.key.name;
-    const value = printNode(node.value)
-      .replace(/^function/, '')
-      .trim();
+    const value = printNode(node.value.body.body);
     // replaceNode(node, `${key === 'initialize' ? 'constructor' : key}${value}`);
     value.indexOf('this') === -1 && staticCandidates.push(key);
-    console.log(node.value.params);
     classBody.push(
       (comment ? printNode(comment) : '') +
         '\n' +
         (node.value.async ? 'async ' : '') +
         (key === 'initialize' ? 'constructor' : key) +
         `(${printNode(node.value.params).slice(0, -1)}) {\n` +
-        printNode(node.value.body.body) +
+        value +
         '\n}'
     );
   });
 
-  body = classBody.join('\n\n');
+  staticProperties.forEach(({ key, node, comment }) => {
+    classBody.push(
+      (comment ? printNode(comment) : '') + '\n' + key + '=' + printNode(node)
+    );
+  });
+
+  staticMethods.forEach(({ key, node, comment }) => {
+    classBody.push(
+      (comment ? printNode(comment) : '') +
+        '\n' +
+        'static ' +
+        (node.async ? 'async ' : '') +
+        key +
+        `(${printNode(node.params).slice(0, -1)}) {\n` +
+        printNode(node.body.body) +
+        '\n}'
+    );
+  });
+
+  let body = classBody.join('\n\n');
 
   let transformed = body;
   do {
