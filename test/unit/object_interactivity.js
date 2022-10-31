@@ -99,7 +99,6 @@
 
   QUnit.test('_setCornerCoords', function(assert) {
     var cObj = new fabric.Object({ top: 10, left: 10, width: 10, height: 10, strokeWidth: 0 });
-    assert.ok(typeof cObj._setCornerCoords === 'function', '_setCornerCoords should exist');
     cObj.setCoords();
 
     assert.equal(cObj.oCoords.tl.corner.tl.x.toFixed(2), 3.5);
