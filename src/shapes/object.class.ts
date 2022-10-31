@@ -1,27 +1,23 @@
-// @ts-nocheck
-import type { TClassProperties, TDegree, TSize, TFiller } from '../typedefs';
 import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { config } from '../config';
-import { VERSION } from '../constants';
-import { Point } from '../point.class';
-import { capValue } from '../util/misc/capValue';
-import { pick } from '../util/misc/pick';
-import { runningAnimations } from '../util/animation_registry';
-import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
-import { clone } from '../util/lang_object';
-import { toFixed } from '../util/misc/toFixed';
-import { capitalize } from '../util/lang_string';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { createCanvasElement } from '../util/misc/dom';
+import { ALIASING_LIMIT, iMatrix, VERSION } from '../constants';
 import { ObjectGeometry } from '../mixins/object_geometry.mixin';
+import { Point } from '../point.class';
+import type { TClassProperties, TDegree, TFiller, TSize } from '../typedefs';
+import { runningAnimations } from '../util/animation_registry';
+import { clone } from '../util/lang_object';
+import { capitalize } from '../util/lang_string';
+import { capValue } from '../util/misc/capValue';
+import { createCanvasElement } from '../util/misc/dom';
 import { qrDecompose, transformPoint } from '../util/misc/matrix';
-import { Canvas, Shadow, StaticCanvas } from '../__types__';
+import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
+import { pick } from '../util/misc/pick';
+import { toFixed } from '../util/misc/toFixed';
+import { Shadow } from '../__types__';
 
 // temporary hack for unfinished migration
 type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
-
-const ALIASING_LIMIT = 2;
 
 /**
  * Root object class from which all 2d shape classes inherit from
@@ -235,14 +231,14 @@ export class FabricObject extends ObjectGeometry {
    * @type String
    * @default butt
    */
-  strokeLineCap: string;
+  strokeLineCap: CanvasLineCap;
 
   /**
    * Corner style of an object's stroke (one of "bevel", "round", "miter")
    * @type String
    * @default
    */
-  strokeLineJoin: string;
+  strokeLineJoin: CanvasLineJoin;
 
   /**
    * Maximum miter length (used for strokeLineJoin = "miter") of an object's stroke
@@ -838,7 +834,7 @@ export class FabricObject extends ObjectGeometry {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[]): Record<string, any> {
+  toObject(propertiesToInclude?: (keyof this)[]): Record<string, any> {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -1013,10 +1009,9 @@ export class FabricObject extends ObjectGeometry {
    * @return {fabric.Object} thisArg
    */
   _set(key: string, value: any) {
-    const shouldConstrainValue = key === 'scaleX' || key === 'scaleY',
-      isChanged = this[key] !== value;
+    const isChanged = this[key] !== value;
 
-    if (shouldConstrainValue) {
+    if (key === 'scaleX' || key === 'scaleY') {
       value = this._constrainScale(value);
     }
     if (key === 'scaleX' && value < 0) {
@@ -1256,7 +1251,7 @@ export class FabricObject extends ObjectGeometry {
    * @param {CanvasRenderingContext2D} ctx
    * @param {fabric.Object} clipPath
    */
-  _drawClipPath(ctx, clipPath) {
+  _drawClipPath(ctx: CanvasRenderingContext2D, clipPath?: FabricObject) {
     if (!clipPath) {
       return;
     }
@@ -1274,12 +1269,12 @@ export class FabricObject extends ObjectGeometry {
    * Paint the cached copy of the object on the target context.
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  drawCacheOnCanvas(ctx) {
-    ctx.scale(1 / this.zoomX, 1 / this.zoomY);
+  drawCacheOnCanvas(ctx: CanvasRenderingContext2D) {
+    ctx.scale(1 / this.zoomX!, 1 / this.zoomY!);
     ctx.drawImage(
-      this._cacheCanvas,
-      -this.cacheTranslationX,
-      -this.cacheTranslationY
+      this._cacheCanvas!,
+      -this.cacheTranslationX!,
+      -this.cacheTranslationY!
     );
   }
 
@@ -1307,8 +1302,8 @@ export class FabricObject extends ObjectGeometry {
         (this.statefullCache && this.hasStateChanged('cacheProperties'))
       ) {
         if (this._cacheCanvas && this._cacheContext && !skipCanvas) {
-          const width = this.cacheWidth / this.zoomX;
-          const height = this.cacheHeight / this.zoomY;
+          const width = this.cacheWidth! / this.zoomX!;
+          const height = this.cacheHeight! / this.zoomY!;
           this._cacheContext.clearRect(-width / 2, -height / 2, width, height);
         }
         return true;
@@ -1322,7 +1317,7 @@ export class FabricObject extends ObjectGeometry {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _renderBackground(ctx) {
+  _renderBackground(ctx: CanvasRenderingContext2D) {
     if (!this.backgroundColor) {
       return;
     }
@@ -1339,7 +1334,7 @@ export class FabricObject extends ObjectGeometry {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _setOpacity(ctx) {
+  _setOpacity(ctx: CanvasRenderingContext2D) {
     if (this.group && !this.group._transformDone) {
       ctx.globalAlpha = this.getObjectOpacity();
     } else {
@@ -1347,7 +1342,18 @@ export class FabricObject extends ObjectGeometry {
     }
   }
 
-  _setStrokeStyles(ctx, decl) {
+  _setStrokeStyles(
+    ctx: CanvasRenderingContext2D,
+    decl: Pick<
+      this,
+      | 'stroke'
+      | 'strokeWidth'
+      | 'strokeLineCap'
+      | 'strokeDashOffset'
+      | 'strokeLineJoin'
+      | 'strokeMiterLimit'
+    >
+  ) {
     const stroke = decl.stroke;
     if (stroke) {
       ctx.lineWidth = decl.strokeWidth;
@@ -1378,19 +1384,18 @@ export class FabricObject extends ObjectGeometry {
     }
   }
 
-  _setFillStyles(ctx, decl) {
-    const fill = decl.fill;
+  _setFillStyles(ctx: CanvasRenderingContext2D, { fill }: Pick<this, 'fill'>) {
     if (fill) {
       if (fill.toLive) {
         ctx.fillStyle = fill.toLive(ctx, this);
-        this._applyPatternGradientTransform(ctx, decl.fill);
+        this._applyPatternGradientTransform(ctx, fill);
       } else {
         ctx.fillStyle = fill;
       }
     }
   }
 
-  _setClippingProperties(ctx) {
+  _setClippingProperties(ctx: CanvasRenderingContext2D) {
     ctx.globalAlpha = 1;
     ctx.strokeStyle = 'transparent';
     ctx.fillStyle = '#000000';
@@ -1422,15 +1427,13 @@ export class FabricObject extends ObjectGeometry {
       return;
     }
 
-    let shadow = this.shadow,
+    const shadow = this.shadow,
       canvas = this.canvas,
-      multX = (canvas && canvas.viewportTransform[0]) || 1,
-      multY = (canvas && canvas.viewportTransform[3]) || 1,
+      retinaScaling = canvas?.getRetinaScaling() || 1,
+      [sx, , , sy] = canvas?.viewportTransform || iMatrix,
+      multX = sx * retinaScaling,
+      multY = sy * retinaScaling,
       scaling = shadow.nonScaling ? new Point(1, 1) : this.getObjectScaling();
-    if (canvas && canvas._isRetinaScaling()) {
-      multX *= config.devicePixelRatio;
-      multY *= config.devicePixelRatio;
-    }
     ctx.shadowColor = shadow.color;
     ctx.shadowBlur =
       (shadow.blur *
@@ -1446,7 +1449,7 @@ export class FabricObject extends ObjectGeometry {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _removeShadow(ctx) {
+  _removeShadow(ctx: CanvasRenderingContext2D) {
     if (!this.shadow) {
       return;
     }
@@ -1557,7 +1560,7 @@ export class FabricObject extends ObjectGeometry {
    * transforming a context to transform the gradient, is going to transform the stroke too.
    * we want to transform the gradient but not the stroke operation, so we create
    * a transformed gradient on a pattern and then we use the pattern instead of the gradient.
-   * this method has drwabacks: is slow, is in low resolution, needs a patch for when the size
+   * this method has drawbacks: is slow, is in low resolution, needs a patch for when the size
    * is limited.
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -1724,13 +1727,11 @@ export class FabricObject extends ObjectGeometry {
       this.shadow = null;
     }
 
-    let el = fabric.util.createCanvasElement(),
+    const el = fabric.util.createCanvasElement(),
       // skip canvas zoom and calculate with setCoords now.
       boundingRect = this.getBoundingRect(true, true),
       shadow = this.shadow,
-      shadowOffset = { x: 0, y: 0 },
-      width,
-      height;
+      shadowOffset = new Point();
 
     if (shadow) {
       const shadowBlur = shadow.blur;
@@ -1743,8 +1744,8 @@ export class FabricObject extends ObjectGeometry {
       shadowOffset.y =
         2 * Math.round(abs(shadow.offsetY) + shadowBlur) * abs(scaling.y);
     }
-    width = boundingRect.width + shadowOffset.x;
-    height = boundingRect.height + shadowOffset.y;
+    const width = boundingRect.width + shadowOffset.x,
+      height = boundingRect.height + shadowOffset.y;
     // if the current width/height is not an integer
     // we need to make it so.
     el.width = Math.ceil(width);
@@ -1966,7 +1967,17 @@ export class FabricObject extends ObjectGeometry {
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Object>}
    */
-  static _fromObject(klass, object, { extraParam, ...options } = {}) {
+  static _fromObject<
+    T extends FabricObject,
+    X,
+    K extends X extends string
+      ? { new (arg0: string, ...args: any[]): T }
+      : { new (...args: any[]): T }
+  >(
+    klass: K,
+    object: Record<string, unknown>,
+    { extraParam, ...options }: { extraParam?: X; signal?: AbortSignal } = {}
+  ) {
     return enlivenObjectEnlivables(clone(object, true), options).then(
       (enlivedMap) => {
         // from the resulting enlived options, extract options.extraParam to arg0
@@ -1986,12 +1997,15 @@ export class FabricObject extends ObjectGeometry {
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<fabric.Object>}
    */
-  static fromObject(object, options) {
+  static fromObject(
+    object: Record<string, unknown>,
+    options?: { signal?: AbortSignal }
+  ) {
     return FabricObject._fromObject(FabricObject, object, options);
   }
 }
 
-const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
+const fabricObjectDefaultValues: Partial<TClassProperties<FabricObject>> = {
   type: 'object',
   originX: 'left',
   originY: 'top',
@@ -2075,7 +2089,6 @@ const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
   clipPath: undefined,
   inverted: false,
   absolutePositioned: false,
-  controls: {},
 };
 
 Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
