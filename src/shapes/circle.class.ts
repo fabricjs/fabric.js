@@ -135,7 +135,7 @@ export class Circle extends FabricObject {
         ' A ' + radius + ' ' + radius,
         ' 0 ',
         +largeFlag + ' 1',
-        ' ' + endX + ' ' + endY,
+        ` ${endX} ${endY}`,
         '" ',
         'COMMON_PARTS',
         ' />\n',
