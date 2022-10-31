@@ -14,7 +14,7 @@ import {
   makePathSimpler,
   parsePath,
 } from '../util/path';
-import { FabricObject } from './object.class';
+import { FabricObject, fabricObjectDefaultValues } from './object.class';
 
 export class Path extends FabricObject {
   /**
@@ -392,11 +392,11 @@ export class Path extends FabricObject {
 export const pathDefaultValues: Partial<TClassProperties<Path>> = {
   type: 'path',
   path: null,
-  cacheProperties: FabricObject.prototype.cacheProperties.concat(
+  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat(
     'path',
     'fillRule'
   ),
-  stateProperties: FabricObject.prototype.stateProperties.concat('path'),
+  stateProperties: fabricObjectDefaultValues.stateProperties.concat('path'),
 };
 
 Object.assign(Path.prototype, pathDefaultValues);
