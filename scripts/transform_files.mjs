@@ -294,10 +294,25 @@ function transformClass(type, raw, options = {}) {
         )}` || name
       : className || name;
 
-  const classDirective =
+  let classDirective =
     type === 'mixin'
       ? generateMixin(body, finalName, namespace, useExports)
       : generateClass(body, finalName, superClass, useExports);
+
+  if (_.size(defaultValues) > 0) {
+    const defaultsKey = `${_.lowerFirst(finalName)}DefaultValues`;
+    classDirective +=
+      '\n\n' +
+      `export const ${defaultsKey} = {\n${_.map(defaultValues, (value, key) =>
+        [key, value].join(':')
+      ).join(',\n')}\n};` +
+      '\n\n' +
+      `Object.assign(${finalName}.prototype, ${defaultsKey})`;
+  }
+
+  if (type === 'class' && !useExports) {
+    classDirective += `\n/** @todo TODO_JS_MIGRATION remove next line after refactoring build */\n${namespace} = ${name};\n`;
+  }
 
   let rawFile;
 
@@ -324,31 +339,16 @@ function transformClass(type, raw, options = {}) {
     .replace(new RegExp(namespace.replace(/\./g, '\\.'), 'g'), name)
     .replace(/fabric\.Object/g, 'FabricObject');
 
-  if (_.size(defaultValues) > 0) {
-    const defaultsKey = `${_.lowerFirst(name)}DefaultValues`;
-    rawFile +=
-      '\n' +
-      `export const ${defaultsKey} = {\n${_.map(defaultValues, (value, key) =>
-        [key, value].join(':')
-      ).join(',\n')}\n};` +
-      '\n' +
-      `Object.assign(${finalName}.prototype, ${defaultsKey})`;
-  }
-
-  if (type === 'class' && !useExports) {
-    rawFile += `\n/** @todo TODO_JS_MIGRATION remove next line after refactoring build */\n${namespace} = ${name};\n`;
-  }
-
-  //  in case of multiple declaration in one file
-  // try {
-  //   rawFile = transformClass('class', rawFile, options);
-  // } catch (error) {}
-  // try {
-  //   rawFile = transformClass('mixin', rawFile, options);
-  // } catch (error) {}
-
   rawFile.indexOf('//@ts-nocheck') === -1 &&
     (rawFile = `//@ts-nocheck\n${rawFile}`);
+
+  //  in case of multiple declaration in one file
+  try {
+    return transformClass('class', rawFile, options);
+  } catch (error) {}
+  try {
+    return transformClass('mixin', rawFile, options);
+  } catch (error) {}
 
   return {
     name,
