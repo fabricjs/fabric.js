@@ -185,7 +185,7 @@ export class InteractiveFabricObject extends FabricObject {
       coords: Record<string, TOCoord> = {};
 
     this.forEachControl((control, key) => {
-      const position = control.positionHandler(dim, finalMatrix, this, control);
+      const position = control.positionHandler(dim, finalMatrix, this);
       coords[key] = Object.assign(
         position,
         this._calcCornerCoords(control, position)
