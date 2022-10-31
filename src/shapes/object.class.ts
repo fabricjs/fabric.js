@@ -2058,7 +2058,6 @@ const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
   noScaleCache: true,
   strokeUniform: false,
   dirty: true,
-  __corner: 0,
   paintFirst: 'fill',
   activeOn: 'down',
   stateProperties: (

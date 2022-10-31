@@ -774,7 +774,7 @@ import { fireEvent } from '../util/fireEvent';
         this._groupSelector = null;
         this._currentTransform = null;
         // reset the target information about which corner is selected
-        target && (target.__corner = 0);
+        target && (target.__corner = undefined);
         if (shouldRender) {
           this.requestRenderAll();
         } else if (!isClick) {

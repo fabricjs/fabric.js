@@ -889,7 +889,7 @@
     c.setActiveObject(obj);
     obj.__corner = 'test';
     c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(obj.__corner, 0, '__corner has been resetted from activeObject');
+    assert.equal(obj.__corner, undefined, '__corner has been resetted from activeObject');
   });
 
   QUnit.test('mouseEnter does not removes __corner if there is a transform', function(assert) {

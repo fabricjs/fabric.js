@@ -38,10 +38,9 @@ export class InteractiveFabricObject extends FabricObject {
    * It should be private, but there is no harm in using it as
    * a read-only property.
    * this isn't cleaned automatically. Non selected objects may have wrong values
-   * @type number|string|any
-   * @default 0
+   * @type [string]
    */
-  __corner: number | string;
+  __corner?: string;
 
   /**
    * a map of control visibility for this object.
@@ -109,7 +108,7 @@ export class InteractiveFabricObject extends FabricObject {
       return false;
     }
 
-    this.__corner = 0;
+    this.__corner = undefined;
     // had to keep the reverse loop because was breaking tests
     const cornerEntries = Object.entries(this.oCoords);
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
