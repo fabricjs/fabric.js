@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Color } from '../color';
 import { config } from '../config';
 import { FabricObject } from '../shapes/fabricObject.class';
