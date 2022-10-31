@@ -131,8 +131,8 @@ export class Circle extends FabricObject {
         endY = sin(end) * radius,
         largeFlag = angle > 180 ? '1' : '0';
       return [
-        '<path d="M ' + startX + ' ' + startY,
-        ' A ' + radius + ' ' + radius,
+        `<path d="M ${startX} ${startY}`,
+        ` A ${radius} ${radius}`,
         ' 0 ',
         `${largeFlag} 1`,
         ` ${endX} ${endY}`,
