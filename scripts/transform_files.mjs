@@ -162,10 +162,12 @@ function parseClassBase(raw, find) {
     variableNode.type === 'ExpressionStatement'
       ? variableNode.expression.left
       : variableNode.declarations[0].id
-  );
+  ).trim();
 
   const declaration = found.arguments.pop();
-  const superClasses = found.arguments.map((node) => printASTNode(raw, node));
+  const superClasses = found.arguments.map((node) =>
+    printASTNode(raw, node).replaceAll(',', '').trim()
+  );
   const [methods, properties] = _.partition(
     found.properties,
     (node) =>
@@ -365,12 +367,15 @@ function transformClass(type, raw, options = {}) {
   raw = `${raw.slice(0, match.index)}${classDirective}${raw
     .slice(end + 1)
     .replace(/\s*\)\s*;?/, '')}`;
-  if (type === 'mixin') {
-    //  in case of multiple mixins in one file
-    try {
-      return transformClass(type, raw, options);
-    } catch (error) {}
-  }
+
+  //  in case of multiple declaration in one file
+  try {
+    return transformClass('class', raw, options);
+  } catch (error) {}
+  try {
+    return transformClass('mixin', raw, options);
+  } catch (error) {}
+
   if (type === 'class' && !useExports) {
     raw = `${raw}\n/** @todo TODO_JS_MIGRATION remove next line after refactoring build */\n${namespace} = ${name};\n`;
   }
