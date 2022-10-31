@@ -6,12 +6,6 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { FabricObject } from './fabricObject.class';
 
-/**
- * Circle class
- * @class Circle
- * @extends fabric.Object
- * @see {@link Circle#initialize} for constructor definition
- */
 export class Circle extends FabricObject {
   /**
    * Radius of this circle
@@ -40,7 +34,6 @@ export class Circle extends FabricObject {
    * @private
    * @param {String} key
    * @param {*} value
-   * @return {Circle} thisArg
    */
   _set(key: string, value: any) {
     super._set(key, value);
