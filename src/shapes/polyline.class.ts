@@ -8,6 +8,7 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 import { TProjectStrokeOnPointsOptions } from '../util/misc/projectStroke/types';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { calcDimensionsMatrix, transformPoint } from '../util/misc/matrix';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
@@ -113,24 +114,9 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
        * @private
        */
       _projectStrokeOnPoints: function (
-        options?: Partial<TProjectStrokeOnPointsOptions>
+        options: Partial<TProjectStrokeOnPointsOptions>
       ) {
-        return projectStrokeOnPoints(
-          this.points,
-          {
-            scaleX: this.scaleX,
-            scaleY: this.scaleY,
-            skewX: this.skewX,
-            skewY: this.skewY,
-            strokeLineCap: this.strokeLineCap,
-            strokeLineJoin: this.strokeLineJoin,
-            strokeMiterLimit: this.strokeMiterLimit,
-            strokeUniform: this.strokeUniform,
-            strokeWidth: this.strokeWidth,
-            ...(options || {}),
-          },
-          this.isOpen()
-        );
+        return projectStrokeOnPoints(this.points, options, this.isOpen());
       },
 
       /**
@@ -140,6 +126,18 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
       _calcDimensions: function (
         options?: Partial<TProjectStrokeOnPointsOptions>
       ) {
+        options = {
+          scaleX: this.scaleX,
+          scaleY: this.scaleY,
+          skewX: this.skewX,
+          skewY: this.skewY,
+          strokeLineCap: this.strokeLineCap,
+          strokeLineJoin: this.strokeLineJoin,
+          strokeMiterLimit: this.strokeMiterLimit,
+          strokeUniform: this.strokeUniform,
+          strokeWidth: this.strokeWidth,
+          ...(options || {}),
+        };
         const points = this.exactBoundingBox
           ? this._projectStrokeOnPoints(options).map(
               (projection) => projection.projectedPoint
@@ -154,28 +152,34 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
             pathOffset: new Point(),
           };
         }
-        const bbox = makeBoundingBoxFromPoints(points);
-        const bboxNoStroke = makeBoundingBoxFromPoints(this.points);
-        const offsetX = bbox.left + bbox.width / 2,
-          offsetY = bbox.top + bbox.height / 2;
-        const pathOffsetX =
-          offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
-        const pathOffsetY =
-          offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY));
-        // TODO: remove next line
-        const legacyCorrection =
-          !this.fromSVG && !this.exactBoundingBox ? this.strokeWidth / 2 : 0;
+        const bbox = makeBoundingBoxFromPoints(points),
+          // Remove scale effect, since it's applied after
+          matrix = calcDimensionsMatrix(
+            Object.assign(options, { scaleX: 1, scaleY: 1 })
+          ),
+          bboxNoStroke = makeBoundingBoxFromPoints(
+            this.points.map((p) => transformPoint(p, matrix, true))
+          ),
+          offsetX = bbox.left + bbox.width / 2,
+          offsetY = bbox.top + bbox.height / 2,
+          pathOffsetX =
+            offsetX - offsetY * Math.tan(degreesToRadians(this.skewX)),
+          pathOffsetY =
+            offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY)),
+          // TODO: remove next line
+          legacyCorrection =
+            !this.fromSVG && !this.exactBoundingBox ? this.strokeWidth / 2 : 0;
         return {
           ...bbox,
           left: bbox.left - legacyCorrection,
           top: bbox.top - legacyCorrection,
           pathOffset: new Point(pathOffsetX, pathOffsetY),
-          strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top).subtract(
-            new Point(bbox.left, bbox.top)
-          ),
-          strokeDiff: new Point(bbox.width, bbox.height).subtract(
-            new Point(bboxNoStroke.width, bboxNoStroke.height)
-          ),
+          strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top)
+            .subtract(new Point(bbox.left, bbox.top))
+            .multiply(new Point(this.scaleX, this.scaleY)),
+          strokeDiff: new Point(bbox.width, bbox.height)
+            .subtract(new Point(bboxNoStroke.width, bboxNoStroke.height))
+            .multiply(new Point(this.scaleX, this.scaleY)),
         };
       },
 
