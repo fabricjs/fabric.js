@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { ControlCursorCallback, TransformActionHandler } from '../typedefs';
 import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
 import { isLocked, NOT_ALLOWED_CURSOR } from './util';
