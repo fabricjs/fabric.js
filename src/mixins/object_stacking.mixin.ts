@@ -2,9 +2,8 @@
 
 import { fabric } from '../../HEADER';
 import type { FabricObject } from '../shapes/fabricObject.class';
-import { FabricObjectAncestryMixin } from './object_ancestry.mixin';
 
-export class FabricObjectObjectStackingMixin extends FabricObjectAncestryMixin {
+export class FabricObjectObjectStackingMixin {
   /**
    * Moves an object to the bottom of the stack of drawn objects
    * @return {FabricObject} thisArg
