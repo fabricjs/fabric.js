@@ -1991,7 +1991,7 @@ export class FabricObject extends ObjectGeometry {
   }
 }
 
-const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
+export const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
   type: 'object',
   originX: 'left',
   originY: 'top',
