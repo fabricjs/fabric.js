@@ -4,6 +4,7 @@ import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { FabricObject } from './fabricObject.class';
+import { fabricObjectDefaultValues } from './object.class';
 
 export class Rect extends FabricObject {
   /**
@@ -206,11 +207,11 @@ export class Rect extends FabricObject {
 }
 
 export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
-  stateProperties: FabricObject.prototype.stateProperties.concat('rx', 'ry'),
+  stateProperties: fabricObjectDefaultValues.stateProperties.concat('rx', 'ry'),
   type: 'rect',
   rx: 0,
   ry: 0,
-  cacheProperties: FabricObject.prototype.cacheProperties.concat('rx', 'ry'),
+  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat('rx', 'ry'),
 };
 
 Object.assign(Rect.prototype, rectDefaultValues);
