@@ -28,11 +28,7 @@ export class Triangle extends FabricObject {
   _toSVG() {
     const widthBy2 = this.width / 2,
       heightBy2 = this.height / 2,
-      points = [
-        -widthBy2 + ' ' + heightBy2,
-        '0 ' + -heightBy2,
-        widthBy2 + ' ' + heightBy2,
-      ].join(',');
+      points = `${-widthBy2} ${heightBy2},0 ${-heightBy2},${widthBy2} ${heightBy2}`;
     return ['<polygon ', 'COMMON_PARTS', 'points="', points, '" />'];
   }
 
