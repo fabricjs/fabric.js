@@ -1,3 +1,7 @@
+// @ts-nocheck
+import { fabric } from '../../HEADER';
+import type { FabricObject } from '../shapes/fabricObject.class';
+
 fabric.util.object.extend(
   fabric.StaticCanvas.prototype,
   /** @lends fabric.StaticCanvas.prototype */ {
@@ -7,7 +11,7 @@ fabric.util.object.extend(
      * @return {fabric.Canvas} thisArg
      * @chainable
      */
-    straightenObject: function (object) {
+    straightenObject: function (object: FabricObject) {
       object.straighten();
       this.requestRenderAll();
       return this;
@@ -18,7 +22,7 @@ fabric.util.object.extend(
      * @param {fabric.Object} object Object to straighten
      * @return {fabric.Canvas} thisArg
      */
-    fxStraightenObject: function (object) {
+    fxStraightenObject: function (object: FabricObject) {
       return object.fxStraighten({
         onChange: this.requestRenderAllBound,
       });

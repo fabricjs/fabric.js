@@ -17,9 +17,7 @@ import './src/mixins/canvas_grouping.mixin'; // optional interaction
 import './src/mixins/canvas_dataurl_exporter.mixin';
 import './src/mixins/canvas_serialization.mixin'; // optiona serialization
 import './src/mixins/canvas_gestures.mixin'; // optional gesturesv
-import './src/mixins/object_interactivity.mixin'; // optional interaction
-import './src/mixins/object_ancestry.mixin';
-import './src/mixins/object_stacking.mixin';
+import './src/mixins/CanvasStraighteningMixin'; // optional gesturesv
 import './src/mixins/object.svg_export';
 import './src/mixins/stateful.mixin';
 import './src/mixins/animation.mixin'; // optional animation
@@ -34,7 +32,6 @@ import './src/shapes/path.class';
 import './src/shapes/group.class';
 import './src/shapes/active_selection.class'; // optional interaction
 import './src/shapes/image.class';
-import './src/mixins/object_straightening.mixin'; // optional objectstraightening
 import './src/filters/webgl_backend.class'; // optional image_filters
 import './src/filters/2d_backend.class'; // optional image_filters
 import './src/filters/base_filter.class'; // optional image_filters

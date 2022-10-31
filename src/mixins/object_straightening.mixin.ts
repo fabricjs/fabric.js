@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import type { FabricObject } from '../shapes/fabricObject.class';
 import { TDegree } from '../typedefs';
 import { animate } from '../util/animate';
