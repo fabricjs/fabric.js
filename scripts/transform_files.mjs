@@ -56,7 +56,7 @@ function parseClassBase(raw, find) {
       });
     },
   });
-  fs.writeFileSync('./ast.json', JSON.stringify(ast, null, 2));
+  // fs.writeFileSync('./ast.json', JSON.stringify(ast, null, 2));
 
   function printNode(node, removeTrailingComma) {
     return printASTNode(raw, node, removeTrailingComma);
