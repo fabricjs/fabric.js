@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { fabric } from '../../HEADER';
 import type { FabricObject } from '../shapes/fabricObject.class';
 import type { Group } from '../shapes/group.class';
@@ -64,8 +66,8 @@ export class FabricObjectAncestryMixin {
   ) {
     if (this === other) {
       return {
-        fork: [],
-        otherFork: [],
+        fork: [] as FabricObject[],
+        otherFork: [] as FabricObject[],
         common: [this, ...this.getAncestors(strict)],
       };
     } else if (!other) {
@@ -138,5 +140,35 @@ export class FabricObjectAncestryMixin {
   ) {
     const commonAncestors = this.findCommonAncestors(other, strict);
     return commonAncestors && !!commonAncestors.common.length;
+  }
+
+  /**
+   *
+   * @param {FabricObject} other object to compare against
+   * @returns {boolean | undefined} if objects do not share a common ancestor or they are strictly equal it is impossible to determine which is in front of the other; in such cases the function returns `undefined`
+   */
+  isInFrontOf(this: FabricObject & this, other: FabricObject & this) {
+    if (this === other) {
+      return undefined;
+    }
+    const ancestorData = this.findCommonAncestors(other);
+    if (!ancestorData) {
+      return undefined;
+    }
+    if (ancestorData.fork.includes(other)) {
+      return true;
+    }
+    if (ancestorData.otherFork.includes(this)) {
+      return false;
+    }
+    const firstCommonAncestor = ancestorData.common[0];
+    if (!firstCommonAncestor) {
+      return undefined;
+    }
+    const headOfFork = ancestorData.fork.pop(),
+      headOfOtherFork = ancestorData.otherFork.pop(),
+      thisIndex = firstCommonAncestor._objects.indexOf(headOfFork),
+      otherIndex = firstCommonAncestor._objects.indexOf(headOfOtherFork);
+    return thisIndex > -1 && thisIndex > otherIndex;
   }
 }

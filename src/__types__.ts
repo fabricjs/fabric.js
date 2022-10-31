@@ -1,5 +1,6 @@
 import type { Observable } from './mixins/observable.mixin';
 import type { Point } from './point.class';
+import type { FabricObject } from './shapes/fabricObject.class';
 import { ModifierKey, TMat2D } from './typedefs';
 
 /**
@@ -19,6 +20,7 @@ export type StaticCanvas = Record<string, any> & {
     br: Point;
   };
   getRetinaScaling(): number;
+  _objects: FabricObject[];
 } & Observable;
 export type Rect = any;
 export type TObject = any;

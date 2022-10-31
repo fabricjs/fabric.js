@@ -3,7 +3,9 @@ import { Point } from '../point.class';
 import { FabricObject } from './fabricObject.class';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
 
-export class Group extends FabricObject {}
+export class Group extends FabricObject {
+  _objects: FabricObject[];
+}
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
