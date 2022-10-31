@@ -412,7 +412,7 @@ function transformClass(type, raw, options = {}) {
       `Object.assign(${finalName}.prototype, ${defaultsKey})`;
   }
 
-  if (type === 'class' && !useExports) {
+  if (type === 'class' /*&& !useExports*/) {
     classDirective += `\n/** @todo TODO_JS_MIGRATION remove next line after refactoring build */\n${namespace} = ${name};\n`;
   }
 
