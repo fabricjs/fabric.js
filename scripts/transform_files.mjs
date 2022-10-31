@@ -293,13 +293,21 @@ function transformClass(type, raw, options = {}) {
           node.callee.property.name === 'callSuper'
         ) {
           const [methodNameArg, ...args] = node.arguments;
+          const lastArg = args[args.length - 1];
+          const removeParen =
+            lastArg.type === 'Identifier' || lastArg.type === 'Literal';
+          const out = `${
+            methodNameArg.value === 'initialize'
+              ? 'super'
+              : `super.${methodNameArg.value}`
+          }(${printASTNode(value, args)})`;
           superTransforms.push({
             node,
             methodName: methodNameArg.value,
-            value: `super.${methodNameArg.value}(${printASTNode(
-              value,
-              args
-            ).replace(/\(|\)/gm, '')});`,
+            value:
+              removeParen && out[out.length - 1] === ')'
+                ? out.slice(0, -1)
+                : out,
           });
         }
       },
