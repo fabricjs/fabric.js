@@ -323,18 +323,20 @@ function transformClass(type, raw, options = {}) {
           node.callee.property?.name === 'callSuper'
         ) {
           const [methodNameArg, ...args] = node.arguments;
-          const lastArg = args[args.length - 1];
-          const removeParen =
-            lastArg?.type === 'Identifier' || lastArg?.type === 'Literal';
           const out = `${
             methodNameArg.value === 'initialize'
               ? 'super'
               : `super.${methodNameArg.value}`
           }(${printASTNode(value, args)})`;
+          console.log(printNode(node));
           superTransforms.push({
             node,
             methodName: methodNameArg.value,
-            value: out,
+            value:
+              out.split('(').length < out.split(')').length &&
+              out[out.length - 1] === ')'
+                ? out.slice(0, -1)
+                : out,
           });
         }
       },
@@ -484,7 +486,6 @@ function convertFile(type, source, dest, options) {
     });
     dest = (typeof dest === 'function' ? dest(name) : dest) || source;
     fs.writeFileSync(dest, raw);
-    cp.execSync(`prettier --write ${source}`);
     options.verbose &&
       console.log({
         state: 'success',
@@ -601,6 +602,12 @@ export function transform(options = {}) {
         { dir, file, type }
       );
     });
+
+  cp.execSync(
+    `prettier --write ${result
+      .map(({ dir, file }) => path.relative('.', path.resolve(dir, file)))
+      .join(' ')}`
+  );
 
   const [errors, files] = _.partition(result, (file) => file instanceof Error);
   const dirs = files.reduce((dirs, { dir, file }) => {
