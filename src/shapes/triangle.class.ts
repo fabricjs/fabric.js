@@ -4,27 +4,6 @@ import { FabricObject } from './fabricObject.class';
 
 export class Triangle extends FabricObject {
   /**
-   * Type of an object
-   * @type String
-   * @default
-   */
-  type: string;
-
-  /**
-   * Width is set to 100 to compensate the old initialize code that was setting it to 100
-   * @type Number
-   * @default
-   */
-  width: number;
-
-  /**
-   * Height is set to 100 to compensate the old initialize code that was setting it to 100
-   * @type Number
-   * @default
-   */
-  height: number;
-
-  /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
