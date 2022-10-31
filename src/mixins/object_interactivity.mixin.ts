@@ -1,19 +1,19 @@
-import { IPoint, Point } from '../point.class';
-import type { TCornerPoint, TDegree, TMat2D } from '../typedefs';
+import { ControlRenderingStyleOverride } from '../controls';
+import type { Control } from '../controls/control.class';
+import { Point } from '../point.class';
 import { FabricObject } from '../shapes/object.class';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import type { TCornerPoint, TDegree, TMat2D } from '../typedefs';
 import {
   calcRotateMatrix,
   multiplyTransformMatrices,
   qrDecompose,
   TQrDecomposeOut,
 } from '../util/misc/matrix';
-import { ObjectGeometry } from './object_geometry.mixin';
-import type { Control } from '../controls/control.class';
 import { sizeAfterTransform } from '../util/misc/objectTransforms';
-import { ControlRenderingStyleOverride } from '../controls';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { ObjectGeometry } from './object_geometry.mixin';
 
-type TOCoord = IPoint & {
+type TOCoord = Point & {
   corner: TCornerPoint;
   touchCorner: TCornerPoint;
 };
@@ -185,7 +185,11 @@ export class InteractiveFabricObject extends FabricObject {
       coords: Record<string, TOCoord> = {};
 
     this.forEachControl((control, key) => {
-      coords[key] = control.positionHandler(dim, finalMatrix, this, control);
+      const position = control.positionHandler(dim, finalMatrix, this, control);
+      coords[key] = Object.assign(
+        position,
+        this._calcCornerCoords(control, position)
+      );
     });
 
     // debug code
@@ -202,6 +206,31 @@ export class InteractiveFabricObject extends FabricObject {
       } 50);
     */
     return coords;
+  }
+
+  /**
+   * Sets the coordinates that determine the interaction area of each control
+   * note: if we would switch to ROUND corner area, all of this would disappear.
+   * everything would resolve to a single point and a pythagorean theorem for the distance
+   * @todo evaluate simplification of code switching to circle interaction area at runtime
+   * @private
+   */
+  private _calcCornerCoords(control: Control, position: Point) {
+    const corner = control.calcCornerCoords(
+      this.angle,
+      this.cornerSize,
+      position.x,
+      position.y,
+      false
+    );
+    const touchCorner = control.calcCornerCoords(
+      this.angle,
+      this.touchCornerSize,
+      position.x,
+      position.y,
+      true
+    );
+    return { corner, touchCorner };
   }
 
   /**
@@ -237,33 +266,6 @@ export class InteractiveFabricObject extends FabricObject {
     for (const i in this.controls) {
       fn(this.controls[i], i, this);
     }
-  }
-
-  /**
-   * Sets the coordinates that determine the interaction area of each control
-   * note: if we would switch to ROUND corner area, all of this would disappear.
-   * everything would resolve to a single point and a pythagorean theorem for the distance
-   * @todo evaluate simplification of code switching to circle interaction area at runtime
-   * @private
-   */
-  _setCornerCoords(): void {
-    Object.entries(this.oCoords).forEach(([controlKey, control]) => {
-      const controlObject = this.controls[controlKey];
-      control.corner = controlObject.calcCornerCoords(
-        this.angle,
-        this.cornerSize,
-        control.x,
-        control.y,
-        false
-      );
-      control.touchCorner = controlObject.calcCornerCoords(
-        this.angle,
-        this.touchCornerSize,
-        control.x,
-        control.y,
-        true
-      );
-    });
   }
 
   /**
