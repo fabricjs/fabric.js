@@ -18,7 +18,8 @@ function readFile(file) {
 }
 
 function printASTNode(raw, node, removeTrailingComma = true) {
-  if (node.type === 'Literal') return node.value;
+  if (node.type === 'Literal')
+    return typeof node.value === 'string' ? `'${node.value}'` : node.value;
   if (Array.isArray(node) && node.length === 0) return '';
   const out = (
     Array.isArray(node)
@@ -157,7 +158,7 @@ function parseClassBase(raw, find) {
     staticMethods,
     staticProperties,
     comments,
-    raw: raw.slice(declaration.start, declaration.end + 1),
+    body: raw.slice(declaration.start, declaration.end + 1),
     printNode,
   };
 }
@@ -354,8 +355,6 @@ function transformClass(type, raw, options = {}) {
 
   const body = classBody.join('\r\n\r\n');
 
-  console.log(body);
-
   const finalName =
     type === 'mixin'
       ? `${_.upperFirst(name)}${className.replace(
@@ -376,7 +375,7 @@ function transformClass(type, raw, options = {}) {
     const defaultsKey = `${_.lowerFirst(finalName)}DefaultValues`;
     classDirective +=
       '\n\n' +
-      `export const ${defaultsKey}: TClassProperties<${finalName}> = {\n${_.map(
+      `export const ${defaultsKey}: Partial<TClassProperties<${finalName}>> = {\n${_.map(
         defaultValues,
         (value, key) => [key, value].join(':')
       ).join(',\n')}\n};` +
@@ -423,7 +422,8 @@ function transformClass(type, raw, options = {}) {
 
   rawFile = rawFile
     .replace(new RegExp(namespace.replace(/\./g, '\\.'), 'g'), name)
-    .replace(/fabric\.Object/g, 'FabricObject');
+    .replace(/fabric\.Object/g, 'FabricObject')
+    .replace(/fabric\.util\./g, '');
 
   rawFile.indexOf('//@ts-nocheck') === -1 &&
     (rawFile = `//@ts-nocheck\n${rawFile}`);
