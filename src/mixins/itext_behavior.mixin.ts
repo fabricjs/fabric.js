@@ -479,7 +479,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
         var pointer = this.canvas.getPointer(e);
         var diff = pointer.subtract(pos);
         var enableRetinaScaling = this.canvas._isRetinaScaling();
-        var retinaScaling = this.canvas.getRetinaScaling();
+        var retinaScaling = this.getRetinaScaling();
         var bbox = this.getBoundingRect(true);
         var correction = pos.subtract(new Point(bbox.left, bbox.top));
         var offset = correction.add(diff).scalarMultiply(retinaScaling);
@@ -889,7 +889,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             x: boundaries.left + leftOffset,
             y: boundaries.top + boundaries.topOffset + charHeight,
           },
-          retinaScaling = this.canvas.getRetinaScaling(),
+          retinaScaling = this.getRetinaScaling(),
           upperCanvas = this.canvas.upperCanvasEl,
           upperCanvasWidth = upperCanvas.width / retinaScaling,
           upperCanvasHeight = upperCanvas.height / retinaScaling,
