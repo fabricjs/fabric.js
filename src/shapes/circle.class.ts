@@ -134,7 +134,7 @@ export class Circle extends FabricObject {
         '<path d="M ' + startX + ' ' + startY,
         ' A ' + radius + ' ' + radius,
         ' 0 ',
-        +largeFlag + ' 1',
+        `${largeFlag} 1`,
         ` ${endX} ${endY}`,
         '" ',
         'COMMON_PARTS',
