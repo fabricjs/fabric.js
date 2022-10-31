@@ -327,7 +327,14 @@ function transformClass(type, raw, options = {}) {
             methodNameArg.value === 'initialize'
               ? 'super'
               : `super.${methodNameArg.value}`
-          }(${args.map((arg) => printASTNode(value, arg)).join(', ')})`;
+          }(${args
+            .map((arg) => {
+              const out = printASTNode(value, arg);
+              out.replace(/[^\(|\)]/gm, '').length % 2 === 1
+                ? out.splice(0, -1)
+                : out;
+            })
+            .join(', ')})`;
           superTransforms.push({
             node,
             methodName: methodNameArg.value,
