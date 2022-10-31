@@ -94,7 +94,7 @@ export class FabricObjectObjectAnimationMixin {
       abort:
         options.abort &&
         ((value, valueProgress, timeProgress) => {
-          return options.abort(value, valueProgress, timeProgress);
+          return options.abort.call(this, value, valueProgress, timeProgress);
         }),
       onChange: (value, valueProgress, timeProgress) => {
         if (propPair) {
