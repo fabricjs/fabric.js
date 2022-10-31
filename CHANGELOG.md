@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): patch TS transformer [#8409](https://github.com/fabricjs/fabric.js/pull/8409)
 - chore(TS): migrate Ellipse [#8408](https://github.com/fabricjs/fabric.js/pull/8408)
 - chore(TS): migrate Triangle to TS [#8410](https://github.com/fabricjs/fabric.js/pull/8410)
 - chore(TS): migrate Circle to TS [#8406](https://github.com/fabricjs/fabric.js/pull/8406)
