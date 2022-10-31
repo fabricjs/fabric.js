@@ -181,31 +181,6 @@ function parseMixin(raw) {
   });
 }
 
-function transformSuperCall(raw) {
-  const regex = /this.callSuper\((.+)\)/g;
-  const result = regex.exec(raw);
-  if (!result) {
-    if (raw.indexOf('callSuper') > -1)
-      throw new Error(`failed to replace 'callSuper'`);
-    return raw;
-  }
-  const [rawMethodName, ...args] = result[1].split(',');
-  const methodName = rawMethodName.replace(/'|"/g, '');
-  const firstArgIndex = result[1].indexOf(args[0]);
-  const rest =
-    firstArgIndex > -1
-      ? result[1].slice(firstArgIndex, result[1].length).trim()
-      : '';
-  const transformedCall = `super${
-    methodName === 'initialize' ? '' : `.${methodName}`
-  }(${rest})`;
-  return (
-    raw.slice(0, result.index) +
-    transformedCall +
-    raw.slice(result.index + result[0].length)
-  );
-}
-
 function generateClass(rawClass, className, superClass, useExports) {
   return `${useExports ? 'export ' : ''}class ${className}${
     superClass ? ` extends ${superClass}` : ''
@@ -306,7 +281,30 @@ function transformClass(type, raw, options = {}) {
   methods.forEach(({ node, comment }) => {
     const key = node.key.name;
     const value = printNode(node.value.body.body);
-    // replaceNode(node, `${key === 'initialize' ? 'constructor' : key}${value}`);
+    const methodAST = acorn.parse(value, {
+      ecmaVersion: 2022,
+      allowReturnOutsideFunction: true,
+    });
+    const superTransforms = [];
+    walk.simple(methodAST, {
+      CallExpression(node) {
+        if (
+          node.callee.object.type === 'ThisExpression' &&
+          node.callee.property.name === 'callSuper'
+        ) {
+          const [methodNameArg, ...args] = node.arguments;
+          superTransforms.push({
+            node,
+            methodName: methodNameArg.value,
+            value: `super.${methodNameArg.value}(${printASTNode(
+              value,
+              args
+            ).replace(/\(|\)/gm, '')});`,
+          });
+        }
+      },
+    });
+
     value.indexOf('this') === -1 && staticCandidates.push(key);
     classBody.push(
       (comment ? printNode(comment) : '') +
@@ -314,23 +312,26 @@ function transformClass(type, raw, options = {}) {
         (node.value.async ? 'async ' : '') +
         (key === 'initialize' ? 'constructor' : key) +
         `(${printNode(node.value.params).slice(0, -1)}) {\n` +
-        value +
+        superTransforms.reduceRight((value, { node, value: out }) => {
+          return value.slice(0, node.start) + out + value.slice(node.end + 1);
+        }, value) +
         '\n}'
     );
   });
 
   staticProperties.forEach(({ key, value, comment }) => {
-    classBody.push(
+    const out =
       (comment ? printNode(comment) : '') +
-        '\n' +
-        'static ' +
-        key +
-        '=' +
-        printNode(value)
-    );
+      '\r\n' +
+      'static ' +
+      key +
+      '=' +
+      printNode(value);
+    classBody.push(out);
   });
 
   staticMethods.forEach(({ key, value, comment }) => {
+    // console.log(printNode(comment));
     classBody.push(
       (comment ? printNode(comment) : '') +
         '\n' +
@@ -343,17 +344,9 @@ function transformClass(type, raw, options = {}) {
     );
   });
 
-  let body = classBody.join('\n\n');
+  const body = classBody.join('\r\n\r\n');
 
-  let transformed = body;
-  do {
-    body = transformed;
-    try {
-      transformed = transformSuperCall(body);
-    } catch (error) {
-      // console.error(error);
-    }
-  } while (transformed !== body);
+  console.log(body);
 
   const finalName =
     type === 'mixin'
@@ -411,14 +404,13 @@ function transformClass(type, raw, options = {}) {
   [...staticMethods, ...staticProperties].forEach(({ node, comment }) => {
     if (comment) {
       rawFile = rawFile.replace(
-        new RegExp(
-          _.escapeRegExp(printNode(comment, false)).replace(' ', '\\s'),
-          'gm'
-        ),
+        printNode({
+          start: comment.start,
+          end: node.end,
+        }),
         ''
       );
     }
-    rawFile = rawFile.replace(printNode(node, false), '');
   });
 
   rawFile = rawFile
