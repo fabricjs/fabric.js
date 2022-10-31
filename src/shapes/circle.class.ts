@@ -6,6 +6,7 @@ import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { FabricObject } from './fabricObject.class';
+import { fabricObjectDefaultValues } from './object.class';
 
 export class Circle extends FabricObject {
   /**
@@ -202,23 +203,23 @@ export class Circle extends FabricObject {
     FabricObject._fromObject(Circle, object);
 }
 
-export const defaultValues: Partial<TClassProperties<Circle>> = {
+export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
   type: 'circle',
   radius: 0,
   startAngle: 0,
   endAngle: 360,
-  stateProperties: FabricObject.prototype.stateProperties.concat(
+  stateProperties: fabricObjectDefaultValues.stateProperties.concat(
     'radius',
     'startAngle',
     'endAngle'
   ),
-  cacheProperties: FabricObject.prototype.cacheProperties.concat(
+  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat(
     'radius',
     'startAngle',
     'endAngle'
   ),
 };
 
-Object.assign(Circle.prototype, defaultValues);
+Object.assign(Circle.prototype, circleDefaultValues);
 
 fabric.Circle = Circle;
