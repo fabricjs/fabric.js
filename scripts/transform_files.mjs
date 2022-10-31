@@ -457,14 +457,6 @@ function transformClass(type, raw, options = {}) {
   rawFile.indexOf('//@ts-nocheck') === -1 &&
     (rawFile = `//@ts-nocheck\n${rawFile}`);
 
-  //  in case of multiple declaration in one file
-  try {
-    return transformClass('class', rawFile, options);
-  } catch (error) {}
-  try {
-    return transformClass('mixin', rawFile, options);
-  } catch (error) {}
-
   return {
     name,
     raw: rawFile,
