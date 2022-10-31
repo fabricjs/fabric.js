@@ -965,7 +965,7 @@ export class FabricObject extends ObjectGeometry {
     const scale = this.getObjectScaling();
     if (this.canvas) {
       const zoom = this.canvas.getZoom();
-      const retina = this.getRetinaScaling();
+      const retina = this.getCanvasRetinaScaling();
       return scale.scalarMultiply(zoom * retina);
     }
     return scale;
@@ -1430,7 +1430,7 @@ export class FabricObject extends ObjectGeometry {
 
     const shadow = this.shadow,
       canvas = this.canvas,
-      retinaScaling = this.getRetinaScaling(),
+      retinaScaling = this.getCanvasRetinaScaling(),
       [sx, , , sy] = canvas?.viewportTransform || iMatrix,
       multX = sx * retinaScaling,
       multY = sy * retinaScaling,
@@ -1573,7 +1573,7 @@ export class FabricObject extends ObjectGeometry {
   ) {
     const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
       pCanvas = fabric.util.createCanvasElement(),
-      retinaScaling = this.getRetinaScaling(),
+      retinaScaling = this.getCanvasRetinaScaling(),
       width = dims.x / this.scaleX / retinaScaling,
       height = dims.y / this.scaleY / retinaScaling;
     pCanvas.width = width;

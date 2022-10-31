@@ -426,7 +426,7 @@ export class InteractiveFabricObject extends FabricObject {
    */
   drawControls(ctx: CanvasRenderingContext2D, styleOverride = {}) {
     ctx.save();
-    const retinaScaling = this.getRetinaScaling();
+    const retinaScaling = this.getCanvasRetinaScaling();
     const { cornerStrokeColor, cornerDashArray, cornerColor } = this;
     const options = {
       cornerStrokeColor,

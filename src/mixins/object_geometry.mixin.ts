@@ -602,7 +602,7 @@ export class ObjectGeometry extends ObjectOrigin {
     return this.scale(value / this.height / boundingRectFactor);
   }
 
-  getRetinaScaling() {
+  getCanvasRetinaScaling() {
     return this.canvas?.getRetinaScaling() || 1;
   }
 
