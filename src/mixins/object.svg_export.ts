@@ -1,8 +1,8 @@
-//@ts-nocheck
-
 import { Color } from '../color';
 import { config } from '../config';
 import { FabricObject } from '../shapes/fabricObject.class';
+import { matrixToSVG } from '../util/misc/svgParsing';
+import { toFixed } from '../util/misc/toFixed';
 
 /* _TO_SVG_START_ */
 
@@ -171,8 +171,8 @@ export class FabricObjectSVGExportMixin {
    */
   getSvgTransform(full, additionalTransform) {
     const transform = full ? this.calcTransformMatrix() : this.calcOwnMatrix(),
-      svgTransform = 'transform="' + matrixToSVG(transform);
-    return svgTransform + (additionalTransform || '') + '" ';
+      svgTransform = `transform="${matrixToSVG(transform)}`;
+    return `${svgTransform + (additionalTransform || '')}" `;
   }
 
   _setSVGBg(textBgRects) {
