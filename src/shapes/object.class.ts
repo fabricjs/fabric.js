@@ -2007,7 +2007,9 @@ export class FabricObject extends ObjectGeometry {
   }
 }
 
-const fabricObjectDefaultValues: Partial<TClassProperties<FabricObject>> = {
+export const fabricObjectDefaultValues: Partial<
+  TClassProperties<FabricObject>
+> = {
   type: 'object',
   originX: 'left',
   originY: 'top',
