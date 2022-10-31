@@ -885,10 +885,10 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             this.lineHeight,
           leftOffset = boundaries.leftOffset,
           m = this.calcTransformMatrix(),
-          p = {
-            x: boundaries.left + leftOffset,
-            y: boundaries.top + boundaries.topOffset + charHeight,
-          },
+          p = new Point(
+            boundaries.left + leftOffset,
+            boundaries.top + boundaries.topOffset + charHeight
+          ),
           retinaScaling = this.getRetinaScaling(),
           upperCanvas = this.canvas.upperCanvasEl,
           upperCanvasWidth = upperCanvas.width / retinaScaling,
