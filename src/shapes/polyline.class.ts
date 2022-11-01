@@ -62,7 +62,7 @@ export class Polyline extends FabricObject {
    */
   exactBoundingBox: boolean;
 
-  private initialized: boolean;
+  private initialized: true | undefined;
 
   /**
    * A list of properties that if changed trigger a recalculation of dimensions
@@ -335,7 +335,6 @@ export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   type: 'polyline',
   points: [],
   exactBoundingBox: false,
-  initialized: false,
   cacheProperties: fabricObjectDefaultValues.cacheProperties.concat('points'),
   strokeBBoxAffectingProperties: [
     'skewX',
