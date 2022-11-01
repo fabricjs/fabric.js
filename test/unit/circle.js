@@ -56,7 +56,7 @@
     assert.equal(circle.width, 20);
     assert.equal(circle.height, 20);
 
-    assert.equal(circle, circle.setRadius(20));
+    circle.setRadius(20);
 
     assert.equal(circle.getRadiusX(), 20);
     assert.equal(circle.getRadiusY(), 20);
