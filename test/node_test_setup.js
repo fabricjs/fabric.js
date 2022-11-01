@@ -23,10 +23,14 @@ QUnit.debugVisual = Number(process.env.QUNIT_DEBUG_VISUAL_TESTS);
 QUnit.recreateVisualRefs = Number(process.env.QUNIT_RECREATE_VISUAL_REFS);
 QUnit.config.filter = process.env.QUNIT_FILTER;
 
+// https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+global.CI = process.env.CI;
+
 
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
 global.fs = require('fs');
+global.path = require('path');
 global.visualCallback = {
   addArguments: function() {},
 };

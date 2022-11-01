@@ -14,7 +14,12 @@
 {{#serve_files}}<script src="{{{src}}}"{{#attrs}} {{&.}}{{/attrs}}></script>{{/serve_files}}
 
 <script>
+// runs from github action
+window.CI = {{CI}};
+
+// QUnit config
 QUnit.config.reorder = false;
+{{#qunit.filter}}QUnit.config.filter = {{qunit.filter}};{{/qunit.filter}}
 QUnit.config.noglobals = true;
 QUnit.config.hidepassed = true;
 QUnit.config.testTimeout = 15000;
@@ -22,7 +27,7 @@ QUnit.config.testTimeout = 15000;
 
 {{#visual}}
 <script>
-QUnit.testDone(visualCallback.testDone.bind(visualCallback));
+{{qunit.launch}} && QUnit.testDone(appendTestResults);
 
 // global error handling
 window.addEventListener('unhandledrejection', (event) => {
@@ -66,7 +71,7 @@ if(
    // is Google Chrome
     QUnit.recreateVisualRefs = {{qunit.recreate}};
     QUnit.debugVisual = {{qunit.debug}};
-    {{#qunit.filter}}QUnit.config.filter = {{qunit.filter}};{{/qunit.filter}}
+    QUnit.launch = {{qunit.launch}};
 }
 </script>
 {{/visual}}

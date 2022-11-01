@@ -48,12 +48,26 @@ function startGoldensServer() {
                 const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
                 res.end(JSON.stringify({ exists: fs.existsSync(goldenPath) }));
             }
-            else if (req.method.toUpperCase() === 'POST') {
+            else if (req.method.toUpperCase() === 'POST' && req.url === '/goldens') {
                 const { files: [{ rawData }], fields: { filename } } = await parseRequest(req);
-                const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename.split('/golden/')[1]);
+                const fileName = filename.split('/golden/')[1];
+                const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', fileName);
                 console.log(chalk.gray('[info]'), `creating golden ${path.relative(wd, goldenPath)}`);
                 fs.writeFileSync(goldenPath, rawData, { encoding: 'binary' });
                 res.end();
+            }
+            else if (req.method.toUpperCase() === 'POST' && req.url === '/goldens/results') {
+                const { files, fields: { filename } } = await parseRequest(req);
+                const fileName = /\/golden\/(.*)\..*$/.exec(filename)[1];
+                const dumpsPath = path.resolve(wd, 'cli_output', 'test_results', 'visuals', fileName);
+                !fs.existsSync(dumpsPath) && fs.mkdirSync(dumpsPath, { recursive: true });
+                const out = { name: fileName, dir: dumpsPath };
+                files.forEach(({ rawData, filename }) => {
+                    const filePath = path.resolve(dumpsPath, filename);
+                    fs.writeFileSync(filePath, rawData, { encoding: 'binary' });
+                    out[path.basename(filePath, '.png')] = path.relative('.', filePath);
+                });
+                res.end(JSON.stringify(out));
             }
         }).listen();
     const port = server.address().port;

@@ -3,6 +3,7 @@
 ## [next]
 
 - test(): stroke projection [#8374](https://github.com/fabricjs/fabric.js/pull/8374)
+- ci(): fixed visual tests not to create a missing golden when running from CI and to fail instead + improve visual test suite [#8311](https://github.com/fabricjs/fabric.js/pull/8311)
 - ci(): remove buggy changelog action in favor of `git diff` bash script + direct git how to merge `CHANGELOG.md` [#8309](https://github.com/fabricjs/fabric.js/pull/8346)
 - fix(): skewing controls accuracy + successive interactions [#8380](https://github.com/fabricjs/fabric.js/pull/8380)
 - chore(TS): Convert Geometry and Origin to classes/e6/ts [#8390](https://github.com/fabricjs/fabric.js/pull/8390)

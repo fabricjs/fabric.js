@@ -14,7 +14,7 @@ module.exports = {
     ...config.serve_files,
     'test/lib/pixelmatch.js',
     'test/lib/visualTestLoop.js',
-    'test/lib/visualCallbackQunit.js',
+    'test/lib/appendTestResults.js',
     ...(process.env.TEST_FILES ? process.env.TEST_FILES.split(',') : ['test/visual/*.js'])
   ],
   routes: {
@@ -23,6 +23,7 @@ module.exports = {
     '/golden_maker.html': 'test/lib/goldenMaker.html',
     '/golden': 'test/visual/golden',
     '/assets': 'test/visual/assets',
+    '/results': 'cli_output/test_results/visuals'
   },
   launchers: {
     Node: {
@@ -33,12 +34,15 @@ module.exports = {
   proxies: {
     '/goldens': {
       target: startGoldensServer().url,
-      secure: false
+      secure: false,
     }
   },
   qunit: {
     ...config.qunit,
     recreate: Number(process.env.QUNIT_RECREATE_VISUAL_REFS) || false,
     debug: Number(process.env.QUNIT_DEBUG_VISUAL_TESTS) || false,
+    launch: Number(process.env.QUNIT_LAUNCH) || false,
   },
+  // since we are storing test results we don't want them to get messed up by concurrent runs
+  parallel: 1,
 }

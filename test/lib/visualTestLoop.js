@@ -28,7 +28,10 @@
     if (opts.height) {
       options.height = opts.height;
     }
-    return new fabric[fabricClass](null, options);
+    const canvas = new fabric[fabricClass](null, options);
+    // stub
+    canvas.requestRenderAll = canvas.renderAll;
+    return canvas;
   }
 
   function localPath(path, filename) {
@@ -41,7 +44,7 @@
   }
   exports.getAssetName = getAssetName;
 
-  function getGoldeName(filename) {
+  function getGoldenName(filename) {
     var finalName = '/golden/' + filename;
     return fabric.isLikelyNode ? localPath('/../visual', finalName) : finalName;
   }
@@ -82,18 +85,7 @@
     }
   }
 
-  async function getImage(filename, original) {
-    if (fabric.isLikelyNode && original) {
-      var plainFileName = filename.replace('file://', '');
-      if (!fs.existsSync(plainFileName)) {
-        generateGolden(filename, original);
-      }
-    }
-    else if (original) {
-      await fetch(`/goldens/${filename}`, { method: 'GET' })
-        .then(res => res.json())
-        .then(res => !res.exists && generateGolden(filename, original));
-    }
+  async function getImage(src) {
     return new Promise((resolve, reject) => {
       const img = fabric.document.createElement('img');
       img.onload = function () {
@@ -106,90 +98,193 @@
         img.onload = null;
         reject(err);
       };
-      img.src = filename;
+      img.src = src;
     });
-   
   }
-
-  exports.visualTestLoop = function(QUnit) {
-    var _pixelMatch;
-    var visualCallback;
-    var imageDataToChalk;
+  
+  function goldenExists(fileName) {
     if (fabric.isLikelyNode) {
-      _pixelMatch = global.pixelmatch;
-      visualCallback = global.visualCallback;
-      imageDataToChalk = global.imageDataToChalk;
+      var plainFileName = fileName.replace('file://', '');
+      return fs.existsSync(plainFileName);
     }
     else {
-      if (window) {
-        _pixelMatch = window.pixelmatch;
-        visualCallback = window.visualCallback;
-      }
-      imageDataToChalk = function() { return ''; };
+      return fetch(`/goldens/${fileName}`, { method: 'GET' })
+        .then(res => res.json())
+        .then(res => res.exists);
     }
+  }
 
-    var pixelmatchOptions = {
-      includeAA: false,
-      threshold: 0.095
-    };
+  async function dumpResults(filename, passing, visuals) {
+    const keys = Object.keys(visuals);
+    if (fabric.isLikelyNode && CI && !passing) {
+      const plainFileName = filename.replace('file://', '');
+      const goldenPath = path.relative(path.resolve('test', 'visual', 'golden'), plainFileName);
+      const dumpsPath = path.resolve('cli_output', 'test_results', 'visuals', path.basename(goldenPath, '.png'));
+      !fs.existsSync(dumpsPath) && fs.mkdirSync(dumpsPath, { recursive: true });
+      keys.forEach(key => {
+        const dataUrl = visuals[key].toDataURL().split(',')[1];
+        fs.writeFileSync(path.resolve(dumpsPath, `${key}.png`), dataUrl, { encoding: 'base64' });
+      });
+    }
+    else if (!fabric.isLikelyNode && CI ? !passing : QUnit.launch) {
+      const blobs = await Promise.all(keys.map(key => new Promise((resolve, reject) => {
+        try {
+          visuals[key].toBlob(resolve, 'image/png');
+        } catch (error) {
+          reject(error);
+        }
+      })));
+      return new Promise((resolve, reject) => {
+        const formData = new FormData();
+        keys.forEach((key, index) => formData.append(key, blobs[index], `${key}.png`));
+        formData.append('filename', filename);
+        formData.append('passing', passing);
+        const request = new XMLHttpRequest();
+        request.open('POST', '/goldens/results', true);
+        request.onreadystatechange = () => {
+          if (request.readyState === XMLHttpRequest.DONE) {
+            const status = request.status;
+            if (status === 0 || (status >= 200 && status < 400)) {
+              resolve(JSON.parse(request.responseText));
+            } else {
+              reject();
+            }
+          }
+        };
+        request.send(formData);
+      }).catch(err => {
+        throw err;
+      });
+    }
+  }
 
-    return function testCallback(testObj) {
-      if (testObj.disabled) {
+  const pixelmatchOptions = {
+    includeAA: false,
+    threshold: 0.095
+  };
+
+  exports.visualTestLoop = function(QUnit) {
+
+    return function testCallback({
+      disabled,
+      action = 'test',
+      test: testName,
+      code,
+      percentage,
+      golden,
+      newModule,
+      beforeEachHandler,
+      /**
+       * do not generate a golden
+       */
+      testOnly,
+      fabricClass = 'StaticCanvas',
+      width,
+      height
+    }) {
+      if (disabled) {
         return;
       }
-      fabric.StaticCanvas.prototype.requestRenderAll = fabric.StaticCanvas.prototype.renderAll;
-      var testName = testObj.test;
-      var code = testObj.code;
-      var percentage = testObj.percentage;
-      var golden = testObj.golden;
-      var newModule = testObj.newModule;
       if (newModule) {
         QUnit.module(newModule, {
-          beforeEach: testObj.beforeEachHandler,
+          beforeEach: beforeEachHandler,
         });
       }
-      QUnit.test(testName, function(assert) {
-        var done = assert.async();
-        var fabricCanvas = createCanvasForTest(testObj);
-        code(fabricCanvas, async function (renderedCanvas) {
-          var width = renderedCanvas.width;
-          var height = renderedCanvas.height;
-          var totalPixels = width * height;
-          var imageDataCanvas = renderedCanvas.getContext('2d').getImageData(0, 0, width, height);
-          var canvas = fabric.document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          var ctx = canvas.getContext('2d');
-          var output = ctx.getImageData(0, 0, width, height);
-          const goldenImage = await getImage(getGoldeName(golden), renderedCanvas);
-          ctx.drawImage(goldenImage, 0, 0);
-          visualCallback.addArguments({
-            enabled: true,
-            golden: canvas,
-            fabric: imageDataCanvas,
-            diff: output,
-            goldenName: golden
-          });
-          var imageDataGolden = ctx.getImageData(0, 0, width, height).data;
-          var differentPixels = _pixelMatch(imageDataCanvas.data, imageDataGolden, output.data, width, height, pixelmatchOptions);
-          var percDiff = differentPixels / totalPixels * 100;
-          var okDiff = totalPixels * percentage;
-          var isOK = differentPixels <= okDiff;
-          assert.ok(
-            isOK,
-            testName + ' [' + golden + '] has too many different pixels ' + differentPixels + '(' + okDiff + ') representing ' + percDiff + '% (>' + (percentage * 100) + '%)'
-          );
-          if (!isOK) {
-            var stringa = imageDataToChalk(output);
-            console.log(stringa);
-          }
-          if (!testObj.testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)) {
-            await generateGolden(getGoldeName(golden), renderedCanvas);
-          }
-          await fabricCanvas.dispose();
-          done();          
+      QUnit[action](testName, function (assert) {
+        assert.visualEqual(code, golden, {
+          fabricClass,
+          width,
+          height,
+          percentageThreshold: percentage,
+          testOnly,
         });
       });
     }
+  }
+
+  const testIdToFileMap = {};
+  exports.testIdToFileMap = testIdToFileMap;
+
+  QUnit.assert.visualEqual = async function visualAssertion(callback, ref, {
+    fabricClass,
+    width,
+    height,
+    /**
+     * [0, 1]
+     */
+    percentageThreshold,
+    /**
+     * do not generate a golden if test fails, overriding all cli flags
+     */
+    testOnly,
+  }) {
+    const done = this.async();
+    const fabricCanvas = createCanvasForTest({ fabricClass, width, height });
+    const fileName = getGoldenName(ref);
+    const basename = /(.*)\..*/.exec(ref)[1];
+    testIdToFileMap[this.test.testId] = {
+      name: ref,
+      basename,
+      expected: `/results/${basename}/expected.png`,
+      actual: `/results/${basename}/actual.png`,
+      diff: `/results/${basename}/diff.png`,
+    };
+    const exists = await goldenExists(fileName);
+
+    if (CI && !exists) {
+      // this means that the golden wasn't committed to the repo
+      // we do not want the test to create the missing golden thus reporting a false positive
+      this.ok(false, `golden [${ref}] not found`);
+      done();
+      return;
+    };
+        
+    callback(fabricCanvas, async (actual) => {
+      // retrieve golden
+      if (!exists) {
+        await generateGolden(fileName, actual);
+      }
+      const width = actual.width;
+      const height = actual.height;
+      const totalPixels = width * height;
+      const imageDataActual = actual.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, width, height);
+
+      const expected = fabric.document.createElement('canvas');
+      expected.width = width;
+      expected.height = height;
+      const ctx = expected.getContext('2d', { willReadFrequently: true });
+      const diffOutput = ctx.getImageData(0, 0, width, height);
+      ctx.drawImage(await getImage(fileName, actual), 0, 0);
+
+      const imageDataGolden = ctx.getImageData(0, 0, width, height).data;
+      const differentPixels = pixelmatch(imageDataActual.data, imageDataGolden, diffOutput.data, width, height, pixelmatchOptions);
+      const okDiff = totalPixels * percentageThreshold;
+      const isOK = differentPixels <= okDiff;
+      this.pushResult({
+        result: isOK,
+        actual: `${differentPixels} different pixels (${(differentPixels / totalPixels * 100).toFixed(2)}%)`,
+        expected: `${okDiff} >= different pixels (${(percentageThreshold * 100).toFixed(2)}%)`,
+        message: ` [${ref}] has too many different pixels`
+      });
+
+      if (!this.todo && !testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)) {
+        await generateGolden(fileName, actual);
+      }
+
+      // dump results
+      const diff = fabric.document.createElement('canvas');
+      diff.width = width;
+      diff.height = height;
+      diff.getContext('2d', { willReadFrequently: true }).putImageData(diffOutput, 0, 0);
+      await dumpResults(fileName, isOK, {
+        expected,
+        actual,
+        diff
+      });
+      
+      await fabricCanvas.dispose();
+      done();
+    });
+
   }
 })(typeof window === 'undefined' ? exports : this);
