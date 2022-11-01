@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { FabricObject } from './fabricObject.class';
+import { initFilterBackend } from '../filters/WebGLProbe';
 
 (function (global) {
   var fabric = global.fabric,
@@ -452,7 +453,7 @@ import { FabricObject } from './fabricObject.class';
           return;
         }
         if (!fabric.filterBackend) {
-          fabric.filterBackend = fabric.initFilterBackend();
+          fabric.filterBackend = initFilterBackend();
         }
         var canvasEl = fabric.util.createCanvasElement(),
           cacheKey = this._filteredEl
@@ -526,7 +527,7 @@ import { FabricObject } from './fabricObject.class';
           this._lastScaleY = 1;
         }
         if (!fabric.filterBackend) {
-          fabric.filterBackend = fabric.initFilterBackend();
+          fabric.filterBackend = initFilterBackend();
         }
         fabric.filterBackend.applyFilters(
           filters,

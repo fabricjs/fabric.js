@@ -1,30 +1,11 @@
+import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { createCanvasElement } from '../util/misc/dom';
-import { webGLProbe } from './WebGLProbe';
+import { TWebGLPipelineState, TProgramCache, TTextureCache } from './typedefs';
 
+export class WebGLFilterBackend {
 
-function initFilterBackend() {
-  if (
-    config.enableGLFiltering &&
-    webGLProbe.isSupported(config.textureSize)
-  ) {
-    return new WebglFilterBackend({ tileSize: config.textureSize });
-  } else {
-    return new Canvas2dFilterBackend();
-  }
-};
-
-export type TPipelineState = {
-
-}
-
-export type TApplyFilterArgs = {
-
-}
-
-class WebglFilterBackend {
-
-  tileSize: number = config.textureSize;
+  tileSize: number;
 
   /**
    * Define ...
@@ -37,22 +18,22 @@ class WebglFilterBackend {
    **/
   imageBuffer?: ArrayBuffer
 
-  canvas: HTMLCanvasElement | null;
+  canvas: HTMLCanvasElement;
 
   /**
    * The Webgl context that will execute the operations for filtering
    **/
-  gl: WebGLRenderingContext | null;
+  gl: WebGLRenderingContext;
 
   /**
    * Keyed map for shader cache
    **/
-  programCache: any;
+  programCache: TProgramCache;
 
   /**
    * Keyed map for texture cache
    **/
-  textureCache: any;
+  textureCache: TTextureCache;
 
   /**
    * Contains GPU info for debug
@@ -68,7 +49,7 @@ class WebglFilterBackend {
    **/
   resources = {}
 
-  constructor({ tileSize } = {}) {
+  constructor({ tileSize = config.textureSize } = {}) {
     if (tileSize) {
       this.tileSize = tileSize;
     }
@@ -105,21 +86,23 @@ class WebglFilterBackend {
 
     const testContext = {
       imageBuffer: imageBuffer,
+    } as unknown as Required<WebGLFilterBackend>;
+    const testPipelineState = {
       destinationWidth: width,
       destinationHeight: height,
       targetCanvas: targetCanvas,
-    };
+    } as unknown as TWebGLPipelineState;
     let startTime;
     targetCanvas.width = width;
     targetCanvas.height = height;
 
-    startTime = window.performance.now();
-    this.copyGLTo2D.call(testContext, this.gl, testContext);
-    const drawImageTime = window.performance.now() - startTime;
+    startTime = fabric.window.performance.now();
+    this.copyGLTo2D.call(testContext, this.gl, testPipelineState);
+    const drawImageTime = fabric.window.performance.now() - startTime;
 
-    startTime = window.performance.now();
-    copyGLTo2DPutImageData.call(testContext, this.gl, testContext);
-    const putImageDataTime = window.performance.now() - startTime;
+    startTime = fabric.window.performance.now();
+    copyGLTo2DPutImageData.call(testContext, this.gl, testPipelineState);
+    const putImageDataTime = fabric.window.performance.now() - startTime;
 
     if (drawImageTime > putImageDataTime) {
       this.imageBuffer = imageBuffer;
@@ -158,7 +141,7 @@ class WebglFilterBackend {
    * to the provided target canvas.
    *
    * @param {Array} filters The filters to apply.
-   * @param {HTMLImageElement|HTMLCanvasElement} source The source to be filtered.
+   * @param {TexImageSource} source The source to be filtered.
    * @param {Number} width The width of the source input.
    * @param {Number} height The height of the source input.
    * @param {HTMLCanvasElement} targetCanvas The destination for filtered output to be drawn.
@@ -166,24 +149,27 @@ class WebglFilterBackend {
    * omitted, caching will be skipped.
    */
   applyFilters(
-    filters,
-    source,
-    width,
-    height,
-    targetCanvas,
-    cacheKey
-  ): TPipelineState | undefined {
+    filters: any[],
+    source: TexImageSource,
+    width: number,
+    height: number,
+    targetCanvas: HTMLCanvasElement,
+    cacheKey?: string,
+  ): TWebGLPipelineState | undefined {
     const gl = this.gl;
-    if (!gl) {
+    const ctx = targetCanvas.getContext('2d');
+    if (!gl || !ctx) {
       return;
     }
     let cachedTexture;
     if (cacheKey) {
       cachedTexture = this.getCachedTexture(cacheKey, source);
     }
-    const pipelineState = {
-      originalWidth: source.width || source.originalWidth,
-      originalHeight: source.height || source.originalHeight,
+    const pipelineState: TWebGLPipelineState = {
+      // @ts-ignore
+      originalWidth: source.width || source.originalWidth || 0,
+      // @ts-ignore
+      originalHeight: source.height || source.originalHeight || 0,
       sourceWidth: width,
       sourceHeight: height,
       destinationWidth: width,
@@ -193,12 +179,12 @@ class WebglFilterBackend {
         gl,
         width,
         height,
-        !cachedTexture && source
+        !cachedTexture ? source : undefined
       ),
       targetTexture: this.createTexture(gl, width, height),
       originalTexture:
         cachedTexture ||
-        this.createTexture(gl, width, height, !cachedTexture && source),
+        this.createTexture(gl, width, height, !cachedTexture ? source : undefined),
       passes: filters.length,
       webgl: true,
       aPosition: this.aPosition,
@@ -218,7 +204,7 @@ class WebglFilterBackend {
     gl.deleteTexture(pipelineState.sourceTexture);
     gl.deleteTexture(pipelineState.targetTexture);
     gl.deleteFramebuffer(tempFbo);
-    targetCanvas.getContext('2d').setTransform(1, 0, 0, 1, 0, 0);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     return pipelineState;
   }
 
@@ -227,7 +213,11 @@ class WebglFilterBackend {
    */
   dispose() {
     if (this.canvas) {
+      // we are disposing, we don't care about the fact
+      // that the canvas shouldn't be null.
+      // @ts-ignore
       this.canvas = null;
+      // @ts-ignore
       this.gl = null;
     }
     this.clearWebGLCaches();
@@ -253,7 +243,7 @@ class WebglFilterBackend {
    * @returns {WebGLTexture}
    */
   createTexture(gl: WebGLRenderingContext, width: number, height: number, textureImageSource?: TexImageSource) {
-    var texture = gl.createTexture();
+    const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -297,7 +287,7 @@ class WebglFilterBackend {
     if (this.textureCache[uniqueId]) {
       return this.textureCache[uniqueId];
     } else {
-      var texture = this.createTexture(
+      const texture = this.createTexture(
         this.gl,
         textureImageSource.width,
         textureImageSource.height,
@@ -330,10 +320,13 @@ class WebglFilterBackend {
    * @param {WebGLRenderingContext} sourceContext The WebGL context to copy from.
    * @param {Object} pipelineState The 2D target canvas to copy on to.
    */
-  copyGLTo2D(gl: WebGLRenderingContext, pipelineState: TPipelineState) {
+  copyGLTo2D(gl: WebGLRenderingContext, pipelineState: TWebGLPipelineState) {
     const glCanvas = gl.canvas,
     targetCanvas = pipelineState.targetCanvas,
-    ctx = targetCanvas.getContext('2d');
+      ctx = targetCanvas.getContext('2d');
+    if (!ctx) {
+      return;
+    }
     ctx.translate(0, targetCanvas.height); // move it down again
     ctx.scale(1, -1); // vertical flip
     // where is my image on the big glcanvas?
@@ -362,7 +355,7 @@ class WebglFilterBackend {
     if (this.gpuInfo) {
       return this.gpuInfo;
     }
-    var gl = this.gl,
+    const gl = this.gl,
       gpuInfo = { renderer: '', vendor: '' };
     if (!gl) {
       return gpuInfo;
@@ -383,8 +376,8 @@ class WebglFilterBackend {
   }
 }
 
-function resizeCanvasIfNeeded(pipelineState: TPipelineState) {
-  var targetCanvas = pipelineState.targetCanvas,
+function resizeCanvasIfNeeded(pipelineState: TWebGLPipelineState): void {
+  const targetCanvas = pipelineState.targetCanvas,
     width = targetCanvas.width,
     height = targetCanvas.height,
     dWidth = pipelineState.destinationWidth,
@@ -404,19 +397,17 @@ function resizeCanvasIfNeeded(pipelineState: TPipelineState) {
  * @param {HTMLCanvasElement} targetCanvas The 2D target canvas to copy on to.
  * @param {Object} pipelineState The 2D target canvas to copy on to.
  */
-function copyGLTo2DPutImageData(gl: WebGLRenderingContext, pipelineState: TPipelineState) {
-  var targetCanvas = pipelineState.targetCanvas,
+function copyGLTo2DPutImageData(this: Required<WebGLFilterBackend>, gl: WebGLRenderingContext, pipelineState: TWebGLPipelineState) {
+  const targetCanvas = pipelineState.targetCanvas,
     ctx = targetCanvas.getContext('2d'),
     dWidth = pipelineState.destinationWidth,
     dHeight = pipelineState.destinationHeight,
     numBytes = dWidth * dHeight * 4;
 
-  // eslint-disable-next-line no-undef
-  var u8 = new Uint8Array(this.imageBuffer, 0, numBytes);
-  // eslint-disable-next-line no-undef
-  var u8Clamped = new Uint8ClampedArray(this.imageBuffer, 0, numBytes);
+  const u8 = new Uint8Array(this.imageBuffer, 0, numBytes);
+  const u8Clamped = new Uint8ClampedArray(this.imageBuffer, 0, numBytes);
 
   gl.readPixels(0, 0, dWidth, dHeight, gl.RGBA, gl.UNSIGNED_BYTE, u8);
-  var imgData = new ImageData(u8Clamped, dWidth, dHeight);
+  const imgData = new ImageData(u8Clamped, dWidth, dHeight);
   ctx.putImageData(imgData, 0, 0);
 }

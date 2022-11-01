@@ -2,6 +2,20 @@
 
 import { fabric } from '../../HEADER';
 import { createCanvasElement } from '../util/misc/dom';
+import { webGLProbe } from './WebGLProbe';
+import { Canvas2dFilterBackend } from './2d_backend.class';
+import type { WebglFilterBackend } from './webgl_backend.class';
+
+export function initFilterBackend(): WebglFilterBackend | Canvas2dFilterBackend {
+  if (
+    config.enableGLFiltering &&
+    webGLProbe.isSupported(config.textureSize)
+  ) {
+    return new WebglFilterBackend({ tileSize: config.textureSize });
+  } else {
+    return new Canvas2dFilterBackend();
+  }
+};
 
 export const enum TWebGLPrecision {
   low = 'lowp',
