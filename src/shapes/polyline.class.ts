@@ -62,7 +62,7 @@ export class Polyline extends FabricObject {
    */
   exactBoundingBox: boolean;
 
-  initialized: boolean;
+  private initialized: boolean;
 
   /**
    * A list of properties that if changed trigger a recalculation of dimensions
