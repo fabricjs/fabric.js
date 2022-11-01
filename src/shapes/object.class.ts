@@ -235,14 +235,14 @@ export class FabricObject extends ObjectGeometry {
    * @type String
    * @default butt
    */
-  strokeLineCap: string;
+  strokeLineCap: CanvasLineCap;
 
   /**
    * Corner style of an object's stroke (one of "bevel", "round", "miter")
    * @type String
    * @default
    */
-  strokeLineJoin: string;
+  strokeLineJoin: CanvasLineJoin;
 
   /**
    * Maximum miter length (used for strokeLineJoin = "miter") of an object's stroke
@@ -1012,7 +1012,7 @@ export class FabricObject extends ObjectGeometry {
    * @param {*} value
    * @return {fabric.Object} thisArg
    */
-  _set(key: string, value: any) {
+  _set<K extends keyof this, V extends this[K]>(key: K, value: V) {
     const shouldConstrainValue = key === 'scaleX' || key === 'scaleY',
       isChanged = this[key] !== value;
 

@@ -79,7 +79,7 @@ export class Polyline extends FabricObject {
   }
 
   private _projectStrokeOnPoints() {
-    return projectStrokeOnPoints(this.points, this, this.isOpen);
+    return projectStrokeOnPoints(this.points, this, this.isOpen());
   }
 
   /**
@@ -99,6 +99,7 @@ export class Polyline extends FabricObject {
         width: 0,
         height: 0,
         pathOffset: new Point(),
+        strokeOffset: new Point(),
       };
     }
     const bbox = makeBoundingBoxFromPoints(points);
@@ -148,7 +149,7 @@ export class Polyline extends FabricObject {
    *
    * @private
    */
-  _getTransformedDimensions(options) {
+  _getTransformedDimensions(options: any) {
     return this.exactBoundingBox
       ? super._getTransformedDimensions({
           ...(options || {}),
@@ -165,7 +166,7 @@ export class Polyline extends FabricObject {
    * Recalculates dimensions when changing skew and scale
    * @private
    */
-  _set(key, value) {
+  _set<K extends keyof this, V extends this[K]>(key: K, value: V) {
     const changed = this.initialized && this[key] !== value;
     const output = super._set(key, value);
     if (
@@ -186,7 +187,7 @@ export class Polyline extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude: Array<any>): object {
+  toObject(propertiesToInclude: (keyof this)[]): object {
     return {
       ...super.toObject(propertiesToInclude),
       points: this.points.concat(),
@@ -226,8 +227,7 @@ export class Polyline extends FabricObject {
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   commonRender(ctx: CanvasRenderingContext2D) {
-    let point,
-      len = this.points.length,
+    const len = this.points.length,
       x = this.pathOffset.x,
       y = this.pathOffset.y;
 
@@ -239,7 +239,7 @@ export class Polyline extends FabricObject {
     ctx.beginPath();
     ctx.moveTo(this.points[0].x - x, this.points[0].y - y);
     for (let i = 0; i < len; i++) {
-      point = this.points[i];
+      const point = this.points[i];
       ctx.lineTo(point.x - x, point.y - y);
     }
     return true;
@@ -291,7 +291,7 @@ export class Polyline extends FabricObject {
   >(klass: T) {
     return function (
       element: SVGElement,
-      callback: (poly: InstanceType<T>) => any,
+      callback: (poly: InstanceType<T> | null) => any,
       options = {}
     ) {
       if (!element) {

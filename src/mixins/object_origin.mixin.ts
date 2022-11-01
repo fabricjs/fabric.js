@@ -1,10 +1,10 @@
 import { Point } from '../point.class';
 import { transformPoint } from '../util/misc/matrix';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { CommonMethods } from './shared_methods.mixin';
-import { TDegree, TOriginX, TOriginY } from '../typedefs';
 import { Group } from '../shapes/group.class';
+import { TDegree, TOriginX, TOriginY } from '../typedefs';
 import { sizeAfterTransform } from '../util/misc/objectTransforms';
+import { CommonMethods } from './shared_methods.mixin';
 
 const originOffset = {
   left: -0.5,
