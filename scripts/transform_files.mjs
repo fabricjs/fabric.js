@@ -191,16 +191,32 @@ function parseMixin(raw) {
       undefined,
       undefined,
       (nodeType, node) => {
-        return (
-          nodeType === 'CallExpression' &&
-          printASTNode(raw, node.callee).endsWith('extend(')
-        );
+        if (
+          nodeType === 'ExpressionStatement' &&
+          node.expression.type === 'CallExpression' &&
+          printASTNode(raw, node.expression.callee).endsWith('extend(')
+        ) {
+          const lastNode = ast.body[ast.body.length - 1];
+          if (
+            lastNode.type === 'ExpressionStatement' &&
+            lastNode.expression.callee.params[0].name === 'global'
+          ) {
+            // fs.writeFileSync(
+            //   './ast.json',
+            //   JSON.stringify(lastNode.expression.callee.body.body, null, 2)
+            // );
+            return lastNode.expression.callee.body.body.includes(node);
+          } else {
+            return ast.body.includes(node);
+          }
+        }
+        return false;
       }
     );
     return {
-      found,
+      found: found.expression,
       parent: found,
-      variableName: printASTNode(raw, found.arguments[0]).replace(
+      variableName: printASTNode(raw, found.expression.arguments[0]).replace(
         '.prototype',
         ''
       ),
@@ -597,11 +613,13 @@ export function transform(options = {}) {
       );
     });
 
-  cp.execSync(
-    `prettier --write ${result
-      .map(({ dir, file }) => path.relative('.', path.resolve(dir, file)))
-      .join(' ')}`
-  );
+  try {
+    cp.execSync(
+      `prettier --write ${result
+        .map(({ dir, file }) => path.relative('.', path.resolve(dir, file)))
+        .join(' ')}`
+    );
+  } catch (error) {}
 
   const [errors, files] = _.partition(result, (file) => file instanceof Error);
   const dirs = files.reduce((dirs, { dir, file }) => {
@@ -620,4 +638,8 @@ export function transform(options = {}) {
     console.error(`failed files:`);
     errors.map(console.error);
   }
+
+  console.log(chalk.blue('\n\nTransformation Results:'));
+  console.log(chalk.bold(`success: ${files.length}`));
+  console.log(chalk.bold(`failed: ${errors.length}\n\n`));
 }
