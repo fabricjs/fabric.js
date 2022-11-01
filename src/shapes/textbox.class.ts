@@ -1,24 +1,19 @@
-//@ts-nocheck
-const fabric = global.fabric || (global.fabric = {});
+// @ts-nocheck
+
+import { fabric } from '../../HEADER';
+import { TClassProperties } from '../typedefs';
+import { stylesFromArray } from '../util/misc/textStyles';
+import { IText } from './itext.class';
+import { FabricObject } from './object.class';
+import { textDefaultValues } from './text.class';
 
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
  * and wraps lines automatically. Textboxes have their Y scaling locked, the
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
- * @class Textbox
- * @extends fabric.IText
- * @return {Textbox} thisArg
- * @see {@link Textbox#initialize} for constructor definition
  */
-export class Textbox extends fabric.IText {
-  /**
-   * Type of an object
-   * @type String
-   * @default
-   */
-  type: string;
-
+export class Textbox extends IText {
   /**
    * Minimum width of textbox, in pixels.
    * @type Number
@@ -39,31 +34,7 @@ export class Textbox extends fabric.IText {
    * Cached array of text wrapping.
    * @type Array
    */
-  __cachedLines: Array<any>;
-
-  /**
-   * Override standard Object class values
-   */
-  lockScalingFlip: boolean;
-
-  /**
-   * Override standard Object class values
-   * Textbox needs this on false
-   */
-  noScaleCache: boolean;
-
-  /**
-   * Properties which when set cause object to change dimensions
-   * @type Object
-   * @private
-   */
-  _dimensionAffectingProps: object;
-
-  /**
-   * Use this regular expression to split strings in breakable lines
-   * @private
-   */
-  _wordJoiners;
+  __cachedLines: Array<any> | null = null;
 
   /**
    * Use this boolean property in order to split strings that have no white space concept.
@@ -152,7 +123,7 @@ export class Textbox extends fabric.IText {
         lineIndex = map.line;
       }
     }
-    return fabric.Text.prototype.styleHas.call(this, property, lineIndex);
+    return this.styleHas(property, lineIndex);
   }
 
   /**
@@ -453,7 +424,7 @@ export class Textbox extends fabric.IText {
    * @override
    */
   _splitTextIntoLines(text: string): Array<any> {
-    const newText = fabric.Text.prototype._splitTextIntoLines.call(this, text),
+    const newText = this._splitTextIntoLines(text),
       graphemeLines = this._wrapText(newText.lines, this.width),
       lines = new Array(graphemeLines.length);
     for (let i = 0; i < graphemeLines.length; i++) {
@@ -515,13 +486,14 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
   type: 'textbox',
   minWidth: 20,
   dynamicMinWidth: 2,
-  __cachedLines: null,
   lockScalingFlip: true,
   noScaleCache: false,
   _dimensionAffectingProps:
-    fabric.Text.prototype._dimensionAffectingProps.concat('width'),
+    textDefaultValues._dimensionAffectingProps!.concat('width'),
   _wordJoiners: /[ \t\r]/,
   splitByGrapheme: false,
 };
 
 Object.assign(Textbox.prototype, textboxDefaultValues);
+
+fabric.Textbox = Textbox;

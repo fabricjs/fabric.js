@@ -1,10 +1,15 @@
-// @ts-nocheck
+//// @ts-nocheck
 
+import { FabricObject } from '../shapes/fabricObject.class';
 import { Text } from '../shapes/text.class';
 
-export class TextStyleMixin extends Text {
-  selectionStart?: number;
-  selectionEnd?: number;
+export abstract class StyledText extends Text {
+  // styles: any;
+  // protected _textLines: any;
+  // protected _unwrappedTextLines: any;
+  // protected _forceClearCache: boolean;
+  // protected _styleProperties: any;
+  // abstract missingNewlineOffset(i: number): number;
 
   /**
    * Returns true if object has no styling or no styling in a line
@@ -137,7 +142,7 @@ export class TextStyleMixin extends Text {
    *
    * @param {String} props The property to remove from character styles.
    */
-  removeStyle(property) {
+  removeStyle(property: string) {
     if (!this.styles || !property || property === '') {
       return;
     }
@@ -162,7 +167,7 @@ export class TextStyleMixin extends Text {
   /**
    * @private
    */
-  _extendStyles(index, styles) {
+  _extendStyles(index: number, styles) {
     const loc = this.get2DCursorLocation(index);
 
     if (!this._getLineStyle(loc.lineIndex)) {
@@ -180,14 +185,11 @@ export class TextStyleMixin extends Text {
   }
 
   /**
-   * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start)
-   * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
+   * Returns 2d representation (lineIndex and charIndex) of cursor
+   * @param {Number} selectionStart
    * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. useful to manage styles.
    */
   get2DCursorLocation(selectionStart: number, skipWrapping?: boolean) {
-    if (typeof selectionStart === 'undefined') {
-      selectionStart = this.selectionStart;
-    }
     const lines = skipWrapping ? this._unwrappedTextLines : this._textLines;
     let i: number;
     for (i = 0; i < lines.length; i++) {
@@ -210,25 +212,18 @@ export class TextStyleMixin extends Text {
 
   /**
    * Gets style of a current selection/cursor (at the start position)
-   * if startIndex or endIndex are not provided, selectionStart or selectionEnd will be used.
-   * @param {Number} [startIndex] Start index to get styles at
-   * @param {Number} [endIndex] End index to get styles at, if not specified selectionEnd or startIndex + 1
+   * @param {Number} startIndex Start index to get styles at
+   * @param {Number} endIndex End index to get styles at, if not specified startIndex + 1
    * @param {Boolean} [complete] get full style or not
    * @return {Array} styles an array with one, zero or more Style objects
    */
   getSelectionStyles(
     startIndex: number,
-    endIndex: number,
-    complete: boolean
+    endIndex?: number,
+    complete?: boolean
   ): Array<any> {
-    if (typeof startIndex === 'undefined') {
-      startIndex = this.selectionStart || 0;
-    }
-    if (typeof endIndex === 'undefined') {
-      endIndex = this.selectionEnd || startIndex;
-    }
     const styles = [];
-    for (let i = startIndex; i < endIndex; i++) {
+    for (let i = startIndex; i < (endIndex || startIndex); i++) {
       styles.push(this.getStyleAtPosition(i, complete));
     }
     return styles;
@@ -241,7 +236,7 @@ export class TextStyleMixin extends Text {
    * @return {Object} style Style object at a specified index
    * @private
    */
-  getStyleAtPosition(position: number, complete: boolean): object {
+  getStyleAtPosition(position: number, complete?: boolean): object {
     const loc = this.get2DCursorLocation(position),
       style = complete
         ? this.getCompleteStyleDeclaration(loc.lineIndex, loc.charIndex)
@@ -251,29 +246,16 @@ export class TextStyleMixin extends Text {
 
   /**
    * Sets style of a current selection, if no selection exist, do not set anything.
-   * @param {Object} [styles] Styles object
-   * @param {Number} [startIndex] Start index to get styles at
-   * @param {Number} [endIndex] End index to get styles at, if not specified selectionEnd or startIndex + 1
-   * @return {fabric.IText} thisArg
-   * @chainable
+   * @param {Object} styles Styles object
+   * @param {Number} startIndex Start index to get styles at
+   * @param {Number} [endIndex] End index to get styles at, if not specified startIndex + 1
    */
-  setSelectionStyles(
-    styles: object,
-    startIndex: number,
-    endIndex: number
-  ): fabric.IText {
-    if (typeof startIndex === 'undefined') {
-      startIndex = this.selectionStart || 0;
-    }
-    if (typeof endIndex === 'undefined') {
-      endIndex = this.selectionEnd || startIndex;
-    }
-    for (let i = startIndex; i < endIndex; i++) {
+  setSelectionStyles(styles: object, startIndex: number, endIndex?: number) {
+    for (let i = startIndex; i < (endIndex || startIndex); i++) {
       this._extendStyles(i, styles);
     }
     /* not included in _extendStyles to avoid clearing cache more than once */
     this._forceClearCache = true;
-    return this;
   }
 
   /**
@@ -282,7 +264,7 @@ export class TextStyleMixin extends Text {
    * @param {Number} charIndex
    * @return {Object} style object
    */
-  _getStyleDeclaration(lineIndex: number, charIndex: number): object {
+  _getStyleDeclaration(lineIndex: number, charIndex: number) {
     const lineStyle = this.styles && this.styles[lineIndex];
     if (!lineStyle) {
       return null;
@@ -298,10 +280,9 @@ export class TextStyleMixin extends Text {
    * @return {Object} style object
    */
   getCompleteStyleDeclaration(lineIndex: number, charIndex: number): object {
-    let style = this._getStyleDeclaration(lineIndex, charIndex) || {},
-      styleObject = {},
-      prop;
-    for (let i = 0; i < this._styleProperties.length; i++) {
+    const style = this._getStyleDeclaration(lineIndex, charIndex) || {},
+      styleObject: Record<keyof this, this[keyof this]> = {};
+    for (let i = 0, prop: keyof this; i < this._styleProperties.length; i++) {
       prop = this._styleProperties[i];
       styleObject[prop] =
         typeof style[prop] === 'undefined' ? this[prop] : style[prop];
@@ -315,7 +296,11 @@ export class TextStyleMixin extends Text {
    * @param {Object} style
    * @private
    */
-  _setStyleDeclaration(lineIndex: number, charIndex: number, style: object) {
+  protected _setStyleDeclaration(
+    lineIndex: number,
+    charIndex: number,
+    style: object
+  ) {
     this.styles[lineIndex][charIndex] = style;
   }
 
@@ -325,7 +310,7 @@ export class TextStyleMixin extends Text {
    * @param {Number} charIndex
    * @private
    */
-  _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
+  protected _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
     delete this.styles[lineIndex][charIndex];
   }
 
@@ -334,7 +319,7 @@ export class TextStyleMixin extends Text {
    * @return {Boolean} if the line exists or not
    * @private
    */
-  _getLineStyle(lineIndex: number): boolean {
+  protected _getLineStyle(lineIndex: number): boolean {
     return !!this.styles[lineIndex];
   }
 
@@ -343,7 +328,7 @@ export class TextStyleMixin extends Text {
    * @param {Number} lineIndex
    * @private
    */
-  _setLineStyle(lineIndex: number) {
+  protected _setLineStyle(lineIndex: number) {
     this.styles[lineIndex] = {};
   }
 
@@ -351,7 +336,54 @@ export class TextStyleMixin extends Text {
    * @param {Number} lineIndex
    * @private
    */
-  _deleteLineStyle(lineIndex: number) {
+  protected _deleteLineStyle(lineIndex: number) {
     delete this.styles[lineIndex];
+  }
+}
+
+export abstract class ITextBase extends StyledText {
+  abstract selectionStart: number;
+  abstract selectionEnd: number;
+
+  /**
+   * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start)
+   * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
+   * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. useful to manage styles.
+   */
+  get2DCursorLocation(
+    selectionStart: number = this.selectionStart,
+    skipWrapping?: boolean
+  ) {
+    return super.get2DCursorLocation(selectionStart, skipWrapping);
+  }
+
+  /**
+   * Gets style of a current selection/cursor (at the start position)
+   * if startIndex or endIndex are not provided, selectionStart or selectionEnd will be used.
+   * @param {Number} startIndex Start index to get styles at
+   * @param {Number} endIndex End index to get styles at, if not specified selectionEnd or startIndex + 1
+   * @param {Boolean} [complete] get full style or not
+   * @return {Array} styles an array with one, zero or more Style objects
+   */
+  getSelectionStyles(
+    startIndex: number = this.selectionStart || 0,
+    endIndex: number = this.selectionEnd,
+    complete?: boolean
+  ) {
+    return super.getSelectionStyles(startIndex, endIndex, complete);
+  }
+
+  /**
+   * Sets style of a current selection, if no selection exist, do not set anything.
+   * @param {Object} [styles] Styles object
+   * @param {Number} [startIndex] Start index to get styles at
+   * @param {Number} [endIndex] End index to get styles at, if not specified selectionEnd or startIndex + 1
+   */
+  setSelectionStyles(
+    styles: object,
+    startIndex: number = this.selectionStart || 0,
+    endIndex: number = this.selectionEnd
+  ) {
+    return super.setSelectionStyles(styles, startIndex, endIndex);
   }
 }

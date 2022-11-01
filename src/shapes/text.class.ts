@@ -1,8 +1,9 @@
-// @ts-nocheck
+//// @ts-nocheck
 
 import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
+import { StyledText } from '../mixins/text_style.mixin';
 import { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import {
@@ -289,7 +290,7 @@ export class Text extends FabricObject {
    * @type {CanvasRenderingContext2D}
    * @default
    */
-  _measuringContext: CanvasRenderingContext2D;
+  _measuringContext: CanvasRenderingContext2D | null = null;
 
   /**
    * Baseline shift, styles only, keep at 0 for the main text object
@@ -316,7 +317,7 @@ export class Text extends FabricObject {
    * @type {Array}
    * @default
    */
-  _styleProperties: Array<any>;
+  _styleProperties: (keyof this)[];
 
   /**
    * contains characters bounding boxes
@@ -1661,13 +1662,13 @@ export class Text extends FabricObject {
   /**
    * Returns the text as an array of lines.
    * @param {String} text text to split
-   * @returns {Array} Lines in the text
+   * @returns  Lines in the text
    */
-  _splitTextIntoLines(text: string): Array<any> {
-    let lines = text.split(this._reNewline),
-      newLines = new Array(lines.length),
-      newLine = ['\n'],
-      newText = [];
+  _splitTextIntoLines(text: string) {
+    const lines = text.split(this._reNewline),
+      newLines = new Array<string[]>(lines.length),
+      newLine = ['\n'];
+    let newText = [];
     for (let i = 0; i < lines.length; i++) {
       newLines[i] = this.graphemeSplit(lines[i]);
       newText = newText.concat(newLines[i], newLine);
@@ -1929,7 +1930,6 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
   _fontSizeMult: 1.13,
   charSpacing: 0,
   styles: null,
-  _measuringContext: null,
   deltaY: 0,
   direction: 'ltr',
   _styleProperties: [
@@ -1956,3 +1956,5 @@ Object.assign(Text.prototype, textDefaultValues);
 /* _FROM_SVG_START_ */
 
 /* _FROM_SVG_END_ */
+
+fabric.Text = StyledText;

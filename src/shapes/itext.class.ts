@@ -1,12 +1,14 @@
-//@ts-nocheck
+////@ts-nocheck
+import { fabric } from '../../HEADER';
+import { StyledText } from '../mixins/text_style.mixin';
+import { TClassProperties } from '../typedefs';
+import { stylesFromArray } from '../util/misc/textStyles';
 import { FabricObject } from './fabricObject.class';
 
-const fabric = global.fabric;
 /**
  * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
  * prefix when observing canvas.
  * @class IText
- * @extends fabric.Text
  *
  * @fires changed
  * @fires selection:changed
@@ -53,27 +55,20 @@ const fabric = global.fabric;
  *   Select line:                    triple click
  * </pre>
  */
-export class IText extends fabric.Text {
-  /**
-   * Type of an object
-   * @type String
-   * @default
-   */
-  type: string;
-
+export class IText extends StyledText {
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number
    * @default
    */
-  selectionStart: number;
+  selectionStart = 0;
 
   /**
    * Index where text selection ends
    * @type Number
    * @default
    */
-  selectionEnd: number;
+  selectionEnd = 0;
 
   /**
    * Color of text selection
@@ -128,7 +123,7 @@ export class IText extends fabric.Text {
   cursorDelay: number;
 
   /**
-   * Duration of cursor fadein (in ms)
+   * Duration of cursor fade in (in ms)
    * @type Number
    * @default
    */
@@ -149,12 +144,12 @@ export class IText extends fabric.Text {
    * @type HTMLElement
    * @default
    */
-  hiddenTextareaContainer: HTMLElement;
+  hiddenTextareaContainer?: HTMLElement | null;
 
   /**
    * @private
    */
-  _reSpace;
+  _reSpace: RegExp;
 
   /**
    * @private
@@ -164,7 +159,7 @@ export class IText extends fabric.Text {
   /**
    * @private
    */
-  _selectionDirection;
+  _selectionDirection: CanvasDirection;
 
   /**
    * Helps determining when the text is in composition, so that the cursor
@@ -178,7 +173,7 @@ export class IText extends fabric.Text {
    * @param {Object} [options] Options object
    * @return {IText} thisArg
    */
-  constructor(text: string, options: object): IText {
+  constructor(text: string, options: object) {
     super(text, options);
     this.initBehavior();
   }
@@ -643,3 +638,5 @@ export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
 };
 
 Object.assign(IText.prototype, iTextDefaultValues);
+
+fabric.IText = IText;
