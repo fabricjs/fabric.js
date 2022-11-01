@@ -58,7 +58,7 @@ export class Polyline extends FabricObject {
    *   top: 100
    * });
    */
-  constructor(points: Point[] = [], options = {}) {
+  constructor(points: Point[] = [], options: object = {}): Polyline {
     super({ points, ...options });
     this.initialized = true;
     const bboxTL = this.setDimensions();
@@ -72,11 +72,12 @@ export class Polyline extends FabricObject {
     this.setPositionByOrigin(origin, this.originX, this.originY);
   }
 
-  /**
-   * @private
-   */
-  _projectStrokeOnPoints() {
-    return projectStrokeOnPoints(this.points, this, true);
+  protected isOpen() {
+    return true;
+  }
+
+  private _projectStrokeOnPoints() {
+    return projectStrokeOnPoints(this.points, this, this.isOpen);
   }
 
   /**
@@ -124,7 +125,7 @@ export class Polyline extends FabricObject {
   /**
    * @returns {Point} top left position of the bounding box, useful for complementary positioning
    */
-  setDimensions() {
+  setDimensions(): Point {
     const { left, top, width, height, pathOffset, strokeOffset } =
       this._calcDimensions();
     this.set({ width, height, pathOffset, strokeOffset });
@@ -184,7 +185,7 @@ export class Polyline extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude) {
+  toObject(propertiesToInclude: Array<any>): object {
     return {
       ...super.toObject(propertiesToInclude),
       points: this.points.concat(),
@@ -196,13 +197,13 @@ export class Polyline extends FabricObject {
    * @return {Array} an array of strings with the specific svg representation
    * of the instance
    */
-  _toSVG() {
-    var points = [],
+  _toSVG(): Array<any> {
+    const points = [],
       diffX = this.pathOffset.x,
       diffY = this.pathOffset.y,
       NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
 
-    for (var i = 0, len = this.points.length; i < len; i++) {
+    for (let i = 0, len = this.points.length; i < len; i++) {
       points.push(
         toFixed(this.points[i].x - diffX, NUM_FRACTION_DIGITS),
         ',',
@@ -223,8 +224,8 @@ export class Polyline extends FabricObject {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  commonRender(ctx) {
-    var point,
+  commonRender(ctx: CanvasRenderingContext2D) {
+    let point,
       len = this.points.length,
       x = this.pathOffset.x,
       y = this.pathOffset.y;
@@ -236,7 +237,7 @@ export class Polyline extends FabricObject {
     }
     ctx.beginPath();
     ctx.moveTo(this.points[0].x - x, this.points[0].y - y);
-    for (var i = 0; i < len; i++) {
+    for (let i = 0; i < len; i++) {
       point = this.points[i];
       ctx.lineTo(point.x - x, point.y - y);
     }
@@ -247,7 +248,7 @@ export class Polyline extends FabricObject {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _render(ctx) {
+  _render(ctx: CanvasRenderingContext2D) {
     if (!this.commonRender(ctx)) {
       return;
     }
@@ -258,8 +259,8 @@ export class Polyline extends FabricObject {
    * Returns complexity of an instance
    * @return {Number} complexity of this instance
    */
-  complexity() {
-    return this.get('points').length;
+  complexity(): number {
+    return this.points.length;
   }
 
   /**
@@ -280,9 +281,7 @@ export class Polyline extends FabricObject {
    * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  static fromElementGenerator<
-    K extends { new (points: Point[], options: any): InstanceType<K> }
-  >(klass: K) {
+  static fromElementGenerator<K extends typeof Polyline>(klass: K) {
     return function (
       element: SVGElement,
       callback: (poly: InstanceType<K>) => any,
@@ -315,7 +314,7 @@ export class Polyline extends FabricObject {
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Polyline>}
    */
-  static fromObject(object) {
+  static fromObject(object: object): Promise<Polyline> {
     return FabricObject._fromObject(Polyline, object, {
       extraParam: 'points',
     });

@@ -5,10 +5,7 @@ import { FabricObject } from './object.class';
 import { Polyline } from './polyline.class';
 
 export class Polygon extends Polyline {
-  /**
-   * @todo make this method protected when migrating
-   */
-  isOpen() {
+  protected isOpen() {
     return false;
   }
 
