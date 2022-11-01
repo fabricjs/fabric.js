@@ -403,7 +403,9 @@ function copyGLTo2DPutImageData(this: Required<WebGLFilterBackend>, gl: WebGLRen
     dWidth = pipelineState.destinationWidth,
     dHeight = pipelineState.destinationHeight,
     numBytes = dWidth * dHeight * 4;
-
+  if (!ctx) {
+    return;
+  }
   const u8 = new Uint8Array(this.imageBuffer, 0, numBytes);
   const u8Clamped = new Uint8ClampedArray(this.imageBuffer, 0, numBytes);
 

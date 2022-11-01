@@ -1,21 +1,8 @@
-//@ts-nocheck
-
 import { fabric } from '../../HEADER';
+import { config } from '../config';
 import { createCanvasElement } from '../util/misc/dom';
-import { webGLProbe } from './WebGLProbe';
 import { Canvas2dFilterBackend } from './2d_backend.class';
-import type { WebglFilterBackend } from './webgl_backend.class';
-
-export function initFilterBackend(): WebglFilterBackend | Canvas2dFilterBackend {
-  if (
-    config.enableGLFiltering &&
-    webGLProbe.isSupported(config.textureSize)
-  ) {
-    return new WebglFilterBackend({ tileSize: config.textureSize });
-  } else {
-    return new Canvas2dFilterBackend();
-  }
-};
+import { WebGLFilterBackend } from './webgl_backend.class';
 
 export const enum TWebGLPrecision {
   low = 'lowp',
@@ -59,9 +46,12 @@ class WebGLProbe {
    * @param {TWebGLPrecision} Precision to test can be any of following
    * @returns {Boolean} Whether the user's browser WebGL supports given precision.
    */
-  private testPrecision(gl: WebGLRenderingContext, precision: TWebGLPrecision) {
+  private testPrecision(gl: WebGLRenderingContext, precision: TWebGLPrecision): boolean {
     const fragmentSource = `precision ${precision} float;\nvoid main(){}`;
     const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+    if (!fragmentShader) {
+      return false;
+    }
     gl.shaderSource(fragmentShader, fragmentSource);
     gl.compileShader(fragmentShader);
     return !!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS);
@@ -76,8 +66,7 @@ class WebGLProbe {
       return;
     }
     const canvas = createCanvasElement();
-    const gl =
-      canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    const gl = canvas.getContext('webgl');
     if (gl) {
       this._maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
       this._webGLPrecision = WebGLPrecision.find((key) =>
@@ -94,3 +83,18 @@ class WebGLProbe {
 }
 
 export const webGLProbe = new WebGLProbe();
+
+export function initFilterBackend(): WebGLFilterBackend | Canvas2dFilterBackend {
+  if (
+    config.enableGLFiltering &&
+    webGLProbe.isSupported(config.textureSize)
+  ) {
+    return new WebGLFilterBackend({ tileSize: config.textureSize });
+  } else {
+    return new Canvas2dFilterBackend();
+  }
+};
+
+fabric.Canvas2dFilterBackend = Canvas2dFilterBackend;
+fabric.WebglFilterBackend = WebGLFilterBackend;
+fabric.initFilterBackend = initFilterBackend;
