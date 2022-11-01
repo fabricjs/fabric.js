@@ -1012,7 +1012,7 @@ export class FabricObject extends ObjectGeometry {
    * @param {*} value
    * @return {fabric.Object} thisArg
    */
-  _set<K extends keyof this, V extends this[K]>(key: K, value: V) {
+  _set(key: string, value: any) {
     const shouldConstrainValue = key === 'scaleX' || key === 'scaleY',
       isChanged = this[key] !== value;
 

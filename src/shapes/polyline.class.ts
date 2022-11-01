@@ -166,8 +166,8 @@ export class Polyline extends FabricObject {
    * Recalculates dimensions when changing skew and scale
    * @private
    */
-  _set<K extends keyof this, V extends this[K]>(key: K, value: V) {
-    const changed = this.initialized && this[key] !== value;
+  _set(key: string, value: any) {
+    const changed = this.initialized && this[key as keyof this] !== value;
     const output = super._set(key, value);
     if (
       changed &&
@@ -175,7 +175,7 @@ export class Polyline extends FabricObject {
         this.strokeUniform &&
         this.strokeBBoxAffectingProperties.includes('strokeUniform') &&
         this.strokeLineJoin !== 'round') ||
-        this.strokeBBoxAffectingProperties.includes(key))
+        this.strokeBBoxAffectingProperties.includes(key as keyof this))
     ) {
       this.setDimensions();
     }
