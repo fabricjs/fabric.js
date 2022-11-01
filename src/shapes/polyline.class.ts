@@ -38,6 +38,8 @@ export class Polyline extends FabricObject {
    * @todo check if you really need to recalculate for all cases
    */
   strokeBBoxAffectingProperties: (keyof this)[];
+  fromSVG: boolean;
+  pathOffset: Point;
 
   /**
    * Constructor
@@ -58,7 +60,7 @@ export class Polyline extends FabricObject {
    *   top: 100
    * });
    */
-  constructor(points: Point[] = [], options: object = {}): Polyline {
+  constructor(points: Point[] = [], options: any = {}) {
     super({ points, ...options });
     this.initialized = true;
     const bboxTL = this.setDimensions();
@@ -116,8 +118,7 @@ export class Polyline extends FabricObject {
       top: bbox.top - legacyCorrection,
       pathOffset: new Point(pathOffsetX, pathOffsetY),
       strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top).subtract(
-        bbox.left,
-        bbox.top
+        new Point(bbox.left, bbox.top)
       ),
     };
   }
@@ -197,7 +198,7 @@ export class Polyline extends FabricObject {
    * @return {Array} an array of strings with the specific svg representation
    * of the instance
    */
-  _toSVG(): Array<any> {
+  _toSVG() {
     const points = [],
       diffX = this.pathOffset.x,
       diffY = this.pathOffset.y,
@@ -281,10 +282,15 @@ export class Polyline extends FabricObject {
    * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  static fromElementGenerator<K extends typeof Polyline>(klass: K) {
+  static fromElementGenerator<
+    T extends {
+      new (points: Point[], options: any): any;
+      ATTRIBUTE_NAMES: string[];
+    }
+  >(klass: T) {
     return function (
       element: SVGElement,
-      callback: (poly: InstanceType<K>) => any,
+      callback: (poly: InstanceType<T>) => any,
       options = {}
     ) {
       if (!element) {
@@ -298,7 +304,7 @@ export class Polyline extends FabricObject {
           klass.ATTRIBUTE_NAMES
         );
       callback(
-        new klass(points, {
+        new klass(points || [], {
           ...parsedAttributes,
           ...options,
           fromSVG: true,
