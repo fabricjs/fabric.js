@@ -12,6 +12,36 @@ import { toFixed } from '../util/misc/toFixed';
 import { FabricObject } from './fabricObject.class';
 import { fabricObjectDefaultValues } from './object.class';
 
+export function polyFromElement<
+  T extends {
+    new (points: IPoint[], options: any): any;
+    ATTRIBUTE_NAMES: string[];
+  }
+>(
+  klass: T,
+  element: SVGElement,
+  callback: (poly: InstanceType<T> | null) => any,
+  options = {}
+) {
+  if (!element) {
+    return callback(null);
+  }
+  const points = parsePointsAttribute(element.getAttribute('points')),
+    // we omit left and top to instruct the constructor to position the object using the bbox
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    { left, top, ...parsedAttributes } = parseAttributes(
+      element,
+      klass.ATTRIBUTE_NAMES
+    );
+  callback(
+    new klass(points || [], {
+      ...parsedAttributes,
+      ...options,
+      fromSVG: true,
+    })
+  );
+}
+
 export class Polyline extends FabricObject {
   /**
    * Points array
@@ -277,38 +307,13 @@ export class Polyline extends FabricObject {
    * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  static fromElementGenerator<
-    T extends {
-      new (points: IPoint[], options: any): any;
-      ATTRIBUTE_NAMES: string[];
-    }
-  >(klass: T) {
-    return function (
-      element: SVGElement,
-      callback: (poly: InstanceType<T> | null) => any,
-      options = {}
-    ) {
-      if (!element) {
-        return callback(null);
-      }
-      const points = parsePointsAttribute(element.getAttribute('points')),
-        // we omit left and top to instruct the constructor to position the object using the bbox
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        { left, top, ...parsedAttributes } = parseAttributes(
-          element,
-          klass.ATTRIBUTE_NAMES
-        );
-      callback(
-        new klass(points || [], {
-          ...parsedAttributes,
-          ...options,
-          fromSVG: true,
-        })
-      );
-    };
+  static fromElement(
+    element: SVGElement,
+    callback: (poly: Polyline | null) => any,
+    options?: any
+  ) {
+    return polyFromElement(Polyline, element, callback, options);
   }
-
-  static fromElement = Polyline.fromElementGenerator(Polyline);
 
   /* _FROM_SVG_END_ */
 

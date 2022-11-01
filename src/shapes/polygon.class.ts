@@ -1,7 +1,7 @@
 import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
 import { FabricObject } from './object.class';
-import { Polyline } from './polyline.class';
+import { polyFromElement, Polyline } from './polyline.class';
 
 export class Polygon extends Polyline {
   protected isOpen() {
@@ -18,7 +18,13 @@ export class Polygon extends Polyline {
    * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  static fromElement = Polyline.fromElementGenerator(Polygon);
+  static fromElement(
+    element: SVGElement,
+    callback: (poly: Polygon | null) => any,
+    options?: any
+  ) {
+    return polyFromElement(Polygon, element, callback, options);
+  }
 
   /* _FROM_SVG_END_ */
 
