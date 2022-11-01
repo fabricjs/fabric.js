@@ -5,7 +5,7 @@ import type { StaticCanvas } from '../__types__';
 
 type TAncestor = FabricObject | StaticCanvas;
 
-type TStrictAncestor = Group | StaticCanvas;
+type TContainer = Group | StaticCanvas;
 
 /**
  * Strict: only ancestors that are objects (without canvas)
@@ -187,10 +187,10 @@ export class FabricObjectAncestryMixin {
     }
     const headOfFork = ancestorData.fork.pop() as FabricObject,
       headOfOtherFork = ancestorData.otherFork.pop() as FabricObject,
-      thisIndex = (firstCommonAncestor as TStrictAncestor)._objects.indexOf(
+      thisIndex = (firstCommonAncestor as TContainer)._objects.indexOf(
         headOfFork
       ),
-      otherIndex = (firstCommonAncestor as TStrictAncestor)._objects.indexOf(
+      otherIndex = (firstCommonAncestor as TContainer)._objects.indexOf(
         headOfOtherFork
       );
     return thisIndex > -1 && thisIndex > otherIndex;
