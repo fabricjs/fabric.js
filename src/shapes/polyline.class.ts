@@ -9,7 +9,8 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
-import { FabricObject } from './object.class';
+import { FabricObject } from './fabricObject.class';
+import { fabricObjectDefaultValues } from './object.class';
 
 export class Polyline extends FabricObject {
   /**
@@ -333,7 +334,7 @@ export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   points: [],
   exactBoundingBox: false,
   initialized: false,
-  cacheProperties: FabricObject.prototype.cacheProperties.concat('points'),
+  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat('points'),
   strokeBBoxAffectingProperties: [
     'skewX',
     'skewY',
