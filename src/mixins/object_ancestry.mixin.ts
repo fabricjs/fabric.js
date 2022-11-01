@@ -7,6 +7,9 @@ type TAncestor = FabricObject | StaticCanvas;
 
 type TStrictAncestor = Group | StaticCanvas;
 
+/**
+ * Strict: only ancestors that are objects (without canvas)
+ */
 export type Ancestors<Strict> = Strict extends true
   ? [FabricObject | Group] | [FabricObject | Group, ...Group[]] | Group[]
   :
