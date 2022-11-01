@@ -253,6 +253,7 @@ export class Polyline extends FabricObject {
     if (!this.commonRender(ctx)) {
       return;
     }
+    !this.isOpen() && ctx.closePath();
     this._renderPaintInOrder(ctx);
   }
 
