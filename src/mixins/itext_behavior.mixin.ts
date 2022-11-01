@@ -1,11 +1,12 @@
 //@ts-nocheck
 import { Point } from '../point.class';
+import { TEvent } from '../typedefs';
 import { removeFromArray } from '../util/internals';
 
 // extend this regex to support non english languages
 const reNonWord = /[ \n\.,;!\?\-]/;
 
-var fabric = global.fabric;
+const fabric = global.fabric;
 
 export function ITextBehaviorMixinGenerator(Klass) {
   return class ITextBehaviorMixin extends Klass {
@@ -39,10 +40,10 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * Initializes "added" event handler
      */
     initAddedHandler() {
-      var _this = this;
+      const _this = this;
       this.on('added', function (opt) {
         //  make sure we listen to the canvas added event
-        var canvas = opt.target;
+        const canvas = opt.target;
         if (canvas) {
           if (!canvas._hasITextHandlers) {
             canvas._hasITextHandlers = true;
@@ -55,10 +56,10 @@ export function ITextBehaviorMixinGenerator(Klass) {
     }
 
     initRemovedHandler() {
-      var _this = this;
+      const _this = this;
       this.on('removed', function (opt) {
         //  make sure we listen to the canvas removed event
-        var canvas = opt.target;
+        const canvas = opt.target;
         if (canvas) {
           canvas._iTextInstances = canvas._iTextInstances || [];
           removeFromArray(canvas._iTextInstances, _this);
@@ -109,7 +110,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @private
      */
     _animateCursor(obj, targetOpacity, duration, completeMethod) {
-      var tickState = {
+      const tickState = {
         isAborted: false,
         abort: function () {
           this.isAborted = true;
@@ -140,7 +141,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @private
      */
     _onTickComplete() {
-      var _this = this;
+      const _this = this;
 
       if (this._cursorTimeout1) {
         clearTimeout(this._cursorTimeout1);
@@ -159,7 +160,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * Initializes delayed cursor
      */
     initDelayedCursor(restart) {
-      var _this = this,
+      const _this = this,
         delay = restart ? 0 : this.cursorDelay;
 
       this.abortCursorAnimation();
@@ -176,7 +177,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * Aborts cursor animation, clears all timeouts and clear textarea context if necessary
      */
     abortCursorAnimation() {
-      var shouldClear =
+      const shouldClear =
         this._currentTickState || this._currentTickCompleteState;
       this._currentTickState && this._currentTickState.abort();
       this._currentTickCompleteState && this._currentTickCompleteState.abort();
@@ -197,7 +198,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @return {IText} thisArg
      * @chainable
      */
-    selectAll() {
+    selectAll(): IText {
       this.selectionStart = 0;
       this.selectionEnd = this._text.length;
       this._fireSelectionChanged();
@@ -209,7 +210,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * Returns selected text
      * @return {String}
      */
-    getSelectedText() {
+    getSelectedText(): string {
       return this._text.slice(this.selectionStart, this.selectionEnd).join('');
     }
 
@@ -218,8 +219,8 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findWordBoundaryLeft(startFrom) {
-      var offset = 0,
+    findWordBoundaryLeft(startFrom: number): number {
+      let offset = 0,
         index = startFrom - 1;
 
       // remove space before cursor first
@@ -242,8 +243,8 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findWordBoundaryRight(startFrom) {
-      var offset = 0,
+    findWordBoundaryRight(startFrom: number): number {
+      let offset = 0,
         index = startFrom;
 
       // remove space after cursor first
@@ -266,8 +267,8 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findLineBoundaryLeft(startFrom) {
-      var offset = 0,
+    findLineBoundaryLeft(startFrom: number): number {
+      let offset = 0,
         index = startFrom - 1;
 
       while (!/\n/.test(this._text[index]) && index > -1) {
@@ -283,8 +284,8 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {Number} startFrom Current selection index
      * @return {Number} New selection index
      */
-    findLineBoundaryRight(startFrom) {
-      var offset = 0,
+    findLineBoundaryRight(startFrom: number): number {
+      let offset = 0,
         index = startFrom;
 
       while (!/\n/.test(this._text[index]) && index < this._text.length) {
@@ -301,8 +302,8 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {Number} direction 1 or -1
      * @return {Number} Index of the beginning or end of a word
      */
-    searchWordBoundary(selectionStart, direction) {
-      var text = this._text,
+    searchWordBoundary(selectionStart: number, direction: number): number {
+      let text = this._text,
         index = this._reSpace.test(text[selectionStart])
           ? selectionStart - 1
           : selectionStart,
@@ -322,9 +323,9 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * Selects a word based on the index
      * @param {Number} selectionStart Index of a character
      */
-    selectWord(selectionStart) {
+    selectWord(selectionStart: number) {
       selectionStart = selectionStart || this.selectionStart;
-      var newSelectionStart = this.searchWordBoundary(
+      const newSelectionStart = this.searchWordBoundary(
           selectionStart,
           -1
         ) /* search backwards */,
@@ -346,9 +347,9 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @return {IText} thisArg
      * @chainable
      */
-    selectLine(selectionStart) {
+    selectLine(selectionStart: number): IText {
       selectionStart = selectionStart || this.selectionStart;
-      var newSelectionStart = this.findLineBoundaryLeft(selectionStart),
+      const newSelectionStart = this.findLineBoundaryLeft(selectionStart),
         newSelectionEnd = this.findLineBoundaryRight(selectionStart);
 
       this.selectionStart = newSelectionStart;
@@ -363,7 +364,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @return {IText} thisArg
      * @chainable
      */
-    enterEditing(e) {
+    enterEditing(e): IText {
       if (this.isEditing || !this.editable) {
         return;
       }
@@ -424,7 +425,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
       fabric.document.activeElement !== this.hiddenTextarea &&
         this.hiddenTextarea.focus();
 
-      var newSelectionStart = this.getSelectionStartFromPointer(options.e),
+      const newSelectionStart = this.getSelectionStartFromPointer(options.e),
         currentStart = this.selectionStart,
         currentEnd = this.selectionEnd;
       if (
@@ -462,27 +463,35 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {string} data.text
      * @param {string} data.value selected text
      */
-    setDragImage(e, data) {
-      var t = this.calcTransformMatrix();
-      var flipFactor = new Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
-      var boundaries = this._getCursorBoundaries(data.selectionStart);
-      var selectionPosition = new Point(
+    setDragImage(
+      e: DragEvent,
+      data: {
+        selectionStart: number;
+        selectionEnd: number;
+        text: string;
+        value: string;
+      }
+    ) {
+      const t = this.calcTransformMatrix();
+      const flipFactor = new Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
+      const boundaries = this._getCursorBoundaries(data.selectionStart);
+      const selectionPosition = new Point(
         boundaries.left + boundaries.leftOffset,
         boundaries.top + boundaries.topOffset
       ).multiply(flipFactor);
-      var pos = transformPoint(selectionPosition, t);
-      var pointer = this.canvas.getPointer(e);
-      var diff = pointer.subtract(pos);
-      var enableRetinaScaling = this.canvas._isRetinaScaling();
-      var retinaScaling = this.canvas.getRetinaScaling();
-      var bbox = this.getBoundingRect(true);
-      var correction = pos.subtract(new Point(bbox.left, bbox.top));
-      var offset = correction.add(diff).scalarMultiply(retinaScaling);
+      const pos = transformPoint(selectionPosition, t);
+      const pointer = this.canvas.getPointer(e);
+      const diff = pointer.subtract(pos);
+      const enableRetinaScaling = this.canvas._isRetinaScaling();
+      const retinaScaling = this.canvas.getRetinaScaling();
+      const bbox = this.getBoundingRect(true);
+      const correction = pos.subtract(new Point(bbox.left, bbox.top));
+      const offset = correction.add(diff).scalarMultiply(retinaScaling);
       //  prepare instance for drag image snapshot by making all non selected text invisible
-      var bgc = this.backgroundColor;
-      var styles = object.clone(this.styles, true);
+      const bgc = this.backgroundColor;
+      const styles = object.clone(this.styles, true);
       delete this.backgroundColor;
-      var styleOverride = {
+      const styleOverride = {
         fill: 'transparent',
         textBackgroundColor: 'transparent',
       };
@@ -492,17 +501,17 @@ export function ITextBehaviorMixinGenerator(Klass) {
         data.selectionEnd,
         data.text.length
       );
-      var dragImage = this.toCanvasElement({
+      let dragImage = this.toCanvasElement({
         enableRetinaScaling: enableRetinaScaling,
       });
       this.backgroundColor = bgc;
       this.styles = styles;
       //  handle retina scaling
       if (enableRetinaScaling && retinaScaling > 1) {
-        var c = createCanvasElement();
+        const c = createCanvasElement();
         c.width = dragImage.width / retinaScaling;
         c.height = dragImage.height / retinaScaling;
-        var ctx = c.getContext('2d');
+        const ctx = c.getContext('2d');
         ctx.scale(1 / retinaScaling, 1 / retinaScaling);
         ctx.drawImage(dragImage, 0, 0);
         dragImage = c;
@@ -527,17 +536,20 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {DragEvent} e
      * @returns {boolean} should handle event
      */
-    onDragStart(e) {
+    onDragStart(e: DragEvent): boolean {
       this.__dragStartFired = true;
       if (this.__isDragging) {
-        var selection = (this.__dragStartSelection = {
+        const selection = (this.__dragStartSelection = {
           selectionStart: this.selectionStart,
           selectionEnd: this.selectionEnd,
         });
-        var value = this._text
+        const value = this._text
           .slice(selection.selectionStart, selection.selectionEnd)
           .join('');
-        var data = Object.assign({ text: this.text, value: value }, selection);
+        const data = Object.assign(
+          { text: this.text, value: value },
+          selection
+        );
         e.dataTransfer.setData('text/plain', value);
         e.dataTransfer.setData(
           'application/fabric',
@@ -563,13 +575,13 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {DragEvent} e
      * @returns {boolean}
      */
-    canDrop(e) {
+    canDrop(e: DragEvent): boolean {
       if (this.editable && !this.__corner) {
         if (this.__isDragging && this.__dragStartSelection) {
           //  drag source trying to drop over itself
           //  allow dropping only outside of drag start selection
-          var index = this.getSelectionStartFromPointer(e);
-          var dragStartSelection = this.__dragStartSelection;
+          const index = this.getSelectionStartFromPointer(e);
+          const dragStartSelection = this.__dragStartSelection;
           return (
             index < dragStartSelection.selectionStart ||
             index > dragStartSelection.selectionEnd
@@ -586,9 +598,8 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {object} options
      * @param {DragEvent} options.e
      */
-    dragEnterHandler(options) {
-      var e = options.e;
-      var canDrop = !e.defaultPrevented && this.canDrop(e);
+    dragEnterHandler({ e }: TEvent<DragEvent>) {
+      const canDrop = !e.defaultPrevented && this.canDrop(e);
       if (!this.__isDraggingOver && canDrop) {
         this.__isDraggingOver = true;
       }
@@ -600,9 +611,8 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {object} options
      * @param {DragEvent} options.e
      */
-    dragOverHandler(options) {
-      var e = options.e;
-      var canDrop = !e.defaultPrevented && this.canDrop(e);
+    dragOverHandler({ e }: TEvent<DragEvent>) {
+      const canDrop = !e.defaultPrevented && this.canDrop(e);
       if (!this.__isDraggingOver && canDrop) {
         this.__isDraggingOver = true;
       } else if (this.__isDraggingOver && !canDrop) {
@@ -638,15 +648,14 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {object} options
      * @param {DragEvent} options.e
      */
-    dragEndHandler(options) {
-      var e = options.e;
+    dragEndHandler({ e }: TEvent<DragEvent>) {
       if (this.__isDragging && this.__dragStartFired) {
         //  once the drop event finishes we check if we need to change the drag source
         //  if the drag source received the drop we bail out
         if (this.__dragStartSelection) {
-          var selectionStart = this.__dragStartSelection.selectionStart;
-          var selectionEnd = this.__dragStartSelection.selectionEnd;
-          var dropEffect = e.dataTransfer.dropEffect;
+          const selectionStart = this.__dragStartSelection.selectionStart;
+          const selectionEnd = this.__dragStartSelection.selectionEnd;
+          const dropEffect = e.dataTransfer.dropEffect;
           if (dropEffect === 'none') {
             this.selectionStart = selectionStart;
             this.selectionEnd = selectionEnd;
@@ -688,25 +697,24 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {object} options
      * @param {DragEvent} options.e
      */
-    dropHandler(options) {
-      var e = options.e,
-        didDrop = e.defaultPrevented;
+    dropHandler({ e }: TEvent<DragEvent>) {
+      const didDrop = e.defaultPrevented;
       this.__isDraggingOver = false;
       // inform browser that the drop has been accepted
       e.preventDefault();
-      var insert = e.dataTransfer.getData('text/plain');
+      let insert = e.dataTransfer.getData('text/plain');
       if (insert && !didDrop) {
-        var insertAt = this.getSelectionStartFromPointer(e);
-        var data = e.dataTransfer.types.includes('application/fabric')
+        let insertAt = this.getSelectionStartFromPointer(e);
+        const data = e.dataTransfer.types.includes('application/fabric')
           ? JSON.parse(e.dataTransfer.getData('application/fabric'))
           : {};
-        var styles = data.styles;
-        var trailing = insert[Math.max(0, insert.length - 1)];
-        var selectionStartOffset = 0;
+        const styles = data.styles;
+        const trailing = insert[Math.max(0, insert.length - 1)];
+        const selectionStartOffset = 0;
         //  drag and drop in same instance
         if (this.__dragStartSelection) {
-          var selectionStart = this.__dragStartSelection.selectionStart;
-          var selectionEnd = this.__dragStartSelection.selectionEnd;
+          const selectionStart = this.__dragStartSelection.selectionStart;
+          const selectionEnd = this.__dragStartSelection.selectionEnd;
           if (insertAt > selectionStart && insertAt <= selectionEnd) {
             insertAt = selectionStart;
           } else if (insertAt > selectionEnd) {
@@ -771,12 +779,12 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * convert from textarea to grapheme indexes
      */
     fromStringToGraphemeSelection(start, end, text) {
-      var smallerTextStart = text.slice(0, start),
+      const smallerTextStart = text.slice(0, start),
         graphemeStart = this.graphemeSplit(smallerTextStart).length;
       if (start === end) {
         return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
       }
-      var smallerTextEnd = text.slice(start, end),
+      const smallerTextEnd = text.slice(start, end),
         graphemeEnd = this.graphemeSplit(smallerTextEnd).length;
       return {
         selectionStart: graphemeStart,
@@ -788,12 +796,12 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * convert from fabric to textarea values
      */
     fromGraphemeToStringSelection(start, end, _text) {
-      var smallerTextStart = _text.slice(0, start),
+      const smallerTextStart = _text.slice(0, start),
         graphemeStart = smallerTextStart.join('').length;
       if (start === end) {
         return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
       }
-      var smallerTextEnd = _text.slice(start, end),
+      const smallerTextEnd = _text.slice(start, end),
         graphemeEnd = smallerTextEnd.join('').length;
       return {
         selectionStart: graphemeStart,
@@ -810,7 +818,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
         return;
       }
       if (!this.inCompositionMode) {
-        var newSelection = this.fromGraphemeToStringSelection(
+        const newSelection = this.fromGraphemeToStringSelection(
           this.selectionStart,
           this.selectionEnd,
           this._text
@@ -834,7 +842,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
         this.initDimensions();
         this.setCoords();
       }
-      var newSelection = this.fromStringToGraphemeSelection(
+      const newSelection = this.fromStringToGraphemeSelection(
         this.hiddenTextarea.selectionStart,
         this.hiddenTextarea.selectionEnd,
         this.hiddenTextarea.value
@@ -851,7 +859,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
      */
     updateTextareaPosition() {
       if (this.selectionStart === this.selectionEnd) {
-        var style = this._calcTextareaPosition();
+        const style = this._calcTextareaPosition();
         this.hiddenTextarea.style.left = style.left;
         this.hiddenTextarea.style.top = style.top;
       }
@@ -861,11 +869,11 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @private
      * @return {Object} style contains style for hiddenTextarea
      */
-    _calcTextareaPosition() {
+    _calcTextareaPosition(): object {
       if (!this.canvas) {
         return { x: 1, y: 1 };
       }
-      var desiredPosition = this.inCompositionMode
+      let desiredPosition = this.inCompositionMode
           ? this.compositionStart
           : this.selectionStart,
         boundaries = this._getCursorBoundaries(desiredPosition),
@@ -963,9 +971,9 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @return {IText} thisArg
      * @chainable
      */
-    exitEditing() {
-      var isTextChanged = this._textBeforeEdit !== this.text;
-      var hiddenTextarea = this.hiddenTextarea;
+    exitEditing(): IText {
+      const isTextChanged = this._textBeforeEdit !== this.text;
+      const hiddenTextarea = this.hiddenTextarea;
       this.selected = false;
       this.isEditing = false;
 
@@ -997,7 +1005,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @private
      */
     _removeExtraneousStyles() {
-      for (var prop in this.styles) {
+      for (const prop in this.styles) {
         if (!this._textLines[prop]) {
           delete this.styles[prop];
         }
@@ -1009,8 +1017,8 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {Number} start linear start position for removal (included in removal)
      * @param {Number} end linear end position for removal ( excluded from removal )
      */
-    removeStyleFromTo(start, end) {
-      var cursorStart = this.get2DCursorLocation(start, true),
+    removeStyleFromTo(start: number, end: number) {
+      let cursorStart = this.get2DCursorLocation(start, true),
         cursorEnd = this.get2DCursorLocation(end, true),
         lineStart = cursorStart.lineIndex,
         charStart = cursorStart.charIndex,
@@ -1049,7 +1057,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
         // remove and shift left on the same line
         if (this.styles[lineStart]) {
           styleObj = this.styles[lineStart];
-          var diff = charEnd - charStart,
+          let diff = charEnd - charStart,
             numericChar,
             _char;
           for (i = charStart; i < charEnd; i++) {
@@ -1071,10 +1079,10 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {Number} lineIndex Index of a line
      * @param {Number} offset Can any number?
      */
-    shiftLineStyles(lineIndex, offset) {
-      var clonedStyles = Object.assign({}, this.styles);
-      for (var line in this.styles) {
-        var numericLine = parseInt(line, 10);
+    shiftLineStyles(lineIndex: number, offset: number) {
+      const clonedStyles = Object.assign({}, this.styles);
+      for (const line in this.styles) {
+        const numericLine = parseInt(line, 10);
         if (numericLine > lineIndex) {
           this.styles[numericLine + offset] = clonedStyles[numericLine];
           if (!clonedStyles[numericLine - offset]) {
@@ -1105,8 +1113,13 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {Number} qty number of lines to add
      * @param {Array} copiedStyle Array of objects styles
      */
-    insertNewlineStyleObject(lineIndex, charIndex, qty, copiedStyl) {
-      var currentCharStyle,
+    insertNewlineStyleObject(
+      lineIndex: number,
+      charIndex: number,
+      qty: number,
+      copiedStyl
+    ) {
+      let currentCharStyle,
         newLineStyles = {},
         somethingAdded = false,
         isEndOfLine = this._unwrappedTextLines[lineIndex].length === charIndex;
@@ -1119,8 +1132,8 @@ export function ITextBehaviorMixinGenerator(Klass) {
       }
       // we clone styles of all chars
       // after cursor onto the current line
-      for (var index in this.styles[lineIndex]) {
-        var numIndex = parseInt(index, 10);
+      for (const index in this.styles[lineIndex]) {
+        const numIndex = parseInt(index, 10);
         if (numIndex >= charIndex) {
           somethingAdded = true;
           newLineStyles[numIndex - charIndex] = this.styles[lineIndex][index];
@@ -1130,7 +1143,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
           }
         }
       }
-      var styleCarriedOver = false;
+      let styleCarriedOver = false;
       if (somethingAdded && !isEndOfLine) {
         // if is end of line, the extra style we copied
         // is probably not something we want
@@ -1167,11 +1180,16 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {Number} quantity number Style object to insert, if given
      * @param {Array} copiedStyle array of style objects
      */
-    insertCharStyleObject(lineIndex, charIndex, quantity, copiedStyl) {
+    insertCharStyleObject(
+      lineIndex: number,
+      charIndex: number,
+      quantity: number,
+      copiedStyl
+    ) {
       if (!this.styles) {
         this.styles = {};
       }
-      var currentLineStyles = this.styles[lineIndex],
+      const currentLineStyles = this.styles[lineIndex],
         currentLineStylesCloned = currentLineStyles
           ? Object.assign({}, currentLineStyles)
           : {};
@@ -1179,8 +1197,8 @@ export function ITextBehaviorMixinGenerator(Klass) {
       quantity || (quantity = 1);
       // shift all char styles by quantity forward
       // 0,1,2,3 -> (charIndex=2) -> 0,1,3,4 -> (insert 2) -> 0,1,2,3,4
-      for (var index in currentLineStylesCloned) {
-        var numericIndex = parseInt(index, 10);
+      for (const index in currentLineStylesCloned) {
+        const numericIndex = parseInt(index, 10);
         if (numericIndex >= charIndex) {
           currentLineStyles[numericIndex + quantity] =
             currentLineStylesCloned[numericIndex];
@@ -1209,7 +1227,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
       if (!currentLineStyles) {
         return;
       }
-      var newStyle = currentLineStyles[charIndex ? charIndex - 1 : 1];
+      const newStyle = currentLineStyles[charIndex ? charIndex - 1 : 1];
       while (newStyle && quantity--) {
         this.styles[lineIndex][charIndex + quantity] = Object.assign(
           {},
@@ -1224,8 +1242,12 @@ export function ITextBehaviorMixinGenerator(Klass) {
      * @param {Number} start cursor index for inserting style
      * @param {Array} [copiedStyle] array of style objects to insert.
      */
-    insertNewStyleBlock(insertedText, start, copiedStyle) {
-      var cursorLoc = this.get2DCursorLocation(start, true),
+    insertNewStyleBlock(
+      insertedText: string[],
+      start: number,
+      copiedStyle: Array<any>
+    ) {
+      let cursorLoc = this.get2DCursorLocation(start, true),
         addedLines = [0],
         linesLength = 0;
       // get an array of how many char per lines are being added.
@@ -1315,7 +1337,7 @@ export function ITextBehaviorMixinGenerator(Klass) {
     }
 
     setSelectionInBoundaries() {
-      var length = this.text.length;
+      const length = this.text.length;
       if (this.selectionStart > length) {
         this.selectionStart = length;
       } else if (this.selectionStart < 0) {

@@ -16,7 +16,7 @@ export function TextIMixinGenerator(Klass) {
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    _toSVG() {
+    _toSVG(): string {
       var offsets = this._getSVGLeftTopOffsets(),
         textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
       return this._wrapSVGTextAndBg(textAndBg);
@@ -27,7 +27,7 @@ export function TextIMixinGenerator(Klass) {
      * @param {Function} [reviver] Method for further parsing of svg representation.
      * @return {String} svg representation of an instance
      */
-    toSVG(reviver) {
+    toSVG(reviver: Function): string {
       return this._createBaseSVGMarkup(this._toSVG(), {
         reviver: reviver,
         noStyle: true,
@@ -79,7 +79,7 @@ export function TextIMixinGenerator(Klass) {
      * @param {Number} textLeftOffset Text left offset
      * @return {Object}
      */
-    _getSVGTextAndBg(textTopOffset, textLeftOffset) {
+    _getSVGTextAndBg(textTopOffset: number, textLeftOffset: number): object {
       var textSpans = [],
         textBgRects = [],
         height = textTopOffset,
@@ -269,7 +269,7 @@ export function TextIMixinGenerator(Klass) {
      * @param {*} value
      * @return {String}
      */
-    _getFillAttributes(value) {
+    _getFillAttributes(value: any): string {
       var fillColor =
         value && typeof value === 'string' ? new Color(value) : '';
       if (!fillColor || !fillColor.getSource() || fillColor.getAlpha() === 1) {
@@ -307,7 +307,7 @@ export function TextIMixinGenerator(Klass) {
      * @param {Boolean} skipShadow a boolean to skip shadow filter output
      * @return {String}
      */
-    getSvgStyles(skipShadow) {
+    getSvgStyles(skipShadow: boolean): string {
       var svgStyle = FabricObject.prototype.getSvgStyles.call(this, skipShadow);
       return svgStyle + ' white-space: pre;';
     }

@@ -8,7 +8,7 @@ export function TextStyleMixinGenerator(Klass) {
      * @param {Number} lineIndex , lineIndex is on wrapped lines.
      * @return {Boolean}
      */
-    isEmptyStyles(lineIndex) {
+    isEmptyStyles(lineIndex: number): boolean {
       if (!this.styles) {
         return true;
       }
@@ -37,7 +37,7 @@ export function TextStyleMixinGenerator(Klass) {
      * @param {Number} lineIndex to check the style on
      * @return {Boolean}
      */
-    styleHas(property, lineIndex) {
+    styleHas(property: string, lineIndex: number): boolean {
       if (!this.styles || !property || property === '') {
         return false;
       }
@@ -70,7 +70,7 @@ export function TextStyleMixinGenerator(Klass) {
      *
      * @param {string} property The property to compare between characters and text.
      */
-    cleanStyle(property) {
+    cleanStyle(property: string) {
       if (!this.styles || !property || property === '') {
         return false;
       }
@@ -181,7 +181,7 @@ export function TextStyleMixinGenerator(Klass) {
      * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
      * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. useful to manage styles.
      */
-    get2DCursorLocation(selectionStart, skipWrapping) {
+    get2DCursorLocation(selectionStart: number, skipWrapping: boolean) {
       if (typeof selectionStart === 'undefined') {
         selectionStart = this.selectionStart;
       }
@@ -213,7 +213,11 @@ export function TextStyleMixinGenerator(Klass) {
      * @param {Boolean} [complete] get full style or not
      * @return {Array} styles an array with one, zero or more Style objects
      */
-    getSelectionStyles(startIndex, endIndex, complete) {
+    getSelectionStyles(
+      startIndex: number,
+      endIndex: number,
+      complete: boolean
+    ): Array<any> {
       if (typeof startIndex === 'undefined') {
         startIndex = this.selectionStart || 0;
       }
@@ -234,7 +238,7 @@ export function TextStyleMixinGenerator(Klass) {
      * @return {Object} style Style object at a specified index
      * @private
      */
-    getStyleAtPosition(position, complete) {
+    getStyleAtPosition(position: number, complete: boolean): object {
       var loc = this.get2DCursorLocation(position),
         style = complete
           ? this.getCompleteStyleDeclaration(loc.lineIndex, loc.charIndex)
@@ -250,7 +254,11 @@ export function TextStyleMixinGenerator(Klass) {
      * @return {fabric.IText} thisArg
      * @chainable
      */
-    setSelectionStyles(styles, startIndex, endIndex) {
+    setSelectionStyles(
+      styles: object,
+      startIndex: number,
+      endIndex: number
+    ): fabric.IText {
       if (typeof startIndex === 'undefined') {
         startIndex = this.selectionStart || 0;
       }
@@ -271,7 +279,7 @@ export function TextStyleMixinGenerator(Klass) {
      * @param {Number} charIndex
      * @return {Object} style object
      */
-    _getStyleDeclaration(lineIndex, charIndex) {
+    _getStyleDeclaration(lineIndex: number, charIndex: number): object {
       var lineStyle = this.styles && this.styles[lineIndex];
       if (!lineStyle) {
         return null;
@@ -286,7 +294,7 @@ export function TextStyleMixinGenerator(Klass) {
      * @param {Number} charIndex position of the character on the line
      * @return {Object} style object
      */
-    getCompleteStyleDeclaration(lineIndex, charIndex) {
+    getCompleteStyleDeclaration(lineIndex: number, charIndex: number): object {
       var style = this._getStyleDeclaration(lineIndex, charIndex) || {},
         styleObject = {},
         prop;
@@ -304,7 +312,7 @@ export function TextStyleMixinGenerator(Klass) {
      * @param {Object} style
      * @private
      */
-    _setStyleDeclaration(lineIndex, charIndex, style) {
+    _setStyleDeclaration(lineIndex: number, charIndex: number, style: object) {
       this.styles[lineIndex][charIndex] = style;
     }
 
@@ -314,7 +322,7 @@ export function TextStyleMixinGenerator(Klass) {
      * @param {Number} charIndex
      * @private
      */
-    _deleteStyleDeclaration(lineIndex, charIndex) {
+    _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
       delete this.styles[lineIndex][charIndex];
     }
 
@@ -323,7 +331,7 @@ export function TextStyleMixinGenerator(Klass) {
      * @return {Boolean} if the line exists or not
      * @private
      */
-    _getLineStyle(lineIndex) {
+    _getLineStyle(lineIndex: number): boolean {
       return !!this.styles[lineIndex];
     }
 
@@ -332,7 +340,7 @@ export function TextStyleMixinGenerator(Klass) {
      * @param {Number} lineIndex
      * @private
      */
-    _setLineStyle(lineIndex) {
+    _setLineStyle(lineIndex: number) {
       this.styles[lineIndex] = {};
     }
 
@@ -340,7 +348,7 @@ export function TextStyleMixinGenerator(Klass) {
      * @param {Number} lineIndex
      * @private
      */
-    _deleteLineStyle(lineIndex) {
+    _deleteLineStyle(lineIndex: number) {
       delete this.styles[lineIndex];
     }
   };

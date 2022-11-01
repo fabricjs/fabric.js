@@ -3,8 +3,6 @@ import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { Point } from '../point.class';
 import { TPointerEvent } from '../typedefs';
 
-var fabric = global.fabric;
-
 export function ITextClickBehaviorMixinGenerator(Klass) {
   return class ITextClickBehaviorMixin extends Klass {
     /**
@@ -210,9 +208,9 @@ export function ITextClickBehaviorMixinGenerator(Klass) {
 
     /**
      * Changes cursor location in a text depending on passed pointer (x/y) object
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      */
-    setCursorByClick(e) {
+    setCursorByClick(e: TPointerEvent) {
       var newSelection = this.getSelectionStartFromPointer(e),
         start = this.selectionStart,
         end = this.selectionEnd;
@@ -234,7 +232,7 @@ export function ITextClickBehaviorMixinGenerator(Klass) {
      * @param {IPoint} [pointer] Pointer to operate upon (instead of event)
      * @return {Point} Coordinates of a pointer (x, y)
      */
-    getLocalPointer(e, pointer) {
+    getLocalPointer(e: TPointerEvent, pointer: IPoint): Point {
       const thePointer = pointer || this.canvas.getPointer(e);
       return transformPoint(
         thePointer,
@@ -244,10 +242,10 @@ export function ITextClickBehaviorMixinGenerator(Klass) {
 
     /**
      * Returns index of a character corresponding to where an object was clicked
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      * @return {Number} Index of a character
      */
-    getSelectionStartFromPointer(e) {
+    getSelectionStartFromPointer(e: TPointerEvent): number {
       var mouseOffset = this.getLocalPointer(e),
         prevWidth = 0,
         width = 0,

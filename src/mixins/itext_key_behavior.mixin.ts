@@ -108,9 +108,9 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
     /**
      * Handles keydown event
      * only used for arrows and combination of modifier keys.
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      */
-    onKeyDown(e) {
+    onKeyDown(e: TPointerEvent) {
       if (!this.isEditing) {
         return;
       }
@@ -141,9 +141,9 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
      * Handles keyup event
      * We handle KeyUp because ie11 and edge have difficulties copy/pasting
      * if a copy/cut event fired, keyup is dismissed
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      */
-    onKeyUp(e) {
+    onKeyUp(e: TPointerEvent) {
       if (!this.isEditing || this._copyDone || this.inCompositionMode) {
         this._copyDone = false;
         return;
@@ -160,9 +160,9 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
 
     /**
      * Handles onInput event
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      */
-    onInput(e) {
+    onInput(e: TPointerEvent) {
       var fromPaste = this.fromPaste;
       this.fromPaste = false;
       e && e.stopPropagation();
@@ -290,7 +290,6 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
 
     /**
      * Copies selected text
-     * @param {Event} e Event object
      */
     copy() {
       if (this.selectionStart === this.selectionEnd) {
@@ -313,7 +312,6 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
 
     /**
      * Pastes text
-     * @param {Event} e Event object
      */
     paste() {
       this.fromPaste = true;
@@ -321,10 +319,10 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
 
     /**
      * @private
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      * @return {Object} Clipboard data object
      */
-    _getClipboardData(e) {
+    _getClipboardData(e: TPointerEvent): object {
       return (e && e.clipboardData) || fabric.window.clipboardData;
     }
 
@@ -335,7 +333,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
      * @param {Number} charIndex
      * @return {Number} widthBeforeCursor width before cursor
      */
-    _getWidthBeforeCursor(lineIndex, charIndex) {
+    _getWidthBeforeCursor(lineIndex: number, charIndex: number): number {
       var widthBeforeCursor = this._getLineLeftOffset(lineIndex),
         bound;
 
@@ -348,11 +346,11 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
 
     /**
      * Gets start offset of a selection
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      * @param {Boolean} isRight
      * @return {Number}
      */
-    getDownCursorOffset(e, isRight) {
+    getDownCursorOffset(e: TPointerEvent, isRight: boolean): number {
       var selectionProp = this._getSelectionForOffset(e, isRight),
         cursorLocation = this.get2DCursorLocation(selectionProp),
         lineIndex = cursorLocation.lineIndex;
@@ -383,11 +381,11 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
     /**
      * private
      * Helps finding if the offset should be counted from Start or End
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      * @param {Boolean} isRight
      * @return {Number}
      */
-    _getSelectionForOffset(e, isRight) {
+    _getSelectionForOffset(e: TPointerEvent, isRight: boolean): number {
       if (e.shiftKey && this.selectionStart !== this.selectionEnd && isRight) {
         return this.selectionEnd;
       } else {
@@ -396,11 +394,11 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
     }
 
     /**
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      * @param {Boolean} isRight
      * @return {Number}
      */
-    getUpCursorOffset(e, isRight) {
+    getUpCursorOffset(e: TPointerEvent, isRight: boolean): number {
       var selectionProp = this._getSelectionForOffset(e, isRight),
         cursorLocation = this.get2DCursorLocation(selectionProp),
         lineIndex = cursorLocation.lineIndex;
@@ -462,9 +460,9 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
 
     /**
      * Moves cursor down
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      */
-    moveCursorDown(e) {
+    moveCursorDown(e: TPointerEvent) {
       if (
         this.selectionStart >= this._text.length &&
         this.selectionEnd >= this._text.length
@@ -476,9 +474,9 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
 
     /**
      * Moves cursor up
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      */
-    moveCursorUp(e) {
+    moveCursorUp(e: TPointerEvent) {
       if (this.selectionStart === 0 && this.selectionEnd === 0) {
         return;
       }
@@ -488,9 +486,9 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
     /**
      * Moves cursor up or down, fires the events
      * @param {String} direction 'Up' or 'Down'
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      */
-    _moveCursorUpOrDown(direction, e) {
+    _moveCursorUpOrDown(direction: string, e: TPointerEvent) {
       var action = 'get' + direction + 'CursorOffset',
         offset = this[action](e, this._selectionDirection === 'right');
       if (e.shiftKey) {
@@ -512,7 +510,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
      * Moves cursor with shift
      * @param {Number} offset
      */
-    moveCursorWithShift(offset) {
+    moveCursorWithShift(offset: number) {
       var newSelection =
         this._selectionDirection === 'left'
           ? this.selectionStart + offset
@@ -529,7 +527,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
      * Moves cursor up without shift
      * @param {Number} offset
      */
-    moveCursorWithoutShift(offset) {
+    moveCursorWithoutShift(offset: number) {
       if (offset < 0) {
         this.selectionStart += offset;
         this.selectionEnd = this.selectionStart;
@@ -542,9 +540,9 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
 
     /**
      * Moves cursor left
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      */
-    moveCursorLeft(e) {
+    moveCursorLeft(e: TPointerEvent) {
       if (this.selectionStart === 0 && this.selectionEnd === 0) {
         return;
       }
@@ -555,7 +553,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
      * @private
      * @return {Boolean} true if a change happened
      */
-    _move(e, prop, direction) {
+    _move(e, prop, direction): boolean {
       var newValue;
       if (e.altKey) {
         newValue = this['findWordBoundary' + direction](this[prop]);
@@ -587,9 +585,9 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
 
     /**
      * Moves cursor left without keeping selection
-     * @param {Event} e
+     * @param {TPointerEvent} e
      */
-    moveCursorLeftWithoutShift(e) {
+    moveCursorLeftWithoutShift(e: TPointerEvent) {
       var change = true;
       this._selectionDirection = 'left';
 
@@ -607,9 +605,9 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
 
     /**
      * Moves cursor left while keeping selection
-     * @param {Event} e
+     * @param {TPointerEvent} e
      */
-    moveCursorLeftWithShift(e) {
+    moveCursorLeftWithShift(e: TPointerEvent) {
       if (
         this._selectionDirection === 'right' &&
         this.selectionStart !== this.selectionEnd
@@ -623,9 +621,9 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
 
     /**
      * Moves cursor right
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      */
-    moveCursorRight(e) {
+    moveCursorRight(e: TPointerEvent) {
       if (
         this.selectionStart >= this._text.length &&
         this.selectionEnd >= this._text.length
@@ -638,9 +636,9 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
     /**
      * Moves cursor right or Left, fires event
      * @param {String} direction 'Left', 'Right'
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      */
-    _moveCursorLeftOrRight(direction, e) {
+    _moveCursorLeftOrRight(direction: string, e: TPointerEvent) {
       var actionName = 'moveCursor' + direction + 'With';
       this._currentCursorOpacity = 1;
 
@@ -659,9 +657,9 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
 
     /**
      * Moves cursor right while keeping selection
-     * @param {Event} e
+     * @param {TPointerEvent} e
      */
-    moveCursorRightWithShift(e) {
+    moveCursorRightWithShift(e: TPointerEvent) {
       if (
         this._selectionDirection === 'left' &&
         this.selectionStart !== this.selectionEnd
@@ -675,9 +673,9 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
 
     /**
      * Moves cursor right without keeping selection
-     * @param {Event} e Event object
+     * @param {TPointerEvent} e Event object
      */
-    moveCursorRightWithoutShift(e) {
+    moveCursorRightWithoutShift(e: TPointerEvent) {
       var changed = true;
       this._selectionDirection = 'right';
 
@@ -697,7 +695,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
      * @param {Number} start
      * @param {Number} end default to start + 1
      */
-    removeChars(start, end) {
+    removeChars(start: number, end: number) {
       if (typeof end === 'undefined') {
         end = start + 1;
       }
@@ -724,7 +722,7 @@ export function ITextKeyBehaviorMixinGenerator(Klass) {
      * @param {Number} start
      * @param {Number} end default to start + 1
      */
-    insertChars(text, style, start, end) {
+    insertChars(text: string, style: Array<any>, start: number, end: number) {
       if (typeof end === 'undefined') {
         end = start;
       }
