@@ -46,7 +46,10 @@ class WebGLProbe {
    * @param {TWebGLPrecision} Precision to test can be any of following
    * @returns {Boolean} Whether the user's browser WebGL supports given precision.
    */
-  private testPrecision(gl: WebGLRenderingContext, precision: TWebGLPrecision): boolean {
+  private testPrecision(
+    gl: WebGLRenderingContext,
+    precision: TWebGLPrecision
+  ): boolean {
     const fragmentSource = `precision ${precision} float;\nvoid main(){}`;
     const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
     if (!fragmentShader) {
@@ -84,16 +87,15 @@ class WebGLProbe {
 
 export const webGLProbe = new WebGLProbe();
 
-export function initFilterBackend(): WebGLFilterBackend | Canvas2dFilterBackend {
-  if (
-    config.enableGLFiltering &&
-    webGLProbe.isSupported(config.textureSize)
-  ) {
+export function initFilterBackend():
+  | WebGLFilterBackend
+  | Canvas2dFilterBackend {
+  if (config.enableGLFiltering && webGLProbe.isSupported(config.textureSize)) {
     return new WebGLFilterBackend({ tileSize: config.textureSize });
   } else {
     return new Canvas2dFilterBackend();
   }
-};
+}
 
 fabric.Canvas2dFilterBackend = Canvas2dFilterBackend;
 fabric.WebglFilterBackend = WebGLFilterBackend;

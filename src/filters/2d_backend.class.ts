@@ -20,7 +20,7 @@ export class Canvas2dFilterBackend {
    * in this object there will be appended some canvases, created once, resized sometimes
    * cleared never. Clearing is left to the developer.
    **/
-  resources = {}
+  resources = {};
 
   /**
    * Apply a set of filters against a source image and draw the filtered output
@@ -37,7 +37,7 @@ export class Canvas2dFilterBackend {
     sourceElement: HTMLImageElement | HTMLCanvasElement,
     sourceWidth: number,
     sourceHeight: number,
-    targetCanvas: HTMLCanvasElement,
+    targetCanvas: HTMLCanvasElement
   ): T2DPipelineState | void {
     const ctx = targetCanvas.getContext('2d');
     if (!ctx) {
@@ -45,12 +45,7 @@ export class Canvas2dFilterBackend {
     }
     ctx.drawImage(sourceElement, 0, 0, sourceWidth, sourceHeight);
     const imageData = ctx.getImageData(0, 0, sourceWidth, sourceHeight);
-    const originalImageData = ctx.getImageData(
-      0,
-      0,
-      sourceWidth,
-      sourceHeight
-    );
+    const originalImageData = ctx.getImageData(0, 0, sourceWidth, sourceHeight);
     const pipelineState: T2DPipelineState = {
       sourceWidth: sourceWidth,
       sourceHeight: sourceHeight,
@@ -74,4 +69,4 @@ export class Canvas2dFilterBackend {
     ctx.putImageData(pipelineState.imageData, 0, 0);
     return pipelineState;
   }
-};
+}

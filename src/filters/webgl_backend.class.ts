@@ -4,7 +4,6 @@ import { createCanvasElement } from '../util/misc/dom';
 import { TWebGLPipelineState, TProgramCache, TTextureCache } from './typedefs';
 
 export class WebGLFilterBackend {
-
   tileSize: number;
 
   /**
@@ -16,7 +15,7 @@ export class WebGLFilterBackend {
    * If GLPut data is the fastest operation, or if forced, this buffer will be used
    * to transfer the data back in the 2d logic
    **/
-  imageBuffer?: ArrayBuffer
+  imageBuffer?: ArrayBuffer;
 
   canvas: HTMLCanvasElement;
 
@@ -38,7 +37,7 @@ export class WebGLFilterBackend {
   /**
    * Contains GPU info for debug
    **/
-  gpuInfo: any
+  gpuInfo: any;
 
   /**
    * Experimental. This object is a sort of repository of help layers used to avoid
@@ -47,7 +46,7 @@ export class WebGLFilterBackend {
    * in this object there will be appended some canvases, created once, resized sometimes
    * cleared never. Clearing is left to the developer.
    **/
-  resources = {}
+  resources = {};
 
   constructor({ tileSize = config.textureSize } = {}) {
     if (tileSize) {
@@ -74,7 +73,6 @@ export class WebGLFilterBackend {
    * putImageData is faster than drawImage for that specific operation.
    */
   chooseFastestCopyGLTo2DMethod(width: number, height: number): void {
-
     const targetCanvas = createCanvasElement();
     // eslint-disable-next-line no-undef
     const imageBuffer = new ArrayBuffer(width * height * 4);
@@ -154,7 +152,7 @@ export class WebGLFilterBackend {
     width: number,
     height: number,
     targetCanvas: HTMLCanvasElement,
-    cacheKey?: string,
+    cacheKey?: string
   ): TWebGLPipelineState | undefined {
     const gl = this.gl;
     const ctx = targetCanvas.getContext('2d');
@@ -184,7 +182,12 @@ export class WebGLFilterBackend {
       targetTexture: this.createTexture(gl, width, height),
       originalTexture:
         cachedTexture ||
-        this.createTexture(gl, width, height, !cachedTexture ? source : undefined),
+        this.createTexture(
+          gl,
+          width,
+          height,
+          !cachedTexture ? source : undefined
+        ),
       passes: filters.length,
       webgl: true,
       aPosition: this.aPosition,
@@ -242,7 +245,12 @@ export class WebGLFilterBackend {
    * @param {HTMLImageElement|HTMLCanvasElement} textureImageSource A source for the texture data.
    * @returns {WebGLTexture}
    */
-  createTexture(gl: WebGLRenderingContext, width: number, height: number, textureImageSource?: TexImageSource) {
+  createTexture(
+    gl: WebGLRenderingContext,
+    width: number,
+    height: number,
+    textureImageSource?: TexImageSource
+  ) {
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -322,7 +330,7 @@ export class WebGLFilterBackend {
    */
   copyGLTo2D(gl: WebGLRenderingContext, pipelineState: TWebGLPipelineState) {
     const glCanvas = gl.canvas,
-    targetCanvas = pipelineState.targetCanvas,
+      targetCanvas = pipelineState.targetCanvas,
       ctx = targetCanvas.getContext('2d');
     if (!ctx) {
       return;
@@ -397,7 +405,11 @@ function resizeCanvasIfNeeded(pipelineState: TWebGLPipelineState): void {
  * @param {HTMLCanvasElement} targetCanvas The 2D target canvas to copy on to.
  * @param {Object} pipelineState The 2D target canvas to copy on to.
  */
-function copyGLTo2DPutImageData(this: Required<WebGLFilterBackend>, gl: WebGLRenderingContext, pipelineState: TWebGLPipelineState) {
+function copyGLTo2DPutImageData(
+  this: Required<WebGLFilterBackend>,
+  gl: WebGLRenderingContext,
+  pipelineState: TWebGLPipelineState
+) {
   const targetCanvas = pipelineState.targetCanvas,
     ctx = targetCanvas.getContext('2d'),
     dWidth = pipelineState.destinationWidth,

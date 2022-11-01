@@ -23,7 +23,7 @@ export type TWebGLPipelineState = {
   programCache: TProgramCache;
   pass: number;
   targetCanvas: HTMLCanvasElement;
-}
+};
 
 export type T2DPipelineState = {
   sourceWidth: number;
@@ -34,8 +34,6 @@ export type T2DPipelineState = {
   originalEl: HTMLCanvasElement | HTMLImageElement;
   originalImageData?: ImageData;
   ctx: CanvasRenderingContext2D;
-}
+};
 
-export type TApplyFilterArgs = {
-
-}
+export type TApplyFilterArgs = {};
