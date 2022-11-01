@@ -4,21 +4,11 @@ import { createCanvasElement } from '../util/misc/dom';
 import { Canvas2dFilterBackend } from './2d_backend.class';
 import { WebGLFilterBackend } from './webgl_backend.class';
 
-export const enum TWebGLPrecision {
+export const enum WebGLPrecision {
   low = 'lowp',
   medium = 'mediump',
   high = 'highp',
 }
-
-/**
- * @todo remove once rollup supports transforming enums...
- * https://github.com/rollup/plugins/issues/463
- */
-const WebGLPrecision = [
-  TWebGLPrecision.low,
-  TWebGLPrecision.medium,
-  TWebGLPrecision.high,
-];
 
 /**
  * Lazy initialize WebGL contants
@@ -28,7 +18,7 @@ class WebGLProbe {
 
   private _maxTextureSize?: number;
 
-  private _webGLPrecision?: TWebGLPrecision;
+  private _webGLPrecision: WebGLPrecision;
 
   get maxTextureSize() {
     this.queryWebGL();
@@ -43,12 +33,12 @@ class WebGLProbe {
   /**
    * Tests if webgl supports certain precision
    * @param {WebGL} Canvas WebGL context to test on
-   * @param {TWebGLPrecision} Precision to test can be any of following
+   * @param {WebGLPrecision} Precision to test can be any of following
    * @returns {Boolean} Whether the user's browser WebGL supports given precision.
    */
   private testPrecision(
     gl: WebGLRenderingContext,
-    precision: TWebGLPrecision
+    precision: WebGLPrecision
   ): boolean {
     const fragmentSource = `precision ${precision} float;\nvoid main(){}`;
     const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
