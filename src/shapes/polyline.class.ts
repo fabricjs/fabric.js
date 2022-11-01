@@ -39,8 +39,12 @@ export class Polyline extends FabricObject {
    * @todo check if you really need to recalculate for all cases
    */
   strokeBBoxAffectingProperties: (keyof this)[];
+
   fromSVG: boolean;
+
   pathOffset: Point;
+
+  strokeOffset: Point;
 
   /**
    * Constructor
@@ -227,7 +231,7 @@ export class Polyline extends FabricObject {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  commonRender(ctx: CanvasRenderingContext2D) {
+  _render(ctx: CanvasRenderingContext2D) {
     const len = this.points.length,
       x = this.pathOffset.x,
       y = this.pathOffset.y;
@@ -235,24 +239,13 @@ export class Polyline extends FabricObject {
     if (!len || isNaN(this.points[len - 1].y)) {
       // do not draw if no points or odd points
       // NaN comes from parseFloat of a empty string in parser
-      return false;
+      return;
     }
     ctx.beginPath();
     ctx.moveTo(this.points[0].x - x, this.points[0].y - y);
     for (let i = 0; i < len; i++) {
       const point = this.points[i];
       ctx.lineTo(point.x - x, point.y - y);
-    }
-    return true;
-  }
-
-  /**
-   * @private
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   */
-  _render(ctx: CanvasRenderingContext2D) {
-    if (!this.commonRender(ctx)) {
-      return;
     }
     !this.isOpen() && ctx.closePath();
     this._renderPaintInOrder(ctx);
@@ -266,6 +259,8 @@ export class Polyline extends FabricObject {
     return this.points.length;
   }
 
+  /* _FROM_SVG_START_ */
+
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link Polyline.fromElement})
    * @static
@@ -273,8 +268,6 @@ export class Polyline extends FabricObject {
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolylineElement
    */
   static ATTRIBUTE_NAMES = [...SHARED_ATTRIBUTES];
-
-  static fromElement = Polyline.fromElementGenerator(Polyline);
 
   /**
    * Returns Polyline instance from an SVG element
@@ -315,6 +308,10 @@ export class Polyline extends FabricObject {
     };
   }
 
+  static fromElement = Polyline.fromElementGenerator(Polyline);
+
+  /* _FROM_SVG_END_ */
+
   /**
    * Returns Polyline instance from an object representation
    * @static
@@ -351,7 +348,3 @@ Object.assign(Polyline.prototype, polylineDefaultValues);
 
 /** @todo TODO_JS_MIGRATION remove next line after refactoring build */
 fabric.Polyline = Polyline;
-
-/* _FROM_SVG_START_ */
-
-/* _FROM_SVG_END_ */
