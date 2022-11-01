@@ -3,7 +3,7 @@ import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
-import { Point } from '../point.class';
+import { IPoint, Point } from '../point.class';
 import { TClassProperties } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
@@ -18,7 +18,7 @@ export class Polyline extends FabricObject {
    * @type Array
    * @default
    */
-  points: Point[];
+  points: IPoint[];
 
   /**
    * WARNING: Feature in progress
@@ -65,7 +65,7 @@ export class Polyline extends FabricObject {
    *   top: 100
    * });
    */
-  constructor(points: Point[] = [], options: any = {}) {
+  constructor(points: IPoint[] = [], options: any = {}) {
     super({ points, ...options });
     this.initialized = true;
     const bboxTL = this.setDimensions();
@@ -279,7 +279,7 @@ export class Polyline extends FabricObject {
    */
   static fromElementGenerator<
     T extends {
-      new (points: Point[], options: any): any;
+      new (points: IPoint[], options: any): any;
       ATTRIBUTE_NAMES: string[];
     }
   >(klass: T) {
