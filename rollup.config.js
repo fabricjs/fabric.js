@@ -11,6 +11,12 @@ const splitter = /\n|\s|,/g;
 export default {
   input: process.env.BUILD_INPUT?.split(splitter) || ['./index.js'],
   output: [
+    {
+      file: process.env.BUILD_OUTPUT || './dist/fabric.js',
+      name: 'fabric',
+      format: 'cjs',
+      sourcemap: true,
+    },
     Number(process.env.MINIFY)
       ? {
           file: process.env.BUILD_MIN_OUTPUT || './dist/fabric.min.js',
@@ -25,12 +31,6 @@ export default {
           ],
         }
       : null,
-    {
-      file: process.env.BUILD_OUTPUT || './dist/fabric.js',
-      name: 'fabric',
-      format: 'cjs',
-      sourcemap: true,
-    },
   ],
   // see list of plugins (not comprehensive): https://github.com/rollup/awesome
   plugins: [
