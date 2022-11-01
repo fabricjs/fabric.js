@@ -333,7 +333,6 @@ export class Polyline extends FabricObject {
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   type: 'polyline',
-  points: [],
   exactBoundingBox: false,
   cacheProperties: fabricObjectDefaultValues.cacheProperties.concat('points'),
   strokeBBoxAffectingProperties: [
