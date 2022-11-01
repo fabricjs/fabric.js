@@ -1,5 +1,5 @@
 //@ts-nocheck
-var fabric = global.fabric || (global.fabric = {});
+const fabric = global.fabric || (global.fabric = {});
 
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
@@ -111,12 +111,12 @@ export class Textbox extends fabric.IText {
    * @private
    */
   _generateStyleMap(textInfo) {
-    var realLineCount = 0,
+    let realLineCount = 0,
       realLineCharCount = 0,
       charCount = 0,
       map = {};
 
-    for (var i = 0; i < textInfo.graphemeLines.length; i++) {
+    for (let i = 0; i < textInfo.graphemeLines.length; i++) {
       if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
         realLineCharCount = 0;
         charCount++;
@@ -147,7 +147,7 @@ export class Textbox extends fabric.IText {
    */
   styleHas(property, lineIndex: number): boolean {
     if (this._styleMap && !this.isWrapping) {
-      var map = this._styleMap[lineIndex];
+      const map = this._styleMap[lineIndex];
       if (map) {
         lineIndex = map.line;
       }
@@ -164,7 +164,7 @@ export class Textbox extends fabric.IText {
     if (!this.styles) {
       return true;
     }
-    var offset = 0,
+    let offset = 0,
       nextLineIndex = lineIndex + 1,
       nextOffset,
       obj,
@@ -184,11 +184,11 @@ export class Textbox extends fabric.IText {
       typeof lineIndex === 'undefined'
         ? this.styles
         : { line: this.styles[lineIndex] };
-    for (var p1 in obj) {
-      for (var p2 in obj[p1]) {
+    for (const p1 in obj) {
+      for (const p2 in obj[p1]) {
         if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
           // eslint-disable-next-line no-unused-vars
-          for (var p3 in obj[p1][p2]) {
+          for (const p3 in obj[p1][p2]) {
             return false;
           }
         }
@@ -204,7 +204,7 @@ export class Textbox extends fabric.IText {
    */
   _getStyleDeclaration(lineIndex: number, charIndex: number) {
     if (this._styleMap && !this.isWrapping) {
-      var map = this._styleMap[lineIndex];
+      const map = this._styleMap[lineIndex];
       if (!map) {
         return null;
       }
@@ -221,7 +221,7 @@ export class Textbox extends fabric.IText {
    * @private
    */
   _setStyleDeclaration(lineIndex: number, charIndex: number, style: object) {
-    var map = this._styleMap[lineIndex];
+    const map = this._styleMap[lineIndex];
     lineIndex = map.line;
     charIndex = map.offset + charIndex;
 
@@ -234,7 +234,7 @@ export class Textbox extends fabric.IText {
    * @private
    */
   _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
-    var map = this._styleMap[lineIndex];
+    const map = this._styleMap[lineIndex];
     lineIndex = map.line;
     charIndex = map.offset + charIndex;
     delete this.styles[lineIndex][charIndex];
@@ -249,7 +249,7 @@ export class Textbox extends fabric.IText {
    * @private
    */
   _getLineStyle(lineIndex: number): boolean {
-    var map = this._styleMap[lineIndex];
+    const map = this._styleMap[lineIndex];
     return !!this.styles[map.line];
   }
 
@@ -260,7 +260,7 @@ export class Textbox extends fabric.IText {
    * @private
    */
   _setLineStyle(lineIndex: number) {
-    var map = this._styleMap[lineIndex];
+    const map = this._styleMap[lineIndex];
     this.styles[map.line] = {};
   }
 
@@ -274,7 +274,7 @@ export class Textbox extends fabric.IText {
    * @returns {Array} Array of lines
    */
   _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
-    var wrapped = [],
+    let wrapped = [],
       i;
     this.isWrapping = true;
     for (i = 0; i < lines.length; i++) {
@@ -297,12 +297,12 @@ export class Textbox extends fabric.IText {
    * @returns {number}
    */
   _measureWord(word, lineIndex: number, charOffset: number): number {
-    var width = 0,
+    let width = 0,
       prevGrapheme,
       skipLeft = true;
     charOffset = charOffset || 0;
-    for (var i = 0, len = word.length; i < len; i++) {
-      var box = this._getGraphemeBox(
+    for (let i = 0, len = word.length; i < len; i++) {
+      const box = this._getGraphemeBox(
         word[i],
         lineIndex,
         i + charOffset,
@@ -363,17 +363,17 @@ export class Textbox extends fabric.IText {
     }
     desiredWidth -= reservedSpace;
     // measure words
-    var data = words.map(
+    const data = words.map(
       function (word) {
         // if using splitByGrapheme words are already in graphemes.
         word = splitByGrapheme ? word : this.graphemeSplit(word);
-        var width = this._measureWord(word, lineIndex, offset);
+        const width = this._measureWord(word, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
         offset += word.length + 1;
         return { word: word, width: width };
       }.bind(this)
     );
-    var maxWidth = Math.max(
+    const maxWidth = Math.max(
       desiredWidth,
       largestWordWidth,
       this.dynamicMinWidth
@@ -453,10 +453,10 @@ export class Textbox extends fabric.IText {
    * @override
    */
   _splitTextIntoLines(text: string): Array<any> {
-    var newText = fabric.Text.prototype._splitTextIntoLines.call(this, text),
+    const newText = fabric.Text.prototype._splitTextIntoLines.call(this, text),
       graphemeLines = this._wrapText(newText.lines, this.width),
       lines = new Array(graphemeLines.length);
-    for (var i = 0; i < graphemeLines.length; i++) {
+    for (let i = 0; i < graphemeLines.length; i++) {
       lines[i] = graphemeLines[i].join('');
     }
     newText.lines = lines;
@@ -469,7 +469,7 @@ export class Textbox extends fabric.IText {
   }
 
   _removeExtraneousStyles() {
-    var linesToKeep = {};
+    const linesToKeep = {};
     for (var prop in this._styleMap) {
       if (this._textLines[prop]) {
         linesToKeep[this._styleMap[prop].line] = 1;
@@ -502,9 +502,9 @@ export class Textbox extends fabric.IText {
    * @returns {Promise<Textbox>}
    */
   static fromObject(object: object): Promise<Textbox> {
-    var styles = stylesFromArray(object.styles, object.text);
+    const styles = stylesFromArray(object.styles, object.text);
     //copy object to prevent mutation
-    var objCopy = Object.assign({}, object, { styles: styles });
+    const objCopy = Object.assign({}, object, { styles: styles });
     return FabricObject._fromObject(Textbox, objCopy, {
       extraParam: 'text',
     });

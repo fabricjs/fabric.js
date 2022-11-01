@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { FabricObject } from './fabricObject.class';
 
-var fabric = global.fabric;
+const fabric = global.fabric;
 /**
  * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
  * prefix when observing canvas.
@@ -279,11 +279,11 @@ export class IText extends fabric.Text {
     if (!this.isEditing) {
       return;
     }
-    var ctx = this.clearContextTop(true);
+    const ctx = this.clearContextTop(true);
     if (!ctx) {
       return;
     }
-    var boundaries = this._getCursorBoundaries();
+    const boundaries = this._getCursorBoundaries();
     if (this.selectionStart === this.selectionEnd) {
       this.renderCursor(ctx, boundaries);
     } else {
@@ -298,7 +298,7 @@ export class IText extends fabric.Text {
    * If contextTop is not available, do nothing.
    */
   renderCursorAt(selectionStart) {
-    var boundaries = this._getCursorBoundaries(selectionStart, true);
+    const boundaries = this._getCursorBoundaries(selectionStart, true);
     this._renderCursor(this.canvas.contextTop, boundaries, selectionStart);
   }
 
@@ -314,7 +314,7 @@ export class IText extends fabric.Text {
     if (typeof index === 'undefined') {
       index = this.selectionStart;
     }
-    var left = this._getLeftOffset(),
+    const left = this._getLeftOffset(),
       top = this._getTopOffset(),
       offsets = this._getCursorBoundariesOffsets(index, skipCaching);
     return {
@@ -347,7 +347,7 @@ export class IText extends fabric.Text {
    * @param {number} index index from start
    */
   __getCursorBoundariesOffsets(index: number) {
-    var lineLeftOffset,
+    let lineLeftOffset,
       lineIndex,
       charIndex,
       topOffset = 0,
@@ -356,11 +356,11 @@ export class IText extends fabric.Text {
       cursorPosition = this.get2DCursorLocation(index);
     charIndex = cursorPosition.charIndex;
     lineIndex = cursorPosition.lineIndex;
-    for (var i = 0; i < lineIndex; i++) {
+    for (let i = 0; i < lineIndex; i++) {
       topOffset += this.getHeightOfLine(i);
     }
     lineLeftOffset = this._getLineLeftOffset(lineIndex);
-    var bound = this.__charBounds[lineIndex][charIndex];
+    const bound = this.__charBounds[lineIndex][charIndex];
     bound && (leftOffset = bound.left);
     if (
       this.charSpacing !== 0 &&
@@ -404,7 +404,7 @@ export class IText extends fabric.Text {
   }
 
   _renderCursor(ctx, boundaries, selectionStart) {
-    var cursorLocation = this.get2DCursorLocation(selectionStart),
+    let cursorLocation = this.get2DCursorLocation(selectionStart),
       lineIndex = cursorLocation.lineIndex,
       charIndex =
         cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
@@ -441,7 +441,7 @@ export class IText extends fabric.Text {
    * @param {CanvasRenderingContext2D} ctx transformed context to draw on
    */
   renderSelection(ctx: CanvasRenderingContext2D, boundaries: object) {
-    var selection = {
+    const selection = {
       selectionStart: this.inCompositionMode
         ? this.hiddenTextarea.selectionStart
         : this.selectionStart,
@@ -473,7 +473,7 @@ export class IText extends fabric.Text {
   }
 
   renderDropTargetEffect(e) {
-    var dragSelection = this.getSelectionStartFromPointer(e);
+    const dragSelection = this.getSelectionStartFromPointer(e);
     this.renderCursorAt(dragSelection);
   }
 
@@ -489,7 +489,7 @@ export class IText extends fabric.Text {
     selection: { selectionStart: number; selectionEnd: number },
     boundaries: object
   ) {
-    var selectionStart = selection.selectionStart,
+    const selectionStart = selection.selectionStart,
       selectionEnd = selection.selectionEnd,
       isJustify = this.textAlign.indexOf('justify') !== -1,
       start = this.get2DCursorLocation(selectionStart),
@@ -499,8 +499,8 @@ export class IText extends fabric.Text {
       startChar = start.charIndex < 0 ? 0 : start.charIndex,
       endChar = end.charIndex < 0 ? 0 : end.charIndex;
 
-    for (var i = startLine; i <= endLine; i++) {
-      var lineOffset = this._getLineLeftOffset(i) || 0,
+    for (let i = startLine; i <= endLine; i++) {
+      let lineOffset = this._getLineLeftOffset(i) || 0,
         lineHeight = this.getHeightOfLine(i),
         realLineHeight = 0,
         boxStart = 0,
@@ -518,7 +518,7 @@ export class IText extends fabric.Text {
         if (endChar === 0) {
           boxEnd = this.__charBounds[endLine][endChar].left;
         } else {
-          var charSpacing = this._getWidthOfCharSpacing();
+          const charSpacing = this._getWidthOfCharSpacing();
           boxEnd =
             this.__charBounds[endLine][endChar - 1].left +
             this.__charBounds[endLine][endChar - 1].width -
@@ -529,7 +529,7 @@ export class IText extends fabric.Text {
       if (this.lineHeight < 1 || (i === endLine && this.lineHeight > 1)) {
         lineHeight /= this.lineHeight;
       }
-      var drawStart = boundaries.left + lineOffset + boxStart,
+      let drawStart = boundaries.left + lineOffset + boxStart,
         drawWidth = boxEnd - boxStart,
         drawHeight = lineHeight,
         extraTop = 0;
@@ -577,7 +577,7 @@ export class IText extends fabric.Text {
    * @return {Number} Character font size
    */
   getCurrentCharFontSize(): number {
-    var cp = this._getCurrentCharIndex();
+    const cp = this._getCurrentCharIndex();
     return this.getValueOfPropertyAt(cp.l, cp.c, 'fontSize');
   }
 
@@ -590,7 +590,7 @@ export class IText extends fabric.Text {
    * @return {String | fabric.Gradient | fabric.Pattern} Character color (fill)
    */
   getCurrentCharColor(): string | fabric.Gradient | fabric.Pattern {
-    var cp = this._getCurrentCharIndex();
+    const cp = this._getCurrentCharIndex();
     return this.getValueOfPropertyAt(cp.l, cp.c, 'fill');
   }
 
@@ -599,7 +599,7 @@ export class IText extends fabric.Text {
    * @private
    */
   _getCurrentCharIndex() {
-    var cursorPosition = this.get2DCursorLocation(this.selectionStart, true),
+    const cursorPosition = this.get2DCursorLocation(this.selectionStart, true),
       charIndex =
         cursorPosition.charIndex > 0 ? cursorPosition.charIndex - 1 : 0;
     return { l: cursorPosition.lineIndex, c: charIndex };
@@ -613,9 +613,9 @@ export class IText extends fabric.Text {
    * @returns {Promise<IText>}
    */
   static fromObject(object: object): Promise<IText> {
-    var styles = stylesFromArray(object.styles, object.text);
+    const styles = stylesFromArray(object.styles, object.text);
     //copy object to prevent mutation
-    var objCopy = Object.assign({}, object, { styles: styles });
+    const objCopy = Object.assign({}, object, { styles: styles });
     return FabricObject._fromObject(IText, objCopy, {
       extraParam: 'text',
     });
