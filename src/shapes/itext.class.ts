@@ -149,7 +149,7 @@ export class IText extends fabric.Text {
    * @type HTMLElement
    * @default
    */
-  hiddenTextareaContainer;
+  hiddenTextareaContainer: HTMLElement;
 
   /**
    * @private
@@ -178,7 +178,7 @@ export class IText extends fabric.Text {
    * @param {Object} [options] Options object
    * @return {IText} thisArg
    */
-  constructor(text, options) {
+  constructor(text: string, options: object): IText {
     super(text, options);
     this.initBehavior();
   }
@@ -189,7 +189,7 @@ export class IText extends fabric.Text {
    * @param {string} key
    * @param {*} value
    */
-  _set(key, value) {
+  _set(key: string, value: any) {
     if (this.isEditing && this._savedProps && key in this._savedProps) {
       this._savedProps[key] = value;
     } else {
@@ -201,7 +201,7 @@ export class IText extends fabric.Text {
    * Sets selection start (left boundary of a selection)
    * @param {Number} index Index to set selection start to
    */
-  setSelectionStart(index) {
+  setSelectionStart(index: number) {
     index = Math.max(index, 0);
     this._updateAndFire('selectionStart', index);
   }
@@ -210,7 +210,7 @@ export class IText extends fabric.Text {
    * Sets selection end (right boundary of a selection)
    * @param {Number} index Index to set selection end to
    */
-  setSelectionEnd(index) {
+  setSelectionEnd(index: number) {
     index = Math.min(index, this.text.length);
     this._updateAndFire('selectionEnd', index);
   }
@@ -220,7 +220,7 @@ export class IText extends fabric.Text {
    * @param {String} property 'selectionStart' or 'selectionEnd'
    * @param {Number} index new position of property
    */
-  _updateAndFire(property, index) {
+  _updateAndFire(property: string, index: number) {
     if (this[property] !== index) {
       this._fireSelectionChanged();
       this[property] = index;
@@ -254,7 +254,7 @@ export class IText extends fabric.Text {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  render(ctx) {
+  render(ctx: CanvasRenderingContext2D) {
     this.clearContextTop();
     super.render(ctx);
     // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
@@ -267,7 +267,7 @@ export class IText extends fabric.Text {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _render(ctx) {
+  _render(ctx: CanvasRenderingContext2D) {
     super._render(ctx);
   }
 
@@ -310,7 +310,7 @@ export class IText extends fabric.Text {
    * @param {number} [index] index from start
    * @param {boolean} [skipCaching]
    */
-  _getCursorBoundaries(index, skipCaching) {
+  _getCursorBoundaries(index: number, skipCaching: boolean) {
     if (typeof index === 'undefined') {
       index = this.selectionStart;
     }
@@ -331,7 +331,7 @@ export class IText extends fabric.Text {
    * @param {number} index index from start
    * @param {boolean} [skipCaching]
    */
-  _getCursorBoundariesOffsets(index, skipCaching) {
+  _getCursorBoundariesOffsets(index: number, skipCaching: boolean) {
     if (skipCaching) {
       return this.__getCursorBoundariesOffsets(index);
     }
@@ -346,7 +346,7 @@ export class IText extends fabric.Text {
    * @private
    * @param {number} index index from start
    */
-  __getCursorBoundariesOffsets(index) {
+  __getCursorBoundariesOffsets(index: number) {
     var lineLeftOffset,
       lineIndex,
       charIndex,
@@ -399,7 +399,7 @@ export class IText extends fabric.Text {
    * @param {Object} boundaries
    * @param {CanvasRenderingContext2D} ctx transformed context to draw on
    */
-  renderCursor(ctx, boundaries) {
+  renderCursor(ctx: CanvasRenderingContext2D, boundaries: object) {
     this._renderCursor(ctx, boundaries, this.selectionStart);
   }
 
@@ -440,7 +440,7 @@ export class IText extends fabric.Text {
    * @param {Object} boundaries Object with left/top/leftOffset/topOffset
    * @param {CanvasRenderingContext2D} ctx transformed context to draw on
    */
-  renderSelection(ctx, boundaries) {
+  renderSelection(ctx: CanvasRenderingContext2D, boundaries: object) {
     var selection = {
       selectionStart: this.inCompositionMode
         ? this.hiddenTextarea.selectionStart
@@ -484,7 +484,11 @@ export class IText extends fabric.Text {
    * @param {Object} boundaries Object with left/top/leftOffset/topOffset
    * @param {CanvasRenderingContext2D} ctx transformed context to draw on
    */
-  _renderSelection(ctx, selection, boundaries) {
+  _renderSelection(
+    ctx: CanvasRenderingContext2D,
+    selection: { selectionStart: number; selectionEnd: number },
+    boundaries: object
+  ) {
     var selectionStart = selection.selectionStart,
       selectionEnd = selection.selectionEnd,
       isJustify = this.textAlign.indexOf('justify') !== -1,
@@ -572,7 +576,7 @@ export class IText extends fabric.Text {
    * Unused from the library, is for the end user
    * @return {Number} Character font size
    */
-  getCurrentCharFontSize() {
+  getCurrentCharFontSize(): number {
     var cp = this._getCurrentCharIndex();
     return this.getValueOfPropertyAt(cp.l, cp.c, 'fontSize');
   }
@@ -585,7 +589,7 @@ export class IText extends fabric.Text {
    * Unused by the library, is for the end user
    * @return {String | fabric.Gradient | fabric.Pattern} Character color (fill)
    */
-  getCurrentCharColor() {
+  getCurrentCharColor(): string | fabric.Gradient | fabric.Pattern {
     var cp = this._getCurrentCharIndex();
     return this.getValueOfPropertyAt(cp.l, cp.c, 'fill');
   }
@@ -608,7 +612,7 @@ export class IText extends fabric.Text {
    * @param {Object} object Object to create an instance from
    * @returns {Promise<IText>}
    */
-  static fromObject(object) {
+  static fromObject(object: object): Promise<IText> {
     var styles = stylesFromArray(object.styles, object.text);
     //copy object to prevent mutation
     var objCopy = Object.assign({}, object, { styles: styles });

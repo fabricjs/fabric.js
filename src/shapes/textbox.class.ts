@@ -39,7 +39,7 @@ export class Textbox extends fabric.IText {
    * Cached array of text wrapping.
    * @type Array
    */
-  __cachedLines;
+  __cachedLines: Array<any>;
 
   /**
    * Override standard Object class values
@@ -57,7 +57,7 @@ export class Textbox extends fabric.IText {
    * @type Object
    * @private
    */
-  _dimensionAffectingProps;
+  _dimensionAffectingProps: object;
 
   /**
    * Use this regular expression to split strings in breakable lines
@@ -145,7 +145,7 @@ export class Textbox extends fabric.IText {
    * @param {Number} lineIndex
    * @return {Boolean}
    */
-  styleHas(property, lineIndex) {
+  styleHas(property, lineIndex: number): boolean {
     if (this._styleMap && !this.isWrapping) {
       var map = this._styleMap[lineIndex];
       if (map) {
@@ -160,7 +160,7 @@ export class Textbox extends fabric.IText {
    * @param {Number} lineIndex , lineIndex is on wrapped lines.
    * @return {Boolean}
    */
-  isEmptyStyles(lineIndex) {
+  isEmptyStyles(lineIndex: number): boolean {
     if (!this.styles) {
       return true;
     }
@@ -202,7 +202,7 @@ export class Textbox extends fabric.IText {
    * @param {Number} charIndex
    * @private
    */
-  _getStyleDeclaration(lineIndex, charIndex) {
+  _getStyleDeclaration(lineIndex: number, charIndex: number) {
     if (this._styleMap && !this.isWrapping) {
       var map = this._styleMap[lineIndex];
       if (!map) {
@@ -220,7 +220,7 @@ export class Textbox extends fabric.IText {
    * @param {Object} style
    * @private
    */
-  _setStyleDeclaration(lineIndex, charIndex, style) {
+  _setStyleDeclaration(lineIndex: number, charIndex: number, style: object) {
     var map = this._styleMap[lineIndex];
     lineIndex = map.line;
     charIndex = map.offset + charIndex;
@@ -233,7 +233,7 @@ export class Textbox extends fabric.IText {
    * @param {Number} charIndex
    * @private
    */
-  _deleteStyleDeclaration(lineIndex, charIndex) {
+  _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
     var map = this._styleMap[lineIndex];
     lineIndex = map.line;
     charIndex = map.offset + charIndex;
@@ -248,7 +248,7 @@ export class Textbox extends fabric.IText {
    * @returns {Boolean} if the line exists or not
    * @private
    */
-  _getLineStyle(lineIndex) {
+  _getLineStyle(lineIndex: number): boolean {
     var map = this._styleMap[lineIndex];
     return !!this.styles[map.line];
   }
@@ -259,7 +259,7 @@ export class Textbox extends fabric.IText {
    * @param {Object} style
    * @private
    */
-  _setLineStyle(lineIndex) {
+  _setLineStyle(lineIndex: number) {
     var map = this._styleMap[lineIndex];
     this.styles[map.line] = {};
   }
@@ -273,7 +273,7 @@ export class Textbox extends fabric.IText {
    * @param {Number} desiredWidth width you want to wrap to
    * @returns {Array} Array of lines
    */
-  _wrapText(lines, desiredWidth) {
+  _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
     var wrapped = [],
       i;
     this.isWrapping = true;
@@ -296,7 +296,7 @@ export class Textbox extends fabric.IText {
    * @param {number} charOffset
    * @returns {number}
    */
-  _measureWord(word, lineIndex, charOffset) {
+  _measureWord(word, lineIndex: number, charOffset: number): number {
     var width = 0,
       prevGrapheme,
       skipLeft = true;
@@ -321,7 +321,7 @@ export class Textbox extends fabric.IText {
    * @param {string} value
    * @returns {string[]} array of words
    */
-  wordSplit(value) {
+  wordSplit(value: string): string[] {
     return value.split(this._wordJoiners);
   }
 
@@ -334,7 +334,12 @@ export class Textbox extends fabric.IText {
    * @returns {Array} Array of line(s) into which the given text is wrapped
    * to.
    */
-  _wrapLine(_line, lineIndex, desiredWidth, reservedSpace) {
+  _wrapLine(
+    _line,
+    lineIndex: number,
+    desiredWidth: number,
+    reservedSpace: number
+  ): Array<any> {
     var lineWidth = 0,
       splitByGrapheme = this.splitByGrapheme,
       graphemeLines = [],
@@ -416,7 +421,7 @@ export class Textbox extends fabric.IText {
    * @param {Number} lineIndex text to split
    * @return {Boolean}
    */
-  isEndOfWrapping(lineIndex) {
+  isEndOfWrapping(lineIndex: number): boolean {
     if (!this._styleMap[lineIndex + 1]) {
       // is last line, return true;
       return true;
@@ -447,7 +452,7 @@ export class Textbox extends fabric.IText {
    * @returns {Array} Array of lines in the Textbox.
    * @override
    */
-  _splitTextIntoLines(text) {
+  _splitTextIntoLines(text: string): Array<any> {
     var newText = fabric.Text.prototype._splitTextIntoLines.call(this, text),
       graphemeLines = this._wrapText(newText.lines, this.width),
       lines = new Array(graphemeLines.length);
@@ -483,7 +488,7 @@ export class Textbox extends fabric.IText {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude) {
+  toObject(propertiesToInclude: Array<any>): object {
     return super.toObject(
       ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
     );
@@ -496,7 +501,7 @@ export class Textbox extends fabric.IText {
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Textbox>}
    */
-  static fromObject(object) {
+  static fromObject(object: object): Promise<Textbox> {
     var styles = stylesFromArray(object.styles, object.text);
     //copy object to prevent mutation
     var objCopy = Object.assign({}, object, { styles: styles });
