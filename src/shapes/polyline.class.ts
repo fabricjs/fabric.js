@@ -154,9 +154,7 @@ import { calcDimensionsMatrix, transformPoint } from '../util/misc/matrix';
         }
         const bbox = makeBoundingBoxFromPoints(points),
           // Remove scale effect, since it's applied after
-          matrix = calcDimensionsMatrix(
-            Object.assign(options, { scaleX: 1, scaleY: 1 })
-          ),
+          matrix = calcDimensionsMatrix({ ...options, scaleX: 1, scaleY: 1 }),
           bboxNoStroke = makeBoundingBoxFromPoints(
             this.points.map((p) => transformPoint(p, matrix, true))
           ),
