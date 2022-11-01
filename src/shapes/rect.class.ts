@@ -121,7 +121,9 @@ export class Rect extends FabricObject {
     return [
       '<rect ',
       'COMMON_PARTS',
-      `x="${-width / 2}" y="${-height / 2}" rx="${rx}" ry="${ry}" width="${width}" height="${height}" />\n`,
+      `x="${-width / 2}" y="${
+        -height / 2
+      }" rx="${rx}" ry="${ry}" width="${width}" height="${height}" />\n`,
     ];
   }
 
