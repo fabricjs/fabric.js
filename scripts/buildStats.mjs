@@ -9,7 +9,7 @@ const MAX_COMMENT_CHARS = 65536;
 function printSize(a, b) {
   const diff = b - a;
   return `${b.toFixed(3)} (**${Math.sign(diff) > 0 ? '+' : ''}${diff.toFixed(
-    3
+    diff !== 0 ? 3 : 0
   )}**)`;
 }
 
@@ -47,7 +47,7 @@ export async function run({ github, context, a, b }) {
 
   const table = [
     ['file / KB (diff)', 'bundled', 'minified', 'gzipped'],
-    ['---', '---', '---', '---', '---'],
+    ['---', '---', '---', '---'],
     ..._.map(b.size, (_b, file) => {
       const _a = {
         bundled: 0,
