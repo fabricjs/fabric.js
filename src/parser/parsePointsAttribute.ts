@@ -1,7 +1,5 @@
 //@ts-nocheck
 
-import { Point } from '../point.class';
-
 /**
  * Parses "points" attribute, returning an array of values
  * @static
@@ -19,12 +17,15 @@ export function parsePointsAttribute(points) {
   points = points.replace(/,/g, ' ').trim();
 
   points = points.split(/\s+/);
-  const parsedPoints: Point[] = [];
+  let parsedPoints = [],
+    i,
+    len;
 
-  for (let i = 0; i < points.length; i += 2) {
-    parsedPoints.push(
-      new Point(parseFloat(points[i]), parseFloat(points[i + 1]))
-    );
+  for (i = 0, len = points.length; i < len; i += 2) {
+    parsedPoints.push({
+      x: parseFloat(points[i]),
+      y: parseFloat(points[i + 1]),
+    });
   }
 
   // odd number of points is an error
