@@ -7,21 +7,28 @@ type TAncestor = FabricObject | StaticCanvas;
 
 type TStrictAncestor = Group | StaticCanvas;
 
-export type Ancestors = FabricObject[] | [...FabricObject[], StaticCanvas];
+export type Ancestors<Strict> = Strict extends true
+  ? [FabricObject | Group] | [FabricObject | Group, ...Group[]] | Group[]
+  :
+      | [FabricObject | Group | StaticCanvas]
+      | [FabricObject | Group, StaticCanvas]
+      | [FabricObject, ...Group[]]
+      | Group[]
+      | [FabricObject | Group, ...Group[], StaticCanvas];
 
-export type AncestryComparison = {
+export type AncestryComparison<Strict> = {
   /**
    * common ancestors of `this` and`other`(may include`this` | `other`)
    */
-  common: Ancestors;
+  common: Ancestors<Strict>;
   /**
    * ancestors that are of `this` only
    */
-  fork: Ancestors;
+  fork: Ancestors<Strict>;
   /**
    * ancestors that are of `other` only
    */
-  otherFork: Ancestors;
+  otherFork: Ancestors<Strict>;
 };
 
 export class FabricObjectAncestryMixin {
@@ -53,14 +60,14 @@ export class FabricObjectAncestryMixin {
    * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
    * @returns {Ancestors} ancestors from bottom to top
    */
-  getAncestors(strict?: boolean): Ancestors {
+  getAncestors<T extends boolean>(strict?: T): Ancestors<T> {
     const ancestors: TAncestor[] = [];
     let parent = this.group || (strict ? undefined : this.canvas);
     while (parent) {
       ancestors.push(parent);
       parent = parent.group || (strict ? undefined : parent.canvas);
     }
-    return ancestors as Ancestors;
+    return ancestors as Ancestors<T>;
   }
 
   /**
@@ -70,17 +77,17 @@ export class FabricObjectAncestryMixin {
    * @param {boolean} [strict] finds only ancestors that are objects (without canvas)
    * @returns {AncestryComparison} an object that represent the ancestry situation.
    */
-  findCommonAncestors(
+  findCommonAncestors<T extends boolean>(
     this: FabricObject & this,
     other: FabricObject & this,
-    strict?: boolean
-  ): AncestryComparison {
+    strict?: T
+  ): AncestryComparison<T> {
     if (this === other) {
       return {
-        fork: [] as FabricObject[],
-        otherFork: [] as FabricObject[],
+        fork: [],
+        otherFork: [],
         common: [this, ...this.getAncestors(strict)],
-      };
+      } as AncestryComparison<T>;
     }
     const ancestors = this.getAncestors(strict);
     const otherAncestors = other.getAncestors(strict);
@@ -97,7 +104,7 @@ export class FabricObjectAncestryMixin {
           ...otherAncestors.slice(0, otherAncestors.length - 1),
         ],
         common: [this],
-      } as AncestryComparison;
+      } as AncestryComparison<T>;
     }
     //  compare ancestors
     for (let i = 0, ancestor; i < ancestors.length; i++) {
@@ -107,7 +114,7 @@ export class FabricObjectAncestryMixin {
           fork: [this, ...ancestors.slice(0, i)],
           otherFork: [],
           common: ancestors.slice(i),
-        } as AncestryComparison;
+        } as AncestryComparison<T>;
       }
       for (let j = 0; j < otherAncestors.length; j++) {
         if (this === otherAncestors[j]) {
@@ -115,14 +122,14 @@ export class FabricObjectAncestryMixin {
             fork: [],
             otherFork: [other, ...otherAncestors.slice(0, j)],
             common: [this, ...ancestors],
-          } as AncestryComparison;
+          } as AncestryComparison<T>;
         }
         if (ancestor === otherAncestors[j]) {
           return {
             fork: [this, ...ancestors.slice(0, i)],
             otherFork: [other, ...otherAncestors.slice(0, j)],
             common: ancestors.slice(i),
-          } as AncestryComparison;
+          } as AncestryComparison<T>;
         }
       }
     }
@@ -131,7 +138,7 @@ export class FabricObjectAncestryMixin {
       fork: [this, ...ancestors],
       otherFork: [other, ...otherAncestors],
       common: [],
-    } as AncestryComparison;
+    } as AncestryComparison<T>;
   }
 
   /**
@@ -165,10 +172,10 @@ export class FabricObjectAncestryMixin {
     if (!ancestorData) {
       return undefined;
     }
-    if (ancestorData.fork.includes(other)) {
+    if (ancestorData.fork.includes(other as any)) {
       return true;
     }
-    if (ancestorData.otherFork.includes(this)) {
+    if (ancestorData.otherFork.includes(this as any)) {
       return false;
     }
     const firstCommonAncestor = ancestorData.common[0];
