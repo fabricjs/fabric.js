@@ -1,4 +1,5 @@
-const { ensureDirSync, writeFileSync } = require('fs-extra');
+const { default: chalk } = require('chalk');
+const { ensureDirSync, writeFileSync, createWriteStream } = require('fs-extra');
 const _ = require('lodash');
 const TapReporter = require('testem/lib/reporters/tap_reporter');
 const { resultString,summaryDisplay } = require('testem/lib/utils/displayutils');
@@ -28,6 +29,7 @@ class TapReporterLogger extends TapReporter {
       let passed = 0,
         skipped = 0,
         todo = 0;
+      const contextName = launcher.toLowerCase().trim().split(' ')[0];
       const logs = results.map(data => {
         data.result.passed && passed++;
         data.result.skipped && skipped++;
@@ -40,7 +42,12 @@ class TapReporterLogger extends TapReporter {
         skipped,
         todo
       });
-      writeFileSync(`${this.reportDir}/${launcher.toLowerCase().trim().split(' ')[0]}.txt`, `${logs}\n${summary}`);
+      const out = `${logs}\n${summary}`;
+      writeFileSync(`${this.reportDir}/${contextName}.txt`, out);
+      if (process.env.CI) {
+        console.log(`\n\n${chalk.cyan(`${contextName} results:`)}`);
+        console.log(out);
+      }
     });
   }
 }
@@ -93,5 +100,7 @@ module.exports = {
   parallel: 4,
   reporter: TapReporterLogger,
   // https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
-  CI: process.env.CI || false
+  CI: process.env.CI || false,
+  // disable hectic logging in CI
+  stdout_stream: process.env.CI ? createWriteStream('./cli_output/dump.txt') : process.stdout
 }
