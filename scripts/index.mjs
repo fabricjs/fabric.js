@@ -663,24 +663,24 @@ program
     const results = [];
     if (options.suite) {
       results.push(
-        ...(await Promise.all(
+        ...Promise.all(
           _.map(options.suite, (suite) => {
             return test(suite, null, options);
           })
-        ))
+        )
       );
     } else if (options.file) {
       results.push(
-        await test(
+        test(
           options.file.startsWith('visual') ? 'visual' : 'unit',
           [`test/${options.file}`],
           options
         )
       );
     } else {
-      results.push(...(await runInteractiveTestSuite(options)));
+      results.push(...runInteractiveTestSuite(options));
     }
-    if (_.some(results)) {
+    if (_.some(await Promise.all(results))) {
       // inform ci that tests have failed
       process.exit(1);
     }
