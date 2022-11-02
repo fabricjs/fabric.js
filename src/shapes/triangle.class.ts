@@ -1,82 +1,55 @@
-//@ts-nocheck
-(function (global) {
-  var fabric = global.fabric || (global.fabric = {});
+import { fabric } from '../../HEADER';
+import { TClassProperties } from '../typedefs';
+import { FabricObject } from './fabricObject.class';
+
+export class Triangle extends FabricObject {
   /**
-   * Triangle class
-   * @class fabric.Triangle
-   * @extends fabric.Object
-   * @return {fabric.Triangle} thisArg
-   * @see {@link fabric.Triangle#initialize} for constructor definition
+   * @private
+   * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  fabric.Triangle = fabric.util.createClass(
-    fabric.Object,
-    /** @lends fabric.Triangle.prototype */ {
-      /**
-       * Type of an object
-       * @type String
-       * @default
-       */
-      type: 'triangle',
+  _render(ctx: CanvasRenderingContext2D) {
+    const widthBy2 = this.width / 2,
+      heightBy2 = this.height / 2;
 
-      /**
-       * Width is set to 100 to compensate the old initialize code that was setting it to 100
-       * @type Number
-       * @default
-       */
-      width: 100,
+    ctx.beginPath();
+    ctx.moveTo(-widthBy2, heightBy2);
+    ctx.lineTo(0, -heightBy2);
+    ctx.lineTo(widthBy2, heightBy2);
+    ctx.closePath();
 
-      /**
-       * Height is set to 100 to compensate the old initialize code that was setting it to 100
-       * @type Number
-       * @default
-       */
-      height: 100,
-
-      /**
-       * @private
-       * @param {CanvasRenderingContext2D} ctx Context to render on
-       */
-      _render: function (ctx) {
-        var widthBy2 = this.width / 2,
-          heightBy2 = this.height / 2;
-
-        ctx.beginPath();
-        ctx.moveTo(-widthBy2, heightBy2);
-        ctx.lineTo(0, -heightBy2);
-        ctx.lineTo(widthBy2, heightBy2);
-        ctx.closePath();
-
-        this._renderPaintInOrder(ctx);
-      },
-
-      /* _TO_SVG_START_ */
-      /**
-       * Returns svg representation of an instance
-       * @return {Array} an array of strings with the specific svg representation
-       * of the instance
-       */
-      _toSVG: function () {
-        var widthBy2 = this.width / 2,
-          heightBy2 = this.height / 2,
-          points = [
-            -widthBy2 + ' ' + heightBy2,
-            '0 ' + -heightBy2,
-            widthBy2 + ' ' + heightBy2,
-          ].join(',');
-        return ['<polygon ', 'COMMON_PARTS', 'points="', points, '" />'];
-      },
-      /* _TO_SVG_END_ */
-    }
-  );
+    this._renderPaintInOrder(ctx);
+  }
 
   /**
-   * Returns {@link fabric.Triangle} instance from an object representation
+   * Returns svg representation of an instance
+   * @return {Array} an array of strings with the specific svg representation
+   * of the instance
+   */
+  _toSVG() {
+    const widthBy2 = this.width / 2,
+      heightBy2 = this.height / 2,
+      points = `${-widthBy2} ${heightBy2},0 ${-heightBy2},${widthBy2} ${heightBy2}`;
+    return ['<polygon ', 'COMMON_PARTS', 'points="', points, '" />'];
+  }
+
+  /**
+   * Returns {@link Triangle} instance from an object representation
    * @static
-   * @memberOf fabric.Triangle
+   * @memberOf Triangle
    * @param {Object} object Object to create an instance from
-   * @returns {Promise<fabric.Triangle>}
+   * @returns {Promise<Triangle>}
    */
-  fabric.Triangle.fromObject = function (object) {
-    return fabric.Object._fromObject(fabric.Triangle, object);
-  };
-})(typeof exports !== 'undefined' ? exports : window);
+  static fromObject(object: any) {
+    return FabricObject._fromObject(Triangle, object);
+  }
+}
+
+export const triangleDefaultValues: Partial<TClassProperties<Triangle>> = {
+  type: 'triangle',
+  width: 100,
+  height: 100,
+};
+
+Object.assign(Triangle.prototype, triangleDefaultValues);
+
+fabric.Triangle = Triangle;

@@ -6,7 +6,7 @@ import { Point } from './point.class';
 import { requestAnimFrame } from './util/animate';
 import { removeFromArray } from './util/internals';
 import { pick } from './util/misc/pick';
-import { FabricObject } from './shapes/object.class';
+import { FabricObject } from './shapes/fabricObject.class';
 import { CommonMethods } from './mixins/shared_methods.mixin';
 (function (global) {
   // aliases for faster resolution
@@ -499,16 +499,16 @@ import { CommonMethods } from './mixins/shared_methods.mixin';
         this.viewportTransform = vpt;
         for (i = 0, len = this._objects.length; i < len; i++) {
           object = this._objects[i];
-          object.group || object.setCoords(true);
+          object.group || object.setCoords();
         }
         if (activeObject) {
           activeObject.setCoords();
         }
         if (backgroundObject) {
-          backgroundObject.setCoords(true);
+          backgroundObject.setCoords();
         }
         if (overlayObject) {
-          overlayObject.setCoords(true);
+          overlayObject.setCoords();
         }
         this.calcViewportBoundaries();
         this.renderOnAddRemove && this.requestRenderAll();

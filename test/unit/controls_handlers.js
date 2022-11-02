@@ -93,10 +93,10 @@
         assert.deepEqual(options, {
           e: eventData,
           transform: transform,
-          pointer: {
-            x: 200,
-            y: 300,
-          },
+          pointer: new fabric.Point(
+            200,
+            300,
+          ),
         });
         done();
       });
@@ -204,10 +204,10 @@
         assert.deepEqual(options, {
           e: eventData,
           transform: transform,
-          pointer: {
-            x: 200,
-            y: 300,
-          },
+          pointer: new fabric.Point(
+            200,
+            300,
+          ),
         });
         done();
       });
