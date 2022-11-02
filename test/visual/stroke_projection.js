@@ -2,11 +2,6 @@ QUnit.module('stroke projection', (hooks) => {
   const tests = [];
 
   const generalCasesToTest = {
-    noMiterAfterMiterLimit2: [
-      { x: 0, y: 0 },
-      { x: 10, y: 30 },
-      { x: 43, y: 0 },
-    ],
     acuteAngle: [
       { x: 3, y: -10 },
       { x: 18, y: 16 },
@@ -30,11 +25,6 @@ QUnit.module('stroke projection', (hooks) => {
     twoPoints: [
       { x: 10, y: 10 },
       { x: 100, y: 100 },
-    ],
-    twoPointsClose: [
-      { x: 0, y: 0 },
-      { x: 2, y: -0.98 },
-      { x: 100, y: 0 },
     ],
     twoEqualPointsLine: [
       { x: 10, y: 10 },
@@ -90,28 +80,6 @@ QUnit.module('stroke projection', (hooks) => {
       {x:66.02231772645243, y:71.09250552411001},
       {x:10.289783513792408, y:10.149937092784299}
     ],
-    spikes: [
-      { x: 97.39086147549884, y: 204.072360524695 },
-      { x: 52, y: 203 },
-      { x: 87.75101187636338, y: 196.11948460540825 },
-      { x: 32.56287292131242, y: 200.6984131649976 },
-      { x: 108.71768475448265, y: 205.27734172458693 },
-      { x: 60.03644427884856, y: 191.78155228579726 },
-      { x: 76.18319235740043, y: 192.98653348568922 },
-      { x: 70.64027883789757, y: 253.23559348028593 },
-      { x: 109.92266595437465, y: 237.08884540173398 },
-      { x: 26.53796692185277, y: 218.77313116337686 },
-      { x: 70.15828635794081, y: 177.08078164711569 },
-      { x: 21.236049642328275, y: 242.87275516121528 },
-      { x: 97.63185771547685, y: 232.26892060216653 },
-      { x: 105.82572987474202, y: 221.18309356316072 },
-      { x: 78, y: 242 },
-      { x: 98.35484643541207, y: 186.72063124625117 },
-      { x: 113.77860579402882, y: 220.46010484322534 },
-      { x: 84, y: 251 },
-      { x: 42.68471500040471, y: 189.3715898860134 },
-      { x: 88, y: 257 },
-    ],
     orthogonalProjection1: [
       { x: 4.1139063087281045, y: 6.008805382999107 },
       { x: 3.661690750974974, y: 6.067776795471968 },
@@ -147,10 +115,10 @@ QUnit.module('stroke projection', (hooks) => {
         exactBoundingBox: true,
         ...polyOptions,
       });
+    poly.setDimensions();
     const target = group ? new fabric.Group([poly]) : poly;
     target.scaleX = scale.x;
     target.scaleY = scale.y;
-    poly.setDimensions();
     const size = target._getTransformedDimensions(),
       bg = new fabric.Rect({
         width: size.x,
@@ -223,7 +191,15 @@ QUnit.module('stroke projection', (hooks) => {
   }
 
   // Test only miter limit
-  for (let [caseName, casePoints] of Object.entries(generalCasesToTest)) {
+  const selectedMiterLimitCases = {
+    noMiterAfterMiterLimit2: generalCasesToTest.noMiterAfterMiterLimit2, 
+    acuteAngle: generalCasesToTest.acuteAngle, 
+    obtuseAngle: generalCasesToTest.obtuseAngle, 
+    convex: generalCasesToTest.convex, 
+    concave: generalCasesToTest.concave, 
+    complex: generalCasesToTest.complex 
+  };
+  for (let [caseName, casePoints] of Object.entries(selectedMiterLimitCases)) {
     const builder = fabric.Polygon;
     [5, 20, 120].forEach((strokeMiterLimit) => {
       [true, false].forEach((strokeUniform) => {
