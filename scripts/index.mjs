@@ -26,7 +26,7 @@ import process from 'node:process';
 import os from 'os';
 import { build } from './build.mjs';
 import { awaitBuild } from './buildLock.mjs';
-import { CLI_CACHE, testResultsPath, wd } from './dirname.mjs';
+import { CLI_CACHE, testResultsPath, wd, __filename } from './dirname.mjs';
 import { listFiles, transform as transformFiles } from './transform_files.mjs';
 
 const program = new commander.Command();
@@ -252,7 +252,7 @@ function logTestResults(dir, context, suite) {
  *
  * @returns {Promise<boolean | undefined>} true if some tests failed
  */
-async function runTestem({
+async function runBrowserTest({
   suite,
   port,
   launch,
@@ -319,6 +319,31 @@ async function runTestem({
   }
 }
 
+async function runNodeTest({ processOptions, suite, out, parallel }) {
+  const cmd = processOptions.env.NODE_CMD;
+  const file = path.resolve(out, suite, 'node.txt');
+  try {
+    ensureDirSync(path.resolve(out, suite));
+    await new Promise((resolve) => {
+      const child = cp
+        .spawn(cmd, {
+          ...processOptions,
+          stdio: 'pipe',
+        })
+        .on('message', (m) => fs.appendFileSync(file, m.toString()))
+        .on('exit', (code) => {
+          logTestResults(out, 'node', suite);
+          resolve(code);
+        });
+      child.stdout.pipe(process.stdout);
+      child.stdout.pipe(fs.createWriteStream(file));
+    });
+  } catch (error) {
+    console.log(error);
+    return true;
+  }
+}
+
 /**
  *
  * @param {'unit' | 'visual'} suite
@@ -327,8 +352,6 @@ async function runTestem({
  * @returns {Promise<boolean | undefined>} true if some tests failed
  */
 async function test(suite, tests, options = {}) {
-  let failed = false;
-
   fs.removeSync(testResultsPath);
   fs.mkdirSync(testResultsPath, { recursive: true });
 
@@ -350,12 +373,15 @@ async function test(suite, tests, options = {}) {
     REPORT_DIR: path.resolve(options.out, suite),
   };
   const browserContexts = options.context.filter((c) => c !== 'node');
+  const tasks = [];
 
   // temporary revert
   // run node tests directly with qunit
   if (options.context.includes('node')) {
-    try {
-      const nodeProcessOptions = {
+    const task = runNodeTest({
+      ...options,
+      suite,
+      processOptions: {
         cwd: wd,
         env: {
           ...env,
@@ -364,50 +390,36 @@ async function test(suite, tests, options = {}) {
         },
         shell: true,
         stdio: 'inherit',
-      };
-      if (options.parallel) {
-        ensureDirSync(path.resolve(options.out, suite));
-        await new Promise((resolve) => {
-          const write = fs.openSync(
-            path.resolve(options.out, suite, 'node.txt'),
-            'a'
-          );
-          cp.spawn(env.NODE_CMD, {
-            ...nodeProcessOptions,
-            detached: true,
-            stdio: ['ignore', write, write],
-          }).on('exit', (code) => {
-            logTestResults(options.out, 'node', suite);
-            resolve(code);
-          });
-        });
-      } else {
-        cp.execSync(env.NODE_CMD, nodeProcessOptions);
-      }
-    } catch (error) {
-      failed = true;
+      },
+    });
+    if (!options.parallel) {
+      await task;
     }
+    tasks.push(task);
   }
 
   if (browserContexts.length > 0) {
-    failed =
-      (await runTestem({
-        ...options,
-        suite,
-        processOptions: {
-          cwd: wd,
-          env: {
-            ...env,
-            ...qunitEnv,
-          },
-          shell: true,
-          stdio: 'inherit',
+    const task = runBrowserTest({
+      ...options,
+      suite,
+      processOptions: {
+        cwd: wd,
+        env: {
+          ...env,
+          ...qunitEnv,
         },
-        context: browserContexts,
-      })) || failed;
+        shell: true,
+        stdio: 'inherit',
+      },
+      context: browserContexts,
+    });
+    if (!options.parallel) {
+      await task;
+    }
+    tasks.push(task);
   }
 
-  return failed;
+  return Promise.all(tasks).then((failed) => failed.some((status) => status));
 }
 
 /**
