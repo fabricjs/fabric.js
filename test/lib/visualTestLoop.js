@@ -125,7 +125,8 @@
       fs.writeFileSync(path.resolve(dumpsPath, 'info.json'), JSON.stringify({
         module,
         test,
-        file: basename
+        file: basename,
+        passing: false
       }, null, 2));
       keys.forEach(key => {
         const dataUrl = visuals[key].toDataURL().split(',')[1];

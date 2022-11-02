@@ -65,7 +65,7 @@ function startGoldensServer() {
                     module,
                     test,
                     file: fileName,
-                    passing
+                    passing: JSON.parse(passing)
                 }, null, 2));
                 const out = { name: fileName, dir: dumpsPath };
                 files.forEach(({ rawData, filename }) => {

@@ -572,6 +572,74 @@ async function runInteractiveTestSuite(options) {
   );
 }
 
+function buildVisualTestResultsIndex() {
+  const headers = ['actual', 'expected', 'diff'];
+  fs.readdirSync(path.resolve(testResultsPath, 'visual')).forEach((context) => {
+    const dir = path.resolve(testResultsPath, 'visual', context);
+    if (!fs.lstatSync(dir).isDirectory()) return;
+    const entries = [];
+    function recurse(dir) {
+      if (!fs.lstatSync(dir).isDirectory()) return;
+      else if (fs.existsSync(path.resolve(dir, 'info.json'))) {
+        entries.push(dir);
+      } else {
+        fs.readdirSync(dir).forEach((child) =>
+          recurse(path.resolve(dir, child))
+        );
+      }
+    }
+    recurse(dir);
+
+    const rows = [
+      `<thead style="position:sticky;top: 0;">${[
+        'module',
+        'test',
+        'file',
+        'status',
+        ...headers,
+      ]
+        .map((th) => `<th>${th}</th>`)
+        .join('')}</thead>`,
+      ...entries.map((testDir) => {
+        const { module, test, file, passing } = fs.readJSONSync(
+          path.resolve(testDir, 'info.json')
+        );
+        const content = [
+          module,
+          test,
+          file,
+          passing ? 'passing' : `<strong style="color:red">FAILING</strong>`,
+          ...headers.map(
+            (t) =>
+              `<img src="${path.relative(
+                dir,
+                path.resolve(testDir, `${t}.png`)
+              )}">`
+          ),
+        ]
+          .map((td) => `<td>${td}</td>`)
+          .join('\n');
+
+        return `<tr>${content}</tr>`;
+      }),
+    ];
+    fs.writeFileSync(
+      path.resolve(dir, 'index.html'),
+      `<html><head><style>
+table, td, th {
+  border: 1px solid;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+</style></head>
+<body><table>${rows.join('\n')}</table></body></html>`
+    );
+  });
+}
+
 program
   .name('fabric.js')
   .description('fabric.js DEV CLI tools')
@@ -680,6 +748,9 @@ program
     } else {
       results.push(...(await runInteractiveTestSuite(options)));
     }
+
+    buildVisualTestResultsIndex();
+
     if (_.some(results)) {
       // inform ci that tests have failed
       process.exit(1);
