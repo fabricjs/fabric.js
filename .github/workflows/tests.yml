@@ -24,14 +24,12 @@ jobs:
           name: tests-build
           path: dist
   browser:
-    name: ${{ matrix.target }} ${{ matrix.suite }} tests
+    name: browser tests
     runs-on: ubuntu-latest
     needs: build
     strategy:
       matrix:
         node-version: [16.x]
-        target: [chrome, firefox]
-        suite: [unit, visual]
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
@@ -45,15 +43,15 @@ jobs:
         with:
           name: tests-build
           path: dist
-      - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
+      - name: Run browser headless test
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
-      - name: Archive visual test results
-        if: failure() && matrix.suite == 'visual'
+          run: npm run test -- -c chrome firefox -s unit visual
+      - name: Archive test results
+        if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.target }}-failing-visual-tests
+          name: browser-test-results
           path: cli_output/test_results
   node:
     runs-on: ubuntu-latest
@@ -66,7 +64,6 @@ jobs:
         # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
         # supported Node.js release schedule: https://nodejs.org/en/about/releases/
         node-version: [14.x, 16.x, 18.x]
-        suite: [unit, visual]
     steps:
       - uses: actions/checkout@v3
       - name: Install node-canvas
@@ -82,13 +79,13 @@ jobs:
         with:
           name: tests-build
           path: dist
-      - name: Run ${{ matrix.suite }} tests
-        run: npm run test -- -c node -s ${{ matrix.suite }}
+      - name: Run tests
+        run: npm run test -- -c node -a
       - name: Archive visual test results
-        if: failure() && matrix.suite == 'visual' && matrix.node-version == '16.x'
+        if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: node-failing-visual-tests
+          name: node-${{ matrix.node-version }}-test-results
           path: cli_output/test_results
   cleanup:
     runs-on: ubuntu-latest
