@@ -243,12 +243,9 @@ function logTestResults(dir, context, suite) {
       chalk.cyan(`${_.upperFirst(context)} ${_.upperFirst(suite)} Test Results`)
     )}\n`
   );
-  console.dir({
-    [context]: fs
-      .readFileSync(path.resolve(dir, suite, `${context}.txt`))
-      .toString()
-      .split('\n'),
-  });
+  console.log(
+    fs.readFileSync(path.resolve(dir, suite, `${context}.txt`)).toString()
+  );
 }
 
 /**
