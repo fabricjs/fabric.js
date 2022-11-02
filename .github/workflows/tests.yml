@@ -6,27 +6,9 @@ on:
     branches: [master]
 
 jobs:
-  build:
-    name: Upload build artifact
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-          cache: npm
-      - run: npm ci
-      - run: npm run build -- -f
-      - name: Upload artifact
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: tests-build
-          path: dist
   browser:
     name: browser tests
     runs-on: ubuntu-latest
-    needs: build
     strategy:
       matrix:
         node-version: [16.x]
@@ -38,11 +20,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: npm
       - run: npm ci
-      - name: Download build
-        uses: actions/download-artifact@v3
-        with:
-          name: tests-build
-          path: dist
+      - run: npm run build -- -f
       - name: Run browser headless test
         uses: GabrielBB/xvfb-action@v1
         with:
@@ -56,7 +34,6 @@ jobs:
   node:
     runs-on: ubuntu-latest
     name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
-    needs: build
     strategy:
       fail-fast: false
       matrix:
@@ -74,11 +51,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: npm
       - run: npm ci
-      - name: Download build
-        uses: actions/download-artifact@v3
-        with:
-          name: tests-build
-          path: dist
+      - run: npm run build -- -f
       - name: Run tests
         run: npm run test -- -c node -a
       - name: Archive visual test results
@@ -87,12 +60,3 @@ jobs:
         with:
           name: node-${{ matrix.node-version }}-test-results
           path: cli_output/test_results
-  cleanup:
-    runs-on: ubuntu-latest
-    name: Delete build artifacts
-    needs: [build, browser, node]
-    if: always()
-    steps:
-      - uses: geekyeggo/delete-artifact@v2
-        with:
-          name: tests-build
