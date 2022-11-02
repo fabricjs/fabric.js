@@ -14,7 +14,7 @@
 import chalk from 'chalk';
 import cp from 'child_process';
 import * as commander from 'commander';
-import fs from 'fs-extra';
+import fs, { ensureDirSync } from 'fs-extra';
 import fuzzy from 'fuzzy';
 import inquirer from 'inquirer';
 import Checkbox from 'inquirer-checkbox-plus-prompt';
@@ -237,6 +237,17 @@ function exportToWebsite(options) {
   });
 }
 
+function logTestResults(dir, context, suite) {
+  console.log(
+    `\n\n${chalk.underline(
+      chalk.cyan(`${_.upperFirst(context)} ${_.upperFirst(suite)} Test Results`)
+    )}\n`
+  );
+  console.log(
+    fs.readFileSync(path.resolve(dir, suite, `${context}.txt`)).toString()
+  );
+}
+
 /**
  *
  * @returns {Promise<boolean | undefined>} true if some tests failed
@@ -290,16 +301,7 @@ async function runTestem({
           detached: true,
         }).on('exit', (code) => {
           context.forEach((c) => {
-            console.log(
-              `\n\n${chalk.underline(
-                chalk.cyan(
-                  `${_.upperFirst(c)} ${_.upperFirst(suite)} Test Results`
-                )
-              )}\n`
-            );
-            console.log(
-              fs.readFileSync(path.resolve(out, suite, `${c}.txt`)).toString()
-            );
+            logTestResults(out, c, suite);
           });
           resolve(code);
         });
@@ -353,16 +355,35 @@ async function test(suite, tests, options = {}) {
   // run node tests directly with qunit
   if (options.context.includes('node')) {
     try {
-      cp.execSync(env.NODE_CMD, {
+      const nodeProcessOptions = {
         cwd: wd,
         env: {
           ...env,
-          // browser takes precendence in golden ref generation
+          // browser takes precedence in golden ref generation
           ...(browserContexts.length === 0 ? qunitEnv : {}),
         },
         shell: true,
         stdio: 'inherit',
-      });
+      };
+      if (options.parallel) {
+        ensureDirSync(path.resolve(options.out, suite));
+        await new Promise((resolve) => {
+          const write = fs.openSync(
+            path.resolve(options.out, suite, 'node.txt'),
+            'a'
+          );
+          cp.spawn(env.NODE_CMD, {
+            ...nodeProcessOptions,
+            detached: true,
+            stdio: ['ignore', write, write],
+          }).on('exit', (code) => {
+            logTestResults(options.out, 'node', suite);
+            resolve(code);
+          });
+        });
+      } else {
+        cp.execSync(env.NODE_CMD, nodeProcessOptions);
+      }
     } catch (error) {
       failed = true;
     }
