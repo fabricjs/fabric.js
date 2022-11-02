@@ -29,7 +29,7 @@ global.RUNNER_ID = 'node';
 
 global.fabric = require('../dist/fabric').fabric;
 global.pixelmatch = require('pixelmatch');
-global.fs = require('fs');
+global.fs = require('fs-extra');
 global.path = require('path');
 global.visualCallback = {
   addArguments: function() {},
