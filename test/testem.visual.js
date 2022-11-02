@@ -23,7 +23,7 @@ module.exports = {
     '/golden_maker.html': 'test/lib/goldenMaker.html',
     '/golden': 'test/visual/golden',
     '/assets': 'test/visual/assets',
-    '/results': 'cli_output/test_results/visuals'
+    '/results': 'cli_output/test_results'
   },
   launchers: {
     Node: {
@@ -43,6 +43,4 @@ module.exports = {
     debug: Number(process.env.QUNIT_DEBUG_VISUAL_TESTS) || false,
     launch: Number(process.env.QUNIT_LAUNCH) || false,
   },
-  // since we are storing test results we don't want them to get messed up by concurrent runs
-  parallel: 1,
 }

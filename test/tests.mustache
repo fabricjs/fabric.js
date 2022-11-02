@@ -14,8 +14,23 @@
 {{#serve_files}}<script src="{{{src}}}"{{#attrs}} {{&.}}{{/attrs}}></script>{{/serve_files}}
 
 <script>
-// runs from github action
+// true when running from github action
 window.CI = {{CI}};
+
+function getRunnerId() {
+    if (navigator.userAgent.toLowerCase().indexOf('firefox') !== -1) {
+      return 'firefox';
+    }
+    else if (navigator.userAgent.toLowerCase().indexOf('chrome') !== -1) {
+      return 'chrome';
+    }
+    else {
+      // fallback to the test unique id
+      return Testem.getId();
+    }
+}
+// used by browser logic to dump files
+window.RUNNER_ID = getRunnerId();
 
 // QUnit config
 QUnit.config.reorder = false;
