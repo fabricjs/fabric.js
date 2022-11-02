@@ -252,7 +252,7 @@ function logTestResults(dir, context, suite) {
  *
  * @returns {Promise<boolean | undefined>} true if some tests failed
  */
-async function runBrowserTest({
+async function runTestem({
   suite,
   port,
   launch,
@@ -319,6 +319,11 @@ async function runBrowserTest({
   }
 }
 
+async function awaitIfSync(task, parallel) {
+  if (!parallel) await task;
+  return task;
+}
+
 /**
  *
  * @param {'unit' | 'visual'} suite
@@ -354,30 +359,38 @@ async function test(suite, tests, options = {}) {
   // run node tests directly with qunit
   if (options.context.includes('node')) {
     fs.ensureDirSync(path.resolve(options.out, suite));
-    const file = path.resolve(options.out, suite, 'node.txt');
-    const task = cp.spawn(
-      'node',
-      [path.resolve(__dirname, 'runNodeTest.mjs')],
-      {
-        detached: true,
-        shell: true,
-        stdio: 'inherit',
-        env: {
-          ...env,
-          // browser takes precedence in golden ref generation
-          ...(browserContexts.length === 0 ? qunitEnv : {}),
-          REPORT_FILE: file,
-        },
+    const processOptions = {
+      shell: true,
+      stdio: 'inherit',
+      env: {
+        ...env,
+        // browser takes precedence in golden ref generation
+        ...(browserContexts.length === 0 ? qunitEnv : {}),
+        REPORT_FILE: path.resolve(options.out, suite, 'node.txt'),
+      },
+    };
+    if (options.parallel) {
+      const task = new Promise((resolve) => {
+        cp.spawn('node', [path.resolve(__dirname, 'runNodeTest.mjs')], {
+          ...processOptions,
+          detached: true,
+        }).on('exit', (code) => {
+          logTestResults(options.out, 'node', suite);
+          resolve(code);
+        });
+      });
+      tasks.push(task);
+    } else {
+      try {
+        cp.execSync(env.NODE_CMD, processOptions);
+      } catch (error) {
+        tasks.push(true);
       }
-    );
-    if (!options.parallel) {
-      await task;
     }
-    tasks.push(task);
   }
 
   if (browserContexts.length > 0) {
-    const task = runBrowserTest({
+    const task = runTestem({
       ...options,
       suite,
       processOptions: {
@@ -391,10 +404,8 @@ async function test(suite, tests, options = {}) {
       },
       context: browserContexts,
     });
-    if (!options.parallel) {
-      await task;
-    }
-    tasks.push(task);
+
+    tasks.push(awaitIfSync(task, options.parallel));
   }
 
   return Promise.all(tasks).then((failed) => failed.some((status) => status));
@@ -546,13 +557,18 @@ async function runInteractiveTestSuite(options) {
     { unit: [], visual: [] }
   );
   return Promise.all(
-    _.map(tests, (files, suite) => {
-      if (files === true) {
-        return test(suite, null, options);
-      } else if (Array.isArray(files) && files.length > 0) {
-        return test(suite, files, options);
-      }
-    })
+    _.reduce(
+      tests,
+      (tasks, files, suite) => {
+        if (files === true) {
+          tasks.push(awaitIfSync(test(suite, null, options)));
+        } else if (Array.isArray(files) && files.length > 0) {
+          tasks.push(awaitIfSync(test(suite, files, options)));
+        }
+        return tasks;
+      },
+      []
+    )
   );
 }
 
@@ -615,7 +631,8 @@ program
   .option('--no-verbose', 'disable verbose logging')
   .option('-l, --launch', 'launch tests in the browser', false)
   .option('--dev', 'runs testem in `dev` mode, without a `ci` flag', false)
-  .option('-p, --parallel', 'runs testem in parallel', false)
+  .option('-p, --parallel', 'runs tests in parallel', true)
+  .option('-np, --no-parallel', 'runs tests one after the other')
   .addOption(
     new commander.Option('-c, --context <context...>', 'context to test in')
       .choices(['node', 'chrome', 'firefox'])
