@@ -13,5 +13,5 @@ const { stdout } = cp
   .on('exit', (code) => {
     process.exit(code);
   });
-!Number(process.env.VERBOSE) && stdout.pipe(process.stdout);
+Number(process.env.VERBOSE) && stdout.pipe(process.stdout);
 stdout.pipe(createWriteStream(process.env.REPORT_FILE));
