@@ -627,8 +627,8 @@ program
     false
   )
   .option('-r, --recreate', 'recreate visual refs (golden images)', false)
-  .option('-v, --verbose', 'log passing tests', true)
-  .option('--no-verbose', 'disable verbose logging')
+  .option('-v, --verbose', 'log passing tests', !process.env.CI)
+  .option('-nv, --no-verbose', 'disable verbose logging')
   .option('-l, --launch', 'launch tests in the browser', false)
   .option('--dev', 'runs testem in `dev` mode, without a `ci` flag', false)
   .option('-p, --parallel', 'runs tests in parallel', true)
