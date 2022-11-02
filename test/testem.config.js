@@ -44,10 +44,6 @@ class TapReporterLogger extends TapReporter {
       });
       const out = `${logs}\n${summary}`;
       writeFileSync(`${this.reportDir}/${contextName}.txt`, out);
-      if (process.env.CI) {
-        console.log(`\n\n${chalk.cyan(`${contextName} results:`)}`);
-        console.log(out);
-      }
     });
   }
 }
@@ -101,6 +97,4 @@ module.exports = {
   reporter: TapReporterLogger,
   // https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
   CI: process.env.CI || false,
-  // disable hectic logging in CI
-  stdout_stream: process.env.CI ? createWriteStream('./cli_output/dump.txt') : process.stdout
 }

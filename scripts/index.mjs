@@ -246,6 +246,8 @@ async function runTestem({
   port,
   launch,
   dev,
+  parallel,
+  out,
   processOptions,
   context,
 } = {}) {
@@ -281,13 +283,36 @@ async function runTestem({
       detached: true,
     });
   } else {
-    try {
-      cp.execSync(
-        ['testem', 'ci', ...processCmdOptions].join(' '),
-        processOptions
-      );
-    } catch (error) {
-      return true;
+    if (parallel) {
+      return new Promise((resolve) => {
+        cp.spawn(['testem', 'ci', ...processCmdOptions].join(' '), {
+          ...processOptions,
+          detached: true,
+        }).on('exit', (code) => {
+          context.forEach((c) => {
+            console.log(
+              `\n\n${chalk.underline(
+                chalk.cyan(
+                  `${_.upperFirst(c)} ${_.upperFirst(suite)} Test Results`
+                )
+              )}\n`
+            );
+            console.log(
+              fs.readFileSync(path.resolve(out, suite, `${c}.txt`)).toString()
+            );
+          });
+          resolve(code);
+        });
+      });
+    } else {
+      try {
+        cp.execSync(
+          ['testem', 'ci', ...processCmdOptions].join(' '),
+          processOptions
+        );
+      } catch (error) {
+        return true;
+      }
     }
   }
 }
@@ -366,7 +391,7 @@ async function test(suite, tests, options = {}) {
 
 /**
  *
- * @param {'unit'|'visual'} type correspondes to the test directories
+ * @param {'unit'|'visual'} type corresponds to the test directories
  * @returns
  */
 function listTestFiles(type) {
@@ -494,7 +519,7 @@ async function selectTestFile() {
   return filteredTests;
 }
 
-async function runIntreactiveTestSuite(options) {
+async function runInteractiveTestSuite(options) {
   //  some tests fail because of some pollution when run from the same context
   // test(_.map(await selectTestFile(), curr => `test/${curr.type}/${curr.file}`))
   const tests = _.reduce(
@@ -579,6 +604,7 @@ program
   .option('--no-verbose', 'disable verbose logging')
   .option('-l, --launch', 'launch tests in the browser', false)
   .option('--dev', 'runs testem in `dev` mode, without a `ci` flag', false)
+  .option('-p, --parallel', 'runs testem in parallel', false)
   .addOption(
     new commander.Option('-c, --context <context...>', 'context to test in')
       .choices(['node', 'chrome', 'firefox'])
@@ -624,7 +650,7 @@ program
         )
       );
     } else {
-      results.push(...(await runIntreactiveTestSuite(options)));
+      results.push(...(await runInteractiveTestSuite(options)));
     }
     if (_.some(results)) {
       // inform ci that tests have failed
