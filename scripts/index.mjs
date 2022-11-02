@@ -275,7 +275,7 @@ async function runTestem({
     context.map(_.upperFirst).join(','),
   ];
 
-  if (dev) {
+  if (dev || launch) {
     cp.spawn(['testem', ...processCmdOptions].join(' '), {
       ...processOptions,
       detached: true,
@@ -302,16 +302,15 @@ async function runTestem({
 async function test(suite, tests, options = {}) {
   let failed = false;
 
-  const visualTestResultsPath = path.resolve(testResultsPath, 'visuals');
-  fs.removeSync(visualTestResultsPath);
-  fs.mkdirSync(visualTestResultsPath, { recursive: true });
+  fs.removeSync(testResultsPath);
+  fs.mkdirSync(testResultsPath, { recursive: true });
 
   await awaitBuild();
 
   const qunitEnv = {
     QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
     QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
-    QUNIT_LAUNCH: Number(options.launch),
+    QUNIT_LAUNCH: Number(options.launch || options.dev),
     QUNIT_FILTER: options.filter,
   };
   const env = {
@@ -594,6 +593,14 @@ program
     }
     if (options.all) {
       options.suite = ['unit', 'visual'];
+    }
+    if ((options.recreate || options.debug) && options.context.length > 1) {
+      console.warn(
+        chalk.yellow(
+          `\n[CAUTION]: Using the recreate/debug option with multiple contexts (${options.context}) is not advised`,
+          `since it will recreate visual refs from the last run\n`
+        )
+      );
     }
     const results = [];
     if (options.suite) {
