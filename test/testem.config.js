@@ -1,5 +1,4 @@
-const { writeFileSync } = require('fs');
-const path = require('path');
+const { ensureDirSync, writeFileSync } = require('fs-extra');
 const _ = require('lodash');
 const TapReporter = require('testem/lib/reporters/tap_reporter');
 const { resultString,summaryDisplay } = require('testem/lib/utils/displayutils');
@@ -11,8 +10,8 @@ const { resultString,summaryDisplay } = require('testem/lib/utils/displayutils')
 class TapReporterLogger extends TapReporter {
   constructor(silent, out, config) {
     super(silent, out, config);
-    this.reportFilePath = config.get('report_file');
-    this.reportDir = path.dirname(this.reportFilePath);
+    this.reportDir = config.get('report_dir');
+    ensureDirSync(this.reportDir);
   }
   finish() {
     super.finish();
@@ -41,7 +40,7 @@ class TapReporterLogger extends TapReporter {
         skipped,
         todo
       });
-      writeFileSync(`${this.reportDir}/${launcher.toLowerCase()}_results.txt`, `${logs}\n${summary}`);
+      writeFileSync(`${this.reportDir}/${launcher.toLowerCase().trim().split(' ')[0]}.txt`, `${logs}\n${summary}`);
     });
   }
 }

@@ -2,14 +2,14 @@ const chalk = require('chalk');
 const config = require('./testem.config');
 const { startGoldensServer } = require('./GoldensServer');
 
-const reportPath = process.env.REPORT_FILE || 'cli_output/test_results/visual/results.txt';
+const reportPath = process.env.REPORT_DIR;
 console.log(chalk.bold(chalk.blue(`running visual test suite`)));
 console.log(chalk.gray(`reporting results to ${reportPath}`));
 
 module.exports = {
   ...config,
   visual: true,
-  report_file: reportPath,
+  report_dir: reportPath,
   serve_files: [
     ...config.serve_files,
     'test/lib/pixelmatch.js',
@@ -23,7 +23,7 @@ module.exports = {
     '/golden_maker.html': 'test/lib/goldenMaker.html',
     '/golden': 'test/visual/golden',
     '/assets': 'test/visual/assets',
-    '/results': 'cli_output/test_results'
+    '/results': reportPath
   },
   launchers: {
     Node: {

@@ -116,17 +116,17 @@
 
   async function dumpResults(filename, passing, visuals) {
     const keys = Object.keys(visuals);
-    if (fabric.isLikelyNode && CI && !passing) {
+    if (fabric.isLikelyNode && !passing) {
       const plainFileName = filename.replace('file://', '');
       const goldenPath = path.relative(path.resolve('test', 'visual', 'golden'), plainFileName);
-      const dumpsPath = path.resolve('cli_output', 'test_results', RUNNER_ID, path.basename(goldenPath, '.png'));
-      !fs.existsSync(dumpsPath) && fs.mkdirSync(dumpsPath, { recursive: true });
+      const dumpsPath = path.resolve(process.env.REPORT_DIR, RUNNER_ID, path.basename(goldenPath, '.png'));
+      fs.ensureDirSync(dumpsPath);
       keys.forEach(key => {
         const dataUrl = visuals[key].toDataURL().split(',')[1];
         fs.writeFileSync(path.resolve(dumpsPath, `${key}.png`), dataUrl, { encoding: 'base64' });
       });
     }
-    else if (!fabric.isLikelyNode && CI ? !passing : QUnit.launch) {
+    else if (!fabric.isLikelyNode && (QUnit.launch || !passing)) {
       const blobs = await Promise.all(keys.map(key => new Promise((resolve, reject) => {
         try {
           visuals[key].toBlob(resolve, 'image/png');

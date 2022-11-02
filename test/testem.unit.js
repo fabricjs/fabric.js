@@ -1,13 +1,13 @@
 const chalk = require('chalk');
 const config = require('./testem.config');
 
-const reportPath = process.env.REPORT_FILE || 'cli_output/test_results/unit/results.txt';
+const reportPath = process.env.REPORT_DIR;
 console.log(chalk.bold(chalk.blue(`running unit test suite`)));
 console.log(chalk.gray(`reporting results to ${reportPath}`));
 
 module.exports = {
   ...config,
-  report_file: reportPath,
+  report_dir: reportPath,
   serve_files: [
     ...config.serve_files,
     'test/lib/event.simulate.js',

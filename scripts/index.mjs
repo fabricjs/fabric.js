@@ -320,7 +320,7 @@ async function test(suite, tests, options = {}) {
       .concat(tests || `test/${suite}`)
       .join(' '),
     VERBOSE: Number(options.verbose),
-    REPORT_FILE: options.out,
+    REPORT_DIR: path.resolve(options.out, suite),
   };
   const browserContexts = options.context.filter((c) => c !== 'node');
 
@@ -585,7 +585,11 @@ program
       .default(['node'])
   )
   .option('-p, --port')
-  .option('-o, --out <out>', 'path to report test results to')
+  .option(
+    '-o, --out <out>',
+    'directory path to report test results to',
+    testResultsPath
+  )
   .option('--clear-cache', 'clear CLI test cache', false)
   .action(async (options) => {
     if (options.clearCache) {
