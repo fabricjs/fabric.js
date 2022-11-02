@@ -54,7 +54,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.target }}-failing-visual-tests
-          path: cli_output/test_results/visuals
+          path: cli_output/test_results
   node:
     runs-on: ubuntu-latest
     name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
@@ -89,7 +89,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: node-failing-visual-tests
-          path: cli_output/test_results/visuals
+          path: cli_output/test_results
   cleanup:
     runs-on: ubuntu-latest
     name: Delete build artifacts
