@@ -3,6 +3,7 @@ import { createWriteStream } from 'fs';
 import process from 'node:process';
 import { wd } from './dirname.mjs';
 
+// for logging we run this as a separate process
 const { stdout } = cp.spawn(process.env.NODE_CMD, {
   cwd: wd,
   shell: true,
