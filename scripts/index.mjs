@@ -14,7 +14,7 @@
 import chalk from 'chalk';
 import cp from 'child_process';
 import * as commander from 'commander';
-import fs, { ensureDirSync } from 'fs-extra';
+import fs from 'fs-extra';
 import fuzzy from 'fuzzy';
 import inquirer from 'inquirer';
 import Checkbox from 'inquirer-checkbox-plus-prompt';
@@ -26,7 +26,7 @@ import process from 'node:process';
 import os from 'os';
 import { build } from './build.mjs';
 import { awaitBuild } from './buildLock.mjs';
-import { CLI_CACHE, testResultsPath, wd, __filename } from './dirname.mjs';
+import { CLI_CACHE, testResultsPath, wd, __dirname } from './dirname.mjs';
 import { listFiles, transform as transformFiles } from './transform_files.mjs';
 
 const program = new commander.Command();
@@ -319,31 +319,6 @@ async function runBrowserTest({
   }
 }
 
-async function runNodeTest({ processOptions, suite, out, parallel }) {
-  const cmd = processOptions.env.NODE_CMD;
-  const file = path.resolve(out, suite, 'node.txt');
-  try {
-    ensureDirSync(path.resolve(out, suite));
-    await new Promise((resolve) => {
-      const child = cp
-        .spawn(cmd, {
-          ...processOptions,
-          stdio: 'pipe',
-        })
-        .on('message', (m) => fs.appendFileSync(file, m.toString()))
-        .on('exit', (code) => {
-          logTestResults(out, 'node', suite);
-          resolve(code);
-        });
-      child.stdout.pipe(process.stdout);
-      child.stdout.pipe(fs.createWriteStream(file));
-    });
-  } catch (error) {
-    console.log(error);
-    return true;
-  }
-}
-
 /**
  *
  * @param {'unit' | 'visual'} suite
@@ -378,20 +353,23 @@ async function test(suite, tests, options = {}) {
   // temporary revert
   // run node tests directly with qunit
   if (options.context.includes('node')) {
-    const task = runNodeTest({
-      ...options,
-      suite,
-      processOptions: {
-        cwd: wd,
+    fs.ensureDirSync(path.resolve(options.out, suite));
+    const file = path.resolve(options.out, suite, 'node.txt');
+    const task = cp.spawn(
+      'node',
+      [path.resolve(__dirname, 'runNodeTest.mjs')],
+      {
+        detached: true,
+        shell: true,
+        stdio: 'inherit',
         env: {
           ...env,
           // browser takes precedence in golden ref generation
           ...(browserContexts.length === 0 ? qunitEnv : {}),
+          REPORT_FILE: file,
         },
-        shell: true,
-        stdio: 'inherit',
-      },
-    });
+      }
+    );
     if (!options.parallel) {
       await task;
     }
