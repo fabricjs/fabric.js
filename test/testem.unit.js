@@ -1,7 +1,7 @@
 const chalk = require('chalk');
 const config = require('./testem.config');
 
-const reportPath = process.env.REPORT_FILE || 'cli_output/test_results/unit.txt';
+const reportPath = process.env.REPORT_FILE || 'cli_output/test_results/unit/results.txt';
 console.log(chalk.bold(chalk.blue(`running unit test suite`)));
 console.log(chalk.gray(`reporting results to ${reportPath}`));
 

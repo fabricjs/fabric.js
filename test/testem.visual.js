@@ -2,7 +2,7 @@ const chalk = require('chalk');
 const config = require('./testem.config');
 const { startGoldensServer } = require('./GoldensServer');
 
-const reportPath = process.env.REPORT_FILE || 'cli_output/test_results/visual.txt';
+const reportPath = process.env.REPORT_FILE || 'cli_output/test_results/visual/results.txt';
 console.log(chalk.bold(chalk.blue(`running visual test suite`)));
 console.log(chalk.gray(`reporting results to ${reportPath}`));
 
