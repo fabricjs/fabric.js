@@ -119,7 +119,7 @@
     if (fabric.isLikelyNode && CI && !passing) {
       const plainFileName = filename.replace('file://', '');
       const goldenPath = path.relative(path.resolve('test', 'visual', 'golden'), plainFileName);
-      const dumpsPath = path.resolve('cli_output', 'test_results', 'visuals', path.basename(goldenPath, '.png'));
+      const dumpsPath = path.resolve('cli_output', 'test_results', RUNNER_ID, path.basename(goldenPath, '.png'));
       !fs.existsSync(dumpsPath) && fs.mkdirSync(dumpsPath, { recursive: true });
       keys.forEach(key => {
         const dataUrl = visuals[key].toDataURL().split(',')[1];
@@ -139,6 +139,7 @@
         keys.forEach((key, index) => formData.append(key, blobs[index], `${key}.png`));
         formData.append('filename', filename);
         formData.append('passing', passing);
+        formData.append('runner', RUNNER_ID);
         const request = new XMLHttpRequest();
         request.open('POST', '/goldens/results', true);
         request.onreadystatechange = () => {
@@ -225,9 +226,9 @@
     testIdToFileMap[this.test.testId] = {
       name: ref,
       basename,
-      expected: `/results/${basename}/expected.png`,
-      actual: `/results/${basename}/actual.png`,
-      diff: `/results/${basename}/diff.png`,
+      expected: `/results/${RUNNER_ID}/${basename}/expected.png`,
+      actual: `/results/${RUNNER_ID}/${basename}/actual.png`,
+      diff: `/results/${RUNNER_ID}/${basename}/diff.png`,
     };
     const exists = await goldenExists(fileName);
 

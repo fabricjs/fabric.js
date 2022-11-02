@@ -14,8 +14,23 @@
 {{#serve_files}}<script src="{{{src}}}"{{#attrs}} {{&.}}{{/attrs}}></script>{{/serve_files}}
 
 <script>
-// runs from github action
+// true when running from github action
 window.CI = {{CI}};
+
+function getRunnerId() {
+    if (navigator.userAgent.toLowerCase().indexOf('firefox') !== -1) {
+      return 'firefox';
+    }
+    else if (navigator.userAgent.toLowerCase().indexOf('chrome') !== -1) {
+      return 'chrome';
+    }
+    else {
+      // fallback to the test unique id
+      return Testem.getId();
+    }
+}
+// used by browser logic to dump files
+window.RUNNER_ID = getRunnerId();
 
 // QUnit config
 QUnit.config.reorder = false;
@@ -23,11 +38,6 @@ QUnit.config.reorder = false;
 QUnit.config.noglobals = true;
 QUnit.config.hidepassed = true;
 QUnit.config.testTimeout = 15000;
-</script>
-
-{{#visual}}
-<script>
-{{qunit.launch}} && QUnit.testDone(appendTestResults);
 
 // global error handling
 window.addEventListener('unhandledrejection', (event) => {
@@ -42,6 +52,15 @@ window.addEventListener('error', (event) => {
   QUnit.onUncaughtException(event.error);
 });
 
+</script>
+
+{{#visual}}
+<script>
+{{qunit.launch}} && QUnit.testDone(appendTestResults);
+QUnit.launch = {{qunit.launch}};
+QUnit.recreateVisualRefs = {{qunit.recreate}};
+QUnit.debugVisual = {{qunit.debug}};
+
 function downloadGoldens() {
     const checkbox = document.getElementById('qunit-urlconfig-hidepassed');
     checkbox.checked && checkbox.click();
@@ -51,27 +70,6 @@ function downloadGoldens() {
         link.download = canvas.getAttribute('data-golden');
         link.click();
     });
-}
-
-//  https://stackoverflow.com/questions/4565112/javascript-how-to-find-out-if-the-user-browser-is-chrome/13348618#13348618
-var isChromium = window.chrome;
-var winNav = window.navigator;
-var vendorName = winNav.vendor;
-var isOpera = typeof window.opr !== "undefined";
-var isIEedge = winNav.userAgent.indexOf("Edg") > -1;
-var isIOSChrome = winNav.userAgent.match("CriOS");
-if(
-  isIOSChrome || 
-  (isChromium !== null &&
-  //typeof isChromium !== "undefined" &&    //  fails on headless chrome
-  vendorName === "Google Inc." &&
-  isOpera === false &&
-  isIEedge === false)
-) {
-   // is Google Chrome
-    QUnit.recreateVisualRefs = {{qunit.recreate}};
-    QUnit.debugVisual = {{qunit.debug}};
-    QUnit.launch = {{qunit.launch}};
 }
 </script>
 {{/visual}}
