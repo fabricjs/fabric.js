@@ -1,6 +1,5 @@
 
-function appendResultsToNode(node, testId) {
-  const { name, basename, expected, actual, diff } = window.testIdToFileMap[testId];
+function appendResultsToNode(node, { name, basename, expected, actual, diff }) {
   const template = document.getElementById('error_output');
   const errorOutput = template.content.cloneNode(true);
   const urls = { expected, actual, diff };
@@ -31,7 +30,7 @@ function appendTestResults({ testId }) {
   const id = `qunit-test-output-${testId}`;
   const node = document.getElementById(id);
   if (node) {
-    appendResultsToNode(node, testId);
+    appendResultsToNode(node, window.testIdToFileMap[testId]);
   }
   else {
     new MutationObserver((mutationList, observer) => {
@@ -39,7 +38,7 @@ function appendTestResults({ testId }) {
         if (mutation.type === 'childList') {
           mutation.addedNodes.forEach(node => {
             if (node.id === id && !node.querySelector('table')) {
-              appendResultsToNode(node, testId);
+              appendResultsToNode(node, window.testIdToFileMap[testId]);
               observer.disconnect();
             }
           });
