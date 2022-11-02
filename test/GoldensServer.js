@@ -57,10 +57,16 @@ function startGoldensServer() {
                 res.end();
             }
             else if (req.method.toUpperCase() === 'POST' && req.url === '/goldens/results') {
-                const { files, fields: { filename, runner } } = await parseRequest(req);
+                const { files, fields: { filename, runner, test, module, passing } } = await parseRequest(req);
                 const fileName = /\/golden\/(.*)\..*$/.exec(filename)[1];
                 const dumpsPath = path.resolve(process.env.REPORT_DIR, runner, fileName);
                 fs.ensureDirSync(dumpsPath);
+                fs.writeFileSync(path.resolve(dumpsPath, 'info.json'), JSON.stringify({
+                    module,
+                    test,
+                    file: fileName,
+                    passing
+                }, null, 2));
                 const out = { name: fileName, dir: dumpsPath };
                 files.forEach(({ rawData, filename }) => {
                     const filePath = path.resolve(dumpsPath, filename);

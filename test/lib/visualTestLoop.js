@@ -114,13 +114,19 @@
     }
   }
 
-  async function dumpResults(filename, passing, visuals) {
+  async function dumpResults(filename, { passing, test, module }, visuals) {
     const keys = Object.keys(visuals);
     if (fabric.isLikelyNode && !passing) {
       const plainFileName = filename.replace('file://', '');
       const goldenPath = path.relative(path.resolve('test', 'visual', 'golden'), plainFileName);
-      const dumpsPath = path.resolve(process.env.REPORT_DIR, RUNNER_ID, path.basename(goldenPath, '.png'));
+      const basename = path.basename(goldenPath, '.png');
+      const dumpsPath = path.resolve(process.env.REPORT_DIR, RUNNER_ID, basename);
       fs.ensureDirSync(dumpsPath);
+      fs.writeFileSync(path.resolve(dumpsPath, 'info.json'), JSON.stringify({
+        module,
+        test,
+        file: basename
+      }, null, 2));
       keys.forEach(key => {
         const dataUrl = visuals[key].toDataURL().split(',')[1];
         fs.writeFileSync(path.resolve(dumpsPath, `${key}.png`), dataUrl, { encoding: 'base64' });
@@ -139,6 +145,8 @@
         keys.forEach((key, index) => formData.append(key, blobs[index], `${key}.png`));
         formData.append('filename', filename);
         formData.append('passing', passing);
+        formData.append('test', test);
+        formData.append('module', module);
         formData.append('runner', RUNNER_ID);
         const request = new XMLHttpRequest();
         request.open('POST', '/goldens/results', true);
@@ -277,11 +285,18 @@
       diff.width = width;
       diff.height = height;
       diff.getContext('2d', { willReadFrequently: true }).putImageData(diffOutput, 0, 0);
-      await dumpResults(fileName, isOK, {
-        expected,
-        actual,
-        diff
-      });
+      
+      await dumpResults(fileName,
+        {
+          passing: isOK,
+          test: this.test.testName,
+          module: this.test.module.name
+        },
+        {
+          expected,
+          actual,
+          diff
+        });
       
       await fabricCanvas.dispose();
       done();
