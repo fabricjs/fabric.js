@@ -592,7 +592,6 @@ function buildVisualTestResultsIndex() {
 
     const rows = [
       `<thead style="position:sticky;top: 0;">${[
-        'module',
         'test',
         'file',
         'status',
@@ -605,8 +604,7 @@ function buildVisualTestResultsIndex() {
           path.resolve(testDir, 'info.json')
         );
         const content = [
-          module,
-          test,
+          module + ' / ' + test,
           file,
           passing ? 'passing' : `<strong style="color:red">FAILING</strong>`,
           ...headers.map(
