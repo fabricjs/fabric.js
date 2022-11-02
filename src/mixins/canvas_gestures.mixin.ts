@@ -1,4 +1,7 @@
 //@ts-nocheck
+
+import { scalingEqually } from '../controls/actions';
+
 (function (global) {
   var fabric = global.fabric,
     degreesToRadians = fabric.util.degreesToRadians,
@@ -136,7 +139,7 @@
           target = t.target;
         t.gestureScale = s;
         target._scaling = true;
-        return fabric.controlsUtils.scalingEqually(e, t, 0, 0);
+        return scalingEqually(e, t, 0, 0);
       },
 
       /**
