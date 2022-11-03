@@ -1,9 +1,8 @@
-// @ts-nocheck
 import { fabric } from '../../HEADER';
+import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import { TClassProperties, TFiller } from '../typedefs';
 import { stylesFromArray } from '../util/misc/textStyles';
 import { FabricObject } from './fabricObject.class';
-import { Text } from './text.class';
 
 /**
  * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
@@ -55,7 +54,7 @@ import { Text } from './text.class';
  *   Select line:                    triple click
  * </pre>
  */
-export class IText extends Text {
+export class IText extends ITextClickBehaviorMixin {
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number
@@ -426,23 +425,23 @@ export class IText extends Text {
   }
 
   _renderCursor(ctx, boundaries, selectionStart) {
-    let cursorLocation = this.get2DCursorLocation(selectionStart),
+    const cursorLocation = this.get2DCursorLocation(selectionStart),
       lineIndex = cursorLocation.lineIndex,
       charIndex =
         cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
       charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
       multiplier = this.scaleX * this.canvas.getZoom(),
       cursorWidth = this.cursorWidth / multiplier,
-      topOffset = boundaries.topOffset,
       dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY');
-    topOffset +=
+    const topOffset =
+      boundaries.topOffset +
       ((1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex)) /
         this.lineHeight -
       charHeight * (1 - this._fontSizeFraction);
 
     if (this.inCompositionMode) {
       // TODO: investigate why there isn't a return inside the if,
-      // and why can't happe top of the function
+      // and why can't happen at the top of the function
       this.renderSelection(ctx, boundaries);
     }
     ctx.fillStyle =
@@ -522,8 +521,8 @@ export class IText extends Text {
       endChar = end.charIndex < 0 ? 0 : end.charIndex;
 
     for (let i = startLine; i <= endLine; i++) {
-      let lineOffset = this._getLineLeftOffset(i) || 0,
-        lineHeight = this.getHeightOfLine(i),
+      const lineOffset = this._getLineLeftOffset(i) || 0;
+      let lineHeight = this.getHeightOfLine(i),
         realLineHeight = 0,
         boxStart = 0,
         boxEnd = 0;
@@ -551,10 +550,10 @@ export class IText extends Text {
       if (this.lineHeight < 1 || (i === endLine && this.lineHeight > 1)) {
         lineHeight /= this.lineHeight;
       }
-      let drawStart = boundaries.left + lineOffset + boxStart,
-        drawWidth = boxEnd - boxStart,
-        drawHeight = lineHeight,
-        extraTop = 0;
+      let drawStart = boundaries.left + lineOffset + boxStart;
+      const drawWidth = boxEnd - boxStart;
+      let drawHeight = lineHeight;
+      let extraTop = 0;
       if (this.inCompositionMode) {
         ctx.fillStyle = this.compositionColor || 'black';
         drawHeight = 1;

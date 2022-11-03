@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
 import { Text } from '../shapes/text.class';
@@ -12,19 +14,20 @@ import { Canvas } from '../__types__';
 const reNonWord = /[ \n\.,;!\?\-]/;
 
 export abstract class ITextBehaviorMixin extends Text {
-  isEditing: boolean;
-  selected: boolean;
-  cursorDelay: number;
-  selectionStart: number;
-  selectionEnd: number;
-  cursorDuration: number;
-  editable: boolean;
-  editingBorderColor: string;
-  inCompositionMode: boolean;
-  compositionStart: number;
-  compositionEnd: number;
+  abstract isEditing: boolean;
+  abstract selected: boolean;
+  abstract cursorDelay: number;
+  abstract selectionStart: number;
+  abstract selectionEnd: number;
+  abstract cursorDuration: number;
+  abstract editable: boolean;
+  abstract editingBorderColor: string;
+  abstract inCompositionMode: boolean;
+  abstract compositionStart: number;
+  abstract compositionEnd: number;
 
   abstract hiddenTextarea: HTMLTextAreaElement;
+
   protected _reSpace: RegExp;
   private _currentTickState: { isAborted: boolean; abort: () => void };
   private _cursorTimeout1: number;

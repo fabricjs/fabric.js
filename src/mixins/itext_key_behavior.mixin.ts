@@ -58,6 +58,8 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
     65: 'selectAll';
   };
 
+  hiddenTextarea: HTMLTextAreaElement | null;
+
   /**
    * DOM container to append the hiddenTextarea.
    * An alternative to attaching to the document.body.

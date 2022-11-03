@@ -1,13 +1,13 @@
-////@ts-nocheck
+//@ts-nocheck
 import { IPoint, Point } from '../point.class';
 import { TPointerEvent, TransformEvent } from '../typedefs';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
-import { ITextBehaviorMixin } from './itext_behavior.mixin';
+import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
 
-export abstract class ITextClickBehaviorMixin extends ITextBehaviorMixin {
+export abstract class ITextClickBehaviorMixin extends ITextKeyBehaviorMixin {
   private __lastClickTime: number;
   private __lastLastClickTime: number;
-  private __lastPointer: IPoint | {};
+  private __lastPointer: IPoint | Record<string, never>;
   private __newClickTime: number;
 
   /**
