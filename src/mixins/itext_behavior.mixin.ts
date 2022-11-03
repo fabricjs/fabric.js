@@ -9,6 +9,7 @@ import { removeFromArray } from '../util/internals';
 import { createCanvasElement } from '../util/misc/dom';
 import { transformPoint } from '../util/misc/matrix';
 import { Canvas } from '../__types__';
+import { TextStyleDeclaration } from './text_style.mixin';
 
 // extend this regex to support non english languages
 const reNonWord = /[ \n\.,;!\?\-]/;
@@ -1237,7 +1238,7 @@ export abstract class ITextBehaviorMixin extends Text {
     lineIndex: number,
     charIndex: number,
     quantity: number,
-    copiedStyl
+    copiedStyle: TextStyleDeclaration[]
   ) {
     if (!this.styles) {
       this.styles = {};
@@ -1298,7 +1299,7 @@ export abstract class ITextBehaviorMixin extends Text {
   insertNewStyleBlock(
     insertedText: string[],
     start: number,
-    copiedStyle: Array<any>
+    copiedStyle: TextStyleDeclaration[]
   ) {
     let cursorLoc = this.get2DCursorLocation(start, true),
       addedLines = [0],
@@ -1392,7 +1393,12 @@ export abstract class ITextBehaviorMixin extends Text {
    * @param {Number} start
    * @param {Number} end default to start + 1
    */
-  insertChars(text: string, style: Array<any>, start: number, end: number) {
+  insertChars(
+    text: string,
+    style: TextStyleDeclaration[],
+    start: number,
+    end: number
+  ) {
     if (typeof end === 'undefined') {
       end = start;
     }
