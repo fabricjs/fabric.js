@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { fabric } from '../../HEADER';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import { TClassProperties, TFiller } from '../typedefs';
@@ -69,6 +70,10 @@ export class IText extends ITextClickBehaviorMixin {
    */
   selectionEnd: number;
 
+  compositionStart: number;
+
+  compositionEnd: number;
+
   /**
    * Color of text selection
    * @type String
@@ -136,27 +141,6 @@ export class IText extends ITextClickBehaviorMixin {
   caching: boolean;
 
   /**
-   * @private
-   */
-  _reSpace: RegExp;
-
-  /**
-   * @private
-   */
-  _currentCursorOpacity: number;
-
-  /**
-   * @private
-   */
-  _selectionDirection: CanvasDirection;
-
-  /**
-   * Helps determining when the text is in composition, so that the cursor
-   * rendering is altered.
-   */
-  inCompositionMode: boolean;
-
-  /**
    * Constructor
    * @param {String} text Text string
    * @param {Object} [options] Options object
@@ -179,6 +163,7 @@ export class IText extends ITextClickBehaviorMixin {
     } else {
       super._set(key, value);
     }
+    return this;
   }
 
   /**
