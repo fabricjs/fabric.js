@@ -91,25 +91,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run prettier:check
-  coverage:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Code Coverage Report Updater
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-          cache: npm
-      - run: npm ci
-      - run: npm run build -- -f
-      - run: npm run test:coverage
-      - run: npm run coverage:report
-      - uses: ShaMan123/lcov-reporter-action@v1.1.1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          delete-old-comments: true
-          update-comment: true
   changelog:
     if: ${{ always() }}
     runs-on: ubuntu-latest

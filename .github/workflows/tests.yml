@@ -53,7 +53,20 @@ jobs:
       - run: npm ci
       - run: npm run build -- -f
       - name: Run tests
-        run: npm run test -- -c node -a
+        run: |
+          if [[ ${{ matrix.node-version }} -eq 16 ]]; then
+            npm run test -- -c node -a --coverage
+            npm run coverage:report
+          else
+            npm run test -- -c node -a
+          fi
+      - name: Coverage Report
+        if: matrix.node-version == 16 && always()
+        uses: ShaMan123/lcov-reporter-action@v1.1.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          delete-old-comments: true
+          update-comment: true
       - name: Rename artifact (./node > ./node${{ matrix.node-version }})
         run: mv cli_output/test_results/node cli_output/test_results/node${{ matrix.node-version }}
       - name: Archive visual test results
