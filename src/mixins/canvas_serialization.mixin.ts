@@ -90,7 +90,7 @@
         // call it. Normally loading an Object from JSON
         // create the Object instance. Here the Canvas is
         // already an instance and we are just loading things over it
-        this._setOptions(serialized);
+        this.set(serialized);
       },
 
       /**

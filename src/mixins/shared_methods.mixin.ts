@@ -1,56 +1,41 @@
-//@ts-nocheck
 import { Observable } from './observable.mixin';
 
 export class CommonMethods extends Observable {
   /**
-   * Sets object's properties from options
-   * @param {Object} [options] Options object
-   */
-  _setOptions(options: any) {
-    for (const prop in options) {
-      this.set(prop, options[prop]);
-    }
-  }
-
-  /**
-   * @private
-   */
-  _setObject(obj: Record<string, any>) {
-    for (const prop in obj) {
-      this._set(prop, obj[prop]);
-    }
-  }
-
-  /**
-   * Sets property to a given value. When changing position/dimension -related properties (left, top, scale, angle, etc.) `set` does not update position of object's borders/controls. If you need to update those, call `setCoords()`.
+   * Sets property to a given value and runs side effects.
+   * When changing position/dimension related properties (left, top, scale, angle, etc.)
+   * `set` does not update position of object's borders/controls. If you need to update those, call `setCoords()`.
    * @param {String|Object} key Property name or object (if object, iterate over the object properties)
-   * @param {Object|Function} value Property value (if function, the value is passed into it and its return value is used as a new one)
-   * @return {fabric.Object} thisArg
-   * @chainable
+   * @param {*} [value] Property value
    */
-  set(key: string | Record<string, any>, value?: any) {
-    if (typeof key === 'object') {
-      this._setObject(key);
+  set<K extends keyof this, V extends this[K]>(key: K, value: V): this;
+  set<K extends keyof this, V extends this[K]>(value: Record<K, V>): this;
+  set<K extends keyof this, V extends this[K]>(
+    arg0: K | Record<K, V>,
+    value?: V
+  ) {
+    if (typeof arg0 === 'object') {
+      for (const prop in arg0) {
+        this._set(prop, arg0[prop] as any);
+      }
     } else {
-      this._set(key, value);
+      this._set(arg0, value!);
     }
     return this;
   }
 
-  _set(key: string, value: any) {
+  protected _set<K extends keyof this, V extends this[K]>(key: K, value: V) {
     this[key] = value;
   }
 
   /**
    * Toggles specified property from `true` to `false` or from `false` to `true`
    * @param {String} property Property to toggle
-   * @return {fabric.Object} thisArg
-   * @chainable
    */
-  toggle(property: string) {
+  toggle<T extends keyof this>(property: T) {
     const value = this.get(property);
     if (typeof value === 'boolean') {
-      this.set(property, !value);
+      this.set(property, !value as this[T]);
     }
     return this;
   }
@@ -60,7 +45,7 @@ export class CommonMethods extends Observable {
    * @param {String} property Property name
    * @return {*} value of a property
    */
-  get(property: string) {
+  get<T extends keyof this>(property: T) {
     return this[property];
   }
 }

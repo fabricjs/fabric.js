@@ -818,7 +818,7 @@ export class FabricObject extends ObjectGeometry {
    * @param {Object} [options] Options object
    */
   setOptions(options: Record<string, any> = {}) {
-    this._setOptions(options);
+    this.set(options);
   }
 
   /**
