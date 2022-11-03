@@ -224,32 +224,32 @@ const DEFAULT_SVG_FONT_SIZE = 16;
 /* "magic number" for bezier approximations of arcs (http://itc.ktu.lt/itc354/Riskus354.pdf) */
 const kRect = 1 - 0.5522847498;
 
-var fabric$1 = fabric$1 || {
+var fabric$3 = fabric$3 || {
     version: version,
     config,
     cache,
     iMatrix,
 };
 if (typeof exports !== 'undefined') {
-    exports.fabric = fabric$1;
+    exports.fabric = fabric$3;
 }
 else if (typeof define === 'function' && define.amd) {
     /* _AMD_START_ */
     define([], function () {
-        return fabric$1;
+        return fabric$3;
     });
 }
 /* _AMD_END_ */
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
     if (document instanceof
         (typeof HTMLDocument !== 'undefined' ? HTMLDocument : Document)) {
-        fabric$1.document = document;
+        fabric$3.document = document;
     }
     else {
-        fabric$1.document = document.implementation.createHTMLDocument('');
+        fabric$3.document = document.implementation.createHTMLDocument('');
     }
-    fabric$1.window = window;
-    window.fabric = fabric$1;
+    fabric$3.window = window;
+    window.fabric = fabric$3;
 }
 else {
     // assume we're running under node.js when document/window are not present
@@ -260,36 +260,36 @@ else {
         },
         resources: 'usable',
     }).window;
-    fabric$1.document = virtualWindow.document;
-    fabric$1.jsdomImplForWrapper =
+    fabric$3.document = virtualWindow.document;
+    fabric$3.jsdomImplForWrapper =
         require('jsdom/lib/jsdom/living/generated/utils').implForWrapper;
-    fabric$1.nodeCanvas = require('jsdom/lib/jsdom/utils').Canvas;
-    fabric$1.window = virtualWindow;
-    global.DOMParser = fabric$1.window.DOMParser;
+    fabric$3.nodeCanvas = require('jsdom/lib/jsdom/utils').Canvas;
+    fabric$3.window = virtualWindow;
+    global.DOMParser = fabric$3.window.DOMParser;
 }
 /**
  * True when in environment that supports touch events
  * @type boolean
  */
-fabric$1.isTouchSupported =
-    'ontouchstart' in fabric$1.window ||
-        'ontouchstart' in fabric$1.document ||
-        (fabric$1.window &&
-            fabric$1.window.navigator &&
-            fabric$1.window.navigator.maxTouchPoints > 0);
+fabric$3.isTouchSupported =
+    'ontouchstart' in fabric$3.window ||
+        'ontouchstart' in fabric$3.document ||
+        (fabric$3.window &&
+            fabric$3.window.navigator &&
+            fabric$3.window.navigator.maxTouchPoints > 0);
 /**
  * True when in environment that's probably Node.js
  * @type boolean
  */
-fabric$1.isLikelyNode =
+fabric$3.isLikelyNode =
     typeof Buffer !== 'undefined' && typeof window === 'undefined';
 /**
  * @todo move to config when window is exported
  */
 config.configure({
-    devicePixelRatio: fabric$1.window.devicePixelRatio ||
-        fabric$1.window.webkitDevicePixelRatio ||
-        fabric$1.window.mozDevicePixelRatio ||
+    devicePixelRatio: fabric$3.window.devicePixelRatio ||
+        fabric$3.window.webkitDevicePixelRatio ||
+        fabric$3.window.mozDevicePixelRatio ||
         1,
 });
 
@@ -827,7 +827,7 @@ class Point {
     }
 }
 const originZero = new Point(0, 0);
-fabric$1.Point = Point;
+fabric$3.Point = Point;
 
 const unitVectorX = new Point(1, 0);
 /**
@@ -1297,7 +1297,7 @@ function __rest(s, e) {
  * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
  * @return {Point} The transformed point
  */
-const transformPoint = (p, t, ignoreOffset) => new Point(p).transform(t, ignoreOffset);
+const transformPoint$1 = (p, t, ignoreOffset) => new Point(p).transform(t, ignoreOffset);
 /**
  * Invert transformation t
  * @static
@@ -1306,7 +1306,7 @@ const transformPoint = (p, t, ignoreOffset) => new Point(p).transform(t, ignoreO
  * @return {Array} The inverted transform
  */
 const invertTransform = (t) => {
-    const a = 1 / (t[0] * t[3] - t[1] * t[2]), r = [a * t[3], -a * t[1], -a * t[2], a * t[0], 0, 0], { x, y } = transformPoint(new Point(t[4], t[5]), r, true);
+    const a = 1 / (t[0] * t[3] - t[1] * t[2]), r = [a * t[3], -a * t[1], -a * t[2], a * t[0], 0, 0], { x, y } = transformPoint$1(new Point(t[4], t[5]), r, true);
     r[4] = -x;
     r[5] = -y;
     return r;
@@ -1449,7 +1449,7 @@ const extend = (destination, source, deep) => {
     // the deep clone is for internal use, is not meant to avoid
     // javascript traps or cloning html element or self referenced objects.
     if (deep) {
-        if (!fabric$1.isLikelyNode && source instanceof Element) {
+        if (!fabric$3.isLikelyNode && source instanceof Element) {
             // avoid cloning deep images, canvases,
             destination = source;
         }
@@ -1501,7 +1501,7 @@ const clone = (object, deep) => deep ? extend({}, object, deep) : Object.assign(
  * @param {boolean} forTextSpans whether to check overline, underline, and line-through properties
  * @return {boolean} true if the style changed
  */
-const hasStyleChanged = (prevStyle, thisStyle, forTextSpans = false) => prevStyle.fill !== thisStyle.fill ||
+const hasStyleChanged$1 = (prevStyle, thisStyle, forTextSpans = false) => prevStyle.fill !== thisStyle.fill ||
     prevStyle.stroke !== thisStyle.stroke ||
     prevStyle.strokeWidth !== thisStyle.strokeWidth ||
     prevStyle.fontSize !== thisStyle.fontSize ||
@@ -1541,7 +1541,7 @@ const stylesToArray = (styles, text) => {
             const thisStyle = styles[i][c];
             //check if style exists for this character
             if (thisStyle && Object.keys(thisStyle).length > 0) {
-                if (hasStyleChanged(prevStyle, thisStyle, true)) {
+                if (hasStyleChanged$1(prevStyle, thisStyle, true)) {
                     stylesArray.push({
                         start: charIndex,
                         end: charIndex + 1,
@@ -1602,14 +1602,14 @@ const stylesFromArray = (styles, text) => {
  * @memberOf fabric.util
  * @return {CanvasElement} initialized canvas element
  */
-const createCanvasElement = () => fabric$1.document.createElement('canvas');
+const createCanvasElement$1 = () => fabric$3.document.createElement('canvas');
 /**
  * Creates image element (works on client and node)
  * @static
  * @memberOf fabric.util
  * @return {HTMLImageElement} HTML image element
  */
-const createImage = () => fabric$1.document.createElement('img');
+const createImage = () => fabric$3.document.createElement('img');
 /**
  * Creates a canvas element that is a copy of another and is also painted
  * @param {CanvasElement} canvas to copy size and content of
@@ -1619,7 +1619,7 @@ const createImage = () => fabric$1.document.createElement('img');
  */
 const copyCanvasElement = (canvas) => {
     var _a;
-    const newCanvas = createCanvasElement();
+    const newCanvas = createCanvasElement$1();
     newCanvas.width = canvas.width;
     newCanvas.height = canvas.height;
     (_a = newCanvas.getContext('2d')) === null || _a === void 0 ? void 0 : _a.drawImage(canvas, 0, 0);
@@ -1645,7 +1645,7 @@ const toDataURL = (canvasEl, format, quality) => canvasEl.toDataURL(`image/${for
  * @param {number} fractionDigits number of fraction digits to "leave"
  * @return {number}
  */
-const toFixed = (number, fractionDigits) => parseFloat(Number(number).toFixed(fractionDigits));
+const toFixed$1 = (number, fractionDigits) => parseFloat(Number(number).toFixed(fractionDigits));
 
 /**
  * Returns array of attributes for given svg that fabric parses
@@ -1722,7 +1722,7 @@ const groupSVGElements = (elements) => {
     if (elements && elements.length === 1) {
         return elements[0];
     }
-    return new fabric$1.Group(elements);
+    return new fabric$3.Group(elements);
 };
 // align can be either none or undefined or a combination of mid/max
 const parseAlign = (align) => {
@@ -1758,7 +1758,7 @@ const parsePreserveAspectRatioAttribute = (attribute) => {
  */
 const matrixToSVG = (transform) => 'matrix(' +
     transform
-        .map((value) => toFixed(value, config.NUM_FRACTION_DIGITS))
+        .map((value) => toFixed$1(value, config.NUM_FRACTION_DIGITS))
         .join(' ') +
     ')';
 
@@ -2116,7 +2116,7 @@ const getWholeChar = (str, i) => {
  * @param {object} namespace Namespace to get klass "Class" object from
  * @return {Object} klass "Class"
  */
-const getKlass = (type, namespace = fabric$1) => namespace[capitalize(camelize(type), true)];
+const getKlass = (type, namespace = fabric$3) => namespace[capitalize(camelize(type), true)];
 /**
  * Loads image element from given url and resolve it, or catch.
  * @memberOf fabric.util
@@ -2168,7 +2168,7 @@ const loadImage = (url, { signal, crossOrigin = null } = {}) => new Promise(func
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  * @returns {Promise<fabric.Object[]>}
  */
-const enlivenObjects = (objects, { signal, reviver = noop, namespace = fabric$1 } = {}) => new Promise((resolve, reject) => {
+const enlivenObjects = (objects, { signal, reviver = noop, namespace = fabric$3 } = {}) => new Promise((resolve, reject) => {
     const instances = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     Promise.all(objects.map((obj) => getKlass(obj.type, namespace)
@@ -2213,7 +2213,7 @@ const enlivenObjectEnlivables = (serializedObject, { signal } = {}) => new Promi
         }
         // gradient
         if (value.colorStops) {
-            return new fabric$1.Gradient(value);
+            return new fabric$3.Gradient(value);
         }
         // clipPath
         if (value.type) {
@@ -2224,7 +2224,7 @@ const enlivenObjectEnlivables = (serializedObject, { signal } = {}) => new Promi
         }
         // pattern
         if (value.source) {
-            return fabric$1.Pattern.fromObject(value, { signal }).then((pattern) => {
+            return fabric$3.Pattern.fromObject(value, { signal }).then((pattern) => {
                 instances.push(pattern);
                 return pattern;
             });
@@ -3006,7 +3006,7 @@ const transformPath = (path, transform, pathOffset) => {
     return path.map((pathSegment) => {
         const newSegment = pathSegment.slice(0);
         for (let i = 1; i < pathSegment.length - 1; i += 2) {
-            const { x, y } = transformPoint({
+            const { x, y } = transformPoint$1({
                 x: pathSegment[i],
                 y: pathSegment[i + 1],
             }, transform);
@@ -3054,7 +3054,7 @@ const joinPath = (pathData) => pathData.map((segment) => segment.join(' ')).join
  * @param {HTMLElement} element
  * @param {Object | string} styles
  */
-function setStyle(element, styles) {
+function setStyle$1(element, styles) {
     const elementStyle = element.style;
     if (!elementStyle) {
         return;
@@ -3129,7 +3129,7 @@ const touchEvents = ['touchstart', 'touchmove', 'touchend'];
  * @param {String} eventName
  * @param {Function} handler
  */
-const addListener = (element, eventName, handler, options) => element && element.addEventListener(eventName, handler, options);
+const addListener$1 = (element, eventName, handler, options) => element && element.addEventListener(eventName, handler, options);
 /**
  * Removes an event listener from an element
  * @function
@@ -3177,7 +3177,7 @@ function wrapElement(element, wrapper) {
  */
 function getScrollLeftTop(element) {
     let left = 0, top = 0;
-    const docElement = fabric$1.document.documentElement, body = fabric$1.document.body || {
+    const docElement = fabric$3.document.documentElement, body = fabric$3.document.body || {
         scrollLeft: 0,
         scrollTop: 0,
     };
@@ -3188,7 +3188,7 @@ function getScrollLeftTop(element) {
     while (element && (element.parentNode || element.host)) {
         // Set element to element parent, or 'host' in case of ShadowDOM
         element = element.parentNode || element.host;
-        if (element === fabric$1.document) {
+        if (element === fabric$3.document) {
             left = body.scrollLeft || docElement.scrollLeft || 0;
             top = body.scrollTop || docElement.scrollTop || 0;
         }
@@ -3220,7 +3220,7 @@ function getElementOffset(element) {
     if (!doc) {
         return offset;
     }
-    const elemStyle = fabric$1.document.defaultView.getComputedStyle(element, null);
+    const elemStyle = fabric$3.document.defaultView.getComputedStyle(element, null);
     for (const attr in offsetAttributes) {
         offset[offsetAttributes[attr]] += parseInt(elemStyle[attr], 10) || 0;
     }
@@ -3261,14 +3261,14 @@ function makeElementSelectable(element) {
     return element;
 }
 function getNodeCanvas(element) {
-    const impl = fabric$1.jsdomImplForWrapper(element);
+    const impl = fabric$3.jsdomImplForWrapper(element);
     return impl._canvas || impl._image;
 }
 function cleanUpJsdomNode(element) {
-    if (!fabric$1.isLikelyNode) {
+    if (!fabric$3.isLikelyNode) {
         return;
     }
-    const impl = fabric$1.jsdomImplForWrapper(element);
+    const impl = fabric$3.jsdomImplForWrapper(element);
     if (impl) {
         impl._image = null;
         impl._canvas = null;
@@ -3355,7 +3355,7 @@ const mergeClipPaths = (c1, c2) => {
         //  case (1)
         a.inverted = b.inverted = false;
     }
-    return new fabric$1.Group([a], { clipPath: b, inverted });
+    return new fabric$3.Group([a], { clipPath: b, inverted });
 };
 
 /**
@@ -4229,7 +4229,7 @@ class Color {
     }
 }
 
-fabric$1.Color = Color;
+fabric$3.Color = Color;
 
 //@ts-nocheck
 /**
@@ -4300,7 +4300,7 @@ class RunningAnimations extends Array {
     }
 }
 const runningAnimations = new RunningAnimations();
-fabric$1.runningAnimations = runningAnimations;
+fabric$3.runningAnimations = runningAnimations;
 
 //@ts-nocheck
 /**
@@ -4416,11 +4416,11 @@ function animate(options = {}) {
     }
     return context.cancel;
 }
-const _requestAnimFrame = fabric$1.window.requestAnimationFrame ||
+const _requestAnimFrame = fabric$3.window.requestAnimationFrame ||
     function (callback) {
-        return fabric$1.window.setTimeout(callback, 1000 / 60);
+        return fabric$3.window.setTimeout(callback, 1000 / 60);
     };
-const _cancelAnimFrame = fabric$1.window.cancelAnimationFrame || fabric$1.window.clearTimeout;
+const _cancelAnimFrame = fabric$3.window.cancelAnimationFrame || fabric$3.window.clearTimeout;
 /**
  * requestAnimationFrame polyfill based on http://paulirish.com/2011/requestanimationframe-for-smart-animating/
  * In order to get a precise start time, `requestAnimFrame` should be called as an entry into the method
@@ -4429,10 +4429,10 @@ const _cancelAnimFrame = fabric$1.window.cancelAnimationFrame || fabric$1.window
  * @param {DOMElement} element optional Element to associate with animation
  */
 function requestAnimFrame(...args) {
-    return _requestAnimFrame.apply(fabric$1.window, args);
+    return _requestAnimFrame.apply(fabric$3.window, args);
 }
 function cancelAnimFrame(...args) {
-    return _cancelAnimFrame.apply(fabric$1.window, args);
+    return _cancelAnimFrame.apply(fabric$3.window, args);
 }
 
 // Calculate an in-between color. Returns a "rgba()" string.
@@ -4564,7 +4564,7 @@ function createClass(...args) {
 /**
  * @namespace fabric.util
  */
-fabric$1.util = {
+fabric$3.util = {
     cos,
     sin,
     rotateVector,
@@ -4580,7 +4580,7 @@ fabric$1.util = {
     removeFromArray,
     projectStrokeOnPoints,
     // matrix.ts file
-    transformPoint,
+    transformPoint: transformPoint$1,
     invertTransform,
     composeMatrix,
     qrDecompose,
@@ -4590,16 +4590,16 @@ fabric$1.util = {
     // textStyles.ts file
     stylesFromArray,
     stylesToArray,
-    hasStyleChanged,
+    hasStyleChanged: hasStyleChanged$1,
     object: {
         clone,
         extend,
     },
-    createCanvasElement,
+    createCanvasElement: createCanvasElement$1,
     createImage,
     copyCanvasElement,
     toDataURL,
-    toFixed,
+    toFixed: toFixed$1,
     matrixToSVG,
     parsePreserveAspectRatioAttribute,
     groupSVGElements,
@@ -4639,11 +4639,11 @@ fabric$1.util = {
     transformPath,
     getRegularPolygonPath,
     request,
-    setStyle,
+    setStyle: setStyle$1,
     isTouchEvent,
     getPointer,
     removeListener,
-    addListener,
+    addListener: addListener$1,
     wrapElement,
     getScrollLeftTop,
     getElementOffset,
@@ -4712,7 +4712,7 @@ const ElementsParser = function (elements, callback, options, reviver, parsingOp
         });
     };
     proto.findTag = function (el) {
-        return fabric$1[capitalize(el.tagName.replace('svg:', ''))];
+        return fabric$3[capitalize(el.tagName.replace('svg:', ''))];
     };
     proto.createObject = function (el, index) {
         const klass = this.findTag(el);
@@ -4734,7 +4734,7 @@ const ElementsParser = function (elements, callback, options, reviver, parsingOp
             let _options;
             _this.resolveGradient(obj, el, 'fill');
             _this.resolveGradient(obj, el, 'stroke');
-            if (obj instanceof fabric$1.Image && obj._originalElement) {
+            if (obj instanceof fabric$3.Image && obj._originalElement) {
                 _options = obj.parsePreserveAspectRatioAttribute(el);
             }
             obj._removeTransformMatrix(_options);
@@ -4752,13 +4752,13 @@ const ElementsParser = function (elements, callback, options, reviver, parsingOp
         regex.lastIndex = 0;
         const id = regex.exec(value)[1];
         regex.lastIndex = 0;
-        return fabric$1[storage][this.svgUid][id];
+        return fabric$3[storage][this.svgUid][id];
     };
     proto.resolveGradient = function (obj, el, property) {
         const gradientDef = this.extractPropertyDefinition(obj, property, 'gradientDefs');
         if (gradientDef) {
             const opacityAttr = el.getAttribute(property + '-opacity');
-            const gradient = fabric$1.Gradient.fromElement(gradientDef, obj, Object.assign(Object.assign({}, this.options), { opacity: opacityAttr }));
+            const gradient = fabric$3.Gradient.fromElement(gradientDef, obj, Object.assign(Object.assign({}, this.options), { opacity: opacityAttr }));
             obj.set(property, gradient);
         }
     };
@@ -4791,7 +4791,7 @@ const ElementsParser = function (elements, callback, options, reviver, parsingOp
                 clipPath = container[0];
             }
             else {
-                clipPath = new fabric$1.Group(container);
+                clipPath = new fabric$3.Group(container);
             }
             gTransform = multiplyTransformMatrices(objTransformInv, clipPath.calcTransformMatrix());
             if (clipPath.clipPath) {
@@ -5369,7 +5369,7 @@ class Intersection {
         ]);
     }
 }
-fabric$1.Intersection = Intersection;
+fabric$3.Intersection = Intersection;
 
 //@ts-nocheck
 /**
@@ -5481,7 +5481,7 @@ class Observable {
         }
     }
 }
-fabric$1.Observable = Observable;
+fabric$3.Observable = Observable;
 
 //@ts-nocheck
 class CommonMethods extends Observable {
@@ -5644,7 +5644,7 @@ class ObjectOrigin extends CommonMethods {
     getCenterPoint() {
         const relCenter = this.getRelativeCenterPoint();
         return this.group
-            ? transformPoint(relCenter, this.group.calcTransformMatrix())
+            ? transformPoint$1(relCenter, this.group.calcTransformMatrix())
             : relCenter;
     }
     /**
@@ -5772,7 +5772,7 @@ class ObjectGeometry extends ObjectOrigin {
     getXY() {
         const relativePosition = this.getRelativeXY();
         return this.group
-            ? transformPoint(relativePosition, this.group.calcTransformMatrix())
+            ? transformPoint$1(relativePosition, this.group.calcTransformMatrix())
             : relativePosition;
     }
     /**
@@ -5787,7 +5787,7 @@ class ObjectGeometry extends ObjectOrigin {
      */
     setXY(point, originX, originY) {
         if (this.group) {
-            point = transformPoint(point, invertTransform(this.group.calcTransformMatrix()));
+            point = transformPoint$1(point, invertTransform(this.group.calcTransformMatrix()));
         }
         this.setRelativeXY(point, originX, originY);
     }
@@ -5840,7 +5840,7 @@ class ObjectGeometry extends ObjectOrigin {
         const coords = [tl, tr, br, bl];
         if (this.group) {
             const t = this.group.calcTransformMatrix();
-            return coords.map((p) => transformPoint(p, t));
+            return coords.map((p) => transformPoint$1(p, t));
         }
         return coords;
     }
@@ -6129,10 +6129,10 @@ class ObjectGeometry extends ObjectOrigin {
     calcLineCoords() {
         const vpt = this.getViewportTransform(), padding = this.padding, angle = degreesToRadians(this.getTotalAngle()), cosP = cos(angle) * padding, sinP = sin(angle) * padding, cosPSinP = cosP + sinP, cosPMinusSinP = cosP - sinP, { tl, tr, bl, br } = this.calcACoords();
         const lineCoords = {
-            tl: transformPoint(tl, vpt),
-            tr: transformPoint(tr, vpt),
-            bl: transformPoint(bl, vpt),
-            br: transformPoint(br, vpt),
+            tl: transformPoint$1(tl, vpt),
+            tr: transformPoint$1(tr, vpt),
+            bl: transformPoint$1(bl, vpt),
+            br: transformPoint$1(br, vpt),
         };
         if (padding) {
             lineCoords.tl.x -= cosPMinusSinP;
@@ -6165,10 +6165,10 @@ class ObjectGeometry extends ObjectOrigin {
         const rotateMatrix = calcRotateMatrix({ angle: this.angle }), center = this.getRelativeCenterPoint(), translateMatrix = [1, 0, 0, 1, center.x, center.y], finalMatrix = multiplyTransformMatrices(translateMatrix, rotateMatrix), dim = this._getTransformedDimensions(), w = dim.x / 2, h = dim.y / 2;
         return {
             // corners
-            tl: transformPoint({ x: -w, y: -h }, finalMatrix),
-            tr: transformPoint({ x: w, y: -h }, finalMatrix),
-            bl: transformPoint({ x: -w, y: h }, finalMatrix),
-            br: transformPoint({ x: w, y: h }, finalMatrix),
+            tl: transformPoint$1({ x: -w, y: -h }, finalMatrix),
+            tr: transformPoint$1({ x: w, y: -h }, finalMatrix),
+            bl: transformPoint$1({ x: -w, y: h }, finalMatrix),
+            br: transformPoint$1({ x: w, y: h }, finalMatrix),
         };
     }
     /**
@@ -6362,7 +6362,7 @@ class FabricObject extends ObjectGeometry {
      * @private
      */
     _createCacheCanvas() {
-        this._cacheCanvas = createCanvasElement();
+        this._cacheCanvas = createCanvasElement$1();
         this._cacheContext = this._cacheCanvas.getContext('2d');
         this._updateCacheCanvas();
         // if canvas gets created, is empty, so dirty.
@@ -6467,7 +6467,7 @@ class FabricObject extends ObjectGeometry {
                 additionalHeight = height * 0.1;
             }
         }
-        if (this instanceof fabric$1.Text && this.path) {
+        if (this instanceof fabric$3.Text && this.path) {
             shouldRedraw = true;
             shouldResizeCanvas = true;
             // IMHO in those lines we are using zoomX and zoomY not the this version.
@@ -6523,13 +6523,13 @@ class FabricObject extends ObjectGeometry {
      */
     toObject(propertiesToInclude) {
         const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS, clipPathData = this.clipPath && !this.clipPath.excludeFromExport
-            ? Object.assign(Object.assign({}, this.clipPath.toObject(propertiesToInclude)), { inverted: this.clipPath.inverted, absolutePositioned: this.clipPath.absolutePositioned }) : null, object = Object.assign(Object.assign(Object.assign({}, pick(this, propertiesToInclude)), { type: this.type, version: version, originX: this.originX, originY: this.originY, left: toFixed(this.left, NUM_FRACTION_DIGITS), top: toFixed(this.top, NUM_FRACTION_DIGITS), width: toFixed(this.width, NUM_FRACTION_DIGITS), height: toFixed(this.height, NUM_FRACTION_DIGITS), fill: this.fill && this.fill.toObject ? this.fill.toObject() : this.fill, stroke: this.stroke && this.stroke.toObject
+            ? Object.assign(Object.assign({}, this.clipPath.toObject(propertiesToInclude)), { inverted: this.clipPath.inverted, absolutePositioned: this.clipPath.absolutePositioned }) : null, object = Object.assign(Object.assign(Object.assign({}, pick(this, propertiesToInclude)), { type: this.type, version: version, originX: this.originX, originY: this.originY, left: toFixed$1(this.left, NUM_FRACTION_DIGITS), top: toFixed$1(this.top, NUM_FRACTION_DIGITS), width: toFixed$1(this.width, NUM_FRACTION_DIGITS), height: toFixed$1(this.height, NUM_FRACTION_DIGITS), fill: this.fill && this.fill.toObject ? this.fill.toObject() : this.fill, stroke: this.stroke && this.stroke.toObject
                 ? this.stroke.toObject()
-                : this.stroke, strokeWidth: toFixed(this.strokeWidth, NUM_FRACTION_DIGITS), strokeDashArray: this.strokeDashArray
+                : this.stroke, strokeWidth: toFixed$1(this.strokeWidth, NUM_FRACTION_DIGITS), strokeDashArray: this.strokeDashArray
                 ? this.strokeDashArray.concat()
-                : this.strokeDashArray, strokeLineCap: this.strokeLineCap, strokeDashOffset: this.strokeDashOffset, strokeLineJoin: this.strokeLineJoin, strokeUniform: this.strokeUniform, strokeMiterLimit: toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS), scaleX: toFixed(this.scaleX, NUM_FRACTION_DIGITS), scaleY: toFixed(this.scaleY, NUM_FRACTION_DIGITS), angle: toFixed(this.angle, NUM_FRACTION_DIGITS), flipX: this.flipX, flipY: this.flipY, opacity: toFixed(this.opacity, NUM_FRACTION_DIGITS), shadow: this.shadow && this.shadow.toObject
+                : this.strokeDashArray, strokeLineCap: this.strokeLineCap, strokeDashOffset: this.strokeDashOffset, strokeLineJoin: this.strokeLineJoin, strokeUniform: this.strokeUniform, strokeMiterLimit: toFixed$1(this.strokeMiterLimit, NUM_FRACTION_DIGITS), scaleX: toFixed$1(this.scaleX, NUM_FRACTION_DIGITS), scaleY: toFixed$1(this.scaleY, NUM_FRACTION_DIGITS), angle: toFixed$1(this.angle, NUM_FRACTION_DIGITS), flipX: this.flipX, flipY: this.flipY, opacity: toFixed$1(this.opacity, NUM_FRACTION_DIGITS), shadow: this.shadow && this.shadow.toObject
                 ? this.shadow.toObject()
-                : this.shadow, visible: this.visible, backgroundColor: this.backgroundColor, fillRule: this.fillRule, paintFirst: this.paintFirst, globalCompositeOperation: this.globalCompositeOperation, skewX: toFixed(this.skewX, NUM_FRACTION_DIGITS), skewY: toFixed(this.skewY, NUM_FRACTION_DIGITS) }), (clipPathData ? { clipPath: clipPathData } : null));
+                : this.shadow, visible: this.visible, backgroundColor: this.backgroundColor, fillRule: this.fillRule, paintFirst: this.paintFirst, globalCompositeOperation: this.globalCompositeOperation, skewX: toFixed$1(this.skewX, NUM_FRACTION_DIGITS), skewY: toFixed$1(this.skewY, NUM_FRACTION_DIGITS) }), (clipPathData ? { clipPath: clipPathData } : null));
         return !this.includeDefaultValues
             ? this._removeDefaultValues(object)
             : object;
@@ -6548,7 +6548,7 @@ class FabricObject extends ObjectGeometry {
      * @param {Object} object
      */
     _removeDefaultValues(object) {
-        const prototype = fabric$1.util.getKlass(object.type).prototype;
+        const prototype = fabric$3.util.getKlass(object.type).prototype;
         Object.keys(object).forEach(function (prop) {
             if (prop === 'left' || prop === 'top' || prop === 'type') {
                 return;
@@ -6653,8 +6653,8 @@ class FabricObject extends ObjectGeometry {
             this.flipY = !this.flipY;
             value *= -1;
         }
-        else if (key === 'shadow' && value && !(value instanceof fabric$1.Shadow)) {
-            value = new fabric$1.Shadow(value);
+        else if (key === 'shadow' && value && !(value instanceof fabric$3.Shadow)) {
+            value = new fabric$3.Shadow(value);
         }
         else if (key === 'dirty' && this.group) {
             this.group.set('dirty', value);
@@ -6827,7 +6827,7 @@ class FabricObject extends ObjectGeometry {
         }
         //ctx.scale(1 / 2, 1 / 2);
         if (clipPath.absolutePositioned) {
-            const m = fabric$1.util.invertTransform(this.calcTransformMatrix());
+            const m = fabric$3.util.invertTransform(this.calcTransformMatrix());
             ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
         }
         clipPath.transform(ctx);
@@ -7135,7 +7135,7 @@ class FabricObject extends ObjectGeometry {
      * @param {fabric.Gradient} filler a fabric gradient instance
      */
     _applyPatternForTransformedGradient(ctx, filler) {
-        const dims = this._limitCacheSize(this._getCacheCanvasDimensions()), pCanvas = fabric$1.util.createCanvasElement(), retinaScaling = this.canvas.getRetinaScaling(), width = dims.x / this.scaleX / retinaScaling, height = dims.y / this.scaleY / retinaScaling;
+        const dims = this._limitCacheSize(this._getCacheCanvasDimensions()), pCanvas = fabric$3.util.createCanvasElement(), retinaScaling = this.canvas.getRetinaScaling(), width = dims.x / this.scaleX / retinaScaling, height = dims.y / this.scaleY / retinaScaling;
         pCanvas.width = width;
         pCanvas.height = height;
         const pCtx = pCanvas.getContext('2d');
@@ -7193,7 +7193,7 @@ class FabricObject extends ObjectGeometry {
         let center = this._findCenterFromElement();
         if (this.transformMatrix) {
             this._assignTransformMatrixProps();
-            center = transformPoint(center, this.transformMatrix);
+            center = transformPoint$1(center, this.transformMatrix);
         }
         this.transformMatrix = null;
         if (preserveAspectRatioOptions) {
@@ -7238,7 +7238,7 @@ class FabricObject extends ObjectGeometry {
      */
     cloneAsImage(options) {
         const canvasEl = this.toCanvasElement(options);
-        return new fabric$1.Image(canvasEl);
+        return new fabric$3.Image(canvasEl);
     }
     /**
      * Converts an object into a HTMLCanvas element
@@ -7255,7 +7255,7 @@ class FabricObject extends ObjectGeometry {
      */
     toCanvasElement(options) {
         options || (options = {});
-        const utils = fabric$1.util, origParams = utils.saveObjectTransform(this), originalGroup = this.group, originalShadow = this.shadow, abs = Math.abs, retinaScaling = options.enableRetinaScaling
+        const utils = fabric$3.util, origParams = utils.saveObjectTransform(this), originalGroup = this.group, originalShadow = this.shadow, abs = Math.abs, retinaScaling = options.enableRetinaScaling
             ? Math.max(config.devicePixelRatio, 1)
             : 1, multiplier = (options.multiplier || 1) * retinaScaling;
         delete this.group;
@@ -7265,7 +7265,7 @@ class FabricObject extends ObjectGeometry {
         if (options.withoutShadow) {
             this.shadow = null;
         }
-        let el = fabric$1.util.createCanvasElement(), 
+        let el = fabric$3.util.createCanvasElement(), 
         // skip canvas zoom and calculate with setCoords now.
         boundingRect = this.getBoundingRect(true, true), shadow = this.shadow, shadowOffset = { x: 0, y: 0 }, width, height;
         if (shadow) {
@@ -7285,7 +7285,7 @@ class FabricObject extends ObjectGeometry {
         // we need to make it so.
         el.width = Math.ceil(width);
         el.height = Math.ceil(height);
-        let canvas = new fabric$1.StaticCanvas(el, {
+        let canvas = new fabric$3.StaticCanvas(el, {
             enableRetinaScaling: false,
             renderOnAddRemove: false,
             skipOffscreen: false,
@@ -7331,7 +7331,7 @@ class FabricObject extends ObjectGeometry {
      * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
      */
     toDataURL(options = {}) {
-        return fabric$1.util.toDataURL(this.toCanvasElement(options), options.format || 'png', options.quality || 1);
+        return fabric$3.util.toDataURL(this.toCanvasElement(options), options.format || 'png', options.quality || 1);
     }
     /**
      * Returns true if specified type is identical to the type of an instance
@@ -7564,7 +7564,7 @@ const fabricObjectDefaultValues = {
     lockSkewingY: false,
     lockScalingFlip: false,
     excludeFromExport: false,
-    objectCaching: !fabric$1.isLikelyNode,
+    objectCaching: !fabric$3.isLikelyNode,
     statefullCache: false,
     noScaleCache: true,
     strokeUniform: false,
@@ -8090,7 +8090,7 @@ function parseSVGDocument(doc, callback, reviver, parsingOptions) {
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  */
 function loadSVGFromString(string, callback, reviver, options) {
-    const parser = new fabric$1.window.DOMParser(), doc = parser.parseFromString(string.trim(), 'text/xml');
+    const parser = new fabric$3.window.DOMParser(), doc = parser.parseFromString(string.trim(), 'text/xml');
     parseSVGDocument(doc.documentElement, function (results, _options, elements, allElements) {
         callback(results, _options, elements, allElements);
     }, reviver, options);
@@ -8534,7 +8534,7 @@ function setStrokeFillOpacity(attributes) {
         }
         const color = new Color(attributes[attr]);
         attributes[attr] = color
-            .setAlpha(toFixed(color.getAlpha() * attributes[colorAttributes[attr]], 2))
+            .setAlpha(toFixed$1(color.getAlpha() * attributes[colorAttributes[attr]], 2))
             .toRgba();
     }
     return attributes;
@@ -8627,7 +8627,7 @@ function parsePointsAttribute(points) {
     return parsedPoints;
 }
 
-Object.assign(fabric$1, {
+Object.assign(fabric$3, {
     SHARED_ATTRIBUTES,
     cssRules,
     gradientDefs,
@@ -8999,7 +8999,7 @@ class Gradient {
             })));
     }
 }
-fabric$1.Gradient = Gradient;
+fabric$3.Gradient = Gradient;
 
 //@ts-nocheck
 /**
@@ -9094,7 +9094,7 @@ class Pattern$1 {
      * @return {object} Object representation of a pattern instance
      */
     toObject(propertiesToInclude) {
-        return Object.assign(Object.assign({}, pick(this, propertiesToInclude)), { type: 'pattern', source: this.sourceToString(), repeat: this.repeat, crossOrigin: this.crossOrigin, offsetX: toFixed(this.offsetX, config.NUM_FRACTION_DIGITS), offsetY: toFixed(this.offsetY, config.NUM_FRACTION_DIGITS), patternTransform: this.patternTransform
+        return Object.assign(Object.assign({}, pick(this, propertiesToInclude)), { type: 'pattern', source: this.sourceToString(), repeat: this.repeat, crossOrigin: this.crossOrigin, offsetX: toFixed$1(this.offsetX, config.NUM_FRACTION_DIGITS), offsetY: toFixed$1(this.offsetY, config.NUM_FRACTION_DIGITS), patternTransform: this.patternTransform
                 ? this.patternTransform.concat()
                 : null });
     }
@@ -9122,7 +9122,7 @@ class Pattern$1 {
         return new Pattern$1(Object.assign(Object.assign({}, serialized), { source: img }));
     }
 }
-fabric$1.Pattern = Pattern$1;
+fabric$3.Pattern = Pattern$1;
 
 //@ts-nocheck
 (function (global) {
@@ -11567,7 +11567,7 @@ const scalingYOrSkewingX = (eventData, transform, x, y) => {
 /**
  * @todo remove as unused
  */
-fabric$1.controlsUtils = {
+fabric$3.controlsUtils = {
     scaleCursorStyleHandler,
     skewCursorStyleHandler,
     scaleSkewCursorStyleHandler,
@@ -15659,7 +15659,7 @@ const circleDefaultValues = {
     cacheProperties: fabricObjectDefaultValues.cacheProperties.concat('radius', 'startAngle', 'endAngle'),
 };
 Object.assign(Circle$1.prototype, circleDefaultValues);
-fabric$1.Circle = Circle$1;
+fabric$3.Circle = Circle$1;
 
 class Triangle extends InteractiveFabricObject {
     /**
@@ -15701,7 +15701,7 @@ const triangleDefaultValues = {
     height: 100,
 };
 Object.assign(Triangle.prototype, triangleDefaultValues);
-fabric$1.Triangle = Triangle;
+fabric$3.Triangle = Triangle;
 
 class Ellipse extends InteractiveFabricObject {
     /**
@@ -15826,23 +15826,56 @@ const ellipseDefaultValues = {
     cacheProperties: [...fabricObjectDefaultValues.cacheProperties, 'rx', 'ry'],
 };
 Object.assign(Ellipse.prototype, ellipseDefaultValues);
-fabric$1.Ellipse = Ellipse;
+fabric$3.Ellipse = Ellipse;
 
-class Rect$1 extends InteractiveFabricObject {
+/**
+ * Rectangle class
+ * @class Rect
+ * @extends fabric.Object
+ * @return {Rect} thisArg
+ * @see {@link Rect#initialize} for constructor definition
+ */
+const Rect$1 = fabric$3.util.createClass(fabric$3.Object, 
+/** @lends Rect.prototype */ {
+    /**
+     * List of properties to consider when checking if state of an object is changed ({@link fabric.Object#hasStateChanged})
+     * as well as for history (undo/redo) purposes
+     * @type Array
+     */
+    stateProperties: fabric$3.Object.prototype.stateProperties.concat('rx', 'ry'),
+    /**
+     * Type of an object
+     * @type String
+     * @default
+     */
+    type: 'rect',
+    /**
+     * Horizontal border radius
+     * @type Number
+     * @default
+     */
+    rx: 0,
+    /**
+     * Vertical border radius
+     * @type Number
+     * @default
+     */
+    ry: 0,
+    cacheProperties: fabric$3.Object.prototype.cacheProperties.concat('rx', 'ry'),
     /**
      * Constructor
      * @param {Object} [options] Options object
      * @return {Object} thisArg
      */
-    constructor(options) {
-        super(options);
+    initialize: function (options) {
+        this.callSuper('initialize', options);
         this._initRxRy();
-    }
+    },
     /**
      * Initializes rx/ry attributes
      * @private
      */
-    _initRxRy() {
+    _initRxRy: function () {
         const { rx, ry } = this;
         if (rx && !ry) {
             this.ry = rx;
@@ -15850,12 +15883,14 @@ class Rect$1 extends InteractiveFabricObject {
         else if (ry && !rx) {
             this.rx = ry;
         }
-    }
+    },
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
      */
-    _render(ctx) {
+    _render: function (ctx) {
+        // 1x1 case (used in spray brush) optimization was removed because
+        // with caching and higher zoom level this makes more damage than help
         const { width: w, height: h } = this;
         const x = -w / 2;
         const y = -h / 2;
@@ -15878,83 +15913,80 @@ class Rect$1 extends InteractiveFabricObject {
             ctx.bezierCurveTo(x, y + kRect * ry, x + kRect * rx, y, x + rx, y);
         ctx.closePath();
         this._renderPaintInOrder(ctx);
-    }
+    },
     /**
      * Returns object representation of an instance
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} object representation of an instance
      */
-    toObject(propertiesToInclude = []) {
-        return super.toObject(['rx', 'ry', ...propertiesToInclude]);
-    }
+    toObject: function (propertiesToInclude) {
+        return this.callSuper('toObject', ['rx', 'ry'].concat(propertiesToInclude));
+    },
+    /* _TO_SVG_START_ */
     /**
      * Returns svg representation of an instance
      * @return {Array} an array of strings with the specific svg representation
      * of the instance
      */
-    _toSVG() {
+    _toSVG: function () {
         const { width, height, rx, ry } = this;
         return [
             '<rect ',
             'COMMON_PARTS',
-            `x="${-width / 2}" y="${-height / 2}" rx="${rx}" ry="${ry}" width="${width}" height="${height}" />\n`,
-        ];
-    }
-    /**
-     * Returns {@link Rect} instance from an object representation
-     * @static
-     * @memberOf Rect
-     * @param {Object} object Object to create an instance from
-     * @returns {Promise<Rect>}
-     */
-    static fromObject(object) {
-        return InteractiveFabricObject._fromObject(Rect$1, object);
-    }
-    /* _FROM_SVG_START_ */
-    /**
-     * Returns {@link Rect} instance from an SVG element
-     * @static
-     * @memberOf Rect
-     * @param {SVGElement} element Element to parse
-     * @param {Function} callback callback function invoked after parsing
-     * @param {Object} [options] Options object
-     */
-    static fromElement(element, callback, options = {}) {
-        if (!element) {
-            return callback(null);
-        }
-        const _a = parseAttributes(element, Rect$1.ATTRIBUTE_NAMES), { left = 0, top = 0, width = 0, height = 0, visible = true } = _a, restOfparsedAttributes = __rest(_a, ["left", "top", "width", "height", "visible"]);
-        const rect = new Rect$1(Object.assign(Object.assign(Object.assign({}, options), restOfparsedAttributes), { left,
-            top,
+            'x="',
+            -width / 2,
+            '" y="',
+            -height / 2,
+            '" rx="',
+            rx,
+            '" ry="',
+            ry,
+            '" width="',
             width,
-            height, visible: Boolean(visible && width && height) }));
-        callback(rect);
-    }
-}
+            '" height="',
+            height,
+            '" />\n',
+        ];
+    },
+    /* _TO_SVG_END_ */
+});
+/* _FROM_SVG_START_ */
 /**
  * List of attribute names to account for when parsing SVG element (used by `Rect.fromElement`)
  * @static
  * @memberOf Rect
  * @see: http://www.w3.org/TR/SVG/shapes.html#RectElement
  */
-Rect$1.ATTRIBUTE_NAMES = [
-    ...SHARED_ATTRIBUTES,
-    'x',
-    'y',
-    'rx',
-    'ry',
-    'width',
-    'height',
-];
-const rectDefaultValues = {
-    stateProperties: fabricObjectDefaultValues.stateProperties.concat('rx', 'ry'),
-    type: 'rect',
-    rx: 0,
-    ry: 0,
-    cacheProperties: fabricObjectDefaultValues.cacheProperties.concat('rx', 'ry'),
+Rect$1.ATTRIBUTE_NAMES = fabric$3.SHARED_ATTRIBUTES.concat('x y rx ry width height'.split(' '));
+/**
+ * Returns {@link Rect} instance from an SVG element
+ * @static
+ * @memberOf Rect
+ * @param {SVGElement} element Element to parse
+ * @param {Function} callback callback function invoked after parsing
+ * @param {Object} [options] Options object
+ */
+Rect$1.fromElement = function (element, callback, options = {}) {
+    if (!element) {
+        return callback(null);
+    }
+    const _a = fabric$3.parseAttributes(element, Rect$1.ATTRIBUTE_NAMES), { left = 0, top = 0, width = 0, height = 0, visible = true } = _a, restOfparsedAttributes = __rest(_a, ["left", "top", "width", "height", "visible"]);
+    const rect = new Rect$1(Object.assign(Object.assign(Object.assign({}, options), restOfparsedAttributes), { left,
+        top,
+        width,
+        height, visible: Boolean(visible && width && height) }));
+    callback(rect);
 };
-Object.assign(Rect$1.prototype, rectDefaultValues);
-fabric$1.Rect = Rect$1;
+/* _FROM_SVG_END_ */
+/**
+ * Returns {@link Rect} instance from an object representation
+ * @static
+ * @memberOf Rect
+ * @param {Object} object Object to create an instance from
+ * @returns {Promise<Rect>}
+ */
+Rect$1.fromObject = (object) => fabric$3.Object._fromObject(Rect$1, object);
+fabric$3.Rect = Rect$1;
 
 //@ts-nocheck
 (function (global) {
@@ -18455,10 +18487,10 @@ class WebGLProbe {
      * @returns config object if true
      */
     queryWebGL() {
-        if (this.initialized || fabric$1.isLikelyNode) {
+        if (this.initialized || fabric$3.isLikelyNode) {
             return;
         }
-        const canvas = createCanvasElement();
+        const canvas = createCanvasElement$1();
         const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
         if (gl) {
             this._maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
@@ -22124,253 +22156,300 @@ function copyGLTo2DPutImageData(gl, pipelineState) {
         fabric.Image.filters.BaseFilter.fromObject;
 })(typeof exports !== 'undefined' ? exports : window);
 
-//@ts-nocheck
-(function (global) {
-    var fabric = global.fabric || (global.fabric = {});
-    var additionalProps = ('fontFamily fontWeight fontSize text underline overline linethrough' +
-        ' textAlign fontStyle lineHeight textBackgroundColor charSpacing styles' +
-        ' direction path pathStartOffset pathSide pathAlign').split(' ');
+class TextStyleMixin extends InteractiveFabricObject {
     /**
-     * Text class
-     * @class fabric.Text
-     * @extends fabric.Object
-     * @return {fabric.Text} thisArg
-     * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
-     * @see {@link fabric.Text#initialize} for constructor definition
+     * Returns true if object has no styling or no styling in a line
+     * @param {Number} lineIndex , lineIndex is on wrapped lines.
+     * @return {Boolean}
      */
-    fabric.Text = fabric.util.createClass(fabric.Object, 
-    /** @lends fabric.Text.prototype */ {
-        /**
-         * Properties which when set cause object to change dimensions
-         * @type Array
-         * @private
-         */
-        _dimensionAffectingProps: [
-            'fontSize',
-            'fontWeight',
-            'fontFamily',
-            'fontStyle',
-            'lineHeight',
-            'text',
-            'charSpacing',
-            'textAlign',
-            'styles',
-            'path',
-            'pathStartOffset',
-            'pathSide',
-            'pathAlign',
-        ],
-        /**
-         * @private
-         */
-        _reNewline: /\r?\n/,
-        /**
-         * Use this regular expression to filter for whitespaces that is not a new line.
-         * Mostly used when text is 'justify' aligned.
-         * @private
-         */
-        _reSpacesAndTabs: /[ \t\r]/g,
-        /**
-         * Use this regular expression to filter for whitespace that is not a new line.
-         * Mostly used when text is 'justify' aligned.
-         * @private
-         */
-        _reSpaceAndTab: /[ \t\r]/,
-        /**
-         * Use this regular expression to filter consecutive groups of non spaces.
-         * Mostly used when text is 'justify' aligned.
-         * @private
-         */
-        _reWords: /\S+/g,
-        /**
-         * Type of an object
-         * @type String
-         * @default
-         */
-        type: 'text',
-        /**
-         * Font size (in pixels)
-         * @type Number
-         * @default
-         */
-        fontSize: 40,
-        /**
-         * Font weight (e.g. bold, normal, 400, 600, 800)
-         * @type {(Number|String)}
-         * @default
-         */
-        fontWeight: 'normal',
-        /**
-         * Font family
-         * @type String
-         * @default
-         */
-        fontFamily: 'Times New Roman',
-        /**
-         * Text decoration underline.
-         * @type Boolean
-         * @default
-         */
-        underline: false,
-        /**
-         * Text decoration overline.
-         * @type Boolean
-         * @default
-         */
-        overline: false,
-        /**
-         * Text decoration linethrough.
-         * @type Boolean
-         * @default
-         */
-        linethrough: false,
-        /**
-         * Text alignment. Possible values: "left", "center", "right", "justify",
-         * "justify-left", "justify-center" or "justify-right".
-         * @type String
-         * @default
-         */
-        textAlign: 'left',
-        /**
-         * Font style . Possible values: "", "normal", "italic" or "oblique".
-         * @type String
-         * @default
-         */
-        fontStyle: 'normal',
-        /**
-         * Line height
-         * @type Number
-         * @default
-         */
-        lineHeight: 1.16,
-        /**
-         * Superscript schema object (minimum overlap)
-         * @type {Object}
-         * @default
-         */
-        superscript: {
-            size: 0.6,
-            baseline: -0.35, // baseline-shift factor (upwards)
-        },
-        /**
-         * Subscript schema object (minimum overlap)
-         * @type {Object}
-         * @default
-         */
-        subscript: {
-            size: 0.6,
-            baseline: 0.11, // baseline-shift factor (downwards)
-        },
-        /**
-         * Background color of text lines
-         * @type String
-         * @default
-         */
-        textBackgroundColor: '',
-        /**
-         * List of properties to consider when checking if
-         * state of an object is changed ({@link fabric.Object#hasStateChanged})
-         * as well as for history (undo/redo) purposes
-         * @type Array
-         */
-        stateProperties: fabric.Object.prototype.stateProperties.concat(additionalProps),
-        /**
-         * List of properties to consider when checking if cache needs refresh
-         * @type Array
-         */
-        cacheProperties: fabric.Object.prototype.cacheProperties.concat(additionalProps),
-        /**
-         * When defined, an object is rendered via stroke and this property specifies its color.
-         * <b>Backwards incompatibility note:</b> This property was named "strokeStyle" until v1.1.6
-         * @type String
-         * @default
-         */
-        stroke: null,
-        /**
-         * Shadow object representing shadow of this shape.
-         * <b>Backwards incompatibility note:</b> This property was named "textShadow" (String) until v1.2.11
-         * @type fabric.Shadow
-         * @default
-         */
-        shadow: null,
-        /**
-         * fabric.Path that the text should follow.
-         * since 4.6.0 the path will be drawn automatically.
-         * if you want to make the path visible, give it a stroke and strokeWidth or fill value
-         * if you want it to be hidden, assign visible = false to the path.
-         * This feature is in BETA, and SVG import/export is not yet supported.
-         * @type fabric.Path
-         * @example
-         * var textPath = new fabric.Text('Text on a path', {
-         *     top: 150,
-         *     left: 150,
-         *     textAlign: 'center',
-         *     charSpacing: -50,
-         *     path: new fabric.Path('M 0 0 C 50 -100 150 -100 200 0', {
-         *         strokeWidth: 1,
-         *         visible: false
-         *     }),
-         *     pathSide: 'left',
-         *     pathStartOffset: 0
-         * });
-         * @default
-         */
-        path: null,
-        /**
-         * Offset amount for text path starting position
-         * Only used when text has a path
-         * @type Number
-         * @default
-         */
-        pathStartOffset: 0,
-        /**
-         * Which side of the path the text should be drawn on.
-         * Only used when text has a path
-         * @type {String} 'left|right'
-         * @default
-         */
-        pathSide: 'left',
-        /**
-         * How text is aligned to the path. This property determines
-         * the perpendicular position of each character relative to the path.
-         * (one of "baseline", "center", "ascender", "descender")
-         * This feature is in BETA, and its behavior may change
-         * @type String
-         * @default
-         */
-        pathAlign: 'baseline',
-        /**
-         * @private
-         */
-        _fontSizeFraction: 0.222,
-        /**
-         * @private
-         */
-        offsets: {
-            underline: 0.1,
-            linethrough: -0.315,
-            overline: -0.88,
-        },
-        /**
-         * Text Line proportion to font Size (in pixels)
-         * @type Number
-         * @default
-         */
-        _fontSizeMult: 1.13,
-        /**
-         * additional space between characters
-         * expressed in thousands of em unit
-         * @type Number
-         * @default
-         */
-        charSpacing: 0,
-        /**
-         * Object containing character styles - top-level properties -> line numbers,
-         * 2nd-level properties - character numbers
-         * @type Object
-         * @default
-         */
-        styles: null,
+    isEmptyStyles(lineIndex) {
+        if (!this.styles) {
+            return true;
+        }
+        if (typeof lineIndex !== 'undefined' && !this.styles[lineIndex]) {
+            return true;
+        }
+        const obj = typeof lineIndex === 'undefined'
+            ? this.styles
+            : { line: this.styles[lineIndex] };
+        for (const p1 in obj) {
+            for (const p2 in obj[p1]) {
+                // eslint-disable-next-line no-unused-vars
+                for (const p3 in obj[p1][p2]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    /**
+     * Returns true if object has a style property or has it ina specified line
+     * This function is used to detect if a text will use a particular property or not.
+     * @param {String} property to check for
+     * @param {Number} lineIndex to check the style on
+     * @return {Boolean}
+     */
+    styleHas(property, lineIndex) {
+        if (!this.styles || !property || property === '') {
+            return false;
+        }
+        if (typeof lineIndex !== 'undefined' && !this.styles[lineIndex]) {
+            return false;
+        }
+        const obj = typeof lineIndex === 'undefined'
+            ? this.styles
+            : { 0: this.styles[lineIndex] };
+        // eslint-disable-next-line
+        for (const p1 in obj) {
+            // eslint-disable-next-line
+            for (const p2 in obj[p1]) {
+                if (typeof obj[p1][p2][property] !== 'undefined') {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    /**
+     * Check if characters in a text have a value for a property
+     * whose value matches the textbox's value for that property.  If so,
+     * the character-level property is deleted.  If the character
+     * has no other properties, then it is also deleted.  Finally,
+     * if the line containing that character has no other characters
+     * then it also is deleted.
+     *
+     * @param {string} property The property to compare between characters and text.
+     */
+    cleanStyle(property) {
+        if (!this.styles || !property || property === '') {
+            return false;
+        }
+        const obj = this.styles;
+        let stylesCount = 0, letterCount, stylePropertyValue, allStyleObjectPropertiesMatch = true, graphemeCount = 0;
+        for (const p1 in obj) {
+            letterCount = 0;
+            for (const p2 in obj[p1]) {
+                const styleObject = obj[p1][p2], stylePropertyHasBeenSet = Object.prototype.hasOwnProperty.call(styleObject, property);
+                stylesCount++;
+                if (stylePropertyHasBeenSet) {
+                    if (!stylePropertyValue) {
+                        stylePropertyValue = styleObject[property];
+                    }
+                    else if (styleObject[property] !== stylePropertyValue) {
+                        allStyleObjectPropertiesMatch = false;
+                    }
+                    if (styleObject[property] === this[property]) {
+                        delete styleObject[property];
+                    }
+                }
+                else {
+                    allStyleObjectPropertiesMatch = false;
+                }
+                if (Object.keys(styleObject).length !== 0) {
+                    letterCount++;
+                }
+                else {
+                    delete obj[p1][p2];
+                }
+            }
+            if (letterCount === 0) {
+                delete obj[p1];
+            }
+        }
+        // if every grapheme has the same style set then
+        // delete those styles and set it on the parent
+        for (let i = 0; i < this._textLines.length; i++) {
+            graphemeCount += this._textLines[i].length;
+        }
+        if (allStyleObjectPropertiesMatch && stylesCount === graphemeCount) {
+            this[property] = stylePropertyValue;
+            this.removeStyle(property);
+        }
+    }
+    /**
+     * Remove a style property or properties from all individual character styles
+     * in a text object.  Deletes the character style object if it contains no other style
+     * props.  Deletes a line style object if it contains no other character styles.
+     *
+     * @param {String} props The property to remove from character styles.
+     */
+    removeStyle(property) {
+        if (!this.styles || !property || property === '') {
+            return;
+        }
+        const obj = this.styles;
+        let line, lineNum, charNum;
+        for (lineNum in obj) {
+            line = obj[lineNum];
+            for (charNum in line) {
+                delete line[charNum][property];
+                if (Object.keys(line[charNum]).length === 0) {
+                    delete line[charNum];
+                }
+            }
+            if (Object.keys(line).length === 0) {
+                delete obj[lineNum];
+            }
+        }
+    }
+    _extendStyles(index, styles) {
+        const { lineIndex, charIndex } = this.get2DCursorLocation(index);
+        if (!this._getLineStyle(lineIndex)) {
+            this._setLineStyle(lineIndex);
+        }
+        if (!this._getStyleDeclaration(lineIndex, charIndex)) {
+            this._setStyleDeclaration(lineIndex, charIndex, {});
+        }
+        return Object.assign(this._getStyleDeclaration(lineIndex, charIndex) || {}, styles);
+    }
+    /**
+     * Gets style of a current selection/cursor (at the start position)
+     * @param {Number} startIndex Start index to get styles at
+     * @param {Number} endIndex End index to get styles at, if not specified startIndex + 1
+     * @param {Boolean} [complete] get full style or not
+     * @return {Array} styles an array with one, zero or more Style objects
+     */
+    getSelectionStyles(startIndex, endIndex, complete) {
+        const styles = [];
+        for (let i = startIndex; i < (endIndex || startIndex); i++) {
+            styles.push(this.getStyleAtPosition(i, complete));
+        }
+        return styles;
+    }
+    /**
+     * Gets style of a current selection/cursor position
+     * @param {Number} position  to get styles at
+     * @param {Boolean} [complete] full style if true
+     * @return {Object} style Style object at a specified index
+     * @private
+     */
+    getStyleAtPosition(position, complete) {
+        const { lineIndex, charIndex } = this.get2DCursorLocation(position);
+        return ((complete
+            ? this.getCompleteStyleDeclaration(lineIndex, charIndex)
+            : this._getStyleDeclaration(lineIndex, charIndex)) || {});
+    }
+    /**
+     * Sets style of a current selection, if no selection exist, do not set anything.
+     * @param {Object} styles Styles object
+     * @param {Number} startIndex Start index to get styles at
+     * @param {Number} [endIndex] End index to get styles at, if not specified startIndex + 1
+     */
+    setSelectionStyles(styles, startIndex, endIndex) {
+        for (let i = startIndex; i < (endIndex || startIndex); i++) {
+            this._extendStyles(i, styles);
+        }
+        /* not included in _extendStyles to avoid clearing cache more than once */
+        this._forceClearCache = true;
+    }
+    /**
+     * get the reference, not a clone, of the style object for a given character
+     * @param {Number} lineIndex
+     * @param {Number} charIndex
+     * @return {Object} style object
+     */
+    _getStyleDeclaration(lineIndex, charIndex) {
+        const lineStyle = this.styles && this.styles[lineIndex];
+        if (!lineStyle) {
+            return null;
+        }
+        return lineStyle[charIndex];
+    }
+    /**
+     * return a new object that contains all the style property for a character
+     * the object returned is newly created
+     * @param {Number} lineIndex of the line where the character is
+     * @param {Number} charIndex position of the character on the line
+     * @return {Object} style object
+     */
+    getCompleteStyleDeclaration(lineIndex, charIndex) {
+        const style = this._getStyleDeclaration(lineIndex, charIndex) || {}, styleObject = {};
+        for (let i = 0; i < this._styleProperties.length; i++) {
+            const prop = this._styleProperties[i];
+            styleObject[prop] =
+                typeof style[prop] === 'undefined'
+                    ? this[prop]
+                    : style[prop];
+        }
+        return styleObject;
+    }
+    /**
+     * @param {Number} lineIndex
+     * @param {Number} charIndex
+     * @param {Object} style
+     * @private
+     */
+    _setStyleDeclaration(lineIndex, charIndex, style) {
+        this.styles[lineIndex][charIndex] = style;
+    }
+    /**
+     *
+     * @param {Number} lineIndex
+     * @param {Number} charIndex
+     * @private
+     */
+    _deleteStyleDeclaration(lineIndex, charIndex) {
+        delete this.styles[lineIndex][charIndex];
+    }
+    /**
+     * @param {Number} lineIndex
+     * @return {Boolean} if the line exists or not
+     * @private
+     */
+    _getLineStyle(lineIndex) {
+        return !!this.styles[lineIndex];
+    }
+    /**
+     * Set the line style to an empty object so that is initialized
+     * @param {Number} lineIndex
+     * @private
+     */
+    _setLineStyle(lineIndex) {
+        this.styles[lineIndex] = {};
+    }
+    _deleteLineStyle(lineIndex) {
+        delete this.styles[lineIndex];
+    }
+}
+
+// @ts-nocheck
+const additionalProps = [
+    'fontFamily',
+    'fontWeight',
+    'fontSize',
+    'text',
+    'underline',
+    'overline',
+    'linethrough',
+    'textAlign',
+    'fontStyle',
+    'lineHeight',
+    'textBackgroundColor',
+    'charSpacing',
+    'styles',
+    'direction',
+    'path',
+    'pathStartOffset',
+    'pathSide',
+    'pathAlign',
+];
+/**
+ * Text class
+ * @class Text
+ * @extends FabricObject
+ * @return {Text} thisArg
+ * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
+ * @see {@link Text#initialize} for constructor definition
+ */
+class Text$1 extends TextStyleMixin {
+    /**
+     * Constructor
+     * @param {String} text Text string
+     * @param {Object} [options] Options object
+     * @return {Text} thisArg
+     */
+    constructor(text, options) {
+        super(Object.assign(Object.assign({}, options), { text, styles: (options === null || options === void 0 ? void 0 : options.styles) || {} }));
         /**
          * Reference to a context to measure text char or couple of chars
          * the cacheContext of the canvas will be used or a freshly created one if the object is not on canvas
@@ -22379,1197 +22458,1129 @@ function copyGLTo2DPutImageData(gl, pipelineState) {
          * @type {CanvasRenderingContext2D}
          * @default
          */
-        _measuringContext: null,
-        /**
-         * Baseline shift, styles only, keep at 0 for the main text object
-         * @type {Number}
-         * @default
-         */
-        deltaY: 0,
-        /**
-         * WARNING: EXPERIMENTAL. NOT SUPPORTED YET
-         * determine the direction of the text.
-         * This has to be set manually together with textAlign and originX for proper
-         * experience.
-         * some interesting link for the future
-         * https://www.w3.org/International/questions/qa-bidi-unicode-controls
-         * @since 4.5.0
-         * @type {String} 'ltr|rtl'
-         * @default
-         */
-        direction: 'ltr',
-        /**
-         * Array of properties that define a style unit (of 'styles').
-         * @type {Array}
-         * @default
-         */
-        _styleProperties: [
-            'stroke',
-            'strokeWidth',
-            'fill',
-            'fontFamily',
-            'fontSize',
-            'fontWeight',
-            'fontStyle',
-            'underline',
-            'overline',
-            'linethrough',
-            'deltaY',
-            'textBackgroundColor',
-        ],
-        /**
-         * contains characters bounding boxes
-         */
-        __charBounds: [],
-        /**
-         * use this size when measuring text. To avoid IE11 rounding errors
-         * @type {Number}
-         * @default
-         * @readonly
-         * @private
-         */
-        CACHE_FONT_SIZE: 400,
-        /**
-         * contains the min text width to avoid getting 0
-         * @type {Number}
-         * @default
-         */
-        MIN_TEXT_WIDTH: 2,
-        /**
-         * Constructor
-         * @param {String} text Text string
-         * @param {Object} [options] Options object
-         * @return {fabric.Text} thisArg
-         */
-        initialize: function (text, options) {
-            this.styles = options ? options.styles || {} : {};
-            this.text = text;
-            this.__skipDimension = true;
-            this.callSuper('initialize', options);
-            if (this.path) {
-                this.setPathInfo();
+        this._measuringContext = null;
+        this.initialized = true;
+        if (this.path) {
+            this.setPathInfo();
+        }
+        this.__skipDimension = false;
+        this.initDimensions();
+        this.setCoords();
+        this.setupState({ propertySet: '_dimensionAffectingProps' });
+    }
+    /**
+     * If text has a path, it will add the extra information needed
+     * for path and text calculations
+     * @return {Text} thisArg
+     */
+    setPathInfo() {
+        const path = this.path;
+        if (path) {
+            path.segmentsInfo = getPathSegmentsInfo(path.path);
+        }
+    }
+    /**
+     * Return a context for measurement of text string.
+     * if created it gets stored for reuse
+     * this is for internal use, please do not use it
+     * @private
+     * @param {String} text Text string
+     * @param {Object} [options] Options object
+     * @return {Text} thisArg
+     */
+    getMeasuringContext() {
+        if (!fabric$3._measuringContext) {
+            fabric$3._measuringContext =
+                (this.canvas && this.canvas.contextCache) ||
+                    createCanvasElement$1().getContext('2d');
+        }
+        return fabric$3._measuringContext;
+    }
+    /**
+     * @private
+     * Divides text into lines of text and lines of graphemes.
+     */
+    _splitText() {
+        const newLines = this._splitTextIntoLines(this.text);
+        this.textLines = newLines.lines;
+        this._textLines = newLines.graphemeLines;
+        this._unwrappedTextLines = newLines._unwrappedLines;
+        this._text = newLines.graphemeText;
+        return newLines;
+    }
+    /**
+     * Initialize or update text dimensions.
+     * Updates this.width and this.height with the proper values.
+     * Does not return dimensions.
+     */
+    initDimensions() {
+        if (this.__skipDimension) {
+            return;
+        }
+        this._splitText();
+        this._clearCache();
+        if (this.path) {
+            this.width = this.path.width;
+            this.height = this.path.height;
+        }
+        else {
+            this.width =
+                this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
+            this.height = this.calcTextHeight();
+        }
+        if (this.textAlign.indexOf('justify') !== -1) {
+            // once text is measured we need to make space fatter to make justified text.
+            this.enlargeSpaces();
+        }
+        this.saveState({ propertySet: '_dimensionAffectingProps' });
+    }
+    /**
+     * Enlarge space boxes and shift the others
+     */
+    enlargeSpaces() {
+        let diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound, spaces;
+        for (let i = 0, len = this._textLines.length; i < len; i++) {
+            if (this.textAlign !== 'justify' &&
+                (i === len - 1 || this.isEndOfWrapping(i))) {
+                continue;
             }
-            this.__skipDimension = false;
-            this.initDimensions();
-            this.setCoords();
-            this.setupState({ propertySet: '_dimensionAffectingProps' });
-        },
-        /**
-         * If text has a path, it will add the extra information needed
-         * for path and text calculations
-         * @return {fabric.Text} thisArg
-         */
-        setPathInfo: function () {
-            var path = this.path;
-            if (path) {
-                path.segmentsInfo = fabric.util.getPathSegmentsInfo(path.path);
-            }
-        },
-        /**
-         * Return a context for measurement of text string.
-         * if created it gets stored for reuse
-         * this is for internal use, please do not use it
-         * @private
-         * @param {String} text Text string
-         * @param {Object} [options] Options object
-         * @return {fabric.Text} thisArg
-         */
-        getMeasuringContext: function () {
-            // if we did not return we have to measure something.
-            if (!fabric._measuringContext) {
-                fabric._measuringContext =
-                    (this.canvas && this.canvas.contextCache) ||
-                        fabric.util.createCanvasElement().getContext('2d');
-            }
-            return fabric._measuringContext;
-        },
-        /**
-         * @private
-         * Divides text into lines of text and lines of graphemes.
-         */
-        _splitText: function () {
-            var newLines = this._splitTextIntoLines(this.text);
-            this.textLines = newLines.lines;
-            this._textLines = newLines.graphemeLines;
-            this._unwrappedTextLines = newLines._unwrappedLines;
-            this._text = newLines.graphemeText;
-            return newLines;
-        },
-        /**
-         * Initialize or update text dimensions.
-         * Updates this.width and this.height with the proper values.
-         * Does not return dimensions.
-         */
-        initDimensions: function () {
-            if (this.__skipDimension) {
-                return;
-            }
-            this._splitText();
-            this._clearCache();
-            if (this.path) {
-                this.width = this.path.width;
-                this.height = this.path.height;
-            }
-            else {
-                this.width =
-                    this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
-                this.height = this.calcTextHeight();
-            }
-            if (this.textAlign.indexOf('justify') !== -1) {
-                // once text is measured we need to make space fatter to make justified text.
-                this.enlargeSpaces();
-            }
-            this.saveState({ propertySet: '_dimensionAffectingProps' });
-        },
-        /**
-         * Enlarge space boxes and shift the others
-         */
-        enlargeSpaces: function () {
-            var diffSpace, currentLineWidth, numberOfSpaces, accumulatedSpace, line, charBound, spaces;
-            for (var i = 0, len = this._textLines.length; i < len; i++) {
-                if (this.textAlign !== 'justify' &&
-                    (i === len - 1 || this.isEndOfWrapping(i))) {
-                    continue;
-                }
-                accumulatedSpace = 0;
-                line = this._textLines[i];
-                currentLineWidth = this.getLineWidth(i);
-                if (currentLineWidth < this.width &&
-                    (spaces = this.textLines[i].match(this._reSpacesAndTabs))) {
-                    numberOfSpaces = spaces.length;
-                    diffSpace = (this.width - currentLineWidth) / numberOfSpaces;
-                    for (var j = 0, jlen = line.length; j <= jlen; j++) {
-                        charBound = this.__charBounds[i][j];
-                        if (this._reSpaceAndTab.test(line[j])) {
-                            charBound.width += diffSpace;
-                            charBound.kernedWidth += diffSpace;
-                            charBound.left += accumulatedSpace;
-                            accumulatedSpace += diffSpace;
-                        }
-                        else {
-                            charBound.left += accumulatedSpace;
-                        }
-                    }
-                }
-            }
-        },
-        /**
-         * Detect if the text line is ended with an hard break
-         * text and itext do not have wrapping, return false
-         * @return {Boolean}
-         */
-        isEndOfWrapping: function (lineIndex) {
-            return lineIndex === this._textLines.length - 1;
-        },
-        /**
-         * Detect if a line has a linebreak and so we need to account for it when moving
-         * and counting style.
-         * It return always for text and Itext.
-         * @return Number
-         */
-        missingNewlineOffset: function () {
-            return 1;
-        },
-        /**
-         * Returns string representation of an instance
-         * @return {String} String representation of text object
-         */
-        toString: function () {
-            return ('#<fabric.Text (' +
-                this.complexity() +
-                '): { "text": "' +
-                this.text +
-                '", "fontFamily": "' +
-                this.fontFamily +
-                '" }>');
-        },
-        /**
-         * Return the dimension and the zoom level needed to create a cache canvas
-         * big enough to host the object to be cached.
-         * @private
-         * @param {Object} dim.x width of object to be cached
-         * @param {Object} dim.y height of object to be cached
-         * @return {Object}.width width of canvas
-         * @return {Object}.height height of canvas
-         * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
-         * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
-         */
-        _getCacheCanvasDimensions: function () {
-            var dims = this.callSuper('_getCacheCanvasDimensions');
-            var fontSize = this.fontSize;
-            dims.width += fontSize * dims.zoomX;
-            dims.height += fontSize * dims.zoomY;
-            return dims;
-        },
-        /**
-         * @private
-         * @param {CanvasRenderingContext2D} ctx Context to render on
-         */
-        _render: function (ctx) {
-            var path = this.path;
-            path && !path.isNotVisible() && path._render(ctx);
-            this._setTextStyles(ctx);
-            this._renderTextLinesBackground(ctx);
-            this._renderTextDecoration(ctx, 'underline');
-            this._renderText(ctx);
-            this._renderTextDecoration(ctx, 'overline');
-            this._renderTextDecoration(ctx, 'linethrough');
-        },
-        /**
-         * @private
-         * @param {CanvasRenderingContext2D} ctx Context to render on
-         */
-        _renderText: function (ctx) {
-            if (this.paintFirst === 'stroke') {
-                this._renderTextStroke(ctx);
-                this._renderTextFill(ctx);
-            }
-            else {
-                this._renderTextFill(ctx);
-                this._renderTextStroke(ctx);
-            }
-        },
-        /**
-         * Set the font parameter of the context with the object properties or with charStyle
-         * @private
-         * @param {CanvasRenderingContext2D} ctx Context to render on
-         * @param {Object} [charStyle] object with font style properties
-         * @param {String} [charStyle.fontFamily] Font Family
-         * @param {Number} [charStyle.fontSize] Font size in pixels. ( without px suffix )
-         * @param {String} [charStyle.fontWeight] Font weight
-         * @param {String} [charStyle.fontStyle] Font style (italic|normal)
-         */
-        _setTextStyles: function (ctx, charStyle, forMeasuring) {
-            ctx.textBaseline = 'alphabetical';
-            if (this.path) {
-                switch (this.pathAlign) {
-                    case 'center':
-                        ctx.textBaseline = 'middle';
-                        break;
-                    case 'ascender':
-                        ctx.textBaseline = 'top';
-                        break;
-                    case 'descender':
-                        ctx.textBaseline = 'bottom';
-                        break;
-                }
-            }
-            ctx.font = this._getFontDeclaration(charStyle, forMeasuring);
-        },
-        /**
-         * calculate and return the text Width measuring each line.
-         * @private
-         * @param {CanvasRenderingContext2D} ctx Context to render on
-         * @return {Number} Maximum width of fabric.Text object
-         */
-        calcTextWidth: function () {
-            var maxWidth = this.getLineWidth(0);
-            for (var i = 1, len = this._textLines.length; i < len; i++) {
-                var currentLineWidth = this.getLineWidth(i);
-                if (currentLineWidth > maxWidth) {
-                    maxWidth = currentLineWidth;
-                }
-            }
-            return maxWidth;
-        },
-        /**
-         * @private
-         * @param {String} method Method name ("fillText" or "strokeText")
-         * @param {CanvasRenderingContext2D} ctx Context to render on
-         * @param {String} line Text to render
-         * @param {Number} left Left position of text
-         * @param {Number} top Top position of text
-         * @param {Number} lineIndex Index of a line in a text
-         */
-        _renderTextLine: function (method, ctx, line, left, top, lineIndex) {
-            this._renderChars(method, ctx, line, left, top, lineIndex);
-        },
-        /**
-         * Renders the text background for lines, taking care of style
-         * @private
-         * @param {CanvasRenderingContext2D} ctx Context to render on
-         */
-        _renderTextLinesBackground: function (ctx) {
-            if (!this.textBackgroundColor &&
-                !this.styleHas('textBackgroundColor')) {
-                return;
-            }
-            var heightOfLine, lineLeftOffset, originalFill = ctx.fillStyle, line, lastColor, leftOffset = this._getLeftOffset(), lineTopOffset = this._getTopOffset(), boxStart = 0, boxWidth = 0, charBox, currentColor, path = this.path, drawStart;
-            for (var i = 0, len = this._textLines.length; i < len; i++) {
-                heightOfLine = this.getHeightOfLine(i);
-                if (!this.textBackgroundColor &&
-                    !this.styleHas('textBackgroundColor', i)) {
-                    lineTopOffset += heightOfLine;
-                    continue;
-                }
-                line = this._textLines[i];
-                lineLeftOffset = this._getLineLeftOffset(i);
-                boxWidth = 0;
-                boxStart = 0;
-                lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
-                for (var j = 0, jlen = line.length; j < jlen; j++) {
-                    charBox = this.__charBounds[i][j];
-                    currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
-                    if (path) {
-                        ctx.save();
-                        ctx.translate(charBox.renderLeft, charBox.renderTop);
-                        ctx.rotate(charBox.angle);
-                        ctx.fillStyle = currentColor;
-                        currentColor &&
-                            ctx.fillRect(-charBox.width / 2, (-heightOfLine / this.lineHeight) *
-                                (1 - this._fontSizeFraction), charBox.width, heightOfLine / this.lineHeight);
-                        ctx.restore();
-                    }
-                    else if (currentColor !== lastColor) {
-                        drawStart = leftOffset + lineLeftOffset + boxStart;
-                        if (this.direction === 'rtl') {
-                            drawStart = this.width - drawStart - boxWidth;
-                        }
-                        ctx.fillStyle = lastColor;
-                        lastColor &&
-                            ctx.fillRect(drawStart, lineTopOffset, boxWidth, heightOfLine / this.lineHeight);
-                        boxStart = charBox.left;
-                        boxWidth = charBox.width;
-                        lastColor = currentColor;
+            accumulatedSpace = 0;
+            line = this._textLines[i];
+            currentLineWidth = this.getLineWidth(i);
+            if (currentLineWidth < this.width &&
+                (spaces = this.textLines[i].match(this._reSpacesAndTabs))) {
+                numberOfSpaces = spaces.length;
+                diffSpace = (this.width - currentLineWidth) / numberOfSpaces;
+                for (let j = 0, jlen = line.length; j <= jlen; j++) {
+                    charBound = this.__charBounds[i][j];
+                    if (this._reSpaceAndTab.test(line[j])) {
+                        charBound.width += diffSpace;
+                        charBound.kernedWidth += diffSpace;
+                        charBound.left += accumulatedSpace;
+                        accumulatedSpace += diffSpace;
                     }
                     else {
-                        boxWidth += charBox.kernedWidth;
+                        charBound.left += accumulatedSpace;
                     }
                 }
-                if (currentColor && !path) {
+            }
+        }
+    }
+    /**
+     * Detect if the text line is ended with an hard break
+     * text and itext do not have wrapping, return false
+     * @return {Boolean}
+     */
+    isEndOfWrapping(lineIndex) {
+        return lineIndex === this._textLines.length - 1;
+    }
+    /**
+     * Detect if a line has a linebreak and so we need to account for it when moving
+     * and counting style.
+     * It return always for text and Itext.
+     * @return Number
+     */
+    missingNewlineOffset() {
+        return 1;
+    }
+    /**
+     * Returns 2d representation (lineIndex and charIndex) of cursor
+     * @param {Number} selectionStart
+     * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. useful to manage styles.
+     */
+    get2DCursorLocation(selectionStart, skipWrapping) {
+        const lines = skipWrapping ? this._unwrappedTextLines : this._textLines;
+        let i;
+        for (i = 0; i < lines.length; i++) {
+            if (selectionStart <= lines[i].length) {
+                return {
+                    lineIndex: i,
+                    charIndex: selectionStart,
+                };
+            }
+            selectionStart -= lines[i].length + this.missingNewlineOffset(i);
+        }
+        return {
+            lineIndex: i - 1,
+            charIndex: lines[i - 1].length < selectionStart
+                ? lines[i - 1].length
+                : selectionStart,
+        };
+    }
+    /**
+     * Returns string representation of an instance
+     * @return {String} String representation of text object
+     */
+    toString() {
+        return ('#<Text (' +
+            this.complexity() +
+            '): { "text": "' +
+            this.text +
+            '", "fontFamily": "' +
+            this.fontFamily +
+            '" }>');
+    }
+    /**
+     * Return the dimension and the zoom level needed to create a cache canvas
+     * big enough to host the object to be cached.
+     * @private
+     * @param {Object} dim.x width of object to be cached
+     * @param {Object} dim.y height of object to be cached
+     * @return {Object}.width width of canvas
+     * @return {Object}.height height of canvas
+     * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
+     * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
+     */
+    _getCacheCanvasDimensions() {
+        const dims = super._getCacheCanvasDimensions();
+        const fontSize = this.fontSize;
+        dims.width += fontSize * dims.zoomX;
+        dims.height += fontSize * dims.zoomY;
+        return dims;
+    }
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _render(ctx) {
+        const path = this.path;
+        path && !path.isNotVisible() && path._render(ctx);
+        this._setTextStyles(ctx);
+        this._renderTextLinesBackground(ctx);
+        this._renderTextDecoration(ctx, 'underline');
+        this._renderText(ctx);
+        this._renderTextDecoration(ctx, 'overline');
+        this._renderTextDecoration(ctx, 'linethrough');
+    }
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderText(ctx) {
+        if (this.paintFirst === 'stroke') {
+            this._renderTextStroke(ctx);
+            this._renderTextFill(ctx);
+        }
+        else {
+            this._renderTextFill(ctx);
+            this._renderTextStroke(ctx);
+        }
+    }
+    /**
+     * Set the font parameter of the context with the object properties or with charStyle
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Object} [charStyle] object with font style properties
+     * @param {String} [charStyle.fontFamily] Font Family
+     * @param {Number} [charStyle.fontSize] Font size in pixels. ( without px suffix )
+     * @param {String} [charStyle.fontWeight] Font weight
+     * @param {String} [charStyle.fontStyle] Font style (italic|normal)
+     */
+    _setTextStyles(ctx, charStyle, forMeasuring) {
+        ctx.textBaseline = 'alphabetical';
+        if (this.path) {
+            switch (this.pathAlign) {
+                case 'center':
+                    ctx.textBaseline = 'middle';
+                    break;
+                case 'ascender':
+                    ctx.textBaseline = 'top';
+                    break;
+                case 'descender':
+                    ctx.textBaseline = 'bottom';
+                    break;
+            }
+        }
+        ctx.font = this._getFontDeclaration(charStyle, forMeasuring);
+    }
+    /**
+     * calculate and return the text Width measuring each line.
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @return {Number} Maximum width of Text object
+     */
+    calcTextWidth() {
+        let maxWidth = this.getLineWidth(0);
+        for (let i = 1, len = this._textLines.length; i < len; i++) {
+            const currentLineWidth = this.getLineWidth(i);
+            if (currentLineWidth > maxWidth) {
+                maxWidth = currentLineWidth;
+            }
+        }
+        return maxWidth;
+    }
+    /**
+     * @private
+     * @param {String} method Method name ("fillText" or "strokeText")
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {String} line Text to render
+     * @param {Number} left Left position of text
+     * @param {Number} top Top position of text
+     * @param {Number} lineIndex Index of a line in a text
+     */
+    _renderTextLine(method, ctx, line, left, top, lineIndex) {
+        this._renderChars(method, ctx, line, left, top, lineIndex);
+    }
+    /**
+     * Renders the text background for lines, taking care of style
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderTextLinesBackground(ctx) {
+        if (!this.textBackgroundColor && !this.styleHas('textBackgroundColor')) {
+            return;
+        }
+        let heightOfLine, lineLeftOffset, originalFill = ctx.fillStyle, line, lastColor, leftOffset = this._getLeftOffset(), lineTopOffset = this._getTopOffset(), boxStart = 0, boxWidth = 0, charBox, currentColor, path = this.path, drawStart;
+        for (let i = 0, len = this._textLines.length; i < len; i++) {
+            heightOfLine = this.getHeightOfLine(i);
+            if (!this.textBackgroundColor &&
+                !this.styleHas('textBackgroundColor', i)) {
+                lineTopOffset += heightOfLine;
+                continue;
+            }
+            line = this._textLines[i];
+            lineLeftOffset = this._getLineLeftOffset(i);
+            boxWidth = 0;
+            boxStart = 0;
+            lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
+            for (let j = 0, jlen = line.length; j < jlen; j++) {
+                charBox = this.__charBounds[i][j];
+                currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
+                if (path) {
+                    ctx.save();
+                    ctx.translate(charBox.renderLeft, charBox.renderTop);
+                    ctx.rotate(charBox.angle);
+                    ctx.fillStyle = currentColor;
+                    currentColor &&
+                        ctx.fillRect(-charBox.width / 2, (-heightOfLine / this.lineHeight) * (1 - this._fontSizeFraction), charBox.width, heightOfLine / this.lineHeight);
+                    ctx.restore();
+                }
+                else if (currentColor !== lastColor) {
                     drawStart = leftOffset + lineLeftOffset + boxStart;
                     if (this.direction === 'rtl') {
                         drawStart = this.width - drawStart - boxWidth;
                     }
-                    ctx.fillStyle = currentColor;
-                    ctx.fillRect(drawStart, lineTopOffset, boxWidth, heightOfLine / this.lineHeight);
-                }
-                lineTopOffset += heightOfLine;
-            }
-            ctx.fillStyle = originalFill;
-            // if there is text background color no
-            // other shadows should be casted
-            this._removeShadow(ctx);
-        },
-        /**
-         * measure and return the width of a single character.
-         * possibly overridden to accommodate different measure logic or
-         * to hook some external lib for character measurement
-         * @private
-         * @param {String} _char, char to be measured
-         * @param {Object} charStyle style of char to be measured
-         * @param {String} [previousChar] previous char
-         * @param {Object} [prevCharStyle] style of previous char
-         */
-        _measureChar: function (_char, charStyle, previousChar, prevCharStyle) {
-            // first i try to return from cache
-            var fontCache = cache.getFontCache(charStyle), fontDeclaration = this._getFontDeclaration(charStyle), previousFontDeclaration = this._getFontDeclaration(prevCharStyle), couple = previousChar + _char, stylesAreEqual = fontDeclaration === previousFontDeclaration, width, coupleWidth, previousWidth, fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE, kernedWidth;
-            if (previousChar && fontCache[previousChar] !== undefined) {
-                previousWidth = fontCache[previousChar];
-            }
-            if (fontCache[_char] !== undefined) {
-                kernedWidth = width = fontCache[_char];
-            }
-            if (stylesAreEqual && fontCache[couple] !== undefined) {
-                coupleWidth = fontCache[couple];
-                kernedWidth = coupleWidth - previousWidth;
-            }
-            if (width === undefined ||
-                previousWidth === undefined ||
-                coupleWidth === undefined) {
-                var ctx = this.getMeasuringContext();
-                // send a TRUE to specify measuring font size CACHE_FONT_SIZE
-                this._setTextStyles(ctx, charStyle, true);
-            }
-            if (width === undefined) {
-                kernedWidth = width = ctx.measureText(_char).width;
-                fontCache[_char] = width;
-            }
-            if (previousWidth === undefined && stylesAreEqual && previousChar) {
-                previousWidth = ctx.measureText(previousChar).width;
-                fontCache[previousChar] = previousWidth;
-            }
-            if (stylesAreEqual && coupleWidth === undefined) {
-                // we can measure the kerning couple and subtract the width of the previous character
-                coupleWidth = ctx.measureText(couple).width;
-                fontCache[couple] = coupleWidth;
-                kernedWidth = coupleWidth - previousWidth;
-            }
-            return {
-                width: width * fontMultiplier,
-                kernedWidth: kernedWidth * fontMultiplier,
-            };
-        },
-        /**
-         * Computes height of character at given position
-         * @param {Number} line the line index number
-         * @param {Number} _char the character index number
-         * @return {Number} fontSize of the character
-         */
-        getHeightOfChar: function (line, _char) {
-            return this.getValueOfPropertyAt(line, _char, 'fontSize');
-        },
-        /**
-         * measure a text line measuring all characters.
-         * @param {Number} lineIndex line number
-         * @return {Number} Line width
-         */
-        measureLine: function (lineIndex) {
-            var lineInfo = this._measureLine(lineIndex);
-            if (this.charSpacing !== 0) {
-                lineInfo.width -= this._getWidthOfCharSpacing();
-            }
-            if (lineInfo.width < 0) {
-                lineInfo.width = 0;
-            }
-            return lineInfo;
-        },
-        /**
-         * measure every grapheme of a line, populating __charBounds
-         * @param {Number} lineIndex
-         * @return {Object} object.width total width of characters
-         * @return {Object} object.widthOfSpaces length of chars that match this._reSpacesAndTabs
-         */
-        _measureLine: function (lineIndex) {
-            var width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme, graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length), positionInPath = 0, startingPoint, totalPathLength, path = this.path, reverse = this.pathSide === 'right';
-            this.__charBounds[lineIndex] = lineBounds;
-            for (i = 0; i < line.length; i++) {
-                grapheme = line[i];
-                graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
-                lineBounds[i] = graphemeInfo;
-                width += graphemeInfo.kernedWidth;
-                prevGrapheme = grapheme;
-            }
-            // this latest bound box represent the last character of the line
-            // to simplify cursor handling in interactive mode.
-            lineBounds[i] = {
-                left: graphemeInfo ? graphemeInfo.left + graphemeInfo.width : 0,
-                width: 0,
-                kernedWidth: 0,
-                height: this.fontSize,
-            };
-            if (path) {
-                totalPathLength =
-                    path.segmentsInfo[path.segmentsInfo.length - 1].length;
-                startingPoint = fabric.util.getPointOnPath(path.path, 0, path.segmentsInfo);
-                startingPoint.x += path.pathOffset.x;
-                startingPoint.y += path.pathOffset.y;
-                switch (this.textAlign) {
-                    case 'left':
-                        positionInPath = reverse ? totalPathLength - width : 0;
-                        break;
-                    case 'center':
-                        positionInPath = (totalPathLength - width) / 2;
-                        break;
-                    case 'right':
-                        positionInPath = reverse ? 0 : totalPathLength - width;
-                        break;
-                    //todo - add support for justify
-                }
-                positionInPath += this.pathStartOffset * (reverse ? -1 : 1);
-                for (i = reverse ? line.length - 1 : 0; reverse ? i >= 0 : i < line.length; reverse ? i-- : i++) {
-                    graphemeInfo = lineBounds[i];
-                    if (positionInPath > totalPathLength) {
-                        positionInPath %= totalPathLength;
-                    }
-                    else if (positionInPath < 0) {
-                        positionInPath += totalPathLength;
-                    }
-                    // it would probably much faster to send all the grapheme position for a line
-                    // and calculate path position/angle at once.
-                    this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint);
-                    positionInPath += graphemeInfo.kernedWidth;
-                }
-            }
-            return { width: width, numOfSpaces: numOfSpaces };
-        },
-        /**
-         * Calculate the angle  and the left,top position of the char that follow a path.
-         * It appends it to graphemeInfo to be reused later at rendering
-         * @private
-         * @param {Number} positionInPath to be measured
-         * @param {Object} graphemeInfo current grapheme box information
-         * @param {Object} startingPoint position of the point
-         */
-        _setGraphemeOnPath: function (positionInPath, graphemeInfo, startingPoint) {
-            var centerPosition = positionInPath + graphemeInfo.kernedWidth / 2, path = this.path;
-            // we are at currentPositionOnPath. we want to know what point on the path is.
-            var info = fabric.util.getPointOnPath(path.path, centerPosition, path.segmentsInfo);
-            graphemeInfo.renderLeft = info.x - startingPoint.x;
-            graphemeInfo.renderTop = info.y - startingPoint.y;
-            graphemeInfo.angle =
-                info.angle + (this.pathSide === 'right' ? Math.PI : 0);
-        },
-        /**
-         * Measure and return the info of a single grapheme.
-         * needs the the info of previous graphemes already filled
-         * Override to customize measuring
-         *
-         * @typedef {object} GraphemeBBox
-         * @property {number} width
-         * @property {number} height
-         * @property {number} kernedWidth
-         * @property {number} left
-         * @property {number} deltaY
-         *
-         * @param {String} grapheme to be measured
-         * @param {Number} lineIndex index of the line where the char is
-         * @param {Number} charIndex position in the line
-         * @param {String} [prevGrapheme] character preceding the one to be measured
-         * @returns {GraphemeBBox} grapheme bbox
-         */
-        _getGraphemeBox: function (grapheme, lineIndex, charIndex, prevGrapheme, skipLeft) {
-            var style = this.getCompleteStyleDeclaration(lineIndex, charIndex), prevStyle = prevGrapheme
-                ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1)
-                : {}, info = this._measureChar(grapheme, style, prevGrapheme, prevStyle), kernedWidth = info.kernedWidth, width = info.width, charSpacing;
-            if (this.charSpacing !== 0) {
-                charSpacing = this._getWidthOfCharSpacing();
-                width += charSpacing;
-                kernedWidth += charSpacing;
-            }
-            var box = {
-                width: width,
-                left: 0,
-                height: style.fontSize,
-                kernedWidth: kernedWidth,
-                deltaY: style.deltaY,
-            };
-            if (charIndex > 0 && !skipLeft) {
-                var previousBox = this.__charBounds[lineIndex][charIndex - 1];
-                box.left =
-                    previousBox.left +
-                        previousBox.width +
-                        info.kernedWidth -
-                        info.width;
-            }
-            return box;
-        },
-        /**
-         * Calculate height of line at 'lineIndex'
-         * @param {Number} lineIndex index of line to calculate
-         * @return {Number}
-         */
-        getHeightOfLine: function (lineIndex) {
-            if (this.__lineHeights[lineIndex]) {
-                return this.__lineHeights[lineIndex];
-            }
-            var line = this._textLines[lineIndex], 
-            // char 0 is measured before the line cycle because it nneds to char
-            // emptylines
-            maxHeight = this.getHeightOfChar(lineIndex, 0);
-            for (var i = 1, len = line.length; i < len; i++) {
-                maxHeight = Math.max(this.getHeightOfChar(lineIndex, i), maxHeight);
-            }
-            return (this.__lineHeights[lineIndex] =
-                maxHeight * this.lineHeight * this._fontSizeMult);
-        },
-        /**
-         * Calculate text box height
-         */
-        calcTextHeight: function () {
-            var lineHeight, height = 0;
-            for (var i = 0, len = this._textLines.length; i < len; i++) {
-                lineHeight = this.getHeightOfLine(i);
-                height += i === len - 1 ? lineHeight / this.lineHeight : lineHeight;
-            }
-            return height;
-        },
-        /**
-         * @private
-         * @return {Number} Left offset
-         */
-        _getLeftOffset: function () {
-            return this.direction === 'ltr' ? -this.width / 2 : this.width / 2;
-        },
-        /**
-         * @private
-         * @return {Number} Top offset
-         */
-        _getTopOffset: function () {
-            return -this.height / 2;
-        },
-        /**
-         * @private
-         * @param {CanvasRenderingContext2D} ctx Context to render on
-         * @param {String} method Method name ("fillText" or "strokeText")
-         */
-        _renderTextCommon: function (ctx, method) {
-            ctx.save();
-            var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset();
-            for (var i = 0, len = this._textLines.length; i < len; i++) {
-                var heightOfLine = this.getHeightOfLine(i), maxHeight = heightOfLine / this.lineHeight, leftOffset = this._getLineLeftOffset(i);
-                this._renderTextLine(method, ctx, this._textLines[i], left + leftOffset, top + lineHeights + maxHeight, i);
-                lineHeights += heightOfLine;
-            }
-            ctx.restore();
-        },
-        /**
-         * @private
-         * @param {CanvasRenderingContext2D} ctx Context to render on
-         */
-        _renderTextFill: function (ctx) {
-            if (!this.fill && !this.styleHas('fill')) {
-                return;
-            }
-            this._renderTextCommon(ctx, 'fillText');
-        },
-        /**
-         * @private
-         * @param {CanvasRenderingContext2D} ctx Context to render on
-         */
-        _renderTextStroke: function (ctx) {
-            if ((!this.stroke || this.strokeWidth === 0) && this.isEmptyStyles()) {
-                return;
-            }
-            if (this.shadow && !this.shadow.affectStroke) {
-                this._removeShadow(ctx);
-            }
-            ctx.save();
-            this._setLineDash(ctx, this.strokeDashArray);
-            ctx.beginPath();
-            this._renderTextCommon(ctx, 'strokeText');
-            ctx.closePath();
-            ctx.restore();
-        },
-        /**
-         * @private
-         * @param {String} method fillText or strokeText.
-         * @param {CanvasRenderingContext2D} ctx Context to render on
-         * @param {Array} line Content of the line, splitted in an array by grapheme
-         * @param {Number} left
-         * @param {Number} top
-         * @param {Number} lineIndex
-         */
-        _renderChars: function (method, ctx, line, left, top, lineIndex) {
-            // set proper line offset
-            var lineHeight = this.getHeightOfLine(lineIndex), isJustify = this.textAlign.indexOf('justify') !== -1, actualStyle, nextStyle, charsToRender = '', charBox, boxWidth = 0, timeToRender, path = this.path, shortCut = !isJustify &&
-                this.charSpacing === 0 &&
-                this.isEmptyStyles(lineIndex) &&
-                !path, isLtr = this.direction === 'ltr', sign = this.direction === 'ltr' ? 1 : -1, 
-            // this was changed in the PR #7674
-            // currentDirection = ctx.canvas.getAttribute('dir');
-            drawingLeft, currentDirection = ctx.direction;
-            ctx.save();
-            if (currentDirection !== this.direction) {
-                ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
-                ctx.direction = isLtr ? 'ltr' : 'rtl';
-                ctx.textAlign = isLtr ? 'left' : 'right';
-            }
-            top -= (lineHeight * this._fontSizeFraction) / this.lineHeight;
-            if (shortCut) {
-                // render all the line in one pass without checking
-                // drawingLeft = isLtr ? left : left - this.getLineWidth(lineIndex);
-                this._renderChar(method, ctx, lineIndex, 0, line.join(''), left, top, lineHeight);
-                ctx.restore();
-                return;
-            }
-            for (var i = 0, len = line.length - 1; i <= len; i++) {
-                timeToRender = i === len || this.charSpacing || path;
-                charsToRender += line[i];
-                charBox = this.__charBounds[lineIndex][i];
-                if (boxWidth === 0) {
-                    left += sign * (charBox.kernedWidth - charBox.width);
-                    boxWidth += charBox.width;
+                    ctx.fillStyle = lastColor;
+                    lastColor &&
+                        ctx.fillRect(drawStart, lineTopOffset, boxWidth, heightOfLine / this.lineHeight);
+                    boxStart = charBox.left;
+                    boxWidth = charBox.width;
+                    lastColor = currentColor;
                 }
                 else {
                     boxWidth += charBox.kernedWidth;
                 }
-                if (isJustify && !timeToRender) {
-                    if (this._reSpaceAndTab.test(line[i])) {
-                        timeToRender = true;
-                    }
-                }
-                if (!timeToRender) {
-                    // if we have charSpacing, we render char by char
-                    actualStyle =
-                        actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
-                    nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
-                    timeToRender = fabric.util.hasStyleChanged(actualStyle, nextStyle, false);
-                }
-                if (timeToRender) {
-                    if (path) {
-                        ctx.save();
-                        ctx.translate(charBox.renderLeft, charBox.renderTop);
-                        ctx.rotate(charBox.angle);
-                        this._renderChar(method, ctx, lineIndex, i, charsToRender, -boxWidth / 2, 0, lineHeight);
-                        ctx.restore();
-                    }
-                    else {
-                        drawingLeft = left;
-                        this._renderChar(method, ctx, lineIndex, i, charsToRender, drawingLeft, top, lineHeight);
-                    }
-                    charsToRender = '';
-                    actualStyle = nextStyle;
-                    left += sign * boxWidth;
-                    boxWidth = 0;
-                }
             }
-            ctx.restore();
-        },
-        /**
-         * This function try to patch the missing gradientTransform on canvas gradients.
-         * transforming a context to transform the gradient, is going to transform the stroke too.
-         * we want to transform the gradient but not the stroke operation, so we create
-         * a transformed gradient on a pattern and then we use the pattern instead of the gradient.
-         * this method has drawbacks: is slow, is in low resolution, needs a patch for when the size
-         * is limited.
-         * @private
-         * @param {fabric.Gradient} filler a fabric gradient instance
-         * @return {CanvasPattern} a pattern to use as fill/stroke style
-         */
-        _applyPatternGradientTransformText: function (filler) {
-            var pCanvas = fabric.util.createCanvasElement(), pCtx, 
-            // TODO: verify compatibility with strokeUniform
-            width = this.width + this.strokeWidth, height = this.height + this.strokeWidth;
-            pCanvas.width = width;
-            pCanvas.height = height;
-            pCtx = pCanvas.getContext('2d');
-            pCtx.beginPath();
-            pCtx.moveTo(0, 0);
-            pCtx.lineTo(width, 0);
-            pCtx.lineTo(width, height);
-            pCtx.lineTo(0, height);
-            pCtx.closePath();
-            pCtx.translate(width / 2, height / 2);
-            pCtx.fillStyle = filler.toLive(pCtx);
-            this._applyPatternGradientTransform(pCtx, filler);
-            pCtx.fill();
-            return pCtx.createPattern(pCanvas, 'no-repeat');
-        },
-        handleFiller: function (ctx, property, filler) {
-            var offsetX, offsetY;
-            if (filler.toLive) {
-                if (filler.gradientUnits === 'percentage' ||
-                    filler.gradientTransform ||
-                    filler.patternTransform) {
-                    // need to transform gradient in a pattern.
-                    // this is a slow process. If you are hitting this codepath, and the object
-                    // is not using caching, you should consider switching it on.
-                    // we need a canvas as big as the current object caching canvas.
-                    offsetX = -this.width / 2;
-                    offsetY = -this.height / 2;
-                    ctx.translate(offsetX, offsetY);
-                    ctx[property] = this._applyPatternGradientTransformText(filler);
-                    return { offsetX: offsetX, offsetY: offsetY };
-                }
-                else {
-                    // is a simple gradient or pattern
-                    ctx[property] = filler.toLive(ctx, this);
-                    return this._applyPatternGradientTransform(ctx, filler);
-                }
-            }
-            else {
-                // is a color
-                ctx[property] = filler;
-            }
-            return { offsetX: 0, offsetY: 0 };
-        },
-        _setStrokeStyles: function (ctx, decl) {
-            ctx.lineWidth = decl.strokeWidth;
-            ctx.lineCap = this.strokeLineCap;
-            ctx.lineDashOffset = this.strokeDashOffset;
-            ctx.lineJoin = this.strokeLineJoin;
-            ctx.miterLimit = this.strokeMiterLimit;
-            return this.handleFiller(ctx, 'strokeStyle', decl.stroke);
-        },
-        _setFillStyles: function (ctx, decl) {
-            return this.handleFiller(ctx, 'fillStyle', decl.fill);
-        },
-        /**
-         * @private
-         * @param {String} method
-         * @param {CanvasRenderingContext2D} ctx Context to render on
-         * @param {Number} lineIndex
-         * @param {Number} charIndex
-         * @param {String} _char
-         * @param {Number} left Left coordinate
-         * @param {Number} top Top coordinate
-         * @param {Number} lineHeight Height of the line
-         */
-        _renderChar: function (method, ctx, lineIndex, charIndex, _char, left, top) {
-            var decl = this._getStyleDeclaration(lineIndex, charIndex), fullDecl = this.getCompleteStyleDeclaration(lineIndex, charIndex), shouldFill = method === 'fillText' && fullDecl.fill, shouldStroke = method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth, fillOffsets, strokeOffsets;
-            if (!shouldStroke && !shouldFill) {
-                return;
-            }
-            ctx.save();
-            shouldFill && (fillOffsets = this._setFillStyles(ctx, fullDecl));
-            shouldStroke && (strokeOffsets = this._setStrokeStyles(ctx, fullDecl));
-            ctx.font = this._getFontDeclaration(fullDecl);
-            if (decl && decl.textBackgroundColor) {
-                this._removeShadow(ctx);
-            }
-            if (decl && decl.deltaY) {
-                top += decl.deltaY;
-            }
-            shouldFill &&
-                ctx.fillText(_char, left - fillOffsets.offsetX, top - fillOffsets.offsetY);
-            shouldStroke &&
-                ctx.strokeText(_char, left - strokeOffsets.offsetX, top - strokeOffsets.offsetY);
-            ctx.restore();
-        },
-        /**
-         * Turns the character into a 'superior figure' (i.e. 'superscript')
-         * @param {Number} start selection start
-         * @param {Number} end selection end
-         * @returns {fabric.Text} thisArg
-         * @chainable
-         */
-        setSuperscript: function (start, end) {
-            return this._setScript(start, end, this.superscript);
-        },
-        /**
-         * Turns the character into an 'inferior figure' (i.e. 'subscript')
-         * @param {Number} start selection start
-         * @param {Number} end selection end
-         * @returns {fabric.Text} thisArg
-         * @chainable
-         */
-        setSubscript: function (start, end) {
-            return this._setScript(start, end, this.subscript);
-        },
-        /**
-         * Applies 'schema' at given position
-         * @private
-         * @param {Number} start selection start
-         * @param {Number} end selection end
-         * @param {Number} schema
-         * @returns {fabric.Text} thisArg
-         * @chainable
-         */
-        _setScript: function (start, end, schema) {
-            var loc = this.get2DCursorLocation(start, true), fontSize = this.getValueOfPropertyAt(loc.lineIndex, loc.charIndex, 'fontSize'), dy = this.getValueOfPropertyAt(loc.lineIndex, loc.charIndex, 'deltaY'), style = {
-                fontSize: fontSize * schema.size,
-                deltaY: dy + fontSize * schema.baseline,
-            };
-            this.setSelectionStyles(style, start, end);
-            return this;
-        },
-        /**
-         * @private
-         * @param {Number} lineIndex index text line
-         * @return {Number} Line left offset
-         */
-        _getLineLeftOffset: function (lineIndex) {
-            var lineWidth = this.getLineWidth(lineIndex), lineDiff = this.width - lineWidth, textAlign = this.textAlign, direction = this.direction, isEndOfWrapping, leftOffset = 0, isEndOfWrapping = this.isEndOfWrapping(lineIndex);
-            if (textAlign === 'justify' ||
-                (textAlign === 'justify-center' && !isEndOfWrapping) ||
-                (textAlign === 'justify-right' && !isEndOfWrapping) ||
-                (textAlign === 'justify-left' && !isEndOfWrapping)) {
-                return 0;
-            }
-            if (textAlign === 'center') {
-                leftOffset = lineDiff / 2;
-            }
-            if (textAlign === 'right') {
-                leftOffset = lineDiff;
-            }
-            if (textAlign === 'justify-center') {
-                leftOffset = lineDiff / 2;
-            }
-            if (textAlign === 'justify-right') {
-                leftOffset = lineDiff;
-            }
-            if (direction === 'rtl') {
-                if (textAlign === 'right' ||
-                    textAlign === 'justify' ||
-                    textAlign === 'justify-right') {
-                    leftOffset = 0;
-                }
-                else if (textAlign === 'left' || textAlign === 'justify-left') {
-                    leftOffset = -lineDiff;
-                }
-                else if (textAlign === 'center' || textAlign === 'justify-center') {
-                    leftOffset = -lineDiff / 2;
-                }
-            }
-            return leftOffset;
-        },
-        /**
-         * @private
-         */
-        _clearCache: function () {
-            this.__lineWidths = [];
-            this.__lineHeights = [];
-            this.__charBounds = [];
-        },
-        /**
-         * @private
-         */
-        _shouldClearDimensionCache: function () {
-            var shouldClear = this._forceClearCache;
-            shouldClear ||
-                (shouldClear = this.hasStateChanged('_dimensionAffectingProps'));
-            if (shouldClear) {
-                this.dirty = true;
-                this._forceClearCache = false;
-            }
-            return shouldClear;
-        },
-        /**
-         * Measure a single line given its index. Used to calculate the initial
-         * text bounding box. The values are calculated and stored in __lineWidths cache.
-         * @private
-         * @param {Number} lineIndex line number
-         * @return {Number} Line width
-         */
-        getLineWidth: function (lineIndex) {
-            if (this.__lineWidths[lineIndex] !== undefined) {
-                return this.__lineWidths[lineIndex];
-            }
-            var lineInfo = this.measureLine(lineIndex);
-            var width = lineInfo.width;
-            this.__lineWidths[lineIndex] = width;
-            return width;
-        },
-        _getWidthOfCharSpacing: function () {
-            if (this.charSpacing !== 0) {
-                return (this.fontSize * this.charSpacing) / 1000;
-            }
-            return 0;
-        },
-        /**
-         * Retrieves the value of property at given character position
-         * @param {Number} lineIndex the line number
-         * @param {Number} charIndex the character number
-         * @param {String} property the property name
-         * @returns the value of 'property'
-         */
-        getValueOfPropertyAt: function (lineIndex, charIndex, property) {
-            var charStyle = this._getStyleDeclaration(lineIndex, charIndex);
-            if (charStyle && typeof charStyle[property] !== 'undefined') {
-                return charStyle[property];
-            }
-            return this[property];
-        },
-        /**
-         * @private
-         * @param {CanvasRenderingContext2D} ctx Context to render on
-         */
-        _renderTextDecoration: function (ctx, type) {
-            if (!this[type] && !this.styleHas(type)) {
-                return;
-            }
-            var heightOfLine, size, _size, lineLeftOffset, dy, _dy, line, lastDecoration, leftOffset = this._getLeftOffset(), topOffset = this._getTopOffset(), top, boxStart, boxWidth, charBox, currentDecoration, maxHeight, currentFill, lastFill, path = this.path, charSpacing = this._getWidthOfCharSpacing(), offsetY = this.offsets[type];
-            for (var i = 0, len = this._textLines.length; i < len; i++) {
-                heightOfLine = this.getHeightOfLine(i);
-                if (!this[type] && !this.styleHas(type, i)) {
-                    topOffset += heightOfLine;
-                    continue;
-                }
-                line = this._textLines[i];
-                maxHeight = heightOfLine / this.lineHeight;
-                lineLeftOffset = this._getLineLeftOffset(i);
-                boxStart = 0;
-                boxWidth = 0;
-                lastDecoration = this.getValueOfPropertyAt(i, 0, type);
-                lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
-                top = topOffset + maxHeight * (1 - this._fontSizeFraction);
-                size = this.getHeightOfChar(i, 0);
-                dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
-                for (var j = 0, jlen = line.length; j < jlen; j++) {
-                    charBox = this.__charBounds[i][j];
-                    currentDecoration = this.getValueOfPropertyAt(i, j, type);
-                    currentFill = this.getValueOfPropertyAt(i, j, 'fill');
-                    _size = this.getHeightOfChar(i, j);
-                    _dy = this.getValueOfPropertyAt(i, j, 'deltaY');
-                    if (path && currentDecoration && currentFill) {
-                        ctx.save();
-                        ctx.fillStyle = lastFill;
-                        ctx.translate(charBox.renderLeft, charBox.renderTop);
-                        ctx.rotate(charBox.angle);
-                        ctx.fillRect(-charBox.kernedWidth / 2, offsetY * _size + _dy, charBox.kernedWidth, this.fontSize / 15);
-                        ctx.restore();
-                    }
-                    else if ((currentDecoration !== lastDecoration ||
-                        currentFill !== lastFill ||
-                        _size !== size ||
-                        _dy !== dy) &&
-                        boxWidth > 0) {
-                        var drawStart = leftOffset + lineLeftOffset + boxStart;
-                        if (this.direction === 'rtl') {
-                            drawStart = this.width - drawStart - boxWidth;
-                        }
-                        if (lastDecoration && lastFill) {
-                            ctx.fillStyle = lastFill;
-                            ctx.fillRect(drawStart, top + offsetY * size + dy, boxWidth, this.fontSize / 15);
-                        }
-                        boxStart = charBox.left;
-                        boxWidth = charBox.width;
-                        lastDecoration = currentDecoration;
-                        lastFill = currentFill;
-                        size = _size;
-                        dy = _dy;
-                    }
-                    else {
-                        boxWidth += charBox.kernedWidth;
-                    }
-                }
-                var drawStart = leftOffset + lineLeftOffset + boxStart;
+            if (currentColor && !path) {
+                drawStart = leftOffset + lineLeftOffset + boxStart;
                 if (this.direction === 'rtl') {
                     drawStart = this.width - drawStart - boxWidth;
                 }
-                ctx.fillStyle = currentFill;
-                currentDecoration &&
-                    currentFill &&
-                    ctx.fillRect(drawStart, top + offsetY * size + dy, boxWidth - charSpacing, this.fontSize / 15);
-                topOffset += heightOfLine;
+                ctx.fillStyle = currentColor;
+                ctx.fillRect(drawStart, lineTopOffset, boxWidth, heightOfLine / this.lineHeight);
             }
-            // if there is text background color no
-            // other shadows should be casted
-            this._removeShadow(ctx);
-        },
-        /**
-         * return font declaration string for canvas context
-         * @param {Object} [styleObject] object
-         * @returns {String} font declaration formatted for canvas context.
-         */
-        _getFontDeclaration: function (styleObject, forMeasuring) {
-            var style = styleObject || this, family = this.fontFamily, fontIsGeneric = fabric.Text.genericFonts.indexOf(family.toLowerCase()) > -1;
-            var fontFamily = family === undefined ||
-                family.indexOf("'") > -1 ||
-                family.indexOf(',') > -1 ||
-                family.indexOf('"') > -1 ||
-                fontIsGeneric
-                ? style.fontFamily
-                : '"' + style.fontFamily + '"';
-            return [
-                // node-canvas needs "weight style", while browsers need "style weight"
-                // verify if this can be fixed in JSDOM
-                fabric.isLikelyNode ? style.fontWeight : style.fontStyle,
-                fabric.isLikelyNode ? style.fontStyle : style.fontWeight,
-                forMeasuring ? this.CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
-                fontFamily,
-            ].join(' ');
-        },
-        /**
-         * Renders text instance on a specified context
-         * @param {CanvasRenderingContext2D} ctx Context to render on
-         */
-        render: function (ctx) {
-            // do not render if object is not visible
-            if (!this.visible) {
-                return;
+            lineTopOffset += heightOfLine;
+        }
+        ctx.fillStyle = originalFill;
+        // if there is text background color no
+        // other shadows should be casted
+        this._removeShadow(ctx);
+    }
+    /**
+     * measure and return the width of a single character.
+     * possibly overridden to accommodate different measure logic or
+     * to hook some external lib for character measurement
+     * @private
+     * @param {String} _char, char to be measured
+     * @param {Object} charStyle style of char to be measured
+     * @param {String} [previousChar] previous char
+     * @param {Object} [prevCharStyle] style of previous char
+     */
+    _measureChar(_char, charStyle, previousChar, prevCharStyle) {
+        let fontCache = cache.getFontCache(charStyle), fontDeclaration = this._getFontDeclaration(charStyle), previousFontDeclaration = this._getFontDeclaration(prevCharStyle), couple = previousChar + _char, stylesAreEqual = fontDeclaration === previousFontDeclaration, width, coupleWidth, previousWidth, fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE, kernedWidth;
+        if (previousChar && fontCache[previousChar] !== undefined) {
+            previousWidth = fontCache[previousChar];
+        }
+        if (fontCache[_char] !== undefined) {
+            kernedWidth = width = fontCache[_char];
+        }
+        if (stylesAreEqual && fontCache[couple] !== undefined) {
+            coupleWidth = fontCache[couple];
+            kernedWidth = coupleWidth - previousWidth;
+        }
+        if (width === undefined ||
+            previousWidth === undefined ||
+            coupleWidth === undefined) {
+            var ctx = this.getMeasuringContext();
+            // send a TRUE to specify measuring font size CACHE_FONT_SIZE
+            this._setTextStyles(ctx, charStyle, true);
+        }
+        if (width === undefined) {
+            kernedWidth = width = ctx.measureText(_char).width;
+            fontCache[_char] = width;
+        }
+        if (previousWidth === undefined && stylesAreEqual && previousChar) {
+            previousWidth = ctx.measureText(previousChar).width;
+            fontCache[previousChar] = previousWidth;
+        }
+        if (stylesAreEqual && coupleWidth === undefined) {
+            // we can measure the kerning couple and subtract the width of the previous character
+            coupleWidth = ctx.measureText(couple).width;
+            fontCache[couple] = coupleWidth;
+            kernedWidth = coupleWidth - previousWidth;
+        }
+        return {
+            width: width * fontMultiplier,
+            kernedWidth: kernedWidth * fontMultiplier,
+        };
+    }
+    /**
+     * Computes height of character at given position
+     * @param {Number} line the line index number
+     * @param {Number} _char the character index number
+     * @return {Number} fontSize of the character
+     */
+    getHeightOfChar(line, _char) {
+        return this.getValueOfPropertyAt(line, _char, 'fontSize');
+    }
+    /**
+     * measure a text line measuring all characters.
+     * @param {Number} lineIndex line number
+     * @return {Number} Line width
+     */
+    measureLine(lineIndex) {
+        const lineInfo = this._measureLine(lineIndex);
+        if (this.charSpacing !== 0) {
+            lineInfo.width -= this._getWidthOfCharSpacing();
+        }
+        if (lineInfo.width < 0) {
+            lineInfo.width = 0;
+        }
+        return lineInfo;
+    }
+    /**
+     * measure every grapheme of a line, populating __charBounds
+     * @param {Number} lineIndex
+     * @return {Object} object.width total width of characters
+     * @return {Object} object.widthOfSpaces length of chars that match this._reSpacesAndTabs
+     */
+    _measureLine(lineIndex) {
+        let width = 0, i, grapheme, line = this._textLines[lineIndex], prevGrapheme, graphemeInfo, numOfSpaces = 0, lineBounds = new Array(line.length), positionInPath = 0, startingPoint, totalPathLength, path = this.path, reverse = this.pathSide === 'right';
+        this.__charBounds[lineIndex] = lineBounds;
+        for (i = 0; i < line.length; i++) {
+            grapheme = line[i];
+            graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
+            lineBounds[i] = graphemeInfo;
+            width += graphemeInfo.kernedWidth;
+            prevGrapheme = grapheme;
+        }
+        // this latest bound box represent the last character of the line
+        // to simplify cursor handling in interactive mode.
+        lineBounds[i] = {
+            left: graphemeInfo ? graphemeInfo.left + graphemeInfo.width : 0,
+            width: 0,
+            kernedWidth: 0,
+            height: this.fontSize,
+        };
+        if (path) {
+            totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
+            startingPoint = getPointOnPath(path.path, 0, path.segmentsInfo);
+            startingPoint.x += path.pathOffset.x;
+            startingPoint.y += path.pathOffset.y;
+            switch (this.textAlign) {
+                case 'left':
+                    positionInPath = reverse ? totalPathLength - width : 0;
+                    break;
+                case 'center':
+                    positionInPath = (totalPathLength - width) / 2;
+                    break;
+                case 'right':
+                    positionInPath = reverse ? 0 : totalPathLength - width;
+                    break;
+                //todo - add support for justify
             }
-            if (this.canvas &&
-                this.canvas.skipOffscreen &&
-                !this.group &&
-                !this.isOnScreen()) {
-                return;
-            }
-            if (this._shouldClearDimensionCache()) {
-                this.initDimensions();
-            }
-            this.callSuper('render', ctx);
-        },
-        /**
-         * Override this method to customize grapheme splitting
-         * @param {string} value
-         * @returns {string[]} array of graphemes
-         */
-        graphemeSplit: function (value) {
-            return fabric.util.string.graphemeSplit(value);
-        },
-        /**
-         * Returns the text as an array of lines.
-         * @param {String} text text to split
-         * @returns {Array} Lines in the text
-         */
-        _splitTextIntoLines: function (text) {
-            var lines = text.split(this._reNewline), newLines = new Array(lines.length), newLine = ['\n'], newText = [];
-            for (var i = 0; i < lines.length; i++) {
-                newLines[i] = this.graphemeSplit(lines[i]);
-                newText = newText.concat(newLines[i], newLine);
-            }
-            newText.pop();
-            return {
-                _unwrappedLines: newLines,
-                lines: lines,
-                graphemeText: newText,
-                graphemeLines: newLines,
-            };
-        },
-        /**
-         * Returns object representation of an instance
-         * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-         * @return {Object} Object representation of an instance
-         */
-        toObject: function (propertiesToInclude) {
-            var allProperties = additionalProps.concat(propertiesToInclude);
-            var obj = this.callSuper('toObject', allProperties);
-            obj.styles = fabric.util.stylesToArray(this.styles, this.text);
-            if (obj.path) {
-                obj.path = this.path.toObject();
-            }
-            return obj;
-        },
-        /**
-         * Sets property to a given value. When changing position/dimension -related properties (left, top, scale, angle, etc.) `set` does not update position of object's borders/controls. If you need to update those, call `setCoords()`.
-         * @param {String|Object} key Property name or object (if object, iterate over the object properties)
-         * @param {Object|Function} value Property value (if function, the value is passed into it and its return value is used as a new one)
-         * @return {fabric.Object} thisArg
-         * @chainable
-         */
-        set: function (key, value) {
-            this.callSuper('set', key, value);
-            var needsDims = false;
-            var isAddingPath = false;
-            if (typeof key === 'object') {
-                for (var _key in key) {
-                    if (_key === 'path') {
-                        this.setPathInfo();
-                    }
-                    needsDims =
-                        needsDims || this._dimensionAffectingProps.indexOf(_key) !== -1;
-                    isAddingPath = isAddingPath || _key === 'path';
+            positionInPath += this.pathStartOffset * (reverse ? -1 : 1);
+            for (i = reverse ? line.length - 1 : 0; reverse ? i >= 0 : i < line.length; reverse ? i-- : i++) {
+                graphemeInfo = lineBounds[i];
+                if (positionInPath > totalPathLength) {
+                    positionInPath %= totalPathLength;
                 }
+                else if (positionInPath < 0) {
+                    positionInPath += totalPathLength;
+                }
+                // it would probably much faster to send all the grapheme position for a line
+                // and calculate path position/angle at once.
+                this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint);
+                positionInPath += graphemeInfo.kernedWidth;
+            }
+        }
+        return { width: width, numOfSpaces: numOfSpaces };
+    }
+    /**
+     * Calculate the angle  and the left,top position of the char that follow a path.
+     * It appends it to graphemeInfo to be reused later at rendering
+     * @private
+     * @param {Number} positionInPath to be measured
+     * @param {Object} graphemeInfo current grapheme box information
+     * @param {Object} startingPoint position of the point
+     */
+    _setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint) {
+        const centerPosition = positionInPath + graphemeInfo.kernedWidth / 2, path = this.path;
+        // we are at currentPositionOnPath. we want to know what point on the path is.
+        const info = getPointOnPath(path.path, centerPosition, path.segmentsInfo);
+        graphemeInfo.renderLeft = info.x - startingPoint.x;
+        graphemeInfo.renderTop = info.y - startingPoint.y;
+        graphemeInfo.angle = info.angle + (this.pathSide === 'right' ? Math.PI : 0);
+    }
+    /**
+     *
+     * @param {String} grapheme to be measured
+     * @param {Number} lineIndex index of the line where the char is
+     * @param {Number} charIndex position in the line
+     * @param {String} [prevGrapheme] character preceding the one to be measured
+     * @returns {GraphemeBBox} grapheme bbox
+     */
+    _getGraphemeBox(grapheme, lineIndex, charIndex, prevGrapheme, skipLeft) {
+        const style = this.getCompleteStyleDeclaration(lineIndex, charIndex), prevStyle = prevGrapheme
+            ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1)
+            : {}, info = this._measureChar(grapheme, style, prevGrapheme, prevStyle);
+        let kernedWidth = info.kernedWidth, width = info.width, charSpacing;
+        if (this.charSpacing !== 0) {
+            charSpacing = this._getWidthOfCharSpacing();
+            width += charSpacing;
+            kernedWidth += charSpacing;
+        }
+        const box = {
+            width: width,
+            left: 0,
+            height: style.fontSize,
+            kernedWidth: kernedWidth,
+            deltaY: style.deltaY,
+        };
+        if (charIndex > 0 && !skipLeft) {
+            const previousBox = this.__charBounds[lineIndex][charIndex - 1];
+            box.left =
+                previousBox.left + previousBox.width + info.kernedWidth - info.width;
+        }
+        return box;
+    }
+    /**
+     * Calculate height of line at 'lineIndex'
+     * @param {Number} lineIndex index of line to calculate
+     * @return {Number}
+     */
+    getHeightOfLine(lineIndex) {
+        if (this.__lineHeights[lineIndex]) {
+            return this.__lineHeights[lineIndex];
+        }
+        let line = this._textLines[lineIndex], 
+        // char 0 is measured before the line cycle because it nneds to char
+        // emptylines
+        maxHeight = this.getHeightOfChar(lineIndex, 0);
+        for (let i = 1, len = line.length; i < len; i++) {
+            maxHeight = Math.max(this.getHeightOfChar(lineIndex, i), maxHeight);
+        }
+        return (this.__lineHeights[lineIndex] =
+            maxHeight * this.lineHeight * this._fontSizeMult);
+    }
+    /**
+     * Calculate text box height
+     */
+    calcTextHeight() {
+        let lineHeight, height = 0;
+        for (let i = 0, len = this._textLines.length; i < len; i++) {
+            lineHeight = this.getHeightOfLine(i);
+            height += i === len - 1 ? lineHeight / this.lineHeight : lineHeight;
+        }
+        return height;
+    }
+    /**
+     * @private
+     * @return {Number} Left offset
+     */
+    _getLeftOffset() {
+        return this.direction === 'ltr' ? -this.width / 2 : this.width / 2;
+    }
+    /**
+     * @private
+     * @return {Number} Top offset
+     */
+    _getTopOffset() {
+        return -this.height / 2;
+    }
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {String} method Method name ("fillText" or "strokeText")
+     */
+    _renderTextCommon(ctx, method) {
+        ctx.save();
+        let lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset();
+        for (let i = 0, len = this._textLines.length; i < len; i++) {
+            const heightOfLine = this.getHeightOfLine(i), maxHeight = heightOfLine / this.lineHeight, leftOffset = this._getLineLeftOffset(i);
+            this._renderTextLine(method, ctx, this._textLines[i], left + leftOffset, top + lineHeights + maxHeight, i);
+            lineHeights += heightOfLine;
+        }
+        ctx.restore();
+    }
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderTextFill(ctx) {
+        if (!this.fill && !this.styleHas('fill')) {
+            return;
+        }
+        this._renderTextCommon(ctx, 'fillText');
+    }
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderTextStroke(ctx) {
+        if ((!this.stroke || this.strokeWidth === 0) && this.isEmptyStyles()) {
+            return;
+        }
+        if (this.shadow && !this.shadow.affectStroke) {
+            this._removeShadow(ctx);
+        }
+        ctx.save();
+        this._setLineDash(ctx, this.strokeDashArray);
+        ctx.beginPath();
+        this._renderTextCommon(ctx, 'strokeText');
+        ctx.closePath();
+        ctx.restore();
+    }
+    /**
+     * @private
+     * @param {String} method fillText or strokeText.
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Array} line Content of the line, splitted in an array by grapheme
+     * @param {Number} left
+     * @param {Number} top
+     * @param {Number} lineIndex
+     */
+    _renderChars(method, ctx, line, left, top, lineIndex) {
+        let lineHeight = this.getHeightOfLine(lineIndex), isJustify = this.textAlign.indexOf('justify') !== -1, actualStyle, nextStyle, charsToRender = '', charBox, boxWidth = 0, timeToRender, path = this.path, shortCut = !isJustify &&
+            this.charSpacing === 0 &&
+            this.isEmptyStyles(lineIndex) &&
+            !path, isLtr = this.direction === 'ltr', sign = this.direction === 'ltr' ? 1 : -1, 
+        // this was changed in the PR #7674
+        // currentDirection = ctx.canvas.getAttribute('dir');
+        drawingLeft, currentDirection = ctx.direction;
+        ctx.save();
+        if (currentDirection !== this.direction) {
+            ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
+            ctx.direction = isLtr ? 'ltr' : 'rtl';
+            ctx.textAlign = isLtr ? 'left' : 'right';
+        }
+        top -= (lineHeight * this._fontSizeFraction) / this.lineHeight;
+        if (shortCut) {
+            // render all the line in one pass without checking
+            // drawingLeft = isLtr ? left : left - this.getLineWidth(lineIndex);
+            this._renderChar(method, ctx, lineIndex, 0, line.join(''), left, top, lineHeight);
+            ctx.restore();
+            return;
+        }
+        for (let i = 0, len = line.length - 1; i <= len; i++) {
+            timeToRender = i === len || this.charSpacing || path;
+            charsToRender += line[i];
+            charBox = this.__charBounds[lineIndex][i];
+            if (boxWidth === 0) {
+                left += sign * (charBox.kernedWidth - charBox.width);
+                boxWidth += charBox.width;
             }
             else {
-                needsDims = this._dimensionAffectingProps.indexOf(key) !== -1;
-                isAddingPath = key === 'path';
+                boxWidth += charBox.kernedWidth;
             }
-            if (isAddingPath) {
-                this.setPathInfo();
+            if (isJustify && !timeToRender) {
+                if (this._reSpaceAndTab.test(line[i])) {
+                    timeToRender = true;
+                }
             }
-            if (needsDims) {
-                this.initDimensions();
-                this.setCoords();
+            if (!timeToRender) {
+                // if we have charSpacing, we render char by char
+                actualStyle =
+                    actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
+                nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
+                timeToRender = hasStyleChanged$1(actualStyle, nextStyle, false);
             }
-            return this;
-        },
-        /**
-         * Returns complexity of an instance
-         * @return {Number} complexity
-         */
-        complexity: function () {
-            return 1;
-        },
-    });
-    /* _FROM_SVG_START_ */
+            if (timeToRender) {
+                if (path) {
+                    ctx.save();
+                    ctx.translate(charBox.renderLeft, charBox.renderTop);
+                    ctx.rotate(charBox.angle);
+                    this._renderChar(method, ctx, lineIndex, i, charsToRender, -boxWidth / 2, 0, lineHeight);
+                    ctx.restore();
+                }
+                else {
+                    drawingLeft = left;
+                    this._renderChar(method, ctx, lineIndex, i, charsToRender, drawingLeft, top, lineHeight);
+                }
+                charsToRender = '';
+                actualStyle = nextStyle;
+                left += sign * boxWidth;
+                boxWidth = 0;
+            }
+        }
+        ctx.restore();
+    }
     /**
-     * List of attribute names to account for when parsing SVG element (used by {@link fabric.Text.fromElement})
-     * @static
-     * @memberOf fabric.Text
-     * @see: http://www.w3.org/TR/SVG/text.html#TextElement
+     * This function try to patch the missing gradientTransform on canvas gradients.
+     * transforming a context to transform the gradient, is going to transform the stroke too.
+     * we want to transform the gradient but not the stroke operation, so we create
+     * a transformed gradient on a pattern and then we use the pattern instead of the gradient.
+     * this method has drawbacks: is slow, is in low resolution, needs a patch for when the size
+     * is limited.
+     * @private
+     * @param {fabric.Gradient} filler a fabric gradient instance
+     * @return {CanvasPattern} a pattern to use as fill/stroke style
      */
-    fabric.Text.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat('x y dx dy font-family font-style font-weight font-size letter-spacing text-decoration text-anchor'.split(' '));
+    _applyPatternGradientTransformText(filler) {
+        let pCanvas = createCanvasElement$1(), pCtx, 
+        // TODO: verify compatibility with strokeUniform
+        width = this.width + this.strokeWidth, height = this.height + this.strokeWidth;
+        pCanvas.width = width;
+        pCanvas.height = height;
+        pCtx = pCanvas.getContext('2d');
+        pCtx.beginPath();
+        pCtx.moveTo(0, 0);
+        pCtx.lineTo(width, 0);
+        pCtx.lineTo(width, height);
+        pCtx.lineTo(0, height);
+        pCtx.closePath();
+        pCtx.translate(width / 2, height / 2);
+        pCtx.fillStyle = filler.toLive(pCtx);
+        this._applyPatternGradientTransform(pCtx, filler);
+        pCtx.fill();
+        return pCtx.createPattern(pCanvas, 'no-repeat');
+    }
+    handleFiller(ctx, property, filler) {
+        let offsetX, offsetY;
+        if (filler.toLive) {
+            if (filler.gradientUnits === 'percentage' ||
+                filler.gradientTransform ||
+                filler.patternTransform) {
+                // need to transform gradient in a pattern.
+                // this is a slow process. If you are hitting this codepath, and the object
+                // is not using caching, you should consider switching it on.
+                // we need a canvas as big as the current object caching canvas.
+                offsetX = -this.width / 2;
+                offsetY = -this.height / 2;
+                ctx.translate(offsetX, offsetY);
+                ctx[property] = this._applyPatternGradientTransformText(filler);
+                return { offsetX: offsetX, offsetY: offsetY };
+            }
+            else {
+                // is a simple gradient or pattern
+                ctx[property] = filler.toLive(ctx, this);
+                return this._applyPatternGradientTransform(ctx, filler);
+            }
+        }
+        else {
+            // is a color
+            ctx[property] = filler;
+        }
+        return { offsetX: 0, offsetY: 0 };
+    }
+    _setStrokeStyles(ctx, decl) {
+        ctx.lineWidth = decl.strokeWidth;
+        ctx.lineCap = this.strokeLineCap;
+        ctx.lineDashOffset = this.strokeDashOffset;
+        ctx.lineJoin = this.strokeLineJoin;
+        ctx.miterLimit = this.strokeMiterLimit;
+        return this.handleFiller(ctx, 'strokeStyle', decl.stroke);
+    }
+    _setFillStyles(ctx, decl) {
+        return this.handleFiller(ctx, 'fillStyle', decl.fill);
+    }
     /**
-     * Returns fabric.Text instance from an SVG element (<b>not yet implemented</b>)
+     * @private
+     * @param {String} method
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     * @param {Number} lineIndex
+     * @param {Number} charIndex
+     * @param {String} _char
+     * @param {Number} left Left coordinate
+     * @param {Number} top Top coordinate
+     * @param {Number} lineHeight Height of the line
+     */
+    _renderChar(method, ctx, lineIndex, charIndex, _char, left, top) {
+        const decl = this._getStyleDeclaration(lineIndex, charIndex), fullDecl = this.getCompleteStyleDeclaration(lineIndex, charIndex), shouldFill = method === 'fillText' && fullDecl.fill, shouldStroke = method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth;
+        let fillOffsets, strokeOffsets;
+        if (!shouldStroke && !shouldFill) {
+            return;
+        }
+        ctx.save();
+        shouldFill && (fillOffsets = this._setFillStyles(ctx, fullDecl));
+        shouldStroke && (strokeOffsets = this._setStrokeStyles(ctx, fullDecl));
+        ctx.font = this._getFontDeclaration(fullDecl);
+        if (decl && decl.textBackgroundColor) {
+            this._removeShadow(ctx);
+        }
+        if (decl && decl.deltaY) {
+            top += decl.deltaY;
+        }
+        shouldFill &&
+            ctx.fillText(_char, left - fillOffsets.offsetX, top - fillOffsets.offsetY);
+        shouldStroke &&
+            ctx.strokeText(_char, left - strokeOffsets.offsetX, top - strokeOffsets.offsetY);
+        ctx.restore();
+    }
+    /**
+     * Turns the character into a 'superior figure' (i.e. 'superscript')
+     * @param {Number} start selection start
+     * @param {Number} end selection end
+     * @returns {Text} thisArg
+     * @chainable
+     */
+    setSuperscript(start, end) {
+        return this._setScript(start, end, this.superscript);
+    }
+    /**
+     * Turns the character into an 'inferior figure' (i.e. 'subscript')
+     * @param {Number} start selection start
+     * @param {Number} end selection end
+     * @returns {Text} thisArg
+     * @chainable
+     */
+    setSubscript(start, end) {
+        return this._setScript(start, end, this.subscript);
+    }
+    /**
+     * Applies 'schema' at given position
+     * @private
+     * @param {Number} start selection start
+     * @param {Number} end selection end
+     * @param {Number} schema
+     * @returns {Text} thisArg
+     * @chainable
+     */
+    _setScript(start, end, schema) {
+        const loc = this.get2DCursorLocation(start, true), fontSize = this.getValueOfPropertyAt(loc.lineIndex, loc.charIndex, 'fontSize'), dy = this.getValueOfPropertyAt(loc.lineIndex, loc.charIndex, 'deltaY'), style = {
+            fontSize: fontSize * schema.size,
+            deltaY: dy + fontSize * schema.baseline,
+        };
+        this.setSelectionStyles(style, start, end);
+        return this;
+    }
+    /**
+     * @private
+     * @param {Number} lineIndex index text line
+     * @return {Number} Line left offset
+     */
+    _getLineLeftOffset(lineIndex) {
+        var lineWidth = this.getLineWidth(lineIndex), lineDiff = this.width - lineWidth, textAlign = this.textAlign, direction = this.direction, isEndOfWrapping, leftOffset = 0, isEndOfWrapping = this.isEndOfWrapping(lineIndex);
+        if (textAlign === 'justify' ||
+            (textAlign === 'justify-center' && !isEndOfWrapping) ||
+            (textAlign === 'justify-right' && !isEndOfWrapping) ||
+            (textAlign === 'justify-left' && !isEndOfWrapping)) {
+            return 0;
+        }
+        if (textAlign === 'center') {
+            leftOffset = lineDiff / 2;
+        }
+        if (textAlign === 'right') {
+            leftOffset = lineDiff;
+        }
+        if (textAlign === 'justify-center') {
+            leftOffset = lineDiff / 2;
+        }
+        if (textAlign === 'justify-right') {
+            leftOffset = lineDiff;
+        }
+        if (direction === 'rtl') {
+            if (textAlign === 'right' ||
+                textAlign === 'justify' ||
+                textAlign === 'justify-right') {
+                leftOffset = 0;
+            }
+            else if (textAlign === 'left' || textAlign === 'justify-left') {
+                leftOffset = -lineDiff;
+            }
+            else if (textAlign === 'center' || textAlign === 'justify-center') {
+                leftOffset = -lineDiff / 2;
+            }
+        }
+        return leftOffset;
+    }
+    /**
+     * @private
+     */
+    _clearCache() {
+        this.__lineWidths = [];
+        this.__lineHeights = [];
+        this.__charBounds = [];
+    }
+    /**
+     * @private
+     */
+    _shouldClearDimensionCache() {
+        let shouldClear = this._forceClearCache;
+        shouldClear ||
+            (shouldClear = this.hasStateChanged('_dimensionAffectingProps'));
+        if (shouldClear) {
+            this.dirty = true;
+            this._forceClearCache = false;
+        }
+        return shouldClear;
+    }
+    /**
+     * Measure a single line given its index. Used to calculate the initial
+     * text bounding box. The values are calculated and stored in __lineWidths cache.
+     * @private
+     * @param {Number} lineIndex line number
+     * @return {Number} Line width
+     */
+    getLineWidth(lineIndex) {
+        if (this.__lineWidths[lineIndex] !== undefined) {
+            return this.__lineWidths[lineIndex];
+        }
+        const lineInfo = this.measureLine(lineIndex);
+        const width = lineInfo.width;
+        this.__lineWidths[lineIndex] = width;
+        return width;
+    }
+    _getWidthOfCharSpacing() {
+        if (this.charSpacing !== 0) {
+            return (this.fontSize * this.charSpacing) / 1000;
+        }
+        return 0;
+    }
+    /**
+     * Retrieves the value of property at given character position
+     * @param {Number} lineIndex the line number
+     * @param {Number} charIndex the character number
+     * @param {String} property the property name
+     * @returns the value of 'property'
+     */
+    getValueOfPropertyAt(lineIndex, charIndex, property) {
+        const charStyle = this._getStyleDeclaration(lineIndex, charIndex);
+        if (charStyle && typeof charStyle[property] !== 'undefined') {
+            return charStyle[property];
+        }
+        return this[property];
+    }
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderTextDecoration(ctx, type) {
+        if (!this[type] && !this.styleHas(type)) {
+            return;
+        }
+        let heightOfLine, size, _size, lineLeftOffset, dy, _dy, line, lastDecoration, leftOffset = this._getLeftOffset(), topOffset = this._getTopOffset(), top, boxStart, boxWidth, charBox, currentDecoration, maxHeight, currentFill, lastFill, path = this.path, charSpacing = this._getWidthOfCharSpacing(), offsetY = this.offsets[type];
+        for (let i = 0, len = this._textLines.length; i < len; i++) {
+            heightOfLine = this.getHeightOfLine(i);
+            if (!this[type] && !this.styleHas(type, i)) {
+                topOffset += heightOfLine;
+                continue;
+            }
+            line = this._textLines[i];
+            maxHeight = heightOfLine / this.lineHeight;
+            lineLeftOffset = this._getLineLeftOffset(i);
+            boxStart = 0;
+            boxWidth = 0;
+            lastDecoration = this.getValueOfPropertyAt(i, 0, type);
+            lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
+            top = topOffset + maxHeight * (1 - this._fontSizeFraction);
+            size = this.getHeightOfChar(i, 0);
+            dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
+            for (let j = 0, jlen = line.length; j < jlen; j++) {
+                charBox = this.__charBounds[i][j];
+                currentDecoration = this.getValueOfPropertyAt(i, j, type);
+                currentFill = this.getValueOfPropertyAt(i, j, 'fill');
+                _size = this.getHeightOfChar(i, j);
+                _dy = this.getValueOfPropertyAt(i, j, 'deltaY');
+                if (path && currentDecoration && currentFill) {
+                    ctx.save();
+                    ctx.fillStyle = lastFill;
+                    ctx.translate(charBox.renderLeft, charBox.renderTop);
+                    ctx.rotate(charBox.angle);
+                    ctx.fillRect(-charBox.kernedWidth / 2, offsetY * _size + _dy, charBox.kernedWidth, this.fontSize / 15);
+                    ctx.restore();
+                }
+                else if ((currentDecoration !== lastDecoration ||
+                    currentFill !== lastFill ||
+                    _size !== size ||
+                    _dy !== dy) &&
+                    boxWidth > 0) {
+                    var drawStart = leftOffset + lineLeftOffset + boxStart;
+                    if (this.direction === 'rtl') {
+                        drawStart = this.width - drawStart - boxWidth;
+                    }
+                    if (lastDecoration && lastFill) {
+                        ctx.fillStyle = lastFill;
+                        ctx.fillRect(drawStart, top + offsetY * size + dy, boxWidth, this.fontSize / 15);
+                    }
+                    boxStart = charBox.left;
+                    boxWidth = charBox.width;
+                    lastDecoration = currentDecoration;
+                    lastFill = currentFill;
+                    size = _size;
+                    dy = _dy;
+                }
+                else {
+                    boxWidth += charBox.kernedWidth;
+                }
+            }
+            var drawStart = leftOffset + lineLeftOffset + boxStart;
+            if (this.direction === 'rtl') {
+                drawStart = this.width - drawStart - boxWidth;
+            }
+            ctx.fillStyle = currentFill;
+            currentDecoration &&
+                currentFill &&
+                ctx.fillRect(drawStart, top + offsetY * size + dy, boxWidth - charSpacing, this.fontSize / 15);
+            topOffset += heightOfLine;
+        }
+        // if there is text background color no
+        // other shadows should be casted
+        this._removeShadow(ctx);
+    }
+    /**
+     * return font declaration string for canvas context
+     * @param {Object} [styleObject] object
+     * @returns {String} font declaration formatted for canvas context.
+     */
+    _getFontDeclaration(styleObject, forMeasuring) {
+        const style = styleObject || this, family = this.fontFamily, fontIsGeneric = Text$1.genericFonts.indexOf(family.toLowerCase()) > -1;
+        const fontFamily = family === undefined ||
+            family.indexOf("'") > -1 ||
+            family.indexOf(',') > -1 ||
+            family.indexOf('"') > -1 ||
+            fontIsGeneric
+            ? style.fontFamily
+            : '"' + style.fontFamily + '"';
+        return [
+            // node-canvas needs "weight style", while browsers need "style weight"
+            // verify if this can be fixed in JSDOM
+            fabric$3.isLikelyNode ? style.fontWeight : style.fontStyle,
+            fabric$3.isLikelyNode ? style.fontStyle : style.fontWeight,
+            forMeasuring ? this.CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
+            fontFamily,
+        ].join(' ');
+    }
+    /**
+     * Renders text instance on a specified context
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    render(ctx) {
+        if (!this.visible) {
+            return;
+        }
+        if (this.canvas &&
+            this.canvas.skipOffscreen &&
+            !this.group &&
+            !this.isOnScreen()) {
+            return;
+        }
+        if (this._shouldClearDimensionCache()) {
+            this.initDimensions();
+        }
+        super.render(ctx);
+    }
+    /**
+     * Override this method to customize grapheme splitting
+     * @param {string} value
+     * @returns {string[]} array of graphemes
+     */
+    graphemeSplit(value) {
+        return graphemeSplit(value);
+    }
+    /**
+     * Returns the text as an array of lines.
+     * @param {String} text text to split
+     * @returns  Lines in the text
+     */
+    _splitTextIntoLines(text) {
+        const lines = text.split(this._reNewline), newLines = new Array(lines.length), newLine = ['\n'];
+        let newText = [];
+        for (let i = 0; i < lines.length; i++) {
+            newLines[i] = this.graphemeSplit(lines[i]);
+            newText = newText.concat(newLines[i], newLine);
+        }
+        newText.pop();
+        return {
+            _unwrappedLines: newLines,
+            lines: lines,
+            graphemeText: newText,
+            graphemeLines: newLines,
+        };
+    }
+    /**
+     * Returns object representation of an instance
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} Object representation of an instance
+     */
+    toObject(propertiesToInclude) {
+        const allProperties = additionalProps.concat(propertiesToInclude);
+        const obj = super.toObject(allProperties);
+        obj.styles = stylesToArray(this.styles, this.text);
+        if (obj.path) {
+            obj.path = this.path.toObject();
+        }
+        return obj;
+    }
+    /**
+     * Sets property to a given value. When changing position/dimension -related properties (left, top, scale, angle, etc.) `set` does not update position of object's borders/controls. If you need to update those, call `setCoords()`.
+     * @param {String|Object} key Property name or object (if object, iterate over the object properties)
+     * @param {*} value Property value (if function, the value is passed into it and its return value is used as a new one)
+     * @return {FabricObject} thisArg
+     * @chainable
+     */
+    set(key, value) {
+        super.set(key, value);
+        let needsDims = false;
+        let isAddingPath = false;
+        if (typeof key === 'object') {
+            for (const _key in key) {
+                if (_key === 'path') {
+                    this.setPathInfo();
+                }
+                needsDims =
+                    needsDims || this._dimensionAffectingProps.indexOf(_key) !== -1;
+                isAddingPath = isAddingPath || _key === 'path';
+            }
+        }
+        else {
+            needsDims = this._dimensionAffectingProps.indexOf(key) !== -1;
+            isAddingPath = key === 'path';
+        }
+        if (isAddingPath) {
+            this.setPathInfo();
+        }
+        if (needsDims && this.initialized) {
+            this.initDimensions();
+            this.setCoords();
+        }
+        return this;
+    }
+    /**
+     * Returns complexity of an instance
+     * @return {Number} complexity
+     */
+    complexity() {
+        return 1;
+    }
+    /**
+     * Returns Text instance from an SVG element (<b>not yet implemented</b>)
      * @static
-     * @memberOf fabric.Text
+     * @memberOf Text
      * @param {SVGElement} element Element to parse
      * @param {Function} callback callback function invoked after parsing
      * @param {Object} [options] Options object
      */
-    fabric.Text.fromElement = function (element, callback, options) {
+    static fromElement(element, callback, options) {
         if (!element) {
             return callback(null);
         }
-        var parsedAttributes = fabric.parseAttributes(element, fabric.Text.ATTRIBUTE_NAMES), parsedAnchor = parsedAttributes.textAnchor || 'left';
+        const parsedAttributes = fabric$3.parseAttributes(element, Text$1.ATTRIBUTE_NAMES), parsedAnchor = parsedAttributes.textAnchor || 'left';
         options = Object.assign({}, options, parsedAttributes);
         options.top = options.top || 0;
         options.left = options.left || 0;
         if (parsedAttributes.textDecoration) {
-            var textDecoration = parsedAttributes.textDecoration;
+            const textDecoration = parsedAttributes.textDecoration;
             if (textDecoration.indexOf('underline') !== -1) {
                 options.underline = true;
             }
@@ -23590,7 +23601,7 @@ function copyGLTo2DPutImageData(gl, pipelineState) {
         if (!('fontSize' in options)) {
             options.fontSize = DEFAULT_SVG_FONT_SIZE;
         }
-        var textContent = '';
+        let textContent = '';
         // The XML is not properly parsed in IE9 so a workaround to get
         // textContent is through firstChild.data. Another workaround would be
         // to convert XML loaded from a file to be converted using DOMParser (same way loadSVGFromString() does)
@@ -23607,9 +23618,9 @@ function copyGLTo2DPutImageData(gl, pipelineState) {
         textContent = textContent
             .replace(/^\s+|\s+$|\n+/g, '')
             .replace(/\s+/g, ' ');
-        var originalStrokeWidth = options.strokeWidth;
+        const originalStrokeWidth = options.strokeWidth;
         options.strokeWidth = 0;
-        var text = new fabric.Text(textContent, options), textHeightScaleFactor = text.getScaledHeight() / text.height, lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height, scaledDiff = lineHeightDiff * textHeightScaleFactor, textHeight = text.getScaledHeight() + scaledDiff, offX = 0;
+        let text = new Text$1(textContent, options), textHeightScaleFactor = text.getScaledHeight() / text.height, lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height, scaledDiff = lineHeightDiff * textHeightScaleFactor, textHeight = text.getScaledHeight() + scaledDiff, offX = 0;
         /*
           Adjust positioning:
             x/y attributes in SVG correspond to the bottom-left corner of text bounding box
@@ -23629,876 +23640,603 @@ function copyGLTo2DPutImageData(gl, pipelineState) {
             strokeWidth: typeof originalStrokeWidth !== 'undefined' ? originalStrokeWidth : 1,
         });
         callback(text);
-    };
-    /* _FROM_SVG_END_ */
+    }
     /**
-     * Returns fabric.Text instance from an object representation
+     * Returns Text instance from an object representation
      * @static
-     * @memberOf fabric.Text
+     * @memberOf Text
      * @param {Object} object plain js Object to create an instance from
-     * @returns {Promise<fabric.Text>}
+     * @returns {Promise<Text>}
      */
-    fabric.Text.fromObject = function (object) {
-        var styles = fabric.util.stylesFromArray(object.styles, object.text);
+    static fromObject(object) {
+        const styles = stylesFromArray(object.styles, object.text);
         //copy object to prevent mutation
-        var objCopy = Object.assign({}, object, { styles: styles });
-        return fabric.Object._fromObject(fabric.Text, objCopy, {
+        const objCopy = Object.assign({}, object, { styles: styles });
+        return InteractiveFabricObject._fromObject(Text$1, objCopy, {
             extraParam: 'text',
         });
-    };
-    fabric.Text.genericFonts = [
-        'sans-serif',
-        'serif',
-        'cursive',
-        'fantasy',
-        'monospace',
-    ];
-})(typeof exports !== 'undefined' ? exports : window);
+    }
+}
+/**
+ * List of attribute names to account for when parsing SVG element (used by {@link Text.fromElement})
+ * @static
+ * @memberOf Text
+ * @see: http://www.w3.org/TR/SVG/text.html#TextElement
+ */
+Text$1.ATTRIBUTE_NAMES = fabric$3.SHARED_ATTRIBUTES.concat('x y dx dy font-family font-style font-weight font-size letter-spacing text-decoration text-anchor'.split(' '));
+Text$1.genericFonts = [
+    'sans-serif',
+    'serif',
+    'cursive',
+    'fantasy',
+    'monospace',
+];
+const textDefaultValues = {
+    _dimensionAffectingProps: [
+        'fontSize',
+        'fontWeight',
+        'fontFamily',
+        'fontStyle',
+        'lineHeight',
+        'text',
+        'charSpacing',
+        'textAlign',
+        'styles',
+        'path',
+        'pathStartOffset',
+        'pathSide',
+        'pathAlign',
+    ],
+    _reNewline: /\r?\n/,
+    _reSpacesAndTabs: /[ \t\r]/g,
+    _reSpaceAndTab: /[ \t\r]/,
+    _reWords: /\S+/g,
+    type: 'text',
+    fontSize: 40,
+    fontWeight: 'normal',
+    fontFamily: 'Times New Roman',
+    underline: false,
+    overline: false,
+    linethrough: false,
+    textAlign: 'left',
+    fontStyle: 'normal',
+    lineHeight: 1.16,
+    superscript: {
+        size: 0.6,
+        baseline: -0.35, // baseline-shift factor (upwards)
+    },
+    subscript: {
+        size: 0.6,
+        baseline: 0.11, // baseline-shift factor (downwards)
+    },
+    textBackgroundColor: '',
+    stateProperties: InteractiveFabricObject.prototype.stateProperties.concat(additionalProps),
+    cacheProperties: InteractiveFabricObject.prototype.cacheProperties.concat(additionalProps),
+    stroke: null,
+    shadow: null,
+    path: null,
+    pathStartOffset: 0,
+    pathSide: 'left',
+    pathAlign: 'baseline',
+    _fontSizeFraction: 0.222,
+    offsets: {
+        underline: 0.1,
+        linethrough: -0.315,
+        overline: -0.88,
+    },
+    _fontSizeMult: 1.13,
+    charSpacing: 0,
+    styles: null,
+    deltaY: 0,
+    direction: 'ltr',
+    _styleProperties: [
+        'stroke',
+        'strokeWidth',
+        'fill',
+        'fontFamily',
+        'fontSize',
+        'fontWeight',
+        'fontStyle',
+        'underline',
+        'overline',
+        'linethrough',
+        'deltaY',
+        'textBackgroundColor',
+    ],
+    __charBounds: [],
+    CACHE_FONT_SIZE: 400,
+    MIN_TEXT_WIDTH: 2,
+};
+Object.assign(Text$1.prototype, textDefaultValues);
+/* _FROM_SVG_START_ */
+/* _FROM_SVG_END_ */
+fabric$3.Text = Text$1;
 
-//@ts-nocheck
-(function (global) {
-    var fabric = global.fabric;
-    fabric.util.object.extend(fabric.Text.prototype, 
-    /** @lends fabric.Text.prototype */ {
-        /**
-         * Returns true if object has no styling or no styling in a line
-         * @param {Number} lineIndex , lineIndex is on wrapped lines.
-         * @return {Boolean}
-         */
-        isEmptyStyles: function (lineIndex) {
-            if (!this.styles) {
-                return true;
-            }
-            if (typeof lineIndex !== 'undefined' && !this.styles[lineIndex]) {
-                return true;
-            }
-            var obj = typeof lineIndex === 'undefined'
-                ? this.styles
-                : { line: this.styles[lineIndex] };
-            for (var p1 in obj) {
-                for (var p2 in obj[p1]) {
-                    // eslint-disable-next-line no-unused-vars
-                    for (var p3 in obj[p1][p2]) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        },
-        /**
-         * Returns true if object has a style property or has it ina specified line
-         * This function is used to detect if a text will use a particular property or not.
-         * @param {String} property to check for
-         * @param {Number} lineIndex to check the style on
-         * @return {Boolean}
-         */
-        styleHas: function (property, lineIndex) {
-            if (!this.styles || !property || property === '') {
-                return false;
-            }
-            if (typeof lineIndex !== 'undefined' && !this.styles[lineIndex]) {
-                return false;
-            }
-            var obj = typeof lineIndex === 'undefined'
-                ? this.styles
-                : { 0: this.styles[lineIndex] };
-            // eslint-disable-next-line
-            for (var p1 in obj) {
-                // eslint-disable-next-line
-                for (var p2 in obj[p1]) {
-                    if (typeof obj[p1][p2][property] !== 'undefined') {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        },
-        /**
-         * Check if characters in a text have a value for a property
-         * whose value matches the textbox's value for that property.  If so,
-         * the character-level property is deleted.  If the character
-         * has no other properties, then it is also deleted.  Finally,
-         * if the line containing that character has no other characters
-         * then it also is deleted.
-         *
-         * @param {string} property The property to compare between characters and text.
-         */
-        cleanStyle: function (property) {
-            if (!this.styles || !property || property === '') {
-                return false;
-            }
-            var obj = this.styles, stylesCount = 0, letterCount, stylePropertyValue, allStyleObjectPropertiesMatch = true, graphemeCount = 0, styleObject;
-            // eslint-disable-next-line
-            for (var p1 in obj) {
-                letterCount = 0;
-                // eslint-disable-next-line
-                for (var p2 in obj[p1]) {
-                    var styleObject = obj[p1][p2], stylePropertyHasBeenSet = styleObject.hasOwnProperty(property);
-                    stylesCount++;
-                    if (stylePropertyHasBeenSet) {
-                        if (!stylePropertyValue) {
-                            stylePropertyValue = styleObject[property];
-                        }
-                        else if (styleObject[property] !== stylePropertyValue) {
-                            allStyleObjectPropertiesMatch = false;
-                        }
-                        if (styleObject[property] === this[property]) {
-                            delete styleObject[property];
-                        }
-                    }
-                    else {
-                        allStyleObjectPropertiesMatch = false;
-                    }
-                    if (Object.keys(styleObject).length !== 0) {
-                        letterCount++;
-                    }
-                    else {
-                        delete obj[p1][p2];
-                    }
-                }
-                if (letterCount === 0) {
-                    delete obj[p1];
-                }
-            }
-            // if every grapheme has the same style set then
-            // delete those styles and set it on the parent
-            for (var i = 0; i < this._textLines.length; i++) {
-                graphemeCount += this._textLines[i].length;
-            }
-            if (allStyleObjectPropertiesMatch && stylesCount === graphemeCount) {
-                this[property] = stylePropertyValue;
-                this.removeStyle(property);
-            }
-        },
-        /**
-         * Remove a style property or properties from all individual character styles
-         * in a text object.  Deletes the character style object if it contains no other style
-         * props.  Deletes a line style object if it contains no other character styles.
-         *
-         * @param {String} props The property to remove from character styles.
-         */
-        removeStyle: function (property) {
-            if (!this.styles || !property || property === '') {
-                return;
-            }
-            var obj = this.styles, line, lineNum, charNum;
-            for (lineNum in obj) {
-                line = obj[lineNum];
-                for (charNum in line) {
-                    delete line[charNum][property];
-                    if (Object.keys(line[charNum]).length === 0) {
-                        delete line[charNum];
-                    }
-                }
-                if (Object.keys(line).length === 0) {
-                    delete obj[lineNum];
-                }
-            }
-        },
-        /**
-         * @private
-         */
-        _extendStyles: function (index, styles) {
-            var loc = this.get2DCursorLocation(index);
-            if (!this._getLineStyle(loc.lineIndex)) {
-                this._setLineStyle(loc.lineIndex);
-            }
-            if (!this._getStyleDeclaration(loc.lineIndex, loc.charIndex)) {
-                this._setStyleDeclaration(loc.lineIndex, loc.charIndex, {});
-            }
-            fabric.util.object.extend(this._getStyleDeclaration(loc.lineIndex, loc.charIndex), styles);
-        },
-        /**
-         * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start)
-         * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
-         * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. useful to manage styles.
-         */
-        get2DCursorLocation: function (selectionStart, skipWrapping) {
-            if (typeof selectionStart === 'undefined') {
-                selectionStart = this.selectionStart;
-            }
-            var lines = skipWrapping ? this._unwrappedTextLines : this._textLines, len = lines.length;
-            for (var i = 0; i < len; i++) {
-                if (selectionStart <= lines[i].length) {
-                    return {
-                        lineIndex: i,
-                        charIndex: selectionStart,
-                    };
-                }
-                selectionStart -= lines[i].length + this.missingNewlineOffset(i);
-            }
-            return {
-                lineIndex: i - 1,
-                charIndex: lines[i - 1].length < selectionStart
-                    ? lines[i - 1].length
-                    : selectionStart,
-            };
-        },
-        /**
-         * Gets style of a current selection/cursor (at the start position)
-         * if startIndex or endIndex are not provided, selectionStart or selectionEnd will be used.
-         * @param {Number} [startIndex] Start index to get styles at
-         * @param {Number} [endIndex] End index to get styles at, if not specified selectionEnd or startIndex + 1
-         * @param {Boolean} [complete] get full style or not
-         * @return {Array} styles an array with one, zero or more Style objects
-         */
-        getSelectionStyles: function (startIndex, endIndex, complete) {
-            if (typeof startIndex === 'undefined') {
-                startIndex = this.selectionStart || 0;
-            }
-            if (typeof endIndex === 'undefined') {
-                endIndex = this.selectionEnd || startIndex;
-            }
-            var styles = [];
-            for (var i = startIndex; i < endIndex; i++) {
-                styles.push(this.getStyleAtPosition(i, complete));
-            }
-            return styles;
-        },
-        /**
-         * Gets style of a current selection/cursor position
-         * @param {Number} position  to get styles at
-         * @param {Boolean} [complete] full style if true
-         * @return {Object} style Style object at a specified index
-         * @private
-         */
-        getStyleAtPosition: function (position, complete) {
-            var loc = this.get2DCursorLocation(position), style = complete
-                ? this.getCompleteStyleDeclaration(loc.lineIndex, loc.charIndex)
-                : this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
-            return style || {};
-        },
-        /**
-         * Sets style of a current selection, if no selection exist, do not set anything.
-         * @param {Object} [styles] Styles object
-         * @param {Number} [startIndex] Start index to get styles at
-         * @param {Number} [endIndex] End index to get styles at, if not specified selectionEnd or startIndex + 1
-         * @return {fabric.IText} thisArg
-         * @chainable
-         */
-        setSelectionStyles: function (styles, startIndex, endIndex) {
-            if (typeof startIndex === 'undefined') {
-                startIndex = this.selectionStart || 0;
-            }
-            if (typeof endIndex === 'undefined') {
-                endIndex = this.selectionEnd || startIndex;
-            }
-            for (var i = startIndex; i < endIndex; i++) {
-                this._extendStyles(i, styles);
-            }
-            /* not included in _extendStyles to avoid clearing cache more than once */
-            this._forceClearCache = true;
-            return this;
-        },
-        /**
-         * get the reference, not a clone, of the style object for a given character
-         * @param {Number} lineIndex
-         * @param {Number} charIndex
-         * @return {Object} style object
-         */
-        _getStyleDeclaration: function (lineIndex, charIndex) {
-            var lineStyle = this.styles && this.styles[lineIndex];
-            if (!lineStyle) {
-                return null;
-            }
-            return lineStyle[charIndex];
-        },
-        /**
-         * return a new object that contains all the style property for a character
-         * the object returned is newly created
-         * @param {Number} lineIndex of the line where the character is
-         * @param {Number} charIndex position of the character on the line
-         * @return {Object} style object
-         */
-        getCompleteStyleDeclaration: function (lineIndex, charIndex) {
-            var style = this._getStyleDeclaration(lineIndex, charIndex) || {}, styleObject = {}, prop;
-            for (var i = 0; i < this._styleProperties.length; i++) {
-                prop = this._styleProperties[i];
-                styleObject[prop] =
-                    typeof style[prop] === 'undefined' ? this[prop] : style[prop];
-            }
-            return styleObject;
-        },
-        /**
-         * @param {Number} lineIndex
-         * @param {Number} charIndex
-         * @param {Object} style
-         * @private
-         */
-        _setStyleDeclaration: function (lineIndex, charIndex, style) {
-            this.styles[lineIndex][charIndex] = style;
-        },
-        /**
-         *
-         * @param {Number} lineIndex
-         * @param {Number} charIndex
-         * @private
-         */
-        _deleteStyleDeclaration: function (lineIndex, charIndex) {
-            delete this.styles[lineIndex][charIndex];
-        },
-        /**
-         * @param {Number} lineIndex
-         * @return {Boolean} if the line exists or not
-         * @private
-         */
-        _getLineStyle: function (lineIndex) {
-            return !!this.styles[lineIndex];
-        },
-        /**
-         * Set the line style to an empty object so that is initialized
-         * @param {Number} lineIndex
-         * @private
-         */
-        _setLineStyle: function (lineIndex) {
-            this.styles[lineIndex] = {};
-        },
-        /**
-         * @param {Number} lineIndex
-         * @private
-         */
-        _deleteLineStyle: function (lineIndex) {
-            delete this.styles[lineIndex];
-        },
-    });
-})(typeof exports !== 'undefined' ? exports : window);
-
-//@ts-nocheck
-(function (global) {
-    var fabric = global.fabric;
+// @ts-nocheck
+/**
+ * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
+ * prefix when observing canvas.
+ * @class IText
+ *
+ * @fires changed
+ * @fires selection:changed
+ * @fires editing:entered
+ * @fires editing:exited
+ * @fires dragstart
+ * @fires drag drag event firing on the drag source
+ * @fires dragend
+ * @fires copy
+ * @fires cut
+ * @fires paste
+ *
+ * @return {IText} thisArg
+ * @see {@link IText#initialize} for constructor definition
+ *
+ * <p>Supported key combinations:</p>
+ * <pre>
+ *   Move cursor:                    left, right, up, down
+ *   Select character:               shift + left, shift + right
+ *   Select text vertically:         shift + up, shift + down
+ *   Move cursor by word:            alt + left, alt + right
+ *   Select words:                   shift + alt + left, shift + alt + right
+ *   Move cursor to line start/end:  cmd + left, cmd + right or home, end
+ *   Select till start/end of line:  cmd + shift + left, cmd + shift + right or shift + home, shift + end
+ *   Jump to start/end of text:      cmd + up, cmd + down
+ *   Select till start/end of text:  cmd + shift + up, cmd + shift + down or shift + pgUp, shift + pgDown
+ *   Delete character:               backspace
+ *   Delete word:                    alt + backspace
+ *   Delete line:                    cmd + backspace
+ *   Forward delete:                 delete
+ *   Copy text:                      ctrl/cmd + c
+ *   Paste text:                     ctrl/cmd + v
+ *   Cut text:                       ctrl/cmd + x
+ *   Select entire text:             ctrl/cmd + a
+ *   Quit editing                    tab or esc
+ * </pre>
+ *
+ * <p>Supported mouse/touch combination</p>
+ * <pre>
+ *   Position cursor:                click/touch
+ *   Create selection:               click/touch & drag
+ *   Create selection:               click & shift + click
+ *   Select word:                    double click
+ *   Select line:                    triple click
+ * </pre>
+ */
+class IText$1 extends Text$1 {
     /**
-     * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
-     * prefix when observing canvas.
-     * @class fabric.IText
-     * @extends fabric.Text
-     *
-     * @fires changed
-     * @fires selection:changed
-     * @fires editing:entered
-     * @fires editing:exited
-     * @fires dragstart
-     * @fires drag drag event firing on the drag source
-     * @fires dragend
-     * @fires copy
-     * @fires cut
-     * @fires paste
-     *
-     * @return {fabric.IText} thisArg
-     * @see {@link fabric.IText#initialize} for constructor definition
-     *
-     * <p>Supported key combinations:</p>
-     * <pre>
-     *   Move cursor:                    left, right, up, down
-     *   Select character:               shift + left, shift + right
-     *   Select text vertically:         shift + up, shift + down
-     *   Move cursor by word:            alt + left, alt + right
-     *   Select words:                   shift + alt + left, shift + alt + right
-     *   Move cursor to line start/end:  cmd + left, cmd + right or home, end
-     *   Select till start/end of line:  cmd + shift + left, cmd + shift + right or shift + home, shift + end
-     *   Jump to start/end of text:      cmd + up, cmd + down
-     *   Select till start/end of text:  cmd + shift + up, cmd + shift + down or shift + pgUp, shift + pgDown
-     *   Delete character:               backspace
-     *   Delete word:                    alt + backspace
-     *   Delete line:                    cmd + backspace
-     *   Forward delete:                 delete
-     *   Copy text:                      ctrl/cmd + c
-     *   Paste text:                     ctrl/cmd + v
-     *   Cut text:                       ctrl/cmd + x
-     *   Select entire text:             ctrl/cmd + a
-     *   Quit editing                    tab or esc
-     * </pre>
-     *
-     * <p>Supported mouse/touch combination</p>
-     * <pre>
-     *   Position cursor:                click/touch
-     *   Create selection:               click/touch & drag
-     *   Create selection:               click & shift + click
-     *   Select word:                    double click
-     *   Select line:                    triple click
-     * </pre>
+     * Constructor
+     * @param {String} text Text string
+     * @param {Object} [options] Options object
+     * @return {IText} thisArg
      */
-    fabric.IText = fabric.util.createClass(fabric.Text, 
-    /** @lends fabric.IText.prototype */ {
-        /**
-         * Type of an object
-         * @type String
-         * @default
-         */
-        type: 'i-text',
+    constructor(text, options) {
+        super(text, options);
         /**
          * Index where text selection starts (or where cursor is when there is no selection)
          * @type Number
          * @default
          */
-        selectionStart: 0,
+        this.selectionStart = 0;
         /**
          * Index where text selection ends
          * @type Number
          * @default
          */
-        selectionEnd: 0,
-        /**
-         * Color of text selection
-         * @type String
-         * @default
-         */
-        selectionColor: 'rgba(17,119,255,0.3)',
-        /**
-         * Indicates whether text is in editing mode
-         * @type Boolean
-         * @default
-         */
-        isEditing: false,
-        /**
-         * Indicates whether a text can be edited
-         * @type Boolean
-         * @default
-         */
-        editable: true,
-        /**
-         * Border color of text object while it's in editing mode
-         * @type String
-         * @default
-         */
-        editingBorderColor: 'rgba(102,153,255,0.25)',
-        /**
-         * Width of cursor (in px)
-         * @type Number
-         * @default
-         */
-        cursorWidth: 2,
-        /**
-         * Color of text cursor color in editing mode.
-         * if not set (default) will take color from the text.
-         * if set to a color value that fabric can understand, it will
-         * be used instead of the color of the text at the current position.
-         * @type String
-         * @default
-         */
-        cursorColor: '',
-        /**
-         * Delay between cursor blink (in ms)
-         * @type Number
-         * @default
-         */
-        cursorDelay: 1000,
-        /**
-         * Duration of cursor fadein (in ms)
-         * @type Number
-         * @default
-         */
-        cursorDuration: 600,
-        /**
-         * Indicates whether internal text char widths can be cached
-         * @type Boolean
-         * @default
-         */
-        caching: true,
-        /**
-         * DOM container to append the hiddenTextarea.
-         * An alternative to attaching to the document.body.
-         * Useful to reduce laggish redraw of the full document.body tree and
-         * also with modals event capturing that won't let the textarea take focus.
-         * @type HTMLElement
-         * @default
-         */
-        hiddenTextareaContainer: null,
-        /**
-         * @private
-         */
-        _reSpace: /\s|\n/,
-        /**
-         * @private
-         */
-        _currentCursorOpacity: 1,
-        /**
-         * @private
-         */
-        _selectionDirection: null,
-        /**
-         * Helps determining when the text is in composition, so that the cursor
-         * rendering is altered.
-         */
-        inCompositionMode: false,
-        /**
-         * Constructor
-         * @param {String} text Text string
-         * @param {Object} [options] Options object
-         * @return {fabric.IText} thisArg
-         */
-        initialize: function (text, options) {
-            this.callSuper('initialize', text, options);
-            this.initBehavior();
-        },
-        /**
-         * While editing handle differently
-         * @private
-         * @param {string} key
-         * @param {*} value
-         */
-        _set: function (key, value) {
-            if (this.isEditing && this._savedProps && key in this._savedProps) {
-                this._savedProps[key] = value;
+        this.selectionEnd = 0;
+        this.initBehavior();
+    }
+    /**
+     * While editing handle differently
+     * @private
+     * @param {string} key
+     * @param {*} value
+     */
+    _set(key, value) {
+        if (this.isEditing && this._savedProps && key in this._savedProps) {
+            this._savedProps[key] = value;
+        }
+        else {
+            super._set(key, value);
+        }
+    }
+    /**
+     * Sets selection start (left boundary of a selection)
+     * @param {Number} index Index to set selection start to
+     */
+    setSelectionStart(index) {
+        index = Math.max(index, 0);
+        this._updateAndFire('selectionStart', index);
+    }
+    /**
+     * Sets selection end (right boundary of a selection)
+     * @param {Number} index Index to set selection end to
+     */
+    setSelectionEnd(index) {
+        index = Math.min(index, this.text.length);
+        this._updateAndFire('selectionEnd', index);
+    }
+    /**
+     * @private
+     * @param {String} property 'selectionStart' or 'selectionEnd'
+     * @param {Number} index new position of property
+     */
+    _updateAndFire(property, index) {
+        if (this[property] !== index) {
+            this._fireSelectionChanged();
+            this[property] = index;
+        }
+        this._updateTextarea();
+    }
+    /**
+     * Fires the even of selection changed
+     * @private
+     */
+    _fireSelectionChanged() {
+        this.fire('selection:changed');
+        this.canvas && this.canvas.fire('text:selection:changed', { target: this });
+    }
+    /**
+     * Initialize text dimensions. Render all text on given context
+     * or on a offscreen canvas to get the text width with measureText.
+     * Updates this.width and this.height with the proper values.
+     * Does not return dimensions.
+     * @private
+     */
+    initDimensions() {
+        this.isEditing && this.initDelayedCursor();
+        this.clearContextTop();
+        super.initDimensions();
+    }
+    /**
+     * Gets style of a current selection/cursor (at the start position)
+     * if startIndex or endIndex are not provided, selectionStart or selectionEnd will be used.
+     * @param {Number} startIndex Start index to get styles at
+     * @param {Number} endIndex End index to get styles at, if not specified selectionEnd or startIndex + 1
+     * @param {Boolean} [complete] get full style or not
+     * @return {Array} styles an array with one, zero or more Style objects
+     */
+    getSelectionStyles(startIndex = this.selectionStart || 0, endIndex = this.selectionEnd, complete) {
+        return super.getSelectionStyles(startIndex, endIndex, complete);
+    }
+    /**
+     * Sets style of a current selection, if no selection exist, do not set anything.
+     * @param {Object} [styles] Styles object
+     * @param {Number} [startIndex] Start index to get styles at
+     * @param {Number} [endIndex] End index to get styles at, if not specified selectionEnd or startIndex + 1
+     */
+    setSelectionStyles(styles, startIndex = this.selectionStart || 0, endIndex = this.selectionEnd) {
+        return super.setSelectionStyles(styles, startIndex, endIndex);
+    }
+    /**
+     * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start)
+     * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
+     * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. useful to manage styles.
+     */
+    get2DCursorLocation(selectionStart = this.selectionStart, skipWrapping) {
+        return super.get2DCursorLocation(selectionStart, skipWrapping);
+    }
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    render(ctx) {
+        this.clearContextTop();
+        super.render(ctx);
+        // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
+        // the correct position but not at every cursor animation.
+        this.cursorOffsetCache = {};
+        this.renderCursorOrSelection();
+    }
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _render(ctx) {
+        super._render(ctx);
+    }
+    /**
+     * Renders cursor or selection (depending on what exists)
+     * it does on the contextTop. If contextTop is not available, do nothing.
+     */
+    renderCursorOrSelection() {
+        if (!this.isEditing) {
+            return;
+        }
+        const ctx = this.clearContextTop(true);
+        if (!ctx) {
+            return;
+        }
+        const boundaries = this._getCursorBoundaries();
+        if (this.selectionStart === this.selectionEnd) {
+            this.renderCursor(ctx, boundaries);
+        }
+        else {
+            this.renderSelection(ctx, boundaries);
+        }
+        ctx.restore();
+    }
+    /**
+     * Renders cursor on context Top, outside the animation cycle, on request
+     * Used for the drag/drop effect.
+     * If contextTop is not available, do nothing.
+     */
+    renderCursorAt(selectionStart) {
+        const boundaries = this._getCursorBoundaries(selectionStart, true);
+        this._renderCursor(this.canvas.contextTop, boundaries, selectionStart);
+    }
+    /**
+     * Returns cursor boundaries (left, top, leftOffset, topOffset)
+     * left/top are left/top of entire text box
+     * leftOffset/topOffset are offset from that left/top point of a text box
+     * @private
+     * @param {number} [index] index from start
+     * @param {boolean} [skipCaching]
+     */
+    _getCursorBoundaries(index, skipCaching) {
+        if (typeof index === 'undefined') {
+            index = this.selectionStart;
+        }
+        const left = this._getLeftOffset(), top = this._getTopOffset(), offsets = this._getCursorBoundariesOffsets(index, skipCaching);
+        return {
+            left: left,
+            top: top,
+            leftOffset: offsets.left,
+            topOffset: offsets.top,
+        };
+    }
+    /**
+     * Caches and returns cursor left/top offset relative to instance's center point
+     * @private
+     * @param {number} index index from start
+     * @param {boolean} [skipCaching]
+     */
+    _getCursorBoundariesOffsets(index, skipCaching) {
+        if (skipCaching) {
+            return this.__getCursorBoundariesOffsets(index);
+        }
+        if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
+            return this.cursorOffsetCache;
+        }
+        return (this.cursorOffsetCache = this.__getCursorBoundariesOffsets(index));
+    }
+    /**
+     * Calculates cursor left/top offset relative to instance's center point
+     * @private
+     * @param {number} index index from start
+     */
+    __getCursorBoundariesOffsets(index) {
+        let topOffset = 0, leftOffset = 0;
+        const { charIndex, lineIndex } = this.get2DCursorLocation(index);
+        for (let i = 0; i < lineIndex; i++) {
+            topOffset += this.getHeightOfLine(i);
+        }
+        const lineLeftOffset = this._getLineLeftOffset(lineIndex);
+        const bound = this.__charBounds[lineIndex][charIndex];
+        bound && (leftOffset = bound.left);
+        if (this.charSpacing !== 0 &&
+            charIndex === this._textLines[lineIndex].length) {
+            leftOffset -= this._getWidthOfCharSpacing();
+        }
+        const boundaries = {
+            top: topOffset,
+            left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
+        };
+        if (this.direction === 'rtl') {
+            if (this.textAlign === 'right' ||
+                this.textAlign === 'justify' ||
+                this.textAlign === 'justify-right') {
+                boundaries.left *= -1;
+            }
+            else if (this.textAlign === 'left' ||
+                this.textAlign === 'justify-left') {
+                boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+            }
+            else if (this.textAlign === 'center' ||
+                this.textAlign === 'justify-center') {
+                boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+            }
+        }
+        return boundaries;
+    }
+    /**
+     * Renders cursor
+     * @param {Object} boundaries
+     * @param {CanvasRenderingContext2D} ctx transformed context to draw on
+     */
+    renderCursor(ctx, boundaries) {
+        this._renderCursor(ctx, boundaries, this.selectionStart);
+    }
+    _renderCursor(ctx, boundaries, selectionStart) {
+        let cursorLocation = this.get2DCursorLocation(selectionStart), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0, charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'), multiplier = this.scaleX * this.canvas.getZoom(), cursorWidth = this.cursorWidth / multiplier, topOffset = boundaries.topOffset, dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY');
+        topOffset +=
+            ((1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex)) /
+                this.lineHeight -
+                charHeight * (1 - this._fontSizeFraction);
+        if (this.inCompositionMode) {
+            // TODO: investigate why there isn't a return inside the if,
+            // and why can't happe top of the function
+            this.renderSelection(ctx, boundaries);
+        }
+        ctx.fillStyle =
+            this.cursorColor ||
+                this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
+        ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
+        ctx.fillRect(boundaries.left + boundaries.leftOffset - cursorWidth / 2, topOffset + boundaries.top + dy, cursorWidth, charHeight);
+    }
+    /**
+     * Renders text selection
+     * @param {Object} boundaries Object with left/top/leftOffset/topOffset
+     * @param {CanvasRenderingContext2D} ctx transformed context to draw on
+     */
+    renderSelection(ctx, boundaries) {
+        const selection = {
+            selectionStart: this.inCompositionMode
+                ? this.hiddenTextarea.selectionStart
+                : this.selectionStart,
+            selectionEnd: this.inCompositionMode
+                ? this.hiddenTextarea.selectionEnd
+                : this.selectionEnd,
+        };
+        this._renderSelection(ctx, selection, boundaries);
+    }
+    /**
+     * Renders drag start text selection
+     */
+    renderDragSourceEffect() {
+        if (this.__isDragging &&
+            this.__dragStartSelection &&
+            this.__dragStartSelection) {
+            this._renderSelection(this.canvas.contextTop, this.__dragStartSelection, this._getCursorBoundaries(this.__dragStartSelection.selectionStart, true));
+        }
+    }
+    renderDropTargetEffect(e) {
+        const dragSelection = this.getSelectionStartFromPointer(e);
+        this.renderCursorAt(dragSelection);
+    }
+    /**
+     * Renders text selection
+     * @private
+     * @param {{ selectionStart: number, selectionEnd: number }} selection
+     * @param {Object} boundaries Object with left/top/leftOffset/topOffset
+     * @param {CanvasRenderingContext2D} ctx transformed context to draw on
+     */
+    _renderSelection(ctx, selection, boundaries) {
+        const selectionStart = selection.selectionStart, selectionEnd = selection.selectionEnd, isJustify = this.textAlign.indexOf('justify') !== -1, start = this.get2DCursorLocation(selectionStart), end = this.get2DCursorLocation(selectionEnd), startLine = start.lineIndex, endLine = end.lineIndex, startChar = start.charIndex < 0 ? 0 : start.charIndex, endChar = end.charIndex < 0 ? 0 : end.charIndex;
+        for (let i = startLine; i <= endLine; i++) {
+            let lineOffset = this._getLineLeftOffset(i) || 0, lineHeight = this.getHeightOfLine(i), realLineHeight = 0, boxStart = 0, boxEnd = 0;
+            if (i === startLine) {
+                boxStart = this.__charBounds[startLine][startChar].left;
+            }
+            if (i >= startLine && i < endLine) {
+                boxEnd =
+                    isJustify && !this.isEndOfWrapping(i)
+                        ? this.width
+                        : this.getLineWidth(i) || 5; // WTF is this 5?
+            }
+            else if (i === endLine) {
+                if (endChar === 0) {
+                    boxEnd = this.__charBounds[endLine][endChar].left;
+                }
+                else {
+                    const charSpacing = this._getWidthOfCharSpacing();
+                    boxEnd =
+                        this.__charBounds[endLine][endChar - 1].left +
+                            this.__charBounds[endLine][endChar - 1].width -
+                            charSpacing;
+                }
+            }
+            realLineHeight = lineHeight;
+            if (this.lineHeight < 1 || (i === endLine && this.lineHeight > 1)) {
+                lineHeight /= this.lineHeight;
+            }
+            let drawStart = boundaries.left + lineOffset + boxStart, drawWidth = boxEnd - boxStart, drawHeight = lineHeight, extraTop = 0;
+            if (this.inCompositionMode) {
+                ctx.fillStyle = this.compositionColor || 'black';
+                drawHeight = 1;
+                extraTop = lineHeight;
             }
             else {
-                this.callSuper('_set', key, value);
+                ctx.fillStyle = this.selectionColor;
             }
-        },
-        /**
-         * Sets selection start (left boundary of a selection)
-         * @param {Number} index Index to set selection start to
-         */
-        setSelectionStart: function (index) {
-            index = Math.max(index, 0);
-            this._updateAndFire('selectionStart', index);
-        },
-        /**
-         * Sets selection end (right boundary of a selection)
-         * @param {Number} index Index to set selection end to
-         */
-        setSelectionEnd: function (index) {
-            index = Math.min(index, this.text.length);
-            this._updateAndFire('selectionEnd', index);
-        },
-        /**
-         * @private
-         * @param {String} property 'selectionStart' or 'selectionEnd'
-         * @param {Number} index new position of property
-         */
-        _updateAndFire: function (property, index) {
-            if (this[property] !== index) {
-                this._fireSelectionChanged();
-                this[property] = index;
-            }
-            this._updateTextarea();
-        },
-        /**
-         * Fires the even of selection changed
-         * @private
-         */
-        _fireSelectionChanged: function () {
-            this.fire('selection:changed');
-            this.canvas &&
-                this.canvas.fire('text:selection:changed', { target: this });
-        },
-        /**
-         * Initialize text dimensions. Render all text on given context
-         * or on a offscreen canvas to get the text width with measureText.
-         * Updates this.width and this.height with the proper values.
-         * Does not return dimensions.
-         * @private
-         */
-        initDimensions: function () {
-            this.isEditing && this.initDelayedCursor();
-            this.clearContextTop();
-            this.callSuper('initDimensions');
-        },
-        /**
-         * @private
-         * @param {CanvasRenderingContext2D} ctx Context to render on
-         */
-        render: function (ctx) {
-            this.clearContextTop();
-            this.callSuper('render', ctx);
-            // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
-            // the correct position but not at every cursor animation.
-            this.cursorOffsetCache = {};
-            this.renderCursorOrSelection();
-        },
-        /**
-         * @private
-         * @param {CanvasRenderingContext2D} ctx Context to render on
-         */
-        _render: function (ctx) {
-            this.callSuper('_render', ctx);
-        },
-        /**
-         * Renders cursor or selection (depending on what exists)
-         * it does on the contextTop. If contextTop is not available, do nothing.
-         */
-        renderCursorOrSelection: function () {
-            if (!this.isEditing) {
-                return;
-            }
-            var ctx = this.clearContextTop(true);
-            if (!ctx) {
-                return;
-            }
-            var boundaries = this._getCursorBoundaries();
-            if (this.selectionStart === this.selectionEnd) {
-                this.renderCursor(ctx, boundaries);
-            }
-            else {
-                this.renderSelection(ctx, boundaries);
-            }
-            ctx.restore();
-        },
-        /**
-         * Renders cursor on context Top, outside the animation cycle, on request
-         * Used for the drag/drop effect.
-         * If contextTop is not available, do nothing.
-         */
-        renderCursorAt: function (selectionStart) {
-            var boundaries = this._getCursorBoundaries(selectionStart, true);
-            this._renderCursor(this.canvas.contextTop, boundaries, selectionStart);
-        },
-        /**
-         * Returns cursor boundaries (left, top, leftOffset, topOffset)
-         * left/top are left/top of entire text box
-         * leftOffset/topOffset are offset from that left/top point of a text box
-         * @private
-         * @param {number} [index] index from start
-         * @param {boolean} [skipCaching]
-         */
-        _getCursorBoundaries: function (index, skipCaching) {
-            if (typeof index === 'undefined') {
-                index = this.selectionStart;
-            }
-            var left = this._getLeftOffset(), top = this._getTopOffset(), offsets = this._getCursorBoundariesOffsets(index, skipCaching);
-            return {
-                left: left,
-                top: top,
-                leftOffset: offsets.left,
-                topOffset: offsets.top,
-            };
-        },
-        /**
-         * Caches and returns cursor left/top offset relative to instance's center point
-         * @private
-         * @param {number} index index from start
-         * @param {boolean} [skipCaching]
-         */
-        _getCursorBoundariesOffsets: function (index, skipCaching) {
-            if (skipCaching) {
-                return this.__getCursorBoundariesOffsets(index);
-            }
-            if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
-                return this.cursorOffsetCache;
-            }
-            return (this.cursorOffsetCache =
-                this.__getCursorBoundariesOffsets(index));
-        },
-        /**
-         * Calcualtes cursor left/top offset relative to instance's center point
-         * @private
-         * @param {number} index index from start
-         */
-        __getCursorBoundariesOffsets: function (index) {
-            var lineLeftOffset, lineIndex, charIndex, topOffset = 0, leftOffset = 0, boundaries, cursorPosition = this.get2DCursorLocation(index);
-            charIndex = cursorPosition.charIndex;
-            lineIndex = cursorPosition.lineIndex;
-            for (var i = 0; i < lineIndex; i++) {
-                topOffset += this.getHeightOfLine(i);
-            }
-            lineLeftOffset = this._getLineLeftOffset(lineIndex);
-            var bound = this.__charBounds[lineIndex][charIndex];
-            bound && (leftOffset = bound.left);
-            if (this.charSpacing !== 0 &&
-                charIndex === this._textLines[lineIndex].length) {
-                leftOffset -= this._getWidthOfCharSpacing();
-            }
-            boundaries = {
-                top: topOffset,
-                left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
-            };
             if (this.direction === 'rtl') {
                 if (this.textAlign === 'right' ||
                     this.textAlign === 'justify' ||
                     this.textAlign === 'justify-right') {
-                    boundaries.left *= -1;
+                    drawStart = this.width - drawStart - drawWidth;
                 }
                 else if (this.textAlign === 'left' ||
                     this.textAlign === 'justify-left') {
-                    boundaries.left =
-                        lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+                    drawStart = boundaries.left + lineOffset - boxEnd;
                 }
                 else if (this.textAlign === 'center' ||
                     this.textAlign === 'justify-center') {
-                    boundaries.left =
-                        lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+                    drawStart = boundaries.left + lineOffset - boxEnd;
                 }
             }
-            return boundaries;
-        },
-        /**
-         * Renders cursor
-         * @param {Object} boundaries
-         * @param {CanvasRenderingContext2D} ctx transformed context to draw on
-         */
-        renderCursor: function (ctx, boundaries) {
-            this._renderCursor(ctx, boundaries, this.selectionStart);
-        },
-        _renderCursor: function (ctx, boundaries, selectionStart) {
-            var cursorLocation = this.get2DCursorLocation(selectionStart), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0, charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'), multiplier = this.scaleX * this.canvas.getZoom(), cursorWidth = this.cursorWidth / multiplier, topOffset = boundaries.topOffset, dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY');
-            topOffset +=
-                ((1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex)) /
-                    this.lineHeight -
-                    charHeight * (1 - this._fontSizeFraction);
-            if (this.inCompositionMode) {
-                // TODO: investigate why there isn't a return inside the if,
-                // and why can't happe top of the function
-                this.renderSelection(ctx, boundaries);
-            }
-            ctx.fillStyle =
-                this.cursorColor ||
-                    this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
-            ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
-            ctx.fillRect(boundaries.left + boundaries.leftOffset - cursorWidth / 2, topOffset + boundaries.top + dy, cursorWidth, charHeight);
-        },
-        /**
-         * Renders text selection
-         * @param {Object} boundaries Object with left/top/leftOffset/topOffset
-         * @param {CanvasRenderingContext2D} ctx transformed context to draw on
-         */
-        renderSelection: function (ctx, boundaries) {
-            var selection = {
-                selectionStart: this.inCompositionMode
-                    ? this.hiddenTextarea.selectionStart
-                    : this.selectionStart,
-                selectionEnd: this.inCompositionMode
-                    ? this.hiddenTextarea.selectionEnd
-                    : this.selectionEnd,
-            };
-            this._renderSelection(ctx, selection, boundaries);
-        },
-        /**
-         * Renders drag start text selection
-         */
-        renderDragSourceEffect: function () {
-            if (this.__isDragging &&
-                this.__dragStartSelection &&
-                this.__dragStartSelection) {
-                this._renderSelection(this.canvas.contextTop, this.__dragStartSelection, this._getCursorBoundaries(this.__dragStartSelection.selectionStart, true));
-            }
-        },
-        renderDropTargetEffect: function (e) {
-            var dragSelection = this.getSelectionStartFromPointer(e);
-            this.renderCursorAt(dragSelection);
-        },
-        /**
-         * Renders text selection
-         * @private
-         * @param {{ selectionStart: number, selectionEnd: number }} selection
-         * @param {Object} boundaries Object with left/top/leftOffset/topOffset
-         * @param {CanvasRenderingContext2D} ctx transformed context to draw on
-         */
-        _renderSelection: function (ctx, selection, boundaries) {
-            var selectionStart = selection.selectionStart, selectionEnd = selection.selectionEnd, isJustify = this.textAlign.indexOf('justify') !== -1, start = this.get2DCursorLocation(selectionStart), end = this.get2DCursorLocation(selectionEnd), startLine = start.lineIndex, endLine = end.lineIndex, startChar = start.charIndex < 0 ? 0 : start.charIndex, endChar = end.charIndex < 0 ? 0 : end.charIndex;
-            for (var i = startLine; i <= endLine; i++) {
-                var lineOffset = this._getLineLeftOffset(i) || 0, lineHeight = this.getHeightOfLine(i), realLineHeight = 0, boxStart = 0, boxEnd = 0;
-                if (i === startLine) {
-                    boxStart = this.__charBounds[startLine][startChar].left;
-                }
-                if (i >= startLine && i < endLine) {
-                    boxEnd =
-                        isJustify && !this.isEndOfWrapping(i)
-                            ? this.width
-                            : this.getLineWidth(i) || 5; // WTF is this 5?
-                }
-                else if (i === endLine) {
-                    if (endChar === 0) {
-                        boxEnd = this.__charBounds[endLine][endChar].left;
-                    }
-                    else {
-                        var charSpacing = this._getWidthOfCharSpacing();
-                        boxEnd =
-                            this.__charBounds[endLine][endChar - 1].left +
-                                this.__charBounds[endLine][endChar - 1].width -
-                                charSpacing;
-                    }
-                }
-                realLineHeight = lineHeight;
-                if (this.lineHeight < 1 || (i === endLine && this.lineHeight > 1)) {
-                    lineHeight /= this.lineHeight;
-                }
-                var drawStart = boundaries.left + lineOffset + boxStart, drawWidth = boxEnd - boxStart, drawHeight = lineHeight, extraTop = 0;
-                if (this.inCompositionMode) {
-                    ctx.fillStyle = this.compositionColor || 'black';
-                    drawHeight = 1;
-                    extraTop = lineHeight;
-                }
-                else {
-                    ctx.fillStyle = this.selectionColor;
-                }
-                if (this.direction === 'rtl') {
-                    if (this.textAlign === 'right' ||
-                        this.textAlign === 'justify' ||
-                        this.textAlign === 'justify-right') {
-                        drawStart = this.width - drawStart - drawWidth;
-                    }
-                    else if (this.textAlign === 'left' ||
-                        this.textAlign === 'justify-left') {
-                        drawStart = boundaries.left + lineOffset - boxEnd;
-                    }
-                    else if (this.textAlign === 'center' ||
-                        this.textAlign === 'justify-center') {
-                        drawStart = boundaries.left + lineOffset - boxEnd;
-                    }
-                }
-                ctx.fillRect(drawStart, boundaries.top + boundaries.topOffset + extraTop, drawWidth, drawHeight);
-                boundaries.topOffset += realLineHeight;
-            }
-        },
-        /**
-         * High level function to know the height of the cursor.
-         * the currentChar is the one that precedes the cursor
-         * Returns fontSize of char at the current cursor
-         * Unused from the library, is for the end user
-         * @return {Number} Character font size
-         */
-        getCurrentCharFontSize: function () {
-            var cp = this._getCurrentCharIndex();
-            return this.getValueOfPropertyAt(cp.l, cp.c, 'fontSize');
-        },
-        /**
-         * High level function to know the color of the cursor.
-         * the currentChar is the one that precedes the cursor
-         * Returns color (fill) of char at the current cursor
-         * if the text object has a pattern or gradient for filler, it will return that.
-         * Unused by the library, is for the end user
-         * @return {String | fabric.Gradient | fabric.Pattern} Character color (fill)
-         */
-        getCurrentCharColor: function () {
-            var cp = this._getCurrentCharIndex();
-            return this.getValueOfPropertyAt(cp.l, cp.c, 'fill');
-        },
-        /**
-         * Returns the cursor position for the getCurrent.. functions
-         * @private
-         */
-        _getCurrentCharIndex: function () {
-            var cursorPosition = this.get2DCursorLocation(this.selectionStart, true), charIndex = cursorPosition.charIndex > 0 ? cursorPosition.charIndex - 1 : 0;
-            return { l: cursorPosition.lineIndex, c: charIndex };
-        },
-    });
+            ctx.fillRect(drawStart, boundaries.top + boundaries.topOffset + extraTop, drawWidth, drawHeight);
+            boundaries.topOffset += realLineHeight;
+        }
+    }
     /**
-     * Returns fabric.IText instance from an object representation
-     * @static
-     * @memberOf fabric.IText
-     * @param {Object} object Object to create an instance from
-     * @returns {Promise<fabric.IText>}
+     * High level function to know the height of the cursor.
+     * the currentChar is the one that precedes the cursor
+     * Returns fontSize of char at the current cursor
+     * Unused from the library, is for the end user
+     * @return {Number} Character font size
      */
-    fabric.IText.fromObject = function (object) {
-        var styles = fabric.util.stylesFromArray(object.styles, object.text);
+    getCurrentCharFontSize() {
+        const cp = this._getCurrentCharIndex();
+        return this.getValueOfPropertyAt(cp.l, cp.c, 'fontSize');
+    }
+    /**
+     * High level function to know the color of the cursor.
+     * the currentChar is the one that precedes the cursor
+     * Returns color (fill) of char at the current cursor
+     * if the text object has a pattern or gradient for filler, it will return that.
+     * Unused by the library, is for the end user
+     * @return {String | fabric.Gradient | fabric.Pattern} Character color (fill)
+     */
+    getCurrentCharColor() {
+        const cp = this._getCurrentCharIndex();
+        return this.getValueOfPropertyAt(cp.l, cp.c, 'fill');
+    }
+    /**
+     * Returns the cursor position for the getCurrent.. functions
+     * @private
+     */
+    _getCurrentCharIndex() {
+        const cursorPosition = this.get2DCursorLocation(this.selectionStart, true), charIndex = cursorPosition.charIndex > 0 ? cursorPosition.charIndex - 1 : 0;
+        return { l: cursorPosition.lineIndex, c: charIndex };
+    }
+    /**
+     * Returns IText instance from an object representation
+     * @static
+     * @memberOf IText
+     * @param {Object} object Object to create an instance from
+     * @returns {Promise<IText>}
+     */
+    static fromObject(object) {
+        const styles = stylesFromArray(object.styles, object.text);
         //copy object to prevent mutation
-        var objCopy = Object.assign({}, object, { styles: styles });
-        return InteractiveFabricObject._fromObject(fabric.IText, objCopy, {
+        const objCopy = Object.assign({}, object, { styles: styles });
+        return InteractiveFabricObject._fromObject(IText$1, objCopy, {
             extraParam: 'text',
         });
-    };
-})(typeof exports !== 'undefined' ? exports : window);
+    }
+}
+const iTextDefaultValues = {
+    type: 'i-text',
+    selectionStart: 0,
+    selectionEnd: 0,
+    selectionColor: 'rgba(17,119,255,0.3)',
+    isEditing: false,
+    editable: true,
+    editingBorderColor: 'rgba(102,153,255,0.25)',
+    cursorWidth: 2,
+    cursorColor: '',
+    cursorDelay: 1000,
+    cursorDuration: 600,
+    caching: true,
+    hiddenTextareaContainer: null,
+    _reSpace: /\s|\n/,
+    _currentCursorOpacity: 1,
+    _selectionDirection: null,
+    inCompositionMode: false,
+};
+Object.assign(IText$1.prototype, iTextDefaultValues);
+fabric$3.IText = IText$1;
 
 //@ts-nocheck
 // extend this regex to support non english languages
 const reNonWord = /[ \n\.,;!\?\-]/;
-(function (global) {
-    var fabric = global.fabric;
-    fabric.util.object.extend(fabric.IText.prototype, 
-    /** @lends fabric.IText.prototype */ {
+const fabric$2 = global.fabric;
+function ITextBehaviorMixinGenerator(Klass) {
+    return class ITextBehaviorMixin extends Klass {
         /**
          * Initializes all the interactive behavior of IText
          */
-        initBehavior: function () {
+        initBehavior() {
             this.initAddedHandler();
             this.initRemovedHandler();
             this.initCursorSelectionHandlers();
@@ -24514,19 +24252,19 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             this.on('dragleave', this.dragLeaveHandler);
             this.on('dragend', this.dragEndHandler);
             this.on('drop', this.dropHandler);
-        },
-        onDeselect: function () {
+        }
+        onDeselect() {
             this.isEditing && this.exitEditing();
             this.selected = false;
-        },
+        }
         /**
          * Initializes "added" event handler
          */
-        initAddedHandler: function () {
-            var _this = this;
+        initAddedHandler() {
+            const _this = this;
             this.on('added', function (opt) {
                 //  make sure we listen to the canvas added event
-                var canvas = opt.target;
+                const canvas = opt.target;
                 if (canvas) {
                     if (!canvas._hasITextHandlers) {
                         canvas._hasITextHandlers = true;
@@ -24536,12 +24274,12 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                     canvas._iTextInstances.push(_this);
                 }
             });
-        },
-        initRemovedHandler: function () {
-            var _this = this;
+        }
+        initRemovedHandler() {
+            const _this = this;
             this.on('removed', function (opt) {
                 //  make sure we listen to the canvas removed event
-                var canvas = opt.target;
+                const canvas = opt.target;
                 if (canvas) {
                     canvas._iTextInstances = canvas._iTextInstances || [];
                     removeFromArray(canvas._iTextInstances, _this);
@@ -24551,12 +24289,12 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                     }
                 }
             });
-        },
+        }
         /**
          * register canvas event to manage exiting on other instances
          * @private
          */
-        _initCanvasHandlers: function (canvas) {
+        _initCanvasHandlers(canvas) {
             canvas._mouseUpITextHandler = function () {
                 if (canvas._iTextInstances) {
                     canvas._iTextInstances.forEach(function (obj) {
@@ -24565,25 +24303,25 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 }
             };
             canvas.on('mouse:up', canvas._mouseUpITextHandler);
-        },
+        }
         /**
          * remove canvas event to manage exiting on other instances
          * @private
          */
-        _removeCanvasHandlers: function (canvas) {
+        _removeCanvasHandlers(canvas) {
             canvas.off('mouse:up', canvas._mouseUpITextHandler);
-        },
+        }
         /**
          * @private
          */
-        _tick: function () {
+        _tick() {
             this._currentTickState = this._animateCursor(this, 1, this.cursorDuration, '_onTickComplete');
-        },
+        }
         /**
          * @private
          */
-        _animateCursor: function (obj, targetOpacity, duration, completeMethod) {
-            var tickState = {
+        _animateCursor(obj, targetOpacity, duration, completeMethod) {
+            const tickState = {
                 isAborted: false,
                 abort: function () {
                     this.isAborted = true;
@@ -24607,24 +24345,24 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 },
             });
             return tickState;
-        },
+        }
         /**
          * @private
          */
-        _onTickComplete: function () {
-            var _this = this;
+        _onTickComplete() {
+            const _this = this;
             if (this._cursorTimeout1) {
                 clearTimeout(this._cursorTimeout1);
             }
             this._cursorTimeout1 = setTimeout(function () {
                 _this._currentTickCompleteState = _this._animateCursor(_this, 0, this.cursorDuration / 2, '_tick');
             }, 100);
-        },
+        }
         /**
          * Initializes delayed cursor
          */
-        initDelayedCursor: function (restart) {
-            var _this = this, delay = restart ? 0 : this.cursorDelay;
+        initDelayedCursor(restart) {
+            const _this = this, delay = restart ? 0 : this.cursorDelay;
             this.abortCursorAnimation();
             if (delay) {
                 this._cursorTimeout2 = setTimeout(function () {
@@ -24634,15 +24372,14 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             else {
                 this._tick();
             }
-        },
+        }
         /**
          * Aborts cursor animation, clears all timeouts and clear textarea context if necessary
          */
-        abortCursorAnimation: function () {
-            var shouldClear = this._currentTickState || this._currentTickCompleteState;
+        abortCursorAnimation() {
+            const shouldClear = this._currentTickState || this._currentTickCompleteState;
             this._currentTickState && this._currentTickState.abort();
-            this._currentTickCompleteState &&
-                this._currentTickCompleteState.abort();
+            this._currentTickCompleteState && this._currentTickCompleteState.abort();
             clearTimeout(this._cursorTimeout1);
             clearTimeout(this._cursorTimeout2);
             this._currentCursorOpacity = 1;
@@ -24650,35 +24387,33 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             if (shouldClear) {
                 this.clearContextTop();
             }
-        },
+        }
         /**
          * Selects entire text
-         * @return {fabric.IText} thisArg
+         * @return {IText} thisArg
          * @chainable
          */
-        selectAll: function () {
+        selectAll() {
             this.selectionStart = 0;
             this.selectionEnd = this._text.length;
             this._fireSelectionChanged();
             this._updateTextarea();
             return this;
-        },
+        }
         /**
          * Returns selected text
          * @return {String}
          */
-        getSelectedText: function () {
-            return this._text
-                .slice(this.selectionStart, this.selectionEnd)
-                .join('');
-        },
+        getSelectedText() {
+            return this._text.slice(this.selectionStart, this.selectionEnd).join('');
+        }
         /**
          * Find new selection index representing start of current word according to current selection index
          * @param {Number} startFrom Current selection index
          * @return {Number} New selection index
          */
-        findWordBoundaryLeft: function (startFrom) {
-            var offset = 0, index = startFrom - 1;
+        findWordBoundaryLeft(startFrom) {
+            let offset = 0, index = startFrom - 1;
             // remove space before cursor first
             if (this._reSpace.test(this._text[index])) {
                 while (this._reSpace.test(this._text[index])) {
@@ -24691,14 +24426,14 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 index--;
             }
             return startFrom - offset;
-        },
+        }
         /**
          * Find new selection index representing end of current word according to current selection index
          * @param {Number} startFrom Current selection index
          * @return {Number} New selection index
          */
-        findWordBoundaryRight: function (startFrom) {
-            var offset = 0, index = startFrom;
+        findWordBoundaryRight(startFrom) {
+            let offset = 0, index = startFrom;
             // remove space after cursor first
             if (this._reSpace.test(this._text[index])) {
                 while (this._reSpace.test(this._text[index])) {
@@ -24711,41 +24446,41 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 index++;
             }
             return startFrom + offset;
-        },
+        }
         /**
          * Find new selection index representing start of current line according to current selection index
          * @param {Number} startFrom Current selection index
          * @return {Number} New selection index
          */
-        findLineBoundaryLeft: function (startFrom) {
-            var offset = 0, index = startFrom - 1;
+        findLineBoundaryLeft(startFrom) {
+            let offset = 0, index = startFrom - 1;
             while (!/\n/.test(this._text[index]) && index > -1) {
                 offset++;
                 index--;
             }
             return startFrom - offset;
-        },
+        }
         /**
          * Find new selection index representing end of current line according to current selection index
          * @param {Number} startFrom Current selection index
          * @return {Number} New selection index
          */
-        findLineBoundaryRight: function (startFrom) {
-            var offset = 0, index = startFrom;
+        findLineBoundaryRight(startFrom) {
+            let offset = 0, index = startFrom;
             while (!/\n/.test(this._text[index]) && index < this._text.length) {
                 offset++;
                 index++;
             }
             return startFrom + offset;
-        },
+        }
         /**
          * Finds index corresponding to beginning or end of a word
          * @param {Number} selectionStart Index of a character
          * @param {Number} direction 1 or -1
          * @return {Number} Index of the beginning or end of a word
          */
-        searchWordBoundary: function (selectionStart, direction) {
-            var text = this._text, index = this._reSpace.test(text[selectionStart])
+        searchWordBoundary(selectionStart, direction) {
+            let text = this._text, index = this._reSpace.test(text[selectionStart])
                 ? selectionStart - 1
                 : selectionStart, _char = text[index];
             while (!reNonWord.test(_char) && index > 0 && index < text.length) {
@@ -24756,41 +24491,41 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 index += direction === 1 ? 0 : 1;
             }
             return index;
-        },
+        }
         /**
          * Selects a word based on the index
          * @param {Number} selectionStart Index of a character
          */
-        selectWord: function (selectionStart) {
+        selectWord(selectionStart) {
             selectionStart = selectionStart || this.selectionStart;
-            var newSelectionStart = this.searchWordBoundary(selectionStart, -1) /* search backwards */, newSelectionEnd = this.searchWordBoundary(selectionStart, 1); /* search forward */
+            const newSelectionStart = this.searchWordBoundary(selectionStart, -1) /* search backwards */, newSelectionEnd = this.searchWordBoundary(selectionStart, 1); /* search forward */
             this.selectionStart = newSelectionStart;
             this.selectionEnd = newSelectionEnd;
             this._fireSelectionChanged();
             this._updateTextarea();
             this.renderCursorOrSelection();
-        },
+        }
         /**
          * Selects a line based on the index
          * @param {Number} selectionStart Index of a character
-         * @return {fabric.IText} thisArg
+         * @return {IText} thisArg
          * @chainable
          */
-        selectLine: function (selectionStart) {
+        selectLine(selectionStart) {
             selectionStart = selectionStart || this.selectionStart;
-            var newSelectionStart = this.findLineBoundaryLeft(selectionStart), newSelectionEnd = this.findLineBoundaryRight(selectionStart);
+            const newSelectionStart = this.findLineBoundaryLeft(selectionStart), newSelectionEnd = this.findLineBoundaryRight(selectionStart);
             this.selectionStart = newSelectionStart;
             this.selectionEnd = newSelectionEnd;
             this._fireSelectionChanged();
             this._updateTextarea();
             return this;
-        },
+        }
         /**
          * Enters editing state
-         * @return {fabric.IText} thisArg
+         * @return {IText} thisArg
          * @chainable
          */
-        enterEditing: function (e) {
+        enterEditing(e) {
             if (this.isEditing || !this.editable) {
                 return;
             }
@@ -24816,8 +24551,8 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             this.initMouseMoveHandler();
             this.canvas.requestRenderAll();
             return this;
-        },
-        exitEditingOnOthers: function (canvas) {
+        }
+        exitEditingOnOthers(canvas) {
             if (canvas._iTextInstances) {
                 canvas._iTextInstances.forEach(function (obj) {
                     obj.selected = false;
@@ -24826,28 +24561,27 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                     }
                 });
             }
-        },
+        }
         /**
          * Initializes "mousemove" event handler
          */
-        initMouseMoveHandler: function () {
+        initMouseMoveHandler() {
             this.canvas.on('mouse:move', this.mouseMoveHandler);
-        },
+        }
         /**
          * @private
          */
-        mouseMoveHandler: function (options) {
+        mouseMoveHandler(options) {
             if (!this.__isMousedown || !this.isEditing) {
                 return;
             }
             // regain focus
-            fabric.document.activeElement !== this.hiddenTextarea &&
+            fabric$2.document.activeElement !== this.hiddenTextarea &&
                 this.hiddenTextarea.focus();
-            var newSelectionStart = this.getSelectionStartFromPointer(options.e), currentStart = this.selectionStart, currentEnd = this.selectionEnd;
+            const newSelectionStart = this.getSelectionStartFromPointer(options.e), currentStart = this.selectionStart, currentEnd = this.selectionEnd;
             if ((newSelectionStart !== this.__selectionStartOnMouseDown ||
                 currentStart === currentEnd) &&
-                (currentStart === newSelectionStart ||
-                    currentEnd === newSelectionStart)) {
+                (currentStart === newSelectionStart || currentEnd === newSelectionStart)) {
                 return;
             }
             if (newSelectionStart > this.__selectionStartOnMouseDown) {
@@ -24865,7 +24599,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this._updateTextarea();
                 this.renderCursorOrSelection();
             }
-        },
+        }
         /**
          * Override to customize the drag image
          * https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setDragImage
@@ -24876,40 +24610,40 @@ const reNonWord = /[ \n\.,;!\?\-]/;
          * @param {string} data.text
          * @param {string} data.value selected text
          */
-        setDragImage: function (e, data) {
-            var t = this.calcTransformMatrix();
-            var flipFactor = new Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
-            var boundaries = this._getCursorBoundaries(data.selectionStart);
-            var selectionPosition = new Point(boundaries.left + boundaries.leftOffset, boundaries.top + boundaries.topOffset).multiply(flipFactor);
-            var pos = fabric.util.transformPoint(selectionPosition, t);
-            var pointer = this.canvas.getPointer(e);
-            var diff = pointer.subtract(pos);
-            var enableRetinaScaling = this.canvas._isRetinaScaling();
-            var retinaScaling = this.canvas.getRetinaScaling();
-            var bbox = this.getBoundingRect(true);
-            var correction = pos.subtract(new Point(bbox.left, bbox.top));
-            var offset = correction.add(diff).scalarMultiply(retinaScaling);
+        setDragImage(e, data) {
+            const t = this.calcTransformMatrix();
+            const flipFactor = new Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
+            const boundaries = this._getCursorBoundaries(data.selectionStart);
+            const selectionPosition = new Point(boundaries.left + boundaries.leftOffset, boundaries.top + boundaries.topOffset).multiply(flipFactor);
+            const pos = transformPoint(selectionPosition, t);
+            const pointer = this.canvas.getPointer(e);
+            const diff = pointer.subtract(pos);
+            const enableRetinaScaling = this.canvas._isRetinaScaling();
+            const retinaScaling = this.canvas.getRetinaScaling();
+            const bbox = this.getBoundingRect(true);
+            const correction = pos.subtract(new Point(bbox.left, bbox.top));
+            const offset = correction.add(diff).scalarMultiply(retinaScaling);
             //  prepare instance for drag image snapshot by making all non selected text invisible
-            var bgc = this.backgroundColor;
-            var styles = fabric.util.object.clone(this.styles, true);
+            const bgc = this.backgroundColor;
+            const styles = object.clone(this.styles, true);
             delete this.backgroundColor;
-            var styleOverride = {
+            const styleOverride = {
                 fill: 'transparent',
                 textBackgroundColor: 'transparent',
             };
             this.setSelectionStyles(styleOverride, 0, data.selectionStart);
             this.setSelectionStyles(styleOverride, data.selectionEnd, data.text.length);
-            var dragImage = this.toCanvasElement({
+            let dragImage = this.toCanvasElement({
                 enableRetinaScaling: enableRetinaScaling,
             });
             this.backgroundColor = bgc;
             this.styles = styles;
             //  handle retina scaling
             if (enableRetinaScaling && retinaScaling > 1) {
-                var c = fabric.util.createCanvasElement();
+                const c = createCanvasElement();
                 c.width = dragImage.width / retinaScaling;
                 c.height = dragImage.height / retinaScaling;
-                var ctx = c.getContext('2d');
+                const ctx = c.getContext('2d');
                 ctx.scale(1 / retinaScaling, 1 / retinaScaling);
                 ctx.drawImage(dragImage, 0, 0);
                 dragImage = c;
@@ -24919,31 +24653,31 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 dragImage.remove();
             };
             //  position drag image offsecreen
-            fabric.util.setStyle(dragImage, {
+            setStyle(dragImage, {
                 position: 'absolute',
                 left: -dragImage.width + 'px',
                 border: 'none',
             });
-            fabric.document.body.appendChild(dragImage);
+            fabric$2.document.body.appendChild(dragImage);
             e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
-        },
+        }
         /**
          * support native like text dragging
          * @private
          * @param {DragEvent} e
          * @returns {boolean} should handle event
          */
-        onDragStart: function (e) {
+        onDragStart(e) {
             this.__dragStartFired = true;
             if (this.__isDragging) {
-                var selection = (this.__dragStartSelection = {
+                const selection = (this.__dragStartSelection = {
                     selectionStart: this.selectionStart,
                     selectionEnd: this.selectionEnd,
                 });
-                var value = this._text
+                const value = this._text
                     .slice(selection.selectionStart, selection.selectionEnd)
                     .join('');
-                var data = Object.assign({ text: this.text, value: value }, selection);
+                const data = Object.assign({ text: this.text, value: value }, selection);
                 e.dataTransfer.setData('text/plain', value);
                 e.dataTransfer.setData('application/fabric', JSON.stringify({
                     value: value,
@@ -24954,49 +24688,47 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             }
             this.abortCursorAnimation();
             return this.__isDragging;
-        },
+        }
         /**
          * Override to customize drag and drop behavior
          * @public
          * @param {DragEvent} e
          * @returns {boolean}
          */
-        canDrop: function (e) {
+        canDrop(e) {
             if (this.editable && !this.__corner) {
                 if (this.__isDragging && this.__dragStartSelection) {
                     //  drag source trying to drop over itself
                     //  allow dropping only outside of drag start selection
-                    var index = this.getSelectionStartFromPointer(e);
-                    var dragStartSelection = this.__dragStartSelection;
+                    const index = this.getSelectionStartFromPointer(e);
+                    const dragStartSelection = this.__dragStartSelection;
                     return (index < dragStartSelection.selectionStart ||
                         index > dragStartSelection.selectionEnd);
                 }
                 return true;
             }
             return false;
-        },
+        }
         /**
          * support native like text dragging
          * @private
          * @param {object} options
          * @param {DragEvent} options.e
          */
-        dragEnterHandler: function (options) {
-            var e = options.e;
-            var canDrop = !e.defaultPrevented && this.canDrop(e);
+        dragEnterHandler({ e }) {
+            const canDrop = !e.defaultPrevented && this.canDrop(e);
             if (!this.__isDraggingOver && canDrop) {
                 this.__isDraggingOver = true;
             }
-        },
+        }
         /**
          * support native like text dragging
          * @private
          * @param {object} options
          * @param {DragEvent} options.e
          */
-        dragOverHandler: function (options) {
-            var e = options.e;
-            var canDrop = !e.defaultPrevented && this.canDrop(e);
+        dragOverHandler({ e }) {
+            const canDrop = !e.defaultPrevented && this.canDrop(e);
             if (!this.__isDraggingOver && canDrop) {
                 this.__isDraggingOver = true;
             }
@@ -25012,16 +24744,16 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 options.dropTarget = this;
                 // find cursor under the drag part.
             }
-        },
+        }
         /**
          * support native like text dragging
          * @private
          */
-        dragLeaveHandler: function () {
+        dragLeaveHandler() {
             if (this.__isDraggingOver || this.__isDragging) {
                 this.__isDraggingOver = false;
             }
-        },
+        }
         /**
          * support native like text dragging
          * fired only on the drag source
@@ -25031,15 +24763,14 @@ const reNonWord = /[ \n\.,;!\?\-]/;
          * @param {object} options
          * @param {DragEvent} options.e
          */
-        dragEndHandler: function (options) {
-            var e = options.e;
+        dragEndHandler({ e }) {
             if (this.__isDragging && this.__dragStartFired) {
                 //  once the drop event finishes we check if we need to change the drag source
                 //  if the drag source received the drop we bail out
                 if (this.__dragStartSelection) {
-                    var selectionStart = this.__dragStartSelection.selectionStart;
-                    var selectionEnd = this.__dragStartSelection.selectionEnd;
-                    var dropEffect = e.dataTransfer.dropEffect;
+                    const selectionStart = this.__dragStartSelection.selectionStart;
+                    const selectionEnd = this.__dragStartSelection.selectionEnd;
+                    const dropEffect = e.dataTransfer.dropEffect;
                     if (dropEffect === 'none') {
                         this.selectionStart = selectionStart;
                         this.selectionEnd = selectionEnd;
@@ -25069,7 +24800,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             delete this.__dragImageDisposer;
             delete this.__dragStartSelection;
             this.__isDraggingOver = false;
-        },
+        }
         /**
          * support native like text dragging
          *
@@ -25080,24 +24811,24 @@ const reNonWord = /[ \n\.,;!\?\-]/;
          * @param {object} options
          * @param {DragEvent} options.e
          */
-        dropHandler: function (options) {
-            var e = options.e, didDrop = e.defaultPrevented;
+        dropHandler({ e }) {
+            const didDrop = e.defaultPrevented;
             this.__isDraggingOver = false;
             // inform browser that the drop has been accepted
             e.preventDefault();
-            var insert = e.dataTransfer.getData('text/plain');
+            let insert = e.dataTransfer.getData('text/plain');
             if (insert && !didDrop) {
-                var insertAt = this.getSelectionStartFromPointer(e);
-                var data = e.dataTransfer.types.includes('application/fabric')
+                let insertAt = this.getSelectionStartFromPointer(e);
+                const data = e.dataTransfer.types.includes('application/fabric')
                     ? JSON.parse(e.dataTransfer.getData('application/fabric'))
                     : {};
-                var styles = data.styles;
-                var trailing = insert[Math.max(0, insert.length - 1)];
-                var selectionStartOffset = 0;
+                const styles = data.styles;
+                const trailing = insert[Math.max(0, insert.length - 1)];
+                const selectionStartOffset = 0;
                 //  drag and drop in same instance
                 if (this.__dragStartSelection) {
-                    var selectionStart = this.__dragStartSelection.selectionStart;
-                    var selectionEnd = this.__dragStartSelection.selectionEnd;
+                    const selectionStart = this.__dragStartSelection.selectionStart;
+                    const selectionEnd = this.__dragStartSelection.selectionEnd;
                     if (insertAt > selectionStart && insertAt <= selectionEnd) {
                         insertAt = selectionStart;
                     }
@@ -25134,11 +24865,11 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this.canvas.contextTopDirty = true;
                 this.canvas.requestRenderAll();
             }
-        },
+        }
         /**
          * @private
          */
-        _setEditingProps: function () {
+        _setEditingProps() {
             this.hoverCursor = 'text';
             if (this.canvas) {
                 this.canvas.defaultCursor = this.canvas.moveCursor = 'text';
@@ -25146,54 +24877,54 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             this.borderColor = this.editingBorderColor;
             this.hasControls = this.selectable = false;
             this.lockMovementX = this.lockMovementY = true;
-        },
+        }
         /**
          * convert from textarea to grapheme indexes
          */
-        fromStringToGraphemeSelection: function (start, end, text) {
-            var smallerTextStart = text.slice(0, start), graphemeStart = this.graphemeSplit(smallerTextStart).length;
+        fromStringToGraphemeSelection(start, end, text) {
+            const smallerTextStart = text.slice(0, start), graphemeStart = this.graphemeSplit(smallerTextStart).length;
             if (start === end) {
                 return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
             }
-            var smallerTextEnd = text.slice(start, end), graphemeEnd = this.graphemeSplit(smallerTextEnd).length;
+            const smallerTextEnd = text.slice(start, end), graphemeEnd = this.graphemeSplit(smallerTextEnd).length;
             return {
                 selectionStart: graphemeStart,
                 selectionEnd: graphemeStart + graphemeEnd,
             };
-        },
+        }
         /**
          * convert from fabric to textarea values
          */
-        fromGraphemeToStringSelection: function (start, end, _text) {
-            var smallerTextStart = _text.slice(0, start), graphemeStart = smallerTextStart.join('').length;
+        fromGraphemeToStringSelection(start, end, _text) {
+            const smallerTextStart = _text.slice(0, start), graphemeStart = smallerTextStart.join('').length;
             if (start === end) {
                 return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
             }
-            var smallerTextEnd = _text.slice(start, end), graphemeEnd = smallerTextEnd.join('').length;
+            const smallerTextEnd = _text.slice(start, end), graphemeEnd = smallerTextEnd.join('').length;
             return {
                 selectionStart: graphemeStart,
                 selectionEnd: graphemeStart + graphemeEnd,
             };
-        },
+        }
         /**
          * @private
          */
-        _updateTextarea: function () {
+        _updateTextarea() {
             this.cursorOffsetCache = {};
             if (!this.hiddenTextarea) {
                 return;
             }
             if (!this.inCompositionMode) {
-                var newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd, this._text);
+                const newSelection = this.fromGraphemeToStringSelection(this.selectionStart, this.selectionEnd, this._text);
                 this.hiddenTextarea.selectionStart = newSelection.selectionStart;
                 this.hiddenTextarea.selectionEnd = newSelection.selectionEnd;
             }
             this.updateTextareaPosition();
-        },
+        }
         /**
          * @private
          */
-        updateFromTextArea: function () {
+        updateFromTextArea() {
             if (!this.hiddenTextarea) {
                 return;
             }
@@ -25203,40 +24934,40 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this.initDimensions();
                 this.setCoords();
             }
-            var newSelection = this.fromStringToGraphemeSelection(this.hiddenTextarea.selectionStart, this.hiddenTextarea.selectionEnd, this.hiddenTextarea.value);
+            const newSelection = this.fromStringToGraphemeSelection(this.hiddenTextarea.selectionStart, this.hiddenTextarea.selectionEnd, this.hiddenTextarea.value);
             this.selectionEnd = this.selectionStart = newSelection.selectionEnd;
             if (!this.inCompositionMode) {
                 this.selectionStart = newSelection.selectionStart;
             }
             this.updateTextareaPosition();
-        },
+        }
         /**
          * @private
          */
-        updateTextareaPosition: function () {
+        updateTextareaPosition() {
             if (this.selectionStart === this.selectionEnd) {
-                var style = this._calcTextareaPosition();
+                const style = this._calcTextareaPosition();
                 this.hiddenTextarea.style.left = style.left;
                 this.hiddenTextarea.style.top = style.top;
             }
-        },
+        }
         /**
          * @private
          * @return {Object} style contains style for hiddenTextarea
          */
-        _calcTextareaPosition: function () {
+        _calcTextareaPosition() {
             if (!this.canvas) {
                 return { x: 1, y: 1 };
             }
-            var desiredPosition = this.inCompositionMode
+            let desiredPosition = this.inCompositionMode
                 ? this.compositionStart
                 : this.selectionStart, boundaries = this._getCursorBoundaries(desiredPosition), cursorLocation = this.get2DCursorLocation(desiredPosition), lineIndex = cursorLocation.lineIndex, charIndex = cursorLocation.charIndex, charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize') *
                 this.lineHeight, leftOffset = boundaries.leftOffset, m = this.calcTransformMatrix(), p = {
                 x: boundaries.left + leftOffset,
                 y: boundaries.top + boundaries.topOffset + charHeight,
             }, retinaScaling = this.canvas.getRetinaScaling(), upperCanvas = this.canvas.upperCanvasEl, upperCanvasWidth = upperCanvas.width / retinaScaling, upperCanvasHeight = upperCanvas.height / retinaScaling, maxWidth = upperCanvasWidth - charHeight, maxHeight = upperCanvasHeight - charHeight, scaleX = upperCanvas.clientWidth / upperCanvasWidth, scaleY = upperCanvas.clientHeight / upperCanvasHeight;
-            p = fabric.util.transformPoint(p, m);
-            p = fabric.util.transformPoint(p, this.canvas.viewportTransform);
+            p = transformPoint(p, m);
+            p = transformPoint(p, this.canvas.viewportTransform);
             p.x *= scaleX;
             p.y *= scaleY;
             if (p.x < 0) {
@@ -25260,11 +24991,11 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 fontSize: charHeight + 'px',
                 charHeight: charHeight,
             };
-        },
+        }
         /**
          * @private
          */
-        _saveEditingProps: function () {
+        _saveEditingProps() {
             this._savedProps = {
                 hasControls: this.hasControls,
                 borderColor: this.borderColor,
@@ -25275,11 +25006,11 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 defaultCursor: this.canvas && this.canvas.defaultCursor,
                 moveCursor: this.canvas && this.canvas.moveCursor,
             };
-        },
+        }
         /**
          * @private
          */
-        _restoreEditingProps: function () {
+        _restoreEditingProps() {
             if (!this._savedProps) {
                 return;
             }
@@ -25294,15 +25025,15 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this.canvas.moveCursor = this._savedProps.moveCursor;
             }
             delete this._savedProps;
-        },
+        }
         /**
          * Exits from editing state
-         * @return {fabric.IText} thisArg
+         * @return {IText} thisArg
          * @chainable
          */
-        exitEditing: function () {
-            var isTextChanged = this._textBeforeEdit !== this.text;
-            var hiddenTextarea = this.hiddenTextarea;
+        exitEditing() {
+            const isTextChanged = this._textBeforeEdit !== this.text;
+            const hiddenTextarea = this.hiddenTextarea;
             this.selected = false;
             this.isEditing = false;
             this.selectionEnd = this.selectionStart;
@@ -25323,28 +25054,27 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             if (this.canvas) {
                 this.canvas.off('mouse:move', this.mouseMoveHandler);
                 this.canvas.fire('text:editing:exited', { target: this });
-                isTextChanged &&
-                    this.canvas.fire('object:modified', { target: this });
+                isTextChanged && this.canvas.fire('object:modified', { target: this });
             }
             return this;
-        },
+        }
         /**
          * @private
          */
-        _removeExtraneousStyles: function () {
-            for (var prop in this.styles) {
+        _removeExtraneousStyles() {
+            for (const prop in this.styles) {
                 if (!this._textLines[prop]) {
                     delete this.styles[prop];
                 }
             }
-        },
+        }
         /**
          * remove and reflow a style block from start to end.
          * @param {Number} start linear start position for removal (included in removal)
          * @param {Number} end linear end position for removal ( excluded from removal )
          */
-        removeStyleFromTo: function (start, end) {
-            var cursorStart = this.get2DCursorLocation(start, true), cursorEnd = this.get2DCursorLocation(end, true), lineStart = cursorStart.lineIndex, charStart = cursorStart.charIndex, lineEnd = cursorEnd.lineIndex, charEnd = cursorEnd.charIndex, i, styleObj;
+        removeStyleFromTo(start, end) {
+            let cursorStart = this.get2DCursorLocation(start, true), cursorEnd = this.get2DCursorLocation(end, true), lineStart = cursorStart.lineIndex, charStart = cursorStart.charIndex, lineEnd = cursorEnd.lineIndex, charEnd = cursorEnd.charIndex, i, styleObj;
             if (lineStart !== lineEnd) {
                 // step1 remove the trailing of lineStart
                 if (this.styles[lineStart]) {
@@ -25373,7 +25103,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 // remove and shift left on the same line
                 if (this.styles[lineStart]) {
                     styleObj = this.styles[lineStart];
-                    var diff = charEnd - charStart, numericChar, _char;
+                    let diff = charEnd - charStart, numericChar, _char;
                     for (i = charStart; i < charEnd; i++) {
                         delete styleObj[i];
                     }
@@ -25386,18 +25116,16 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                     }
                 }
             }
-        },
+        }
         /**
          * Shifts line styles up or down
          * @param {Number} lineIndex Index of a line
          * @param {Number} offset Can any number?
          */
-        shiftLineStyles: function (lineIndex, offset) {
-            // shift all line styles by offset upward or downward
-            // do not clone deep. we need new array, not new style objects
-            var clonedStyles = Object.assign({}, this.styles);
-            for (var line in this.styles) {
-                var numericLine = parseInt(line, 10);
+        shiftLineStyles(lineIndex, offset) {
+            const clonedStyles = Object.assign({}, this.styles);
+            for (const line in this.styles) {
+                const numericLine = parseInt(line, 10);
                 if (numericLine > lineIndex) {
                     this.styles[numericLine + offset] = clonedStyles[numericLine];
                     if (!clonedStyles[numericLine - offset]) {
@@ -25405,15 +25133,15 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                     }
                 }
             }
-        },
-        restartCursorIfNeeded: function () {
+        }
+        restartCursorIfNeeded() {
             if (!this._currentTickState ||
                 this._currentTickState.isAborted ||
                 !this._currentTickCompleteState ||
                 this._currentTickCompleteState.isAborted) {
                 this.initDelayedCursor();
             }
-        },
+        }
         /**
          * Handle insertion of more consecutive style lines for when one or more
          * newlines gets added to the text. Since current style needs to be shifted
@@ -25424,8 +25152,8 @@ const reNonWord = /[ \n\.,;!\?\-]/;
          * @param {Number} qty number of lines to add
          * @param {Array} copiedStyle Array of objects styles
          */
-        insertNewlineStyleObject: function (lineIndex, charIndex, qty, copiedStyle) {
-            var currentCharStyle, newLineStyles = {}, somethingAdded = false, isEndOfLine = this._unwrappedTextLines[lineIndex].length === charIndex;
+        insertNewlineStyleObject(lineIndex, charIndex, qty, copiedStyl) {
+            let currentCharStyle, newLineStyles = {}, somethingAdded = false, isEndOfLine = this._unwrappedTextLines[lineIndex].length === charIndex;
             qty || (qty = 1);
             this.shiftLineStyles(lineIndex, qty);
             if (this.styles[lineIndex]) {
@@ -25434,8 +25162,8 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             }
             // we clone styles of all chars
             // after cursor onto the current line
-            for (var index in this.styles[lineIndex]) {
-                var numIndex = parseInt(index, 10);
+            for (const index in this.styles[lineIndex]) {
+                const numIndex = parseInt(index, 10);
                 if (numIndex >= charIndex) {
                     somethingAdded = true;
                     newLineStyles[numIndex - charIndex] = this.styles[lineIndex][index];
@@ -25445,7 +25173,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                     }
                 }
             }
-            var styleCarriedOver = false;
+            let styleCarriedOver = false;
             if (somethingAdded && !isEndOfLine) {
                 // if is end of line, the extra style we copied
                 // is probably not something we want
@@ -25475,7 +25203,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 qty--;
             }
             this._forceClearCache = true;
-        },
+        }
         /**
          * Inserts style object for a given line/char index
          * @param {Number} lineIndex Index of a line
@@ -25483,18 +25211,18 @@ const reNonWord = /[ \n\.,;!\?\-]/;
          * @param {Number} quantity number Style object to insert, if given
          * @param {Array} copiedStyle array of style objects
          */
-        insertCharStyleObject: function (lineIndex, charIndex, quantity, copiedStyle) {
+        insertCharStyleObject(lineIndex, charIndex, quantity, copiedStyl) {
             if (!this.styles) {
                 this.styles = {};
             }
-            var currentLineStyles = this.styles[lineIndex], currentLineStylesCloned = currentLineStyles
+            const currentLineStyles = this.styles[lineIndex], currentLineStylesCloned = currentLineStyles
                 ? Object.assign({}, currentLineStyles)
                 : {};
             quantity || (quantity = 1);
             // shift all char styles by quantity forward
             // 0,1,2,3 -> (charIndex=2) -> 0,1,3,4 -> (insert 2) -> 0,1,2,3,4
-            for (var index in currentLineStylesCloned) {
-                var numericIndex = parseInt(index, 10);
+            for (const index in currentLineStylesCloned) {
+                const numericIndex = parseInt(index, 10);
                 if (numericIndex >= charIndex) {
                     currentLineStyles[numericIndex + quantity] =
                         currentLineStylesCloned[numericIndex];
@@ -25520,19 +25248,19 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             if (!currentLineStyles) {
                 return;
             }
-            var newStyle = currentLineStyles[charIndex ? charIndex - 1 : 1];
+            const newStyle = currentLineStyles[charIndex ? charIndex - 1 : 1];
             while (newStyle && quantity--) {
                 this.styles[lineIndex][charIndex + quantity] = Object.assign({}, newStyle);
             }
-        },
+        }
         /**
          * Inserts style object(s)
          * @param {Array} insertedText Characters at the location where style is inserted
          * @param {Number} start cursor index for inserting style
          * @param {Array} [copiedStyle] array of style objects to insert.
          */
-        insertNewStyleBlock: function (insertedText, start, copiedStyle) {
-            var cursorLoc = this.get2DCursorLocation(start, true), addedLines = [0], linesLength = 0;
+        insertNewStyleBlock(insertedText, start, copiedStyle) {
+            let cursorLoc = this.get2DCursorLocation(start, true), addedLines = [0], linesLength = 0;
             // get an array of how many char per lines are being added.
             for (var i = 0; i < insertedText.length; i++) {
                 if (insertedText[i] === '\n') {
@@ -25569,12 +25297,12 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             if (addedLines[i] > 0) {
                 this.insertCharStyleObject(cursorLoc.lineIndex + i, 0, addedLines[i], copiedStyle);
             }
-        },
+        }
         /**
          * Set the selectionStart and selectionEnd according to the new position of cursor
          * mimic the key - mouse navigation when shift is pressed.
          */
-        setSelectionStartEndWithShift: function (start, end, newSelection) {
+        setSelectionStartEndWithShift(start, end, newSelection) {
             if (newSelection <= start) {
                 if (end === start) {
                     this._selectionDirection = 'left';
@@ -25604,9 +25332,9 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 }
                 this.selectionEnd = newSelection;
             }
-        },
-        setSelectionInBoundaries: function () {
-            var length = this.text.length;
+        }
+        setSelectionInBoundaries() {
+            const length = this.text.length;
             if (this.selectionStart > length) {
                 this.selectionStart = length;
             }
@@ -25619,31 +25347,29 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             else if (this.selectionEnd < 0) {
                 this.selectionEnd = 0;
             }
-        },
-    });
-})(typeof exports !== 'undefined' ? exports : window);
+        }
+    };
+}
+IText = ITextBehaviorMixinGenerator(IText);
 
 //@ts-nocheck
-(function (global) {
-    var fabric = global.fabric;
-    fabric.util.object.extend(fabric.IText.prototype, 
-    /** @lends fabric.IText.prototype */ {
+function ITextClickBehaviorMixinGenerator(Klass) {
+    return class ITextClickBehaviorMixin extends Klass {
         /**
          * Initializes "dbclick" event handler
          */
-        initDoubleClickSimulation: function () {
-            // for double click
+        initDoubleClickSimulation() {
             this.__lastClickTime = +new Date();
             // for triple click
             this.__lastLastClickTime = +new Date();
             this.__lastPointer = {};
             this.on('mousedown', this.onMouseDown);
-        },
+        }
         /**
          * Default event handler to simulate triple click
          * @private
          */
-        onMouseDown: function (options) {
+        onMouseDown(options) {
             if (!this.canvas) {
                 return;
             }
@@ -25658,53 +25384,53 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             this.__lastPointer = newPointer;
             this.__lastIsEditing = this.isEditing;
             this.__lastSelected = this.selected;
-        },
-        isTripleClick: function (newPointer) {
+        }
+        isTripleClick(newPointer) {
             return (this.__newClickTime - this.__lastClickTime < 500 &&
                 this.__lastClickTime - this.__lastLastClickTime < 500 &&
                 this.__lastPointer.x === newPointer.x &&
                 this.__lastPointer.y === newPointer.y);
-        },
+        }
         /**
          * @private
          */
-        _stopEvent: function (e) {
+        _stopEvent(e) {
             e.preventDefault && e.preventDefault();
             e.stopPropagation && e.stopPropagation();
-        },
+        }
         /**
          * Initializes event handlers related to cursor or selection
          */
-        initCursorSelectionHandlers: function () {
+        initCursorSelectionHandlers() {
             this.initMousedownHandler();
             this.initMouseupHandler();
             this.initClicks();
-        },
+        }
         /**
          * Default handler for double click, select a word
          */
-        doubleClickHandler: function (options) {
+        doubleClickHandler(options) {
             if (!this.isEditing) {
                 return;
             }
             this.selectWord(this.getSelectionStartFromPointer(options.e));
-        },
+        }
         /**
          * Default handler for triple click, select a line
          */
-        tripleClickHandler: function (options) {
+        tripleClickHandler(options) {
             if (!this.isEditing) {
                 return;
             }
             this.selectLine(this.getSelectionStartFromPointer(options.e));
-        },
+        }
         /**
          * Initializes double and triple click event handlers
          */
-        initClicks: function () {
+        initClicks() {
             this.on('mousedblclick', this.doubleClickHandler);
             this.on('tripleclick', this.tripleClickHandler);
-        },
+        }
         /**
          * Default event handler for the basic functionalities needed on _mouseDown
          * can be overridden to do something different.
@@ -25713,7 +25439,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
          * initializing a mousedDown on a text area will cancel fabricjs knowledge of
          * current compositionMode. It will be set to false.
          */
-        _mouseDownHandler: function (options) {
+        _mouseDownHandler(options) {
             if (!this.canvas ||
                 !this.editable ||
                 (options.e.button && options.e.button !== 1)) {
@@ -25731,13 +25457,13 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 }
                 this.renderCursorOrSelection();
             }
-        },
+        }
         /**
          * Default event handler for the basic functionalities needed on mousedown:before
          * can be overridden to do something different.
          * Scope of this implementation is: verify the object is already selected when mousing down
          */
-        _mouseDownHandlerBefore: function (options) {
+        _mouseDownHandlerBefore(options) {
             if (!this.canvas ||
                 !this.editable ||
                 (options.e.button && options.e.button !== 1)) {
@@ -25753,25 +25479,25 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                     newSelection >= this.selectionStart &&
                     newSelection <= this.selectionEnd &&
                     this.selectionStart < this.selectionEnd;
-        },
+        }
         /**
          * Initializes "mousedown" event handler
          */
-        initMousedownHandler: function () {
+        initMousedownHandler() {
             this.on('mousedown', this._mouseDownHandler);
             this.on('mousedown:before', this._mouseDownHandlerBefore);
-        },
+        }
         /**
          * Initializes "mouseup" event handler
          */
-        initMouseupHandler: function () {
+        initMouseupHandler() {
             this.on('mouseup', this.mouseUpHandler);
-        },
+        }
         /**
          * standard handler for mouse up, overridable
          * @private
          */
-        mouseUpHandler: function (options) {
+        mouseUpHandler(options) {
             this.__isMousedown = false;
             if (!this.editable ||
                 (this.group && !this.group.interactive) ||
@@ -25802,12 +25528,12 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             else {
                 this.selected = true;
             }
-        },
+        }
         /**
          * Changes cursor location in a text depending on passed pointer (x/y) object
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          */
-        setCursorByClick: function (e) {
+        setCursorByClick(e) {
             var newSelection = this.getSelectionStartFromPointer(e), start = this.selectionStart, end = this.selectionEnd;
             if (e.shiftKey) {
                 this.setSelectionStartEndWithShift(start, end, newSelection);
@@ -25820,23 +25546,23 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this._fireSelectionChanged();
                 this._updateTextarea();
             }
-        },
+        }
         /**
          * Returns coordinates of a pointer relative to object's top left corner in object's plane
-         * @param {Event} e Event to operate upon
-         * @param {Object} [pointer] Pointer to operate upon (instead of event)
+         * @param {TPointerEvent} e Event to operate upon
+         * @param {IPoint} [pointer] Pointer to operate upon (instead of event)
          * @return {Point} Coordinates of a pointer (x, y)
          */
-        getLocalPointer: function (e, pointer) {
+        getLocalPointer(e, pointer) {
             const thePointer = pointer || this.canvas.getPointer(e);
-            return transformPoint(thePointer, invertTransform(this.calcTransformMatrix())).add(new Point(this.width / 2, this.height / 2));
-        },
+            return transformPoint$1(thePointer, invertTransform(this.calcTransformMatrix())).add(new Point(this.width / 2, this.height / 2));
+        }
         /**
          * Returns index of a character corresponding to where an object was clicked
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          * @return {Number} Index of a character
          */
-        getSelectionStartFromPointer: function (e) {
+        getSelectionStartFromPointer(e) {
             var mouseOffset = this.getLocalPointer(e), prevWidth = 0, width = 0, height = 0, charIndex = 0, lineIndex = 0, lineLeftOffset, line;
             for (var i = 0, len = this._textLines.length; i < len; i++) {
                 if (height <= mouseOffset.y) {
@@ -25844,8 +25570,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                     lineIndex = i;
                     if (i > 0) {
                         charIndex +=
-                            this._textLines[i - 1].length +
-                                this.missingNewlineOffset(i - 1);
+                            this._textLines[i - 1].length + this.missingNewlineOffset(i - 1);
                     }
                 }
                 else {
@@ -25874,12 +25599,11 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 }
             }
             return this._getNewSelectionStartFromOffset(mouseOffset, prevWidth, width, charIndex, jlen);
-        },
+        }
         /**
          * @private
          */
-        _getNewSelectionStartFromOffset: function (mouseOffset, prevWidth, width, index, jlen) {
-            // we need Math.abs because when width is after the last char, the offset is given as 1, while is 0
+        _getNewSelectionStartFromOffset(mouseOffset, prevWidth, width, index, jle) {
             var distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth, distanceBtwNextCharAndCursor = width - mouseOffset.x, offset = distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor ||
                 distanceBtwNextCharAndCursor < 0
                 ? 0
@@ -25892,20 +25616,20 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 newSelectionStart = this._text.length;
             }
             return newSelectionStart;
-        },
-    });
-})(typeof exports !== 'undefined' ? exports : window);
+        }
+    };
+}
+IText = ITextClickBehaviorMixinGenerator(IText);
 
 //@ts-nocheck
-(function (global) {
-    var fabric = global.fabric;
-    fabric.util.object.extend(fabric.IText.prototype, 
-    /** @lends fabric.IText.prototype */ {
+var fabric$1 = global.fabric;
+function ITextKeyBehaviorMixinGenerator(Klass) {
+    return class ITextKeyBehaviorMixin extends Klass {
         /**
          * Initializes hidden textarea (needed to bring up keyboard in iOS)
          */
-        initHiddenTextarea: function () {
-            this.hiddenTextarea = fabric.document.createElement('textarea');
+        initHiddenTextarea() {
+            this.hiddenTextarea = fabric$1.document.createElement('textarea');
             this.hiddenTextarea.setAttribute('autocapitalize', 'off');
             this.hiddenTextarea.setAttribute('autocorrect', 'off');
             this.hiddenTextarea.setAttribute('autocomplete', 'off');
@@ -25928,87 +25652,38 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this.hiddenTextareaContainer.appendChild(this.hiddenTextarea);
             }
             else {
-                fabric.document.body.appendChild(this.hiddenTextarea);
+                fabric$1.document.body.appendChild(this.hiddenTextarea);
             }
-            fabric.util.addListener(this.hiddenTextarea, 'blur', this.blur.bind(this));
-            fabric.util.addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
-            fabric.util.addListener(this.hiddenTextarea, 'keyup', this.onKeyUp.bind(this));
-            fabric.util.addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
-            fabric.util.addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
-            fabric.util.addListener(this.hiddenTextarea, 'cut', this.copy.bind(this));
-            fabric.util.addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
-            fabric.util.addListener(this.hiddenTextarea, 'compositionstart', this.onCompositionStart.bind(this));
-            fabric.util.addListener(this.hiddenTextarea, 'compositionupdate', this.onCompositionUpdate.bind(this));
-            fabric.util.addListener(this.hiddenTextarea, 'compositionend', this.onCompositionEnd.bind(this));
+            addListener(this.hiddenTextarea, 'blur', this.blur.bind(this));
+            addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
+            addListener(this.hiddenTextarea, 'keyup', this.onKeyUp.bind(this));
+            addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
+            addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
+            addListener(this.hiddenTextarea, 'cut', this.copy.bind(this));
+            addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
+            addListener(this.hiddenTextarea, 'compositionstart', this.onCompositionStart.bind(this));
+            addListener(this.hiddenTextarea, 'compositionupdate', this.onCompositionUpdate.bind(this));
+            addListener(this.hiddenTextarea, 'compositionend', this.onCompositionEnd.bind(this));
             if (!this._clickHandlerInitialized && this.canvas) {
-                fabric.util.addListener(this.canvas.upperCanvasEl, 'click', this.onClick.bind(this));
+                addListener(this.canvas.upperCanvasEl, 'click', this.onClick.bind(this));
                 this._clickHandlerInitialized = true;
             }
-        },
-        /**
-         * For functionalities on keyDown
-         * Map a special key to a function of the instance/prototype
-         * If you need different behaviour for ESC or TAB or arrows, you have to change
-         * this map setting the name of a function that you build on the fabric.Itext or
-         * your prototype.
-         * the map change will affect all Instances unless you need for only some text Instances
-         * in that case you have to clone this object and assign your Instance.
-         * this.keysMap = Object.assign({}, this.keysMap);
-         * The function must be in fabric.Itext.prototype.myFunction And will receive event as args[0]
-         */
-        keysMap: {
-            9: 'exitEditing',
-            27: 'exitEditing',
-            33: 'moveCursorUp',
-            34: 'moveCursorDown',
-            35: 'moveCursorRight',
-            36: 'moveCursorLeft',
-            37: 'moveCursorLeft',
-            38: 'moveCursorUp',
-            39: 'moveCursorRight',
-            40: 'moveCursorDown',
-        },
-        keysMapRtl: {
-            9: 'exitEditing',
-            27: 'exitEditing',
-            33: 'moveCursorUp',
-            34: 'moveCursorDown',
-            35: 'moveCursorLeft',
-            36: 'moveCursorRight',
-            37: 'moveCursorRight',
-            38: 'moveCursorUp',
-            39: 'moveCursorLeft',
-            40: 'moveCursorDown',
-        },
-        /**
-         * For functionalities on keyUp + ctrl || cmd
-         */
-        ctrlKeysMapUp: {
-            67: 'copy',
-            88: 'cut',
-        },
-        /**
-         * For functionalities on keyDown + ctrl || cmd
-         */
-        ctrlKeysMapDown: {
-            65: 'selectAll',
-        },
-        onClick: function () {
-            // No need to trigger click event here, focus is enough to have the keyboard appear on Android
+        }
+        onClick() {
             this.hiddenTextarea && this.hiddenTextarea.focus();
-        },
+        }
         /**
          * Override this method to customize cursor behavior on textbox blur
          */
-        blur: function () {
+        blur() {
             this.abortCursorAnimation();
-        },
+        }
         /**
          * Handles keydown event
          * only used for arrows and combination of modifier keys.
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          */
-        onKeyDown: function (e) {
+        onKeyDown(e) {
             if (!this.isEditing) {
                 return;
             }
@@ -26034,14 +25709,14 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             else {
                 this.canvas && this.canvas.requestRenderAll();
             }
-        },
+        }
         /**
          * Handles keyup event
          * We handle KeyUp because ie11 and edge have difficulties copy/pasting
          * if a copy/cut event fired, keyup is dismissed
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          */
-        onKeyUp: function (e) {
+        onKeyUp(e) {
             if (!this.isEditing || this._copyDone || this.inCompositionMode) {
                 this._copyDone = false;
                 return;
@@ -26055,12 +25730,12 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             e.stopImmediatePropagation();
             e.preventDefault();
             this.canvas && this.canvas.requestRenderAll();
-        },
+        }
         /**
          * Handles onInput event
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          */
-        onInput: function (e) {
+        onInput(e) {
             var fromPaste = this.fromPaste;
             this.fromPaste = false;
             e && e.stopPropagation();
@@ -26124,9 +25799,9 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             }
             if (insertedText.length) {
                 if (fromPaste &&
-                    insertedText.join('') === fabric.copiedText &&
+                    insertedText.join('') === fabric$1.copiedText &&
                     !config.disableStyleCopyPaste) {
-                    copiedStyle = fabric.copiedTextStyle;
+                    copiedStyle = fabric$1.copiedTextStyle;
                 }
                 this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
             }
@@ -26136,60 +25811,56 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this.canvas.fire('text:changed', { target: this });
                 this.canvas.requestRenderAll();
             }
-        },
+        }
         /**
          * Composition start
          */
-        onCompositionStart: function () {
+        onCompositionStart() {
             this.inCompositionMode = true;
-        },
+        }
         /**
          * Composition end
          */
-        onCompositionEnd: function () {
+        onCompositionEnd() {
             this.inCompositionMode = false;
-        },
-        // /**
-        //  * Composition update
+        }
         //  */
-        onCompositionUpdate: function (e) {
+        onCompositionUpdate(e) {
             this.compositionStart = e.target.selectionStart;
             this.compositionEnd = e.target.selectionEnd;
             this.updateTextareaPosition();
-        },
+        }
         /**
          * Copies selected text
-         * @param {Event} e Event object
          */
-        copy: function () {
+        copy() {
             if (this.selectionStart === this.selectionEnd) {
                 //do not cut-copy if no selection
                 return;
             }
-            fabric.copiedText = this.getSelectedText();
+            fabric$1.copiedText = this.getSelectedText();
             if (!config.disableStyleCopyPaste) {
-                fabric.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd, true);
+                fabric$1.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd, true);
             }
             else {
-                fabric.copiedTextStyle = null;
+                fabric$1.copiedTextStyle = null;
             }
             this._copyDone = true;
-        },
+        }
         /**
          * Pastes text
-         * @param {Event} e Event object
          */
-        paste: function () {
+        paste() {
             this.fromPaste = true;
-        },
+        }
         /**
          * @private
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          * @return {Object} Clipboard data object
          */
-        _getClipboardData: function (e) {
-            return (e && e.clipboardData) || fabric.window.clipboardData;
-        },
+        _getClipboardData(e) {
+            return (e && e.clipboardData) || fabric$1.window.clipboardData;
+        }
         /**
          * Finds the width in pixels before the cursor on the same line
          * @private
@@ -26197,21 +25868,21 @@ const reNonWord = /[ \n\.,;!\?\-]/;
          * @param {Number} charIndex
          * @return {Number} widthBeforeCursor width before cursor
          */
-        _getWidthBeforeCursor: function (lineIndex, charIndex) {
+        _getWidthBeforeCursor(lineIndex, charIndex) {
             var widthBeforeCursor = this._getLineLeftOffset(lineIndex), bound;
             if (charIndex > 0) {
                 bound = this.__charBounds[lineIndex][charIndex - 1];
                 widthBeforeCursor += bound.left + bound.width;
             }
             return widthBeforeCursor;
-        },
+        }
         /**
          * Gets start offset of a selection
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          * @param {Boolean} isRight
          * @return {Number}
          */
-        getDownCursorOffset: function (e, isRight) {
+        getDownCursorOffset(e, isRight) {
             var selectionProp = this._getSelectionForOffset(e, isRight), cursorLocation = this.get2DCursorLocation(selectionProp), lineIndex = cursorLocation.lineIndex;
             // if on last line, down cursor goes to end of line
             if (lineIndex === this._textLines.length - 1 ||
@@ -26225,30 +25896,28 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 indexOnOtherLine +
                 1 +
                 this.missingNewlineOffset(lineIndex));
-        },
+        }
         /**
          * private
          * Helps finding if the offset should be counted from Start or End
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          * @param {Boolean} isRight
          * @return {Number}
          */
-        _getSelectionForOffset: function (e, isRight) {
-            if (e.shiftKey &&
-                this.selectionStart !== this.selectionEnd &&
-                isRight) {
+        _getSelectionForOffset(e, isRight) {
+            if (e.shiftKey && this.selectionStart !== this.selectionEnd && isRight) {
                 return this.selectionEnd;
             }
             else {
                 return this.selectionStart;
             }
-        },
+        }
         /**
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          * @param {Boolean} isRight
          * @return {Number}
          */
-        getUpCursorOffset: function (e, isRight) {
+        getUpCursorOffset(e, isRight) {
             var selectionProp = this._getSelectionForOffset(e, isRight), cursorLocation = this.get2DCursorLocation(selectionProp), lineIndex = cursorLocation.lineIndex;
             if (lineIndex === 0 || e.metaKey || e.keyCode === 33) {
                 // if on first line, up cursor goes to start of line
@@ -26260,12 +25929,12 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 indexOnOtherLine -
                 textBeforeCursor.length +
                 (1 - missingNewlineOffset));
-        },
+        }
         /**
          * for a given width it founds the matching character.
          * @private
          */
-        _getIndexOnLine: function (lineIndex, width) {
+        _getIndexOnLine(lineIndex, width) {
             var line = this._textLines[lineIndex], lineLeftOffset = this._getLineLeftOffset(lineIndex), widthOfCharsOnLine = lineLeftOffset, indexOnLine = 0, charWidth, foundMatch;
             for (var j = 0, jlen = line.length; j < jlen; j++) {
                 charWidth = this.__charBounds[lineIndex][j].width;
@@ -26282,36 +25951,34 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 indexOnLine = line.length - 1;
             }
             return indexOnLine;
-        },
+        }
         /**
          * Moves cursor down
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          */
-        moveCursorDown: function (e) {
+        moveCursorDown(e) {
             if (this.selectionStart >= this._text.length &&
                 this.selectionEnd >= this._text.length) {
                 return;
             }
             this._moveCursorUpOrDown('Down', e);
-        },
+        }
         /**
          * Moves cursor up
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          */
-        moveCursorUp: function (e) {
+        moveCursorUp(e) {
             if (this.selectionStart === 0 && this.selectionEnd === 0) {
                 return;
             }
             this._moveCursorUpOrDown('Up', e);
-        },
+        }
         /**
          * Moves cursor up or down, fires the events
          * @param {String} direction 'Up' or 'Down'
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          */
-        _moveCursorUpOrDown: function (direction, e) {
-            // getUpCursorOffset
-            // getDownCursorOffset
+        _moveCursorUpOrDown(direction, e) {
             var action = 'get' + direction + 'CursorOffset', offset = this[action](e, this._selectionDirection === 'right');
             if (e.shiftKey) {
                 this.moveCursorWithShift(offset);
@@ -26327,23 +25994,23 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this._fireSelectionChanged();
                 this._updateTextarea();
             }
-        },
+        }
         /**
          * Moves cursor with shift
          * @param {Number} offset
          */
-        moveCursorWithShift: function (offset) {
+        moveCursorWithShift(offset) {
             var newSelection = this._selectionDirection === 'left'
                 ? this.selectionStart + offset
                 : this.selectionEnd + offset;
             this.setSelectionStartEndWithShift(this.selectionStart, this.selectionEnd, newSelection);
             return offset !== 0;
-        },
+        }
         /**
          * Moves cursor up without shift
          * @param {Number} offset
          */
-        moveCursorWithoutShift: function (offset) {
+        moveCursorWithoutShift(offset) {
             if (offset < 0) {
                 this.selectionStart += offset;
                 this.selectionEnd = this.selectionStart;
@@ -26353,22 +26020,22 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this.selectionStart = this.selectionEnd;
             }
             return offset !== 0;
-        },
+        }
         /**
          * Moves cursor left
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          */
-        moveCursorLeft: function (e) {
+        moveCursorLeft(e) {
             if (this.selectionStart === 0 && this.selectionEnd === 0) {
                 return;
             }
             this._moveCursorLeftOrRight('Left', e);
-        },
+        }
         /**
          * @private
          * @return {Boolean} true if a change happened
          */
-        _move: function (e, prop, direction) {
+        _move(e, prop, direction) {
             var newValue;
             if (e.altKey) {
                 newValue = this['findWordBoundary' + direction](this[prop]);
@@ -26384,24 +26051,24 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this[prop] = newValue;
                 return true;
             }
-        },
+        }
         /**
          * @private
          */
-        _moveLeft: function (e, prop) {
+        _moveLeft(e, prop) {
             return this._move(e, prop, 'Left');
-        },
+        }
         /**
          * @private
          */
-        _moveRight: function (e, prop) {
+        _moveRight(e, prop) {
             return this._move(e, prop, 'Right');
-        },
+        }
         /**
          * Moves cursor left without keeping selection
-         * @param {Event} e
+         * @param {TPointerEvent} e
          */
-        moveCursorLeftWithoutShift: function (e) {
+        moveCursorLeftWithoutShift(e) {
             var change = true;
             this._selectionDirection = 'left';
             // only move cursor when there is no selection,
@@ -26412,12 +26079,12 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             }
             this.selectionEnd = this.selectionStart;
             return change;
-        },
+        }
         /**
          * Moves cursor left while keeping selection
-         * @param {Event} e
+         * @param {TPointerEvent} e
          */
-        moveCursorLeftWithShift: function (e) {
+        moveCursorLeftWithShift(e) {
             if (this._selectionDirection === 'right' &&
                 this.selectionStart !== this.selectionEnd) {
                 return this._moveLeft(e, 'selectionEnd');
@@ -26426,24 +26093,24 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this._selectionDirection = 'left';
                 return this._moveLeft(e, 'selectionStart');
             }
-        },
+        }
         /**
          * Moves cursor right
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          */
-        moveCursorRight: function (e) {
+        moveCursorRight(e) {
             if (this.selectionStart >= this._text.length &&
                 this.selectionEnd >= this._text.length) {
                 return;
             }
             this._moveCursorLeftOrRight('Right', e);
-        },
+        }
         /**
          * Moves cursor right or Left, fires event
          * @param {String} direction 'Left', 'Right'
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          */
-        _moveCursorLeftOrRight: function (direction, e) {
+        _moveCursorLeftOrRight(direction, e) {
             var actionName = 'moveCursor' + direction + 'With';
             this._currentCursorOpacity = 1;
             if (e.shiftKey) {
@@ -26458,12 +26125,12 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this._fireSelectionChanged();
                 this._updateTextarea();
             }
-        },
+        }
         /**
          * Moves cursor right while keeping selection
-         * @param {Event} e
+         * @param {TPointerEvent} e
          */
-        moveCursorRightWithShift: function (e) {
+        moveCursorRightWithShift(e) {
             if (this._selectionDirection === 'left' &&
                 this.selectionStart !== this.selectionEnd) {
                 return this._moveRight(e, 'selectionStart');
@@ -26472,12 +26139,12 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this._selectionDirection = 'right';
                 return this._moveRight(e, 'selectionEnd');
             }
-        },
+        }
         /**
          * Moves cursor right without keeping selection
-         * @param {Event} e Event object
+         * @param {TPointerEvent} e Event object
          */
-        moveCursorRightWithoutShift: function (e) {
+        moveCursorRightWithoutShift(e) {
             var changed = true;
             this._selectionDirection = 'right';
             if (this.selectionStart === this.selectionEnd) {
@@ -26488,7 +26155,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this.selectionStart = this.selectionEnd;
             }
             return changed;
-        },
+        }
         /**
          * Removes characters from start/end
          * start/end ar per grapheme position in _text array.
@@ -26496,7 +26163,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
          * @param {Number} start
          * @param {Number} end default to start + 1
          */
-        removeChars: function (start, end) {
+        removeChars(start, end) {
             if (typeof end === 'undefined') {
                 end = start + 1;
             }
@@ -26509,7 +26176,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this.setCoords();
             }
             this._removeExtraneousStyles();
-        },
+        }
         /**
          * insert characters at start position, before start position.
          * start  equal 1 it means the text get inserted between actual grapheme 0 and 1
@@ -26522,7 +26189,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
          * @param {Number} start
          * @param {Number} end default to start + 1
          */
-        insertChars: function (text, style, start, end) {
+        insertChars(text, style, start, end) {
             if (typeof end === 'undefined') {
                 end = start;
             }
@@ -26539,51 +26206,85 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 this.setCoords();
             }
             this._removeExtraneousStyles();
-        },
-    });
-})(typeof exports !== 'undefined' ? exports : window);
+        }
+    };
+}
+IText = ITextKeyBehaviorMixinGenerator(IText);
+const iTextKeyBehaviorMixinDefaultValues = {
+    keysMap: {
+        9: 'exitEditing',
+        27: 'exitEditing',
+        33: 'moveCursorUp',
+        34: 'moveCursorDown',
+        35: 'moveCursorRight',
+        36: 'moveCursorLeft',
+        37: 'moveCursorLeft',
+        38: 'moveCursorUp',
+        39: 'moveCursorRight',
+        40: 'moveCursorDown',
+    },
+    keysMapRtl: {
+        9: 'exitEditing',
+        27: 'exitEditing',
+        33: 'moveCursorUp',
+        34: 'moveCursorDown',
+        35: 'moveCursorLeft',
+        36: 'moveCursorRight',
+        37: 'moveCursorRight',
+        38: 'moveCursorUp',
+        39: 'moveCursorLeft',
+        40: 'moveCursorDown',
+    },
+    ctrlKeysMapUp: {
+        67: 'copy',
+        88: 'cut',
+    },
+    ctrlKeysMapDown: {
+        65: 'selectAll',
+    },
+};
+Object.assign(ITextKeyBehaviorMixin.prototype, iTextKeyBehaviorMixinDefaultValues);
 
 //@ts-nocheck
 /* _TO_SVG_START_ */
-(function (global) {
-    var fabric = global.fabric, toFixed = fabric.util.toFixed, multipleSpacesRegex = /  +/g;
-    fabric.util.object.extend(fabric.Text.prototype, 
-    /** @lends fabric.Text.prototype */ {
+var toFixed = toFixed, multipleSpacesRegex = /  +/g;
+function TextIMixinGenerator(Klass) {
+    return class TextIMixin extends Klass {
         /**
          * Returns SVG representation of an instance
          * @param {Function} [reviver] Method for further parsing of svg representation.
          * @return {String} svg representation of an instance
          */
-        _toSVG: function () {
+        _toSVG() {
             var offsets = this._getSVGLeftTopOffsets(), textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
             return this._wrapSVGTextAndBg(textAndBg);
-        },
+        }
         /**
          * Returns svg representation of an instance
          * @param {Function} [reviver] Method for further parsing of svg representation.
          * @return {String} svg representation of an instance
          */
-        toSVG: function (reviver) {
+        toSVG(reviver) {
             return this._createBaseSVGMarkup(this._toSVG(), {
                 reviver: reviver,
                 noStyle: true,
                 withShadow: true,
             });
-        },
+        }
         /**
          * @private
          */
-        _getSVGLeftTopOffsets: function () {
+        _getSVGLeftTopOffsets() {
             return {
                 textLeft: -this.width / 2,
                 textTop: -this.height / 2,
                 lineTop: this.getHeightOfLine(0),
             };
-        },
+        }
         /**
          * @private
          */
-        _wrapSVGTextAndBg: function (textAndBg) {
+        _wrapSVGTextAndBg(textAndBg) {
             var noShadow = true, textDecoration = this.getSvgTextDecoration(this);
             return [
                 textAndBg.textBgRects.join(''),
@@ -26604,14 +26305,14 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 textAndBg.textSpans.join(''),
                 '</text>\n',
             ];
-        },
+        }
         /**
          * @private
          * @param {Number} textTopOffset Text top offset
          * @param {Number} textLeftOffset Text left offset
          * @return {Object}
          */
-        _getSVGTextAndBg: function (textTopOffset, textLeftOffset) {
+        _getSVGTextAndBg(textTopOffset, textLeftOffset) {
             var textSpans = [], textBgRects = [], height = textTopOffset, lineOffset;
             // bounding-box background
             this._setSVGBg(textBgRects);
@@ -26632,11 +26333,11 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 textSpans: textSpans,
                 textBgRects: textBgRects,
             };
-        },
+        }
         /**
          * @private
          */
-        _createTextCharSpan: function (_char, styleDecl, left, top) {
+        _createTextCharSpan(_char, styleDecl, left, top) {
             var shouldUseWhitespace = _char !== _char.trim() || _char.match(multipleSpacesRegex), styleProps = this.getSvgSpanStyles(styleDecl, shouldUseWhitespace), fillStyles = styleProps ? 'style="' + styleProps + '"' : '', dy = styleDecl.deltaY, dySpan = '', NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
             if (dy) {
                 dySpan = ' dy="' + toFixed(dy, NUM_FRACTION_DIGITS) + '" ';
@@ -26650,12 +26351,11 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 dySpan,
                 fillStyles,
                 '>',
-                fabric.util.string.escapeXml(_char),
+                string.escapeXml(_char),
                 '</tspan>',
             ].join('');
-        },
-        _setSVGTextLineText: function (textSpans, lineIndex, textLeftOffset, textTopOffset) {
-            // set proper line offset
+        }
+        _setSVGTextLineText(textSpans, lineIndex, textLeftOffset, textTopOffse) {
             var lineHeight = this.getHeightOfLine(lineIndex), isJustify = this.textAlign.indexOf('justify') !== -1, actualStyle, nextStyle, charsToRender = '', charBox, style, boxWidth = 0, line = this._textLines[lineIndex], timeToRender;
             textTopOffset +=
                 (lineHeight * (1 - this._fontSizeFraction)) / this.lineHeight;
@@ -26680,7 +26380,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                     actualStyle =
                         actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
                     nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
-                    timeToRender = fabric.util.hasStyleChanged(actualStyle, nextStyle, true);
+                    timeToRender = hasStyleChanged(actualStyle, nextStyle, true);
                 }
                 if (timeToRender) {
                     style = this._getStyleDeclaration(lineIndex, i) || {};
@@ -26696,12 +26396,12 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                     boxWidth = 0;
                 }
             }
-        },
-        _pushTextBgRect: function (textBgRects, color, left, top, width, height) {
+        }
+        _pushTextBgRect(textBgRects, color, left, top, width, height) {
             var NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
             textBgRects.push('\t\t<rect ', this._getFillAttributes(color), ' x="', toFixed(left, NUM_FRACTION_DIGITS), '" y="', toFixed(top, NUM_FRACTION_DIGITS), '" width="', toFixed(width, NUM_FRACTION_DIGITS), '" height="', toFixed(height, NUM_FRACTION_DIGITS), '"></rect>\n');
-        },
-        _setSVGTextLineBg: function (textBgRects, i, leftOffset, textTopOffset) {
+        }
+        _setSVGTextLineBg(textBgRects, i, leftOffset, textTopOffset) {
             var line = this._textLines[i], heightOfLine = this.getHeightOfLine(i) / this.lineHeight, boxWidth = 0, boxStart = 0, charBox, currentColor, lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
             for (var j = 0, jlen = line.length; j < jlen; j++) {
                 charBox = this.__charBounds[i][j];
@@ -26719,7 +26419,7 @@ const reNonWord = /[ \n\.,;!\?\-]/;
             }
             currentColor &&
                 this._pushTextBgRect(textBgRects, currentColor, leftOffset + boxStart, textTopOffset, boxWidth, heightOfLine);
-        },
+        }
         /**
          * Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
          * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
@@ -26728,11 +26428,9 @@ const reNonWord = /[ \n\.,;!\?\-]/;
          * @param {*} value
          * @return {String}
          */
-        _getFillAttributes: function (value) {
+        _getFillAttributes(value) {
             var fillColor = value && typeof value === 'string' ? new Color(value) : '';
-            if (!fillColor ||
-                !fillColor.getSource() ||
-                fillColor.getAlpha() === 1) {
+            if (!fillColor || !fillColor.getSource() || fillColor.getAlpha() === 1) {
                 return 'fill="' + value + '"';
             }
             return ('opacity="' +
@@ -26740,11 +26438,11 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 '" fill="' +
                 fillColor.setAlpha(1).toRgb() +
                 '"');
-        },
+        }
         /**
          * @private
          */
-        _getSVGLineTopOffset: function (lineIndex) {
+        _getSVGLineTopOffset(lineIndex) {
             var lineTopOffset = 0, lastHeight = 0;
             for (var j = 0; j < lineIndex; j++) {
                 lineTopOffset += this.getHeightOfLine(j);
@@ -26755,451 +26453,412 @@ const reNonWord = /[ \n\.,;!\?\-]/;
                 offset: ((this._fontSizeMult - this._fontSizeFraction) * lastHeight) /
                     (this.lineHeight * this._fontSizeMult),
             };
-        },
+        }
         /**
          * Returns styles-string for svg-export
          * @param {Boolean} skipShadow a boolean to skip shadow filter output
          * @return {String}
          */
-        getSvgStyles: function (skipShadow) {
+        getSvgStyles(skipShadow) {
             var svgStyle = InteractiveFabricObject.prototype.getSvgStyles.call(this, skipShadow);
             return svgStyle + ' white-space: pre;';
-        },
-    });
-})(typeof exports !== 'undefined' ? exports : window);
+        }
+    };
+}
+Text = TextIMixinGenerator(Text);
 /* _TO_SVG_END_ */
 
-//@ts-nocheck
-(function (global) {
-    var fabric = global.fabric || (global.fabric = {});
-    /**
-     * Textbox class, based on IText, allows the user to resize the text rectangle
-     * and wraps lines automatically. Textboxes have their Y scaling locked, the
-     * user can only change width. Height is adjusted automatically based on the
-     * wrapping of lines.
-     * @class fabric.Textbox
-     * @extends fabric.IText
-     * @return {fabric.Textbox} thisArg
-     * @see {@link fabric.Textbox#initialize} for constructor definition
-     */
-    fabric.Textbox = fabric.util.createClass(fabric.IText, {
-        /**
-         * Type of an object
-         * @type String
-         * @default
-         */
-        type: 'textbox',
-        /**
-         * Minimum width of textbox, in pixels.
-         * @type Number
-         * @default
-         */
-        minWidth: 20,
-        /**
-         * Minimum calculated width of a textbox, in pixels.
-         * fixed to 2 so that an empty textbox cannot go to 0
-         * and is still selectable without text.
-         * @type Number
-         * @default
-         */
-        dynamicMinWidth: 2,
+// @ts-nocheck
+/**
+ * Textbox class, based on IText, allows the user to resize the text rectangle
+ * and wraps lines automatically. Textboxes have their Y scaling locked, the
+ * user can only change width. Height is adjusted automatically based on the
+ * wrapping of lines.
+ */
+class Textbox extends IText$1 {
+    constructor() {
+        super(...arguments);
         /**
          * Cached array of text wrapping.
          * @type Array
          */
-        __cachedLines: null,
-        /**
-         * Override standard Object class values
-         */
-        lockScalingFlip: true,
-        /**
-         * Override standard Object class values
-         * Textbox needs this on false
-         */
-        noScaleCache: false,
-        /**
-         * Properties which when set cause object to change dimensions
-         * @type Object
-         * @private
-         */
-        _dimensionAffectingProps: fabric.Text.prototype._dimensionAffectingProps.concat('width'),
-        /**
-         * Use this regular expression to split strings in breakable lines
-         * @private
-         */
-        _wordJoiners: /[ \t\r]/,
-        /**
-         * Use this boolean property in order to split strings that have no white space concept.
-         * this is a cheap way to help with chinese/japanese
-         * @type Boolean
-         * @since 2.6.0
-         */
-        splitByGrapheme: false,
-        /**
-         * Unlike superclass's version of this function, Textbox does not update
-         * its width.
-         * @private
-         * @override
-         */
-        initDimensions: function () {
-            if (this.__skipDimension) {
-                return;
+        this.__cachedLines = null;
+    }
+    /**
+     * Unlike superclass's version of this function, Textbox does not update
+     * its width.
+     * @private
+     * @override
+     */
+    initDimensions() {
+        if (this.__skipDimension) {
+            return;
+        }
+        this.isEditing && this.initDelayedCursor();
+        this.clearContextTop();
+        this._clearCache();
+        // clear dynamicMinWidth as it will be different after we re-wrap line
+        this.dynamicMinWidth = 0;
+        // wrap lines
+        this._styleMap = this._generateStyleMap(this._splitText());
+        // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
+        if (this.dynamicMinWidth > this.width) {
+            this._set('width', this.dynamicMinWidth);
+        }
+        if (this.textAlign.indexOf('justify') !== -1) {
+            // once text is measured we need to make space fatter to make justified text.
+            this.enlargeSpaces();
+        }
+        // clear cache and re-calculate height
+        this.height = this.calcTextHeight();
+        this.saveState({ propertySet: '_dimensionAffectingProps' });
+    }
+    /**
+     * Generate an object that translates the style object so that it is
+     * broken up by visual lines (new lines and automatic wrapping).
+     * The original text styles object is broken up by actual lines (new lines only),
+     * which is only sufficient for Text / IText
+     * @private
+     */
+    _generateStyleMap(textInfo) {
+        let realLineCount = 0, realLineCharCount = 0, charCount = 0, map = {};
+        for (let i = 0; i < textInfo.graphemeLines.length; i++) {
+            if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
+                realLineCharCount = 0;
+                charCount++;
+                realLineCount++;
             }
-            this.isEditing && this.initDelayedCursor();
-            this.clearContextTop();
-            this._clearCache();
-            // clear dynamicMinWidth as it will be different after we re-wrap line
-            this.dynamicMinWidth = 0;
-            // wrap lines
-            this._styleMap = this._generateStyleMap(this._splitText());
-            // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
-            if (this.dynamicMinWidth > this.width) {
-                this._set('width', this.dynamicMinWidth);
+            else if (!this.splitByGrapheme &&
+                this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) &&
+                i > 0) {
+                // this case deals with space's that are removed from end of lines when wrapping
+                realLineCharCount++;
+                charCount++;
             }
-            if (this.textAlign.indexOf('justify') !== -1) {
-                // once text is measured we need to make space fatter to make justified text.
-                this.enlargeSpaces();
-            }
-            // clear cache and re-calculate height
-            this.height = this.calcTextHeight();
-            this.saveState({ propertySet: '_dimensionAffectingProps' });
-        },
-        /**
-         * Generate an object that translates the style object so that it is
-         * broken up by visual lines (new lines and automatic wrapping).
-         * The original text styles object is broken up by actual lines (new lines only),
-         * which is only sufficient for Text / IText
-         * @private
-         */
-        _generateStyleMap: function (textInfo) {
-            var realLineCount = 0, realLineCharCount = 0, charCount = 0, map = {};
-            for (var i = 0; i < textInfo.graphemeLines.length; i++) {
-                if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
-                    realLineCharCount = 0;
-                    charCount++;
-                    realLineCount++;
-                }
-                else if (!this.splitByGrapheme &&
-                    this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) &&
-                    i > 0) {
-                    // this case deals with space's that are removed from end of lines when wrapping
-                    realLineCharCount++;
-                    charCount++;
-                }
-                map[i] = { line: realLineCount, offset: realLineCharCount };
-                charCount += textInfo.graphemeLines[i].length;
-                realLineCharCount += textInfo.graphemeLines[i].length;
-            }
-            return map;
-        },
-        /**
-         * Returns true if object has a style property or has it on a specified line
-         * @param {Number} lineIndex
-         * @return {Boolean}
-         */
-        styleHas: function (property, lineIndex) {
-            if (this._styleMap && !this.isWrapping) {
-                var map = this._styleMap[lineIndex];
-                if (map) {
-                    lineIndex = map.line;
-                }
-            }
-            return fabric.Text.prototype.styleHas.call(this, property, lineIndex);
-        },
-        /**
-         * Returns true if object has no styling or no styling in a line
-         * @param {Number} lineIndex , lineIndex is on wrapped lines.
-         * @return {Boolean}
-         */
-        isEmptyStyles: function (lineIndex) {
-            if (!this.styles) {
-                return true;
-            }
-            var offset = 0, nextLineIndex = lineIndex + 1, nextOffset, obj, shouldLimit = false, map = this._styleMap[lineIndex], mapNextLine = this._styleMap[lineIndex + 1];
+            map[i] = { line: realLineCount, offset: realLineCharCount };
+            charCount += textInfo.graphemeLines[i].length;
+            realLineCharCount += textInfo.graphemeLines[i].length;
+        }
+        return map;
+    }
+    /**
+     * Returns true if object has a style property or has it on a specified line
+     * @param {Number} lineIndex
+     * @return {Boolean}
+     */
+    styleHas(property, lineIndex) {
+        if (this._styleMap && !this.isWrapping) {
+            const map = this._styleMap[lineIndex];
             if (map) {
                 lineIndex = map.line;
-                offset = map.offset;
             }
-            if (mapNextLine) {
-                nextLineIndex = mapNextLine.line;
-                shouldLimit = nextLineIndex === lineIndex;
-                nextOffset = mapNextLine.offset;
-            }
-            obj =
-                typeof lineIndex === 'undefined'
-                    ? this.styles
-                    : { line: this.styles[lineIndex] };
-            for (var p1 in obj) {
-                for (var p2 in obj[p1]) {
-                    if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
-                        // eslint-disable-next-line no-unused-vars
-                        for (var p3 in obj[p1][p2]) {
-                            return false;
-                        }
+        }
+        return super.styleHas(property, lineIndex);
+    }
+    /**
+     * Returns true if object has no styling or no styling in a line
+     * @param {Number} lineIndex , lineIndex is on wrapped lines.
+     * @return {Boolean}
+     */
+    isEmptyStyles(lineIndex) {
+        if (!this.styles) {
+            return true;
+        }
+        let offset = 0, nextLineIndex = lineIndex + 1, nextOffset, obj, shouldLimit = false, map = this._styleMap[lineIndex], mapNextLine = this._styleMap[lineIndex + 1];
+        if (map) {
+            lineIndex = map.line;
+            offset = map.offset;
+        }
+        if (mapNextLine) {
+            nextLineIndex = mapNextLine.line;
+            shouldLimit = nextLineIndex === lineIndex;
+            nextOffset = mapNextLine.offset;
+        }
+        obj =
+            typeof lineIndex === 'undefined'
+                ? this.styles
+                : { line: this.styles[lineIndex] };
+        for (const p1 in obj) {
+            for (const p2 in obj[p1]) {
+                if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
+                    // eslint-disable-next-line no-unused-vars
+                    for (const p3 in obj[p1][p2]) {
+                        return false;
                     }
                 }
             }
-            return true;
-        },
-        /**
-         * @param {Number} lineIndex
-         * @param {Number} charIndex
-         * @private
-         */
-        _getStyleDeclaration: function (lineIndex, charIndex) {
-            if (this._styleMap && !this.isWrapping) {
-                var map = this._styleMap[lineIndex];
-                if (!map) {
-                    return null;
-                }
-                lineIndex = map.line;
-                charIndex = map.offset + charIndex;
-            }
-            return this.callSuper('_getStyleDeclaration', lineIndex, charIndex);
-        },
-        /**
-         * @param {Number} lineIndex
-         * @param {Number} charIndex
-         * @param {Object} style
-         * @private
-         */
-        _setStyleDeclaration: function (lineIndex, charIndex, style) {
-            var map = this._styleMap[lineIndex];
-            lineIndex = map.line;
-            charIndex = map.offset + charIndex;
-            this.styles[lineIndex][charIndex] = style;
-        },
-        /**
-         * @param {Number} lineIndex
-         * @param {Number} charIndex
-         * @private
-         */
-        _deleteStyleDeclaration: function (lineIndex, charIndex) {
-            var map = this._styleMap[lineIndex];
-            lineIndex = map.line;
-            charIndex = map.offset + charIndex;
-            delete this.styles[lineIndex][charIndex];
-        },
-        /**
-         * probably broken need a fix
-         * Returns the real style line that correspond to the wrapped lineIndex line
-         * Used just to verify if the line does exist or not.
-         * @param {Number} lineIndex
-         * @returns {Boolean} if the line exists or not
-         * @private
-         */
-        _getLineStyle: function (lineIndex) {
-            var map = this._styleMap[lineIndex];
-            return !!this.styles[map.line];
-        },
-        /**
-         * Set the line style to an empty object so that is initialized
-         * @param {Number} lineIndex
-         * @param {Object} style
-         * @private
-         */
-        _setLineStyle: function (lineIndex) {
-            var map = this._styleMap[lineIndex];
-            this.styles[map.line] = {};
-        },
-        /**
-         * Wraps text using the 'width' property of Textbox. First this function
-         * splits text on newlines, so we preserve newlines entered by the user.
-         * Then it wraps each line using the width of the Textbox by calling
-         * _wrapLine().
-         * @param {Array} lines The string array of text that is split into lines
-         * @param {Number} desiredWidth width you want to wrap to
-         * @returns {Array} Array of lines
-         */
-        _wrapText: function (lines, desiredWidth) {
-            var wrapped = [], i;
-            this.isWrapping = true;
-            for (i = 0; i < lines.length; i++) {
-                wrapped.push.apply(wrapped, this._wrapLine(lines[i], i, desiredWidth));
-            }
-            this.isWrapping = false;
-            return wrapped;
-        },
-        /**
-         * Helper function to measure a string of text, given its lineIndex and charIndex offset
-         * It gets called when charBounds are not available yet.
-         * Override if necessary
-         * Use with {@link fabric.Textbox#wordSplit}
-         *
-         * @param {CanvasRenderingContext2D} ctx
-         * @param {String} text
-         * @param {number} lineIndex
-         * @param {number} charOffset
-         * @returns {number}
-         */
-        _measureWord: function (word, lineIndex, charOffset) {
-            var width = 0, prevGrapheme, skipLeft = true;
-            charOffset = charOffset || 0;
-            for (var i = 0, len = word.length; i < len; i++) {
-                var box = this._getGraphemeBox(word[i], lineIndex, i + charOffset, prevGrapheme, skipLeft);
-                width += box.kernedWidth;
-                prevGrapheme = word[i];
-            }
-            return width;
-        },
-        /**
-         * Override this method to customize word splitting
-         * Use with {@link fabric.Textbox#_measureWord}
-         * @param {string} value
-         * @returns {string[]} array of words
-         */
-        wordSplit: function (value) {
-            return value.split(this._wordJoiners);
-        },
-        /**
-         * Wraps a line of text using the width of the Textbox and a context.
-         * @param {Array} line The grapheme array that represent the line
-         * @param {Number} lineIndex
-         * @param {Number} desiredWidth width you want to wrap the line to
-         * @param {Number} reservedSpace space to remove from wrapping for custom functionalities
-         * @returns {Array} Array of line(s) into which the given text is wrapped
-         * to.
-         */
-        _wrapLine: function (_line, lineIndex, desiredWidth, reservedSpace) {
-            var lineWidth = 0, splitByGrapheme = this.splitByGrapheme, graphemeLines = [], line = [], 
-            // spaces in different languages?
-            words = splitByGrapheme
-                ? this.graphemeSplit(_line)
-                : this.wordSplit(_line), word = '', offset = 0, infix = splitByGrapheme ? '' : ' ', wordWidth = 0, infixWidth = 0, largestWordWidth = 0, lineJustStarted = true, additionalSpace = this._getWidthOfCharSpacing(), reservedSpace = reservedSpace || 0;
-            // fix a difference between split and graphemeSplit
-            if (words.length === 0) {
-                words.push([]);
-            }
-            desiredWidth -= reservedSpace;
-            // measure words
-            var data = words.map(function (word) {
-                // if using splitByGrapheme words are already in graphemes.
-                word = splitByGrapheme ? word : this.graphemeSplit(word);
-                var width = this._measureWord(word, lineIndex, offset);
-                largestWordWidth = Math.max(width, largestWordWidth);
-                offset += word.length + 1;
-                return { word: word, width: width };
-            }.bind(this));
-            var maxWidth = Math.max(desiredWidth, largestWordWidth, this.dynamicMinWidth);
-            // layout words
-            offset = 0;
-            for (var i = 0; i < words.length; i++) {
-                word = data[i].word;
-                wordWidth = data[i].width;
-                offset += word.length;
-                lineWidth += infixWidth + wordWidth - additionalSpace;
-                if (lineWidth > maxWidth && !lineJustStarted) {
-                    graphemeLines.push(line);
-                    line = [];
-                    lineWidth = wordWidth;
-                    lineJustStarted = true;
-                }
-                else {
-                    lineWidth += additionalSpace;
-                }
-                if (!lineJustStarted && !splitByGrapheme) {
-                    line.push(infix);
-                }
-                line = line.concat(word);
-                infixWidth = splitByGrapheme
-                    ? 0
-                    : this._measureWord([infix], lineIndex, offset);
-                offset++;
-                lineJustStarted = false;
-            }
-            i && graphemeLines.push(line);
-            if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
-                this.dynamicMinWidth =
-                    largestWordWidth - additionalSpace + reservedSpace;
-            }
-            return graphemeLines;
-        },
-        /**
-         * Detect if the text line is ended with an hard break
-         * text and itext do not have wrapping, return false
-         * @param {Number} lineIndex text to split
-         * @return {Boolean}
-         */
-        isEndOfWrapping: function (lineIndex) {
-            if (!this._styleMap[lineIndex + 1]) {
-                // is last line, return true;
-                return true;
-            }
-            if (this._styleMap[lineIndex + 1].line !== this._styleMap[lineIndex].line) {
-                // this is last line before a line break, return true;
-                return true;
-            }
-            return false;
-        },
-        /**
-         * Detect if a line has a linebreak and so we need to account for it when moving
-         * and counting style.
-         * @return Number
-         */
-        missingNewlineOffset: function (lineIndex) {
-            if (this.splitByGrapheme) {
-                return this.isEndOfWrapping(lineIndex) ? 1 : 0;
-            }
-            return 1;
-        },
-        /**
-         * Gets lines of text to render in the Textbox. This function calculates
-         * text wrapping on the fly every time it is called.
-         * @param {String} text text to split
-         * @returns {Array} Array of lines in the Textbox.
-         * @override
-         */
-        _splitTextIntoLines: function (text) {
-            var newText = fabric.Text.prototype._splitTextIntoLines.call(this, text), graphemeLines = this._wrapText(newText.lines, this.width), lines = new Array(graphemeLines.length);
-            for (var i = 0; i < graphemeLines.length; i++) {
-                lines[i] = graphemeLines[i].join('');
-            }
-            newText.lines = lines;
-            newText.graphemeLines = graphemeLines;
-            return newText;
-        },
-        getMinWidth: function () {
-            return Math.max(this.minWidth, this.dynamicMinWidth);
-        },
-        _removeExtraneousStyles: function () {
-            var linesToKeep = {};
-            for (var prop in this._styleMap) {
-                if (this._textLines[prop]) {
-                    linesToKeep[this._styleMap[prop].line] = 1;
-                }
-            }
-            for (var prop in this.styles) {
-                if (!linesToKeep[prop]) {
-                    delete this.styles[prop];
-                }
-            }
-        },
-        /**
-         * Returns object representation of an instance
-         * @method toObject
-         * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-         * @return {Object} object representation of an instance
-         */
-        toObject: function (propertiesToInclude) {
-            return this.callSuper('toObject', ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude));
-        },
-    });
+        }
+        return true;
+    }
     /**
-     * Returns fabric.Textbox instance from an object representation
-     * @static
-     * @memberOf fabric.Textbox
-     * @param {Object} object Object to create an instance from
-     * @returns {Promise<fabric.Textbox>}
+     * @param {Number} lineIndex
+     * @param {Number} charIndex
+     * @private
      */
-    fabric.Textbox.fromObject = function (object) {
-        var styles = fabric.util.stylesFromArray(object.styles, object.text);
+    _getStyleDeclaration(lineIndex, charIndex) {
+        if (this._styleMap && !this.isWrapping) {
+            const map = this._styleMap[lineIndex];
+            if (!map) {
+                return null;
+            }
+            lineIndex = map.line;
+            charIndex = map.offset + charIndex;
+        }
+        return super._getStyleDeclaration(lineIndex, charIndex);
+    }
+    /**
+     * @param {Number} lineIndex
+     * @param {Number} charIndex
+     * @param {Object} style
+     * @private
+     */
+    _setStyleDeclaration(lineIndex, charIndex, style) {
+        const map = this._styleMap[lineIndex];
+        lineIndex = map.line;
+        charIndex = map.offset + charIndex;
+        this.styles[lineIndex][charIndex] = style;
+    }
+    /**
+     * @param {Number} lineIndex
+     * @param {Number} charIndex
+     * @private
+     */
+    _deleteStyleDeclaration(lineIndex, charIndex) {
+        const map = this._styleMap[lineIndex];
+        lineIndex = map.line;
+        charIndex = map.offset + charIndex;
+        delete this.styles[lineIndex][charIndex];
+    }
+    /**
+     * probably broken need a fix
+     * Returns the real style line that correspond to the wrapped lineIndex line
+     * Used just to verify if the line does exist or not.
+     * @param {Number} lineIndex
+     * @returns {Boolean} if the line exists or not
+     * @private
+     */
+    _getLineStyle(lineIndex) {
+        const map = this._styleMap[lineIndex];
+        return !!this.styles[map.line];
+    }
+    /**
+     * Set the line style to an empty object so that is initialized
+     * @param {Number} lineIndex
+     * @param {Object} style
+     * @private
+     */
+    _setLineStyle(lineIndex) {
+        const map = this._styleMap[lineIndex];
+        this.styles[map.line] = {};
+    }
+    /**
+     * Wraps text using the 'width' property of Textbox. First this function
+     * splits text on newlines, so we preserve newlines entered by the user.
+     * Then it wraps each line using the width of the Textbox by calling
+     * _wrapLine().
+     * @param {Array} lines The string array of text that is split into lines
+     * @param {Number} desiredWidth width you want to wrap to
+     * @returns {Array} Array of lines
+     */
+    _wrapText(lines, desiredWidth) {
+        let wrapped = [], i;
+        this.isWrapping = true;
+        for (i = 0; i < lines.length; i++) {
+            wrapped.push.apply(wrapped, this._wrapLine(lines[i], i, desiredWidth));
+        }
+        this.isWrapping = false;
+        return wrapped;
+    }
+    /**
+     * Helper function to measure a string of text, given its lineIndex and charIndex offset
+     * It gets called when charBounds are not available yet.
+     * Override if necessary
+     * Use with {@link Textbox#wordSplit}
+     *
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {String} text
+     * @param {number} lineIndex
+     * @param {number} charOffset
+     * @returns {number}
+     */
+    _measureWord(word, lineIndex, charOffset) {
+        let width = 0, prevGrapheme, skipLeft = true;
+        charOffset = charOffset || 0;
+        for (let i = 0, len = word.length; i < len; i++) {
+            const box = this._getGraphemeBox(word[i], lineIndex, i + charOffset, prevGrapheme, skipLeft);
+            width += box.kernedWidth;
+            prevGrapheme = word[i];
+        }
+        return width;
+    }
+    /**
+     * Override this method to customize word splitting
+     * Use with {@link Textbox#_measureWord}
+     * @param {string} value
+     * @returns {string[]} array of words
+     */
+    wordSplit(value) {
+        return value.split(this._wordJoiners);
+    }
+    /**
+     * Wraps a line of text using the width of the Textbox and a context.
+     * @param {Array} line The grapheme array that represent the line
+     * @param {Number} lineIndex
+     * @param {Number} desiredWidth width you want to wrap the line to
+     * @param {Number} reservedSpace space to remove from wrapping for custom functionalities
+     * @returns {Array} Array of line(s) into which the given text is wrapped
+     * to.
+     */
+    _wrapLine(_line, lineIndex, desiredWidth, reservedSpace) {
+        var lineWidth = 0, splitByGrapheme = this.splitByGrapheme, graphemeLines = [], line = [], 
+        // spaces in different languages?
+        words = splitByGrapheme
+            ? this.graphemeSplit(_line)
+            : this.wordSplit(_line), word = '', offset = 0, infix = splitByGrapheme ? '' : ' ', wordWidth = 0, infixWidth = 0, largestWordWidth = 0, lineJustStarted = true, additionalSpace = this._getWidthOfCharSpacing(), reservedSpace = reservedSpace || 0;
+        // fix a difference between split and graphemeSplit
+        if (words.length === 0) {
+            words.push([]);
+        }
+        desiredWidth -= reservedSpace;
+        // measure words
+        const data = words.map(function (word) {
+            // if using splitByGrapheme words are already in graphemes.
+            word = splitByGrapheme ? word : this.graphemeSplit(word);
+            const width = this._measureWord(word, lineIndex, offset);
+            largestWordWidth = Math.max(width, largestWordWidth);
+            offset += word.length + 1;
+            return { word: word, width: width };
+        }.bind(this));
+        const maxWidth = Math.max(desiredWidth, largestWordWidth, this.dynamicMinWidth);
+        // layout words
+        offset = 0;
+        for (var i = 0; i < words.length; i++) {
+            word = data[i].word;
+            wordWidth = data[i].width;
+            offset += word.length;
+            lineWidth += infixWidth + wordWidth - additionalSpace;
+            if (lineWidth > maxWidth && !lineJustStarted) {
+                graphemeLines.push(line);
+                line = [];
+                lineWidth = wordWidth;
+                lineJustStarted = true;
+            }
+            else {
+                lineWidth += additionalSpace;
+            }
+            if (!lineJustStarted && !splitByGrapheme) {
+                line.push(infix);
+            }
+            line = line.concat(word);
+            infixWidth = splitByGrapheme
+                ? 0
+                : this._measureWord([infix], lineIndex, offset);
+            offset++;
+            lineJustStarted = false;
+        }
+        i && graphemeLines.push(line);
+        if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
+            this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
+        }
+        return graphemeLines;
+    }
+    /**
+     * Detect if the text line is ended with an hard break
+     * text and itext do not have wrapping, return false
+     * @param {Number} lineIndex text to split
+     * @return {Boolean}
+     */
+    isEndOfWrapping(lineIndex) {
+        if (!this._styleMap[lineIndex + 1]) {
+            // is last line, return true;
+            return true;
+        }
+        if (this._styleMap[lineIndex + 1].line !== this._styleMap[lineIndex].line) {
+            // this is last line before a line break, return true;
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Detect if a line has a linebreak and so we need to account for it when moving
+     * and counting style.
+     * @return Number
+     */
+    missingNewlineOffset(lineIndex) {
+        if (this.splitByGrapheme) {
+            return this.isEndOfWrapping(lineIndex) ? 1 : 0;
+        }
+        return 1;
+    }
+    /**
+     * Gets lines of text to render in the Textbox. This function calculates
+     * text wrapping on the fly every time it is called.
+     * @param {String} text text to split
+     * @returns {Array} Array of lines in the Textbox.
+     * @override
+     */
+    _splitTextIntoLines(text) {
+        const newText = super._splitTextIntoLines(text), graphemeLines = this._wrapText(newText.lines, this.width), lines = new Array(graphemeLines.length);
+        for (let i = 0; i < graphemeLines.length; i++) {
+            lines[i] = graphemeLines[i].join('');
+        }
+        newText.lines = lines;
+        newText.graphemeLines = graphemeLines;
+        return newText;
+    }
+    getMinWidth() {
+        return Math.max(this.minWidth, this.dynamicMinWidth);
+    }
+    _removeExtraneousStyles() {
+        const linesToKeep = {};
+        for (var prop in this._styleMap) {
+            if (this._textLines[prop]) {
+                linesToKeep[this._styleMap[prop].line] = 1;
+            }
+        }
+        for (var prop in this.styles) {
+            if (!linesToKeep[prop]) {
+                delete this.styles[prop];
+            }
+        }
+    }
+    /**
+     * Returns object representation of an instance
+     * @method toObject
+     * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+     * @return {Object} object representation of an instance
+     */
+    toObject(propertiesToInclude) {
+        return super.toObject(['minWidth', 'splitByGrapheme'].concat(propertiesToInclude));
+    }
+    /**
+     * Returns Textbox instance from an object representation
+     * @static
+     * @memberOf Textbox
+     * @param {Object} object Object to create an instance from
+     * @returns {Promise<Textbox>}
+     */
+    static fromObject(object) {
+        const styles = stylesFromArray(object.styles, object.text);
         //copy object to prevent mutation
-        var objCopy = Object.assign({}, object, { styles: styles });
-        return fabric.Object._fromObject(fabric.Textbox, objCopy, {
+        const objCopy = Object.assign({}, object, { styles: styles });
+        return FabricObject._fromObject(Textbox, objCopy, {
             extraParam: 'text',
         });
-    };
-})(typeof exports !== 'undefined' ? exports : window);
+    }
+}
+const textboxDefaultValues = {
+    type: 'textbox',
+    minWidth: 20,
+    dynamicMinWidth: 2,
+    lockScalingFlip: true,
+    noScaleCache: false,
+    _dimensionAffectingProps: textDefaultValues._dimensionAffectingProps.concat('width'),
+    _wordJoiners: /[ \t\r]/,
+    splitByGrapheme: false,
+};
+Object.assign(Textbox.prototype, textboxDefaultValues);
+fabric$3.Textbox = Textbox;
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 class Control {
@@ -27451,7 +27110,7 @@ class Control {
         }
     }
 }
-fabric$1.Control = Control;
+fabric$3.Control = Control;
 
 // @ts-nocheck
 const defaultControls = {
@@ -27531,13 +27190,13 @@ const textboxDefaultControls = Object.assign(Object.assign({}, defaultControls),
         actionName: 'resizing',
     }) });
 InteractiveFabricObject.prototype.controls = Object.assign(Object.assign({}, (InteractiveFabricObject.prototype.controls || {})), defaultControls);
-if (fabric$1.Textbox) {
+if (fabric$3.Textbox) {
     // this is breaking the prototype inheritance, no time / ideas to fix it.
     // is important to document that if you want to have all objects to have a
     // specific custom control, you have to add it to Object prototype and to Textbox
     // prototype. The controls are shared as references. So changes to control `tr`
     // can still apply to all objects if needed.
-    fabric$1.Textbox.prototype.controls = Object.assign(Object.assign({}, (fabric$1.Textbox.prototype.controls || {})), textboxDefaultControls);
+    fabric$3.Textbox.prototype.controls = Object.assign(Object.assign({}, (fabric$3.Textbox.prototype.controls || {})), textboxDefaultControls);
 }
 
 /**
@@ -27659,12 +27318,12 @@ class BaseBrush {
             pointer.y > this.canvas.getHeight());
     }
 }
-fabric$1.BaseBrush = BaseBrush;
+fabric$3.BaseBrush = BaseBrush;
 
 /**
  * @todo remove transient
  */
-const { Circle, Group: Group$1, Shadow: Shadow$2 } = fabric$1;
+const { Circle, Group: Group$1, Shadow: Shadow$2 } = fabric$3;
 class CircleBrush extends BaseBrush {
     constructor(canvas) {
         super(canvas);
@@ -27774,12 +27433,12 @@ class CircleBrush extends BaseBrush {
         return pointerPoint;
     }
 }
-fabric$1.CircleBrush = CircleBrush;
+fabric$3.CircleBrush = CircleBrush;
 
 /**
  * @todo remove transient
  */
-const { Path, Shadow: Shadow$1 } = fabric$1;
+const { Path, Shadow: Shadow$1 } = fabric$3;
 /**
  * @private
  * @param {PathData} pathData SVG path commands
@@ -28034,18 +27693,18 @@ class PencilBrush extends BaseBrush {
         this.canvas.fire('path:created', { path: path });
     }
 }
-fabric$1.PencilBrush = PencilBrush;
+fabric$3.PencilBrush = PencilBrush;
 
 /**
  * @todo remove transient
  */
-const { Pattern } = fabric$1;
+const { Pattern } = fabric$3;
 class PatternBrush extends PencilBrush {
     constructor(canvas) {
         super(canvas);
     }
     getPatternSrc() {
-        const dotWidth = 20, dotDistance = 5, patternCanvas = createCanvasElement(), patternCtx = patternCanvas.getContext('2d');
+        const dotWidth = 20, dotDistance = 5, patternCanvas = createCanvasElement$1(), patternCtx = patternCanvas.getContext('2d');
         patternCanvas.width = patternCanvas.height = dotWidth + dotDistance;
         if (patternCtx) {
             patternCtx.fillStyle = this.color;
@@ -28088,12 +27747,12 @@ class PatternBrush extends PencilBrush {
         return path;
     }
 }
-fabric$1.PatternBrush = PatternBrush;
+fabric$3.PatternBrush = PatternBrush;
 
 /**
  * @todo remove transient
  */
-const { Group, Rect, Shadow } = fabric$1;
+const { Group, Rect, Shadow } = fabric$3;
 /**
  *
  * @param rects
@@ -28262,5 +27921,5 @@ class SprayBrush extends BaseBrush {
         this.sprayChunks.push(this.sprayChunk);
     }
 }
-fabric$1.SprayBrush = SprayBrush;
+fabric$3.SprayBrush = SprayBrush;
 //# sourceMappingURL=fabric.js.map
