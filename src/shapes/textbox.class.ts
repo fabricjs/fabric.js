@@ -409,7 +409,7 @@ export class Textbox extends IText {
    * and counting style.
    * @return Number
    */
-  missingNewlineOffset(lineIndex) {
+  missingNewlineOffset(lineIndex: number) {
     if (this.splitByGrapheme) {
       return this.isEndOfWrapping(lineIndex) ? 1 : 0;
     }

@@ -1,38 +1,76 @@
-////@ts-nocheck
+//@ts-nocheck
 
 import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { TPointerEvent } from '../typedefs';
-import { addListener } from '../util/dom_event';
 import { ITextBehaviorMixin } from './itext_behavior.mixin';
 
 export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
   /**
    * For functionalities on keyDown
    * Map a special key to a function of the instance/prototype
-   * If you need different behaviour for ESC or TAB or arrows, you have to change
-   * this map setting the name of a function that you build on the fabric.Itext or
+   * If you need different behavior for ESC or TAB or arrows, you have to change
+   * this map setting the name of a function that you build on the IText or
    * your prototype.
    * the map change will affect all Instances unless you need for only some text Instances
    * in that case you have to clone this object and assign your Instance.
    * this.keysMap = Object.assign({}, this.keysMap);
-   * The function must be in fabric.Itext.prototype.myFunction And will receive event as args[0]
+   * The function must be in IText.prototype.myFunction And will receive event as args[0]
    */
-  keysMap;
+  keysMap: {
+    9: 'exitEditing';
+    27: 'exitEditing';
+    33: 'moveCursorUp';
+    34: 'moveCursorDown';
+    35: 'moveCursorRight';
+    36: 'moveCursorLeft';
+    37: 'moveCursorLeft';
+    38: 'moveCursorUp';
+    39: 'moveCursorRight';
+    40: 'moveCursorDown';
+  };
 
-  keysMapRtl;
+  keysMapRtl: {
+    9: 'exitEditing';
+    27: 'exitEditing';
+    33: 'moveCursorUp';
+    34: 'moveCursorDown';
+    35: 'moveCursorLeft';
+    36: 'moveCursorRight';
+    37: 'moveCursorRight';
+    38: 'moveCursorUp';
+    39: 'moveCursorLeft';
+    40: 'moveCursorDown';
+  };
 
   /**
    * For functionalities on keyUp + ctrl || cmd
    */
-  ctrlKeysMapUp;
+  ctrlKeysMapUp: {
+    67: 'copy';
+    88: 'cut';
+  };
 
   /**
    * For functionalities on keyDown + ctrl || cmd
    */
-  ctrlKeysMapDown;
+  ctrlKeysMapDown: {
+    65: 'selectAll';
+  };
+
+  /**
+   * DOM container to append the hiddenTextarea.
+   * An alternative to attaching to the document.body.
+   * Useful to reduce laggish redraw of the full document.body tree and
+   * also with modals event capturing that won't let the textarea take focus.
+   * @type HTMLElement
+   * @default
+   */
+  hiddenTextareaContainer?: HTMLElement | null;
+
   private _clickHandlerInitialized: boolean;
   private _copyDone: boolean;
+  private fromPaste: boolean;
 
   /**
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
@@ -99,9 +137,9 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
   /**
    * Handles keydown event
    * only used for arrows and combination of modifier keys.
-   * @param {TPointerEvent} e Event object
+   * @param {KeyboardEvent} e Event object
    */
-  onKeyDown(e: TPointerEvent) {
+  onKeyDown(e: KeyboardEvent) {
     if (!this.isEditing) {
       return;
     }
@@ -129,9 +167,9 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * Handles keyup event
    * We handle KeyUp because ie11 and edge have difficulties copy/pasting
    * if a copy/cut event fired, keyup is dismissed
-   * @param {TPointerEvent} e Event object
+   * @param {KeyboardEvent} e Event object
    */
-  onKeyUp(e: TPointerEvent) {
+  onKeyUp(e: KeyboardEvent) {
     if (!this.isEditing || this._copyDone || this.inCompositionMode) {
       this._copyDone = false;
       return;
@@ -148,9 +186,9 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
 
   /**
    * Handles onInput event
-   * @param {TPointerEvent} e Event object
+   * @param {Event} e Event object
    */
-  onInput(e: TPointerEvent) {
+  onInput(e: Event) {
     const fromPaste = this.fromPaste;
     this.fromPaste = false;
     e && e.stopPropagation();
@@ -307,10 +345,10 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
 
   /**
    * @private
-   * @param {TPointerEvent} e Event object
+   * @param {ClipboardEvent} e Event object
    * @return {Object} Clipboard data object
    */
-  _getClipboardData(e: TPointerEvent): object {
+  _getClipboardData(e: ClipboardEvent): object {
     return (e && e.clipboardData) || fabric.window.clipboardData;
   }
 
@@ -338,7 +376,7 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * @param {Boolean} isRight
    * @return {Number}
    */
-  getDownCursorOffset(e: TPointerEvent, isRight: boolean): number {
+  getDownCursorOffset(e: KeyboardEvent, isRight: boolean): number {
     const selectionProp = this._getSelectionForOffset(e, isRight),
       cursorLocation = this.get2DCursorLocation(selectionProp),
       lineIndex = cursorLocation.lineIndex;
@@ -366,11 +404,11 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
   /**
    * private
    * Helps finding if the offset should be counted from Start or End
-   * @param {TPointerEvent} e Event object
+   * @param {KeyboardEvent} e Event object
    * @param {Boolean} isRight
    * @return {Number}
    */
-  _getSelectionForOffset(e: TPointerEvent, isRight: boolean): number {
+  _getSelectionForOffset(e: KeyboardEvent, isRight: boolean): number {
     if (e.shiftKey && this.selectionStart !== this.selectionEnd && isRight) {
       return this.selectionEnd;
     } else {
@@ -379,11 +417,11 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
   }
 
   /**
-   * @param {TPointerEvent} e Event object
+   * @param {KeyboardEvent} e Event object
    * @param {Boolean} isRight
    * @return {Number}
    */
-  getUpCursorOffset(e: TPointerEvent, isRight: boolean): number {
+  getUpCursorOffset(e: KeyboardEvent, isRight: boolean): number {
     const selectionProp = this._getSelectionForOffset(e, isRight),
       cursorLocation = this.get2DCursorLocation(selectionProp),
       lineIndex = cursorLocation.lineIndex;
@@ -409,10 +447,10 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * for a given width it founds the matching character.
    * @private
    */
-  _getIndexOnLine(lineIndex, width) {
-    let line = this._textLines[lineIndex],
-      lineLeftOffset = this._getLineLeftOffset(lineIndex),
-      widthOfCharsOnLine = lineLeftOffset,
+  _getIndexOnLine(lineIndex: number, width: number) {
+    const line = this._textLines[lineIndex],
+      lineLeftOffset = this._getLineLeftOffset(lineIndex);
+    let widthOfCharsOnLine = lineLeftOffset,
       indexOnLine = 0,
       charWidth,
       foundMatch;
@@ -470,8 +508,8 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * @param {String} direction 'Up' or 'Down'
    * @param {TPointerEvent} e Event object
    */
-  _moveCursorUpOrDown(direction: string, e: TPointerEvent) {
-    const action = 'get' + direction + 'CursorOffset',
+  _moveCursorUpOrDown(direction: 'Up' | 'Down', e: TPointerEvent) {
+    const action = `get${direction}CursorOffset`,
       offset = this[action](e, this._selectionDirection === 'right');
     if (e.shiftKey) {
       this.moveCursorWithShift(offset);
@@ -713,11 +751,11 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
     }
     const graphemes = this.graphemeSplit(text);
     this.insertNewStyleBlock(graphemes, start, style);
-    this._text = [].concat(
-      this._text.slice(0, start),
-      graphemes,
-      this._text.slice(end)
-    );
+    this._text = [
+      ...this._text.slice(0, start),
+      ...graphemes,
+      ...this._text.slice(end),
+    ];
     this.text = this._text.join('');
     this.set('dirty', true);
     if (this._shouldClearDimensionCache()) {
@@ -727,42 +765,3 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
     this._removeExtraneousStyles();
   }
 }
-
-export const ITextKeyBehaviorMixinDefaultValues = {
-  keysMap: {
-    9: 'exitEditing',
-    27: 'exitEditing',
-    33: 'moveCursorUp',
-    34: 'moveCursorDown',
-    35: 'moveCursorRight',
-    36: 'moveCursorLeft',
-    37: 'moveCursorLeft',
-    38: 'moveCursorUp',
-    39: 'moveCursorRight',
-    40: 'moveCursorDown',
-  },
-  keysMapRtl: {
-    9: 'exitEditing',
-    27: 'exitEditing',
-    33: 'moveCursorUp',
-    34: 'moveCursorDown',
-    35: 'moveCursorLeft',
-    36: 'moveCursorRight',
-    37: 'moveCursorRight',
-    38: 'moveCursorUp',
-    39: 'moveCursorLeft',
-    40: 'moveCursorDown',
-  },
-  ctrlKeysMapUp: {
-    67: 'copy',
-    88: 'cut',
-  },
-  ctrlKeysMapDown: {
-    65: 'selectAll',
-  },
-};
-
-Object.assign(
-  ITextKeyBehaviorMixin.prototype,
-  ITextKeyBehaviorMixinDefaultValues
-);

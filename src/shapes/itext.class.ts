@@ -137,16 +137,6 @@ export class IText extends Text {
   caching: boolean;
 
   /**
-   * DOM container to append the hiddenTextarea.
-   * An alternative to attaching to the document.body.
-   * Useful to reduce laggish redraw of the full document.body tree and
-   * also with modals event capturing that won't let the textarea take focus.
-   * @type HTMLElement
-   * @default
-   */
-  hiddenTextareaContainer?: HTMLElement | null;
-
-  /**
    * @private
    */
   _reSpace: RegExp;

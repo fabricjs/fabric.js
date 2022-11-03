@@ -217,7 +217,7 @@ export abstract class ITextBehaviorMixin extends Text {
   /**
    * Initializes delayed cursor
    */
-  initDelayedCursor(restart) {
+  initDelayedCursor(restart?: boolean) {
     const delay = restart ? 0 : this.cursorDelay;
 
     this.abortCursorAnimation();
