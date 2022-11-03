@@ -1,6 +1,13 @@
 (function() {
 
-  QUnit.module('fabric.Text');
+  QUnit.module('fabric.Text', {
+    before() {
+      fabric.config.configure({ NUM_FRACTION_DIGITS: 2 });
+    },
+    after() {
+      fabric.config.restoreDefaults();
+    }
+  });
 
   function createTextObject(text) {
     return new fabric.Text(text || 'x');
