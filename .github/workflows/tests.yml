@@ -67,11 +67,12 @@ jobs:
           delete-old-comments: true
           update-comment: true
       - name: Rename artifact (*node > *node${{ matrix.node-version }})
-        if: always()
+        if: failure()
         run: |
-          mv cli_output/test_results/visual/node cli_output/test_results/visual/node${{ matrix.node-version }}
           mv cli_output/test_results/visual/node.txt cli_output/test_results/visual/node${{ matrix.node-version }}.txt
           mv cli_output/test_results/unit/node.txt cli_output/test_results/unit/node${{ matrix.node-version }}.txt
+          src=cli_output/test_results/visual/node
+          [ ! -d $src ] || mv $src $src${{ matrix.node-version }}
       - name: Archive visual test results
         if: failure()
         uses: actions/upload-artifact@v3
