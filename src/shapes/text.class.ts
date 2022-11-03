@@ -272,14 +272,6 @@ export class Text extends TextStyleMixin {
   charSpacing: number;
 
   /**
-   * Object containing character styles - top-level properties -> line numbers,
-   * 2nd-level properties - character numbers
-   * @type Object
-   * @default
-   */
-  styles: object;
-
-  /**
    * Reference to a context to measure text char or couple of chars
    * the cacheContext of the canvas will be used or a freshly created one if the object is not on canvas
    * once created it will be referenced on fabric._measuringContext to avoid creating a canvas for every
