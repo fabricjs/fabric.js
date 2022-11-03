@@ -276,6 +276,18 @@ export class IText extends Text {
   }
 
   /**
+   * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start)
+   * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
+   * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. useful to manage styles.
+   */
+  get2DCursorLocation(
+    selectionStart = this.selectionStart,
+    skipWrapping?: boolean
+  ) {
+    return super.get2DCursorLocation(selectionStart, skipWrapping);
+  }
+
+  /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
