@@ -1740,6 +1740,16 @@ export class Text extends TextStyleMixin {
     return 1;
   }
 
+  static genericFonts = [
+    'sans-serif',
+    'serif',
+    'cursive',
+    'fantasy',
+    'monospace',
+  ];
+
+  /* _FROM_SVG_START_ */
+
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link Text.fromElement})
    * @static
@@ -1751,14 +1761,6 @@ export class Text extends TextStyleMixin {
       ' '
     )
   );
-
-  static genericFonts = [
-    'sans-serif',
-    'serif',
-    'cursive',
-    'fantasy',
-    'monospace',
-  ];
 
   /**
    * Returns Text instance from an SVG element (<b>not yet implemented</b>)
@@ -1856,6 +1858,8 @@ export class Text extends TextStyleMixin {
     callback(text);
   }
 
+  /* _FROM_SVG_END_ */
+
   /**
    * Returns Text instance from an object representation
    * @static
@@ -1952,9 +1956,5 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
 };
 
 Object.assign(Text.prototype, textDefaultValues);
-
-/* _FROM_SVG_START_ */
-
-/* _FROM_SVG_END_ */
 
 fabric.Text = Text;
