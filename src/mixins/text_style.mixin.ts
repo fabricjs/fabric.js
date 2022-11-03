@@ -97,7 +97,10 @@ export abstract class TextStyleMixin extends FabricObject {
       letterCount = 0;
       for (const p2 in obj[p1]) {
         const styleObject = obj[p1][p2],
-          stylePropertyHasBeenSet = Object.hasOwn(styleObject, property);
+          stylePropertyHasBeenSet = Object.prototype.hasOwnProperty.call(
+            styleObject,
+            property
+          );
 
         stylesCount++;
 
