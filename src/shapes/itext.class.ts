@@ -1,6 +1,6 @@
 ////@ts-nocheck
 import { fabric } from '../../HEADER';
-import { StyledText } from '../mixins/text_style.mixin';
+import { TextStyleMixin } from '../mixins/text_style.mixin';
 import { TClassProperties } from '../typedefs';
 import { stylesFromArray } from '../util/misc/textStyles';
 import { FabricObject } from './fabricObject.class';
@@ -55,7 +55,7 @@ import { FabricObject } from './fabricObject.class';
  *   Select line:                    triple click
  * </pre>
  */
-export class IText extends StyledText {
+export class IText extends Text {
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number
@@ -243,6 +243,36 @@ export class IText extends StyledText {
     this.isEditing && this.initDelayedCursor();
     this.clearContextTop();
     super.initDimensions();
+  }
+
+  /**
+   * Gets style of a current selection/cursor (at the start position)
+   * if startIndex or endIndex are not provided, selectionStart or selectionEnd will be used.
+   * @param {Number} startIndex Start index to get styles at
+   * @param {Number} endIndex End index to get styles at, if not specified selectionEnd or startIndex + 1
+   * @param {Boolean} [complete] get full style or not
+   * @return {Array} styles an array with one, zero or more Style objects
+   */
+  getSelectionStyles(
+    startIndex: number = this.selectionStart || 0,
+    endIndex: number = this.selectionEnd,
+    complete?: boolean
+  ) {
+    return super.getSelectionStyles(startIndex, endIndex, complete);
+  }
+
+  /**
+   * Sets style of a current selection, if no selection exist, do not set anything.
+   * @param {Object} [styles] Styles object
+   * @param {Number} [startIndex] Start index to get styles at
+   * @param {Number} [endIndex] End index to get styles at, if not specified selectionEnd or startIndex + 1
+   */
+  setSelectionStyles(
+    styles: object,
+    startIndex: number = this.selectionStart || 0,
+    endIndex: number = this.selectionEnd
+  ) {
+    return super.setSelectionStyles(styles, startIndex, endIndex);
   }
 
   /**
