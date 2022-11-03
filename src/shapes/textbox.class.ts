@@ -123,7 +123,7 @@ export class Textbox extends IText {
         lineIndex = map.line;
       }
     }
-    return this.styleHas(property, lineIndex);
+    return super.styleHas(property, lineIndex);
   }
 
   /**
@@ -423,8 +423,8 @@ export class Textbox extends IText {
    * @returns {Array} Array of lines in the Textbox.
    * @override
    */
-  _splitTextIntoLines(text: string): Array<any> {
-    const newText = this._splitTextIntoLines(text),
+  _splitTextIntoLines(text: string) {
+    const newText = super._splitTextIntoLines(text),
       graphemeLines = this._wrapText(newText.lines, this.width),
       lines = new Array(graphemeLines.length);
     for (let i = 0; i < graphemeLines.length; i++) {
