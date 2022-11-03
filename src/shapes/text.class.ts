@@ -1349,7 +1349,7 @@ export class Text extends TextStyleMixin {
    * @param {Number} end selection end
    */
   setSuperscript(start: number, end: number) {
-    return this._setScript(start, end, this.superscript);
+    this._setScript(start, end, this.superscript);
   }
 
   /**
@@ -1358,7 +1358,7 @@ export class Text extends TextStyleMixin {
    * @param {Number} end selection end
    */
   setSubscript(start: number, end: number) {
-    return this._setScript(start, end, this.subscript);
+    this._setScript(start, end, this.subscript);
   }
 
   /**
@@ -1368,7 +1368,7 @@ export class Text extends TextStyleMixin {
    * @param {Number} end selection end
    * @param {Number} schema
    */
-  _setScript(start: number, end: number, schema: number) {
+  protected _setScript(start: number, end: number, schema: number) {
     const loc = this.get2DCursorLocation(start, true),
       fontSize = this.getValueOfPropertyAt(
         loc.lineIndex,
