@@ -5,6 +5,7 @@ import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { TextStyleMixin } from '../mixins/text_style.mixin';
 import { TClassProperties } from '../typedefs';
+import { graphemeSplit } from '../util/lang_string';
 import { createCanvasElement } from '../util/misc/dom';
 import {
   hasStyleChanged,
@@ -13,6 +14,19 @@ import {
 } from '../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
 import { FabricObject } from './fabricObject.class';
+
+/**
+ * Measure and return the info of a single grapheme.
+ * needs the the info of previous graphemes already filled
+ * Override to customize measuring
+ */
+export type GraphemeBBox = {
+  width: number;
+  height: number;
+  kernedWidth: number;
+  left: number;
+  deltaY: number;
+};
 
 const additionalProps = [
   'fontFamily',
@@ -327,10 +341,8 @@ export class Text extends TextStyleMixin {
    * @return {Text} thisArg
    */
   constructor(text: string, options: object): Text {
-    this.styles = options ? options.styles || {} : {};
-    this.text = text;
-    this.__skipDimension = true;
-    super(options);
+    // this.__skipDimension = true;
+    super({ ...options, text, styles: options?.styles || {} });
     if (this.path) {
       this.setPathInfo();
     }
@@ -338,9 +350,6 @@ export class Text extends TextStyleMixin {
     this.initDimensions();
     this.setCoords();
     this.setupState({ propertySet: '_dimensionAffectingProps' });
-  }
-  setupState(arg0: { propertySet: string }) {
-    throw new Error('Method not implemented.');
   }
 
   /**
@@ -410,9 +419,6 @@ export class Text extends TextStyleMixin {
       this.enlargeSpaces();
     }
     this.saveState({ propertySet: '_dimensionAffectingProps' });
-  }
-  saveState(arg0: { propertySet: string }) {
-    throw new Error('Method not implemented.');
   }
 
   /**
@@ -729,9 +735,6 @@ export class Text extends TextStyleMixin {
     // other shadows should be casted
     this._removeShadow(ctx);
   }
-  styleHas(arg0: string) {
-    throw new Error('Method not implemented.');
-  }
 
   /**
    * measure and return the width of a single character.
@@ -797,9 +800,6 @@ export class Text extends TextStyleMixin {
       width: width * fontMultiplier,
       kernedWidth: kernedWidth * fontMultiplier,
     };
-  }
-  measureText(_char: string) {
-    throw new Error('Method not implemented.');
   }
 
   /**
@@ -927,16 +927,6 @@ export class Text extends TextStyleMixin {
   }
 
   /**
-   * Measure and return the info of a single grapheme.
-   * needs the the info of previous graphemes already filled
-   * Override to customize measuring
-   *
-   * @typedef {object} GraphemeBBox
-   * @property {number} width
-   * @property {number} height
-   * @property {number} kernedWidth
-   * @property {number} left
-   * @property {number} deltaY
    *
    * @param {String} grapheme to be measured
    * @param {Number} lineIndex index of the line where the char is
@@ -949,14 +939,14 @@ export class Text extends TextStyleMixin {
     lineIndex: number,
     charIndex: number,
     prevGrapheme: string,
-    skipLef
+    skipLeft
   ): GraphemeBBox {
-    let style = this.getCompleteStyleDeclaration(lineIndex, charIndex),
+    const style = this.getCompleteStyleDeclaration(lineIndex, charIndex),
       prevStyle = prevGrapheme
         ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1)
         : {},
-      info = this._measureChar(grapheme, style, prevGrapheme, prevStyle),
-      kernedWidth = info.kernedWidth,
+      info = this._measureChar(grapheme, style, prevGrapheme, prevStyle);
+    let kernedWidth = info.kernedWidth,
       width = info.width,
       charSpacing;
 
@@ -966,7 +956,7 @@ export class Text extends TextStyleMixin {
       kernedWidth += charSpacing;
     }
 
-    const box = {
+    const box: GraphemeBBox = {
       width: width,
       left: 0,
       height: style.fontSize,
@@ -979,9 +969,6 @@ export class Text extends TextStyleMixin {
         previousBox.left + previousBox.width + info.kernedWidth - info.width;
     }
     return box;
-  }
-  getCompleteStyleDeclaration(lineIndex: number, charIndex: number) {
-    throw new Error('Method not implemented.');
   }
 
   /**
@@ -1093,9 +1080,6 @@ export class Text extends TextStyleMixin {
     this._renderTextCommon(ctx, 'strokeText');
     ctx.closePath();
     ctx.restore();
-  }
-  isEmptyStyles() {
-    throw new Error('Method not implemented.');
   }
 
   /**
@@ -1351,9 +1335,6 @@ export class Text extends TextStyleMixin {
       );
     ctx.restore();
   }
-  _getStyleDeclaration(lineIndex: number, charIndex: number) {
-    throw new Error('Method not implemented.');
-  }
 
   /**
    * Turns the character into a 'superior figure' (i.e. 'superscript')
@@ -1400,13 +1381,6 @@ export class Text extends TextStyleMixin {
       };
     this.setSelectionStyles(style, start, end);
     return this;
-  }
-  setSelectionStyles(
-    style: { fontSize: number; deltaY: any },
-    start: number,
-    end: number
-  ) {
-    throw new Error('Method not implemented.');
   }
 
   /**
@@ -1479,9 +1453,6 @@ export class Text extends TextStyleMixin {
       this._forceClearCache = false;
     }
     return shouldClear;
-  }
-  hasStateChanged(arg0: string): any {
-    throw new Error('Method not implemented.');
   }
 
   /**
@@ -1693,7 +1664,7 @@ export class Text extends TextStyleMixin {
    * @returns {string[]} array of graphemes
    */
   graphemeSplit(value: string): string[] {
-    return string.graphemeSplit(value);
+    return graphemeSplit(value);
   }
 
   /**
