@@ -1,7 +1,11 @@
+import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
 import { Text } from '../shapes/text.class';
-import { TEvent } from '../typedefs';
+import { TEvent, TPointerEvent } from '../typedefs';
+import { setStyle } from '../util/dom_style';
 import { removeFromArray } from '../util/internals';
+import { createCanvasElement } from '../util/misc/dom';
+import { transformPoint } from '../util/misc/matrix';
 import { Canvas } from '../__types__';
 
 // extend this regex to support non english languages
@@ -10,17 +14,23 @@ const reNonWord = /[ \n\.,;!\?\-]/;
 export abstract class ITextBehaviorMixin extends Text {
   isEditing: boolean;
   selected: boolean;
-  private _currentTickState: { isAborted: boolean; abort: () => void };
-  private _cursorTimeout1: number;
-  private _currentTickCompleteState: { isAborted: boolean; abort: () => void };
   cursorDelay: number;
-  private _cursorTimeout2: number;
-  _currentCursorOpacity: number;
   selectionStart: number;
   selectionEnd: number;
-  _reSpace: RegExp;
+  cursorDuration: number;
   editable: boolean;
-  hiddenTextarea: HTMLTextAreaElement;
+  editingBorderColor: string;
+  inCompositionMode: boolean;
+  compositionStart: number;
+  compositionEnd: number;
+
+  abstract hiddenTextarea: HTMLTextAreaElement;
+  protected _reSpace: RegExp;
+  private _currentTickState: { isAborted: boolean; abort: () => void };
+  private _cursorTimeout1: number;
+  private _cursorTimeout2: number;
+  private _currentTickCompleteState: { isAborted: boolean; abort: () => void };
+  protected _currentCursorOpacity: number;
   private _textBeforeEdit: string;
   protected __isMousedown: boolean;
   protected __selectionStartOnMouseDown: number;
@@ -33,23 +43,34 @@ export abstract class ITextBehaviorMixin extends Text {
   };
   protected __isDraggingOver: boolean;
   protected __lastSelected: boolean;
-  editingBorderColor: string;
-  cursorOffsetCache: { left?: number; top?: number } = {};
-  inCompositionMode: boolean;
-  compositionStart: number;
+  protected cursorOffsetCache: { left?: number; top?: number } = {};
   protected _savedProps: {
     hasControls: boolean;
     borderColor: string;
     lockMovementX: boolean;
     lockMovementY: boolean;
     selectable: boolean;
-    hoverCursor: string;
+    hoverCursor: string | null;
     defaultCursor: string;
     moveCursor: string;
   };
   protected _selectionDirection: 'left' | 'right' | null;
 
   abstract initHiddenTextarea(): void;
+  abstract initCursorSelectionHandlers(): void;
+  abstract initDoubleClickSimulation(): void;
+  abstract _fireSelectionChanged(): void;
+  abstract renderCursorOrSelection(): void;
+  abstract getSelectionStartFromPointer(e: TPointerEvent): number;
+  abstract _getCursorBoundaries(
+    index: number,
+    skipCaching: boolean
+  ): {
+    left: number;
+    top: number;
+    leftOffset: number;
+    topOffset: number;
+  };
 
   /**
    * Initializes all the interactive behavior of IText
@@ -425,9 +446,9 @@ export abstract class ITextBehaviorMixin extends Text {
     return this;
   }
 
-  exitEditingOnOthers(canvas) {
+  exitEditingOnOthers(canvas: Canvas) {
     if (canvas._iTextInstances) {
-      canvas._iTextInstances.forEach(function (obj) {
+      canvas._iTextInstances.forEach((obj) => {
         obj.selected = false;
         if (obj.isEditing) {
           obj.exitEditing();

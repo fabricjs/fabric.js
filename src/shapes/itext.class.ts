@@ -347,7 +347,7 @@ export class IText extends Text {
    * @param {number} [index] index from start
    * @param {boolean} [skipCaching]
    */
-  _getCursorBoundaries(index: number, skipCaching: boolean) {
+  _getCursorBoundaries(index: number, skipCaching?: boolean) {
     if (typeof index === 'undefined') {
       index = this.selectionStart;
     }
@@ -368,7 +368,7 @@ export class IText extends Text {
    * @param {number} index index from start
    * @param {boolean} [skipCaching]
    */
-  _getCursorBoundariesOffsets(index: number, skipCaching: boolean) {
+  _getCursorBoundariesOffsets(index: number, skipCaching?: boolean) {
     if (skipCaching) {
       return this.__getCursorBoundariesOffsets(index);
     }

@@ -6,7 +6,7 @@ import { TPointerEvent } from '../typedefs';
 import { addListener } from '../util/dom_event';
 import { ITextBehaviorMixin } from './itext_behavior.mixin';
 
-export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
+export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
   /**
    * For functionalities on keyDown
    * Map a special key to a function of the instance/prototype
@@ -31,6 +31,8 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * For functionalities on keyDown + ctrl || cmd
    */
   ctrlKeysMapDown;
+  private _clickHandlerInitialized: boolean;
+  private _copyDone: boolean;
 
   /**
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
@@ -54,31 +56,31 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
       fabric.document.body.appendChild(this.hiddenTextarea);
     }
 
-    addListener(this.hiddenTextarea, 'blur', this.blur.bind(this));
-    addListener(this.hiddenTextarea, 'keydown', this.onKeyDown.bind(this));
-    addListener(this.hiddenTextarea, 'keyup', this.onKeyUp.bind(this));
-    addListener(this.hiddenTextarea, 'input', this.onInput.bind(this));
-    addListener(this.hiddenTextarea, 'copy', this.copy.bind(this));
-    addListener(this.hiddenTextarea, 'cut', this.copy.bind(this));
-    addListener(this.hiddenTextarea, 'paste', this.paste.bind(this));
-    addListener(
-      this.hiddenTextarea,
+    this.hiddenTextarea.addEventListener('blur', this.blur.bind(this));
+    this.hiddenTextarea.addEventListener('keydown', this.onKeyDown.bind(this));
+    this.hiddenTextarea.addEventListener('keyup', this.onKeyUp.bind(this));
+    this.hiddenTextarea.addEventListener('input', this.onInput.bind(this));
+    this.hiddenTextarea.addEventListener('copy', this.copy.bind(this));
+    this.hiddenTextarea.addEventListener('cut', this.copy.bind(this));
+    this.hiddenTextarea.addEventListener('paste', this.paste.bind(this));
+    this.hiddenTextarea.addEventListener(
       'compositionstart',
       this.onCompositionStart.bind(this)
     );
-    addListener(
-      this.hiddenTextarea,
+    this.hiddenTextarea.addEventListener(
       'compositionupdate',
       this.onCompositionUpdate.bind(this)
     );
-    addListener(
-      this.hiddenTextarea,
+    this.hiddenTextarea.addEventListener(
       'compositionend',
       this.onCompositionEnd.bind(this)
     );
 
     if (!this._clickHandlerInitialized && this.canvas) {
-      addListener(this.canvas.upperCanvasEl, 'click', this.onClick.bind(this));
+      this.canvas.upperCanvasEl.addEventListener(
+        'click',
+        this.onClick.bind(this)
+      );
       this._clickHandlerInitialized = true;
     }
   }
@@ -103,7 +105,7 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
     if (!this.isEditing) {
       return;
     }
-    var keyMap = this.direction === 'rtl' ? this.keysMapRtl : this.keysMap;
+    const keyMap = this.direction === 'rtl' ? this.keysMapRtl : this.keysMap;
     if (e.keyCode in keyMap) {
       this[keyMap[e.keyCode]](e);
     } else if (e.keyCode in this.ctrlKeysMapDown && (e.ctrlKey || e.metaKey)) {
@@ -149,25 +151,24 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * @param {TPointerEvent} e Event object
    */
   onInput(e: TPointerEvent) {
-    var fromPaste = this.fromPaste;
+    const fromPaste = this.fromPaste;
     this.fromPaste = false;
     e && e.stopPropagation();
     if (!this.isEditing) {
       return;
     }
     // decisions about style changes.
-    var nextText = this._splitTextIntoLines(
+    const nextText = this._splitTextIntoLines(
         this.hiddenTextarea.value
       ).graphemeText,
       charCount = this._text.length,
       nextCharCount = nextText.length,
-      removedText,
-      insertedText,
-      charDiff = nextCharCount - charCount,
       selectionStart = this.selectionStart,
       selectionEnd = this.selectionEnd,
-      selection = selectionStart !== selectionEnd,
-      copiedStyle,
+      selection = selectionStart !== selectionEnd;
+    let copiedStyle,
+      removedText,
+      charDiff = nextCharCount - charCount,
       removeFrom,
       removeTo;
     if (this.hiddenTextarea.value === '') {
@@ -181,12 +182,12 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
       return;
     }
 
-    var textareaSelection = this.fromStringToGraphemeSelection(
+    const textareaSelection = this.fromStringToGraphemeSelection(
       this.hiddenTextarea.selectionStart,
       this.hiddenTextarea.selectionEnd,
       this.hiddenTextarea.value
     );
-    var backDelete = selectionStart > textareaSelection.selectionStart;
+    const backDelete = selectionStart > textareaSelection.selectionStart;
 
     if (selection) {
       removedText = this._text.slice(selectionStart, selectionEnd);
@@ -201,7 +202,7 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
         );
       }
     }
-    insertedText = nextText.slice(
+    const insertedText = nextText.slice(
       textareaSelection.selectionEnd - charDiff,
       textareaSelection.selectionEnd
     );
@@ -216,11 +217,12 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
           false
         );
         // now duplicate the style one for each inserted text.
-        copiedStyle = insertedText.map(function () {
-          // this return an array of references, but that is fine since we are
-          // copying the style later.
-          return copiedStyle[0];
-        });
+        copiedStyle = insertedText.map(
+          () =>
+            // this return an array of references, but that is fine since we are
+            // copying the style later.
+            copiedStyle[0]
+        );
       }
       if (selection) {
         removeFrom = selectionStart;
@@ -320,7 +322,7 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * @return {Number} widthBeforeCursor width before cursor
    */
   _getWidthBeforeCursor(lineIndex: number, charIndex: number): number {
-    var widthBeforeCursor = this._getLineLeftOffset(lineIndex),
+    let widthBeforeCursor = this._getLineLeftOffset(lineIndex),
       bound;
 
     if (charIndex > 0) {
@@ -337,7 +339,7 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * @return {Number}
    */
   getDownCursorOffset(e: TPointerEvent, isRight: boolean): number {
-    var selectionProp = this._getSelectionForOffset(e, isRight),
+    const selectionProp = this._getSelectionForOffset(e, isRight),
       cursorLocation = this.get2DCursorLocation(selectionProp),
       lineIndex = cursorLocation.lineIndex;
     // if on last line, down cursor goes to end of line
@@ -349,7 +351,7 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
       // move to the end of a text
       return this._text.length - selectionProp;
     }
-    var charIndex = cursorLocation.charIndex,
+    const charIndex = cursorLocation.charIndex,
       widthBeforeCursor = this._getWidthBeforeCursor(lineIndex, charIndex),
       indexOnOtherLine = this._getIndexOnLine(lineIndex + 1, widthBeforeCursor),
       textAfterCursor = this._textLines[lineIndex].slice(charIndex);
@@ -382,14 +384,14 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * @return {Number}
    */
   getUpCursorOffset(e: TPointerEvent, isRight: boolean): number {
-    var selectionProp = this._getSelectionForOffset(e, isRight),
+    const selectionProp = this._getSelectionForOffset(e, isRight),
       cursorLocation = this.get2DCursorLocation(selectionProp),
       lineIndex = cursorLocation.lineIndex;
     if (lineIndex === 0 || e.metaKey || e.keyCode === 33) {
       // if on first line, up cursor goes to start of line
       return -selectionProp;
     }
-    var charIndex = cursorLocation.charIndex,
+    const charIndex = cursorLocation.charIndex,
       widthBeforeCursor = this._getWidthBeforeCursor(lineIndex, charIndex),
       indexOnOtherLine = this._getIndexOnLine(lineIndex - 1, widthBeforeCursor),
       textBeforeCursor = this._textLines[lineIndex].slice(0, charIndex),
@@ -408,19 +410,19 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * @private
    */
   _getIndexOnLine(lineIndex, width) {
-    var line = this._textLines[lineIndex],
+    let line = this._textLines[lineIndex],
       lineLeftOffset = this._getLineLeftOffset(lineIndex),
       widthOfCharsOnLine = lineLeftOffset,
       indexOnLine = 0,
       charWidth,
       foundMatch;
 
-    for (var j = 0, jlen = line.length; j < jlen; j++) {
+    for (let j = 0, jlen = line.length; j < jlen; j++) {
       charWidth = this.__charBounds[lineIndex][j].width;
       widthOfCharsOnLine += charWidth;
       if (widthOfCharsOnLine > width) {
         foundMatch = true;
-        var leftEdge = widthOfCharsOnLine - charWidth,
+        const leftEdge = widthOfCharsOnLine - charWidth,
           rightEdge = widthOfCharsOnLine,
           offsetFromLeftEdge = Math.abs(leftEdge - width),
           offsetFromRightEdge = Math.abs(rightEdge - width);
@@ -469,7 +471,7 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * @param {TPointerEvent} e Event object
    */
   _moveCursorUpOrDown(direction: string, e: TPointerEvent) {
-    var action = 'get' + direction + 'CursorOffset',
+    const action = 'get' + direction + 'CursorOffset',
       offset = this[action](e, this._selectionDirection === 'right');
     if (e.shiftKey) {
       this.moveCursorWithShift(offset);
@@ -491,7 +493,7 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * @param {Number} offset
    */
   moveCursorWithShift(offset: number) {
-    var newSelection =
+    const newSelection =
       this._selectionDirection === 'left'
         ? this.selectionStart + offset
         : this.selectionEnd + offset;
@@ -534,7 +536,7 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * @return {Boolean} true if a change happened
    */
   _move(e, prop, direction): boolean {
-    var newValue;
+    let newValue;
     if (e.altKey) {
       newValue = this['findWordBoundary' + direction](this[prop]);
     } else if (e.metaKey || e.keyCode === 35 || e.keyCode === 36) {
@@ -568,7 +570,7 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * @param {TPointerEvent} e
    */
   moveCursorLeftWithoutShift(e: TPointerEvent) {
-    var change = true;
+    let change = true;
     this._selectionDirection = 'left';
 
     // only move cursor when there is no selection,
@@ -619,7 +621,7 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * @param {TPointerEvent} e Event object
    */
   _moveCursorLeftOrRight(direction: string, e: TPointerEvent) {
-    var actionName = 'moveCursor' + direction + 'With';
+    let actionName = 'moveCursor' + direction + 'With';
     this._currentCursorOpacity = 1;
 
     if (e.shiftKey) {
@@ -656,7 +658,7 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * @param {TPointerEvent} e Event object
    */
   moveCursorRightWithoutShift(e: TPointerEvent) {
-    var changed = true;
+    let changed = true;
     this._selectionDirection = 'right';
 
     if (this.selectionStart === this.selectionEnd) {
@@ -709,7 +711,7 @@ export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
     if (end > start) {
       this.removeStyleFromTo(start, end);
     }
-    var graphemes = this.graphemeSplit(text);
+    const graphemes = this.graphemeSplit(text);
     this.insertNewStyleBlock(graphemes, start, style);
     this._text = [].concat(
       this._text.slice(0, start),
