@@ -1,15 +1,16 @@
-//// @ts-nocheck
-
 import { FabricObject } from '../shapes/fabricObject.class';
-import { TClassProperties } from '../typedefs';
 
-export abstract class StyledText extends FabricObject {
-  abstract styles: {
-    [line: number]: { [char: number]: Partial<TClassProperties<this>> };
-  };
-  protected abstract _textLines: any;
+type TextStyleDeclaration = Record<string, any>;
+
+export type TextStyle = {
+  [line: number | string]: { [char: number | string]: TextStyleDeclaration };
+};
+
+export abstract class TextStyleMixin extends FabricObject {
+  abstract styles: TextStyle;
+  protected abstract _textLines: string[][];
   protected abstract _forceClearCache: boolean;
-  protected abstract _styleProperties: Partial<TClassProperties<this>>[];
+  protected abstract _styleProperties: string[];
   abstract get2DCursorLocation(
     selectionStart: number,
     skipWrapping?: boolean
@@ -92,13 +93,11 @@ export abstract class StyledText extends FabricObject {
       stylePropertyValue,
       allStyleObjectPropertiesMatch = true,
       graphemeCount = 0;
-    // eslint-disable-next-line
     for (const p1 in obj) {
       letterCount = 0;
-      // eslint-disable-next-line
       for (const p2 in obj[p1]) {
         const styleObject = obj[p1][p2],
-          stylePropertyHasBeenSet = styleObject.hasOwnProperty(property);
+          stylePropertyHasBeenSet = Object.hasOwn(styleObject, property);
 
         stylesCount++;
 
@@ -109,7 +108,7 @@ export abstract class StyledText extends FabricObject {
             allStyleObjectPropertiesMatch = false;
           }
 
-          if (styleObject[property] === this[property]) {
+          if (styleObject[property] === this[property as keyof this]) {
             delete styleObject[property];
           }
         } else {
@@ -133,7 +132,7 @@ export abstract class StyledText extends FabricObject {
       graphemeCount += this._textLines[i].length;
     }
     if (allStyleObjectPropertiesMatch && stylesCount === graphemeCount) {
-      this[property] = stylePropertyValue;
+      this[property as keyof this] = stylePropertyValue;
       this.removeStyle(property);
     }
   }
@@ -149,10 +148,8 @@ export abstract class StyledText extends FabricObject {
     if (!this.styles || !property || property === '') {
       return;
     }
-    let obj = this.styles,
-      line,
-      lineNum,
-      charNum;
+    const obj = this.styles;
+    let line, lineNum, charNum;
     for (lineNum in obj) {
       line = obj[lineNum];
       for (charNum in line) {
@@ -167,22 +164,19 @@ export abstract class StyledText extends FabricObject {
     }
   }
 
-  /**
-   * @private
-   */
-  _extendStyles(index: number, styles) {
-    const loc = this.get2DCursorLocation(index);
+  private _extendStyles(index: number, styles: TextStyleDeclaration) {
+    const { lineIndex, charIndex } = this.get2DCursorLocation(index);
 
-    if (!this._getLineStyle(loc.lineIndex)) {
-      this._setLineStyle(loc.lineIndex);
+    if (!this._getLineStyle(lineIndex)) {
+      this._setLineStyle(lineIndex);
     }
 
-    if (!this._getStyleDeclaration(loc.lineIndex, loc.charIndex)) {
-      this._setStyleDeclaration(loc.lineIndex, loc.charIndex, {});
+    if (!this._getStyleDeclaration(lineIndex, charIndex)) {
+      this._setStyleDeclaration(lineIndex, charIndex, {});
     }
 
     return Object.assign(
-      this._getStyleDeclaration(loc.lineIndex, loc.charIndex),
+      this._getStyleDeclaration(lineIndex, charIndex) || {},
       styles
     );
   }
@@ -198,8 +192,8 @@ export abstract class StyledText extends FabricObject {
     startIndex: number,
     endIndex?: number,
     complete?: boolean
-  ): Array<any> {
-    const styles = [];
+  ) {
+    const styles: TextStyleDeclaration[] = [];
     for (let i = startIndex; i < (endIndex || startIndex); i++) {
       styles.push(this.getStyleAtPosition(i, complete));
     }
@@ -213,12 +207,13 @@ export abstract class StyledText extends FabricObject {
    * @return {Object} style Style object at a specified index
    * @private
    */
-  getStyleAtPosition(position: number, complete?: boolean): object {
-    const loc = this.get2DCursorLocation(position),
-      style = complete
-        ? this.getCompleteStyleDeclaration(loc.lineIndex, loc.charIndex)
-        : this._getStyleDeclaration(loc.lineIndex, loc.charIndex);
-    return style || {};
+  getStyleAtPosition(position: number, complete?: boolean) {
+    const { lineIndex, charIndex } = this.get2DCursorLocation(position);
+    return (
+      (complete
+        ? this.getCompleteStyleDeclaration(lineIndex, charIndex)
+        : this._getStyleDeclaration(lineIndex, charIndex)) || {}
+    );
   }
 
   /**
@@ -256,13 +251,15 @@ export abstract class StyledText extends FabricObject {
    * @param {Number} charIndex position of the character on the line
    * @return {Object} style object
    */
-  getCompleteStyleDeclaration(lineIndex: number, charIndex: number): object {
+  getCompleteStyleDeclaration(lineIndex: number, charIndex: number) {
     const style = this._getStyleDeclaration(lineIndex, charIndex) || {},
-      styleObject: Record<keyof this, this[keyof this]> = {};
-    for (let i = 0, prop: keyof this; i < this._styleProperties.length; i++) {
-      prop = this._styleProperties[i];
+      styleObject: TextStyleDeclaration = {};
+    for (let i = 0; i < this._styleProperties.length; i++) {
+      const prop = this._styleProperties[i];
       styleObject[prop] =
-        typeof style[prop] === 'undefined' ? this[prop] : style[prop];
+        typeof style[prop] === 'undefined'
+          ? this[prop as keyof this]
+          : style[prop];
     }
     return styleObject;
   }
@@ -309,58 +306,7 @@ export abstract class StyledText extends FabricObject {
     this.styles[lineIndex] = {};
   }
 
-  /**
-   * @param {Number} lineIndex
-   * @private
-   */
   protected _deleteLineStyle(lineIndex: number) {
     delete this.styles[lineIndex];
-  }
-}
-
-export abstract class ITextBase extends StyledText {
-  abstract selectionStart: number;
-  abstract selectionEnd: number;
-
-  /**
-   * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start)
-   * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
-   * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. useful to manage styles.
-   */
-  get2DCursorLocation(
-    selectionStart: number = this.selectionStart,
-    skipWrapping?: boolean
-  ) {
-    return super.get2DCursorLocation(selectionStart, skipWrapping);
-  }
-
-  /**
-   * Gets style of a current selection/cursor (at the start position)
-   * if startIndex or endIndex are not provided, selectionStart or selectionEnd will be used.
-   * @param {Number} startIndex Start index to get styles at
-   * @param {Number} endIndex End index to get styles at, if not specified selectionEnd or startIndex + 1
-   * @param {Boolean} [complete] get full style or not
-   * @return {Array} styles an array with one, zero or more Style objects
-   */
-  getSelectionStyles(
-    startIndex: number = this.selectionStart || 0,
-    endIndex: number = this.selectionEnd,
-    complete?: boolean
-  ) {
-    return super.getSelectionStyles(startIndex, endIndex, complete);
-  }
-
-  /**
-   * Sets style of a current selection, if no selection exist, do not set anything.
-   * @param {Object} [styles] Styles object
-   * @param {Number} [startIndex] Start index to get styles at
-   * @param {Number} [endIndex] End index to get styles at, if not specified selectionEnd or startIndex + 1
-   */
-  setSelectionStyles(
-    styles: object,
-    startIndex: number = this.selectionStart || 0,
-    endIndex: number = this.selectionEnd
-  ) {
-    return super.setSelectionStyles(styles, startIndex, endIndex);
   }
 }

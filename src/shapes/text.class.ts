@@ -1,15 +1,15 @@
-//// @ts-nocheck
+// @ts-nocheck
 
 import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
-import { StyledText } from '../mixins/text_style.mixin';
+import { TextStyleMixin } from '../mixins/text_style.mixin';
 import { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import {
   hasStyleChanged,
-  stylesToArray,
   stylesFromArray,
+  stylesToArray,
 } from '../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
 import { FabricObject } from './fabricObject.class';
@@ -43,7 +43,7 @@ const additionalProps = [
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  * @see {@link Text#initialize} for constructor definition
  */
-export class Text extends FabricObject {
+export class Text extends TextStyleMixin {
   /**
    * Properties which when set cause object to change dimensions
    * @type Array
@@ -1741,10 +1741,7 @@ export class Text extends FabricObject {
    * @return {FabricObject} thisArg
    * @chainable
    */
-  set<K extends keyof this, V extends this[K]>(
-    key: K | Record<K, V>,
-    value?: V
-  ): FabricObject {
+  set(key: string | any, value?: any) {
     super.set(key, value);
     let needsDims = false;
     let isAddingPath = false;
@@ -1997,4 +1994,4 @@ Object.assign(Text.prototype, textDefaultValues);
 
 /* _FROM_SVG_END_ */
 
-fabric.Text = StyledText;
+fabric.Text = Text;
