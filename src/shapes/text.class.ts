@@ -334,6 +334,8 @@ export class Text extends TextStyleMixin {
   protected __lineWidths: number[];
   protected _forceClearCache: boolean;
 
+  private initialized?: true;
+
   /**
    * Constructor
    * @param {String} text Text string
@@ -341,8 +343,8 @@ export class Text extends TextStyleMixin {
    * @return {Text} thisArg
    */
   constructor(text: string, options: object): Text {
-    // this.__skipDimension = true;
     super({ ...options, text, styles: options?.styles || {} });
+    this.initialized = true;
     if (this.path) {
       this.setPathInfo();
     }
@@ -632,7 +634,7 @@ export class Text extends TextStyleMixin {
    * @param {Number} lineIndex Index of a line in a text
    */
   _renderTextLine(
-    method: string,
+    method: 'fillText' | 'strokeText',
     ctx: CanvasRenderingContext2D,
     line: string,
     left: number,
@@ -914,7 +916,7 @@ export class Text extends TextStyleMixin {
   _setGraphemeOnPath(
     positionInPath: number,
     graphemeInfo: object,
-    startingPoin
+    startingPoint
   ) {
     const centerPosition = positionInPath + graphemeInfo.kernedWidth / 2,
       path = this.path;
@@ -1027,7 +1029,10 @@ export class Text extends TextStyleMixin {
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {String} method Method name ("fillText" or "strokeText")
    */
-  _renderTextCommon(ctx: CanvasRenderingContext2D, method: string) {
+  _renderTextCommon(
+    ctx: CanvasRenderingContext2D,
+    method: 'fillText' | 'strokeText'
+  ) {
     ctx.save();
     let lineHeights = 0,
       left = this._getLeftOffset(),
@@ -1092,7 +1097,7 @@ export class Text extends TextStyleMixin {
    * @param {Number} lineIndex
    */
   _renderChars(
-    method: string,
+    method: 'fillText' | 'strokeText',
     ctx: CanvasRenderingContext2D,
     line: Array<any>,
     left: number,
@@ -1289,21 +1294,20 @@ export class Text extends TextStyleMixin {
    * @param {Number} lineHeight Height of the line
    */
   _renderChar(
-    method: string,
+    method: 'fillText' | 'strokeText',
     ctx: CanvasRenderingContext2D,
     lineIndex: number,
     charIndex: number,
     _char: string,
     left: number,
-    to
+    top: number
   ) {
-    let decl = this._getStyleDeclaration(lineIndex, charIndex),
+    const decl = this._getStyleDeclaration(lineIndex, charIndex),
       fullDecl = this.getCompleteStyleDeclaration(lineIndex, charIndex),
       shouldFill = method === 'fillText' && fullDecl.fill,
       shouldStroke =
-        method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth,
-      fillOffsets,
-      strokeOffsets;
+        method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth;
+    let fillOffsets, strokeOffsets;
 
     if (!shouldStroke && !shouldFill) {
       return;
@@ -1732,7 +1736,7 @@ export class Text extends TextStyleMixin {
     if (isAddingPath) {
       this.setPathInfo();
     }
-    if (needsDims) {
+    if (needsDims && this.initialized) {
       this.initDimensions();
       this.setCoords();
     }
