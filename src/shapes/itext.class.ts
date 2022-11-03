@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { fabric } from '../../HEADER';
-import { TClassProperties } from '../typedefs';
+import { TClassProperties, TFiller } from '../typedefs';
 import { stylesFromArray } from '../util/misc/textStyles';
 import { FabricObject } from './fabricObject.class';
 import { Text } from './text.class';
@@ -61,14 +61,14 @@ export class IText extends Text {
    * @type Number
    * @default
    */
-  selectionStart = 0;
+  selectionStart: number;
 
   /**
    * Index where text selection ends
    * @type Number
    * @default
    */
-  selectionEnd = 0;
+  selectionEnd: number;
 
   /**
    * Color of text selection
@@ -619,9 +619,9 @@ export class IText extends Text {
    * Returns color (fill) of char at the current cursor
    * if the text object has a pattern or gradient for filler, it will return that.
    * Unused by the library, is for the end user
-   * @return {String | fabric.Gradient | fabric.Pattern} Character color (fill)
+   * @return {String | TFiller} Character color (fill)
    */
-  getCurrentCharColor(): string | fabric.Gradient | fabric.Pattern {
+  getCurrentCharColor(): string | TFiller {
     const cp = this._getCurrentCharIndex();
     return this.getValueOfPropertyAt(cp.l, cp.c, 'fill');
   }
