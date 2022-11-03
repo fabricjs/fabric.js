@@ -4,7 +4,7 @@ import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { TextStyleMixin } from '../mixins/text_style.mixin';
-import { TClassProperties } from '../typedefs';
+import { TClassProperties, TFiller } from '../typedefs';
 import { graphemeSplit } from '../util/lang_string';
 import { createCanvasElement } from '../util/misc/dom';
 import {
@@ -14,6 +14,7 @@ import {
 } from '../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
 import { FabricObject } from './fabricObject.class';
+import { fabricObjectDefaultValues } from './object.class';
 
 /**
  * Measure and return the info of a single grapheme.
@@ -159,17 +160,35 @@ export class Text extends TextStyleMixin {
 
   /**
    * Superscript schema object (minimum overlap)
-   * @type {Object}
-   * @default
    */
-  superscript: object;
+  superscript: {
+    /**
+     * fontSize factor
+     * @default 0.6
+     */
+    size: number;
+    /**
+     * baseline-shift factor (upwards)
+     * @default -0.35
+     */
+    baseline: number;
+  };
 
   /**
    * Subscript schema object (minimum overlap)
-   * @type {Object}
-   * @default
    */
-  subscript: object;
+  subscript: {
+    /**
+     * fontSize factor
+     * @default 0.6
+     */
+    size: number;
+    /**
+     * baseline-shift factor (downwards)
+     * @default 0.11
+     */
+    baseline: number;
+  };
 
   /**
    * Background color of text lines
@@ -254,14 +273,6 @@ export class Text extends TextStyleMixin {
   charSpacing: number;
 
   /**
-   * Object containing character styles - top-level properties -> line numbers,
-   * 2nd-level properties - character numbers
-   * @type Object
-   * @default
-   */
-  styles: object;
-
-  /**
    * Reference to a context to measure text char or couple of chars
    * the cacheContext of the canvas will be used or a freshly created one if the object is not on canvas
    * once created it will be referenced on fabric._measuringContext to avoid creating a canvas for every
@@ -306,7 +317,7 @@ export class Text extends TextStyleMixin {
     width: number;
     kernedWidth: number;
     height: number;
-  }[];
+  }[] = [];
 
   /**
    * use this size when measuring text. To avoid IE11 rounding errors
@@ -336,12 +347,6 @@ export class Text extends TextStyleMixin {
 
   private initialized?: true;
 
-  /**
-   * Constructor
-   * @param {String} text Text string
-   * @param {Object} [options] Options object
-   * @return {Text} thisArg
-   */
   constructor(text: string, options: object): Text {
     super({ ...options, text, styles: options?.styles || {} });
     this.initialized = true;
@@ -357,9 +362,8 @@ export class Text extends TextStyleMixin {
   /**
    * If text has a path, it will add the extra information needed
    * for path and text calculations
-   * @return {Text} thisArg
    */
-  setPathInfo(): Text {
+  setPathInfo() {
     const path = this.path;
     if (path) {
       path.segmentsInfo = getPathSegmentsInfo(path.path);
@@ -373,9 +377,8 @@ export class Text extends TextStyleMixin {
    * @private
    * @param {String} text Text string
    * @param {Object} [options] Options object
-   * @return {Text} thisArg
    */
-  getMeasuringContext(): Text {
+  getMeasuringContext() {
     if (!fabric._measuringContext) {
       fabric._measuringContext =
         (this.canvas && this.canvas.contextCache) ||
@@ -910,12 +913,12 @@ export class Text extends TextStyleMixin {
    * It appends it to graphemeInfo to be reused later at rendering
    * @private
    * @param {Number} positionInPath to be measured
-   * @param {Object} graphemeInfo current grapheme box information
+   * @param {GraphemeBBox} graphemeInfo current grapheme box information
    * @param {Object} startingPoint position of the point
    */
   _setGraphemeOnPath(
     positionInPath: number,
-    graphemeInfo: object,
+    graphemeInfo: GraphemeBBox,
     startingPoint
   ) {
     const centerPosition = positionInPath + graphemeInfo.kernedWidth / 2,
@@ -1215,10 +1218,10 @@ export class Text extends TextStyleMixin {
    * this method has drawbacks: is slow, is in low resolution, needs a patch for when the size
    * is limited.
    * @private
-   * @param {fabric.Gradient} filler a fabric gradient instance
+   * @param {TFiller} filler a fabric gradient instance
    * @return {CanvasPattern} a pattern to use as fill/stroke style
    */
-  _applyPatternGradientTransformText(filler: fabric.Gradient): CanvasPattern {
+  _applyPatternGradientTransformText(filler: TFiller): CanvasPattern {
     let pCanvas = createCanvasElement(),
       pCtx,
       // TODO: verify compatibility with strokeUniform
@@ -1344,22 +1347,18 @@ export class Text extends TextStyleMixin {
    * Turns the character into a 'superior figure' (i.e. 'superscript')
    * @param {Number} start selection start
    * @param {Number} end selection end
-   * @returns {Text} thisArg
-   * @chainable
    */
-  setSuperscript(start: number, end: number): Text {
-    return this._setScript(start, end, this.superscript);
+  setSuperscript(start: number, end: number) {
+    this._setScript(start, end, this.superscript);
   }
 
   /**
    * Turns the character into an 'inferior figure' (i.e. 'subscript')
    * @param {Number} start selection start
    * @param {Number} end selection end
-   * @returns {Text} thisArg
-   * @chainable
    */
-  setSubscript(start: number, end: number): Text {
-    return this._setScript(start, end, this.subscript);
+  setSubscript(start: number, end: number) {
+    this._setScript(start, end, this.subscript);
   }
 
   /**
@@ -1368,10 +1367,8 @@ export class Text extends TextStyleMixin {
    * @param {Number} start selection start
    * @param {Number} end selection end
    * @param {Number} schema
-   * @returns {Text} thisArg
-   * @chainable
    */
-  _setScript(start: number, end: number, schema: number): Text {
+  protected _setScript(start: number, end: number, schema: number) {
     const loc = this.get2DCursorLocation(start, true),
       fontSize = this.getValueOfPropertyAt(
         loc.lineIndex,
@@ -1384,7 +1381,6 @@ export class Text extends TextStyleMixin {
         deltaY: dy + fontSize * schema.baseline,
       };
     this.setSelectionStyles(style, start, end);
-    return this;
   }
 
   /**
@@ -1709,13 +1705,6 @@ export class Text extends TextStyleMixin {
     return obj;
   }
 
-  /**
-   * Sets property to a given value. When changing position/dimension -related properties (left, top, scale, angle, etc.) `set` does not update position of object's borders/controls. If you need to update those, call `setCoords()`.
-   * @param {String|Object} key Property name or object (if object, iterate over the object properties)
-   * @param {*} value Property value (if function, the value is passed into it and its return value is used as a new one)
-   * @return {FabricObject} thisArg
-   * @chainable
-   */
   set(key: string | any, value?: any) {
     super.set(key, value);
     let needsDims = false;
@@ -1751,6 +1740,16 @@ export class Text extends TextStyleMixin {
     return 1;
   }
 
+  static genericFonts = [
+    'sans-serif',
+    'serif',
+    'cursive',
+    'fantasy',
+    'monospace',
+  ];
+
+  /* _FROM_SVG_START_ */
+
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link Text.fromElement})
    * @static
@@ -1762,14 +1761,6 @@ export class Text extends TextStyleMixin {
       ' '
     )
   );
-
-  static genericFonts = [
-    'sans-serif',
-    'serif',
-    'cursive',
-    'fantasy',
-    'monospace',
-  ];
 
   /**
    * Returns Text instance from an SVG element (<b>not yet implemented</b>)
@@ -1867,6 +1858,8 @@ export class Text extends TextStyleMixin {
     callback(text);
   }
 
+  /* _FROM_SVG_END_ */
+
   /**
    * Returns Text instance from an object representation
    * @static
@@ -1900,6 +1893,20 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
     'pathSide',
     'pathAlign',
   ],
+  _styleProperties: [
+    'stroke',
+    'strokeWidth',
+    'fill',
+    'fontFamily',
+    'fontSize',
+    'fontWeight',
+    'fontStyle',
+    'underline',
+    'overline',
+    'linethrough',
+    'deltaY',
+    'textBackgroundColor',
+  ],
   _reNewline: /\r?\n/,
   _reSpacesAndTabs: /[ \t\r]/g,
   _reSpaceAndTab: /[ \t\r]/,
@@ -1924,9 +1931,9 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
   },
   textBackgroundColor: '',
   stateProperties:
-    FabricObject.prototype.stateProperties.concat(additionalProps),
+    fabricObjectDefaultValues.stateProperties.concat(additionalProps),
   cacheProperties:
-    FabricObject.prototype.cacheProperties.concat(additionalProps),
+    fabricObjectDefaultValues.cacheProperties.concat(additionalProps),
   stroke: null,
   shadow: null,
   path: null,
@@ -1944,29 +1951,10 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
   styles: null,
   deltaY: 0,
   direction: 'ltr',
-  _styleProperties: [
-    'stroke',
-    'strokeWidth',
-    'fill',
-    'fontFamily',
-    'fontSize',
-    'fontWeight',
-    'fontStyle',
-    'underline',
-    'overline',
-    'linethrough',
-    'deltaY',
-    'textBackgroundColor',
-  ],
-  __charBounds: [],
   CACHE_FONT_SIZE: 400,
   MIN_TEXT_WIDTH: 2,
 };
 
 Object.assign(Text.prototype, textDefaultValues);
-
-/* _FROM_SVG_START_ */
-
-/* _FROM_SVG_END_ */
 
 fabric.Text = Text;

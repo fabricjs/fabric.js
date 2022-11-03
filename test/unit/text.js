@@ -722,7 +722,8 @@
     var schema = text.superscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
-    text.setSuperscript(1, 2).setSuperscript(2, 3);
+    text.setSuperscript(1, 2);
+    text.setSuperscript(2, 3);
 
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
@@ -744,7 +745,8 @@
     var schema = text.subscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
-    text.setSubscript(1,2).setSubscript(2,3);
+    text.setSubscript(1, 2);
+    text.setSubscript(2, 3);
 
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
