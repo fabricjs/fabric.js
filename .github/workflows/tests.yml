@@ -57,10 +57,10 @@ jobs:
       - name: Run tests
         run: npm run test -- -c node -a ${{ env.flag }}
       - name: Prepare Coverage Report
-        if: matrix.node-version == 16
+        if: matrix.node-version == 16 && always()
         run: npm run coverage:report
       - name: Post Coverage Report
-        if: matrix.node-version == 16
+        if: matrix.node-version == 16 && always()
         uses: ShaMan123/lcov-reporter-action@v1.1.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
