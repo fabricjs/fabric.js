@@ -75,7 +75,7 @@
   QUnit.test('toString', function(assert) {
     var text = createTextObject();
     assert.ok(typeof text.toString === 'function');
-    assert.equal(text.toString(), '#<fabric.Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
+    assert.equal(text.toString(), '#<Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
   });
 
   QUnit.test('_getFontDeclaration', function(assert) {
