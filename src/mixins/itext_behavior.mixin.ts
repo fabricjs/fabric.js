@@ -1171,7 +1171,7 @@ export abstract class ITextBehaviorMixin extends Text {
     lineIndex: number,
     charIndex: number,
     qty: number,
-    copiedStyl
+    copiedStyle
   ) {
     let currentCharStyle,
       newLineStyles = {},
