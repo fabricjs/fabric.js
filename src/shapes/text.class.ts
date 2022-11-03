@@ -3,7 +3,7 @@
 import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
-import { TextStyleMixin } from '../mixins/text_style.mixin';
+import { TextStyle, TextStyleMixin } from '../mixins/text_style.mixin';
 import { TClassProperties, TFiller } from '../typedefs';
 import { graphemeSplit } from '../util/lang_string';
 import { createCanvasElement } from '../util/misc/dom';
@@ -196,6 +196,8 @@ export class Text extends TextStyleMixin {
    * @default
    */
   textBackgroundColor: string;
+
+  styles: TextStyle;
 
   /**
    * fabric.Path that the text should follow.
