@@ -346,12 +346,6 @@ export class Text extends TextStyleMixin {
 
   private initialized?: true;
 
-  /**
-   * Constructor
-   * @param {String} text Text string
-   * @param {Object} [options] Options object
-   * @return {Text} thisArg
-   */
   constructor(text: string, options: object): Text {
     super({ ...options, text, styles: options?.styles || {} });
     this.initialized = true;
@@ -367,9 +361,8 @@ export class Text extends TextStyleMixin {
   /**
    * If text has a path, it will add the extra information needed
    * for path and text calculations
-   * @return {Text} thisArg
    */
-  setPathInfo(): Text {
+  setPathInfo() {
     const path = this.path;
     if (path) {
       path.segmentsInfo = getPathSegmentsInfo(path.path);
@@ -383,9 +376,8 @@ export class Text extends TextStyleMixin {
    * @private
    * @param {String} text Text string
    * @param {Object} [options] Options object
-   * @return {Text} thisArg
    */
-  getMeasuringContext(): Text {
+  getMeasuringContext() {
     if (!fabric._measuringContext) {
       fabric._measuringContext =
         (this.canvas && this.canvas.contextCache) ||
