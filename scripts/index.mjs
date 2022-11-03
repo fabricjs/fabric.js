@@ -736,6 +736,15 @@ program
         )
       );
     }
+    if (options.coverage && !options.context.includes('node')) {
+      console.error(chalk.red('Coverage reporting is available on node only.'));
+      console.info(
+        chalk.redBright(
+          'For available solutions see:\n`karma` as a replacement for `testem`\nOR https://github.com/testem/testem/tree/master/examples/coverage_istanbul\n'
+        )
+      );
+      process.exit(1);
+    }
     const results = [];
     if (options.suite) {
       results.push(
