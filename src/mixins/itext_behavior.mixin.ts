@@ -7,7 +7,50 @@ import { Canvas } from '../__types__';
 // extend this regex to support non english languages
 const reNonWord = /[ \n\.,;!\?\-]/;
 
-export class ITextBehaviorMixin extends Text {
+export abstract class ITextBehaviorMixin extends Text {
+  isEditing: boolean;
+  selected: boolean;
+  private _currentTickState: { isAborted: boolean; abort: () => void };
+  private _cursorTimeout1: number;
+  private _currentTickCompleteState: { isAborted: boolean; abort: () => void };
+  cursorDelay: number;
+  private _cursorTimeout2: number;
+  _currentCursorOpacity: number;
+  selectionStart: number;
+  selectionEnd: number;
+  _reSpace: RegExp;
+  editable: boolean;
+  hiddenTextarea: HTMLTextAreaElement;
+  private _textBeforeEdit: string;
+  protected __isMousedown: boolean;
+  protected __selectionStartOnMouseDown: number;
+  private __dragImageDisposer: VoidFunction;
+  private __dragStartFired: boolean;
+  protected __isDragging: boolean;
+  protected __dragStartSelection: {
+    selectionStart: number;
+    selectionEnd: number;
+  };
+  protected __isDraggingOver: boolean;
+  protected __lastSelected: boolean;
+  editingBorderColor: string;
+  cursorOffsetCache: { left?: number; top?: number } = {};
+  inCompositionMode: boolean;
+  compositionStart: number;
+  protected _savedProps: {
+    hasControls: boolean;
+    borderColor: string;
+    lockMovementX: boolean;
+    lockMovementY: boolean;
+    selectable: boolean;
+    hoverCursor: string;
+    defaultCursor: string;
+    moveCursor: string;
+  };
+  protected _selectionDirection: 'left' | 'right' | null;
+
+  abstract initHiddenTextarea(): void;
+
   /**
    * Initializes all the interactive behavior of IText
    */
@@ -500,7 +543,7 @@ export class ITextBehaviorMixin extends Text {
       dragImage = c;
     }
     this.__dragImageDisposer && this.__dragImageDisposer();
-    this.__dragImageDisposer = function () {
+    this.__dragImageDisposer = () => {
       dragImage.remove();
     };
     //  position drag image offsecreen
@@ -1283,6 +1326,41 @@ export class ITextBehaviorMixin extends Text {
         copiedStyle
       );
     }
+  }
+
+  /**
+   * insert characters at start position, before start position.
+   * start  equal 1 it means the text get inserted between actual grapheme 0 and 1
+   * if style array is provided, it must be as the same length of text in graphemes
+   * if end is provided and is bigger than start, old text is replaced.
+   * start/end ar per grapheme position in _text array.
+   *
+   * @param {String} text text to insert
+   * @param {Array} style array of style objects
+   * @param {Number} start
+   * @param {Number} end default to start + 1
+   */
+  insertChars(text: string, style: Array<any>, start: number, end: number) {
+    if (typeof end === 'undefined') {
+      end = start;
+    }
+    if (end > start) {
+      this.removeStyleFromTo(start, end);
+    }
+    var graphemes = this.graphemeSplit(text);
+    this.insertNewStyleBlock(graphemes, start, style);
+    this._text = [].concat(
+      this._text.slice(0, start),
+      graphemes,
+      this._text.slice(end)
+    );
+    this.text = this._text.join('');
+    this.set('dirty', true);
+    if (this._shouldClearDimensionCache()) {
+      this.initDimensions();
+      this.setCoords();
+    }
+    this._removeExtraneousStyles();
   }
 
   /**

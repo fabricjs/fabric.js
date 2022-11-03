@@ -1,28 +1,15 @@
 ////@ts-nocheck
-import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { Point } from '../point.class';
 import { TPointerEvent } from '../typedefs';
-import { Text } from '../shapes/text.class';
+import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { ITextBehaviorMixin } from './itext_behavior.mixin';
 
-abstract class ITextBase extends Text {
-  __lastClickTime: number;
-  __lastLastClickTime: number;
-  __lastPointer: {};
-  __newClickTime: number;
-  __lastIsEditing: any;
-  isEditing: any;
-  __lastSelected: any;
-  selected: any;
-  editable: any;
-  __isMousedown: boolean;
-  inCompositionMode: boolean;
-  __selectionStartOnMouseDown: any;
-  selectionStart: any;
-  selectionEnd: any;
-  __isDragging: any;
-}
+export class ITextClickBehaviorMixin extends ITextBehaviorMixin {
+  private __lastClickTime: number;
+  private __lastLastClickTime: number;
+  private __lastPointer: {};
+  private __newClickTime: number;
 
-export class ITextClickBehaviorMixin extends ITextBase {
   /**
    * Initializes "dbclick" event handler
    */
@@ -54,7 +41,6 @@ export class ITextClickBehaviorMixin extends ITextBase {
     this.__lastLastClickTime = this.__lastClickTime;
     this.__lastClickTime = this.__newClickTime;
     this.__lastPointer = newPointer;
-    this.__lastIsEditing = this.isEditing;
     this.__lastSelected = this.selected;
   }
 
@@ -93,9 +79,6 @@ export class ITextClickBehaviorMixin extends ITextBase {
     }
     this.selectWord(this.getSelectionStartFromPointer(options.e));
   }
-  selectWord(arg0: number) {
-    throw new Error('Method not implemented.');
-  }
 
   /**
    * Default handler for triple click, select a line
@@ -105,9 +88,6 @@ export class ITextClickBehaviorMixin extends ITextBase {
       return;
     }
     this.selectLine(this.getSelectionStartFromPointer(options.e));
-  }
-  selectLine(arg0: number) {
-    throw new Error('Method not implemented.');
   }
 
   /**
@@ -149,12 +129,6 @@ export class ITextClickBehaviorMixin extends ITextBase {
       }
       this.renderCursorOrSelection();
     }
-  }
-  abortCursorAnimation() {
-    throw new Error('Method not implemented.');
-  }
-  renderCursorOrSelection() {
-    throw new Error('Method not implemented.');
   }
 
   /**
@@ -235,12 +209,6 @@ export class ITextClickBehaviorMixin extends ITextBase {
       this.selected = true;
     }
   }
-  enterEditing(e: any) {
-    throw new Error('Method not implemented.');
-  }
-  initDelayedCursor(arg0: boolean) {
-    throw new Error('Method not implemented.');
-  }
 
   /**
    * Changes cursor location in a text depending on passed pointer (x/y) object
@@ -260,15 +228,6 @@ export class ITextClickBehaviorMixin extends ITextBase {
       this._fireSelectionChanged();
       this._updateTextarea();
     }
-  }
-  setSelectionStartEndWithShift(start: any, end: any, newSelection: number) {
-    throw new Error('Method not implemented.');
-  }
-  _fireSelectionChanged() {
-    throw new Error('Method not implemented.');
-  }
-  _updateTextarea() {
-    throw new Error('Method not implemented.');
   }
 
   /**

@@ -2,11 +2,11 @@
 
 import { fabric } from '../../HEADER';
 import { config } from '../config';
-import { Text } from '../shapes/text.class';
 import { TPointerEvent } from '../typedefs';
 import { addListener } from '../util/dom_event';
+import { ITextBehaviorMixin } from './itext_behavior.mixin';
 
-export class ITextKeyBehaviorMixin extends Text {
+export class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
   /**
    * For functionalities on keyDown
    * Map a special key to a function of the instance/prototype
