@@ -67,6 +67,7 @@ jobs:
           delete-old-comments: true
           update-comment: true
       - name: Rename artifact (*node > *node${{ matrix.node-version }})
+        if: always()
         run: |
           mv cli_output/test_results/visual/node cli_output/test_results/visual/node${{ matrix.node-version }}
           mv cli_output/test_results/visual/node.txt cli_output/test_results/visual/node${{ matrix.node-version }}.txt
