@@ -1,9 +1,9 @@
-////@ts-nocheck
+// @ts-nocheck
 import { fabric } from '../../HEADER';
-import { TextStyleMixin } from '../mixins/text_style.mixin';
 import { TClassProperties } from '../typedefs';
 import { stylesFromArray } from '../util/misc/textStyles';
 import { FabricObject } from './fabricObject.class';
+import { Text } from './text.class';
 
 /**
  * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
