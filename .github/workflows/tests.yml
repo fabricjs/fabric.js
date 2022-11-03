@@ -41,6 +41,8 @@ jobs:
         # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
         # supported Node.js release schedule: https://nodejs.org/en/about/releases/
         node-version: [14, 16, 18]
+    env:
+      flag: ${{ (matrix.node-version == 16 && '--coverage') || '' }}
     steps:
       - uses: actions/checkout@v3
       - name: Install node-canvas
@@ -53,22 +55,22 @@ jobs:
       - run: npm ci
       - run: npm run build -- -f
       - name: Run tests
-        run: |
-          if [[ ${{ matrix.node-version }} -eq 16 ]]; then
-            npm run test -- -c node -a --coverage
-            npm run coverage:report
-          else
-            npm run test -- -c node -a
-          fi
-      - name: Coverage Report
-        if: matrix.node-version == 16 && always()
+        run: npm run test -- -c node -a ${{ env.flag }}
+      - name: Prepare Coverage Report
+        if: matrix.node-version == 16
+        run: npm run coverage:report
+      - name: Post Coverage Report
+        if: matrix.node-version == 16
         uses: ShaMan123/lcov-reporter-action@v1.1.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           delete-old-comments: true
           update-comment: true
-      - name: Rename artifact (./node > ./node${{ matrix.node-version }})
-        run: mv cli_output/test_results/node cli_output/test_results/node${{ matrix.node-version }}
+      - name: Rename artifact (*node > *node${{ matrix.node-version }})
+        run: |
+          mv cli_output/test_results/visual/node cli_output/test_results/visual/node${{ matrix.node-version }}
+          mv cli_output/test_results/visual/node.txt cli_output/test_results/visual/node${{ matrix.node-version }}.txt
+          mv cli_output/test_results/unit/node.txt cli_output/test_results/unit/node${{ matrix.node-version }}.txt
       - name: Archive visual test results
         if: failure()
         uses: actions/upload-artifact@v3
