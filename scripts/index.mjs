@@ -294,9 +294,10 @@ async function runTestem({
       detached: true,
     });
   } else {
+    const cmd = ['testem', 'ci', ...processCmdOptions].join(' ');
     if (parallel) {
       return new Promise((resolve) => {
-        cp.spawn(['testem', 'ci', ...processCmdOptions].join(' '), {
+        cp.spawn(cmd, {
           ...processOptions,
           detached: true,
         }).on('exit', (code) => {
@@ -308,10 +309,7 @@ async function runTestem({
       });
     } else {
       try {
-        cp.execSync(
-          ['testem', 'ci', ...processCmdOptions].join(' '),
-          processOptions
-        );
+        cp.execSync(cmd, processOptions);
       } catch (error) {
         return true;
       }
@@ -346,7 +344,12 @@ async function test(suite, tests, options = {}) {
   const env = {
     ...process.env,
     TEST_FILES: (tests || []).join(','),
-    NODE_CMD: ['qunit', 'test/node_test_setup.js', 'test/lib']
+    NODE_CMD: [
+      options.coverage ? 'nyc --silent' : '',
+      'qunit',
+      'test/node_test_setup.js',
+      suite === 'visual' ? 'test/lib' : '',
+    ]
       .concat(tests || `test/${suite}`)
       .join(' '),
     VERBOSE: Number(options.verbose),
@@ -574,8 +577,10 @@ async function runInteractiveTestSuite(options) {
 
 function buildVisualTestResultsIndex() {
   const headers = ['actual', 'expected', 'diff'];
-  fs.readdirSync(path.resolve(testResultsPath, 'visual')).forEach((context) => {
-    const dir = path.resolve(testResultsPath, 'visual', context);
+  const visualResultsDir = path.resolve(testResultsPath, 'visual');
+  if (!fs.existsSync(visualResultsDir)) return;
+  fs.readdirSync(visualResultsDir).forEach((context) => {
+    const dir = path.resolve(visualResultsDir, context);
     if (!fs.lstatSync(dir).isDirectory()) return;
     const entries = [];
     function recurse(dir) {
@@ -711,6 +716,11 @@ program
     testResultsPath
   )
   .option('--clear-cache', 'clear CLI test cache', false)
+  .option(
+    '-cov, --coverage',
+    'inspect coverage, currently supported on node only',
+    false
+  )
   .action(async (options) => {
     if (options.clearCache) {
       fs.removeSync(CLI_CACHE);
