@@ -36,7 +36,7 @@
   QUnit.test('constructor', function(assert) {
     var group = makeAsWith2Objects();
 
-    assert.ok(false);
+    assert.ok(group);
     assert.ok(group instanceof fabric.ActiveSelection, 'should be instance of fabric.ActiveSelection');
   });
 
