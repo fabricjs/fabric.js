@@ -7,7 +7,7 @@ import { ITextBehaviorMixin } from './itext_behavior.mixin';
 export abstract class ITextClickBehaviorMixin extends ITextBehaviorMixin {
   private __lastClickTime: number;
   private __lastLastClickTime: number;
-  private __lastPointer: {};
+  private __lastPointer: IPoint | {};
   private __newClickTime: number;
 
   /**
@@ -28,12 +28,12 @@ export abstract class ITextClickBehaviorMixin extends ITextBehaviorMixin {
    * Default event handler to simulate triple click
    * @private
    */
-  onMouseDown(options) {
+  onMouseDown(options: TransformEvent) {
     if (!this.canvas) {
       return;
     }
     this.__newClickTime = +new Date();
-    var newPointer = options.pointer;
+    const newPointer = options.pointer;
     if (this.isTripleClick(newPointer)) {
       this.fire('tripleclick', options);
       this._stopEvent(options.e);
@@ -44,7 +44,7 @@ export abstract class ITextClickBehaviorMixin extends ITextBehaviorMixin {
     this.__lastSelected = this.selected;
   }
 
-  isTripleClick(newPointer) {
+  isTripleClick(newPointer: IPoint) {
     return (
       this.__newClickTime - this.__lastClickTime < 500 &&
       this.__lastClickTime - this.__lastLastClickTime < 500 &&
@@ -73,7 +73,7 @@ export abstract class ITextClickBehaviorMixin extends ITextBehaviorMixin {
   /**
    * Default handler for double click, select a word
    */
-  doubleClickHandler(options) {
+  doubleClickHandler(options: TransformEvent) {
     if (!this.isEditing) {
       return;
     }
@@ -83,7 +83,7 @@ export abstract class ITextClickBehaviorMixin extends ITextBehaviorMixin {
   /**
    * Default handler for triple click, select a line
    */
-  tripleClickHandler(options) {
+  tripleClickHandler(options: TransformEvent) {
     if (!this.isEditing) {
       return;
     }
@@ -106,7 +106,7 @@ export abstract class ITextClickBehaviorMixin extends ITextBehaviorMixin {
    * initializing a mousedDown on a text area will cancel fabricjs knowledge of
    * current compositionMode. It will be set to false.
    */
-  _mouseDownHandler(options) {
+  _mouseDownHandler(options: TransformEvent) {
     if (
       !this.canvas ||
       !this.editable ||
@@ -136,7 +136,7 @@ export abstract class ITextClickBehaviorMixin extends ITextBehaviorMixin {
    * can be overridden to do something different.
    * Scope of this implementation is: verify the object is already selected when mousing down
    */
-  _mouseDownHandlerBefore(options) {
+  _mouseDownHandlerBefore(options: TransformEvent) {
     if (
       !this.canvas ||
       !this.editable ||
@@ -148,7 +148,7 @@ export abstract class ITextClickBehaviorMixin extends ITextBehaviorMixin {
     // may trigger editing mode in some way.
     this.selected = this === this.canvas._activeObject;
     // text dragging logic
-    var newSelection = this.getSelectionStartFromPointer(options.e);
+    const newSelection = this.getSelectionStartFromPointer(options.e);
     this.__isDragging =
       this.isEditing &&
       newSelection >= this.selectionStart &&
@@ -187,7 +187,7 @@ export abstract class ITextClickBehaviorMixin extends ITextBehaviorMixin {
     }
 
     if (this.canvas) {
-      var currentActive = this.canvas._activeObject;
+      const currentActive = this.canvas._activeObject;
       if (currentActive && currentActive !== this) {
         // avoid running this logic when there is an active object
         // this because is possible with shift click and fast clicks,
@@ -215,7 +215,7 @@ export abstract class ITextClickBehaviorMixin extends ITextBehaviorMixin {
    * @param {TPointerEvent} e Event object
    */
   setCursorByClick(e: TPointerEvent) {
-    var newSelection = this.getSelectionStartFromPointer(e),
+    const newSelection = this.getSelectionStartFromPointer(e),
       start = this.selectionStart,
       end = this.selectionEnd;
     if (e.shiftKey) {
@@ -250,7 +250,7 @@ export abstract class ITextClickBehaviorMixin extends ITextBehaviorMixin {
    * @return {Number} Index of a character
    */
   getSelectionStartFromPointer(e: TPointerEvent): number {
-    var mouseOffset = this.getLocalPointer(e),
+    let mouseOffset = this.getLocalPointer(e),
       prevWidth = 0,
       width = 0,
       height = 0,
@@ -258,7 +258,7 @@ export abstract class ITextClickBehaviorMixin extends ITextBehaviorMixin {
       lineIndex = 0,
       lineLeftOffset,
       line;
-    for (var i = 0, len = this._textLines.length; i < len; i++) {
+    for (let i = 0, len = this._textLines.length; i < len; i++) {
       if (height <= mouseOffset.y) {
         height += this.getHeightOfLine(i) * this.scaleY;
         lineIndex = i;
@@ -302,15 +302,21 @@ export abstract class ITextClickBehaviorMixin extends ITextBehaviorMixin {
   /**
    * @private
    */
-  _getNewSelectionStartFromOffset(mouseOffset, prevWidth, width, index, jle) {
-    var distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth,
+  _getNewSelectionStartFromOffset(
+    mouseOffset: IPoint,
+    prevWidth: number,
+    width: number,
+    index: number,
+    jlen: number
+  ) {
+    const distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth,
       distanceBtwNextCharAndCursor = width - mouseOffset.x,
       offset =
         distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor ||
         distanceBtwNextCharAndCursor < 0
           ? 0
-          : 1,
-      newSelectionStart = index + offset;
+          : 1;
+    let newSelectionStart = index + offset;
     // if object is horizontally flipped, mirror cursor location from the end
     if (this.flipX) {
       newSelectionStart = jlen - newSelectionStart;
