@@ -1,10 +1,10 @@
 ////@ts-nocheck
-import { Point } from '../point.class';
-import { TPointerEvent } from '../typedefs';
+import { IPoint, Point } from '../point.class';
+import { TPointerEvent, TransformEvent } from '../typedefs';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { ITextBehaviorMixin } from './itext_behavior.mixin';
 
-export class ITextClickBehaviorMixin extends ITextBehaviorMixin {
+export abstract class ITextClickBehaviorMixin extends ITextBehaviorMixin {
   private __lastClickTime: number;
   private __lastLastClickTime: number;
   private __lastPointer: {};
@@ -175,7 +175,7 @@ export class ITextClickBehaviorMixin extends ITextBehaviorMixin {
    * standard handler for mouse up, overridable
    * @private
    */
-  mouseUpHandler(options) {
+  mouseUpHandler(options: TransformEvent) {
     this.__isMousedown = false;
     if (
       !this.editable ||
