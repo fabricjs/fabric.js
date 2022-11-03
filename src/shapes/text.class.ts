@@ -159,17 +159,35 @@ export class Text extends TextStyleMixin {
 
   /**
    * Superscript schema object (minimum overlap)
-   * @type {Object}
-   * @default
    */
-  superscript: object;
+  superscript: {
+    /**
+     * fontSize factor
+     * @default 0.6
+     */
+    size: number;
+    /**
+     * baseline-shift factor (upwards)
+     * @default -0.35
+     */
+    baseline: number;
+  };
 
   /**
    * Subscript schema object (minimum overlap)
-   * @type {Object}
-   * @default
    */
-  subscript: object;
+  subscript: {
+    /**
+     * fontSize factor
+     * @default 0.6
+     */
+    size: number;
+    /**
+     * baseline-shift factor (downwards)
+     * @default 0.11
+     */
+    baseline: number;
+  };
 
   /**
    * Background color of text lines
