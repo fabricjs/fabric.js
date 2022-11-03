@@ -1,15 +1,19 @@
 //// @ts-nocheck
 
 import { FabricObject } from '../shapes/fabricObject.class';
-import { Text } from '../shapes/text.class';
+import { TClassProperties } from '../typedefs';
 
-export abstract class StyledText extends Text {
-  // styles: any;
-  // protected _textLines: any;
-  // protected _unwrappedTextLines: any;
-  // protected _forceClearCache: boolean;
-  // protected _styleProperties: any;
-  // abstract missingNewlineOffset(i: number): number;
+export abstract class StyledText extends FabricObject {
+  abstract styles: {
+    [line: number]: { [char: number]: Partial<TClassProperties<this>> };
+  };
+  protected abstract _textLines: any;
+  protected abstract _forceClearCache: boolean;
+  protected abstract _styleProperties: Partial<TClassProperties<this>>[];
+  abstract get2DCursorLocation(
+    selectionStart: number,
+    skipWrapping?: boolean
+  ): { charIndex: number; lineIndex: number };
 
   /**
    * Returns true if object has no styling or no styling in a line
@@ -57,9 +61,9 @@ export abstract class StyledText extends Text {
         ? this.styles
         : { 0: this.styles[lineIndex] };
     // eslint-disable-next-line
-    for (var p1 in obj) {
+    for (const p1 in obj) {
       // eslint-disable-next-line
-      for (var p2 in obj[p1]) {
+      for (const p2 in obj[p1]) {
         if (typeof obj[p1][p2][property] !== 'undefined') {
           return true;
         }
@@ -82,19 +86,18 @@ export abstract class StyledText extends Text {
     if (!this.styles || !property || property === '') {
       return false;
     }
-    var obj = this.styles,
-      stylesCount = 0,
+    const obj = this.styles;
+    let stylesCount = 0,
       letterCount,
       stylePropertyValue,
       allStyleObjectPropertiesMatch = true,
-      graphemeCount = 0,
-      styleObject;
+      graphemeCount = 0;
     // eslint-disable-next-line
-    for (var p1 in obj) {
+    for (const p1 in obj) {
       letterCount = 0;
       // eslint-disable-next-line
-      for (var p2 in obj[p1]) {
-        var styleObject = obj[p1][p2],
+      for (const p2 in obj[p1]) {
+        const styleObject = obj[p1][p2],
           stylePropertyHasBeenSet = styleObject.hasOwnProperty(property);
 
         stylesCount++;
@@ -182,32 +185,6 @@ export abstract class StyledText extends Text {
       this._getStyleDeclaration(loc.lineIndex, loc.charIndex),
       styles
     );
-  }
-
-  /**
-   * Returns 2d representation (lineIndex and charIndex) of cursor
-   * @param {Number} selectionStart
-   * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. useful to manage styles.
-   */
-  get2DCursorLocation(selectionStart: number, skipWrapping?: boolean) {
-    const lines = skipWrapping ? this._unwrappedTextLines : this._textLines;
-    let i: number;
-    for (i = 0; i < lines.length; i++) {
-      if (selectionStart <= lines[i].length) {
-        return {
-          lineIndex: i,
-          charIndex: selectionStart,
-        };
-      }
-      selectionStart -= lines[i].length + this.missingNewlineOffset(i);
-    }
-    return {
-      lineIndex: i - 1,
-      charIndex:
-        lines[i - 1].length < selectionStart
-          ? lines[i - 1].length
-          : selectionStart,
-    };
   }
 
   /**

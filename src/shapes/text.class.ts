@@ -49,40 +49,35 @@ export class Text extends FabricObject {
    * @type Array
    * @private
    */
-  _dimensionAffectingProps: Array<any>;
+  _dimensionAffectingProps: Partial<TClassProperties<this>>[];
 
   /**
    * @private
    */
-  _reNewline;
+  _reNewline: RegExp;
 
   /**
    * Use this regular expression to filter for whitespaces that is not a new line.
    * Mostly used when text is 'justify' aligned.
    * @private
    */
-  _reSpacesAndTabs;
+  _reSpacesAndTabs: RegExp;
 
   /**
    * Use this regular expression to filter for whitespace that is not a new line.
    * Mostly used when text is 'justify' aligned.
    * @private
    */
-  _reSpaceAndTab;
+  _reSpaceAndTab: RegExp;
 
   /**
    * Use this regular expression to filter consecutive groups of non spaces.
    * Mostly used when text is 'justify' aligned.
    * @private
    */
-  _reWords;
+  _reWords: RegExp;
 
-  /**
-   * Type of an object
-   * @type String
-   * @default
-   */
-  type: string;
+  text: string;
 
   /**
    * Font size (in pixels)
@@ -170,36 +165,6 @@ export class Text extends FabricObject {
   textBackgroundColor: string;
 
   /**
-   * List of properties to consider when checking if
-   * state of an object is changed ({@link FabricObject#hasStateChanged})
-   * as well as for history (undo/redo) purposes
-   * @type Array
-   */
-  stateProperties: Array<any>;
-
-  /**
-   * List of properties to consider when checking if cache needs refresh
-   * @type Array
-   */
-  cacheProperties: Array<any>;
-
-  /**
-   * When defined, an object is rendered via stroke and this property specifies its color.
-   * <b>Backwards incompatibility note:</b> This property was named "strokeStyle" until v1.1.6
-   * @type String
-   * @default
-   */
-  stroke: string;
-
-  /**
-   * Shadow object representing shadow of this shape.
-   * <b>Backwards incompatibility note:</b> This property was named "textShadow" (String) until v1.2.11
-   * @type fabric.Shadow
-   * @default
-   */
-  shadow: fabric.Shadow;
-
-  /**
    * fabric.Path that the text should follow.
    * since 4.6.0 the path will be drawn automatically.
    * if you want to make the path visible, give it a stroke and strokeWidth or fill value
@@ -221,7 +186,7 @@ export class Text extends FabricObject {
    * });
    * @default
    */
-  path: fabric.Path;
+  path: FabricObject /* todo fabric.Path*/;
 
   /**
    * Offset amount for text path starting position
@@ -257,7 +222,7 @@ export class Text extends FabricObject {
   /**
    * @private
    */
-  offsets;
+  offsets: { underline: number; linethrough: number; overline: number };
 
   /**
    * Text Line proportion to font Size (in pixels)
@@ -322,7 +287,12 @@ export class Text extends FabricObject {
   /**
    * contains characters bounding boxes
    */
-  __charBounds;
+  protected __charBounds: {
+    left: number;
+    width: number;
+    kernedWidth: number;
+    height: number;
+  }[];
 
   /**
    * use this size when measuring text. To avoid IE11 rounding errors
@@ -339,6 +309,16 @@ export class Text extends FabricObject {
    * @default
    */
   MIN_TEXT_WIDTH: number;
+
+  protected __skipDimension: boolean;
+  protected textLines: string[];
+  protected _textLines: string[][];
+  protected _unwrappedTextLines: string[][];
+  protected _text: string[];
+  protected cursorWidth: number;
+  protected __lineHeights: number[];
+  protected __lineWidths: number[];
+  protected _forceClearCache: boolean;
 
   /**
    * Constructor
@@ -358,6 +338,9 @@ export class Text extends FabricObject {
     this.initDimensions();
     this.setCoords();
     this.setupState({ propertySet: '_dimensionAffectingProps' });
+  }
+  setupState(arg0: { propertySet: string }) {
+    throw new Error('Method not implemented.');
   }
 
   /**
@@ -428,6 +411,9 @@ export class Text extends FabricObject {
     }
     this.saveState({ propertySet: '_dimensionAffectingProps' });
   }
+  saveState(arg0: { propertySet: string }) {
+    throw new Error('Method not implemented.');
+  }
 
   /**
    * Enlarge space boxes and shift the others
@@ -476,7 +462,7 @@ export class Text extends FabricObject {
    * text and itext do not have wrapping, return false
    * @return {Boolean}
    */
-  isEndOfWrapping(lineIndex): boolean {
+  isEndOfWrapping(lineIndex: number): boolean {
     return lineIndex === this._textLines.length - 1;
   }
 
@@ -488,6 +474,32 @@ export class Text extends FabricObject {
    */
   missingNewlineOffset() {
     return 1;
+  }
+
+  /**
+   * Returns 2d representation (lineIndex and charIndex) of cursor
+   * @param {Number} selectionStart
+   * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. useful to manage styles.
+   */
+  get2DCursorLocation(selectionStart: number, skipWrapping?: boolean) {
+    const lines = skipWrapping ? this._unwrappedTextLines : this._textLines;
+    let i: number;
+    for (i = 0; i < lines.length; i++) {
+      if (selectionStart <= lines[i].length) {
+        return {
+          lineIndex: i,
+          charIndex: selectionStart,
+        };
+      }
+      selectionStart -= lines[i].length + this.missingNewlineOffset(i);
+    }
+    return {
+      lineIndex: i - 1,
+      charIndex:
+        lines[i - 1].length < selectionStart
+          ? lines[i - 1].length
+          : selectionStart,
+    };
   }
 
   /**
@@ -717,6 +729,9 @@ export class Text extends FabricObject {
     // other shadows should be casted
     this._removeShadow(ctx);
   }
+  styleHas(arg0: string) {
+    throw new Error('Method not implemented.');
+  }
 
   /**
    * measure and return the width of a single character.
@@ -782,6 +797,9 @@ export class Text extends FabricObject {
       width: width * fontMultiplier,
       kernedWidth: kernedWidth * fontMultiplier,
     };
+  }
+  measureText(_char: string) {
+    throw new Error('Method not implemented.');
   }
 
   /**
@@ -962,6 +980,9 @@ export class Text extends FabricObject {
     }
     return box;
   }
+  getCompleteStyleDeclaration(lineIndex: number, charIndex: number) {
+    throw new Error('Method not implemented.');
+  }
 
   /**
    * Calculate height of line at 'lineIndex'
@@ -1072,6 +1093,9 @@ export class Text extends FabricObject {
     this._renderTextCommon(ctx, 'strokeText');
     ctx.closePath();
     ctx.restore();
+  }
+  isEmptyStyles() {
+    throw new Error('Method not implemented.');
   }
 
   /**
@@ -1327,6 +1351,9 @@ export class Text extends FabricObject {
       );
     ctx.restore();
   }
+  _getStyleDeclaration(lineIndex: number, charIndex: number) {
+    throw new Error('Method not implemented.');
+  }
 
   /**
    * Turns the character into a 'superior figure' (i.e. 'superscript')
@@ -1373,6 +1400,13 @@ export class Text extends FabricObject {
       };
     this.setSelectionStyles(style, start, end);
     return this;
+  }
+  setSelectionStyles(
+    style: { fontSize: number; deltaY: any },
+    start: number,
+    end: number
+  ) {
+    throw new Error('Method not implemented.');
   }
 
   /**
@@ -1445,6 +1479,9 @@ export class Text extends FabricObject {
       this._forceClearCache = false;
     }
     return shouldClear;
+  }
+  hasStateChanged(arg0: string): any {
+    throw new Error('Method not implemented.');
   }
 
   /**
@@ -1700,11 +1737,14 @@ export class Text extends FabricObject {
   /**
    * Sets property to a given value. When changing position/dimension -related properties (left, top, scale, angle, etc.) `set` does not update position of object's borders/controls. If you need to update those, call `setCoords()`.
    * @param {String|Object} key Property name or object (if object, iterate over the object properties)
-   * @param {Object|Function} value Property value (if function, the value is passed into it and its return value is used as a new one)
+   * @param {*} value Property value (if function, the value is passed into it and its return value is used as a new one)
    * @return {FabricObject} thisArg
    * @chainable
    */
-  set(key: string | object, value: object | Function): FabricObject {
+  set<K extends keyof this, V extends this[K]>(
+    key: K | Record<K, V>,
+    value?: V
+  ): FabricObject {
     super.set(key, value);
     let needsDims = false;
     let isAddingPath = false;
