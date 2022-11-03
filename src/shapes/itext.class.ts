@@ -367,24 +367,19 @@ export class IText extends Text {
   }
 
   /**
-   * Calcualtes cursor left/top offset relative to instance's center point
+   * Calculates cursor left/top offset relative to instance's center point
    * @private
    * @param {number} index index from start
    */
   __getCursorBoundariesOffsets(index: number) {
-    let lineLeftOffset,
-      lineIndex,
-      charIndex,
-      topOffset = 0,
-      leftOffset = 0,
-      boundaries,
-      cursorPosition = this.get2DCursorLocation(index);
-    charIndex = cursorPosition.charIndex;
-    lineIndex = cursorPosition.lineIndex;
+    let topOffset = 0,
+      leftOffset = 0;
+    const { charIndex, lineIndex } = this.get2DCursorLocation(index);
+
     for (let i = 0; i < lineIndex; i++) {
       topOffset += this.getHeightOfLine(i);
     }
-    lineLeftOffset = this._getLineLeftOffset(lineIndex);
+    const lineLeftOffset = this._getLineLeftOffset(lineIndex);
     const bound = this.__charBounds[lineIndex][charIndex];
     bound && (leftOffset = bound.left);
     if (
@@ -393,7 +388,7 @@ export class IText extends Text {
     ) {
       leftOffset -= this._getWidthOfCharSpacing();
     }
-    boundaries = {
+    const boundaries = {
       top: topOffset,
       left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
     };
