@@ -37,7 +37,7 @@ QUnit.config.reorder = false;
 {{#qunit.filter}}QUnit.config.filter = {{qunit.filter}};{{/qunit.filter}}
 QUnit.config.noglobals = true;
 QUnit.config.hidepassed = true;
-QUnit.config.testTimeout = 15000;
+QUnit.config.testTimeout = {{qunit.timeout}};
 
 // global error handling
 window.addEventListener('unhandledrejection', (event) => {

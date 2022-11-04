@@ -89,6 +89,7 @@ module.exports = {
   ignore_missing_launchers: false,
   qunit: {
     filter: process.env.QUNIT_FILTER || null,
+    timeout: Number(process.env.QUNIT_TIMEOUT)
   },
   timeout: 540,
   browser_start_timeout: 60,

@@ -340,6 +340,7 @@ async function test(suite, tests, options = {}) {
     QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
     QUNIT_LAUNCH: Number(options.launch || options.dev),
     QUNIT_FILTER: options.filter,
+    QUNIT_TIMEOUT: 15000,
   };
   const env = {
     ...process.env,
