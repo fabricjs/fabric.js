@@ -42,7 +42,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: checkout src files
-        run: git checkout origin/master -- src
+        run: git checkout origin/master -- src index.js HEADER.js
       - name: upstream build stats
         run: npm run build -- -s
       - name: persist
