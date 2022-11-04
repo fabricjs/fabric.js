@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          ref: master
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
@@ -38,8 +38,6 @@ jobs:
             return JSON.stringify({
               size: JSON.parse(fs.readFileSync('cli_output/build_size.json'))
             });
-      - name: checkout src files
-        run: git checkout origin/master -- src
       - name: upstream build stats
         run: npm run build -- -s
       - name: persist
