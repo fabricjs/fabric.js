@@ -215,7 +215,7 @@
   const testIdToFileMap = {};
   exports.testIdToFileMap = testIdToFileMap;
 
-  QUnit.assert.visualEqual = async function visualAssertion(callback, ref, {
+  QUnit.assert.visualEqual = async function visualAssertion(callback, file, {
     fabricClass,
     width,
     height,
@@ -230,21 +230,20 @@
   }) {
     const done = this.async();
     const fabricCanvas = createCanvasForTest({ fabricClass, width, height });
-    const fileName = getGoldenName(ref);
-    const basename = /(.*)\..*/.exec(ref)[1];
+    const basename = /(.*)\..*/.exec(file)[1];
     testIdToFileMap[this.test.testId] = {
-      name: ref,
+      name: file,
       basename,
       expected: `/results/${RUNNER_ID}/${basename}/expected.png`,
       actual: `/results/${RUNNER_ID}/${basename}/actual.png`,
       diff: `/results/${RUNNER_ID}/${basename}/diff.png`,
     };
-    const exists = await goldenExists(fileName);
+    const exists = await goldenExists(file);
 
     if (CI && !exists) {
       // this means that the golden wasn't committed to the repo
       // we do not want the test to create the missing golden thus reporting a false positive
-      this.ok(false, `golden [${ref}] not found`);
+      this.ok(false, `golden [${file}] not found`);
       done();
       return;
     };
@@ -252,7 +251,7 @@
     callback(fabricCanvas, async (actual) => {
       // retrieve golden
       if (!exists) {
-        await generateGolden(fileName, actual);
+        await generateGolden(file, actual);
       }
       const width = actual.width;
       const height = actual.height;
@@ -264,7 +263,7 @@
       expected.height = height;
       const ctx = expected.getContext('2d', { willReadFrequently: true });
       const diffOutput = ctx.getImageData(0, 0, width, height);
-      ctx.drawImage(await getImage(fileName, actual), 0, 0);
+      ctx.drawImage(await getImage(getGoldenName(file), actual), 0, 0);
 
       const imageDataGolden = ctx.getImageData(0, 0, width, height).data;
       const differentPixels = pixelmatch(imageDataActual.data, imageDataGolden, diffOutput.data, width, height, pixelmatchOptions);
@@ -274,11 +273,11 @@
         result: isOK,
         actual: `${differentPixels} different pixels (${(differentPixels / totalPixels * 100).toFixed(2)}%)`,
         expected: `${okDiff} >= different pixels (${(percentageThreshold * 100).toFixed(2)}%)`,
-        message: ` [${ref}] has too many different pixels`
+        message: ` [${file}] has too many different pixels`
       });
 
       if (!this.todo && !testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)) {
-        await generateGolden(fileName, actual);
+        await generateGolden(file, actual);
       }
 
       // dump results
@@ -287,7 +286,7 @@
       diff.height = height;
       diff.getContext('2d', { willReadFrequently: true }).putImageData(diffOutput, 0, 0);
       
-      await dumpResults(fileName,
+      await dumpResults(file,
         {
           passing: isOK,
           test: this.test.testName,
