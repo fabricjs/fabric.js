@@ -90,7 +90,12 @@
     if (CI && !exists) {
       // this means that the golden wasn't committed to the repo
       // we do not want the test to create the missing golden thus reporting a false positive
-      this.ok(false, `golden [${file}] not found`);
+      this.pushResult({
+        result: false,
+        actual: `not found`,
+        expected: `golden [${file}]`,
+        message: `golden [${file}] not found`
+      });
       done();
       return;
     };
