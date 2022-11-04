@@ -13,7 +13,7 @@ function getGolden(name) {
 }
 
 function goldenExists(name) {
-  return fetch(`/goldens/${name}`, { method: 'GET' })
+  return fetch(`/goldens?name=${name}`, { method: 'GET' })
     .then(res => res.json())
     .then(res => res.exists);
 }

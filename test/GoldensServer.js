@@ -3,6 +3,7 @@ const path = require('path');
 const chalk = require('chalk');
 const http = require('http');
 const busboy = require('busboy');
+const { URL, URLSearchParams } = require('node:url');
 
 const wd = path.resolve(__dirname, '..');
 
@@ -43,8 +44,8 @@ function startGoldensServer() {
             if (req.method.toUpperCase() === 'GET' && req.url === '/') {
                 res.end('This endpoint is used by fabric.js for the browser visual test suite');
             }
-            else if (req.method.toUpperCase() === 'GET') {
-                const filename = req.url;
+            else if (req.method.toUpperCase() === 'GET' && req.url.startsWith('/goldens')) {
+                const filename = new URLSearchParams(req.url.split('?').pop()).get('name');
                 const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
                 res.end(JSON.stringify({ exists: fs.existsSync(goldenPath) }));
             }
