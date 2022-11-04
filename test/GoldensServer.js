@@ -57,7 +57,7 @@ function startGoldensServer() {
             }
             else if (req.method.toUpperCase() === 'POST' && req.url === '/goldens/results') {
                 const { files, fields: { filename, runner, test, module, passing } } = await parseRequest(req);
-                const basename = path.basename(filename,'.png');
+                const basename = filename.replace('.png', '');
                 const dumpsPath = path.resolve(process.env.REPORT_DIR, runner, basename);
                 fs.ensureDirSync(dumpsPath);
                 fs.writeFileSync(path.resolve(dumpsPath, 'info.json'), JSON.stringify({
