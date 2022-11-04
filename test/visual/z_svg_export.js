@@ -391,9 +391,9 @@
     height: 230,
   });
 
-  async function multipleGradients(canvas, callback) {
+  function multipleGradients(canvas, callback) {
     getAsset('svg_linear_9', (err, svg) => {
-      fabric.loadSVGFromURL(svg, function (objects) {
+      fabric.loadSVGFromString(svg, function (objects) {
         var group = fabric.util.groupSVGElements(objects);
         canvas.add(group);
         toSVGCanvas(canvas, callback);
