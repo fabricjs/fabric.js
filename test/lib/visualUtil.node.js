@@ -8,7 +8,7 @@ const wd = path.resolve(__dirname, '..', 'visual');
 const RUNNER_ID = process.env.RUNNER_ID || 'node';
 
 function getAsset(name, callback) {
-  return fs.readFile(path.resolve(wd, 'assets', name), { encoding: 'utf8' }, callback);
+  return fs.readFile(path.resolve(wd, 'assets', `${name}.svg`), { encoding: 'utf8' }, callback);
 }
 
 async function getFixture(name, callback) {
