@@ -1,10 +1,7 @@
 
-function getAsset(name, callback) {
-  fabric.util.request(`/assets/${name}.svg`, {
-    onComplete: function (xhr) {
-      callback(null, xhr.responseText);
-    }
-  });
+async function getAsset(name, callback) {
+  const svg = (await fetch(`/assets/${name}.svg`)).text();
+  callback(null, svg);
 }
 
 async function getFixture(name, callback) {
