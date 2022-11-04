@@ -7,11 +7,12 @@ on:
 
 jobs:
   browser:
-    name: browser tests
+    name: ${{ matrix.target }} tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [16.x]
+        target: [chrome, firefox]
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
@@ -24,7 +25,7 @@ jobs:
       - name: Run browser headless test
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: npm run test -- -c chrome firefox -s unit visual
+          run: npm run test -- -c ${{ matrix.target }} -s unit visual
       - name: Archive test results
         if: failure()
         uses: actions/upload-artifact@v3
@@ -33,7 +34,7 @@ jobs:
           path: cli_output/test_results
   node:
     runs-on: ubuntu-latest
-    name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
+    name: Node ${{ matrix.node-version }} tests
     strategy:
       fail-fast: false
       matrix:
