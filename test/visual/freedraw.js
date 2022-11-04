@@ -30,15 +30,6 @@
   });
   fabric.Object.prototype.objectCaching = true;
   // eslint-disable-next-line
-  var visualTestLoop, compareGoldensTest;
-  if (fabric.isLikelyNode) {
-    visualTestLoop = global.visualTestLoop;
-    compareGoldensTest = global.compareGoldensTest;
-  }
-  else {
-    visualTestLoop = window.visualTestLoop;
-    compareGoldensTest = window.compareGoldensTest;
-  }
   function setBrush(canvas, brush) {
     canvas.isDrawingMode = true;
     canvas.freeDrawingBrush = brush;
@@ -2213,7 +2204,6 @@
   });
 
   var visualTester = visualTestLoop(QUnit);
-  //var compareGoldens = compareGoldensTest(QUnit);
   tests[0].newModule = 'Free Drawing';
   tests.forEach(function (test) {
     var options = Object.assign({}, freeDrawingTestDefaults, test.targets);
