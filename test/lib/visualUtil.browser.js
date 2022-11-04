@@ -1,6 +1,6 @@
 
 async function getAsset(name, callback) {
-  const svg = (await fetch(`/assets/${name}.svg`)).text();
+  const svg = await (await fetch(`/assets/${name}.svg`)).text();
   callback(null, svg);
 }
 
