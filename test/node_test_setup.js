@@ -1,8 +1,20 @@
 require('source-map-support/register');
-// set the fabric framework as a global for tests
-var chalk = require('chalk');
-var diff = require('deep-object-diff').diff;
-var commander = require('commander');
+require('./fabricSetup.node');
+
+const diff = require('deep-object-diff').diff;
+const { visualTestLoop } = require('./lib/visualTestLoop');
+const { simulateEvent } = require('./lib/event.simulate');
+const { fabric } = require('../dist/fabric');
+const pixelmatch = require('pixelmatch');
+
+const {
+  getAsset,
+  getFixture,
+  getGolden,
+  goldenExists,
+  generateGolden,
+  dumpResults
+} = require('./lib/visualUtil.node');
 
 // TODO remove block and dependency when node 14 fades out
 // node 14 AbortController polyfill for tests
@@ -10,66 +22,27 @@ if (!global.AbortController) {
   require("abort-controller/polyfill");
 }
 
+Object.assign(global, {
+  pixelmatch,
+  simulateEvent,
+  visualTestLoop,
+  // running for CI: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+  CI: process.env.CI,
+  RUNNER_ID: process.env.RUNNER_ID || 'node',
+  getAsset,
+  getFixture,
+  getGolden,
+  goldenExists,
+  generateGolden,
+  dumpResults
+});
 
-commander.program
-  .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)
-  .option('-r, --recreate', 'recreate visual refs (golden images)', false)
-  .action(options => {
-    QUnit.debug = QUnit.debugVisual = options.debug;
-    QUnit.recreateVisualRefs = options.recreate;
-  }).parse(process.argv);
-//  for now accept an env variable because qunit doesn't allow passing unknown options
 QUnit.debugVisual = Number(process.env.QUNIT_DEBUG_VISUAL_TESTS);
 QUnit.recreateVisualRefs = Number(process.env.QUNIT_RECREATE_VISUAL_REFS);
 QUnit.config.filter = process.env.QUNIT_FILTER;
-
-// running for CI: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
-global.CI = process.env.CI;
-global.RUNNER_ID = 'node';
-
-global.fabric = require('../dist/fabric').fabric;
-global.pixelmatch = require('pixelmatch');
-global.fs = require('fs-extra');
-global.path = require('path');
-global.visualCallback = {
-  addArguments: function() {},
-};
-global.visualTestLoop = require('./lib/visualTestLoop').visualTestLoop;
-global.compareGoldensTest = require('./lib/visualTestLoop').compareGoldensTest;
-global.getFixture = require('./lib/visualTestLoop').getFixture;
-global.getAsset = require('./lib/visualTestLoop').getAsset;
-global.getAssetName = require('./lib/visualTestLoop').getAssetName;
-global.simulateEvent = require('./lib/event.simulate').simulateEvent;
-QUnit.config.testTimeout = 15000;
+QUnit.config.testTimeout = Number(process.env.QUNIT_TIMEOUT);
 QUnit.config.noglobals = true;
 QUnit.config.hidepassed = true;
-
-var jsdom = require('jsdom');
-
-// make a jsdom version for tests that does not spam too much.
-class CustomResourceLoader extends jsdom.ResourceLoader {
-  fetch(url, options) {
-    return super.fetch(url, options).catch(e => {
-      console.log('JSDOM CATCHED FETCHING', url);
-      throw new Error('JSDOM FETCH CATCHED');
-    });
-  }
-}
-
-var virtualWindow = new jsdom.JSDOM(
-  decodeURIComponent('%3C!DOCTYPE%20html%3E%3Chtml%3E%3Chead%3E%3C%2Fhead%3E%3Cbody%3E%3C%2Fbody%3E%3C%2Fhtml%3E'),
-  {
-    features: {
-      FetchExternalResources: ['img']
-    },
-    resources: new CustomResourceLoader(),
-  }).window;
-fabric.document = virtualWindow.document;
-fabric.jsdomImplForWrapper = require('jsdom/lib/jsdom/living/generated/utils').implForWrapper;
-fabric.nodeCanvas = require('jsdom/lib/jsdom/utils').Canvas;
-fabric.window = virtualWindow;
-DOMParser = fabric.window.DOMParser;
-
 
 //  QUnit Logging
 

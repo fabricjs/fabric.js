@@ -2,16 +2,6 @@
   fabric.config.configure({
     enableGLFiltering: false
   });
-  var visualTestLoop;
-  var getAssetName;
-  if (fabric.isLikelyNode) {
-    visualTestLoop = global.visualTestLoop;
-    getAssetName = global.getAssetName;
-  }
-  else {
-    visualTestLoop = window.visualTestLoop;
-    getAssetName = window.getAssetName;
-  }
 
   function svgToDataURL(svgStr) {
     var encoded = encodeURIComponent(svgStr)

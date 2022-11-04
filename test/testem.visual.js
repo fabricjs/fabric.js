@@ -13,6 +13,8 @@ module.exports = {
   serve_files: [
     ...config.serve_files,
     'test/lib/pixelmatch.js',
+    'test/lib/visualUtil.js',
+    'test/lib/visualUtil.browser.js',
     'test/lib/visualTestLoop.js',
     'test/lib/appendTestResults.js',
     ...(process.env.TEST_FILES ? process.env.TEST_FILES.split(',') : ['test/visual/*.js'])

@@ -50,24 +50,23 @@ function startGoldensServer() {
             }
             else if (req.method.toUpperCase() === 'POST' && req.url === '/goldens') {
                 const { files: [{ rawData }], fields: { filename } } = await parseRequest(req);
-                const fileName = filename.split('/golden/')[1];
-                const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', fileName);
+                const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
                 console.log(chalk.gray('[info]'), `creating golden ${path.relative(wd, goldenPath)}`);
                 fs.writeFileSync(goldenPath, rawData, { encoding: 'binary' });
                 res.end();
             }
             else if (req.method.toUpperCase() === 'POST' && req.url === '/goldens/results') {
                 const { files, fields: { filename, runner, test, module, passing } } = await parseRequest(req);
-                const fileName = /\/golden\/(.*)\..*$/.exec(filename)[1];
-                const dumpsPath = path.resolve(process.env.REPORT_DIR, runner, fileName);
+                const basename = path.basename(filename,'.png');
+                const dumpsPath = path.resolve(process.env.REPORT_DIR, runner, basename);
                 fs.ensureDirSync(dumpsPath);
                 fs.writeFileSync(path.resolve(dumpsPath, 'info.json'), JSON.stringify({
                     module,
                     test,
-                    file: fileName,
+                    file: basename,
                     passing: JSON.parse(passing)
                 }, null, 2));
-                const out = { name: fileName, dir: dumpsPath };
+                const out = { name: basename, dir: dumpsPath };
                 files.forEach(({ rawData, filename }) => {
                     const filePath = path.resolve(dumpsPath, filename);
                     fs.writeFileSync(filePath, rawData, { encoding: 'binary' });
