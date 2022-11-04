@@ -3,7 +3,7 @@ const path = require('path');
 const chalk = require('chalk');
 const http = require('http');
 const busboy = require('busboy');
-const { URL, URLSearchParams } = require('node:url');
+const { URLSearchParams } = require('node:url');
 
 const wd = path.resolve(__dirname, '..');
 
