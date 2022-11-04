@@ -391,12 +391,14 @@
     height: 230,
   });
 
-  function multipleGradients(canvas, callback) {
-    fabric.loadSVGFromURL(getAssetName('svg_linear_9'), function(objects) {
-      var group = fabric.util.groupSVGElements(objects);
-      canvas.add(group);
-      toSVGCanvas(canvas, callback);
-    });
+  async function multipleGradients(canvas, callback) {
+    getAsset('svg_linear_9', (err, svg) => {
+      fabric.loadSVGFromURL(svg, function (objects) {
+        var group = fabric.util.groupSVGElements(objects);
+        canvas.add(group);
+        toSVGCanvas(canvas, callback);
+      });
+    });    
   }
 
   tests.push({
