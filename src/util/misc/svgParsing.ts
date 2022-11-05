@@ -1,10 +1,9 @@
-//@ts-nocheck
-
 import { fabric } from '../../../HEADER';
 import { SVGElementName, SupportedSVGUnit, TMat2D } from '../../typedefs';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
 import { toFixed } from './toFixed';
 import { config } from '../../config';
+import {FabricObject} from "../../shapes/fabricObject.class";
 /**
  * Returns array of attributes for given svg that fabric parses
  * @memberOf fabric.util

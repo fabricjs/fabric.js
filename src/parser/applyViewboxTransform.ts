@@ -173,6 +173,7 @@ export function applyViewboxTransform(element: Element): TParsedViewBoxDims {
     el = element.ownerDocument.createElementNS(svgNS, 'g');
     // element.firstChild != null
     while (element.firstChild) {
+      //TODO: is this correct? shouldn't this infinitely loop????
       el.appendChild(element.firstChild);
     }
     element.appendChild(el);
