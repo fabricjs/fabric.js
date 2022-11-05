@@ -38,10 +38,9 @@ module.exports = {
       secure: false,
     }
   },
-  qunit: {
-    ...config.qunit,
+  testActions: {
     recreate: Number(process.env.RECREATE_VISUAL_REFS) || false,
     debug: Number(process.env.DEBUG_VISUAL_TESTS) || false,
-    launch: Number(process.env.QUNIT_LAUNCH) || false,
   },
+  launch: Number(process.env.LAUNCH_BROWSER) || false,
 }

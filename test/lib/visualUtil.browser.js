@@ -49,25 +49,24 @@ async function generateGolden(name, canvas) {
 }
 
 async function dumpResults(name, { passing, test, module }, visuals) {
-  if (QUnit.launch || !passing) {
-    const keys = Object.keys(visuals);
-    const blobs = await Promise.all(keys.map(key => new Promise((resolve, reject) => {
-      try {
-        visuals[key].toBlob(resolve, 'image/png');
-      } catch (error) {
-        reject(error);
-      }
-    })));
-    const formData = new FormData();
-    keys.forEach((key, index) => formData.append(key, blobs[index], `${key}.png`));
-    formData.append('filename', name);
-    formData.append('passing', passing);
-    formData.append('test', test);
-    formData.append('module', module);
-    formData.append('runner', getRunnerId());
-    return fetch('/goldens/results', {
-      body: formData,
-      method: 'POST'
-    });
-  }
+
+  const keys = Object.keys(visuals);
+  const blobs = await Promise.all(keys.map(key => new Promise((resolve, reject) => {
+    try {
+      visuals[key].toBlob(resolve, 'image/png');
+    } catch (error) {
+      reject(error);
+    }
+  })));
+  const formData = new FormData();
+  keys.forEach((key, index) => formData.append(key, blobs[index], `${key}.png`));
+  formData.append('filename', name);
+  formData.append('passing', passing);
+  formData.append('test', test);
+  formData.append('module', module);
+  formData.append('runner', getRunnerId());
+  return fetch('/goldens/results', {
+    body: formData,
+    method: 'POST'
+  });
 }

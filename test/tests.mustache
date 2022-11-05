@@ -44,9 +44,8 @@ window.addEventListener('error', (event) => {
 {{#visual}}
 <script>
 
-QUnit.launch = {{qunit.launch}};
 const testIdToFileMap = {};
-{{qunit.launch}} && QUnit.testDone(test => appendTestResults(testIdToFileMap, test));
+{{launch}} && QUnit.testDone(test => appendTestResults(testIdToFileMap, test));
 const RUNNER_ID = getRunnerId();
 
 /**
@@ -63,7 +62,8 @@ QUnit.assert.visualEqual = async function assertVisualEqual(callback, file, opti
     generateGolden,
     shouldFailIfNotFound: () => {{CI}},
     shouldGenerateGolden: passing =>
-      !this.todo && !options.testOnly && ((!passing && {{qunit.debug}}) || {{qunit.recreate}}),
+      !this.todo && !options.testOnly && ((!passing && {{testActions.debug}}) || {{testActions.recreate}}),
+    shouldDumpResults: passing => {{launch}} || !passing,
     dumpResults,
     testName: this.test.testName,
     moduleName: this.test.module.name

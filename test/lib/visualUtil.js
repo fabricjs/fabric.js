@@ -89,15 +89,15 @@
         const imageDataGolden = ctx.getImageData(0, 0, width, height).data;
         const differentPixels = this.pixelmatch(imageDataActual.data, imageDataGolden, diffOutput.data, width, height, pixelmatchOptions);
         const okDiff = totalPixels * percentageThreshold;
-        const isOK = differentPixels <= okDiff;
+        const passing = differentPixels <= okDiff;
         const result = {
-          result: isOK,
+          result: passing,
           actual: `${differentPixels} different pixels (${(differentPixels / totalPixels * 100).toFixed(2)}%)`,
           expected: `${okDiff} >= different pixels (${(percentageThreshold * 100).toFixed(2)}%)`,
           message: ` [${file}] has too many different pixels`
         };
 
-        if (this.shouldGenerateGolden(isOK)) {
+        if (this.shouldGenerateGolden(passing)) {
           await this.generateGolden(file, actual);
         }
 
@@ -107,9 +107,9 @@
         diff.height = height;
         diff.getContext('2d', { willReadFrequently: true }).putImageData(diffOutput, 0, 0);
       
-        await this.dumpResults(file,
+        this.shouldDumpResults(passing) && await this.dumpResults(file,
           {
-            passing: isOK,
+            passing,
             test: this.testName,
             module: this.moduleName
           },

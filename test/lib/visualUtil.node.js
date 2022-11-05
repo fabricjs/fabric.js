@@ -32,21 +32,19 @@ function generateGolden(name, canvas) {
 }
 
 async function dumpResults(name, { passing, test, module }, visuals) {
-  if (!passing) {
-    const basename = path.basename(name, '.png');
-    const dumpsPath = path.resolve(REPORT_DIR, RUNNER_ID, basename);
-    fs.ensureDirSync(dumpsPath);
-    fs.writeFileSync(path.resolve(dumpsPath, 'info.json'), JSON.stringify({
-      module,
-      test,
-      file: basename,
-      passing: false
-    }, null, 2));
-    Object.keys(visuals).forEach(key => {
-      const dataUrl = visuals[key].toDataURL().split(',')[1];
-      fs.writeFileSync(path.resolve(dumpsPath, `${key}.png`), dataUrl, { encoding: 'base64' });
-    });
-  }
+  const basename = path.basename(name, '.png');
+  const dumpsPath = path.resolve(REPORT_DIR, RUNNER_ID, basename);
+  fs.ensureDirSync(dumpsPath);
+  fs.writeFileSync(path.resolve(dumpsPath, 'info.json'), JSON.stringify({
+    module,
+    test,
+    file: basename,
+    passing
+  }, null, 2));
+  Object.keys(visuals).forEach(key => {
+    const dataUrl = visuals[key].toDataURL().split(',')[1];
+    fs.writeFileSync(path.resolve(dumpsPath, `${key}.png`), dataUrl, { encoding: 'base64' });
+  });
 }
 
 module.exports = {

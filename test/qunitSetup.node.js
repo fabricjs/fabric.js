@@ -96,6 +96,7 @@ QUnit.assert.visualEqual = async function assertVisualEqual(callback, file, opti
     shouldFailIfNotFound: () => process.env.CI,
     shouldGenerateGolden: passing =>
       !this.todo && !options.testOnly && ((!passing && debugVisual) || recreateVisualRefs),
+    shouldDumpResults: passing => !passing,
     dumpResults,
     testName: this.test.testName,
     moduleName: this.test.module.name
