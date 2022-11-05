@@ -1,24 +1,6 @@
 (function (exports) {
   
-  function createCanvasForTest(opts) {
-    var fabricClass = opts.fabricClass || 'StaticCanvas';
-    var options = { enableRetinaScaling: false, renderOnAddRemove: false, width: 200, height: 200 };
-    if (opts.width) {
-      options.width = opts.width;
-    }
-    if (opts.height) {
-      options.height = opts.height;
-    }
-    const canvas = new fabric[fabricClass](null, options);
-    // stub
-    canvas.requestRenderAll = canvas.renderAll;
-    return canvas;
-  }
-  
-  const pixelmatchOptions = {
-    includeAA: false,
-    threshold: 0.095
-  };
+
 
   /**
    * @deprecated use QUnit.assert.visualEqual instead
@@ -81,7 +63,6 @@
     testOnly,
   }) {
     const done = this.async();
-    const fabricCanvas = createCanvasForTest({ fabricClass, width, height });
     const basename = /(.*)\..*/.exec(file)[1];
     testIdToFileMap[this.test.testId] = {
       name: file,
@@ -90,6 +71,11 @@
       actual: `/results/${RUNNER_ID}/${basename}/actual.png`,
       diff: `/results/${RUNNER_ID}/${basename}/diff.png`,
     };
+
+
+
+!this.todo && !testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)
+
     const exists = await goldenExists(file);
 
     if (CI && !exists) {
@@ -133,7 +119,7 @@
         message: ` [${file}] has too many different pixels`
       });
 
-      if (!this.todo && !testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)) {
+      if () {
         await generateGolden(file, actual);
       }
 
