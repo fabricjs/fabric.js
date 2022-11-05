@@ -348,7 +348,7 @@ async function test(suite, tests, options = {}) {
     NODE_CMD: [
       options.coverage ? 'nyc --silent' : '',
       'qunit',
-      'test/nodeSetup.js',
+      'test/testSetup.node.js',
       suite === 'visual' ? 'test/lib' : '',
     ]
       .concat(tests || `test/${suite}`)

@@ -15,7 +15,7 @@ module.exports = {
   ],
   launchers: {
     Node: {
-      command: process.env.NODE_CMD || 'qunit test/nodeSetup.js test/lib test/unit',
+      command: process.env.NODE_CMD || 'qunit test/testSetup.node.js test/lib test/unit',
       protocol: 'tap'
     }
   },
