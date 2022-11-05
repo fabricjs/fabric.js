@@ -30,6 +30,7 @@ export type TComposeMatrixArgs = TTranslateMatrixArgs &
 export type TQrDecomposeOut = Required<
   Omit<TComposeMatrixArgs, 'flipX' | 'flipY'>
 >;
+
 /**
  * Apply transform t to point p
  * @static
@@ -216,4 +217,51 @@ export const composeMatrix = ({
     matrix = multiplyTransformMatrices(matrix, scaleMatrix);
   }
   return matrix;
+};
+
+/**
+ * Decomposes standard 3x3 matrix into transform components.
+ * If `angle` is not provided, there are several possible
+ * values for the components. In this scenario, `skewY` is
+ * considered equal to zero and we calculate the other
+ * components accordingly. 
+ * 
+ * @static
+ * @memberOf fabric.util
+ * @param  {TMat2D} m transformMatrix
+ * @param  {TDegree=} angle rotation
+ * @return {Object} Components of transform
+ */
+export const decodeTransformMatrix = (m: TMat2D, angle?: TDegree): TComposeMatrixArgs => {
+  // Our "best guess" for the lack of information provided
+  if (typeof angle === 'undefined') {
+    const options = qrDecompose(m);
+    return {
+      flipX: options.scaleX < 0,
+      flipY: options.scaleY < 0,
+      ...options
+    };
+  }
+
+  const theta = degreesToRadians(angle as TDegree),
+    cosin = cos(theta),
+    sinus = sin(theta),
+    inverseRotationMatrix = [cosin, -sinus, sinus, cosin, 0, 0] as TMat2D,
+    matrixWithoutRotation = multiplyTransformMatrices(inverseRotationMatrix, m),
+    scaleY = matrixWithoutRotation[3],
+    shearY = matrixWithoutRotation[1] / scaleY,
+    scaleX = matrixWithoutRotation[0] - shearY * matrixWithoutRotation[2],
+    shearX = matrixWithoutRotation[2] / scaleX;
+  
+  return {
+    angle,
+    flipX: scaleX < 0,
+    flipY: scaleY < 0,
+    scaleX: Math.abs(scaleX),
+    scaleY: Math.abs(scaleY),
+    skewX: radiansToDegrees(Math.atan(shearX)),
+    skewY: radiansToDegrees(Math.atan(shearY)),
+    translateX: m[4] || 0,
+    translateY: m[5] || 0
+  };
 };
