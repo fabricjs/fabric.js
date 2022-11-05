@@ -12,7 +12,6 @@ module.exports = {
   report_dir: reportPath,
   serve_files: [
     ...config.serve_files,
-    'test/lib/pixelmatch.js',
     'test/lib/visualUtil.js',
     'test/lib/visualUtil.browser.js',
     'test/lib/visualTestLoop.js',
