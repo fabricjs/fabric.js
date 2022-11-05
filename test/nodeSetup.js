@@ -1,5 +1,6 @@
 require('source-map-support/register');
 require('./fabricSetup.node');
+require('./qunitSetup.node');
 
 const { visualTestLoop } = require('./lib/visualTestLoop');
 const { simulateEvent } = require('./lib/event.simulate');
