@@ -74,7 +74,7 @@ export function applyViewboxTransform(element: Element): TParsedViewBoxDims {
       element.parentNode.nodeName !== '#document'
     ) {
       translateMatrix =
-        ' translate(' + parseUnit(xAttr) + ' ' + parseUnit(yAttr) + ') ';
+        ` translate(${parseUnit(xAttr)} ${parseUnit(yAttr)}) `;
       matrix = (element.getAttribute('transform') || '') + translateMatrix;
       element.setAttribute('transform', matrix);
       element.removeAttribute('x');
@@ -152,21 +152,12 @@ export function applyViewboxTransform(element: Element): TParsedViewBoxDims {
   }
   if ((xAttr || yAttr) && element.parentNode?.nodeName !== '#document') {
     translateMatrix =
-      ' translate(' + parseUnit(xAttr) + ' ' + parseUnit(yAttr) + ') ';
+      ` translate(${parseUnit(xAttr)} ${parseUnit(yAttr)}) `;
   }
 
-  matrix =
-    translateMatrix +
-    ' matrix(' +
-    scaleX +
-    ' 0' +
-    ' 0 ' +
-    scaleY +
-    ' ' +
-    (minX * scaleX + widthDiff) +
-    ' ' +
-    (minY * scaleY + heightDiff) +
-    ') ';
+  matrix = `${translateMatrix} matrix(${scaleX} 0 0 ${scaleY} ${
+    minX * scaleX + widthDiff
+  } ${minY * scaleY + heightDiff}) `;
   // seems unused.
   // parsedDim.viewboxTransform = parseTransformAttribute(matrix);
   if (element.nodeName === 'svg') {
