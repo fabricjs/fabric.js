@@ -4,7 +4,6 @@ require('./qunitSetup.node');
 
 const { visualTestLoop } = require('./lib/visualTestLoop');
 const { simulateEvent } = require('./lib/event.simulate');
-const pixelmatch = require('pixelmatch');
 
 const {
   getAsset,
@@ -18,7 +17,6 @@ if (!global.AbortController) {
 }
 
 Object.assign(global, {
-  pixelmatch,
   simulateEvent,
   visualTestLoop,
   // running for CI: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables

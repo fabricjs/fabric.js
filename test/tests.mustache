@@ -57,6 +57,7 @@ const RUNNER_ID = getRunnerId();
 QUnit.assert.visualEqual = async function assertVisualEqual(callback, file, options) {
   const done = this.async();
   const result = await visualAssertion.call({
+    pixelmatch,
     getGolden,
     goldenExists,
     generateGolden,

@@ -1,5 +1,6 @@
 const { fabric } = require('../dist/fabric');
 const { diff } = require('deep-object-diff');
+const pixelmatch = require('pixelmatch');
 const {
   getGolden,
   goldenExists,
@@ -90,6 +91,7 @@ QUnit.assert.strictEqual = function (actual, expected, message) {
 QUnit.assert.visualEqual = async function assertVisualEqual(callback, file, options) {
   const done = this.async();
   const result = await visualAssertion.call({
+    pixelmatch,
     getGolden,
     goldenExists,
     generateGolden,
