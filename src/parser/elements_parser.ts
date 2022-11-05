@@ -6,7 +6,8 @@ import {
   qrDecompose,
 } from '../util/misc/matrix';
 import { TParsedViewBoxDims } from './applyViewboxTransform';
-import {FabricObject} from "../shapes/object.class";
+import { FabricObject } from '../shapes/object.class';
+import { Point } from '../point.class';
 
 export interface ElementsParserOptions extends TParsedViewBoxDims {
   svgUid?: number;
@@ -40,11 +41,12 @@ class ElementsParser {
   reviver: TReviver;
   svgUid: number;
   parsingOptions: ElementsParserParsingOptions;
-  regexUrl: RegExp;
   doc?: Document;
 
   instances?: Array<FabricObject>;
   numElements?: number;
+
+  regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
 
   constructor(
     elements: Element[],
@@ -60,7 +62,6 @@ class ElementsParser {
     this.reviver = reviver;
     this.svgUid = (options && options.svgUid) || 0;
     this.parsingOptions = parsingOptions;
-    this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
     this.doc = doc;
   }
 
@@ -86,7 +87,11 @@ class ElementsParser {
     // TODO: firgure out a better way. maybe modify sig of FabricObject?
     if (klass && (klass as any).fromElement) {
       try {
-        (klass as any).fromElement(el, this.createCallback(index, el), this.options);
+        (klass as any).fromElement(
+          el,
+          this.createCallback(index, el),
+          this.options
+        );
       } catch (err) {
         console.log(err);
       }
@@ -146,10 +151,7 @@ class ElementsParser {
     }
   }
 
-  createClipPathCallback(
-    obj: FabricObject,
-    container: Array<FabricObject>
-  ) {
+  createClipPathCallback(obj: FabricObject, container: Array<FabricObject>) {
     return (_newObj: FabricObject) => {
       (_newObj as any)._removeTransformMatrix();
       _newObj.fillRule = (_newObj as any).clipRule;
@@ -158,17 +160,17 @@ class ElementsParser {
   }
 
   resolveClipPath(obj: FabricObject, usingElement: Element) {
-    let clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
-      element: Element,
-      klass,
-      objTransformInv,
-      container,
-      gTransform;
-    if (clipPath) {
-      container = Array<FabricObject>();
-      objTransformInv = invertTransform((obj as any).calcTransformMatrix());
+    const clipPathSubtree: Element[] = this.extractPropertyDefinition(
+      obj,
+      'clipPath',
+      'clipPaths'
+    );
+    if (clipPathSubtree) {
+      const container = Array<FabricObject>();
+      const objTransformInv = invertTransform(obj.calcTransformMatrix());
       // move the clipPath tag as sibling to the real element that is using it
-      const clipPathTag = clipPath[0].parentNode;
+      const clipPathTag = clipPathSubtree[0].parentNode;
+      if (!clipPathTag) return; // Temporary
       let clipPathOwner = usingElement;
       while (
         clipPathOwner.parentNode &&
@@ -178,21 +180,21 @@ class ElementsParser {
       }
       if (clipPathOwner.parentNode) {
         clipPathOwner.parentNode.appendChild(clipPathTag);
-        for (let i = 0; i < clipPath.length; i++) {
-          element = clipPath[i];
-          klass = this.findTag(element);
+        for (const element of clipPathSubtree) {
+          const klass = this.findTag(element);
           (klass as any).fromElement(
             element,
             this.createClipPathCallback(obj, container),
             this.options
           );
         }
+        let clipPath: FabricObject;
         if (container.length === 1) {
           clipPath = container[0];
         } else {
           clipPath = new fabric.Group(container);
         }
-        gTransform = multiplyTransformMatrices(
+        const gTransform = multiplyTransformMatrices(
           objTransformInv,
           clipPath.calcTransformMatrix()
         );

@@ -1,4 +1,4 @@
-import { Point } from '../point.class';
+import { IPoint, Point } from '../point.class';
 import { transformPoint } from '../util/misc/matrix';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { CommonMethods } from './shared_methods.mixin';
@@ -193,7 +193,7 @@ export class ObjectOrigin extends CommonMethods {
    * @return {Point}
    */
   translateToGivenOrigin(
-    point: Point,
+    point: IPoint,
     fromOriginX: TOriginX,
     fromOriginY: TOriginY,
     toOriginX: TOriginX,
@@ -221,7 +221,7 @@ export class ObjectOrigin extends CommonMethods {
    * @return {Point}
    */
   translateToCenterPoint(
-    point: Point,
+    point: IPoint,
     originX: TOriginX,
     originY: TOriginY
   ): Point {
@@ -307,7 +307,7 @@ export class ObjectOrigin extends CommonMethods {
    * @param {TOriginY} originY Vertical origin: 'top', 'center' or 'bottom'
    * @return {void}
    */
-  setPositionByOrigin(pos: Point, originX: TOriginX, originY: TOriginY) {
+  setPositionByOrigin(pos: IPoint, originX: TOriginX, originY: TOriginY) {
     const center = this.translateToCenterPoint(pos, originX, originY),
       position = this.translateToOriginPoint(
         center,
