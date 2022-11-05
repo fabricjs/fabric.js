@@ -29,7 +29,7 @@ module.exports = {
   },
   launchers: {
     Node: {
-      command: process.env.NODE_CMD || 'qunit test/node_test_setup.js test/lib test/visual',
+      command: process.env.NODE_CMD || 'qunit test/nodeSetup.js test/lib test/visual',
       protocol: 'tap'
     }
   },
