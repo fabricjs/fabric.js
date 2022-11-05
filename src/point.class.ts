@@ -11,7 +11,7 @@ export interface IPoint {
 /**
  * Adaptation of work of Kevin Lindsey(kevin@kevlindev.com)
  */
-export class Point {
+export class Point implements IPoint {
   x: number;
 
   y: number;
@@ -324,7 +324,7 @@ export class Point {
    * @param {Point} that
    * @chainable
    */
-  setFromPoint(that: Point) {
+  setFromPoint(that: IPoint) {
     this.x = that.x;
     this.y = that.y;
     return this;
@@ -334,7 +334,7 @@ export class Point {
    * Swaps x/y of this point and another point
    * @param {Point} that
    */
-  swap(that: Point) {
+  swap(that: IPoint) {
     const x = this.x,
       y = this.y;
     this.x = that.x;
@@ -359,7 +359,7 @@ export class Point {
    * @param {TRadian} radians The radians of the angle for the rotation
    * @return {Point} The new rotated point
    */
-  rotate(radians: TRadian, origin: Point = originZero): Point {
+  rotate(radians: TRadian, origin: IPoint = originZero): Point {
     // TODO benchmark and verify the add and subtract how much cost
     // and then in case early return if no origin is passed
     const sinus = sin(radians),
