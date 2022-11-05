@@ -20,6 +20,11 @@
     threshold: 0.095
   };
 
+  /**
+   * @deprecated use QUnit.assert.visualEqual instead
+   * @param {*} QUnit 
+   * @returns 
+   */
   exports.visualTestLoop = function(QUnit) {
 
     return function testCallback({
