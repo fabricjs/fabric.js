@@ -224,22 +224,25 @@ export const composeMatrix = ({
  * If `angle` is not provided, there are several possible
  * values for the components. In this scenario, `skewY` is
  * considered equal to zero and we calculate the other
- * components accordingly. 
- * 
+ * components accordingly.
+ *
  * @static
  * @memberOf fabric.util
  * @param  {TMat2D} m transformMatrix
  * @param  {TDegree=} angle rotation
  * @return {Object} Components of transform
  */
-export const decodeTransformMatrix = (m: TMat2D, angle?: TDegree): TComposeMatrixArgs => {
+export const decodeTransformMatrix = (
+  m: TMat2D,
+  angle?: TDegree
+): TComposeMatrixArgs => {
   // Our "best guess" for the lack of information provided
   if (typeof angle === 'undefined') {
     const options = qrDecompose(m);
     return {
       flipX: options.scaleX < 0,
       flipY: options.scaleY < 0,
-      ...options
+      ...options,
     };
   }
 
@@ -252,7 +255,7 @@ export const decodeTransformMatrix = (m: TMat2D, angle?: TDegree): TComposeMatri
     shearY = matrixWithoutRotation[1] / scaleY,
     scaleX = matrixWithoutRotation[0] - shearY * matrixWithoutRotation[2],
     shearX = matrixWithoutRotation[2] / scaleX;
-  
+
   return {
     angle,
     flipX: scaleX < 0,
@@ -262,6 +265,6 @@ export const decodeTransformMatrix = (m: TMat2D, angle?: TDegree): TComposeMatri
     skewX: radiansToDegrees(Math.atan(shearX)),
     skewY: radiansToDegrees(Math.atan(shearY)),
     translateX: m[4] || 0,
-    translateY: m[5] || 0
+    translateY: m[5] || 0,
   };
 };
