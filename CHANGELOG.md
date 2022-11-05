@@ -2,6 +2,16 @@
 
 ## [next]
 
+- chore(TS): migrate Rect [#8411](https://github.com/fabricjs/fabric.js/pull/8411)
+- chore(TS): migrate Ellipse [#8408](https://github.com/fabricjs/fabric.js/pull/8408)
+- chore(TS): migrate Triangle to TS [#8410](https://github.com/fabricjs/fabric.js/pull/8410)
+- chore(TS): migrate Circle to TS [#8406](https://github.com/fabricjs/fabric.js/pull/8406)
+- chore(TS): convert Object interactivity mixin to its own class [#8401](https://github.com/fabricjs/fabric.js/pull/8401)
+- chore(TS): Convert controls e6/ts [#8400](https://github.com/fabricjs/fabric.js/pull/8400)
+- ci(): remove buggy changelog action in favor of `git diff` bash script + direct git how to merge `CHANGELOG.md` [#8309](https://github.com/fabricjs/fabric.js/pull/8346)
+- fix(): skewing controls accuracy + successive interactions [#8380](https://github.com/fabricjs/fabric.js/pull/8380)
+- chore(TS): Convert Geometry and Origin to classes/e6/ts [#8390](https://github.com/fabricjs/fabric.js/pull/8390)
+- ci(): build stats report [#8395](https://github.com/fabricjs/fabric.js/pull/8395)
 - chore(TS): convert object to es6 class [#8322](https://github.com/fabricjs/fabric.js/pull/8322)
 - docs(): guides follow up, feature request template [#8379](https://github.com/fabricjs/fabric.js/pull/8379)
 - docs(): refactor guides, bug report template [#8189](https://github.com/fabricjs/fabric.js/pull/8189)

@@ -25,7 +25,7 @@ export type TParseSVGDocumentCallback = (
   elements?: Element[],
   descendants?: Element[]
 ) => void;
-import { FabricObject } from '../shapes/object.class';
+import { FabricObject } from '../shapes/fabricObject.class';
 
 /**
  * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback

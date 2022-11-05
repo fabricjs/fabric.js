@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { FabricObject } from './object.class';
+import { FabricObject } from './fabricObject.class';
 
 (function (global) {
   var fabric = global.fabric,
