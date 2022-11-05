@@ -43,7 +43,7 @@
    * @param String message (optional)
    */
   QUnit.assert.close = function(actual, expected, maxDifference, message) {
-    var actualDiff = (actual === expected) ? 0 : Math.abs(actual - expected),
+    const actualDiff = (actual === expected) ? 0 : Math.abs(actual - expected),
         result = actualDiff <= maxDifference;
 
     message = message || (actual + " should be within " + maxDifference + " (inclusive) of " + expected + (result ? "" : ". Actual: " + actualDiff));
@@ -1011,53 +1011,90 @@
     assert.deepEqual(matrix, fabric.iMatrix, 'default is identity matrix');
   });
 
-  QUnit.test('decodeTransformMatrix with angle', function(assert) {
-    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
+  function runTestForDecodeTransformMatrix(assert, angle) {
     const maxDiffAllowed = 0.000000009;
-    for (let angle = 0; angle <= 360; angle += 30) {
-      [[1, 1], [1, 4], [5, 1], [3, 8]].forEach(([scaleX, scaleY]) => {
-        for (let skewX = -80; skewX < 90; skewX += 20) {
-          for (let skewY = -80; skewY < 90; skewY += 20) {
-            [
-              [false, false], 
-              [true, false], 
-              [false, true], 
-              [true, true]
-            ].forEach(([flipX, flipY]) => {
-              const expectedOptions = {
-                  scaleX,
-                  scaleY,
-                  skewX,
-                  skewY,
-                  angle,
-                  flipX,
-                  flipY,
-                  translateX: 100,
-                  translateY: 200
-                },
-                matrix = fabric.util.composeMatrix(expectedOptions),
-                decodedMatrix = fabric.util.decodeTransformMatrix(matrix, expectedOptions.angle);
-              Object.keys(decodedMatrix).forEach(option => {
-                option === 'flipX' || option === 'flipY'
-                ? assert.equal(
+    [[1, 1], [1, 4], [5, 1], [3, 8]].forEach(([scaleX, scaleY]) => {
+      for (let skewX = -80; skewX < 90; skewX += 45) {
+        for (let skewY = -80; skewY < 90; skewY += 45) {
+          [
+            [false, false], 
+            [true, false], 
+            [false, true], 
+            [true, true]
+          ].forEach(([flipX, flipY]) => {
+            const expectedOptions = {
+                scaleX,
+                scaleY,
+                skewX,
+                skewY,
+                angle,
+                flipX,
+                flipY,
+                translateX: 100,
+                translateY: 200
+              },
+              matrix = fabric.util.composeMatrix(expectedOptions),
+              decodedMatrix = fabric.util.decodeTransformMatrix(matrix, expectedOptions.angle);
+            Object.keys(decodedMatrix).forEach(option => {
+              option === 'flipX' || option === 'flipY'
+              ? assert.equal(
+                decodedMatrix[option], 
+                expectedOptions[option], 
+                `${option}. Reference options: ${JSON.stringify(expectedOptions)}`
+              )
+              : assert.close(
                   decodedMatrix[option], 
                   expectedOptions[option], 
-                  `${option}. Reference options: ${JSON.stringify(expectedOptions)}`
+                  maxDiffAllowed,
+                  `${option}: actual is ${decodedMatrix[option]} and expected is ${expectedOptions[option]}.`
+                  + `Max diff allowed: ${maxDiffAllowed}, current diff: ${Math.abs(decodedMatrix[option] - expectedOptions[option])}.`
+                  + `Reference options: ${JSON.stringify(expectedOptions)}`
                 )
-                : assert.close(
-                    decodedMatrix[option], 
-                    expectedOptions[option], 
-                    maxDiffAllowed,
-                    `${option}: actual is ${decodedMatrix[option]} and expected is ${expectedOptions[option]}.`
-                    + `Max diff allowed: ${maxDiffAllowed}, current diff: ${Math.abs(decodedMatrix[option] - expectedOptions[option])}.`
-                    + `Reference options: ${JSON.stringify(expectedOptions)}`
-                  )
-              });
             });
-          };
+          });
         };
-      });
-    };
+      };
+    });
+  };
+
+  QUnit.test('decodeTransformMatrix with angle 0', function(assert) {
+    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
+    runTestForDecodeTransformMatrix(assert, 0);
+  });
+
+  QUnit.test('decodeTransformMatrix with angle 60', function(assert) {
+    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
+    runTestForDecodeTransformMatrix(assert, 60);
+  });
+
+  QUnit.test('decodeTransformMatrix with angle 120', function(assert) {
+    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
+    runTestForDecodeTransformMatrix(assert, 120);
+  });
+
+  QUnit.test('decodeTransformMatrix with angle 180', function(assert) {
+    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
+    runTestForDecodeTransformMatrix(assert, 180);
+  });
+
+  QUnit.test('decodeTransformMatrix with angle 210', function(assert) {
+    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
+    runTestForDecodeTransformMatrix(assert, 210);
+  });
+
+  QUnit.test('decodeTransformMatrix with angle 270', function(assert) {
+    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
+    runTestForDecodeTransformMatrix(assert, 270);
+  });
+
+  QUnit.test('decodeTransformMatrix with angle 330', function(assert) {
+    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
+    runTestForDecodeTransformMatrix(assert, 330);
+  });
+
+  QUnit.test('decodeTransformMatrix with angle 360', function(assert) {
+    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
+    runTestForDecodeTransformMatrix(assert, 360);
   });
 
   QUnit.test('fabric.util.capValue ar < 1', function(assert) {
