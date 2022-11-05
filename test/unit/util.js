@@ -1,5 +1,3 @@
-const exp = require('constants');
-
 (function() {
 
   QUnit.module('fabric.util');
