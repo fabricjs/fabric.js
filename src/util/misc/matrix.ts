@@ -226,6 +226,8 @@ export const composeMatrix = ({
  * considered equal to zero and we calculate the other
  * components accordingly.
  *
+ * @see https://github.com/fabricjs/fabric.js/pull/8425
+ *
  * @static
  * @memberOf fabric.util
  * @param  {TMat2D} m transformMatrix
