@@ -1011,7 +1011,7 @@
     assert.deepEqual(matrix, fabric.iMatrix, 'default is identity matrix');
   });
 
-  QUnit.test.only('decodeTransformMatrix with angle', function(assert) {
+  QUnit.test('decodeTransformMatrix with angle', function(assert) {
     assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
     const maxDiffAllowed = 0.000000009;
     for (let angle = 0; angle <= 360; angle += 30) {
