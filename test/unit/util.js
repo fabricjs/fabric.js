@@ -1,3 +1,5 @@
+const exp = require('constants');
+
 (function() {
 
   QUnit.module('fabric.util');
@@ -29,6 +31,32 @@
     : getAbsolutePath('../fixtures/very_large_image.jpg');
 
   var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
+
+/**
+   * Checks that the first two arguments are equal, or are numbers close enough to be considered equal
+   * based on a specified maximum allowable difference.
+   * Credits: https://github.com/JamesMGreene/qunit-assert-close/blob/master/qunit-assert-close.js
+   *
+   * @example assert.close(3.141, Math.PI, 0.001);
+   *
+   * @param Number actual
+   * @param Number expected
+   * @param Number maxDifference (the maximum inclusive difference allowed between the actual and expected numbers)
+   * @param String message (optional)
+   */
+  QUnit.assert.close = function(actual, expected, maxDifference, message) {
+    var actualDiff = (actual === expected) ? 0 : Math.abs(actual - expected),
+        result = actualDiff <= maxDifference;
+
+    message = message || (actual + " should be within " + maxDifference + " (inclusive) of " + expected + (result ? "" : ". Actual: " + actualDiff));
+
+    this.pushResult({
+      result,
+      actual: actualDiff,
+      expected: maxDifference,
+      message
+    })
+  };
 
   QUnit.test('fabric.util.toFixed', function(assert) {
     assert.ok(typeof fabric.util.toFixed === 'function');
@@ -983,6 +1011,55 @@
     assert.ok(typeof fabric.util.composeMatrix === 'function');
     var matrix = fabric.util.composeMatrix({});
     assert.deepEqual(matrix, fabric.iMatrix, 'default is identity matrix');
+  });
+
+  QUnit.test.only('decodeTransformMatrix with angle', function(assert) {
+    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
+    const maxDiffAllowed = 0.000000009;
+    for (let angle = 0; angle <= 360; angle += 30) {
+      [[1, 1], [1, 4], [5, 1], [3, 8]].forEach(([scaleX, scaleY]) => {
+        for (let skewX = -80; skewX < 90; skewX += 20) {
+          for (let skewY = -80; skewY < 90; skewY += 20) {
+            [
+              [false, false], 
+              [true, false], 
+              [false, true], 
+              [true, true]
+            ].forEach(([flipX, flipY]) => {
+              const expectedOptions = {
+                  scaleX,
+                  scaleY,
+                  skewX,
+                  skewY,
+                  angle,
+                  flipX,
+                  flipY,
+                  translateX: 100,
+                  translateY: 200
+                },
+                matrix = fabric.util.composeMatrix(expectedOptions),
+                decodedMatrix = fabric.util.decodeTransformMatrix(matrix, expectedOptions.angle);
+              Object.keys(decodedMatrix).forEach(option => {
+                option === 'flipX' || option === 'flipY'
+                ? assert.equal(
+                  decodedMatrix[option], 
+                  expectedOptions[option], 
+                  `${option}. Reference options: ${JSON.stringify(expectedOptions)}`
+                )
+                : assert.close(
+                    decodedMatrix[option], 
+                    expectedOptions[option], 
+                    maxDiffAllowed,
+                    `${option}: actual is ${decodedMatrix[option]} and expected is ${expectedOptions[option]}.`
+                    + `Max diff allowed: ${maxDiffAllowed}, current diff: ${Math.abs(decodedMatrix[option] - expectedOptions[option])}.`
+                    + `Reference options: ${JSON.stringify(expectedOptions)}`
+                  )
+              });
+            });
+          };
+        };
+      });
+    };
   });
 
   QUnit.test('fabric.util.capValue ar < 1', function(assert) {
