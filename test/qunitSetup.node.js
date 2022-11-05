@@ -1,8 +1,16 @@
 const { fabric } = require('../dist/fabric');
 const { diff } = require('deep-object-diff');
+const {
+  getGolden,
+  goldenExists,
+  generateGolden,
+  dumpResults
+} = require('./lib/visualUtil.node');
+const { visualAssertion } = require('./lib/visualUtil');
 
-QUnit.debugVisual = Number(process.env.QUNIT_DEBUG_VISUAL_TESTS);
-QUnit.recreateVisualRefs = Number(process.env.QUNIT_RECREATE_VISUAL_REFS);
+const debugVisual = Number(process.env.DEBUG_VISUAL_TESTS);
+const recreateVisualRefs = Number(process.env.RECREATE_VISUAL_REFS);
+
 QUnit.config.filter = process.env.QUNIT_FILTER;
 QUnit.config.testTimeout = Number(process.env.QUNIT_TIMEOUT);
 QUnit.config.noglobals = true;
@@ -72,3 +80,26 @@ QUnit.assert.strictEqual = function (actual, expected, message) {
     message
   });
 };
+
+/**
+ * visual testing
+ * @param {*} callback 
+ * @param {*} file 
+ * @param {*} options 
+ */
+QUnit.assert.visualEqual = async function assertVisualEqual(callback, file, options) {
+  const done = this.async();
+  const result = await visualAssertion.call({
+    getGolden,
+    goldenExists,
+    generateGolden,
+    shouldFailIfNotFound: () => process.env.CI,
+    shouldGenerateGolden: passing =>
+      !this.todo && !options.testOnly && ((!passing && debugVisual) || recreateVisualRefs),
+    dumpResults,
+    testName: this.test.testName,
+    moduleName: this.test.module.name
+  }, callback, file, options);
+  this.pushResult(result);
+  done();
+}

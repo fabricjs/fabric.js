@@ -6,6 +6,7 @@ const { pathToFileURL } = require('node:url');
 
 const wd = path.resolve(__dirname, '..', 'visual');
 const RUNNER_ID = process.env.RUNNER_ID || 'node';
+const REPORT_DIR = process.env.REPORT_DIR;
 
 function getAsset(name, callback) {
   return fs.readFile(path.resolve(wd, 'assets', `${name}.svg`), { encoding: 'utf8' }, callback);
@@ -33,7 +34,7 @@ function generateGolden(name, canvas) {
 async function dumpResults(name, { passing, test, module }, visuals) {
   if (!passing) {
     const basename = path.basename(name, '.png');
-    const dumpsPath = path.resolve(process.env.REPORT_DIR, RUNNER_ID, basename);
+    const dumpsPath = path.resolve(REPORT_DIR, RUNNER_ID, basename);
     fs.ensureDirSync(dumpsPath);
     fs.writeFileSync(path.resolve(dumpsPath, 'info.json'), JSON.stringify({
       module,
@@ -49,7 +50,6 @@ async function dumpResults(name, { passing, test, module }, visuals) {
 }
 
 module.exports = {
-  RUNNER_ID,
   getAsset,
   getFixture,
   getGolden,

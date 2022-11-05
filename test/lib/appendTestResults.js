@@ -26,11 +26,11 @@ function appendResultsToNode(node, { name, basename, expected, actual, diff }) {
 /**
  * Called from testem.mustache file
  */
-function appendTestResults({ testId }) {
+function appendTestResults(testIdToFileMap, { testId }) {
   const id = `qunit-test-output-${testId}`;
   const node = document.getElementById(id);
   if (node) {
-    appendResultsToNode(node, window.testIdToFileMap[testId]);
+    appendResultsToNode(node, testIdToFileMap[testId]);
   }
   else {
     new MutationObserver((mutationList, observer) => {
@@ -38,7 +38,7 @@ function appendTestResults({ testId }) {
         if (mutation.type === 'childList') {
           mutation.addedNodes.forEach(node => {
             if (node.id === id && !node.querySelector('table')) {
-              appendResultsToNode(node, window.testIdToFileMap[testId]);
+              appendResultsToNode(node, testIdToFileMap[testId]);
               observer.disconnect();
             }
           });

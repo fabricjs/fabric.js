@@ -19,21 +19,6 @@
 // true when running from github action
 window.CI = {{CI}};
 
-function getRunnerId() {
-    if (navigator.userAgent.toLowerCase().indexOf('firefox') !== -1) {
-      return 'firefox';
-    }
-    else if (navigator.userAgent.toLowerCase().indexOf('chrome') !== -1) {
-      return 'chrome';
-    }
-    else {
-      // fallback to the test unique id
-      return Testem.getId();
-    }
-}
-// used by browser logic to dump files
-window.RUNNER_ID = getRunnerId();
-
 // QUnit config
 QUnit.config.reorder = false;
 {{#qunit.filter}}QUnit.config.filter = {{qunit.filter}};{{/qunit.filter}}
@@ -58,10 +43,42 @@ window.addEventListener('error', (event) => {
 
 {{#visual}}
 <script>
-{{qunit.launch}} && QUnit.testDone(appendTestResults);
+
 QUnit.launch = {{qunit.launch}};
-QUnit.recreateVisualRefs = {{qunit.recreate}};
-QUnit.debugVisual = {{qunit.debug}};
+const testIdToFileMap = {};
+{{qunit.launch}} && QUnit.testDone(test => appendTestResults(testIdToFileMap, test));
+const RUNNER_ID = getRunnerId();
+
+/**
+ * visual testing
+ * @param {*} callback 
+ * @param {*} file 
+ * @param {*} options 
+ */
+QUnit.assert.visualEqual = async function assertVisualEqual(callback, file, options) {
+  const done = this.async();
+  const result = await visualAssertion.call({
+    getGolden,
+    goldenExists,
+    generateGolden,
+    shouldFailIfNotFound: () => {{CI}},
+    shouldGenerateGolden: passing =>
+      !this.todo && !options.testOnly && ((!passing && {{qunit.debug}}) || {{qunit.recreate}}),
+    dumpResults,
+    testName: this.test.testName,
+    moduleName: this.test.module.name
+  }, callback, file, options);
+  this.pushResult(result);
+  const basename = /(.*)\..*/.exec(file)[1];
+  testIdToFileMap[this.test.testId] = {
+    name: file,
+    basename,
+    expected: `/results/${RUNNER_ID}/${basename}/expected.png`,
+    actual: `/results/${RUNNER_ID}/${basename}/actual.png`,
+    diff: `/results/${RUNNER_ID}/${basename}/diff.png`,
+  };
+  done();
+}
 
 function downloadGoldens() {
     const checkbox = document.getElementById('qunit-urlconfig-hidepassed');

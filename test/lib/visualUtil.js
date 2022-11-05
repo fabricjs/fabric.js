@@ -19,8 +19,6 @@
     canvas.requestRenderAll = canvas.renderAll;
     return canvas;
   }
-  
-
 
   async function getImage(src) {
     return new Promise((resolve, reject) => {
@@ -39,7 +37,14 @@
     });
   }
 
-  async function visualAssertion(context, callback, file, {
+  /**
+   * Runs in context
+   * @param {*} callback 
+   * @param {*} file 
+   * @param {*} param2 
+   * @returns 
+   */
+  async function visualAssertion(callback, file, {
     fabricClass,
     width,
     height,
@@ -49,11 +54,12 @@
     percentageThreshold,
   }) {
     const fabricCanvas = createCanvasForTest({ fabricClass, width, height });
-    const exists = await context.goldenExists(file);
+    const exists = await this.goldenExists(file);
 
-    if (context.CI && !exists) {
-      // this means that the golden wasn't committed to the repo
-      // we do not want the test to create the missing golden thus reporting a false positive
+    if (!exists && this.shouldFailIfNotFound()) {
+      // this case occurs when running from CI
+      // it means that the golden wasn't committed to the repo
+      // we do not want the test to create the missing golden, thus reporting a false positive
       return {
         result: false,
         actual: `not found`,
@@ -62,62 +68,64 @@
       };
     };
         
-    callback(fabricCanvas, async (actual) => {
-      // retrieve golden
-      if (!exists) {
-        await context.generateGolden(file, actual);
-      }
-      const width = actual.width;
-      const height = actual.height;
-      const totalPixels = width * height;
-      const imageDataActual = actual.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, width, height);
+    return new Promise(resolve => {
+      callback(fabricCanvas, async (actual) => {
+        // retrieve golden
+        if (!exists) {
+          await this.generateGolden(file, actual);
+        }
+        const width = actual.width;
+        const height = actual.height;
+        const totalPixels = width * height;
+        const imageDataActual = actual.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, width, height);
 
-      const expected = fabric.document.createElement('canvas');
-      expected.width = width;
-      expected.height = height;
-      const ctx = expected.getContext('2d', { willReadFrequently: true });
-      const diffOutput = ctx.getImageData(0, 0, width, height);
-      ctx.drawImage(await context.getGolden(file), 0, 0);
+        const expected = fabric.document.createElement('canvas');
+        expected.width = width;
+        expected.height = height;
+        const ctx = expected.getContext('2d', { willReadFrequently: true });
+        const diffOutput = ctx.getImageData(0, 0, width, height);
+        ctx.drawImage(await this.getGolden(file), 0, 0);
 
-      const imageDataGolden = ctx.getImageData(0, 0, width, height).data;
-      const differentPixels = context.pixelmatch(imageDataActual.data, imageDataGolden, diffOutput.data, width, height, pixelmatchOptions);
-      const okDiff = totalPixels * percentageThreshold;
-      const isOK = differentPixels <= okDiff;
-      const result = {
-        result: isOK,
-        actual: `${differentPixels} different pixels (${(differentPixels / totalPixels * 100).toFixed(2)}%)`,
-        expected: `${okDiff} >= different pixels (${(percentageThreshold * 100).toFixed(2)}%)`,
-        message: ` [${file}] has too many different pixels`
-      };
+        const imageDataGolden = ctx.getImageData(0, 0, width, height).data;
+        const differentPixels = this.pixelmatch(imageDataActual.data, imageDataGolden, diffOutput.data, width, height, pixelmatchOptions);
+        const okDiff = totalPixels * percentageThreshold;
+        const isOK = differentPixels <= okDiff;
+        const result = {
+          result: isOK,
+          actual: `${differentPixels} different pixels (${(differentPixels / totalPixels * 100).toFixed(2)}%)`,
+          expected: `${okDiff} >= different pixels (${(percentageThreshold * 100).toFixed(2)}%)`,
+          message: ` [${file}] has too many different pixels`
+        };
 
-      if (context.shouldGenerateGolden(isOK)) {
-        await context.generateGolden(file, actual);
-      }
+        if (this.shouldGenerateGolden(isOK)) {
+          await this.generateGolden(file, actual);
+        }
 
-      // dump results
-      const diff = fabric.document.createElement('canvas');
-      diff.width = width;
-      diff.height = height;
-      diff.getContext('2d', { willReadFrequently: true }).putImageData(diffOutput, 0, 0);
+        // dump results
+        const diff = fabric.document.createElement('canvas');
+        diff.width = width;
+        diff.height = height;
+        diff.getContext('2d', { willReadFrequently: true }).putImageData(diffOutput, 0, 0);
       
-      await context.dumpResults(file,
-        {
-          passing: isOK,
-          test: context.testName,
-          module: context.moduleName
-        },
-        {
-          expected,
-          actual,
-          diff
-        });
+        await this.dumpResults(file,
+          {
+            passing: isOK,
+            test: this.testName,
+            module: this.moduleName
+          },
+          {
+            expected,
+            actual,
+            diff
+          });
       
-      await fabricCanvas.dispose();
+        await fabricCanvas.dispose();
 
-      return result;
+        resolve(result);
+      });
     });
-
   }
 
   exports.getImage = getImage;
+  exports.visualAssertion = visualAssertion;
 })(typeof window === 'undefined' ? exports : this);

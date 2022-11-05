@@ -1,4 +1,17 @@
 
+function getRunnerId() {
+  if (navigator.userAgent.toLowerCase().indexOf('firefox') !== -1) {
+    return 'firefox';
+  }
+  else if (navigator.userAgent.toLowerCase().indexOf('chrome') !== -1) {
+    return 'chrome';
+  }
+  else {
+    // fallback to the test unique id
+    return Testem.getId();
+  }
+}
+
 async function getAsset(name, callback) {
   const svg = await (await fetch(`/assets/${name}.svg`)).text();
   callback(null, svg);
@@ -51,7 +64,7 @@ async function dumpResults(name, { passing, test, module }, visuals) {
     formData.append('passing', passing);
     formData.append('test', test);
     formData.append('module', module);
-    formData.append('runner', RUNNER_ID);
+    formData.append('runner', getRunnerId());
     return fetch('/goldens/results', {
       body: formData,
       method: 'POST'

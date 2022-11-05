@@ -336,8 +336,8 @@ async function test(suite, tests, options = {}) {
   await awaitBuild();
 
   const qunitEnv = {
-    QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
-    QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
+    DEBUG_VISUAL_TESTS: Number(options.debug),
+    RECREATE_VISUAL_REFS: Number(options.recreate),
     QUNIT_LAUNCH: Number(options.launch || options.dev),
     QUNIT_FILTER: options.filter,
     QUNIT_TIMEOUT: 15000,
