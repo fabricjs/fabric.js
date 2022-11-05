@@ -26,6 +26,7 @@ export type TParseSVGDocumentCallback = (
   descendants?: Element[]
 ) => void;
 import { FabricObject } from '../shapes/fabricObject.class';
+import {InteractiveFabricObject} from "../mixins/object_interactivity.mixin";
 
 /**
  * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
@@ -107,7 +108,7 @@ export function parseSVGDocument(
     elements,
     function (instances, elements) {
       if (callback) {
-        callback(instances, options, elements, descendants);
+        callback(instances as InteractiveFabricObject[], options, elements, descendants);
         delete gradientDefs[svgUid];
         delete cssRules[svgUid];
         delete clipPaths[svgUid];
