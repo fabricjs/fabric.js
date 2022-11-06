@@ -607,11 +607,13 @@ export class ObjectGeometry extends ObjectOrigin {
    * @returns {TDegree}
    */
   getTotalAngle(): TDegree {
-    // @ts-ignore
-    return this.getAncestors(true).reduce(
-      (angle: number, ancestor: any) => angle + ancestor.angle,
-      this.angle
-    );
+    let angle = this.angle;
+    let parent: any = this.group;
+    while (parent) {
+      angle += parent.angle;
+      parent = parent.group;
+    }
+    return angle;
   }
 
   /**
