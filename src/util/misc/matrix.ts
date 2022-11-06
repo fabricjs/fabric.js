@@ -201,7 +201,6 @@ export const calcDimensionsMatrix = ({
  * @param  {Number} [options.translateY]
  * @return {Number[]} transform matrix
  */
-
 export const composeMatrix = ({
   translateX = 0,
   translateY = 0,
@@ -248,11 +247,15 @@ export const decodeTransformMatrix = (
     };
   }
 
-  const theta = degreesToRadians(angle as TDegree),
+  const theta = degreesToRadians(angle),
     cosin = cos(theta),
     sinus = sin(theta),
     inverseRotationMatrix = [cosin, -sinus, sinus, cosin, 0, 0] as TMat2D,
-    matrixWithoutRotation = multiplyTransformMatrices(inverseRotationMatrix, m),
+    matrixWithoutRotation = multiplyTransformMatrices(
+      inverseRotationMatrix,
+      m,
+      true
+    ),
     scaleY = matrixWithoutRotation[3],
     shearY = matrixWithoutRotation[1] / scaleY,
     scaleX = matrixWithoutRotation[0] - shearY * matrixWithoutRotation[2],
