@@ -1012,6 +1012,7 @@
   });
 
   function runTestForDecodeTransformMatrix(assert, angle) {
+    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
     const maxDiffAllowed = 0.000000009;
     [[1, 1], [1, 4], [5, 1], [3, 8]].forEach(([scaleX, scaleY]) => {
       for (let skewX = -80; skewX < 90; skewX += 45) {
@@ -1057,44 +1058,10 @@
     });
   };
 
-  QUnit.test('decodeTransformMatrix with angle 0', function(assert) {
-    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
-    runTestForDecodeTransformMatrix(assert, 0);
-  });
-
-  QUnit.test('decodeTransformMatrix with angle 60', function(assert) {
-    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
-    runTestForDecodeTransformMatrix(assert, 60);
-  });
-
-  QUnit.test('decodeTransformMatrix with angle 120', function(assert) {
-    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
-    runTestForDecodeTransformMatrix(assert, 120);
-  });
-
-  QUnit.test('decodeTransformMatrix with angle 180', function(assert) {
-    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
-    runTestForDecodeTransformMatrix(assert, 180);
-  });
-
-  QUnit.test('decodeTransformMatrix with angle 210', function(assert) {
-    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
-    runTestForDecodeTransformMatrix(assert, 210);
-  });
-
-  QUnit.test('decodeTransformMatrix with angle 270', function(assert) {
-    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
-    runTestForDecodeTransformMatrix(assert, 270);
-  });
-
-  QUnit.test('decodeTransformMatrix with angle 330', function(assert) {
-    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
-    runTestForDecodeTransformMatrix(assert, 330);
-  });
-
-  QUnit.test('decodeTransformMatrix with angle 360', function(assert) {
-    assert.ok(typeof fabric.util.decodeTransformMatrix === 'function');
-    runTestForDecodeTransformMatrix(assert, 360);
+  QUnit.test('decodeTransformMatrix with angle', function (assert) {
+    for (let angle = 0; angle <= 360; angle += 30) {
+      runTestForDecodeTransformMatrix(assert, angle);
+    }
   });
 
   QUnit.test('fabric.util.capValue ar < 1', function(assert) {
