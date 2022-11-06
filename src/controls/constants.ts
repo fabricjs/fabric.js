@@ -1,5 +1,7 @@
 import { TAxis, TAxisKey } from '../typedefs';
 
+export const NOT_ALLOWED_CURSOR = 'not-allowed';
+
 export const AXIS_KEYS: Record<
   TAxis,
   {

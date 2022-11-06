@@ -2,7 +2,8 @@
 
 import { ControlCursorCallback, TransformActionHandler } from '../typedefs';
 import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
-import { isLocked, NOT_ALLOWED_CURSOR } from './util';
+import { NOT_ALLOWED_CURSOR } from './constants';
+import { isLocked } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 

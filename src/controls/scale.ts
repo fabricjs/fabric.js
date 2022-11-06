@@ -7,13 +7,13 @@ import {
   TransformActionHandler,
 } from '../typedefs';
 import { Canvas } from '../__types__';
+import { NOT_ALLOWED_CURSOR } from './constants';
 import {
   findCornerQuadrant,
   getLocalPoint,
   invertOrigin,
   isLocked,
   isTransformCentered,
-  NOT_ALLOWED_CURSOR,
 } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';

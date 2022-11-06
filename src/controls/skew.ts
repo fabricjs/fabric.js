@@ -11,13 +11,8 @@ import {
   degreesToRadians,
   radiansToDegrees,
 } from '../util/misc/radiansDegreesConversion';
-import { AXIS_KEYS } from './AXIS_KEYS';
-import {
-  findCornerQuadrant,
-  getLocalPoint,
-  isLocked,
-  NOT_ALLOWED_CURSOR,
-} from './util';
+import { AXIS_KEYS, NOT_ALLOWED_CURSOR } from './constants';
+import { findCornerQuadrant, getLocalPoint, isLocked } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 

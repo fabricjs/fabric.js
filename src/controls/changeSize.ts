@@ -1,6 +1,6 @@
 import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { TAxis, Transform } from '../typedefs';
-import { AXIS_KEYS } from './AXIS_KEYS';
+import { AXIS_KEYS } from './constants';
 import { getLocalPoint, isTransformCentered } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
