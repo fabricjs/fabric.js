@@ -1,6 +1,15 @@
 (function() {
 
-  QUnit.module('fabric.util');
+  QUnit.module('fabric.util', {
+    before() {
+      fabric.config.configure({
+        enableGLFiltering: false
+      })
+    },
+    after() {
+      fabric.config.restoreDefaults();
+    }
+  });
 
   function _createImageElement() {
     return fabric.document.createElement('img');
