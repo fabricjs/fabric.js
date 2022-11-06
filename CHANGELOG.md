@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(): expose `changeHeight` control action [#8426](https://github.com/fabricjs/fabric.js/pull/8426)
 - chore(TS): migrate Rect [#8411](https://github.com/fabricjs/fabric.js/pull/8411)
 - chore(TS): migrate Ellipse [#8408](https://github.com/fabricjs/fabric.js/pull/8408)
 - chore(TS): migrate Triangle to TS [#8410](https://github.com/fabricjs/fabric.js/pull/8410)
