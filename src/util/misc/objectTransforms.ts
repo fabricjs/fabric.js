@@ -1,13 +1,13 @@
 import { Point } from '../../point.class';
 import type { FabricObject } from '../../shapes/object.class';
-import { TMat2D } from '../../typedefs';
+import { TDegree, TMat2D } from '../../typedefs';
 import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
-import type { TScaleMatrixArgs } from './matrix';
 import {
   calcDimensionsMatrix,
+  decodeTransformMatrix,
   invertTransform,
   multiplyTransformMatrices,
-  qrDecompose,
+  TScaleMatrixArgs,
 } from './matrix';
 
 /**
@@ -19,19 +19,27 @@ import {
  * in the opposite direction.
  * This util is used to add objects inside transformed groups or nested groups.
  * @memberOf fabric.util
- * @param {fabric.Object} object the object you want to transform
- * @param {Array} transform the destination transform
+ * @param {FabricObject} object the object you want to transform
+ * @param {TMat2D} transform the destination transform
+ * @param {TDegree} [removedAngle] provide this value for matrix decomposition accuracy
  */
 export const removeTransformFromObject = (
   object: FabricObject,
-  transform: TMat2D
+  transform: TMat2D,
+  removedAngle?: TDegree
 ) => {
   const inverted = invertTransform(transform),
     finalTransform = multiplyTransformMatrices(
       inverted,
       object.calcOwnMatrix()
     );
-  applyTransformToObject(object, finalTransform);
+  applyTransformToObject(
+    object,
+    finalTransform,
+    typeof removedAngle === 'number'
+      ? object.getTotalAngle() - removedAngle
+      : undefined
+  );
 };
 
 /**
@@ -40,27 +48,37 @@ export const removeTransformFromObject = (
  * Adding to an object a transform that scale by 2 is like scaling it by 2.
  * This is used when removing an object from an active selection for example.
  * @memberOf fabric.util
- * @param {fabric.Object} object the object you want to transform
- * @param {Array} transform the destination transform
+ * @param {FabricObject} object the object you want to transform
+ * @param {TMat2D} transform the destination transform
+ * @param {TDegree} [addedAngle] provide this value for matrix decomposition accuracy
  */
-export const addTransformToObject = (object: FabricObject, transform: TMat2D) =>
+export const addTransformToObject = (
+  object: FabricObject,
+  transform: TMat2D,
+  addedAngle?: TDegree
+) =>
   applyTransformToObject(
     object,
-    multiplyTransformMatrices(transform, object.calcOwnMatrix())
+    multiplyTransformMatrices(transform, object.calcOwnMatrix()),
+    typeof addedAngle === 'number'
+      ? object.getTotalAngle() + addedAngle
+      : undefined
   );
 
 /**
  * discard an object transform state and apply the one from the matrix.
  * @memberOf fabric.util
- * @param {fabric.Object} object the object you want to transform
- * @param {Array} transform the destination transform
+ * @param {FabricObject} object the object you want to transform
+ * @param {TMat2D} transform the destination transform
+ * @param {TDegree} [angle] provide this value for matrix decomposition accuracy
  */
 export const applyTransformToObject = (
   object: FabricObject,
-  transform: TMat2D
+  transform: TMat2D,
+  angle?: TDegree
 ) => {
   const { translateX, translateY, scaleX, scaleY, ...otherOptions } =
-      qrDecompose(transform),
+      decodeTransformMatrix(transform, angle),
     center = new Point(translateX, translateY);
   object.flipX = false;
   object.flipY = false;
@@ -72,7 +90,7 @@ export const applyTransformToObject = (
  * reset an object transform state to neutral. Top and left are not accounted for
  * @static
  * @memberOf fabric.util
- * @param  {fabric.Object} target object to transform
+ * @param  {FabricObject} target object to transform
  */
 export const resetObjectTransform = (target: FabricObject) => {
   target.scaleX = 1;
@@ -88,7 +106,7 @@ export const resetObjectTransform = (target: FabricObject) => {
  * Extract Object transform values
  * @static
  * @memberOf fabric.util
- * @param  {fabric.Object} target object to read from
+ * @param  {FabricObject} target object to read from
  * @return {Object} Components of transform
  */
 export const saveObjectTransform = (target: FabricObject) => ({
@@ -111,11 +129,7 @@ export const saveObjectTransform = (target: FabricObject) => ({
  * @memberOf fabric.util
  * @param {Number} width
  * @param {Number} height
- * @param {Object} options
- * @param {Number} options.scaleX
- * @param {Number} options.scaleY
- * @param {Number} options.skewX
- * @param {Number} options.skewY
+ * @param {TScaleMatrixArgs} options
  * @returns {Point} size
  */
 export const sizeAfterTransform = (
