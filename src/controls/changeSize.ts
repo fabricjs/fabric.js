@@ -31,7 +31,7 @@ const changeObjectSize = (
   const { origin: originKey, scale: scaleKey, size: sizeKey } = AXIS_KEYS[axis];
   const origin = resolveOrigin(target[originKey]);
   const scale = target[scaleKey];
-  //  make sure the control changes width/height ONLY from it's side of target
+  //  make sure the control changes width/height ONLY from its side of target
   if (
     origin === 0 ||
     (origin > 0 && offset < 0) ||
