@@ -3,7 +3,6 @@ import { Point } from '../point.class';
 import {
   ControlCursorCallback,
   TAxis,
-  TAxisKey,
   TPointerEvent,
   Transform,
   TransformActionHandler,
@@ -12,6 +11,7 @@ import {
   degreesToRadians,
   radiansToDegrees,
 } from '../util/misc/radiansDegreesConversion';
+import { AXIS_KEYS } from './AXIS_KEYS';
 import {
   findCornerQuadrant,
   getLocalPoint,
@@ -22,35 +22,6 @@ import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 
 export type SkewTransform = Transform & { skewingSide: -1 | 1 };
-
-const AXIS_KEYS: Record<
-  TAxis,
-  {
-    counterAxis: TAxis;
-    scale: TAxisKey<'scale'>;
-    skew: TAxisKey<'skew'>;
-    lockSkewing: TAxisKey<'lockSkewing'>;
-    origin: TAxisKey<'origin'>;
-    flip: TAxisKey<'flip'>;
-  }
-> = {
-  x: {
-    counterAxis: 'y',
-    scale: 'scaleX',
-    skew: 'skewX',
-    lockSkewing: 'lockSkewingX',
-    origin: 'originX',
-    flip: 'flipX',
-  },
-  y: {
-    counterAxis: 'x',
-    scale: 'scaleY',
-    skew: 'skewY',
-    lockSkewing: 'lockSkewingY',
-    origin: 'originY',
-    flip: 'flipY',
-  },
-};
 
 const skewMap = ['ns', 'nesw', 'ew', 'nwse'];
 
