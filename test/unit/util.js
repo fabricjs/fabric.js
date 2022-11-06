@@ -1058,11 +1058,11 @@
     });
   };
 
-  QUnit.test('decodeTransformMatrix with angle', function (assert) {
-    for (let angle = 0; angle <= 360; angle += 30) {
+  for (let angle = 0; angle <= 360; angle += 30) {
+    QUnit.test(`decodeTransformMatrix with ${angle}`, function (assert) {
       runTestForDecodeTransformMatrix(assert, angle);
-    }
-  });
+    });
+  };
 
   QUnit.test('fabric.util.capValue ar < 1', function(assert) {
     assert.ok(typeof fabric.util.capValue === 'function');
