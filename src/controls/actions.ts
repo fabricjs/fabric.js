@@ -1,5 +1,5 @@
 import { fabric } from '../../HEADER';
-import { changeWidth } from './changeSize';
+import { changeWidth } from './changeWidth';
 import { renderCircleControl, renderSquareControl } from './controls.render';
 import { dragHandler } from './drag';
 import { rotationStyleHandler, rotationWithSnapping } from './rotate';
