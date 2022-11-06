@@ -29,7 +29,7 @@ const changeObjectSize = (
     y
   )[axis];
   const { origin: originKey, scale: scaleKey, size: sizeKey } = AXIS_KEYS[axis];
-  const origin = resolveOrigin(target[originKey]);
+  const origin = resolveOrigin(transform[originKey]);
   const scale = target[scaleKey];
   //  make sure the control changes width/height ONLY from its side of target
   if (
