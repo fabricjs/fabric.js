@@ -23,9 +23,7 @@ jobs:
       - run: npm ci
       - run: npm run build -- -f
       - name: Run browser headless test
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          run: npm run test -- -c ${{ matrix.target }} -s unit visual
+        run: xvfb-run -a npm run test -- -c ${{ matrix.target }} -s unit visual
       - name: Archive test results
         if: failure()
         uses: actions/upload-artifact@v3
