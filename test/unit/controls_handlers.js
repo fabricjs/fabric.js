@@ -22,75 +22,109 @@
         signY: 1,
       };
     }
-    QUnit.test('changeWidth changes the width', function(assert) {
+    QUnit.test('changeWidth/changeHeight changes the width/height', function(assert) {
       assert.equal(transform.target.width, 100);
-      var changed = fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
-      assert.ok(changed, 'control changed target');
+      const changedWidth = fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
+      const changedHeight = fabric.controlsUtils.changeHeight(eventData, transform, 200, 300);
+      assert.ok(changedWidth, 'control changed target width');
+      assert.ok(changedHeight, 'control changed target height');
       assert.equal(transform.target.width, 199);
+      assert.equal(transform.target.height, 299);
       assert.equal(transform.target.left, 0);
       assert.equal(transform.target.top, 0);
     });
-    QUnit.test('changeWidth does not change the width', function (assert) {
+    QUnit.test('changeWidth/changeHeight does not change the width/height', function (assert) {
       var target = new fabric.Rect({ width: 100, height: 100, canvas });
       target._set = () => { };
       assert.equal(target.width, 100);
-      var changed = fabric.controlsUtils.changeWidth(eventData, Object.assign({}, transform, { target }), 200, 300);
-      assert.ok(!changed, 'control change was rejected');
+      const changedWidth = fabric.controlsUtils.changeWidth(eventData, { ...transform, target }, 200, 300);
+      const changedHeight = fabric.controlsUtils.changeHeight(eventData, { ...transform, target }, 200, 300);
+      assert.ok(!changedWidth, 'control change was rejected');
+      assert.ok(!changedHeight, 'control change was rejected');
       assert.equal(target.width, 100);
+      assert.equal(target.height, 100);
       assert.equal(target.left, 0);
       assert.equal(target.top, 0);
     });
-    QUnit.test('changeWidth does not change the width of target\'s other side', function (assert) {
+    QUnit.test('changeWidth/changeHeight does not change the width/height of target\'s other side', function (assert) {
       assert.equal(transform.target.width, 100);
-      var changed = fabric.controlsUtils.changeWidth(eventData, prepareTransform(transform.target, 'ml'), 200, 300);
-      assert.ok(!changed, 'control should not have changed target');
+      assert.equal(transform.target.height, 100);
+      let changedWidth = fabric.controlsUtils.changeWidth(eventData, prepareTransform(transform.target, 'ml'), 200, 300);
+      let changedHeight = fabric.controlsUtils.changeHeight(eventData, prepareTransform(transform.target, 'mt'), 200, 300);
+      assert.ok(!changedWidth, 'control should not have changed target width');
+      assert.ok(!changedHeight, 'control should not have changed target height');
       assert.equal(transform.target.width, 100);
-      changed = fabric.controlsUtils.changeWidth(eventData, prepareTransform(transform.target, 'mr'), -200, 300);
-      assert.ok(!changed, 'control should not have changed target');
+      assert.equal(transform.target.height, 100);
+      changedWidth = fabric.controlsUtils.changeWidth(eventData, prepareTransform(transform.target, 'mr'), -200, 300);
+      changedHeight = fabric.controlsUtils.changeHeight(eventData, prepareTransform(transform.target, 'mb'), 200, -300);
+      assert.ok(!changedWidth, 'control should not have changed target width');
+      assert.ok(!changedHeight, 'control should not have changed target height');
       assert.equal(transform.target.width, 100);
-      assert.equal(transform.target.left, 0);
-      assert.equal(transform.target.top, 0);
+      assert.equal(transform.target.height, 100);
     });
-    QUnit.test('changeWidth changes the width with centered transform', function(assert) {
+    QUnit.test('changeWidth/changeHeight changes the width/height with centered transform', function(assert) {
       transform.originX = 'center';
       transform.originY = 'center';
       assert.equal(transform.target.width, 100);
+      assert.equal(transform.target.height, 100);
       fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
+      fabric.controlsUtils.changeHeight(eventData, transform, 200, 300);
       assert.equal(transform.target.width, 298);
+      assert.equal(transform.target.height, 498);
       assert.equal(transform.target.left, -99);
-      assert.equal(transform.target.top, 0);
+      assert.equal(transform.target.top, -199);
     });
-    QUnit.test('changeWidth changes the width with big strokeWidth', function(assert) {
+    QUnit.test('changeWidth/changeHeight changes the width/height with big strokeWidth', function(assert) {
       transform.target.strokeWidth = 15;
       fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
+      fabric.controlsUtils.changeHeight(eventData, transform, 200, 300);
       assert.equal(transform.target.width, 185);
+      assert.equal(transform.target.height, 285);
     });
-    QUnit.test('changeWidth changes the width with big strokeWidth and strokeUniform', function(assert) {
+    QUnit.test('changeWidth/changeHeight changes the width/height with big strokeWidth and strokeUniform', function(assert) {
       transform.target.strokeWidth = 15;
       transform.target.strokeUniform = true;
       fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
+      fabric.controlsUtils.changeHeight(eventData, transform, 200, 300);
       assert.equal(transform.target.width, 185);
+      assert.equal(transform.target.height, 285);
     });
-    QUnit.test('changeWidth changes the width with big strokeWidth and strokeUniform + scaling', function(assert) {
+    QUnit.test('changeWidth/changeHeight changes the width/height with big strokeWidth and strokeUniform + scaling', function(assert) {
       transform.target.strokeWidth = 15;
       transform.target.strokeUniform = true;
       transform.target.scaleX = 3;
+      transform.target.scaleY = 3;
       fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
+      fabric.controlsUtils.changeHeight(eventData, transform, 200, 300);
       assert.equal(Math.ceil(transform.target.width), 62);
+      assert.equal(Math.ceil(transform.target.height), 95);
     });
-    QUnit.test('changeWidth changes the width with big strokeWidth + scaling', function(assert) {
+    QUnit.test('changeWidth/changeHeight changes the width/height with big strokeWidth + scaling', function(assert) {
       transform.target.strokeWidth = 15;
       transform.target.scaleX = 3;
+      transform.target.scaleY = 3;
       fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
+      fabric.controlsUtils.changeHeight(eventData, transform, 200, 300);
       assert.equal(Math.ceil(transform.target.width), 52);
+      assert.equal(Math.ceil(transform.target.height), 85);
     });
-    QUnit.test('changeWidth will fire events on canvas and target resizing', function(assert) {
-      var done = assert.async();
+    QUnit.test('changeWidth/changeHeight will fire events on canvas and target resizing', function(assert) {
+      const firedObject = [];
+      const firedCanvas = [];
       transform.target.canvas.on('object:resizing', function(options) {
-        assert.equal(options.target, transform.target);
+        firedCanvas.push(options);
       });
       transform.target.on('resizing', function(options) {
-        assert.deepEqual(options, {
+        firedObject.push(options);
+      });
+      fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
+      assert.equal(firedCanvas.length, 1);
+      assert.equal(firedObject.length, 1);
+      fabric.controlsUtils.changeHeight(eventData, transform, 200, 300);
+      assert.equal(firedCanvas.length, 2);
+      assert.equal(firedObject.length, 2);
+      firedObject.forEach(actual => {
+        assert.deepEqual(actual, {
           e: eventData,
           transform: transform,
           pointer: new fabric.Point(
@@ -98,9 +132,18 @@
             300,
           ),
         });
-        done();
-      });
-      fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
+      });     
+      firedCanvas.forEach(actual => {
+        assert.deepEqual(actual, {
+          e: eventData,
+          transform: transform,
+          target: transform.target,
+          pointer: new fabric.Point(
+            200,
+            300,
+          ),
+        });
+      });   
     });
     QUnit.test('scalingXOrSkewingY changes scaleX', function(assert) {
       transform.target.scaleX = 1;
