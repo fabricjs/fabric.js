@@ -124,15 +124,40 @@ export const transformPointRelativeToCanvas = (
  * @param {TMat2D} [to] destination plane matrix to contain object. Passing `undefined` means `object` should be sent to the canvas coordinate plane.
  * @returns {TMat2D} the transform matrix that was applied to `object`
  */
-export const sendObjectToPlane = (
+export function sendObjectToPlane(
   object: FabricObject,
-  from?: TMat2D,
-  to?: TMat2D
-): TMat2D => {
-  const t = calcPlaneChangeMatrix(from, to);
+  to?: FabricObject
+): { transform: TMat2D; angle: TDegree };
+/**
+ * Use this signature for clip path
+ * @deprecated clip path's awareness to ancestors is planned to be fixed
+ * @todo remove signature + update examples once fixed
+ */
+export function sendObjectToPlane(
+  object: FabricObject,
+  from: FabricObject | undefined,
+  to: FabricObject | undefined
+): { transform: TMat2D; angle: TDegree };
+export function sendObjectToPlane(
+  object: FabricObject,
+  arg1?: FabricObject,
+  arg2?: FabricObject
+) {
+  const { from, to } =
+    arguments.length === 3
+      ? { from: arg1, to: arg2 }
+      : { from: object.group, to: arg1 };
+  const t = calcPlaneChangeMatrix(
+    from?.calcTransformMatrix(),
+    to?.calcTransformMatrix()
+  );
+  const angle = (object.angle -
+    (from?.getTotalAngle() || 0) +
+    (to?.getTotalAngle() || 0)) as TDegree;
   applyTransformToObject(
     object,
-    multiplyTransformMatrices(t, object.calcOwnMatrix())
+    multiplyTransformMatrices(t, object.calcOwnMatrix()),
+    angle
   );
-  return t;
-};
+  return { transform: t, angle };
+}
