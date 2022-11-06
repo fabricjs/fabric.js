@@ -1,22 +1,21 @@
 // @ts-nocheck
-import type { TClassProperties, TDegree, TSize, TFiller } from '../typedefs';
 import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { config } from '../config';
 import { VERSION } from '../constants';
-import { Point } from '../point.class';
-import { capValue } from '../util/misc/capValue';
-import { pick } from '../util/misc/pick';
-import { runningAnimations } from '../util/animation_registry';
-import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
-import { clone } from '../util/lang_object';
-import { toFixed } from '../util/misc/toFixed';
-import { capitalize } from '../util/lang_string';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { createCanvasElement } from '../util/misc/dom';
 import { ObjectGeometry } from '../mixins/object_geometry.mixin';
-import { qrDecompose, transformPoint } from '../util/misc/matrix';
-import { Canvas, Shadow, StaticCanvas } from '../__types__';
+import { Point } from '../point.class';
+import type { TClassProperties, TDegree, TFiller, TSize } from '../typedefs';
+import { runningAnimations } from '../util/animation_registry';
+import { clone } from '../util/lang_object';
+import { capitalize } from '../util/lang_string';
+import { capValue } from '../util/misc/capValue';
+import { createCanvasElement } from '../util/misc/dom';
+import { decodeTransformMatrix, transformPoint } from '../util/misc/matrix';
+import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
+import { pick } from '../util/misc/pick';
+import { toFixed } from '../util/misc/toFixed';
+import { Shadow } from '../__types__';
 
 // temporary hack for unfinished migration
 type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
@@ -956,7 +955,7 @@ export class FabricObject extends ObjectGeometry {
       return new Point(Math.abs(this.scaleX), Math.abs(this.scaleY));
     }
     // if we are inside a group total zoom calculation is complex, we defer to generic matrices
-    const options = qrDecompose(this.calcTransformMatrix());
+    const options = this.decodeTransformMatrix();
     return new Point(Math.abs(options.scaleX), Math.abs(options.scaleY));
   }
 
@@ -1619,7 +1618,7 @@ export class FabricObject extends ObjectGeometry {
    */
   _assignTransformMatrixProps() {
     if (this.transformMatrix) {
-      const options = qrDecompose(this.transformMatrix);
+      const options = decodeTransformMatrix(this.transformMatrix);
       this.flipX = false;
       this.flipY = false;
       this.set('scaleX', options.scaleX);

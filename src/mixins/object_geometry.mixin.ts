@@ -1,3 +1,6 @@
+import { iMatrix } from '../constants';
+import { Intersection } from '../intersection.class';
+import { Point } from '../point.class';
 import type {
   TBBox,
   TCornerPoint,
@@ -6,17 +9,14 @@ import type {
   TOriginX,
   TOriginY,
 } from '../typedefs';
-import { iMatrix } from '../constants';
-import { Intersection } from '../intersection.class';
-import { Point } from '../point.class';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { cos } from '../util/misc/cos';
 import {
   calcRotateMatrix,
   composeMatrix,
+  decodeTransformMatrix,
   invertTransform,
   multiplyTransformMatrices,
-  qrDecompose,
   transformPoint,
 } from '../util/misc/matrix';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
@@ -607,9 +607,11 @@ export class ObjectGeometry extends ObjectOrigin {
    * @returns {TDegree}
    */
   getTotalAngle(): TDegree {
-    return this.group
-      ? qrDecompose(this.calcTransformMatrix()).angle
-      : this.angle;
+    // @ts-ignore
+    return this.getAncestors(true).reduce(
+      (angle: number, ancestor: any) => angle + ancestor.angle,
+      this.angle
+    );
   }
 
   /**
@@ -759,6 +761,13 @@ export class ObjectGeometry extends ObjectOrigin {
       value: matrix,
     };
     return matrix;
+  }
+
+  decodeTransformMatrix(skipGroup = false) {
+    return decodeTransformMatrix(
+      this.calcTransformMatrix(skipGroup),
+      skipGroup ? this.angle : this.getTotalAngle()
+    );
   }
 
   /**

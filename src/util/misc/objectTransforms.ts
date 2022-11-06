@@ -2,7 +2,7 @@ import { Point } from '../../point.class';
 import type { FabricObject } from '../../shapes/object.class';
 import { TMat2D } from '../../typedefs';
 import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
-import type { TComposeMatrixArgs, TScaleMatrixArgs } from './matrix';
+import type { TScaleMatrixArgs } from './matrix';
 import {
   calcDimensionsMatrix,
   invertTransform,
