@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
 import { FabricObject } from '../shapes/fabricObject.class';
 import { BaseBrush } from './base_brush.class';
@@ -54,5 +53,3 @@ export abstract class DrawShapeBase<T extends FabricObject> extends BaseBrush {
     ctx.restore();
   }
 }
-
-fabric.DrawShapeBase = DrawShapeBase;
