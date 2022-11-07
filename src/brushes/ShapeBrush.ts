@@ -4,6 +4,7 @@ import { Circle } from '../shapes/circle.class';
 import { Ellipse } from '../shapes/ellipse.class';
 import { FabricObject } from '../shapes/fabricObject.class';
 import { Rect } from '../shapes/rect.class';
+import { ModifierKey } from '../typedefs';
 import { BaseBrush, TBrushEventData } from './base_brush.class';
 
 export abstract class ShapeBaseBrush<T extends FabricObject> extends BaseBrush {
@@ -34,7 +35,7 @@ export abstract class ShapeBaseBrush<T extends FabricObject> extends BaseBrush {
     });
   }
 
-  protected setBounds(a: Point, b: Point, ev: TBrushEventData) {
+  protected setBounds(a: Point, b: Point) {
     const v = b.subtract(a);
     const shape = this.shape!;
     if (this.centered) {
@@ -70,13 +71,14 @@ export abstract class ShapeBaseBrush<T extends FabricObject> extends BaseBrush {
     this.start = pointer;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onMouseMove(pointer: Point, ev: TBrushEventData) {
-    this.setBounds(this.start, pointer, ev);
+    this.setBounds(this.start, pointer);
     this._render();
   }
 
   onMouseUp(ev: TBrushEventData) {
-    this.setBounds(this.start, ev.pointer, ev);
+    this.setBounds(this.start, ev.pointer);
     this.finalize();
   }
 
@@ -99,36 +101,27 @@ export class ShapeBrush extends ShapeBaseBrush<FabricObject> {
   }
 }
 
-export class CircleBrush1 extends ShapeBaseBrush<Circle> {
-  create() {
-    return new Circle();
-  }
-  protected setBounds(a: Point, b: Point): void {
-    const v = b.subtract(a);
-    const shape = this.shape!;
-    if (this.centered) {
-      shape.set({ radius: v.distanceFrom(new Point()) });
-      shape.setPositionByOrigin(a, 0.5, 0.5);
-    } else {
-      shape.set({ radius: Math.max(Math.abs(v.x), Math.abs(v.y)) / 2 });
-      //   keep a in place
-      shape.setPositionByOrigin(
-        a,
-        -Math.sign(v.x) * 0.5 + 0.5,
-        -Math.sign(v.y) * 0.5 + 0.5
-      );
-    }
-  }
-}
+export class CircularShapeBrush extends ShapeBaseBrush<Ellipse> {
+  /**
+   * The event modifier key that makes the brush draw a circle.
+   */
+  modifierKey?: ModifierKey = 'shiftKey';
 
-export class EllipseBrush extends ShapeBaseBrush<Ellipse> {
+  drawCircle?: boolean;
+
   create() {
-    return new Ellipse({});
+    return new Ellipse();
   }
-  protected setBounds(a: Point, b: Point, ev: TBrushEventData) {
-    super.setBounds(a, b, ev);
+
+  onMouseMove(pointer: Point, ev: TBrushEventData) {
+    this.drawCircle = this.modifierKey && ev.e[this.modifierKey];
+    super.onMouseMove(pointer, ev);
+  }
+
+  protected setBounds(a: Point, b: Point) {
+    super.setBounds(a, b);
     const shape = this.shape!;
-    if (ev.e.shiftKey) {
+    if (this.drawCircle) {
       const r = Math.max(shape.width, shape.height) / 2;
       shape.set({ rx: r, ry: r });
     } else {
@@ -139,5 +132,4 @@ export class EllipseBrush extends ShapeBaseBrush<Ellipse> {
 
 fabric.ShapeBaseBrush = ShapeBaseBrush;
 fabric.ShapeBrush = ShapeBrush;
-fabric.CircleBrush1 = CircleBrush1;
-fabric.EllipseBrush = EllipseBrush;
+fabric.CircularShapeBrush = CircularShapeBrush;
