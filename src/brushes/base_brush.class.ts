@@ -1,7 +1,10 @@
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import type { Point } from '../point.class';
+import { TEvent } from '../typedefs';
 import type { Canvas, Shadow } from '../__types__';
+
+type TBrushEventData = TEvent & { pointer: Point };
 
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
@@ -76,9 +79,9 @@ export abstract class BaseBrush {
   }
 
   abstract _render(): void;
-  abstract onMouseDown(pointer: Point): void;
-  abstract onMouseMove(pointer: Point): void;
-  abstract onMouseUp(pointer: Point): void;
+  abstract onMouseDown(pointer: Point, ev: TBrushEventData): void;
+  abstract onMouseMove(pointer: Point, ev: TBrushEventData): void;
+  abstract onMouseUp(ev: TBrushEventData): void;
 
   /**
    * Sets brush styles
