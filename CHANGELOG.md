@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): BaseBrush abstract methods [#8428](https://github.com/fabricjs/fabric.js/pull/8428)
 - chore(TS): migrate Rect [#8411](https://github.com/fabricjs/fabric.js/pull/8411)
 - chore(TS): migrate Ellipse [#8408](https://github.com/fabricjs/fabric.js/pull/8408)
 - chore(TS): migrate Triangle to TS [#8410](https://github.com/fabricjs/fabric.js/pull/8410)
