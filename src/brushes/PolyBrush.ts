@@ -2,6 +2,7 @@ import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
 import { Polygon } from '../shapes/polygon.class';
 import { Polyline } from '../shapes/polyline.class';
+import { invertTransform } from '../util/misc/matrix';
 import { BaseBrush } from './base_brush.class';
 
 export class PolyBrush extends BaseBrush {
@@ -11,15 +12,23 @@ export class PolyBrush extends BaseBrush {
   stroke = '';
   fill = '';
 
+  private normalizePointer(pointer: Point) {
+    return pointer.transform(this.canvas.viewportTransform, true);
+  }
+
+  addPoint(pointer: Point) {
+    this.poly!.points.push(this.normalizePointer(pointer));
+  }
+
   replacePoint(pointer: Point) {
-    const poly = this.poly!;
-    poly.points.pop();
-    poly.points.push(pointer);
+    this.poly!.points.pop();
+    this.addPoint(pointer);
     this._render();
   }
 
   private create(pointer: Point) {
-    this.poly = new this.builder([pointer, pointer], {
+    const p = this.normalizePointer(pointer);
+    this.poly = new this.builder([p, p], {
       objectCaching: false,
       canvas: this.canvas,
     });
@@ -41,7 +50,8 @@ export class PolyBrush extends BaseBrush {
   private finalize() {
     // release interaction
     this.canvas._isCurrentlyDrawing = false;
-    const poly = this.poly!;
+    const poly = this.poly;
+    if (!poly) return;
     // restore default value
     poly.set('objectCaching', this.builder.prototype.objectCaching);
     const pos = poly.setDimensions().scalarAdd(this.width / 2);
@@ -59,7 +69,7 @@ export class PolyBrush extends BaseBrush {
 
   onMouseDown(pointer: Point) {
     if (this.poly) {
-      this.poly.points.push(pointer);
+      this.addPoint(pointer);
     } else {
       this.create(pointer);
     }
@@ -71,18 +81,18 @@ export class PolyBrush extends BaseBrush {
 
   onMouseUp({ pointer }: { pointer: Point }) {
     this.replacePoint(pointer);
-    this.poly!.points.push(pointer);
+    this.addPoint(pointer);
     return true;
   }
 
   onDoubleClick(pointer: Point) {
-    this.replacePoint(pointer);
+    this.poly && this.replacePoint(pointer);
     this.finalize();
   }
 
   _render(ctx = this.canvas.contextTop) {
     this.canvas.clearContext(this.canvas.contextTop);
-    this.poly!.render(ctx);
+    this.poly?.render(ctx);
   }
 }
 
