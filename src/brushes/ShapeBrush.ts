@@ -1,10 +1,7 @@
 import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
-import { Circle } from '../shapes/circle.class';
-import { Ellipse } from '../shapes/ellipse.class';
 import { FabricObject } from '../shapes/fabricObject.class';
 import { Rect } from '../shapes/rect.class';
-import { ModifierKey } from '../typedefs';
 import { BaseBrush, TBrushEventData } from './base_brush.class';
 
 export abstract class ShapeBaseBrush<T extends FabricObject> extends BaseBrush {
@@ -101,35 +98,5 @@ export class ShapeBrush extends ShapeBaseBrush<FabricObject> {
   }
 }
 
-export class CircularShapeBrush extends ShapeBaseBrush<Ellipse> {
-  /**
-   * The event modifier key that makes the brush draw a circle.
-   */
-  modifierKey?: ModifierKey = 'shiftKey';
-
-  drawCircle?: boolean;
-
-  create() {
-    return new Ellipse();
-  }
-
-  onMouseMove(pointer: Point, ev: TBrushEventData) {
-    this.drawCircle = this.modifierKey && ev.e[this.modifierKey];
-    super.onMouseMove(pointer, ev);
-  }
-
-  protected setBounds(a: Point, b: Point) {
-    super.setBounds(a, b);
-    const shape = this.shape!;
-    if (this.drawCircle) {
-      const r = Math.max(shape.width, shape.height) / 2;
-      shape.set({ rx: r, ry: r });
-    } else {
-      shape.set({ rx: shape.width / 2, ry: shape.height / 2 });
-    }
-  }
-}
-
 fabric.ShapeBaseBrush = ShapeBaseBrush;
 fabric.ShapeBrush = ShapeBrush;
-fabric.CircularShapeBrush = CircularShapeBrush;
