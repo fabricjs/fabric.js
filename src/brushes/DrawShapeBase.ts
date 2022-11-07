@@ -3,7 +3,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
 import { BaseBrush } from './base_brush.class';
 
 /**
- * Declarative shape drawing
+ * Declarative shape drawing using pointer events
  */
 export abstract class DrawShapeBase<T extends FabricObject> extends BaseBrush {
   shape: T | undefined;
