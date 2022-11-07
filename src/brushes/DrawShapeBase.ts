@@ -2,6 +2,9 @@ import { Point } from '../point.class';
 import { FabricObject } from '../shapes/fabricObject.class';
 import { BaseBrush } from './base_brush.class';
 
+/**
+ * Declarative shape drawing
+ */
 export abstract class DrawShapeBase<T extends FabricObject> extends BaseBrush {
   shape: T | undefined;
   stroke = '';
