@@ -1,10 +1,13 @@
 import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
+import { Circle } from '../shapes/circle.class';
+import { Ellipse } from '../shapes/ellipse.class';
 import { FabricObject } from '../shapes/fabricObject.class';
+import { Rect } from '../shapes/rect.class';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { BaseBrush } from './base_brush.class';
 
-export abstract class ShapeBrush<T extends FabricObject> extends BaseBrush {
+export abstract class ShapeBaseBrush<T extends FabricObject> extends BaseBrush {
   shape: T | undefined;
   stroke = '';
   fill = '';
@@ -31,11 +34,10 @@ export abstract class ShapeBrush<T extends FabricObject> extends BaseBrush {
     });
   }
 
-  private setBounds(a: Point, b: Point) {
+  protected setBounds(a: Point, b: Point) {
     const { left, top, width, height } = makeBoundingBoxFromPoints([a, b]);
     this.shape!.set({ width, height });
     this.shape!.setPositionByOrigin(new Point(left, top), 'left', 'top');
-    this._render();
   }
 
   protected finalize() {
@@ -59,6 +61,7 @@ export abstract class ShapeBrush<T extends FabricObject> extends BaseBrush {
 
   onMouseMove(pointer: Point) {
     this.setBounds(this.start, pointer);
+    this._render();
   }
 
   onMouseUp({ pointer }: { pointer: Point }) {
@@ -78,4 +81,36 @@ export abstract class ShapeBrush<T extends FabricObject> extends BaseBrush {
   }
 }
 
+export class ShapeBrush extends ShapeBaseBrush<FabricObject> {
+  builder = Rect;
+  create() {
+    return new this.builder();
+  }
+}
+
+export class CircleBrush extends ShapeBaseBrush<Circle> {
+  create() {
+    return new Circle({});
+  }
+  protected setBounds(a: Point, b: Point): void {
+    const { left, top, width, height } = makeBoundingBoxFromPoints([a, b]);
+    this.shape!.set({ radius: Math.max(width, height) / 2 });
+    this.shape!.setPositionByOrigin(new Point(left, top), 'left', 'top');
+  }
+}
+
+export class EllipseBrush extends ShapeBaseBrush<Ellipse> {
+  create() {
+    return new Ellipse({});
+  }
+  protected setBounds(a: Point, b: Point): void {
+    const { left, top, width, height } = makeBoundingBoxFromPoints([a, b]);
+    this.shape!.set({ rx: width / 2, ry: height / 2 });
+    this.shape!.setPositionByOrigin(new Point(left, top), 'left', 'top');
+  }
+}
+
+fabric.ShapeBaseBrush = ShapeBaseBrush;
 fabric.ShapeBrush = ShapeBrush;
+fabric.CircleBrush = CircleBrush;
+fabric.EllipseBrush = EllipseBrush;

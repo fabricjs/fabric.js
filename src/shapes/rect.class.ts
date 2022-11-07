@@ -26,7 +26,7 @@ export class Rect extends FabricObject {
    * @param {Object} [options] Options object
    * @return {Object} thisArg
    */
-  constructor(options: Record<string, unknown>) {
+  constructor(options?: Record<string, unknown>) {
     super(options);
     this._initRxRy();
   }
