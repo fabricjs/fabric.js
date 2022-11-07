@@ -9,24 +9,15 @@ const MAX_COMMENT_CHARS = 65536;
 const INACCURATE_COMMENT =
   '\n*inaccurate, see [link](https://github.com/doesdev/rollup-plugin-analyzer#why-is-the-reported-size-not-the-same-as-the-file-on-disk)';
 
-function getSign(n) {
-  switch (Math.sign(n)) {
-    case 0:
-      return '';
-    case 1:
-      return '+';
-    case -1:
-      return '-';
-  }
-}
-
 function printSize(a, b) {
   const diff = b - a;
-  return `${b} (${getSign(diff)}${diff})`;
+  return `${b.toFixed(3)} (**${Math.sign(diff) > 0 ? '+' : ''}${diff.toFixed(
+    3
+  )}**)`;
 }
 
 function printSizeByte(a, b) {
-  return printSize(Math.round(a / 1024), Math.round(b / 1024));
+  return printSize(a / 1024, b / 1024);
 }
 
 export async function findCommentId(github, context) {
@@ -105,13 +96,17 @@ export async function run({ github, context, a, b }) {
         printSizeByte(_a.gzipped, _b.gzipped),
       ];
     }),
-    ..._.map(files, ({ a, b }, key) => {
-      return [
-        key,
-        printSize(a.sizeBefore, b.sizeBefore),
-        printSize(a.sizeAfter, b.sizeAfter),
-      ];
-    }),
+    ..._.orderBy(
+      _.map(files, ({ a, b }, key) => {
+        return [
+          key,
+          printSizeByte(a.sizeBefore, b.sizeBefore),
+          printSizeByte(a.sizeAfter, b.sizeAfter),
+        ];
+      }),
+      [0],
+      ['asc']
+    ),
   ];
 
   const body =

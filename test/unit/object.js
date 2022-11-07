@@ -317,7 +317,6 @@
     cObj.scale(1.5);
     assert.equal(cObj.get('scaleX'), 1.5);
     assert.equal(cObj.get('scaleY'), 1.5);
-    assert.equal(cObj.scale(2), cObj, 'chainable');
   });
 
   QUnit.test('setOpacity', function(assert) {
@@ -340,23 +339,6 @@
     assert.equal(cObj.get('angle'), 0);
     assert.equal(cObj.set('angle', 45), cObj, 'chainable');
     assert.equal(cObj.get('angle'), 45);
-  });
-
-  QUnit.test('drawBorders', function(assert) {
-    var cObj = new fabric.Object(), canvas = fabric.document.createElement('canvas');
-
-    var dummyContext = canvas.getContext('2d');
-
-    assert.ok(typeof cObj.drawBorders === 'function');
-    assert.equal(cObj.drawBorders(dummyContext), cObj, 'chainable');
-  });
-
-  QUnit.test('drawControls', function(assert) {
-    var cObj = new fabric.Object(), _canvas = fabric.document.createElement('canvas');
-    cObj.canvas = canvas;
-    var dummyContext = _canvas.getContext('2d');
-    assert.ok(typeof cObj.drawControls === 'function');
-    assert.equal(cObj.drawControls(dummyContext), cObj, 'chainable');
   });
 
   QUnit.test('clone', function(assert) {

@@ -4,7 +4,6 @@ import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { config } from '../config';
 import { VERSION } from '../constants';
-import { CommonMethods } from '../mixins/shared_methods.mixin';
 import { Point } from '../point.class';
 import { capValue } from '../util/misc/capValue';
 import { pick } from '../util/misc/pick';
@@ -15,9 +14,12 @@ import { toFixed } from '../util/misc/toFixed';
 import { capitalize } from '../util/lang_string';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { createCanvasElement } from '../util/misc/dom';
+import { ObjectGeometry } from '../mixins/object_geometry.mixin';
+import { qrDecompose, transformPoint } from '../util/misc/matrix';
+import { Canvas, Shadow, StaticCanvas } from '../__types__';
 
-type StaticCanvas = any;
-type Canvas = any;
+// temporary hack for unfinished migration
+type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
 
 const ALIASING_LIMIT = 2;
 
@@ -56,80 +58,8 @@ const ALIASING_LIMIT = 2;
  * @fires dragleave
  * @fires drop
  */
-export class FabricObject extends CommonMethods {
+export class FabricObject extends ObjectGeometry {
   type: string;
-
-  /**
-   * Horizontal origin of transformation of an object (one of "left", "right", "center")
-   * See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
-   * @type String
-   * @default 'left'
-   */
-  originX: string;
-
-  /**
-   * Vertical origin of transformation of an object (one of "top", "bottom", "center")
-   * See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
-   * @type String
-   * @default 'top'
-   */
-  originY: string;
-
-  /**
-   * Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
-   * @type Number
-   * @default 0
-   */
-  top: number;
-
-  /**
-   * Left position of an object. Note that by default it's relative to object left. You can change this by setting originX={left/center/right}
-   * @type Number
-   * @default 0
-   */
-  left: number;
-
-  /**
-   * Object width
-   * @type Number
-   * @default
-   */
-  width: number;
-
-  /**
-   * Object height
-   * @type Number
-   * @default
-   */
-  height: number;
-
-  /**
-   * Object scale factor (horizontal)
-   * @type Number
-   * @default 1
-   */
-  scaleX: number;
-
-  /**
-   * Object scale factor (vertical)
-   * @type Number
-   * @default 1
-   */
-  scaleY: number;
-
-  /**
-   * When true, an object is rendered as flipped horizontally
-   * @type Boolean
-   * @default false
-   */
-  flipX: boolean;
-
-  /**
-   * When true, an object is rendered as flipped vertically
-   * @type Boolean
-   * @default false
-   */
-  flipY: boolean;
 
   /**
    * Opacity of an object
@@ -137,27 +67,6 @@ export class FabricObject extends CommonMethods {
    * @default 1
    */
   opacity: number;
-
-  /**
-   * Angle of rotation of an object (in degrees)
-   * @type Number
-   * @default 0
-   */
-  angle: TDegree;
-
-  /**
-   * Angle of skew on x axes of an object (in degrees)
-   * @type Number
-   * @default 0
-   */
-  skewX: number;
-
-  /**
-   * Angle of skew on y axes of an object (in degrees)
-   * @type Number
-   * @default 0
-   */
-  skewY: number;
 
   /**
    * Size of object's controlling corners (in pixels)
@@ -195,13 +104,6 @@ export class FabricObject extends CommonMethods {
   moveCursor: null;
 
   /**
-   * Padding between object and its controlling borders (in pixels)
-   * @type Number
-   * @default 0
-   */
-  padding: number;
-
-  /**
    * Color of controlling borders of an object (when it's active)
    * @type String
    * @default rgb(178,204,255)
@@ -221,7 +123,7 @@ export class FabricObject extends CommonMethods {
    * @type String
    * @default rgb(178,204,255)
    */
-  cornerColor: string | null;
+  cornerColor: string;
 
   /**
    * Color of controlling corners of an object (when it's active and transparentCorners false)
@@ -229,7 +131,7 @@ export class FabricObject extends CommonMethods {
    * @type String
    * @default null
    */
-  cornerStrokeColor: string | null;
+  cornerStrokeColor: string;
 
   /**
    * Specify style of control, 'rect' or 'circle'
@@ -265,6 +167,14 @@ export class FabricObject extends CommonMethods {
    * @default
    */
   centeredRotation: true;
+
+  /**
+   * When defined, an object is rendered via stroke and this property specifies its color
+   * takes css colors https://www.w3.org/TR/css-color-3/
+   * @type String
+   * @default null
+   */
+  stroke: string | TFiller | null;
 
   /**
    * Color of object's fill
@@ -307,21 +217,6 @@ export class FabricObject extends CommonMethods {
   selectionBackgroundColor: string;
 
   /**
-   * When defined, an object is rendered via stroke and this property specifies its color
-   * takes css colors https://www.w3.org/TR/css-color-3/
-   * @type String
-   * @default null
-   */
-  stroke: string | TFiller | null;
-
-  /**
-   * Width of a stroke used to render this object
-   * @type Number
-   * @default 1
-   */
-  strokeWidth: number;
-
-  /**
    * Array specifying dash pattern of an object's stroke (stroke must be defined)
    * @type Array
    * @default null;
@@ -361,7 +256,7 @@ export class FabricObject extends CommonMethods {
    * @type fabric.Shadow
    * @default null
    */
-  shadow: any | null;
+  shadow: Shadow | null;
 
   /**
    * Opacity of object's controlling borders when object is active and moving
@@ -535,35 +430,12 @@ export class FabricObject extends CommonMethods {
   noScaleCache: boolean;
 
   /**
-   * When `false`, the stoke width will scale with the object.
-   * When `true`, the stroke will always match the exact pixel size entered for stroke width.
-   * this Property does not work on Text classes or drawing call that uses strokeText,fillText methods
-   * default to false
-   * @since 2.6.0
-   * @type Boolean
-   * @default false
-   * @type Boolean
-   * @default false
-   */
-  strokeUniform: boolean;
-
-  /**
    * When set to `true`, object's cache will be rerendered next render call.
    * since 1.7.0
    * @type Boolean
    * @default true
    */
   dirty: boolean;
-
-  /**
-   * keeps the value of the last hovered corner during mouse move.
-   * 0 is no corner, or 'mt', 'ml', 'mtr' etc..
-   * It should be private, but there is no harm in using it as
-   * a read-only property.
-   * @type number|string|any
-   * @default 0
-   */
-  __corner: number | string;
 
   /**
    * Determines if the fill or the stroke is drawn first (one of "fill" or "stroke")
@@ -635,14 +507,6 @@ export class FabricObject extends CommonMethods {
    * @default false
    */
   absolutePositioned: boolean;
-
-  /**
-   * A Reference of the Canvas where the object is actually added
-   * @type StaticCanvas | Canvas;
-   * @default undefined
-   * @private
-   */
-  canvas?: StaticCanvas | Canvas;
 
   /**
    * Quick access for the _cacheCanvas rendering context
@@ -744,11 +608,13 @@ export class FabricObject extends CommonMethods {
    */
   static __uid = 0;
 
+  callSuper?: TCallSuper;
+
   /**
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: Record<string, unknown>) {
+  constructor(options?: Partial<TClassProperties<FabricObject>>) {
     super();
     if (options) {
       this.setOptions(options);
@@ -759,7 +625,7 @@ export class FabricObject extends CommonMethods {
    * Temporary compatibility issue with old classes
    * @param {Object} [options] Options object
    */
-  initialize(options: Record<string, unknown>) {
+  initialize(options?: Partial<TClassProperties<FabricObject>>) {
     if (options) {
       this.setOptions(options);
     }
@@ -1090,7 +956,7 @@ export class FabricObject extends CommonMethods {
       return new Point(Math.abs(this.scaleX), Math.abs(this.scaleY));
     }
     // if we are inside a group total zoom calculation is complex, we defer to generic matrices
-    const options = fabric.util.qrDecompose(this.calcTransformMatrix());
+    const options = qrDecompose(this.calcTransformMatrix());
     return new Point(Math.abs(options.scaleX), Math.abs(options.scaleY));
   }
 
@@ -1121,13 +987,23 @@ export class FabricObject extends CommonMethods {
   }
 
   /**
-   * Returns the object angle relative to canvas counting also the group property
-   * @returns {number}
+   * Makes sure the scale is valid and modifies it if necessary
+   * @todo: this is a control action issue, not a geometry one
+   * @private
+   * @param {Number} value, unconstrained
+   * @return {Number} constrained value;
    */
-  getTotalAngle() {
-    return this.group
-      ? fabric.util.qrDecompose(this.calcTransformMatrix()).angle
-      : this.angle;
+  _constrainScale(value: number): number {
+    if (Math.abs(value) < this.minScaleLimit) {
+      if (value < 0) {
+        return -this.minScaleLimit;
+      } else {
+        return this.minScaleLimit;
+      }
+    } else if (value === 0) {
+      return 0.0001;
+    }
+    return value;
   }
 
   /**
@@ -1167,19 +1043,6 @@ export class FabricObject extends CommonMethods {
       }
     }
     return this;
-  }
-
-  /**
-   * Retrieves viewportTransform from Object's canvas if possible
-   * @method getViewportTransform
-   * @memberOf FabricObject.prototype
-   * @return {Array}
-   */
-  getViewportTransform() {
-    if (this.canvas && this.canvas.viewportTransform) {
-      return this.canvas.viewportTransform;
-    }
-    return fabric.iMatrix.concat();
   }
 
   /*
@@ -1551,44 +1414,6 @@ export class FabricObject extends CommonMethods {
   }
 
   /**
-   * Renders controls and borders for the object
-   * the context here is not transformed
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {Object} [styleOverride] properties to override the object style
-   */
-  _renderControls(ctx, styleOverride) {
-    let vpt = this.getViewportTransform(),
-      matrix = this.calcTransformMatrix(),
-      options,
-      drawBorders,
-      drawControls;
-    styleOverride = styleOverride || {};
-    drawBorders =
-      typeof styleOverride.hasBorders !== 'undefined'
-        ? styleOverride.hasBorders
-        : this.hasBorders;
-    drawControls =
-      typeof styleOverride.hasControls !== 'undefined'
-        ? styleOverride.hasControls
-        : this.hasControls;
-    matrix = fabric.util.multiplyTransformMatrices(vpt, matrix);
-    options = fabric.util.qrDecompose(matrix);
-    ctx.save();
-    ctx.translate(options.translateX, options.translateY);
-    ctx.lineWidth = 1 * this.borderScaleFactor;
-    if (!this.group) {
-      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-    }
-    if (this.flipX) {
-      options.angle -= 180;
-    }
-    ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
-    drawBorders && this.drawBorders(ctx, options, styleOverride);
-    drawControls && this.drawControls(ctx, styleOverride);
-    ctx.restore();
-  }
-
-  /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
@@ -1794,7 +1619,7 @@ export class FabricObject extends CommonMethods {
    */
   _assignTransformMatrixProps() {
     if (this.transformMatrix) {
-      const options = fabric.util.qrDecompose(this.transformMatrix);
+      const options = qrDecompose(this.transformMatrix);
       this.flipX = false;
       this.flipY = false;
       this.set('scaleX', options.scaleX);
@@ -1816,7 +1641,7 @@ export class FabricObject extends CommonMethods {
     let center = this._findCenterFromElement();
     if (this.transformMatrix) {
       this._assignTransformMatrixProps();
-      center = fabric.util.transformPoint(center, this.transformMatrix);
+      center = transformPoint(center, this.transformMatrix);
     }
     this.transformMatrix = null;
     if (preserveAspectRatioOptions) {
@@ -2166,7 +1991,7 @@ export class FabricObject extends CommonMethods {
   }
 }
 
-const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
+export const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
   type: 'object',
   originX: 'left',
   originY: 'top',
@@ -2191,7 +2016,7 @@ const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
   borderColor: 'rgb(178,204,255)',
   borderDashArray: null,
   cornerColor: 'rgb(178,204,255)',
-  cornerStrokeColor: null,
+  cornerStrokeColor: '',
   cornerStyle: 'rect',
   cornerDashArray: null,
   centeredScaling: false,
@@ -2250,11 +2075,7 @@ const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
   clipPath: undefined,
   inverted: false,
   absolutePositioned: false,
+  controls: {},
 };
 
 Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
-
-(function (global) {
-  const fabric = global.fabric;
-  fabric.Object = FabricObject;
-})(typeof exports !== 'undefined' ? exports : window);
