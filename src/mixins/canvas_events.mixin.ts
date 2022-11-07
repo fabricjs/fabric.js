@@ -456,6 +456,8 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} e Event object fired on mousedown
        */
       _onDoubleClick: function (e) {
+        this.freeDrawingBrush?.onDoubleClick &&
+          this.freeDrawingBrush.onDoubleClick(this.getPointer(e));
         this._cacheTransformEventData(e);
         this._handleEvent(e, 'dblclick');
         this._resetTransformEventData();
