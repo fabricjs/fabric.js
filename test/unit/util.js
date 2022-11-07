@@ -1064,6 +1064,170 @@
     });
   };
 
+  QUnit.test.only('decodeTransformMatrix nested groups just adding angles', function(assert) {
+    const rect = new fabric.Rect({
+      scaleX: 1,
+      scaleY: 2,
+      skewX: 0,
+      skewY: 0,
+      angle: 20,
+      flipX: false,
+      flipY: false
+    }),
+    groupDeep1 = new fabric.Group([rect], {
+      scaleX: 2,
+      scaleY: 3,
+      skewX: 0,
+      skewY: 0,
+      angle: 20,
+      flipX: false,
+      flipY: false
+    }),
+    groupRoot = new fabric.Group([groupDeep1], {
+      scaleX: 3,
+      scaleY: 1,
+      skewX: 0,
+      skewY: 0,
+      angle: 40,
+      flipX: false,
+      flipY: false ,
+      top: 100,
+      left: 200
+    });
+
+    const maxDiffAllowed = 0.000000009;
+    const decodedMatrix = fabric.util.decodeTransformMatrix(
+      rect.calcTransformMatrix(), 
+      groupRoot.angle + groupDeep1.angle + rect.angle
+    );
+
+    const expectedOptions = {
+      scaleX: groupRoot.scaleX * groupDeep1.scaleX * rect.scaleX,
+      scaleY: groupRoot.scaleY * groupDeep1.scaleY * rect.scaleY,
+      skewX: 0,
+      skewY: 0,
+      angle: groupRoot.angle + groupDeep1.angle + rect.angle,
+      flipX: false,
+      flipY: false,
+      translateX: groupRoot.left,
+      translateY: groupRoot.top
+    }
+
+    Object.keys(decodedMatrix).forEach(option => {
+      option === 'flipX' || option === 'flipY'
+      ? assert.equal(
+        decodedMatrix[option], 
+        expectedOptions[option], 
+        `${option}. Reference options: ${JSON.stringify(expectedOptions)}`
+      )
+      : assert.close(
+          decodedMatrix[option], 
+          expectedOptions[option], 
+          maxDiffAllowed,
+          `${option}: actual is ${decodedMatrix[option]} and expected is ${expectedOptions[option]}.`
+          + `Max diff allowed: ${maxDiffAllowed}, current diff: ${Math.abs(decodedMatrix[option] - expectedOptions[option])}.`
+          + `Reference options: ${JSON.stringify(expectedOptions)}`
+        )
+    });
+  });
+
+  QUnit.test.only('decodeTransformMatrix nested groups', function(assert) {
+    const rect = new fabric.Rect({
+      scaleX: 1,
+      scaleY: 2,
+      skewX: 0,
+      skewY: 0,
+      angle: 20,
+      flipX: false,
+      flipY: false
+    }),
+    groupDeep1 = new fabric.Group([rect], {
+      scaleX: 2,
+      scaleY: 3,
+      skewX: 0,
+      skewY: 0,
+      angle: 20,
+      flipX: false,
+      flipY: false
+    }),
+    groupRoot = new fabric.Group([groupDeep1], {
+      scaleX: 3,
+      scaleY: 1,
+      skewX: 0,
+      skewY: 0,
+      angle: 40,
+      flipX: false,
+      flipY: false ,
+      top: 100,
+      left: 200
+    });
+
+    const maxDiffAllowed = 0.000000009;
+
+    const inverseRotationMatrix = (angle) => {
+      const theta = fabric.util.degreesToRadians(angle),
+        cosin = fabric.util.cos(theta),
+        sinus = fabric.util.sin(theta);
+      return [cosin, -sinus, sinus, cosin, 0, 0]
+    }
+
+    const decodeNestedTransformMatrix = (obj) => {
+      let finalMatrixWithoutRotation = fabric.util.multiplyTransformMatrices(
+          inverseRotationMatrix(obj.angle),
+          obj.calcOwnMatrix()
+        ),
+        totalAngle = obj.angle,
+        parent = obj.group;
+      while (parent) {
+        totalAngle += parent.angle;
+        const matrixWithoutRotation = fabric.util.multiplyTransformMatrices(
+          inverseRotationMatrix(parent.angle),
+          parent.calcOwnMatrix()
+        );
+        finalMatrixWithoutRotation = fabric.util.multiplyTransformMatrices(
+          matrixWithoutRotation, 
+          finalMatrixWithoutRotation
+        );
+        parent = parent.group;
+      }
+      return  {
+        ...fabric.util.decodeTransformMatrix(finalMatrixWithoutRotation, 0),
+        angle: totalAngle
+      }
+    };
+
+    const decodedMatrix = decodeNestedTransformMatrix(rect);
+
+    const expectedOptions = {
+      scaleX: groupRoot.scaleX * groupDeep1.scaleX * rect.scaleX,
+      scaleY: groupRoot.scaleY * groupDeep1.scaleY * rect.scaleY,
+      skewX: 0,
+      skewY: 0,
+      angle: groupRoot.angle + groupDeep1.angle + rect.angle,
+      flipX: false,
+      flipY: false,
+      translateX: groupRoot.left,
+      translateY: groupRoot.top
+    }
+
+    Object.keys(decodedMatrix).forEach(option => {
+      option === 'flipX' || option === 'flipY'
+      ? assert.equal(
+        decodedMatrix[option], 
+        expectedOptions[option], 
+        `${option}. Reference options: ${JSON.stringify(expectedOptions)}`
+      )
+      : assert.close(
+          decodedMatrix[option], 
+          expectedOptions[option], 
+          maxDiffAllowed,
+          `${option}: actual is ${decodedMatrix[option]} and expected is ${expectedOptions[option]}.`
+          + `Max diff allowed: ${maxDiffAllowed}, current diff: ${Math.abs(decodedMatrix[option] - expectedOptions[option])}.`
+          + `Reference options: ${JSON.stringify(expectedOptions)}`
+        )
+    });
+  });
+
   QUnit.test('fabric.util.capValue ar < 1', function(assert) {
     assert.ok(typeof fabric.util.capValue === 'function');
     var val = fabric.util.capValue(3, 10, 70);
