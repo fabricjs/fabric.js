@@ -8,7 +8,7 @@ import type {
 } from '../typedefs';
 import { iMatrix } from '../constants';
 import { Intersection } from '../intersection.class';
-import { Point } from '../point.class';
+import {IPoint, Point } from '../point.class';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { cos } from '../util/misc/cos';
 import {
@@ -187,7 +187,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
    * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
    */
-  setXY(point: Point, originX?: TOriginX, originY?: TOriginY) {
+  setXY(point: IPoint, originX?: TOriginX, originY?: TOriginY) {
     if (this.group) {
       point = transformPoint(
         point,
@@ -210,7 +210,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
    * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
    */
-  setRelativeXY(point: Point, originX?: TOriginX, originY?: TOriginY) {
+  setRelativeXY(point: IPoint, originX?: TOriginX, originY?: TOriginY) {
     this.setPositionByOrigin(
       point,
       originX || this.originX,
@@ -331,15 +331,15 @@ export class ObjectGeometry extends ObjectOrigin {
 
   /**
    * Checks if object is fully contained within area formed by 2 points
-   * @param {Object} pointTL top-left point of area
-   * @param {Object} pointBR bottom-right point of area
+   * @param {IPoint} pointTL top-left point of area
+   * @param {IPoint} pointBR bottom-right point of area
    * @param {Boolean} [absolute] use coordinates without viewportTransform
    * @param {Boolean} [calculate] use coordinates of current position instead of stored one
    * @return {Boolean} true if object is fully contained within area formed by 2 points
    */
   isContainedWithinRect(
-    pointTL: Point,
-    pointBR: Point,
+    pointTL: IPoint,
+    pointBR: IPoint,
     absolute: boolean,
     calculate: boolean
   ): boolean {
@@ -354,14 +354,14 @@ export class ObjectGeometry extends ObjectOrigin {
 
   /**
    * Checks if point is inside the object
-   * @param {Point} point Point to check against
+   * @param {IPoint} point Point to check against
    * @param {Object} [lines] object returned from @method _getImageLines
    * @param {Boolean} [absolute] use coordinates without viewportTransform
    * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
    * @return {Boolean} true if point is inside the object
    */
   containsPoint(
-    point: Point,
+    point: IPoint,
     lines: TBBoxLines | undefined,
     absolute = false,
     calculate = false
@@ -497,7 +497,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Object} lines Coordinates of the object being evaluated
    * @return {number} number of crossPoint
    */
-  _findCrossPoints(point: Point, lines: TBBoxLines): number {
+  _findCrossPoints(point: IPoint, lines: TBBoxLines): number {
     let xcount = 0;
 
     for (const lineKey in lines) {

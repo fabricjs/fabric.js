@@ -1,6 +1,6 @@
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
-import { Point } from '../point.class';
+import {IPoint, Point} from '../point.class';
 import { getRandomInt } from '../util/internals';
 import { Canvas } from '../__types__';
 import { BaseBrush } from './base_brush.class';
@@ -11,11 +11,9 @@ import { BaseBrush } from './base_brush.class';
 const { Circle, Group, Shadow } = fabric;
 
 export type CircleBrushPoint = {
-  x: number;
-  y: number;
   radius: number;
   fill: string;
-};
+} & IPoint;
 
 export class CircleBrush extends BaseBrush {
   /**
@@ -34,9 +32,9 @@ export class CircleBrush extends BaseBrush {
 
   /**
    * Invoked inside on mouse down and mouse move
-   * @param {Point} pointer
+   * @param {IPoint} pointer
    */
-  drawDot(pointer: Point) {
+  drawDot(pointer: IPoint) {
     const point = this.addPoint(pointer),
       ctx = this.canvas.contextTop;
     this._saveAndTransform(ctx);
@@ -55,7 +53,7 @@ export class CircleBrush extends BaseBrush {
   /**
    * Invoked on mouse down
    */
-  onMouseDown(pointer: Point) {
+  onMouseDown(pointer: IPoint) {
     this.points = [];
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
@@ -78,9 +76,9 @@ export class CircleBrush extends BaseBrush {
 
   /**
    * Invoked on mouse move
-   * @param {Point} pointer
+   * @param {IPoint} pointer
    */
-  onMouseMove(pointer: Point) {
+  onMouseMove(pointer: IPoint) {
     if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
       return;
     }
@@ -130,10 +128,10 @@ export class CircleBrush extends BaseBrush {
   }
 
   /**
-   * @param {Object} pointer
-   * @return {Point} Just added pointer point
+   * @param {IPoint} pointer
+   * @return {CircleBrushPoint} Just added pointer point
    */
-  addPoint({ x, y }: Point) {
+  addPoint({ x, y }: IPoint): CircleBrushPoint {
     const pointerPoint: CircleBrushPoint = {
       x,
       y,

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { fabric } from '../../HEADER';
 import { halfPI } from '../constants';
-import { Point } from '../point.class';
+import {IPoint, Point} from '../point.class';
 import type { FabricObject } from '../shapes/object.class';
 import {
   TDegree,
@@ -272,7 +272,7 @@ export class Control {
   }
 
   positionHandler(
-    dim: Point,
+    dim: IPoint,
     finalMatrix: TMat2D,
     fabricObject: FabricObject,
     currentControl: Control

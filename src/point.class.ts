@@ -33,7 +33,7 @@ export class Point implements IPoint {
 
   /**
    * Adds another point to this one and returns another one
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Point} new Point instance with added values
    */
   add(that: IPoint): Point {
@@ -42,7 +42,7 @@ export class Point implements IPoint {
 
   /**
    * Adds another point to this one
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Point} thisArg
    * @chainable
    * @deprecated
@@ -77,7 +77,7 @@ export class Point implements IPoint {
 
   /**
    * Subtracts another point from this point and returns a new one
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Point} new Point object with subtracted values
    */
   subtract(that: IPoint): Point {
@@ -86,7 +86,7 @@ export class Point implements IPoint {
 
   /**
    * Subtracts another point from this point
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Point} thisArg
    * @chainable
    * @deprecated
@@ -121,10 +121,10 @@ export class Point implements IPoint {
 
   /**
    * Multiplies this point by another value and returns a new one
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Point}
    */
-  multiply(that: Point): Point {
+  multiply(that: IPoint): Point {
     return new Point(this.x * that.x, this.y * that.y);
   }
 
@@ -152,7 +152,7 @@ export class Point implements IPoint {
 
   /**
    * Divides this point by another and returns a new one
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Point}
    */
   divide(that: IPoint): Point {
@@ -183,7 +183,7 @@ export class Point implements IPoint {
 
   /**
    * Returns true if this point is equal to another one
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Boolean}
    */
   eq(that: IPoint): boolean {
@@ -192,7 +192,7 @@ export class Point implements IPoint {
 
   /**
    * Returns true if this point is less than another one
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Boolean}
    */
   lt(that: IPoint): boolean {
@@ -201,7 +201,7 @@ export class Point implements IPoint {
 
   /**
    * Returns true if this point is less than or equal to another one
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Boolean}
    */
   lte(that: IPoint): boolean {
@@ -211,7 +211,7 @@ export class Point implements IPoint {
   /**
 
    * Returns true if this point is greater another one
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Boolean}
    */
   gt(that: IPoint): boolean {
@@ -220,7 +220,7 @@ export class Point implements IPoint {
 
   /**
    * Returns true if this point is greater than or equal to another one
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Boolean}
    */
   gte(that: IPoint): boolean {
@@ -229,7 +229,7 @@ export class Point implements IPoint {
 
   /**
    * Returns new point which is the result of linear interpolation with this one and another one
-   * @param {Point} that
+   * @param {IPoint} that
    * @param {Number} t , position of interpolation, between 0 and 1 default 0.5
    * @return {Point}
    */
@@ -243,7 +243,7 @@ export class Point implements IPoint {
 
   /**
    * Returns distance from this point and another one
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Number}
    */
   distanceFrom(that: IPoint): number {
@@ -254,7 +254,7 @@ export class Point implements IPoint {
 
   /**
    * Returns the point between this point and another one
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Point}
    */
   midPointFrom(that: IPoint): Point {
@@ -263,7 +263,7 @@ export class Point implements IPoint {
 
   /**
    * Returns a new point which is the min of this and another one
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Point}
    */
   min(that: IPoint): Point {
@@ -272,7 +272,7 @@ export class Point implements IPoint {
 
   /**
    * Returns a new point which is the max of this and another one
-   * @param {Point} that
+   * @param {IPoint} that
    * @return {Point}
    */
   max(that: IPoint): Point {
@@ -321,7 +321,7 @@ export class Point implements IPoint {
 
   /**
    * Sets x/y of this point from another point
-   * @param {Point} that
+   * @param {IPoint} that
    * @chainable
    */
   setFromPoint(that: IPoint) {
@@ -332,7 +332,7 @@ export class Point implements IPoint {
 
   /**
    * Swaps x/y of this point and another point
-   * @param {Point} that
+   * @param {IPoint} that
    */
   swap(that: IPoint) {
     const x = this.x,
@@ -355,7 +355,7 @@ export class Point implements IPoint {
    * Rotates `point` around `origin` with `radians`
    * @static
    * @memberOf fabric.util
-   * @param {Point} origin The origin of the rotation
+   * @param {IPoint} origin The origin of the rotation
    * @param {TRadian} radians The radians of the angle for the rotation
    * @return {Point} The new rotated point
    */

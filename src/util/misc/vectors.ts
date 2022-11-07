@@ -19,8 +19,8 @@ export const rotateVector = (vector: Point, radians: TRadian) =>
  * @static
  * @memberOf fabric.util
  *
- * @param {Point} from
- * @param {Point} to
+ * @param {IPoint} from
+ * @param {IPoint} to
  * @returns {Point} vector
  */
 export const createVector = (from: IPoint, to: IPoint): Point =>
@@ -38,7 +38,7 @@ export const magnitude = (point: Point) => point.distanceFrom(new Point());
  * @param {Point} b
  * @returns the angle in radians from `a` to `b`
  */
-export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian => {
+export const calcAngleBetweenVectors = (a: IPoint, b: IPoint): TRadian => {
   const dot = a.x * b.x + a.y * b.y,
     det = a.x * b.y - a.y * b.x;
   return Math.atan2(det, dot) as TRadian;
@@ -49,7 +49,7 @@ export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian => {
  * @param {Point} v
  * @returns the angle in radians of `v`
  */
-export const calcVectorRotation = (v: Point) =>
+export const calcVectorRotation = (v: IPoint) =>
   calcAngleBetweenVectors(unitVectorX, v);
 
 /**
@@ -59,12 +59,12 @@ export const calcVectorRotation = (v: Point) =>
 export const getUnitVector = (v: Point): Point => v.scalarDivide(magnitude(v));
 
 /**
- * @param {Point} A
- * @param {Point} B
- * @param {Point} C
+ * @param {IPoint} A
+ * @param {IPoint} B
+ * @param {IPoint} C
  * @returns {{ vector: Point, angle: TRadian}} vector representing the bisector of A and A's angle
  */
-export const getBisector = (A: Point, B: Point, C: Point) => {
+export const getBisector = (A: IPoint, B: IPoint, C: IPoint) => {
   const AB = createVector(A, B),
     AC = createVector(A, C),
     alpha = calcAngleBetweenVectors(AB, AC);
@@ -75,12 +75,12 @@ export const getBisector = (A: Point, B: Point, C: Point) => {
 };
 
 /**
- * @param {Point} v
+ * @param {IPoint} v
  * @param {Boolean} [counterClockwise] the direction of the orthogonal vector, defaults to `true`
  * @returns {Point} the unit orthogonal vector
  */
 export const getOrthonormalVector = (
-  v: Point,
+  v: IPoint,
   counterClockwise = true
 ): Point =>
   getUnitVector(new Point(-v.y, v.x).scalarMultiply(counterClockwise ? 1 : -1));

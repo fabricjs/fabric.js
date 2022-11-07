@@ -1,5 +1,4 @@
-//@ts-nocheck
-import { Point } from './point.class';
+import { IPoint, Point } from './point.class';
 import { fabric } from '../HEADER';
 
 /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
@@ -14,7 +13,7 @@ export type IntersectionType = 'Intersection' | 'Coincident' | 'Parallel';
  * @param B
  * @returns true if `T` is contained
  */
-const isContainedInInterval = (T: Point, A: Point, B: Point) => {
+const isContainedInInterval = (T: IPoint, A: IPoint, B: IPoint) => {
   const TA = new Point(T).subtract(A);
   const TB = new Point(T).subtract(B);
   return (
@@ -37,7 +36,7 @@ export class Intersection {
    * @param {Point} point
    * @returns
    */
-  contains(point) {
+  contains(point: IPoint) {
     return this.points.some((p) => p.eq(point));
   }
 
@@ -47,7 +46,7 @@ export class Intersection {
    * @return {Intersection} thisArg
    * @chainable
    */
-  private append(...points) {
+  private append(...points: Point[]) {
     this.points = this.points.concat(
       points.filter((point) => {
         return !this.contains(point);
@@ -67,7 +66,14 @@ export class Intersection {
    * @param {boolean} [bInfinite=true] check segment intersection by passing `false`
    * @return {Intersection}
    */
-  static intersectLineLine(a1, a2, b1, b2, aInfinite = true, bInfinite = true) {
+  static intersectLineLine(
+    a1: IPoint,
+    a2: IPoint,
+    b1: IPoint,
+    b2: IPoint,
+    aInfinite = true,
+    bInfinite = true
+  ) {
     let result;
     const uaT = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x),
       ubT = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x),
@@ -113,7 +119,7 @@ export class Intersection {
    * @param {Point} l2 other point on line
    * @return {Intersection}
    */
-  static intersectSegmentLine(s1, s2, l1, l2) {
+  static intersectSegmentLine(s1: IPoint, s2: IPoint, l1: IPoint, l2: IPoint) {
     return Intersection.intersectLineLine(s1, s2, l1, l2, false, true);
   }
 
@@ -127,7 +133,12 @@ export class Intersection {
    * @param {Point} b2 other boundary point of segment
    * @return {Intersection}
    */
-  static intersectSegmentSegment(a1, a2, b1, b2) {
+  static intersectSegmentSegment(
+    a1: IPoint,
+    a2: IPoint,
+    b1: IPoint,
+    b2: IPoint
+  ) {
     return Intersection.intersectLineLine(a1, a2, b1, b2, false, false);
   }
 
@@ -144,7 +155,12 @@ export class Intersection {
    * @param {boolean} [infinite=true] check segment intersection by passing `false`
    * @return {Intersection}
    */
-  static intersectLinePolygon(a1, a2, points, infinite = true) {
+  static intersectLinePolygon(
+    a1: IPoint,
+    a2: IPoint,
+    points: IPoint[],
+    infinite = true
+  ) {
     const result = new Intersection();
     const length = points.length;
 
@@ -174,7 +190,7 @@ export class Intersection {
    * @param {Point[]} points polygon points
    * @return {Intersection}
    */
-  static intersectSegmentPolygon(a1, a2, points) {
+  static intersectSegmentPolygon(a1: IPoint, a2: IPoint, points: IPoint[]) {
     return Intersection.intersectLinePolygon(a1, a2, points, false);
   }
 
@@ -188,7 +204,7 @@ export class Intersection {
    * @param {Point[]} points2
    * @return {Intersection}
    */
-  static intersectPolygonPolygon(points1, points2) {
+  static intersectPolygonPolygon(points1: Point[], points2: Point[]) {
     const result = new Intersection(),
       length = points1.length;
     const coincidences = [];
@@ -223,7 +239,7 @@ export class Intersection {
    * @param {Point} r2 bottom right point of rect
    * @return {Intersection}
    */
-  static intersectPolygonRectangle(points, r1, r2) {
+  static intersectPolygonRectangle(points: Point[], r1: Point, r2: Point) {
     const min = r1.min(r2),
       max = r1.max(r2),
       topRight = new Point(max.x, min.y),

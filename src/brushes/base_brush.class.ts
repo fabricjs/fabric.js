@@ -1,6 +1,6 @@
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
-import { Point } from '../point.class';
+import {IPoint, Point} from '../point.class';
 import { Canvas, Shadow } from '../__types__';
 
 /**
@@ -138,10 +138,10 @@ export abstract class BaseBrush {
 
   /**
    * Check is pointer is outside canvas boundaries
-   * @param {Object} pointer
+   * @param {IPoint} pointer
    * @private
    */
-  protected _isOutSideCanvas(pointer: Point) {
+  protected _isOutSideCanvas(pointer: IPoint) {
     return (
       pointer.x < 0 ||
       pointer.x > this.canvas.getWidth() ||

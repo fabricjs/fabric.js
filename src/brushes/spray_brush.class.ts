@@ -1,5 +1,5 @@
 import { fabric } from '../../HEADER';
-import { Point } from '../point.class';
+import {IPoint, Point} from '../point.class';
 import { getRandomInt } from '../util/internals';
 import { Canvas, Rect } from '../__types__';
 import { BaseBrush } from './base_brush.class';
@@ -10,11 +10,9 @@ import { BaseBrush } from './base_brush.class';
 const { Group, Rect, Shadow } = fabric;
 
 export type SprayBrushPoint = {
-  x: number;
-  y: number;
   width: number;
   opacity: number;
-};
+} & IPoint;
 
 /**
  *
@@ -98,7 +96,7 @@ export class SprayBrush extends BaseBrush {
    * Invoked on mouse down
    * @param {Point} pointer
    */
-  onMouseDown(pointer: Point) {
+  onMouseDown(pointer: IPoint) {
     this.sprayChunks = [];
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
@@ -111,7 +109,7 @@ export class SprayBrush extends BaseBrush {
    * Invoked on mouse move
    * @param {Point} pointer
    */
-  onMouseMove(pointer: Point) {
+  onMouseMove(pointer: IPoint) {
     if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
       return;
     }
@@ -198,7 +196,7 @@ export class SprayBrush extends BaseBrush {
   /**
    * @param {Point} pointer
    */
-  addSprayChunk(pointer: Point) {
+  addSprayChunk(pointer: IPoint) {
     this.sprayChunk = [];
     const radius = this.width / 2;
 
