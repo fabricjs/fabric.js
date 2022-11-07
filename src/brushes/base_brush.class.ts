@@ -81,7 +81,10 @@ export abstract class BaseBrush {
   abstract _render(): void;
   abstract onMouseDown(pointer: Point, ev: TBrushEventData): void;
   abstract onMouseMove(pointer: Point, ev: TBrushEventData): void;
-  abstract onMouseUp(ev: TBrushEventData): void;
+  /**
+   * @returns true if brush should continue blocking interaction
+   */
+  abstract onMouseUp(ev: TBrushEventData): boolean | void;
 
   /**
    * Sets brush styles
