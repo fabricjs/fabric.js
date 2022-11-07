@@ -4,11 +4,11 @@ import { FabricObject } from '../shapes/fabricObject.class';
 import { Rect } from '../shapes/rect.class';
 import { ModifierKey } from '../typedefs';
 import { TBrushEventData } from './base_brush.class';
-import { ShapeBaseBrush } from './ShapeBaseBrush';
+import { DrawShapeBase } from './DrawShapeBase';
 
-export class ShapeBrush<
+export class DrawShape<
   T extends typeof FabricObject = typeof Rect
-> extends ShapeBaseBrush<InstanceType<T>> {
+> extends DrawShapeBase<InstanceType<T>> {
   /**
    * class to build shape from
    */
@@ -77,4 +77,4 @@ export class ShapeBrush<
   }
 }
 
-fabric.ShapeBrush = ShapeBrush;
+fabric.DrawShape = DrawShape;

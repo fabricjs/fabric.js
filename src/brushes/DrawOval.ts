@@ -1,9 +1,9 @@
 import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
 import { Ellipse } from '../shapes/ellipse.class';
-import { ShapeBrush } from './ShapeBrush';
+import { DrawShape } from './DrawShape';
 
-export class CircularShapeBrush extends ShapeBrush<typeof Ellipse> {
+export class DrawOval extends DrawShape<typeof Ellipse> {
   builder = Ellipse;
 
   protected setBounds(a: Point, b: Point) {
@@ -34,4 +34,4 @@ export class CircularShapeBrush extends ShapeBrush<typeof Ellipse> {
   }
 }
 
-fabric.CircularShapeBrush = CircularShapeBrush;
+fabric.DrawOval = DrawOval;

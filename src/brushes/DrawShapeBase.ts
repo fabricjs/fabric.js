@@ -3,7 +3,7 @@ import { Point } from '../point.class';
 import { FabricObject } from '../shapes/fabricObject.class';
 import { BaseBrush } from './base_brush.class';
 
-export abstract class ShapeBaseBrush<T extends FabricObject> extends BaseBrush {
+export abstract class DrawShapeBase<T extends FabricObject> extends BaseBrush {
   shape: T | undefined;
   stroke = '';
   fill = '';
@@ -55,4 +55,4 @@ export abstract class ShapeBaseBrush<T extends FabricObject> extends BaseBrush {
   }
 }
 
-fabric.ShapeBaseBrush = ShapeBaseBrush;
+fabric.DrawShapeBase = DrawShapeBase;

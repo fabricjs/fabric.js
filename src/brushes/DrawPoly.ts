@@ -2,9 +2,9 @@ import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
 import { Polygon } from '../shapes/polygon.class';
 import { Polyline } from '../shapes/polyline.class';
-import { ShapeBaseBrush } from './ShapeBaseBrush';
+import { DrawShapeBase } from './DrawShapeBase';
 
-export class PolyBrush extends ShapeBaseBrush<Polyline> {
+export class DrawPoly extends DrawShapeBase<Polyline> {
   builder = Polygon;
 
   private addPoint(pointer: Point) {
@@ -57,4 +57,4 @@ export class PolyBrush extends ShapeBaseBrush<Polyline> {
   }
 }
 
-fabric.PolyBrush = PolyBrush;
+fabric.DrawPoly = DrawPoly;
