@@ -2,6 +2,7 @@ import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
 import { FabricObject } from '../shapes/fabricObject.class';
 import { Rect } from '../shapes/rect.class';
+import { ModifierKey } from '../typedefs';
 import { BaseBrush, TBrushEventData } from './base_brush.class';
 
 export abstract class ShapeBaseBrush<T extends FabricObject> extends BaseBrush {
@@ -9,6 +10,11 @@ export abstract class ShapeBaseBrush<T extends FabricObject> extends BaseBrush {
   stroke = '';
   fill = '';
   centered = false;
+  /**
+   * The event modifier key that makes the brush draw a circle.
+   */
+  modifierKey?: ModifierKey = 'shiftKey';
+  symmetric?: boolean;
 
   private start: Point;
 
@@ -35,12 +41,20 @@ export abstract class ShapeBaseBrush<T extends FabricObject> extends BaseBrush {
   protected setBounds(a: Point, b: Point) {
     const v = b.subtract(a);
     const shape = this.shape!;
+    const d = new Point(Math.abs(v.x), Math.abs(v.y));
+    // size
+    if (this.symmetric) {
+      const side =
+        (d.distanceFrom(new Point()) / Math.SQRT2) * (this.centered ? 2 : 1);
+      shape.set({ width: side, height: side });
+    } else {
+      shape.set({ width: d.x, height: d.y });
+    }
+    // position
     if (this.centered) {
-      shape.set({ width: Math.abs(v.x) * 2, height: Math.abs(v.y) * 2 });
       shape.setPositionByOrigin(a, 0.5, 0.5);
     } else {
-      shape.set({ width: Math.abs(v.x), height: Math.abs(v.y) });
-      //   keep a in place
+      // keep a in place
       shape.setPositionByOrigin(
         a,
         -Math.sign(v.x) * 0.5 + 0.5,
@@ -70,6 +84,7 @@ export abstract class ShapeBaseBrush<T extends FabricObject> extends BaseBrush {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onMouseMove(pointer: Point, ev: TBrushEventData) {
+    this.symmetric = this.modifierKey && ev.e[this.modifierKey];
     this.setBounds(this.start, pointer);
     this._render();
   }
