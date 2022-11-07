@@ -2,7 +2,7 @@ import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
 import { Polygon } from '../shapes/polygon.class';
 import { Polyline } from '../shapes/polyline.class';
-import { ShapeBaseBrush } from './ShapeBrush';
+import { ShapeBaseBrush } from './ShapeBaseBrush';
 
 export class PolyBrush extends ShapeBaseBrush<Polyline> {
   builder = Polygon;

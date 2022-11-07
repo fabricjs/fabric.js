@@ -1,12 +1,10 @@
 import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
 import { Ellipse } from '../shapes/ellipse.class';
-import { ShapeBaseBrush } from './ShapeBrush';
+import { ShapeBrush } from './ShapeBrush';
 
-export class CircularShapeBrush extends ShapeBaseBrush<Ellipse> {
-  create() {
-    return new Ellipse();
-  }
+export class CircularShapeBrush extends ShapeBrush<typeof Ellipse> {
+  builder = Ellipse;
 
   protected setBounds(a: Point, b: Point) {
     const v = b.subtract(a);
