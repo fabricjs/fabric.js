@@ -2,37 +2,32 @@ import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
 import { Polygon } from '../shapes/polygon.class';
 import { Polyline } from '../shapes/polyline.class';
-import { invertTransform } from '../util/misc/matrix';
 import { BaseBrush } from './base_brush.class';
 
 export class PolyBrush extends BaseBrush {
   poly: Polyline | undefined;
   builder = Polygon;
-  width = 5;
   stroke = '';
   fill = '';
 
-  private normalizePointer(pointer: Point) {
-    return pointer.transform(this.canvas.viewportTransform, true);
+  private addPoint(pointer: Point) {
+    this.poly!.points.push(pointer);
   }
 
-  addPoint(pointer: Point) {
-    this.poly!.points.push(this.normalizePointer(pointer));
-  }
-
-  replacePoint(pointer: Point) {
+  private replacePoint(pointer: Point) {
     this.poly!.points.pop();
     this.addPoint(pointer);
     this._render();
   }
 
   private create(pointer: Point) {
-    const p = this.normalizePointer(pointer);
-    this.poly = new this.builder([p, p], {
+    this.poly = new this.builder([], {
       objectCaching: false,
       canvas: this.canvas,
     });
     this.setStyles();
+    this.addPoint(pointer);
+    this.addPoint(pointer);
   }
 
   setStyles() {
@@ -53,7 +48,7 @@ export class PolyBrush extends BaseBrush {
     const poly = this.poly;
     if (!poly) return;
     // restore default value
-    poly.set('objectCaching', this.builder.prototype.objectCaching);
+    poly.objectCaching = this.builder.prototype.objectCaching;
     const pos = poly.setDimensions().scalarAdd(this.width / 2);
     poly.setPositionByOrigin(pos, 'left', 'top');
     poly.setCoords();
@@ -92,7 +87,12 @@ export class PolyBrush extends BaseBrush {
 
   _render(ctx = this.canvas.contextTop) {
     this.canvas.clearContext(this.canvas.contextTop);
-    this.poly?.render(ctx);
+    ctx.save();
+    const t = this.canvas.viewportTransform;
+    const offset = new Point().transform(t);
+    ctx.transform(t[0], t[1], t[2], t[3], -offset.x, -offset.y);
+    this.poly!.render(ctx);
+    ctx.restore();
   }
 }
 
