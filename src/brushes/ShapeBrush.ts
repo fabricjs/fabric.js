@@ -4,13 +4,13 @@ import { Circle } from '../shapes/circle.class';
 import { Ellipse } from '../shapes/ellipse.class';
 import { FabricObject } from '../shapes/fabricObject.class';
 import { Rect } from '../shapes/rect.class';
-import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
-import { BaseBrush } from './base_brush.class';
+import { BaseBrush, TBrushEventData } from './base_brush.class';
 
 export abstract class ShapeBaseBrush<T extends FabricObject> extends BaseBrush {
   shape: T | undefined;
   stroke = '';
   fill = '';
+  centered = false;
 
   private start: Point;
 
@@ -34,10 +34,21 @@ export abstract class ShapeBaseBrush<T extends FabricObject> extends BaseBrush {
     });
   }
 
-  protected setBounds(a: Point, b: Point) {
-    const { left, top, width, height } = makeBoundingBoxFromPoints([a, b]);
-    this.shape!.set({ width, height });
-    this.shape!.setPositionByOrigin(new Point(left, top), 'left', 'top');
+  protected setBounds(a: Point, b: Point, ev: TBrushEventData) {
+    const v = b.subtract(a);
+    const shape = this.shape!;
+    if (this.centered) {
+      shape.set({ width: Math.abs(v.x) * 2, height: Math.abs(v.y) * 2 });
+      shape.setPositionByOrigin(a, 0.5, 0.5);
+    } else {
+      shape.set({ width: Math.abs(v.x), height: Math.abs(v.y) });
+      //   keep a in place
+      shape.setPositionByOrigin(
+        a,
+        -Math.sign(v.x) * 0.5 + 0.5,
+        -Math.sign(v.y) * 0.5 + 0.5
+      );
+    }
   }
 
   protected finalize() {
@@ -55,17 +66,17 @@ export abstract class ShapeBaseBrush<T extends FabricObject> extends BaseBrush {
   }
 
   onMouseDown(pointer: Point) {
-    this.build(pointer);
+    this.build();
     this.start = pointer;
   }
 
-  onMouseMove(pointer: Point) {
-    this.setBounds(this.start, pointer);
+  onMouseMove(pointer: Point, ev: TBrushEventData) {
+    this.setBounds(this.start, pointer, ev);
     this._render();
   }
 
-  onMouseUp({ pointer }: { pointer: Point }) {
-    this.setBounds(this.start, pointer);
+  onMouseUp(ev: TBrushEventData) {
+    this.setBounds(this.start, ev.pointer, ev);
     this.finalize();
   }
 
@@ -88,14 +99,25 @@ export class ShapeBrush extends ShapeBaseBrush<FabricObject> {
   }
 }
 
-export class CircleBrush extends ShapeBaseBrush<Circle> {
+export class CircleBrush1 extends ShapeBaseBrush<Circle> {
   create() {
-    return new Circle({});
+    return new Circle();
   }
   protected setBounds(a: Point, b: Point): void {
-    const { left, top, width, height } = makeBoundingBoxFromPoints([a, b]);
-    this.shape!.set({ radius: Math.max(width, height) / 2 });
-    this.shape!.setPositionByOrigin(new Point(left, top), 'left', 'top');
+    const v = b.subtract(a);
+    const shape = this.shape!;
+    if (this.centered) {
+      shape.set({ radius: v.distanceFrom(new Point()) });
+      shape.setPositionByOrigin(a, 0.5, 0.5);
+    } else {
+      shape.set({ radius: Math.max(Math.abs(v.x), Math.abs(v.y)) / 2 });
+      //   keep a in place
+      shape.setPositionByOrigin(
+        a,
+        -Math.sign(v.x) * 0.5 + 0.5,
+        -Math.sign(v.y) * 0.5 + 0.5
+      );
+    }
   }
 }
 
@@ -103,14 +125,19 @@ export class EllipseBrush extends ShapeBaseBrush<Ellipse> {
   create() {
     return new Ellipse({});
   }
-  protected setBounds(a: Point, b: Point): void {
-    const { left, top, width, height } = makeBoundingBoxFromPoints([a, b]);
-    this.shape!.set({ rx: width / 2, ry: height / 2 });
-    this.shape!.setPositionByOrigin(new Point(left, top), 'left', 'top');
+  protected setBounds(a: Point, b: Point, ev: TBrushEventData) {
+    super.setBounds(a, b, ev);
+    const shape = this.shape!;
+    if (ev.e.shiftKey) {
+      const r = Math.max(shape.width, shape.height) / 2;
+      shape.set({ rx: r, ry: r });
+    } else {
+      shape.set({ rx: shape.width / 2, ry: shape.height / 2 });
+    }
   }
 }
 
 fabric.ShapeBaseBrush = ShapeBaseBrush;
 fabric.ShapeBrush = ShapeBrush;
-fabric.CircleBrush = CircleBrush;
+fabric.CircleBrush1 = CircleBrush1;
 fabric.EllipseBrush = EllipseBrush;
