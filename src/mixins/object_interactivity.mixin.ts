@@ -1,16 +1,16 @@
+import type { Control } from '../controls/control.class';
 import { IPoint, Point } from '../point.class';
-import type { TCornerPoint, TDegree, TMat2D } from '../typedefs';
 import { FabricObject } from '../shapes/object.class';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import type { TCornerPoint, TDegree, TMat2D } from '../typedefs';
 import {
   calcRotateMatrix,
+  decodeTransformMatrix,
   multiplyTransformMatrices,
-  qrDecompose,
   TQrDecomposeOut,
 } from '../util/misc/matrix';
-import { ObjectGeometry } from './object_geometry.mixin';
-import type { Control } from '../controls/control.class';
 import { sizeAfterTransform } from '../util/misc/objectTransforms';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { ObjectGeometry } from './object_geometry.mixin';
 
 type TOCoord = IPoint & {
   corner: TCornerPoint;
@@ -166,9 +166,7 @@ export class InteractiveFabricObject extends FabricObject {
         0,
         0,
       ]),
-      transformOptions = this.group
-        ? qrDecompose(this.calcTransformMatrix())
-        : undefined,
+      transformOptions = this.group ? this.decodeTransformMatrix() : undefined,
       dim = this._calculateCurrentDimensions(transformOptions),
       coords: Record<string, TOCoord> = {};
 
@@ -339,7 +337,8 @@ export class InteractiveFabricObject extends FabricObject {
       shouldDrawBorders = styleOptions.hasBorders,
       shouldDrawControls = styleOptions.hasControls;
     const matrix = multiplyTransformMatrices(vpt, this.calcTransformMatrix());
-    const options = qrDecompose(matrix);
+    // todo: once vpt rotation is supported we need to account for it in the decoding of the matrix
+    const options = decodeTransformMatrix(matrix, this.getTotalAngle());
     ctx.save();
     ctx.translate(options.translateX, options.translateY);
     ctx.lineWidth = 1 * this.borderScaleFactor;

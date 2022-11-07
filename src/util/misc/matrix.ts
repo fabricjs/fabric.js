@@ -236,7 +236,7 @@ export const composeMatrix = ({
 export const decodeTransformMatrix = (
   m: TMat2D,
   angle?: TDegree
-): TComposeMatrixArgs => {
+): Required<TComposeMatrixArgs> => {
   // Our "best guess" for the lack of information provided
   if (typeof angle === 'undefined') {
     const options = qrDecompose(m);

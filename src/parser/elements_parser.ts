@@ -3,9 +3,9 @@
 import { fabric } from '../../HEADER';
 import { capitalize } from '../util/lang_string';
 import {
+  decodeTransformMatrix,
   invertTransform,
   multiplyTransformMatrices,
-  qrDecompose,
 } from '../util/misc/matrix';
 
 const ElementsParser = function (
@@ -152,7 +152,7 @@ const ElementsParser = function (
       if (clipPath.clipPath) {
         this.resolveClipPath(clipPath, clipPathOwner);
       }
-      const options = qrDecompose(gTransform);
+      const options = decodeTransformMatrix(gTransform);
       clipPath.flipX = false;
       clipPath.flipY = false;
       clipPath.set('scaleX', options.scaleX);

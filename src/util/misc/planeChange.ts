@@ -1,7 +1,8 @@
 import { iMatrix } from '../../constants';
 import type { Point } from '../../point.class';
-import type { TMat2D } from '../../typedefs';
-import { TObject } from '../../__types__';
+import type { FabricObject } from '../../shapes/fabricObject.class';
+import type { TDegree, TMat2D } from '../../typedefs';
+import type { StaticCanvas } from '../../__types__';
 import { invertTransform, multiplyTransformMatrices } from './matrix';
 import { applyTransformToObject } from './objectTransforms';
 
@@ -27,15 +28,14 @@ export const calcPlaneChangeMatrix = (
  * From the canvas/viewer's perspective the point remains unchanged.
  *
  * @example <caption>Send point from canvas plane to group plane</caption>
- * var obj = new fabric.Rect({ left: 20, top: 20, width: 60, height: 60, strokeWidth: 0 });
- * var group = new fabric.Group([obj], { strokeWidth: 0 });
- * var sentPoint1 = fabric.util.sendPointToPlane(new Point(50, 50), undefined, group.calcTransformMatrix());
- * var sentPoint2 = fabric.util.sendPointToPlane(new Point(50, 50), fabric.iMatrix, group.calcTransformMatrix());
+ * const obj = new fabric.Rect({ left: 20, top: 20, width: 60, height: 60, strokeWidth: 0 });
+ * const group = new fabric.Group([obj], { strokeWidth: 0 });
+ * const sentPoint1 = fabric.util.sendPointToPlane(new Point(50, 50), undefined, group.calcTransformMatrix());
+ * const sentPoint2 = fabric.util.sendPointToPlane(new Point(50, 50), fabric.iMatrix, group.calcTransformMatrix());
  * console.log(sentPoint1, sentPoint2) //  both points print (0,0) which is the center of group
  *
  * @static
  * @memberOf fabric.util
- * @see {fabric.util.transformPointRelativeToCanvas} for transforming relative to canvas
  * @param {Point} point
  * @param {TMat2D} [from] plane matrix containing object. Passing `undefined` is equivalent to passing the identity matrix, which means `point` exists in the canvas coordinate plane.
  * @param {TMat2D} [to] destination plane matrix to contain object. Passing `undefined` means `point` should be sent to the canvas coordinate plane.
@@ -45,10 +45,7 @@ export const sendPointToPlane = (
   point: Point,
   from: TMat2D = iMatrix,
   to: TMat2D = iMatrix
-): Point =>
-  //  we are actually looking for the transformation from the destination plane to the source plane (which is a linear mapping)
-  //  the object will exist on the destination plane and we want it to seem unchanged by it so we reverse the destination matrix (to) and then apply the source matrix (from)
-  point.transform(calcPlaneChangeMatrix(from, to));
+): Point => point.transform(calcPlaneChangeMatrix(from, to));
 
 /**
  * Transform point relative to canvas.
@@ -71,7 +68,7 @@ export const sendPointToPlane = (
  */
 export const transformPointRelativeToCanvas = (
   point: Point,
-  canvas: any,
+  canvas: StaticCanvas,
   relationBefore: ObjectRelation,
   relationAfter: ObjectRelation
 ): Point => {
@@ -122,13 +119,13 @@ export const transformPointRelativeToCanvas = (
  *
  * @static
  * @memberof fabric.util
- * @param {fabric.Object} object
- * @param {Matrix} [from] plane matrix containing object. Passing `undefined` is equivalent to passing the identity matrix, which means `object` is a direct child of canvas.
- * @param {Matrix} [to] destination plane matrix to contain object. Passing `undefined` means `object` should be sent to the canvas coordinate plane.
- * @returns {Matrix} the transform matrix that was applied to `object`
+ * @param {FabricObject} object
+ * @param {TMat2D} [from] plane matrix containing object. Passing `undefined` is equivalent to passing the identity matrix, which means `object` is a direct child of canvas.
+ * @param {TMat2D} [to] destination plane matrix to contain object. Passing `undefined` means `object` should be sent to the canvas coordinate plane.
+ * @returns {TMat2D} the transform matrix that was applied to `object`
  */
 export const sendObjectToPlane = (
-  object: TObject,
+  object: FabricObject,
   from?: TMat2D,
   to?: TMat2D
 ): TMat2D => {

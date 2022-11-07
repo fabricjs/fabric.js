@@ -1111,10 +1111,9 @@
     group.scaleX = 2;
     group.scaleY = 3;
     object.group = group;
-    var objectScale = object.getObjectScaling();
     assert.deepEqual(
-      new fabric.Point(Math.round(objectScale.x * 1000) / 1000, Math.round(objectScale.y * 1000) / 1000),
-      new fabric.Point(7.649, 4.707)
+      object.getObjectScaling(),
+      new fabric.Point(7.2, 5)
     );
   });
 
