@@ -156,11 +156,13 @@ export type TObjectEvents = ObjectPointerEvents &
     removed: { target: Group | Canvas };
 
     // IText
+    // todo - move to file
     'selection:changed': never;
     changed: never;
     tripleclick: XTransformEvent;
 
     // Group
+    // todo - move to file
     layout: LayoutEventData;
 
     // erasing
