@@ -1,8 +1,8 @@
 //@ts-nocheck
+import { TObjectEvents } from '../EventTypeDefs';
+import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { Point } from '../point.class';
 import { FabricObject } from './fabricObject.class';
-import { resolveOrigin } from '../mixins/object_origin.mixin';
-import { TObjectEvents } from '../EventTypeDefs';
 
 export type LayoutContextType =
   | 'initialization'
