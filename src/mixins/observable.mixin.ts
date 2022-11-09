@@ -139,7 +139,7 @@ export class Observable<EventMap> {
     // one object with key/value pairs was passed
     else if (typeof arg0 === 'object') {
       for (const eventName in arg0) {
-        this._removeEventListener(eventName, arg0[eventName]);
+        this._removeEventListener(eventName as K, arg0[eventName]);
       }
     } else {
       this._removeEventListener(arg0, handler);
