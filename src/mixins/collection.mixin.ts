@@ -49,17 +49,16 @@ export class Collection {
    */
   remove(objectsToRemove: FabricObject[], callback: ObjectCallback) {
     const objects = this._objects,
-      removed = [];
-    for (let i = 0, object, index; i < objectsToRemove.length; i++) {
-      object = objectsToRemove[i];
-      index = objects.indexOf(object);
+      removed: FabricObject[] = [];
+    objectsToRemove.forEach((object, i) => {
+      const index = objects.indexOf(object);
       // only call onObjectRemoved if an object was actually removed
       if (index !== -1) {
         objects.splice(index, 1);
         removed.push(object);
         callback && callback.call(this, object);
       }
-    }
+    });
     return removed;
   }
 
@@ -75,12 +74,12 @@ export class Collection {
    */
   forEachObject<T>(
     callback: (
-      this: T,
+      this: T | undefined,
       object: FabricObject,
       index: number,
       array: FabricObject[]
     ) => any,
-    context: T
+    context?: T
   ) {
     this.getObjects().forEach(callback.bind(context));
   }
