@@ -2,6 +2,7 @@
 import { Point } from '../point.class';
 import { FabricObject } from './fabricObject.class';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
+import { TObjectEvents } from '../EventTypeDefs';
 
 export type LayoutContextType =
   | 'initialization'
@@ -27,13 +28,15 @@ export type LayoutResult = {
   height: number;
 };
 
-export type LayoutEventData = {
-  context: LayoutContext;
-  result: LayoutResult;
-  diff: Point;
+export type GroupEvents = TObjectEvents & {
+  layout: {
+    context: LayoutContext;
+    result: LayoutResult;
+    diff: Point;
+  };
 };
 
-export class Group extends FabricObject {}
+export class Group extends FabricObject<GroupEvents> {}
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),

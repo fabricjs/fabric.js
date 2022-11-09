@@ -104,6 +104,21 @@ type TPointerEvents<Prefix extends string, E = Record<string, never>> = Record<
 export type ObjectPointerEvents = TPointerEvents<'mouse'>;
 export type CanvasPointerEvents = TPointerEvents<'mouse:'>;
 
+export type TObjectEvents = ObjectPointerEvents &
+  DnDEvents &
+  ObjectModifiedEvents & {
+    // selection
+    selected: never;
+    deselected: never;
+
+    // tree
+    added: { target: Group | Canvas };
+    removed: { target: Group | Canvas };
+
+    // erasing
+    'erasing:end': { path: FabricObject };
+  };
+
 export type TCanvasEvents = CanvasPointerEvents &
   CanvasDnDEvents &
   CanvasModifiedEvents &
@@ -142,29 +157,4 @@ export type TCanvasEvents = CanvasPointerEvents &
     // misc
     'contextmenu:before': SimpleEventHandler<Event>;
     contextmenu: SimpleEventHandler<Event>;
-  };
-
-export type TObjectEvents = ObjectPointerEvents &
-  DnDEvents &
-  ObjectModifiedEvents & {
-    // selection
-    selected: never;
-    deselected: never;
-
-    // tree
-    added: { target: Group | Canvas };
-    removed: { target: Group | Canvas };
-
-    // IText
-    // todo - move to file
-    'selection:changed': never;
-    changed: never;
-    tripleclick: XTransformEvent;
-
-    // Group
-    // todo - move to file
-    layout: LayoutEventData;
-
-    // erasing
-    'erasing:end': { path: FabricObject };
   };
