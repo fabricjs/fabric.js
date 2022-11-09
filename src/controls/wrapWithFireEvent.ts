@@ -1,4 +1,4 @@
-import { TModificationEvents } from '../mixins/EventTypeDefs';
+import { TModificationEvents } from '../EventTypeDefs';
 import { Transform, TransformActionHandler } from '../typedefs';
 import { fireEvent } from '../util/fireEvent';
 import { commonEventInfo } from './util';

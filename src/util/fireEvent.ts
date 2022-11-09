@@ -1,4 +1,4 @@
-import { TModificationEvents } from '../mixins/EventTypeDefs';
+import { TModificationEvents } from '../EventTypeDefs';
 import { TransformEvent } from '../typedefs';
 
 export const fireEvent = (

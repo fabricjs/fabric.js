@@ -17,6 +17,7 @@ import { createCanvasElement } from '../util/misc/dom';
 import { ObjectGeometry } from '../mixins/object_geometry.mixin';
 import { qrDecompose, transformPoint } from '../util/misc/matrix';
 import { Canvas, Shadow, StaticCanvas } from '../__types__';
+import { TObjectEvents } from '../EventTypeDefs';
 
 // temporary hack for unfinished migration
 type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
@@ -34,17 +35,12 @@ const ALIASING_LIMIT = 2;
  *
  * @fires selected
  * @fires deselected
- * @fires modified
- * @fires modified
- * @fires moved
- * @fires scaled
- * @fires rotated
- * @fires skewed
  *
  * @fires rotating
  * @fires scaling
  * @fires moving
  * @fires skewing
+ * @fires modified
  *
  * @fires mousedown
  * @fires mouseup
@@ -58,7 +54,9 @@ const ALIASING_LIMIT = 2;
  * @fires dragleave
  * @fires drop
  */
-export class FabricObject extends ObjectGeometry {
+export class FabricObject<
+  T extends TObjectEvents = TObjectEvents
+> extends ObjectGeometry<T> {
   type: string;
 
   /**

@@ -1,4 +1,4 @@
-import { TCanvasEvents } from './mixins/EventTypeDefs';
+import { TCanvasEvents } from './EventTypeDefs';
 import type { Observable } from './mixins/observable.mixin';
 import type { Point } from './point.class';
 import { ModifierKey, TMat2D } from './typedefs';

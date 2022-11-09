@@ -1,8 +1,8 @@
-import { Point } from '../point.class';
-import { FabricObject } from '../shapes/fabricObject.class';
-import { Group, LayoutEventData } from '../shapes/group.class';
-import { TEvent, TransformEvent, TPointerEvent } from '../typedefs';
-import { Canvas } from '../__types__';
+import { Point } from './point.class';
+import { FabricObject } from './shapes/fabricObject.class';
+import { Group, LayoutEventData } from './shapes/group.class';
+import { TEvent, TransformEvent, TPointerEvent } from './typedefs';
+import { Canvas } from './__types__';
 
 export type TModificationEvents =
   | 'moving'
