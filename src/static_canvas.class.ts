@@ -585,54 +585,21 @@ import { CommonMethods } from './mixins/shared_methods.mixin';
         return this.lowerCanvasEl;
       },
 
-      /**
-       * @param {...fabric.Object} objects to add
-       * @return {Self} thisArg
-       * @chainable
-       */
-      add: function () {
-        fabric.Collection.add.call(this, arguments, this._onObjectAdded);
-        arguments.length > 0 &&
-          this.renderOnAddRemove &&
-          this.requestRenderAll();
+      add: function (...objects: FabricObject[]) {
+        super.add(...objects);
+        objects.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
         return this;
       },
 
-      /**
-       * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
-       * An object should be an instance of (or inherit from) fabric.Object
-       * @param {fabric.Object|fabric.Object[]} objects Object(s) to insert
-       * @param {Number} index Index to insert object at
-       * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
-       * @return {Self} thisArg
-       * @chainable
-       */
-      insertAt: function (objects, index) {
-        fabric.Collection.insertAt.call(
-          this,
-          objects,
-          index,
-          this._onObjectAdded
-        );
-        (Array.isArray(objects) ? objects.length > 0 : !!objects) &&
-          this.renderOnAddRemove &&
-          this.requestRenderAll();
+      insertAt: function (index, ...objects: FabricObject[]) {
+        super.insertAt(index, ...objects);
+        objects.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
         return this;
       },
 
-      /**
-       * @param {...fabric.Object} objects to remove
-       * @return {Self} thisArg
-       * @chainable
-       */
-      remove: function () {
-        var removed = fabric.Collection.remove.call(
-          this,
-          arguments,
-          this._onObjectRemoved
-        );
+      remove: function (...objects: FabricObject[]) {
+        const removed = super.remove(...objects);
         removed.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
-        return this;
       },
 
       /**

@@ -1,62 +1,55 @@
-import { fabric } from '../../HEADER';
 import type { FabricObject } from '../shapes/fabricObject.class';
 
-type ObjectCallback = (object: FabricObject) => any;
-
-export class Collection {
+export abstract class Collection {
   /**
    * @type {FabricObject[]}
    */
   _objects: FabricObject[] = [];
 
+  protected abstract _onObjectAdded(object: FabricObject): void;
+
+  protected abstract _onObjectRemoved(object: FabricObject): void;
+
   /**
    * Adds objects to collection
    * Objects should be instances of (or inherit from) FabricObject
-   * @param {FabricObject[]} objects to add
-   * @param {ObjectCallback} [callback]
+   * @param {...FabricObject[]} objects to add
    * @returns {number} new array length
    */
-  add(objects: FabricObject[], callback: ObjectCallback) {
+  add(...objects: FabricObject[]) {
     const size = this._objects.push(...objects);
-    objects.forEach(callback.bind(this));
+    objects.forEach((object) => this._onObjectAdded(object));
     return size;
   }
 
   /**
    * Inserts an object into collection at specified index
-   * @param {FabricObject|FabricObject[]} objects Object(s) to insert
    * @param {number} index Index to insert object at
-   * @param {ObjectCallback} [callback]
+   * @param {...FabricObject[]} objects Object(s) to insert
    * @returns {number} new array length
    */
-  insertAt(
-    objects: FabricObject | FabricObject[],
-    index: number,
-    callback: ObjectCallback
-  ) {
-    objects = Array.isArray(objects) ? objects : [objects];
+  insertAt(index: number, ...objects: FabricObject[]) {
     this._objects.splice(index, 0, ...objects);
-    callback && objects.forEach(callback.bind(this));
+    objects.forEach((object) => this._onObjectAdded(object));
     return this._objects.length;
   }
 
   /**
    * Removes objects from a collection, then renders canvas (if `renderOnAddRemove` is not `false`)
    * @private
-   * @param {FabricObject[]} objectsToRemove objects to remove
-   * @param {ObjectCallback} [callback] function to call for each object removed
+   * @param {...FabricObject[]} objects objects to remove
    * @returns {FabricObject[]} removed objects
    */
-  remove(objectsToRemove: FabricObject[], callback: ObjectCallback) {
-    const objects = this._objects,
+  remove(...objects: FabricObject[]) {
+    const array = this._objects,
       removed: FabricObject[] = [];
-    objectsToRemove.forEach((object) => {
-      const index = objects.indexOf(object);
+    objects.forEach((object) => {
+      const index = array.indexOf(object);
       // only call onObjectRemoved if an object was actually removed
       if (index !== -1) {
-        objects.splice(index, 1);
+        array.splice(index, 1);
         removed.push(object);
-        callback && callback.call(this, object);
+        this._onObjectRemoved(object);
       }
     });
     return removed;
@@ -151,5 +144,3 @@ export class Collection {
     }, 0);
   }
 }
-
-fabric.Collection = new Collection();

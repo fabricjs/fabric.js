@@ -2,6 +2,8 @@
 import { Point } from '../point.class';
 import { FabricObject } from './fabricObject.class';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
+import { applyMixins } from '../util/applymixins';
+import { Collection } from '../mixins/collection.mixin';
 
 export class Group extends FabricObject {}
 
@@ -22,8 +24,7 @@ export class Group extends FabricObject {}
    * @see {@link fabric.Group#initialize} for constructor definition
    */
   fabric.Group = fabric.util.createClass(
-    FabricObject,
-    fabric.Collection,
+    applyMixins(class CollectionObject extends FabricObject {}, Collection),
     /** @lends fabric.Group.prototype */ {
       /**
        * Type of an object
@@ -163,45 +164,32 @@ export class Group extends FabricObject {}
 
       /**
        * Add objects
-       * @param {...fabric.Object} objects
+       * @param {...FabricObject[]} objects
        */
-      add: function () {
-        var allowedObjects = this._filterObjectsBeforeEnteringGroup(
-          Array.from(arguments)
-        );
+      add: function (...objects: FabricObject[]) {
+        const allowedObjects = this._filterObjectsBeforeEnteringGroup(objects);
         fabric.Collection.add.call(this, allowedObjects, this._onObjectAdded);
         this._onAfterObjectsChange('added', allowedObjects);
       },
 
       /**
        * Inserts an object into collection at specified index
-       * @param {fabric.Object | fabric.Object[]} objects Object to insert
+       * @param {FabricObject[]} objects Object to insert
        * @param {Number} index Index to insert object at
        */
-      insertAt: function (objects, index) {
-        var allowedObjects = this._filterObjectsBeforeEnteringGroup(
-          Array.isArray(objects) ? objects : [objects]
-        );
-        fabric.Collection.insertAt.call(
-          this,
-          allowedObjects,
-          index,
-          this._onObjectAdded
-        );
+      insertAt: function (index: number, ...objects: FabricObject[]) {
+        const allowedObjects = this._filterObjectsBeforeEnteringGroup(objects);
+        super.insertAt(allowedObjects, index);
         this._onAfterObjectsChange('added', allowedObjects);
       },
 
       /**
        * Remove objects
-       * @param {...fabric.Object} objects
-       * @returns {fabric.Object[]} removed objects
+       * @param {...FabricObject[]} objects
+       * @returns {FabricObject[]} removed objects
        */
-      remove: function () {
-        var removed = fabric.Collection.remove.call(
-          this,
-          arguments,
-          this._onObjectRemoved
-        );
+      remove: function (...objects: FabricObject[]) {
+        const removed = super.remove(objects);
         this._onAfterObjectsChange('removed', removed);
         return removed;
       },
@@ -212,7 +200,7 @@ export class Group extends FabricObject {}
        */
       removeAll: function () {
         this._activeObjects = [];
-        return this.remove.apply(this, this._objects.slice());
+        return this.remove(...this._objects.slice());
       },
 
       /**
