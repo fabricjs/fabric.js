@@ -1,15 +1,15 @@
-//@ts-nocheck
-
 import { fabric } from '../../HEADER';
 
-type EventRegistryObject = Record<string, Function>;
+export type TEventCallback<T = any> = (options: T) => any;
+
+type EventRegistryObject<T = any> = Record<string, TEventCallback<T>>;
 
 /**
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#events}
  * @see {@link http://fabricjs.com/events|Events demo}
  */
 export class Observable {
-  private __eventListeners: Record<Function[]> = {};
+  private __eventListeners: Record<string, TEventCallback[]> = {};
 
   /**
    * Observes specified event
@@ -19,9 +19,12 @@ export class Observable {
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
    * @return {Function} disposer
    */
-  on(eventName: string, handler: Function): Function;
-  on(handlers: EventRegistryObject): Function;
-  on(arg0: string | EventRegistryObject, handler?: Function): Function {
+  on<T>(eventName: string, handler: TEventCallback<T>): VoidFunction;
+  on<T>(handlers: EventRegistryObject<T>): VoidFunction;
+  on<T>(
+    arg0: string | EventRegistryObject<T>,
+    handler?: TEventCallback<T>
+  ): VoidFunction {
     if (!this.__eventListeners) {
       this.__eventListeners = {};
     }
@@ -52,18 +55,21 @@ export class Observable {
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
    * @return {Function} disposer
    */
-  once(eventName: string, handler: Function): Function;
-  once(handlers: EventRegistryObject): Function;
-  once(arg0: string | EventRegistryObject, handler?: Function): Function {
+  once<T>(eventName: string, handler: TEventCallback<T>): VoidFunction;
+  once<T>(handlers: EventRegistryObject<T>): VoidFunction;
+  once<T>(
+    arg0: string | EventRegistryObject<T>,
+    handler?: TEventCallback<T>
+  ): VoidFunction {
     if (typeof arg0 === 'object') {
       // one object with key/value pairs was passed
-      const disposers: Function[] = [];
+      const disposers: VoidFunction[] = [];
       for (const eventName in arg0) {
         disposers.push(this.once(eventName, arg0[eventName]));
       }
       return () => disposers.forEach((d) => d());
     } else if (handler) {
-      const disposer = this.on(arg0, (...args: any[]) => {
+      const disposer = this.on<T>(arg0, (...args) => {
         handler(...args);
         disposer();
       });
@@ -79,7 +85,7 @@ export class Observable {
    * @param {string} eventName
    * @param {Function} [handler]
    */
-  private _removeEventListener(eventName: string, handler?: Function) {
+  private _removeEventListener(eventName: string, handler?: TEventCallback) {
     if (!this.__eventListeners[eventName]) {
       return;
     }
@@ -100,9 +106,9 @@ export class Observable {
    * @param {EventRegistryObject} handlers key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function to be deleted from EventListeners
    */
-  off(eventName: string, handler: Function): void;
+  off(eventName: string, handler: TEventCallback): void;
   off(handlers: EventRegistryObject): void;
-  off(arg0?: string | EventRegistryObject, handler?: Function) {
+  off(arg0?: string | EventRegistryObject, handler?: TEventCallback) {
     if (!this.__eventListeners) {
       return;
     }
@@ -128,7 +134,7 @@ export class Observable {
    * @param {String} eventName Event name to fire
    * @param {Object} [options] Options object
    */
-  fire(eventName: string, options: object) {
+  fire(eventName: string, options?: object) {
     if (!this.__eventListeners) {
       return;
     }
