@@ -71,12 +71,12 @@ export const enum SupportedSVGUnit {
 
 export type TMat2D = [number, number, number, number, number, number];
 
-export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
-
 /**
  * SVG path commands
  */
 export type PathData = (string | number)[][];
+
+export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
 
 export type TPointerEvent = MouseEvent | TouchEvent;
 
