@@ -36,27 +36,22 @@ export class Path extends FabricObject {
    * @param {Object} [options] Options object
    * @return {Path} thisArg
    */
-  constructor(path: PathData | string, { path: _, ...options }) {
+  constructor(path: PathData | string, { path: _, left, top, ...options }) {
     super(options);
-    const pathTL = this._setPath(path || []);
-    const origin = this.translateToGivenOrigin(
-      new Point(options.left ?? pathTL.x, options.top ?? pathTL.y),
-      typeof options.left === 'number' ? this.originX : 'left',
-      typeof options.top === 'number' ? this.originY : 'top',
-      this.originX,
-      this.originY
-    );
-    this.setPositionByOrigin(origin, this.originX, this.originY);
+    this._setPath(path || [], true);
+    typeof left === 'number' && this.set('left', left);
+    typeof top === 'number' && this.set('top', top);
   }
 
   /**
    * @private
    * @param {PathData | string} path Path data (sequence of coordinates and corresponding "command" tokens)
+   * @param {boolean} [adjustPosition] pass true to reposition the object according to the bounding box
    * @returns {Point} top left position of the bounding box, useful for complementary positioning
    */
-  _setPath(path: PathData | string) {
+  _setPath(path: PathData | string, adjustPosition?: boolean) {
     this.path = makePathSimpler(Array.isArray(path) ? path : parsePath(path));
-    return this.setDimensions();
+    this.setBoundingBox(adjustPosition);
   }
 
   /**
@@ -251,13 +246,15 @@ export class Path extends FabricObject {
     return this.path.length;
   }
 
-  /**
-   * @returns {Point} top left position of the bounding box, useful for complementary positioning
-   */
   setDimensions() {
+    this.setBoundingBox();
+  }
+
+  setBoundingBox(adjustPosition?: boolean) {
     const { left, top, width, height, pathOffset } = this._calcDimensions();
     this.set({ width, height, pathOffset });
-    return new Point(left, top);
+    adjustPosition &&
+      this.setPositionByOrigin(new Point(left, top), 'left', 'top');
   }
 
   /**
