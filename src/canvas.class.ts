@@ -2,7 +2,7 @@
 import { dragHandler, getActionFromCorner } from './controls/actions';
 import { Point } from './point.class';
 import { FabricObject } from './shapes/fabricObject.class';
-import { Transform } from './typedefs';
+import { Transform } from './EventTypeDefs';
 import { saveObjectTransform } from './util/misc/objectTransforms';
 
 (function (global) {

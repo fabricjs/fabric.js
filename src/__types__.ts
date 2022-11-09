@@ -1,7 +1,8 @@
 import { CanvasEvents } from './EventTypeDefs';
 import type { Observable } from './mixins/observable.mixin';
 import type { Point } from './point.class';
-import { ModifierKey, TMat2D } from './typedefs';
+import { TMat2D } from './typedefs';
+import { ModifierKey } from './EventTypeDefs';
 
 /**
  * @todo remove transient

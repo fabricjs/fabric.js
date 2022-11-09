@@ -1,14 +1,13 @@
-import { resolveOrigin } from '../mixins/object_origin.mixin';
-import { Point } from '../point.class';
-import type { FabricObject } from '../shapes/fabricObject.class';
 import {
-  TOriginX,
-  TOriginY,
   TPointerEvent,
   Transform,
   TransformAction,
   TransformEvent,
-} from '../typedefs';
+} from '../EventTypeDefs';
+import { resolveOrigin } from '../mixins/object_origin.mixin';
+import { Point } from '../point.class';
+import type { FabricObject } from '../shapes/fabricObject.class';
+import { TOriginX, TOriginY } from '../typedefs';
 import {
   degreesToRadians,
   radiansToDegrees,

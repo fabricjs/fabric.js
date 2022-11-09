@@ -1,5 +1,8 @@
-import { TModificationEvents } from '../EventTypeDefs';
-import { Transform, TransformActionHandler } from '../typedefs';
+import {
+  TModificationEvents,
+  Transform,
+  TransformActionHandler,
+} from '../EventTypeDefs';
 import { fireEvent } from '../util/fireEvent';
 import { commonEventInfo } from './util';
 

@@ -1,4 +1,4 @@
-import { TransformActionHandler } from '../typedefs';
+import { TransformActionHandler } from '../EventTypeDefs';
 import { getLocalPoint, isTransformCentered } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';

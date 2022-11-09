@@ -1,8 +1,70 @@
+import type { Control } from './controls/control.class';
 import type { Point } from './point.class';
 import type { FabricObject } from './shapes/fabricObject.class';
 import type { Group } from './shapes/group.class';
-import type { TEvent, TPointerEvent, TransformEvent } from './typedefs';
+import type { TOriginX, TOriginY, TRadian } from './typedefs';
+import type { saveObjectTransform } from './util/misc/objectTransforms';
 import type { Canvas } from './__types__';
+
+export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
+
+export type TPointerEvent = MouseEvent | TouchEvent;
+
+export type TransformAction<T extends Transform = Transform, R = void> = (
+  eventData: TPointerEvent,
+  transform: T,
+  x: number,
+  y: number
+) => R;
+
+export type TransformActionHandler<T extends Transform = Transform> =
+  TransformAction<T, boolean>;
+
+export type ControlCallback<R = void> = (
+  eventData: TPointerEvent,
+  control: Control,
+  fabricObject: FabricObject
+) => R;
+
+export type ControlCursorCallback = ControlCallback<string>;
+/**
+ * relative to target's containing coordinate plane
+ * both agree on every point
+ */
+
+export type Transform = {
+  target: FabricObject;
+  action: string;
+  actionHandler: TransformActionHandler;
+  corner: string;
+  scaleX: number;
+  scaleY: number;
+  skewX: number;
+  skewY: number;
+  offsetX: number;
+  offsetY: number;
+  originX: TOriginX;
+  originY: TOriginY;
+  ex: number;
+  ey: number;
+  lastX: number;
+  lastY: number;
+  theta: TRadian;
+  width: number;
+  height: number;
+  shiftKey: boolean;
+  altKey: boolean;
+  original: ReturnType<typeof saveObjectTransform>;
+};
+
+export type TEvent<E extends Event = TPointerEvent> = {
+  e: E;
+};
+
+export type TransformEvent<E extends Event = TPointerEvent> = TEvent<E> & {
+  transform: Transform;
+  pointer: Point;
+};
 
 export type TModificationEvents =
   | 'moving'

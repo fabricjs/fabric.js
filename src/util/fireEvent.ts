@@ -1,5 +1,4 @@
-import { TModificationEvents } from '../EventTypeDefs';
-import { TransformEvent } from '../typedefs';
+import { TModificationEvents, TransformEvent } from '../EventTypeDefs';
 
 export const fireEvent = (
   eventName: TModificationEvents,
