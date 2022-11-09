@@ -347,15 +347,6 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
   }
 
   /**
-   * @private
-   * @param {ClipboardEvent} e Event object
-   * @return {Object} Clipboard data object
-   */
-  _getClipboardData(e: ClipboardEvent): object {
-    return (e && e.clipboardData) || fabric.window.clipboardData;
-  }
-
-  /**
    * Finds the width in pixels before the cursor on the same line
    * @private
    * @param {Number} lineIndex
