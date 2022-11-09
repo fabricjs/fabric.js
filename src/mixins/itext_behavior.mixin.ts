@@ -260,6 +260,17 @@ export abstract class ITextBehaviorMixin extends Text {
     }
   }
 
+  restartCursorIfNeeded() {
+    if (
+      !this._currentTickState ||
+      this._currentTickState.isAborted ||
+      !this._currentTickCompleteState ||
+      this._currentTickCompleteState.isAborted
+    ) {
+      this.initDelayedCursor();
+    }
+  }
+
   /**
    * Selects entire text
    */
@@ -1143,17 +1154,6 @@ export abstract class ITextBehaviorMixin extends Text {
           delete this.styles[numericLine];
         }
       }
-    }
-  }
-
-  restartCursorIfNeeded() {
-    if (
-      !this._currentTickState ||
-      this._currentTickState.isAborted ||
-      !this._currentTickCompleteState ||
-      this._currentTickCompleteState.isAborted
-    ) {
-      this.initDelayedCursor();
     }
   }
 
