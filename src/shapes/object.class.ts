@@ -17,7 +17,7 @@ import { createCanvasElement } from '../util/misc/dom';
 import { ObjectGeometry } from '../mixins/object_geometry.mixin';
 import { qrDecompose, transformPoint } from '../util/misc/matrix';
 import { Canvas, Shadow, StaticCanvas } from '../__types__';
-import { ObjectEventsSpec } from '../EventTypeDefs';
+import { ObjectEvents } from '../EventTypeDefs';
 
 // temporary hack for unfinished migration
 type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
@@ -55,7 +55,7 @@ const ALIASING_LIMIT = 2;
  * @fires drop
  */
 export class FabricObject<
-  EventSpec extends ObjectEventsSpec = ObjectEventsSpec
+  EventSpec extends ObjectEvents = ObjectEvents
 > extends ObjectGeometry<EventSpec> {
   type: string;
 

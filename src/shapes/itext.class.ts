@@ -2,7 +2,7 @@
 import { TObjectEvents, XTransformEvent } from '../EventTypeDefs';
 import { FabricObject } from './fabricObject.class';
 
-export type ITextEventsSpec = TObjectEvents & {
+export type ITextEvents = TObjectEvents & {
   'selection:changed': never;
   changed: never;
   tripleclick: XTransformEvent;

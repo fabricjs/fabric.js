@@ -1,4 +1,4 @@
-import { CanvasEventsSpec } from './EventTypeDefs';
+import { CanvasEvents } from './EventTypeDefs';
 import type { Observable } from './mixins/observable.mixin';
 import type { Point } from './point.class';
 import { ModifierKey, TMat2D } from './typedefs';
@@ -20,6 +20,6 @@ export type StaticCanvas = Record<string, any> & {
     br: Point;
   };
   getRetinaScaling(): number;
-} & Observable<CanvasEventsSpec>;
+} & Observable<CanvasEvents>;
 export type Rect = any;
 export type TObject = any;

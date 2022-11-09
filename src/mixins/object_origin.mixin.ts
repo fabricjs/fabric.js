@@ -1,11 +1,10 @@
 import { Point } from '../point.class';
+import { Group } from '../shapes/group.class';
+import { TDegree, TOriginX, TOriginY } from '../typedefs';
 import { transformPoint } from '../util/misc/matrix';
+import { sizeAfterTransform } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { CommonMethods } from './shared_methods.mixin';
-import { TDegree, TOriginX, TOriginY } from '../typedefs';
-import { Group } from '../shapes/group.class';
-import { sizeAfterTransform } from '../util/misc/objectTransforms';
-import { ObjectEventsSpec } from '../EventTypeDefs';
 
 const originOffset = {
   left: -0.5,

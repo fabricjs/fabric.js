@@ -104,7 +104,7 @@ type TPointerEvents<Prefix extends string, E = Record<string, never>> = Record<
 export type ObjectPointerEvents = TPointerEvents<'mouse'>;
 export type CanvasPointerEvents = TPointerEvents<'mouse:'>;
 
-export type ObjectEventsSpec = ObjectPointerEvents &
+export type ObjectEvents = ObjectPointerEvents &
   DnDEvents &
   ObjectModifiedEvents & {
     // selection
@@ -119,7 +119,7 @@ export type ObjectEventsSpec = ObjectPointerEvents &
     'erasing:end': { path: FabricObject };
   };
 
-export type CanvasEventsSpec = CanvasPointerEvents &
+export type CanvasEvents = CanvasPointerEvents &
   CanvasDnDEvents &
   CanvasModifiedEvents &
   CanvasSelectionEvents & {

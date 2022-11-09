@@ -28,7 +28,7 @@ export type LayoutResult = {
   height: number;
 };
 
-export type GroupEventsSpec = TObjectEvents & {
+export type GroupEvents = TObjectEvents & {
   layout: {
     context: LayoutContext;
     result: LayoutResult;
@@ -36,7 +36,7 @@ export type GroupEventsSpec = TObjectEvents & {
   };
 };
 
-export class Group extends FabricObject<GroupEventsSpec> {}
+export class Group extends FabricObject<GroupEvents> {}
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
