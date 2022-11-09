@@ -1,6 +1,10 @@
+import { TModificationEvents } from '../mixins/EventTypeDefs';
 import { TransformEvent } from '../typedefs';
 
-export const fireEvent = (eventName: string, options: TransformEvent) => {
+export const fireEvent = (
+  eventName: TModificationEvents,
+  options: TransformEvent
+) => {
   const {
     transform: { target },
   } = options;
