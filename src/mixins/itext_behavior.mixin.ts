@@ -1451,18 +1451,4 @@ export abstract class ITextBehaviorMixin extends Text {
       this.selectionEnd = newSelection;
     }
   }
-
-  setSelectionInBoundaries() {
-    const length = this.text.length;
-    if (this.selectionStart > length) {
-      this.selectionStart = length;
-    } else if (this.selectionStart < 0) {
-      this.selectionStart = 0;
-    }
-    if (this.selectionEnd > length) {
-      this.selectionEnd = length;
-    } else if (this.selectionEnd < 0) {
-      this.selectionEnd = 0;
-    }
-  }
 }
