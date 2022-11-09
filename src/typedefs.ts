@@ -131,7 +131,7 @@ export type TEvent<E extends Event = TPointerEvent> = {
   e: E;
 };
 
-export type TransformEvent = TEvent & {
+export type TransformEvent<E extends Event = TPointerEvent> = TEvent<E> & {
   transform: Transform;
   pointer: Point;
 };

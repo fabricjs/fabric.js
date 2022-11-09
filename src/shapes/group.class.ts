@@ -3,6 +3,36 @@ import { Point } from '../point.class';
 import { FabricObject } from './fabricObject.class';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
 
+export type LayoutContextType =
+  | 'initialization'
+  | 'object_modified'
+  | 'added'
+  | 'removed'
+  | 'layout_change'
+  | 'imperative';
+
+export type LayoutContext = {
+  type: LayoutContextType;
+  /**
+   * array of objects starting from the object that triggered the call to the current one
+   */
+  path?: Group[];
+  [key: string]: any;
+};
+
+export type LayoutResult = {
+  centerX: number;
+  centerY: number;
+  width: number;
+  height: number;
+};
+
+export type LayoutEventData = {
+  context: LayoutContext;
+  result: LayoutResult;
+  diff: Point;
+};
+
 export class Group extends FabricObject {}
 
 (function (global) {
