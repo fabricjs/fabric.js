@@ -1,11 +1,13 @@
 //@ts-nocheck
 import { config } from './config';
 import { VERSION } from './constants';
+import { Observable } from './mixins/observable.mixin';
 import { Point } from './point.class';
 import { requestAnimFrame } from './util/animate';
 import { removeFromArray } from './util/internals';
 import { pick } from './util/misc/pick';
-
+import { FabricObject } from './shapes/fabricObject.class';
+import { CommonMethods } from './mixins/shared_methods.mixin';
 (function (global) {
   // aliases for faster resolution
   var fabric = global.fabric,
@@ -33,7 +35,6 @@ import { pick } from './util/misc/pick';
    */
   // eslint-disable-next-line max-len
   fabric.StaticCanvas = fabric.util.createClass(
-    fabric.CommonMethods,
     fabric.Collection,
     /** @lends fabric.StaticCanvas.prototype */ {
       /**
@@ -293,7 +294,7 @@ import { pick } from './util/misc/pick';
        */
       _initOptions: function (options) {
         var lowerCanvasEl = this.lowerCanvasEl;
-        this._setOptions(options);
+        this.set(options);
 
         this.width = this.width || parseInt(lowerCanvasEl.width, 10) || 0;
         this.height = this.height || parseInt(lowerCanvasEl.height, 10) || 0;
@@ -498,16 +499,16 @@ import { pick } from './util/misc/pick';
         this.viewportTransform = vpt;
         for (i = 0, len = this._objects.length; i < len; i++) {
           object = this._objects[i];
-          object.group || object.setCoords(true);
+          object.group || object.setCoords();
         }
         if (activeObject) {
           activeObject.setCoords();
         }
         if (backgroundObject) {
-          backgroundObject.setCoords(true);
+          backgroundObject.setCoords();
         }
         if (overlayObject) {
-          overlayObject.setCoords(true);
+          overlayObject.setCoords();
         }
         this.calcViewportBoundaries();
         this.renderOnAddRemove && this.requestRenderAll();
@@ -1363,7 +1364,7 @@ import { pick } from './util/misc/pick';
       createSVGClipPathMarkup: function (options) {
         var clipPath = this.clipPath;
         if (clipPath) {
-          clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+          clipPath.clipPathId = 'CLIPPATH_' + FabricObject.__uid++;
           return (
             '<clipPath id="' +
             clipPath.clipPathId +
@@ -1883,7 +1884,21 @@ import { pick } from './util/misc/pick';
     }
   );
 
-  extend(fabric.StaticCanvas.prototype, fabric.Observable);
+  // hack - class methods are not enumrable
+  // TODO remove when migrating to es6
+  Object.getOwnPropertyNames(Observable.prototype).forEach((key) => {
+    if (key === 'constructor') return;
+    Object.defineProperty(fabric.StaticCanvas.prototype, key, {
+      value: Observable.prototype[key],
+    });
+  });
+  Object.getOwnPropertyNames(CommonMethods.prototype).forEach((key) => {
+    if (key === 'constructor') return;
+    Object.defineProperty(fabric.StaticCanvas.prototype, key, {
+      value: CommonMethods.prototype[key],
+    });
+  });
+
   extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
 
   extend(

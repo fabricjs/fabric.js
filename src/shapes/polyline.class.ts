@@ -1,14 +1,17 @@
 //@ts-nocheck
 
 import { config } from '../config';
+import { parseAttributes } from '../parser/parseAttributes';
+import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import { Point } from '../point.class';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
+import { projectStrokeOnPoints } from '../util/misc/projectStroke';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 
 (function (global) {
   var fabric = global.fabric || (global.fabric = {}),
     extend = fabric.util.object.extend,
-    toFixed = fabric.util.toFixed,
-    projectStrokeOnPoints = fabric.util.projectStrokeOnPoints;
+    toFixed = fabric.util.toFixed;
 
   /**
    * Polyline class
@@ -41,10 +44,28 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
        * @deprecated
        * @type Boolean
        * @default false
+       * @todo set default to true and remove flag and related logic
        */
       exactBoundingBox: false,
 
+      initialized: false,
+
       cacheProperties: fabric.Object.prototype.cacheProperties.concat('points'),
+
+      /**
+       * A list of properties that if changed trigger a recalculation of dimensions
+       * @todo check if you really need to recalculate for all cases
+       */
+      strokeBBoxAffectingProperties: [
+        'skewX',
+        'skewY',
+        'strokeLineCap',
+        'strokeLineJoin',
+        'strokeMiterLimit',
+        'strokeWidth',
+        'strokeUniform',
+        'points',
+      ],
 
       /**
        * Constructor
@@ -65,11 +86,19 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
        *   top: 100
        * });
        */
-      initialize: function (points, options) {
-        options = options || {};
+      initialize: function (points, options = {}) {
         this.points = points || [];
         this.callSuper('initialize', options);
-        this._setPositionDimensions(options);
+        this.initialized = true;
+        const bboxTL = this.setDimensions();
+        const origin = this.translateToGivenOrigin(
+          new Point(options.left ?? bboxTL.x, options.top ?? bboxTL.y),
+          typeof options.left === 'number' ? this.originX : 'left',
+          typeof options.top === 'number' ? this.originY : 'top',
+          this.originX,
+          this.originY
+        );
+        this.setPositionByOrigin(origin, this.originX, this.originY);
       },
 
       /**
@@ -79,56 +108,104 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
         return projectStrokeOnPoints(this.points, this, true);
       },
 
-      _setPositionDimensions: function (options) {
-        options || (options = {});
-        var calcDim = this._calcDimensions(options),
-          correctLeftTop,
-          correctSize = this.exactBoundingBox ? this.strokeWidth : 0;
-        this.width = calcDim.width - correctSize;
-        this.height = calcDim.height - correctSize;
-        if (!options.fromSVG) {
-          correctLeftTop = this.translateToGivenOrigin(
-            {
-              // this looks bad, but is one way to keep it optional for now.
-              x: calcDim.left - this.strokeWidth / 2 + correctSize / 2,
-              y: calcDim.top - this.strokeWidth / 2 + correctSize / 2,
-            },
-            'left',
-            'top',
-            this.originX,
-            this.originY
-          );
-        }
-        if (typeof options.left === 'undefined') {
-          this.left = options.fromSVG ? calcDim.left : correctLeftTop.x;
-        }
-        if (typeof options.top === 'undefined') {
-          this.top = options.fromSVG ? calcDim.top : correctLeftTop.y;
-        }
-        this.pathOffset = {
-          x: calcDim.left + this.width / 2 + correctSize / 2,
-          y: calcDim.top + this.height / 2 + correctSize / 2,
-        };
-      },
-
       /**
-       * Calculate the polygon min and max point from points array,
-       * returning an object with left, top, width, height to measure the
-       * polygon size
-       * @return {Object} object.left X coordinate of the polygon leftmost point
-       * @return {Object} object.top Y coordinate of the polygon topmost point
-       * @return {Object} object.width distance between X coordinates of the polygon leftmost and rightmost point
-       * @return {Object} object.height distance between Y coordinates of the polygon topmost and bottommost point
+       * Calculate the polygon bounding box
        * @private
        */
       _calcDimensions: function () {
         const points = this.exactBoundingBox
-          ? this._projectStrokeOnPoints()
-          : this.points.map((p) => new Point(p));
+          ? this._projectStrokeOnPoints().map(
+              (projection) => projection.projectedPoint
+            )
+          : this.points;
         if (points.length === 0) {
-          return makeBoundingBoxFromPoints([new Point(0, 0)]);
+          return {
+            left: 0,
+            top: 0,
+            width: 0,
+            height: 0,
+            pathOffset: new Point(),
+          };
         }
-        return makeBoundingBoxFromPoints(points);
+        const bbox = makeBoundingBoxFromPoints(points);
+        const bboxNoStroke = makeBoundingBoxFromPoints(this.points);
+        const offsetX = bbox.left + bbox.width / 2,
+          offsetY = bbox.top + bbox.height / 2;
+        const pathOffsetX =
+          offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
+        const pathOffsetY =
+          offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY));
+        // TODO: remove next line
+        const legacyCorrection =
+          !this.fromSVG && !this.exactBoundingBox ? this.strokeWidth / 2 : 0;
+        return {
+          ...bbox,
+          left: bbox.left - legacyCorrection,
+          top: bbox.top - legacyCorrection,
+          pathOffset: new Point(pathOffsetX, pathOffsetY),
+          strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top).subtract(
+            bbox.left,
+            bbox.top
+          ),
+        };
+      },
+
+      /**
+       * @returns {Point} top left position of the bounding box, useful for complementary positioning
+       */
+      setDimensions: function () {
+        const { left, top, width, height, pathOffset, strokeOffset } =
+          this._calcDimensions();
+        this.set({ width, height, pathOffset, strokeOffset });
+        return new Point(left, top);
+      },
+
+      /**
+       * @override stroke is taken in account in size
+       */
+      _getNonTransformedDimensions: function () {
+        return this.exactBoundingBox
+          ? new Point(this.width, this.height)
+          : this.callSuper('_getNonTransformedDimensions');
+      },
+
+      /**
+       * @override stroke and skewing are taken into account when projecting stroke on points,
+       * therefore we don't want the default calculation to account for skewing as well
+       *
+       * @private
+       */
+      _getTransformedDimensions: function (options) {
+        return this.exactBoundingBox
+          ? this.callSuper('_getTransformedDimensions', {
+              ...(options || {}),
+              // disable stroke bbox calculations
+              strokeWidth: 0,
+              // disable skewing bbox calculations
+              skewX: 0,
+              skewY: 0,
+            })
+          : this.callSuper('_getTransformedDimensions', options);
+      },
+
+      /**
+       * Recalculates dimensions when changing skew and scale
+       * @private
+       */
+      _set: function (key, value) {
+        const changed = this.initialized && this[key] !== value;
+        const output = this.callSuper('_set', key, value);
+        if (
+          changed &&
+          (((key === 'scaleX' || key === 'scaleY') &&
+            this.strokeUniform &&
+            this.strokeBBoxAffectingProperties.includes('strokeUniform') &&
+            this.strokeLineJoin !== 'round') ||
+            this.strokeBBoxAffectingProperties.includes(key))
+        ) {
+          this.setDimensions();
+        }
+        return output;
       },
 
       /**
@@ -235,19 +312,24 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
    * @param {Object} [options] Options object
    */
   fabric.Polyline.fromElementGenerator = function (_class) {
-    return function (element, callback, options) {
+    return function (element, callback, options = {}) {
       if (!element) {
         return callback(null);
       }
-      options || (options = {});
-
-      var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(
+      const points = parsePointsAttribute(element.getAttribute('points')),
+        // we omit left and top to instruct the constructor to position the object using the bbox
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        { left, top, ...parsedAttributes } = parseAttributes(
           element,
           fabric[_class].ATTRIBUTE_NAMES
         );
-      parsedAttributes.fromSVG = true;
-      callback(new fabric[_class](points, extend(parsedAttributes, options)));
+      callback(
+        new fabric[_class](points, {
+          ...parsedAttributes,
+          ...options,
+          fromSVG: true,
+        })
+      );
     };
   };
 
