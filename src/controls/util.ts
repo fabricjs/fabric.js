@@ -2,7 +2,7 @@ import {
   TPointerEvent,
   Transform,
   TransformAction,
-  TransformEvent,
+  BasicTransformEvent,
 } from '../EventTypeDefs';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { Point } from '../point.class';
@@ -61,12 +61,10 @@ export const isLocked = (
     | 'lockScalingFlip'
 ) => target[lockingKey];
 
-export const commonEventInfo: TransformAction<Transform, TransformEvent> = (
-  eventData,
-  transform,
-  x,
-  y
-) => {
+export const commonEventInfo: TransformAction<
+  Transform,
+  BasicTransformEvent
+> = (eventData, transform, x, y) => {
   return {
     e: eventData,
     transform,

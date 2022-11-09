@@ -1,11 +1,11 @@
 // @ts-nocheck
-import { TObjectEvents, XTransformEvent } from '../EventTypeDefs';
+import { TObjectEvents, TransformEvent } from '../EventTypeDefs';
 import { FabricObject } from './fabricObject.class';
 
 export type ITextEvents = TObjectEvents & {
   'selection:changed': never;
   changed: never;
-  tripleclick: XTransformEvent;
+  tripleclick: TransformEvent;
 };
 
 (function (global) {

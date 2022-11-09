@@ -27,11 +27,11 @@ export type ControlCallback<R = void> = (
 ) => R;
 
 export type ControlCursorCallback = ControlCallback<string>;
+
 /**
  * relative to target's containing coordinate plane
  * both agree on every point
  */
-
 export type Transform = {
   target: FabricObject;
   action: string;
@@ -61,7 +61,7 @@ export type TEvent<E extends Event = TPointerEvent> = {
   e: E;
 };
 
-export type TransformEvent<E extends Event = TPointerEvent> = TEvent<E> & {
+export type BasicTransformEvent<E extends Event = TPointerEvent> = TEvent<E> & {
   transform: Transform;
   pointer: Point;
 };
@@ -73,17 +73,17 @@ export type TModificationEvents =
   | 'skewing'
   | 'resizing';
 
-type ObjectModifiedEvents = Record<TModificationEvents, TransformEvent> & {
-  modified: TransformEvent | never;
+type ObjectModifiedEvents = Record<TModificationEvents, BasicTransformEvent> & {
+  modified: BasicTransformEvent | never;
 };
 
 type CanvasModifiedEvents = Record<
   `object:${keyof ObjectModifiedEvents}`,
-  TransformEvent & { target: FabricObject }
+  BasicTransformEvent & { target: FabricObject }
 >;
 
-export type XTransformEvent<T extends Event = TPointerEvent> =
-  TransformEvent<T> & {
+export type TransformEvent<T extends Event = TPointerEvent> =
+  BasicTransformEvent<T> & {
     target: FabricObject;
     subTargets: FabricObject[];
     button: number;
@@ -157,11 +157,11 @@ type TPointerEvents<Prefix extends string, E = Record<string, never>> = Record<
     | WithBeforeSuffix<'move'>
     | WithBeforeSuffix<'up'>
     | 'dblclick'}`,
-  XTransformEvent & E
+  TransformEvent & E
 > &
-  Record<`${Prefix}wheel`, XTransformEvent<WheelEvent> & E> &
-  Record<`${Prefix}over`, XTransformEvent & InEvent & E> &
-  Record<`${Prefix}out`, XTransformEvent & OutEvent & E>;
+  Record<`${Prefix}wheel`, TransformEvent<WheelEvent> & E> &
+  Record<`${Prefix}over`, TransformEvent & InEvent & E> &
+  Record<`${Prefix}out`, TransformEvent & OutEvent & E>;
 
 export type ObjectPointerEvents = TPointerEvents<'mouse'>;
 export type CanvasPointerEvents = TPointerEvents<'mouse:'>;
