@@ -50,7 +50,7 @@ export class Collection {
   remove(objectsToRemove: FabricObject[], callback: ObjectCallback) {
     const objects = this._objects,
       removed: FabricObject[] = [];
-    objectsToRemove.forEach((object, i) => {
+    objectsToRemove.forEach((object) => {
       const index = objects.indexOf(object);
       // only call onObjectRemoved if an object was actually removed
       if (index !== -1) {
