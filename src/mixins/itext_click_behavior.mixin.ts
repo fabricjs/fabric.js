@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { IPoint, Point } from '../point.class';
 import { TPointerEvent, TransformEvent } from '../typedefs';
+import { stopEvent } from '../util/dom_event';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
 
@@ -36,7 +37,7 @@ export abstract class ITextClickBehaviorMixin extends ITextKeyBehaviorMixin {
     const newPointer = options.pointer;
     if (this.isTripleClick(newPointer)) {
       this.fire('tripleclick', options);
-      this._stopEvent(options.e);
+      stopEvent(options.e);
     }
     this.__lastLastClickTime = this.__lastClickTime;
     this.__lastClickTime = this.__newClickTime;
@@ -51,14 +52,6 @@ export abstract class ITextClickBehaviorMixin extends ITextKeyBehaviorMixin {
       this.__lastPointer.x === newPointer.x &&
       this.__lastPointer.y === newPointer.y
     );
-  }
-
-  /**
-   * @private
-   */
-  _stopEvent(e) {
-    e.preventDefault && e.preventDefault();
-    e.stopPropagation && e.stopPropagation();
   }
 
   /**
