@@ -11,7 +11,7 @@ import {
 import { ObjectGeometry } from './object_geometry.mixin';
 import type { Control } from '../controls/control.class';
 import { sizeAfterTransform } from '../util/misc/objectTransforms';
-import { TObjectEvents } from '../EventTypeDefs';
+import { ObjectEventsSpec } from '../EventTypeDefs';
 
 type TOCoord = IPoint & {
   corner: TCornerPoint;
@@ -21,8 +21,8 @@ type TOCoord = IPoint & {
 type TControlSet = Record<string, Control>;
 
 export class InteractiveFabricObject<
-  T extends TObjectEvents = TObjectEvents
-> extends FabricObject<T> {
+  EventSpec extends ObjectEventsSpec = ObjectEventsSpec
+> extends FabricObject<EventSpec> {
   /**
    * Describe object's corner position in canvas element coordinates.
    * properties are depending on control keys and padding the main controls.

@@ -8,9 +8,9 @@ type EventRegistryObject<T = any> = Record<string, TEventCallback<T>>;
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#events}
  * @see {@link http://fabricjs.com/events|Events demo}
  */
-export class Observable<EventMap> {
-  private __eventListeners: Record<keyof EventMap, TEventCallback[]> =
-    {} as Record<keyof EventMap, TEventCallback[]>;
+export class Observable<EventSpec> {
+  private __eventListeners: Record<keyof EventSpec, TEventCallback[]> =
+    {} as Record<keyof EventSpec, TEventCallback[]>;
 
   /**
    * Observes specified event
@@ -20,19 +20,19 @@ export class Observable<EventMap> {
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
    * @return {Function} disposer
    */
-  on<K extends keyof EventMap, E extends EventMap[K]>(
+  on<K extends keyof EventSpec, E extends EventSpec[K]>(
     eventName: K,
     handler: TEventCallback<E>
   ): VoidFunction;
-  on<K extends keyof EventMap, E extends EventMap[K]>(
+  on<K extends keyof EventSpec, E extends EventSpec[K]>(
     handlers: EventRegistryObject<E>
   ): VoidFunction;
-  on<K extends keyof EventMap, E extends EventMap[K]>(
+  on<K extends keyof EventSpec, E extends EventSpec[K]>(
     arg0: K | EventRegistryObject<E>,
     handler?: TEventCallback<E>
   ): VoidFunction {
     if (!this.__eventListeners) {
-      this.__eventListeners = {} as Record<keyof EventMap, TEventCallback[]>;
+      this.__eventListeners = {} as Record<keyof EventSpec, TEventCallback[]>;
     }
     if (typeof arg0 === 'object') {
       // one object with key/value pairs was passed
@@ -61,14 +61,14 @@ export class Observable<EventMap> {
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
    * @return {Function} disposer
    */
-  once<K extends keyof EventMap, E extends EventMap[K]>(
+  once<K extends keyof EventSpec, E extends EventSpec[K]>(
     eventName: K,
     handler: TEventCallback<E>
   ): VoidFunction;
-  once<K extends keyof EventMap, E extends EventMap[K]>(
+  once<K extends keyof EventSpec, E extends EventSpec[K]>(
     handlers: EventRegistryObject<E>
   ): VoidFunction;
-  once<K extends keyof EventMap, E extends EventMap[K]>(
+  once<K extends keyof EventSpec, E extends EventSpec[K]>(
     arg0: K | EventRegistryObject<E>,
     handler?: TEventCallback<E>
   ): VoidFunction {
@@ -96,7 +96,7 @@ export class Observable<EventMap> {
    * @param {string} eventName
    * @param {Function} [handler]
    */
-  private _removeEventListener<K extends keyof EventMap>(
+  private _removeEventListener<K extends keyof EventSpec>(
     eventName: K,
     handler?: TEventCallback
   ) {
@@ -120,9 +120,9 @@ export class Observable<EventMap> {
    * @param {EventRegistryObject} handlers key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function to be deleted from EventListeners
    */
-  off<K extends keyof EventMap>(eventName: K, handler: TEventCallback): void;
+  off<K extends keyof EventSpec>(eventName: K, handler: TEventCallback): void;
   off(handlers: EventRegistryObject): void;
-  off<K extends keyof EventMap>(
+  off<K extends keyof EventSpec>(
     arg0?: K | EventRegistryObject,
     handler?: TEventCallback
   ) {
@@ -151,7 +151,7 @@ export class Observable<EventMap> {
    * @param {String} eventName Event name to fire
    * @param {Object} [options] Options object
    */
-  fire<K extends keyof EventMap>(eventName: K, options?: EventMap[K]) {
+  fire<K extends keyof EventSpec>(eventName: K, options?: EventSpec[K]) {
     if (!this.__eventListeners) {
       return;
     }
