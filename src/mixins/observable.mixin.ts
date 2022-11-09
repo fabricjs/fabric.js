@@ -8,8 +8,9 @@ type EventRegistryObject<T = any> = Record<string, TEventCallback<T>>;
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#events}
  * @see {@link http://fabricjs.com/events|Events demo}
  */
-export class Observable {
-  private __eventListeners: Record<string, TEventCallback[]> = {};
+export class Observable<EventMap> {
+  private __eventListeners: Record<keyof EventMap, TEventCallback[]> =
+    {} as Record<keyof EventMap, TEventCallback[]>;
 
   /**
    * Observes specified event
@@ -19,19 +20,24 @@ export class Observable {
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
    * @return {Function} disposer
    */
-  on<T>(eventName: string, handler: TEventCallback<T>): VoidFunction;
-  on<T>(handlers: EventRegistryObject<T>): VoidFunction;
-  on<T>(
-    arg0: string | EventRegistryObject<T>,
-    handler?: TEventCallback<T>
+  on<K extends keyof EventMap, E extends EventMap[K]>(
+    eventName: K,
+    handler: TEventCallback<E>
+  ): VoidFunction;
+  on<K extends keyof EventMap, E extends EventMap[K]>(
+    handlers: EventRegistryObject<E>
+  ): VoidFunction;
+  on<K extends keyof EventMap, E extends EventMap[K]>(
+    arg0: K | EventRegistryObject<E>,
+    handler?: TEventCallback<E>
   ): VoidFunction {
     if (!this.__eventListeners) {
-      this.__eventListeners = {};
+      this.__eventListeners = {} as Record<keyof EventMap, TEventCallback[]>;
     }
     if (typeof arg0 === 'object') {
       // one object with key/value pairs was passed
       for (const eventName in arg0) {
-        this.on(eventName, arg0[eventName]);
+        this.on(eventName as K, arg0[eventName]);
       }
       return () => this.off(arg0);
     } else if (handler) {
@@ -55,21 +61,26 @@ export class Observable {
    * @param {Function} handler Function that receives a notification when an event of the specified type occurs
    * @return {Function} disposer
    */
-  once<T>(eventName: string, handler: TEventCallback<T>): VoidFunction;
-  once<T>(handlers: EventRegistryObject<T>): VoidFunction;
-  once<T>(
-    arg0: string | EventRegistryObject<T>,
-    handler?: TEventCallback<T>
+  once<K extends keyof EventMap, E extends EventMap[K]>(
+    eventName: K,
+    handler: TEventCallback<E>
+  ): VoidFunction;
+  once<K extends keyof EventMap, E extends EventMap[K]>(
+    handlers: EventRegistryObject<E>
+  ): VoidFunction;
+  once<K extends keyof EventMap, E extends EventMap[K]>(
+    arg0: K | EventRegistryObject<E>,
+    handler?: TEventCallback<E>
   ): VoidFunction {
     if (typeof arg0 === 'object') {
       // one object with key/value pairs was passed
       const disposers: VoidFunction[] = [];
       for (const eventName in arg0) {
-        disposers.push(this.once(eventName, arg0[eventName]));
+        disposers.push(this.once(eventName as K, arg0[eventName]));
       }
       return () => disposers.forEach((d) => d());
     } else if (handler) {
-      const disposer = this.on<T>(arg0, (...args) => {
+      const disposer = this.on<K, E>(arg0, (...args) => {
         handler(...args);
         disposer();
       });
@@ -85,7 +96,10 @@ export class Observable {
    * @param {string} eventName
    * @param {Function} [handler]
    */
-  private _removeEventListener(eventName: string, handler?: TEventCallback) {
+  private _removeEventListener<K extends keyof EventMap>(
+    eventName: K,
+    handler?: TEventCallback
+  ) {
     if (!this.__eventListeners[eventName]) {
       return;
     }
@@ -106,9 +120,12 @@ export class Observable {
    * @param {EventRegistryObject} handlers key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
    * @param {Function} handler Function to be deleted from EventListeners
    */
-  off(eventName: string, handler: TEventCallback): void;
+  off<K extends keyof EventMap>(eventName: K, handler: TEventCallback): void;
   off(handlers: EventRegistryObject): void;
-  off(arg0?: string | EventRegistryObject, handler?: TEventCallback) {
+  off<K extends keyof EventMap>(
+    arg0?: K | EventRegistryObject,
+    handler?: TEventCallback
+  ) {
     if (!this.__eventListeners) {
       return;
     }
@@ -134,7 +151,7 @@ export class Observable {
    * @param {String} eventName Event name to fire
    * @param {Object} [options] Options object
    */
-  fire(eventName: string, options?: object) {
+  fire<K extends keyof EventMap>(eventName: K, options?: EventMap[K]) {
     if (!this.__eventListeners) {
       return;
     }
