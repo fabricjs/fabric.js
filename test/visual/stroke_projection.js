@@ -128,6 +128,7 @@ QUnit.module('stroke projection', (hooks) => {
         originX: poly.originX,
         originY: poly.originY,
         fill: 'blue',
+        strokeWidth: 0
       });
     canvas.add(bg, target);
     canvas.setActiveObject(target);
