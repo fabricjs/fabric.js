@@ -300,7 +300,7 @@ QUnit.module('stroke projection', (hooks) => {
             },
             golden: `stroke-projection/${
               isPolygon ? 'strokeLineJoin' : 'strokeLineCap'
-            }/${testCase.name}/${strokeLineCap}${
+            }/${testCase.name}-${strokeLineCap}${
               strokeUniform ? '-uniform-' : ''
             }-${skewX}skewX-${skewY}skewY.png`,
             percentage: 0.001,
