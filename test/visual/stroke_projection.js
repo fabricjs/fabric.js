@@ -1,6 +1,6 @@
 QUnit.module('stroke projection', (hooks) => {
   const tests = [];
-  let __objectCaching
+  let __objectCaching;
 
   hooks.before(() => {
     __objectCaching = fabric.Object.prototype.objectCaching;
@@ -80,36 +80,52 @@ QUnit.module('stroke projection', (hooks) => {
       { x: 40, y: 37 },
     ],
     lambdaLetter: [
-      {x:6, y:6},
-      {x:1, y:1},
-      {x:6, y:6},
-      {x:38.77601986838591, y:27.967786748661318},
-      {x:15.760060710778454, y:75.5007458785029},
-      {x:27.26804028958214, y:59.48964385581943},
-      {x:56.78850964390483, y:59.489643855819416},
-      {x:66.02231772645243, y:71.09250552411001},
-      {x:10.289783513792408, y:10.149937092784299}
+      { x: 6, y: 6 },
+      { x: 1, y: 1 },
+      { x: 6, y: 6 },
+      { x: 38.77601986838591, y: 27.967786748661318 },
+      { x: 15.760060710778454, y: 75.5007458785029 },
+      { x: 27.26804028958214, y: 59.48964385581943 },
+      { x: 56.78850964390483, y: 59.489643855819416 },
+      { x: 66.02231772645243, y: 71.09250552411001 },
+      { x: 10.289783513792408, y: 10.149937092784299 },
     ],
     orthogonalProjection1: [
       { x: 4.1139063087281045, y: 6.008805382999107 },
       { x: 3.661690750974974, y: 6.067776795471968 },
-      { x: 3.205180554242954, y: 5.878987418072784 }
+      { x: 3.205180554242954, y: 5.878987418072784 },
     ],
     orthogonalProjection2: [
       { x: 76.58215114247255, y: -48.214288917214105 },
       { x: 76.95213430503364, y: -54.68899426204861 },
-      { x: 82.704500475429, y: -49.91128595590783 }
+      { x: 82.704500475429, y: -49.91128595590783 },
     ],
     orthogonalProjection3: [
-      {x:79.76446629479383, y:-43.30180101207208},
-      {x:84.9774418788902, y:-48.28812548381641},
-      {x:82.704500475429, y:-49.91128595590783}
+      { x: 79.76446629479383, y: -43.30180101207208 },
+      { x: 84.9774418788902, y: -48.28812548381641 },
+      { x: 82.704500475429, y: -49.91128595590783 },
     ],
     orthogonalProjection4: [
-      {x:79.63237629347668, y:-41.260831452943876},
-      {x:84.9774418788902, y:-48.28812548381641},
-      {x:85.52113122175491, y:-50.718528761996765}
-    ]
+      { x: 79.63237629347668, y: -41.260831452943876 },
+      { x: 84.9774418788902, y: -48.28812548381641 },
+      { x: 85.52113122175491, y: -50.718528761996765 },
+    ],
+  };
+
+  // Single point
+  const testCase = {
+    name: 'singlePoint',
+    points: [{ x: 100, y: 100 }],
+  };
+
+  // Test only miter limit
+  const selectedMiterLimitCases = {
+    noMiterAfterMiterLimit2: generalCasesToTest.noMiterAfterMiterLimit2,
+    acuteAngle: generalCasesToTest.acuteAngle,
+    obtuseAngle: generalCasesToTest.obtuseAngle,
+    convex: generalCasesToTest.convex,
+    concave: generalCasesToTest.concave,
+    complex: generalCasesToTest.complex,
   };
 
   function renderStrokeTest(canvas, { builder, points, group }, polyOptions) {
@@ -136,11 +152,18 @@ QUnit.module('stroke projection', (hooks) => {
         originX: poly.originX,
         originY: poly.originY,
         fill: 'blue',
-        strokeWidth: 0
+        strokeWidth: 0,
       });
     canvas.add(bg, target);
     canvas.setActiveObject(target);
-    canvas.setViewportTransform([canvas.width / size.x * 0.9, 0, 0, canvas.height / size.y * 0.9, 0, 0]);
+    canvas.setViewportTransform([
+      (canvas.width / size.x) * 0.9,
+      0,
+      0,
+      (canvas.height / size.y) * 0.9,
+      0,
+      0,
+    ]);
     bg.viewportCenter();
     target.viewportCenter();
     canvas.backgroundColor = 'white';
@@ -165,7 +188,10 @@ QUnit.module('stroke projection', (hooks) => {
               [20, 0],
               [25, 35],
             ].forEach(([skewX, skewY]) => {
-              if (strokeLineTypeCase === 'round' && (skewX !== 0) & (skewY !== 0))
+              if (
+                strokeLineTypeCase === 'round' &&
+                (skewX !== 0) & (skewY !== 0)
+              )
                 return; // TODO: remove this line when fix strokeLineJoins equals `round` with `skewX`and `skewY` applied at sametime
               tests.push({
                 test: `${caseName} of type ${builderType} with ${strokeLineType}=${strokeLineTypeCase}, strokeUniform=${strokeUniform}, skewX=${skewX}, skewY=${skewY}, grouped=${group}`,
@@ -175,7 +201,7 @@ QUnit.module('stroke projection', (hooks) => {
                     {
                       builder,
                       points: casePoints,
-                      group
+                      group,
                     },
                     {
                       [strokeLineType]: strokeLineTypeCase,
@@ -186,8 +212,9 @@ QUnit.module('stroke projection', (hooks) => {
                   );
                   callback(canvas.lowerCanvasEl);
                 },
-                golden: `stroke-projection/${strokeLineType}/${strokeLineTypeCase}/${caseName}-${strokeUniform ? 'uniform-' : ''
-                  }-${skewX}skewX-${skewY}skewY-${group ? 'grouped' : ''}.png`,
+                golden: `stroke-projection/${strokeLineType}/${strokeLineTypeCase}/${caseName}-${
+                  strokeUniform ? 'uniform-' : ''
+                }-${skewX}skewX-${skewY}skewY-${group ? 'grouped' : ''}.png`,
                 percentage: 0.001,
                 width: 600,
                 height: 900,
@@ -200,15 +227,6 @@ QUnit.module('stroke projection', (hooks) => {
     });
   }
 
-  // Test only miter limit
-  const selectedMiterLimitCases = {
-    noMiterAfterMiterLimit2: generalCasesToTest.noMiterAfterMiterLimit2, 
-    acuteAngle: generalCasesToTest.acuteAngle, 
-    obtuseAngle: generalCasesToTest.obtuseAngle, 
-    convex: generalCasesToTest.convex, 
-    concave: generalCasesToTest.concave, 
-    complex: generalCasesToTest.complex 
-  };
   for (let [caseName, casePoints] of Object.entries(selectedMiterLimitCases)) {
     const builder = fabric.Polygon;
     [5, 20, 120].forEach((strokeMiterLimit) => {
@@ -249,14 +267,6 @@ QUnit.module('stroke projection', (hooks) => {
     });
   }
 
-  // Single point
-    const testCase = {
-      name: 'singlePoint',
-      points: [
-        { x: 100, y: 100 },
-      ],
-    };
-
   [fabric.Polyline, fabric.Polygon].forEach((builder) => {
     const builderType = builder.prototype.type,
       isPolygon = builderType === 'polygon';
@@ -288,8 +298,11 @@ QUnit.module('stroke projection', (hooks) => {
               );
               callback(canvas.lowerCanvasEl);
             },
-            golden: `stroke-projection/${isPolygon ? 'strokeLineJoin' : 'strokeLineCap'}/${testCase.name}/${strokeLineCap}${strokeUniform ? '-uniform-' : ''
-              }-${skewX}skewX-${skewY}skewY.png`,
+            golden: `stroke-projection/${
+              isPolygon ? 'strokeLineJoin' : 'strokeLineCap'
+            }/${testCase.name}/${strokeLineCap}${
+              strokeUniform ? '-uniform-' : ''
+            }-${skewX}skewX-${skewY}skewY.png`,
             percentage: 0.001,
             width: 600,
             height: 900,
@@ -299,7 +312,6 @@ QUnit.module('stroke projection', (hooks) => {
       });
     });
   });
- 
 
   tests.forEach(visualTestLoop(QUnit));
 });
