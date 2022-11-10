@@ -1,5 +1,15 @@
 QUnit.module('stroke projection', (hooks) => {
   const tests = [];
+  let __objectCaching
+
+  hooks.before(() => {
+    __objectCaching = fabric.Object.prototype.objectCaching;
+    fabric.Object.prototype.objectCaching = false;
+  });
+
+  hooks.after(() => {
+    fabric.Object.prototype.objectCaching = __objectCaching;
+  });
 
   const generalCasesToTest = {
     acuteAngle: [
@@ -101,8 +111,6 @@ QUnit.module('stroke projection', (hooks) => {
       {x:85.52113122175491, y:-50.718528761996765}
     ]
   };
-
-  fabric.Object.prototype.noScaleCache = false;
 
   function renderStrokeTest(canvas, { builder, points, group }, polyOptions) {
     const scale = new fabric.Point(2, 3),
