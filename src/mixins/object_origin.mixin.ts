@@ -1,4 +1,4 @@
-import {IPoint, Point} from '../point.class';
+import { IPoint, Point } from '../point.class';
 import { transformPoint } from '../util/misc/matrix';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { CommonMethods } from './shared_methods.mixin';

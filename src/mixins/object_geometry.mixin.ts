@@ -8,7 +8,7 @@ import type {
 } from '../typedefs';
 import { iMatrix } from '../constants';
 import { Intersection } from '../intersection.class';
-import {IPoint, Point } from '../point.class';
+import { IPoint, Point } from '../point.class';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { cos } from '../util/misc/cos';
 import {

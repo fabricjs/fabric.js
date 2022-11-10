@@ -1,5 +1,5 @@
 import { fabric } from '../../HEADER';
-import {IPoint, Point} from '../point.class';
+import { IPoint, Point } from '../point.class';
 import { getRandomInt } from '../util/internals';
 import { Canvas, Rect } from '../__types__';
 import { BaseBrush } from './base_brush.class';

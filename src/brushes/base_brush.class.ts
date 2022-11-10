@@ -1,6 +1,6 @@
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
-import {IPoint, Point} from '../point.class';
+import { IPoint, Point } from '../point.class';
 import { Canvas, Shadow } from '../__types__';
 
 /**
