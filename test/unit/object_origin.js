@@ -160,77 +160,86 @@
     assert.deepEqual(p, new fabric.Point(8.931134647613884, 67.02306745986067));
   });
 
+  function normalizePoint(target, point, originX, originY) {
+    target.controls = {
+      test: new fabric.Control({
+        offsetX: 0,
+        offsetY: 0,
+      })
+    }
+    return fabric.controlsUtils.getLocalPoint({ target, corner: 'test' }, originX, originY, point.x, point.y);
+  }
 
-  QUnit.test('normalizePoint', function(assert) {
+  QUnit.test('getLocalPoint', function(assert) {
     var rect = new fabric.Rect(rectOptions),
         p,
         point = new fabric.Point(15, 20);
 
-    p = rect.normalizePoint(point, 'center', 'center');
+    p = normalizePoint(rect, point, 'center', 'center');
     assert.deepEqual(p, new fabric.Point(-42, -67));
 
-    p = rect.normalizePoint(point, 'center', 'top');
+    p = normalizePoint(rect, point, 'center', 'top');
     assert.deepEqual(p, new fabric.Point(-42, -25));
 
-    p = rect.normalizePoint(point, 'center', 'bottom');
+    p = normalizePoint(rect, point, 'center', 'bottom');
     assert.deepEqual(p, new fabric.Point(-42, -109));
 
-    p = rect.normalizePoint(point, 'left', 'center');
+    p = normalizePoint(rect, point, 'left', 'center');
     assert.deepEqual(p, new fabric.Point(-20, -67));
 
-    p = rect.normalizePoint(point, 'left', 'top');
+    p = normalizePoint(rect, point, 'left', 'top');
     assert.deepEqual(p, new fabric.Point(-20, -25));
 
-    p = rect.normalizePoint(point, 'left', 'bottom');
+    p = normalizePoint(rect, point, 'left', 'bottom');
     assert.deepEqual(p, new fabric.Point(-20, -109));
 
-    p = rect.normalizePoint(point, 'right', 'center');
+    p = normalizePoint(rect, point, 'right', 'center');
     assert.deepEqual(p, new fabric.Point(-64, -67));
 
-    p = rect.normalizePoint(point, 'right', 'top');
+    p = normalizePoint(rect, point, 'right', 'top');
     assert.deepEqual(p, new fabric.Point(-64, -25));
 
-    p = rect.normalizePoint(point, 'right', 'bottom');
+    p = normalizePoint(rect, point, 'right', 'bottom');
     assert.deepEqual(p, new fabric.Point(-64, -109));
 
-    p = rect.normalizePoint(point);
+    p = normalizePoint(rect, point);
     assert.deepEqual(p, new fabric.Point(-20, -25));
   });
 
-  QUnit.test('toLocalPointRotated', function(assert) {
+  QUnit.test('getLocalPoint rotated', function(assert) {
     var rect = new fabric.Rect(rectOptions),
         p,
         point = new fabric.Point(15, 20);
     rect.angle = 35;
 
-    p = rect.normalizePoint(point, 'center', 'center');
+    p = normalizePoint(rect, point, 'center', 'center');
     assert.deepEqual(p, new fabric.Point(-52.72245179455599, -51.00727238020387));
 
-    p = rect.normalizePoint(point, 'center', 'top');
+    p = normalizePoint(rect, point, 'center', 'top');
     assert.deepEqual(p, new fabric.Point(-52.72245179455599, -9.007272380203872));
 
-    p = rect.normalizePoint(point, 'center', 'bottom');
+    p = normalizePoint(rect, point, 'center', 'bottom');
     assert.deepEqual(p, new fabric.Point(-52.72245179455599, -93.00727238020387));
 
-    p = rect.normalizePoint(point, 'left', 'center');
+    p = normalizePoint(rect, point, 'left', 'center');
     assert.deepEqual(p, new fabric.Point(-30.722451794555987, -51.00727238020387));
 
-    p = rect.normalizePoint(point, 'left', 'top');
+    p = normalizePoint(rect, point, 'left', 'top');
     assert.deepEqual(p, new fabric.Point(-30.722451794555987, -9.007272380203872));
 
-    p = rect.normalizePoint(point, 'left', 'bottom');
+    p = normalizePoint(rect, point, 'left', 'bottom');
     assert.deepEqual(p, new fabric.Point(-30.722451794555987, -93.00727238020387));
 
-    p = rect.normalizePoint(point, 'right', 'center');
+    p = normalizePoint(rect, point, 'right', 'center');
     assert.deepEqual(p, new fabric.Point(-74.722451794556, -51.00727238020387));
 
-    p = rect.normalizePoint(point, 'right', 'top');
+    p = normalizePoint(rect, point, 'right', 'top');
     assert.deepEqual(p, new fabric.Point(-74.722451794556, -9.007272380203872));
 
-    p = rect.normalizePoint(point, 'right', 'bottom');
+    p = normalizePoint(rect, point, 'right', 'bottom');
     assert.deepEqual(p, new fabric.Point(-74.722451794556, -93.00727238020387));
 
-    p = rect.normalizePoint(point);
+    p = normalizePoint(rect, point);
     assert.deepEqual(p, new fabric.Point(-58.791317146942106, -3.9842049203432026));
   });
 
@@ -378,34 +387,34 @@
         p,
         point = new fabric.Point(15, 20);
 
-    p = rect.normalizePoint(point, 0.5, 0.5);
+    p = normalizePoint(rect, point, 0.5, 0.5);
     assert.deepEqual(p, new fabric.Point(-42, -67));
 
-    p = rect.normalizePoint(point, 0.5, 0);
+    p = normalizePoint(rect, point, 0.5, 0);
     assert.deepEqual(p, new fabric.Point(-42, -25));
 
-    p = rect.normalizePoint(point, 0.5, 1);
+    p = normalizePoint(rect, point, 0.5, 1);
     assert.deepEqual(p, new fabric.Point(-42, -109));
 
-    p = rect.normalizePoint(point, 0, 0.5);
+    p = normalizePoint(rect, point, 0, 0.5);
     assert.deepEqual(p, new fabric.Point(-20, -67));
 
-    p = rect.normalizePoint(point, 0, 0);
+    p = normalizePoint(rect, point, 0, 0);
     assert.deepEqual(p, new fabric.Point(-20, -25));
 
-    p = rect.normalizePoint(point, 0, 1);
+    p = normalizePoint(rect, point, 0, 1);
     assert.deepEqual(p, new fabric.Point(-20, -109));
 
-    p = rect.normalizePoint(point, 1, 0.5);
+    p = normalizePoint(rect, point, 1, 0.5);
     assert.deepEqual(p, new fabric.Point(-64, -67));
 
-    p = rect.normalizePoint(point, 1, 0);
+    p = normalizePoint(rect, point, 1, 0);
     assert.deepEqual(p, new fabric.Point(-64, -25));
 
-    p = rect.normalizePoint(point, 1, 1);
+    p = normalizePoint(rect, point, 1, 1);
     assert.deepEqual(p, new fabric.Point(-64, -109));
 
-    p = rect.normalizePoint(point);
+    p = normalizePoint(rect, point);
     assert.deepEqual(p, new fabric.Point(-20, -25));
   });
 
@@ -415,34 +424,34 @@
         point = new fabric.Point(15, 20);
     rect.angle = 35;
 
-    p = rect.normalizePoint(point, 0.5, 0.5);
+    p = normalizePoint(rect, point, 0.5, 0.5);
     assert.deepEqual(p, new fabric.Point(-52.72245179455599, -51.00727238020387));
 
-    p = rect.normalizePoint(point, 0.5, 0);
+    p = normalizePoint(rect, point, 0.5, 0);
     assert.deepEqual(p, new fabric.Point(-52.72245179455599, -9.007272380203872));
 
-    p = rect.normalizePoint(point, 0.5, 1);
+    p = normalizePoint(rect, point, 0.5, 1);
     assert.deepEqual(p, new fabric.Point(-52.72245179455599, -93.00727238020387));
 
-    p = rect.normalizePoint(point, 0, 0.5);
+    p = normalizePoint(rect, point, 0, 0.5);
     assert.deepEqual(p, new fabric.Point(-30.722451794555987, -51.00727238020387));
 
-    p = rect.normalizePoint(point, 0, 0);
+    p = normalizePoint(rect, point, 0, 0);
     assert.deepEqual(p, new fabric.Point(-30.722451794555987, -9.007272380203872));
 
-    p = rect.normalizePoint(point, 0, 1);
+    p = normalizePoint(rect, point, 0, 1);
     assert.deepEqual(p, new fabric.Point(-30.722451794555987, -93.00727238020387));
 
-    p = rect.normalizePoint(point, 1, 0.5);
+    p = normalizePoint(rect, point, 1, 0.5);
     assert.deepEqual(p, new fabric.Point(-74.722451794556, -51.00727238020387));
 
-    p = rect.normalizePoint(point, 1, 0);
+    p = normalizePoint(rect, point, 1, 0);
     assert.deepEqual(p, new fabric.Point(-74.722451794556, -9.007272380203872));
 
-    p = rect.normalizePoint(point, 1, 1);
+    p = normalizePoint(rect, point, 1, 1);
     assert.deepEqual(p, new fabric.Point(-74.722451794556, -93.00727238020387));
 
-    p = rect.normalizePoint(point);
+    p = normalizePoint(rect, point);
     assert.deepEqual(p, new fabric.Point(-58.791317146942106, -3.9842049203432026));
   });
 

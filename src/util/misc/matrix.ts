@@ -26,6 +26,10 @@ export type TScaleMatrixArgs = {
 export type TComposeMatrixArgs = TTranslateMatrixArgs &
   TRotateMatrixArgs &
   TScaleMatrixArgs;
+
+export type TQrDecomposeOut = Required<
+  Omit<TComposeMatrixArgs, 'flipX' | 'flipY'>
+>;
 /**
  * Apply transform t to point p
  * @static
@@ -87,9 +91,7 @@ export const multiplyTransformMatrices = (
  * @param  {TMat2D} a transformMatrix
  * @return {Object} Components of transform
  */
-export const qrDecompose = (
-  a: TMat2D
-): Required<Omit<TComposeMatrixArgs, 'flipX' | 'flipY'>> => {
+export const qrDecompose = (a: TMat2D): TQrDecomposeOut => {
   const angle = Math.atan2(a[1], a[0]),
     denom = Math.pow(a[0], 2) + Math.pow(a[1], 2),
     scaleX = Math.sqrt(denom),

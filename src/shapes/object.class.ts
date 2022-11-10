@@ -16,9 +16,10 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { createCanvasElement } from '../util/misc/dom';
 import { ObjectGeometry } from '../mixins/object_geometry.mixin';
 import { qrDecompose, transformPoint } from '../util/misc/matrix';
+import { Canvas, Shadow, StaticCanvas } from '../__types__';
 
-type StaticCanvas = any;
-type Canvas = any;
+// temporary hack for unfinished migration
+type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
 
 const ALIASING_LIMIT = 2;
 
@@ -122,7 +123,7 @@ export class FabricObject extends ObjectGeometry {
    * @type String
    * @default rgb(178,204,255)
    */
-  cornerColor: string | null;
+  cornerColor: string;
 
   /**
    * Color of controlling corners of an object (when it's active and transparentCorners false)
@@ -130,7 +131,7 @@ export class FabricObject extends ObjectGeometry {
    * @type String
    * @default null
    */
-  cornerStrokeColor: string | null;
+  cornerStrokeColor: string;
 
   /**
    * Specify style of control, 'rect' or 'circle'
@@ -255,7 +256,7 @@ export class FabricObject extends ObjectGeometry {
    * @type fabric.Shadow
    * @default null
    */
-  shadow: any | null;
+  shadow: Shadow | null;
 
   /**
    * Opacity of object's controlling borders when object is active and moving
@@ -437,16 +438,6 @@ export class FabricObject extends ObjectGeometry {
   dirty: boolean;
 
   /**
-   * keeps the value of the last hovered corner during mouse move.
-   * 0 is no corner, or 'mt', 'ml', 'mtr' etc..
-   * It should be private, but there is no harm in using it as
-   * a read-only property.
-   * @type number|string|any
-   * @default 0
-   */
-  __corner: number | string;
-
-  /**
    * Determines if the fill or the stroke is drawn first (one of "fill" or "stroke")
    * @type String
    * @default
@@ -516,14 +507,6 @@ export class FabricObject extends ObjectGeometry {
    * @default false
    */
   absolutePositioned: boolean;
-
-  /**
-   * A Reference of the Canvas where the object is actually added
-   * @type StaticCanvas | Canvas;
-   * @default undefined
-   * @private
-   */
-  canvas?: StaticCanvas | Canvas;
 
   /**
    * Quick access for the _cacheCanvas rendering context
@@ -625,11 +608,13 @@ export class FabricObject extends ObjectGeometry {
    */
   static __uid = 0;
 
+  callSuper?: TCallSuper;
+
   /**
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: Record<string, unknown>) {
+  constructor(options?: Partial<TClassProperties<FabricObject>>) {
     super();
     if (options) {
       this.setOptions(options);
@@ -640,7 +625,7 @@ export class FabricObject extends ObjectGeometry {
    * Temporary compatibility issue with old classes
    * @param {Object} [options] Options object
    */
-  initialize(options: Record<string, unknown>) {
+  initialize(options?: Partial<TClassProperties<FabricObject>>) {
     if (options) {
       this.setOptions(options);
     }
@@ -1429,45 +1414,6 @@ export class FabricObject extends ObjectGeometry {
   }
 
   /**
-   * Renders controls and borders for the object
-   * the context here is not transformed
-   * @todo move to interactivity
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {Object} [styleOverride] properties to override the object style
-   */
-  _renderControls(ctx, styleOverride) {
-    let vpt = this.getViewportTransform(),
-      matrix = this.calcTransformMatrix(),
-      options,
-      drawBorders,
-      drawControls;
-    styleOverride = styleOverride || {};
-    drawBorders =
-      typeof styleOverride.hasBorders !== 'undefined'
-        ? styleOverride.hasBorders
-        : this.hasBorders;
-    drawControls =
-      typeof styleOverride.hasControls !== 'undefined'
-        ? styleOverride.hasControls
-        : this.hasControls;
-    matrix = fabric.util.multiplyTransformMatrices(vpt, matrix);
-    options = fabric.util.qrDecompose(matrix);
-    ctx.save();
-    ctx.translate(options.translateX, options.translateY);
-    ctx.lineWidth = 1 * this.borderScaleFactor;
-    if (!this.group) {
-      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-    }
-    if (this.flipX) {
-      options.angle -= 180;
-    }
-    ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
-    drawBorders && this.drawBorders(ctx, options, styleOverride);
-    drawControls && this.drawControls(ctx, styleOverride);
-    ctx.restore();
-  }
-
-  /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
@@ -2045,7 +1991,7 @@ export class FabricObject extends ObjectGeometry {
   }
 }
 
-const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
+export const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
   type: 'object',
   originX: 'left',
   originY: 'top',
@@ -2070,7 +2016,7 @@ const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
   borderColor: 'rgb(178,204,255)',
   borderDashArray: null,
   cornerColor: 'rgb(178,204,255)',
-  cornerStrokeColor: null,
+  cornerStrokeColor: '',
   cornerStyle: 'rect',
   cornerDashArray: null,
   centeredScaling: false,
@@ -2133,8 +2079,3 @@ const fabricObjectDefaultValues: TClassProperties<FabricObject> = {
 };
 
 Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
-
-(function (global) {
-  const fabric = global.fabric;
-  fabric.Object = FabricObject;
-})(typeof exports !== 'undefined' ? exports : window);
