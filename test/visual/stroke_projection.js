@@ -113,7 +113,7 @@ QUnit.module('stroke projection', (hooks) => {
   };
 
   // Single point
-  const testCase = {
+  const testSinglePoint = {
     name: 'singlePoint',
     points: [{ x: 100, y: 100 }],
   };
@@ -139,10 +139,10 @@ QUnit.module('stroke projection', (hooks) => {
         exactBoundingBox: true,
         ...polyOptions,
       });
-    poly.setDimensions();
     const target = group ? new fabric.Group([poly]) : poly;
     target.scaleX = scale.x;
     target.scaleY = scale.y;
+    target.setDimensions();
     const size = target._getTransformedDimensions(),
       bg = new fabric.Rect({
         width: size.x,
@@ -153,6 +153,7 @@ QUnit.module('stroke projection', (hooks) => {
         originY: poly.originY,
         fill: 'blue',
         strokeWidth: 0,
+        objectCaching: false
       });
     canvas.add(bg, target);
     canvas.setActiveObject(target);
@@ -281,13 +282,13 @@ QUnit.module('stroke projection', (hooks) => {
           if (strokeLineCap === 'round' && (skewX !== 0) & (skewY !== 0))
             return; // TODO: remove this line when fix strokeLineJoins equals `round` with `skewX`and `skewY` applied at sametime
           tests.push({
-            test: `${testCase.name} of type ${builderType} with strokeLineCap=${strokeLineCap}, strokeUniform=${strokeUniform}, skewX=${skewX}, skewY=${skewY}`,
+            test: `${testSinglePoint.name} of type ${builderType} with strokeLineCap=${strokeLineCap}, strokeUniform=${strokeUniform}, skewX=${skewX}, skewY=${skewY}`,
             code: function (canvas, callback) {
               renderStrokeTest(
                 canvas,
                 {
                   builder,
-                  points: testCase.points,
+                  points: testSinglePoint.points,
                 },
                 {
                   strokeLineCap,
@@ -300,7 +301,7 @@ QUnit.module('stroke projection', (hooks) => {
             },
             golden: `stroke-projection/${
               isPolygon ? 'strokeLineJoin' : 'strokeLineCap'
-            }/${testCase.name}-${strokeLineCap}${
+            }/${testSinglePoint.name}-${strokeLineCap}${
               strokeUniform ? '-uniform-' : ''
             }-${skewX}skewX-${skewY}skewY.png`,
             percentage: 0.001,
