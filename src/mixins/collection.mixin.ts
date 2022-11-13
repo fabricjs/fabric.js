@@ -13,10 +13,6 @@ export function createCollectionMixin(Klass: { new (...args: any[]): any }) {
      */
     _objects: FabricObject[] = [];
 
-    // protected abstract _onObjectAdded(object: FabricObject): void;
-
-    // protected abstract _onObjectRemoved(object: FabricObject): void;
-
     /**
      * Adds objects to collection
      * Objects should be instances of (or inherit from) FabricObject
