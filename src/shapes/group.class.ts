@@ -26,10 +26,7 @@ export class Group extends FabricObject {}
    */
   fabric.Group = fabric.util.createClass(
     class GroupCollection extends createCollectionMixin(
-      class GroupCollection
-        extends FabricObject
-        implements CollectionCallbacks
-      {
+      class GroupBase extends FabricObject implements CollectionCallbacks {
         /**
          * @private
          * @param {fabric.Object} object
