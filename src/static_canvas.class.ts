@@ -41,7 +41,7 @@ import { pick } from './util/misc/pick';
         return this;
       }
 
-      insertAt(index, ...objects: FabricObject[]) {
+      insertAt(index: number, ...objects: FabricObject[]) {
         super.insertAt(index, ...objects);
         objects.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
         return this;
