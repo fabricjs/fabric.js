@@ -36,7 +36,10 @@ export class Path extends FabricObject {
    * @param {Object} [options] Options object
    * @return {Path} thisArg
    */
-  constructor(path: PathData | string, { path: _, left, top, ...options } = {}) {
+  constructor(
+    path: PathData | string,
+    { path: _, left, top, ...options } = {}
+  ) {
     super(options);
 
     const pathTL = this._setPath(path || []);
@@ -150,7 +153,9 @@ export class Path extends FabricObject {
    * @return {String} string representation of an instance
    */
   toString() {
-    return `#<Path (${this.complexity()}): { "top": ${this.top}, "left": ${this.left} }>`;
+    return `#<Path (${this.complexity()}): { "top": ${this.top}, "left": ${
+      this.left
+    } }>`;
   }
 
   /**
@@ -196,7 +201,10 @@ export class Path extends FabricObject {
 
   _getOffsetTransform() {
     const digits = config.NUM_FRACTION_DIGITS;
-    return ` translate(${toFixed(-this.pathOffset.x, digits)}, ${toFixed(-this.pathOffset.y, digits)})`;
+    return ` translate(${toFixed(-this.pathOffset.x, digits)}, ${toFixed(
+      -this.pathOffset.y,
+      digits
+    )})`;
   }
 
   /**
