@@ -1,8 +1,5 @@
 //@ts-nocheck
-import {
-  createCollectionMixin,
-  CollectionCallbacks,
-} from '../mixins/collection.mixin';
+import { createCollectionMixin } from '../mixins/collection.mixin';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { Point } from '../point.class';
 import { FabricObject } from './fabricObject.class';
@@ -25,37 +22,7 @@ export class Group extends FabricObject {}
    * @see {@link fabric.Group#initialize} for constructor definition
    */
   fabric.Group = fabric.util.createClass(
-    class GroupCollection extends createCollectionMixin(
-      class GroupBase extends FabricObject implements CollectionCallbacks {
-        /**
-         * @private
-         * @param {fabric.Object} object
-         */
-        _onObjectAdded(object) {
-          this.enterGroup(object, true);
-          object.fire('added', { target: this });
-        }
-
-        /**
-         * @private
-         * @param {fabric.Object} object
-         */
-        _onRelativeObjectAdded(object) {
-          this.enterGroup(object, false);
-          object.fire('added', { target: this });
-        }
-
-        /**
-         * @private
-         * @param {fabric.Object} object
-         * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
-         */
-        _onObjectRemoved(object, removeParentTransform) {
-          this.exitGroup(object, removeParentTransform);
-          object.fire('removed', { target: this });
-        }
-      }
-    ) {
+    class GroupBase extends createCollectionMixin(FabricObject) {
       /**
        * Checks if object can enter group and logs relevant warnings
        * @private
@@ -125,6 +92,26 @@ export class Group extends FabricObject {}
         const removed = super.remove(...objects);
         this._onAfterObjectsChange('removed', removed);
         return removed;
+      }
+
+      protected _onObjectAdded(object: FabricObject) {
+        this.enterGroup(object, true);
+        object.fire('added', { target: this });
+      }
+
+      protected _onRelativeObjectAdded(object: FabricObject) {
+        this.enterGroup(object, false);
+        object.fire('added', { target: this });
+      }
+
+      /**
+       * @private
+       * @param {fabric.Object} object
+       * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
+       */
+      protected _onObjectRemoved(object, removeParentTransform) {
+        this.exitGroup(object, removeParentTransform);
+        object.fire('removed', { target: this });
       }
 
       /**

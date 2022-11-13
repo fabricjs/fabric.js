@@ -1,10 +1,7 @@
 //@ts-nocheck
 import { config } from './config';
 import { VERSION } from './constants';
-import {
-  createCollectionMixin,
-  CollectionCallbacks,
-} from './mixins/collection.mixin';
+import { createCollectionMixin } from './mixins/collection.mixin';
 import { CommonMethods } from './mixins/shared_methods.mixin';
 import { Point } from './point.class';
 import { FabricObject } from './shapes/fabricObject.class';
@@ -37,43 +34,7 @@ import { pick } from './util/misc/pick';
    */
   // eslint-disable-next-line max-len
   fabric.StaticCanvas = fabric.util.createClass(
-    class extends createCollectionMixin(
-      class StaticCanvasBase
-        extends CommonMethods
-        implements CollectionCallbacks
-      {
-        /**
-         * @private
-         * @param {fabric.Object} obj Object that was added
-         */
-        _onObjectAdded(obj) {
-          this.stateful && obj.setupState();
-          if (obj.canvas && obj.canvas !== this) {
-            /* _DEV_MODE_START_ */
-            console.warn(
-              'fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
-                'Resulting to default behavior: removing object from previous canvas and adding to new canvas'
-            );
-            /* _DEV_MODE_END_ */
-            obj.canvas.remove(obj);
-          }
-          obj._set('canvas', this);
-          obj.setCoords();
-          this.fire('object:added', { target: obj });
-          obj.fire('added', { target: this });
-        }
-
-        /**
-         * @private
-         * @param {fabric.Object} obj Object that was removed
-         */
-        _onObjectRemoved(obj) {
-          obj._set('canvas', undefined);
-          this.fire('object:removed', { target: obj });
-          obj.fire('removed', { target: this });
-        }
-      }
-    ) {
+    class extends createCollectionMixin(CommonMethods) {
       add(...objects: FabricObject[]) {
         super.add(...objects);
         objects.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
@@ -90,6 +51,29 @@ import { pick } from './util/misc/pick';
         const removed = super.remove(...objects);
         removed.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
         return this;
+      }
+
+      protected _onObjectAdded(obj: FabricObject) {
+        this.stateful && obj.setupState();
+        if (obj.canvas && obj.canvas !== this) {
+          /* _DEV_MODE_START_ */
+          console.warn(
+            'fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
+              'Resulting to default behavior: removing object from previous canvas and adding to new canvas'
+          );
+          /* _DEV_MODE_END_ */
+          obj.canvas.remove(obj);
+        }
+        obj._set('canvas', this);
+        obj.setCoords();
+        this.fire('object:added', { target: obj });
+        obj.fire('added', { target: this });
+      }
+
+      protected _onObjectRemoved(obj: FabricObject) {
+        obj._set('canvas', undefined);
+        this.fire('object:removed', { target: obj });
+        obj.fire('removed', { target: this });
       }
     },
     /** @lends fabric.StaticCanvas.prototype */ {

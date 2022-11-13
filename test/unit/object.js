@@ -834,7 +834,7 @@
         return JSON.stringify(this.toJSON(), null, '\t');
       }
     }
-    const Collection = fabric.createCollectionMixin(class TestCollection extends TestObject {
+    class TestCollection extends fabric.createCollectionMixin(TestObject) {
       constructor({ id }) {
         super();
         this.id = id;
@@ -849,8 +849,8 @@
       removeAll() {
         this.remove(...this._objects);
       }
-    });
-    class TestCanvas extends Collection {
+    }
+    class TestCanvas extends TestCollection {
       _onObjectAdded (object) {
         object.canvas = this;
       }
@@ -861,9 +861,9 @@
     return {
       object: new TestObject({ id: 'object' }),
       other: new TestObject({ id: 'other' }),
-      a: new Collection({ id: 'a' }),
-      b: new Collection({ id: 'b' }),
-      c: new Collection({ id: 'c' }),
+      a: new TestCollection({ id: 'a' }),
+      b: new TestCollection({ id: 'b' }),
+      c: new TestCollection({ id: 'c' }),
       canvas: new TestCanvas({ id: 'canvas' })
     }
   }

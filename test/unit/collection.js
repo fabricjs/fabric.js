@@ -3,19 +3,19 @@
   
   let collection, collection2, added, removed;
 
-  const Klass = fabric.createCollectionMixin(class Tester {
+  class TestCollection extends fabric.createCollectionMixin(class {}) {
     _onObjectAdded(object) {
       added.push(object);
     }
     _onObjectRemoved(object) {
       removed.push(object)
     }
-  });
+  }
 
   QUnit.module('fabric.Collection', {
     beforeEach: function() {
-      collection = new Klass();
-      collection2 = new Klass();
+      collection = new TestCollection();
+      collection2 = new TestCollection();
       added = [];
       removed = [];
     }

@@ -1,17 +1,22 @@
 import { fabric } from '../../HEADER';
 import type { FabricObject } from '../shapes/fabricObject.class';
 
-export interface CollectionCallbacks {
-  _onObjectAdded(object: FabricObject): void;
-  _onObjectRemoved(object: FabricObject): void;
-}
-
 export function createCollectionMixin(Klass: { new (...args: any[]): any }) {
   return class Collection extends Klass {
     /**
      * @type {FabricObject[]}
      */
     _objects: FabricObject[] = [];
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _onObjectAdded(object: FabricObject) {
+      // subclasses should override this method
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _onObjectRemoved(object: FabricObject) {
+      // subclasses should override this method
+    }
 
     /**
      * Adds objects to collection
