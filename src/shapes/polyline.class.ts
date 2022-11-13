@@ -245,11 +245,9 @@ export class Polyline extends FabricObject {
       );
     }
     return [
-      '<' + this.type + ' ',
+      `<${this.type} `,
       'COMMON_PARTS',
-      'points="',
-      points.join(''),
-      '" />\n',
+      `points="${points.join('')}" />\n`,
     ];
   }
 
