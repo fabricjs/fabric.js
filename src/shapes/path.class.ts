@@ -143,15 +143,7 @@ export class Path extends FabricObject {
    * @return {String} string representation of an instance
    */
   toString() {
-    return (
-      '#<Path (' +
-      this.complexity() +
-      '): { "top": ' +
-      this.top +
-      ', "left": ' +
-      this.left +
-      ' }>'
-    );
+    return `#<Path (${this.complexity()}): { "top": ${this.top}, "left": ${this.left} }>`;
   }
 
   /**
@@ -191,22 +183,13 @@ export class Path extends FabricObject {
     return [
       '<path ',
       'COMMON_PARTS',
-      'd="',
-      path,
-      '" stroke-linecap="round" ',
-      '/>\n',
+      `d="${path}" stroke-linecap="round" />\n`,
     ];
   }
 
   _getOffsetTransform() {
     const digits = config.NUM_FRACTION_DIGITS;
-    return (
-      ' translate(' +
-      toFixed(-this.pathOffset.x, digits) +
-      ', ' +
-      toFixed(-this.pathOffset.y, digits) +
-      ')'
-    );
+    return ` translate(${toFixed(-this.pathOffset.x, digits)}, ${toFixed(-this.pathOffset.y, digits)})`;
   }
 
   /**
