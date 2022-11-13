@@ -2,7 +2,6 @@
 import { config } from './config';
 import { VERSION } from './constants';
 import { createCollectionMixin, ICollection } from './mixins/collection.mixin';
-import { Observable } from './mixins/observable.mixin';
 import { CommonMethods } from './mixins/shared_methods.mixin';
 import { Point } from './point.class';
 import { FabricObject } from './shapes/fabricObject.class';
