@@ -69,8 +69,8 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
         So we divide by scale, to remove its effect.
       */
       const projection = new Point(1, 1)
-          .scalarMultiply(this.strokeProjectionMagnitude)
-          .multiply(this.strokeUniformScalar);
+        .scalarMultiply(this.strokeProjectionMagnitude)
+        .multiply(this.strokeUniformScalar);
       projections.push(
         this.applySkew(this.A.add(projection)),
         this.applySkew(this.A.subtract(projection))
@@ -104,8 +104,8 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
         So we divide by scale, to remove its effect.
       */
       const projection = new Point(1, 1)
-          .scalarMultiply(this.strokeProjectionMagnitude)
-          .multiply(this.strokeUniformScalar);
+        .scalarMultiply(this.strokeProjectionMagnitude)
+        .multiply(this.strokeUniformScalar);
       projections.push(this.A.add(projection), this.A.subtract(projection));
     } else {
       const orthogonalProjection = this.calcOrthogonalProjection(
