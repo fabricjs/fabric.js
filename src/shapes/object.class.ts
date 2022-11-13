@@ -235,14 +235,14 @@ export class FabricObject extends ObjectGeometry {
    * @type String
    * @default butt
    */
-  strokeLineCap: string;
+  strokeLineCap: CanvasLineCap;
 
   /**
    * Corner style of an object's stroke (one of "bevel", "round", "miter")
    * @type String
    * @default
    */
-  strokeLineJoin: string;
+  strokeLineJoin: CanvasLineJoin;
 
   /**
    * Maximum miter length (used for strokeLineJoin = "miter") of an object's stroke
