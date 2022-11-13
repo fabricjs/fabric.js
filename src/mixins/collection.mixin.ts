@@ -153,15 +153,4 @@ export function createCollectionMixin(Klass: { new (...args: any[]): any }) {
   };
 }
 
-fabric.Collection = createCollectionMixin(
-  class implements ICollection {
-    _onObjectAdded(object: FabricObject): void {
-      throw new Error('Method not implemented.');
-    }
-    _onObjectRemoved(object: FabricObject): void {
-      throw new Error('Method not implemented.');
-    }
-  }
-);
-
 fabric.createCollectionMixin = createCollectionMixin;
