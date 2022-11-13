@@ -36,11 +36,18 @@ export class Path extends FabricObject {
    * @param {Object} [options] Options object
    * @return {Path} thisArg
    */
-  constructor(path: PathData | string, { path: _, left, top, ...options }) {
+  constructor(path: PathData | string, { path: _, left, top, ...options } = {}) {
     super(options);
-    this._setPath(path || [], true);
-    typeof left === 'number' && this.set('left', left);
-    typeof top === 'number' && this.set('top', top);
+
+    const pathTL = this._setPath(path || []);
+    const origin = this.translateToGivenOrigin(
+      new Point(left ?? pathTL.x, top ?? pathTL.y),
+      typeof left === 'number' ? this.originX : 'left',
+      typeof top === 'number' ? this.originY : 'top',
+      this.originX,
+      this.originY
+    );
+    this.setPositionByOrigin(origin, this.originX, this.originY);
   }
 
   /**
@@ -51,7 +58,7 @@ export class Path extends FabricObject {
    */
   _setPath(path: PathData | string, adjustPosition?: boolean) {
     this.path = makePathSimpler(Array.isArray(path) ? path : parsePath(path));
-    this.setBoundingBox(adjustPosition);
+    return this.setDimensions();
   }
 
   /**
@@ -230,14 +237,9 @@ export class Path extends FabricObject {
   }
 
   setDimensions() {
-    this.setBoundingBox();
-  }
-
-  setBoundingBox(adjustPosition?: boolean) {
     const { left, top, width, height, pathOffset } = this._calcDimensions();
     this.set({ width, height, pathOffset });
-    adjustPosition &&
-      this.setPositionByOrigin(new Point(left, top), 'left', 'top');
+    return new Point(left, top);
   }
 
   /**
