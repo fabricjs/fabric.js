@@ -1,7 +1,7 @@
 import { fabric } from '../../HEADER';
 import type { FabricObject } from '../shapes/fabricObject.class';
 
-export interface ICollection {
+export interface CollectionCallbacks {
   _onObjectAdded(object: FabricObject): void;
   _onObjectRemoved(object: FabricObject): void;
 }

@@ -1,7 +1,10 @@
 //@ts-nocheck
 import { config } from './config';
 import { VERSION } from './constants';
-import { createCollectionMixin, ICollection } from './mixins/collection.mixin';
+import {
+  createCollectionMixin,
+  CollectionCallbacks,
+} from './mixins/collection.mixin';
 import { CommonMethods } from './mixins/shared_methods.mixin';
 import { Point } from './point.class';
 import { FabricObject } from './shapes/fabricObject.class';
@@ -35,7 +38,10 @@ import { pick } from './util/misc/pick';
   // eslint-disable-next-line max-len
   fabric.StaticCanvas = fabric.util.createClass(
     class extends createCollectionMixin(
-      class StaticCanvasBase extends CommonMethods implements ICollection {
+      class StaticCanvasBase
+        extends CommonMethods
+        implements CollectionCallbacks
+      {
         /**
          * @private
          * @param {fabric.Object} obj Object that was added

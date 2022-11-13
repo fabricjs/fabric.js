@@ -1,5 +1,8 @@
 //@ts-nocheck
-import { createCollectionMixin, ICollection } from '../mixins/collection.mixin';
+import {
+  createCollectionMixin,
+  CollectionCallbacks,
+} from '../mixins/collection.mixin';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { Point } from '../point.class';
 import { FabricObject } from './fabricObject.class';
@@ -23,7 +26,10 @@ export class Group extends FabricObject {}
    */
   fabric.Group = fabric.util.createClass(
     class GroupCollection extends createCollectionMixin(
-      class GroupCollection extends FabricObject implements ICollection {
+      class GroupCollection
+        extends FabricObject
+        implements CollectionCallbacks
+      {
         /**
          * @private
          * @param {fabric.Object} object
