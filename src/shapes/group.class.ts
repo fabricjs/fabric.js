@@ -55,7 +55,7 @@ export class Group extends FabricObject {}
        * If Overriding, be sure not pass illegal objects to group - it will break your app.
        * @private
        */
-      _filterObjectsBeforeEnteringGroup(objects) {
+      protected _filterObjectsBeforeEnteringGroup(objects) {
         return objects.filter((object, index, array) => {
           // can enter AND is the first occurrence of the object in the passed args (to prevent adding duplicates)
           return this.canEnterGroup(object) && array.indexOf(object) === index;
@@ -119,7 +119,7 @@ export class Group extends FabricObject {}
        * @param {'added'|'removed'} type
        * @param {fabric.Object[]} targets
        */
-      _onAfterObjectsChange(type, targets) {
+      protected _onAfterObjectsChange(type, targets) {
         this._applyLayoutStrategy({
           type: type,
           targets: targets,
