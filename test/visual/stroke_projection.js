@@ -232,37 +232,30 @@ QUnit.module('stroke projection', (hooks) => {
     const builder = fabric.Polygon;
     [5, 20, 120].forEach((strokeMiterLimit) => {
       [true, false].forEach((strokeUniform) => {
-        [
-          [0, 0],
-          [0, 30],
-          [20, 0],
-          [25, 35],
-        ].forEach(([skewX, skewY]) => {
-          tests.push({
-            test: `${caseName} with strokeMiterLimit=${strokeMiterLimit}, strokeUniform=${strokeUniform}, skewX=${skewX} and skewY=${skewY} values`,
-            code: function (canvas, callback) {
-              renderStrokeTest(
-                canvas,
-                {
-                  builder,
-                  points: casePoints,
-                },
-                {
-                  strokeLineJoin: 'miter',
-                  strokeUniform,
-                  strokeMiterLimit,
-                }
-              );
-              callback(canvas.lowerCanvasEl);
-            },
-            golden: `stroke-projection/strokeLineJoin/miter-limit/${caseName}-${
-              strokeUniform ? 'uniform-' : ''
-            }-${strokeMiterLimit}miterLimit-${skewX}skewX-${skewY}skewY.png`,
-            percentage: 0.001,
-            width: 600,
-            height: 900,
-            fabricClass: 'Canvas',
-          });
+        tests.push({
+          test: `${caseName} with strokeMiterLimit=${strokeMiterLimit}, strokeUniform=${strokeUniform} values`,
+          code: function (canvas, callback) {
+            renderStrokeTest(
+              canvas,
+              {
+                builder,
+                points: casePoints,
+              },
+              {
+                strokeLineJoin: 'miter',
+                strokeUniform,
+                strokeMiterLimit,
+              }
+            );
+            callback(canvas.lowerCanvasEl);
+          },
+          golden: `stroke-projection/strokeLineJoin/miter-limit/${caseName}-${
+            strokeUniform ? 'uniform-' : ''
+          }-${strokeMiterLimit}miterLimit.png`,
+          percentage: 0.001,
+          width: 600,
+          height: 900,
+          fabricClass: 'Canvas',
         });
       });
     });
