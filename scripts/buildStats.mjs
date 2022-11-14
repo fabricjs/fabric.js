@@ -6,13 +6,10 @@ const COMMENT_MARKER = '<!-- BUILD STATS COMMENT -->';
 
 const MAX_COMMENT_CHARS = 65536;
 
-const INACCURATE_COMMENT =
-  '\n*inaccurate, see [link](https://github.com/doesdev/rollup-plugin-analyzer#why-is-the-reported-size-not-the-same-as-the-file-on-disk)';
-
 function printSize(a, b) {
   const diff = b - a;
   return `${b.toFixed(3)} (**${Math.sign(diff) > 0 ? '+' : ''}${diff.toFixed(
-    3
+    diff !== 0 ? 3 : 0
   )}**)`;
 }
 
@@ -46,41 +43,11 @@ export async function findCommentId(github, context) {
 export async function run({ github, context, a, b }) {
   const {
     repo: { owner, repo },
-    payload: {
-      pull_request: { base, head },
-    },
   } = context;
-  const changedFiles = (
-    await github.rest.repos.compareCommits({
-      base: base.sha,
-      head: head.sha,
-      owner,
-      repo,
-    })
-  ).data.files
-    .map(({ filename }) => filename)
-    .filter((file) => file.startsWith('src'));
-
-  const files = {};
-  b.stats.modules.forEach((b) => {
-    const file = b.id.replace(/^(\\|\/)/, '');
-    if (!changedFiles.includes(file)) {
-      return;
-    }
-    const aOut = {
-      origSize: 0,
-      size: 0,
-      ...(a.stats.modules.find(({ id }) => id === b.id) || {}),
-    };
-    files[file] = {
-      a: { sizeBefore: aOut.origSize, sizeAfter: aOut.size },
-      b: { sizeBefore: b.origSize, sizeAfter: b.size },
-    };
-  });
 
   const table = [
-    ['file / KB (diff)', 'bundled', 'reduced*', 'minified', 'gzipped'],
-    ['---', '---', '---', '---', '---'],
+    ['file / KB (diff)', 'bundled', 'minified', 'gzipped'],
+    ['---', '---', '---', '---'],
     ..._.map(b.size, (_b, file) => {
       const _a = {
         bundled: 0,
@@ -91,35 +58,21 @@ export async function run({ github, context, a, b }) {
       return [
         file,
         printSizeByte(_a.bundled, _b.bundled),
-        '',
         printSizeByte(_a.minified, _b.minified),
         printSizeByte(_a.gzipped, _b.gzipped),
       ];
     }),
-    ..._.orderBy(
-      _.map(files, ({ a, b }, key) => {
-        return [
-          key,
-          printSizeByte(a.sizeBefore, b.sizeBefore),
-          printSizeByte(a.sizeAfter, b.sizeAfter),
-        ];
-      }),
-      [0],
-      ['asc']
-    ),
   ];
 
-  const body =
-    [
-      COMMENT_MARKER,
-      '**Build Stats**',
-      '',
-      ...table.map((row) => ['', ...row, ''].join(' | ')),
-      '',
-    ]
-      .join('\n')
-      .slice(0, MAX_COMMENT_CHARS - INACCURATE_COMMENT.length) +
-    INACCURATE_COMMENT;
+  const body = [
+    COMMENT_MARKER,
+    '**Build Stats**',
+    '',
+    ...table.map((row) => ['', ...row, ''].join(' | ')),
+    '',
+  ]
+    .join('\n')
+    .slice(0, MAX_COMMENT_CHARS);
 
   const commentId = await findCommentId(github, context);
 

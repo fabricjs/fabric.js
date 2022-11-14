@@ -4,6 +4,10 @@
 
 - test(): stroke projection [#8374](https://github.com/fabricjs/fabric.js/pull/8374)
 - ci(): fixed visual tests not to create a missing golden when running from CI and to fail instead + improve visual test suite [#8311](https://github.com/fabricjs/fabric.js/pull/8311)
+- chore(TS): migrate Path [#8412](https://github.com/fabricjs/fabric.js/pull/8412)
+- ci(): remove unwanted build stats (from [#8395](https://github.com/fabricjs/fabric.js/pull/8395)) [#8416](https://github.com/fabricjs/fabric.js/pull/8416)
+- chore(TS): migrate Line [#8413](https://github.com/fabricjs/fabric.js/pull/8413)
+- chore(TS): migrate Polyline/Polygon [#8417](https://github.com/fabricjs/fabric.js/pull/8417)
 - chore(TS): migrate Rect [#8411](https://github.com/fabricjs/fabric.js/pull/8411)
 - chore(TS): migrate Ellipse [#8408](https://github.com/fabricjs/fabric.js/pull/8408)
 - chore(TS): migrate Triangle to TS [#8410](https://github.com/fabricjs/fabric.js/pull/8410)
