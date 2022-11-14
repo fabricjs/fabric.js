@@ -1,5 +1,4 @@
 // @ts-nocheck
-
 import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
@@ -337,17 +336,29 @@ export class Text extends TextStyleMixin {
    */
   MIN_TEXT_WIDTH: number;
 
-  protected __skipDimension: boolean;
-  protected textLines: string[];
-  protected _textLines: string[][];
-  protected _unwrappedTextLines: string[][];
-  protected _text: string[];
-  protected cursorWidth: number;
-  protected __lineHeights: number[];
-  protected __lineWidths: number[];
-  protected _forceClearCache: boolean;
+  /**
+   * contains the the text of the object, divided in lines as they are displayed
+   * on screen. Wrapping will divide the text independently of line breaks
+   * @type {string[]}
+   * @default
+   */
+  textLines: string[];
 
-  private initialized?: true;
+  /**
+   * same as textlines, but each line is an array of graphemes as split by splitByGrapheme
+   * @type {string[]}
+   * @default
+   */
+  _textLines: string[][];
+
+  _unwrappedTextLines: string[][];
+  _text: string[];
+  cursorWidth: number;
+  __lineHeights: number[];
+  __lineWidths: number[];
+  _forceClearCache: boolean;
+
+  initialized?: true;
 
   constructor(text: string, options: object): Text {
     super({ ...options, text, styles: options?.styles || {} });
@@ -355,7 +366,6 @@ export class Text extends TextStyleMixin {
     if (this.path) {
       this.setPathInfo();
     }
-    this.__skipDimension = false;
     this.initDimensions();
     this.setCoords();
     this.setupState({ propertySet: '_dimensionAffectingProps' });
@@ -1224,14 +1234,13 @@ export class Text extends TextStyleMixin {
    * @return {CanvasPattern} a pattern to use as fill/stroke style
    */
   _applyPatternGradientTransformText(filler: TFiller): CanvasPattern {
-    let pCanvas = createCanvasElement(),
-      pCtx,
+    const pCanvas = createCanvasElement(),
       // TODO: verify compatibility with strokeUniform
       width = this.width + this.strokeWidth,
-      height = this.height + this.strokeWidth;
+      height = this.height + this.strokeWidth,
+      pCtx = pCanvas.getContext('2d');
     pCanvas.width = width;
     pCanvas.height = height;
-    pCtx = pCanvas.getContext('2d');
     pCtx.beginPath();
     pCtx.moveTo(0, 0);
     pCtx.lineTo(width, 0);
@@ -1391,13 +1400,12 @@ export class Text extends TextStyleMixin {
    * @return {Number} Line left offset
    */
   _getLineLeftOffset(lineIndex: number): number {
-    var lineWidth = this.getLineWidth(lineIndex),
+    const lineWidth = this.getLineWidth(lineIndex),
       lineDiff = this.width - lineWidth,
       textAlign = this.textAlign,
       direction = this.direction,
-      isEndOfWrapping,
-      leftOffset = 0,
       isEndOfWrapping = this.isEndOfWrapping(lineIndex);
+    let leftOffset = 0;
     if (
       textAlign === 'justify' ||
       (textAlign === 'justify-center' && !isEndOfWrapping) ||
@@ -1505,50 +1513,34 @@ export class Text extends TextStyleMixin {
     if (!this[type] && !this.styleHas(type)) {
       return;
     }
-    let heightOfLine,
-      size,
-      _size,
-      lineLeftOffset,
-      dy,
-      _dy,
-      line,
-      lastDecoration,
-      leftOffset = this._getLeftOffset(),
-      topOffset = this._getTopOffset(),
-      top,
-      boxStart,
-      boxWidth,
-      charBox,
-      currentDecoration,
-      maxHeight,
-      currentFill,
-      lastFill,
+    let topOffset = this._getTopOffset();
+    const leftOffset = this._getLeftOffset(),
       path = this.path,
       charSpacing = this._getWidthOfCharSpacing(),
       offsetY = this.offsets[type];
 
     for (let i = 0, len = this._textLines.length; i < len; i++) {
-      heightOfLine = this.getHeightOfLine(i);
+      const heightOfLine = this.getHeightOfLine(i);
       if (!this[type] && !this.styleHas(type, i)) {
         topOffset += heightOfLine;
         continue;
       }
-      line = this._textLines[i];
-      maxHeight = heightOfLine / this.lineHeight;
-      lineLeftOffset = this._getLineLeftOffset(i);
-      boxStart = 0;
-      boxWidth = 0;
-      lastDecoration = this.getValueOfPropertyAt(i, 0, type);
-      lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
-      top = topOffset + maxHeight * (1 - this._fontSizeFraction);
-      size = this.getHeightOfChar(i, 0);
-      dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
+      const line = this._textLines[i];
+      const maxHeight = heightOfLine / this.lineHeight;
+      const lineLeftOffset = this._getLineLeftOffset(i);
+      let boxStart = 0;
+      let boxWidth = 0;
+      let lastDecoration = this.getValueOfPropertyAt(i, 0, type);
+      let lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
+      const top = topOffset + maxHeight * (1 - this._fontSizeFraction);
+      let size = this.getHeightOfChar(i, 0);
+      let dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
       for (let j = 0, jlen = line.length; j < jlen; j++) {
-        charBox = this.__charBounds[i][j];
-        currentDecoration = this.getValueOfPropertyAt(i, j, type);
-        currentFill = this.getValueOfPropertyAt(i, j, 'fill');
-        _size = this.getHeightOfChar(i, j);
-        _dy = this.getValueOfPropertyAt(i, j, 'deltaY');
+        const charBox = this.__charBounds[i][j];
+        const currentDecoration = this.getValueOfPropertyAt(i, j, type);
+        const currentFill = this.getValueOfPropertyAt(i, j, 'fill');
+        const currentSize = this.getHeightOfChar(i, j);
+        const currentDy = this.getValueOfPropertyAt(i, j, 'deltaY');
         if (path && currentDecoration && currentFill) {
           ctx.save();
           ctx.fillStyle = lastFill;
@@ -1556,7 +1548,7 @@ export class Text extends TextStyleMixin {
           ctx.rotate(charBox.angle);
           ctx.fillRect(
             -charBox.kernedWidth / 2,
-            offsetY * _size + _dy,
+            offsetY * currentSize + currentDy,
             charBox.kernedWidth,
             this.fontSize / 15
           );
@@ -1564,11 +1556,11 @@ export class Text extends TextStyleMixin {
         } else if (
           (currentDecoration !== lastDecoration ||
             currentFill !== lastFill ||
-            _size !== size ||
-            _dy !== dy) &&
+            currentSize !== size ||
+            currentDy !== dy) &&
           boxWidth > 0
         ) {
-          var drawStart = leftOffset + lineLeftOffset + boxStart;
+          let drawStart = leftOffset + lineLeftOffset + boxStart;
           if (this.direction === 'rtl') {
             drawStart = this.width - drawStart - boxWidth;
           }
@@ -1585,13 +1577,13 @@ export class Text extends TextStyleMixin {
           boxWidth = charBox.width;
           lastDecoration = currentDecoration;
           lastFill = currentFill;
-          size = _size;
-          dy = _dy;
+          size = currentSize;
+          dy = currentDy;
         } else {
           boxWidth += charBox.kernedWidth;
         }
       }
-      var drawStart = leftOffset + lineLeftOffset + boxStart;
+      let drawStart = leftOffset + lineLeftOffset + boxStart;
       if (this.direction === 'rtl') {
         drawStart = this.width - drawStart - boxWidth;
       }
@@ -1662,6 +1654,9 @@ export class Text extends TextStyleMixin {
 
   /**
    * Override this method to customize grapheme splitting
+   * @todo the util `graphemeSplit` needs to be injectable in some way.
+   * is more comfortable to inject the correct util rather than having to override text
+   * in the middle of the prototype chain
    * @param {string} value
    * @returns {string[]} array of graphemes
    */
@@ -1830,13 +1825,14 @@ export class Text extends TextStyleMixin {
     const originalStrokeWidth = options.strokeWidth;
     options.strokeWidth = 0;
 
-    let text = new Text(textContent, options),
+    const text = new Text(textContent, options),
       textHeightScaleFactor = text.getScaledHeight() / text.height,
       lineHeightDiff =
         (text.height + text.strokeWidth) * text.lineHeight - text.height,
       scaledDiff = lineHeightDiff * textHeightScaleFactor,
-      textHeight = text.getScaledHeight() + scaledDiff,
-      offX = 0;
+      textHeight = text.getScaledHeight() + scaledDiff;
+
+    let offX = 0;
     /*
       Adjust positioning:
         x/y attributes in SVG correspond to the bottom-left corner of text bounding box

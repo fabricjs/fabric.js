@@ -51,7 +51,7 @@ export class Textbox extends IText {
    * @override
    */
   initDimensions() {
-    if (this.__skipDimension) {
+    if (!this.initialized) {
       return;
     }
     this.isEditing && this.initDelayedCursor();
