@@ -199,33 +199,30 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    * Calculation: the projections are the points furthest from the vertex in
    * the direction of the X and Y axes after distortion.
    *
-   * @todo TODO:
-   *  - Consider only projections that are inside the beginning and end of the circle segment
-   *
    * @see https://github.com/fabricjs/fabric.js/pull/8344#2-3-2-round-skew
    */
   private projectRoundWithSkew(startCircle: Point, endCircle: Point) {
     const projections: Point[] = [];
 
-    const { skewX, skewY } = this.options;
-    // The points furthest from the vertex in the direction of the X and Y axes after distortion
-    const circleRadius = new Point()
-        .scalarAdd(this.strokeProjectionMagnitude)
-        .multiply(this.strokeUniformScalar),
-      newY =
-        circleRadius.y / Math.sqrt(1 + Math.tan(degreesToRadians(skewY)) ** 2),
-      furthestY = new Point(
-        Math.sqrt(
-          circleRadius.x ** 2 - ((newY * circleRadius.x) / circleRadius.y) ** 2
-        ),
-        newY
-      ),
-      newX =
-        circleRadius.x / Math.sqrt(1 + Math.tan(degreesToRadians(skewX)) ** 2),
-      furthestX = new Point(
-        newX,
-        Math.sqrt(newY ** 2 - ((newX * newY) / circleRadius.x) ** 2)
+    const { skewX, skewY, scaleX, scaleY, strokeUniform } = this.options,
+      shearing = new Point(
+        Math.tan(degreesToRadians(skewX)),
+        Math.tan(degreesToRadians(skewY))
       );
+    // The points furthest from the vertex in the direction of the X and Y axes after distortion
+    const circleRadius = this.strokeProjectionMagnitude,
+      newY = strokeUniform
+        ? circleRadius /
+          scaleY /
+          Math.sqrt(1 / scaleY ** 2 + (1 / scaleX ** 2) * shearing.y ** 2)
+        : circleRadius / Math.sqrt(1 + shearing.y ** 2),
+      furthestY = new Point(Math.sqrt(circleRadius ** 2 - newY ** 2), newY),
+      newX = strokeUniform
+        ? circleRadius /
+          scaleX /
+          Math.sqrt(1 / scaleX ** 2 + (1 / scaleY ** 2) * shearing.x ** 2)
+        : circleRadius / Math.sqrt(1 + shearing.x ** 2),
+      furthestX = new Point(newX, Math.sqrt(circleRadius ** 2 - newX ** 2));
 
     [
       furthestX,
@@ -233,7 +230,13 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       furthestY,
       furthestY.scalarMultiply(-1),
     ]
-      .map((vector) => this.applySkew(vector))
+      // We need to skew the vector here as this information is used to check if
+      // it is between the start and end of the circle segment
+      .map((vector) =>
+        this.applySkew(
+          strokeUniform ? vector.multiply(this.strokeUniformScalar) : vector
+        )
+      )
       .forEach((vector) => {
         if (isBetweenVectors(vector, startCircle, endCircle)) {
           projections.push(this.applySkew(this.A).add(vector));
@@ -260,7 +263,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       // when `isStraightLine` === true, we compare with the vector opposite AB, otherwise we compare with the bisector.
       comparsionVector = isStraightLine
         ? this.applySkew(this.AB.scalarMultiply(-1))
-        : this.applySkew(this.bisector),
+        : this.applySkew(this.bisector.multiply(this.strokeUniformScalar)),
       // the beginning of the circle segment is always to the right of the comparsion vector (cross product > 0)
       // if `isStraightLine` === true, otherwise is always to the left ot the comparsion vector (cross product < 0).
       isProj0Start = isStraightLine
