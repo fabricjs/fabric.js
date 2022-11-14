@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): finalize Path migration [#8438](https://github.com/fabricjs/fabric.js/pull/8438)
 - chore(TS): migrate Path [#8412](https://github.com/fabricjs/fabric.js/pull/8412)
 - ci(): remove unwanted build stats (from [#8395](https://github.com/fabricjs/fabric.js/pull/8395)) [#8416](https://github.com/fabricjs/fabric.js/pull/8416)
 - chore(TS): migrate Line [#8413](https://github.com/fabricjs/fabric.js/pull/8413)
