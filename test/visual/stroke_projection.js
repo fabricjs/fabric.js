@@ -120,7 +120,6 @@ QUnit.module('stroke projection', (hooks) => {
 
   // Test only miter limit
   const selectedMiterLimitCases = {
-    noMiterAfterMiterLimit2: generalCasesToTest.noMiterAfterMiterLimit2,
     acuteAngle: generalCasesToTest.acuteAngle,
     obtuseAngle: generalCasesToTest.obtuseAngle,
     convex: generalCasesToTest.convex,
