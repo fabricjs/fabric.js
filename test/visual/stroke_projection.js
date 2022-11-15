@@ -188,11 +188,6 @@ QUnit.module('stroke projection', (hooks) => {
               [20, 0],
               [25, 35],
             ].forEach(([skewX, skewY]) => {
-              if (
-                strokeLineTypeCase === 'round' &&
-                (skewX !== 0) & (skewY !== 0)
-              )
-                return; // TODO: remove this line when fix strokeLineJoins equals `round` with `skewX`and `skewY` applied at sametime
               tests.push({
                 test: `${caseName} of type ${builderType} with ${strokeLineType}=${strokeLineTypeCase}, strokeUniform=${strokeUniform}, skewX=${skewX}, skewY=${skewY}, grouped=${group}`,
                 code: function (canvas, callback) {
@@ -271,8 +266,6 @@ QUnit.module('stroke projection', (hooks) => {
           [20, 0],
           [25, 35],
         ].forEach(([skewX, skewY]) => {
-          if (strokeLineCap === 'round' && (skewX !== 0) & (skewY !== 0))
-            return; // TODO: remove this line when fix strokeLineJoins equals `round` with `skewX`and `skewY` applied at sametime
           tests.push({
             test: `${testSinglePoint.name} of type ${builderType} with strokeLineCap=${strokeLineCap}, strokeUniform=${strokeUniform}, skewX=${skewX}, skewY=${skewY}`,
             code: function (canvas, callback) {
