@@ -668,22 +668,12 @@ export class Text extends TextStyleMixin {
     if (!this.textBackgroundColor && !this.styleHas('textBackgroundColor')) {
       return;
     }
-    let heightOfLine,
-      lineLeftOffset,
-      originalFill = ctx.fillStyle,
-      line,
-      lastColor,
-      leftOffset = this._getLeftOffset(),
-      lineTopOffset = this._getTopOffset(),
-      boxStart = 0,
-      boxWidth = 0,
-      charBox,
-      currentColor,
-      path = this.path,
-      drawStart;
+    const originalFill = ctx.fillStyle,
+      leftOffset = this._getLeftOffset();
+    let lineTopOffset = this._getTopOffset();
 
     for (let i = 0, len = this._textLines.length; i < len; i++) {
-      heightOfLine = this.getHeightOfLine(i);
+      const heightOfLine = this.getHeightOfLine(i);
       if (
         !this.textBackgroundColor &&
         !this.styleHas('textBackgroundColor', i)
@@ -691,15 +681,17 @@ export class Text extends TextStyleMixin {
         lineTopOffset += heightOfLine;
         continue;
       }
-      line = this._textLines[i];
-      lineLeftOffset = this._getLineLeftOffset(i);
-      boxWidth = 0;
-      boxStart = 0;
-      lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
-      for (let j = 0, jlen = line.length; j < jlen; j++) {
-        charBox = this.__charBounds[i][j];
+      const jlen = this._textLines[i].length;
+      const lineLeftOffset = this._getLineLeftOffset(i);
+      let boxWidth = 0;
+      let boxStart = 0;
+      let drawStart;
+      let currentColor;
+      let lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
+      for (let j = 0; j < jlen; j++) {
+        const charBox = this.__charBounds[i][j];
         currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
-        if (path) {
+        if (this.path) {
           ctx.save();
           ctx.translate(charBox.renderLeft, charBox.renderTop);
           ctx.rotate(charBox.angle);
@@ -732,7 +724,7 @@ export class Text extends TextStyleMixin {
           boxWidth += charBox.kernedWidth;
         }
       }
-      if (currentColor && !path) {
+      if (currentColor && !this.path) {
         drawStart = leftOffset + lineLeftOffset + boxStart;
         if (this.direction === 'rtl') {
           drawStart = this.width - drawStart - boxWidth;
@@ -769,16 +761,17 @@ export class Text extends TextStyleMixin {
     previousChar: string,
     prevCharStyle: object
   ) {
-    let fontCache = cache.getFontCache(charStyle),
+    const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
       previousFontDeclaration = this._getFontDeclaration(prevCharStyle),
       couple = previousChar + _char,
       stylesAreEqual = fontDeclaration === previousFontDeclaration,
-      width,
+      fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE;
+    let width,
       coupleWidth,
       previousWidth,
-      fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE,
-      kernedWidth;
+      kernedWidth,
+      ctx;
 
     if (previousChar && fontCache[previousChar] !== undefined) {
       previousWidth = fontCache[previousChar];
@@ -795,23 +788,23 @@ export class Text extends TextStyleMixin {
       previousWidth === undefined ||
       coupleWidth === undefined
     ) {
-      var ctx = this.getMeasuringContext();
+      ctx = this.getMeasuringContext();
       // send a TRUE to specify measuring font size CACHE_FONT_SIZE
       this._setTextStyles(ctx, charStyle, true);
-    }
-    if (width === undefined) {
-      kernedWidth = width = ctx.measureText(_char).width;
-      fontCache[_char] = width;
-    }
-    if (previousWidth === undefined && stylesAreEqual && previousChar) {
-      previousWidth = ctx.measureText(previousChar).width;
-      fontCache[previousChar] = previousWidth;
-    }
-    if (stylesAreEqual && coupleWidth === undefined) {
-      // we can measure the kerning couple and subtract the width of the previous character
-      coupleWidth = ctx.measureText(couple).width;
-      fontCache[couple] = coupleWidth;
-      kernedWidth = coupleWidth - previousWidth;
+      if (width === undefined) {
+        kernedWidth = width = ctx.measureText(_char).width;
+        fontCache[_char] = width;
+      }
+      if (previousWidth === undefined && stylesAreEqual && previousChar) {
+        previousWidth = ctx.measureText(previousChar).width;
+        fontCache[previousChar] = previousWidth;
+      }
+      if (stylesAreEqual && coupleWidth === undefined) {
+        // we can measure the kerning couple and subtract the width of the previous character
+        coupleWidth = ctx.measureText(couple).width;
+        fontCache[couple] = coupleWidth;
+        kernedWidth = coupleWidth - previousWidth;
+      }
     }
     return {
       width: width * fontMultiplier,
@@ -998,11 +991,10 @@ export class Text extends TextStyleMixin {
       return this.__lineHeights[lineIndex];
     }
 
-    let line = this._textLines[lineIndex],
-      // char 0 is measured before the line cycle because it nneds to char
-      // emptylines
-      maxHeight = this.getHeightOfChar(lineIndex, 0);
-    for (let i = 1, len = line.length; i < len; i++) {
+    // char 0 is measured before the line cycle because it nneds to char
+    // emptylines
+    let maxHeight = this.getHeightOfChar(lineIndex, 0);
+    for (let i = 1, len = this._textLines[lineIndex].length; i < len; i++) {
       maxHeight = Math.max(this.getHeightOfChar(lineIndex, i), maxHeight);
     }
 
@@ -1049,8 +1041,8 @@ export class Text extends TextStyleMixin {
     method: 'fillText' | 'strokeText'
   ) {
     ctx.save();
-    let lineHeights = 0,
-      left = this._getLeftOffset(),
+    let lineHeights = 0;
+    const left = this._getLeftOffset(),
       top = this._getTopOffset();
     for (let i = 0, len = this._textLines.length; i < len; i++) {
       const heightOfLine = this.getHeightOfLine(i),
