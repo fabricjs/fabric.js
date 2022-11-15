@@ -224,9 +224,13 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       ),
       newX = strokeUniform
         ? circleRadius /
-          scaleX /
-          Math.sqrt(1 / scaleX ** 2 + (1 / scaleY ** 2) * shearing.x ** 2)
-        : circleRadius / Math.sqrt(1 + shearing.x ** 2),
+          Math.sqrt(
+            1 +
+              (shearing.x ** 2 * (1 / scaleY) ** 2) /
+                (1 / scaleX + (1 / scaleX) * shearing.x * shearing.y) ** 2
+          )
+        : circleRadius /
+          Math.sqrt(1 + shearing.x ** 2 / (1 + shearing.x * shearing.y) ** 2),
       furthestX = new Point(
         newX,
         Math.sqrt(Math.max(circleRadius ** 2 - newX ** 2, 0))
