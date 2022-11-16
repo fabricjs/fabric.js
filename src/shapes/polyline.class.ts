@@ -6,7 +6,9 @@ import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import { IPoint, Point } from '../point.class';
 import { TClassProperties } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
+import { calcDimensionsMatrix, transformPoint } from '../util/misc/matrix';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
+import { TProjectStrokeOnPointsOptions } from '../util/misc/projectStroke/types';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
 import { FabricObject } from './fabricObject.class';
@@ -107,19 +109,31 @@ export class Polyline extends FabricObject {
     return true;
   }
 
-  private _projectStrokeOnPoints() {
-    return projectStrokeOnPoints(this.points, this, this.isOpen());
+  private _projectStrokeOnPoints(options: TProjectStrokeOnPointsOptions) {
+    return projectStrokeOnPoints(this.points, options, this.isOpen());
   }
 
   /**
    * Calculate the polygon bounding box
    * @private
    */
-  _calcDimensions() {
+  _calcDimensions(options?: Partial<TProjectStrokeOnPointsOptions>) {
+    options = {
+      scaleX: this.scaleX,
+      scaleY: this.scaleY,
+      skewX: this.skewX,
+      skewY: this.skewY,
+      strokeLineCap: this.strokeLineCap,
+      strokeLineJoin: this.strokeLineJoin,
+      strokeMiterLimit: this.strokeMiterLimit,
+      strokeUniform: this.strokeUniform,
+      strokeWidth: this.strokeWidth,
+      ...(options || {}),
+    };
     const points = this.exactBoundingBox
-      ? this._projectStrokeOnPoints().map(
-          (projection) => projection.projectedPoint
-        )
+      ? this._projectStrokeOnPoints(
+          options as TProjectStrokeOnPointsOptions
+        ).map((projection) => projection.projectedPoint)
       : this.points;
     if (points.length === 0) {
       return {
@@ -128,28 +142,35 @@ export class Polyline extends FabricObject {
         width: 0,
         height: 0,
         pathOffset: new Point(),
-        strokeOffset: new Point(),
+        strokeDiff: new Point(),
       };
     }
-    const bbox = makeBoundingBoxFromPoints(points);
-    const bboxNoStroke = makeBoundingBoxFromPoints(this.points);
-    const offsetX = bbox.left + bbox.width / 2,
-      offsetY = bbox.top + bbox.height / 2;
-    const pathOffsetX =
-      offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
-    const pathOffsetY =
-      offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY));
-    // TODO: remove next line
-    const legacyCorrection =
-      !this.fromSVG && !this.exactBoundingBox ? this.strokeWidth / 2 : 0;
+    const bbox = makeBoundingBoxFromPoints(points),
+      // Remove scale effect, since it's applied after
+      matrix = calcDimensionsMatrix({ ...options, scaleX: 1, scaleY: 1 }),
+      bboxNoStroke = makeBoundingBoxFromPoints(
+        this.points.map((p) => transformPoint(p, matrix, true))
+      ),
+      offsetX = bbox.left + bbox.width / 2,
+      offsetY = bbox.top + bbox.height / 2,
+      pathOffsetX = offsetX - offsetY * Math.tan(degreesToRadians(this.skewX)),
+      pathOffsetY =
+        offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY)),
+      scale = new Point(this.scaleX, this.scaleY),
+      // TODO: remove next line
+      legacyCorrection =
+        !this.fromSVG && !this.exactBoundingBox ? this.strokeWidth / 2 : 0;
     return {
       ...bbox,
       left: bbox.left - legacyCorrection,
       top: bbox.top - legacyCorrection,
       pathOffset: new Point(pathOffsetX, pathOffsetY),
-      strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top).subtract(
-        new Point(bbox.left, bbox.top)
-      ),
+      strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top)
+        .subtract(new Point(bbox.left, bbox.top))
+        .multiply(scale),
+      strokeDiff: new Point(bbox.width, bbox.height)
+        .subtract(new Point(bboxNoStroke.width, bboxNoStroke.height))
+        .multiply(scale),
     };
   }
 
@@ -158,9 +179,9 @@ export class Polyline extends FabricObject {
   }
 
   setBoundingBox(adjustPosition?: boolean) {
-    const { left, top, width, height, pathOffset, strokeOffset } =
+    const { left, top, width, height, pathOffset, strokeDiff } =
       this._calcDimensions();
-    this.set({ width, height, pathOffset, strokeOffset });
+    this.set({ width, height, pathOffset, strokeDiff });
     adjustPosition &&
       this.setPositionByOrigin(new Point(left, top), 'left', 'top');
   }
@@ -170,7 +191,8 @@ export class Polyline extends FabricObject {
    */
   _getNonTransformedDimensions() {
     return this.exactBoundingBox
-      ? new Point(this.width, this.height)
+      ? // TODO: fix this
+        new Point(this.width, this.height)
       : super._getNonTransformedDimensions();
   }
 
@@ -180,7 +202,7 @@ export class Polyline extends FabricObject {
    *
    * @private
    */
-  _getTransformedDimensions(options: any) {
+  _getTransformedDimensions(options: Partial<TProjectStrokeOnPointsOptions>) {
     return this.exactBoundingBox
       ? super._getTransformedDimensions({
           ...(options || {}),
