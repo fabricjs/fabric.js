@@ -43,8 +43,5 @@ module.exports = {
   },
   timeout: 540,
   browser_start_timeout: 60,
-  browser_disconnect_timeout: 60,
-  parallel: 4,
-  // https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
-  CI: process.env.CI || false
+  parallel: 4
 }

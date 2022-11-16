@@ -26,7 +26,7 @@ import process from 'node:process';
 import os from 'os';
 import { build } from './build.mjs';
 import { awaitBuild } from './buildLock.mjs';
-import { CLI_CACHE, testResultsPath, wd } from './dirname.mjs';
+import { CLI_CACHE, wd } from './dirname.mjs';
 import { listFiles, transform as transformFiles } from './transform_files.mjs';
 
 const program = new commander.Command();
@@ -301,17 +301,10 @@ async function runTestem({
  */
 async function test(suite, tests, options = {}) {
   let failed = false;
-
-  const visualTestResultsPath = path.resolve(testResultsPath, 'visuals');
-  fs.removeSync(visualTestResultsPath);
-  fs.mkdirSync(visualTestResultsPath, { recursive: true });
-
   await awaitBuild();
-
   const qunitEnv = {
     QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
     QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
-    QUNIT_LAUNCH: Number(options.launch),
     QUNIT_FILTER: options.filter,
   };
   const env = {
