@@ -851,12 +851,12 @@ export class Text extends TextStyleMixin {
 
     const reverse = this.pathSide === 'right',
       path = this.path,
-      lineBounds = new Array(line.length),
-      line = this._textLines[lineIndex];
-
+      line = this._textLines[lineIndex],
+      llength = line.length,
+      lineBounds = new Array(llength);
 
     this.__charBounds[lineIndex] = lineBounds;
-    for (let i = 0; i < line.length; i++) {
+    for (let i = 0; i < llength; i++) {
       const grapheme = line[i];
       graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
       lineBounds[i] = graphemeInfo;
@@ -865,7 +865,7 @@ export class Text extends TextStyleMixin {
     }
     // this latest bound box represent the last character of the line
     // to simplify cursor handling in interactive mode.
-    lineBounds[i] = {
+    lineBounds[llength] = {
       left: graphemeInfo ? graphemeInfo.left + graphemeInfo.width : 0,
       width: 0,
       kernedWidth: 0,
@@ -891,8 +891,8 @@ export class Text extends TextStyleMixin {
       }
       positionInPath += this.pathStartOffset * (reverse ? -1 : 1);
       for (
-        i = reverse ? line.length - 1 : 0;
-        reverse ? i >= 0 : i < line.length;
+        i = reverse ? llength - 1 : 0;
+        reverse ? i >= 0 : i < llength;
         reverse ? i-- : i++
       ) {
         graphemeInfo = lineBounds[i];
