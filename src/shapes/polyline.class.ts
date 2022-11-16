@@ -223,6 +223,7 @@ export class Polyline extends FabricObject {
     const changed = this.initialized && this[key as keyof this] !== value;
     const output = super._set(key, value);
     if (
+      this.exactBoundingBox &&
       changed &&
       (((key === 'scaleX' || key === 'scaleY') &&
         this.strokeUniform &&
