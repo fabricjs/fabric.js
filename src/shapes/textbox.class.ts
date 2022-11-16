@@ -306,41 +306,38 @@ export class Textbox extends IText {
     _line,
     lineIndex: number,
     desiredWidth: number,
-    reservedSpace: number
+    reservedSpace = 0,
   ): Array<any> {
-    var lineWidth = 0,
+    const additionalSpace = this._getWidthOfCharSpacing(),
       splitByGrapheme = this.splitByGrapheme,
       graphemeLines = [],
-      line = [],
-      // spaces in different languages?
       words = splitByGrapheme
         ? this.graphemeSplit(_line)
         : this.wordSplit(_line),
-      word = '',
+      infix = splitByGrapheme ? '' : ' ';
+
+    let lineWidth = 0,
+      line = [],
+      // spaces in different languages?
       offset = 0,
-      infix = splitByGrapheme ? '' : ' ',
-      wordWidth = 0,
       infixWidth = 0,
       largestWordWidth = 0,
       lineJustStarted = true,
-      additionalSpace = this._getWidthOfCharSpacing(),
-      reservedSpace = reservedSpace || 0;
     // fix a difference between split and graphemeSplit
     if (words.length === 0) {
       words.push([]);
     }
     desiredWidth -= reservedSpace;
     // measure words
-    const data = words.map(
-      function (word) {
-        // if using splitByGrapheme words are already in graphemes.
-        word = splitByGrapheme ? word : this.graphemeSplit(word);
-        const width = this._measureWord(word, lineIndex, offset);
-        largestWordWidth = Math.max(width, largestWordWidth);
-        offset += word.length + 1;
-        return { word: word, width: width };
-      }.bind(this)
-    );
+    const data = words.map((word) => {
+      // if using splitByGrapheme words are already in graphemes.
+      word = splitByGrapheme ? word : this.graphemeSplit(word);
+      const width = this._measureWord(word, lineIndex, offset);
+      largestWordWidth = Math.max(width, largestWordWidth);
+      offset += word.length + 1;
+      return { word: word, width: width };
+    });
+
     const maxWidth = Math.max(
       desiredWidth,
       largestWordWidth,
@@ -350,8 +347,8 @@ export class Textbox extends IText {
     offset = 0;
     let i;
     for (i = 0; i < words.length; i++) {
-      word = data[i].word;
-      wordWidth = data[i].width;
+      const word = data[i].word;
+      const wordWidth = data[i].width;
       offset += word.length;
 
       lineWidth += infixWidth + wordWidth - additionalSpace;
