@@ -1108,14 +1108,8 @@ export class Text extends TextStyleMixin {
     top: number,
     lineIndex: number
   ) {
-    let lineHeight = this.getHeightOfLine(lineIndex),
+    const lineHeight = this.getHeightOfLine(lineIndex),
       isJustify = this.textAlign.indexOf('justify') !== -1,
-      actualStyle,
-      nextStyle,
-      charsToRender = '',
-      charBox,
-      boxWidth = 0,
-      timeToRender,
       path = this.path,
       shortCut =
         !isJustify &&
@@ -1126,8 +1120,16 @@ export class Text extends TextStyleMixin {
       sign = this.direction === 'ltr' ? 1 : -1,
       // this was changed in the PR #7674
       // currentDirection = ctx.canvas.getAttribute('dir');
-      drawingLeft,
       currentDirection = ctx.direction;
+
+    let actualStyle,
+      nextStyle,
+      charsToRender = '',
+      charBox,
+      boxWidth = 0,
+      timeToRender,
+      drawingLeft;
+
     ctx.save();
     if (currentDirection !== this.direction) {
       ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
