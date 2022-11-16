@@ -2,7 +2,14 @@
   function removeTranslate(str) {
     return str.replace(/matrix\(.*?\)/, '');
   }
-  QUnit.module('fabric.Text');
+  QUnit.module('fabric.Text SVG Export', {
+    before() {
+      fabric.config.configure({ NUM_FRACTION_DIGITS: 2 });
+    },
+    after() {
+      fabric.config.restoreDefaults();
+    }
+  });
   QUnit.test('toSVG', function(assert) {
     var TEXT_SVG = '<g transform=\"\" style=\"\"  >\n\t\t<text xml:space=\"preserve\" font-family=\"Times New Roman\" font-size=\"40\" font-style=\"normal\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;\" ><tspan x=\"-10\" y=\"12.57\" >x</tspan></text>\n</g>\n';
     var text = new fabric.Text('x');

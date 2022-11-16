@@ -58,7 +58,6 @@ import './src/filters/gamma_filter.class'; // optional image_filters
 import './src/filters/composed_filter.class'; // optional image_filters
 import './src/filters/hue_rotation.class'; // optional image_filters
 import './src/shapes/text.class'; // optional text
-import './src/mixins/text_style.mixin'; // optional text
 import './src/shapes/itext.class'; // optional itext
 import './src/mixins/itext_behavior.mixin'; // optional itext
 import './src/mixins/itext_click_behavior.mixin'; // optional itext
