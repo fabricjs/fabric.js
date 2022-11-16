@@ -84,8 +84,8 @@ export class Textbox extends IText {
   _generateStyleMap(textInfo) {
     let realLineCount = 0,
       realLineCharCount = 0,
-      charCount = 0,
-      map = {};
+      charCount = 0;
+    const map = {};
 
     for (let i = 0; i < textInfo.graphemeLines.length; i++) {
       if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
@@ -138,9 +138,8 @@ export class Textbox extends IText {
     let offset = 0,
       nextLineIndex = lineIndex + 1,
       nextOffset,
-      obj,
-      shouldLimit = false,
-      map = this._styleMap[lineIndex],
+      shouldLimit = false;
+    const map = this._styleMap[lineIndex],
       mapNextLine = this._styleMap[lineIndex + 1];
     if (map) {
       lineIndex = map.line;
@@ -151,7 +150,7 @@ export class Textbox extends IText {
       shouldLimit = nextLineIndex === lineIndex;
       nextOffset = mapNextLine.offset;
     }
-    obj =
+    const obj =
       typeof lineIndex === 'undefined'
         ? this.styles
         : { line: this.styles[lineIndex] };
@@ -245,11 +244,10 @@ export class Textbox extends IText {
    * @returns {Array} Array of lines
    */
   _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
-    let wrapped = [],
-      i;
+    const wrapped = [];
     this.isWrapping = true;
-    for (i = 0; i < lines.length; i++) {
-      wrapped.push.apply(wrapped, this._wrapLine(lines[i], i, desiredWidth));
+    for (let i = 0; i < lines.length; i++) {
+      wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
     }
     this.isWrapping = false;
     return wrapped;
@@ -267,11 +265,10 @@ export class Textbox extends IText {
    * @param {number} charOffset
    * @returns {number}
    */
-  _measureWord(word, lineIndex: number, charOffset: number): number {
+  _measureWord(word, lineIndex: number, charOffset = 0): number {
     let width = 0,
-      prevGrapheme,
-      skipLeft = true;
-    charOffset = charOffset || 0;
+      prevGrapheme;
+    const skipLeft = true;
     for (let i = 0, len = word.length; i < len; i++) {
       const box = this._getGraphemeBox(
         word[i],
@@ -351,7 +348,8 @@ export class Textbox extends IText {
     );
     // layout words
     offset = 0;
-    for (var i = 0; i < words.length; i++) {
+    let i;
+    for (i = 0; i < words.length; i++) {
       word = data[i].word;
       wordWidth = data[i].width;
       offset += word.length;
@@ -441,12 +439,12 @@ export class Textbox extends IText {
 
   _removeExtraneousStyles() {
     const linesToKeep = {};
-    for (var prop in this._styleMap) {
+    for (const prop in this._styleMap) {
       if (this._textLines[prop]) {
         linesToKeep[this._styleMap[prop].line] = 1;
       }
     }
-    for (var prop in this.styles) {
+    for (const prop in this.styles) {
       if (!linesToKeep[prop]) {
         delete this.styles[prop];
       }

@@ -436,16 +436,15 @@ export class IText extends Text {
   }
 
   _renderCursor(ctx, boundaries, selectionStart) {
-    let cursorLocation = this.get2DCursorLocation(selectionStart),
+    const cursorLocation = this.get2DCursorLocation(selectionStart),
       lineIndex = cursorLocation.lineIndex,
       charIndex =
         cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
       charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
       multiplier = this.scaleX * this.canvas.getZoom(),
       cursorWidth = this.cursorWidth / multiplier,
-      topOffset = boundaries.topOffset,
-      dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY');
-    topOffset +=
+      dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY'),
+    topOffset = boundaries.topOffset +
       ((1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex)) /
         this.lineHeight -
       charHeight * (1 - this._fontSizeFraction);
@@ -532,8 +531,8 @@ export class IText extends Text {
       endChar = end.charIndex < 0 ? 0 : end.charIndex;
 
     for (let i = startLine; i <= endLine; i++) {
-      let lineOffset = this._getLineLeftOffset(i) || 0,
-        lineHeight = this.getHeightOfLine(i),
+      const lineOffset = this._getLineLeftOffset(i) || 0;
+      let lineHeight = this.getHeightOfLine(i),
         realLineHeight = 0,
         boxStart = 0,
         boxEnd = 0;
@@ -562,9 +561,9 @@ export class IText extends Text {
         lineHeight /= this.lineHeight;
       }
       let drawStart = boundaries.left + lineOffset + boxStart,
-        drawWidth = boxEnd - boxStart,
         drawHeight = lineHeight,
         extraTop = 0;
+      const drawWidth = boxEnd - boxStart;
       if (this.inCompositionMode) {
         ctx.fillStyle = this.compositionColor || 'black';
         drawHeight = 1;
