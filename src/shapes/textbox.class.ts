@@ -306,7 +306,7 @@ export class Textbox extends IText {
     _line,
     lineIndex: number,
     desiredWidth: number,
-    reservedSpace = 0,
+    reservedSpace = 0
   ): Array<any> {
     const additionalSpace = this._getWidthOfCharSpacing(),
       splitByGrapheme = this.splitByGrapheme,
@@ -322,7 +322,7 @@ export class Textbox extends IText {
       offset = 0,
       infixWidth = 0,
       largestWordWidth = 0,
-      lineJustStarted = true,
+      lineJustStarted = true;
     // fix a difference between split and graphemeSplit
     if (words.length === 0) {
       words.push([]);

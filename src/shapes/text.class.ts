@@ -767,11 +767,7 @@ export class Text extends TextStyleMixin {
       couple = previousChar + _char,
       stylesAreEqual = fontDeclaration === previousFontDeclaration,
       fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE;
-    let width,
-      coupleWidth,
-      previousWidth,
-      kernedWidth,
-      ctx;
+    let width, coupleWidth, previousWidth, kernedWidth, ctx;
 
     if (previousChar && fontCache[previousChar] !== undefined) {
       previousWidth = fontCache[previousChar];
@@ -873,7 +869,8 @@ export class Text extends TextStyleMixin {
     };
     if (path) {
       let positionInPath = 0;
-      const totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
+      const totalPathLength =
+        path.segmentsInfo[path.segmentsInfo.length - 1].length;
       const startingPoint = getPointOnPath(path.path, 0, path.segmentsInfo);
       startingPoint.x += path.pathOffset.x;
       startingPoint.y += path.pathOffset.y;

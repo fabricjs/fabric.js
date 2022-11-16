@@ -444,10 +444,11 @@ export class IText extends Text {
       multiplier = this.scaleX * this.canvas.getZoom(),
       cursorWidth = this.cursorWidth / multiplier,
       dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY'),
-    topOffset = boundaries.topOffset +
-      ((1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex)) /
-        this.lineHeight -
-      charHeight * (1 - this._fontSizeFraction);
+      topOffset =
+        boundaries.topOffset +
+        ((1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex)) /
+          this.lineHeight -
+        charHeight * (1 - this._fontSizeFraction);
 
     if (this.inCompositionMode) {
       // TODO: investigate why there isn't a return inside the if,
