@@ -269,13 +269,13 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       proj0 = projections[isStraightLine ? 0 : 2].subtract(newOrigin),
       proj1 = projections[isStraightLine ? 1 : 0].subtract(newOrigin),
       // when `isStraightLine` === true, we compare with the vector opposite AB, otherwise we compare with the bisector.
-      comparsionVector = isStraightLine
+      comparisonVector = isStraightLine
         ? this.applySkew(this.AB.scalarMultiply(-1))
         : this.applySkew(
             this.bisector.multiply(this.strokeUniformScalar).scalarMultiply(-1)
           ),
-      // the beginning of the circle segment is always to the right of the comparsion vector (cross product > 0)
-      isProj0Start = crossProduct(proj0, comparsionVector) > 0,
+      // the beginning of the circle segment is always to the right of the comparison vector (cross product > 0)
+      isProj0Start = crossProduct(proj0, comparisonVector) > 0,
       startCircle = isProj0Start ? proj0 : proj1,
       endCircle = isProj0Start ? proj1 : proj0;
     if (!this.isSkewed()) {
