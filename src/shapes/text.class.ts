@@ -888,7 +888,7 @@ export class Text extends TextStyleMixin {
       }
       positionInPath += this.pathStartOffset * (reverse ? -1 : 1);
       for (
-        i = reverse ? llength - 1 : 0;
+        let i = reverse ? llength - 1 : 0;
         reverse ? i >= 0 : i < llength;
         reverse ? i-- : i++
       ) {
@@ -1520,13 +1520,15 @@ export class Text extends TextStyleMixin {
       let boxWidth = 0;
       let lastDecoration = this.getValueOfPropertyAt(i, 0, type);
       let lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
+      let currentDecoration;
+      let currentFill;
       const top = topOffset + maxHeight * (1 - this._fontSizeFraction);
       let size = this.getHeightOfChar(i, 0);
       let dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
       for (let j = 0, jlen = line.length; j < jlen; j++) {
         const charBox = this.__charBounds[i][j];
-        const currentDecoration = this.getValueOfPropertyAt(i, j, type);
-        const currentFill = this.getValueOfPropertyAt(i, j, 'fill');
+        currentDecoration = this.getValueOfPropertyAt(i, j, type);
+        currentFill = this.getValueOfPropertyAt(i, j, 'fill');
         const currentSize = this.getHeightOfChar(i, j);
         const currentDy = this.getValueOfPropertyAt(i, j, 'deltaY');
         if (path && currentDecoration && currentFill) {
