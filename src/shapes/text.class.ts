@@ -842,26 +842,22 @@ export class Text extends TextStyleMixin {
    * measure every grapheme of a line, populating __charBounds
    * @param {Number} lineIndex
    * @return {Object} object.width total width of characters
-   * @return {Object} object.widthOfSpaces length of chars that match this._reSpacesAndTabs
+   * @return {Object} object.numOfSpaces length of chars that match this._reSpacesAndTabs
    */
   _measureLine(lineIndex: number): object {
     let width = 0,
-      i,
-      grapheme,
-      line = this._textLines[lineIndex],
       prevGrapheme,
-      graphemeInfo,
-      numOfSpaces = 0,
-      lineBounds = new Array(line.length),
-      positionInPath = 0,
-      startingPoint,
-      totalPathLength,
+      graphemeInfo;
+
+    const reverse = this.pathSide === 'right',
       path = this.path,
-      reverse = this.pathSide === 'right';
+      lineBounds = new Array(line.length),
+      line = this._textLines[lineIndex];
+
 
     this.__charBounds[lineIndex] = lineBounds;
-    for (i = 0; i < line.length; i++) {
-      grapheme = line[i];
+    for (let i = 0; i < line.length; i++) {
+      const grapheme = line[i];
       graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
       lineBounds[i] = graphemeInfo;
       width += graphemeInfo.kernedWidth;
@@ -876,8 +872,9 @@ export class Text extends TextStyleMixin {
       height: this.fontSize,
     };
     if (path) {
-      totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
-      startingPoint = getPointOnPath(path.path, 0, path.segmentsInfo);
+      let positionInPath = 0;
+      const totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
+      const startingPoint = getPointOnPath(path.path, 0, path.segmentsInfo);
       startingPoint.x += path.pathOffset.x;
       startingPoint.y += path.pathOffset.y;
       switch (this.textAlign) {
@@ -910,7 +907,7 @@ export class Text extends TextStyleMixin {
         positionInPath += graphemeInfo.kernedWidth;
       }
     }
-    return { width: width, numOfSpaces: numOfSpaces };
+    return { width: width, numOfSpaces: 0 };
   }
 
   /**
