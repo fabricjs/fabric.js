@@ -214,6 +214,7 @@ QUnit.module('stroke projection', (hooks) => {
                 width: 600,
                 height: 900,
                 fabricClass: 'Canvas',
+                disabled: fabric.isLikelyNode,
               });
             });
           });
@@ -250,6 +251,7 @@ QUnit.module('stroke projection', (hooks) => {
           width: 600,
           height: 900,
           fabricClass: 'Canvas',
+          disabled: fabric.isLikelyNode,
         });
       });
     });
@@ -293,6 +295,7 @@ QUnit.module('stroke projection', (hooks) => {
             width: 600,
             height: 900,
             fabricClass: 'Canvas',
+            disabled: fabric.isLikelyNode,
           });
         });
       });
