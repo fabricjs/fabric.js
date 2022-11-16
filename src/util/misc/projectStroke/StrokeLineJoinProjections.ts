@@ -219,17 +219,21 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       furthestY = new Point(
         // Safe guard due to floating point precision. In some situations the square root
         // was returning NaN because of a negative number close to zero.
-        Math.sqrt(circleRadius ** 2 - newY ** 2) || 0,
+        Math.sqrt(Math.max(circleRadius ** 2 - newY ** 2, 0)),
         newY
       ),
       newX = strokeUniform
         ? circleRadius /
-          scaleX /
-          Math.sqrt(1 / scaleX ** 2 + (1 / scaleY ** 2) * shearing.x ** 2)
-        : circleRadius / Math.sqrt(1 + shearing.x ** 2),
+          Math.sqrt(
+            1 +
+              (shearing.x ** 2 * (1 / scaleY) ** 2) /
+                (1 / scaleX + (1 / scaleX) * shearing.x * shearing.y) ** 2
+          )
+        : circleRadius /
+          Math.sqrt(1 + shearing.x ** 2 / (1 + shearing.x * shearing.y) ** 2),
       furthestX = new Point(
         newX,
-        Math.sqrt(circleRadius ** 2 - newX ** 2) || 0
+        Math.sqrt(Math.max(circleRadius ** 2 - newX ** 2, 0))
       );
 
     [

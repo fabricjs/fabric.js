@@ -120,7 +120,6 @@ QUnit.module('stroke projection', (hooks) => {
 
   // Test only miter limit
   const selectedMiterLimitCases = {
-    noMiterAfterMiterLimit2: generalCasesToTest.noMiterAfterMiterLimit2,
     acuteAngle: generalCasesToTest.acuteAngle,
     obtuseAngle: generalCasesToTest.obtuseAngle,
     convex: generalCasesToTest.convex,
@@ -189,11 +188,6 @@ QUnit.module('stroke projection', (hooks) => {
               [20, 0],
               [25, 35],
             ].forEach(([skewX, skewY]) => {
-              if (
-                strokeLineTypeCase === 'round' &&
-                (skewX !== 0) & (skewY !== 0)
-              )
-                return; // TODO: remove this line when fix strokeLineJoins equals `round` with `skewX`and `skewY` applied at sametime
               tests.push({
                 test: `${caseName} of type ${builderType} with ${strokeLineType}=${strokeLineTypeCase}, strokeUniform=${strokeUniform}, skewX=${skewX}, skewY=${skewY}, grouped=${group}`,
                 code: function (canvas, callback) {
@@ -232,37 +226,30 @@ QUnit.module('stroke projection', (hooks) => {
     const builder = fabric.Polygon;
     [5, 20, 120].forEach((strokeMiterLimit) => {
       [true, false].forEach((strokeUniform) => {
-        [
-          [0, 0],
-          [0, 30],
-          [20, 0],
-          [25, 35],
-        ].forEach(([skewX, skewY]) => {
-          tests.push({
-            test: `${caseName} with strokeMiterLimit=${strokeMiterLimit}, strokeUniform=${strokeUniform}, skewX=${skewX} and skewY=${skewY} values`,
-            code: function (canvas, callback) {
-              renderStrokeTest(
-                canvas,
-                {
-                  builder,
-                  points: casePoints,
-                },
-                {
-                  strokeLineJoin: 'miter',
-                  strokeUniform,
-                  strokeMiterLimit,
-                }
-              );
-              callback(canvas.lowerCanvasEl);
-            },
-            golden: `stroke-projection/strokeLineJoin/miter-limit/${caseName}-${
-              strokeUniform ? 'uniform-' : ''
-            }-${strokeMiterLimit}miterLimit-${skewX}skewX-${skewY}skewY.png`,
-            percentage: 0.001,
-            width: 600,
-            height: 900,
-            fabricClass: 'Canvas',
-          });
+        tests.push({
+          test: `${caseName} with strokeMiterLimit=${strokeMiterLimit}, strokeUniform=${strokeUniform} values`,
+          code: function (canvas, callback) {
+            renderStrokeTest(
+              canvas,
+              {
+                builder,
+                points: casePoints,
+              },
+              {
+                strokeLineJoin: 'miter',
+                strokeUniform,
+                strokeMiterLimit,
+              }
+            );
+            callback(canvas.lowerCanvasEl);
+          },
+          golden: `stroke-projection/strokeLineJoin/miter-limit/${caseName}-${
+            strokeUniform ? 'uniform-' : ''
+          }-${strokeMiterLimit}miterLimit.png`,
+          percentage: 0.001,
+          width: 600,
+          height: 900,
+          fabricClass: 'Canvas',
         });
       });
     });
@@ -279,8 +266,6 @@ QUnit.module('stroke projection', (hooks) => {
           [20, 0],
           [25, 35],
         ].forEach(([skewX, skewY]) => {
-          if (strokeLineCap === 'round' && (skewX !== 0) & (skewY !== 0))
-            return; // TODO: remove this line when fix strokeLineJoins equals `round` with `skewX`and `skewY` applied at sametime
           tests.push({
             test: `${testSinglePoint.name} of type ${builderType} with strokeLineCap=${strokeLineCap}, strokeUniform=${strokeUniform}, skewX=${skewX}, skewY=${skewY}`,
             code: function (canvas, callback) {
