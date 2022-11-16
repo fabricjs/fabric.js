@@ -14,6 +14,18 @@ import { toFixed } from '../util/misc/toFixed';
 import { FabricObject } from './fabricObject.class';
 import { fabricObjectDefaultValues } from './object.class';
 
+const strokeProjectionOptions: (keyof TProjectStrokeOnPointsOptions)[] = [
+  'scaleX',
+  'scaleY',
+  'skewX',
+  'skewY',
+  'strokeLineCap',
+  'strokeLineJoin',
+  'strokeMiterLimit',
+  'strokeUniform',
+  'strokeWidth',
+];
+
 export function polyFromElement<
   T extends {
     new (points: IPoint[], options: any): any;
@@ -77,6 +89,8 @@ export class Polyline extends FabricObject {
   pathOffset: Point;
 
   strokeOffset: Point;
+
+  strokeDiff: Point;
 
   /**
    * Constructor
@@ -202,17 +216,30 @@ export class Polyline extends FabricObject {
    *
    * @private
    */
-  _getTransformedDimensions(options: Partial<TProjectStrokeOnPointsOptions>) {
-    return this.exactBoundingBox
-      ? super._getTransformedDimensions({
-          ...(options || {}),
-          // disable stroke bbox calculations
-          strokeWidth: 0,
-          // disable skewing bbox calculations
-          skewX: 0,
-          skewY: 0,
-        })
-      : super._getTransformedDimensions(options);
+  _getTransformedDimensions(options: any = {}) {
+    if (this.exactBoundingBox) {
+      let size: Point;
+      if (
+        Object.keys(options).some((key) =>
+          strokeProjectionOptions.includes(
+            key as keyof TProjectStrokeOnPointsOptions
+          )
+        )
+      ) {
+        const { width, height } = this._calcDimensions(options);
+        size = new Point(options.width ?? width, options.height ?? height);
+      } else {
+        size = new Point(
+          options.width ?? this.width,
+          options.height ?? this.height
+        );
+      }
+      return size.multiply(
+        new Point(options.scaleX || this.scaleX, options.scaleY || this.scaleY)
+      );
+    } else {
+      return super._getTransformedDimensions(options);
+    }
   }
 
   /**
