@@ -212,7 +212,8 @@ export class Polyline extends FabricObject {
 
   /**
    * @override stroke and skewing are taken into account when projecting stroke on points,
-   * therefore we don't want the default calculation to account for skewing as well
+   * therefore we don't want the default calculation to account for skewing as well.
+   * Though it is possible to pass `width` and `height` in `options`, doing so is very strange, use with discretion.
    *
    * @private
    */
