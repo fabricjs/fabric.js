@@ -255,8 +255,7 @@ export class Polyline extends FabricObject {
       changed &&
       (((key === 'scaleX' || key === 'scaleY') &&
         this.strokeUniform &&
-        this.strokeBBoxAffectingProperties.includes('strokeUniform') &&
-        this.strokeLineJoin !== 'round') ||
+        this.strokeBBoxAffectingProperties.includes('strokeUniform')) ||
         this.strokeBBoxAffectingProperties.includes(key as keyof this))
     ) {
       this.setDimensions();
