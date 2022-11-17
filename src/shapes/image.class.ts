@@ -1,7 +1,17 @@
 ////@ts-nocheck
+import { TClassProperties } from '../typedefs';
+import { cleanUpJsdomNode } from '../util/dom_misc';
+import { createCanvasElement } from '../util/misc/dom';
+import { findScaleToFit, findScaleToCover } from '../util/misc/findScaleTo';
+import {
+  loadImage,
+  enlivenObjects,
+  enlivenObjectEnlivables,
+} from '../util/misc/objectEnlive';
+import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
 import { FabricObject } from './fabricObject.class';
 
-var fabric = global.fabric,
+const fabric = global.fabric,
   extend = object.extend;
 /**
  * Image class
@@ -91,6 +101,18 @@ export class Image extends FabricObject {
    */
   imageSmoothing: boolean;
 
+  protected src: string;
+
+  preserveAspectRatio: string;
+
+  static filters: any;
+  filters: any[];
+  resizeFilter: any;
+
+  _element: CanvasImageSource;
+  _originalElement: CanvasImageSource;
+  _filteredEl: CanvasImageSource;
+
   /**
    * Constructor
    * Image can be initialized with any canvas drawable or a string.
@@ -104,7 +126,7 @@ export class Image extends FabricObject {
   constructor(element: CanvasImageSource, options) {
     options || (options = {});
     this.filters = [];
-    this.cacheKey = 'texture' + FabricObject.__uid++;
+    this.cacheKey = `texture${FabricObject.__uid++}`;
     super(options);
     this._initElement(element, options);
   }
@@ -126,9 +148,9 @@ export class Image extends FabricObject {
    * @return {Image} thisArg
    * @chainable
    */
-  setElement(element, options) {
+  setElement(element: CanvasImageSource, options) {
     this.removeTexture(this.cacheKey);
-    this.removeTexture(this.cacheKey + '_filtered');
+    this.removeTexture(`${this.cacheKey}_filtered`);
     this._element = element;
     this._originalElement = element;
     this._initConfig(options);
@@ -149,8 +171,8 @@ export class Image extends FabricObject {
   /**
    * Delete a single texture if in webgl mode
    */
-  removeTexture(key) {
-    var backend = fabric.filterBackend;
+  removeTexture(key: string) {
+    const backend = fabric.filterBackend;
     if (backend && backend.evictCachesForKey) {
       backend.evictCachesForKey(key);
     }
@@ -162,13 +184,13 @@ export class Image extends FabricObject {
   dispose() {
     super.dispose();
     this.removeTexture(this.cacheKey);
-    this.removeTexture(this.cacheKey + '_filtered');
+    this.removeTexture(`${this.cacheKey}_filtered`);
     this._cacheContext = undefined;
     ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'].forEach(
-      function (element) {
+      (element) => {
         cleanUpJsdomNode(this[element]);
         this[element] = undefined;
-      }.bind(this)
+      }
     );
   }
 
@@ -184,7 +206,7 @@ export class Image extends FabricObject {
    * @return {Object} Object with "width" and "height" properties
    */
   getOriginalSize() {
-    var element = this.getElement();
+    const element = this.getElement();
     return {
       width: element.naturalWidth || element.width,
       height: element.naturalHeight || element.height,
@@ -199,7 +221,7 @@ export class Image extends FabricObject {
     if (!this.stroke || this.strokeWidth === 0) {
       return;
     }
-    var w = this.width / 2,
+    const w = this.width / 2,
       h = this.height / 2;
     ctx.beginPath();
     ctx.moveTo(-w, -h);
@@ -216,25 +238,19 @@ export class Image extends FabricObject {
    * @return {Object} Object representation of an instance
    */
   toObject(propertiesToInclude) {
-    var filters = [];
-
-    this.filters.forEach(function (filterObj) {
-      if (filterObj) {
-        filters.push(filterObj.toObject());
-      }
+    const filters = [];
+    this.filters.forEach((filterObj) => {
+      filterObj && filters.push(filterObj.toObject());
     });
-    var object = extend(
-      super.toObject(['cropX', 'cropY'].concat(propertiesToInclude)),
-      {
-        src: this.getSrc(),
-        crossOrigin: this.getCrossOrigin(),
-        filters: filters,
-      }
-    );
-    if (this.resizeFilter) {
-      object.resizeFilter = this.resizeFilter.toObject();
-    }
-    return object;
+    return {
+      ...super.toObject(['cropX', 'cropY', ...propertiesToInclude]),
+      src: this.getSrc(),
+      crossOrigin: this.getCrossOrigin(),
+      filters,
+      ...(this.resizeFilter
+        ? { resizeFilter: this.resizeFilter.toObject() }
+        : {}),
+    };
   }
 
   /**
@@ -256,7 +272,7 @@ export class Image extends FabricObject {
    * of the instance
    */
   _toSVG() {
-    var svgString = [],
+    let svgString = [],
       imageMarkup = [],
       strokeSvg,
       element = this._element,
@@ -268,7 +284,7 @@ export class Image extends FabricObject {
       return [];
     }
     if (this.hasCrop()) {
-      var clipPathId = FabricObject.__uid++;
+      const clipPathId = FabricObject.__uid++;
       svgString.push(
         '<clipPath id="imageCrop_' + clipPathId + '">\n',
         '\t<rect x="' +
@@ -310,7 +326,7 @@ export class Image extends FabricObject {
     );
 
     if (this.stroke || this.strokeDashArray) {
-      var origFill = this.fill;
+      const origFill = this.fill;
       this.fill = null;
       strokeSvg = [
         '\t<rect ',
@@ -335,6 +351,12 @@ export class Image extends FabricObject {
     }
     return svgString;
   }
+  getSvgSrc(arg0: boolean): any {
+    throw new Error('Method not implemented.');
+  }
+  getSvgStyles(): any {
+    throw new Error('Method not implemented.');
+  }
 
   /**
    * Returns source of an image
@@ -342,7 +364,7 @@ export class Image extends FabricObject {
    * @return {String} Source of an image
    */
   getSrc(filtered) {
-    var element = filtered ? this._element : this._originalElement;
+    const element = filtered ? this._element : this._originalElement;
     if (element) {
       if (element.toDataURL) {
         return element.toDataURL();
@@ -369,7 +391,7 @@ export class Image extends FabricObject {
    * @return {Promise<Image>} thisArg
    */
   setSrc(src, options) {
-    var _this = this;
+    const _this = this;
     return loadImage(src, options).then(function (img) {
       _this.setElement(img, options);
       _this._setWidthHeight();
@@ -386,7 +408,7 @@ export class Image extends FabricObject {
   }
 
   applyResizeFilters() {
-    var filter = this.resizeFilter,
+    const filter = this.resizeFilter,
       minimumScale = this.minimumScaleTrigger,
       objectScale = this.getTotalObjectScaling(),
       scaleX = objectScale.x,
@@ -406,7 +428,7 @@ export class Image extends FabricObject {
     if (!fabric.filterBackend) {
       fabric.filterBackend = fabric.initFilterBackend();
     }
-    var canvasEl = createCanvasElement(),
+    const canvasEl = createCanvasElement(),
       cacheKey = this._filteredEl ? this.cacheKey + '_filtered' : this.cacheKey,
       sourceWidth = elementToFilter.width,
       sourceHeight = elementToFilter.height;
@@ -437,13 +459,11 @@ export class Image extends FabricObject {
    */
   applyFilters(filters) {
     filters = filters || this.filters || [];
-    filters = filters.filter(function (filter) {
-      return filter && !filter.isNeutralState();
-    });
+    filters = filters.filter((filter) => filter && !filter.isNeutralState());
     this.set('dirty', true);
 
     // needs to clear out or WEBGL will not resize correctly
-    this.removeTexture(this.cacheKey + '_filtered');
+    this.removeTexture(`${this.cacheKey}_filtered`);
 
     if (filters.length === 0) {
       this._element = this._originalElement;
@@ -453,13 +473,13 @@ export class Image extends FabricObject {
       return this;
     }
 
-    var imgElement = this._originalElement,
+    const imgElement = this._originalElement,
       sourceWidth = imgElement.naturalWidth || imgElement.width,
       sourceHeight = imgElement.naturalHeight || imgElement.height;
 
     if (this._element === this._originalElement) {
       // if the element is the same we need to create a new element
-      var canvasEl = createCanvasElement();
+      const canvasEl = createCanvasElement();
       canvasEl.width = sourceWidth;
       canvasEl.height = sourceHeight;
       this._element = canvasEl;
@@ -536,11 +556,11 @@ export class Image extends FabricObject {
   }
 
   _renderFill(ctx) {
-    var elementToDraw = this._element;
+    const elementToDraw = this._element;
     if (!elementToDraw) {
       return;
     }
-    var scaleX = this._filterScalingX,
+    const scaleX = this._filterScalingX,
       scaleY = this._filterScalingY,
       w = this.width,
       h = this.height,
@@ -570,7 +590,7 @@ export class Image extends FabricObject {
    * @private
    */
   _needsResize() {
-    var scale = this.getTotalObjectScaling();
+    const scale = this.getTotalObjectScaling();
     return scale.x !== this._lastScaleX || scale.y !== this._lastScaleY;
   }
 
@@ -613,7 +633,7 @@ export class Image extends FabricObject {
    */
   _setWidthHeight(options) {
     options || (options = {});
-    var el = this.getElement();
+    const el = this.getElement();
     this.width = options.width || el.naturalWidth || el.width || 0;
     this.height = options.height || el.naturalHeight || el.height || 0;
   }
@@ -625,7 +645,7 @@ export class Image extends FabricObject {
    * @return {Object}
    */
   parsePreserveAspectRatioAttribute() {
-    var pAR = parsePreserveAspectRatioAttribute(this.preserveAspectRatio || ''),
+    let pAR = parsePreserveAspectRatioAttribute(this.preserveAspectRatio || ''),
       rWidth = this._element.width,
       rHeight = this._element.height,
       scaleX = 1,
@@ -719,13 +739,13 @@ export class Image extends FabricObject {
    * @returns {Promise<Image>}
    */
   static fromObject(object, options) {
-    var _object = Object.assign({}, object),
+    const _object = Object.assign({}, object),
       filters = _object.filters,
       resizeFilter = _object.resizeFilter;
     // the generic enliving will fail on filters for now
     delete _object.resizeFilter;
     delete _object.filters;
-    var imageOptions = Object.assign({}, options, {
+    const imageOptions = Object.assign({}, options, {
         crossOrigin: _object.crossOrigin,
       }),
       filterOptions = Object.assign({}, options, {
@@ -771,7 +791,7 @@ export class Image extends FabricObject {
    * @return {Image} Instance of Image
    */
   static fromElement(element, callback, options) {
-    var parsedAttributes = fabric.parseAttributes(
+    const parsedAttributes = fabric.parseAttributes(
       element,
       Image.ATTRIBUTE_NAMES
     );
