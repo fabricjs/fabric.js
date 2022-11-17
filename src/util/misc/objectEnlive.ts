@@ -134,7 +134,7 @@ export const enlivenObjectEnlivables = (
   serializedObject: any,
   { signal }: { signal?: AbortSignal } = {}
 ) =>
-  new Promise((resolve, reject) => {
+  new Promise<Record<string, any>>((resolve, reject) => {
     const instances: any[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     // enlive every possible property
