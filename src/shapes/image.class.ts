@@ -759,8 +759,8 @@ export class Image extends FabricObject {
       resizeFilter && enlivenObjects([resizeFilter], filterOptions),
       enlivenObjectEnlivables(object, options),
     ]).then(
-      ([img, filters = [], [resizeFilter], hydratedProps]) =>
-        new Image(img, {
+      ([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) =>
+        new Image(el, {
           ...object,
           crossOrigin,
           filters,
