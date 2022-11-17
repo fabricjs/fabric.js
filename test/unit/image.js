@@ -296,7 +296,7 @@
     var done = assert.async();
     createImageObject(function(image) {
       assert.ok(typeof image.toString === 'function');
-      assert.equal(image.toString(), '#<fabric.Image: { src: "' + image.getSrc() + '" }>');
+      assert.equal(image.toString(), '#<Image: { src: "' + image.getSrc() + '" }>');
       done();
     });
   });
