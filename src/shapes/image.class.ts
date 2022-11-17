@@ -646,9 +646,8 @@ export class Image extends FabricObject {
    * Calculate offset for center and scale factor for the image in order to respect
    * the preserveAspectRatio attribute
    * @private
-   * @return {Object}
    */
-  parsePreserveAspectRatioAttribute(): object {
+  parsePreserveAspectRatioAttribute() {
     let pAR = parsePreserveAspectRatioAttribute(this.preserveAspectRatio || ''),
       rWidth = this._element.width,
       rHeight = this._element.height,
