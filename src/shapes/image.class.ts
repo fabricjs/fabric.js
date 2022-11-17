@@ -126,10 +126,16 @@ export class Image extends FabricObject {
    * @param {Object} [options] Options object
    */
   constructor(element: ImageSource, options: any = {}) {
-    super(options);
+    super();
     this.filters = [];
     this.cacheKey = `texture${FabricObject.__uid++}`;
-    this._initElement(element, options);
+    this.setElement(
+      (typeof element === 'string' &&
+        fabric.document.getElementById(element)) ||
+        element,
+      options
+    );
+    this.set(options);
   }
 
   /**
@@ -144,17 +150,16 @@ export class Image extends FabricObject {
    * If filters defined they are applied to new image.
    * You might need to call `canvas.renderAll` and `object.setCoords` after replacing, to render new image and update controls area.
    * @param {HTMLImageElement} element
-   * @param {Object} [options] Options object
+   * @param {Object} [size] Options object
    * @return {Image} thisArg
    * @chainable
    */
-  setElement(element: ImageSource, options: object = {}): Image {
+  setElement(element: ImageSource, size: Partial<TSize> = {}): Image {
     this.removeTexture(this.cacheKey);
     this.removeTexture(`${this.cacheKey}_filtered`);
     this._element = element;
     this._originalElement = element;
-    this.set(options);
-    this._setWidthHeight(options);
+    this._setWidthHeight(size);
     element.classList.add(Image.CSS_CANVAS);
     if (this.filters.length !== 0) {
       this.applyFilters();
@@ -166,7 +171,6 @@ export class Image extends FabricObject {
     if (this.resizeFilter) {
       this.applyResizeFilters();
     }
-    return this;
   }
 
   /**
@@ -401,10 +405,10 @@ export class Image extends FabricObject {
    * @param {LoadImageOptions} [options] Options object
    * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
    */
-  setSrc(src: string, options: LoadImageOptions) {
-    return loadImage(src, options).then((img) => {
-      this.setElement(img, options);
-      this._setWidthHeight();
+  setSrc(src: string, { crossOrigin, signal }: LoadImageOptions) {
+    return loadImage(src, { crossOrigin, signal }).then((img) => {
+      typeof crossOrigin !== 'undefined' && this.set({ crossOrigin });
+      this.setElement(img);
     });
   }
 
@@ -598,35 +602,22 @@ export class Image extends FabricObject {
 
   /**
    * @private
+   * @deprecated unused
    */
   _resetWidthHeight() {
     this.set(this.getOriginalSize());
   }
 
   /**
-   * The Image class's initialization method. This method is automatically
-   * called by the constructor.
-   * @private
-   * @param {ImageSource|String} element The element representing the image
-   * @param {Object} [options] Options object
-   */
-  protected _initElement(element: ImageSource | string, options: object) {
-    this.setElement(
-      fabric.document.getElementById(element) || element,
-      options
-    );
-  }
-
-  /**
    * @private
    * Set the width and the height of the image object, using the element or the
    * options.
-   * @param {Object} [options] Object with width/height properties
+   * @param {Object} [size] Object with width/height properties
    */
-  _setWidthHeight(options: Partial<TSize> = {}) {
-    const size = { ...this.getOriginalSize(), ...options };
-    this.width = size.width || 0;
-    this.height = size.height || 0;
+  _setWidthHeight({ width, height }: Partial<TSize> = {}) {
+    const size = this.getOriginalSize();
+    this.width = width || size.width;
+    this.height = height || size.height;
   }
 
   /**
