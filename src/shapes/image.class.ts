@@ -1,18 +1,25 @@
-////@ts-nocheck
-import { TClassProperties } from '../typedefs';
+// @ts-nocheck
+import { fabric } from '../../HEADER';
+import { SHARED_ATTRIBUTES } from '../parser/attributes';
+import { parseAttributes } from '../parser/parseAttributes';
+import { TClassProperties, TSize } from '../typedefs';
 import { cleanUpJsdomNode } from '../util/dom_misc';
 import { createCanvasElement } from '../util/misc/dom';
-import { findScaleToFit, findScaleToCover } from '../util/misc/findScaleTo';
+import { findScaleToCover, findScaleToFit } from '../util/misc/findScaleTo';
 import {
-  loadImage,
-  enlivenObjects,
   enlivenObjectEnlivables,
+  enlivenObjects,
+  loadImage,
+  LoadImageOptions,
 } from '../util/misc/objectEnlive';
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
-import { FabricObject } from './fabricObject.class';
+import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
 
-const fabric = global.fabric,
-  extend = object.extend;
+export type ImageSource =
+  | HTMLImageElement
+  | HTMLVideoElement
+  | HTMLCanvasElement;
+
 /**
  * Image class
  * @class Image
@@ -22,7 +29,7 @@ const fabric = global.fabric,
  */
 export class Image extends FabricObject {
   /**
-   * When calling {@link Image.getSrc}, return value from element src with `element.getAttribute('src')`.
+   * When calling {@link getSrc}, return value from element src with `element.getAttribute('src')`.
    * This allows for relative urls as image src.
    * @since 2.7.0
    * @type Boolean
@@ -36,7 +43,7 @@ export class Image extends FabricObject {
    * if the Image got resized after the last Render
    * @type Number
    */
-  _lastScaleX: number;
+  protected _lastScaleX: number;
 
   /**
    * private
@@ -44,21 +51,21 @@ export class Image extends FabricObject {
    * if the Image got resized after the last Render
    * @type Number
    */
-  _lastScaleY: number;
+  protected _lastScaleY: number;
 
   /**
    * private
    * contains last value of scaling applied by the apply filter chain
    * @type Number
    */
-  _filterScalingX: number;
+  protected _filterScalingX: number;
 
   /**
    * private
    * contains last value of scaling applied by the apply filter chain
    * @type Number
    */
-  _filterScalingY: number;
+  protected _filterScalingY: number;
 
   /**
    * minimum scale factor under which any resizeFilter is triggered to resize the image
@@ -109,9 +116,9 @@ export class Image extends FabricObject {
   filters: any[];
   resizeFilter: any;
 
-  _element: CanvasImageSource;
-  _originalElement: CanvasImageSource;
-  _filteredEl: CanvasImageSource;
+  protected _element: ImageSource;
+  protected _originalElement: ImageSource;
+  protected _filteredEl: ImageSource;
 
   /**
    * Constructor
@@ -121,22 +128,19 @@ export class Image extends FabricObject {
    * Please check video element events for seeking.
    * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | String} element Image element
    * @param {Object} [options] Options object
-   * @return {Image} thisArg
    */
-  constructor(element: CanvasImageSource, options) {
-    options || (options = {});
+  constructor(element: ImageSource, options: any = {}) {
+    super(options);
     this.filters = [];
     this.cacheKey = `texture${FabricObject.__uid++}`;
-    super(options);
     this._initElement(element, options);
   }
 
   /**
    * Returns image element which this instance if based on
-   * @return {HTMLImageElement} Image element
    */
   getElement() {
-    return this._element || {};
+    return this._element;
   }
 
   /**
@@ -148,7 +152,7 @@ export class Image extends FabricObject {
    * @return {Image} thisArg
    * @chainable
    */
-  setElement(element: CanvasImageSource, options) {
+  setElement(element: ImageSource, options: object): Image {
     this.removeTexture(this.cacheKey);
     this.removeTexture(`${this.cacheKey}_filtered`);
     this._element = element;
@@ -185,10 +189,10 @@ export class Image extends FabricObject {
     super.dispose();
     this.removeTexture(this.cacheKey);
     this.removeTexture(`${this.cacheKey}_filtered`);
-    this._cacheContext = undefined;
+    this._cacheContext = null;
     ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'].forEach(
       (element) => {
-        cleanUpJsdomNode(this[element]);
+        cleanUpJsdomNode(this[element as keyof this]);
         this[element] = undefined;
       }
     );
@@ -198,15 +202,23 @@ export class Image extends FabricObject {
    * Get the crossOrigin value (of the corresponding image element)
    */
   getCrossOrigin() {
-    return this._originalElement && (this._originalElement.crossOrigin || null);
+    return (
+      this._originalElement &&
+      ((this._originalElement as any).crossOrigin || null)
+    );
   }
 
   /**
    * Returns original size of an image
-   * @return {Object} Object with "width" and "height" properties
    */
   getOriginalSize() {
     const element = this.getElement();
+    if (!element) {
+      return {
+        width: 0,
+        height: 0,
+      };
+    }
     return {
       width: element.naturalWidth || element.width,
       height: element.naturalHeight || element.height,
@@ -217,7 +229,7 @@ export class Image extends FabricObject {
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _stroke(ctx) {
+  _stroke(ctx: CanvasRenderingContext2D) {
     if (!this.stroke || this.strokeWidth === 0) {
       return;
     }
@@ -237,7 +249,7 @@ export class Image extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude) {
+  toObject(propertiesToInclude: (keyof this)[] = []): Record<string, any> {
     const filters = [];
     this.filters.forEach((filterObj) => {
       filterObj && filters.push(filterObj.toObject());
@@ -259,8 +271,8 @@ export class Image extends FabricObject {
    */
   hasCrop() {
     return (
-      this.cropX ||
-      this.cropY ||
+      !!this.cropX ||
+      !!this.cropY ||
       this.width < this._element.width ||
       this.height < this._element.height
     );
@@ -268,7 +280,7 @@ export class Image extends FabricObject {
 
   /**
    * Returns svg representation of an instance
-   * @return {Array} an array of strings with the specific svg representation
+   * @return {string[]} an array of strings with the specific svg representation
    * of the instance
    */
   _toSVG() {
@@ -351,19 +363,13 @@ export class Image extends FabricObject {
     }
     return svgString;
   }
-  getSvgSrc(arg0: boolean): any {
-    throw new Error('Method not implemented.');
-  }
-  getSvgStyles(): any {
-    throw new Error('Method not implemented.');
-  }
 
   /**
    * Returns source of an image
    * @param {Boolean} filtered indicates if the src is needed for svg
    * @return {String} Source of an image
    */
-  getSrc(filtered) {
+  getSrc(filtered?: boolean) {
     const element = filtered ? this._element : this._originalElement;
     if (element) {
       if (element.toDataURL) {
@@ -381,21 +387,25 @@ export class Image extends FabricObject {
   }
 
   /**
+   * Alias for getSrc
+   * @param filtered
+   * @deprecated
+   */
+  getSvgSrc(filtered?: boolean) {
+    return this.getSrc(filtered);
+  }
+
+  /**
    * Loads and sets source of an image\
    * **IMPORTANT**: It is recommended to abort loading tasks before calling this method to prevent race conditions and unnecessary networking
    * @param {String} src Source string (URL)
-   * @param {Object} [options] Options object
-   * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   * @param {String} [options.crossOrigin] crossOrigin value (one of "", "anonymous", "use-credentials")
+   * @param {LoadImageOptions} [options] Options object
    * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
-   * @return {Promise<Image>} thisArg
    */
-  setSrc(src, options) {
-    const _this = this;
-    return loadImage(src, options).then(function (img) {
-      _this.setElement(img, options);
-      _this._setWidthHeight();
-      return _this;
+  setSrc(src: string, options: LoadImageOptions) {
+    return loadImage(src, options).then((img) => {
+      this.setElement(img, options);
+      this._setWidthHeight();
     });
   }
 
@@ -403,8 +413,8 @@ export class Image extends FabricObject {
    * Returns string representation of an instance
    * @return {String} String representation of an instance
    */
-  toString() {
-    return '#<Image: { src: "' + this.getSrc() + '" }>';
+  toString(): string {
+    return `#<Image: { src: "${this.getSrc()}" }>`;
   }
 
   applyResizeFilters() {
@@ -429,7 +439,7 @@ export class Image extends FabricObject {
       fabric.filterBackend = fabric.initFilterBackend();
     }
     const canvasEl = createCanvasElement(),
-      cacheKey = this._filteredEl ? this.cacheKey + '_filtered' : this.cacheKey,
+      cacheKey = this._filteredEl ? `${this.cacheKey}_filtered` : this.cacheKey,
       sourceWidth = elementToFilter.width,
       sourceHeight = elementToFilter.height;
     canvasEl.width = sourceWidth;
@@ -454,11 +464,8 @@ export class Image extends FabricObject {
    * @method applyFilters
    * @param {Array} filters to be applied
    * @param {Boolean} forResizing specify if the filter operation is a resize operation
-   * @return {thisArg} return the Image object
-   * @chainable
    */
-  applyFilters(filters) {
-    filters = filters || this.filters || [];
+  applyFilters(filters = this.filters || []) {
     filters = filters.filter((filter) => filter && !filter.isNeutralState());
     this.set('dirty', true);
 
@@ -470,7 +477,6 @@ export class Image extends FabricObject {
       this._filteredEl = null;
       this._filterScalingX = 1;
       this._filterScalingY = 1;
-      return this;
     }
 
     const imgElement = this._originalElement,
@@ -514,14 +520,13 @@ export class Image extends FabricObject {
       this._filterScalingY =
         this._element.height / this._originalElement.height;
     }
-    return this;
   }
 
   /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _render(ctx) {
+  _render(ctx: CanvasRenderingContext2D) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
     if (this.isMoving !== true && this.resizeFilter && this._needsResize()) {
       this.applyResizeFilters();
@@ -535,9 +540,9 @@ export class Image extends FabricObject {
    * it will set the imageSmoothing for the draw operation
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  drawCacheOnCanvas(ctx) {
+  drawCacheOnCanvas(ctx: CanvasRenderingContext2D) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
-    FabricObject.prototype.drawCacheOnCanvas.call(this, ctx);
+    super.drawCacheOnCanvas(ctx);
   }
 
   /**
@@ -551,11 +556,11 @@ export class Image extends FabricObject {
    * A full performance audit should be done.
    * @return {Boolean}
    */
-  shouldCache() {
+  shouldCache(): boolean {
     return this.needsItsOwnCache();
   }
 
-  _renderFill(ctx) {
+  _renderFill(ctx: CanvasRenderingContext2D) {
     const elementToDraw = this._element;
     if (!elementToDraw) {
       return;
@@ -605,10 +610,10 @@ export class Image extends FabricObject {
    * The Image class's initialization method. This method is automatically
    * called by the constructor.
    * @private
-   * @param {HTMLImageElement|String} element The element representing the image
+   * @param {ImageSource|String} element The element representing the image
    * @param {Object} [options] Options object
    */
-  _initElement(element, options) {
+  protected _initElement(element: ImageSource | string, options: object) {
     this.setElement(
       fabric.document.getElementById(element) || element,
       options
@@ -619,7 +624,7 @@ export class Image extends FabricObject {
    * @private
    * @param {Object} [options] Options object
    */
-  _initConfig(options) {
+  _initConfig(options: object) {
     options || (options = {});
     this.setOptions(options);
     this._setWidthHeight(options);
@@ -631,11 +636,10 @@ export class Image extends FabricObject {
    * options.
    * @param {Object} [options] Object with width/height properties
    */
-  _setWidthHeight(options) {
-    options || (options = {});
-    const el = this.getElement();
-    this.width = options.width || el.naturalWidth || el.width || 0;
-    this.height = options.height || el.naturalHeight || el.height || 0;
+  _setWidthHeight(options: Partial<TSize> = {}) {
+    const size = { ...this.getOriginalSize(), ...options };
+    this.width = size.width || 0;
+    this.height = size.height || 0;
   }
 
   /**
@@ -644,7 +648,7 @@ export class Image extends FabricObject {
    * @private
    * @return {Object}
    */
-  parsePreserveAspectRatioAttribute() {
+  parsePreserveAspectRatioAttribute(): object {
     let pAR = parsePreserveAspectRatioAttribute(this.preserveAspectRatio || ''),
       rWidth = this._element.width,
       rHeight = this._element.height,
@@ -720,15 +724,21 @@ export class Image extends FabricObject {
   static CSS_CANVAS = 'canvas-img';
 
   /**
-   * List of attribute names to account for when parsing SVG element (used by {@link Image.fromElement})
+   * List of attribute names to account for when parsing SVG element (used by {@link fromElement})
    * @static
    * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
    */
-  static ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat(
-    'x y width height preserveAspectRatio xlink:href crossOrigin image-rendering'.split(
-      ' '
-    )
-  );
+  static ATTRIBUTE_NAMES = [
+    ...SHARED_ATTRIBUTES,
+    'x',
+    'y',
+    'width',
+    'height',
+    'preserveAspectRatio',
+    'xlink:href',
+    'crossOrigin',
+    'image-rendering',
+  ];
 
   /**
    * Creates an instance of Image from its object representation
@@ -738,47 +748,38 @@ export class Image extends FabricObject {
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<Image>}
    */
-  static fromObject(object, options) {
-    const _object = Object.assign({}, object),
-      filters = _object.filters,
-      resizeFilter = _object.resizeFilter;
-    // the generic enliving will fail on filters for now
-    delete _object.resizeFilter;
-    delete _object.filters;
-    const imageOptions = Object.assign({}, options, {
-        crossOrigin: _object.crossOrigin,
-      }),
-      filterOptions = Object.assign({}, options, {
-        namespace: Image.filters,
-      });
+  static fromObject(
+    { filters, resizeFilter, src, crossOrigin, ...object }: any,
+    options: { signal: AbortSignal }
+  ): Promise<Image> {
+    const imageOptions = { ...options, crossOrigin },
+      filterOptions = { ...options, namespace: Image.filters };
     return Promise.all([
-      loadImage(_object.src, imageOptions),
+      loadImage(src, imageOptions),
       filters && enlivenObjects(filters, filterOptions),
       resizeFilter && enlivenObjects([resizeFilter], filterOptions),
-      enlivenObjectEnlivables(_object, options),
-    ]).then(function (imgAndFilters) {
-      _object.filters = imgAndFilters[1] || [];
-      _object.resizeFilter = imgAndFilters[2] && imgAndFilters[2][0];
-      return new Image(
-        imgAndFilters[0],
-        Object.assign(_object, imgAndFilters[3])
-      );
-    });
+      enlivenObjectEnlivables(object, options),
+    ]).then(
+      ([img, filters = [], [resizeFilter], hydratedProps]) =>
+        new Image(img, {
+          ...object,
+          crossOrigin,
+          filters,
+          resizeFilter,
+          ...hydratedProps,
+        })
+    );
   }
 
   /**
    * Creates an instance of Image from an URL string
    * @static
    * @param {String} url URL to create an image from
-   * @param {object} [options] Options object
-   * @param {string} [options.crossOrigin] cors value for the image loading, default to anonymous
-   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @param {LoadImageOptions} [options] Options object
    * @returns {Promise<Image>}
    */
-  static fromURL(url, options) {
-    return loadImage(url, options || {}).then(function (img) {
-      return new Image(img, options);
-    });
+  static fromURL(url: string, options: LoadImageOptions = {}): Promise<Image> {
+    return loadImage(url, options).then((img) => new Image(img, options));
   }
 
   /**
@@ -788,17 +789,17 @@ export class Image extends FabricObject {
    * @param {Object} [options] Options object
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @param {Function} callback Callback to execute when Image object is created
-   * @return {Image} Instance of Image
    */
-  static fromElement(element, callback, options) {
-    const parsedAttributes = fabric.parseAttributes(
-      element,
-      Image.ATTRIBUTE_NAMES
-    );
-    Image.fromURL(
-      parsedAttributes['xlink:href'],
-      Object.assign({}, options || {}, parsedAttributes)
-    ).then(function (fabricImage) {
+  static fromElement(
+    element: SVGElement,
+    callback: (image: Image) => any,
+    options: { signal?: AbortSignal } = {}
+  ) {
+    const parsedAttributes = parseAttributes(element, Image.ATTRIBUTE_NAMES);
+    Image.fromURL(parsedAttributes['xlink:href'], {
+      ...options,
+      ...parsedAttributes,
+    }).then((fabricImage) => {
       callback(fabricImage);
     });
   }
@@ -813,11 +814,11 @@ export const imageDefaultValues: Partial<TClassProperties<Image>> = {
   _filterScalingX: 1,
   _filterScalingY: 1,
   minimumScaleTrigger: 0.5,
-  stateProperties: FabricObject.prototype.stateProperties.concat(
+  stateProperties: fabricObjectDefaultValues.stateProperties.concat(
     'cropX',
     'cropY'
   ),
-  cacheProperties: FabricObject.prototype.cacheProperties.concat(
+  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat(
     'cropX',
     'cropY'
   ),
@@ -829,10 +830,4 @@ export const imageDefaultValues: Partial<TClassProperties<Image>> = {
 
 Object.assign(Image.prototype, imageDefaultValues);
 
-/**
- * Alias for getSrc
- * @static
- */
-Image.prototype.getSvgSrc = Image.prototype.getSrc;
-
-/* _FROM_SVG_START_ */
+fabric.Image = Image;
