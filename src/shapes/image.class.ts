@@ -21,11 +21,7 @@ export type ImageSource =
   | HTMLCanvasElement;
 
 /**
- * Image class
- * @class Image
- * @extends FabricObject
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
- * @see {@link Image#initialize} for constructor definition
  */
 export class Image extends FabricObject {
   /**
@@ -152,12 +148,13 @@ export class Image extends FabricObject {
    * @return {Image} thisArg
    * @chainable
    */
-  setElement(element: ImageSource, options: object): Image {
+  setElement(element: ImageSource, options: object = {}): Image {
     this.removeTexture(this.cacheKey);
     this.removeTexture(`${this.cacheKey}_filtered`);
     this._element = element;
     this._originalElement = element;
-    this._initConfig(options);
+    this.set(options);
+    this._setWidthHeight(options);
     element.classList.add(Image.CSS_CANVAS);
     if (this.filters.length !== 0) {
       this.applyFilters();
@@ -174,6 +171,7 @@ export class Image extends FabricObject {
 
   /**
    * Delete a single texture if in webgl mode
+   * @todo make static and use instanceof WebGLBackend
    */
   removeTexture(key: string) {
     const backend = fabric.filterBackend;
@@ -193,6 +191,7 @@ export class Image extends FabricObject {
     ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'].forEach(
       (element) => {
         cleanUpJsdomNode(this[element as keyof this]);
+        // @ts-expect-error disposing
         this[element] = undefined;
       }
     );
@@ -618,16 +617,6 @@ export class Image extends FabricObject {
       fabric.document.getElementById(element) || element,
       options
     );
-  }
-
-  /**
-   * @private
-   * @param {Object} [options] Options object
-   */
-  _initConfig(options: object) {
-    options || (options = {});
-    this.setOptions(options);
-    this._setWidthHeight(options);
   }
 
   /**
