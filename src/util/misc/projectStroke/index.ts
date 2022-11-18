@@ -22,6 +22,7 @@ export const projectStrokeOnPoints = (
     return projections;
   }
 
+  // first we remove duplicate neighboring points
   const reduced = points.reduce(
     (reduced, point) => {
       if (!reduced[reduced.length - 1].eq(point)) {
