@@ -1,5 +1,5 @@
 import { IPoint, Point } from '../../../point.class';
-import { createVector, getOrthonormalVector, getUnitVector } from '../vectors';
+import { getOrthonormalVector, getUnitVector } from '../vectors';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
 import { TProjection, TProjectStrokeOnPointsOptions } from './types';
