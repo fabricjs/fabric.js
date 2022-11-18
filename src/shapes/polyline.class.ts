@@ -156,6 +156,7 @@ export class Polyline extends FabricObject {
         width: 0,
         height: 0,
         pathOffset: new Point(),
+        strokeOffset: new Point(),
         strokeDiff: new Point(),
       };
     }
@@ -193,9 +194,9 @@ export class Polyline extends FabricObject {
   }
 
   setBoundingBox(adjustPosition?: boolean) {
-    const { left, top, width, height, pathOffset, strokeDiff } =
+    const { left, top, width, height, pathOffset, strokeOffset, strokeDiff } =
       this._calcDimensions();
-    this.set({ width, height, pathOffset, strokeDiff });
+    this.set({ width, height, pathOffset, strokeOffset, strokeDiff });
     adjustPosition &&
       this.setPositionByOrigin(new Point(left, top), 'left', 'top');
   }
