@@ -1,4 +1,8 @@
+import { fabric } from '../../HEADER';
+import type { TWebGLPipelineState, T2DPipelineState, TWebGLUniformLocationMap, TWebGLAttributeLocationMap, TWebGLProgramCacheItem } from './typedefs';
 import { WebGLPrecision, webGLProbe } from './WebGLProbe';
+import { isWebGLPipelineState } from './typedefs';
+import { createCanvasElement } from '../util/misc/dom';
 
 /**
  * @namespace fabric.Image.filters
@@ -41,6 +45,14 @@ export class BaseFilter {
     void main() {
       gl_FragColor = texture2D(uTexture, vTexCoord);
     }`;
+
+ /**
+  * Name of the parameter that can be changed in the filter.
+  * Some filters have more than one paramenter and there is no
+  * mainParameter
+  * @private
+  */
+  mainParameter: '';
 
   /**
    * Constructor
@@ -102,14 +114,13 @@ export class BaseFilter {
       );
     }
 
-    var attributeLocations = this.getAttributeLocations(gl, program);
-    var uniformLocations = this.getUniformLocations(gl, program) || {};
+    const uniformLocations = this.getUniformLocations(gl, program);
     uniformLocations.uStepW = gl.getUniformLocation(program, 'uStepW');
     uniformLocations.uStepH = gl.getUniformLocation(program, 'uStepH');
     return {
-      program: program,
-      attributeLocations: attributeLocations,
-      uniformLocations: uniformLocations,
+      program,
+      attributeLocations: this.getAttributeLocations(gl, program),
+      uniformLocations,
     };
   }
 
@@ -120,7 +131,7 @@ export class BaseFilter {
   * @param {WebGLShaderProgram} program The shader program from which to take attribute locations.
   * @returns {Object} A map of attribute names to attribute locations.
   */
-  getAttributeLocations(gl, program) {
+  getAttributeLocations(gl: WebGLRenderingContext, program: WebGLProgram): TWebGLAttributeLocationMap {
     return {
       aPosition: gl.getAttribLocation(program, 'aPosition'),
     };
@@ -135,7 +146,7 @@ export class BaseFilter {
   * @param {WebGLShaderProgram} program The shader program from which to take uniform locations.
   * @returns {Object} A map of uniform names to uniform locations.
   */
-  getUniformLocations(/* gl, program */) {
+  getUniformLocations(gl: WebGLRenderingContext, program: WebGLProgram): TWebGLUniformLocationMap {
     // in case i do not need any special uniform i need to return an empty object
     return {};
   }
@@ -146,22 +157,20 @@ export class BaseFilter {
   * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
   * @param {Object} attributeLocations A map of shader attribute names to their locations.
   */
-  sendAttributeData(gl, attributeLocations, aPositionData) {
-    var attributeLocation = attributeLocations.aPosition;
-    var buffer = gl.createBuffer();
+  sendAttributeData(gl: WebGLRenderingContext, attributeLocations: Record<string, number>, aPositionData) {
+    const attributeLocation = attributeLocations.aPosition;
+    const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.enableVertexAttribArray(attributeLocation);
     gl.vertexAttribPointer(attributeLocation, 2, gl.FLOAT, false, 0, 0);
     gl.bufferData(gl.ARRAY_BUFFER, aPositionData, gl.STATIC_DRAW);
   }
 
-  _setupFrameBuffer(options) {
-    var gl = options.context,
-      width,
-      height;
+  _setupFrameBuffer(options: TWebGLPipelineState) {
+    const gl = options.context;
     if (options.passes > 1) {
-      width = options.destinationWidth;
-      height = options.destinationHeight;
+      const width = options.destinationWidth;
+      const height = options.destinationHeight;
       if (
         options.sourceWidth !== width ||
         options.sourceHeight !== height
@@ -187,10 +196,10 @@ export class BaseFilter {
     }
   }
 
-  _swapTextures(options) {
+  _swapTextures(options: TWebGLPipelineState) {
     options.passes--;
     options.pass++;
-    var temp = options.targetTexture;
+    const temp = options.targetTexture;
     options.targetTexture = options.sourceTexture;
     options.sourceTexture = temp;
   }
@@ -202,19 +211,15 @@ export class BaseFilter {
   * Other filters may need their own version ( ColorMatrix, HueRotation, gamma, ComposedFilter )
   * @param {Object} options
   **/
-  isNeutralState(/* options */) {
-    var main = this.mainParameter,
-      _class = fabric.Image.filters[this.type].prototype;
+  isNeutralState(/* options */): boolean {
+    const main = this.mainParameter,
+      // ts you are lying
+      proto = this.__proto__;
     if (main) {
-      if (Array.isArray(_class[main])) {
-        for (var i = _class[main].length; i--; ) {
-          if (this[main][i] !== _class[main][i]) {
-            return false;
-          }
-        }
-        return true;
+      if (Array.isArray(proto[main])) {
+        return proto[main].every((value: any, i: number) => value === this[main][i])
       } else {
-        return _class[main] === this[main];
+        return proto[main] === this[main];
       }
     } else {
       return false;
@@ -234,8 +239,8 @@ export class BaseFilter {
   * @param {WebGLRenderingContext} options.context The GL context used for rendering.
   * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
   */
-  applyTo(options) {
-    if (options.webgl) {
+  applyTo(options: TWebGLPipelineState | T2DPipelineState) {
+    if (isWebGLPipelineState(options)) {
       this._setupFrameBuffer(options);
       this.applyToWebGL(options);
       this._swapTextures(options);
@@ -249,9 +254,10 @@ export class BaseFilter {
   * @param {Object} options
   * @param {WebGLRenderingContext} options.context The GL context used for rendering.
   * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+  * @return {WebGLProgram} the compiled program shader
   */
-  retrieveShader(options) {
-    if (!options.programCache.hasOwnProperty(this.type)) {
+  retrieveShader(options: TWebGLPipelineState): TWebGLProgramCacheItem {
+    if (!options.programCache[this.type]) {
       options.programCache[this.type] = this.createProgram(options.context);
     }
     return options.programCache[this.type];
@@ -269,9 +275,9 @@ export class BaseFilter {
   * @param {WebGLRenderingContext} options.context The GL context used for rendering.
   * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
   */
-  applyToWebGL(options) {
-    var gl = options.context;
-    var shader = this.retrieveShader(options);
+  applyToWebGL(options: TWebGLPipelineState) {
+    const gl = options.context;
+    const shader = this.retrieveShader(options);
     if (options.pass === 0 && options.originalTexture) {
       gl.bindTexture(gl.TEXTURE_2D, options.originalTexture);
     } else {
@@ -292,14 +298,14 @@ export class BaseFilter {
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 
-  bindAdditionalTexture(gl, texture, textureUnit) {
+  bindAdditionalTexture(gl: WebGLRenderingContext, texture: WebGLTexture, textureUnit: number) {
     gl.activeTexture(textureUnit);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     // reset active texture to 0 as usual
     gl.activeTexture(gl.TEXTURE0);
   }
 
-  unbindAdditionalTexture(gl, textureUnit) {
+  unbindAdditionalTexture(gl: WebGLRenderingContext, textureUnit: number) {
     gl.activeTexture(textureUnit);
     gl.bindTexture(gl.TEXTURE_2D, null);
     gl.activeTexture(gl.TEXTURE0);
@@ -321,7 +327,7 @@ export class BaseFilter {
   * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
   * @param {Object} uniformLocations A map of shader uniform names to their locations.
   */
-  sendUniformData(/* gl, uniformLocations */) {
+  sendUniformData(gl: WebGLRenderingContext, uniformLocations: TWebGLUniformLocationMap): void {
     // Intentionally left blank.  Override me in subclasses.
   }
 
@@ -329,9 +335,9 @@ export class BaseFilter {
   * If needed by a 2d filter, this functions can create an helper canvas to be used
   * remember that options.targetCanvas is available for use till end of chain.
   */
-  createHelpLayer(options) {
+  createHelpLayer(options: T2DPipelineState) {
     if (!options.helpLayer) {
-      var helpLayer = document.createElement('canvas');
+      const helpLayer = createCanvasElement();
       helpLayer.width = options.sourceWidth;
       helpLayer.height = options.sourceHeight;
       options.helpLayer = helpLayer;
