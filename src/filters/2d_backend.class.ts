@@ -9,10 +9,6 @@ export class Canvas2dFilterBackend {
   dispose = noop;
   clearWebGLCaches = noop;
 
-  constructor() {
-    return this;
-  }
-
   /**
    * Experimental. This object is a sort of repository of help layers used to avoid
    * of recreating them during frequent filtering. If you are previewing a filter with
