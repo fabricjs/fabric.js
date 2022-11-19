@@ -43,26 +43,27 @@ export class Canvas2dFilterBackend {
     const imageData = ctx.getImageData(0, 0, sourceWidth, sourceHeight);
     const originalImageData = ctx.getImageData(0, 0, sourceWidth, sourceHeight);
     const pipelineState: T2DPipelineState = {
-      sourceWidth: sourceWidth,
-      sourceHeight: sourceHeight,
-      imageData: imageData,
+      sourceWidth,
+      sourceHeight,
+      imageData,
       originalEl: sourceElement,
-      originalImageData: originalImageData,
+      originalImageData,
       canvasEl: targetCanvas,
-      ctx: ctx,
+      ctx,
       filterBackend: this,
     };
     filters.forEach(function (filter) {
       filter.applyTo(pipelineState);
     });
+    const { imageData: imageDataPostFilter } = pipelineState;
     if (
-      pipelineState.imageData.width !== sourceWidth ||
-      pipelineState.imageData.height !== sourceHeight
+      imageDataPostFilter.width !== sourceWidth ||
+      imageDataPostFilter.height !== sourceHeight
     ) {
-      targetCanvas.width = pipelineState.imageData.width;
-      targetCanvas.height = pipelineState.imageData.height;
+      targetCanvas.width = imageDataPostFilter.width;
+      targetCanvas.height = imageDataPostFilter.height;
     }
-    ctx.putImageData(pipelineState.imageData, 0, 0);
+    ctx.putImageData(imageDataPostFilter, 0, 0);
     return pipelineState;
   }
 }

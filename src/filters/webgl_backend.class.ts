@@ -49,10 +49,8 @@ export class WebGLFilterBackend {
   resources = {};
 
   constructor({ tileSize = config.textureSize } = {}) {
-    if (tileSize) {
-      this.tileSize = tileSize;
-    }
-    this.setupGLContext(this.tileSize, this.tileSize);
+    this.tileSize = tileSize;
+    this.setupGLContext(tileSize, tileSize);
     this.captureGPUInfo();
   }
 
