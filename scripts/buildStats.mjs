@@ -48,7 +48,7 @@ export async function run({ github, context, a, b }) {
   const table = [
     ['file / KB (diff)', 'bundled', 'minified', 'gzipped'],
     ['---', '---', '---', '---'],
-    ..._.map(b.size, (_b, file) => {
+    ...Object.entries(b.size).map(([file, _b]) => {
       const _a = {
         bundled: 0,
         minified: 0,
@@ -99,7 +99,7 @@ export async function run_simple({ github, context, a, b }) {
   const table = [
     ['file / KB (diff)', 'bundled', 'minified'],
     ['---', '---', '---', '---'],
-    ..._.map(b.size, (_b, file) => {
+    ...Object.entries(b.size).map(([file, _b]) => {
       const _a = {
         bundled: 0,
         minified: 0,

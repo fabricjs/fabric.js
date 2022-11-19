@@ -57,7 +57,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const { run } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
+            const { run_simple } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
             const res = await run_simple({
               github,
               context,
