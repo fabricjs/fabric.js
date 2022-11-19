@@ -4,7 +4,7 @@ import { createCanvasElement } from '../util/misc/dom';
 import { Canvas2dFilterBackend } from './2d_backend.class';
 import { WebGLFilterBackend } from './webgl_backend.class';
 
-export const enum WebGLPrecision {
+export enum WebGLPrecision {
   low = 'lowp',
   medium = 'mediump',
   high = 'highp',
@@ -18,7 +18,7 @@ class WebGLProbe {
 
   private _maxTextureSize?: number;
 
-  private _webGLPrecision: WebGLPrecision;
+  private _webGLPrecision: WebGLPrecision | undefined;
 
   get maxTextureSize() {
     this.queryWebGL();
@@ -62,7 +62,7 @@ class WebGLProbe {
     const gl = canvas.getContext('webgl');
     if (gl) {
       this._maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-      this._webGLPrecision = WebGLPrecision.find((key) =>
+      this._webGLPrecision = Object.values(WebGLPrecision).find((key) =>
         this.testPrecision(gl, key)
       );
       console.log(`fabric: max texture size ${this._maxTextureSize}`);

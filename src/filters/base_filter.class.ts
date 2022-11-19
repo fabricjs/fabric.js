@@ -63,6 +63,14 @@ export abstract class BaseFilter {
   }
 
   /**
+   * just the compatibility layer until all classes are translated
+   * @param {Object} [options] Options object
+   */
+  initialize(options = {}) {
+    this.setOptions(options);
+  }
+
+  /**
    * Sets filter's properties from options
    * @param {Object} [options] Options object
    */
@@ -78,7 +86,7 @@ export abstract class BaseFilter {
    * @param {String} vertexSource vertexShader source for compilation
    */
   createProgram(gl: WebGLRenderingContext, fragmentSource: string = this.fragmentSource, vertexSource: string = this.vertexSource) {
-    if (webGLProbe.webGLPrecision !== WebGLPrecision.high) {
+    if (webGLProbe.webGLPrecision && webGLProbe.webGLPrecision !== WebGLPrecision.high) {
       fragmentSource = fragmentSource.replace(
         new RegExp(highPsourceCode, 'g'),
         highPsourceCode.replace(WebGLPrecision.high, webGLProbe.webGLPrecision),
@@ -377,3 +385,7 @@ export abstract class BaseFilter {
     return Promise.resolve(new fabric.Image.filters[object.type](object));
   };
 }
+
+fabric.Image.filters = {
+  BaseFilter
+};
