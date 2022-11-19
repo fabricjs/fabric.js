@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 const REQUESTED_COMMENTS_PER_PAGE = 20;
 
 const COMMENT_MARKER = '<!-- BUILD STATS COMMENT -->';
@@ -13,7 +11,7 @@ function printSize(a, b) {
   )}**)`;
 }
 
-function printSizeByte(a, b) {
+function printSizeKByte(a, b) {
   return printSize(a / 1024, b / 1024);
 }
 
@@ -48,7 +46,7 @@ export async function run({ github, context, a, b }) {
   const table = [
     ['file / KB (diff)', 'bundled', 'minified', 'gzipped'],
     ['---', '---', '---', '---'],
-    ..._.map(b.size, (_b, file) => {
+    ...Object.entries(b.size).map(([file, _b]) => {
       const _a = {
         bundled: 0,
         minified: 0,
@@ -57,9 +55,58 @@ export async function run({ github, context, a, b }) {
       };
       return [
         file,
-        printSizeByte(_a.bundled, _b.bundled),
-        printSizeByte(_a.minified, _b.minified),
-        printSizeByte(_a.gzipped, _b.gzipped),
+        printSizeKByte(_a.bundled, _b.bundled),
+        printSizeKByte(_a.minified, _b.minified),
+        printSizeKByte(_a.gzipped, _b.gzipped),
+      ];
+    }),
+  ];
+
+  const body = [
+    COMMENT_MARKER,
+    '**Build Stats**',
+    '',
+    ...table.map((row) => ['', ...row, ''].join(' | ')),
+    '',
+  ]
+    .join('\n')
+    .slice(0, MAX_COMMENT_CHARS);
+
+  const commentId = await findCommentId(github, context);
+
+  await (commentId
+    ? github.rest.issues.updateComment({
+        repo,
+        owner,
+        comment_id: commentId,
+        body,
+      })
+    : github.rest.issues.createComment({
+        repo,
+        owner,
+        issue_number: context.payload.pull_request.number,
+        body,
+      }));
+}
+
+export async function run_simple({ github, context, a, b }) {
+  const {
+    repo: { owner, repo },
+  } = context;
+
+  const table = [
+    ['file / KB (diff)', 'bundled', 'minified'],
+    ['---', '---', '---'],
+    ...Object.entries(b.size).map(([file, _b]) => {
+      const _a = {
+        bundled: 0,
+        minified: 0,
+        ...(a.size[file] || {}),
+      };
+      return [
+        file,
+        printSizeKByte(_a.bundled, _b.bundled),
+        printSizeKByte(_a.minified, _b.minified),
       ];
     }),
   ];

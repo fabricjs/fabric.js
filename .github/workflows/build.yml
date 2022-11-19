@@ -27,7 +27,7 @@ jobs:
           node-version: 16.x
       - run: npm ci
       - name: build stats
-        run: npm run build -- -s
+        run: npm run build
       - name: persist
         id: b
         uses: actions/github-script@v6
@@ -36,7 +36,7 @@ jobs:
           script: |
             const fs = require('fs');
             return JSON.stringify({
-              size: JSON.parse(fs.readFileSync('cli_output/build_size.json'))
+              size: { fabric: { minified: fs.statSync('dist/fabric.min.js').size, bundled: fs.statSync('dist/fabric.js').size } }
             });
       - name: checkout src files
         run: git checkout origin/master -- src
@@ -50,15 +50,15 @@ jobs:
           script: |
             const fs = require('fs');
             return JSON.stringify({
-              size: JSON.parse(fs.readFileSync('cli_output/build_size.json'))
+              size: { fabric: { minified: fs.statSync('dist/fabric.min.js').size, bundled: fs.statSync('dist/fabric.js').size } }
             });
       - name: process
         uses: actions/github-script@v6
         with:
           result-encoding: string
           script: |
-            const { run } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
-            const res = await run({
+            const { run_simple } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
+            const res = await run_simple({
               github,
               context,
               core,
