@@ -37,7 +37,7 @@ export type T2DPipelineState = {
   helpLayer?: HTMLCanvasElement;
 };
 
-export type TWebGLUniformLocationMap = Record<string, WebGLUniformLocation>;
+export type TWebGLUniformLocationMap = Record<string, WebGLUniformLocation | null>;
 
 export type TWebGLAttributeLocationMap = Record<string, number>;
 

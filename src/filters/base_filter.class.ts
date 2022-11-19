@@ -18,7 +18,7 @@ const highPsourceCode = `precision ${WebGLPrecision.high} float`;
  * @class fabric.Image.filters.BaseFilter
  * @memberOf fabric.Image.filters
  */
-export class BaseFilter {
+export abstract class BaseFilter {
   /**
    * Filter type
    * @param {String} type
@@ -52,7 +52,7 @@ export class BaseFilter {
   * mainParameter
   * @private
   */
-  mainParameter: '';
+  mainParameter?: keyof this;
 
   /**
    * Constructor
@@ -114,7 +114,7 @@ export class BaseFilter {
       );
     }
 
-    const uniformLocations = this.getUniformLocations(gl, program);
+    const uniformLocations = this.getUniformLocations(gl, program) || {};
     uniformLocations.uStepW = gl.getUniformLocation(program, 'uStepW');
     uniformLocations.uStepH = gl.getUniformLocation(program, 'uStepH');
     return {
@@ -146,10 +146,7 @@ export class BaseFilter {
   * @param {WebGLShaderProgram} program The shader program from which to take uniform locations.
   * @returns {Object} A map of uniform names to uniform locations.
   */
-  getUniformLocations(gl: WebGLRenderingContext, program: WebGLProgram): TWebGLUniformLocationMap {
-    // in case i do not need any special uniform i need to return an empty object
-    return {};
-  }
+  abstract getUniformLocations(gl: WebGLRenderingContext, program: WebGLProgram): TWebGLUniformLocationMap;
 
   /**
   * Send attribute data from this filter to its shader program on the GPU.
@@ -157,7 +154,7 @@ export class BaseFilter {
   * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
   * @param {Object} attributeLocations A map of shader attribute names to their locations.
   */
-  sendAttributeData(gl: WebGLRenderingContext, attributeLocations: Record<string, number>, aPositionData) {
+  sendAttributeData(gl: WebGLRenderingContext, attributeLocations: Record<string, number>, aPositionData: Float32Array) {
     const attributeLocation = attributeLocations.aPosition;
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -213,10 +210,11 @@ export class BaseFilter {
   **/
   isNeutralState(/* options */): boolean {
     const main = this.mainParameter,
-      // ts you are lying
+      // @ts-ignore ts you are lying
       proto = this.__proto__;
     if (main) {
-      if (Array.isArray(proto[main])) {
+      if (Array.isArray(proto[main]) && Array.isArray(this[main])) {
+        // @ts-ignore requires some kind of dynamic type thing, or delete, or leave it ignored
         return proto[main].every((value: any, i: number) => value === this[main][i])
       } else {
         return proto[main] === this[main];
@@ -248,6 +246,8 @@ export class BaseFilter {
       this.applyTo2d(options);
     }
   }
+
+  abstract applyTo2d(options: T2DPipelineState): void;
 
   /**
   * Retrieves the cached shader.
@@ -312,11 +312,13 @@ export class BaseFilter {
   }
 
   getMainParameter() {
-    return this[this.mainParameter];
+    return this.mainParameter ? this[this.mainParameter] : undefined;
   }
 
-  setMainParameter(value) {
-    this[this.mainParameter] = value;
+  setMainParameter(value: any) {
+    if (this.mainParameter) {
+      this[this.mainParameter] = value;
+    }
   }
 
   /**
@@ -349,12 +351,11 @@ export class BaseFilter {
   * @return {Object} Object representation of an instance
   */
   toObject() {
-    var object = { type: this.type }
-      mainP = this.mainParameter;
-    if (mainP) {
-      object[mainP] = this[mainP];
-    }
-    return object;
+    const mainP = this.mainParameter;
+    return {
+      type: this.type,
+      ...(mainP ? { [mainP]: this[mainP] } : {}),
+    };
   }
 
   /**
@@ -371,7 +372,8 @@ export class BaseFilter {
    * @param {Object} object Object to create an instance from
    * @returns {Promise<fabric.Image.filters.BaseFilter>}
    */
-  static fromObject = function (object) {
-   return Promise.resolve(new fabric.Image.filters[object.type](object));
+  static fromObject = function (object: any) {
+    // todo: the class registry her
+    return Promise.resolve(new fabric.Image.filters[object.type](object));
   };
 }
