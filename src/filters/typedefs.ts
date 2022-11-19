@@ -37,10 +37,12 @@ export type T2DPipelineState = {
   helpLayer?: HTMLCanvasElement;
 };
 
-export type TWebGLUniformLocationMap = Record<string, WebGLUniformLocation | null>;
+export type TWebGLUniformLocationMap = Record<
+  string,
+  WebGLUniformLocation | null
+>;
 
 export type TWebGLAttributeLocationMap = Record<string, number>;
-
 
 export type TWebGLProgramCacheItem = {
   program: WebGLProgram;
@@ -50,6 +52,8 @@ export type TWebGLProgramCacheItem = {
 
 export type TApplyFilterArgs = {};
 
-export const isWebGLPipelineState = (options: TWebGLPipelineState | T2DPipelineState): options is TWebGLPipelineState => {
+export const isWebGLPipelineState = (
+  options: TWebGLPipelineState | T2DPipelineState
+): options is TWebGLPipelineState => {
   return (options as TWebGLPipelineState).webgl !== undefined;
-}
+};

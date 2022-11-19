@@ -1,5 +1,11 @@
 import { fabric } from '../../HEADER';
-import type { TWebGLPipelineState, T2DPipelineState, TWebGLUniformLocationMap, TWebGLAttributeLocationMap, TWebGLProgramCacheItem } from './typedefs';
+import type {
+  TWebGLPipelineState,
+  T2DPipelineState,
+  TWebGLUniformLocationMap,
+  TWebGLAttributeLocationMap,
+  TWebGLProgramCacheItem,
+} from './typedefs';
 import { WebGLPrecision, webGLProbe } from './WebGLProbe';
 import { isWebGLPipelineState } from './typedefs';
 import { createCanvasElement } from '../util/misc/dom';
@@ -27,9 +33,9 @@ export abstract class BaseFilter {
   type = 'BaseFilter';
 
   /**
-  * Array of attributes to send with buffers. do not modify
-  * @private
-  */
+   * Array of attributes to send with buffers. do not modify
+   * @private
+   */
   vertexSource = `
     attribute vec2 aPosition;
     varying vec2 vTexCoord;
@@ -46,12 +52,12 @@ export abstract class BaseFilter {
       gl_FragColor = texture2D(uTexture, vTexCoord);
     }`;
 
- /**
-  * Name of the parameter that can be changed in the filter.
-  * Some filters have more than one paramenter and there is no
-  * mainParameter
-  * @private
-  */
+  /**
+   * Name of the parameter that can be changed in the filter.
+   * Some filters have more than one paramenter and there is no
+   * mainParameter
+   * @private
+   */
   mainParameter?: keyof this;
 
   /**
@@ -85,11 +91,18 @@ export abstract class BaseFilter {
    * @param {String} fragmentSource fragmentShader source for compilation
    * @param {String} vertexSource vertexShader source for compilation
    */
-  createProgram(gl: WebGLRenderingContext, fragmentSource: string = this.fragmentSource, vertexSource: string = this.vertexSource) {
-    if (webGLProbe.webGLPrecision && webGLProbe.webGLPrecision !== WebGLPrecision.high) {
+  createProgram(
+    gl: WebGLRenderingContext,
+    fragmentSource: string = this.fragmentSource,
+    vertexSource: string = this.vertexSource
+  ) {
+    if (
+      webGLProbe.webGLPrecision &&
+      webGLProbe.webGLPrecision !== WebGLPrecision.high
+    ) {
       fragmentSource = fragmentSource.replace(
         new RegExp(highPsourceCode, 'g'),
-        highPsourceCode.replace(WebGLPrecision.high, webGLProbe.webGLPrecision),
+        highPsourceCode.replace(WebGLPrecision.high, webGLProbe.webGLPrecision)
       );
     }
     const vertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -102,13 +115,21 @@ export abstract class BaseFilter {
     gl.shaderSource(vertexShader, vertexSource);
     gl.compileShader(vertexShader);
     if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
-      throw new Error(`Vertex shader compile error for ${this.type}: ${gl.getShaderInfoLog(vertexShader)}`);
+      throw new Error(
+        `Vertex shader compile error for ${this.type}: ${gl.getShaderInfoLog(
+          vertexShader
+        )}`
+      );
     }
 
     gl.shaderSource(fragmentShader, fragmentSource);
     gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
-      throw new Error(`Fragment shader compile error for ${this.type}: ${gl.getShaderInfoLog(fragmentShader)}`);
+      throw new Error(
+        `Fragment shader compile error for ${this.type}: ${gl.getShaderInfoLog(
+          fragmentShader
+        )}`
+      );
     }
 
     gl.attachShader(program, vertexShader);
@@ -117,8 +138,7 @@ export abstract class BaseFilter {
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       throw new Error(
         // eslint-disable-next-line prefer-template
-        'Shader link error for "${this.type}" ' +
-          gl.getProgramInfoLog(program)
+        'Shader link error for "${this.type}" ' + gl.getProgramInfoLog(program)
       );
     }
 
@@ -133,36 +153,46 @@ export abstract class BaseFilter {
   }
 
   /**
-  * Return a map of attribute names to WebGLAttributeLocation objects.
-  *
-  * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
-  * @param {WebGLShaderProgram} program The shader program from which to take attribute locations.
-  * @returns {Object} A map of attribute names to attribute locations.
-  */
-  getAttributeLocations(gl: WebGLRenderingContext, program: WebGLProgram): TWebGLAttributeLocationMap {
+   * Return a map of attribute names to WebGLAttributeLocation objects.
+   *
+   * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
+   * @param {WebGLShaderProgram} program The shader program from which to take attribute locations.
+   * @returns {Object} A map of attribute names to attribute locations.
+   */
+  getAttributeLocations(
+    gl: WebGLRenderingContext,
+    program: WebGLProgram
+  ): TWebGLAttributeLocationMap {
     return {
       aPosition: gl.getAttribLocation(program, 'aPosition'),
     };
   }
 
   /**
-  * Return a map of uniform names to WebGLUniformLocation objects.
-  *
-  * Intended to be overridden by subclasses.
-  *
-  * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
-  * @param {WebGLShaderProgram} program The shader program from which to take uniform locations.
-  * @returns {Object} A map of uniform names to uniform locations.
-  */
-  abstract getUniformLocations(gl: WebGLRenderingContext, program: WebGLProgram): TWebGLUniformLocationMap;
+   * Return a map of uniform names to WebGLUniformLocation objects.
+   *
+   * Intended to be overridden by subclasses.
+   *
+   * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
+   * @param {WebGLShaderProgram} program The shader program from which to take uniform locations.
+   * @returns {Object} A map of uniform names to uniform locations.
+   */
+  abstract getUniformLocations(
+    gl: WebGLRenderingContext,
+    program: WebGLProgram
+  ): TWebGLUniformLocationMap;
 
   /**
-  * Send attribute data from this filter to its shader program on the GPU.
-  *
-  * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
-  * @param {Object} attributeLocations A map of shader attribute names to their locations.
-  */
-  sendAttributeData(gl: WebGLRenderingContext, attributeLocations: Record<string, number>, aPositionData: Float32Array) {
+   * Send attribute data from this filter to its shader program on the GPU.
+   *
+   * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
+   * @param {Object} attributeLocations A map of shader attribute names to their locations.
+   */
+  sendAttributeData(
+    gl: WebGLRenderingContext,
+    attributeLocations: Record<string, number>,
+    aPositionData: Float32Array
+  ) {
     const attributeLocation = attributeLocations.aPosition;
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -176,10 +206,7 @@ export abstract class BaseFilter {
     if (options.passes > 1) {
       const width = options.destinationWidth;
       const height = options.destinationHeight;
-      if (
-        options.sourceWidth !== width ||
-        options.sourceHeight !== height
-      ) {
+      if (options.sourceWidth !== width || options.sourceHeight !== height) {
         gl.deleteTexture(options.targetTexture);
         options.targetTexture = options.filterBackend.createTexture(
           gl,
@@ -210,12 +237,12 @@ export abstract class BaseFilter {
   }
 
   /**
-  * Generic isNeutral implementation for one parameter based filters.
-  * Used only in image applyFilters to discard filters that will not have an effect
-  * on the image
-  * Other filters may need their own version ( ColorMatrix, HueRotation, gamma, ComposedFilter )
-  * @param {Object} options
-  **/
+   * Generic isNeutral implementation for one parameter based filters.
+   * Used only in image applyFilters to discard filters that will not have an effect
+   * on the image
+   * Other filters may need their own version ( ColorMatrix, HueRotation, gamma, ComposedFilter )
+   * @param {Object} options
+   **/
   isNeutralState(/* options */): boolean {
     const main = this.mainParameter,
       // @ts-ignore ts you are lying
@@ -223,7 +250,9 @@ export abstract class BaseFilter {
     if (main) {
       if (Array.isArray(proto[main]) && Array.isArray(this[main])) {
         // @ts-ignore requires some kind of dynamic type thing, or delete, or leave it ignored
-        return proto[main].every((value: any, i: number) => value === this[main][i])
+        return proto[main].every(
+          (value: any, i: number) => value === this[main][i]
+        );
       } else {
         return proto[main] === this[main];
       }
@@ -233,18 +262,18 @@ export abstract class BaseFilter {
   }
 
   /**
-  * Apply this filter to the input image data provided.
-  *
-  * Determines whether to use WebGL or Canvas2D based on the options.webgl flag.
-  *
-  * @param {Object} options
-  * @param {Number} options.passes The number of filters remaining to be executed
-  * @param {Boolean} options.webgl Whether to use webgl to render the filter.
-  * @param {WebGLTexture} options.sourceTexture The texture setup as the source to be filtered.
-  * @param {WebGLTexture} options.targetTexture The texture where filtered output should be drawn.
-  * @param {WebGLRenderingContext} options.context The GL context used for rendering.
-  * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
-  */
+   * Apply this filter to the input image data provided.
+   *
+   * Determines whether to use WebGL or Canvas2D based on the options.webgl flag.
+   *
+   * @param {Object} options
+   * @param {Number} options.passes The number of filters remaining to be executed
+   * @param {Boolean} options.webgl Whether to use webgl to render the filter.
+   * @param {WebGLTexture} options.sourceTexture The texture setup as the source to be filtered.
+   * @param {WebGLTexture} options.targetTexture The texture where filtered output should be drawn.
+   * @param {WebGLRenderingContext} options.context The GL context used for rendering.
+   * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+   */
   applyTo(options: TWebGLPipelineState | T2DPipelineState) {
     if (isWebGLPipelineState(options)) {
       this._setupFrameBuffer(options);
@@ -258,12 +287,12 @@ export abstract class BaseFilter {
   abstract applyTo2d(options: T2DPipelineState): void;
 
   /**
-  * Retrieves the cached shader.
-  * @param {Object} options
-  * @param {WebGLRenderingContext} options.context The GL context used for rendering.
-  * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
-  * @return {WebGLProgram} the compiled program shader
-  */
+   * Retrieves the cached shader.
+   * @param {Object} options
+   * @param {WebGLRenderingContext} options.context The GL context used for rendering.
+   * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+   * @return {WebGLProgram} the compiled program shader
+   */
   retrieveShader(options: TWebGLPipelineState): TWebGLProgramCacheItem {
     if (!options.programCache[this.type]) {
       options.programCache[this.type] = this.createProgram(options.context);
@@ -272,17 +301,17 @@ export abstract class BaseFilter {
   }
 
   /**
-  * Apply this filter using webgl.
-  *
-  * @param {Object} options
-  * @param {Number} options.passes The number of filters remaining to be executed
-  * @param {Boolean} options.webgl Whether to use webgl to render the filter.
-  * @param {WebGLTexture} options.originalTexture The texture of the original input image.
-  * @param {WebGLTexture} options.sourceTexture The texture setup as the source to be filtered.
-  * @param {WebGLTexture} options.targetTexture The texture where filtered output should be drawn.
-  * @param {WebGLRenderingContext} options.context The GL context used for rendering.
-  * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
-  */
+   * Apply this filter using webgl.
+   *
+   * @param {Object} options
+   * @param {Number} options.passes The number of filters remaining to be executed
+   * @param {Boolean} options.webgl Whether to use webgl to render the filter.
+   * @param {WebGLTexture} options.originalTexture The texture of the original input image.
+   * @param {WebGLTexture} options.sourceTexture The texture setup as the source to be filtered.
+   * @param {WebGLTexture} options.targetTexture The texture where filtered output should be drawn.
+   * @param {WebGLRenderingContext} options.context The GL context used for rendering.
+   * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
+   */
   applyToWebGL(options: TWebGLPipelineState) {
     const gl = options.context;
     const shader = this.retrieveShader(options);
@@ -292,11 +321,7 @@ export abstract class BaseFilter {
       gl.bindTexture(gl.TEXTURE_2D, options.sourceTexture);
     }
     gl.useProgram(shader.program);
-    this.sendAttributeData(
-      gl,
-      shader.attributeLocations,
-      options.aPosition
-    );
+    this.sendAttributeData(gl, shader.attributeLocations, options.aPosition);
 
     gl.uniform1f(shader.uniformLocations.uStepW, 1 / options.sourceWidth);
     gl.uniform1f(shader.uniformLocations.uStepH, 1 / options.sourceHeight);
@@ -306,7 +331,11 @@ export abstract class BaseFilter {
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 
-  bindAdditionalTexture(gl: WebGLRenderingContext, texture: WebGLTexture, textureUnit: number) {
+  bindAdditionalTexture(
+    gl: WebGLRenderingContext,
+    texture: WebGLTexture,
+    textureUnit: number
+  ) {
     gl.activeTexture(textureUnit);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     // reset active texture to 0 as usual
@@ -330,21 +359,24 @@ export abstract class BaseFilter {
   }
 
   /**
-  * Send uniform data from this filter to its shader program on the GPU.
-  *
-  * Intended to be overridden by subclasses.
-  *
-  * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
-  * @param {Object} uniformLocations A map of shader uniform names to their locations.
-  */
-  sendUniformData(gl: WebGLRenderingContext, uniformLocations: TWebGLUniformLocationMap): void {
+   * Send uniform data from this filter to its shader program on the GPU.
+   *
+   * Intended to be overridden by subclasses.
+   *
+   * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
+   * @param {Object} uniformLocations A map of shader uniform names to their locations.
+   */
+  sendUniformData(
+    gl: WebGLRenderingContext,
+    uniformLocations: TWebGLUniformLocationMap
+  ): void {
     // Intentionally left blank.  Override me in subclasses.
   }
 
   /**
-  * If needed by a 2d filter, this functions can create an helper canvas to be used
-  * remember that options.targetCanvas is available for use till end of chain.
-  */
+   * If needed by a 2d filter, this functions can create an helper canvas to be used
+   * remember that options.targetCanvas is available for use till end of chain.
+   */
   createHelpLayer(options: T2DPipelineState) {
     if (!options.helpLayer) {
       const helpLayer = createCanvasElement();
@@ -355,9 +387,9 @@ export abstract class BaseFilter {
   }
 
   /**
-  * Returns object representation of an instance
-  * @return {Object} Object representation of an instance
-  */
+   * Returns object representation of an instance
+   * @return {Object} Object representation of an instance
+   */
   toObject() {
     const mainP = this.mainParameter;
     return {
@@ -367,9 +399,9 @@ export abstract class BaseFilter {
   }
 
   /**
-  * Returns a JSON representation of an instance
-  * @return {Object} JSON
-  */
+   * Returns a JSON representation of an instance
+   * @return {Object} JSON
+   */
   toJSON() {
     // delegate, not alias
     return this.toObject();
@@ -387,5 +419,5 @@ export abstract class BaseFilter {
 }
 
 fabric.Image.filters = {
-  BaseFilter
+  BaseFilter,
 };
