@@ -148,7 +148,7 @@
     var done = assert.async();
     makePathObject(function(path) {
       assert.ok(typeof path.toString === 'function');
-      assert.equal(path.toString(), '#<fabric.Path (4): { "top": 100, "left": 100 }>');
+      assert.equal(path.toString(), '#<Path (4): { "top": 100, "left": 100 }>');
       done();
     });
   });
