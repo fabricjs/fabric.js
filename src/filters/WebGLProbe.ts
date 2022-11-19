@@ -14,21 +14,9 @@ export enum WebGLPrecision {
  * Lazy initialize WebGL contants
  */
 class WebGLProbe {
-  private initialized = false;
+  maxTextureSize?: number;
 
-  private _maxTextureSize?: number;
-
-  private _webGLPrecision: WebGLPrecision | undefined;
-
-  get maxTextureSize() {
-    this.queryWebGL();
-    return this._maxTextureSize;
-  }
-
-  get webGLPrecision() {
-    this.queryWebGL();
-    return this._webGLPrecision;
-  }
+  webGLPrecision: WebGLPrecision | undefined;
 
   /**
    * Tests if webgl supports certain precision
@@ -54,20 +42,19 @@ class WebGLProbe {
    * query browser for WebGL
    * @returns config object if true
    */
-  private queryWebGL() {
-    if (this.initialized || fabric.isLikelyNode) {
+  queryWebGL() {
+    if (fabric.isLikelyNode) {
       return;
     }
     const canvas = createCanvasElement();
     const gl = canvas.getContext('webgl');
     if (gl) {
-      this._maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-      this._webGLPrecision = Object.values(WebGLPrecision).find((key) =>
-        this.testPrecision(gl, key)
+      this.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+      this.webGLPrecision = Object.values(WebGLPrecision).find((precision) =>
+        this.testPrecision(gl, precision)
       );
-      console.log(`fabric: max texture size ${this._maxTextureSize}`);
+      console.log(`fabric: max texture size ${this.maxTextureSize}`);
     }
-    this.initialized = true;
   }
 
   isSupported(textureSize: number) {
@@ -80,6 +67,7 @@ export const webGLProbe = new WebGLProbe();
 export function initFilterBackend():
   | WebGLFilterBackend
   | Canvas2dFilterBackend {
+  webGLProbe.queryWebGL();
   if (config.enableGLFiltering && webGLProbe.isSupported(config.textureSize)) {
     return new WebGLFilterBackend({ tileSize: config.textureSize });
   } else {
