@@ -96,7 +96,7 @@ export async function run_simple({ github, context, a, b }) {
 
   const table = [
     ['file / KB (diff)', 'bundled', 'minified'],
-    ['---', '---', '---', ],
+    ['---', '---', '---'],
     ...Object.entries(b.size).map(([file, _b]) => {
       const _a = {
         bundled: 0,
