@@ -36,21 +36,8 @@ export abstract class BaseFilter {
    * Array of attributes to send with buffers. do not modify
    * @private
    */
-  vertexSource = `
-    attribute vec2 aPosition;
-    varying vec2 vTexCoord;
-    void main() {
-      vTexCoord = aPosition;
-      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
-    }`;
-
-  fragmentSource = `
-    ${highPsourceCode};
-    varying vec2 vTexCoord;
-    uniform sampler2D uTexture;
-    void main() {
-      gl_FragColor = texture2D(uTexture, vTexCoord);
-    }`;
+  vertexSource: string;
+  fragmentSource: string;
 
   /**
    * Name of the parameter that can be changed in the filter.
@@ -415,6 +402,24 @@ export abstract class BaseFilter {
     return Promise.resolve(new fabric.Image.filters[object.type](object));
   };
 }
+
+Object.assign(BaseFilter.prototype, {
+  vertexSource: `
+    attribute vec2 aPosition;
+    varying vec2 vTexCoord;
+    void main() {
+      vTexCoord = aPosition;
+      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
+    }`,
+
+  fragmentSource: `
+    ${highPsourceCode};
+    varying vec2 vTexCoord;
+    uniform sampler2D uTexture;
+    void main() {
+      gl_FragColor = texture2D(uTexture, vTexCoord);
+    }`,
+});
 
 fabric.Image.filters = {
   BaseFilter,
