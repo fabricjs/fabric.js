@@ -1,14 +1,9 @@
 /**
  * Canvas 2D filter backend.
  */
-import { noop } from '../constants';
 import { T2DPipelineState } from './typedefs';
 
 export class Canvas2dFilterBackend {
-  evictCachesForKey = noop;
-  dispose = noop;
-  clearWebGLCaches = noop;
-
   /**
    * Experimental. This object is a sort of repository of help layers used to avoid
    * of recreating them during frequent filtering. If you are previewing a filter with
