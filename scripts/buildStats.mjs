@@ -90,3 +90,52 @@ export async function run({ github, context, a, b }) {
         body,
       }));
 }
+
+export async function run_simple({ github, context, a, b }) {
+  const {
+    repo: { owner, repo },
+  } = context;
+
+  const table = [
+    ['file / KB (diff)', 'bundled', 'minified'],
+    ['---', '---', '---', '---'],
+    ..._.map(b.size, (_b, file) => {
+      const _a = {
+        bundled: 0,
+        minified: 0,
+        ...(a.size[file] || {}),
+      };
+      return [
+        file,
+        printSize(_a.bundled, _b.bundled),
+        printSize(_a.minified, _b.minified),
+      ];
+    }),
+  ];
+
+  const body = [
+    COMMENT_MARKER,
+    '**Build Stats**',
+    '',
+    ...table.map((row) => ['', ...row, ''].join(' | ')),
+    '',
+  ]
+    .join('\n')
+    .slice(0, MAX_COMMENT_CHARS);
+
+  const commentId = await findCommentId(github, context);
+
+  await (commentId
+    ? github.rest.issues.updateComment({
+        repo,
+        owner,
+        comment_id: commentId,
+        body,
+      })
+    : github.rest.issues.createComment({
+        repo,
+        owner,
+        issue_number: context.payload.pull_request.number,
+        body,
+      }));
+}
