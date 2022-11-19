@@ -4,14 +4,14 @@ const COMMENT_MARKER = '<!-- BUILD STATS COMMENT -->';
 
 const MAX_COMMENT_CHARS = 65536;
 
-function printSize(a, b, decimals = 3) {
+function printSize(a, b) {
   const diff = b - a;
-  return `${b.toFixed(decimals)} (**${Math.sign(diff) > 0 ? '+' : ''}${diff.toFixed(
-    diff !== 0 ? decimals : 0
+  return `${b.toFixed(3)} (**${Math.sign(diff) > 0 ? '+' : ''}${diff.toFixed(
+    diff !== 0 ? 3 : 0
   )}**)`;
 }
 
-function printSizeByte(a, b) {
+function printSizeKByte(a, b) {
   return printSize(a / 1024, b / 1024);
 }
 
@@ -55,9 +55,9 @@ export async function run({ github, context, a, b }) {
       };
       return [
         file,
-        printSizeByte(_a.bundled, _b.bundled),
-        printSizeByte(_a.minified, _b.minified),
-        printSizeByte(_a.gzipped, _b.gzipped),
+        printSizeKByte(_a.bundled, _b.bundled),
+        printSizeKByte(_a.minified, _b.minified),
+        printSizeKByte(_a.gzipped, _b.gzipped),
       ];
     }),
   ];
@@ -105,8 +105,8 @@ export async function run_simple({ github, context, a, b }) {
       };
       return [
         file,
-        printSize(_a.bundled, _b.bundled, 0),
-        printSize(_a.minified, _b.minified, 0),
+        printSizeKByte(_a.bundled, _b.bundled),
+        printSizeKByte(_a.minified, _b.minified),
       ];
     }),
   ];
