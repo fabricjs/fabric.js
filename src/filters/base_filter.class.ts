@@ -249,8 +249,8 @@ export abstract class BaseFilter {
       proto = this.__proto__;
     if (main) {
       if (Array.isArray(proto[main]) && Array.isArray(this[main])) {
-        // @ts-ignore requires some kind of dynamic type thing, or delete, or leave it ignored
         return proto[main].every(
+          // @ts-ignore requires some kind of dynamic type thing, or delete, or leave it ignored
           (value: any, i: number) => value === this[main][i]
         );
       } else {
@@ -366,12 +366,10 @@ export abstract class BaseFilter {
    * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
    * @param {Object} uniformLocations A map of shader uniform names to their locations.
    */
-  sendUniformData(
+  abstract sendUniformData(
     gl: WebGLRenderingContext,
     uniformLocations: TWebGLUniformLocationMap
-  ): void {
-    // Intentionally left blank.  Override me in subclasses.
-  }
+  ): void;
 
   /**
    * If needed by a 2d filter, this functions can create an helper canvas to be used
