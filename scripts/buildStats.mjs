@@ -1,15 +1,13 @@
-import _ from 'lodash';
-
 const REQUESTED_COMMENTS_PER_PAGE = 20;
 
 const COMMENT_MARKER = '<!-- BUILD STATS COMMENT -->';
 
 const MAX_COMMENT_CHARS = 65536;
 
-function printSize(a, b) {
+function printSize(a, b, decimals = 3) {
   const diff = b - a;
-  return `${b.toFixed(3)} (**${Math.sign(diff) > 0 ? '+' : ''}${diff.toFixed(
-    diff !== 0 ? 3 : 0
+  return `${b.toFixed(decimals)} (**${Math.sign(diff) > 0 ? '+' : ''}${diff.toFixed(
+    diff !== 0 ? decimals : 0
   )}**)`;
 }
 
@@ -98,7 +96,7 @@ export async function run_simple({ github, context, a, b }) {
 
   const table = [
     ['file / KB (diff)', 'bundled', 'minified'],
-    ['---', '---', '---', '---'],
+    ['---', '---', '---', ],
     ...Object.entries(b.size).map(([file, _b]) => {
       const _a = {
         bundled: 0,
@@ -107,8 +105,8 @@ export async function run_simple({ github, context, a, b }) {
       };
       return [
         file,
-        printSize(_a.bundled, _b.bundled),
-        printSize(_a.minified, _b.minified),
+        printSize(_a.bundled, _b.bundled, 0),
+        printSize(_a.minified, _b.minified, 0),
       ];
     }),
   ];
