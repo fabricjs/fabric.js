@@ -130,13 +130,13 @@ export class Image extends FabricObject {
     super();
     this.filters = [];
     this.cacheKey = `texture${FabricObject.__uid++}`;
+    this.set(options);
     this.setElement(
       (typeof element === 'string' &&
         fabric.document.getElementById(element)) ||
         element,
       options
     );
-    this.set(options);
   }
 
   /**
