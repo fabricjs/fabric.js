@@ -406,7 +406,7 @@ export class Image extends FabricObject {
    * @param {LoadImageOptions} [options] Options object
    * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
    */
-  setSrc(src: string, { crossOrigin, signal }: LoadImageOptions) {
+  setSrc(src: string, { crossOrigin, signal }: LoadImageOptions = {}) {
     return loadImage(src, { crossOrigin, signal }).then((img) => {
       typeof crossOrigin !== 'undefined' && this.set({ crossOrigin });
       this.setElement(img);
