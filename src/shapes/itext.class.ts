@@ -418,12 +418,12 @@ export class IText extends ITextClickBehaviorMixin {
       charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
       multiplier = this.scaleX * this.canvas.getZoom(),
       cursorWidth = this.cursorWidth / multiplier,
-      dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY');
-    const topOffset =
-      boundaries.topOffset +
-      ((1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex)) /
-        this.lineHeight -
-      charHeight * (1 - this._fontSizeFraction);
+      dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY'),
+      topOffset =
+        boundaries.topOffset +
+        ((1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex)) /
+          this.lineHeight -
+        charHeight * (1 - this._fontSizeFraction);
 
     if (this.inCompositionMode) {
       // TODO: investigate why there isn't a return inside the if,
@@ -536,10 +536,10 @@ export class IText extends ITextClickBehaviorMixin {
       if (this.lineHeight < 1 || (i === endLine && this.lineHeight > 1)) {
         lineHeight /= this.lineHeight;
       }
-      let drawStart = boundaries.left + lineOffset + boxStart;
+      let drawStart = boundaries.left + lineOffset + boxStart,
+        drawHeight = lineHeight,
+        extraTop = 0;
       const drawWidth = boxEnd - boxStart;
-      let drawHeight = lineHeight;
-      let extraTop = 0;
       if (this.inCompositionMode) {
         ctx.fillStyle = this.compositionColor || 'black';
         drawHeight = 1;
