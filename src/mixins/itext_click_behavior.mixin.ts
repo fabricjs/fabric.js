@@ -261,7 +261,7 @@ export abstract class ITextClickBehaviorMixin extends ITextKeyBehaviorMixin {
     }
     const lineLeftOffset = Math.abs(this._getLineLeftOffset(lineIndex));
     let width = lineLeftOffset * this.scaleX;
-    const jlen = this._textLines[lineIndex].length
+    const jlen = this._textLines[lineIndex].length;
     // handling of RTL: in order to get things work correctly,
     // we assume RTL writing is mirrored compared to LTR writing.
     // so in position detection we mirror the X offset, and when is time
