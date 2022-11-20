@@ -209,9 +209,9 @@ export class Group extends FabricObject {}
           'initialize',
           Object.assign({}, options, { angle: 0, skewX: 0, skewY: 0 })
         );
-        this.forEachObject(function (object) {
+        this.forEachObject((object) => {
           this.enterGroup(object, false);
-        }, this);
+        });
         this._applyLayoutStrategy({
           type: 'initialization',
           options: options,
@@ -228,7 +228,7 @@ export class Group extends FabricObject {}
         var prev = this[key];
         this.callSuper('_set', key, value);
         if (key === 'canvas' && prev !== value) {
-          this.forEachObject(function (object) {
+          this.forEachObject((object) => {
             object._set(key, value);
           });
         }
@@ -240,7 +240,7 @@ export class Group extends FabricObject {}
           });
         }
         if (key === 'interactive') {
-          this.forEachObject(this._watchObject.bind(this, value));
+          this.forEachObject((object) => this._watchObject(value, object));
         }
         return this;
       },
@@ -478,9 +478,7 @@ export class Group extends FabricObject {}
       setCoords: function () {
         this.callSuper('setCoords');
         this._shouldSetNestedCoords() &&
-          this.forEachObject(function (object) {
-            object.setCoords();
-          });
+          this.forEachObject((object) => object.setCoords());
       },
 
       /**
@@ -559,9 +557,9 @@ export class Group extends FabricObject {}
           this.set({ width: result.width, height: result.height });
           //  adjust objects to account for new center
           !context.objectsRelativeToGroup &&
-            this.forEachObject(function (object) {
+            this.forEachObject((object) => {
               this._adjustObjectPosition(object, diff);
-            }, this);
+            });
           //  clip path as well
           !isFirstLayout &&
             this.layout !== 'clip-path' &&
@@ -958,10 +956,10 @@ export class Group extends FabricObject {}
 
       dispose: function () {
         this._activeObjects = [];
-        this.forEachObject(function (object) {
+        this.forEachObject((object) => {
           this._watchObject(false, object);
-          object.dispose && object.dispose();
-        }, this);
+          object.dispose();
+        });
         this.callSuper('dispose');
       },
 

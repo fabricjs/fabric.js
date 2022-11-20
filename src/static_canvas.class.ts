@@ -1762,9 +1762,7 @@ import { pick } from './util/misc/pick';
       destroy: function () {
         this.destroyed = true;
         this.cancelRequestedRender();
-        this.forEachObject(function (object) {
-          object.dispose && object.dispose();
-        });
+        this.forEachObject((object) => object.dispose());
         this._objects = [];
         if (this.backgroundImage && this.backgroundImage.dispose) {
           this.backgroundImage.dispose();

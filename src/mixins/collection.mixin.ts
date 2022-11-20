@@ -65,24 +65,20 @@ export function createCollectionMixin(Klass: { new (...args: any[]): any }) {
 
     /**
      * Executes given function for each object in this group
+     * A simple shortcut for getObjects().forEach, before es6 was more complicated,
+     * now is just a shortcut.
      * @param {Function} callback
      *                   Callback invoked with current object as first argument,
      *                   index - as second and an array of all objects - as third.
-     *                   Callback is invoked in a context of Global Object (e.g. `window`)
-     *                   when no `context` argument is given
-     *
-     * @param {Object} context Context (aka thisObject)
      */
-    forEachObject<T>(
+    forEachObject(
       callback: (
-        this: T | undefined,
         object: FabricObject,
         index: number,
         array: FabricObject[]
       ) => any,
-      context?: T
     ) {
-      this.getObjects().forEach(callback.bind(context));
+      this.getObjects().forEach((object, index, objects) => callback(object, index, objects));
     }
 
     /**
