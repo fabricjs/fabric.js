@@ -1,9 +1,9 @@
 // @ts-nocheck
 import { fabric } from '../../HEADER';
+import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import { TClassProperties, TFiller } from '../typedefs';
 import { stylesFromArray } from '../util/misc/textStyles';
 import { FabricObject } from './fabricObject.class';
-import { Text } from './text.class';
 
 /**
  * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
@@ -55,7 +55,7 @@ import { Text } from './text.class';
  *   Select line:                    triple click
  * </pre>
  */
-export class IText extends Text {
+export class IText extends ITextClickBehaviorMixin {
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number
@@ -69,6 +69,10 @@ export class IText extends Text {
    * @default
    */
   selectionEnd: number;
+
+  compositionStart: number;
+
+  compositionEnd: number;
 
   /**
    * Color of text selection
@@ -137,37 +141,7 @@ export class IText extends Text {
   caching: boolean;
 
   /**
-   * DOM container to append the hiddenTextarea.
-   * An alternative to attaching to the document.body.
-   * Useful to reduce laggish redraw of the full document.body tree and
-   * also with modals event capturing that won't let the textarea take focus.
-   * @type HTMLElement
-   * @default
-   */
-  hiddenTextareaContainer?: HTMLElement | null;
 
-  /**
-   * @private
-   */
-  _reSpace: RegExp;
-
-  /**
-   * @private
-   */
-  _currentCursorOpacity: number;
-
-  /**
-   * @private
-   */
-  _selectionDirection: CanvasDirection;
-
-  /**
-   * Helps determining when the text is in composition, so that the cursor
-   * rendering is altered.
-   */
-  inCompositionMode: boolean;
-
-  /**
    * Constructor
    * @param {String} text Text string
    * @param {Object} [options] Options object
@@ -190,6 +164,7 @@ export class IText extends Text {
     } else {
       super._set(key, value);
     }
+    return this;
   }
 
   /**
@@ -347,7 +322,7 @@ export class IText extends Text {
    * @param {number} [index] index from start
    * @param {boolean} [skipCaching]
    */
-  _getCursorBoundaries(index: number, skipCaching: boolean) {
+  _getCursorBoundaries(index: number, skipCaching?: boolean) {
     if (typeof index === 'undefined') {
       index = this.selectionStart;
     }
@@ -368,7 +343,7 @@ export class IText extends Text {
    * @param {number} index index from start
    * @param {boolean} [skipCaching]
    */
-  _getCursorBoundariesOffsets(index: number, skipCaching: boolean) {
+  _getCursorBoundariesOffsets(index: number, skipCaching?: boolean) {
     if (skipCaching) {
       return this.__getCursorBoundariesOffsets(index);
     }
@@ -452,7 +427,7 @@ export class IText extends Text {
 
     if (this.inCompositionMode) {
       // TODO: investigate why there isn't a return inside the if,
-      // and why can't happe top of the function
+      // and why can't happen at the top of the function
       this.renderSelection(ctx, boundaries);
     }
     ctx.fillStyle =
