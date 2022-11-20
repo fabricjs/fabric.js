@@ -40,7 +40,7 @@ export class Image extends FabricObject {
    * if the Image got resized after the last Render
    * @type Number
    */
-  protected _lastScaleX: number;
+  protected _lastScaleX = 1;
 
   /**
    * private
@@ -48,21 +48,21 @@ export class Image extends FabricObject {
    * if the Image got resized after the last Render
    * @type Number
    */
-  protected _lastScaleY: number;
+  protected _lastScaleY = 1;
 
   /**
    * private
    * contains last value of scaling applied by the apply filter chain
    * @type Number
    */
-  protected _filterScalingX: number;
+  protected _filterScalingX = 1;
 
   /**
    * private
    * contains last value of scaling applied by the apply filter chain
    * @type Number
    */
-  protected _filterScalingY: number;
+  protected _filterScalingY = 1;
 
   /**
    * minimum scale factor under which any resizeFilter is triggered to resize the image
@@ -781,10 +781,6 @@ export const imageDefaultValues: Partial<TClassProperties<Image>> = {
   type: 'image',
   strokeWidth: 0,
   srcFromAttribute: false,
-  _lastScaleX: 1,
-  _lastScaleY: 1,
-  _filterScalingX: 1,
-  _filterScalingY: 1,
   minimumScaleTrigger: 0.5,
   stateProperties: fabricObjectDefaultValues.stateProperties.concat(
     'cropX',
