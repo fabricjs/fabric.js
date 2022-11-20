@@ -64,7 +64,7 @@ export type ITextEvents = ObjectEvents & {
  *   Select line:                    triple click
  * </pre>
  */
-export class IText extends ITextClickBehaviorMixin {
+export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number

@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { fabric } from '../../HEADER';
+import { ObjectEvents } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Text } from '../shapes/text.class';
 import { TEvent, TPointerEvent } from '../typedefs';
@@ -14,7 +15,9 @@ import { TextStyleDeclaration } from './text_style.mixin';
 // extend this regex to support non english languages
 const reNonWord = /[ \n\.,;!\?\-]/;
 
-export abstract class ITextBehaviorMixin extends Text {
+export abstract class ITextBehaviorMixin<
+  EventSpec extends ObjectEvents
+> extends Text<EventSpec> {
   abstract isEditing: boolean;
   abstract cursorDelay: number;
   abstract selectionStart: number;
