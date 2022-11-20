@@ -1,6 +1,6 @@
 import { FabricObject } from '../shapes/fabricObject.class';
 
-type TextStyleDeclaration = Record<string, any>;
+export type TextStyleDeclaration = Record<string, any>;
 
 export type TextStyle = {
   [line: number | string]: { [char: number | string]: TextStyleDeclaration };
