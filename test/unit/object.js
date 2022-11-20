@@ -608,7 +608,7 @@
     var object2 = new fabric.Object();
 
     canvas.add(object);
-    canvas.insertAt(object2, 0);
+    canvas.insertAt(0, object2);
 
     assert.ok(object.canvas === canvas);
     assert.ok(object2.canvas === canvas);
@@ -821,58 +821,50 @@
   });
 
   function prepareObjectsForTreeTesting() {
-    var TObject = fabric.util.createClass(fabric.Object, {
-      toJSON: function () {
+    class TestObject extends fabric.Object {
+      toJSON() {
         return {
           id: this.id,
           objects: this._objects?.map(o => o.id),
           parent: this.parent?.id,
           canvas: this.canvas?.id
         }
-      },
-      toString: function () {
+      }
+      toString() {
         return JSON.stringify(this.toJSON(), null, '\t');
       }
-    });
-    var Collection = fabric.util.createClass(TObject, fabric.Collection, {
-      initialize: function ({ id }) {
+    }
+    class TestCollection extends fabric.createCollectionMixin(TestObject) {
+      constructor({ id }) {
+        super();
         this.id = id;
         this._objects = [];
-      },
-      add: function () {
-        fabric.Collection.add.call(this, arguments, this._onObjectAdded);
-      },
-      insertAt: function (objects, index) {
-        fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
-      },
-      remove: function () {
-        fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
-      },
-      _onObjectAdded: function (object) {
+      }
+      _onObjectAdded(object) {
         object.group = this;
-      },
-      _onObjectRemoved: function (object) {
+      }
+      _onObjectRemoved(object) {
         delete object.group;
-      },
-      removeAll: function () {
-        this.remove.apply(this, this._objects);
-      },
-    });
-    var canvas = fabric.util.object.extend(new Collection({ id: 'canvas' }), {
-      _onObjectAdded: function (object) {
+      }
+      removeAll() {
+        this.remove(...this._objects);
+      }
+    }
+    class TestCanvas extends TestCollection {
+      _onObjectAdded (object) {
         object.canvas = this;
-      },
-      _onObjectRemoved: function (object) {
+      }
+      _onObjectRemoved (object) {
         delete object.canvas;
-      },
-    });
+      }
+    }
     return {
-      object: new TObject({ id: 'object' }),
-      other: new TObject({ id: 'other' }),
-      a: new Collection({ id: 'a' }),
-      b: new Collection({ id: 'b' }),
-      c: new Collection({ id: 'c' }),
-      canvas
+      object: new TestObject({ id: 'object' }),
+      other: new TestObject({ id: 'other' }),
+      a: new TestCollection({ id: 'a' }),
+      b: new TestCollection({ id: 'b' }),
+      c: new TestCollection({ id: 'c' }),
+      canvas: new TestCanvas({ id: 'canvas' })
     }
   }
 
@@ -972,7 +964,7 @@
     assert.ok(object.canvas === canvas, 'object should have canvas set');
     findCommonAncestors(object, other, true, { fork: [object, a], otherFork: [other], common: [] });
     findCommonAncestors(object, other, false, { fork: [object, a], otherFork: [other, canvas], common: [] });
-    canvas.insertAt(a, 0);
+    canvas.insertAt(0, a);
     findCommonAncestors(object, other, true, { fork: [object, a], otherFork: [other], common: [] });
     findCommonAncestors(object, other, false, { fork: [object, a], otherFork: [other], common: [canvas] });
     findCommonAncestors(a, other, false, { fork: [a], otherFork: [other], common: [canvas] });
@@ -1057,7 +1049,7 @@
     a.add(object);
     assert.ok(object.canvas === canvas, 'object should have canvas set');
     assert.isInFrontOf(object, other, undefined);
-    canvas.insertAt(a, 0);
+    canvas.insertAt(0, a);
     assert.isInFrontOf(object, other, false);
     assert.isInFrontOf(a, other, false);
     assert.isInFrontOf(a, canvas, true);

@@ -1,53 +1,38 @@
-//@ts-nocheck
-
 import { fabric } from '../../HEADER';
+import { config } from '../config';
 import { createCanvasElement } from '../util/misc/dom';
+import { Canvas2dFilterBackend } from './2d_backend.class';
+import { WebGLFilterBackend } from './webgl_backend.class';
 
-export const enum TWebGLPrecision {
+export enum WebGLPrecision {
   low = 'lowp',
   medium = 'mediump',
   high = 'highp',
 }
 
 /**
- * @todo remove once rollup supports transforming enums...
- * https://github.com/rollup/plugins/issues/463
- */
-const WebGLPrecision = [
-  TWebGLPrecision.low,
-  TWebGLPrecision.medium,
-  TWebGLPrecision.high,
-];
-
-/**
  * Lazy initialize WebGL contants
  */
 class WebGLProbe {
-  private initialized = false;
+  maxTextureSize?: number;
 
-  private _maxTextureSize?: number;
-
-  private _webGLPrecision?: TWebGLPrecision;
-
-  get maxTextureSize() {
-    this.queryWebGL();
-    return this._maxTextureSize;
-  }
-
-  get webGLPrecision() {
-    this.queryWebGL();
-    return this._webGLPrecision;
-  }
+  webGLPrecision: WebGLPrecision | undefined;
 
   /**
    * Tests if webgl supports certain precision
    * @param {WebGL} Canvas WebGL context to test on
-   * @param {TWebGLPrecision} Precision to test can be any of following
+   * @param {WebGLPrecision} Precision to test can be any of following
    * @returns {Boolean} Whether the user's browser WebGL supports given precision.
    */
-  private testPrecision(gl: WebGLRenderingContext, precision: TWebGLPrecision) {
+  private testPrecision(
+    gl: WebGLRenderingContext,
+    precision: WebGLPrecision
+  ): boolean {
     const fragmentSource = `precision ${precision} float;\nvoid main(){}`;
     const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+    if (!fragmentShader) {
+      return false;
+    }
     gl.shaderSource(fragmentShader, fragmentSource);
     gl.compileShader(fragmentShader);
     return !!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS);
@@ -57,21 +42,19 @@ class WebGLProbe {
    * query browser for WebGL
    * @returns config object if true
    */
-  private queryWebGL() {
-    if (this.initialized || fabric.isLikelyNode) {
+  queryWebGL() {
+    if (fabric.isLikelyNode) {
       return;
     }
     const canvas = createCanvasElement();
-    const gl =
-      canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    const gl = canvas.getContext('webgl');
     if (gl) {
-      this._maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-      this._webGLPrecision = WebGLPrecision.find((key) =>
-        this.testPrecision(gl, key)
+      this.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+      this.webGLPrecision = Object.values(WebGLPrecision).find((precision) =>
+        this.testPrecision(gl, precision)
       );
-      console.log(`fabric: max texture size ${this._maxTextureSize}`);
+      console.log(`fabric: max texture size ${this.maxTextureSize}`);
     }
-    this.initialized = true;
   }
 
   isSupported(textureSize: number) {
@@ -80,3 +63,18 @@ class WebGLProbe {
 }
 
 export const webGLProbe = new WebGLProbe();
+
+export function initFilterBackend():
+  | WebGLFilterBackend
+  | Canvas2dFilterBackend {
+  webGLProbe.queryWebGL();
+  if (config.enableGLFiltering && webGLProbe.isSupported(config.textureSize)) {
+    return new WebGLFilterBackend({ tileSize: config.textureSize });
+  } else {
+    return new Canvas2dFilterBackend();
+  }
+}
+
+fabric.Canvas2dFilterBackend = Canvas2dFilterBackend;
+fabric.WebglFilterBackend = WebGLFilterBackend;
+fabric.initFilterBackend = initFilterBackend;
