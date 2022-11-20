@@ -92,6 +92,9 @@ export class Polyline extends FabricObject {
 
   strokeDiff: Point;
 
+  // How much we should add to the original `width`/`height` to find the correct BBOX
+  resizingOffset: Point;
+
   /**
    * Constructor
    * @param {Array} points Array of points (where each point is an object with x and y)
@@ -112,6 +115,14 @@ export class Polyline extends FabricObject {
    * });
    */
   constructor(points: IPoint[] = [], { left, top, ...options }: any = {}) {
+    if (
+      typeof options.width === 'undefined' ||
+      typeof options.height === 'undefined'
+    ) {
+      const { width, height } = makeBoundingBoxFromPoints(points);
+      options.width = options.width || width;
+      options.height = options.height || height;
+    }
     super({ points, ...options });
     this.initialized = true;
     this.setBoundingBox(true);
@@ -158,9 +169,11 @@ export class Polyline extends FabricObject {
         pathOffset: new Point(),
         strokeOffset: new Point(),
         strokeDiff: new Point(),
+        resizingOffset: new Point(),
       };
     }
-    const bbox = makeBoundingBoxFromPoints(points),
+    const bboxOriginal = makeBoundingBoxFromPoints(this.points),
+      bbox = makeBoundingBoxFromPoints(points),
       // Remove scale effect, since it's applied after
       matrix = calcDimensionsMatrix({ ...options, scaleX: 1, scaleY: 1 }),
       bboxNoStroke = makeBoundingBoxFromPoints(
@@ -176,7 +189,7 @@ export class Polyline extends FabricObject {
       legacyCorrection =
         !this.fromSVG && !this.exactBoundingBox ? this.strokeWidth / 2 : 0;
     return {
-      ...bbox,
+      ...bboxOriginal,
       left: bbox.left - legacyCorrection,
       top: bbox.top - legacyCorrection,
       pathOffset: new Point(pathOffsetX, pathOffsetY),
@@ -186,6 +199,10 @@ export class Polyline extends FabricObject {
       strokeDiff: new Point(bbox.width, bbox.height)
         .subtract(new Point(bboxNoStroke.width, bboxNoStroke.height))
         .multiply(scale),
+      resizingOffset: new Point(
+        bbox.width - bboxOriginal.width,
+        bbox.height - bboxOriginal.height
+      ),
     };
   }
 
@@ -194,9 +211,9 @@ export class Polyline extends FabricObject {
   }
 
   setBoundingBox(adjustPosition?: boolean) {
-    const { left, top, width, height, pathOffset, strokeOffset, strokeDiff } =
+    const { left, top, resizingOffset, pathOffset, strokeOffset, strokeDiff } =
       this._calcDimensions();
-    this.set({ width, height, pathOffset, strokeOffset, strokeDiff });
+    this.set({ resizingOffset, pathOffset, strokeOffset, strokeDiff });
     adjustPosition &&
       this.setPositionByOrigin(new Point(left, top), 'left', 'top');
   }
@@ -206,21 +223,19 @@ export class Polyline extends FabricObject {
    */
   _getNonTransformedDimensions() {
     return this.exactBoundingBox
-      ? // TODO: fix this
-        new Point(this.width, this.height)
+      ? new Point(this.width, this.height)
       : super._getNonTransformedDimensions();
   }
 
   /**
    * @override stroke and skewing are taken into account when projecting stroke on points,
    * therefore we don't want the default calculation to account for skewing as well.
-   * Though it is possible to pass `width` and `height` in `options`, doing so is very strange, use with discretion.
    *
    * @private
    */
   _getTransformedDimensions(options: any = {}) {
     if (this.exactBoundingBox) {
-      let size: Point;
+      let size: Point = new Point(this.width, this.height);
       if (
         Object.keys(options).some((key) =>
           strokeProjectionOptions.includes(
@@ -228,13 +243,10 @@ export class Polyline extends FabricObject {
           )
         )
       ) {
-        const { width, height } = this._calcDimensions(options);
-        size = new Point(options.width ?? width, options.height ?? height);
+        const { resizingOffset } = this._calcDimensions(options);
+        size = size.add(resizingOffset);
       } else {
-        size = new Point(
-          options.width ?? this.width,
-          options.height ?? this.height
-        );
+        size = size.add(this.resizingOffset);
       }
       return size.multiply(
         new Point(options.scaleX || this.scaleX, options.scaleY || this.scaleY)
@@ -262,6 +274,21 @@ export class Polyline extends FabricObject {
       this.setDimensions();
     }
     return output;
+  }
+
+  /**
+   * In the polyline the properties `strokeUniform`, `strokeLineJoin`,
+   * `strokeLineCap`, `strokeMiterLimit` change the `width`/`height` of
+   * the BBOX. So we must recalculate the own transform matrix. As the
+   * original cache does not take these properties into account, we extend
+   * it with the `resizingOffset` property on the key.
+   * @param args
+   * @returns
+   */
+  transformMatrixKey(...args: any): string {
+    const oldKey = super.transformMatrixKey(...args),
+      newPart = this.resizingOffset || '';
+    return oldKey + newPart;
   }
 
   /**
