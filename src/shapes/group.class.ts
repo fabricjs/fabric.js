@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { TObjectEvents } from '../EventTypeDefs';
+import { ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../mixins/collection.mixin';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { Point } from '../point.class';
@@ -29,7 +29,7 @@ export type LayoutResult = {
   height: number;
 };
 
-export type GroupEvents = TObjectEvents & {
+export type GroupEvents = ObjectEvents & {
   layout: {
     context: LayoutContext;
     result: LayoutResult;

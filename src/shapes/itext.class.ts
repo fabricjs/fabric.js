@@ -1,12 +1,12 @@
 // @ts-nocheck
-import { TObjectEvents, TransformEvent } from '../EventTypeDefs';
 import { fabric } from '../../HEADER';
+import { ObjectEvents, TransformEvent } from '../EventTypeDefs';
 import { TClassProperties, TFiller } from '../typedefs';
 import { stylesFromArray } from '../util/misc/textStyles';
 import { FabricObject } from './fabricObject.class';
 import { Text } from './text.class';
 
-export type ITextEvents = TObjectEvents & {
+export type ITextEvents = ObjectEvents & {
   'selection:changed': never;
   changed: never;
   tripleclick: TransformEvent;
