@@ -318,7 +318,7 @@ export class Text extends TextStyleMixin {
     width: number;
     kernedWidth: number;
     height: number;
-  }[] = [];
+  }[][] = [];
 
   /**
    * use this size when measuring text. To avoid IE11 rounding errors
@@ -495,7 +495,8 @@ export class Text extends TextStyleMixin {
    * It return always for text and Itext.
    * @return Number
    */
-  missingNewlineOffset() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  missingNewlineOffset(lineIndex: number) {
     return 1;
   }
 
