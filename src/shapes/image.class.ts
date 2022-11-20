@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { fabric } from '../../HEADER';
+import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties, TSize } from '../typedefs';
@@ -178,8 +179,8 @@ export class Image extends FabricObject {
    * @todo make static and use instanceof WebGLBackend
    */
   removeTexture(key: string) {
-    const backend = fabric.filterBackend;
-    if (backend && backend.evictCachesForKey) {
+    const backend = getFilterBackend();
+    if (backend.evictCachesForKey) {
       backend.evictCachesForKey(key);
     }
   }
@@ -438,9 +439,6 @@ export class Image extends FabricObject {
       this._lastScaleY = scaleY;
       return;
     }
-    if (!fabric.filterBackend) {
-      fabric.filterBackend = fabric.initFilterBackend();
-    }
     const canvasEl = createCanvasElement(),
       cacheKey = this._filteredEl ? `${this.cacheKey}_filtered` : this.cacheKey,
       sourceWidth = elementToFilter.width,
@@ -450,7 +448,7 @@ export class Image extends FabricObject {
     this._element = canvasEl;
     this._lastScaleX = filter.scaleX = scaleX;
     this._lastScaleY = filter.scaleY = scaleY;
-    fabric.filterBackend.applyFilters(
+    getFilterBackend().applyFilters(
       [filter],
       elementToFilter,
       sourceWidth,
@@ -504,10 +502,7 @@ export class Image extends FabricObject {
       this._lastScaleX = 1;
       this._lastScaleY = 1;
     }
-    if (!fabric.filterBackend) {
-      fabric.filterBackend = fabric.initFilterBackend();
-    }
-    fabric.filterBackend.applyFilters(
+    getFilterBackend().applyFilters(
       filters,
       this._originalElement,
       sourceWidth,
