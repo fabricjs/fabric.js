@@ -2,7 +2,10 @@ import { fabric } from '../../HEADER';
 
 export type TEventCallback<T = any> = (options: T) => any;
 
-type EventRegistryObject<T = any> = Record<string, TEventCallback<T>>;
+type EventRegistryObject<
+  K extends string | number | symbol = string,
+  E = any
+> = Record<K, TEventCallback<E>>;
 
 /**
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#events}
@@ -24,11 +27,15 @@ export class Observable<EventSpec> {
     eventName: K,
     handler: TEventCallback<E>
   ): VoidFunction;
-  on<K extends keyof EventSpec, E extends EventSpec[K]>(
-    handlers: EventRegistryObject<E>
+  on<K extends string, E>(
+    eventName: K,
+    handler: TEventCallback<E>
   ): VoidFunction;
   on<K extends keyof EventSpec, E extends EventSpec[K]>(
-    arg0: K | EventRegistryObject<E>,
+    handlers: EventRegistryObject<K, E>
+  ): VoidFunction;
+  on<K extends keyof EventSpec, E extends EventSpec[K]>(
+    arg0: K | EventRegistryObject<K, E>,
     handler?: TEventCallback<E>
   ): VoidFunction {
     if (!this.__eventListeners) {
@@ -65,11 +72,15 @@ export class Observable<EventSpec> {
     eventName: K,
     handler: TEventCallback<E>
   ): VoidFunction;
-  once<K extends keyof EventSpec, E extends EventSpec[K]>(
-    handlers: EventRegistryObject<E>
+  once<K extends string, E>(
+    eventName: K,
+    handler: TEventCallback<E>
   ): VoidFunction;
   once<K extends keyof EventSpec, E extends EventSpec[K]>(
-    arg0: K | EventRegistryObject<E>,
+    handlers: EventRegistryObject<K, E>
+  ): VoidFunction;
+  once<K extends keyof EventSpec, E extends EventSpec[K]>(
+    arg0: K | EventRegistryObject<K, E>,
     handler?: TEventCallback<E>
   ): VoidFunction {
     if (typeof arg0 === 'object') {
