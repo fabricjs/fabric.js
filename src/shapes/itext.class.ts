@@ -4,65 +4,6 @@ import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import { TClassProperties, TFiller } from '../typedefs';
 import { stylesFromArray } from '../util/misc/textStyles';
 import { FabricObject } from './fabricObject.class';
-import { Text } from './text.class';
-
-/**
- * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
- * prefix when observing canvas.
- * @class IText
- *
- * @fires changed
- * @fires selection:changed
- * @fires editing:entered
- * @fires editing:exited
- * @fires dragstart
- * @fires drag drag event firing on the drag source
- * @fires dragend
- * @fires copy
- * @fires cut
- * @fires paste
- *
- * @return {IText} thisArg
- * @see {@link IText#initialize} for constructor definition
- *
- * <p>Supported key combinations:</p>
- * <pre>
- *   Move cursor:                    left, right, up, down
- *   Select character:               shift + left, shift + right
- *   Select text vertically:         shift + up, shift + down
- *   Move cursor by word:            alt + left, alt + right
- *   Select words:                   shift + alt + left, shift + alt + right
- *   Move cursor to line start/end:  cmd + left, cmd + right or home, end
- *   Select till start/end of line:  cmd + shift + left, cmd + shift + right or shift + home, shift + end
- *   Jump to start/end of text:      cmd + up, cmd + down
- *   Select till start/end of text:  cmd + shift + up, cmd + shift + down or shift + pgUp, shift + pgDown
- *   Delete character:               backspace
- *   Delete word:                    alt + backspace
- *   Delete line:                    cmd + backspace
- *   Forward delete:                 delete
- *   Copy text:                      ctrl/cmd + c
- *   Paste text:                     ctrl/cmd + v
- *   Cut text:                       ctrl/cmd + x
- *   Select entire text:             ctrl/cmd + a
- *   Quit editing                    tab or esc
- * </pre>
- *
- * <p>Supported mouse/touch combination</p>
- * <pre>
- *   Position cursor:                click/touch
- *   Create selection:               click/touch & drag
- *   Create selection:               click & shift + click
- *   Select word:                    double click
- *   Select line:                    triple click
- * </pre>
- */
-export class IText extends Text {
-  /**
-   * Index where text selection starts (or where cursor is when there is no selection)
-   * @type Number
-   * @default
-   */
-  selectionStart: number;
 
 /**
  * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
