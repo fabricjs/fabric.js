@@ -76,9 +76,11 @@ export function createCollectionMixin(Klass: { new (...args: any[]): any }) {
         object: FabricObject,
         index: number,
         array: FabricObject[]
-      ) => any,
+      ) => any
     ) {
-      this.getObjects().forEach((object, index, objects) => callback(object, index, objects));
+      this.getObjects().forEach((object, index, objects) =>
+        callback(object, index, objects)
+      );
     }
 
     /**
