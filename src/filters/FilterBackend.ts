@@ -6,8 +6,6 @@ import { webGLProbe } from './WebGLProbe';
 
 export type FilterBackend = WebGLFilterBackend | Canvas2dFilterBackend;
 
-let filterBackend: FilterBackend;
-
 export function initFilterBackend(): FilterBackend {
   webGLProbe.queryWebGL();
   if (config.enableGLFiltering && webGLProbe.isSupported(config.textureSize)) {
@@ -17,13 +15,14 @@ export function initFilterBackend(): FilterBackend {
   }
 }
 
-export function getFilterBackend() {
-  if (!filterBackend) {
-    filterBackend = initFilterBackend();
-    // TODO: remove next line after fabric is modular
-    fabric.filterBackend = filterBackend;
+/**
+ * @todo refactor to a module w/o assigning to fabric
+ */
+export function getFilterBackend(): FilterBackend {
+  if (!fabric.filterBackend) {
+    fabric.filterBackend = initFilterBackend();
   }
-  return filterBackend;
+  return fabric.filterBackend;
 }
 
 fabric.Canvas2dFilterBackend = Canvas2dFilterBackend;
