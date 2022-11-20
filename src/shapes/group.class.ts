@@ -258,7 +258,7 @@ export class Group extends FabricObject {}
        */
       removeAll: function () {
         this._activeObjects = [];
-        return this.remove(...this._objects.slice());
+        return this.remove(...this._objects);
       },
 
       /**
