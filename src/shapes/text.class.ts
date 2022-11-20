@@ -1,5 +1,4 @@
 // @ts-nocheck
-
 import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
@@ -337,17 +336,29 @@ export class Text extends TextStyleMixin {
    */
   MIN_TEXT_WIDTH: number;
 
-  protected __skipDimension: boolean;
-  protected textLines: string[];
-  protected _textLines: string[][];
-  protected _unwrappedTextLines: string[][];
-  protected _text: string[];
-  protected cursorWidth: number;
-  protected __lineHeights: number[];
-  protected __lineWidths: number[];
-  protected _forceClearCache: boolean;
+  /**
+   * contains the the text of the object, divided in lines as they are displayed
+   * on screen. Wrapping will divide the text independently of line breaks
+   * @type {string[]}
+   * @default
+   */
+  textLines: string[];
 
-  private initialized?: true;
+  /**
+   * same as textlines, but each line is an array of graphemes as split by splitByGrapheme
+   * @type {string[]}
+   * @default
+   */
+  _textLines: string[][];
+
+  _unwrappedTextLines: string[][];
+  _text: string[];
+  cursorWidth: number;
+  __lineHeights: number[];
+  __lineWidths: number[];
+  _forceClearCache: boolean;
+
+  initialized?: true;
 
   constructor(text: string, options: object): Text {
     super({ ...options, text, styles: options?.styles || {} });
@@ -355,7 +366,6 @@ export class Text extends TextStyleMixin {
     if (this.path) {
       this.setPathInfo();
     }
-    this.__skipDimension = false;
     this.initDimensions();
     this.setCoords();
     this.setupState({ propertySet: '_dimensionAffectingProps' });
@@ -659,22 +669,12 @@ export class Text extends TextStyleMixin {
     if (!this.textBackgroundColor && !this.styleHas('textBackgroundColor')) {
       return;
     }
-    let heightOfLine,
-      lineLeftOffset,
-      originalFill = ctx.fillStyle,
-      line,
-      lastColor,
-      leftOffset = this._getLeftOffset(),
-      lineTopOffset = this._getTopOffset(),
-      boxStart = 0,
-      boxWidth = 0,
-      charBox,
-      currentColor,
-      path = this.path,
-      drawStart;
+    const originalFill = ctx.fillStyle,
+      leftOffset = this._getLeftOffset();
+    let lineTopOffset = this._getTopOffset();
 
     for (let i = 0, len = this._textLines.length; i < len; i++) {
-      heightOfLine = this.getHeightOfLine(i);
+      const heightOfLine = this.getHeightOfLine(i);
       if (
         !this.textBackgroundColor &&
         !this.styleHas('textBackgroundColor', i)
@@ -682,15 +682,17 @@ export class Text extends TextStyleMixin {
         lineTopOffset += heightOfLine;
         continue;
       }
-      line = this._textLines[i];
-      lineLeftOffset = this._getLineLeftOffset(i);
-      boxWidth = 0;
-      boxStart = 0;
-      lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
-      for (let j = 0, jlen = line.length; j < jlen; j++) {
-        charBox = this.__charBounds[i][j];
+      const jlen = this._textLines[i].length;
+      const lineLeftOffset = this._getLineLeftOffset(i);
+      let boxWidth = 0;
+      let boxStart = 0;
+      let drawStart;
+      let currentColor;
+      let lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
+      for (let j = 0; j < jlen; j++) {
+        const charBox = this.__charBounds[i][j];
         currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
-        if (path) {
+        if (this.path) {
           ctx.save();
           ctx.translate(charBox.renderLeft, charBox.renderTop);
           ctx.rotate(charBox.angle);
@@ -723,7 +725,7 @@ export class Text extends TextStyleMixin {
           boxWidth += charBox.kernedWidth;
         }
       }
-      if (currentColor && !path) {
+      if (currentColor && !this.path) {
         drawStart = leftOffset + lineLeftOffset + boxStart;
         if (this.direction === 'rtl') {
           drawStart = this.width - drawStart - boxWidth;
@@ -760,16 +762,13 @@ export class Text extends TextStyleMixin {
     previousChar: string,
     prevCharStyle: object
   ) {
-    let fontCache = cache.getFontCache(charStyle),
+    const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
       previousFontDeclaration = this._getFontDeclaration(prevCharStyle),
       couple = previousChar + _char,
       stylesAreEqual = fontDeclaration === previousFontDeclaration,
-      width,
-      coupleWidth,
-      previousWidth,
-      fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE,
-      kernedWidth;
+      fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE;
+    let width, coupleWidth, previousWidth, kernedWidth, ctx;
 
     if (previousChar && fontCache[previousChar] !== undefined) {
       previousWidth = fontCache[previousChar];
@@ -786,23 +785,23 @@ export class Text extends TextStyleMixin {
       previousWidth === undefined ||
       coupleWidth === undefined
     ) {
-      var ctx = this.getMeasuringContext();
+      ctx = this.getMeasuringContext();
       // send a TRUE to specify measuring font size CACHE_FONT_SIZE
       this._setTextStyles(ctx, charStyle, true);
-    }
-    if (width === undefined) {
-      kernedWidth = width = ctx.measureText(_char).width;
-      fontCache[_char] = width;
-    }
-    if (previousWidth === undefined && stylesAreEqual && previousChar) {
-      previousWidth = ctx.measureText(previousChar).width;
-      fontCache[previousChar] = previousWidth;
-    }
-    if (stylesAreEqual && coupleWidth === undefined) {
-      // we can measure the kerning couple and subtract the width of the previous character
-      coupleWidth = ctx.measureText(couple).width;
-      fontCache[couple] = coupleWidth;
-      kernedWidth = coupleWidth - previousWidth;
+      if (width === undefined) {
+        kernedWidth = width = ctx.measureText(_char).width;
+        fontCache[_char] = width;
+      }
+      if (previousWidth === undefined && stylesAreEqual && previousChar) {
+        previousWidth = ctx.measureText(previousChar).width;
+        fontCache[previousChar] = previousWidth;
+      }
+      if (stylesAreEqual && coupleWidth === undefined) {
+        // we can measure the kerning couple and subtract the width of the previous character
+        coupleWidth = ctx.measureText(couple).width;
+        fontCache[couple] = coupleWidth;
+        kernedWidth = coupleWidth - previousWidth;
+      }
     }
     return {
       width: width * fontMultiplier,
@@ -840,26 +839,22 @@ export class Text extends TextStyleMixin {
    * measure every grapheme of a line, populating __charBounds
    * @param {Number} lineIndex
    * @return {Object} object.width total width of characters
-   * @return {Object} object.widthOfSpaces length of chars that match this._reSpacesAndTabs
+   * @return {Object} object.numOfSpaces length of chars that match this._reSpacesAndTabs
    */
   _measureLine(lineIndex: number): object {
     let width = 0,
-      i,
-      grapheme,
-      line = this._textLines[lineIndex],
       prevGrapheme,
-      graphemeInfo,
-      numOfSpaces = 0,
-      lineBounds = new Array(line.length),
-      positionInPath = 0,
-      startingPoint,
-      totalPathLength,
+      graphemeInfo;
+
+    const reverse = this.pathSide === 'right',
       path = this.path,
-      reverse = this.pathSide === 'right';
+      line = this._textLines[lineIndex],
+      llength = line.length,
+      lineBounds = new Array(llength);
 
     this.__charBounds[lineIndex] = lineBounds;
-    for (i = 0; i < line.length; i++) {
-      grapheme = line[i];
+    for (let i = 0; i < llength; i++) {
+      const grapheme = line[i];
       graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
       lineBounds[i] = graphemeInfo;
       width += graphemeInfo.kernedWidth;
@@ -867,15 +862,17 @@ export class Text extends TextStyleMixin {
     }
     // this latest bound box represent the last character of the line
     // to simplify cursor handling in interactive mode.
-    lineBounds[i] = {
+    lineBounds[llength] = {
       left: graphemeInfo ? graphemeInfo.left + graphemeInfo.width : 0,
       width: 0,
       kernedWidth: 0,
       height: this.fontSize,
     };
     if (path) {
-      totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
-      startingPoint = getPointOnPath(path.path, 0, path.segmentsInfo);
+      let positionInPath = 0;
+      const totalPathLength =
+        path.segmentsInfo[path.segmentsInfo.length - 1].length;
+      const startingPoint = getPointOnPath(path.path, 0, path.segmentsInfo);
       startingPoint.x += path.pathOffset.x;
       startingPoint.y += path.pathOffset.y;
       switch (this.textAlign) {
@@ -892,8 +889,8 @@ export class Text extends TextStyleMixin {
       }
       positionInPath += this.pathStartOffset * (reverse ? -1 : 1);
       for (
-        i = reverse ? line.length - 1 : 0;
-        reverse ? i >= 0 : i < line.length;
+        let i = reverse ? llength - 1 : 0;
+        reverse ? i >= 0 : i < llength;
         reverse ? i-- : i++
       ) {
         graphemeInfo = lineBounds[i];
@@ -908,7 +905,7 @@ export class Text extends TextStyleMixin {
         positionInPath += graphemeInfo.kernedWidth;
       }
     }
-    return { width: width, numOfSpaces: numOfSpaces };
+    return { width: width, numOfSpaces: 0 };
   }
 
   /**
@@ -989,11 +986,10 @@ export class Text extends TextStyleMixin {
       return this.__lineHeights[lineIndex];
     }
 
-    let line = this._textLines[lineIndex],
-      // char 0 is measured before the line cycle because it nneds to char
-      // emptylines
-      maxHeight = this.getHeightOfChar(lineIndex, 0);
-    for (let i = 1, len = line.length; i < len; i++) {
+    // char 0 is measured before the line cycle because it nneds to char
+    // emptylines
+    let maxHeight = this.getHeightOfChar(lineIndex, 0);
+    for (let i = 1, len = this._textLines[lineIndex].length; i < len; i++) {
       maxHeight = Math.max(this.getHeightOfChar(lineIndex, i), maxHeight);
     }
 
@@ -1040,8 +1036,8 @@ export class Text extends TextStyleMixin {
     method: 'fillText' | 'strokeText'
   ) {
     ctx.save();
-    let lineHeights = 0,
-      left = this._getLeftOffset(),
+    let lineHeights = 0;
+    const left = this._getLeftOffset(),
       top = this._getTopOffset();
     for (let i = 0, len = this._textLines.length; i < len; i++) {
       const heightOfLine = this.getHeightOfLine(i),
@@ -1110,14 +1106,8 @@ export class Text extends TextStyleMixin {
     top: number,
     lineIndex: number
   ) {
-    let lineHeight = this.getHeightOfLine(lineIndex),
+    const lineHeight = this.getHeightOfLine(lineIndex),
       isJustify = this.textAlign.indexOf('justify') !== -1,
-      actualStyle,
-      nextStyle,
-      charsToRender = '',
-      charBox,
-      boxWidth = 0,
-      timeToRender,
       path = this.path,
       shortCut =
         !isJustify &&
@@ -1128,8 +1118,16 @@ export class Text extends TextStyleMixin {
       sign = this.direction === 'ltr' ? 1 : -1,
       // this was changed in the PR #7674
       // currentDirection = ctx.canvas.getAttribute('dir');
-      drawingLeft,
       currentDirection = ctx.direction;
+
+    let actualStyle,
+      nextStyle,
+      charsToRender = '',
+      charBox,
+      boxWidth = 0,
+      timeToRender,
+      drawingLeft;
+
     ctx.save();
     if (currentDirection !== this.direction) {
       ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
@@ -1225,14 +1223,13 @@ export class Text extends TextStyleMixin {
    * @return {CanvasPattern} a pattern to use as fill/stroke style
    */
   _applyPatternGradientTransformText(filler: TFiller): CanvasPattern {
-    let pCanvas = createCanvasElement(),
-      pCtx,
+    const pCanvas = createCanvasElement(),
       // TODO: verify compatibility with strokeUniform
       width = this.width + this.strokeWidth,
-      height = this.height + this.strokeWidth;
+      height = this.height + this.strokeWidth,
+      pCtx = pCanvas.getContext('2d');
     pCanvas.width = width;
     pCanvas.height = height;
-    pCtx = pCanvas.getContext('2d');
     pCtx.beginPath();
     pCtx.moveTo(0, 0);
     pCtx.lineTo(width, 0);
@@ -1392,13 +1389,12 @@ export class Text extends TextStyleMixin {
    * @return {Number} Line left offset
    */
   _getLineLeftOffset(lineIndex: number): number {
-    var lineWidth = this.getLineWidth(lineIndex),
+    const lineWidth = this.getLineWidth(lineIndex),
       lineDiff = this.width - lineWidth,
       textAlign = this.textAlign,
       direction = this.direction,
-      isEndOfWrapping,
-      leftOffset = 0,
       isEndOfWrapping = this.isEndOfWrapping(lineIndex);
+    let leftOffset = 0;
     if (
       textAlign === 'justify' ||
       (textAlign === 'justify-center' && !isEndOfWrapping) ||
@@ -1506,50 +1502,36 @@ export class Text extends TextStyleMixin {
     if (!this[type] && !this.styleHas(type)) {
       return;
     }
-    let heightOfLine,
-      size,
-      _size,
-      lineLeftOffset,
-      dy,
-      _dy,
-      line,
-      lastDecoration,
-      leftOffset = this._getLeftOffset(),
-      topOffset = this._getTopOffset(),
-      top,
-      boxStart,
-      boxWidth,
-      charBox,
-      currentDecoration,
-      maxHeight,
-      currentFill,
-      lastFill,
+    let topOffset = this._getTopOffset();
+    const leftOffset = this._getLeftOffset(),
       path = this.path,
       charSpacing = this._getWidthOfCharSpacing(),
       offsetY = this.offsets[type];
 
     for (let i = 0, len = this._textLines.length; i < len; i++) {
-      heightOfLine = this.getHeightOfLine(i);
+      const heightOfLine = this.getHeightOfLine(i);
       if (!this[type] && !this.styleHas(type, i)) {
         topOffset += heightOfLine;
         continue;
       }
-      line = this._textLines[i];
-      maxHeight = heightOfLine / this.lineHeight;
-      lineLeftOffset = this._getLineLeftOffset(i);
-      boxStart = 0;
-      boxWidth = 0;
-      lastDecoration = this.getValueOfPropertyAt(i, 0, type);
-      lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
-      top = topOffset + maxHeight * (1 - this._fontSizeFraction);
-      size = this.getHeightOfChar(i, 0);
-      dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
+      const line = this._textLines[i];
+      const maxHeight = heightOfLine / this.lineHeight;
+      const lineLeftOffset = this._getLineLeftOffset(i);
+      let boxStart = 0;
+      let boxWidth = 0;
+      let lastDecoration = this.getValueOfPropertyAt(i, 0, type);
+      let lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
+      let currentDecoration;
+      let currentFill;
+      const top = topOffset + maxHeight * (1 - this._fontSizeFraction);
+      let size = this.getHeightOfChar(i, 0);
+      let dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
       for (let j = 0, jlen = line.length; j < jlen; j++) {
-        charBox = this.__charBounds[i][j];
+        const charBox = this.__charBounds[i][j];
         currentDecoration = this.getValueOfPropertyAt(i, j, type);
         currentFill = this.getValueOfPropertyAt(i, j, 'fill');
-        _size = this.getHeightOfChar(i, j);
-        _dy = this.getValueOfPropertyAt(i, j, 'deltaY');
+        const currentSize = this.getHeightOfChar(i, j);
+        const currentDy = this.getValueOfPropertyAt(i, j, 'deltaY');
         if (path && currentDecoration && currentFill) {
           ctx.save();
           ctx.fillStyle = lastFill;
@@ -1557,7 +1539,7 @@ export class Text extends TextStyleMixin {
           ctx.rotate(charBox.angle);
           ctx.fillRect(
             -charBox.kernedWidth / 2,
-            offsetY * _size + _dy,
+            offsetY * currentSize + currentDy,
             charBox.kernedWidth,
             this.fontSize / 15
           );
@@ -1565,11 +1547,11 @@ export class Text extends TextStyleMixin {
         } else if (
           (currentDecoration !== lastDecoration ||
             currentFill !== lastFill ||
-            _size !== size ||
-            _dy !== dy) &&
+            currentSize !== size ||
+            currentDy !== dy) &&
           boxWidth > 0
         ) {
-          var drawStart = leftOffset + lineLeftOffset + boxStart;
+          let drawStart = leftOffset + lineLeftOffset + boxStart;
           if (this.direction === 'rtl') {
             drawStart = this.width - drawStart - boxWidth;
           }
@@ -1586,13 +1568,13 @@ export class Text extends TextStyleMixin {
           boxWidth = charBox.width;
           lastDecoration = currentDecoration;
           lastFill = currentFill;
-          size = _size;
-          dy = _dy;
+          size = currentSize;
+          dy = currentDy;
         } else {
           boxWidth += charBox.kernedWidth;
         }
       }
-      var drawStart = leftOffset + lineLeftOffset + boxStart;
+      let drawStart = leftOffset + lineLeftOffset + boxStart;
       if (this.direction === 'rtl') {
         drawStart = this.width - drawStart - boxWidth;
       }
@@ -1663,6 +1645,9 @@ export class Text extends TextStyleMixin {
 
   /**
    * Override this method to customize grapheme splitting
+   * @todo the util `graphemeSplit` needs to be injectable in some way.
+   * is more comfortable to inject the correct util rather than having to override text
+   * in the middle of the prototype chain
    * @param {string} value
    * @returns {string[]} array of graphemes
    */
@@ -1831,13 +1816,14 @@ export class Text extends TextStyleMixin {
     const originalStrokeWidth = options.strokeWidth;
     options.strokeWidth = 0;
 
-    let text = new Text(textContent, options),
+    const text = new Text(textContent, options),
       textHeightScaleFactor = text.getScaledHeight() / text.height,
       lineHeightDiff =
         (text.height + text.strokeWidth) * text.lineHeight - text.height,
       scaledDiff = lineHeightDiff * textHeightScaleFactor,
-      textHeight = text.getScaledHeight() + scaledDiff,
-      offX = 0;
+      textHeight = text.getScaledHeight() + scaledDiff;
+
+    let offX = 0;
     /*
       Adjust positioning:
         x/y attributes in SVG correspond to the bottom-left corner of text bounding box
