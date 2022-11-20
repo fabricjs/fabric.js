@@ -478,6 +478,7 @@ export class Image extends FabricObject {
       this._filteredEl = null;
       this._filterScalingX = 1;
       this._filterScalingY = 1;
+      return;
     }
 
     const imgElement = this._originalElement,
