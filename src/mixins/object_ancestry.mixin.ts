@@ -8,7 +8,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
     /** @lends FabricObject.prototype */ {
       /**
        * Checks if object is decendant of target
-       * Should be used instead of @link {fabric.Collection.contains} for performance reasons
+       * Should be used instead of @link {Group.contains} or @link {StaticCanvas.contains} for performance reasons
        * @param {fabric.Object|fabric.StaticCanvas} target
        * @returns {boolean}
        */
