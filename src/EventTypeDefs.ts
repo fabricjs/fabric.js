@@ -5,6 +5,7 @@ import type { Group } from './shapes/group.class';
 import type { TOriginX, TOriginY, TRadian } from './typedefs';
 import type { saveObjectTransform } from './util/misc/objectTransforms';
 import type { Canvas } from './__types__';
+import type { IText } from './shapes/itext.class';
 
 export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
 
@@ -213,8 +214,10 @@ export type CanvasEvents = CanvasPointerEvents &
         };
 
     // IText
-    'text:selection:changed': { target: FabricObject };
-    'text:changed': { target: FabricObject };
+    'text:selection:changed': { target: IText };
+    'text:changed': { target: IText };
+    'text:editing:entered': { target: IText };
+    'text:editing:exited': { target: IText };
 
     // misc
     'contextmenu:before': SimpleEventHandler<Event>;

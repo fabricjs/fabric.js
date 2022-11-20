@@ -10,6 +10,8 @@ export type ITextEvents = TObjectEvents & {
   'selection:changed': never;
   changed: never;
   tripleclick: TransformEvent;
+  'editing:entered': never;
+  'editing:exited': never;
 };
 
 /**
