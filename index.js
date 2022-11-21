@@ -17,10 +17,12 @@ import './src/mixins/canvas_grouping.mixin'; // optional interaction
 import './src/mixins/canvas_dataurl_exporter.mixin';
 import './src/mixins/canvas_serialization.mixin'; // optiona serialization
 import './src/mixins/canvas_gestures.mixin'; // optional gesturesv
-import './src/mixins/canvas_straightening.mixin'; // optional gesturesv
+import './src/mixins/object_interactivity.mixin'; // optional interaction
+import './src/mixins/object_ancestry.mixin';
+import './src/mixins/object_stacking.mixin';
+import './src/mixins/object.svg_export';
 import './src/mixins/stateful.mixin';
-import './src/mixins/canvas_animation.mixin'; // optional animation
-
+import './src/mixins/animation.mixin'; // optional animation
 import './src/shapes/line.class';
 import './src/shapes/circle.class';
 import './src/shapes/triangle.class';
@@ -32,8 +34,8 @@ import './src/shapes/path.class';
 import './src/shapes/group.class';
 import './src/shapes/active_selection.class'; // optional interaction
 import './src/shapes/image.class';
-import './src/filters/webgl_backend.class'; // optional image_filters
-import './src/filters/2d_backend.class'; // optional image_filters
+import './src/mixins/object_straightening.mixin'; // optional objectstraightening
+import './src/filters/WebGLProbe'; // optional image_filters
 import './src/filters/base_filter.class'; // optional image_filters
 import './src/filters/colormatrix_filter.class'; // optional image_filters
 import './src/filters/brightness_filter.class'; // optional image_filters
@@ -55,11 +57,7 @@ import './src/filters/gamma_filter.class'; // optional image_filters
 import './src/filters/composed_filter.class'; // optional image_filters
 import './src/filters/hue_rotation.class'; // optional image_filters
 import './src/shapes/text.class'; // optional text
-import './src/mixins/text_style.mixin'; // optional text
 import './src/shapes/itext.class'; // optional itext
-import './src/mixins/itext_behavior.mixin'; // optional itext
-import './src/mixins/itext_click_behavior.mixin'; // optional itext
-import './src/mixins/itext_key_behavior.mixin'; // optional itext
 import './src/mixins/itext.svg_export'; // optional itext
 import './src/shapes/textbox.class'; // optional textbox
 import './src/controls'; // optional interaction

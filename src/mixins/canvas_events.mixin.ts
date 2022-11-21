@@ -1,5 +1,6 @@
 //@ts-nocheck
 
+import { stopEvent } from '../util/dom_event';
 import { fireEvent } from '../util/fireEvent';
 
 (function (global) {
@@ -266,8 +267,7 @@ import { fireEvent } from '../util/fireEvent';
           addListener(this.upperCanvasEl, 'drag', this._onDragProgress);
           return;
         }
-        e.preventDefault();
-        e.stopPropagation();
+        stopEvent(e);
       },
 
       /**

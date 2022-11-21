@@ -3,6 +3,16 @@
 ## [next]
 
 - chore(TS): migrate object mixins to TS [#8414](https://github.com/fabricjs/fabric.js/pull/8414)
+- chore(TS): migrate text classes/mixins [#8408](https://github.com/fabricjs/fabric.js/pull/8408)
+- chore(TS): migrate Collection [#8433](https://github.com/fabricjs/fabric.js/pull/8433)
+- ci(): Simplify filestats even more [#8449](https://github.com/fabricjs/fabric.js/pull/8449)
+- chore(TS): migrate filter backends [#8403](https://github.com/fabricjs/fabric.js/pull/8403)
+- chore(TS): migrate Text classes/mixins [#8408](https://github.com/fabricjs/fabric.js/pull/8408)
+- chore(TS): migrate Path [#8412](https://github.com/fabricjs/fabric.js/pull/8412)
+- ci(): remove unwanted build stats (from [#8395](https://github.com/fabricjs/fabric.js/pull/8395)) [#8416](https://github.com/fabricjs/fabric.js/pull/8416)
+- chore(TS): migrate Line [#8413](https://github.com/fabricjs/fabric.js/pull/8413)
+- chore(TS): migrate Polyline/Polygon [#8417](https://github.com/fabricjs/fabric.js/pull/8417)
+- chore(TS): migrate Rect [#8411](https://github.com/fabricjs/fabric.js/pull/8411)
 - chore(TS): migrate Ellipse [#8408](https://github.com/fabricjs/fabric.js/pull/8408)
 - chore(TS): migrate Triangle to TS [#8410](https://github.com/fabricjs/fabric.js/pull/8410)
 - chore(TS): migrate Circle to TS [#8406](https://github.com/fabricjs/fabric.js/pull/8406)
