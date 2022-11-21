@@ -4,11 +4,10 @@ import { createCollectionMixin } from '../mixins/collection.mixin';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { Point } from '../point.class';
 import { TClassProperties } from '../typedefs';
-import { clone } from '../util/lang_object';
 import { cos } from '../util/misc/cos';
 import {
-  multiplyTransformMatrices,
   invertTransform,
+  multiplyTransformMatrices,
   transformPoint,
 } from '../util/misc/matrix';
 import {
@@ -1034,8 +1033,7 @@ export class Group extends createCollectionMixin(FabricObject) {
    * @param {Object} object Object to create a group from
    * @returns {Promise<Group>}
    */
-  static fromObject({ objects = [], ...object }) {
-    const options = clone(object, true);
+  static fromObject({ objects = [], ...options }) {
     return Promise.all([
       enlivenObjects(objects),
       enlivenObjectEnlivables(options),
