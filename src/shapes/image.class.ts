@@ -205,14 +205,17 @@ export class Image extends FabricObject {
    * Get the crossOrigin value (of the corresponding image element)
    */
   getCrossOrigin() {
-    return this._originalElement && (this._originalElement.crossOrigin || null);
+    return (
+      this._originalElement &&
+      ((this._originalElement as any).crossOrigin || null)
+    );
   }
 
   /**
    * Returns original size of an image
    */
   getOriginalSize() {
-    const element = this.getElement();
+    const element = this.getElement() as any;
     if (!element) {
       return {
         width: 0,
@@ -250,7 +253,7 @@ export class Image extends FabricObject {
    * @return {Object} Object representation of an instance
    */
   toObject(propertiesToInclude: (keyof this)[] = []): Record<string, any> {
-    const filters = [];
+    const filters: Record<string, any>[] = [];
     this.filters.forEach((filterObj) => {
       filterObj && filters.push(filterObj.toObject());
     });
@@ -284,12 +287,12 @@ export class Image extends FabricObject {
    * of the instance
    */
   _toSVG() {
-    let svgString = [],
-      imageMarkup = [],
-      strokeSvg,
+    const imageMarkup = [],
       element = this._element,
       x = -this.width / 2,
-      y = -this.height / 2,
+      y = -this.height / 2;
+    let svgString = [],
+      strokeSvg,
       clipPath = '',
       imageRendering = '';
     if (!element) {
@@ -435,7 +438,6 @@ export class Image extends FabricObject {
       return;
     }
     const canvasEl = createCanvasElement(),
-      cacheKey = this._filteredEl ? `${this.cacheKey}_filtered` : this.cacheKey,
       sourceWidth = elementToFilter.width,
       sourceHeight = elementToFilter.height;
     canvasEl.width = sourceWidth;
@@ -448,8 +450,7 @@ export class Image extends FabricObject {
       elementToFilter,
       sourceWidth,
       sourceHeight,
-      this._element,
-      cacheKey
+      this._element
     );
     this._filterScalingX = canvasEl.width / this._originalElement.width;
     this._filterScalingY = canvasEl.height / this._originalElement.height;
@@ -503,8 +504,7 @@ export class Image extends FabricObject {
       this._originalElement,
       sourceWidth,
       sourceHeight,
-      this._element,
-      this.cacheKey
+      this._element
     );
     if (
       this._originalElement.width !== this._element.width ||
@@ -616,8 +616,13 @@ export class Image extends FabricObject {
    * @private
    */
   parsePreserveAspectRatioAttribute() {
-    let pAR = parsePreserveAspectRatioAttribute(this.preserveAspectRatio || ''),
-      rWidth = this._element.width,
+    const pAR = parsePreserveAspectRatioAttribute(
+        this.preserveAspectRatio || ''
+      ),
+      pWidth = this.width,
+      pHeight = this.height,
+      parsedAttributes = { width: pWidth, height: pHeight };
+    let rWidth = this._element.width,
       rHeight = this._element.height,
       scaleX = 1,
       scaleY = 1,
@@ -625,10 +630,8 @@ export class Image extends FabricObject {
       offsetTop = 0,
       cropX = 0,
       cropY = 0,
-      offset,
-      pWidth = this.width,
-      pHeight = this.height,
-      parsedAttributes = { width: pWidth, height: pHeight };
+      offset;
+
     if (pAR && (pAR.alignX !== 'none' || pAR.alignY !== 'none')) {
       if (pAR.meetOrSlice === 'meet') {
         scaleX = scaleY = findScaleToFit(this._element, parsedAttributes);
@@ -673,12 +676,12 @@ export class Image extends FabricObject {
     return {
       width: rWidth,
       height: rHeight,
-      scaleX: scaleX,
-      scaleY: scaleY,
-      offsetLeft: offsetLeft,
-      offsetTop: offsetTop,
-      cropX: cropX,
-      cropY: cropY,
+      scaleX,
+      scaleY,
+      offsetLeft,
+      offsetTop,
+      cropX,
+      cropY,
     };
   }
 
