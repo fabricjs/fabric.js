@@ -865,10 +865,10 @@ export class Group extends createCollectionMixin(FabricObject) {
       let sizeVector = object._getTransformedDimensions().scalarDivide(2);
       if (object.angle) {
         const rad = degreesToRadians(object.angle),
-          sinus = Math.abs(sin(rad)),
+          sine = Math.abs(sin(rad)),
           cosine = Math.abs(cos(rad)),
-          rx = sizeVector.x * cosine + sizeVector.y * sinus,
-          ry = sizeVector.x * sinus + sizeVector.y * cosine;
+          rx = sizeVector.x * cosine + sizeVector.y * sine,
+          ry = sizeVector.x * sine + sizeVector.y * cosine;
         sizeVector = new Point(rx, ry);
       }
       const a = objCenter.subtract(sizeVector);
