@@ -51,7 +51,7 @@ export class Textbox extends IText {
    * @override
    */
   initDimensions() {
-    if (this.__skipDimension) {
+    if (!this.initialized) {
       return;
     }
     this.isEditing && this.initDelayedCursor();
@@ -84,8 +84,8 @@ export class Textbox extends IText {
   _generateStyleMap(textInfo) {
     let realLineCount = 0,
       realLineCharCount = 0,
-      charCount = 0,
-      map = {};
+      charCount = 0;
+    const map = {};
 
     for (let i = 0; i < textInfo.graphemeLines.length; i++) {
       if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
@@ -138,9 +138,8 @@ export class Textbox extends IText {
     let offset = 0,
       nextLineIndex = lineIndex + 1,
       nextOffset,
-      obj,
-      shouldLimit = false,
-      map = this._styleMap[lineIndex],
+      shouldLimit = false;
+    const map = this._styleMap[lineIndex],
       mapNextLine = this._styleMap[lineIndex + 1];
     if (map) {
       lineIndex = map.line;
@@ -151,7 +150,7 @@ export class Textbox extends IText {
       shouldLimit = nextLineIndex === lineIndex;
       nextOffset = mapNextLine.offset;
     }
-    obj =
+    const obj =
       typeof lineIndex === 'undefined'
         ? this.styles
         : { line: this.styles[lineIndex] };
@@ -245,11 +244,10 @@ export class Textbox extends IText {
    * @returns {Array} Array of lines
    */
   _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
-    let wrapped = [],
-      i;
+    const wrapped = [];
     this.isWrapping = true;
-    for (i = 0; i < lines.length; i++) {
-      wrapped.push.apply(wrapped, this._wrapLine(lines[i], i, desiredWidth));
+    for (let i = 0; i < lines.length; i++) {
+      wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
     }
     this.isWrapping = false;
     return wrapped;
@@ -267,11 +265,10 @@ export class Textbox extends IText {
    * @param {number} charOffset
    * @returns {number}
    */
-  _measureWord(word, lineIndex: number, charOffset: number): number {
+  _measureWord(word, lineIndex: number, charOffset = 0): number {
     let width = 0,
-      prevGrapheme,
-      skipLeft = true;
-    charOffset = charOffset || 0;
+      prevGrapheme;
+    const skipLeft = true;
     for (let i = 0, len = word.length; i < len; i++) {
       const box = this._getGraphemeBox(
         word[i],
@@ -309,41 +306,38 @@ export class Textbox extends IText {
     _line,
     lineIndex: number,
     desiredWidth: number,
-    reservedSpace: number
+    reservedSpace = 0
   ): Array<any> {
-    var lineWidth = 0,
+    const additionalSpace = this._getWidthOfCharSpacing(),
       splitByGrapheme = this.splitByGrapheme,
       graphemeLines = [],
-      line = [],
-      // spaces in different languages?
       words = splitByGrapheme
         ? this.graphemeSplit(_line)
         : this.wordSplit(_line),
-      word = '',
+      infix = splitByGrapheme ? '' : ' ';
+
+    let lineWidth = 0,
+      line = [],
+      // spaces in different languages?
       offset = 0,
-      infix = splitByGrapheme ? '' : ' ',
-      wordWidth = 0,
       infixWidth = 0,
       largestWordWidth = 0,
-      lineJustStarted = true,
-      additionalSpace = this._getWidthOfCharSpacing(),
-      reservedSpace = reservedSpace || 0;
+      lineJustStarted = true;
     // fix a difference between split and graphemeSplit
     if (words.length === 0) {
       words.push([]);
     }
     desiredWidth -= reservedSpace;
     // measure words
-    const data = words.map(
-      function (word) {
-        // if using splitByGrapheme words are already in graphemes.
-        word = splitByGrapheme ? word : this.graphemeSplit(word);
-        const width = this._measureWord(word, lineIndex, offset);
-        largestWordWidth = Math.max(width, largestWordWidth);
-        offset += word.length + 1;
-        return { word: word, width: width };
-      }.bind(this)
-    );
+    const data = words.map((word) => {
+      // if using splitByGrapheme words are already in graphemes.
+      word = splitByGrapheme ? word : this.graphemeSplit(word);
+      const width = this._measureWord(word, lineIndex, offset);
+      largestWordWidth = Math.max(width, largestWordWidth);
+      offset += word.length + 1;
+      return { word: word, width: width };
+    });
+
     const maxWidth = Math.max(
       desiredWidth,
       largestWordWidth,
@@ -351,9 +345,10 @@ export class Textbox extends IText {
     );
     // layout words
     offset = 0;
-    for (var i = 0; i < words.length; i++) {
-      word = data[i].word;
-      wordWidth = data[i].width;
+    let i;
+    for (i = 0; i < words.length; i++) {
+      const word = data[i].word;
+      const wordWidth = data[i].width;
       offset += word.length;
 
       lineWidth += infixWidth + wordWidth - additionalSpace;
@@ -409,7 +404,7 @@ export class Textbox extends IText {
    * and counting style.
    * @return Number
    */
-  missingNewlineOffset(lineIndex: number) {
+  missingNewlineOffset(lineIndex) {
     if (this.splitByGrapheme) {
       return this.isEndOfWrapping(lineIndex) ? 1 : 0;
     }
@@ -441,12 +436,12 @@ export class Textbox extends IText {
 
   _removeExtraneousStyles() {
     const linesToKeep = {};
-    for (var prop in this._styleMap) {
+    for (const prop in this._styleMap) {
       if (this._textLines[prop]) {
         linesToKeep[this._styleMap[prop].line] = 1;
       }
     }
-    for (var prop in this.styles) {
+    for (const prop in this.styles) {
       if (!linesToKeep[prop]) {
         delete this.styles[prop];
       }

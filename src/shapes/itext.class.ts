@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { fabric } from '../../HEADER';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
-import { TBBox, TClassProperties, TFiller } from '../typedefs';
+import { TClassProperties, TFiller } from '../typedefs';
 import { stylesFromArray } from '../util/misc/textStyles';
 import { FabricObject } from './fabricObject.class';
 
@@ -141,6 +141,7 @@ export class IText extends ITextClickBehaviorMixin {
   caching: boolean;
 
   /**
+
    * Constructor
    * @param {String} text Text string
    * @param {Object} [options] Options object
@@ -321,14 +322,18 @@ export class IText extends ITextClickBehaviorMixin {
    * @param {number} [index] index from start
    * @param {boolean} [skipCaching]
    */
-  _getCursorBoundaries(index = this.selectionStart, skipCaching?: boolean) {
-    const { left: leftOffset, top: topOffset } =
-      this._getCursorBoundariesOffsets(index, skipCaching);
+  _getCursorBoundaries(index: number, skipCaching?: boolean) {
+    if (typeof index === 'undefined') {
+      index = this.selectionStart;
+    }
+    const left = this._getLeftOffset(),
+      top = this._getTopOffset(),
+      offsets = this._getCursorBoundariesOffsets(index, skipCaching);
     return {
-      left: this._getLeftOffset(),
-      top: this._getTopOffset(),
-      leftOffset,
-      topOffset,
+      left: left,
+      top: top,
+      leftOffset: offsets.left,
+      topOffset: offsets.top,
     };
   }
 
@@ -413,17 +418,16 @@ export class IText extends ITextClickBehaviorMixin {
       charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
       multiplier = this.scaleX * this.canvas.getZoom(),
       cursorWidth = this.cursorWidth / multiplier,
-      dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY');
-    const topOffset =
-      boundaries.topOffset +
-      ((1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex)) /
-        this.lineHeight -
-      charHeight * (1 - this._fontSizeFraction);
+      dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY'),
+      topOffset =
+        boundaries.topOffset +
+        ((1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex)) /
+          this.lineHeight -
+        charHeight * (1 - this._fontSizeFraction);
 
     if (this.inCompositionMode) {
       // TODO: investigate why there isn't a return inside the if,
       // and why can't happen at the top of the function
-      // or why not direct the call to `renderSelection` from `renderCursorOrSelection`
       this.renderSelection(ctx, boundaries);
     }
     ctx.fillStyle =
@@ -443,10 +447,7 @@ export class IText extends ITextClickBehaviorMixin {
    * @param {Object} boundaries Object with left/top/leftOffset/topOffset
    * @param {CanvasRenderingContext2D} ctx transformed context to draw on
    */
-  renderSelection(
-    ctx: CanvasRenderingContext2D,
-    boundaries: ReturnType<this['_getCursorBoundaries']>
-  ) {
+  renderSelection(ctx: CanvasRenderingContext2D, boundaries: object) {
     const selection = {
       selectionStart: this.inCompositionMode
         ? this.hiddenTextarea.selectionStart
@@ -483,20 +484,27 @@ export class IText extends ITextClickBehaviorMixin {
     this.renderCursorAt(dragSelection);
   }
 
-  getSelectionBounds(
-    selectionStart = this.selectionStart,
-    selectionEnd = this.selectionEnd,
-    boundaries = this._getCursorBoundaries(selectionStart, true)
+  /**
+   * Renders text selection
+   * @private
+   * @param {{ selectionStart: number, selectionEnd: number }} selection
+   * @param {Object} boundaries Object with left/top/leftOffset/topOffset
+   * @param {CanvasRenderingContext2D} ctx transformed context to draw on
+   */
+  _renderSelection(
+    ctx: CanvasRenderingContext2D,
+    selection: { selectionStart: number; selectionEnd: number },
+    boundaries: object
   ) {
-    const isJustify = this.textAlign.indexOf('justify') !== -1,
+    const selectionStart = selection.selectionStart,
+      selectionEnd = selection.selectionEnd,
+      isJustify = this.textAlign.indexOf('justify') !== -1,
       start = this.get2DCursorLocation(selectionStart),
       end = this.get2DCursorLocation(selectionEnd),
       startLine = start.lineIndex,
       endLine = end.lineIndex,
-      startChar = Math.max(start.charIndex, 0),
-      endChar = Math.max(end.charIndex, 0);
-
-    const data: TBBox[] = [];
+      startChar = start.charIndex < 0 ? 0 : start.charIndex,
+      endChar = end.charIndex < 0 ? 0 : end.charIndex;
 
     for (let i = startLine; i <= endLine; i++) {
       const lineOffset = this._getLineLeftOffset(i) || 0;
@@ -528,10 +536,10 @@ export class IText extends ITextClickBehaviorMixin {
       if (this.lineHeight < 1 || (i === endLine && this.lineHeight > 1)) {
         lineHeight /= this.lineHeight;
       }
-      let drawStart = boundaries.left + lineOffset + boxStart;
+      let drawStart = boundaries.left + lineOffset + boxStart,
+        drawHeight = lineHeight,
+        extraTop = 0;
       const drawWidth = boxEnd - boxStart;
-      let drawHeight = lineHeight;
-      let extraTop = 0;
       if (this.inCompositionMode) {
         ctx.fillStyle = this.compositionColor || 'black';
         drawHeight = 1;
@@ -558,43 +566,14 @@ export class IText extends ITextClickBehaviorMixin {
           drawStart = boundaries.left + lineOffset - boxEnd;
         }
       }
-      data.push({
-        left: drawStart,
-        top: boundaries.top + boundaries.topOffset + extraTop,
-        width: drawWidth,
-        height: drawHeight,
-      });
+      ctx.fillRect(
+        drawStart,
+        boundaries.top + boundaries.topOffset + extraTop,
+        drawWidth,
+        drawHeight
+      );
       boundaries.topOffset += realLineHeight;
     }
-
-    return {
-      data,
-      start: {
-        ...start,
-        selectionIndex: selectionStart,
-      },
-      end: {
-        ...start,
-        selectionIndex: selectionEnd,
-      },
-    };
-  }
-
-  private _renderSelection(
-    ctx: CanvasRenderingContext2D,
-    {
-      selectionStart,
-      selectionEnd,
-    }: { selectionStart: number; selectionEnd: number },
-    boundaries: ReturnType<this['_getCursorBoundaries']>
-  ) {
-    this.getSelectionBounds(
-      selectionStart,
-      selectionEnd,
-      boundaries
-    ).data.forEach(({ left, top, width, height }) => {
-      ctx.fillRect(left, top, width, height);
-    });
   }
 
   /**

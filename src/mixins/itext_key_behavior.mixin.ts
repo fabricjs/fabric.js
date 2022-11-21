@@ -3,6 +3,7 @@
 import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { TPointerEvent } from '../typedefs';
+import { capValue } from '../util/misc/capValue';
 import { ITextBehaviorMixin } from './itext_behavior.mixin';
 
 export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
@@ -346,15 +347,6 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
   }
 
   /**
-   * @private
-   * @param {ClipboardEvent} e Event object
-   * @return {Object} Clipboard data object
-   */
-  _getClipboardData(e: ClipboardEvent): object {
-    return (e && e.clipboardData) || fabric.window.clipboardData;
-  }
-
-  /**
    * Finds the width in pixels before the cursor on the same line
    * @private
    * @param {Number} lineIndex
@@ -519,7 +511,9 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
       this.moveCursorWithoutShift(offset);
     }
     if (offset !== 0) {
-      this.setSelectionInBoundaries();
+      const max = this.text.length;
+      this.selectionStart = capValue(0, this.selectionStart, max);
+      this.selectionEnd = capValue(0, this.selectionEnd, max);
       this.abortCursorAnimation();
       this._currentCursorOpacity = 1;
       this.initDelayedCursor();

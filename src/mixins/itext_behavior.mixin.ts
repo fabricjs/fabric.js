@@ -260,6 +260,17 @@ export abstract class ITextBehaviorMixin extends Text {
     }
   }
 
+  restartCursorIfNeeded() {
+    if (
+      !this._currentTickState ||
+      this._currentTickState.isAborted ||
+      !this._currentTickCompleteState ||
+      this._currentTickCompleteState.isAborted
+    ) {
+      this.initDelayedCursor();
+    }
+  }
+
   /**
    * Selects entire text
    */
@@ -1146,17 +1157,6 @@ export abstract class ITextBehaviorMixin extends Text {
     }
   }
 
-  restartCursorIfNeeded() {
-    if (
-      !this._currentTickState ||
-      this._currentTickState.isAborted ||
-      !this._currentTickCompleteState ||
-      this._currentTickCompleteState.isAborted
-    ) {
-      this.initDelayedCursor();
-    }
-  }
-
   /**
    * Handle insertion of more consecutive style lines for when one or more
    * newlines gets added to the text. Since current style needs to be shifted
@@ -1449,20 +1449,6 @@ export abstract class ITextBehaviorMixin extends Text {
         this.selectionStart = end;
       }
       this.selectionEnd = newSelection;
-    }
-  }
-
-  setSelectionInBoundaries() {
-    const length = this.text.length;
-    if (this.selectionStart > length) {
-      this.selectionStart = length;
-    } else if (this.selectionStart < 0) {
-      this.selectionStart = 0;
-    }
-    if (this.selectionEnd > length) {
-      this.selectionEnd = length;
-    } else if (this.selectionEnd < 0) {
-      this.selectionEnd = 0;
     }
   }
 }

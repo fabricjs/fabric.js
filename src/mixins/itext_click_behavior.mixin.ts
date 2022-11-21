@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { IPoint, Point } from '../point.class';
 import { TPointerEvent, TransformEvent } from '../typedefs';
+import { stopEvent } from '../util/dom_event';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
 
@@ -36,7 +37,7 @@ export abstract class ITextClickBehaviorMixin extends ITextKeyBehaviorMixin {
     const newPointer = options.pointer;
     if (this.isTripleClick(newPointer)) {
       this.fire('tripleclick', options);
-      this._stopEvent(options.e);
+      stopEvent(options.e);
     }
     this.__lastLastClickTime = this.__lastClickTime;
     this.__lastClickTime = this.__newClickTime;
@@ -51,14 +52,6 @@ export abstract class ITextClickBehaviorMixin extends ITextKeyBehaviorMixin {
       this.__lastPointer.x === newPointer.x &&
       this.__lastPointer.y === newPointer.y
     );
-  }
-
-  /**
-   * @private
-   */
-  _stopEvent(e) {
-    e.preventDefault && e.preventDefault();
-    e.stopPropagation && e.stopPropagation();
   }
 
   /**
@@ -250,14 +243,10 @@ export abstract class ITextClickBehaviorMixin extends ITextKeyBehaviorMixin {
    * @return {Number} Index of a character
    */
   getSelectionStartFromPointer(e: TPointerEvent): number {
-    let mouseOffset = this.getLocalPointer(e),
-      prevWidth = 0,
-      width = 0,
-      height = 0,
+    const mouseOffset = this.getLocalPointer(e);
+    let height = 0,
       charIndex = 0,
-      lineIndex = 0,
-      lineLeftOffset,
-      line;
+      lineIndex = 0;
     for (let i = 0, len = this._textLines.length; i < len; i++) {
       if (height <= mouseOffset.y) {
         height += this.getHeightOfLine(i) * this.scaleY;
@@ -270,9 +259,9 @@ export abstract class ITextClickBehaviorMixin extends ITextKeyBehaviorMixin {
         break;
       }
     }
-    lineLeftOffset = Math.abs(this._getLineLeftOffset(lineIndex));
-    width = lineLeftOffset * this.scaleX;
-    line = this._textLines[lineIndex];
+    const lineLeftOffset = Math.abs(this._getLineLeftOffset(lineIndex));
+    let width = lineLeftOffset * this.scaleX;
+    const jlen = this._textLines[lineIndex].length;
     // handling of RTL: in order to get things work correctly,
     // we assume RTL writing is mirrored compared to LTR writing.
     // so in position detection we mirror the X offset, and when is time
@@ -280,7 +269,8 @@ export abstract class ITextClickBehaviorMixin extends ITextKeyBehaviorMixin {
     if (this.direction === 'rtl') {
       mouseOffset.x = this.width * this.scaleX - mouseOffset.x;
     }
-    for (var j = 0, jlen = line.length; j < jlen; j++) {
+    let prevWidth = 0;
+    for (let j = 0; j < jlen; j++) {
       prevWidth = width;
       // i removed something about flipX here, check.
       width += this.__charBounds[lineIndex][j].kernedWidth * this.scaleX;
