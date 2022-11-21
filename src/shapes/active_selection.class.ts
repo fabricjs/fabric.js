@@ -3,7 +3,7 @@ import { ControlRenderingStyleOverride } from '../controls';
 import { TClassProperties } from '../typedefs';
 import { enlivenObjects } from '../util/misc/objectEnlive';
 import { FabricObject } from './fabricObject.class';
-import { Group } from './group.class';
+import { Group, groupDefaultValues } from './group.class';
 
 export class ActiveSelection extends Group {
   constructor(
@@ -160,6 +160,7 @@ export class ActiveSelection extends Group {
 export const activeSelectionDefaultValues: Partial<
   TClassProperties<ActiveSelection>
 > = {
+  ...groupDefaultValues,
   type: 'activeSelection',
   layout: 'fit-content',
   subTargetCheck: false,
