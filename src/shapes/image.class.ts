@@ -128,15 +128,16 @@ export class Image extends FabricObject {
    * @param {ImageSource | string} element Image element
    * @param {Object} [options] Options object
    */
-  constructor(element: ImageSource | string, options: any = {}) {
+  constructor(elementId: string, options: any = {});
+  constructor(element: ImageSource, options: any = {});
+  constructor(arg0: ImageSource | string, options: any = {}) {
     super();
     this.filters = [];
     this.cacheKey = `texture${FabricObject.__uid++}`;
     this.set(options);
     this.setElement(
-      (typeof element === 'string' &&
-        fabric.document.getElementById(element)) ||
-        element,
+      (typeof arg0 === 'string' && fabric.document.getElementById(arg0)) ||
+        arg0,
       options
     );
   }
