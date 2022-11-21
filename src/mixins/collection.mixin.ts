@@ -125,7 +125,7 @@ export function createCollectionMixin<T extends { new (...args: any[]): any }>(
     /**
      * Returns true if collection contains an object.\
      * **Prefer using {@link `FabricObject#isDescendantOf`} for performance reasons**
-     * instead of a.contains(b) use b.isDescendantOf(a)
+     * instead of `a.contains(b)` use `b.isDescendantOf(a)`
      * @param {Object} object Object to check against
      * @param {Boolean} [deep=false] `true` to check all descendants, `false` to check only `_objects`
      * @return {Boolean} `true` if collection contains an object
@@ -135,7 +135,9 @@ export function createCollectionMixin<T extends { new (...args: any[]): any }>(
         return true;
       } else if (deep) {
         return this._objects.some(
-          (obj) => obj instanceof Collection && obj.contains(object, true)
+          (obj) =>
+            obj instanceof Collection &&
+            (obj as unknown as Collection).contains(object, true)
         );
       }
       return false;
