@@ -1,5 +1,6 @@
-// @ts-nocheck
+//@ts-nocheck
 import { fabric } from '../../HEADER';
+import type { BaseFilter } from '../filters/base_filter.class';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
@@ -26,7 +27,7 @@ export type ImageSource =
  */
 export class Image extends FabricObject {
   /**
-   * When calling {@link getSrc}, return value from element src with `element.getAttribute('src')`.
+   * When calling {@link Image.getSrc}, return value from element src with `element.getAttribute('src')`.
    * This allows for relative urls as image src.
    * @since 2.7.0
    * @type Boolean
@@ -105,13 +106,14 @@ export class Image extends FabricObject {
    */
   imageSmoothing: boolean;
 
-  protected src: string;
-
   preserveAspectRatio: string;
 
-  static filters: any;
-  filters: any[];
-  resizeFilter: any;
+  protected src: string;
+
+  static filters: Record<string, BaseFilter>;
+
+  filters: BaseFilter[];
+  resizeFilter: BaseFilter;
 
   protected _element: ImageSource;
   protected _originalElement: ImageSource;
@@ -123,10 +125,10 @@ export class Image extends FabricObject {
    * The string should be a url and will be loaded as an image.
    * Canvas and Image element work out of the box, while videos require extra code to work.
    * Please check video element events for seeking.
-   * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | String} element Image element
+   * @param {ImageSource | string} element Image element
    * @param {Object} [options] Options object
    */
-  constructor(element: ImageSource, options: any = {}) {
+  constructor(element: ImageSource | string, options: any = {}) {
     super();
     this.filters = [];
     this.cacheKey = `texture${FabricObject.__uid++}`;
@@ -151,11 +153,9 @@ export class Image extends FabricObject {
    * If filters defined they are applied to new image.
    * You might need to call `canvas.renderAll` and `object.setCoords` after replacing, to render new image and update controls area.
    * @param {HTMLImageElement} element
-   * @param {Object} [size] Options object
-   * @return {Image} thisArg
-   * @chainable
+   * @param {Partial<TSize>} [size] Options object
    */
-  setElement(element: ImageSource, size: Partial<TSize> = {}): Image {
+  setElement(element: ImageSource, size: Partial<TSize> = {}) {
     this.removeTexture(this.cacheKey);
     this.removeTexture(`${this.cacheKey}_filtered`);
     this._element = element;
@@ -176,11 +176,10 @@ export class Image extends FabricObject {
 
   /**
    * Delete a single texture if in webgl mode
-   * @todo make static and use instanceof WebGLBackend
    */
   removeTexture(key: string) {
-    const backend = getFilterBackend();
-    if (backend.evictCachesForKey) {
+    const backend = fabric.filterBackend;
+    if (backend && backend.evictCachesForKey) {
       backend.evictCachesForKey(key);
     }
   }
@@ -206,10 +205,7 @@ export class Image extends FabricObject {
    * Get the crossOrigin value (of the corresponding image element)
    */
   getCrossOrigin() {
-    return (
-      this._originalElement &&
-      ((this._originalElement as any).crossOrigin || null)
-    );
+    return this._originalElement && (this._originalElement.crossOrigin || null);
   }
 
   /**
@@ -404,7 +400,6 @@ export class Image extends FabricObject {
    * **IMPORTANT**: It is recommended to abort loading tasks before calling this method to prevent race conditions and unnecessary networking
    * @param {String} src Source string (URL)
    * @param {LoadImageOptions} [options] Options object
-   * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
    */
   setSrc(src: string, { crossOrigin, signal }: LoadImageOptions = {}) {
     return loadImage(src, { crossOrigin, signal }).then((img) => {
@@ -417,7 +412,7 @@ export class Image extends FabricObject {
    * Returns string representation of an instance
    * @return {String} String representation of an instance
    */
-  toString(): string {
+  toString() {
     return `#<Image: { src: "${this.getSrc()}" }>`;
   }
 
@@ -466,7 +461,7 @@ export class Image extends FabricObject {
    * @param {Array} filters to be applied
    * @param {Boolean} forResizing specify if the filter operation is a resize operation
    */
-  applyFilters(filters = this.filters || []) {
+  applyFilters(filters: BaseFilter[] = this.filters || []) {
     filters = filters.filter((filter) => filter && !filter.isNeutralState());
     this.set('dirty', true);
 
@@ -555,7 +550,7 @@ export class Image extends FabricObject {
    * A full performance audit should be done.
    * @return {Boolean}
    */
-  shouldCache(): boolean {
+  shouldCache() {
     return this.needsItsOwnCache();
   }
 
@@ -608,7 +603,6 @@ export class Image extends FabricObject {
    * @private
    * Set the width and the height of the image object, using the element or the
    * options.
-   * @param {Object} [size] Object with width/height properties
    */
   _setWidthHeight({ width, height }: Partial<TSize> = {}) {
     const size = this.getOriginalSize();
@@ -697,7 +691,7 @@ export class Image extends FabricObject {
   static CSS_CANVAS = 'canvas-img';
 
   /**
-   * List of attribute names to account for when parsing SVG element (used by {@link fromElement})
+   * List of attribute names to account for when parsing SVG element (used by {@link Image.fromElement})
    * @static
    * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
    */
@@ -721,27 +715,32 @@ export class Image extends FabricObject {
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<Image>}
    */
-  static fromObject(
-    { filters, resizeFilter, src, crossOrigin, ...object }: any,
-    options: { signal: AbortSignal }
-  ): Promise<Image> {
-    const imageOptions = { ...options, crossOrigin },
-      filterOptions = { ...options, namespace: Image.filters };
+  static fromObject(object, options) {
+    const _object = Object.assign({}, object),
+      filters = _object.filters,
+      resizeFilter = _object.resizeFilter;
+    // the generic enliving will fail on filters for now
+    delete _object.resizeFilter;
+    delete _object.filters;
+    const imageOptions = Object.assign({}, options, {
+        crossOrigin: _object.crossOrigin,
+      }),
+      filterOptions = Object.assign({}, options, {
+        namespace: Image.filters,
+      });
     return Promise.all([
-      loadImage(src, imageOptions),
+      loadImage(_object.src, imageOptions),
       filters && enlivenObjects(filters, filterOptions),
       resizeFilter && enlivenObjects([resizeFilter], filterOptions),
-      enlivenObjectEnlivables(object, options),
-    ]).then(
-      ([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) =>
-        new Image(el, {
-          ...object,
-          crossOrigin,
-          filters,
-          resizeFilter,
-          ...hydratedProps,
-        })
-    );
+      enlivenObjectEnlivables(_object, options),
+    ]).then(function (imgAndFilters) {
+      _object.filters = imgAndFilters[1] || [];
+      _object.resizeFilter = imgAndFilters[2] && imgAndFilters[2][0];
+      return new Image(
+        imgAndFilters[0],
+        Object.assign(_object, imgAndFilters[3])
+      );
+    });
   }
 
   /**
@@ -772,9 +771,7 @@ export class Image extends FabricObject {
     Image.fromURL(parsedAttributes['xlink:href'], {
       ...options,
       ...parsedAttributes,
-    }).then((fabricImage) => {
-      callback(fabricImage);
-    });
+    }).then(callback);
   }
 }
 
@@ -791,7 +788,6 @@ export const imageDefaultValues: Partial<TClassProperties<Image>> = {
     'cropX',
     'cropY'
   ),
-  cacheKey: '',
   cropX: 0,
   cropY: 0,
   imageSmoothing: true,
