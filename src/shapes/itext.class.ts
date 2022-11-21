@@ -534,11 +534,8 @@ export class IText extends ITextClickBehaviorMixin {
         extraTop = 0;
       const drawWidth = boxEnd - boxStart;
       if (this.inCompositionMode) {
-        ctx.fillStyle = this.compositionColor || 'black';
         drawHeight = 1;
         extraTop = lineHeight;
-      } else {
-        ctx.fillStyle = this.selectionColor;
       }
       if (this.direction === 'rtl') {
         if (
@@ -589,6 +586,9 @@ export class IText extends ITextClickBehaviorMixin {
     }: { selectionStart: number; selectionEnd: number },
     boundaries: ReturnType<this['_getCursorBoundaries']>
   ) {
+    ctx.fillStyle = this.inCompositionMode
+      ? this.compositionColor || 'black'
+      : this.selectionColor;
     this.getSelectionBounds(
       selectionStart,
       selectionEnd,
