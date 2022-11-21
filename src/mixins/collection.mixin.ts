@@ -1,7 +1,9 @@
 import { fabric } from '../../HEADER';
 import type { FabricObject } from '../shapes/fabricObject.class';
 
-export function createCollectionMixin(Klass: { new (...args: any[]): any }) {
+export function createCollectionMixin<T extends { new (...args: any[]): any }>(
+  Klass: T
+) {
   return class Collection extends Klass {
     /**
      * @type {FabricObject[]}
