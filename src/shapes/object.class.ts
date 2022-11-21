@@ -1971,8 +1971,8 @@ export class FabricObject extends ObjectGeometry {
   static _fromObject<
     T extends FabricObject,
     X,
-    K extends X extends string
-      ? { new (arg0: string, ...args: any[]): T }
+    K extends X extends keyof T
+      ? { new (arg0: T[X], ...args: any[]): T }
       : { new (...args: any[]): T }
   >(
     klass: K,
