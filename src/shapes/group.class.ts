@@ -1,4 +1,4 @@
-/////@ts-nocheck
+// @ts-nocheck
 import { fabric } from '../../HEADER';
 import { createCollectionMixin } from '../mixins/collection.mixin';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
@@ -572,16 +572,14 @@ export class Group extends createCollectionMixin(FabricObject) {
       this._objects.concat(),
       context
     );
+    let diff: Point;
     if (result) {
       //  handle positioning
       const newCenter = new Point(result.centerX, result.centerY);
       const vector = center
         .subtract(newCenter)
         .add(new Point(result.correctionX || 0, result.correctionY || 0));
-      const diff = vector.transform(
-        invertTransform(this.calcOwnMatrix()),
-        true
-      );
+      diff = vector.transform(invertTransform(this.calcOwnMatrix()), true);
       //  set dimensions
       this.set({ width: result.width, height: result.height });
       //  adjust objects to account for new center
@@ -619,9 +617,9 @@ export class Group extends createCollectionMixin(FabricObject) {
     //  fire layout hook and event (event will fire only for layouts after initialization layout)
     this.onLayout(context, result);
     this.fire('layout', {
-      context: context,
-      result: result,
-      diff: diff,
+      context,
+      result,
+      diff,
     });
     //  recursive up
     if (this.group && this.group._applyLayoutStrategy) {
