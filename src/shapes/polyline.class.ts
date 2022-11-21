@@ -95,18 +95,12 @@ export class Polyline extends FabricObject {
    *   top: 100
    * });
    */
-  constructor(points: IPoint[] = [], options: any = {}) {
+  constructor(points: IPoint[] = [], { left, top, ...options }: any = {}) {
     super({ points, ...options });
     this.initialized = true;
-    const bboxTL = this.setDimensions();
-    const origin = this.translateToGivenOrigin(
-      new Point(options.left ?? bboxTL.x, options.top ?? bboxTL.y),
-      typeof options.left === 'number' ? this.originX : 'left',
-      typeof options.top === 'number' ? this.originY : 'top',
-      this.originX,
-      this.originY
-    );
-    this.setPositionByOrigin(origin, this.originX, this.originY);
+    this.setBoundingBox(true);
+    typeof left === 'number' && this.set('left', left);
+    typeof top === 'number' && this.set('top', top);
   }
 
   protected isOpen() {
@@ -159,14 +153,16 @@ export class Polyline extends FabricObject {
     };
   }
 
-  /**
-   * @returns {Point} top left position of the bounding box, useful for complementary positioning
-   */
-  setDimensions(): Point {
+  setDimensions() {
+    this.setBoundingBox();
+  }
+
+  setBoundingBox(adjustPosition?: boolean) {
     const { left, top, width, height, pathOffset, strokeOffset } =
       this._calcDimensions();
     this.set({ width, height, pathOffset, strokeOffset });
-    return new Point(left, top);
+    adjustPosition &&
+      this.setPositionByOrigin(new Point(left, top), 'left', 'top');
   }
 
   /**
@@ -249,11 +245,9 @@ export class Polyline extends FabricObject {
       );
     }
     return [
-      '<' + this.type + ' ',
+      `<${this.type} `,
       'COMMON_PARTS',
-      'points="',
-      points.join(''),
-      '" />\n',
+      `points="${points.join('')}" />\n`,
     ];
   }
 
