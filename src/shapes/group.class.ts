@@ -222,7 +222,7 @@ export class Group extends createCollectionMixin(FabricObject) {
     object.fire('added', { target: this });
   }
 
-  protected _onRelativeObjectAdded(object: FabricObject) {
+  _onRelativeObjectAdded(object: FabricObject) {
     this.enterGroup(object, false);
     object.fire('added', { target: this });
   }
@@ -232,10 +232,7 @@ export class Group extends createCollectionMixin(FabricObject) {
    * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
    */
-  protected _onObjectRemoved(
-    object: FabricObject,
-    removeParentTransform?: boolean
-  ) {
+  _onObjectRemoved(object: FabricObject, removeParentTransform?: boolean) {
     this.exitGroup(object, removeParentTransform);
     object.fire('removed', { target: this });
   }
@@ -245,10 +242,7 @@ export class Group extends createCollectionMixin(FabricObject) {
    * @param {'added'|'removed'} type
    * @param {FabricObject[]} targets
    */
-  protected _onAfterObjectsChange(
-    type: 'added' | 'removed',
-    targets: FabricObject[]
-  ) {
+  _onAfterObjectsChange(type: 'added' | 'removed', targets: FabricObject[]) {
     this._applyLayoutStrategy({
       type: type,
       targets: targets,
