@@ -1,6 +1,7 @@
 import { fabric } from '../../HEADER';
 import { ControlRenderingStyleOverride } from '../controls';
 import { TClassProperties } from '../typedefs';
+import { clone } from '../util/lang_object';
 import { enlivenObjects } from '../util/misc/objectEnlive';
 import { FabricObject } from './fabricObject.class';
 import { Group } from './group.class';
@@ -151,7 +152,7 @@ export class ActiveSelection extends Group {
    * @returns {Promise<ActiveSelection>}
    */
   static fromObject({ objects = [], ...object }) {
-    const options = object.clone(object, true);
+    const options = clone(object, true);
     return enlivenObjects(objects).then(
       (enlivenedObjects) => new ActiveSelection(enlivenedObjects, options, true)
     );
