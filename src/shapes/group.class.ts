@@ -1042,7 +1042,6 @@ export class Group extends createCollectionMixin(FabricObject) {
    */
   static fromObject({ objects = [], ...object }) {
     const options = clone(object, true);
-    delete options.objects;
     return Promise.all([
       enlivenObjects(objects),
       enlivenObjectEnlivables(options),
