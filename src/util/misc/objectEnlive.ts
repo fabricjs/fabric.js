@@ -1,7 +1,7 @@
 import { fabric } from '../../../HEADER';
 import { noop } from '../../constants';
+import type { FabricObject } from '../../shapes/fabricObject.class';
 import { TCrossOrigin } from '../../typedefs';
-import { TObject } from '../../__types__';
 import { camelize, capitalize } from '../lang_string';
 import { createImage } from './dom';
 
@@ -86,8 +86,8 @@ export const enlivenObjects = (
   objects: any[],
   { signal, reviver = noop, namespace = fabric }: EnlivenObjectOptions = {}
 ) =>
-  new Promise<TObject[]>((resolve, reject) => {
-    const instances: TObject[] = [];
+  new Promise<FabricObject[]>((resolve, reject) => {
+    const instances: FabricObject[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     Promise.all(
       objects.map((obj) =>
@@ -97,7 +97,7 @@ export const enlivenObjects = (
             reviver,
             namespace,
           })
-          .then((fabricInstance: TObject) => {
+          .then((fabricInstance: FabricObject) => {
             reviver(obj, fabricInstance);
             instances.push(fabricInstance);
             return fabricInstance;
@@ -130,7 +130,7 @@ export const enlivenObjectEnlivables = (
   serializedObject: any,
   { signal }: { signal?: AbortSignal } = {}
 ) =>
-  new Promise((resolve, reject) => {
+  new Promise<Record<string, unknown>>((resolve, reject) => {
     const instances: any[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     // enlive every possible property
