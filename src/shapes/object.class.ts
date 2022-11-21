@@ -17,6 +17,7 @@ import { createCanvasElement } from '../util/misc/dom';
 import { ObjectGeometry } from '../mixins/object_geometry.mixin';
 import { qrDecompose, transformPoint } from '../util/misc/matrix';
 import { Canvas, Shadow, StaticCanvas } from '../__types__';
+import type { Group } from './group.class';
 
 // temporary hack for unfinished migration
 type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
@@ -589,7 +590,7 @@ export class FabricObject extends ObjectGeometry {
    * @default undefined
    * @private
    */
-  group?: FabricObject;
+  group?: Group;
 
   /**
    * Indicate if the object is sitting on a cache dedicated to it
