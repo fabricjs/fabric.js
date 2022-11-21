@@ -4,9 +4,6 @@ import fs from 'fs-extra';
 import _ from 'lodash';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import * as acorn from 'acorn';
-import * as walk from 'acorn-walk';
-import * as cp from 'node:child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,217 +14,202 @@ function readFile(file) {
   return fs.readFileSync(path.resolve(wd, file)).toString('utf-8');
 }
 
-function printASTNode(raw, node, removeTrailingComma = true) {
-  if (node.type === 'Literal')
-    return typeof node.value === 'string' ? `'${node.value}'` : `${node.value}`;
-  if (Array.isArray(node) && node.length === 0) return '';
-  const out = (
-    Array.isArray(node)
-      ? raw.slice(node[0].start, node[node.length - 1].end + 1)
-      : raw.slice(node.start, node.end + 1)
-  ).trim();
-  return removeTrailingComma && out.endsWith(',')
-    ? out.slice(0, out.length - 1)
-    : out;
+function getVariableNameOfNS(raw, namespace) {
+  const regex = new RegExp(
+    `\\s*(.+)=\\s*${namespace.replaceAll('.', '\\.')}[^(]+`,
+    'm'
+  );
+  const result = regex.exec(raw);
+  return result ? result[1].trim() : namespace;
+}
+
+function getNSFromVariableName(raw, varname) {
+  if (varname === 'fabric') return 'fabric';
+  const regex = new RegExp(`\\s*${varname}\\s*=\\s*(.*)\\s*?,\\s*`, 'gm');
+  const result = regex.exec(raw);
+  return result ? result[1].trim() : null;
+}
+
+function findObject(raw, charStart, charEnd, startFrom = 0) {
+  const start = raw.indexOf(charStart, startFrom);
+  let index = start;
+  let counter = 0;
+  while (index < raw.length) {
+    if (raw[index] === charStart) {
+      counter++;
+    } else if (raw[index] === charEnd) {
+      counter--;
+      if (counter === 0) {
+        break;
+      }
+    }
+    index++;
+  }
+  return start > -1
+    ? {
+        start,
+        end: index,
+        raw: raw.slice(start, index + charEnd.length),
+      }
+    : null;
+}
+
+function parseRawClass(raw) {
+  let index = 0;
+  const pairs = [
+    {
+      opening: '{',
+      closing: '}',
+      test(key, index, input) {
+        return input[index] === this[key];
+      },
+    },
+    {
+      opening: '[',
+      closing: ']',
+      test(key, index, input) {
+        return input[index] === this[key];
+      },
+    },
+    {
+      opening: '(',
+      closing: ')',
+      test(key, index, input) {
+        return input[index] === this[key];
+      },
+    },
+    {
+      blocking: true,
+      opening: '/*',
+      closing: '*/',
+      test(key, index, input) {
+        return key === 'closing'
+          ? input[index - 1] === this[key][0] && input[index] === this[key][1]
+          : input[index] === this[key][0] && input[index + 1] === this[key][1];
+      },
+    },
+  ];
+  const stack = [];
+  const commas = [];
+  const fields = [];
+  while (index < raw.length) {
+    const top = stack[stack.length - 1];
+    //console.log(raw[index],top)
+    if (top && top.test('closing', index, raw)) {
+      stack.pop();
+    } else if (!top || !top.blocking) {
+      const found = pairs.find((t) => t.test('opening', index, raw));
+      if (found) {
+        stack.push(found);
+      } else if (pairs.some((t) => t.test('closing', index, raw))) {
+        stack.pop();
+      } else if (raw[index] === ',' && stack.length === 1) {
+        commas.push(index);
+      } else if (raw[index] === ':' && stack.length === 1) {
+        const trim = raw.slice(0, index).trim();
+        const result = /\s*(.+)$/.exec(trim);
+        result && fields.push(result[1]);
+      }
+    }
+
+    index++;
+  }
+  commas.reverse().forEach((pos) => {
+    raw = raw.slice(0, pos) + raw.slice(pos + 1);
+  });
+  return { raw, fields };
 }
 
 /**
  *
- * @param {string} raw
- * @param {(tree: acorn.Node) => {found:acorn.Node, parent:acorn.Node,variableName:string}} find
+ * @param {RegExpExecArray | null} regex
  * @returns
  */
-function parseClassBase(raw, find) {
-  const comments = [];
-  const ast = acorn.parse(raw, {
-    ecmaVersion: 2022,
-    sourceType: 'module',
-    locations: true,
-    onComment(block, value, start, end, locStart, locEnd) {
-      comments.push({
-        block,
-        value,
-        start,
-        end,
-        loc: {
-          start: locStart,
-          end: locEnd,
-        },
-      });
-    },
-  });
-  // fs.writeFileSync('./ast.json', JSON.stringify(ast, null, 2));
-
-  function printNode(node, removeTrailingComma) {
-    return printASTNode(raw, node, removeTrailingComma);
-  }
-
-  function findNodeComment(node) {
-    return comments.find(
-      (comment) => comment.loc.end.line === node.loc.start.line - 1
-    );
-  }
-
-  const { found, parent, variableName } = find(ast);
-
-  const declaration = found.arguments.pop();
-  const superClasses = found.arguments.map((node) => printNode(node, true));
-  const [methods, properties] = _.partition(
-    declaration.properties.map((node) => ({
-      node,
-      comment: findNodeComment(node),
-    })),
-    ({ node }) =>
-      node.type === 'Property' && node.value.type === 'FunctionExpression'
-  );
-  const name = variableName.slice(variableName.lastIndexOf('.') + 1);
-  const defaultValues = _.fromPairs(
-    properties.map(({ node }) => {
-      return [node.key.name, printNode(node.value)];
-    })
-  );
-
-  const statics = [];
-  walk.simple(ast, {
-    ExpressionStatement(node) {
-      const {
-        expression: { left, right },
-      } = node;
-      if (
-        left?.type === 'MemberExpression' &&
-        printNode(left.object).slice(0, -1) === variableName
-      ) {
-        statics.push({
-          type: right.type === 'FunctionExpression' ? 'method' : 'property',
-          key: printNode(left.property),
-          value: right,
-          node,
-          comment: findNodeComment(left),
-        });
-      }
-    },
-  });
-
-  const [staticMethods, staticProperties] = _.partition(
-    statics,
-    ({ type }) => type === 'method'
-  );
-
+function findClassBase(raw, regex) {
+  const result = regex.exec(raw);
+  if (!result) throw new Error('FAILED TO PARSE');
+  const [match, classNSRaw, superClassRaw] = result;
+  const [first, ...rest] = classNSRaw.trim().split('.');
+  const namespace = [getNSFromVariableName(raw, first), ...rest].join('.');
+  const name = namespace.slice(namespace.lastIndexOf('.') + 1);
+  const superClasses =
+    superClassRaw
+      ?.trim()
+      .split(',')
+      .filter((raw) => !raw.match(/\/\*+/) && raw)
+      .map((key) => key.trim())
+      .map((val) => {
+        const [first, ...rest] = val.split('.');
+        return [getNSFromVariableName(raw, first), ...rest].join('.');
+      }) || [];
+  const rawObject = findObject(raw, '{', '}', result.index);
+  // const NS = namespace.slice(0, namespace.lastIndexOf('.'));
+  // const { fabric } = require(wd);
+  // const klass = fabric.util.resolveNamespace(NS === 'fabric' ? null : NS)[name];
   return {
-    ast,
     name,
-    namespace: variableName,
+    namespace,
     superClasses,
     superClass:
       superClasses.length > 0
         ? superClasses[superClasses.length - 1]
         : undefined,
     requiresSuperClassResolution: superClasses.length > 0,
-    start: declaration.start,
-    end: declaration.end,
-    variableNode: parent,
-    declaration,
-    methods,
-    properties,
-    defaultValues,
-    staticMethods,
-    staticProperties,
-    comments,
-    body: raw.slice(declaration.start, declaration.end + 1),
-    printNode,
+    match: {
+      index: result.index,
+      value: match,
+    },
+    ...rawObject,
   };
 }
 
-function parseClass(raw) {
-  return parseClassBase(raw, (ast) => {
-    const { node: found } = walk.findNodeAt(
-      ast,
-      undefined,
-      undefined,
-      (nodeType, node) => {
-        return (
-          nodeType === 'CallExpression' &&
-          printASTNode(raw, node.callee).endsWith('createClass(')
-        );
-      }
-    );
-    const { node: parent } = walk.findNodeAt(
-      ast,
-      undefined,
-      undefined,
-      (nodeType, node) => {
-        return (
-          (nodeType === 'VariableDeclaration' ||
-            nodeType === 'ExpressionStatement') &&
-          node.start < found.start &&
-          node.end > found.end &&
-          !!walk.findNodeAt(
-            node,
-            undefined,
-            undefined,
-            (nodeType, node) => node === found
-          )
-        );
-      }
-    );
-
-    const variableNode =
-      parent.type === 'ExpressionStatement'
-        ? parent.expression.left
-        : parent.declarations[0].id;
-
-    return {
-      found,
-      parent,
-      variableName: printASTNode(raw, variableNode),
-    };
-  });
+function findClass(raw) {
+  const keyWord = getVariableNameOfNS(raw, 'fabric.util.createClass');
+  const regex = new RegExp(
+    `(.+)=\\s*${keyWord.replaceAll('.', '\\.')}\\((\.*)\\{`,
+    'm'
+  );
+  return findClassBase(raw, regex);
 }
 
-function parseMixin(raw) {
-  return parseClassBase(raw, (ast) => {
-    const { node: found } = walk.findNodeAt(
-      ast,
-      undefined,
-      undefined,
-      (nodeType, node) => {
-        if (
-          nodeType === 'ExpressionStatement' &&
-          node.expression.type === 'CallExpression' &&
-          printASTNode(raw, node.expression.callee).endsWith('extend(')
-        ) {
-          const lastNode = ast.body[ast.body.length - 1];
-          if (
-            lastNode.type === 'ExpressionStatement' &&
-            lastNode.expression.callee.params[0].name === 'global'
-          ) {
-            // fs.writeFileSync(
-            //   './ast.json',
-            //   JSON.stringify(lastNode.expression.callee.body.body, null, 2)
-            // );
-            return lastNode.expression.callee.body.body.includes(node);
-          } else {
-            return ast.body.includes(node);
-          }
-        }
-        return false;
-      }
-    );
-    return {
-      found: found.expression,
-      parent: found,
-      variableName: printASTNode(raw, found.expression.arguments[0]).replace(
-        '.prototype',
-        ''
-      ),
-    };
-  });
+function findMixin(raw) {
+  const keyWord = getVariableNameOfNS(raw, 'fabric.util.object.extend');
+  const regex = new RegExp(
+    `${keyWord.replaceAll('.', '\\.')}\\((.+)\\.prototype,\.*\\{`,
+    'm'
+  );
+  return findClassBase(raw, regex);
+}
+
+function transformSuperCall(raw) {
+  const regex = /this.callSuper\((.+)\)/g;
+  const result = regex.exec(raw);
+  if (!result) {
+    if (raw.indexOf('callSuper') > -1)
+      throw new Error(`failed to replace 'callSuper'`);
+    return raw;
+  }
+  const [rawMethodName, ...args] = result[1].split(',');
+  const methodName = rawMethodName.replace(/'|"/g, '');
+  const firstArgIndex = result[1].indexOf(args[0]);
+  const rest =
+    firstArgIndex > -1
+      ? result[1].slice(firstArgIndex, result[1].length).trim()
+      : '';
+  const transformedCall = `super${
+    methodName === 'initialize' ? '' : `.${methodName}`
+  }(${rest})`;
+  return (
+    raw.slice(0, result.index) +
+    transformedCall +
+    raw.slice(result.index + result[0].length)
+  );
 }
 
 function generateClass(rawClass, className, superClass, useExports) {
   return `${useExports ? 'export ' : ''}class ${className}${
     superClass ? ` extends ${superClass}` : ''
-  } {\n${rawClass}\n}`;
+  } ${rawClass}`;
 }
 
 /**
@@ -237,7 +219,7 @@ function generateMixin(rawClass, mixinName, baseClassNS, useExports) {
   const funcName = `${mixinName}Generator`;
   return `
 ${useExports ? 'export ' : ''}function ${funcName}(Klass) {
-  return class ${mixinName || ''} extends Klass {\n${rawClass}\n}\n
+  return class ${mixinName || ''} extends Klass ${rawClass}
 }
 
 ${baseClassNS ? `${baseClassNS} = ${funcName}(${baseClassNS});` : ''}
@@ -254,6 +236,24 @@ function getMixinName(file) {
   return name.replace('Itext', 'IText') + 'Mixin';
 }
 
+function transformFile(raw, { namespace, name } = {}) {
+  if (raw.replace(/\/\*.*\*\\s*/).startsWith('(function')) {
+    const wrapper = findObject(raw, '{', '}');
+    raw = wrapper.raw.slice(1, wrapper.raw.length - 1);
+  }
+
+  const annoyingCheck = new RegExp(
+    `if\\s*\\(\\s*(global.)?${namespace.replace(/\./g, '\\.')}\\s*\\)\\s*{`
+  );
+  const result = annoyingCheck.exec(raw);
+  if (result) {
+    const found = findObject(raw, '{', '}', result.index);
+    raw = raw.slice(0, result.index) + raw.slice(found.end + 1);
+  }
+  raw = `//@ts-nocheck\n${raw}`;
+  return raw;
+}
+
 /**
  *
  * @param {string} file
@@ -264,219 +264,90 @@ function transformClass(type, raw, options = {}) {
   const { className, useExports } = options;
   if (!type) throw new Error(`INVALID_ARGUMENT type`);
   const {
-    ast,
+    match,
     name,
     namespace,
     superClass,
+    raw: _rawClass,
     end,
     requiresSuperClassResolution,
     superClasses,
-    methods,
-    properties,
-    defaultValues,
-    staticMethods,
-    staticProperties,
-    declaration,
-    variableNode,
-    printNode,
-  } = type === 'mixin' ? parseMixin(raw) : parseClass(raw);
-
-  // safety
-  const duplicateMethods = _.differenceWith(
-    methods,
-    _.uniqBy(methods, 'node.key.name'),
-    (a, b) => a === b
-  );
-  if (duplicateMethods.length > 0) {
-    throw new Error(
-      `${name}: duplicate methods found: ${_.map(
-        duplicateMethods,
-        'node.key.name'
-      )}`
-    );
-  }
-  const duplicateProps = _.differenceWith(
-    properties,
-    _.uniqBy(properties, 'node.key.name'),
-    (a, b) => a === b
-  );
-
-  if (duplicateProps.length > 0) {
-    throw new Error(
-      `${name}: duplicate properties found: ${_.map(
-        duplicateProps,
-        'node.key.name'
-      )}`
-    );
-  }
-
-  const classBody = [];
-
-  properties.forEach(({ node, comment }) => {
-    const key = node.key.name;
-    const typeable =
-      node.value.type === 'Literal' &&
-      ['boolean', 'number', 'string'].includes(typeof node.value.value);
-    const typed = typeable ? `${key}: ${typeof node.value.value}` : key;
-    classBody.push((comment ? printNode(comment) : '') + '\n' + typed);
-    // replaceNode(node, typeable ? `${key}: ${typeof node.value.value}` : key);
-  });
-
-  const staticCandidates = [];
-
-  methods.forEach(({ node, comment }) => {
-    const key = node.key.name;
-    const value = printNode(node.value.body.body);
-    const methodAST = acorn.parse(value, {
-      ecmaVersion: 2022,
-      allowReturnOutsideFunction: true,
-    });
-    const superTransforms = [];
-    walk.simple(methodAST, {
-      CallExpression(node) {
-        if (
-          node.callee.object?.type === 'ThisExpression' &&
-          node.callee.property?.name === 'callSuper'
-        ) {
-          const [methodNameArg, ...args] = node.arguments;
-          const out = `${
-            methodNameArg.value === 'initialize'
-              ? 'super'
-              : `super.${methodNameArg.value}`
-          }(${args
-            .map((arg) => {
-              const out = printASTNode(value, arg);
-              return out.replace(/[^\(|\)]/gm, '').length % 2 === 1
-                ? out.slice(0, -1)
-                : out;
-            })
-            .join(', ')})`;
-          superTransforms.push({
-            node,
-            methodName: methodNameArg.value,
-            value: out,
-          });
-        }
-      },
-    });
-
-    value.indexOf('this') === -1 && staticCandidates.push(key);
-    classBody.push(
-      (comment ? printNode(comment) : '') +
-        '\n' +
-        (node.value.async ? 'async ' : '') +
-        (key === 'initialize' ? 'constructor' : key) +
-        `(${printNode(node.value.params).slice(0, -1)}) {\n` +
-        superTransforms.reduceRight((value, { node, value: out }) => {
-          return value.replace(printASTNode(value, node), out);
-        }, value) +
-        '\n}'
-    );
-  });
-
-  staticProperties.forEach(({ key, value, comment }) => {
-    const out =
-      (comment ? printNode(comment) : '') +
-      '\r\n' +
-      'static ' +
-      key +
-      '=' +
-      printNode(value);
-    classBody.push(out);
-  });
-
-  staticMethods.forEach(({ key, value, comment }) => {
-    classBody.push(
-      (comment ? printNode(comment) : '') +
-        '\n' +
-        'static ' +
-        (value.async ? 'async ' : '') +
-        key +
-        `(${printNode(value.params).slice(0, -1)}) {\n` +
-        printNode(value.body.body) +
-        '\n}'
-    );
-  });
-
-  const body = classBody.join('\r\n\r\n');
-
-  const finalName =
-    type === 'mixin'
-      ? `${_.upperFirst(name)}${className.replace(
-          new RegExp(
-            name.toLowerCase() === 'staticcanvas' ? 'canvas' : name,
-            'i'
-          ),
-          ''
-        )}` || name
-      : className || name;
-
-  let classDirective =
-    type === 'mixin'
-      ? generateMixin(body, finalName, namespace, useExports)
-      : generateClass(body, finalName, superClass, useExports);
-
-  if (_.size(defaultValues) > 0) {
-    const defaultsKey = `${_.lowerFirst(finalName)}DefaultValues`;
-    classDirective +=
-      '\n\n' +
-      `export const ${defaultsKey}: Partial<TClassProperties<${finalName}>> = {\n${_.map(
-        defaultValues,
-        (value, key) => [key, value].join(':')
-      ).join(',\n')}\n};` +
-      '\n\n' +
-      `Object.assign(${finalName}.prototype, ${defaultsKey})`;
-  }
-
-  let rawFile;
-
-  const lastNode = ast.body[ast.body.length - 1];
-  if (
-    lastNode.type === 'ExpressionStatement' &&
-    lastNode.expression.callee.params[0].name === 'global'
-  ) {
-    const bodyNodes = lastNode.expression.callee.body.body;
-    rawFile =
-      raw.slice(0, lastNode.start) +
-      printNode(bodyNodes).replace(
-        printNode(variableNode, false),
-        classDirective
-      ) +
-      raw.slice(lastNode.end + 1);
-  } else {
-    rawFile = `${raw.slice(0, variableNode.start)}${classDirective}${raw
-      .slice(end + 1)
-      .replace(/\s*\)\s*;?/, '')}`;
-  }
-
-  [...staticMethods, ...staticProperties].forEach(({ node, comment }) => {
-    if (comment) {
-      rawFile = rawFile.replace(
-        printNode({
-          start: comment.start,
-          end: node.end,
-        }),
-        ''
+  } = type === 'mixin' ? findMixin(raw) : findClass(raw);
+  let { raw: rawClass, fields } = parseRawClass(_rawClass);
+  const getPropStart = (key, raw) => {
+    const searchPhrase = `^(\\s*)${key}\\s*:\\s*`;
+    const regex = new RegExp(searchPhrase, 'm');
+    const result = regex.exec(raw);
+    const whitespace = result[1];
+    return {
+      start: result?.index + whitespace.length || -1,
+      regex,
+      value: `${whitespace}${key} = `,
+    };
+  };
+  const staticCandidantes = [];
+  fields.forEach((key) => {
+    const searchPhrase = `^(\\s*)${key}\\s*:\\s*function\\s*\\(`;
+    const regex = new RegExp(searchPhrase, 'm');
+    const result = regex.exec(rawClass);
+    if (result) {
+      const whitespace = result[1];
+      const start = result.index + whitespace.length;
+      const func = findObject(rawClass, '{', '}', start);
+      start && func.raw.indexOf('this') === -1 && staticCandidantes.push(key);
+      rawClass = rawClass.replace(
+        regex,
+        `${whitespace}${key === 'initialize' ? 'constructor' : key}(`
       );
+      if (regex.exec(rawClass)) {
+        throw new Error(`dupliate method found ${name}#${key}`);
+      }
+    } else {
+      const start = getPropStart(key, rawClass);
+      rawClass = rawClass.replace(start.regex, start.value);
     }
   });
-
-  rawFile = rawFile
-    .replace(new RegExp(namespace.replace(/\./g, '\\.'), 'g'), name)
-    .replace(/fabric\.Object/g, 'FabricObject')
-    .replace(/fabric\.util\./g, '');
-
-  rawFile.indexOf('//@ts-nocheck') === -1 &&
-    (rawFile = `//@ts-nocheck\n${rawFile}`);
-
-  if (type === 'class' /*&& !useExports*/) {
-    classDirective += `\n\n/** @todo TODO_JS_MIGRATION remove next line after refactoring build */\n${namespace} = ${name};\n`;
+  let transformed = rawClass;
+  do {
+    rawClass = transformed;
+    try {
+      transformed = transformSuperCall(rawClass);
+    } catch (error) {
+      console.error(error);
+    }
+  } while (transformed !== rawClass);
+  const classDirective =
+    type === 'mixin'
+      ? generateMixin(
+          rawClass,
+          `${_.upperFirst(name)}${className.replace(
+            new RegExp(
+              name.toLowerCase() === 'staticcanvas' ? 'canvas' : name,
+              'i'
+            ),
+            ''
+          )}` || name,
+          namespace,
+          useExports
+        )
+      : generateClass(rawClass, className || name, superClass, useExports);
+  raw = `${raw.slice(0, match.index)}${classDirective}${raw
+    .slice(end + 1)
+    .replace(/\s*\)\s*;?/, '')}`;
+  if (type === 'mixin') {
+    //  in case of multiple mixins in one file
+    try {
+      return transformClass(type, raw, options);
+    } catch (error) {}
   }
-
+  if (type === 'class' && !useExports) {
+    raw = `${raw}\n/** @todo TODO_JS_MIGRATION remove next line after refactoring build */\n${namespace} = ${name};\n`;
+  }
+  raw = transformFile(raw, { namespace, name });
   return {
     name,
-    raw: rawFile,
-    staticCandidates,
+    raw,
+    staticCandidantes,
     requiresSuperClassResolution,
     superClasses,
   };
@@ -487,7 +358,7 @@ function convertFile(type, source, dest, options) {
     const {
       name,
       raw,
-      staticCandidates,
+      staticCandidantes,
       requiresSuperClassResolution,
       superClasses,
     } = transformClass(type, readFile(source), {
@@ -506,8 +377,8 @@ function convertFile(type, source, dest, options) {
         requiresSuperClassResolution: requiresSuperClassResolution
           ? superClasses
           : false,
-        staticCandidates:
-          staticCandidates.length > 0 ? staticCandidates : 'none',
+        staticCandidantes:
+          staticCandidantes.length > 0 ? staticCandidantes : 'none',
       });
     return dest;
   } catch (error) {
@@ -613,14 +484,6 @@ export function transform(options = {}) {
       );
     });
 
-  try {
-    cp.execSync(
-      `prettier --write ${result
-        .map(({ dir, file }) => path.relative('.', path.resolve(dir, file)))
-        .join(' ')}`
-    );
-  } catch (error) {}
-
   const [errors, files] = _.partition(result, (file) => file instanceof Error);
   const dirs = files.reduce((dirs, { dir, file }) => {
     (dirs[dir] || (dirs[dir] = [])).push(file);
@@ -634,12 +497,8 @@ export function transform(options = {}) {
       fs.removeSync(path.resolve(dir, file.replace('.ts', '.js')))
     );
 
-  if (!options.verbose && errors.length > 0) {
+  if (!options.verbose) {
     console.error(`failed files:`);
     errors.map(console.error);
   }
-
-  console.log(chalk.blue('\n\nTransformation Results:'));
-  console.log(chalk.bold(`success: ${files.length}`));
-  console.log(chalk.bold(`failed: ${errors.length}\n\n`));
 }
