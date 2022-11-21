@@ -642,6 +642,7 @@ program
   .option('-i, --index', 'create index files', false)
   .option('-ts, --typescript', 'transform into typescript', false)
   .option('-v, --verbose', 'verbose logging', true)
+  .option('--no-verbose', 'verbose logging')
   .option('-a, --all', 'transform all files', false)
   .option(
     '-d, --diff <branch>',
