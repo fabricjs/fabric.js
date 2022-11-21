@@ -585,12 +585,18 @@ export class FabricObject extends ObjectGeometry {
   cacheTranslationY?: number;
 
   /**
-   * A reference to the parent of the object, usually a FabricGroup
+   * A reference to the parent of the object, usually a Group
    * @type number
    * @default undefined
    * @private
    */
   group?: Group;
+
+  /**
+   * A reference to the parent of the object
+   * Used to keep the original parent ref when the object has been added to an ActiveSelection, hence loosing the `group` ref
+   */
+  __owningGroup?: Group;
 
   /**
    * Indicate if the object is sitting on a cache dedicated to it
