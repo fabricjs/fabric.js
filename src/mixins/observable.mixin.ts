@@ -128,7 +128,7 @@ export class Observable {
    * @param {String} eventName Event name to fire
    * @param {Object} [options] Options object
    */
-  fire(eventName: string, options: object) {
+  fire(eventName: string, options?: object) {
     if (!this.__eventListeners) {
       return;
     }

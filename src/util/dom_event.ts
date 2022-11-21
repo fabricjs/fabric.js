@@ -44,3 +44,8 @@ export const getPointer = (event) => {
 
 export const isTouchEvent = (event) =>
   touchEvents.indexOf(event.type) > -1 || event.pointerType === 'touch';
+
+export const stopEvent = (e: Event) => {
+  e.preventDefault();
+  e.stopPropagation();
+};
