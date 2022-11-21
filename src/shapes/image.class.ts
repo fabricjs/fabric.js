@@ -718,31 +718,26 @@ export class Image extends FabricObject {
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<Image>}
    */
-  static fromObject(object, options) {
-    const _object = Object.assign({}, object),
-      filters = _object.filters,
-      resizeFilter = _object.resizeFilter;
-    // the generic enliving will fail on filters for now
-    delete _object.resizeFilter;
-    delete _object.filters;
-    const imageOptions = Object.assign({}, options, {
-        crossOrigin: _object.crossOrigin,
-      }),
-      filterOptions = Object.assign({}, options, {
-        namespace: Image.filters,
-      });
+  static fromObject(
+    { filters, resizeFilter, src, crossOrigin, ...object }: any,
+    options: { signal: AbortSignal }
+  ): Promise<Image> {
+    const imageOptions = { ...options, crossOrigin },
+      filterOptions = { ...options, namespace: Image.filters };
     return Promise.all([
-      loadImage(_object.src, imageOptions),
+      loadImage(src, imageOptions),
       filters && enlivenObjects(filters, filterOptions),
       resizeFilter && enlivenObjects([resizeFilter], filterOptions),
-      enlivenObjectEnlivables(_object, options),
-    ]).then(function (imgAndFilters) {
-      _object.filters = imgAndFilters[1] || [];
-      _object.resizeFilter = imgAndFilters[2] && imgAndFilters[2][0];
-      return new Image(
-        imgAndFilters[0],
-        Object.assign(_object, imgAndFilters[3])
-      );
+      enlivenObjectEnlivables(object, options),
+    ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
+      return new Image(el, {
+        ...object,
+        src,
+        crossOrigin,
+        filters,
+        resizeFilter,
+        ...hydratedProps,
+      });
     });
   }
 
