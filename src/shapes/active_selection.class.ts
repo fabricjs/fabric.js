@@ -6,14 +6,6 @@ import { FabricObject } from './fabricObject.class';
 import { Group } from './group.class';
 
 export class ActiveSelection extends Group {
-  /**
-   * Constructor
-   *
-   * @param {FabricObject[]} [objects] instance objects
-   * @param {Object} [options] Options object
-   * @param {boolean} [objectsRelativeToGroup] true if objects exist in group coordinate plane
-   * @return {ActiveSelection} thisArg
-   */
   constructor(
     objects?: FabricObject[],
     options?: any,
