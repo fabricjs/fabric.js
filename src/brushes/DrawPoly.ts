@@ -26,8 +26,12 @@ export class DrawPoly extends DrawShapeBase<Polyline> {
     this.canvas._isCurrentlyDrawing = false;
     const shape = this.shape;
     if (!shape) return;
-    const pos = shape.setDimensions().scalarAdd(this.width / 2);
-    shape.setPositionByOrigin(pos, 'left', 'top');
+    shape.setBoundingBox(true);
+    const r = this.width / 2;
+    shape.set({
+      left: shape.left + r,
+      top: shape.top + r,
+    });
     super.finalize();
   }
 
