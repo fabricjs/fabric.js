@@ -18,45 +18,45 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
    * this.keysMap = Object.assign({}, this.keysMap);
    * The function must be in IText.prototype.myFunction And will receive event as args[0]
    */
-  keysMap: {
-    9: 'exitEditing';
-    27: 'exitEditing';
-    33: 'moveCursorUp';
-    34: 'moveCursorDown';
-    35: 'moveCursorRight';
-    36: 'moveCursorLeft';
-    37: 'moveCursorLeft';
-    38: 'moveCursorUp';
-    39: 'moveCursorRight';
-    40: 'moveCursorDown';
+  keysMap = {
+    9: 'exitEditing',
+    27: 'exitEditing',
+    33: 'moveCursorUp',
+    34: 'moveCursorDown',
+    35: 'moveCursorRight',
+    36: 'moveCursorLeft',
+    37: 'moveCursorLeft',
+    38: 'moveCursorUp',
+    39: 'moveCursorRight',
+    40: 'moveCursorDown',
   };
 
-  keysMapRtl: {
-    9: 'exitEditing';
-    27: 'exitEditing';
-    33: 'moveCursorUp';
-    34: 'moveCursorDown';
-    35: 'moveCursorLeft';
-    36: 'moveCursorRight';
-    37: 'moveCursorRight';
-    38: 'moveCursorUp';
-    39: 'moveCursorLeft';
-    40: 'moveCursorDown';
+  keysMapRtl = {
+    9: 'exitEditing',
+    27: 'exitEditing',
+    33: 'moveCursorUp',
+    34: 'moveCursorDown',
+    35: 'moveCursorLeft',
+    36: 'moveCursorRight',
+    37: 'moveCursorRight',
+    38: 'moveCursorUp',
+    39: 'moveCursorLeft',
+    40: 'moveCursorDown',
   };
 
   /**
    * For functionalities on keyUp + ctrl || cmd
    */
-  ctrlKeysMapUp: {
-    67: 'copy';
-    88: 'cut';
+  ctrlKeysMapUp = {
+    67: 'copy',
+    88: 'cut',
   };
 
   /**
    * For functionalities on keyDown + ctrl || cmd
    */
-  ctrlKeysMapDown: {
-    65: 'selectAll';
+  ctrlKeysMapDown = {
+    65: 'selectAll',
   };
 
   hiddenTextarea: HTMLTextAreaElement | null;
