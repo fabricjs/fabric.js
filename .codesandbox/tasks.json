@@ -1,0 +1,35 @@
+// https://codesandbox.io/docs/learn/repositories/tasks
+{
+  "setupTasks": [
+    {
+      "name": "Installing Dependencies",
+      "command": "npm install"
+    }
+  ],
+  "tasks": {
+    "install-dependencies": {
+      "name": "Install Dependencies",
+      "command": "npm install"
+    },
+    "build": {
+      "name": "Build & Watch",
+      "command": "npm run build -- -f -w",
+      "runAtStart": true
+    },
+    "node": {
+      "name": "Run Node Template",
+      "command": "npm start node -- --no-watch",
+      "runAtStart": true
+    },
+    "next": {
+      "name": "Run Next Template",
+      "command": "npm start next -- --no-watch",
+      "runAtStart": true
+    },
+    "vanilla": {
+      "name": "Run Vanilla Template",
+      "command": "npm start vanilla -- --no-watch",
+      "runAtStart": true
+    }
+  }
+}
