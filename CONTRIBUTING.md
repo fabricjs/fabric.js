@@ -189,12 +189,11 @@ You can actively develop fabric online using [Github Codespaces](https://github.
 
 - After the Github Codespace has started run `npm start <template>` to start a [prototyping](#-prototyping) app.
 - Gitpod will start the [prototyping](#-prototyping) apps and expose them as endpoints available on forwarded ports.
-`A service is available on port ...` popups will show up.
+  `A service is available on port ...` popups will show up.
 
 ### 🧭 Prototyping
 
 [`.codesandbox/templates`](.codesandbox/templates) contains templates for **INSTANT** out-of-the-box prototyping [**👍 Try it out**](.codesandbox/README.md)
-
 
 ### 🔮 Symlinking
 
