@@ -10,13 +10,7 @@
   "forwardPorts": [8080, 3000, 1234],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": [
-    "npm i",
-    "npm run build -- -w -f",
-    "npm start node -- --no-watch",
-    "npm start next -- --no-watch",
-    "npm start vanilla -- --no-watch"
-  ]
+  "postCreateCommand": "npm i"
 
   // Configure tool-specific properties.
   // "customizations": {},
