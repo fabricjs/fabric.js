@@ -2,7 +2,8 @@
 
 ## [next]
 
-- chore(TS): migrate text classes/mixins [#8408](https://github.com/fabricjs/fabric.js/pull/8408)
+- fix(TS): migration error of itext key mixin (#8421) [#8457](https://github.com/fabricjs/fabric.js/pull/8457)
+- chore(TS): migrate text classes/mixins [#8421](https://github.com/fabricjs/fabric.js/pull/8421)
 - chore(TS): migrate Collection [#8433](https://github.com/fabricjs/fabric.js/pull/8433)
 - ci(): Simplify filestats even more [#8449](https://github.com/fabricjs/fabric.js/pull/8449)
 - chore(TS): migrate filter backends [#8403](https://github.com/fabricjs/fabric.js/pull/8403)
