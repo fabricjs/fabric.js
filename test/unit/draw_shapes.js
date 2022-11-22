@@ -100,6 +100,20 @@
             'should preserve position from mousedown');
         });
 
+        QUnit.test('Draw Oval + centered', function (assert) {
+          const brush = new fabric.DrawOval(canvas);
+          brush.centered = true;
+          const shape = runShapeBrushTest(brush, assert);
+          assert.equal(shape.rx, 10, 'should set rx');
+          assert.equal(shape.ry, 15, 'should set ry');
+          assert.equal(shape.width, 20, 'should set width');
+          assert.equal(shape.height, 30, 'should set height');
+          assert.deepEqual(
+            shape.getCenterPoint(),
+            new fabric.Point(10, 10),
+            'should preserve position from mousedown');
+        });
+
         QUnit.test('Draw Oval + symmetric', function (assert) {
           const shape = runShapeBrushTest(new fabric.DrawOval(canvas), assert, {
             shiftKey: true
@@ -110,6 +124,22 @@
           assert.equal(shape.height, 15, 'should set height');
           assert.deepEqual(
             shape.translateToOriginPoint(shape.getCenterPoint(), 'left', 'top'),
+            new fabric.Point(10, 10),
+            'should preserve position from mousedown');
+        });
+
+        QUnit.test('Draw Oval + centered + symmetric', function (assert) {
+          const brush = new fabric.DrawOval(canvas);
+          brush.centered = true;
+          const shape = runShapeBrushTest(brush, assert, {
+            shiftKey: true
+          });
+          assert.equal(Math.round(shape.rx), 18, 'should set rx');
+          assert.equal(Math.round(shape.ry), 18, 'should set ry');
+          assert.equal(Math.round(shape.width), 36, 'should set width');
+          assert.equal(Math.round(shape.height), 36, 'should set height');
+          assert.deepEqual(
+            shape.getCenterPoint(),
             new fabric.Point(10, 10),
             'should preserve position from mousedown');
         });
