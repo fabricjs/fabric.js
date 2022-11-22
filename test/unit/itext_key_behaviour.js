@@ -243,7 +243,7 @@
   });
 
   QUnit.test('mousedown calls key maps', function (assert) {
-    var event = {
+    const event = {
       stopPropagation: function () { },
       stopImmediatePropagation: function () { },
       preventDefault: function () { },
@@ -254,7 +254,7 @@
 
     }
     ['default', 'rtl', 'ctrl'].forEach(x => { TestIText.prototype[`__test_${x}`] = () => fired.push(x) });
-    var iText = new TestIText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' } } } });
+    const iText = new TestIText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' } } } });
     iText.isEditing = true;
     const fired = [];
     iText.keysMap = { 0: `__test_default` };
