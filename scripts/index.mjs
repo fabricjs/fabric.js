@@ -760,15 +760,42 @@ sandbox
   });
 
 sandbox
-  .command('start <path>')
+  .command('start [path]')
   .description('start a sandbox')
+  .addOption(
+    new commander.Option(
+      '-t, --template <template>',
+      'template to use instead of a "path"'
+    ).choices(templates)
+  )
   .option('-w, --watch', 'build and watch fabric', true)
   .option(
     '--no-watch',
     'use this option if you have another process watching fabric'
   )
-  .action((pathToSandbox, { watch }) => {
-    startSandbox(pathToSandbox, watch);
+  .action(async (pathToSandbox, { template, watch }, context) => {
+    if (!fs.existsSync(pathToSandbox) && templates.includes(pathToSandbox)) {
+      const { confirm } = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'confirm',
+          message: `Did you mean to run ${chalk.blue(
+            `npm run sandbox start -- -t ${pathToSandbox}\n`
+          )}?`,
+          default: true,
+        },
+      ]);
+      if (!confirm) {
+        context.help({ error: true });
+        return;
+      }
+      template = pathToSandbox;
+      pathToSandbox = undefined;
+    }
+    startSandbox(
+      pathToSandbox || path.resolve(codesandboxTemplatesDir, template),
+      watch
+    );
   });
 
 program.parse(process.argv);
