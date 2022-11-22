@@ -595,23 +595,23 @@
       });
     });
 
-    group.insertAt(rect3, 1);
+    group.insertAt(1, rect3);
     control.splice(1, 0, rect3);
     firingControl.push(rect3);
     equalsControl('rect3');
-    group.insertAt(rect4, 0);
+    group.insertAt(0, rect4);
     control.splice(0, 0, rect4);
     firingControl.push(rect4);
     equalsControl('rect4');
-    group.insertAt(rect5, 2);
+    group.insertAt(2, rect5);
     control.splice(2, 0, rect5);
     firingControl.push(rect5);
     equalsControl('rect5');
-    group.insertAt([rect6], 2);
+    group.insertAt(2, rect6);
     control.splice(2, 0, rect6);
     firingControl.push(rect6);
     equalsControl('rect6');
-    group.insertAt([rect7, rect8], 3);
+    group.insertAt(3, rect7, rect8);
     control.splice(3, 0, rect7, rect8);
     firingControl.push(rect7, rect8);
     equalsControl('rect7');
@@ -723,7 +723,7 @@
     assert.deepEqual(group.getObjects(), [rect1, rect2], '`rect2` should have entered once');
     //  adding self
     assert.notOk(group.canEnterGroup(group));
-    group.insertAt(group, 0);
+    group.insertAt(0, group);
     assert.deepEqual(group.getObjects(), [rect1, rect2], 'objects should not have changed');
     //  nested object should be removed from group
     var nestedGroup = new fabric.Group([rect1]);

@@ -1,7 +1,8 @@
 //@ts-nocheck
+import { createCollectionMixin } from '../mixins/collection.mixin';
+import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { Point } from '../point.class';
 import { FabricObject } from './fabricObject.class';
-import { resolveOrigin } from '../mixins/object_origin.mixin';
 
 export class Group extends FabricObject {}
 
@@ -17,13 +18,115 @@ export class Group extends FabricObject {}
    * Group class
    * @class fabric.Group
    * @extends fabric.Object
-   * @mixes fabric.Collection
    * @fires layout once layout completes
    * @see {@link fabric.Group#initialize} for constructor definition
    */
   fabric.Group = fabric.util.createClass(
-    FabricObject,
-    fabric.Collection,
+    class GroupBase extends createCollectionMixin(FabricObject) {
+      /**
+       * Checks if object can enter group and logs relevant warnings
+       * @private
+       * @param {fabric.Object} object
+       * @returns
+       */
+      canEnterGroup(object) {
+        if (object === this || this.isDescendantOf(object)) {
+          //  prevent circular object tree
+          /* _DEV_MODE_START_ */
+          console.error(
+            'fabric.Group: circular object trees are not supported, this call has no effect'
+          );
+          /* _DEV_MODE_END_ */
+          return false;
+        } else if (this._objects.indexOf(object) !== -1) {
+          // is already in the objects array
+          /* _DEV_MODE_START_ */
+          console.error(
+            'fabric.Group: duplicate objects are not supported inside group, this call has no effect'
+          );
+          /* _DEV_MODE_END_ */
+          return false;
+        }
+        return true;
+      }
+
+      /**
+       * Override this method to enhance performance (for groups with a lot of objects).
+       * If Overriding, be sure not pass illegal objects to group - it will break your app.
+       * @private
+       */
+      protected _filterObjectsBeforeEnteringGroup(objects) {
+        return objects.filter((object, index, array) => {
+          // can enter AND is the first occurrence of the object in the passed args (to prevent adding duplicates)
+          return this.canEnterGroup(object) && array.indexOf(object) === index;
+        });
+      }
+
+      /**
+       * Add objects
+       * @param {...FabricObject[]} objects
+       */
+      add(...objects: FabricObject[]) {
+        const allowedObjects = this._filterObjectsBeforeEnteringGroup(objects);
+        super.add(...allowedObjects);
+        this._onAfterObjectsChange('added', allowedObjects);
+      }
+
+      /**
+       * Inserts an object into collection at specified index
+       * @param {FabricObject[]} objects Object to insert
+       * @param {Number} index Index to insert object at
+       */
+      insertAt(index: number, ...objects: FabricObject[]) {
+        const allowedObjects = this._filterObjectsBeforeEnteringGroup(objects);
+        super.insertAt(index, ...allowedObjects);
+        this._onAfterObjectsChange('added', allowedObjects);
+      }
+
+      /**
+       * Remove objects
+       * @param {...FabricObject[]} objects
+       * @returns {FabricObject[]} removed objects
+       */
+      remove(...objects: FabricObject[]) {
+        const removed = super.remove(...objects);
+        this._onAfterObjectsChange('removed', removed);
+        return removed;
+      }
+
+      protected _onObjectAdded(object: FabricObject) {
+        this.enterGroup(object, true);
+        object.fire('added', { target: this });
+      }
+
+      protected _onRelativeObjectAdded(object: FabricObject) {
+        this.enterGroup(object, false);
+        object.fire('added', { target: this });
+      }
+
+      /**
+       * @private
+       * @param {fabric.Object} object
+       * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
+       */
+      protected _onObjectRemoved(object, removeParentTransform) {
+        this.exitGroup(object, removeParentTransform);
+        object.fire('removed', { target: this });
+      }
+
+      /**
+       * @private
+       * @param {'added'|'removed'} type
+       * @param {fabric.Object[]} targets
+       */
+      protected _onAfterObjectsChange(type, targets) {
+        this._applyLayoutStrategy({
+          type: type,
+          targets: targets,
+        });
+        this._set('dirty', true);
+      }
+    },
     /** @lends fabric.Group.prototype */ {
       /**
        * Type of an object
@@ -106,9 +209,9 @@ export class Group extends FabricObject {}
           'initialize',
           Object.assign({}, options, { angle: 0, skewX: 0, skewY: 0 })
         );
-        this.forEachObject(function (object) {
+        this.forEachObject((object) => {
           this.enterGroup(object, false);
-        }, this);
+        });
         this._applyLayoutStrategy({
           type: 'initialization',
           options: options,
@@ -125,7 +228,7 @@ export class Group extends FabricObject {}
         var prev = this[key];
         this.callSuper('_set', key, value);
         if (key === 'canvas' && prev !== value) {
-          this.forEachObject(function (object) {
+          this.forEachObject((object) => {
             object._set(key, value);
           });
         }
@@ -137,7 +240,7 @@ export class Group extends FabricObject {}
           });
         }
         if (key === 'interactive') {
-          this.forEachObject(this._watchObject.bind(this, value));
+          this.forEachObject((object) => this._watchObject(value, object));
         }
         return this;
       },
@@ -150,69 +253,12 @@ export class Group extends FabricObject {}
       },
 
       /**
-       * Override this method to enhance performance (for groups with a lot of objects).
-       * If Overriding, be sure not pass illegal objects to group - it will break your app.
-       * @private
-       */
-      _filterObjectsBeforeEnteringGroup: function (objects) {
-        return objects.filter(function (object, index, array) {
-          // can enter AND is the first occurrence of the object in the passed args (to prevent adding duplicates)
-          return this.canEnterGroup(object) && array.indexOf(object) === index;
-        }, this);
-      },
-
-      /**
-       * Add objects
-       * @param {...fabric.Object} objects
-       */
-      add: function () {
-        var allowedObjects = this._filterObjectsBeforeEnteringGroup(
-          Array.from(arguments)
-        );
-        fabric.Collection.add.call(this, allowedObjects, this._onObjectAdded);
-        this._onAfterObjectsChange('added', allowedObjects);
-      },
-
-      /**
-       * Inserts an object into collection at specified index
-       * @param {fabric.Object | fabric.Object[]} objects Object to insert
-       * @param {Number} index Index to insert object at
-       */
-      insertAt: function (objects, index) {
-        var allowedObjects = this._filterObjectsBeforeEnteringGroup(
-          Array.isArray(objects) ? objects : [objects]
-        );
-        fabric.Collection.insertAt.call(
-          this,
-          allowedObjects,
-          index,
-          this._onObjectAdded
-        );
-        this._onAfterObjectsChange('added', allowedObjects);
-      },
-
-      /**
-       * Remove objects
-       * @param {...fabric.Object} objects
-       * @returns {fabric.Object[]} removed objects
-       */
-      remove: function () {
-        var removed = fabric.Collection.remove.call(
-          this,
-          arguments,
-          this._onObjectRemoved
-        );
-        this._onAfterObjectsChange('removed', removed);
-        return removed;
-      },
-
-      /**
        * Remove all objects
        * @returns {fabric.Object[]} removed objects
        */
       removeAll: function () {
         this._activeObjects = [];
-        return this.remove.apply(this, this._objects.slice());
+        return this.remove(...this._objects);
       },
 
       /**
@@ -259,33 +305,6 @@ export class Group extends FabricObject {}
         object[directive]('modified', this.__objectMonitor);
         object[directive]('selected', this.__objectSelectionTracker);
         object[directive]('deselected', this.__objectSelectionDisposer);
-      },
-
-      /**
-       * Checks if object can enter group and logs relevant warnings
-       * @private
-       * @param {fabric.Object} object
-       * @returns
-       */
-      canEnterGroup: function (object) {
-        if (object === this || this.isDescendantOf(object)) {
-          //  prevent circular object tree
-          /* _DEV_MODE_START_ */
-          console.error(
-            'fabric.Group: circular object trees are not supported, this call has no effect'
-          );
-          /* _DEV_MODE_END_ */
-          return false;
-        } else if (this._objects.indexOf(object) !== -1) {
-          // is already in the objects array
-          /* _DEV_MODE_START_ */
-          console.error(
-            'fabric.Group: duplicate objects are not supported inside group, this call has no effect'
-          );
-          /* _DEV_MODE_END_ */
-          return false;
-        }
-        return true;
       },
 
       /**
@@ -370,47 +389,6 @@ export class Group extends FabricObject {}
         if (index > -1) {
           this._activeObjects.splice(index, 1);
         }
-      },
-
-      /**
-       * @private
-       * @param {'added'|'removed'} type
-       * @param {fabric.Object[]} targets
-       */
-      _onAfterObjectsChange: function (type, targets) {
-        this._applyLayoutStrategy({
-          type: type,
-          targets: targets,
-        });
-        this._set('dirty', true);
-      },
-
-      /**
-       * @private
-       * @param {fabric.Object} object
-       */
-      _onObjectAdded: function (object) {
-        this.enterGroup(object, true);
-        object.fire('added', { target: this });
-      },
-
-      /**
-       * @private
-       * @param {fabric.Object} object
-       */
-      _onRelativeObjectAdded: function (object) {
-        this.enterGroup(object, false);
-        object.fire('added', { target: this });
-      },
-
-      /**
-       * @private
-       * @param {fabric.Object} object
-       * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
-       */
-      _onObjectRemoved: function (object, removeParentTransform) {
-        this.exitGroup(object, removeParentTransform);
-        object.fire('removed', { target: this });
       },
 
       /**
@@ -500,9 +478,7 @@ export class Group extends FabricObject {}
       setCoords: function () {
         this.callSuper('setCoords');
         this._shouldSetNestedCoords() &&
-          this.forEachObject(function (object) {
-            object.setCoords();
-          });
+          this.forEachObject((object) => object.setCoords());
       },
 
       /**
@@ -581,9 +557,9 @@ export class Group extends FabricObject {}
           this.set({ width: result.width, height: result.height });
           //  adjust objects to account for new center
           !context.objectsRelativeToGroup &&
-            this.forEachObject(function (object) {
+            this.forEachObject((object) => {
               this._adjustObjectPosition(object, diff);
-            }, this);
+            });
           //  clip path as well
           !isFirstLayout &&
             this.layout !== 'clip-path' &&
@@ -980,10 +956,10 @@ export class Group extends FabricObject {}
 
       dispose: function () {
         this._activeObjects = [];
-        this.forEachObject(function (object) {
+        this.forEachObject((object) => {
           this._watchObject(false, object);
-          object.dispose && object.dispose();
-        }, this);
+          object.dispose();
+        });
         this.callSuper('dispose');
       },
 
