@@ -1,0 +1,26 @@
+// https://docs.github.com/en/codespaces/setting-up-your-project-for-codespaces/setting-up-your-nodejs-project-for-codespaces
+{
+  "name": "Node.js & TypeScript",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:16-bullseye",
+
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  // "features": {},
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // "forwardPorts": [],
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": [
+    "npm i",
+    "npm run build -- -w -f",
+    "npm start node -- --no-watch",
+    "npm start next -- --no-watch",
+    "npm start vanilla -- --no-watch"
+  ]
+
+  // Configure tool-specific properties.
+  // "customizations": {},
+
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
+}
