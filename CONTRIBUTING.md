@@ -185,45 +185,15 @@ Options:
 
 #### Online
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
+You can actively develop fabric online using [Github Codespaces](https://github.com/codespaces/new?hide_repo_select=true&ref=master&repo=712530), [Gitpod](https://gitpod.io/from-referrer/) or CodeSandbox:
 
-Gitpod will start the [prototyping](#-prototyping) apps and expose them as endpoints.
+- Gitpod will start the [prototyping](#-prototyping) apps and expose them as endpoints.
 `A service is available on port ...` popups will show up.
 
 ### 🧭 Prototyping
 
-[`.codesandbox/templates`](.codesandbox/templates) contains templates for **INSTANT** out-of-the-box prototyping **👍 Try it out**
+[`.codesandbox/templates`](.codesandbox/templates) contains templates for **INSTANT** out-of-the-box prototyping [**👍 Try it out**](.codesandbox/README.md)
 
-```bash
-
-npm run sandbox build next [/path/to/sandbox]
-> building next app at /path/to/sandbox
-
-npm run sandbox start </path/to/sandbox>
-> starting dev server
-
-npm run sandbox deploy </path/to/sandbox>
-> created codesandbox https://codesandbox.io/s/fgh476
-
-npm run sandbox deploy -- --template node
-> created codesandbox https://codesandbox.io/s/fgh476
-
-npm run sandbox -- --help
-
-> Usage: fabric.js sandbox [options] [command]
-
-> sandbox commands
-
-Options:
-  -h, --help                      display help for command
-
-Commands:
-  deploy [options] [path]         deploy a sandbox to codesandbox
-  build <template> [destination]  build and start a sandbox
-  start <path>                    start a sandbox
-  help [command]                  display help for command
-
-```
 
 ### 🔮 Symlinking
 
