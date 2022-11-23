@@ -256,6 +256,7 @@ export abstract class BaseBrush<T extends FabricObject> {
       this.canvas.fire('path:created', { path: shape });
       this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
     }
+    this.canvas.contextTopDirty = true;
     this.canvas.requestRenderAll();
   }
 }
