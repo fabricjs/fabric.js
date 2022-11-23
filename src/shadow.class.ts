@@ -79,11 +79,11 @@ export class Shadow {
   }
 
   /**
-   * @param {String} shadow Shadow value to parse
+   * @param {String} value Shadow value to parse
    * @return {Object} Shadow object with color, offsetX, offsetY and blur
    */
-  static parseShadow(shadow: string) {
-    const shadowStr = shadow.trim(),
+  static parseShadow(value: string) {
+    const shadowStr = value.trim(),
       offsetsAndBlur = Shadow.reOffsetsAndBlur.exec(shadowStr) || [],
       color = shadowStr.replace(Shadow.reOffsetsAndBlur, '') || 'rgb(0,0,0)';
 
