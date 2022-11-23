@@ -337,9 +337,7 @@ export class Point {
   }
 
   /**
-   * Rotates `point` around `origin` with `radians`
-   * @static
-   * @memberOf fabric.util
+   * Rotates `point` around `origin` by `radians`
    * @param {Point} origin The origin of the rotation
    * @param {TRadian} radians The radians of the angle for the rotation
    * @return {Point} The new rotated point
@@ -358,9 +356,7 @@ export class Point {
   }
 
   /**
-   * Apply transform t to point p
-   * @static
-   * @memberOf fabric.util
+   * Apply transform to point
    * @param  {TMat2D} t The transform
    * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
    * @return {Point} The transformed point
