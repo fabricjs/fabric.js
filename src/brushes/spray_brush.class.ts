@@ -95,6 +95,11 @@ export class SprayBrush extends BaseBrush<FabricObject> {
     this.sprayChunk = [];
   }
 
+  _setBrushStyles(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
+    super._setBrushStyles(ctx);
+    ctx.fillStyle = this.color;
+  }
+
   protected finalizeShape() {
     const rects = [];
     for (let i = 0; i < this.sprayChunks.length; i++) {
@@ -128,8 +133,8 @@ export class SprayBrush extends BaseBrush<FabricObject> {
   onMouseDown(pointer: Point) {
     this.sprayChunks = [];
     this.canvas.clearContext(this.canvas.contextTop);
+    this._setBrushStyles();
     this._setShadow();
-
     this.addSprayChunk(pointer);
     this.renderChunk(this.sprayChunk);
   }
@@ -153,18 +158,23 @@ export class SprayBrush extends BaseBrush<FabricObject> {
     this.finalize();
   }
 
-  renderChunk(sprayChunk: SprayBrushPoint[]) {
-    const ctx = this.canvas.contextTop;
-    ctx.save();
-    ctx.fillStyle = this.color;
-    this.transform(ctx);
-
+  protected drawChunk(
+    ctx: CanvasRenderingContext2D,
+    sprayChunk: SprayBrushPoint[]
+  ) {
     for (let i = 0; i < sprayChunk.length; i++) {
       const point = sprayChunk[i];
       ctx.globalAlpha = point.opacity;
       ctx.fillRect(point.x, point.y, point.width, point.width);
     }
+  }
 
+  protected renderChunk(sprayChunk: SprayBrushPoint[]) {
+    const ctx = this.canvas.contextTop;
+    ctx.save();
+    this.transform(ctx);
+    this.drawChunk(ctx, sprayChunk);
+    this._drawClipPath(ctx, this.clipPath);
     ctx.restore();
   }
 
@@ -172,9 +182,8 @@ export class SprayBrush extends BaseBrush<FabricObject> {
    * Render all spray chunks
    */
   protected _render(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = this.color;
     for (let i = 0; i < this.sprayChunks.length; i++) {
-      this.renderChunk(this.sprayChunks[i]);
+      this.drawChunk(ctx, this.sprayChunks[i]);
     }
     ctx.restore();
   }

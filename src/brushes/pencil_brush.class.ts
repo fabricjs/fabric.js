@@ -170,6 +170,7 @@ export class PencilBrush extends BaseBrush<Path> {
       points[length - 1]
     );
     ctx.stroke();
+    this._drawClipPath(ctx, this.clipPath);
     ctx.restore();
   }
 

@@ -107,7 +107,7 @@ export abstract class BaseBrush<T extends FabricObject> {
    * @private
    * @param {CanvasRenderingContext2D} ctx
    */
-  _setBrushStyles(ctx: CanvasRenderingContext2D) {
+  _setBrushStyles(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
     ctx.strokeStyle = this.color;
     ctx.lineWidth = this.width;
     ctx.lineCap = this.strokeLineCap;

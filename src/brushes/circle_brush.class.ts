@@ -60,6 +60,7 @@ export class CircleBrush extends BaseBrush<FabricObject> {
     ctx.save();
     this.transform(ctx);
     this.dot(ctx, point);
+    this._drawClipPath(ctx, this.clipPath);
     ctx.restore();
   }
 
