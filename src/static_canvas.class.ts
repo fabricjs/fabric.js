@@ -1,11 +1,13 @@
 //@ts-nocheck
 import { config } from './config';
 import { VERSION } from './constants';
+import { createCollectionMixin } from './mixins/collection.mixin';
+import { CommonMethods } from './mixins/shared_methods.mixin';
 import { Point } from './point.class';
+import { FabricObject } from './shapes/fabricObject.class';
 import { requestAnimFrame } from './util/animate';
 import { removeFromArray } from './util/internals';
 import { pick } from './util/misc/pick';
-
 (function (global) {
   // aliases for faster resolution
   var fabric = global.fabric,
@@ -21,7 +23,6 @@ import { pick } from './util/misc/pick';
   /**
    * Static canvas class
    * @class fabric.StaticCanvas
-   * @mixes fabric.Collection
    * @mixes fabric.Observable
    * @see {@link http://fabricjs.com/static_canvas|StaticCanvas demo}
    * @see {@link fabric.StaticCanvas#initialize} for constructor definition
@@ -33,8 +34,48 @@ import { pick } from './util/misc/pick';
    */
   // eslint-disable-next-line max-len
   fabric.StaticCanvas = fabric.util.createClass(
-    fabric.CommonMethods,
-    fabric.Collection,
+    class extends createCollectionMixin(CommonMethods) {
+      add(...objects: FabricObject[]) {
+        super.add(...objects);
+        objects.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
+        return this;
+      }
+
+      insertAt(index: number, ...objects: FabricObject[]) {
+        super.insertAt(index, ...objects);
+        objects.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
+        return this;
+      }
+
+      remove(...objects: FabricObject[]) {
+        const removed = super.remove(...objects);
+        removed.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
+        return this;
+      }
+
+      protected _onObjectAdded(obj: FabricObject) {
+        this.stateful && obj.setupState();
+        if (obj.canvas && obj.canvas !== this) {
+          /* _DEV_MODE_START_ */
+          console.warn(
+            'fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
+              'Resulting to default behavior: removing object from previous canvas and adding to new canvas'
+          );
+          /* _DEV_MODE_END_ */
+          obj.canvas.remove(obj);
+        }
+        obj._set('canvas', this);
+        obj.setCoords();
+        this.fire('object:added', { target: obj });
+        obj.fire('added', { target: this });
+      }
+
+      protected _onObjectRemoved(obj: FabricObject) {
+        obj._set('canvas', undefined);
+        this.fire('object:removed', { target: obj });
+        obj.fire('removed', { target: this });
+      }
+    },
     /** @lends fabric.StaticCanvas.prototype */ {
       /**
        * Constructor
@@ -100,7 +141,7 @@ import { pick } from './util/misc/pick';
       stateful: false,
 
       /**
-       * Indicates whether {@link fabric.Collection.add}, {@link fabric.Collection.insertAt} and {@link fabric.Collection.remove},
+       * Indicates whether {@link add}, {@link insertAt} and {@link remove},
        * {@link fabric.StaticCanvas.moveTo}, {@link fabric.StaticCanvas.clear} and many more, should also re-render canvas.
        * Disabling this option will not give a performance boost when adding/removing a lot of objects to/from canvas at once
        * since the renders are quequed and executed one per frame.
@@ -293,7 +334,7 @@ import { pick } from './util/misc/pick';
        */
       _initOptions: function (options) {
         var lowerCanvasEl = this.lowerCanvasEl;
-        this._setOptions(options);
+        this.set(options);
 
         this.width = this.width || parseInt(lowerCanvasEl.width, 10) || 0;
         this.height = this.height || parseInt(lowerCanvasEl.height, 10) || 0;
@@ -498,16 +539,16 @@ import { pick } from './util/misc/pick';
         this.viewportTransform = vpt;
         for (i = 0, len = this._objects.length; i < len; i++) {
           object = this._objects[i];
-          object.group || object.setCoords(true);
+          object.group || object.setCoords();
         }
         if (activeObject) {
           activeObject.setCoords();
         }
         if (backgroundObject) {
-          backgroundObject.setCoords(true);
+          backgroundObject.setCoords();
         }
         if (overlayObject) {
-          overlayObject.setCoords(true);
+          overlayObject.setCoords();
         }
         this.calcViewportBoundaries();
         this.renderOnAddRemove && this.requestRenderAll();
@@ -582,87 +623,6 @@ import { pick } from './util/misc/pick';
        */
       getElement: function () {
         return this.lowerCanvasEl;
-      },
-
-      /**
-       * @param {...fabric.Object} objects to add
-       * @return {Self} thisArg
-       * @chainable
-       */
-      add: function () {
-        fabric.Collection.add.call(this, arguments, this._onObjectAdded);
-        arguments.length > 0 &&
-          this.renderOnAddRemove &&
-          this.requestRenderAll();
-        return this;
-      },
-
-      /**
-       * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
-       * An object should be an instance of (or inherit from) fabric.Object
-       * @param {fabric.Object|fabric.Object[]} objects Object(s) to insert
-       * @param {Number} index Index to insert object at
-       * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
-       * @return {Self} thisArg
-       * @chainable
-       */
-      insertAt: function (objects, index) {
-        fabric.Collection.insertAt.call(
-          this,
-          objects,
-          index,
-          this._onObjectAdded
-        );
-        (Array.isArray(objects) ? objects.length > 0 : !!objects) &&
-          this.renderOnAddRemove &&
-          this.requestRenderAll();
-        return this;
-      },
-
-      /**
-       * @param {...fabric.Object} objects to remove
-       * @return {Self} thisArg
-       * @chainable
-       */
-      remove: function () {
-        var removed = fabric.Collection.remove.call(
-          this,
-          arguments,
-          this._onObjectRemoved
-        );
-        removed.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
-        return this;
-      },
-
-      /**
-       * @private
-       * @param {fabric.Object} obj Object that was added
-       */
-      _onObjectAdded: function (obj) {
-        this.stateful && obj.setupState();
-        if (obj.canvas && obj.canvas !== this) {
-          /* _DEV_MODE_START_ */
-          console.warn(
-            'fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
-              'Resulting to default behavior: removing object from previous canvas and adding to new canvas'
-          );
-          /* _DEV_MODE_END_ */
-          obj.canvas.remove(obj);
-        }
-        obj._set('canvas', this);
-        obj.setCoords();
-        this.fire('object:added', { target: obj });
-        obj.fire('added', { target: this });
-      },
-
-      /**
-       * @private
-       * @param {fabric.Object} obj Object that was removed
-       */
-      _onObjectRemoved: function (obj) {
-        obj._set('canvas', undefined);
-        this.fire('object:removed', { target: obj });
-        obj.fire('removed', { target: this });
       },
 
       /**
@@ -1327,7 +1287,7 @@ import { pick } from './util/misc/pick';
       createSVGClipPathMarkup: function (options) {
         var clipPath = this.clipPath;
         if (clipPath) {
-          clipPath.clipPathId = 'CLIPPATH_' + fabric.Object.__uid++;
+          clipPath.clipPathId = 'CLIPPATH_' + FabricObject.__uid++;
           return (
             '<clipPath id="' +
             clipPath.clipPathId +
@@ -1802,9 +1762,7 @@ import { pick } from './util/misc/pick';
       destroy: function () {
         this.destroyed = true;
         this.cancelRequestedRender();
-        this.forEachObject(function (object) {
-          object.dispose && object.dispose();
-        });
+        this.forEachObject((object) => object.dispose());
         this._objects = [];
         if (this.backgroundImage && this.backgroundImage.dispose) {
           this.backgroundImage.dispose();
@@ -1847,7 +1805,6 @@ import { pick } from './util/misc/pick';
     }
   );
 
-  extend(fabric.StaticCanvas.prototype, fabric.Observable);
   extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
 
   extend(

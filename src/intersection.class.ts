@@ -4,7 +4,7 @@ import { fabric } from '../HEADER';
 
 /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 
-type IntersectionType = 'Intersection' | 'Coincident' | 'Parallel';
+export type IntersectionType = 'Intersection' | 'Coincident' | 'Parallel';
 
 /**
  * **Assuming `T`, `A`, `B` are points on the same line**,
