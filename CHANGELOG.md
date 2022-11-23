@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(Object Stacking): 🔙 refactor logic to support Group 🔝
 - chore(TS): migrate Group/ActiveSelection [#8455](https://github.com/fabricjs/fabric.js/pull/8455)
 - chore(TS): migrate text classes/mixins [#8408](https://github.com/fabricjs/fabric.js/pull/8408)
 - chore(TS): migrate Collection [#8433](https://github.com/fabricjs/fabric.js/pull/8433)
