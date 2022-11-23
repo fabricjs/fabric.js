@@ -345,7 +345,7 @@ import { Point } from '../point.class';
    * After erasing is done the created path is added to all intersected objects' `eraser` property.
    *
    * In order to update the EraserBrush call `preparePattern`.
-   * It may come in handy when canvas changes during erasing (i.e animations) and you want the eraser to reflect the changes.
+   * It may come in handy when canvas changes during erasing (i.e animations) and you want the eraser to reflect the changes (performance may suffer).
    *
    * @tutorial {@link http://fabricjs.com/erasing}
    * @class fabric.EraserBrush
@@ -544,25 +544,6 @@ import { Point } from '../point.class';
       _setBrushStyles: function (ctx) {
         this.callSuper('_setBrushStyles', ctx);
         ctx.strokeStyle = 'black';
-      },
-
-      /**
-       * **Customiztion**
-       *
-       * if you need the eraser to update on each render (i.e animating during erasing) override this method by **adding** the following (performance may suffer):
-       * @example
-       * ```
-       * if(ctx === this.canvas.contextTop) {
-       *  this.preparePattern();
-       * }
-       * ```
-       *
-       * @override fabric.BaseBrush#_saveAndTransform
-       * @param {CanvasRenderingContext2D} ctx
-       */
-      _saveAndTransform: function (ctx) {
-        this.callSuper('_saveAndTransform', ctx);
-        this._setBrushStyles(ctx);
         ctx.globalCompositeOperation =
           ctx === this.canvas.getContext()
             ? 'destination-out'
@@ -596,7 +577,7 @@ import { Point } from '../point.class';
         this.preparePattern();
         this._isErasing = true;
         this.canvas.fire('erasing:start');
-        this._render();
+        this.render();
       },
 
       /**
@@ -606,44 +587,35 @@ import { Point } from '../point.class';
        *
        * @todo provide a better solution to https://github.com/fabricjs/fabric.js/issues/7984
        */
-      _render: function () {
-        var ctx,
-          lineWidth = this.width;
+      render: function (ctx) {
+        var lineWidth = this.width;
         var t = this.canvas.getRetinaScaling(),
           s = 1 / t;
         //  clip canvas
-        ctx = this.canvas.getContext();
         //  a hack that fixes https://github.com/fabricjs/fabric.js/issues/7984 by reducing path width
         //  the issue's cause is unknown at time of writing (@ShaMan123 06/2022)
         if (lineWidth - this.erasingWidthAliasing > 0) {
           this.width = lineWidth - this.erasingWidthAliasing;
-          this.callSuper('_render', ctx);
+          this.callSuper('render', this.canvas.getContext());
           this.width = lineWidth;
         }
         //  render brush and mask it with pattern
-        ctx = this.canvas.contextTop;
         this.canvas.clearContext(ctx);
         ctx.save();
         ctx.scale(s, s);
         ctx.drawImage(this._patternCanvas, 0, 0);
         ctx.restore();
-        this.callSuper('_render', ctx);
+        this.callSuper('render', ctx);
       },
 
-      /**
-       * Creates fabric.Path object
-       * @override
-       * @private
-       * @param {(string|number)[][]} pathData Path data
-       * @return {fabric.Path} Path to add on canvas
-       * @returns
-       */
-      createPath: function (pathData) {
-        var path = this.callSuper('createPath', pathData);
-        path.globalCompositeOperation = this.inverted
-          ? 'source-over'
-          : 'destination-out';
-        path.stroke = this.inverted ? 'white' : 'black';
+      finalizeShape: function () {
+        var path = this.callSuper('finalizeShape');
+        path?.set({
+          globalCompositeOperation: this.inverted
+            ? 'source-over'
+            : 'destination-out',
+          stroke: this.inverted ? 'white' : 'black',
+        });
         return path;
       },
 
@@ -763,7 +735,7 @@ import { Point } from '../point.class';
           });
           if (context) {
             (obj.group ? context.subTargets : context.targets).push(obj);
-            //context.paths.set(obj, path);
+            context.paths.set(obj, path);
           }
           return path;
         });
@@ -788,7 +760,7 @@ import { Point } from '../point.class';
               this._addPathToObjectEraser(drawable, path).then(function (path) {
                 if (context) {
                   context.drawables[prop] = drawable;
-                  //context.paths.set(drawable, path);
+                  context.paths.set(drawable, path);
                 }
                 return path;
               })
@@ -797,74 +769,51 @@ import { Point } from '../point.class';
         );
       },
 
+      finalizeErasing: async function (path) {
+        // finalize erasing
+        const context = {
+          targets: [],
+          subTargets: [],
+          paths: new Map(),
+          drawables: {},
+          path,
+        };
+        const tasks = canvas._objects.map(
+          (obj) =>
+            obj.erasable &&
+            obj.intersectsWithObject(path, true, true) &&
+            this._addPathToObjectEraser(obj, path, context)
+        );
+        tasks.push(this.applyEraserToCanvas(path, context));
+        await Promise.all(tasks);
+        return context;
+      },
+
       /**
        * On mouseup after drawing the path on contextTop canvas
        * we use the points captured to create an new fabric path object
        * and add it to every intersected erasable object.
        */
-      _finalizeAndAddPath: function () {
-        var ctx = this.canvas.contextTop,
-          canvas = this.canvas;
-        ctx.closePath();
-        if (this.decimate) {
-          this._points = this.decimatePoints(this._points, this.decimate);
-        }
-
-        // clear
-        canvas.clearContext(canvas.contextTop);
+      finalize: async function () {
         this._isErasing = false;
-
-        var pathData =
-          this._points && this._points.length > 1
-            ? this.convertPointsToSVGPath(this._points)
-            : null;
-        if (!pathData || this._isEmptySVGPath(pathData)) {
+        this.finalizePath();
+        this._resetShadow();
+        const shape = this.finalizeShape();
+        if (shape) {
+          shape.set({
+            canvas: this.canvas,
+            shadow: this.shadow ? new Shadow(this.shadow) : undefined,
+            clipPath: await this.createClipPath(shape),
+          });
+          shape.setCoords();
+          this.canvas.fire('interaction:completed', { result: shape });
+          this.canvas.fire('before:path:created', { path: shape });
+          canvas.fire('erasing:end', await this.finalizeErasing(shape));
+          this.canvas.fire('path:created', { path: shape });
+        } else {
           canvas.fire('erasing:end');
-          // do not create 0 width/height paths, as they are
-          // rendered inconsistently across browsers
-          // Firefox 4, for example, renders a dot,
-          // whereas Chrome 10 renders nothing
-          canvas.requestRenderAll();
-          return;
         }
-
-        var path = this.createPath(pathData);
-        //  needed for `intersectsWithObject`
-        path.setCoords();
-        //  commense event sequence
-        canvas.fire('before:path:created', { path: path });
-
-        // finalize erasing
-        var _this = this;
-        var context = {
-          targets: [],
-          subTargets: [],
-          //paths: new Map(),
-          drawables: {},
-        };
-        var tasks = canvas._objects.map(function (obj) {
-          return (
-            obj.erasable &&
-            obj.intersectsWithObject(path, true, true) &&
-            _this._addPathToObjectEraser(obj, path, context)
-          );
-        });
-        tasks.push(_this.applyEraserToCanvas(path, context));
-        return Promise.all(tasks).then(function () {
-          //  fire erasing:end
-          canvas.fire(
-            'erasing:end',
-            Object.assign(context, {
-              path: path,
-            })
-          );
-
-          canvas.requestRenderAll();
-          _this._resetShadow();
-
-          // fire event 'path' created
-          canvas.fire('path:created', { path: path });
-        });
+        this.canvas.requestRenderAll();
       },
     }
   );

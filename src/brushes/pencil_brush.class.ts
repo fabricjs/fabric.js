@@ -270,7 +270,7 @@ export class PencilBrush extends BaseBrush<Path> {
     return newPoints;
   }
 
-  protected async finalize() {
+  protected finalizePath() {
     const ctx = this.canvas.contextTop;
     ctx.closePath();
     if (this.decimate) {
@@ -279,6 +279,10 @@ export class PencilBrush extends BaseBrush<Path> {
     if (this.shadow) {
       this.shadow.affectStroke = true;
     }
+  }
+
+  protected async finalize() {
+    this.finalizePath();
     super.finalize();
   }
 }
