@@ -216,7 +216,7 @@ export class Group extends createCollectionMixin(FabricObject) {
     return removed;
   }
 
-  protected _onObjectAdded(object: FabricObject) {
+  _onObjectAdded(object: FabricObject) {
     this.enterGroup(object, true);
     object.fire('added', { target: this });
   }
