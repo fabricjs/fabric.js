@@ -100,15 +100,16 @@ export abstract class BaseBrush {
     ctx.setLineDash(this.strokeDashArray || []);
   }
 
+  transform(ctx: CanvasRenderingContext2D) {
+    ctx.transform(...this.canvas.viewportTransform);
+  }
+
   /**
    * Sets the transformation on given context
-   * @param {CanvasRenderingContext2D} ctx context to render on
-   * @private
    */
   protected _saveAndTransform(ctx: CanvasRenderingContext2D) {
-    const v = this.canvas.viewportTransform;
     ctx.save();
-    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+    this.transform(ctx);
   }
 
   protected needsFullRender() {

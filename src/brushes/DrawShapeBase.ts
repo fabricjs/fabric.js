@@ -45,12 +45,16 @@ export abstract class DrawShapeBase<T extends FabricObject> extends BaseBrush {
     this.setStyles();
   }
 
-  _render(ctx = this.canvas.contextTop) {
-    this.canvas.clearContext(this.canvas.contextTop);
-    ctx.save();
+  transform(ctx: CanvasRenderingContext2D) {
     const t = this.canvas.viewportTransform;
     const offset = new Point().transform(t);
     ctx.transform(t[0], t[1], t[2], t[3], -offset.x, -offset.y);
+  }
+
+  _render(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
+    this.canvas.clearContext(ctx);
+    ctx.save();
+    this.transform(ctx);
     this.shape!.transform(ctx);
     this.shape!._render(ctx);
     ctx.restore();
