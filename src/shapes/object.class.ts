@@ -1662,7 +1662,7 @@ export class FabricObject extends ObjectGeometry {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @returns {Promise<fabric.Object>}
    */
-  clone(propertiesToInclude: (keyof this)[]) {
+  clone(propertiesToInclude: (keyof this)[]): Promise<this> {
     const objectForm = this.toObject(propertiesToInclude);
     // todo ok understand this. is static or it isn't?
     return this.constructor.fromObject(objectForm);

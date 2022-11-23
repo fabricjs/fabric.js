@@ -527,7 +527,7 @@ import { saveObjectTransform } from './util/misc/objectTransforms';
       renderTopLayer: function (ctx) {
         ctx.save();
         if (this.isDrawingMode && this._isCurrentlyDrawing) {
-          this.freeDrawingBrush && this.freeDrawingBrush._render();
+          this.freeDrawingBrush && this.freeDrawingBrush.render(ctx);
           this.contextTopDirty = true;
         }
         // we render the top context - last object

@@ -76,7 +76,7 @@ export class PencilBrush extends BaseBrush {
     // capture coordinates immediately
     // this allows to draw dots (when movement never occurs)
     this._addPoint(pointer);
-    this._render();
+    this.render();
   }
 
   /**
@@ -94,26 +94,9 @@ export class PencilBrush extends BaseBrush {
     if (this._addPoint(pointer) && this._points.length > 1) {
       if (this.needsFullRender()) {
         // redraw curve
-        // clear top canvas
-        this.canvas.clearContext(this.canvas.contextTop);
-        this._render();
+        this.render();
       } else {
-        const points = this._points,
-          length = points.length,
-          ctx = this.canvas.contextTop;
-        // draw the curve update
-        this._saveAndTransform(ctx);
-        if (this.oldEnd) {
-          ctx.beginPath();
-          ctx.moveTo(this.oldEnd.x, this.oldEnd.y);
-        }
-        this.oldEnd = PencilBrush.drawSegment(
-          ctx,
-          points[length - 2],
-          points[length - 1]
-        );
-        ctx.stroke();
-        ctx.restore();
+        this._renderCurve();
       }
     }
   }
@@ -172,14 +155,36 @@ export class PencilBrush extends BaseBrush {
   }
 
   /**
+   * draw the curve update
+   */
+  protected _renderCurve(
+    ctx: CanvasRenderingContext2D = this.canvas.contextTop
+  ) {
+    const points = this._points,
+      length = points.length;
+    ctx.save();
+    this.transform(ctx);
+    if (this.oldEnd) {
+      ctx.beginPath();
+      ctx.moveTo(this.oldEnd.x, this.oldEnd.y);
+    }
+    this.oldEnd = PencilBrush.drawSegment(
+      ctx,
+      points[length - 2],
+      points[length - 1]
+    );
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /**
    * Draw a smooth path on the topCanvas using quadraticCurveTo
    * @private
-   * @param {CanvasRenderingContext2D} [ctx]
+   * @param {CanvasRenderingContext2D} ctx
    */
-  _render(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
+  protected _render(ctx: CanvasRenderingContext2D) {
     let p1 = this._points[0],
       p2 = this._points[1];
-    this._saveAndTransform(ctx);
     ctx.beginPath();
     //if we only have 2 points in the path and they are the same
     //it means that the user only clicked the canvas without moving the mouse

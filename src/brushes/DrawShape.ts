@@ -68,7 +68,7 @@ export class DrawShape<
   onMouseMove(pointer: Point, ev: TBrushEventData) {
     this.symmetric = this.modifierKey && ev.e[this.modifierKey];
     this.setBounds(this.start, pointer);
-    this._render();
+    this.render();
   }
 
   onMouseUp(ev: TBrushEventData) {

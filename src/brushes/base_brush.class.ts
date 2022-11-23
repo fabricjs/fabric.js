@@ -1,7 +1,13 @@
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import type { Point } from '../point.class';
+import { FabricObject } from '../shapes/fabricObject.class';
 import { TEvent } from '../typedefs';
+import {
+  multiplyTransformMatrices,
+  invertTransform,
+} from '../util/misc/matrix';
+import { applyTransformToObject } from '../util/misc/objectTransforms';
 import type { Canvas, Shadow } from '../__types__';
 
 export type TBrushEventData = TEvent & { pointer: Point };
@@ -70,6 +76,13 @@ export abstract class BaseBrush {
   limitedToCanvasSize = false;
 
   /**
+   * Same as FabricObject `clipPath` property.
+   * The clip path is positioned relative to the top left corner of the viewport.
+   * The `absolutePositioned` property renders the clip path w/o viewport transform.
+   */
+  clipPath?: FabricObject;
+
+  /**
    * @todo add type
    */
   canvas: Canvas;
@@ -78,7 +91,7 @@ export abstract class BaseBrush {
     this.canvas = canvas;
   }
 
-  abstract _render(): void;
+  protected abstract _render(ctx: CanvasRenderingContext2D): void;
   abstract onMouseDown(pointer: Point, ev: TBrushEventData): void;
   abstract onMouseMove(pointer: Point, ev: TBrushEventData): void;
   /**
@@ -104,17 +117,13 @@ export abstract class BaseBrush {
     ctx.transform(...this.canvas.viewportTransform);
   }
 
-  /**
-   * Sets the transformation on given context
-   */
-  protected _saveAndTransform(ctx: CanvasRenderingContext2D) {
-    ctx.save();
-    this.transform(ctx);
-  }
-
   protected needsFullRender() {
     const color = new Color(this.color);
-    return color.getAlpha() < 1 || !!this.shadow;
+    return (
+      color.getAlpha() < 1 ||
+      !!this.shadow ||
+      (this.clipPath && this.clipPath.isCacheDirty())
+    );
   }
 
   /**
@@ -160,6 +169,72 @@ export abstract class BaseBrush {
       pointer.y < 0 ||
       pointer.y > this.canvas.getHeight()
     );
+  }
+
+  /**
+   * needed for `absolutePositioned` `clipPath`
+   * @private
+   */
+  calcTransformMatrix() {
+    return this.canvas.viewportTransform;
+  }
+
+  /**
+   * @private
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {FabricObject} clipPath
+   */
+  drawClipPathOnCache(ctx: CanvasRenderingContext2D, clipPath: FabricObject) {
+    // TODO: no proto calls
+    FabricObject.prototype.drawClipPathOnCache.call(this, ctx, clipPath);
+  }
+
+  /**
+   * @private
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {FabricObject} clipPath
+   */
+  _drawClipPath(ctx: CanvasRenderingContext2D, clipPath?: FabricObject) {
+    if (!clipPath) {
+      return;
+    }
+    ctx.save();
+    // TODO: no proto calls
+    FabricObject.prototype._drawClipPath.call(this, ctx, clipPath);
+    ctx.restore();
+  }
+
+  /**
+   * Adds the clip path to the resulting object created by the brush
+   */
+  protected _addClipPathToResult(result: FabricObject) {
+    if (!this.clipPath) {
+      return Promise.resolve();
+    }
+    let t = result.calcTransformMatrix();
+    if (this.clipPath.absolutePositioned) {
+      t = multiplyTransformMatrices(this.calcTransformMatrix(), t);
+    }
+    return this.clipPath.clone(['inverted']).then((clipPath) => {
+      const desiredTransform = multiplyTransformMatrices(
+        invertTransform(t),
+        clipPath.calcTransformMatrix()
+      );
+      applyTransformToObject(clipPath, desiredTransform);
+      result.set('clipPath', clipPath);
+    });
+  }
+
+  /**
+   * Render the full state of the brush
+   */
+  render(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
+    this.canvas.clearContext(ctx);
+    ctx.save();
+    this.transform(ctx);
+    this._render(ctx);
+    this._drawClipPath(ctx, this.clipPath);
+    ctx.restore();
   }
 }
 

@@ -39,7 +39,8 @@ export class CircleBrush extends BaseBrush {
   drawDot(pointer: Point) {
     const point = this.addPoint(pointer),
       ctx = this.canvas.contextTop;
-    this._saveAndTransform(ctx);
+    ctx.save();
+    this.transform(ctx);
     this.dot(ctx, point);
     ctx.restore();
   }
@@ -66,14 +67,11 @@ export class CircleBrush extends BaseBrush {
    * Render the full state of the brush
    * @private
    */
-  _render() {
-    const ctx = this.canvas.contextTop,
-      points = this.points;
-    this._saveAndTransform(ctx);
+  protected _render(ctx: CanvasRenderingContext2D) {
+    const points = this.points;
     for (let i = 0; i < points.length; i++) {
       this.dot(ctx, points[i]);
     }
-    ctx.restore();
   }
 
   /**
@@ -85,9 +83,8 @@ export class CircleBrush extends BaseBrush {
       return;
     }
     if (this.needsFullRender()) {
-      this.canvas.clearContext(this.canvas.contextTop);
       this.addPoint(pointer);
-      this._render();
+      this.render();
     } else {
       this.drawDot(pointer);
     }

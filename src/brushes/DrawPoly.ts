@@ -14,7 +14,7 @@ export class DrawPoly extends DrawShapeBase<Polyline> {
   private replacePoint(pointer: Point) {
     this.shape!.points.pop();
     this.addPoint(pointer);
-    this._render();
+    this.render();
   }
 
   create() {

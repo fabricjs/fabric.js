@@ -169,7 +169,8 @@ export class SprayBrush extends BaseBrush {
     const ctx = this.canvas.contextTop;
     ctx.fillStyle = this.color;
 
-    this._saveAndTransform(ctx);
+    ctx.save();
+    this.transform(ctx);
 
     for (let i = 0; i < sprayChunck.length; i++) {
       const point = sprayChunck[i];
@@ -183,12 +184,8 @@ export class SprayBrush extends BaseBrush {
   /**
    * Render all spray chunks
    */
-  _render() {
-    const ctx = this.canvas.contextTop;
+  protected _render(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = this.color;
-
-    this._saveAndTransform(ctx);
-
     for (let i = 0; i < this.sprayChunks.length; i++) {
       this.renderChunck(this.sprayChunks[i]);
     }

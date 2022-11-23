@@ -10,6 +10,8 @@ export type Canvas = StaticCanvas & {
   altActionKey: ModifierKey;
   uniScaleKey: ModifierKey;
   uniformScaling: boolean;
+  contextTop: CanvasRenderingContext2D;
+  getTopContext(): CanvasRenderingContext2D;
 } & Record<string, any>;
 export type StaticCanvas = Record<string, any> & {
   getZoom(): number;

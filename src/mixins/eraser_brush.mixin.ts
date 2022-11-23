@@ -329,7 +329,7 @@ import { Point } from '../point.class';
      */
     _renderOverlay: function (ctx) {
       __renderOverlay.call(this, ctx);
-      this.isErasing() && this.freeDrawingBrush._render();
+      this.isErasing() && this.freeDrawingBrush.render(ctx);
     },
   });
 
