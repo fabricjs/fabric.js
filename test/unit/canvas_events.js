@@ -307,16 +307,16 @@
   QUnit.test('setDimensions and active brush', function(assert) {
     var prepareFor = false;
     var rendered = false;
-    var canva = new fabric.Canvas(null, { width: 500, height: 500 });
+    var canvas = new fabric.Canvas(null, { width: 500, height: 500 });
     var brush = new fabric.PencilBrush({ color: 'red', width: 4 });
-    canva.isDrawingMode = true;
-    canva.freeDrawingBrush = brush;
-    canva._isCurrentlyDrawing = true;
-    brush._render = function() { rendered = true; };
+    canvas.isDrawingMode = true;
+    canvas.freeDrawingBrush = brush;
+    canvas._isCurrentlyDrawing = true;
+    brush.render = function() { rendered = true; };
     brush._setBrushStyles = function() { prepareFor = true; };
-    canva.setDimensions({ width: 200, height: 200 });
-    canva.renderAll();
-    assert.equal(rendered, true, 'the brush called the _render method');
+    canvas.setDimensions({ width: 200, height: 200 });
+    canvas.renderAll();
+    assert.equal(rendered, true, 'the brush called the render method');
     assert.equal(prepareFor, true, 'the brush called the _setBrushStyles method');
   });
 
