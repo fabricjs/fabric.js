@@ -230,9 +230,8 @@ export abstract class ITextClickBehaviorMixin extends ITextKeyBehaviorMixin {
    * @return {Point} Coordinates of a pointer (x, y)
    */
   getLocalPointer(e: TPointerEvent, pointer: IPoint): Point {
-    const thePointer = pointer || this.canvas.getPointer(e);
     return transformPoint(
-      thePointer,
+      pointer || this.canvas.getPointer(e),
       invertTransform(this.calcTransformMatrix())
     ).add(new Point(this.width / 2, this.height / 2));
   }
