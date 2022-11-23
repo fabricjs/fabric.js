@@ -178,10 +178,12 @@ export class Shadow {
       return data;
     }
 
-    const proto = Shadow.prototype;
+    const defaults = Shadow.prototype;
     const out: Record<string, unknown> = {};
     for (const key in data) {
-      if (data[key as keyof typeof data] !== proto[key as keyof typeof data]) {
+      if (
+        data[key as keyof typeof data] !== defaults[key as keyof typeof data]
+      ) {
         out[key] = data[key as keyof typeof data];
       }
     }
