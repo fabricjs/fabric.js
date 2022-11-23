@@ -8,7 +8,7 @@ import { BaseBrush } from './base_brush.class';
 /**
  * @todo remove transient
  */
-const { Group, Rect, Shadow } = fabric;
+const { Group, Rect } = fabric;
 
 export type SprayBrushPoint = {
   x: number;
@@ -118,7 +118,6 @@ export class SprayBrush extends BaseBrush<FabricObject> {
       layout: 'fixed',
       subTargetCheck: false,
       interactive: false,
-      shadow: this.shadow ? new Shadow(this.shadow) : undefined,
     });
   }
 

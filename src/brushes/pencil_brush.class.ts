@@ -7,11 +7,6 @@ import { Canvas } from '../__types__';
 import { BaseBrush } from './base_brush.class';
 
 /**
- * @todo remove transient
- */
-const { Shadow } = fabric;
-
-/**
  * @private
  * @param {PathData} pathData SVG path commands
  * @returns {boolean}
@@ -236,7 +231,7 @@ export class PencilBrush extends BaseBrush<Path> {
       // whereas Chrome 10 renders nothing
       return;
     }
-    const path = new Path(pathData, {
+    return new Path(pathData, {
       fill: null,
       stroke: this.color,
       strokeWidth: this.width,
@@ -245,11 +240,6 @@ export class PencilBrush extends BaseBrush<Path> {
       strokeLineJoin: this.strokeLineJoin,
       strokeDashArray: this.strokeDashArray,
     });
-    if (this.shadow) {
-      this.shadow.affectStroke = true;
-      path.shadow = new Shadow(this.shadow);
-    }
-    return path;
   }
 
   /**
@@ -285,6 +275,9 @@ export class PencilBrush extends BaseBrush<Path> {
     ctx.closePath();
     if (this.decimate) {
       this._points = this.decimatePoints(this._points, this.decimate);
+    }
+    if (this.shadow) {
+      this.shadow.affectStroke = true;
     }
     super.finalize();
   }

@@ -10,6 +10,11 @@ import type { Canvas, Shadow } from '../__types__';
 export type TBrushEventData = TEvent & { pointer: Point };
 
 /**
+ * @todo remove transient
+ */
+const { Shadow } = fabric;
+
+/**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
  */
 export abstract class BaseBrush<T extends FabricObject> {
@@ -203,9 +208,9 @@ export abstract class BaseBrush<T extends FabricObject> {
   }
 
   /**
-   * Adds the clip path to the resulting object created by the brush
+   * clones the brush's clip path and prepares it for the resulting object
    */
-  protected async addClipPathToResult(result: FabricObject) {
+  protected async createClipPath(result: FabricObject) {
     if (!this.clipPath) {
       return;
     }
@@ -217,7 +222,6 @@ export abstract class BaseBrush<T extends FabricObject> {
         ? multiplyTransformMatrices(this.calcTransformMatrix(), t)
         : t
     );
-    result.set('clipPath', clipPath);
     return clipPath;
   }
 
@@ -237,8 +241,11 @@ export abstract class BaseBrush<T extends FabricObject> {
     this._resetShadow();
     const shape = this.finalizeShape();
     if (shape) {
-      await this.addClipPathToResult(shape);
-      shape.set('canvas', this.canvas);
+      shape.set({
+        canvas: this.canvas,
+        shadow: this.shadow ? new Shadow(this.shadow) : undefined,
+        clipPath: await this.createClipPath(shape),
+      });
       shape.setCoords();
       this.canvas.fire('interaction:completed', { result: shape });
       // TODO: don't add to canvas by default

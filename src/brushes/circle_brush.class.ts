@@ -9,7 +9,7 @@ import { BaseBrush } from './base_brush.class';
 /**
  * @todo remove transient
  */
-const { Circle, Group, Shadow } = fabric;
+const { Circle, Group } = fabric;
 
 export type CircleBrushPoint = {
   x: number;
@@ -86,9 +86,7 @@ export class CircleBrush extends BaseBrush<FabricObject> {
         })
       );
     }
-    return new Group(circles, {
-      shadow: this.shadow ? new Shadow(this.shadow) : undefined,
-    });
+    return new Group(circles);
   }
 
   /**
