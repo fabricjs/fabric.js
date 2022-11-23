@@ -269,8 +269,8 @@ export class ObjectGeometry extends ObjectOrigin {
   intersectsWithRect(
     pointTL: Point,
     pointBR: Point,
-    absolute: boolean,
-    calculate: boolean
+    absolute?: boolean,
+    calculate?: boolean
   ): boolean {
     const coords = this.getCoords(absolute, calculate),
       intersection = Intersection.intersectPolygonRectangle(
@@ -288,10 +288,10 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Boolean} [calculate] use coordinates of current position instead of calculating them
    * @return {Boolean} true if object intersects with another object
    */
-  intersectsWithObject(
-    other: ObjectGeometry,
-    absolute: boolean,
-    calculate: boolean
+  intersectsWithObject<T extends ObjectGeometry>(
+    other: T,
+    absolute?: boolean,
+    calculate?: boolean
   ): boolean {
     const intersection = Intersection.intersectPolygonPolygon(
       this.getCoords(absolute, calculate),
@@ -313,10 +313,10 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Boolean} [calculate] use coordinates of current position instead of store ones
    * @return {Boolean} true if object is fully contained within area of another object
    */
-  isContainedWithinObject(
-    other: ObjectGeometry,
-    absolute: boolean,
-    calculate: boolean
+  isContainedWithinObject<T extends ObjectGeometry>(
+    other: T,
+    absolute?: boolean,
+    calculate?: boolean
   ): boolean {
     const points = this.getCoords(absolute, calculate),
       otherCoords = absolute ? other.aCoords : other.lineCoords,
@@ -340,8 +340,8 @@ export class ObjectGeometry extends ObjectOrigin {
   isContainedWithinRect(
     pointTL: Point,
     pointBR: Point,
-    absolute: boolean,
-    calculate: boolean
+    absolute?: boolean,
+    calculate?: boolean
   ): boolean {
     const boundingRect = this.getBoundingRect(absolute, calculate);
     return (
@@ -349,6 +349,14 @@ export class ObjectGeometry extends ObjectOrigin {
       boundingRect.left + boundingRect.width <= pointBR.x &&
       boundingRect.top >= pointTL.y &&
       boundingRect.top + boundingRect.height <= pointBR.y
+    );
+  }
+
+  isOverlapping<T extends ObjectGeometry>(other: T) {
+    return (
+      this.intersectsWithObject(other) ||
+      this.isContainedWithinObject(other) ||
+      other.isContainedWithinObject(this)
     );
   }
 
@@ -416,7 +424,7 @@ export class ObjectGeometry extends ObjectOrigin {
   private _containsCenterOfCanvas(
     pointTL: Point,
     pointBR: Point,
-    calculate: boolean
+    calculate?: boolean
   ): boolean {
     // worst case scenario the object is so big that contains the screen
     const centerPoint = pointTL.midPointFrom(pointBR);
@@ -428,7 +436,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
    * @return {Boolean} true if object is partially contained within canvas
    */
-  isPartiallyOnScreen(calculate: boolean): boolean {
+  isPartiallyOnScreen(calculate?: boolean): boolean {
     if (!this.canvas) {
       return false;
     }
@@ -582,7 +590,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Boolean} absolute ignore viewport
    * @return {void}
    */
-  scaleToWidth(value: number, absolute: boolean) {
+  scaleToWidth(value: number, absolute?: boolean) {
     // adjust to bounding rect factor so that rotated shapes would fit as well
     const boundingRectFactor =
       this.getBoundingRect(absolute).width / this.getScaledWidth();

@@ -249,6 +249,10 @@ export class Group extends createCollectionMixin(FabricObject) {
     this._set('dirty', true);
   }
 
+  _onStackOrderChanged() {
+    this._set('dirty', true);
+  }
+
   /**
    * @private
    * @param {string} key

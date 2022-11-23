@@ -75,6 +75,10 @@ import { pick } from './util/misc/pick';
         this.fire('object:removed', { target: obj });
         obj.fire('removed', { target: this });
       }
+
+      protected _onStackOrderChanged() {
+        this.renderOnAddRemove && this.requestRenderAll();
+      }
     },
     /** @lends fabric.StaticCanvas.prototype */ {
       /**
@@ -141,8 +145,7 @@ import { pick } from './util/misc/pick';
       stateful: false,
 
       /**
-       * Indicates whether {@link add}, {@link insertAt} and {@link remove},
-       * {@link fabric.StaticCanvas.moveTo}, {@link fabric.StaticCanvas.clear} and many more, should also re-render canvas.
+       * Indicates whether {@link add}, {@link insertAt} and {@link remove}, {@link clear} and many more, should also re-render canvas.
        * Disabling this option will not give a performance boost when adding/removing a lot of objects to/from canvas at once
        * since the renders are quequed and executed one per frame.
        * Disabling is suggested anyway and managing the renders of the app manually is not a big effort ( canvas.requestRenderAll() )
@@ -1494,231 +1497,6 @@ import { pick } from './util/misc/pick';
         }
       },
       /* _TO_SVG_END_ */
-
-      /**
-       * Moves an object or the objects of a multiple selection
-       * to the bottom of the stack of drawn objects
-       * @param {fabric.Object} object Object to send to back
-       * @return {fabric.Canvas} thisArg
-       * @chainable
-       */
-      sendToBack: function (object) {
-        if (!object) {
-          return this;
-        }
-        var activeSelection = this._activeObject,
-          i,
-          obj,
-          objs;
-        if (object === activeSelection && object.type === 'activeSelection') {
-          objs = activeSelection._objects;
-          for (i = objs.length; i--; ) {
-            obj = objs[i];
-            removeFromArray(this._objects, obj);
-            this._objects.unshift(obj);
-          }
-        } else {
-          removeFromArray(this._objects, object);
-          this._objects.unshift(object);
-        }
-        this.renderOnAddRemove && this.requestRenderAll();
-        return this;
-      },
-
-      /**
-       * Moves an object or the objects of a multiple selection
-       * to the top of the stack of drawn objects
-       * @param {fabric.Object} object Object to send
-       * @return {fabric.Canvas} thisArg
-       * @chainable
-       */
-      bringToFront: function (object) {
-        if (!object) {
-          return this;
-        }
-        var activeSelection = this._activeObject,
-          i,
-          obj,
-          objs;
-        if (object === activeSelection && object.type === 'activeSelection') {
-          objs = activeSelection._objects;
-          for (i = 0; i < objs.length; i++) {
-            obj = objs[i];
-            removeFromArray(this._objects, obj);
-            this._objects.push(obj);
-          }
-        } else {
-          removeFromArray(this._objects, object);
-          this._objects.push(object);
-        }
-        this.renderOnAddRemove && this.requestRenderAll();
-        return this;
-      },
-
-      /**
-       * Moves an object or a selection down in stack of drawn objects
-       * An optional parameter, intersecting allows to move the object in behind
-       * the first intersecting object. Where intersection is calculated with
-       * bounding box. If no intersection is found, there will not be change in the
-       * stack.
-       * @param {fabric.Object} object Object to send
-       * @param {Boolean} [intersecting] If `true`, send object behind next lower intersecting object
-       * @return {fabric.Canvas} thisArg
-       * @chainable
-       */
-      sendBackwards: function (object, intersecting) {
-        if (!object) {
-          return this;
-        }
-        var activeSelection = this._activeObject,
-          i,
-          obj,
-          idx,
-          newIdx,
-          objs,
-          objsMoved = 0;
-
-        if (object === activeSelection && object.type === 'activeSelection') {
-          objs = activeSelection._objects;
-          for (i = 0; i < objs.length; i++) {
-            obj = objs[i];
-            idx = this._objects.indexOf(obj);
-            if (idx > 0 + objsMoved) {
-              newIdx = idx - 1;
-              removeFromArray(this._objects, obj);
-              this._objects.splice(newIdx, 0, obj);
-            }
-            objsMoved++;
-          }
-        } else {
-          idx = this._objects.indexOf(object);
-          if (idx !== 0) {
-            // if object is not on the bottom of stack
-            newIdx = this._findNewLowerIndex(object, idx, intersecting);
-            removeFromArray(this._objects, object);
-            this._objects.splice(newIdx, 0, object);
-          }
-        }
-        this.renderOnAddRemove && this.requestRenderAll();
-        return this;
-      },
-
-      /**
-       * @private
-       */
-      _findNewLowerIndex: function (object, idx, intersecting) {
-        var newIdx, i;
-
-        if (intersecting) {
-          newIdx = idx;
-
-          // traverse down the stack looking for the nearest intersecting object
-          for (i = idx - 1; i >= 0; --i) {
-            var isIntersecting =
-              object.intersectsWithObject(this._objects[i]) ||
-              object.isContainedWithinObject(this._objects[i]) ||
-              this._objects[i].isContainedWithinObject(object);
-
-            if (isIntersecting) {
-              newIdx = i;
-              break;
-            }
-          }
-        } else {
-          newIdx = idx - 1;
-        }
-
-        return newIdx;
-      },
-
-      /**
-       * Moves an object or a selection up in stack of drawn objects
-       * An optional parameter, intersecting allows to move the object in front
-       * of the first intersecting object. Where intersection is calculated with
-       * bounding box. If no intersection is found, there will not be change in the
-       * stack.
-       * @param {fabric.Object} object Object to send
-       * @param {Boolean} [intersecting] If `true`, send object in front of next upper intersecting object
-       * @return {fabric.Canvas} thisArg
-       * @chainable
-       */
-      bringForward: function (object, intersecting) {
-        if (!object) {
-          return this;
-        }
-        var activeSelection = this._activeObject,
-          i,
-          obj,
-          idx,
-          newIdx,
-          objs,
-          objsMoved = 0;
-
-        if (object === activeSelection && object.type === 'activeSelection') {
-          objs = activeSelection._objects;
-          for (i = objs.length; i--; ) {
-            obj = objs[i];
-            idx = this._objects.indexOf(obj);
-            if (idx < this._objects.length - 1 - objsMoved) {
-              newIdx = idx + 1;
-              removeFromArray(this._objects, obj);
-              this._objects.splice(newIdx, 0, obj);
-            }
-            objsMoved++;
-          }
-        } else {
-          idx = this._objects.indexOf(object);
-          if (idx !== this._objects.length - 1) {
-            // if object is not on top of stack (last item in an array)
-            newIdx = this._findNewUpperIndex(object, idx, intersecting);
-            removeFromArray(this._objects, object);
-            this._objects.splice(newIdx, 0, object);
-          }
-        }
-        this.renderOnAddRemove && this.requestRenderAll();
-        return this;
-      },
-
-      /**
-       * @private
-       */
-      _findNewUpperIndex: function (object, idx, intersecting) {
-        var newIdx, i, len;
-
-        if (intersecting) {
-          newIdx = idx;
-
-          // traverse up the stack looking for the nearest intersecting object
-          for (i = idx + 1, len = this._objects.length; i < len; ++i) {
-            var isIntersecting =
-              object.intersectsWithObject(this._objects[i]) ||
-              object.isContainedWithinObject(this._objects[i]) ||
-              this._objects[i].isContainedWithinObject(object);
-
-            if (isIntersecting) {
-              newIdx = i;
-              break;
-            }
-          }
-        } else {
-          newIdx = idx + 1;
-        }
-
-        return newIdx;
-      },
-
-      /**
-       * Moves an object to specified level in stack of drawn objects
-       * @param {fabric.Object} object Object to send
-       * @param {Number} index Position to move to
-       * @return {fabric.Canvas} thisArg
-       * @chainable
-       */
-      moveTo: function (object, index) {
-        removeFromArray(this._objects, object);
-        this._objects.splice(index, 0, object);
-        return this.renderOnAddRemove && this.requestRenderAll();
-      },
 
       /**
        * Waits until rendering has settled to destroy the canvas
