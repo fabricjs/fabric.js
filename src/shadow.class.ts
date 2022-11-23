@@ -84,14 +84,18 @@ export class Shadow {
    */
   static parseShadow(value: string) {
     const shadowStr = value.trim(),
-      offsetsAndBlur = Shadow.reOffsetsAndBlur.exec(shadowStr) || [],
-      color = shadowStr.replace(Shadow.reOffsetsAndBlur, '') || 'rgb(0,0,0)';
+      [offsetX, offsetY, blur] = (
+        Shadow.reOffsetsAndBlur.exec(shadowStr)?.slice(1) || []
+      ).map((value) => parseFloat(value) || 0),
+      color = (
+        shadowStr.replace(Shadow.reOffsetsAndBlur, '') || 'rgb(0,0,0)'
+      ).trim();
 
     return {
-      color: color.trim(),
-      offsetX: parseFloat(offsetsAndBlur[1]) || 0,
-      offsetY: parseFloat(offsetsAndBlur[2]) || 0,
-      blur: parseFloat(offsetsAndBlur[3]) || 0,
+      color,
+      offsetX,
+      offsetY,
+      blur,
     };
   }
 
