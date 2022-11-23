@@ -517,7 +517,7 @@ export class InteractiveFabricObject extends FabricObject {
    * with the object transformMatrix, or restored to neutral transform
    */
   clearContextTop(
-    restoreManually: boolean
+    restoreManually?: boolean
   ): CanvasRenderingContext2D | undefined {
     if (!this.canvas) {
       return;
