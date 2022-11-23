@@ -147,7 +147,7 @@ import { pick } from './util/misc/pick';
       /**
        * Indicates whether {@link add}, {@link insertAt} and {@link remove}, {@link clear} and many more, should also re-render canvas.
        * Disabling this option will not give a performance boost when adding/removing a lot of objects to/from canvas at once
-       * since the renders are quequed and executed one per frame.
+       * since the renders are queued and executed one per frame.
        * Disabling is suggested anyway and managing the renders of the app manually is not a big effort ( canvas.requestRenderAll() )
        * Left default to true to do not break documentation and old app, fiddles.
        * @type Boolean
