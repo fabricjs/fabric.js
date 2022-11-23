@@ -1,5 +1,4 @@
 import { fabric } from '../../HEADER';
-import { PathData } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { Canvas } from '../__types__';
 import { PencilBrush } from './pencil_brush.class';
@@ -68,15 +67,16 @@ export class PatternBrush extends PencilBrush {
   /**
    * Creates path
    */
-  createPath(pathData: PathData) {
-    const path = super.createPath(pathData),
-      topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2);
-
-    path.stroke = new Pattern({
-      source: this.source || this.getPatternSrcFunction(),
-      offsetX: -topLeft.x,
-      offsetY: -topLeft.y,
-    });
+  protected finalizeShape() {
+    const path = super.finalizeShape();
+    if (path) {
+      const topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2);
+      path.stroke = new Pattern({
+        source: this.source || this.getPatternSrcFunction(),
+        offsetX: -topLeft.x,
+        offsetY: -topLeft.y,
+      });
+    }
     return path;
   }
 }

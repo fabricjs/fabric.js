@@ -5,7 +5,9 @@ import { BaseBrush } from './base_brush.class';
 /**
  * Declarative shape drawing using pointer events
  */
-export abstract class DrawShapeBase<T extends FabricObject> extends BaseBrush {
+export abstract class DrawShapeBase<
+  T extends FabricObject
+> extends BaseBrush<T> {
   shape: T | undefined;
   stroke = '';
   fill = '';
@@ -30,15 +32,11 @@ export abstract class DrawShapeBase<T extends FabricObject> extends BaseBrush {
     });
   }
 
-  protected finalize() {
+  protected finalizeShape() {
     const shape = this.shape;
-    if (!shape) return;
-    shape.setCoords();
-    this.canvas.fire('before:path:created', { path: this.shape });
-    this.canvas.add(this.shape);
-    this.canvas.fire('path:created', { path: this.shape });
-    this.canvas.clearContext(this.canvas.contextTop);
+    // we release the ref here and not in `finalize` (async) to avoid a race condition
     this.shape = undefined;
+    return shape;
   }
 
   _setBrushStyles() {

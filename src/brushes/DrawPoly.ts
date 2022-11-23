@@ -21,17 +21,22 @@ export class DrawPoly extends DrawShapeBase<Polyline> {
     return new this.builder();
   }
 
-  protected finalize() {
+  protected finalizeShape() {
+    const shape = super.finalizeShape();
+    if (shape) {
+      shape.setBoundingBox(true);
+      const r = this.width / 2;
+      shape.set({
+        left: shape.left + r,
+        top: shape.top + r,
+      });
+    }
+    return shape;
+  }
+
+  protected async finalize() {
     // release interaction
     this.canvas._isCurrentlyDrawing = false;
-    const shape = this.shape;
-    if (!shape) return;
-    shape.setBoundingBox(true);
-    const r = this.width / 2;
-    shape.set({
-      left: shape.left + r,
-      top: shape.top + r,
-    });
     super.finalize();
   }
 

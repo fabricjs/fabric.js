@@ -1,5 +1,6 @@
 import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
+import { Path } from '../shapes/path.class';
 import { TEvent, ModifierKey, PathData } from '../typedefs';
 import { getSmoothPathFromPoints, joinPath } from '../util/path';
 import { Canvas } from '../__types__';
@@ -8,7 +9,7 @@ import { BaseBrush } from './base_brush.class';
 /**
  * @todo remove transient
  */
-const { Path, Shadow } = fabric;
+const { Shadow } = fabric;
 
 /**
  * @private
@@ -19,7 +20,7 @@ function isEmptySVGPath(pathData: PathData): boolean {
   return joinPath(pathData) === 'M 0 0 Q 0 0 0 0 L 0 0';
 }
 
-export class PencilBrush extends BaseBrush {
+export class PencilBrush extends BaseBrush<Path> {
   /**
    * Discard points that are less than `decimate` pixel distant from each other
    * @type Number
@@ -110,7 +111,7 @@ export class PencilBrush extends BaseBrush {
     }
     this.drawStraightLine = false;
     this.oldEnd = undefined;
-    this._finalizeAndAddPath();
+    this.finalize();
     return false;
   }
 
@@ -224,10 +225,17 @@ export class PencilBrush extends BaseBrush {
 
   /**
    * Creates a Path object to add on canvas
-   * @param {PathData} pathData Path data
    * @return {Path} Path to add on canvas
    */
-  createPath(pathData: PathData) {
+  protected finalizeShape() {
+    const pathData = this.convertPointsToSVGPath(this._points);
+    if (isEmptySVGPath(pathData)) {
+      // do not create 0 width/height paths, as they are
+      // rendered inconsistently across browsers
+      // Firefox 4, for example, renders a dot,
+      // whereas Chrome 10 renders nothing
+      return;
+    }
     const path = new Path(pathData, {
       fill: null,
       stroke: this.color,
@@ -241,7 +249,6 @@ export class PencilBrush extends BaseBrush {
       this.shadow.affectStroke = true;
       path.shadow = new Shadow(this.shadow);
     }
-
     return path;
   }
 
@@ -273,37 +280,13 @@ export class PencilBrush extends BaseBrush {
     return newPoints;
   }
 
-  /**
-   * On mouseup after drawing the path on contextTop canvas
-   * we use the points captured to create an new Path object
-   * and add it to the canvas.
-   */
-  _finalizeAndAddPath() {
+  protected async finalize() {
     const ctx = this.canvas.contextTop;
     ctx.closePath();
     if (this.decimate) {
       this._points = this.decimatePoints(this._points, this.decimate);
     }
-    const pathData = this.convertPointsToSVGPath(this._points);
-    if (isEmptySVGPath(pathData)) {
-      // do not create 0 width/height paths, as they are
-      // rendered inconsistently across browsers
-      // Firefox 4, for example, renders a dot,
-      // whereas Chrome 10 renders nothing
-      this.canvas.requestRenderAll();
-      return;
-    }
-
-    const path = this.createPath(pathData);
-    this.canvas.clearContext(this.canvas.contextTop);
-    this.canvas.fire('before:path:created', { path: path });
-    this.canvas.add(path);
-    this.canvas.requestRenderAll();
-    path.setCoords();
-    this._resetShadow();
-
-    // fire event 'path' created
-    this.canvas.fire('path:created', { path: path });
+    super.finalize();
   }
 }
 

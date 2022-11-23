@@ -3,11 +3,8 @@ import { Color } from '../color';
 import type { Point } from '../point.class';
 import { FabricObject } from '../shapes/fabricObject.class';
 import { TEvent } from '../typedefs';
-import {
-  multiplyTransformMatrices,
-  invertTransform,
-} from '../util/misc/matrix';
-import { applyTransformToObject } from '../util/misc/objectTransforms';
+import { multiplyTransformMatrices } from '../util/misc/matrix';
+import { sendObjectToPlane } from '../util/misc/planeChange';
 import type { Canvas, Shadow } from '../__types__';
 
 export type TBrushEventData = TEvent & { pointer: Point };
@@ -15,7 +12,7 @@ export type TBrushEventData = TEvent & { pointer: Point };
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
  */
-export abstract class BaseBrush {
+export abstract class BaseBrush<T extends FabricObject> {
   /**
    * Color of a brush
    * @type String
@@ -98,6 +95,7 @@ export abstract class BaseBrush {
    * @returns true if brush should continue blocking interaction
    */
   abstract onMouseUp(ev: TBrushEventData): boolean | void;
+  protected abstract finalizeShape(): T | undefined;
 
   /**
    * Sets brush styles
@@ -150,9 +148,9 @@ export abstract class BaseBrush {
    * Removes brush shadow styles
    * @private
    */
-  protected _resetShadow() {
-    const ctx = this.canvas.contextTop;
-
+  protected _resetShadow(
+    ctx: CanvasRenderingContext2D = this.canvas.contextTop
+  ) {
     ctx.shadowColor = '';
     ctx.shadowBlur = ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
   }
@@ -207,22 +205,20 @@ export abstract class BaseBrush {
   /**
    * Adds the clip path to the resulting object created by the brush
    */
-  protected _addClipPathToResult(result: FabricObject) {
+  protected async addClipPathToResult(result: FabricObject) {
     if (!this.clipPath) {
-      return Promise.resolve();
+      return;
     }
-    let t = result.calcTransformMatrix();
-    if (this.clipPath.absolutePositioned) {
-      t = multiplyTransformMatrices(this.calcTransformMatrix(), t);
-    }
-    return this.clipPath.clone(['inverted']).then((clipPath) => {
-      const desiredTransform = multiplyTransformMatrices(
-        invertTransform(t),
-        clipPath.calcTransformMatrix()
-      );
-      applyTransformToObject(clipPath, desiredTransform);
-      result.set('clipPath', clipPath);
-    });
+    const t = result.calcTransformMatrix();
+    const clipPath = await this.clipPath.clone(['inverted']);
+    sendObjectToPlane(
+      clipPath,
+      this.clipPath.absolutePositioned
+        ? multiplyTransformMatrices(this.calcTransformMatrix(), t)
+        : t
+    );
+    result.set('clipPath', clipPath);
+    return clipPath;
   }
 
   /**
@@ -235,6 +231,25 @@ export abstract class BaseBrush {
     this._render(ctx);
     this._drawClipPath(ctx, this.clipPath);
     ctx.restore();
+  }
+
+  protected async finalize() {
+    this._resetShadow();
+    const shape = this.finalizeShape();
+    if (shape) {
+      await this.addClipPathToResult(shape);
+      shape.set('canvas', this.canvas);
+      shape.setCoords();
+      this.canvas.fire('interaction:completed', { result: shape });
+      // TODO: don't add to canvas by default
+      this.canvas.fire('before:path:created', { path: shape });
+      const originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
+      this.canvas.renderOnAddRemove = false;
+      this.canvas.add(shape);
+      this.canvas.fire('path:created', { path: shape });
+      this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
+    }
+    this.canvas.requestRenderAll();
   }
 }
 

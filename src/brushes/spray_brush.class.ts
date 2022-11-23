@@ -1,5 +1,6 @@
 import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
+import { FabricObject } from '../shapes/fabricObject.class';
 import { getRandomInt } from '../util/internals';
 import { Canvas, Rect } from '../__types__';
 import { BaseBrush } from './base_brush.class';
@@ -36,7 +37,7 @@ function getUniqueRects(rects: Rect[]) {
   return uniqueRectsArray;
 }
 
-export class SprayBrush extends BaseBrush {
+export class SprayBrush extends BaseBrush<FabricObject> {
   /**
    * Width of a spray
    * @type Number
@@ -94,6 +95,33 @@ export class SprayBrush extends BaseBrush {
     this.sprayChunk = [];
   }
 
+  protected finalizeShape() {
+    const rects = [];
+    for (let i = 0; i < this.sprayChunks.length; i++) {
+      const sprayChunk = this.sprayChunks[i];
+      for (let j = 0; j < sprayChunk.length; j++) {
+        const chunk = sprayChunk[j];
+        const rect = new Rect({
+          width: chunk.width,
+          height: chunk.width,
+          left: chunk.x + 1,
+          top: chunk.y + 1,
+          originX: 'center',
+          originY: 'center',
+          fill: this.color,
+        });
+        rects.push(rect);
+      }
+    }
+    return new Group(this.optimizeOverlapping ? getUniqueRects(rects) : rects, {
+      objectCaching: true,
+      layout: 'fixed',
+      subTargetCheck: false,
+      interactive: false,
+      shadow: this.shadow ? new Shadow(this.shadow) : undefined,
+    });
+  }
+
   /**
    * Invoked on mouse down
    * @param {Point} pointer
@@ -104,7 +132,7 @@ export class SprayBrush extends BaseBrush {
     this._setShadow();
 
     this.addSprayChunk(pointer);
-    this.renderChunck(this.sprayChunk);
+    this.renderChunk(this.sprayChunk);
   }
 
   /**
@@ -116,64 +144,24 @@ export class SprayBrush extends BaseBrush {
       return;
     }
     this.addSprayChunk(pointer);
-    this.renderChunck(this.sprayChunk);
+    this.renderChunk(this.sprayChunk);
   }
 
   /**
    * Invoked on mouse up
    */
   onMouseUp() {
-    const originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
-    this.canvas.renderOnAddRemove = false;
-
-    const rects = [];
-
-    for (let i = 0; i < this.sprayChunks.length; i++) {
-      const sprayChunk = this.sprayChunks[i];
-      for (let j = 0; j < sprayChunk.length; j++) {
-        const chunck = sprayChunk[j];
-        const rect = new Rect({
-          width: chunck.width,
-          height: chunck.width,
-          left: chunck.x + 1,
-          top: chunck.y + 1,
-          originX: 'center',
-          originY: 'center',
-          fill: this.color,
-        });
-        rects.push(rect);
-      }
-    }
-
-    const group = new Group(
-      this.optimizeOverlapping ? getUniqueRects(rects) : rects,
-      {
-        objectCaching: true,
-        layout: 'fixed',
-        subTargetCheck: false,
-        interactive: false,
-      }
-    );
-    this.shadow && group.set('shadow', new Shadow(this.shadow));
-    this.canvas.fire('before:path:created', { path: group });
-    this.canvas.add(group);
-    this.canvas.fire('path:created', { path: group });
-
-    this.canvas.clearContext(this.canvas.contextTop);
-    this._resetShadow();
-    this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
-    this.canvas.requestRenderAll();
+    this.finalize();
   }
 
-  renderChunck(sprayChunck: SprayBrushPoint[]) {
+  renderChunk(sprayChunk: SprayBrushPoint[]) {
     const ctx = this.canvas.contextTop;
-    ctx.fillStyle = this.color;
-
     ctx.save();
+    ctx.fillStyle = this.color;
     this.transform(ctx);
 
-    for (let i = 0; i < sprayChunck.length; i++) {
-      const point = sprayChunck[i];
+    for (let i = 0; i < sprayChunk.length; i++) {
+      const point = sprayChunk[i];
       ctx.globalAlpha = point.opacity;
       ctx.fillRect(point.x, point.y, point.width, point.width);
     }
@@ -187,7 +175,7 @@ export class SprayBrush extends BaseBrush {
   protected _render(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = this.color;
     for (let i = 0; i < this.sprayChunks.length; i++) {
-      this.renderChunck(this.sprayChunks[i]);
+      this.renderChunk(this.sprayChunks[i]);
     }
     ctx.restore();
   }
