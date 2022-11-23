@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(Itext): show incorrect pointer position after scale changed
 - chore(TS): migrate text classes/mixins [#8408](https://github.com/fabricjs/fabric.js/pull/8408)
 - chore(TS): migrate Collection [#8433](https://github.com/fabricjs/fabric.js/pull/8433)
 - ci(): Simplify filestats even more [#8449](https://github.com/fabricjs/fabric.js/pull/8449)
