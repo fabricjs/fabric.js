@@ -16,7 +16,8 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { createCanvasElement } from '../util/misc/dom';
 import { ObjectGeometry } from '../mixins/object_geometry.mixin';
 import { qrDecompose, transformPoint } from '../util/misc/matrix';
-import { Canvas, Shadow, StaticCanvas } from '../__types__';
+import { Canvas, StaticCanvas } from '../__types__';
+import { Shadow } from '../shadow.class';
 
 // temporary hack for unfinished migration
 type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
@@ -253,7 +254,7 @@ export class FabricObject extends ObjectGeometry {
 
   /**
    * Shadow object representing shadow of this shape
-   * @type fabric.Shadow
+   * @type Shadow
    * @default null
    */
   shadow: Shadow | null;
@@ -1025,8 +1026,8 @@ export class FabricObject extends ObjectGeometry {
     } else if (key === 'scaleY' && value < 0) {
       this.flipY = !this.flipY;
       value *= -1;
-    } else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
-      value = new fabric.Shadow(value);
+    } else if (key === 'shadow' && value && !(value instanceof Shadow)) {
+      value = new Shadow(value);
     } else if (key === 'dirty' && this.group) {
       this.group.set('dirty', value);
     }

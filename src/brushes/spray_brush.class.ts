@@ -1,13 +1,15 @@
 import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
+import { Shadow } from '../shadow.class';
+import { Rect } from '../shapes/rect.class';
 import { getRandomInt } from '../util/internals';
-import { Canvas, Rect } from '../__types__';
+import { Canvas } from '../__types__';
 import { BaseBrush } from './base_brush.class';
 
 /**
  * @todo remove transient
  */
-const { Group, Rect, Shadow } = fabric;
+const { Group } = fabric;
 
 export type SprayBrushPoint = {
   x: number;
