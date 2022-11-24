@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): migrate Image [#8443](https://github.com/fabricjs/fabric.js/pull/8443)
 - chore(TS): migrate Shadow [#8462](https://github.com/fabricjs/fabric.js/pull/8462)
 - fix(Itext): show incorrect pointer position after scale changed
 - chore(TS): migrate text classes/mixins [#8408](https://github.com/fabricjs/fabric.js/pull/8408)
