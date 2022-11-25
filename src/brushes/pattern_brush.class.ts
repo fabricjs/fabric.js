@@ -1,13 +1,9 @@
 import { fabric } from '../../HEADER';
+import { Pattern } from '../pattern.class';
 import { PathData } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { Canvas } from '../__types__';
 import { PencilBrush } from './pencil_brush.class';
-
-/**
- * @todo remove transient
- */
-const { Pattern } = fabric;
 
 export class PatternBrush extends PencilBrush {
   source?: CanvasImageSource;
@@ -16,7 +12,7 @@ export class PatternBrush extends PencilBrush {
     super(canvas);
   }
 
-  getPatternSrc() {
+  getPatternSrc(color = this.color) {
     const dotWidth = 20,
       dotDistance = 5,
       patternCanvas = createCanvasElement(),
@@ -24,7 +20,7 @@ export class PatternBrush extends PencilBrush {
 
     patternCanvas.width = patternCanvas.height = dotWidth + dotDistance;
     if (patternCtx) {
-      patternCtx.fillStyle = this.color;
+      patternCtx.fillStyle = color;
       patternCtx.beginPath();
       patternCtx.arc(
         dotWidth / 2,
@@ -38,13 +34,6 @@ export class PatternBrush extends PencilBrush {
       patternCtx.fill();
     }
     return patternCanvas;
-  }
-
-  getPatternSrcFunction() {
-    return String(this.getPatternSrc).replace(
-      'this.color',
-      '"' + this.color + '"'
-    );
   }
 
   /**
@@ -73,7 +62,7 @@ export class PatternBrush extends PencilBrush {
       topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2);
 
     path.stroke = new Pattern({
-      source: this.source || this.getPatternSrcFunction(),
+      source: this.source || this.getPatternSrc(),
       offsetX: -topLeft.x,
       offsetY: -topLeft.y,
     });
