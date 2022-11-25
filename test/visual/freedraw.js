@@ -2033,7 +2033,7 @@ QUnit.module('Free Drawing', hooks => {
     objectCachingDefault = fabric.Object.prototype.objectCaching;
     if (fabric.isLikelyNode) {
       fabric.config.configure({
-        browserShadowBlurConstant: BROWSER_SHADOW_BLUR[process.env.launcher.toLowerCase()]
+        browserShadowBlurConstant: BROWSER_SHADOW_BLUR[process.env.launcher?.toLowerCase() || 'node']
       });
     }
     else {
@@ -2276,7 +2276,7 @@ QUnit.module('Free Drawing', hooks => {
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
       },
-      disabled: fabric.isLikelyNode
+      disabled: fabric.isLikelyNodegz
     }));
     options.mesh && visualTester(Object.assign({}, test, {
       test: `${test.test} (context mesh)`,
