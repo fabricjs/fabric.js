@@ -1,13 +1,9 @@
 import { fabric } from '../../HEADER';
+import { Pattern } from '../pattern.class';
 import { PathData } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { Canvas } from '../__types__';
 import { PencilBrush } from './pencil_brush.class';
-
-/**
- * @todo remove transient
- */
-const { Pattern } = fabric;
 
 export class PatternBrush extends PencilBrush {
   source?: CanvasImageSource;
