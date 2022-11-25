@@ -16,7 +16,7 @@ import { wd } from '../scripts/dirname.mjs';
 export function startSandbox(destination, buildAndWatch) {
   console.log(chalk.blue('\n> linking fabric'));
   cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
-  cp.execSync('npm link fabric', {
+  cp.execSync('npm link fabric --save', {
     cwd: destination,
     stdio: 'inherit',
   });
