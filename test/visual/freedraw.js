@@ -2230,14 +2230,39 @@ QUnit.module('Free Drawing', hooks => {
     }
   });
 
+  async function patternFromSource(canvas) {
+    var brush = new fabric.PatternBrush(canvas);
+    brush.source = await new Promise(resolve => getFixture('greyfloral.png', false, resolve));
+    brush.color = 'red';
+    brush.width = 25;
+    pointDrawer(points, brush, true);
+    brush.source = await new Promise(resolve => getFixture('parrot.png', false, resolve));
+    brush.width = 7;
+    pointDrawer(points, brush);
+  }
+
+  tests.push({
+    test: 'Pattern src from `source`',
+    build: patternFromSource,
+    golden: 'freedrawingPatternSource.png',
+    percentage: 0.09,
+    width: 200,
+    height: 250,
+    fabricClass: 'Canvas',
+    targets: {
+      main: true,
+      compare: false
+    }
+  });
+
   tests.forEach(function (test) {
     var options = Object.assign({}, freeDrawingTestDefaults, test.targets);
     if (options.top) {
       visualTester(Object.assign({}, test, {
         test: `${test.test} (top context)`,
         golden: `top_ctx_${test.golden}`,
-        code: function (canvas, callback) {
-          test.build(canvas);
+        code: async function (canvas, callback) {
+          await test.build(canvas);
           callback(canvas.upperCanvasEl);
         },
         disabled: fabric.isLikelyNode
@@ -2246,8 +2271,8 @@ QUnit.module('Free Drawing', hooks => {
     options.main && visualTester(Object.assign({}, test, {
       test: `${test.test} (main context)`,
       golden: `main_ctx_${test.golden}`,
-      code: function (canvas, callback) {
-        test.build(canvas);
+      code: async function (canvas, callback) {
+        await test.build(canvas);
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
       },
@@ -2256,8 +2281,8 @@ QUnit.module('Free Drawing', hooks => {
     options.mesh && visualTester(Object.assign({}, test, {
       test: `${test.test} (context mesh)`,
       golden: `mesh_${test.golden}`,
-      code: function (canvas, callback) {
-        test.build(canvas);
+      code: async function (canvas, callback) {
+        await test.build(canvas);
         canvas.renderAll();
         canvas.contextContainer.drawImage(canvas.upperCanvasEl, 0, 0);
         callback(canvas.lowerCanvasEl);
@@ -2266,8 +2291,8 @@ QUnit.module('Free Drawing', hooks => {
     }));
     options.result && visualTester(Object.assign({}, test, {
       test: `${test.test} (result)`,
-      code: function (canvas, callback) {
-        test.build(canvas);
+      code: async function (canvas, callback) {
+        await test.build(canvas);
         fireMouseUp(canvas.freeDrawingBrush);
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
