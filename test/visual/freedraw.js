@@ -2045,7 +2045,7 @@ QUnit.module('Free Drawing', hooks => {
     fabric.Object.prototype.objectCaching = true;
   });
   hooks.after(() => {
-    fabric.config.restoreDefaults();
+    // fabric.config.restoreDefaults();
     fabric.Object.prototype.objectCaching = objectCachingDefault;
   });
 
