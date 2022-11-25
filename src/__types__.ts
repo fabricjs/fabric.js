@@ -5,7 +5,6 @@ import { ModifierKey, TMat2D } from './typedefs';
 /**
  * @todo remove transient
  */
-export type Shadow = any;
 export type Canvas = StaticCanvas & {
   altActionKey: ModifierKey;
   uniScaleKey: ModifierKey;

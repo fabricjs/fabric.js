@@ -31,7 +31,7 @@ export type T2DPipelineState = {
   filterBackend: Canvas2dFilterBackend;
   canvasEl: HTMLCanvasElement;
   imageData: ImageData;
-  originalEl: HTMLCanvasElement | HTMLImageElement;
+  originalEl: CanvasImageSource;
   originalImageData?: ImageData;
   ctx: CanvasRenderingContext2D;
   helpLayer?: HTMLCanvasElement;

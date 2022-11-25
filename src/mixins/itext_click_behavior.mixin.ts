@@ -230,9 +230,8 @@ export abstract class ITextClickBehaviorMixin extends ITextKeyBehaviorMixin {
    * @return {Point} Coordinates of a pointer (x, y)
    */
   getLocalPointer(e: TPointerEvent, pointer: IPoint): Point {
-    const thePointer = pointer || this.canvas.getPointer(e);
     return transformPoint(
-      thePointer,
+      pointer || this.canvas.getPointer(e),
       invertTransform(this.calcTransformMatrix())
     ).add(new Point(this.width / 2, this.height / 2));
   }
@@ -249,7 +248,7 @@ export abstract class ITextClickBehaviorMixin extends ITextKeyBehaviorMixin {
       lineIndex = 0;
     for (let i = 0, len = this._textLines.length; i < len; i++) {
       if (height <= mouseOffset.y) {
-        height += this.getHeightOfLine(i) * this.scaleY;
+        height += this.getHeightOfLine(i);
         lineIndex = i;
         if (i > 0) {
           charIndex +=
@@ -260,20 +259,20 @@ export abstract class ITextClickBehaviorMixin extends ITextKeyBehaviorMixin {
       }
     }
     const lineLeftOffset = Math.abs(this._getLineLeftOffset(lineIndex));
-    let width = lineLeftOffset * this.scaleX;
+    let width = lineLeftOffset;
     const jlen = this._textLines[lineIndex].length;
     // handling of RTL: in order to get things work correctly,
     // we assume RTL writing is mirrored compared to LTR writing.
     // so in position detection we mirror the X offset, and when is time
     // of rendering it, we mirror it again.
     if (this.direction === 'rtl') {
-      mouseOffset.x = this.width * this.scaleX - mouseOffset.x;
+      mouseOffset.x = this.width - mouseOffset.x;
     }
     let prevWidth = 0;
     for (let j = 0; j < jlen; j++) {
       prevWidth = width;
       // i removed something about flipX here, check.
-      width += this.__charBounds[lineIndex][j].kernedWidth * this.scaleX;
+      width += this.__charBounds[lineIndex][j].kernedWidth;
       if (width <= mouseOffset.x) {
         charIndex++;
       } else {

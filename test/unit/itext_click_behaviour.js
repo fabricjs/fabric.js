@@ -124,6 +124,23 @@
       var selection = iText._getNewSelectionStartFromOffset({ y: 1, x: 1000 }, 500, 520, index, jlen);
       assert.equal(selection, index, 'index value was NOT moved to next char, since is already at end of text');
     });
+    QUnit.test('getSelectionStartFromPointer with scale', function (assert) {
+      const eventData = {
+        which: 1,
+        target: canvas.upperCanvasEl,
+        clientX: 70,
+        clientY: 10
+      };
+      const iText = new fabric.IText('test need some word\nsecond line', { scaleX: 3, scaleY: 2, canvas });
+      assert.equal(iText.getSelectionStartFromPointer(eventData), 2, 'index');
+      assert.equal(iText.getSelectionStartFromPointer({ ...eventData, clientY: 20 }), 2, 'index');
+      iText.set({ scaleX: 0.5, scaleY: 0.25 });
+      assert.equal(iText.getSelectionStartFromPointer(eventData), 9, 'index');
+      assert.equal(iText.getSelectionStartFromPointer({ ...eventData, clientY: 20 }), 29, 'index');
+      iText.set({ scaleX: 1, scaleY: 1 });
+      assert.equal(iText.getSelectionStartFromPointer(eventData), 5, 'index');
+      assert.equal(iText.getSelectionStartFromPointer({ ...eventData, clientY: 20 }), 5, 'index');
+    });
     QUnit.test('_mouseDownHandlerBefore set up selected property', function(assert) {
       var iText = new fabric.IText('test need some word\nsecond line');
       assert.equal(iText.selected, undefined, 'iText has no selected property');
