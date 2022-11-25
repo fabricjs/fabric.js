@@ -61,6 +61,7 @@ export class ActiveSelection extends Group {
    * @param {FabricObject[]} targets
    */
   _onAfterObjectsChange(type: 'added' | 'removed', targets: FabricObject[]) {
+    super._onAfterObjectsChange(type, targets);
     const groups: Group[] = [];
     targets.forEach((object) => {
       object.group &&

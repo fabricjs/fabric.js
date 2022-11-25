@@ -70,6 +70,8 @@ export type LayoutResult = {
 };
 
 /**
+ * @fires object:added
+ * @fires object:removed
  * @fires layout once layout completes
  */
 export class Group extends createCollectionMixin(FabricObject) {
@@ -216,13 +218,15 @@ export class Group extends createCollectionMixin(FabricObject) {
     return removed;
   }
 
-  protected _onObjectAdded(object: FabricObject) {
+  _onObjectAdded(object: FabricObject) {
     this.enterGroup(object, true);
+    this.fire('object:added', { target: object });
     object.fire('added', { target: this });
   }
 
   _onRelativeObjectAdded(object: FabricObject) {
     this.enterGroup(object, false);
+    this.fire('object:added', { target: object });
     object.fire('added', { target: this });
   }
 
@@ -233,6 +237,7 @@ export class Group extends createCollectionMixin(FabricObject) {
    */
   _onObjectRemoved(object: FabricObject, removeParentTransform?: boolean) {
     this.exitGroup(object, removeParentTransform);
+    this.fire('object:removed', { target: object });
     object.fire('removed', { target: this });
   }
 
