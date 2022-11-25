@@ -36,7 +36,7 @@ export class PatternBrush extends PencilBrush {
     return patternCanvas;
   }
 
-  getPatternSrcFunction() {
+  protected getPatternSrcFunction() {
     return String(this.getPatternSrc).replace(
       'this.color',
       '"' + this.color + '"'
@@ -69,7 +69,7 @@ export class PatternBrush extends PencilBrush {
       topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2);
 
     path.stroke = new Pattern({
-      source: this.source || this.getPatternSrcFunction(),
+      source: this.source || eval(this.getPatternSrcFunction()),
       offsetX: -topLeft.x,
       offsetY: -topLeft.y,
     });
