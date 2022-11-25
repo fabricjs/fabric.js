@@ -15,8 +15,14 @@ import { createImage } from './dom';
 export const getKlass = (type: string, namespace = fabric): any =>
   namespace[capitalize(camelize(type), true)];
 
-type LoadImageOptions = {
+export type LoadImageOptions = {
+  /**
+   * see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   */
   signal?: AbortSignal;
+  /**
+   * cors value for the image loading, default to anonymous
+   */
   crossOrigin?: TCrossOrigin;
 };
 
@@ -24,10 +30,8 @@ type LoadImageOptions = {
  * Loads image element from given url and resolve it, or catch.
  * @memberOf fabric.util
  * @param {String} url URL representing an image
- * @param {Object} [options] image loading options
- * @param {string} [options.crossOrigin] cors value for the image loading, default to anonymous
- * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
- * @param {Promise<fabric.Image>} img the loaded image.
+ * @param {LoadImageOptions} [options] image loading options
+ * @returns {Promise<fabric.Image>} the loaded image.
  */
 export const loadImage = (
   url: string,
@@ -130,7 +134,7 @@ export const enlivenObjectEnlivables = (
   serializedObject: any,
   { signal }: { signal?: AbortSignal } = {}
 ) =>
-  new Promise((resolve, reject) => {
+  new Promise<Record<string, any>>((resolve, reject) => {
     const instances: any[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     // enlive every possible property
