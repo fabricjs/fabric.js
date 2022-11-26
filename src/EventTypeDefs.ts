@@ -182,19 +182,22 @@ export type ObjectEvents = ObjectPointerEvents &
     'erasing:end': { path: FabricObject };
   };
 
-export type CanvasEvents = CanvasPointerEvents &
+export type StaticCanvasEvents = {
+  // tree
+  'object:added': { target: FabricObject };
+  'object:removed': { target: FabricObject };
+  'canvas:cleared': never;
+
+  // rendering
+  'before:render': { ctx: CanvasRenderingContext2D };
+  'after:render': { ctx: CanvasRenderingContext2D };
+};
+
+export type CanvasEvents = StaticCanvasEvents &
+  CanvasPointerEvents &
   CanvasDnDEvents &
   CanvasModifiedEvents &
   CanvasSelectionEvents & {
-    // tree
-    'object:added': { target: FabricObject };
-    'object:removed': { target: FabricObject };
-    'canvas:cleared': never;
-
-    // rendering
-    'before:render': { ctx: CanvasRenderingContext2D };
-    'after:render': { ctx: CanvasRenderingContext2D };
-
     // brushes
     'before:path:created': { path: FabricObject };
     'path:created': { path: FabricObject };
