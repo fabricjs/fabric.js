@@ -85,7 +85,7 @@ export const createObjectDefaultControls = () => ({
     withConnection: true,
     actionName: 'rotate',
   }),
-})
+});
 
 export const createResizeControls = () => ({
   mr: new Control({
@@ -107,7 +107,7 @@ export const createResizeControls = () => ({
 export const createTextboxDefaultControls = () => ({
   ...createObjectDefaultControls(),
   ...createResizeControls(),
-})
+});
 
 export const defaultControls = createObjectDefaultControls();
 
