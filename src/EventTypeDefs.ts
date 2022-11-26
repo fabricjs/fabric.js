@@ -171,8 +171,14 @@ export type ObjectEvents = ObjectPointerEvents &
   DnDEvents &
   ObjectModifiedEvents & {
     // selection
-    selected: never;
-    deselected: never;
+    selected: {
+      e: TEvent;
+      target: FabricObject;
+    };
+    deselected: {
+      e?: TEvent;
+      target: FabricObject;
+    };
 
     // tree
     added: { target: Group | Canvas };
