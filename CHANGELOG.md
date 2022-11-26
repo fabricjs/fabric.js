@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(PatternBrush): `getPatternSrc`, rm `getPatternSrcFunction` [#8468](https://github.com/fabricjs/fabric.js/pull/8468)
 - chore(TS): more FabricObject typing [#8405](https://github.com/fabricjs/fabric.js/pull/8405)
 - chore(TS): Observable types [#8431](https://github.com/fabricjs/fabric.js/pull/8431)
 - chore(TS): migrate Group/ActiveSelection [#8455](https://github.com/fabricjs/fabric.js/pull/8455)
