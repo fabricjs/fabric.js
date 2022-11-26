@@ -1,0 +1,120 @@
+name: '🩺'
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Uglified build
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - run: npm run build
+  stats:
+    name: Build stats
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - name: build stats
+        run: npm run build
+      - name: persist
+        id: b
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+            return JSON.stringify({
+              size: { fabric: { minified: fs.statSync('dist/fabric.min.js').size, bundled: fs.statSync('dist/fabric.js').size } }
+            });
+      - name: checkout src files
+        run: git checkout origin/master -- src index.js HEADER.js
+      - name: upstream build stats
+        run: npm run build -- -s
+      - name: persist
+        id: a
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+            return JSON.stringify({
+              size: { fabric: { minified: fs.statSync('dist/fabric.min.js').size, bundled: fs.statSync('dist/fabric.js').size } }
+            });
+      - name: process
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const { run_simple } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
+            const res = await run_simple({
+              github,
+              context,
+              core,
+              a: JSON.parse('${{ steps.a.outputs.result }}'),
+              b: JSON.parse('${{ steps.b.outputs.result }}'),
+            });
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Linting
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - run: npm run lint
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Prettier check
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - run: npm run prettier:check
+  coverage:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Code Coverage Report Updater
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - run: npm run build -- -f
+      - run: npm run test:coverage && npm run test:visual:coverage
+      - run: npm run coverage:report
+      - uses: ShaMan123/lcov-reporter-action@v1.1.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          delete-old-comments: true
+          update-comment: true
+  changelog:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    env:
+      file: CHANGELOG.md
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Checking ${{ env.file }}
+        run: |
+          if [[ $(git diff --name-only origin/master HEAD -- ${{ env.file }} | grep '^${{ env.file }}$' -c) -eq 0 ]]; then
+            echo "Expected '${{ env.file }}' to be modified"
+            exit 1
+          fi

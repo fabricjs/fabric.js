@@ -127,6 +127,10 @@
     return _createImageObject(IMG_WIDTH, IMG_HEIGHT, callback);
   }
 
+  function createImageStub() {
+    return new fabric.Image(_createImageElement(), { width: 0, height: 0 });
+  }
+
   function setSrc(img, src, callback) {
     img.onload = callback;
     img.src = src;
@@ -197,6 +201,7 @@
     afterEach: function() {
       canvas.cancelRequestedRender();
       canvas2.cancelRequestedRender();
+      fabric.config.configure({ devicePixelRatio: 1 });
     }
   });
 
@@ -380,7 +385,7 @@
     assert.strictEqual(objectsAdded[2], circle2);
 
     var circle3 = new fabric.Circle();
-    canvas.insertAt(circle3, 2);
+    canvas.insertAt(2, circle3);
 
     assert.strictEqual(objectsAdded[3], circle3);
   });
@@ -401,13 +406,13 @@
     canvas.renderOnAddRemove = true;
     assert.equal(renderAllCount, 0);
     var rect = makeRect();
-    canvas.insertAt(rect, 1);
+    canvas.insertAt(1, rect);
     assert.equal(renderAllCount, 1);
     assert.strictEqual(canvas.item(1), rect);
-    canvas.insertAt(rect, 2);
+    canvas.insertAt(2, rect);
     assert.equal(renderAllCount, 2);
     assert.strictEqual(canvas.item(2), rect);
-    assert.equal(canvas.insertAt(rect, 2), canvas, 'should be chainable');
+    canvas.insertAt(2, rect)
     assert.equal(renderAllCount, 3);
   });
 
@@ -428,11 +433,11 @@
 
     var rect = makeRect();
 
-    canvas.insertAt(rect, 1);
+    canvas.insertAt(1, rect);
     assert.equal(renderAllCount, 0);
 
     assert.strictEqual(canvas.item(1), rect);
-    canvas.insertAt(rect, 2);
+    canvas.insertAt(2, rect);
     assert.equal(renderAllCount, 0);
   });
 
@@ -590,15 +595,14 @@
 
   QUnit.test('toDataURL with enableRetinaScaling: true and no multiplier', function(assert) {
     var done = assert.async();
-    fabric.devicePixelRatio = 2;
+    fabric.config.configure({ devicePixelRatio: 2 });
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: true });
     c.cancelRequestedRender();
     var img = fabric.document.createElement('img');
     img.onload = function() {
-      assert.equal(img.width, c.width * fabric.devicePixelRatio, 'output width is bigger');
-      assert.equal(img.height, c.height * fabric.devicePixelRatio, 'output height is bigger');
-      fabric.devicePixelRatio = 1;
+      assert.equal(img.width, c.width * fabric.config.devicePixelRatio, 'output width is bigger');
+      assert.equal(img.height, c.height * fabric.config.devicePixelRatio, 'output height is bigger');
       done();
     };
     img.src = dataUrl;
@@ -606,15 +610,14 @@
 
   QUnit.test('toDataURL with enableRetinaScaling: true and multiplier = 1', function(assert) {
     var done = assert.async();
-    fabric.devicePixelRatio = 2;
+    fabric.config.configure({ devicePixelRatio: 2 });
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: true, multiplier: 1 });
     c.cancelRequestedRender();
     var img = fabric.document.createElement('img');
     img.onload = function() {
-      assert.equal(img.width, c.width * fabric.devicePixelRatio, 'output width is bigger');
-      assert.equal(img.height, c.height * fabric.devicePixelRatio, 'output height is bigger');
-      fabric.devicePixelRatio = 1;
+      assert.equal(img.width, c.width * fabric.config.devicePixelRatio, 'output width is bigger');
+      assert.equal(img.height, c.height * fabric.config.devicePixelRatio, 'output height is bigger');
       done();
     };
     img.src = dataUrl;
@@ -622,15 +625,14 @@
 
   QUnit.test('toDataURL with enableRetinaScaling: true and multiplier = 3', function(assert) {
     var done = assert.async();
-    fabric.devicePixelRatio = 2;
+    fabric.config.configure({ devicePixelRatio: 2 });
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: true, multiplier: 3 });
     c.cancelRequestedRender();
     var img = fabric.document.createElement('img');
     img.onload = function() {
-      assert.equal(img.width, c.width * fabric.devicePixelRatio * 3, 'output width is bigger by 6');
-      assert.equal(img.height, c.height * fabric.devicePixelRatio * 3, 'output height is bigger by 6');
-      fabric.devicePixelRatio = 1;
+      assert.equal(img.width, c.width * fabric.config.devicePixelRatio * 3, 'output width is bigger by 6');
+      assert.equal(img.height, c.height * fabric.config.devicePixelRatio * 3, 'output height is bigger by 6');
       done();
     };
     img.src = dataUrl;
@@ -638,7 +640,7 @@
 
   QUnit.test('toDataURL with enableRetinaScaling: false and no multiplier', function(assert) {
     var done = assert.async();
-    fabric.devicePixelRatio = 2;
+    fabric.config.configure({ devicePixelRatio: 2 });
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false });
     c.cancelRequestedRender();
@@ -646,7 +648,6 @@
     img.onload = function() {
       assert.equal(img.width, c.width, 'output width is not bigger');
       assert.equal(img.height, c.height, 'output height is not bigger');
-      fabric.devicePixelRatio = 1;
       done();
     };
     img.src = dataUrl;
@@ -654,7 +655,7 @@
 
   QUnit.test('toDataURL with enableRetinaScaling: false and multiplier = 1', function(assert) {
     var done = assert.async();
-    fabric.devicePixelRatio = 2;
+    fabric.config.configure({ devicePixelRatio: 2 });
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false, multiplier: 1 });
     c.cancelRequestedRender();
@@ -662,7 +663,6 @@
     img.onload = function() {
       assert.equal(img.width, c.width, 'output width is not bigger');
       assert.equal(img.height, c.height, 'output height is not bigger');
-      fabric.devicePixelRatio = 1;
       done();
     };
     img.src = dataUrl;
@@ -670,7 +670,7 @@
 
   QUnit.test('toDataURL with enableRetinaScaling: false and multiplier = 3', function(assert) {
     var done = assert.async();
-    fabric.devicePixelRatio = 2;
+    fabric.config.configure({ devicePixelRatio: 2 });
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false, multiplier: 3 });
     c.cancelRequestedRender();
@@ -678,7 +678,6 @@
     img.onload = function() {
       assert.equal(img.width, c.width * 3, 'output width is bigger by 3');
       assert.equal(img.height, c.height * 3, 'output height is bigger by 3');
-      fabric.devicePixelRatio = 1;
       done();
     };
     img.src = dataUrl;
@@ -686,7 +685,7 @@
 
   QUnit.test('toDataURL with enableRetinaScaling: false', function(assert) {
     var done = assert.async();
-    fabric.devicePixelRatio = 2;
+    fabric.config.configure({ devicePixelRatio: 2 });
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false });
     c.cancelRequestedRender();
@@ -694,7 +693,6 @@
     img.onload = function() {
       assert.equal(img.width, c.width, 'output width is bigger');
       assert.equal(img.height, c.height, 'output height is bigger');
-      fabric.devicePixelRatio = 1;
       done();
     };
     img.src = dataUrl;
@@ -884,7 +882,7 @@
         text = new fabric.Text('Text'),
         group = new fabric.Group([text, line]),
         ellipse = new fabric.Ellipse(),
-        image = new fabric.Image({width: 0, height: 0}),
+        image = createImageStub(),
         path2 = new fabric.Path('M 0 0 L 200 100 L 200 300 z'),
         path3 = new fabric.Path('M 50 50 L 100 300 L 400 400 z'),
         pathGroup = new fabric.Group([path2, path3]);
@@ -919,9 +917,9 @@
         text = new fabric.Text('Text'),
         group = new fabric.Group([text, line]),
         ellipse = new fabric.Ellipse(),
-        image = new fabric.Image({width: 0, height: 0}),
-        imageBG = new fabric.Image({width: 0, height: 0}),
-        imageOL = new fabric.Image({width: 0, height: 0}),
+        image = createImageStub(),
+        imageBG = createImageStub(),
+        imageOL = createImageStub(),
         path2 = new fabric.Path('M 0 0 L 200 100 L 200 300 z'),
         path3 = new fabric.Path('M 50 50 L 100 300 L 400 400 z'),
         pathGroup = new fabric.Group([path2, path3]);
@@ -959,7 +957,7 @@
         text = new fabric.Text('Text'),
         group = new fabric.Group([text, line]),
         ellipse = new fabric.Ellipse(),
-        image = new fabric.Image({width: 0, height: 0}),
+        image = createImageStub(),
         path2 = new fabric.Path('M 0 0 L 200 100 L 200 300 z'),
         path3 = new fabric.Path('M 50 50 L 100 300 L 400 400 z'),
         pathGroup = new fabric.Group([path2, path3]);
@@ -989,10 +987,7 @@
   });
 
   QUnit.test('toSVG with exclude from export background', function(assert) {
-    var image = fabric.document.createElement('img'),
-        imageBG = new fabric.Image(image, {width: 0, height: 0}),
-        imageOL = new fabric.Image(image, {width: 0, height: 0});
-
+    const imageBG = createImageStub(), imageOL = createImageStub();
     canvas.renderOnAddRemove = false;
     canvas.backgroundImage = imageBG;
     canvas.overlayImage = imageOL;
@@ -1011,12 +1006,12 @@
 
   QUnit.test('toJSON', function(assert) {
     assert.ok(typeof canvas.toJSON === 'function');
-    assert.equal(JSON.stringify(canvas.toJSON()), '{"version":"' + fabric.version + '","objects":[]}');
+    assert.equal(JSON.stringify(canvas), JSON.stringify({ "version": fabric.version, "objects": [] }));
     canvas.backgroundColor = '#ff5555';
     canvas.overlayColor = 'rgba(0,0,0,0.2)';
-    assert.equal(JSON.stringify(canvas.toJSON()), '{"version":"' + fabric.version + '","objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlay` value should be reflected in json');
+    assert.deepEqual(canvas.toJSON(), { "version": fabric.version,"objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}, '`background` and `overlay` value should be reflected in json');
     canvas.add(makeRect());
-    assert.deepEqual(JSON.stringify(canvas.toJSON()), RECT_JSON);
+    assert.deepEqual(canvas.toJSON(), JSON.parse(RECT_JSON));
   });
 
   QUnit.test('toJSON custom properties non-existence check', function(assert) {
@@ -1027,7 +1022,7 @@
 
     canvas.bar = 456;
 
-    var data = canvas.toJSON(['padding', 'foo', 'bar', 'baz']);
+    var data = canvas.toObject(['padding', 'foo', 'bar', 'baz']);
     assert.ok('padding' in data.objects[0]);
     assert.ok('foo' in data.objects[0], 'foo shouldn\'t be included if it\'s not in an object');
     assert.ok(!('bar' in data.objects[0]), 'bar shouldn\'t be included if it\'s not in an object');
@@ -1059,7 +1054,7 @@
     createImageObject(function(image) {
       canvas.backgroundImage = image;
       image.custom = 'yes';
-      var json = canvas.toJSON(['custom']);
+      var json = canvas.toObject(['custom']);
       assert.equal(json.backgroundImage.custom, 'yes');
       canvas.backgroundImage = null;
       done();
@@ -1088,7 +1083,7 @@
     createImageObject(function(image) {
       canvas.overlayImage = image;
       image.custom = 'yes';
-      var json = canvas.toJSON(['custom']);
+      var json = canvas.toObject(['custom']);
       assert.equal(json.overlayImage.custom, 'yes');
       canvas.overlayImage = null;
       done();
@@ -1100,7 +1095,7 @@
       sourcePath: 'http://example.com/'
     });
     canvas.add(path);
-    assert.equal(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
+    assert.deepEqual(canvas.toDatalessJSON(), JSON.parse(PATH_DATALESS_JSON));
   });
 
   QUnit.test('toObject', function(assert) {
@@ -1328,6 +1323,21 @@
     });
   });
 
+  QUnit.test('loadFromJSON with AbortController', function (assert) {
+    var done = assert.async();
+    assert.expect(1);
+    var serialized = JSON.parse(PATH_JSON);
+    serialized.background = 'green';
+    serialized.backgroundImage = { "type": "image", "originX": "left", "originY": "top", "left": 13.6, "top": -1.4, "width": 3000, "height": 3351, "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 0, "strokeDashArray": null, "strokeLineCap": "butt", "strokeDashOffset": 0, "strokeLineJoin": "miter", "strokeMiterLimit": 4, "scaleX": 0.05, "scaleY": 0.05, "angle": 0, "flipX": false, "flipY": false, "opacity": 1, "shadow": null, "visible": true, "backgroundColor": "", "fillRule": "nonzero", "globalCompositeOperation": "source-over", "skewX": 0, "skewY": 0, "src": IMG_SRC, "filters": [], "crossOrigin": "" };
+    var abortController = new AbortController();
+    canvas.loadFromJSON(serialized, null, { signal: abortController.signal })
+      .catch(function (err) {
+        assert.equal(err.type, 'abort', 'should be an abort event');
+        done();
+      });
+    abortController.abort();
+  });
+
   QUnit.test('loadFromJSON custom properties', function(assert) {
     var done = assert.async();
     var rect = new fabric.Rect({ width: 10, height: 20 });
@@ -1336,11 +1346,11 @@
 
     canvas.add(rect);
 
-    var jsonWithoutFoo = JSON.stringify(canvas.toJSON(['padding']));
-    var jsonWithFoo = JSON.stringify(canvas.toJSON(['padding', 'foo']));
+    var jsonWithoutFoo = canvas.toObject(['padding']);
+    var jsonWithFoo = canvas.toObject(['padding', 'foo']);
 
-    assert.equal(jsonWithFoo, RECT_JSON_WITH_PADDING);
-    assert.ok(jsonWithoutFoo !== RECT_JSON_WITH_PADDING);
+    assert.deepEqual(jsonWithFoo, JSON.parse(RECT_JSON_WITH_PADDING));
+    assert.notDeepEqual(jsonWithoutFoo, JSON.parse(RECT_JSON_WITH_PADDING));
 
     canvas.clear();
     canvas.loadFromJSON(jsonWithFoo).then(function() {
@@ -1601,19 +1611,6 @@
     assert.equal(canvas.toString(), '#<fabric.Canvas (1): { objects: 1 }>');
   });
 
-  QUnit.test('dispose clear references', function(assert) {
-    var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
-    assert.ok(typeof canvas2.dispose === 'function');
-    canvas2.add(makeRect(), makeRect(), makeRect());
-    var lowerCanvas = canvas2.lowerCanvasEl;
-    assert.equal(lowerCanvas.getAttribute('data-fabric'), 'main', 'lowerCanvasEl should be marked by fabric');
-    canvas2.dispose();
-    assert.equal(canvas2.getObjects().length, 0, 'dispose should clear canvas');
-    assert.equal(canvas2.lowerCanvasEl, null, 'dispose should clear lowerCanvasEl');
-    assert.equal(lowerCanvas.hasAttribute('data-fabric'), false, 'dispose should clear lowerCanvasEl data-fabric attr');
-    assert.equal(canvas2.contextContainer, null, 'dispose should clear contextContainer');
-  });
-
   QUnit.test('clone', function(assert) {
     var done = assert.async();
     var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false, width: 10, height: 10 });
@@ -1849,39 +1846,49 @@
     assert.deepEqual(canvas.vptCoords.br, new fabric.Point(30 + canvas.getWidth() / 2, canvas.getHeight() / 2 - 30), 'tl is 0,0');
   });
 
+  QUnit.test('calcViewportBoundaries with flipped zoom and translation', function (assert) {
+    assert.ok(typeof canvas.calcViewportBoundaries === 'function');
+    canvas.setViewportTransform([2, 0, 0, -2, -60, 60]);
+    canvas.calcViewportBoundaries();
+    assert.deepEqual({ x: canvas.vptCoords.tl.x, y: canvas.vptCoords.tl.y }, { x: 30, y: -145 }, 'tl is 30, -145');
+    assert.deepEqual({ x: canvas.vptCoords.tr.x, y: canvas.vptCoords.tr.y }, { x: 130, y: -145 }, 'tr is 130, -145');
+    assert.deepEqual({ x: canvas.vptCoords.bl.x, y: canvas.vptCoords.bl.y }, { x: 30,  y: 30 }, 'bl is 30,-70');
+    assert.deepEqual({ x: canvas.vptCoords.br.x, y: canvas.vptCoords.br.y }, { x: 130,  y: 30 }, 'br is 130,-70');
+  });
+
   QUnit.test('_isRetinaScaling', function(assert) {
     canvas.enableRetinaScaling = true;
-    fabric.devicePixelRatio = 2;
+    fabric.config.configure({ devicePixelRatio: 2 });
     var isScaling = canvas._isRetinaScaling();
     assert.equal(isScaling, true, 'retina > 1 and enabled');
 
     canvas.enableRetinaScaling = false;
-    fabric.devicePixelRatio = 2;
+    fabric.config.configure({ devicePixelRatio: 2 });
     var isScaling = canvas._isRetinaScaling();
     assert.equal(isScaling, false, 'retina > 1 and disabled');
 
     canvas.enableRetinaScaling = false;
-    fabric.devicePixelRatio = 1;
+    fabric.config.configure({ devicePixelRatio: 1 });
     var isScaling = canvas._isRetinaScaling();
     assert.equal(isScaling, false, 'retina = 1 and disabled');
 
     canvas.enableRetinaScaling = true;
-    fabric.devicePixelRatio = 1;
+    fabric.config.configure({ devicePixelRatio: 1 });
     var isScaling = canvas._isRetinaScaling();
     assert.equal(isScaling, false, 'retina = 1 and enabled');
   });
 
   QUnit.test('getRetinaScaling', function(assert) {
     canvas.enableRetinaScaling = true;
-    fabric.devicePixelRatio = 1;
+    fabric.config.configure({ devicePixelRatio: 1 });
     var scaling = canvas.getRetinaScaling();
     assert.equal(scaling, 1, 'retina is devicePixelRatio');
 
-    fabric.devicePixelRatio = 2;
+    fabric.config.configure({ devicePixelRatio: 2 });
     var scaling = canvas.getRetinaScaling();
     assert.equal(scaling, 2, 'retina is devicePixelRatio');
 
-    fabric.devicePixelRatio = 2;
+    fabric.config.configure({ devicePixelRatio: 2 });
     canvas.enableRetinaScaling = false;
     var scaling = canvas.getRetinaScaling();
     assert.equal(scaling, 1, 'retina is disabled, 1');
@@ -1984,11 +1991,11 @@
 
   QUnit.test('requestRenderAll and cancelRequestedRender', function(assert) {
     var canvas2 = new fabric.StaticCanvas();
-    assert.equal(canvas2.isRendering, undefined, 'no redering is in progress');
+    assert.equal(canvas2.nextRenderHandle, undefined, 'no redering is in progress');
     canvas2.requestRenderAll();
-    assert.notEqual(canvas2.isRendering, 0, 'a rendering is scehduled');
+    assert.notEqual(canvas2.nextRenderHandle, 0, 'a rendering is scehduled');
     canvas2.cancelRequestedRender();
-    assert.equal(canvas2.isRendering, 0, 'rendering cancelled');
+    assert.equal(canvas2.nextRenderHandle, 0, 'rendering cancelled');
   });
 
   // QUnit.test('backgroundImage', function(assert) {

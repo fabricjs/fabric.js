@@ -97,9 +97,19 @@
     var rect1 = new fabric.Rect(),
         rect2 = new fabric.Rect(),
         rect3 = new fabric.Rect(),
-        group = new fabric.Group([rect1, rect2, rect3]);
+        group = new fabric.Group([rect1, rect2, rect3]),
+        fired = false, targets = [];
 
     assert.ok(typeof group.remove === 'function');
+    assert.ok(rect1.group === group, 'group should be referenced');
+    group.on('object:removed', (opt) => {
+      targets.push(opt.target);
+    });
+    rect1.on('removed', (opt) => {
+      assert.equal(opt.target, group);
+      assert.ok(rect1.group === undefined, 'group should not be referenced');
+      fired = true;
+    });
     var removed = group.remove(rect2);
     assert.deepEqual(removed, [rect2], 'should return removed objects');
     assert.deepEqual(group.getObjects(), [rect1, rect3], 'should remove object properly');
@@ -107,6 +117,8 @@
     var removed = group.remove(rect1, rect3);
     assert.deepEqual(removed, [rect1, rect3], 'should return removed objects');
     assert.equal(group.isEmpty(), true, 'group should be empty');
+    assert.ok(fired, 'should have fired removed event on rect1');
+    //assert.deepEqual(targets, [rect2, rect1, rect3], 'should contain removed objects');
   });
 
   QUnit.test('size', function(assert) {
@@ -583,23 +595,23 @@
       });
     });
 
-    group.insertAt(rect3, 1);
+    group.insertAt(1, rect3);
     control.splice(1, 0, rect3);
     firingControl.push(rect3);
     equalsControl('rect3');
-    group.insertAt(rect4, 0);
+    group.insertAt(0, rect4);
     control.splice(0, 0, rect4);
     firingControl.push(rect4);
     equalsControl('rect4');
-    group.insertAt(rect5, 2);
+    group.insertAt(2, rect5);
     control.splice(2, 0, rect5);
     firingControl.push(rect5);
     equalsControl('rect5');
-    group.insertAt([rect6], 2);
+    group.insertAt(2, rect6);
     control.splice(2, 0, rect6);
     firingControl.push(rect6);
     equalsControl('rect6');
-    group.insertAt([rect7, rect8], 3);
+    group.insertAt(3, rect7, rect8);
     control.splice(3, 0, rect7, rect8);
     firingControl.push(rect7, rect8);
     equalsControl('rect7');
@@ -702,27 +714,27 @@
       group = new fabric.Group([rect1]);
 
     //  duplicate
-    assert.notOk(group.canEnter(rect1));
-    // group.add(rect1);
-    // assert.deepEqual(group.getObjects(), [rect1], 'objects should not have changed');
+    assert.notOk(group.canEnterGroup(rect1));
+    group.add(rect1);
+    assert.deepEqual(group.getObjects(), [rect1], 'objects should not have changed');
     //  duplicate on same call
-    assert.ok(group.canEnter(rect2));
-    // group.add(rect2, rect2);
-    // assert.deepEqual(group.getObjects(), [rect1, rect2], '`rect2` should have entered once');
+    assert.ok(group.canEnterGroup(rect2));
+    group.add(rect2, rect2);
+    assert.deepEqual(group.getObjects(), [rect1, rect2], '`rect2` should have entered once');
     //  adding self
-    assert.notOk(group.canEnter(group));
-    // group.add(group);
-    // assert.deepEqual(group.getObjects(), [rect1, rect2], 'objects should not have changed');
+    assert.notOk(group.canEnterGroup(group));
+    group.insertAt(0, group);
+    assert.deepEqual(group.getObjects(), [rect1, rect2], 'objects should not have changed');
     //  nested object should be removed from group
     var nestedGroup = new fabric.Group([rect1]);
-    assert.ok(group.canEnter(nestedGroup));
-    // group.add(nestedGroup);
-    // assert.deepEqual(group.getObjects(), [rect2, nestedGroup], '`rect1` was removed from group once it entered `nestedGroup`');
+    assert.ok(group.canEnterGroup(nestedGroup));
+    group.add(nestedGroup);
+    assert.deepEqual(group.getObjects(), [rect2, nestedGroup], '`rect1` was removed from group once it entered `nestedGroup`');
     //  circular group
-    var circularGroup = new fabric.Group([rect2, group]);
-    assert.notOk(group.canEnter(circularGroup), 'circular group should be denied entry');
-    // group.add(circularGroup);
-    // assert.deepEqual(group.getObjects(), [rect2, nestedGroup], 'objects should not have changed');
+    var circularGroup = new fabric.Group([group]);
+    assert.notOk(group.canEnterGroup(circularGroup), 'circular group should be denied entry');
+    group.add(circularGroup);
+    assert.deepEqual(group.getObjects(), [rect2, nestedGroup], 'objects should not have changed');
   });
 
   QUnit.test('group remove', function(assert) {
@@ -877,7 +889,7 @@
 
     group1.addRelativeToGroup(rect5);
     var t = group1.calcTransformMatrix();
-    var pos = fabric.util.transformPoint(new fabric.Point(rect5.left, rect5.top), t);
+    fabric.util.transformPoint(new fabric.Point(rect5.left, rect5.top), t);
     assert.equal(rect5.top, -5.5, 'top has been moved');
     assert.equal(rect5.left, -19.5, 'left has been moved');
     assert.equal(rect5.scaleX, 2, 'scaleX has been scaled');

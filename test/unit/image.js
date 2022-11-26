@@ -99,7 +99,7 @@
 
   function setSrc(img, src, callback) {
     img.onload = function() {
-      callback && callback();
+      if (callback) { callback(); }
     };
     img.src = src;
   }
@@ -296,7 +296,7 @@
     var done = assert.async();
     createImageObject(function(image) {
       assert.ok(typeof image.toString === 'function');
-      assert.equal(image.toString(), '#<fabric.Image: { src: "' + image.getSrc() + '" }>');
+      assert.equal(image.toString(), '#<Image: { src: "' + image.getSrc() + '" }>');
       done();
     });
   });
@@ -402,7 +402,7 @@
 
       var elImage = _createImageElement();
       assert.notEqual(image.getElement(), elImage);
-      assert.equal(image.setElement(elImage), image, 'chainable');
+      image.setElement(elImage);
       assert.equal(image.getElement(), elImage);
       assert.equal(image._originalElement, elImage);
       done();
@@ -421,7 +421,7 @@
       };
       var elImage = _createImageElement();
       fabric.filterBackend.textureCache[image.cacheKey] = 'something';
-      assert.equal(image.setElement(elImage), image, 'chainable');
+      image.setElement(elImage);
       assert.equal(fabric.filterBackend.textureCache[image.cacheKey], undefined);
       fabric.filterBackend = fabricBackend;
       done();
@@ -647,7 +647,7 @@
       y: '0',
       width: '70',
       height: '170',
-      preserveAspectRatio: 'meet xMidYMid',
+      preserveAspectRatio: 'xMidYMid meet',
       'xlink:href': IMAGE_DATA_URL
     });
 
@@ -676,7 +676,7 @@
       y: '0',
       width: '70',
       height: '170',
-      preserveAspectRatio: 'meet xMidYMax',
+      preserveAspectRatio: 'xMidYMax meet',
       'xlink:href': IMAGE_DATA_URL
     });
 
@@ -705,7 +705,7 @@
       y: '0',
       width: '70',
       height: '170',
-      preserveAspectRatio: 'meet xMidYMin',
+      preserveAspectRatio: 'xMidYMin meet',
       'xlink:href': IMAGE_DATA_URL
     });
 
@@ -734,7 +734,7 @@
       y: '0',
       width: '140',
       height: '85',
-      preserveAspectRatio: 'meet xMinYMin',
+      preserveAspectRatio: 'xMinYMin meet',
       'xlink:href': IMAGE_DATA_URL
     });
 
@@ -763,7 +763,7 @@
       y: '0',
       width: '140',
       height: '85',
-      preserveAspectRatio: 'meet xMidYMin',
+      preserveAspectRatio: 'xMidYMin meet',
       'xlink:href': IMAGE_DATA_URL
     });
 
@@ -792,7 +792,7 @@
       y: '0',
       width: '140',
       height: '85',
-      preserveAspectRatio: 'meet xMaxYMin',
+      preserveAspectRatio: 'xMaxYMin meet',
       'xlink:href': IMAGE_DATA_URL
     });
 

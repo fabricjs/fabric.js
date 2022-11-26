@@ -1,6 +1,13 @@
 (function() {
 
-  QUnit.module('fabric.Text');
+  QUnit.module('fabric.Text', {
+    before() {
+      fabric.config.configure({ NUM_FRACTION_DIGITS: 2 });
+    },
+    after() {
+      fabric.config.restoreDefaults();
+    }
+  });
 
   function createTextObject(text) {
     return new fabric.Text(text || 'x');
@@ -51,7 +58,7 @@
     skewX:                      0,
     skewY:                      0,
     charSpacing:                0,
-    styles:                     {},
+    styles:                     [],
     path:                       null,
     strokeUniform:              false,
     direction:                  'ltr',
@@ -75,7 +82,7 @@
   QUnit.test('toString', function(assert) {
     var text = createTextObject();
     assert.ok(typeof text.toString === 'function');
-    assert.equal(text.toString(), '#<fabric.Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
+    assert.equal(text.toString(), '#<Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
   });
 
   QUnit.test('_getFontDeclaration', function(assert) {
@@ -264,7 +271,6 @@
         fontSize:         123,
         underline:        true,
       });
-
       assert.deepEqual(textWithAttrs.toObject(), expectedObject);
     });
   });
@@ -346,9 +352,9 @@
     var text = new fabric.Text('xxxxxx\nx y');
     text.styles = { 1: { 0: { }, 1: { }}, 2: { }, 3: { 4: { }}};
     text.cleanStyle('any');
-    assert.equal(text.styles[1], undefined, 'the style has been cleaned since there were no usefull informations');
-    assert.equal(text.styles[2], undefined, 'the style has been cleaned since there were no usefull informations');
-    assert.equal(text.styles[3], undefined, 'the style has been cleaned since there were no usefull informations');
+    assert.equal(text.styles[1], undefined, 'the style has been cleaned since there was no useful information');
+    assert.equal(text.styles[2], undefined, 'the style has been cleaned since there was no useful information');
+    assert.equal(text.styles[3], undefined, 'the style has been cleaned since there was no useful information');
   });
 
   QUnit.test('text cleanStyle with full style', function(assert) {
@@ -388,10 +394,28 @@
     assert.equal(text.styles[0], undefined, 'the styles got empty and has been removed');
   });
 
+  QUnit.test('text toObject removes empty style object', function(assert) {
+    var text = new fabric.Text('xxx');
+    text.styles = { 0: { 0: {} } };
+    var obj = text.toObject();
+    assert.deepEqual(obj.styles, [], 'empty style object has been removed');
+  });
+
+  QUnit.test('text toObject can handle style objects with only a textBackgroundColor property', function(assert) {
+    var text = new fabric.Text('xxx');
+    text.styles = { 0: { 0: { textBackgroundColor: 'blue' } } };
+    var obj = text.toObject();
+    assert.deepEqual(
+      obj.styles,
+      [{ start: 0, end: 1, style: { textBackgroundColor: 'blue' }}],
+      'styles with only a textBackgroundColor property do not throw an error'
+    );
+  });
+
   QUnit.test('getFontCache works with fontWeight numbers', function(assert) {
     var text = new fabric.Text('xxx', { fontWeight: 400 });
     text.initDimensions();
-    var cache = fabric.charWidthsCache[text.fontFamily.toLowerCase()];
+    var cache = fabric.cache.charWidthsCache[text.fontFamily.toLowerCase()];
     var cacheProp = text.fontStyle + '_400';
     assert.equal(cacheProp in cache, true, '400 is converted to string');
   });
@@ -401,8 +425,8 @@
     text.initDimensions();
     var text2 = new fabric.Text('xxx', { fontWeight: 'bOLd', fontStyle: 'nORMAl' });
     text2.initDimensions();
-    var cache = text.getFontCache(text);
-    var cache2 = text2.getFontCache(text2);
+    var cache = fabric.cache.getFontCache(text);
+    var cache2 = fabric.cache.getFontCache(text2);
     assert.equal(cache, cache2, 'you get the same cache');
   });
   // moved
@@ -608,17 +632,17 @@
         }
       }
     });
-    fabric.Object.NUM_FRACTION_DIGITS = 1;
+    fabric.config.configure({ NUM_FRACTION_DIGITS: 1 });
     var SVG_1 = iText.toSVG();
     // var SVG_1_EXPECTED = '\t<g transform="translate(124.5 23.1)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-124" y="12.6" style="fill: rgb(255,0,0); ">t</tspan><tspan x="-112.9" y="12.6" style="fill: rgb(0,0,255); ">e</tspan><tspan x="-95.1" y="12.6" style="fill: rgb(0,128,0); ">s</tspan><tspan x="-79.6" y="12.6" style="fill: rgb(255,255,0); ">t</tspan><tspan x="-68.4" y="12.6" style="fill: rgb(255,192,203); white-space: pre; "> </tspan><tspan x="-58.4" y="12.6" >foo bar-baz</tspan></text>\n\t</g>\n';
     //assert.equal(SVG_1, SVG_1_EXPECTED, 'numbers have max 1 decimal');
-    fabric.Object.NUM_FRACTION_DIGITS = 3;
+    fabric.config.configure({ NUM_FRACTION_DIGITS: 3 });
     var SVG_2 = iText.toSVG();
     // var SVG_2_EXPECTED = '\t<g transform="translate(124.484 23.1)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-123.984" y="12.566" style="fill: rgb(255,0,0); ">t</tspan><tspan x="-112.871" y="12.566" style="fill: rgb(0,0,255); ">e</tspan><tspan x="-95.117" y="12.566" style="fill: rgb(0,128,0); ">s</tspan><tspan x="-79.551" y="12.566" style="fill: rgb(255,255,0); ">t</tspan><tspan x="-68.438" y="12.566" style="fill: rgb(255,192,203); white-space: pre; "> </tspan><tspan x="-58.438" y="12.566" >foo bar-baz</tspan></text>\n\t</g>\n';
     //assert.equal(SVG_2, SVG_2_EXPECTED, 'numbers have max 3 decimal');
     assert.ok(SVG_2.length > SVG_1.length, 'SVG 2 has more decimal');
     // put back to 2 or break all tests
-    fabric.Object.NUM_FRACTION_DIGITS = 2;
+    fabric.config.configure({ NUM_FRACTION_DIGITS: 2 });
   });
 
   QUnit.test('getSvgSpanStyles produces correct output', function(assert) {
@@ -698,7 +722,8 @@
     var schema = text.superscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
-    text.setSuperscript(1, 2).setSuperscript(2, 3);
+    text.setSuperscript(1, 2);
+    text.setSuperscript(2, 3);
 
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
@@ -720,7 +745,8 @@
     var schema = text.subscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
-    text.setSubscript(1,2).setSubscript(2,3);
+    text.setSubscript(1, 2);
+    text.setSubscript(2, 3);
 
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
@@ -742,13 +768,13 @@
   });
 
   QUnit.test('_measureChar handles 0 width chars', function(assert) {
-    fabric.charWidthsCache = {};
+    fabric.cache.clearFontCache();
     var zwc =  '\u200b';
     var text = new fabric.Text('');
     var style = text.getCompleteStyleDeclaration(0, 0);
     var box = text._measureChar('a', style, zwc, style);
     var box2 = text._measureChar('a', style, zwc, style);
-    assert.equal(fabric.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal[zwc], 0, 'zwc is a 0 width char');
+    assert.equal(fabric.cache.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal[zwc], 0, 'zwc is a 0 width char');
     assert.equal(box.kernedWidth, box2.kernedWidth, '2 measurements of the same string return the same number');
   });
 
