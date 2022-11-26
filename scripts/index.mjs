@@ -756,7 +756,7 @@ sandbox
         `> building ${chalk.bold(template)} sandbox`
       )} at ${chalk.cyanBright(destination)}`
     );
-    startSandbox(destination, watch);
+    startSandbox(destination, watch, true);
   });
 
 sandbox
