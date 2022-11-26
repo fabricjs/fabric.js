@@ -24,7 +24,7 @@ import moment from 'moment';
 import path from 'node:path';
 import process from 'node:process';
 import os from 'os';
-import { createCodeSandbox } from '../.codesandbox/deploy.mjs';
+import { createCodeSandbox, ignore } from '../.codesandbox/deploy.mjs';
 import { startSandbox } from '../.codesandbox/start.mjs';
 import { build } from './build.mjs';
 import { awaitBuild } from './buildLock.mjs';
@@ -750,7 +750,10 @@ sandbox
     'use this option if you have another process watching fabric'
   )
   .action((template, destination, { watch }) => {
-    fs.copySync(path.resolve(codesandboxTemplatesDir, template), destination);
+    const templateDir = path.resolve(codesandboxTemplatesDir, template);
+    fs.copySync(templateDir, destination, {
+      filter: (src) => !ignore(templateDir, path.relative(templateDir, src)),
+    });
     console.log(
       `${chalk.blue(
         `> building ${chalk.bold(template)} sandbox`

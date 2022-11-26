@@ -21,6 +21,15 @@ function parseIgnoreFile(file) {
   );
 }
 
+export function ignore(appPath, fileName) {
+  const gitignore = path.resolve(appPath, '.gitignore');
+  const codesandboxignore = path.resolve(appPath, '.codesandboxignore');
+  const ignore = _.flatten(
+    [gitignore, codesandboxignore].filter(fs.existsSync).map(parseIgnoreFile)
+  );
+  return ignore.some((r) => r.test(fileName));
+}
+
 /**
  * https://codesandbox.io/docs/api/#define-api
  */
@@ -38,16 +47,9 @@ export async function createCodeSandbox(appPath) {
     },
   };
 
-  const gitignore = path.resolve(appPath, '.gitignore');
-  const codesandboxignore = path.resolve(appPath, '.codesandboxignore');
-  const ignore = _.flatten(
-    [gitignore, codesandboxignore].filter(fs.existsSync).map(parseIgnoreFile)
-  );
-
   const processFile = (fileName) => {
     const filePath = path.resolve(appPath, fileName);
-    if (fileName === 'package.json' || ignore.some((r) => r.test(fileName)))
-      return;
+    if (fileName === 'package.json' || ignore(appPath, fileName)) return;
     const ext = path.extname(fileName).slice(1);
     if (fs.lstatSync(filePath).isDirectory()) {
       fs.readdirSync(filePath).forEach((file) => {
