@@ -1,7 +1,6 @@
 (function() {
-  fabric.config.configure({
-    enableGLFiltering: false
-  });
+  fabric.enableGLFiltering = false;
+  fabric.isWebglSupported = false;
   var visualTestLoop;
   var getAssetName;
   if (fabric.isLikelyNode) {
@@ -57,7 +56,7 @@
     newModule: 'Export clippaths to SVG',
     percentage: 0.06,
     beforeEachHandler: function() {
-      fabric.config.configure({ NUM_FRACTION_DIGITS: 4 });
+      fabric.Object.NUM_FRACTION_DIGITS = 4;
       fabric.Object.prototype.objectCaching = false;
     }
   });

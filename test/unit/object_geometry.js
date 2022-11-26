@@ -246,7 +246,8 @@
   QUnit.test('setCoords', function(assert) {
     var cObj = new fabric.Object({ left: 150, top: 150, width: 100, height: 100, strokeWidth: 0});
     assert.ok(typeof cObj.setCoords === 'function');
-    cObj.setCoords();
+    assert.equal(cObj.setCoords(), cObj, 'chainable');
+
     assert.equal(cObj.oCoords.tl.x, 150);
     assert.equal(cObj.oCoords.tl.y, 150);
     assert.equal(cObj.oCoords.tr.x, 250);
@@ -333,24 +334,6 @@
   QUnit.test('isOnScreen', function(assert) {
     var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100, strokeWidth: 0});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    canvas.calcViewportBoundaries();
-    cObj.canvas = canvas;
-    cObj.setCoords();
-    assert.ok(cObj.isOnScreen(), 'object is onScreen');
-    cObj.top = 1000;
-    assert.ok(cObj.isOnScreen(), 'object is still wrongly on screen since setCoords is not called and calculate is not set, even when top is already at 1000');
-    assert.ok(!cObj.isOnScreen(true), 'object is not onScreen with top 1000 with calculate true and no setCoords call');
-    cObj.setCoords();
-    assert.ok(!cObj.isOnScreen(), 'object is not onScreen with top 1000');
-    canvas.setZoom(0.1);
-    cObj.setCoords();
-    assert.ok(cObj.isOnScreen(), 'zooming out the object is again on screen');
-  });
-
-  QUnit.test('isOnScreen flipped vpt', function (assert) {
-    var cObj = new fabric.Object({ left: -50, top: -50, width: 100, height: 100, strokeWidth: 0 });
-    canvas.viewportTransform = [-1, 0, 0, -1, 0, 0];
-    canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
     cObj.setCoords();
     assert.ok(cObj.isOnScreen(), 'object is onScreen');
@@ -398,7 +381,6 @@
     var cObj = new fabric.Object(
       { left: -10, top: -10, width: canvas.getWidth() + 100, height: canvas.getHeight(), strokeWidth: 0});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
     cObj.setCoords();
     assert.equal(cObj.isOnScreen(), true, 'object is onScreen because it include the canvas');
@@ -411,7 +393,6 @@
   QUnit.test('isOnScreen with object that is in top left corner of canvas', function(assert) {
     var cObj = new fabric.Rect({left: -46.56, top: -9.23, width: 50,height: 50, angle: 314.57});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
     cObj.setCoords();
     assert.ok(cObj.isOnScreen(), 'object is onScreen because it intersect a canvas line');
@@ -469,8 +450,8 @@
 
   QUnit.test('scaleToWidth', function(assert) {
     var cObj = new fabric.Object({ width: 560, strokeWidth: 0 });
-    assert.ok(typeof cObj.scaleToWidth === 'function', 'scaleToWidth should exist');
-    cObj.scaleToWidth(100);
+    assert.ok(typeof cObj.scaleToWidth === 'function',  'scaleToWidth should exist');
+    assert.equal(cObj.scaleToWidth(100), cObj, 'chainable');
     assert.equal(cObj.getScaledWidth(), 100);
     assert.equal(cObj.get('scaleX'), 100 / 560);
   });
@@ -480,10 +461,10 @@
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 0, 0]
     };
-    cObj.scaleToWidth(100, true);
+    assert.equal(cObj.scaleToWidth(100, true), cObj, 'chainable');
     assert.equal(cObj.getScaledWidth(), 100, 'is not influenced by zoom - width');
     assert.equal(cObj.get('scaleX'), 100 / 560);
-    cObj.scaleToWidth(100);
+    assert.equal(cObj.scaleToWidth(100), cObj, 'chainable');
     assert.equal(cObj.getScaledWidth(), 50, 'is influenced by zoom - width');
     assert.equal(cObj.get('scaleX'), 100 / 560 / 2);
   });
@@ -492,7 +473,7 @@
   QUnit.test('scaleToHeight', function(assert) {
     var cObj = new fabric.Object({ height: 560, strokeWidth: 0 });
     assert.ok(typeof cObj.scaleToHeight === 'function', 'scaleToHeight should exist');
-    cObj.scaleToHeight(100);
+    assert.equal(cObj.scaleToHeight(100), cObj, 'chainable');
     assert.equal(cObj.getScaledHeight(), 100);
     assert.equal(cObj.get('scaleY'), 100 / 560);
   });
@@ -502,10 +483,10 @@
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 0, 0]
     };
-    cObj.scaleToHeight(100, true);
+    assert.equal(cObj.scaleToHeight(100, true), cObj, 'chainable');
     assert.equal(cObj.getScaledHeight(), 100, 'is not influenced by zoom - height');
     assert.equal(cObj.get('scaleY'), 100 / 560);
-    cObj.scaleToHeight(100);
+    assert.equal(cObj.scaleToHeight(100), cObj, 'chainable');
     assert.equal(cObj.getScaledHeight(), 50, 'is influenced by zoom - height');
     assert.equal(cObj.get('scaleY'), 100 / 560 / 2);
   });
@@ -565,16 +546,14 @@
     assert.equal(boundingRect.width, 123);
     assert.equal(boundingRect.height, 0);
 
-    cObj.set('height', 167);
-    cObj.setCoords();
+    cObj.set('height', 167).setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 0);
     assert.equal(Math.abs(boundingRect.top).toFixed(13), 0);
     assert.equal(boundingRect.width, 123);
     assert.equal(boundingRect.height, 167);
 
-    cObj.scale(2)
-    cObj.setCoords();
+    cObj.scale(2).setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 0);
     assert.equal(Math.abs(boundingRect.top).toFixed(13), 0);
@@ -594,24 +573,21 @@
     assert.equal(boundingRect.width.toFixed(2), 1);
     assert.equal(boundingRect.height.toFixed(2), 1);
 
-    cObj.set('width', 123)
-    cObj.setCoords();
+    cObj.set('width', 123).setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left.toFixed(2), 0);
     assert.equal(boundingRect.top.toFixed(2), 0);
     assert.equal(boundingRect.width.toFixed(2), 124);
     assert.equal(boundingRect.height.toFixed(2), 1);
 
-    cObj.set('height', 167)
-    cObj.setCoords();
+    cObj.set('height', 167).setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left.toFixed(2), 0);
     assert.equal(boundingRect.top.toFixed(2), 0);
     assert.equal(boundingRect.width.toFixed(2), 124);
     assert.equal(boundingRect.height.toFixed(2), 168);
 
-    cObj.scale(2)
-    cObj.setCoords();
+    cObj.scale(2).setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left.toFixed(2), 0);
     assert.equal(boundingRect.top.toFixed(2), 0);
@@ -833,7 +809,6 @@
   QUnit.test('isPartiallyOnScreen', function(assert) {
     var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100, strokeWidth: 0});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
     cObj.left = -60;
     cObj.top = -60;
@@ -843,8 +818,8 @@
     cObj.top = -110;
     cObj.setCoords();
     assert.equal(cObj.isPartiallyOnScreen(true), false,'object is completely offScreen and not partial');
-    cObj.left = 45;
-    cObj.top = 45;
+    cObj.left = 50;
+    cObj.top = 50;
     cObj.setCoords();
     assert.equal(cObj.isPartiallyOnScreen(true), false, 'object is completely on screen and not partial');
     canvas.setZoom(2);

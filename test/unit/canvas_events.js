@@ -26,7 +26,6 @@
       canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
       canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
       canvas.off();
-      canvas.setDimensions({ width: 600, height: 600 });
       canvas.calcOffset();
       upperCanvasEl.style.display = 'none';
       canvas.cancelRequestedRender();
@@ -85,35 +84,20 @@
   QUnit.test('cache and reset event properties', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl };
     var rect = new fabric.Rect({ width: 60, height: 60 });
-    function cacheAndAssertTransformEvent() {
-      canvas._cacheTransformEventData(e);
-      assert.deepEqual(canvas._pointer, new fabric.Point(30, 30), 'pointer has been cached');
-      assert.deepEqual(canvas._absolutePointer, new fabric.Point(15, 15), 'absolute pointer has been cached');
-    }
-    function assertTransformEventCacheIsReset() {
-      assert.equal(canvas._pointer, null);
-      assert.equal(canvas._absolutePointer, null);
-      assert.equal(canvas._target, null);
-    }
     canvas._currentTransform = null;
     canvas.add(rect);
-    assertTransformEventCacheIsReset();
+    assert.equal(canvas._pointer, null);
+    assert.equal(canvas._absolutePointer, null);
+    assert.equal(canvas._target, null);
     canvas.viewportTransform = [2, 0, 0, 2, 0, 0];
-
-    cacheAndAssertTransformEvent();
+    canvas._cacheTransformEventData(e);
+    assert.deepEqual(canvas._pointer, { x: 30, y: 30 }, 'pointer has been cached');
+    assert.deepEqual(canvas._absolutePointer, new fabric.Point(15, 15), 'absolute pointer has been cached');
     assert.ok(canvas._target === rect);
     canvas._resetTransformEventData();
-    assertTransformEventCacheIsReset();
-
-    //  canvas resize
-    cacheAndAssertTransformEvent();
-    canvas.setDimensions({ width: 200, height: 200 });
-    assertTransformEventCacheIsReset();
-
-    //  window resize
-    cacheAndAssertTransformEvent();
-    canvas._onResize();
-    assertTransformEventCacheIsReset();
+    assert.equal(canvas._pointer, null);
+    assert.equal(canvas._absolutePointer, null);
+    assert.equal(canvas._target, null);
   });
 
   QUnit.test('mouse:down with different buttons', function(assert) {
@@ -357,6 +341,7 @@
     var rect = new fabric.Rect({ left: 0, top: 0, width: 50, height: 50 });
     canvas.add(rect);
     var count = 0;
+    var count2 = 0;
     var opt;
     canvas.on('object:modified', function(_opt) {
       count++;
@@ -547,6 +532,21 @@
     });
   });
 
+  ['DragEnter', 'DragLeave', 'DragOver'].forEach(function(eventType) {
+    QUnit.test('Fabric event fired - ' + eventType, function(assert) {
+      var eventName = eventType.toLowerCase();
+      var counter = 0;
+      var c = new fabric.Canvas();
+      c.on(eventName, function() {
+        counter++;
+      });
+      var event = fabric.document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      c.upperCanvasEl.dispatchEvent(event);
+      assert.equal(counter, 1, eventName + ' fabric event fired');
+    });
+  });
+
   QUnit.test('Fabric event fired - Drop', function (assert) {
     var eventNames = ['drop:before', 'drop'];
     var c = new fabric.Canvas();
@@ -562,47 +562,28 @@
     assert.deepEqual(fired, eventNames, 'bad drop event fired');
   });
 
-  QUnit.test('drag event cycle', async function (assert) {
-    async function testDragCycle(cycle, canDrop) {
+  ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
+    QUnit.test('_simpleEventHandler fires on object and canvas - ' + eventType, function(assert) {
+      var eventName = eventType.toLowerCase();
+      var counter = 0;
+      var target;
       var c = new fabric.Canvas();
       var rect = new fabric.Rect({ width: 10, height: 10 });
-      rect.canDrop = function () {
-        return canDrop;
-      }
       c.add(rect);
-      var registery = [], canvasRegistry = [];
-      cycle.forEach(eventName => {
-        rect.once(eventName, function () {
-          registery.push(eventName);
-        });
-        c.once(eventName, function (opt) {
-          assert.equal(opt.target, rect, eventName + ' on canvas has rect as a target');
-          canvasRegistry.push(eventName);
-        });
-        var event = fabric.document.createEvent('HTMLEvents');
-        event.initEvent(eventName, true, true);
-        event.clientX = 5;
-        event.clientY = 5;
-        c.upperCanvasEl.dispatchEvent(event);
+      rect.on(eventName, function() {
+        counter++;
       });
-      await c.dispose();
-      assert.equal(canvasRegistry.length, cycle.length, 'should fire cycle on canvas');
-      assert.deepEqual(canvasRegistry, cycle, 'should fire all events on canvas');
-      return registery
-    }
-    var cycle, res;
-    cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'drop'];
-    res = await testDragCycle(cycle, true);
-    assert.deepEqual(res, cycle, 'should fire all events on rect');
-    cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'dragleave'];
-    res = await testDragCycle(cycle, true);
-    assert.deepEqual(res, cycle, 'should fire all events on rect');
-    cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'drop'];
-    res = await testDragCycle(cycle);
-    assert.deepEqual(res, cycle, 'should fire all events on rect');
-    cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'dragleave'];
-    res = await testDragCycle(cycle);
-    assert.deepEqual(res, cycle, 'should fire all events on rect');
+      c.on(eventName, function(opt) {
+        target = opt.target;
+      });
+      var event = fabric.document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      event.clientX = 5;
+      event.clientY = 5;
+      c.upperCanvasEl.dispatchEvent(event);
+      assert.equal(counter, 1, eventName + ' fabric event fired on rect');
+      assert.equal(target, rect, eventName + ' on canvas has rect as a target');
+    });
   });
 
   ['mousedown', 'mousemove', 'wheel', 'dblclick'].forEach(function(eventType) {
@@ -633,57 +614,22 @@
     });
   });
 
-  QUnit.test('mouseenter (mouse:over)', function (assert) {
-    var eventname = 'mouse:over'
-    var counter = 0;
-    var c = new fabric.Canvas();
-    c.on(eventname, function () {
-      counter++;
-    });
-    var event = fabric.document.createEvent('HTMLEvents');
-    event.initEvent('mouseenter', true, true);
-    c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(counter, 1, eventname + ' fabric event fired');
-  });
-
-  QUnit.test('mouseout', function (assert) {
-    var eventName = 'mouseout';
-    var canvasEventName = 'mouse:out';
-    var c = new fabric.Canvas();
-    var o1 = new fabric.Object();
-    var o2 = new fabric.Object();
-    var o3 = new fabric.Object();
-    var control = [];
-    var targetControl = [];
-    [o1, o2, o3].forEach(target => {
-      target.on(canvasEventName.replace(':', ''), () => {
-        targetControl.push(target);
+  ['mouseout', 'mouseenter'].forEach(function(eventType) {
+    QUnit.test('Fabric event fired - ' + eventType, function(assert) {
+      var eventname = eventType.slice(0, 5) + ':' + eventType.slice(5);
+      if (eventType === 'mouseenter') {
+        eventname = 'mouse:over';
+      }
+      var counter = 0;
+      var c = new fabric.Canvas();
+      c.on(eventname, function() {
+        counter++;
       });
+      var event = fabric.document.createEvent('HTMLEvents');
+      event.initEvent(eventType, true, true);
+      c.upperCanvasEl.dispatchEvent(event);
+      assert.equal(counter, 1, eventname + ' fabric event fired');
     });
-    canvas.add(o1, o2, o3);
-    c.on(canvasEventName, function (ev) {
-      control.push(ev);
-    });
-    var event = fabric.document.createEvent('HTMLEvents');
-    event.initEvent(eventName, true, true);
-
-    //  with targets
-    c._hoveredTarget = o3;
-    c._hoveredTargets = [o2, o1];
-    c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(c._hoveredTarget, null, 'should clear `_hoveredTarget` ref');
-    assert.deepEqual(c._hoveredTargets, [], 'should clear `_hoveredTargets` ref');
-    const expected = [o3, o2, o1];
-    assert.deepEqual(control.map(ev => ev.target), expected, 'should equal control');
-    assert.deepEqual(targetControl, expected, 'should equal target control');
-
-    //  without targets
-    control = [];
-    targetControl = [];
-    c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(control.length, 1, 'should have fired once');
-    assert.equal(control[0].target, null, 'no target should be referenced');
-    assert.deepEqual(targetControl, [], 'no target should be referenced');
   });
 
   QUnit.test('mouseover and mouseout with subtarget check', function(assert) {

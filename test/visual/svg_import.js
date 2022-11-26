@@ -1,7 +1,6 @@
 (function() {
-  fabric.config.configure({
-    enableGLFiltering: false
-  });
+  fabric.enableGLFiltering = false;
+  fabric.isWebglSupported = false;
   fabric.Object.prototype.objectCaching = true;
   var visualTestLoop;
   var getAsset;
@@ -94,9 +93,7 @@
     'cs',
     'qt',
     'generic-path',
-    '177',
-    'polygons',
-    'polygons-rounded',
+    '177'
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));

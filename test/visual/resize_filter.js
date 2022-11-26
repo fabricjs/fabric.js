@@ -1,10 +1,8 @@
 (function() {
-  fabric.config.configure({
-    enableGLFiltering: false
-  });
+  fabric.enableGLFiltering = false;
+  fabric.isWebglSupported = false;
   var visualTestLoop;
   var getFixture;
-  var isFirefox = false;
   if (fabric.isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
     getFixture = global.getFixture;
@@ -12,7 +10,6 @@
   else {
     visualTestLoop = window.visualTestLoop;
     getFixture = window.getFixture;
-    isFirefox = window.navigator.userAgent.includes('Firefox/')
   }
 
   var tests = [];
@@ -37,7 +34,6 @@
     golden: 'parrot.png',
     newModule: 'Image resize filter test',
     percentage: 0.08,
-    disabled: isFirefox,
     width: 200,
     height: 200,
     beforeEachHandler: function() {
@@ -61,7 +57,6 @@
     test: 'Image resize without zoom',
     code: imageResizeTestNoZoom,
     golden: 'parrot.png',
-    disabled: isFirefox,
     percentage: 0.08,
     width: 200,
     height: 200,
@@ -85,7 +80,6 @@
     code: imageResizeTestAnamorphic,
     golden: 'parrotxy.png',
     percentage: 0.08,
-    disabled: isFirefox,
     width: 200,
     height: 200,
   });
@@ -108,7 +102,6 @@
     test: 'Image resize with scaled group',
     code: imageResizeTestGroup,
     golden: 'parrot.png',
-    disabled: isFirefox,
     percentage: 0.08,
     width: 200,
     height: 200,

@@ -1,32 +1,31 @@
 (function() {
   if (fabric.isLikelyNode) {
     if (process.env.launcher === 'Firefox') {
-      fabric.config.configure({ browserShadowBlurConstant: 0.9 });
+      fabric.browserShadowBlurConstant = 0.9;
     }
     if (process.env.launcher === 'Node') {
-      fabric.config.configure({ browserShadowBlurConstant: 1 });
+      fabric.browserShadowBlurConstant = 1;
     }
     if (process.env.launcher === 'Chrome') {
-      fabric.config.configure({ browserShadowBlurConstant: 1.5 });
+      fabric.browserShadowBlurConstant = 1.5;
     }
     if (process.env.launcher === 'Edge') {
-      fabric.config.configure({ browserShadowBlurConstant: 1.75 });
+      fabric.browserShadowBlurConstant = 1.75;
     }
   }
   else {
     if (navigator.userAgent.indexOf('Firefox') !== -1) {
-      fabric.config.configure({ browserShadowBlurConstant: 0.9 });
+      fabric.browserShadowBlurConstant = 0.9;
     }
     if (navigator.userAgent.indexOf('Chrome') !== -1) {
-      fabric.config.configure({ browserShadowBlurConstant: 1.5 });
+      fabric.browserShadowBlurConstant = 1.5;
     }
     if (navigator.userAgent.indexOf('Edge') !== -1) {
-      fabric.config.configure({ browserShadowBlurConstant: 1.75 });
+      fabric.browserShadowBlurConstant = 1.75;
     }
   }
-  fabric.config.configure({
-    enableGLFiltering: false
-  });
+  fabric.enableGLFiltering = false;
+  fabric.isWebglSupported = false;
   fabric.Object.prototype.objectCaching = true;
   var visualTestLoop;
   if (fabric.isLikelyNode) {
@@ -296,16 +295,14 @@
             borderColor: object.fill,
             cornerColor: object.fill,
           });
-          if (object.getObjects) {
-            object.getObjects().forEach(function(subTarget) {
-              subTarget.borderScaleFactor = 3;
-              subTarget.transparentCorners = false;
-              subTarget._renderControls(canvas.contextContainer, {
-                borderColor: subTarget.fill,
-                cornerColor: subTarget.fill,
-              });
+          object._objects && object.getObjects().forEach(function(subTarget) {
+            subTarget.borderScaleFactor = 3;
+            subTarget.transparentCorners = false;
+            subTarget._renderControls(canvas.contextContainer, {
+              borderColor: subTarget.fill,
+              cornerColor: subTarget.fill,
             });
-          }
+          });
         });
         callback(canvas.lowerCanvasEl);
       });
@@ -332,16 +329,14 @@
             borderColor: object.fill,
             cornerColor: object.fill,
           });
-          if (object.getObjects) {
-            object.getObjects().forEach(function(subTarget) {
-              subTarget.borderScaleFactor = 3;
-              subTarget.transparentCorners = false;
-              subTarget._renderControls(canvas.contextContainer, {
-                borderColor: subTarget.fill,
-                cornerColor: subTarget.fill,
-              });
+          object._objects && object.getObjects().forEach(function(subTarget) {
+            subTarget.borderScaleFactor = 3;
+            subTarget.transparentCorners = false;
+            subTarget._renderControls(canvas.contextContainer, {
+              borderColor: subTarget.fill,
+              cornerColor: subTarget.fill,
             });
-          }
+          });
         });
         callback(canvas.lowerCanvasEl);
       });

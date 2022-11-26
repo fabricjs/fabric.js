@@ -3,13 +3,11 @@
   var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
 
   QUnit.module('fabric.Object', {
-    afterEach: function () {
-      fabric.config.configure({
-        perfLimitSizeTotal: 2097152,
-        maxCacheSideLimit: 4096,
-        minCacheSideLimit: 256,
-        devicePixelRatio: 1,
-      });
+    afterEach: function() {
+      fabric.perfLimitSizeTotal = 2097152;
+      fabric.maxCacheSideLimit = 4096;
+      fabric.minCacheSideLimit = 256;
+      fabric.devicePixelRatio = 1;
       canvas.enableRetinaScaling = false;
       canvas.setZoom(1);
       canvas.clear();
@@ -122,7 +120,6 @@
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.toJSON === 'function');
     assert.equal(JSON.stringify(cObj.toJSON()), emptyObjectJSON);
-    assert.equal(JSON.stringify(cObj), emptyObjectJSON);
 
     cObj.set('opacity', 0.88)
       .set('scaleX', 1.3)
@@ -227,7 +224,7 @@
 
     function testFractionDigits(fractionDigits, expectedValue) {
 
-      fabric.config.configure({ NUM_FRACTION_DIGITS: fractionDigits });
+      fabric.Object.NUM_FRACTION_DIGITS = fractionDigits;
 
       testedProperties.forEach(function(property) {
         cObj.set(property, fractionalValue);
@@ -235,7 +232,7 @@
           'value of ' + property + ' should have ' + fractionDigits + ' fractional digits');
       }, this);
 
-      fabric.config.configure({ NUM_FRACTION_DIGITS: fractionDigitsDefault });
+      fabric.Object.NUM_FRACTION_DIGITS = fractionDigitsDefault;
     }
 
     testFractionDigits.call(this, 2, 166.67);
@@ -317,6 +314,7 @@
     cObj.scale(1.5);
     assert.equal(cObj.get('scaleX'), 1.5);
     assert.equal(cObj.get('scaleY'), 1.5);
+    assert.equal(cObj.scale(2), cObj, 'chainable');
   });
 
   QUnit.test('setOpacity', function(assert) {
@@ -339,6 +337,23 @@
     assert.equal(cObj.get('angle'), 0);
     assert.equal(cObj.set('angle', 45), cObj, 'chainable');
     assert.equal(cObj.get('angle'), 45);
+  });
+
+  QUnit.test('drawBorders', function(assert) {
+    var cObj = new fabric.Object(), canvas = fabric.document.createElement('canvas');
+
+    var dummyContext = canvas.getContext('2d');
+
+    assert.ok(typeof cObj.drawBorders === 'function');
+    assert.equal(cObj.drawBorders(dummyContext), cObj, 'chainable');
+  });
+
+  QUnit.test('drawControls', function(assert) {
+    var cObj = new fabric.Object(), _canvas = fabric.document.createElement('canvas');
+    cObj.canvas = canvas;
+    var dummyContext = _canvas.getContext('2d');
+    assert.ok(typeof cObj.drawControls === 'function');
+    assert.equal(cObj.drawControls(dummyContext), cObj, 'chainable');
   });
 
   QUnit.test('clone', function(assert) {
@@ -371,11 +386,12 @@
 
   QUnit.test('cloneAsImage with retina scaling enabled', function(assert) {
     var cObj = new fabric.Rect({ width: 100, height: 100, fill: 'red', strokeWidth: 0 });
-    fabric.config.configure({ devicePixelRatio: 2 });
+    fabric.devicePixelRatio = 2;
     var image = cObj.cloneAsImage({ enableRetinaScaling: true });
     assert.ok(image);
     assert.ok(image instanceof fabric.Image);
     assert.equal(image.width, 200, 'the image has been scaled by retina');
+    fabric.devicePixelRatio = 1;
   });
 
   QUnit.test('toCanvasElement', function(assert) {
@@ -446,7 +462,7 @@
       assert.equal(dataURL.substring(0, 22), 'data:image/jpeg;base64');
     }
     catch (err) {
-      console.log('jpeg toDataURL not supported');
+      fabric.log('jpeg toDataURL not supported');
     }
   });
 
@@ -608,7 +624,7 @@
     var object2 = new fabric.Object();
 
     canvas.add(object);
-    canvas.insertAt(0, object2);
+    canvas.insertAt(object2, 0);
 
     assert.ok(object.canvas === canvas);
     assert.ok(object2.canvas === canvas);
@@ -623,7 +639,6 @@
     object.on('removed', function (opt) {
       removedEventFired = true;
       assert.ok(opt.target === canvas, 'target should equal to canvas');
-      assert.ok(object.canvas === undefined, 'canvas should not be referenced');
     });
     canvas.remove(object);
 
@@ -821,50 +836,58 @@
   });
 
   function prepareObjectsForTreeTesting() {
-    class TestObject extends fabric.Object {
-      toJSON() {
+    var TObject = fabric.util.createClass(fabric.Object, {
+      toJSON: function () {
         return {
           id: this.id,
           objects: this._objects?.map(o => o.id),
           parent: this.parent?.id,
           canvas: this.canvas?.id
         }
-      }
-      toString() {
+      },
+      toString: function () {
         return JSON.stringify(this.toJSON(), null, '\t');
       }
-    }
-    class TestCollection extends fabric.createCollectionMixin(TestObject) {
-      constructor({ id }) {
-        super();
+    });
+    var Collection = fabric.util.createClass(TObject, fabric.Collection, {
+      initialize: function ({ id }) {
         this.id = id;
         this._objects = [];
-      }
-      _onObjectAdded(object) {
+      },
+      add: function () {
+        fabric.Collection.add.call(this, arguments, this._onObjectAdded);
+      },
+      insertAt: function (objects, index) {
+        fabric.Collection.insertAt.call(this, objects, index, this._onObjectAdded);
+      },
+      remove: function () {
+        fabric.Collection.remove.call(this, arguments, this._onObjectRemoved);
+      },
+      _onObjectAdded: function (object) {
         object.group = this;
-      }
-      _onObjectRemoved(object) {
+      },
+      _onObjectRemoved: function (object) {
         delete object.group;
-      }
-      removeAll() {
-        this.remove(...this._objects);
-      }
-    }
-    class TestCanvas extends TestCollection {
-      _onObjectAdded (object) {
+      },
+      removeAll: function () {
+        this.remove.apply(this, this._objects);
+      },
+    });
+    var canvas = fabric.util.object.extend(new Collection({ id: 'canvas' }), {
+      _onObjectAdded: function (object) {
         object.canvas = this;
-      }
-      _onObjectRemoved (object) {
+      },
+      _onObjectRemoved: function (object) {
         delete object.canvas;
-      }
-    }
+      },
+    });
     return {
-      object: new TestObject({ id: 'object' }),
-      other: new TestObject({ id: 'other' }),
-      a: new TestCollection({ id: 'a' }),
-      b: new TestCollection({ id: 'b' }),
-      c: new TestCollection({ id: 'c' }),
-      canvas: new TestCanvas({ id: 'canvas' })
+      object: new TObject({ id: 'object' }),
+      other: new TObject({ id: 'other' }),
+      a: new Collection({ id: 'a' }),
+      b: new Collection({ id: 'b' }),
+      c: new Collection({ id: 'c' }),
+      canvas
     }
   }
 
@@ -964,7 +987,7 @@
     assert.ok(object.canvas === canvas, 'object should have canvas set');
     findCommonAncestors(object, other, true, { fork: [object, a], otherFork: [other], common: [] });
     findCommonAncestors(object, other, false, { fork: [object, a], otherFork: [other, canvas], common: [] });
-    canvas.insertAt(0, a);
+    canvas.insertAt(a, 0);
     findCommonAncestors(object, other, true, { fork: [object, a], otherFork: [other], common: [] });
     findCommonAncestors(object, other, false, { fork: [object, a], otherFork: [other], common: [canvas] });
     findCommonAncestors(a, other, false, { fork: [a], otherFork: [other], common: [canvas] });
@@ -1049,7 +1072,7 @@
     a.add(object);
     assert.ok(object.canvas === canvas, 'object should have canvas set');
     assert.isInFrontOf(object, other, undefined);
-    canvas.insertAt(0, a);
+    canvas.insertAt(a, 0);
     assert.isInFrontOf(object, other, false);
     assert.isInFrontOf(a, other, false);
     assert.isInFrontOf(a, canvas, true);
@@ -1069,7 +1092,7 @@
   QUnit.test('getTotalObjectScaling with retina', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2});
     canvas.enableRetinaScaling = true;
-    fabric.config.configure({ devicePixelRatio: 4 });
+    fabric.devicePixelRatio = 4;
     canvas.add(object);
     var objectScale = object.getTotalObjectScaling();
     assert.ok(objectScale instanceof fabric.Point);
@@ -1180,11 +1203,9 @@
   });
 
   QUnit.test('_updateCacheCanvas check if cache canvas should be updated', function(assert) {
-    fabric.config.configure({
-      perfLimitSizeTotal: 10000,
-      maxCacheSideLimit: 4096,
-      minCacheSideLimit: 1
-    });
+    fabric.perfLimitSizeTotal = 10000;
+    fabric.maxCacheSideLimit = 4096;
+    fabric.minCacheSideLimit = 1;
     var object = new fabric.Object({ width: 10, height: 10, strokeWidth: 0 });
     object._createCacheCanvas();
     assert.equal(object.cacheWidth, 12, 'current cache dimensions are saved');
@@ -1202,11 +1223,9 @@
   });
 
   QUnit.test('_limitCacheSize limit min to 256', function(assert) {
-    fabric.config.configure({
-      perfLimitSizeTotal: 50000,
-      maxCacheSideLimit: 4096,
-      minCacheSideLimit: 256
-    });
+    fabric.perfLimitSizeTotal = 50000;
+    fabric.maxCacheSideLimit = 4096;
+    fabric.minCacheSideLimit = 256;
     var object = new fabric.Object({ width: 200, height: 200, strokeWidth: 0 });
     var dims = object._getCacheCanvasDimensions();
     var zoomX = dims.zoomX;
@@ -1220,11 +1239,9 @@
   });
 
   QUnit.test('_limitCacheSize does not limit if not necessary', function(assert) {
-    fabric.config.configure({
-      perfLimitSizeTotal: 1000000,
-      maxCacheSideLimit: 4096,
-      minCacheSideLimit: 256
-    });
+    fabric.perfLimitSizeTotal = 1000000;
+    fabric.maxCacheSideLimit = 4096;
+    fabric.minCacheSideLimit = 256;
     var object = new fabric.Object({ width: 400, height: 400, strokeWidth: 0 });
     var dims = object._getCacheCanvasDimensions();
     var zoomX = dims.zoomX;
@@ -1238,11 +1255,9 @@
   });
 
   QUnit.test('_limitCacheSize does cap up minCacheSideLimit', function(assert) {
-    fabric.config.configure({
-      perfLimitSizeTotal: 10000,
-      maxCacheSideLimit: 4096,
-      minCacheSideLimit: 256
-    });
+    fabric.perfLimitSizeTotal = 10000;
+    fabric.maxCacheSideLimit = 4096;
+    fabric.minCacheSideLimit = 256;
     var object = new fabric.Object({ width: 400, height: 400, strokeWidth: 0 });
     var dims = object._getCacheCanvasDimensions();
     var width = dims.width;
@@ -1258,11 +1273,9 @@
   });
 
   QUnit.test('_limitCacheSize does cap up if necessary', function(assert) {
-    fabric.config.configure({
-      perfLimitSizeTotal: 1000000,
-      maxCacheSideLimit: 4096,
-      minCacheSideLimit: 256
-    });
+    fabric.perfLimitSizeTotal = 1000000;
+    fabric.maxCacheSideLimit = 4096;
+    fabric.minCacheSideLimit = 256;
     var object = new fabric.Object({ width: 2046, height: 2046, strokeWidth: 0 });
     var dims = object._getCacheCanvasDimensions();
     var width = dims.width;
@@ -1278,29 +1291,25 @@
   });
 
   QUnit.test('_limitCacheSize does cap up if necessary to maxCacheSideLimit', function(assert) {
-    fabric.config.configure({
-      perfLimitSizeTotal: 100000000,
-      maxCacheSideLimit: 4096,
-      minCacheSideLimit: 256
-    });
+    fabric.perfLimitSizeTotal = 100000000;
+    fabric.maxCacheSideLimit = 4096;
+    fabric.minCacheSideLimit = 256;
     var object = new fabric.Object({ width: 8192, height: 8192, strokeWidth: 0 });
     var dims = object._getCacheCanvasDimensions();
     var zoomX = dims.zoomX;
     var zoomY = dims.zoomY;
     var limitedDims = object._limitCacheSize(dims);
     assert.equal(dims, limitedDims, 'object is mutated');
-    assert.equal(dims.width, fabric.config.maxCacheSideLimit, 'width is capped to max allowed by fabric');
-    assert.equal(dims.height, fabric.config.maxCacheSideLimit, 'height is capped to max allowed by fabric');
+    assert.equal(dims.width, fabric.maxCacheSideLimit, 'width is capped to max allowed by fabric');
+    assert.equal(dims.height, fabric.maxCacheSideLimit, 'height is capped to max allowed by fabric');
     assert.equal(dims.zoomX, zoomX * 4096 / 8194, 'zoom factor X gets updated to represent the shrink');
     assert.equal(dims.zoomY, zoomY * 4096 / 8194, 'zoom factor Y gets updated to represent the shrink');
   });
 
   QUnit.test('_limitCacheSize does cap up if necessary to maxCacheSideLimit, different AR', function(assert) {
-    fabric.config.configure({
-      perfLimitSizeTotal: 100000000,
-      maxCacheSideLimit: 4096,
-      minCacheSideLimit: 256
-    });
+    fabric.perfLimitSizeTotal = 100000000;
+    fabric.maxCacheSideLimit = 4096;
+    fabric.minCacheSideLimit = 256;
     var object = new fabric.Object({ width: 16384, height: 8192, strokeWidth: 0 });
     var dims = object._getCacheCanvasDimensions();
     var width = dims.width;
@@ -1309,10 +1318,10 @@
     var zoomY = dims.zoomY;
     var limitedDims = object._limitCacheSize(dims);
     assert.equal(dims, limitedDims, 'object is mutated');
-    assert.equal(dims.width, fabric.config.maxCacheSideLimit, 'width is capped to max allowed by fabric');
-    assert.equal(dims.height, fabric.config.maxCacheSideLimit, 'height is capped to max allowed by fabric');
-    assert.equal(dims.zoomX, zoomX * fabric.config.maxCacheSideLimit / width, 'zoom factor X gets updated to represent the shrink');
-    assert.equal(dims.zoomY, zoomY * fabric.config.maxCacheSideLimit / height, 'zoom factor Y gets updated to represent the shrink');
+    assert.equal(dims.width, fabric.maxCacheSideLimit, 'width is capped to max allowed by fabric');
+    assert.equal(dims.height, fabric.maxCacheSideLimit, 'height is capped to max allowed by fabric');
+    assert.equal(dims.zoomX, zoomX * fabric.maxCacheSideLimit / width, 'zoom factor X gets updated to represent the shrink');
+    assert.equal(dims.zoomY, zoomY * fabric.maxCacheSideLimit / height, 'zoom factor Y gets updated to represent the shrink');
   });
 
   QUnit.test('_setShadow', function(assert) {
@@ -1332,12 +1341,12 @@
     assert.equal(context.shadowOffsetX, object.shadow.offsetX, 'shadow offsetX is set');
     assert.equal(context.shadowOffsetY, object.shadow.offsetY, 'shadow offsetY is set');
     assert.equal(context.shadowBlur, object.shadow.blur, 'shadow blur is set');
-    fabric.config.configure({ browserShadowBlurConstant: 1.5 });
+    fabric.browserShadowBlurConstant = 1.5;
     object._setShadow(context);
     assert.equal(context.shadowOffsetX, object.shadow.offsetX, 'shadow offsetX is unchanged with browserConstant');
     assert.equal(context.shadowOffsetY, object.shadow.offsetY, 'shadow offsetY is unchanged with browserConstant');
     assert.equal(context.shadowBlur, object.shadow.blur * 1.5, 'shadow blur is affected with browserConstant');
-    fabric.config.configure({ browserShadowBlurConstant: 1 });
+    fabric.browserShadowBlurConstant = 1;
     object.scaleX = 2;
     object.scaleY = 3;
     object._setShadow(context);
@@ -1480,18 +1489,5 @@
     assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, 1, 'runningAnimations should include the animation');
     object.dispose();
     assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, 0, 'runningAnimations should be empty after dispose');
-  });
-  QUnit.test('prototype changes', function (assert) {
-    var object = new fabric.Object();
-    var object2 = new fabric.Object();
-    object2.fill = 'red'
-    assert.equal(object.fill, 'rgb(0,0,0)', 'by default objects have a rgb(0,0,0) fill');
-    assert.equal(object2.fill, 'red', 'once assigned object is red');
-    fabric.Object.prototype.fill = 'green';
-    assert.equal(object.fill, 'green', 'object with no value assigned read from prototype');
-    assert.equal(object2.fill, 'red', 'once assigned object is red, it stays red');
-    var object3 = new fabric.Object();
-    assert.equal(object3.fill, 'green', 'newly created object have now green by default');
-    fabric.Object.prototype.fill = 'rgb(0,0,0)';
   });
 })();

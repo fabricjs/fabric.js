@@ -24,6 +24,8 @@
 
     var cObj = new fabric.Object({ });
     assert.ok(typeof cObj.setControlVisible === 'function', 'setControlVisible should exist');
+    assert.equal(cObj.setControlVisible('tl'), cObj, 'chainable');
+
     cObj.setControlVisible('tl', false);
     assert.equal(cObj.isControlVisible('tl'), false);
     cObj.setControlVisible('tl', true);
@@ -52,6 +54,8 @@
 
     var cObj = new fabric.Object({ });
     assert.ok(typeof cObj.setControlsVisibility === 'function', 'setControlsVisibility should exist');
+    assert.equal(cObj.setControlsVisibility(), cObj, 'chainable');
+
     cObj.setControlsVisibility({
       bl: false,
       br: false,

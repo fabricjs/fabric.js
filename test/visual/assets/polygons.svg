@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="800" height="600" viewBox="0 0 800 600" xml:space="preserve">
-<polygon style="stroke: rgba(255,0,0,0.5); stroke-width: 24; stroke-miterlimit: 999; fill: rgb(35,183,122); fill-rule: nonzero;" points="200,90 220,380 160,210"></polygon>
-<polygon transform="translate(-100, 200)" style="stroke: rgba(0,255,0,0.5); stroke-width: 24; stroke-miterlimit: 999; fill: rgb(35,183,122); fill-rule: nonzero;" points="200,90 220,380 160,210"></polygon>
-<polygon transform="translate(200, 00)" style="stroke: rgba(0,0,255,0.5); stroke-width: 24; stroke-miterlimit: 999; fill: rgb(35,183,122); fill-rule: nonzero;" points="200,90 220,380 160,210"></polygon>
-<polygon transform="translate(150, 200)" style="stroke: rgba(255,255,0,0.5); stroke-width: 24; stroke-miterlimit: 999; fill: rgb(35,183,122); fill-rule: nonzero;" points="200,90 220,380 160,210"></polygon>
-<polygon transform="rotate(30)" style="stroke: rgba(255,0,255,0.5); stroke-width: 24; stroke-miterlimit: 999; fill: rgb(35,183,122); fill-rule: nonzero;" points="200,90 220,380 160,210"></polygon>
-<polygon transform="matrix(1,2,3,4,-900,-1700)" style="stroke: rgba(0,255,255,0.5); stroke-width: 24; stroke-miterlimit: 999; fill: rgb(35,183,122); fill-rule: nonzero;" points="200,90 220,380 160,210"></polygon>
-</svg>

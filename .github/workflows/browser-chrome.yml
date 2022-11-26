@@ -1,0 +1,25 @@
+# This workflow will do a clean install of node dependencies, build the library, run testem for chrome
+
+name: Unit tests on Chrome
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  chrome-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Unit tests on Chrome
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+    - run: npm ci
+    - run: npm run build:fast
+    - name: Run headless test
+      uses: GabrielBB/xvfb-action@v1
+      with:
+        run: npm run testem:ci -- --port 8080 -f testem.json -l Chrome

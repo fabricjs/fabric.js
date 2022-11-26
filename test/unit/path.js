@@ -59,9 +59,7 @@
   function updatePath(pathObject, value, preservePosition) {
     const { left, top } = pathObject;
     pathObject._setPath(value);
-    if (preservePosition) {
-      pathObject.set({ left, top });
-    }
+    preservePosition && pathObject.set({ left, top });
   }
 
   QUnit.module('fabric.Path', {
@@ -148,7 +146,7 @@
     var done = assert.async();
     makePathObject(function(path) {
       assert.ok(typeof path.toString === 'function');
-      assert.equal(path.toString(), '#<Path (4): { "top": 100, "left": 100 }>');
+      assert.equal(path.toString(), '#<fabric.Path (4): { "top": 100, "left": 100 }>');
       done();
     });
   });

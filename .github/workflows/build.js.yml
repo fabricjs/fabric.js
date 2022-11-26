@@ -1,0 +1,44 @@
+# This workflow will install Uglify and verify that fabric can be build with it
+
+name: Pr quality check
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Uglyfied build
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+    - run: npm install uglify-js@3.3.x
+    - run: npm run build
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Linting
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+    - run: npm install eslint@4.7.x
+    - run: npm run lint
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Coverage report
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+    - run: npm ci
+    - run: npm run build:fast
+    - run: npm run test:coverage && npm run test:visual:coverage
+    - uses: ChristiaanScheermeijer/jest-reporter-action@v0.4.0
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        test-command: "npm run coverage:report"
