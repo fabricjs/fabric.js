@@ -1,23 +1,22 @@
 // @ts-nocheck
-import type { TClassProperties, TDegree, TSize, TFiller } from '../typedefs';
 import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { config } from '../config';
 import { VERSION } from '../constants';
-import { Point } from '../point.class';
-import { capValue } from '../util/misc/capValue';
-import { pick } from '../util/misc/pick';
-import { runningAnimations } from '../util/animation_registry';
-import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
-import { clone } from '../util/lang_object';
-import { toFixed } from '../util/misc/toFixed';
-import { capitalize } from '../util/lang_string';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { createCanvasElement } from '../util/misc/dom';
 import { ObjectGeometry } from '../mixins/object_geometry.mixin';
-import { qrDecompose, transformPoint } from '../util/misc/matrix';
-import { Canvas, StaticCanvas } from '../__types__';
+import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
+import type { TClassProperties, TDegree, TFiller, TSize } from '../typedefs';
+import { runningAnimations } from '../util/animation_registry';
+import { clone } from '../util/lang_object';
+import { capitalize } from '../util/lang_string';
+import { capValue } from '../util/misc/capValue';
+import { createCanvasElement } from '../util/misc/dom';
+import { qrDecompose, transformPoint } from '../util/misc/matrix';
+import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
+import { pick } from '../util/misc/pick';
+import { toFixed } from '../util/misc/toFixed';
+import type { Group } from './group.class';
 
 // temporary hack for unfinished migration
 type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
@@ -585,12 +584,18 @@ export class FabricObject extends ObjectGeometry {
   cacheTranslationY?: number;
 
   /**
-   * A reference to the parent of the object, usually a FabricGroup
+   * A reference to the parent of the object, usually a Group
    * @type number
    * @default undefined
    * @private
    */
-  group?: FabricObject;
+  group?: Group;
+
+  /**
+   * A reference to the parent of the object
+   * Used to keep the original parent ref when the object has been added to an ActiveSelection, hence loosing the `group` ref
+   */
+  __owningGroup?: Group;
 
   /**
    * Indicate if the object is sitting on a cache dedicated to it

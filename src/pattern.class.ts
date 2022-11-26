@@ -83,7 +83,6 @@ export class Pattern {
    * Constructor
    * @param {Object} [options] Options object
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
-   * @return {fabric.Pattern} thisArg
    */
   constructor(options: TPatternOptions = {}) {
     this.id = FabricObject.__uid++;
