@@ -2015,7 +2015,7 @@
     }
   ].map(p => new fabric.Point(p));;
 
-  
+
 
 QUnit.module('Free Drawing', hooks => {
   const visualTester = visualTestLoop(QUnit);
@@ -2276,7 +2276,7 @@ QUnit.module('Free Drawing', hooks => {
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
       },
-      disabled: fabric.isLikelyNodegz
+      disabled: fabric.isLikelyNode
     }));
     options.mesh && visualTester(Object.assign({}, test, {
       test: `${test.test} (context mesh)`,
