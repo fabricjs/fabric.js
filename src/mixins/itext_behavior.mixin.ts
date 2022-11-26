@@ -1,10 +1,10 @@
 // @ts-nocheck
 
 import { fabric } from '../../HEADER';
-import { ObjectEvents } from '../EventTypeDefs';
+import { ObjectEvents, TEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Text } from '../shapes/text.class';
-import { TEvent, TPointerEvent } from '../typedefs';
+import { TPointerEvent } from '../typedefs';
 import { setStyle } from '../util/dom_style';
 import { removeFromArray } from '../util/internals';
 import { createCanvasElement } from '../util/misc/dom';
