@@ -12,7 +12,7 @@ export class PatternBrush extends PencilBrush {
     super(canvas);
   }
 
-  getPatternSrc(color = this.color) {
+  getPatternSrc() {
     const dotWidth = 20,
       dotDistance = 5,
       patternCanvas = createCanvasElement(),
@@ -20,7 +20,7 @@ export class PatternBrush extends PencilBrush {
 
     patternCanvas.width = patternCanvas.height = dotWidth + dotDistance;
     if (patternCtx) {
-      patternCtx.fillStyle = color;
+      patternCtx.fillStyle = this.color;
       patternCtx.beginPath();
       patternCtx.arc(
         dotWidth / 2,
