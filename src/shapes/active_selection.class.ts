@@ -61,6 +61,7 @@ export class ActiveSelection extends Group {
    * @param {FabricObject[]} targets
    */
   _onAfterObjectsChange(type: 'added' | 'removed', targets: FabricObject[]) {
+    // @TODO figure out this change. This part wasn't here before migration.
     super._onAfterObjectsChange(type, targets);
     const groups: Group[] = [];
     targets.forEach((object) => {
