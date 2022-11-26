@@ -325,7 +325,7 @@ export class Textbox extends IText {
     );
 
     const wrapped: string[][][] = [];
-    for (let i = 0; i < lines.length; i++) {
+    for (let i = 0; i < data.length; i++) {
       wrapped.push(...this._wrapLine(data[i], i));
     }
     if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
