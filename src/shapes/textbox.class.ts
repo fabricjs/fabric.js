@@ -2,6 +2,7 @@
 
 import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
+import { capValue } from '../util/misc/capValue';
 import { stylesFromArray } from '../util/misc/textStyles';
 import { IText } from './itext.class';
 import { FabricObject } from './object.class';
@@ -63,15 +64,13 @@ export class Textbox extends IText {
 
   _set(key: string, value: any) {
     if (key === 'width') {
-      value = Math.max(
+      value = capValue(
         this.minWidth,
-        Math.min(
-          value,
-          Math.max(
-            this.minWidth,
-            this.maxWidth,
-            this._actualMaxWidth || this.maxWidth
-          )
+        value,
+        Math.max(
+          this.minWidth,
+          this.maxWidth,
+          this._actualMaxWidth || this.maxWidth
         )
       );
     }
