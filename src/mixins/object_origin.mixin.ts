@@ -1,10 +1,10 @@
 import { Point } from '../point.class';
+import type { Group } from '../shapes/group.class';
+import { TDegree, TOriginX, TOriginY } from '../typedefs';
 import { transformPoint } from '../util/misc/matrix';
+import { sizeAfterTransform } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { CommonMethods } from './shared_methods.mixin';
-import { TDegree, TOriginX, TOriginY } from '../typedefs';
-import { Group } from '../shapes/group.class';
-import { sizeAfterTransform } from '../util/misc/objectTransforms';
 
 const originOffset = {
   left: -0.5,
@@ -27,7 +27,7 @@ export const resolveOrigin = (
     ? originOffset[originValue]
     : originValue - 0.5;
 
-export class ObjectOrigin extends CommonMethods {
+export class ObjectOrigin<EventSpec> extends CommonMethods<EventSpec> {
   /**
    * Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
    * @type Number

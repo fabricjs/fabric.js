@@ -1,4 +1,5 @@
-// @ts-nocheck
+//@ts-nocheck
+import { ObjectEvents } from '../EventTypeDefs';
 import { fabric } from '../../HEADER';
 import { createCollectionMixin } from '../mixins/collection.mixin';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
@@ -19,12 +20,6 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
 
-export type LayoutStrategy =
-  | 'fit-content'
-  | 'fit-content-lazy'
-  | 'fixed'
-  | 'clip-path';
-
 export type LayoutContextType =
   | 'initialization'
   | 'object_modified'
@@ -33,9 +28,6 @@ export type LayoutContextType =
   | 'layout_change'
   | 'imperative';
 
-/**
- * context object with data regarding what triggered the call
- */
 export type LayoutContext = {
   type: LayoutContextType;
   /**
@@ -44,6 +36,29 @@ export type LayoutContext = {
   path?: Group[];
   [key: string]: any;
 };
+
+export type LayoutResult = {
+  centerX: number;
+  centerY: number;
+  width: number;
+  height: number;
+};
+
+export type GroupEvents = ObjectEvents & {
+  layout: {
+    context: LayoutContext;
+    result: LayoutResult;
+    diff: Point;
+  };
+  'object:added': { target: FabricObject };
+  'object:removed': { target: FabricObject };
+};
+
+export type LayoutStrategy =
+  | 'fit-content'
+  | 'fit-content-lazy'
+  | 'fixed'
+  | 'clip-path';
 
 /**
  * positioning and layout data **relative** to instance's parent
@@ -74,7 +89,7 @@ export type LayoutResult = {
  * @fires object:removed
  * @fires layout once layout completes
  */
-export class Group extends createCollectionMixin(FabricObject) {
+export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   /**
    * Specifies the **layout strategy** for instance
    * Used by `getLayoutStrategyResult` to calculate layout
