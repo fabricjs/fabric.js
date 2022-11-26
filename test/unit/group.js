@@ -49,7 +49,7 @@
 
   QUnit.test('toString', function(assert) {
     var group = makeGroupWith2Objects();
-    assert.equal(group.toString(), '#<fabric.Group: (2)>', 'should return proper representation');
+    assert.equal(group.toString(), '#<Group: (2)>', 'should return proper representation');
   });
 
   QUnit.test('getObjects', function(assert) {

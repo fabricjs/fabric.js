@@ -19,4 +19,3 @@ export type StaticCanvas = Record<string, any> & {
   };
   getRetinaScaling(): number;
 } & Observable;
-export type TObject = any;

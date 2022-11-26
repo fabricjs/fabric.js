@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): migrate Group/ActiveSelection [#8455](https://github.com/fabricjs/fabric.js/pull/8455)
 - fix(TS): migration error of itext key mixin (#8421) [#8457](https://github.com/fabricjs/fabric.js/pull/8457)
 - chore(TS): migrate text classes/mixins [#8421](https://github.com/fabricjs/fabric.js/pull/8421)
 - chore(TS): migrate Image [#8443](https://github.com/fabricjs/fabric.js/pull/8443)
