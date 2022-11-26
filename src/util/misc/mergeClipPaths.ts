@@ -1,5 +1,5 @@
 import { fabric } from '../../../HEADER';
-import { TObject } from '../../__types__';
+import type { FabricObject } from '../../shapes/fabricObject.class';
 import { sendObjectToPlane } from './planeChange';
 
 /**
@@ -21,7 +21,7 @@ import { sendObjectToPlane } from './planeChange';
  * @param {fabric.Object} c2
  * @returns {fabric.Object} merged clip path
  */
-export const mergeClipPaths = (c1: TObject, c2: TObject) => {
+export const mergeClipPaths = (c1: FabricObject, c2: FabricObject) => {
   let a = c1,
     b = c2;
   if (a.inverted && !b.inverted) {

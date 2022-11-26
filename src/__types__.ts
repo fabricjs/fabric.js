@@ -1,11 +1,11 @@
+import { CanvasEvents, ModifierKey } from './EventTypeDefs';
 import type { Observable } from './mixins/observable.mixin';
 import type { Point } from './point.class';
-import { ModifierKey, TMat2D } from './typedefs';
+import { TMat2D } from './typedefs';
 
 /**
  * @todo remove transient
  */
-export type Shadow = any;
 export type Canvas = StaticCanvas & {
   altActionKey: ModifierKey;
   uniScaleKey: ModifierKey;
@@ -19,6 +19,4 @@ export type StaticCanvas = Record<string, any> & {
     br: Point;
   };
   getRetinaScaling(): number;
-} & Observable;
-export type Rect = any;
-export type TObject = any;
+} & Observable<CanvasEvents>;

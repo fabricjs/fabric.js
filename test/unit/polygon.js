@@ -58,6 +58,7 @@
     var polygon = new fabric.Polygon(getPoints());
 
     assert.ok(polygon instanceof fabric.Polygon);
+    assert.ok(polygon instanceof fabric.Polyline);
     assert.ok(polygon instanceof fabric.Object);
 
     assert.equal(polygon.type, 'polygon');
