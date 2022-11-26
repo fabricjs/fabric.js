@@ -324,10 +324,10 @@ export class Textbox extends IText {
       largestWordWidth
     );
 
-    const wrapped: string[][][] = [];
-    for (let i = 0; i < data.length; i++) {
-      wrapped.push(...this._wrapLine(data[i], i));
-    }
+    const wrapped = data.reduce((acc, lineData, index) => {
+      acc.push(...this._wrapLine(lineData, index));
+      return acc;
+    }, [] as string[][]);
     if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
       this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
     }
