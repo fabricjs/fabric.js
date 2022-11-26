@@ -1,12 +1,13 @@
 import { fabric } from 'fabric';
 import React from 'react';
 import { useCallback, useEffect, useRef } from 'react';
+import { FabricContext } from './FabricContext';
 
 const DEV_MODE = process.env.NODE_ENV === 'development';
 
 export function useCanvas(
   ref?: React.ForwardedRef<HTMLCanvasElement>,
-  init?: (canvas: fabric.Canvas) => any,
+  init?: (canvas: fabric.Canvas, fabric: fabric) => any,
   saveState = false,
   deps: any[] = []
 ) {
@@ -33,7 +34,7 @@ export function useCanvas(
       const canvas = new fabric.Canvas(el, { backgroundColor: 'white' });
       fc.current = canvas;
       // invoke callback
-      init && init(canvas);
+      init && init(canvas, fabric);
       // restore state
       if (DEV_MODE && saveState && data.current) {
         canvas.loadFromJSON(data.current);
@@ -60,8 +61,16 @@ export function useCanvas(
 
 export const Canvas = React.forwardRef<
   HTMLCanvasElement,
-  { onLoad?: (canvas: fabric.Canvas) => any; saveState?: boolean }
->(({ onLoad, saveState }, ref) => {
+  React.PropsWithChildren<{
+    onLoad?: (canvas: fabric.Canvas, fabric: fabric) => any;
+    saveState?: boolean;
+  }>
+>(({ onLoad, saveState, children }, ref) => {
   const [canvasRef, setCanvasElRef] = useCanvas(ref, onLoad, saveState);
-  return <canvas ref={setCanvasElRef} />;
+  return (
+    <FabricContext.Provider value={fabric}>
+      <canvas ref={setCanvasElRef} />
+      {children}
+    </FabricContext.Provider>
+  );
 });

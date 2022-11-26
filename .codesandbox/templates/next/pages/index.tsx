@@ -11,10 +11,11 @@ const Canvas = dynamic(
 );
 
 const IndexPage: NextPage = () => {
-  const onLoad = useCallback(async (canvas) => {
+  const onLoad = useCallback(async (canvas, fabric) => {
     // load fabric dynamically for it to load with a browser context
-    // regular importing will fail with SSR
-    const { fabric } = await import('fabric');
+    // regular importing will fail with SSR since fabric will think it is running in node
+    // const { fabric } = await import("fabric");
+    // UPDATE: it seems that dynamic importing also fails so we revert to passing fabric as an argument
     canvas.setDimensions({
       width: 500,
       height: 500,
