@@ -26,12 +26,12 @@ export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
   /**
    * For functionalities on keyUp + ctrl || cmd
    */
-  ctrlKeysMapUp: TKeyMapIText
+  ctrlKeysMapUp: TKeyMapIText;
 
   /**
    * For functionalities on keyDown + ctrl || cmd
    */
-  ctrlKeysMapDown: TKeyMapIText
+  ctrlKeysMapDown: TKeyMapIText;
 
   hiddenTextarea: HTMLTextAreaElement | null;
 
