@@ -144,7 +144,7 @@
   QUnit.test('toObject with maxWidth', function (assert) {
     var textbox = new fabric.Textbox('The quick \nbrown \nfox', { maxWidth: 400 });
     var obj = textbox.toObject();
-    assert.deepEqual(obj, Object.assign(TEXTBOX_OBJECT, { maxWidth: 400 }), 'JSON OUTPUT MATCH');
+    assert.equal(obj.maxWidth, 400, 'JSON OUTPUT MATCH');
   });
 
   QUnit.test('fromObject', function(assert) {
