@@ -114,5 +114,8 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "main": "./dist/fabric.js"
+  "main": "./dist/fabric.js",
+  "dependencies": {
+    "ts-key-enum": "^3.0.12"
+  }
 }

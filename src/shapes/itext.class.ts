@@ -4,7 +4,7 @@ import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import { TClassProperties, TFiller } from '../typedefs';
 import { stylesFromArray } from '../util/misc/textStyles';
 import { FabricObject } from './fabricObject.class';
-
+import { keysMap, keysMapRtl, ctrlKeysMapDown, ctrlKeysMapUp } from '../mixins/itext_key_const';
 /**
  * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
  * prefix when observing canvas.
@@ -647,6 +647,10 @@ export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
   _currentCursorOpacity: 1,
   _selectionDirection: null,
   inCompositionMode: false,
+  keysMap,
+  keysMapRtl,
+  ctrlKeysMapDown,
+  ctrlKeysMapUp,
 };
 
 Object.assign(IText.prototype, iTextDefaultValues);
