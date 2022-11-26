@@ -605,6 +605,10 @@ export class ObjectGeometry<
     return this.scale(value / this.height / boundingRectFactor);
   }
 
+  getCanvasRetinaScaling() {
+    return this.canvas?.getRetinaScaling() || 1;
+  }
+
   /**
    * Returns the object angle relative to canvas counting also the group property
    * @returns {TDegree}

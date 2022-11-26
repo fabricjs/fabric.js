@@ -39,12 +39,6 @@ export type TBBox = {
 
 export type Percent = `${number}%`;
 
-export const enum StrokeLineJoin {
-  miter = 'miter',
-  bevel = 'bevel',
-  round = 'round',
-}
-
 export const enum ImageFormat {
   jpeg = 'jpeg',
   jpg = 'jpeg',

@@ -558,7 +558,7 @@ export abstract class ITextBehaviorMixin<
     const pointer = this.canvas.getPointer(e);
     const diff = pointer.subtract(pos);
     const enableRetinaScaling = this.canvas._isRetinaScaling();
-    const retinaScaling = this.canvas.getRetinaScaling();
+    const retinaScaling = this.getCanvasRetinaScaling();
     const bbox = this.getBoundingRect(true);
     const correction = pos.subtract(new Point(bbox.left, bbox.top));
     const offset = correction.add(diff).scalarMultiply(retinaScaling);
@@ -952,7 +952,7 @@ export abstract class ITextBehaviorMixin<
         this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize') *
         this.lineHeight,
       leftOffset = boundaries.leftOffset,
-      retinaScaling = this.canvas.getRetinaScaling(),
+      retinaScaling = this.getCanvasRetinaScaling(),
       upperCanvas = this.canvas.upperCanvasEl,
       upperCanvasWidth = upperCanvas.width / retinaScaling,
       upperCanvasHeight = upperCanvas.height / retinaScaling,

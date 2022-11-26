@@ -429,7 +429,7 @@ export class InteractiveFabricObject<
    */
   drawControls(ctx: CanvasRenderingContext2D, styleOverride = {}) {
     ctx.save();
-    const retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : 1;
+    const retinaScaling = this.getCanvasRetinaScaling();
     const { cornerStrokeColor, cornerDashArray, cornerColor } = this;
     const options = {
       cornerStrokeColor,
