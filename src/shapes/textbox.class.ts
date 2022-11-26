@@ -469,14 +469,13 @@ export class Textbox extends IText {
    */
   _splitTextIntoLines(text: string) {
     const newText = super._splitTextIntoLines(text),
-      graphemeLines = this._wrapText(newText.lines, this.width),
-      lines = new Array(graphemeLines.length);
-    for (let i = 0; i < graphemeLines.length; i++) {
-      lines[i] = graphemeLines[i].join('');
-    }
-    newText.lines = lines;
-    newText.graphemeLines = graphemeLines;
-    return newText;
+      graphemeLines = this._wrapText(newText.lines, this.width);
+
+    return {
+      ...newText,
+      graphemeLines,
+      lines: graphemeLines.map((value) => value.join('')),
+    };
   }
 
   getMinWidth() {
