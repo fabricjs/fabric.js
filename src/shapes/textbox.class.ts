@@ -67,7 +67,11 @@ export class Textbox extends IText {
         this.minWidth,
         Math.min(
           value,
-          Math.max(this.minWidth, this.maxWidth, this._actualMaxWidth)
+          Math.max(
+            this.minWidth,
+            this.maxWidth,
+            this._actualMaxWidth || this.maxWidth
+          )
         )
       );
     }
