@@ -241,6 +241,34 @@
     // needed or test hangs
     iText.abortCursorAnimation();
   });
+
+  QUnit.test('mousedown calls key maps', function (assert) {
+    const event = {
+      stopPropagation: function () { },
+      stopImmediatePropagation: function () { },
+      preventDefault: function () { },
+      ctrlKey: false,
+      keyCode: 0
+    };
+    class TestIText extends fabric.IText {
+
+    }
+    ['default', 'rtl', 'ctrl'].forEach(x => { TestIText.prototype[`__test_${x}`] = () => fired.push(x) });
+    const iText = new TestIText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' } } } });
+    iText.isEditing = true;
+    const fired = [];
+    iText.keysMap = { 0: `__test_default` };
+    iText.keysMapRtl = { 0: `__test_rtl` };
+    iText.ctrlKeysMapDown = { 1: `__test_ctrl` };
+    iText.onKeyDown(event);
+    assert.deepEqual(fired, ['default']);
+    iText.direction = 'rtl';
+    iText.onKeyDown(event);
+    assert.deepEqual(fired, ['default', 'rtl']);
+    iText.onKeyDown({ ...event, ctrlKey: true, keyCode: 1 });
+    assert.deepEqual(fired, ['default', 'rtl', 'ctrl']);
+  });
+
   // QUnit.test('copy and paste', function(assert) {
   //   var event = { stopPropagation: function(){}, preventDefault: function(){} };
   //   var iText = new fabric.IText('test', { styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});

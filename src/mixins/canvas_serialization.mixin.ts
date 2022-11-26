@@ -74,11 +74,10 @@
        * @param {Array} enlivenedObjects canvas objects
        */
       __setupCanvas: function (serialized, enlivenedObjects) {
-        var _this = this;
-        enlivenedObjects.forEach(function (obj, index) {
+        enlivenedObjects.forEach((obj, index) => {
           // we splice the array just in case some custom classes restored from JSON
           // will add more object to canvas at canvas init.
-          _this.insertAt(obj, index);
+          this.insertAt(index, obj);
         });
         // remove parts i cannot set as options
         delete serialized.objects;

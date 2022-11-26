@@ -2,7 +2,8 @@ import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import type { Point } from '../point.class';
 import { TEvent } from '../typedefs';
-import type { Canvas, Shadow } from '../__types__';
+import type { Shadow } from '../shadow.class';
+import { Canvas } from '../__types__';
 
 type TBrushEventData = TEvent & { pointer: Point };
 
