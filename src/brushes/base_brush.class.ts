@@ -1,7 +1,7 @@
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import type { Point } from '../point.class';
-import { TEvent } from '../typedefs';
+import { TEvent } from '../EventTypeDefs';
 import type { Shadow } from '../shadow.class';
 import { Canvas } from '../__types__';
 
