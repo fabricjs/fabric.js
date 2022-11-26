@@ -89,8 +89,18 @@
   });
 
   QUnit.test('constructor with width too small', function(assert) {
-    var textbox = new fabric.Textbox('test', { width: 5 });
+    var textbox = new fabric.Textbox('test', { minWidth: 5, width: 5 });
     assert.equal(Math.round(textbox.width), 56, 'width is calculated by constructor');
+  });
+
+  QUnit.test('constructor with minWidth override', function (assert) {
+    var textbox = new fabric.Textbox('test', { minWidth: 60, width: 5 });
+    assert.equal(Math.round(textbox.width), 60, 'width is taken by minWidth');
+  });
+
+  QUnit.test('constructor with illegal maxWidth', function (assert) {
+    var textbox = new fabric.Textbox('test', { maxWidth: null });
+    assert.equal(textbox.maxWidth, Infinity, 'maxWidth is taken by contstructor');
   });
 
   QUnit.test('initial properties', function(assert) {
@@ -129,6 +139,12 @@
     assert.deepEqual(obj.styles[0].style, TEXTBOX_OBJECT.styles[0].style, 'style properties match at first index');
     assert.deepEqual(obj.styles[1], TEXTBOX_OBJECT.styles[1], 'styles array matches at second index');
     assert.deepEqual(obj.styles[1].style, TEXTBOX_OBJECT.styles[1].style, 'style properties match at second index');
+  });
+
+  QUnit.test('toObject with maxWidth', function (assert) {
+    var textbox = new fabric.Textbox('x', { maxWidth: 400 });
+    var obj = textbox.toObject();
+    assert.deepEqual(obj, Object.assign(TEXTBOX_OBJECT, { maxWidth: 400 }), 'JSON OUTPUT MATCH');
   });
 
   QUnit.test('fromObject', function(assert) {
@@ -534,6 +550,7 @@
     }
     var textbox = new fabric.Textbox(text, {
       styles: { 0: styles },
+      minWidth: 5,
       width: 5,
     });
     assert.equal(typeof textbox._deleteStyleDeclaration, 'function', 'function exists');
@@ -550,6 +567,7 @@
     }
     var textbox = new fabric.Textbox(text, {
       styles: { 0: styles },
+      minWidth: 5,
       width: 5,
     });
     assert.equal(typeof textbox._setStyleDeclaration, 'function', 'function exists');

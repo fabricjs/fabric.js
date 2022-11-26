@@ -15,7 +15,9 @@ import { textDefaultValues } from './text.class';
  */
 export class Textbox extends IText {
   /**
-   * Minimum width of textbox, in pixels.
+   * Minimum width of textbox, in pixels.\
+   * Use the `resizing` event to change this value on the fly.\
+   * Overrides {@link #maxWidth} in case of conflict.
    * @type Number
    * @default
    */
@@ -31,6 +33,21 @@ export class Textbox extends IText {
   dynamicMinWidth: number;
 
   /**
+   * Maximum width of textbox, in pixels.\
+   * Use the `resizing` event to change this value on the fly.\
+   * Will be overridden by {@link #minWidth} and by {@link #_actualMaxWidth} in case of conflict.
+   * @type {Number}
+   * @default
+   */
+  maxWidth: number;
+
+  /**
+   * Holds the calculated max width value taking into account the largest word and minimum values
+   * @private
+   */
+  _actualMaxWidth = Infinity;
+
+  /**
    * Cached array of text wrapping.
    * @type Array
    */
@@ -43,6 +60,30 @@ export class Textbox extends IText {
    * @since 2.6.0
    */
   splitByGrapheme: boolean;
+
+  _set(key: string, value: any) {
+    if (key === 'width') {
+      value = Math.max(
+        this.minWidth,
+        Math.min(
+          value,
+          Math.max(this.minWidth, this.maxWidth, this._actualMaxWidth)
+        )
+      );
+    }
+    if (key === 'maxWidth' && !value) {
+      value = Infinity;
+    }
+    super._set(key, value);
+    /* _DEV_MODE_START_ */
+    if (
+      (key === 'maxWidth' && this.width > value) ||
+      (key === 'minWidth' && this.width < value)
+    ) {
+      console.warn(`fabric.Textbox: setting ${key}, width is out of range`);
+    }
+    /* _DEV_MODE_END_ */
+  }
 
   /**
    * Unlike superclass's version of this function, Textbox does not update
@@ -59,12 +100,11 @@ export class Textbox extends IText {
     this._clearCache();
     // clear dynamicMinWidth as it will be different after we re-wrap line
     this.dynamicMinWidth = 0;
+    this._actualMaxWidth = Infinity;
     // wrap lines
     this._styleMap = this._generateStyleMap(this._splitText());
     // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
-    if (this.dynamicMinWidth > this.width) {
-      this._set('width', this.dynamicMinWidth);
-    }
+    this._set('width', Math.max(this.getMinWidth(), this.width));
     if (this.textAlign.indexOf('justify') !== -1) {
       // once text is measured we need to make space fatter to make justified text.
       this.enlargeSpaces();
@@ -327,7 +367,6 @@ export class Textbox extends IText {
     if (words.length === 0) {
       words.push([]);
     }
-    desiredWidth -= reservedSpace;
     // measure words
     const data = words.map((word) => {
       // if using splitByGrapheme words are already in graphemes.
@@ -335,14 +374,15 @@ export class Textbox extends IText {
       const width = this._measureWord(word, lineIndex, offset);
       largestWordWidth = Math.max(width, largestWordWidth);
       offset += word.length + 1;
-      return { word: word, width: width };
+      return { word, width };
     });
 
     const maxWidth = Math.max(
-      desiredWidth,
-      largestWordWidth,
-      this.dynamicMinWidth
+      Math.min(desiredWidth, this.maxWidth) - reservedSpace,
+      this.getMinWidth(),
+      largestWordWidth
     );
+    this._actualMaxWidth = maxWidth;
     // layout words
     offset = 0;
     let i;
@@ -454,10 +494,13 @@ export class Textbox extends IText {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: Array<any>): object {
-    return super.toObject(
-      ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
-    );
+  toObject(propertiesToInclude: string[]): object {
+    return {
+      ...super.toObject(
+        ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
+      ),
+      ...(this.maxWidth < Infinity ? { maxWidth: this.maxWidth } : {}),
+    };
   }
 
   /**
@@ -468,23 +511,32 @@ export class Textbox extends IText {
    * @returns {Promise<Textbox>}
    */
   static fromObject(object: object): Promise<Textbox> {
-    const styles = stylesFromArray(object.styles, object.text);
-    //copy object to prevent mutation
-    const objCopy = Object.assign({}, object, { styles: styles });
-    return FabricObject._fromObject(Textbox, objCopy, {
-      extraParam: 'text',
-    });
+    return FabricObject._fromObject(
+      Textbox,
+      {
+        // spread object to prevent mutation
+        ...object,
+        styles: stylesFromArray(object.styles, object.text),
+      },
+      {
+        extraParam: 'text',
+      }
+    );
   }
 }
 
 export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
   type: 'textbox',
   minWidth: 20,
+  maxWidth: Infinity,
   dynamicMinWidth: 2,
   lockScalingFlip: true,
   noScaleCache: false,
-  _dimensionAffectingProps:
-    textDefaultValues._dimensionAffectingProps!.concat('width'),
+  _dimensionAffectingProps: textDefaultValues._dimensionAffectingProps!.concat(
+    'width',
+    'minWidth',
+    'maxWidth'
+  ),
   _wordJoiners: /[ \t\r]/,
   splitByGrapheme: false,
 };
