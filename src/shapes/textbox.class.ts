@@ -291,6 +291,7 @@ export class Textbox extends IText {
     desiredWidth: number = this.width,
     reservedSpace = 0
   ) {
+    this.isWrapping = true;
     const additionalSpace = this._getWidthOfCharSpacing();
     let largestWordWidth = 0;
     const data = lines.map((line, index) => {
@@ -324,9 +325,8 @@ export class Textbox extends IText {
     );
 
     const wrapped: string[][][] = [];
-    this.isWrapping = true;
     for (let i = 0; i < lines.length; i++) {
-      wrapped.push(...this._wrapLine(data[i], i, desiredWidth));
+      wrapped.push(...this._wrapLine(data[i], i));
     }
     if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
       this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
