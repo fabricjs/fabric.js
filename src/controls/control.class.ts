@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { fabric } from '../../HEADER';
 import { halfPI } from '../constants';
-import { Point } from '../point.class';
-import type { FabricObject } from '../shapes/object.class';
 import {
-  TDegree,
-  TMat2D,
   TPointerEvent,
   TransformAction,
   TransformActionHandler,
-} from '../typedefs';
+} from '../EventTypeDefs';
+import { Point } from '../point.class';
+import type { FabricObject } from '../shapes/object.class';
+import { TDegree, TMat2D } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';

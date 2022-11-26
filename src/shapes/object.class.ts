@@ -5,6 +5,7 @@ import { config } from '../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../constants';
 import { ObjectGeometry } from '../mixins/object_geometry.mixin';
 import { Point } from '../point.class';
+import { Shadow } from '../shadow.class';
 import type { TClassProperties, TDegree, TFiller, TSize } from '../typedefs';
 import { runningAnimations } from '../util/animation_registry';
 import { clone } from '../util/lang_object';
@@ -16,6 +17,9 @@ import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
 import { Shadow } from '../__types__';
+import { Canvas, StaticCanvas } from '../__types__';
+import { ObjectEvents } from '../EventTypeDefs';
+import type { Group } from './group.class';
 
 // temporary hack for unfinished migration
 type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
@@ -31,17 +35,12 @@ type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
  *
  * @fires selected
  * @fires deselected
- * @fires modified
- * @fires modified
- * @fires moved
- * @fires scaled
- * @fires rotated
- * @fires skewed
  *
  * @fires rotating
  * @fires scaling
  * @fires moving
  * @fires skewing
+ * @fires modified
  *
  * @fires mousedown
  * @fires mouseup
@@ -55,7 +54,9 @@ type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
  * @fires dragleave
  * @fires drop
  */
-export class FabricObject extends ObjectGeometry {
+export class FabricObject<
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends ObjectGeometry<EventSpec> {
   type: string;
 
   /**
@@ -250,7 +251,7 @@ export class FabricObject extends ObjectGeometry {
 
   /**
    * Shadow object representing shadow of this shape
-   * @type fabric.Shadow
+   * @type Shadow
    * @default null
    */
   shadow: Shadow | null;
@@ -581,12 +582,18 @@ export class FabricObject extends ObjectGeometry {
   cacheTranslationY?: number;
 
   /**
-   * A reference to the parent of the object, usually a FabricGroup
+   * A reference to the parent of the object, usually a Group
    * @type number
    * @default undefined
    * @private
    */
-  group?: FabricObject;
+  group?: Group;
+
+  /**
+   * A reference to the parent of the object
+   * Used to keep the original parent ref when the object has been added to an ActiveSelection, hence loosing the `group` ref
+   */
+  __owningGroup?: Group;
 
   /**
    * Indicate if the object is sitting on a cache dedicated to it
@@ -1021,8 +1028,8 @@ export class FabricObject extends ObjectGeometry {
     } else if (key === 'scaleY' && value < 0) {
       this.flipY = !this.flipY;
       value *= -1;
-    } else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
-      value = new fabric.Shadow(value);
+    } else if (key === 'shadow' && value && !(value instanceof Shadow)) {
+      value = new Shadow(value);
     } else if (key === 'dirty' && this.group) {
       this.group.set('dirty', value);
     }
