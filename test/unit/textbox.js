@@ -338,7 +338,7 @@
     var textbox = new fabric.Textbox('xa xb xc xd xe ya yb id', {
       width: 2000,
     });
-    var line1 = textbox._wrapLine('xa xb xc xd xe ya yb id', 0, 100, 0);
+    var line1 = textbox._wrapText(['xa xb xc xd xe ya yb id'], 100, 0);
     var expected1 =  [
       ['x', 'a', ' ', 'x', 'b'],
       ['x', 'c', ' ', 'x', 'd'],
@@ -346,7 +346,7 @@
       ['y', 'b', ' ', 'i', 'd']];
     assert.deepEqual(line1, expected1, 'wrapping without reserved');
     assert.deepEqual(textbox.dynamicMinWidth, 40, 'wrapping without reserved');
-    var line2 = textbox._wrapLine('xa xb xc xd xe ya yb id', 0, 100, 50);
+    var line2 = textbox._wrapText(['xa xb xc xd xe ya yb id'], 100, 50);
     var expected2 =  [
       ['x', 'a'],
       ['x', 'b'],
@@ -363,10 +363,10 @@
     var textbox = new fabric.Textbox('', {
       width: 10,
     });
-    var line1 = textbox._wrapLine('', 0, 100, 0);
+    var line1 = textbox._wrapText([''], 100, 0);
     assert.deepEqual(line1, [[]], 'wrapping without splitByGrapheme');
     textbox.splitByGrapheme = true;
-    var line2 = textbox._wrapLine('', 0, 100, 0);
+    var line2 = textbox._wrapText([''], 100, 0);
     assert.deepEqual(line2, [[]], 'wrapping with splitByGrapheme');
   });
   QUnit.test('texbox will change width from the mr corner', function(assert) {
