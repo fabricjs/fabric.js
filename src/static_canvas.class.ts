@@ -1,7 +1,6 @@
 //@ts-nocheck
 import { config } from './config';
 import { VERSION } from './constants';
-import { CanvasEvents } from './EventTypeDefs';
 import { createCollectionMixin } from './mixins/collection.mixin';
 import { CommonMethods } from './mixins/shared_methods.mixin';
 import { Point } from './point.class';
@@ -35,7 +34,7 @@ import { pick } from './util/misc/pick';
    */
   // eslint-disable-next-line max-len
   fabric.StaticCanvas = fabric.util.createClass(
-    class extends createCollectionMixin(CommonMethods<CanvasEvents>) {
+    class extends createCollectionMixin(CommonMethods) {
       add(...objects: FabricObject[]) {
         super.add(...objects);
         objects.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
