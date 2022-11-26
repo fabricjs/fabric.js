@@ -286,11 +286,50 @@ export class Textbox extends IText {
    * @param {Number} desiredWidth width you want to wrap to
    * @returns {Array} Array of lines
    */
-  _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
-    const wrapped = [];
+  _wrapText(
+    lines: string[],
+    desiredWidth: number = this.width,
+    reservedSpace = 0
+  ) {
+    const additionalSpace = this._getWidthOfCharSpacing();
+    let largestWordWidth = 0;
+    const data = lines.map((line, index) => {
+      const parts = this.splitByGrapheme
+        ? this.graphemeSplit(line)
+        : this.wordSplit(line);
+      // fix a difference between split and graphemeSplit
+      if (parts.length === 0) {
+        parts.push([]);
+      }
+      const { data } = parts.reduce(
+        (acc, value) => {
+          // if using splitByGrapheme words are already in graphemes.
+          value = this.splitByGrapheme ? value : this.graphemeSplit(value);
+          const width = this._measureWord(value, index, acc.offset);
+          largestWordWidth = Math.max(width, largestWordWidth);
+          // spaces in different languages?
+          acc.offset += value.length + 1;
+          acc.data.push({ value, width });
+          return acc;
+        },
+        { offset: 0, data: [] as { value: string | string[]; width: number }[] }
+      );
+      return data;
+    });
+
+    this._actualMaxWidth = Math.max(
+      Math.min(desiredWidth, this.maxWidth) - reservedSpace,
+      this.getMinWidth(),
+      largestWordWidth
+    );
+
+    const wrapped: string[][][] = [];
     this.isWrapping = true;
     for (let i = 0; i < lines.length; i++) {
-      wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
+      wrapped.push(...this._wrapLine(data[i], i, desiredWidth));
+    }
+    if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
+      this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
     }
     this.isWrapping = false;
     return wrapped;
@@ -345,57 +384,27 @@ export class Textbox extends IText {
    * @returns {Array} Array of line(s) into which the given text is wrapped
    * to.
    */
-  _wrapLine(
-    _line,
-    lineIndex: number,
-    desiredWidth: number,
-    reservedSpace = 0
-  ): Array<any> {
+  _wrapLine(data, lineIndex: number) {
     const additionalSpace = this._getWidthOfCharSpacing(),
       splitByGrapheme = this.splitByGrapheme,
-      graphemeLines = [],
-      words = splitByGrapheme
-        ? this.graphemeSplit(_line)
-        : this.wordSplit(_line),
+      graphemeLines: string[][] = [],
       infix = splitByGrapheme ? '' : ' ';
 
     let lineWidth = 0,
-      line = [],
+      line: string[] = [],
       // spaces in different languages?
       offset = 0,
       infixWidth = 0,
-      largestWordWidth = 0,
-      lineJustStarted = true;
-    // fix a difference between split and graphemeSplit
-    if (words.length === 0) {
-      words.push([]);
-    }
-    // measure words
-    const data = words.map((word) => {
-      // if using splitByGrapheme words are already in graphemes.
-      word = splitByGrapheme ? word : this.graphemeSplit(word);
-      const width = this._measureWord(word, lineIndex, offset);
-      largestWordWidth = Math.max(width, largestWordWidth);
-      offset += word.length + 1;
-      return { word, width };
-    });
-
-    const maxWidth = Math.max(
-      Math.min(desiredWidth, this.maxWidth) - reservedSpace,
-      this.getMinWidth(),
-      largestWordWidth
-    );
-    this._actualMaxWidth = maxWidth;
+      lineJustStarted = true,
+      i;
     // layout words
-    offset = 0;
-    let i;
-    for (i = 0; i < words.length; i++) {
-      const word = data[i].word;
+    for (i = 0; i < data.length; i++) {
+      const word = data[i].value;
       const wordWidth = data[i].width;
       offset += word.length;
 
       lineWidth += infixWidth + wordWidth - additionalSpace;
-      if (lineWidth > maxWidth && !lineJustStarted) {
+      if (lineWidth > this._actualMaxWidth && !lineJustStarted) {
         graphemeLines.push(line);
         line = [];
         lineWidth = wordWidth;
@@ -418,9 +427,6 @@ export class Textbox extends IText {
 
     i && graphemeLines.push(line);
 
-    if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
-      this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
-    }
     return graphemeLines;
   }
 
