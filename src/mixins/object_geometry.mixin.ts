@@ -23,6 +23,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { Canvas, StaticCanvas } from '../__types__';
 import { ObjectOrigin } from './object_origin.mixin';
+import { ObjectEvents } from '../EventTypeDefs';
 
 type TLineDescriptor = {
   o: Point;
@@ -43,7 +44,9 @@ type TMatrixCache = {
 
 type TACoords = TCornerPoint;
 
-export class ObjectGeometry extends ObjectOrigin {
+export class ObjectGeometry<
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends ObjectOrigin<EventSpec> {
   /**
    * When true, an object is rendered as flipped horizontally
    * @type Boolean

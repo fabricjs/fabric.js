@@ -13,6 +13,8 @@ import { capitalize } from '../util/lang_string';
 import { capValue } from '../util/misc/capValue';
 import { createCanvasElement } from '../util/misc/dom';
 import { qrDecompose, transformPoint } from '../util/misc/matrix';
+import { Canvas, StaticCanvas } from '../__types__';
+import { ObjectEvents } from '../EventTypeDefs';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
@@ -34,17 +36,12 @@ const ALIASING_LIMIT = 2;
  *
  * @fires selected
  * @fires deselected
- * @fires modified
- * @fires modified
- * @fires moved
- * @fires scaled
- * @fires rotated
- * @fires skewed
  *
  * @fires rotating
  * @fires scaling
  * @fires moving
  * @fires skewing
+ * @fires modified
  *
  * @fires mousedown
  * @fires mouseup
@@ -58,7 +55,9 @@ const ALIASING_LIMIT = 2;
  * @fires dragleave
  * @fires drop
  */
-export class FabricObject extends ObjectGeometry {
+export class FabricObject<
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends ObjectGeometry<EventSpec> {
   type: string;
 
   /**
