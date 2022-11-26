@@ -82,7 +82,7 @@ export class InteractiveFabricObject<
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: Record<string, unknown>) {
+  constructor(options?: Record<string, unknown>) {
     super(options);
   }
 

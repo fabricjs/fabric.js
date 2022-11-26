@@ -1,7 +1,8 @@
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import { Point } from '../point.class';
-import { Canvas, Shadow } from '../__types__';
+import type { Shadow } from '../shadow.class';
+import { Canvas } from '../__types__';
 
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}

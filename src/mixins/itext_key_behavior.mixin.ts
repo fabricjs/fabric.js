@@ -6,6 +6,7 @@ import { ObjectEvents } from '../EventTypeDefs';
 import { TPointerEvent } from '../typedefs';
 import { capValue } from '../util/misc/capValue';
 import { ITextBehaviorMixin } from './itext_behavior.mixin';
+import type { TKeyMapIText } from './itext_key_const';
 
 export abstract class ITextKeyBehaviorMixin<
   EventSpec extends ObjectEvents
@@ -21,46 +22,19 @@ export abstract class ITextKeyBehaviorMixin<
    * this.keysMap = Object.assign({}, this.keysMap);
    * The function must be in IText.prototype.myFunction And will receive event as args[0]
    */
-  keysMap: {
-    9: 'exitEditing';
-    27: 'exitEditing';
-    33: 'moveCursorUp';
-    34: 'moveCursorDown';
-    35: 'moveCursorRight';
-    36: 'moveCursorLeft';
-    37: 'moveCursorLeft';
-    38: 'moveCursorUp';
-    39: 'moveCursorRight';
-    40: 'moveCursorDown';
-  };
+  keysMap: TKeyMapIText;
 
-  keysMapRtl: {
-    9: 'exitEditing';
-    27: 'exitEditing';
-    33: 'moveCursorUp';
-    34: 'moveCursorDown';
-    35: 'moveCursorLeft';
-    36: 'moveCursorRight';
-    37: 'moveCursorRight';
-    38: 'moveCursorUp';
-    39: 'moveCursorLeft';
-    40: 'moveCursorDown';
-  };
+  keysMapRtl: TKeyMapIText;
 
   /**
    * For functionalities on keyUp + ctrl || cmd
    */
-  ctrlKeysMapUp: {
-    67: 'copy';
-    88: 'cut';
-  };
+  ctrlKeysMapUp: TKeyMapIText;
 
   /**
    * For functionalities on keyDown + ctrl || cmd
    */
-  ctrlKeysMapDown: {
-    65: 'selectAll';
-  };
+  ctrlKeysMapDown: TKeyMapIText;
 
   hiddenTextarea: HTMLTextAreaElement | null;
 

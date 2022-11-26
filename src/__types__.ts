@@ -6,7 +6,6 @@ import { TMat2D } from './typedefs';
 /**
  * @todo remove transient
  */
-export type Shadow = any;
 export type Canvas = StaticCanvas & {
   altActionKey: ModifierKey;
   uniScaleKey: ModifierKey;
@@ -21,5 +20,3 @@ export type StaticCanvas = Record<string, any> & {
   };
   getRetinaScaling(): number;
 } & Observable<CanvasEvents>;
-export type Rect = any;
-export type TObject = any;
