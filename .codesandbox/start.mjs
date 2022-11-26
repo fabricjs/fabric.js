@@ -14,7 +14,10 @@ import { wd } from '../scripts/dirname.mjs';
  * @param {string} destination
  */
 export function startSandbox(destination, buildAndWatch, installDeps = false) {
-  if (installDeps) {
+  if (
+    installDeps ||
+    !fs.existsSync(path.resolve(destination, 'node_modules'))
+  ) {
     console.log(chalk.blue('\n> installing dependencies'));
     cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
   }
