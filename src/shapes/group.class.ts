@@ -50,6 +50,8 @@ export type GroupEvents = ObjectEvents & {
     result: LayoutResult;
     diff: Point;
   };
+  'object:added': { target: FabricObject };
+  'object:removed': { target: FabricObject };
 };
 
 export type LayoutStrategy =
@@ -87,7 +89,7 @@ export type LayoutResult = {
  * @fires object:removed
  * @fires layout once layout completes
  */
-export class Group extends createCollectionMixin(FabricObject) {
+export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   /**
    * Specifies the **layout strategy** for instance
    * Used by `getLayoutStrategyResult` to calculate layout
