@@ -1,11 +1,16 @@
 (function() {
   var canvas = this.canvas = new fabric.Canvas();
   QUnit.module('fabric.Textbox', {
-    afterEach: function() {
+    before() {
+      fabric.config.configure({ NUM_FRACTION_DIGITS: 2 });
+    },
+    after() {
+      fabric.config.restoreDefaults();
+    },
+    afterEach() {
       canvas.clear();
     }
   });
-
   var TEXTBOX_OBJECT = {
     version: fabric.version,
     type: 'textbox',

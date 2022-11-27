@@ -1,4 +1,5 @@
 import { IPoint, Point } from '../../point.class';
+import { TBBox } from '../../typedefs';
 
 /**
  * Calculates bounding box (left, top, width, height) from given `points`
@@ -7,7 +8,7 @@ import { IPoint, Point } from '../../point.class';
  * @param {IPoint[]} points
  * @return {Object} Object with left, top, width, height properties
  */
-export const makeBoundingBoxFromPoints = (points: IPoint[]) => {
+export const makeBoundingBoxFromPoints = (points: IPoint[]): TBBox => {
   if (points.length === 0) {
     return {
       left: 0,

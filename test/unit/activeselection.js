@@ -42,7 +42,7 @@
 
   QUnit.test('toString', function(assert) {
     var group = makeAsWith2Objects();
-    assert.equal(group.toString(), '#<fabric.ActiveSelection: (2)>', 'should return proper representation');
+    assert.equal(group.toString(), '#<ActiveSelection: (2)>', 'should return proper representation');
   });
 
   QUnit.test('toObject', function(assert) {
