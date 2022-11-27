@@ -6,6 +6,11 @@ import { animate } from '../util/animate';
 import { animateColor } from '../util/animate_color';
 import { StackedObject } from './object_ancestry.mixin';
 
+/**
+ * TODO remove transient
+ */
+type TAnimationOptions = Record<string, any>;
+
 export abstract class AnimatableObject<
   EventSpec extends ObjectEvents = ObjectEvents
 > extends StackedObject<EventSpec> {
@@ -15,6 +20,12 @@ export abstract class AnimatableObject<
    * @default
    */
   FX_DURATION: number;
+
+  /**
+   * List of properties to consider for animating colors.
+   * @type String[]
+   */
+  colorProperties: string[];
 
   abstract rotate(deg: TDegree): void;
 
@@ -33,61 +44,45 @@ export abstract class AnimatableObject<
    * As string — one property
    *
    * object.animate('left', ...);
-   * object.animate('left', { duration: ... });
    *
    */
-  animate() {
-    if (arguments[0] && typeof arguments[0] === 'object') {
-      let propsToAnimate = [],
-        prop,
-        skipCallbacks,
-        out = [];
-      for (prop in arguments[0]) {
-        propsToAnimate.push(prop);
-      }
-      for (let i = 0, len = propsToAnimate.length; i < len; i++) {
-        prop = propsToAnimate[i];
-        skipCallbacks = i !== len - 1;
-        out.push(
-          this._animate(prop, arguments[0][prop], arguments[1], skipCallbacks)
-        );
-      }
-      return out;
-    } else {
-      return this._animate.apply(this, arguments);
-    }
+  animate<T>(key: string, toValue: T, options?: TAnimationOptions): void;
+  animate<T>(animatable: Record<string, T>, options?: TAnimationOptions): void;
+  animate<T, S extends string | Record<string, T>>(
+    arg0: S,
+    arg1: S extends string ? T : TAnimationOptions,
+    arg2?: TAnimationOptions
+  ) {
+    const animatable = (
+      typeof arg0 === 'string' ? { [arg0]: arg1 } : arg0
+    ) as Record<string, T>;
+    const keys = Object.keys(animatable);
+    const options = (
+      typeof arg0 === 'string' ? arg2 : arg1
+    ) as TAnimationOptions;
+    keys.map((key, index) =>
+      this._animate(
+        key,
+        animatable[key],
+        index === keys.length - 1
+          ? options
+          : { ...options, onChange: undefined, onComplete: undefined }
+      )
+    );
   }
 
   /**
    * @private
-   * @param {String} property Property to animate
+   * @param {String} key Property to animate
    * @param {String} to Value to animate to
    * @param {Object} [options] Options object
-   * @param {Boolean} [skipCallbacks] When true, callbacks like onchange and oncomplete are not invoked
    */
-  _animate(property, to, options, skipCallbacks) {
-    let propPair;
+  _animate<T>(key: string, to: T, options: TAnimationOptions = {}) {
+    const path = key.split('.');
+    const propIsColor = this.colorProperties.includes(path[path.length - 1]);
+    const currentValue = path.reduce((deep: any, key) => deep[key], this);
 
     to = to.toString();
-
-    options = Object.assign({}, options);
-
-    if (~property.indexOf('.')) {
-      propPair = property.split('.');
-    }
-
-    const propIsColor =
-      this.colorProperties.indexOf(property) > -1 ||
-      (propPair && this.colorProperties.indexOf(propPair[1]) > -1);
-
-    const currentValue = propPair
-      ? this.get(propPair[0])[propPair[1]]
-      : this.get(property);
-
-    if (!('from' in options)) {
-      options.from = currentValue;
-    }
-
     if (!propIsColor) {
       if (~to.indexOf('=')) {
         to = currentValue + parseFloat(to.replace('=', ''));
@@ -98,7 +93,7 @@ export abstract class AnimatableObject<
 
     const animationOptions = {
       target: this,
-      startValue: options.from,
+      startValue: options.from ?? currentValue,
       endValue: to,
       byValue: options.by,
       easing: options.easing,
@@ -109,22 +104,16 @@ export abstract class AnimatableObject<
           return options.abort.call(this, value, valueProgress, timeProgress);
         }),
       onChange: (value, valueProgress, timeProgress) => {
-        if (propPair) {
-          this[propPair[0]][propPair[1]] = value;
-        } else {
-          this.set(property, value);
-        }
-        if (skipCallbacks) {
-          return;
-        }
+        path.reduce((deep: any, key, index) => {
+          if (index === path.length - 1) {
+            deep[key] = value;
+          }
+          return deep[key];
+        }, this);
         options.onChange &&
           options.onChange(value, valueProgress, timeProgress);
       },
       onComplete: (value, valueProgress, timeProgress) => {
-        if (skipCallbacks) {
-          return;
-        }
-
         this.setCoords();
         options.onComplete &&
           options.onComplete(value, valueProgress, timeProgress);
@@ -147,7 +136,7 @@ export abstract class AnimatableObject<
    * @private
    * @return {Number} angle value
    */
-  _getAngleValueForStraighten() {
+  protected _getAngleValueForStraighten() {
     const angle = this.angle % 360;
     if (angle > 0) {
       return Math.round((angle - 1) / 90) * 90;

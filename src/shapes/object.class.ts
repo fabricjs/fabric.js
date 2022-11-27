@@ -469,12 +469,6 @@ export class FabricObject<
   cacheProperties: string[];
 
   /**
-   * List of properties to consider for animating colors.
-   * @type String[]
-   */
-  colorProperties: string[];
-
-  /**
    * a fabricObject that, without stroke define a clipping area with their shape. filled in black
    * the clipPath object gets used when the object has rendered, and the context is placed in the center
    * of the object cacheCanvas.
