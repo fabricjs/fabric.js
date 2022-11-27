@@ -1,21 +1,23 @@
 import { fabric } from '../../HEADER';
-import type { FabricObject } from '../shapes/fabricObject.class';
 import type { Group } from '../shapes/group.class';
 import type { Canvas, StaticCanvas } from '../__types__';
 
-type TAncestor = FabricObject | Canvas | StaticCanvas;
+type TAncestor = FabricObjectAncestryMixin | Canvas | StaticCanvas;
 
 /**
  * Strict: only ancestors that are objects (without canvas)
  */
 export type Ancestors<Strict> = Strict extends true
-  ? [FabricObject | Group] | [FabricObject | Group, ...Group[]] | Group[]
-  :
-      | [FabricObject | Group | Canvas | StaticCanvas]
-      | [FabricObject | Group, Canvas | StaticCanvas]
-      | [FabricObject, ...Group[]]
+  ?
+      | [FabricObjectAncestryMixin | Group]
+      | [FabricObjectAncestryMixin | Group, ...Group[]]
       | Group[]
-      | [FabricObject | Group, ...Group[], Canvas | StaticCanvas];
+  :
+      | [FabricObjectAncestryMixin | Group | Canvas | StaticCanvas]
+      | [FabricObjectAncestryMixin | Group, Canvas | StaticCanvas]
+      | [FabricObjectAncestryMixin, ...Group[]]
+      | Group[]
+      | [FabricObjectAncestryMixin | Group, ...Group[], Canvas | StaticCanvas];
 
 export type AncestryComparison<Strict> = {
   /**
@@ -74,13 +76,12 @@ export class FabricObjectAncestryMixin {
   /**
    * Compare ancestors
    *
-   * @param {FabricObject} other
+   * @param {FabricObjectAncestryMixin} other
    * @param {boolean} [strict] finds only ancestors that are objects (without canvas)
    * @returns {AncestryComparison} an object that represent the ancestry situation.
    */
   findCommonAncestors<T extends boolean>(
-    this: FabricObject & this,
-    other: FabricObject & this,
+    other: FabricObjectAncestryMixin,
     strict?: T
   ): AncestryComparison<T> {
     if (this === other) {
@@ -144,13 +145,12 @@ export class FabricObjectAncestryMixin {
 
   /**
    *
-   * @param {FabricObject} other
+   * @param {FabricObjectAncestryMixin} other
    * @param {boolean} [strict] checks only ancestors that are objects (without canvas)
    * @returns {boolean}
    */
   hasCommonAncestors(
-    this: FabricObject & this,
-    other: FabricObject & this,
+    other: FabricObjectAncestryMixin,
     strict?: boolean
   ): boolean {
     const commonAncestors = this.findCommonAncestors(other, strict);
