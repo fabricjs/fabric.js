@@ -1,17 +1,9 @@
-//@ts-nocheck
-'use strict';
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = createClass;
+import { TClassProperties } from '../typedefs';
+import { BaseFilter } from './base_filter.class';
+import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
  * Vibrance filter class
- * @class fabric.Image.Vibrance
- * @memberOf fabric.Image.filters
- * @extends fabric.Image.filters.BaseFilter
- * @see {@link fabric.Image.Vibrance#initialize} for constructor definition
- * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
  * var filter = new fabric.Image.Vibrance({
  *   vibrance: 1
@@ -19,16 +11,7 @@ var fabric = global.fabric || (global.fabric = {}),
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Vibrance extends filters.BaseFilter {
-  /**
-   * Filter type
-   * @param {String} type
-   * @default
-   */
-  type: string;
-
-  fragmentSource;
-
+export class Vibrance extends BaseFilter {
   /**
    * Vibrance value, from -1 to 1.
    * Increases/decreases the saturation of more muted colors with less effect on saturated colors.
@@ -39,31 +22,21 @@ export class Vibrance extends filters.BaseFilter {
    */
   vibrance: number;
 
-  mainParameter: string;
-
   /**
    * Apply the Vibrance operation to a Uint8ClampedArray representing the pixels of an image.
    *
    * @param {Object} options
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
-  applyTo2d(options) {
+  applyTo2d({ imageData: { data } }: T2DPipelineState) {
     if (this.vibrance === 0) {
       return;
     }
-    var imageData = options.imageData,
-      data = imageData.data,
-      len = data.length,
-      adjust = -this.vibrance,
-      i,
-      max,
-      avg,
-      amt;
-
-    for (i = 0; i < len; i += 4) {
-      max = Math.max(data[i], data[i + 1], data[i + 2]);
-      avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-      amt = ((Math.abs(max - avg) * 2) / 255) * adjust;
+    const adjust = -this.vibrance;
+    for (let i = 0; i < data.length; i += 4) {
+      const max = Math.max(data[i], data[i + 1], data[i + 2]);
+      const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      const amt = ((Math.abs(max - avg) * 2) / 255) * adjust;
       data[i] += max !== data[i] ? (max - data[i]) * amt : 0;
       data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * amt : 0;
       data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * amt : 0;
@@ -76,7 +49,10 @@ export class Vibrance extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {WebGLShaderProgram} program This filter's compiled shader program.
    */
-  getUniformLocations(gl, program) {
+  getUniformLocations(
+    gl: WebGLRenderingContext,
+    program: WebGLProgram
+  ): TWebGLUniformLocationMap {
     return {
       uVibrance: gl.getUniformLocation(program, 'uVibrance'),
     };
@@ -88,7 +64,10 @@ export class Vibrance extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
-  sendUniformData(gl, uniformLocations) {
+  sendUniformData(
+    gl: WebGLRenderingContext,
+    uniformLocations: TWebGLUniformLocationMap
+  ) {
     gl.uniform1f(uniformLocations.uVibrance, -this.vibrance);
   }
 }
@@ -115,11 +94,3 @@ export const vibranceDefaultValues: Partial<TClassProperties<Vibrance>> = {
 };
 
 Object.assign(Vibrance.prototype, vibranceDefaultValues);
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.Vibrance>}
- */
-fabric.Image.Vibrance.fromObject = fabric.Image.filters.BaseFilter.fromObject;
