@@ -1,11 +1,11 @@
-import type { FabricObject } from '../shapes/fabricObject.class';
 import {
   ControlCursorCallback,
-  TAxis,
   TPointerEvent,
   Transform,
   TransformActionHandler,
-} from '../typedefs';
+} from '../EventTypeDefs';
+import type { FabricObject } from '../shapes/fabricObject.class';
+import { TAxis } from '../typedefs';
 import { Canvas } from '../__types__';
 import {
   findCornerQuadrant,

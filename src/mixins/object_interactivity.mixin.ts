@@ -12,6 +12,7 @@ import {
 import { sizeAfterTransform } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { ObjectGeometry } from './object_geometry.mixin';
+import { ObjectEvents } from '../EventTypeDefs';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
@@ -32,7 +33,9 @@ type TStyleOverride = ControlRenderingStyleOverride &
     }
   >;
 
-export class InteractiveFabricObject extends FabricObject {
+export class InteractiveFabricObject<
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends FabricObject<EventSpec> {
   /**
    * Describe object's corner position in canvas element coordinates.
    * properties are depending on control keys and padding the main controls.
@@ -91,7 +94,7 @@ export class InteractiveFabricObject extends FabricObject {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: Record<string, unknown>) {
+  constructor(options?: Record<string, unknown>) {
     super(options);
   }
 
@@ -443,7 +446,7 @@ export class InteractiveFabricObject extends FabricObject {
     styleOverride: ControlRenderingStyleOverride = {}
   ) {
     ctx.save();
-    const retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : 1;
+    const retinaScaling = this.getCanvasRetinaScaling();
     const { cornerStrokeColor, cornerDashArray, cornerColor } = this;
     const options = {
       cornerStrokeColor,
