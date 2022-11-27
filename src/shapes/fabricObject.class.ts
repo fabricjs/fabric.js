@@ -15,7 +15,6 @@ const FabricObject = applyMixins(InteractiveFabricObject, [
   FabricObjectObjectAnimationMixin,
 ]);
 
-// TS should merge all these types on top of FabricObject but it doesn't
 export interface FabricObject
   extends InteractiveFabricObject,
     FabricObjectObjectStackingMixin,
