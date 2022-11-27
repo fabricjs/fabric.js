@@ -4,23 +4,20 @@ import type { Group } from '../shapes/group.class';
 import type { Canvas, StaticCanvas } from '../__types__';
 import { ObjectGeometry } from './object_geometry.mixin';
 
-type TAncestor = FabricObjectAncestryMixin | Canvas | StaticCanvas;
+type TAncestor = StackedObject | Canvas | StaticCanvas;
 type TCollection = Group | Canvas | StaticCanvas;
 
 /**
  * Strict: only ancestors that are objects (without canvas)
  */
 export type Ancestors<Strict> = Strict extends true
-  ?
-      | [FabricObjectAncestryMixin | Group]
-      | [FabricObjectAncestryMixin | Group, ...Group[]]
-      | Group[]
+  ? [StackedObject | Group] | [StackedObject | Group, ...Group[]] | Group[]
   :
-      | [FabricObjectAncestryMixin | Group | Canvas | StaticCanvas]
-      | [FabricObjectAncestryMixin | Group, Canvas | StaticCanvas]
-      | [FabricObjectAncestryMixin, ...Group[]]
+      | [StackedObject | Group | Canvas | StaticCanvas]
+      | [StackedObject | Group, Canvas | StaticCanvas]
+      | [StackedObject, ...Group[]]
       | Group[]
-      | [FabricObjectAncestryMixin | Group, ...Group[], Canvas | StaticCanvas];
+      | [StackedObject | Group, ...Group[], Canvas | StaticCanvas];
 
 export type AncestryComparison<Strict> = {
   /**
@@ -37,7 +34,7 @@ export type AncestryComparison<Strict> = {
   otherFork: Ancestors<Strict>;
 };
 
-export class FabricObjectAncestryMixin<
+export class StackedObject<
   EventSpec extends ObjectEvents = ObjectEvents
 > extends ObjectGeometry<EventSpec> {
   /**
@@ -78,7 +75,7 @@ export class FabricObjectAncestryMixin<
   /**
    * Compare ancestors
    *
-   * @param {FabricObjectAncestryMixin} other
+   * @param {StackedObject} other
    * @param {boolean} [strict] finds only ancestors that are objects (without canvas)
    * @returns {AncestryComparison} an object that represent the ancestry situation.
    */
@@ -147,7 +144,7 @@ export class FabricObjectAncestryMixin<
 
   /**
    *
-   * @param {FabricObjectAncestryMixin} other
+   * @param {StackedObject} other
    * @param {boolean} [strict] checks only ancestors that are objects (without canvas)
    * @returns {boolean}
    */

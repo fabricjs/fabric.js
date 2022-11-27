@@ -3,11 +3,11 @@ import { ObjectEvents } from '../EventTypeDefs';
 import { TDegree } from '../typedefs';
 import { animate } from '../util/animate';
 import { animateColor } from '../util/animate_color';
-import { FabricObjectAncestryMixin } from './object_ancestry.mixin';
+import { StackedObject } from './object_ancestry.mixin';
 
 export abstract class AnimatableObject<
   EventSpec extends ObjectEvents = ObjectEvents
-> extends FabricObjectAncestryMixin<EventSpec> {
+> extends StackedObject<EventSpec> {
   /**
    * Animation duration (in ms) for fx* methods
    * @type Number
