@@ -1,11 +1,11 @@
 import { TClassProperties } from '../typedefs';
-import { AbstractBaseFilter, BaseFilter } from './base_filter.class';
+import { AbstractBaseFilter } from './base_filter.class';
 import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
  * Grayscale image filter class
  * @example
- * var filter = new fabric.Image.Grayscale();
+ * const filter = new Grayscale();
  * object.filters.push(filter);
  * object.applyFilters();
  */
