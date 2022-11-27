@@ -1,37 +1,17 @@
-//@ts-nocheck
-'use strict';
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = createClass;
+import { TClassProperties } from '../typedefs';
+import { BaseFilter } from './base_filter.class';
+import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
  * Brightness filter class
- * @class fabric.Image.Brightness
- * @memberOf fabric.Image.filters
- * @extends fabric.Image.filters.BaseFilter
- * @see {@link fabric.Image.Brightness#initialize} for constructor definition
- * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
- * var filter = new fabric.Image.Brightness({
+ * const filter = new fabric.Image.Brightness({
  *   brightness: 0.05
  * });
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Brightness extends filters.BaseFilter {
-  /**
-   * Filter type
-   * @param {String} type
-   * @default
-   */
-  type: string;
-
-  /**
-   * Fragment source for the brightness program
-   */
-  fragmentSource;
-
+export class Brightness extends BaseFilter {
   /**
    * Brightness value, from -1 to 1.
    * translated to -255 to 255 for 2d
@@ -42,28 +22,17 @@ export class Brightness extends filters.BaseFilter {
   brightness: number;
 
   /**
-   * Describe the property that is the filter parameter
-   * @param {String} m
-   * @default
-   */
-  mainParameter: string;
-
-  /**
    * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.
    *
    * @param {Object} options
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
-  applyTo2d(options) {
+  applyTo2d({ imageData: { data } }: T2DPipelineState) {
     if (this.brightness === 0) {
       return;
     }
-    var imageData = options.imageData,
-      data = imageData.data,
-      i,
-      len = data.length,
-      brightness = Math.round(this.brightness * 255);
-    for (i = 0; i < len; i += 4) {
+    const brightness = Math.round(this.brightness * 255);
+    for (let i = 0; i < data.length; i += 4) {
       data[i] = data[i] + brightness;
       data[i + 1] = data[i + 1] + brightness;
       data[i + 2] = data[i + 2] + brightness;
@@ -76,7 +45,10 @@ export class Brightness extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {WebGLShaderProgram} program This filter's compiled shader program.
    */
-  getUniformLocations(gl, program) {
+  getUniformLocations(
+    gl: WebGLRenderingContext,
+    program: WebGLProgram
+  ): TWebGLUniformLocationMap {
     return {
       uBrightness: gl.getUniformLocation(program, 'uBrightness'),
     };
@@ -88,33 +60,29 @@ export class Brightness extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
-  sendUniformData(gl, uniformLocations) {
+  sendUniformData(
+    gl: WebGLRenderingContext,
+    uniformLocations: TWebGLUniformLocationMap
+  ) {
     gl.uniform1f(uniformLocations.uBrightness, this.brightness);
   }
 }
 
 export const brightnessDefaultValues: Partial<TClassProperties<Brightness>> = {
   type: 'Brightness',
-  fragmentSource:
-    'precision highp float;\n' +
-    'uniform sampler2D uTexture;\n' +
-    'uniform float uBrightness;\n' +
-    'varying vec2 vTexCoord;\n' +
-    'void main() {\n' +
-    'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-    'color.rgb += uBrightness;\n' +
-    'gl_FragColor = color;\n' +
-    '}',
+  fragmentSource: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform float uBrightness;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = texture2D(uTexture, vTexCoord);
+      color.rgb += uBrightness;
+      gl_FragColor = color;
+    }
+  `,
   brightness: 0,
   mainParameter: 'brightness',
 };
 
 Object.assign(Brightness.prototype, brightnessDefaultValues);
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.Brightness>}
- */
-fabric.Image.Brightness.fromObject = fabric.Image.filters.BaseFilter.fromObject;
