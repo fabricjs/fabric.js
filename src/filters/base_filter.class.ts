@@ -1,14 +1,14 @@
-import { fabric } from '../../HEADER';
-import type {
-  TWebGLPipelineState,
-  T2DPipelineState,
-  TWebGLUniformLocationMap,
-  TWebGLAttributeLocationMap,
-  TWebGLProgramCacheItem,
-} from './typedefs';
-import { WebGLPrecision, webGLProbe } from './WebGLProbe';
-import { isWebGLPipelineState } from './typedefs';
+import { Image } from '../shapes/image.class';
 import { createCanvasElement } from '../util/misc/dom';
+import type {
+  T2DPipelineState,
+  TWebGLAttributeLocationMap,
+  TWebGLPipelineState,
+  TWebGLProgramCacheItem,
+  TWebGLUniformLocationMap,
+} from './typedefs';
+import { isWebGLPipelineState } from './typedefs';
+import { WebGLPrecision, webGLProbe } from './WebGLProbe';
 
 const highPsourceCode = `precision ${WebGLPrecision.high} float`;
 
@@ -400,12 +400,11 @@ export abstract class AbstractBaseFilter {
    * Create filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
-   * @returns {Promise<fabric.Image.filters.BaseFilter>}
    */
   static fromObject(object: any) {
     // todo: the class registry her
     return Promise.resolve<AbstractBaseFilter>(
-      new fabric.Image.filters[object.type](object)
+      new Image.filters[object.type](object)
     );
   }
 }
