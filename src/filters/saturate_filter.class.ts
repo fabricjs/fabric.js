@@ -1,17 +1,9 @@
-//@ts-nocheck
-'use strict';
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = createClass;
+import { TClassProperties } from '../typedefs';
+import { BaseFilter } from './base_filter.class';
+import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
  * Saturate filter class
- * @class fabric.Image.Saturation
- * @memberOf fabric.Image.filters
- * @extends fabric.Image.filters.BaseFilter
- * @see {@link fabric.Image.Saturation#initialize} for constructor definition
- * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
  * var filter = new fabric.Image.Saturation({
  *   saturation: 1
@@ -19,16 +11,7 @@ var fabric = global.fabric || (global.fabric = {}),
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Saturation extends filters.BaseFilter {
-  /**
-   * Filter type
-   * @param {String} type
-   * @default
-   */
-  type: string;
-
-  fragmentSource;
-
+export class Saturation extends BaseFilter {
   /**
    * Saturation value, from -1 to 1.
    * Increases/decreases the color saturation.
@@ -39,27 +22,19 @@ export class Saturation extends filters.BaseFilter {
    */
   saturation: number;
 
-  mainParameter: string;
-
   /**
    * Apply the Saturation operation to a Uint8ClampedArray representing the pixels of an image.
    *
    * @param {Object} options
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
-  applyTo2d(options) {
+  applyTo2d({ imageData: { data } }: T2DPipelineState) {
     if (this.saturation === 0) {
       return;
     }
-    var imageData = options.imageData,
-      data = imageData.data,
-      len = data.length,
-      adjust = -this.saturation,
-      i,
-      max;
-
-    for (i = 0; i < len; i += 4) {
-      max = Math.max(data[i], data[i + 1], data[i + 2]);
+    const adjust = -this.saturation;
+    for (let i = 0; i < data.length; i += 4) {
+      const max = Math.max(data[i], data[i + 1], data[i + 2]);
       data[i] += max !== data[i] ? (max - data[i]) * adjust : 0;
       data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * adjust : 0;
       data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * adjust : 0;
@@ -72,7 +47,10 @@ export class Saturation extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {WebGLShaderProgram} program This filter's compiled shader program.
    */
-  getUniformLocations(gl, program) {
+  getUniformLocations(
+    gl: WebGLRenderingContext,
+    program: WebGLProgram
+  ): TWebGLUniformLocationMap {
     return {
       uSaturation: gl.getUniformLocation(program, 'uSaturation'),
     };
@@ -84,7 +62,10 @@ export class Saturation extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
-  sendUniformData(gl, uniformLocations) {
+  sendUniformData(
+    gl: WebGLRenderingContext,
+    uniformLocations: TWebGLUniformLocationMap
+  ) {
     gl.uniform1f(uniformLocations.uSaturation, -this.saturation);
   }
 }
@@ -110,11 +91,3 @@ export const saturationDefaultValues: Partial<TClassProperties<Saturation>> = {
 };
 
 Object.assign(Saturation.prototype, saturationDefaultValues);
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.Saturation>}
- */
-fabric.Image.Saturation.fromObject = fabric.Image.filters.BaseFilter.fromObject;
