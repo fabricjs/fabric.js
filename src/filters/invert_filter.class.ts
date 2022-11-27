@@ -4,7 +4,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
  * @example
- * var filter = new fabric.Image.Invert();
+ * var filter = new Invert();
  * object.filters.push(filter);
  * object.applyFilters(canvas.renderAll.bind(canvas));
  */

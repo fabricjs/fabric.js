@@ -5,7 +5,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 /**
  * Saturate filter class
  * @example
- * var filter = new fabric.Image.Saturation({
+ * var filter = new Saturation({
  *   saturation: 1
  * });
  * object.filters.push(filter);
