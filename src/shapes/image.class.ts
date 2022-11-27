@@ -16,6 +16,7 @@ import {
 } from '../util/misc/objectEnlive';
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
 import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
+import * as filters from '../filters';
 
 export type ImageSource =
   | HTMLImageElement
@@ -110,7 +111,7 @@ export class Image extends FabricObject {
 
   protected src: string;
 
-  static filters: Record<string, typeof BaseFilter>;
+  static filters = filters;
 
   filters: BaseFilter[];
   resizeFilter: BaseFilter;
