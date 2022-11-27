@@ -1843,9 +1843,7 @@ export class FabricObject<
 
   /**
    * Sets "angle" of an instance with centered rotation
-   * @param {Number} angle Angle value (in degrees)
-   * @return {fabric.Object} thisArg
-   * @chainable
+   * @param {TDegree} angle Angle value (in degrees)
    */
   rotate(angle: TDegree) {
     const shouldCenterOrigin =
