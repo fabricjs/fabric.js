@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { Color } from '../color';
 import { config } from '../config';
-import { FabricObject } from '../shapes/object.class';
+import { FabricObject } from '../shapes/fabricObject.class';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
 
