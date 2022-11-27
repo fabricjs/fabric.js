@@ -1,48 +1,25 @@
-//@ts-nocheck
-
 import { Color } from '../color';
-
-('use strict');
-
-var fabric = global.fabric || (global.fabric = {}),
-  extend = object.extend,
-  filters = fabric.Image.filters,
-  createClass = createClass;
+import { TClassProperties } from '../typedefs';
+import { BaseFilter } from './base_filter.class';
+import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
  * Remove white filter class
- * @class fabric.Image.RemoveColor
- * @memberOf fabric.Image.filters
- * @extends fabric.Image.filters.BaseFilter
- * @see {@link fabric.Image.RemoveColor#initialize} for constructor definition
- * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
- * var filter = new fabric.Image.RemoveColor({
+ * const filter = new RemoveColor({
  *   threshold: 0.2,
  * });
  * object.filters.push(filter);
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class RemoveColor extends filters.BaseFilter {
-  /**
-   * Filter type
-   * @param {String} type
-   * @default
-   */
-  type: string;
-
+export class RemoveColor extends BaseFilter {
   /**
    * Color to remove, in any format understood by fabric.Color.
    * @param {String} type
    * @default
    */
   color: string;
-
-  /**
-   * Fragment source for the brightness program
-   */
-  fragmentSource;
 
   /**
    * distance to actual color, as value up or down from each r,g,b
@@ -60,14 +37,8 @@ export class RemoveColor extends filters.BaseFilter {
    * Applies filter to canvas element
    * @param {Object} canvasEl Canvas element to apply filter to
    */
-  applyTo2d(options) {
-    var imageData = options.imageData,
-      data = imageData.data,
-      i,
-      distance = this.distance * 255,
-      r,
-      g,
-      b,
+  applyTo2d({ imageData: { data } }: T2DPipelineState) {
+    const distance = this.distance * 255,
       source = new Color(this.color).getSource(),
       lowC = [source[0] - distance, source[1] - distance, source[2] - distance],
       highC = [
@@ -76,10 +47,10 @@ export class RemoveColor extends filters.BaseFilter {
         source[2] + distance,
       ];
 
-    for (i = 0; i < data.length; i += 4) {
-      r = data[i];
-      g = data[i + 1];
-      b = data[i + 2];
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
 
       if (
         r > lowC[0] &&
@@ -100,7 +71,10 @@ export class RemoveColor extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {WebGLShaderProgram} program This filter's compiled shader program.
    */
-  getUniformLocations(gl, program) {
+  getUniformLocations(
+    gl: WebGLRenderingContext,
+    program: WebGLProgram
+  ): TWebGLUniformLocationMap {
     return {
       uLow: gl.getUniformLocation(program, 'uLow'),
       uHigh: gl.getUniformLocation(program, 'uHigh'),
@@ -113,9 +87,12 @@ export class RemoveColor extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
-  sendUniformData(gl, uniformLocations) {
-    var source = new Color(this.color).getSource(),
-      distance = parseFloat(this.distance),
+  sendUniformData(
+    gl: WebGLRenderingContext,
+    uniformLocations: TWebGLUniformLocationMap
+  ) {
+    const source = new Color(this.color).getSource(),
+      distance = this.distance,
       lowC = [
         0 + source[0] / 255 - distance,
         0 + source[1] / 255 - distance,
@@ -137,10 +114,7 @@ export class RemoveColor extends filters.BaseFilter {
    * @return {Object} Object representation of an instance
    */
   toObject() {
-    return extend(super.toObject(), {
-      color: this.color,
-      distance: this.distance,
-    });
+    return { ...super.toObject(), color: this.color, distance: this.distance };
   }
 }
 
@@ -165,12 +139,3 @@ export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
   };
 
 Object.assign(RemoveColor.prototype, removeColorDefaultValues);
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.RemoveColor>}
- */
-fabric.Image.RemoveColor.fromObject =
-  fabric.Image.filters.BaseFilter.fromObject;
