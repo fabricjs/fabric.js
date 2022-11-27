@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Image } from '../shapes/image.class';
 import { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';

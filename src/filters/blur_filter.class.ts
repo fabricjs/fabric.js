@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { BaseFilter } from './base_filter.class';
