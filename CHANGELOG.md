@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(): Add `createObjectDefaultControls` and `createTextboxDefaultControls` to create copies of control sets. [#8415](https://github.com/fabricjs/fabric.js/pull/8415)
 - fix(PatternBrush): `getPatternSrc`, rm `getPatternSrcFunction` [#8468](https://github.com/fabricjs/fabric.js/pull/8468)
 - chore(TS): more FabricObject typing [#8405](https://github.com/fabricjs/fabric.js/pull/8405)
 - chore(TS): Observable types [#8431](https://github.com/fabricjs/fabric.js/pull/8431)
