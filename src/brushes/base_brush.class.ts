@@ -1,10 +1,11 @@
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import type { Point } from '../point.class';
-import { TEvent } from '../typedefs';
-import type { Canvas, Shadow } from '../__types__';
+import { TEvent } from '../EventTypeDefs';
+import type { Shadow } from '../shadow.class';
+import { Canvas } from '../__types__';
 
-export type TBrushEventData = TEvent & { pointer: Point };
+type TBrushEventData = TEvent & { pointer: Point };
 
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
@@ -110,6 +111,11 @@ export abstract class BaseBrush {
   protected _saveAndTransform(ctx: CanvasRenderingContext2D) {
     ctx.save();
     this.transform(ctx);
+  }
+
+  protected needsFullRender() {
+    const color = new Color(this.color);
+    return color.getAlpha() < 1 || !!this.shadow;
   }
 
   protected needsFullRender() {

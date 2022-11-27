@@ -1,13 +1,12 @@
-import { resolveOrigin } from '../mixins/object_origin.mixin';
-import { Point } from '../point.class';
 import {
   ControlCursorCallback,
-  TAxis,
-  TAxisKey,
   TPointerEvent,
   Transform,
   TransformActionHandler,
-} from '../typedefs';
+} from '../EventTypeDefs';
+import { resolveOrigin } from '../mixins/object_origin.mixin';
+import { Point } from '../point.class';
+import { TAxis, TAxisKey } from '../typedefs';
 import {
   degreesToRadians,
   radiansToDegrees,

@@ -1,7 +1,11 @@
 import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
 import { FabricObject } from './object.class';
-import { polyFromElement, Polyline } from './polyline.class';
+import {
+  polyFromElement,
+  Polyline,
+  polylineDefaultValues,
+} from './polyline.class';
 
 export class Polygon extends Polyline {
   protected isOpen() {
@@ -35,7 +39,7 @@ export class Polygon extends Polyline {
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Polygon>}
    */
-  static fromObject(object: any) {
+  static fromObject(object: Record<string, unknown>): Promise<Polygon> {
     return FabricObject._fromObject(Polygon, object, {
       extraParam: 'points',
     });
@@ -43,6 +47,7 @@ export class Polygon extends Polyline {
 }
 
 export const polygonDefaultValues: Partial<TClassProperties<Polygon>> = {
+  ...polylineDefaultValues,
   type: 'polygon',
 };
 

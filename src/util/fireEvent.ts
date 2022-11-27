@@ -1,6 +1,9 @@
-import { TransformEvent } from '../typedefs';
+import { TModificationEvents, BasicTransformEvent } from '../EventTypeDefs';
 
-export const fireEvent = (eventName: string, options: TransformEvent) => {
+export const fireEvent = (
+  eventName: TModificationEvents,
+  options: BasicTransformEvent
+) => {
   const {
     transform: { target },
   } = options;
