@@ -355,7 +355,7 @@ export class ObjectGeometry<
     );
   }
 
-  isOverlapping<T extends ObjectGeometry>(other: T) {
+  isOverlapping<T extends ObjectGeometry>(other: T): boolean {
     return (
       this.intersectsWithObject(other) ||
       this.isContainedWithinObject(other) ||
