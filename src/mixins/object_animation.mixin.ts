@@ -1,6 +1,5 @@
 // @ts-nocheck
 
-import type { FabricObject } from '../shapes/fabricObject.class';
 import { animate } from '../util/animate';
 import { animateColor } from '../util/animate_color';
 
@@ -9,7 +8,6 @@ export class FabricObjectObjectAnimationMixin {
    * Animates object's properties
    * @param {String|Object} property Property to animate (if string) or properties to animate (if object)
    * @param {Number|Object} value Value to animate property to (if string was given first) or options object
-   * @return {FabricObject} thisArg
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#animation}
    * @return {AnimationContext | AnimationContext[]} animation context (or an array if passed multiple properties)
    *

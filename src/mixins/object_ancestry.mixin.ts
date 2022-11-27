@@ -3,7 +3,7 @@ import type { FabricObject } from '../shapes/fabricObject.class';
 import type { Group } from '../shapes/group.class';
 import type { Canvas, StaticCanvas } from '../__types__';
 
-type TAncestor = FabricObject | StaticCanvas;
+type TAncestor = FabricObject | Canvas | StaticCanvas;
 
 /**
  * Strict: only ancestors that are objects (without canvas)
@@ -11,11 +11,11 @@ type TAncestor = FabricObject | StaticCanvas;
 export type Ancestors<Strict> = Strict extends true
   ? [FabricObject | Group] | [FabricObject | Group, ...Group[]] | Group[]
   :
-      | [FabricObject | Group | StaticCanvas]
-      | [FabricObject | Group, StaticCanvas]
+      | [FabricObject | Group | Canvas | StaticCanvas]
+      | [FabricObject | Group, Canvas | StaticCanvas]
       | [FabricObject, ...Group[]]
       | Group[]
-      | [FabricObject | Group, ...Group[], StaticCanvas];
+      | [FabricObject | Group, ...Group[], Canvas | StaticCanvas];
 
 export type AncestryComparison<Strict> = {
   /**
