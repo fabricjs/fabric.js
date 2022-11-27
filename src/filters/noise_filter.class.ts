@@ -1,46 +1,19 @@
-//@ts-nocheck
-'use strict';
-
-var fabric = global.fabric || (global.fabric = {}),
-  extend = object.extend,
-  filters = fabric.Image.filters,
-  createClass = createClass;
+import { extend } from 'lodash';
+import { TClassProperties } from '../typedefs';
+import { BaseFilter } from './base_filter.class';
+import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
  * Noise filter class
- * @class fabric.Image.Noise
- * @memberOf fabric.Image.filters
- * @extends fabric.Image.filters.BaseFilter
- * @see {@link fabric.Image.Noise#initialize} for constructor definition
- * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
- * var filter = new fabric.Image.Noise({
+ * const filter = new Noise({
  *   noise: 700
  * });
  * object.filters.push(filter);
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class Noise extends filters.BaseFilter {
-  /**
-   * Filter type
-   * @param {String} type
-   * @default
-   */
-  type: string;
-
-  /**
-   * Fragment source for the noise program
-   */
-  fragmentSource;
-
-  /**
-   * Describe the property that is the filter parameter
-   * @param {String} m
-   * @default
-   */
-  mainParameter: string;
-
+export class Noise extends BaseFilter {
   /**
    * Noise value, from
    * @param {Number} noise
@@ -54,20 +27,13 @@ export class Noise extends filters.BaseFilter {
    * @param {Object} options
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
-  applyTo2d(options) {
+  applyTo2d({ imageData: { data } }: T2DPipelineState) {
     if (this.noise === 0) {
       return;
     }
-    var imageData = options.imageData,
-      data = imageData.data,
-      i,
-      len = data.length,
-      noise = this.noise,
-      rand;
-
-    for (i = 0, len = data.length; i < len; i += 4) {
-      rand = (0.5 - Math.random()) * noise;
-
+    const noise = this.noise;
+    for (let i = 0; i < data.length; i += 4) {
+      const rand = (0.5 - Math.random()) * noise;
       data[i] += rand;
       data[i + 1] += rand;
       data[i + 2] += rand;
@@ -80,7 +46,10 @@ export class Noise extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {WebGLShaderProgram} program This filter's compiled shader program.
    */
-  getUniformLocations(gl, program) {
+  getUniformLocations(
+    gl: WebGLRenderingContext,
+    program: WebGLProgram
+  ): TWebGLUniformLocationMap {
     return {
       uNoise: gl.getUniformLocation(program, 'uNoise'),
       uSeed: gl.getUniformLocation(program, 'uSeed'),
@@ -93,7 +62,10 @@ export class Noise extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
-  sendUniformData(gl, uniformLocations) {
+  sendUniformData(
+    gl: WebGLRenderingContext,
+    uniformLocations: TWebGLUniformLocationMap
+  ) {
     gl.uniform1f(uniformLocations.uNoise, this.noise / 255);
     gl.uniform1f(uniformLocations.uSeed, Math.random());
   }
@@ -131,11 +103,3 @@ export const noiseDefaultValues: Partial<TClassProperties<Noise>> = {
 };
 
 Object.assign(Noise.prototype, noiseDefaultValues);
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.Noise>}
- */
-fabric.Image.Noise.fromObject = fabric.Image.filters.BaseFilter.fromObject;
