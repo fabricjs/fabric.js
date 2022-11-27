@@ -1,21 +1,13 @@
-//@ts-nocheck
-'use strict';
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = createClass;
+import { TClassProperties } from '../typedefs';
+import { BaseFilter } from './base_filter.class';
+import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
    * Color Matrix filter class
-   * @class fabric.Image.ColorMatrix
-   * @memberOf fabric.Image.filters
-   * @extends fabric.Image.filters.BaseFilter
-   * @see {@link fabric.Image.ColorMatrix#initialize} for constructor definition
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
-   * @see {@Link http://www.webwasp.co.uk/tutorials/219/Color_Matrix_Filter.php}
-   * @see {@Link http://phoboslab.org/log/2013/11/fast-image-filters-with-webgl}
+   * @see {@Link http://phoboslab.org/log/2013/11/fast-image-filters-with-webgl demo}
    * @example <caption>Kodachrome filter</caption>
-   * var filter = new fabric.Image.ColorMatrix({
+   * var filter = new ColorMatrix({
    *  matrix: [
        1.1285582396593525, -0.3967382283601348, -0.03992559172921793, 0, 63.72958762196502,
        -0.16404339962244616, 1.0835251566291304, -0.05498805115633132, 0, 24.732407896706203,
@@ -26,16 +18,7 @@ var fabric = global.fabric || (global.fabric = {}),
    * object.filters.push(filter);
    * object.applyFilters();
    */
-export class ColorMatrix extends filters.BaseFilter {
-  /**
-   * Filter type
-   * @param {String} type
-   * @default
-   */
-  type: string;
-
-  fragmentSource;
-
+export class ColorMatrix extends BaseFilter {
   /**
    * Colormatrix for pixels.
    * array of 20 floats. Numbers in positions 4, 9, 14, 19 loose meaning
@@ -44,9 +27,7 @@ export class ColorMatrix extends filters.BaseFilter {
    * @param {Array} matrix array of 20 numbers.
    * @default
    */
-  matrix;
-
-  mainParameter: string;
+  matrix: number[];
 
   /**
    * Lock the colormatrix on the color part, skipping alpha, mainly for non webgl scenario
@@ -56,14 +37,11 @@ export class ColorMatrix extends filters.BaseFilter {
    */
   colorsOnly: boolean;
 
-  /**
-   * Constructor
-   * @param {Object} [options] Options object
-   */
-  constructor(options) {
-    super(options);
-    // create a new array instead mutating the prototype with push
-    this.matrix = this.matrix.slice(0);
+  setOptions(options: Record<string, any>): void {
+    if (options.matrix) {
+      // safeguard against mutation
+      this.matrix = [...options.matrix];
+    }
   }
 
   /**
@@ -72,28 +50,22 @@ export class ColorMatrix extends filters.BaseFilter {
    * @param {Object} options
    * @param {ImageData} options.imageData The Uint8Array to be filtered.
    */
-  applyTo2d(options) {
-    var imageData = options.imageData,
+  applyTo2d(options: T2DPipelineState) {
+    const imageData = options.imageData,
       data = imageData.data,
-      iLen = data.length,
       m = this.matrix,
-      r,
-      g,
-      b,
-      a,
-      i,
       colorsOnly = this.colorsOnly;
 
-    for (i = 0; i < iLen; i += 4) {
-      r = data[i];
-      g = data[i + 1];
-      b = data[i + 2];
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
       if (colorsOnly) {
         data[i] = r * m[0] + g * m[1] + b * m[2] + m[4] * 255;
         data[i + 1] = r * m[5] + g * m[6] + b * m[7] + m[9] * 255;
         data[i + 2] = r * m[10] + g * m[11] + b * m[12] + m[14] * 255;
       } else {
-        a = data[i + 3];
+        const a = data[i + 3];
         data[i] = r * m[0] + g * m[1] + b * m[2] + a * m[3] + m[4] * 255;
         data[i + 1] = r * m[5] + g * m[6] + b * m[7] + a * m[8] + m[9] * 255;
         data[i + 2] =
@@ -110,7 +82,10 @@ export class ColorMatrix extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {WebGLShaderProgram} program This filter's compiled shader program.
    */
-  getUniformLocations(gl, program) {
+  getUniformLocations(
+    gl: WebGLRenderingContext,
+    program: WebGLProgram
+  ): TWebGLUniformLocationMap {
     return {
       uColorMatrix: gl.getUniformLocation(program, 'uColorMatrix'),
       uConstants: gl.getUniformLocation(program, 'uConstants'),
@@ -123,8 +98,11 @@ export class ColorMatrix extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
-  sendUniformData(gl, uniformLocations) {
-    var m = this.matrix,
+  sendUniformData(
+    gl: WebGLRenderingContext,
+    uniformLocations: TWebGLUniformLocationMap
+  ) {
+    const m = this.matrix,
       matrix = [
         m[0],
         m[1],
@@ -152,30 +130,21 @@ export class ColorMatrix extends filters.BaseFilter {
 export const colorMatrixDefaultValues: Partial<TClassProperties<ColorMatrix>> =
   {
     type: 'ColorMatrix',
-    fragmentSource:
-      'precision highp float;\n' +
-      'uniform sampler2D uTexture;\n' +
-      'varying vec2 vTexCoord;\n' +
-      'uniform mat4 uColorMatrix;\n' +
-      'uniform vec4 uConstants;\n' +
-      'void main() {\n' +
-      'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-      'color *= uColorMatrix;\n' +
-      'color += uConstants;\n' +
-      'gl_FragColor = color;\n' +
-      '}',
+    fragmentSource: `
+      precision highp float;
+      uniform sampler2D uTexture;
+      varying vec2 vTexCoord;
+      uniform mat4 uColorMatrix;
+      uniform vec4 uConstants;
+      void main() {
+        vec4 color = texture2D(uTexture, vTexCoord);
+        color *= uColorMatrix;
+        color += uConstants;
+        gl_FragColor = color;
+      }`,
     matrix: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
     mainParameter: 'matrix',
     colorsOnly: true,
   };
 
 Object.assign(ColorMatrix.prototype, colorMatrixDefaultValues);
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.ColorMatrix>}
- */
-fabric.Image.ColorMatrix.fromObject =
-  fabric.Image.filters.BaseFilter.fromObject;
