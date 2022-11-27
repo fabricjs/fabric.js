@@ -7,7 +7,7 @@ import { ifNaN } from './util/internals';
 import { loadImage } from './util/misc/objectEnlive';
 import { pick } from './util/misc/pick';
 import { toFixed } from './util/misc/toFixed';
-import { FabricObject } from './shapes/object.class';
+import { FabricObject } from './shapes/fabricObject.class';
 export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
 
 type TExportedKeys =
@@ -83,7 +83,6 @@ export class Pattern {
    * Constructor
    * @param {Object} [options] Options object
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
-   * @return {fabric.Pattern} thisArg
    */
   constructor(options: TPatternOptions = {}) {
     this.id = FabricObject.__uid++;
@@ -144,7 +143,7 @@ export class Pattern {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object} Object representation of a pattern instance
    */
-  toObject(propertiesToInclude: (keyof this)[]) {
+  toObject(propertiesToInclude?: (keyof this)[]) {
     return {
       ...pick(this, propertiesToInclude),
       type: 'pattern',
