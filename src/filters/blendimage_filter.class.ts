@@ -48,22 +48,12 @@ export class BlendImage extends AbstractBaseFilter {
 
   fragmentSource: Record<string, string>;
 
-  getFragmentSource(): string {
-    return this.fragmentSource[this.mode];
+  getCacheKey() {
+    return `${this.type}_${this.mode}`;
   }
 
-  /**
-   * Retrieves the cached shader.
-   * @param {Object} options
-   * @param {WebGLRenderingContext} options.context The GL context used for rendering.
-   * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
-   */
-  retrieveShader(options: TWebGLPipelineState) {
-    const cacheKey = `${this.type}_${this.mode}`;
-    if (!options.programCache[cacheKey]) {
-      options.programCache[cacheKey] = this.createProgram(options.context);
-    }
-    return options.programCache[cacheKey];
+  getFragmentSource(): string {
+    return this.fragmentSource[this.mode];
   }
 
   applyToWebGL(options: TWebGLPipelineState) {
