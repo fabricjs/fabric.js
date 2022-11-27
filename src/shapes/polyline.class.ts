@@ -218,7 +218,7 @@ export class Polyline extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[]): object {
+  toObject(propertiesToInclude?: (keyof this)[]): object {
     return {
       ...super.toObject(propertiesToInclude),
       points: this.points.concat(),
@@ -318,7 +318,7 @@ export class Polyline extends FabricObject {
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Polyline>}
    */
-  static fromObject(object: object): Promise<Polyline> {
+  static fromObject(object: Record<string, unknown>): Promise<Polyline> {
     return FabricObject._fromObject(Polyline, object, {
       extraParam: 'points',
     });

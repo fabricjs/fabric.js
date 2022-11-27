@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { Observable } from './observable.mixin';
 
-export class CommonMethods extends Observable {
+export class CommonMethods<EventSpec> extends Observable<EventSpec> {
   /**
    * Sets object's properties from options
    * @param {Object} [options] Options object

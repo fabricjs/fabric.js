@@ -331,22 +331,24 @@
   });
 
   QUnit.test('before:selection:cleared gets target the active object', function(assert) {
-    var passedTarget;
+    var deselected;
     canvas.on('before:selection:cleared', function(options) {
-      passedTarget = options.target;
+      deselected = options.deselected;
     });
     var rect = new fabric.Rect();
     canvas.add(rect);
     canvas.setActiveObject(rect);
     canvas.discardActiveObject();
-    assert.equal(passedTarget, rect, 'options.target was the removed object');
+    assert.equal(deselected.length, 1, 'options.deselected was the removed object');
+    assert.equal(deselected[0], rect, 'options.deselected was the removed object');
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     canvas.add(rect1, rect2);
     var activeSelection = new fabric.ActiveSelection([rect1, rect2], { canvas: canvas });
     canvas.setActiveObject(activeSelection);
     canvas.discardActiveObject();
-    assert.equal(passedTarget, activeSelection, 'removing an activeSelection pass that as a target');
+    assert.equal(deselected.length, 1, 'options.deselected was the removed object');
+    assert.equal(deselected[0], activeSelection, 'removing an activeSelection pass that as a target');
   });
 
   QUnit.test('selection:cleared', function(assert) {

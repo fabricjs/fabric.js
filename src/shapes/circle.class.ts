@@ -196,7 +196,7 @@ export class Circle extends FabricObject {
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Circle>}
    */
-  static fromObject(object: object): Promise<Circle> {
+  static fromObject(object: Record<string, unknown>): Promise<Circle> {
     return FabricObject._fromObject(Circle, object);
   }
 }
