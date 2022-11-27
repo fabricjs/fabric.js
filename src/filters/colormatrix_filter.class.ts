@@ -37,11 +37,12 @@ export class ColorMatrix extends BaseFilter {
    */
   colorsOnly: boolean;
 
-  setOptions(options: Record<string, any>): void {
-    if (options.matrix) {
+  setOptions({ matrix, ...options }: Record<string, any>) {
+    if (matrix) {
       // safeguard against mutation
-      this.matrix = [...options.matrix];
+      this.matrix = [...matrix];
     }
+    super.setOptions(options);
   }
 
   /**
