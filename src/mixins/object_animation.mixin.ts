@@ -1,9 +1,22 @@
-// @ts-nocheck
-
+import { noop } from 'lodash';
+import { ObjectEvents } from '../EventTypeDefs';
+import { TDegree } from '../typedefs';
 import { animate } from '../util/animate';
 import { animateColor } from '../util/animate_color';
+import { FabricObjectAncestryMixin } from './object_ancestry.mixin';
 
-export class FabricObjectObjectAnimationMixin {
+export abstract class AnimatableObject<
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends FabricObjectAncestryMixin<EventSpec> {
+  /**
+   * Animation duration (in ms) for fx* methods
+   * @type Number
+   * @default
+   */
+  FX_DURATION: number;
+
+  abstract rotate(deg: TDegree): void;
+
   /**
    * Animates object's properties
    * @param {String|Object} property Property to animate (if string) or properties to animate (if object)
@@ -82,7 +95,7 @@ export class FabricObjectObjectAnimationMixin {
       }
     }
 
-    const _options = {
+    const animationOptions = {
       target: this,
       startValue: options.from,
       endValue: to,
@@ -119,13 +132,63 @@ export class FabricObjectObjectAnimationMixin {
 
     if (propIsColor) {
       return animateColor(
-        _options.startValue,
-        _options.endValue,
-        _options.duration,
-        _options
+        animationOptions.startValue,
+        animationOptions.endValue,
+        animationOptions.duration,
+        animationOptions
       );
     } else {
-      return animate(_options);
+      return animate(animationOptions);
     }
+  }
+
+  /**
+   * @private
+   * @return {Number} angle value
+   */
+  _getAngleValueForStraighten() {
+    const angle = this.angle % 360;
+    if (angle > 0) {
+      return Math.round((angle - 1) / 90) * 90;
+    }
+    return Math.round(angle / 90) * 90;
+  }
+
+  /**
+   * Straightens an object (rotating it from current angle to one of 0, 90, 180, 270, etc. depending on which is closer)
+   */
+  straighten() {
+    this.rotate(this._getAngleValueForStraighten());
+  }
+
+  /**
+   * Same as {@link straighten} but with animation
+   * @param {Object} callbacks Object with callback functions
+   * @param {Function} [callbacks.onComplete] Invoked on completion
+   * @param {Function} [callbacks.onChange] Invoked on every step of animation
+   */
+  fxStraighten(
+    callbacks: {
+      onChange?(value: TDegree): any;
+      onComplete?(): any;
+    } = {}
+  ) {
+    const onComplete = callbacks.onComplete || noop,
+      onChange = callbacks.onChange || noop;
+
+    return animate({
+      target: this,
+      startValue: this.angle,
+      endValue: this._getAngleValueForStraighten(),
+      duration: this.FX_DURATION,
+      onChange: (value: TDegree) => {
+        this.rotate(value);
+        onChange(value);
+      },
+      onComplete: () => {
+        this.setCoords();
+        onComplete();
+      },
+    });
   }
 }
