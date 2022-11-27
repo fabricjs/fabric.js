@@ -1,12 +1,15 @@
+import { ObjectEvents } from '../EventTypeDefs';
 import { FabricObject } from '../shapes/fabricObject.class';
 
-type TextStyleDeclaration = Record<string, any>;
+export type TextStyleDeclaration = Record<string, any>;
 
 export type TextStyle = {
   [line: number | string]: { [char: number | string]: TextStyleDeclaration };
 };
 
-export abstract class TextStyleMixin extends FabricObject {
+export abstract class TextStyleMixin<
+  EventSpec extends ObjectEvents
+> extends FabricObject<EventSpec> {
   abstract styles: TextStyle;
   protected abstract _textLines: string[][];
   protected abstract _forceClearCache: boolean;
