@@ -1,22 +1,23 @@
-//@ts-nocheck
-'use strict';
-
-var fabric = global.fabric,
-  filters = fabric.Image.filters,
-  createClass = createClass;
+import { Image } from '../shapes/image.class';
+import { TClassProperties } from '../typedefs';
+import { createCanvasElement } from '../util/misc/dom';
+import { AbstractBaseFilter } from './base_filter.class';
+import {
+  T2DPipelineState,
+  TWebGLPipelineState,
+  TWebGLUniformLocationMap,
+} from './typedefs';
+import { WebGLFilterBackend } from './webgl_backend.class';
 
 /**
  * Image Blend filter class
- * @class fabric.Image.filter.BlendImage
- * @memberOf fabric.Image.filters
- * @extends fabric.Image.filters.BaseFilter
  * @example
- * var filter = new fabric.Image.filters.BlendColor({
+ * const filter = new filters.BlendColor({
  *  color: '#000',
  *  mode: 'multiply'
  * });
  *
- * var filter = new fabric.Image.BlendImage({
+ * const filter = new BlendImage({
  *  image: fabricImageObject,
  *  mode: 'multiply',
  *  alpha: 0.5
@@ -25,16 +26,12 @@ var fabric = global.fabric,
  * object.applyFilters();
  * canvas.renderAll();
  */
-
-export class BlendImage extends filters.BaseFilter {
-  /** @lends fabric.Image.BlendImage.prototype */
-  type: string;
-
+export class BlendImage extends AbstractBaseFilter {
   /**
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.
    **/
-  image;
+  image: Image;
 
   /**
    * Blend mode for the filter (one of "multiply", "mask")
@@ -49,12 +46,11 @@ export class BlendImage extends filters.BaseFilter {
    **/
   alpha: number;
 
-  vertexSource;
+  fragmentSource: Record<string, string>;
 
-  /**
-   * Fragment source for the Multiply program
-   */
-  fragmentSource;
+  getFragmentSource(): string {
+    return this.fragmentSource[this.mode];
+  }
 
   /**
    * Retrieves the cached shader.
@@ -62,28 +58,24 @@ export class BlendImage extends filters.BaseFilter {
    * @param {WebGLRenderingContext} options.context The GL context used for rendering.
    * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
    */
-  retrieveShader(options) {
-    var cacheKey = this.type + '_' + this.mode;
-    var shaderSource = this.fragmentSource[this.mode];
-    if (!options.programCache.hasOwnProperty(cacheKey)) {
-      options.programCache[cacheKey] = this.createProgram(
-        options.context,
-        shaderSource
-      );
+  retrieveShader(options: TWebGLPipelineState) {
+    const cacheKey = `${this.type}_${this.mode}`;
+    if (!options.programCache[cacheKey]) {
+      options.programCache[cacheKey] = this.createProgram(options.context);
     }
     return options.programCache[cacheKey];
   }
 
-  applyToWebGL(options) {
-    var gl = options.context,
+  applyToWebGL(options: TWebGLPipelineState) {
+    const gl = options.context,
       texture = this.createTexture(options.filterBackend, this.image);
     this.bindAdditionalTexture(gl, texture, gl.TEXTURE1);
     super.applyToWebGL(options);
     this.unbindAdditionalTexture(gl, gl.TEXTURE1);
   }
 
-  createTexture(backend, image) {
-    return backend.getCachedTexture(image.cacheKey, image._element);
+  createTexture(backend: WebGLFilterBackend, image: Image) {
+    return backend.getCachedTexture(image.cacheKey, image.getElement());
   }
 
   /**
@@ -93,9 +85,8 @@ export class BlendImage extends filters.BaseFilter {
    * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
    */
   calculateMatrix() {
-    var image = this.image,
-      width = image._element.width,
-      height = image._element.height;
+    const image = this.image,
+      { width, height } = image.getElement();
     return [
       1 / image.scaleX,
       0,
@@ -115,31 +106,16 @@ export class BlendImage extends filters.BaseFilter {
    * @param {Object} options
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
-  applyTo2d(options) {
-    var imageData = options.imageData,
-      resources = options.filterBackend.resources,
-      data = imageData.data,
-      iLen = data.length,
-      width = imageData.width,
-      height = imageData.height,
-      tr,
-      tg,
-      tb,
-      ta,
-      r,
-      g,
-      b,
-      a,
-      canvas1,
-      context,
-      image = this.image,
-      blendData;
-
+  applyTo2d({
+    imageData: { data, width, height },
+    filterBackend: { resources },
+  }: T2DPipelineState) {
+    const image = this.image;
     if (!resources.blendImage) {
       resources.blendImage = createCanvasElement();
     }
-    canvas1 = resources.blendImage;
-    context = canvas1.getContext('2d');
+    const canvas1 = resources.blendImage;
+    const context = canvas1.getContext('2d');
     if (canvas1.width !== width || canvas1.height !== height) {
       canvas1.width = width;
       canvas1.height = height;
@@ -154,18 +130,18 @@ export class BlendImage extends filters.BaseFilter {
       image.left,
       image.top
     );
-    context.drawImage(image._element, 0, 0, width, height);
-    blendData = context.getImageData(0, 0, width, height).data;
-    for (var i = 0; i < iLen; i += 4) {
-      r = data[i];
-      g = data[i + 1];
-      b = data[i + 2];
-      a = data[i + 3];
+    context.drawImage(image.getElement(), 0, 0, width, height);
+    const blendData = context.getImageData(0, 0, width, height).data;
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const a = data[i + 3];
 
-      tr = blendData[i];
-      tg = blendData[i + 1];
-      tb = blendData[i + 2];
-      ta = blendData[i + 3];
+      const tr = blendData[i];
+      const tg = blendData[i + 1];
+      const tb = blendData[i + 2];
+      const ta = blendData[i + 3];
 
       switch (this.mode) {
         case 'multiply':
@@ -187,7 +163,10 @@ export class BlendImage extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {WebGLShaderProgram} program This filter's compiled shader program.
    */
-  getUniformLocations(gl, program) {
+  getUniformLocations(
+    gl: WebGLRenderingContext,
+    program: WebGLProgram
+  ): TWebGLUniformLocationMap {
     return {
       uTransformMatrix: gl.getUniformLocation(program, 'uTransformMatrix'),
       uImage: gl.getUniformLocation(program, 'uImage'),
@@ -200,8 +179,11 @@ export class BlendImage extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
-  sendUniformData(gl, uniformLocations) {
-    var matrix = this.calculateMatrix();
+  sendUniformData(
+    gl: WebGLRenderingContext,
+    uniformLocations: TWebGLUniformLocationMap
+  ) {
+    const matrix = this.calculateMatrix();
     gl.uniform1i(uniformLocations.uImage, 1); // texture unit 1.
     gl.uniformMatrix3fv(uniformLocations.uTransformMatrix, false, matrix);
   }
@@ -218,67 +200,67 @@ export class BlendImage extends filters.BaseFilter {
       alpha: this.alpha,
     };
   }
+
+  /**
+   * Create filter instance from an object representation
+   * @static
+   * @param {object} object Object to create an instance from
+   * @param {object} [options]
+   * @param {AbortSignal} [options.signal] handle aborting image loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @returns {Promise<BlendImage>}
+   */
+  static fromObject(object, options) {
+    return Image.fromObject(object.image, options).then(
+      (image) => new BlendImage({ ...object, image })
+    );
+  }
 }
 
 export const blendImageDefaultValues: Partial<TClassProperties<BlendImage>> = {
   type: 'BlendImage',
-  image: null,
   mode: 'multiply',
   alpha: 1,
-  vertexSource:
-    'attribute vec2 aPosition;\n' +
-    'varying vec2 vTexCoord;\n' +
-    'varying vec2 vTexCoord2;\n' +
-    'uniform mat3 uTransformMatrix;\n' +
-    'void main() {\n' +
-    'vTexCoord = aPosition;\n' +
-    'vTexCoord2 = (uTransformMatrix * vec3(aPosition, 1.0)).xy;\n' +
-    'gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n' +
-    '}',
+  vertexSource: `
+    attribute vec2 aPosition;
+    varying vec2 vTexCoord;
+    varying vec2 vTexCoord2;
+    uniform mat3 uTransformMatrix;
+    void main() {
+      vTexCoord = aPosition;
+      vTexCoord2 = (uTransformMatrix * vec3(aPosition, 1.0)).xy;
+      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
+    }
+    `,
   fragmentSource: {
-    multiply:
-      'precision highp float;\n' +
-      'uniform sampler2D uTexture;\n' +
-      'uniform sampler2D uImage;\n' +
-      'uniform vec4 uColor;\n' +
-      'varying vec2 vTexCoord;\n' +
-      'varying vec2 vTexCoord2;\n' +
-      'void main() {\n' +
-      'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-      'vec4 color2 = texture2D(uImage, vTexCoord2);\n' +
-      'color.rgba *= color2.rgba;\n' +
-      'gl_FragColor = color;\n' +
-      '}',
-    mask:
-      'precision highp float;\n' +
-      'uniform sampler2D uTexture;\n' +
-      'uniform sampler2D uImage;\n' +
-      'uniform vec4 uColor;\n' +
-      'varying vec2 vTexCoord;\n' +
-      'varying vec2 vTexCoord2;\n' +
-      'void main() {\n' +
-      'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-      'vec4 color2 = texture2D(uImage, vTexCoord2);\n' +
-      'color.a = color2.a;\n' +
-      'gl_FragColor = color;\n' +
-      '}',
+    multiply: `
+      precision highp float;
+      uniform sampler2D uTexture;
+      uniform sampler2D uImage;
+      uniform vec4 uColor;
+      varying vec2 vTexCoord;
+      varying vec2 vTexCoord2;
+      void main() {
+        vec4 color = texture2D(uTexture, vTexCoord);
+        vec4 color2 = texture2D(uImage, vTexCoord2);
+        color.rgba *= color2.rgba;
+        gl_FragColor = color;
+      }
+      `,
+    mask: `
+      precision highp float;
+      uniform sampler2D uTexture;
+      uniform sampler2D uImage;
+      uniform vec4 uColor;
+      varying vec2 vTexCoord;
+      varying vec2 vTexCoord2;
+      void main() {
+        vec4 color = texture2D(uTexture, vTexCoord);
+        vec4 color2 = texture2D(uImage, vTexCoord2);
+        color.a = color2.a;
+        gl_FragColor = color;
+      }
+      `,
   },
 };
 
 Object.assign(BlendImage.prototype, blendImageDefaultValues);
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {object} object Object to create an instance from
- * @param {object} [options]
- * @param {AbortSignal} [options.signal] handle aborting image loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
- * @returns {Promise<fabric.Image.BlendImage>}
- */
-fabric.Image.BlendImage.fromObject = function (object, options) {
-  return fabric.Image.fromObject(object.image, options).then(function (image) {
-    return new fabric.Image.BlendImage(
-      Object.assign({}, object, { image: image })
-    );
-  });
-};
