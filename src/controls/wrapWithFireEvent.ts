@@ -1,4 +1,8 @@
-import { Transform, TransformActionHandler } from '../typedefs';
+import {
+  TModificationEvents,
+  Transform,
+  TransformActionHandler,
+} from '../EventTypeDefs';
 import { fireEvent } from '../util/fireEvent';
 import { commonEventInfo } from './util';
 
@@ -8,7 +12,7 @@ import { commonEventInfo } from './util';
  * @return {Function} a function with an action handler signature
  */
 export const wrapWithFireEvent = <T extends Transform>(
-  eventName: string,
+  eventName: TModificationEvents,
   actionHandler: TransformActionHandler<T>
 ) => {
   return ((eventData, transform, x, y) => {

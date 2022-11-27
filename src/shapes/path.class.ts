@@ -38,7 +38,7 @@ export class Path extends FabricObject {
    */
   constructor(
     path: PathData | string,
-    { path: _, left, top, ...options } = {}
+    { path: _, left, top, ...options }: any = {}
   ) {
     super(options);
 

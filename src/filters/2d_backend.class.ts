@@ -1,6 +1,7 @@
 /**
  * Canvas 2D filter backend.
  */
+import type { BaseFilter } from './base_filter.class';
 import { T2DPipelineState } from './typedefs';
 
 export class Canvas2dFilterBackend {
@@ -24,8 +25,8 @@ export class Canvas2dFilterBackend {
    * @param {HTMLCanvasElement} targetCanvas The destination for filtered output to be drawn.
    */
   applyFilters(
-    filters: any[],
-    sourceElement: HTMLImageElement | HTMLCanvasElement,
+    filters: BaseFilter[],
+    sourceElement: CanvasImageSource,
     sourceWidth: number,
     sourceHeight: number,
     targetCanvas: HTMLCanvasElement
@@ -47,7 +48,7 @@ export class Canvas2dFilterBackend {
       ctx,
       filterBackend: this,
     };
-    filters.forEach(function (filter) {
+    filters.forEach((filter) => {
       filter.applyTo(pipelineState);
     });
     const { imageData: imageDataPostFilter } = pipelineState;
