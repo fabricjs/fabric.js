@@ -1,7 +1,7 @@
 import { iMatrix } from '../../constants';
 import type { Point } from '../../point.class';
+import type { FabricObject } from '../../shapes/fabricObject.class';
 import type { TMat2D } from '../../typedefs';
-import { TObject } from '../../__types__';
 import { invertTransform, multiplyTransformMatrices } from './matrix';
 import { applyTransformToObject } from './objectTransforms';
 
@@ -128,7 +128,7 @@ export const transformPointRelativeToCanvas = (
  * @returns {Matrix} the transform matrix that was applied to `object`
  */
 export const sendObjectToPlane = (
-  object: TObject,
+  object: FabricObject,
   from?: TMat2D,
   to?: TMat2D
 ): TMat2D => {
