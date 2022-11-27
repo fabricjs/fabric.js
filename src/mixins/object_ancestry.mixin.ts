@@ -1,8 +1,11 @@
 import { fabric } from '../../HEADER';
+import { ObjectEvents } from '../EventTypeDefs';
 import type { Group } from '../shapes/group.class';
 import type { Canvas, StaticCanvas } from '../__types__';
+import { ObjectGeometry } from './object_geometry.mixin';
 
 type TAncestor = FabricObjectAncestryMixin | Canvas | StaticCanvas;
+type TCollection = Group | Canvas | StaticCanvas;
 
 /**
  * Strict: only ancestors that are objects (without canvas)
@@ -34,10 +37,9 @@ export type AncestryComparison<Strict> = {
   otherFork: Ancestors<Strict>;
 };
 
-export class FabricObjectAncestryMixin {
-  group?: Group;
-  canvas?: StaticCanvas | Canvas;
-
+export class FabricObjectAncestryMixin<
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends ObjectGeometry<EventSpec> {
   /**
    * Checks if object is descendant of target
    * Should be used instead of @link {Collection.contains} for performance reasons
@@ -80,16 +82,16 @@ export class FabricObjectAncestryMixin {
    * @param {boolean} [strict] finds only ancestors that are objects (without canvas)
    * @returns {AncestryComparison} an object that represent the ancestry situation.
    */
-  findCommonAncestors<T extends boolean>(
-    other: FabricObjectAncestryMixin,
-    strict?: T
-  ): AncestryComparison<T> {
+  findCommonAncestors<T extends this, S extends boolean>(
+    other: T,
+    strict?: S
+  ): AncestryComparison<S> {
     if (this === other) {
       return {
         fork: [],
         otherFork: [],
         common: [this, ...this.getAncestors(strict)],
-      } as AncestryComparison<T>;
+      } as AncestryComparison<S>;
     }
     const ancestors = this.getAncestors(strict);
     const otherAncestors = other.getAncestors(strict);
@@ -106,7 +108,7 @@ export class FabricObjectAncestryMixin {
           ...otherAncestors.slice(0, otherAncestors.length - 1),
         ],
         common: [this],
-      } as AncestryComparison<T>;
+      } as AncestryComparison<S>;
     }
     //  compare ancestors
     for (let i = 0, ancestor; i < ancestors.length; i++) {
@@ -116,7 +118,7 @@ export class FabricObjectAncestryMixin {
           fork: [this, ...ancestors.slice(0, i)],
           otherFork: [],
           common: ancestors.slice(i),
-        } as AncestryComparison<T>;
+        } as AncestryComparison<S>;
       }
       for (let j = 0; j < otherAncestors.length; j++) {
         if (this === otherAncestors[j]) {
@@ -124,14 +126,14 @@ export class FabricObjectAncestryMixin {
             fork: [],
             otherFork: [other, ...otherAncestors.slice(0, j)],
             common: [this, ...ancestors],
-          } as AncestryComparison<T>;
+          } as AncestryComparison<S>;
         }
         if (ancestor === otherAncestors[j]) {
           return {
             fork: [this, ...ancestors.slice(0, i)],
             otherFork: [other, ...otherAncestors.slice(0, j)],
             common: ancestors.slice(i),
-          } as AncestryComparison<T>;
+          } as AncestryComparison<S>;
         }
       }
     }
@@ -140,7 +142,7 @@ export class FabricObjectAncestryMixin {
       fork: [this, ...ancestors],
       otherFork: [other, ...otherAncestors],
       common: [],
-    } as AncestryComparison<T>;
+    } as AncestryComparison<S>;
   }
 
   /**
@@ -149,11 +151,42 @@ export class FabricObjectAncestryMixin {
    * @param {boolean} [strict] checks only ancestors that are objects (without canvas)
    * @returns {boolean}
    */
-  hasCommonAncestors(
-    other: FabricObjectAncestryMixin,
-    strict?: boolean
-  ): boolean {
+  hasCommonAncestors<T extends this>(other: T, strict?: boolean): boolean {
     const commonAncestors = this.findCommonAncestors(other, strict);
     return commonAncestors && !!commonAncestors.common.length;
+  }
+
+  /**
+   *
+   * @param {FabricObject} other object to compare against
+   * @returns {boolean | undefined} if objects do not share a common ancestor or they are strictly equal it is impossible to determine which is in front of the other; in such cases the function returns `undefined`
+   */
+  isInFrontOf<T extends this>(other: T): boolean | undefined {
+    if (this === other) {
+      return undefined;
+    }
+    const ancestorData = this.findCommonAncestors(other);
+    if (!ancestorData) {
+      return undefined;
+    }
+    if (ancestorData.fork.includes(other as any)) {
+      return true;
+    }
+    if (ancestorData.otherFork.includes(this as any)) {
+      return false;
+    }
+    const firstCommonAncestor = ancestorData.common[0];
+    if (!firstCommonAncestor) {
+      return undefined;
+    }
+    const headOfFork = ancestorData.fork.pop(),
+      headOfOtherFork = ancestorData.otherFork.pop(),
+      thisIndex = (firstCommonAncestor as TCollection)._objects.indexOf(
+        headOfFork as any
+      ),
+      otherIndex = (firstCommonAncestor as TCollection)._objects.indexOf(
+        headOfOtherFork as any
+      );
+    return thisIndex > -1 && thisIndex > otherIndex;
   }
 }

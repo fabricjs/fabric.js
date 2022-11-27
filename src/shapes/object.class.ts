@@ -4,7 +4,7 @@ import { cache } from '../cache';
 import { config } from '../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../constants';
 import { ObjectEvents } from '../EventTypeDefs';
-import { ObjectGeometry } from '../mixins/object_geometry.mixin';
+import { FabricObjectAncestryMixin } from '../mixins/object_ancestry.mixin';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
 import type { TClassProperties, TDegree, TFiller, TSize } from '../typedefs';
@@ -54,7 +54,7 @@ type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
  */
 export class FabricObject<
   EventSpec extends ObjectEvents = ObjectEvents
-> extends ObjectGeometry<EventSpec> {
+> extends FabricObjectAncestryMixin<EventSpec> {
   type: string;
 
   /**

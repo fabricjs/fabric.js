@@ -21,5 +21,5 @@ export type StaticCanvas = Record<string, any> & {
     br: Point;
   };
   getRetinaScaling(): number;
-  _objects: FabricObject;
+  _objects: FabricObject[];
 } & Observable<StaticCanvasEvents>;
