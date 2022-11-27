@@ -19,12 +19,21 @@ import { createCanvasElement } from '../util/misc/dom';
 
 const highPsourceCode = `precision ${WebGLPrecision.high} float`;
 
+export type AbstractBaseFilterOptions = {
+  mainParameter: string;
+  vertexSource: string;
+};
+
+export type BaseFilterOptions = AbstractBaseFilterOptions & {
+  fragmentSource: string;
+};
+
 /**
  * Root filter class from which all filter classes inherit from
  * @class fabric.Image.filters.BaseFilter
  * @memberOf fabric.Image.filters
  */
-export abstract class BaseFilter {
+export abstract class AbstractBaseFilter {
   /**
    * Filter type
    * @param {String} type
@@ -37,11 +46,10 @@ export abstract class BaseFilter {
    * @private
    */
   vertexSource: string;
-  fragmentSource: string;
 
   /**
    * Name of the parameter that can be changed in the filter.
-   * Some filters have more than one paramenter and there is no
+   * Some filters have more than one parameter and there is no
    * mainParameter
    * @private
    */
@@ -51,7 +59,7 @@ export abstract class BaseFilter {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options = {}) {
+  constructor(options: Partial<AbstractBaseFilterOptions> = {}) {
     this.setOptions(options);
   }
 
@@ -71,6 +79,8 @@ export abstract class BaseFilter {
     Object.assign(this, options);
   }
 
+  abstract getFragmentSource(): string;
+
   /**
    * Compile this filter's shader program.
    *
@@ -80,7 +90,7 @@ export abstract class BaseFilter {
    */
   createProgram(
     gl: WebGLRenderingContext,
-    fragmentSource: string = this.fragmentSource,
+    fragmentSource: string = this.getFragmentSource(),
     vertexSource: string = this.vertexSource
   ) {
     if (
@@ -392,19 +402,34 @@ export abstract class BaseFilter {
     // delegate, not alias
     return this.toObject();
   }
+
   /**
    * Create filter instance from an object representation
    * @static
    * @param {Object} object Object to create an instance from
    * @returns {Promise<fabric.Image.filters.BaseFilter>}
    */
-  static fromObject = function (object: any) {
+  static fromObject(object: any) {
     // todo: the class registry her
-    return Promise.resolve(new fabric.Image.filters[object.type](object));
-  };
+    return Promise.resolve<AbstractBaseFilter>(
+      new fabric.Image.filters[object.type](object)
+    );
+  }
 }
 
-Object.assign(BaseFilter.prototype, {
+export abstract class BaseFilter extends AbstractBaseFilter {
+  fragmentSource: string;
+
+  constructor(options?: Partial<BaseFilterOptions>) {
+    super(options);
+  }
+
+  getFragmentSource() {
+    return this.fragmentSource;
+  }
+}
+
+Object.assign(AbstractBaseFilter.prototype, {
   vertexSource: `
     attribute vec2 aPosition;
     varying vec2 vTexCoord;
@@ -412,7 +437,9 @@ Object.assign(BaseFilter.prototype, {
       vTexCoord = aPosition;
       gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
     }`,
+});
 
+Object.assign(BaseFilter.prototype, {
   fragmentSource: `
     ${highPsourceCode};
     varying vec2 vTexCoord;
@@ -421,7 +448,3 @@ Object.assign(BaseFilter.prototype, {
       gl_FragColor = texture2D(uTexture, vTexCoord);
     }`,
 });
-
-fabric.Image.filters = {
-  BaseFilter,
-};
