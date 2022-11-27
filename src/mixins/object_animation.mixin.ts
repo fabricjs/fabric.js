@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { noop } from 'lodash';
+import { noop } from '../constants';
 import { ObjectEvents } from '../EventTypeDefs';
 import { TDegree } from '../typedefs';
 import { animate } from '../util/animate';
