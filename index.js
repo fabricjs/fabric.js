@@ -15,12 +15,12 @@ import './src/canvas.class'; // optional interaction
 import './src/mixins/canvas_events.mixin'; // optional interaction
 import './src/mixins/canvas_grouping.mixin'; // optional interaction
 import './src/mixins/canvas_dataurl_exporter.mixin';
-import './src/mixins/canvas_serialization.mixin'; // optiona serialization
-import './src/mixins/canvas_gestures.mixin'; // optional gesturesv
-import './src/mixins/stateful.mixin'; // will die soon
+import './src/mixins/canvas_serialization.mixin'; // optional serialization
+import './src/mixins/canvas_gestures.mixin'; // optional gestures
 import './src/mixins/canvas_animation.mixin'; // optional animation
 import './src/mixins/canvas_straightening.mixin'; // optional animation
 import './src/shapes/fabricObject.class';
+import './src/mixins/stateful.mixin'; // will die soon
 import './src/shapes/line.class';
 import './src/shapes/circle.class';
 import './src/shapes/triangle.class';
@@ -32,7 +32,7 @@ import './src/shapes/path.class';
 import './src/shapes/group.class';
 import './src/shapes/active_selection.class'; // optional interaction
 import './src/shapes/image.class';
-import './src/mixins/object_straightening.mixin'; // optional objectstraightening
+import './src/mixins/object_straightening.mixin'; // optional object straightening
 import './src/filters/WebGLProbe'; // optional image_filters
 import './src/filters/base_filter.class'; // optional image_filters
 import './src/filters/colormatrix_filter.class'; // optional image_filters
