@@ -363,7 +363,7 @@ export class Text<
 
   initialized?: true;
 
-  constructor(text: string, options: object): Text {
+  constructor(text: string, options: object) {
     super({ ...options, text, styles: options?.styles || {} });
     this.initialized = true;
     if (this.path) {
