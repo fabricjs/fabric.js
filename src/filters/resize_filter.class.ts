@@ -1,36 +1,17 @@
-//@ts-nocheck
-'use strict';
-
-var fabric = global.fabric || (global.fabric = {}),
-  pow = Math.pow,
-  floor = Math.floor,
-  sqrt = Math.sqrt,
-  abs = Math.abs,
-  round = Math.round,
-  sin = Math.sin,
-  ceil = Math.ceil,
-  filters = fabric.Image.filters,
-  createClass = createClass;
+// @ts-nocheck
+import { fabric } from '../../HEADER';
+import { TClassProperties } from '../typedefs';
+import { BaseFilter } from './base_filter.class';
+import { isWebGLPipelineState, T2DPipelineState } from './typedefs';
 
 /**
  * Resize image filter class
- * @class fabric.Image.Resize
- * @memberOf fabric.Image.filters
- * @extends fabric.Image.filters.BaseFilter
- * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
- * var filter = new fabric.Image.Resize();
+ * const filter = new Resize();
  * object.filters.push(filter);
  * object.applyFilters(canvas.renderAll.bind(canvas));
  */
-export class Resize extends filters.BaseFilter {
-  /**
-   * Filter type
-   * @param {String} type
-   * @default
-   */
-  type: string;
-
+export class Resize extends BaseFilter {
   /**
    * Resize type
    * for webgl resizeType is just lanczos, for canvas2d can be:
@@ -61,7 +42,7 @@ export class Resize extends filters.BaseFilter {
    */
   lanczosLobes: number;
 
-  fragmentSourceTOP;
+  fragmentSourceTOP: string;
 
   /**
    * Return WebGL uniform locations for this filter's shader.
@@ -90,36 +71,27 @@ export class Resize extends filters.BaseFilter {
     gl.uniform1fv(uniformLocations.uTaps, this.taps);
   }
 
-  /**
-   * Retrieves the cached shader.
-   * @param {Object} options
-   * @param {WebGLRenderingContext} options.context The GL context used for rendering.
-   * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
-   */
-  retrieveShader(options) {
-    var filterWindow = this.getFilterWindow(),
-      cacheKey = this.type + '_' + filterWindow;
-    if (!options.programCache.hasOwnProperty(cacheKey)) {
-      var fragmentShader = this.generateShader(filterWindow);
-      options.programCache[cacheKey] = this.createProgram(
-        options.context,
-        fragmentShader
-      );
-    }
-    return options.programCache[cacheKey];
-  }
-
   getFilterWindow() {
-    var scale = this.tempScale;
+    const scale = this.tempScale;
     return Math.ceil(this.lanczosLobes / scale);
   }
 
+  getCacheKey(): string {
+    const filterWindow = this.getFilterWindow();
+    return `${this.type}_${filterWindow}`;
+  }
+
+  getFragmentSource(): string {
+    const filterWindow = this.getFilterWindow();
+    return this.generateShader(filterWindow);
+  }
+
   getTaps() {
-    var lobeFunction = this.lanczosCreate(this.lanczosLobes),
+    const lobeFunction = this.lanczosCreate(this.lanczosLobes),
       scale = this.tempScale,
       filterWindow = this.getFilterWindow(),
       taps = new Array(filterWindow);
-    for (var i = 1; i <= filterWindow; i++) {
+    for (let i = 1; i <= filterWindow; i++) {
       taps[i - 1] = lobeFunction(i * scale);
     }
     return taps;
@@ -129,34 +101,27 @@ export class Resize extends filters.BaseFilter {
    * Generate vertex and shader sources from the necessary steps numbers
    * @param {Number} filterWindow
    */
-  generateShader(filterWindow) {
-    var offsets = new Array(filterWindow),
-      fragmentShader = this.fragmentSourceTOP,
-      filterWindow;
+  generateShader(filterWindow: number) {
+    const offsets = new Array(filterWindow);
+    let fragmentShader = this.fragmentSourceTOP;
 
-    for (var i = 1; i <= filterWindow; i++) {
+    for (let i = 1; i <= filterWindow; i++) {
       offsets[i - 1] = i + '.0 * uDelta';
     }
 
-    fragmentShader += 'uniform float uTaps[' + filterWindow + '];\n';
-    fragmentShader += 'void main() {\n';
-    fragmentShader += '  vec4 color = texture2D(uTexture, vTexCoord);\n';
-    fragmentShader += '  float sum = 1.0;\n';
+    fragmentShader += `
+      uniform float uTaps[${filterWindow}];
+      void main() {
+        vec4 color = texture2D(uTexture, vTexCoord);
+        float sum = 1.0;
+      }
+    `;
 
-    offsets.forEach(function (offset, i) {
-      fragmentShader +=
-        '  color += texture2D(uTexture, vTexCoord + ' +
-        offset +
-        ') * uTaps[' +
-        i +
-        '];\n';
-      fragmentShader +=
-        '  color += texture2D(uTexture, vTexCoord - ' +
-        offset +
-        ') * uTaps[' +
-        i +
-        '];\n';
-      fragmentShader += '  sum += 2.0 * uTaps[' + i + '];\n';
+    offsets.forEach((offset, i) => {
+      fragmentShader += `
+        color += texture2D(uTexture, vTexCoord + ${offset}) * uTaps[${i}] + texture2D(uTexture, vTexCoord - ${offset}) * uTaps[${i}];
+        sum += 2.0 * uTaps[${i}];
+      `;
     });
     fragmentShader += '  gl_FragColor = color / sum;\n';
     fragmentShader += '}';
@@ -175,8 +140,8 @@ export class Resize extends filters.BaseFilter {
    * @param {WebGLRenderingContext} options.context The GL context used for rendering.
    * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
    */
-  applyTo(options) {
-    if (options.webgl) {
+  applyTo(options: TWebGLPipelineState | T2DPipelineState) {
+    if (isWebGLPipelineState(options)) {
       options.passes++;
       this.width = options.sourceWidth;
       this.horizontal = true;
@@ -209,8 +174,8 @@ export class Resize extends filters.BaseFilter {
     return this.scaleX === 1 && this.scaleY === 1;
   }
 
-  lanczosCreate(lobes) {
-    return function (x) {
+  lanczosCreate(lobes: number) {
+    return (x: number) => {
       if (x >= lobes || x <= -lobes) {
         return 0.0;
       }
@@ -218,30 +183,23 @@ export class Resize extends filters.BaseFilter {
         return 1.0;
       }
       x *= Math.PI;
-      var xx = x / lobes;
-      return ((sin(x) / x) * sin(xx)) / xx;
+      const xx = x / lobes;
+      return ((Math.sin(x) / x) * Math.sin(xx)) / xx;
     };
   }
 
-  /**
-   * Applies filter to canvas element
-   * @memberOf fabric.Image.Resize.prototype
-   * @param {Object} canvasEl Canvas element to apply filter to
-   * @param {Number} scaleX
-   * @param {Number} scaleY
-   */
-  applyTo2d(options) {
-    var imageData = options.imageData,
+  applyTo2d(options: T2DPipelineState) {
+    const imageData = options.imageData,
       scaleX = this.scaleX,
       scaleY = this.scaleY;
 
     this.rcpScaleX = 1 / scaleX;
     this.rcpScaleY = 1 / scaleY;
 
-    var oW = imageData.width,
+    let oW = imageData.width,
       oH = imageData.height,
-      dW = round(oW * scaleX),
-      dH = round(oH * scaleY),
+      dW = Math.round(oW * scaleX),
+      dH = Math.round(oH * scaleY),
       newData;
 
     if (this.resizeType === 'sliceHack') {
@@ -265,46 +223,50 @@ export class Resize extends filters.BaseFilter {
    * @param {Number} dH Destination Height
    * @returns {ImageData}
    */
-  sliceByTwo(options, oW, oH, dW, dH) {
-    var imageData = options.imageData,
+  sliceByTwo(
+    options: T2DPipelineState,
+    oW: number,
+    oH: number,
+    dW: number,
+    dH: number
+  ) {
+    let imageData = options.imageData,
       mult = 0.5,
       doneW = false,
       doneH = false,
       stepW = oW * mult,
       stepH = oH * mult,
-      resources = fabric.filterBackend.resources,
-      tmpCanvas,
-      ctx,
+      resources = options.filterBackend.resources,
       sX = 0,
       sY = 0,
       dX = oW,
       dY = 0;
     if (!resources.sliceByTwo) {
-      resources.sliceByTwo = document.createElement('canvas');
+      resources.sliceByTwo = fabric.document.createElement('canvas');
     }
-    tmpCanvas = resources.sliceByTwo;
+    const tmpCanvas = resources.sliceByTwo;
     if (tmpCanvas.width < oW * 1.5 || tmpCanvas.height < oH) {
       tmpCanvas.width = oW * 1.5;
       tmpCanvas.height = oH;
     }
-    ctx = tmpCanvas.getContext('2d');
+    const ctx = tmpCanvas.getContext('2d');
     ctx.clearRect(0, 0, oW * 1.5, oH);
     ctx.putImageData(imageData, 0, 0);
 
-    dW = floor(dW);
-    dH = floor(dH);
+    dW = Math.floor(dW);
+    dH = Math.floor(dH);
 
     while (!doneW || !doneH) {
       oW = stepW;
       oH = stepH;
-      if (dW < floor(stepW * mult)) {
-        stepW = floor(stepW * mult);
+      if (dW < Math.floor(stepW * mult)) {
+        stepW = Math.floor(stepW * mult);
       } else {
         stepW = dW;
         doneW = true;
       }
-      if (dH < floor(stepH * mult)) {
-        stepH = floor(stepH * mult);
+      if (dH < Math.floor(stepH * mult)) {
+        stepH = Math.floor(stepH * mult);
       } else {
         stepH = dH;
         doneH = true;
@@ -326,14 +288,20 @@ export class Resize extends filters.BaseFilter {
    * @param {Number} dH Destination Height
    * @returns {ImageData}
    */
-  lanczosResize(options, oW, oH, dW, dH) {
+  lanczosResize(
+    options: T2DPipelineState,
+    oW: number,
+    oH: number,
+    dW: number,
+    dH: number
+  ) {
     function process(u) {
-      var v, i, weight, idx, a, red, green, blue, alpha, fX, fY;
+      let v, i, weight, idx, a, red, green, blue, alpha, fX, fY;
       center.x = (u + 0.5) * ratioX;
-      icenter.x = floor(center.x);
+      icenter.x = Math.floor(center.x);
       for (v = 0; v < dH; v++) {
         center.y = (v + 0.5) * ratioY;
-        icenter.y = floor(center.y);
+        icenter.y = Math.floor(center.y);
         a = 0;
         red = 0;
         green = 0;
@@ -343,18 +311,20 @@ export class Resize extends filters.BaseFilter {
           if (i < 0 || i >= oW) {
             continue;
           }
-          fX = floor(1000 * abs(i - center.x));
+          fX = Math.floor(1000 * Math.abs(i - center.x));
           if (!cacheLanc[fX]) {
             cacheLanc[fX] = {};
           }
-          for (var j = icenter.y - range2Y; j <= icenter.y + range2Y; j++) {
+          for (let j = icenter.y - range2Y; j <= icenter.y + range2Y; j++) {
             if (j < 0 || j >= oH) {
               continue;
             }
-            fY = floor(1000 * abs(j - center.y));
+            fY = Math.floor(1000 * Math.abs(j - center.y));
             if (!cacheLanc[fX][fY]) {
               cacheLanc[fX][fY] = lanczos(
-                sqrt(pow(fX * rcpRatioX, 2) + pow(fY * rcpRatioY, 2)) / 1000
+                Math.sqrt(
+                  Math.pow(fX * rcpRatioX, 2) + Math.pow(fY * rcpRatioY, 2)
+                ) / 1000
               );
             }
             weight = cacheLanc[fX][fY];
@@ -382,7 +352,7 @@ export class Resize extends filters.BaseFilter {
       }
     }
 
-    var srcData = options.imageData.data,
+    const srcData = options.imageData.data,
       destImg = options.ctx.createImageData(dW, dH),
       destData = destImg.data,
       lanczos = this.lanczosCreate(this.lanczosLobes),
@@ -390,8 +360,8 @@ export class Resize extends filters.BaseFilter {
       ratioY = this.rcpScaleY,
       rcpRatioX = 2 / this.rcpScaleX,
       rcpRatioY = 2 / this.rcpScaleY,
-      range2X = ceil((ratioX * this.lanczosLobes) / 2),
-      range2Y = ceil((ratioY * this.lanczosLobes) / 2),
+      range2X = Math.ceil((ratioX * this.lanczosLobes) / 2),
+      range2Y = Math.ceil((ratioY * this.lanczosLobes) / 2),
       cacheLanc = {},
       center = {},
       icenter = {};
@@ -408,8 +378,14 @@ export class Resize extends filters.BaseFilter {
    * @param {Number} dH Destination Height
    * @returns {ImageData}
    */
-  bilinearFiltering(options, oW, oH, dW, dH) {
-    var a,
+  bilinearFiltering(
+    options: T2DPipelineState,
+    oW: number,
+    oH: number,
+    dW: number,
+    dH: number
+  ) {
+    let a,
       b,
       c,
       d,
@@ -432,8 +408,8 @@ export class Resize extends filters.BaseFilter {
       destPixels = destImage.data;
     for (i = 0; i < dH; i++) {
       for (j = 0; j < dW; j++) {
-        x = floor(ratioX * j);
-        y = floor(ratioY * i);
+        x = Math.floor(ratioX * j);
+        y = Math.floor(ratioY * i);
         xDiff = ratioX * j - x;
         yDiff = ratioY * i - y;
         origPix = 4 * (y * oW + x);
@@ -464,18 +440,24 @@ export class Resize extends filters.BaseFilter {
    * @param {Number} dH Destination Height
    * @returns {ImageData}
    */
-  hermiteFastResize(options, oW, oH, dW, dH) {
-    var ratioW = this.rcpScaleX,
+  hermiteFastResize(
+    options: T2DPipelineState,
+    oW: number,
+    oH: number,
+    dW: number,
+    dH: number
+  ) {
+    const ratioW = this.rcpScaleX,
       ratioH = this.rcpScaleY,
-      ratioWHalf = ceil(ratioW / 2),
-      ratioHHalf = ceil(ratioH / 2),
+      ratioWHalf = Math.ceil(ratioW / 2),
+      ratioHHalf = Math.ceil(ratioH / 2),
       img = options.imageData,
       data = img.data,
       img2 = options.ctx.createImageData(dW, dH),
       data2 = img2.data;
-    for (var j = 0; j < dH; j++) {
-      for (var i = 0; i < dW; i++) {
-        var x2 = (i + j * dW) * 4,
+    for (let j = 0; j < dH; j++) {
+      for (let i = 0; i < dW; i++) {
+        let x2 = (i + j * dW) * 4,
           weight = 0,
           weights = 0,
           weightsAlpha = 0,
@@ -484,13 +466,13 @@ export class Resize extends filters.BaseFilter {
           gxB = 0,
           gxA = 0,
           centerY = (j + 0.5) * ratioH;
-        for (var yy = floor(j * ratioH); yy < (j + 1) * ratioH; yy++) {
-          var dy = abs(centerY - (yy + 0.5)) / ratioHHalf,
+        for (let yy = Math.floor(j * ratioH); yy < (j + 1) * ratioH; yy++) {
+          const dy = Math.abs(centerY - (yy + 0.5)) / ratioHHalf,
             centerX = (i + 0.5) * ratioW,
             w0 = dy * dy;
-          for (var xx = floor(i * ratioW); xx < (i + 1) * ratioW; xx++) {
-            var dx = abs(centerX - (xx + 0.5)) / ratioWHalf,
-              w = sqrt(w0 + dx * dx);
+          for (let xx = Math.floor(i * ratioW); xx < (i + 1) * ratioW; xx++) {
+            let dx = Math.abs(centerX - (xx + 0.5)) / ratioWHalf,
+              w = Math.sqrt(w0 + dx * dx);
             /* eslint-disable max-depth */
             if (w > 1 && w < -1) {
               continue;
@@ -552,11 +534,3 @@ export const resizeDefaultValues: Partial<TClassProperties<Resize>> = {
 };
 
 Object.assign(Resize.prototype, resizeDefaultValues);
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.Resize>}
- */
-fabric.Image.Resize.fromObject = fabric.Image.filters.BaseFilter.fromObject;
