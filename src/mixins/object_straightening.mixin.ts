@@ -1,10 +1,16 @@
-// @ts-nocheck
-
+import { noop } from '../constants';
 import type { FabricObject } from '../shapes/fabricObject.class';
 import { TDegree } from '../typedefs';
 import { animate } from '../util/animate';
 
 export class FabricObjectObjectStraighteningMixin {
+  /**
+   * Animation duration (in ms) for fx* methods
+   * @type Number
+   * @default
+   */
+  FX_DURATION = 500;
+
   /**
    * @private
    * @return {Number} angle value
@@ -36,19 +42,16 @@ export class FabricObjectObjectStraighteningMixin {
   fxStraighten(
     this: FabricObject & this,
     callbacks: {
-      onChange(value: TDegree): any;
-      onComplete(): any;
-    }
+      onChange?(value: TDegree): any;
+      onComplete?(): any;
+    } = {}
   ) {
-    callbacks = callbacks || {};
-
-    const empty = function () {},
-      onComplete = callbacks.onComplete || empty,
-      onChange = callbacks.onChange || empty;
+    const onComplete = callbacks.onComplete || noop,
+      onChange = callbacks.onChange || noop;
 
     return animate({
       target: this,
-      startValue: this.get('angle'),
+      startValue: this.angle,
       endValue: this._getAngleValueForStraighten(),
       duration: this.FX_DURATION,
       onChange: (value: TDegree) => {
