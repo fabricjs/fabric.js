@@ -52,7 +52,7 @@ export abstract class AnimatableObject<
   animate<T, S extends string | Record<string, T>>(
     arg0: S,
     arg1: S extends string ? T : TAnimationOptions,
-    arg2?: TAnimationOptions
+    arg2?: S extends string ? TAnimationOptions : never
   ) {
     const animatable = (
       typeof arg0 === 'string' ? { [arg0]: arg1 } : arg0
