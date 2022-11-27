@@ -3,6 +3,7 @@ const path = require('path');
 const chalk = require('chalk');
 const http = require('http');
 const busboy = require('busboy');
+const { URLSearchParams } = require('node:url');
 
 const wd = path.resolve(__dirname, '..');
 
@@ -41,19 +42,38 @@ function startGoldensServer() {
     const server = http
         .createServer(async (req, res) => {
             if (req.method.toUpperCase() === 'GET' && req.url === '/') {
-                res.end('This endpoint is used by fabric.js and testem to generate goldens');
+                res.end('This endpoint is used by fabric.js for the browser visual test suite');
             }
-            else if (req.method.toUpperCase() === 'GET') {
-                const filename = req.url.split('/golden/')[1] || req.url;
+            else if (req.method.toUpperCase() === 'GET' && req.url.startsWith('/goldens')) {
+                const filename = new URLSearchParams(req.url.split('?').pop()).get('name');
                 const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
                 res.end(JSON.stringify({ exists: fs.existsSync(goldenPath) }));
             }
-            else if (req.method.toUpperCase() === 'POST') {
+            else if (req.method.toUpperCase() === 'POST' && req.url === '/goldens') {
                 const { files: [{ rawData }], fields: { filename } } = await parseRequest(req);
-                const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename.split('/golden/')[1]);
+                const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
                 console.log(chalk.gray('[info]'), `creating golden ${path.relative(wd, goldenPath)}`);
                 fs.writeFileSync(goldenPath, rawData, { encoding: 'binary' });
                 res.end();
+            }
+            else if (req.method.toUpperCase() === 'POST' && req.url === '/goldens/results') {
+                const { files, fields: { filename, runner, test, module, passing } } = await parseRequest(req);
+                const basename = filename.replace('.png', '');
+                const dumpsPath = path.resolve(process.env.REPORT_DIR, runner, basename);
+                fs.ensureDirSync(dumpsPath);
+                fs.writeFileSync(path.resolve(dumpsPath, 'info.json'), JSON.stringify({
+                    module,
+                    test,
+                    file: basename,
+                    passing: JSON.parse(passing)
+                }, null, 2));
+                const out = { name: basename, dir: dumpsPath };
+                files.forEach(({ rawData, filename }) => {
+                    const filePath = path.resolve(dumpsPath, filename);
+                    fs.writeFileSync(filePath, rawData, { encoding: 'binary' });
+                    out[path.basename(filePath, '.png')] = path.relative('.', filePath);
+                });
+                res.end(JSON.stringify(out));
             }
         }).listen();
     const port = server.address().port;

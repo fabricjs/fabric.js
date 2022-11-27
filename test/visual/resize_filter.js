@@ -18,7 +18,7 @@
   var tests = [];
 
   function imageResizeTest(canvas, callback) {
-    getFixture('parrot.png', false, function(img) {
+    getFixture('parrot.png', function(img) {
       var zoom = 8;
       var image = new fabric.Image(img);
       image.resizeFilter = new fabric.Image.filters.Resize({ resizeType: 'lanczos' });
@@ -46,7 +46,7 @@
   });
 
   function imageResizeTestNoZoom(canvas, callback) {
-    getFixture('parrot.png', false, function(img) {
+    getFixture('parrot.png', function(img) {
       var image = new fabric.Image(img);
       image.resizeFilter = new fabric.Image.filters.Resize({ resizeType: 'lanczos' });
       image.scaleToWidth(canvas.width);
@@ -68,7 +68,7 @@
   });
 
   function imageResizeTestAnamorphic(canvas, callback) {
-    getFixture('parrot.png', false, function(img) {
+    getFixture('parrot.png', function(img) {
       var image = new fabric.Image(img);
       image.resizeFilter = new fabric.Image.filters.Resize({ resizeType: 'lanczos' });
       image.scaleY = 0.3;
@@ -91,7 +91,7 @@
   });
 
   function imageResizeTestGroup(canvas, callback) {
-    getFixture('parrot.png', false, function(img) {
+    getFixture('parrot.png', function(img) {
       var image = new fabric.Image(img, { strokeWidth: 0 });
       image.resizeFilter = new fabric.Image.filters.Resize({ resizeType: 'lanczos' });
       var group = new fabric.Group([image]);
@@ -115,7 +115,7 @@
   });
 
   function blendImageTest2(canvas, callback) {
-    getFixture('parrot.png', false, function(img) {
+    getFixture('parrot.png', function(img) {
       var image = new fabric.Image(img);
       var backdropImage = new fabric.Image(img);
       backdropImage.left = backdropImage.width;
@@ -142,8 +142,8 @@
   });
 
   function blendImageTest(canvas, callback) {
-    getFixture('parrot.png', false, function(img) {
-      getFixture('very_large_image.jpg', false, function(backdrop) {
+    getFixture('parrot.png', function(img) {
+      getFixture('very_large_image.jpg', function(backdrop) {
         var image = new fabric.Image(img);
         var backdropImage = new fabric.Image(backdrop);
         image.filters.push(new fabric.Image.filters.BlendImage({image: backdropImage, alpha: 0.5 }));

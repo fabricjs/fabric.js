@@ -7,24 +7,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      stats: ${{ steps.b.outputs.result }}
     steps:
       - uses: actions/checkout@v3
-      - name: Uglified build
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16.x
-      - run: npm ci
-      - run: npm run build
-  stats:
-    name: Build stats
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
+          cache: npm
       - run: npm ci
       - name: build stats
         run: npm run build
@@ -38,6 +28,19 @@ jobs:
             return JSON.stringify({
               size: { fabric: { minified: fs.statSync('dist/fabric.min.js').size, bundled: fs.statSync('dist/fabric.js').size } }
             });
+  stats:
+    name: Build stats
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: npm
+      - run: npm ci
       - name: checkout src files
         run: git checkout origin/master -- src index.js HEADER.js
       - name: upstream build stats
@@ -63,46 +66,30 @@ jobs:
               context,
               core,
               a: JSON.parse('${{ steps.a.outputs.result }}'),
-              b: JSON.parse('${{ steps.b.outputs.result }}'),
+              b: JSON.parse('${{ needs.build.outputs.stats }}'),
             });
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Linting
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16.x
+          cache: npm
       - run: npm ci
       - run: npm run lint
   prettier:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Prettier check
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16.x
+          cache: npm
       - run: npm ci
       - run: npm run prettier:check
-  coverage:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Code Coverage Report Updater
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16.x
-      - run: npm ci
-      - run: npm run build -- -f
-      - run: npm run test:coverage && npm run test:visual:coverage
-      - run: npm run coverage:report
-      - uses: ShaMan123/lcov-reporter-action@v1.1.1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          delete-old-comments: true
-          update-comment: true
   changelog:
     if: ${{ always() }}
     runs-on: ubuntu-latest

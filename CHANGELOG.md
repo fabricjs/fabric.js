@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): fixed visual tests not to create a missing golden when running from CI and to fail instead + improve visual test suite [#8311](https://github.com/fabricjs/fabric.js/pull/8311)
 - chore(TS): BaseBrush abstract methods [#8428](https://github.com/fabricjs/fabric.js/pull/8428)
 - feat(): Add `createObjectDefaultControls` and `createTextboxDefaultControls` to create copies of control sets. [#8415](https://github.com/fabricjs/fabric.js/pull/8415)
 - fix(PatternBrush): `getPatternSrc`, rm `getPatternSrcFunction` [#8468](https://github.com/fabricjs/fabric.js/pull/8468)

@@ -7,47 +7,74 @@ on:
 
 jobs:
   browser:
-    name: ${{ matrix.target }} ${{ matrix.suite }} tests
+    name: ${{ matrix.target }} tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [16.x]
         target: [chrome, firefox]
-        suite: [unit, visual]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v2
-      - name: Unit tests on Chrome
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          cache: npm
       - run: npm ci
       - run: npm run build -- -f
-      - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
-        uses: GabrielBB/xvfb-action@v1
+      - name: Run browser headless test
+        run: xvfb-run -a npm run test -- -c ${{ matrix.target }} -s unit visual
+      - name: Archive test results
+        if: failure()
+        uses: actions/upload-artifact@v3
         with:
-          run: npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
+          name: test-results
+          path: cli_output/test_results
   node:
     runs-on: ubuntu-latest
-    name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
+    name: Node ${{ matrix.node-version }} tests
     strategy:
       fail-fast: false
       matrix:
         # For more information see:
         # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
         # supported Node.js release schedule: https://nodejs.org/en/about/releases/
-        node-version: [14.x, 16.x, 18.x]
-        suite: [unit, visual]
+        node-version: [14, 16, 18]
+    env:
+      flag: ${{ (matrix.node-version == 16 && '--coverage') || '' }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install node-canvas
         run: sudo apt-get install libgif-dev libpng-dev libpango1.0-dev libjpeg8-dev librsvg2-dev libcairo2-dev
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ matrix.node-version }}.x
+          cache: npm
       - run: npm ci
-      - name: Build
-        run: npm run build -- -f
-      - name: Run ${{ matrix.suite }} tests
-        run: npm run test -- -c node -s ${{ matrix.suite }}
+      - run: npm run build -- -f
+      - name: Run tests
+        run: npm run test -- -c node -a ${{ env.flag }}
+      - name: Prepare Coverage Report
+        if: matrix.node-version == 16 && always()
+        run: npm run coverage:report
+      - name: Post Coverage Report
+        if: matrix.node-version == 16 && always()
+        uses: ShaMan123/lcov-reporter-action@v1.1.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          delete-old-comments: true
+          update-comment: true
+      - name: Rename artifact (*node > *node${{ matrix.node-version }})
+        if: failure()
+        run: |
+          mv cli_output/test_results/visual/node.txt cli_output/test_results/visual/node${{ matrix.node-version }}.txt
+          mv cli_output/test_results/unit/node.txt cli_output/test_results/unit/node${{ matrix.node-version }}.txt
+          src=cli_output/test_results/visual/node
+          [ ! -d $src ] || mv $src ${src}${{ matrix.node-version }}
+      - name: Archive visual test results
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: cli_output/test_results

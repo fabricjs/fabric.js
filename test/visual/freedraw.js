@@ -2232,11 +2232,11 @@ QUnit.module('Free Drawing', hooks => {
 
   async function patternFromSource(canvas) {
     var brush = new fabric.PatternBrush(canvas);
-    brush.source = await new Promise(resolve => getFixture('greyfloral.png', false, resolve));
+    brush.source = await new Promise(resolve => getFixture('greyfloral.png', resolve));
     brush.color = 'red';
     brush.width = 25;
     pointDrawer(points, brush, true);
-    brush.source = await new Promise(resolve => getFixture('parrot.png', false, resolve));
+    brush.source = await new Promise(resolve => getFixture('parrot.png', resolve));
     brush.width = 7;
     pointDrawer(points, brush);
   }

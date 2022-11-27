@@ -62,8 +62,6 @@
     "test:unit-browser": "npm run test -- -s unit -p 8080 -l -c ",
     "test:visual-browser": "npm run test -- -s visual -p 8080 -l -c ",
     "test": "npm run cli -- test",
-    "test:coverage": "nyc --silent qunit test/node_test_setup.js test/lib test/unit",
-    "test:visual:coverage": "nyc --silent --no-clean qunit test/node_test_setup.js test/lib test/visual",
     "coverage:report": "nyc report --reporter=lcov --reporter=text",
     "lint": "eslint --config .eslintrc.js src/**/*.ts",
     "lint_tests": "eslint test/unit --config .eslintrc_tests && eslint test/visual --config .eslintrc_tests",

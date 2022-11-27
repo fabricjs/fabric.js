@@ -7,6 +7,8 @@
 <script src="/node_modules/qunit/qunit/qunit.js"></script>
 <link rel="stylesheet" href="/node_modules/qunit/qunit/qunit.css"/>
 
+<script src="/node_modules/pixelmatch/index.js"></script>
+
 <script src="/node_modules/source-map-support/browser-source-map-support.js"></script>
 <script>sourceMapSupport.install();</script>
 
@@ -14,15 +16,15 @@
 {{#serve_files}}<script src="{{{src}}}"{{#attrs}} {{&.}}{{/attrs}}></script>{{/serve_files}}
 
 <script>
+// true when running from github action
+window.CI = {{CI}};
+
+// QUnit config
 QUnit.config.reorder = false;
+{{#qunit.filter}}QUnit.config.filter = {{qunit.filter}};{{/qunit.filter}}
 QUnit.config.noglobals = true;
 QUnit.config.hidepassed = true;
-QUnit.config.testTimeout = 15000;
-</script>
-
-{{#visual}}
-<script>
-QUnit.testDone(visualCallback.testDone.bind(visualCallback));
+QUnit.config.testTimeout = {{qunit.timeout}};
 
 // global error handling
 window.addEventListener('unhandledrejection', (event) => {
@@ -37,6 +39,48 @@ window.addEventListener('error', (event) => {
   QUnit.onUncaughtException(event.error);
 });
 
+</script>
+
+{{#visual}}
+<script>
+
+const testIdToFileMap = {};
+{{launch}} && QUnit.testDone(test => appendTestResults(testIdToFileMap, test));
+const RUNNER_ID = getRunnerId();
+
+/**
+ * visual testing
+ * @param {*} callback 
+ * @param {*} file 
+ * @param {*} options 
+ */
+QUnit.assert.visualEqual = async function assertVisualEqual(callback, file, options) {
+  const done = this.async();
+  const result = await visualAssertion.call({
+    pixelmatch,
+    getGolden,
+    goldenExists,
+    generateGolden,
+    shouldFailIfNotFound: () => {{CI}},
+    shouldGenerateGolden: passing =>
+      !this.todo && !options.testOnly && ((!passing && {{testActions.debug}}) || {{testActions.recreate}}),
+    shouldDumpResults: passing => {{launch}} || !passing,
+    dumpResults,
+    testName: this.test.testName,
+    moduleName: this.test.module.name
+  }, callback, file, options);
+  this.pushResult(result);
+  const basename = /(.*)\..*/.exec(file)[1];
+  testIdToFileMap[this.test.testId] = {
+    name: file,
+    basename,
+    expected: `/results/${RUNNER_ID}/${basename}/expected.png`,
+    actual: `/results/${RUNNER_ID}/${basename}/actual.png`,
+    diff: `/results/${RUNNER_ID}/${basename}/diff.png`,
+  };
+  done();
+}
+
 function downloadGoldens() {
     const checkbox = document.getElementById('qunit-urlconfig-hidepassed');
     checkbox.checked && checkbox.click();
@@ -46,27 +90,6 @@ function downloadGoldens() {
         link.download = canvas.getAttribute('data-golden');
         link.click();
     });
-}
-
-//  https://stackoverflow.com/questions/4565112/javascript-how-to-find-out-if-the-user-browser-is-chrome/13348618#13348618
-var isChromium = window.chrome;
-var winNav = window.navigator;
-var vendorName = winNav.vendor;
-var isOpera = typeof window.opr !== "undefined";
-var isIEedge = winNav.userAgent.indexOf("Edg") > -1;
-var isIOSChrome = winNav.userAgent.match("CriOS");
-if(
-  isIOSChrome || 
-  (isChromium !== null &&
-  //typeof isChromium !== "undefined" &&    //  fails on headless chrome
-  vendorName === "Google Inc." &&
-  isOpera === false &&
-  isIEedge === false)
-) {
-   // is Google Chrome
-    QUnit.recreateVisualRefs = {{qunit.recreate}};
-    QUnit.debugVisual = {{qunit.debug}};
-    {{#qunit.filter}}QUnit.config.filter = {{qunit.filter}};{{/qunit.filter}}
 }
 </script>
 {{/visual}}

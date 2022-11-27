@@ -2,16 +2,6 @@
   fabric.config.configure({
     enableGLFiltering: false
   });
-  var visualTestLoop;
-  var getAssetName;
-  if (fabric.isLikelyNode) {
-    visualTestLoop = global.visualTestLoop;
-    getAssetName = global.getAssetName;
-  }
-  else {
-    visualTestLoop = window.visualTestLoop;
-    getAssetName = window.getAssetName;
-  }
 
   function svgToDataURL(svgStr) {
     var encoded = encodeURIComponent(svgStr)
@@ -402,11 +392,13 @@
   });
 
   function multipleGradients(canvas, callback) {
-    fabric.loadSVGFromURL(getAssetName('svg_linear_9'), function(objects) {
-      var group = fabric.util.groupSVGElements(objects);
-      canvas.add(group);
-      toSVGCanvas(canvas, callback);
-    });
+    getAsset('svg_linear_9', (err, svg) => {
+      fabric.loadSVGFromString(svg, function (objects) {
+        var group = fabric.util.groupSVGElements(objects);
+        canvas.add(group);
+        toSVGCanvas(canvas, callback);
+      });
+    });    
   }
 
   tests.push({

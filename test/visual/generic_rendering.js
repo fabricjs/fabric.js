@@ -309,7 +309,7 @@
   });
 
   function canvasPattern(fabricCanvas, callback) {
-    getFixture('diet.jpeg', false, function(img) {
+    getFixture('diet.jpeg', function(img) {
       var pattern = new fabric.Pattern({
         source: img,
         repeat: 'repeat',
@@ -333,7 +333,7 @@
   });
 
   function canvasPatternMultiplier(fabricCanvas, callback) {
-    getFixture('diet.jpeg', false, function(img2) {
+    getFixture('diet.jpeg', function(img2) {
       var pattern = new fabric.Pattern({
         source: img2,
         repeat: 'repeat',
@@ -357,7 +357,7 @@
   });
 
   function imageSmoothing(fabricCanvas, callback) {
-    getFixture('greyfloral.png', false, function(img2) {
+    getFixture('greyfloral.png', function(img2) {
       var fImg = new fabric.Image(img2, { imageSmoothing: false, scaleX: 10, scaleY: 10 });
       var fImg2 = new fabric.Image(img2, { left: 400, scaleX: 10, scaleY: 10 });
       fabricCanvas.add(fImg);

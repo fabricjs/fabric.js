@@ -26,7 +26,7 @@ import process from 'node:process';
 import os from 'os';
 import { build } from './build.mjs';
 import { awaitBuild } from './buildLock.mjs';
-import { CLI_CACHE, wd } from './dirname.mjs';
+import { CLI_CACHE, testResultsPath, wd, __dirname } from './dirname.mjs';
 import { listFiles, transform as transformFiles } from './transform_files.mjs';
 
 const program = new commander.Command();
@@ -237,6 +237,17 @@ function exportToWebsite(options) {
   });
 }
 
+function logTestResults(dir, context, suite) {
+  console.log(
+    `\n\n${chalk.underline(
+      chalk.cyan(`${_.upperFirst(context)} ${_.upperFirst(suite)} Test Results`)
+    )}\n`
+  );
+  console.log(
+    fs.readFileSync(path.resolve(dir, suite, `${context}.txt`)).toString()
+  );
+}
+
 /**
  *
  * @returns {Promise<boolean | undefined>} true if some tests failed
@@ -246,6 +257,8 @@ async function runTestem({
   port,
   launch,
   dev,
+  parallel,
+  out,
   processOptions,
   context,
 } = {}) {
@@ -275,21 +288,38 @@ async function runTestem({
     context.map(_.upperFirst).join(','),
   ];
 
-  if (dev) {
+  if (dev || launch) {
     cp.spawn(['testem', ...processCmdOptions].join(' '), {
       ...processOptions,
       detached: true,
     });
   } else {
-    try {
-      cp.execSync(
-        ['testem', 'ci', ...processCmdOptions].join(' '),
-        processOptions
-      );
-    } catch (error) {
-      return true;
+    const cmd = ['testem', 'ci', ...processCmdOptions].join(' ');
+    if (parallel) {
+      return new Promise((resolve) => {
+        cp.spawn(cmd, {
+          ...processOptions,
+          detached: true,
+        }).on('exit', (code) => {
+          context.forEach((c) => {
+            logTestResults(out, c, suite);
+          });
+          resolve(code);
+        });
+      });
+    } else {
+      try {
+        cp.execSync(cmd, processOptions);
+      } catch (error) {
+        return true;
+      }
     }
   }
+}
+
+async function awaitIfSync(task, parallel) {
+  if (!parallel) await task;
+  return task;
 }
 
 /**
@@ -300,67 +330,94 @@ async function runTestem({
  * @returns {Promise<boolean | undefined>} true if some tests failed
  */
 async function test(suite, tests, options = {}) {
-  let failed = false;
+  fs.removeSync(testResultsPath);
+  fs.mkdirSync(testResultsPath, { recursive: true });
+
   await awaitBuild();
+
   const qunitEnv = {
-    QUNIT_DEBUG_VISUAL_TESTS: Number(options.debug),
-    QUNIT_RECREATE_VISUAL_REFS: Number(options.recreate),
+    DEBUG_VISUAL_TESTS: Number(options.debug),
+    RECREATE_VISUAL_REFS: Number(options.recreate),
+    LAUNCH_BROWSER: Number(options.launch || options.dev),
     QUNIT_FILTER: options.filter,
+    QUNIT_TIMEOUT: 15000,
   };
   const env = {
     ...process.env,
     TEST_FILES: (tests || []).join(','),
-    NODE_CMD: ['qunit', 'test/node_test_setup.js', 'test/lib']
+    NODE_CMD: [
+      options.coverage ? 'nyc --silent' : '',
+      'qunit',
+      'test/testSetup.node.js',
+      suite === 'visual' ? 'test/lib' : '',
+    ]
       .concat(tests || `test/${suite}`)
       .join(' '),
     VERBOSE: Number(options.verbose),
-    REPORT_FILE: options.out,
+    REPORT_DIR: path.resolve(options.out, suite),
   };
   const browserContexts = options.context.filter((c) => c !== 'node');
+  const tasks = [];
 
   // temporary revert
   // run node tests directly with qunit
   if (options.context.includes('node')) {
-    try {
-      cp.execSync(env.NODE_CMD, {
-        cwd: wd,
-        env: {
-          ...env,
-          // browser takes precendence in golden ref generation
-          ...(browserContexts.length === 0 ? qunitEnv : {}),
-        },
-        shell: true,
-        stdio: 'inherit',
+    fs.ensureDirSync(path.resolve(options.out, suite));
+    const processOptions = {
+      shell: true,
+      stdio: 'inherit',
+      env: {
+        ...env,
+        // browser takes precedence in golden ref generation
+        ...(browserContexts.length === 0 ? qunitEnv : {}),
+        REPORT_FILE: path.resolve(options.out, suite, 'node.txt'),
+      },
+    };
+    if (options.parallel) {
+      const task = new Promise((resolve) => {
+        cp.spawn('node', [path.resolve(__dirname, 'runNodeTest.mjs')], {
+          ...processOptions,
+          detached: true,
+        }).on('exit', (code) => {
+          logTestResults(options.out, 'node', suite);
+          resolve(code);
+        });
       });
-    } catch (error) {
-      failed = true;
+      tasks.push(task);
+    } else {
+      try {
+        cp.execSync(env.NODE_CMD, processOptions);
+      } catch (error) {
+        tasks.push(true);
+      }
     }
   }
 
   if (browserContexts.length > 0) {
-    failed =
-      (await runTestem({
-        ...options,
-        suite,
-        processOptions: {
-          cwd: wd,
-          env: {
-            ...env,
-            ...qunitEnv,
-          },
-          shell: true,
-          stdio: 'inherit',
+    const task = runTestem({
+      ...options,
+      suite,
+      processOptions: {
+        cwd: wd,
+        env: {
+          ...env,
+          ...qunitEnv,
         },
-        context: browserContexts,
-      })) || failed;
+        shell: true,
+        stdio: 'inherit',
+      },
+      context: browserContexts,
+    });
+
+    tasks.push(awaitIfSync(task, options.parallel));
   }
 
-  return failed;
+  return Promise.all(tasks).then((failed) => failed.some((status) => status));
 }
 
 /**
  *
- * @param {'unit'|'visual'} type correspondes to the test directories
+ * @param {'unit'|'visual'} type corresponds to the test directories
  * @returns
  */
 function listTestFiles(type) {
@@ -488,7 +545,7 @@ async function selectTestFile() {
   return filteredTests;
 }
 
-async function runIntreactiveTestSuite(options) {
+async function runInteractiveTestSuite(options) {
   //  some tests fail because of some pollution when run from the same context
   // test(_.map(await selectTestFile(), curr => `test/${curr.type}/${curr.file}`))
   const tests = _.reduce(
@@ -504,14 +561,87 @@ async function runIntreactiveTestSuite(options) {
     { unit: [], visual: [] }
   );
   return Promise.all(
-    _.map(tests, (files, suite) => {
-      if (files === true) {
-        return test(suite, null, options);
-      } else if (Array.isArray(files) && files.length > 0) {
-        return test(suite, files, options);
-      }
-    })
+    _.reduce(
+      tests,
+      (tasks, files, suite) => {
+        if (files === true) {
+          tasks.push(awaitIfSync(test(suite, null, options)));
+        } else if (Array.isArray(files) && files.length > 0) {
+          tasks.push(awaitIfSync(test(suite, files, options)));
+        }
+        return tasks;
+      },
+      []
+    )
   );
+}
+
+function buildVisualTestResultsIndex() {
+  const headers = ['actual', 'expected', 'diff'];
+  const visualResultsDir = path.resolve(testResultsPath, 'visual');
+  if (!fs.existsSync(visualResultsDir)) return;
+  fs.readdirSync(visualResultsDir).forEach((context) => {
+    const dir = path.resolve(visualResultsDir, context);
+    if (!fs.lstatSync(dir).isDirectory()) return;
+    const entries = [];
+    function recurse(dir) {
+      if (!fs.lstatSync(dir).isDirectory()) return;
+      else if (fs.existsSync(path.resolve(dir, 'info.json'))) {
+        entries.push(dir);
+      } else {
+        fs.readdirSync(dir).forEach((child) =>
+          recurse(path.resolve(dir, child))
+        );
+      }
+    }
+    recurse(dir);
+
+    const rows = [
+      `<thead style="position:sticky;top: 0;">${[
+        'test',
+        'file',
+        'status',
+        ...headers,
+      ]
+        .map((th) => `<th>${th}</th>`)
+        .join('')}</thead>`,
+      ...entries.map((testDir) => {
+        const { module, test, file, passing } = fs.readJSONSync(
+          path.resolve(testDir, 'info.json')
+        );
+        const content = [
+          `${module} / ${test}`,
+          file,
+          passing ? 'passing' : `<strong style="color:red">FAILING</strong>`,
+          ...headers.map(
+            (t) =>
+              `<img src="${path.relative(
+                dir,
+                path.resolve(testDir, `${t}.png`)
+              )}">`
+          ),
+        ]
+          .map((td) => `<td>${td}</td>`)
+          .join('\n');
+
+        return `<tr>${content}</tr>`;
+      }),
+    ];
+    fs.writeFileSync(
+      path.resolve(dir, 'index.html'),
+      `<html><head><style>
+table, td, th {
+  border: 1px solid;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+</style></head>
+<body><table>${rows.join('\n')}</table></body></html>`
+    );
+  });
 }
 
 program
@@ -569,24 +699,52 @@ program
     false
   )
   .option('-r, --recreate', 'recreate visual refs (golden images)', false)
-  .option('-v, --verbose', 'log passing tests', true)
-  .option('--no-verbose', 'disable verbose logging')
+  .option('-v, --verbose', 'log passing tests', !process.env.CI)
+  .option('-nv, --no-verbose', 'disable verbose logging')
   .option('-l, --launch', 'launch tests in the browser', false)
   .option('--dev', 'runs testem in `dev` mode, without a `ci` flag', false)
+  .option('-p, --parallel', 'runs tests in parallel', true)
+  .option('-np, --no-parallel', 'runs tests one after the other')
   .addOption(
     new commander.Option('-c, --context <context...>', 'context to test in')
       .choices(['node', 'chrome', 'firefox'])
       .default(['node'])
   )
   .option('-p, --port')
-  .option('-o, --out <out>', 'path to report test results to')
+  .option(
+    '-o, --out <out>',
+    'directory path to report test results to',
+    testResultsPath
+  )
   .option('--clear-cache', 'clear CLI test cache', false)
+  .option(
+    '-cov, --coverage',
+    'inspect coverage, currently supported on node only',
+    false
+  )
   .action(async (options) => {
     if (options.clearCache) {
       fs.removeSync(CLI_CACHE);
     }
     if (options.all) {
       options.suite = ['unit', 'visual'];
+    }
+    if ((options.recreate || options.debug) && options.context.length > 1) {
+      console.warn(
+        chalk.yellow(
+          `\n[CAUTION]: Using the recreate/debug option with multiple contexts (${options.context}) is not advised`,
+          `since it will recreate visual refs from the last run\n`
+        )
+      );
+    }
+    if (options.coverage && !options.context.includes('node')) {
+      console.error(chalk.red('Coverage reporting is available on node only.'));
+      console.info(
+        chalk.redBright(
+          'For available solutions see:\n`karma` as a replacement for `testem`\nOR https://github.com/testem/testem/tree/master/examples/coverage_istanbul\n'
+        )
+      );
+      process.exit(1);
     }
     const results = [];
     if (options.suite) {
@@ -606,8 +764,11 @@ program
         )
       );
     } else {
-      results.push(...(await runIntreactiveTestSuite(options)));
+      results.push(...(await runInteractiveTestSuite(options)));
     }
+
+    buildVisualTestResultsIndex();
+
     if (_.some(results)) {
       // inform ci that tests have failed
       process.exit(1);
