@@ -18,5 +18,5 @@ export function applyMixins<T extends TClass, S extends TClass>(
         );
     });
   });
-  return derivedCtor as T & S;
+  return derivedCtor;
 }
