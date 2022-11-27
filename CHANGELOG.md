@@ -3,6 +3,11 @@
 ## [next]
 
 - feat(minor): expose IText `getSelectionBounds` [#8453](https://github.com/fabricjs/fabric.js/pull/8453)
+- chore(TS): BaseBrush abstract methods [#8428](https://github.com/fabricjs/fabric.js/pull/8428)
+- feat(): Add `createObjectDefaultControls` and `createTextboxDefaultControls` to create copies of control sets. [#8415](https://github.com/fabricjs/fabric.js/pull/8415)
+- fix(PatternBrush): `getPatternSrc`, rm `getPatternSrcFunction` [#8468](https://github.com/fabricjs/fabric.js/pull/8468)
+- chore(TS): more FabricObject typing [#8405](https://github.com/fabricjs/fabric.js/pull/8405)
+- chore(TS): Observable types [#8431](https://github.com/fabricjs/fabric.js/pull/8431)
 - chore(TS): migrate Group/ActiveSelection [#8455](https://github.com/fabricjs/fabric.js/pull/8455)
 - fix(TS): migration error of itext key mixin (#8421) [#8457](https://github.com/fabricjs/fabric.js/pull/8457)
 - chore(TS): migrate text classes/mixins [#8421](https://github.com/fabricjs/fabric.js/pull/8421)
