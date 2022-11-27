@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { noop } from 'lodash';
 import { ObjectEvents } from '../EventTypeDefs';
 import { TDegree } from '../typedefs';
