@@ -17,12 +17,10 @@ import './src/mixins/canvas_grouping.mixin'; // optional interaction
 import './src/mixins/canvas_dataurl_exporter.mixin';
 import './src/mixins/canvas_serialization.mixin'; // optiona serialization
 import './src/mixins/canvas_gestures.mixin'; // optional gesturesv
-import './src/mixins/object_interactivity.mixin'; // optional interaction
-import './src/mixins/object_ancestry.mixin';
-import './src/mixins/object_stacking.mixin';
-import './src/mixins/object.svg_export';
-import './src/mixins/stateful.mixin';
-import './src/mixins/animation.mixin'; // optional animation
+import './src/mixins/stateful.mixin'; // will die soon
+import './src/mixins/canvas_animation.mixin'; // optional animation
+import './src/mixins/canvas_straightening.mixin'; // optional animation
+import './src/shapes/fabricObject.class';
 import './src/shapes/line.class';
 import './src/shapes/circle.class';
 import './src/shapes/triangle.class';

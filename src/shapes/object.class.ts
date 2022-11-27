@@ -3,6 +3,7 @@ import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { config } from '../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../constants';
+import { ObjectEvents } from '../EventTypeDefs';
 import { ObjectGeometry } from '../mixins/object_geometry.mixin';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
@@ -16,9 +17,6 @@ import { qrDecompose, transformPoint } from '../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
-import { Shadow } from '../__types__';
-import { Canvas, StaticCanvas } from '../__types__';
-import { ObjectEvents } from '../EventTypeDefs';
 import type { Group } from './group.class';
 
 // temporary hack for unfinished migration
