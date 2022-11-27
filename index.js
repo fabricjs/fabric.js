@@ -32,7 +32,6 @@ import './src/shapes/path.class';
 import './src/shapes/group.class';
 import './src/shapes/active_selection.class'; // optional interaction
 import './src/shapes/image.class';
-import './src/mixins/object_straightening.mixin'; // optional object straightening
 import './src/filters/WebGLProbe'; // optional image_filters
 import './src/filters/base_filter.class'; // optional image_filters
 import './src/filters/colormatrix_filter.class'; // optional image_filters
