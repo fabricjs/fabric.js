@@ -22,5 +22,6 @@ applyMixins(InteractiveFabricObject, [
 //     FabricObjectSVGExportMixin,FabricObjectObjectAnimationMixin {}
 
 export { InteractiveFabricObject as FabricObject };
+export { fabricObjectDefaultValues } from './object.class';
 
 fabric.Object = InteractiveFabricObject;

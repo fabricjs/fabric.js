@@ -47,7 +47,6 @@ export class Cache {
    * measurement and so wrong bounding boxes.
    * After the font cache is cleared, either change the textObject text content or call
    * initDimensions() to trigger a recalculation
-   * @memberOf fabric.util
    * @param {String} [fontFamily] font family to clear
    */
   clearFontCache(fontFamily?: string) {
@@ -62,7 +61,6 @@ export class Cache {
   /**
    * Given current aspect ratio, determines the max width and height that can
    * respect the total allowed area for the cache.
-   * @memberOf fabric.util
    * @param {number} ar aspect ratio
    * @return {number[]} Limited dimensions X and Y
    */
