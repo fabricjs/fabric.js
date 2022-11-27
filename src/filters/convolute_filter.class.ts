@@ -175,6 +175,10 @@ export class Convolute extends AbstractBaseFilter {
       matrix: [...this.matrix],
     };
   }
+
+  static async fromObject(object: any) {
+    return new Convolute(object);
+  }
 }
 
 export const convoluteDefaultValues: Partial<TClassProperties<Convolute>> = {

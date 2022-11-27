@@ -518,6 +518,10 @@ export class Resize extends BaseFilter {
       lanczosLobes: this.lanczosLobes,
     };
   }
+
+  static async fromObject(object: any) {
+    return new Resize(object);
+  }
 }
 
 export const resizeDefaultValues: Partial<TClassProperties<Resize>> = {

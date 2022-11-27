@@ -1,4 +1,3 @@
-import { extend } from 'lodash';
 import { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
 import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
@@ -75,9 +74,11 @@ export class Noise extends BaseFilter {
    * @return {Object} Object representation of an instance
    */
   toObject() {
-    return extend(super.toObject(), {
-      noise: this.noise,
-    });
+    return { ...super.toObject(), noise: this.noise };
+  }
+
+  static async fromObject(object: any) {
+    return new Noise(object);
   }
 }
 

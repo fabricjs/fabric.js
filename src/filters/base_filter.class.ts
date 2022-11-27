@@ -395,18 +395,6 @@ export abstract class AbstractBaseFilter {
     // delegate, not alias
     return this.toObject();
   }
-
-  /**
-   * Create filter instance from an object representation
-   * @static
-   * @param {Object} object Object to create an instance from
-   */
-  static fromObject(object: any) {
-    // todo: the class registry her
-    return Promise.resolve<AbstractBaseFilter>(
-      new Image.filters[object.type](object)
-    );
-  }
 }
 
 export abstract class BaseFilter extends AbstractBaseFilter {

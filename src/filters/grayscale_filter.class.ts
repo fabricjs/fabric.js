@@ -87,6 +87,10 @@ export class Grayscale extends AbstractBaseFilter {
   isNeutralState() {
     return false;
   }
+
+  static async fromObject(object: any) {
+    return new Grayscale(object);
+  }
 }
 
 export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {

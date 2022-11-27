@@ -126,6 +126,10 @@ export class ColorMatrix extends BaseFilter {
     gl.uniformMatrix4fv(uniformLocations.uColorMatrix, false, matrix);
     gl.uniform4fv(uniformLocations.uConstants, constants);
   }
+
+  static async fromObject(object: any) {
+    return new ColorMatrix(object);
+  }
 }
 
 export const colorMatrixDefaultValues: Partial<TClassProperties<ColorMatrix>> =

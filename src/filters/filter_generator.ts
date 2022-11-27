@@ -27,6 +27,10 @@ export function createColorMatrixFilter(key: string, matrix: number[]) {
      * Lock the colormatrix on the color part, skipping alpha
      */
     colorsOnly = true;
+
+    static async fromObject(object: any) {
+      return new GeneratedColorMatrix(object);
+    }
   };
 }
 

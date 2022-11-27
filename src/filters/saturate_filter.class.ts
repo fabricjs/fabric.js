@@ -68,6 +68,10 @@ export class Saturation extends BaseFilter {
   ) {
     gl.uniform1f(uniformLocations.uSaturation, -this.saturation);
   }
+
+  static async fromObject(object: any) {
+    return new Saturation(object);
+  }
 }
 
 export const saturationDefaultValues: Partial<TClassProperties<Saturation>> = {

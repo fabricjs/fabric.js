@@ -80,6 +80,10 @@ export class Invert extends BaseFilter {
     gl.uniform1i(uniformLocations.uInvert, Number(this.invert));
     gl.uniform1i(uniformLocations.uAlpha, Number(this.alpha));
   }
+
+  static async fromObject(object: any) {
+    return new Invert(object);
+  }
 }
 
 export const invertDefaultValues: Partial<TClassProperties<Invert>> = {

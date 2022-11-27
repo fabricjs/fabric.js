@@ -161,6 +161,10 @@ export class Blur extends BaseFilter {
     }
     return delta;
   }
+
+  static async fromObject(object: any) {
+    return new Blur(object);
+  }
 }
 
 export const blurDefaultValues: Partial<TClassProperties<Blur>> = {

@@ -78,6 +78,10 @@ export class Pixelate extends BaseFilter {
   ) {
     gl.uniform1f(uniformLocations.uBlocksize, this.blocksize);
   }
+
+  static async fromObject(object: any) {
+    return new Pixelate(object);
+  }
 }
 
 export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {

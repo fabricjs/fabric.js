@@ -95,6 +95,10 @@ export class Gamma extends BaseFilter {
   ) {
     gl.uniform3fv(uniformLocations.uGamma, this.gamma);
   }
+
+  static async fromObject(object: any) {
+    return new Gamma(object);
+  }
 }
 
 export const gammaDefaultValues: Partial<TClassProperties<Gamma>> = {

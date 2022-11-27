@@ -65,6 +65,10 @@ export class MyFilter extends BaseFilter {
   ) {
     gl.uniform1f(uniformLocations.uMyParameter, this.myParameter);
   }
+
+  static async fromObject(object: any) {
+    return new MyFilter(object);
+  }
 }
 
 export const myFilterDefaultValues: Partial<TClassProperties<MyFilter>> = {

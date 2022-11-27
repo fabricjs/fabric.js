@@ -212,6 +212,10 @@ export class BlendColor extends AbstractBaseFilter {
       alpha: this.alpha,
     };
   }
+
+  static async fromObject(object: any) {
+    return new BlendColor(object);
+  }
 }
 
 export const blendColorDefaultValues: Partial<TClassProperties<BlendColor>> = {

@@ -116,6 +116,10 @@ export class RemoveColor extends BaseFilter {
   toObject() {
     return { ...super.toObject(), color: this.color, distance: this.distance };
   }
+
+  static async fromObject(object: any) {
+    return new RemoveColor(object);
+  }
 }
 
 export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
