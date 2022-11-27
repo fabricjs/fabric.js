@@ -9,4 +9,5 @@ export { fabricObjectDefaultValues } from './object.class';
 (function (global) {
   const fabric = global.fabric;
   fabric.Object = InteractiveFabricObject;
+  // eslint-disable-next-line no-restricted-globals
 })(typeof exports !== 'undefined' ? exports : window);

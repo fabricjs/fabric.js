@@ -16,9 +16,13 @@ import { setStrokeFillOpacity } from './setStrokeFillOpacity';
  * @param {Array} attributes Array of attributes to parse
  * @return {Object} object containing parsed attributes' names/values
  */
-export function parseAttributes(element, attributes, svgUid?: string) {
+export function parseAttributes(
+  element,
+  attributes,
+  svgUid?: string
+): Record<string, any> {
   if (!element) {
-    return;
+    return {};
   }
 
   let value,
@@ -65,12 +69,10 @@ export function parseAttributes(element, attributes, svgUid?: string) {
     );
   }
 
-  let normalizedAttr,
-    normalizedValue,
-    normalizedStyle = {};
+  const normalizedStyle = {};
   for (const attr in ownAttributes) {
-    normalizedAttr = normalizeAttr(attr);
-    normalizedValue = normalizeValue(
+    const normalizedAttr = normalizeAttr(attr);
+    const normalizedValue = normalizeValue(
       normalizedAttr,
       ownAttributes[attr],
       parentAttributes,
@@ -81,7 +83,7 @@ export function parseAttributes(element, attributes, svgUid?: string) {
   if (normalizedStyle && normalizedStyle.font) {
     parseFontDeclaration(normalizedStyle.font, normalizedStyle);
   }
-  const mergedAttrs = Object.assign(parentAttributes, normalizedStyle);
+  const mergedAttrs = { ...parentAttributes, ...normalizedStyle };
   return svgValidParentsRegEx.test(element.nodeName)
     ? mergedAttrs
     : setStrokeFillOpacity(mergedAttrs);

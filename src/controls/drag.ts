@@ -1,4 +1,4 @@
-import { TransformActionHandler } from '../typedefs';
+import { TransformActionHandler } from '../EventTypeDefs';
 import { fireEvent } from '../util/fireEvent';
 import { commonEventInfo, isLocked } from './util';
 

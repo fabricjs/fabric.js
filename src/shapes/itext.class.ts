@@ -1,9 +1,24 @@
 // @ts-nocheck
 import { fabric } from '../../HEADER';
+import { ObjectEvents, TransformEvent } from '../EventTypeDefs';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import { TClassProperties, TFiller } from '../typedefs';
 import { stylesFromArray } from '../util/misc/textStyles';
 import { FabricObject } from './fabricObject.class';
+import {
+  keysMap,
+  keysMapRtl,
+  ctrlKeysMapDown,
+  ctrlKeysMapUp,
+} from '../mixins/itext_key_const';
+
+export type ITextEvents = ObjectEvents & {
+  'selection:changed': never;
+  changed: never;
+  tripleclick: TransformEvent;
+  'editing:entered': never;
+  'editing:exited': never;
+};
 
 /**
  * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
@@ -55,7 +70,7 @@ import { FabricObject } from './fabricObject.class';
  *   Select line:                    triple click
  * </pre>
  */
-export class IText extends ITextClickBehaviorMixin {
+export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number
@@ -647,6 +662,10 @@ export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
   _currentCursorOpacity: 1,
   _selectionDirection: null,
   inCompositionMode: false,
+  keysMap,
+  keysMapRtl,
+  ctrlKeysMapDown,
+  ctrlKeysMapUp,
 };
 
 Object.assign(IText.prototype, iTextDefaultValues);
