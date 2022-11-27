@@ -1,10 +1,9 @@
 //@ts-nocheck
-(function (global) {
-  'use strict';
+'use strict';
 
   var fabric = global.fabric || (global.fabric = {}),
     filters = fabric.Image.filters,
-    createClass = fabric.util.createClass;
+    createClass = createClass;
 
   var matrices = {
     Brownie: [
@@ -38,36 +37,42 @@
   };
 
   for (var key in matrices) {
-    filters[key] = createClass(
-      filters.ColorMatrix,
-      /** @lends fabric.Image.filters.Sepia.prototype */ {
-        /**
+    export class filters[key] extends filters.ColorMatrix {
+/**
          * Filter type
          * @param {String} type
          * @default
          */
-        type: key,
+type
 
-        /**
+/**
          * Colormatrix for the effect
          * array of 20 floats. Numbers in positions 4, 9, 14, 19 loose meaning
          * outside the -1, 1 range.
          * @param {Array} matrix array of 20 numbers.
          * @default
          */
-        matrix: matrices[key],
+matrix
 
-        /**
+/**
          * Lock the matrix export for this kind of static, parameter less filters.
          */
-        mainParameter: false,
-        /**
+mainParameter: boolean
+
+/**
          * Lock the colormatrix on the color part, skipping alpha
          */
-        colorsOnly: true,
-      }
-    );
+colorsOnly: boolean
+}
+
+export const filters[key]DefaultValues: Partial<TClassProperties<filters[key]>> = {
+type:key,
+matrix:matrices[key],
+mainParameter:false,
+colorsOnly:true
+};
+
+Object.assign(filters[key].prototype, filters[key]DefaultValues)
     fabric.Image.filters[key].fromObject =
       fabric.Image.filters.BaseFilter.fromObject;
   }
-})(typeof exports !== 'undefined' ? exports : window);
