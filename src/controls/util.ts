@@ -1,14 +1,13 @@
-import { resolveOrigin } from '../mixins/object_origin.mixin';
-import { Point } from '../point.class';
-import type { FabricObject } from '../shapes/fabricObject.class';
 import {
-  TOriginX,
-  TOriginY,
   TPointerEvent,
   Transform,
   TransformAction,
-  TransformEvent,
-} from '../typedefs';
+  BasicTransformEvent,
+} from '../EventTypeDefs';
+import { resolveOrigin } from '../mixins/object_origin.mixin';
+import { Point } from '../point.class';
+import type { FabricObject } from '../shapes/fabricObject.class';
+import { TOriginX, TOriginY } from '../typedefs';
 import {
   degreesToRadians,
   radiansToDegrees,
@@ -62,12 +61,10 @@ export const isLocked = (
     | 'lockScalingFlip'
 ) => target[lockingKey];
 
-export const commonEventInfo: TransformAction<Transform, TransformEvent> = (
-  eventData,
-  transform,
-  x,
-  y
-) => {
+export const commonEventInfo: TransformAction<
+  Transform,
+  BasicTransformEvent
+> = (eventData, transform, x, y) => {
   return {
     e: eventData,
     transform,

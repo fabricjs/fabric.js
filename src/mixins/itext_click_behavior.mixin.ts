@@ -1,11 +1,14 @@
 //@ts-nocheck
+import { ObjectEvents } from '../EventTypeDefs';
 import { IPoint, Point } from '../point.class';
 import { TPointerEvent, TransformEvent } from '../typedefs';
 import { stopEvent } from '../util/dom_event';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
 
-export abstract class ITextClickBehaviorMixin extends ITextKeyBehaviorMixin {
+export abstract class ITextClickBehaviorMixin<
+  EventSpec extends ObjectEvents
+> extends ITextKeyBehaviorMixin<EventSpec> {
   private __lastClickTime: number;
   private __lastLastClickTime: number;
   private __lastPointer: IPoint | Record<string, never>;
